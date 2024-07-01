@@ -115,10 +115,6 @@ Function init()
   'pauseAdAnimation helps for stopping the pause ad animation
   m.pauseAdAnimation = invalid
 
-  'this field holds the player state before the signUpSaveProgress button selected, which is used to set the player state
-  'state once the user back from the sign up process or sign up process completed.
-  m.stateForSignUpSaveProgress = ""
-
   m.top.observeFieldScoped("sendPendingPauseAdPixel", "onSendPendingPauseAdPixel")
   m.top.observeFieldScoped("pauseAdResponse", "onPauseAdResponse")
   m.pauseAdOverlayTimer = m.top.findNode("PauseAdOverlayTimer")
@@ -327,20 +323,8 @@ Function init()
 
   m.skipCuepointsButtonUpTranslation = 681
   m.skipCuepointsButtonDownTranslation = 780
-  m.signUpSaveProgressButtonYTranslation = 681
   m.thumbnailMaxYOffset = 825
   m.Transport.translation = [0,783]
-
-  m.signUpSaveProgressButton = m.top.findNode("signUpSaveProgressButton")
-  signUpSaveProgressContentNode = CreateObject("roSGNode", "DetailMenuItemContentNode")
-  signUpSaveProgressContentNode.title = getTranslation("registration_signup_button")
-  signUpSaveProgressContentNode.badgeText = getTranslation("registration_signup_button_free")
-  signUpSaveProgressContentNode.HDPosterUrl = "pkg:/images/icon-account.webp"
-  signUpSaveProgressContentNode.isUnfocusedFootprintEnabled = true
-  m.signUpSaveProgressButton.itemContent = signUpSaveProgressContentNode
-  m.signUpSaveProgressButton.translation = [87, m.signUpSaveProgressButtonYTranslation]
-  m.signUpSaveProgressButton.observeFieldScoped("buttonSelected", "onSignUpSaveProgressButtonSelected")
-  m.isSignUpSaveProgressInPlayerEnabled = getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_player_controls_v2", false).enabled
 
   setFocusToComponent(m.PlayPauseButton)
 
@@ -388,27 +372,6 @@ Function onScreenFocusChange()
         rafChild.setFocus(true)
       end if
     end if
-
-    if isNonEmptyString(m.stateForSignUpSaveProgress) = true
-      if m.top.isUserLoggedIn = true
-        hideSignUpSaveProgressButton()
-      end if
-
-      if m.stateForSignUpSaveProgress = "play"
-        resumeFromPause(false)
-        updateVideoState("play")
-      else
-        m.video.control = "pause"
-        updateVideoState("pause")
-      end if
-
-      updatePlayPauseUri()
-      setFocusToComponent(m.PlayPauseButton)
-
-      'resetting this field, once we set the player state when the user either back from signUp process or complete the
-      'signup process.
-      m.stateForSignUpSaveProgress = ""
-    end if
   end if
 End Function
 
@@ -431,14 +394,10 @@ End Function
 'control visibility, set the translation and focus
 Function showSkipCuepointsButton()
   tubiLog("videoPlayerScreen.showSkipCuepointsButton")
-  hideSignUpSaveProgressButton()
 
   xPosition = m.top.width - (m.skipCuepointsButton.boundingRect().width + 60)
 
   if m.HUD.opacity = 1
-    if m.signUpSaveProgressButton.hasFocus() = true
-      setFocusToComponent(m.PlayPauseButton)
-    end if
     m.skipCuepointsButton.translation = [xPosition, m.skipCuepointsButtonUpTranslation]
   else if m.HUD.opacity > 0
     setFocusToComponent(m.skipCuepointsButton, true)
@@ -474,12 +433,6 @@ Function autoHideSkipCuepointsButton()
   clearSkipCuepointsTimer()
   if m.HUD.opacity < 1
     hideSkipCuepointsButton(m.top)
-
-    if m.top.isTrailer = false AND m.top.appMode <> "KIDS_MODE" AND m.top.isUserLoggedIn = false AND getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_player_controls_v2").enabled = true
-      if m.skipCuepointsButton.visible = false
-        showSignUpSaveProgressButton()
-      end if
-    end if
   end if
 End Function
 
@@ -501,27 +454,10 @@ Function clearSkipCuepointsTimer()
 End Function
 
 
-'Make the SignupSaveProgress Button visible and based on transport
-'control visibility, set the translation and focus
-Function showSignUpSaveProgressButton()
-  tubiLog("videoPlayerScreen.showSignUpSaveProgressButton")
-  m.signUpSaveProgressButton.visible = true
-End Function
-
-
-Function hideSignUpSaveProgressButton()
-  m.signUpSaveProgressButton.visible = false
-End Function
-
-
 Function playContent()
   tubilog("VideoPlayer.playContent")
 
   if m.Video.content <> invalid
-
-    if m.top.isUserLoggedIn = true OR m.top.appMode = "KIDS_MODE" OR m.top.isTrailer = true
-      hideSignUpSaveProgressButton()
-    end if
 
     ' Always reset ad state when we first start playback.  Preroll fetch will populate midrolls list
     m.midrolls = {}
@@ -2298,30 +2234,6 @@ End Function
 Function onSeekToChange(msg)
   position = msg.getData()
   jumpToPosition(position)
-End Function
-
-
-Function onSignUpSaveProgressButtonSelected()
-  videoState = m.VideoState
-
-  if videoState = "play"
-    pauseVideo(false)
-  end if
-
-  m.top.trackingComponentInfo = {
-    componentType : "button_component"
-    componentValues : {
-      button_type: "TEXT"
-      button_value: "SIGNUP_TO_SAVE_PROGRESS"
-    }
-  }
-
-  'When SignUpSaveProgress button is selected and user will be taken to signIn/signUp process, we should hide/stop the pauseAd overlay/timer
-  hidePauseAdOverlay()
-  resetPauseAdOverlay()
-
-  m.stateForSignUpSaveProgress = videoState
-  m.top.signUpSaveProgressButtonSelected = true
 End Function
 
 

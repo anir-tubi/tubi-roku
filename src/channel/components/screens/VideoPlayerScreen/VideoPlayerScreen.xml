@@ -233,8 +233,6 @@
       <field id="subtitleTrackSettings" type="assocarray" value="{}" alias="closedCaptionAndAudioSelectionOverlay.subtitleTrackSettings" />
       <field id="audioTrackSettings" type="assocarray" value="{}" alias="closedCaptionAndAudioSelectionOverlay.audioTrackSettings" />
 
-      <!-- set to true when the user selects signUpSaveProgress button in the player -->
-      <field id="signUpSaveProgressButtonSelected" type="boolean" alwaysNotify="true" />
   </interface>
 
   <children>

@@ -1315,50 +1315,6 @@ Function AfterSignInPlayLockedContentWhileSkippingDetailScreen(params)
 End Function
 
 
-Function afterSignUpProcessCompletedFromPlayer()
-  tubilog("SignInHelpers.afterSignUpProcessCompletedFromPlayer")
-  setUiModeFromState()
-
-  '.popScreenAfterSignInProcess() will trigger the onScreenFocusChange() of videoPlayer screen and by that time
-  'isUserLoggedIn is still false and not hiding.This is to remove the signup save progres button after user signedIn.
-  videoPlayerScreen = getScreenFromStackById(m.constants.ui.screenIds.videoPlayerScreen)
-  if videoPlayerScreen <> invalid
-    videoPlayerScreen.isUserLoggedIn = true
-  end if
-
-  currentScreen = popScreenAfterSignInProcess()
-
-  if currentScreen <> invalid AND currentScreen.getSubtype() = "VideoPlayerScreen"
-    authInfo = getFieldFromGlobal("authInfo")
-    name = ""
-
-    if authInfo <> invalid
-      if isNonEmptyString(authInfo.firstName) = true AND isNonEmptyString(authInfo.lastName) = true
-        name = authInfo.firstName + " " + authInfo.lastName
-      else
-        name = authInfo.name
-      end if
-    end if
-
-    message = getTranslation("videoPlayer_toast_message")
-    headerText = getTranslation("videoPlayer_toast_heading", {"userName": name})
-
-    toastInfo = {
-      message: message
-      selfDestructTimer: 5
-      imageUri: "pkg:/images/Icon-sign-up.webp"
-      headerText: headerText
-    }
-
-    showToast(toastInfo, true)
-  end if
-
-  refreshAllDetailScreens()
-  setContentToRefreshAllPersonalizedScreens(true)
-  showHideSpinner(false)
-End Function
-
-
 Function afterSignInLikeDislikeLinear(channelInfo)
 
   if channelInfo <> invalid

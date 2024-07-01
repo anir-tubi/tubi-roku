@@ -22,13 +22,11 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       else if key = "fastforward"
         if m.FastForwardButton.enabled then
           handleFastForward()
-          hideSignUpSaveProgressButton()
         end if
 
       else if key = "rewind"
         if m.RewindButton.enabled then
           handleRewind()
-          hideSignUpSaveProgressButton()
         end if
 
       else if key = "replay"
@@ -55,7 +53,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           end if
         end if
 
-      else if key = "left" AND m.focusedNode.isSameNode(m.Related) = false AND m.focusedNode.isSameNode(m.signUpSaveProgressButton) = false
+      else if key = "left" AND m.focusedNode.isSameNode(m.Related) = false
         'video is in playback mode and user wants to skip back
         if m.HUD.opacity = 0 AND m.focusedNode.isSameNode(m.progressBar) = false AND isActiveVideoState(m.VideoState, m.Video)
           handleSkipVideo(-10)
@@ -79,7 +77,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           end if
         end if
 
-      else if key = "right" AND m.focusedNode.isSameNode(m.Related) = false AND m.focusedNode.isSameNode(m.signUpSaveProgressButton) = false
+      else if key = "right" AND m.focusedNode.isSameNode(m.Related) = false
         'video is in playback mode and user wants to skip ahead
         if m.HUD.opacity = 0 AND m.focusedNode.isSameNode(m.progressBar) = false AND isActiveVideoState(m.VideoState, m.Video)
           handleSkipVideo(10)
@@ -110,14 +108,12 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         else if m.TopOverlay.opacity = 0 AND m.focusedNode.isSameNode(m.Related) = false
           showTransport()
           showYMAL()
-        else if m.focusedNode.isSameNode(m.progressBar) = false AND m.skipCuepointsButton.hasFocus() = false AND m.signUpSaveProgressButton.hasFocus() = false
+        else if m.focusedNode.isSameNode(m.progressBar) = false AND m.skipCuepointsButton.hasFocus() = false
           setFocusToComponent(m.ProgressBar)
-        else if m.focusedNode.isSameNode(m.progressBar) = false AND m.signUpSaveProgressButton.hasFocus() = false
+        else if m.focusedNode.isSameNode(m.progressBar) = false
           setFocusToComponent(m.ProgressBar)
         else if m.focusedNode.isSameNode(m.progressBar) = true AND m.skipCuepointsButton <> invalid AND m.skipCuepointsButton.visible = true
           setFocusToComponent(m.skipCuepointsButton)
-        else if m.focusedNode.isSameNode(m.progressBar) = true AND m.signUpSaveProgressButton.visible = true
-          setFocusToComponent(m.signUpSaveProgressButton)
         else
           return false
         end if
@@ -129,8 +125,6 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         else if m.focusedNode.isSameNode(m.progressBar) = true
           setFocusToComponent(m.PlayPauseButton, true)
         else if m.skipCuepointsButton.hasFocus() = true
-          setFocusToComponent(m.ProgressBar)
-        else if m.signUpSaveProgressButton.hasFocus() = true
           setFocusToComponent(m.ProgressBar)
         else if isFocusOnPlayerControl() = true AND m.TopOverlay.opacity = 1
 
@@ -701,10 +695,6 @@ Function handleSkipVideo(amt)
     hideSkipCuepointsButton(m.top)
     clearSkipCuepointsTimer()
 
-    if m.top.isUserLoggedIn = false AND m.isSignUpSaveProgressInPlayerEnabled = true
-      hideSignUpSaveProgressButton()
-    end if
-
     if m.VideoState <> "rew" AND m.VideoState <> "ffw"
       playProgressEvent = getPlayProgressEvent("handleSkipVideo")
       if playProgressEvent <> invalid
@@ -1075,8 +1065,6 @@ Function isFocusable(component)
 
   if component.isSameNode(m.skipCuepointsButton) = true
     focusable = true
-  else if component.isSameNode(m.signUpSaveProgressButton) = true
-      focusable = true
   else if component.isSameNode(m.Related) = true
     focusable = true
   else if component.isSameNode(m.UpNext) = true
@@ -1100,10 +1088,6 @@ Function removeFocusForAllChildComponents()
   'setting all child component's focus to false
   if m.skipCuepointsButton.isInFocusChain() = true
     m.skipCuepointsButton.setFocus(false)
-  end if
-
-  if m.signUpSaveProgressButton.isInFocusChain() = true
-    m.signUpSaveProgressButton.setFocus(false)
   end if
 
   if m.Related.isInFocusChain() = true
@@ -1199,13 +1183,6 @@ End Function
 Function animateTransport(direction)
   tubiLog("VideoTransportHandling.AnimateTransport, direction = " + direction)
   handleSkipCuepointsButtonOnAnimateTransport(direction)
-
-  if m.top.isTrailer = false AND direction = "in" AND m.VideoState <> "skip" AND m.top.appMode <> "KIDS_MODE" AND m.top.isUserLoggedIn = false AND getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_player_controls_v2").enabled = true
-    m.Thumbnail.visible = false
-    if m.skipCuepointsButton.visible = false
-      showSignUpSaveProgressButton()
-    end if
-  end if
 
   if direction = "in" AND m.ratingOverlay.opacity = 1.0
     hideRatingGradient()
@@ -1635,10 +1612,6 @@ Function animateTransportAndYMAL(direction)
   if direction = "in"
     m.Thumbnail.visible = false
 
-    if m.top.isUserLoggedIn = false AND m.isSignUpSaveProgressInPlayerEnabled = true
-      fade(m.signUpSaveProgressButton, "out", 0.6)
-    end if
-
     handleSkipCuepointsButtonOnAnimateTransport("out")
     fade(m.TopOverlay, "out", 0.4)
     fade(m.TransportButtons, "out", 0.4)
@@ -1650,8 +1623,6 @@ Function animateTransportAndYMAL(direction)
   else
     if m.skipCuepointsButtonTimer <> invalid
       showSkipCuepointsButton()
-    else if m.top.isUserLoggedIn = false AND m.isSignUpSaveProgressInPlayerEnabled = true
-      fade(m.signUpSaveProgressButton, "in", 0.6)
     end if
 
     if m.VideoState = "ffw" or m.VideoState = "rew"
@@ -1719,10 +1690,6 @@ Function hideYMAL(showSignUpButton = true)
 
     if m.skipCuepointsButtonTimer <> invalid
       showSkipCuepointsButton()
-    else if m.top.isTrailer = false AND m.top.appMode <> "KIDS_MODE" AND m.top.isUserLoggedIn = false AND showSignUpButton = true AND getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_player_controls_v2").enabled = true
-      if m.skipCuepointsButton.visible = false
-        showSignUpSaveProgressButton()
-      end if
     end if
   end if
 End Function

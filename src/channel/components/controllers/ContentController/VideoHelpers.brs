@@ -108,10 +108,6 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
     initVideoTracking(videoPlayer) 'initializeYoubora
     setInScreenCache(videoPlayer)
 
-    if getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_player_controls_v2", false).enabled = true
-      videoPlayer.observeFieldScoped("signUpSaveProgressButtonSelected", "onSignUpSaveProgressButtonSelected")
-    end if
-
     if getExperimentResource("roku_screensaver", "roku_screensaver_v2", false).enabled = true then
       videoPlayer.disableScreensaver = true
     end if
@@ -1645,26 +1641,4 @@ Function onRokuContinueWatchingConsentDialogAcceptSelected()
   body = {}
   body[m.constants.consentKeys.continueWatching] = "opted_in"
   setConsent(body)
-End Function
-
-
-Function onSignUpSaveProgressButtonSelected(msg)
-  tubiLog("VideoHelpers.onSignUpSaveProgressButtonSelected")
-
-  videoPlayer = msg.getRoSGNode()
-  if videoPlayer <> invalid
-    videoPlayerComponentInfo = videoPlayer.trackingComponentInfo
-
-    pageOneof = m.Tracking.getAnalyticsPage(videoPlayer.trackingPageInfo.pageType, videoPlayer.trackingPageInfo.pageValues)
-    componentOneof = m.Tracking.getAnalyticsComponent(videoPlayerComponentInfo.componentType, videoPlayerComponentInfo.componentValues)
-
-    componentInteractionInfo = {
-      pageOneof: pageOneof
-      componentOneof: componentOneof
-      user_interaction: "CONFIRM"
-    }
-    sendComponentInteractionInfo(componentInteractionInfo)
-
-    startSignIn(afterSignUpProcessCompletedFromPlayer)
-  end if
 End Function
