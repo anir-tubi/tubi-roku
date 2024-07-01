@@ -1897,6 +1897,15 @@ Function onCustomSuspend(msg)
       end if
     end if
 
+    ' If any of the one trust screens were open we are force closing them.
+    ' We have 2 OT Screens OTBanner(Initial Consent Screen) and OTPreferenceCenter which is opened when users clicks view privacy settings from settings screen.
+    ' If the OTBanner screen was open then we do not have any Tubi Screens opened yet and currentScreen will be invalid which will result in application restart as a part of logic inside onCustomResume method. 
+    ' If OTPreferenceCenter was open that means user is in Settings Screen and Settings screen has instantResumeAction: "startChannel" which will cause the focus to be reset to home by logic below.
+    oneTrustViews = m.top.findNode("OneTrustViews")
+    if oneTrustViews <> invalid
+      m.NodeHelpers.removeAllChildren(oneTrustViews)
+    end if
+
     ' When resuming from suspending the app, Roku force restores the currFocus row back to the state that existed at the time of suspending the app.
     ' This force restore happens after we set the focus appropriately using jumpToItem which rendering our jumpToItem action useless.
     ' To work around this firmware behavior, we set the focus to the home menu item at the time of suspend so that when the app resumes, the Roku behavior will focus the correct side nav menu item. (Refreshing of home screen content will happen during resume that is inside onCustomResume method.)
