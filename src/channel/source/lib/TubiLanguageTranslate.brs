@@ -4975,30 +4975,6 @@ Function getTranslation_en_GB()
       "description": "header text to be displayed on Toast-message when user unfavorites a linear channel",
       "message": "Removed from Favourites"
     },
-    "dialog_moviesDisabled_title": {
-      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav movies menu item but the item has been disabled",
-      "message": "Films disabled"
-    },
-    "screenSearch_defaultLinearSearch": {
-      "description": "Directions on the search page",
-      "message": "Search for films, TV shows, Live TV, and people"
-    },
-    "screenDetails_error_addQueueMovie_description": {
-      "description": "Description of the warning dialog when user is attempting to add a movie to their list but are not signed in",
-      "message": "Sign in or register for a Tubi account to add this film to your list."
-    },
-    "screenDetails_error_queueMovie_description": {
-      "description": "Error message when a movie is not added to the user's list.",
-      "message": "We’re not sure what happened but something went wrong when trying to add this film to your list."
-    },
-    "screenDetails_error_noQueueMovie_description": {
-      "description": "Error message when a movie is not removed from the user's list.",
-      "message": "We’re not sure what happened but something went wrong when trying to remove this film from your list."
-    },
-    "screenSettings_signIn_description": {
-      "description": "Directions for the signin page",
-      "message": "Sign in to your Tubi account on your computer or phone to see your saved TV shows and films on My List, continue watching where you left off and get personal recommendations synced across your phone, television, tablet or computer."
-    },
     "screenSettings_about_description": {
       "description": "The description on the about screen",
       "message": "Tubi is the leading free, premium, video streaming app. We have a large and diverse library of content with many thousands of titles and 3x fewer adverts than other TV services."
@@ -5019,10 +4995,6 @@ Function getTranslation_en_GB()
       "description": "Description of message to let users know that they must be signed in to change the AutoplayPreview choice.",
       "message": "You must be signed in to change Auto-play Preview preferences."
     },
-    "screenMovies_error_fetchScreenContent_description": {
-      "description": "Onscreen message to indicate movies content could not be loaded",
-      "message": "Unable to load the Tubi Films screen."
-    },
     "short_version_date_format_6": {
       "description": "Shortened version of date format for the month of June",
       "message": "June {day}, {year}"
@@ -5039,10 +5011,6 @@ Function getTranslation_en_GB()
       "description": "The subtitle of the MyStuff Screen for the guest user.",
       "message": "Find your favourites fast, pick up where you left off–all in one place."
     },
-    "screenMyStuff_allEmptyUISubtitle": {
-      "description": "The subtitle of the MyStuff Screen for the guest user.",
-      "message": "Use the bookmark button to save series and films to your My List."
-    },
     "screenAgeVerification_network_issue": {
       "description": "An error message shown to users when they submit their birthdate, but there is an unexpected server or network error",
       "message": "Could not successfully send your date of birth to our servers."
@@ -5050,10 +5018,6 @@ Function getTranslation_en_GB()
     "metadata_myStuff_empty_myList_description": {
       "description": "For an empty MyList container, this is the description/subtitle that is display in the empty container",
       "message": "Use the bookmark button to save favourite series and movies. They’ll show up here."
-    },
-    "metadata_myStuff_empty_continueWatching_description": {
-      "description": "For an empty continueWatching container, this is the description/subtitle that is display in the empty container",
-      "message": "Films and series you haven’t finished will show up here."
     },
     "metadata_continueWatching_notSignedIn_description": {
       "description": "tells non registered user what they need to do to see the continue watching container",
@@ -5071,18 +5035,9 @@ Function getTranslation_en_GB()
       "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
       "message": "Adverts start in {seconds} s"
     },
-    "channel_name": {
-      "description": "This is the name of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
-      "message": "Tubi - Free Films & TV"
-    },
-    "channel_description": {
-      "description": "This is the description of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
-      "message": "Enjoy the largest library of popular films and TV shows, all for free!",
-      "note": "This translation is used for channelStore, please double check that it is not needed before deleting"
-    },
     "channel_webDescription": {
       "description": "This is the description of the app. This is not located in the app. It is displayed to the user in the Roku Web Channel Store",
-      "message": "Watch thousands of hit films and TV series for free. Tubi is 100% legal unlimited streaming, with no credit cards and no subscription required. Choose what you want to watch, when you want to watch it, with fewer adverts than other TV services. Tubi is the largest free streaming service featuring award-winning films and TV series. There is something for everybody; from comedy to drama, kids to classics, and niche favourites such as Korean dramas, anime, and British series. Download now and start streaming entertainment for free, today!",
+      "message": "Watch thousands of hit movies and TV series for free. Tubi is 100% legal unlimited streaming, with no credit cards and no subscription required. Choose what you want to watch, when you want to watch it, with fewer adverts than other TV services. Tubi is the largest free streaming service featuring award-winning films and TV series. There is something for everybody; from comedy to drama, kids to classics, and niche favourites such as Korean dramas, anime, and British series. Download now and start streaming entertainment for free, today!",
       "note": "This translation is used for channelStore, please double check that it is not needed before deleting"
     },
     "dialog_whoops_title": {
