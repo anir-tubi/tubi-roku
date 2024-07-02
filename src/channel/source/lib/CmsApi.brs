@@ -56,7 +56,7 @@ Function cmsApi_createRelatedContentReqInfo(contentId, bKidsMode = false)
   options.params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
   options.params = m.setTupianPosterParam(options.params)
 
-  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_cuepoint_accuracy", "roku_cuepoint_accuracy_related_content_v2").enabled = true
+  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_related_cuepoint", "roku_related_cuepoint_v1").enabled = true
     url = m.constants.urls.autopilot.relatedContent
     options.params["content_id"] = contentId
   else
@@ -72,7 +72,7 @@ End Function
 
 ' @passedOptions: assocArray, options to be added to the request object as created by Request().createAsync()
 Function cmsApi_createUpNextContentReqInfo(passedOptions)
-  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_cuepoint_accuracy", "roku_cuepoint_accuracy_autoplay_v2").enabled = true
+  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_autoplay_cuepoint", "roku_autoplay_cuepoint_v1").enabled = true
     url = m.constants.urls.autopilot.upNextContentV3
   else
     url = m.constants.urls.autopilot.upNextContent

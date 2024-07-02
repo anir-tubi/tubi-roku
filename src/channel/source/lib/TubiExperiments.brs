@@ -76,9 +76,15 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_cuepoint_accuracy: {
-        roku_cuepoint_accuracy_content_v2 : {"enabled": false}
-        roku_cuepoint_accuracy_related_content_v2 : {"enabled": false}
-        roku_cuepoint_accuracy_autoplay_v2 : {"enabled": false}
+        roku_cuepoint_accuracy_content_v2 : {"enabled": true}
+      }
+
+      roku_related_cuepoint: {
+        roku_related_cuepoint_v1 : {"enabled": false}
+      }
+
+      roku_autoplay_cuepoint: {
+        roku_autoplay_cuepoint_v1 : {"enabled": false}
       }
 
     }
