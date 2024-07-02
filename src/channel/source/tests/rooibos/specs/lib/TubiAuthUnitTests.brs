@@ -386,6 +386,8 @@ End Function
 Function tubiAuth_requestTokenTransfer_test()
   auth = m.auth
   auth.constants.urls.userDevice.transferToken = "http://127.0.0.1:65535/"
+  deviceId = m.constants.deviceInfo.deviceAdId
+  transferTokenUrl =  auth.constants.urls.userDevice.transferToken + "?idfa=" + deviceId
   externalAuthInfo = {
     platform: "iphone"
     externalDeviceId: "Some555Other666String777"
@@ -399,7 +401,7 @@ Function tubiAuth_requestTokenTransfer_test()
   m.assertNotInvalid(authRequest)
   m.assertNotInvalid(authRequest.isHttps)
   m.assertNotInvalid(authRequest.url)
-  m.assertEqual(authRequest.url, auth.constants.urls.userDevice.transferToken)
+  m.assertEqual(authRequest.url, transferTokenUrl)
   m.assertNotInvalid(authRequest.method)
   m.assertEqual(authRequest.method, "POST")
 End Function

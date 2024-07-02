@@ -1020,6 +1020,12 @@ Function tubiAuth_requestTokenTransfer(externalAuthInfo, port)
     retries: 0
   }
 
+  params = {}
+  'passing device advertiser id to tokenTransfer request.
+  params["idfa"] = m.constants.deviceInfo.deviceAdId
+
+  reqOptions["params"] = params
+
   newTokenReq = m.request.createAsync(m.constants.urls.userDevice.transferToken, "getRefreshTokenFromTransfer", reqOptions)
   reqSent = newTokenReq.start(port)
 
