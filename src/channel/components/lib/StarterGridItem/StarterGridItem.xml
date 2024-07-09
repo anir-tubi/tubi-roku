@@ -16,6 +16,7 @@
     <field id="focusPercent" type="float" />
     <field id="width" alias="poster.width" />
     <field id="height" alias="poster.height" />
+    <field id="index" type="integer" />
   </interface>
 
   <children>

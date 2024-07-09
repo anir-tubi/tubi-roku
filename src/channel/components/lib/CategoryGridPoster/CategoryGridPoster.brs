@@ -198,6 +198,7 @@ End Function
 
 
 Function onItemFocusPercentChange()
+
   if m.top.itemContent <> invalid AND m.top.itemContent.needsLogin = true
     if m.lockIcon <> invalid then m.lockIcon.opacity = m.top.focusPercent
   end if

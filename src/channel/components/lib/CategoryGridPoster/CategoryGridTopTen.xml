@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="CategoryGridTopTen" extends="Group" >
+  <script type="text/brightscript" uri="CategoryGridTopTen.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+
+  <interface>
+    <field id="width" alias="Poster.width" />
+    <field id="height" alias="Poster.height" />
+    <field id="index" type="integer" />
+    <field id="focusPercent" type="float" />
+    <field id="itemContent" type="node" />
+    <field id="itemHasFocus" type="boolean" />
+  </interface>
+
+  <children>
+    <Poster
+      id="topTenNumbers"
+      translation="[-256,0]"
+      width="244"/>
+
+      <Poster
+      id="bgTopTenNumbers"
+      opacity="0.0"
+      translation="[-256,0]"
+      width="244"/>
+
+    <Poster
+      translation="[0,0]"
+      id="Poster"/>
+
+  </children>
+</component>

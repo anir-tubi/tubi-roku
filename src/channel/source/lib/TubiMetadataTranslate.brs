@@ -87,7 +87,7 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
     gridType = gridItemTypes.portrait
   end if
 
-  if gridType = gridItemTypes.portrait
+  if gridType = gridItemTypes.portrait OR gridType = gridItemTypes.portraitTopTen
     if canvasImages <> invalid AND type(canvasImages.poster_tb) = "roArray" AND isNonEmptyString(canvasImages.poster_tb[0]) = true
       '//A custom portrait size was requested, use this image instead of the default image
       sThumbnailURL = canvasImages.poster_tb[0]
@@ -1828,6 +1828,8 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
     gridItemType = gridItemTypes.landscapeNoTitle
   else if orientation = gridItemTypes.landscapeInnerMetadata
     gridItemType = gridItemTypes.landscapeInnerMetadata
+  else if container.id = constants.ui.categoryIds.topTenSeries
+    gridItemType = gridItemTypes.portraitTopTen
   end if
 
   return gridItemType

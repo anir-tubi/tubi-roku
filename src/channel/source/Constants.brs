@@ -1057,6 +1057,7 @@ Function getConstants()
       constants.ui.categoryIds.seriesSpotlight = "series_spotlight"
       constants.ui.categoryIds.favorites = "temp_linear_favorites"
       constants.ui.categoryIds.topSearched = "top_searched"
+      constants.ui.categoryIds.topTenSeries = "top_10_tv_shows_on_tubi"
 
     constants.ui.categoryTypes = {}
       'these map to tensor api container types
@@ -1342,6 +1343,7 @@ Function getConstants()
       constants.ui.gridItemTypes.emptyContainer = "emptyContainer"
       constants.ui.gridItemTypes.portraitGenre = "portrait_genre"
       constants.ui.gridItemTypes.landscapeGenre = "landscape_genre"
+      constants.ui.gridItemTypes.portraitTopTen = "portraitTopTen"
 
     constants.ui.uris = {}
 

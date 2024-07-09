@@ -10,6 +10,7 @@ Function init()
     "focusPercent"
     "width"
     "height"
+    "index"
   ]
 
 End Function
@@ -31,6 +32,8 @@ Function onItemContentChange(msg)
       childGridItemComponent = "CategoryGridPoster"
     else if gridItemType = "linear" then 'For any linear content use CategoryGridPoster to add badges/progress bar etc
       childGridItemComponent = "CategoryGridLinearPoster"
+    else if gridItemType = "portraitTopTen"
+      childGridItemComponent = "CategoryGridTopTen" 'make sure this check before itemContent.needsLogin check
     else if itemContent.type = "linear" then
       row = itemContent.getParent()
       if row <> invalid AND row.gridItemType = "landscapeNoTitle" OR row.gridItemType = "landscape" then
@@ -40,7 +43,7 @@ Function onItemContentChange(msg)
       childGridItemComponent = "CategoryGridPoster"
     else
       row = itemContent.getParent()
-      if row <> invalid AND row.id = "continue_watching" then
+      if row <> invalid AND row.id = "continue_watching"
         childGridItemComponent = "CategoryGridPoster"
       end if
     end if

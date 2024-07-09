@@ -260,6 +260,8 @@ Function setRowHeights()
   'determine the height of each row in the RowList so we can set it on RowList.rowItemSize
   rowItemSize = []
   rowHeights = []
+  rowItemSpacings = []
+  focusXOffsets = []
   numRows = 2
   posterSize = m.constants.ui.imageSizes.largePoster
   landscapeSize = m.constants.ui.imageSizes.largeLandscape
@@ -275,6 +277,8 @@ Function setRowHeights()
       posterHeight = posterSize[1]
       rowItemSize.push([1693, posterHeight])
       rowHeight = posterHeight
+      rowItemSpacings.push([15, 0])
+      focusXOffsets.push(0)
     else if gridItemType = gridItemTypes.portraitGenre
       ' Setting numrows to 3 if we have portrait genre because of bug in arraygrid whenever any row is of a larger height than the first row it
       ' causes issues with peeking. Setting numrows to 3 increase the clipping rect which works as a work around for our bug.
@@ -282,16 +286,30 @@ Function setRowHeights()
       genrePortraitItemSize = m.constants.ui.imageSizes.genrePortrait
       rowItemSize.push([genrePortraitItemSize[0], genrePortraitItemSize[1]])
       rowHeight = genrePortraitItemSize[1]
+      rowItemSpacings.push([15, 0])
+      focusXOffsets.push(0)
     else if gridItemType = gridItemTypes.landscapeGenre
       numRows = 3
       genreLandscapeItemSize = m.constants.ui.imageSizes.largeLandscape
       rowItemSize.push([genreLandscapeItemSize[0], genreLandscapeItemSize[1]])
       rowHeight = genreLandscapeItemSize[1]
+      rowItemSpacings.push([15, 0])
+      focusXOffsets.push(0)
     else if gridItemType = gridItemTypes.portrait
       posterWidth = posterSize[0]
       posterHeight = posterSize[1]
       rowItemSize.push([posterWidth, posterHeight])
       rowHeight = posterHeight
+      rowItemSpacings.push([15, 0])
+      focusXOffsets.push(0)
+    else if gridItemType = gridItemTypes.portraitTopTen
+      posterWidth = posterSize[0]
+      posterHeight = posterSize[1]
+      rowItemSize.push([posterWidth, posterHeight])
+      rowHeight = posterHeight
+      rowItemSpacings.push([243, 0])
+      'push the focus indicator to the right so it doesn't cover the top ten label
+      focusXOffsets.push(243)
     else if gridItemType = gridItemTypes.landscape OR gridItemType = gridItemTypes.landscapeNoTitle OR gridItemType = gridItemTypes.linear
       posterWidth = landscapeSize[0]
       posterHeight = landscapeSize[1]
@@ -300,6 +318,8 @@ Function setRowHeights()
       end if
       rowItemSize.push([posterWidth, posterHeight])
       rowHeight = posterHeight
+      rowItemSpacings.push([15, 0])
+      focusXOffsets.push(0)
     end if
 
     if category.sponsorImages <> invalid
@@ -318,6 +338,8 @@ Function setRowHeights()
     "rowHeights": rowHeights
     "showRowLabel": [true]
     "numRows": numRows
+    "rowItemSpacing": rowItemSpacings
+    "focusXOffset" : focusXOffsets
   })
   m.RowList.content = m.top.content
 End Function
