@@ -234,10 +234,10 @@ const PlayBack = ({ content }) => {
 
 	function allNaN(arr: number[]): boolean {
 		if (arr.length < 7000) {
-			return false
+			return false;
 		}
-		return arr.every(num => isNaN(num));
-  }
+		return arr.every((num) => isNaN(num));
+	}
 
 	async function seekToAutoplay() {
 		await clickOnSkipIntroIfPresent();
@@ -303,7 +303,7 @@ const PlayBack = ({ content }) => {
 				} else {
 					countDownAutoplay = await elements.countDownAutoplay();
 				}
-				const text = countDownAutoplay.text
+				const text = countDownAutoplay.text;
 				const [start, inn, space, seconds] = countDownAutoplay.text.split(' ');
 				if (content.mode === 'series' || content.type === 's') {
 					if (
@@ -392,6 +392,7 @@ const PlayBack = ({ content }) => {
 		await titleDetailsPage.pageDidLoad();
 		return titleDetailsPage;
 	}
+
 
 	return {
 		pageDidLoad,

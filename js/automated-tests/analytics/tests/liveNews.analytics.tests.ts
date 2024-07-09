@@ -45,7 +45,7 @@ describe('Live News Events', function () {
 		await homePage.navigateToLiveNews();
 		const liveNews = LiveNews();
 		await liveNews.checkIfLiveNewsShown();
-		await liveNews.waitUntilCountDownAppears();
+		await liveNews.waitWhenGoFullScreen();
 		await verifyC118162();
 	});
 	it('A "fullscreen_toggle" beacon should be sent when the video exits fullscreen C118175 \

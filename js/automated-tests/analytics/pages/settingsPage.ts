@@ -39,6 +39,7 @@ const Settings = () => {
 
 	async function signOut() {
 		await moveToRow(ui.row - settingsTabs.signOut.row);
+		await ecp.sendKeypress(ecp.Key.Ok, { wait: 3000 });
 		await ecp.sendKeypress(ecp.Key.Ok);
 	}
 

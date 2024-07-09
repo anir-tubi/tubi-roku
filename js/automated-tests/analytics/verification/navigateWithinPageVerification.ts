@@ -456,6 +456,61 @@ export async function verifyC425233(titleId) {
 	);
 }
 
+export async function verifyC524595() {
+	let navigateWithinPage;
+	let i = 1;
+	while (navigateWithinPage === undefined && i < 16) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.navigate_within_page,
+			25 + i
+		);
+		navigateWithinPage = pulletEvents.find(
+			(event) =>
+				event.navigate_within_page.middle_nav_component &&
+				event.navigate_within_page.middle_nav_component.middle_nav_section &&
+				event.navigate_within_page.middle_nav_component.middle_nav_section ===
+					MidleNavComponents.watchTrailer
+		);
+		i++;
+	}
+	expect(
+		navigateWithinPage.navigate_within_page.dest_middle_nav_component
+			.middle_nav_section
+	).equal(
+		MidleNavComponents.addToMyList,
+		`event should contain navigateWithinPage.navigate_within_page.dest_middle_nav_component.middle_nav_sectionn===START_FROM_BEGINNING \n
+	${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(navigateWithinPage.navigate_within_page.horizontal_location).equal(
+		1,
+		`event should contain navigateWithinPage.navigate_within_page.horizontal_location===1 \n
+	${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(navigateWithinPage.navigate_within_page.means_of_navigation).equal(
+		'SCROLL',
+		`event should contain navigateWithinPage.navigate_within_page.means_of_navigation===SCROLL \n
+	${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(
+		navigateWithinPage.navigate_within_page.middle_nav_component
+			.middle_nav_section
+	).equal(
+		MidleNavComponents.watchTrailer,
+		`event should contain navigateWithinPage.navigate_within_page.middle_nav_component.middle_nav_sectionn===WATCH_TRAILER \n
+	${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(navigateWithinPage.navigate_within_page.vertical_location).to.match(
+		/\d/,
+		`event should contain navigateWithinPage.navigate_within_page.vertical_location===2 \n
+	${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(navigateWithinPage.navigate_within_page.video_page.video_id).equal(
+		parseInt(titleId),
+		`event should contain navigateWithinPage.navigate_within_page.video_page===${titleId} \n
+	${JSON.stringify(navigateWithinPage)} \n`
+	);
+}
+
 export async function verifyC425236(titleId) {
 	let navigateWithinPage;
 	let i = 1;

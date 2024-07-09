@@ -1163,8 +1163,11 @@ const elements = typeCheckElements({
 
   /** Live Icon */
   liveIcon: {
-    keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#liveBadgeHeader.#BadgeBackground',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#RowList.2.items.0.1.#badgeGroup',
+  },
+
+  loadingSpinnerLinear: {
+    keyPath:'#ContentController.#uiGroup.#LinearVideoPlayerSpinner.#PosterOrMessage.#SpinnerPoster',
   },
 
   liveBadgeText: {
@@ -1504,10 +1507,9 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#ResultArea.#NoResultsMessage',
   },
 
-  /** counter text for live preview */
-  countDownText: {
-    keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#PlayerCountdownGroup.#CountdownText',
+  /** text for liniear to expire 1 hour 27 mins left as example */
+  linearExpirationTimeText: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#ExpireWarning',
   },
 
   /** closed caption audio button */

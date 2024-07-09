@@ -19,6 +19,7 @@ import {
 	verifyC425233,
 	verifyC268959,
 	verifyC268957WithinPage,
+	verifyC524595
 } from '../verification/navigateWithinPageVerification';
 import {
 	verifyC268956ComponentInteraction,
@@ -164,4 +165,5 @@ describe('Navigate Within Page', function () {
 		await verifyC268959();
 		await verifyC268957WithinPage();
 	});
+
 });

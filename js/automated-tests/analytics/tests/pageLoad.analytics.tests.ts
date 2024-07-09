@@ -44,7 +44,7 @@ describe('Page Load Analytics', function () {
 		await verifyC21254PlayerLoad(titleId);
 	});
 
-	it('When browse is loaded then first key is ""categoryListPage"" in the logs C543703 and Page Load - When category container is loaded then first key is ""categoryPage"" with categorySlug C543704 and HomePage to CategoryPage by CategoryComponent C543705 and C21260 and C76712 and C76713 and C76714 and C3857 and C3858 and C3860 @analyticsASet3,@analyticsPageLoad,@debug', async () => {
+	it('When browse is loaded then first key is ""categoryListPage"" in the logs C543703 and Page Load - When category container is loaded then first key is ""categoryPage"" with categorySlug C543704 and HomePage to CategoryPage by CategoryComponent C543705 and C21260 and C76712 and C76713 and C76714 and C3857 and C3858 and C3860 @analyticsASet3,@analyticsPageLoad', async () => {
 		const homePage = HomePage();
 		const categories = await homePage.selectSideNavTab(tabs.categories,7);
 		const container = await categories.selectCategoryByName('action');

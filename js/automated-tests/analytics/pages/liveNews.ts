@@ -16,8 +16,10 @@ const LiveNews = () => {
 			await testUtils.getNodeForElement(LINEAR_NODES.LIVENEWS_SUBTITLES_PANEL),
 		liveIcon: async () =>
 			await testUtils.getNodeForElement(LINEAR_NODES.LIVE_ICON),
-		countDownText: async () =>
-			await testUtils.getNodeForElement(LINEAR_NODES.COUNT_DOWN),
+		linearExpirationTimeText: async () =>
+			await testUtils.getNodeForElement('linearExpirationTimeText'),
+		loadingSpinnerLinear: async () =>
+			await testUtils.getNodeForElement('loadingSpinnerLinear'),
 	};
 
 	async function checkIfVideoPlaying() {
@@ -47,27 +49,23 @@ const LiveNews = () => {
 		});
 	}
 
-	async function waitUntilCountDownAppears() {
-		await testUtils.retryWithTimeOut(async () => {
-			const element = await elements.countDownText();
-			expect(element.visible).to.equal(true);
-		});
-	}
-
-	async function waitWhenGoFullScreen() {
-		await waitUntilCountDownAppears();
+	async function waitLiveIconPresent() {
 		await testUtils.untilTrue(
 			async () => {
 				await utils.sleep(800);
-				const element = await elements.countDownText();
-				let { text } = element;
-				if (text.includes('Fullscreen in 0 sec')) {
+				const element = await elements.liveIcon();
+				let { visible } = element;
+				if (visible) {
 					return true;
 				}
 			},
-			'Full screen is not visible after 15 sec',
+			'Live icon not present',
 			15000
-		);
+		);}
+
+	async function waitWhenGoFullScreen() {
+		await waitLiveIconPresent();
+		await utils.sleep(17000);
 	}
 
 	async function selectSubtitles(togle) {
@@ -123,7 +121,6 @@ const LiveNews = () => {
 		navigateThroughChannelsAndGoToNextCategory,
 		selectSubtitles,
 		checkIfLiveNewsShown,
-		waitUntilCountDownAppears,
 		waitWhenGoFullScreen,
 		selectNewChannelFromMenu,
 		navigateToChannelMenu,
