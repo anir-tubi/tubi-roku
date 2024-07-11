@@ -71,7 +71,6 @@ Function init()
   m.linearContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.linearSlideAmt]
   m.originalContentAreaMaskOffset = m.ContentArea.maskOffset
 
-  m.InfoPanel.translation = [m.InfoPanel.translation[0], 133]
   authInfo = m.global.authInfo
 
   if authInfo <> invalid AND authInfo.parentalrating <> invalid
@@ -556,22 +555,6 @@ Function populateInfoPanel(mode, contentNode)
   if contentNode <> invalid
     if mode = m.constants.ui.infoPanelModes.item
       populateInfoPanelWithHomescreenStyleItemMode(contentNode, m.InfoPanel)
-    else if mode = m.constants.ui.infoPanelModes.linearHomeScreen 'v3 api
-      theme = getThemeFromGlobal()
-      m.InfoPanel.mode = mode
-
-      m.InfoPanel.liveBadgeHeaderUri = "pkg:/images/live-icon-filled.webp"
-      m.InfoPanel.liveBadgeHeaderText = UCase(getTranslation("screenSearch_liveText"))
-
-      if theme <> invalid
-        m.InfoPanel.liveBadgeHeaderTextColor =  theme.primaryTextColor
-        m.InfoPanel.liveBadgeHeaderBackgroundColor = theme.focused2Color
-      end if
-
-      m.InfoPanel.title = contentNode.title
-      m.InfoPanel.description = contentNode.description
-      m.InfoPanel.needsLogin = contentNode.needsLogin AND (m.top.signedIn <> true)
-      m.InfoPanel.reminderIsSet = false
     else if mode = m.constants.ui.infoPanelModes.linearProgramHomescreen
       populateInfoPanelWithLinearProgramHomescreenMode(contentNode, m.InfoPanel) 'V4 api
     else if mode = m.constants.ui.infoPanelModes.continueWatching

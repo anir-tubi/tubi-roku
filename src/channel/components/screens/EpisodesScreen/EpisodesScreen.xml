@@ -46,7 +46,7 @@
     <Group id="PageGroup">
       <InfoPanel
         id="InfoPanel"
-        translation="[0,165]"
+        translation="[0,130]"
         maxHeight="511"
         mode="detail"
         visible="true" />

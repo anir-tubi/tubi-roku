@@ -97,7 +97,7 @@
       <InfoPanel
         id="ChannelsInfoPanel"
         mode="item"
-        translation="[0,165]"
+        translation="[0,130]"
         maxHeight="355"
         maxTitleLines="2"
         visible="true" />

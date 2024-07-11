@@ -371,8 +371,8 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     detailScreen.description = stateSource.description
     detailScreen.lineOneData = lineOneData
     detailScreen.lineTwoData = lineTwoData
-    detailScreen.directors = stateSource.directors
     detailScreen.starring = stateSource.actors
+    detailScreen.directors = stateSource.directors
     detailScreen.reminderIsSet = (availabilityType = "upcoming" AND bookmark <> invalid)
     detailScreen.needsLoginHint = (content.needsLogin = true AND isLoggedInUser() = false) ' because we do not repull the content after signed in.
     detailScreen.infoPanelVisible = true

@@ -85,8 +85,8 @@ Function updateInfoPanel(infoNode, content)
   infoNode.lineOneData = lineOneData
   infoNode.lineTwoData = lineTwoData
   infoNode.description = content.description
-  infoNode.directors = content.directors
   infoNode.starring = content.actors
+  infoNode.directors = content.directors
   infoNode.needsLogin = (content.needsLogin = true)
 
   ' always have to do this

@@ -189,7 +189,7 @@
 
       <InfoPanel
         id="InfoPanel"
-        translation="[0,165]"
+        translation="[0,130]"
         visible="false"
         maxHeight="354"
         maxTitleLines="2"/>

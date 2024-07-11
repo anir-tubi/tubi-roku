@@ -277,7 +277,7 @@
         <InfoPanel
           id="DetailInfoPanel"
           mode="item"
-          translation="[0,165]"
+          translation="[0,130]"
           maxHeight="462"
           maxTitleLines="2"
           visible="false" />
@@ -287,7 +287,7 @@
           translation="[0,642]"
           itemSize="[465,80]"
           itemComponentName="DetailMenuItem"
-          itemSpacing="[0,8]"
+          itemSpacing="[0,12]"
           numRows="3"
           numColumns="1"
           vertFocusAnimationStyle="floatingFocus"/>

@@ -138,7 +138,7 @@
             visible="false"
             maxHeight="355"
             translation="[0,390]"
-            maxTitleLines="3"/>
+            maxTitleLines="2"/>
 
           <ProgramGuide
             id="EPG"

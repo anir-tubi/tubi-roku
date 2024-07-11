@@ -535,7 +535,6 @@ Function onItemFocused(msg)
 
     m.searchScreenInfoPanel.lineOneData = lineOneData
     m.searchScreenInfoPanel.lineTwoData = lineTwoData
-    m.searchScreenInfoPanel.descriptionMaxLines = 2
     m.searchScreenInfoPanel.calculateHeight = true
 
     ' Set up the info that the ContentController uses to send navigate_within_page events.

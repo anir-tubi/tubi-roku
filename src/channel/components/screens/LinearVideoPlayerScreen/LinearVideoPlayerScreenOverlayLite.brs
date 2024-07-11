@@ -430,7 +430,6 @@ Function updateInfoPanel(channelInfo)
 
     m.InfoPanel.lineOneData = lineOneData
     m.InfoPanel.description = programInfo.description
-    m.InfoPanel.descriptionMaxLines = 3
     m.InfoPanel.needsLogin = programInfo.needsLogin
 
     endTime = programInfo.endTime

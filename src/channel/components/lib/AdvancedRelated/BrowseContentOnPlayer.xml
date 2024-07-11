@@ -68,7 +68,7 @@
         mode="item"
         width="993"
         maxHeight="312"
-        maxTitleLines="3"
+        maxTitleLines="2"
         opacity="0.0"/>
 
       <Group

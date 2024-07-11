@@ -51,10 +51,9 @@
     <field id="liveBadgeHeaderUri" alias="liveBadgeHeader.iconUri" />
     <field id="liveBadgeHeaderText" alias="liveBadgeHeader.text" />
     <field id="liveBadgeHeaderTextColor" alias="liveBadgeHeader.textColor" />
-     <field id="liveBadgeHeaderBackgroundColor" alias="liveBadgeHeader.backgroundColor" />
+    <field id="liveBadgeHeaderBackgroundColor" alias="liveBadgeHeader.backgroundColor" />
     <field id="episodeTitle" type="string" />
     <field id="description" type="string" />
-    <field id="descriptionMaxLines" alias="Description.maxLines" />
     <field id="directors" type="stringarray" />
     <field id="starring" type="stringarray" />
     <field id="seasonEpisodeCount" type="integer" />
@@ -146,7 +145,7 @@
             id="Title"
             width="1140"
             wrap="true"
-            maxLines="2"
+            maxLines="3"
             vertAlign="bottom">
             <Font
               id="TitleFont"
@@ -163,13 +162,14 @@
         <LayoutGroup
           id="TwoLineInfo"
           layoutDirection="vert"
-          itemSpacings="[8]"
+          itemSpacings="[2]"
+          vertAlignment="bottom"
           visible="true" >
           <LayoutGroup
             id="FirstLineGroup"
             layoutDirection="horiz"
             itemSpacings="[10]"
-            vertAlignment="bottom"
+            vertAlignment="center"
             addItemSpacingAfterChild="true">
             <Badge
               id="FirstLineAvailabilityBadge"/>
@@ -263,16 +263,16 @@
           <Poster
             id="DescriptionFocusButton"
             uri="pkg:/images/menu-focus-$$RES$$.9.png"
+            translation="[25,0]"
             width="1140"
-            height="300"
+            height="120"
             visible="false"/>
           <Label
             id="Description"
             width="1140"
-            lineSpacing="16"
-            maxLines="5"
+            maxLines="3"
             wrap="true"
-            translation="[25,15]"
+            translation="[25,3]"
             visible="false">
             <Font
               id="DescriptionFont"
@@ -330,45 +330,6 @@
         </LayoutGroup>
 
         <LayoutGroup
-          id="DirectorGroup"
-          layoutDirection="horiz"
-          vertAlignment="bottom"
-          itemSpacings="[5]"
-          visible="false">
-          <LayoutGroup
-            id="DirectorPrefix"
-            layoutDirection="horiz"
-            itemSpacings="[5]"
-            vertAlignment="bottom">
-            <Label
-              id="DirectorTag"
-              opacity="0.5">
-              <Font
-                role="font"/>
-            </Label>
-            <!-- this layout group pushes the separator rectangle up 2 pixels -->
-            <LayoutGroup
-              layoutDirection="vert">
-              <Rectangle
-                id="DirectorRect"
-                visible = "false"
-                width="32"
-                height="2"/>
-              <Rectangle
-                opacity="0.0"
-                height="5"/>
-            </LayoutGroup>
-          </LayoutGroup>
-          <Label
-            id="Director"
-            ellipsizeOnBoundary="true"
-            width="710">
-            <Font
-              role="font"/>
-          </Label>
-        </LayoutGroup>
-
-        <LayoutGroup
           id="StarringGroup"
           layoutDirection="horiz"
           vertAlignment="bottom"
@@ -400,6 +361,45 @@
           </LayoutGroup>
           <Label
             id="Starring"
+            ellipsizeOnBoundary="true"
+            width="710">
+            <Font
+              role="font"/>
+          </Label>
+        </LayoutGroup>
+
+        <LayoutGroup
+          id="DirectorGroup"
+          layoutDirection="horiz"
+          vertAlignment="bottom"
+          itemSpacings="[5]"
+          visible="false">
+          <LayoutGroup
+            id="DirectorPrefix"
+            layoutDirection="horiz"
+            itemSpacings="[5]"
+            vertAlignment="bottom">
+            <Label
+              id="DirectorTag"
+              opacity="0.5">
+              <Font
+                role="font"/>
+            </Label>
+            <!-- this layout group pushes the separator rectangle up 2 pixels -->
+            <LayoutGroup
+              layoutDirection="vert">
+              <Rectangle
+                id="DirectorRect"
+                visible = "false"
+                width="32"
+                height="2"/>
+              <Rectangle
+                opacity="0.0"
+                height="5"/>
+            </LayoutGroup>
+          </LayoutGroup>
+          <Label
+            id="Director"
             ellipsizeOnBoundary="true"
             width="710">
             <Font

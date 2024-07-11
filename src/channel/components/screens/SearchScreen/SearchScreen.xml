@@ -49,7 +49,7 @@
     <Group id="PageGroup">
       <Group
         id="leftSide"
-        translation="[0,120]">
+        translation="[0,132]">
         <LayoutGroup
           itemSpacings="[24, 12]"
           horizAlignment="left"
@@ -111,7 +111,7 @@
       <InfoPanel
         id="SearchScreenInfoPanel"
         visible="false"
-        translation="[0, 120]"/>
+        translation="[0, 130]"/>
       <Group
         id="searchGroup"
         translation="[0, 414]">
