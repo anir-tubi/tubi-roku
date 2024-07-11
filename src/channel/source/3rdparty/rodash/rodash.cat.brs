@@ -1,4 +1,4 @@
-' VERSION: rodash 0.3.5
+' VERSION: rodash 0.3.6
 ' LICENSE: Permission is hereby granted, free of charge, to any person obtaining
 ' LICENSE: a copy of this software and associated documentation files (the
 ' LICENSE: "Software"), to deal in the Software without restriction, including
@@ -207,7 +207,6 @@ appInfo: {
 id: ai.GetID()
 version: ai.GetVersion()
 title: ai.GetTitle()
-subtitle: ai.GetSubtitle()
 devid: ai.GetDevID()
 isDev: ai.IsDev()
 }
