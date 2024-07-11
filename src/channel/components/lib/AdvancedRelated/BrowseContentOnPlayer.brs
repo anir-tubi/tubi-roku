@@ -27,24 +27,6 @@ Function init()
   ' Used to determine if navigate_within_page events should be sent. Only send when the Related content row already
   ' has focus, not when it gains focus.
   m.isRelatedFocused = false
-
-  if m.global <> invalid
-    m.global.observeFieldScoped("theme", "onThemeChange")
-  end if
-  onThemeChange()
-End Function
-
-
-Function onThemeChange(msg = invalid)
-  if msg <> invalid
-    theme = msg.getData()
-  else
-    theme = getThemeFromGlobal()
-  end if
-
-  if theme <> invalid
-    m.categoryGridList.focusBitmapBlendColor = theme.focusedColor
-  end if
 End Function
 
 
