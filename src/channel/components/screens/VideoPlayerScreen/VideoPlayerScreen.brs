@@ -164,8 +164,6 @@ Function init()
   ' skip button for each cuepoint should only be shown once per video
   m.cuePointsHistory = {}
 
-  m.skipCuepointsButton.uri = "pkg:/images/selector-$$RES$$.9.png"
-
   m.RAFAdContainer = m.top.findNode("RAFAdContainer")
 
   m.AdsTask = m.top.findNode("AdsTask")
