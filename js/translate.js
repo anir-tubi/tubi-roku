@@ -447,7 +447,7 @@ async function compareEnglishTranslations(remoteUSEnglishTranslations) {
     }
   }
   if(aMissingData.length > 0){
-    log(`The US English strings associated with the following ID(s) do NOT exist or are DIFFERENT from those found on Crowdin: ${aMissingData.join(", ")}.`);
+    log(`The US English strings associated with the following ID(s) are MISSING from Crowdin, or they are DIFFERENT from those found on Crowdin: ${aMissingData.join(", ")}.`);
     
     //Add a prompt asking if the engineer wants to cancel, so he/she can fix the English local and remote string mismatch.
     const {bEnglishMismatchCancel} = await prompts({
