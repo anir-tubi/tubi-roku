@@ -137,7 +137,7 @@ describe('Espanol', function () {
           await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
           await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
-          // Set Parental Controls to Little Kids
+          // Set Parental Controls to Teens
           await testUtils.goToPage('settings');
 
           // On Settings Page?
@@ -148,7 +148,7 @@ describe('Espanol', function () {
           await selectTeensFromParentalSettings();
           await enterPasswordSettingsChange();
 
-          // Verify Little Kids PC Settings Change dialog
+          // Verify Teens PC Settings Change dialog
           const parentalControlsSettingsTeens = await testUtils.getNodeForElement('parentalControlsSettingsTeens');
           expect(parentalControlsSettingsTeens.text).to.equal('Parental controls setting has changed to Teens. Parental controls will be password protected after 5 minutes.');
           await ecp.sendKeypress(ecp.Key.Ok);
@@ -242,6 +242,7 @@ describe('Espanol', function () {
     }
 
     async function selectLittleKidsFromParentalSettings() {
+      await testUtils.waitForElementToFullyShowOnScreen('parentalControlsSettingsGroup');
       await ecp.sendKeypress(ecp.Key.Right);
       await utils.sleep(2000);
       await ecp.sendKeypress(ecp.Key.Up, {count:3});
@@ -250,9 +251,10 @@ describe('Espanol', function () {
     }
 
     async function selectTeensFromParentalSettings() {
+      await testUtils.waitForElementToFullyShowOnScreen('parentalControlsSettingsGroup');
       await ecp.sendKeypress(ecp.Key.Right);
-      await utils.sleep(2000);
+      await utils.sleep(3000);
       await ecp.sendKeypress(ecp.Key.Up, {count:1});
-      await utils.sleep(2000);
+      await utils.sleep(3000);
       await ecp.sendKeypress(ecp.Key.Ok);
     }

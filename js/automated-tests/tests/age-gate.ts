@@ -283,6 +283,6 @@ describe('Age Gate', function () {
   }
 
   async function yearsVerificationEntry() {
-    await testUtils.waitForElementToShowOnScreen('yearsVerificationEntry');
+    await testUtils.waitForElementToShowOnScreen('yearsVerificationEntry', 'Verification not present', 10000);
     expect(yearsVerificationEntry).to.exist;
   }

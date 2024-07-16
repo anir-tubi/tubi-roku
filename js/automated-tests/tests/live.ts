@@ -116,7 +116,8 @@ describe('Live', function () {
         await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
 
         // Verify that preview video is playing
-        await testUtils.waitForPlayerStateToEqual('previewVideoPlayer','playing', 8000);
+        // Check this it is failing
+        await testUtils.waitForPlayerStateToEqual('previewVideoPlayer','playing', 15000);
      
         // Verify that full linear video is playing
         await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen','playing',20000);

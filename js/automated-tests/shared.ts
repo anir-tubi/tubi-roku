@@ -66,6 +66,7 @@ class Shared {
 
 
     async selectLittleKidsFromParentalSettings() {
+      await testUtils.waitForElementToFullyShowOnScreen('parentalControlsSettingsGroup');
       await ecp.sendKeypress(ecp.Key.Right);
       await utils.sleep(2000);
       await ecp.sendKeypress(ecp.Key.Up, {count:3});
@@ -75,6 +76,7 @@ class Shared {
 
 
     async selectOlderKidsFromParentalSettings() {
+      await testUtils.waitForElementToFullyShowOnScreen('parentalControlsSettingsGroup');
       await ecp.sendKeypress(ecp.Key.Right);
       await utils.sleep(2000);
       await ecp.sendKeypress(ecp.Key.Up, {count:2});
@@ -83,6 +85,7 @@ class Shared {
     }
 
     async selectTeensFromParentalSettings() {
+      await testUtils.waitForElementToFullyShowOnScreen('parentalControlsSettingsGroup');
       await ecp.sendKeypress(ecp.Key.Right);
       await utils.sleep(2000);
       await ecp.sendKeypress(ecp.Key.Up, {count:1});

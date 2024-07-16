@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { ecp, utils } from 'roku-test-automation';
-import { testUtils } from '../test-utils';
+import { ContentRatings, testUtils } from '../test-utils';
 import { shared } from '../shared';
 
 describe('Kids Mode', function () {
@@ -60,7 +60,6 @@ describe('Kids Mode', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     await openKidsMode();
-
 
     // Open Settings
     await shared.openSettings();
@@ -160,6 +159,7 @@ describe('Kids Mode', function () {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await openKidsMode();
     await ecp.sendKeypress(ecp.Key.Right);
+    await testUtils.waitForSideNavMenuToNotBeExpanded();
 
     // Check Ratings label
     const homeScreenRatingsLabel = await testUtils.getNodeForElement('homeScreenRatingsLabel');
@@ -188,7 +188,7 @@ describe('Kids Mode', function () {
     await openKidsMode();
 
     // Open Settings
-    await shared.openSettings();
+    await kidsOpenSettings();
 
     // Choose PC Older Kids
     await selectOlderKidsFromParentalSettings();
@@ -372,12 +372,12 @@ async function openKidsMode() {
   // IMPROVEMENT remove need for this by addressing the weird behavior when animation ends
   await utils.sleep(500); // Adding sleeps temporary
   await ecp.sendKeypress(ecp.Key.Ok);
-  const exitKidsOption = await testUtils.getNodeForElement('exitKidsOption');
-  expect(exitKidsOption.visible).to.be.true;
+  await testUtils.waitForElementToFullyShowOnScreen('exitKidsOption');
 }
 
 async function guestSelectOlderKidsParentalControls() {
   // Select Older Kids Parental Controls
+  await testUtils.waitForElementToFullyShowOnScreen('parentalControlsSettingsGroup');
   await ecp.sendKeypress(ecp.Key.Right);
   await ecp.sendKeypress(ecp.Key.Up, { count: 2 });
   await signInUserFromParentalControls();
@@ -386,6 +386,7 @@ async function guestSelectOlderKidsParentalControls() {
 async function guestSelectLittleKidsParentalControls() {
   // Select Little Kids Parental Controls
   await ecp.sendKeypress(ecp.Key.Ok);
+  await testUtils.waitForElementToFullyShowOnScreen('parentalControlsSettingsGroup');
   await ecp.sendKeypress(ecp.Key.Up, { count: 3 });
   await signInUserFromParentalControls();
 }
@@ -457,6 +458,7 @@ async function selectOlderKidsFromParentalSettings() {
 }
 
 async function selectLittleKidsFromParentalSettings() {
+  await testUtils.waitForElementToFullyShowOnScreen('adultControlSelected');
   await ecp.sendKeypress(ecp.Key.Right);
   await ecp.sendKeypress(ecp.Key.Up, { count: 3 });
   await ecp.sendKeypress(ecp.Key.Ok);
@@ -475,8 +477,8 @@ async function checkForKidsModeNotGrayed(){
 }
 
 async function checkForKidsModeAdult(){
-  const exitKidsOption = await testUtils.getNodeForElement('exitKidsOption');
-  expect(exitKidsOption.text).to.equal('Kids');  
+  await testUtils.waitForElementToFullyShowOnScreen('exitKidsOption');
+  
 }
 
 

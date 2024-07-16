@@ -431,8 +431,7 @@ describe('Parental Controls', function () {
 
 
       // Select Search
-      await ecp.sendKeypress(ecp.Key.Up);
-      await testUtils.waitForElementToFullyShowOnScreen('leftNavSearchItem');
+      await testUtils.jumpToRowWithTitle('sideNavMenu', 'Search');
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Send adult title text

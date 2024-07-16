@@ -200,6 +200,10 @@ const elements = typeCheckElements({
     keyPath:
       '#ContentController.#d15a38c.#DialogBox.#ContentArea.#MessageGroup.#Message',
   },
+  /** PC Controls Settings Change Dialog */
+  parentalControlsSettingsDialogBox: {
+    keyPath: '#ContentController.#c25f262.#DialogBox.#ContentArea',
+  },
 
   /** Exit Kids Menu item in Kids more is grayed out */
   exitKidsGrayedOut: {
@@ -234,7 +238,7 @@ const elements = typeCheckElements({
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#Title',
   },
-
+  
   /** Content title on the detail screen */
   detailScreenPanel: {
     keyPath:
@@ -249,7 +253,7 @@ const elements = typeCheckElements({
 
   detailScreenMenu: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#Menu',
   },
 
   /** Add to My List Button */
@@ -286,12 +290,6 @@ const elements = typeCheckElements({
   onMoviesPageButton: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#PageGroup.#topNav-movies.#TopNavMenu.1.#selectedBackground',
-  },
-
-  /** Remove from history button */
-  removeFromHistoryButton: {
-    keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#Menu.5',
   },
 
   myStuffContinueWatchingRow: {
@@ -387,6 +385,10 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList',
     xpath:
       '/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/MaskGroup/CategoryGridList/RowList',
+  },
+
+  homeScreenFeaturedPoster: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#RowList.0.items.0.#poster',
   },
 
   youMightAlsoLikeFirstPoster: {
@@ -1141,6 +1143,15 @@ const elements = typeCheckElements({
   parentalControlsSettingsTeens: {
     keyPath:
       '#ContentController.#c25f262.#DialogBox.#ContentArea.#MessageGroup.#Message',
+  },
+   /** Group for PC Settings Change */
+  parentalControlsSettingsGroup: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.3.#Offset.#ContentGroup',
+  },
+
+  /** PC Dialog Settings Change box */
+  parentalControlsChangeDialog: {
+    keyPath: '#ContentController.#c25f262.#DialogBox.#ContentArea',
   },
 
   /** Sign in password */
@@ -2177,30 +2188,30 @@ const elements = typeCheckElements({
 
   /* Welcome registration modal */
   welcomeRegModal: {
-    keyPath: '#ContentController.#777c636.#dialogBox.#mask',
+    keyPath: '#ContentController.#af05b2f.#dialogBox.#mask',
   },
 
   /* Welcome registration modal header*/
   welcomeRegModalHeader: {
-    keyPath: '#ContentController.#777c636.#dialogBox.#contentArea.0.#header',
+    keyPath: '#ContentController.#af05b2f.#dialogBox.#contentArea.0.#header',
   },
 
   /* Welcome registration modal sign in button focused*/
   welcomeRegModalSignInButtonFocused: {
     keyPath:
-      '#ContentController.#777c636.#dialogBox.#contentArea.#buttonList.0.#buttonTextParent.#labelFocused',
+      '#ContentController.#af05b2f.#dialogBox.#contentArea.#buttonList.0.#buttonTextParent.#labelFocused',
   },
 
   /* Welcome registration modal sign in button*/
   welcomeRegModalContinueAsGuestButton: {
     keyPath:
-      '#ContentController.#777c636.#dialogBox.#contentArea.#buttonList.1.#buttonTextParent.#label',
+      '#ContentController.#af05b2f.#dialogBox.#contentArea.#buttonList.1.#buttonTextParent.#label',
   },
 
   /* Welcome registration modal sign in button focused*/
   welcomeRegModalContinueAsGuestButtonFocused: {
     keyPath:
-      '#ContentController.#777c636.#dialogBox.#contentArea.#buttonList.1.#buttonTextParent.#labelFocused',
+      '#ContentController.#af05b2f.#dialogBox.#contentArea.#buttonList.1.#buttonTextParent.#labelFocused',
   },
 
   /** Reaction button Liked */

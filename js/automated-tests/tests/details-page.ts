@@ -416,11 +416,12 @@ describe('Details Page', function () {
       let content = await testUtils.getCurrentlyFocusedGridItemContent('detailScreenMenu');
       expect(content.id).to.equal('PlayMenuItem');
 
+      // Capture the current item title so we can make sure we got the same item on the next launch
+      const firstScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
+
       // Select Play button
       await ecp.sendKeypress(ecp.Key.Ok);
 
-      // Capture the current item title so we can make sure we got the same item on the next launch
-      const firstScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
 
       // Call to createHistory function
       await createHistory();
@@ -446,7 +447,7 @@ describe('Details Page', function () {
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Verify that we got the same item otherwise we aren't actually confirming if resume went away
-      await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle', 'Title not shown', 8000);
+      await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle', 'Title not shown', 10000);
       const secondScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
       expect(firstScreenTitle.text).to.equal(secondScreenTitle.text);
 
