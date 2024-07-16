@@ -2079,6 +2079,7 @@ End Function
 Function onAvailableAudioTracksChange(msg)
   availableAudioTracks = msg.getData()
   setInitialAudioTrack(availableAudioTracks)
+  setCCAudioTransportBarVisibility()
 End Function
 
 
@@ -2113,8 +2114,6 @@ Function setInitialSubtitleTrack(availableSubtitleTracks)
     ' This else block will handle case where we do not have a preferred subtitle track saved for device.
     m.closedCaptionAndAudioSelectionOverlay.closedCaptionTrack = m.video.currentSubtitleTrack
   end if
-
-  setCCAudioTransportBarVisibility()
 End Function
 
 
