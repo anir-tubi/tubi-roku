@@ -1349,10 +1349,6 @@ Function getTranslation_en_US()
       "description": "Message to be displayed on Toast-message when user signed in.",
       "message": "You are now successfully signed in"
     },
-    "videoPlayer_toast_heading": {
-      "description": "Header text to be displayed on Toast-message when user signed in.",
-      "message": "Welcome to Tubi, {userName}"
-    },
     "linearVideoPlayer_buttonBack": {
       "description": "Label of a Button to go back",
       "message": "Back"
@@ -1931,6 +1927,10 @@ Function getTranslation_es_MX()
       "description": "header text to be displayed on Toast-message when user unfavorites a linear channel",
       "message": "Eliminado de Favoritos"
     },
+    "epg_started_at": {
+      "description": "Program time Title for live program.",
+      "message": "Comenzó a las"
+    },
     "detail_screen_like_disLike_toast_header": {
       "description": "header text to be displayed on Toast-message when user like/dislike a title",
       "message": "Gracias por tus comentarios!"
@@ -2105,7 +2105,11 @@ Function getTranslation_es_MX()
     },
     "dialog_tvDisabled_title": {
       "description": "Title of a Dialog Window that is shown when the user clicked the sidenav TV menu item but the item has been disabled",
-      "message": "Series desactivado"
+      "message": "TV Series Deshabilitados"
+    },
+    "dialog_linearEPGDisabled_title": {
+      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav Live TV menu item but the item has been disabled",
+      "message": "TV en Vivo Deshabilitada"
     },
     "dialog_sideNavItemDisabled_description": {
       "description": "Message of a Dialog Window that is shown when the user clicked on a sidenav menu item but the item has been disabled",
@@ -2575,6 +2579,14 @@ Function getTranslation_es_MX()
       "description": "Indicate the number of minutes left. Use an abbreviation for minutes to save space and so we don't have to worry about plural and singular forms of the word minutes.",
       "message": "quedan {minutes} m"
     },
+    "hour_mins_left": {
+      "description": "Indicates time left in the format 'x hour y mins left'",
+      "message": "{hour} horas {minutes} mins quedan"
+    },
+    "mins_left": {
+      "description": "Indicates time left in the format 'y mins left'",
+      "message": "{minutes} mins quedan"
+    },
     "today": {
       "description": "Today",
       "message": "HOY"
@@ -2582,6 +2594,10 @@ Function getTranslation_es_MX()
     "tomorrow": {
       "description": "Tomorrow",
       "message": "MAÑANA"
+    },
+    "onNow": {
+      "description": "badge text to show program is not live but on now",
+      "message": "AHORA"
     },
     "day_1": {
       "description": "shortened version Monday, formatted with , and a space",
@@ -2692,8 +2708,12 @@ Function getTranslation_es_MX()
       "message": "Ver Tráiler"
     },
     "screenDetails_button_episodes": {
-      "description": "Label of button to allow users to display the list of episodes/seasons of the current video title",
+      "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
       "message": "Lista de Capítulos"
+    },
+    "screenDetails_button_episodes_experiment": {
+      "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
+      "message": "Todos los Capítulos"
     },
     "screenDetails_relatedTitles": {
       "description": "Label of button to allow users to view other video titles related to the current video title",
@@ -2934,6 +2954,10 @@ Function getTranslation_es_MX()
     "videoPlayer_adHeadsUp": {
       "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
       "message": "Pausa publicitaria comienza en {seconds} s"
+    },
+    "videoPlayer_toast_message": {
+      "description": "Message to be displayed on Toast-message when user signed in.",
+      "message": "Has iniciado sesión correctamente"
     },
     "linearVideoPlayer_buttonBack": {
       "description": "Label of a Button to go back",
@@ -3313,6 +3337,14 @@ Function getTranslation_es_MX()
       "description": "Manage preferences button label.",
       "message": "Administra Preferencias"
     },
+    "accept_all_button_label": {
+      "description": "Accept button label.",
+      "message": "Aceptar Todo"
+    },
+    "reject_all_button_label": {
+      "description": "Reject button label.",
+      "message": "Rechazar Todo"
+    },
     "privacy_preferences_label": {
       "description": "privacy preferences screen title.",
       "message": "Configuración de Privacidad"
@@ -3381,6 +3413,30 @@ Function getTranslation_es_MX()
       "description": "Roku Continue Watching screen sub heading.",
       "message": "Facilite volver a lo que estabas viendo y obtén mejores recomendaciones para stream a continuación.\n\nElige " + Chr(34) + "Aceptar ahora" + Chr(34) + " para dar permiso a Tubi para compartir tu historial de visualización de videos con Roku.\n\nPuedes cambiar esto en cualquier momento en Configuración."
     },
+    "player_exit_prompt_signup_heading": {
+      "description": "Video Player exit prompt signup header",
+      "message": "Espera, no pierdas tu lugar!"
+    },
+    "player_exit_prompt_signup_sub_heading": {
+      "description": "Video Player exit prompt signup sub header",
+      "message": "Regístrate para guardar tu progreso y recogerlo donde lo dejaste. No se requiere tarjeta de crédito."
+    },
+    "player_exit_prompt_signup_later_button": {
+      "description": "Video Player exit prompt signup later",
+      "message": "Regístrate Más Tarde"
+    },
+    "trending_search_results_hint": {
+      "description": "Trending Search Results hint which will be displayed in the search screen when we do not have enough search results.",
+      "message": "Aquí hay otras búsquedas populares que te pueden gustar"
+    },
+    "search_results_no_matching_results": {
+      "description": "No matching results message which will be displayed in search results screen.",
+      "message": "No pudimos encontrar ningún resultado para"
+    },
+    "privacy_center_save_restart": {
+      "description": "Settings screen privacy center save and restart consent button label.",
+      "message": "Guardar y Reiniciar Tubi"
+    },
     "gdpr_age_gate_error_dialog_heading": {
       "description": "GDPR age gate error dialog heading.",
       "message": "Lo Sentimos"
@@ -3392,6 +3448,14 @@ Function getTranslation_es_MX()
     "gdpr_age_gate_error_dialog_exit_tubi": {
       "description": "GDPR age gate error dialog exit tubi button label.",
       "message": "Salir de Tubi"
+    },
+    "updated_terms_toast_message": {
+      "description": "Message on the toast message informing the user of update ToS. Please keep style tags intact when translating.",
+      "message": "<defaultStyle>Hemos actualizado nuestros Términos de uso. Al continuar utilizando Tubi, aceptas estos términos actualizados. Puede ver nuestros términos en </defaultStyle><urlStyle>https://tubitv.com/static/terms</urlStyle>"
+    },
+    "updated_terms_toast_header": {
+      "description": "Header on the toast message informing the user of update ToS",
+      "message": "Importante"
     },
     "privacy_center_restart_channel": {
       "description": "Settings screen privacy center restart channel button label.",
@@ -3470,6 +3534,10 @@ Function getTranslation_fr_CA()
     "epg_unfavorites_toast_header": {
       "description": "header text to be displayed on Toast-message when user unfavorites a linear channel",
       "message": "Retiré des favoris"
+    },
+    "epg_started_at": {
+      "description": "Program time Title for live program.",
+      "message": "Commencé à"
     },
     "detail_screen_like_disLike_toast_header": {
       "description": "header text to be displayed on Toast-message when user like/dislike a title",
@@ -3645,7 +3713,11 @@ Function getTranslation_fr_CA()
     },
     "dialog_tvDisabled_title": {
       "description": "Title of a Dialog Window that is shown when the user clicked the sidenav TV menu item but the item has been disabled",
-      "message": "TV désactivée"
+      "message": "Série TV Désactivée"
+    },
+    "dialog_linearEPGDisabled_title": {
+      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav Live TV menu item but the item has been disabled",
+      "message": "TV en DIRECT Désactivée"
     },
     "dialog_sideNavItemDisabled_description": {
       "description": "Message of a Dialog Window that is shown when the user clicked on a sidenav menu item but the item has been disabled",
@@ -4115,6 +4187,14 @@ Function getTranslation_fr_CA()
       "description": "Indicate the number of minutes left. Use an abbreviation for minutes to save space and so we don't have to worry about plural and singular forms of the word minutes.",
       "message": "plus que {minutes} min"
     },
+    "hour_mins_left": {
+      "description": "Indicates time left in the format 'x hour y mins left'",
+      "message": "{hour} heures {minutes} min restantes"
+    },
+    "mins_left": {
+      "description": "Indicates time left in the format 'y mins left'",
+      "message": "{minutes} min restantes"
+    },
     "today": {
       "description": "Today",
       "message": "AUJOURD'HUI"
@@ -4122,6 +4202,10 @@ Function getTranslation_fr_CA()
     "tomorrow": {
       "description": "Tomorrow",
       "message": "DEMAIN"
+    },
+    "onNow": {
+      "description": "badge text to show program is not live but on now",
+      "message": "MAINTENANT"
     },
     "day_1": {
       "description": "shortened version Monday, formatted with , and a space",
@@ -4181,7 +4265,7 @@ Function getTranslation_fr_CA()
     },
     "short_version_date_format_8": {
       "description": "Shortened version of date format for the month of August",
-      "message": "{day} août {year}"
+      "message": "{day} août {year}"
     },
     "short_version_date_format_9": {
       "description": "Shortened version of date format for the month of September",
@@ -4232,8 +4316,12 @@ Function getTranslation_fr_CA()
       "message": "Regarder la bande-annonce"
     },
     "screenDetails_button_episodes": {
-      "description": "Label of button to allow users to display the list of episodes/seasons of the current video title",
+      "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
       "message": "Liste des épisodes"
+    },
+    "screenDetails_button_episodes_experiment": {
+      "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
+      "message": "Tous les épisodes"
     },
     "screenDetails_relatedTitles": {
       "description": "Label of button to allow users to view other video titles related to the current video title",
@@ -4474,6 +4562,10 @@ Function getTranslation_fr_CA()
     "videoPlayer_adHeadsUp": {
       "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
       "message": "La pause pub commence dans {seconds} sec."
+    },
+    "videoPlayer_toast_message": {
+      "description": "Message to be displayed on Toast-message when user signed in.",
+      "message": "Vous êtes maintenant connecté avec succès"
     },
     "linearVideoPlayer_buttonBack": {
       "description": "Label of a Button to go back",
@@ -4853,6 +4945,14 @@ Function getTranslation_fr_CA()
       "description": "Manage preferences button label.",
       "message": "Gérer les Préférences"
     },
+    "accept_all_button_label": {
+      "description": "Accept button label.",
+      "message": "Tout Accepter"
+    },
+    "reject_all_button_label": {
+      "description": "Reject button label.",
+      "message": "Rejeter Tout"
+    },
     "privacy_preferences_label": {
       "description": "privacy preferences screen title.",
       "message": "Paramètres de Confidentialité"
@@ -4921,6 +5021,30 @@ Function getTranslation_fr_CA()
       "description": "Roku Continue Watching screen sub heading.",
       "message": "Facilitez-vous la tâche pour revenir à ce que vous regardiez et obtenez de meilleures recommandations sur ce qu'il faut diffuser ensuite.\n\nChoisir " + Chr(34) + "Accepter maintenant" + Chr(34) + " pour autoriser Tubi à partager votre historique de visionnage de vidéos avec Roku.\n\nVous pouvez modifier cela à tout moment dans les paramètres."
     },
+    "player_exit_prompt_signup_heading": {
+      "description": "Video Player exit prompt signup header",
+      "message": "Attendez, ne perds pas ta place!"
+    },
+    "player_exit_prompt_signup_sub_heading": {
+      "description": "Video Player exit prompt signup sub header",
+      "message": "Inscrivez pour sauvegarder vos progrès et reprendre. Aucune carte de crédit n'est requise."
+    },
+    "player_exit_prompt_signup_later_button": {
+      "description": "Video Player exit prompt signup later",
+      "message": "S'inscrire plus tard"
+    },
+    "trending_search_results_hint": {
+      "description": "Trending Search Results hint which will be displayed in the search screen when we do not have enough search results.",
+      "message": "Voici d'autres recherches populaires qui pourraient vous plaire"
+    },
+    "search_results_no_matching_results": {
+      "description": "No matching results message which will be displayed in search results screen.",
+      "message": "Nous n'avons trouvé aucun résultat pour"
+    },
+    "privacy_center_save_restart": {
+      "description": "Settings screen privacy center save and restart consent button label.",
+      "message": "Enregistrer et Redémarrer Tubi"
+    },
     "gdpr_age_gate_error_dialog_heading": {
       "description": "GDPR age gate error dialog heading.",
       "message": "Nous sommes désolés"
@@ -4932,6 +5056,14 @@ Function getTranslation_fr_CA()
     "gdpr_age_gate_error_dialog_exit_tubi": {
       "description": "GDPR age gate error dialog exit tubi button label.",
       "message": "Sortie Tubi"
+    },
+    "updated_terms_toast_message": {
+      "description": "Message on the toast message informing the user of update ToS. Please keep style tags intact when translating.",
+      "message": "<defaultStyle>Nous avons mis à jour nos Conditions d'utilisation. En continuant à utiliser Tubi, vous acceptez ces conditions mises à jour. Vous pouvez consulter nos conditions sur</defaultStyle><urlStyle>https://tubitv.com/static/terms</urlStyle>"
+    },
+    "updated_terms_toast_header": {
+      "description": "Header on the toast message informing the user of update ToS",
+      "message": "Important"
     },
     "privacy_center_restart_channel": {
       "description": "Settings screen privacy center restart channel button label.",
@@ -4975,6 +5107,14 @@ Function getTranslation_en_GB()
       "description": "header text to be displayed on Toast-message when user unfavorites a linear channel",
       "message": "Removed from Favourites"
     },
+    "dialog_tvDisabled_title": {
+      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav TV menu item but the item has been disabled",
+      "message": "TV Shows Disabled"
+    },
+    "dialog_linearEPGDisabled_title": {
+      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav Live TV menu item but the item has been disabled",
+      "message": "Live TV Disabled"
+    },
     "screenSettings_about_description": {
       "description": "The description on the about screen",
       "message": "Tubi is the leading free, premium, video streaming app. We have a large and diverse library of content with many thousands of titles and 3x fewer adverts than other TV services."
@@ -5011,6 +5151,10 @@ Function getTranslation_en_GB()
       "description": "The subtitle of the MyStuff Screen for the guest user.",
       "message": "Find your favourites fast, pick up where you left off–all in one place."
     },
+    "screenDetails_button_episodes_experiment": {
+      "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
+      "message": "All Episodes"
+    },
     "screenAgeVerification_network_issue": {
       "description": "An error message shown to users when they submit their birthdate, but there is an unexpected server or network error",
       "message": "Could not successfully send your date of birth to our servers."
@@ -5018,10 +5162,6 @@ Function getTranslation_en_GB()
     "metadata_myStuff_empty_myList_description": {
       "description": "For an empty MyList container, this is the description/subtitle that is display in the empty container",
       "message": "Use the bookmark button to save favourite series and movies. They’ll show up here."
-    },
-    "metadata_continueWatching_notSignedIn_description": {
-      "description": "tells non registered user what they need to do to see the continue watching container",
-      "message": "Pick up right where you left off next time you play a TV Series or a Film. Available upon sign up."
     },
     "registration_signIn_recommended": {
       "description": "text appended to recommended row label to subtly remind users that they are signed out so that they understand that they need to sign-in to use Tubi at its fullest",
