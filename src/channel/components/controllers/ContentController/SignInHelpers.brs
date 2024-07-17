@@ -738,7 +738,7 @@ Function onSideNavSignInCompleted()
   tubiLog("SignInHelpers.onSideNavSignInCompleted")
 
   ' set the mode before any changes are done to the UI
-  setUiModeFromState()
+  refreshUiAfterSignIn()  
 
   ' Here we notify screens that may exist, though we try to keep context
   '
@@ -769,7 +769,7 @@ End Function
 
 Function onMatureContentWarningSignInCompleted()
   tubiLog("SignInHelpers.onMatureContentWarningSignInCompleted")
-  setUiModeFromState()
+  refreshUiAfterSignIn()
   setContentToRefreshAllPersonalizedScreens(false)
 
   currentScreen = popScreenAfterSignInProcess()
@@ -857,7 +857,7 @@ End Function
 ' onQueueAfterSignIn - occurs after activation success via Add to My List on Details page
 Function onQueueAfterSignIn()
   tubiLog("SignInHelpers.onQueueAfterSignIn")
-  setUiModeFromState()
+  refreshUiAfterSignIn()
 
   ' setContentToRefresh is not required for homescreen as we are fetching homescreen content
   ' right after adding into queue when onBookmarkedAfterSignIn() is called.
@@ -879,7 +879,7 @@ End Function
 ' onLikeAfterSignIn - occurs after activation success via Like Button on Details page
 Function onLikeAfterSignIn()
   tubiLog("SignInHelpers.onLikeAfterSignIn")
-  setUiModeFromState()
+  refreshUiAfterSignIn()
   setContentToRefreshAllPersonalizedScreens()
 
   currentScreen = popScreenAfterSignInProcess()
@@ -898,7 +898,7 @@ End Function
 ' onDislikeAfterSignIn - occurs after activation success via Dislike Button on Details page
 Function onDislikeAfterSignIn()
   tubiLog("SignInHelpers.onDislikeAfterSignIn")
-  setUiModeFromState()
+  refreshUiAfterSignIn()
   setContentToRefreshAllPersonalizedScreens()
 
   currentScreen = popScreenAfterSignInProcess()
@@ -918,7 +918,7 @@ End Function
 Function onCWRowAfterSignIn()
   tubiLog("SignInHelpers.onCWRowAfterSignIn")
 
-  setUiModeFromState()
+  refreshUiAfterSignIn()
 
   setContentToRefreshAllPersonalizedScreens()
 
@@ -928,7 +928,7 @@ End Function
 
 Function onRegistrationProcessCompletedOnDetailsScreen()
   tubiLog("SignInHelpers.onRegistrationProcessCompletedOnDetailsScreen")
-  setUiModeFromState()
+  refreshUiAfterSignIn()
   setContentToRefreshAllPersonalizedScreens(true)
 
   currentScreen = popScreenAfterSignInProcess()
@@ -959,7 +959,7 @@ End Function
 
 Function onRegistrationProcessCompletedOnPlayerBackPress()
   tubiLog("SignInHelpers.onRegistrationProcessCompletedOnPlayerScreen")
-  setUiModeFromState()
+  refreshUiAfterSignIn()
   setContentToRefreshAllPersonalizedScreens(true)
   popScreenAfterSignInProcess()
   m.spinner.visible = false
@@ -981,7 +981,7 @@ Function onParentalControlAfterSignIn()
     currentScreen.setFocus(true)
 
     '//before signing in, the user selected a new parental setting, so take user to parental change screen
-    setUiModeFromState()  '//in case the user cancels out of the confirm password screen, ensure the mode matches with the newly signed in user's saved mode
+    refreshUiAfterSignIn()  '//in case the user cancels out of the confirm password screen, ensure the mode matches with the newly signed in user's saved mode
     onParentalSettingSelected()
 
 
@@ -1027,7 +1027,7 @@ End Function
 Function onAutoplayPreviewAfterSignIn()
   tubiLog("SignInHelpers.onAutoplayPreviewAfterSignIn")
 
-  setUiModeFromState()
+  refreshUiAfterSignIn()
   currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
 
@@ -1445,4 +1445,10 @@ Function base64UrlToBase64(base64Url)
   end if
 
   return base64
+End Function
+
+
+Function refreshUiAfterSignIn()
+  setUiModeFromState()
+  refreshHomeScreenSideNav()
 End Function
