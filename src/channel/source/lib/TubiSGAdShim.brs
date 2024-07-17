@@ -39,7 +39,9 @@ Function tubiSGAdShim_run(videoPlayerNode) As boolean
     tubiLog("TubSGAdShim.Run: videoPlayerNode is not component type VideoPlayer")
     return false
   end if
-  port = CreateObject("roMessagePort")
+
+  ' Re-using the port so that we can listen to ad tracking requests too in the same while loop.
+  port = m.ads.adMessagePort
   m.videoPlayerNode.observeField("adControl", port)
   m.videoPlayerNode.observeFieldScoped("userConsentsOptOutStatus", port)
   m.videoPlayerNode.observeFieldScoped("tcfString", port)
@@ -51,7 +53,6 @@ Function tubiSGAdShim_run(videoPlayerNode) As boolean
   while(true)
     msg = wait(0, port)
     msgType = type(msg)
-
     if msgType = "roSGNodeEvent"
       tubiLog("TubiSGAdShim got roSGNodeEvent for " + msg.GetField())
       if msg.GetField() = "exitApp"
@@ -82,6 +83,8 @@ Function tubiSGAdShim_run(videoPlayerNode) As boolean
       else if msg.GetField() = "tcfString"
         m.ads.tracking.tcfString = msg.getData()
       end if
+    else if msgType = "roUrlEvent" then
+      m.ads.requestQueue.handleEvent(msg)
     end if
   end while
   return false

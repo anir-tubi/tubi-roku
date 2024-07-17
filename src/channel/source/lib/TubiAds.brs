@@ -23,7 +23,7 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
   #end if
 
   'a port used for sending logging requests
-  adLoggingPort = CreateObject("roMessagePort")
+  adMessagePort = CreateObject("roMessagePort")
 
   if adContentType <> "hls" AND adContentType <> "mp4"
     adContentType = "mp4"  ' safety fallback
@@ -46,7 +46,7 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
     ' private
     updateYouboraOptions: tubiAds_updateYouboraOptions
     parseOutNotUsedAdPodPixels: tubiAds_parseOutNotUsedAdPodPixels
-    requestQueue: requestQueue.create(adLoggingPort)
+    requestQueue: requestQueue.create(adMessagePort)
     allAdUnitsList: []
     totalAdBreakAds: 0
     commercialDuration : 0
@@ -85,6 +85,7 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
     tcfString: tcfString ' IAB TC String, currently stored in m.global.IABTCF_TCString from one trust sdk.
     userConsentsOptOutStatus: userConsentsOptOutStatus ' assoc array of consent to purpose key mapping. ex: {"functional": true, "analytics": true}
     isGDPR: isGDPR
+    adMessagePort: adMessagePort
   }
 End Function
 

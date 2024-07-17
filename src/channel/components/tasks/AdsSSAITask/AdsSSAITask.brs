@@ -135,6 +135,8 @@ Function runSSAILoop(ssaiPort)
         m.top.control = "STOP"
         exit while
       end if
+    else if type(msg) = "roUrlEvent" then
+      m.requestQueue.handleEvent(msg)
     end if
   end while
 End Function
