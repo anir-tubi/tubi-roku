@@ -111,6 +111,7 @@
       <InfoPanel
         id="SearchScreenInfoPanel"
         visible="false"
+        maxHeight="354"
         translation="[0, 130]"/>
       <Group
         id="searchGroup"

@@ -813,6 +813,12 @@ End Function
 Function onModeChange()
   tubiLog("InfoPanel.onModeChange")
   resetDefaultState()
+
+  ' For some modes, if a content is locked, a lock icon and sign in message will be appended 
+  ' dynamically as a child to m.offset. The pattern is that the itemSpacing for this lock
+  ' child should be 2 pixels if it is appended after the m.directorGroup child, and 13 pixels if
+  ' appended after the m.descriptionGroup child.
+
   if m.top.mode = m.constants.ui.infoPanelModes.item
     ' used for movies and series on the homescreen and similar screens
     m.infoPanelGroup.appendChild(m.offset)
@@ -835,7 +841,7 @@ Function onModeChange()
     m.secondLineGroup.appendChild(m.line2)
 
     'The third item spacing is to add the space between description and needsLogin(signup text with lock icon)
-    m.offset.itemSpacings = [13, 13, 2]
+    m.offset.itemSpacings = [13, 13, 13]
   else if m.top.mode = m.constants.ui.infoPanelModes.movie
     ' used for movies on the details screen
     m.infoPanelGroup.appendChild(m.offset)
@@ -859,8 +865,7 @@ Function onModeChange()
     m.twoLineInfo.appendChild(m.secondLineGroup)
     m.secondLineGroup.appendChild(m.line2)
 
-    'The third item spacing is to add the space between description and starring/directors/needsLogin(signup text with lock icon)
-    m.offset.itemSpacings = [13, 13, 2]
+    m.offset.itemSpacings = [13, 13, 13, 2]
   else if m.top.mode = m.constants.ui.infoPanelModes.series
     ' used for episodes/series on the details screen
     m.infoPanelGroup.appendChild(m.offset)
@@ -884,9 +889,8 @@ Function onModeChange()
 
     m.twoLineInfo.appendChild(m.secondLineGroup)
 
-    'The fourth item spacing is to add the space between description and starring/director/needsLogin(signup text with lock icon)
     m.secondLineGroup.appendChild(m.line2)
-    m.offset.itemSpacings = [13, 16, 13, 2]
+    m.offset.itemSpacings = [13, 16, 13, 13, 2]
   else if m.top.mode = m.constants.ui.infoPanelModes.episode
     ' used for episodes on the episode list screen
     m.infoPanelGroup.appendChild(m.offset)
@@ -909,8 +913,7 @@ Function onModeChange()
     m.twoLineInfo.appendChild(m.secondLineGroup)
     m.secondLineGroup.appendChild(m.line2)
 
-    'The fourth item spacing is to add the space between description and needsLogin(signup text with lock icon)
-    m.offset.itemSpacings = [13, 16, 13, 2]
+    m.offset.itemSpacings = [13, 16, 13]
   else if m.top.mode = m.constants.ui.infoPanelModes.season
     ' used when the side nav season item is focused on the episode list screen
     m.infoPanelGroup.appendChild(m.offset)
@@ -922,7 +925,7 @@ Function onModeChange()
     m.secondLineGroup.appendChild(m.line2)
 
     'The third item spacing is to add the space between description and needsLogin(signup text with lock icon)
-    m.offset.itemSpacings = [13, 16, 13, 2]
+    m.offset.itemSpacings = [13, 16, 13]
   else if m.top.mode = m.constants.ui.infoPanelModes.continueWatching 'guest User
     ' used for guest user continue watching row on the home screen
     m.infoPanelGroup.appendChild(m.offset)
@@ -936,7 +939,8 @@ Function onModeChange()
     m.offset.appendChild(m.title)
     m.offset.appendChild(m.descriptionGroup)
     m.offset.appendChild(m.playerCountdownGroup)
-    m.offset.itemSpacings = [12, 12, 2]
+    'The fourth item spacing is to add the space between playerCountdownGroup and needsLogin(signup text with lock icon)
+    m.offset.itemSpacings = [12, 12, 12, 2]
   else if m.top.mode = m.constants.ui.infoPanelModes.epg
     '//For when the linear player is on its own EPG screen
     m.infoPanelGroup.appendChild(m.leftHeaderImage)
@@ -957,7 +961,7 @@ Function onModeChange()
     m.playerCountdownGroup.translation = [1215, -111]
 
     'The third item spacing is to add the space between description and needsLogin(signup text with lock icon)
-    m.offset.itemSpacings = [12, 16, 2]
+    m.offset.itemSpacings = [12, 16, 13]
   else if m.top.mode = m.constants.ui.infoPanelModes.simplifiedLinearPlayer
     '//For when the linear player is on its own EPG screen
     m.infoPanelGroup.appendChild(m.offset)
@@ -988,7 +992,7 @@ Function onModeChange()
     m.secondLineGroup.appendChild(m.line2)
 
     'The third item spacing is to add the space between description and needsLogin(signup text with lock icon)
-    m.offset.itemSpacings = [13, 16, 2]
+    m.offset.itemSpacings = [13, 16, 13]
   else if m.top.mode = m.constants.ui.infoPanelModes.sportsEvent
     m.infoPanelGroup.appendChild(m.offset)
     m.offset.appendChild(m.title)
@@ -1023,8 +1027,7 @@ Function onModeChange()
 
     m.offset.appendChild(m.descriptionGroup)
 
-    'The fourth itemSpacing is to add the space between description and needsLogin(signup text with lock icon)
-    m.offset.itemSpacings = [13, 16, 13, 2]
+    m.offset.itemSpacings = [13, 16, 13]
   end if
 End Function
 
