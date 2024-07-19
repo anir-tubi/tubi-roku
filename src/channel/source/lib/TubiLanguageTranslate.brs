@@ -1987,10 +1987,6 @@ Function getTranslation_es_MX()
       "description": "When something is loading, this text appears so the user knows something is loading.",
       "message": "Cargando..."
     },
-    "dialog_errorPrefix": {
-      "description": "When the user is displayed an error, this is the prefix of the error ID that is presented to them: i.e. Error 101",
-      "message": "Error: "
-    },
     "dialog_defaultError_title": {
       "description": "The default title of a popup error dialog",
       "message": "Algo salió mal"
@@ -2050,10 +2046,6 @@ Function getTranslation_es_MX()
     "dialog_button_skip": {
       "description": "Label of the dialog button to skip what is being asked",
       "message": "Saltar"
-    },
-    "dialog_button_ok": {
-      "description": "Label of the dialog button to confirm the action the dialog is asking",
-      "message": "OK"
     },
     "dialog_button_off": {
       "description": "Label of the dialog button to turn something off: i.e. turn off closed captions",
@@ -2891,22 +2883,6 @@ Function getTranslation_es_MX()
       "description": "metadata label to indicate the actors of the current video title",
       "message": "Protagonizado por"
     },
-    "metadata_hoursAndMinutes": {
-      "description": "a duration listed in hours and minutes (abbreviated for brevity and so singular and plural forms are irrelevant)",
-      "message": "{hours} h {minutes} min"
-    },
-    "metadata_hours": {
-      "description": "a duration listed in hours (abbreviated for brevity and so singular and plural forms are irrelevant)",
-      "message": "{hours} h"
-    },
-    "metadata_minutes": {
-      "description": "a duration listed in minutes (abbreviated for brevity and so singular and plural forms are irrelevant)",
-      "message": "{minutes} min"
-    },
-    "metadata_seconds": {
-      "description": "a duration listed in seconds (abbreviated for brevity and so singular and plural forms are irrelevant)",
-      "message": "{seconds} sec"
-    },
     "metadata_seasons_plural": {
       "description": "Label of how many seasons of the current TV title",
       "message": "{seasons} Temporadas"
@@ -2914,10 +2890,6 @@ Function getTranslation_es_MX()
     "metadata_seasons_singular": {
       "description": "Label for when the current TV title has exactly one season",
       "message": "1 Temporada"
-    },
-    "metadata_series": {
-      "description": "Label to indicate a title is a TV series",
-      "message": "Series"
     },
     "sponsor_brought_by": {
       "description": "When content is sponsored by an advertizer, then this text proceeds the image of the sponsor. The text and the image should make a complete sentence.",
@@ -3321,10 +3293,6 @@ Function getTranslation_es_MX()
       "description": "Available closed caption tracks section header label.",
       "message": "Subtítulos"
     },
-    "cc_audio_overlay_audio": {
-      "description": "Available audio tracks section header label.",
-      "message": "Audio"
-    },
     "consent_screen_heading": {
       "description": "Consent screen heading.",
       "message": "Tu Privacidad"
@@ -3658,10 +3626,6 @@ Function getTranslation_fr_CA()
     "dialog_button_skip": {
       "description": "Label of the dialog button to skip what is being asked",
       "message": "Passer"
-    },
-    "dialog_button_ok": {
-      "description": "Label of the dialog button to confirm the action the dialog is asking",
-      "message": "OK"
     },
     "dialog_button_off": {
       "description": "Label of the dialog button to turn something off: i.e. turn off closed captions",
@@ -4499,22 +4463,6 @@ Function getTranslation_fr_CA()
       "description": "metadata label to indicate the actors of the current video title",
       "message": "Avec"
     },
-    "metadata_hoursAndMinutes": {
-      "description": "a duration listed in hours and minutes (abbreviated for brevity and so singular and plural forms are irrelevant)",
-      "message": "{hours} h {minutes} min"
-    },
-    "metadata_hours": {
-      "description": "a duration listed in hours (abbreviated for brevity and so singular and plural forms are irrelevant)",
-      "message": "{hours} h"
-    },
-    "metadata_minutes": {
-      "description": "a duration listed in minutes (abbreviated for brevity and so singular and plural forms are irrelevant)",
-      "message": "{minutes} min"
-    },
-    "metadata_seconds": {
-      "description": "a duration listed in seconds (abbreviated for brevity and so singular and plural forms are irrelevant)",
-      "message": "{seconds} sec"
-    },
     "metadata_seasons_plural": {
       "description": "Label of how many seasons of the current TV title",
       "message": "{seasons} saisons"
@@ -4578,10 +4526,6 @@ Function getTranslation_fr_CA()
     "linearVideoPlayer_buttonCaptions2": {
       "description": "Label of a Button to display the closed captions",
       "message": "Sous-titres"
-    },
-    "linearVideoPlayer_buttonGuide": {
-      "description": "Label of a Button to view the channel guide",
-      "message": "Guide"
     },
     "linearVideoPlayer_buttonGuide2": {
       "description": "Label of a Button to view the channel guide",
@@ -4929,10 +4873,6 @@ Function getTranslation_fr_CA()
       "description": "Available closed caption tracks section header label.",
       "message": "Sous-titres"
     },
-    "cc_audio_overlay_audio": {
-      "description": "Available audio tracks section header label.",
-      "message": "Audio"
-    },
     "consent_screen_heading": {
       "description": "Consent screen heading.",
       "message": "Votre Vie Privée"
@@ -5061,10 +5001,6 @@ Function getTranslation_fr_CA()
       "description": "Message on the toast message informing the user of update ToS. Please keep style tags intact when translating.",
       "message": "<defaultStyle>Nous avons mis à jour nos Conditions d'utilisation. En continuant à utiliser Tubi, vous acceptez ces conditions mises à jour. Vous pouvez consulter nos conditions sur</defaultStyle><urlStyle>https://tubitv.com/static/terms</urlStyle>"
     },
-    "updated_terms_toast_header": {
-      "description": "Header on the toast message informing the user of update ToS",
-      "message": "Important"
-    },
     "privacy_center_restart_channel": {
       "description": "Settings screen privacy center restart channel button label.",
       "message": "Redémarrer"
@@ -5107,14 +5043,6 @@ Function getTranslation_en_GB()
       "description": "header text to be displayed on Toast-message when user unfavorites a linear channel",
       "message": "Removed from Favourites"
     },
-    "dialog_tvDisabled_title": {
-      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav TV menu item but the item has been disabled",
-      "message": "TV Shows Disabled"
-    },
-    "dialog_linearEPGDisabled_title": {
-      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav Live TV menu item but the item has been disabled",
-      "message": "Live TV Disabled"
-    },
     "screenSettings_about_description": {
       "description": "The description on the about screen",
       "message": "Tubi is the leading free, premium, video streaming app. We have a large and diverse library of content with many thousands of titles and 3x fewer adverts than other TV services."
@@ -5150,10 +5078,6 @@ Function getTranslation_en_GB()
     "screenMyStuff_signedOutUISubtitle": {
       "description": "The subtitle of the MyStuff Screen for the guest user.",
       "message": "Find your favourites fast, pick up where you left off–all in one place."
-    },
-    "screenDetails_button_episodes_experiment": {
-      "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
-      "message": "All Episodes"
     },
     "screenAgeVerification_network_issue": {
       "description": "An error message shown to users when they submit their birthdate, but there is an unexpected server or network error",
