@@ -10,6 +10,7 @@ Function init()
 
   topRef.observeFieldScoped("itemSelected", "onItemSelectedChange")
   topRef.observeFieldScoped("defaultCheckedItemIndex", "onDefaultCheckedItemIndexChange")
+  topRef.observeFieldScoped("updateSelection", "onItemSelectedChange")
   m.currentCheckedItemIndex = topRef.defaultCheckedItemIndex
 End Function
 
@@ -23,7 +24,7 @@ Function onItemSelectedChange(msg)
   selectedItemIndex = msg.getData()
   content = m.top.content
 
-  if content <> invalid
+  if content <> invalid AND (m.currentCheckedItemIndex <> selectedItemIndex)
     contentCount = content.getChildCount()
 
     'Removes tick/check mark from all items on list

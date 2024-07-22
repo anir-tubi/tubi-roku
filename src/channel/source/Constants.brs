@@ -820,6 +820,27 @@ Function getConstants()
         constants.player.subtitle.localizedLanguage.german = "Deutsch"
         constants.player.subtitle.localizedLanguage.italian = "Italiano"
 
+    constants.player.audioTrack = {}
+
+      constants.player.audioTrack.audioDescriptionTrackNamePrefix = "Audio Description"
+      constants.player.audioTrack.audioDescriptionTrackName = "English - Audio Description"
+
+      constants.player.audioTrack.localizedLanguage = {}
+      constants.player.audioTrack.localizedLanguage.EN = "English"
+      constants.player.audioTrack.localizedLanguage.ES = "Español"
+      constants.player.audioTrack.localizedLanguage.FR = "Français"
+      constants.player.audioTrack.localizedLanguage.DE = "Deutsch"
+      constants.player.audioTrack.localizedLanguage.PO = "Português"
+      constants.player.audioTrack.localizedLanguage.IT = "Italiano"
+      constants.player.audioTrack.localizedLanguage.JA = "Japanese"
+      constants.player.audioTrack.localizedLanguage.KO = "Korean"
+      constants.player.audioTrack.localizedLanguage.ZH = "Chinese"
+
+      constants.player.audioTrack.roles = {}
+        constants.player.audioTrack.roles.main = "main"
+        constants.player.audioTrack.roles.description = "description"
+      
+
     'video player returns one of the following
     constants.player.playerResults = {}
       constants.player.playerResults.completed = "COMPLETED"
@@ -898,12 +919,6 @@ Function getConstants()
           avcCodec + "_" + maxH264Resolution.toStr() + "p"
         ]
       end if
-
-      constants.player.audioTrackRoles = {}
-        constants.player.audioTrackRoles.main = "main"
-        constants.player.audioTrackRoles.description = "description"
-
-      constants.player.audioDescriptionTrackNamePrefix = "Audio Description"
 
       'constants needed for the linear video player
       constants.player.linear = {}
@@ -1620,7 +1635,7 @@ Function getConstants()
       constants.persistentDataKeyConsentKeyMapping = {
         "enable_video_preview": constants.consentKeys.essential
         "audio_track": constants.consentKeys.essential
-        "subtitleTrack": constants.consentKeys.essential
+        "subtitle_track": constants.consentKeys.essential
         "enable_like_toast_notification": constants.consentKeys.essential
         "enable_dislike_toast_notification": constants.consentKeys.essential
         "last_roku_cw_consent_prompt_shown_at": constants.consentKeys.essential

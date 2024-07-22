@@ -1405,6 +1405,7 @@ Function onAudioTrackSettingsChange(msg)
   selectedAudioTrack = msg.getData()
   ' Making sure we only call update when necessary.
   currentAudioTrack = m.pub_serverPersistentData.audioTrack
+
   if (currentAudioTrack.language <> selectedAudioTrack.language) OR (currentAudioTrack.role <> selectedAudioTrack.role)
     saveServerPersistentData({
       "audioTrack": selectedAudioTrack

@@ -8,6 +8,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/source/lib/ArrayUtils.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -57,13 +58,6 @@
     <!-- Sample: {"language": "EN"} -->
     <field id="subtitleTrackSettings" type="assocarray" value="{}" />
 
-    <!--
-      - Will be set when the user selects an audio track. This will be used to update the user or device settings to store the selected audio track as the preferred audio track.
-      - The AA set on the audioTrackSettings field contains 2 keys: "language" which is a 2 letter lanuguage code and "role". "role" can have the values "main" or "description".
-    -->
-
-    <!-- Sample: {"language": "en","role": "main"} -->
-    <field id="audioTrackSettings" type="assocarray" value="{}" />
   </interface>
 
   <children>

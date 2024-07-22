@@ -66,6 +66,7 @@ Function init()
   m.Video.observeField("streamingSegment", "onStreamingSegmentChange")
   m.video.observeFieldScoped("availableSubtitleTracks", "setCCAudioTransportBarVisibility")
   m.video.observeFieldScoped("availableAudioTracks", "onAvailableAudioTracksChange")
+  m.video.observeFieldScoped("audioTrack", "onAudioTrackChanged")
   if getExperimentResource("roku_async_stop", "roku_async_stop_v5", false).enabled = true then
     m.video.asyncStopSemantics = true
   end if
@@ -234,7 +235,7 @@ Function init()
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("globalCaptionTurnedOff", "onGlobalCaptionTurnedOffChange")
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("wasBackButtonSelected", "onWasBackButtonSelectedChange")
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("trackingEventInfo", "onTrackingEventInfoChange")
-  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("audioTrack", "onAudioTrackChange")
+  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("audioTrack", "onAudioTrackChangedOnCCOverlay")
   m.closedCaptionAndAudioSelectionOverlayGroup = m.top.findNode("closedCaptionAndAudioSelectionOverlayGroup")
 
   'm.focusedNode holds the node/component which helps setting/unsetting focus to component/m.top on video player screen
@@ -361,7 +362,8 @@ Function init()
 End Function
 
 
-Function onScreenFocusChange()
+Function onScreenFocusChange() 
+
   if m.top.hasFocus() = true then
     if m.top.adState = "adsPlaying" then
       ' If the screensaver screen takes over while an ad is paused when they leave the screensaver they are brought back to the video player screen but the focus is on the screen itself not the RAF renderer. We are manually setting it back so a user can properly resume the ad.
@@ -483,70 +485,7 @@ Function playContent()
       updateLastPingTime(0)
     end if
 
-    'start_video user event analytics
-    if m.top.isTrailer = true
-      'set up tracking for trailer
-      trackEvent({
-        type: "start_trailer"
-        values: {
-          video_id: m.Video.content.id.toInt()
-          is_fullscreen: true
-        }
-      })
-    else
-      'set up tracking for normal playback
-      playbackSource = m.top.playbackSource
-      isLiveTv = false
-      isFullScreen = true
-      isEmbedded = false
-
-      hasSubtitles = false
-      if m.Video.globalCaptionMode = "On" AND m.Video.content.hasSubtitles = true
-        hasSubtitles = true
-      end if
-
-      resourceType = "VIDEO_RESOURCE_TYPE_UNKNOWN"
-      if m.Video.content.drmType = m.constants.player.drmTypes.dashWidevine
-        resourceType = "VIDEO_RESOURCE_TYPE_DASH_WIDEVINE"
-      else if m.Video.content.drmType = m.constants.player.drmTypes.dashPlayready
-        resourceType = "VIDEO_RESOURCE_TYPE_DASH_PLAYREADY"
-      else if m.Video.content.drmType = m.constants.player.drmTypes.dash
-        resourceType = "VIDEO_RESOURCE_TYPE_DASH"
-      else if m.Video.content.drmType = m.constants.player.drmTypes.hlsv6
-        resourceType = "VIDEO_RESOURCE_TYPE_HLSV6"
-      else if m.Video.content.drmType = m.constants.player.drmTypes.hlsv3
-        resourceType = "VIDEO_RESOURCE_TYPE_HLSV3"
-      end if
-
-      codeType = "VIDEO_CODEC_UNKNOWN"
-      if isNonEmptyString(m.Video.content.codec) = true
-        codeType = "VIDEO_CODEC_" + m.Video.content.codec
-      end if
-
-      resolution = "VIDEO_RESOLUTION_UNKNOWN"
-      if isNonEmptyString(m.Video.content.resolution) = true
-        resolution = "VIDEO_RESOLUTION_" + m.Video.content.resolution
-      end if
-
-      trackEvent({
-        type: "start_video"
-        values: {
-          video_id: m.Video.content.id.toInt()
-          start_position: Int(m.playerPosition * 1000)
-          current_cdn: ""   'not possible for Roku client
-          has_subtitles: hasSubtitles  'the video player will show subtitles at start
-          is_livetv: isLiveTv
-          is_embedded: isEmbedded
-          is_fullscreen: isFullScreen
-          playback_source: playbackSource.srcForAnalytic
-          video_player: "DEFAULT"
-          video_resource_type: resourceType
-          video_resource_url: m.Video.content.URL
-          video_codec_type: codeType
-          video_resolution: resolution
-        }
-      })
-    end if
+    fireStartVideoOrTrailerEvent()
 
     updateVideoState("play")
     if m.top.enableAds = true then
@@ -576,7 +515,7 @@ Function playContent()
       ' case Roku's video player logic will choose an audio track
       setInitialAudioTrack(m.Video.availableAudioTracks)
     end if
-
+  
   end if
 
 End Function
@@ -812,12 +751,83 @@ Function updateLastPingTime(position)
 End Function
 
 
+Function fireStartVideoOrTrailerEvent()
+
+  'start_video user event analytics
+  if m.top.isTrailer = true
+    'set up tracking for trailer
+    trackEvent({
+      type: "start_trailer"
+      values: {
+        video_id: m.Video.content.id.toInt()
+        is_fullscreen: true
+      }
+    })
+  else
+    'set up tracking for normal playback
+    playbackSource = m.top.playbackSource
+    isLiveTv = false
+    isFullScreen = true
+    isEmbedded = false
+
+    hasSubtitles = false
+    if m.Video.globalCaptionMode = "On" AND m.Video.content.hasSubtitles = true
+      hasSubtitles = true
+    end if
+
+    resourceType = "VIDEO_RESOURCE_TYPE_UNKNOWN"
+    if m.Video.content.drmType = m.constants.player.drmTypes.dashWidevine
+      resourceType = "VIDEO_RESOURCE_TYPE_DASH_WIDEVINE"
+    else if m.Video.content.drmType = m.constants.player.drmTypes.dashPlayready
+      resourceType = "VIDEO_RESOURCE_TYPE_DASH_PLAYREADY"
+    else if m.Video.content.drmType = m.constants.player.drmTypes.dash
+      resourceType = "VIDEO_RESOURCE_TYPE_DASH"
+    else if m.Video.content.drmType = m.constants.player.drmTypes.hlsv6
+      resourceType = "VIDEO_RESOURCE_TYPE_HLSV6"
+    else if m.Video.content.drmType = m.constants.player.drmTypes.hlsv3
+      resourceType = "VIDEO_RESOURCE_TYPE_HLSV3"
+    end if
+
+    codeType = "VIDEO_CODEC_UNKNOWN"
+    if isNonEmptyString(m.Video.content.codec) = true
+      codeType = "VIDEO_CODEC_" + m.Video.content.codec
+    end if
+
+    resolution = "VIDEO_RESOLUTION_UNKNOWN"
+    if isNonEmptyString(m.Video.content.resolution) = true
+      resolution = "VIDEO_RESOLUTION_" + m.Video.content.resolution
+    end if
+
+    trackEvent({
+      type: "start_video"
+      values: {
+        video_id: m.Video.content.id.toInt()
+        start_position: Int(m.playerPosition * 1000)
+        current_cdn: ""   'not possible for Roku client
+        has_subtitles: hasSubtitles  'the video player will show subtitles at start
+        is_livetv: isLiveTv
+        is_embedded: isEmbedded
+        is_fullscreen: isFullScreen
+        playback_source: playbackSource.srcForAnalytic
+        video_player: "DEFAULT"
+        video_resource_type: resourceType
+        video_resource_url: m.Video.content.URL
+        video_codec_type: codeType
+        video_resolution: resolution
+      }
+    })
+  end if
+
+End Function
+
+
 '''''''''''''''''''''''''
 ' onVideoPositionChange
 '
 ' The notificationInterval and analyticsInterval are not necessarily equal or evenly divisible
 ' so we check the time passage before we send playProgress events
 Function onVideoPositionChange(msg)
+
   floatPosition = msg.getData()
   ' position is a float so we have to convert it to an integer for our key based lookups to work correctly
   position = int(floatPosition)
@@ -2083,6 +2093,37 @@ Function onAvailableAudioTracksChange(msg)
 End Function
 
 
+Function onAudioTrackChanged(msg)
+  audioTrack = msg.getData()
+  m.closedCaptionAndAudioSelectionOverlay.currentAudioTrack = audioTrack
+  availableAudioTracks = m.Video.availableAudioTracks
+
+  for each track in availableAudioTracks
+
+    if audioTrack = track.Track
+      audioDescriptionTrackNamePrefix = m.constants.player.audioTrack.audioDescriptionTrackNamePrefix
+      
+      if isNonEmptyString(track.name) = true AND track.name.instr(audioDescriptionTrackNamePrefix) > -1
+        role = m.constants.player.audioTrack.roles.description
+      else
+        role = m.constants.player.audioTrack.roles.main
+      end if
+
+      languageCode = m.tubiTrackingInfo.getLanguageCode(track.language)
+      selectedAudioTrack = {
+        language: languageCode,
+        role: role
+      }
+
+      m.top.audioTrackSettings = selectedAudioTrack
+      m.top.preferredAudioTrack = selectedAudioTrack
+
+    end if
+
+  end for
+End Function
+
+
 Function setInitialSubtitleTrack(availableSubtitleTracks)
   preferredSubtitleTrack = m.top.preferredSubtitleTrack
 
@@ -2129,15 +2170,17 @@ Function setInitialAudioTrack(availableAudioTracks)
       if isNonEmptyString(track.name) then
 
         hasAccessibilityDescription = false
-        if track.name.instr(m.constants.player.audioDescriptionTrackNamePrefix) > -1
+        if track.name.instr(m.constants.player.audioTrack.audioDescriptionTrackNamePrefix) > -1
           hasAccessibilityDescription = true
         end if
 
-        if track.language = preferredAudioTrack.language
+        languageCode = m.tubiTrackingInfo.getLanguageCode(track.language)
+
+        if languageCode = preferredAudioTrack.language
           ' If it is normal audio track and user did not prefer one with audio description.
-          if hasAccessibilityDescription = false AND preferredAudioTrack.role = m.constants.player.audioTrackRoles.main
+          if hasAccessibilityDescription = false AND preferredAudioTrack.role = m.constants.player.audioTrack.roles.main
             updatedAudioTrack = track
-          else if hasAccessibilityDescription = true AND preferredAudioTrack.role = m.constants.player.audioTrackRoles.description
+          else if hasAccessibilityDescription = true AND preferredAudioTrack.role = m.constants.player.audioTrack.roles.description
             updatedAudioTrack = track
           end if
         end if
@@ -2163,7 +2206,7 @@ Function setInitialAudioTrack(availableAudioTracks)
 End Function
 
 
-Function onAudioTrackChange(msg)
+Function onAudioTrackChangedOnCCOverlay(msg)
   audioTrack = msg.getData()
   m.Video.audioTrack = audioTrack
 End Function

@@ -1164,25 +1164,35 @@ Function tubiTracking_isString(value)
 End Function
 
 
-' Returns language code based on the language returned from backend.
+' Returns 2 digit language code in upper case based on the language returned from backend.
 ' @language: string, contains the language that is been returned from backend.
 Function tubiTracking_getLanguageCode(language)
   languageCode = "UNKNOWN"
 
-  if language = "eng" OR language = "en"
-    languageCode = "EN"
-  else if language = "spa"
-    languageCode = "ES"
-  else if language = "fre"
-    languageCode = "FR"
-  else if language = "fra"
-    languageCode = "FR"
-  else if language = "kor"
-    languageCode = "KO"
-  else if language = "cho"
-    languageCode = "ZH"
-  else if language = "zhi"
-    languageCode = "ZH"
+  if isString(language) = true
+  
+    language = LCase(language)
+
+    if language = "eng" OR language = "en" 'ENGLISH
+      languageCode = "EN"
+    else if language = "spa" OR language = "es" 'ESPANOL
+      languageCode = "ES"
+    else if language = "fra" OR language = "fre" OR language = "fr" 'FRENCH
+      languageCode = "FR"
+    else if language = "ger" OR language = "due" OR language = "de" 'GERMAN
+      languageCode = "DE"  
+    else if language = "por" OR language = "pt" 'PORTUGUESE
+      languageCode = "PT"
+    else if language = "ita" OR language = "it" 'ITALIAN
+      languageCode = "IT"  
+    else if language = "jpn" OR language = "ja" 'JAPANESE
+      languageCode = "JA"
+    else if language = "kor" OR language = "ko" 'KOREAN
+      languageCode = "KO"
+    else if language = "chi" OR language = "zho" OR language = "zh" 'CHINESE
+      languageCode = "ZH"  
+    end if
+
   end if
 
   return languageCode

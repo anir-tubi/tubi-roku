@@ -3,7 +3,13 @@
   <script type="text/brightscript" uri="CheckBoxList.brs" />
 
    <interface>
-   <!-- Setting always notify so that m scope value of defaultCheckedItemIndex is always synced up with this value on re-open. -->
+    <!-- INPUTS -->
+   
+    <!-- Setting always notify so that m scope value of defaultCheckedItemIndex is always synced up with this value on re-open. -->
     <field id="defaultCheckedItemIndex" type="int" alwaysNotify="true" />
+    
+    <!-- updateSelection is used to handled below use case 
+         It is possible user may update the Audio Track in Roku firmware UI when the CCOverlay is open, At this time we need to update the audio track selection on CCOverlay as well to make it same -->
+    <field id="updateSelection" type="int" alwaysNotify="true" />
   </interface>
 </component>

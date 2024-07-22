@@ -54,6 +54,19 @@ End Function
 
 Function onCurrentAudioTrackChange(msg)
   m.currentAudioTrack = msg.getData()
+
+  if isNonEmptyArray(m.availableAudioTracks) = true
+    for i = 0 to m.availableAudioTracks.Count()-1
+      track = m.availableAudioTracks[i]
+      
+      if track.track = m.currentAudioTrack
+        'It is possible user may update the Audio Track in Roku firmware UI when the CCOverlay is open, At this time we need to update the audio track selection on CCOverlay as well to make it same.
+        m.audioTrackSelector.updateSelection = i
+        exit for
+      end if
+    end for
+  end if
+
 End Function
 
 
@@ -140,34 +153,76 @@ Function renderAvailableClosedCaptionTracks()
 End Function
 
 
+Function sortAudioTracks(availableAudioTracks)
+
+  hasAccessibilityDescription = false
+  for each track in availableAudioTracks
+    if isNonEmptyString(track.name) = true AND track.name.instr(m.constants.player.audioTrack.audioDescriptionTrackNamePrefix) > -1
+      hasAccessibilityDescription = true
+      exit for
+    end if
+  end for
+
+  audioTracks = []
+
+  for each track in availableAudioTracks
+    languageCode = m.tubiTrackingInfo.getLanguageCode(track.language)
+
+    if languageCode = "EN" 'ENGLISH
+      if isNonEmptyString(track.name) = true AND track.name.instr(m.constants.player.audioTrack.audioDescriptionTrackNamePrefix) > -1
+        index = 1
+      else
+        index = 0  
+      end if
+    else if languageCode = "ES" 'ESPANOL
+      if hasAccessibilityDescription = true
+        index = 2
+      else
+        index = 1
+      end if
+    else if languageCode = "FR" 'FRENCH
+      if hasAccessibilityDescription = true
+        index = 3
+      else
+        index = 2
+      end if
+    else
+      index = availableAudioTracks.Count()
+    end if
+
+    audioTracks = insertItemIntoArray(audioTracks, track, index)
+  end for
+
+  return audioTracks
+End Function
+
+
 Function renderAudioTracks()
   currentAudioTrack = m.currentAudioTrack
-  availableAudioTracks = m.top.availableAudioTracks
-
-  ' Sorting the audio tracks since the sort order is not assured from backend.
-  ' Below approach of sorting will make sure even when we have multiple languages they are grouped together.
-  ' And always as the same position.
-  availableAudioTracks.sortBy("Name")
-
-  ' Storing in availableAudioTracks in m scope since we sorting the array obtained from roku video node.
-  m.availableAudioTracks = availableAudioTracks
-
+  m.availableAudioTracks = m.top.availableAudioTracks
   trackNodeCount = 0
   trackNodes = []
-  if availableAudioTracks.Count() > 1
-    index = 0
 
-    for each track in availableAudioTracks
+  if m.availableAudioTracks.Count() > 1
+    index = 0
+    sortedAudioTracks = sortAudioTracks(m.availableAudioTracks)
+    m.availableAudioTracks = sortedAudioTracks
+
+    for each track in sortedAudioTracks
+
       if isNonEmptyString(track.name) then
         checked = (currentAudioTrack = track.track)
+        localizedTitle = getLocalizedAudioTrackLanguage(track)
+
         trackNodes.push({
-          title: track.name
+          title: localizedTitle
           checked: checked
         })
 
         if checked = true
           m.audioTrackSelector.defaultCheckedItemIndex = index
         end if
+
         index = index + 1
       end if
     end for
@@ -265,6 +320,25 @@ Function getLocalizedSubtitleLanguage(subtitleLanguage)
 End Function
 
 
+'getLocalizedAudioTrackLanguage gets the localized audio track language
+'
+'@track: assocarray, audio track object returned from backend
+'returns (string) localized audio track name or audio track name as returned from backend
+Function getLocalizedAudioTrackLanguage(track)
+  localizedAudioTrackLanguage = track.name
+  languageCode =  m.tubiTrackingInfo.getLanguageCode(track.language)
+  audioDescriptionTrackNamePrefix = m.constants.player.audioTrack.audioDescriptionTrackNamePrefix
+
+  if languageCode = "EN" AND isNonEmptyString(track.name) = true AND track.name.instr(audioDescriptionTrackNamePrefix) > -1 'English Audio Description
+    localizedAudioTrackLanguage = m.constants.player.audioTrack.audioDescriptionTrackName
+  else if languageCode <> "UNKNOWN"
+    localizedAudioTrackLanguage = m.constants.player.audioTrack.localizedLanguage[languageCode]
+  end if
+
+  return localizedAudioTrackLanguage
+End Function
+
+
 ' Callback triggered when the user changes the caption selection.
 Function onClosedCaptionSelectorItemSelectedChange(msg)
   itemSelected = msg.getData()
@@ -317,7 +391,7 @@ Function onAudioTrackSelectorItemSelectedChange(msg)
     m.currentAudioTrack = selectedTrack.track
 
     hasAccessibilityDescription = false
-    if selectedTrack.name.instr(m.constants.player.audioDescriptionTrackNamePrefix) > -1
+    if selectedTrack.name.instr(m.constants.player.audioTrack.audioDescriptionTrackNamePrefix) > -1
       hasAccessibilityDescription = true
     end if
 
@@ -330,16 +404,6 @@ Function onAudioTrackSelectorItemSelectedChange(msg)
       }
     }
 
-    ' Setting the preferred audio track so that it can saved to user/device settings.
-    role = m.constants.player.audioTrackRoles.main
-    if hasAccessibilityDescription = true
-      role = m.constants.player.audioTrackRoles.description
-    end if
-
-    m.top.audioTrackSettings = {
-      language: selectedTrack.language,
-      role: role
-    }
   end if
 End Function
 

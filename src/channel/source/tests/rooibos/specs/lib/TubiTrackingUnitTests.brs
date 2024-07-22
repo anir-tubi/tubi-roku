@@ -565,13 +565,88 @@ End Function
 
 '@Test getLanguageCode unit tests
 Function tubiTracking_getLanguageCode_test()
+
+  languageCode = m.Tracking.getLanguageCode("ENG")
+  m.assertEqual(languageCode, "EN")
+
   languageCode = m.Tracking.getLanguageCode("en")
   m.assertEqual(languageCode, "EN")
 
-  languageCode = m.Tracking.getLanguageCode("fra")
+  languageCode = m.Tracking.getLanguageCode("SPA")
+  m.assertEqual(languageCode, "ES")
+
+  languageCode = m.Tracking.getLanguageCode("es")
+  m.assertEqual(languageCode, "ES")
+
+  languageCode = m.Tracking.getLanguageCode("FRA")
   m.assertEqual(languageCode, "FR")
+
+  languageCode = m.Tracking.getLanguageCode("FRE")
+  m.assertEqual(languageCode, "FR")
+
+  languageCode = m.Tracking.getLanguageCode("fr")
+  m.assertEqual(languageCode, "FR")  
+
+  languageCode = m.Tracking.getLanguageCode("GER")
+  m.assertEqual(languageCode, "DE")
+
+  languageCode = m.Tracking.getLanguageCode("DUE")
+  m.assertEqual(languageCode, "DE")
+
+  languageCode = m.Tracking.getLanguageCode("de")
+  m.assertEqual(languageCode, "DE")
+
+  languageCode = m.Tracking.getLanguageCode("POR")
+  m.assertEqual(languageCode, "PT")
+
+  languageCode = m.Tracking.getLanguageCode("pt")
+  m.assertEqual(languageCode, "PT")
+
+  languageCode = m.Tracking.getLanguageCode("ITA")
+  m.assertEqual(languageCode, "IT")
+
+  languageCode = m.Tracking.getLanguageCode("it")
+  m.assertEqual(languageCode, "IT")
+
+  languageCode = m.Tracking.getLanguageCode("JPN")
+  m.assertEqual(languageCode, "JA")
+
+  languageCode = m.Tracking.getLanguageCode("ja")
+  m.assertEqual(languageCode, "JA")
+
+  languageCode = m.Tracking.getLanguageCode("KOR")
+  m.assertEqual(languageCode, "KO")
+
+  languageCode = m.Tracking.getLanguageCode("ko")
+  m.assertEqual(languageCode, "KO")
+
+  languageCode = m.Tracking.getLanguageCode("CHI")
+  m.assertEqual(languageCode, "ZH")
+
+  languageCode = m.Tracking.getLanguageCode("ZHO")
+  m.assertEqual(languageCode, "ZH")
+
+  languageCode = m.Tracking.getLanguageCode("zh")
+  m.assertEqual(languageCode, "ZH")
+
+  ' Passing a 4 digit code which is not in the if else conditions.
+  languageCode = m.Tracking.getLanguageCode("abcd")
+  m.assertEqual(languageCode, "UNKNOWN")
 
   ' Passing a code which is not in the if else conditions.
   languageCode = m.Tracking.getLanguageCode("jfk")
   m.assertEqual(languageCode, "UNKNOWN")
+
+  ' Passing invalid which will return UNKNOWN.
+  languageCode = m.Tracking.getLanguageCode(invalid)
+  m.assertEqual(languageCode, "UNKNOWN")
+
+  ' Passing an integer which will return UNKNOWN.
+  languageCode = m.Tracking.getLanguageCode(5)
+  m.assertEqual(languageCode, "UNKNOWN")
+
+  ' Passing a empty string which will return UNKNOWN.
+  languageCode = m.Tracking.getLanguageCode("")
+  m.assertEqual(languageCode, "UNKNOWN")
+
 End Function

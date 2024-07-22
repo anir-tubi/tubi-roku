@@ -231,7 +231,7 @@
       <field id="sendPauseAdPixel" type="string" alwaysNotify="true"/>
 
       <field id="subtitleTrackSettings" type="assocarray" value="{}" alias="closedCaptionAndAudioSelectionOverlay.subtitleTrackSettings" />
-      <field id="audioTrackSettings" type="assocarray" value="{}" alias="closedCaptionAndAudioSelectionOverlay.audioTrackSettings" />
+      <field id="audioTrackSettings" type="assocarray" value="{}" />
 
   </interface>
 
