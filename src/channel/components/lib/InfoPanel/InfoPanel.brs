@@ -39,6 +39,7 @@ Function init()
   m.signInGroup = m.top.findNode("signInGroup")
   m.SignInLock = m.twoLineInfo.findNode("SignInLock")
   m.signInText = m.top.findNode("signInText")
+  m.SignInBg = m.top.findNode("SignInBg")
   m.reminderGroup = m.top.findNode("ReminderGroup")
   m.reminderTitle = m.top.findNode("ReminderTitle")
 
@@ -117,7 +118,7 @@ Function init()
   setTypographyOfLabel(m.ExpireWarning, typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.Line2, typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.Description, typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.SignInText, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.SignInText, typographyConstants.ids.bodySmall)
   setTypographyOfLabel(m.ReminderTitle, typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.DirectorTag, typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.Director, typographyConstants.ids.bodyMedium)
@@ -143,6 +144,7 @@ Function onThemeChange(msg = invalid)
     m.expireWarning.color = theme.cautionColor
     m.SignInLock.blendColor = theme.cautionColor
     m.signInText.color = theme.cautionColor
+    m.SignInBg.blendColor = theme.cautionColor
     m.Title.color = theme.primaryTextColor
     m.RatingLabel.color = theme.primaryTextColor
     m.Description.color = theme.primaryTextColor

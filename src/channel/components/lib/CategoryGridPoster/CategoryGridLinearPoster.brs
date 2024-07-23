@@ -3,7 +3,6 @@ Function init()
   m.badgeGroup = m.top.findNode("badgeGroup")
   m.progressBar = m.top.findNode("progressBar")
   m.top.observeField("itemContent", "onContentChange")
-  m.top.observeFieldScoped("focusPercent", "onFocusPercentChange")
   m.top.observeFieldScoped("height", "onPosterSizeChange")
   m.top.observeFieldScoped("width", "onPosterSizeChange")
 
@@ -51,15 +50,6 @@ Function setThemeColors()
 End Function
 
 
-Function setLockIconOpacity()
-  if m.top.itemHasFocus = false
-    if m.lockIcon <> invalid then m.lockIcon.opacity = 0.0
-  else
-    if m.lockIcon <> invalid then m.lockIcon.opacity = 1.0
-  end if
-End Function
-
-
 Function onContentChange(msg)
   itemContent = msg.getData()
   updateItemContent(itemContent)
@@ -67,7 +57,6 @@ End Function
 
 
 Function updateItemContent(itemContent)
-  removeLockIcon()
   removeBadges()
   sPosterURL = ""
 
@@ -76,6 +65,8 @@ Function updateItemContent(itemContent)
 
     if itemContent.needsLogin = true
       setLockIcon()
+    else
+      removeLockIcon()
     end if
 
     currentProgram = getCurrentliveProgram(itemContent)
@@ -123,11 +114,14 @@ Function onPosterSizeChange()
 End Function
 
 
-Function onFocusPercentChange(msg)
-  focusPercent = msg.getData()
-  item = m.top.itemContent
-  if item <> invalid AND item.needsLogin = true
-    m.lockIcon.opacity = focusPercent
+Function onHandleFocus()
+  focusPercent = m.top.focusPercent
+  if m.lockIcon <> invalid
+    if focusPercent > 0.1 AND (m.top.rowHasFocus = true OR m.top.itemHasFocus = true)
+      m.lockIcon.opacity = focusPercent
+    else
+      m.lockIcon.opacity = 0.0
+    end if
   end if
 End Function
 
@@ -172,20 +166,27 @@ End Function
 
 
 Function setLockIcon()
+
   if m.lockIcon = invalid
     m.lockIcon = m.top.createChild("Poster")
     m.lockIcon.opacity = 0.0
-    m.lockIcon.width = 21
-    m.lockIcon.height = 24
+    m.lockIcon.width = 48
+    m.lockIcon.height = 48
     m.lockIcon.uri = "pkg:/images/icon-lock.webp"
-    m.lockIcon.translation = [m.top.width - 36, 15]
+    m.lockIcon.translation = [m.top.width - 56, 8]
+    m.top.observeFieldScoped("focusPercent", "onHandleFocus")
+    m.top.observeFieldScoped("rowHasFocus", "onHandleFocus")
+    m.top.observeFieldScoped("itemHasFocus", "onHandleFocus")
   end if
-  setLockIconOpacity()
 End Function
 
 
 Function removeLockIcon()
   if m.lockIcon <> invalid
     m.top.removeChild(m.lockIcon)
+    m.lockIcon = invalid
+    m.top.unObserveFieldScoped("focusPercent")
+    m.top.unObserveFieldScoped("rowHasFocus")
+    m.top.unObserveFieldScoped("itemHasFocus")
   end if
 End Function

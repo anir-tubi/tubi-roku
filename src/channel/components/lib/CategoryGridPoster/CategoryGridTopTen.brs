@@ -3,9 +3,8 @@ Function init()
   m.topTenNumbers = m.top.findNode("topTenNumbers")
   m.bgTopTenNumbers = m.top.findNode("bgTopTenNumbers")
   m.top.observeField("itemContent", "onContentChange")
-  m.top.observeFieldScoped("focusPercent", "onFocusPercentChange")
-  m.top.observeFieldScoped("itemHasFocus", "onItemHasFocusChange")
-  m.previousFocusPercent = 0
+  m.top.observeFieldScoped("focusPercent", "onHandleFocus")
+  m.top.observeFieldScoped("rowHasFocus", "onHandleFocus")
   setThemeColors()
 End Function
 
@@ -24,12 +23,14 @@ End Function
 
 Function onContentChange(msg)
   itemContent = msg.getData()
-  removeLockIcon()
+
 
   if itemContent <> invalid AND m.top.index < 10
 
     if itemContent.needsLogin = true
       setLockIcon()
+    else
+      removeLockIcon()
     end if
 
     m.poster.uri = itemContent.hdgridposterurl
@@ -42,31 +43,16 @@ Function onContentChange(msg)
 End Function
 
 
-Function onFocusPercentChange(msg)
-  focusPercent = msg.getData()
+Function onHandleFocus()
+  focusPercent = m.top.focusPercent
   m.bgTopTenNumbers.opacity = focusPercent
-End Function
 
-
-Function onItemHasFocusChange(msg)
-  itemFocus = msg.getData()
-
-  if itemFocus = true
-    m.bgTopTenNumbers.opacity = 1.0
-  else
-    m.bgTopTenNumbers.opacity = 0.0
-  end if
-
-  setLockIconOpacity()
-End Function
-
-
-Function setLockIconOpacity()
-  if m.top.itemHasFocus = false
-    if m.lockIcon <> invalid then m.lockIcon.opacity = 0.0
-  else
-    if m.lockIcon <> invalid then m.lockIcon.opacity = 1.0
-  end if
+    if focusPercent > 0.1 AND m.top.rowHasFocus = true
+      if m.lockIcon <> invalid then m.lockIcon.opacity = focusPercent
+    else
+      if m.lockIcon <> invalid then m.lockIcon.opacity = 0.0
+      m.bgTopTenNumbers.opacity = 0.0
+    end if
 End Function
 
 
@@ -74,19 +60,18 @@ Function setLockIcon()
   if m.lockIcon = invalid
     m.lockIcon = createObject("roSGNode", "Poster")
     m.lockIcon.opacity = 0.0
-    m.lockIcon.width = 21
-    m.lockIcon.height = 24
+    m.lockIcon.width = 48
+    m.lockIcon.height = 48
     m.lockIcon.uri = "pkg:/images/icon-lock.webp"
-    m.lockIcon.translation = [m.top.width - 36, 15]
+    m.lockIcon.translation = [m.top.width - 56, 8]
     m.top.appendChild(m.lockIcon)
   end if
-
-  setLockIconOpacity()
 End Function
 
 
 Function removeLockIcon()
   if m.lockIcon <> invalid
     m.top.removeChild(m.lockIcon)
+    m.lockIcon = invalid
   end if
 End Function

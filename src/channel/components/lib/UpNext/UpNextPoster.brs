@@ -24,9 +24,11 @@ Function onContentChange()
 
     m.poster.uri = sURI
 
-    removeLockIcon()
+
     if item.needsLogin = true
       setLockIcon()
+    else
+      removeLockIcon()
     end if
 
   end if
@@ -34,20 +36,25 @@ End Function
 
 Function setLockIcon()
   tubiLog("UpNextPoster.setLockIcon")
-  m.lockIcon = m.top.createChild("Poster")
-  m.lockIcon.opacity = 0.0
-  m.lockIcon.width = 21
-  m.lockIcon.height = 24
-  m.lockIcon.uri = "pkg:/images/icon-lock.webp"
-  m.lockIcon.translation = [174, 14]
-  m.top.observeFieldscoped("focusPercent", "onFocusPercent")
+  if m.lockIcon = invalid
+    m.lockIcon = m.top.createChild("Poster")
+    m.lockIcon.opacity = 0.0
+    m.lockIcon.width = 21
+    m.lockIcon.height = 24
+    m.lockIcon.uri = "pkg:/images/icon-lock.webp"
+    m.lockIcon.translation = [184, 8]
+    m.top.observeFieldscoped("focusPercent", "onFocusPercent")
+  end if
 End Function
 
 
 Function removeLockIcon()
   tubiLog("UpNextPoster.removeLockIcon")
-  m.top.removeChild(m.lockIcon)
-  m.top.unObserveFieldscoped("focusPercent")
+  if m.lockIcon <> invalid
+    m.top.removeChild(m.lockIcon)
+    m.lockIcon = invalid
+    m.top.unObserveFieldscoped("focusPercent")
+  end if
 End Function
 
 

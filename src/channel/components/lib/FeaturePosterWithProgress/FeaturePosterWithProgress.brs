@@ -52,24 +52,39 @@ End Function
 
 
 Function setLockIcon()
-  m.lockIcon = m.top.createChild("Poster")
-  m.lockIcon.opacity = 0.0
-  m.lockIcon.width = 21
-  m.lockIcon.height = 24
-  m.lockIcon.uri = "pkg:/images/icon-lock.webp"
-  m.lockIcon.translation = [m.top.width-36, 15]
-  m.top.observeFieldscoped("focusPercent", "onFocusPercent")
+  if m.lockIcon = invalid
+    m.lockIcon = m.top.createChild("Poster")
+    m.lockIcon.opacity = 0.0
+    m.lockIcon.width = 48
+    m.lockIcon.height = 48
+    m.lockIcon.uri = "pkg:/images/icon-lock.webp"
+    m.lockIcon.translation = [m.top.width - 56, 8]
+    m.top.observeFieldscoped("focusPercent", "onHandleFocus")
+    m.top.observeField("rowHasFocus", "onHandleFocus")
+  end if
 End Function
 
 
 Function removeLockIcon()
-  m.top.removeChild(m.lockIcon)
-  m.top.unObserveFieldscoped("focusPercent")
+  if m.lockIcon <> invalid
+    m.top.removeChild(m.lockIcon)
+    m.lockIcon = invalid
+    m.top.unObserveFieldscoped("focusPercent")
+    m.top.unObserveField("rowHasFocus")
+  end if
 End Function
 
 
-Function onFocusPercent(msg)
-  if  m.lockIcon <> invalid
-    m.lockIcon.opacity = msg.getData()
+' This function combines the focus percentage and rowHasFocus to determine if the lock icon should be visible
+' to avoid a bug where lock icon is shown on first column.
+Function onHandleFocus()
+focusPercent = m.top.focusPercent
+if m.lockIcon <> invalid
+  if focusPercent > 0.1 AND m.top.rowHasFocus = true
+    m.lockIcon.opacity = focusPercent
+  else
+    m.lockIcon.opacity = 0.0
   end if
+end if
+
 End Function

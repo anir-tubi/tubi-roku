@@ -7,6 +7,7 @@ Function init()
   m.conditionallyObservedFields = [
     "itemHasFocus"
     "rowListHasFocus"
+    "rowHasFocus"
     "focusPercent"
     "width"
     "height"

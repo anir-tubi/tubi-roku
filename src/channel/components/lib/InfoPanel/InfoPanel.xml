@@ -286,20 +286,26 @@
           id="SignInGroup"
           layoutDirection="horiz"
           vertAlignment="custom"
-          itemSpacings="[10]"
+          itemSpacings="[-180,10]"
           addItemSpacingAfterChild="true">
           <Poster
+            id="SignInBg"
+            width="200"
+            height="43"
+            translation="[0,0]"
+            uri="pkg:/images/sign-in-gate-banner.webp"/>
+          <Poster
             id="SignInLock"
-            width="20"
+            width="24"
             height="24"
             translation="[0,9]"
-            uri="pkg:/images/icon-lock.webp"
+            uri="pkg:/images/lock-closed.webp"
             loadDisplayMode="scaleToFit" />
           <Label
             id="SignInText"
             width="1140"
             wrap="false"
-            translation="[0,3]">
+            translation="[0,6]">
             <Font
               id="SignInFont"
               role="font"/>

@@ -44,8 +44,6 @@ Function init()
     emptyContainer: "emptyContainer"
   }
 
-  m.top.observeFieldScoped("focusPercent", "onItemFocusPercentChange")
-  m.top.observeFieldScoped("itemHasFocus", "onRowItemHasFocus")
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.InnerTitle, typographyConstants.ids.bodySmallStrong)
@@ -71,17 +69,14 @@ Function onThemeChange()
 End Function
 
 
-Function onRowItemHasFocus()
-  setLockIconOpacity()
-End Function
+Function onHandleFocus()
 
-
-Function setLockIconOpacity()
+  focusPercent = m.top.focusPercent
   if m.lockIcon <> invalid
-    if m.top.itemHasFocus = false
-      m.lockIcon.opacity = 0.0
+    if focusPercent > 0.1 AND (m.top.rowHasFocus = true OR m.top.itemHasFocus = true)
+      m.lockIcon.opacity = focusPercent
     else
-      m.lockIcon.opacity = 1.0
+      m.lockIcon.opacity = 0.0
     end if
   end if
 End Function
@@ -126,7 +121,6 @@ Function onContentChange(msg)
   m.poster.visible = true
 
   removeBadges()
-  removeLockIcon()
   removeShowALlLabel()
 
   sPosterURL = ""
@@ -144,6 +138,8 @@ Function onContentChange(msg)
 
     if itemContent.needsLogin = true
       setLockIcon()
+    else
+      removeLockIcon()
     end if
 
     categoryContent = itemContent.getParent()
@@ -197,14 +193,6 @@ Function moveInnerAssets()
 End Function
 
 
-Function onItemFocusPercentChange()
-
-  if m.top.itemContent <> invalid AND m.top.itemContent.needsLogin = true
-    if m.lockIcon <> invalid then m.lockIcon.opacity = m.top.focusPercent
-  end if
-End Function
-
-
 Function drawHistoryProgressBar()
   history = getHistory(m.top.itemContent.id)
 
@@ -241,53 +229,6 @@ Function drawProgressBar(nowPos, duration)
   end if
 
   moveInnerAssets()
-End Function
-
-
-Function onItemFocus()
-  handleLocalFocusChange(m.top.itemHasFocus)
-End Function
-
-
-' @localFocus: boolean, the state of focus for the itemComponent
-Function handleLocalFocusChange(newLocalFocus)
-
-  if m.localFocus = false AND newLocalFocus = true
-    'Do nothing for now. But we can add logic here when needed
-  else if m.localFocus = true AND newLocalFocus = false
-    ' item is losing focus - so fade the poster in (as necessary) and destroy the video player
-    if m.poster.opacity < 1.0
-      ' stop any fade out animations that might be running
-      if m.fadeOutAnimation <> invalid
-        m.fadeOutAnimation.control = "stop"
-      end if
-
-      ' fade in the poster, but if there is already a fade in animation running, let it run
-      if m.fadeInAnimation = invalid OR m.fadeInAnimation.state <> "running"
-        m.fadeInAnimation = fade(m.poster, "in", m.posterFadeTime)
-      end if
-    end if
-
-  end if
-
-  m.localFocus = newLocalFocus
-End Function
-
-
-Function onRowListHasFocus()
-  ' fade the poster in when focusing side nav or leaving the page
-  if m.top.rowListHasFocus = false
-    handleLocalFocusChange(false)
-  end if
-End Function
-
-
-Function onFocusPercentChange()
-  if m.top.focusPercent < 1.0 AND m.localFocus = true
-    handleLocalFocusChange(false)
-  else if m.top.focusPercent = 1.0 AND m.localFocus = false AND m.top.rowListHasFocus = true
-    handleLocalFocusChange(true)
-  end if
 End Function
 
 
@@ -363,19 +304,31 @@ End Function
 
 Function setLockIcon()
   tubiLog("CategoryGridPoster.setLockIcon")
-  m.lockIcon = m.top.createChild("Poster")
-  m.lockIcon.opacity = 0.0
-  m.lockIcon.width = 21
-  m.lockIcon.height = 24
-  m.lockIcon.uri = "pkg:/images/icon-lock.webp"
-  m.lockIcon.translation = [m.top.width-36, 15]
-  setLockIconOpacity()
+  if m.lockIcon = invalid
+    m.lockIcon = m.top.createChild("Poster")
+    m.lockIcon.opacity = 0.0
+    m.lockIcon.width = 48
+    m.lockIcon.height = 48
+    m.lockIcon.uri = "pkg:/images/icon-lock.webp"
+    m.lockIcon.translation = [m.top.width - 56, 8]
+
+    m.top.observeFieldScoped("focusPercent", "onHandleFocus")
+    m.top.observeFieldScoped("itemHasFocus", "onHandleFocus")
+    m.top.observeFieldScoped("rowHasFocus", "onHandleFocus")
+  end if
 End Function
 
 
 Function removeLockIcon()
   tubiLog("CategoryGridPoster.removeLockIcon")
-  m.top.removeChild(m.lockIcon)
+  if m.lockIcon <> invalid
+    m.top.removeChild(m.lockIcon)
+    m.lockIcon = invalid
+    m.top.unObserveFieldScoped("focusPercent")
+    m.top.unObserveFieldScoped("itemHasFocus")
+    m.top.unObserveFieldScoped("rowHasFocus")
+  end if
+
 End Function
 
 

@@ -17,6 +17,8 @@
     <field id="focusPercent" type="float" />
     <field id="width" alias="Poster.width" />
     <field id="height" alias="Poster.height" />
+    <field id="rowHasFocus" type="boolean" />
+    <field id="itemHasFocus" type="boolean" />
   </interface>
 
   <children>
