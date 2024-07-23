@@ -25,6 +25,10 @@
       <!-- Indicated whether to show/hide the signIn hint -->
       <field id="needsLoginHint" type="boolean" alias="DetailInfoPanel.needsLogin" />
 
+      <!--Not intended to be used as stand alone. This field only represents reason of locking if needsLogin = true
+        this field needs to be set before setting needsLoginHint-->
+      <field id="loginReason" alias="DetailInfoPanel.loginReason" />
+
       <!-- Indicated whether to play/pause/stop video preview -->
       <field id="isVideoPreviewOn" type="boolean" value="true" />
 

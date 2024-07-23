@@ -131,7 +131,13 @@ Function onEpisodeFocused()
         genres: episode.genres
       }
       'TODO: use pubsub or someother way of communication if user is signed In or not.  isLoggedInUser uses global node.
-      m.Info.needsLogin = (episode.needsLogin = true AND isLoggedInUser() = false)
+      if episode.needsLogin = true AND isLoggedInUser() = false
+        m.Info.loginReason = episode.loginReason 'set login reason before needslogin
+        m.Info.needsLogin = true
+      else
+        m.Info.needsLogin = false
+      end if
+
       m.Info.width = 1140
       m.Info.calculateHeight = true
     end if

@@ -1616,8 +1616,12 @@ Function getTranslation_en_US()
       "message": "Sign in to watch free. No subscription or credit card required."
     },
     "registration_signIn_to_play_R_rated": {
-      "description": "hint text next to the Sign In to Play button when a non registered user focuses on details screen for sportsEvent",
-      "message": "This title requires sign in to protect younger audiences. No credit card required."
+      "description": "Hint message why we have locked the content.",
+      "message": "Sign in required to protect younger audiences. No credit card needed."
+    },
+    "registration_signIn_to_play_default": {
+      "description": "Hint message why we have locked the content. This is the default message",
+      "message": "Sign in required. No credit card needed."
     },
     "text_new":{
       "description": "simple text to use anywhere to indicate item is new",

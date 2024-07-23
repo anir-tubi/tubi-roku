@@ -308,6 +308,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
   if contentFromServer.needs_login = true and isSignedInUser = false
     translatedContent.needsLogin = true
+    translatedContent.loginReason = contentFromServer.login_reason
   end if
 
   ' in case isCdc was already set from the parent above, don't overwrite
@@ -1406,6 +1407,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
 
           if fullChild.needs_login = true AND isSignedInUser = false
             childAA.needsLogin = true
+            childAA.loginReason = fullChild.login_reason
           end if
 
           if hasVideoResources = true
@@ -2137,6 +2139,7 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
 
           if channelFromServer.needs_login = true AND isUserSignedIn = false
             channelContentNode.needsLogin = true
+            channelContentNode.loginReason = channelFromServer.login_reason
           end if
 
           channelContentNode.pubId = channelFromServer.publisher_id
@@ -2174,6 +2177,7 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
           'programlevel
           if channelFromServer.needs_login = true AND isUserSignedIn = false
             program.needsLogin = true
+            program.loginReason = channelFromServer.login_reason
           end if
         end if
 
@@ -2265,6 +2269,7 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
       'channel level needs_login
       if channelFromServer.needs_login = true AND isUserSignedIn = false
         channelNode.needsLogin = true
+        channelNode.loginReason = channelFromServer.login_reason
       end if
 
       channelNode.backgrounds = m.dedupeBackgrounds(channelFromServer.images.background)
@@ -2404,6 +2409,7 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
 
   if channelFromServer.needs_login = true AND isUserSignedIn = false
     translatedProgram.needsLogin = true
+    translatedProgram.loginReason = channelFromServer.login_reason
   end if
 
   if programFromServer.videoRenditions <> invalid

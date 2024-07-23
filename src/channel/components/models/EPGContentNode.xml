@@ -46,6 +46,9 @@
     <!--InfoPanel signInRequired title to display a hint in the info panel -->
     <field id="needsLogin" type="boolean" value="false"/>
 
+    <!--Not intended to be used as stand alone. This field only represents reason of locking if needsLogin = true-->
+    <field id="loginReason" type="string" />
+
     <!--Change this field to default secondaryTitle once it available in 11.5-->
     <field id="epgProgramTitle" type="string" />
 

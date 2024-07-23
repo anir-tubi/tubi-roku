@@ -561,8 +561,17 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.mode = mode
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
-      m.InfoPanel.needsLogin = contentNode.needsLogin AND (m.top.signedIn <> true)
+
+      if contentNode.needsLogin = true AND m.top.signedIn <> true
+
+        m.InfoPanel.loginReason = contentNode.loginReason 'set login reason before needsLogin
+        m.InfoPanel.needsLogin = true
+      else
+        m.InfoPanel.needsLogin = false
+      end if
+
       m.InfoPanel.reminderIsSet = false
+
     else if mode = m.constants.ui.infoPanelModes.sportsEvent
       populateInfoPanelWithHomescreenStyleSportsMode(contentNode, m.InfoPanel)
     end if

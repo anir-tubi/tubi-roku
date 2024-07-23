@@ -58,6 +58,8 @@
     <field id="starring" type="stringarray" />
     <field id="seasonEpisodeCount" type="integer" />
     <field id="fullscreenCountdown" type="integer" value="0"/>
+        <!--Set this field before setting needsLogin-->
+    <field id="loginReason" type="string" />
     <field id="needsLogin" type="boolean" />
     <field id="reminderIsSet" type="boolean" />
     <field id="calculateHeight" type="boolean" alwaysNotify="true" />

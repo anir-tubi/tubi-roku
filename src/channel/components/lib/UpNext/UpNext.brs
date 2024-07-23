@@ -362,7 +362,13 @@ Function updateInfoPanel(infoNode, content)
   infoNode.description = content.description
   infoNode.starring = content.actors
   infoNode.directors = content.directors
-  infoNode.needsLogin = (content.needsLogin = true AND isLoggedinUser() = false)
+
+  if content.needsLogin = true AND isLoggedinUser() = false
+    infoNode.loginReason = content.loginReason 'set loginReason before needs login
+    infoNode.needsLogin = true
+  else
+    infoNode.needsLogin = false
+  end if
 
   ' always have to do this
   infoNode.calculateHeight = true

@@ -87,7 +87,13 @@ Function updateInfoPanel(infoNode, content)
   infoNode.description = content.description
   infoNode.starring = content.actors
   infoNode.directors = content.directors
-  infoNode.needsLogin = (content.needsLogin = true)
+
+  if content.needsLogin = true
+    infoNode.loginReason = content.loginReason
+    infoNode.needsLogin = true
+  else
+    infoNode.needsLogin = false
+  end if
 
   ' always have to do this
   infoNode.calculateHeight = true

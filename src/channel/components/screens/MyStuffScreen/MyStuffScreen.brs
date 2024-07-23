@@ -394,7 +394,14 @@ Function populateInfoPanel(mode, contentNode)
       end if
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
-      m.InfoPanel.needsLogin = contentNode.needsLogin AND (m.top.signedIn <> true)
+
+      if contentNode.needsLogin AND m.top.signedIn <> true
+        m.InfoPanel.loginReason = contentNode.loginReason
+        m.InfoPanel.needsLogin = true
+      else
+        m.InfoPanel.needsLogin = false
+      end if
+
       m.InfoPanel.reminderIsSet = false
       m.InfoPanel.width = 650
     else if mode = m.constants.ui.infoPanelModes.continueWatching

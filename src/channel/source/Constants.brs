@@ -839,7 +839,7 @@ Function getConstants()
       constants.player.audioTrack.roles = {}
         constants.player.audioTrack.roles.main = "main"
         constants.player.audioTrack.roles.description = "description"
-      
+
 
     'video player returns one of the following
     constants.player.playerResults = {}
@@ -1234,6 +1234,10 @@ Function getConstants()
       constants.ui.contentIds.channelList = "channelsList"
       constants.ui.contentIds.timeGridContent = "timeGridContent"
       constants.ui.contentIds.showAllGames = "showAllGames"
+
+    constants.ui.loginReasons = {}
+    constants.ui.loginReasons.matureContentGating = "MATURE_CONTENT_GATING"
+    constants.ui.loginReasons.unknown = "UNKNOWN"
 
     ' content ids of contents that should not be removed from the content cache
     constants.ui.permanentlyCachedContentIds = {}

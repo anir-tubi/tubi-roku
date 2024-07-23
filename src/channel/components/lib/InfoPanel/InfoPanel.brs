@@ -68,6 +68,7 @@ Function init()
   m.top.observeFieldScoped("fullscreenCountdown", "onPlayerCountDownChange")
   m.top.observeFieldScoped("calculateHeight", "onCalculateHeight")
   m.top.observeFieldScoped("focusedChild", "onComponentFocus")
+  m.top.observeFieldScoped("loginReason", "onLoginReasonChange")
   m.offset.observeFieldScoped("translation", "onOffsetTranslationChange")
   m.partnerLogo.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.rating.observeFieldScoped("loadStatus", "onPosterLoadStatus")
@@ -75,7 +76,6 @@ Function init()
   m.audioDescriptionPoster.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.resolutionPoster.observeFieldScoped("loadStatus", "onPosterLoadStatus")
 
-  m.signInText.text = getTranslation("registration_signIn_to_play_R_rated")
   m.reminderTitle.text = getTranslation("info_panel_reminder_is_set")
 
   onWidthChange()
@@ -100,6 +100,12 @@ Function init()
 
   DirectorRect.width = nMatchDirectorWidth + spacerWidth
   StarringRect.width = nMatchStarringWidth + spacerWidth
+
+  ' this enum been used to avoid calling getTranslation every time item been focused.
+  m.signInTextEnum = {}
+  m.signInTextEnum[m.constants.ui.loginReasons.matureContentGating] = getTranslation("registration_signIn_to_play_R_rated")
+  m.signInTextEnum[m.constants.ui.loginReasons.unknown] = getTranslation("registration_signIn_to_play_default")
+
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.title, typographyConstants.ids.headerSmall)
@@ -274,6 +280,16 @@ Function onNeedsLoginChange(msg)
 
     m.offset.appendChild(m.signInGroup)
   end if
+End Function
+
+
+Function onLoginReasonChange(msg)
+
+  loginReason = msg.getData()
+  if isNonEmptyString(loginReason) = true
+    m.signInText.text = m.signInTextEnum[loginReason]
+  end if
+
 End Function
 
 
@@ -814,7 +830,7 @@ Function onModeChange()
   tubiLog("InfoPanel.onModeChange")
   resetDefaultState()
 
-  ' For some modes, if a content is locked, a lock icon and sign in message will be appended 
+  ' For some modes, if a content is locked, a lock icon and sign in message will be appended
   ' dynamically as a child to m.offset. The pattern is that the itemSpacing for this lock
   ' child should be 2 pixels if it is appended after the m.directorGroup child, and 13 pixels if
   ' appended after the m.descriptionGroup child.

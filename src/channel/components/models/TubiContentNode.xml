@@ -36,6 +36,9 @@
     <field id="highestRendition" type="string" />
 
     <field id="needsLogin" type="boolean"  value="false"/>
+    <!--Not intended to be used as stand alone. This field only represents reason of locking if needsLogin = true-->
+    <field id="loginReason" type="string" />
+
     <field id="hasVideoResources" type="boolean" />
 
     <!-- tracking info to be used specifically by youbora. The names of the keys of this AA will be under: constants.thirdParty.youbora.trackingKeys -->

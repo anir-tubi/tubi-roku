@@ -45,7 +45,12 @@ Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel)
 
   infoPanel.lineOneData = lineOneData
   infoPanel.lineTwoData = lineTwoData
-  infoPanel.needsLogin = (content.needsLogin = true)
+  if content.needsLogin = true
+    infoPanel.loginReason = content.loginReason
+    infoPanel.needsLogin = true
+  else
+    infoPanel.needsLogin = false
+  end if
   infoPanel.reminderIsSet = false
   infoPanel.width = 960
 End Function
@@ -90,7 +95,13 @@ Function populateInfoPanelWithHomescreenStyleSportsMode(content, infoPanel)
     roundGroupInfo: content.roundGroupInfo
   }
   infoPanel.reminderIsSet = (availabilityType = m.constants.ui.contentTimings.upcoming AND getBookmark(content.id) <> invalid)
-  infoPanel.needsLogin = (content.needsLogin AND m.top.signedIn <> true)
+  if content.needsLogin = true AND m.top.signedIn <> true
+    infoPanel.loginReason = content.loginReason 'set loginReason before needs Login
+    infoPanel.needsLogin = true
+  else
+    infoPanel.needsLogin = false
+  end if
+
   infoPanel.width = 960
 End Function
 
@@ -172,7 +183,13 @@ Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel)
   infoPanel.lineOneData = lineOneData
   infoPanel.lineTwoData = lineTwoData
 
-  infoPanel.needsLogin = (content.needsLogin AND m.top.signedIn <> true)
+  if content.needsLogin = true AND m.top.signedIn <> true
+    infoPanel.loginReason = content.loginReason
+    infoPanel.needsLogin = true
+  else
+    infoPanel.needsLogin = false
+  end if
+
   infoPanel.width = 960
 End Function
 

@@ -478,7 +478,13 @@ Function onItemFocused(msg)
         badgeText: getTranslation("screenSearch_liveText")
         genres: focusedContent.genres
       }
-      m.searchScreenInfoPanel.needsLogin = focusedContent.needsLogin AND (m.top.signedIn <> true)
+      if focusedContent.needsLogin = true AND m.top.signedIn <> true
+        m.searchScreenInfoPanel.loginReason = focusedContent.loginReason 'set loginreason before needslogin
+        m.searchScreenInfoPanel.needsLogin = true
+      else
+        m.searchScreenInfoPanel.needsLogin = false
+      end if
+
     else if focusedContent.type = m.constants.ui.contentTypes.sportsEvent
       m.searchScreenInfoPanel.mode = m.constants.ui.infoPanelModes.sportsEvent
 
@@ -503,8 +509,13 @@ Function onItemFocused(msg)
       lineTwoData = {
         roundGroupInfo: focusedContent.roundGroupInfo
       }
+      if focusedContent.needsLogin = true AND m.top.signedIn <> true
+        m.searchScreenInfoPanel.loginReason = focusedContent.loginReason 'set loginreason before needslogin
+        m.searchScreenInfoPanel.needsLogin = true
+      else
+        m.searchScreenInfoPanel.needsLogin = false
+      end if
 
-      m.searchScreenInfoPanel.needsLogin = focusedContent.needsLogin AND (m.top.signedIn <> true)
     else
       m.searchScreenInfoPanel.mode = m.constants.ui.infoPanelModes.item
       lineOneData = {
@@ -526,12 +537,13 @@ Function onItemFocused(msg)
         getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v2")
       end if
 
-      m.searchScreenInfoPanel.needsLogin = (focusedContent.needsLogin AND m.top.signedIn <> true)
+      if focusedContent.needsLogin = true AND m.top.signedIn <> true
+        m.searchScreenInfoPanel.loginReason = focusedContent.loginReason 'set loginreason before needslogin
+        m.searchScreenInfoPanel.needsLogin = true
+      else
+        m.searchScreenInfoPanel.needsLogin = false
+      end if
     end if
-
-    ' description = m.searchScreenInfoPanel.findNode("Description")
-    ' description.width = 960
-    ' m.searchScreenInfoPanel.width = 960
 
     m.searchScreenInfoPanel.lineOneData = lineOneData
     m.searchScreenInfoPanel.lineTwoData = lineTwoData
@@ -635,7 +647,7 @@ Function onKeyEvent(key As string, press As boolean) As boolean
     if key = "right" AND m.Keyboard.isInFocusChain() AND m.isSearchRequestInProgress = false then
       if m.ResultGrid.content <> invalid AND m.ResultGrid.content.getChildCount() > 0 AND m.isTrendingResultsGridInFocus = false
         m.ResultGrid.setFocus(true)
-      ' Only setting focus to trending search result if the user is eligible.  
+      ' Only setting focus to trending search result if the user is eligible.
       else if m.trendingSearchResultGrid.content <> invalid AND m.trendingSearchResultGrid.content.getChildCount() > 0 AND m.trendingSearchResultsContainer.visible = true
         m.trendingSearchResultGrid.setFocus(true)
       end if

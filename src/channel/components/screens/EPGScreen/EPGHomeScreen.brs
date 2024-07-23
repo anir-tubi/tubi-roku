@@ -129,7 +129,14 @@ Function populateInfoPanel(contentNode)
 
     m.InfoPanel.lineOneData = lineOneData
     m.InfoPanel.description = contentNode.description
-    m.InfoPanel.needsLogin = (contentNode.needsLogin = true AND m.top.signedIn <> true)
+
+    if contentNode.needsLogin = true AND m.top.signedIn <> true
+      m.InfoPanel.loginReason = contentNode.loginReason 'set login reason before setting needsLogin
+      m.InfoPanel.needsLogin = true
+    else
+      m.InfoPanel.needsLogin = false
+    end if
+
   end if
 
   m.InfoPanel.calculateHeight = true
