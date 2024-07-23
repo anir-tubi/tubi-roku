@@ -235,6 +235,13 @@ export async function C450501NavigateToPageDestLoginPage(seriesId) {
 			(event) =>
 				event.navigate_to_page.dest_login_page &&
 				event.navigate_to_page.dest_login_page.choice == 'EMAIL' &&
+				event.navigate_to_page.video_player_page 
+		);
+		i++;
+	}
+	expect(
+		navigateToPageEvent.navigate_to_page.video_player_page.video_id
+	).equal(
 				event.navigate_to_page.video_player_page
 		);
 		i++;

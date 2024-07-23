@@ -759,6 +759,10 @@ const elements = typeCheckElements({
       '/TubiScene/ContentController/Group/Group/ScreenStack/SettingsScreen/PanelSet/ParentalControlsPanel/Group/Group/MarkupList/CheckButton[2]/LayoutGroup/Poster',
   },
 
+  browseWhileWatchingRowList: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#YmalRow.0.#YmalGroup.#YmalRow.#CategoryGridList.#RowList',
+  },
+
   searchResultChannelNameABC: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#SearchScreenInfoPanel.#infoPanelGroup.#Offset.#Title',

@@ -64,7 +64,7 @@ const SideNav = () => {
 	const elements = {};
 
 	const ui = {
-		row: 4,
+		row: 7,
 	};
 
 	async function selectTab(tab, { isAuth }) {

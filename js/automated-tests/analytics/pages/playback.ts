@@ -393,6 +393,17 @@ const PlayBack = ({ content }) => {
 		return titleDetailsPage;
 	}
 
+	async function selectFirstTitleFromBrowseWhileWatching() {
+		await ecp.sendKeypress(ecp.Key.Down, { count: 3, wait: 700 });
+		const content = await testUtils.getCurrentlyFocusedGridItemContent(
+			'browseWhileWatchingRowList'
+		);
+		await ecp.sendKeypress(ecp.Key.Right, { wait: 200 });
+		await ecp.sendKeypress(ecp.Key.Ok);
+		const playback = PlayBack({ content: content });
+		await playback.pageDidLoad();
+		return playback;
+	}
 
 	return {
 		pageDidLoad,
@@ -419,6 +430,7 @@ const PlayBack = ({ content }) => {
 		getCurrentPlaybackTimeInSeconds,
 		fastForwardNoWaitTime,
 		clickOnSkipIntro,
+		selectFirstTitleFromBrowseWhileWatching,
 	};
 };
 

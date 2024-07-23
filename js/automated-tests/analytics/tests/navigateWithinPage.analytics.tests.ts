@@ -166,4 +166,15 @@ describe('Navigate Within Page', function () {
 		await verifyC268957WithinPage();
 	});
 
+	it('C524595 User lands on the “You May Also Like” container on the player page. @analyticsASet2,@analyticsNavigateWithinPage', async () => {
+		const homePage = HomePage();
+		let movieDetailsPage = await homePage.selectFocusedTitleMovie();
+		const video = await movieDetailsPage.selectPlay();
+		await video.allowPlaybackToPlayForSeconds(10000);
+		await video.selectFirstTitleFromBrowseWhileWatching();
+		await video.allowPlaybackToPlayForSeconds(10000);
+		await ecp.sendKeypress(ecp.Key.Back);
+		await verifyC524595();
+	});
+
 });
