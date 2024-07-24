@@ -3202,8 +3202,12 @@ Function getTranslation_es_MX()
       "message": "Inicia sesión para ver gratis. No se requiere tarjeta de crédito."
     },
     "registration_signIn_to_play_R_rated": {
-      "description": "hint text next to the Sign In to Play button when a non registered user focuses on details screen for sportsEvent",
-      "message": "Este título requiere iniciar sesión para proteger la audiencia joven. Es Gratis!"
+      "description": "Hint message why we have locked the content.",
+      "message": "Iniciar sesión requerido para proteger a audiencias jóvenes. No se necesita tarjeta de crédito."
+    },
+    "registration_signIn_to_play_default": {
+      "description": "Hint message why we have locked the content. This is the default message",
+      "message": "Iniciar sesión requerido. No se necesita tarjeta de crédito."
     },
     "text_new": {
       "description": "simple text to use anywhere to indicate item is new",
@@ -4782,8 +4786,12 @@ Function getTranslation_fr_CA()
       "message": "Connectez-vous pour regarder gratuitement. Aucun abonnement ou carte de crédit requis."
     },
     "registration_signIn_to_play_R_rated": {
-      "description": "hint text next to the Sign In to Play button when a non registered user focuses on details screen for sportsEvent",
-      "message": "Ce titre nécessite vous connecter pour protéger un public plus jeune. Aucune carte de crédit requise."
+      "description": "Hint message why we have locked the content.",
+      "message": "Connexion requise pour protéger les jeunes publics. Non carte de crédit nécessaire."
+    },
+    "registration_signIn_to_play_default": {
+      "description": "Hint message why we have locked the content. This is the default message",
+      "message": "Connexion requise. Aucune carte de crédit nécessaire."
     },
     "text_new": {
       "description": "simple text to use anywhere to indicate item is new",
