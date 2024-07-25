@@ -347,6 +347,8 @@ Function proceedAfterConsentUpdated()
   m.oneTrust.unObserveFieldScoped("RejectAll")
   m.oneTrust.unObserveFieldScoped("onHideBanner")
   m.oneTrust.unObserveFieldScoped("onHideFailure")
+  ' Updating the consent status.
+  m.trackingLoggingTask.userConsentsOptOutStatus = getConsentsOptOutStatus()
   m.isConsentCheckComplete = true
   if m.callbackAfterConsent <> invalid
     callbackAfterConsent = m.callbackAfterConsent
