@@ -106,6 +106,7 @@ Function init()
   m.signInTextEnum = {}
   m.signInTextEnum[m.constants.ui.loginReasons.matureContentGating] = getTranslation("registration_signIn_to_play_R_rated")
   m.signInTextEnum[m.constants.ui.loginReasons.unknown] = getTranslation("registration_signIn_to_play_default")
+  m.signInText.text = m.signInTextEnum[m.constants.ui.loginReasons.unknown] 'default value if loginReason="" instead of UNKNOWN as expected
 
 
   typographyConstants = getTypographyConstants()
@@ -861,8 +862,6 @@ Function onModeChange()
     m.offset.appendChild(m.title)
     m.offset.appendChild(m.twoLineInfo)
     m.offset.appendChild(m.descriptionGroup)
-    m.offset.appendChild(m.starringGroup)
-    m.offset.appendChild(m.directorGroup)
 
     m.twoLineInfo.appendChild(m.firstLineGroup)
     m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
@@ -886,9 +885,6 @@ Function onModeChange()
     m.offset.appendChild(m.episode)
     m.offset.appendChild(m.twoLineInfo)
     m.offset.appendChild(m.descriptionGroup)
-    m.offset.appendChild(m.starringGroup)
-    m.offset.appendChild(m.directorGroup)
-
     m.twoLineInfo.appendChild(m.firstLineGroup)
     m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
     m.firstLineGroup.appendChild(m.line1)

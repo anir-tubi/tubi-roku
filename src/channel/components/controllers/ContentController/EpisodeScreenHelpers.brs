@@ -28,6 +28,7 @@ Function showEpisodeScreen(content, shouldSendNavigationAnalytics, playbackSourc
   episodesScreen.shouldFocusWhenPushed = m.top.fadeInContentController
   episodesScreen.content = content
   episodesScreen.updateContent = true
+  episodesScreen.signedIn = isLoggedInUser()
   episodesScreen.playbackSource = playbackSource
 
   if episodesScreen.content <> invalid AND episodesScreen.content.id <> invalid

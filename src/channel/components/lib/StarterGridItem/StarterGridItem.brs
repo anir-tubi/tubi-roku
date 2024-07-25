@@ -40,7 +40,7 @@ Function onItemContentChange(msg)
       if row <> invalid AND row.gridItemType = "landscapeNoTitle" OR row.gridItemType = "landscape" then
         childGridItemComponent = "CategoryGridLinearPoster"
       end if
-    else if itemContent.needsLogin = true AND isLoggedInUser() = false
+    else if itemContent.needsLogin = true AND isLoggedInUser() = false '//TBD : isLoggedInUser accesses m.global for every item. Try to remove this
       childGridItemComponent = "CategoryGridPoster"
     else
       row = itemContent.getParent()

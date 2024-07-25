@@ -25,6 +25,8 @@
 
       <field id="playbackSource" type="assocArray"/>
 
+      <field id="signedIn" type="boolean"/>
+
     <!-- OUTPUT -->
       <field id="episodeFocused" alias="RowList.rowItemFocused" />
 

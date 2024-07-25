@@ -738,7 +738,7 @@ Function onSideNavSignInCompleted()
   tubiLog("SignInHelpers.onSideNavSignInCompleted")
 
   ' set the mode before any changes are done to the UI
-  refreshUiAfterSignIn()  
+  refreshUiAfterSignIn()
 
   ' Here we notify screens that may exist, though we try to keep context
   '
@@ -891,6 +891,7 @@ Function onLikeAfterSignIn()
     onLike(currentScreen)
     'refresh the detail screen in case the newly signed in user has any progress with the current content
     refreshDetailScreenContent(currentScreen)
+    currentScreen.refreshRelatedContent = true
   end if
 End Function
 
@@ -910,6 +911,7 @@ Function onDislikeAfterSignIn()
     onDislike(currentScreen)
     'refresh the detail screen in case the newly signed in user has any progress with the current content
     refreshDetailScreenContent(currentScreen)
+    currentScreen.refreshRelatedContent = true
   end if
 End Function
 
@@ -938,6 +940,7 @@ Function onRegistrationProcessCompletedOnDetailsScreen()
   if currentScreen <> invalid and currentScreen.getSubtype() = "DetailScreen"
     currentScreen.jumpToItem = 0
     currentScreen.setfocus(true)
+    currentScreen.refreshRelatedContent = true
   end if
 End Function
 

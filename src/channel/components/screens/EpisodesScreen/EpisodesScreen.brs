@@ -55,6 +55,7 @@ End Function
 Function onScreenFocusChange()
   tubiLog("EpisodesScreen.onScreenFocusChange")
   if m.top.hasFocus() then
+
     'an extra set focus is necessary due to a bug in the roku Rowlist component that offsets the cursor in error
     m.RowList.setFocus(true)
     m.gridIsFocused = false
@@ -130,8 +131,8 @@ Function onEpisodeFocused()
       m.Info.lineTwoData = {
         genres: episode.genres
       }
-      'TODO: use pubsub or someother way of communication if user is signed In or not.  isLoggedInUser uses global node.
-      if episode.needsLogin = true AND isLoggedInUser() = false
+
+      if episode.needsLogin = true AND m.top.signedIn = false
         m.Info.loginReason = episode.loginReason 'set login reason before needslogin
         m.Info.needsLogin = true
       else

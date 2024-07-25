@@ -27,12 +27,14 @@ Function init()
   ' Used to determine if navigate_within_page events should be sent. Only send when the Related content row already
   ' has focus, not when it gains focus.
   m.isRelatedFocused = false
+  m.signedIn = isLoggedInUser() ' Initial value
 End Function
 
 
 Function onComponentFocus()
   if m.top.hasFocus()
     m.categoryGridList.focusedPosition = [0,0]
+    m.signedIn = isLoggedInUser() 'everytime the component gets focus, check if user is signed in
     m.categoryGridList.setFocus(true)
     if m.info.opacity = 0
       fade(m.info, "in", 0.4)
@@ -85,10 +87,8 @@ Function updateInfoPanel(infoNode, content)
   infoNode.lineOneData = lineOneData
   infoNode.lineTwoData = lineTwoData
   infoNode.description = content.description
-  infoNode.starring = content.actors
-  infoNode.directors = content.directors
 
-  if content.needsLogin = true
+  if content.needsLogin = true AND m.signedIn = false 'do not use isSignedInUser() here, it uses m.global and not ideal to access m.global for each item focus
     infoNode.loginReason = content.loginReason
     infoNode.needsLogin = true
   else
