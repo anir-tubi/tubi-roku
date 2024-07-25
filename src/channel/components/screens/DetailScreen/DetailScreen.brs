@@ -222,6 +222,11 @@ Function changeButtonText(sButtonStringId, sButtonText)
 
   else if sButtonStringId = "stringPlayButton"
     stringNode = m.PlayMenuItem
+    if sButtonText = getTranslation("screenDetails_button_startOver")
+      stringNode.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.startFromBeginningMenuItem]
+    else
+      stringNode.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.PlayMenuItem.id]
+    end if
   end if
 
   if stringNode <> invalid
