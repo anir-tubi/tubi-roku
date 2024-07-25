@@ -7,7 +7,7 @@ Function init()
   m.top.observeFieldScoped("text", "onTextChanged")
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.badgeText, typographyConstants.ids.bodyExtraSmall)
+  setTypographyOfLabel(m.badgeText, typographyConstants.ids.bodyExtraSmallStrong)
 End Function
 
 

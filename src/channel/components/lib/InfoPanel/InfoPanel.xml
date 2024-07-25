@@ -147,7 +147,7 @@
             id="Title"
             width="1140"
             wrap="true"
-            maxLines="3"
+            maxLines="2"
             vertAlign="bottom">
             <Font
               id="TitleFont"
