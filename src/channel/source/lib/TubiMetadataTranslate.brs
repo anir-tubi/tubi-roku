@@ -36,7 +36,6 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     buildCategoryChildrenInfo: tubiMetadataTranslate_buildCategoryChildrenInfo
     buildEmptyMyStuffCategoryAA: tubiMetadataTranslate_buildEmptyMyStuffCategoryAA
     buildContinueWatchingSignedOutUserCategoryAA: tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA
-    buildGenreCategory: tubiMetadataTranslate_buildGenreCategory
     generateChannelPosterUrl: tubiMetadataTranslate_generateChannelPosterUrl
     fetchedAtTimestamp: tubiMetadataTranslate_fetchedAtTimestamp
     getGridItemType: tubiMetadataTranslate_getGridItemType
@@ -44,7 +43,6 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     composeVideoResources: tubiMetadataTranslate_composeVideoResources
     getRoundedCornersURL: tubiMetadataTranslate_getRoundedCornersURL
     getBackgroundImages: tubiMetadataTranslate_getBackgroundImages
-    getAllGenres: tubiMetadataTranslate_getAllGenres
   }
 End Function
 
@@ -172,9 +170,6 @@ Function tubiMetadataTranslate_translateBackendTypeToClientSideType(sBackendType
     sReturn = m.contentTypes.sportsEvent
   else if sBackendType = "n"
     sReturn = m.contentTypes.navigate
-  ' TODO: Remove this after roku_genres_homegrid is graduated.
-  else if sBackendType = "genre"
-    sReturn = m.contentTypes.genre
   end if
 
   return sReturn
@@ -873,8 +868,6 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
     continueWatchingIndex = 4
     queueIndex = 5
 
-    genreInHomeGridType = m.experiments.getExperimentResource("roku_genres_homegrid", "roku_genres_homegrid_v1").home_grid_type
-
     'set up AAs for all categories
     for i = 0 to containers.count() - 1
       container = containers[i]
@@ -897,12 +890,6 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
         homescreenAA.children.push(categoryAA)
       end if
 
-      'Insert a Genres row at 15th position for roku_genres_homegrid_v1 experiement.
-      ' Since all rows might not have value solely relying on i is causing a bug when CW is empty.
-      if homescreenAA.children.count() = 14 AND genreInHomeGridType <> "none" AND contentMode = "" AND uiMode = m.constants.ui.modes.standard AND m.constants.deviceinfo.countrycode = "US"
-        genreRowAA = m.buildGenreCategory(genreInHomeGridType)
-        homescreenAA.children.push(genreRowAA)
-      end if
     end for
 
     translated.update(homescreenAA, true)
@@ -1602,63 +1589,6 @@ Function tubiMetadataTranslate_translate(contentToTranslate, isSignedInUser = fa
   m.setTotalCount(translated)
   tubiLog("TranslateMetadata converted " + stri(node_count) + " nodes")
   return translated
-End Function
-
-
-' This function is used to insert a populare genres row in a home screen response. All the posters and titles are hard coded for now.
-' @returns: assocArray, an AA with keys:
-'                       "children", as an array of AAs containing content metadata
-'                       "json", a JSON formatted string of contents belonging to the container/category
-'                       "id", id of the container/category
-'                       "title", title of the Container/Category
-'                       ...
-' @gridType: String, type of genre grid type valid values are : "landscape", "portrait". This value is controlled from the experiment.
-Function tubiMetadataTranslate_buildGenreCategory(gridType)
-  genres = m.getAllGenres()
-
-  useLandscapeImage = false
-  gridItemType = m.constants.ui.gridItemTypes.portraitGenre
-  if gridType = "landscape"
-    gridItemType = m.constants.ui.gridItemTypes.landscapeGenre
-    useLandscapeImage = true
-  end if
-
-  jsonAA = {}
-  contentType = m.constants.uapiContentTypes.genre
-  genreNodes = []
-
-  for each item in genres
-    genre = {
-      id: item.id
-      type: contentType
-      slug: item.id
-      gridItemType: gridItemType
-      subtype: "ContentNode"
-    }
-
-    if useLandscapeImage = true
-      genre.hdgridposterurl = item.landscapeImage
-    else
-      genre.hdgridposterurl = item.portraitImage
-    end if
-
-    jsonAA[item.id] = genre
-    genreNodes.push(genre)
-  end for
-
-  genreRowMetadata = {
-    id: "popular_genres"
-    slug: "popular_genres"
-    title: "Popular Genres" ' TODO: Change it to use translation once we fix the issue with other row titles getting translated.
-    validUntil: -1
-    state: "full"
-    gridItemType: gridItemType
-    children: genreNodes
-    totalCount: genres.count()
-    json: FormatJSON(jsonAA)
-  }
-
-  return genreRowMetadata
 End Function
 
 
@@ -2655,63 +2585,4 @@ Function tubiMetadataTranslate_translateMiniHomescreen(contentToTranslate, conte
   end if
 
   return translated
-End Function
-
-
-' Returns the list of genres and its metadata.
-' Each genre item has 2 images landscape and portrait.
-' TODO: Remove this after roku_genres_homegrid is graduated.
-Function tubiMetadataTranslate_getAllGenres()
-  return [
-    {
-      id: "drama",
-      landscapeImage: "https://cdn.adrise.tv/image/roku_support_images/genres/drama_landscape.webp",
-      portraitImage: "https://cdn.adrise.tv/image/roku_support_images/genres/drama_portrait.webp"
-    },
-    {
-      id: "comedy",
-      landscapeImage: "https://cdn.adrise.tv/image/roku_support_images/genres/comedy_landscape.webp",
-      portraitImage: "https://cdn.adrise.tv/image/roku_support_images/genres/comedy_portrait.webp"
-    },
-    {
-      id: "action",
-      landscapeImage: "https://cdn.adrise.tv/image/roku_support_images/genres/action_landscape.webp",
-      portraitImage: "https://cdn.adrise.tv/image/roku_support_images/genres/action_portrait.webp"
-    },
-    {
-      id: "crime_tv",
-      landscapeImage: "https://cdn.adrise.tv/image/roku_support_images/genres/crime_landscape.webp",
-      portraitImage: "https://cdn.adrise.tv/image/roku_support_images/genres/crime_portrait.webp"
-    },
-    {
-      id: "horror",
-      landscapeImage: "https://cdn.adrise.tv/image/roku_support_images/genres/horror_landscape.webp",
-      portraitImage: "https://cdn.adrise.tv/image/roku_support_images/genres/horror_portrait.webp"
-    },
-    {
-      id: "reality_tv",
-      landscapeImage: "https://cdn.adrise.tv/image/roku_support_images/genres/reality_tv_landscape.webp",
-      portraitImage: "https://cdn.adrise.tv/image/roku_support_images/genres/reality_tv_portrait.webp"
-    },
-    {
-      id: "black_cinema",
-      landscapeImage: "https://cdn.adrise.tv/image/roku_support_images/genres/black_cinema_landscape.webp",
-      portraitImage: "https://cdn.adrise.tv/image/roku_support_images/genres/black_cinema_portrait.webp"
-    },
-    {
-      id: "thrillers",
-      landscapeImage: "https://cdn.adrise.tv/image/roku_support_images/genres/thrillers_landscape.webp",
-      portraitImage: "https://cdn.adrise.tv/image/roku_support_images/genres/thrillers_portrait.webp"
-    },
-    {
-      id: "documentary",
-      landscapeImage: "https://cdn.adrise.tv/image/roku_support_images/genres/documentary_landscape.webp",
-      portraitImage: "https://cdn.adrise.tv/image/roku_support_images/genres/documentary_portrait.webp"
-    },
-    {
-      id: "family_movies",
-      landscapeImage: "https://cdn.adrise.tv/image/roku_support_images/genres/family_movies_landscape.webp",
-      portraitImage: "https://cdn.adrise.tv/image/roku_support_images/genres/family_movies_portrait.webp"
-    }
-  ]
 End Function

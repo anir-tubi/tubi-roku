@@ -91,12 +91,6 @@
       <!-- This field is used to force remove focus from the rowlist. -->
       <field id="removeFocusFromRowList" type="boolean" />
 
-      <!-- This field will hold boolean true or false, will be set to true if we need to expand content area, false otherwise
-        -  TODO: Remove this field after roku_genres_homegrid is graduated.
-      -->
-      <field id="expandContentArea" type="boolean" />
-
-
     <!-- OUTPUT -->
       <field id="itemSelected" type="node"/>
 
@@ -116,12 +110,16 @@
 
       <field id="focusedPosition" alias="RowList.rowItemFocused" />
 
+      <field id="itemUnfocused" alias="RowList.itemUnfocused" />
+
+      <field id="vertFocusDirection" alias="RowList.vertFocusDirection" />
+
       <!-- in the case that focus is not being set on the RowList, inform that content is loaded
            and infoPanel should be updated. Typically happens on kids mode toggle.
       -->
       <field id="reloadedItemToBeFocused" type="node" />
 
-      <field id="currFocusRow" type="integer" />
+      <field id="currFocusRow" alias="RowList.currFocusRow" />
       <field id="currFocusColumn" alias="RowList.currFocusColumn" />
       <field id="scrollingstatus" alias="RowList.scrollingstatus" />
 
@@ -146,14 +144,9 @@
       showRowCounter="[false]"
       fadeFocusFeedbackWhenAutoScrolling="true"
       focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+      focusFootprintBitmapUri="pkg:/images/transparent.png"
       rowFocusAnimationStyle="floatingFocus"
       vertFocusAnimationStyle="fixedFocus"/>
-    <Timer
-      id="RowListItemDebounce"
-      duration="0.5"/>
-    <Timer
-      id="AnimateToCategoryDebounce"
-      duration="0.5"/>
     <Timer
       id="LinearProgramRefreshTimer"
       repeat="true"

@@ -1,7 +1,6 @@
 Function init()
   tubiLog("CategoryGridList.init")
   m.constants = getConstantsFromGlobal()
-  m.lastFocused = 0
 
   m.top.observeField("categoryResponseInBatch", "onCategoryResponseInBatch")
   m.top.observeField("focusedChild", "onComponentFocusChange")
@@ -10,17 +9,9 @@ Function init()
   m.top.observeField("repopulateContent", "onRepopulateContent")
   m.top.observeField("animateToCategory", "onAnimateToCategory")
   m.top.observeFieldScoped("removeFocusFromRowList", "onRemoveFocusFromRowList")
-  m.top.observeFieldScoped("expandContentArea", "onExpandContentArea")
   m.RowList = m.top.findNode("RowList")
   m.RowList.observeField("rowItemFocused", "onRowItemFocused")
   m.RowList.observeField("rowItemSelected", "onRowItemSelected")
-  m.RowList.observeFieldScoped("currFocusRow", "onCurrFocusRow")
-  m.RowList.observeFieldScoped("itemUnfocused", "onItemUnfocused")
-
-  m.RowListItemDebounce = m.top.findNode("RowListitemDebounce")
-  m.RowListItemDebounce.observeField("fire", "onRowListItemDebounce")
-  m.AnimateToCategoryDebounce = m.top.findNode("AnimateToCategoryDebounce")
-  m.AnimateToCategoryDebounce.observeField("fire", "onAnimateToCategoryDebounce")
 
   ' Parameters for the metadata block cache. Window size is number of items to fetch, page delimiter
   ' is what focus thresholds trigger a fetch.
@@ -127,10 +118,6 @@ Function onComponentFocusChange()
 
     if resolveAbbreviatedContent(itemToJumpTo) <> invalid
       m.justGainedFocus = true
-      m.RowList.setFocus(true)
-      'an extra set focus is necessary due to a bug in the roku Rowlist component that offsets the cursor in error.
-      '   This is especially true when the Rowlist does not have initial focus when the content has loaded.
-      m.RowList.setFocus(false)
       m.RowList.setFocus(true)
     end if
 
@@ -279,22 +266,6 @@ Function setRowHeights()
       rowHeight = posterHeight
       rowItemSpacings.push([15, 0])
       focusXOffsets.push(0)
-    else if gridItemType = gridItemTypes.portraitGenre
-      ' Setting numrows to 3 if we have portrait genre because of bug in arraygrid whenever any row is of a larger height than the first row it
-      ' causes issues with peeking. Setting numrows to 3 increase the clipping rect which works as a work around for our bug.
-      numRows = 3
-      genrePortraitItemSize = m.constants.ui.imageSizes.genrePortrait
-      rowItemSize.push([genrePortraitItemSize[0], genrePortraitItemSize[1]])
-      rowHeight = genrePortraitItemSize[1]
-      rowItemSpacings.push([15, 0])
-      focusXOffsets.push(0)
-    else if gridItemType = gridItemTypes.landscapeGenre
-      numRows = 3
-      genreLandscapeItemSize = m.constants.ui.imageSizes.largeLandscape
-      rowItemSize.push([genreLandscapeItemSize[0], genreLandscapeItemSize[1]])
-      rowHeight = genreLandscapeItemSize[1]
-      rowItemSpacings.push([15, 0])
-      focusXOffsets.push(0)
     else if gridItemType = gridItemTypes.portrait
       posterWidth = posterSize[0]
       posterHeight = posterSize[1]
@@ -349,12 +320,7 @@ End Function
 ' RowList doesn't have focus.
 Function onAnimateToCategory()
   tubiLog("CategoryGridList.onAnimateToCategory")
-  m.AnimateToCategoryDebounce.control = "start"
-End Function
 
-
-Function onAnimateToCategoryDebounce()
-  tubiLog("CategoryGridList.onAnimateToCategoryDebounce")
   m.top.loadCategoriesIndex = m.top.animateToCategory
 End Function
 
@@ -413,50 +379,34 @@ End Function
 
 
 '''''''''''''''
-' onRowItemFocused - RowList.rowItemFocused event handler.  To reduce jank we debounce/delay these events
+' onRowItemFocused - RowList.rowItemFocused event handler.
 Function onRowItemFocused()
   tubiLog("CategoryGridList.onRowItemFocused")
   if m.justGainedFocus = true
-    onRowListItemDebounce()
     m.justGainedFocus = false
-  else
-    m.RowListItemDebounce.control = "start"
-    ' immediately update the position counter
-    if m.top.content <> invalid AND m.Rowlist <> invalid AND m.Rowlist.rowItemFocused <> invalid
-      category = m.top.content.getChild(m.RowList.rowItemFocused[0])
-      if category <> invalid then
-        category.focusIndex = m.RowList.rowItemFocused[1]
-      end if
-      if m.RowList.rowItemFocused[0] = 13
-        ' Firing the exposure event.
-        ' Since we are displaying genre row at 15 and index starts at zero firing the event when 13 row is focused.
-        getExperimentResource("roku_genres_homegrid", "roku_genres_homegrid_v1", true)
-      end if
-    end if
   end if
-End Function
 
-
-'''''''''''''''
-' onRowListItemDebounce - RowList.rowItemFocus debounce handler
-Function onRowListItemDebounce()
-  tubiLog("CategoryGridList.onRowListItemDebounce")
-  if m.top.content <> invalid
+  if m.top.content <> invalid AND m.Rowlist <> invalid AND m.Rowlist.rowItemFocused <> invalid
     category = m.top.content.getChild(m.RowList.rowItemFocused[0])
-
-    if category <> invalid
+    if category <> invalid then
+      category.focusIndex = m.RowList.rowItemFocused[1]
       m.top.oldCategoryId = m.top.currCategoryId
       m.top.currCategoryId = category.id
-    end if
-  end if
 
-  itemFocused = resolveAbbreviatedContent(m.RowList.rowItemFocused)
-  if itemFocused <> invalid
-    m.top.oldCursorPosition = m.top.cursorPosition
-    m.top.cursorPosition = m.RowList.rowItemFocused
-    m.top.oldItemFocused = m.top.itemFocused
-    m.top.rowFocused = m.top.content.getChild(m.RowList.rowItemFocused[0])
-    m.top.itemFocused = itemFocused
+      itemFocused = resolveAbbreviatedContent(m.RowList.rowItemFocused)
+      if itemFocused <> invalid
+        m.top.oldCursorPosition = m.top.cursorPosition
+        m.top.cursorPosition = m.RowList.rowItemFocused
+        m.top.oldItemFocused = m.top.itemFocused
+        m.top.rowFocused = m.top.content.getChild(m.RowList.rowItemFocused[0])
+        m.top.itemFocused = itemFocused
+      end if
+    end if
+
+    if m.firstTimeLinearProgramEnabled = false
+      m.firstTimeLinearProgramEnabled = true
+      getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v2", true)
+    end if
   end if
 End Function
 
@@ -617,27 +567,6 @@ Function setRowListFocus()
 End Function
 
 
-Function onItemUnfocused()
-  m.lastFocused = m.RowList.itemUnfocused
-End Function
-
-
-'In homescreen.brs -> onCurrFocusRowChange is executing multiple times.
-'To avoid that, this function exposes single currFocusRow as integer.
-Function onCurrFocusRow(msg)
-  focusPos = msg.getData()
-  newFocus = Int(focusPos)
-  if focusPos > m.lastFocused
-    if newFocus < focusPos
-      newFocus += 1
-    end if
-  end if
-
-  m.top.currFocusRow = newFocus
-
-End Function
-
-
 Function onLinearProgramRefreshTimer()
 
   if m.global <> invalid AND m.global.refreshLinearChannels <> invalid
@@ -645,26 +574,4 @@ Function onLinearProgramRefreshTimer()
     m.global.refreshLinearChannels = not m.global.refreshLinearChannels
   end if
 
-End Function
-
-
-Function onExpandContentArea(msg)
-  shouldExpandContentArea = msg.getData()
-
-  if shouldExpandContentArea = true
-    ' Setting negative margin so that upper row is visible.
-    ' The genre is placed in 15 row.
-    previousRowHeight = m.RowList.rowHeights[13]
-    translationY = -(previousRowHeight + m.RowList.rowSpacings[0])
-  else
-    ' Resetting the values back to normal.
-    translationY = 0
-  end if
-
-  m.RowList.itemClippingRect = {
-    height: 1080
-    width: 1920
-    x: -20
-    y: translationY
-  }
 End Function

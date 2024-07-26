@@ -39,6 +39,7 @@ Function init()
   m.CategoryGridList.observeField("currFocusRow", "onCurrFocusRowChange")
   m.CategoryGridList.observeField("currFocusColumn", "onCurrFocusColumnChange")
   m.CategoryGridList.observeField("rowFocused", "onRowFocused")
+  m.CategoryGridList.observeFieldScoped("vertFocusDirection", "onVertFocusDirectionChange")
 
   'used to know when to send tracking info. Do not send focus tracking info when the grid is 1st loaded
   m.gridHasGainedInitialFocus = false
@@ -62,13 +63,8 @@ Function init()
 
   m.sponsorSlideAmt = 29 'the amount the grid slides up to fit the sponsored header. This is the difference of the heights of the sponsored and normal row titles
   m.sponsorMaskOffsetDiff = 119 'the diff in the amount the content area mask is offset in the up direction for sponsored rows. This is the difference of the heights of the sponsored and normal row titles
-  m.linearSlideAmt = 0 'the amount the grid slides up to fit the linear content item
-  m.linearMaskOffsetDiff = -199 'the diff in the amount the content area mask is offset in the up direction for the linear news container
-  m.genreSlideAmount = 400
-  m.genresMaskOffsetDiff = 119
-
+  
   m.originalContentAreaTranslation = m.ContentArea.translation
-  m.linearContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.linearSlideAmt]
   m.originalContentAreaMaskOffset = m.ContentArea.maskOffset
 
   authInfo = m.global.authInfo
@@ -77,8 +73,7 @@ Function init()
     m.top.parentalRating = authInfo.parentalrating
   end if
 
-  ' TODO: Remove after genre grid experiement graduated.
-  m.genreInHomeGridType = getExperimentResource("roku_genres_homegrid", "roku_genres_homegrid_v1", false).home_grid_type
+  m.scrollDirection = "none"
 End Function
 
 
@@ -206,22 +201,7 @@ Function onCurrFocusRowChange()
   'the last row that was focused and settled as an integer
   lastFocusRow = m.CategoryGridList.cursorPosition[0]
 
-  scrollDirection = ""
-  if m.lastFocusPosition >= 0
-    if currFocusRow > m.lastFocusPosition
-      scrollDirection = "down"
-    else if currFocusRow < m.lastFocusPosition
-      scrollDirection = "up"
-    end if
-  else
-    ' this is the first time onCurrFocusRowChange has run during this grid scroll animation so we can
-    ' use lastFocusRow as a reference for finding the scroll direction.
-    if currFocusRow > lastFocusRow
-      scrollDirection = "down"
-    else if currFocusRow < lastFocusRow
-      scrollDirection = "up"
-    end if
-  end if
+  scrollDirection = m.scrollDirection
 
   ' If a user quickly presses the up and down buttons quickly, before the
   ' rowList can set rowList.rowItemFocused, we need to correct lastFocusRow to be accurate
@@ -289,21 +269,8 @@ Function onCurrFocusRowChange()
     categoryLosingFocus = m.CategoryGridList.content.getChild(rowLosingFocus) 'TubiCategoryNode
   end if
 
-  gridItemTypes = m.constants.ui.gridItemTypes
   if categoryEnteringFocus <> invalid
     sSponsorBackgroundURL = ""
-
-    if categoryEnteringFocus.gridItemType = gridItemTypes.linear
-      ' update contentArea translation, only when linear gain focus
-      expandContentAreaForLinear(rowPercent)
-    else if categoryEnteringFocus.gridItemType = gridItemTypes.landscapeGenre OR categoryEnteringFocus.gridItemType = gridItemTypes.portraitGenre
-      expandContentAreaForGenre(rowPercent)
-    else
-      ' In the case of fast scrolling many rows of the grid, across the large vitg or linear rows, the category grid list may
-      ' not finish it's translation animation as the focus leaves the vitg or linear rows. We correct for that as the focus scrolls
-      ' through non video in the grid rows.
-      contractContentAreaToOriginal(rowPercent)
-    end if
 
     if categoryEnteringFocus.sponsorImages <> invalid
       '//if the entering row is sponsored, then take into account the extra room that the sponsor artwork takes up in the row header
@@ -335,10 +302,6 @@ End Function
 
 ' @rowPercent: float, the percentage that the row is focused
 Function contractContentAreaToOriginal(rowPercent)
-  ' TODO: Remove after roku_genres_homegrid is graduated.
-  if m.genreInHomeGridType = "landscape"
-    m.categoryGridList.expandContentArea = false
-  end if
 
   if m.ContentArea.translation[1] <> m.originalContentAreaTranslation[1]
     'gradually reset back to original position
@@ -368,28 +331,6 @@ End Function
 Function expandContentAreaForSponsorship(rowPercent)
   m.ContentArea.translation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - (m.sponsorSlideAmt * rowPercent)]
   m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.ContentArea.maskOffset[1] + (m.sponsorMaskOffsetDiff * rowPercent)]
-End Function
-
-
-Function expandContentAreaForLinear(rowPercent)
-  m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.originalContentAreaTranslation[1] - (m.linearSlideAmt * rowPercent)]
-  m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] + (m.linearMaskOffsetDiff * rowPercent)]
-End Function
-
-
-' @rowPercent: float, the percentage that the Genres row is focused
-Function expandContentAreaForGenre(rowPercent)
-  m.infoPanel.opacity = 1 - rowPercent
-  ' When the genre grid type is landscape avoid using scroll list.
-  ' We cannot use same approach for both due to the portrait mode. Roku has a bug where if the row size is more than half of the screen it does not fully show the row we have to scroll the whole
-  ' rowlist upwards.
-  if m.genreInHomeGridType = "portrait"
-    m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.originalContentAreaTranslation[1] - (m.genreSlideAmount * rowPercent)]
-    m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] + (m.genresMaskOffsetDiff * rowPercent)]
-  else
-    m.categoryGridList.expandContentArea = true
-    m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.originalContentAreaTranslation[1] + 69]
-  end if
 End Function
 
 
@@ -462,13 +403,7 @@ Function onGridFocusChange() as void
       'and the current design only has one row per category
       tile = m.Tracking.getAnalyticsTile(oldFocusedContent, oldAnalyticsCol, 1)
 
-      ' TODO: Remove after roku_genres_homegrid is graduated.
-      if oldFocusedContent <> invalid AND oldFocusedContent.parentId = "popular_genres"
-        categoryComponentInfo["category_col"] = oldAnalyticsCol
-        categoryComponentInfo["utility_tile"] = tile
-      else
-        categoryComponentInfo["content_tile"] = tile
-      end if
+      categoryComponentInfo["content_tile"] = tile
 
 
       m.top.navigateWithinPageInfo = {
@@ -516,13 +451,7 @@ Function getTrackingComponentInfoOfCategoryGridList(gridItem, itemPosition)
     componentValues["category_row"] = itemPosition[0] + 1 'all analytics are 1 based
     tile = m.Tracking.getAnalyticsTile(gridItem, itemPosition[1] + 1)
 
-    ' TODO: Remove after roku_genres_homegrid is graduated.
-    if gridItem.parentId = "popular_genres"
-      componentValues["category_col"] = itemPosition[1] + 1
-      componentValues["utility_tile"] = tile
-    else
-      componentValues["content_tile"] = tile
-    end if
+    componentValues["content_tile"] = tile
 
     ' Set the tracking component of the gridItem that was passed so it can be accessed as part of the navigateToPage event
     trackingComponentInfo = {
@@ -692,5 +621,17 @@ Function refreshHomeScreenContainers()
   end for
   if loadCategoryForIds.count() > 0
     m.top.loadCategoryForIds = loadCategoryForIds
+  end if
+End Function
+
+
+' Observer that gets fired when the rowlist vertical focus direction field changes.
+Function onVertFocusDirectionChange(msg)
+  direction = msg.getData()
+  ' Since the direction gets reset during the flow.
+  ' The value of m.scrollDirection gets reset to none after the value changes to up or down during scrolling.
+  ' This is the reason we are maintaining our own directional scope variable.
+  if direction <> "none"
+    m.scrollDirection = direction
   end if
 End Function

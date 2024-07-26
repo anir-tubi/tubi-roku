@@ -71,10 +71,6 @@ Function TubiExperiments(constants) as Object
         roku_relaunch_series_v2: {"enabled": false}
       }
 
-      roku_genres_homegrid: {
-        roku_genres_homegrid_v1 : {"home_grid_type": "none"} 'valid values are : "none", "landscape", "portrait".
-      }
-
       roku_cuepoint_accuracy: {
         roku_cuepoint_accuracy_content_v2 : {"enabled": true}
       }

@@ -715,8 +715,6 @@ Function getConstants()
     constants.uapiContentTypes.channel = "channel"
     constants.uapiContentTypes.sportsEvent = "sports_event"
     constants.uapiContentTypes.container = "container"
-    ' TODO: Remove this after roku_genres_homegrid is graduated.
-    constants.uapiContentTypes.genre = "genre"
 
   constants.serverValues = {}
     constants.serverValues.tensorVideoRenditions = {}
@@ -1130,8 +1128,6 @@ Function getConstants()
       constants.ui.contentTypes.historySignedOutUser = "continue_watching_signed_out_user"
       constants.ui.contentTypes.emptyContainer = "emptyContainer"
       constants.ui.contentTypes.epg = "epg"
-      ' TODO: Remove this after roku_genres_homegrid is graduated.
-      constants.ui.contentTypes.genre = "genre"
       constants.ui.contentTypes.sportsEvent = "sports_event"
 
     '// Check if these are required for sports events
@@ -1360,8 +1356,6 @@ Function getConstants()
       constants.ui.gridItemTypes.linear = "linear"
       constants.ui.gridItemTypes.historySignedOutUser = "continue_watching_signed_out_user"
       constants.ui.gridItemTypes.emptyContainer = "emptyContainer"
-      constants.ui.gridItemTypes.portraitGenre = "portrait_genre"
-      constants.ui.gridItemTypes.landscapeGenre = "landscape_genre"
       constants.ui.gridItemTypes.portraitTopTen = "portraitTopTen"
 
     constants.ui.uris = {}
