@@ -1753,6 +1753,14 @@ Function trailerHelper(screen)
         trailerContent.subtitleTracks = []
         trailerContent.subtitleConfig = invalid
         trailerContent.rating = content.rating
+        ' We can not set NeedsLogin on trailerContent which will stop playing the trailer when user selects 'Watch Trailer'
+        ' So we are setting loginReason on trailerContent which will be used to hide 'watch movie' transport button
+        if content.needsLogin = true AND isLoggedInUser() = false
+          trailerContent.loginReason = content.loginReason
+        else
+          trailerContent.loginReason = ""
+        end if
+
         trailerContent.descriptorCode = content.descriptorCode
         trailerContent.descriptors = content.descriptors
         trailerContent.descriptorDescription = content.descriptorDescription

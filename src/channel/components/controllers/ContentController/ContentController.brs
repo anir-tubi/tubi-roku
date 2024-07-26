@@ -1280,8 +1280,6 @@ End Function
 
 
 Function refreshAllDetailScreens()
-  'Save exp result to avoid accessing funtion within for loop
-  isRokuRegTVTExpOn = getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v2", false).enabled = true
 
   for i = 0 to m.screenStack.getChildCount() - 1
     screen = m.screenStack.getChild(i)
@@ -1299,7 +1297,7 @@ Function refreshAllDetailScreens()
       refreshDetailScreenContent(screen)
       resetRelatedContent(screen)
     else if screen.subType() = "CategoryDetailsScreen"
-      if isRokuRegTVTExpOn = true AND screen.content <> invalid AND screen.content.validUntil <> invalid
+      if screen.content <> invalid AND screen.content.validUntil <> invalid
         screen.content.validUntil = 0
       end if
     end if
@@ -1899,7 +1897,7 @@ Function onCustomSuspend(msg)
 
     ' If any of the one trust screens were open we are force closing them.
     ' We have 2 OT Screens OTBanner(Initial Consent Screen) and OTPreferenceCenter which is opened when users clicks view privacy settings from settings screen.
-    ' If the OTBanner screen was open then we do not have any Tubi Screens opened yet and currentScreen will be invalid which will result in application restart as a part of logic inside onCustomResume method. 
+    ' If the OTBanner screen was open then we do not have any Tubi Screens opened yet and currentScreen will be invalid which will result in application restart as a part of logic inside onCustomResume method.
     ' If OTPreferenceCenter was open that means user is in Settings Screen and Settings screen has instantResumeAction: "startChannel" which will cause the focus to be reset to home by logic below.
     oneTrustViews = m.top.findNode("OneTrustViews")
     if oneTrustViews <> invalid

@@ -362,7 +362,7 @@ Function init()
 End Function
 
 
-Function onScreenFocusChange() 
+Function onScreenFocusChange()
 
   if m.top.hasFocus() = true then
     if m.top.adState = "adsPlaying" then
@@ -515,7 +515,7 @@ Function playContent()
       ' case Roku's video player logic will choose an audio track
       setInitialAudioTrack(m.Video.availableAudioTracks)
     end if
-  
+
   end if
 
 End Function
@@ -1594,6 +1594,8 @@ Function updateVideoPlayerState(content) as Void
 
     if (content.rating = "R" OR content.rating = "TV-MA" OR content.rating = "NC-17") AND m.constants.deviceinfo.countrycode = "US" AND isLoggedInUser() = false AND getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v2", false).enabled = true
       m.TransportButtons.removeChild(m.SkipTrailerButton)
+    else if isNonEmptyString(content.loginReason) = true
+      m.TransportButtons.removeChild(m.SkipTrailerButton)
     else if m.NodeHelpers.getChildIndex(m.TransportButtons, m.SkipTrailerButton) < 0
       m.TransportButtons.insertChild(m.SkipTrailerButton, 0)
     end if
@@ -2102,7 +2104,7 @@ Function onAudioTrackChanged(msg)
 
     if audioTrack = track.Track
       audioDescriptionTrackNamePrefix = m.constants.player.audioTrack.audioDescriptionTrackNamePrefix
-      
+
       if isNonEmptyString(track.name) = true AND track.name.instr(audioDescriptionTrackNamePrefix) > -1
         role = m.constants.player.audioTrack.roles.description
       else
