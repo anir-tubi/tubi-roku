@@ -1293,12 +1293,12 @@ Function AfterSignInPlayLockedContent(callbackAfterSignInParams)
   tubilog("SignInHelpers.AfterSignInPlayLockedContent")
 
   popScreenAfterSignInProcess()
+  setContentToRefreshAllPersonalizedScreens(true)
 
   if callbackAfterSignInParams <> invalid
     playVideoContent(callbackAfterSignInParams.content, callbackAfterSignInParams.playbackSource, callbackAfterSignInParams.position)
   end if
   refreshAllDetailScreens()
-  setContentToRefreshAllPersonalizedScreens(true)
   showHideSpinner(false)
 End Function
 
