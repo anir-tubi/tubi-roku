@@ -486,8 +486,8 @@ End Function
 '                                                    valid values are "deeplink" , "ap_auto", "ap_select", "container", "ymal", "search", "epg", "unknown"
 
 '                                               playbackContainer - if srcForAds = container, then playbackContainer is set to the id of the container that was the source, otherwise not used.
-
-Function playUpNextContent(nextContent, playbackSource = {"srcForAnalytic": "unknown", "srcForAds": "unknown"})
+' @refetch: boolean, this param tells whether the nextContent should be refetched from server or not. default is false
+Function playUpNextContent(nextContent, playbackSource = {"srcForAnalytic": "unknown", "srcForAds": "unknown"}, refetch = false)
   tubiLog("VideoHelpers.playUpNextContent")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
 
@@ -539,16 +539,16 @@ Function playUpNextContent(nextContent, playbackSource = {"srcForAnalytic": "unk
     ' populate the detail screen with the new content while the video is showing so when the user
     ' exits, it's already populated and there is no visible screen re-render. Assume this is only necessary
     ' for movies, as series only autoplay into the same series for now.
-    if oldContent.parentType <> m.constants.ui.contentTypes.series
+    ' Also refetching is required for both movies/series, when selecting content from Browse While Watchibg
+    if oldContent.parentType <> m.constants.ui.contentTypes.series OR refetch = true
+      emptyNode = CreateObject("roSGNode", "TubiContentNode")
       if nextContent.type = m.constants.ui.contentTypes.series
-        'this is not ideal but since we already have series content, we can do not want to refetch the series content.
-        onAutoplaySingleContentResponse(nextContent)
+        emptyNode.type = m.constants.ui.contentTypes.series
       else
-        emptyMovieNode = CreateObject("roSGNode", "TubiContentNode")
-        emptyMovieNode.type = m.constants.ui.contentTypes.video
-        emptyMovieNode.id = nextContent.id
-        getSingleContentFromServer(emptyMovieNode, onAutoplaySingleContentResponse, onSingleContentErrorWithoutTracking)
+        emptyNode.type = m.constants.ui.contentTypes.video
       end if
+      emptyNode.id = nextContent.id
+      getSingleContentFromServer(emptyNode, onAutoplaySingleContentResponse, onSingleContentErrorWithoutTracking)
     end if
 
     if nextContent.needsLogin = true AND isLoggedInUser() = false
@@ -1580,7 +1580,7 @@ Function handleYMALContentSuccessResponse(content)
     "srcForAnalytic": m.constants.player.playbackSource.unknown
     "srcForAds": m.constants.player.playbackOrigin.ymal
   }
-  playUpNextContent(content, playbackSource)
+  playUpNextContent(content, playbackSource, true)
 End Function
 
 
