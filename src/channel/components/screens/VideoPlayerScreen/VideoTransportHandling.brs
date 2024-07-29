@@ -126,7 +126,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           setFocusToComponent(m.PlayPauseButton, true)
         else if m.skipCuepointsButton.hasFocus() = true
           setFocusToComponent(m.ProgressBar)
-        else if isFocusOnPlayerControl() = true AND m.TopOverlay.opacity = 1
+        else if isFocusOnPlayerControl() = true AND m.TopOverlay.opacity = 1 AND m.top.isTrailer = false
 
           if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4", false).enabled = true
             relatedContent = m.top.browseContent
@@ -1642,7 +1642,7 @@ End Function
 
 ' show YMAL row on bottom of the screen and fire exposure event
 Function showYMAL()
-  if m.top.appMode <> "KIDS_MODE"
+  if m.top.appMode <> "KIDS_MODE" AND m.top.isTrailer = false
 
     if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4", false).enabled = true
       content = m.top.browseContent
@@ -1654,11 +1654,6 @@ Function showYMAL()
     if content <> invalid AND content.getChildCount() > 0 AND getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4").enabled = true
       m.Related.jumpToRowItem = [0,0]
       m.Related.isLoading = false
-    else if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4", false).enabled = true
-      ' Since we do not show YMAL for trailers avoiding showing the spinner when user is viewing trailer.
-      if m.top.isTrailer = false
-        m.Related.isLoading = true
-      end if
     end if
 
     m.Related.show = true
