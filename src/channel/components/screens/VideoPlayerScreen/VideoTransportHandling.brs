@@ -945,6 +945,7 @@ Function jumpToPosition(position)
     showAdBreak()
     m.showRatings = true
   else if shouldAdBreak = true
+    unObserveClosedCaptionAndAudioTrack()
     ' leave m.VideoState = "play" because from the component's perspective video is still playing
     m.Video.control = "stop"
     m.top.adPosition = adPosition

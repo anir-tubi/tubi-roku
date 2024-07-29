@@ -22,6 +22,9 @@ Function init()
 
   m.tubiTrackingInfo = TubiTrackingInfo(m.constants)
 
+  m.currentSubtitleTrack = ""
+  m.top.observeFieldScoped("currentSubtitleTrack", "onCurrentSubtitleTrackChanged")
+
   m.currentAudioTrack = ""
   m.top.observeFieldScoped("currentAudioTrack", "onCurrentAudioTrackChange")
 
@@ -49,6 +52,12 @@ Function onThemeChange(msg = invalid)
     m.audioTrackSelector.focusBitmapBlendColor = theme.focusedColor
     m.overlayBackground.blendColor = theme.neutralSolidColor
   end if
+End Function
+
+
+Function onCurrentSubtitleTrackChanged(msg)
+  m.currentSubtitleTrack = msg.getData()
+  updateSubtitleTrackSelectorUI()
 End Function
 
 
@@ -93,7 +102,7 @@ End Function
 
 Function renderAvailableClosedCaptionTracks()
   availableClosedCaptionTracks = m.top.availableClosedCaptionTracks
-  closedCaptionTrack = m.top.closedCaptionTrack
+  subtitleTrack = m.currentSubtitleTrack
   trackNodes = []
 
   if availableClosedCaptionTracks.Count() > 0
@@ -112,7 +121,7 @@ Function renderAvailableClosedCaptionTracks()
       index = index + 1
 
       ' Checking if the caption is turned on or in instant replay mode and selected track matches the item.
-      checked = (globalCaptionMode <> "Off" AND closedCaptionTrack = track.trackName)
+      checked = (globalCaptionMode <> "Off" AND subtitleTrack = track.trackName)
       localizedTitle = getLocalizedSubtitleLanguage(track.description)
 
       if localizedTitle <> invalid
@@ -371,13 +380,12 @@ Function onClosedCaptionSelectorItemSelectedChange(msg)
           language_code: languageCode
         }
       }
-      m.top.closedCaptionTrack = selectedTrack.TrackName
+
+      m.top.subtitleTrack = selectedTrack.trackName
+      m.currentSubtitleTrack = selectedTrack.trackName
+
     end if
   end if
-
-  m.top.subtitleTrackSettings = {
-    language: languageCode
-  }
 
 End Function
 
@@ -408,8 +416,34 @@ Function onAudioTrackSelectorItemSelectedChange(msg)
 End Function
 
 
+Function updateSubtitleTrackSelectorUI()
+  availableClosedCaptionTracks = m.top.availableClosedCaptionTracks
+
+  if isNonEmptyArray(availableClosedCaptionTracks) = true
+    for i = 0 to availableClosedCaptionTracks.Count() - 1
+      track = availableClosedCaptionTracks[i]
+
+      if track.trackName = m.currentSubtitleTrack
+        'It is possible user may update the Audio Track in Roku firmware UI when the CCOverlay is open, At this time we need to update the audio track selection on CCOverlay as well to make it same.
+        'incrementing by 1 as we show "Off" as first item
+        index = i + 1
+        m.closedCaptionSelector.updateSelection = index
+        exit for
+      end if
+    end for
+  end if
+  
+End Function
+
+
 Function onGlobalCaptionModeChange(msg)
   m.globalCaptionMode = msg.getData()
+  
+  if m.globalCaptionMode = "Off"
+    m.closedCaptionSelector.updateSelection = 0
+  else if m.globalCaptionMode = "On"
+    updateSubtitleTrackSelectorUI()
+  end if
 End Function
 
 

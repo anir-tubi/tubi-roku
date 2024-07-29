@@ -301,7 +301,7 @@ End Function
 ' Displays the closed caption and audio track selection overlay.
 Function showClosedCaptionAudioTrackOverlay()
   videoNode = m.top.videoNode
-  m.closedCaptionAndAudioSelectionOverlay.closedCaptionTrack = videoNode.subtitleTrack
+  m.closedCaptionAndAudioSelectionOverlay.currentSubtitleTrack = videoNode.subtitleTrack
   m.closedCaptionAndAudioSelectionOverlay.globalCaptionMode = videoNode.globalCaptionMode
   m.closedCaptionAndAudioSelectionOverlay.availableClosedCaptionTracks = videoNode.availableSubtitleTracks
   m.closedCaptionAndAudioSelectionOverlay.availableAudioTracks = videoNode.availableAudioTracks

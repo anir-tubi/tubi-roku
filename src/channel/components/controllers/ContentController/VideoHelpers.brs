@@ -1393,6 +1393,7 @@ Function onSubtitleTrackSettingsChange(msg)
   selectedSubtitleTrack = msg.getData()
   ' Making sure we only call update when necessary.
   currentSubtitleTrack = m.pub_serverPersistentData.subtitleTrack
+
   if currentSubtitleTrack = invalid OR (currentSubtitleTrack.language <> selectedSubtitleTrack.language)
     saveServerPersistentData({
       "subtitleTrack": selectedSubtitleTrack

@@ -216,7 +216,6 @@
       <field id="sendYouboraError" type="boolean" alwaysNotify="true" />
       <field id="sendVideoTrackingStart" type="boolean" alwaysNotify="true" />
 
-      <field id="closedCaptionTrack" type="string" alias="VideoNode.subtitleTrack, closedCaptionAndAudioSelectionOverlay.closedCaptionTrack" />
       <!-- Timestamp of the last time we finished playing back video with this player. If -1 then we are currently playing back. -->
       <field id="timestampOfLastVideoPlayback" type="integer" value="0" />
 
@@ -230,7 +229,7 @@
       <!-- pixelUrl to fire during pause ad -->
       <field id="sendPauseAdPixel" type="string" alwaysNotify="true"/>
 
-      <field id="subtitleTrackSettings" type="assocarray" value="{}" alias="closedCaptionAndAudioSelectionOverlay.subtitleTrackSettings" />
+      <field id="subtitleTrackSettings" type="assocarray" value="{}" />
       <field id="audioTrackSettings" type="assocarray" value="{}" />
 
   </interface>

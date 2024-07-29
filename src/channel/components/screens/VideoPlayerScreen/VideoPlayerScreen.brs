@@ -67,6 +67,7 @@ Function init()
   m.video.observeFieldScoped("availableSubtitleTracks", "setCCAudioTransportBarVisibility")
   m.video.observeFieldScoped("availableAudioTracks", "onAvailableAudioTracksChange")
   m.video.observeFieldScoped("audioTrack", "onAudioTrackChanged")
+  m.video.observeFieldScoped("subtitleTrack", "onSubtitleTrackChanged")  
   if getExperimentResource("roku_async_stop", "roku_async_stop_v5", false).enabled = true then
     m.video.asyncStopSemantics = true
   end if
@@ -235,6 +236,7 @@ Function init()
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("globalCaptionTurnedOff", "onGlobalCaptionTurnedOffChange")
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("wasBackButtonSelected", "onWasBackButtonSelectedChange")
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("trackingEventInfo", "onTrackingEventInfoChange")
+  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("subtitleTrack", "onSubtitleTrackChangedOnCCOverlay")
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("audioTrack", "onAudioTrackChangedOnCCOverlay")
   m.closedCaptionAndAudioSelectionOverlayGroup = m.top.findNode("closedCaptionAndAudioSelectionOverlayGroup")
 
@@ -686,6 +688,7 @@ Function onVideoStateChange(msg)
       m.top.state = state   'triggers error modal in ContentController
     end if
   else if state = "stopped" then
+
     if m.isShowAdBreakPendingStop = true then
       showAdBreakStoppedCallback()
     else if m.VideoState = "stop"  then
@@ -1124,6 +1127,8 @@ Function onAdStateChange(msg)
       updateVideoState("play")
       updateLastPingTime(m.playerPosition) ' updating lastPingtime for extra safety
 
+      unObserveClosedCaptionAndAudioTrack()
+      observeClosedCaptionAndAudioTrack()
       m.Video.control = "play"
 
       ' sometimes position callback not getting triggered for longtime after playing Ads.
@@ -1346,6 +1351,9 @@ End Function
 Function showAdBreak()
   m.didSeeAdCountdown = false   'reset the variable
 
+  'un-observing globalCaptionMode, subtitle and audioTrack to avoid callbacks of those video node fields when Ad starts/ends
+  unObserveClosedCaptionAndAudioTrack()
+
   ' leave m.VideoState = "play" because from the component's perspective video is still playing
 
   ' If Video node is already in stopped state then calling control = "stop" on it will not trigger onVideoStateChange (async will but will leave it stuck in state=stopping).
@@ -1384,6 +1392,20 @@ Function showAdBreakStoppedCallback()
 End Function
 
 
+Function observeClosedCaptionAndAudioTrack()
+  m.Video.observeFieldScoped("globalCaptionMode", "onCaptionModeChange")
+  m.Video.observeFieldScoped("subtitleTrack", "onSubtitleTrackChanged")
+  m.Video.observeFieldScoped("audioTrack", "onAudioTrackChanged")
+End Function
+
+
+Function unObserveClosedCaptionAndAudioTrack()
+  m.Video.unObserveFieldScoped("globalCaptionMode")
+  m.Video.unObserveFieldScoped("subtitleTrack")
+  m.Video.unObserveFieldScoped("audioTrack")
+End Function
+
+
 ' Helper function that aggregates any tasks that need to be done before playing a new video
 ' @contentNode: roSGNode, a TubiContentNode
 ' @videoResourceIndex: intarray, [0] -> codexIndex & [1] -> drmIndex
@@ -1392,7 +1414,8 @@ Function prepareToStartVideo(content, videoResourceIndex = [0,0])
   resetVideoPlayerState(content)
   resetPauseAd()
   resetPauseAdTimers()
-  m.Video.observeFieldScoped("globalCaptionMode", "onCaptionModeChange")
+  unObserveClosedCaptionAndAudioTrack()
+  observeClosedCaptionAndAudioTrack()
 
   videoResources = content.videoResources
   codecIndex = videoResourceIndex[0]
@@ -1479,7 +1502,9 @@ End Function
 
 Function stopVideo()
   tubilog("VideoPlayer.stopVideo")
-  m.Video.unobserveFieldScoped("globalCaptionMode")
+
+  'un-observing globalCaptionMode, subtitle and audioTrack to avoid callbacks of those video node fields when user presses back
+  unObserveClosedCaptionAndAudioTrack()
   videoState = m.videoState
 
   ' updating last ping time with current player position if the video is not playing OR not paused.
@@ -2095,6 +2120,30 @@ Function onAvailableAudioTracksChange(msg)
 End Function
 
 
+Function onSubtitleTrackChanged(msg)
+  subtitleTrack = msg.getData()
+  m.closedCaptionAndAudioSelectionOverlay.currentSubtitleTrack = subtitleTrack
+  availableSubtitleTracks = m.Video.availableSubtitleTracks
+
+  for each track in availableSubtitleTracks
+
+    if subtitleTrack = track.trackName
+
+      languageCode = m.tubiTrackingInfo.getLanguageCode(track.language)
+      selectedSubtitleTrack = {
+        language: languageCode,
+      }
+
+      m.top.subtitleTrackSettings = selectedSubtitleTrack
+      m.top.preferredSubtitleTrack = selectedSubtitleTrack
+      exit for
+
+    end if
+
+  end for
+End Function
+
+
 Function onAudioTrackChanged(msg)
   audioTrack = msg.getData()
   m.closedCaptionAndAudioSelectionOverlay.currentAudioTrack = audioTrack
@@ -2148,14 +2197,14 @@ Function setInitialSubtitleTrack(availableSubtitleTracks)
     ' Setting updated subtitle track to the video node.
     if updatedSubtitleTrack <> invalid
       m.Video.subtitleTrack = updatedSubtitleTrack.TrackName
-      m.closedCaptionAndAudioSelectionOverlay.closedCaptionTrack = updatedSubtitleTrack.TrackName
+      m.closedCaptionAndAudioSelectionOverlay.currentSubtitleTrack = updatedSubtitleTrack.TrackName
     else
-      m.closedCaptionAndAudioSelectionOverlay.closedCaptionTrack = availableSubtitleTracks[0].TrackName
+      m.closedCaptionAndAudioSelectionOverlay.currentSubtitleTrack = availableSubtitleTracks[0].TrackName
     end if
 
   else if availableSubtitleTracks <> invalid AND availableSubtitleTracks.Count() > 0 AND isNonEmptyString(m.video.currentSubtitleTrack) = true
     ' This else block will handle case where we do not have a preferred subtitle track saved for device.
-    m.closedCaptionAndAudioSelectionOverlay.closedCaptionTrack = m.video.currentSubtitleTrack
+    m.closedCaptionAndAudioSelectionOverlay.currentSubtitleTrack = m.video.currentSubtitleTrack
   end if
 End Function
 
@@ -2205,6 +2254,12 @@ Function setInitialAudioTrack(availableAudioTracks)
     ' This else block will handle case where we do not have a preferred audio track saved for user.
     m.closedCaptionAndAudioSelectionOverlay.currentAudioTrack = m.video.currentAudioTrack
   end if
+End Function
+
+
+Function onSubtitleTrackChangedOnCCOverlay(msg)
+  subtitleTrack = msg.getData()
+  m.Video.subtitleTrack = subtitleTrack
 End Function
 
 

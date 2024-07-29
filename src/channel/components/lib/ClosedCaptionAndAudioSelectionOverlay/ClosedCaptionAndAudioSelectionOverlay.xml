@@ -20,6 +20,16 @@
     <field id="availableClosedCaptionTracks" type="array" value="[]"/>
 
     <!--
+      - Holds the current subtitle track name that has been previously selected by the user either earlier during this session or during a previous playback session.
+      - Please refer setInitialSubtitleTrack inside videoplayerscreen.brs where we are looping through the available subtitle tracks and matching it against the user saved subtitle track preference.
+      - This string value will be used to set the check mark on the subtile track item within the overlay.
+      - Sample availableSubtitleTracks=[{Description: "English", HasAccessibilityCaption: false, HasAccessibilityDescription: false, HasAccessibilitySign: false, Language: "eng", TrackName: "<dev_d_0>http://s.adrise.tv/0b37a162-bc11-4ed5-ac6b-07304ae72c95.srt"}]
+      - currentSubtitleTrack will hold track eg. <dev_d_0>http://s.adrise.tv/0b37a162-bc11-4ed5-ac6b-07304ae72c95.srt
+      - This field is used to show the check mark for the selected subtitle track
+    -->
+    <field id="currentSubtitleTrack" type="string" value="" />
+
+    <!--
       - Holds the current audio track name that has been previously selected by the user either earlier during this session or during a previous playback session.
       - Please refer onAvailableAudioTracksChange inside videoplayerscreen.brs where we are looping through the available audio tracks and matching it against the user saved audio track preference.
       - This string value will be used to set the check mark on the audio track item within the overlay.
@@ -35,7 +45,7 @@
     <!-- OUTPUTS -->
 
     <!-- Will be set when the user selects a closed captioning track. This will be eventually be piped to videonode.  -->
-    <field id="closedCaptionTrack" type="string" value="" />
+    <field id="subtitleTrack" type="string" value="" />
 
     <!--
       - Will be set when the user selects a audio track.
@@ -49,14 +59,6 @@
     <field id="globalCaptionTurnedOn" type="boolean" alwaysNotify="true" />
     <field id="globalCaptionTurnedOff" type="boolean" alwaysNotify="true" />
     <field id="trackingEventInfo" type="assocarray" alwaysNotify="true" />
-
-    <!--
-      - Will be set when the user selects an subtitle track. This will be used to update the device settings to store the selected subtitle track as the preferred subtitle track.
-      - The AA set on the subtitleTrackSettings field contain key: "language" which is a 2 letter lanuguage code
-    -->
-
-    <!-- Sample: {"language": "EN"} -->
-    <field id="subtitleTrackSettings" type="assocarray" value="{}" />
 
   </interface>
 
