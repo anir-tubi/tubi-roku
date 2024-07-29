@@ -193,7 +193,7 @@ describe('Espanol', function () {
 
       // Create history with one Evergreen title movie
 
-      const contentId = await user.getContentById(300006083);
+      const contentId = await user.getContentById(300005220);
       await user.addContentToViewHistory(contentId, 500);
 
    }
@@ -203,7 +203,7 @@ describe('Espanol', function () {
     // Create a user with one title series
 
     await user.addContentToWatchList({
-          id: '0300006083',
+          id: '0300005220',
           type: 'series'
         });
       

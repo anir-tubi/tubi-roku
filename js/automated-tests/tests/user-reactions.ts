@@ -116,6 +116,7 @@ describe('User Reactions', function () {
 
       // Navigate right until the grid is in focus
       await testUtils.untilTrue(async () => {
+        await testUtils.waitForElementToShowOnScreen('searchResultGrid');
           await ecp.sendKeypress(ecp.Key.Right);
           const { value: id } = await odc.getValue({
               base: 'focusedNode',

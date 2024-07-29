@@ -42,6 +42,7 @@ describe('Homescreen Navigation - Movies Filter', function () {
     }
 
     // Now select a title to redirect us on the detail page
+    await ecp.sendKeypress(ecp.Key.Down);
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify the Details page is a Movies Details page

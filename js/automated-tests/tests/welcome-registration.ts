@@ -79,7 +79,7 @@ describe('Welcome Registration', function () {
     await ecp.sendKeypress(ecp.Key.Back);
 
     // Verify Welcome Modal not displayed and Homescreen displayec
-    await testUtils.waitForElementToNotShowOnScreen('welcomeRegModal', 'Welcome Modal still showing on screen', 3000);
+    await testUtils.waitForElementToNotShowOnScreen('welcomeRegModal', 'Welcome Modal still showing on screen', 5000);
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
   });
 

@@ -188,6 +188,7 @@ describe('Kids Mode', function () {
     await openKidsMode();
 
     // Open Settings
+    await ecp.sendKeypress(ecp.Key.Left);
     await kidsOpenSettings();
 
     // Choose PC Older Kids
@@ -432,8 +433,7 @@ async function signInUserFromParentalControls() {
 
 async function kidsOpenSettings() {
   await ecp.sendKeypress(ecp.Key.Left);
-  const leftNavHomeButton = await testUtils.getNodeForElement('leftNavHomeButton');
-  expect(leftNavHomeButton.visible).to.be.true;
+  await testUtils.waitForElementToFullyShowOnScreen('leftNavHomeButton',  'Left Nav home button not found', 10000);
   await ecp.sendKeypress(ecp.Key.Down, { count: 7 });
   await ecp.sendKeypress(ecp.Key.Ok);
 

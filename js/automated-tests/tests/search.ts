@@ -6,7 +6,10 @@ import { testUtils } from '../test-utils';
 describe('Search', function () {
   describe('Linear Search', function () {
     it('C244256 When a user searches for a channel, the channel is shown in the search results @search', async () => {
-      await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
+      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+      await testUtils.goToPage('search');
+      await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for element to have focus',10000);
       await ecp.sendText('nbc');
 
       // Call function to navigate right to search results grid
@@ -22,7 +25,10 @@ describe('Search', function () {
     });
 
     it('C244258 When a user clicks on the channel poster, the live channel should start playing @search', async () => {
-      await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
+      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+      await testUtils.goToPage('search');
+      await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for element to have focus',10000);
       await ecp.sendText('nbc');
 
       // Call function to navigate right to search results grid
@@ -42,7 +48,10 @@ describe('Search', function () {
     });
 
     it('C244259 When a user presses the back button, the user is sent back to the search result page @search', async () => {
-      await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
+      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+      await testUtils.goToPage('search');
+      await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for element to have focus',10000);
       await ecp.sendText('nbc');
 
       // Call function to navigate right to search results grid
@@ -69,7 +78,10 @@ describe('Search', function () {
     });
 
     it('C244260 - The user should be able to access the channel guide and other player features from the player page of the selected channel @search', async () => {
-      await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
+      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+      await testUtils.goToPage('search');
+      await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for element to have focus',10000);
       await ecp.sendText('nbc');
 
       // Call function to navigate right to search results grid
@@ -122,7 +134,10 @@ describe('Search', function () {
     */
 
     it('C244271  Ensure that when the user hover over a channel search result the channel name and description is displayed on the top left corner @search', async () => {
-      await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
+      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+      await testUtils.goToPage('search');
+      await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for element to have focus',10000);
       await ecp.sendText('nbc');
 
       // Call function to navigate right to search results grid
@@ -147,7 +162,10 @@ describe('Search', function () {
     });
 
     it('C406434 When a user taps "Play" button on linear channel, backing out takes user back to search results @search', async () => {
-      await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
+      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+      await testUtils.goToPage('search');await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
+      await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for element to have focus',10000);
       await ecp.sendText('nbc');
 
       // Call function to navigate right to search results grid
@@ -175,8 +193,10 @@ describe('Search', function () {
 
     // https://tubi.testrail.io/index.php?/cases/view/540011
     it('540011 - If search page fetches "Top Searched" container, more than 10 titles are displayed under Trending Searches @search', async () => {
-      await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: false });
-      await testUtils.waitForElementToFullyShowOnScreen('trendingSearchesHeader', 'Timed out waiting for element to have focus');
+      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+      await testUtils.goToPage('search');
+      await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for element to have focus',10000);
 
       // Navigate down 3 rows
       await ecp.sendKeypress(ecp.Key.Down, {count:3});
@@ -185,7 +205,7 @@ describe('Search', function () {
     });
 
     // https://tubi.testrail.io/index.php?/cases/view/540012
-    it('540012 - Trending Searches in Kids Moe, more than 10 titles are displayed under Trending Searches @search', async () => {
+    it('540012 - Trending Searches in Kids Mode, more than 10 titles are displayed under Trending Searches @search', async () => {
       await testUtils.startApplicationAtPage('kids', { shouldCreateNewUser: false });
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for rowlist to have focus');
       await testUtils.goToPage('search');
@@ -203,6 +223,7 @@ describe('Search', function () {
 
 // Navigate right until the grid is in focus
 async function navigateRightToGrid() {
+  await testUtils.waitForElementToShowOnScreen('searchResultGrid');
   await testUtils.untilTrue(async () => {
     await ecp.sendKeypress(ecp.Key.Right);
     const { value: id } = await odc.getValue({
