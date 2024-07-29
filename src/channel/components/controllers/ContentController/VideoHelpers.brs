@@ -1247,6 +1247,7 @@ Function fetchUpNextContent(videoPlayer)
         "is_kids_mode": shouldKidsModeBeSentToServer()
         "container_id": m.autoplayContext
         "mode": "nap"
+        "include_series": true
       }
     }
 
@@ -1261,7 +1262,7 @@ Function fetchUpNextContent(videoPlayer)
     upNextReqInfo = m.cmsApi.createUpNextContentReqInfo(options)
 
     'fire exposure event when fetching upnext content
-    getExperimentResource("roku_autoplay_cuepoint", "roku_autoplay_cuepoint_v1", true)
+    getExperimentResource("roku_autoplay_cuepoint", "roku_autoplay_cuepoint_v2", true)
 
     return m.makeRequest({
       requestType: m.constants.reqNames.getUpNextContent
