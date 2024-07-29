@@ -13,3 +13,7 @@ starter_library_manifest:
   minor_version: 3
   build_version: 0
   revision_version: 0
+one_trust_library_manifest:
+  major_version: 202405
+  minor_version: 1
+  build_version: 0

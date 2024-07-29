@@ -5,3 +5,4 @@ settings:
   mode: "staging"
   starterComponentsUrl: "https://rcdn-staging.tubitv.com/appFiles/starter-components/tubi_starter_components_{{versionMinorUnderscored}}.pkg"
   remoteComponentsUrl: "https://rcdn-staging.tubitv.com/appFiles/components/tubi_remote_components_{{versionUnderscored}}.pkg"
+  oneTrustComponentsUrl: "https://rcdn-staging.tubitv.com/appFiles/one-trust-components/tubi_one_trust_components_{{oneTrustVersionUnderscored}}.pkg"

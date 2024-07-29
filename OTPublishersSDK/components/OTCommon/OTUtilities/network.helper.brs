@@ -22,6 +22,7 @@ end function
 
 function getOTconfig()
     m.logger.set(m.errortype.Info, m.errorTags.OneTrust, m.constant.info["700"])
-    ' jenkins will update the version in OTconfig file to automation the sdk version 
-    return ParseJson(ReadAsciiFile("pkg:/components/OTPublishersSDK/OTconfig.json"))
+    ' jenkins will update the version in OTconfig file to automation the sdk version
+    ' ******* DONOT Revert to pkg since we need it for having to support component library. ADDED BY TUBI ROKU DEV TEAM ****
+    return ParseJson(ReadAsciiFile("libpkg:/components/OTPublishersSDK/OTconfig.json"))
 end function

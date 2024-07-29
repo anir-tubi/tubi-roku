@@ -5,7 +5,7 @@ const fs = require('fs');
 const shell = require('shelljs');
 shell.config.silent = true;
 
-const {getBuildTag, incrementBuildNumber, incrementRevisionNumber} = require('./config');
+const {getBuildTag, incrementBuildNumber, incrementRevisionNumber, getOneTrustBuildTag} = require('./config');
 const {NoStackError, execShellCommand} = require('./utilities');
 
 const githubDeveloperInfo = require('./github-developer-info.json');
@@ -126,6 +126,7 @@ ${rcdnPrUrl}`;
     done(new NoStackError(errorMsg));
   }
 }
+
 
 //All the steps necessary to push starter and remote components to the CDNs and make a PR to the CDNs
 // returns the URL string of created PR.
@@ -279,6 +280,118 @@ async function createCdnPrUrl(done, cdn = 'cdn') {
   if (!cdnPrUrl) {
     return done(new NoStackError(errMsg));
   } else {
+    return cdnPrUrl;
+  }
+}
+
+
+async function createCdnPrUrlForOneTrustSDK(done, buildTag) {
+
+  const cdnPath = process.env.RCDN_GIT_DIRECTORY;
+  const CDNRepositoryUrl = `${ghInfo.rcdnRepo}`;
+
+  // check if the environment variable for the path to the CDN repo has been set
+  if (!cdnPath) {
+    const errorMsg = `You did not set a RCDN_GIT_DIRECTORY variable in your .bash_profile or .bashrc or .zsh_profile file.`;
+    done(new NoStackError(errorMsg));
+  }
+
+  // check that the CDN repo is clean - verifyGit() handles any error messages as necessary
+  verifyGit(done, cdnPath);
+
+  // attempt to checkout master in the CDN repo
+  log(`...Checking out master on the local ${CDNRepositoryUrl} repo`);
+  const gitCheckoutMasterCDN = `git -C ${cdnPath} checkout master`;
+  const gitCheckoutMasterCDNErrorMsg = `Could not checkout master on the ${cdnPath}`;
+  execShellCommand(done, gitCheckoutMasterCDN, gitCheckoutMasterCDNErrorMsg);
+
+  // attempt to pull origin master for the CDN repo
+  log(`...Pulling remote master to the local ${CDNRepositoryUrl} repo`);
+  const gitPullMasterCDN = `git -C ${cdnPath} pull origin master`;
+  const gitPullMasterCDNErrorMsg = `Could not pull master from origin at ${cdnPath}`;
+  execShellCommand(done, gitPullMasterCDN, gitPullMasterCDNErrorMsg);
+
+  // attempt to check out a new branch off master for the CDN repo
+  const cdnBranchName = `roku_one_trust_${buildTag}`;
+  // check if there is already a branch with the cdnBranchName and delete it if there is
+  log(`...Checking if there already exists a local branch named ${cdnBranchName} on ${cdnPath}`);
+  const gitListCDNBranch = `git -C ${cdnPath} branch --list ${cdnBranchName}`;
+  const gitListCDNBranchErrorMsg = `Could not list the branches at ${cdnPath}`;
+  const gitListRes = execShellCommand(done, gitListCDNBranch, gitListCDNBranchErrorMsg);
+
+  if (gitListRes) {
+    // there exists a branch with the cdnBranchName already, so delete it.
+    // We've already switched to master on `${cdnPath}` earlier in this flow.
+    log(`...Deleting the ${cdnBranchName} on ${cdnPath}`);
+    const gitDeleteCDNBranch = `git -C ${cdnPath} branch -D ${cdnBranchName}`;
+    const gitDeleteCDNBranchErrorMsg = `Could not delete the "${cdnBranchName}" branch at ${cdnPath}`;
+    execShellCommand(done, gitDeleteCDNBranch, gitDeleteCDNBranchErrorMsg);
+  }
+
+  log(`...Creating a new ${cdnBranchName} branch on the local ${CDNRepositoryUrl} repo`);
+  const gitCheckoutNewCDNBranch = `git -C ${cdnPath} checkout -b ${cdnBranchName}`;
+  const gitCheckoutNewCDNBranchErrorMsg = `Could not checkout a new branch "${cdnBranchName}" at ${cdnPath}`;
+  execShellCommand(done, gitCheckoutNewCDNBranch, gitCheckoutNewCDNBranchErrorMsg);
+
+  const oneTrustComponentsFileName = `tubi_one_trust_components_${buildTag}.pkg`;
+
+  const cdnOneTrustComponentsPath = `${cdnPath}/appFiles/one-trust-components/${oneTrustComponentsFileName}`;
+
+  const localOneTrustComponentsPath = `build/${oneTrustComponentsFileName}`;
+
+  // copy the starter components from the /build directory to the CDN repo directory
+  log(`...Copying the one trust components to the local ${CDNRepositoryUrl} repo`);
+  const moveStarterComponentsResult = shell.cp(localOneTrustComponentsPath, cdnOneTrustComponentsPath);
+  if (moveStarterComponentsResult.stderr) {
+    const errorMsg = `There was an error moving the one trust components. You will need to manually copy the starter components and remote components and manually make a PR. Error Message: ${moveStarterComponentsResult.stderr}`;
+    done(new NoStackError(errorMsg));
+  }
+
+
+  // add the updates so they are staged for commit
+  log(`...Staging changes for commit on the local ${CDNRepositoryUrl} repo`);
+  const gitAddCDNBranch = `git -C ${cdnPath} add . `;
+  const gitAddCDNBranchErrorMsg = `Could not run "git add . " on ${cdnPath}`;
+  execShellCommand(done, gitAddCDNBranch, gitAddCDNBranchErrorMsg);
+
+  // commit the updates to the branch
+  log(`...Committing the staged changes on the local ${CDNRepositoryUrl} repo`);
+  const gitCommitCDNBranch = `git -C ${cdnPath} commit -m 'Updating the one trust components for ${cdnBranchName}'`;
+  const gitCommitCDNBranchErrorMsg = `"git commit" failed on ${cdnPath}`;
+  execShellCommand(done, gitCommitCDNBranch, gitCommitCDNBranchErrorMsg);
+
+  // push the branch to Github
+  log(`...Pushing the local ${cdnBranchName} branch to the remote ${CDNRepositoryUrl} repo`);
+  const gitPushCDNBranch = `git -C ${cdnPath} push origin ${cdnBranchName}`;
+  const gitPushCDNBranchErrorMsg = `Could not push ${cdnBranchName} to origin (Github) at ${cdnPath}`;
+  execShellCommand(done, gitPushCDNBranch, gitPushCDNBranchErrorMsg);
+
+  // make a PR against master on the CDN repo at Github
+  log(`...Making a PR on ${CDNRepositoryUrl} against the remote master branch`);
+  let cdnPrUrl = '';
+  let errMsg = `Failed to create CDN PRs. Please create manually.`;
+  try {
+    const cdnPrRes = await octokit().pulls.create({
+      owner: ghInfo.owner,
+      repo: `${CDNRepositoryUrl}`,
+      title: `Updating one trust components for roku ${buildTag}`,
+      head: cdnBranchName,
+      base: 'master'
+    });
+    cdnPrUrl = cdnPrRes.data.html_url;
+  } catch (err) {
+    errMsg = err;
+  }
+
+  // failed to make PR on CDN/RCDN repo at Github due to git process steps. In this event stop execution of the script.
+  if (!cdnPrUrl) {
+    return done(new NoStackError(errMsg));
+  } else {
+    // multi line string
+    const prUrlsForPasting = `${cdnPrUrl}`;
+    clipboardy.writeSync(prUrlsForPasting);
+
+    log(`The CDN PR url have been placed on your clipboard. Please share with the team!`);
     return cdnPrUrl;
   }
 }
@@ -987,4 +1100,5 @@ module.exports = {
   bumpBuildTen,
   bumpRevision,
   tagBuild,
+  createCdnPrUrlForOneTrustSDK
 };

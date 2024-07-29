@@ -8,6 +8,7 @@ settings:
   platformName: "roku"
   starterComponentsUrl: "https://rcdn-production.tubitv.com/appFiles/starter-components/tubi_starter_components_{{versionMinorUnderscored}}.pkg"
   remoteComponentsUrl:  "https://rcdn-production.tubitv.com/appFiles/components/tubi_remote_components_{{versionUnderscored}}.pkg"
+  oneTrustComponentsUrl:  "https://rcdn-production.tubitv.com/appFiles/one-trust-components/tubi_one_trust_components_{{oneTrustVersionUnderscored}}.pkg"
   remoteComponentsExtension: "pkg"
   remoteComponentLibProvided: "{{remoteComponentLibProvided}}"
   suitest: false
@@ -94,3 +95,9 @@ starter_library_manifest:
   rsg_version: 1.2
   confirm_partner_button: 1
   bs_const: {{bsConst}}
+
+one_trust_library_manifest:
+  title: "One Trust Component Library"
+  sg_component_libs_provided: "OneTrustLibrary"
+  hidden: 1
+  rsg_version: 1.2

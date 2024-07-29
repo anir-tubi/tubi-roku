@@ -15,7 +15,7 @@ const clipboardy = require('clipboardy');
 // const requestDebug = require('request-debug')(request);
 
 //Importing old build functions
-const {load, getBuildTag} = require('./js/config');
+const {load, getBuildTag, getOneTrustBuildTag} = require('./js/config');
 const {createManifest, createSettings} = require('./js/build');
 const {keypress, deeplink, uploadPkg, signPkg, installWithSquashfs} = require('./js/network');
 
@@ -29,7 +29,7 @@ const {replaceTypographyConstants, updateTypographyJSON} = require('./js/typogra
 const {NoStackError} = require('./js/utilities');
 
 // Importing functions with Git functionality
-const {makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges, buildQaBranch, bumpBuild, bumpBuildTen, bumpRevision, tagBuild} = require('./js/git');
+const {makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges, buildQaBranch, bumpBuild, bumpBuildTen, bumpRevision, tagBuild, createCdnPrUrlForOneTrustSDK} = require('./js/git');
 
 // Importing functions related to Github action runners
 const {setupAutomatedTestsGithubActionRunner, startAutomatedTestsGithubActionRunner, removeAutomatedTestsGithubActionRunner} = require('./js/action-runner');
@@ -47,6 +47,9 @@ const options = {
   port: 8090,
   telnet: process.env.ROKU_DEV_TELNET
 };
+
+// distribution ID of roku staging CDN pointing to s3 bucket tubi-rokucdn-source-staging
+const stagingCdnDistributionID = `E1TFU8FZM49RLM`;
 
 // overwrite the config and/or target default options with passed in arguments;
 // for example a -staging argument will set options.config to 'staging'
@@ -505,6 +508,30 @@ function buildRemote() {
 }
 
 
+function buildOneTrust() {
+  let build = new Promise((res, rej) => {
+    let sources = [
+      "OTPublishersSDK/**/*"
+    ];
+
+    let stream = collect(sources)
+      .pipe(dest('build/onetrust/components/OTPublishersSDK'));
+
+    stream.on('end', () => {
+      res();
+    });
+  });
+
+  const buildTag = getOneTrustBuildTag(options)
+
+  return build
+  .then(() => {
+    createManifest(options, 'build/onetrust/manifest', 'one_trust_library_manifest');
+    return zipAsPromise('build/onetrust/**/*', `tubi_one_trust_components_${buildTag}.zip`, 'build/');
+  });
+}
+
+
 // upload - upload the zip package file to a roku device
 // returns a promise
 // @zipPath: the relative path to the zip file that will be uploaded to the roku
@@ -652,6 +679,36 @@ function packageRemote(done) {
       log('HINT: Make sure you are using the correct Roku device IP.');
       done(err);
     });
+}
+
+
+function packageOneTrust(done) {
+  const buildTag = getOneTrustBuildTag(options)
+  log('Starting packageOneTrust');
+  
+  const zipPath = `build/tubi_one_trust_components_${buildTag}.zip`;
+  const appName = `tubi_one_trust_components_${buildTag}`;
+
+  return installWithSquashfs(zipPath, options.target, options.devPass)
+    .then(() => {
+      log(`Signing ${zipPath}`);
+      return signPkg(options.target, options.devPass, options.pkgPass, appName, 'build');
+    })
+    .then(path => {
+      log(`Signed package at ${zipPath}`);
+    })
+    .catch(err => {
+      console.log(err);
+      log('Could not package one trust components');
+      log('HINT: Make sure you are using the correct Roku device IP.');
+      done(err);
+    });
+}
+
+
+function makeOneTrustReleasePrs(done) {
+  const buildTag = getOneTrustBuildTag(options);
+  return createCdnPrUrlForOneTrustSDK(done, buildTag);
 }
 
 
@@ -811,8 +868,6 @@ function pushStaging(done) {
 
   const localStarterComponentsPath  = `build/tubi_starter_components_${minorBuildTag}.pkg`;
   const rcdnS3starterComponentsPath = `s3://tubi-rokucdn-source-staging/appFiles/starter-components/tubi_starter_components_${minorBuildTag}.pkg`;
-  // distribution ID of roku staging CDN pointing to s3 bucket tubi-rokucdn-source-staging
-  const stagingCdnDistributionID = `E1TFU8FZM49RLM`;
 
   let pushResult = shell.exec(`aws s3 cp ${localRemoteComponentsPath} ${rcdnS3RemoteComponentsPath} --profile $AWS_PROFILE`);
 
@@ -826,6 +881,23 @@ function pushStaging(done) {
   }
 
   if (!pushResult.stderr) {
+    done();
+  } else {
+    done(new NoStackError(`AWS S3 error: Hint - check valet auth. And also make sure AWS_PROFILE env variable set to main-roku-dev`));
+  }
+}
+
+
+// Generates a one trust component library pkg and pushes it to staging aws s3.
+function pushOneTrustStaging(done) {
+  const buildTag = getOneTrustBuildTag(options);
+
+  const localPath = `build/tubi_one_trust_components_${buildTag}.pkg`;
+  const remotePath = `s3://tubi-rokucdn-source-staging/appFiles/one-trust-components/tubi_one_trust_components_${buildTag}.pkg`;
+
+  const result = shell.exec(`aws s3 cp ${localPath} ${remotePath} --profile $AWS_PROFILE`);
+
+  if (!result.stderr) {
     done();
   } else {
     done(new NoStackError(`AWS S3 error: Hint - check valet auth. And also make sure AWS_PROFILE env variable set to main-roku-dev`));
@@ -910,6 +982,8 @@ exports.compareProd = findCommitsNotOnProductionBranch;
 exports.compareCheckedOut = findCommitsNotOnCurrentBranch;
 exports.addMissingImages = addMissingImagesToRemoteLibrary;
 exports.tasks = listTasks;
+exports.pushOneTrustStagingCDN = series(buildOneTrust, packageOneTrust, pushOneTrustStaging);
+exports.releaseOneTrust = series(buildOneTrust, packageOneTrust, makeOneTrustReleasePrs)
 
 // Automated test related
 // Because automated-tests has to call ts-node/register it takes over 300ms to load so we only want to load when necessary. We are adding wrappers for these functions here

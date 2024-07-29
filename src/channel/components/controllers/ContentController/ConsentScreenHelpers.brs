@@ -101,7 +101,9 @@ Function getConsent(onGetConsentCompletionCallback)
   if isGDPR(m.constants) = true
     oneTrustViews = m.top.createChild("Group")
     oneTrustViews.id = "oneTrustViews"
-    initialiazeOneTrustSDK()
+    m.oneTrustLib = m.top.createChild("ComponentLibrary")
+    m.oneTrustLib.observeField("loadStatus", "onOneTrustCompLibLoadStatusChanged")
+    m.oneTrustLib.uri = m.constants.settings.oneTrustComponentsUrl
   else
     ' If the user is not in GDPR country we will call account service get consent api.
     ' Response from get consent will contain privacy center information and consent status for Roku's continue watching feature.
@@ -118,9 +120,17 @@ Function getConsent(onGetConsentCompletionCallback)
 End Function
 
 
+function onOneTrustCompLibLoadStatusChanged(msg) as void
+  loadStatus = msg.getData()
+  if loadStatus = "ready"
+     initialiazeOneTrustSDK()
+  end if
+end function
+
+
 Function initialiazeOneTrustSDK()
   if m.oneTrust = invalid
-    m.oneTrust = CreateObject("roSGNode", "OTinitialize") 'bs:disable-line 1128
+    m.oneTrust = CreateObject("roSGNode", "OneTrustLibrary:OTinitialize") 'bs:disable-line 1128
     m.global.Addfield("OTsdk", "node", false)
     ' Since One trust sdk access m.global.OTsdk within it's codebase we need to update the m.global.OTsdk to have the sdk instance.
     ' The reason why we are also storing it's reference in m scope for better performance since we access the sdk instance a lot of items during the app session.
@@ -368,7 +378,9 @@ Function getConsentOptOutStatusByKey(key)
   ' Proceeding with consent check only if key is not essential. Since if it is essential we are allowed to proceed in kids etc.
   if key <> m.constants.consentKeys.essential
     if isGDPR(m.constants) = true
-      didOptOut = (m.oneTrust.callFunc("getConsentStatusForGroupID", key) <> 1)
+      if m.oneTrust <> invalid
+        didOptOut = (m.oneTrust.callFunc("getConsentStatusForGroupID", key) <> 1)
+      end if
     else
       ' Irrespective of whether user as opted in or opted out when we are in non adult mode we should treat has if user opted out.
       isUserAllowedToManageConsent = isUserAllowedToManageConsent()

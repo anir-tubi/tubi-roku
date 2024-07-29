@@ -751,6 +751,30 @@ charlesProxyEnabled: true
 
 If set up correctly the first time your Roku sends a request to Charles, Charles will ask you to approve the connection. Just click `Allow` and you should see the traffic in Charles(except Youbora and Santry related traffic).
 
+# Publish a new version of One Trust Component Library
+
+Whenever we want to update to a newer version of One Trust Library, we have to publish a new one trust component library.
+
+1\. Login to https://myfox.okta.com and select OneTrust application from the list.
+2\. Navigate to https://app.onetrust.com/mobile/scripts and select Roku from the list of applications.
+3\. Select SDK from the navigation bar shown in the screen.
+4\. Select the SDK Version we want to upgrade to from the dropdown and click download sdk.
+5\. Create a new branch on project-total-recall repo and copy over the changes from download sdk into OTPublishersSDK folder present in the root of the repository.
+6\. Create a pull request once the changes are reviewed and merged.
+7\. To publish the new version of the One Trust component library to the staging aws bucket:
+```shell
+gulp pushOneTrustStagingCDN
+```
+8\. To create a PR for adding the One Trust component library to the production Roku CDN (rCDN):
+```shell
+gulp releaseOneTrust
+```
+9\. Once the pull requests created by step 8 are reviewed and merged. Execute infra command to deploy the one trust component library package to production aws bucket. Typically this will be done as part of releasing a new version of the app and is not required to be done separately just for the one trust component library.
+```shell
+infra -vvv deploy -e production cdn-roku
+```
+
+
 # 11.0 Unused Variables
 
 The spring 2022 11.0 firmware release introduced checking for unused local variables inside of functions. While it is best to remove variables if they're not needed, there are times where this is not the simplest thing to do, especially if there are plans to add more functionality to the function in the future. Roku provides a way to silence these warnings by prepending your variables names with an underscore `_` character. Without this logs like the following will show up in the debug console

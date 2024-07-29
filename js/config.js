@@ -95,6 +95,7 @@ function load(options) {
     versionUnderscored: formatBuildTag(build, 'revision'),
     versionMinorUnderscored: formatBuildTag(build, 'minor'),
     versionMinorDotted: formatBuildTag(build, 'minor', '.'),
+    oneTrustVersionUnderscored: formatOneTrustBuildTag(build['one_trust_library_manifest']),
     remoteComponentLibProvided: `TubiRemoteLib-${build.component_library_manifest.build_version}`,
     fileType: overWrittenDataPre.settings.remoteComponentsExtension,
     bsConst: getBsConstsFromSettings(overWrittenDataPre.settings),
@@ -170,9 +171,20 @@ function removeNullsFromObject(obj){
 }
 
 
+function getOneTrustBuildTag(options) {
+  const buildConfig = load(options)['one_trust_library_manifest'];
+  return formatOneTrustBuildTag(buildConfig)
+}
+
+function formatOneTrustBuildTag(buildConfig) {
+  return `${buildConfig.major_version}_${buildConfig.minor_version}_${buildConfig.build_version}`
+}
+
+
 module.exports = {
   load,
   incrementBuildNumber,
   incrementRevisionNumber,
-  getBuildTag
+  getBuildTag,
+  getOneTrustBuildTag
 };
