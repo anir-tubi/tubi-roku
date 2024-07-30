@@ -1233,7 +1233,13 @@ const elements = typeCheckElements({
   /** email address box for creating account */
   emailAddressBox: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.#emailLayout.1.#emailTextEditBox.1',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#emailInputScreen.#emailLayout.1.#emailTextEditBox',
+  },
+
+  /** Enter Email Address Page Title */
+  enterEmailAddressTitle: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#emailInputScreen.#emailLayout.#pageHeading',
   },
 
   confirmYourAgeText: {
@@ -1619,6 +1625,11 @@ const elements = typeCheckElements({
   audioDescriptionEnabledCheck: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.#overlayBackground.0.#audioTracksSection.#audioTrackSelector.1.#container',
+  },
+
+  /* autoplay container */
+  autoPlayContentPoster: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextParent.#UpNextSeriesGroup.#GridSeries.0'
   },
 
   /** autoplay countdown movies */
@@ -2123,6 +2134,13 @@ const elements = typeCheckElements({
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.0.#DetailsMenuTextParent.#DetailsMenuText',
   },
+
+  /** Sign Up to Save Progress Series detail menu item button text when have history */
+  seriesSignUpToSaveProgressButtonTextOnDetailsPageWithHistory: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuText',
+  },
+
   /** Sign Up to Save Progress detail menu item badge text */
   seriesSignUpBadgeLabelText: {
     keyPath:
@@ -2258,18 +2276,42 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuTextFocused',
   },
 
-  /** Continue Watching Row Category Name on Home page */
-  continueWatchingRowHome: {
-    keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#RowList.0.title.#CategoryName',
+    /** Continue Watching Row Category Name on Home page */
+    continueWatchingRowHome: {
+      keyPath:
+        '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#RowList.0.title.#CategoryName',
+    },
+  
+    /** Continue Watching Row Title on Home page */
+    continueWatchingRowHomeTitle: {
+      keyPath: 
+        '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsVideoGrid.0.1.#posterLayout.#Poster',
+    },
+
+  // title on the exit prompt of Sign up to Save Progress 
+  signUpExitDialogTitle: {
+    keyPath: '#ContentController.#8dcd9fd.#DialogBox.#ContentArea.#Title'
   },
 
-  /** Continue Watching Row Title on Home page */
-  continueWatchingRowHomeTitle: {
-    keyPath: 
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsVideoGrid.0.1.#posterLayout.#Poster',
+  //exit prompt of Sign up to Save Progress 
+  signUpExitDialog: {
+    keyPath: '#ContentController.#8dcd9fd.#DialogBox'
   },
 
+  // Description on the exit prompt of Sign up to Save Progress 
+  signUpExitDialogDescription: {
+    keyPath: '#ContentController.#8dcd9fd.#DialogBox.#ContentArea.#MessageGroup.#Message'
+  },
+
+  // Sign up button on the exit prompt of Sign up to Save Progress 
+  signUpExitDialogSignUpButton: {
+    keyPath: '#ContentController.#8dcd9fd.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText'
+  },
+
+  // Sign up later button on the exit prompt of Sign up to Save Progress 
+  signUpExitDialogLaterButton: {
+    keyPath: '#ContentController.#8dcd9fd.#DialogBox.#ContentArea.#ButtonList.1.#buttonTextParent.#buttonText'
+  }
 
 });
 
