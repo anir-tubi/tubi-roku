@@ -1491,6 +1491,22 @@ class Auth {
   }
 
 
+  // Creates device id similar to what Roku's looks like
+  public generateDeviceId() {
+    // Outputs string like 1d27bcd5-037e-56b3-bec0-f7c20f0edbdd
+    return `${this.generateDeviceIdPart(8)}-${this.generateDeviceIdPart(4)}-${this.generateDeviceIdPart(4)}-${this.generateDeviceIdPart(4)}-${this.generateDeviceIdPart(12)}`;
+  }
+
+
+  private generateDeviceIdPart(length: number) {
+    let result = '';
+    for(let i = 0; i < length; i++) {
+        result += Math.floor(Math.random() * 16).toString(16);
+    }
+    return result;
+  }
+
+
   public async getSigningKey() {
     const verifier = utils.randomStringGenerator(36);
     const challenge = createHash('sha256').update(verifier).digest('base64').replace(/\+/g, '-').replace(/\//g, '_');
@@ -1757,6 +1773,23 @@ abstract class User {
   }
 
 
+  public async getDeviceSettings() {
+    return await this.sendTubiAuthNetworkRequest({
+      method: 'get',
+      url: auth.baseAccountUrl + '/device/settings',
+    }) as DeviceSettings;
+  }
+
+
+  public async updateDeviceSettings(deviceSettings: Partial<DeviceSettings>) {
+    return await this.sendTubiAuthNetworkRequest({
+      method: 'patch',
+      url: auth.baseAccountUrl + '/device/settings',
+      body: deviceSettings
+    }) as DeviceSettings;
+  }
+
+
   public getContent() {
     return new FilterContent(this);
   }
@@ -1819,12 +1852,17 @@ class RegisteredUser extends User {
 
 
   public async enableVideoPreview(enabled: boolean) {
+    return await this.updateUserSettings({
+      enable_video_preview: enabled
+    });
+  }
+
+
+  public async updateUserSettings(userSettings: Partial<UserInfoResponse>) {
     await this.sendTubiAuthNetworkRequest({
       method: 'patch',
       url: auth.baseAccountUrl + '/user/settings',
-      body: {
-        enable_video_preview: enabled
-      }
+      body: userSettings
     });
   }
 
@@ -2239,6 +2277,19 @@ type UserInfoResponse = {
     verifier: string;
   }
   password: string | undefined;
+};
+
+
+type DeviceSettings = {
+  enable_like_toast_notification: boolean | null;
+  enable_dislike_toast_notification: boolean | null;
+  second_session_linear_not_watched: boolean | null;
+  subtitle_track: any;
+  audio_track: {
+    language: string,
+    role: string
+  } | null;
+  pause_ad_device_cap: any;
 };
 
 

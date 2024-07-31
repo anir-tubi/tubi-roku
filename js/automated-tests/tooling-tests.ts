@@ -574,6 +574,30 @@ describe('test-utils', function () {
     });
 
 
+    describe('updateDeviceSettings', function () {
+      before(() => {
+        // device settings are tied to deviceId, so we need to generate a new deviceId for these tests
+        auth['deviceId'] = auth.generateDeviceId();
+      });
+
+      after(() => {
+        // Need to reset the deviceId so it doesn't affect other tests
+        auth['deviceId'] = '';
+      });
+
+      it('should properly update the specified device settings', async () => {
+        const user = await testUtils.createAnonymousUser();
+        const deviceSettings = await user.getDeviceSettings();
+        expect(deviceSettings.second_session_linear_not_watched).to.be.undefined;
+        await user.updateDeviceSettings({
+          second_session_linear_not_watched: false
+        });
+        const newDeviceSettings = await user.getDeviceSettings();
+        expect(newDeviceSettings.second_session_linear_not_watched).to.be.false;
+      });
+    });
+
+
     describe('enableVideoPreview', function () {
       it('should properly change video preview setting', async () => {
         const user = await testUtils.createRegisteredUser();
