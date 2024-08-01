@@ -689,8 +689,13 @@ End Function
 Function sendDeviceEnvironmentSettingsLog()
   ' Holds true or false based on if the setting is turned on or off.
   autoPlay = true
+
   deviceInfo = CreateObject("roDeviceInfo")
   drmInfo = deviceInfo.GetDrmInfoEx()
+  model = deviceInfo.GetModel()
+  modelType = deviceInfo.GetModelType()
+  videoMode = deviceInfo.GetVideoMode().toInt()
+  isHevcCompatible = (deviceInfo.CanDecodeVideo({Codec: "hevc"}).result = true)
 
   if FindMemberFunction(deviceInfo, "IsAutoplayEnabled") <> invalid AND deviceInfo.IsAutoplayEnabled() = false
     autoPlay = false
@@ -700,6 +705,10 @@ Function sendDeviceEnvironmentSettingsLog()
     isVideoPreviewOn: (isVideoPreviewOn() = true)
     autoPlay: autoPlay
     drmInfo: drmInfo
+    model: model
+    modelType: modelType
+    videoMode: videoMode
+    isHevcCompatible: isHevcCompatible
   }
   tubiLog(FormatJSON(deviceInfo), "info", "clientInfo", "device-info", 0.2) 'send info to server
 
