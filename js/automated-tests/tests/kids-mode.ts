@@ -5,7 +5,7 @@ import { shared } from '../shared';
 
 describe('Kids Mode', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/537398
-  it('C537398 - Guest User - Toggle ON - Home Screen - When User Switches Parental Control to Older Kids Then Exit Kids is still present, @kidsmode_guest, @smoke', async () => {
+  it('C537398 - Guest User - Toggle ON - Home Screen - When User Switches Parental Control to Older Kids Then Exit Kids is still present, @kidsmode_guest', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await openKidsMode();
  
