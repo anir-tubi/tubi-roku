@@ -239,13 +239,6 @@ export async function C450501NavigateToPageDestLoginPage(seriesId) {
 		);
 		i++;
 	}
-	expect(
-		navigateToPageEvent.navigate_to_page.video_player_page.video_id
-	).equal(
-				event.navigate_to_page.video_player_page
-		);
-		i++;
-	}
 	expect(navigateToPageEvent.navigate_to_page.video_player_page.video_id).equal(
 		seriesId,
 		`navigateToPageEvent.navigate_to_page.dest_series_detail_page.series_id===${seriesId}, Event: \n
