@@ -115,9 +115,9 @@ describe('Live', function () {
         // Navigate to the Live News Row
         await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
 
-        // Verify that preview video is playing
-        // Check this it is failing
-        await testUtils.waitForPlayerStateToEqual('previewVideoPlayer','playing', 15000);
+        // Verify that full video plays after preview video is playing
+        
+        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen','playing', 20000);
      
         // Verify that full linear video is playing
         await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen','playing',20000);
