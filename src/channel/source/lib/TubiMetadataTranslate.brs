@@ -1135,8 +1135,10 @@ Function tubiMetadataTranslate_translateCategoryDetails(contentToTranslate, isSi
   sOrientation = m.constants.ui.gridItemTypes.portrait
   bFullData = true
   contentMode = m.constants.ui.contentMode.homescreen
+  screenId = m.constants.ui.screenIds.categoryDetailsScreen
 
-  categoryMetadata = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData, contentMode, "", isSignedInUser)
+
+  categoryMetadata = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser)
 
   if categoryMetadata <> invalid
     translated.update(categoryMetadata)
@@ -1160,11 +1162,11 @@ End Function
 ' @contentMode: string, one of the contentModes found at m.constants.ui.contentMode
 ' @isSignedInUser: boolean, value based on user logged In or not
 ' returns an associative array that can be passed to ContentNode.update() to populate the ContentNode and it's children
-Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode = "homeScreen", screenId="", isSignedInUser = false)
+Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode = "homeScreen", screenId = "", isSignedInUser = false)
 
   categoryParent = m.buildCategoryParentInfo(container, sOrientation)
 
-  gridItemType = m.getGridItemType(container, sOrientation, m.constants)
+  gridItemType = m.getGridItemType(container, sOrientation, m.constants, screenId)
   categoryChildrenInfo = m.buildCategoryChildrenInfo(container, contents, contentsJson, gridItemType, bFullData, isSignedInUser)
 
   categoryParent.children = categoryChildrenInfo.children
@@ -1749,7 +1751,7 @@ End Function
 ' @orientation: string, "landscape" or "portrait"
 ' @constants: assocArray, m.constants
 ' returns: string, one of the gridItemTypes as found in m.constants.ui.gridItemTypes
-Function tubiMetadataTranslate_getGridItemType(container, orientation, constants)
+Function tubiMetadataTranslate_getGridItemType(container, orientation, constants, screenId = "")
   gridItemTypes = constants.ui.gridItemTypes
   gridItemType = gridItemTypes.portrait
 
@@ -1760,7 +1762,7 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
     gridItemType = gridItemTypes.landscapeNoTitle
   else if orientation = gridItemTypes.landscapeInnerMetadata
     gridItemType = gridItemTypes.landscapeInnerMetadata
-  else if container.id = constants.ui.categoryIds.topTenSeries
+  else if container.id = constants.ui.categoryIds.topTenSeries AND screenId <> constants.ui.screenIds.categoryDetailsScreen
     gridItemType = gridItemTypes.portraitTopTen
   end if
 
