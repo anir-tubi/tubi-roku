@@ -329,8 +329,8 @@ End Function
 '   So if a gridType already adjusted the rowList's position, then adjust it more but relative to where it already had been adjusted.
 ' @rowPercent: float, the percentage that the Sponsorship row is focused
 Function expandContentAreaForSponsorship(rowPercent)
-  m.ContentArea.translation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - (m.sponsorSlideAmt * rowPercent)]
-  m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.ContentArea.maskOffset[1] + (m.sponsorMaskOffsetDiff * rowPercent)]
+  m.ContentArea.translation = [m.ContentArea.translation[0], m.originalContentAreaTranslation[1] - (m.sponsorSlideAmt * rowPercent)]
+  m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] + (m.sponsorMaskOffsetDiff * rowPercent)]
 End Function
 
 
