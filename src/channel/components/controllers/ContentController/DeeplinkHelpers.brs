@@ -234,7 +234,6 @@ End Function
 ' this function calls appropriate functions to handle the deeplinks based on deeplink type
 Function handleDeeplinkContentByType()
   tubilog("deeplinkHelpers.handleDeeplinkContentByType")
-
   if m.deepLinkContent <> invalid
     if m.deepLinkContent.deeplinkType = "linear" OR m.deepLinkContent.deeplinkType = "liveTV"
       'if fadeInContentController is still playing, then linear content can not play.
@@ -547,7 +546,11 @@ Function handleCategoryDeeplinkContent()
     if m.enteredFromDeepLink = true
       sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.category, m.Tracking, m.trackingLoggingTask, m.constants)
     end if
-    showCategoryListScreen(m.constants, true)
+    if (getExperimentResource("roku_category_redesign", "roku_category_redesign_v1", true).enabled = true)
+      showCategoryPanelListScreen(m.constants, true)
+    else
+      showCategoryListScreen(m.constants, true)
+    end if
   end if
   sCatSideNavID = m.constants.ui.sideNavIds.categories
 
@@ -569,7 +572,7 @@ Function handleNetworkDeeplinkContent()
     message = getTranslation("dialog_sideNavItemDisabled_Parental_description")
     showDeeplinkErrorModal(invalid, message)
   else
-    if m.deeplinkContent.id <> ""
+    if isNonEmptyString(m.deeplinkContent.id) = true
       if m.enteredFromDeepLink = true
         sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.categoryDetail, m.Tracking, m.trackingLoggingTask, m.constants)
       end if
@@ -578,13 +581,19 @@ Function handleNetworkDeeplinkContent()
       if m.enteredFromDeepLink = true
         sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.channel, m.Tracking, m.trackingLoggingTask, m.constants)
       end if
-      showChannelListScreen(m.constants, true)
+
+      if (getExperimentResource("roku_category_redesign", "roku_category_redesign_v1", true).enabled = true)
+        showCategoryPanelListScreen(m.constants, true, m.constants.ui.categoryIds.networks)
+      else
+        showChannelListScreen(m.constants, true) 
+      end if
     end if
     setUiMode(m.constants.ui.modes.standard)
   end if
-  focusSideNavOption(m.constants.ui.sideNavIds.channels)
-  resetDeeplinkValues()
 
+  '//::NOTE:: there is no longer a channels side nav option, so target the categories side nav item.
+  focusSideNavOption(m.constants.ui.sideNavIds.categories)
+  resetDeeplinkValues()
 End Function
 
 

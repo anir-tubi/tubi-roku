@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - Category PanelList Screen
+ -
+ - This is a screen that displays a list of categories on the left, and the focused item page on the right
+ -->
+<component name="CategoryPanelListScreen" extends="BaseScreen">
+
+  <script type="text/brightscript" uri="CategoryPanelListScreen.brs" />
+  <script type="text/brightscript" uri="../../lib/CacheValidationMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" /> 
+
+  <interface>
+    <!-- INPUT -->
+      <!-- categoryId is one of the categories/channels (eg. categories(queue, action etc) or channels(fox, aetv etc))  -->
+      <!-- assigning this value helps to redirect the user to specific category/channel detailscreen once user signedIn via category/channel detailscreen -->
+      <field id="categoryId" type="string"/>
+
+      <!-- content should be a container content node with a single channel content node filled with multiple item content nodes -->
+      <field id="content" type="node"/>
+
+      <!-- content should be a container content node with a single channel content node filled with multiple item content nodes -->
+      <field id="categoryContent" type="node"/>
+
+      <!-- Should the screen load the content. This is set immediately after the content changes indicating that it is safe to load the content.  -->
+      <field id="shouldLoadContent" type="boolean" alwaysNotify="true"/>
+      
+      <!-- Should the screen load the category content. This is set immediately after the categoryContent changes indicating that it is safe to load the categoryContent.  -->
+      <field id="shouldLoadCategoryContent" type="boolean" alwaysNotify="true"/>
+
+
+      <!-- This field accomplishes 2 things:
+              1. tells ContentController/CategoryPanelListScreenHelpers that the content metadata
+                  for the category content is out of the cache window and should be updated, value = 0
+              2. user has scrolled down to an index where we need to load more contents.
+              Please note: that it is important that alwaysNotify is set to true so we can communicate to the Helper when the cache is out of date, value > 0 -->
+      <field id="categoryBatchIndex" type="integer" alwaysNotify="true" />
+
+      <!-- hides or shows the loading spinner -->
+      <field id="isLoading" type="boolean" alias="spinner.visible" />
+
+      <!-- hides or shows the loading spinner for the category Right panel -->
+      <field id="isCategoryLoading" type="boolean" alwaysNotify="true" />
+
+      <!-- If the screen is not enabled, then user should not be able to select anything -->
+      <field id="enabled" type="boolean"  alwaysNotify="true"/>
+
+      <field id="reloadUserCategoriesResponse" type="node" alwaysNotify="true"/>
+
+      <!--jumpToItemByID is the category ID, used to jump to a category item on the left navigation bar of categoryScreen when content is played through deeplink after content has been loaded.-->
+       <field id="jumpToItemByID" type="string" value="" />
+
+      <!--jumpToCategoryItemByID is used to jump focus to a video title on the right category panel when content is played through deeplink after content has been loaded.
+          The Associative array should contain two elements: categoryId (to refer to the category) and contentId (to refer to the ID of the item on the cateoryDetailsPanel )
+      -->
+       <field id="jumpToCategoryItemByID" type="assocarray" value="" />
+
+    <!-- OUTPUT -->
+
+      <!-- tells the ChannelScreenHelper to display SignIn Required modal-->
+      <field id="signInRequired" type="boolean" alwaysNotify="true" />
+
+      <!-- The item in the grid (from the vertical list of categories on the left side) that is in focus -->
+      <field id="itemFocused" type="integer" alwaysNotify="true"/> 
+
+      <!-- the content node representing the item (from the vertical list of categories on the left side) which is in focus -->
+      <field id="contentFocused" type="node" alwaysNotify="true"/>
+
+      <!-- the content node representing the item (from the vertical list of categories on the left side) which was clicked on -->
+      <field id="contentSelected" type="node" alwaysNotify="true"/>
+
+
+      <!-- the content node representing the video tile which was clicked on. In case of a screen like networks, the content node will be associated with a network tile -->
+      <field id="categoryContentSelected" type="node" alwaysNotify="true"/>
+
+      <!-- set to the contentNode of the ChannelsVideoGrid content item which was focused when
+           the "play" input transport deeplink was triggered
+      -->
+      <field id="contentToPlay" type="node" alwaysNotify="true"/>
+
+      <!-- This field indicates that category panel is fully loaded with all available contents or upto constants.performance.categoryGridList.finalLazyLoadSize-->
+      <field id="isCategoryFullyLoaded" type="boolean" alwaysNotify="true" />
+
+      <!-- tells ContentController/Helpers that the content metadata is
+            out of the cache window and should be updated -->
+      <field id="refreshContent" type="boolean" alwaysNotify="true" />
+
+      <!-- Same as the trackingPageInfo property, but is it the trackingPageInfo for the current category panel -->
+      <field id="categoryTrackingPageInfo" type="assocarray" alwaysNotify="true"/>
+
+      <!-- Holds a load time start value [returned from UpTime()] that can be used to determine how long the page took to load.  -->
+      <field id="trackingLoadStartTime" type="integer" />
+      
+      <!-- Holds a load time start value [returned from UpTime()] that can be used to determine how long the category panel took to load. -->
+      <field id="categoryTrackingLoadStartTime" type="integer" />
+
+  </interface>
+
+  <children>
+    <Group id="PageGroup">
+      <PanelSet
+        id="PanelSet"
+        width="1920"
+        height="1080"
+        translation="[0,0]"/>
+    </Group>
+
+    <Spinner
+      id="spinner"
+      visible="false"
+      width="1920"
+      height="1080"/>
+
+  </children>
+</component>

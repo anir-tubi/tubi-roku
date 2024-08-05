@@ -982,9 +982,9 @@ Function tubiTracking_getOneOfs()
   ' At some point we may need to split the component "Oneof" like we did with the page and dest_page "Oneof"
   ' but for now this is sufficient
   componentOneof = {
-    ' browse_menu_component: {    ' Does not currently exist in roku UI
-    '   category_slug: ""
-    ' }
+    browse_menu_component: { ' Used for category roku_category_redesign_v1 screen
+      category_slug: ""
+    }
 
     generic_component: {' Used for components that are not yet defined in protos
       generic_component_type: "" ' GenericComponentType enum

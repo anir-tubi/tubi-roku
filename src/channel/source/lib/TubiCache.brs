@@ -23,6 +23,7 @@ Function TubiCache(nodeHelpers, cacheableScreenIds, permanentContentIds)
     getCachedNodeCount: tubiCache_getCachedNodeCount
     getCachedScreenCount: tubiCache_getCachedScreenCount
     getCachedScreenIds: tubiCache_getCachedScreenIds
+    deleteScreenContentCache: tubiCache_deleteScreenContentCache
 
     ' private methods
     getLruContentFromCache: tubiCache_getLruContentFromCache
@@ -31,7 +32,6 @@ Function TubiCache(nodeHelpers, cacheableScreenIds, permanentContentIds)
     deleteContentFromCache: tubiCache_deleteContentFromCache
     deleteFromContentCacheOrder: tubiCache_deleteFromContentCacheOrder
     markContentNotValidOnCachedScreens: tubiCache_markContentNotValidOnCachedScreens
-    deleteScreenContentCache: tubiCache_deleteScreenContentCache
 
     ' private properties
     screenCache: {}

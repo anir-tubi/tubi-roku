@@ -21,6 +21,9 @@
 
       <!-- Lazy loading the screen so set + next to the total count-->
       <field id="isFullyLoaded" type="boolean" alwaysNotify="true" />
+
+      <!-- The X position for the CategoryCount group-->
+      <field id="countTranslationXPos" type="integer" alwaysNotify="true" />
   </interface>
 
   <children>

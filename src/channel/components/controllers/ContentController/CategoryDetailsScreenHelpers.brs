@@ -329,7 +329,6 @@ Function showCategoryDetailError(error, bContentEmptyError = false)
   ' displaying an error. When the user traverses back through the navigation stack, the
   ' categoryDetailsScreen will eventually be revealed and if there is still no content, then
   ' an error modal will be displayed.
-  ' popScreen(false, false)
   if topScreen.id = m.constants.ui.screenIds.categoryDetailsScreen
     categoryDetailsScreen = topScreen
 

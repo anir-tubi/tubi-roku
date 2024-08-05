@@ -227,11 +227,20 @@ Function processNavigateAction(uriParameters)
     else if page = "liveTv"
       showDefaultEPGScreen()
     else if page = "categories"
-      showCategoryListScreen(m.constants)
+      if (getExperimentResource("roku_category_redesign", "roku_category_redesign_v1", true).enabled = true)
+        showCategoryPanelListScreen(m.constants)
+      else
+        showCategoryListScreen(m.constants)
+      end if
       focusSideNavOption(m.constants.ui.sideNavIds.categories)
     else if page = "channels"
-      showChannelListScreen(m.constants)
-      focusSideNavOption(m.constants.ui.sideNavIds.channels)
+      if (getExperimentResource("roku_category_redesign", "roku_category_redesign_v1", true).enabled = true)
+        showCategoryPanelListScreen(m.constants, false, m.constants.ui.categoryIds.networks)
+        focusSideNavOption(m.constants.ui.sideNavIds.categories)
+      else
+        showChannelListScreen(m.constants)
+        focusSideNavOption(m.constants.ui.sideNavIds.channels)
+      end if
     else if page = "signin" OR page = "signup"
       isUserSigedIn = isLoggedInUser()
       if isUserSigedIn = false

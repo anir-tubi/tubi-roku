@@ -935,8 +935,8 @@ Function onModeChange()
 
     'The third item spacing is to add the space between description and needsLogin(signup text with lock icon)
     m.offset.itemSpacings = [13, 16, 13]
-  else if m.top.mode = m.constants.ui.infoPanelModes.continueWatching 'guest User
-    ' used for guest user continue watching row on the home screen
+  else if m.top.mode = m.constants.ui.infoPanelModes.continueWatching OR m.top.mode = m.constants.ui.infoPanelModes.channel
+    ' used for guest user continue watching row on the home screen or for channel metadata
     m.infoPanelGroup.appendChild(m.offset)
     m.offset.appendChild(m.title)
     m.offset.appendChild(m.descriptionGroup)

@@ -45,7 +45,7 @@ Function setSettingsSidePanelMenuItems()
 
   testAidDisplayOrder = 7
 
-  ' Adding a display order field since roku does not maintain order in a associative array.
+  ' Adding a display order field since roku does not maintain order in an associative array.
   availablePanelItems = {
     "parentalControls": {
       subType: "DetailMenuItemContentNode"

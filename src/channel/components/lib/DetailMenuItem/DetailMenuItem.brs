@@ -8,6 +8,7 @@ Function init()
   m.buttonBG = m.top.findNode("buttonBG")
 
   m.Icon = m.top.findNode("Icon")
+  m.IconParent = m.top.findNode("IconParent")
   m.IconFocused = m.top.findNode("IconFocused")
   m.DetailsMenuTextParent = m.top.findNode("DetailsMenuTextParent")
   m.DetailsMenuText = m.top.findNode("DetailsMenuText")
@@ -65,6 +66,23 @@ End Function
 
 Function onWidthChange()
   m.buttonBG.width = m.top.width
+  setUIBasedOnSetWidth()
+End Function
+
+
+' Set properties of some UI elements if the width had been set
+Function setUIBasedOnSetWidth()
+  '//Do not set the width until the content has been set
+  item = m.top.itemContent
+  nWidth = m.top.width
+  if nWidth > 0 AND item <> invalid
+    nRightPadding = m.IconParent.translation[0] * 1.5
+    nLeftPadding = m.DetailsMenuText.translation[0]
+    nTextWidth = nWidth - nLeftPadding - nRightPadding
+    m.DetailsMenuTextFocused.width = nTextWidth
+    m.DetailsMenuText.width = nTextWidth
+    m.top.calculatedTextWidth = nTextWidth
+  end if
 End Function
 
 
@@ -80,19 +98,35 @@ Function onItemContentChange()
     'If the button has title and BadgeText, calculated width will be width of both title and badgeText to avoid button crop. To get the
     'calculated width we are assigning the title and badgeText to the m.DetailsMenuText and get the calculated value
     'and after setting the calculatedWidth resetting m.DetailsMenuText.text to title.
-    m.DetailsMenuText.text = item.title + item.badgeText
-    m.DetailsMenuTextFocused.text = item.title + item.badgeText
+    sTitle = item.title
+    if item.badgeText <> invalid AND item.badgeText <> ""
+      sTitle = sTitle + item.badgeText
+    end if
+
+    m.DetailsMenuText.text = sTitle
+    m.DetailsMenuTextFocused.text = sTitle
+    m.DetailsMenuText.horizAlign = "left"
+    m.DetailsMenuTextFocused.horizAlign = "left"
     iconWidth = 0
+
+    bVisibleImage = true
+    bVisibleBadgeText = true
     'adding extra width for focus if icon is present
     if item.iconUrl <> invalid AND item.iconUrl <> ""
-      iconWidth = 36
+      m.Icon.uri = item.iconUrl
+      m.IconFocused.uri = item.iconUrl
+      m.DetailsMenuTextParent.translation = [72, 0]
+    else
+      'Move the translation of Button text to left when there is no image
+      m.DetailsMenuTextParent.translation = [m.IconParent.translation[0], 0]
+      bVisibleImage = false
     end if
-    m.top.calculatedTextWidth = m.DetailsMenuText.boundingRect().width + iconWidth
+
+    nDetailsMenuTextBoundingWidth = m.DetailsMenuText.boundingRect().width 
+    m.top.calculatedTextWidth = nDetailsMenuTextBoundingWidth + iconWidth
     m.DetailsMenuText.text = item.title
     m.DetailsMenuTextFocused.text = item.title
-
-    m.Icon.uri = item.iconUrl
-    m.IconFocused.uri = item.iconUrl
+    setUIBasedOnSetWidth()
 
     m.buttonBG.visible = item.isUnfocusedFootprintEnabled
 
@@ -101,16 +135,11 @@ Function onItemContentChange()
     else
       m.Progress.visible = false
     end if
-    m.top.calculatedWidth = m.top.calculatedTextWidth + m.DetailsMenuTextParent.translation[0]
 
-    'Move the translation of Button text to left when there is no image
-    if item.id = "signUpMenuItem" AND item.iconUrl = ""
-      m.DetailsMenuTextParent.translation = [22, 0]
-    else
-      m.DetailsMenuTextParent.translation = [72, 0]
-    end if
-    calculatedWidth = m.DetailsMenuText.boundingRect().width + m.DetailsMenuTextParent.translation[0]
-    if item.badgeText <> ""
+    m.top.calculatedWidth = m.top.calculatedTextWidth + m.DetailsMenuTextParent.translation[0]
+    calculatedWidth = nDetailsMenuTextBoundingWidth + m.DetailsMenuTextParent.translation[0]
+
+    if item.badgeText <> invalid AND item.badgeText <> ""
       m.badgeLabel.text = item.badgeText
       m.badgeLabel.visible = true
       m.badgeLabel.translation = [calculatedWidth + 20, 20]
@@ -120,6 +149,7 @@ Function onItemContentChange()
     else
       m.badgeLabel.visible = false
       m.badgeLabelFocused.visible = false
+      bVisibleBadgeText = false
     end if
 
     'This is for Continue Watching row in home screen. It has only one item and we can't focus inside the item, so making the
@@ -128,12 +158,17 @@ Function onItemContentChange()
       m.DetailsMenuText.opacity = 0
       m.DetailsMenuTextFocused.opacity = 1
     end if
-
-    'Adjusting the DetailsMenuText text to center when there is no icoUrl and badge label text.
-    if item.align = "center"
-      xTranslation = (m.top.width - m.top.calculatedTextWidth) / 2
-      m.DetailsMenuTextParent.translation = [xTranslation, 0]
+    
+    if bVisibleImage = false AND bVisibleBadgeText = false
+      'Adjusting the DetailsMenuText text to center when there is no iconUrl and badge label text.
+      if item.align = "center"
+        xTranslation = (m.top.width - m.top.calculatedTextWidth) / 2
+        m.DetailsMenuTextParent.translation = [xTranslation, 0]
+        m.DetailsMenuText.horizAlign = item.align
+        m.DetailsMenuTextFocused.horizAlign = item.align
+      end if
     end if
+
   end if
 End Function
 
@@ -157,6 +192,9 @@ Function onItemHasFocus()
       m.buttonBG.blendcolor = theme.neutralColor
     end if
   end if
+
+  '//Call setFocusUI() on the chance that a Menu Item's focusPercent does not get changed. For example, a list's jumpToItem is called which may bypass setting of focusPercent 
+  setFocusUI()
 End Function
 
 
@@ -184,8 +222,13 @@ Function onGridHasFocus(msg)
 End Function
 
 
-Function onFocusPercentChange(msg)
-  focusPercent = msg.getData()
+Function onFocusPercentChange()
+  setFocusUI()
+End Function
+
+
+Function setFocusUI()
+  focusPercent = m.top.focusPercent
   if m.top.gridHasFocus = true
     m.DetailsMenuText.opacity = 1 - focusPercent
     m.DetailsMenuTextFocused.opacity = focusPercent

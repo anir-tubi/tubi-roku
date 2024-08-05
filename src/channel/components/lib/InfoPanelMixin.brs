@@ -6,6 +6,7 @@
 '
 ' @sideEffects: updates fields on the passed in infoPanel node
 Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel)
+  tubiLog("InfoPanelMixin.populateInfoPanelWithHomescreenStyleItemMode")
   ' used by homescreen, category details screen etc.
   ' IMPORTANT, still need to call infoPanel.calculateHeight after calling this function
   infoPanel.mode = m.constants.ui.infoPanelModes.item
@@ -64,6 +65,7 @@ End Function
 '
 ' @sideEffects: updates fields on the passed in infoPanel node
 Function populateInfoPanelWithHomescreenStyleSportsMode(content, infoPanel)
+  tubiLog("InfoPanelMixin.populateInfoPanelWithHomescreenStyleSportsMode")
   infoPanel.mode = m.constants.ui.infoPanelModes.sportsEvent
   infoPanel.title = content.title
 
@@ -115,6 +117,7 @@ End Function
 ' @sideEffects: updates fields on the passed in infoPanel node
 
 Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel)
+  tubiLog("InfoPanelMixin.populateInfoPanelWithLinearProgramHomescreenMode")
   infoPanel.mode = m.constants.ui.infoPanelModes.linearProgramHomescreen
   currentProgram = getCurrentLiveProgram(content)
 

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="CategoryMenuPanelList" extends="ListPanel" >
+  <script type="text/brightscript" uri="CategoryMenuPanelList.brs"/>
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+      <field id="content" alias="Menu.content"/>
+      <field id="itemSelected" alias="Menu.itemSelected"/>
+      <field id="itemFocused" alias="Menu.itemFocused"/>
+      <field id="itemUnfocused" alias="Menu.itemUnfocused"/>
+      <field id="numColumns" alias="Menu.numColumns"/>
+      <field id="jumpToItem" alias="Menu.jumpToItem"/>
+
+    <!-- OUTPUTS -->
+  </interface>
+
+  <children>
+    <Group
+      id="MenuGroup"
+      translation="[0,120]">
+      <MarkupGrid
+        id="Menu"
+        drawFocusFeedbackOnTop="false"
+        numRows="10"
+        columnWidths="432"
+        itemSize="[432,72]"
+        itemSpacing="[0,8]"
+        numColumns="1"
+        itemComponentName="DetailMenuItem"
+        vertFocusAnimationStyle="floatingFocus">
+      </MarkupGrid>
+    </Group>
+  </children>
+</component>

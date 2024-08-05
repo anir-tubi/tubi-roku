@@ -989,7 +989,12 @@ Function setDirtyUserCategories(categoryId)
     ' needed in case the image sizes on the homescreen are different than the image sizes
     ' on the categoryDetailsScreen. We don't want to add large homescreen images sizes to the
     ' content on the categoryDetailsScreen.
-    if isCategoryDetailScreenInStack(categoryId) = true
+    isCategoryInStack = false
+    if (getExperimentResource("roku_category_redesign", "roku_category_redesign_v1", false).enabled = false)
+      isCategoryInStack = isCategoryDetailScreenInStack(categoryId)
+    end if
+
+    if isCategoryInStack = true 
       optionCategoryDetail = {
         params: {
           content_mode: ""
@@ -1020,8 +1025,14 @@ Function onReloadUserCategoriesResponse(handledRequest)
   ' update the main home screen with the updated user category
   onReloadUserCategoriesInHomeScreen(handledRequest)
 
-  ' inform the category list screen of the updated user category
-  categoryListScreen = getFromScreenCache(m.constants.ui.screenIds.categoryListScreen)
+  categoryListScreen = invalid
+  if (getExperimentResource("roku_category_redesign", "roku_category_redesign_v1", false).enabled = false)
+    ' inform the category list screen of the updated user category
+    categoryListScreen = getFromScreenCache(m.constants.ui.screenIds.categoryListScreen)
+  else
+    categoryListScreen = getFromScreenCache(m.constants.ui.screenIds.categoryPanelListScreen)
+  end if
+
   if categoryListScreen <> invalid
     categoryListScreen.reloadUserCategoriesResponse = handledRequest
   end if
@@ -1321,7 +1332,7 @@ Function refreshStackedUserScreenWithChangedCategory(sCategoryID)
   ' Tell the screen that contains the category associated with the passed ID to refresh the next time is is on screen by setting the validUntil variable to 0
   for i = 0 to m.screenStack.getChildCount() - 1
     screen = m.screenStack.getChild(i)
-    if screen <> invalid AND screen.isSubType("CategoryDetailsScreen")
+    if screen <> invalid AND screen.isSubType("CategoryDetailsScreen") = true
       content = screen.content
       if content <> invalid AND content.id = sCategoryID
         screen.content.validUntil = 0
@@ -1450,6 +1461,12 @@ Function getFromContentCache(contentId)
 End Function
 
 
+' @screenId: string, the id of the screen shows content cache needs to be cleared.
+Function deleteScreenContentCache(screenId)
+  m.cache.deleteScreenContentCache(screenId)
+End Function
+
+
 ' This will tell the screen to update its content the next time the screen is displayed
 ' @sID: string, the ID of the screen whose content should be marked to be refreshed
 Function setContentToRefresh(sID)
@@ -1494,6 +1511,7 @@ Function setContentToRefreshAllPersonalizedScreens(shouldRefetchHomescreen = tru
   setContentToRefresh(m.constants.ui.screenIds.espanolScreen)
   setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
   setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
+  setContentToRefresh(m.constants.ui.screenIds.categoryPanelListScreen)
   setContentToRefresh(m.constants.ui.screenIds.epgScreen)
   setContentToRefresh(m.constants.ui.screenIds.linearVideoPlayerScreen)
   setContentToRefresh(m.constants.ui.screenIds.myStuffScreen)
@@ -1647,6 +1665,7 @@ Function onCategoryScreenBackgroundChange(msg)
     uriList: categoryDetailsScreen.backgroundUriList
   }
 End Function
+
 
 Function displayDefaultBackground()
   TubiLog("ContentController.displayDefaultBackground")
@@ -1869,12 +1888,13 @@ Function onCustomSuspend(msg)
       currentScreen.sendPendingPauseAdPixel = true
       ' don't send analytics event when user presses "home" button during playback, so sending param as false.
       returnToDetailScreenFromVideo(false, false)
-    else if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.categoryDetailsScreen
+    else if currentScreen <> invalid AND (currentScreen.id = m.constants.ui.screenIds.categoryDetailsScreen OR currentScreen.id = m.constants.ui.screenIds.categoryPanelListScreen)
       ' if current screen is categoryDetailsScreen, instant resume action is to start the channel from the homescreen (not a full channel restart).
       ' Remove the parent screen from the cache so that it is reloaded if a user navigates back to it in order to prevent a UX bug such that the cached screen
       ' is displayed but nothing is displayed on the screen.
       deleteFromScreenCache(m.constants.ui.screenIds.channelListScreen)
       deleteFromScreenCache(m.constants.ui.screenIds.categoryListScreen)
+      deleteFromScreenCache(m.constants.ui.screenIds.categoryPanelListScreen)
     else
       ' if the focus is on live TV row, stop the playback
       linearVideoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)

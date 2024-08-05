@@ -4,46 +4,46 @@ Function init()
   m.contentLoadedAndFocused = false
   m.constants = getConstantsFromGlobal()
 
-  Request = TubiRequest(m.constants.settings)
-  Auth = TubiAuth(m.constants, Request)
-  m.Tracking = TubiTracking(m.constants, Request, Auth)
+  m.Tracking = TubiTrackingInfo(m.constants)
   m.experiments = TubiExperiments(m.constants)
-  m.metadataTranslate = TubiMetadataTranslate(m.constants, m.experiments)
 
-  m.itemsInRowCount = 8
+  '//if there is a sponsorship, then this will be changed to the number of pixels that some UI assets and the slide animation need to be adjusted vertically.
+  m.nSponsorshipYDelta = 0
+
+  '//The number of whole items visible on the screen
+  m.itemsInRowCount = 4
 
   m.upperRowIndex = Int(m.constants.performance.categoryGridList.lazyLoadBatchSize / m.itemsInRowCount) ' items per row = 8 * 6 = 48
   m.lowerRowIndex = 0
   m.numRowsInBatch = Int(m.constants.performance.categoryGridList.lazyLoadBatchSize / m.itemsInRowCount)
 
-  m.PageGroup = m.top.findNode("PageGroup")
-  m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]
+  m.PageAnimatedGroup = m.top.findNode("PageAnimatedGroup")
+  m.spinner = m.top.findNode("ChannelDetailSpinner")
   m.InfoPanel = m.top.findNode("ChannelsInfoPanel")
   m.PageTitleAndCounter = m.top.findNode("pageTitleAndCounter")
-  m.VideoGrid = m.top.findNode("ChannelsVideoGrid")
-  m.VideoGrid.itemSize = m.constants.ui.imageSizes.largePoster
+  m.ContentGrid = m.top.findNode("ChannelsContentGrid")
+  m.ContentGrid.itemSize = m.constants.ui.imageSizes.largePoster
 
-  m.top.observeField("shouldLoadContent", "onLoadContent")
-  m.top.observeField("isLoading", "onIsLoading")
-  m.top.observeField("focusedChild", "onScreenFocusChange")
-  m.top.observeField("transportVoiceRequest", "onTransportVoiceRequest")
-  m.VideoGrid.observeField("itemFocused", "onItemFocused")
-  m.VideoGrid.observeField("itemSelected", "onItemSelected")
+  m.top.observeFieldScoped("shouldLoadContent", "onLoadContent")
+  m.top.observeFieldScoped("isLoading", "onIsLoading")
+  m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
+  m.top.observeFieldScoped("width", "onWidthChange")
+  m.top.observeFieldScoped("height", "onHeightChange")
+  m.top.observeFieldScoped("transportVoiceRequest", "onTransportVoiceRequest")
+  m.top.observeFieldScoped("checkOnRefreshed", "onCheckOnRefreshTriggerred")
+  m.ContentGrid.observeFieldScoped("itemFocused", "onItemFocused")
+  m.ContentGrid.observeFieldScoped("itemSelected", "onItemSelected")
 
   ' set initial tracking values
   m.top.trackingPageInfo = createTrackingPageInfo(invalid)
   m.oldCategoryComponent = invalid
-
-  m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
-
-  m.top.screenLevel = m.constants.ui.screenLevels.categoryDetailsScreen
-  m.top.handlesTransportVoiceRequests = true
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
   onThemeChange()
 End Function
+
 
 Function onThemeChange(msg = invalid)
   if msg <> invalid
@@ -53,104 +53,145 @@ Function onThemeChange(msg = invalid)
   end if
 
   if theme <> invalid
-    m.VideoGrid.focusBitmapBlendColor = theme.focusedColor
+    m.ContentGrid.focusBitmapBlendColor = theme.focusedColor
   end if
 End Function
 
 
+Function onWidthChange(msg)
+  m.spinner.width = msg.getData()
+End Function
+
+
+Function onHeightChange(msg)
+  m.spinner.height = msg.getData()
+End Function
+
+
+Function checkOnRefresh()
+  if m.top.content <> invalid AND m.top.content.getChildCount() > 0
+    if shouldRefresh(m.top.content) = true 'cacheValidationMixin
+      '//indicate that when the content is refreshed, it should attempt to focus close to where it was previously focused on.
+      m.top.jumpToItemFocused = m.ContentGrid.itemFocused
+      ' CategoryDetailPage lazy loads more than 200+ titles.  If user revisits categoryDetailPage from title detail page and content needs to be refreshed, then
+      ' reset the lazy loading logic along with refreshed conent so that user can use lazy loading feature.
+      ' TODO: Implement the logic to focus nJumpToItemFocused exactly.
+      m.upperRowIndex = Int(m.constants.performance.categoryGridList.lazyLoadBatchSize / m.itemsInRowCount) ' items per row = 8 * 6 = 48
+      m.lowerRowIndex = 0
+      m.top.categoryBatchIndex = 0
+    end if
+  end if
+End Function
+
+
+Function onCheckOnRefreshTriggerred()
+  checkOnRefresh()
+End Function
+
+
 Function onScreenFocusChange()
+  tubiLog("CategoryDetailsPanel.onScreenFocusChange")
+  setUIBasedOnFocus()
+End Function
+
+
+Function setUIBasedOnFocus(bAnimateOn = true)
+  tubiLog("CategoryDetailsPanel.setUIBasedOnFocus")
+  nAnimateTime = .5
+  if m.top.shouldAnimateOnFocus = false OR bAnimateOn = false
+    nAnimateTime = 0
+  end if
 
   if m.top.hasFocus() = true
-    if m.top.content <> invalid
+    if m.top.isLoading = true
+      '//Since the content is still loading and there is nothing to focus on, 
+      '//then have the focus return to the left panel
+      m.top.backButtonPressed = true
+    else if m.top.content <> invalid
       if m.top.content.getChildCount() > 0
-        m.VideoGrid.setFocus(true)
+        m.ContentGrid.setFocus(true)
+        '//Animate panel so infoPanel is visible
+        slideTo(m.PageAnimatedGroup, [0, -m.nSponsorshipYDelta], nAnimateTime)
+        fade(m.InfoPanel, "in", nAnimateTime)
+        fade(m.PageTitleAndCounter, "in", nAnimateTime)
       end if
-      if shouldRefresh(m.top.content) = true 'cacheValidationMixin
-        '//indicate that when the content is refreshed, it should attempt to focus close to where it was previously focused on.
-        m.top.jumpToItemFocused = m.VideoGrid.itemFocused
-        ' CategoryDetailPage lazy loads more than 200+ titles.  If user revisits categoryDetailPage from title detail page and content needs to be refreshed, then
-        ' reset the lazy loading logic along with refreshed conent so that user can use lazy loading feature.
-        ' TODO: Implement the logic to focus nJumpToItemFocused exactly.
-        m.upperRowIndex = Int(m.constants.performance.categoryGridList.lazyLoadBatchSize / m.itemsInRowCount) ' items per row = 8 * 6 = 48
-        m.lowerRowIndex = 0
-        m.top.categoryBatchIndex = 0
-      end if
+
+      checkOnRefresh()
     end if
+  else if m.top.isInFocusChain() = false
+    '//Animate panel so infoPanel is no longer visible
+    slideTo(m.PageAnimatedGroup, [0, -375], nAnimateTime)
+    fade(m.InfoPanel, "out", nAnimateTime)
+    fade(m.PageTitleAndCounter, "out", nAnimateTime, 0, .4)
+    m.top.backgroundUriList = []
   end if
 
 End Function
 
 
 Function onLoadContent()
-  tubiLog("CategoryDetailsScreen.onLoadContent")
-  if m.top.content <> invalid
-    category = m.top.content
+  tubiLog("CategoryDetailsPanel.onLoadContent")
+  category = m.top.content
+  if category <> invalid
     m.contentLoadedAndFocused = false
     if category.getChildCount() > 0
+      m.nSponsorshipYDelta = 0
       if category.sponsorImages <> invalid
-        '//check in photoshop and re-adjust postions
-        m.PageTitleAndCounter.translation = [m.PageTitleAndCounter.translation[0], 518]
-        m.VideoGrid.translation = [m.VideoGrid.translation[0], 627]
-
-        '//if a channel is sponsored, then display a background artwork related to the sponsor
-        sSponsorBackgroundURL = ""
-        if m.constants.deviceInfo.limitedUi = false AND category.sponsorImages.brandBackground <> ""
-          sSponsorBackgroundURL = category.sponsorImages.brandBackground
-        else if category.sponsorImages.brandColor <> ""
-          sSponsorBackgroundURL = category.sponsorImages.brandColor
-        end if
-        m.top.sponsorshipBackground = sSponsorBackgroundURL
+        m.nSponsorshipYDelta = -45
+        m.PageTitleAndCounter.translation = [m.PageTitleAndCounter.translation[0], m.PageTitleAndCounter.translation[1] + m.nSponsorshipYDelta]
+        m.InfoPanel.translation = [m.InfoPanel.translation[0], m.InfoPanel.translation[1] + m.nSponsorshipYDelta]
       end if
 
       m.PageTitleAndCounter.content = category
-      m.VideoGrid.content = category
+      m.ContentGrid.content = category
 
-      m.VideoGrid.setFocus(true)
-
+      nPopulateIndex = m.ContentGrid.itemFocused
       nJumpToItemFocused = m.top.jumpToItemFocused
       nContentMaxCount = category.getChildCount() - 1
       if nJumpToItemFocused >= 0
         if nJumpToItemFocused > nContentMaxCount
           nJumpToItemFocused = nContentMaxCount
         end if
-        m.VideoGrid.jumpToItem = nJumpToItemFocused
+        nPopulateIndex = nJumpToItemFocused
+        m.ContentGrid.jumpToItem = nJumpToItemFocused
       end if
 
-      m.VideoGrid.visible = true
+      populateContent = category.getChild(nPopulateIndex) 'contentNode
+
+      populateInfoPanel(m.InfoPanel, populateContent) 
+      m.ContentGrid.visible = true
+
+      setUIBasedOnFocus(false)
     end if
 
-    if category <> invalid
-      m.top.trackingPageInfo = createTrackingPageInfo(category)
-    end if
+    m.top.trackingPageInfo = createTrackingPageInfo(category)
   end if
 End Function
 
 
-Function onIsLoading()
-  tubiLog("CategoryDetailsScreen.onIsLoading")
-  if m.top.isLoading = true
+Function onIsLoading(msg)
+  tubiLog("CategoryDetailsPanel.onIsLoading")
+  if msg.getData() = true
+    m.top.backgroundUriList = []
     m.InfoPanel.visible = false
-    m.VideoGrid.visible = false
+    m.ContentGrid.visible = false
     m.PageTitleAndCounter.visible = false
   else
     m.InfoPanel.visible = true
-    m.VideoGrid.visible = true
+    m.ContentGrid.visible = true
     m.PageTitleAndCounter.visible = true
   end if
 End Function
 
 
-Function onItemFocused(_msg)
-  tubiLog("CategoryDetailsScreen.onItemFocused")
+Function onItemFocused(msg)
+  tubiLog("CategoryDetailsPanel.onItemFocused")
   if m.top.content <> invalid
-    item = m.VideoGrid.itemFocused
+    item = msg.getData()
     category = m.top.content 'contentNode
     content = category.getChild(item) 'contentNode
 
     if content <> invalid
-      ' setting the focused content's Id to contentFocusedId field, later it will be used for setting focus on previous screen(home)
-      m.top.contentFocusedId = content.id
-
       ' Update the info panel
       populateInfoPanel(m.InfoPanel, content)
 
@@ -163,7 +204,7 @@ Function onItemFocused(_msg)
         m.top.backgroundUriList = []
       end if
 
-      numColumns = m.VideoGrid.numColumns
+      numColumns = m.ContentGrid.numColumns
 
       if m.contentLoadedAndFocused = true
         '//Do not send out tracking when the grid is initially loaded. When an item 1st gain focus, this indicates that the grid was just loaded.
@@ -184,6 +225,8 @@ Function onItemFocused(_msg)
         }
 
         m.oldCategoryComponent = getTrackingComponentInfo(item, numColumns, category, m.Tracking)
+        focusedContent = category.getChild(m.ContentGrid.itemFocused)
+        updateTrackingInfo(category, focusedContent, m.ContentGrid.itemFocused)
 
 
         'lazy loading logic:
@@ -200,14 +243,20 @@ Function onItemFocused(_msg)
         end if
 
       else
+        
         m.contentLoadedAndFocused = true
         m.oldCategoryComponent = getTrackingComponentInfo(item, numColumns, category, m.Tracking)
+        focusedContent = category.getChild(m.ContentGrid.itemFocused)
+        updateTrackingInfo(category, focusedContent, m.ContentGrid.itemFocused)
+
       end if
+      m.top.itemFocused = item
     else
       '//if content is not valid, then we should refresh the screen.
       '//Most likely what happened is that the content was modified while the screen is off screen: i.e. ContinuedWatching screen no longer has any content so refreshing the page will most likely result in a content error.
       m.top.refreshChannel = true
     end if
+    
   end if
 End Function
 
@@ -226,6 +275,7 @@ Function handleItemSelected(itemSelected)
   if content <> invalid
     ' Update the tracking info so that it is ready once the ContentController creates the details page
     updateTrackingInfo(category, content, itemSelected)
+    m.contentLoadedAndFocused = false
 
     ' Pass info to ContentController
     m.top.contentSelected = content
@@ -233,46 +283,22 @@ Function handleItemSelected(itemSelected)
 End Function
 
 
-' @category: roSGNode, contentNode containing info about the category represented on the page
-' @content: roSGNode, contentNode containing info about the content that was selected from the grid
-' @itemSelected: integer, the position in the grid
-Function updateTrackingInfo(category, content, itemSelected)
-  if content <> invalid
-    m.top.trackingPageInfo = createTrackingPageInfo(category)
-
-    categorySlug = ""
-    if category <> invalid
-      categorySlug = category.slug
-    end if
-
-    numColumns = m.VideoGrid.numColumns
-    col = 1 + (itemSelected MOD numColumns)
-    row = 1 + (itemSelected \ numColumns)
-    'Set the tracking component of the item that was selected so it can be accessed as part of the navigateToPage event
-    m.top.trackingComponentInfo = {
-      componentType: "category_component"
-      componentValues: {
-        category_slug: categorySlug
-        category_row: 1
-        content_tile: m.Tracking.getAnalyticsTile(content, col, row)
-      }
-    }
-    m.contentLoadedAndFocused = false
-  end if
-End Function
-
-
 '@infoPanel: roSGNode, an InfoPanel component
 '@content: roSGNode, a content node
 Function populateInfoPanel(infoPanel, content)
-  if content.type = m.constants.ui.contentTypes.sportsEvent
-    populateInfoPanelWithHomescreenStyleSportsMode(content, infoPanel)
-  else
-    populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel)
-  end if
+  if content <> invalid
+    if content.type = m.constants.ui.contentTypes.sportsEvent
+      populateInfoPanelWithHomescreenStyleSportsMode(content, infoPanel)
+    else if content.type = m.constants.ui.contentTypes.channel
+      infoPanel.mode = m.constants.ui.infoPanelModes.channel
+      infoPanel.title = content.title
+      infoPanel.description = content.description
+    else
+      populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel)
+    end if
 
-  infoPanel.calculateHeight = true
-  return infoPanel
+    infoPanel.calculateHeight = true
+  end if
 End Function
 
 
@@ -314,14 +340,39 @@ Function getTrackingComponentInfo(itemIndex, numColumns, category, trackingLib)
 End Function
 
 
+' @category: roSGNode, contentNode containing info about the category represented on the page
+' @content: roSGNode, contentNode containing info about the content that was selected from the grid
+' @itemSelected: integer, the position in the grid
+Function updateTrackingInfo(category, content, itemSelected)
+  if content <> invalid
+    m.top.trackingPageInfo = createTrackingPageInfo(category)
+
+    categorySlug = ""
+    if category <> invalid
+      categorySlug = category.slug
+    end if
+
+    numColumns = m.ContentGrid.numColumns
+    col = 1 + (itemSelected MOD numColumns)
+    row = 1 + (itemSelected \ numColumns)
+    'Set the tracking component of the item that was selected so it can be accessed as part of the navigateToPage event
+    m.top.trackingComponentInfo = {
+      componentType: "category_component"
+      componentValues: {
+        category_slug: categorySlug
+        category_row: 1
+        content_tile: m.Tracking.getAnalyticsTile(content, col, row)
+      }
+    }
+  end if
+End Function
+
+
 Function onKeyEvent(key, press) as Boolean
   handled = false
 
   if press = true
-    if key = "left" OR key = "back"
-      m.top.backButtonPressed = true
-      handled = true
-    else if key = "play"
+    if key = "play"
       handlePlayInput()
       handled = true
     end if
@@ -347,14 +398,14 @@ Function onTransportVoiceRequest(msg)
   if inputInfo <> invalid AND inputInfo.command <> invalid
     command = inputInfo.command
   end if
-  tubiLog("CategoryDetailsScreen.onTransportVoiceRequest " + command)
+  tubiLog("CategoryDetailsPanel.onTransportVoiceRequest " + command)
 
-  if m.VideoGrid.isInFocusChain() = true
+  if m.ContentGrid.isInFocusChain() = true
     if command = "play"
       handlePlayInput()
       response = "success"
     else if command = "ok"
-      handleItemSelected(m.VideoGrid.itemFocused)
+      handleItemSelected(m.ContentGrid.itemFocused)
       response = "success"
     end if
   end if
@@ -365,10 +416,11 @@ End Function
 
 
 Function handlePlayInput()
-  if m.VideoGrid.isInFocusChain() = true
+  if m.ContentGrid.isInFocusChain() = true
     category = m.top.content
-    selectedContent = category.getChild(m.VideoGrid.itemFocused)
-    updateTrackingInfo(category, selectedContent, m.VideoGrid.itemFocused)
+    selectedContent = category.getChild(m.ContentGrid.itemFocused)
+    updateTrackingInfo(category, selectedContent, m.ContentGrid.itemFocused)
+    m.contentLoadedAndFocused = false
     m.top.contentToPlay = selectedContent
   end if
 End Function

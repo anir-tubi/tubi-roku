@@ -26,6 +26,10 @@ Function TubiExperiments(constants) as Object
         roku_screensaver_v2 : {"enabled": false}
       }
 
+      roku_category_redesign: {
+        roku_category_redesign_v1: {"enabled": false}
+      }
+      
       roku_large_play_progress: {
         roku_large_play_progress_v1 : {"enabled": true}
       }

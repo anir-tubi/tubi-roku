@@ -1062,9 +1062,9 @@ Function getConstants()
       constants.ui.categoryIds.history = "continue_watching"
       constants.ui.categoryIds.queue = "queue"
       constants.ui.categoryIds.featured = "featured"
+      constants.ui.categoryIds.networks = "networks"
       constants.ui.categoryIds.myLikes = "my_likes"
       constants.ui.categoryIds.recommendedForYou = "recommended_for_you"
-
       constants.ui.categoryIds.mostPopular = "most_popular"
       constants.ui.categoryIds.movieNight = "movie_night"
       constants.ui.categoryIds.seriesSpotlight = "series_spotlight"
@@ -1098,6 +1098,7 @@ Function getConstants()
       'these map to different InfoPanel modes/types
       constants.ui.infoPanelModes.item = "item"
       constants.ui.infoPanelModes.continueWatching = "continueWatching"
+      constants.ui.infoPanelModes.channel = "channel"
       constants.ui.infoPanelModes.movie = "movie"
       constants.ui.infoPanelModes.series = "series"
       constants.ui.infoPanelModes.season = "season"
@@ -1164,6 +1165,7 @@ Function getConstants()
       constants.ui.screenLevels.myStuffScreen = 20
       constants.ui.screenLevels.settingsScreen = 20
       constants.ui.screenLevels.categoryListScreen = 20
+      constants.ui.screenLevels.categoryPanelListScreen = 20
       constants.ui.screenLevels.channelListScreen = 30
       constants.ui.screenLevels.confirmPasswordScreen = 40
       constants.ui.screenLevels.categoryDetailsScreen = 40
@@ -1186,6 +1188,7 @@ Function getConstants()
       constants.ui.screenIds.categoryDetailsScreen = "categoryDetailsScreen"
       constants.ui.screenIds.channelListScreen = "channelListScreen"
       constants.ui.screenIds.categoryListScreen = "categoryListScreen"
+      constants.ui.screenIds.categoryPanelListScreen = "categoryPanelListScreen"
       constants.ui.screenIds.espanolScreen = "espanolScreen"
       constants.ui.screenIds.movieScreen = "movieScreen"
       constants.ui.screenIds.myStuffScreen = "myStuffScreen"
@@ -1212,6 +1215,7 @@ Function getConstants()
       constants.ui.cacheableScreenIds[constants.ui.screenIds.homeScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.channelListScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.categoryListScreen] = true
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.categoryPanelListScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.espanolScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.movieScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.myStuffScreen] = true
@@ -1289,6 +1293,7 @@ Function getConstants()
     constants.ui.sideNavOpenIds = {}
       constants.ui.sideNavOpenIds[constants.ui.screenIds.homeScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.categoryListScreen] = true
+      constants.ui.sideNavOpenIds[constants.ui.screenIds.categoryPanelListScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.espanolScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.epgScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.tvScreen] = true
@@ -1321,6 +1326,7 @@ Function getConstants()
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.searchScreen] = constants.ui.sideNavIds.search
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.channelListScreen] = constants.ui.sideNavIds.channels
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.categoryListScreen] = constants.ui.sideNavIds.categories
+      constants.ui.screenIdToSideNavId[constants.ui.screenIds.categoryPanelListScreen] = constants.ui.sideNavIds.categories
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.espanolScreen] = constants.ui.sideNavIds.espanol
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.myStuffScreen] = constants.ui.sideNavIds.myList
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.settingsScreen] = constants.ui.sideNavIds.settings

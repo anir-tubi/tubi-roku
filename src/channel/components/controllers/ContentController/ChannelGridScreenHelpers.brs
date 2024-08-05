@@ -2,7 +2,7 @@
 ' @constants: assocArray, constants as set in Constants.brs and updated in the hotpatch
 ' @sendNavigationLoadEvents: boolean, when the page is loaded, do the navigation to page, pageload events needs to be sent
 Function showChannelListScreen(constants, sendNavigationLoadEvents = true)
-  tubiLog("ChannelGridScreenHelers.showChannelListScreen")
+  tubiLog("ChannelGridScreenHelpers.showChannelListScreen")
   channelListScreen = getFromScreenCache(m.constants.ui.screenIds.channelListScreen)
   if channelListScreen <> invalid
     if sendNavigationLoadEvents = false
@@ -19,7 +19,7 @@ End Function
 ' gets the CategoryListScreen from the screen cache if it exists, otherwise wraps showChannelGridScreen()
 ' @constants: assocArray, constants as set in Constants.brs and updated in the hotpatch
 Function showCategoryListScreen(constants, sendNavigationLoadEvents = true)
-  tubiLog("ChannelGridScreenHelers.showCategoryListScreen")
+  tubiLog("ChannelGridScreenHelpers.showCategoryListScreen")
   categoryListScreen = getFromScreenCache(m.constants.ui.screenIds.categoryListScreen)
   if categoryListScreen <> invalid
     if sendNavigationLoadEvents = false
@@ -40,7 +40,7 @@ End Function
 ' @bChannel: boolean, Is this a grid page displaying channels? If not, it will be a grid page displaying categories
 ' @screenLevel: integer, Should this screen have a different screenlevel other than its default one?
 Function showChannelGridScreen(constants, bChannel = true, screenLevel = -1, sendNavigationLoadEvents = true)
-  tubiLog("ChannelGridScreenHelers.showChannelGridScreen")
+  tubiLog("ChannelGridScreenHelpers.showChannelGridScreen")
   gridScreen = CreateObject("roSGNode", "ChannelGridScreen")
 
   gridScreenId = constants.ui.screenIds.channelListScreen
@@ -84,7 +84,7 @@ Function onGridContentSelected(msg)
   selectedItem = msg.getData()
 
   'If the user selects networks from CategoryList Screen we are showing the ChannelListScreen with list of channels.
-  if selectedItem.id = "networks"
+  if selectedItem.id = m.constants.ui.categoryIds.networks
     showChannelListScreen(m.constants)
   else
     showCategoryDetailsScreen(gridScreen.contentSelected)
@@ -115,7 +115,7 @@ End Function
 
 
 Function refreshGridScreen(gridScreen)
-  tubiLog("ChannelGridScreenHelers.refreshGridScreen")
+  tubiLog("ChannelGridScreenHelpers.refreshGridScreen")
   m.refreshingChannelGridCache = true
   gridScreen.isLoading = true
   getGridDataFromServer(gridScreen)
@@ -123,7 +123,7 @@ End Function
 
 
 Function onRefreshGridSignal(msg)
-  tubiLog("ChannelGridScreenHelers.onRefreshGridSignal")
+  tubiLog("ChannelGridScreenHelpers.onRefreshGridSignal")
   gridScreen = msg.getRoSGNode()
   refreshGridScreen(gridScreen)
 End Function

@@ -960,6 +960,9 @@ Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate,
       if categoryAA <> invalid
         if bDisplayChannels = true
           categoryAA.type = m.contentTypes.channel
+          if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_category_redesign", "roku_category_redesign_v1").enabled = true
+            categoryAA.HDGRIDPOSTERURL = m.generateChannelPosterUrl(categoryAA.id)
+          end if
         else
           categoryAA.type = m.contentTypes.category
         end if
@@ -1005,7 +1008,7 @@ Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate,
       id: "networks"
       isSpecial: true
       slug: "networks"
-      title: "Networks"
+      title: getTranslation("menu_networks")
       type: "channel"
   }
   end if

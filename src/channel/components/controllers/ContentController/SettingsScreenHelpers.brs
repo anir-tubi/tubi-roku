@@ -337,6 +337,7 @@ Function refreshScreenAfterParentalChanges()
   setContentToRefresh(m.constants.ui.screenIds.espanolScreen)
   setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
   setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
+  setContentToRefresh(m.constants.ui.screenIds.categoryPanelListScreen)
   setContentToRefresh(m.constants.ui.screenIds.epgScreen)
   setContentToRefresh(m.constants.ui.screenIds.myStuffScreen)
 
@@ -354,8 +355,10 @@ Function refreshScreenAfterParentalChanges()
     if screen.id = m.constants.ui.screenIds.searchScreen
       screen.kidsModeEnabled = isKidsUIOn()
       screen.signedIn = true
-    else if screen.id = m.constants.ui.screenIds.channelListScreen or screen.id = m.constants.ui.screenIds.categoryListScreen
+    else if screen.id = m.constants.ui.screenIds.channelListScreen OR screen.id = m.constants.ui.screenIds.categoryListScreen
       refreshGridScreen(screen)
+    else if screen.id = m.constants.ui.screenIds.categoryPanelListScreen
+      refreshCategoryPanelListScreen(screen)
     else if screen.id = m.constants.ui.screenIds.settingsScreen
       ' Updating the value after parentalControls had been changed.
       m.settingsScreen.isAllowedToManageConsent = isUserAllowedToManageConsent()

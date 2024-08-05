@@ -345,6 +345,10 @@ Function getTranslation_en_US()
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the channels screen.",
       "message": "Channels"
     },
+    "menu_networks": {
+      "description": "Title for a container of channels tiles.",
+      "message": "Networks"
+    },
     "menu_movies": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the movies screen.",
       "message": "Movies"

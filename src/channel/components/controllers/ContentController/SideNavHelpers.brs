@@ -237,7 +237,11 @@ Function onSideNavItemSelected()
         setUiMode(m.constants.ui.modes.standard)
       end if
 
-      showCategoryListScreen(m.constants)
+      if (getExperimentResource("roku_category_redesign", "roku_category_redesign_v1", true).enabled = true)
+        showCategoryPanelListScreen(m.constants)
+      else
+        showCategoryListScreen(m.constants)
+      end if
       bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.espanol
       if isKidsUIOn() = true

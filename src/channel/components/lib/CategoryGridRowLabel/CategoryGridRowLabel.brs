@@ -13,6 +13,7 @@ Function init()
   m.top.observeFieldScoped("content", "onContentChange")
   m.top.observeFieldScoped("currentIndex", "onIndexChange")
   m.top.observeFieldScoped("isFullyLoaded", "onIsFullyLoaded")
+  m.top.observeFieldScoped("countTranslationXPos", "onCountTranslationXPosChanged")
 
   '//Keep a record of what the original transitions are for certain elements in case they need to be adjusted during sponsorships and then returned back to the original transition when the component does not have a sponsorship
   m.originalTranslation_CategoryName = m.CategoryName.translation
@@ -177,4 +178,12 @@ Function onIsFullyLoaded(msg)
 
   end if
 
+End Function
+
+
+'//Change the horizontal position of the count UI element
+Function onCountTranslationXPosChanged(msg)
+  XPos = msg.getData()
+  m.originalTranslation_CategoryCount = [XPos, m.originalTranslation_CategoryCount[1]]
+  m.CategoryCount.translation = [XPos, m.CategoryCount.translation[1]]
 End Function
