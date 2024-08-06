@@ -213,6 +213,7 @@ Function processNavigateAction(uriParameters)
   if page <> invalid
     if page = "movies"
       showMoviesScreen()
+      focusSideNavOption(m.constants.ui.sideNavIds.movies)
     else if page = "myList"
       isUserSigedIn = isLoggedInUser()
       if isUserSigedIn = true
@@ -224,8 +225,10 @@ Function processNavigateAction(uriParameters)
       focusSideNavOption(m.constants.ui.sideNavIds.espanol)
     else if page = "tvShows"
       showTVScreen()
+      focusSideNavOption(m.constants.ui.sideNavIds.tv)
     else if page = "liveTv"
       showDefaultEPGScreen()
+      focusSideNavOption(m.constants.ui.sideNavIds.linearEPG)
     else if page = "categories"
       if (getExperimentResource("roku_category_redesign", "roku_category_redesign_v1", true).enabled = true)
         showCategoryPanelListScreen(m.constants)
