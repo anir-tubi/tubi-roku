@@ -657,6 +657,27 @@ const elements = typeCheckElements({
       '/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/Group/Label',
   },
 
+   /** BWW Row list Poster */
+   browseWhileWatchingRowListPoster: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#YmalRow.0.#YmalGroup.#YmalRow.#CategoryGridList.#RowList.0.items.0.#poster',
+  },
+
+    /** YMAL detail title */
+    ymalDetailsTitle: {
+      keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#YmalRow.0.#YmalGroup.#Info.#infoPanelGroup.#Offset.#Title',
+    },
+
+
+  /** YMAL player poster */
+  videoPlayYmalPoster:{
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#YmalRow.0.#YmalGroup.#YmalRow.#CategoryGridList.#RowList.0.items.0.#poster',
+  },
+
+    /** BWW Featured header */
+    browseWhileWatchingHeader: {
+      keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#YmalRow.0.#YmalGroup.#YmalRow.#CategoryGridList.#RowList.0.title.#CategoryName'
+    },
+
   /** rewind button icon */
   rewindButton: {
     keyPath:
