@@ -54,7 +54,7 @@ describe('Kids Events', function () {
 		await kidsHome.selectSideNavTab(tabs.categories, 4);
 		await utils.sleep(1000);
 		await kidsHome.selectSideNavTabNoPageReturn(tabs.movies, 5);
-		const message = await kidsHome.getPopupMessage();
+		const message = await kidsHome.getPopupMessageKids();
 		await verifyChannelsDisabledText(message);
 	});
 

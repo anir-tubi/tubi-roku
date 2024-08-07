@@ -69,26 +69,27 @@ const LiveNews = () => {
 	}
 
 	async function selectSubtitles(togle) {
-		await ecp.sendKeypress(ecp.Key.Down);
+		await ecp.sendKeypress(ecp.Key.Down, { wait: 500 });
 
-		await ecp.sendKeypress(ecp.Key.Up);
-		await ecp.sendKeypress(ecp.Key.Left);
+		await ecp.sendKeypress(ecp.Key.Up, { wait: 500 });
+		await ecp.sendKeypress(ecp.Key.Left, { wait: 500 });
+		await utils.sleep(1000);
 		await testUtils.retryWithTimeOut(async () => {
 			const subtitlesIcon = await elements.subtitlesIcon();
 			expect(subtitlesIcon.visible).to.equal(true);
 		});
-		await ecp.sendKeypress(ecp.Key.Up);
-		await ecp.sendKeypress(ecp.Key.Ok);
+		await ecp.sendKeypress(ecp.Key.Up, { wait: 500 });
+		await ecp.sendKeypress(ecp.Key.Ok, { wait: 500 });
 		await testUtils.retryWithTimeOut(async () => {
 			const subtitlesNavigation = await elements.subtitlesNavigation();
 			expect(subtitlesNavigation.visible).to.equal(true);
 		});
 		if (togle) {
-			await ecp.sendKeypress(ecp.Key.Right);
-			await ecp.sendKeypress(ecp.Key.Ok);
+			await ecp.sendKeypress(ecp.Key.Right, { wait: 500 });
+			await ecp.sendKeypress(ecp.Key.Ok, { wait: 500 });
 		} else {
-			await ecp.sendKeypress(ecp.Key.Left);
-			await ecp.sendKeypress(ecp.Key.Ok);
+			await ecp.sendKeypress(ecp.Key.Left, { wait: 500 });
+			await ecp.sendKeypress(ecp.Key.Ok, { wait: 500 });
 		}
 	}
 

@@ -23,6 +23,8 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 			await testUtils.getNodeForElement('kidsLogoHomeScreen'),
 		exitToUseFeatureMessage: async () =>
 			await testUtils.getNodeForElement('exitToUseThisFeatureMesage'),
+		exitToUseFeatureMessageKids: async () =>
+			await testUtils.getNodeForElement('exitToUseThisFeatureMesageKids'),
 		tvShowsSeriesLabel: async () =>
 			await testUtils.getNodeForElement('tvShowsSeriesLabel'),
 		moviesLabel: async () => await testUtils.getNodeForElement('moviesLabel'),
@@ -165,6 +167,15 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 		let channelsDisabledMessage;
 		await testUtils.retryWithTimeOut(async () => {
 			channelsDisabledMessage = await elements.exitToUseFeatureMessage();
+			expect(channelsDisabledMessage.text).to.not.be.empty;
+		});
+		return channelsDisabledMessage.text;
+	}
+
+	async function getPopupMessageKids() {
+		let channelsDisabledMessage;
+		await testUtils.retryWithTimeOut(async () => {
+			channelsDisabledMessage = await elements.exitToUseFeatureMessageKids();
 			expect(channelsDisabledMessage.text).to.not.be.empty;
 		});
 		return channelsDisabledMessage.text;
@@ -402,6 +413,7 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 		waitForPlayBackToStartForMovie,
 		selectFocusedTitleMovieWithSubtitles,
 		navigateToContinueWatchingAndSelectIt,
+		getPopupMessageKids,
 		...SideNav(),
 	};
 };

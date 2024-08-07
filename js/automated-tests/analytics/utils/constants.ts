@@ -107,7 +107,7 @@ export const PAGES = {
 // TODO:: roku_all_episiodes_v1 - if experiment is graduated, then change Episode List to All Episodes
 export const TV_SHOW_DETAILS_PAGE_BUTONS = {
 	PLAY: 'Play',
-	EPISODE_LIST: 'Episodes list',
+	EPISODE_LIST: 'All Episodes',
 	LIKE_OR_DISLIKE: 'Like or Dislike',
 	ADD_TO_MY_LIST: 'Add to My List',
 	Go_TO: 'Go to',
