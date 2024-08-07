@@ -117,6 +117,11 @@ Function init()
   'pauseAdAnimation helps for stopping the pause ad animation
   m.pauseAdAnimation = invalid
 
+  m.likeDislikeStateEnabled = false
+
+  m.oldFocusedItem = ""
+  m.oldUnFocusedItem = ""
+
   m.top.observeFieldScoped("sendPendingPauseAdPixel", "onSendPendingPauseAdPixel")
   m.top.observeFieldScoped("pauseAdResponse", "onPauseAdResponse")
   m.pauseAdOverlayTimer = m.top.findNode("PauseAdOverlayTimer")
@@ -147,6 +152,7 @@ Function init()
   m.RemainingLabel = m.top.findNode("RemainingLabel")
   m.ProgressBar = m.top.findNode("ProgressBar")
   m.TopOverlay = m.top.findNode("TopOverlay")
+  m.UpNextOverlay = m.top.findNode("UpNextOverlay")
   m.ScrubTimer = m.top.findNode("ScrubTimer")
   m.HUD = m.top.findNode("HUD")
   m.AdHeadsUp = m.top.findNode("AdHeadsUp")
@@ -333,9 +339,33 @@ Function init()
   m.episodeTitle = m.TopOverlay.findNode("VideoOverlayEpisodeTitle")
   SkipTrailerButtonLabel = m.TopOverlay.findNode("SkipTrailerButtonLabel")
 
+  m.upNextOverlayTitle = m.UpNextOverlay.findNode("UpNextOverlayTitle")
+  m.upNextOverlayHint = m.UpNextOverlay.findNode("UpNextOverlayHint")
+  m.upNextOverlayRecommendation = m.UpNextOverlay.findNode("UpNextOverlayRecommendation")
+
+  m.Menu = m.UpNextOverlay.findNode("Menu")
+  m.Menu.itemClippingRect = {
+    height: 600.0,
+    width: 800.0,
+    x: 0.0,
+    y: 0.0
+  }
+
+  if getExperimentResource("roku_like_dislike_on_autoplay", "roku_like_dislike_on_autoplay_v1", false).enabled = true
+    m.LikeDislikeMenuContent = m.top.findNode("LikeDislikeMenuContent")
+    m.Menu.observeFieldScoped("itemFocused", "onLikeDislikeMenuFocused")
+    m.Menu.observeFieldScoped("itemUnFocused", "onLikeDislikeMenuUnFocused")
+    m.Menu.observeFieldScoped("itemSelected", "onLikeDislikeMenuSelected")
+    m.top.observeFieldScoped("autoPlayLikeDislikeState", "onAutoPlayLikeDislikeStateChanged")
+    setContentForMenu()
+  end if
+
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.title, typographyConstants.ids.headerSmall)
   setTypographyOfLabel(m.episodeTitle, typographyConstants.ids.bodyLarge)
+  setTypographyOfLabel(m.upNextOverlayTitle, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.upNextOverlayHint, typographyConstants.ids.headerSmall)
+  setTypographyOfLabel(m.upNextOverlayRecommendation, typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.AdHeadsUpText, typographyConstants.ids.subheaderMedium)
   setTypographyOfLabel(m.ratedLabel, typographyConstants.ids.bodyMediumStrong)
   setTypographyOfLabel(m.ratingLabel, typographyConstants.ids.bodySmallStrong)
@@ -352,6 +382,7 @@ Function init()
   m.ratingBarAndLabel.translation = [m.constants.ui.translations.marginX, m.ratingBarAndLabel.translation[1]]
   m.descriptorDesc.translation = [m.constants.ui.translations.marginX + 27, m.descriptorDesc.translation[1]]
   m.TopOverlay.translation = [m.constants.ui.translations.marginX, m.TopOverlay.translation[1]]
+  m.UpNextOverlay.translation = [m.constants.ui.translations.marginX, m.UpNextOverlay.translation[1]]
   m.ElapsedLabel.translation = [m.constants.ui.translations.marginX, m.ElapsedLabel.translation[1]]
   m.RemainingLabel.translation = [1920 - m.constants.ui.translations.marginX - m.RemainingLabel.boundingRect().width, m.RemainingLabel.translation[1]]
   m.ProgressBar.translation = [m.constants.ui.translations.marginX, m.ProgressBar.translation[1]]
@@ -364,6 +395,33 @@ Function init()
 End Function
 
 
+Function setContentForMenu()
+  likeContentNode = CreateObject("roSGNode", "ContentNode")
+  likeContentNode.id = "LikeMenuItem"
+  dislikeContentNode = CreateObject("roSGNode", "ContentNode")
+  dislikeContentNode.id = "DislikeMenuItem"
+
+  if isLoggedInUser() = true
+    if m.top.autoPlayLikeDislikeState = m.constants.ui.likeDislikeStates.liked
+      likeContentNode.HDPosterUrl = "pkg:/images/icon-autoplay-liked.png"
+    else if m.top.autoPlayLikeDislikeState = m.constants.ui.likeDislikeStates.disliked
+      dislikeContentNode.HDPosterUrl = "pkg:/images/icon-autoplay-disliked.png"
+    else
+      likeContentNode.HDPosterUrl = "pkg:/images/icon-autoplay-like.png"
+      dislikeContentNode.HDPosterUrl = "pkg:/images/icon-autoplay-dislike.png"
+    end if
+  else
+    likeContentNode.HDPosterUrl = "pkg:/images/icon-autoplay-like.png"
+    dislikeContentNode.HDPosterUrl = "pkg:/images/icon-autoplay-dislike.png"
+  end if
+
+  likeContentNode.title = getTranslation("screenPlayer_button_like")
+  dislikeContentNode.title = getTranslation("screenDetails_button_notForMe")
+  m.LikeDislikeMenuContent.appendChild(likeContentNode)
+  m.LikeDislikeMenuContent.appendChild(dislikeContentNode)
+End Function
+
+
 Function onScreenFocusChange()
 
   if m.top.hasFocus() = true then
@@ -373,6 +431,10 @@ Function onScreenFocusChange()
       if rafChild <> invalid then
         rafChild.setFocus(true)
       end if
+    end if
+
+    if m.likeDislikeStateEnabled = true
+        m.Menu.setFocus(true)
     end if
   end if
 End Function
@@ -543,6 +605,9 @@ Function onThemeChange(msg = invalid)
     m.skipCuepointsButton.notFilledBackgroundColor = theme.shadeColor2
     m.closedCaptionAndAudioSelectionOverlayGroup.color = theme.shadeColor
 
+    m.Menu.focusBitmapBlendColor = theme.focusedColor
+    m.Menu.focusFootprintBlendColor = theme.neutralColor2
+
     if theme.id = m.constants.ui.themeIDs.kidsMode
       m.logo.visible = false
       m.logoKids.visible = true
@@ -590,6 +655,7 @@ Function onControlChange()
     hideYMAL()
     setFocusToPlaybackControl()
     m.UpNext.stopAutoPlayTimer = true
+    m.Menu.setFocus(false)
     m.UpNext.hide = true
 
     'in the case where an ad break has started, but RAF does not yet have control, we want to break out of ads on back button pressed
@@ -930,6 +996,21 @@ Function onVideoPositionChange(msg)
         setFocusToPlaybackControl()
         clearSkipCuepointsButtonAndTimer()
 
+        if getExperimentResource("roku_like_dislike_on_autoplay", "roku_like_dislike_on_autoplay_v1").enabled = true
+          fade(m.UpNextOverlay, "in", 1.0)
+          m.upNextOverlayTitle.text = content.title
+          m.upNextOverlayHint.text = "What do you think?"
+          m.upNextOverlayRecommendation.text = "Improve your recommendations"
+          m.UpNextOverlay.visible = true
+          like = getLike(content.id)
+          sLikedState = ""
+          if like <> invalid
+            sLikedState = like.state
+          end if
+
+          m.top.autoPlayLikeDislikeState = sLikedState
+        end if
+
         m.UpNext.show = true
         m.UpNext.setFocus(true)
         m.shouldShowUpNext = false
@@ -1222,8 +1303,12 @@ Function onUpNextContentSelected(msg)
   ' we don't want to trigger potential animations at that point.
   if contentSelected <> invalid
     tubiLog("VideoPlayer.onUpNextContentSelected")
+    m.likeDislikeStateEnabled = false
+    m.Menu.setFocus(false)
     m.UpNext.hide = true
   end if
+
+  fade(m.UpNextOverlay, "out", 0.75)
 
   m.top.trackingComponentInfo = {
     componentType: "auto_play_component"
@@ -1235,6 +1320,85 @@ Function onUpNextContentSelected(msg)
   ' if contentSelected is invalid, it is handled by the callback in VideoHelpers
   m.top.upNextContentToAutoplay = contentSelected
   setFocusToPlaybackControl()
+End Function
+
+
+Function onLikeDislikeMenuFocused()
+  focusedMenuItem = m.Menu.content.getChild(m.Menu.itemFocused)
+  focusedItem = ""
+  if focusedMenuItem.id = "LikeMenuItem"
+    focusedItem = m.constants.ui.likeDislikeActions.like
+  else if focusedMenuItem.id = "DislikeMenuItem"
+    focusedItem = m.constants.ui.likeDislikeActions.dislike
+  end if
+
+  if isNonEmptyString(focusedItem) = true AND m.oldFocusedItem <> focusedMenuItem.id
+    sendComponentInteractionEventForLikeDislike(focusedItem, "TOGGLE_ON")
+    m.oldFocusedItem = focusedMenuItem.id
+  end if
+
+End Function
+
+
+Function onLikeDislikeMenuUnFocused(msg)
+  index = msg.getData()
+  if index <> invalid
+    unFocusedMenuItem = m.Menu.content.getChild(index)
+    unFocusedItem = ""
+    if unFocusedMenuItem <> invalid
+      if unFocusedMenuItem.id = "LikeMenuItem"
+        unFocusedItem = m.constants.ui.likeDislikeActions.like
+      else if unFocusedMenuItem.id = "DislikeMenuItem"
+        unFocusedItem = m.constants.ui.likeDislikeActions.dislike
+      end if
+
+      if (isNonEmptyString(unFocusedItem) = true AND m.oldUnFocusedItem <> unFocusedMenuItem.id) OR m.Menu.hasFocus() = false
+        sendComponentInteractionEventForLikeDislike(unFocusedItem, "TOGGLE_OFF")
+        m.oldUnFocusedItem = unFocusedMenuItem.id
+      end if
+    end if
+  end if
+End Function
+
+
+Function onLikeDislikeMenuSelected()
+  selectedIndex = m.Menu.itemSelected
+  if selectedIndex <> -1
+    selectedMenuItem = m.Menu.content.getChild(selectedIndex)
+    handleStateForLikeDislikeSelected()
+    if selectedMenuItem.id = "LikeMenuItem"
+      m.top.autoPlayLikeRemoveLikeSelected = true
+    else
+      m.top.autoPlayDisLikeRemoveDislikeSelected = true
+    end if
+  end if
+End Function
+
+
+Function sendComponentInteractionEventForLikeDislike(sRatingChange, userInteractionValue)
+'//Send Analytics of user interaction with the like/dislike button
+sAnalyticsEventType = ""
+if sRatingChange = m.constants.ui.likeDislikeActions.like
+  sAnalyticsEventType = "LIKE"
+else if sRatingChange = m.constants.ui.likeDislikeActions.dislike
+  sAnalyticsEventType = "DISLIKE"
+else if sRatingChange = m.constants.ui.likeDislikeActions.removeLike
+  sAnalyticsEventType = "UNDO_LIKE"
+else if sRatingChange = m.constants.ui.likeDislikeActions.removeDislike
+  sAnalyticsEventType = "UNDO_DISLIKE"
+end if
+
+trackingPageInfo = m.top.trackingPageInfo
+componentValues = {
+  button_type: "TEXT"
+  button_value: sAnalyticsEventType 'Button value is always upper case and concatinated by "_"
+}
+
+m.top.componentInteractionInfo = {
+  pageOneof: m.Tracking.getAnalyticsPage(trackingPageInfo.pageType, trackingPageInfo.pageValues)
+  componentOneof: m.Tracking.getAnalyticsComponent("button_component", componentValues)
+  user_interaction: userInteractionValue
+}
 End Function
 
 
@@ -1342,6 +1506,9 @@ Function backButtonExit()
     pauseVideo(false, false)
     m.top.showSignUpModal = true
   else
+    m.UpNextOverlay.setFocus(false)
+    m.Menu.itemSelected = -1
+    fade(m.UpNextOverlay, "outin", 0.75)
     m.top.backButtonPressed = true
   end if
 End Function
@@ -1454,6 +1621,7 @@ Function resetVideoPlayerState(content = invalid)
   m.top.adPosition = 0
 
   m.pauseAdOverlay.opacity = 0
+  m.UpNextOverlay.opacity = 0
   m.ratingOverlay.opacity = 0
   m.showRatings = true
   m.ratingInterval = 0
@@ -2334,6 +2502,20 @@ Function onSeekToChange(msg)
 End Function
 
 
+Function handleStateForLikeDislikeSelected()
+  m.likeDislikeStateEnabled = true
+
+  m.top.trackingComponentInfo = {
+    componentType : "button_component"
+    componentValues : {
+      button_type: "TEXT"
+      button_value: "SIGNUP_TO_SAVE_PROGRESS"
+    }
+  }
+
+End Function
+
+
 Function onRelatedContentUpdated(msg)
   m.Related.content = m.top.relatedContent
   m.Related.updateContent = true
@@ -2368,4 +2550,29 @@ End Function
 
 Function onUserConsentsOptOutStatusChange(msg)
   m.adsLimited.userConsentsOptOutStatus = msg.getData()
+End Function
+
+
+Function onAutoPlayLikeDislikeStateChanged(msg)
+  likeDislikeState = msg.getData()
+  likedislikeActionContentNode = m.LikeDislikeMenuContent
+  for i = 0 to likedislikeActionContentNode.getChildCount() - 1
+    child = m.LikeDislikeMenuContent.getChild(i)
+    if child.id = "LikeMenuItem"
+      if likeDislikeState = m.constants.ui.likeDislikeStates.liked
+        child.HDPosterUrl = "pkg:/images/icon-autoplay-liked.png"
+      else
+        child.HDPosterUrl  = "pkg:/images/icon-autoplay-like.png"
+      end if
+    else if child.id = "DislikeMenuItem"
+      if likeDislikeState = m.constants.ui.likeDislikeStates.disliked
+        child.HDPosterUrl  = "pkg:/images/icon-autoplay-disliked.png"
+      else
+        child.HDPosterUrl  = "pkg:/images/icon-autoplay-dislike.png"
+      end if
+    end if
+  end for
+
+  m.LikeDislikeMenuContent.Update(likedislikeActionContentNode, true)
+
 End Function

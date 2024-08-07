@@ -1213,6 +1213,10 @@ Function getTranslation_en_US()
       "description": "A message informing the user that they entered a date that is not acceptable",
       "message": "Please enter a valid year of birth"
     },
+    "screenPlayer_button_like": {
+      "description": "Label of button to allow users to like the current video title",
+      "message": "I like it"
+    },
     "metadata_fullscreen_countdown_plural": {
       "description": "label to indicate how many seconds it will take before the video player will automatically go fullscreen. This is the plural version but an attempt should be made to ensure the string is neither plural or singular by using a shorten form of seconds.",
       "message": "Fullscreen in {seconds} sec"
@@ -1878,6 +1882,22 @@ Function getTranslation_en_US()
     "privacy_disclaimer": {
       "description": "Privacy disclaimer text displayed in Sign in and registration flow.",
       "message": "By registering or signing in, you agree that you have read and understood Tubi's Privacy Policy and agree to Tubi's Terms of Use. Learn more at {privacy_policy_url} and {terms_of_use_url}"
+    },
+    "screenEndCard_nextUpIn": {
+      "description": "indicator for how many seconds until next video will start playing (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "Next up in"
+    },
+    "screenEndCard_nextUp": {
+      "description": "indicator for how many seconds until next video will start playing (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "Next up"
+    },
+    "screenEndCard_overlay_hint": {
+      "description": "hint text on the upnext overlay ",
+      "message": "What do you think?"
+    },
+    "screenEndCard_overlay_improve_recommendations": {
+      "description": "hint text on the upnext overlay for recommendation",
+      "message": "Improve your recommendations"
     }
   }
 End Function

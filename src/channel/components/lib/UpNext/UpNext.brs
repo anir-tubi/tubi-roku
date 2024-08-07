@@ -38,7 +38,7 @@ Function init()
   m.GridSeries.observeField("itemFocused", "onSeriesItemFocused")
   m.GridSeries.observeField("itemSelected", "onSeriesItemSelected")
 
-  focusBox = m.top.findNode("FocusBox")
+  m.focusBox = m.top.findNode("FocusBox")
   if m.constants.deviceInfo.scaledUi = true then
     focusBoxMargin = 4
   else
@@ -47,15 +47,15 @@ Function init()
 
   theme = getThemeFromGlobal()
   if theme <> invalid
-    focusBox.blendColor = theme.focusedColor
+    m.focusBox.blendColor = theme.focusedColor
     m.GridSeries.focusBitmapBlendColor = theme.focusedColor
     m.CountdownMovie.color = theme.highlightedTextColor
     m.CountdownSeries.color = theme.highlightedTextColor
   end if
 
-  focusBox.width = m.constants.ui.imageSizes.largePoster[0] + focusBoxMargin * 2
-  focusBox.height = m.constants.ui.imageSizes.largePoster[1] + focusBoxMargin * 2
-  focusBox.translation = [- focusBoxMargin, - focusBoxMargin]
+  m.focusBox.width = m.constants.ui.imageSizes.largePoster[0] + focusBoxMargin * 2
+  m.focusBox.height = m.constants.ui.imageSizes.largePoster[1] + focusBoxMargin * 2
+  m.focusBox.translation = [- focusBoxMargin, - focusBoxMargin]
   m.InfoMovie.maxHeight = m.constants.ui.imageSizes.largePoster[1]
 
 
@@ -105,13 +105,15 @@ End Function
 Function onComponentFocus()
   if m.top.hasFocus()
 
+    m.focusBox.visible = true
+
     'If the autoPlay is off, we don't need to show the count down timer.
     if m.top.isAutoPlayOff = false
       m.Timer.unobserveFieldScoped("fire")
       m.Timer.observeFieldScoped("fire", "onCountdownTimer")
     end if
 
-    if m.MovieGroup.visible
+    if m.MovieGroup.visible = true
       m.GridMovie.setFocus(true)
     else if m.SeriesGroup.visible = true
       m.GridSeries.setFocus(true)
@@ -176,6 +178,7 @@ End Function
 Function onKeyEvent(key, press) as Boolean
   tubiLog("UpNext.onKeyEvent")
   ' pass through back presses, but consume all other button presses
+  handled = false
   if press
     if key = "back"
       stopTimer()
@@ -186,13 +189,24 @@ Function onKeyEvent(key, press) as Boolean
       else if m.SeriesGroup.isInFocusChain() = true
         handleSeriesItemSelected(m.GridSeries.itemFocused)
       end if
+      handled = true
+    else if key = "up"
+      if getExperimentResource("roku_like_dislike_on_autoplay", "roku_like_dislike_on_autoplay_v1", false).enabled = true
+        stopTimer()
+        if m.MovieGroup.visible = true
+          m.CountdownMovie.text = getTranslation("screenEndCard_nextUp")
+        else
+          m.CountdownSeries.text = getTranslation("screenEndCard_nextUp")
+        end if
+        m.focusBox.visible = false
+      end if
     end if
   end if
 
   'reset the value so as not to block subsequent valid key press events
   m.top.invalidCommand = ""
 
-  return true
+  return handled
 End Function
 
 
@@ -255,6 +269,9 @@ Function itemFocusedHelper(grid, info)
   if grid.content <> invalid
     content = grid.content.getChild(grid.itemFocused)
     if content <> invalid
+      if m.Timer.control = "stop"
+        m.Timer.control = "start"
+      end if
       updateInfoPanel(info, content)
       m.top.contentFocused = content
       m.top.itemFocused = grid.itemFocused
@@ -293,7 +310,7 @@ Function onCountdownTimer()
   if m.top.isAutoPlayOff = false
     if m.timeRemaining = 0
       m.top.autoplayMode = "automatic"
-      if m.MovieGroup.visible
+      if m.MovieGroup.visible = true
         if m.GridMovie.content <> invalid
           m.top.contentSelected = m.GridMovie.content.getChild(m.GridMovie.itemFocused)
         else
@@ -312,7 +329,7 @@ Function onCountdownTimer()
       end if
       stopTimer()
     else
-      if m.MovieGroup.visible
+      if m.MovieGroup.visible = true
         drawCountdown(m.CountdownMovie, m.timeRemaining)
       else
         drawCountdown(m.CountdownSeries, m.timeRemaining)
@@ -324,7 +341,16 @@ End Function
 
 Function drawCountdown(labelNode, time)
   if m.top.isAutoPlayOff = false
+    if getExperimentResource("roku_like_dislike_on_autoplay", "roku_like_dislike_on_autoplay_v1", false).enabled = true
+      if labelNode.id = m.CountdownSeries.id
+        labelNode.translation = [-597, -21]
+      else
+        labelNode.translation = [-270, -21]
+      end if
+      labelNode.text = getTranslation("screenEndCard_nextUpIn") + stri(time)
+    else
     labelNode.text = getTranslation("screenEndCard_startingIn", {seconds: stri(time)})
+    end if
   end if
 End Function
 
@@ -380,7 +406,7 @@ Function onShow()
 
   ' reset the countdown timer prior to fading in the up next content so that
   ' the timer doesn't flash an old time from the previous time the up next UI was visible.
-  if m.MovieGroup.visible
+  if m.MovieGroup.visible = true
     drawCountdown(m.CountdownMovie, m.timeRemaining)
   else
     drawCountdown(m.CountdownSeries, m.timeRemaining)
