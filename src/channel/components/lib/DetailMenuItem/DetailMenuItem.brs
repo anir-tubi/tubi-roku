@@ -186,7 +186,9 @@ End Function
 Function onItemHasFocus()
   theme = getThemeFromGlobal()
   if theme <> invalid
-    if m.top.itemHasFocus = true
+    if m.top.itemHasFocus = true AND m.top.focusPercent = 1
+      '//Sometimes m.top.itemHasFocus is set to true when it should not: i.e. navigating really qucikly down a menu for some reason confuses the m.top.itemHasFocus setting.
+      '// so verify that focusPercent is set to 1
       m.buttonBG.blendcolor = theme.focusedColor
     else
       m.buttonBG.blendcolor = theme.neutralColor
@@ -202,8 +204,9 @@ Function onGridHasFocus(msg)
   gridHasFocus = msg.getData()
   if m.top.itemContent <> invalid
     '//do not change the menu item's focus UI until the itemContent has been set. this ensures that the look of the 1st item is set properly as the focus to the 1st item can be gained and lost even before the itemContent has been set
-
-    if gridHasFocus = true AND m.top.itemHasFocus = true
+    '//Sometimes m.top.itemHasFocus is set to true when it should not: i.e. navigating really qucikly down a menu for some reason confuses the m.top.itemHasFocus setting.
+    '// so verify that focusPercent is set to 1
+    if gridHasFocus = true AND m.top.itemHasFocus = true AND m.top.focusPercent = 1
       m.DetailsMenuTextFocused.opacity = 1.0
       m.DetailsMenuText.opacity = 0
       m.IconFocused.opacity = 1.0
