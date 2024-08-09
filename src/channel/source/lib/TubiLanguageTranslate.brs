@@ -1983,6 +1983,10 @@ Function getTranslation_es_MX()
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the channels screen.",
       "message": "Canales"
     },
+    "menu_networks": {
+      "description": "Title for a container of channels tiles.",
+      "message": "Canales"
+    },
     "menu_movies": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the movies screen.",
       "message": "Películas"
@@ -2839,6 +2843,10 @@ Function getTranslation_es_MX()
       "description": "A message informing the user that they entered a date that is not acceptable",
       "message": "Por favor, ingresa un año de nacimiento válido"
     },
+    "screenPlayer_button_like": {
+      "description": "Label of button to allow users to like the current video title",
+      "message": "Me gusta"
+    },
     "metadata_fullscreen_countdown_plural": {
       "description": "label to indicate how many seconds it will take before the video player will automatically go fullscreen. This is the plural version but an attempt should be made to ensure the string is neither plural or singular by using a shorten form of seconds.",
       "message": "Pantalla completa en {seconds} s"
@@ -3480,6 +3488,22 @@ Function getTranslation_es_MX()
     "privacy_disclaimer": {
       "description": "Privacy disclaimer text displayed in Sign in and registration flow.",
       "message": "Al regístrarte o inicia sesión, acceptas que has leido y entendido la Politica de Privacidade de Tubi y aceptas los Términos de Uso de Tubi. Obtenga más información en {privacy_policy_url} y {terms_of_use_url}"
+    },
+    "screenEndCard_nextUpIn": {
+      "description": "indicator for how many seconds until next video will start playing (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "Siguiente en"
+    },
+    "screenEndCard_nextUp": {
+      "description": "indicator for how many seconds until next video will start playing (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "Siguiente"
+    },
+    "screenEndCard_overlay_hint": {
+      "description": "hint text on the upnext overlay ",
+      "message": "¿Qué opinas?"
+    },
+    "screenEndCard_overlay_improve_recommendations": {
+      "description": "hint text on the upnext overlay for recommendation",
+      "message": "Mejorar tus recomendaciones"
     }
   }
 End Function
@@ -3562,6 +3586,10 @@ Function getTranslation_fr_CA()
     "menu_channels": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the channels screen.",
       "message": "Chaînes"
+    },
+    "menu_networks": {
+      "description": "Title for a container of channels tiles.",
+      "message": "Réseaux"
     },
     "menu_movies": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the movies screen.",
@@ -4423,6 +4451,10 @@ Function getTranslation_fr_CA()
       "description": "A message informing the user that they entered a date that is not acceptable",
       "message": "Veuillez entrer une année de naissance valide"
     },
+    "screenPlayer_button_like": {
+      "description": "Label of button to allow users to like the current video title",
+      "message": "J'aime ça"
+    },
     "metadata_fullscreen_countdown_plural": {
       "description": "label to indicate how many seconds it will take before the video player will automatically go fullscreen. This is the plural version but an attempt should be made to ensure the string is neither plural or singular by using a shorten form of seconds.",
       "message": "Plein écran dans {seconds} sec"
@@ -5060,6 +5092,22 @@ Function getTranslation_fr_CA()
     "privacy_disclaimer": {
       "description": "Privacy disclaimer text displayed in Sign in and registration flow.",
       "message": "En vous inscrivant ou en vous connectant, vous reconnaissez avoir lu et compris la Politique de confidentialité de Tubi et acceptez les Conditions d'utilisation de Tubi. En savoir plus sur {privacy_policy_url} et {terms_of_use_url}"
+    },
+    "screenEndCard_nextUpIn": {
+      "description": "indicator for how many seconds until next video will start playing (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "Ensuite dans"
+    },
+    "screenEndCard_nextUp": {
+      "description": "indicator for how many seconds until next video will start playing (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "Suivant"
+    },
+    "screenEndCard_overlay_hint": {
+      "description": "hint text on the upnext overlay ",
+      "message": "Qu'en penses-tu?"
+    },
+    "screenEndCard_overlay_improve_recommendations": {
+      "description": "hint text on the upnext overlay for recommendation",
+      "message": "Améliorez vos recommandations"
     }
   }
 End Function
