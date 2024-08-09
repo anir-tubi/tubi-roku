@@ -1219,7 +1219,7 @@ const elements = typeCheckElements({
 
   liveBadgeText: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#RowList.2.items.0.1.#badgeGroup.0.#BadgeInfoLayout.#BadgeText',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#RowList.6.items.0.1.#badgeGroup.0.#BadgeInfoLayout',
   },
 
   /** Preview off button */

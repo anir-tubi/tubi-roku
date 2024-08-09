@@ -29,13 +29,12 @@ describe('Age Gate', function () {
     await selectSignInFromHomeScreen();
 
     // wait for Let's Create Your Account Modal and Continue
-    await utils.sleep(3000); // Roku modal
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await utils.sleep(6000); // Roku modal
+    await ecp.sendKeypress(ecp.Key.Ok, {wait:1000});
 
 
     // Land on Sign In to Your Account page
-    const signInScreenPasswordBox = await testUtils.getNodeForElement('signInScreenPasswordBox');
-    expect(signInScreenPasswordBox.visible).to.be.true;
+    await testUtils.waitForElementToFullyShowOnScreen('signInScreenPasswordBox', 'Sign In screen pw box not found', 20000);
 
     // Create Account
     await ecp.sendKeypress(ecp.Key.Up);
@@ -49,7 +48,7 @@ describe('Age Gate', function () {
     // Send email address
     await ecp.sendText(email);
     await ecp.sendKeypress(ecp.Key.Right);
-    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4, wait: 1000});
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify Age Gate Screen
@@ -74,13 +73,12 @@ describe('Age Gate', function () {
     await selectSignInFromHomeScreen();
 
     // wait for Let's Create Your Account Modal and Continue
-    await utils.sleep(3000); // Roku modal
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await utils.sleep(6000); // Roku modal
+    await ecp.sendKeypress(ecp.Key.Ok, {wait:1000});
 
 
     // Land on Sign In to Your Account page
-    const signInScreenPasswordBox = await testUtils.getNodeForElement('signInScreenPasswordBox');
-    expect(signInScreenPasswordBox.visible).to.be.true;
+    await testUtils.waitForElementToFullyShowOnScreen('signInScreenPasswordBox', 'Sign in screen pw box not found', 10000);
 
     // Create Account
     await ecp.sendKeypress(ecp.Key.Up);

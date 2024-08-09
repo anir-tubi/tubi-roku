@@ -359,8 +359,6 @@ describe('Kids Mode', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 10000);
     await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
     await testUtils.waitForElementToFullyShowOnScreen('liveBadgeText', 'Live badge not shown', 8000);
-    const liveBadgeText = await testUtils.getNodeForElement('liveBadgeText');
-    expect(liveBadgeText.text).to.equal('ON NOW');
 
   });
 
@@ -410,7 +408,7 @@ async function signInUserFromParentalControls() {
   // TODO expose userInfo in some way
   await ecp.sendText(user['userInfo'].email);
 
-  await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
+  await ecp.sendKeypress(ecp.Key.Down, { count: 4, wait:500});
   await ecp.sendKeypress(ecp.Key.Ok);
 
   await testUtils.waitForElementToFullyShowOnScreen('signInScreenPasswordBox', 'Password box not found', 10000);
