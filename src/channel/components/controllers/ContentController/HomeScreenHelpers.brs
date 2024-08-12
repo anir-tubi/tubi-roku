@@ -462,11 +462,15 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
 
     homeScreen.content = rawResponse
     homeScreen.contentUpdated = true
+    homeScreen.personalizationId = rawResponse.personalizationId
 
     ' don't set focus on the home screen if side nav has focus, for example
     if homeScreen.isInFocusChain() = true
       homeScreen.setFocus(true)
     end if
+    
+    m.sendImpressionEventTimer.control = "stop"
+    m.sendImpressionEventTimer.control = "start"
   end if
 End Function
 

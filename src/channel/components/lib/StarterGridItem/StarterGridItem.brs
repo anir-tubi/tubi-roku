@@ -14,6 +14,31 @@ Function init()
     "index"
   ]
 
+  ' Below field will hold the object of roTimeSpan that will be used to calculate how long the item was fully visible for use with viewableImpressionEvents.
+  m.itemVisibleTimespan = invalid
+
+  ' During navigation between screens for ex homescreen to movies the renderTracking change to none happens async with the new screen been loaded.
+  ' Due to which when it fires rendertracking for rowlist item with none value the currentScreen value would have already changed to new screen.
+  ' To avoid any timing issues choosing a safer side of adding a field to individual row node which will hold the id of the screen to which it belongs too.
+  ' Adding a for loop with max as 10 to avoid infinite incase we place the starter grid item outside of categoryGridList
+  ' Doing it in init due to roku orphaning the itemcomponent when it deletes the item from the screen during navigation which causes getparent to be invalid.
+  ' Performance tested the below code it was not adding a additional process time. 
+  m.parentScreenId = ""
+  m.parentScreenTrackingPageInfo = {}
+  m.personalizationId = ""
+  parent = m.top.getParent()
+  for x = 1 to 10
+    if parent.isSubType("CategoryGridList") = true
+      m.parentScreenId = parent.parentScreenId
+      m.parentScreenTrackingPageInfo = parent.parentScreenTrackingPageInfo
+      m.personalizationId = parent.personalizationId
+      ' Only enabling it if we find the parent values.
+      m.top.enableRenderTracking = true
+      m.top.observeFieldScoped("renderTracking", "onRenderTrackingChange")
+      exit for
+    end if
+    parent = parent.getParent()
+  end for
 End Function
 
 
@@ -113,5 +138,57 @@ Function conditionallyObservedFieldCallback(msg)
     tubiLog("m.childGridItem was invalid. Cannot pass along field to child", "warn")
   else
     childGridItem[msg.getField()] = msg.getData()
+  end if
+End Function
+
+
+Function onRenderTrackingChange(msg)
+  state = msg.getData()
+  topRef = m.top
+  content = topRef.itemContent
+
+  ' Checking the item is of type video or series or linear only then we proceed.
+  contentType = content.type
+  if contentType = "series" OR contentType = "video" OR contentType = "linear"
+    ' Minimum visible time in milli seconds.
+    MIN_VISIBLE_THRESHOLD = 1000
+
+    if state = "full"
+      ' Not doing it init of the method to avoid having to create this for items that are not visible yet.
+      ' Since Rowlist creates additional nodes for items that are not visible plus partially visible.
+      m.itemVisibleTimespan = CreateObject("roTimespan")
+    else if state <> "full" AND m.itemVisibleTimespan <> invalid
+      duration = m.itemVisibleTimespan.totalMilliSeconds()
+      row = content.getParent()
+      if duration >= MIN_VISIBLE_THRESHOLD AND row <> invalid AND m.parentScreenId <> invalid
+        itemInfo = {
+          row: topRef.rowIndex + 1
+          col: topRef.index + 1
+          duration: duration
+        }
+
+        if content.type = "series"
+          seriesId = content.id
+          if seriesId.startsWith("0") = true
+            seriesId = mid(seriesId, 2)
+          end if
+          itemInfo.series_id = seriesId
+        else
+          itemInfo.video_id = content.id
+        end if
+
+        trackingInfo = {
+          containerId: row.id
+          itemInfo: itemInfo
+          screenId: m.parentScreenId
+          screenTrackingInfo: m.parentScreenTrackingPageInfo
+          personalizationId: m.personalizationId
+        }
+
+        m.global.viewableImpressionEventInfo = trackingInfo
+        m.itemVisibleTimespan = invalid
+      end if
+      
+    end if
   end if
 End Function

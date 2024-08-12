@@ -851,6 +851,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
     title: ""
     validUntil: 0
     children: []    'categories
+    personalizationId: ""
   }
 
   if contentToTranslate <> invalid
@@ -859,6 +860,8 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
     else
       homescreenAA.validUntil = Uptime(0) + m.constants.cacheTimes.homescreen
     end if
+
+    homescreenAA.personalizationId = contentToTranslate.personalization_id
 
     containers = contentToTranslate.containers
     contents = contentToTranslate.contents

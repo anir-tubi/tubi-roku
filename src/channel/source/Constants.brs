@@ -297,6 +297,7 @@ Function getConstants()
     constants.reqNames.postAnalytics = "postAnalytics"
     constants.reqNames.postBrazeMergeUsers = "postBrazeMergeUsers"
     constants.reqNames.postLogout = "postLogout"
+    constants.reqNames.postViewableImpression = "postViewableImpression"
 
     ' a list of reqnames that the general task will inject auth headers and should expect to handle 403 errors for
     constants.reqNames.acceptsTubiAuth = {}
@@ -626,6 +627,15 @@ Function getConstants()
       end if
 
       constants.urls.analytics.singleEvent = constants.urls.analytics.urlBase + "/v2/single-event" 'preferred by back end team
+    
+    constants.urls.impressionEvents = {}
+      constants.urls.impressionEvents.urlBase = "https://user-signals.staging-public.tubi.io/user-signals"
+      ' QA analytics proxy server
+      if mode = "production"
+        constants.urls.impressionEvents.urlBase = "https://user-signals.production-public.tubi.io/user-signals"
+      end if
+
+      constants.urls.impressionEvents.singleEvent = constants.urls.impressionEvents.urlBase + "/v1/single-event"
 
     'cuepoints url
     constants.urls.cuepointsBaseUrl = "https://ads.adrise.tv/cue-points/"

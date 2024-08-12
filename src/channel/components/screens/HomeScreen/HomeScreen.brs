@@ -97,6 +97,8 @@ Function onIDChange()
   end if
 
   m.top.trackingPageInfo = newTrackingPageInfo
+  m.categoryGridList.parentScreenId = m.top.id
+  m.categoryGridList.parentScreenTrackingPageInfo = newTrackingPageInfo
 End Function
 
 

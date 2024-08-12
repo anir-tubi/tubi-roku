@@ -17,6 +17,7 @@
     <field id="width" alias="poster.width" />
     <field id="height" alias="poster.height" />
     <field id="index" type="integer" />
+    <field id="rowIndex" type="integer" />
     <field id="rowHasFocus" type="boolean" />
   </interface>
 

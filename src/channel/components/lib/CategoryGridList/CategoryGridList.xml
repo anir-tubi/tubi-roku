@@ -91,6 +91,21 @@
       <!-- This field is used to force remove focus from the rowlist. -->
       <field id="removeFocusFromRowList" type="boolean" />
 
+      <!-- parentScreenId will be set with screen id in which the rowlist is displayed. ex homescreen,tvscreen,moviesscreen etc. -->
+      <field id="parentScreenId" type="string" />
+      
+      <!-- 
+        {
+          pageType: "video_page"  'corresponds to one of the page types in tubiTracking_getAnalyticsPage() which mirrors the protos repo
+          pageValues: {}          'an assoc array with key/values that match the pageType as found in tubiTracking_getAnalyticsPage()
+        }
+       -->
+      <field id="parentScreenTrackingPageInfo" type="assocarray" />
+
+      <!-- Contains the value of personalization_id returned from backend home screen api call. -->
+      <field id="personalizationId" type="string" />
+
+
     <!-- OUTPUT -->
       <field id="itemSelected" type="node"/>
 

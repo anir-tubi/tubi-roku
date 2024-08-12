@@ -152,6 +152,8 @@
        <!--Communicates to the parent that some of the containers has expired and to be loaded-->
       <field id="loadCategoryForIds" type="array" alwaysNotify="true"/>
 
+    <!-- DATA STORE (Anything defined below are not meant to be used as output or input fields which will triggered change events. ) -->
+      <field id="personalizationId" type="string" alias="CategoryGridList.personalizationId" />
   </interface>
 
   <children>

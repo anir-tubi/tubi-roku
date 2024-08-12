@@ -650,3 +650,45 @@ Function tubiTracking_getLanguageCode_test()
   m.assertEqual(languageCode, "UNKNOWN")
 
 End Function
+
+
+'@Test createViewableImpressionTrackingReqInfo unit tests
+Function tubiTracking_createViewableImpressionTrackingReqInfo_test()
+  constants = getConstants()
+  body = {
+    platform: "Roku"
+    user_id: "1234"
+  }
+  req = m.Tracking.createViewableImpressionTrackingReqInfo(body)
+  requestBody = ParseJson(req.options.body)
+  m.assertNotInvalid(req)
+  m.assertEqual(req.options.method, "POST")
+  m.assertNotEmpty(req.options.body)
+  m.assertEqual(constants.urls.analytics.viewableImpressionEvent, req.url)
+  m.assertEqual(body.platform, requestBody.platform)
+  m.assertEqual(body.user_id, requestBody.user_id)
+End Function
+
+
+'@Test getViewableImpressionEvent unit tests
+Function tubiTracking_getViewableImpressionEvent_test()
+  constants = getConstants()
+  data = {
+    containers: [
+      {
+        id: "featured"
+        contents: []
+      }
+    ]
+  }
+  eventInfo = m.Tracking.getViewableImpressionEvent(data)
+
+  m.assertEqual(eventInfo.device_id, constants.deviceInfo.deviceId)
+  date = CreateObject("roDateTime")
+  currentDay = date.GetDayOfMonth()
+  date.FromISO8601String(eventInfo.sent_timestamp)
+  m.assertEqual(currentDay, date.GetDayOfMonth())
+  m.assertEqual(eventInfo.platform, constants.analyticsPlatform)
+  m.assertArrayCount(eventInfo.containers, 1)
+  m.assertAAHasKey(eventInfo, "user_id")
+End Function

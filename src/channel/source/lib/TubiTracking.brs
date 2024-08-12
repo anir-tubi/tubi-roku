@@ -7,6 +7,8 @@ Function TubiTracking(constants, request, auth, userConsentsOptOutStatus = {})
     getClientEvent: tubiTracking_getClientEvent
     getUserTrackingRequest: tubiTracking_getUserTrackingRequest
     createUserTrackingReqInfo: tubiTracking_createUserTrackingReqInfo
+    getViewableImpressionEvent: tubiTracking_getViewableImpressionEvent
+    createViewableImpressionTrackingReqInfo: tubiTracking_createViewableImpressionTrackingReqInfo
 
     getAnalyticsRequestIdempotency: tubiTracking_getAnalyticsRequestIdempotency
     getAnalyticsTimestamp: tubiTracking_getAnalyticsTimestamp
@@ -30,6 +32,7 @@ Function TubiTracking(constants, request, auth, userConsentsOptOutStatus = {})
     isNumeric: tubiTracking_isNumeric
     isString: tubiTracking_isString
     getHomePageContentModeMap: tubiTracking_getHomePageContentModeMap
+    processRepeatedProperty: tubiTracking_processRepeatedProperty
 
     ' an AA structure of the valid "Oneofs" that are needed in various protos messages
     allOneofs: tubiTracking_getOneOfs()
@@ -45,6 +48,9 @@ Function TubiTracking(constants, request, auth, userConsentsOptOutStatus = {})
 
     ' Holds an assoc array indicating whether user has opted out of individual consent like analytics, marketing, etc.
     userConsentsOptOutStatus: userConsentsOptOutStatus
+
+    ' an AA structure of the valid "repeated" that are needed in various protos messages
+    allRepeated: tubiTracking_getRepeated()
   }
 End Function
 
@@ -84,6 +90,9 @@ Function TubiTrackingInfo(constants)
 
     ' an AA map of Menu items in the details screen to their corresponding enum values for the LeftSideNavComponent Section
     detailScreenMenuItemMap: tubiTracking_getDetailScreenMenuPageMap(constants)
+
+    ' an AA structure of the valid "repeated" that are needed in various protos messages
+    allRepeated: tubiTracking_getRepeated()
   }
 End Function
 
@@ -520,11 +529,6 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       experiment: {} 'Experiment
     }
 
-    viewable_impression: {   'TODO: not part of V1
-      impression_type: {} 'ViewableImpressionType
-      contents: {}  'TODO: Figure out what this looks like
-    }
-
     request_for_info: {
       request_for_info_action: "" 'RequestForInfoAction enum
       prompt: "" 'optional, describes the question being asked
@@ -738,6 +742,11 @@ Function tubiTracking_populateMessage(messageType, messageValues, messageBase)
                 messageFields.addReplace(key, messageValues[prop][key])
               end if
             end for
+          end if
+        else if m.allRepeated[prop] <> invalid
+          if type(messageValues[prop]) = "roArray"
+            processedValue = m.processRepeatedProperty(prop, messageValues[prop])
+            messageFields.addReplace(prop, processedValue)  
           end if
         else
           messageFields.addReplace(prop, messageValues.Lookup(prop))
@@ -1203,4 +1212,79 @@ End Function
 ' @consetKey: string, contains the consent key returned from backend.
 Function tubiTracking_getConsentAnalyticValue(consentKey)
   return UCase(consentKey)
+End Function
+
+
+' Returns an AA with all the various valid choices where "repeated" is required by protos
+' This should be kept updated as protos updates
+Function tubiTracking_getRepeated()
+  container = {
+    id: ""
+    contents: [] ' Repeated property of type content_title
+  }
+
+  content_tile = {
+    series_id: -1
+    video_id: -1
+    row: -1
+    col: -1
+    duration: 0
+  }
+
+  return {
+    containers: container
+    contents: content_tile
+  }
+End Function
+
+
+Function tubiTracking_processRepeatedProperty(prop, list)
+  repeatedValues = []
+
+  for each values in list
+    item = m.populateMessage(prop, values, m.allRepeated[prop])
+    if item <> invalid
+      repeatedValues.push(item[prop])
+    end if
+  end for
+
+  return repeatedValues
+End Function
+
+
+Function tubiTracking_getViewableImpressionEvent(eventValues) as Object
+  eventBase = {
+    containers: [] ' Repeated property of type container.
+    personalization_id: ""
+    pageOneof: {} 'current screen
+  }
+  eventInfo = m.populateMessage("viewable_impression", eventValues, eventBase)
+  user = m.getAnalyticsUser()
+  impressionEvent = {
+    device_id: m.constants.deviceInfo.deviceId
+    sent_timestamp: m.getAnalyticsTimestamp()
+    platform: m.constants.analyticsPlatform
+    user_id: user.user_id
+  }
+  
+  ' Appending the event data.
+  impressionEvent.append(eventInfo.viewable_impression)
+
+  return impressionEvent
+End Function
+
+
+' @trackData: assocArray, object returned from m.getViewableImpressionEvent()
+Function tubiTracking_createViewableImpressionTrackingReqInfo(trackData)
+  options = {
+    method: m.constants.reqTypes.post
+    body: FormatJson(trackData)
+  }
+
+  reqInfo = {
+    url: m.constants.urls.impressionEvents.singleEvent
+    options: options
+  }
+
+  return reqInfo
 End Function

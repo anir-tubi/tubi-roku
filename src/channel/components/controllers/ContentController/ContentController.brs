@@ -238,6 +238,34 @@ Function init()
   ' Since One trust sdk access m.global.OTsdk within it's codebase we need to update the m.global.OTsdk to have the sdk instance.
   ' The reason why we are also storing it's reference in m scope for better performance since we access the sdk instance a lot of items during the app session.
   m.oneTrust = invalid
+
+  ' Format of data that should be set on viewableImpressionEventInfo
+  ' {
+  '   containerId: "" Contains the id of the row where the tile was displayed. ex: comedy etc.
+  '   itemInfo: {
+  '     row: 1 - Vertical position within a container, 1-based index
+  '     col: 1 - Horizontal position within a container, 1-based index
+  '     duration: 2000 - Total duration the tile was visible in milliseconds
+  '   }
+  '   screenId: "" - Contains id of the screen where the tile is displayed.
+  '   screenTrackingInfo: Format: { pageType: "home_page", pageValues: {} }
+  '   personalizationId: ""
+  m.global.addField("viewableImpressionEventInfo", "assocarray", false)
+  m.global.observeFieldScoped("viewableImpressionEventInfo", "onViewableImpressionEventInfoChange")
+
+  ' Holds information related to queued viewable impression event info.
+  ' Holds information related to all the program tiles that have been displayed to user and is in viewable area for more than 1 sec.
+  m.viewableImpressionEvents = {
+    containers: {} ' Contains a mapping of different tile with container id as a key. Each item inside the container will hold value matching format mentioned in the field m.global.viewableImpressionEventInfo above.
+    pageOneof: invalid ' Contains value returned from getAnalyticsPage for the screen where tile is displayed . ex: {"home_page": {"content_mode": "CONTENT_MODE_MOVIE"}}
+    personalizationId: "" ' Contains the value of personalization_id returned from backend home screen api call.
+    screenId: "" ' Contains id of screen where the tile is visible. Possible values are from constants.ui.screenIds
+  }
+
+  m.sendImpressionEventTimer = CreateObject("roSGNode", "Timer")
+  m.sendImpressionEventTimer.duration = 10
+  m.sendImpressionEventTimer.repeat = true
+  m.sendImpressionEventTimer.observeFieldScoped("fire", "sendImpressionEvent")
 End Function
 
 
@@ -1850,6 +1878,9 @@ Function onCustomSuspend(msg)
   tubiLog("ContentController.onCustomSuspend")
   customSuspendArgs = msg.getData()
 
+  ' Firing any viewable impression if present in queue.
+  sendImpressionEvent()
+
   ' Setting to false as a safety in case we have missed a spot where we needed to reset to false.
   ' This way they just have to background the app instead of totally restarting it to get video playing again.
   m.isVideoPlayerStopping = false
@@ -2907,4 +2938,80 @@ End Function
 
 Function onSeriesRelaunchError(_error)
   startChannel()
+End Function
+
+
+Function onViewableImpressionEventInfoChange(msg)
+  ' During navigation between pages onScreenChange get triggered well in advance before the rowlist items render tracking becomes none.
+  ' We are checking in this if the screen is different from what is stored in m.viewableImpressionEvents then we fire the events.
+  ' The sequence of events are when navigating between home to movies. Home Screen items tracking info becomes none for all items and then the movies screen becomes full.
+  data = msg.getData()
+  
+  if data.screenId <> m.viewableImpressionEvents.screenId AND m.viewableImpressionEvents.screenId <> invalid
+    ' After sending the events the m.viewableImpressionEvents will be reset.
+    sendImpressionEvent()
+  end if
+  
+  ' Using screenId check because screenId is only available if the tile is displayed in HomeScreen.
+  ' We cannot use screen.isSubtype("HomeScreen") because when the user navigates from homescreen to detailscreen,
+  ' we will get some events of homescreen tiles hidden after the current screen changes to details screen.
+  if isNonEmptyString(data.screenId) = true
+    containerId = data.containerId
+    containers = m.viewableImpressionEvents.containers
+
+    ' Checking if this the first tile for a particular row and then creating a entry in the map.
+    if containers[containerId] = invalid
+      containers[containerId] = {
+        id: containerId
+        contents: []
+      }
+    end if
+
+    containers[containerId].contents.push(data.itemInfo)
+
+    m.viewableImpressionEvents.containers = containers
+
+    if isNonEmptyString(m.viewableImpressionEvents.screenId) = false
+      trackingPageInfo = data.screenTrackingInfo
+      m.viewableImpressionEvents.pageOneof = m.Tracking.getAnalyticsPage(trackingPageInfo.pageType, trackingPageInfo.pageValues)
+      m.viewableImpressionEvents.personalizationId = data.personalizationId
+      m.viewableImpressionEvents.screenId = data.screenId
+    end if
+  end if
+End Function
+
+
+Function sendImpressionEvent()
+  if m.viewableImpressionEvents <> invalid
+    if m.viewableImpressionEvents.containers <> invalid AND m.viewableImpressionEvents.containers.count() > 0
+      containers = []
+      items = m.viewableImpressionEvents.containers.Items()
+      for each item in items
+        containers.push(item.value)
+      end for
+
+      eventValues = {
+        pageOneOf: m.viewableImpressionEvents.pageOneof
+        containers: containers
+        personalization_id: m.viewableImpressionEvents.personalizationId
+      }
+
+      trackData = m.Tracking.getViewableImpressionEvent(eventValues)      
+      requestInfo = m.Tracking.createViewableImpressionTrackingReqInfo(trackData)
+      
+      m.makeRequest({
+        url: requestInfo.url
+        requestType: m.constants.reqNames.postViewableImpression
+        options: requestInfo.options
+        silenceCallbackWarnings: true
+      })
+    end if
+  end if
+
+  m.viewableImpressionEvents = {
+    containers: {}
+    pageOneof: invalid
+    personalizationId: ""
+    screenId: ""
+  }
 End Function
