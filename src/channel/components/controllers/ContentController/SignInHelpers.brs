@@ -794,7 +794,11 @@ Function onSignOutCompleted()
     }
   }
 
+  saveLocalServerPresistantData([{
+    "isVideoPreviewOn": true
+  }])
   getConsentAfterSignOut()
+  getServerPersistentData()
 End Function
 
 
