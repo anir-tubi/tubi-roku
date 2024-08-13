@@ -279,6 +279,8 @@ Function onScreenFocusChange()
         '// upon the right panel gaining focus - just as it is done for the left panel in this function.
         m.CategoryMenuPanel.nextPanel.checkOnRefreshed = true
       end if
+      ' Resetting the previous screens background if any present.
+      m.top.backgroundUriList = []
     end if
 
   else if m.top.isInFocusChain() = false
