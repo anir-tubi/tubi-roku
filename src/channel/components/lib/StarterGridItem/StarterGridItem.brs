@@ -28,6 +28,12 @@ Function init()
   m.personalizationId = ""
   parent = m.top.getParent()
   for x = 1 to 10
+    ' If at any point of view due to any reason parent is invalid and then exiting the for loop.
+    ' parent can be invalid if the starterGridItem is used outside of rowlist.
+    if parent = invalid
+      exit for
+    end if
+
     if parent.isSubType("CategoryGridList") = true
       m.parentScreenId = parent.parentScreenId
       m.parentScreenTrackingPageInfo = parent.parentScreenTrackingPageInfo
