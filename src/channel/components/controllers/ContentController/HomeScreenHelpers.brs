@@ -862,7 +862,16 @@ Function onHomescreenContentReady(msg)
     currentScreen = getCurrentScreen()
 
     if currentScreen <> invalid AND currentScreen.isSubType("HomeScreen") = true
-      screenTrackingLoad(homeScreen.trackingPageInfo, loadTime)
+      trackingPageInfo = homeScreen.trackingPageInfo
+      pageValues = trackingPageInfo.pageValues
+
+      ' pageValues will always be a valid aa, just adding a check for additional safety.
+      if pageValues <> invalid AND isNonEmptyString(homeScreen.personalizationId) = true
+        pageValues.personalization_id = homeScreen.personalizationId
+      end if
+      trackingPageInfo.pageValues = pageValues
+    
+      screenTrackingLoad(trackingPageInfo, loadTime)
 
       'show registration welcome Screen only to new user over homescreen.
       'we need to check if user already signed up in detail Screen if they have entered through deeplink.

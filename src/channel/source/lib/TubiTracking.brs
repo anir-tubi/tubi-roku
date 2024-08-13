@@ -799,6 +799,7 @@ Function tubiTracking_getOneOfs()
 
   home_page = {
     content_mode: "CONTENT_MODE_UNKNOWN" 'filler because empty fields are removed
+    personalization_id: ""
   }
 
   for_you_page = {
