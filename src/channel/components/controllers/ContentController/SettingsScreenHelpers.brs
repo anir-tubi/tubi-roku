@@ -10,6 +10,8 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0)
   m.settingsScreen.isAllowedToManageConsent = isUserAllowedToManageConsent()
   m.settingsScreen.consentSettings = m.consentSettings
 
+  m.pubSub.subscribe("pub_serverPersistentData.isVideoPreviewOn", m.settingsScreen, "isVideoPreviewOn")
+
   ' This observer must be set before setSettingsScreenSignInInfo is called to trigger initial field change
   m.settingsScreen.observeFieldScoped("fetchUserSettings", "onFetchUserSettingsChanged")
   setSettingsScreenSignInInfo()
