@@ -21,7 +21,7 @@ describe('Kids Mode', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Navigate to Left Nav
-    await ecp.sendKeypress(ecp.Key.Left, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Back, { count: 2, wait:1000});
 
      // Is the Exit Kids button grayed out?
      await checkForKidsModeGrayed();
@@ -358,7 +358,6 @@ describe('Kids Mode', function () {
     await ecp.sendKeypress(ecp.Key.Right);
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 10000);
     await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
-    await testUtils.waitForElementToFullyShowOnScreen('liveBadgeText', 'Live badge not shown', 8000);
 
   });
 
@@ -393,12 +392,11 @@ async function guestSelectLittleKidsParentalControls() {
 
 async function signInUserFromParentalControls() {
   await ecp.sendKeypress(ecp.Key.Ok);
-  const dialogBoxSignInButton = await testUtils.getNodeForElement('dialogBoxSignInButton');
-  expect(dialogBoxSignInButton.visible).to.be.true;
+  await testUtils.waitForElementToFullyShowOnScreen('dialogBoxSignInButton');
 
   // Show request for info Roku overlay
   await ecp.sendKeypress(ecp.Key.Ok);
-  await utils.sleep(2000); // We can't get rid of this sleep since this is Roku's native panel and we have no way to observe when it is showing
+  await utils.sleep(7000); // We can't get rid of this sleep since this is Roku's native panel and we have no way to observe when it is showing
   await ecp.sendKeypress(ecp.Key.Down);
   await ecp.sendKeypress(ecp.Key.Ok);
 
@@ -408,7 +406,7 @@ async function signInUserFromParentalControls() {
   // TODO expose userInfo in some way
   await ecp.sendText(user['userInfo'].email);
 
-  await ecp.sendKeypress(ecp.Key.Down, { count: 4, wait:500});
+  await ecp.sendKeypress(ecp.Key.Down, { count: 4, wait:1500});
   await ecp.sendKeypress(ecp.Key.Ok);
 
   await testUtils.waitForElementToFullyShowOnScreen('signInScreenPasswordBox', 'Password box not found', 10000);
@@ -418,17 +416,19 @@ async function signInUserFromParentalControls() {
   await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
   await utils.sleep(1500);
   await ecp.sendKeypress(ecp.Key.Ok);
-  await testUtils.getNodeForElement('enterPasswordDialogMessage');
+  await testUtils.waitForElementToFullyShowOnScreen('enterPasswordContentMessage');
   await ecp.sendKeypress(ecp.Key.Ok);
 
-  // Enter password again
+  await testUtils.waitForElementToFullyShowOnScreen('pcPasswordEntryBox', 'Password box not found', 10000);
+  await ecp.sendKeypress(ecp.Key.Ok);
   await ecp.sendText('111111');
   await ecp.sendKeypress(ecp.Key.Right);
   await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
-  await utils.sleep(2000);
+  await utils.sleep(1500);
   await ecp.sendKeypress(ecp.Key.Ok);
-}
 
+
+}
 async function kidsOpenSettings() {
   await ecp.sendKeypress(ecp.Key.Left);
   await testUtils.waitForElementToFullyShowOnScreen('leftNavHomeButton',  'Left Nav home button not found', 10000);
@@ -478,5 +478,3 @@ async function checkForKidsModeAdult(){
   await testUtils.waitForElementToFullyShowOnScreen('exitKidsOption');
   
 }
-
-

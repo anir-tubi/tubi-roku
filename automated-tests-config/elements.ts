@@ -195,6 +195,12 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.0.#password',
   },
 
+   /** Password Entry Box */
+   pcPasswordEntryBox: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.#contentGroup.#password.#rectBG',
+  },
+
   /** Dialog box text for PC Settings Change for Older Kids */
   parentalControlsSettingsOlderKids: {
     keyPath:
@@ -1147,6 +1153,11 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#390640d.#DialogBox.#ContentArea.#Title',
   },
 
+  /** Enter your password meesage on dialog box */
+  enterPasswordContentMessage: {
+    keyPath: '#ContentController.#390640d.#DialogBox.#ContentArea.#MessageGroup.#Message',
+  },
+
   /** Password screen keyboard */
   passwordKeyboard: {
     keyPath:
@@ -1284,7 +1295,7 @@ const elements = typeCheckElements({
   /** age gate invalid age */
   ageGateInvalidAge: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.3.#AgeErrorPrompt',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.#AgeErrorPrompt',
   },
 
   /** Cannot exit kids mode modal */
@@ -1762,7 +1773,7 @@ const elements = typeCheckElements({
   /** age gate number page */
   ageVerificationPad: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.3.#AgeVerificationNumberPadGroup.#AgeVerificationNumberPad.#keyboard.0',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.#AgeVerificationNumberPadGroup.#AgeVerificationNumberPad.#keyboard.0',
   },
 
   /** Autoplay Title */

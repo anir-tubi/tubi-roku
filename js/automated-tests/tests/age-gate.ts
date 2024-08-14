@@ -29,18 +29,11 @@ describe('Age Gate', function () {
     await selectSignInFromHomeScreen();
 
     // wait for Let's Create Your Account Modal and Continue
-    await utils.sleep(6000); // Roku modal
+    await utils.sleep(7000); // Roku modal
+    await ecp.sendKeypress(ecp.Key.Down, {wait:1000});
     await ecp.sendKeypress(ecp.Key.Ok, {wait:1000});
-
-
-    // Land on Sign In to Your Account page
-    await testUtils.waitForElementToFullyShowOnScreen('signInScreenPasswordBox', 'Sign In screen pw box not found', 20000);
-
-    // Create Account
-    await ecp.sendKeypress(ecp.Key.Up);
     await ecp.sendKeypress(ecp.Key.Ok);
-    const emailAddressBox = testUtils.getNodeForElement('emailAddressBox');
-    expect(emailAddressBox).to.exist;
+    await testUtils.waitForElementToFullyShowOnScreen('emailAddressBox');
 
     // Now we need to make our user with not registered with Tubi
     const email = `build_roku_${Math.floor(Date.now() / 1000)}@tubi.tv`;
@@ -53,14 +46,13 @@ describe('Age Gate', function () {
 
     // Verify Age Gate Screen
     await testUtils.waitForElementToFullyShowOnScreen('ageVerificationPad', 'age verification keypad not found', 10000);
-    await yearsVerificationEntry();
 
     // Enter invalid Age >  125
     await ecp.sendText('126');
 
     // Verify error message
-    const ageGateInvalidAge = await testUtils.getNodeForElement('ageGateInvalidAge');
-    expect(ageGateInvalidAge.visible).to.equal(true);
+    await testUtils.waitForElementToFullyShowOnScreen('ageGateInvalidAge');
+    
 
   });
 
@@ -73,18 +65,12 @@ describe('Age Gate', function () {
     await selectSignInFromHomeScreen();
 
     // wait for Let's Create Your Account Modal and Continue
-    await utils.sleep(6000); // Roku modal
+    await utils.sleep(7000); // Roku modal
+    await ecp.sendKeypress(ecp.Key.Down, {wait:1000});
     await ecp.sendKeypress(ecp.Key.Ok, {wait:1000});
 
-
-    // Land on Sign In to Your Account page
-    await testUtils.waitForElementToFullyShowOnScreen('signInScreenPasswordBox', 'Sign in screen pw box not found', 10000);
-
     // Create Account
-    await ecp.sendKeypress(ecp.Key.Up);
-    await ecp.sendKeypress(ecp.Key.Ok);
-    const emailAddressBox = testUtils.getNodeForElement('emailAddressBox');
-    expect(emailAddressBox).to.exist;
+    const emailAddressBox = testUtils.waitForElementToFullyShowOnScreen('emailAddressBox');
 
     // Now we need to make our user with not registered with Tubi
     const email = `build_roku_${Math.floor(Date.now() / 1000)}@tubi.tv`;
@@ -96,16 +82,13 @@ describe('Age Gate', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify Age Gate Screen
-    await yearsVerificationEntry();
+    await testUtils.waitForElementToFullyShowOnScreen('ageVerificationPad', 'age verification keypad not found', 10000);
 
-    // Enter invalid Age of 0
-    await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
-    await ecp.sendKeypress(ecp.Key.Ok);
+    // Enter invalid Age >  125
+    await ecp.sendText('0');
 
     // Verify error message
-    const ageGateInvalidAge = await testUtils.getNodeForElement('ageGateInvalidAge');
-    expect(ageGateInvalidAge.visible).to.equal(true);
-
+    await testUtils.waitForElementToFullyShowOnScreen('ageGateInvalidAge');
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/242820

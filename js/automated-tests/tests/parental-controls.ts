@@ -468,7 +468,7 @@ describe('Parental Controls', function () {
       await enterPasswordSettingsChange();
 
       // Verify Little Kids PC Settings Change dialog
-      const parentalControlsSettingsLittleKids = await testUtils.getNodeForElement('parentalControlsSettingsLittleKids');
+      const parentalControlsSettingsLittleKids = await testUtils.getNodeForElement('parentalControlsSettingsLittleKids', 8000);
       expect(parentalControlsSettingsLittleKids.text).to.equal('Parental controls setting has changed to Little Kids. Parental controls will be password protected after 5 minutes.');
       await ecp.sendKeypress(ecp.Key.Ok);
 
