@@ -82,7 +82,6 @@ When asked to set up a dev password, use "1234" so it's easier for any developer
 export ROKU_DEV_TARGET="<your-roku-ip>""
 export DEV_PASSWORD="<dev password set up on Roku device>"
 export PKG_PASSWORD="<password from the GENKEY utility used for signing packages>"
-export CDN_GIT_DIRECTORY="<path to the adrise_cdn repo directory ex: ~/dev/adrise_cdn>"
 export RCDN_GIT_DIRECTORY="<path to the rcdn repo directory ex: ~/dev/rcdn>"
 export GITHUB_PAT="<github personal access token>"
 export ROKU_DEV_TELNET="sametab" (optional)
@@ -316,13 +315,13 @@ TBD
 
     __Note:__ As an edge case, if you need to manually perform the release steps for the new build, follow the [Manual Submission Release Steps](https://github.com/adRise/project-total-recall/docs/manual_release.md#submission-release)
 
-10\. Inform the team that the PRs are ready for review (you can paste the urls that were added to the clipboard when the last step completed, into the `#roku_dev slack channel`. The PR URLs can also be found on the project-total-recall, adrise_cdn and rcdn repos respectively), and wait for approval.
+10\. Inform the team that the PRs are ready for review (you can paste the urls that were added to the clipboard when the last step completed, into the `#roku_dev slack channel`. The PR URLs can also be found on the project-total-recall and rcdn repos respectively), and wait for approval.
 
-11\. Merge the new PR in the adrise_cdn repo and rcdn repo. Also merge the release_x_y_z PR into the x_y_branch branch. Once merged, delete both of these branches.
+11\. Merge the new PR in the rcdn repo. Also merge the release_x_y_z PR into the x_y_branch branch in project_total_recall. Once merged, delete both of these branches.
 
 12\. check if you need to run multifactor authentication for AWS. Typically this means running `$ valet`. Refer to the [valet repo](https://github.com/adRise/valet#installation) on how to install the valet command.
 
-- __DO NOT PROCEED TO THE FOLLOWING INFRA SCRIPT STEP UNTIL THE PR FOR THE adRise_cdn REPO, rcdn REPO AND THE PR FOR THE project-total-recall REPO ARE APPROVED AND MERGED.__
+- __DO NOT PROCEED TO THE FOLLOWING INFRA SCRIPT STEP UNTIL THE PR FOR THE rcdn REPO AND THE PR FOR THE project-total-recall REPO ARE APPROVED AND MERGED.__
 
 13\. Use an infra script to move the updates from the CDN repo to the actual CDN servers.
 
@@ -447,11 +446,11 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
   __Note:__ As an edge case, if you need to manually perform the release steps for the new build, follow the [Manual Remote Release Steps](https://github.com/adRise/project-total-recall/docs/manual_release.md#remote-release)
 
-10\. Inform the team that the PRs are ready for review (you can paste the urls that were added to the clipboard when the last step completed, into the `#rokudev slack channel`. The PR URLs can also be found on the project-total-recall and adrise_cdn repos respectively), and wait for approval.
+10\. Inform the team that the PRs are ready for review (you can paste the urls that were added to the clipboard when the last step completed, into the `#rokudev slack channel`. The PR URLs can also be found on the project-total-recall and rcdn repos respectively), and wait for approval.
 
-11\. Merge the new PRs in the adrise_cdn repo and rcdn repo. Also merge the release_x_y_z PR into the x_y_branch branch. Once merged, delete both of these branches.
+11\. Merge the new PR in the rcdn repo. Also merge the release_x_y_z PR into the x_y_branch branch in project_total_recall. Once merged, delete both of these branches.
 
-12\. check if you need to run multifactor authentication for AWS. Typically this means running `$ valet`. You ran this in a previous step, but some time may has passed and you may have to run it again. Refer to the [valet repo](https://github.com/adRise/valet#installation) on how to install the valet command.
+12\. Check if you need to run multifactor authentication for AWS. Typically this means running `$ valet`. You ran this in a previous step, but some time may has passed and you may have to run it again. Refer to the [valet repo](https://github.com/adRise/valet#installation) on how to install the valet command.
 
 - __DO NOT PROCEED TO THE FOLLOWING INFRA SCRIPT STEP UNTIL THIS PR AND THE PREVIOUS PRs ARE APPROVED__
 
@@ -466,7 +465,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
 - Connect to the company VPN (Tailscale) or else you will not be able to run the following Infra Script successfully.
 
-- Deploy to the Roku CDN and CDN by running the Infra Script which is detailed in the [RCDN README file](https://github.com/adRise/rcdn#readme).
+- Deploy to the Roku CDN by running the Infra Script which is detailed in the [RCDN README file](https://github.com/adRise/rcdn#readme).
 
 - If you encounter an SSH error (`SSH agent does not have your private key loaded`) while running the infra script, run the following command:
 
@@ -784,6 +783,41 @@ BRIGHTSCRIPT: WARNING: unused variable 'port' in function 'processmessage' in pk
 ```
 
 When you see these go ahead and either remove the variable or add a leading underscore to silence them to avoid clogging up the debug console.
+
+# Rollback A Release
+```text
+Limitation: CAN NOT ROLLBACK TO THE VERSION BEFORE SUBMISSION BUILD.
+Please note that rollback should happen only after proper approval from leadership.
+Important: Please note that after rollback, release branch `x_y_branch` will not reflect what is in production until subsequent remote release.
+```
+In a situation where the currently released version needs to be rolled back to the previous version, follow the steps:
+
+  1. cd "<path to the rcdn repo directory ex: ~/dev/rcdn>" and checkout latest master
+  ```shell
+      cd $RCDN_GIT_DIRECTORY
+      git checkout master
+      git pull origin master
+  ```
+
+  4. Create and checkout rollback branch `rollback_to_version_x_y_z` (where where x is the Major Release number, where y is the Minor Release number, and where "z" is the patch number. eg: git branch rollback_to_version_3_3_42)
+  ```shell
+    git branch rollback_to_version_x_y_z
+    git checkout rollback_to_version_x_y_z
+  ```
+  6. Locate the backup starter-component file in the `rollbackStarterComponents` directory by finding the child directory name with the version to be rolled back to, and copy the starter components file within the child directory to the `starterComponents` directory.
+  ```shell
+  cp $RCDN_GIT_DIRECTORY/rollbackStarterComponents/x_y_z_0/tubi_starter_components_x_y.pkg $RCDN_GIT_DIRECTORY/starter-components
+  ```
+  7. Commit the change with commit message 'Rollback to Version x_y_z' and push the branch.
+
+  8. Create the PR against the master
+  9. Request for review in `#rokudev slack channel`.
+
+  10. After the PR has been APPROVED, merge the PR.
+  11. Follow the regular release deployment procress:
+
+  - Deploy to the Roku CDN by running the Infra Script which is detailed in the [RCDN README file](https://github.com/adRise/rcdn#readme)..
+
 
 # Contributing
 
