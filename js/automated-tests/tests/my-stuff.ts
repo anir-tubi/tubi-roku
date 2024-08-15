@@ -678,8 +678,7 @@ describe('MyStuff', function () {
          expect(myListPosterContent.id).is.equal('poster');
 
          // Navigate to Details page of title and check Resume button and title
-         await ecp.sendKeypress(ecp.Key.Ok);
-         await testUtils.waitForElementToFullyShowOnScreen('resumePlayingButton');
+         await testUtils.waitForElementToFullyShowOnScreen('resumePlayingButton','Resume button not found', 5000);
          const correctTitle = await testUtils.getNodeForElement('titleMovieDetailsTitle');
          expect(correctTitle.text).to.equal('Zapped');
 

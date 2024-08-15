@@ -251,7 +251,7 @@ async function verifySaveProgressExitPrompt() {
 async function triggerSaveProgressExitPromp() {
     await ecp.sendKeypress(ecp.Key.Forward, {count: 2});
     await ecp.sleep(6000);
-    await ecp.sendKeypress(ecp.Key.Play);
+    await ecp.sendKeypress(ecp.Key.Play, {wait: 2000});
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
     await ecp.sendKeypress(ecp.Key.Back);
 }

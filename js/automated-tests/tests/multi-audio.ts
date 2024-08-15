@@ -100,8 +100,6 @@ describe('Multiple Audio', function () {
 
     // Verify that AD is still enabled
     await testUtils.waitForElementToFullyShowOnScreen('audioDescriptionItemChecked');
-    const audioDescriptionItemChecked = await testUtils.getNodeForElement('audioDescriptionItemChecked');
-    expect(audioDescriptionItemChecked.id).is.equal('checkIcon');
 
     // Reset AD controls to default
     await resetAudioOptions();

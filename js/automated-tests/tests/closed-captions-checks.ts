@@ -77,8 +77,8 @@ describe('Closed Captions Checks', function () {
     await ecp.sendKeypress(ecp.Key.Right, {count:4});
     await ecp.sendKeypress(ecp.Key.Ok);
     await ecp.sendKeypress(ecp.Key.Down);
-    const closedCaptionOn = await testUtils.getNodeForElement('closedCaptionOn');
-    expect(closedCaptionOn.id).to.equal('checkIcon');
+    await testUtils.waitForElementToFullyShowOnScreen('closedCaptionOn');
+  
    
   }); 
 

@@ -127,7 +127,7 @@ describe('Details Page', function () {
       await testUtils.selectAndVerifyDetailPageMenuItem('playFromBeginning');
 
       // await testUtils.selectAndVerifyDetailPageMenuItem('play');  Need an update from Brian here
-      await testUtils.expectPlayerStateToEventuallyEqual('play', 5000);
+      await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing',5000);
 
       // Verify Movie title playback starts from beginning
       const position = await testUtils.getPlayerPosition();

@@ -346,7 +346,6 @@ describe('Browse While Watching', function () {
         await ecp.sendKeypress(ecp.Key.Ok);
         await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 10000);
         await utils.sleep(2000);
-        const resumeposition = await testUtils.getPlayerPosition();
 
         // Check that title resumes from history
 

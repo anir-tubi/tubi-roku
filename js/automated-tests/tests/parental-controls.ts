@@ -436,7 +436,7 @@ describe('Parental Controls', function () {
 
       // Send adult title text
       await testUtils.waitForElementToFullyShowOnScreen('searchGrid');
-      await ecp.sendText('the stepdaughter');
+      await ecp.sendText('viewer discrection advised');
       await testUtils.waitForElementToFullyShowOnScreen('noResultsMessage');
 
       // Verify no result for Older Kids level
@@ -477,7 +477,7 @@ describe('Parental Controls', function () {
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
       // Jump to CW row
-      await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Continue Watching');
+      await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Continue Watching', 5000);
 
 
     // To Do : revisit once back end issue is addressed.
