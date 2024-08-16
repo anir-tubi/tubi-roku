@@ -1143,7 +1143,7 @@ Function getTranslation_en_US()
     },
     "screenDetails_button_notForMe": {
       "description": "Label of button to allow users to ignore the current video title",
-      "message": "Not for Me"
+      "message": "Not for me"
     },
     "screenDetails_button_likeDislike": {
       "description": "Label of unfocused button to allow users to like or dislike the current video title",
@@ -1893,7 +1893,7 @@ Function getTranslation_en_US()
     },
     "screenEndCard_overlay_hint": {
       "description": "hint text on the upnext overlay ",
-      "message": "What do you think?"
+      "message": "What did you think?"
     },
     "screenEndCard_overlay_improve_recommendations": {
       "description": "hint text on the upnext overlay for recommendation",
