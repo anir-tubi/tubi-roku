@@ -998,7 +998,12 @@ Function onVideoPositionChange(msg)
 
         if UCase(m.constants.deviceInfo.countryCode) = "US" AND m.top.appMode <> "KIDS_MODE" AND getExperimentResource("roku_like_dislike_on_autoplay", "roku_like_dislike_on_autoplay_v1").enabled = true
           fade(m.UpNextOverlay, "in", 1.0)
-          m.upNextOverlayTitle.text = content.title
+          title = content.title
+          if content.parentType = m.constants.ui.contentTypes.series
+            title = content.parentTitle
+          end if
+
+          m.upNextOverlayTitle.text = title
           m.upNextOverlayHint.text = getTranslation("screenEndCard_overlay_hint")
           m.upNextOverlayRecommendation.text = getTranslation("screenEndCard_overlay_improve_recommendations")
           m.UpNextOverlay.visible = true
