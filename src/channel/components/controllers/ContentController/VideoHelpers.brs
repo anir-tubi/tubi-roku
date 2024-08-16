@@ -1842,6 +1842,9 @@ Function onAutoPlayLikeChangedSuccess(response)
           }
 
           showToast(toastInfo, true)
+          if isLoggedInUser() = true
+            sendExplicitFeedBackEvent(videoPlayerScreen, sReturnedAction)
+          end if
         end if
 
         videoPlayerScreen.autoPlayLikeDislikeState = sLikedState
