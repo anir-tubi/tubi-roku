@@ -996,11 +996,11 @@ Function onVideoPositionChange(msg)
         setFocusToPlaybackControl()
         clearSkipCuepointsButtonAndTimer()
 
-        if m.top.appMode <> "KIDS_MODE" AND getExperimentResource("roku_like_dislike_on_autoplay", "roku_like_dislike_on_autoplay_v1").enabled = true
+        if UCase(m.constants.deviceInfo.countryCode) = "US" AND m.top.appMode <> "KIDS_MODE" AND getExperimentResource("roku_like_dislike_on_autoplay", "roku_like_dislike_on_autoplay_v1").enabled = true
           fade(m.UpNextOverlay, "in", 1.0)
           m.upNextOverlayTitle.text = content.title
-          m.upNextOverlayHint.text = "What do you think?"
-          m.upNextOverlayRecommendation.text = "Improve your recommendations"
+          m.upNextOverlayHint.text = getTranslation("screenEndCard_overlay_hint")
+          m.upNextOverlayRecommendation.text = getTranslation("screenEndCard_overlay_improve_recommendations")
           m.UpNextOverlay.visible = true
           like = getLike(content.id)
           sLikedState = ""
