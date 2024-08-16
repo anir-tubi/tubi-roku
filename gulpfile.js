@@ -685,7 +685,7 @@ function packageRemote(done) {
 function packageOneTrust(done) {
   const buildTag = getOneTrustBuildTag(options)
   log('Starting packageOneTrust');
-  
+
   const zipPath = `build/tubi_one_trust_components_${buildTag}.zip`;
   const appName = `tubi_one_trust_components_${buildTag}`;
 

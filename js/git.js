@@ -14,7 +14,6 @@ const githubDeveloperInfo = require('./github-developer-info.json');
 const ghInfo = {
   owner: 'adRise',
   rokuRepo: 'project-total-recall',
-  cdnRepo: 'adrise_cdn',
   rcdnRepo: 'rcdn',
 };
 
@@ -62,7 +61,7 @@ function verifyGit(done, directory = '') {
 }
 
 
-// Calls function createCdnPrUrl to push and create PR to rcdn repo and adrise_cdn repo
+// Calls function createCdnPrUrl to push and create PR to rcdn repo
 // Additionally make a PR against the production release branch on project-total-recall and copy the
 // urls to the local clipboard.
 async function makeReleasePrs(done) {
@@ -80,10 +79,7 @@ async function makeReleasePrs(done) {
   execShellCommand(done, gitRename, gitRenameErrorMsg);
 
   //create PR against rcdn repository
-  const rcdnPrUrl = await createCdnPrUrl(done, 'rcdn');
-
-  // create PR in adrise_cdn repository
-  const cdnPrUrl = await createCdnPrUrl(done, 'cdn');
+  const rcdnPrUrl = await createCdnPrUrl(done);
 
   // push the release branch to the project-total-recall repo
   log(`...Pushing the local ${releaseBranchName} branch to the remote ${ghInfo.rokuRepo} repo`);
@@ -113,10 +109,9 @@ async function makeReleasePrs(done) {
   }
 
   // copy the PR urls to the clipboard
-  if (releasePrUrl && cdnPrUrl && rcdnPrUrl) {
+  if (releasePrUrl && rcdnPrUrl) {
     // multi line string
     const prUrlsForPasting = `${releasePrUrl}
-${cdnPrUrl}
 ${rcdnPrUrl}`;
 
     clipboardy.writeSync(prUrlsForPasting);
@@ -128,24 +123,16 @@ ${rcdnPrUrl}`;
 }
 
 
-//All the steps necessary to push starter and remote components to the CDNs and make a PR to the CDNs
+//All the steps necessary to push starter and remote components to the CDN and make a PR to the CDN
 // returns the URL string of created PR.
-// @cdn: string,  ="cdn" to push starter and remote components to adrise_cdn repo and create PR against master
-//                ="rcdn" to push starter and remote components to rcdn repo and create PR against master
-async function createCdnPrUrl(done, cdn = 'cdn') {
+async function createCdnPrUrl(done) {
 
   const minorBuildTag = getBuildTag('minor');
   const fullBuildTag = getBuildTag('revision');
 
-  let cdnPath = process.env.CDN_GIT_DIRECTORY;
-  let ghInfoCDNRepo = `${ghInfo.cdnRepo}`;
-  let cdnDirVariable = `CDN_GIT_DIRECTORY`;
-
-  if (cdn === `rcdn`) {
-    cdnPath = process.env.RCDN_GIT_DIRECTORY;
-    ghInfoCDNRepo = `${ghInfo.rcdnRepo}`;
-    cdnDirVariable = `RCDN_GIT_DIRECTORY`;
-  }
+  let cdnPath = process.env.RCDN_GIT_DIRECTORY;
+  let ghInfoCDNRepo = `${ghInfo.rcdnRepo}`;
+  let cdnDirVariable = `RCDN_GIT_DIRECTORY`;
 
 
   // check if the environment variable for the path to the CDN repo has been set
@@ -195,13 +182,8 @@ async function createCdnPrUrl(done, cdn = 'cdn') {
   const starterComponentsFileName = `tubi_starter_components_${minorBuildTag}.pkg`;
   const remoteComponentsFileName = `tubi_remote_components_${fullBuildTag}.pkg`;
 
-  let cdnStarterComponentsPath = `${cdnPath}/hotpatches/roku/starter-components/${starterComponentsFileName}`;
-  let cdnRemoteComponentsPath = `${cdnPath}/hotpatches/roku/components/${remoteComponentsFileName}`;
-
-  if (cdn === 'rcdn') {
-    cdnStarterComponentsPath = `${cdnPath}/appFiles/starter-components/${starterComponentsFileName}`;
-    cdnRemoteComponentsPath = `${cdnPath}/appFiles/components/${remoteComponentsFileName}`;
-  }
+  let cdnStarterComponentsPath = `${cdnPath}/appFiles/starter-components/${starterComponentsFileName}`;
+  let cdnRemoteComponentsPath = `${cdnPath}/appFiles/components/${remoteComponentsFileName}`;
 
   const localStarterComponentsPath = `build/tubi_starter_components_${minorBuildTag}.pkg`;
   const localRemoteComponentsPath = `build/tubi_remote_components_${fullBuildTag}.pkg`;
@@ -225,19 +207,18 @@ async function createCdnPrUrl(done, cdn = 'cdn') {
   }
 
   // copy the rollback starter components from the /build directory to the CDN repo rollbackStarterComponents directory for backup
-  if (cdn === 'rcdn') {
-    // create the directory if it doesn't exist
-    const makeVersionAsDir = shell.mkdir('-p', `${cdnPath}/rollbackStarterComponents/${fullBuildTag}`);
-    if (!makeVersionAsDir.stderr) {
-      let rollbackStarterComponentsPath = `${cdnPath}/rollbackStarterComponents/${fullBuildTag}/${starterComponentsFileName}`;
 
-      log(`...Copying the rollback starter components to the rollbackStarterComponents directory`);
-      const copyRollbackStarterComponentsRes = shell.cp(localStarterComponentsPath, rollbackStarterComponentsPath);
+  // create the directory if it doesn't exist
+  const makeVersionAsDir = shell.mkdir('-p', `${cdnPath}/rollbackStarterComponents/${fullBuildTag}`);
+  if (!makeVersionAsDir.stderr) {
+    let rollbackStarterComponentsPath = `${cdnPath}/rollbackStarterComponents/${fullBuildTag}/${starterComponentsFileName}`;
 
-      if (copyRollbackStarterComponentsRes.stderr) {
-        //just print the error message and continue.
-        log(`There was an error moving the starter component to rollback directory. You will need to manually copy the starter component to rollbackStarterComponents/fullVersion/ and create a PR.`);
-      }
+    log(`...Copying the rollback starter components to the rollbackStarterComponents directory`);
+    const copyRollbackStarterComponentsRes = shell.cp(localStarterComponentsPath, rollbackStarterComponentsPath);
+
+    if (copyRollbackStarterComponentsRes.stderr) {
+      //just print the error message and continue.
+      log(`There was an error moving the starter component to rollback directory. You will need to manually copy the starter component to rollbackStarterComponents/fullVersion/ and create a PR.`);
     }
   }
 
