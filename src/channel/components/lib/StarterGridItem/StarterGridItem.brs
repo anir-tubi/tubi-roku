@@ -201,9 +201,9 @@ Function onRenderTrackingChange(msg)
         }
 
         m.global.viewableImpressionEventInfo = trackingInfo
-        m.itemVisibleTimespan = invalid
       end if
 
+      m.itemVisibleTimespan = invalid
     end if
   end if
 End Function
