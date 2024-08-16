@@ -996,7 +996,7 @@ Function onVideoPositionChange(msg)
         setFocusToPlaybackControl()
         clearSkipCuepointsButtonAndTimer()
 
-        if getExperimentResource("roku_like_dislike_on_autoplay", "roku_like_dislike_on_autoplay_v1").enabled = true
+        if m.top.appMode <> "KIDS_MODE" AND getExperimentResource("roku_like_dislike_on_autoplay", "roku_like_dislike_on_autoplay_v1").enabled = true
           fade(m.UpNextOverlay, "in", 1.0)
           m.upNextOverlayTitle.text = content.title
           m.upNextOverlayHint.text = "What do you think?"
