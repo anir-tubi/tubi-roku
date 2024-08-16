@@ -13,22 +13,22 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
 
       if key = "OK"
         handleOk()
-      else if key = "play" AND m.Menu.hasFocus() = false then
+      else if key = "play"
         if m.PlayPauseButton.enabled then
           handlePlayPause()
         end if
 
-      else if key = "fastforward" AND m.Menu.hasFocus() = false
+      else if key = "fastforward"
         if m.FastForwardButton.enabled then
           handleFastForward()
         end if
 
-      else if key = "rewind" AND m.Menu.hasFocus() = false
+      else if key = "rewind"
         if m.RewindButton.enabled then
           handleRewind()
         end if
 
-      else if key = "replay" AND m.Menu.hasFocus() = false
+      else if key = "replay"
         if m.HopBackButton.enabled then
           handleHopBack(true, 20)
         end if
@@ -52,7 +52,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           end if
         end if
 
-      else if key = "left" AND m.focusedNode.isSameNode(m.Related) = false AND m.Menu.hasFocus() = false
+      else if key = "left" AND m.focusedNode.isSameNode(m.Related) = false
         'video is in playback mode and user wants to skip back
         if m.HUD.opacity = 0 AND m.focusedNode.isSameNode(m.progressBar) = false AND isActiveVideoState(m.VideoState, m.Video)
           handleSkipVideo(-10)
@@ -76,7 +76,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           end if
         end if
 
-      else if key = "right" AND m.focusedNode.isSameNode(m.Related) = false AND m.Menu.hasFocus() = false
+      else if key = "right" AND m.focusedNode.isSameNode(m.Related) = false
         'video is in playback mode and user wants to skip ahead
         if m.HUD.opacity = 0 AND m.focusedNode.isSameNode(m.progressBar) = false AND isActiveVideoState(m.VideoState, m.Video)
           handleSkipVideo(10)
@@ -128,13 +128,14 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           m.Menu.setFocus(false)
           m.UpNext.setFocus(true)
         else if m.TopOverlay.opacity = 0 AND m.focusedNode.isSameNode(m.Related) = false
+
           showTransport()
           showYMAL()
         else if m.focusedNode.isSameNode(m.progressBar) = true
           setFocusToComponent(m.PlayPauseButton, true)
         else if m.skipCuepointsButton.hasFocus() = true
           setFocusToComponent(m.ProgressBar)
-        else if isFocusOnPlayerControl() = true AND m.TopOverlay.opacity = 1 AND m.top.isTrailer = false AND (m.Menu.hasFocus() = false)
+        else if isFocusOnPlayerControl() = true AND m.TopOverlay.opacity = 1 AND m.top.isTrailer = false
 
           if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4", false).enabled = true
             relatedContent = m.top.browseContent
@@ -1304,12 +1305,22 @@ Function isButtonPressAllowed(key, videoState, videoNode)
 
   isAllowed  = true
   'in non active video states, we don't allow the disabled keys, non disable keys are always allowed
-  if not (isActiveVideoState(videoState, videoNode) AND disabledKeys[key] = true) AND (m.Menu.hasFocus() = true AND key = "OK")
+  if not isActiveVideoState(videoState, videoNode) AND disabledKeys[key] = true
+    isAllowed = false
+  end if
+
+  'When likeDislike menu has focus, back and down press are allowed. Down to focus on upnext and beck to hide the upnext and overlay.
+  if m.Menu.hasFocus() = true AND (disabledKeys[key] = true AND key <> "down")
+    isAllowed = false
+  end if
+
+  'When upnext is focused, only up and back keys are allowed. Up to focus on like/dislie and back to hide the upnext and overlay.
+  if m.UpNext.isInFocusChain() = true AND (disabledKeys[key] = true AND key <> "up")
     isAllowed = false
   end if
 
   ' If closed caption and audio overlay is showing then we ignore button press in the screen level.
-  if (m.isClosedCaptionAudioOverlayShowing = true) OR (m.Menu.hasFocus() = true AND key = "OK")
+  if m.isClosedCaptionAudioOverlayShowing = true
     isAllowed = false
   end if
 
