@@ -460,9 +460,11 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     '   </CategoryContentNode>
     ' </CategoryContentNode>
 
+    homeScreen.personalizationId = rawResponse.personalizationId
+    homeScreen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
+    
     homeScreen.content = rawResponse
     homeScreen.contentUpdated = true
-    homeScreen.personalizationId = rawResponse.personalizationId
 
     ' don't set focus on the home screen if side nav has focus, for example
     if homeScreen.isInFocusChain() = true

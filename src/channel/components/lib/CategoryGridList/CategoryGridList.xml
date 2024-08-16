@@ -105,6 +105,8 @@
       <!-- Contains the value of personalization_id returned from backend home screen api call. -->
       <field id="personalizationId" type="string" />
 
+      <!-- We have to create a field due to renderTracking events being async each itemComponent should be aware of what the mode was when it rendered. -->
+      <field id="shouldTrackViewableImpressionEvent" type="boolean" />
 
     <!-- OUTPUT -->
       <field id="itemSelected" type="node"/>

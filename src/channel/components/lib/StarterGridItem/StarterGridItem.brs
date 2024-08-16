@@ -22,10 +22,8 @@ Function init()
   ' To avoid any timing issues choosing a safer side of adding a field to individual row node which will hold the id of the screen to which it belongs too.
   ' Adding a for loop with max as 10 to avoid infinite incase we place the starter grid item outside of categoryGridList
   ' Doing it in init due to roku orphaning the itemcomponent when it deletes the item from the screen during navigation which causes getparent to be invalid.
-  ' Performance tested the below code it was not adding a additional process time. 
-  m.parentScreenId = ""
-  m.parentScreenTrackingPageInfo = {}
-  m.personalizationId = ""
+  ' Performance tested the below code it was not adding a additional process time.
+  m.parentArrayGrid = invalid
   parent = m.top.getParent()
   for x = 1 to 10
     ' If at any point of view due to any reason parent is invalid and then exiting the for loop.
@@ -35,9 +33,7 @@ Function init()
     end if
 
     if parent.isSubType("CategoryGridList") = true
-      m.parentScreenId = parent.parentScreenId
-      m.parentScreenTrackingPageInfo = parent.parentScreenTrackingPageInfo
-      m.personalizationId = parent.personalizationId
+      m.parentArrayGrid = parent
       ' Only enabling it if we find the parent values.
       m.top.enableRenderTracking = true
       m.top.observeFieldScoped("renderTracking", "onRenderTrackingChange")
@@ -52,7 +48,6 @@ Function onItemContentChange(msg)
   itemContent = msg.getData()
 
   if itemContent <> invalid
-
     gridItemType = itemContent.gridItemType
 
     childGridItemComponent = invalid
@@ -112,6 +107,20 @@ Function onItemContentChange(msg)
       end if
     end if
   end if
+
+  ' If the parent array grid is invalid then resetting the values.
+  ' Getting the values in onItemContentChange due to the fact that Rowlist re-uses itemComponent when it does it does not call the init.
+  if m.parentArrayGrid <> invalid
+    m.parentScreenId = m.parentArrayGrid.parentScreenId
+    m.parentScreenTrackingPageInfo = m.parentArrayGrid.parentScreenTrackingPageInfo
+    m.personalizationId = m.parentArrayGrid.personalizationId
+    m.shouldTrackViewableImpressionEvent = m.parentArrayGrid.shouldTrackViewableImpressionEvent
+  else
+    m.parentScreenId = ""
+    m.parentScreenTrackingPageInfo = {}
+    m.personalizationId = ""
+    m.shouldTrackViewableImpressionEvent = false
+  end if
 End Function
 
 
@@ -155,7 +164,7 @@ Function onRenderTrackingChange(msg)
 
   ' Checking the item is of type video or series or linear only then we proceed.
   contentType = content.type
-  if contentType = "series" OR contentType = "video" OR contentType = "linear"
+  if m.shouldTrackViewableImpressionEvent = true AND (contentType = "series" OR contentType = "video" OR contentType = "linear")
     ' Minimum visible time in milli seconds.
     MIN_VISIBLE_THRESHOLD = 1000
 
@@ -194,7 +203,7 @@ Function onRenderTrackingChange(msg)
         m.global.viewableImpressionEventInfo = trackingInfo
         m.itemVisibleTimespan = invalid
       end if
-      
+
     end if
   end if
 End Function

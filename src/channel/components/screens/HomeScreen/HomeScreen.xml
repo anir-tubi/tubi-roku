@@ -87,6 +87,9 @@
       <!-- This field is used to force remove focus from the rowlist. -->
       <field id="removeFocusFromRowList" type="boolean" alias="CategoryGridList.removeFocusFromRowList" />
 
+      <!-- We have to create a field due to renderTracking events being async each itemComponent should be aware of what the mode was when it rendered. -->
+      <field id="shouldTrackViewableImpressionEvent" type="boolean" value="true" alias="CategoryGridList.shouldTrackViewableImpressionEvent" />
+
     <!-- OUTPUTS -->
       <!-- Trigger the content to be loaded.  This field is used to delay
            the initial category content loading until after the stateful
