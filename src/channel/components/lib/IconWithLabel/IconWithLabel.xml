@@ -19,7 +19,7 @@
   <children>
     <LayoutGroup
       horizAlignment="center"
-      itemspacings="[27]"
+      itemspacings="[20]"
       translation="[36, 0]">
 
       <Group
@@ -28,7 +28,7 @@
           id="menuItemIcon"
           height="72"
           width="72"/>
-          <Poster
+        <Poster
           id="menuItemIconFocused"
           opacity="0"
           height="72"
