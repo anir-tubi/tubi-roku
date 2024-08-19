@@ -88,7 +88,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_autoplay_cuepoint: {
-        roku_autoplay_cuepoint_v2 : {"enabled": false}
+        roku_autoplay_cuepoint_v2 : {"enabled": true}
       }
 
     }
