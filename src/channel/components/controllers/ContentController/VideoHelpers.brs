@@ -1699,10 +1699,10 @@ Function onAutoPlayDisLikeRemoveDislikeSelected(msg)
     updateLikeDislikePlayer(videoPlayer, autoPlayLikeDislikeState)
   else
     autoPlayLikeDislikeState = m.constants.ui.likeDislikeActions.dislike
-    sendAutoPlayLikeDislikeSelectedAnalytics(videoPlayer, autoPlayLikeDislikeState)
     likeDislikeParams = {likeDislikeState: autoPlayLikeDislikeState, menuItem: "DislikeMenuItem" }
     startSignIn(afterDislikeSelectedFromUpNextUI, likeDislikeParams)
   end if
+  sendAutoPlayLikeDislikeSelectedAnalytics(videoPlayer, autoPlayLikeDislikeState)
 End function
 
 
