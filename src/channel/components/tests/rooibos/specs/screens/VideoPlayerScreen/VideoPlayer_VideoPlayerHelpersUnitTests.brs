@@ -178,6 +178,7 @@ Function isButtonPressAllowed_test()
 
   video.state = "playing"
   videoState = "play"
+  GetGlobalAA().Menu.visible = false
   m.AssertTrue(isButtonPressAllowed("OK", videoState, video))
 
   video.state = "stopped"

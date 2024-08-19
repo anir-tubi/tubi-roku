@@ -1304,8 +1304,8 @@ Function isButtonPressAllowed(key, videoState, videoNode)
   }
 
   isAllowed  = true
-  'in non active video states, we don't allow the disabled keys, non disable keys are always allowed
-  if not isActiveVideoState(videoState, videoNode) AND disabledKeys[key] = true
+  'When the like/dislike menu is not visible in non-active video states, disabled keys are not permitted, while non-disabled keys are always allowed.
+  if isActiveVideoState(videoState, videoNode) = false AND disabledKeys[key] = true AND m.Menu.visible = false
     isAllowed = false
   end if
 
