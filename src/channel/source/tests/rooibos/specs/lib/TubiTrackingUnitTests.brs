@@ -664,7 +664,7 @@ Function tubiTracking_createViewableImpressionTrackingReqInfo_test()
   m.assertNotInvalid(req)
   m.assertEqual(req.options.method, "POST")
   m.assertNotEmpty(req.options.body)
-  m.assertEqual(constants.urls.analytics.viewableImpressionEvent, req.url)
+  m.assertEqual(constants.urls.impressionEvents.singleEvent, req.url)
   m.assertEqual(body.platform, requestBody.platform)
   m.assertEqual(body.user_id, requestBody.user_id)
 End Function
