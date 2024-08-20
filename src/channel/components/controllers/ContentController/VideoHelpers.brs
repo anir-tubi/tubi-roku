@@ -109,7 +109,7 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
     initVideoTracking(videoPlayer) 'initializeYoubora
     setInScreenCache(videoPlayer)
 
-    if getExperimentResource("roku_like_dislike_on_autoplay", "roku_like_dislike_on_autoplay_v1", false).enabled = true
+    if getExperimentResource("roku_like_dislike_on_autoplay", "roku_like_dislike_on_autoplay_v2", false).enabled = true
       videoPlayer.observeFieldScoped("autoPlayLikeRemoveLikeSelected", "onAutoPlayLikeRemoveLikeSelected")
       videoPlayer.observeFieldScoped("autoPlayDisLikeRemoveDislikeSelected", "onAutoPlayDisLikeRemoveDislikeSelected")
       videoPlayer.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")

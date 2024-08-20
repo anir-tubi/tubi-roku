@@ -102,7 +102,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
 
       else if key = "up"
         if m.Menu.hasFocus() = false
-          if  m.UpNext.isInFocusChain() = true AND getExperimentResource("roku_like_dislike_on_autoplay", "roku_like_dislike_on_autoplay_v1", false).enabled = true
+          if  m.UpNext.isInFocusChain() = true AND getExperimentResource("roku_like_dislike_on_autoplay", "roku_like_dislike_on_autoplay_v2", false).enabled = true
             m.Menu.setFocus(true)
           else if m.focusedNode.isSameNode(m.Related) = true
             animateTransportAndYMAL("out")

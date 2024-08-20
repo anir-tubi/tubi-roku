@@ -191,7 +191,7 @@ Function onKeyEvent(key, press) as Boolean
       end if
       handled = true
     else if key = "up"
-      if getExperimentResource("roku_like_dislike_on_autoplay", "roku_like_dislike_on_autoplay_v1", false).enabled = true
+      if getExperimentResource("roku_like_dislike_on_autoplay", "roku_like_dislike_on_autoplay_v2", false).enabled = true
         stopTimer()
         if m.MovieGroup.visible = true
           m.CountdownMovie.text = getTranslation("screenEndCard_nextUp")
@@ -341,7 +341,7 @@ End Function
 
 Function drawCountdown(labelNode, time)
   if m.top.isAutoPlayOff = false
-    if getExperimentResource("roku_like_dislike_on_autoplay", "roku_like_dislike_on_autoplay_v1", false).enabled = true
+    if getExperimentResource("roku_like_dislike_on_autoplay", "roku_like_dislike_on_autoplay_v2", false).enabled = true
       if labelNode.id = m.CountdownSeries.id
         labelNode.translation = [-597, -21]
       else

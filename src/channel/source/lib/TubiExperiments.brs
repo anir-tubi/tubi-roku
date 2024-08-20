@@ -43,7 +43,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_like_dislike_on_autoplay: {
-        roku_like_dislike_on_autoplay_v1: {"enabled": false}
+        roku_like_dislike_on_autoplay_v2: {"enabled": false}
       }
 
       roku_registration_vs_tvt_lock_rated_content: {

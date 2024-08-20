@@ -351,7 +351,7 @@ Function init()
     y: 0.0
   }
 
-  if getExperimentResource("roku_like_dislike_on_autoplay", "roku_like_dislike_on_autoplay_v1", false).enabled = true
+  if getExperimentResource("roku_like_dislike_on_autoplay", "roku_like_dislike_on_autoplay_v2", false).enabled = true
     m.LikeDislikeMenuContent = m.top.findNode("LikeDislikeMenuContent")
     m.Menu.observeFieldScoped("itemFocused", "onLikeDislikeMenuFocused")
     m.Menu.observeFieldScoped("itemUnFocused", "onLikeDislikeMenuUnFocused")
@@ -1037,7 +1037,7 @@ Function onVideoPositionChange(msg)
         setFocusToPlaybackControl()
         clearSkipCuepointsButtonAndTimer()
 
-        if UCase(m.constants.deviceInfo.countryCode) = "US" AND m.top.appMode <> "KIDS_MODE" AND getExperimentResource("roku_like_dislike_on_autoplay", "roku_like_dislike_on_autoplay_v1").enabled = true
+        if UCase(m.constants.deviceInfo.countryCode) = "US" AND m.top.appMode <> "KIDS_MODE" AND getExperimentResource("roku_like_dislike_on_autoplay", "roku_like_dislike_on_autoplay_v2").enabled = true
           fade(m.UpNextOverlay, "in", 1.0)
           title = content.title
           if content.parentType = m.constants.ui.contentTypes.series
