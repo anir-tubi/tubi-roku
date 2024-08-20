@@ -148,7 +148,7 @@ Function onCategoryDetailPanelResponse(categoryContent)
     end if
     
 
-    if focusedItem.id = categoryContent.id
+    if categoryContent <> invalid AND focusedItem.id = categoryContent.id
       
       if responseItemsCount > 0
         setInContentCache(categoryContent, screen.id)
@@ -171,7 +171,7 @@ Function onCategoryDetailPanelResponse(categoryContent)
 
         'Total received content is less than batchsize that means we have reached the maximum available
         'Number of contents on the screen + next batchsize is more than maximum limit
-        if responseItemsCount <  m.constants.performance.categoryGridList.lazyLoadBatchSize OR (screen.content.getChildCount() +  m.constants.performance.categoryGridList.lazyLoadBatchSize > m.constants.performance.categoryGridList.finalLazyLoadSize)
+        if responseItemsCount <  m.constants.performance.categoryGridList.lazyLoadBatchSize OR (screen.categoryContent.getChildCount() +  m.constants.performance.categoryGridList.lazyLoadBatchSize > m.constants.performance.categoryGridList.finalLazyLoadSize)
           screen.isCategoryFullyLoaded = true
         else
           screen.isCategoryFullyLoaded = false

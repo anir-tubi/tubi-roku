@@ -963,7 +963,7 @@ Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate,
       if categoryAA <> invalid
         if bDisplayChannels = true
           categoryAA.type = m.contentTypes.channel
-          if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_category_redesign", "roku_category_redesign_v1").enabled = true
+          if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_category_redesign", "roku_category_redesign_v2").enabled = true
             categoryAA.HDGRIDPOSTERURL = m.generateChannelPosterUrl(categoryAA.id)
           end if
         else

@@ -237,7 +237,7 @@ Function onSideNavItemSelected()
         setUiMode(m.constants.ui.modes.standard)
       end if
 
-      if (getExperimentResource("roku_category_redesign", "roku_category_redesign_v1", true).enabled = true)
+      if (getExperimentResource("roku_category_redesign", "roku_category_redesign_v2", true).enabled = true)
         showCategoryPanelListScreen(m.constants)
       else
         showCategoryListScreen(m.constants)

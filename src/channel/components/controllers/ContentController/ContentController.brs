@@ -1020,7 +1020,7 @@ Function setDirtyUserCategories(categoryId)
     ' on the categoryDetailsScreen. We don't want to add large homescreen images sizes to the
     ' content on the categoryDetailsScreen.
     isCategoryInStack = false
-    if (getExperimentResource("roku_category_redesign", "roku_category_redesign_v1", false).enabled = false)
+    if (getExperimentResource("roku_category_redesign", "roku_category_redesign_v2", false).enabled = false)
       isCategoryInStack = isCategoryDetailScreenInStack(categoryId)
     end if
 
@@ -1056,7 +1056,7 @@ Function onReloadUserCategoriesResponse(handledRequest)
   onReloadUserCategoriesInHomeScreen(handledRequest)
 
   categoryListScreen = invalid
-  if (getExperimentResource("roku_category_redesign", "roku_category_redesign_v1", false).enabled = false)
+  if (getExperimentResource("roku_category_redesign", "roku_category_redesign_v2", false).enabled = false)
     ' inform the category list screen of the updated user category
     categoryListScreen = getFromScreenCache(m.constants.ui.screenIds.categoryListScreen)
   else
