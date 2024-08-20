@@ -726,12 +726,53 @@ Function onVideoStateChange(msg)
   else if state = "error"
     content = m.Video.content
     errorInfo = getPlaybackErrorInfo(m.Video.position, m.Video.downloadedSegment, m.Video.streamingSegment, m.Video.streamingInfo,m.Video.errorCode, m.Video.errorStr, content)
+
+    errorCode = m.video.errorCode
+    errorInfo.type = m.constants.errors.type.videoError + " " + errorCode.toStr()
+    errorInfo.name = m.constants.errors.message.videoPlayer
+
+    videoErrorInfo = m.video.errorInfo
+    if videoErrorInfo <> invalid
+      errorInfo.debug_msg = videoErrorInfo.dbgmsg
+    end if
+
+    if content <> invalid
+      if content.codec <> invalid
+        errorInfo.codec = content.codec
+      end if
+
+      if content.resolution <> invalid
+        errorInfo.resolution = content.resolution
+      end if
+    end if
+
+    ' If the error is related to DRM adding additional info to the log.
+    if errorCode = -6
+      licenseStatus = m.Video.licenseStatus
+
+      if videoErrorInfo <> invalid
+        errorInfo.drm_error_code = videoErrorInfo.drmerrcode
+      end if
+
+      if licenseStatus <> invalid
+        if licenseStatus.keysystem <> invalid
+          errorInfo.drm_type = licenseStatus.keysystem
+        end if
+
+        if licenseStatus.response <> invalid
+          errorInfo.license_response = licenseStatus.response
+        end if
+
+        if licenseStatus.duration <> invalid
+          errorInfo.license_req_duration = licenseStatus.duration
+        end if
+      end if
+    end if
+
     jsonErrorInfo = FormatJSON(errorInfo)
     ' sending the logs to uapi
     tubiLog(jsonErrorInfo, "error", "videoPlayback", "video-playback", 0.1)
 
-    errorInfo.type = m.constants.errors.type.videoError + " " + m.video.errorCode.toStr()
-    errorInfo.name = m.constants.errors.message.videoPlayer
     ' sending the logs to sentry sdk
     tubiException(errorInfo, "error", 0.1)
 
