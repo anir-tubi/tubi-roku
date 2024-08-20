@@ -239,6 +239,8 @@ Function init()
   ' The reason why we are also storing it's reference in m scope for better performance since we access the sdk instance a lot of items during the app session.
   m.oneTrust = invalid
 
+  'This variable is used to avoid multiple calls to getExperimentResource
+  m.detailScreenHorizMenuExp = (getExperimentResource("roku_horizontal_menu", "roku_horizontal_menu_v1", false).enabled = true)
   ' Format of data that should be set on viewableImpressionEventInfo
   ' {
   '   containerId: "" Contains the id of the row where the tile was displayed. ex: comedy etc.
@@ -1022,7 +1024,7 @@ Function setDirtyUserCategories(categoryId)
       isCategoryInStack = isCategoryDetailScreenInStack(categoryId)
     end if
 
-    if isCategoryInStack = true 
+    if isCategoryInStack = true
       optionCategoryDetail = {
         params: {
           content_mode: ""
@@ -1332,7 +1334,7 @@ Function refreshAllDetailScreens()
   for i = 0 to m.screenStack.getChildCount() - 1
     screen = m.screenStack.getChild(i)
 
-    if screen.subType() = "DetailScreen"
+    if screen.subType() = "DetailScreen" OR screen.subType() = "DetailScreenHoriz"
       content = screen.content 'No need to re fetch the content, just re populate the screen content
       populateDetailScreen(screen, content, false, -1)
       resetRelatedContent(screen)
@@ -2946,12 +2948,12 @@ Function onViewableImpressionEventInfoChange(msg)
   ' We are checking in this if the screen is different from what is stored in m.viewableImpressionEvents then we fire the events.
   ' The sequence of events are when navigating between home to movies. Home Screen items tracking info becomes none for all items and then the movies screen becomes full.
   data = msg.getData()
-  
+
   if data.screenId <> m.viewableImpressionEvents.screenId AND m.viewableImpressionEvents.screenId <> invalid
     ' After sending the events the m.viewableImpressionEvents will be reset.
     sendImpressionEvent()
   end if
-  
+
   ' Using screenId check because screenId is only available if the tile is displayed in HomeScreen.
   ' We cannot use screen.isSubtype("HomeScreen") because when the user navigates from homescreen to detailscreen,
   ' we will get some events of homescreen tiles hidden after the current screen changes to details screen.
@@ -2996,9 +2998,9 @@ Function sendImpressionEvent()
         personalization_id: m.viewableImpressionEvents.personalizationId
       }
 
-      trackData = m.Tracking.getViewableImpressionEvent(eventValues)      
+      trackData = m.Tracking.getViewableImpressionEvent(eventValues)
       requestInfo = m.Tracking.createViewableImpressionTrackingReqInfo(trackData)
-      
+
       m.makeRequest({
         url: requestInfo.url
         requestType: m.constants.reqNames.postViewableImpression

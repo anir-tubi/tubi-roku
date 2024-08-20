@@ -33,7 +33,7 @@ Function TubiExperiments(constants) as Object
       roku_large_play_progress: {
         roku_large_play_progress_v1 : {"enabled": true}
       }
-      
+
       roku_all_episiodes: {
         roku_all_episiodes_v1 : {"enabled": false}
       }
@@ -89,6 +89,10 @@ Function TubiExperiments(constants) as Object
 
       roku_autoplay_cuepoint: {
         roku_autoplay_cuepoint_v2 : {"enabled": true}
+      }
+
+      roku_horizontal_menu:{
+        roku_horizontal_menu_v1: {"enabled": false}
       }
 
     }

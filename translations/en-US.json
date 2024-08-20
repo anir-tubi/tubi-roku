@@ -860,6 +860,14 @@
     "description": "Label of button to allow users to like the current video title",
     "message": "Like"
   },
+  "screenDetails_button_likeIt": {
+    "description": "Label of button to allow users to like the current video title",
+    "message": "I like it"
+  },
+  "screenDetails_button_removeRating": {
+    "description": "text to be place AFTER the text that indicates that the user 'liked' or 'disliked' the current video title. This appears once the button gains focus",
+    "message": "Remove Rating"
+  },
   "screenDetails_button_liked": {
     "description": "Label of button to indicate to users that the current video title has been liked",
     "message": "Liked"

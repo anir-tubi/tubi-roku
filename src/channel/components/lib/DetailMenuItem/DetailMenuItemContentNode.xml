@@ -14,5 +14,9 @@
 
     <!-- The button_value of the menu item that should be sent to analytics as part of a ButtonComponent -->
     <field id="analyticsButtonValue" type="string" value="" />
+
+    <!--Primary buttons will always have icon and text on screen.
+        For other non primary buttons, we only show icons and text will be displayed when users hover on it.-->
+    <field id="isPrimaryButton" type="boolean" />
   </interface>
 </component>
