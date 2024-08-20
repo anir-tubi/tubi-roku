@@ -686,6 +686,7 @@ End Function
 Function onPostSignInAuthInfoUpdated()
   tubiLog("SignInHelpers.onPostSignInAuthInfoUpdated")
   authInfo = getFieldFromGlobal("authInfo")
+
   if (shouldShowAgeGate() AND authInfo <> invalid AND authInfo.hasAge <> true)
     m.spinner.visible = false
     signInInfo = invalid
@@ -704,6 +705,9 @@ Function onPostSignInAuthInfoUpdated()
     else
       showRokuCWConsentScreen(startChannel)
     end if
+    saveServerPersistentData({
+      "lastRokuCwConsentPromptShownAt": createObject("roDateTime").asSeconds()
+    })
   else if m.callbackAfterSignIn <> invalid
     executeCallbackAfterSignIn()
   else

@@ -60,7 +60,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_cw_consent_existing_user: {
-        roku_cw_consent_existing_user_after_plyback_v3: {"enabled": false}
+        roku_cw_consent_existing_user_after_playback_v4: {"enabled": false}
       }
 
       roku_linear_player_view: {
