@@ -56,7 +56,7 @@ describe('Welcome Registration', function () {
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/450824
-  it('C450824 - When user does not complete sign in flow do not show Welcome Registration modal - Exit from Email Address page, @welcome_modaltest', async () => {
+  it('C450824 - When user does not complete sign in flow do not show Welcome Registration modal - Exit from Email Address page, @welcome_modal', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false, hideStartupModals: false });
 
     // Verify Welcome Registration Dialog Displayed
@@ -78,7 +78,7 @@ describe('Welcome Registration', function () {
     // Press Back on the Sign In screen
     await ecp.sendKeypress(ecp.Key.Back);
 
-    // Verify Welcome Modal not displayed and Homescreen displayec
+    // Verify Welcome Modal not displayed and Homescreen displayed
     await testUtils.waitForElementToNotShowOnScreen('welcomeRegModal', 'Welcome Modal still showing on screen', 5000);
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
   });
@@ -98,6 +98,15 @@ describe('Welcome Registration', function () {
     await ecp.sendKeypress(ecp.Key.Down);
     await testUtils.waitForElementToShowOnScreen('welcomeRegModal', 'Welcome Modal not showing on screen', 1000);
     await testUtils.waitForElementToFullyShowOnScreen('welcomeRegModalContinueAsGuestButtonFocused', 'Continue as guest button not focused', 2000);
+  });
+
+  // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/450820
+  it('C450820 - Returning registered user should not see the Welcome Registration component, @welcome_modal', async () => {
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true, hideStartupModals: false });
+
+    // Verify Welcome Modal not displayed and Homescreen displayec
+    await testUtils.waitForElementToNotShowOnScreen('welcomeRegModal', 'Welcome Modal still showing on screen', 3000);
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
   });
 
 });

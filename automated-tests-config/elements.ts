@@ -2315,17 +2315,27 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuTextFocused',
   },
 
-    /** Continue Watching Row Category Name on Home page */
-    continueWatchingRowHome: {
-      keyPath:
-        '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#RowList.0.title.#CategoryName',
-    },
+  /* the title count on content list page */
+  categoryDetailsScreenTitleCount: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#pageTitleAndCounter.#CategoryCount',
+  },
+
+  /* the indicator of tile's index on content list page */
+  categoryDetailsScreenFocusIndex: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#pageTitleAndCounter.#CategoryCount.#FocusIndex',
+  },
+
+  /** Continue Watching Row Category Name on Home page */
+  continueWatchingRowHome: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#RowList.0.title.#CategoryName',
+  },
   
-    /** Continue Watching Row Title on Home page */
-    continueWatchingRowHomeTitle: {
-      keyPath: 
-        '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsVideoGrid.0.1.#posterLayout.#Poster',
-    },
+  /** Continue Watching Row Title on Home page */
+  continueWatchingRowHomeTitle: {
+    keyPath: 
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsVideoGrid.0.1.#posterLayout.#Poster',
+  },
 
   // title on the exit prompt of Sign up to Save Progress 
   signUpExitDialogTitle: {
