@@ -3524,6 +3524,10 @@ Function getTranslation_es_MX()
     "screenEndCard_overlay_improve_recommendations": {
       "description": "hint text on the upnext overlay for recommendation",
       "message": "Mejorar tus recomendaciones"
+    },
+    "dialog_gdpr_manage_privacy_settings_error_description": {
+      "description": "Error dialog description shown due to one trust component library failure when clicking manage privacy settings.",
+      "message": "Reinicia Tubi para actualizar la configuración de privacidad. Por favor envíe un correo a support@tubi.tv si sigue pasando."
     }
   }
 End Function
@@ -5136,6 +5140,10 @@ Function getTranslation_fr_CA()
     "screenEndCard_overlay_improve_recommendations": {
       "description": "hint text on the upnext overlay for recommendation",
       "message": "Améliorez vos recommandations"
+    },
+    "dialog_gdpr_manage_privacy_settings_error_description": {
+      "description": "Error dialog description shown due to one trust component library failure when clicking manage privacy settings.",
+      "message": "Redémarrer Tubi pour mettre à jour les paramètres de confidentialité. S'il vous plaît email support@tubi.tv si ça continue."
     }
   }
 End Function
