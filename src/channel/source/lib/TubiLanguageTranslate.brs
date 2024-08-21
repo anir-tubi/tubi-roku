@@ -1906,6 +1906,10 @@ Function getTranslation_en_US()
     "screenEndCard_overlay_improve_recommendations": {
       "description": "hint text on the upnext overlay for recommendation",
       "message": "Improve your recommendations"
+    },
+    "dialog_gdpr_manage_privacy_settings_error_description": {
+      "description": "Error dialog description shown due to one trust component library failure when clicking manage privacy settings.",
+      "message": "Please try restarting Tubi to update the privacy settings. Please email support@tubi.tv if this keeps happening."
     }
   }
 End Function

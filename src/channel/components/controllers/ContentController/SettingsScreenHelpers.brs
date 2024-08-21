@@ -637,10 +637,39 @@ End Function
 
 
 Function onDidUserSelectManagePrivacySettingsButton()
-  m.oneTrust.callFunc("showPreferenceCenterUI")
-  m.oneTrust.unobserveFieldScoped("onHidePreferenceCenter")
-  m.oneTrust.observeFieldScoped("onHidePreferenceCenter", "onPreferenceCenterClosed")
-  m.oneTrust.observeFieldScoped("onSdkBroadCast", "onPreferencesUpdated")
+  if m.oneTrust <> invalid
+    m.oneTrust.callFunc("showPreferenceCenterUI")
+    m.oneTrust.unobserveFieldScoped("onHidePreferenceCenter")
+    m.oneTrust.observeFieldScoped("onHidePreferenceCenter", "onPreferenceCenterClosed")
+    m.oneTrust.observeFieldScoped("onSdkBroadCast", "onPreferencesUpdated")
+  else
+    ' Showing a default something went wrong error message with information to contact support.
+    ' Since this a very rare edge case falling back to default.
+    ' TODO: If we notice lot of support emails or comp lib failures we will revisit this.
+    dialogEvent = {
+      type: "dialog"
+      values: {
+        dialog_type: "PRIVACY_PREFERENCES" 'DialogType enum
+        pageOneof: {}
+        dialog_action: "SHOW"
+        dialog_sub_type: "onetrust_load_fail"
+      }
+    }
+
+    currentScreen = getCurrentScreen()
+    if currentScreen.trackingPageInfo <> invalid
+      dialogEvent.values.pageOneof = m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
+    end if
+
+    modalInfo = {
+      title: getTranslation("dialog_defaultError_title")
+      message: getTranslation("dialog_gdpr_manage_privacy_settings_error_description")
+      openTrackEvent: dialogEvent
+      trackingTask: m.trackingLoggingTask
+    }
+
+    showErrorModal(modalInfo)
+  end if
 End Function
 
 

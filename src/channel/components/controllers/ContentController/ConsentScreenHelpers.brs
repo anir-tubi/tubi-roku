@@ -124,6 +124,8 @@ function onOneTrustCompLibLoadStatusChanged(msg) as void
   loadStatus = msg.getData()
   if loadStatus = "ready"
      initialiazeOneTrustSDK()
+  else if loadStatus = "failed"
+    onOneTrustSDKInitializeFailure(msg)
   end if
 end function
 
@@ -378,8 +380,11 @@ Function getConsentOptOutStatusByKey(key)
   ' Proceeding with consent check only if key is not essential. Since if it is essential we are allowed to proceed in kids etc.
   if key <> m.constants.consentKeys.essential
     if isGDPR(m.constants) = true
+      ' If one trust sdk is invalid that means initialization failed so defaulting to opt out.
       if m.oneTrust <> invalid
         didOptOut = (m.oneTrust.callFunc("getConsentStatusForGroupID", key) <> 1)
+      else
+        didOptOut = true
       end if
     else
       ' Irrespective of whether user as opted in or opted out when we are in non adult mode we should treat has if user opted out.
@@ -441,7 +446,9 @@ End Function
 Function isUserConsentRequired()
   consentRequired = false
   if isGDPR(m.constants) = true
-    consentRequired = m.oneTrust.callFunc("shouldShowBanner")
+    if m.oneTrust <> invalid
+      consentRequired = m.oneTrust.callFunc("shouldShowBanner")
+    end if
   else
     if m.consentSettings <> invalid AND m.consentSettings.consentRequired = true
       consentRequired = true
@@ -455,4 +462,27 @@ End Function
 ' Creating a wrapper so that it is easier to switch to not use global and use some other method easily.
 Function getTCFString()
   return m.global.IABTCF_TCString
+End Function
+
+
+Function onOneTrustSDKInitializeFailure(msg)
+  message = "one trust component library failed to load"
+  compLibNode = msg.getRoSGNode()
+  if compLibNode <> invalid
+    error = {
+      type: m.constants.errors.type.loadFailed
+      name: "OneTrustComponentLibrary"
+      message: message
+      loadStatus: "failed"
+      url: compLibNode.uri
+    }
+    ' Since it is a critical for working in GDPR countries setting sampling rate to 1 and also given the fact users are very less.
+    tubiException(error, "error", 1)
+  end if
+  m.trackingLoggingTask.userConsentsOptOutStatus = getConsentsOptOutStatus()
+  if m.onGetConsentCompletionCallback <> invalid
+    getConsentCompletionCallback = m.onGetConsentCompletionCallback
+    m.onGetConsentCompletionCallback = invalid
+    getConsentCompletionCallback()
+  end if
 End Function
