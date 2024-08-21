@@ -1130,8 +1130,8 @@ Function getTranslation_en_US()
       "message": "Like"
     },
     "screenDetails_button_likeIt": {
-    "description": "Label of button to allow users to like the current video title",
-    "message": "I like it"
+      "description": "Label of button to allow users to like the current video title",
+      "message": "I like it"
     },
     "screenDetails_button_removeRating": {
       "description": "text to be place AFTER the text that indicates that the user 'liked' or 'disliked' the current video title. This appears once the button gains focus",
@@ -2767,6 +2767,14 @@ Function getTranslation_es_MX()
       "description": "Label of button to allow users to like the current video title",
       "message": "Me Gusta"
     },
+    "screenDetails_button_likeIt": {
+      "description": "Label of button to allow users to like the current video title",
+      "message": "Me gusta"
+    },
+    "screenDetails_button_removeRating": {
+      "description": "text to be place AFTER the text that indicates that the user 'liked' or 'disliked' the current video title. This appears once the button gains focus",
+      "message": "Borrar Calificación"
+    },
     "screenDetails_button_liked": {
       "description": "Label of button to indicate to users that the current video title has been liked",
       "message": "Te Gustó"
@@ -3235,7 +3243,7 @@ Function getTranslation_es_MX()
     },
     "registration_signIn_to_play_button": {
       "description": "button text for when a non registered user focuses on details screen for sportsEvent",
-      "message": "Inicia sesión para Ver"
+      "message": "Inicia Sesión para Ver"
     },
     "registration_signIn_to_play_hint": {
       "description": "hint text next to the Sign In to Play button when a non registered user focuses on details screen for sportsEvent",
@@ -3507,7 +3515,7 @@ Function getTranslation_es_MX()
     },
     "screenEndCard_overlay_hint": {
       "description": "hint text on the upnext overlay ",
-      "message": "¿Qué opinas?"
+      "message": "¿Qué te pareció?"
     },
     "screenEndCard_overlay_improve_recommendations": {
       "description": "hint text on the upnext overlay for recommendation",
@@ -4375,6 +4383,14 @@ Function getTranslation_fr_CA()
       "description": "Label of button to allow users to like the current video title",
       "message": "J'aime"
     },
+    "screenDetails_button_likeIt": {
+      "description": "Label of button to allow users to like the current video title",
+      "message": "J'aime ça"
+    },
+    "screenDetails_button_removeRating": {
+      "description": "text to be place AFTER the text that indicates that the user 'liked' or 'disliked' the current video title. This appears once the button gains focus",
+      "message": "Supprimer l'évaluation"
+    },
     "screenDetails_button_liked": {
       "description": "Label of button to indicate to users that the current video title has been liked",
       "message": "Vous aimez"
@@ -4843,7 +4859,7 @@ Function getTranslation_fr_CA()
     },
     "registration_signIn_to_play_button": {
       "description": "button text for when a non registered user focuses on details screen for sportsEvent",
-      "message": "Connectez-vous pour jouer"
+      "message": "Se connecter"
     },
     "registration_signIn_to_play_hint": {
       "description": "hint text next to the Sign In to Play button when a non registered user focuses on details screen for sportsEvent",
@@ -5111,7 +5127,7 @@ Function getTranslation_fr_CA()
     },
     "screenEndCard_overlay_hint": {
       "description": "hint text on the upnext overlay ",
-      "message": "Qu'en penses-tu?"
+      "message": "Qu'en pensez-vous?"
     },
     "screenEndCard_overlay_improve_recommendations": {
       "description": "hint text on the upnext overlay for recommendation",
