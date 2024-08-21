@@ -1283,7 +1283,7 @@ const elements = typeCheckElements({
 
   confirmYourAgeText: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.1.#AgeVerificationPageText.#AgeVerificationPageHeader',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.#AgeVerificationPageText.#AgeVerificationPageHeader',
   },
 
   /** age gate year box */
@@ -2360,8 +2360,57 @@ const elements = typeCheckElements({
   // Sign up later button on the exit prompt of Sign up to Save Progress 
   signUpExitDialogLaterButton: {
     keyPath: '#ContentController.#8dcd9fd.#DialogBox.#ContentArea.#ButtonList.1.#buttonTextParent.#buttonText'
-  }
+  },
 
+  // Oops wrong password dialog
+  wrongPasswordDialog: {
+    keyPath: '#ContentController.#bb742c3.#DialogBox.#ContentArea'
+  },
+
+  // Oops wrong password dialog title
+  wrongPasswordTitle: {
+    keyPath: '#ContentController.#bb742c3.#DialogBox.#ContentArea.#Title'
+  },
+  
+  // Oops wrong password dialog message
+  wrongPasswordMessage: {
+    keyPath: '#ContentController.#bb742c3.#DialogBox.#ContentArea.#MessageGroup.#Message'
+  },
+
+  // Oops wrong password dialog Forgot Password button
+  wrongPasswordForgotButton: {
+    keyPath: '#ContentController.#bb742c3.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText'
+  },
+
+  // Oops wrong password dialog Retry button
+  wrongPasswordRetryButton: {
+    keyPath: '#ContentController.#bb742c3.#DialogBox.#ContentArea.#ButtonList.1.#buttonTextParent.#buttonText'
+  },
+
+  // title of Help is on the way! screen after user select Forgot Password
+  helpIsOnTheWayScreenTitle: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#forgotPasswordProcessingScreen.#pageLayout.#pageHeading'
+  },
+
+  // Get Back to What You Love Faster Consent Page
+  continueWatchingConsentPage: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#rokuContinueWatchingConsentScreen.0.#heading'
+  },
+
+  // Get Back to What You Love Faster Consent Page
+  continueWatchingConsentPageAcceptButton: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#rokuContinueWatchingConsentScreen.0.#buttonList.0'
+  },
+
+  // Welcome To Tubi Kids
+  welcomeToTubiKidsTitle: {
+    keyPath: '#ContentController.#9a73203.#DialogBox.#ContentArea.#Title'
+  },
+
+  // OK Button on the Welcome To Tubi Kids Dialog
+  welcomeToTubiKidsOKButton: {
+    keyPath: '#ContentController.#9a73203.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonTextFocused'
+  }
 });
 
 export {
