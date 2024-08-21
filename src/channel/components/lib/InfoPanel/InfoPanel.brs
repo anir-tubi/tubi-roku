@@ -245,6 +245,7 @@ Function onEpisodeTitleChange(msg)
     end if
     m.episode.text = episodeTitle
   else if episodeIsPresent = true
+      m.episode.text = ""
       m.offset.removeChild(m.episode)
   end if
 End Function
