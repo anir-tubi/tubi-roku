@@ -255,7 +255,7 @@ export async function verifyC3840() {
 				event.component_interaction.left_side_nav_component &&
 				event.component_interaction.left_side_nav_component.left_nav_section &&
 				event.component_interaction.left_side_nav_component.left_nav_section ===
-					'HOME' &&
+					'MOVIES' &&
 				event.component_interaction.user_interaction &&
 				event.component_interaction.user_interaction ===
 					UserInteraction.TOGGLE_ON
@@ -266,9 +266,9 @@ export async function verifyC3840() {
 		componentIteractionEvent.component_interaction.left_side_nav_component
 			.left_nav_section
 	).equal(
-		'HOME',
+		'MOVIES',
 		` componentIteractionEvent.component_interaction.left_side_nav_component
-			.left_nav_section===HOME, Event: \n
+			.left_nav_section===MOVIES, Event: \n
 	${JSON.stringify(componentIteractionEvent)} \n`
 	);
 	expect(componentIteractionEvent.component_interaction.user_interaction).equal(

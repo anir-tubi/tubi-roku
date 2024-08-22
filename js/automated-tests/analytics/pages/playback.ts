@@ -331,9 +331,11 @@ const PlayBack = ({ content }) => {
 
 	async function selectNextTitleInAutoplay(times) {
 		await waitForCountDown();
-		await allowPlaybackToPlayForSeconds(1000);
-		await ecp.sendKeypress(ecp.Key.Right, { count: times });
-		await allowPlaybackToPlayForSeconds(1000);
+		await allowPlaybackToPlayForSeconds(2000);
+		if (times != 0) {
+			await ecp.sendKeypress(ecp.Key.Right, { count: times });
+		}
+		await allowPlaybackToPlayForSeconds(2000);
 		await ecp.sendKeypress(ecp.Key.Ok);
 		await pageDidLoad();
 	}
