@@ -174,10 +174,6 @@ Function init()
 
   m.RAFAdContainer = m.top.findNode("RAFAdContainer")
 
-  m.AdsTask = m.top.findNode("AdsTask")
-  m.AdsTask.videoPlayerNode = m.top
-  m.AdsTask.control = "RUN"
-
   'm.VideoState is source of truth for the state of the video player for the UI
   'possible values are "play", "pause", "rew", "ffw", "stop", "refresh", "skip", "hop"
   updateVideoState("stop")
@@ -392,6 +388,11 @@ Function init()
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
   onThemeChange()
+
+  'Setting ad task control to "RUN" as the last step in init() because making UI updates, as in onThemeChange(), while the task is starting up causes bright script to throw loop detected error for some reason.
+  m.AdsTask = m.top.findNode("AdsTask")
+  m.AdsTask.videoPlayerNode = m.top
+  m.AdsTask.control = "RUN"
 End Function
 
 
