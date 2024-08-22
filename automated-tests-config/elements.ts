@@ -70,7 +70,7 @@ const elements = typeCheckElements({
   /** Component on the Home Screen that we can pull content for the Grid from */
   homeScreenRowList: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#RowList',
   },
 
   /** Component on the Movie Screen that we can pull content for the Grid from */
@@ -236,7 +236,7 @@ const elements = typeCheckElements({
 
   exitToUseThisFeatureMesage: {
     keyPath:
-      '#ContentController.#9f2a0ff.#DialogBox.#ContentArea.#MessageGroup.#Message',
+      '#ContentController.#9b8346e.#DialogBox.#ContentArea.#MessageGroup.#Message',
   },
 
 
