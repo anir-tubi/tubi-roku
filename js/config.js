@@ -167,17 +167,17 @@ function removeNullsFromObject(obj){
       removeNullsFromObject(value);
     }
   }
-  return obj
+  return obj;
 }
 
 
 function getOneTrustBuildTag(options) {
   const buildConfig = load(options)['one_trust_library_manifest'];
-  return formatOneTrustBuildTag(buildConfig)
+  return formatOneTrustBuildTag(buildConfig);
 }
 
 function formatOneTrustBuildTag(buildConfig) {
-  return `${buildConfig.major_version}_${buildConfig.minor_version}_${buildConfig.build_version}`
+  return `${buildConfig.major_version}_${buildConfig.minor_version}_${buildConfig.build_version}`;
 }
 
 

@@ -2,6 +2,8 @@ const log = require('fancy-log');
 const clipboardy = require('clipboardy');
 const prompts = require('prompts');
 const fs = require('fs');
+const path = require('path');
+const os = require('os');
 const shell = require('shelljs');
 shell.config.silent = true;
 
@@ -78,8 +80,33 @@ async function makeReleasePrs(done) {
   const gitRenameErrorMsg = `Could not rename the local branch to ${releaseBranchName}`;
   execShellCommand(done, gitRename, gitRenameErrorMsg);
 
+  const cdnBranchName = `roku_${fullBuildTag}`;
+
+  const commitMessage = `Updating the starter and remote components for ${cdnBranchName}`;
+
+  const starterComponentsFileName = `tubi_starter_components_${minorBuildTag}.pkg`;
+  const remoteComponentsFileName = `tubi_remote_components_${fullBuildTag}.pkg`;
+
+  const localStarterComponentsPath = `build/${starterComponentsFileName}`;
+  const localRemoteComponentsPath = `build/${remoteComponentsFileName}`;
+
   //create PR against rcdn repository
-  const rcdnPrUrl = await createCdnPrUrl(done);
+  let filePaths = [{
+    src: localStarterComponentsPath,
+    dst: `appFiles/starter-components/${starterComponentsFileName}`
+  }, {
+    src: localStarterComponentsPath,
+    dest: `rollbackStarterComponents/${fullBuildTag}/${starterComponentsFileName}` // Only sending to rcdn
+  }, {
+    src: localRemoteComponentsPath,
+    dest: `appFiles/components/${remoteComponentsFileName}`
+  }];
+
+  const rcdnPrUrl = await createCdnPullRequest(done, {
+    filePaths: filePaths,
+    cdnBranchName: cdnBranchName,
+    commitMessage: commitMessage
+  });
 
   // push the release branch to the project-total-recall repo
   log(`...Pushing the local ${releaseBranchName} branch to the remote ${ghInfo.rokuRepo} repo`);
@@ -125,14 +152,23 @@ ${rcdnPrUrl}`;
 
 //All the steps necessary to push starter and remote components to the CDN and make a PR to the CDN
 // returns the URL string of created PR.
-async function createCdnPrUrl(done) {
-
-  const minorBuildTag = getBuildTag('minor');
-  const fullBuildTag = getBuildTag('revision');
-
+// @args: object, args to be passed in function:
+//    filePaths: array of objects, each object has src and dest keys. The value for src is the path to the file being added to the CDN. The value for dest is the path within the CDN repo to which the file will be copied.
+//    cdnBranchName: string, the branch name to be created on the CDN repo
+//    commitMessage: string, the commit message to be used for the PR
+async function createCdnPullRequest(done, {
+  filePaths,
+  cdnBranchName,
+  commitMessage
+}) {
   let cdnPath = process.env.RCDN_GIT_DIRECTORY;
   let ghInfoCDNRepo = `${ghInfo.rcdnRepo}`;
   let cdnDirVariable = `RCDN_GIT_DIRECTORY`;
+
+  // fs.mkdir does not handle the tilde correctly so we need to replace it with the absolute path to the home directory to avoid failing
+  if (cdnPath.startsWith('~')) {
+    cdnPath = path.join(os.homedir(), cdnPath.slice(1));
+  }
 
 
   // check if the environment variable for the path to the CDN repo has been set
@@ -158,7 +194,6 @@ async function createCdnPrUrl(done) {
   execShellCommand(done, gitPullMasterCDN, gitPullMasterCDNErrorMsg);
 
   // attempt to check out a new branch off master for the CDN repo
-  const cdnBranchName = `roku_${fullBuildTag}`;
   // check if there is already a branch with the cdnBranchName and delete it if there is
   log(`...Checking if there already exists a local branch named ${cdnBranchName} on ${cdnPath}`);
   const gitListCDNBranch = `git -C ${cdnPath} branch --list ${cdnBranchName}`;
@@ -179,58 +214,31 @@ async function createCdnPrUrl(done) {
   const gitCheckoutNewCDNBranchErrorMsg = `Could not checkout a new branch "${cdnBranchName}" at ${cdnPath}`;
   execShellCommand(done, gitCheckoutNewCDNBranch, gitCheckoutNewCDNBranchErrorMsg);
 
-  const starterComponentsFileName = `tubi_starter_components_${minorBuildTag}.pkg`;
-  const remoteComponentsFileName = `tubi_remote_components_${fullBuildTag}.pkg`;
+  // Loops through each filePath object and copies the file from the src path to the dest path.
+  for (const filePath of filePaths) {
+    const destinationFilePath = `${cdnPath}/${filePath.dest}`;
 
-  let cdnStarterComponentsPath = `${cdnPath}/appFiles/starter-components/${starterComponentsFileName}`;
-  let cdnRemoteComponentsPath = `${cdnPath}/appFiles/components/${remoteComponentsFileName}`;
+    // We want to make sure the folder always exists first or else the copy will fail
+    fs.mkdirSync(path.dirname(destinationFilePath), { recursive: true });
 
-  const localStarterComponentsPath = `build/tubi_starter_components_${minorBuildTag}.pkg`;
-  const localRemoteComponentsPath = `build/tubi_remote_components_${fullBuildTag}.pkg`;
-
-  // copy the starter components from the /build directory to the CDN repo directory
-  log(`...Copying the starter components to the local ${ghInfoCDNRepo} repo`);
-  const moveStarterComponentsResult = shell.cp(localStarterComponentsPath, cdnStarterComponentsPath);
-  if (moveStarterComponentsResult.stderr) {
-    const errorMsg = `There was an error moving the starter components. You will need to manually copy the starter components and remote components and manually make a PR.
-          Error Message: ${moveStarterComponentsResult.stderr}`;
-    done(new NoStackError(errorMsg));
-  }
-
-  // copy the remote components from the /build directory to the CDN repo directory
-  log(`...Copying the remote components to the local ${ghInfoCDNRepo} repo`);
-  const moveRemoteComponentsRes = shell.cp(localRemoteComponentsPath, cdnRemoteComponentsPath);
-  if (moveRemoteComponentsRes.stderr) {
-    const errorMsg = `There was an error moving the remote components. You will need to manually copy the remote components and manually make a PR.
-          Error Message: ${moveRemoteComponentsRes.stderr}`;
-    done(new NoStackError(errorMsg));
-  }
-
-  // copy the rollback starter components from the /build directory to the CDN repo rollbackStarterComponents directory for backup
-
-  // create the directory if it doesn't exist
-  const makeVersionAsDir = shell.mkdir('-p', `${cdnPath}/rollbackStarterComponents/${fullBuildTag}`);
-  if (!makeVersionAsDir.stderr) {
-    let rollbackStarterComponentsPath = `${cdnPath}/rollbackStarterComponents/${fullBuildTag}/${starterComponentsFileName}`;
-
-    log(`...Copying the rollback starter components to the rollbackStarterComponents directory`);
-    const copyRollbackStarterComponentsRes = shell.cp(localStarterComponentsPath, rollbackStarterComponentsPath);
-
-    if (copyRollbackStarterComponentsRes.stderr) {
-      //just print the error message and continue.
-      log(`There was an error moving the starter component to rollback directory. You will need to manually copy the starter component to rollbackStarterComponents/fullVersion/ and create a PR.`);
+    const moveRemoteComponentsRes = shell.cp(filePath.src, destinationFilePath);
+    if (moveRemoteComponentsRes.stderr) {
+      const errorMsg = `There was an error moving ${filePath.src}. You will need to manually copy ${filePath.src} and manually make a PR.
+            Error Message: ${moveRemoteComponentsRes.stderr}`;
+      done(new NoStackError(errorMsg));
+      return;
     }
   }
 
   // add the updates so they are staged for commit
   log(`...Staging changes for commit on the local ${ghInfoCDNRepo} repo`);
-  const gitAddCDNBranch = `git -C ${cdnPath} add . `;
-  const gitAddCDNBranchErrorMsg = `Could not run "git add . " on ${cdnPath}`;
+  const gitAddCDNBranch = `git -C ${cdnPath} add .`;
+  const gitAddCDNBranchErrorMsg = `Could not run "git add ." on ${cdnPath}`;
   execShellCommand(done, gitAddCDNBranch, gitAddCDNBranchErrorMsg);
 
   // commit the updates to the branch
   log(`...Committing the staged changes on the local ${ghInfoCDNRepo} repo`);
-  const gitCommitCDNBranch = `git -C ${cdnPath} commit -m 'Updating the starter and remote components for ${cdnBranchName}'`;
+  const gitCommitCDNBranch = `git -C ${cdnPath} commit -m '${commitMessage}'`;
   const gitCommitCDNBranchErrorMsg = `"git commit" failed on ${cdnPath}`;
   execShellCommand(done, gitCommitCDNBranch, gitCommitCDNBranchErrorMsg);
 
@@ -243,12 +251,12 @@ async function createCdnPrUrl(done) {
   // make a PR against master on the CDN repo at Github
   log(`...Making a PR on ${ghInfoCDNRepo} against the remote master branch`);
   let cdnPrUrl = '';
-  let errMsg = `Failed to create CDN PRs. Please create manually.`;
+  let errMsg = `Failed to create CDN PR. Please create manually.`;
   try {
     const cdnPrRes = await octokit().pulls.create({
       owner: ghInfo.owner,
       repo: `${ghInfoCDNRepo}`,
-      title: `Updating starter and remote components for roku ${fullBuildTag}`,
+      title: commitMessage,
       head: cdnBranchName,
       base: 'master'
     });
@@ -266,115 +274,20 @@ async function createCdnPrUrl(done) {
 }
 
 
-async function createCdnPrUrlForOneTrustSDK(done, buildTag) {
-
-  const cdnPath = process.env.RCDN_GIT_DIRECTORY;
-  const CDNRepositoryUrl = `${ghInfo.rcdnRepo}`;
-
-  // check if the environment variable for the path to the CDN repo has been set
-  if (!cdnPath) {
-    const errorMsg = `You did not set a RCDN_GIT_DIRECTORY variable in your .bash_profile or .bashrc or .zsh_profile file.`;
-    done(new NoStackError(errorMsg));
-  }
-
-  // check that the CDN repo is clean - verifyGit() handles any error messages as necessary
-  verifyGit(done, cdnPath);
-
-  // attempt to checkout master in the CDN repo
-  log(`...Checking out master on the local ${CDNRepositoryUrl} repo`);
-  const gitCheckoutMasterCDN = `git -C ${cdnPath} checkout master`;
-  const gitCheckoutMasterCDNErrorMsg = `Could not checkout master on the ${cdnPath}`;
-  execShellCommand(done, gitCheckoutMasterCDN, gitCheckoutMasterCDNErrorMsg);
-
-  // attempt to pull origin master for the CDN repo
-  log(`...Pulling remote master to the local ${CDNRepositoryUrl} repo`);
-  const gitPullMasterCDN = `git -C ${cdnPath} pull origin master`;
-  const gitPullMasterCDNErrorMsg = `Could not pull master from origin at ${cdnPath}`;
-  execShellCommand(done, gitPullMasterCDN, gitPullMasterCDNErrorMsg);
-
-  // attempt to check out a new branch off master for the CDN repo
-  const cdnBranchName = `roku_one_trust_${buildTag}`;
-  // check if there is already a branch with the cdnBranchName and delete it if there is
-  log(`...Checking if there already exists a local branch named ${cdnBranchName} on ${cdnPath}`);
-  const gitListCDNBranch = `git -C ${cdnPath} branch --list ${cdnBranchName}`;
-  const gitListCDNBranchErrorMsg = `Could not list the branches at ${cdnPath}`;
-  const gitListRes = execShellCommand(done, gitListCDNBranch, gitListCDNBranchErrorMsg);
-
-  if (gitListRes) {
-    // there exists a branch with the cdnBranchName already, so delete it.
-    // We've already switched to master on `${cdnPath}` earlier in this flow.
-    log(`...Deleting the ${cdnBranchName} on ${cdnPath}`);
-    const gitDeleteCDNBranch = `git -C ${cdnPath} branch -D ${cdnBranchName}`;
-    const gitDeleteCDNBranchErrorMsg = `Could not delete the "${cdnBranchName}" branch at ${cdnPath}`;
-    execShellCommand(done, gitDeleteCDNBranch, gitDeleteCDNBranchErrorMsg);
-  }
-
-  log(`...Creating a new ${cdnBranchName} branch on the local ${CDNRepositoryUrl} repo`);
-  const gitCheckoutNewCDNBranch = `git -C ${cdnPath} checkout -b ${cdnBranchName}`;
-  const gitCheckoutNewCDNBranchErrorMsg = `Could not checkout a new branch "${cdnBranchName}" at ${cdnPath}`;
-  execShellCommand(done, gitCheckoutNewCDNBranch, gitCheckoutNewCDNBranchErrorMsg);
-
+async function createCdnPullRequestForOneTrustSDK(done, buildTag) {
   const oneTrustComponentsFileName = `tubi_one_trust_components_${buildTag}.pkg`;
 
-  const cdnOneTrustComponentsPath = `${cdnPath}/appFiles/one-trust-components/${oneTrustComponentsFileName}`;
+  const filePaths = [{
+    src: `build/${oneTrustComponentsFileName}`,
+    dest: `appFiles/one-trust-components/${oneTrustComponentsFileName}`
+  }];
 
-  const localOneTrustComponentsPath = `build/${oneTrustComponentsFileName}`;
-
-  // copy the starter components from the /build directory to the CDN repo directory
-  log(`...Copying the one trust components to the local ${CDNRepositoryUrl} repo`);
-  const moveStarterComponentsResult = shell.cp(localOneTrustComponentsPath, cdnOneTrustComponentsPath);
-  if (moveStarterComponentsResult.stderr) {
-    const errorMsg = `There was an error moving the one trust components. You will need to manually copy the starter components and remote components and manually make a PR. Error Message: ${moveStarterComponentsResult.stderr}`;
-    done(new NoStackError(errorMsg));
-  }
-
-
-  // add the updates so they are staged for commit
-  log(`...Staging changes for commit on the local ${CDNRepositoryUrl} repo`);
-  const gitAddCDNBranch = `git -C ${cdnPath} add . `;
-  const gitAddCDNBranchErrorMsg = `Could not run "git add . " on ${cdnPath}`;
-  execShellCommand(done, gitAddCDNBranch, gitAddCDNBranchErrorMsg);
-
-  // commit the updates to the branch
-  log(`...Committing the staged changes on the local ${CDNRepositoryUrl} repo`);
-  const gitCommitCDNBranch = `git -C ${cdnPath} commit -m 'Updating the one trust components for ${cdnBranchName}'`;
-  const gitCommitCDNBranchErrorMsg = `"git commit" failed on ${cdnPath}`;
-  execShellCommand(done, gitCommitCDNBranch, gitCommitCDNBranchErrorMsg);
-
-  // push the branch to Github
-  log(`...Pushing the local ${cdnBranchName} branch to the remote ${CDNRepositoryUrl} repo`);
-  const gitPushCDNBranch = `git -C ${cdnPath} push origin ${cdnBranchName}`;
-  const gitPushCDNBranchErrorMsg = `Could not push ${cdnBranchName} to origin (Github) at ${cdnPath}`;
-  execShellCommand(done, gitPushCDNBranch, gitPushCDNBranchErrorMsg);
-
-  // make a PR against master on the CDN repo at Github
-  log(`...Making a PR on ${CDNRepositoryUrl} against the remote master branch`);
-  let cdnPrUrl = '';
-  let errMsg = `Failed to create CDN PRs. Please create manually.`;
-  try {
-    const cdnPrRes = await octokit().pulls.create({
-      owner: ghInfo.owner,
-      repo: `${CDNRepositoryUrl}`,
-      title: `Updating one trust components for roku ${buildTag}`,
-      head: cdnBranchName,
-      base: 'master'
-    });
-    cdnPrUrl = cdnPrRes.data.html_url;
-  } catch (err) {
-    errMsg = err;
-  }
-
-  // failed to make PR on CDN/RCDN repo at Github due to git process steps. In this event stop execution of the script.
-  if (!cdnPrUrl) {
-    return done(new NoStackError(errMsg));
-  } else {
-    // multi line string
-    const prUrlsForPasting = `${cdnPrUrl}`;
-    clipboardy.writeSync(prUrlsForPasting);
-
-    log(`The CDN PR url have been placed on your clipboard. Please share with the team!`);
-    return cdnPrUrl;
-  }
+  const cdnBranchName = `roku_one_trust_${buildTag}`;
+  await createCdnPullRequest(done, {
+    cdnBranchName: cdnBranchName,
+    filePaths: filePaths,
+    commitMessage: `Updating the one trust components for ${cdnBranchName}`
+  });
 }
 
 
@@ -1081,5 +994,5 @@ module.exports = {
   bumpBuildTen,
   bumpRevision,
   tagBuild,
-  createCdnPrUrlForOneTrustSDK
+  createCdnPullRequestForOneTrustSDK
 };

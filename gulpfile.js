@@ -29,7 +29,7 @@ const {replaceTypographyConstants, updateTypographyJSON} = require('./js/typogra
 const {NoStackError} = require('./js/utilities');
 
 // Importing functions with Git functionality
-const {makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges, buildQaBranch, bumpBuild, bumpBuildTen, bumpRevision, tagBuild, createCdnPrUrlForOneTrustSDK} = require('./js/git');
+const {makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges, buildQaBranch, bumpBuild, bumpBuildTen, bumpRevision, tagBuild, createCdnPullRequestForOneTrustSDK} = require('./js/git');
 
 // Importing functions related to Github action runners
 const {setupAutomatedTestsGithubActionRunner, startAutomatedTestsGithubActionRunner, removeAutomatedTestsGithubActionRunner} = require('./js/action-runner');
@@ -708,7 +708,7 @@ function packageOneTrust(done) {
 
 function makeOneTrustReleasePrs(done) {
   const buildTag = getOneTrustBuildTag(options);
-  return createCdnPrUrlForOneTrustSDK(done, buildTag);
+  return createCdnPullRequestForOneTrustSDK(done, buildTag);
 }
 
 
@@ -983,7 +983,7 @@ exports.compareCheckedOut = findCommitsNotOnCurrentBranch;
 exports.addMissingImages = addMissingImagesToRemoteLibrary;
 exports.tasks = listTasks;
 exports.pushOneTrustStagingCDN = series(buildOneTrust, packageOneTrust, pushOneTrustStaging);
-exports.releaseOneTrust = series(buildOneTrust, packageOneTrust, makeOneTrustReleasePrs)
+exports.releaseOneTrust = series(buildOneTrust, packageOneTrust, makeOneTrustReleasePrs);
 
 // Automated test related
 // Because automated-tests has to call ts-node/register it takes over 300ms to load so we only want to load when necessary. We are adding wrappers for these functions here
