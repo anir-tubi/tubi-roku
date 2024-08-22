@@ -90,6 +90,9 @@
       <!-- We have to create a field due to renderTracking events being async each itemComponent should be aware of what the mode was when it rendered. -->
       <field id="shouldTrackViewableImpressionEvent" type="boolean" value="true" alias="CategoryGridList.shouldTrackViewableImpressionEvent" />
 
+      <!-- Will be set to true if we want to reset the grid position back to [0,0] -->
+      <field id="resetGridPosition" alias="CategoryGridList.resetGridPosition" />
+
     <!-- OUTPUTS -->
       <!-- Trigger the content to be loaded.  This field is used to delay
            the initial category content loading until after the stateful

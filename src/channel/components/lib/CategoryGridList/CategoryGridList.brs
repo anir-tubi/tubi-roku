@@ -119,6 +119,13 @@ Function onComponentFocusChange()
     if resolveAbbreviatedContent(itemToJumpTo) <> invalid
       m.justGainedFocus = true
       m.RowList.setFocus(true)
+
+      ' Adding to check to make sure if reset grid position was requested.
+      ' Making sure we are resetting after focus is set to rowlist.
+      if m.top.resetGridPosition = true
+        itemToJumpTo = [0, 0]
+        m.top.resetGridPosition = false
+      end if
     end if
 
     m.LinearProgramRefreshTimer.control = "start"

@@ -385,6 +385,10 @@ Function enableKidsModeFromSideNav()
   showDefaultHomeScreen()
   homeSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
   focusSideNavOption(homeSideNavID)
+  ' We are resetting the grid position to top because when we change modes the content of home screen is totally different.
+  ' So placing user back to the position which he was when in other modes like placing user down the 10th position when he switches from adult to kids
+  ' we should not be placing user at 10th row but start user at the top of the grid.
+  resetCategoryGridPosition()
 End Function
 
 
@@ -399,6 +403,10 @@ Function disableKidsModeFromSideNav()
   ' Since we are queuing braze in app messages when the application is in kids mode when the user exits kids mode
   ' We are going to process any queued messages.
   processQueuedInAppMessage()
+  ' We are resetting the grid position to top because when we change modes the content of home screen is totally different.
+  ' So placing user back to the position which he was when in other modes like placing user down the 10th position when he switches from adult to kids
+  ' we should not be placing user at 10th row but start user at the top of the grid.
+  resetCategoryGridPosition()
 End Function
 
 

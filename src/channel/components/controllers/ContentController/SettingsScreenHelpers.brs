@@ -325,6 +325,10 @@ End Function
 ' Also used after kids mode is enabled or disabled
 Function refreshScreenAfterParentalChanges()
   tubiLog("SettingsScreenHelpers.refreshScreenAfterParentalChanges")
+  ' We are resetting the grid position to top because when we change modes the content of home screen is totally different.
+  ' So placing user back to the position which he was when in other modes like placing user down the 10th position when he switches from adult to kids
+  ' we should not be placing user at 10th row but start user at the top of the grid.
+  resetCategoryGridPosition()
   homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
   if homeScreen <> invalid
     authInfo = getFieldFromGlobal("authInfo")

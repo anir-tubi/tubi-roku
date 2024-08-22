@@ -1105,6 +1105,7 @@ End Function
 ' @mode: string, one of the modes at constants.ui.modes
 Function setUiMode(mode)
   TubiLog("ContentController.setUiMode: " + mode)
+
   if mode = m.constants.ui.modes.standard
     'standard
     m.uiMode = mode
@@ -3016,4 +3017,13 @@ Function sendImpressionEvent()
     personalizationId: ""
     screenId: ""
   }
+End Function
+
+
+' Informs home screen to reset the position to top next time when it is recieves focus.
+Function resetCategoryGridPosition()
+  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  if homeScreen <> invalid
+    homeScreen.resetGridPosition = true
+  end if
 End Function
