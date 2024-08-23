@@ -13,10 +13,12 @@ Function init()
   m.Instructions = m.top.findNode("Instructions")
   m.Menu = m.top.findNode("AutoplayPreviewMenu")
   m.Menu.focusBitmapUri = "pkg:/images/menu-focus-$$RES$$.9.png"
+  m.Menu.focusFootprintBitmapUri = "pkg:/images/transparent.png"
 
   theme = getThemeFromGlobal()
   if theme <> invalid
     m.Menu.focusBitmapBlendColor = theme.focusedColor
+    m.Menu.focusFootprintBlendColor = theme.neutralColor
     m.Title.color = theme.primaryTextColor
     m.Instructions.color = theme.primaryTextColor
   end if

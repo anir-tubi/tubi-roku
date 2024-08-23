@@ -27,6 +27,7 @@ Function init()
   theme = getThemeFromGlobal()
   if theme <> invalid
     m.Menu.focusBitmapBlendColor = theme.focusedColor
+    m.Menu.focusFootprintBlendColor = theme.neutralColor
     m.Title.color = theme.primaryTextColor
     m.Instructions.color = theme.primaryTextColor
   end if
