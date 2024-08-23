@@ -627,7 +627,7 @@ Function getConstants()
       end if
 
       constants.urls.analytics.singleEvent = constants.urls.analytics.urlBase + "/v2/single-event" 'preferred by back end team
-    
+
     constants.urls.impressionEvents = {}
       constants.urls.impressionEvents.urlBase = "https://user-signals.staging-public.tubi.io/user-signals"
       ' QA analytics proxy server
@@ -971,6 +971,7 @@ Function getConstants()
   constants.errors.context.channelsScreen = "9"
   constants.errors.context.categoriesScreen = "10"
   constants.errors.context.linearPlayerScreen = "11"
+  constants.errors.context.epgScreen = "12"
   constants.errors.context.emailVerificationScreen = "13"
   constants.errors.context.forgotPasswordProcessingScreen = "15"
   constants.errors.context.myStuffScreen = "16"
