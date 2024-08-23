@@ -955,7 +955,7 @@ Function onRelatedItemFocused()
         m.top.navigateWithinPageInfo = {
           pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
           componentOneof: m.Tracking.getAnalyticsComponent("related_component", m.oldYmalComponent) 'category_list_component doesn't exist in protos
-          means_of_navigation: "BUTTON" 'MeansOfNavigation enum
+          means_of_navigation: "SCROLL" 'MeansOfNavigation enum
           vertical_location: row '1 based index
           horizontal_location: col
         }

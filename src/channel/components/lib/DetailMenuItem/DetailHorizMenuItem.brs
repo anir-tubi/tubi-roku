@@ -10,6 +10,11 @@ Function init()
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.title, typographyConstants.ids.bodyMediumStrong)
   setTypographyOfLabel(m.bottomItemText, typographyConstants.ids.bodySmallStrong)
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+
   onThemeChange()
 End Function
 
