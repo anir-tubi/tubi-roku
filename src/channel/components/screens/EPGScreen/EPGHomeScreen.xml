@@ -25,6 +25,9 @@
     <!-- Not Used in EPGScreen. But this field is set in SideNav functions and without interface brightScript will throw error  -->
     <field id="enabled" type="boolean" alwaysNotify="true"/>
 
+    <!-- set to true if the user is signed in and we want to change the experience based on that -->
+    <field id="signedIn" type="boolean" value="false" />
+
 
     <!--this field is used to reset the timeGrid linearChannelToPlay field in case of player error-->
     <field id="resetPlayerContent" type="boolean" alwaysNotify="true"/>
