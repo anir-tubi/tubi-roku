@@ -289,7 +289,7 @@ Function onEmailExistsResponse(response)
           end if
 
           ' Removing below special characters from firstName/lastName fields as it is not accepted in backend.
-          regex = CreateObject("roRegex", "[<>&,`'!@$%()=+{}[\]\""]", "")
+          regex = CreateObject("roRegex", "[<>&,`'!@$%()=+{}[\]\""]", "")  '" quote comment to aid in syntax highlighting
           firstName = regex.replaceAll(firstName, "")
           lastName = regex.replaceAll(lastName, "")
 
