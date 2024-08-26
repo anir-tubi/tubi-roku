@@ -266,7 +266,6 @@ Function init()
 
   m.sendImpressionEventTimer = CreateObject("roSGNode", "Timer")
   m.sendImpressionEventTimer.duration = 10
-  m.sendImpressionEventTimer.repeat = true
   m.sendImpressionEventTimer.observeFieldScoped("fire", "sendImpressionEvent")
 End Function
 
@@ -3017,6 +3016,9 @@ Function sendImpressionEvent()
     personalizationId: ""
     screenId: ""
   }
+  
+  m.sendImpressionEventTimer.control = "stop"
+  m.sendImpressionEventTimer.control = "start"
 End Function
 
 
