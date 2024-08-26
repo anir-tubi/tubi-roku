@@ -67,7 +67,7 @@ Function init()
   m.video.observeFieldScoped("availableSubtitleTracks", "setCCAudioTransportBarVisibility")
   m.video.observeFieldScoped("availableAudioTracks", "onAvailableAudioTracksChange")
   m.video.observeFieldScoped("audioTrack", "onAudioTrackChanged")
-  m.video.observeFieldScoped("subtitleTrack", "onSubtitleTrackChanged")  
+  m.video.observeFieldScoped("subtitleTrack", "onSubtitleTrackChanged")
   if getExperimentResource("roku_async_stop", "roku_async_stop_v5", false).enabled = true then
     m.video.asyncStopSemantics = true
   end if
@@ -1832,9 +1832,7 @@ Function updateVideoPlayerState(content) as Void
   'add the skip trailer button if it's a trailer and it doesn't already exist on the transport
   else
 
-    if (content.rating = "R" OR content.rating = "TV-MA" OR content.rating = "NC-17") AND m.constants.deviceinfo.countrycode = "US" AND isLoggedInUser() = false AND getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v2", false).enabled = true
-      m.TransportButtons.removeChild(m.SkipTrailerButton)
-    else if isNonEmptyString(content.loginReason) = true
+    if isNonEmptyString(content.loginReason) = true
       m.TransportButtons.removeChild(m.SkipTrailerButton)
     else if m.NodeHelpers.getChildIndex(m.TransportButtons, m.SkipTrailerButton) < 0
       m.TransportButtons.insertChild(m.SkipTrailerButton, 0)

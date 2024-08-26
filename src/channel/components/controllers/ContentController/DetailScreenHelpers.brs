@@ -104,10 +104,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     ' checking if the series content node exists in the content cache prior to fetching the content
     seriesContent = invalid
     if content.type = m.constants.ui.contentTypes.series
-      'if roku_registration_vs_tvt_lock_rated_content exp is true then do not use the cached content because needsLogin info might not be accurate.
-      if getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v2", false).enabled <> true
-        seriesContent = getFromContentCache(content.id)
-      end if
+      seriesContent = getFromContentCache(content.id)
     end if
 
     ' don't send tracking in case of series until we resolve series episode and send tracking if we already populate the detail screen to avoid wrong order of events
@@ -336,12 +333,6 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
 
     lineOneData.length = stateSource.length
     lineOneData.rating = stateSource.rating
-
-    rating = UCase(stateSource.rating)
-    if (rating = "R" OR rating = "TV-MA" OR rating = "NC-17") AND m.constants.deviceinfo.countrycode = "US" AND isLoggedInUser() = false
-      getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v2")
-    end if
-
     lineOneData.releaseDate = content.releaseDate
     lineOneData.descriptorCode = content.descriptorCode
     lineOneData.partnerLogoUri = content.inlineLogoUri

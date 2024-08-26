@@ -532,11 +532,6 @@ Function onItemFocused(msg)
         genres: focusedContent.genres
       }
 
-      rating = UCase(focusedContent.rating)
-      if (rating = "R" OR rating = "TV-MA" OR rating = "NC-17") AND m.constants.deviceinfo.countrycode = "US"  AND isLoggedInUser() = false
-        getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v2")
-      end if
-
       if focusedContent.needsLogin = true AND m.top.signedIn <> true
         m.searchScreenInfoPanel.loginReason = focusedContent.loginReason 'set loginreason before needslogin
         m.searchScreenInfoPanel.needsLogin = true

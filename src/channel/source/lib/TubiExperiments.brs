@@ -29,7 +29,7 @@ Function TubiExperiments(constants) as Object
       roku_category_redesign: {
         roku_category_redesign_v2: {"enabled": false}
       }
-      
+
       roku_large_play_progress: {
         roku_large_play_progress_v1 : {"enabled": true}
       }
@@ -44,10 +44,6 @@ Function TubiExperiments(constants) as Object
 
       roku_like_dislike_on_autoplay: {
         roku_like_dislike_on_autoplay_v2: {"enabled": false}
-      }
-
-      roku_registration_vs_tvt_lock_rated_content: {
-        roku_registration_vs_tvt_lock_rated_content_v2: {"enabled" : false}
       }
 
       roku_async_stop: {

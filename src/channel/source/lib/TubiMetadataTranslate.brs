@@ -438,11 +438,6 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.ratings <> invalid AND contentFromServer.ratings[0] <> invalid AND contentFromServer.ratings[0].value <> invalid
     translatedContent.rating = contentFromServer.ratings[0].value
 
-    rating = translatedContent.rating
-    if (rating = "R" OR rating = "TV-MA" OR rating = "NC-17") AND m.constants.deviceinfo.countrycode = "US" AND translatedContent[typeVar] <> m.contentTypes.linear AND isSignedInUser = false AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v2").enabled = true
-      translatedContent.needsLogin = true
-    end if
-
     if contentFromServer.ratings[0].descriptors <> invalid AND contentFromServer.ratings[0].descriptors.Count() > 0
       m.setDescriptorCodeAndDescription(translatedContent, contentFromServer.ratings[0].descriptors)
     end if
@@ -1391,13 +1386,6 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
 
           if fullChild.showAllText <> invalid
             childAA.append({showAllText: fullChild.showAllText})
-          end if
-          '//TODO: REMOVE AFTER EXPERIMENT roku_registration_vs_tvt_lock_rated_content
-          if fullChild.ratings <> invalid AND fullChild.ratings[0] <> invalid AND fullChild.ratings[0].value <> invalid
-            rating = UCase(fullChild.ratings[0].value)
-            if (rating = "R" OR rating = "TV-MA" OR rating = "NC-17") AND m.constants.deviceinfo.countrycode = "US" AND fullChild.type <> "l" AND isSignedInUser = false AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v2").enabled = true
-              childAA.needsLogin = true
-            end if
           end if
 
           if fullChild.needs_login = true AND isSignedInUser = false
@@ -2465,13 +2453,6 @@ Function tubiMetadataTranslate_upNextTranslateRecursiveWrapper(content, upnextCo
       else
         bInclude = false
       end if
-    end if
-  end if
-
-  if (bInclude = true AND m.experiments <> invalid AND m.constants.deviceinfo.countrycode = "US" AND m.experiments.getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v2").enabled = true)
-    rating = UCase(content.ratings[0].value)
-    if (rating = "R" OR rating = "TV-MA" OR rating = "NC-17") AND isSignedInUser = false
-      bInclude = false
     end if
   end if
 
