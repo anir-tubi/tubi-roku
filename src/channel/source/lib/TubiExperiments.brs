@@ -35,7 +35,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_all_episiodes: {
-        roku_all_episiodes_v1 : {"enabled": false}
+        roku_all_episiodes_v1 : {"enabled": true}
       }
 
       roku_linear_favorites: {
