@@ -81,6 +81,30 @@ Function init()
 
   onWidthChange()
 
+  ' this enum been used to avoid calling getTranslation every time item been focused.
+  m.signInTextEnum = {}
+  m.signInTextEnum[m.constants.ui.loginReasons.matureContentGating] = getTranslation("registration_signIn_to_play_R_rated")
+  m.signInTextEnum[m.constants.ui.loginReasons.unknown] = getTranslation("registration_signIn_to_play_default")
+  m.signInText.text = m.signInTextEnum[m.constants.ui.loginReasons.unknown] 'default value if loginReason="" instead of UNKNOWN as expected
+
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.title, typographyConstants.ids.headerSmall)
+  setTypographyOfLabel(m.episode, typographyConstants.ids.subheaderSmall)
+  setTypographyOfLabel(m.Line1, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.Line1Bold, typographyConstants.ids.subheaderSmall)
+  setTypographyOfLabel(m.DescriptorCode, typographyConstants.ids.bodyExtraSmallStrong)
+  setTypographyOfLabel(m.RatingLabel, typographyConstants.ids.bodyExtraSmallStrong)
+  setTypographyOfLabel(m.ExpireWarning, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.Line2, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.Description, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.SignInText, typographyConstants.ids.bodySmall)
+  setTypographyOfLabel(m.ReminderTitle, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.DirectorTag, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.Director, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.StarringTag, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.Starring, typographyConstants.ids.bodyMedium)
+
+
   m.starringTag.width = 0
   m.directorTag.width = 0
   m.directorTag.text = getTranslation("metadata_directed")
@@ -101,30 +125,6 @@ Function init()
 
   DirectorRect.width = nMatchDirectorWidth + spacerWidth
   StarringRect.width = nMatchStarringWidth + spacerWidth
-
-  ' this enum been used to avoid calling getTranslation every time item been focused.
-  m.signInTextEnum = {}
-  m.signInTextEnum[m.constants.ui.loginReasons.matureContentGating] = getTranslation("registration_signIn_to_play_R_rated")
-  m.signInTextEnum[m.constants.ui.loginReasons.unknown] = getTranslation("registration_signIn_to_play_default")
-  m.signInText.text = m.signInTextEnum[m.constants.ui.loginReasons.unknown] 'default value if loginReason="" instead of UNKNOWN as expected
-
-
-  typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.title, typographyConstants.ids.headerSmall)
-  setTypographyOfLabel(m.episode, typographyConstants.ids.subheaderSmall)
-  setTypographyOfLabel(m.Line1, typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.Line1Bold, typographyConstants.ids.subheaderSmall)
-  setTypographyOfLabel(m.DescriptorCode, typographyConstants.ids.bodyExtraSmallStrong)
-  setTypographyOfLabel(m.RatingLabel, typographyConstants.ids.bodyExtraSmallStrong)
-  setTypographyOfLabel(m.ExpireWarning, typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.Line2, typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.Description, typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.SignInText, typographyConstants.ids.bodySmall)
-  setTypographyOfLabel(m.ReminderTitle, typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.DirectorTag, typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.Director, typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.StarringTag, typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.Starring, typographyConstants.ids.bodyMedium)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
