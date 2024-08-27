@@ -104,7 +104,7 @@ Function setUIBasedOnFocus(bAnimateOn = true)
 
   if m.top.hasFocus() = true
     if m.top.isLoading = true
-      '//Since the content is still loading and there is nothing to focus on, 
+      '//Since the content is still loading and there is nothing to focus on,
       '//then have the focus return to the left panel
       m.top.backButtonPressed = true
     else if m.top.content <> invalid
@@ -158,7 +158,7 @@ Function onLoadContent()
 
       populateContent = category.getChild(nPopulateIndex) 'contentNode
 
-      populateInfoPanel(m.InfoPanel, populateContent) 
+      populateInfoPanel(m.InfoPanel, populateContent)
       m.ContentGrid.visible = true
 
       setUIBasedOnFocus(false)
@@ -243,7 +243,7 @@ Function onItemFocused(msg)
         end if
 
       else
-        
+
         m.contentLoadedAndFocused = true
         m.oldCategoryComponent = getTrackingComponentInfo(item, numColumns, category, m.Tracking)
         focusedContent = category.getChild(m.ContentGrid.itemFocused)
@@ -256,7 +256,7 @@ Function onItemFocused(msg)
       '//Most likely what happened is that the content was modified while the screen is off screen: i.e. ContinuedWatching screen no longer has any content so refreshing the page will most likely result in a content error.
       m.top.refreshChannel = true
     end if
-    
+
   end if
 End Function
 
@@ -378,9 +378,8 @@ Function onKeyEvent(key, press) as Boolean
     end if
   else
     if key = "back"
-      authInfo = m.global.authInfo
       ' show SignInRequired modal when guest user presses back from ActivationCodeScreen to CategoryDetailsScreen
-      if authInfo = invalid OR (authInfo <> invalid AND authInfo.userId = invalid)
+      if isLoggedInUser() = false then
         m.top.signInRequired = true
         handled = true
       end if

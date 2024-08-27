@@ -295,7 +295,7 @@ Function verifyAgeAtSignup(signInInfo, birthdate)
     })
   else
     ' not expected to ever happen, so punt and start the app normally if it does
-    startUserExperienceAsAgeNotVerified()
+    runControllerStartSequenceAsAgeNotVerified()
   end if
 
 End Function
@@ -348,7 +348,7 @@ Function onAgeVerifiedAtStartup(age)
   ' Fire for successful age verified at startup.
   m.top.signalBeacon("AppDialogComplete")
 
-  startUserExperience()
+  runControllerStartSequence()
 End Function
 
 
@@ -357,7 +357,7 @@ Function onAgeNotVerifiedAtSignIn(err)
     if err.code = 422 OR err.code = 451
       handle_422_451_error(restartChannelAfterAgeVerification) ' happens when user enters age less than 13
     else
-      handleNetworkError(err, verifyAgeAtSignIn, startUserExperienceAsAgeNotVerified) ' happens when there is a network failure or some backend issue
+      handleNetworkError(err, verifyAgeAtSignIn, runControllerStartSequenceAsAgeNotVerified) ' happens when there is a network failure or some backend issue
     end if
   end if
 End Function
@@ -400,9 +400,9 @@ End Function
 Function onAgeNotVerifiedAtStartup(err)
   if err <> invalid AND err.code <> invalid
     if err.code = 422 OR err.code = 451
-      handle_422_451_error(startUserExperienceAsAgeNotVerifiedOnStartUp) ' happens when user enters age less than 13
+      handle_422_451_error(runControllerStartSequenceAsAgeNotVerifiedOnStartUp) ' happens when user enters age less than 13
     else
-      handleNetworkError(err, verifyAgeAtStartUp, startUserExperienceAsAgeNotVerifiedOnStartUp) ' happens when there is a network failure or some backend issue
+      handleNetworkError(err, verifyAgeAtStartUp, runControllerStartSequenceAsAgeNotVerifiedOnStartUp) ' happens when there is a network failure or some backend issue
     end if
   end if
 End Function
@@ -423,9 +423,9 @@ Function onAgeNotVerifiedAtSignup(error)
 
     ' List of error codes from the constants.
     errorCodes = m.constants.errors.codes
-    
+
     if httpCode = 422 OR httpCode = 451
-      
+
       ' If the user is in GDPR countries then user is not allowed to use the application if they are not 18+.
       if isGDPR(m.constants) = true
         resetAuthStateOnAgeGateError()
@@ -439,7 +439,7 @@ Function onAgeNotVerifiedAtSignup(error)
     else
       handleNetworkErrorOnSignUp(error) ' happens when there is a network failure or some backend issue
     end if
-    
+
   end if
 End Function
 
@@ -520,22 +520,17 @@ Function handleNetworkErrorOnSignUp(err)
   cancelSignUpButton = getTranslation("dialog_button_cancel") + " " + getTranslation("dialog_button_signUp")
   buttons = [getTranslation("dialog_button_tryAgain"), cancelSignUpButton]
 
-  showErrorModal(modalInfo, verifyAgeAtSignupWrapper, verifyAgeAtSignupParams, startUserExperienceAsAgeNotVerified, invalid, buttons)
+  showErrorModal(modalInfo, verifyAgeAtSignupWrapper, verifyAgeAtSignupParams, runControllerStartSequenceAsAgeNotVerified, invalid, buttons)
 End Function
 
 
 ' triggered when user enters age less than 13 on age gate screen
 Function handle_422_451_error(callback)
-  Request = TubiRequest(m.constants.settings)
-  Auth = TubiAuth(m.constants, Request)
-
   ' 422: the user is not old enough to use Tubi except in kids mode according to COPPA (US only)
   ' 451: the user is not old enough to use Tubi except in kids mode for some international reasons
-  m.guestUserHasAgeInfo = Auth.setGuestUserHasAgeInfo(false)
-  Auth.logout()
-  m.global.authInfo = invalid
+  m.guestUserHasAgeInfo = setGuestUserHasAgeInfo(false)
+  m.tubiAuthUpdate.logout(callback) ' redirecting to kidsMode after we logout, so that user will be aware what the experience will be
   setUiMode(m.constants.ui.modes.kidsAgeGate) ' setting ui mode to kids Age gate
-  callback() ' redirecting to kidsMode before showing enterKidsMode modal, so that user will be aware what the experience will be
 
   currentScreen = getCurrentScreen()
   if m.uiMode = m.constants.ui.modes.kidsAgeGate then
@@ -663,7 +658,7 @@ Function onAgeSubmitted(verifyAgeCallback) as Void
     verifyAgeCallback(birthdate)
   else
     ' not expected to ever happen, so punt and start the app normally if it does
-    startUserExperienceAsAgeNotVerified()
+    runControllerStartSequenceAsAgeNotVerified()
   end if
 End Function
 
@@ -692,7 +687,7 @@ Function verifyAge(birthdate, successCallback, errorCallback)
 
   else
     ' not expected to ever happen, so punt and start the app normally if it does
-    startUserExperienceAsAgeNotVerified()
+    runControllerStartSequenceAsAgeNotVerified()
   end if
 End Function
 
@@ -730,28 +725,17 @@ Function onAgeVerified(age)
   tubiLog("AgeVerificationScreen.onAgeVerified")
   m.spinner.visible = true
 
-  Request = TubiRequest(m.constants.settings)
-  Auth = TubiAuth(m.constants, Request)
-
   if isLoggedInUser() AND age >= m.constants.ui.ages.ageGate
     ' age verified for logged in user so update auth info
-    authInfo = m.global.authInfo
-    updatedAuthInfo = Auth.updateAuthInfoWithAge(true)
-    if isAA(authInfo) = true AND isAA(updatedAuthInfo) = true
-      ' append updatedAuthInfo to the global authInfo to maintain the existing additional fields from global that aren't stored in registry
-      authInfo.append(updatedAuthInfo)
-      updatedAuthInfo = authInfo
-    end if
-    m.global.authInfo = updatedAuthInfo
+    m.tubiAuthUpdate.updateAuthInfoWithAge(true)
   else if age >= m.constants.ui.ages.ageGate
     ' age verified for guest user, so store age verification
-    m.guestUserHasAgeInfo = Auth.setGuestUserHasAgeInfo(true)
+    m.guestUserHasAgeInfo = setGuestUserHasAgeInfo(true)
   end if
 End Function
 
 
-Function startUserExperienceAsAgeNotVerifiedOnStartUp()
-  m.authInfoReceived = true
+Function runControllerStartSequenceAsAgeNotVerifiedOnStartUp()
   m.ageVerificationComplete = true
   m.spinner.visible = true
 
@@ -760,15 +744,14 @@ Function startUserExperienceAsAgeNotVerifiedOnStartUp()
   ' Fire for not age verified at startup.
   m.top.signalBeacon("AppDialogComplete")
 
-  startUserExperience()
+  runControllerStartSequence()
 End Function
 
 
-Function startUserExperienceAsAgeNotVerified()
-  m.authInfoReceived = true
+Function runControllerStartSequenceAsAgeNotVerified()
   m.ageVerificationComplete = true
   m.spinner.visible = true
-  startUserExperience()
+  runControllerStartSequence()
 End Function
 
 
@@ -799,26 +782,12 @@ Function onBirthdayCheckSuccess(hasAgeInfo)
   tubiLog("AgeVerificationScreenHelpers.onBirthdayCheckSuccess")
 
   if hasAgeInfo <> invalid AND hasAgeInfo.hasAge = true
-    Request = TubiRequest(m.constants.settings)
-    Auth = TubiAuth(m.constants, Request)
-
-    authInfo = m.global.authInfo
-    updatedAuthInfo = Auth.updateAuthInfoWithAge(true)
-    if isAA(authInfo) = true AND isAA(updatedAuthInfo) = true
-      ' append updatedAuthInfo to the global authInfo to maintain the existing additional fields from global that aren't stored in registry
-      authInfo.append(updatedAuthInfo)
-      updatedAuthInfo = authInfo
-    end if
-    m.global.authInfo = updatedAuthInfo
-
-    if updatedAuthInfo.hasAge = true
-      m.ageVerificationComplete = true
-    end if
-    startUserExperience()
+    m.tubiAuthUpdate.updateAuthInfoWithAge(true)
+    m.ageVerificationComplete = true
+    runControllerStartSequence()
   else
-
     signInInfo = {}
-    authInfo = m.global.authInfo
+    authInfo = m.tubiAuthUpdate.getAuthInfo()
     if isLoggedInUser(authInfo) AND authInfo.firstname <> invalid
       signInInfo.email = authInfo.email
       signInInfo.firstname = authInfo.firstname
@@ -836,21 +805,16 @@ Function onBirthdayCheckError(errorInfo)
   tubiLog("AgeVerificationScreenHelpers.onBirthdayCheckError")
   if errorInfo <> invalid
     code = errorInfo.code
-    Request = TubiRequest(m.constants.settings)
-    Auth = TubiAuth(m.constants, Request)
 
     if code = 422 OR code = 451
       ' 422 signifies the user has birthdate under age 13 (COPPA)
       ' 451 signifies the user is too young internationally
       ' logout the user and prepare them for age gated kids mode
-      Auth.logout()
-      m.global.authInfo = invalid
-      Auth.setGuestUserHasAgeInfo(false)
-      startUserExperience()
+      setGuestUserHasAgeInfo(false)
+      m.tubiAuthUpdate.logout(runControllerStartSequence)
     else
       ' all other error codes, log the user out and show "couldn't log you in error message"
-      Auth.logout()
-      m.global.authInfo = invalid
+      m.tubiAuthUpdate.logout()
 
       userErrorCode = getUserFacingErrorCode("12", "100", code.toStr())
       message = getTranslation("error_check_birthdate_description")
@@ -872,7 +836,7 @@ Function onBirthdayCheckError(errorInfo)
       title = getTranslation("dialog_errorOops_title")
       message = getErrorMessage(message, userErrorCode)
 
-      showSimpleInstantResumableModal(title, message, [], dialogEvent, m.trackingLoggingTask, startUserExperience)
+      showSimpleInstantResumableModal(title, message, [], dialogEvent, m.trackingLoggingTask, runControllerStartSequence)
     end if
   end if
 End Function
@@ -895,7 +859,7 @@ Function patchSignedInUserAge()
       }
     }
 
-    authInfo = m.global.authInfo
+    authInfo = m.tubiAuthUpdate.getAuthInfo()
     if isLoggedInUser(authInfo)
       patchSettingsInfo = m.userDeviceApi.patchSettingsInfo(options)
 
@@ -921,11 +885,8 @@ End Function
 
 
 Function resetAuthStateOnAgeGateError()
-  Request = TubiRequest(m.constants.settings)
-  Auth = TubiAuth(m.constants, Request)
-  m.guestUserHasAgeInfo = Auth.setGuestUserHasAgeInfo(false)
-  Auth.logout()
-  m.global.authInfo = invalid
+  m.guestUserHasAgeInfo = setGuestUserHasAgeInfo(false)
+  m.tubiAuthUpdate.logout()
 End Function
 
 

@@ -57,7 +57,7 @@ Function init()
   m.backgroundUriList = []
 
   m.privacyDisclaimer = m.top.findNode("privacyDisclaimer")
-  externalConfig = m.constants.externalConfig.info
+  externalConfig = getExternalConfigInfoFromGlobal()
   params = {
     "privacy_policy_url": externalConfig.privacy_policy_url,
     "terms_of_use_url": externalConfig.terms_of_use_url

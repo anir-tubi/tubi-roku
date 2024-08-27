@@ -21,6 +21,7 @@ Function init()
   m.logoGroup = m.top.findNode("logoGroup")
   m.LoadingMessage = m.top.findNode("LoadingMessage")
   m.AdsSSAITask = m.top.findNode("PlayerAdsSSAITask")
+  m.top.task = m.AdsSSAITask
   m.AdsSSAITask.observeField("nowPlaying", "onAdChange")
 
   m.Video = m.top.findNode("VideoNode") ' reference in case we change from extending Video to extending Group

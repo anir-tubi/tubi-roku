@@ -24,7 +24,8 @@ Function init()
     m.RowList.observeField("itemFocused", "onItemFocused")
   end if
 
-  experiments = TubiExperiments(m.constants)
+  experimentsInfo = getExperimentsInfoFromGlobal()
+  experiments = TubiExperiments(experimentsInfo)
   m.metadataTranslate = TubiMetadataTranslate(m.constants, experiments)
 
   m.RowList.drawFocusFeedbackOnTop = true

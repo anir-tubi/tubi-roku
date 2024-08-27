@@ -264,7 +264,6 @@ Function onEmailExistsResponse(response)
       else
         if parsedResponse.code = "AVAILABLE"
           '//user's email address does not exist in Tubi servers, so sign user up with a new Tubi account
-          m.authInfoReceived = false
           signUpCredentials = {}
           signUpCredentials.email = email
           signUpCredentials.emailType = emailType
@@ -413,7 +412,8 @@ End Function
 
 ' onSignUpResponse callback is triggered when the sign up is success
 ' @_response: the response of signUp API in the form of AA
-Function onSignUpResponse(_response)
+Function onSignUpResponse(response)
+  m.tubiAuthUpdate.handleRegistration(response)
 
   m.trackingLoggingTask.trackEvent = {
     type: "account"
@@ -485,6 +485,8 @@ End Function
 ' onSignInResponse callback is triggered when the sign In is success
 ' @response: assocarray or invalid, the response of signIn API in the form of AA or invalid if called from onQueryStatusOfMagicLinkResponse
 Function onSignInResponse(response)
+  m.tubiAuthUpdate.handleRegistration(response)
+
   m.trackingLoggingTask.trackEvent = {
     type: "account"
     values: {
@@ -537,44 +539,6 @@ Function onSignInResponse(response)
       })
     end if
   end if
-
-  '//::TODO::roku_registration_gender_data - once the user is signed in, then call an API to ensure
-  '//   the Roku saved info (i.e. gender, first name, etc) are saved using the following API
-  '//   https://docs.tubi.io/api_docs/account#operations-User-patch-user-settings,
-  '//
-  '//   Is there a problem if the user saved something different in the Roku accont as compared to Tubi account?
-  '//   For example, what if the user has the two accounts. In the Roku account, he is known as Thomas, and
-  '//   in the Tubi account, he set his name to be his nickname, Tommy. So everytime we signs into his Roku app, it
-  '//   changes his name to Thomas. The user changes his name in Tubi.tv, but again everytime he signs into the Roku app,
-  '//   his name changes - very frustrating.
-  '//   Maybe things like names and gender only changes if that info is not present in Tubi but is present in the Account info?
-  '//   i.e. isNonEmptyString(_response.first_name) = false, isNonEmptyString(_response.gender) = false
-
-
-  ' signInScreen = getFromScreenCache(m.constants.ui.screenIds.signInScreen)
-  ' rokuUserInfo = signInScreen.signInInfo
-  ' if rokuUserInfo <> invalid
-  '   genderSend = ""
-  '   firstNameSend = ""
-  '   lastNameSend = ""
-  '   if isNonEmptyString(rokuUserInfo.gender) = true AND isNonEmptyString(_response.gender) = false
-  '     '//Roku account has gender info, but the Tubi account does not
-  '     genderSend = rokuUserInfo.gender
-  '   end if
-  '   if isNonEmptyString(rokuUserInfo.firstName) = true AND isNonEmptyString(_response.first_name) = false
-  '     '//Roku account has first name info, but the Tubi account does not
-  '     firstNameSend = rokuUserInfo.firstName
-  '   end if
-  '   if isNonEmptyString(rokuUserInfo.lastName) = true AND isNonEmptyString(_response.last_name) = false
-  '     '//Roku account has last name info, but the Tubi account does not
-  '     lastNameSend = rokuUserInfo.lastName
-  '   end if
-
-  '   if isNonEmptyString(lastNameSend) OR isNonEmptyString(firstNameSend) OR isNonEmptyString(lastNameSend)
-  '     '//if any of the data in not empty then send the data that is not empty using the following API
-  '     '//   https://docs.tubi.io/api_docs/account#operations-User-patch-user-settings,
-  '   end if
-  ' end if
 
   onActivationSuccess()
 
@@ -648,12 +612,6 @@ End Function
 Function onActivationSuccess()
 
   tubiLog("SignInHelpers.onActivationSuccess")
- ' retrieve the credentials on the AuthTask before starting the UI. This reduces jank.
-  m.authInfoReceived = false
-  if m.authTask <> invalid
-    m.authTask.unobserveFieldScoped("authInfo")
-  end if
-
   getUserInfo(refreshConsent)
 
   m.spinner.visible = true
@@ -685,18 +643,15 @@ End Function
 
 Function onPostSignInAuthInfoUpdated()
   tubiLog("SignInHelpers.onPostSignInAuthInfoUpdated")
-  authInfo = getFieldFromGlobal("authInfo")
-
+  authInfo = m.tubiAuthUpdate.getAuthInfo()
   if (shouldShowAgeGate() AND authInfo <> invalid AND authInfo.hasAge <> true)
     m.spinner.visible = false
     signInInfo = invalid
 
-    if authInfo <> invalid
-      signInInfo = {}
-      signInInfo.email  = authInfo.email
-      signInInfo.firstname = authInfo.firstname
-      signInInfo.gender = authInfo.gender
-    end if
+    signInInfo = {}
+    signInInfo.email  = authInfo.email
+    signInInfo.firstname = authInfo.firstname
+    signInInfo.gender = authInfo.gender
     showAgeVerificationScreenAtSignIn(signInInfo)
   else if m.shouldShowRokuCWConsentScreen = true
     m.shouldShowRokuCWConsentScreen = false
@@ -764,7 +719,8 @@ Function onSideNavSignInCompleted()
   setContentToRefreshAllPersonalizedScreens()
 
   refreshAllDetailScreens()
-  setSideNavSignedInItem(m.global.authInfo)
+  authInfo = m.tubiAuthUpdate.getAuthInfo()
+  setSideNavSignedInItem(authInfo)
 
   ' this happens when a user signs out or user signs in from the side nav or from settings side nav
   startChannel()
@@ -822,7 +778,7 @@ end function
 
 
 Function onPostSignOutServerPersistentDataRefresh()
-  authInfo = getFieldFromGlobal("authInfo")
+  authInfo = m.tubiAuthUpdate.getAuthInfo()
   ' set the mode before any changes are done to the UI
   setUiMode(m.constants.ui.modes.standard)
 
@@ -839,24 +795,18 @@ End Function
 Function onStartupAuthInfoReceived()
   tubiLog("SignInHelpers.onStartupAuthInfoReceived")
   handleUpdatedAuth()
-  startUserExperience()
+  runControllerStartSequence()
 End Function
 
 
 ' These are the basic actions taken after the user has signed in
 Function handleUpdatedAuth()
   ' AuthInfo may be invalid if authTask failed to log the user in
-  authInfo = m.authTask.authInfo
   if shouldShowAgeGate()
-    m.guestUserHasAgeInfo = m.authTask.guestUserHasAgeInfo
+    m.guestUserHasAgeInfo = getGuestUserHasAgeInfo()
   end if
-  m.global.authInfo = authInfo
 
-  ' These will be empty parent nodes (no children) if user is not authenticated
-  m.authInfoReceived = true
-  m.authTask.unobserveFieldScoped("authInfo")
-  m.authTask = invalid
-
+  authInfo = m.tubiAuthUpdate.getAuthInfo()
   setSideNavSignedInItem(authInfo)
 End Function
 
@@ -1095,7 +1045,6 @@ End Function
 
 
 Function signUserUpForQAAutomation()
-  m.authInfoReceived = false
   dateTime = CreateObject("roDateTime")
   secondsFromEpoch = dateTime.AsSeconds()
 
@@ -1181,8 +1130,7 @@ Function onQueryStatusOfMagicLinkResponse(response)
       m.emailVerificationTimer.control = "start"
     else if response <> invalid AND response.access_token <> invalid
       onStopAndClearEmailVerificationTimer()
-      Auth = TubiAuth(m.constants, m.Request)
-      Auth.handleRegistration(response)
+      m.tubiAuthUpdate.handleRegistration(response)
       onSignInResponse(invalid)
     end if
   end if
@@ -1383,7 +1331,7 @@ End Function
 ' in a m scope variable m.tokenDebugInfo. m.tokenDebugInfo will be pass along in the debug logging request whenever we recieve token mismatch error.
 Function processTokenToGenerateTokenDebugInfo()
   ' Processing the token before sending request. So that we can use this info if it fails.
-  authInfo = getFieldFromGlobal("authInfo")
+  authInfo = m.tubiAuthUpdate.getAuthInfo()
   ' Creating assoc array so that we append object as and when we have it.
   tokenDebugInfo = {}
   if authInfo <> invalid
@@ -1408,9 +1356,8 @@ Function processTokenToGenerateTokenDebugInfo()
     end if
   end if
 
-  Auth = TubiAuth(m.constants, m.Request)
   ' This reads token from registry not from global this will help us figure out if we are having difference in registry vs global.
-  authInfo = Auth.getAuthInfoNoUpdate()
+  authInfo = m.tubiAuthUpdate.getAuthInfoNoUpdate()
 
   if authInfo <> invalid
     if authInfo.accessToken <> invalid

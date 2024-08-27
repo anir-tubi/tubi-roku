@@ -1579,11 +1579,8 @@ Function onRemoveFromHistory(detailScreen)
     contentId = detailScreen.content.id
     history = getHistory(contentId)
 
-    authInfo = getFieldFromGlobal("authInfo")
-
-    isLoggedInUser = isLoggedInUser(authInfo)
-
-    if isLoggedInUser = true AND  history <> invalid AND isNonEmptyString(history.historyId) = true
+    authInfo = m.tubiAuthUpdate.getAuthInfo()
+    if isLoggedInUser(authInfo) = true AND history <> invalid AND isNonEmptyString(history.historyId) = true
       content = detailScreen.content.clone(false)
       detailScreen.stringNoHistoryButton = getTranslation("screenDetails_button_removing")
       content.historyId = history.historyId
@@ -1599,7 +1596,7 @@ Function onRemoveFromHistory(detailScreen)
         errorCallback: onHistoryRemovedError
         responseType: "boolean"
       })
-    else if isLoggedInUser = false
+    else if isLoggedInUser(authInfo) = false
       removeHistoryLocally(contentId)
       detailScreen.isWaitingForServerResponse = false
       setIsHistory(detailScreen, false)

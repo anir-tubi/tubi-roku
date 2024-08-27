@@ -1,12 +1,10 @@
 
 ' Thin wrapper for Tensor API requests.  Collected here to facilitate easy
 ' integration tests
-Function TensorApi(constants, request, auth)
+Function TensorApi(constants)
   return {
     ' dependencies
     constants: constants
-    request: request
-    auth: auth
 
     ' public
     getEPGChannelIdsReqInfo: tensorApi_getEPGChannelIdsReqInfo

@@ -1,7 +1,11 @@
 ' @authInfo: assocArray, authInfo AA as returned by Auth().getAuthInfo()
 Function isLoggedInUser(authInfo = invalid)
   if authInfo = invalid
-    authInfo = m.global.authInfo
+    if m.constants = invalid then
+      m.constants = getConstantsFromGlobal()
+    end if
+
+    authInfo = TubiAuth(m.constants).getAuthInfo()
   end if
 
   return (authInfo <> invalid AND authInfo.userId <> invalid)
@@ -13,18 +17,4 @@ Function isNewUser()
   bNewUser = m.global.isNewUser
   return (bNewUser <> invalid AND bNewUser = true AND isLoggedInUser() = false)
 
-End Function
-
-
-Function needsToShowAgeVerificationScreen()
-  if isLoggedInUser() = true AND m.global.authInfo.hasAge = true then
-    return false
-  else
-    guestUserHasAgeInfo = TubiAuth(m.constants, m.Request).getGuestUserHasAgeInfo()
-    ' In the case that the user is logged in but there is no age information associated with the account, hasAge defaults to false.
-    if guestUserHasAgeInfo.hasAge = true AND guestUserHasAgeInfo.expired <> true
-      return false
-    end if
-  end if
-  return true
 End Function

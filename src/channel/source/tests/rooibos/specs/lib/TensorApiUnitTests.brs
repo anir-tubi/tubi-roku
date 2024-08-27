@@ -3,9 +3,7 @@
 '@Setup
 Function TensorApiSetup()
   constants = getConstants()
-  request = TubiRequest(constants.settings)
-  auth = TubiAuth(constants, request)
-  m.tensorApi = TensorApi(constants, request, auth)
+  m.tensorApi = TensorApi(constants)
 End function
 
 

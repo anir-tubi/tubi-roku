@@ -1,8 +1,17 @@
-Function TubiTracking(constants, request, auth, userConsentsOptOutStatus = {})
+' Tracking module
+' @constants: assocArray, constants as set in Constants.brs and updated in the hotpatch
+' @auth: TubiAuth, the auth object as returned by TubiAuth()
+' @userConsentsOptOutStatus: AA, holds an assoc array indicating whether user has opted out of individual consent like analytics, marketing, etc.
+' @request: Request, the request object as returned by Request(). Should only be passed in if TubiTracking() is being called from within a task.
+' @externalConfigInfo: AA, holds the external config info. Should only be passed in if TubiTracking() is being called from within a task.
+Function TubiTracking(constants, auth, userConsentsOptOutStatus = {}, request = invalid, externalConfigInfo = invalid)
   return {
     constants: constants
-    request: request
     auth: auth
+
+    request: request
+    externalConfigInfo: externalConfigInfo
+
     trackUserEvent: tubiTracking_trackUserEvent
     getClientEvent: tubiTracking_getClientEvent
     getUserTrackingRequest: tubiTracking_getUserTrackingRequest
@@ -107,8 +116,8 @@ End Function
 ' @eventValues: assocArray, keys/values that correspond to the fields within the event type specified in @eventType
 ' @requestQueue: assocArray, a request queue as returned by TubiRequestQueue().create()
 Function tubiTracking_trackUserEvent(eventType = "", eventValues = invalid, requestQueue = invalid)
-  if eventType <> ""
-    blockedAnalyticsEvents = m.constants.externalConfig.info.blocked_analytics_events_mapping
+  if eventType <> "" AND m.externalConfigInfo <> invalid
+    blockedAnalyticsEvents = m.externalConfigInfo.blocked_analytics_events_mapping
     userConsentsOptOutStatus = {}
     if isAA(m.userConsentsOptOutStatus) = true
       userConsentsOptOutStatus = m.userConsentsOptOutStatus
@@ -151,11 +160,73 @@ End Function
 '@eventType: string, the type of event we are sending, will be used as part of the request identifier
 '@trackData: assocArray, object returned from m.getTrackData()
 Function tubiTracking_getUserTrackingRequest(eventType, trackData) as Object
+  if m.request = invalid then
+    print "Request object is invalid. Cannot send request. Note request should only be supplied in tasks"
+    return invalid
+  end if
+
   reqInfo = m.createUserTrackingReqInfo(trackData)
   trackUrl = reqInfo.url
   options = reqInfo.options
-  userRequest = m.request.createAsync(trackUrl, "track_" + eventType, options)
-  return userRequest
+
+  canCreateRequest = true
+
+  authInfo = m.auth.getAuthInfo()
+  if authInfo = invalid OR m.auth.checkIfAuthExpired(authInfo) = true then
+    ' bs:disable-next-line 1001 LINT1001
+    if isFunction(getUpdatedAuth) = true then
+      ' If we need updated auth then we are blocking the request here while we get the updated auth with a 10 second time out
+      port = createObject("roMessagePort")
+      getUpdatedAuth(port) 'bs:disable-line 1140 LINT1001
+      ts = createObject("roTimespan")
+      while true
+        msg = wait(100, port)
+
+        if ts.totalMilliseconds() >= 10000 then
+          tubiLog("Failed to get updated auth info. Timed out after 10 seconds", "warn")
+          exit while
+        end if
+
+        'bs:disable-next-line 1140 LINT1001
+        if conditionallyProcessAuthUpdatedMessage(msg) = true then
+          exit while
+        end if
+      end while
+
+      authInfo = m.auth.getAuthInfo()
+      if authInfo = invalid OR m.auth.checkIfAuthExpired(authInfo) = true then
+        tubiLog("Failed to get updated auth info. Can not create tracking request", "warn")
+        canCreateRequest = false
+      end if
+    else
+      tubiLog("getUpdatedAuth() function is not defined. Cannot send request.", "warn")
+      canCreateRequest = false
+    end if
+  else if m.auth.checkIfAuthExpired(authInfo, 60 * 10) = true then
+    ' We are proactively retrieving updated auth info if it expires in the next ten minutes. In this case we are not blocking the request while we get the updated auth
+
+    ' bs:disable-next-line 1001 LINT1001
+    if isFunction(getUpdatedAuth) = true then
+      getUpdatedAuth() 'bs:disable-line 1140 LINT1001
+    else
+      tubiLog("getUpdatedAuth() function is not defined. Continuing for now without updating auth.", "warn")
+    end if
+  end if
+
+  if canCreateRequest = true then
+    headers = m.auth.getAuthHeaders(authInfo.accessToken)
+    if headers <> invalid
+      if options.headers = invalid
+        options.headers = {}
+      end if
+      options.headers.append(headers)
+    end if
+
+    userRequest = m.request.createAsync(trackUrl, "track_" + eventType, options)
+    return userRequest
+  else
+    return invalid
+  end if
 End Function
 
 
@@ -746,7 +817,7 @@ Function tubiTracking_populateMessage(messageType, messageValues, messageBase)
         else if m.allRepeated[prop] <> invalid
           if type(messageValues[prop]) = "roArray"
             processedValue = m.processRepeatedProperty(prop, messageValues[prop])
-            messageFields.addReplace(prop, processedValue)  
+            messageFields.addReplace(prop, processedValue)
           end if
         else
           messageFields.addReplace(prop, messageValues.Lookup(prop))
@@ -1180,7 +1251,7 @@ Function tubiTracking_getLanguageCode(language)
   languageCode = "UNKNOWN"
 
   if isString(language) = true
-  
+
     language = LCase(language)
 
     if language = "eng" OR language = "en" 'ENGLISH
@@ -1190,17 +1261,17 @@ Function tubiTracking_getLanguageCode(language)
     else if language = "fra" OR language = "fre" OR language = "fr" 'FRENCH
       languageCode = "FR"
     else if language = "ger" OR language = "due" OR language = "de" 'GERMAN
-      languageCode = "DE"  
+      languageCode = "DE"
     else if language = "por" OR language = "pt" 'PORTUGUESE
       languageCode = "PT"
     else if language = "ita" OR language = "it" 'ITALIAN
-      languageCode = "IT"  
+      languageCode = "IT"
     else if language = "jpn" OR language = "ja" 'JAPANESE
       languageCode = "JA"
     else if language = "kor" OR language = "ko" 'KOREAN
       languageCode = "KO"
     else if language = "chi" OR language = "zho" OR language = "zh" 'CHINESE
-      languageCode = "ZH"  
+      languageCode = "ZH"
     end if
 
   end if
@@ -1267,7 +1338,7 @@ Function tubiTracking_getViewableImpressionEvent(eventValues) as Object
     platform: m.constants.analyticsPlatform
     user_id: user.user_id
   }
-  
+
   ' Appending the event data.
   impressionEvent.append(eventInfo.viewable_impression)
 

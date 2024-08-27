@@ -1,8 +1,7 @@
 Function init()
   m.constants = getConstantsFromGlobal()
-  Request = TubiRequest(m.constants.settings)
-  m.Auth = TubiAuth(m.constants, Request)
-  m.Tracking = TubiTracking(m.constants, Request, m.Auth)
+  m.Auth = TubiAuth(m.constants)
+  m.Tracking = TubiTracking(m.constants, m.Auth)
   m.NodeHelpers = TubiNodeHelpers()
   m.PageGroup = m.top.findNode("PageGroup")
   m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]

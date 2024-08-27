@@ -79,8 +79,9 @@ Function onContentChange()
     m.subText.visible = false
 
     if item.subtext <> invalid AND item.subtext <> ""
-      authInfo = getFieldFromGlobal("authInfo")
-      if (authInfo = invalid or (authInfo <> invalid AND authInfo.userId = invalid))  'signedOut user or new user
+      ' Purposely passing in invalid constants for each row label to avoid having to pull in constants for each row label
+      authInfo = TubiAuth(invalid).getAuthInfo()
+      if isLoggedInUser(authInfo) = false  'signedOut user or new user
         'recalculate the width of the rowlabel. This is required because Spanish titles might be different width than english.
         m.CategoryName.width = 0
         m.CategoryName.text = item.title

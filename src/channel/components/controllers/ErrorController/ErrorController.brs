@@ -2,9 +2,7 @@ Function init()
   m.constants = getConstantsFromGlobal()
   m.trackingLoggingTask = m.top.findNode("TrackingLoggingTask")
   m.trackingLoggingTask.control = "RUN"
-  Request = TubiRequest(m.constants.settings)
-  Auth = TubiAuth(m.constants, Request)
-  m.Tracking = TubiTracking(m.constants, Request, Auth)
+  m.tracking = TubiTrackingInfo(m.constants)
   m.top.observeField("connectionError","showConnectionError")
 End Function
 
@@ -34,7 +32,7 @@ Function showModalDialog(error)
     type: "dialog"
     values: {
       dialog_type: "NETWORK_ERROR" 'DialogType enum
-      pageOneOf: m.Tracking.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_UNKNOWN"})  'a valid page type (see DialogEvent in events.protos)
+      pageOneOf: m.tracking.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_UNKNOWN"})  'a valid page type (see DialogEvent in events.protos)
       dialog_action: "SHOW"
       dialog_sub_type: errorCode
     }

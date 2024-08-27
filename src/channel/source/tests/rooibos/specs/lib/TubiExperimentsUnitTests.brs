@@ -2,112 +2,35 @@
 
 '@Setup
 Function TubiExperimentsSetup()
-
-  m.constants = getConstants()
-  m.request = TubiRequest()
-  m.experiments = TubiExperiments(m.constants)
-  m.experiments.getNamespaces = tubiExperiments_mockGetNamespaces_testHelper
-
+  m.experimentsInfo = {
+    "roku_tupian_background_images": {
+      "experiment_result": {
+        "experiment_name": "roku_tupian_background_images_v1",
+        "segment": "0x00C50289",
+        "treatment": "tupian_background_images"
+      },
+      "namespace": "roku_tupian_background_images",
+      "resource": {
+        "enabled": true
+      }
+    }
+  }
 End function
-
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 '@It tests functions in TubiExperiments.brs
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
-' Mock experiment response from swagger:
-' https://default_server/datascience/evaluate/namespaces?platform=roku&inputs=%7B%22deviceId%22%3A%22AABBCCDDEE%22%7D
-Function tubiExperiments_mockGetNamespaces_testHelper(request) As Object
-  return ParseJson("[{""namespace"": ""UserNamespace"",""resource"": ""{\""testParam\"":false}"",""experiment_result"": {""experiment_name"": ""qa.preroll_at_90"",""treatment"": ""off""}}]")
-end Function
-
-
-'@Test initSuccess unit tests
-Function tubiExperiments_initSuccess_test()
-  experiments = m.experiments
-  m.assertInvalid(m.constants.experiments.info)
-  experiments.init(m.request)
-  m.assertNotInvalid(m.constants.experiments.info)
-End Function
-
-
-'@Test getExperimentResourceValid unit tests
-Function tubiExperiments_getExperimentResourceValid_test()
-  experiments = m.experiments
-  experiments.init(m.request)
-  trackinfo = experiments.getExperimentTracking("UserNamespace", "preroll_at_90")
-  moreinfo = experiments.getExperimentResource("UserNamespace", "preroll_at_90")
-  m.assertNotInvalid(trackinfo)
-  m.assertNotInvalid(moreinfo)
-  m.assertNotInvalid(moreinfo.testParam)
-  m.assertFalse(moreinfo.testParam)
-End Function
-
-
-'@Test getExperimentResourceInvalid unit tests
-Function tubiExperiments_getExperimentResourceInvalid_test()
-  experiments = m.experiments
-  experiments.init(m.request)
-  trackinfo = experiments.getExperimentTracking("UserNamespace", "roku_missing_experiment")
-  moreinfo = experiments.getExperimentResource("UserNamespace", "roku_missing_experiment")
-  m.assertInvalid(trackinfo)
-  m.assertInvalid(moreinfo)
-End Function
-
-
-'@Test getExperimentResult unit tests
-Function tubiExperiments_getExperimentResult_test()
-  experiments = m.experiments
-  experiments.init(m.request)
-  experimentResult = experiments.getExperimentResult("UserNamespace", "roku_missing_experiment")
-  m.assertInvalid(experimentResult)
-  experimentResult = experiments.getExperimentResult("UserNamespace", "preroll_at_90")
-  m.assertNotInvalid(experimentResult)
-  m.assertEqual(experimentResult.experiment_name, "qa.preroll_at_90")
-  m.assertEqual(experimentResult.treatment, "off")
-
-End Function
-
-
-'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-'@It initFailed in TubiExperiments.brs
-'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
-
-' Mock that the server did not respond, or response was invalid
-Function tubiExperiments_mockGetInvalidNamespaces_testHelper(request) As Object
-  return invalid
-End Function
-
-
-'@BeforeEach
-Function tubiExperiments_updateNamespaces()
-
-  m.experiments.getNamespaces = tubiExperiments_mockGetInvalidNamespaces_testHelper
-
-End Function
-
-
-'@Test initFailed unit tests
-Function tubiExperiments_initFailed_test()
-  experiments = m.experiments
-  experiments.init(m.request)
-  m.assertInvalid(m.constants.experiments.info)
-  ' We don't want to crash if init() failed, just use defaults if available, otherwise return 'invalid' for the value
-  trackinfo = experiments.getExperimentTracking("UserNamespace", "preroll_at_90")
-  moreinfo = experiments.getExperimentResource("UserNamespace", "preroll_at_90")
-
-  m.assertInvalid(trackinfo)
-  m.assertInvalid(moreinfo)
-End Function
-
-
-'@Test getNamespaceRequestInfo unit tests
-Function tubiExperiments_getNamespaceRequestInfo_test()
-  requestInfo = m.experiments.getNamespaceRequestInfo(m.constants)
-  m.assertNotInvalid(requestInfo.url)
-  m.assertEqual(requestInfo.requestType, "getNamespaces")
-  m.assertEqual(requestInfo.responseType, "assocarray")
+'@Test getExperiment
+Function tubiExperiments_getExperiment_test()
+  experiments = TubiExperiments(m.experimentsInfo)
+  namespace = "roku_tupian_background_images"
+  experimentName = "roku_tupian_background_images_v1"
+  result = experiments.getExperiment(namespace, experimentName)
+  m.assertEqual(result.namespace, namespace)
+  m.assertEqual(result.resource, m.experimentsInfo[namespace].resource)
+  m.assertEqual(experimentName, m.experimentsInfo[namespace].experiment_result.experiment_name)
+  m.assertEqual(result.experiment_result.segment, m.experimentsInfo[namespace].experiment_result.segment)
+  m.assertEqual(result.experiment_result.treatment, m.experimentsInfo[namespace].experiment_result.treatment)
 End Function

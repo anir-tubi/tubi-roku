@@ -4,9 +4,7 @@ Function init()
   m.contentLoadedAndFocused = false
   m.constants = getConstantsFromGlobal()
 
-  Request = TubiRequest(m.constants.settings)
-  Auth = TubiAuth(m.constants, Request)
-  m.Tracking = TubiTracking(m.constants, Request, Auth)
+  m.Tracking = TubiTrackingInfo(m.constants)
 
   m.PageGroup = m.top.findNode("PageGroup")
   m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]

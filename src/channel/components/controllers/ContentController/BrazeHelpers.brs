@@ -17,8 +17,9 @@ Function setBrazeUserData(authInfo)
     m.braze.setCustomAttribute("preferred_device_id", m.constants.deviceInfo.deviceId)
     if authInfo <> invalid AND authInfo.userId <> invalid
       m.braze.setUserId(authInfo.userId)
-      if authInfo.email <> invalid
-        m.braze.setEmail(authInfo.email)
+      if m.pub_serverPersistentData.email <> invalid
+        ' Email no longer comes from authInfo so must be pulled in
+        m.braze.setEmail(m.pub_serverPersistentData.email)
       end if
     else
       ' Setting device id as the unique id.
@@ -185,7 +186,7 @@ Function onBrazeInAppMessageButtonSelected(parameters)
       processUriClickAction(uriParameters)
     else
       ' Focusing back to the screen.
-      m.top.setFocus(true)
+      manageChildFocus()
     end if
 
   end if

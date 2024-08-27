@@ -5,7 +5,9 @@ Function init()
   m.top.observeField("request", m.port)
   m.top.observeField("batchRequest", m.port)
   m.top.observeField("cancel", m.port)
+  m.top.observeField("newConstants", m.port)
   m.constants = getConstantsFromGlobal()
+  m.experimentsInfo = {} ' In order to be able to update the experiments without having pass it down manually we need an existing AA that we can just update the keys on
   ' Creating a scope variable that will be overridden by each sub task
   m.requestTypes = {}
   ' We store a local copy of the translations so we don't have to do a rendezvous each time we request a translation during parsing
@@ -52,37 +54,65 @@ Function listen()
   ' Calling register parsing callback which will be overridden by every sub tasks.
 
   m.requestModule = Request(m.constants.settings)
-  m.auth = TubiAuth(m.constants, m.requestModule)
-  m.authInfo = invalid
+  m.auth = TubiAuth(m.constants)
   nTimeout = 0  'We do not need to execute timeout processing logic every time while loop is executed (200ms). This counter is used to control the timeout logic execution to every third time.
 
   while (true)
     msg = wait(200, m.port)
     if type(msg) = "roSGNodeEvent" then
-      if msg.getField() = "request" then
+      field = msg.getField()
+      if field = "request" then
         reqInfo = msg.getData()
         makeApiRequest(reqInfo, invalid)
-      else if msg.getField() = "batchRequest"
+      else if field = "batchRequest"
         batchInfo = msg.getData()
         if batchInfo <> invalid then
           makeBatchApiRequests(batchInfo)
         end if
-      else if msg.getField() = "cancel" then
+      else if field = "cancel" then
         reqInfo = msg.getData()
         if reqInfo <> invalid then
           cancelRequests(reqInfo)
         end if
+      else if field = "newConstants" then
+        constants = msg.getData()
+
+        ' Instead of trying to track down all the spots constants might be used we are keeping the AA reference and just replacing the keys to update all to use the same data
+        for each key in m.constants
+          if constants[key] = invalid
+            m.constants[key].delete()
+          end if
+        end for
+
+        m.constants.append(constants)
+      else if field = "newExperimentsInfo" then
+        experimentsInfo = msg.getData()
+
+        ' Instead of trying to track down all the spots experimentsInfo might be used we are keeping the AA reference and just replacing the keys to update all to use the same data
+        for each key in m.experimentsInfo
+          if experimentsInfo[key] = invalid
+            m.experimentsInfo[key].delete()
+          end if
+        end for
+
+        m.experimentsInfo.append(experimentsInfo)
+      else
+        conditionallyProcessAuthUpdatedMessage(msg)
       end if
     else if type(msg) = "roUrlEvent" then
       processResponse(msg)
     end if
 
     for each requestId in m.backedOffJobs
-      obj = m.backedOffJobs[requestId]
-      if obj.timespan.totalMilliseconds() > obj.backoffDuration then
-        job = obj.job
-        makeApiRequest(job.reqInfo, job.batchInfo)
-        m.backedOffJobs.delete(requestId)
+      backedOffJob = m.backedOffJobs[requestId]
+
+      if backedOffJob.timespan.totalMilliseconds() > backedOffJob.backoffDuration then
+        job = backedOffJob.job
+        requestType = job.reqInfo.requestType
+        if m.waitingForUpdatedAuthInfo = false OR m.constants.reqNames.acceptsTubiAuth[requestType] <> true then
+          makeApiRequest(job.reqInfo, job.batchInfo)
+          m.backedOffJobs.delete(requestId)
+        end if
       end if
     end for
 
@@ -137,7 +167,7 @@ Function processTimeoutError(job)
         }
       }
 
-      processErrorResponse(result, callbackTypes, job )
+      processErrorResponse(result, callbackTypes, job)
     end if
   end if
 
@@ -160,14 +190,19 @@ Function makeApiRequest(reqInfo, batchInfo = invalid) as Boolean
       options = {}
     end if
 
-    if m.constants.reqNames.acceptsTubiAuth[requestType] = true
-      m.authInfo = m.auth.getAuthInfo()
-      if m.authInfo = invalid OR m.authInfo.accessToken = invalid
-        m.authInfo = m.auth.fetchAndSaveAnonymousAuthInfo()
-      end if
+    isValidAuthInfoAvailable = true
 
-      if m.authInfo <> invalid AND m.authInfo.accessToken <> invalid
-        headers = m.auth.getAuthHeaders(m.authInfo.accessToken)
+    if m.constants.reqNames.acceptsTubiAuth[requestType] = true
+      authInfo = m.auth.getAuthInfo()
+      ' It is expected that the authInfo should never be invalid when accessed here. It is possible that the token is expired but for simplicity we send the request and when we get the 403 response we will retry after updating the auth info. This allows for a simpler process and more consistent behavior.
+      if authInfo <> invalid AND authInfo.accessToken <> invalid AND m.auth.checkIfAuthExpired(authInfo) = false then
+
+        ' We are proactively retrieving updated auth info if it expires in the next ten minutes
+        if m.auth.checkIfAuthExpired(authInfo, 60 * 10) = true then
+          getUpdatedAuth()
+        end if
+
+        headers = m.auth.getAuthHeaders(authInfo.accessToken)
         if headers <> invalid
           if options.headers = invalid
             options.headers = {}
@@ -175,30 +210,37 @@ Function makeApiRequest(reqInfo, batchInfo = invalid) as Boolean
           options.headers.append(headers)
         end if
       else
-        ' Since this request needs auth token and all tries to refetch token failed.
-        ' Even if we proceed it will fail. So short circuiting it.
-        ' TBD: If we throw a error or send a event to sentry.
-        return false
+        isValidAuthInfoAvailable = false
       end if
     end if
 
     tubiReq = m.requestModule.createAsync(url, requestType, options)
-    reqSent = tubiReq.start(m.port)
 
-    urlTransfer = tubiReq.urlTransfer
+    job = {
+      startTime: createObject("roTimespan")
+      reqInfo: reqInfo
+      tubiReq: tubiReq
+      batchInfo: batchInfo
+    }
 
-    if urlTransfer <> invalid AND reqSent = true
-      id = urlTransfer.getIdentity().toStr()
-
-      m.jobStore[id] = {
-        startTime: createObject("roTimespan")
-        reqInfo: reqInfo
-        tubiReq: tubiReq
-        batchInfo: batchInfo
-      }
+    ' If valid auth info isn't available then we want to request updated auth info and hold off the request until we get it
+    if isValidAuthInfoAvailable = false then
+      getUpdatedAuth()
+      handleBackoff(invalid, job, reqInfo.retries, 0)
       return true
     else
-      return false
+      reqSent = tubiReq.start(m.port)
+
+      urlTransfer = tubiReq.urlTransfer
+
+      if urlTransfer <> invalid AND reqSent = true
+        id = urlTransfer.getIdentity().toStr()
+
+        m.jobStore[id] = job
+        return true
+      else
+        return false
+      end if
     end if
   else
     return false
@@ -268,18 +310,8 @@ Function processResponse(msg)
         else if (code = 403 OR code = 401) AND m.constants.reqNames.acceptsTubiAuth[requestType] = true AND checkIfTokenExpiredError(result.response) = true
           if retries > 0
             ' request could not be authed by backend so attempt to refresh the auth token and try again
-            timeout = 100
-            if m.authInfo <> invalid AND m.authInfo.userId <> invalid
-              newAuthInfo = m.auth.refreshAuthToken(m.authInfo, timeout)
-            else
-              newAuthInfo = m.auth.refreshAnonymousToken(m.authInfo, timeout)
-            end if
-
-            if newAuthInfo <> invalid
-              handleBackoff(result, job, retries) 'pause before retry to relieve pressure on the backend
-            else
-              processErrorResponse(result, callbackTypes, job)
-            end if
+            getUpdatedAuth()
+            handleBackoff(result, job, retries, 0) ' let the request be handled by backoff after updated auth comes back
           else
             processErrorResponse(result, callbackTypes, job)
           end if
@@ -290,7 +322,8 @@ Function processResponse(msg)
             processErrorResponse(result, callbackTypes, job)
           end if
         end if
-
+      else
+        tubiLog("Could not load callbackTypes for requestType: " + requestType, "warn")
       end if
 
       m.jobStore.delete(id) ' delete the job from assocarray after the response is sent to avoid memory leak
@@ -532,20 +565,32 @@ Function cancelRequests(reqInfo) As Void
 End Function
 
 
-' Helper function to setup logic to store the job before retrying after the requested amount of time has passed
+' Helper function to setup logic to store the job before retrying after the appropriate amount of time has passed.
+' This can be used to store jobs waiting to be retried after the initial request fails.
+' This can also be used to store jobs waiting to be sent while the auth/anonymous token is refreshed
 '
-' @result : assocarray, this is the request handleEvent AA with response
+' @result : assocarray, this is the request handleEvent AA with response or invalid if we haven't sent the request yet
 ' @job: AssocArray, the job for this request as created in makeApiRequest
 ' @retries: integer, the number of remaining retries for a request/request node
+' @backoffDuration: integer, the amount of time to wait before retrying the request. This should only be changed if we want to overwrite the default backoff duration or the backoff duration included as part of the request info
 '
 ' side effects: updates the retries and pause fields of the passed in reqInfo
-Function handleBackoff(result, job, retries)
-  sendApiErrorLog(result)
+Function handleBackoff(result, job, retries, backoffDuration = -1)
+  tubiLog("BaseGeneralTask.handleBackoff")
+  if result <> invalid then
+    sendApiErrorLog(result)
+  end if
+
   reqInfo = job.reqInfo
-  backoffFactor = reqInfo.backoffFactor
-  backoffDuration = reqInfo.pause * backoffFactor
+
+  if backoffDuration <> -1 then
+    backoffFactor = reqInfo.backoffFactor
+    backoffDuration = reqInfo.pause * backoffFactor
+  end if
+
   reqInfo.pause = backoffDuration
   reqInfo.retries = retries - 1
+
   m.backedOffJobs[reqInfo.id] = {
     "timespan": createObject("roTimespan")
     "job": job
@@ -655,4 +700,33 @@ Function checkIfTokenExpiredError(response)
   end if
 
   return false
+End Function
+
+
+Function onAuthUpdatedFailure()
+  ' If auth update failed we need to clear out any backed off jobs that were waiting for the updated auth info so the user can know the request failed if appropriate
+  for each requestId in m.backedOffJobs
+    job = m.backedOffJobs[requestId].job
+    reqInfo = job.reqInfo
+    requestType = reqInfo.requestType
+    if m.constants.reqNames.acceptsTubiAuth[requestType] = true then
+      callbackTypes = m.requestTypes[requestType]
+      if callbackTypes <> invalid then
+        errCode = -1238
+
+        result = {
+          response: {
+            "code": errCode
+            "name": requestType
+            "failReason": "Auth update failed"
+            "url": job.reqInfo.url
+          }
+        }
+
+        processErrorResponse(result, callbackTypes, job)
+      end if
+
+      m.backedOffJobs.delete(requestId)
+    end if
+  end for
 End Function

@@ -5,10 +5,9 @@
  - Retrieve the auth info, which may be stored and might be refreshed from the auth server.
  -
  -->
-<component name="TrackingLoggingTask" extends="Task">
+<component name="TrackingLoggingTask" extends="BaseTaskNeedingAuth">
   <script type="text/brightscript" uri="TrackingLoggingTask.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Sentry.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/RequestQueue.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />

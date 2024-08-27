@@ -10,6 +10,7 @@ Function init()
   m.top.observeField("userConsentsOptOutStatus", m.port)
 
   m.constants = getConstantsFromGlobal()
+  m.externalConfigInfo = getExternalConfigInfoFromGlobal()
 
   m.top.control = "RUN"
 End Function
@@ -25,10 +26,10 @@ Function watchLoop()
   tubiLog("TrackingLoggingTask.watchLoop started")
   m.queue = TubiRequestQueue().create(m.port)
   m.request = TubiRequest(m.constants.settings)
-  m.auth = TubiAuth(m.constants, m.request)
+  m.auth = TubiAuth(m.constants)
   sentryInfo = Sentry(m.constants, m.auth)
   m.logger = TubiLogger(m.constants, m.request, m.auth, sentryInfo)
-  m.tracking = TubiTracking(m.constants, m.request, m.auth, m.top.userConsentsOptOutStatus)
+  m.tracking = TubiTracking(m.constants, m.auth, m.top.userConsentsOptOutStatus, m.request, m.externalConfigInfo)
   m.analyticsAppMode = "DEFAULT_MODE"
 
   'when the trackEvent field for the metadata task field is updated, the event is heard in this loop

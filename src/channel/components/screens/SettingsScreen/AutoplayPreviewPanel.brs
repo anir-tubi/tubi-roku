@@ -112,9 +112,8 @@ End Function
 
 
 Function sendComponentInteractionEventForAutoplayPreview()
-  Request = TubiRequest(m.constants.settings)
-  Auth = TubiAuth(m.constants, Request)
-  Tracking = TubiTracking(m.constants, Request, Auth)
+  Auth = TubiAuth(m.constants)
+  Tracking = TubiTracking(m.constants, Auth)
 
   leftSideNavComponent = {
     left_nav_section: "ACCOUNT"

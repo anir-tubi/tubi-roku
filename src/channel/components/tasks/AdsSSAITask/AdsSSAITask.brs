@@ -12,21 +12,22 @@ Function init()
   ' Will add interface field when we have a use case.
   ' indicates if the current stream is displaying filler video because there are no ads to play
   m.isPlayingAdFiller = false
+
+  m.constants = getConstantsFromGlobal()
+  m.externalConfigInfo = getExternalConfigInfoFromGlobal()
 End Function
 
 
 Function execAdsSSAITask()
-  m.constants = getConstantsFromGlobal()
-
   'a port used for sending requests
   m.ssaiPort = CreateObject("roMessagePort")
   m.request = TubiRequest(m.constants.settings)
   requestQueueLib = TubiRequestQueue()
   m.requestQueue = requestQueueLib.create(m.ssaiPort)
 
-  auth = TubiAuth(m.constants, m.request)
+  auth = TubiAuth(m.constants)
   userConsentsOptOutStatus = m.top.userConsentsOptOutStatus
-  m.tracking = TubiTracking(m.constants, m.request, auth, userConsentsOptOutStatus)
+  m.tracking = TubiTracking(m.constants, auth, userConsentsOptOutStatus)
   gdpr = isGDPR(m.constants)
   m.adLib = TubiAds(m.constants, m.request, requestQueueLib, auth, m.tracking, "mp4", m.top.tcfString, userConsentsOptOutStatus, gdpr)
   m.raf = m.adLib.roAdFramework
@@ -106,7 +107,7 @@ Function runSSAILoop(ssaiPort)
         userConsentsOptOutStatus = msg.getData()
         m.tracking.userConsentsOptOutStatus = userConsentsOptOutStatus
         m.adLib.userConsentsOptOutStatus = userConsentsOptOutStatus
-        
+
         userPersonalAdOptOutStatus = userConsentsOptOutStatus[m.constants.consentKeys.personalization]
         if userPersonalAdOptOutStatus <> invalid
           m.adLib.setLimitAdTracking(userPersonalAdOptOutStatus)

@@ -1,9 +1,8 @@
 ' Show the homescreen, whether existing in the screen pool already or creating a new one
 '
 ' @constants: assocArray, constants as set in Constants.brs and updated in the hotpatch
-' @authInfo: assocArray, normally set by m.global.authInfo
 ' @screenID: string, What kind of homescreen do you wish to make: regular, movies, or TV
-Function showHomeScreen(constants, authInfo, screenID = "")
+Function showHomeScreen(constants, screenID = "")
   tubiLog("HomeScreenHelpers.showHomeScreen")
   if screenID = ""
     screenID = constants.ui.screenIds.homeScreen
@@ -27,6 +26,7 @@ Function showHomeScreen(constants, authInfo, screenID = "")
       showHideSpinner(false)
     end if
 
+    authInfo = m.tubiAuthUpdate.getAuthInfo()
     homeScreen.signedIn = isLoggedInUser(authInfo)
 
     homeScreen.isVideoPreviewOn = m.pub_serverPersistentData.isVideoPreviewOn
@@ -69,6 +69,7 @@ Function showHomeScreen(constants, authInfo, screenID = "")
     homeScreen.contentMode = sContentMode
     homeScreen.shouldKidsModeBeSentToServer = shouldKidsModeBeSentToServer()
 
+    authInfo = m.tubiAuthUpdate.getAuthInfo()
     homeScreen.signedIn = isLoggedInUser(authInfo)
     homeScreen.isVideoPreviewOn = m.pub_serverPersistentData.isVideoPreviewOn
     m.pubSub.subscribe("pub_serverPersistentData.isVideoPreviewOn", homeScreen, "isVideoPreviewOn")
@@ -134,22 +135,22 @@ End Function
 
 
 Function showEspanolScreen()
-  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.espanolScreen)
+  showHomeScreen(m.constants, m.constants.ui.screenIds.espanolScreen)
 End Function
 
 
 Function showMoviesScreen()
-  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.movieScreen)
+  showHomeScreen(m.constants, m.constants.ui.screenIds.movieScreen)
 End Function
 
 
 Function showTVScreen()
-  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.tvScreen)
+  showHomeScreen(m.constants, m.constants.ui.screenIds.tvScreen)
 End Function
 
 
 Function showDefaultHomeScreen()
-  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.homeScreen)
+  showHomeScreen(m.constants, m.constants.ui.screenIds.homeScreen)
 End Function
 
 
@@ -345,7 +346,8 @@ Function fetchHomeScreen(homeScreen)
     reqName = m.constants.reqNames.getHomescreen
 
     homeScreen.trackingLoadStartTime = UpTime(0)
-    homeScreen.signedIn = isLoggedInUser()
+    authInfo = m.tubiAuthUpdate.getAuthInfo()
+    homeScreen.signedIn = isLoggedInUser(authInfo)
     homeScreen.unobserveFieldScoped("contentReady")
     homeScreen.observeFieldScoped("contentReady", "onHomescreenContentReady")
 

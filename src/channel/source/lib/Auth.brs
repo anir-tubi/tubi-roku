@@ -1,65 +1,74 @@
+' TubiAuth provides a read only way to access auth info
 '@constants: assocArray, the constants object returned from getConstants()
-'@request: assocArray, the object returned from TubiRequest()
-Function TubiAuth(constants, request)
+Function TubiAuth(constants)
   authRegSection = "auth"
-  if constants.settings.stagingApis = true then
+  if constants <> invalid AND constants.settings.stagingApis = true then
     authRegSection = "auth_staging"
   end if
 
   return {
     authRegSection: authRegSection
-    firstVisitRegSection: "visit"
-    guestUserHasAgeRegSection: "has_age"
-    educationalModal: "educationalModal"
-
     constants: constants
-    request: request
 
     'public methods
     getAuthInfoNoUpdate: tubiAuth_getAuthInfoNoUpdate
-    getAuthInfo: tubiAuth_getAuthInfo
-    setAuthInfo: tubiAuth_setAuthInfo
-    getFirstVisit: tubiAuth_getFirstVisit
-    setFirstVisit: tubiAuth_setFirstVisit
-    clearFirstVisit: tubiAuth_clearFirstVisit
-    handleRegistration: tubiAuth_handleRegistration
-    logout: tubiAuth_deleteAuthInfo
-    refreshAuthToken: tubiAuth_refreshAuthToken
-    transferRefreshToken: tubiAuth_transferRefreshToken
+    getAuthInfo: tubiAuth_getAuthInfoNoUpdate ' Duplicated to allow easier migration
+    checkIfAuthExpired: tubiAuth_checkIfAuthExpired
     getAuthHeaders: tubiAuth_getAuthHeaders
-    createAuthRequest: tubiAuth_createAuthRequest
-    updateAuthInfoWithAge: tubiAuth_updateAuthInfoWithAge
-    getGuestUserHasAgeInfo: tubiAuth_getGuestUserHasAgeInfo
-    setGuestUserHasAgeInfo: tubiAuth_setGuestUserHasAgeInfo
-    deleteGuestUserHasAgeInfo: tubiAuth_deleteGuestUserHasAgeInfo
-    getEducationalModalEntry: tubiAuth_getEducationalModalEntry
-    setEducationalModalEntry: tubiAuth_setEducationalModalEntry
-    clearEducationalModalEntry: tubiAuth_clearEducationalModalEntry
 
+    'private methods
+    regRead: tubiAuth_regRead
+    regReadAll: tubiAuth_regReadAll
+  }
+End Function
+
+
+' TubiAuthUpdate provides all the capabilities of TubiAuth and adds ability to update auth
+'@constants: assocArray, the constants object returned from getConstants()
+Function TubiAuthUpdate(constants)
+  ' Verify we are being called from a controller
+  if m.generalTask = invalid then
+    tubiLog("TubiAuthUpdate() must be called from a controller", "error")
+    return invalid
+  end if
+
+  module = TubiAuth(constants)
+  module.append({
+    ' controllerCallbackIds
+    callbackForLogout: invalid
+    callBackForInitOrUpdateAuthInfo: invalid
+    callBackForTransferRefreshToken: invalid
+
+    ' public methods
+    initOrUpdateAuthInfo: tubiAuth_initOrUpdateAuthInfo
+    setAuthInfo: tubiAuth_setAuthInfo
+    logout: tubiAuth_logout
+    updateAuthInfoWithAge: tubiAuth_updateAuthInfoWithAge
+    transferRefreshToken: tubiAuth_transferRefreshToken
+    handleRegistration: tubiAuth_handleRegistration
 
     'private methods
     saveAuthInfo: tubiAuth_saveAuthInfo
     deleteAuthInfo: tubiAuth_deleteAuthInfo
-    checkIfAuthExpired: tubiAuth_checkIfAuthExpired
-    requestTokenRefresh: tubiAuth_requestTokenRefresh
-    requestTokenTransfer: tubiAuth_requestTokenTransfer
+    getTokenRefreshInfo: tubiAuth_getTokenRefreshInfo
+    getRequestTokenTransferInfo: tubiAuth_getRequestTokenTransferInfo
     handleRefreshResponse: tubiAuth_handleRefreshResponse
+    handleTransferRefreshResponse: tubiAuth_handleTransferRefreshResponse
     updateAuthInfo: tubiAuth_updateAuthInfo
     formatAuthInfoFromServer: tubiAuth_formatAuthInfoFromServer
 
-    fetchAnonymousAuthInfo: tubiAuth_fetchAnonymousAuthInfo
     fetchAndSaveAnonymousAuthInfo: tubiAuth_fetchAndSaveAnonymousAuthInfo
-    updateAnonymousAuthInfo: tubiAuth_updateAnonymousAuthInfo
 
-    getAnonymousSigningKeyRequest: tubiAuth_getAnonymousSigningKeyRequest
+    getAnonymousSigningKeyRequestInfo: tubiAuth_getAnonymousSigningKeyRequestInfo
     handleAnonymousSigningKeyResponse: tubiAuth_handleAnonymousSigningKeyResponse
 
-    getAnonymousTokenRequest: tubiAuth_getAnonymousTokenRequest
+    getAnonymousTokenRequestInfo: tubiAuth_getAnonymousTokenRequestInfo
     handleAnonymousTokenResponse: tubiAuth_handleAnonymousTokenResponse
 
     refreshAnonymousToken: tubiAuth_refreshAnonymousToken
-    getAnonymousRefreshTokenRequest: tubiAuth_getAnonymousRefreshTokenRequest
+    getAnonymousRefreshTokenRequestInfo: tubiAuth_getAnonymousRefreshTokenRequestInfo
     handleAnonymousRefreshTokenResponse: tubiAuth_handleAnonymousRefreshTokenResponse
+    refreshAuthToken: tubiAuth_refreshAuthToken
 
     createSignature: tubiAuth_createSignature
     constructCanonicalRequest: tubiAuth_constructCanonicalRequest
@@ -73,11 +82,9 @@ Function TubiAuth(constants, request)
     calculateSignature: tubiAuth_calculateSignature
     getSignedHeaders: tubiAuth_getSignedHeaders
 
-    regRead: tubiAuth_regRead
-    regReadAll: tubiAuth_regReadAll
-    regWrite: tubiAuth_regWrite
-    regDelete: tubiAuth_regDelete
-  }
+    makeRequest: tubiAuth_makeRequest
+  })
+  return module
 End Function
 
 
@@ -101,8 +108,6 @@ End Function
 '  accessToken: someAccessToken(String)
 '  expireTime: numberOfSecondsUntilExpires(Integer)
 '}
-' tubiAuth_getAuthInfo will try to make a roUrlTransfer if the token needs to be updated which isn't allowed on the render thread.
-' This function allows accessing auth info from the render thread without this issue
 Function tubiAuth_getAuthInfoNoUpdate()
   authInfo = m.regReadAll(m.authRegSection) 'returns empty assocArray if nothing in the auth registry
 
@@ -131,31 +136,33 @@ Function tubiAuth_getAuthInfoNoUpdate()
     return authInfo
   end if
 
-  return authInfo  'can return invalid
+  return authInfo  'can return an empty assocArray
 End Function
 
-' Same as getAuthInfoNoUpdate but will request a new auth token and update the registry if necessary.
-' Should not be called from render thread!
-Function tubiAuth_getAuthInfo()
+
+' If the access token has expired it will try to refresh it.
+' If there is no auth info available it will get anonymous auth info
+' @callback: function, the callback that will called after the auth info is available
+' @forceUpdate: boolean - if true will attempt to refresh access token even if the access token does not appear to be expired
+Function tubiAuth_initOrUpdateAuthInfo(callback, forceUpdate = false)
+  controllerCallbackId = "callBackForInitOrUpdateAuthInfo"
+  m[controllerCallbackId] = callback
   authInfo = m.getAuthInfoNoUpdate()
 
-  isExpired = m.checkIfAuthExpired(authInfo)
-  newAuthInfo = invalid
-  if authInfo.expireTime <> invalid   'used as test to determine if we have any auth info in the auth registry
-    if isExpired = true
+  if authInfo.expireTime <> invalid 'used as test to determine if we have any auth info in the auth registry
+    if m.checkIfAuthExpired(authInfo) = true OR forceUpdate = true then
       if authInfo.userId <> invalid
-        newAuthInfo = m.refreshAuthToken(authInfo, 3) 'can return invalid
+        m.refreshAuthToken(authInfo, controllerCallbackId)
       else
-        newAuthInfo = m.refreshAnonymousToken(authInfo, 3) 'can return invalid
+        m.refreshAnonymousToken(authInfo, controllerCallbackId)
       end if
     else
-      newAuthInfo = authInfo
+      ' authInfo is not expired so nothing to do. Just call the callback immediately
+      callback()
     end if
   else
-    newAuthInfo = m.fetchAndSaveAnonymousAuthInfo()
+    m.fetchAndSaveAnonymousAuthInfo(controllerCallbackId)
   end if
-
-  return newAuthInfo 'can return invalid
 End Function
 
 
@@ -165,66 +172,49 @@ End Function
 Function tubiAuth_setAuthInfo(key, value)
 
   if isString(key) = true AND isString(value) = true
-    m.regWrite(key, value, m.authRegSection)
+    ' Make sure keys are stored in the registry in the same way always
+    lCaseKey = lcase(key)
+    acceptedKeys = {
+      accesstoken: true
+      authtype: true
+      expiretime: true
+      firstname: true
+      hasage: true
+      lastname: true
+      name: true
+      refreshtoken: true
+      secretkey: true
+      userid: true
+    }
+
+    correctlyCasedKey = invalid
+    if acceptedKeys[lCaseKey] = true
+      if lCaseKey = "secretkey"
+        correctlyCasedKey = "secretKey"
+      else
+        correctlyCasedKey = lCaseKey
+      end if
+    end if
+
+    if correctlyCasedKey <> invalid then
+      sec = createObject("roRegistrySection", m.authRegSection)
+      sec.write(correctlyCasedKey, value)
+      sec.flush() ' commit it
+    else
+      tubiLog("Key " + key + " is not a valid auth registry value", "warn")
+    end if
   else
     tubiLog("Key/Value provided for SetAuthInfo Function are not Strings.", "warn")
   end if
-
 End Function
 
 
 ' It refreshes the accessToken using refresh Token
 ' @authInfo: assocarray, contains accessToken, refreshToken, expireTime
-' @timeout: integer, the max amount of time to wait for a response from the server in seconds
-'
-' returns authInfo = {
-'  refreshToken: someRefreshToken(String)
-'  accessToken: someAccessToken(String)
-'  expireTime: numberOfSecondsUntilExpires(Integer)
-'}
-Function tubiAuth_refreshAnonymousToken(authInfo, timeout)
-  newAuthInfo = invalid
-
-  if isAA(authInfo) = false OR isString(authInfo.secretKey) = false then
-    newAuthInfo = m.fetchAndSaveAnonymousAuthInfo()
-  else
-    authPort = CreateObject("roMessagePort")
-    refreshTokenReq = m.getAnonymousRefreshTokenRequest(authInfo)
-
-    if refreshTokenReq.start(authPort) = true
-      timer = CreateObject("roTimespan")
-      while true
-        msg = wait(100, authPort)
-
-        newAccess = m.handleAnonymousRefreshTokenResponse(msg, refreshTokenReq)
-        ' newAccess might be invalid if there was a network error other than 403
-        ' in which case we don't have any new auth info to update and we don't want to
-        ' delete the previous auth info.
-        if newAccess <> invalid
-          if newAccess.access_token <> invalid
-            newAuthInfo = m.updateAnonymousAuthInfo(newAccess, authInfo)
-            newAuthInfo = m.saveAuthInfo(newAuthInfo) 'returns invalid if not saved to the registry
-          else
-            ' Most likely in this block if receiving a 401 when attempting to refresh the anonymous token.
-            ' Be careful to only do this if the service rejected auth refresh.  We don't
-            ' want to delete auth info for transient errors like network down.
-            m.deleteAuthInfo()
-            newAuthInfo = m.fetchAndSaveAnonymousAuthInfo()
-          end if
-          exit while
-        end if
-
-        'wait max x secs for a response to refresh the auth token
-        if timer.totalMilliseconds() > (timeout * 1000)
-          exit while
-        end if
-      end while
-    end if
-
-  end if
-
-  return newAuthInfo 'may return invalid
-
+' @controllerCallbackId: string, the id for the callback function that should be called when this process is completed ex. "callBackForInitOrUpdateAuthInfo"
+Function tubiAuth_refreshAnonymousToken(authInfo, controllerCallbackId)
+  tokenReqInfo = m.getAnonymousRefreshTokenRequestInfo(authInfo)
+  m.makeRequest(tokenReqInfo, "handleAnonymousRefreshTokenResponse", controllerCallbackId)
 End Function
 
 
@@ -232,7 +222,7 @@ End Function
 ' @authInfo: assocarray, contains accessToken, refreshToken, expireTime
 '
 ' returns AnonymousRefreshToken request object in assocarray
-Function tubiAuth_getAnonymousRefreshTokenRequest(authInfo)
+Function tubiAuth_getAnonymousRefreshTokenRequestInfo(authInfo)
 
   algorithm = m.constants.anonymous.algorithm
   dateTime = createObject("roDateTime").ToISOString()
@@ -245,17 +235,19 @@ Function tubiAuth_getAnonymousRefreshTokenRequest(authInfo)
   body = {}
   bodyJson = FormatJSON(body)
 
-  tokenReqOptions = {
-    url : m.constants.urls.account.anonymous.refreshToken
-    body: bodyJson
-    headers: headers
-    method: m.constants.reqTypes.post
-    retries: 0
+  tokenReqInfo = {
+    url: m.constants.urls.account.anonymous.refreshToken
+    options: {
+      body: bodyJson
+      headers: headers
+      method: m.constants.reqTypes.post
+    }
   }
-  signature = m.createSignature(dateTime, tokenReqOptions, secretKey, algorithm)
+
+  signature = m.createSignature(dateTime, tokenReqInfo, secretKey, algorithm)
   signedHeaders = m.getSignedHeaders(headers)
 
-  params = {
+  tokenReqInfo.options.params = {
     "X-Tubi-Algorithm": algorithm
     "X-Tubi-SignedHeaders": signedHeaders
     "X-Tubi-Date": dateTimeFormatted
@@ -263,93 +255,34 @@ Function tubiAuth_getAnonymousRefreshTokenRequest(authInfo)
     "X-Tubi-Signature" : signature
   }
 
-  tokenReqOptions["params"] = params
 
-  return m.request.createAsync(m.constants.urls.account.anonymous.refreshToken, "refreshAnonymousToken", tokenReqOptions)
-
+  return tokenReqInfo
 End Function
 
 
-Function tubiAuth_fetchAndSaveAnonymousAuthInfo()
-  authInfo = m.fetchAnonymousAuthInfo()
-  return m.saveAuthInfo(authInfo)
-End Function
-
-
-'returns invalid or an assocArray that looks like the following
-'authInfo = {
-'  refreshToken: someRefreshToken(String)
-'  accessToken: someAccessToken(String)
-'  expireTime: numberOfSecondsUntilExpires(Integer as String)
-'  secretKey: someSecretKey(String)
-'}
-Function tubiAuth_fetchAnonymousAuthInfo()
-
-  authInfo = invalid
-
+' Kicks off the process to fetch an anonymous auth token
+' @controllerCallbackId: string, the id for the callback function that should be called when this process is completed ex. "callBackForInitOrUpdateAuthInfo
+Function tubiAuth_fetchAndSaveAnonymousAuthInfo(controllerCallbackId)
   roDeviceInfo = CreateObject("roDeviceInfo")
   verifier = roDeviceInfo.GetRandomUUID()
 
-  authPort = CreateObject("roMessagePort")
   timeout = 10
-  anonymousSigningKeyReq = m.getAnonymousSigningKeyRequest(verifier)
-
-  signingKeyResponse = invalid
-  if anonymousSigningKeyReq.start(authPort) = true
-    timer = CreateObject("roTimespan")
-    while true
-      msg = wait(100, authPort)
-      signingKeyResponse = m.handleAnonymousSigningKeyResponse(msg, anonymousSigningKeyReq)
-      if signingKeyResponse <> invalid
-        exit while
-      end if
-      'wait max x secs for a response to refresh the auth token
-      if timer.totalMilliseconds() > (timeout * 1000)
-        exit while
-      end if
-    end while
-  end if
-
-  if signingKeyResponse = invalid or (signingKeyResponse.id = invalid or signingKeyResponse.key = invalid)
-    return invalid
-  end if
-
-  authPort = CreateObject("roMessagePort")
-  anonymousTokenReq = m.getAnonymousTokenRequest(verifier, signingKeyResponse)
-
-  if anonymousTokenReq.start(authPort) = true
-    timer = CreateObject("roTimespan")
-    while true
-      msg = wait(100, authPort)
-      token = m.handleAnonymousTokenResponse(msg, anonymousTokenReq)
-      if token <> invalid
-        if token.access_token <> invalid AND token.refresh_token <> invalid AND token.expires_in <> invalid
-          authInfo = m.formatAuthInfoFromServer(token)
-          authInfo["secretKey"] = signingKeyResponse.key ' store secretKey in registry, we need it for refreshing anonymous token
-        end if
-        exit while
-      end if
-      'wait max x secs for a response to refresh the auth token
-      if timer.totalMilliseconds() > (timeout * 1000)
-        exit while
-      end if
-    end while
-  end if
-
-  return authInfo
-
+  anonymousSigningKeyReqInfo = m.getAnonymousSigningKeyRequestInfo(verifier)
+  anonymousSigningKeyReqInfo.timeoutInMilliSec = timeout * 1000
+  m.makeRequest(anonymousSigningKeyReqInfo, "handleAnonymousSigningKeyResponse", controllerCallbackId, {
+    verifier: verifier
+  })
 End Function
 
 
-' It creates request object for anonymous Token
+' It creates request info for anonymous Token
 ' @verifier: string, random string used for anonymous token request
-' @response: assocarray, signingKey response {id, key}
+' @signingKeyResponse: assocarray, signingKey response {id, key}
 '
 ' returns request object used to fetch an anonymous token as returned by Request().createAsync()
-Function tubiAuth_getAnonymousTokenRequest(verifier, response)
-
-  id = response.id
-  secretKey = response.key
+Function tubiAuth_getAnonymousTokenRequestInfo(verifier, signingKeyResponse)
+  id = signingKeyResponse.id
+  secretKey = signingKeyResponse.key
   algorithm = m.constants.anonymous.algorithm
 
   dateTime = createObject("roDateTime").ToISOString()
@@ -367,40 +300,34 @@ Function tubiAuth_getAnonymousTokenRequest(verifier, response)
   headers.append(m.constants.headers.commonUapi)
 
   tokenReqInfo = {
-    url : m.constants.urls.account.anonymous.token
-    body: bodyJson
-    headers: headers
-    method: m.constants.reqTypes.post
+    url: m.constants.urls.account.anonymous.token
+    options: {
+      body: bodyJson
+      headers: headers
+      method: m.constants.reqTypes.post
+    }
   }
+
   signature = m.createSignature(dateTime, tokenReqInfo, secretKey, algorithm)
   signedHeaders = m.getSignedHeaders(headers)
 
-  params = {
+  tokenReqInfo.options.params = {
     "X-Tubi-Algorithm": algorithm
     "X-Tubi-SignedHeaders": signedHeaders
     "X-Tubi-Date": dateTimeFormatted
     "X-Tubi-Expires": "60"
-    "X-Tubi-Signature" : signature
+    "X-Tubi-Signature": signature
   }
 
-  reqOptions = {
-    method: m.constants.reqTypes.post
-    body: bodyJson
-    headers: headers
-    params: params
-    retries: 0
-  }
-
-  return m.request.createAsync(m.constants.urls.account.anonymous.token, "getAnonymousToken", reqOptions)
+  return tokenReqInfo
 End Function
 
 
-' It creates request object for anonymous signingKey
+' It creates request info for anonymous signingKey
 ' @verifier: string, random string used for anonymous signingKey request
 '
-' returns request object as returned by Request().createAsync()
-Function tubiAuth_getAnonymousSigningKeyRequest(verifier)
-
+' returns request info object
+Function tubiAuth_getAnonymousSigningKeyRequestInfo(verifier)
   ba1 = CreateObject("roByteArray")
   ba1.FromAsciiString(verifier)
   digest = CreateObject("roEVPDigest")
@@ -424,147 +351,91 @@ Function tubiAuth_getAnonymousSigningKeyRequest(verifier)
   headers = {}
   headers.append(m.constants.headers.commonUapi)
 
-  reqOptions = {
-    method: m.constants.reqTypes.post
-    body: bodyJson
-    headers: headers
-    retries: 0
+  options = {
+    "method": m.constants.reqTypes.post
+    "body": bodyJson
+    "headers": headers
   }
 
-  return m.request.createAsync(m.constants.urls.account.anonymous.signingKey, "getAnonymousSigningKey", reqOptions)
+  return {
+    "url": m.constants.urls.account.anonymous.signingKey
+    "options": options
+  }
 End Function
 
 
 ' handles anonymous signingKey response
-' @msg: roUrlEvent
-' @anonymousSigningKeyReq: assocarray, a request object as returned by Request().createAsync()
-'                                      and used to make the request to fetch the signing key
-'
-' returns response in assocarray (id, key)
-Function tubiAuth_handleAnonymousSigningKeyResponse(msg, anonymousSigningKeyReq)
-  signingKey = invalid
-
-  responseInfo = anonymousSigningKeyReq.handleEvent(msg)
-
-  if responseInfo <> invalid AND responseInfo.response <> invalid AND responseInfo.response.data <> invalid
-    code = responseInfo.response.code
-    if code < 200 or code >= 400
-      ' challenge was not valid
-      signingKey = {}
-    else if responseInfo.response.data.len() > 0
-      signingKey = ParseJson(responseInfo.response.data)
-    end if
+Function tubiAuth_handleAnonymousSigningKeyResponse(response)
+  signingKeyResponse = response.data
+  if signingKeyResponse = invalid OR (signingKeyResponse.id = invalid OR signingKeyResponse.key = invalid) then
+    tubiLog("Signing Key Response is invalid", "warn")
+  else
+    responseContext = response.responseContext
+    anonymousTokenReqInfo = m.getAnonymousTokenRequestInfo(responseContext.verifier, signingKeyResponse)
+    anonymousTokenReqInfo.timeoutInMilliSec = 10000
+    m.makeRequest(anonymousTokenReqInfo, "handleAnonymousTokenResponse", responseContext.controllerCallbackId, {
+      "secretKey": signingKeyResponse.key
+    })
   end if
-
-  return signingKey
 End Function
 
 
-' handles anonymous token response
-' @msg: roUrlEvent
-' @anonymousTokenReq: assocarray, a request object as returned by Request().createAsync()
-'                                 and used to make the request to fetch the anonymous auth token
-'
-' returns response in assocarray (accessToken, refreshToken, expires_in)
-Function tubiAuth_handleAnonymousTokenResponse(msg, anonymousTokenReq)
-  anonymousTokenInfo = invalid
-
-  responseInfo = anonymousTokenReq.handleEvent(msg)
-
-  if responseInfo <> invalid AND responseInfo.response <> invalid AND responseInfo.response.data <> invalid
-    code = responseInfo.response.code
-    if code < 200 or code >= 400
-      ' signing key was not valid
-      anonymousTokenInfo = {}
-    else if responseInfo.response.data.len() > 0
-      anonymousTokenInfo = ParseJson(responseInfo.response.data)
+' Handles anonymous token response
+Function tubiAuth_handleAnonymousTokenResponse(response)
+  token = response.data
+  if token <> invalid
+    if token.access_token <> invalid AND token.refresh_token <> invalid AND token.expires_in <> invalid
+      authInfo = m.formatAuthInfoFromServer(token)
+      authInfo["secretKey"] = response.responseContext.secretKey ' store secretKey in registry, we need it for refreshing anonymous token
+      m.saveAuthInfo(authInfo)
+      controllerCallbackId = response.responseContext.controllerCallbackId
+      callback = m[controllerCallbackId]
+      if callback <> invalid then
+        m[controllerCallbackId] = invalid
+        callback()
+      end if
+    else
+      tubiLog("Token response is invalid", "warn")
     end if
   end if
-
-  return anonymousTokenInfo
 End Function
 
 
 ' handles anonymous refresh token response
-' @msg: roUrlEvent
-' @anonymousTokenReq: assocarray
-'
-' returns response in assocarray (accessToken, refreshToken, expires_in), empty AA if 401, or invalid
-Function tubiAuth_handleAnonymousRefreshTokenResponse(msg, anonymousTokenReq)
-  newAccess = invalid
+' @response: assocarray as returned from request made in refreshAnonymousToken
+Function tubiAuth_handleAnonymousRefreshTokenResponse(response)
+  if response <> invalid
+    controllerCallbackId = response.responseContext.controllerCallbackId
+    if response.code = 401 OR response.code = 403
+      ' Be careful to only do this if the service rejected auth refresh. We don't
+      ' want to clear auth info for error code besides these
 
-  responseInfo = anonymousTokenReq.handleEvent(msg)
+      ' We are deleting the stored token info since backend said it cannot use the refresh token to provide
+      ' a new access token.
+      callback = m[controllerCallbackId]
+      if callback <> invalid then
+        m[controllerCallbackId] = invalid
+        m.logout(callback)
+      end if
+    else
+      newAuthInfo = m.updateAuthInfo(response.data)
+      if newAuthInfo <> invalid
+        ' handling the succesful token refresh
+        m.saveAuthInfo(newAuthInfo, true)
+      else
+        ' Since the refresh token call failed.
+        ' This else part is triggered because backend HTTP code was not 401 or 403.
+        ' Assuming it is some temporary issue we are not logging the user out but instead returning the same token
+        ' So that we can re-use existing registry values to refresh the token again during relaunch or next re-try.
+        ' callback
+      end if
 
-  if responseInfo <> invalid AND responseInfo.response <> invalid AND responseInfo.response.data <> invalid
-    if responseInfo.response.code = 403
-      ' refresh token was expired
-      newAccess = {}
-    else if responseInfo.response.data.len() > 0
-      newAccess = ParseJson(responseInfo.response.data)
+      callback = m[controllerCallbackId]
+      if callback <> invalid then
+        m[controllerCallbackId] = invalid
+        callback()
+      end if
     end if
-  end if
-
-  return newAccess
-End Function
-
-
-Function tubiAuth_clearFirstVisit()
-  firstVisit = m.regDelete("firstVisit", m.firstVisitRegSection)
-  return firstVisit
-End Function
-
-
-'reads device registry for firstVisit value
-'returns firstVisit value if value is present, otherwise return -1
-Function tubiAuth_getFirstVisit()
-  firstVisit = m.regRead("firstVisit", m.firstVisitRegSection)
-  if firstVisit <> invalid
-    firstVisit = firstVisit.toInt()
-  else
-    firstVisit = -1
-  end if
-  return firstVisit
-End Function
-
-
-'sets the first visit value (number of days since Unix epoch) in the device registry
-'returns the number of days since Unix epoch
-Function tubiAuth_setFirstVisit()
-  dateTime = CreateObject("roDateTime")
-  secondsFromEpoch = dateTime.AsSeconds()
-  daysFromEpoch = Int(secondsFromEpoch / 60 / 60 / 24)
-  m.regWrite("firstVisit", daysFromEpoch.toStr(), m.firstVisitRegSection)
-  return daysFromEpoch
-End Function
-
-
-'reads device registry for key passed in educationalModal registry section
-'returns boolean value based on registry entry
-Function tubiAuth_getEducationalModalEntry(key="")
-  if key = ""
-    return true
-  end if
-  isModalShown = m.regRead(key, m.educationalModal)
-  if isModalShown <> invalid
-    return true
-  else
-    return false
-  end if
-End Function
-
-
-'writes device registry for name passed in educationalModal registry section
-Function tubiAuth_setEducationalModalEntry(key=invalid, value="true")
-  if key <> invalid
-    m.regWrite(key, value, m.educationalModal)
-  end if
-End Function
-
-
-'clears device registry for name passed in educationalModal registry section
-Function tubiAuth_clearEducationalModalEntry(key=invalid)
-  if key <> invalid
-    m.regDelete(key, m.educationalModal)
   end if
 End Function
 
@@ -585,16 +456,12 @@ End Function
 '@serverAuthInfo: assocArray of auth info as received from the server
 Function tubiAuth_handleRegistration(serverAuthInfo)
   authInfo = m.formatAuthInfoFromServer(serverAuthInfo)
-  authInfo = m.saveAuthInfo(authInfo)
-
-  return authInfo
+  m.saveAuthInfo(authInfo)
 End Function
 
 
 
 'requests and receives a new auth token from the server
-'this is a helper function that wraps tubiAuth_requestTokenRefresh_ and tubiAuth_handleRefreshResponse_
-'this function behaves synchronously and blocks until a response is received or the timeout is reached
 '@authInfo = {
 '  refreshToken: someRefreshToken(String)
 '  accessToken: someAccessToken(String)
@@ -606,63 +473,10 @@ End Function
 '  authType: analyticsAuthType(String)
 '  hasAge: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
 '}
-'@timeout: integer, the max amount of time to wait for a response from the server in seconds
-'
-'returns the new authInfo if updated or invalid if there was a problem receiving or updating the new authInfo
-'side effects... overwrites the old authInfo in the registry with the new authInfo
-Function tubiAuth_refreshAuthToken(authInfo, timeout)
-  authPort = CreateObject("roMessagePort")
-  refreshReq = m.requestTokenRefresh(authInfo, authPort)
-  newAuthInfo = invalid
-
-  if refreshReq <> invalid
-    timer = CreateObject("roTimespan")
-    while true
-      msg = wait(100, authPort)
-      newAccess = m.handleRefreshResponse(msg, refreshReq)
-
-      if newAccess <> invalid
-        if newAccess.access_token <> invalid
-          newAuthInfo = m.updateAuthInfo(newAccess, authInfo)
-
-          ' prior to saving authType as part of the authInfo in the registry, the only possible
-          ' authType for analytics was "CODE" which was hard coded in the analytics module.
-          ' At this point in the code, it's possible that the previously saved authInfo does
-          ' not have an authType, so we default to "CODE". Over time the number of devices
-          ' that enter this if block should drop to 0 as newly signed in/activated users save
-          ' the authType in the registry, and older users add the "CODE" authType as they
-          ' refresh their token.
-          if authInfo.authType = invalid
-            newAuthInfo.authType = "CODE"
-          end if
-          newAuthInfo = m.saveAuthInfo(newAuthInfo) 'returns invalid if not saved to the registry
-        else if newAccess.code = m.constants.errors.codes.invalidToken
-          ' Be careful to only do this if the service rejected auth refresh.  We don't
-          ' want to sign users out for transient errors like network down.
-
-          ' We are deleting the stored token info since backend said it cannot use the refresh token to provide
-          ' a new access token.
-          m.deleteAuthInfo()
-          ' Since we logged out the user we can make a request for anonymous token.
-          newAuthInfo = m.fetchAndSaveAnonymousAuthInfo()
-        else
-          ' Since the refresh token call failed.
-          ' This else part is triggered because backend HTTP code was not 401 or 403.
-          ' Assuming it is some temporary issue we are not logging the user out but instead returning the same token
-          ' So that we can re-use existing registry values to refresh the token again during relaunch or next re-try.
-          newAuthInfo = authInfo
-        end if
-        exit while
-      end if
-
-      'wait max x secs for a response to refresh the auth token
-      if timer.totalMilliseconds() > (timeout * 1000)
-        exit while
-      end if
-    end while
-  end if
-
-  return newAuthInfo 'may return invalid
+' @controllerCallbackId: string, the id for the callback function that should be called when this process is completed ex. "callBackForInitOrUpdateAuthInfo
+Function tubiAuth_refreshAuthToken(authInfo, controllerCallbackId)
+  requestInfo = m.getTokenRefreshInfo(authInfo)
+  m.makeRequest(requestInfo, "handleRefreshResponse", controllerCallbackId)
 End Function
 
 
@@ -674,43 +488,17 @@ End Function
 '   externalDeviceId: string of integers, the device id for the originating device
 '   externalRefreshToken: string, the refresh token sent by the originating device
 '   userId: string of integers, the user id sent by the originating device
-'@timeout: integer, the max amount of time (in ms) to wait for a response from the server
-'
-Function tubiAuth_transferRefreshToken(externalAuthInfo, timeout=10)
-  newAuthInfo = invalid
-  authPort = CreateObject("roMessagePort")
-
+' @callback: function, the callback that will called after the token transfer has finished
+Function tubiAuth_transferRefreshToken(externalAuthInfo, callback)
   'create and send transfer request
-  transferReq = m.requestTokenTransfer(externalAuthInfo, authPort)
+  requestInfo = m.getRequestTokenTransferInfo(externalAuthInfo)
 
-  'listen for transfer request response
-  if transferReq <> invalid
-    timer = CreateObject("roTimespan")
-    while true
-      msg = wait(100, authPort)
-      newRefreshToken = m.handleRefreshResponse(msg, transferReq)
+  controllerCallbackId = "callBackForTransferRefreshToken"
+  m[controllerCallbackId] = callback
 
-      if newRefreshToken <> invalid
-        if newRefreshToken.refresh_token <> invalid
-          stubbedAuthInfo = {
-            refreshToken: newRefreshToken.refresh_token
-            userId: externalAuthInfo.userId
-          }
-
-          'get new auth token and save new auth info to registry
-          newAuthInfo = m.refreshAuthToken(stubbedAuthInfo, timeout)
-        end if
-        exit while
-      end if
-
-      'wait max x secs for a response to refresh the auth token
-      if timer.totalMilliseconds() > (timeout * 1000)
-        exit while
-      end if
-    end while
-  end if
-
-  return newAuthInfo
+  m.makeRequest(requestInfo, "handleTransferRefreshResponse", controllerCallbackId, {
+    "userId": externalAuthInfo.userId
+  })
 End Function
 
 
@@ -730,60 +518,6 @@ Function tubiAuth_getAuthHeaders(authToken)
 End Function
 
 
-'a wrapper for TubiRequest().createAsync(). Used to create requests that require authorization
-' @url - The URL (with or without query params) to request
-' @name (optional) - a human readable name for the request, to track in logs
-' @options (optional) - options to tune the behavior of the request
-'         valid Options:
-'               method - HTTP method as string: GET, PUT, POST, PATCH, or DELETE
-'               params - assoc array of URL query params
-'               body - PUT or POST body as string
-'               headers - assoc array of headers and their values
-'
-' returns a request objects as created by TubiRequest().createAsync() with an additional property(authInfo)
-' and additional method(getAuthHeaders) - both are needed in request.handleEvent()
-' or returns invalid if there is no authInfo in the registry
-Function tubiAuth_createAuthRequest(url as String, name = "" as String, options={} as Object) as Object
-  authReq = invalid
-  authInfo = m.getAuthInfo()
-  if authInfo <> invalid and authInfo.accessToken <> invalid AND authInfo.userId <> invalid
-    authHeaders = m.getAuthHeaders(authInfo.accessToken)
-    if authHeaders <> invalid
-      if options.headers <> invalid
-        options.headers.append(authHeaders)
-      else
-        options.headers = authHeaders
-      end if
-    end if
-
-    'add user id if not already added
-    if options.params = invalid
-      options.params = {}
-    end if
-    if options.params["user_id"] = invalid AND (url <> m.constants.urls.account.userSettings AND url <> m.constants.urls.account.parentalRating)
-      options.params["user_id"] = authInfo.userId
-    end if
-
-    authReq = m.request.createAsync(url, name, options)
-    authReq.getAuthHeaders = m.getAuthHeaders
-    authReq.refreshAuthToken = m.refreshAuthToken
-    authReq.requestTokenRefresh = m.requestTokenRefresh
-    authReq.updateAuthInfo = m.updateAuthInfo
-    authReq.saveAuthInfo = m.saveAuthInfo
-    authReq.handleRefreshResponse = m.handleRefreshResponse
-    authReq.deleteAuthInfo = m.deleteAuthInfo
-    authReq.constants = m.constants
-    authReq.request = m.request
-    authReq.authInfo = authInfo
-    authReq.regWrite = m.regWrite
-    authReq.authRegSection = m.authRegSection
-    authReq.setAuthInfo = m.setAuthInfo
-  end if
-
-  return authReq
-End Function
-
-
 ' @hasAge: boolean, backend response field "has_age". True indicates the user has an age
 '                   associated with the account, and the age is >= 13.
 Function tubiAuth_updateAuthInfoWithAge(hasAge)
@@ -793,75 +527,9 @@ Function tubiAuth_updateAuthInfoWithAge(hasAge)
     if authInfo.userId <> invalid
       ' presence of userId indicates the user is logged in.
       ' Only save hasAge for a logged in user.
-      authInfo.hasAge = hasAge.toStr()
-    end if
-
-    ' getAuthInfo() returns an int, but saveAuthInfo() expects a string for expire time
-    expireTime = authInfo.expireTime
-    if isInteger(expireTime) = true
-      authInfo.expireTime = expireTime.toStr()
+      m.setAuthInfo("hasage", hasAge.toStr())
     end if
   end if
-
-  m.saveAuthInfo(authInfo)
-  return m.getAuthInfo()
-End Function
-
-
-Function tubiAuth_getGuestUserHasAgeInfo()
-  hasAgeStored = m.regRead("ageInfo", m.guestUserHasAgeRegSection)
-  if hasAgeStored <> invalid
-
-    hasAgeStored = ParseJson(hasAgeStored)
-    dateTime = CreateObject("roDateTime")
-    nowTime = dateTime.AsSeconds()
-
-    hasAgeInfo = {
-      hasAge: hasAgeStored.hasAge
-      expired: true
-    }
-
-    if hasAgeStored.expireTime > nowTime
-      hasAgeInfo.expired = false
-    end if
-  else
-    hasAgeInfo = {
-      hasAge: false
-      expired: true
-    }
-  end if
-  return hasAgeInfo
-End Function
-
-
-' @hasAge: boolean, true indicates that the backend has determined that this user is >= 13 years old
-Function tubiAuth_setGuestUserHasAgeInfo(hasAge)
-  if isBoolean(hasAge) = false
-    hasAge = false
-  end if
-
-  dateTime = CreateObject("roDateTime")
-  nowTime = dateTime.AsSeconds()
-
-  'set the default expire time (ie. the user failed the age gate)
-  hasAgeStored = {
-    hasAge: hasAge
-    expireTime: nowTime + m.constants.timers.coppaFailTimeout
-  }
-
-  if hasAge = true
-    ' update with the expire time used if the user passed the age gate
-    hasAgeStored.expireTime = nowTime + m.constants.timers.coppaPassTimeout
-  end if
-
-  hasAgeStoredJson = FormatJson(hasAgeStored)
-  m.regWrite("ageInfo", hasAgeStoredJson, m.guestUserHasAgeRegSection)
-  return hasAgeStored
-End Function
-
-
-Function tubiAuth_deleteGuestUserHasAgeInfo()
-  m.regDelete("ageInfo", m.guestUserHasAgeRegSection)
 End Function
 
 
@@ -876,19 +544,41 @@ End Function
 '  authType: analyticsAuthType(String)
 '  hasAge: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
 '}
-Function tubiAuth_saveAuthInfo(authInfo)
-  if authInfo <> invalid AND authInfo.refreshToken <> invalid AND authInfo.accessToken <> invalid AND authInfo.expireTime <> invalid AND isString(authInfo.expireTime) = true
+' @authInfoMustHaveRefreshToken: boolean, if the authInfo to be saved was generated from a requsest
+'                                         to refresh the auth/anonymous token, the refresh token is not
+'                                         expected to be included in the passed in authInfo and authInfoMustHaveRefreshToken
+'                                         should be set to false. If the authInfo to be saved was generated
+'                                         as part of the initial setup of auth/anonymous token, a refresh
+'                                         token is expected to be included in the passed in authInfo and
+'                                         authInfoMustHaveRefreshToken should be set to true
+Function tubiAuth_saveAuthInfo(authInfo, authInfoMustHaveRefreshToken = false)
+  if authInfo <> invalid AND authInfo.accessToken <> invalid AND isString(authInfo.expireTime) = true then
+    if authInfoMustHaveRefreshToken = false then
+      if authInfo.refreshToken = invalid then
+        tubiLog("AuthInfo is missing refreshToken and refresh was false", "warn")
+        authInfo = [] ' Setting empty to prevent saving to registry
+      end if
+    end if
+
     for each key in authInfo
       value = authInfo[key]
       if isString(value) = false
         value = value.toStr()
       end if
-      m.regWrite(key, value, m.authRegSection)
+
+      m.setAuthInfo(key, value)
     end for
   else
-    authInfo = invalid
+    tubiLog("AuthInfo is invalid or missing required fields", "warn")
   end if
-  return authInfo
+End Function
+
+
+Function tubiAuth_logout(callback = invalid)
+  controllerCallbackId = "callbackForLogout"
+  m[controllerCallbackId] = callback
+  m.deleteAuthInfo()
+  m.fetchAndSaveAnonymousAuthInfo(controllerCallbackId)
 End Function
 
 
@@ -912,13 +602,19 @@ End Function
 '  authType: analyticsAuthType(String)
 '  hasAge: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
 '}
-Function tubiAuth_checkIfAuthExpired(authInfo)
+' @timeOffset: integer, the number of seconds to offset the current time by. Used to allowing checking if the auth token will expire soon. Only positive numbers are allowed.
+Function tubiAuth_checkIfAuthExpired(authInfo, timeOffset = 0)
   isExpired = true
+
+  if timeOffset < 0 then
+    tubiLog("timeOffset must be a positive number", "warn")
+    timeOffset = 0
+  end if
 
   dateTime = CreateObject("roDateTime")
   timeInSecs = dateTime.asSeconds()
 
-  if isInteger(authInfo.expireTime) AND timeInSecs < authInfo.expireTime
+  if isInteger(authInfo.expireTime) AND timeInSecs + timeOffset < authInfo.expireTime
     isExpired = false
   end if
 
@@ -928,44 +624,20 @@ End Function
 
 'returns an authInfo object that is ready to be sent into the registry (expireTime is a string representation of an integer)
 '@newAccess: assocArray, contains the new auth token and expire time as sent from the server during a refresh token action
-'@authInfo: assocArray, authInfo as pulled from the registry with the old auth token and expire time
-Function tubiAuth_updateAuthInfo(newAccess, authInfo)
+Function tubiAuth_updateAuthInfo(newAccess)
   updatedAuthInfo = invalid
 
   if newAccess <> invalid AND newAccess.expires_in <> invalid AND newAccess.access_token <> invalid
     dateTime = CreateObject("roDateTime")
     newExpireTime = dateTime.asSeconds() + newAccess.expires_in
 
-    if authInfo <> invalid
-      authInfo.expireTime = newExpireTime.ToStr()
-      authInfo.accessToken = newAccess.access_token
+    updatedAuthInfo = {
+      expireTime: newExpireTime.ToStr()
+      accessToken: newAccess.access_token
+    }
 
-      updatedAuthInfo = authInfo
-    end if
-  end if
-
-  return updatedAuthInfo
-End Function
-
-
-'returns an authInfo object that is ready to be sent into the registry (expireTime is a string representation of an integer)
-'@newAccess: assocArray, contains the new auth token and expire time as sent from the server during a refresh token action
-'@authInfo: assocArray, authInfo as pulled from the registry with the old auth token and expire time
-Function tubiAuth_updateAnonymousAuthInfo(newAccess, authInfo)
-  updatedAuthInfo = invalid
-
-  if newAccess <> invalid AND newAccess.expires_in <> invalid AND newAccess.access_token <> invalid AND newAccess.refresh_token <> invalid
-    dateTime = CreateObject("roDateTime")
-    newExpireTime = dateTime.asSeconds() + newAccess.expires_in
-
-    if authInfo <> invalid
-
-      authInfo.expireTime = newExpireTime.ToStr()
-      authInfo.accessToken = newAccess.access_token
-      authInfo.refreshToken = newAccess.refresh_token
-      authInfo.authType = "NOT_AUTHED"
-
-      updatedAuthInfo = authInfo
+    if newAccess.refresh_token <> invalid
+      updatedAuthInfo.refreshToken = newAccess.refresh_token
     end if
   end if
 
@@ -974,26 +646,18 @@ End Function
 
 
 'used to get a new auth token when the current auth token has expired
-'@authInfo: assocArray, expired authToken
-'@port: roMessagePort
-Function tubiAuth_requestTokenRefresh(authInfo, port)
-
+'@authInfo: assocArray, contains the refreshToken we will use to refresh the auth token
+Function tubiAuth_getTokenRefreshInfo(authInfo)
   headers = m.getAuthHeaders(authInfo.refreshToken)
 
-  reqOptions = {
-    method: "POST"
-    headers: headers
-    retries: 0
+  requestInfo = {
+    "url": m.constants.urls.userDevice.refreshToken
+    "options": {
+      "method": m.constants.reqTypes.post
+      "headers": headers
+    }
   }
-
-  newTokenReq = m.request.createAsync(m.constants.urls.userDevice.refreshToken, "getNewAccessToken", reqOptions)
-  reqSent = newTokenReq.start(port)
-
-  if reqSent = true
-    return newTokenReq
-  end if
-
-  return invalid
+  return requestInfo
 End Function
 
 
@@ -1003,7 +667,7 @@ End Function
 '   externalDeviceId: string of integers, the device id for the originating device
 '   externalRefreshToken: string, the refresh token sent by the originating device
 '   userId: string of integers, the user id sent by the originating device
-Function tubiAuth_requestTokenTransfer(externalAuthInfo, port)
+Function tubiAuth_getRequestTokenTransferInfo(externalAuthInfo)
   body = {
     device_id: m.constants.deviceInfo.deviceId
     platform: m.constants.platform
@@ -1013,49 +677,73 @@ Function tubiAuth_requestTokenTransfer(externalAuthInfo, port)
   bodyJson = FormatJson(body)
 
   headers = m.getAuthHeaders(externalAuthInfo.externalRefreshToken)
-  reqOptions = {
-    method: "POST"
-    body: bodyJson
-    headers: headers
-    retries: 0
+
+  options = {
+    "method": m.constants.reqTypes.post
+    "body": bodyJson
+    "headers": headers
   }
 
   params = {}
   'passing device advertiser id to tokenTransfer request.
   params["idfa"] = m.constants.deviceInfo.deviceAdId
 
-  reqOptions["params"] = params
+  options["params"] = params
 
-  newTokenReq = m.request.createAsync(m.constants.urls.userDevice.transferToken, "getRefreshTokenFromTransfer", reqOptions)
-  reqSent = newTokenReq.start(port)
-
-  if reqSent = true
-    return newTokenReq
-  end if
-
-  return invalid
+  return {
+    "url": m.constants.urls.userDevice.transferToken
+    "options": options
+  }
 End Function
 
 
-'@refreshRequest: assocArray, a reqest object as created by tubiRequest().createAsyncHTTPRequest()
-Function tubiAuth_handleRefreshResponse(msg, refreshRequest)
-  newAccess = invalid
+Function tubiAuth_handleTransferRefreshResponse(response)
+  if response <> invalid
+    m.handleRefreshResponse(response, true)
+  end if
+End Function
 
-  responseInfo = refreshRequest.handleEvent(msg)
 
-  if responseInfo <> invalid AND responseInfo.response <> invalid
-    if responseInfo.response.code = 401 OR responseInfo.response.code = 403
-      ' We are returning a error code similar to what is been returned by content api's
-      ' if the token passed is invalid, so that we can remove this override in future once backend returns us the response.
-      newAccess = {
-        "code": m.constants.errors.codes.invalidToken
-      }
-    else if responseInfo.response.data <> invalid AND responseInfo.response.data.len() > 0
-      newAccess = ParseJson(responseInfo.response.data)
+Function tubiAuth_handleRefreshResponse(response, isTransferRefreshResponse = false)
+  if response <> invalid
+    controllerCallbackId = response.responseContext.controllerCallbackId
+    if response.code = 401 OR response.code = 403
+      ' Be careful to only do this if the service rejected auth refresh.  We don't
+      ' want to sign users out for transient errors like network down.
+
+      ' We are deleting the stored token info since backend said it cannot use the refresh token to provide
+      ' a new access token.
+      callback = m[controllerCallbackId]
+      if callback <> invalid then
+        m[controllerCallbackId] = invalid
+        m.logout(callback)
+      end if
+    else
+      newAuthInfo = m.updateAuthInfo(response.data)
+      if newAuthInfo <> invalid
+        ' If it is a transfer refresh response, we need to set authType or else it will stay with whatever the last one was
+        if isTransferRefreshResponse = true then
+          ' Transfer refresh does not have the userId in the response so we have to add from the info passed in from mobile
+          newAuthInfo.userId = response.responseContext.userId
+          newAuthInfo.authType = "MOBILE_APP"
+        end if
+
+        m.saveAuthInfo(newAuthInfo, true)
+      else
+        ' Since the refresh token call failed.
+        ' This else part is triggered because backend HTTP code was not 401 or 403.
+        ' Assuming it is some temporary issue we are not logging the user out but instead returning the same token
+        ' So that we can re-use existing registry values to refresh the token again during relaunch or next re-try.
+        ' callback
+      end if
+
+      callback = m[controllerCallbackId]
+      if callback <> invalid then
+        m[controllerCallbackId] = invalid
+        callback()
+      end if
     end if
   end if
-
-  return newAccess
 End Function
 
 
@@ -1130,24 +818,6 @@ Function tubiAuth_regRead(key, section=invalid)
 End Function
 
 
-' copied from /source/3rdparty/roku/generalUtils.brs so that it won't need to be added as a dependency
-Function tubiAuth_regWrite(key, val, section=invalid)
-  if section = invalid then section = "Default"
-  sec = CreateObject("roRegistrySection", section)
-  sec.Write(key, val)
-  sec.Flush() ' commit it
-End Function
-
-
-' copied from /source/3rdparty/roku/generalUtils.brs so that it won't need to be added as a dependency
-Function tubiAuth_regDelete(key, section=invalid)
-  if section = invalid then section = "Default"
-  sec = CreateObject("roRegistrySection", section)
-  sec.Delete(key)
-  sec.Flush()
-End Function
-
-
 ' tubiAuth_createSignature
 ' Creates a signature to be used for signing requests, as documented by Amazon Signature 4 spec
 ' https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html
@@ -1182,17 +852,16 @@ End Function
 ' returns canonicalRequest : string
 '
 Function tubiAuth_constructCanonicalRequest(tokenReqInfo)
-
-  method = tokenReqInfo.method
+  options = tokenReqInfo.options
+  method = options.method
   absolutePath = m.getAbsolutePath(tokenReqInfo.url)
-  queryString = m.constructCanonicalQueryString(tokenReqInfo.params)
-  canonicalHeader = m.constructCanonicalHeaders(tokenReqInfo.headers)
-  signedHeader = m.constructSignedHeaders(tokenReqInfo.headers)
-  hashedPayload = m.constructHashedPayload(tokenReqInfo.body)
+  queryString = m.constructCanonicalQueryString(options.params)
+  canonicalHeader = m.constructCanonicalHeaders(options.headers)
+  signedHeader = m.constructSignedHeaders(options.headers)
+  hashedPayload = m.constructHashedPayload(options.body)
 
   canonicalRequest = method + chr(10) + absolutePath + chr(10) + queryString + chr(10) + canonicalHeader + chr(10) + signedHeader + chr(10) + hashedPayload
   return canonicalRequest
-
 End Function
 
 
@@ -1406,4 +1075,49 @@ Function tubiAuth_getSignedHeaders(headers)
   end if
 
   return signedHeaders
+End Function
+
+
+' Function as a wrapper around the GeneralTaskModule makeRequest method to allow us calling it from in here without storing a reference to controller m that could create a loop
+' @requestInfo: assocarray, contains information needed to make the request. Expected fields:
+'   url (required): String, url of the request api
+'   requestType (required): String, name of the request api, for example "getHomescreen".
+'                           Can be found in constants.reqNames
+'   options: AA, options as expected by TubiRequest().createAsync. (For example: method, params, body, headers)
+' @authCallbackName: string, the name of the callback function inside of Auth.brs that should be called after the request is completed
+' @controllerCallbackId: string, the id for the callback function that should be called when this process is completed ex. "callBackForInitOrUpdateAuthInfo
+' @responseContext: assocarray, additional context to be passed to the callback function
+Function tubiAuth_makeRequest(requestInfo, authCallbackName, controllerCallbackId, responseContext = {})
+  makeRequest = getGlobalAA().makeRequest
+  if makeRequest <> invalid then
+    requestInfo.successCallback = tubiAuthGeneralTaskRequestCallback
+    requestInfo.errorCallback = tubiAuthGeneralTaskRequestCallback
+
+    responseContext.append({
+      "authCallbackName": authCallbackName
+      "controllerCallbackId": controllerCallbackId
+    })
+
+    requestInfo.append({
+      "responseContext": responseContext
+      "responseType": "assocarray"
+      "requestType": m.constants.reqNames.genericWithResponseContext
+      "retries": 0 ' We don't want to retry any auth requests
+    })
+    makeRequest(requestInfo)
+  end if
+End Function
+
+
+Function tubiAuthGeneralTaskRequestCallback(response)
+  auth = m.tubiAuthUpdate
+  if auth = invalid then
+    tubiLog("tubiAuthGeneralTaskRequestCallback: auth is invalid", "warn")
+  else
+    if response.responseContext <> invalid AND isNonEmptyString(response.responseContext.authCallbackName) AND isFunction(auth[response.responseContext.authCallbackName]) then
+      auth[response.responseContext.authCallbackName](response)
+    else
+      tubiLog("tubiAuthGeneralTaskRequestCallback: responseContext.callbackName is invalid", "warn")
+    end if
+  end if
 End Function

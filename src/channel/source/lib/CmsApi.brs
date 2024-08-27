@@ -1,12 +1,10 @@
 ' Thin wrapper for CMS API, Autopilot API and Search API requests.  Collected here to facilitate easy
 ' integration tests
-Function CmsApi(constants, request, auth, apiUtils, experiments=invalid)
+Function CmsApi(constants, apiUtils, experiments=invalid)
 
   defaultValues = {
     ' dependencies
     constants: constants
-    request: request
-    auth: auth
     experiments: experiments
 
     ' public
@@ -28,7 +26,6 @@ Function CmsApi(constants, request, auth, apiUtils, experiments=invalid)
     createHomeScreenContainerIdsForScreensaverReqInfo: cmsApi_createHomeScreenContainerIdsForScreensaverReqInfo
 
     ' private
-    createAuthRequest: cmsApi_createAuthRequest
     setImageParams: cmsApi_setImageParams
     setTupianPosterParam: cmsApi_setTupianPosterParam
     setTupianLandscapeParam: cmsApi_setTupianLandscapeParam
@@ -486,17 +483,6 @@ End Function
 ' @existingParams: assocArray, any parameters that have already been defined that need to be added to
 Function cmsApi_setTupianBackgroundParam(existingParams = {})
   return m.setImageParams(["background"], existingParams)
-End Function
-
-
-'''''''''''''''''''''
-' create an auth request if user is logged in, otherwise use a normal request
-Function cmsApi_createAuthRequest(url, reqName, options)
-  request = m.auth.createAuthRequest(url, reqName, options)
-  if request = invalid
-    request = m.request.createAsync(url, reqName, options)
-  end if
-  return request
 End Function
 
 

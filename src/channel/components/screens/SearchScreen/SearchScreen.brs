@@ -2,9 +2,7 @@ Function init()
   tubiLog("SearchScreen.init")
   m._ = rodash()
   m.constants = getConstantsFromGlobal()
-  Request = TubiRequest(m.constants.settings)
-  Auth = TubiAuth(m.constants, Request)
-  m.Tracking = TubiTracking(m.constants, Request, Auth)
+  m.Tracking = TubiTrackingInfo(m.constants)
 
   m.ResultArea = m.top.findNode("ResultArea")
 
@@ -193,7 +191,7 @@ End Function
 Function setSearchStrings()
   m.sDefaultSearchText = getTranslation("screenSearch_trendingSearch")
   m.searchTitleText = getTranslation("menu_search")
-  if m.constants.externalConfig.info.livetv = true
+  if getExternalConfigInfoFromGlobal().livetv = true
     m.searchHintToSearch = getTranslation("screenSearch_defaultLinearSearch")
   else
     m.searchHintToSearch = getTranslation("screenSearch_defaultSearch")

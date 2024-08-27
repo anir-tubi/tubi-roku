@@ -34,7 +34,8 @@ Function initSideNav()
   end if
 
   'set the initial value for the sign in item string
-  setSideNavSignedInItem(m.global.authInfo)
+  authInfo = m.tubiAuthUpdate.getAuthInfo()
+  setSideNavSignedInItem(authInfo)
 End Function
 
 
@@ -81,7 +82,7 @@ End Function
 
 
 ' Change the appearance of the side nav sign in item when the user data has changed
-' @authInfo: AA, authInfo as stored on m.global.authInfo
+' @authInfo: AA, authInfo as stored in the registry
 Function setSideNavSignedInItem(authInfo)
   tubiLog("SideNavHelpers.setSideNavSignedInItem")
   sName = getTranslation("menu_signIn")
@@ -116,7 +117,7 @@ Function onSideNavItemSelected()
   tubiLog("SideNavHelpers.onSideNavItemSelected")
   itemSelectedId = m.SideNav.itemSelectedId
   itemSelected = m.SideNav.itemSelected
-  authInfo = m.global.authInfo
+  authInfo = m.tubiAuthUpdate.getAuthInfo()
   currentScreenNow = getCurrentScreen()
 
   ' TODO: Once top nav ids and side nav ids are separated we can directly set the
@@ -152,7 +153,7 @@ Function onSideNavItemSelected()
         setUiMode(m.constants.ui.modes.standard)
       end if
 
-      if authInfo = invalid or (authInfo <> invalid AND authInfo.userId = invalid)
+      if isLoggedInUser(authInfo) = false then
         '//if user is not signed in, then bring up the sign on page; otherwise, don't do anything
         startSignIn(onSideNavSignInCompleted)
         bNewScreenCalledSuccess = false ' setting bNewScreenCalledSuccess as false to keep the sidenav open when RFI modal is displayed. This is to avoid focus issue.
@@ -221,7 +222,7 @@ Function onSideNavItemSelected()
         setUiMode(m.constants.ui.modes.standard)
       end if
 
-      showHomeScreen(m.constants, authInfo)
+      showHomeScreen(m.constants)
       bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.channels
       if isKidsUIOn() = true

@@ -1,6 +1,5 @@
-Function TubiExternalConfig(request as Object, constants as Object) as Object
-  return{
-    request: request
+Function TubiExternalConfig(constants as Object) as Object
+  return {
     constants: constants
 
     'default values should just be a simple key/value associative array
@@ -9,73 +8,9 @@ Function TubiExternalConfig(request as Object, constants as Object) as Object
     }
 
     ' public methods
-    init: tubiExternalConfig_init
-    getConfigsRequest: tubiExternalConfig_getConfigsRequest
-    parseConfigs: tubiExternalConfig_parseConfigs
     getConfigsRequestInfo: tubiExternalConfig_getConfigsRequestInfo
     parseBlockedAnalyticsEvents: tubiExternalConfig_parseBlockedAnalyticsEvents
-
-    ' private methods
-    getConfigs: tubiExternalConfig_getConfigs_
-    storeConfigs: tubiExternalConfig_storeConfigs_
   }
-End Function
-
-
-' Synchronously requests the configs and places them on constants.
-Function tubiExternalConfig_init()
-  configs = m.getConfigs()
-
-  mergedConfig = {}
-  mergedConfig.append(m.defaultValues)
-  if configs <> invalid
-    mergedConfig.append(configs)
-  end if
-
-  m.storeConfigs(mergedConfig, m.constants)
-  return mergedConfig
-End Function
-
-
-' Example JSON response from the service:
-'
-' {
-'   "livetv": false,
-'   "intro_landscape_hibpr": "http://c12.adrise.tv/v2/sources/content-owners/adrise-no-ads/325254/v20169072053-1920x1080-2413k.mp4",
-'   "intro_landscape_lowbpr": "http://c12.adrise.tv/v2/sources/content-owners/adrise-no-ads/325254/v20169072053-1920x1080-341k.mp4",
-'   "intro_portrait_hibpr": "http://c12.adrise.tv/v2/sources/content-owners/adrise-no-ads/325255/v20169072050-1080x1920-2624k.mp4",
-'   "intro_portrait_lowbpr": "http://c12.adrise.tv/v2/sources/content-owners/adrise-no-ads/325255/v20169072050-1080x1920-335k.mp4"
-' }
-'
-Function tubiExternalConfig_getConfigs_()
-  configRequest = m.getConfigsRequest(m.request, m.constants)
-  res = configRequest.runSynchronous()
-  configs = m.parseConfigs(res)
-  return configs  'can return invalid
-End Function
-
-
-' @configs: assocArray, configs as sent from the UAPI and json parsed
-' @constants: assocArray, constants
-' @sideEffect: updates the constants AA that is passed into the function by adding an AA on
-'              constants.externalConfig.info and updating the value at constants.deviceInfo.countryCode
-'              with the value from remote configs (as determined by Maxmind on the backend)
-Function tubiExternalConfig_storeConfigs_(configs, constants)
-  constants.externalConfig.info = configs
-
-  if constants.deviceInfo <> invalid AND configs <> invalid AND configs.country <> invalid
-    constants.deviceInfo.countryCode = UCase(configs.country)
-  end if
-
-  return constants
-End Function
-
-
-
-Function tubiExternalConfig_getConfigsRequest(request, constants)
-  requestInfo = m.getConfigsRequestInfo(constants)
-
-  return request.createAsync(requestInfo.url, requestInfo.requestType, requestInfo.options)
 End Function
 
 

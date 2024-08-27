@@ -147,6 +147,9 @@
       <field id="isDisplayingOverlay" alias="VideoOverlay.isDisplaying, VideoOverlayLite.isDisplaying" />
       <field id="linearOverlayLiteComponentInteractionInfo" alias="VideoOverlayLite.componentInteractionInfo" />
       <field id="globalCaptionMode" alias="VideoOverlayLite.globalCaptionMode, VideoNode.globalCaptionMode" />
+
+      <!-- This field is used to expose the task to allow us to be able to communicate directly with the task from the contentController context regarding auth -->
+      <field id="task" type="node" />
   </interface>
 
   <children>

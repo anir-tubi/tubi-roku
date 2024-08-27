@@ -3,9 +3,7 @@ Function init()
 
   m._ = rodash()
   m.constants = getConstantsFromGlobal()
-  Request = TubiRequest(m.constants.settings)
-  Auth = TubiAuth(m.constants, Request)
-  m.Tracking = TubiTracking(m.constants, Request, Auth)
+  m.Tracking = TubiTrackingInfo(m.constants)
   m.PageGroup = m.top.findNode("PageGroup")
   m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]
   m.ContentArea = m.top.findNode("ContentArea")
@@ -63,15 +61,9 @@ Function init()
 
   m.sponsorSlideAmt = 29 'the amount the grid slides up to fit the sponsored header. This is the difference of the heights of the sponsored and normal row titles
   m.sponsorMaskOffsetDiff = 119 'the diff in the amount the content area mask is offset in the up direction for sponsored rows. This is the difference of the heights of the sponsored and normal row titles
-  
+
   m.originalContentAreaTranslation = m.ContentArea.translation
   m.originalContentAreaMaskOffset = m.ContentArea.maskOffset
-
-  authInfo = m.global.authInfo
-
-  if authInfo <> invalid AND authInfo.parentalrating <> invalid
-    m.top.parentalRating = authInfo.parentalrating
-  end if
 
   m.scrollDirection = "none"
 End Function

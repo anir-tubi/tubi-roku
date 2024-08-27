@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+- BaseTaskNeedingAuth
+-
+- Provides a common component that tasks can extend from that need to be able to request updated auth info and know when it is availabe in order to function properly. The functions provided by this are:
+- getUpdatedAuth() which should be called when we received 401 or 403 from the server and need updated auth. The extending task must have a roMessagePort on m.port in order for getAuthUpdate() to work properly, in order to observe when updated auth is available.
+- conditionallyProcessAuthUpdatedMessage() which should be called in the task's run loop to check if the message received is concerning updated auth being available. Auth module is expected to be available at m.auth.
+- onAuthUpdatedSuccess() which serves as an overwritable callback for when the attempt to update auth has concluded and was deemed successful (ie. the token was refreshed).
+- onAuthUpdatedFailure() which serves as an overwritable callback for when the attempt to update auth has concluded and was deemed unsuccessful (ie. could not refresh the token).
+-
+-->
+<component name="BaseTaskNeedingAuth" extends="Task">
+  <script type="text/brightscript" uri="BaseTaskNeedingAuth.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+    <interface>
+      <!-- INPUT -->
+        <!-- getUpdatedAuth() observes this field to know when update auth info is availabe at which point m.waitingForUpdatedAuthInfo is set back to false. -->
+        <field id="authUpdated" type="boolean" alwaysNotify="true" />
+
+      <!-- OUTPUT -->
+        <!-- updateAuth is set by calling getUpdatedAuth() which is observed in the active controller to trigger us getting updated auth info. m.waitingForUpdatedAuthInfo is set to true to let the task know we are waiting for updated auth info. -->
+        <field id="updateAuth" type="boolean" alwaysNotify="true" />
+    </interface>
+</component>

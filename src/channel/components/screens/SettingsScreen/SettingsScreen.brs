@@ -49,9 +49,7 @@ Function init()
   m.top.screenLevel = m.constants.ui.screenLevels.settingsScreen
   m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
 
-  request = TubiRequest(m.constants.settings)
-  auth = TubiAuth(m.constants, request)
-  m.Tracking = TubiTracking(m.constants, request, auth)
+  m.Tracking = TubiTrackingInfo(m.constants)
 
   onThemeChange()
 End Function

@@ -5,7 +5,7 @@
 Function TubiLoggerSetup()
   m.constants = getConstants()
   request = TubiRequest()
-  auth = TubiAuth(m.constants, request)
+  auth = TubiAuth(m.constants)
   m.log = TubiLogger(m.constants, request, auth)
 End function
 

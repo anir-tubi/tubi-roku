@@ -8,6 +8,11 @@ Function registerParsingCallbacks()
     parseError: parseGenericError
   }
 
+  m.requestTypes[m.constants.reqNames.genericWithResponseContext] = {
+    parseSuccess: parseGenericWithResponseContextSuccess
+    parseError: parseGenericWithResponseContextError
+  }
+
   ' sprites
   m.requestTypes[m.constants.reqNames.getThumbnails] = {
     parseSuccess: parseVideoScreenSpritesSuccess
@@ -262,11 +267,22 @@ Function registerParsingCallbacks()
     parseError: parseGenericError
   }
 
+  ' external config request
+  m.requestTypes[m.constants.reqNames.getExternalConfigs] = {
+    parseSuccess: parseGetExternalConfigSuccess
+    parseError: parseGenericError
+  }
+
+  'tubi experiments.
+  m.requestTypes[m.constants.reqNames.getNamespaces] = {
+    parseSuccess: parseTubiExperimentsNamespaceRequestSuccess
+    parseError: parseGenericError
+  }
 End Function
 
 
 ' Called from the base general task listen method. Below overridden method will be used to register helpers/utilities.
 Function instantiateLibs()
-  experiments = TubiExperiments(m.constants)
-  m.metadataTranslate = TubiMetadataTranslate(m.constants, experiments)
+  m.experiments = TubiExperiments(m.experimentsInfo)
+  m.metadataTranslate = TubiMetadataTranslate(m.constants, m.experiments)
 End Function

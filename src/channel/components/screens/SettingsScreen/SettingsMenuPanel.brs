@@ -98,7 +98,7 @@ Function setSettingsSidePanelMenuItems()
   }
 
   ' removing the parental controls if the config returns false.
-  if m.constants.externalConfig.info.enable_parental_control = false
+  if getExternalConfigInfoFromGlobal().enable_parental_control = false
     availablePanelItems.delete("parentalControls")
   end if
 

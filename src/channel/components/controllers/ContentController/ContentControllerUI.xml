@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - ContentControllerUI
+ -
+ - This serves as the spot for all ui components of the ContentController.
+ - We don't want to make these components until after auth, remote config and experiments are all ready to go.
+ - This is to avoid the issue where a component copies the default values before the actual values have been updated by ContentController
+ -
+ -->
+<component name="ContentControllerUI" extends="Group">
+  <interface>
+    <!-- All interface and actual controller code should be added in ContentController instead -->
+  </interface>
+
+    <children>
+      <!--
+        - This hides the loading screen that was in place by the Scene
+        - before remote components have loaded
+        -->
+      <Rectangle
+        id="ContentBackground"
+        width="1920"
+        height="1080"
+        translation="[0,0]"/>
+
+      <!-- All the children of this group exist only in a single instance -->
+      <Group
+        id="ContentGroup"
+        visible="false">
+
+        <VideoPreviewPlayer
+          id="videoPreviewPlayer" />
+
+        <!--  Group that contains the linear video player when it is not in its fullscreen state -->
+        <Group
+          id="LinearPlayerGroup"/>
+        <!--Handles the background images -->
+        <BackgroundGroup
+          id="BackgroundGroup"/>
+        <!--Handles the background sponsorship images when the current focused item is sponsored-->
+        <SponsorshipBackgroundGroup
+          id="SponsorshipBackgroundGroup"
+          translation="[0,522]"/>
+
+        <ScreenStack
+          id="ScreenStack"/>
+
+        <!--  Group that contains the linear video player when it is not in its fullscreen state, and when the player needs to be above the screen stack layer. -->
+        <Group
+          id="LinearPlayerGroupAboveScreenStack"/>
+
+        <SideNav
+          id="SideNav"
+          translation="[0,0]"
+          width="338"/>
+        <Clock
+          id="clock"
+          width="93"
+          height="36"
+          visible="false"
+          translation="[1729,72]"/>
+
+        <Group
+          id="logoGroup">
+          <Poster
+            id="tubiLogo"
+            height="48"
+            width="134"
+            uri="pkg:/images/logo-large.webp"
+            translation="[1698,54]"/>
+          <Poster
+            id="tubiKidsLogo"
+            height="48"
+            width="256"
+            uri="pkg:/images/logo-kids-large.webp"
+            translation="[1575,54]"
+            visible="false"/>
+          <Poster
+            id="tubiEspanolLogo"
+            height="93"
+            width="134"
+            uri="pkg:/images/logo-espanol-large.webp"
+            translation="[1698,54]"
+            visible="false"/>
+        </Group>
+        <TubiToast
+          id="tubiToast"
+          translation="[1191, 60]"/>
+      </Group>
+
+      <!-- Services -->
+
+      <TrackingLoggingTask
+        id="TrackingLoggingTask"/>
+
+      <!-- The timer that is used to countdown when the minimized player goes fullscreen -->
+      <Timer
+        id="PlayerFullscreenCountdownTimer"
+        duration="1"
+        repeat="true"/>
+
+      <!-- The timer that is used to check if guests are allowed to see the history of content. -->
+      <Timer
+        id="ResumeAllowedTimer"
+        duration="300"
+        repeat="true"/>
+
+      <!-- The timer that is used to check if we should show the screensaver -->
+      <Timer
+        id="screensaverTimer" />
+
+      <!-- Spinner primarily for sign-in/sign-out transitions -->
+      <Spinner
+        id="ContentControllerSpinner"
+        visible="true"
+        modal="true"
+        width="1920"
+        height="1080"/>
+
+      <!-- Spinner to indicate loading of a linear video when it is not fullscreen -->
+      <Spinner
+        id="LinearVideoPlayerSpinner"
+        translation="[1576,660]"
+        showShade="false"
+        displayText="false"
+        width="266"
+        height="66"
+        horizAlign="right"
+        vertAlign="bottom"
+        visible="false"/>
+  </children>
+</component>

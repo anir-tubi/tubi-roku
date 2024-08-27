@@ -1,8 +1,6 @@
 Function init()
   m.constants = getConstantsFromGlobal()
-  Request = TubiRequest(m.constants.settings)
-  Auth = TubiAuth(m.constants, Request)
-  m.Tracking = TubiTracking(m.constants, Request, Auth)
+  m.Tracking = TubiTrackingInfo(m.constants)
 
   m.top.observeFieldScoped("focusedChild", "onFocusChange")
   m.top.observeFieldScoped("stringSignIn", "onSignInChange")
@@ -133,7 +131,7 @@ Function onCreateMenuItems()
     menuItems.push(m.constants.ui.sideNavIds.tv)
   end if
 
-  if m.constants.externalConfig.info.livetv = true
+  if getExternalConfigInfoFromGlobal().livetv = true
     menuItems.push(m.constants.ui.sideNavIds.linearEPG)
   end if
 

@@ -10,6 +10,8 @@ Function GeneralTaskModule(context, generalTask)
     makeRequest: generalTask_makeRequest
     makeBatchRequest: generalTask_makeBatchRequest
     cancelRequest: generalTask_cancelRequest
+    updateGeneralTaskConstants: generalTask_updateGeneralTaskConstants
+    updateGeneralTaskExperimentsInfo: generalTask_updateGeneralTaskExperimentsInfo
 
     ' private
     generalTask: generalTask
@@ -192,7 +194,7 @@ End Function
 '   information to be passed from the original makeRequest call, all the way through to callbacks.
 '   In this way, the callbacks can have some context about what happened to trigger them.
 '
-Function generalTask_makeRequest(reqInfo = {})
+Function generalTask_makeRequest(reqInfo)
   if m.verifyRequestInfo(reqInfo) = false then
     return invalid
   end if
@@ -391,4 +393,14 @@ Function getArrayInterfaceTypes()
     "nodearray": true
     "array": true
   }
+End Function
+
+
+Function generalTask_updateGeneralTaskConstants(constants)
+  m.generalTask.newConstants = constants
+End Function
+
+
+Function generalTask_updateGeneralTaskExperimentsInfo(experimentsInfo)
+  m.generalTask.newExperimentsInfo = experimentsInfo
 End Function

@@ -1,4 +1,4 @@
-Function showConsentScreen(callback = startUserExperience)
+Function showConsentScreen(callback = runControllerStartSequence)
   m.callbackAfterConsent = callback
   bannerScreenTrackingInfo = {
     pageType: "your_privacy_page"
@@ -162,7 +162,7 @@ Function initialiazeOneTrustSDK()
     m.oneTrust.callFunc("setupUI", { "view":  oneTrustViewsGroup})
   end if
   tcfString = getTCFString()
-  
+
   ' For performance reasons so that we can quickly show the homescreen.
   ' Since for guest user consent if we have locally stored consent we do not have to wait until one trust syncs the data from backend
   ' because we need to refresh registry consent with server data only for logged in user because there is a possibility of data been updated from other devices.
@@ -338,18 +338,12 @@ End Function
 
 
 Function onInitialGetConsentRequestComplete()
-  if isGDPR(m.constants) = true
-    consentRequired = isUserConsentRequired()
+  if isGDPR(m.constants) = true AND isUserConsentRequired() = true AND isUserInAdultsMode() = true AND isKidsUIOn() = false
     ' Calling getConsents api so that we have the data ready whenever we are ready to calling startUserExperience or showConsentScreen method.
-    if consentRequired = true AND isUserInAdultsMode() = true AND isKidsUIOn() = false
-      showConsentScreen()
-    else
-      m.isConsentCheckComplete = true
-      startUserExperience()
-    end if
+    showConsentScreen()
   else
     m.isConsentCheckComplete = true
-    startUserExperience()
+    runControllerStartSequence()
   end if
 End Function
 
@@ -367,7 +361,7 @@ Function proceedAfterConsentUpdated()
     m.callbackAfterConsent = invalid
     callbackAfterConsent()
   else
-    startUserExperience()
+    runControllerStartSequence()
   end if
 End Function
 
@@ -402,7 +396,7 @@ Function getConsentOptOutStatusByKey(key)
       end if
     end if
   end if
-  
+
   return didOptOut
 End Function
 
@@ -436,7 +430,7 @@ Function getConsentsOptOutStatus()
       consentsStatus[consentKeys[key]] = getConsentOptOutStatusByKey(consentKeys[key])
     end for
   end if
-  
+
   return consentsStatus
 End Function
 

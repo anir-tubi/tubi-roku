@@ -4,10 +4,10 @@ Function init()
   m.contentLoadedAndFocused = false
   m.constants = getConstantsFromGlobal()
 
-  Request = TubiRequest(m.constants.settings)
-  Auth = TubiAuth(m.constants, Request)
-  m.Tracking = TubiTracking(m.constants, Request, Auth)
-  m.experiments = TubiExperiments(m.constants)
+  m.auth = TubiAuth(m.constants)
+  m.Tracking = TubiTracking(m.constants, m.auth)
+  experimentsInfo = getExperimentsInfoFromGlobal()
+  m.experiments = TubiExperiments(experimentsInfo)
   m.metadataTranslate = TubiMetadataTranslate(m.constants, m.experiments)
 
   m.itemsInRowCount = 8
@@ -69,7 +69,7 @@ Function onScreenFocusChange()
         '//indicate that when the content is refreshed, it should attempt to focus close to where it was previously focused on.
         m.top.jumpToItemFocused = m.VideoGrid.itemFocused
         ' CategoryDetailPage lazy loads more than 200+ titles.  If user revisits categoryDetailPage from title detail page and content needs to be refreshed, then
-        ' reset the lazy loading logic along with refreshed conent so that user can use lazy loading feature.
+        ' reset the lazy loading logic along with refreshed content so that user can use lazy loading feature.
         ' TODO: Implement the logic to focus nJumpToItemFocused exactly.
         m.upperRowIndex = Int(m.constants.performance.categoryGridList.lazyLoadBatchSize / m.itemsInRowCount) ' items per row = 8 * 6 = 48
         m.lowerRowIndex = 0
@@ -327,9 +327,9 @@ Function onKeyEvent(key, press) as Boolean
     end if
   else
     if key = "back"
-      authInfo = m.global.authInfo
+      authInfo = m.auth.getAuthInfo()
       ' show SignInRequired modal when guest user presses back from ActivationCodeScreen to CategoryDetailsScreen
-      if authInfo = invalid OR (authInfo <> invalid AND authInfo.userId = invalid)
+      if isLoggedInUser(authInfo) = false then
         m.top.signInRequired = true
         handled = true
       end if

@@ -9,6 +9,7 @@
     "locale/**/*.*",
     "fonts/**/*.*",
     "!components/controllers/TubiScene/TrackerTask.xml",
+    "!components/controllers/StarterController/simple/StarterController.xml",
     "!components/OTPublishersSDK/**/*.*"
   ],
   "diagnosticFilters": [{
@@ -22,5 +23,11 @@
   {
     "codes": [1013],
     "src": "components/lib/DevGridOverlay.brs"
+  }, {
+    "codes": [1115],
+    "src": "components/controllers/StarterController/StarterController.xml"
+  }, {
+    "codes": [1115],
+    "src": "components/controllers/StarterController/StartControllerWithTasks/StarterController.xml"
   }]
 }

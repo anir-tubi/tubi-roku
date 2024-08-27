@@ -1,8 +1,7 @@
 Function init()
   m.constants = getConstants()
   m.global.constants = m.constants
-  m.request = TubiRequest(m.constants.settings)
-  m._ = rodash()
+  m.global.theme = m.constants.ui.themes.default
 
   if m.constants.settings.mode = "dev" AND m.constants.settings.processAnimationLogo = false
     m.top.fadeInRemoteComponent = true
@@ -12,64 +11,34 @@ Function init()
     processAnimationLogo()
   end if
 
-  m.isExperimentConfigReady = false
-  m.isExternalConfigReady = false
+  m.top.observeFieldScoped("getUrl", "runControllerStartSequence")
 
-  m.top.observeFieldScoped("getUrl", "onUrlRequest")
+  m.isExternalConfigReady = false ' Used to know if we have received external config or at least tried and had the request fail
+  m.isExperimentsConfigReady = false ' Used to know if we have received experiments config or at least tried and had the request fail
 
-  starterTask = createObject("roSGNode", "StarterGeneralTask") ' initiate StarterTask
-  GeneralTaskModule(m, starterTask)
-
-  sendRequestForExperimentsAndConfig()
-
-End Function
-
-
-Function onUrlRequest()
-  checkIfExperimentAndRemoteConfigReadyAndProceed()
+  if m.constants.settings.useFullStarterController = true then
+    setupFullStarterController() 'bs:disable-line 1140 LINT1001
+  else
+    m.isExperimentsConfigReady = true
+    m.isExternalConfigReady = true
+  end if
 End Function
 
 
 ' Proceed with loading comp lib after experiments and external config is ready for use.
-Function checkIfExperimentAndRemoteConfigReadyAndProceed()
-  if m.top.getUrl = true AND m.isExperimentConfigReady = true AND m.isExternalConfigReady = true
-    'Handle any remote config updates here:
-    'Let youbora be enabled by the remote config
-
-    youboraEnabled = m._.get(m.constants, "externalConfig.info.youbora_enabled")
-    if youboraEnabled = true
-      m.constants.settings.youboraEnabled = youboraEnabled
-    end if
-
-    m.top.newBuildConstants = m.constants
-
+Function runControllerStartSequence()
+  if m.isExternalConfigReady <> true OR m.isExperimentsConfigReady <> true then
+    ' Wait for external and experiments config to be ready before proceeding
+  else if m.top.getUrl <> true then
+    ' Wait for getUrl to be called
+  else
     if m.constants.settings.useRemoteComponents = false
       m.top.useRemoteComponents = m.constants.settings.useRemoteComponents
     else
-      remoteComponentsUrl = m.constants.settings.remoteComponentsUrl
-
-      ' if an experiment or remote config needs to update the remoteComponentsUrl, do it here.
-      ' (experiment tracking should not happen here. It should happen when the user encounters the experiment!)
-      '-------------------------------------------------------------------------------------'
-      ' EXPERIMENT EXAMPLE
-      ' experiments = TubiExperiments(m.constants)
-      ' sideNavEnabled = m.experiments.getExperimentResource("RokuNamespace", "roku_side_nav").enabled
-      ' if sideNavEnabled = true
-      '   remoteComponentsUrl = "someUrl"
-      ' else
-      '   remoteComponentsUrl = "someOtherUrl"
-      ' end if
-      '
-      ' sendExposureEvent("RokuNamespace", "roku_side_nav", experiments)
-      '
-      ' REMOTE/EXTERNAL CONFIG EXAMPLE:
-      ' remoteComponentsUrl = m.constants.externalConfig.sideNavRemoteComponentsUrl
-      '-------------------------------------------------------------------------------------'
-
-
       ' This needs to be set before m.top.remoteComponentsUrl as we are getting m.top.remoteComponentLibProvided as part of that observer's additional fields
       m.top.remoteComponentLibProvided = m.constants.settings.remoteComponentLibProvided
 
+      remoteComponentsUrl = getRemoteComponentsUrl()
       print "remoteComponentsUrl "; remoteComponentsUrl
       m.top.remoteComponentsUrl = remoteComponentsUrl
     end if
@@ -77,101 +46,9 @@ Function checkIfExperimentAndRemoteConfigReadyAndProceed()
 End Function
 
 
-' Performs network request to get experiments and external config.
-Function sendRequestForExperimentsAndConfig()
-  constants = m.constants
-  externalConfig = TubiExternalConfig(m.request, constants)
-  experiments = TubiExperiments(constants)
-
-  experimentsRequest = experiments.getNamespaceRequestInfo(constants)
-  if experimentsRequest <> invalid
-    experimentsRequest.successCallback = onExperimentsRequestSuccess
-    experimentsRequest.errorCallback = onExperimentsRequestFailure
-    experimentsRequest.timeoutInMilliSec = 5000
-    m.makeRequest(experimentsRequest)
-  else
-    ' If there are no namespaces then skip the request.
-    m.isExperimentConfigReady = true
-  end if
-
-  externalConfigRequestInfo = externalConfig.getConfigsRequestInfo(constants)
-  externalConfigRequestInfo.successCallback = onExternalConfigRequestSuccess
-  externalConfigRequestInfo.errorCallback = onExternalConfigRequestFailure
-  externalConfigRequestInfo.timeoutInMilliSec = 5000
-  m.makeRequest(externalConfigRequestInfo)
-End Function
-
-
-' Callback triggered once the experiments request is successful.
-Function onExperimentsRequestSuccess(experimentInfo)
-  m.constants.experiments.info = experimentInfo
-  m.isExperimentConfigReady = true
-  checkIfExperimentAndRemoteConfigReadyAndProceed()
-End Function
-
-
-' Callback triggered if the experiment request fails.
-Function onExperimentsRequestFailure(_responses)
-  ' Continue using the local defaults.
-  m.isExperimentConfigReady = true
-  checkIfExperimentAndRemoteConfigReadyAndProceed()
-End Function
-
-
-' Callback triggered once the config request is successful.
-Function onExternalConfigRequestSuccess(config)
-  if config <> invalid
-    if config.country <> invalid AND config.country <> ""
-      m.constants.deviceInfo.countryCode = UCase(config.country)
-    end if
-
-    if isAA(config.blocked_analytics_events_mapping) = true
-      ' Storing the value of blocked analytics event to registry as a fallback in future if the external config call fails.
-      RegWrite("blocked_analytics_events_mapping", FormatJson(config.blocked_analytics_events_mapping), m.constants.registrySectionIDs.fallbacks)
-    end if
-
-    m.constants.externalConfig.info = config
-  end if
-
-  m.isExternalConfigReady = true
-  checkIfExperimentAndRemoteConfigReadyAndProceed()
-End Function
-
-
-' Callback triggered once the config request is fails.
-Function onExternalConfigRequestFailure(_error)
-  ' Reading the fallback data if present from the registry and setting it to constants.
-  blockedEventsList = RegRead("blocked_analytics_events_mapping", m.constants.registrySectionIDs.fallbacks)
-  if blockedEventsList <> invalid
-    blockedEventsList = ParseJson(blockedEventsList)
-    if isAA(blockedEventsList) = true
-      m.constants.externalConfig.info = {
-        "blocked_analytics_events_mapping": blockedEventsList
-      }
-    end if
-  end if
-
-  m.isExternalConfigReady = true
-  checkIfExperimentAndRemoteConfigReadyAndProceed()
-End Function
-
-
-Function sendExposureEvent(namespaceName as string, experimentName as string, experimentsLib)
-  exposureInfo = experimentsLib.getExperimentTracking(namespaceName, experimentName)
-
-  if exposureInfo <> invalid
-    Request = TubiRequest(m.constants.settings)
-    Auth = TubiAuth(m.constants, Request)
-    trackingLib = TubiTracking(m.constants, Request, Auth)
-    exposureEvent = trackingLib.getClientEvent(exposureInfo.type, exposureInfo.values)
-    reqInfo = trackingLib.createUserTrackingReqInfo(exposureEvent)
-    m.makeRequest({
-      url: reqInfo.url
-      options: reqInfo.options
-      requestType: m.constants.reqNames.postAnalytics
-      silenceCallbackWarnings: true
-    })
-  end if
+' Called in StarterController's runControllerStartSequence. Used to specify what remote components URL to use
+Function getRemoteComponentsUrl()
+  return m.constants.settings.remoteComponentsUrl
 End Function
 
 
@@ -207,7 +84,11 @@ Function processAnimationLogo()
 
   videoContent = createObject("RoSGNode", "ContentNode")
 
-  videoContent.url = m.request.passThroughCharlesProxy(m.constants.urls.animationLogo)
+  if m.request <> invalid then
+    videoContent.url = m.request.passThroughCharlesProxy(m.constants.urls.animationLogo)
+  else
+    videoContent.url = m.constants.urls.animationLogo
+  end if
 
   videoContent.title = "AnimationLogo"
   videoContent.streamformat = "mp4"
@@ -246,6 +127,7 @@ Function playAnimationLogo()
   if m.bufferingCompleted = true AND m.customSplashTimerCount >= m.splashScreenMin
     m.top.fadeOutCustomSplash = true
     m.videoPlayed = true
+
     if m.animationLogo <> invalid
       m.animationLogo.control = "play"
     end if

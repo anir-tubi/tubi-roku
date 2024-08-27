@@ -22,5 +22,13 @@
     <!-- Holds the info related to last series and episode user played. Sample format: { seriesId: "", episodeId: "", lastViewedOn: 1298343,resumeAt: 190 }  -->
     <field id="relaunchSeriesPlaybackInfo" type="assocarray" />
 
+    <!-- Email isn't stored in the registry so we access it from here -->
+    <field id="email" type="string" />
+
+    <!-- parentalRating isn't stored in the registry so we access it from here -->
+    <field id="parentalRating" type="integer" value="3" />
+
+    <!-- hasPassword isn't stored in the registry so we access it from here -->
+    <field id="hasPassword" type="boolean" value="false" />
   </interface>
 </component>

@@ -6,11 +6,10 @@ Function parseGetExternalConfigSuccess(fullResponse, _reqInfo)
   data = fullResponse.data
   if isAA(data) = true
     config = data
-    externalConfig = TubiExternalConfig(m.request, m.constants)
+    externalConfig = TubiExternalConfig(m.constants)
 
     config.blocked_analytics_events_mapping = externalConfig.parseBlockedAnalyticsEvents(config.blocked_analytics_events_mapping)
   end if
 
   return config
 End Function
-

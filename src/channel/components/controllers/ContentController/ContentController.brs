@@ -5,6 +5,54 @@ Function init()
 
   m.constants = getConstantsFromGlobal()
 
+  ' We need to create the general task in order to load our base dependencies (like experiments, remote config, etc.) but we will need to update the general task after the base dependencies are loaded.
+  generalTask = createObject("roSGNode", "ControllerGeneralTask") ' initiate GeneralTask
+  observeUpdateAuth(generalTask)
+
+  ' Initiate GeneralTaskModule by passing caller context.
+  ' Calling GeneralTaskModule() will append methods to the local m.
+  ' DO NOT overwrite m variable methods/properties which belongs to GeneralTaskModule.
+  GeneralTaskModule(m, generalTask)
+
+  ' Should be created after GeneralTaskModule has run as TubiAuthUpdate will verify that the GeneralTaskModule is available
+  m.tubiAuthUpdate = TubiAuthUpdate(m.constants)
+
+  m.deeplinkContent = invalid
+
+  ' Used to know if we are already getting auth and want to avoid running multiple requests at the same time
+  m.getAuthOperationInProgress = false
+
+  ' Used to know when startupArgs have been received so we know if we can proceed
+  m.startupArgsReceived = false
+
+  ' Used to know when the startupArgs have been handled so we know if we can proceed
+  m.startupArgsHandled = false
+
+  m.top.observeFieldScoped("startupArgs", "onStartupArgs")
+
+  m.isExternalConfigReady = false ' Used to know when external config has been loaded so we know if we can proceed
+  m.isExperimentsConfigReady = false ' Used to know when experiments have been loaded so we know if we can proceed
+
+  ' Holds the callback method value which will be called once the initial get consent request is completed.
+  m.onGetConsentCompletionCallback = invalid
+
+  ' Holds the instance of one trust sdk. Creating m scope variable so that we do not have to access the instance from global.
+  ' Since One trust sdk access m.global.OTsdk within it's codebase we need to update the m.global.OTsdk to have the sdk instance.
+  ' The reason why we are also storing it's reference in m scope for better performance since we access the sdk instance a lot of items during the app session.
+  m.oneTrust = invalid
+
+  retrieveInitialAuthInfo()
+End Function
+
+
+' This will load the rest of our modules and UI after the base dependencies are loaded
+Function addControllerUi()
+  m.uiGroup = m.top.findNode("uiGroup")
+  ' We need to add all of the UI that was in ContentController before but is now housed in ContentControllerUI. See ContentControllerUI.xml for more details.
+  ' We're pulling out all of the children of ContentControllerUI and appending them to the uiGroup to avoid having a different node structure than before.
+  children = createObject("roSgNode", "ContentControllerUI").getChildren(-1, 0)
+  m.uiGroup.appendChildren(children)
+
   ' Timer to find last time the app restarted
   m.lastAppRestartTimer = CreateObject("roTimespan")
 
@@ -20,31 +68,22 @@ Function init()
   m.mainTask.observeFieldScoped("screensaverTimeout", "onScreensaverTimeoutChange") ' Declared in ScreensaverHelpers.brs
   m.mainTask.observeFieldScoped("lowMemoryEventInfo", "onLowMemoryEventInfoChange")
 
-
-  generalTask = createObject("roSGNode", "ControllerGeneralTask") ' initiate GeneralTask
-
-  ' Initiate GeneralTaskModule by passing caller context.
-  ' Calling GeneralTaskModule() will append methods to the local m.
-  ' DO NOT overwrite m variable methods/properties which belongs to GeneralTaskModule.
-  GeneralTaskModule(m, generalTask)
-
   m.Request = TubiRequest(m.constants.settings)
-  Auth = TubiAuth(m.constants, m.Request)
   m.NodeHelpers = TubiNodeHelpers()
   apiUtilsLib = ApiUtils(m.constants)
   m.Bookmarks = TubiBookmarks(m.constants)
-  m.Tracking = TubiTracking(m.constants, m.Request, Auth)
-  experiments = TubiExperiments(m.constants)
-  m.cmsApi = CmsApi(m.constants, m.Request, Auth, apiUtilsLib, experiments)
+  m.Tracking = TubiTracking(m.constants, m.tubiAuthUpdate)
+  experimentsInfo = getExperimentsInfoFromGlobal()
+  experiments = TubiExperiments(experimentsInfo)
+  m.cmsApi = CmsApi(m.constants, apiUtilsLib, experiments)
   m.userDeviceApi = UserDeviceApi(m.constants, apiUtilsLib)
-  m.tensorapi = TensorApi(m.constants, m.Request, Auth)
+  m.tensorapi = TensorApi(m.constants)
   m.rainmakerApi = RainmakerApi(m.constants)
   m.pubSub = TubiPubSub(m)
 
   m.background = m.top.findNode("ContentBackground")
   m.SponsorBground = m.top.findNode("SponsorshipBackgroundGroup")
 
-  m.uiGroup = m.top.findNode("uiGroup")
   m.contentGroup = m.top.findNode("ContentGroup")
   m.SideNav = m.top.findNode("SideNav")
 
@@ -89,26 +128,21 @@ Function init()
   'This is used only within the very first session to keep track if user has already seen the welcome registration modal, so that welcome reg modal is not shown multiple times.
   m.hasRegModalBeenShownWithinNewUserSession = false
 
-  ' Set up global services
-  m.metadataFetchTask = m.top.findNode("MetadataFetchTask")
-  m.global.addField("metadataFetchTask", "node", false)
-  m.global.metadataFetchTask = m.metadataFetchTask
 
-  m.trackingLoggingTask = m.top.findNode("TrackingLoggingTask")
+  m.trackingLoggingTask = CreateObject("roSGNode", "TrackingLoggingTask")
+  observeUpdateAuth(m.trackingLoggingTask)
   m.global.addField("trackingLoggingTask", "node", false)
   m.global.trackingLoggingTask = m.trackingLoggingTask
 
   ' initialize states needed for various parts of kids mode
   m.kidsModeFeatureOn = false 'Should the kids Mode feature be made available for the user to interact with
-  enableKidsMode = m.constants.externalConfig.info.enable_kidsmode
+  enableKidsMode = getExternalConfigInfoFromGlobal().enable_kidsmode
 
   ' enable kids mode if the config returns true.
   if enableKidsMode = true
     m.kidsModeFeatureOn = true
   end if
 
-  ' TODO: Once MetadataFetchTask functionality is refactored to use the GeneralTask remove uiMode from m.global
-  m.global.addField("uiMode", "string", false)
   setUiMode(m.constants.ui.modes.standard)
   theme = getThemeFromGlobal()
   if theme <> invalid
@@ -121,11 +155,14 @@ Function init()
   'in case fadeInContentController is still playing when we tried to play linear content which will result in playback error.
   m.linearScreenAfterFn = invalid
 
-  m.deeplinkContent = invalid
-  m.startupArgsReceived = false
-  m.top.observeFieldScoped("startupArgs", "onStartupArgs")
   m.top.observeFieldScoped("roInputInfo", "onInputInfoReceived")
-  m.top.observeFieldScoped("fadeInContentController", "onFadeInContentController")
+
+  if m.top.fadeInContentController = true then
+    onFadeInContentController()
+  else
+    m.top.observeFieldScoped("fadeInContentController", "onFadeInContentController")
+  end if
+
   m.top.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
 
   m.top.observeFieldScoped("customSuspend", "onCustomSuspend")
@@ -144,37 +181,21 @@ Function init()
   m.global.addField("linearLikeIds", "node", false)
   m.global.linearLikeIds = CreateObject("roSGNode", "LikeContentNode")
 
-
-  m.global.addField("authInfo", "assocarray", false)
-  m.global.authInfo = invalid ' indicates not logged in
-
   ' isNewUser global variable is needed to show/hide onboarding, signup button on detail screen
   ' isNewUser will be set to true, if there is entry on firstVisit registry. Otherwise false
   m.global.addField("isNewUser", "boolean", false)
   m.global.isNewUser = false
 
   ' checking the firstVisit in registry and setting the isNewUser global based on it
-  if Auth.getFirstVisit() = -1
+  if getFirstVisit() = -1
     m.global.isNewUser = true
-    Auth.setFirstVisit()
+    setFirstVisit()
   end if
 
-  m.authInfoReceived = false 'is the auth info returned from the registry
   m.authInfoRefreshed = true 'is the auth info refreshed after receiving a deeplink with a refresh token
   m.ageVerificationComplete = false 'has the user verified their age?
   m.getServerPersistentDataComplete = false 'did we finish fetching serverPersistentData. either user/device based on user logged in status.
 
-  ' The following fields are needed as a part of getUserInfo
-  m.userSettings = invalid ' Used to store the response from userSettings call until all other responses are received
-  m.getUserSettingsResponseReceived = false ' Have we received a response for user settings call (success or failure)
-  m.getHistoryIdsResponseReceived = false ' Have we received a response for history ids call (success or failure)
-  m.getQueueIdsResponseReceived = false ' Have we received a response for getQueueIds call (success or failure)
-  m.getUserPreferencesRateTitleLikedResponseReceived = false ' Have we received a response for getUserPreferencesRateTitleLiked call (success or failure)
-  m.getUserPreferencesRateTitleDislikedResponseReceived = false ' Have we received a response for getUserPreferencesRateTitleDisliked call (success or failure)
-  m.getUserPreferencesRateLinearLikedResponseReceived = false ' Have we received a response for getUserPreferencesRateLinearLiked call (success or failure)
-  m.getUserInfoCallback = invalid ' Callback that will be fired after all required calls from getUserInfo have been completed
-
-  getUserInfo(onStartupAuthInfoReceived)
 
   ' indicates if we are building the app in a deep link state
   ' is set to true when a deeplink occurs, and set back to false after the deeplink has been handled
@@ -206,6 +227,7 @@ Function init()
 
   ' Status of user consent check will be used for GDPR. If user consent is required and not given then we will present the user with consent screen.
   m.isConsentCheckComplete = false
+
   ' Holds information related to individual consents and also other GDPR related values like privacy center flags.
   ' Sample data. {"consentRequired": true, [{"key": "behavioral_advertising","subtitle": "Tubi may use your information to make inferences and predict your potential areas of interest.","title": "Targeted Advertising","value": "required", "isRequired": true}]}
   m.consentSettings = {}
@@ -231,13 +253,8 @@ Function init()
   ' "videoPlayerNode" which is the node for the video player and "command" which is the string we will pass to the control field of the videoPlayerNode node.
   m.queuedVideoPlayerCommand = invalid
 
-  ' Holds the callback method value which will be called once the initial get consent request is completed.
-  m.onGetConsentCompletionCallback = invalid
-
-  ' Holds the instance of one trust sdk. Creating m scope variable so that we do not have to access the instance from global.
-  ' Since One trust sdk access m.global.OTsdk within it's codebase we need to update the m.global.OTsdk to have the sdk instance.
-  ' The reason why we are also storing it's reference in m scope for better performance since we access the sdk instance a lot of items during the app session.
-  m.oneTrust = invalid
+  ' Used to store the password for a short period to allow not having to re-enter the password when changing parental controls
+  m.passwordCache = invalid
 
   'This variable is used to avoid multiple calls to getExperimentResource
   m.detailScreenHorizMenuExp = (getExperimentResource("roku_horizontal_menu", "roku_horizontal_menu_v1", false).enabled = true)
@@ -267,6 +284,17 @@ Function init()
   m.sendImpressionEventTimer = CreateObject("roSGNode", "Timer")
   m.sendImpressionEventTimer.duration = 10
   m.sendImpressionEventTimer.observeFieldScoped("fire", "sendImpressionEvent")
+
+  ' The following fields are needed as a part of getUserInfo
+  m.getHistoryIdsResponseReceived = false ' Have we received a response for history ids call (success or failure)
+  m.getQueueIdsResponseReceived = false ' Have we received a response for getQueueIds call (success or failure)
+  m.getUserPreferencesRateTitleLikedResponseReceived = false ' Have we received a response for getUserPreferencesRateTitleLiked call (success or failure)
+  m.getUserPreferencesRateTitleDislikedResponseReceived = false ' Have we received a response for getUserPreferencesRateTitleDisliked call (success or failure)
+  m.getUserPreferencesRateLinearLikedResponseReceived = false ' Have we received a response for getUserPreferencesRateLinearLiked call (success or failure)
+  m.getUserInfoCallback = invalid ' Callback that will be fired after all required calls from getUserInfo have been completed
+
+  ' This needs to go last as this will immediately call runControllerStartSequence if not logged in and we want all the initial state to be setup before this happens
+  getUserInfo(onStartupAuthInfoReceived)
 End Function
 
 
@@ -311,8 +339,7 @@ Function onFadeInContentController()
     end if
 
   end if
-
-  End Function
+End Function
 
 
 Function displayExitModal(trackingPageInfo)
@@ -413,7 +440,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       end if
 
       ' Adding a check to see if the user has completed consent flow.
-      ' if not then showing exit dialog since we have not loaded any screens since it is pre-requiste for loading home screen.
+      ' if not then showing exit dialog since we have not loaded any screens since it is pre-requisite for loading home screen.
       currentScreen = getCurrentScreen()
       if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.consentScreen
         displayExitModal(currentScreen.trackingPageInfo)
@@ -524,13 +551,18 @@ End Function
 
 Function onComponentFocus()
   if m.top.hasFocus() = true then
-    ' If this is called outside the if it will get called every focus change in the entire application so moving in here
-    tubiLog("ContentController.onComponentFocus")
-    if m.SideNav.opened = true
-      displayNavMenu()
-    else if getCurrentScreen() <> invalid
-      getCurrentScreen().setFocus(true)
-    end if
+    manageChildFocus()
+  end if
+End Function
+
+
+' We are breaking out the internal logic of onComponentFocus so that we can directly call it to work around a bug encountered during auth refactor. Call this to focus the appropriate child. Currently either the side nav or the current screen.
+Function manageChildFocus()
+  tubiLog("ContentController.manageChildFocus")
+  if m.SideNav.opened = true
+    displayNavMenu()
+  else if getCurrentScreen() <> invalid
+    getCurrentScreen().setFocus(true)
   end if
 End Function
 
@@ -584,49 +616,44 @@ End Function
 
 
 '''''''''''''''''''''''''
-' startUserExperience
+' runControllerStartSequence
 '
 ' We need to gather information from various places. As callbacks fire when these different infos arrive,
-' they all set some state on m and call startUserExperience(). When all the information has arrived, as verified
+' they all set some state on m and call runControllerStartSequence(). When all the information has arrived, as verified
 ' by the first checks in the function, then the function performs it's functionality to start the channel.
 '
 ' IMPORTANT: this function should only be called as part of the initial start up process, it
 '            should not be called in an effort to "restart the app".
-Function startUserExperience()
-  tubiLog("ContentController.startUserExperience")
+Function runControllerStartSequence()
+  tubiLog("ContentController.runControllerStartSequence")
   cleanRegistry()
-
-  if m.authInfoReceived <> true
-    ' checks if the initial auth info has been pulled from the registry
+  if m.isExternalConfigReady <> true OR m.isExperimentsConfigReady <> true then
+      ' Wait for external and experiments config to be ready before proceeding
+  else if m.uiGroup = invalid then
+    ' checks if the controller's UI has been added as children
+    addControllerUi()
   else if m.startupArgsReceived <> true
     ' checks if the startupArgs have been received from main thread
+  else if m.startUpArgsHandled <> true
+    ' checks if the logic has been run on the startupArgs.
+    ' This is handled separately from onStartupArgs() because we
+    ' cannot proceed with the logic in handleStartUpArgs() until the logic
+    ' in addControllerUi() is run due to m.cmsApi needing to be set before
+    ' calling handleStartupArgs()
+    handleStartUpArgs()
   else if m.authInfoRefreshed <> true
-    ' checks if auth info has been received after a deeplink from external tubi device (iOS) supplied a refresh token
-    ' if m.authInfoReceived is false, it means that a refresh token has been supplied
-    authInfo = m.global.authInfo
-    if authInfo = invalid OR (authInfo <> invalid AND authInfo.userId = invalid)
-      ' we only need to refresh if the user is currently signed out
-      m.authTask = CreateObject("roSGNode", "AuthTask")
-      m.authTask.observeFieldScoped("authInfoRefreshed", "onAuthInfoRefreshed")
-      m.authTask.externalAuthInfo = getExternalAuthInfoFromStartupArgs(m.top.startUpArgs)
-      m.authTask.functionName = "execRefreshAuthInfo"
-      m.authTask.control = "RUN"
-    else
-      ' onAuthInfoRefreshed will update the value of m.authInfoRefreshed to true and re-call startUserExperience()
-      ' which is necessary to proceed past this step if m.authInfoRefreshed was set to false, but the user was already signed in.
-      onAuthInfoRefreshed()
-    end if
+    ' External refresh token was passed in (ie. from mobile) and we are waiting for the network request with the updated auth info to proceed
   else if m.isConsentCheckComplete <> true
     ' Below logic handles the use case where in the previous session if the user entered a age less than 18.
     ' and the user is in gdpr country. During the start up flow we are checking if the user is in gdpr country.
-    ' then we are checking the if user hasage is false which means the age entered is not adult and he recieved a age gate error in previous session.
+    ' then we are checking the if user hasage is false which means the age entered is not adult and he received a age gate error in previous session.
     ' since we have 24 hour lock here we are checking if the user is re-entering the app within the 24 hr lock expires.
     ' If he is within 24 hour lock window we will present the age gate error screen.
     ' If it has been past 24 hour lock window then we will continue as if a new guest user is launching the application.
-    ' since backend clears the consent when user recieves age gate error user will be presented with consent screen after 24 hours.
+    ' since backend clears the consent when user receives age gate error user will be presented with consent screen after 24 hours.
     if isGDPR(m.constants) = true
       if m.guestUserHasAgeInfo = invalid then
-        m.guestUserHasAgeInfo = TubiAuth(m.constants, m.Request).getGuestUserHasAgeInfo()
+        m.guestUserHasAgeInfo = getGuestUserHasAgeInfo()
       end if
 
       ' Have to make sure we check expired as well as default state will always have hasAge = false
@@ -640,11 +667,11 @@ Function startUserExperience()
       getConsent(onInitialGetConsentRequestComplete)
     end if
   else if m.getServerPersistentDataComplete <> true
-    getServerPersistentData(startUserExperience)
+    getServerPersistentData(runControllerStartSequence)
   else if shouldShowAgeGate() = true AND m.ageVerificationComplete <> true
+    authInfo = m.tubiAuthUpdate.getAuthInfo()
     ' check if we have age information for the user
-    if isLoggedInUser() = true
-      authInfo = m.global.authInfo
+    if isLoggedInUser(authInfo) = true
       if authInfo.hasAge <> true
         ' the user is a signed in user who has not been age verified, we should:
         ' 1) check if the backend has an age for the user
@@ -663,14 +690,14 @@ Function startUserExperience()
         ' the user is a signed in user who has been age verified, so set m.ageVerificationComplete = true
         ' and recursively call this function so we can move past the m.ageVerificationComplete check
         m.ageVerificationComplete = true
-        startUserExperience()
+        runControllerStartSequence()
       end if
     else
       ' the user is a guest user, and we are not age gating guest users at app launch,
       ' so set m.ageVerificationComplete = true and recursively call this
       ' Function so we can move past the m.ageVerificationComplete check.
       m.ageVerificationComplete = true
-      startUserExperience()
+      runControllerStartSequence()
     end if
   else
     ' All of the above checked values are true, so we are ready to start the channel UI
@@ -678,7 +705,7 @@ Function startUserExperience()
     ' initSideNav must run after m.global.trackingLoggingTask is set in case there are any experiments
     ' within the side nav component that rely on trackingLoggingTask to send exposure events.
     ' initSideNav relies on m.kidsModeFeatureOn being set, so run after m.kidsModeFeatureOn is set.
-    ' initSideNav also relies on m.global.authInfo being set in order to run isParentalControlsAdultLevel
+    ' initSideNav also relies on registry auth info being set in order to run isParentalControlsAdultLevel
     initSideNav()
 
     showContentGroupAndHideSpinner()
@@ -742,6 +769,12 @@ End Function
 ' this is one of the pre-requisites to starting the SG user experience.
 Function onStartupArgs()
   m.deeplinkContent = invalid
+  m.startupArgsReceived = true
+  runControllerStartSequence()
+End Function
+
+
+Function handleStartUpArgs()
   startupArgs = m.top.startupArgs
   if startupArgs <> invalid then
     m.deeplinkContent = createDeeplinkContentFromStartupArgs(startupArgs)
@@ -749,18 +782,26 @@ Function onStartupArgs()
     m.cmsApi.setUtmCampaignConfig(utmCampaignConfig)
   end if
 
-  externalAuthInfo = getExternalAuthInfoFromStartupArgs(startupArgs)
+  ' First see if the user is logged in. If they are then we don't use the external auth info.
+  authInfo = m.tubiAuthUpdate.getAuthInfo()
+  if isLoggedInUser(authInfo) <> true then
+    ' checks if auth info has been received after a deeplink from external tubi device (iOS) supplied a refresh token
+    externalAuthInfo = getExternalAuthInfoFromStartupArgs(startupArgs)
+    ' Next make sure we have valid external auth info
+    if externalAuthInfo <> invalid
+      ' If so we want to let runControllerStartSequence know that it shouldn't continue until we have the updated auth info
+      m.authInfoRefreshed = false
 
-  if externalAuthInfo <> invalid
-    m.authInfoRefreshed = false
+      m.tubiAuthUpdate.transferRefreshToken(externalAuthInfo, onAuthInfoRefreshed)
+    end if
   end if
 
   if m.deeplinkContent <> invalid
     m.enteredFromDeepLink = true
   end if
 
-  m.startupArgsReceived = true
-  startUserExperience()
+  m.startUpArgsHandled = true
+  runControllerStartSequence()
 End Function
 
 
@@ -819,15 +860,8 @@ End Function
 ' auth info has been added/refreshed after a deeplink from a "casting" device that contained a refreshToken
 Function onAuthInfoRefreshed()
   tubiLog("ContentController.onAuthInfoRefreshed")
-  if m.authTask <> invalid
-    if m.authTask.authInfoRefreshed <> invalid
-      m.global.authInfo = m.authTask.authInfoRefreshed
-    end if
-    m.authTask.unobserveFieldScoped("authInfo")
-    m.authTask = invalid
-  end if
   m.authInfoRefreshed = true
-  refreshUserInfoAndStartUserExperience()
+  refreshUserInfoAndRunControllerStartSequence()
 End Function
 
 
@@ -1147,13 +1181,6 @@ Function setUiMode(mode)
     showHideLogo(m.constants.logoType.tubiEspanol)
   end if
 
-  ' How to access uiMode:
-  ' m.uiMode can be accessed directly in the controller context;
-  ' screens and child components of screens should have uiMode passed down to them from the controller context;
-  ' GeneralTask parsers can have uiMode passed as a custom field on the AA passed to makeRequest()
-  ' Until MetadataFetch task can be replaced by the GeneralTask, MetadataFetchTask must access uiMode via a global
-  m.global.uiMode = m.uiMode
-
   'Need to reset video player's browseContent as the uiMode is changed
   resetVideoPlayerBrowseContent()
 
@@ -1209,7 +1236,7 @@ Function setUiModeFromState()
     modeSet = true
   else if shouldShowAgeGate() = true then
     if m.guestUserHasAgeInfo = invalid then
-      m.guestUserHasAgeInfo = TubiAuth(m.constants, m.Request).getGuestUserHasAgeInfo()
+      m.guestUserHasAgeInfo = getGuestUserHasAgeInfo()
     end if
 
     ' Have to make sure we check expired as well as default state will always have hasAge = false
@@ -1277,11 +1304,9 @@ Function isKidsModeEnabledByParentalControls() as Boolean
   tubiLog("ContentController.isKidsModeEnabledByParentalControls")
   bEnabled = false
 
-  if isLoggedInUser() = true
-    authInfo = m.global.authInfo
-    if authInfo.parentalrating <> invalid AND authInfo.parentalrating < 2
-      bEnabled = true
-    end if
+  authInfo = m.tubiAuthUpdate.getAuthInfo()
+  if isLoggedInUser(authInfo) = true AND m.pub_serverPersistentData.parentalRating < 2 then
+    bEnabled = true
   end if
   return bEnabled
 End Function
@@ -1291,14 +1316,9 @@ Function isParentalControlsAdultLevel() as Boolean
   tubiLog("ContentController.isParentalControlsAdultLevel")
   bEnabled = true
 
-  if isLoggedInUser() = true
-
-    authInfo = m.global.authInfo
-
-    if authInfo.parentalrating = invalid OR authInfo.parentalrating <> 3
-      bEnabled = false
-    end if
-
+  authInfo = m.tubiAuthUpdate.getAuthInfo()
+  if isLoggedInUser(authInfo) = true AND m.pub_serverPersistentData.parentalRating <> 3 then
+    bEnabled = false
   end if
 
   return bEnabled
@@ -1309,14 +1329,11 @@ Function isParentalControlsTeensLevel() as Boolean
   tubiLog("ContentController.isParentalControlsTeensLevel")
   bEnabled = false
 
-  if isLoggedInUser() = true
-
-    authInfo = m.global.authInfo
-
-    if authInfo.parentalrating = invalid OR authInfo.parentalrating = 2
+  authInfo = m.tubiAuthUpdate.getAuthInfo()
+  if isLoggedInUser(authInfo) = true
+    if m.pub_serverPersistentData.parentalRating = 2
       bEnabled = true
     end if
-
   end if
 
   return bEnabled
@@ -1363,17 +1380,6 @@ Function refreshStackedUserScreenWithChangedCategory(sCategoryID)
       end if
     end if
   end for
-End Function
-
-
-'''''''''''''''''''
-' onCloseModal
-'
-' Dismiss a modal dialog
-Function onCloseModal()
-  tubiLog("ContentController.onCloseAbout")
-  popScreen(true, true)
-  m.aboutScreen = invalid
 End Function
 
 
@@ -2000,10 +2006,6 @@ Function onCustomResume(msg)
     lastAppSuspendInSecs = m.appSuspendTimer.TotalSeconds()
     lastAppRestartInDays = m.lastAppRestartTimer.TotalSeconds() / 24 / 60 / 60
 
-    if m.Request = invalid
-      m.Request = TubiRequest(m.constants.settings)
-    end if
-
     if (customResumeLaunchParams.contentId <> invalid AND customResumeLaunchParams.mediaType <> invalid) OR customResumeLaunchParams.page <> invalid
       ' if resuming due to a deeplink, restart the app. Deeplinking into a non standard state creates
       ' lots of edge cases, so for consistency, restarting the app is easiest.
@@ -2072,7 +2074,7 @@ Function onCustomResume(msg)
 
   ' Checking if we have either content id or page in the args.
   ' We currently support content or page deeplinking. If one of the parameter is present in the args.
-  ' that means we recieved a deeplink request in which case we should not land the user in the series he was watching previously.
+  ' that means we received a deeplink request in which case we should not land the user in the series he was watching previously.
   isDeeplinkRequest = (customResumeLaunchParams <> invalid AND (customResumeLaunchParams.contentId <> invalid OR customResumeLaunchParams.page <> invalid))
 
   if isDeeplinkRequest = false AND relaunchSeriesPlaybackInfo <> invalid AND isNonEmptyString(relaunchSeriesPlaybackInfo.seriesId) = true AND getExperimentResource("roku_relaunch_series", "roku_relaunch_series_v2", false).enabled = true
@@ -2258,7 +2260,7 @@ End Function
 ' @successCallback: roFunction, a callback to run after getting a successful network response
 ' @errorCallback: roFunction, a callback to run after getting an error network response
 Function sendNielsenPing(pingType, content = invalid, successCallback = invalid, errorCallback = invalid)
-  Auth = TubiAuth(m.constants, m.Request)
+  Auth = TubiAuth(m.constants)
   tcfString = getTCFString()
   consentOptOutStatus = getConsentsOptOutStatus()
   gdpr = isGDPR()
@@ -2507,7 +2509,7 @@ Function isUserInAdultsMode()
     isUserInAdultsMode = false
   else if shouldShowAgeGate() = true then
     if m.guestUserHasAgeInfo = invalid then
-      m.guestUserHasAgeInfo = TubiAuth(m.constants, m.Request).getGuestUserHasAgeInfo()
+      m.guestUserHasAgeInfo = getGuestUserHasAgeInfo()
     end if
 
     ' Have to make sure we check expired as well as default state will always have hasAge = false
@@ -2556,7 +2558,7 @@ Function configureBrazeAndInitializeTask()
   m.braze = getBrazeInstance(m.brazeTask)
   m.brazeTask.unobserveFieldScoped("BrazeInAppMessage")
   m.brazeTask.observeFieldScoped("BrazeInAppMessage", "onInAppMessageTriggered")
-  authInfo = getFieldFromGlobal("authInfo")
+  authInfo = m.tubiAuthUpdate.getAuthInfo()
   setBrazeUserData(authInfo)
 End Function
 
@@ -2579,15 +2581,15 @@ Function clearRokuContinueWatching()
 End Function
 
 
-Function refreshUserInfoAndStartUserExperience()
-  getUserSettingsRequest = m.userDeviceApi.createUserSettingsGeneralTaskReqInfo(onGetUserInfoSuccess, startUserExperience)
+Function refreshUserInfoAndRunControllerStartSequence()
+  getUserSettingsRequest = m.userDeviceApi.createUserSettingsGeneralTaskReqInfo(onGetUserInfoSuccess, onGetUserInfoFailure)
   m.makeRequest(getUserSettingsRequest)
 End Function
 
 
 Function onGetUserInfoSuccess(userInfo)
   if userInfo <> invalid
-    Auth = TubiAuth(m.constants, m.Request)
+    Auth = m.tubiAuthUpdate
     if userInfo.firstName <> invalid
       Auth.setAuthInfo("firstname", userInfo.firstName)
     end if
@@ -2603,17 +2605,15 @@ Function onGetUserInfoSuccess(userInfo)
     if userInfo.hasAge <> invalid
       Auth.setAuthInfo("hasAge", userInfo.hasAge)
     end if
-
-    ' Email value comes from userSettings and is missing in the authinfo so we have to add it.
-    authInfo = m.global.authInfo
-    if isNonEmptyString(authInfo.email) = false AND userInfo.email <> invalid
-      authInfo.email = userInfo.email
-      m.global.authInfo = authInfo
-    end if
   end if
-  startUserExperience()
+  runControllerStartSequence()
 End Function
 
+
+Function onGetUserInfoFailure(_error)
+  ' We can't call runControllerStartSequence directly because the error callback is expecting a function that takes a single parameter.
+  runControllerStartSequence()
+End Function
 
 ' We need to route commands to Video nodes through this function to allow us to queue them if one of our video nodes is currently stopping
 ' @videoPlayerNode: string, the component containing the Video player node (ie. VideoPlayerScreen, LinearVideoPlayerScreen, etc.)
@@ -2686,38 +2686,20 @@ Function getUserInfo(callback)
   m.getUserInfoCallback = callback
 
   ' Reset our state to nothing being received yet
-  m.getUserSettingsResponseReceived = false
   m.getHistoryIdsResponseReceived = false
   m.getQueueIdsResponseReceived = false
   m.getUserPreferencesRateTitleLikedResponseReceived = false
   m.getUserPreferencesRateTitleDislikedResponseReceived = false
   m.getUserPreferencesRateLinearLikedResponseReceived = false
 
-  ' First have to get authentication
-  m.authTask = createObject("roSGNode", "AuthTask")
-  m.authTask.observeFieldScoped("authInfo", "onAuthInfoChange")
-  m.authTask.functionName = "execInitializeUserData"
-  m.authTask.control = "RUN"
-End function
-
-
-Function onAuthInfoChange(msg)
-' Have to unobserve since we update authInfo again. Potentially could use authInfoRefreshed but naming could get confusing
-  m.authTask.unobserveFieldScoped("authInfo")
-
-  ' Once we have authentication we can branch out and run multiple requests at once
-  authInfo = msg.getData()
+  authInfo = m.tubiAuthUpdate.getAuthInfo()
   if isLoggedInUser(authInfo) = true then
-    getUserSettingsRequest = m.userDeviceApi.createUserSettingsGeneralTaskReqInfo(onGetUserSettingsSuccess, onGetUserSettingsError)
-    m.makeRequest(getUserSettingsRequest)
-
     getHistoryIds(getHistoryIdsSuccess, getHistoryIdsError)
     getQueueIds(getQueueIdsSuccess, getQueueIdsError)
     getUserInfoGetContentRatingTitleLiked()
     getUserInfoGetContentRatingTitleDisliked()
     getUserInfoGetContentRatingLinearLiked()
   else
-    m.getUserSettingsResponseReceived = true
     m.getHistoryIdsResponseReceived = true
     m.getQueueIdsResponseReceived = true
     m.getUserPreferencesRateTitleLikedResponseReceived = true
@@ -2725,20 +2707,6 @@ Function onAuthInfoChange(msg)
     m.getUserPreferencesRateLinearLikedResponseReceived = true
     checkIfAllUserInfoReceived()
   end if
-End Function
-
-
-Function onGetUserSettingsSuccess(userSettings)
-  m.userSettings = userSettings
-  m.getUserSettingsResponseReceived = true
-  checkIfAllUserInfoReceived()
-End Function
-
-
-Function onGetUserSettingsError(error)
-  m.userSettings = invalid
-  m.getUserSettingsResponseReceived = true
-  checkIfAllUserInfoReceived()
 End Function
 
 
@@ -2856,10 +2824,6 @@ End Function
 
 
 Function checkIfAllUserInfoReceived()
-  if m.getUserSettingsResponseReceived <> true then
-    return false
-  end if
-
   if m.getHistoryIdsResponseReceived <> true then
     return false
   end if
@@ -2880,18 +2844,6 @@ Function checkIfAllUserInfoReceived()
     return false
   end if
 
-  ' We had everything we needed to consider this request complete so do some assigning and cleanup
-
-  if m.userSettings <> invalid then
-    ' Currently we continue the same behavior of combining user settings and authInfo together
-    ' To minimize changes and avoid possible issues we're modifying authInfo in place on the AuthTask
-    m.userSettings.append(m.authTask.authInfo)
-    m.authTask.authInfo = m.userSettings
-
-    m.userSettings = invalid
-  end if
-
-  ' Finally call our callback
   getUserInfoCallback = m.getUserInfoCallback
   if getUserInfoCallback <> invalid then
     m.getUserInfoCallback = invalid
@@ -2934,6 +2886,129 @@ End Function
 
 Function onSeriesRelaunchError(_error)
   startChannel()
+End Function
+
+
+Function needsToShowAgeVerificationScreen()
+  authInfo = m.tubiAuthUpdate.getAuthInfo()
+  if isLoggedInUser(authInfo) = true AND authInfo.hasAge = true then
+    return false
+  else
+    guestUserHasAgeInfo = getGuestUserHasAgeInfo()
+    ' In the case that the user is logged in but there is no age information associated with the account, hasAge defaults to false.
+    if guestUserHasAgeInfo.hasAge = true AND guestUserHasAgeInfo.expired <> true
+      return false
+    end if
+  end if
+  return true
+End Function
+
+
+' Provides a list of nodes that should be notified when the authInfo is updated. Called in onUpdatedAuthRetrieved()
+Function getAuthUpdatedNodesList()
+  nodes = [
+    m.generalTask
+    m.trackingLoggingTask
+  ]
+
+  screens = getScreensInStack()
+  for each screen in screens
+    task = screen.task
+    if task <> invalid then
+      nodes.push(task)
+    end if
+  end for
+
+  return nodes
+End Function
+
+
+' Registry related Functions
+
+
+'reads device registry for firstVisit value
+'returns firstVisit value if value is present, otherwise return -1
+Function getFirstVisit()
+  firstVisitRegSection = "visit"
+  firstVisit = regRead("firstVisit", firstVisitRegSection)
+  if firstVisit <> invalid
+    firstVisit = firstVisit.toInt()
+  else
+    firstVisit = -1
+  end if
+  return firstVisit
+End Function
+
+
+'sets the first visit value (number of days since Unix epoch) in the device registry
+'returns the number of days since Unix epoch
+Function setFirstVisit()
+  firstVisitRegSection = "visit"
+  dateTime = createObject("roDateTime")
+  secondsFromEpoch = dateTime.AsSeconds()
+  daysFromEpoch = Int(secondsFromEpoch / 60 / 60 / 24)
+  regWrite("firstVisit", daysFromEpoch.toStr(), firstVisitRegSection)
+  return daysFromEpoch
+End Function
+
+
+Function getGuestUserHasAgeInfo()
+  guestUserHasAgeRegSection = "has_age"
+  hasAgeStored = regRead("ageInfo", guestUserHasAgeRegSection)
+  if hasAgeStored <> invalid
+
+    hasAgeStored = ParseJson(hasAgeStored)
+    dateTime = CreateObject("roDateTime")
+    nowTime = dateTime.AsSeconds()
+
+    hasAgeInfo = {
+      hasAge: hasAgeStored.hasAge
+      expired: true
+    }
+
+    if hasAgeStored.expireTime > nowTime
+      hasAgeInfo.expired = false
+    end if
+  else
+    hasAgeInfo = {
+      hasAge: false
+      expired: true
+    }
+  end if
+  return hasAgeInfo
+End Function
+
+
+' @hasAge: boolean, true indicates that the backend has determined that this user is >= 13 years old
+Function setGuestUserHasAgeInfo(hasAge)
+  guestUserHasAgeRegSection = "has_age"
+  if isBoolean(hasAge) = false
+    hasAge = false
+  end if
+
+  dateTime = CreateObject("roDateTime")
+  nowTime = dateTime.AsSeconds()
+
+  'set the default expire time (ie. the user failed the age gate)
+  hasAgeStored = {
+    hasAge: hasAge
+    expireTime: nowTime + m.constants.timers.coppaFailTimeout
+  }
+
+  if hasAge = true
+    ' update with the expire time used if the user passed the age gate
+    hasAgeStored.expireTime = nowTime + m.constants.timers.coppaPassTimeout
+  end if
+
+  hasAgeStoredJson = FormatJson(hasAgeStored)
+  regWrite("ageInfo", hasAgeStoredJson, guestUserHasAgeRegSection)
+  return hasAgeStored
+End Function
+
+
+Function deleteGuestUserHasAgeInfo()
+  guestUserHasAgeRegSection = "has_age"
+  regDelete("ageInfo", guestUserHasAgeRegSection)
 End Function
 
 

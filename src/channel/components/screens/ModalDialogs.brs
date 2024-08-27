@@ -274,7 +274,9 @@ Function closeModal(modal, buttonSelected = invalid)
   end if
 
   if waitForCallBackResponse = false
-    m.top.setFocus(true)
+    if isFunction(manageChildFocus) = true then 'bs:disable-line 1001 LINT1001
+      manageChildFocus() 'bs:disable-line 1140 LINT1001
+    end if
   end if
 
   if callback <> invalid

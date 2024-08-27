@@ -12,6 +12,20 @@ Function getThemeFromGlobal()
 End Function
 
 
+' make sure theme is set in the case that m.global is not immediately available
+' limits the number of attempts so the while loop doesn't block into perpetuity.
+Function getExternalConfigInfoFromGlobal()
+  return getFieldFromGlobal("externalConfigInfo")
+End Function
+
+
+' make sure theme is set in the case that m.global is not immediately available
+' limits the number of attempts so the while loop doesn't block into perpetuity.
+Function getExperimentsInfoFromGlobal()
+  return getFieldFromGlobal("experimentsInfo")
+End Function
+
+
 ' getFieldFromGlobal finds the value on global based on the key input
 '
 ' @fieldName: string, the key on global variable

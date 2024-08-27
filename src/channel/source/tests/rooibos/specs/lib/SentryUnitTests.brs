@@ -3,8 +3,7 @@
 '@Setup
 Function SentrySetup()
   m.constants = getConstants()
-  request = TubiRequest(m.constants.settings)
-  m.auth = TubiAuth(m.constants, request)
+  m.auth = TubiAuth(m.constants)
 End function
 
 

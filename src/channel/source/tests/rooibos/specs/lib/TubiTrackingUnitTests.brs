@@ -8,9 +8,8 @@ End function
 
 Function tubiTracking_createTubiTracking_testHelper()
   constants = getConstants()
-  request = TubiRequest()
-  auth = TubiAuth(constants, request)
-  tracking = TubiTracking(constants, request, auth)
+  auth = TubiAuth(constants)
+  tracking = TubiTracking(constants, auth)
   return tracking
 End Function
 

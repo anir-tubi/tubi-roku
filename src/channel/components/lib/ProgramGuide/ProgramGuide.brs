@@ -1,11 +1,9 @@
 Function init()
   m.constants = getConstantsFromGlobal()
-  Request = TubiRequest(m.constants.settings)
   '//This var is used to know when to send tracking info. Do not send tracking info when lastFocused row and currentFocusedRow are equal
   m.lastItemFocused = [0, 0]
 
-  Auth = TubiAuth(m.constants, Request)
-  m.Tracking = TubiTracking(m.constants, Request, Auth)
+  m.Tracking = TubiTrackingInfo(m.constants)
   m.channelsGrid = m.top.findNode("channelsGrid")
   m.headerText = m.top.findNode("headerText")
   m.backToLive = m.top.findNode("backToLive")

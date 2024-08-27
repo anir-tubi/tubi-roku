@@ -4,10 +4,11 @@
 ' Note: the component calling getExperimentResource using the ExperimentMixin, must also
 ' have pkg:/source/lib/Request.brs, pkg:/source/lib/GlobalMixin.brs, and pkg:/source/lib/TubiExperiments.brs added as scripts
 Function getExperimentResource(namespaceName as string, experimentName as string, sendEvent=true as Boolean)
-  if m.constants = invalid
-    m.constants = getConstantsFromGlobal()
+  if m.experimentsInfo = invalid then
+    m.experimentsInfo = getExperimentsInfoFromGlobal()
   end if
-  experiments = TubiExperiments(m.constants)
+
+  experiments = TubiExperiments(m.experimentsInfo)
   resource = experiments.getExperimentResource(namespaceName, experimentName)
 
   if sendEvent = true AND resource <> invalid
@@ -52,11 +53,10 @@ End Function
 '       "segment": "WHITELISTED"
 ' this result can be used in youbora requests
 Function getExperimentResult(namespaceName as string, experimentName as string) as Object
-
-  if m.constants = invalid
-    m.constants = getConstantsFromGlobal()
+  if m.experimentsInfo = invalid then
+    m.experimentsInfo = getExperimentsInfoFromGlobal()
   end if
 
-  experiments = TubiExperiments(m.constants)
+  experiments = TubiExperiments(m.experimentsInfo)
   return experiments.getExperimentResult(namespaceName, experimentName)
 End Function

@@ -15,7 +15,7 @@ Function Main(startupArgs)
   port = CreateObject("roMessagePort")
   m.queue = TubiRequestQueue().create(port)
   request = TubiRequest(constants.settings)
-  auth = TubiAuth(constants, request)
+  auth = TubiAuth(constants)
   sentryInfo = Sentry(constants, auth)
   log = TubiLogger(constants, request, auth, sentryInfo)
 
@@ -60,6 +60,8 @@ Function runChannel(constants, log, request)
   sgGlobal = screen.getGlobalNode()
   sgGlobal.addField("constants", "assocarray", false)
   sgGlobal.addField("theme", "assocarray", false)
+  sgGlobal.addField("externalConfigInfo", "assocarray", false)
+  sgGlobal.addField("experimentsInfo", "assocarray", false)
 
   'setting constants here is just to get the scene up and running.
   'Global constants will be overwritten with constants pulled from starterController that are the most recent version of constants
@@ -124,11 +126,6 @@ Function runChannel(constants, log, request)
     componentTimer = CreateObject("roTimespan")
   else
     'only expect this else block to happen when side loading/testing
-    'setting experiment values and external config will normally happen in StarterController when using starter components
-    constants = setRemoteConfigAndExperimentsOnConstants(request, constants)
-
-    sgGlobal.setField("constants", constants)
-    sgGlobal.setField("theme", constants.ui.themes.default)
     controller = loadPackagedComponents(tubiScene, port, startupArgs)
     controller.fadeInContentController = true
     componentsLoaded = true
@@ -238,7 +235,7 @@ Function runChannel(constants, log, request)
             resetComponentLibrary(componentLibrary, tubiScene, port)
           else if retries = maxRetries
 
-            if initSubmittedChannel(request, constants, screen, tubiScene, port, startupArgs) = true
+            if initSubmittedChannel(request, constants, tubiScene, port, startupArgs) = true
 
               message = libraryBeingFetched.id + " failed to load due to API error. Loading packed components"
 
@@ -272,11 +269,6 @@ Function runChannel(constants, log, request)
           starterController.unobserveField("remoteComponentsUrl")
           starterController.unobserveField("useRemoteComponents")
 
-          if starterController.newBuildConstants <> invalid
-            sgGlobal.setField("constants", starterController.newBuildConstants)
-            sgGlobal.setField("theme", starterController.newBuildConstants.ui.themes.default)
-          end if
-
           componentsLoaded = true
           controller = loadPackagedComponents(tubiScene, port, startupArgs)
         end if
@@ -293,11 +285,6 @@ Function runChannel(constants, log, request)
         starterController = msg.GetRoSGNode()
         starterController.unobserveField("remoteComponentsUrl")
         starterController.unobserveField("useRemoteComponents")
-
-        if starterController.newBuildConstants <> invalid
-          sgGlobal.setField("constants", starterController.newBuildConstants)
-          sgGlobal.setField("theme", starterController.newBuildConstants.ui.themes.default)
-        end if
 
         remoteLibrary = tubiScene.findNode("TubiRemoteLibrary")
         libraryBeingFetched = remoteLibrary
@@ -349,7 +336,7 @@ Function runChannel(constants, log, request)
         sleep(pause)
         resetComponentLibrary(libraryBeingFetched, tubiScene, port)
       else if retries = maxRetries
-        if initSubmittedChannel(request, constants, screen, tubiScene, port, startupArgs) = true
+        if initSubmittedChannel(request, constants, tubiScene, port, startupArgs) = true
           message = libraryBeingFetched.id + " failed to load due to timeout. Loading Packed Components"
           messageInfo = {
             message: message
@@ -601,44 +588,39 @@ End Function
 ' @request: assocArray, an instance of the request module as returned by TubiRequest()
 ' @constants: assocArray, constants as returned by getConstants(), this version of constants
 '                         will be the constants that are part of the submitted build.
-' @screen: node, app base screen
 ' @tubiScene: node, home scene node
 ' @port: port, used to create content controller
 ' startupArgs: assocArray, start up app arguments, used to create content controller
 '
 ' returns: boolean, true if the app successfully loaded submitted version of the app,
 '                   false if app can not fallback on submitted version
-Function initSubmittedChannel(request, constants, screen, tubiScene, port, startupArgs)
+Function initSubmittedChannel(request, constants, tubiScene, port, startupArgs)
   print "loading the packed components"
 
-  constants = setRemoteConfigAndExperimentsOnConstants(request, constants)
-
-  sgGlobal = screen.getGlobalNode()
-  sgGlobal.setField("constants", constants)
-  sgGlobal.setField("theme", constants.ui.themes.default)
 
   canFallback = true
 
-  if constants <> invalid
-    submittedAppVersion = "0.0.0"
+  ' TODO now that we do not have external config in main, we need to update this logic to be run after get external config
+  ' if constants <> invalid
+  '   submittedAppVersion = "0.0.0"
 
-    if constants.deviceInfo <> invalid
-      submittedAppVersion =  constants.deviceInfo.clientversion
-    end if
+  '   if constants.deviceInfo <> invalid
+  '     submittedAppVersion =  constants.deviceInfo.clientversion
+  '   end if
 
     ' Sometimes submitted version of the app might have bugs, legal issues or api changes which makes them not worthy of fallback.
     ' constants.externalConfig.info.fallback_blocked_versions will contain a list of submitted app versions that we should not fallback on.
-    if constants.externalConfig <> invalid AND constants.externalConfig.info <> invalid AND constants.externalConfig.info.fallback_blocked_versions <> invalid
-      for each version in constants.externalConfig.info.fallback_blocked_versions
-        if version = submittedAppVersion
-          canFallback = false
-          exit for
-        end if
-      end for
-    else if constants.externalConfig = invalid OR constants.externalConfig.info = invalid OR constants.externalConfig.info.fallback_blocked_versions = invalid  'externalConfig is missing. In this case, do not take risk of loading submitted version. Just show error modal.
-      canFallback = false
-    end if
-  end if
+  '   if constants.externalConfig <> invalid AND constants.externalConfig.info <> invalid AND constants.externalConfig.info.fallback_blocked_versions <> invalid
+  '     for each version in constants.externalConfig.info.fallback_blocked_versions
+  '       if version = submittedAppVersion
+  '         canFallback = false
+  '         exit for
+  '       end if
+  '     end for
+  '   else if constants.externalConfig = invalid OR constants.externalConfig.info = invalid OR constants.externalConfig.info.fallback_blocked_versions = invalid  'externalConfig is missing. In this case, do not take risk of loading submitted version. Just show error modal.
+  '     canFallback = false
+  '   end if
+  ' end if
 
   if canFallback = true
     nodeHelpers = TubiNodeHelpers()
@@ -663,24 +645,6 @@ Function initSubmittedChannel(request, constants, screen, tubiScene, port, start
   else
     return false 'can not fallback on the current version as explicitly specified by external config.
   end if
-End Function
-
-
-' Makes requests for popper experiments and remote config and places the values on the constants
-' As would happen in the starter controller.
-'
-' @request: assocArray, an instance of the request module as returned by TubiRequest()
-' @constants: assocArray, constants as returned by getConstants(), this version of constants
-'                         will be the constants that are part of the submitted build.
-' @return: assocArray, passed in constants AA that has been updated with remote config and
-'                      experiment values.
-Function setRemoteConfigAndExperimentsOnConstants(request, constants)
-  externalConfig = TubiExternalConfig(request, constants)
-  externalConfig.init() 'sets external config values from server on constants
-  experiments = TubiExperiments(constants)
-  experiments.init(request) 'sets experiment values from server on constants
-
-  return constants
 End Function
 
 

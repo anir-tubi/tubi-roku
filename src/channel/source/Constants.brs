@@ -276,6 +276,7 @@ Function getConstants()
     constants.reqNames.getQueue = "getQueue"
     constants.reqNames.getHistory = "getHistory"
     constants.reqNames.generic = "generic"
+    constants.reqNames.genericWithResponseContext = "genericWithResponseContext"
     constants.reqNames.magicLink = "magicLink"
     constants.reqNames.resetPassword = "resetPassword"
     constants.reqNames.queryStatusOfMagicLink = "queryStatusOfMagicLink"
@@ -346,6 +347,7 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.patchConsent] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getUserSettings] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.postLogout] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.postAnalytics] = true
 
 
   constants.anonymous = {}
@@ -460,14 +462,6 @@ Function getConstants()
     constants.logoType.tubiKids = "tubi_kids"
     constants.logoType.tubiEspanol = "tubi_espanol"
     constants.logoType.hide = "hide"
-
-  'experiment information will be placed here
-  constants.experiments = {}
-    constants.experiments.info = invalid    'will be replaced in main.brs
-
-  'external configuration options will be placed here
-  constants.externalConfig = {}
-    constants.externalConfig.info = {}   'will be replaced in main.brs
 
   ' Should the user be shown the upgrade alert to help them upgrade to the latest version.
   '   Used within the hotpatch after a point release to nudge users to use the latest app
@@ -1416,7 +1410,7 @@ Function getConstants()
 
 'THEME/COLOR START///////////////////////
 '//::TODO::colors - the following constants should be moved to themes. The app should not call these constants
-'//The use of the "THEME_" constants will be replaced with hexidecimal color strings during the gulp install process.
+'//The use of the "THEME_" constants will be replaced with hexadecimal color strings during the gulp install process.
 '//Source of JSON theme colors are located in /themes/theme.json which is sourced from a design JSON file.
 '//::NOTE:: See the ReadMe on how to update the JSON.
 
@@ -1650,8 +1644,10 @@ Function getConstants()
       constants.serverPersistentDataKeys.isDisLikeToastNotificationShown = "enable_dislike_toast_notification"
       constants.serverPersistentDataKeys.lastRokuCwConsentPromptShownAt = "last_roku_cw_consent_prompt_shown_at"
       constants.serverPersistentDataKeys.relaunchSeriesPlaybackInfo = "relaunch_series_playback_info"
+      constants.serverPersistentDataKeys.email = "email"
+      constants.serverPersistentDataKeys.parentalRating = "parental_rating"
+      constants.serverPersistentDataKeys.hasPassword = "has_password"
 
-      ' TODO: These are temporary values once finalized will update accordingly.
       constants.persistentDataKeyConsentKeyMapping = {
         "enable_video_preview": constants.consentKeys.essential
         "audio_track": constants.consentKeys.essential
@@ -1659,6 +1655,9 @@ Function getConstants()
         "enable_like_toast_notification": constants.consentKeys.essential
         "enable_dislike_toast_notification": constants.consentKeys.essential
         "last_roku_cw_consent_prompt_shown_at": constants.consentKeys.essential
+        "email": constants.consentKeys.essential
+        "parental_rating": constants.consentKeys.essential
+        "has_password": constants.consentKeys.essential
       }
 
   return constants

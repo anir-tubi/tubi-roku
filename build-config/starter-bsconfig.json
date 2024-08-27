@@ -1,13 +1,4 @@
 {
   "extends": "../bsconfig.json",
-  "rootDir": "../build/starter",
-  "diagnosticFilters": [{
-      "codes": [1104]
-    }, {
-      "codes": [1013],
-      "src": "components/lib/DevGridOverlay.brs"
-    },
-    "source/3rdparty/rodash/rodash.cat.brs",
-    "source/3rdparty/roku/generalUtils.brs"
-  ]
+  "rootDir": "../build/starter"
 }

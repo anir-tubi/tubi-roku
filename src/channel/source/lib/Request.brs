@@ -128,11 +128,6 @@ End Function
 '     events will be sent to the roMessagePort provided.
 '
 Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
-  isRetry = false
-  if m.urltransfer <> invalid
-    isRetry = true
-  end if
-
   if type(urltransfer_or_messageport) = "roUrlTransfer" then
     ' use default assigned port
     m.urltransfer = urltransfer_or_messageport
@@ -147,7 +142,7 @@ Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
     return false
   end if
 
-  if m.params.Count() > 0 AND isRetry = false then
+  if m.params.Count() > 0 then
     fullUrl = m.addParamsToUrl_(m.url, m.params)
     fullProxyUrl = m.passThroughCharlesProxy(fullUrl)
     m.urltransfer.setUrl(fullProxyUrl)
@@ -246,10 +241,9 @@ End Function
 
 
 '''''''''''''''''''''''
-' tubi_handleHttpEvent - ingest a received message.  If the message is not
-'               relevant to this request, return invalid.  If there is a
-'               response available, it is returned. Requests will be
-'               retried on failures.
+' tubi_handleHttpEvent - ingest a received message. If the message is not
+'               relevant to this request, return invalid. If there is a
+'               response available, it is returned.
 '
 ' message - the roUrlEvent received on the caller's roMessagePort
 '
@@ -259,43 +253,14 @@ Function tubi_handleHttpEvent(message As Object) As Object
     return invalid
   end if
 
-  ' handle retries
   if type(message) = "roUrlEvent" then
     if message.GetSourceIdentity() = m.urltransfer.GetIdentity() then
       code = message.GetResponseCode()
 
-      'server said our auth token was not valid
-      if m.authInfo <> invalid AND m.authInfo.userId <> invalid AND code = 403 AND m.retries > 0
-        newAuthInfo = m.refreshAuthToken(m.authInfo, 100)
-        if newAuthInfo <> invalid
-          'replace any necessary new auth info in the headers and try again
-          authHeaders = m.getAuthHeaders(newAuthInfo.accessToken)
-
-          if authHeaders <> invalid
-            for each header in authHeaders
-              m.headers[header] = authHeaders[header]
-            end for
-
-            m.retries = m.retries - 1
-            m.start(m.urltransfer)
-          end if
-
-        else  ' refreshing the auth token failed so just attach the response info and finish
-          m.response = {
-            headers: message.GetResponseHeaders()
-            code: code
-            data: message.GetString()
-            failReason: message.GetFailureReason()
-          }
-          m.urltransfer = invalid ' release reference in case this will be reused
-          return m
-        end if
-
-      else if code < 0 AND m.retries > 0 then
+      if code < 0 AND m.retries > 0 then
         m.retries = m.retries - 1
         m.start(m.urltransfer) ' fire off the request again
       else
-        ' Here on success or on retry limit
         m.response = {
           headers: message.GetResponseHeaders()
           code: code

@@ -155,8 +155,6 @@ function buildInstalled() {
       '!src/channel/components/controllers/StarterController/**',
       '!src/channel/components/tasks/GeneralTask/StarterGeneralTask.xml',
       '!src/channel/components/tasks/GeneralTask/StarterGeneralTask.brs',
-      '!src/channel/components/tasks/GeneralTask/Parsers/ExternalConfigParsers.brs',
-      '!src/channel/components/tasks/GeneralTask/Parsers/TubiExperimentParsers.brs',
     ];
 
     let testSources = [
@@ -209,22 +207,30 @@ function buildInstalled() {
 
 function buildStarter() {
   const minorBuildTag = getBuildTag('minor');
+  const { settings } = load(options);
 
-  mkdirp.sync(`${process.env.PWD}/build/starter/source`);
-
-  // touch the main.brs, can be empty for starter components
-  fs.closeSync(fs.openSync('build/starter/source/main.brs', 'w'));
 
   // include StarterController in starter components
   let starterControllerSrc = [
-    'src/channel/components/controllers/StarterController/**/*'
+    'src/channel/components/controllers/StarterController/**/*',
+    'src/channel/components/controllers/shared.brs',
   ];
   let starterControllerSrcOptions = {
     base: 'src/channel/components'
   };
 
+  // We only want to include the xml file for the version of the starter controller that we are using as it will not compile otherwise
+  if (settings.useFullStarterController) {
+    starterControllerSrc.push('!src/channel/components/controllers/StarterController/StarterController.xml');
+  } else {
+    starterControllerSrc.push('!src/channel/components/controllers/StarterController/StartControllerWithTasks/StarterController.xml');
+    starterControllerSrc.push('!src/channel/components/controllers/StarterController/StartControllerWithTasks/StarterController.brs');
+  }
+
   // include GeneralTask in starterComponents
   let generalTaskSrc = [
+    'src/channel/components/tasks/BaseTaskNeedingAuth/BaseTaskNeedingAuth.xml',
+    'src/channel/components/tasks/BaseTaskNeedingAuth/BaseTaskNeedingAuth.brs',
     'src/channel/components/tasks/GeneralTask/BaseGeneralTask.xml',
     'src/channel/components/tasks/GeneralTask/BaseGeneralTask.brs',
     'src/channel/components/tasks/GeneralTask/StarterGeneralTask.xml',
@@ -248,25 +254,34 @@ function buildStarter() {
   // include generalUtils in starterComponents
   let genUtilSrc = [
     'src/channel/source/3rdparty/roku/generalUtils.brs',
-    'src/channel/source/3rdparty/rta/typeUtils.brs',
-    'src/channel/source/3rdparty/rodash/rodash.cat.brs'
   ];
+
+  if (settings.useFullStarterController) {
+    genUtilSrc.push('src/channel/source/3rdparty/rta/typeUtils.brs');
+  }
+
   let genUtilSrcOptions = {
     base: 'src/channel/source'
   };
 
   // include TubiExperiments, TubiExternalConfig, and Request modules in starterComponents
   let sourceLibsSrc = [
-    'src/channel/source/lib/GeneralTaskModule.brs',
-    'src/channel/source/lib/Auth.brs',
-    'src/channel/source/lib/Request.brs',
     'src/channel/source/lib/Log.brs',
-    'src/channel/source/lib/TubiExperiments.brs',
-    'src/channel/source/lib/TubiExternalConfig.brs',
-    'src/channel/source/lib/TubiTracking.brs',
-    'src/channel/source/lib/TimeOffsetUtils.brs',
-    'src/channel/source/lib/StringUtils.brs'
+
   ];
+
+  if (settings.useFullStarterController) {
+    genUtilSrc.push('src/channel/source/lib/GeneralTaskModule.brs');
+    genUtilSrc.push('src/channel/source/lib/Auth.brs');
+    genUtilSrc.push('src/channel/source/lib/Request.brs');
+    genUtilSrc.push('src/channel/source/lib/TubiExperiments.brs');
+    genUtilSrc.push('src/channel/source/lib/TubiExternalConfig.brs');
+    genUtilSrc.push('src/channel/source/lib/TubiTracking.brs');
+    genUtilSrc.push('src/channel/source/lib/TimeOffsetUtils.brs');
+    genUtilSrc.push('src/channel/source/lib/StringUtils.brs');
+  }
+
+
   let sourceLibsSrcOptions = {
     base: 'src/channel/source'
   };
@@ -307,12 +322,15 @@ function buildStarter() {
       options: componentLibSrcOptions,
       dest: 'build/starter/components'
     },
-    {
+  ];
+
+  if (settings.useFullStarterController) {
+    subTaskPaths.push({
       src: generalTaskSrc,
       options: generalTaskSrcOptions,
       dest: 'build/starter/components'
-    }
-  ];
+    });
+  }
 
   // Loops through each item in the sub task and creates individual promises.
   const promises = [];
@@ -349,11 +367,8 @@ function buildRemote() {
   const minorBuildTag = getBuildTag('minor');
 
   let build = new Promise((res, rej) => {
-    mkdirp.sync(`${process.env.PWD}/build/remote/source`);
     mkdirp.sync(`${process.env.PWD}/build/remote/images`);
 
-    // touch the main.brs, can be empty for remote components
-    fs.closeSync(fs.openSync('build/remote/source/main.brs', 'w'));
 
     let sources = [
       // "src/channel/images/**/*",
@@ -369,9 +384,7 @@ function buildRemote() {
       '!src/channel/components/controllers/BackgroundScene/**',
       '!src/channel/source/tests/**',
       '!src/channel/source/Settings.brs',
-      '!src/channel/components/controllers/TubiScene/TrackerTask.xml',
-      '!src/channel/components/tasks/GeneralTask/Parsers/TubiExperimentParsers.brs',
-      '!src/channel/components/tasks/GeneralTask/Parsers/ExternalConfigParsers.brs'
+      '!src/channel/components/controllers/TubiScene/TrackerTask.xml'
     ];
 
     // don't include TestAid files if config is production

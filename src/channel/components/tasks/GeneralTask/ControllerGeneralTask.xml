@@ -33,4 +33,7 @@
     <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
     <script type="text/brightscript" uri="pkg:/components/lib/DeviceMixin.brs" />
+    <script type="text/brightscript" uri="Parsers/TubiExperimentParsers.brs" />
+    <script type="text/brightscript" uri="Parsers/ExternalConfigParsers.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TubiExternalConfig.brs" />
 </component>

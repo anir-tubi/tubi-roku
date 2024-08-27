@@ -54,36 +54,20 @@ Function setSettingsScreenSignInInfo()
     email: ""
   }
 
-  authInfo = getFieldFromGlobal("authInfo")
-
+  authInfo = m.tubiAuthUpdate.getAuthInfo()
   if isLoggedInUser(authInfo) = true
-
-    if authInfo <> invalid
-      aaSignIn.signedIn = true
-      aaSignIn.email = authInfo.email
-      if isNonEmptyString(authInfo.firstName) = true AND isNonEmptyString(authInfo.lastName) = true
-        sName = authInfo.firstName + " " + authInfo.lastName
-      else
-        sName = authInfo.name
-      end if
-      aaSignIn.name = sName
+    aaSignIn.signedIn = true
+    aaSignIn.email = m.pub_serverPersistentData.email
+    if isNonEmptyString(authInfo.firstName) = true AND isNonEmptyString(authInfo.lastName) = true
+      sName = authInfo.firstName + " " + authInfo.lastName
+    else
+      sName = authInfo.name
     end if
 
+    aaSignIn.name = sName
   end if
 
   m.settingsScreen.signInInfo = aaSignIn
-End Function
-
-
-Function setAuthInfoValue(attribute, value) as boolean
-  bSuccess = false
-  authInfo = getFieldFromGlobal("authInfo")
-  if isLoggedInUser(authInfo) = true
-    authInfo[attribute] = value
-    m.global.authInfo = authInfo
-    bSuccess = true
-  end if
-  return bSuccess
 End Function
 
 
@@ -128,14 +112,7 @@ Function onSignOutModalSelected()
     silenceCallbackWarnings: true
   })
   setSettingsScreenSignInInfo()
-  m.authInfoReceived = false
-  if m.authTask <> invalid
-    m.authTask.unobserveFieldScoped("authInfo")
-  end if
-  m.authTask = CreateObject("roSGNode", "AuthTask")
-  m.authTask.observeFieldScoped("authInfo", "onSignOutCompleted")
-  m.authTask.functionName = "execSignOut"
-  m.authTask.control = "RUN"
+  m.tubiAuthUpdate.logout(onSignOutCompleted)
 
   m.NodeHelpers.removeAllChildren(m.global.bookmarkIds)
   m.NodeHelpers.removeAllChildren(m.global.historyIds)
@@ -209,17 +186,17 @@ Function onParentalSettingSelected()
   parentalSetting = m.settingsScreen.parentalSettingSelected
   if m.settingsScreen.signInInfo <> invalid AND m.settingsScreen.signInInfo.signedIn = true
     m.settingsScreen.actionAfterActivation = ""
-    authInfo = getFieldFromGlobal("authInfo")
-    if isLoggedInUser(authInfo) AND parentalSetting <> authInfo.parentalrating
+    authInfo = m.tubiAuthUpdate.getAuthInfo()
+    if isLoggedInUser(authInfo) = true AND parentalSetting <> m.pub_serverPersistentData.parentalRating then
       ' parental settings have been updated
       nNowDate = getNowSeconds()
       nSavedSeconds = 0
-      if authInfo.secondsOfSavedPassword <> invalid
-        nSavedSeconds = authInfo.secondsOfSavedPassword
+      if m.passwordCache <> invalid AND m.passwordCache.currentTime <> invalid then
+        nSavedSeconds = m.passwordCache.currentTime
       end if
 
       'If the loggedIn user doesn't setup password
-      if authInfo.hasPassword <> true
+      if m.pub_serverPersistentData.hasPassword <> true
         pageInfo = m.settingsScreen.trackingPageInfo
 
         dialogEvent =  {
@@ -248,7 +225,7 @@ Function onParentalSettingSelected()
 
         showSimpleModal("Password Required", message, buttons, dialogEvent, m.trackingLoggingTask, showConfirmPasswordScreen, invalid)
       else
-        if authInfo.passwordText <> invalid AND (nNowDate - nSavedSeconds) < 300
+        if m.passwordCache <> invalid AND m.passwordCache.password <> invalid AND (nNowDate - nSavedSeconds) < 300
           tubiLog("SettingsScreenHelpers.onParentalSettingSelected(), use saved password")
           '//if there is a saved password, was it submitted within the last 5 minutes (300 seconds), if so, then use that password
           onPasswordConfirm()
@@ -289,21 +266,18 @@ End Function
 
 Function onPasswordConfirm(msg = invalid)
   tubiLog("SettingsScreenHelper.onPasswordConfirm")
-  authInfo = getFieldFromGlobal("authInfo")
   sPassword = ""
   if msg <> invalid
     confirmPasswordScreen = msg.getRoSGNode()
     sPassword = confirmPasswordScreen.passwordText
     confirmPasswordScreen.isLoading = true
-  else
+  else if m.passwordCache <> invalid then
     '//if not coming from the password screen, then coming from a saved password within the last few minutes
-    sPassword = authInfo.passwordText
-    if authInfo.secondsOfSavedPassword = invalid or authInfo.secondsOfSavedPassword <= 0
-      setAuthInfoValue("secondsOfSavedPassword", getNowSeconds())
-    end if
+    sPassword = m.passwordCache.password
   end if
 
-  if isLoggedInUser(authInfo)
+  authInfo = m.tubiAuthUpdate.getAuthInfo()
+  if isLoggedInUser(authInfo) = true then
     parentalRatingReq = m.userDeviceApi.updateParentalRatingReqInfo(m.settingsScreen.parentalSettingSelected, sPassword)
 
     m.makeRequest({
@@ -316,8 +290,6 @@ Function onPasswordConfirm(msg = invalid)
       password: sPassword
     })
   end if
-
-
 End Function
 
 
@@ -330,11 +302,7 @@ Function refreshScreenAfterParentalChanges()
   ' we should not be placing user at 10th row but start user at the top of the grid.
   resetCategoryGridPosition()
   homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-  if homeScreen <> invalid
-    authInfo = getFieldFromGlobal("authInfo")
-    if isLoggedInUser(authInfo) AND authInfo.parentalrating <> invalid
-      homeScreen.parentalRating = authInfo.parentalrating
-    end if
+  if homeScreen <> invalid then
     fetchHomescreen(homeScreen)
   end if
 
@@ -383,13 +351,14 @@ Function updateParentalSettingsSuccessResponse(response)
   m.confirmPasswordScreen.isLoading = false
 
   if response <> invalid
-    setAuthInfoValue("parentalrating", m.settingsScreen.parentalSettingSelected)
+    saveLocalServerPresistantData([{parentalRating: m.settingsScreen.parentalSettingSelected}])
     if isConfirmPasswordScreen() = true
       '//If ConfirmPasswordScreen visible, then pop the Screen and save the password
       popScreen(true, true) ' remove the ConfirmPasswordScreen
-
-      setAuthInfoValue("passwordText", response.requestInput.password)
-      setAuthInfoValue("secondsOfSavedPassword", getNowSeconds())
+      m.passwordCache = {
+        password: response.requestInput.password
+        currentTime: getNowSeconds()
+      }
     else
       '//Update menu so it appears updated. This is only needed if the password has been saved locally and was not entered immediately from the password screen
       m.settingsScreen.parentalSettingUpdated = true
@@ -457,11 +426,10 @@ End Function
 
 Function updateParentalSettingsErrorResponse(_error)
   tubiLog("SettingsScreenHelper.updateParentalSettingsErrorResponse")
-  authInfo = getFieldFromGlobal("authInfo")
 
   if isConfirmPasswordScreen() = true
     m.confirmPasswordScreen.isLoading = false
-    setAuthInfoValue("secondsOfSavedPassword", 0)
+    m.passwordCache = invalid
 
     pageInfo = m.settingsScreen.trackingPageInfo
     dialogEvent = {
@@ -479,11 +447,13 @@ Function updateParentalSettingsErrorResponse(_error)
     buttons = [getTranslation("dialog_button_ok")]
 
     showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask)
-  else if authInfo <> invalid AND authInfo.secondsOfSavedPassword <> invalid AND authInfo.secondsOfSavedPassword > 0
-    '//if not showing ConfirmPasswordScreen and showing parentalControls panel AND this came from a saved password,
-    '//   then display the ConfirmPasswordScreen instead of error message
-    setAuthInfoValue("secondsOfSavedPassword", 0)
-    onParentalSettingSelected()
+  else
+    if m.passwordCache <> invalid then
+      '//if not showing ConfirmPasswordScreen and showing parentalControls panel AND this came from a saved password,
+      '//   then display the ConfirmPasswordScreen instead of error message
+      m.passwordCache = invalid
+      onParentalSettingSelected()
+    end if
   end if
 End Function
 

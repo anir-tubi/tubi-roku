@@ -106,6 +106,8 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
     videoPlayer.observeFieldScoped("audioTrackSettings", "onAudioTrackSettingsChange")
     videoPlayer.observeFieldScoped("homescreenContentToPlayUpdated", "onPlayerHomeScreenContentToPlay")
     videoPlayer.observeFieldScoped("relatedContentToPlayUpdated", "onPlayerRelatedContentToPlay")
+    observeUpdateAuth(videoPlayer.task)
+
     initVideoTracking(videoPlayer) 'initializeYoubora
     setInScreenCache(videoPlayer)
 
@@ -1187,8 +1189,9 @@ Function onVideoTrackingStart(msg)
 
     youboraConfig.tvShow = Mid(content.parentId, 2)
 
-    if isLoggedInUser() = true
-      youboraConfig.username = m.global.authInfo.userId
+    authInfo = m.tubiAuthUpdate.getAuthInfo()
+    if isLoggedInUser(authInfo) = true
+      youboraConfig.username = authInfo.userId
     end if
     if content.type = m.constants.ui.contentTypes.linear
       youboraConfig["content.isLive"] = true

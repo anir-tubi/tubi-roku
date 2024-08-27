@@ -48,6 +48,8 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
         videoPlayer.observeFieldScoped("linearOverlayLiteComponentInteractionInfo", "onComponentInteractionInfoChange")
         videoPlayer.observeFieldScoped("trackingLoggingEvent", "ontrackingLoggingEvent")
 
+        observeUpdateAuth(videoPlayer.task)
+
         initVideoTracking(videoPlayer) 'initializeYoubora. Regular and linear video players share tracking functions, which are found in VideoHelpers
         setInScreenCache(videoPlayer)
 
@@ -164,11 +166,10 @@ End Function
 
 
 Function getUpdatedLinearVideoResources(content)
-  auth = TubiAuth(m.constants, m.Request)
   tcfString = getTCFString()
   consentOptOutStatus = getConsentsOptOutStatus()
   gdpr = isGDPR()
-  adLib = TubiAdsLimited(m.constants, auth, tcfString, consentOptOutStatus, gdpr)
+  adLib = TubiAdsLimited(m.constants, m.tubiAuthUpdate, tcfString, consentOptOutStatus, gdpr)
 
   ' add the ad parameters for the content. Back end will forward these parameters to YoSpace/Apollo
   ' so that YoSpace/Apollo can have them when YoSpace/Apollo makes ad requests for SSAI

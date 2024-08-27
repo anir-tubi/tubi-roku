@@ -1,6 +1,7 @@
 Function init()
   m.constants = getConstantsFromGlobal()
-  m.experiments = TubiExperiments(m.constants)
+  experimentsInfo = getExperimentsInfoFromGlobal()
+  m.experiments = TubiExperiments(experimentsInfo)
   m.top.selectButtonMovesPanelForward = true
   m.top.observeFieldScoped("focusedChild", "onComponentFocus")
   m.top.observeFieldScoped("isLoading", "onIsLoading")

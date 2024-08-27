@@ -1,9 +1,7 @@
 Function init()
   m.trackingLoggingTask = getFieldFromGlobal("trackingLoggingTask")
   m.constants = getConstantsFromGlobal()
-  Request = TubiRequest(m.constants.settings)
-  Auth = TubiAuth(m.constants, Request)
-  m.Tracking = TubiTracking(m.constants, Request, Auth)
+  m.Tracking = TubiTrackingInfo(m.constants)
 
   '//keep a count of how many times the user attempts to resend a verification email. After a few times, present a modal to the user that their spam folder should be checked. Hopefully this will limit how many times a verification email is sent
   m.resendVerificationEmailCount = 0

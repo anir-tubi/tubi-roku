@@ -3,10 +3,8 @@
 '@Setup
 Function CmsApiSetup()
   constants = getConstants()
-  request = TubiRequest(constants.settings)
-  auth = TubiAuth(constants, request)
   utils = ApiUtils(constants)
-  m.cmsApi = CmsApi(constants, request, auth, utils)
+  m.cmsApi = CmsApi(constants, utils)
 End function
 
 
@@ -895,118 +893,6 @@ Function cmsApi_createSearchReqInfo_test()
   m.assertEqual(searchInfo.options.params["search"], searchOptions.params["search"])
   m.assertEqual(searchInfo.options.params["isKidsMode"], searchOptions.params["isKidsMode"])
   m.assertEqual(searchInfo.options.params["images[poster_tb]"], searchOptions.params["images[poster_tb]"])
-End Function
-
-
-'@Test unit tests createAuthRequest
-Function cmsApi_createAuthRequest_test()
-  url = "https://someUrl"
-  reqName = "getHomepage"
-  params = {
-    userid: "1234"
-  }
-  headers = {
-    "x-custom-header": "header_value"
-  }
-  body = {
-    content_id: "5678"
-  }
-  options = {
-    params: params
-    headers: headers
-    body: FormatJson(body)
-  }
-
-  ' test expecting an auth request
-  m.cmsApi.auth.getAuthInfo = function()
-    return {
-       refreshToken: "xyz"
-       accessToken: "abc"
-       expireTime: "60"
-       userId: "1234"
-    }
-  end function
-
-  authInfo = m.cmsApi.auth.getAuthInfo()
-  authHeaders = m.cmsApi.auth.getAuthHeaders(authInfo.accessToken)
-  authRequest = m.cmsApi.createAuthRequest(url, reqName, options)
-
-  m.assertNotInvalid(authRequest.url)
-  m.assertNotInvalid(authRequest.name)
-  m.assertNotInvalid(authRequest.params)
-  m.assertNotInvalid(authRequest.body)
-  m.assertNotInvalid(authRequest.headers)
-  m.assertNotInvalid(authRequest.handleEvent)
-  m.assertNotInvalid(authRequest.uuid)
-  m.assertNotInvalid(authRequest.isHttps)
-  m.assertNotInvalid(authRequest.getAuthHeaders)
-  m.assertNotInvalid(authRequest.refreshAuthToken)
-  m.assertNotInvalid(authRequest.requestTokenRefresh)
-  m.assertNotInvalid(authRequest.updateAuthInfo)
-  m.assertNotInvalid(authRequest.saveAuthInfo)
-  m.assertNotInvalid(authRequest.handleRefreshResponse)
-  m.assertNotInvalid(authRequest.deleteAuthInfo)
-  m.assertNotInvalid(authRequest.constants)
-  m.assertNotInvalid(authRequest.request)
-  m.assertNotInvalid(authRequest.authInfo)
-  m.assertNotInvalid(authRequest.regWrite)
-  m.assertNotInvalid(authRequest.authRegSection)
-  m.assertEqual(authRequest.params["userid"], params.userid)
-  m.assertEqual(authRequest.headers["x-custom-header"], headers["x-custom-header"])
-  m.assertEqual(authRequest.body, FormatJson(body))
-  m.assertTrue(authRequest.isHttps)
-  m.assertEqual(authRequest.headers.authorization, authHeaders.authorization)
-  m.assertEqual(authRequest.headers.["Content-Type"], authHeaders["Content-Type"])
-  m.assertEqual(authRequest.headers.["x-client-platform"], authHeaders["x-client-platform"])
-  m.assertEqual(authRequest.headers.["x-client-version"], authHeaders["x-client-version"])
-
-  ' test expecting a non auth request
-  params = {
-    userid: "1234"
-  }
-  headers = {
-    "x-custom-header": "header_value"
-  }
-  body = {
-    content_id: "5678"
-  }
-  options = {
-    params: params
-    headers: headers
-    body: FormatJson(body)
-  }
-
-  m.cmsApi.auth.getAuthInfo = function()
-    return invalid
-  end function
-  nonAuthRequest = m.cmsApi.createAuthRequest(url, reqName, options)
-
-  m.assertNotInvalid(nonAuthRequest.url)
-  m.assertNotInvalid(nonAuthRequest.name)
-  m.assertNotInvalid(nonAuthRequest.params)
-  m.assertNotInvalid(nonAuthRequest.body)
-  m.assertNotInvalid(nonAuthRequest.headers)
-  m.assertNotInvalid(nonAuthRequest.handleEvent)
-  m.assertNotInvalid(nonAuthRequest.uuid)
-  m.assertNotInvalid(nonAuthRequest.isHttps)
-  m.assertInvalid(nonAuthRequest.getAuthHeaders)
-  m.assertInvalid(nonAuthRequest.refreshAuthToken)
-  m.assertInvalid(nonAuthRequest.requestTokenRefresh)
-  m.assertInvalid(nonAuthRequest.updateAuthInfo)
-  m.assertInvalid(nonAuthRequest.saveAuthInfo)
-  m.assertInvalid(nonAuthRequest.handleRefreshResponse)
-  m.assertInvalid(nonAuthRequest.deleteAuthInfo)
-  m.assertInvalid(nonAuthRequest.request)
-  m.assertInvalid(nonAuthRequest.authInfo)
-  m.assertInvalid(nonAuthRequest.regWrite)
-  m.assertInvalid(nonAuthRequest.authRegSection)
-  m.assertEqual(nonAuthRequest.params["userid"], params.userid)
-  m.assertEqual(nonAuthRequest.headers["x-custom-header"], headers["x-custom-header"])
-  m.assertInvalid(nonAuthRequest.headers["x-client-platform"])
-  m.assertInvalid(nonAuthRequest.headers["x-client-version"])
-  m.assertEqual(authRequest.body, FormatJson(body))
-  m.assertTrue(nonAuthRequest.isHttps)
-  m.assertInvalid(nonAuthRequest.headers.authorization)
 End Function
 
 

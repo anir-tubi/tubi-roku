@@ -1,7 +1,6 @@
-Function TubiExperiments(constants) as Object
-
+Function TubiExperiments(experimentsInfo) as Object
   return {
-    constants: constants
+    experimentsInfo: experimentsInfo
 
     ' Every namespace needs to have a default resource AA
     ' Default resources are always used in case that the experiment API doesn't return a response
@@ -94,74 +93,25 @@ Function TubiExperiments(constants) as Object
     }
 
     'public methods
-    init: tubiExperiments_init
     getExperimentTracking: tubiExperiments_getExperimentTracking
     getExperimentResource: tubiExperiments_getExperimentResource
-    getNamespaceRequest: tubiExperiments_getNamespaceRequest
-    handleAsyncNamespaceResponse: tubiExperiments_handleAsyncNamespaceResponse
     getNamespaceRequestInfo: tubiExperiments_getNamespaceRequestInfo
     getExperimentResult: tubiExperiments_getExperimentResult
+    mapNamespaces: tubiExperiments_mapNamespaces
 
     'private methods
-    getNamespaces: tubiExperiments_getNamespaces
     parseNamespace: tubiExperiments_parseNamespace
     getDefaultResource: tubiExperiments_getDefaultResource
     getExperiment: tubiExperiments_getExperiment
-    handleNamespaceResponse: tubiExperiments_handleNamespaceResponse
-    mapNamespaces: tubiExperiments_mapNamespaces
   }
 End Function
 
-
-' @reqest: assocArray, a request module as returned by TubiRequest()
-Function tubiExperiments_init(request)
-  '//go through all the existing namespaces and call the backend to get the data of existing experiments
-  namespaces = m.getNamespaces(request)
-  allNamespaces = invalid
-
-  if namespaces <> invalid
-    allNamespaces = m.mapNamespaces(namespaces)
-  end if
-
-  m.constants.experiments.info = allNamespaces
-  return allNamespaces    'can return invalid
-End Function
-
-
-' Returns an Array of namespaces, synchronously
-' We expect to return an array containing a single or multiple namespace assocArrays
-' @reqest: assocArray, a request module as returned by TubiRequest()
-Function tubiExperiments_getNamespaces(request)
-  returnNamespaces = invalid
-  req = m.getNamespaceRequest(request)
-  if req <> invalid
-    res = req.runSynchronous()
-    if res <> invalid
-      returnNamespaces = m.handleNamespaceResponse(res)
-    end if
-  end if
-
-  return returnNamespaces   'can return invalid
-End Function
-
-
-' returns a request object that can be run asynchronously or synchronously - but may return invalid
-' @reqest: assocArray, a request module as returned by TubiRequest()
-Function tubiExperiments_getNamespaceRequest(request)
-  requestInfo = m.getNamespaceRequestInfo(m.constants)
-  expRequest = invalid
-  if requestInfo <> invalid
-    expRequest = request.createAsync(requestInfo.url, requestInfo.requestType)
-  end if
-
-  return expRequest 'may return invalid
-End Function
 
 ' returns a request info required for experiments request.
 Function tubiExperiments_getNamespaceRequestInfo(constants)
   requestInfo = invalid
   namespaces = m.defaultResources
-  url = m.constants.urls.experiments.evaluate + "?request_context.device_id=" + constants.deviceInfo.deviceId
+  url = constants.urls.experiments.evaluate + "?request_context.device_id=" + constants.deviceInfo.deviceId
 
   nameSpaceQuery = ""
   for each namespace in namespaces
@@ -173,38 +123,12 @@ Function tubiExperiments_getNamespaceRequestInfo(constants)
     url = url + nameSpaceQuery
     requestInfo = {
       url: url
-      requestType: m.constants.reqNames.getNamespaces
+      requestType: constants.reqNames.getNamespaces
       responseType: "assocarray"
     }
   end if
 
   return requestInfo 'may return invalid
-End Function
-
-
-' @resData: string, the response string - expect JSON.
-Function tubiExperiments_handleNamespaceResponse(resData)
-  namespaces = invalid
-  parsedResults = ParseJson(resData)
-  if parsedResults <> invalid AND parsedResults.namespace_results <> invalid
-    namespaces = parsedResults.namespace_results
-  end if
-
-  return namespaces
-End Function
-
-
-' wraps handleNamespaceResponse and mapNamespaces
-' @resData: string, the response string - expect JSON.
-Function tubiExperiments_handleAsyncNamespaceResponse(resData)
-  experimentInfo = invalid
-
-  if resData <> ""
-    namespaces = m.handleNamespaceResponse(resData)
-    experimentInfo = m.mapNamespaces(namespaces)
-  end if
-
-  return experimentInfo
 End Function
 
 
@@ -244,7 +168,7 @@ Function tubiExperiments_getExperiment(namespaceName as string, experimentName a
 
   experiment = invalid
 
-  allExperiments = m.constants.experiments.info
+  allExperiments = m.experimentsInfo
   if namespaceName <> invalid AND experimentName <> invalid AND allExperiments <> invalid
     possibleExperiment = allExperiments[namespaceName]
     if possibleExperiment <> invalid AND possibleExperiment.experiment_result <> invalid AND possibleExperiment.experiment_result.experiment_name <> invalid

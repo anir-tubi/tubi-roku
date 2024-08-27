@@ -3,7 +3,7 @@
 '@Setup
 Function TubiMetadataTranslateSetup()
   m.constants = getConstants()
-  experiments = TubiExperiments(m.constants)
+  experiments = TubiExperiments({})
   m.translate = TubiMetadataTranslate(m.constants, experiments)
 End function
 

@@ -3,9 +3,8 @@
  - AdsTask
  -
  -->
-<component name="AdsTask" extends="Task">
+<component name="AdsTask" extends="BaseTaskNeedingAuth">
     <script type="text/brightscript" uri="AdsTask.brs" />
-    <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
     <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
     <script type="text/brightscript" uri="../../../source/lib/RequestQueue.brs" />
     <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />

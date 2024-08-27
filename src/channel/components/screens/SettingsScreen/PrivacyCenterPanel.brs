@@ -55,7 +55,7 @@ Function onScreenFocusChange()
       m.qrCodeSections.setFocus(true)
     end if
   end if
-  
+
 End Function
 
 
@@ -213,7 +213,7 @@ End Function
 
 ' Renders tos and privacy policy qr codes.
 Function renderTOSPrivacyPolicyQrCodeSection()
-  externalConfig = m.constants.externalConfig.info
+  externalConfig = getExternalConfigInfoFromGlobal()
 
   if externalConfig <> invalid
     if isNonEmptyString(externalConfig.privacy_policy_qr_code_url) = true
