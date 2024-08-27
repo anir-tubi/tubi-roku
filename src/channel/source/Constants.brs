@@ -239,6 +239,11 @@ Function getConstants()
     constants.deviceInfo.locale  = di.GetCurrentLocale()
     constants.deviceInfo.scaledUi = scaledUi
     constants.deviceInfo.videoMode = di.GetVideoMode()
+    if FindMemberFunction(di, "IsAutoplayEnabled") <> invalid
+      constants.deviceInfo.isAutoplayEnabled = di.IsAutoplayEnabled()
+    else
+      constants.deviceInfo.isAutoplayEnabled = true
+    end if
     videoResolution = constants.deviceInfo.videoMode.toInt()
 
   'names given to different request types for identification purposes (for example in the General Task)

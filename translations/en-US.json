@@ -584,6 +584,10 @@
     "description": "Description of the autoplay preview user choice screen",
     "message": "You can turn the autoplay functionality on or off, which allows you to preview the video while browsing."
   },
+  "screenSettings_autoplayPreview_featureDisabledMessage": {
+    "description": "Message to display when the user has set Autoplay to false in Roku(not tubi) main settings.",
+    "message": "Autoplay is currently controlled in Roku Settings. To change this setting, go to Roku Settings -> Accessibility -> Auto-play video."
+  },
   "screenSettings_menu_about": {
     "description": "A menu Item for the Settings screen",
     "message": "About"

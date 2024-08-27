@@ -20,7 +20,6 @@
       <field id="offset" alias="Offset.translation"/>
       <field id="isLoading" type="boolean"/>
 
-
     <!-- OUTPUTS -->
       <field id="itemSelected" alias="AutoplayPreviewMenu.itemSelected"/>
 
@@ -35,7 +34,6 @@
   <children>
     <Group
       id="Offset">
-
     <Group
       id="ContentGroup">
       <Label

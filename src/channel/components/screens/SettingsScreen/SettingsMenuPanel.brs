@@ -102,8 +102,8 @@ Function setSettingsSidePanelMenuItems()
     availablePanelItems.delete("parentalControls")
   end if
 
-  ' Removing video preview button if user is not eligible for preview button.
-  if isVideoPreviewEnabled() = false then
+  ' Removing video preview button if device does not support the feature.
+  if m.constants.deviceInfo.limitedUi = true then
     availablePanelItems.delete("autoplayPreview")
   end if
 

@@ -225,23 +225,30 @@ End Function
 
 
 Function createAutoPreviewPanel()
-  videoPreviewPanel = CreateObject("roSGNode", "AutoplayPreviewPanel")
-  videoPreviewPanel.observeFieldScoped("itemSelected", "onAutoplayPreviewPanelItemSelected")
-  videoPreviewPanel.observeFieldScoped("audioGuideText", "onAudioGuideTextChanged")
-  videoPreviewPanel.observeFieldScoped("componentInteractionInfo", "onAutoPlayPreviewComponentInteractionInfo")
-  videoPreviewPanel.width = m.rightPanelWidth
-  videoPreviewPanel.focusable = true
-  videoPreviewPanel.hasNextPanel = false
-  videoPreviewPanel.leftOnly = false
-  videoPreviewPanel.selectButtonMovesPanelForward = false
-  videoPreviewPanel.offset = m.rightPanelOffset
 
-  if m.top.isVideoPreviewOn = true
-    videoPreviewPanel.selectItem = 0
-  else
-    videoPreviewPanel.selectItem = 1
-  end if
-  return videoPreviewPanel
+    videoPreviewPanel = CreateObject("roSGNode", "AutoplayPreviewPanel")
+    videoPreviewPanel.observeFieldScoped("itemSelected", "onAutoplayPreviewPanelItemSelected")
+    videoPreviewPanel.observeFieldScoped("audioGuideText", "onAudioGuideTextChanged")
+    videoPreviewPanel.observeFieldScoped("componentInteractionInfo", "onAutoPlayPreviewComponentInteractionInfo")
+    videoPreviewPanel.width = m.rightPanelWidth
+    'if user has set Roku->settings->autoplay to off, then do not let them change tubi settings.
+    if m.constants.deviceInfo.IsAutoplayEnabled = true
+      videoPreviewPanel.focusable = true
+    else
+      videoPreviewPanel.focusable = false
+    end if
+
+    videoPreviewPanel.hasNextPanel = false
+    videoPreviewPanel.leftOnly = false
+    videoPreviewPanel.selectButtonMovesPanelForward = false
+    videoPreviewPanel.offset = m.rightPanelOffset
+
+    if m.top.isVideoPreviewOn = true
+      videoPreviewPanel.selectItem = 0
+    else
+      videoPreviewPanel.selectItem = 1
+    end if
+    return videoPreviewPanel
 End Function
 
 
@@ -289,7 +296,7 @@ Function createAboutPanel()
     support_url: "https://tubitv.com/support",
     year: sYear
   }
-  
+
   sSectionTwoText = getTranslation("screenSettings_about_description2", dynamicText)
 
   '//Go thru the sSectionTwoText and find the text within carriage returns and add it to the array
@@ -342,7 +349,7 @@ Function createPrivacyCenterPanel(title)
   privacyCenterPanel.id = "privacyCenterPanel"
   privacyCenterPanel.title = title
   privacyCenterPanel.isAllowedToManageConsent = m.top.isAllowedToManageConsent
-  
+
   if isGDPR() = true
     privacyCenterPanel.observeFieldScoped("didUserSelectManagePrivacySettingsButton", "onDidUserSelectManagePrivacySettingsButton")
   else

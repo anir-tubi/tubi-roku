@@ -6,6 +6,8 @@ Function init()
 
   if m.constants.settings.mode = "dev" AND m.constants.settings.processAnimationLogo = false
     m.top.fadeInRemoteComponent = true
+  else if m.constants.deviceInfo.isAutoplayEnabled = false 'certification requirement that do not show animation logo if autoplay is disabled in device settings.
+    m.top.fadeInRemoteComponent = true
   else
     processAnimationLogo()
   end if

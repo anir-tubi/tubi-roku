@@ -470,7 +470,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     if homeScreen.isInFocusChain() = true
       homeScreen.setFocus(true)
     end if
-    
+
     m.sendImpressionEventTimer.control = "stop"
     m.sendImpressionEventTimer.control = "start"
   end if
@@ -674,7 +674,7 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
       '//unless told otherwise later in this function, the default for bStopCountdownTimer is to assume that
       '//we should stop the countdown timer
       bStopCountdownTimer = true
-      if focusedContent.type = m.constants.ui.categoryTypes.linear AND m.SideNav.opened <> true AND m.tempModal = invalid
+      if focusedContent.type = m.constants.ui.categoryTypes.linear AND m.SideNav.opened <> true AND m.tempModal = invalid AND m.constants.deviceInfo.isAutoplayEnabled = true
         bPlayVideo = true
         if isLinearPlayerPlayingThisContent(focusedContent) = true
           '//No need to play the video. It already is playing the video
@@ -872,7 +872,7 @@ Function onHomescreenContentReady(msg)
         pageValues.personalization_id = homeScreen.personalizationId
       end if
       trackingPageInfo.pageValues = pageValues
-    
+
       screenTrackingLoad(trackingPageInfo, loadTime)
 
       'show registration welcome Screen only to new user over homescreen.

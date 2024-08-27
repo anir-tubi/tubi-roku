@@ -39,21 +39,30 @@ End Function
 
 Function setAutoplayPreviewChoices()
   m.Title.text = getTranslation("screenSettings_menu_autoplayPreview")
-  m.Instructions.text = getTranslation("screenSettings_autoplayPreview_instructions")
+
+  if m.constants.deviceInfo.IsAutoplayEnabled = true
+    m.Instructions.text = getTranslation("screenSettings_autoplayPreview_instructions")
+
+    newContent = m.Menu.content.clone(true)
+
+    for i = 0 to newContent.getChildCount() - 1
+      child = newContent.getchild(i)
+      if child.id = "On"
+        child.title = getTranslation("dialog_button_on")
+      else if child.id = "Off"
+        child.title = getTranslation("dialog_button_off")
+      end if
+    end for
+
+    m.Menu.content = newContent
+    m.Menu.visible = true
+  else
+    m.Instructions.text = getTranslation("screenSettings_autoplayPreview_featureDisabledMessage")
+    m.Menu.visible = false
+  end if
 
   m.instructionsText = m.Title.text + " " + m.Instructions.text
 
-  newContent = m.Menu.content.clone(true)
-  for i = 0 to newContent.getChildCount() - 1
-    child = newContent.getchild(i)
-    if child.id = "On"
-      child.title = getTranslation("dialog_button_on")
-    else if child.id = "Off"
-      child.title = getTranslation("dialog_button_off")
-    end if
-  end for
-
-  m.Menu.content = newContent
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.Title, typographyConstants.ids.headerSmall)
   setTypographyOfLabel(m.Instructions, typographyConstants.ids.bodyMedium)

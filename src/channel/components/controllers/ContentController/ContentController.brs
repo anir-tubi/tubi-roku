@@ -716,8 +716,6 @@ End Function
 
 ' sendDeviceEnvironmentSettingsLog will check deviceInfo and send device-info to logging API
 Function sendDeviceEnvironmentSettingsLog()
-  ' Holds true or false based on if the setting is turned on or off.
-  autoPlay = true
 
   deviceInfo = CreateObject("roDeviceInfo")
   drmInfo = deviceInfo.GetDrmInfoEx()
@@ -726,13 +724,9 @@ Function sendDeviceEnvironmentSettingsLog()
   videoMode = deviceInfo.GetVideoMode().toInt()
   isHevcCompatible = (deviceInfo.CanDecodeVideo({Codec: "hevc"}).result = true)
 
-  if FindMemberFunction(deviceInfo, "IsAutoplayEnabled") <> invalid AND deviceInfo.IsAutoplayEnabled() = false
-    autoPlay = false
-  end if
-
   deviceInfo = {
     isVideoPreviewOn: (isVideoPreviewOn() = true)
-    autoPlay: autoPlay
+    autoPlay: m.constants.deviceInfo.isAutoplayEnabled
     drmInfo: drmInfo
     model: model
     modelType: modelType
