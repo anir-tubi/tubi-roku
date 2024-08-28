@@ -16,7 +16,7 @@ describe('Sign In: On-Device Password Reset', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Wait for Roku Sign up dialog
-    await ecp.sleep(5000);
+    await ecp.sleep(8000);
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify if on the Sign In to Your Account page
@@ -27,10 +27,10 @@ describe('Sign In: On-Device Password Reset', function () {
     await ecp.sleep(3000)
     await ecp.sendKeypress(ecp.Key.Ok)
     await ecp.sendText('111111');
-    await utils.sleep(2000);
+    await utils.sleep(3000);
     await ecp.sendKeypress(ecp.Key.Right);
     await ecp.sendKeypress(ecp.Key.Down, {count:4});
-    await ecp.sleep(2000)
+    await ecp.sleep(3000)
     await ecp.sendKeypress(ecp.Key.Ok);   
 
     // Verify on home page
@@ -38,7 +38,7 @@ describe('Sign In: On-Device Password Reset', function () {
   });
 
 // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/476628
-  it('C476628 - Registered User - Sign In with invalid password, @password_reset', async () => {
+  it('C476628 - Registered User - Sign In with invalid password, @password_reset1', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
@@ -49,7 +49,7 @@ describe('Sign In: On-Device Password Reset', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Wait for Roku Sign up prompt
-    await ecp.sleep(5000);
+    await ecp.sleep(8000);
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify if on the Sign In to Your Account page
@@ -60,10 +60,10 @@ describe('Sign In: On-Device Password Reset', function () {
     await ecp.sleep(3000)
     await ecp.sendKeypress(ecp.Key.Ok)
     await ecp.sendText('222222');
-    await utils.sleep(2000);
+    await utils.sleep(3000);
     await ecp.sendKeypress(ecp.Key.Right);
     await ecp.sendKeypress(ecp.Key.Down, {count:4});
-    await ecp.sleep(2000)
+    await ecp.sleep(3000)
     await ecp.sendKeypress(ecp.Key.Ok);   
 
     // Oops! wrong password! screen is displayed
@@ -71,7 +71,7 @@ describe('Sign In: On-Device Password Reset', function () {
   });
 
 // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/476629
-  it('C476629 - Registered User - Instant Sign-In Link - Prefilled email, @password_reset', async () => {
+  it('C476629 - Registered User - Instant Sign-In Link - Prefilled email, @password_reset1', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
@@ -81,7 +81,7 @@ describe('Sign In: On-Device Password Reset', function () {
     await testUtils.jumpToRowWithTitle('sideNavMenu', 'Sign In');
     await ecp.sendKeypress(ecp.Key.Ok);
 
-    await ecp.sleep(5000);
+    await ecp.sleep(8000);
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify if on the Sign In to Your Account age
@@ -92,10 +92,10 @@ describe('Sign In: On-Device Password Reset', function () {
     await ecp.sleep(3000)
     await ecp.sendKeypress(ecp.Key.Ok)
     await ecp.sendText('222222');
-    await utils.sleep(2000);
+    await utils.sleep(3000);
     await ecp.sendKeypress(ecp.Key.Right);
     await ecp.sendKeypress(ecp.Key.Down, {count:4});
-    await ecp.sleep(2000)
+    await ecp.sleep(3000)
     await ecp.sendKeypress(ecp.Key.Ok);   
 
     // Oops! wrong password! screen is displayed
@@ -121,7 +121,7 @@ it('C476634 - Register New User - Default Mode, @password_reset', async () => {
     await ecp.sendKeypress(ecp.Key.Ok);
     
     // Wait for Roku sign in prompt
-    await ecp.sleep(5000);
+    await ecp.sleep(8000);
     // Cancel to land on Enter Email Address page
     await ecp.sendKeypress(ecp.Key.Back);
 
@@ -131,8 +131,9 @@ it('C476634 - Register New User - Default Mode, @password_reset', async () => {
 
     // Enter a email account which has not been registered for Tubi
     const email = `build_roku_${Math.floor(Date.now() / 1000)}_${Math.floor(Math.random() * 1000)}@tubi.tv`;
-    await ecp.sendText(email);
     await ecp.sleep(2000)
+    await ecp.sendText(email);
+    await ecp.sleep(3000)
     await ecp.sendKeypress(ecp.Key.Down,{count: 4})
     await ecp.sendKeypress(ecp.Key.Ok);
 
@@ -141,8 +142,11 @@ it('C476634 - Register New User - Default Mode, @password_reset', async () => {
     expect(confirmYourAgeText.text).to.equal('Confirm your age*');
 
     // enter age > 13
+    await ecp.sleep(2000)
     await ecp.sendText('14')
+    await ecp.sleep(3000);
     await ecp.sendKeypress(ecp.Key.Down,{count: 4})
+    await ecp.sleep(2000)
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify on Continue Watching Consent Page
@@ -171,7 +175,7 @@ it('C476635 - Register New User - Kids Mode, @password_reset', async () => {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Wait for Roku sign in prompt
-    await ecp.sleep(5000);
+    await ecp.sleep(8000);
     // Cancel to land on Enter Email Address page
     await ecp.sendKeypress(ecp.Key.Back);
 
@@ -181,8 +185,9 @@ it('C476635 - Register New User - Kids Mode, @password_reset', async () => {
 
     // Enter a email account which has not been registered for Tubi
     const email = `build_roku_${Math.floor(Date.now() / 1000)}_${Math.floor(Math.random() * 1000)}@tubi.tv`;
-    await ecp.sendText(email);
     await ecp.sleep(2000)
+    await ecp.sendText(email);
+    await ecp.sleep(3000)
     await ecp.sendKeypress(ecp.Key.Down,{count: 4})
     await ecp.sendKeypress(ecp.Key.Ok);
 
@@ -191,7 +196,9 @@ it('C476635 - Register New User - Kids Mode, @password_reset', async () => {
     expect(confirmYourAgeText.text).to.equal('Confirm your age*');
 
     // enter age < 13
+    await ecp.sleep(2000)
     await ecp.sendText('12')
+    await ecp.sleep(3000)
     await ecp.sendKeypress(ecp.Key.Down,{count: 4})
     await ecp.sendKeypress(ecp.Key.Ok);
 
