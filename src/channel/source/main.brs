@@ -489,6 +489,7 @@ Function logCrashesOnStartup(args, log, constants)
     if findMemberFunction(appManager, "getLastExitInfo") <> invalid then
       baseMessageContents = appManager.getLastExitInfo()
       baseMessageContents["connectionType"] = createObject("roDeviceInfo").getConnectionType()
+      baseMessageContents["model"] = constants.deviceInfo.model
 
       clientLogsMessageContents = {}
       clientLogsMessageContents.append(baseMessageContents)
