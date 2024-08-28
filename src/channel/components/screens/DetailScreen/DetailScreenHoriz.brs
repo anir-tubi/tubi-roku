@@ -143,12 +143,7 @@ Function setDetailStrings()
   m.ResumeMenuItem.title = getTranslation("screenDetails_button_resume_playing")
   m.ResumeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.ResumeMenuItem.id]
 
-  if getExperimentResource("roku_all_episiodes", "roku_all_episiodes_v1", false).enabled = true then
-    m.EpisodesMenuItem.title = getTranslation("screenDetails_button_episodes_experiment")
-  else
-    m.EpisodesMenuItem.title = getTranslation("screenDetails_button_episodes")
-  end if
-
+  m.EpisodesMenuItem.title = getTranslation("screenDetails_button_episodes")
   m.EpisodesMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.EpisodesMenuItem.id]
 
   m.WatchTrailerMenuItem.title = getTranslation("screenDetails_button_trailer")
@@ -508,15 +503,9 @@ End Function
 
 Function onIsSeries()
   tubiLog("DetailScreenHoriz.onIsSeries")
-  isSeries = m.top.isSeries
   episodeListIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.EpisodesMenuItem.id)
 
   menuItems = [ m.PlayMenuItem, m.signUpMenuItem]
-
-  if isSeries = true
-    '//If this is a series, then the all Episodes button should be displayed and the experiment event should be sent
-    getExperimentResource("roku_all_episiodes", "roku_all_episiodes_v1", true)
-  end if
 
   m.menuFocused = false
   addRemoveMenuItem(m.top.isSeries, episodeListIndex, m.EpisodesMenuItem, menuItems)

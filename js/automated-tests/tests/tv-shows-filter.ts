@@ -84,7 +84,6 @@ describe('Homescreen Navigation - TV Shows Filter', function () {
     // Now select a title to redirect us on the detail page
     await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.retryWithTimeOut(async () => {
-      // TODO:: roku_all_episiodes_v1 - if experiment is graduated, then change Episode List to All Episodes
       await testUtils.findRowIndexWithTitle('detailScreenMenu', 'All Episodes');
     });
 

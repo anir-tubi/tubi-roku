@@ -147,12 +147,7 @@ Function setDetailStrings()
   m.ResumeMenuItem.title = getTranslation("screenDetails_button_resume_playing")
   m.ResumeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.ResumeMenuItem.id]
 
-
-  if getExperimentResource("roku_all_episiodes", "roku_all_episiodes_v1", false).enabled = true then
-    m.EpisodesMenuItem.title = getTranslation("screenDetails_button_episodes_experiment")
-  else
-    m.EpisodesMenuItem.title = getTranslation("screenDetails_button_episodes")
-  end if
+  m.EpisodesMenuItem.title = getTranslation("screenDetails_button_episodes")
   m.EpisodesMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.EpisodesMenuItem.id]
 
   m.WatchTrailerMenuItem.title = getTranslation("screenDetails_button_trailer")
@@ -484,10 +479,6 @@ Function onIsSeries()
   signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
   menuItems = [m.signUpMenuItem, m.PlayMenuItem]
 
-  if isSeries = true
-    '//If this is a series, then the all Episodes button should be displayed and the experiment event should be sent
-    getExperimentResource("roku_all_episiodes", "roku_all_episiodes_v1", true)
-  end if
   m.menuFocused = false
 
   '//Change the button order of the signup button depending on isSeries state

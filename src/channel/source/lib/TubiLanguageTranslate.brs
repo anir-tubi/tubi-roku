@@ -1107,10 +1107,6 @@ Function getTranslation_en_US()
     },
     "screenDetails_button_episodes": {
       "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
-      "message": "Episodes list"
-    },
-    "screenDetails_button_episodes_experiment": {
-      "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
       "message": "All Episodes"
     },
     "screenDetails_relatedTitles": {
@@ -2749,10 +2745,6 @@ Function getTranslation_es_MX()
     },
     "screenDetails_button_episodes": {
       "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
-      "message": "Lista de Capítulos"
-    },
-    "screenDetails_button_episodes_experiment": {
-      "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
       "message": "Todos los Capítulos"
     },
     "screenDetails_relatedTitles": {
@@ -4368,10 +4360,6 @@ Function getTranslation_fr_CA()
       "message": "Regarder la bande-annonce"
     },
     "screenDetails_button_episodes": {
-      "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
-      "message": "Liste des épisodes"
-    },
-    "screenDetails_button_episodes_experiment": {
       "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
       "message": "Tous les épisodes"
     },

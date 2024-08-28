@@ -838,10 +838,6 @@
   },
   "screenDetails_button_episodes": {
     "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
-    "message": "Episodes list"
-  },
-  "screenDetails_button_episodes_experiment": {
-    "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
     "message": "All Episodes"
   },
   "screenDetails_relatedTitles": {
