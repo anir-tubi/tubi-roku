@@ -28,7 +28,7 @@ settings:
 
   # useStarterComponents MUST ALWAYS BE TRUE FOR PRODUCTION
   useStarterComponents: true
-  useRemoteComponents: true
+  useRemoteComponents: false
 
   # Set to true only if running an experiment from within the StarterController. This is used to determine if we use the full version of the StarterController that includes the dependencies need to run experiments at the Starter component library level. By not including these dependencies when not needed, we can reduce the size of the Starter component library and the time it takes to compile.
   useFullStarterController: false
