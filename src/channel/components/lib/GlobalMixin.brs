@@ -14,8 +14,13 @@ End Function
 
 ' make sure theme is set in the case that m.global is not immediately available
 ' limits the number of attempts so the while loop doesn't block into perpetuity.
-Function getExternalConfigInfoFromGlobal()
-  return getFieldFromGlobal("externalConfigInfo")
+Function getExternalConfigInfoFromGlobal(fallback = {})
+  externalConfigInfo = getFieldFromGlobal("externalConfigInfo")
+  if externalConfigInfo = invalid then
+    externalConfigInfo = fallback
+  end if
+
+  return externalConfigInfo
 End Function
 
 

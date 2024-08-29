@@ -35,7 +35,7 @@ Function sendRequestForExperimentsAndConfig()
     end if
   end if
 
-  if getExternalConfigInfoFromGlobal() <> invalid then
+  if getExternalConfigInfoFromGlobal(invalid) <> invalid then
     m.isExternalConfigReady = true
     runControllerStartSequence()
   else
