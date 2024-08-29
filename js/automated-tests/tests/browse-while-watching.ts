@@ -378,7 +378,7 @@ describe('Browse While Watching', function () {
         await ecp.sendKeypress(ecp.Key.Down, {wait:1000});
         await testUtils.waitForElementToFullyShowOnScreen('transportButtons', 'player controls not present', 10000);
         await utils.sleep(3000);
-        await ecp.sendKeypress(ecp.Key.Down, {wait:500}); 
+        await ecp.sendKeypress(ecp.Key.Down, {wait:700}); 
         await testUtils.waitForElementToShowOnScreen('browseWhileWatchingHeader', 'BWW rows not shown', 10000);
     }
 
