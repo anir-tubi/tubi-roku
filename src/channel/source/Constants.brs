@@ -1641,7 +1641,6 @@ Function getConstants()
       constants.serverPersistentDataKeys.isLikeToastNotificationShown = "enable_like_toast_notification"
       constants.serverPersistentDataKeys.isDisLikeToastNotificationShown = "enable_dislike_toast_notification"
       constants.serverPersistentDataKeys.lastRokuCwConsentPromptShownAt = "last_roku_cw_consent_prompt_shown_at"
-      constants.serverPersistentDataKeys.relaunchSeriesPlaybackInfo = "relaunch_series_playback_info"
       constants.serverPersistentDataKeys.email = "email"
       constants.serverPersistentDataKeys.parentalRating = "parental_rating"
       constants.serverPersistentDataKeys.hasPassword = "has_password"

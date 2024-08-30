@@ -19,9 +19,6 @@
     <!-- Holds the value of when we showed the roku continue watching prompt to user. -->
     <field id="lastRokuCwConsentPromptShownAt" type="integer" />
 
-    <!-- Holds the info related to last series and episode user played. Sample format: { seriesId: "", episodeId: "", lastViewedOn: 1298343,resumeAt: 190 }  -->
-    <field id="relaunchSeriesPlaybackInfo" type="assocarray" />
-
     <!-- Email isn't stored in the registry so we access it from here -->
     <field id="email" type="string" />
 
