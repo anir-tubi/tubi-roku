@@ -69,11 +69,7 @@ End Function
 
 ' @passedOptions: assocArray, options to be added to the request object as created by Request().createAsync()
 Function cmsApi_createUpNextContentReqInfo(passedOptions)
-  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_autoplay_cuepoint", "roku_autoplay_cuepoint_v2").enabled = true
-    url = m.constants.urls.autopilot.upNextContentV3
-  else
-    url = m.constants.urls.autopilot.upNextContent
-  end if
+  url = m.constants.urls.autopilot.upNextContent
 
   options = m.getCommonOptions()
   params = options.params

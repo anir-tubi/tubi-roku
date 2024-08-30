@@ -74,10 +74,6 @@ Function TubiExperiments(experimentsInfo) as Object
         roku_related_cuepoint_v1 : {"enabled": true}
       }
 
-      roku_autoplay_cuepoint: {
-        roku_autoplay_cuepoint_v2 : {"enabled": true}
-      }
-
       roku_horizontal_menu:{
         roku_horizontal_menu_v1: {"enabled": false}
       }

@@ -506,10 +506,8 @@ Function getConstants()
         constants.urls.autopilot.urlBase = "https://autopilot.staging-public.tubi.io/api"
       end if
 
-      constants.urls.autopilot.upNextContent = constants.urls.autopilot.urlBase + "/v2/autoplay"
-
       constants.urls.autopilot.relatedContent = constants.urls.autopilot.urlBase + "/v1/related"
-      constants.urls.autopilot.upNextContentV3 = constants.urls.autopilot.urlBase + "/v3/autoplay"
+      constants.urls.autopilot.upNextContent = constants.urls.autopilot.urlBase + "/v3/autoplay"
 
     'search url
     constants.urls.search = "https://search.production-public.tubi.io/api/v1/search"
