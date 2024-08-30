@@ -41,11 +41,6 @@ Function TubiExperiments(experimentsInfo) as Object
         roku_async_stop_v5: {"enabled": false}
       }
 
-      roku_cw_consent: {
-        roku_cw_consent_after_signup_short_term_v1: {"enabled": true}
-        roku_cw_consent_after_signup_long_term_v2: {"enabled": true}
-      }
-
       roku_cw_consent_existing_user: {
         roku_cw_consent_existing_user_after_playback_v4: {"enabled": false}
       }
