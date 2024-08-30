@@ -191,7 +191,7 @@ End Function
 Function setSearchStrings()
   m.sDefaultSearchText = getTranslation("screenSearch_trendingSearch")
   m.searchTitleText = getTranslation("menu_search")
-  if getExternalConfigInfoFromGlobal().livetv = true
+  if getExternalConfigValueFromGlobal("livetv", false) = true then
     m.searchHintToSearch = getTranslation("screenSearch_defaultLinearSearch")
   else
     m.searchHintToSearch = getTranslation("screenSearch_defaultSearch")

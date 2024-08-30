@@ -135,13 +135,7 @@ Function addControllerUi()
   m.global.trackingLoggingTask = m.trackingLoggingTask
 
   ' initialize states needed for various parts of kids mode
-  m.kidsModeFeatureOn = false 'Should the kids Mode feature be made available for the user to interact with
-  enableKidsMode = getExternalConfigInfoFromGlobal().enable_kidsmode
-
-  ' enable kids mode if the config returns true.
-  if enableKidsMode = true
-    m.kidsModeFeatureOn = true
-  end if
+  m.kidsModeFeatureOn = getExternalConfigValueFromGlobal("enable_kidsmode", false) 'Should the kids Mode feature be made available for the user to interact with
 
   setUiMode(m.constants.ui.modes.standard)
   theme = getThemeFromGlobal()
@@ -3085,7 +3079,7 @@ Function sendImpressionEvent()
     personalizationId: ""
     screenId: ""
   }
-  
+
   m.sendImpressionEventTimer.control = "stop"
   m.sendImpressionEventTimer.control = "start"
 End Function

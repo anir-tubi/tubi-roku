@@ -12,7 +12,7 @@ Function getThemeFromGlobal()
 End Function
 
 
-' make sure theme is set in the case that m.global is not immediately available
+' make sure external config is set in the case that m.global is not immediately available
 ' limits the number of attempts so the while loop doesn't block into perpetuity.
 Function getExternalConfigInfoFromGlobal(fallback = {})
   externalConfigInfo = getFieldFromGlobal("externalConfigInfo")
@@ -21,6 +21,17 @@ Function getExternalConfigInfoFromGlobal(fallback = {})
   end if
 
   return externalConfigInfo
+End Function
+
+
+' Used to get an external config value at the specified key, falling back to the provided fallback value if the value is invalid.
+Function getExternalConfigValueFromGlobal(key, fallback)
+  externalConfigInfo = getExternalConfigInfoFromGlobal()
+  if externalConfigInfo[key] <> invalid then
+    return externalConfigInfo[key]
+  end if
+
+  return fallback
 End Function
 
 

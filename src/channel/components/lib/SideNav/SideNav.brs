@@ -131,7 +131,7 @@ Function onCreateMenuItems()
     menuItems.push(m.constants.ui.sideNavIds.tv)
   end if
 
-  if getExternalConfigInfoFromGlobal().livetv = true
+  if getExternalConfigValueFromGlobal("livetv", false) = true
     menuItems.push(m.constants.ui.sideNavIds.linearEPG)
   end if
 
