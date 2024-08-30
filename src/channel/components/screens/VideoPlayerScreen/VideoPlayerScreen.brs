@@ -276,18 +276,6 @@ Function init()
   ' callback referencing the value, which would lead to badly formed playProgressEvents.
   m.seekReferenceQueue = []
 
-  ' sometimes the firmware not sending position for videoNode, so seekReferenceQueue is not getting cleared out as we check
-  ' seekReferenceQueue[] entries with playback position in onVideoPositionChange(). In this case we see invalid play progress events with large view-time.
-  ' To avoid this we wanted to check playback position >= seekReferenceQueue, so that even if any position callback is missed seekReferenceQueue will be cleared out on next position callbacks.
-  ' This will be running as a experiment with 5% allocation.
-  m.playProgressExpEnabled = false
-
-  if getExperimentResource("roku_large_play_progress", "roku_large_play_progress_v1", false).enabled = true
-    m.playProgressExpEnabled = true
-  end if
-
-  ' this variable helps to identify whether the play progress exposure event was fired or not.
-  m.wasExposureEventForPlayProgressFired = false
   m.analyticsInterval = m.constants.player.pingFrequency
   m.historyInterval1Min = m.constants.player.historyFrequency1Min 'historyInterval1Min is used for sending exposure event
 
@@ -1752,10 +1740,7 @@ Function seekToPosition(position)
     position = 0
   end if
 
-  if m.playProgressExpEnabled = true
-    m.isSeeking = true
-  end if
-
+  m.isSeeking = true
   m.Video.seek = position
 End Function
 
@@ -2116,21 +2101,8 @@ Function positionInSeekReferenceQueue(position, seekReferenceQueue)
   ' do not have this function called on them, so we clean out the queue when a seek position is successfully found
   ' in the queue.
 
-  ' //REMOVE roku_large_play_progress_v1 related logics once we graduate roku_large_play_progress
   for i=0 to seekReferenceQueue.count() - 1
-
-    positionMatchesWithSeekReferenceQueue = false
-    if m.playProgressExpEnabled = true
-      positionMatchesWithSeekReferenceQueue = (seekReferenceQueue[i] <= position) ' this handles if video node not returned any callback position
-    else
-      positionMatchesWithSeekReferenceQueue = (seekReferenceQueue[i] = position)
-    end if
-
-    ' fire exposure event for roku_large_play_progress_v1 for both treatment & control only once
-    if m.wasExposureEventForPlayProgressFired = false
-      getExperimentResource("roku_large_play_progress", "roku_large_play_progress_v1", true)
-      m.wasExposureEventForPlayProgressFired = true
-    end if
+    positionMatchesWithSeekReferenceQueue = (seekReferenceQueue[i] <= position) ' this handles if video node not returned any callback position
 
     if positionMatchesWithSeekReferenceQueue = true
 

@@ -29,10 +29,6 @@ Function TubiExperiments(experimentsInfo) as Object
         roku_category_redesign_v2: {"enabled": false}
       }
 
-      roku_large_play_progress: {
-        roku_large_play_progress_v1 : {"enabled": true}
-      }
-
       roku_linear_favorites: {
         roku_linear_favorites_v1: {"enabled": false}
       }
