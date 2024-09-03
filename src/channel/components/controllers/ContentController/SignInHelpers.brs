@@ -501,7 +501,9 @@ Function onSignInResponse(response)
 
   if response <> invalid then
     requestInput = response.requestInput
-    rfiSignInInfo = requestInput.rfiSignInInfo
+    if requestInput <> invalid then
+      rfiSignInInfo = requestInput.rfiSignInInfo
+    end if
   end if
 
   ' If email address used to sign in matches the Roku email address then go ahead and backfill their name and gender info
@@ -541,7 +543,6 @@ Function onSignInResponse(response)
   end if
 
   onActivationSuccess()
-
 End Function
 
 
@@ -1130,8 +1131,7 @@ Function onQueryStatusOfMagicLinkResponse(response)
       m.emailVerificationTimer.control = "start"
     else if response <> invalid AND response.access_token <> invalid
       onStopAndClearEmailVerificationTimer()
-      m.tubiAuthUpdate.handleRegistration(response)
-      onSignInResponse(invalid)
+      onSignInResponse(response)
     end if
   end if
 
