@@ -16,7 +16,7 @@ Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel)
   lineOneData = {}
   lineOneData.releaseDate = content.releaseDate
   lineOneData.length = content.length
-  lineOneData.hasCC = (content.hasSubtitles = true OR m._.empty(content.subtitleTracks) = false)
+  lineOneData.hasCC = (content.hasSubtitles = true OR (content.subtitleTracks <> invalid AND content.subtitleTracks.isEmpty() = false))
   lineOneData.hasAudioDescription = content.hasAudioDescription
   lineOneData.rating = content.rating
   lineOneData.partnerLogoUri = content.inlineLogoUri
