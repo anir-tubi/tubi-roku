@@ -6,6 +6,7 @@ Function init()
   m.top.observeField("batchRequest", m.port)
   m.top.observeField("cancel", m.port)
   m.top.observeField("newConstants", m.port)
+  m.top.observeField("newExperimentsInfo", m.port)
   m.constants = getConstantsFromGlobal()
   m.experimentsInfo = {} ' In order to be able to update the experiments without having pass it down manually we need an existing AA that we can just update the keys on
   ' Creating a scope variable that will be overridden by each sub task
