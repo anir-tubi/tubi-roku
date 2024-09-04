@@ -35,8 +35,14 @@ Function init()
     if parent.isSubType("CategoryGridList") = true
       m.parentArrayGrid = parent
       ' Only enabling it if we find the parent values.
-      m.top.enableRenderTracking = true
-      m.top.observeFieldScoped("renderTracking", "onRenderTrackingChange")
+      ' Enabling only if we have parentScreenId. Below logic disables the renderTracking when CategoryGridList is placed in non home screen for now.
+      ' If in future if we want to enable in other screens due to the fact that screenId is required when we set the value in the screen it will
+      ' automatically start tracking. This will disable the tracking in videoPlayerScreen in Browse while watching tray.
+      parentScreenId = parent.parentScreenId
+      if parentScreenId <> invalid AND parentScreenId <> ""
+        m.top.enableRenderTracking = true
+        m.top.observeFieldScoped("renderTracking", "onRenderTrackingChange")
+      end if
       exit for
     end if
     parent = parent.getParent()

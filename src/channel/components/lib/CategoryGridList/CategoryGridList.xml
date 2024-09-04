@@ -92,6 +92,7 @@
       <field id="removeFocusFromRowList" type="boolean" />
 
       <!-- parentScreenId will be set with screen id in which the rowlist is displayed. ex homescreen,tvscreen,moviesscreen etc. -->
+      <!-- This field should be set only if we want to enable viewable impression events to be tracked. -->
       <field id="parentScreenId" type="string" />
       
       <!-- 

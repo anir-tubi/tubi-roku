@@ -2957,6 +2957,18 @@ Function onViewableImpressionEventInfoChange(msg)
       m.viewableImpressionEvents.screenId = data.screenId
     end if
   end if
+
+  ' It is possible that viewable impression events from the homescreen may trigger this callback
+  ' after the user has already left the homescreen, and after the sendImpressionEventTimer has been stopped.
+  ' In this case, we need to restart the timer so that the viewable impression events will be sent.
+  ' Because we are only restarting the sendImpressionEventTimer in sendImpressionEvent() if the user is still on the homescreen,
+  ' it will prevent the timer from continuing to run when not needed.
+  '  This logic will cover the use cases:
+  ' 1. Where user navigated to different screen but we recieved viewable impression events.
+  ' 2. It will also restart the timer if the user navigates back to home screen after navigating to video player or details screen.
+  if m.sendImpressionEventTimer.control <> "start"
+    m.sendImpressionEventTimer.control = "start"
+  end if
 End Function
 
 
@@ -2995,7 +3007,10 @@ Function sendImpressionEvent()
   }
 
   m.sendImpressionEventTimer.control = "stop"
-  m.sendImpressionEventTimer.control = "start"
+  ' For now since we are tracking only in home screen restarting only if the user is home screen.
+  if isCurrentScreenHomeScreen() = true
+    m.sendImpressionEventTimer.control = "start"
+  end if
 End Function
 
 
