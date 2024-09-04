@@ -1,11 +1,9 @@
 Function init()
-  m._ = rodash()
   '//This var is used to know when to send tracking info. Do not send focus tracking info when the grid is 1st loaded
   m.contentLoadedAndFocused = false
   m.constants = getConstantsFromGlobal()
 
   m.Tracking = TubiTrackingInfo(m.constants)
-  m.experiments = TubiExperiments(m.constants)
 
   '//if there is a sponsorship, then this will be changed to the number of pixels that some UI assets and the slide animation need to be adjusted vertically.
   m.nSponsorshipYDelta = 0

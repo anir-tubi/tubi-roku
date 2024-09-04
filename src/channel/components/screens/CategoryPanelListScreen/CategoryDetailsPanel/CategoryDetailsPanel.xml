@@ -15,18 +15,15 @@
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/UserMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
-  <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
-  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/ArrayUtils.brs" />
