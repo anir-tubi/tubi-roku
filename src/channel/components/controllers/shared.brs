@@ -144,3 +144,15 @@ Function onUpdatedAuthRetrieved()
     node.authUpdated = true
   end for
 End Function
+
+
+' Helper function to log a user out of the app by calling the TubiAuthUpdate.logout function but also setting the getAuthOperationInProgress flag to true to prevent duplicate auth requests.
+Function logout(callback = invalid)
+  m.getAuthOperationInProgress = true
+
+  m.tubiAuthUpdate.logout(onUpdatedAuthRetrieved)
+
+  if isFunction(callback)
+    callback()
+  end if
+End Function

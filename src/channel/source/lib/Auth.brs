@@ -42,7 +42,7 @@ Function TubiAuthUpdate(constants)
     ' public methods
     initOrUpdateAuthInfo: tubiAuth_initOrUpdateAuthInfo
     setAuthInfo: tubiAuth_setAuthInfo
-    logout: tubiAuth_logout
+    logout: tubiAuth_logout ' Should only be called internally or by logout() in shared.brs
     updateAuthInfoWithAge: tubiAuth_updateAuthInfoWithAge
     transferRefreshToken: tubiAuth_transferRefreshToken
     handleRegistration: tubiAuth_handleRegistration

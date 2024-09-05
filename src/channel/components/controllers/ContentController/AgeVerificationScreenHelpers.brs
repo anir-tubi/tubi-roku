@@ -529,7 +529,8 @@ Function handle_422_451_error(callback)
   ' 422: the user is not old enough to use Tubi except in kids mode according to COPPA (US only)
   ' 451: the user is not old enough to use Tubi except in kids mode for some international reasons
   m.guestUserHasAgeInfo = setGuestUserHasAgeInfo(false)
-  m.tubiAuthUpdate.logout()
+
+  logout()
   setUiMode(m.constants.ui.modes.kidsAgeGate) ' setting ui mode to kids Age gate
 
   callback() ' redirecting to kidsMode before showing enterKidsMode modal, so that user will be aware what the experience will be
@@ -813,10 +814,10 @@ Function onBirthdayCheckError(errorInfo)
       ' 451 signifies the user is too young internationally
       ' logout the user and prepare them for age gated kids mode
       setGuestUserHasAgeInfo(false)
-      m.tubiAuthUpdate.logout(runControllerStartSequence)
+      logout(runControllerStartSequence)
     else
       ' all other error codes, log the user out and show "couldn't log you in error message"
-      m.tubiAuthUpdate.logout()
+      logout()
 
       userErrorCode = getUserFacingErrorCode("12", "100", code.toStr())
       message = getTranslation("error_check_birthdate_description")
@@ -888,7 +889,7 @@ End Function
 
 Function resetAuthStateOnAgeGateError()
   m.guestUserHasAgeInfo = setGuestUserHasAgeInfo(false)
-  m.tubiAuthUpdate.logout()
+  logout()
 End Function
 
 

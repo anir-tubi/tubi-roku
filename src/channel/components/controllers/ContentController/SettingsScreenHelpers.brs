@@ -112,7 +112,7 @@ Function onSignOutModalSelected()
     silenceCallbackWarnings: true
   })
   setSettingsScreenSignInInfo()
-  m.tubiAuthUpdate.logout(onSignOutCompleted)
+  logout(onSignOutCompleted)
 
   m.NodeHelpers.removeAllChildren(m.global.bookmarkIds)
   m.NodeHelpers.removeAllChildren(m.global.historyIds)
