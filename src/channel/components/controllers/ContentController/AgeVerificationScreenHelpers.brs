@@ -529,8 +529,10 @@ Function handle_422_451_error(callback)
   ' 422: the user is not old enough to use Tubi except in kids mode according to COPPA (US only)
   ' 451: the user is not old enough to use Tubi except in kids mode for some international reasons
   m.guestUserHasAgeInfo = setGuestUserHasAgeInfo(false)
-  m.tubiAuthUpdate.logout(callback) ' redirecting to kidsMode after we logout, so that user will be aware what the experience will be
+  m.tubiAuthUpdate.logout()
   setUiMode(m.constants.ui.modes.kidsAgeGate) ' setting ui mode to kids Age gate
+
+  callback() ' redirecting to kidsMode before showing enterKidsMode modal, so that user will be aware what the experience will be
 
   currentScreen = getCurrentScreen()
   if m.uiMode = m.constants.ui.modes.kidsAgeGate then
