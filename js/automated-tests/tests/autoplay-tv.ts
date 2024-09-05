@@ -40,8 +40,11 @@ describe('Autoplay TV', function () {
 
         await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
         await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
+        await ecp.sendKeypress(ecp.Key.Down);
+
     
         // Trigger Series Autoplay
+        await ecp.sendKeypress(ecp.Key.Play,  {wait:5000});
         await triggerSeriesAutoplay();
 
         // Autoplay triggered?
@@ -49,14 +52,13 @@ describe('Autoplay TV', function () {
 
         // Is next episode playing?
         await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 16000);
-        await ecp.sendKeypress(ecp.Key.Play);
 
         // Play Next Episode
         await triggerSeriesAutoplay();
 
         // Autoplay triggered?
         await checkForAutoPlayTrigger();
-        await ecp.sendKeypress(ecp.Key.Play);
+        await ecp.sendKeypress(ecp.Key.Ok);
 
         // Is next episode playing?
         await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 20000);
@@ -110,10 +112,11 @@ describe('Autoplay TV', function () {
 async function triggerSeriesAutoplay() {
     //Play title, seek to autoplay cue point
     
-    await ecp.sendKeypress(ecp.Key.Play);
+   // await ecp.sendKeypress(ecp.Key.Play,  {wait:5000});
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
-    await ecp.sendKeypress(ecp.Key.Play);
+    await ecp.sendKeypress(ecp.Key.Play,  {wait: 2000});
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','paused');
+    await utils.sleep(2000);
     await testUtils.seekPlayerToRelativePosition('videoPlayerScreen', 0, 'end');
 }
 

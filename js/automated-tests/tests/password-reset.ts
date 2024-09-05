@@ -24,17 +24,17 @@ describe('Sign In: On-Device Password Reset', function () {
     expect(signInScreenPageHeader.text).to.equal('Sign In to Your Account');
 
     // Enter password
-    await ecp.sleep(3000)
-    await ecp.sendKeypress(ecp.Key.Ok)
+    await ecp.sleep(3000);
+    await ecp.sendKeypress(ecp.Key.Ok);
     await ecp.sendText('111111');
     await utils.sleep(3000);
     await ecp.sendKeypress(ecp.Key.Right);
     await ecp.sendKeypress(ecp.Key.Down, {count:4});
-    await ecp.sleep(3000)
+    await ecp.sleep(3000);
     await ecp.sendKeypress(ecp.Key.Ok);   
 
     // Verify on home page
-    await testUtils.waitForCurrentScreenToEqual("homeScreen")
+    await testUtils.waitForCurrentScreenToEqual('homeScreen');
   });
 
 // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/476628
@@ -57,17 +57,17 @@ describe('Sign In: On-Device Password Reset', function () {
     expect(signInScreenPageHeader.text).to.equal('Sign In to Your Account');
 
     // Enter wrong password
-    await ecp.sleep(3000)
-    await ecp.sendKeypress(ecp.Key.Ok)
+    await ecp.sleep(3000);
+    await ecp.sendKeypress(ecp.Key.Ok);
     await ecp.sendText('222222');
     await utils.sleep(3000);
     await ecp.sendKeypress(ecp.Key.Right);
     await ecp.sendKeypress(ecp.Key.Down, {count:4});
-    await ecp.sleep(3000)
+    await ecp.sleep(3000);
     await ecp.sendKeypress(ecp.Key.Ok);   
 
     // Oops! wrong password! screen is displayed
-    await verifyWrongPasswordDialogDisplayed()
+    await verifyWrongPasswordDialogDisplayed();
   });
 
 // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/476629
@@ -89,22 +89,22 @@ describe('Sign In: On-Device Password Reset', function () {
     expect(signInScreenPageHeader.text).to.equal('Sign In to Your Account');
 
     // Enter wrong password
-    await ecp.sleep(3000)
-    await ecp.sendKeypress(ecp.Key.Ok)
+    await ecp.sleep(3000);
+    await ecp.sendKeypress(ecp.Key.Ok);
     await ecp.sendText('222222');
     await utils.sleep(3000);
     await ecp.sendKeypress(ecp.Key.Right);
     await ecp.sendKeypress(ecp.Key.Down, {count:4});
-    await ecp.sleep(3000)
+    await ecp.sleep(3000);
     await ecp.sendKeypress(ecp.Key.Ok);   
 
     // Oops! wrong password! screen is displayed
-    await verifyWrongPasswordDialogDisplayed()
+    await verifyWrongPasswordDialogDisplayed();
 
-    await ecp.sendKeypress(ecp.Key.Ok)
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify on the Help is on the way! screen
-    await testUtils.waitForCurrentScreenToEqual("forgotPasswordProcessingScreen")
+    await testUtils.waitForCurrentScreenToEqual('forgotPasswordProcessingScreen')
     const helpOnTheWayTitle = await testUtils.getNodeForElement('helpIsOnTheWayScreenTitle')
     expect(helpOnTheWayTitle.text).to.equal('Help is on the way!')
   });

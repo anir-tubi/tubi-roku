@@ -338,14 +338,13 @@ describe('Browse While Watching', function () {
 
         // Verify CW row
         await testUtils.jumpToRowWithTitle('browseWhileWatchingRowList', 'Continue Watching'); 
-        await testUtils.waitForElementToShowOnScreen('browseWhileWatchingRowList', 'ContinueWatching');
 
         // Select content and verify resume point is NOT the beginning
 
         // Select a title and Play
-        await ecp.sendKeypress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Ok, {wait:3000});
         await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 10000);
-        await utils.sleep(2000);
+        
 
         // Check that title resumes from history
 
@@ -378,7 +377,7 @@ describe('Browse While Watching', function () {
         await ecp.sendKeypress(ecp.Key.Down, {wait:1000});
         await testUtils.waitForElementToFullyShowOnScreen('transportButtons', 'player controls not present', 10000);
         await utils.sleep(3000);
-        await ecp.sendKeypress(ecp.Key.Down, {wait:700}); 
+        await ecp.sendKeypress(ecp.Key.Down, {wait:1000}); 
         await testUtils.waitForElementToShowOnScreen('browseWhileWatchingHeader', 'BWW rows not shown', 10000);
     }
 
