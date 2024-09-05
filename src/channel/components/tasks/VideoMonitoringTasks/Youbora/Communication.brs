@@ -61,8 +61,6 @@ sub _run()
 				m.requestHost = m.top.requestHost
             	setHost(m.requestHost)
             else if msg.getField() = "nextView"
-              'bs:disable-next-line LINT1005
-            	dict = msg.getData()
             	_nextView()
 			else if msg.getField() = "close"
 				exit while

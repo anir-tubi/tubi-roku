@@ -28,6 +28,8 @@
 
         <field id = "session" type = "assocarray" />
 
+        <field id = "productAnalytics" type = "assocarray" />
+
         <!-- Determines if the plugin is actively listening for events. (READ-ONLY) -->
         <field id = "monitoring" type = "boolean" />
 
@@ -40,5 +42,7 @@
     <script type="text/brightscript" uri="./ViewManager.brs"/>
     <script type="text/brightscript" uri="./Request.brs"/>
     <script type="text/brightscript" uri="./InfoManager.brs"/>
+
+    <script type="text/brightscript" uri="./YBProductAnalytics.brs"/>
 
 </component>

@@ -20,6 +20,7 @@ sub YouboraLog(message as String, contextName as String)
             print "[" + timeStamp + "] (" + contextName + ") " + message
         endif
     catch e
+        print "[Youbora error]: " + e
     end try
 end sub
 

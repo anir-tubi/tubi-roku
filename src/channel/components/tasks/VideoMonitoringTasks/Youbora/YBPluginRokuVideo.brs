@@ -9,7 +9,7 @@ end sub
 sub startMonitoring()
 
     m.pluginName = "RokuVideo"
-    m.pluginVersion = "6.6.10-" + m.pluginName
+    m.pluginVersion = "6.6.14-" + m.pluginName
 
     ' Let's cache the segment used on the bitrate to access less to it
     m.bitrateSegment = invalid
@@ -27,6 +27,7 @@ sub startMonitoring()
         m.top.videoplayer.observeFieldScoped("state", m.port)
         m.top.videoplayer.observeFieldScoped("bufferingStatus", m.port)
         m.top.videoplayer.observeFieldScoped("downloadedSegment", m.port)
+        m.productAnalytics.adapterAfterSet()
     else
         m.top.observeFieldScoped("videoplayer", m.port)
     end if
@@ -54,6 +55,7 @@ function getParamsVideoError()
         end if
         return params
     catch e
+        YouboraLog("[Youbora error]: " + e, "YBPluginRokuVideo")
         return {}
     end try
 end function
@@ -83,6 +85,7 @@ sub updatePlayer (player as object, unobserveGlobalScope as boolean)
                 m.top.videoplayer.unobserveFieldScoped("downloadedSegment")
             end if
             m.top.videoplayer = invalid
+            m.productAnalytics.adapterBeforeRemove()
         end if
         
         if player <> invalid
@@ -270,6 +273,7 @@ sub setNewPlayer()
             m.top.videoplayer.observeFieldScoped("state", m.port)
             m.top.videoplayer.observeFieldScoped("bufferingStatus", m.port)
             m.top.videoplayer.observeFieldScoped("downloadedSegment", m.port)
+            m.productAnalytics.adapterAfterSet()
         end if
     catch e
         YouboraLog("Exception adding player observers: " + e.message, "YBPluginRokuVideo")
@@ -426,6 +430,8 @@ function getBitrate()
         end if
     catch e
         YouboraLog("Exception on getBitrate method: " + e.message, "YBPluginRokuVideo")
+        YouboraLog("Check if videoplayer exists: ", "YBPluginRokuVideo")
+        YouboraLog(m.top.videoplayer, "YBPluginRokuVideo")
     end try
 
     return br

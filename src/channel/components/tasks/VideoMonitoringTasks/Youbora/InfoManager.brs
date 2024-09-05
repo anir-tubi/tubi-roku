@@ -442,12 +442,33 @@ end function
 
 function InfoManager_getEntities() as object
     return {
-        "rendition": m.getRendition(),
-        "title": m.getTitle(),
-        "program": m.options["content.program"],
-        "cdn": m.options["content.cdn"],
-        "subtitles": m.getSubtitles(),
-        "contentLanguage": m.options["content.language"]
+      "rendition": m.getRendition(),
+      "title": m.getTitle(),
+      "program": m.options["content.program"],
+      "cdn": m.options["content.cdn"],
+      "subtitles": m.getSubtitles(),
+      "contentLanguage": m.options["content.language"],
+      "contentId": m.options["content.id"],
+      "param1": m.options["content.customDimension.1"],
+      "param2": m.options["content.customDimension.2"],
+      "param3": m.options["content.customDimension.3"],
+      "param4": m.options["content.customDimension.4"],
+      "param5": m.options["content.customDimension.5"],
+      "param6": m.options["content.customDimension.6"],
+      "param7": m.options["content.customDimension.7"],
+      "param8": m.options["content.customDimension.8"],
+      "param9": m.options["content.customDimension.9"],
+      "param10": m.options["content.customDimension.10"],
+      "param11": m.options["content.customDimension.11"],
+      "param12": m.options["content.customDimension.12"],
+      "param13": m.options["content.customDimension.13"],
+      "param14": m.options["content.customDimension.14"],
+      "param15": m.options["content.customDimension.15"],
+      "param16": m.options["content.customDimension.16"],
+      "param17": m.options["content.customDimension.17"],
+      "param18": m.options["content.customDimension.18"],
+      "param19": m.options["content.customDimension.19"],
+      "param20": m.options["content.customDimension.20"]
     }
 end function
 
@@ -542,6 +563,7 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("properties") = false then outParams["properties"] = m.options["content.metadata"]
         if outParams.DoesExist("cdn") = false then outParams["cdn"] = m.options["content.cdn"]
         if outParams.DoesExist("program") = false then outParams["program"] = m.options["content.program"]
+        if outParams.DoesExist("package") = false then outParams["package"] = m.options["content.package"]
         if outParams.DoesExist("saga") = false then outParams["saga"] = m.options["content.saga"]
         if outParams.DoesExist("tvshow") = false then outParams["tvshow"] = m.options["content.tvShow"]
         if outParams.DoesExist("season") = false then outParams["season"] = m.options["content.season"]
@@ -645,7 +667,7 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("adPlayhead") = false then outParams["adPlayhead"] = m.getAdPlayhead()
         if outParams.DoesExist("adNumber") = false then outParams["adNumber"] = m.getAdNumber()
         if outParams.DoesExist("adNumberInBreak") = false then outParams["adNumberInBreak"] = m.getAdNumberInBreak()
-        if outParams.DoesExist("adnalyzerVersion") = false then outParams["adnalyzerVersion"] = "6.6.10 Roku Adnalyzer"
+        if outParams.DoesExist("adnalyzerVersion") = false then outParams["adnalyzerVersion"] = "6.6.11 Roku Adnalyzer"
         'Extra params
         nextraparams = 10
         index = 1

@@ -11,7 +11,7 @@ function ViewManager(_infoManager as Object, plugin) As Object
 
     'Fields
 		this.isInitiated = false
-	this.isStartSent = false
+    this.isStartSent = false
 		this.isJoinSent = false
 		this.isPaused = false
 		this.isSeeking = false

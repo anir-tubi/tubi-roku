@@ -7,10 +7,11 @@ sub init()
 
     m.port = createObject("roMessagePort")
     m.top.observeField("event", m.port)
-    m.top.ObserveField("adevent", m.port)
-    m.top.ObserveField("imaadevent", m.port)
+    m.top.observeField("adevent", m.port)
+    m.top.observeField("imaadevent", m.port)
     m.top.observeField("options", m.port)
     m.top.observeField("session", m.port)
+    m.top.observeField("productAnalytics", m.port)
     m.top.observeField("updateplayer", m.port)
 
     'Public methods
@@ -64,8 +65,9 @@ sub init()
 
     m.eventHandler = eventHandler
 
-    'Extra to trick beat timer with ping timer
-    m.totalPingTimer = 0
+    ' Product Analytics
+
+    m.productAnalytics = YBProductAnalytics(m)
 
 end sub
 
@@ -74,7 +76,7 @@ sub _run()
     YouboraLog("YBPluginGeneric.brs - run", "YBPluginGeneric")
 
     m.pluginName = "Generic"
-    m.pluginVersion = "6.6.10-" + m.pluginName
+    m.pluginVersion = "6.6.14-" + m.pluginName
 
     m.infoManager = InfoManager(m)
     setOptions(m.top.options)
@@ -83,23 +85,25 @@ sub _run()
     m.viewManager = ViewManager(m.infoManager, m)
     startMonitoring()
 
-    'Create timer for pings
+    'Create timer for video pings
+
     m.pingTimer = CreateObject("roSGNode", "Timer")
-    pingTimerFields = {}
-    pingTimerFields["duration"] = 5
-    pingTimerFields["repeat"] = true
-    m.pingTimer.setFields(pingTimerFields)
-    m.pingTimer.ObserveField("fire", m.port)
+    m.pingTimer.setFields({"id": "timerPing", "duration": 5, "repeat": true})
+    m.pingTimer.observeField("fire", m.port)
+
+    'Create timer for session beats
 
     m.beatTimer = CreateObject("roSGNode", "Timer")
-    beatTimerFields = { "duration" : 30, "repeat" : true }
-    m.beatTimer.setFields(beatTimerFields)
-    m.beatTimer.ObserveField("fire", m.port)
+    m.beatTimer.setFields({"id": "timerBeat", "duration": 30, "repeat": true})
+    m.beatTimer.observeField("fire", m.port)
+
+    'Set started flags
 
     m.isStarted = false
     m.isAdStarted = false
 
     'Endless loop to listen for events
+
     while true
 
         try
@@ -122,18 +126,21 @@ sub _run()
                         invokeHandler(msg.getData())
                     end if
                 else if msg.getField() = "fire" 'Timer callback
-                    'm.viewManager.pingCallback()
-                    if m.pingTimer.control = "stop" or m.pingTimer.control = "none"
-                        m.viewManager.beatCallback()
-                    else
-                        m.viewManager.pingCallback()
-                        if (m.totalPingTimer = 30 or m.totalPingTimer > 25)
-                            m.viewManager.beatCallback()
-                            m.totalPingTimer = 0
-                        else
-                            m.totalPingTimer = m.totalPingTimer + 5
-                        end if
-                    end if
+
+                  if msg.getRoSGNode().id = "timerHighlight"
+                    ' Highlight timer is a one time timer
+                    m.productAnalytics.trackContentHighlight()
+                  else if msg.getRoSGNode().id = "timerUserState"
+                    ' User state timer is a one time timer
+                    m.productAnalytics.setPassive()
+                  else if msg.getRoSGNode().control <> "start"
+                    ' Recurring timer is stopped: we shouldn't be here
+                  else if msg.getRoSGNode().id = "timerBeat"
+                    m.viewManager.beatCallback()
+                  else if msg.getRoSGNode().id = "timerPing"
+                    m.viewManager.pingCallback()
+                  end if
+
                 else if msg.getField() = "options"
                     opt = msg.getData()
                     setOptions(opt)
@@ -146,6 +153,8 @@ sub _run()
                     invokeImaAdHandler(msg.getData())
                 else if msg.getField() = "session"
                     onSessionEvent(msg.getData())
+                  else if msg.getField() = "productAnalytics"
+                    onProductAnalyticsEvent(msg.getData())
                 end if
             else if (mt = "roUrlEvent") '/data response
                 code = msg.GetResponseCode()
@@ -168,17 +177,13 @@ sub _run()
 end sub
 
 sub _stop()
-
     'stopMonitoring()
-
 end sub
 
 sub setNewPlayer()
-
 end sub
 
 sub _taskListener(state)
-
 end sub
 
 'This method should be overriden in the specific plugin in order to process
@@ -268,7 +273,6 @@ function getPlayerVersion()
 end function
 
 sub startPingTimer()
-    'm.beatTimer.control = "stop"
     m.pingTimer.control = "start"
 end sub
 
@@ -298,19 +302,24 @@ end function
 
 sub eventHandler(event as string, params = invalid)
     if event = "init"
+        m.viewManager.isFinished = false
         m.viewManager.sendRequest("init", params)
     else if event = "play"
+        m.viewManager.isFinished = false
         if (m.infoManager.getTitle() <> invalid and m.infoManager.getTitle() <> "") and (m.infoManager.getResource() <> invalid and m.infoManager.getResource() <> "Unknown") and (m.infoManager.getIsLive() = true or m.infoManager.getMediaDuration() <> 0) and m.isStarted = false and m.isExtraMetadataReady() = true or (m.isExtraMetadataReady() = true and m.viewManager.isJoinSent = true)
             m.viewManager.sendRequest("start", params)
             m.isStarted = true
+            m.productAnalytics._adapterTrackStart()
         else if m.viewManager.isInitiated = false and m.isStarted = false
             m.viewManager.sendRequest("init", params)
             m.viewManager.isInitiated = true
         end if
     else if event = "join"
+        m.viewManager.isFinished = false
         if m.viewManager.isInitiated = true and m.isStarted = false and m.isExtraMetadataReady()
             m.viewManager.sendRequest("start", params) ' No need to check if it has been sent or not, ViewManager will take care of that
             m.isStarted = true
+            m.productAnalytics._adapterTrackStart()
         end if
         m.viewManager.sendRequest("join", params)
     else if event = "pause"
@@ -734,6 +743,7 @@ end sub
 
 sub setOptions(options = invalid)
     if options <> invalid
+        options.Append(m.productAnalytics.getOptions())
         m.infoManager.options = options
     end if
 end sub
@@ -792,7 +802,7 @@ sub onSessionEvent(sessionEvent as object)
             if type(event) = "roString"
                 if event = "start"
                     event = "sessionStart"
-                    params = { screeName: sessionEvent.sc, dimensions: sessionEvent.dim }
+                    params = { page: sessionEvent.sc, dimensions: sessionEvent.dim }
                 else if event = "stop"
                     event = "sessionStop"
                 else if event = "error"
@@ -824,4 +834,69 @@ sub onSessionEvent(sessionEvent as object)
     catch e
         YouboraLog("Exception on onSessionEvent: " + e.message, "YBPluginGeneric")
     end try
+end sub
+
+' Handle Product Analytics events
+
+sub onProductAnalyticsEvent(arguments as object)
+
+  try
+
+    if type(arguments) = "roAssociativeArray"
+
+        method = arguments.method
+
+        if type(method) <> "roString"
+          YouboraLog("Method unset", "Product Analytics")
+        else if method = "initialize"
+          m.productAnalytics.initialize(arguments.page, arguments.productAnalyticsSettings)
+        else if method = "newSession"
+          m.productAnalytics.newSession()
+        else if method = "endSession"
+          m.productAnalytics.endSession()
+        else if method = "setUserProfile"
+          m.productAnalytics.setUserProfile(arguments.profileId, arguments.profileType, arguments.dimensions, arguments.metrics)
+        else if method = "trackNavByName"
+          m.productAnalytics.trackNavByName(arguments.page, arguments.dimensions, arguments.metrics)
+        else if method = "trackAttribution"
+          m.productAnalytics.trackAttribution(arguments.utmSource, arguments.utmMedium, arguments.utmCampaign, arguments.utmTerm, arguments.utmContent, arguments.dimensions, arguments.metrics)
+        else if method = "trackSectionIn"
+          m.productAnalytics.trackSectionIn(arguments.section, arguments.sectionOrder, arguments.dimensions, arguments.metrics)
+        else if method = "trackSectionOut"
+          m.productAnalytics.trackSectionOut(arguments.section, arguments.sectionOrder, arguments.dimensions, arguments.metrics)
+        else if method = "contentFocusIn"
+          m.productAnalytics.contentFocusIn(arguments.section, arguments.sectionOrder, arguments.column, arguments.row, arguments.contentID, arguments.dimensions, arguments.metrics)
+        else if method = "contentFocusOut"
+          m.productAnalytics.contentFocusOut()
+        else if method = "trackContentClick"
+          m.productAnalytics.trackContentClick(arguments.section, arguments.sectionOrder, arguments.column, arguments.row, arguments.contentID, arguments.dimensions, arguments.metrics)
+        else if method = "trackPlay"
+          m.productAnalytics.trackPlay(arguments.contentID, arguments.dimensions, arguments.metrics)
+        else if method = "trackPlayerInteraction"
+          m.productAnalytics.trackPlayerInteraction(arguments.eventName, arguments.dimensions, arguments.metrics, false)
+        else if method = "trackSearchQuery"
+          m.productAnalytics.trackSearchQuery(arguments.searchQuery, arguments.dimensions, arguments.metrics)
+        else if method = "trackSearchResult"
+          m.productAnalytics.trackSearchResult(arguments.resultCount, arguments.searchQuery, arguments.dimensions, arguments.metrics)
+        else if method = "trackSearchClick"
+          m.productAnalytics.trackSearchClick(arguments.section, arguments.sectionOrder, arguments.column, arguments.row, arguments.contentID, arguments.searchQuery, arguments.dimensions, arguments.metrics)
+        else if method = "trackExternalAppLaunch"
+          m.productAnalytics.trackExternalAppLaunch(arguments.appName, arguments.dimensions, arguments.metrics)
+        else if method = "trackExternalAppExit"
+          m.productAnalytics.trackExternalAppExit(arguments.appName, arguments.dimensions, arguments.metrics)
+        else if method = "trackEngagementEvent"
+          m.productAnalytics.trackEngagementEvent(arguments.eventName, arguments.contentID, arguments.dimensions, arguments.metrics)
+        else if method = "trackEvent"
+          m.productAnalytics.trackEvent(arguments.eventName, arguments.dimensions, arguments.metrics)
+        else
+          YouboraLog("Unhandled method", "Product Analytics")
+        end if
+
+    end if
+
+  catch e
+
+      YouboraLog("Exception on onProductAnalyticsEvent: " + e.message, "YBPluginGeneric")
+
+  end try
 end sub
