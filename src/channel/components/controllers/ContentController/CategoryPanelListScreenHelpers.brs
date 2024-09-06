@@ -306,7 +306,7 @@ Function refreshCategoryPanelListDetailScreen(screen)
   if focusedItem <> invalid
     screen.isCategoryLoading = true
     if focusedItem.id = m.constants.ui.categoryIds.queue AND isLoggedInUser() = false
-      displaySignInRequiredModal(screen.categoryTrackingPageInfo)
+      displaySignInRequiredModal(screen)
     else
 
       categoryContent = getFromContentCache(focusedItem.id)
@@ -387,7 +387,7 @@ Function onCategoryPanelSignInRequired(msg)
   screen = msg.getRoSGNode()
 
   if screen <> invalid AND screen.categoryContent = invalid
-    displaySignInRequiredModal(screen.categoryTrackingPageInfo) 
+    displaySignInRequiredModal(screen) 
   end if
 End Function
 

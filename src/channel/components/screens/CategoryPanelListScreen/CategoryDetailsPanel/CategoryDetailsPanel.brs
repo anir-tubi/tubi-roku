@@ -373,9 +373,7 @@ Function onKeyEvent(key, press) as Boolean
     if key = "play"
       handlePlayInput()
       handled = true
-    end if
-  else
-    if key = "back"
+    else if key = "back"
       ' show SignInRequired modal when guest user presses back from ActivationCodeScreen to CategoryDetailsScreen
       if isLoggedInUser() = false then
         m.top.signInRequired = true
