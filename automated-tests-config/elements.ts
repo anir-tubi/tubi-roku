@@ -2410,6 +2410,11 @@ const elements = typeCheckElements({
   // OK Button on the Welcome To Tubi Kids Dialog
   welcomeToTubiKidsOKButton: {
     keyPath: '#ContentController.#9a73203.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonTextFocused'
+  },
+
+  // Loading Progress Bar
+  loadingProgressBar: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#Loading.#LoadingProgressBar'
   }
 });
 

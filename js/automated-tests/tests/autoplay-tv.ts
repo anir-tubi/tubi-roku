@@ -9,6 +9,7 @@ describe('Autoplay TV', function () {
         await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
         await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
 
+        await ecp.sendKeypress(ecp.Key.Play,  {wait:5000});
         // Trigger Series Autoplay
         await triggerSeriesAutoplay();
 
@@ -24,12 +25,15 @@ describe('Autoplay TV', function () {
         await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
         await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
+        await ecp.sendKeypress(ecp.Key.Play,  {wait:5000});
         // Trigger Series Autoplay
         await triggerSeriesAutoplay();
 
         // Autoplay triggered?
         await checkForAutoPlayTrigger();
 
+        // Has autoplay container disappeared?
+        await testUtils.waitForElementFieldToEqual('autoPlayContentPoster', 'itemHasfocus', false, 20000);
         // Is next episode playing?
         await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 16000);
 
@@ -49,17 +53,24 @@ describe('Autoplay TV', function () {
 
         // Autoplay triggered?
         await checkForAutoPlayTrigger();
-
-        // Is next episode playing?
-        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 16000);
+        // Wait for count down end
+        await testUtils.waitForElementFieldToEqual('autoPlayContentPoster', 'itemHasfocus', false, 20000);
+        
+        // Is next episode playing? Wait for loading bar to make sure it is playing the next episode
+        await testUtils.waitForElementToFullyShowOnScreen('loadingProgressBar');
+        await testUtils.waitForElementToNotShowOnScreen('loadingProgressBar');
+        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
 
         // Play Next Episode
         await triggerSeriesAutoplay();
 
         // Autoplay triggered?
         await checkForAutoPlayTrigger();
-        await ecp.sendKeypress(ecp.Key.Ok);
+        await testUtils.waitForElementFieldToEqual('autoPlayContentPoster', 'itemHasfocus', true);
+        await ecp.sendKeypress(ecp.Key.Play);
 
+        // Has autoplay container disappeared?
+        await testUtils.waitForElementFieldToEqual('autoPlayContentPoster', 'itemHasfocus', false);
         // Is next episode playing?
         await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 20000);
 
@@ -72,6 +83,7 @@ describe('Autoplay TV', function () {
         await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
         // Trigger Series Autoplay
+        await ecp.sendKeypress(ecp.Key.Play,  {wait:5000});
         await triggerSeriesAutoplay();
 
         // Autoplay triggered?
@@ -102,6 +114,7 @@ describe('Autoplay TV', function () {
         });
 
         //Play title, trigger autoplay
+        await ecp.sendKeypress(ecp.Key.Play,  {wait:5000});
         await triggerSeriesAutoplay();
 
         // Autoplay triggered?
@@ -112,9 +125,10 @@ describe('Autoplay TV', function () {
 async function triggerSeriesAutoplay() {
     //Play title, seek to autoplay cue point
     
-   // await ecp.sendKeypress(ecp.Key.Play,  {wait:5000});
+    // await ecp.sendKeypress(ecp.Key.Play,  {wait:5000});
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
-    await ecp.sendKeypress(ecp.Key.Play,  {wait: 2000});
+    await ecp.sleep(2000);
+    await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','paused');
     await utils.sleep(2000);
     await testUtils.seekPlayerToRelativePosition('videoPlayerScreen', 0, 'end');
