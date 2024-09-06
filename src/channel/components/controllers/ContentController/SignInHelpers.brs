@@ -785,6 +785,8 @@ Function onPostSignOutServerPersistentDataRefresh()
 
   setContentToRefreshAllPersonalizedScreens()
   setSideNavSignedInItem(authInfo)
+  refreshHomeScreenSideNav()
+
   'clear the linearVideoplayer so that locked content will not get played.
   stopAndHideLinearVideoPlayer()
   startChannel()
