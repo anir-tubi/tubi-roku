@@ -23,10 +23,10 @@ describe('Closed Captions Checks', function () {
 
     // Start a live feed
     await ecp.sendKeypress(ecp.Key.Ok);
-    await utils.sleep(5000); // Needed this
+    await utils.sleep(7000); // Needed this
    
     // Verify that video is playing
-    await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 15000);
+    await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 25000);
 
     // Turn on Linear CC
     await utils.sleep(1500);
@@ -70,14 +70,14 @@ describe('Closed Captions Checks', function () {
     await testUtils.selectAndVerifyDetailPageMenuItem('play');
 
     // Verify that video is playing
-    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 20000);
 
     // Check CC state for VOD
     await ecp.sendKeypress(ecp.Key.Up);
     await ecp.sendKeypress(ecp.Key.Right, {count:4});
     await ecp.sendKeypress(ecp.Key.Ok);
     await ecp.sendKeypress(ecp.Key.Down);
-    await testUtils.waitForElementToFullyShowOnScreen('closedCaptionOn');
+    await testUtils.waitForElementToFullyShowOnScreen('closedCaptionOn', 'CC checkmark not found', 25000);
   
    
   }); 

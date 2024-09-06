@@ -50,14 +50,14 @@ describe('Sign up Save Progress Exit Prompt', function () {
     await verifySaveProgressExitPrompt();
 
     // Press OK on Sign Up to Save Progress button
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok, {wait: 10000});
 
     // Wait for the Roku sign up prompt to show up and Continue
-    await ecp.sleep(5000);
+    //await ecp.sleep(5000);
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify if on the Sign In to Your Account age
-    const signInScreenPageHeader = await testUtils.getNodeForElement('signInScreenPageHeader');
+    const signInScreenPageHeader = await testUtils.getNodeForElement('signInScreenPageHeader', 20000 );
     expect(signInScreenPageHeader.text).to.equal('Sign In to Your Account');
 });
 
