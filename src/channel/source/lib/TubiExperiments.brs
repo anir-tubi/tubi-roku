@@ -26,7 +26,7 @@ Function TubiExperiments(experimentsInfo) as Object
       }
 
       roku_category_redesign: {
-        roku_category_redesign_v2: {"enabled": false}
+        roku_category_redesign_v2: {"enabled": true}
       }
 
       roku_linear_favorites: {
