@@ -126,39 +126,39 @@ it('C476634 - Register New User - Default Mode, @password_reset', async () => {
     await ecp.sendKeypress(ecp.Key.Back);
 
     // Verify if on the Enter Email Address Page
-    const enterEmailAddressTitle = await testUtils.getNodeForElement('emailInputScreenHeader')
-    expect(enterEmailAddressTitle.text).to.be.equal('Enter Email Address')
+    const enterEmailAddressTitle = await testUtils.getNodeForElement('emailInputScreenHeader');
+    expect(enterEmailAddressTitle.text).to.be.equal('Enter Email Address');
 
     // Enter a email account which has not been registered for Tubi
     const email = `build_roku_${Math.floor(Date.now() / 1000)}_${Math.floor(Math.random() * 1000)}@tubi.tv`;
-    await ecp.sleep(2000)
+    await ecp.sleep(2000);
     await ecp.sendText(email);
-    await ecp.sleep(3000)
-    await ecp.sendKeypress(ecp.Key.Down,{count: 4})
+    await ecp.sleep(3000);
+    await ecp.sendKeypress(ecp.Key.Down,{count: 4});
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify on Confirm your age page
-    const confirmYourAgeText = await testUtils.getNodeForElement('confirmYourAgeText')
+    const confirmYourAgeText = await testUtils.getNodeForElement('confirmYourAgeText');
     expect(confirmYourAgeText.text).to.equal('Confirm your age*');
 
     // enter age > 13
-    await ecp.sleep(2000)
-    await ecp.sendText('14')
+    await ecp.sleep(2000);
+    await ecp.sendText('14');
     await ecp.sleep(3000);
-    await ecp.sendKeypress(ecp.Key.Down,{count: 4})
-    await ecp.sleep(2000)
+    await ecp.sendKeypress(ecp.Key.Down,{count: 4});
+    await ecp.sleep(2000);
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify on Continue Watching Consent Page
-    const continueWatchingConsentPage = await testUtils.getNodeForElement('continueWatchingConsentPage')
+    const continueWatchingConsentPage = await testUtils.getNodeForElement('continueWatchingConsentPage');
     expect(continueWatchingConsentPage.text).to.equal('Get Back to What You Love Faster');
 
-    await testUtils.waitForElementToFullyShowOnScreen('continueWatchingConsentPageAcceptButton')
-    await ecp.sendKeypress(ecp.Key.Ok)
+    await testUtils.waitForElementToFullyShowOnScreen('continueWatchingConsentPageAcceptButton');
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify user back to home screen and signed in
-    await testUtils.waitForCurrentScreenToEqual('homeScreen')
-    await ecp.sendKeypress(ecp.Key.Left)
+    await testUtils.waitForCurrentScreenToEqual('homeScreen');
+    await ecp.sendKeypress(ecp.Key.Left);
     const sideNavSignedInLabel = await testUtils.getNodeForElement('sideNavSignedInLabel');
     expect(sideNavSignedInLabel.text).to.contain('Hi');
   });
@@ -180,26 +180,26 @@ it('C476635 - Register New User - Kids Mode, @password_reset', async () => {
     await ecp.sendKeypress(ecp.Key.Back);
 
     // Verify if on the Enter Email Address Page
-    const enterEmailAddressTitle = await testUtils.getNodeForElement('emailInputScreenHeader')
-    expect(enterEmailAddressTitle.text).to.be.equal('Enter Email Address')
+    const enterEmailAddressTitle = await testUtils.getNodeForElement('emailInputScreenHeader');
+    expect(enterEmailAddressTitle.text).to.be.equal('Enter Email Address');
 
     // Enter a email account which has not been registered for Tubi
     const email = `build_roku_${Math.floor(Date.now() / 1000)}_${Math.floor(Math.random() * 1000)}@tubi.tv`;
-    await ecp.sleep(2000)
+    await ecp.sleep(2000);
     await ecp.sendText(email);
-    await ecp.sleep(3000)
-    await ecp.sendKeypress(ecp.Key.Down,{count: 4})
+    await ecp.sleep(3000);
+    await ecp.sendKeypress(ecp.Key.Down,{count: 4});
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify on Confirm your age page
-    const confirmYourAgeText = await testUtils.getNodeForElement('confirmYourAgeText')
+    const confirmYourAgeText = await testUtils.getNodeForElement('confirmYourAgeText');
     expect(confirmYourAgeText.text).to.equal('Confirm your age*');
 
     // enter age < 13
-    await ecp.sleep(2000)
-    await ecp.sendText('12')
-    await ecp.sleep(3000)
-    await ecp.sendKeypress(ecp.Key.Down,{count: 4})
+    await ecp.sleep(2000);
+    await ecp.sendText('12');
+    await ecp.sleep(3000);
+    await ecp.sendKeypress(ecp.Key.Down,{count: 4});
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify on home screen with welcome to tubi kids dialog displayed
@@ -211,21 +211,20 @@ it('C476635 - Register New User - Kids Mode, @password_reset', async () => {
 
     // Press Ok to dismiss the dialog, verify user on the Kids mode Home screen
     await ecp.sendKeypress(ecp.Key.Ok);
-    await testUtils.waitForElementToFullyShowOnScreen('tubiKidsLogo')
+    await testUtils.waitForElementToFullyShowOnScreen('tubiKidsLogo');
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
-
   });
 
 
   async function verifyWrongPasswordDialogDisplayed() {
-    await testUtils.waitForElementToFullyShowOnScreen('wrongPasswordDialog')
-    const wrongPasswordDialogTitle = await testUtils.getNodeForElement('wrongPasswordTitle')
-    expect(wrongPasswordDialogTitle.text).to.equal('Oops, wrong Password')
-    const wrongPasswordDialogMessage = await testUtils.getNodeForElement('wrongPasswordMessage')
-    expect(wrongPasswordDialogMessage.text).to.contain("Let's try again or enter a different password for this account:")
-    const wrongPasswordDialogForgotButton = await testUtils.getNodeForElement('wrongPasswordForgotButton')
-    expect(wrongPasswordDialogForgotButton.text).to.equal("Forgot Password")
-    const wrongPasswordDialogRetryButton = await testUtils.getNodeForElement('wrongPasswordRetryButton')
-    expect(wrongPasswordDialogRetryButton.text).to.equal("Retry")
+    await testUtils.waitForElementToFullyShowOnScreen('wrongPasswordDialog');
+    const wrongPasswordDialogTitle = await testUtils.getNodeForElement('wrongPasswordTitle');
+    expect(wrongPasswordDialogTitle.text).to.equal('Oops, wrong Password');
+    const wrongPasswordDialogMessage = await testUtils.getNodeForElement('wrongPasswordMessage');
+    expect(wrongPasswordDialogMessage.text).to.contain("Let's try again or enter a different password for this account:");
+    const wrongPasswordDialogForgotButton = await testUtils.getNodeForElement('wrongPasswordForgotButton');
+    expect(wrongPasswordDialogForgotButton.text).to.equal("Forgot Password");
+    const wrongPasswordDialogRetryButton = await testUtils.getNodeForElement('wrongPasswordRetryButton');
+    expect(wrongPasswordDialogRetryButton.text).to.equal("Retry");
   }
 })
