@@ -57,10 +57,6 @@ Function TubiExperiments(experimentsInfo) as Object
         roku_browse_while_watching_ymal_v4 : {"enabled": true}
       }
 
-      roku_cuepoint_accuracy: {
-        roku_cuepoint_accuracy_content_v2 : {"enabled": true}
-      }
-
       roku_horizontal_menu:{
         roku_horizontal_menu_v1: {"enabled": false}
       }

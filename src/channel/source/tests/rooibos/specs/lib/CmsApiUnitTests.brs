@@ -150,7 +150,7 @@ Function cmsApi_createSingleContentReqInfo_test()
     "images[landscape_tb]"
   ]
 
-  singleContentUrl = m.cmsApi.constants.urls.cms.singleContent
+  singleContentUrl = m.cmsApi.constants.urls.content.singleContent
   singleContentOptions = {
     params: {
       "app_id": m.cmsApi.constants.settings.shortAppName
@@ -216,96 +216,6 @@ Function cmsApi_createSingleContentReqInfo_test()
   m.assertEqual(singleContentInfo.options.params["includeChannels"], singleContentOptions.params["includeChannels"])
   m.assertEqual(singleContentInfo.options.params["video_resources"], singleContentOptions.params["video_resources"])
   m.assertEqual(singleContentInfo.options.params["images[landscape_tb]"], singleContentOptions.params["images[landscape_tb]"])
-End Function
-
-
-'@Test unit tests createMultipleContentReqInfo
-Function cmsApi_createMultipleContentReqInfo_test()
-  infoKeys = [
-    "url"
-    "options"
-  ]
-  params = [
-    "app_id"
-    "platform"
-    "device_id"
-    "content_ids"
-    "isKidsMode"
-    "includeChannels"
-    "video_resources"
-    "images[landscape_tb]"
-  ]
-
-  imageParamTypes = [
-    "landscape"
-  ]
-
-  contentUrl = m.cmsApi.constants.urls.cms.multipleContent
-  contentOptions = {
-    params: {
-      "app_id": m.cmsApi.constants.settings.shortAppName
-      "platform": m.cmsApi.constants.platform
-      "device_id": m.cmsApi.constants.deviceInfo.deviceId
-      "content_ids": "123456,987654"
-      "isKidsMode": false
-      "includeChannels": true
-      "video_resources": m.cmsApi.constants.player.drmOrderWidevineHlsv6
-      "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largeLandscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largeLandscape[1].ToStr() + "_landscape"
-    }
-  }
-
-  ' include channels, no kids mode
-  contentInfo = m.cmsApi.createMultipleContentReqInfo(["123456", "987654"], true, false, imageParamTypes)
-
-  m.assertEqual(contentInfo.count(), 2)
-  m.assertAAHasKeys(contentInfo, infoKeys)
-  m.assertEqual(contentInfo.url, contentUrl)
-  m.assertAAHasKeys(contentInfo.options.params, params)
-  m.assertEqual(contentInfo.options.params["app_id"], contentOptions.params["app_id"])
-  m.assertEqual(contentInfo.options.params["platform"], contentOptions.params["platform"])
-  m.assertEqual(contentInfo.options.params["device_id"], contentOptions.params["device_id"])
-  m.assertEqual(contentInfo.options.params["content_ids"], contentOptions.params["content_ids"])
-  m.assertEqual(contentInfo.options.params["isKidsMode"], contentOptions.params["isKidsMode"])
-  m.assertEqual(contentInfo.options.params["includeChannels"], contentOptions.params["includeChannels"])
-  m.assertEqual(contentInfo.options.params["video_resources"], contentOptions.params["video_resources"])
-  m.assertEqual(contentInfo.options.params["images[landscape_tb]"], contentOptions.params["images[landscape_tb]"])
-
-  ' include channels, with kids mode
-  contentInfo = m.cmsApi.createMultipleContentReqInfo(["123456", "987654"], true, true, imageParamTypes)
-
-  contentOptions.params["isKidsMode"] = true
-
-  m.assertEqual(contentInfo.count(), 2)
-  m.assertAAHasKeys(contentInfo, infoKeys)
-  m.assertEqual(contentInfo.url, contentUrl)
-  m.assertAAHasKeys(contentInfo.options.params, params)
-  m.assertEqual(contentInfo.options.params["app_id"], contentOptions.params["app_id"])
-  m.assertEqual(contentInfo.options.params["platform"], contentOptions.params["platform"])
-  m.assertEqual(contentInfo.options.params["device_id"], contentOptions.params["device_id"])
-  m.assertEqual(contentInfo.options.params["content_ids"], contentOptions.params["content_ids"])
-  m.assertEqual(contentInfo.options.params["isKidsMode"], contentOptions.params["isKidsMode"])
-  m.assertEqual(contentInfo.options.params["includeChannels"], contentOptions.params["includeChannels"])
-  m.assertEqual(contentInfo.options.params["video_resources"], contentOptions.params["video_resources"])
-  m.assertEqual(contentInfo.options.params["images[landscape_tb]"], contentOptions.params["images[landscape_tb]"])
-
-  ' don't include channels, with kids mode
-  contentInfo = m.cmsApi.createMultipleContentReqInfo(["123456", "987654"], false, true, imageParamTypes)
-
-  contentOptions.params["includeChannels"] = false
-  contentOptions.params["isKidsMode"] = true
-
-  m.assertEqual(contentInfo.count(), 2)
-  m.assertAAHasKeys(contentInfo, infoKeys)
-  m.assertEqual(contentInfo.url, contentUrl)
-  m.assertAAHasKeys(contentInfo.options.params, params)
-  m.assertEqual(contentInfo.options.params["app_id"], contentOptions.params["app_id"])
-  m.assertEqual(contentInfo.options.params["platform"], contentOptions.params["platform"])
-  m.assertEqual(contentInfo.options.params["device_id"], contentOptions.params["device_id"])
-  m.assertEqual(contentInfo.options.params["content_ids"], contentOptions.params["content_ids"])
-  m.assertEqual(contentInfo.options.params["isKidsMode"], contentOptions.params["isKidsMode"])
-  m.assertEqual(contentInfo.options.params["includeChannels"], contentOptions.params["includeChannels"])
-  m.assertEqual(contentInfo.options.params["video_resources"], contentOptions.params["video_resources"])
-  m.assertEqual(contentInfo.options.params["images[landscape_tb]"], contentOptions.params["images[landscape_tb]"])
 End Function
 
 

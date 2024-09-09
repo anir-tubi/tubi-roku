@@ -485,16 +485,32 @@ Function getConstants()
       constants.urls.pauseAdsUrl = "https://ads.staging-public.tubi.io/pause/v1/" + constants.analyticsPlatform
     end if
 
-    'contents url
+    'contents cms url
     constants.urls.cms = {}
+    
       constants.urls.cms.urlBase = "https://uapi.adrise.tv/cms"
       if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
         constants.urls.cms.urlBase = "https://uapi.staging-public.tubi.io/cms"
       end if
-      constants.urls.cms.multipleContent = constants.urls.cms.urlBase + "/contents"
-      constants.urls.cms.singleContent = constants.urls.cms.urlBase + "/content"
+
       constants.urls.cms.relatedContent = constants.urls.cms.urlBase + "/content" ' + content_id + "/related"
       constants.urls.cms.thumbnails = constants.urls.cms.urlBase + "/content" ' + content_id + "/thumbnail_sprites"
+
+    'contents content url
+    constants.urls.content = {}
+
+      constants.urls.content.urlBase = "https://content.production-public.tubi.io/api"
+      if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
+        constants.urls.content.urlBase = "https://content.staging-public.tubi.io/api"
+      end if
+      constants.urls.content.singleContent = constants.urls.content.urlBase + "/v2/content"
+
+      'epgProgram url
+      constants.urls.content.epgProgramContentUrlBase = "https://content.production-public.tubi.io"
+      if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
+        constants.urls.content.epgProgramContentUrlBase = "https://content.staging-public.tubi.io"
+      end if
+      constants.urls.content.epgProgramContent = constants.urls.content.epgProgramContentUrlBase + "/epg/programming"
 
       'autopilot url
     constants.urls.autopilot = {}
@@ -669,21 +685,6 @@ Function getConstants()
 
     ' url for pinging Nielsen
     constants.urls.nielsenPing = "https://audit.imrworldwide.com/cgi-bin/gn"
-
-    constants.urls.content = {}
-
-      constants.urls.content.urlBase = "https://content.production-public.tubi.io/api"
-      if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
-        constants.urls.content.urlBase = "https://content.staging-public.tubi.io/api"
-      end if
-      constants.urls.content.singleContentV2 = constants.urls.content.urlBase + "/v2/content"
-
-      'epgProgram url
-      constants.urls.content.epgProgramContentUrlBase = "https://content.production-public.tubi.io"
-      if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
-        constants.urls.content.epgProgramContentUrlBase = "https://content.staging-public.tubi.io"
-      end if
-      constants.urls.content.epgProgramContent = constants.urls.content.epgProgramContentUrlBase + "/epg/programming"
 
     constants.urls.rokuContinueWatchingEndpoint = "https://userdata.sr.roku.com/user-data/v1/content/continueWatching"
 

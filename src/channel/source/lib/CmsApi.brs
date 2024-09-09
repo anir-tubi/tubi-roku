@@ -12,7 +12,6 @@ Function CmsApi(constants, apiUtils, experiments=invalid)
     createRelatedContentReqInfo: cmsApi_createRelatedContentReqInfo
     createUpNextContentReqInfo: cmsApi_createUpNextContentReqInfo
     createSingleContentReqInfo: cmsApi_createSingleContentReqInfo
-    createMultipleContentReqInfo: cmsApi_createMultipleContentReqInfo
     createThumbnailsReqInfo: cmsApi_createThumbnailsReqInfo
     createCategoriesListReqInfo: cmsApi_createCategoriesListReqInfo
     createHomeScreenReqInfo: cmsApi_createHomeScreenReqInfo
@@ -110,51 +109,12 @@ Function cmsApi_createSingleContentReqInfo(contentId, includeChannels=false, bKi
 
   capability = formatJson({"content_types" :["se"]})
   options.headers.append({"x-capability": capability})
-
-  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_cuepoint_accuracy", "roku_cuepoint_accuracy_content_v2").enabled = true
-    url = m.constants.urls.content.singleContentV2
-  else
-    url = m.constants.urls.cms.singleContent
-  end if
+  url = m.constants.urls.content.singleContent
 
   return {
     url: url
     options: options
   }
-End Function
-
-
-'''''''''''''''''''''
-' cmsApi_createMultipleContentReqInfo() - Get the Request Info Associated Array that will be used to get the video metadata associated with an array of video IDs
-' @aContentIds, array, An array of video IDs
-' @includeChannels: boolean Should the channel fields be returned as part of the results
-' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
-' @imageParamTypes: Array, An array of strings representing the image type: i.e. ["poster","landscape"]. What image types/sizes should be requested from the backend. If none are passed, then a default set of types will be used.
-Function cmsApi_createMultipleContentReqInfo(aContentIds, includeChannels=false, bKidsMode = false, imageParamTypes = invalid)
-  if aContentIds <> invalid and aContentIds.Count() > 0
-    options = m.getCommonOptions()
-
-    contentIds = aContentIds.join(",")
-    options.params["content_ids"] = contentIds
-    options.params["isKidsMode"] = bKidsMode
-    options.params["includeChannels"] = includeChannels
-    options.params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
-
-    if imageParamTypes = invalid
-      options.params = m.setTupianLandscapeParam(options.params)
-    else
-      options.params = m.setImageParams(imageParamTypes, options.params)
-    end if
-    capability = formatJson({"content_types" :["se"]})
-    options.headers.append({"x-capability": capability})
-
-    return {
-      url: m.constants.urls.cms.multipleContent
-      options: options
-    }
-  else
-    return invalid
-  end if
 End Function
 
 

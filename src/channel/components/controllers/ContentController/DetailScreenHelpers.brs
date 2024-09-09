@@ -486,9 +486,6 @@ Function getSingleContentFromServer(content, successCallback, errorCallback)
   tubiLog("DetailScreenHelpers.getSingleContentFromServer")
   if content <> invalid
 
-    'Fire exposure event when fetching content
-    getExperimentResource("roku_cuepoint_accuracy", "roku_cuepoint_accuracy_content_v2")
-
     singleRequestInfo = m.cmsApi.createSingleContentReqInfo(content.id, true, shouldKidsModeBeSentToServer())
     m.makeRequest({
       url: singleRequestInfo.url
