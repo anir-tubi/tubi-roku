@@ -94,6 +94,7 @@ Function onContentChange(data)
     end if
 
     onActiveChange()
+    onFocusPercentChange()
   end if
 End Function
 
@@ -102,21 +103,15 @@ Function onGridHasFocusChange()
   gridHasFocus = m.top.gridHasFocus
   m.focusedIcon.visible = gridHasFocus
   m.focusedLabel.visible = gridHasFocus
-  if gridHasFocus = true
-    '//if the list has gained focus, then reset the opacity as well.
-    onFocusPercentChange()
-  else
-    if m.top.itemContent.selected = true
-      m.Icon.opacity = 1
-      m.Icon.uri = m.top.itemContent.filledIconUrl
-    end if
-  end if
+  onFocusPercentChange()
 End Function
 
 
 Function onFocusPercentChange()
   itemContent = m.top.itemContent
   focusPercent = m.top.focusPercent
+  gridHasFocus = m.top.gridHasFocus
+
   m.focusedLabel.opacity = focusPercent
 
   if m.sideIconLabel <> invalid
@@ -124,33 +119,23 @@ Function onFocusPercentChange()
     m.sideIconLabel.opacity = 1 - focusPercent
   end if
 
-  if itemContent <> invalid
-    if itemContent.selected = true
-      if m.top.gridHasFocus = true
-        if itemContent.turnedOn = true
-          m.Icon.opacity = 1 - focusPercent
-        else
-          m.Icon.opacity = .31
-        end if
+  if itemContent <> invalid then
+    if itemContent.turnedOn = true then
+      if gridHasFocus = true then
+        m.Icon.opacity = 1 - focusPercent
         m.focusedIcon.opacity = focusPercent
-        m.Icon.uri = itemContent.filledIconUrl
-        m.focusedIcon.uri = itemContent.filledIconUrl
       else
-        m.focusedIcon.opacity = 1 - focusPercent
-        if itemContent.turnedOn = true
-          m.Icon.opacity = focusPercent
-        else
-          m.Icon.opacity = .31
-        end if
-        m.focusedIcon.uri = itemContent.iconUrl
+        m.Icon.opacity = 1
       end if
     else
-      if itemContent.turnedOn = true
-        m.Icon.opacity = 1 - focusPercent
-      else
-        m.Icon.opacity = .31
-      end if
       m.focusedIcon.opacity = focusPercent
+      m.Icon.opacity = .31
+    end if
+
+    if itemContent.selected = true then
+      m.Icon.uri = itemContent.filledIconUrl
+      m.focusedIcon.uri = itemContent.filledIconUrl
+    else
       m.Icon.uri = itemContent.iconUrl
       m.focusedIcon.uri = itemContent.iconUrl
     end if
