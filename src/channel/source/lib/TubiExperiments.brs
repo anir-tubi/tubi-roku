@@ -61,10 +61,6 @@ Function TubiExperiments(experimentsInfo) as Object
         roku_cuepoint_accuracy_content_v2 : {"enabled": true}
       }
 
-      roku_related_cuepoint: {
-        roku_related_cuepoint_v1 : {"enabled": true}
-      }
-
       roku_horizontal_menu:{
         roku_horizontal_menu_v1: {"enabled": false}
       }

@@ -260,7 +260,6 @@ Function getConstants()
     constants.reqNames.getMultipleContent = "getMultipleContent"
     constants.reqNames.getUpNextContent = "getUpNextContent"
     constants.reqNames.getRelatedContent = "getRelatedContent"
-    constants.reqNames.getAutopilotRelatedContent = "getAutopilotRelatedContent"
     constants.reqNames.getThumbnails = "getThumbnails"
     constants.reqNames.getLiveManifest = "getLiveManifest"
     constants.reqNames.emailExists = "emailExists"
@@ -322,7 +321,6 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getSingleContent] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getUpNextContent] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getRelatedContent] = true
-      constants.reqNames.acceptsTubiAuth[constants.reqNames.getAutopilotRelatedContent] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getThumbnails] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getLiveManifest] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.emailExists] = true

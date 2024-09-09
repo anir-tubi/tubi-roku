@@ -105,16 +105,9 @@ Function registerParsingCallbacks()
     parseError: parseGenericError
   }
 
-
-  ' related content
+  ' autopilot related content
   m.requestTypes[m.constants.reqNames.getRelatedContent] = {
     parseSuccess: parseDetailScreenRelatedContentSuccess
-  }
-
-
-  ' autopilot related content
-  m.requestTypes[m.constants.reqNames.getAutopilotRelatedContent] = {
-    parseSuccess: parseDetailScreenAutopilotRelatedContentSuccess
   }
 
   'epgChannelIds

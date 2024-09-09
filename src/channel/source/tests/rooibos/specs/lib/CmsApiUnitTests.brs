@@ -28,7 +28,8 @@ Function cmsApi_createRelatedContentReqInfo_test()
     "device_id"
   ]
 
-  kidsRelatedReqUrl = m.cmsApi.constants.urls.cms.relatedContent + "/123456/related"
+  kidsRelatedReqUrl = m.cmsApi.constants.urls.autopilot.relatedContent
+
   kidsRelatedReqOptions = {
     params: {
       "isKidsMode": true,
@@ -37,6 +38,7 @@ Function cmsApi_createRelatedContentReqInfo_test()
       "app_id": m.cmsApi.constants.settings.shortAppName
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
+      "content_id": "123456"
     }
   }
 
@@ -53,7 +55,8 @@ Function cmsApi_createRelatedContentReqInfo_test()
   m.assertEqual(kidsRelatedReqOptions.params["platform"], kidsRelatedReqInfo.options.params["platform"])
   m.assertEqual(kidsRelatedReqOptions.params["device_id"], kidsRelatedReqInfo.options.params["device_id"])
 
-  relatedReqUrl = m.cmsApi.constants.urls.cms.relatedContent + "/123456/related"
+  relatedReqUrl = m.cmsApi.constants.urls.autopilot.relatedContent
+
   relatedReqOptions = {
     params: {
       "isKidsMode": false,
@@ -62,6 +65,7 @@ Function cmsApi_createRelatedContentReqInfo_test()
       "app_id": m.cmsApi.constants.settings.shortAppName
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
+      "content_id": "123456"
     }
   }
 

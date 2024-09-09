@@ -52,13 +52,8 @@ Function cmsApi_createRelatedContentReqInfo(contentId, bKidsMode = false)
   options.params["isKidsMode"] = bKidsMode
   options.params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
   options.params = m.setTupianPosterParam(options.params)
-
-  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_related_cuepoint", "roku_related_cuepoint_v1").enabled = true
-    url = m.constants.urls.autopilot.relatedContent
-    options.params["content_id"] = contentId
-  else
-    url = m.constants.urls.cms.relatedContent + "/" + contentId + "/related"
-  end if
+  options.params["content_id"] = contentId
+  url = m.constants.urls.autopilot.relatedContent
 
   return {
     url: url

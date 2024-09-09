@@ -709,13 +709,7 @@ Function getRelatedContent(content, callback = handleRelatedResponse)
   ' (but not if in any of the kids modes, since it won't be displayed)
   if content <> invalid AND isKidsUIOn() = false
     relatedRequestInfo = m.cmsApi.createRelatedContentReqInfo(content.id, shouldKidsModeBeSentToServer())
-
-    'fire exposure event when fetching related content
-    if getExperimentResource("roku_related_cuepoint", "roku_related_cuepoint_v1", true).enabled = true
-      requestType = m.constants.reqNames.getAutopilotRelatedContent
-    else
-      requestType = m.constants.reqNames.getRelatedContent
-    end if
+    requestType = m.constants.reqNames.getRelatedContent
 
     m.makeRequest({
       url: relatedRequestInfo.url

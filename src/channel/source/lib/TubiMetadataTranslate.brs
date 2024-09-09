@@ -5,7 +5,6 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     translateRecursive: tubiMetadataTranslate_translateRecursive
     getContentFromCategoryJson: tubiMetadataTranslate_getContentFromCategoryJson
     translateRelatedContent: tubiMetadataTranslate_translateRelatedContent
-    translateAutopilotRelatedContent: tubiMetadataTranslate_translateAutopilotRelatedContent
     translate: tubiMetadataTranslate_translate
     translateContainer: tubiMetadataTranslate_translateContainer
     translateCategoryDetails: tubiMetadataTranslate_translateCategoryDetails
@@ -714,41 +713,6 @@ End Function
 ' @contentFromServer: assocArray, AA representation of content metadata JSON as returned from server
 ' @isSignedInUser: boolean, value based on user logged In or not
 Function tubiMetadataTranslate_translateRelatedContent(contentFromServer, isSignedInUser = false)
-  translated = CreateObject("roSGNode", "CategoryContentNode")
-  if type(contentFromServer) = "roArray"
-    shortestValidDuration = invalid
-
-    for each content in contentFromServer
-      node = translated.createChild("TubiContentNode")
-      m.translateRecursive(content, node, isSignedInUser)
-
-      if shortestValidDuration = invalid
-        shortestValidDuration = content.valid_duration
-      else if content.valid_duration <> invalid
-        if content.valid_duration < shortestValidDuration
-          shortestValidDuration = content.valid_duration
-        end if
-      end if
-    end for
-
-    if shortestValidDuration <> invalid
-      translated.validUntil = UpTime(0) + shortestValidDuration
-    else
-      translated.validUntil = Uptime(0) + m.constants.cacheTimes.category
-    end if
-  end if
-
-  return translated
-End Function
-
-
-''''''''''''''''''''''
-' translateAutopilotRelatedContent
-'
-' Expect content from the /related API, structured as an array of assocarrays
-' @contentFromServer: assocArray, AA representation of content metadata JSON as returned from server
-' @isSignedInUser: boolean, value based on user logged In or not
-Function tubiMetadataTranslate_translateAutopilotRelatedContent(contentFromServer, isSignedInUser = false)
   translated = CreateObject("roSGNode", "CategoryContentNode")
   if type(contentFromServer) = "roAssociativeArray"
     shortestValidDuration = invalid
