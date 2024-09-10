@@ -1612,11 +1612,15 @@ End Function
 ' @videoResourceIndex: intarray, [0] -> codexIndex & [1] -> drmIndex
 Function prepareToStartVideo(content, videoResourceIndex = [0,0])
 
+  'To prevent duplicate callbacks for the globalCaptionMode, subtitle, and audio track fields when a new video starts or when there are changes to the subtitle or audio track, unobserve these fields.
+  unObserveClosedCaptionAndAudioTrack()
+  'Calling observeClosedCaptionAndAudioTrack() before resetVideoPlayerState() ensures that the "subtitle/audioTrack" callbacks are properly executed when the content node is assigned to the video node in resetVideoPlayerState()
+  'This process is also needed for setting preferred subtitle and audio track and updating the closed caption overlay accordingly.
+  observeClosedCaptionAndAudioTrack()
+
   resetVideoPlayerState(content)
   resetPauseAd()
   resetPauseAdTimers()
-  unObserveClosedCaptionAndAudioTrack()
-  observeClosedCaptionAndAudioTrack()
 
   videoResources = content.videoResources
   codecIndex = videoResourceIndex[0]
@@ -1628,7 +1632,7 @@ Function prepareToStartVideo(content, videoResourceIndex = [0,0])
   end if
 
   setDrmOnContent(content, resource, videoResourceIndex)
-
+  
   m.top.content = content  'sends content to video node and makes current content available to contentController
   m.top.sendVideoTrackingStart = true
 End Function
@@ -1704,9 +1708,10 @@ End Function
 
 Function stopVideo()
   tubilog("VideoPlayer.stopVideo")
-
-  'un-observing globalCaptionMode, subtitle and audioTrack to avoid callbacks of those video node fields when user presses back
+  
+  'unObserveClosedCaptionAndAudioTrack is required to prevent callbacks for the globalCaptionMode, subtitle, and audio track fields when user exits player or changes the video content
   unObserveClosedCaptionAndAudioTrack()
+
   videoState = m.videoState
 
   ' updating last ping time with current player position if the video is not playing OR not paused.
