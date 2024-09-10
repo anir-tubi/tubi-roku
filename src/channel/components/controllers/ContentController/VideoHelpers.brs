@@ -105,7 +105,6 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
     videoPlayer.observeFieldScoped("subtitleTrackSettings", "onSubtitleTrackSettingsChange")
     videoPlayer.observeFieldScoped("audioTrackSettings", "onAudioTrackSettingsChange")
     videoPlayer.observeFieldScoped("homescreenContentToPlayUpdated", "onPlayerHomeScreenContentToPlay")
-    videoPlayer.observeFieldScoped("relatedContentToPlayUpdated", "onPlayerRelatedContentToPlay")
     observeUpdateAuth(videoPlayer.task)
 
     initVideoTracking(videoPlayer) 'initializeYoubora
@@ -133,9 +132,6 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
   if m.pub_serverPersistentData <> invalid
     videoPlayer.preferredAudioTrack = m.pub_serverPersistentData.audioTrack
   end if
-
-  videoPlayer.relatedContent = invalid
-  videoPlayer.updateRelatedContent = true
 
   sLikedState = ""
   if like <> invalid
@@ -229,20 +225,14 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
       sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.streamStart, content)
 
       if isKidsUIOn() = false
-        if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4", false).enabled = true
-          browseContent = videoPlayer.browseContent
+        browseContent = videoPlayer.browseContent
 
-          if browseContent = invalid
-            fetchBrowseContentForPlayer(videoPlayer.appMode)
-          end if
-        else
-          getRelatedContent(content, handleRelatedResponseInVideoPlayer)
+        if browseContent = invalid
+          fetchBrowseContentForPlayer(videoPlayer.appMode)
         end if
       else
         videoPlayer.browseContent = invalid
         videoPlayer.updateBrowseContent = true
-        videoPlayer.relatedContent = invalid
-        videoPlayer.updateRelatedContent = true
       end if
 
     end if
@@ -1451,16 +1441,6 @@ Function sendPauseAdPixel(pixelUrl)
 End Function
 
 
-' @relatedContent: roSGNode, TubiContentNode
-Function handleRelatedResponseInVideoPlayer(relatedContent)
-  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
-  if videoPlayer <> invalid
-    videoPlayer.relatedContent = relatedContent
-    videoPlayer.updateRelatedContent = true
-  end if
-End Function
-
-
 ' @content: tubiContentNode, a content node representing a movie or episode or sports event.
 ' @position: integer, Playback position.
 Function updateRokuContinueWatchingInfo(content, position)
@@ -1557,40 +1537,18 @@ Function onPlayerHomeScreenContentToPlay(msg)
       emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
       emptySeriesNode.type = m.constants.ui.contentTypes.series
       emptySeriesNode.id = content.id
-      getSingleContentFromServer(emptySeriesNode, handleYMALContentSuccessResponse, handleYMALContentErrorResponse)
+      getSingleContentFromServer(emptySeriesNode, handleBrowseWhileWatchingContentSuccessResponse, handleBrowseWhileWatchingContentErrorResponse)
     else
       emptyMovieNode = CreateObject("roSGNode", "TubiContentNode")
       emptyMovieNode.type = m.constants.ui.contentTypes.video
       emptyMovieNode.id = content.id
-      getSingleContentFromServer(emptyMovieNode, handleYMALContentSuccessResponse, handleYMALContentErrorResponse)
+      getSingleContentFromServer(emptyMovieNode, handleBrowseWhileWatchingContentSuccessResponse, handleBrowseWhileWatchingContentErrorResponse)
     end if
   end if
 End Function
 
 
-Function onPlayerRelatedContentToPlay(msg)
-  screen = msg.getRoSGNode()
-  if screen <> invalid then
-    content = screen.relatedContentToPlay
-
-    ' The episode information is not available for the selected series, so refetch required for series content type
-    if content.type = m.constants.ui.contentTypes.series
-      emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
-      emptySeriesNode.type = m.constants.ui.contentTypes.series
-      emptySeriesNode.id = content.id
-      getSingleContentFromServer(emptySeriesNode, handleYMALContentSuccessResponse, handleYMALContentErrorResponse)
-    else
-      playbackSource = {
-        "srcForAnalytic": m.constants.player.playbackSource.unknown
-        "srcForAds": m.constants.player.playbackOrigin.ymal
-      }
-      playUpNextContent(content, playbackSource)
-    end if
-  end if
-End Function
-
-
-Function handleYMALContentSuccessResponse(content)
+Function handleBrowseWhileWatchingContentSuccessResponse(content)
   playbackSource = {
     "srcForAnalytic": m.constants.player.playbackSource.unknown
     "srcForAds": m.constants.player.playbackOrigin.ymal
@@ -1599,7 +1557,7 @@ Function handleYMALContentSuccessResponse(content)
 End Function
 
 
-Function handleYMALContentErrorResponse(error)
+Function handleBrowseWhileWatchingContentErrorResponse(error)
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
   content = invalid
 
@@ -1618,15 +1576,15 @@ Function handleYMALContentErrorResponse(error)
     trackingTask: m.trackingLoggingTask
   }
 
-  showErrorModal(modalInfo, invalid, invalid, onCloseYMALContentFetchErrorModal)
+  showErrorModal(modalInfo, invalid, invalid, onCloseBrowseWhileWatchingContentFetchErrorModal)
 End Function
 
 
-Function onCloseYMALContentFetchErrorModal()
+Function onCloseBrowseWhileWatchingContentFetchErrorModal()
 
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
   if videoPlayer <> invalid
-    videoPlayer.showYMALInFullScreen = true
+    videoPlayer.showBrowseWhileWatchingInFullScreen = true
   end if
 
 End Function

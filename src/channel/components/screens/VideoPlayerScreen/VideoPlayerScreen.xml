@@ -116,13 +116,7 @@
       <!-- Holds the tcf string value. -->
       <field id="tcfString" type="string" />
 
-      <!-- YMAL content to be displayed on YMAL Row inside player -->
-      <field id="relatedContent" type="node" />
-
-      <!-- boolean field which tells the YMAL content is updated -->
-      <field id="updateRelatedContent" type="boolean" alwaysNotify="true"/>
-
-      <!-- browseContent content to be displayed on YMAL Row inside player -->
+      <!-- browseContent content to be displayed on Browse While Watching Row -->
       <field id="browseContent" type="node" />
 
       <!-- boolean field which tells the browseContent is updated -->
@@ -131,8 +125,8 @@
       <!-- Used to allow seeking the video player while still maintaining proper state tracking. Sets video player seek field to appropriate value and updates necessary state. `seek` field is time/double based and value specified should be in seconds -->
       <field id="seekTo" type="time" />
 
-      <!-- boolean field which can be set to true for showing the YMAL in full screen and set focus to YMAL -->
-      <field id="showYMALInFullScreen" type="boolean" alwaysNotify="true"/>
+      <!-- boolean field which can be set to true for showing the BrowseWhileWatching in full screen and set focus to BrowseWhileWatching -->
+      <field id="showBrowseWhileWatchingInFullScreen" type="boolean" alwaysNotify="true"/>
 
     <!-- OUTPUT -->
       <!-- Set to true if the back button was pressed while the video player has focus -->
@@ -180,14 +174,6 @@
 
       <!-- Autoplay this content when this field is set -->
       <field id="upNextContentToAutoplay" type="node" />
-
-      <!-- set to the contentNode of the RelatedGrid item which was focused when
-           the ok button is pressed
-      -->
-      <field id="relatedContentToPlay" type="node" />
-
-      <!-- set to true when the relatedContentToPlay field is updated -->
-      <field id="relatedContentToPlayUpdated" type="boolean" alwaysNotify="true"/>
 
       <!-- set to the contentNode of the homescreen item which was focused when
            the ok button is pressed
@@ -319,7 +305,7 @@
     </Group>
 
     <Poster
-      id="VideoYMALOverlay"
+      id="VideoBrowseWhileWatchingOverlay"
       width="1920"
       height="1080"
       opacity="0.0"
@@ -607,7 +593,7 @@
       opacity="0.0" />
 
     <Group
-      id="YmalRow"/>
+      id="BrowseWhileWatchingRow"/>
 
     <Rectangle
       id="closedCaptionAndAudioSelectionOverlayGroup"

@@ -71,26 +71,18 @@ Function init()
     m.video.asyncStopSemantics = true
   end if
 
-  YmalRow = m.top.findNode("YmalRow")
+  BrowseWhileWatchingRow = m.top.findNode("BrowseWhileWatchingRow")
+  m.BrowseWhileWatching = BrowseWhileWatchingRow.createChild("BrowseContentOnPlayer")
+  m.BrowseWhileWatching.observeFieldScoped("selectedRelatedContentItemUpdated", "onBrowseContentSelected")
 
-  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4", false).enabled = true then
-    m.Related = YmalRow.createChild("BrowseContentOnPlayer")
-    m.Related.observeFieldScoped("selectedRelatedContentItemUpdated", "onBrowseContentSelected")
-  else
-    m.Related = YmalRow.createChild("Related")
-    m.Related.observeFieldScoped("selectedRelatedContentItemUpdated", "onRelatedItemSelected")
-  end if
+  m.BrowseWhileWatching.translation = "[171, 550]"
+  m.BrowseWhileWatching.associatedPageName = "video_player_page"
+  m.BrowseWhileWatching.observeFieldScoped("trackingComponentInfo", "onTrackingComponentInfo")
+  m.BrowseWhileWatching.observeFieldScoped("isRelatedContentFocused", "onRelatedItemFocused")
+  m.BrowseWhileWatching.observeFieldScoped("keyPress", "onKeyPressWhenBrowseWhileWatchingHasFocus")
+  m.BrowseWhileWatching.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
 
-  m.Related.translation = "[171, 550]"
-  m.Related.associatedPageName = "video_player_page"
-  m.Related.observeFieldScoped("trackingComponentInfo", "onTrackingComponentInfo")
-  m.Related.observeFieldScoped("isRelatedContentFocused", "onRelatedItemFocused")
-  m.Related.observeFieldScoped("keyPress", "onKeyPressWhenYMALHasFocus")
-  m.Related.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
-
-  m.top.observeFieldScoped("updateRelatedContent", "onRelatedContentUpdated")
   m.top.observeFieldScoped("updateBrowseContent", "onBrowseContentUpdated")
-
   m.top.observeField("updateContent", "onContentChange")
   m.top.observeField("sprites", "onSpritesReceived")
   m.top.observeField("control", "onControlChange")
@@ -99,7 +91,7 @@ Function init()
   m.top.observeField("adProgress", "onAdProgressChange")
   m.top.observeField("displayAdLoadingMessage", "onDisplayAdLoadingMessage")
   m.top.observeField("seekTo", "onSeekToChange")
-  m.top.observeFieldScoped("showYMALInFullScreen", "onShowYMALInFullScreen")
+  m.top.observeFieldScoped("showBrowseWhileWatchingInFullScreen", "onShowBrowseWhileWatchingInFullScreen")
 
   'isPauseAdReqInProgress is the state of pauseAd requests in flight.
   'If pause ad request is in flight, we do not send another pause ad request
@@ -158,7 +150,7 @@ Function init()
   m.AdHeadsUpText = m.top.findNode("AdHeadsUpText")
   m.Thumbnail = m.top.findNode("Thumbnail")
   m.VideoOverlay = m.top.findNode("VideoOverlay")
-  m.VideoYMALOverlay = m.top.findNode("VideoYMALOverlay")
+  m.VideoBrowseWhileWatchingOverlay = m.top.findNode("VideoBrowseWhileWatchingOverlay")
 
   m.skipCuepointsButton = m.top.findNode("SkipCuepointsButton")
   m.skipCuepointsButton.observeFieldScoped("selected", "onSkipCuepointsButtonSelected")
@@ -213,7 +205,7 @@ Function init()
 
   m.lastButtonPressPos = 0
   m.transportAutoHideTime = m.constants.player.transportAutoHideTime
-  m.ymalAutoHideTime = m.constants.player.ymalAutoHideTime
+  m.browseWhileWatchingAutoHideTime = m.constants.player.browseWhileWatchingAutoHideTime
   m.ignoreOptionsKey = m.constants.deviceInfo.firmwareCaptionMenu
   m.bufferingInfo = invalid
 
@@ -459,7 +451,7 @@ Function showSkipCuepointsButton()
     m.skipCuepointsButton.translation = [xPosition, m.skipCuepointsButtonDownTranslation]
   end if
 
-  if m.focusedNode.isSameNode(m.Related) = false
+  if m.focusedNode.isSameNode(m.BrowseWhileWatching) = false
     m.skipCuepointsButton.visible = true
   end if
 
@@ -640,7 +632,7 @@ Function onControlChange()
     clearSkipCuepointsButtonAndTimer()
     stopVideo()
     animateTransport("out")
-    hideYMAL()
+    hideBrowseWhileWatching()
     setFocusToPlaybackControl()
     m.UpNext.stopAutoPlayTimer = true
     m.Menu.setFocus(false)
@@ -961,16 +953,16 @@ Function onVideoPositionChange(msg)
     m.isSeeking = false
   end if
 
-  if m.focusedNode.isSameNode(m.Related) = true
-    if m.playerPosition > m.lastButtonPressPos + m.ymalAutoHideTime AND m.isClosedCaptionAudioOverlayShowing = false
+  if m.focusedNode.isSameNode(m.BrowseWhileWatching) = true
+    if m.playerPosition > m.lastButtonPressPos + m.browseWhileWatchingAutoHideTime AND m.isClosedCaptionAudioOverlayShowing = false
       animateTransport("out")
-      hideYMAL()
+      hideBrowseWhileWatching()
       setFocusToPlaybackControl()
     end if
   else
     if m.VideoState = "play" AND m.HUD.opacity = 1 AND m.playerPosition > m.lastButtonPressPos + m.transportAutoHideTime AND m.isClosedCaptionAudioOverlayShowing = false
       animateTransport("out")
-      hideYMAL()
+      hideBrowseWhileWatching()
       setFocusToPlaybackControl()
     end if
   end if
@@ -1021,7 +1013,7 @@ Function onVideoPositionChange(msg)
 
       if m.UpNext.content <> invalid
         animateTransport("out")
-        hideYMAL()
+        hideBrowseWhileWatching()
         setFocusToPlaybackControl()
         clearSkipCuepointsButtonAndTimer()
 
@@ -2460,27 +2452,11 @@ End Function
 
 Function onRelatedItemFocused()
   m.lastButtonPressPos = m.playerPosition
-  ' Do not show the PauseAd if the user interacting the YMAL row.
+  ' Do not show the PauseAd if the user interacting the BrowseWhileWatching row.
   ' Resetting the timer when there is any user interaction during pause
   if m.pauseAdOverlayTimer.control = "start"
     restartPauseAdTimer()
   end if
-End Function
-
-
-Function onRelatedItemSelected(msg)
-  screen = msg.getRoSGNode()
-
-  if screen <> invalid then
-    selectedContent = screen.selectedRelatedContentItem
-    animateTransport("out")
-    hideYMAL()
-    setFocusToPlaybackControl()
-    m.top.relatedContentToPlay = selectedContent
-    m.top.relatedContentToPlayUpdated = true
-    resetTransportButtons()
-  end if
-
 End Function
 
 
@@ -2490,7 +2466,7 @@ Function onBrowseContentSelected(msg)
   if screen <> invalid then
     selectedContent = screen.selectedRelatedContentItem
     animateTransport("out")
-    hideYMAL()
+    hideBrowseWhileWatching()
     setFocusToPlaybackControl()
     m.top.homescreenContentToPlay = selectedContent
     m.top.homescreenContentToPlayUpdated = true
@@ -2499,17 +2475,17 @@ Function onBrowseContentSelected(msg)
 End Function
 
 
-Function onKeyPressWhenYMALHasFocus(msg)
+Function onKeyPressWhenBrowseWhileWatchingHasFocus(msg)
   keyPress = msg.getData()
 
   if keyPress = "fastforward"
     if m.FastForwardButton.enabled = true then
-      animateTransportAndYMAL("out")
+      animateTransportAndBrowseWhileWatching("out")
       handleFastForward()
     end if
   else if keyPress = "rewind"
     if m.RewindButton.enabled = true then
-      animateTransportAndYMAL("out")
+      animateTransportAndBrowseWhileWatching("out")
       handleRewind()
     end if
   end if
@@ -2538,15 +2514,15 @@ End Function
 
 
 Function onRelatedContentUpdated(msg)
-  m.Related.content = m.top.relatedContent
-  m.Related.updateContent = true
+  m.BrowseWhileWatching.content = m.top.relatedContent
+  m.BrowseWhileWatching.updateContent = true
 End Function
 
 
 Function onBrowseContentUpdated(msg)
-  m.Related.content = m.top.browseContent
-  m.Related.isLoading = false
-  m.Related.updateContent = true
+  m.BrowseWhileWatching.content = m.top.browseContent
+  m.BrowseWhileWatching.isLoading = false
+  m.BrowseWhileWatching.updateContent = true
 End Function
 
 

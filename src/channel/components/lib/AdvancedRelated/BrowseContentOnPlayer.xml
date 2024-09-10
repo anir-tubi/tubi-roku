@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!-- Also referred to as YMAL UI -->
 <component name="BrowseContentOnPlayer" extends="Group">
   <script type="text/brightscript" uri="BrowseContentOnPlayer.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
@@ -19,15 +18,15 @@
       <field id="updateContent" type="boolean" alwaysNotify="true"/>
       <!-- show or hide the Info panel component -->
       <field id="showInfoPanel" type="boolean" alwaysNotify="true"/>
-      <!-- shows the YMAL patially -->
+      <!-- shows the Browse While Watching patially -->
       <field id="show" type="boolean" alwaysNotify="true"/>
-      <!-- hides the YMAL -->
+      <!-- hides the Browse While Watching -->
       <field id="hide" type="boolean" alwaysNotify="true"/>
-      <!-- opens the YMAL in full screen -->
+      <!-- opens the Browse While Watching in full screen -->
       <field id="open" type="boolean" alwaysNotify="true"/>
-      <!-- closes the YMAL so it is only shown as a peek -->
+      <!-- closes the Browse While Watching so it is only shown as a peek -->
       <field id="close" type="boolean" alwaysNotify="true"/>
-      <!-- show the YMAL in full screen -->
+      <!-- show the Browse While Watching in full screen -->
       <field id="showInFullScreen" type="boolean" alwaysNotify="true"/>
       <!-- The analytics page type value associated with the parent page of this Related component.   -->
       <field id="associatedPageName" type="string" value="video_page"/>
@@ -61,7 +60,7 @@
   <children>
 
     <Group
-      id="YmalGroup"
+      id="BrowseWhileWatchingGroup"
       opacity="0.0"
       translation="[0,0]">
 
@@ -75,7 +74,7 @@
         opacity="0.0"/>
 
       <Group
-        id="YmalRow"
+        id="BrowseWhileWatchingRow"
         opacity="0.2"
         translation="[0,400]">
 

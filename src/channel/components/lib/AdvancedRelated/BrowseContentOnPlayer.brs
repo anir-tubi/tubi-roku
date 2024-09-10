@@ -3,8 +3,8 @@ Function init()
   m.tracking = TubiTrackingInfo(m.constants)
   m._ = rodash()
   m.info = m.top.findNode("Info")
-  m.ymalGroup = m.top.findNode("YmalGroup")
-  m.ymalRow = m.top.findNode("YmalRow")
+  m.browseWhileWatchingGroup = m.top.findNode("BrowseWhileWatchingGroup")
+  m.browseWhileWatchingRow = m.top.findNode("BrowseWhileWatchingRow")
 
   m.categoryGridList = m.top.findNode("CategoryGridList")
   m.categoryGridList.observeFieldScoped("itemSelected", "onGridItemSelected")
@@ -19,10 +19,10 @@ Function init()
   m.top.observeFieldScoped("close", "onCloseRelated")
   m.top.observeFieldScoped("showInFullScreen", "onShowRelatedInFullScreen")
 
-  m.ymalGroupShowAnimation = invalid
+  m.browseWhileWatchingGroupShowAnimation = invalid
 
-  m.ymalXYPositionWhenHidden = [0,0]
-  m.ymalXYPositionWhenOpen = [0,-432]
+  m.browseWhileWatchingXYPositionWhenHidden = [0,0]
+  m.browseWhileWatchingXYPositionWhenOpen = [0,-432]
 
   ' Used to determine if navigate_within_page events should be sent. Only send when the Related content row already
   ' has focus, not when it gains focus.
@@ -121,51 +121,51 @@ Function onShowRelated()
     m.categoryGridList.contentUpdated = true
   end if
 
-  if m.ymalGroup.opacity < 1.0
-    m.ymalGroupShowAnimation = slideFade(m.ymalGroup, "below", "in", 0.6)
+  if m.browseWhileWatchingGroup.opacity < 1.0
+    m.browseWhileWatchingGroupShowAnimation = slideFade(m.browseWhileWatchingGroup, "below", "in", 0.6)
   end if
 End Function
 
 
 Function onHideRelated(msg)
-  ' we need to stop ymalGroupShowAnimation which shows YmalGroup, because ymalGroupShowAnimation duration is set as 0.6 and
-  ' ymalGroup may reappear even after we hide ymalGroup as the animation state is still be running
-  if m.ymalGroupShowAnimation <> invalid AND m.ymalGroupShowAnimation.state = "running"
-    m.ymalGroupShowAnimation.control = "stop"
+  ' we need to stop browseWhileWatchingGroupShowAnimation which shows browseWhileWatchingGroup, because browseWhileWatchingGroupShowAnimation duration is set as 0.6 and
+  ' browseWhileWatchingGroup may reappear even after we hide browseWhileWatchingGroup as the animation state is still be running
+  if m.browseWhileWatchingGroupShowAnimation <> invalid AND m.browseWhileWatchingGroupShowAnimation.state = "running"
+    m.browseWhileWatchingGroupShowAnimation.control = "stop"
   end if
 
-  if m.ymalGroup.opacity > 0
+  if m.browseWhileWatchingGroup.opacity > 0
     hideInfoPanel()
-    fade(m.ymalRow, "out", 0.2, 0, 0.2)
-    slideFade(m.ymalGroup, "below", "out", 0.6)
+    fade(m.browseWhileWatchingRow, "out", 0.2, 0, 0.2)
+    slideFade(m.browseWhileWatchingGroup, "below", "out", 0.6)
   end if
 End Function
 
 
 Function onOpenRelated()
-  if m.ymalRow.opacity < 1.0
-    fade(m.ymalRow, "in", 0.2, 0, 1.0)
+  if m.browseWhileWatchingRow.opacity < 1.0
+    fade(m.browseWhileWatchingRow, "in", 0.2, 0, 1.0)
   end if
 
   showInfoPanel()
-  slideTo(m.ymalGroup, m.ymalXYPositionWhenOpen, 0.6)
+  slideTo(m.browseWhileWatchingGroup, m.browseWhileWatchingXYPositionWhenOpen, 0.6)
 End Function
 
 
 Function onCloseRelated()
-  if m.ymalRow.opacity = 1.0
-    fade(m.ymalRow, "out", 0.2, 0, 0.2)
+  if m.browseWhileWatchingRow.opacity = 1.0
+    fade(m.browseWhileWatchingRow, "out", 0.2, 0, 0.2)
   end if
 
   hideInfoPanel()
-  slideTo(m.ymalGroup, m.ymalXYPositionWhenHidden, 0.6)
+  slideTo(m.browseWhileWatchingGroup, m.browseWhileWatchingXYPositionWhenHidden, 0.6)
 End Function
 
 
 Function onShowRelatedInFullScreen()
-  m.ymalGroup.translation = m.ymalXYPositionWhenOpen
-  fade(m.ymalGroup, "in", 0.6)
-  fade(m.ymalRow, "in", 0.2, 0, 1.0)
+  m.browseWhileWatchingGroup.translation = m.browseWhileWatchingXYPositionWhenOpen
+  fade(m.browseWhileWatchingGroup, "in", 0.6)
+  fade(m.browseWhileWatchingRow, "in", 0.2, 0, 1.0)
   showInfoPanel()
 End Function
 

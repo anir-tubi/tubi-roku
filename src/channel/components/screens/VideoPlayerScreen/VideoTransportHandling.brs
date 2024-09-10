@@ -36,7 +36,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       else if key = "options"
         if m.ignoreOptionsKey = false then
           showTransport()
-          showYMAL()
+          showBrowseWhileWatching()
           stopPauseAdTimer()
           if m.isPixelFiredForCurrentPauseAd = false
 
@@ -52,7 +52,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           end if
         end if
 
-      else if key = "left" AND m.focusedNode.isSameNode(m.Related) = false
+      else if key = "left" AND m.focusedNode.isSameNode(m.BrowseWhileWatching) = false
         'video is in playback mode and user wants to skip back
         if m.HUD.opacity = 0 AND m.focusedNode.isSameNode(m.progressBar) = false AND isActiveVideoState(m.VideoState, m.Video)
           handleSkipVideo(-10)
@@ -76,7 +76,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           end if
         end if
 
-      else if key = "right" AND m.focusedNode.isSameNode(m.Related) = false
+      else if key = "right" AND m.focusedNode.isSameNode(m.BrowseWhileWatching) = false
         'video is in playback mode and user wants to skip ahead
         if m.HUD.opacity = 0 AND m.focusedNode.isSameNode(m.progressBar) = false AND isActiveVideoState(m.VideoState, m.Video)
           handleSkipVideo(10)
@@ -104,12 +104,12 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         if m.Menu.hasFocus() = false
           if  m.UpNext.isInFocusChain() = true AND getExperimentResource("roku_like_dislike_on_autoplay", "roku_like_dislike_on_autoplay_v2", false).enabled = true
             m.Menu.setFocus(true)
-          else if m.focusedNode.isSameNode(m.Related) = true
-            animateTransportAndYMAL("out")
+          else if m.focusedNode.isSameNode(m.BrowseWhileWatching) = true
+            animateTransportAndBrowseWhileWatching("out")
             setFocusToPlaybackControl()
-          else if m.TopOverlay.opacity = 0 AND m.focusedNode.isSameNode(m.Related) = false
+          else if m.TopOverlay.opacity = 0 AND m.focusedNode.isSameNode(m.BrowseWhileWatching) = false
             showTransport()
-            showYMAL()
+            showBrowseWhileWatching()
           else if m.focusedNode.isSameNode(m.progressBar) = false AND m.skipCuepointsButton.hasFocus() = false
             setFocusToComponent(m.ProgressBar)
           else if m.focusedNode.isSameNode(m.progressBar) = false
@@ -127,25 +127,20 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         if m.Menu.hasFocus() = true AND m.UpNext.visible = true
           m.Menu.setFocus(false)
           m.UpNext.setFocus(true)
-        else if m.TopOverlay.opacity = 0 AND m.focusedNode.isSameNode(m.Related) = false
+        else if m.TopOverlay.opacity = 0 AND m.focusedNode.isSameNode(m.BrowseWhileWatching) = false
 
           showTransport()
-          showYMAL()
+          showBrowseWhileWatching()
         else if m.focusedNode.isSameNode(m.progressBar) = true
           setFocusToComponent(m.PlayPauseButton, true)
         else if m.skipCuepointsButton.hasFocus() = true
           setFocusToComponent(m.ProgressBar)
         else if isFocusOnPlayerControl() = true AND m.TopOverlay.opacity = 1 AND m.top.isTrailer = false
-
-          if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4", false).enabled = true
-            relatedContent = m.top.browseContent
-          else
-            relatedContent = m.top.relatedContent
-          end if
+          relatedContent = m.top.browseContent
 
           if relatedContent <> invalid AND relatedContent.getChildCount() > 0
-            setFocusToComponent(m.Related)
-            animateTransportAndYMAL("in")
+            setFocusToComponent(m.BrowseWhileWatching)
+            animateTransportAndBrowseWhileWatching("in")
           else
             return false
           end if
@@ -185,7 +180,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
             setFocusToPlaybackControl()
           end if
         else if m.VideoState = "play"
-          hideYMAL()
+          hideBrowseWhileWatching()
           setFocusToPlaybackControl()
 
           if m.HUD.opacity = 0
@@ -333,11 +328,11 @@ Function pauseVideo(shouldShowTransport, shouldSendAnalytics = true)
       showTransport()
     end if
 
-    showYMAL()
+    showBrowseWhileWatching()
   end if
 
-  if m.focusedNode.isSameNode(m.Related) = true
-    animateTransportAndYMAL("out")
+  if m.focusedNode.isSameNode(m.BrowseWhileWatching) = true
+    animateTransportAndBrowseWhileWatching("out")
     setFocusToPlaybackControl()
   end if
 
@@ -374,7 +369,7 @@ End Function
 'Resume play from a paused state
 Function resumeFromPause(shouldSendAnalytics)
   animateTransport("out")
-  hideYMAL()
+  hideBrowseWhileWatching()
   'Only hide the button, don't clear the button so that the button will be shown again
   'if the transport is shown during playback between the intro or other skippable cuepoints'
   hideSkipCuepointsButton(m.top)
@@ -410,7 +405,7 @@ End Function
 Function resumeFromSkip()
   tubiLog("VideoTransportHandling.resumeFromSkip")
   animateTransport("out")
-  hideYMAL(false)
+  hideBrowseWhileWatching(false)
   'Only hide the button, don't clear the button so that the button will be shown again
   'if the transport is shown during playback between the intro or other skippable cuepoints'
   hideSkipCuepointsButton(m.top)
@@ -443,7 +438,7 @@ End Function
 Function handleSkipTrailer()
   m.top.skipTrailer = true
   animateTransport("out")
-  hideYMAL()
+  hideBrowseWhileWatching()
   resetTransportButtons()
   setFocusToComponent(m.PlayPauseButton)
 End Function
@@ -470,7 +465,7 @@ Function goToStart()
   'Hiding HUD while buffering
   if m.HUD.opacity > 0.0
     animateTransport("out")
-    hideYMAL()
+    hideBrowseWhileWatching()
     setFocusToPlaybackControl()
   end if
   'Only hide the button, don't clear the button so that the button will be shown again
@@ -497,7 +492,7 @@ Function goToNext()
   m.top.goToNext = true
 
   animateTransport("out")
-  hideYMAL()
+  hideBrowseWhileWatching()
   setFocusToPlaybackControl()
   resetTransportButtons()
 End Function
@@ -506,7 +501,7 @@ End Function
 Function handleOk()
   if m.HUD.opacity = 0 AND m.skipCuepointsButton.hasFocus() = false
     showTransport()
-    showYMAL()
+    showBrowseWhileWatching()
   else
     'do action based on the current focused button
     focusButtonId = m.TransportButtons.getChild(m.focusedButtonIndex).id
@@ -642,7 +637,7 @@ Function handleHopForward(duration)
   end if
   if m.HUD.opacity > 0.0
     animateTransport("out")
-    hideYMAL()
+    hideBrowseWhileWatching()
     setFocusToPlaybackControl()
   end if
   'Only hide the button, don't clear the button so that the button will be shown again
@@ -675,7 +670,7 @@ Function handleHopBack(remoteReplayButton, duration)
 
   if m.HUD.opacity > 0.0
     animateTransport("out")
-    hideYMAL()
+    hideBrowseWhileWatching()
     setFocusToPlaybackControl()
   end if
   'Only hide the button, don't clear the button so that the button will be shown again
@@ -729,7 +724,7 @@ Function handleSkipVideo(amt)
     showTransport()
   end if
 
-  showYMAL()
+  showBrowseWhileWatching()
   m.PlayPauseButton.uri = m.buttonUris.play
 
   if m.focusedNode.isSameNode(m.ProgressBar) = false
@@ -780,7 +775,7 @@ Function onSkipCuepointsButtonSelected()
   tubiLog("VideoTransportHandling.onSkipCuepointsButtonSelected")
   if m.HUD.opacity > 0.0
     animateTransport("out")
-    hideYMAL()
+    hideBrowseWhileWatching()
     setFocusToPlaybackControl()
   end if
 
@@ -816,7 +811,7 @@ Function beginScrub()
     showTransport()
   end if
 
-  showYMAL()
+  showBrowseWhileWatching()
   showThumbnail()
   m.scrubTimespan.mark()
 
@@ -846,7 +841,7 @@ Function endScrub(shouldJump = false)
   ' Reset periodic event trackers
 
   animateTransport("out")
-  hideYMAL(false)
+  hideBrowseWhileWatching(false)
   resetTransportButtons()
   m.PlayPauseButton.uri = m.buttonUris.pause
   setFocusToComponent(m.PlayPauseButton)
@@ -1081,7 +1076,7 @@ Function isFocusable(component)
 
   if component.isSameNode(m.skipCuepointsButton) = true
     focusable = true
-  else if component.isSameNode(m.Related) = true
+  else if component.isSameNode(m.BrowseWhileWatching) = true
     focusable = true
   else if component.isSameNode(m.UpNext) = true
     focusable = true
@@ -1106,8 +1101,8 @@ Function removeFocusForAllChildComponents()
     m.skipCuepointsButton.setFocus(false)
   end if
 
-  if m.Related.isInFocusChain() = true
-    m.Related.setFocus(false)
+  if m.BrowseWhileWatching.isInFocusChain() = true
+    m.BrowseWhileWatching.setFocus(false)
   end if
 
   if m.UpNext.isInFocusChain() = true
@@ -1222,7 +1217,7 @@ Function animateTransport(direction)
     end if
   end if
 
-  'Changing opacity to 1, since we changed the opacity to 0 when hiding YMAL
+  'Changing opacity to 1, since we changed the opacity to 0 when hiding BrowseWhileWatching
   if direction = "in" AND m.TransportButtons.opacity = 0.0
     fade(m.TransportButtons, "in", 0.4)
   end if
@@ -1246,7 +1241,7 @@ Function handleSkipCuepointsButtonOnAnimateTransport(direction)
       slideTo(m.skipCuepointsButton,[skipCuepointsButtonTransLation[0], m.skipCuepointsButtonUpTranslation], 0.6)
     end if
   else if direction = "out"
-    if m.focusedNode.isSameNode(m.Related) = true
+    if m.focusedNode.isSameNode(m.BrowseWhileWatching) = true
       hideSkipCuepointsButton()
     else if m.skipCuepointsButton.visible = true AND m.skipCuepointsButtonTimer <> invalid
       slideTo(m.skipCuepointsButton,[skipCuepointsButtonTransLation[0], m.skipCuepointsButtonDownTranslation], 0.6)
@@ -1405,7 +1400,7 @@ Function resetPauseAdOverlay()
     showTransport()
   end if
 
-  showYMAL()
+  showBrowseWhileWatching()
 End Function
 
 
@@ -1460,7 +1455,7 @@ End Function
 ' - sets the focus to pause ad overlay
 Function showPauseAd()
   animateTransport("out")
-  hideYMAL()
+  hideBrowseWhileWatching()
   m.pauseAdAnimation = fade(m.pauseAdOverlay, "in", 0.6, 0.4)
   sendPauseAdPixel(m.constants.pauseAd.pixelTypes.startPixel)
   startImpTrackingTimer()
@@ -1619,7 +1614,7 @@ Function hidePauseAdOverlay()
 End Function
 
 
-' animateYMAL function helps to show the YMAL at center of screen and also helps to move the YMAL to bottom of the screen based on param value
+' animateBrowseWhileWatching function helps to show the BrowseWhileWatching at center of screen and also helps to move the BrowseWhileWatching to bottom of the screen based on param value
 '
 ' @direction: String - in or out
 '   if the direction value is "in",
@@ -1627,7 +1622,7 @@ End Function
 '     - hide TransportButtons
 '     - move the position of rating info
 '     - move the progress bar to top of screen
-'     - show YMAL info panel & set focus to YMAL row
+'     - show BrowseWhileWatching info panel & set focus to BrowseWhileWatching row
 '     - hide Skip buttons if any
 
 '   if the direction value is "out",
@@ -1635,9 +1630,9 @@ End Function
 '     - moves the position of rating info
 '     - show overlay
 '     - move the progress bar to bottom of screen
-'     - hide YMAL info panel & YMAL row
+'     - hide BrowseWhileWatching info panel & BrowseWhileWatching row
 '     - show TransportButtons
-Function animateTransportAndYMAL(direction)
+Function animateTransportAndBrowseWhileWatching(direction)
 
   if direction = "in"
     m.Thumbnail.visible = false
@@ -1646,10 +1641,10 @@ Function animateTransportAndYMAL(direction)
     fade(m.TopOverlay, "out", 0.4)
     fade(m.TransportButtons, "out", 0.4)
     fade(m.VideoOverlay, "out", 0.4)
-    fade(m.VideoYMALOverlay, "in", 0.4)
+    fade(m.VideoBrowseWhileWatchingOverlay, "in", 0.4)
     hideRatingOverlay()
     slideTo(m.HUD, [0, -696], 0.6)
-    m.Related.open = true
+    m.BrowseWhileWatching.open = true
   else
     if m.skipCuepointsButtonTimer <> invalid
       showSkipCuepointsButton()
@@ -1659,57 +1654,52 @@ Function animateTransportAndYMAL(direction)
       m.Thumbnail.visible = true
     end if
 
-    fade(m.VideoYMALOverlay, "out", 0.4)
+    fade(m.VideoBrowseWhileWatchingOverlay, "out", 0.4)
     fade(m.VideoOverlay, "in", 0.4)
     if m.Menu.hasFocus() = false
       fade(m.TopOverlay, "in", 0.6, 0.2)
     end if
     slideTo(m.HUD, [0, 0], 0.6)
-    m.Related.close = true
+    m.BrowseWhileWatching.close = true
     fade(m.TransportButtons, "in", 0.4)
   end if
 
 End Function
 
 
-' show YMAL row on bottom of the screen and fire exposure event
-Function showYMAL()
+' show BrowseWhileWatching row on bottom of the screen and fire exposure event
+Function showBrowseWhileWatching()
   if m.top.appMode <> "KIDS_MODE" AND m.top.isTrailer = false
+    content = m.top.browseContent
 
-    if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4", false).enabled = true
-      content = m.top.browseContent
-    else
-      content = m.top.relatedContent
+    'fire exposure event when BrowseWhileWatching row is displayed at bottom area of the screen
+    if content <> invalid AND content.getChildCount() > 0
+      m.BrowseWhileWatching.jumpToRowItem = [0,0]
+      m.BrowseWhileWatching.isLoading = false
     end if
 
-    'fire exposure event when YMAL row is displayed at bottom area of the screen
-    if content <> invalid AND content.getChildCount() > 0 AND getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4").enabled = true
-      m.Related.jumpToRowItem = [0,0]
-      m.Related.isLoading = false
-    end if
-
-    m.Related.show = true
+    m.BrowseWhileWatching.show = true
 
   end if
 End Function
 
 
-' hideYMAL does below tasks
-'   - hide YMAL info panel
-'   - move YMAL row to bottom of the screen & hide it
-'   - Removing focus from YMAL row
+' hideBrowseWhileWatching does below tasks
+'   - hide BrowseWhileWatching info panel
+'   - move BrowseWhileWatching row to bottom of the screen & hide it
+'   - Removing focus from BrowseWhileWatching row
 '   - Setting focus to Video player
 '   - move the position of rating info
 '   - show skip cue point button if applicable
 '   - show skipSignUp Save Progress button if applicable
 '@showSignUpButton: boolean, used to show the signup button and incase of ffw/rew/skip we will hide the signup button.
-Function hideYMAL(showSignUpButton = true)
-  fade(m.VideoYMALOverlay, "out", 0.4)
-  m.Related.hide = true
+Function hideBrowseWhileWatching(showSignUpButton = true)
+  fade(m.VideoBrowseWhileWatchingOverlay, "out", 0.4)
+  m.BrowseWhileWatching.hide = true
 
-  if m.Related.opacity > 0
-    m.Related.showInfoPanel = false
-    m.Related.setFocus(false)
+  if m.BrowseWhileWatching.opacity > 0
+    m.BrowseWhileWatching.showInfoPanel = false
+    m.BrowseWhileWatching.setFocus(false)
 
     if m.ratingOverlay.opacity = 1.0
       showRatingGradient()
@@ -1746,10 +1736,10 @@ Function hideTopOverlay()
 End Function
 
 
-Function onShowYMALInFullScreen()
-  fade(m.VideoYMALOverlay, "in", 0.4)
+Function onShowBrowseWhileWatchingInFullScreen()
+  fade(m.VideoBrowseWhileWatchingOverlay, "in", 0.4)
   m.HUD.translation = [0, -696]
   fade(m.HUD, "in", 0.6)
-  m.Related.showInFullScreen = true
-  m.Related.setFocus(true)
+  m.BrowseWhileWatching.showInFullScreen = true
+  m.BrowseWhileWatching.setFocus(true)
 End Function
