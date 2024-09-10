@@ -136,7 +136,6 @@ Function createNextPanel(content)
     categoryDetailsPanel.observeFieldScoped("itemFocused", "onCategoryPanelFocusChanged")
     categoryDetailsPanel.observeFieldScoped("navigateWithinPageInfo", "onCategoryPanelNavigateWithinPageInfoChange")
     categoryDetailsPanel.observeFieldScoped("categoryBatchIndex", "onCategoryBatchIndexChange")
-    categoryDetailsPanel.observeFieldScoped("signInRequired", "onSignInRequired")
     categoryDetailsPanel.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
     categoryDetailsPanel.observeFieldScoped("contentToPlay", "onContentToPlay")
 
@@ -241,12 +240,6 @@ End Function
 Function onTransportVoiceResponse(msg)
   TubiLog("CategoryPanelListScreen.onTransportVoiceResponse")
   m.top.transportVoiceResponse = msg.getData()
-End Function
-
-
-Function onSignInRequired(msg)
-  TubiLog("CategoryPanelListScreen.onSignInRequired")
-  m.top.signInRequired = msg.getData()
 End Function
 
 

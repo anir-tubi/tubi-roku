@@ -70,9 +70,6 @@
       <!-- This field indicates that categorydetail page is fully loaded with all avialable contents or upto constants.performance.categoryGridList.finalLazyLoadSize-->
       <field id="isFullyLoaded" alias="pageTitleAndCounter.isFullyLoaded" />
 
-      <!-- tells the ChannelScreenHelper to display SignIn Required modal-->
-      <field id="signInRequired" type="boolean" alwaysNotify="true" />
-
       <!-- will be used to change the sponsored background images on the content controller -->
       <field id="sponsorshipBackground" type="string" alwaysNotify="true" />
 

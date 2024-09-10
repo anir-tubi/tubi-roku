@@ -541,7 +541,16 @@ Function handleCategoryDeeplinkContent()
     if m.enteredFromDeepLink = true
       sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.categoryDetail, m.Tracking, m.trackingLoggingTask, m.constants)
     end if
-    navigateToCategoryDetailsScreen(m.deeplinkContent.id)
+    isUserSigedIn = isLoggedInUser()
+    categoryId = m.deeplinkContent.id
+    categoryIds = m.constants.ui.categoryIds
+    if isUserSigedIn = true OR (categoryId <> categoryIds.history AND categoryId <> categoryIds.queue AND categoryId <> categoryIds.myLikes)
+      navigateToCategoryDetailsScreen(categoryId)
+      focusSideNavOption(m.constants.ui.sideNavIds.categories)
+    else
+      showHomeScreen(m.constants)
+      focusSideNavOption(m.constants.ui.sideNavIds.home)
+    end if
   else
     if m.enteredFromDeepLink = true
       sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.category, m.Tracking, m.trackingLoggingTask, m.constants)

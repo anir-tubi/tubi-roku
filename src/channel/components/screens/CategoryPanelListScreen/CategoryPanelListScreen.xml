@@ -59,9 +59,6 @@
 
     <!-- OUTPUT -->
 
-      <!-- tells the ChannelScreenHelper to display SignIn Required modal-->
-      <field id="signInRequired" type="boolean" alwaysNotify="true" />
-
       <!-- The item in the grid (from the vertical list of categories on the left side) that is in focus -->
       <field id="itemFocused" type="integer" alwaysNotify="true"/> 
 

@@ -251,8 +251,16 @@ Function processNavigateAction(uriParameters)
         startSignIn()
       end if
     else if page = "category" AND isNonEmptyString(uriParameters["category"]) = true
-      navigateToCategoryDetailsScreen(uriParameters["category"])
-      focusSideNavOption(m.constants.ui.sideNavIds.categories)
+      isUserSigedIn = isLoggedInUser()
+      categoryId = uriParameters["category"]
+      categoryIds = m.constants.ui.categoryIds
+      if isUserSigedIn = true OR (categoryId <> categoryIds.history AND categoryId <> categoryIds.queue AND categoryId <> categoryIds.myLikes)
+        navigateToCategoryDetailsScreen(categoryId)
+        focusSideNavOption(m.constants.ui.sideNavIds.categories)
+      else
+        showHomeScreen(m.constants)
+        focusSideNavOption(m.constants.ui.sideNavIds.home)
+      end if
     else if page = "network" AND isNonEmptyString(uriParameters["network"]) = true
       navigateToNetworkDetailsScreen(uriParameters["network"])
       focusSideNavOption(m.constants.ui.sideNavIds.channels)

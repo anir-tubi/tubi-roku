@@ -325,15 +325,6 @@ Function onKeyEvent(key, press) as Boolean
       handlePlayInput()
       handled = true
     end if
-  else
-    if key = "back"
-      authInfo = m.auth.getAuthInfo()
-      ' show SignInRequired modal when guest user presses back from ActivationCodeScreen to CategoryDetailsScreen
-      if isLoggedInUser(authInfo) = false then
-        m.top.signInRequired = true
-        handled = true
-      end if
-    end if
   end if
 
   return handled

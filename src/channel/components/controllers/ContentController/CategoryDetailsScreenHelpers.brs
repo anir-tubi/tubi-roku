@@ -15,7 +15,6 @@ Function showCategoryDetailsScreen(content, sendNavigationLoadEvents = true, con
   categoryDetailsScreen.observeFieldScoped("focusedChild", "onCategoryDetailsScreenFocusChanged")
   categoryDetailsScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   categoryDetailsScreen.observeFieldScoped("categoryBatchIndex", "onCategoryBatchIndexChange")
-  categoryDetailsScreen.observeFieldScoped("signInRequired", "onSignInRequired")
   categoryDetailsScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
   categoryDetailsScreen.observeFieldScoped("contentToPlay", "onContentToPlay")
   categoryDetailsScreen.observeFieldScoped("backButtonPressed", "onCategoryDetailsScreenBackButtonPressed")
@@ -39,12 +38,7 @@ Function showCategoryDetailsScreen(content, sendNavigationLoadEvents = true, con
     pushScreen(categoryDetailsScreen, false, false)
   end if
 
-  ' make queue API request only if the user loggedIn
-  if content.id = m.constants.ui.categoryIds.queue AND isLoggedInUser() = false
-    displaySignInRequiredModal(categoryDetailsScreen)
-  else
-    fetchCategoryDetails(content, 0, contentMode)
-  end if
+  fetchCategoryDetails(content, 0, contentMode)
 
 End Function
 
@@ -62,37 +56,6 @@ Function isCategoryDetailScreenInStack(categoryId)
   end for
 
   return false
-End Function
-
-
-Function onSignInRequired(msg)
-  tubiLog("CategoryDetailsScreenHelpers.onSignInRequired")
-  screen = msg.getRoSGNode()
-
-  if screen <> invalid AND screen.content = invalid
-    displaySignInRequiredModal(screen)
-  end if
-
-End Function
-
-
-Function displaySignInRequiredModal(screen)
-  tubiLog("CategoryDetailsScreenHelpers.displaySignInRequiredModal")
-
-  dialogEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: "SIGNIN_REQUIRED" 'DialogType enum
-      pageOneof: m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pageType, screen.trackingPageInfo.pageValues)
-      dialog_action: "SHOW"
-      dialog_sub_type: "sign-in-mylist"
-    }
-  }
-  title = getTranslation("dialog_whoops_title")
-  message = getTranslation("dialog_mylist_signIn_description")
-  buttons = [getTranslation("dialog_button_register_signIn"), getTranslation("dialog_button_cancel")]
-  showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onSignInModalSelectedViaSideNavMyList, removeTopScreen)
-
 End Function
 
 
@@ -149,7 +112,6 @@ Function onCategoryBatchIndexChange(msg)
       fetchCategoryDetails(categoryContent, index)
     end if
   else
-
     '//If index is 0, then refresh the page
     categoryDetailsScreen.content = invalid
     categoryDetailsScreen.isLoading = true

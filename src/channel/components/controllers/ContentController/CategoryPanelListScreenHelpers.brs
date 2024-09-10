@@ -30,7 +30,6 @@ Function showCategoryPanelListScreen(constants, sendNavigationLoadEvents = true,
     panelScreen.observeFieldScoped("contentFocused", "onCategoryListContentFocused")
     panelScreen.observeFieldScoped("categoryContentSelected", "onCategoryPanelContentSelected")
     panelScreen.observeFieldScoped("contentToPlay", "onContentToPlay")
-    panelScreen.observeFieldScoped("signInRequired", "onCategoryPanelSignInRequired")
     panelScreen.observeFieldScoped("categoryBatchIndex", "onCategoryPanelBatchIndexChange")
     panelScreen.observeFieldScoped("visible", "onCategoryPanelListScreenVisibleChange")
 
@@ -305,17 +304,12 @@ Function refreshCategoryPanelListDetailScreen(screen)
   
   if focusedItem <> invalid
     screen.isCategoryLoading = true
-    if focusedItem.id = m.constants.ui.categoryIds.queue AND isLoggedInUser() = false
-      displaySignInRequiredModal(screen)
+    categoryContent = getFromContentCache(focusedItem.id)
+    if categoryContent <> invalid AND categoryContent.getChildCount() > 0 AND shouldRefresh(categoryContent) <> true
+      '//If the content already exists in the cache and is still fresh, then no need to fetch the content
+      onCategoryDetailPanelResponse(categoryContent)
     else
-
-      categoryContent = getFromContentCache(focusedItem.id)
-      if categoryContent <> invalid AND categoryContent.getChildCount() > 0 AND shouldRefresh(categoryContent) <> true
-        '//If the content already exists in the cache and is still fresh, then no need to fetch the content
-        onCategoryDetailPanelResponse(categoryContent)
-      else
-        fetchCategoryPanelDetails(focusedItem.id)
-      end if
+      fetchCategoryPanelDetails(focusedItem.id)
     end if
   end if
 End Function
@@ -378,16 +372,6 @@ Function onCategoryPanelBatchIndexChange(msg)
     categoryPanelScreen.categoryContent = invalid
     categoryPanelScreen.isCategoryLoading = true
     fetchCategoryPanelDetails(categoryContent.id)
-  end if
-End Function
-
-
-Function onCategoryPanelSignInRequired(msg)
-  tubiLog("CategoryPanelListScreenHelpers.onCategoryPanelSignInRequired")
-  screen = msg.getRoSGNode()
-
-  if screen <> invalid AND screen.categoryContent = invalid
-    displaySignInRequiredModal(screen) 
   end if
 End Function
 

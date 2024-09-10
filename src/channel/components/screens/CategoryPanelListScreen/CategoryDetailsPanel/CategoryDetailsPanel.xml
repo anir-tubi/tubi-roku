@@ -93,9 +93,6 @@
       <!-- This field indicates that categorydetail page is fully loaded with all available contents or upto constants.performance.categoryGridList.finalLazyLoadSize-->
       <field id="isFullyLoaded" alias="pageTitleAndCounter.isFullyLoaded" />
 
-      <!-- tells the ChannelScreenHelper to display SignIn Required modal-->
-      <field id="signInRequired" type="boolean" alwaysNotify="true" />
-
       <!-- Holds a load time start value [returned from UpTime()] that can be used to determine how long the page took to load.
            Used when showing a series/episode page
       -->
