@@ -32,6 +32,7 @@ describe('Live News Events', function () {
 	});
 	it('When the user selects a channel from the channel guide, then it should send a "navigate_to_page" beacon C118158 and C118164 @analyticsASet1', async () => {
 		const homePage = HomePage();
+		await homePage.pageDidLoad();
 		await homePage.navigateToLiveNewsAndSelect(true);
 		const liveNews = LiveNews();
 		await liveNews.selectSubtitles(false);
@@ -42,6 +43,7 @@ describe('Live News Events', function () {
 	it('A "start_live_video_event" beacon should be sent at the start of the video playback. C118162 \
       and UI: C114051 and UI: C114052 @analyticsASet1', async () => {
 		const homePage = HomePage();
+		await homePage.pageDidLoad();
 		await homePage.navigateToLiveNews();
 		const liveNews = LiveNews();
 		await liveNews.checkIfLiveNewsShown();

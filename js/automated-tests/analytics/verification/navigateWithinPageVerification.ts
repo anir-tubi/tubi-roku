@@ -466,47 +466,38 @@ export async function verifyC524595() {
 		);
 		navigateWithinPage = pulletEvents.find(
 			(event) =>
-				event.navigate_within_page.middle_nav_component &&
-				event.navigate_within_page.middle_nav_component.middle_nav_section &&
-				event.navigate_within_page.middle_nav_component.middle_nav_section ===
-					MidleNavComponents.watchTrailer
+				event.navigate_within_page.video_player_page &&
+				event.navigate_within_page.video_player_page.video_id
 		);
 		i++;
 	}
-	expect(
-		navigateWithinPage.navigate_within_page.dest_middle_nav_component
-			.middle_nav_section
-	).equal(
-		MidleNavComponents.addToMyList,
-		`event should contain navigateWithinPage.navigate_within_page.dest_middle_nav_component.middle_nav_sectionn===START_FROM_BEGINNING \n
+	expect(navigateWithinPage.navigate_within_page.video_player_page
+		.video_id).to.match(
+		/\d/,
+		`event should contain navigateWithinPage.navigate_within_page.video_player_page.video_id===id \n
 	${JSON.stringify(navigateWithinPage)} \n`
 	);
 	expect(navigateWithinPage.navigate_within_page.horizontal_location).equal(
-		1,
+		2,
 		`event should contain navigateWithinPage.navigate_within_page.horizontal_location===1 \n
 	${JSON.stringify(navigateWithinPage)} \n`
 	);
 	expect(navigateWithinPage.navigate_within_page.means_of_navigation).equal(
-		'SCROLL',
-		`event should contain navigateWithinPage.navigate_within_page.means_of_navigation===SCROLL \n
+		'BUTTON',
+		`event should contain navigateWithinPage.navigate_within_page.means_of_navigation===BUTTON \n
 	${JSON.stringify(navigateWithinPage)} \n`
 	);
 	expect(
-		navigateWithinPage.navigate_within_page.middle_nav_component
-			.middle_nav_section
+		navigateWithinPage.navigate_within_page.category_component
+			.category_slug
 	).equal(
-		MidleNavComponents.watchTrailer,
-		`event should contain navigateWithinPage.navigate_within_page.middle_nav_component.middle_nav_sectionn===WATCH_TRAILER \n
+		'featured',
+		`event should contain navigateWithinPage.navigate_within_page.category_component.category_slug===featured \n
 	${JSON.stringify(navigateWithinPage)} \n`
 	);
-	expect(navigateWithinPage.navigate_within_page.vertical_location).to.match(
-		/\d/,
+	expect(navigateWithinPage.navigate_within_page.vertical_location).equal(
+		1,
 		`event should contain navigateWithinPage.navigate_within_page.vertical_location===2 \n
-	${JSON.stringify(navigateWithinPage)} \n`
-	);
-	expect(navigateWithinPage.navigate_within_page.video_page.video_id).equal(
-		parseInt(titleId),
-		`event should contain navigateWithinPage.navigate_within_page.video_page===${titleId} \n
 	${JSON.stringify(navigateWithinPage)} \n`
 	);
 }

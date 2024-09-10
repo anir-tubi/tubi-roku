@@ -401,6 +401,7 @@ const PlayBack = ({ content }) => {
 			'browseWhileWatchingRowList'
 		);
 		await ecp.sendKeypress(ecp.Key.Right, { wait: 200 });
+		await allowPlaybackToPlayForSeconds(10000);
 		await ecp.sendKeypress(ecp.Key.Ok);
 		const playback = PlayBack({ content: content });
 		await playback.pageDidLoad();
