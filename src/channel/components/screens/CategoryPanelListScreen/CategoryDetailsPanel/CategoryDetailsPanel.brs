@@ -111,7 +111,6 @@ Function setUIBasedOnFocus(bAnimateOn = true)
         '//Animate panel so infoPanel is visible
         slideTo(m.PageAnimatedGroup, [0, -m.nSponsorshipYDelta], nAnimateTime)
         fade(m.InfoPanel, "in", nAnimateTime)
-        fade(m.PageTitleAndCounter, "in", nAnimateTime)
       end if
 
       checkOnRefresh()
@@ -120,7 +119,6 @@ Function setUIBasedOnFocus(bAnimateOn = true)
     '//Animate panel so infoPanel is no longer visible
     slideTo(m.PageAnimatedGroup, [0, -375], nAnimateTime)
     fade(m.InfoPanel, "out", nAnimateTime)
-    fade(m.PageTitleAndCounter, "out", nAnimateTime, 0, .4)
     m.top.backgroundUriList = []
   end if
 
