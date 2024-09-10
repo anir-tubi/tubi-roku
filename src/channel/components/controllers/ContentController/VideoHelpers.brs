@@ -224,7 +224,8 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
 
       sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.streamStart, content)
 
-      if isKidsUIOn() = false
+      'Do not Fetch/Show BrowseWhileWatching row for kids mode & limited UI models
+      if isKidsUIOn() = false AND m.constants.deviceInfo.limitedUi = false
         browseContent = videoPlayer.browseContent
 
         if browseContent = invalid
