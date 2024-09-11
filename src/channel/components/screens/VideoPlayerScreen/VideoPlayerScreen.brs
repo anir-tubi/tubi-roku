@@ -532,36 +532,57 @@ Function playContent()
     fireStartVideoOrTrailerEvent()
 
     updateVideoState("play")
+
     if m.top.enableAds = true then
+      'boolean to fetch preroll or not, this value is updated based on cuepoint & roku_detect_preroll_from_cue_point experiment.
+      fetchPreroll = false
+
       '//Set the midrolls of the videoplayer now and set the adControl state to preroll
       cuepoints = m.Video.content.cuepoints
       if cuepoints <> invalid
         ' Iterating all cuepoints and storing it in assocarray, so that we don't want to iterate on every position change(notificationInterval) of video.
         for each cuepoint in cuepoints
           tubilog("VideoPlayer: MIDROLL: " + strI(cuepoint))
+
+          if Int(cuepoint) = 0 AND getExperimentResource("roku_detect_preroll_from_cue_point", "roku_detect_preroll_from_cue_point_v1").enabled = true
+            fetchPreroll = true
+          end if
+
           m.midrolls[strI(cuepoint)] = true
         end for
       end if
-      ' Start pre-roll fetch
-      m.top.adControl = "preroll"
+
+      if fetchPreroll = true
+        ' Start pre-roll fetch
+        m.top.adControl = "preroll"
+      else
+        m.Video.control = "play"
+        setInitialCCAndAudioTracks()
+      end if
+
     else
       m.Video.control = "play"
-      setInitialSubtitleTrack(m.Video.availableSubtitleTracks)
-      ' Calling the set initial audio track in the start of video playback.
-      ' The reason we are calling it here is to cover a use case where if we play the same video or the next video as the same value.
-      ' For ex: Between different video with audio tracks the available tracks value is exactly the same value.
-      ' It has 2 elements with Eng as language and track as dash/a~AAC~en~description~~2 and dash/a~AAC~en~main~~2.
-      ' Which results in the observer for available audio track not being fired.
-      ' With the below approach we are setting the value again using existing data from the previous content
-      ' that was played by the video player, which covers the case if the previous and current content have the
-      ' same audio track. In the case where the previous and current content have different audio tracks,
-      ' setInitialAudioTrack() may attempt to set a track that the current content does not contain in which
-      ' case Roku's video player logic will choose an audio track
-      setInitialAudioTrack(m.Video.availableAudioTracks)
+      setInitialCCAndAudioTracks()
     end if
 
   end if
 
+End Function
+
+
+Function setInitialCCAndAudioTracks()
+  setInitialSubtitleTrack(m.Video.availableSubtitleTracks)
+  ' Calling the set initial audio track in the start of video playback.
+  ' The reason we are calling it here is to cover a use case where if we play the same video or the next video as the same value.
+  ' For ex: Between different video with audio tracks the available tracks value is exactly the same value.
+  ' It has 2 elements with Eng as language and track as dash/a~AAC~en~description~~2 and dash/a~AAC~en~main~~2.
+  ' Which results in the observer for available audio track not being fired.
+  ' With the below approach we are setting the value again using existing data from the previous content
+  ' that was played by the video player, which covers the case if the previous and current content have the
+  ' same audio track. In the case where the previous and current content have different audio tracks,
+  ' setInitialAudioTrack() may attempt to set a track that the current content does not contain in which
+  ' case Roku's video player logic will choose an audio track
+  setInitialAudioTrack(m.Video.availableAudioTracks)
 End Function
 
 

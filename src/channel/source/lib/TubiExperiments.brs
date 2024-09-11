@@ -57,6 +57,10 @@ Function TubiExperiments(experimentsInfo) as Object
         roku_horizontal_menu_v1: {"enabled": false}
       }
 
+      roku_detect_preroll_from_cue_point: {
+        roku_detect_preroll_from_cue_point_v1: {"enabled": false}
+      }
+
     }
 
     'public methods
