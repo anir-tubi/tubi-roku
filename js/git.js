@@ -93,7 +93,7 @@ async function makeReleasePrs(done) {
   //create PR against rcdn repository
   let filePaths = [{
     src: localStarterComponentsPath,
-    dst: `appFiles/starter-components/${starterComponentsFileName}`
+    dest: `appFiles/starter-components/${starterComponentsFileName}`
   }, {
     src: localStarterComponentsPath,
     dest: `rollbackStarterComponents/${fullBuildTag}/${starterComponentsFileName}` // Only sending to rcdn
