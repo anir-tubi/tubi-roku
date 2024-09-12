@@ -33,6 +33,9 @@ Function init()
   m.maskLayer10 = topRef.findNode("maskLayer10")
   m.maskLayer11 = topRef.findNode("maskLayer11")
   m.maskLayer2 = topRef.findNode("maskLayer2")
+  m.fullScreenPosterGradient = topRef.findNode("fullScreenPosterGradient")
+  m.fullScreenPosterLeftGradient = topRef.findNode("fullScreenPosterLeftGradient")
+  m.fullScreenPosterBottomGradient = topRef.findNode("fullScreenPosterBottomGradient")
 
   m.timer = CreateObject("roSGNode", "Timer")
   m.timer.duration = 3
@@ -56,12 +59,18 @@ Function setMaskLayerUris()
     m.maskLayer10.uri = "pkg:/images/background-masks/mask-layer-1-0-kids.webp"
     m.maskLayer11.uri = "pkg:/images/background-masks/mask-layer-1-1-kids.webp"
     m.maskLayer2.uri = "pkg:/images/background-masks/mask-layer-2-kids.webp"
+
+    m.fullScreenPosterLeftGradient.uri = "pkg:/images/background-masks/kids-left.png"
+    m.fullScreenPosterBottomGradient.uri = "pkg:/images/background-masks/kids-bottom.png"
   else
     m.posterGroupMask.uri = "pkg:/images/background-masks/mask-layer-0.webp"
     m.defaultBackground.uri = "pkg:/images/background-masks/mask-layer-1-0.webp"
     m.maskLayer10.uri = "pkg:/images/background-masks/mask-layer-1-0.webp"
     m.maskLayer11.uri = "pkg:/images/background-masks/mask-layer-1-1.webp"
     m.maskLayer2.uri = "pkg:/images/background-masks/mask-layer-2.webp"
+
+    m.fullScreenPosterLeftGradient.uri = "pkg:/images/background-masks/left.png"
+    m.fullScreenPosterBottomGradient.uri = "pkg:/images/background-masks/bottom.png"
   end if
 End Function
 
@@ -95,16 +104,27 @@ Function newBackgroundSet()
   m.top.shouldRotateBackgrounds = true
 
   m.aCurrentBackgroundInfo = m.top.backgroundInfo
+  backgroundTypes = m.constants.ui.backgroundTypes
+  
   if m.lastBackgroundInfo <> invalid AND m.aCurrentBackgroundInfo <> invalid AND m.lastBackgroundInfo.type <> m.aCurrentBackgroundInfo.type
-    if m.aCurrentBackgroundInfo.type = m.constants.ui.backgroundTypes.fullScreen
+    backgroundType = m.aCurrentBackgroundInfo.type
+
+    if backgroundType = backgroundTypes.fullScreen
       fade(m.circularMaskLayer, "out", 0.5)
       fade(m.posterGroupMask, "out", 0.5)
       fade(m.defaultBackground, "in", 0.5)
+      fade(m.fullScreenPosterGradient, "out", 0.5)
+    else if backgroundType = backgroundTypes.spotlight
+      fade(m.circularMaskLayer, "out", 0.5)
+      fade(m.posterGroupMask, "out", 0.5)
+      fade(m.defaultBackground, "out", 0.5)
+      fade(m.fullScreenPosterGradient, "in", 0.5)
     else
       fade(m.defaultBackground, "out", 0.5)
       fade(m.circularMaskLayer, "in", 0.5)
       ' Showing the poster group. Posters will automatically animate with width shrink effect due to update in the background info.
       fade(m.posterGroupMask, "in", 0.5)
+      fade(m.fullScreenPosterGradient, "out", 0.5)
     end if
   end if
   
@@ -318,7 +338,7 @@ Function startTransitionIn()
   else if m.newBackgroundType = m.constants.ui.backgroundTypes.epg
     m.newPoster.epgTransitionInControl = "start"
     m.newPoster.lastAnimationName = "epgTransitionIn"
-  else if m.newBackgroundType = m.constants.ui.backgroundTypes.fullScreen
+  else if m.newBackgroundType = m.constants.ui.backgroundTypes.fullScreen OR m.newBackgroundType = m.constants.ui.backgroundTypes.spotlight
     m.newPoster.fullScreenTransitionInControl = "start"
     m.newPoster.lastAnimationName = "FullScreenTransitionIn"
   else if m.newBackgroundType = m.constants.ui.backgroundTypes.rightScreen

@@ -42,6 +42,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     composeVideoResources: tubiMetadataTranslate_composeVideoResources
     getRoundedCornersURL: tubiMetadataTranslate_getRoundedCornersURL
     getBackgroundImages: tubiMetadataTranslate_getBackgroundImages
+    getTitleImageUrl: tubiMetadataTranslate_getTitleImageUrl
   }
 End Function
 
@@ -111,6 +112,10 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
     if isNonEmptyArray(contentFromServer.landscape_images)
       sThumbnailURL = contentFromServer.landscape_images[0]
     end if
+  else if gridType = gridItemTypes.spotlight
+    if canvasImages <> invalid AND type(canvasImages.spotlight_landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.spotlight_landscape_tb[0])
+      sThumbnailURL = canvasImages.spotlight_landscape_tb[0]
+    end if
   end if
 
   '//Ensure thumbnails have rounded corners - will only work with Tupian URLs
@@ -125,8 +130,8 @@ End Function
 '
 ' @contentFromServer: assocArray, AA representation of content metadata JSON as returned from server
 Function tubiMetadataTranslate_getBackgroundImages(contentFromServer)
-  imagesList = contentFromServer.images
   backgrounds = []
+  imagesList = contentFromServer.images
   if imagesList <> invalid AND imagesList.background_tb <> invalid AND type(imagesList.background_tb) = "roArray" AND imagesList.background_tb.count() > 0
     backgrounds = imagesList.background_tb
     ' If we do not have enough background images than back filling it with hero images.
@@ -144,6 +149,22 @@ Function tubiMetadataTranslate_getBackgroundImages(contentFromServer)
   return backgrounds
 End Function
 
+
+'''''''''''''''''''''
+' getTitleImageUrl
+'
+' @contentFromServer: assocArray, AA representation of content metadata JSON as returned from server
+Function tubiMetadataTranslate_getTitleImageUrl(contentFromServer)
+  title = ""
+  if contentFromServer <> invalid
+    imagesList = contentFromServer.images
+    if imagesList <> invalid AND imagesList.title_tb <> invalid AND type(imagesList.title_tb) = "roArray" AND imagesList.title_tb.count() > 0
+      title = imagesList.title_tb[0]
+    end if
+  end if
+
+  return title
+End Function
 
 '''''''''''''''''''''
 ' translateBackendTypeToClientSideType
@@ -290,7 +311,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     translatedContent.genres = contentFromServer.tags 'array of genres
     translatedContent.categories = contentFromServer.tags 'array of genres
   end if
-
+  
   if contentFromServer.slug <> invalid then translatedContent.slug = contentFromServer.slug
   if contentFromServer.lang <> invalid then translatedContent.language = contentFromServer.lang
   if contentFromServer.publisher_id <> invalid then translatedContent.pubId = contentFromServer.publisher_id
@@ -430,8 +451,14 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   end if
 
   backgrounds = m.getBackgroundImages(contentFromServer)
+  
   if backgrounds.count() > 0
     translatedContent.backgrounds = backgrounds
+  end if
+
+  titleImage = m.getTitleImageUrl(contentFromServer)
+  if titleImage <> ""
+    translatedContent.titleImage = titleImage
   end if
 
   if contentFromServer.ratings <> invalid AND contentFromServer.ratings[0] <> invalid AND contentFromServer.ratings[0].value <> invalid
@@ -582,6 +609,16 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.channel_logo <> invalid then translatedContent.inlineLogoUri = contentFromServer.channel_logo
   if contentFromServer.channel_name <> invalid then translatedContent.channelName = contentFromServer.channel_name
 
+  '//::TODO::roku_spotlight_carousel_v1 - The backend needs to create a better way to determine if this is a TubiOriginal.
+  '//   After the experiment, ensure there is a better way.
+  importId = contentFromServer.import_id
+  if importId <> invalid
+    sSuffixOriginal = "-original"
+    if Right(importId, Len(sSuffixOriginal)) = sSuffixOriginal
+      translatedContent.isOriginal = true
+    end if
+  end if
+
   if contentFromServer.is_recurring <> invalid then translatedContent.isRecurring = contentFromServer.is_recurring
   if contentFromServer.availability_ends <> invalid then translatedContent.availabilityEnds = contentFromServer.availability_ends
   if contentFromServer.air_datetime <> invalid then translatedContent.airDateTime = contentFromServer.air_datetime
@@ -683,7 +720,7 @@ Function tubiMetadataTranslate_getContentFromCategoryJson(category, contentId, i
     if parsed <> invalid
       fullContent = parsed[contentId]
       translated = CreateObject("roSGNode", "TubiContentNode")
-      m.translateRecursive(fullContent, translated, isSignedInUser)
+      m.translateRecursive(fullContent, translated, isSignedInUser) 
       translated.parentId = category.id
       translated.parentType = category.type
       translated.parentTitle = category.title
@@ -1713,7 +1750,9 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
   gridItemTypes = constants.ui.gridItemTypes
   gridItemType = gridItemTypes.portrait
 
-  if container.type = constants.ui.categoryTypes.linear
+  if container.id = constants.ui.categoryIds.spotlight AND m.experiments.getExperimentResource("roku_spotlight_carousel", "roku_spotlight_carousel_v1").enabled = true
+    gridItemType = gridItemTypes.spotlight
+  else if container.type = constants.ui.categoryTypes.linear
     gridItemType = gridItemTypes.linear
   else if container.id = constants.ui.categoryIds.featured AND orientation <> gridItemTypes.portrait
     ' `orientation <> gridItemTypes.portrait` is required as the search screen container.id is featured but uses portrait imagery

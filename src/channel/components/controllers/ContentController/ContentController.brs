@@ -1615,8 +1615,11 @@ Function setVideoContentScreenBackground(screen)
   currentScreen = getCurrentScreen()
   if screen <> invalid AND currentScreen <> invalid AND screen.id = currentScreen.id
     contentType = invalid
-    if screen.contentFocused <> invalid
-      contentType = screen.contentFocused.type
+    gridItemType = invalid
+    contentFocused = screen.contentFocused
+    if contentFocused <> invalid
+      contentType = contentFocused.type
+      gridItemType = contentFocused.gridItemType
     end if
     videoPreviewState = getVideoPreviewState()
 
@@ -1625,14 +1628,25 @@ Function setVideoContentScreenBackground(screen)
       isVideoPreviewPlayQueued = true
     end if
 
-    if videoPreviewState = "playing" OR videoPreviewState = "paused" OR videoPreviewState = "buffering" OR isVideoPreviewPlayQueued = TRUE then
+    isSpotlightRowContent = isCurrentScreenHomeScreen() = true AND gridItemType = m.constants.ui.gridItemTypes.spotlight
+    if videoPreviewState = "playing" OR videoPreviewState = "paused" OR videoPreviewState = "buffering" OR isVideoPreviewPlayQueued = true
+      if isSpotlightRowContent = true
+        backgroundType = m.constants.ui.backgroundTypes.spotlight
+      else
+        backgroundType = m.constants.ui.backgroundTypes.epg
+      end if
       m.backgroundGroup.backgroundInfo = {
-        type: m.constants.ui.backgroundTypes.epg
+        type: backgroundType
         uriList: [] ' setting uriList as empty, because don't need to rotate the background poster when video preview is playing. We can't use shouldRotateBackgrounds because we still need the gradients from backgroundGroup
       }
     else
+      if isSpotlightRowContent = true
+        backgroundType = m.constants.ui.backgroundTypes.spotlight
+      else
+        backgroundType = getBackgroundType(screen.backgroundUriList, contentType)
+      end if
       m.backgroundGroup.backgroundInfo = {
-        type: getBackgroundType(screen.backgroundUriList, contentType)
+        type: backgroundType
         uriList: screen.backgroundUriList
       }
     end if

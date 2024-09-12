@@ -377,6 +377,18 @@ Function getTranslation_en_US()
       "description": "The text to display on Show All Games tile",
       "message": "Show All"
     },
+    "screenHome_button_spotlight_details": {
+      "description": "On the home screen of the spotlight row, this is the text of a details button that allows the user to go to the details screen",
+      "message": "Details"
+    },
+    "screenHome_button_spotlight_watch_live": {
+      "description": "On the home screen of the spotlight row, this is the text of a watch live button that allows the user to start playing focused live content",
+      "message": "Watch Live"
+    },
+    "screenHome_button_spotlight_watch_now": {
+      "description": "On the home screen of the spotlight row, this is the text of a watch now button that allows the user to start playing focused linear content",
+      "message": "Watch Now"
+    },
     "loadingIndicator": {
       "description": "When something is loading, this text appears so the user knows something is loading.",
       "message": "Loading..."

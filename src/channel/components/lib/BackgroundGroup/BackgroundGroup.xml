@@ -45,6 +45,20 @@
         id="poster2"
         posterOpacity="1.0"/>
     </Group>
+
+    <Group
+      id="fullScreenPosterGradient"
+      opacity="0">
+      <Poster
+        id="fullScreenPosterLeftGradient"
+        width="1920"
+        height="1080"/>
+      <Poster
+        id="fullScreenPosterBottomGradient"
+        width="1920"
+        height="1080"/>
+    </Group>
+
     <Poster
         id="posterGroupMask"
         width="1122"

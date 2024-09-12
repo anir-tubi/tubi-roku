@@ -80,6 +80,7 @@ Function onVideoPreviewStateChanged(msg)
   else if videoPreviewState = "error"
     ' unobserve the state if we have any error while playing mp4 video previews to avoid autostarting the focused content on autostart variant of experiment.
     videoPreview.unobserveFieldScoped("state")
+    videoPreview.unobserveFieldScoped("position")
   else
     if videoPreview <> invalid
       videoPreview.visible = false
@@ -141,9 +142,30 @@ Function startVideoPreview(content, pageInfo = {})
   tubiLog("VideoPreviewHelpers.startVideoPreview")
   if content <> invalid AND isVideoPreviewOn() = true
     videoPreview = m.videoPreviewPlayer
+
+    ' If the experiment is enabled and focused content is from featured row than expand preview to full screen.
+    if getExperimentResource("roku_spotlight_carousel", "roku_spotlight_carousel_v1", false).enabled = true AND content.parentId = m.constants.ui.categoryIds.featured
+      ' Reducing 1px from both width and height since the player is in background and keeping full width causes roku to display closed captioning overlay.
+      ' To avoid any other Roku OS level default behaivour from kicking in reducing 1px to give a impression that player is not in full screen.
+      videoPreview.update({
+        width: 1919
+        height: 1079
+        videoTranslation: [0, 0]
+      })
+    else
+      videoPreview.update({
+        width: 1120
+        height: 630
+        videoTranslation: [799, 0]
+      })
+    end if
+
     ' unobserve field just in case previous state was errorsstart observing a fresh status.
     videoPreview.unobserveFieldScoped("state")
     videoPreview.observeFieldScoped("state", "onVideoPreviewStateChanged")
+    videoPreview.unobserveFieldScoped("position")
+    videoPreview.observeFieldScoped("position", "onVideoPreviewPositionChanged")
+
     setPageInfoForVideoPreview(pageInfo)
 
     videoContent = createObject("RoSGNode", "ContentNode")
@@ -214,5 +236,16 @@ Function setVideoPreviewAfterFocus(focusedContent, pageInfo = {})
 
       end if
     end if
+  end if
+End Function
+
+
+Function onVideoPreviewPositionChanged(msg)
+  videoPreviewScreen = msg.getRoSGNode()
+  position = msg.getData()
+  duration = videoPreviewScreen.duration
+  currentScreen = getCurrentScreen()
+  if duration > 0 AND position > 0 AND position <= duration AND currentScreen.hasField("videoPreviewProgress") = true
+    currentScreen.videoPreviewProgress = (position * 100) / duration
   end if
 End Function

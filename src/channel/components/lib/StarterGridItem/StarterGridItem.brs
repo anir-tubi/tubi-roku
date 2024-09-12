@@ -55,9 +55,12 @@ Function onItemContentChange(msg)
 
   if itemContent <> invalid
     gridItemType = itemContent.gridItemType
-
+    
     childGridItemComponent = invalid
-    if gridItemType = "emptyContainer" then
+    row = itemContent.getParent()
+    if gridItemType = "spotlight"
+      childGridItemComponent = "SpotlightPoster"
+    else if gridItemType = "emptyContainer" then
       childGridItemComponent = "CategoryGridPoster"
     else if gridItemType = "landscapeInnerMetadata" then
       childGridItemComponent = "CategoryGridPoster"
@@ -68,14 +71,12 @@ Function onItemContentChange(msg)
     else if gridItemType = "portraitTopTen"
       childGridItemComponent = "CategoryGridTopTen" 'make sure this check before itemContent.needsLogin check
     else if itemContent.type = "linear" then
-      row = itemContent.getParent()
       if row <> invalid AND row.gridItemType = "landscapeNoTitle" OR row.gridItemType = "landscape" then
         childGridItemComponent = "CategoryGridLinearPoster"
       end if
     else if itemContent.needsLogin = true AND isLoggedInUser() = false '//TBD : isLoggedInUser accesses m.global for every item. Try to remove this
       childGridItemComponent = "CategoryGridPoster"
     else
-      row = itemContent.getParent()
       if row <> invalid AND row.id = "continue_watching"
         childGridItemComponent = "CategoryGridPoster"
       end if

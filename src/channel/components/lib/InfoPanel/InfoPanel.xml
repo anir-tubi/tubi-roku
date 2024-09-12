@@ -46,12 +46,10 @@
     <field id="mode" type="string"/>
 
     <field id="title" alias="Title.text" />
+    <field id="titleImageUri" type="string" alwaysNotify="true" />
     <field id="leftHeaderImageUri" type="string" />
-    <field id="topHeaderImageUri" alias="TopHeaderImage.uri" />
-    <field id="liveBadgeHeaderUri" alias="liveBadgeHeader.iconUri" />
-    <field id="liveBadgeHeaderText" alias="liveBadgeHeader.text" />
-    <field id="liveBadgeHeaderTextColor" alias="liveBadgeHeader.textColor" />
-    <field id="liveBadgeHeaderBackgroundColor" alias="liveBadgeHeader.backgroundColor" />
+    <field id="liveBadgeHeaderText" type="string" />
+    <field id="channelNameHeader" type="string" alias="channelNameHeader.text" />
     <field id="episodeTitle" type="string" />
     <field id="description" type="string" />
     <field id="directors" type="stringarray" />
@@ -61,6 +59,7 @@
         <!--Set this field before setting needsLogin-->
     <field id="loginReason" type="string" />
     <field id="needsLogin" type="boolean" />
+    <field id="isTubiOriginal" type="boolean" />
     <field id="reminderIsSet" type="boolean" />
     <field id="calculateHeight" type="boolean" alwaysNotify="true" />
 
@@ -131,11 +130,31 @@
         horizAlignment="custom"
         translation="[0,0]">
 
+        <LayoutGroup
+          id="topHeaderGroup"
+          layoutDirection="horiz"
+          horizAlignment="left"
+          translation="[0,0]"
+          itemSpacings="[12]">
+          <Badge
+            visible="false"
+            id="liveBadgeHeader"/>
+          <Label
+            id="channelNameHeader">
+          </Label>
+        </LayoutGroup>
+
         <Poster
-          id="TopHeaderImage"
-          visible="true"/>
-        <Badge
-          id="liveBadgeHeader"/>
+          id="TubiOriginal"
+          uri="https://rcdn-production.tubitv.com/appFiles/images/tubi_original.webp"
+          width="248"
+          height="44"
+          visible="false"
+          loadDisplayMode="scaleToFit"/>
+
+        <Poster
+          id="TitleImage"
+          loadDisplayMode="limitSize"/>
 
         <LayoutGroup
           id="TitleGroup"

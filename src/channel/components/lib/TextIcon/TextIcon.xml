@@ -7,18 +7,28 @@
     <!-- INPUT -->
     <field id="text" alias="textLabel.text" />
     <field id="fontColor" type="string" alias="textLabel.color" />
+    <field id="iconColor" type="string" alias="icon.blendColor" />
     <field id="labelTranslation" type="array" alias="textLabel.translation" />
     <!-- Image uri must be 9 patch image -->
     <field id="uri" type="string" />
+    <field id="iconUri" type="string" />
     <field id="blendColor" type="string" alias="textBackground.blendColor" />
     <field id="fontUri" type="string" alias="textLabel.fontUri" />
     <field id="fontSize" type="integer" alias="textLabel.fontSize" />
     <field id="padding" type="vector2d" value="[12, 6]" />
+
+    <!-- The spacing between the icon (if it is visible) and the textfield in pixels. -->
+    <field id="iconTextSpacing" type="integer" value="-1"/>
   </interface>
 
   <children>
     <Poster
       id="textBackground" />
+    <Poster
+      id="Icon"
+      width="36"
+      height="36"
+      loadSync="true"/>
     <SimpleLabel
       id="textLabel"
       horizOrigin="center"

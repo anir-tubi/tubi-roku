@@ -21,6 +21,7 @@
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/DeviceMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
 
   <interface>
     <!-- INPUT -->
@@ -36,6 +37,10 @@
         ...
       </CategoryContentNode> -->
       <field id="content" type="node"/>
+
+      <field id="spotlightContent" type="node" alias="spotlightRow.content" />
+
+      <field id="spotlightContentUpdated" alias="spotlightRow.contentUpdated" />
 
       <!-- contentUpdated will be set when the new content is ready to be displayed on the screen. -->
       <field id="contentUpdated" type="boolean" alwaysNotify="true"/>
@@ -86,7 +91,7 @@
       <field id="isFullWidth" type="boolean" value="true" />
 
       <!-- set to true if the user is signed in and we want to change the experience based on that -->
-      <field id="signedIn" type="boolean" value="false" />
+      <field id="signedIn" type="boolean" value="false" alias="spotlightRow.signedIn" />
 
       <!-- This field is used to force remove focus from the rowlist. -->
       <field id="removeFocusFromRowList" type="boolean" />
@@ -105,6 +110,12 @@
 
       <!-- Contains the value of personalization_id returned from backend home screen api call. -->
       <field id="personalizationId" type="string" />
+
+      <!-- This field holds data related to video preview progress. -->
+      <field id="videoPreviewProgress" alias="spotlightRow.videoPreviewProgress" />
+
+      <!-- The number that is used as how many more seconds until the linear video player will be going fullscreen -->
+      <field id="fullscreenCountdown" alias="spotlightRow.fullscreenCountdown" />
 
       <!-- We have to create a field due to renderTracking events being async each itemComponent should be aware of what the mode was when it rendered. -->
       <field id="shouldTrackViewableImpressionEvent" type="boolean" />
@@ -127,11 +138,9 @@
 
       <field id="oldCursorPosition" type="vector2d" value="[-1,-1]"/>
 
-      <field id="selectedPosition" alias="RowList.rowItemSelected" />
+      <field id="selectedPosition" type="array" />
 
-      <field id="focusedPosition" alias="RowList.rowItemFocused" />
-
-      <field id="itemUnfocused" alias="RowList.itemUnfocused" />
+      <field id="focusedPosition" type="array" />
 
       <field id="vertFocusDirection" alias="RowList.vertFocusDirection" />
 
@@ -153,6 +162,9 @@
   </interface>
 
   <children>
+    <SpotlightRow 
+      id="spotlightRow"
+      translation="[0,132]" />
     <RowList
       id="RowList"
       itemComponentName="StarterGridItem"

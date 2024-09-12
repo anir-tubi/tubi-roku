@@ -66,6 +66,9 @@ Function init()
   m.originalContentAreaMaskOffset = m.ContentArea.maskOffset
 
   m.scrollDirection = "none"
+
+  ' Holds the boolean indicating if the spotlight experiment is enabled for the user or not.
+  m.isSpotlightRowEnabled = (getExperimentResource("roku_spotlight_carousel", "roku_spotlight_carousel_v1", false).enabled = true)
 End Function
 
 
@@ -104,8 +107,7 @@ Function onLoadingChange()
     emptyContentNode = CreateObject("roSGNode", "TubiContentNode")
     populateInfoPanel(m.constants.ui.infoPanelModes.item, emptyContentNode) 'empties the info panel
     m.CategoryGridList.content = invalid ' should be all categories with initial amounts of content in them
-  else
-    m.CategoryGridList.content = m.top.content ' should be all categories with initial amounts of content in them
+    m.CategoryGridList.spotlightContent = invalid
   end if
 End Function
 
@@ -336,7 +338,7 @@ Function populateInfoPanelByContent(focusedContent)
     else if sType = m.constants.ui.contentTypes.historySignedOutUser
       populateInfoPanel(m.constants.ui.infoPanelModes.continueWatching, focusedContent)
     else if sType = m.constants.ui.contentTypes.sportsEvent
-      populateInfoPanel(m.constants.ui.infoPanelModes.sportsEvent, focusedContent)
+      populateInfoPanel(m.constants.ui.infoPanelModes.sportsEvent, focusedContent) 
     else
       populateInfoPanel(m.constants.ui.infoPanelModes.item, focusedContent)
     end if
@@ -376,7 +378,18 @@ Function onGridFocusChange() as void
 
       m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(focusedContent, m.CategoryGridList.focusedPosition)
       m.top.contentFocused = focusedContent
-      populateInfoPanelByContent(focusedContent)
+      ' Only proceed if the spotlight row is disabled or if parent id is not featured if user has spotlight enabled.
+      ' This is because the spotlight has seperate infopanel within category grid list.
+      if m.isSpotlightRowEnabled = false OR focusedContent.parentId <> m.constants.ui.categoryIds.featured
+        populateInfoPanelByContent(focusedContent)
+      end if
+
+      if m.isSpotlightRowEnabled = true AND focusedContent.parentId = m.constants.ui.categoryIds.spotlight
+        fadeOutInfoPanel()
+        m.top.backgroundUriList = determineBackgroundImage(focusedContent)
+      else
+        fadeInContentArea()
+      end if
     end if
 
   end if
@@ -464,11 +477,14 @@ Function onItemToBeFocusedChange()
     m.top.contentReady = true
   end if
 
+  reloadedItemToBeFocused = m.CategoryGridList.reloadedItemToBeFocused
   'We are updating the infopanel for updated focused content, but not updating the contentFocused.
   'Here we are updating the contentFocused, so it will play correct video preview when the content is updated.
-  m.top.contentFocused = m.CategoryGridList.reloadedItemToBeFocused
+  m.top.contentFocused = reloadedItemToBeFocused
 
-  populateInfoPanelByContent(m.CategoryGridList.reloadedItemToBeFocused)
+  if reloadedItemToBeFocused <> invalid AND reloadedItemToBeFocused.gridItemType <> m.constants.ui.gridItemTypes.spotlight
+    populateInfoPanelByContent(reloadedItemToBeFocused)
+  end if
 End Function
 
 
@@ -533,6 +549,12 @@ Function fadeInContentArea()
   if m.InfoPanelParent.opacity < 1
     m.infoPanelFade = fade(m.InfoPanelParent, "in", .4, 0.0, 1)
   end if
+End Function
+
+
+Function fadeOutInfoPanel()
+  stopAnimation(m.infoPanelFade)
+  m.infoPanelFade = fade(m.InfoPanelParent, "out", .4)
 End Function
 
 

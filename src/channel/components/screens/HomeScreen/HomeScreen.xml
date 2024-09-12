@@ -27,8 +27,14 @@
       <!-- When the Helper receives valid category data from the server, it sets the new value to this field. -->
       <field id="content" alias="CategoryGridList.content" />
 
+      <!-- Spotlight content node, will contain a valid node only if the user is in spotlight experiment control group. -->
+      <field id="spotlightContent" alias="CategoryGridList.spotlightContent" />
+
       <!-- The helper class will call this when the new content is ready to be displayed on the screen. -->
       <field id="contentUpdated" alias="CategoryGridList.contentUpdated" />
+
+      <!-- The helper will set this when the new spotlight content is ready to be displayed on the screen. -->
+      <field id="spotlightContentUpdated" alias="CategoryGridList.spotlightContentUpdated" />
 
       <!-- What kind of content is this homeScreen displaying: movies, tv, normal, espanol etc -->
       <field id="contentMode" alias="CategoryGridList.contentMode" />
@@ -71,7 +77,7 @@
       <field id="resetContentAreaValues" type="boolean" alwaysNotify="true" />
 
       <!-- The number that is used as how many more seconds until the linear video player will be going fullscreen -->
-      <field id="fullscreenCountdown" type="integer"/>
+      <field id="fullscreenCountdown" type="integer" alias="CategoryGridList.fullscreenCountdown" />
 
       <!-- kidsModeFeatureOn will be set based device countryCode -->
       <field id="kidsModeFeatureOn" type="boolean" />
@@ -84,6 +90,8 @@
       <!-- This field is used to force remove focus from the rowlist. -->
       <field id="removeFocusFromRowList" type="boolean" alias="CategoryGridList.removeFocusFromRowList" />
 
+      <!-- This field is used to pass down the video preview progress down to the categorygrid list. -->
+      <field id="videoPreviewProgress" type="boolean" alias="CategoryGridList.videoPreviewProgress" />
       <!-- We have to create a field due to renderTracking events being async each itemComponent should be aware of what the mode was when it rendered. -->
       <field id="shouldTrackViewableImpressionEvent" type="boolean" value="true" alias="CategoryGridList.shouldTrackViewableImpressionEvent" />
 
@@ -154,7 +162,7 @@
 
        <!--Communicates to the parent that some of the containers has expired and to be loaded-->
       <field id="loadCategoryForIds" type="array" alwaysNotify="true"/>
-
+      
     <!-- DATA STORE (Anything defined below are not meant to be used as output or input fields which will triggered change events. ) -->
       <field id="personalizationId" type="string" alias="CategoryGridList.personalizationId" />
   </interface>

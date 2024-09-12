@@ -4,6 +4,7 @@
   <interface>
     <field id="type" type="string" />
     <field id="gridItemType" type="string" />
+    <field id="isOriginal" type="boolean" />
     <field id="parentType" type="string" />
     <field id="parentTitle" type="string" />
     <field id="parentId" type="string" />
@@ -18,6 +19,7 @@
     <field id="pubid" type="string" />
     <field id="country" type="string" />
     <field id="backgrounds" type="stringarray" />
+    <field id="titleImage" type="string" />
     <field id="cuepoints" type="array" />
     <field id="slug" type="string" />
     <field id="bookmarkId" type="string" />

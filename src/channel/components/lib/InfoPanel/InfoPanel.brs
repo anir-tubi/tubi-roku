@@ -5,11 +5,16 @@ Function init()
 
   m.offset = m.top.findNode("Offset")
   m.infoPanelGroup = m.top.findNode("infoPanelGroup")
-  m.topHeaderImage = m.top.findNode("TopHeaderImage")
+  m.topHeaderGroup = m.top.findNode("topHeaderGroup")
   m.liveBadgeHeader = m.top.findNode("liveBadgeHeader")
+  m.channelNameHeader = m.top.findNode("channelNameHeader")
   m.leftHeaderImage = m.top.findNode("LeftHeaderImage")
 
   m.title = m.top.findNode("Title")
+  m.titleImage = m.top.findNode("TitleImage")
+  m.titleImage.loadWidth = 600
+  m.titleImage.loadHeight = m.constants.ui.imageSizes.title[1]
+  m.titleImage.height = m.constants.ui.imageSizes.title[1]
   m.episode = m.top.findNode("Episode")
   m.twoLineInfo = m.top.findNode("TwoLineInfo")
 
@@ -19,6 +24,7 @@ Function init()
   m.line1Bold = m.firstLineGroup.findNode("Line1Bold")
   m.resolutionPoster = m.firstLineGroup.findNode("ResolutionPoster")
   m.closedCaptions = m.firstLineGroup.findNode("ClosedCaptionPoster")
+  m.tubiOriginal = m.top.findNode("TubiOriginal")
   m.audioDescriptionPoster = m.firstLineGroup.findNode("AudioDescriptionPoster")
   m.rating = m.firstLineGroup.findNode("Rating")
   m.ratingBackground = m.rating.findNode("RatingBackground")
@@ -57,6 +63,7 @@ Function init()
   m.top.observeFieldScoped("mode", "onModeChange")
   m.top.observeFieldScoped("width", "onWidthChange")
   m.top.observeFieldScoped("leftHeaderImageUri", "onLeftHeaderImageUriChange")
+  m.top.observeFieldScoped("titleImageUri", "onTitleImageChange")
   m.top.observeFieldScoped("description", "onDescriptionChange")
   m.top.observeFieldScoped("lineOneData", "onLineOneDataChange")
   m.top.observeFieldScoped("lineTwoData", "onLineTwoDataChange")
@@ -70,6 +77,8 @@ Function init()
   m.top.observeFieldScoped("calculateHeight", "onCalculateHeight")
   m.top.observeFieldScoped("focusedChild", "onComponentFocus")
   m.top.observeFieldScoped("loginReason", "onLoginReasonChange")
+  m.top.observeFieldScoped("liveBadgeHeaderText", "onLiveBadgeHeaderTextChange")
+  m.top.observeFieldScoped("isTubiOriginal", "onIsTubiOriginalChange")
   m.offset.observeFieldScoped("translation", "onOffsetTranslationChange")
   m.partnerLogo.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.rating.observeFieldScoped("loadStatus", "onPosterLoadStatus")
@@ -87,22 +96,23 @@ Function init()
   m.signInTextEnum[m.constants.ui.loginReasons.unknown] = getTranslation("registration_signIn_to_play_default")
   m.signInText.text = m.signInTextEnum[m.constants.ui.loginReasons.unknown] 'default value if loginReason="" instead of UNKNOWN as expected
 
-  typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.title, typographyConstants.ids.headerSmall)
-  setTypographyOfLabel(m.episode, typographyConstants.ids.subheaderSmall)
-  setTypographyOfLabel(m.Line1, typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.Line1Bold, typographyConstants.ids.subheaderSmall)
-  setTypographyOfLabel(m.DescriptorCode, typographyConstants.ids.bodyExtraSmallStrong)
-  setTypographyOfLabel(m.RatingLabel, typographyConstants.ids.bodyExtraSmallStrong)
-  setTypographyOfLabel(m.ExpireWarning, typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.Line2, typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.Description, typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.SignInText, typographyConstants.ids.bodySmall)
-  setTypographyOfLabel(m.ReminderTitle, typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.DirectorTag, typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.Director, typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.StarringTag, typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.Starring, typographyConstants.ids.bodyMedium)
+  m.typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.title, m.typographyConstants.ids.headerSmall)
+  setTypographyOfLabel(m.episode, m.typographyConstants.ids.subheaderSmall)
+  setTypographyOfLabel(m.Line1, m.typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.Line1Bold, m.typographyConstants.ids.subheaderSmall)
+  setTypographyOfLabel(m.DescriptorCode, m.typographyConstants.ids.bodyExtraSmallStrong)
+  setTypographyOfLabel(m.RatingLabel, m.typographyConstants.ids.bodyExtraSmallStrong)
+  setTypographyOfLabel(m.ExpireWarning, m.typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.Line2, m.typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.Description, m.typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.SignInText, m.typographyConstants.ids.bodySmall)
+  setTypographyOfLabel(m.ReminderTitle, m.typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.DirectorTag, m.typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.Director, m.typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.StarringTag, m.typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.Starring, m.typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.channelNameHeader, m.typographyConstants.ids.subheaderSmall)
 
 
   m.starringTag.width = 0
@@ -240,7 +250,8 @@ Function onEpisodeTitleChange(msg)
 
   if isNonEmptyString(episodeTitle) = true
     if episodeIsPresent = false
-      programEpisodeIndex = m.nodeHelpers.getChildIndex(m.offset, m.title) + 1
+      parent = m.title.getParent()
+      programEpisodeIndex = m.nodeHelpers.getChildIndex(parent, m.title) + 1
       m.offset.insertChild(m.episode, programEpisodeIndex)
     end if
     m.episode.text = episodeTitle
@@ -294,6 +305,31 @@ Function onLoginReasonChange(msg)
     m.signInText.text = m.signInTextEnum[loginReason]
   end if
 
+End Function
+
+
+Function onLiveBadgeHeaderTextChange(msg)
+  sText = msg.getData()
+  if isNonEmptyString(sText) = true
+    m.liveBadgeHeader.text = sText
+    formatBadge(sText, m.liveBadgeHeader)
+    ' Making sure we add the live badge few in case we had it removed.
+    if m.nodeHelpers.getChildIndex(m.topHeaderGroup, m.liveBadgeHeader) = -1
+      m.topHeaderGroup.insertChild(m.liveBadgeHeader, 0)
+    end if
+    m.liveBadgeHeader.visible = true
+  else
+    m.liveBadgeHeader.visible = false
+    if m.nodeHelpers.getChildIndex(m.topHeaderGroup, m.liveBadgeHeader) >= 0
+      m.topHeaderGroup.removeChild(m.liveBadgeHeader)
+    end if
+  end if
+End Function
+
+
+Function onIsTubiOriginalChange(msg)
+  isTubiOriginal = msg.getData()
+  m.tubiOriginal.visible = (isTubiOriginal = true)
 End Function
 
 
@@ -400,6 +436,28 @@ Function onLineOneDataChange(msg)
       end if
     end if
 
+    if isNonEmptyArray(data.genres) = true
+      sGenresText = getGenreText(data.genres)
+      if sGenresText.len() > 0
+        if text.len() > 0
+          ' add 'dot' spacer only if there is metadata prior to the genre text 
+          text += Chr(&hb7) + " "
+        end if
+        text += sGenresText + " "
+      end if
+    end if
+
+    ' handle sports event round/group info
+    roundGroupInfo = data.roundGroupInfo
+    if isNonEmptyString(roundGroupInfo) = true
+
+      if text.len() > 0
+        text += " " + Chr(&hb7) + " "
+      end if
+
+      text += roundGroupInfo
+    end if
+
     line1IsPresent = (m.line1.getParent() <> invalid)
     line1BoldIsPresent = (m.line1Bold.getParent() <> invalid)
     textIsPresent = (line1IsPresent = true OR line1BoldIsPresent = true)
@@ -407,7 +465,7 @@ Function onLineOneDataChange(msg)
     if isNonEmptyString(text) = true
       if textIsPresent = false
         mode = m.top.mode
-        if mode = m.constants.ui.infoPanelModes.sportsEvent
+        if mode = m.constants.ui.infoPanelModes.sportsEvent OR mode = m.constants.ui.infoPanelModes.spotlightSportsEvent
           firstLineGroup.insertChild(m.line1Bold, insertIndex)
         else
           firstLineGroup.insertChild(m.line1, insertIndex)
@@ -474,7 +532,7 @@ Function onLineOneDataChange(msg)
 
     ' handle rating
     ratingIsPresent = (m.rating.getParent() <> invalid)
-    if isNonEmptyString(data.rating) = true AND m.top.mode <> m.constants.ui.infoPanelModes.sportsEvent
+    if isNonEmptyString(data.rating) = true AND m.top.mode <> m.constants.ui.infoPanelModes.sportsEvent AND m.top.mode <> m.constants.ui.infoPanelModes.spotlightSportsEvent
       if ratingIsPresent = false
         firstLineGroup.insertChild(m.rating, insertIndex)
       end if
@@ -565,8 +623,8 @@ End Function
 Function onLineTwoDataChange(msg)
   tubiLog("InfoPanel.onLineTwoDataChange")
   data = msg.getData()
-  secondLineGroup = m.firstLineGroup
-  secondLineGroupIsPresent = (secondLineGroup.getParent() <> invalid)
+  secondLineGroup = m.secondLineGroup
+  secondLineGroupIsPresent = (secondLineGroup.getParent() <> invalid) 
 
   if isAA(data) AND data.count() > 0 AND secondLineGroupIsPresent = false
     m.twoLineInfo.appendChild(secondLineGroup)
@@ -623,6 +681,34 @@ Function onDescriptionChange(msg)
     m.description.text = description
   else
     m.description.visible = false
+  end if
+End Function
+
+
+Function onTitleImageChange(msg)
+  tubiLog("InfoPanel.onTitleImageChange")
+  titleImageUri = msg.getData()
+
+  if m.top.mode = m.constants.ui.infoPanelModes.spotlightItem 
+    if isNonEmptyString(titleImageUri) = true
+      parent = m.title.getParent()
+      index = m.nodeHelpers.getChildIndex(parent, m.title)
+      if index >= 0
+        m.offset.insertChild(m.titleImage, index)
+        m.offset.removeChild(m.title)
+      end if
+
+      m.titleImage.uri = titleImageUri
+    else
+      parent = m.titleImage.getParent()
+      index = m.nodeHelpers.getChildIndex(parent, m.titleImage)
+      if index >= 0
+        m.offset.insertChild(m.title, index)
+        m.offset.removeChild(m.titleImage)
+      end if
+      
+      m.titleImage.uri = ""
+    end if
   end if
 End Function
 
@@ -796,6 +882,10 @@ Function resetDefaultState()
   infoPanelGroupChildrenCount = m.infoPanelGroup.getChildCount()
   m.infoPanelGroup.removeChildrenIndex(infoPanelGroupChildrenCount, 0)
 
+  m.infoPanelGroup.vertAlignment = "top"
+
+  m.liveBadgeHeader.visible = false
+
   offsetChildrenCount = m.offset.getChildCount()
   m.offset.removeChildrenIndex(offsetChildrenCount, 0)
 
@@ -817,11 +907,6 @@ Function resetDefaultState()
   m.top.needsLogin = false
   m.top.reminderIsSet = false
 
-  if m.topHeaderImage <> invalid
-    m.topHeaderImage.height = 0
-    m.topHeaderImage.width = 0
-  end if
-
 End Function
 
 
@@ -833,6 +918,8 @@ End Function
 Function onModeChange()
   tubiLog("InfoPanel.onModeChange")
   resetDefaultState()
+
+  setTypographyOfLabel(m.title, m.typographyConstants.ids.headerSmall)
 
   if m.top.mode = m.constants.ui.infoPanelModes.item
     ' used for movies and series on the homescreen and similar screens
@@ -851,11 +938,31 @@ Function onModeChange()
     m.firstLineGroup.appendChild(m.descriptorCode)
     m.firstLineGroup.appendChild(m.expireWarning)
     m.firstLineGroup.appendChild(m.partnerLogo)
-
     m.twoLineInfo.appendChild(m.secondLineGroup)
     m.secondLineGroup.appendChild(m.line2)
 
-    'The third item spacing is to add the space between description and needsLogin(signup text with lock icon)
+    m.offset.itemSpacings = [13]
+  else if m.top.mode = m.constants.ui.infoPanelModes.spotlightItem
+    ' used for movies and series on the homescreen and similar screens
+    m.infoPanelGroup.appendChild(m.offset)
+    m.infoPanelGroup.vertAlignment = "bottom"
+    m.offset.appendChild(m.tubiOriginal)
+    '//Featured items have larger title text
+    setTypographyOfLabel(m.title, m.typographyConstants.ids.headerMedium)
+    m.offset.appendChild(m.title)
+    m.offset.appendChild(m.twoLineInfo)
+
+    m.twoLineInfo.appendChild(m.firstLineGroup)
+    m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
+    m.firstLineGroup.appendChild(m.line1)
+    m.firstLineGroup.appendChild(m.resolutionPoster)
+    m.firstLineGroup.appendChild(m.closedCaptionPoster)
+    m.firstLineGroup.appendChild(m.audioDescriptionPoster)
+    m.firstLineGroup.appendChild(m.rating)
+    m.firstLineGroup.appendChild(m.descriptorCode)
+    m.firstLineGroup.appendChild(m.expireWarning)
+    m.firstLineGroup.appendChild(m.partnerLogo)
+
     m.offset.itemSpacings = [13]
   else if m.top.mode = m.constants.ui.infoPanelModes.movie
     ' used for movies on the details screen
@@ -945,7 +1052,7 @@ Function onModeChange()
   else if m.top.mode = m.constants.ui.infoPanelModes.linearHomeScreen
     '//For when the linear player is on the home screen
     m.infoPanelGroup.appendChild(m.offset)
-    m.offset.appendChild(m.liveBadgeHeader)
+    m.offset.appendChild(m.topHeaderGroup)
     m.offset.appendChild(m.title)
     m.offset.appendChild(m.descriptionGroup)
     m.offset.appendChild(m.playerCountdownGroup)
@@ -1018,6 +1125,23 @@ Function onModeChange()
     m.twoLineInfo.appendChild(m.secondLineGroup)
     m.secondLineGroup.appendChild(m.line2)
     m.offset.itemSpacings = [15]
+  else if m.top.mode = m.constants.ui.infoPanelModes.spotlightSportsEvent
+    m.infoPanelGroup.vertAlignment = "bottom"
+    m.infoPanelGroup.appendChild(m.offset)
+    m.offset.appendChild(m.title)
+    m.offset.appendChild(m.twoLineInfo)
+
+    m.twoLineInfo.appendChild(m.firstLineGroup)
+    m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
+    m.firstLineGroup.appendChild(m.line1Bold)
+    m.firstLineGroup.appendChild(m.resolutionPoster)
+    m.firstLineGroup.appendChild(m.closedCaptionPoster)
+    m.firstLineGroup.appendChild(m.audioDescriptionPoster)
+
+    m.top.appendChild(m.playerCountdownGroup)
+    m.playerCountdownGroup.translation = [1215, -111]
+
+    m.offset.itemSpacings = [15]
   else if m.top.mode = m.constants.ui.infoPanelModes.linearProgramHomescreen
     ' This infopanel mode is for linear programs in response with V4 api
     m.infoPanelGroup.appendChild(m.offset)
@@ -1031,22 +1155,44 @@ Function onModeChange()
 
     m.twoLineInfo.appendChild(m.firstLineGroup)
     m.firstLineGroup.appendChild(m.line1)
-
     m.twoLineInfo.appendChild(m.secondLineGroup)
     m.secondLineGroup.appendChild(m.line2)
 
     m.offset.appendChild(m.descriptionGroup)
 
     m.offset.itemSpacings = [13, 16, 13]
+  else if m.top.mode = m.constants.ui.infoPanelModes.spotlightLinearProgramHomescreen
+    ' This infopanel mode is for linear programs that appear in spotlight.
+    m.infoPanelGroup.appendChild(m.offset)
+    m.offset.appendChild(m.topHeaderGroup)
+    m.offset.appendChild(m.title)
+
+    if isNonEmptyString(m.episode.text)
+      m.offset.appendChild(m.episode)
+    end if
+
+    m.offset.appendChild(m.twoLineInfo)
+
+    m.twoLineInfo.appendChild(m.firstLineGroup)
+    m.firstLineGroup.appendChild(m.line1)
+
+    '//Featured items have larger title text
+    setTypographyOfLabel(m.title, m.typographyConstants.ids.headerMedium)
+    m.infoPanelGroup.vertAlignment = "bottom"
+
+    m.top.appendChild(m.playerCountdownGroup)
+    m.playerCountdownGroup.translation = [1185, -591]
+
+    m.offset.itemSpacings = [13, 16, 13]
+
   end if
 End Function
 
 
-' @data: assocArray, that matches form of m.top.lineTwoData
-Function getSecondLineText(data)
-  ' handle genres
+' @genres: Array, An array of genres strings
+' @return A string of Capitalized genres contained in the genres array separated by a comma. If there are no genres in the array, then an empty string is returned.
+Function getGenreText(genres)
   text = ""
-  genres = data.genres
   if isNonEmptyArray(genres) = true
     capitalGenres = []
     for each genre in genres
@@ -1054,6 +1200,15 @@ Function getSecondLineText(data)
     end for
     text = capitalGenres.Join(", ")
   end if
+
+  return text
+End Function
+
+
+' @data: assocArray, that matches form of m.top.lineTwoData
+Function getSecondLineText(data)
+  ' handle genres
+  text = getGenreText(data.genres)
 
   ' handle sports event round/group info
   roundGroupInfo = data.roundGroupInfo
@@ -1093,6 +1248,9 @@ Function formatBadge(text, badgeComponent)
       ' REPLAY badge
       badgeComponent.backgroundColor = theme.backgroundColorLight
       badgeComponent.textColor = theme.textDarkColor
+    else if UCase(text) = UCase(getTranslation("onNow"))
+      badgeComponent.backgroundColor = theme.blueBadgeColor
+      badgeComponent.textColor = m.primaryTextColor
     else
       ' TODAY, TOMORROW, <<Date>> badge
       badgeComponent.backgroundColor = theme.neutralColor

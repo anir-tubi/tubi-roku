@@ -382,14 +382,8 @@ Function populateInfoPanel(mode, contentNode)
     else if mode = m.constants.ui.infoPanelModes.item
       populateInfoPanelWithHomescreenStyleItemMode(contentNode, m.InfoPanel)
     else if mode = m.constants.ui.infoPanelModes.linearHomeScreen
-      theme = getThemeFromGlobal()
       m.InfoPanel.mode = mode
-      m.InfoPanel.liveBadgeHeaderUri = "pkg:/images/live-icon-filled.webp"
       m.InfoPanel.liveBadgeHeaderText = UCase(getTranslation("screenSearch_liveText"))
-      if theme <> invalid
-        m.InfoPanel.liveBadgeHeaderTextColor =  theme.primaryTextColor
-        m.InfoPanel.liveBadgeHeaderBackgroundColor = theme.focused2Color
-      end if
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
 

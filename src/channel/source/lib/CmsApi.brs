@@ -31,6 +31,7 @@ Function CmsApi(constants, apiUtils, experiments=invalid)
     setTupianBackgroundParam: cmsApi_setTupianBackgroundParam
     getWindowInfo: cmsApi_getWindowInfo
     getFullCategoryId: cmsApi_getFullCategoryId
+    createCategoryRequestInfo: cmsApi_createCategoryRequestInfo
   }
 
   cmsApi = {}
@@ -186,12 +187,24 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
 
   if params["content_mode"] <> m.constants.ui.contentMode.linear
     ' don't send the Tupian image params for homescreen requests that are contentMode = "linear"
-    imageParamTypes = [
-      "poster"
-      "landscape"
-      "hero"
-      "background"
-    ]
+    if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_spotlight_carousel", "roku_spotlight_carousel_v1").enabled = true
+      imageParamTypes = [
+        "poster"
+        "landscape"
+        "hero"
+        "background"
+        "title"
+        "spotlightLandscape"
+      ]
+    else
+      imageParamTypes = [
+        "poster"
+        "landscape"
+        "hero"
+        "background"
+      ]
+    end if
+
     params = m.setImageParams(imageParamTypes, options.params, m.constants.ui.screenIds.homeScreen)
   end if
 
@@ -294,7 +307,8 @@ End Function
 '                 see request.brs for more info
 ' @imageParamTypes: Array, What image types/sizes should be requested from the backend. If none are passed, then a default set of types will be used.
 ' @screenId: String, id of the screen to which is requesting to get large poster sizes from Tupian.
-Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptions = {}, imageParamTypes = invalid, screenId = "")
+' @containerGridItemType: String, gridItemType of the container for which we are making the request.
+Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptions = {}, imageParamTypes = invalid, screenId = "", containerGridItemType = invalid)
   options = m.getCommonOptions()
   params = options.params
   url = m.constants.urls.tensor.cdn.container + "/" + categoryId
@@ -313,15 +327,26 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
   end if
 
   if imageParamTypes = invalid
-    imageParamTypes = [
-      "poster"
-      "landscape"
-      "hero"
-      "background"
-    ]
+    if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_spotlight_carousel", "roku_spotlight_carousel_v1").enabled = true AND categoryId = m.constants.ui.categoryIds.spotlight
+      imageParamTypes = [
+        "poster"
+        "landscape"
+        "hero"
+        "background"
+        "title"
+        "spotlightLandscape"
+      ]
+    else
+      imageParamTypes = [
+        "poster"
+        "landscape"
+        "hero"
+        "background"
+      ]
+    end if
   end if
 
-  params = m.setImageParams(imageParamTypes, params, screenId)
+  params = m.setImageParams(imageParamTypes, params, screenId, containerGridItemType)
 
   headers = options.headers
   headers["Accept-Version"] = "6.0.0"
@@ -384,19 +409,25 @@ End Function
 ' https://docs.google.com/document/d/1T9qL5otwgjIAEW4pPwvKiq0PxIYEK-ExKrFBYRkx6BY
 '
 ' @imageTypes, array - an array of strings corresponding to which types of images to request from Tupian
-'                      Accepted values are "poster", "landscape", "hero"
+'                      Accepted values are "poster", "landscape", "hero", "background", "title", "spotlightLandscape"
 ' @existingParams: assocArray, any parameters that have already been defined that need to be added to
-Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "")
-  posterSize = m.constants.ui.imageSizes.poster
-  landscapeSize = m.constants.ui.imageSizes.landscape
-  background = m.constants.ui.imageSizes.background
+' @screenId: id of the screen.
+' @containerGridItemType: String, gridItemType of the container for which we are making the request.
+Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", containerGridItemType = invalid)
+  imageSizes = m.constants.ui.imageSizes
+  posterSize = imageSizes.poster
+  landscapeSize = imageSizes.landscape
+  background = imageSizes.background
+  title = imageSizes.title
+  spotlightLandscape = imageSizes.spotlightLandscape
+  fullScreenBackground = imageSizes.fullScreenBackground
 
   '//For now, ensure the large posters do not show up on the search screen
   isNonLargePostersScreen = (isNonEmptyString(screenId) = true AND screenId = m.constants.ui.screenIds.searchScreen)
 
   if isNonLargePostersScreen = false
-    posterSize = m.constants.ui.imageSizes.largePoster
-    landscapeSize = m.constants.ui.imageSizes.largeLandscape
+    posterSize = imageSizes.largePoster
+    landscapeSize = imageSizes.largeLandscape
   end if
 
   for each imageType in imageTypes
@@ -408,7 +439,15 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "")
     else if imageType = "hero"
       existingParams["images[hero_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_hero"
     else if imageType = "background"
-      existingParams["images[background_tb]"] = "w" + background[0].ToStr() + "h" + background[1].ToStr() + "_background"
+      if containerGridItemType <> m.constants.ui.gridItemTypes.spotlight
+        existingParams["images[background_tb]"] = "w" + background[0].ToStr() + "h" + background[1].ToStr() + "_background"
+      else
+        existingParams["images[background_tb]"] = "w" + fullScreenBackground[0].ToStr() + "h" + fullScreenBackground[1].ToStr() + "_background"
+      end if
+    else if imageType = "title"
+      existingParams["images[title_tb]"] = "w" + title[0].ToStr() + "h" + title[1].ToStr() + "_title"
+    else if imageType = "spotlightLandscape"
+      existingParams["images[spotlight_landscape_tb]"] = "w" + spotlightLandscape[0].ToStr() + "h" + spotlightLandscape[1].ToStr() + "_landscape"
     end if
   end for
 
@@ -450,49 +489,29 @@ Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = 
 
   m.categoryWindowSize = m.constants.performance.categoryGridList.categoryWindowSize
 
-  reqName = m.constants.reqNames.getCategory
-
   requests = []
     'Determine the window start and window size for lazy loading
   windowInfo = m.getWindowInfo(homeScreen, index)
   if windowInfo <> invalid
+    ' Adding spotlight or featured row into lazy loading.
+    if homeScreen.spotlightContent <> invalid
+      category = homeScreen.spotlightContent.getChild(0)
+      if category <> invalid
+        categoryReqInfo = m.createCategoryRequestInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode)
+        
+        if categoryReqInfo <> invalid then
+          requests.push(categoryReqInfo)
+          category.state = "loading"
+        end if
+      end if
+    end if
+
     'Create requests for each category in the window
     for i = windowInfo.start to (windowInfo.start + windowInfo.size)-1
       category = homeScreen.content.getChild(i)
       if category <> invalid
-        categoryReqInfo = invalid
-        if category.state = "partial" or category.state = "none"
-
-          categoryId = m.getFullCategoryId(category)
-
-          if isNonEmptyString(categoryId) = true
-            tubiLog("CategoryGridList.fetch whole: Asking GeneralTask for " + categoryId)
-
-            options = {
-              params: {}
-            }
-
-            if homeScreen.contentMode = m.constants.ui.contentMode.homescreen
-              contentModeValue = ""
-            else
-              contentModeValue = homeScreen.contentMode
-            end if
-
-            contentModeParam = {
-              "content_mode": contentModeValue
-            }
-
-            options.params.append(contentModeParam)
-
-            categoryReqInfo = m.createCategoryReqInfo(categoryId, bKidsMode, options, invalid, m.constants.ui.screenIds.homeScreen)
-            categoryReqInfo.requestType = reqName
-            categoryReqInfo.responseType = "node"
-            categoryReqInfo.isSignedInUser = isSignedInUser
-            categoryReqInfo.screenId = m.constants.ui.screenIds.homeScreen
-            categoryReqInfo.uiMode = uiMode
-          end if
-
-        end if
+        categoryReqInfo = m.createCategoryRequestInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode)
+        
         if categoryReqInfo <> invalid then
           requests.push(categoryReqInfo)
           category.state = "loading"
@@ -707,4 +726,44 @@ Function cmsApi_createHomeScreenContainerIdsForScreensaverReqInfo(kidsMode)
   reqInfo.options.params.append(params)
 
   return reqInfo
+End Function
+
+
+Function cmsApi_createCategoryRequestInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode)
+  categoryReqInfo = invalid
+  if category.state = "partial" or category.state = "none"
+    reqName = m.constants.reqNames.getCategory
+
+    categoryId = m.getFullCategoryId(category)
+
+    if isNonEmptyString(categoryId) = true
+      tubiLog("CategoryGridList.fetch whole: Asking GeneralTask for " + categoryId)
+
+      options = {
+        params: {}
+      }
+
+      if homeScreen.contentMode = m.constants.ui.contentMode.homescreen
+        contentModeValue = ""
+      else
+        contentModeValue = homeScreen.contentMode
+      end if
+
+      contentModeParam = {
+        "content_mode": contentModeValue
+      }
+
+      options.params.append(contentModeParam)
+
+      categoryReqInfo = m.createCategoryReqInfo(categoryId, bKidsMode, options, invalid, m.constants.ui.screenIds.homeScreen, category.gridItemType)
+      categoryReqInfo.requestType = reqName
+      categoryReqInfo.responseType = "node"
+      categoryReqInfo.isSignedInUser = isSignedInUser
+      categoryReqInfo.screenId = m.constants.ui.screenIds.homeScreen
+      categoryReqInfo.uiMode = uiMode
+    end if
+
+  end if
+
+  return categoryReqInfo
 End Function

@@ -1078,6 +1078,8 @@ Function getConstants()
       constants.ui.categoryIds.favorites = "temp_linear_favorites"
       constants.ui.categoryIds.topSearched = "top_searched"
       constants.ui.categoryIds.topTenSeries = "top_10_tv_shows_on_tubi"
+      ' Adding a constant entry so that it is easier to change for testing or future use if we need to pick other container outside of featured.
+      constants.ui.categoryIds.spotlight = "featured"
 
     constants.ui.categoryTypes = {}
       'these map to tensor api container types
@@ -1104,6 +1106,7 @@ Function getConstants()
     constants.ui.infoPanelModes = {}
       'these map to different InfoPanel modes/types
       constants.ui.infoPanelModes.item = "item"
+      constants.ui.infoPanelModes.spotlightItem = "spotlightItem"
       constants.ui.infoPanelModes.continueWatching = "continueWatching"
       constants.ui.infoPanelModes.channel = "channel"
       constants.ui.infoPanelModes.movie = "movie"
@@ -1115,7 +1118,9 @@ Function getConstants()
       constants.ui.infoPanelModes.simplifiedLinearPlayer = "simplifiedLinearPlayer"
       constants.ui.infoPanelModes.linearSearch = "linearSearch"
       constants.ui.infoPanelModes.linearProgramHomescreen = "linearProgramHomescreen"  'v4 api
+      constants.ui.infoPanelModes.spotlightLinearProgramHomescreen = "spotlightLinearProgramHomescreen"
       constants.ui.infoPanelModes.sportsEvent = "sportsEvent"
+      constants.ui.infoPanelModes.spotlightSportsEvent = "spotlightSportsEvent"
 
     constants.ui.contentMode = {}
       ' these are also used for the content experience choices but are the value that is sent to the back end in our api requests
@@ -1148,6 +1153,8 @@ Function getConstants()
       constants.ui.backgroundTypes.topRight = "topright"
       constants.ui.backgroundTypes.epg = "epg"
       constants.ui.backgroundTypes.rightScreen = "rightScreen"
+      ' Introducing a new type of background due to difference of gradient between fullscreen version and spotlight variant.
+      constants.ui.backgroundTypes.spotlight = "spotlight"
 
     constants.ui.modes = {}
       constants.ui.modes.standard = "standard"
@@ -1262,6 +1269,9 @@ Function getConstants()
       'Sizes of poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.poster = [186, 267]
 
+      'Sizes of video title image (if available) that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images. The video title image is an image representation of the title metadata of the video. Not all videos may have this image.
+      constants.ui.imageSizes.title = [0, 201]
+
       'Sizes of large poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.largePoster = [252, 360]
 
@@ -1291,6 +1301,17 @@ Function getConstants()
         constants.ui.imageSizes.background = [798, 450]
       else
         constants.ui.imageSizes.background = [1197, 675]
+      end if
+
+      constants.ui.imageSizes.spotlightLandscape = [252, 142]
+
+      ' Size for the background image.
+      if limitedUi = true
+        constants.ui.imageSizes.fullScreenBackground = [639, 357]
+      else if lowVram = true
+        constants.ui.imageSizes.fullScreenBackground = [1278, 717]
+      else
+        constants.ui.imageSizes.fullScreenBackground = [1920, 1080]
       end if
 
     constants.ui.imageTranslations = {}
@@ -1370,6 +1391,7 @@ Function getConstants()
       constants.ui.gridItemTypes.historySignedOutUser = "continue_watching_signed_out_user"
       constants.ui.gridItemTypes.emptyContainer = "emptyContainer"
       constants.ui.gridItemTypes.portraitTopTen = "portraitTopTen"
+      constants.ui.gridItemTypes.spotlight = "spotlight"
 
     constants.ui.uris = {}
 
@@ -1395,6 +1417,10 @@ Function getConstants()
     constants.ui.rokuCWConsentActionButtonIds = {}
       constants.ui.rokuCWConsentActionButtonIds.accept = "accept"
       constants.ui.rokuCWConsentActionButtonIds.reject = "reject"
+    
+    ' Holds the container index on tensor api home screen response that we need to use as spotlight content.
+    ' Adding a constant entry so that it is easier to change for testing or future use if we need to pick other container outside of featured.
+    constants.ui.spotlightContainerIndex = 0
 
   constants.consentKeys = {}
     constants.consentKeys.essential = "C0001"

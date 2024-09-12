@@ -30,20 +30,24 @@ Function init()
 
   m.RowList.drawFocusFeedbackOnTop = true
 
-  ' suppress debounce if we have just gained focus
-  m.justGainedFocus = false
-
   ' stores an array of the form [y, x], which can be set on RowList.jumpToItem
   m.itemToJumpTo = invalid
 
+  m.LinearProgramRefreshTimer = m.top.findNode("LinearProgramRefreshTimer")
+  m.LinearProgramRefreshTimer.observeFieldScoped("fire", "onLinearProgramRefreshTimer")
+
+  m.spotlightRow = m.top.findNode("spotlightRow")
+  m.spotlightRow.observeFieldScoped("rowItemSelected", "onSpotlightRowItemSelected")
+  m.spotlightRow.observeFieldScoped("rowItemFocused", "onSpotlightRowItemFocused")
+  m.spotlightRow.observeFieldScoped("reloadedItemToBeFocused", "onSpotlightReloadedItemToBeFocused")
+  
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
   onThemeChange()
 
-  m.LinearProgramRefreshTimer = m.top.findNode("LinearProgramRefreshTimer")
-  m.LinearProgramRefreshTimer.observeFieldScoped("fire", "onLinearProgramRefreshTimer")
-
+  ' Holds the value of last focused list, possible values are "", "spotlight", "rowlist".
+  m.lastFocusedList = ""
 End Function
 
 
@@ -97,41 +101,46 @@ End Function
 '
 Function onComponentFocusChange()
   tubiLog("CategoryGridList.onComponentFocusChange " + focusState(m.top))
-
+  content = m.top.content
   itemToJumpTo = invalid
-  if m.itemToJumpTo <> invalid AND resolveAbbreviatedContent(m.itemToJumpTo) <> invalid then
+  if m.itemToJumpTo <> invalid AND resolveAbbreviatedContent(content, m.itemToJumpTo) <> invalid then
     itemToJumpTo = m.itemToJumpTo
   end if
   m.itemToJumpTo = invalid
 
   ' If top has focus then we need to focus the RowList itself
   if m.top.hasFocus() = true then
-    ' Don't want to do any of this logic if we are already have an item we are going to jump to
-    if itemToJumpTo = invalid then
-      rowItemFocused = m.RowList.rowItemFocused
-      if rowItemFocused.count() = 2 AND resolveAbbreviatedContent(rowItemFocused) <> invalid then
-        '// If count does not equal 2 then the rowList has not gained focus yet so use the default first item in the else block
-        itemToJumpTo = rowItemFocused
-      else
-        itemToJumpTo = [0, 0]
+    if m.top.spotlightContent <> invalid AND m.top.spotlightContent.getChildCount() > 0 AND m.lastFocusedList <> "rowlist"
+      m.lastFocusedList = "spotlight"
+      m.spotlightRow.setFocus(true)
+    else
+      ' Don't want to do any of this logic if we are already have an item we are going to jump to
+      if itemToJumpTo = invalid then
+        rowItemFocused = m.RowList.rowItemFocused
+        if rowItemFocused.count() = 2 AND resolveAbbreviatedContent(content, rowItemFocused) <> invalid then
+          '// If count does not equal 2 then the rowList has not gained focus yet so use the default first item in the else block
+          itemToJumpTo = rowItemFocused
+        else
+          itemToJumpTo = [0, 0]
+        end if
       end if
-    end if
 
-    if resolveAbbreviatedContent(itemToJumpTo) <> invalid
-      m.justGainedFocus = true
-      m.RowList.setFocus(true)
+      if resolveAbbreviatedContent(content, itemToJumpTo) <> invalid
+        m.lastFocusedList = "rowlist"
+        m.RowList.setFocus(true)
 
-      ' Adding to check to make sure if reset grid position was requested.
-      ' Making sure we are resetting after focus is set to rowlist.
-      if m.top.resetGridPosition = true
-        itemToJumpTo = [0, 0]
-        m.top.resetGridPosition = false
+        ' Adding to check to make sure if reset grid position was requested.
+        ' Making sure we are resetting after focus is set to rowlist.
+        if m.top.resetGridPosition = true
+          itemToJumpTo = [0, 0]
+          m.top.resetGridPosition = false
+        end if
       end if
-    end if
 
-    m.LinearProgramRefreshTimer.control = "start"
-    ' When Grid get focus refresh all visible channels
-    onLinearProgramRefreshTimer()
+      m.LinearProgramRefreshTimer.control = "start"
+      ' When Grid get focus refresh all visible channels
+      onLinearProgramRefreshTimer()
+    end if
   else if m.top.isInFocusChain() = false
     m.LinearProgramRefreshTimer.control = "stop"
   end if
@@ -167,6 +176,10 @@ Function onContentChange()
       m.top.loadCategoriesIndex = 0
     end if
   end if
+
+  if m.top.spotlightContent <> invalid AND m.top.spotlightContent.getChildCount() > 0
+    m.rowList.translation = [0, 384]
+  end if
 End Function
 
 
@@ -194,10 +207,10 @@ Function onRepopulateContent()
   ' setting the rowItemSize and/or rowHeights moves the focus indicator back to the origin so
   ' we need to move the focus back to it's appropriate place. But we need to check that there is content
   ' at the location or else the RowList loses focus and can't get it back.
-  if resolveAbbreviatedContent(rowItemFocused) <> invalid
+  if resolveAbbreviatedContent(m.top.content, rowItemFocused) <> invalid
     ' re-focus the most recently focused content
     m.itemToJumpTo = rowItemFocused
-  else if resolveAbbreviatedContent([rowItemFocused[0], 0]) <> invalid
+  else if resolveAbbreviatedContent(m.top.content, [rowItemFocused[0], 0]) <> invalid
     ' if there is no content at the most recently focused coordinates, then
     ' check if there is at least one content in the most recently focused row and focus the last content in the row
     rowIndex = 0
@@ -217,7 +230,7 @@ Function onRepopulateContent()
       rowIndex = rowItemFocused[0]
     end if
 
-    while resolveAbbreviatedContent([rowIndex, 0]) = invalid AND rowIndex >= 0
+    while resolveAbbreviatedContent(m.top.content, [rowIndex, 0]) = invalid AND rowIndex >= 0
       rowIndex -= 1
     end while
 
@@ -346,12 +359,13 @@ End Function
 ' Resolve and internal ContentNode that's been abbreviated for the CategoryGridList
 ' into a fully parsed TubiContentNode
 '
+' @content rowlist content node.
 ' @rowItemIndex is 2D array of [rowindex, itemindex] from RowList.rowItemSelected or m.RowList.rowItemFocused
-Function resolveAbbreviatedContent(rowItemIndex)
+Function resolveAbbreviatedContent(content, rowItemIndex)
   tubiLog("CategoryGridList.resolveAbbreviatedContent")
-  if m.top.content <> invalid AND rowItemIndex[0] <> invalid AND rowItemIndex[1] <> invalid
+  if content <> invalid AND rowItemIndex[0] <> invalid AND rowItemIndex[1] <> invalid
     contentId = invalid
-    category = m.top.content.getChild(rowItemIndex[0])
+    category = content.getChild(rowItemIndex[0])
     if category <> invalid
       content = category.getChild(rowItemIndex[1])
       if content <> invalid
@@ -370,15 +384,23 @@ End Function
 
 ''''''''''''''''
 ' onRowItemSelected - RowList.rowItemSelected event handler, triggered when user presses "OK"
-Function onRowItemSelected()
+Function onRowItemSelected(msg)
   tubiLog("CategoryGridList.onRowItemSelected")
   if m.top.content <> invalid 'should not be necessary but crash reports show that it is.
-    category = m.top.content.getChild(m.RowList.rowItemSelected[0])
+    ' If we have spotlight content than we need to increment y position by 1 since spotlight is first row.
+    rowItemSelected = msg.getData()
+    if m.top.spotlightContent <> invalid AND m.top.spotlightContent.getChildCount() > 0
+      m.top.selectedPosition = [rowItemSelected[0] + 1, rowItemSelected[1]]
+    else
+      m.top.selectedPosition = rowItemSelected
+    end if
+    
+    category = m.top.content.getChild(rowItemSelected[0])
     if category <> invalid
       m.top.oldCategoryId = m.top.currCategoryId
       m.top.currCategoryId = category.id
     end if
-    itemSelected = resolveAbbreviatedContent(m.RowList.rowItemSelected)
+    itemSelected = resolveAbbreviatedContent(m.top.content, rowItemSelected)
     if itemSelected <> invalid
       m.top.itemSelected = itemSelected
     end if
@@ -388,25 +410,24 @@ End Function
 
 '''''''''''''''
 ' onRowItemFocused - RowList.rowItemFocused event handler.
-Function onRowItemFocused()
+Function onRowItemFocused(msg)
   tubiLog("CategoryGridList.onRowItemFocused")
-  if m.justGainedFocus = true
-    m.justGainedFocus = false
-  end if
 
-  if m.top.content <> invalid AND m.Rowlist <> invalid AND m.Rowlist.rowItemFocused <> invalid
-    category = m.top.content.getChild(m.RowList.rowItemFocused[0])
+  rowItemFocused = msg.getData()
+  m.top.focusedPosition = rowItemFocused
+  if m.top.content <> invalid AND rowItemFocused <> invalid
+    category = m.top.content.getChild(rowItemFocused[0])
     if category <> invalid then
-      category.focusIndex = m.RowList.rowItemFocused[1]
+      category.focusIndex = rowItemFocused[1]
       m.top.oldCategoryId = m.top.currCategoryId
       m.top.currCategoryId = category.id
 
-      itemFocused = resolveAbbreviatedContent(m.RowList.rowItemFocused)
+      itemFocused = resolveAbbreviatedContent(m.top.content, rowItemFocused)
       if itemFocused <> invalid
         m.top.oldCursorPosition = m.top.cursorPosition
-        m.top.cursorPosition = m.RowList.rowItemFocused
+        m.top.cursorPosition = rowItemFocused
         m.top.oldItemFocused = m.top.itemFocused
-        m.top.rowFocused = m.top.content.getChild(m.RowList.rowItemFocused[0])
+        m.top.rowFocused = m.top.content.getChild(rowItemFocused[0])
         m.top.itemFocused = itemFocused
       end if
     end if
@@ -492,7 +513,8 @@ Function onCategoryResponseInBatch(msg) As Void
     end if
 
     ' inform home screen of first content after content has been set on RowList
-    if shouldInformHomeScreen = true
+    ' Only proceed if we do not have spotlight content. Since this triggers info panel update for the first row of non spotlight content.
+    if shouldInformHomeScreen = true AND m.spotlightRow.content = invalid
       ' set focus once we have content to focus on.
       ' will only affect limitedUI models as high spec models will set focus on m.RowList when m.top gains focus
       ' because their homescreen response contains content in it, but limitedUI models homescreen responses don't.
@@ -551,8 +573,8 @@ End Function
 ' the info panel. In the case that we do not want set focus on the RowList, we still need to let Homescreen.brs that
 ' that content has loaded so it can update the infoPanel.
 Function setRowListFocus()
-  if m.top.hasFocus()
-    m.justGainedFocus = true
+  if m.top.hasFocus() = true
+    m.lastFocusedList = "rowlist"
     m.RowList.setFocus(true)
   else
     if m.RowList.currFocusRow <> invalid AND m.RowList.currFocusRow >= 0 AND m.RowList.currFocusColumn <> invalid AND m.RowList.currFocusColumn >= 0
@@ -570,7 +592,7 @@ Function setRowListFocus()
       reloadedItemIndex = [0, 0]
     end if
     m.top.rowFocused = m.RowList.content.getChild(reloadedItemIndex[0])
-    m.top.reloadedItemToBeFocused = resolveAbbreviatedContent(reloadedItemIndex)
+    m.top.reloadedItemToBeFocused = resolveAbbreviatedContent(m.top.content, reloadedItemIndex)
   end if
 End Function
 
@@ -582,4 +604,74 @@ Function onLinearProgramRefreshTimer()
     m.global.refreshLinearChannels = not m.global.refreshLinearChannels
   end if
 
+End Function
+
+
+Function onSpotlightRowItemSelected(msg)
+  content = m.top.spotlightContent
+  rowItemSelected = msg.getData()
+  if content <> invalid 'should not be necessary but crash reports show that it is.
+    itemSelected = resolveAbbreviatedContent(content, rowItemSelected)
+    if itemSelected <> invalid
+      m.top.oldCategoryId = m.top.currCategoryId
+      m.top.currCategoryId = m.constants.ui.categoryIds.spotlight
+      m.top.selectedPosition = rowItemSelected
+      m.top.currCategoryId = itemSelected.parentId
+      m.top.itemSelected = itemSelected
+    end if
+  end if
+End Function
+
+
+Function onSpotlightRowItemFocused(msg)
+  rowItemFocused = msg.getData()
+  content = m.top.spotlightContent
+
+  if content <> invalid
+    category = content.getChild(rowItemFocused[0])
+    if category <> invalid then
+      category.focusIndex = rowItemFocused[1]
+      m.top.oldCategoryId = m.top.currCategoryId
+      m.top.currCategoryId = category.id
+
+      content = category.getChild(rowItemFocused[1])
+      if content <> invalid
+        itemFocused = m.metadataTranslate.getContentFromCategoryJson(category, content.id, m.top.signedIn)
+        m.top.oldCursorPosition = m.top.cursorPosition
+        m.top.cursorPosition = rowItemFocused
+        m.top.oldItemFocused = m.top.itemFocused
+        m.top.rowFocused = category
+        itemFocused.gridItemType = m.constants.ui.gridItemTypes.spotlight
+        m.top.itemFocused = itemFocused
+        m.top.focusedPosition = rowItemFocused
+      end if
+    end if
+  end if
+End Function
+
+
+Function onSpotlightReloadedItemToBeFocused(msg)
+  ' Not creating a alias to avoid it becoming bi-directional field into the spotlight row.
+  m.top.reloadedItemToBeFocused = msg.getData()
+End Function
+
+
+Function onKeyEvent(key as String, press as Boolean) as Boolean
+  if press = true
+    if key = "down" AND m.spotlightRow.isInFocusChain() = true
+      slideFade(m.spotlightRow, "above", "out", 0.3)
+      slideTo(m.RowList, [0, 0], 0.3)
+      m.lastFocusedList = "rowlist"
+      m.RowList.setFocus(true)
+      return true
+    else if key = "up" AND m.RowList.isInFocusChain() = true
+      slideFade(m.spotlightRow, "below", "in", 0.3)
+      m.lastFocusedList = "spotlight"
+      m.spotlightRow.setFocus(true)
+      slideTo(m.RowList, [0, 384], 0.3)
+      return true
+    end if
+  end if
+
+  return false
 End Function
