@@ -59,6 +59,7 @@
         <Group
           translation="[0,39]"
           id="SpotlightDetailsBtnGroup">
+          <!-- ::TODO::roku_spotlight_carousel_v1 if experiment is graduated, then use different component which has similar purpose or create a new component. -->
           <TextIcon
             id="SpotlightDetailsBtn"
             padding="[39, 33]"
