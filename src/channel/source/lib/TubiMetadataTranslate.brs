@@ -2403,7 +2403,7 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
   end if
 
   if isNonEmptyString(programFromServer.league) = true
-      translatedProgram.league = programFromServer.league.name
+    translatedProgram.league = programFromServer.league
   end if
 
   selectedAttributeText = getTranslation("epg_starts_at") + " "
