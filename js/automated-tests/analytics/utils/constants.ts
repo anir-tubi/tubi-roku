@@ -81,7 +81,7 @@ export const TITLE_DETAILS_PAGE_NODES = {
 	DETAILS_SCREEN_TITLE: 'detailScreenTitle',
 	BACKGROUND_POSTER: 'titleSeriesBackgroundPoster',
 	CAPTIONS: 'closedCaptionPosterInDetailsPage',
-	TITLE_DETIALS_RATINGS_LABEL: 'titleDetailsRatingsLabel',
+	TITLE_DETAILS_RATINGS_LABEL: 'titleDetailsRatingsLabel',
 	YOU_MIGHT_ALSO_LIKE_FIRST_POSTER: 'youMightAlsoLikeFirstPoster',
 	DETAILS_PAGE_MENU: 'detailsPageMenu',
 };

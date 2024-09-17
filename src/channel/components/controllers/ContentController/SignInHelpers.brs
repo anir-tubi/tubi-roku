@@ -779,6 +779,7 @@ end function
 
 
 Function onPostSignOutServerPersistentDataRefresh()
+  tubiLog("SignInHelpers.onPostSignOutServerPersistentDataRefresh")
   authInfo = m.tubiAuthUpdate.getAuthInfo()
   ' set the mode before any changes are done to the UI
   setUiMode(m.constants.ui.modes.standard)
@@ -810,6 +811,14 @@ Function handleUpdatedAuth()
   end if
 
   authInfo = m.tubiAuthUpdate.getAuthInfo()
+  
+  if isLoggedInUser(authInfo) = true
+    '//When signed in, then set the callback in case an endpoint indicates that the user should be signed out
+    m.setSignOutErrorCallback(onSignedInUserNotExistError)
+  else
+    m.setSignOutErrorCallback(invalid)
+  end if
+
   setSideNavSignedInItem(authInfo)
 End Function
 
@@ -1310,6 +1319,7 @@ End Function
 
 
 Function afterSignInLikeDislikeLinear(channelInfo)
+  tubilog("SignInHelpers.afterSignInLikeDislikeLinear")
 
   if channelInfo <> invalid
     setContentToRefreshAllPersonalizedScreens()

@@ -853,6 +853,19 @@ Function onAuthInfoRefreshed()
 End Function
 
 
+' called when the app calls an endpoint which reports an error due to the fact that the signed in user's account does not exist anymore.
+'   This may be because when the app started, the user's accont existed. However, at some point while the app was still open, the user's account
+'   was deleted. For example, the user or someone in the same household of the user went to the tubi website to delete the account.
+Function onSignedInUserNotExistError(error)
+  tubiLog("ContentController.onSignedInUserNotExistError")
+  screen = getCurrentScreen()
+  '//If a signed-in user is no longer exists and a video screen is not visible, then sign out user and set app to guest mode
+  if screen.id <> m.constants.ui.screenIds.videoPlayerScreen AND screen.id <> m.constants.ui.screenIds.linearVideoPlayerScreen 
+    onSignOutModalSelected()
+  end if
+End Function
+
+
 ' called when a user's My List/Bookmarks/Queue is updated
 Function handleQueueChange()
   if isLoggedInUser() = true
@@ -2458,7 +2471,7 @@ End Function
 
 ' isUserInAdultsMode Returns true/false based on if the user is in adults mode based on parental controls and age info.
 Function isUserInAdultsMode()
-  tubiLog("ContentController.setUiModeFromState")
+  tubiLog("ContentController.isUserInAdultsMode")
   isUserInAdultsMode = true
 
   ' Checking gf the parental control is not in adults level.

@@ -333,6 +333,7 @@ End Function
 
 
 Function fetchHomeScreen(homeScreen)
+  tubiLog("HomeScreenHelpers.fetchHomeScreen")
   ' This check causes all category fetches to be skipped prior to the field
   ' being set to true.  Then, once true categories reload any time fetchHomeScreen() is
   ' called, such as when signedIn field changes.

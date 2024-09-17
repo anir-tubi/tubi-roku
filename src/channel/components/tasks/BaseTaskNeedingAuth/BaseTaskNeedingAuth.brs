@@ -5,6 +5,7 @@ End Function
 
 ' When it is discovered that we need updated auth, use this function to start the process to retrieve it. If called multiple times it will only trigger the process once if the updated auth request is still in progress.
 Function getUpdatedAuth(port = invalid)
+  tubiLog("BaseTaskNeedungAuth.getUpdatedAuth")
   ' If we are already requesting updated auth info, then don't do it again
   if m.waitingForUpdatedAuthInfo = false then
     m.waitingForUpdatedAuthInfo = true

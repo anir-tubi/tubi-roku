@@ -48,26 +48,28 @@ End Function
 
 
 Function setSettingsScreenSignInInfo()
-  aaSignIn = {
-    signedIn: false
-    name: ""
-    email: ""
-  }
+  if m.settingsScreen <> invalid
+    aaSignIn = {
+      signedIn: false
+      name: ""
+      email: ""
+    }
 
-  authInfo = m.tubiAuthUpdate.getAuthInfo()
-  if isLoggedInUser(authInfo) = true
-    aaSignIn.signedIn = true
-    aaSignIn.email = m.pub_serverPersistentData.email
-    if isNonEmptyString(authInfo.firstName) = true AND isNonEmptyString(authInfo.lastName) = true
-      sName = authInfo.firstName + " " + authInfo.lastName
-    else
-      sName = authInfo.name
+    authInfo = m.tubiAuthUpdate.getAuthInfo()
+    if isLoggedInUser(authInfo) = true
+      aaSignIn.signedIn = true
+      aaSignIn.email = m.pub_serverPersistentData.email
+      if isNonEmptyString(authInfo.firstName) = true AND isNonEmptyString(authInfo.lastName) = true
+        sName = authInfo.firstName + " " + authInfo.lastName
+      else
+        sName = authInfo.name
+      end if
+
+      aaSignIn.name = sName
     end if
 
-    aaSignIn.name = sName
+    m.settingsScreen.signInInfo = aaSignIn
   end if
-
-  m.settingsScreen.signInInfo = aaSignIn
 End Function
 
 

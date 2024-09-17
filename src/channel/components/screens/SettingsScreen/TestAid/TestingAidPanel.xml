@@ -11,6 +11,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
   <script type="text/brightscript" uri="pkg:/components/lib/DevGridOverlay.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
 
   <interface>
     <!-- INPUTS -->

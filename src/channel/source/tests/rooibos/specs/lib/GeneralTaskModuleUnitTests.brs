@@ -3,6 +3,7 @@
 '@Setup
 Function GeneralTaskModuleSetup()
 
+  m.constants = m.global.constants
   generalTask = CreateObject("roSGNode", "BaseGeneralTask")
   GeneralTaskModule(m, generalTask)
 

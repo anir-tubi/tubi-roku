@@ -404,7 +404,15 @@ Function getUserFacingErrorCode(contextCode, subtypeCode, externalCode = "")
     end if
   end if
 
-  return sPrefix + "-" + contextCode  + "-" + subtypeCode + sExternalCode
+  if isNonEmptyString(contextCode) = true
+    contextCode = "-" + contextCode 
+  end if
+  
+  if isNonEmptyString(subtypeCode) = true
+    subtypeCode = "-" + subtypeCode
+  end if
+
+  return sPrefix + contextCode + subtypeCode + sExternalCode
 End Function
 
 

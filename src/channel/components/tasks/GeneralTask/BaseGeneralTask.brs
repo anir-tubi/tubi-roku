@@ -22,7 +22,7 @@ End Function
 '
 ' this task listens for new request in port and makes api request & response calls
 Function listen()
-  tubiLog("GeneralTask.listen loop started")
+  tubiLog("BaseGeneralTask.listen loop started")
 
   ' batchStore helps to store containers responses as batches
   m.batchStore = {}
@@ -317,14 +317,15 @@ Function processResponse(msg)
             processErrorResponse(result, callbackTypes, job)
           end if
         else
-          if retries > 0
+          bUserNotFoundError = checkIfUserNotFoundError(result.response)
+          if retries > 0 AND bUserNotFoundError = false
             handleBackoff(result, job, retries) 'pause before retry to relieve pressure on the backend
           else
             processErrorResponse(result, callbackTypes, job)
           end if
         end if
       else
-        tubiLog("Could not load callbackTypes for requestType: " + requestType, "warn")
+        tubiLog("BaseGeneralTask: Could not load callbackTypes for requestType: " + requestType, "warn")
       end if
 
       m.jobStore.delete(id) ' delete the job from assocarray after the response is sent to avoid memory leak
@@ -511,6 +512,7 @@ End Function
 ' @job : assocarray, it has reqInfo, tubiReq, batchInfo(invalid for single request, valid for batch request)
 '
 Function processErrorResponse(result, callbackTypes, job)
+  tubiLog("BaseGeneralTask.processErrorResponse")
   ' end result of parsedResponse type may vary depending on API response format
   responseFromServer = result.response
   responseHeaders = responseFromServer.headers
@@ -525,11 +527,20 @@ Function processErrorResponse(result, callbackTypes, job)
     parserCallback = callbackTypes.parseError
   end if
 
+  bUserNotFoundError = checkIfUserNotFoundError(result.response)
+
   sendApiErrorLog(result)
 
   ' some requests might not require error handling, and therefore may not have a parseError callback
-  if parserCallback <> invalid
-    output = parserCallback(result.response, job.reqInfo)
+  if parserCallback <> invalid OR bUserNotFoundError = true
+    if bUserNotFoundError = true
+      output = {
+        code: result.response.code
+        data: result.response.data
+      }
+    else
+      output = parserCallback(result.response, job.reqInfo)
+    end if
 
     ' this block will execute only for batch responses
     if job.batchInfo <> invalid AND job.batchInfo.id <> invalid
@@ -541,7 +552,7 @@ Function processErrorResponse(result, callbackTypes, job)
     job.reqInfo.callbackNode.response = invalid
   end if
 
-End function
+End Function
 
 
 '''''''''''''''''''''''
@@ -550,7 +561,7 @@ End function
 ' this method cancels the outstanding requests on the same screen
 ' @reqInfo: AA that was created by generalTask_makeRequest
 Function cancelRequests(reqInfo) As Void
-  tubiLog("GeneralTask.cancelRequests")
+  tubiLog("BaseGeneralTask.cancelRequests")
 
   requestId = reqInfo.id
   for each key in m.jobStore
@@ -581,7 +592,7 @@ Function handleBackoff(result, job, retries, backoffDuration = -1)
   if result <> invalid then
     sendApiErrorLog(result)
   end if
-
+  
   reqInfo = job.reqInfo
 
   if backoffDuration <> -1 then
@@ -641,13 +652,13 @@ Function isEmptyField(fieldValue)
 
   if fieldValue = invalid
     fieldIsEmpty = true
-  else if (type(fieldValue) = "roArray" or type(fieldValue) = "roAssociativeArray") AND fieldValue.count() = 0
+  else if (type(fieldValue) = "roArray" OR type(fieldValue) = "roAssociativeArray") AND fieldValue.count() = 0
     fieldIsEmpty = true
   else if type(fieldValue) = "roSGNode" AND fieldValue.getChildCount() = 0
     fieldIsEmpty = true
-  else if (type(fieldValue) = "String" or type(fieldValue) = "roString") AND fieldValue = ""
+  else if (type(fieldValue) = "String" OR type(fieldValue) = "roString") AND fieldValue = ""
     fieldIsEmpty = true
-  else if (type(fieldValue) = "Integer" or type(fieldValue) = "roInt" or type(fieldValue) = "roInteger") AND fieldValue = 0
+  else if (type(fieldValue) = "Integer" OR type(fieldValue) = "roInt" OR type(fieldValue) = "roInteger") AND fieldValue = 0
     fieldIsEmpty = true
   end if
 
@@ -693,13 +704,33 @@ End Function
 
 ' Checks the backend response to see if backend returned a error code with expired token.
 Function checkIfTokenExpiredError(response)
-  if response <> invalid AND response.data <> invalid AND response.data <> ""
+  if response <> invalid AND isNonEmptyString(response.data) = true
     parsedResponse = parseJson(response.data)
-    if parsedResponse <> invalid AND parsedResponse["code"] = m.constants.errors.codes.expiredToken
+    if isAA(parsedResponse) = true AND parsedResponse["code"] = m.constants.errors.codes.expiredToken
       return true
     end if
   end if
 
+  return false
+End Function
+
+
+' Checks the backend response to see if backend returned a user not found error.
+Function checkIfUserNotFoundError(response)
+  data = invalid
+  
+  if response <> invalid
+    if isNonEmptyString(response.data) = true 
+      data = parseJson(response.data)
+    else if isAA(response.data) = true
+      data = response.data
+    end if
+  
+    if isAA(data) = true AND isNonEmptyString(data.code) = true AND UCase(data.code) = UCase(m.constants.errors.codes.userNotFound)
+      return true
+    end if
+  end if
+  
   return false
 End Function
 

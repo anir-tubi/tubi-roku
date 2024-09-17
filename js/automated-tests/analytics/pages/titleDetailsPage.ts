@@ -24,7 +24,7 @@ const TitleDetailsPage = (titleDetails) => {
 			await testUtils.getNodeForElement(TITLE_DETAILS_PAGE_NODES.CAPTIONS),
 		titleDetailsRatingsLabel: async () =>
 			await testUtils.getNodeForElement(
-				TITLE_DETAILS_PAGE_NODES.TITLE_DETIALS_RATINGS_LABEL
+				TITLE_DETAILS_PAGE_NODES.TITLE_DETAILS_RATINGS_LABEL
 			),
 		youMightAlsoLikeFistPoster: async () =>
 			await testUtils.getNodeForElement(

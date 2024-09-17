@@ -1010,6 +1010,7 @@ Function getConstants()
     constants.errors.message.badResponse = "Bad Response"
     constants.errors.message.noResponse = "No Response"
     constants.errors.message.lowMemoryWarning = "Low Memory Warning"
+    constants.errors.message.userNotFound = "User Not Found"
 
   ' creating mapping to backend error codes.
   constants.errors.codes = {}
@@ -1019,6 +1020,7 @@ Function getConstants()
     constants.errors.codes.blockedEmailDomain = "BLOCKED_EMAIL_DOMAIN"
     constants.errors.codes.emailExists = "EMAIL_USER_EXISTS"
     constants.errors.codes.invalidToken = "INVALID_TOKEN"
+    constants.errors.codes.userNotFound = "USER_NOT_FOUND"
 
   ' pixel fires when static Ad is shown on video player during pause
   constants.pauseAd = {}
