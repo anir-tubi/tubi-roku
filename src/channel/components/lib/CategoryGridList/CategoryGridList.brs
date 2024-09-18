@@ -664,7 +664,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       m.lastFocusedList = "rowlist"
       m.RowList.setFocus(true)
       return true
-    else if key = "up" AND m.RowList.isInFocusChain() = true
+    else if key = "up" AND m.RowList.isInFocusChain() = true AND m.top.spotlightContent <> invalid AND m.top.spotlightContent.getChildCount() > 0
       slideFade(m.spotlightRow, "below", "in", 0.3)
       m.lastFocusedList = "spotlight"
       m.spotlightRow.setFocus(true)
@@ -672,6 +672,5 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       return true
     end if
   end if
-
   return false
 End Function

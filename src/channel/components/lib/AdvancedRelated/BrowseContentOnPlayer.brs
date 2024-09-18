@@ -33,9 +33,9 @@ End Function
 
 Function onComponentFocus()
   if m.top.hasFocus()
-    m.categoryGridList.focusedPosition = [0,0]
     m.signedIn = isLoggedInUser() 'everytime the component gets focus, check if user is signed in
     m.categoryGridList.setFocus(true)
+    m.categoryGridList.jumpToRowItem = [0,0]
     if m.info.opacity = 0
       fade(m.info, "in", 0.4)
     end if

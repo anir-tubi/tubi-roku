@@ -49,7 +49,9 @@
   <children>
     <Group 
       id="spotlightGroup">
-      <Group id="infoPanelGroup">
+      <Group
+        id="infoPanelGroup"
+        opacity="0">
         <InfoPanel
           id="InfoPanel"
           maxHeight="354"
