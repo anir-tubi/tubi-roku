@@ -147,17 +147,9 @@ Function startVideoPreview(content, pageInfo = {})
     if getExperimentResource("roku_spotlight_carousel", "roku_spotlight_carousel_v1", false).enabled = true AND content.parentId = m.constants.ui.categoryIds.featured
       ' Reducing 1px from both width and height since the player is in background and keeping full width causes roku to display closed captioning overlay.
       ' To avoid any other Roku OS level default behaivour from kicking in reducing 1px to give a impression that player is not in full screen.
-      videoPreview.update({
-        width: 1919
-        height: 1079
-        videoTranslation: [0, 0]
-      })
+      updatePreviewPlayerToFullScreen()
     else
-      videoPreview.update({
-        width: 1120
-        height: 630
-        videoTranslation: [799, 0]
-      })
+      updatePreviewPlayerToCondensedView()
     end if
 
     ' unobserve field just in case previous state was errorsstart observing a fresh status.
@@ -180,6 +172,15 @@ Function startVideoPreview(content, pageInfo = {})
 
 End Function
 
+
+Function updatePreviewPlayerToCondensedView()
+  resizeToLocation(m.videoPreviewPlayer, 1120, 630, [799, 0], 0)
+End Function
+
+
+Function updatePreviewPlayerToFullScreen()
+  resizeToLocation(m.videoPreviewPlayer, 1919, 1079, [0, 0], 0)
+End Function
 
 Function resumeVideoPreview()
   tubiLog("VideoPreviewHelpers.resumeVideoPreview")
@@ -216,6 +217,12 @@ Function setVideoPreviewAfterFocus(focusedContent, pageInfo = {})
           setPageInfoForVideoPreview(pageInfo)
           if previewState = "buffering"
             resumeVideoPreview()
+          end if
+
+          if getExperimentResource("roku_spotlight_carousel", "roku_spotlight_carousel_v1", false).enabled = true AND focusedContent.parentId = m.constants.ui.categoryIds.featured
+            if isCurrentScreenHomeScreen() = true
+              updatePreviewPlayerToFullScreen()
+            end if
           end if
         end if
         m.backgroundGroup.posterVisible = false

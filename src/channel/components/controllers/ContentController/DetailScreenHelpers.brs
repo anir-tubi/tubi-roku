@@ -60,6 +60,14 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
       previewState = getVideoPreviewStateForThisContent(content)
       if previewState = "buffering" or previewState = "playing"
         setPageInfoForVideoPreview(detailScreen.trackingPageInfo) ' this will help to trigger analytics
+
+        if getExperimentResource("roku_spotlight_carousel", "roku_spotlight_carousel_v1", false).enabled = true AND content.parentId = m.constants.ui.categoryIds.featured
+          m.backgroundGroup.backgroundInfo = {
+            type: m.constants.ui.backgroundTypes.topright
+            uriList: []
+          }
+          updatePreviewPlayerToCondensedView()
+        end if
       else
         previewState = getVideoPreviewState()
         if previewState <> "stopped" AND previewState <> "finished" ' this means video not stopped/finished for previous content, so we need to stop it

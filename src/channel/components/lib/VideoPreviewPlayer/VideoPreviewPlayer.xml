@@ -22,7 +22,6 @@
       <!-- Alias fields for the video node -->
       <field id="width" alias="VideoNode.width"/>
       <field id="height" alias="VideoNode.height"/>
-      <field id="videoTranslation" alias="VideoNode.translation"/>
       <field id="disableScreensaver" alias="VideoNode.disableScreensaver" />
 
       <field id="content" type="node"/>
@@ -54,7 +53,6 @@
       id="VideoNode"
       width="1120"
       height="630"
-      translation="[799,0]"
       enableUI="false"
       cgms="3"
       enableTrickPlay="false"
