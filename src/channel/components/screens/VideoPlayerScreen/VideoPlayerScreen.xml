@@ -350,51 +350,6 @@
 
     </Group>
 
-    <Group
-      id="UpNextOverlay"
-      translation="[0,90]"
-      opacity="0.0">
-
-      <Label
-        id="UpNextOverlayTitle"
-        translation="[0,36]"
-        width="1311"
-        height="39"
-        vertAlign="center">
-      </Label>
-      <Label
-        id="UpNextOverlayHint"
-        translation="[0,66]"
-        width="1311"
-        height="72"
-        vertAlign="center">
-      </Label>
-      <Label
-        id="UpNextOverlayRecommendation"
-        translation="[0,132]"
-        width="1311"
-        height="39"
-        vertAlign="center">
-      </Label>
-      <MarkupGrid
-        id="Menu"
-        translation="[0,192]"
-        itemSize="[72, 72]"
-        itemSpacing="[24, 0]"
-        columnSpacings="[16]"
-        numColumns="2"
-        numRows="1"
-        focusBitmapUri="pkg:/images/pill_button_$$RES$$.webp"
-        focusFootprintBitmapUri="pkg:/images/pill_button_$$RES$$.webp"
-        drawFocusFeedbackOnTop="false"
-        itemComponentName="IconWithLabel">
-        <ContentNode
-          id="LikeDislikeMenuContent"
-          role="content">
-        </ContentNode>
-      </MarkupGrid>
-    </Group>
-
     <PauseAdOverlay
       id="PauseAdOverlay"
       opacity="0.0"/>

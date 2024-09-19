@@ -36,7 +36,7 @@ Function init()
   m.GridSeries.observeField("itemFocused", "onSeriesItemFocused")
   m.GridSeries.observeField("itemSelected", "onSeriesItemSelected")
 
-  m.focusBox = m.top.findNode("FocusBox")
+  focusBox = m.top.findNode("FocusBox")
   if m.constants.deviceInfo.scaledUi = true then
     focusBoxMargin = 4
   else
@@ -45,15 +45,15 @@ Function init()
 
   theme = getThemeFromGlobal()
   if theme <> invalid
-    m.focusBox.blendColor = theme.focusedColor
+    focusBox.blendColor = theme.focusedColor
     m.GridSeries.focusBitmapBlendColor = theme.focusedColor
     m.CountdownMovie.color = theme.highlightedTextColor
     m.CountdownSeries.color = theme.highlightedTextColor
   end if
 
-  m.focusBox.width = m.constants.ui.imageSizes.largePoster[0] + focusBoxMargin * 2
-  m.focusBox.height = m.constants.ui.imageSizes.largePoster[1] + focusBoxMargin * 2
-  m.focusBox.translation = [- focusBoxMargin, - focusBoxMargin]
+  focusBox.width = m.constants.ui.imageSizes.largePoster[0] + focusBoxMargin * 2
+  focusBox.height = m.constants.ui.imageSizes.largePoster[1] + focusBoxMargin * 2
+  focusBox.translation = [- focusBoxMargin, - focusBoxMargin]
   m.InfoMovie.maxHeight = m.constants.ui.imageSizes.largePoster[1]
 
 
@@ -102,8 +102,6 @@ End Function
 
 Function onComponentFocus()
   if m.top.hasFocus()
-
-    m.focusBox.visible = true
 
     'If the autoPlay is off, we don't need to show the count down timer.
     if m.top.isAutoPlayOff = false
@@ -188,16 +186,6 @@ Function onKeyEvent(key, press) as Boolean
         handleSeriesItemSelected(m.GridSeries.itemFocused)
       end if
       handled = true
-    else if key = "up"
-      if getExperimentResource("roku_like_dislike_on_autoplay", "roku_like_dislike_on_autoplay_v2", false).enabled = true
-        stopTimer()
-        if m.MovieGroup.visible = true
-          m.CountdownMovie.text = getTranslation("screenEndCard_nextUp")
-        else
-          m.CountdownSeries.text = getTranslation("screenEndCard_nextUp")
-        end if
-        m.focusBox.visible = false
-      end if
     end if
   end if
 
@@ -267,9 +255,6 @@ Function itemFocusedHelper(grid, info)
   if grid.content <> invalid
     content = grid.content.getChild(grid.itemFocused)
     if content <> invalid
-      if m.Timer.control = "stop"
-        m.Timer.control = "start"
-      end if
       updateInfoPanel(info, content)
       m.top.contentFocused = content
       m.top.itemFocused = grid.itemFocused
@@ -339,16 +324,7 @@ End Function
 
 Function drawCountdown(labelNode, time)
   if m.top.isAutoPlayOff = false
-    if getExperimentResource("roku_like_dislike_on_autoplay", "roku_like_dislike_on_autoplay_v2", false).enabled = true
-      if labelNode.id = m.CountdownSeries.id
-        labelNode.translation = [-597, -21]
-      else
-        labelNode.translation = [-270, -21]
-      end if
-      labelNode.text = getTranslation("screenEndCard_nextUpIn") + stri(time)
-    else
     labelNode.text = getTranslation("screenEndCard_startingIn", {seconds: stri(time)})
-    end if
   end if
 End Function
 

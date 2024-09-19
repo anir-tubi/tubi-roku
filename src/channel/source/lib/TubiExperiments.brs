@@ -33,10 +33,6 @@ Function TubiExperiments(experimentsInfo) as Object
         roku_linear_favorites_v1: {"enabled": false}
       }
 
-      roku_like_dislike_on_autoplay: {
-        roku_like_dislike_on_autoplay_v2: {"enabled": false}
-      }
-
       roku_async_stop: {
         roku_async_stop_v5: {"enabled": false}
       }

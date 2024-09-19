@@ -1285,39 +1285,6 @@ Function AfterSignInPlayLockedContentWhileSkippingDetailScreen(params)
 End Function
 
 
-Function afterDislikeSelectedFromUpNextUI(params)
-  tubilog("SignInHelpers.afterLikeSelectedFromUpNextUI")
-  setUiModeFromState()
-
-  currentScreen = popScreenAfterSignInProcess()
-
-  if currentScreen <> invalid AND currentScreen.getSubtype() = "VideoPlayerScreen"
-    menuItem = params.menuItem
-    likeDislikeState = params.likeDislikeState
-
-    if menuItem = "LikeMenuItem"
-      if likeDislikeState = m.constants.ui.likeDislikeStates.liked
-        likeDislikeState = m.constants.ui.likeDislikeActions.removeLike
-      else
-        likeDislikeState = m.constants.ui.likeDislikeActions.like
-      end if
-    else if menuItem = "DislikeMenuItem"
-      if likeDislikeState = m.constants.ui.likeDislikeStates.disliked
-        likeDislikeState = m.constants.ui.likeDislikeActions.removeDislike
-      else
-        likeDislikeState = m.constants.ui.likeDislikeActions.dislike
-      end if
-    end if
-
-    updateLikeDislikePlayer(currentScreen, likeDislikeState)
-  end if
-
-  refreshAllDetailScreens()
-  setContentToRefreshAllPersonalizedScreens(true)
-  showHideSpinner(false)
-End Function
-
-
 Function afterSignInLikeDislikeLinear(channelInfo)
   tubilog("SignInHelpers.afterSignInLikeDislikeLinear")
 

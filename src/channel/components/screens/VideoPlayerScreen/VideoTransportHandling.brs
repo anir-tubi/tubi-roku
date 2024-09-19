@@ -101,34 +101,24 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         end if
 
       else if key = "up"
-        if m.Menu.hasFocus() = false
-          if  m.UpNext.isInFocusChain() = true AND getExperimentResource("roku_like_dislike_on_autoplay", "roku_like_dislike_on_autoplay_v2", false).enabled = true
-            m.Menu.setFocus(true)
-          else if m.focusedNode.isSameNode(m.BrowseWhileWatching) = true
-            animateTransportAndBrowseWhileWatching("out")
-            setFocusToPlaybackControl()
-          else if m.TopOverlay.opacity = 0 AND m.focusedNode.isSameNode(m.BrowseWhileWatching) = false
-            showTransport()
-            showBrowseWhileWatching()
-          else if m.focusedNode.isSameNode(m.progressBar) = false AND m.skipCuepointsButton.hasFocus() = false
-            setFocusToComponent(m.ProgressBar)
-          else if m.focusedNode.isSameNode(m.progressBar) = false
-            setFocusToComponent(m.ProgressBar)
-          else if m.focusedNode.isSameNode(m.progressBar) = true AND m.skipCuepointsButton <> invalid AND m.skipCuepointsButton.visible = true
-            setFocusToComponent(m.skipCuepointsButton)
-          else
-            return false
-          end if
+        if m.focusedNode.isSameNode(m.BrowseWhileWatching) = true
+          animateTransportAndBrowseWhileWatching("out")
+          setFocusToPlaybackControl()
+        else if m.TopOverlay.opacity = 0 AND m.focusedNode.isSameNode(m.BrowseWhileWatching) = false
+          showTransport()
+          showBrowseWhileWatching()
+        else if m.focusedNode.isSameNode(m.progressBar) = false AND m.skipCuepointsButton.hasFocus() = false
+          setFocusToComponent(m.ProgressBar)
+        else if m.focusedNode.isSameNode(m.progressBar) = false
+          setFocusToComponent(m.ProgressBar)
+        else if m.focusedNode.isSameNode(m.progressBar) = true AND m.skipCuepointsButton <> invalid AND m.skipCuepointsButton.visible = true
+          setFocusToComponent(m.skipCuepointsButton)
         else
-         return false
+          return false
         end if
 
       else if key = "down"
-        if m.Menu.hasFocus() = true AND m.UpNext.visible = true
-          m.Menu.setFocus(false)
-          m.UpNext.setFocus(true)
-        else if m.TopOverlay.opacity = 0 AND m.focusedNode.isSameNode(m.BrowseWhileWatching) = false
-
+        if m.TopOverlay.opacity = 0 AND m.focusedNode.isSameNode(m.BrowseWhileWatching) = false
           showTransport()
           showBrowseWhileWatching()
         else if m.focusedNode.isSameNode(m.progressBar) = true
@@ -150,12 +140,8 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         end if
 
       else if key = "back"
-        if m.UpNext.isInFocusChain() OR (m.Menu.hasFocus() = true)
-          m.likeDislikeStateEnabled = false
-          m.oldFocusedItem = ""
-          m.oldUnFocusedItem = ""
+        if m.UpNext.isInFocusChain()
           m.UpNext.hide = true
-          m.Menu.setFocus(false)
           if m.UpNext.isAutoPlayOff = true AND m.VideoState = "stop"
             backButtonExit()
           else
@@ -174,8 +160,6 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
             if m.VideoState = "stop" AND m.UpNext.contentFocused <> invalid
               m.top.upNextContentToAutoplay = m.UpNext.contentFocused
             end if
-
-            fade(m.UpNextOverlay, "out", 0.75)
 
             setFocusToPlaybackControl()
           end if
@@ -1117,9 +1101,6 @@ Function removeFocusForAllChildComponents()
     m.progressBar.setFocus(false)
   end if
 
-  if m.Menu <> invalid AND m.Menu.isInFocusChain() = true
-    m.Menu.setFocus(false)
-  end if
 End Function
 
 
@@ -1299,18 +1280,14 @@ Function isButtonPressAllowed(key, videoState, videoNode)
   }
 
   isAllowed  = true
-  'When the like/dislike menu is not visible in non-active video states, disabled keys are not permitted, while non-disabled keys are always allowed.
-  if isActiveVideoState(videoState, videoNode) = false AND disabledKeys[key] = true AND m.Menu.visible = false
+
+  'in non active video states, we don't allow the disabled keys, non disable keys are always allowed
+  if isActiveVideoState(videoState, videoNode) = false AND disabledKeys[key] = true
     isAllowed = false
   end if
 
-  'When likeDislike menu has focus, back and down press are allowed. Down to focus on upnext and beck to hide the upnext and overlay.
-  if m.Menu.hasFocus() = true AND (disabledKeys[key] = true AND key <> "down")
-    isAllowed = false
-  end if
-
-  'When upnext is focused, only up and back keys are allowed. Up to focus on like/dislie and back to hide the upnext and overlay.
-  if m.UpNext.isInFocusChain() = true AND (disabledKeys[key] = true AND key <> "up")
+  'When upnext is focused, only back keys are allowed.
+  if m.UpNext.isInFocusChain() = true AND disabledKeys[key] = true
     isAllowed = false
   end if
 
@@ -1656,9 +1633,7 @@ Function animateTransportAndBrowseWhileWatching(direction)
 
     fade(m.VideoBrowseWhileWatchingOverlay, "out", 0.4)
     fade(m.VideoOverlay, "in", 0.4)
-    if m.Menu.hasFocus() = false
-      fade(m.TopOverlay, "in", 0.6, 0.2)
-    end if
+    fade(m.TopOverlay, "in", 0.6, 0.2)
     slideTo(m.HUD, [0, 0], 0.6)
     m.BrowseWhileWatching.close = true
     fade(m.TransportButtons, "in", 0.4)
@@ -1725,9 +1700,7 @@ End Function
 
 
 Function showTopOverlay()
-  if  m.Menu.hasFocus() = false
-    fade(m.TopOverlay, "in", 0.6, 0.2)
-  end if
+  fade(m.TopOverlay, "in", 0.6, 0.2)
 End Function
 
 
