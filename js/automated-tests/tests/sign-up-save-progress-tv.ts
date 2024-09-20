@@ -30,7 +30,7 @@ describe('Sign up Save Progress TV', function () {
         await ecp.sendKeypress(ecp.Key.Ok);
 
         // Wait for Let's create your account screen
-        await utils.sleep(3000);
+        await utils.sleep(4000);
 
         // Click OK
         await ecp.sendKeypress(ecp.Key.Ok, {wait:10000});

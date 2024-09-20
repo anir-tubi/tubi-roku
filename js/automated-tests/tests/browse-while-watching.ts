@@ -200,7 +200,7 @@ describe('Browse While Watching', function () {
         await ecp.sendKeypress(ecp.Key.Down);
         await utils.sleep(1000);
         await ecp.sendKeypress(ecp.Key.Down);
-        await testUtils.waitForElementToShowOnScreen('browseWhileWatchingRowListPoster', 'BWW row not shown', 4000);
+        await testUtils.waitForElementToShowOnScreen('browseWhileWatchingHeader', 'BWW row not shown', 4000);
 
          // Check ratings
         expect('ymalRatingsLabel').does.not.contain(['R','MA','TV-MA', 'NR']);

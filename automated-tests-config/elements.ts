@@ -91,15 +91,27 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#espanolScreen.#PageGroup.#ContentArea.#CategoryGridList.0',
   },
 
-  /** category name */
+  /** Category name */
   categoryGridRowList: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#espanolScreen.#PageGroup.#ContentArea.#CategoryGridList.#RowList',
   },
 
+  /** Categories details page */
+  categoriesDetailsPageInfo:{
+    keyPath:
+    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsInfoPanel.#infoPanelGroup.#Offset',
+  },
+
   categoryGridTitle: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#PageGroup.#ChannelCategoryGrid.1.#Title',
+  },
+
+  /** Network page infopanel */
+  networkPageInfoPanelDescription: {
+    keyPath:
+    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsInfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description',
   },
 
   /** TV Shows screen row list */
@@ -567,8 +579,6 @@ const elements = typeCheckElements({
   detailsPageMenu: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu',
-    xpath:
-      '/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/FilledButtonMarkupGrid',
   },
 
   secondaryMenuactive: {
@@ -688,7 +698,7 @@ const elements = typeCheckElements({
 
     /** BWW Featured header */
     browseWhileWatchingHeader: {
-      keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#YmalRow.0.#YmalGroup.#YmalRow.#CategoryGridList.#RowList.0.title.#CategoryName'
+      keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#BrowseWhileWatchingRow.0.#BrowseWhileWatchingGroup.#BrowseWhileWatchingRow.#CategoryGridList.#RowList.0.title.#CategoryName',
     },
 
   /** rewind button icon */
@@ -1051,7 +1061,7 @@ const elements = typeCheckElements({
   /** Item counter */
   itemCounter: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#pageTitleAndCounter.#CategoryCount.#ItemCount',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#pageTitleAndCounter.#CategoryCount.#ItemCount',
   },
 
   /** Channels page grid */
@@ -1283,7 +1293,7 @@ const elements = typeCheckElements({
 
   confirmYourAgeText: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.1.#AgeVerificationPageText.#AgeVerificationPageHeader',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.#AgeVerificationPageText.#AgeVerificationPageHeader',
   },
 
   /** age gate year box */
@@ -1431,6 +1441,24 @@ const elements = typeCheckElements({
        '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu'
   },
 
+  channelRecommendedButton: {
+    keyPath:
+
+    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.0.#DetailsMenuTextParent.#DetailsMenuTextFocused',
+    },
+  
+
+  /** channel Info Panel */
+  channelInfoPanel: {
+    keyPath:
+    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsInfoPanel.#infoPanelGroup.#Offset',
+  },
+
+  networksInfoPanel: {
+    keyPath:
+    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsInfoPanel.#infoPanelGroup.#Offset',
+  },
+
   /** Category  Action */
   channelCategoryPosterTitle2: {
     keyPath:
@@ -1446,14 +1474,40 @@ const elements = typeCheckElements({
   /** category on category page */
   categoryPageCategory: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid.0.#Logo',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid',
   },
 
-   /** category on category page */
-   categoryPageGrid: {
+  /** Kid's category page */
+  kidsCategory: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid',
+    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid',
   },
+
+  /** Kids menu item text */
+  littleKidsMenuItemText: {
+    keyPath:
+    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.2.#DetailsMenuTextParent.#DetailsMenuTextFocused',
+  },
+
+  //** Category Page Grid */
+  categoryPageGrid:{
+    keyPath:
+    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid',
+  },
+
+  // ** Category Header */
+  categoryHeader: {
+    keyPath:
+    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#pageTitleAndCounter.#CategoryName',
+  },
+
+  
+  /** Category ratings label */
+  categoryRatingsLabel: {
+    keyPath:
+    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsInfoPanel.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#Rating.#RatingBackground',
+  },
+
 
   categoryNameInCategoryDetailsPage: {
     keyPath:
@@ -1464,6 +1518,14 @@ const elements = typeCheckElements({
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid.0.#poster',
   },
+
+  actionButtonFocused: {
+    keyPath:
+    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.2',
+  },
+
+  /** Networks page header */
+
 
   skipIntro: {
     keyPath:
@@ -2369,27 +2431,27 @@ const elements = typeCheckElements({
 
   // Oops wrong password dialog
   wrongPasswordDialog: {
-    keyPath: '#ContentController.#bb742c3.#DialogBox.#ContentArea'
+    keyPath: '#ContentController.#ec0af27.#DialogBox.#ContentArea'
   },
 
   // Oops wrong password dialog title
   wrongPasswordTitle: {
-    keyPath: '#ContentController.#bb742c3.#DialogBox.#ContentArea.#Title'
+    keyPath: '#ContentController.#ec0af27.#DialogBox.#ContentArea.#Title'
   },
   
   // Oops wrong password dialog message
   wrongPasswordMessage: {
-    keyPath: '#ContentController.#bb742c3.#DialogBox.#ContentArea.#MessageGroup.#Message'
+    keyPath: '#ContentController.#ec0af27.#DialogBox.#ContentArea.#MessageGroup.#Message'
   },
 
   // Oops wrong password dialog Forgot Password button
   wrongPasswordForgotButton: {
-    keyPath: '#ContentController.#bb742c3.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText'
+    keyPath: '#ContentController.#ec0af27.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText'
   },
 
   // Oops wrong password dialog Retry button
   wrongPasswordRetryButton: {
-    keyPath: '#ContentController.#bb742c3.#DialogBox.#ContentArea.#ButtonList.1.#buttonTextParent.#buttonText'
+    keyPath: '#ContentController.#ec0af27.#DialogBox.#ContentArea.#ButtonList.1.#buttonTextParent.#buttonText'
   },
 
   // title of Help is on the way! screen after user select Forgot Password

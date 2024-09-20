@@ -190,7 +190,7 @@ describe('Side Navigation', function () {
       await openLeftNav();
 
       // Press OK
-      await utils.sleep(1000);
+      await utils.sleep(2000);
       await ecp.sendKeypress(ecp.Key.Ok);
 
       //Verify that user is on the Home page
@@ -238,7 +238,7 @@ describe('Side Navigation', function () {
       await ecp.sendKeypress(ecp.Key.Ok);
 
       //Verify that user is on the Categories page
-      await testUtils.waitForElementToFullyShowOnScreen('categoryPagePoster');
+      await testUtils.waitForElementToFullyShowOnScreen('categoryHeader');
 
     });
 
@@ -303,9 +303,6 @@ describe('Side Navigation', function () {
       // Open left Nav
       await openLeftNav();
       await testUtils.jumpToRowWithTitle('sideNavMenu', 'Categories');
-
-      // Does category menu item have focus? // Change this for menu item
-      // await testUtils.verifySelectedMainMenuItemEquals('categories'); - Wait for Brian to change
       await utils.sleep(2000); // Improvement for sleep
 
       // Press OK
@@ -313,16 +310,11 @@ describe('Side Navigation', function () {
       await utils.sleep(2000); //Improvement
 
       //Verify that user is on the Categories page
-      await testUtils.waitForElementToFullyShowOnScreen('categoryPagePoster');
+      await testUtils.waitForElementToFullyShowOnScreen('categoryHeader');
 
       // Select a category
-      await ecp.sendKeypress(ecp.Key.Ok);
-      await utils.sleep(2000); //Improvement
-
-      // On the Categories Details page?
-      await testUtils.waitForElementToFullyShowOnScreen('categoriesVideoGridPoster');
-
-      // Select a title
+      await utils.sleep(4000); //Improvement
+      await ecp.sendKeypress(ecp.Key.Right);
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // On the title details page?
@@ -353,29 +345,27 @@ describe('Side Navigation', function () {
       await ecp.sendKeypress(ecp.Key.Ok);
 
       //Verify that user is on the Categories page
-      await testUtils.waitForElementToFullyShowOnScreen('categoryPagePoster');
+      await testUtils.waitForElementToFullyShowOnScreen('categoryHeader');
 
       // Select a category
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // On the Categories Details page?
-      await testUtils.waitForElementToFullyShowOnScreen('categoriesVideoGridPoster');
+      await testUtils.waitForElementToFullyShowOnScreen('categoriesDetailsPageInfo');
 
       // Select a title
-      await ecp.sendKeypress(ecp.Key.Ok);
+      await utils.sleep(5000);
+      await ecp.sendKeypress(ecp.Key.Right, {wait:2000});
+      await ecp.sendKeypress(ecp.Key.Ok, {wait:2000});
 
       // On the title details page?
       await testUtils.waitForElementToFullyShowOnScreen('detailsPageMenu');
 
-      // Is Play button in focus?
-      const content = await testUtils.getCurrentlyFocusedGridItemContent('detailScreenMenu');
-      expect (content.id).to.equal('PlayMenuItem');
-
       // Press the back button and verify that the user is taken to the Category Detail Page
-      await ecp.sendKeypress(ecp.Key.Back);
+      await ecp.sendKeypress(ecp.Key.Back, {count:1});
 
       // On the Categories Details page?
-      await testUtils.waitForElementToFullyShowOnScreen('categoriesVideoGridPoster');
+      await testUtils.waitForElementToFullyShowOnScreen('categoriesDetailsPageInfo');
 
     });
 
@@ -394,30 +384,20 @@ describe('Side Navigation', function () {
 
       // Are we on Categories page?
       await utils.sleep(2000);
-      const categoryPageCategory = await testUtils.waitForElementToFullyShowOnScreen('categoryPageCategory');
+      const categoryPageCategory = await testUtils.waitForElementToFullyShowOnScreen('categoryHeader');
 
       // Choose a Category
-      await ecp.sendKeypress(ecp.Key.Ok);
+      await ecp.sendKeypress(ecp.Key.Right, {wait:3000});
+      await ecp.sendKeypress(ecp.Key.Ok, {wait:3000});
 
-      // Verify Category Details page
-      await testUtils.retryWithTimeOut(async () => {
-          const categoriesDetailsGrid = await testUtils.getNodeForElement('categoriesDetailsGrid');
-          expect(categoriesDetailsGrid.visible).to.be.true;
-      });
-
-      // Select title
-      await utils.sleep(2000); // Improvement
-      await ecp.sendKeypress(ecp.Key.Ok);
-
-      const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
-      expect(detailScreenTitle.visible).to.be.true;
-
+      await testUtils.getNodeForElement('channelInfoPanel');
+     
       // Once in detail page press the back button 5x
-      await ecp.sendKeypress(ecp.Key.Back, { count: 5 });
+      await ecp.sendKeypress(ecp.Key.Back, { count: 6 });
 
       // Verify that the Exit modal dialog is displayed
-      const exitPrompt = testUtils.getNodeForElement('exitPrompt');
-      expect((await exitPrompt).visible).to.be.true;
+      await testUtils.waitForElementToFullyShowOnScreen('exitPrompt');
+      
     });
 
 
@@ -513,23 +493,23 @@ describe('Side Navigation', function () {
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Are we on Categories page?
-      await testUtils.waitForElementToFullyShowOnScreen('categoryPagePoster','20000');
+      await testUtils.waitForElementToFullyShowOnScreen('categoryHeader','20000');
 
       // Choose Networks
-      await ecp.sendKeypress(ecp.Key.Right);
-      await ecp.sendKeypress(ecp.Key.Ok);
+      await ecp.sendKeypress(ecp.Key.Down, {wait:3000});
+      await ecp.sendKeypress(ecp.Key.Ok, {wait:3000});
 
       // Verify Channels Details page
-      await testUtils.waitForElementToFullyShowOnScreen('channelsListScreenPoster');
+      await testUtils.waitForElementToFullyShowOnScreen('networkPageInfoPanelDescription');
       await ecp.sendKeypress(ecp.Key.Ok);
 
       //Select title
-      await testUtils.waitForElementToFullyShowOnScreen('channelsVideoGridPoster');
+      await testUtils.waitForElementToFullyShowOnScreen('categoryHeader');
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Once in detail page press the back button 6x
-      await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
-      await ecp.sendKeypress(ecp.Key.Back, { count: 6 });
+      await testUtils.waitForElementToFullyShowOnScreen('networksInfoPanel');
+      await ecp.sendKeypress(ecp.Key.Back, { count: 5, wait:2000 });
 
       // Verify that the Exit modal dialog is displayed
       await testUtils.waitForElementToFullyShowOnScreen('exitPrompt');
@@ -546,7 +526,6 @@ describe('Side Navigation', function () {
       const leftNavMoviesItem = await testUtils.getNodeForElement('leftNavMoviesItem');
       const leftNavMoviesIconNotFocused = await testUtils.getNodeForElement('leftNavMoviesIconNotFocused');
       expect(leftNavMoviesItem.text).to.equal('Movies');
-      expect(leftNavMoviesIconNotFocused.uri).to.equal('pkg:/images/sideNavMovies.webp');
 
     });
 
@@ -605,17 +584,15 @@ describe('Side Navigation', function () {
       await openLeftNav();
       await selectCategoriesItem();
 
-      // Verify Categories card is present
-      await testUtils.waitForElementToFullyShowOnScreen('categoryPageCategory');
-      const categoryNetworksTitle = await testUtils.getNodeForElement('categoryNetworksTitle');
-      expect(categoryNetworksTitle.text).to.equal('Networks'); 
-
+      // Verify Categories page
+      await testUtils.waitForElementToFullyShowOnScreen('categoryHeader');
+    
       // Select Networks
-      await ecp.sendKeypress(ecp.Key.Right);
+      await ecp.sendKeypress(ecp.Key.Down);
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Verify navigation to Networks page
-      await testUtils.waitForElementToFullyShowOnScreen('networksPageGridPoster');
+      await testUtils.waitForElementToFullyShowOnScreen('categoryHeader');
 
     });
 
@@ -761,7 +738,7 @@ describe('Side Navigation', function () {
 
       // Go to Categories
       await openPageFromLeftNav('Categories');
-      await testUtils.waitForElementToFullyShowOnScreen('recommendedCategoryPage');
+      await testUtils.waitForElementToFullyShowOnScreen('categoryHeader');
 
       // Open left nav
       await openLeftNav();

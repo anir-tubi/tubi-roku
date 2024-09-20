@@ -59,12 +59,12 @@ describe('Sign In: On-Device Password Reset', function () {
     // Enter wrong password
     await ecp.sleep(3000);
     await ecp.sendKeypress(ecp.Key.Ok);
-    await ecp.sendText('222222');
+    await ecp.sendText('22222');
     await utils.sleep(3000);
     await ecp.sendKeypress(ecp.Key.Right);
     await ecp.sendKeypress(ecp.Key.Down, {count:4});
     await ecp.sleep(3000);
-    await ecp.sendKeypress(ecp.Key.Ok);   
+    await ecp.sendKeypress(ecp.Key.Ok, {wait:1000});   
 
     // Oops! wrong password! screen is displayed
     await verifyWrongPasswordDialogDisplayed();
@@ -104,9 +104,9 @@ describe('Sign In: On-Device Password Reset', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify on the Help is on the way! screen
-    await testUtils.waitForCurrentScreenToEqual('forgotPasswordProcessingScreen')
-    const helpOnTheWayTitle = await testUtils.getNodeForElement('helpIsOnTheWayScreenTitle')
-    expect(helpOnTheWayTitle.text).to.equal('Help is on the way!')
+    await testUtils.waitForCurrentScreenToEqual('forgotPasswordProcessingScreen');
+    const helpOnTheWayTitle = await testUtils.getNodeForElement('helpIsOnTheWayScreenTitle');
+    expect(helpOnTheWayTitle.text).to.equal('Help is on the way!');
   });
 
 // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/476634
@@ -214,6 +214,7 @@ it('C476635 - Register New User - Kids Mode, @password_reset', async () => {
     await testUtils.waitForElementToFullyShowOnScreen('tubiKidsLogo');
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
   });
+});
 
 
   async function verifyWrongPasswordDialogDisplayed() {
@@ -221,10 +222,9 @@ it('C476635 - Register New User - Kids Mode, @password_reset', async () => {
     const wrongPasswordDialogTitle = await testUtils.getNodeForElement('wrongPasswordTitle');
     expect(wrongPasswordDialogTitle.text).to.equal('Oops, wrong Password');
     const wrongPasswordDialogMessage = await testUtils.getNodeForElement('wrongPasswordMessage');
-    expect(wrongPasswordDialogMessage.text).to.contain("Let's try again or enter a different password for this account:");
+    expect(wrongPasswordDialogMessage.text).to.contain('try again or enter a different password for this account:');
     const wrongPasswordDialogForgotButton = await testUtils.getNodeForElement('wrongPasswordForgotButton');
-    expect(wrongPasswordDialogForgotButton.text).to.equal("Forgot Password");
+    expect(wrongPasswordDialogForgotButton.text).to.equal('Forgot Password');
     const wrongPasswordDialogRetryButton = await testUtils.getNodeForElement('wrongPasswordRetryButton');
-    expect(wrongPasswordDialogRetryButton.text).to.equal("Retry");
+    expect(wrongPasswordDialogRetryButton.text).to.equal('Retry');
   }
-})

@@ -179,7 +179,7 @@ describe('Espanol', function () {
           // Launch at Espanol page with user above that has watch list and history
 
           await testUtils.startApplicationAtPage('espanol', { user: user });
-          await testUtils.waitForElementToHaveFocus('espanolHomeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+          await testUtils.waitForElementToFullyShowOnScreen('espanolLogo', 'Timed out waiting for espanol page');
 
           // Scroll to CW and verify translation
           await testUtils.jumpToRowWithTitle('categoryGridRowList', 'Seguir Viendo', 10000);

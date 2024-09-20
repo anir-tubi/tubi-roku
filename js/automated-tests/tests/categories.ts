@@ -164,7 +164,7 @@ describe('Categories', function () {
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Are we on Categories page?
-      await testUtils.waitForElementToFullyShowOnScreen('categoryPageCategory'); 
+      await testUtils.waitForElementToFullyShowOnScreen('categoryPageCategory', 'Category page not shown', 15000); 
     }
 
     async function verifySixColumns() {

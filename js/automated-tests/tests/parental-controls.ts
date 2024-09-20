@@ -151,12 +151,13 @@ describe('Parental Controls', function () {
 
         // Are we on Categories page?
         await utils.sleep(2000);
-        const categoryPageCategory = testUtils.getNodeForElement('categoryPageCategory');
-        expect((await categoryPageCategory).visible).to.be.true;
+        await testUtils.waitForElementToShowOnScreen('kidsCategory');
 
         // Little Kids content?
-        const horsesAndPoniesTile = testUtils.getNodeForElement('horsesAndPoniesTile');
-        expect((await horsesAndPoniesTile).visible).to.be.true;
+        await ecp.sendKeypress(ecp.Key.Down, {count: 2});
+        await testUtils.waitForElementToFullyShowOnScreen('littleKidsMenuItemText');
+        const menuItemText = await testUtils.getNodeForElement('littleKidsMenuItemText');
+        expect(menuItemText.text).to.equal('Dinosaurs & Dragons');
     });
 
         //https://tubi.testrail.io/index.php?/cases/view/535835
@@ -195,13 +196,29 @@ describe('Parental Controls', function () {
 
         // Are we on Categories page?
         await utils.sleep(2000);
-        const categoryPageCategory = testUtils.getNodeForElement('categoryPageCategory');
-        expect((await categoryPageCategory).visible).to.be.true;
+        await testUtils.waitForElementToShowOnScreen('kidsCategory');
 
-        // Older Kids content?
-        const kidFriendlyClassics = testUtils.getNodeForElement('kidFriendlyClassics');
-        expect((await kidFriendlyClassics).visible).to.be.true;
-    });
+        // Little Kids content?
+        await ecp.sendKeypress(ecp.Key.Down, {wait:2000});
+        await ecp.sendKeypress(ecp.Key.Right, {wait:2000});
+        await testUtils.waitForElementToFullyShowOnScreen('channelInfoPanel');
+    
+        // Check Ratings label
+        const categoryRatingsLabel = await testUtils.getNodeForElement('categoryRatingsLabel');
+        await testUtils.waitForGridContentToLoad('categoryPageGrid');
+        const rowItemsContent = await testUtils.getAllGridItemsContent('categoryPageGrid');
+
+
+        for (const itemContent of rowItemsContent) {
+          const rating = itemContent.ratings[0].value;
+          expect(rating).to.not.equal('R');
+          expect(rating).to.not.equal('MA');
+          expect(rating).to.not.equal('PG-13');
+          expect(rating).to.not.equal('NR');
+          expect(rating).to.not.equal('TV-13');
+          expect(rating).to.not.equal('PG');
+        }
+      });
 
     // https://tubi.testrail.io/index.php?/cases/view/535836
     it('C535836 - Categories Page - When settings is changed from Adult to Teens then categories for Teens are listed, @parental_controls', async () => {
