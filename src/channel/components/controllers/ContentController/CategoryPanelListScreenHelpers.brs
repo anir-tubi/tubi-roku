@@ -32,6 +32,7 @@ Function showCategoryPanelListScreen(constants, sendNavigationLoadEvents = true,
     panelScreen.observeFieldScoped("contentToPlay", "onContentToPlay")
     panelScreen.observeFieldScoped("categoryBatchIndex", "onCategoryPanelBatchIndexChange")
     panelScreen.observeFieldScoped("visible", "onCategoryPanelListScreenVisibleChange")
+    panelScreen.observeFieldScoped("failedJumpToItemByID", "onJumpToIDFailed")
 
     ' Stores state if the categoryPanelScreen is in the process of refreshing/fetching content from API.
     ' Is used to determine when to send the PageLoad analytics event (don't send on refresh)
@@ -423,6 +424,18 @@ Function onCategoriesPanelListSuccess(response)
       end if
     end if
   end if
+End Function
+
+
+'//If the deeplink setting of jumpToCategoryId failed to set focus on a specific category, then 
+'//this might mean that the category does not exist in the category list. Try to load the category in a separate category page
+Function onJumpToIDFailed(msg)
+  tubiLog("CategoryPanelListScreenHelpers.onJumpToIDFailed")
+  jumpToCategoryId = msg.getData()
+
+  contentNode = CreateObject("roSGNode", "CategoryContentNode")
+  contentNode.id = jumpToCategoryId
+  showCategoryDetailsScreen(contentNode, false) 
 End Function
 
 

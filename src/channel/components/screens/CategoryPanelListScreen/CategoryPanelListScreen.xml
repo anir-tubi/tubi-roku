@@ -58,6 +58,8 @@
        <field id="jumpToCategoryItemByID" type="assocarray" value="" />
 
     <!-- OUTPUT -->
+      <!--failedJumpToItemByID is the category ID that had been assigned to jumpToItemByID. When the content loads and the category ID cannot be found, this param is set in attempt load a categoryDetailScreen -->
+       <field id="failedJumpToItemByID" type="string" alwaysNotify="true"/>
 
       <!-- The item in the grid (from the vertical list of categories on the left side) that is in focus -->
       <field id="itemFocused" type="integer" alwaysNotify="true"/> 

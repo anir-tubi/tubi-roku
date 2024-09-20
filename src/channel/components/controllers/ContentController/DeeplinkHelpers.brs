@@ -102,7 +102,7 @@ Function createDeeplinkContentFromStartupArgs(args)
       content.deeplinkType = "moviePage"
     else if args.page = "livefeed"
       content.deeplinkType = "liveTV"
-    else if args.page = "genre"
+    else if args.page = "genre" OR args.page = "category" 
       content.deeplinkType = "category"
     else if args.page = "network"
       content.deeplinkType = "channel"

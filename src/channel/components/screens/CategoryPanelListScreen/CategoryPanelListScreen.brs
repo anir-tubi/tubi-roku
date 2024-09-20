@@ -467,6 +467,8 @@ Function onJumpToItem()
     else
       '//Reset the jumpToItem id when the content is loaded but the category id couldn't be found.
       m.top.jumpToItemByID = ""
+      '//Tell the helper that the screen could not jump to a specific category ID
+      m.top.failedJumpToItemByID = sCategoryID
     end if
   end if
 End Function
