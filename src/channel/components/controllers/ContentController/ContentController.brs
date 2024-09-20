@@ -860,7 +860,7 @@ Function onSignedInUserNotExistError(error)
   tubiLog("ContentController.onSignedInUserNotExistError")
   screen = getCurrentScreen()
   '//If a signed-in user is no longer exists and a video screen is not visible, then sign out user and set app to guest mode
-  if screen.id <> m.constants.ui.screenIds.videoPlayerScreen AND screen.id <> m.constants.ui.screenIds.linearVideoPlayerScreen 
+  if screen.id <> m.constants.ui.screenIds.videoPlayerScreen AND screen.id <> m.constants.ui.screenIds.linearVideoPlayerScreen
     onSignOutModalSelected()
   end if
 End Function
@@ -2146,6 +2146,10 @@ End Function
 Function restartApp()
   tubiLog("ContentController.restartApp")
   clearScreenStack()
+
+  ' Forces the external config to be retrieved again on startup
+  m.global.externalConfigInfo = invalid
+
   m.top.disableInstantResume = true
   m.mainTask.control = "done"
   m.trackingLoggingTask.control = "done"

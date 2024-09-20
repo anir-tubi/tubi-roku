@@ -35,7 +35,10 @@ Function sendRequestForExperimentsAndConfig()
     end if
   end if
 
-  if getExternalConfigInfoFromGlobal(invalid) <> invalid then
+  config = getExternalConfigInfoFromGlobal(invalid)
+  if config <> invalid then
+    ' m.global.constants gets replaced after restarting the application. If we still have the external config then the values that are copied over from externalConfig into constants will not be present after calling restartApp().
+    updateConstantsValuesFromExternalConfig(config)
     m.isExternalConfigReady = true
     runControllerStartSequence()
   else
@@ -70,26 +73,13 @@ End Function
 Function onExternalConfigRequestSuccess(config)
   TubiLog("onExternalConfigRequestSuccess")
   if config <> invalid
-    if config.country <> invalid AND config.country <> ""
-      m.constants.deviceInfo.countryCode = UCase(config.country)
-    end if
+    m.global.externalConfigInfo = config
+    updateConstantsValuesFromExternalConfig(config)
 
     if isAA(config.blocked_analytics_events_mapping) = true
       ' Storing the value of blocked analytics event to registry as a fallback in future if the external config call fails.
       RegWrite("blocked_analytics_events_mapping", FormatJson(config.blocked_analytics_events_mapping), m.constants.registrySectionIDs.fallbacks)
     end if
-
-    m.global.externalConfigInfo = config
-
-    'Let youbora be enabled by the remote config
-    youboraEnabled = config.youbora_enabled
-    if youboraEnabled = true
-      m.constants.settings.youboraEnabled = youboraEnabled
-    end if
-
-    ' Since we're modifying constants here we need to push up the changes to the global copy
-    m.global.constants = m.constants
-    m.updateGeneralTaskConstants(m.constants)
   end if
   m.isExternalConfigReady = true
   runControllerStartSequence()
@@ -112,6 +102,25 @@ Function onExternalConfigRequestFailure(_error)
 
   m.isExternalConfigReady = true
   runControllerStartSequence()
+End Function
+
+
+Function updateConstantsValuesFromExternalConfig(config)
+  if config <> invalid then
+    if config.country <> invalid AND config.country <> ""
+      m.constants.deviceInfo.countryCode = UCase(config.country)
+    end if
+
+    'Let youbora be enabled by the remote config
+    youboraEnabled = config.youbora_enabled
+    if youboraEnabled = true
+      m.constants.settings.youboraEnabled = youboraEnabled
+    end if
+
+    ' Since we're modifying constants here we need to push up the changes to the global copy
+    m.global.constants = m.constants
+    m.updateGeneralTaskConstants(m.constants)
+  end if
 End Function
 
 
