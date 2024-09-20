@@ -1075,7 +1075,7 @@ const elements = typeCheckElements({
 
   channelsVideoGrid: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsVideoGrid',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid',
   },
 
   categoryContent: {
@@ -1221,7 +1221,7 @@ const elements = typeCheckElements({
 
   /** Live Icon */
   liveIcon: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#RowList.2.items.0.1.#badgeGroup',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#RowList.7.items.0.1.#badgeGroup.0.#BadgeInfoLayout',
   },
 
   loadingSpinnerLinear: {
@@ -1423,7 +1423,12 @@ const elements = typeCheckElements({
   /** category on category page */
   channelCategoryGrid: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#PageGroup.#ChannelCategoryGrid',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid',
+  },
+
+  channelSideNav: {
+    keyPath:
+       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu'
   },
 
   /** Category  Action */
@@ -1452,12 +1457,12 @@ const elements = typeCheckElements({
 
   categoryNameInCategoryDetailsPage: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#pageTitleAndCounter.#CategoryName',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#pageTitleAndCounter.#CategoryName',
   },
 
   categoryPoster: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsVideoGrid.0.#poster',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid.0.#poster',
   },
 
   skipIntro: {
@@ -1485,7 +1490,7 @@ const elements = typeCheckElements({
   /** channel page */
   channelPoster: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#channelListScreen.#ChannelCategoryGrid.6.#PosterRect',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid.0.#poster',
   },
 
   titleNameInPlayer: {
@@ -1500,7 +1505,7 @@ const elements = typeCheckElements({
 
   titleNameInContainer: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#ChannelsInfoPanel.#infoPanelGroup.#Offset.#Title',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsInfoPanel.#infoPanelGroup.#Offset.#Title',
   },
 
   titleDescriptionMovieScreen: {
@@ -2018,7 +2023,7 @@ const elements = typeCheckElements({
   /** channels list screen */
   channelsListScreenGrid: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#channelListScreen.#ChannelCategoryGrid',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid',
   },
 
   /** settings left nav button highlighted */

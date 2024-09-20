@@ -102,7 +102,7 @@ describe('Activate events', function () {
 		await ecp.sendKeypress(ecp.Key.Back,{ wait: 3000 });
 		const activation =  ActivatePage();
 		await activation.clickOnLetsCreateYourAccount();
-		await utils.sleep(2000);
+		await utils.sleep(3000);
 		await ecp.sendKeypress(ecp.Key.Ok);
 		const signInEmailPage = SignInEmailPage();
 		await signInEmailPage.pageDidLoad();

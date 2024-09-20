@@ -27,7 +27,11 @@ const Container = () => {
 	}
 
 	async function selectFocusedTitle() {
-		const titleName = await elements.titleName();
+		let titleName;
+		await testUtils.retryWithTimeOut(async () => {
+			titleName = await elements.titleName();
+			expect(titleName.visible).to.equal(true);
+		});
 		await ecp.sendKeypress(ecp.Key.Ok);
 		const titleDetailsPage = TitleDetailsPage({ title: titleName.text });
 		await titleDetailsPage.pageDidLoad();
