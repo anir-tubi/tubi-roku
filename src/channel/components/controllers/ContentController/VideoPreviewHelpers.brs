@@ -148,6 +148,8 @@ Function startVideoPreview(content, pageInfo = {})
       ' Reducing 1px from both width and height since the player is in background and keeping full width causes roku to display closed captioning overlay.
       ' To avoid any other Roku OS level default behaivour from kicking in reducing 1px to give a impression that player is not in full screen.
       updatePreviewPlayerToFullScreen()
+      videoPreview.unobserveFieldScoped("position")
+      videoPreview.observeFieldScoped("position", "onVideoPreviewPositionChanged")
     else
       updatePreviewPlayerToCondensedView()
     end if
@@ -155,9 +157,6 @@ Function startVideoPreview(content, pageInfo = {})
     ' unobserve field just in case previous state was errorsstart observing a fresh status.
     videoPreview.unobserveFieldScoped("state")
     videoPreview.observeFieldScoped("state", "onVideoPreviewStateChanged")
-    videoPreview.unobserveFieldScoped("position")
-    videoPreview.observeFieldScoped("position", "onVideoPreviewPositionChanged")
-
     setPageInfoForVideoPreview(pageInfo)
 
     videoContent = createObject("RoSGNode", "ContentNode")
