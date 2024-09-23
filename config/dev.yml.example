@@ -46,6 +46,9 @@ settings:
   # Setting the below value to true will enable youbora request logging into the console.
   youboraDebugEnabled: false
 
+  # Setting the below value to true will enable player log tracking.
+  playerLogEnabled: false  
+
   stagingApis: false  # setting to true will use UAPI staging APIs (matrix, cms, user_device)
 
   raleEnabled: false # setting to true will enable RALE being included in dev builds

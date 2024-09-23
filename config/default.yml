@@ -38,6 +38,9 @@ settings:
   # Setting the below value to true will enable youbora request logging into the console.
   youboraDebugEnabled: false
 
+  # Setting the below value to true will enable player log tracking.
+  playerLogEnabled: false
+
   # Setting the below value to true will turn off hdmi status checks to avoid issues with automated tests on Roku devices not hooked up to a display
   disableHdmiStatusChecks: false
 

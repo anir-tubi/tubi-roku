@@ -80,6 +80,24 @@ Function onExternalConfigRequestSuccess(config)
       ' Storing the value of blocked analytics event to registry as a fallback in future if the external config call fails.
       RegWrite("blocked_analytics_events_mapping", FormatJson(config.blocked_analytics_events_mapping), m.constants.registrySectionIDs.fallbacks)
     end if
+
+    m.global.externalConfigInfo = config
+
+    'Let youbora be enabled by the remote config
+    youboraEnabled = config.youbora_enabled
+    if youboraEnabled = true
+      m.constants.settings.youboraEnabled = youboraEnabled
+    end if
+
+    'Let player log be enabled by the remote config
+    playerLogEnabled = config.player_log_enabled
+    if playerLogEnabled = true
+      m.constants.settings.playerLogEnabled = playerLogEnabled
+    end if
+
+    ' Since we're modifying constants here we need to push up the changes to the global copy
+    m.global.constants = m.constants
+    m.updateGeneralTaskConstants(m.constants)
   end if
   m.isExternalConfigReady = true
   runControllerStartSequence()
