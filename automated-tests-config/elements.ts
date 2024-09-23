@@ -263,7 +263,7 @@ const elements = typeCheckElements({
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#Title',
   },
-  
+
   /** Content title on the detail screen */
   detailScreenPanel: {
     keyPath:
@@ -803,8 +803,9 @@ const elements = typeCheckElements({
       '/TubiScene/ContentController/Group/Group/ScreenStack/SettingsScreen/PanelSet/ParentalControlsPanel/Group/Group/MarkupList/CheckButton[2]/LayoutGroup/Poster',
   },
 
+
   browseWhileWatchingRowList: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#YmalRow.0.#YmalGroup.#YmalRow.#CategoryGridList.#RowList',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#BrowseWhileWatchingRow.0.#BrowseWhileWatchingGroup.#BrowseWhileWatchingRow.#CategoryGridList.#RowList',
   },
 
   searchResultChannelNameABC: {
@@ -1446,7 +1447,7 @@ const elements = typeCheckElements({
 
     '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.0.#DetailsMenuTextParent.#DetailsMenuTextFocused',
     },
-  
+
 
   /** channel Info Panel */
   channelInfoPanel: {
@@ -1501,7 +1502,7 @@ const elements = typeCheckElements({
     '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#pageTitleAndCounter.#CategoryName',
   },
 
-  
+
   /** Category ratings label */
   categoryRatingsLabel: {
     keyPath:
@@ -2397,34 +2398,34 @@ const elements = typeCheckElements({
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#RowList.0.title.#CategoryName',
   },
-  
+
   /** Continue Watching Row Title on Home page */
   continueWatchingRowHomeTitle: {
-    keyPath: 
+    keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsVideoGrid.0.1.#posterLayout.#Poster',
   },
 
-  // title on the exit prompt of Sign up to Save Progress 
+  // title on the exit prompt of Sign up to Save Progress
   signUpExitDialogTitle: {
     keyPath: '#ContentController.#8dcd9fd.#DialogBox.#ContentArea.#Title'
   },
 
-  //exit prompt of Sign up to Save Progress 
+  //exit prompt of Sign up to Save Progress
   signUpExitDialog: {
     keyPath: '#ContentController.#8dcd9fd.#DialogBox'
   },
 
-  // Description on the exit prompt of Sign up to Save Progress 
+  // Description on the exit prompt of Sign up to Save Progress
   signUpExitDialogDescription: {
     keyPath: '#ContentController.#8dcd9fd.#DialogBox.#ContentArea.#MessageGroup.#Message'
   },
 
-  // Sign up button on the exit prompt of Sign up to Save Progress 
+  // Sign up button on the exit prompt of Sign up to Save Progress
   signUpExitDialogSignUpButton: {
     keyPath: '#ContentController.#8dcd9fd.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText'
   },
 
-  // Sign up later button on the exit prompt of Sign up to Save Progress 
+  // Sign up later button on the exit prompt of Sign up to Save Progress
   signUpExitDialogLaterButton: {
     keyPath: '#ContentController.#8dcd9fd.#DialogBox.#ContentArea.#ButtonList.1.#buttonTextParent.#buttonText'
   },
@@ -2438,7 +2439,7 @@ const elements = typeCheckElements({
   wrongPasswordTitle: {
     keyPath: '#ContentController.#ec0af27.#DialogBox.#ContentArea.#Title'
   },
-  
+
   // Oops wrong password dialog message
   wrongPasswordMessage: {
     keyPath: '#ContentController.#ec0af27.#DialogBox.#ContentArea.#MessageGroup.#Message'

@@ -294,7 +294,7 @@ describe('Browse While Watching', function () {
         await verifyYMALRowInPlayer();
 
         // Verify CW row
-        await testUtils.jumpToRowWithTitle('browseWhileWatchingRowList', 'Continue Watching');    
+        await testUtils.jumpToRowWithTitle('browseWhileWatchingRowList', 'Continue Watching', 10000);    
 
     });
 
