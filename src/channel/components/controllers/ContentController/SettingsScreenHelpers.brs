@@ -7,10 +7,12 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0)
   m.settingsScreen.uiMode = m.uiMode
   ' Passing in the saved isVideoPreviewOn.
   m.settingsScreen.isVideoPreviewOn = m.pub_serverPersistentData.isVideoPreviewOn
+  m.settingsScreen.isAutoPlayTimerOn = isAutoPlayTimerOn()
   m.settingsScreen.isAllowedToManageConsent = isUserAllowedToManageConsent()
   m.settingsScreen.consentSettings = m.consentSettings
 
   m.pubSub.subscribe("pub_serverPersistentData.isVideoPreviewOn", m.settingsScreen, "isVideoPreviewOn")
+  m.pubSub.subscribe("pub_serverPersistentData.isAutoPlayTimerOn", m.settingsScreen, "isAutoPlayTimerOn")
 
   ' This observer must be set before setSettingsScreenSignInInfo is called to trigger initial field change
   m.settingsScreen.observeFieldScoped("fetchUserSettings", "onFetchUserSettingsChanged")
@@ -32,6 +34,10 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0)
   m.settingsScreen.observeFieldScoped("selectedQrCodeSectionInfo", "onSelectedQrCodeSectionInfoChanged")
   if m.constants.settings.mode = "qa" OR  m.constants.settings.mode = "dev" 'this is for extra protection not to restart the app
     m.settingsScreen.observeFieldScoped("appRestartRequested", "onAppRestartRequested")
+  end if
+
+  if getExperimentResource("roku_autoplay_timer", "roku_autoplay_timer_v1").enabled = true
+    m.settingsScreen.observeFieldScoped("autoPlayTimerSettingSelected", "onAutoPlayTimerSettingSelected")
   end if
 
   if screenLevel <> 0
@@ -130,7 +136,7 @@ End Function
 Function onAutoPreviewSettingSelected()
   tubiLog("SettingsScreenHelpers.onAutoPreviewSettingSelected")
   userInteraction = ""
-  if m.settingsScreen.signInInfo <> invalid AND m.settingsScreen.signInInfo.signedIn = true
+  if isLoggedInUser() = true
     if m.settingsScreen.autoPreviewSettingSelected = 0
       choice = true
       userInteraction = "TOGGLE_ON"
@@ -146,7 +152,6 @@ Function onAutoPreviewSettingSelected()
     m.settingsScreen.autoPreviewItemUpdated = m.settingsScreen.autoPreviewSettingSelected
 
     'Send ComponentInteractionEvent
-
     leftSideNavComponent = {
       left_nav_section: "ACCOUNT"
     }
@@ -156,30 +161,68 @@ Function onAutoPreviewSettingSelected()
         account_page_type: "VIDEO_PREVIEW"
       }
     }
-    componentInteractionInfo = {
-      pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
-      componentOneof: m.Tracking.getAnalyticsComponent("left_side_nav_component", leftSideNavComponent)
-      user_interaction: userInteraction
-    }
+    componentInteractionInfo = getComponentInteractionInfo(userInteraction, pageInfo, "left_side_nav_component", leftSideNavComponent)
     sendComponentInteractionInfo(componentInteractionInfo)
   else
-    pageInfo = m.settingsScreen.trackingPageInfo
-    dialogEvent = {
-      type: "dialog"
-      values: {
-        dialog_type: "SIGNIN_REQUIRED"
-        pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
-        dialog_action: "SHOW"
-        dialog_sub_type: "sign-in-videopreview"
-      }
-    }
-
     title = getTranslation("dialog_signIn_title")
     message = getTranslation("screenSettings_error_signInAutoplayPreview_description")
     buttons = [getTranslation("dialog_button_signIn"), getTranslation("dialog_button_cancel")]
-    showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onSignInModalSelectedViaAutoplayPreview)
+
+    showSignInRequiredModal(title, message, buttons, m.settingsScreen, "sign-in-videopreview",  m.Tracking, m.trackingLoggingTask, onSignInModalSelectedViaAutoplayPreview)
   end if
 
+End Function
+
+
+Function onAutoPlayTimerSettingSelected(msg)
+  tubiLog("SettingsScreenHelpers.onAutoPlayTimerSettingSelected")
+  autoPlayTimerSettingSelected = msg.getData()
+  userInteraction = ""
+
+  choice = true
+  if autoPlayTimerSettingSelected = 0
+    choice = true
+    userInteraction = "TOGGLE_ON"
+  else if autoPlayTimerSettingSelected = 1
+    choice = false
+    userInteraction = "TOGGLE_OFF"
+  end if
+
+  if isLoggedInUser() = true
+
+    if autoPlayTimerSettingSelected = 0 OR autoPlayTimerSettingSelected = 1
+      saveAutoPlayNextVideoChoiceToServerPersistentData(choice)
+    end if
+  else
+    title = getTranslation("dialog_signIn_title")
+    message = getTranslation("screenSettings_error_signInAutoplayPreview_description")
+    buttons = [getTranslation("dialog_button_signIn"), getTranslation("dialog_button_cancel")]
+
+    showSignInRequiredModal(title, message, buttons, m.settingsScreen, "sign-in-autoplay", m.Tracking, m.trackingLoggingTask, onSignInModalSelectedViaAutoplayNextVideo)
+  end if
+
+  'Send ComponentInteractionEvent
+  leftSideNavComponent = {
+    left_nav_section: "ACCOUNT"
+  }
+  pageInfo = {
+    pageType: "account_page"
+    pageValues: {
+      account_page_type: "AUTOSTART"
+    }
+  }
+  componentInteractionInfo = getComponentInteractionInfo(userInteraction, pageInfo, "left_side_nav_component", leftSideNavComponent)
+  if autoPlayTimerSettingSelected = 0 OR autoPlayTimerSettingSelected = 1
+    sendComponentInteractionInfo(componentInteractionInfo)
+  end if
+End Function
+
+
+'@choice: boolean, true for on and false for off.
+Function saveAutoPlayNextVideoChoiceToServerPersistentData(choice)
+  saveServerPersistentData([{
+    "isAutoPlayTimerOn": choice
+  }])
 End Function
 
 

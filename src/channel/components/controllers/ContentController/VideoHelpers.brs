@@ -126,6 +126,8 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
     videoPlayer.preferredAudioTrack = m.pub_serverPersistentData.audioTrack
   end if
 
+  videoPlayer.isAutoPlayTimerOn = isAutoPlayTimerOn()
+
   stopVideoPreview()
 
   ' m.upNextRequest can be checked to determine if a request to fetch up next / autoplay content has
@@ -618,7 +620,7 @@ Function onVideoPlayerState(msg)
       end if
       showPlayerError(errorMessage, videoPlayer.videoErrorCode)
     else if state = "finished"
-      isAutoPlayOff = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false))
+      isAutoPlayOff = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR videoPlayer.isAutoPlayTimerOn = false
       finishedContent = videoPlayer.content
       if finishedContent.isTrailer
         returnToDetailScreenFromVideo()
@@ -1294,7 +1296,7 @@ Function onUpNextResponse(upNextContent)
         end if
       else if upNextContent.getChildCount() > 0
         videoPlayer.upNextContent = upNextContent
-        isAutoPlayOff = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false))
+        isAutoPlayOff = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR videoPlayer.isAutoPlayTimerOn = false
         videoPlayer.isAutoPlayOff = isAutoPlayOff
         videoPlayer.upNextUpdateContent = true
       else 'worst case there are no contents under upNextContent

@@ -757,6 +757,7 @@ Function onSignOutCompleted()
 
   saveLocalServerPresistantData([{
     "isVideoPreviewOn": true
+    "isAutoPlayTimerOn": true
   }])
   getConsentAfterSignOut()
   getServerPersistentData()
@@ -996,7 +997,7 @@ Function onSideNavMyListAfterSignIn()
 End Function
 
 
-' onAutoplayPreviewAfterSignIn - occurs after signin success via autoplay preview
+' onAutoplayPreviewAfterSignIn - occurs after signin success via autoplay preview.
 Function onAutoplayPreviewAfterSignIn()
   tubiLog("SignInHelpers.onAutoplayPreviewAfterSignIn")
 
@@ -1010,6 +1011,29 @@ Function onAutoplayPreviewAfterSignIn()
   end if
 
   onAutoPreviewSettingSelected()
+End Function
+
+
+' onAutoplayNextVideoAfterSignIn - occurs after signin success via autoplay next video.
+Function onAutoplayNextVideoAfterSignIn()
+  tubiLog("SignInHelpers.onAutoplayNextVideoAfterSignIn")
+
+  refreshUiAfterSignIn()
+  currentScreen = popScreenAfterSignInProcess()
+  m.spinner.visible = false
+
+  if currentScreen <> invalid AND currentScreen.getSubtype() = "SettingsScreen"
+    setSettingsScreenSignInInfo()
+    currentScreen.setFocus(true)
+
+    if currentScreen.autoPlayTimerSettingSelected = 0
+      saveAutoPlayNextVideoChoiceToServerPersistentData(true)
+    else if currentScreen.autoPlayTimerSettingSelected = 1
+      saveAutoPlayNextVideoChoiceToServerPersistentData(false)
+    end if
+
+  end if
+
 End Function
 
 

@@ -17,11 +17,16 @@
     <!-- INPUTS -->
       <!-- make a particular setting "checked" and focused -->
       <field id="selectItem" type="integer" alwaysNotify="true"/>
+
+      <!-- make a autoplayTimer setting "checked" and focused -->
+      <field id="autoPlayTimerSelectItem" type="integer" alwaysNotify="true"/>
+
       <field id="offset" alias="Offset.translation"/>
       <field id="isLoading" type="boolean"/>
 
     <!-- OUTPUTS -->
       <field id="itemSelected" alias="AutoplayPreviewMenu.itemSelected"/>
+      <field id="autoPlayTimerItemSelected" alias="AutoPlayTimerMenu.itemSelected"/>
 
        <!-- Holds the information needed to populate a component_interaction event. This will
            be observed by the contentController via epgScreenHelper
@@ -46,7 +51,7 @@
 
       <Label
         id="Instructions"
-        width="890"
+        width="1176"
         wrap="true"
         vertAlign="bottom"
         translation="[0,143]">
@@ -69,6 +74,42 @@
             id="On"/>
           <CheckButtonContentNode
             id="Off"/>
+        </ContentNode>
+      </MarkupList>
+    </Group>
+
+    <Group
+      id="AutoPlayTimerContentGroup"
+      visible="false">
+      <Label
+        id="AutoPlayTimerTitle"
+        height="73"
+        vertAlign="bottom">
+        <Font
+         role="font"/>
+      </Label>
+
+      <Label
+        id="AutoPlayTimerInstructions"
+        width="1176"
+        wrap="true"
+        vertAlign="bottom">
+        <Font
+         role="font"/>
+      </Label>
+
+      <MarkupList
+        id="AutoPlayTimerMenu"
+        numRows="2"
+        itemSize="[585,72]"
+        itemSpacing="[0,8]"
+        itemComponentName="CheckButton"
+        vertFocusAnimationStyle="floatingFocus"
+        focusFootprintBitmapUri="pkg:/images/transparent.png"
+        focusBitmapUri="pkg:/images/menu-focus-$$RES$$.9.png">
+        <ContentNode
+          id="AutoPlayTimerMenuContent"
+          role="content">
         </ContentNode>
       </MarkupList>
     </Group>

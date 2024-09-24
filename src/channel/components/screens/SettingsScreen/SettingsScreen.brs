@@ -12,6 +12,8 @@ Function init()
   m.Title = m.top.findNode("Title")
   m.Title.text = getTranslation("menu_settings")
 
+  m.isAutoPlaySettingsExperimentEnabled = getExperimentResource("roku_autoplay_timer", "roku_autoplay_timer_v1", false).enabled
+
   ' Create the menu
   m.SettingsMenuPanel = createSettingsMenuPanel()
   m.SettingsMenuPanel.observeField("createNextPanelIndex", "onCreateNextPanelIndex")
@@ -213,8 +215,14 @@ Function createOrUpdateAutoPlayPreviewPanel(existingPanel = invalid)
     videoPreviewPanel = existingPanel
     if isSignedIn() = true
       videoPreviewPanel.selectItem = m.top.autoPreviewItemUpdated
+      if m.isAutoPlaySettingsExperimentEnabled = true
+        videoPreviewPanel.autoPlayTimerSelectItem = m.top.autoPlayTimerSettingSelected
+      end if
     else
       videoPreviewPanel.selectItem = 0 ' default if not signed in
+      if m.isAutoPlaySettingsExperimentEnabled = true
+        videoPreviewPanel.autoPlayTimerSelectItem = 0 ' default if not signed in
+      end if
     end if
   end if
 
@@ -223,30 +231,54 @@ End Function
 
 
 Function createAutoPreviewPanel()
+  videoPreviewPanel = CreateObject("roSGNode", "AutoplayPreviewPanel")
+  videoPreviewPanel.observeFieldScoped("itemSelected", "onAutoplayPreviewPanelItemSelected")
+  videoPreviewPanel.observeFieldScoped("audioGuideText", "onAudioGuideTextChanged")
+  videoPreviewPanel.observeFieldScoped("componentInteractionInfo", "onAutoPlayPreviewComponentInteractionInfo")
 
-    videoPreviewPanel = CreateObject("roSGNode", "AutoplayPreviewPanel")
-    videoPreviewPanel.observeFieldScoped("itemSelected", "onAutoplayPreviewPanelItemSelected")
-    videoPreviewPanel.observeFieldScoped("audioGuideText", "onAudioGuideTextChanged")
-    videoPreviewPanel.observeFieldScoped("componentInteractionInfo", "onAutoPlayPreviewComponentInteractionInfo")
-    videoPreviewPanel.width = m.rightPanelWidth
-    'if user has set Roku->settings->autoplay to off, then do not let them change tubi settings.
-    if m.constants.deviceInfo.IsAutoplayEnabled = true
-      videoPreviewPanel.focusable = true
+  if m.isAutoPlaySettingsExperimentEnabled = true
+    videoPreviewPanel.observeFieldScoped("autoPlayTimerItemSelected", "onAutoplayTimerItemSelected")
+  end if
+
+  videoPreviewPanel.width = m.rightPanelWidth
+  'if user has set Roku->settings->autoplay to off, then do not let them change tubi settings.
+  if m.constants.deviceInfo.IsAutoplayEnabled = true OR  m.isAutoPlaySettingsExperimentEnabled = true
+    videoPreviewPanel.focusable = true
+  else
+    videoPreviewPanel.focusable = false
+  end if
+
+  videoPreviewPanel.hasNextPanel = false
+  videoPreviewPanel.leftOnly = false
+  videoPreviewPanel.selectButtonMovesPanelForward = false
+  videoPreviewPanel.offset = m.rightPanelOffset
+
+  if m.top.isVideoPreviewOn = true
+    videoPreviewPanel.selectItem = 0
+  else
+    videoPreviewPanel.selectItem = 1
+  end if
+
+  if m.isAutoPlaySettingsExperimentEnabled = true
+    if m.top.isAutoPlayTimerOn = true
+      videoPreviewPanel.autoPlayTimerSelectItem = 0
     else
-      videoPreviewPanel.focusable = false
+      videoPreviewPanel.autoPlayTimerSelectItem = 1
     end if
+  end if
 
-    videoPreviewPanel.hasNextPanel = false
-    videoPreviewPanel.leftOnly = false
-    videoPreviewPanel.selectButtonMovesPanelForward = false
-    videoPreviewPanel.offset = m.rightPanelOffset
+  ' To prevent unintended changes to the autoPlayTimer setting when adjusting the autoPlayPreview setting, ensure
+  ' that changes to autoPlayPreview do not alter autoPlayTimer. When the user initially sets the
+  ' autoPlayPreview value to off (which is 1), and then attempts to modify it, both autoPlayTimer and autoPlayPreview values are updated.
+  ' However, by default, autoPlayPreviewItemUpdated and autoPlayTimerSettingSelected are set to 0, which can result
+  ' in incorrect checked values for the other component. To avoid this issue, carefully manage the state
+  ' updates to ensure the correct values are maintained for both settings
+  if isLoggedInUser() = true
+    m.top.autoPreviewItemUpdated = videoPreviewPanel.selectItem
+    m.top.autoPlayTimerSettingSelected = videoPreviewPanel.autoPlayTimerSelectItem
+  end if
 
-    if m.top.isVideoPreviewOn = true
-      videoPreviewPanel.selectItem = 0
-    else
-      videoPreviewPanel.selectItem = 1
-    end if
-    return videoPreviewPanel
+  return videoPreviewPanel
 End Function
 
 
@@ -566,6 +598,14 @@ Function onAutoplayPreviewPanelItemSelected(msg)
   itemSelected = msg.GetData()
   m.top.autoPreviewSettingSelected = itemSelected
 
+End Function
+
+
+Function onAutoplayTimerItemSelected(msg)
+  tubiLog("SettingsScreen.onAutoplayTimerItemSelected")
+  itemSelected = msg.GetData()
+  m.top.autoPlayTimerSettingSelected = itemSelected
+  onSignInInfoChange()
 End Function
 
 

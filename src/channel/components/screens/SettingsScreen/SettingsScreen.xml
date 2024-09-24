@@ -33,6 +33,8 @@
       <!-- Holds the isVideoPreviewOn value obtained from ServerPersistentData.isVideoPreviewOn. either user or device level value obtained from backend settings endpoint.  -->
       <field id="isVideoPreviewOn" type="boolean" value="true" />
 
+      <field id="isAutoPlayTimerOn" type="boolean" value="true" />
+
       <!-- Holds the consent preferences value obtained from backend. either user or device level.  -->
       <field id="consentSettings" type="assocarray" />
 
@@ -56,6 +58,7 @@
       <field id="fetchUserSettings" type="boolean" alwaysNotify="true"/>
       <field id="parentalSettingSelected" type="integer" alwaysNotify="true"/>
       <field id="autoPreviewSettingSelected" type="integer" alwaysNotify="true" />
+      <field id="autoPlayTimerSettingSelected" type="integer" alwaysNotify="true" />
       <!-- Holds all the draft or unsaved changes to consents. ex: {"essential_functionality": "opt_in"}.  -->
       <field id="newConsentPreferences" type="assocarray" value="{}" />
       <field id="selectedQrCodeSectionInfo" type="assocarray" alwaysNotify="true" />

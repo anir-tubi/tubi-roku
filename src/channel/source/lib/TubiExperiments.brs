@@ -29,6 +29,10 @@ Function TubiExperiments(experimentsInfo) as Object
         roku_category_redesign_v2: {"enabled": true}
       }
 
+      roku_autoplay_timer: {
+        roku_autoplay_timer_v1 : {"enabled": false}
+      }
+      
       roku_linear_favorites: {
         roku_linear_favorites_v1: {"enabled": false}
       }

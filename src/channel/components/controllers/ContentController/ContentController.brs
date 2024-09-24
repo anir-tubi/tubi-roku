@@ -410,6 +410,12 @@ Function onSignInModalSelectedViaAutoplayPreview()
 End Function
 
 
+'triggered when signIn button is selected while updating auto play next video from auto play controls in the setting
+Function onSignInModalSelectedViaAutoplayNextVideo()
+  startSignIn(onAutoplayNextVideoAfterSignIn)
+End Function
+
+
 ' Call this function when the left or back buttons are pressed and the side nav should be opened.
 Function openSideNavFromButton()
   tubilog("ContentController.openSideNavFromButton")
@@ -731,7 +737,6 @@ End Function
 
 ' sendDeviceEnvironmentSettingsLog will check deviceInfo and send device-info to logging API
 Function sendDeviceEnvironmentSettingsLog()
-
   deviceInfo = CreateObject("roDeviceInfo")
   drmInfo = deviceInfo.GetDrmInfoEx()
   model = deviceInfo.GetModel()
@@ -741,6 +746,7 @@ Function sendDeviceEnvironmentSettingsLog()
 
   deviceInfo = {
     isVideoPreviewOn: (isVideoPreviewOn() = true)
+    isAutoPlayTimerOn: (isAutoPlayTimerOn() = true)
     autoPlay: m.constants.deviceInfo.isAutoplayEnabled
     drmInfo: drmInfo
     model: model
@@ -2427,6 +2433,26 @@ Function isVideoPreviewOn()
   end if
 
   return false
+End Function
+
+
+Function isAutoPlayTimerOn()
+  return (m.pub_serverPersistentData.isAutoPlayTimerOn = true)
+End Function
+
+
+' @userInteraction: string, user interaction values are TOGGLE_ON, TOGGLR_OFF and  CONFIRM.
+' @pageInfo: assocarray, value can be { pagetype: "account_page", pagevalues: {}}
+' @componentType: string, type of the component from getOneOf in tubiracking.
+' @componentValue: assocarray, value of the component from from getOneOf in tubitracking.
+Function getComponentInteractionInfo(userInteraction, pageInfo, componentType, componentValue)
+  componentInteractionInfo = {
+    pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+    componentOneof: m.Tracking.getAnalyticsComponent(componentType, componentValue)
+    user_interaction: userInteraction
+  }
+
+  return componentInteractionInfo
 End Function
 
 

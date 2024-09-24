@@ -133,6 +133,8 @@
       <field id="backButtonPressed" type="boolean" value="false" alwaysNotify="true" />
       <field id="upButtonPressed" type="boolean" value="false" alwaysNotify="true" />
 
+      <field id="isAutoPlayTimerOn" type="boolean" value="true" />
+
       <field id="showSignUpModal" type="boolean" alwaysNotify="true" />
 
       <!-- Set to true if the skip trailer button was pressed -->

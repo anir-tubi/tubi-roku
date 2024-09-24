@@ -31,7 +31,7 @@
       <!-- reset the content for new video playback -->
       <field id="resetContent" type="boolean" alwaysNotify="true"/>
 
-      <!-- Indicates if we need enable the auto play or not depending on the mode and region -->
+      <!-- Indicates if we need enable the auto play or not depending on the mode and region and user selection from settings -->
       <field id="isAutoPlayOff" type="boolean" value="false" />
 
       <!-- allowed values are "play", "ok" -->

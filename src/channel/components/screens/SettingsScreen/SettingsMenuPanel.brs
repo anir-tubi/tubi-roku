@@ -45,6 +45,12 @@ Function setSettingsSidePanelMenuItems()
 
   testAidDisplayOrder = 7
 
+  if getExperimentResource("roku_autoplay_timer", "roku_autoplay_timer_v1", false).enabled = true
+    autoPlayPreviewText = getTranslation("screenSettings_menu_autoplayControls")
+  else
+    autoPlayPreviewText = getTranslation("screenSettings_menu_autoplayPreview")
+  end if
+
   ' Adding a display order field since roku does not maintain order in an associative array.
   availablePanelItems = {
     "parentalControls": {
@@ -57,7 +63,7 @@ Function setSettingsSidePanelMenuItems()
     "autoplayPreview": {
       subType: "DetailMenuItemContentNode"
       id: "AutoplayPreviewButton"
-      title: getTranslation("screenSettings_menu_autoplayPreview")
+      title: autoPlayPreviewText
       iconUrl: "pkg:/images/icon-trailer.webp"
       displayOrder: 2
     },

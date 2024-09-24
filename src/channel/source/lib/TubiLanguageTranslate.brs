@@ -837,6 +837,14 @@ Function getTranslation_en_US()
       "description": "The label for the autoplay preview",
       "message": "Autoplay Previews"
     },
+    "screenSettings_menu_autoplayControls": {
+      "description": "The Label for the autoplay controls to turn video preview and autoplay of the next video on or off.",
+      "message": "Autoplay Controls"
+    },
+    "screenSettings_menu_autoplayNextVideo": {
+      "description": "The label for the autoplay next video",
+      "message": "Autoplay Next Video"
+    },
     "screenSettings_parentalControls_group_LittleKids": {
       "description": "Little Kids of the parental controls",
       "message": "Little Kids",
@@ -864,6 +872,10 @@ Function getTranslation_en_US()
     "screenSettings_autoplayPreview_instructions": {
       "description": "Description of the autoplay preview user choice screen",
       "message": "You can turn the autoplay functionality on or off, which allows you to preview the video while browsing."
+    },
+    "screenSettings_autoplayTimer_instructions": {
+      "description": "Description of the autoplay timer user choice screen",
+      "message": "Content is set up to automatically play another video when what you're watching is about to end."
     },
     "screenSettings_autoplayPreview_featureDisabledMessage": {
       "description": "Message to display when the user has set Autoplay to false in Roku(not tubi) main settings.",

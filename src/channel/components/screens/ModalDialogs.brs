@@ -520,6 +520,37 @@ Function showSimpleInstantResumableModal(title, message, buttons, dialogEvent, t
 End Function
 
 
+' Creates a sign in required modal dialog with 2 buttons. The expected behavior is that the 2nd button will act as a cancel option for the user
+' and close the modal without taking any further action.
+'
+' @title: string, the title of the dialog, displayed in larger font
+' @message: string, the main message of the dialog to be displayed to the user
+' @buttons: array of strings (max 2 indexes), a button will be created for each index with the label of the button equal to the index's string.
+'           An empty array will create a single "OK" button by default.
+' @screen: roSGNode, a screen node
+' @dialogSubtype: string, a string limited to 20 characters, used to distinguish different dialogs from each other
+' @trackingLib: associativeArray, an instance of TubiTracking()
+' @trackingTask: roSGNode, an instance of the trackingLoggingTask - used to send close dialog events when the dialog is closed.
+' @callback: (optional) roFunction, a function that will be triggered when the first button is selected
+Function showSignInRequiredModal(dialogTitle, dialogMessage, buttons, screen, dialogSubType, trackingLib, trackingTask, callBackFunction = invalid)
+  pageInfo = screen.trackingPageInfo
+  dialogEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "SIGNIN_REQUIRED"
+      pageOneof: trackingLib.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+      dialog_action: "SHOW"
+      dialog_sub_type: dialogSubType
+    }
+  }
+
+  title = dialogTitle
+  message = dialogMessage
+  buttons = buttons
+  showSimpleInstantResumableModal(title, message, buttons, dialogEvent, trackingTask, callBackFunction)
+End Function
+
+
 ' Helper function with same interface as showSimpleModal().
 ' Allows small variations on showSimpleModal in the case that additional info needs to be added to the modalInfo
 ' prior to calling showModal. For example showDescriptionModal() needs to add the scrollable key.
