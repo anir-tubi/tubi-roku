@@ -159,6 +159,26 @@ describe('Autoplay Movies', function () {
         await testUtils.waitForElementToFullyShowOnScreen('autoPlayYearAndDuration');
 
     });
+
+    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/25123
+    it('C705819 - BWW does not appear while autoplay modal is shown @autoplay', async () => {
+        await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
+
+        // Are we on the Movies page?
+        await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
+
+        //Play title, pause to open player, move right to FF button and press, verify state
+        await ecp.sendKeypress(ecp.Key.Play);
+        await seekToTriggerCuePoint();
+
+        // Autoplay triggered?
+        await checkForAutoPlayTrigger();
+
+        // Check for BWW feature
+        await verifyYMALRowNotInPlayer();
+
+    });
+
 });
 
 async function seekToTriggerCuePoint() {
@@ -170,4 +190,15 @@ async function checkForAutoPlayTrigger() {
     await testUtils.waitForElementToFullyShowOnScreen('countDownMovieAutoPlay');
     const countDownMovieAutoPlay = await testUtils.getNodeForElement('countDownMovieAutoPlay');
     expect(countDownMovieAutoPlay.text).to.contain('Starting');
+}
+
+async function verifyYMALRowNotInPlayer() {
+
+    // Verify YMAL row NOT in player
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 10000);
+    await utils.sleep(2000);
+    await ecp.sendKeypress(ecp.Key.Down);
+    await utils.sleep(1000);
+    await ecp.sendKeypress(ecp.Key.Down);
+    await testUtils.waitForElementToNotShowOnScreen('videoPlayYmalPoster', 'poster shown on screen', 3000);
 }
