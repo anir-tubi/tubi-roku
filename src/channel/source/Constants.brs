@@ -487,7 +487,7 @@ Function getConstants()
 
     'contents cms url
     constants.urls.cms = {}
-    
+
       constants.urls.cms.urlBase = "https://uapi.adrise.tv/cms"
       if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
         constants.urls.cms.urlBase = "https://uapi.staging-public.tubi.io/cms"
@@ -1194,6 +1194,7 @@ Function getConstants()
       constants.ui.screenLevels.ageGateScreen = 90
       constants.ui.screenLevels.consentScreen = 120
       constants.ui.screenLevels.rokuContinueWatchingConsentScreen = 120
+      constants.ui.screenLevels.foxVideoPlayerWrapperScreen = 120
       constants.ui.screenLevels.managePreferencesScreen = 130
       constants.ui.screenLevels.screensaverScreen = 1100
 
@@ -1221,6 +1222,7 @@ Function getConstants()
       constants.ui.screenIds.consentScreen = "consentScreen"
       constants.ui.screenIds.managePreferencesScreen = "managePreferencesScreen"
       constants.ui.screenIds.rokuContinueWatchingConsentScreen = "rokuContinueWatchingConsentScreen"
+      constants.ui.screenIds.foxVideoPlayerWrapperScreen = "FoxVideoPlayerWrapperScreen"
 
     ' notAllowedContainerIds are the containers which are not allowed to be displayed on category screen,
     ' because currently we support only portrait style in category detail screen
@@ -1419,7 +1421,7 @@ Function getConstants()
     constants.ui.rokuCWConsentActionButtonIds = {}
       constants.ui.rokuCWConsentActionButtonIds.accept = "accept"
       constants.ui.rokuCWConsentActionButtonIds.reject = "reject"
-    
+
     ' Holds the container index on tensor api home screen response that we need to use as spotlight content.
     ' Adding a constant entry so that it is easier to change for testing or future use if we need to pick other container outside of featured.
     constants.ui.spotlightContainerIndex = 0

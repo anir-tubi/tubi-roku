@@ -279,6 +279,12 @@ Function addControllerUi()
   m.sendImpressionEventTimer.duration = 10
   m.sendImpressionEventTimer.observeFieldScoped("fire", "sendImpressionEvent")
 
+  ' Used to know if we need to load the fox video player component library at the appropriate time.
+  m.isFoxPlayerLoadRequired = true
+
+  ' Stores a reference to the fox provided video player interface node
+  m.foxRpfInstance = invalid
+
   ' The following fields are needed as a part of getUserInfo
   m.getHistoryIdsResponseReceived = false ' Have we received a response for history ids call (success or failure)
   m.getQueueIdsResponseReceived = false ' Have we received a response for getQueueIds call (success or failure)
@@ -1965,6 +1971,8 @@ Function onCustomSuspend(msg)
     if oneTrustViews <> invalid
       m.NodeHelpers.removeAllChildren(oneTrustViews)
     end if
+
+    closeFoxVideoPlayer()
 
     ' When resuming from suspending the app, Roku force restores the currFocus row back to the state that existed at the time of suspending the app.
     ' This force restore happens after we set the focus appropriately using jumpToItem which rendering our jumpToItem action useless.

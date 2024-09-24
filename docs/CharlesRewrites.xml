@@ -18,7 +18,7 @@
       <rewriteRule>
         <active>true</active>
         <ruleType>6</ruleType>
-        <matchValue>(.*);;(.*)</matchValue>
+        <matchValue>(.*);(.*)</matchValue>
         <matchHeaderRegex>false</matchHeaderRegex>
         <matchValueRegex>true</matchValueRegex>
         <matchRequest>false</matchRequest>
@@ -49,7 +49,7 @@
         <active>true</active>
         <ruleType>9</ruleType>
         <matchHeader>yo.ap</matchHeader>
-        <matchValue>(http://192.168.68.57:8888/);;(.*)</matchValue>
+        <matchValue>(http://192.168.68.57:8888/);(.*)</matchValue>
         <matchHeaderRegex>false</matchHeaderRegex>
         <matchValueRegex>true</matchValueRegex>
         <matchRequest>false</matchRequest>
@@ -70,7 +70,7 @@
         <matchValueRegex>true</matchValueRegex>
         <matchRequest>false</matchRequest>
         <matchResponse>true</matchResponse>
-        <newValue>http://192.168.68.57:8888/;;$1</newValue>
+        <newValue>http://192.168.68.57:8888/;$1</newValue>
         <newHeaderRegex>false</newHeaderRegex>
         <newValueRegex>false</newValueRegex>
         <matchWholeValue>false</matchWholeValue>
@@ -81,7 +81,7 @@
         <active>true</active>
         <ruleType>3</ruleType>
         <matchHeader>Set-Cookie</matchHeader>
-        <matchValue>([\s\S]*?)([\s\S]domain=[^;$]+;;?)</matchValue>
+        <matchValue>([\s\S]*?)([\s\S]domain=[^;$]+;?)</matchValue>
         <matchHeaderRegex>false</matchHeaderRegex>
         <matchValueRegex>true</matchValueRegex>
         <matchRequest>false</matchRequest>

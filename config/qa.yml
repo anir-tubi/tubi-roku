@@ -2,6 +2,7 @@ settings:
   # Settings are added to constants.settings via getSettings
   # Any constants that need to be templatized should be added via settings
   mode: "qa"
+  foxVideoPlayerComponentsUrl: "https://rcdn-staging.tubitv.com/appFiles/fox-video-player-components/fox_video_player_{{foxVideoPlayerVersionUnderscored}}.pkg"
   noAds: false  #setting to true will prevent ads from being requested from rainmaker
   stagingApis: false  #setting to true will use UAPI staging APIs (matrix, cms, user_device)
   remoteComponentsExtension: "zip" #prevents packages being built for qa builds, as they are not used - makes for faster builds

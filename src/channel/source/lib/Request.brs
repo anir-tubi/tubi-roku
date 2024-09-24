@@ -399,7 +399,7 @@ Function tubihttp_passThroughCharlesProxy(url as String) as string
       reg_exp = CreateObject("roRegex", "^(http|https)://", "")
       checkurlAA = reg_exp.Split(url)
       if checkurlAA[1] <> invalid AND Len(checkurlAA[1]) > 0 AND url.instr(m.charlesProxyUrl) = -1
-        proxiedUrl = m.charlesProxyUrl + "/;;" + url
+        proxiedUrl = m.charlesProxyUrl + "/;" + url
       end if
     end if
   end if
@@ -411,7 +411,7 @@ Function tubihttp_removeCharlesProxy(proxiedUrl as String) as String
   returnUrl = proxiedUrl
   if m.charlesProxyEnabled
     if m.configMode <> "production" AND proxiedUrl <> "" AND m.charlesProxyUrl <> ""
-      proxyAddress = m.charlesProxyUrl + "/;;"
+      proxyAddress = m.charlesProxyUrl + "/;"
       returnUrl = proxiedUrl.Replace(proxyAddress, "")
     end if
   end if
