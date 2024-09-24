@@ -1297,6 +1297,11 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.#AgeVerificationPageText.#AgeVerificationPageHeader',
   },
 
+  ageGateHeaderInRegistrationFlow: {
+    keyPath:
+    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.#AgeVerificationPageText.#AgeVerificationPageHeader'
+  },
+
   /** age gate year box */
   ageGateYearsBox: {
     keyPath:
@@ -2483,6 +2488,16 @@ const elements = typeCheckElements({
   // Loading Progress Bar
   loadingProgressBar: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#Loading.#LoadingProgressBar'
+  },
+
+  // Privacy Center Continue Watching Header
+  privacyCenterContinueWatchingHeader: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.#privacyCenterPanel.#Offset.#panelContentSection.#managePreferences.#preferenceMenu.0.#contentSection.1.#title'
+  },
+
+  // Privacy Center Continue Watching Toggle
+  privacyCenterContinueWatchingToggle: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.#privacyCenterPanel.#Offset.#panelContentSection.#managePreferences.#preferenceMenu.0.#contentSection.2.1.#toggleText'
   }
 });
 

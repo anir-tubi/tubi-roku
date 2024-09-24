@@ -138,7 +138,7 @@ it('C476634 - Register New User - Default Mode, @password_reset', async () => {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify on Confirm your age page
-    const confirmYourAgeText = await testUtils.getNodeForElement('confirmYourAgeText');
+    const confirmYourAgeText = await testUtils.getNodeForElement('ageGateHeaderInRegistrationFlow');
     expect(confirmYourAgeText.text).to.equal('Confirm your age*');
 
     // enter age > 13
@@ -192,7 +192,7 @@ it('C476635 - Register New User - Kids Mode, @password_reset', async () => {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify on Confirm your age page
-    const confirmYourAgeText = await testUtils.getNodeForElement('confirmYourAgeText');
+    const confirmYourAgeText = await testUtils.getNodeForElement('ageGateHeaderInRegistrationFlow');
     expect(confirmYourAgeText.text).to.equal('Confirm your age*');
 
     // enter age < 13
