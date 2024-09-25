@@ -6,6 +6,7 @@ Function init()
   m.icon = m.top.findNode("MenuItemIcon")
   m.title = m.top.findNode("MenuItemText")
   m.bottomItemText = m.top.findNode("bottomItemText")
+  m.buttonBg = m.top.findNode("MenuItemBg")
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.title, typographyConstants.ids.bodyMediumStrong)
@@ -32,6 +33,7 @@ Function onThemeChange(msg = invalid)
     m.focusedColor = theme.focusedColor
     m.primaryTextColor = theme.primaryTextColor
     m.bgColor = theme.backgroundcolor
+    m.buttonBg.blendcolor = theme.neutralColor2
     m.bottomItemText.color = theme.focusedColor
   end if
 End Function
@@ -41,17 +43,22 @@ Function onItemContentChange()
   tubiLog("DetailMenuItem.onItemContentChange")
   if m.top.itemContent <> invalid then
     item = m.top.itemContent
+    padding = 32
 
     m.icon.uri = item.iconUrl
 
     if item.isPrimaryButton = true
       m.title.text = item.title
       m.bottomItemText.text = ""
-      m.top.calculatedTextWidth = m.title.boundingRect().width + 52 ' 36 icon size + 16 spacing between icon and text
+      width = m.title.boundingRect().width + 52 ' 36 icon size + 16 spacing between icon and text
+      m.top.calculatedTextWidth = width
+      m.buttonBg.visible = true
+      m.buttonBg.width = padding + width + padding
     else
       m.bottomItemText.text = item.title
       m.title.text = ""
       m.top.calculatedTextWidth =  52
+      m.buttonBg.visible = false
     end if
 
   end if

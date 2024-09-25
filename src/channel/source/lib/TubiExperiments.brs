@@ -54,7 +54,7 @@ Function TubiExperiments(experimentsInfo) as Object
       }
 
       roku_horizontal_menu:{
-        roku_horizontal_menu_v1: {"enabled": false}
+        roku_horizontal_menu_v2: {"enabled": false}
       }
 
       roku_detect_preroll_from_cue_point: {

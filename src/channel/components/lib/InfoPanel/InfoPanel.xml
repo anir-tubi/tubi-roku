@@ -100,12 +100,14 @@
     <field id="titleFontSize" alias="TitleFont.size"/>
     <field id="width" type="float" value="960" />
     <field id="ratingVisible" alias="Rating.visible"/>
+    <field id="vertAlignment" alias="infoPanelGroup.vertAlignment"/>
 
     <!-- OUTPUTS -->
     <field id="descriptionSelected" type="boolean" alwaysNotify="true" />
 
     <!-- Parent can use this to determine whether it makes sense to give InfoPanel focus -->
     <field id="isDescriptionEllipsized" alias="Description.isTextEllipsized" />
+
   </interface>
 
   <children>

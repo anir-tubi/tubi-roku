@@ -357,6 +357,14 @@ Function onResumePointChange()
   else if resumeIndex > -1 AND m.top.resumePoint = 0
     menuItems.removeChildIndex(resumeIndex)
   end if
+
+  'keep the sign up button at the 2 nd place
+  signUpIndex = m.NodeHelpers.getChildIndexById(menuItems, m.signUpMenuItem.id)
+  if signUpIndex > -1 AND signUpIndex <> 1
+    menuItems.removeChildIndex(signUpIndex)
+    menuItems.insertChild(m.signUpMenuItem, 1)
+  end if
+
   m.Menu.content = menuItems
   stringResumeButton = getTranslation("screenDetails_button_resume_playing")
   changeButtonText("stringResumeButton", stringResumeButton)
@@ -487,6 +495,14 @@ Function onIsHistory()
   removeHistoryIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.RemoveHistoryMenuItem.id)
   previousItems = [m.watchTrailerMenuItem, m.dislikeMenuItem, m.likeMenuItem]
   addRemoveMenuItem(bHasHistory, removeHistoryIndex, m.RemoveHistoryMenuItem, previousItems)
+
+  'keep the sign up button at the 2 nd place
+  signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
+  if signUpIndex > -1 AND signUpIndex <> 1
+    addRemoveMenuItem(false, signUpIndex)
+    addRemoveMenuItem(true, 1, m.signUpMenuItem, [m.PlayMenuItem])
+  end if
+
   updateMemuWidths()
 End Function
 
@@ -505,7 +521,7 @@ Function onIsSeries()
   tubiLog("DetailScreenHoriz.onIsSeries")
   episodeListIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.EpisodesMenuItem.id)
 
-  menuItems = [ m.PlayMenuItem, m.signUpMenuItem]
+  menuItems = [ m.signUpMenuItem, m.PlayMenuItem ]
 
   m.menuFocused = false
   addRemoveMenuItem(m.top.isSeries, episodeListIndex, m.EpisodesMenuItem, menuItems)
@@ -586,7 +602,7 @@ Function onIsInKidsMode(msg)
     if isInKidsMode = true AND signUpIndex > -1
       addRemoveMenuItem(false, signUpIndex)
     else if isInKidsMode = false AND signUpIndex = -1
-      addRemoveMenuItem(true, signUpIndex, m.signUpMenuItem, [m.PlayMenuItem])
+      addRemoveMenuItem(true, 1, m.signUpMenuItem, [m.PlayMenuItem])
     end if
   end if
 
@@ -620,8 +636,8 @@ Function onHasTrailer()
     m.dislikeMenuItem
     m.likeMenuItem
     m.addQueueMenuItem
-    m.PlayMenuItem
     m.signUpMenuItem
+    m.PlayMenuItem
   ]
 
   addRemoveMenuItem(m.top.hasTrailer, trailerIndex, m.WatchTrailerMenuItem, previousItems)
@@ -679,11 +695,11 @@ Function setInitialMenuItems() As Void
   tubiLog("DetailScreen.setInitialMenuItems")
   menuItems = CreateObject("roSGNode", "ContentNode")
 
+  menuItems.appendChild(m.PlayMenuItem)
+
   if isLoggedInUser() = false AND isNewUser() = false
     menuItems.appendChild(m.signUpMenuItem)
   end if
-
-  menuItems.appendChild(m.PlayMenuItem)
 
   menuItems.appendChild(m.AddQueueMenuItem)
 
@@ -1071,7 +1087,11 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         m.top.backButtonPressed = true
         return true
       end if
-
+    else if key = "left"
+      if m.RelatedGrid.isInFocusChain() = false
+        m.top.backButtonPressed = true
+        return true
+      end if
     ' Down presses arrive here if not consumed by the menu, meaning it's already at the bottom button
     else if key = "down"
       if m.Menu.isInFocusChain() = true AND m.RelatedContentParentGroup.visible = true AND m.RelatedContentGroup.visible = true then

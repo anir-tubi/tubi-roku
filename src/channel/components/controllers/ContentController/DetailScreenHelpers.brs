@@ -23,7 +23,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
       detailScreen = CreateObject("roSGNode", "DetailScreen")
     end if
 
-    getExperimentResource("roku_horizontal_menu", "roku_horizontal_menu_v1")
+    getExperimentResource("roku_horizontal_menu", "roku_horizontal_menu_v2")
     detailScreen.id = m.constants.ui.screenIds.detailScreen
     detailScreen.trackingLoadStartTime = Uptime(0)
     detailScreen.shouldFocusWhenPushed = m.top.fadeInContentController
@@ -325,6 +325,10 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
       detailScreen.mode = m.constants.ui.infoPanelModes.movie
       detailScreen.isSeries = false
       lineTwoData.genres = content.genres
+    end if
+
+    if m.detailScreenHorizMenuExp = true
+      detailScreen.infoPanelVertAlignment = "bottom"
     end if
 
     if isKidsUIOn() = true

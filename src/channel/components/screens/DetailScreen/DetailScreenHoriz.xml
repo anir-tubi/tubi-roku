@@ -82,6 +82,10 @@
       <!-- Indicates whether the user is loggedIn or not -->
       <field id="needsLogin" alias="DetailInfoPanel.needsLogin" />
 
+      <!-- Indicates vertical alignment of the infopanel.  Values are "top", "bottom", "center".
+        Setting the value to bottom, infopanel will grow upwards when new items has been added. -->
+      <field id ="infoPanelVertAlignment" alias="DetailInfoPanel.vertAlignment" />
+
       <!-- Indicates if the video is in the user's bookmarks/queue -->
       <field id="isBookmark" type="boolean" value="false" />
 
@@ -278,7 +282,7 @@
         <InfoPanel
           id="DetailInfoPanel"
           mode="item"
-          translation="[0,165]"
+          translation="[0,620]"
           maxHeight="462"
           maxTitleLines="2"
           visible="false" />
