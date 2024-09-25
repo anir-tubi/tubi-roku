@@ -351,6 +351,8 @@ Function tubiAds_retrieveAds(adsUrl, adInsertionMethod)
 
 
   requestOptions = {}
+  requestOptions.headers = {}
+  
   if adInsertionMethod = "csai" then
     if m.googleAppSession = invalid then
       m.googleAppSession = newAppSession()
@@ -371,9 +373,7 @@ Function tubiAds_retrieveAds(adsUrl, adInsertionMethod)
     })
 
     givn = m.googleContentSession.getGIVN()
-    requestOptions.headers = {
-      "x-tubi-paln": givn
-    }
+    requestOptions.headers["x-tubi-paln"] = givn
   end if
 
   if m.isGDPR = true 'bs:disable-line 1001 LINT1001
