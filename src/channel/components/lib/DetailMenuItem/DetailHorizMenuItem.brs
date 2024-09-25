@@ -1,16 +1,35 @@
 Function init()
-  m.top.observeField("itemContent", "onItemContentChange")
-  m.top.observeFieldScoped("focusPercent", "onFocusPercentChange")
-  m.top.observeFieldScoped("itemHasFocus", "onItemHasFocus")
+  topRef = m.top
+  topRef.observeFieldScoped("itemContent", "onItemContentChange")
+  topRef.observeFieldScoped("focusPercent", "onFocusPercentChange")
+  topRef.observeFieldScoped("gridHasFocus", "onGridHasFocusChange")
 
-  m.icon = m.top.findNode("MenuItemIcon")
-  m.title = m.top.findNode("MenuItemText")
-  m.bottomItemText = m.top.findNode("bottomItemText")
-  m.buttonBg = m.top.findNode("MenuItemBg")
+  m.icon = topRef.findNode("menuItemIcon")
+  m.iconFocused = topRef.findNode("menuItemIconFocused")
+  m.title = topRef.findNode("menuItemText")
+  m.titleFocused = topRef.findNode("menuItemTextFocused")
+
+  m.bottomItemText = topRef.findNode("bottomItemText")
+  m.buttonBg = topRef.findNode("menuItemBg")
+
+  m.badge = topRef.findNode("badge")
+  m.badgeBackground = topRef.findNode("badgeBackground")
+  m.badgeText = topRef.findNode("badgeText")
+
+  m.badgeFocused = topRef.findNode("badgeFocused")
+  m.badgeBackgroundFocused = topRef.findNode("badgeBackgroundFocused")
+  m.badgeTextFocused = topRef.findNode("badgeTextFocused")
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.title, typographyConstants.ids.bodyMediumStrong)
+  setTypographyOfLabel(m.titleFocused, typographyConstants.ids.bodyMediumStrong)
+  
   setTypographyOfLabel(m.bottomItemText, typographyConstants.ids.bodySmallStrong)
+
+  setTypographyOfLabel(m.badgeText, typographyConstants.ids.bodyExtraSmallStrong)
+  setTypographyOfLabel(m.badgeTextFocused, typographyConstants.ids.bodyExtraSmallStrong)
+
+  m.defaultTitleTranslation = m.title.translation
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -28,12 +47,22 @@ Function onThemeChange(msg = invalid)
   end if
 
   if theme <> invalid
-    m.title.color = theme.primaryTextColor
-
     m.focusedColor = theme.focusedColor
     m.primaryTextColor = theme.primaryTextColor
     m.bgColor = theme.backgroundcolor
-    m.buttonBg.blendcolor = theme.neutralColor2
+
+    m.icon.blendcolor = theme.primaryTextColor
+    m.iconFocused.blendcolor = theme.backgroundcolor
+
+    m.titleFocused.color = theme.backgroundcolor
+    m.title.color = theme.primaryTextColor
+
+    m.badgeText.color = theme.backgroundcolor
+    m.badgeBackground.blendcolor = theme.primaryTextColor
+
+    m.badgeTextFocused.color = theme.primaryTextColor
+    m.badgeBackgroundFocused.blendcolor = theme.backgroundcolor
+
     m.bottomItemText.color = theme.focusedColor
   end if
 End Function
@@ -43,54 +72,115 @@ Function onItemContentChange()
   tubiLog("DetailMenuItem.onItemContentChange")
   if m.top.itemContent <> invalid then
     item = m.top.itemContent
-    padding = 32
 
     m.icon.uri = item.iconUrl
+    m.iconFocused.uri = item.iconUrl
+
+    padding = 32 ' This value represents the left and right padding for the button.
+    itemSpacing = 16
+
+    ' Hiding the values by default and only enabling if required.
+    m.buttonBg.visible = false
+    m.badge.visible = false
+    m.badgeFocused.visible = false
 
     if item.isPrimaryButton = true
       m.title.text = item.title
+      m.titleFocused.text = item.title
+
       m.bottomItemText.text = ""
-      width = m.title.boundingRect().width + 52 ' 36 icon size + 16 spacing between icon and text
+      textWidth = m.title.boundingRect().width
+      width = textWidth + 52 ' 36 icon size + 16 spacing between icon and text
+
+      ' title translation x.
+      titleTransX = m.defaultTitleTranslation[0]
+
+      m.title.translation = m.defaultTitleTranslation
+      m.titleFocused.translation = m.defaultTitleTranslation
+      
+      badgeWidth = 0
+      if item.badgeText <> ""
+        m.badgeText.text = item.badgeText
+        m.badgeTextFocused.text = item.badgeText
+
+        badgeTextWidth = m.badgeText.boundingRect().width
+        badgeWidth = badgeTextWidth + (18 * 2) ' 18 is the padding around text.
+        
+        ' Setting the badge background width.
+        m.badgeBackground.width = badgeWidth
+        m.badgeBackgroundFocused.width = badgeWidth
+
+        ' Centering aligning the text within background.
+        badgeTextTransX = (badgeWidth / 2) - (badgeTextWidth / 2)
+        m.badgeText.translation = [badgeTextTransX, 0]
+        m.badgeTextFocused.translation = [badgeTextTransX, 0]
+
+        ' Positing the badge.
+        ' Center aligning to center of the button.
+        transY = (m.top.height / 2) - (m.badgeBackground.height / 2)
+        transX = titleTransX +  textWidth + itemSpacing
+        m.badge.translation = [transX, transY]
+        m.badgeFocused.translation = [transX, transY]
+
+        m.badge.opacity = 1
+
+        ' Using both visible and opacity so that we can control it for cases where we do not have badge.
+        m.badge.visible = true
+        m.badgeFocused.visible = true
+
+        width += badgeWidth + itemSpacing
+      end if
+
       m.top.calculatedTextWidth = width
       m.buttonBg.visible = true
       m.buttonBg.width = padding + width + padding
+
+      if item.iconUrl = ""
+        m.title.translation = [(m.buttonBg.width / 2) - (textWidth / 2), 32]
+        m.titleFocused.translation = [(m.buttonBg.width / 2) - (textWidth / 2), 32]
+      end if
+
     else
       m.bottomItemText.text = item.title
       m.title.text = ""
+      m.titleFocused.text = ""
       m.top.calculatedTextWidth =  52
       m.buttonBg.visible = false
     end if
-
   end if
 End Function
 
 
-Function onItemHasFocus()
-
+Function onGridHasFocusChange()
   if m.top.itemHasFocus = true
-    m.icon.blendcolor = m.bgColor
-    m.title.color = m.bgColor
-    m.bottomItemText.color = m.focusedColor
+    updateUnfocusedFraction(0)
+    updateFocusedFraction(1)
   else
-    m.icon.blendcolor = m.primaryTextColor
-    m.title.color = m.primaryTextColor
-    m.bottomItemText.color = m.primaryTextColor
+    updateUnfocusedFraction(1)
+    updateFocusedFraction(0)
   end if
 End Function
 
 
 Function onFocusPercentChange(msg)
   focusPercent = msg.getData()
-  m.bottomItemText.opacity = focusPercent
-
-  if focusPercent > 0.5
-    m.icon.blendcolor = m.bgColor
-    m.title.color = m.bgColor
-    m.bottomItemText.color = m.focusedColor
-  else
-    m.icon.blendcolor = m.primaryTextColor
-    m.title.color = m.primaryTextColor
-    m.bottomItemText.color = m.primaryTextColor
+  if m.top.gridHasFocus = true
+    updateUnfocusedFraction(1 - focusPercent)
+    updateFocusedFraction(focusPercent)
   end if
+End Function
 
+
+Function updateUnfocusedFraction(opacity)
+  m.title.opacity = opacity
+  m.icon.opacity = opacity
+  m.badge.opacity = opacity
+End Function
+
+
+Function updateFocusedFraction(opacity)
+  m.titleFocused.opacity = opacity
+  m.iconFocused.opacity = opacity
+  m.badgeFocused.opacity = opacity
+  m.bottomItemText.opacity = opacity
 End Function

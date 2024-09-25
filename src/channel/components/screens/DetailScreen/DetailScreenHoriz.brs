@@ -239,13 +239,13 @@ Function changeButtonText(sButtonStringId, sButtonText)
 
   if stringNode <> invalid
     stringNode.title = sButtonText
-    updateMemuWidths()
+    updateMenuWidths()
   end if
 
 End Function
 
 
-Function updateMemuWidths()
+Function updateMenuWidths()
   colWidths = []
   for i = 0 to m.Menu.content.getChildCount() - 1
     item = m.Menu.content.GetChild(i)
@@ -503,7 +503,7 @@ Function onIsHistory()
     addRemoveMenuItem(true, 1, m.signUpMenuItem, [m.PlayMenuItem])
   end if
 
-  updateMemuWidths()
+  updateMenuWidths()
 End Function
 
 
@@ -591,7 +591,7 @@ Function onRemoveSignupButton()
 
   end if
 
-  updateMemuWidths()
+  updateMenuWidths()
 End Function
 
 

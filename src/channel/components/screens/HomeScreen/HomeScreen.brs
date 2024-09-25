@@ -108,6 +108,7 @@ Function onLoadingChange()
     populateInfoPanel(m.constants.ui.infoPanelModes.item, emptyContentNode) 'empties the info panel
     m.CategoryGridList.content = invalid ' should be all categories with initial amounts of content in them
     m.CategoryGridList.spotlightContent = invalid
+    m.CategoryGridList.purpleCarpetContent = invalid
   end if
 End Function
 
@@ -378,13 +379,14 @@ Function onGridFocusChange() as void
 
       m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(focusedContent, m.CategoryGridList.focusedPosition)
       m.top.contentFocused = focusedContent
+      ' Only proceed if row is not purple carpet.
       ' Only proceed if the spotlight row is disabled or if parent id is not featured if user has spotlight enabled.
       ' This is because the spotlight has seperate infopanel within category grid list.
-      if m.isSpotlightRowEnabled = false OR focusedContent.parentId <> m.constants.ui.categoryIds.featured
+      if focusedContent.gridItemType <> m.constants.ui.gridItemTypes.purpleCarpet AND (m.isSpotlightRowEnabled = false OR focusedContent.gridItemType <> m.constants.ui.gridItemTypes.spotlight)
         populateInfoPanelByContent(focusedContent)
       end if
 
-      if m.isSpotlightRowEnabled = true AND focusedContent.parentId = m.constants.ui.categoryIds.spotlight
+      if focusedContent.gridItemType = m.constants.ui.gridItemTypes.purpleCarpet OR (m.isSpotlightRowEnabled = true AND focusedContent.gridItemType = m.constants.ui.gridItemTypes.spotlight)
         fadeOutInfoPanel()
         m.top.backgroundUriList = determineBackgroundImage(focusedContent)
       else
@@ -482,7 +484,7 @@ Function onItemToBeFocusedChange()
   'Here we are updating the contentFocused, so it will play correct video preview when the content is updated.
   m.top.contentFocused = reloadedItemToBeFocused
 
-  if reloadedItemToBeFocused <> invalid AND reloadedItemToBeFocused.gridItemType <> m.constants.ui.gridItemTypes.spotlight
+  if reloadedItemToBeFocused <> invalid AND reloadedItemToBeFocused.gridItemType <> m.constants.ui.gridItemTypes.spotlight AND reloadedItemToBeFocused.gridItemType <> m.constants.ui.gridItemTypes.purpleCarpet
     populateInfoPanelByContent(reloadedItemToBeFocused)
   end if
 End Function
@@ -533,8 +535,14 @@ End Function
 
 Function setFocusOnCategoryGrid()
   tubiLog("Homescreen.setFocusOnCategoryGrid" + m.top.id)
-
-  fadeInContentArea()
+  ' Only fade in content area if last focused was not spotlight or purple carept.
+  focusedContent = m.categoryGridList.itemFocused
+  if focusedContent <> invalid AND (focusedContent.gridItemType = m.constants.ui.gridItemTypes.purpleCarpet OR (m.isSpotlightRowEnabled = true AND focusedContent.gridItemType = m.constants.ui.gridItemTypes.spotlight))
+    fadeOutInfoPanel()
+    m.top.backgroundUriList = determineBackgroundImage(focusedContent)
+  else
+    fadeInContentArea()
+  end if
   m.CategoryGridList.setFocus(true)
 End Function
 

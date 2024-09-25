@@ -8,9 +8,12 @@
 
   <interface>
     <!-- INPUTS -->
+    <field id="width" type="float" />
+    <field id="height" type="float" />
     <field id="focusPercent" type="float" />
     <field id="itemContent" type="node" />
     <field id="itemHasFocus" type="boolean" />
+    <field id="gridHasFocus" type="boolean" />
 
     <!-- OUTPUTS -->
     <!-- The width of the DetailsMenuText as calculated by boundingRect().width -->
@@ -19,21 +22,29 @@
 
   <children>
     <Poster
-      id="MenuItemBg"
+      id="menuItemBg"
       uri="pkg:/images/pill_button_$$RES$$.9.png"
       visible="false"
       opacity="0.1"
       translation="[0,0]"/>
-
+      
     <LayoutGroup
       horizAlignment="center"
       itemspacings="[48]"
       translation="[52,34]">
 
-      <Poster
-        id="MenuItemIcon"
-        height="36"
-        width="36"/>
+      <Group>
+        <Poster
+          id="menuItemIcon"
+          height="36"
+          width="36"/>
+
+        <Poster
+          opacity="0"
+          id="menuItemIconFocused"
+          height="36"
+          width="36"/>
+      </Group>
 
       <Label
         opacity="0"
@@ -44,10 +55,50 @@
     </LayoutGroup>
 
     <Label
-        translation="[81, 32]"
-        id="MenuItemText">
+      translation="[81, 32]"
+      id="menuItemText">
       <Font
         role="font"/>
     </Label>
+
+    <Label
+      translation="[81, 32]"
+      opacity="0"
+      id="menuItemTextFocused">
+      <Font
+        role="font"/>
+    </Label>
+
+    <Group
+      id="badge"
+      opacity="0">
+      <Poster
+        id="badgeBackground"
+        uri="pkg:/images/badge_$$RES$$.9.png"
+        height="40"/>
+      <Label
+        vertAlign="center"
+        height="40"
+        id="badgeText">
+        <Font
+          role="font"/>
+      </Label>
+    </Group>
+    
+    <Group
+      id="badgeFocused"
+      opacity="0">
+      <Poster
+        id="badgeBackgroundFocused"
+        uri="pkg:/images/badge_$$RES$$.9.png"
+        height="40"/>
+      <Label
+        vertAlign="center"
+        height="40"
+        id="badgeTextFocused">
+        <Font
+          role="font"/>
+      </Label>
+    </Group>
   </children>
 </component>

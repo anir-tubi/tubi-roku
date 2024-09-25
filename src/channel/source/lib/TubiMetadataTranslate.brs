@@ -94,7 +94,7 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
     else if isNonEmptyArray(contentFromServer.thumbnails) = true
       sThumbnailURL = contentFromServer.thumbnails[0]
     end if
-  else if gridType = gridItemTypes.landscape OR gridType = gridItemTypes.landscapeNoTitle OR gridType = gridItemTypes.landscapeInnerMetadata OR gridType = gridItemTypes.linear
+  else if gridType = gridItemTypes.landscape OR gridType = gridItemTypes.landscapeNoTitle OR gridType = gridItemTypes.landscapeInnerMetadata OR gridType = gridItemTypes.linear OR gridType = gridItemTypes.purpleCarpet
     if canvasImages <> invalid AND type(canvasImages.landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.landscape_tb[0])
       '//A custom landscape size was requested, use this image instead of the default image
       sThumbnailURL = canvasImages.landscape_tb[0]
@@ -198,13 +198,11 @@ End Function
 
 ' Convert the URL to that of a URL with rounded corners
 Function tubiMetadataTranslate_getRoundedCornersURL(sPosterURL)
-
   sPosterURL = replaceURLParameter(sPosterURL, "border_radius", "default", true)
   '//::TODO::roku_rounded_corners_v1 - linear thumbnails with a border_radius=8 are cached in the CDN with square corners.
   '// So we are setting the border_radius param to "normal" (which is the same thing as "8") to ensure we display rounded corners and not worry about the cached version of the border_radius=9 URL
   '//   When linear thumnails come from Tupian (sometime in October 2023), then we can set the border radius back to "8" instead of "default", and then we should see the rounded corners.
   ' sPosterURL = replaceURLParameter(sPosterURL, "border_radius", "8", true)
-
   return sPosterURL
 End Function
 
@@ -228,7 +226,12 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
   if contentFromServer[typeVar] <> invalid
     sType = contentFromServer[typeVar]
-    if contentFromServer[typeVar] <> m.constants.ui.contentTypes.emptyContainer
+    
+    ' We do not have any other differentiating parameter outside of player type to figure out if it is a purple carpet content or not.
+    ' Backend content type is sports_event.
+    if contentFromServer["player_type"] = m.constants.ui.playerTypes.fox
+      sType = m.constants.ui.contentTypes.purpleCarpetEvent
+    else if contentFromServer[typeVar] <> m.constants.ui.contentTypes.emptyContainer
       sType = m.translateBackendTypeToClientSideType(contentFromServer[typeVar])
     end if
     translatedContent[typeVar] = sType
@@ -638,6 +641,11 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     translatedContent.validUntil = UpTime(0) + m.constants.cacheTimes.content
   end if
 
+  ' Below field will be used to determine which player to use. Possible values: "tubi","fox".
+  if contentFromServer.player_type <> invalid
+    translatedContent.playerType = contentFromServer.player_type
+  end if
+
   'take care of any children the content might have
   if contentFromServer.children <> invalid AND contentFromServer.children.count() > 0
 
@@ -724,6 +732,10 @@ Function tubiMetadataTranslate_getContentFromCategoryJson(category, contentId, i
       translated.parentId = category.id
       translated.parentType = category.type
       translated.parentTitle = category.title
+
+      if isNonEmptyString(category.gridItemType) = true
+        translated.gridItemType = category.gridItemType
+      end if
 
       if category.gridItemType = m.constants.ui.gridItemTypes.historySignedOutUser
         translated.backgrounds = [m.constants.ui.uris.defaultContentBackgroundUri]
@@ -870,6 +882,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
     'set up AAs for all categories
     for i = 0 to containers.count() - 1
       container = containers[i]
+      container.containerRowIndex = i
       if container.id = m.constants.ui.categoryIds.history
         continueWatchingIndex = i
       else if container.id = m.constants.ui.categoryIds.queue
@@ -1750,7 +1763,7 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
   gridItemTypes = constants.ui.gridItemTypes
   gridItemType = gridItemTypes.portrait
 
-  if container.id = constants.ui.categoryIds.spotlight AND m.experiments.getExperimentResource("roku_spotlight_carousel", "roku_spotlight_carousel_v1").enabled = true
+  if container.id = constants.ui.categoryIds.spotlight AND container.containerRowIndex = constants.ui.spotlightContainerIndex AND m.experiments.getExperimentResource("roku_spotlight_carousel", "roku_spotlight_carousel_v1").enabled = true
     gridItemType = gridItemTypes.spotlight
   else if container.type = constants.ui.categoryTypes.linear
     gridItemType = gridItemTypes.linear
@@ -1761,6 +1774,8 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
     gridItemType = gridItemTypes.landscapeInnerMetadata
   else if container.id = constants.ui.categoryIds.topTenSeries AND screenId <> constants.ui.screenIds.categoryDetailsScreen
     gridItemType = gridItemTypes.portraitTopTen
+  else if container.id = constants.ui.categoryIds.purpleCarpet
+    gridItemType = gridItemTypes.purpleCarpet
   end if
 
   return gridItemType
@@ -2546,6 +2561,7 @@ Function tubiMetadataTranslate_translateMiniHomescreen(contentToTranslate, conte
     'set up AAs for all categories
     for i = 0 to containerCount - 1
       container = containers[i]
+      container.containerRowIndex = i
 
       if container.type <> "linear"
         children = container.children

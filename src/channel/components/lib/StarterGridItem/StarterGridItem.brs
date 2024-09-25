@@ -60,6 +60,8 @@ Function onItemContentChange(msg)
     row = itemContent.getParent()
     if gridItemType = "spotlight"
       childGridItemComponent = "SpotlightPoster"
+    else if gridItemType = "purpleCarpet"
+      childGridItemComponent = "PurpleCarpetPoster"
     else if gridItemType = "emptyContainer" then
       childGridItemComponent = "CategoryGridPoster"
     else if gridItemType = "landscapeInnerMetadata" then

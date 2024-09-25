@@ -42,6 +42,11 @@
 
       <field id="spotlightContentUpdated" alias="spotlightRow.contentUpdated" />
 
+      <!-- Purple carpet content node, will be populated if we receive purple carpet container from home screen response. -->
+      <field id="purpleCarpetContent" type="node" alias="purpleCarpetRow.content" />
+
+      <field id="purpleCarpetContentUpdated" alias="purpleCarpetRow.contentUpdated" />
+
       <!-- contentUpdated will be set when the new content is ready to be displayed on the screen. -->
       <field id="contentUpdated" type="boolean" alwaysNotify="true"/>
 
@@ -91,7 +96,7 @@
       <field id="isFullWidth" type="boolean" value="true" />
 
       <!-- set to true if the user is signed in and we want to change the experience based on that -->
-      <field id="signedIn" type="boolean" value="false" alias="spotlightRow.signedIn" />
+      <field id="signedIn" type="boolean" value="false" />
 
       <!-- This field is used to force remove focus from the rowlist. -->
       <field id="removeFocusFromRowList" type="boolean" />
@@ -122,6 +127,8 @@
 
       <!-- Will be set to true if we want to reset the grid position back to [0,0] -->
       <field id="resetGridPosition" type="boolean" />
+
+      <field id="didUserSetReminderForEventContent" alias="purpleCarpetRow.didUserSetReminderForEventContent" />
 
     <!-- OUTPUT -->
       <field id="itemSelected" type="node"/>
@@ -159,12 +166,20 @@
 
       <field id="loadCategoriesIndex" type="integer" alwaysNotify="true" />
 
+      <field id="eventCtaListItemSelected" alias="purpleCarpetRow.ctaListItemSelected" alwaysNotify="true" />
+
+      <field id="primaryEventContent" alias="purpleCarpetRow.primaryEventContent" />
+
   </interface>
 
   <children>
     <SpotlightRow 
       id="spotlightRow"
+      opacity="0"
       translation="[0,132]" />
+    <PurpleCarpetRow
+      opacity="0"
+      id="purpleCarpetRow" />
     <RowList
       id="RowList"
       itemComponentName="StarterGridItem"

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<component name="AirDateCountdown" extends="Group">
+  <script type="text/brightscript" uri="AirDateCountdown.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!-- INPUT -->
+      <field id="airDateTime" type="string" />
+      
+      <!-- Holds true/false. If true timer for updating countdown will continue running. -->
+      <field id="timerShouldRun" type="boolean" />
+  </interface>
+
+  <children>
+    <LayoutGroup
+      id="elementsGroup"
+      layoutDirection="horiz"
+      itemSpacings="[12]">
+      <Poster
+        id="airDate"
+        width="171"
+        height="40"
+        uri="pkg:/images/menu-focus-$$RES$$.9.png">
+        <Label
+          id="dateText"
+          height="40"
+          horizAlign="center"
+          vertAlign="center">
+          <Font
+            role="font"/>
+        </Label>
+      </Poster>
+      <Poster
+        id="day"
+        width="70"
+        height="40"
+        uri="pkg:/images/menu-focus-$$RES$$.9.png">
+        <Label
+          id="dayText"
+          height="40"
+          horizAlign="center"
+          vertAlign="center">
+          <Font
+            role="font"/>
+        </Label>
+      </Poster>
+      <Poster
+        id="hour"
+        width="70"
+        height="40"
+        uri="pkg:/images/menu-focus-$$RES$$.9.png">
+        <Label
+          id="hourText"
+          height="40"
+          horizAlign="center"
+          vertAlign="center">
+          <Font
+            role="font"/>
+        </Label>
+      </Poster>
+      <Poster
+        id="minute"
+        width="70"
+        height="40"
+        uri="pkg:/images/menu-focus-$$RES$$.9.png">
+        <Label
+          id="minuteText"
+          height="40"
+          horizAlign="center"
+          vertAlign="center">
+          <Font
+            role="font"/>
+        </Label>
+      </Poster>
+    </LayoutGroup>
+
+  </children>
+</component>

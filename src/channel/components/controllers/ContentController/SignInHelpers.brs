@@ -887,9 +887,9 @@ Function onDislikeAfterSignIn()
 End Function
 
 
-' onCWRowAfterSignIn - occurs after activation success via CWRow on homescreen
-Function onCWRowAfterSignIn()
-  tubiLog("SignInHelpers.onCWRowAfterSignIn")
+' refreshScreenAndContentAfterSignIn - occurs after activation success via CWRow on homescreen
+Function refreshScreenAndContentAfterSignIn()
+  tubiLog("SignInHelpers.refreshScreenAndContentAfterSignIn")
 
   refreshUiAfterSignIn()
 
@@ -1445,4 +1445,29 @@ End Function
 Function refreshUiAfterSignIn()
   setUiModeFromState()
   refreshHomeScreenSideNav()
+End Function
+
+
+Function startPurpleCarpetPlaybackAfterSignIn()
+  popScreenAfterSignInProcess()
+  refreshUiAfterSignIn()
+  screen = getCurrentScreen()
+  primaryEventContent = screen.primaryEventContent
+  if primaryEventContent <> invalid
+    processPlayEvent(primaryEventContent,  screen)
+  end if
+
+  setContentToRefreshAllPersonalizedScreens(true)
+End Function
+
+
+Function setOrRemovePurpleCarpetReminderAfterSignIn()
+  popScreenAfterSignInProcess()
+  screen = getCurrentScreen()
+  if screen <> invalid AND screen.hasField("signedIn") = true
+    screen.signedIn = isLoggedInUser()
+  end if
+  setOrRemovePurpleCarpetReminder()
+  refreshUiAfterSignIn()
+  setContentToRefreshAllPersonalizedScreens(true)
 End Function

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<component name="PurpleCarpetRow" extends="Group">
+  <script type="text/brightscript" uri="PurpleCarpetRow.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/ArrayUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeOffsetUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/InfoPanelMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ContentMixin.brs" />
+
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+
+  <interface>
+    <!-- INPUT -->
+      <field id="content" type="node" />
+
+      <!-- contentUpdated will be set when the new content is ready to be displayed on the screen. -->
+      <field id="contentUpdated" type="boolean" alwaysNotify="true"/>
+
+      <field id="signedIn" type="boolean" value="false" />
+
+      <!-- Will be set to true if the component is used in details screen. -->
+      <field id="isContentDetailsView" type="boolean" />
+
+      <!-- Holds true/false based on if the user has set a reminder for the main game event. -->
+      <field id="didUserSetReminderForEventContent" type="boolean" />
+      
+      <!-- Holds true/false based on if container is visible or hidden. -->
+      <field id="isContainerVisible" type="boolean" alias="infoPanel.isContainerVisible" />
+
+    <!-- OUTPUT -->
+      <!-- Content node used for populating the info panel. -->
+      <field id="primaryEventContent" type="node" />
+      
+      <!-- Content node used for populating the list displayed on the right side of the container. -->
+      <field id="listContent" alias="rowList.content" />
+
+      <field id="rowItemSelected" alias="rowList.rowItemSelected" />
+
+      <field id="rowItemFocused" alias="rowList.rowItemFocused" type="intarray" alwaysNotify="true" />
+
+      <field id="ctaListItemSelected" type="string" alwaysNotify="true" />
+  </interface>
+
+  <children>
+    <Group>
+      <Group id="infoPanelGroup"
+        translation="[0, 135]">
+        <InfoPanel
+          id="infoPanel"
+          maxHeight="354"
+          width="960"
+          translation="[0,10]"
+          maxTitleLines="2"/>
+        <MarkupGrid
+          id="ctaButtonList"
+          translation="[0,39]"
+          itemSize="[192, 104]"
+          itemSpacing="[15, 0]"
+          rowHeights="[104]"
+          columnWidths="[192]"
+          columnSpacings="[16]"
+          numColumns="9"
+          numRows="1"
+          focusBitmapUri="pkg:/images/pill_button_$$RES$$.9.png"
+          focusFootprintBitmapUri="pkg:/images/transparent.png"
+          drawFocusFeedbackOnTop="false"
+          itemComponentName="DetailHorizMenuItem"/>
+      </Group>
+      <PurpleCarpetRowList
+        translation="[1072, 0]"
+        itemComponentName="StarterGridItem"
+        numRows="1"
+        itemSpacing="[0,32]"
+        rowSpacings="32"
+        rowItemSpacing="[[15,0]]"
+        showRowCounter="[false]"
+        fadeFocusFeedbackWhenAutoScrolling="true"
+        focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+        focusFootprintBitmapUri="pkg:/images/transparent.png"
+        rowFocusAnimationStyle="fixedFocusWrap"
+        vertFocusAnimationStyle="fixedFocusWrap"
+        id="rowList"/>
+    </Group>
+
+    <Timer id="ctaButtonListRefreshTimer" />
+  </children>
+</component>

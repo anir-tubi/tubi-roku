@@ -36,6 +36,8 @@
       <!-- The helper will set this when the new spotlight content is ready to be displayed on the screen. -->
       <field id="spotlightContentUpdated" alias="CategoryGridList.spotlightContentUpdated" />
 
+      <field id="purpleCarpetContentUpdated" alias="CategoryGridList.purpleCarpetContentUpdated" />
+
       <!-- What kind of content is this homeScreen displaying: movies, tv, normal, espanol etc -->
       <field id="contentMode" alias="CategoryGridList.contentMode" />
 
@@ -97,6 +99,8 @@
 
       <!-- Will be set to true if we want to reset the grid position back to [0,0] -->
       <field id="resetGridPosition" alias="CategoryGridList.resetGridPosition" />
+
+      <field id="didUserSetReminderForEventContent" alias="CategoryGridList.didUserSetReminderForEventContent" />
 
     <!-- OUTPUTS -->
       <!-- Trigger the content to be loaded.  This field is used to delay
@@ -162,6 +166,13 @@
 
        <!--Communicates to the parent that some of the containers has expired and to be loaded-->
       <field id="loadCategoryForIds" type="array" alwaysNotify="true"/>
+
+      <!-- Purple carpet content node, will be populated if we receive purple carpet container from home screen response. -->
+      <field id="purpleCarpetContent" alias="CategoryGridList.purpleCarpetContent" />
+
+      <field id="eventCtaListItemSelected" alias="CategoryGridList.eventCtaListItemSelected" alwaysNotify="true" />
+
+      <field id="primaryEventContent" alias="CategoryGridList.primaryEventContent" />
       
     <!-- DATA STORE (Anything defined below are not meant to be used as output or input fields which will triggered change events. ) -->
       <field id="personalizationId" type="string" alias="CategoryGridList.personalizationId" />

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="PurpleCarpetPoster" extends="Group" >
+  <script type="text/brightscript" uri="PurpleCarpetPoster.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ContentMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+
+  <interface>
+    <field id="itemContent" type="node" />
+    <field id="focusPercent" type="float" />
+    <field id="width" alias="Poster.width" />
+    <field id="height" alias="Poster.height" />
+    <field id="rowHasFocus" type="boolean" />
+    <field id="itemHasFocus" type="boolean" />
+  </interface>
+
+  <children>
+    <Poster
+      id="Poster"
+      loadingBitmapUri="pkg:/images/placeholder.webp"
+      failedBitmapUri="pkg:/images/placeholder.webp" />
+
+    <LayoutGroup
+      layoutDirection="horiz"
+      id="badgeGroup"
+      itemSpacings="[9]" />
+
+  </children>
+</component>

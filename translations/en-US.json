@@ -1645,5 +1645,33 @@
   "dialog_gdpr_manage_privacy_settings_error_description": {
     "description": "Error dialog description shown due to one trust component library failure when clicking manage privacy settings.",
     "message": "Please try restarting Tubi to update the privacy settings. Please email support@tubi.tv if this keeps happening."
+  },
+  "live_on_date": {
+    "description": "date label used in air date countdown timer",
+    "message": "LIVE ON {month} {day}"
+  },
+  "live_on_date_today": {
+    "description": "date label used in air date countdown timer",
+    "message": "TODAY AT {time}"
+  },
+  "live_on_day": {
+    "description": "day label used in air date countdown timer",
+    "message": "{day} D"
+  },
+  "live_on_hour": {
+    "description": "day label used in air date countdown timer",
+    "message": "{hour} HR"
+  },
+  "live_on_minute": {
+    "description": "day label used in air date countdown timer",
+    "message": "{min} MIN"
+  },
+  "screenHome_button_sign_in_watch": {
+    "description": "Sign in to watch live button label.",
+    "message": "Sign In to Watch"
+  },
+  "available_at": {
+    "description": "Sign in to watch live button label.",
+    "message": "Available at {time}"
   }
 }

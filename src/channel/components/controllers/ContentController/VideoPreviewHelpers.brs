@@ -144,7 +144,7 @@ Function startVideoPreview(content, pageInfo = {})
     videoPreview = m.videoPreviewPlayer
 
     ' If the experiment is enabled and focused content is from featured row than expand preview to full screen.
-    if getExperimentResource("roku_spotlight_carousel", "roku_spotlight_carousel_v1", false).enabled = true AND content.parentId = m.constants.ui.categoryIds.featured
+    if content.gridItemType = m.constants.ui.gridItemTypes.spotlight
       ' Reducing 1px from both width and height since the player is in background and keeping full width causes roku to display closed captioning overlay.
       ' To avoid any other Roku OS level default behaivour from kicking in reducing 1px to give a impression that player is not in full screen.
       updatePreviewPlayerToFullScreen()

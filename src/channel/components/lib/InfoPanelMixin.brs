@@ -85,11 +85,10 @@ Function populateInfoPanelWithHomescreenStyleSportsMode(content, infoPanel, bInS
   airDatetime = content.airDatetime
   info = getAvailabilityTypeBadgeAndMatchTimeValues(airDatetime, hasVideoresources)
   matchTime = info.matchTime
-  badgeText = info.badgeText
   availabilityType = info.availabilityType
 
   lineOneData = {}
-  lineOneData.badgeText = badgeText
+  lineOneData.badgeText = info.badgeText
   lineOneData.hasCC = content.hasSubtitles
   lineOneData.hasAudioDescription = content.hasAudioDescription
   lineOneData.length = content.length
@@ -121,6 +120,50 @@ Function populateInfoPanelWithHomescreenStyleSportsMode(content, infoPanel, bInS
   else
     infoPanel.needsLogin = false
   end if
+End Function
+
+
+' Populates the info panel with the fields necessary for the "sportsEvent" mode so that it looks
+' like the info panel on the homescreen
+'
+' @content: TubiContentNode, containing a sports event
+' @infoPanel: InfoPanel node
+'
+' @sideEffects: updates fields on the passed in infoPanel node
+Function populateInfoPanelWithPurpleCarpetMode(content, infoPanel)
+  infoPanel.title = content.title
+
+  hasVideoresources = content.hasVideoresources
+  airDatetime = content.airDatetime
+  info = getAvailabilityTypeBadgeAndMatchTimeValues(airDatetime, hasVideoresources)
+  availabilityType = info.availabilityType
+
+  lineOneData = {}
+  lineOneData.hasCC = content.hasSubtitles
+  lineOneData.hasAudioDescription = content.hasAudioDescription
+  lineOneData.length = content.length
+
+  if content.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
+    lineOneData.has4k = true
+  end if
+
+  lineTwoData = {}
+  infoPanel.mode = m.constants.ui.infoPanelModes.purpleCarpetEvent
+  lineOneData.roundGroupInfo = content.roundGroupInfo
+
+  infoPanel.lineOneData = lineOneData
+  infoPanel.lineTwoData = lineTwoData
+
+  infoPanel.reminderIsSet = (availabilityType = m.constants.ui.contentTimings.upcoming AND getBookmark(content.id) <> invalid)
+
+  infoPanel.description = content.description
+  if content.titleImage <> invalid
+    infoPanel.titleImageUri = content.titleImage
+  else
+    infoPanel.titleImageUri = ""
+  end if
+
+  infoPanel.airDateTime = content.airDateTime
 
   infoPanel.width = 960
 End Function

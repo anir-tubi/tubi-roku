@@ -1665,7 +1665,7 @@ Function setVideoContentScreenBackground(screen)
         uriList: [] ' setting uriList as empty, because don't need to rotate the background poster when video preview is playing. We can't use shouldRotateBackgrounds because we still need the gradients from backgroundGroup
       }
     else
-      if isSpotlightRowContent = true
+      if isSpotlightRowContent = true OR gridItemType = m.constants.ui.gridItemTypes.purpleCarpet
         backgroundType = m.constants.ui.backgroundTypes.spotlight
       else
         backgroundType = getBackgroundType(screen.backgroundUriList, contentType)

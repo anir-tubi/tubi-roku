@@ -53,6 +53,7 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.observeFieldScoped("stopVideoPreview", "onStopVideoPreview")
     homeScreen.observeFieldScoped("pauseVideoPreview", "onPauseVideoPreview")
     homeScreen.observeFieldScoped("loadCategoryForIds", "onLoadCategoryForIds")
+    homeScreen.observeFieldScoped("eventCtaListItemSelected", "onEventCtaListItemSelected")
 
     m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop listening to timer before listing to it in case a previous screen started the timer
     m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
@@ -113,15 +114,24 @@ End Function
 Function processHomeScreenBatchResponse(response, screenId)
   homeScreen = getFromScreenCache(screenId)
   if homeScreen <> invalid
+    
+    containerRow = m.nodeHelpers.getChildById(response, m.constants.ui.categoryIds.purpleCarpet)
+    if containerRow <> invalid
+      response.removeChild(containerRow)
+      updatePurpleCarpetRowContent(homeScreen, containerRow)
+    end if
+
     ' We have 2 different settings which are using to pick a row from response to be eligible for spotlight row.
     ' spotlightContainerIndex - Holds the value of the position in the home response.
     ' categoryIds.spotlight - Holds the slug of the container that we need to match.
     ' The reason for choosing 2 setting is to provide flexibility and protection such that if backend returns a different container at spotlightContainerIndex than we could display a 
     ' different variant or experiment and have the container mentioned in categoryIds.spotlight fallback to default landscape variant.
-    containerRow = response.getChild(m.constants.ui.spotlightContainerIndex)
-    if containerRow <> invalid AND containerRow.id = m.constants.ui.categoryIds.spotlight AND getExperimentResource("roku_spotlight_carousel", "roku_spotlight_carousel_v1", false).enabled = true
-      response.removeChild(containerRow)
-      updateSpotlightRowContent(homeScreen, containerRow)
+    if homeScreen.purpleCarpetContent = invalid
+      containerRow = response.getChild(m.constants.ui.spotlightContainerIndex)
+      if containerRow <> invalid AND containerRow.id = m.constants.ui.categoryIds.spotlight AND getExperimentResource("roku_spotlight_carousel", "roku_spotlight_carousel_v1", false).enabled = true
+        response.removeChild(containerRow)
+        updateSpotlightRowContent(homeScreen, containerRow)
+      end if
     end if
     homeScreen.batchResponse = response
   end if
@@ -457,15 +467,24 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     '   </CategoryContentNode>
     ' </CategoryContentNode>
     
+
+    containerRow = m.nodeHelpers.getChildById(rawResponse, m.constants.ui.categoryIds.purpleCarpet)
+    if containerRow <> invalid
+      rawResponse.removeChild(containerRow)
+      updatePurpleCarpetRowContent(homeScreen, containerRow)
+    end if
+
     ' We have 2 different settings which are using to pick a row from response to be eligible for spotlight row.
     ' spotlightContainerIndex - Holds the value of the position in the home response.
     ' categoryIds.spotlight - Holds the slug of the container that we need to match.
     ' The reason for choosing 2 setting is to provide flexibility and protection such that if backend returns a different container at spotlightContainerIndex than we could display a 
     ' different variant or experiment and have the container mentioned in categoryIds.spotlight fallback to default landscape variant.
-    containerRow = rawResponse.getChild(m.constants.ui.spotlightContainerIndex)
-    if containerRow.id = m.constants.ui.categoryIds.spotlight AND getExperimentResource("roku_spotlight_carousel", "roku_spotlight_carousel_v1", false).enabled = true
-      rawResponse.removeChild(containerRow)
-      updateSpotlightRowContent(homeScreen, containerRow)
+    if homeScreen.purpleCarpetContent = invalid
+      containerRow = rawResponse.getChild(m.constants.ui.spotlightContainerIndex)
+      if containerRow.id = m.constants.ui.categoryIds.spotlight AND getExperimentResource("roku_spotlight_carousel", "roku_spotlight_carousel_v1", false).enabled = true
+        rawResponse.removeChild(containerRow)
+        updateSpotlightRowContent(homeScreen, containerRow)
+      end if
     end if
 
     homeScreen.personalizationId = rawResponse.personalizationId
@@ -809,13 +828,17 @@ Function onContentSelected(msg)
   content = msg.getData()
   homeScreen = msg.getRoSGNode()
   m.autoplayContext = homeScreen.currCategoryId
-  if content.type = m.constants.uapiContentTypes.channel
+  
+  contentType = content.type
+  if contentType = m.constants.ui.contentTypes.purpleCarpetEvent AND homeScreen.purpleCarpetContent <> invalid
+    processPlayEvent(content, homeScreen)
+  else if contentType = m.constants.uapiContentTypes.channel
     stopVideoPreview()
     showCategoryDetailsScreen(content)
-  else if content.type = m.constants.ui.contentTypes.historySignedOutUser
+  else if contentType = m.constants.ui.contentTypes.historySignedOutUser
     '//if a signed out user selects the continue watching row, then navigate him/her to the sign in screen
-    startSignIn(onCWRowAfterSignIn)
-  else if content.type = m.constants.ui.contentTypes.linear
+    startSignIn(refreshScreenAndContentAfterSignIn)
+  else if contentType = m.constants.ui.contentTypes.linear
     selectLinearContent(content)
   else
     playbackSource = {
@@ -846,11 +869,15 @@ Function onContentToPlay(msg)
     "playbackContainer": containerId
   }
 
-  if content.type = m.constants.uapiContentTypes.channel
+  contentType = content.type
+  if contentType = m.constants.ui.contentTypes.purpleCarpetEvent AND screen.purpleCarpetContent <> invalid
+    ' For now always sending to event details screen.
+    showEventDetailScreen(content.id, screen.purpleCarpetContent)
+  else if contentType = m.constants.uapiContentTypes.channel
     showCategoryDetailsScreen(content)
-  else if content.type = m.constants.ui.contentTypes.historySignedOutUser
+  else if contentType = m.constants.ui.contentTypes.historySignedOutUser
     '//if a signed out user selects the continue watching row, then navigate him/her to the sign in screen
-    startSignIn(onCWRowAfterSignIn)
+    startSignIn(refreshScreenAndContentAfterSignIn)
   else
     showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource)
   end if
@@ -1086,4 +1113,125 @@ Function updateSpotlightRowContent(homeScreen, content)
   rowContentNode.appendChild(content)
   homeScreen.spotlightContent = rowContentNode
   homeScreen.spotlightContentUpdated = true
+End Function
+
+
+' @param homeScreen, roSGNode - The HomeScreen component that contains the focused content.
+' @param content, roSGNode - The CategoryContentNode for the spotlight row.
+Function updatePurpleCarpetRowContent(homeScreen, content)
+  rowContentNode = CreateObject("roSGNode", "ContentNode")
+  rowContentNode.id = m.constants.ui.categoryIds.purpleCarpet
+  content.gridItemType = m.constants.ui.gridItemTypes.purpleCarpet
+  rowContentNode.appendChild(content)
+  primaryContent = content.getChild(0)
+  bookmark = getBookmark(primaryContent.id)
+  homeScreen.didUserSetReminderForEventContent = (bookmark <> invalid)
+  homeScreen.purpleCarpetContent = rowContentNode
+  homeScreen.purpleCarpetContentUpdated = true
+End Function
+
+
+Function onEventCtaListItemSelected(msg)
+  id = msg.getData()
+  screen = msg.getRoSGNode()
+  primaryEventContent = screen.primaryEventContent
+  purpleCarpetContent = screen.purpleCarpetContent
+
+  if primaryEventContent <> invalid
+    if id = "signInWatch"
+      startSignIn(startPurpleCarpetPlaybackAfterSignIn)
+    else if id = "details"
+      showEventDetailScreen(primaryEventContent.id, purpleCarpetContent)
+    else if id = "watchLive"
+      processPlayEvent(primaryEventContent, screen)
+    else if id = "reminder"
+      if isLoggedInUser() = false
+        startSignIn(setOrRemovePurpleCarpetReminderAfterSignIn)
+      else
+        setOrRemovePurpleCarpetReminder()
+      end if
+    end if
+  end if
+End Function
+
+
+Function setOrRemovePurpleCarpetReminder()
+  screen = getCurrentScreen()
+  primaryEventContent = screen.primaryEventContent
+  if primaryEventContent <> invalid
+    ' Since we are overriding the content type to purple carpet.
+    contentType = m.constants.uapiContentTypes.sportsEvent
+    bookmark = getBookmark(primaryEventContent.id)
+    didUserSetReminderForEventContent = (bookmark <> invalid)
+
+    if didUserSetReminderForEventContent <> true
+      addToQueueReq = m.userDeviceApi.addToQueueReqInfo(primaryEventContent.id, m.constants.ui.contentTypes.sportsEvent, m.constants.userQueueType.remindMe)
+      m.makeRequest({
+        url: addToQueueReq.url
+        requestType: m.constants.reqNames.postToQueue
+        options: addToQueueReq.options
+        successCallback: onSetReminderSuccess
+        silenceCallbackWarnings: true
+        responseType: "assocarray"
+      })
+    else
+      removeFromQueueReq = m.userDeviceApi.removeFromQueueReqInfo(bookmark.bookmarkId, primaryEventContent.id, contentType)
+      m.makeRequest({
+        url: removeFromQueueReq.url
+        requestType: m.constants.reqNames.postToQueue
+        options: removeFromQueueReq.options
+        successCallback: onRemoveReminderSuccess
+        silenceCallbackWarnings: true
+      })
+    end if
+  end if
+End Function
+
+
+Function onSetReminderSuccess(_response)
+  updateReminderStatusOnScreens(true)
+  handleQueueChange()
+End Function
+
+
+Function onRemoveReminderSuccess(_response)
+  updateReminderStatusOnScreens(false)
+  handleQueueChange()
+End Function
+
+
+Function updateReminderStatusOnScreens(status)
+  screen = getCurrentScreen()
+
+  if screen.hasField("didUserSetReminderForEventContent") = true
+    screen.didUserSetReminderForEventContent = status
+  end if
+
+  ' Since we are using the same callback for both details and home. Making sure home screen is also updated with latest value.
+  if isCurrentScreenHomeScreen() = false
+    homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+    if homeScreen <> invalid
+      homeScreen.didUserSetReminderForEventContent = status
+    end if
+  end if
+End Function
+
+
+' Starts playback if the event is live or else navigates to details screen.
+Function processPlayEvent(event, screen)
+  currentDatetime = CreateObject("roDateTime")
+  airDatetime = CreateObject("roDateTime")
+  airDatetime.FromISO8601String(event.airDateTime)
+  ' If current time is greater than the air date time that means the program is live and we will start playback if user is signed in.
+  if currentDatetime.asSeconds() >= airDatetime.asSeconds() AND (isLoggedInUser() = true OR event.needsLogin = false)
+    stopLinearVideoContent()
+    playbackSource = {
+      "srcForAnalytic": m.constants.player.playbackSource.unknown
+      "srcForAds": m.constants.player.playbackOrigin.container
+      "playbackContainer": m.constants.ui.categoryIds.purpleCarpet
+    }
+    playLinearVideoContent(event, false, screen.id, false, playbackSource)
+  else
+    showEventDetailScreen(event.id, screen.purpleCarpetContent)
+  end if
 End Function

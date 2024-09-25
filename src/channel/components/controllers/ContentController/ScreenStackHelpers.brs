@@ -145,7 +145,8 @@ Function screenTrackingNavigate(oldTrackingPageInfo, newTrackingPageInfo, tracki
 
   trackingComponentType = ""
   trackingComponentValues = {}
-  if trackingComponentInfo <> invalid
+  
+  if trackingComponentInfo <> invalid AND trackingComponentInfo.componentType <> invalid
     trackingComponentType = trackingComponentInfo.componentType
     trackingComponentValues = trackingComponentInfo.componentValues
   end if

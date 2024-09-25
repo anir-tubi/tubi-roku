@@ -541,6 +541,12 @@ Function getConstants()
         constants.urls.tensor.cdn.container = constants.urls.tensor.cdn.urlBase + "/v4/containers"
         constants.urls.tensor.cdn.epgChannelIds = constants.urls.tensor.cdn.urlBase + "/v2/epg"
 
+        ' TODO: For now only enabling it for staging until we are ready to go.
+        if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
+          constants.urls.tensor.cdn.homescreen = constants.urls.tensor.cdn.urlBase + "/v5/homescreen"
+          constants.urls.tensor.cdn.container = constants.urls.tensor.cdn.urlBase + "/v5/containers"
+        end if
+
 
     'user devices url
     constants.urls.userDevice = {}
@@ -1083,6 +1089,7 @@ Function getConstants()
       constants.ui.categoryIds.topTenSeries = "top_10_tv_shows_on_tubi"
       ' Adding a constant entry so that it is easier to change for testing or future use if we need to pick other container outside of featured.
       constants.ui.categoryIds.spotlight = "featured"
+      constants.ui.categoryIds.purpleCarpet = "fox_live_events"
 
     constants.ui.categoryTypes = {}
       'these map to tensor api container types
@@ -1124,6 +1131,7 @@ Function getConstants()
       constants.ui.infoPanelModes.spotlightLinearProgramHomescreen = "spotlightLinearProgramHomescreen"
       constants.ui.infoPanelModes.sportsEvent = "sportsEvent"
       constants.ui.infoPanelModes.spotlightSportsEvent = "spotlightSportsEvent"
+      constants.ui.infoPanelModes.purpleCarpetEvent = "purpleCarpetEvent"
 
     constants.ui.contentMode = {}
       ' these are also used for the content experience choices but are the value that is sent to the back end in our api requests
@@ -1145,6 +1153,11 @@ Function getConstants()
       constants.ui.contentTypes.emptyContainer = "emptyContainer"
       constants.ui.contentTypes.epg = "epg"
       constants.ui.contentTypes.sportsEvent = "sports_event"
+      constants.ui.contentTypes.purpleCarpetEvent = "purple_carpet_event"
+    
+    constants.ui.playerTypes = {}
+      constants.ui.playerTypes.fox = "fox"
+      constants.ui.playerTypes.tubi = "tubi"
 
     '// Check if these are required for sports events
     constants.ui.contentTimings = {}
@@ -1188,6 +1201,7 @@ Function getConstants()
       constants.ui.screenLevels.categoryDetailsScreen = 40
       constants.ui.screenLevels.detailScreen = 50
       constants.ui.screenLevels.episodeScreen = 50
+      constants.ui.screenLevels.eventDetailScreen = 50
       constants.ui.screenLevels.videoPlayerScreen = 60
       constants.ui.screenLevels.linearVideoPlayerScreen = 60
       constants.ui.screenLevels.emailInputScreen = 90
@@ -1223,6 +1237,7 @@ Function getConstants()
       constants.ui.screenIds.consentScreen = "consentScreen"
       constants.ui.screenIds.managePreferencesScreen = "managePreferencesScreen"
       constants.ui.screenIds.rokuContinueWatchingConsentScreen = "rokuContinueWatchingConsentScreen"
+      constants.ui.screenIds.eventDetailScreen = "eventDetailScreen"
       constants.ui.screenIds.foxVideoPlayerWrapperScreen = "FoxVideoPlayerWrapperScreen"
 
     ' notAllowedContainerIds are the containers which are not allowed to be displayed on category screen,
@@ -1397,6 +1412,7 @@ Function getConstants()
       constants.ui.gridItemTypes.emptyContainer = "emptyContainer"
       constants.ui.gridItemTypes.portraitTopTen = "portraitTopTen"
       constants.ui.gridItemTypes.spotlight = "spotlight"
+      constants.ui.gridItemTypes.purpleCarpet = "purpleCarpet"
 
     constants.ui.uris = {}
 

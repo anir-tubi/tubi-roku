@@ -85,6 +85,8 @@ Function init()
   m.closedCaptions.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.audioDescriptionPoster.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.resolutionPoster.observeFieldScoped("loadStatus", "onPosterLoadStatus")
+  m.top.observeFieldScoped("airDateTime", "onAirDateChange")
+  m.top.observeFieldScoped("timerShouldRun", "onTimerShouldRun")
 
   m.reminderTitle.text = getTranslation("info_panel_reminder_is_set")
 
@@ -135,6 +137,9 @@ Function init()
 
   DirectorRect.width = nMatchDirectorWidth + spacerWidth
   StarringRect.width = nMatchStarringWidth + spacerWidth
+
+  ' Holds the instance of AirDateCountDown component which will be used to display a timer based on event air date.
+  m.airDateCountdown = m.top.findNode("airDateCountdown")
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -688,27 +693,25 @@ End Function
 Function onTitleImageChange(msg)
   tubiLog("InfoPanel.onTitleImageChange")
   titleImageUri = msg.getData()
-
-  if m.top.mode = m.constants.ui.infoPanelModes.spotlightItem 
-    if isNonEmptyString(titleImageUri) = true
-      parent = m.title.getParent()
-      index = m.nodeHelpers.getChildIndex(parent, m.title)
-      if index >= 0
-        m.offset.insertChild(m.titleImage, index)
-        m.offset.removeChild(m.title)
-      end if
-
-      m.titleImage.uri = titleImageUri
-    else
-      parent = m.titleImage.getParent()
-      index = m.nodeHelpers.getChildIndex(parent, m.titleImage)
-      if index >= 0
-        m.offset.insertChild(m.title, index)
-        m.offset.removeChild(m.titleImage)
-      end if
-      
-      m.titleImage.uri = ""
+  ' Since we are controlling when this value set from within info panel mixin we do not have to provide additional mode checks here.
+  if isNonEmptyString(titleImageUri) = true
+    parent = m.title.getParent()
+    index = m.nodeHelpers.getChildIndex(parent, m.title)
+    if index >= 0
+      m.offset.insertChild(m.titleImage, index)
+      m.offset.removeChild(m.title)
     end if
+
+    m.titleImage.uri = titleImageUri
+  else
+    parent = m.titleImage.getParent()
+    index = m.nodeHelpers.getChildIndex(parent, m.titleImage)
+    if index >= 0
+      m.offset.insertChild(m.title, index)
+      m.offset.removeChild(m.titleImage)
+    end if
+    
+    m.titleImage.uri = ""
   end if
 End Function
 
@@ -878,6 +881,25 @@ Function onCalculateHeight()
 End Function
 
 
+Function onAirDateChange(msg)
+  data = msg.getData()
+
+  currentDatetime = CreateObject("roDateTime")
+  airDatetime = CreateObject("roDateTime")
+  airDatetime.FromISO8601String(data)
+  index = m.nodeHelpers.getChildIndex(m.offset, m.airDateCountdown)
+  ' Checking if the current time is not greater than air date.
+  if airDatetime.asSeconds() > currentDatetime.asSeconds()
+    if index = -1
+      m.offset.insertChild(m.airDateCountdown, 0)
+    end if
+    m.airDateCountdown.airDateTime = data
+  else if index >= 0
+    m.offset.removeChild(m.airDateCountdown)
+  end if
+End Function
+
+
 Function resetDefaultState()
   infoPanelGroupChildrenCount = m.infoPanelGroup.getChildCount()
   m.infoPanelGroup.removeChildrenIndex(infoPanelGroupChildrenCount, 0)
@@ -901,6 +923,10 @@ Function resetDefaultState()
   'm.playerCountdownGroup has been added to parent to accommodate EPG Screen design
   if m.playerCountdownGroup <> invalid
     m.top.removeChild(m.playerCountdownGroup)
+  end if
+
+  if m.airDateCountdown <> invalid
+    m.offset.removeChild(m.airDateCountdown)
   end if
 
   ' reset any boolean INPUT state fields m.top
@@ -963,7 +989,8 @@ Function onModeChange()
     m.firstLineGroup.appendChild(m.expireWarning)
     m.firstLineGroup.appendChild(m.partnerLogo)
 
-    m.offset.itemSpacings = [13]
+    m.offset.itemSpacings = [13]  
+
   else if m.top.mode = m.constants.ui.infoPanelModes.movie
     ' used for movies on the details screen
     m.infoPanelGroup.appendChild(m.offset)
@@ -1184,7 +1211,21 @@ Function onModeChange()
     m.playerCountdownGroup.translation = [1185, -591]
 
     m.offset.itemSpacings = [13, 16, 13]
+  else if m.top.mode = m.constants.ui.infoPanelModes.purpleCarpetEvent
+    m.infoPanelGroup.vertAlignment = "bottom"
+    m.infoPanelGroup.appendChild(m.offset)
+    m.offset.appendChild(m.title)
+    m.offset.appendChild(m.twoLineInfo)
+    m.offset.appendChild(m.descriptionGroup)
 
+    m.twoLineInfo.appendChild(m.firstLineGroup)
+    m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
+    m.firstLineGroup.appendChild(m.line1Bold)
+    m.firstLineGroup.appendChild(m.resolutionPoster)
+    m.firstLineGroup.appendChild(m.closedCaptionPoster)
+    m.firstLineGroup.appendChild(m.audioDescriptionPoster)
+
+    m.offset.itemSpacings = [15]
   end if
 End Function
 
@@ -1259,6 +1300,15 @@ Function formatBadge(text, badgeComponent)
   end if
 
   badgeComponent.text = UCase(text)
+End Function
+
+
+Function onTimerShouldRun(msg)
+  isContainerVisible = msg.getData()
+  ' Passing down the information related to if the info panel is visible to user or is hidden. 
+  if m.airDateCountdown <> invalid
+    m.airDateCountdown.timerShouldRun = (isContainerVisible = true)
+  end if
 End Function
 
 

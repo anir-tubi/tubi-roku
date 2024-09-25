@@ -120,5 +120,7 @@
 
     <field id="adParam" type="assocArray" />-->
 
+    <field id="playerType" type="string" />
+
   </interface>
 </component>

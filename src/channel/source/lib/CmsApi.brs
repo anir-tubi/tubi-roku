@@ -250,6 +250,8 @@ Function cmsApi_createMiniHomeScreenOnPlayerReqInfo(bKidsMode = false, passedOpt
   headers["Accept-Version"] = "6.0.0"
   url = m.constants.urls.tensor.cdn.homescreen
   params["is_kids_mode"] = bKidsMode
+  ' Disabling showing fox live events in browse while watching.
+  params["include_fox_live_events"] = false
   ' content_mode is mandatory param and its value needs to be passed as empty for fetching homescreen content
   params["content_mode"] = "" ' default contentMode
 
@@ -493,6 +495,19 @@ Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = 
     'Determine the window start and window size for lazy loading
   windowInfo = m.getWindowInfo(homeScreen, index)
   if windowInfo <> invalid
+    ' Adding spotlight or featured row into lazy loading.
+    if homeScreen.purpleCarpetContent <> invalid
+      category = homeScreen.purpleCarpetContent.getChild(0)
+      if category <> invalid
+        categoryReqInfo = m.createCategoryRequestInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode)
+        
+        if categoryReqInfo <> invalid then
+          requests.push(categoryReqInfo)
+          category.state = "loading"
+        end if
+      end if
+    end if
+
     ' Adding spotlight or featured row into lazy loading.
     if homeScreen.spotlightContent <> invalid
       category = homeScreen.spotlightContent.getChild(0)
