@@ -221,7 +221,7 @@ Function onMovieItemFocused()
   'to fire a navigate_within_page analytics event.
   if m.isUpNextFocused = true
     m.top.navigateWithinPageInfo = {
-      pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: m.top.videoId.toInt()})
+      pageOneof: m.Tracking.getAnalyticsPage("video_player_page", {video_id: m.top.videoId.toInt()})
       componentOneof: m.Tracking.getAnalyticsComponent("auto_play_component", m.oldAutoPlayComponent)
       means_of_navigation: "BUTTON" 'MeansOfNavigation enum
       vertical_location: row
