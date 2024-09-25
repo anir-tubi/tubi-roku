@@ -703,7 +703,8 @@ Function getConstants()
 
   'common http request headers
   constants.headers = {}
-    constants.headers.language = {"Accept-Language": "en-US"}
+    locale = constants.deviceInfo.locale.replace("_", "-")
+    constants.headers.language = {"Accept-Language": locale}
     constants.headers.json = {"Content-Type": "application/json"}
     constants.headers.platform =  {"x-client-platform": constants.platform}
     constants.headers.clientVersion = {"x-client-version": constants.deviceInfo.clientVersion}
