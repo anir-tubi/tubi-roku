@@ -62,6 +62,7 @@
         <InfoPanel
           id="infoPanel"
           maxHeight="354"
+          vertAlignment="bottom"
           width="960"
           translation="[0,10]"
           maxTitleLines="2"/>

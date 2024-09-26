@@ -904,8 +904,6 @@ Function resetDefaultState()
   infoPanelGroupChildrenCount = m.infoPanelGroup.getChildCount()
   m.infoPanelGroup.removeChildrenIndex(infoPanelGroupChildrenCount, 0)
 
-  m.infoPanelGroup.vertAlignment = "top"
-
   m.liveBadgeHeader.visible = false
 
   offsetChildrenCount = m.offset.getChildCount()
@@ -971,7 +969,6 @@ Function onModeChange()
   else if m.top.mode = m.constants.ui.infoPanelModes.spotlightItem
     ' used for movies and series on the homescreen and similar screens
     m.infoPanelGroup.appendChild(m.offset)
-    m.infoPanelGroup.vertAlignment = "bottom"
     m.offset.appendChild(m.tubiOriginal)
     '//Featured items have larger title text
     setTypographyOfLabel(m.title, m.typographyConstants.ids.headerMedium)
@@ -1153,7 +1150,6 @@ Function onModeChange()
     m.secondLineGroup.appendChild(m.line2)
     m.offset.itemSpacings = [15]
   else if m.top.mode = m.constants.ui.infoPanelModes.spotlightSportsEvent
-    m.infoPanelGroup.vertAlignment = "bottom"
     m.infoPanelGroup.appendChild(m.offset)
     m.offset.appendChild(m.title)
     m.offset.appendChild(m.twoLineInfo)
@@ -1205,14 +1201,12 @@ Function onModeChange()
 
     '//Featured items have larger title text
     setTypographyOfLabel(m.title, m.typographyConstants.ids.headerMedium)
-    m.infoPanelGroup.vertAlignment = "bottom"
 
     m.top.appendChild(m.playerCountdownGroup)
     m.playerCountdownGroup.translation = [1185, -591]
 
     m.offset.itemSpacings = [13, 16, 13]
   else if m.top.mode = m.constants.ui.infoPanelModes.purpleCarpetEvent
-    m.infoPanelGroup.vertAlignment = "bottom"
     m.infoPanelGroup.appendChild(m.offset)
     m.offset.appendChild(m.title)
     m.offset.appendChild(m.twoLineInfo)
