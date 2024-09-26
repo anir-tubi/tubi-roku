@@ -21,7 +21,6 @@
 
     <!-- INPUT -->
       <!-- Alias fields for the video node -->
-      <field id="position" alias="VideoNode.position"/>
       <field id="width" alias="VideoNode.width"/>
       <field id="height" alias="VideoNode.height"/>
       <field id="disableScreensaver" alias="VideoNode.disableScreensaver" />
@@ -136,6 +135,8 @@
       <field id="isAutoPlayTimerOn" type="boolean" value="true" />
 
       <field id="showSignUpModal" type="boolean" alwaysNotify="true" />
+
+      <field id="position" type="float"/>
 
       <!-- Set to true if the skip trailer button was pressed -->
       <field id="skipTrailer" type="boolean" value="false" alwaysNotify="true" />

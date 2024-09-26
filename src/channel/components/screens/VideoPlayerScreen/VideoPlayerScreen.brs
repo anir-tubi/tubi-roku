@@ -881,6 +881,7 @@ End Function
 Function onVideoPositionChange(msg)
 
   floatPosition = msg.getData()
+  m.top.position = floatPosition
   ' position is a float so we have to convert it to an integer for our key based lookups to work correctly
   position = int(floatPosition)
   positionDecimalPart = floatPosition - position
@@ -1498,7 +1499,8 @@ End Function
 Function resetVideoPlayerState(content = invalid)
   ' setting startUpBuffering to true as this function will be triggered when user tries to play or resume video
   m.startUpBuffering = true
-  m.Video.position = 0
+  m.playerPosition = 0
+  m.top.position = 0
   m.LoadingProgressBar.progress = 0
   m.LoadingMessage.text = ""
   cancelReplayCaptions()
@@ -1535,6 +1537,7 @@ Function resetVideoPlayerState(content = invalid)
   ' Hiding the closed caption and audio overlay on every playback start if in case it is open.
   m.isClosedCaptionAudioOverlayShowing = false
   m.closedCaptionAndAudioSelectionOverlayGroup.opacity = 0
+
 End Function
 
 
