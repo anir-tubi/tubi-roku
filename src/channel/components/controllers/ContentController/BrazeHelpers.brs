@@ -95,6 +95,7 @@ Function processInAppMessage(message)
   if message <> invalid
     ' Stopping any preview that is in progress.
     stopVideoPreview()
+    stopAndHideLinearVideoPlayer()
     extras = message.extras
     ' Checking to make sure we have a template config key before proceeding.
     if extras <> invalid AND extras.template <> invalid
