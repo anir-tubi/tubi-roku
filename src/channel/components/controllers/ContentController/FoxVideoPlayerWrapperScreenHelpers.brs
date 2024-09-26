@@ -382,6 +382,9 @@ Function getFoxVideoPlayerConfig()
         "displayEndCardOnClips": {
           "enabled": false
         },
+        "live": {
+          "enableControls": true,
+        },
         "loop": {
           "@note": "-1 means use autoplayStill (never load background video), 0 means infinite loop, 1 means play once, 2 means play twice etc.",
           "value": 1

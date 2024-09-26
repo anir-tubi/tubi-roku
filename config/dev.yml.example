@@ -16,6 +16,7 @@ settings:
   mode: "dev"
   starterComponentsUrl: "http://{{localHostUri}}/tubi_starter_components_{{versionMinorUnderscored}}.{{fileType}}"
   remoteComponentsUrl: "http://{{localHostUri}}/tubi_remote_components_{{versionUnderscored}}.{{fileType}}"
+  foxVideoPlayerComponentsUrl: "https://rcdn-staging.tubitv.com/appFiles/fox-video-player-components/fox_video_player_{{foxVideoPlayerVersionUnderscored}}.pkg"
   # remoteComponentsExtension will fill in the {{fileType}} template value.
   remoteComponentsExtension: "zip"
 
@@ -47,7 +48,7 @@ settings:
   youboraDebugEnabled: false
 
   # Setting the below value to true will enable player log tracking.
-  playerLogEnabled: false  
+  playerLogEnabled: false
 
   stagingApis: false  # setting to true will use UAPI staging APIs (matrix, cms, user_device)
 
