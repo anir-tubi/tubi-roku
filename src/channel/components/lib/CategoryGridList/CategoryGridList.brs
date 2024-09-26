@@ -710,7 +710,7 @@ End Function
 Function onKeyEvent(key as String, press as Boolean) as Boolean
   if press = true
     if key = "down" AND m.RowList.isInFocusChain() = false
-      if m.spotlightRow.isInFocusChain = true
+      if m.spotlightRow.isInFocusChain() = true
         slideFade(m.spotlightRow, "above", "out", 0.3)
       else if m.purpleCarpetRow.isInFocusChain() = true
         m.purpleCarpetRow.isContainerVisible = false
