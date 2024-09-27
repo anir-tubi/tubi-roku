@@ -160,6 +160,7 @@ Function populateCtaButtonList()
         subType: "DetailMenuItemContentNode"
         title: getTranslation("available_at", {"time": formattedTime})
         isPrimaryButton: true
+        disabled: true
       })
     end if
 

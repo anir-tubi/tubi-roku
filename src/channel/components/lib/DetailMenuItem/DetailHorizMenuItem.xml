@@ -8,8 +8,8 @@
 
   <interface>
     <!-- INPUTS -->
-    <field id="width" type="float" />
-    <field id="height" type="float" />
+    <field id="width" type="float" alias="menuItemBg.width,menuItemBgFocused.width" />
+    <field id="height" type="float" alias="menuItemBg.height,menuItemBgFocused.height" />
     <field id="focusPercent" type="float" />
     <field id="itemContent" type="node" />
     <field id="itemHasFocus" type="boolean" />
@@ -26,6 +26,10 @@
       uri="pkg:/images/pill_button_$$RES$$.9.png"
       visible="false"
       opacity="0.1"
+      translation="[0,0]"/>
+    <Poster
+      id="menuItemBgFocused"
+      opacity="0"
       translation="[0,0]"/>
       
     <LayoutGroup

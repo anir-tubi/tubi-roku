@@ -297,8 +297,7 @@
             columnSpacings="[16]"
             numColumns="9"
             numRows="1"
-            focusBitmapUri="pkg:/images/pill_button_$$RES$$.9.png"
-            focusFootprintBitmapUri="pkg:/images/pill_button_$$RES$$.9.png"
+            drawFocusFeedback="false"
             drawFocusFeedbackOnTop="false"
             itemComponentName="DetailHorizMenuItem"/>
 

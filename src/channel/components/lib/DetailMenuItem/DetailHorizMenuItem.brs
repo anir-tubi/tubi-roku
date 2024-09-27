@@ -11,6 +11,7 @@ Function init()
 
   m.bottomItemText = topRef.findNode("bottomItemText")
   m.buttonBg = topRef.findNode("menuItemBg")
+  m.buttonBgFocused = topRef.findNode("menuItemBgFocused")
 
   m.badge = topRef.findNode("badge")
   m.badgeBackground = topRef.findNode("badgeBackground")
@@ -50,6 +51,7 @@ Function onThemeChange(msg = invalid)
     m.focusedColor = theme.focusedColor
     m.primaryTextColor = theme.primaryTextColor
     m.bgColor = theme.backgroundcolor
+    m.secondaryTextColor = theme.secondaryTextColor
 
     m.icon.blendcolor = theme.primaryTextColor
     m.iconFocused.blendcolor = theme.backgroundcolor
@@ -64,6 +66,7 @@ Function onThemeChange(msg = invalid)
     m.badgeBackgroundFocused.blendcolor = theme.backgroundcolor
 
     m.bottomItemText.color = theme.focusedColor
+    m.buttonBgFocused.blendcolor = theme.focusedColor
   end if
 End Function
 
@@ -134,6 +137,7 @@ Function onItemContentChange()
       m.top.calculatedTextWidth = width
       m.buttonBg.visible = true
       m.buttonBg.width = padding + width + padding
+      m.buttonBgFocused.width = m.buttonBg.width
 
       if item.iconUrl = ""
         m.title.translation = [(m.buttonBg.width / 2) - (textWidth / 2), 32]
@@ -146,6 +150,16 @@ Function onItemContentChange()
       m.titleFocused.text = ""
       m.top.calculatedTextWidth =  52
       m.buttonBg.visible = false
+    end if
+
+    if item.disabled = true
+      m.title.color = m.secondaryTextColor
+      m.titleFocused.color = m.secondaryTextColor
+      m.buttonBgFocused.uri = "pkg:/images/large_pill_disabled_focus_$$RES$$.9.png"
+    else
+      m.buttonBgFocused.uri = "pkg:/images/pill_button_$$RES$$.9.png"
+      m.titleFocused.color = m.bgColor
+      m.title.color = m.primaryTextColor
     end if
   end if
 End Function
@@ -183,4 +197,5 @@ Function updateFocusedFraction(opacity)
   m.iconFocused.opacity = opacity
   m.badgeFocused.opacity = opacity
   m.bottomItemText.opacity = opacity
+  m.buttonBgFocused.opacity = opacity
 End Function
