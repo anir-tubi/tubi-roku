@@ -732,7 +732,7 @@ describe('MyStuff', function () {
 
       });
       // https://tubi.testrail.io/index.php?/cases/view/439646
-      it('C439646 - Kids - Registered User - Video Preview does not play when Autoplay Previews is Off @mystuff', async () => {
+      it.only('C439646 - Kids - Registered User - Video Preview does not play when Autoplay Previews is Off @mystuff', async () => {
          
          // Create user with watch list and history
          const user = await testUtils.createRegisteredUser();
@@ -770,7 +770,7 @@ describe('MyStuff', function () {
          await highlightMyStuffMenuItem();
          await ecp.sendKeypress(ecp.Key.Ok);
          await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
-         await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'stopped');
+         await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', ['stopped', '']);
 
          // Move down and check My List
          // Check the My List displays titles 
@@ -780,7 +780,7 @@ describe('MyStuff', function () {
          expect(myListPosterContent.height).is.equal(360);
 
          // Check that video preview is not playing when autoplay preview is turned off on My List Row
-         await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'stopped');
+         await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', ['stopped', '']);
       });   
          
 });

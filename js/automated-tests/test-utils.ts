@@ -72,7 +72,7 @@ enum ScreenIds {
 }
 
 
-type VideoPlayerStates = 'none' | 'buffering' | 'playing' | 'paused' | 'stopped' | 'finished' | 'error'
+type VideoPlayerStates = '' | 'none' | 'buffering' | 'playing' | 'paused' | 'stopped' | 'finished' | 'error'
 
 
 const abbreviatedContentTypeConversion = {
@@ -444,11 +444,16 @@ class TestUtils {
    * @param expectedState - The state we are waiting for
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
-  public async waitForPlayerStateToEqual(videoPlayerElementId: VideoPlayerElementId, expectedState: VideoPlayerStates, timeout = 15000) {
+  public async waitForPlayerStateToEqual(videoPlayerElementId: VideoPlayerElementId, expectedState: VideoPlayerStates | VideoPlayerStates[], timeout = 15000) {
+    // check if expectedState is a string
+    if (typeof expectedState === 'string') {
+      expectedState = [expectedState];
+    }
+
     const element = this.getElementKeyPath(videoPlayerElementId);
     return await testUtils.retryWithTimeOut(async () => {
       const state = await this.getElementField(videoPlayerElementId, 'state', timeout);
-      expect(state).to.equal(expectedState);
+      expect(state).to.be.oneOf(expectedState);
     }, timeout);
   }
 

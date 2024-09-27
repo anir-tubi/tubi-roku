@@ -815,6 +815,14 @@ const elements = typeCheckElements({
       '/TubiScene/ContentController/Group/Group/ScreenStack/SearchScreen/InfoPanel/LayoutGroup/LayoutGroup/Label',
   },
 
+  directorTag: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#DirectorGroup.#DirectorPrefix.#DirectorTag',
+  }, 
+
+  starringTag: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#StarringGroup.#StarringPrefix.#StarringTag',
+  }, 
+
   searchResultsText: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#SearchScreenInfoPanel.#infoPanelGroup.#Offset.#Title',
@@ -1618,6 +1626,11 @@ const elements = typeCheckElements({
   artHouseFilms: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid.5.#Title',
+  },
+
+  bWWTitle: {
+    keyPath:
+    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#BrowseWhileWatchingRow.0.#BrowseWhileWatchingGroup.#Info.#infoPanelGroup.#Offset.#Title',
   },
 
   /** Kids left nav option */
