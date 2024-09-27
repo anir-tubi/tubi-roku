@@ -63,7 +63,7 @@ End Function
 
 Function onRowItemSelectedChange(msg)
   rowItemSelected = msg.getData()
-  content = m.detailsPurpleCarpetRow.content
+  content = m.detailsPurpleCarpetRow.listContent
   if content <> invalid
     container = content.getChild(0)
     if container <> invalid AND isNonEmptyArray(rowItemSelected) = true
