@@ -129,7 +129,7 @@ Function populateCtaButtonList()
         id: "signInWatch"
         subType: "DetailMenuItemContentNode"
         title: getTranslation("screenHome_button_sign_in_watch")
-        iconUrl: "pkg:/images/icon-account.webp"
+        iconUrl: "pkg:/images/lock-closed.webp"
         badgeText: getTranslation("registration_signup_button_free")
         isPrimaryButton: true
       })
