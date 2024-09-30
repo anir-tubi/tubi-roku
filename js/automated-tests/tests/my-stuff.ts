@@ -732,7 +732,7 @@ describe('MyStuff', function () {
 
       });
       // https://tubi.testrail.io/index.php?/cases/view/439646
-      it.only('C439646 - Kids - Registered User - Video Preview does not play when Autoplay Previews is Off @mystuff', async () => {
+      it('C439646 - Kids - Registered User - Video Preview does not play when Autoplay Previews is Off @mystuff', async () => {
          
          // Create user with watch list and history
          const user = await testUtils.createRegisteredUser();
