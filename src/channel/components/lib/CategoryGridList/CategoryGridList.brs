@@ -288,6 +288,8 @@ Function setRowHeights()
   numRows = 2
   posterSize = m.constants.ui.imageSizes.largePoster
   landscapeSize = m.constants.ui.imageSizes.largeLandscape
+  showRowLabel = []
+  rowSpacings = []
 
   for i=0 to m.top.content.getChildCount()-1
     category = m.top.content.getChild(i)
@@ -301,6 +303,12 @@ Function setRowHeights()
       rowItemSize.push([1693, posterHeight])
       rowHeight = posterHeight
       rowItemSpacings.push([15, 0])
+      focusXOffsets.push(0)
+    else if gridItemType = gridItemTypes.banner
+      bannerSize = m.constants.ui.imageSizes.banner
+      rowItemSize.push(bannerSize)
+      rowHeight = bannerSize[1]
+      rowItemSpacings.push([10, 0])
       focusXOffsets.push(0)
     else if gridItemType = gridItemTypes.portrait
       posterWidth = posterSize[0]
@@ -329,6 +337,16 @@ Function setRowHeights()
       focusXOffsets.push(0)
     end if
 
+    ' In future when we clean up purple carpet code we will should either add the spacings in xml or continue pushing 32 for each gridItemType's if block above.
+    if gridItemType = gridItemTypes.banner
+      showRowLabel.push(false)
+      ' Adding a negative margin so that we move the row up since the banner row does not any header.
+      rowSpacings.push(-32)
+    else
+      showRowLabel.push(true)
+      rowSpacings.push(32)
+    end if
+
     if category.sponsorImages <> invalid
       '//if this is a sponsored row, then adjust the spacing so row includes the header size of the sponsored row
       rowHeightAdjustment = rowHeightAdjustment + 32
@@ -343,10 +361,11 @@ Function setRowHeights()
     "itemSize" : itemSize
     "rowItemSize": rowItemSize
     "rowHeights": rowHeights
-    "showRowLabel": [true]
+    "showRowLabel": showRowLabel
     "numRows": numRows
     "rowItemSpacing": rowItemSpacings
     "focusXOffset" : focusXOffsets
+    "rowSpacings": rowSpacings
   })
   m.RowList.content = m.top.content
 End Function

@@ -102,7 +102,8 @@ Function populateInfoPanelWithHomescreenStyleSportsMode(content, infoPanel, bInS
   end if
 
   lineTwoData = {}
-  if bInSpotlight = true
+
+  if bInSpotlight = true	
     infoPanel.mode = m.constants.ui.infoPanelModes.spotlightSportsEvent
     lineOneData.roundGroupInfo = content.roundGroupInfo
   else
@@ -293,6 +294,41 @@ Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel, bI
     infoPanel.needsLogin = true
   else
     infoPanel.needsLogin = false
+  end if
+
+  infoPanel.width = 960
+End Function
+
+
+' Populates the info panel with the fields necessary for the "sportsEvent" mode so that it looks
+' like the info panel on the homescreen
+'
+' @content: TubiContentNode, containing a sports event
+' @infoPanel: InfoPanel node
+'
+' @sideEffects: updates fields on the passed in infoPanel node
+Function populateInfoPanelWithPurpleCarpetBannerMode(content, infoPanel)
+  infoPanel.title = content.title
+
+  lineOneData = {}
+  lineOneData.hasCC = content.hasSubtitles
+
+  if content.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
+    lineOneData.has4k = true
+  end if
+
+  lineTwoData = {}
+  infoPanel.mode = m.constants.ui.infoPanelModes.purpleCarpetBanner
+  lineOneData.roundGroupInfo = content.roundGroupInfo
+
+  infoPanel.lineOneData = lineOneData
+  infoPanel.lineTwoData = lineTwoData
+
+  infoPanel.description = content.description
+  if content.titleImage <> invalid
+    infoPanel.titleImageUri = content.titleImage
+  else
+    infoPanel.titleImageUri = ""
   end if
 
   infoPanel.width = 960

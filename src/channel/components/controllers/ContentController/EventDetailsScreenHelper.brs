@@ -1,3 +1,5 @@
+' @eventId: String, id of the program or event.
+' @content: roSGNode|invalid, purple carpet container content node or invalid incase it is not present in the home screen response.
 Function showEventDetailScreen(eventId, content)
   screen = CreateObject("roSGNode", "EventDetailsScreen")
   screen.id = m.constants.ui.screenIds.eventDetailScreen

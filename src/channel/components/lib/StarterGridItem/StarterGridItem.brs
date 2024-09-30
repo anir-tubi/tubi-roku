@@ -62,6 +62,8 @@ Function onItemContentChange(msg)
       childGridItemComponent = "SpotlightPoster"
     else if gridItemType = "purpleCarpet"
       childGridItemComponent = "PurpleCarpetPoster"
+    else if gridItemType = "banner"
+      childGridItemComponent = "Banner"
     else if gridItemType = "emptyContainer" then
       childGridItemComponent = "CategoryGridPoster"
     else if gridItemType = "landscapeInnerMetadata" then

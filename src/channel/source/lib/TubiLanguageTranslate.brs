@@ -1942,6 +1942,10 @@ Function getTranslation_en_US()
     "available_at": {
       "description": "Sign in to watch live button label.",
       "message": "Available at {time}"
+    },
+    "watch_for_free": {
+      "description": "Sign in to watch live button label.",
+      "message": "Watch free on {date}."
     }
   }
 End Function

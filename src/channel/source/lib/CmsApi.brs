@@ -171,6 +171,12 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
   params["include_empty_queue"] = true
   params["include_channels"] = true
   params["include_sponsorships"] = true
+
+  ' TODO: Temporary for testing will be removed.
+  if m.constants.settings.mode <> "production"
+    params["include_fox_live_events_banner"] = true
+  end if
+
   params["is_kids_mode"] = bKidsMode
   ' content_mode is mandatory param and its value needs to be passed as empty for fetching homescreen content
   params["content_mode"] = "" ' default contentMode

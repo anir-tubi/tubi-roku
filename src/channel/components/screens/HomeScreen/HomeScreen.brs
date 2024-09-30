@@ -340,6 +340,8 @@ Function populateInfoPanelByContent(focusedContent)
       populateInfoPanel(m.constants.ui.infoPanelModes.continueWatching, focusedContent)
     else if sType = m.constants.ui.contentTypes.sportsEvent
       populateInfoPanel(m.constants.ui.infoPanelModes.sportsEvent, focusedContent) 
+    else if sType = m.constants.ui.contentTypes.purpleCarpetEvent
+      populateInfoPanel(m.constants.ui.infoPanelModes.purpleCarpetBanner, focusedContent) 
     else
       populateInfoPanel(m.constants.ui.infoPanelModes.item, focusedContent)
     end if
@@ -515,6 +517,8 @@ Function populateInfoPanel(mode, contentNode)
 
     else if mode = m.constants.ui.infoPanelModes.sportsEvent
       populateInfoPanelWithHomescreenStyleSportsMode(contentNode, m.InfoPanel)
+    else if mode = m.constants.ui.infoPanelModes.purpleCarpetBanner
+      populateInfoPanelWithPurpleCarpetBannerMode(contentNode, m.InfoPanel)
     end if
 
     m.InfoPanel.calculateHeight = true

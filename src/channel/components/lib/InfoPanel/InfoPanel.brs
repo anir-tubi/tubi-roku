@@ -466,7 +466,7 @@ Function onLineOneDataChange(msg)
     line1IsPresent = (m.line1.getParent() <> invalid)
     line1BoldIsPresent = (m.line1Bold.getParent() <> invalid)
     textIsPresent = (line1IsPresent = true OR line1BoldIsPresent = true)
-
+    
     if isNonEmptyString(text) = true
       if textIsPresent = false
         mode = m.top.mode
@@ -1220,6 +1220,21 @@ Function onModeChange()
     m.firstLineGroup.appendChild(m.audioDescriptionPoster)
 
     m.offset.itemSpacings = [15]
+  else if m.top.mode = m.constants.ui.infoPanelModes.purpleCarpetBanner
+    ' used for movies and series on the homescreen and similar screens
+    m.infoPanelGroup.appendChild(m.offset)
+    m.offset.appendChild(m.title)
+    m.offset.appendChild(m.twoLineInfo)
+    m.offset.appendChild(m.descriptionGroup)
+
+    m.twoLineInfo.appendChild(m.firstLineGroup)
+    m.firstLineGroup.appendChild(m.line1)
+    m.firstLineGroup.appendChild(m.resolutionPoster)
+    m.firstLineGroup.appendChild(m.closedCaptionPoster)
+    m.twoLineInfo.appendChild(m.secondLineGroup)
+    m.secondLineGroup.appendChild(m.line2)
+
+    m.offset.itemSpacings = [13]
   end if
 End Function
 

@@ -1090,6 +1090,7 @@ Function getConstants()
       ' Adding a constant entry so that it is easier to change for testing or future use if we need to pick other container outside of featured.
       constants.ui.categoryIds.spotlight = "featured"
       constants.ui.categoryIds.purpleCarpet = "fox_live_events"
+      constants.ui.categoryIds.purpleCarpetBanner = "fox_live_events_banner"
 
     constants.ui.categoryTypes = {}
       'these map to tensor api container types
@@ -1131,6 +1132,7 @@ Function getConstants()
       constants.ui.infoPanelModes.spotlightLinearProgramHomescreen = "spotlightLinearProgramHomescreen"
       constants.ui.infoPanelModes.sportsEvent = "sportsEvent"
       constants.ui.infoPanelModes.spotlightSportsEvent = "spotlightSportsEvent"
+      constants.ui.infoPanelModes.purpleCarpetBanner = "purpleCarpetBanner"
       constants.ui.infoPanelModes.purpleCarpetEvent = "purpleCarpetEvent"
 
     constants.ui.contentMode = {}
@@ -1314,6 +1316,10 @@ Function getConstants()
       'Sizes of the linear background and minimized linear video player
       constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension = [1120,630]
 
+      ' Sizes for the full width banner component. It is currently going to be used for purple carpet banner.
+      ' Will be removed when purple carpet code is cleaned up.
+      constants.ui.imageSizes.banner = [1693, 162]
+
       ' Size for the background image.
       if limitedUi = true
         constants.ui.imageSizes.background = [399, 225]
@@ -1412,7 +1418,10 @@ Function getConstants()
       constants.ui.gridItemTypes.emptyContainer = "emptyContainer"
       constants.ui.gridItemTypes.portraitTopTen = "portraitTopTen"
       constants.ui.gridItemTypes.spotlight = "spotlight"
+      ' Will be removed when purple carpet code is cleaned up.
       constants.ui.gridItemTypes.purpleCarpet = "purpleCarpet"
+      ' Will be removed when purple carpet code is cleaned up.
+      constants.ui.gridItemTypes.banner = "banner"
 
     constants.ui.uris = {}
 

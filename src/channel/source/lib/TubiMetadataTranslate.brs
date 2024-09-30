@@ -39,6 +39,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     fetchedAtTimestamp: tubiMetadataTranslate_fetchedAtTimestamp
     getGridItemType: tubiMetadataTranslate_getGridItemType
     getThumbnailImage: tubiMetadataTranslate_getThumbnailImage
+    getBannerTitleImageUrl: tubiMetadataTranslate_getBannerTitleImageUrl
     composeVideoResources: tubiMetadataTranslate_composeVideoResources
     getRoundedCornersURL: tubiMetadataTranslate_getRoundedCornersURL
     getBackgroundImages: tubiMetadataTranslate_getBackgroundImages
@@ -84,7 +85,7 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
   if gridType = ""
     gridType = gridItemTypes.portrait
   end if
-
+  
   if gridType = gridItemTypes.portrait OR gridType = gridItemTypes.portraitTopTen
     if canvasImages <> invalid AND type(canvasImages.poster_tb) = "roArray" AND isNonEmptyString(canvasImages.poster_tb[0]) = true
       '//A custom portrait size was requested, use this image instead of the default image
@@ -116,12 +117,29 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
     if canvasImages <> invalid AND type(canvasImages.spotlight_landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.spotlight_landscape_tb[0])
       sThumbnailURL = canvasImages.spotlight_landscape_tb[0]
     end if
+  else if gridType = gridItemTypes.banner
+    bannerImages = contentFromServer.banner_images
+    if bannerImages <> invalid AND isNonEmptyString(bannerImages.large_background) = true
+      sThumbnailURL = bannerImages.large_background
+    end if
   end if
 
   '//Ensure thumbnails have rounded corners - will only work with Tupian URLs
   sThumbnailURL = m.getRoundedCornersURL(sThumbnailURL)
 
   return sThumbnailURL
+End Function
+
+
+' @contentFromServer: assocArray, AA representation of content metadata JSON as returned from server
+' @returns: String, returns the "title" image url for the purple carpet banner component displayed in the home grid.
+Function tubiMetadataTranslate_getBannerTitleImageUrl(contentFromServer)
+  bannerImages = contentFromServer.banner_images
+  if bannerImages <> invalid AND isNonEmptyString(bannerImages.title) = true
+    return bannerImages.title
+  end if
+  
+  return ""
 End Function
 
 
@@ -1459,6 +1477,12 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           sHDGridPosterURL = m.getThumbnailImage(fullChild, gridType)
           childAA.hdgridposterurl = sHDGridPosterURL
 
+          if childAA.gridItemType = "banner"
+            titleImageUrl = m.getBannerTitleImageUrl(fullChild)
+            if isNonEmptyString(titleImageUrl) = true
+              childAA.bannerTitleImageUrl = titleImageUrl
+            end if
+          end if
 
           if parentGridItemType = gridItemTypes.linear AND fullChild.thumbnails <> invalid
             childAA.inlineLogoUri = fullChild.thumbnails[0]
@@ -1776,6 +1800,8 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
     gridItemType = gridItemTypes.portraitTopTen
   else if container.id = constants.ui.categoryIds.purpleCarpet
     gridItemType = gridItemTypes.purpleCarpet
+  else if container.id = constants.ui.categoryIds.purpleCarpetBanner
+    gridItemType = gridItemTypes.banner
   end if
 
   return gridItemType
