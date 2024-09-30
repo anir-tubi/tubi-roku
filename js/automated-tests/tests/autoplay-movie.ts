@@ -179,6 +179,30 @@ describe('Autoplay Movies', function () {
 
     });
 
+    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/710850
+    it('C710850 - Ensure movie plays to the end after dismissing autoplay modal @autoplay', async () => {
+        await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
+
+        // Are we on the Movies page?
+        await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
+
+        //Play title, seek to 15s before the end to trigger autoplay
+        await ecp.sendKeypress(ecp.Key.Play);
+        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing');
+        await testUtils.seekPlayerToRelativePosition('videoPlayerScreen', -15000, 'end');
+
+        // Autoplay triggered?
+        await checkForAutoPlayTrigger();
+        await ecp.sleep(2000);
+
+        // Press back to dismiss the Autoplay
+        await ecp.sendKeypress(ecp.Key.Back);
+        await testUtils.waitForElementToNotShowOnScreen('countDownMovieAutoPlay');
+        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing');
+        const contentLength = await testUtils.getPlayerDuration('videoPlayerScreen');
+        await testUtils.waitForPlayerPositionToEqual('videoPlayerScreen', contentLength, 1000, 15000);
+    });
+
 });
 
 async function seekToTriggerCuePoint() {
