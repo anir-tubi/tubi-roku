@@ -293,6 +293,7 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 	}
 
 	async function selectFocusedTitleTVShow() {
+		await ecp.sendKeypress(ecp.Key.Down);
 		const content = await testUtils.getCurrentlyFocusedGridItemContent(
 			NODES.TV_SHOW_SCREEN_ROW_LIST
 		);

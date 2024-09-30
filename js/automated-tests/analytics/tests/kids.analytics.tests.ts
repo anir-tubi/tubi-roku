@@ -74,10 +74,11 @@ describe('Kids Events', function () {
 		await settingsScreen.checkIfKidsLogoPresent();
 	});
 
-	it('UI Playback - When user presses Forward 30 seconds then playback advances 30 seconds forward: C4164 @analyticsASet1,@analyticsKids', async () => {
+	it('UI Playback - When user presses Forward 30 seconds then playback advances 30 seconds forward: C4164 @analyticsASet1,@analyticsKids,@debug', async () => {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);
+		await ecp.sendKeypress(ecp.Key.Down);
 		const video = await kidsHome.playKidsTitle();
 		await video.thirtySkipForward();
 		await video.allowPlaybackToPlayForSeconds(1500);
@@ -92,6 +93,7 @@ describe('Kids Events', function () {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);
+		await ecp.sendKeypress(ecp.Key.Down);
 		const video = await kidsHome.playKidsTitle();
 		await video.thirtySkipBack();
 		await ecp.sendKeypress(ecp.Key.Up);
@@ -106,6 +108,7 @@ describe('Kids Events', function () {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);
+		await ecp.sendKeypress(ecp.Key.Down);
 		const video = await kidsHome.playKidsTitle();
 		await video.fastForwardNoWaitTime();
 		await video.allowPlaybackToPlayForSeconds(10000);
@@ -121,6 +124,7 @@ describe('Kids Events', function () {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);
+		await ecp.sendKeypress(ecp.Key.Down);
 		const video = await kidsHome.playKidsTitle();
 		await video.fastForwardNoWaitTime({ howFast: 2 });
 		await video.allowPlaybackToPlayForSeconds(10000);
@@ -135,6 +139,7 @@ describe('Kids Events', function () {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);
+		await ecp.sendKeypress(ecp.Key.Down);
 		const video = await kidsHome.playKidsTitle();
 		await video.fastForward({ howFast: 3, howLong: 1500 });
 		await video.allowPlaybackToPlayForSeconds(15000);
@@ -150,6 +155,7 @@ describe('Kids Events', function () {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);
+		await ecp.sendKeypress(ecp.Key.Down);
 		const video = await kidsHome.playKidsTitle();
 		await video.rewindPlayback();
 		await video.allowPlaybackToPlayForSeconds(1000);
@@ -165,6 +171,7 @@ describe('Kids Events', function () {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);
+		await ecp.sendKeypress(ecp.Key.Down);
 		const video = await kidsHome.playKidsTitle();
 		await video.rewindPlayback({ howFast: 2, howLong: 500 });
 		await video.allowPlaybackToPlayForSeconds(12000);
@@ -180,6 +187,7 @@ describe('Kids Events', function () {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);
+		await ecp.sendKeypress(ecp.Key.Down);
 		const video = await kidsHome.playKidsTitle();
 		await video.rewindPlayback({ howFast: 3, howLong: 500 });
 		await video.allowPlaybackToPlayForSeconds(2000);

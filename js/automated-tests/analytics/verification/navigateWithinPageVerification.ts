@@ -99,32 +99,6 @@ export async function verifyC76717(slugCategory) {
 ${JSON.stringify(navigateWithinPage)}\n`
 	);
 }
-export async function verifyC543705(slugCategory) {
-	let navigateWithinPage;
-	let i = 1;
-	while (navigateWithinPage === undefined && i < 16) {
-		const pulletEvents = await getMatchedEventsFromLastEvent(
-			Events.navigate_within_page,
-			25 + i
-		);
-		navigateWithinPage = pulletEvents.find(
-			(event) =>
-				event.navigate_within_page &&
-				event.navigate_within_page.category_component &&
-				event.navigate_within_page.category_component.category_slug &&
-				event.navigate_within_page.category_component.category_slug ===
-					slugCategory
-		);
-		i++;
-	}
-	expect(
-		navigateWithinPage.navigate_within_page.category_component.category_slug
-	).equal(
-		slugCategory,
-		`event should contains navigate_within_page.category_component.category_slug==${slugCategory}, Event: \n
-${JSON.stringify(navigateWithinPage)}\n`
-	);
-}
 
 export async function verifyC268959() {
 	let navigateWithinPage;

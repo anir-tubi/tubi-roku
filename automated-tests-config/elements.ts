@@ -1302,7 +1302,7 @@ const elements = typeCheckElements({
 
   confirmYourAgeText: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.#AgeVerificationPageText.#AgeVerificationPageHeader',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.1.#AgeVerificationPageText.#AgeVerificationPageHeader',
   },
 
   ageGateHeaderInRegistrationFlow: {

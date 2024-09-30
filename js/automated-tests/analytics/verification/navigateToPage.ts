@@ -683,7 +683,7 @@ export async function verifyC21262(id) {
 export async function verifyC63513(tag) {
 	expect(tag.split(' ')[2]).equal('Series');
 }
-export async function verifyC76713(category) {
+export async function verifyC690749(category) {
 	let eventNavigateToPage;
 	let i = 1;
 	while (eventNavigateToPage === undefined && i < 20) {
@@ -699,7 +699,7 @@ export async function verifyC76713(category) {
 	}
 	expect(eventNavigateToPage.navigate_to_page.category_list_page).to.be.empty;
 	expect(
-		eventNavigateToPage.navigate_to_page.dest_category_page.category_slug
+		eventNavigateToPage.navigate_to_page.category_component.category_slug
 	).equal(
 		category,
 		`event should navigate_to_page.dest_category_page.category_slug===action, Event: \n

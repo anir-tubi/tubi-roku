@@ -15,12 +15,11 @@ import {
 } from '../verification/pageLoad';
 import {
 	verifyC112682,
-	verifyC76713,
+	verifyC690749,
 	verifyC112683,
 } from '../verification/navigateToPage';
 
 import {
-	verifyC543705,
 	verifyC76717,
 	verifyC76715NavigateWithinPage,
 } from '../verification/navigateWithinPageVerification';
@@ -53,8 +52,7 @@ describe('Page Load Analytics', function () {
 		await verifyC112682();
 		await verifyC543704(slugCategory);
 		await verifyC543703();
-		await verifyC543705(slugCategory);
-		await verifyC76713(slugCategory);
+		await verifyC690749(slugCategory);
 	});
 	it('When channels page displayed C76715 and C76716 and C76717 and C3859 and UI: C44199 @analyticsASet3,@analyticsPageLoad', async () => {
 		const homePage = HomePage();
