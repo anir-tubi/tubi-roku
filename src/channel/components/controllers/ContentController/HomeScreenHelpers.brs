@@ -114,9 +114,13 @@ End Function
 Function processHomeScreenBatchResponse(response, screenId)
   homeScreen = getFromScreenCache(screenId)
   if homeScreen <> invalid
-    
+
     containerRow = m.nodeHelpers.getChildById(response, m.constants.ui.categoryIds.purpleCarpet)
     if containerRow <> invalid
+      if m.isFoxPlayerLoadRequired = true then
+        loadFoxVideoPlayerComponentLibrary()
+      end if
+
       response.removeChild(containerRow)
       updatePurpleCarpetRowContent(homeScreen, containerRow)
     end if
@@ -124,7 +128,7 @@ Function processHomeScreenBatchResponse(response, screenId)
     ' We have 2 different settings which are using to pick a row from response to be eligible for spotlight row.
     ' spotlightContainerIndex - Holds the value of the position in the home response.
     ' categoryIds.spotlight - Holds the slug of the container that we need to match.
-    ' The reason for choosing 2 setting is to provide flexibility and protection such that if backend returns a different container at spotlightContainerIndex than we could display a 
+    ' The reason for choosing 2 setting is to provide flexibility and protection such that if backend returns a different container at spotlightContainerIndex than we could display a
     ' different variant or experiment and have the container mentioned in categoryIds.spotlight fallback to default landscape variant.
     if homeScreen.purpleCarpetContent = invalid
       containerRow = response.getChild(m.constants.ui.spotlightContainerIndex)
@@ -466,7 +470,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     '      ...
     '   </CategoryContentNode>
     ' </CategoryContentNode>
-    
+
 
     containerRow = m.nodeHelpers.getChildById(rawResponse, m.constants.ui.categoryIds.purpleCarpet)
     if containerRow <> invalid
@@ -477,7 +481,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     ' We have 2 different settings which are using to pick a row from response to be eligible for spotlight row.
     ' spotlightContainerIndex - Holds the value of the position in the home response.
     ' categoryIds.spotlight - Holds the slug of the container that we need to match.
-    ' The reason for choosing 2 setting is to provide flexibility and protection such that if backend returns a different container at spotlightContainerIndex than we could display a 
+    ' The reason for choosing 2 setting is to provide flexibility and protection such that if backend returns a different container at spotlightContainerIndex than we could display a
     ' different variant or experiment and have the container mentioned in categoryIds.spotlight fallback to default landscape variant.
     if homeScreen.purpleCarpetContent = invalid
       containerRow = rawResponse.getChild(m.constants.ui.spotlightContainerIndex)
@@ -489,7 +493,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
 
     homeScreen.personalizationId = rawResponse.personalizationId
     homeScreen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
-    
+
     homeScreen.content = rawResponse
     homeScreen.contentUpdated = true
 
@@ -828,7 +832,7 @@ Function onContentSelected(msg)
   content = msg.getData()
   homeScreen = msg.getRoSGNode()
   m.autoplayContext = homeScreen.currCategoryId
-  
+
   contentType = content.type
   if contentType = m.constants.ui.contentTypes.purpleCarpetEvent AND homeScreen.purpleCarpetContent <> invalid
     processPlayEvent(content, homeScreen)

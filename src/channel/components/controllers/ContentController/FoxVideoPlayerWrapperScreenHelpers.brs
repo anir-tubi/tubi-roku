@@ -39,10 +39,7 @@ Function playLinearVideoWithFoxPlayer(content)
 
     ' If we haven't retrieved the fox player yet then start loading it
     if m.isFoxPlayerLoadRequired = true
-      m.isFoxPlayerLoadRequired = false
-      componentLibrary = m.top.createChild("ComponentLibrary")
-      componentLibrary.observeField("loadStatus", "onFoxVideoPlayerComponentLibraryLoadStatus")
-      componentLibrary.uri = m.constants.settings.foxVideoPlayerComponentsUrl
+      loadFoxVideoPlayerComponentLibrary()
     else if m.foxRpfInstance <> invalid then
       ' If the fox player has finished loading then we can start playing the video. We check for this by looking if m.foxRpfInstance has been set which we set after load is completed. Else we will wait for the load to complete with the already set onFoxVideoPlayerComponentLibraryLoadStatus observer
       foxVideoPlayerWrapperScreen.isFoxVideoPlayerAvailable = true
@@ -50,6 +47,15 @@ Function playLinearVideoWithFoxPlayer(content)
 
     getChannelCurrentContentId()
   end if
+End Function
+
+
+Function loadFoxVideoPlayerComponentLibrary()
+  tubiLog("loadFoxVideoPlayerComponentLibrary")
+  m.isFoxPlayerLoadRequired = false
+  componentLibrary = m.top.createChild("ComponentLibrary")
+  componentLibrary.observeField("loadStatus", "onFoxVideoPlayerComponentLibraryLoadStatus")
+  componentLibrary.uri = m.constants.settings.foxVideoPlayerComponentsUrl
 End Function
 
 
