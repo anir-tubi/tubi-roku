@@ -177,7 +177,8 @@ Function populateCtaButtonList()
         subType: "DetailMenuItemContentNode"
         title: getTranslation(reminderTranslationId)
         iconUrl: "pkg:/images/reminder-set.webp"
-        isPrimaryButton: (isContentDetailsView = true)
+        ' Making the button primary only if this button is the only button that is being displayed.
+        isPrimaryButton: (menuItems.count() = 0)
       })
     end if
 

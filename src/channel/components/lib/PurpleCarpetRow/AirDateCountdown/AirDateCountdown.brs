@@ -1,5 +1,6 @@
 Function init()
   topRef = m.top
+  m.nodeHelpers = TubiNodeHelpers()
   m.elementsGroup = topRef.findNode("elementsGroup")
   m.airDate = topRef.findNode("airDate")
   m.day = topRef.findNode("day")
@@ -63,64 +64,69 @@ Function updateUI()
   airDatetime.toLocalTime()
 
   airDateMonth = airDatetime.GetMonth()
-  if airDateMonth < 10
-    monthStr = "0" + airDateMonth.toStr()
-  else
-    monthStr = airDateMonth.toStr()
-  end if
-
   airDateDay = airDatetime.getDayOfMonth()
-  if airDateDay < 10
-    dayStr = "0" + airDateDay.toStr()
-  else
-    dayStr = airDateDay.toStr()
-  end if
 
   ' Checking if the current day and air date are same.
   if airDateMonth = currentMonth AND airDateDay = currentDayOfMonth
     formattedTime = airDatetime.asTimeStringLoc("h:mm a")
     m.dateText.text = getTranslation("live_on_date_today", {"time": formattedTime})
   else
-    m.dateText.text = getTranslation("live_on_date", {"month": monthStr, "day": dayStr})
+    formattedMonth = airDatetime.asDateStringLoc("MMM")
+    formattedMonth = UCase(formattedMonth)
+
+    formattedDay = airDatetime.asDateStringLoc("d")
+    
+    m.dateText.text = getTranslation("live_on_date", {"day": formattedDay, "month": formattedMonth})
   end if
 
-  remainingDays = airDateDay - currentDayOfMonth
   secondsUntilAirTime = airDatetime.asSeconds() - currentDatetime.asSeconds()
-  
   if secondsUntilAirTime > 0
-    if remainingDays > 0
-      remainingSeconds = secondsUntilAirTime mod 86400
-      hour = Cint(remainingSeconds / 3600)
-  
-      remainingSeconds = secondsUntilAirTime mod 3600
-      minutes = Cint(remainingSeconds / 60)
-      
-      if remainingDays < 10
-        m.dayText.text = getTranslation("live_on_day", {"day": remainingDays.toStr()})
-      else
-        m.dayText.text = getTranslation("live_on_day", {"day": "0" + remainingDays.toStr()})
+    
+    ' Finding difference between dates in number of days.
+    remainingDays = Fix(secondsUntilAirTime / 86400)
+
+    ' Adding a check to see if it just 24 hours and some minutes so that we do not display like 1 day and 30 mins instead display 24 hours and 30 mins.
+    remainingHours = Fix(secondsUntilAirTime / 3600)
+
+    remainingSeconds = secondsUntilAirTime mod 86400
+    hour = Fix(remainingSeconds / 3600)
+    remainingSeconds = secondsUntilAirTime mod 3600
+    minutes = Fix(remainingSeconds / 60)
+
+    ' Position of components within the elementsgroup
+    ' 0 - air date string for ex: displays like LIVE ON SEP 28
+    ' 1 - remaining days until the air date
+    ' 2 - remaining hours until the air date
+    ' 3 - remaining minutes until the air date.
+
+    ' Since we re-use the same info panel between different items and we remove the fields if we do not have values we need to make sure they are added if needed.
+    if remainingDays > 0 AND remainingHours > 24
+      if m.nodeHelpers.getChildIndex(m.elementsGroup, m.day) = -1
+        m.elementsGroup.insertChild(m.day, 1)
       end if
-  
-      m.hourText.text = getTranslation("live_on_hour", {"hour": hour.toStr()})
-      m.minuteText.text = getTranslation("live_on_minute", {"min": minutes.toStr()})
+      m.dayText.text = getTranslation("live_on_day", {"day": remainingDays.toStr()})
     else
       m.elementsGroup.removeChild(m.day)
-      
-      hour = Cint(secondsUntilAirTime / 3600)
-      minutes = Cint(secondsUntilAirTime / 60)
-  
-      if hour > 0
-        m.hourText.text = getTranslation("live_on_hour", {"hour": hour.toStr()})
-      else
-        m.elementsGroup.removeChild(m.hour)
+    end if
+    
+    if hour > 0
+      if m.nodeHelpers.getChildIndex(m.hour, m.hour) = -1
+        m.elementsGroup.insertChild(m.hour, 2)
       end if
-      
-      ' If both hour and minute is zero removing the minute.
-      if minutes > 0 OR hour > 0
-        m.minuteText.text = getTranslation("live_on_minute", {"min": minutes.toStr()})
-      else
-        m.elementsGroup.removeChild(m.minute)
+      m.hourText.text = getTranslation("live_on_hour", {"hour": hour.toStr()})
+    else
+      m.elementsGroup.removeChild(m.hour)
+    end if
+
+    ' If both hour and minute is zero removing the minute.
+    if minutes > 0 OR hour > 0
+      if m.nodeHelpers.getChildIndex(m.minute, m.hour) = -1
+        m.elementsGroup.insertChild(m.minute, 3)
       end if
+
+      m.minuteText.text = getTranslation("live_on_minute", {"min": minutes.toStr()})
+    else
+      m.elementsGroup.removeChild(m.minute)
     end if
     
     padding = 32
