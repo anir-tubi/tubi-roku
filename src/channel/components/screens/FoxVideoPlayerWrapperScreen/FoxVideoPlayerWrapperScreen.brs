@@ -81,3 +81,14 @@ Function buildPlayerInfo(contentId)
     node: videoContentNode,
   }
 End Function
+
+
+Function onKeyEvent(key as String, press as Boolean) as Boolean
+  if press = true AND key = "back" then
+    ' If we call close on the fox player, it will clear out the playPosition which we don't want
+    m.top.isPlayerClosed = true
+    return true
+  end if
+
+  return false
+End Function

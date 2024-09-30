@@ -285,6 +285,12 @@ Function addControllerUi()
   ' Stores a reference to the fox provided video player interface node
   m.foxRpfInstance = invalid
 
+  ' The position we last sent fox player progress from
+  m.lastSentFoxPlayerProgressPosition = 0
+
+  ' The content that is currently being used as input to play with the fox video player
+  m.foxPlayerCurrentInputContent = invalid
+
   ' The following fields are needed as a part of getUserInfo
   m.getHistoryIdsResponseReceived = false ' Have we received a response for history ids call (success or failure)
   m.getQueueIdsResponseReceived = false ' Have we received a response for getQueueIds call (success or failure)

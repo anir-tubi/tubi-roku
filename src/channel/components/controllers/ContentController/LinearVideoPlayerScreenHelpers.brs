@@ -19,7 +19,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
     if isNonEmptyString(content.playerType) = true AND content.playerType = "fox"
       if bMinimized = false then
         ' We only load when fullscreen
-        playLinearVideoWithFoxPlayer()
+        playLinearVideoWithFoxPlayer(content)
       end if
     else
       ' we make changes to the content from this point forward. If we don't clone, those changes will initialize
@@ -52,7 +52,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
           videoPlayer.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
           videoPlayer.observeFieldScoped("channelLikeDislikeInfo", "onChannelLikeDislikeInfo")
           videoPlayer.observeFieldScoped("linearOverlayLiteComponentInteractionInfo", "onComponentInteractionInfoChange")
-          videoPlayer.observeFieldScoped("trackingLoggingEvent", "ontrackingLoggingEvent")
+          videoPlayer.observeFieldScoped("trackingLoggingEvent", "onTrackingLoggingEvent")
 
           observeUpdateAuth(videoPlayer.task)
 
@@ -931,7 +931,7 @@ Function handleBackToEPGScreen(content, screenId)
 End Function
 
 
-Function ontrackingLoggingEvent(event)
+Function onTrackingLoggingEvent(event)
   trackEvent = event.getData()
 
   if event <> invalid

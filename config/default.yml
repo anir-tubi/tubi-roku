@@ -45,10 +45,6 @@ settings:
   # Setting the below value to true will turn off hdmi status checks to avoid issues with automated tests on Roku devices not hooked up to a display
   disableHdmiStatusChecks: false
 
-  # TODO remove after integrated with UI changes
-  # Used to switch linear player to use Fox video player for testing purposes
-  useFoxVideoPlayer: false
-
   # Any configs added to the bs_const setting will be included in the various manifest
   # configurations via the handlebars templates
   bs_const:

@@ -1,30 +1,55 @@
-Function playLinearVideoWithFoxPlayer()
-  ' Used to route fox player watch call through Charles
-  ' m.global.update({
-  '   proxyParameters: {
-  '     "isProxyEnabled": true
-  '     "proxyIp": "192.168.10.117"
-  '   }
-  ' }, true)
+' Call to play linear video with fox player
+' @param content: The content we want to play as returned by homescreen and container endpoints
+Function playLinearVideoWithFoxPlayer(content)
+  if isNode(content) = false then
+    tubiLog("playLinearVideoWithFoxPlayer content is not a node")
+  else
+    ' Used to route fox player watch call through Charles
+    ' m.global.update({
+    '   proxyParameters: {
+    '     "isProxyEnabled": true
+    '     "proxyIp": "192.168.10.117"
+    '   }
+    ' }, true)
 
-  ' We immediately show the player screen so we can show the loading spinner but have to wait until we are ready to actually try playing video
-  foxVideoPlayerWrapperScreen = createObject("roSGNode", "FoxVideoPlayerWrapperScreen")
-  foxVideoPlayerWrapperScreen.id = m.constants.ui.screenIds.foxVideoPlayerWrapperScreen
-  ' TODO revisit sending analytic events once we figure out correct values to send
-  pushScreen(foxVideoPlayerWrapperScreen, false, false)
+    ' We immediately show the player screen so we can show the loading spinner but have to wait until we are ready to actually try playing video
+    m.foxPlayerCurrentInputContent = content
 
-  ' If we haven't retrieved the fox player yet then start loading it
-  if m.isFoxPlayerLoadRequired = true
-    m.isFoxPlayerLoadRequired = false
-    componentLibrary = m.top.createChild("ComponentLibrary")
-    componentLibrary.observeField("loadStatus", "onFoxVideoPlayerComponentLibraryLoadStatus")
-    componentLibrary.uri = m.constants.settings.foxVideoPlayerComponentsUrl
-  else if m.foxRpfInstance <> invalid then
-    ' If the fox player has finished loading then we can start playing the video. We check for this by looking if m.foxRpfInstance has been set which we set after load is completed. Else we will wait for the load to complete with the already set onFoxVideoPlayerComponentLibraryLoadStatus observer
-    foxVideoPlayerWrapperScreen.isFoxVideoPlayerAvailable = true
+    m.lastSentFoxPlayerProgressPosition = 0
+
+    event = {
+      type: "start_live_video"
+      values: {
+        video_id: content.id.toInt()
+        has_subtitles: ""
+        video_player: "DEFAULT"
+        video_codec_type: ""
+        video_resolution: ""
+        is_fullscreen: true
+        input_device: "UNKNOWN_DEVICE"
+      }
+    }
+
+    m.trackingLoggingTask.trackEvent = event
+
+    foxVideoPlayerWrapperScreen = createObject("roSGNode", "FoxVideoPlayerWrapperScreen")
+    foxVideoPlayerWrapperScreen.id = m.constants.ui.screenIds.foxVideoPlayerWrapperScreen
+    foxVideoPlayerWrapperScreen.observeFieldScoped("isPlayerClosed", "onFoxVideoPlayerIsPlayerClosed")
+    pushScreen(foxVideoPlayerWrapperScreen, false, false)
+
+    ' If we haven't retrieved the fox player yet then start loading it
+    if m.isFoxPlayerLoadRequired = true
+      m.isFoxPlayerLoadRequired = false
+      componentLibrary = m.top.createChild("ComponentLibrary")
+      componentLibrary.observeField("loadStatus", "onFoxVideoPlayerComponentLibraryLoadStatus")
+      componentLibrary.uri = m.constants.settings.foxVideoPlayerComponentsUrl
+    else if m.foxRpfInstance <> invalid then
+      ' If the fox player has finished loading then we can start playing the video. We check for this by looking if m.foxRpfInstance has been set which we set after load is completed. Else we will wait for the load to complete with the already set onFoxVideoPlayerComponentLibraryLoadStatus observer
+      foxVideoPlayerWrapperScreen.isFoxVideoPlayerAvailable = true
+    end if
+
+    getChannelCurrentContentId()
   end if
-
-  getChannelCurrentContentId()
 End Function
 
 
@@ -50,9 +75,9 @@ Function onFoxVideoPlayerComponentLibraryLoadStatus(msg)
 
         if foxRpfInstance.playerEvent <> invalid then
           foxRpfInstance.playerEvent.observeFieldScoped("liveAssetInfo", "onFoxVideoPlayerliveAssetInfoChange")
+          foxRpfInstance.playerEvent.observeFieldScoped("playerPosition", "onFoxVideoPlayerPlayerPositionChange")
         end if
 
-        foxRpfInstance.observeFieldScoped("playerEvent", "onFoxVideoPlayerEvent")
         foxRpfInstance.observeFieldScoped("analyticsEvent", "onFoxVideoPlayerAnalyticsEvent")
         foxRpfInstance.observeFieldScoped("playbackAnalyticsEvent", "onFoxVideoPlayerPlaybackAnalyticsEvent")
         foxRpfInstance.observeFieldScoped("playerLoaded", "onFoxVideoPlayerLoaded")
@@ -470,11 +495,6 @@ Function getFoxVideoPlayerConfig()
   return config
 End Function
 
-
-Function onFoxVideoPlayerEvent(msg)
-  print "onFoxVideoPlayerEvent " msg.getData()
-End Function
-
 Function onFoxVideoPlayerAnalyticsEvent(msg)
   print "onFoxVideoPlayerAnalyticsEvent " msg.getData()
 End Function
@@ -497,6 +517,41 @@ End Function
 
 Function onFoxVideoPlayerliveAssetInfoChange(msg)
   print "onFoxVideoPlayerliveAssetInfoChange " msg.getData()
+End Function
+
+
+Function onFoxVideoPlayerPlayerPositionChange(msg)
+  position = msg.getData()
+  sendFoxVideoPlayerLivePlayProgressEvent(position)
+End Function
+
+
+' Sends the live play progress event to TrackingLoggingTask
+' @param position: The current position of the video player
+' @param alwaysSend: If true, the event will be sent even if the view time is less than 10 seconds
+Function sendFoxVideoPlayerLivePlayProgressEvent(position, alwaysSend = false)
+  if isNumber(position) = false then
+    tubiLog("sendFoxVideoPlayerLivePlayProgressEvent position is not a number")
+  else
+    viewTime = position - m.lastSentFoxPlayerProgressPosition
+    if m.foxPlayerCurrentInputContent <> invalid AND (viewTime >= 10 OR (alwaysSend AND viewTime > 0)) then
+      event = {
+        type: "live_play_progress"
+        values: {
+          video_id: m.foxPlayerCurrentInputContent.id.toInt()
+          has_subtitles: ""
+          video_player: "DEFAULT"
+          video_codec_type: ""
+          video_resolution: ""
+          is_fullscreen: true
+          view_time: viewTime
+        }
+      }
+
+      m.trackingLoggingTask.trackEvent = event
+      m.lastSentFoxPlayerProgressPosition = position
+    end if
+  end if
 End Function
 
 
@@ -544,13 +599,18 @@ End Function
 Function closeFoxVideoPlayer()
   foxVideoPlayerWrapperScreen = getScreenFromStackById(m.constants.ui.screenIds.foxVideoPlayerWrapperScreen)
   if foxVideoPlayerWrapperScreen <> invalid then
-    foxVideoPlayerWrapperScreen.observeFieldScoped("isPlayerClosed", "onFoxVideoPlayerIsPlayerClosed")
     foxVideoPlayerWrapperScreen.closePlayer = true
   end if
 End Function
 
 
 Function onFoxVideoPlayerIsPlayerClosed()
+  if m.foxRpfInstance <> invalid AND m.foxRpfInstance.playerEvent <> invalid then
+    sendFoxVideoPlayerLivePlayProgressEvent(m.foxRpfInstance.playerEvent.playerPosition, true)
+  end if
+
+  m.foxPlayerCurrentInputContent = invalid
+
   if getScreenStackSize() > 1 then
     removeTopMostScreenWithIDFromStack(m.constants.ui.screenIds.foxVideoPlayerWrapperScreen)
   else
