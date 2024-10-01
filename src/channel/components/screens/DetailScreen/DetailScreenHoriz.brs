@@ -348,14 +348,18 @@ End Function
 
 Function onResumePointChange()
   tubiLog("DetailScreen.onResumePointChange")
+
   menuItems = m.Menu.content
   resumeIndex = m.NodeHelpers.getChildIndexById(menuItems, m.ResumeMenuItem.id)
-
   m.ResumeMenuItem.playstart = m.top.resumePoint
+
   if resumeIndex = -1 AND m.top.resumePoint > 0
     menuItems.insertChild(m.ResumeMenuItem, 0)
   else if resumeIndex > -1 AND m.top.resumePoint = 0
     menuItems.removeChildIndex(resumeIndex)
+    stringPlayButton = getTranslation("screenDetails_button_play")
+    changeButtonText("stringPlayButton", stringPlayButton)
+    m.PlayMenuItem.iconUrl = "pkg:/images/icon-play.webp"
   end if
 
   'keep the sign up button at the 2 nd place
@@ -478,11 +482,12 @@ End Function
 
 Function onIsHistory()
   tubiLog("DetailScreen.onIsHistory")
-  'if removing from history, remove the resume button
-  resumeIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.ResumeMenuItem.id)
 
   bHasHistory = m.top.isHistory
+
   if bHasHistory = false
+    'if removing from history, remove the resume button
+    resumeIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.ResumeMenuItem.id)
     addRemoveMenuItem(bHasHistory, resumeIndex)
   end if
 
