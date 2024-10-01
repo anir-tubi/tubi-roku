@@ -186,10 +186,13 @@ Function addControllerUi()
     setFirstVisit()
   end if
 
-  m.authInfoRefreshed = true 'is the auth info refreshed after receiving a deeplink with a refresh token
+  m.authInfoNeedsRefreshing = false 'does the auth info need to be refreshed after receiving a deeplink with a refresh token
   m.ageVerificationComplete = false 'has the user verified their age?
   m.getServerPersistentDataComplete = false 'did we finish fetching serverPersistentData. either user/device based on user logged in status.
 
+  ' used to keep state if we went through the process to refresh auth after receiving a transfer token from
+  ' a mobile device deeplink. Used to determine if we should show a toast message or not.
+  m.authInfoRefreshed = false
 
   ' indicates if we are building the app in a deep link state
   ' is set to true when a deeplink occurs, and set back to false after the deeplink has been handled
@@ -653,7 +656,7 @@ Function runControllerStartSequence()
     ' in addControllerUi() is run due to m.cmsApi needing to be set before
     ' calling handleStartupArgs()
     handleStartUpArgs()
-  else if m.authInfoRefreshed <> true
+  else if m.authInfoNeedsRefreshing = true
     ' External refresh token was passed in (ie. from mobile) and we are waiting for the network request with the updated auth info to proceed
   else if m.isConsentCheckComplete <> true
     ' Below logic handles the use case where in the previous session if the user entered a age less than 18.
@@ -721,6 +724,11 @@ Function runControllerStartSequence()
     initSideNav()
 
     showContentGroupAndHideSpinner()
+
+    if m.authInfoRefreshed = true
+      showToastAfterAuthRefreshFromMobile()
+      m.authInfoRefreshed = false
+    end if
 
     sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
     sendDeviceEnvironmentSettingsLog()
@@ -796,7 +804,7 @@ Function handleStartUpArgs()
     ' Next make sure we have valid external auth info
     if externalAuthInfo <> invalid
       ' If so we want to let runControllerStartSequence know that it shouldn't continue until we have the updated auth info
-      m.authInfoRefreshed = false
+      m.authInfoNeedsRefreshing = true
 
       m.tubiAuthUpdate.transferRefreshToken(externalAuthInfo, onAuthInfoRefreshed)
     end if
@@ -866,6 +874,7 @@ End Function
 ' auth info has been added/refreshed after a deeplink from a "casting" device that contained a refreshToken
 Function onAuthInfoRefreshed()
   tubiLog("ContentController.onAuthInfoRefreshed")
+  m.authInfoNeedsRefreshing = false
   m.authInfoRefreshed = true
   refreshUserInfoAndRunControllerStartSequence()
 End Function
@@ -3090,5 +3099,29 @@ Function resetCategoryGridPosition()
   homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
   if homeScreen <> invalid
     homeScreen.resetGridPosition = true
+  end if
+End Function
+
+
+Function showToastAfterAuthRefreshFromMobile()
+  authInfo = m.tubiAuthUpdate.getAuthInfo()
+
+  if isLoggedInUser(authInfo) = true
+    email = ""
+    if m.pub_serverPersistentData.email <> invalid
+      email = m.pub_serverPersistentData.email
+    end if
+
+    message = getTranslation("auth_refresh_welcome_message", {email: email})
+    headerText = getTranslation("auth_refresh_welcome_header")
+
+    toastInfo = {
+      message: message
+      selfDestructTimer: 7
+      imageUri: "pkg:/images/sideNavAccountFilled.webp"
+      headerText: headerText
+    }
+
+    showToast(toastInfo)
   end if
 End Function

@@ -1472,9 +1472,7 @@ Function setDetailScreenLikeDislikeStateFromLikeAction(detailScreen, sLikeAction
       }
 
       showToast(toastInfo, true, dialogEventInfo)
-
     else if sLikedState = m.constants.ui.likeDislikeStates.disliked AND m.pub_serverPersistentData.isDisLikeToastNotificationShown = false
-
       saveServerPersistentData({
         "isDisLikeToastNotificationShown": true
       }, "device")
@@ -1500,7 +1498,6 @@ Function setDetailScreenLikeDislikeStateFromLikeAction(detailScreen, sLikeAction
       }
 
       showToast(toastInfo, true, dialogEventInfo)
-
     end if
   end if
 

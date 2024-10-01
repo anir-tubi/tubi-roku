@@ -43,6 +43,7 @@ Function getTranslation(sID as string, aDynamicStrings = {}) as String
 
   for each param in aDynamicStrings
     sToString = aDynamicStrings[param]
+
     if param <> invalid AND sToString <> invalid
       '//place dynamic text in the translation. Look for and replace brackets {} with the dynamic string
       sFromString = "{" + param + "}"
@@ -1946,6 +1947,14 @@ Function getTranslation_en_US()
     "watch_for_free": {
       "description": "Sign in to watch live button label.",
       "message": "Watch free on {date}."
+    },
+    "auth_refresh_welcome_message": {
+      "description": "A message that let's the user know they've been signed in with the given email",
+      "message": "Signed in as {email}"
+    },
+    "auth_refresh_welcome_header": {
+      "description": "A header for the message that let's the user know they've been signed in with the given email",
+      "message": "Welcome!"
     }
   }
 End Function
