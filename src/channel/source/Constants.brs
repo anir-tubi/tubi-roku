@@ -1206,12 +1206,12 @@ Function getConstants()
       constants.ui.screenLevels.eventDetailScreen = 50
       constants.ui.screenLevels.videoPlayerScreen = 60
       constants.ui.screenLevels.linearVideoPlayerScreen = 60
+      constants.ui.screenLevels.foxVideoPlayerWrapperScreen = 60
       constants.ui.screenLevels.emailInputScreen = 90
       constants.ui.screenLevels.signInScreen = 90
       constants.ui.screenLevels.ageGateScreen = 90
       constants.ui.screenLevels.consentScreen = 120
       constants.ui.screenLevels.rokuContinueWatchingConsentScreen = 120
-      constants.ui.screenLevels.foxVideoPlayerWrapperScreen = 120
       constants.ui.screenLevels.managePreferencesScreen = 130
       constants.ui.screenLevels.screensaverScreen = 1100
 

@@ -1,6 +1,9 @@
 Function init()
   constants = getConstantsFromGlobal()
   topRef = m.top
+
+  topRef.screenLevel = constants.ui.screenLevels.eventDetailScreen
+
   m.detailsPurpleCarpetRow = topRef.findNode("detailsPurpleCarpetRow")
   m.detailsPurpleCarpetRow.translation = [constants.ui.translations.marginX, 516]
 

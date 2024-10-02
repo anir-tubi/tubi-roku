@@ -6,7 +6,7 @@
 
   <interface>
     <!-- INPUTS -->
-      <!-- When the Helper receives valid category data from the server, it sets the new value to this field. -->
+      <!-- Holds the purple carpet container node. The data will be formatted in the same format as a content node passed to rowlist. It can have a single child or multiple childrens depending on how many items gets returned from backend. -->
       <field id="content" type="node" />
 
       <!-- id of the event or program for which we are displaying the details screen. -->

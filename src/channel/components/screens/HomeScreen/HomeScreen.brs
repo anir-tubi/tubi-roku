@@ -487,6 +487,8 @@ Function onItemToBeFocusedChange()
   m.top.contentFocused = reloadedItemToBeFocused
 
   if reloadedItemToBeFocused <> invalid AND reloadedItemToBeFocused.gridItemType <> m.constants.ui.gridItemTypes.spotlight AND reloadedItemToBeFocused.gridItemType <> m.constants.ui.gridItemTypes.purpleCarpet
+    ' Covers use cases where info panel was hidden but due to home screen container changes purple carpet or spotlight is removed and info panel was reset.
+    fadeInContentArea()
     populateInfoPanelByContent(reloadedItemToBeFocused)
   end if
 End Function

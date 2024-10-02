@@ -20,7 +20,7 @@ Function init()
   topRef.observeFieldScoped("contentUpdated", "onContentChange")
   topRef.observeField("focusedChild", "onComponentFocusChange")
   topRef.observeFieldScoped("signedIn", "populateCtaButtonList")
-  topRef.observeFieldScoped("didUserSetReminderForEventContent", "populateCtaButtonList")
+  topRef.observeFieldScoped("didUserSetReminderForEventContent", "onDidSetReminderForEventContentChange")
 
   experimentsInfo = getExperimentsInfoFromGlobal()
   experiments = TubiExperiments(experimentsInfo)
@@ -58,9 +58,9 @@ End Function
 
 Function onComponentFocusChange()
   if m.top.hasFocus() = true
-    if m.lastFocusedElement = "ctaButtonList"
+    if m.lastFocusedElement = "ctaButtonList" OR m.rowList.content = invalid
       m.ctaButtonList.setFocus(true)
-    else
+    else if m.rowList.content <> invalid
       m.rowList.setFocus(true)
     end if
   end if
@@ -69,26 +69,38 @@ End Function
 
 Function onContentChange()
   m.top.primaryEventContent = invalid
+  m.rowList.content = invalid
   if m.top.content <> invalid then
     ' Creating a clone to avoid modifying the original content node.
-    content = m.top.content.clone(true)
-    category = content.getChild(0)
+    rowListContent = m.top.content.clone(true)
+    category = rowListContent.getChild(0)
     primaryEventContent = category.getChild(0)
     category.removeChild(primaryEventContent)
-    primaryEventContent = m.metadataTranslate.getContentFromCategoryJson(category, primaryEventContent.id, m.top.signedIn)
-    m.rowList.content = content
+    
+    ' field with key "json" is a json string that holds the complete response from the container api request.
+    ' Even though we are removing primary event from the category container on line number 78, "json" field will hold the complete response from backend.
+    singleContent = m.metadataTranslate.getContentFromCategoryJson(category, primaryEventContent.id, m.top.signedIn)
+    if singleContent <> invalid
+      primaryEventContent = singleContent
+    end if
 
-    spotlightSize = m.constants.ui.imageSizes.largeLandscape
-    posterHeight = spotlightSize[1]
-    m.rowList.update({
-      "itemSize" : [771, posterHeight]
-      "rowItemSize": [spotlightSize]
-      "rowHeights": [posterHeight]
-    })
-    m.top.primaryEventContent = primaryEventContent
+    if category.getChildCount() > 0
+      size = m.constants.ui.imageSizes.largeLandscape
+      posterHeight = size[1]
+      m.rowList.update({
+        "content": rowListContent
+        "itemSize" : [771, posterHeight]
+        "rowItemSize": [size]
+        "rowHeights": [posterHeight]
+      })
+    end if
 
-    populateCtaButtonList()
-    populateInfoPanelWithPurpleCarpetMode(m.top.primaryEventContent, m.infoPanel)
+    if primaryEventContent <> invalid
+      m.top.primaryEventContent = primaryEventContent
+
+      populateCtaButtonList()
+      populateInfoPanelWithPurpleCarpetMode(m.top.primaryEventContent, m.infoPanel)
+    end if
   end if
 End Function
 
@@ -168,15 +180,17 @@ Function populateCtaButtonList()
     if isEventToday = false
       if m.top.didUserSetReminderForEventContent <> true
         reminderTranslationId = "screenDetails_button_set_reminder"
+        iconUrl = "pkg:/images/set-reminder.webp"
       else
         reminderTranslationId = "screenDetails_button_remove_reminder"
+        iconUrl = "pkg:/images/reminder-set.webp"
       end if
 
       menuItems.push({
         id: "reminder"
         subType: "DetailMenuItemContentNode"
         title: getTranslation(reminderTranslationId)
-        iconUrl: "pkg:/images/reminder-set.webp"
+        iconUrl: iconUrl
         ' Making the button primary only if this button is the only button that is being displayed.
         isPrimaryButton: (menuItems.count() = 0)
       })
@@ -188,6 +202,12 @@ Function populateCtaButtonList()
     }, true)
     m.ctaButtonList.content = content
     updateMenuWidths()
+
+    ' Making sure when we refresh the button list we set the focus back to where it was focused.
+    itemFocused = m.ctaButtonList.itemFocused
+    if itemFocused <> invalid AND itemFocused >= 0
+      m.ctaButtonList.jumpToItem = itemFocused
+    end if
   end if
 End Function
 
@@ -224,6 +244,18 @@ Function onCtaListItemSelected(msg)
     if item <> invalid
       m.top.ctaListItemSelected = item.id
     end if
+  end if
+End Function
+
+
+Function onDidSetReminderForEventContentChange(msg)
+  reminderIsSet = msg.getData()
+
+  populateCtaButtonList()
+
+  if m.infoPanel <> invalid
+    ' Triggering a info panel update to display reminder state.
+    m.infoPanel.reminderIsSet = reminderIsSet
   end if
 End Function
 

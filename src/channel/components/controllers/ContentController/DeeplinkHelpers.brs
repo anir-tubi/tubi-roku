@@ -236,13 +236,8 @@ Function handleDeeplinkContentByType()
   tubilog("deeplinkHelpers.handleDeeplinkContentByType")
   if m.deepLinkContent <> invalid
     if m.deepLinkContent.deeplinkType = "linear" OR m.deepLinkContent.deeplinkType = "liveTV"
-      'if fadeInContentController is still playing, then linear content can not play.
-      'in that case, consider handling the linear deeplink content after fade in animation is over in onFadeInContentController
-      if m.top.fadeInContentController = true
-        handleLinearDeeplinkContent()
-      else
-        m.linearScreenAfterFn = handleLinearDeeplinkContent
-      end if
+      ' TODO: Remove the additional request and call startDeeplinkedLinearPlayback directly.
+      getSingleContentFromServer(m.deeplinkContent, onDeeplinkLiveTVContentSuccess, showDeeplinkErrorModal)
     else if m.deepLinkContent.deeplinkType = "category"
       handleCategoryDeeplinkContent()
     else if m.deepLinkContent.deeplinkType = "channel"
@@ -281,10 +276,8 @@ Function handleDeeplinkContentByType()
       showDetailScreen(m.deeplinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource)
 
     else if m.deepLinkContent.deeplinktype = "sports"
-      playbackSource = getPlaybackSourceForDeeplinkType()
-      showDetailScreen(m.deeplinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource)
-      sideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
-      focusSideNavOption(sideNavID)
+      ' TODO: Remove the additional request and call showSportsDetailsScreen directly.
+      getSingleContentFromServer(m.deeplinkContent, onDeeplinkSportsContentSuccess, showDeeplinkErrorModal)
     else
       message = getTranslation("error_deeplink_page")
       showDeeplinkErrorModal(invalid, message)
@@ -937,6 +930,59 @@ Function skipDetailScreenDeeplinkWrapper(refreshedContent)
     handleSingleContentDeeplinkError(invalid) 'if the content type is linear, then do not show detailScreen instead show error dialog.
   else
     skipDetailScreen(refreshedContent)
+  end if
+End Function
+
+
+' Callback triggered once the request to fetch sports event information succeeds.
+Function onDeeplinkSportsContentSuccess(content)
+  if content <> invalid
+    
+    if content.playerType = m.constants.ui.playerTypes.fox
+      processEventDeeplink(content)
+    else
+      showSportsDetailsScreen()
+    end if
+    
+  else
+    showDeeplinkErrorModal()
+  end if
+
+End Function
+
+
+' Callback triggered once the request to fetch sports event information succeeds.
+Function onDeeplinkLiveTVContentSuccess(content)
+  if content <> invalid
+    
+    if content.playerType = m.constants.ui.playerTypes.fox
+      processEventDeeplink(content)
+    else
+      startDeeplinkedLinearPlayback()
+    end if
+    
+  else
+    showDeeplinkErrorModal()
+  end if
+
+End Function
+
+
+Function showSportsDetailsScreen()
+  playbackSource = getPlaybackSourceForDeeplinkType()
+  showDetailScreen(m.deeplinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource)
+  sideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
+  focusSideNavOption(sideNavID)
+End Function
+
+
+Function startDeeplinkedLinearPlayback()
+  'if fadeInContentController is still playing, then linear content can not play.
+  'in that case, consider handling the linear deeplink content after fade in animation is over in onFadeInContentController
+  if m.top.fadeInContentController = true
+    handleLinearDeeplinkContent()
+  else
+    m.linearScreenAfterFn = handleLinearDeeplinkContent
   end if
 End Function
 

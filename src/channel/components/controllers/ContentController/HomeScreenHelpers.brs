@@ -476,6 +476,9 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     if containerRow <> invalid
       rawResponse.removeChild(containerRow)
       updatePurpleCarpetRowContent(homeScreen, containerRow)
+    else
+      homeScreen.purpleCarpetContent = invalid
+      homeScreen.purpleCarpetContentUpdated = true
     end if
 
     ' We have 2 different settings which are using to pick a row from response to be eligible for spotlight row.

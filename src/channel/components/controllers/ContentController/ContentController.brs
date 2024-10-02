@@ -294,6 +294,11 @@ Function addControllerUi()
   ' The content that is currently being used as input to play with the fox video player
   m.foxPlayerCurrentInputContent = invalid
 
+  ' Content node for a single purple carpet event. This is used in case of purple carpet event deeplinking and purple carpet banner click.
+  m.singlePurpleCarpetEventContentNode = invalid
+  ' Callback triggered once the event details was completely loaded. This is used in case of purple carpet event deeplinking and purple carpet banner click.
+  m.eventDetailsScreenLoadCompletionCallback = invalid
+
   ' The following fields are needed as a part of getUserInfo
   m.getHistoryIdsResponseReceived = false ' Have we received a response for history ids call (success or failure)
   m.getQueueIdsResponseReceived = false ' Have we received a response for getQueueIds call (success or failure)

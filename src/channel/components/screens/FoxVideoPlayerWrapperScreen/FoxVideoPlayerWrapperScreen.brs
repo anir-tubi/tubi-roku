@@ -1,6 +1,6 @@
 Function init()
   tubiLog("FoxVideoPlayerWrapperScreen.init")
-
+  constants = getConstantsFromGlobal()
   m.spinner = m.top.findNode("spinner")
 
   m.rpfPlaybackPage = invalid ' Stores a reference to the actual fox provided video player component
@@ -10,6 +10,8 @@ Function init()
   m.top.observeFieldScoped("isFoxVideoPlayerAvailable", "playContentWithFoxVideoPlayer")
 
   m.top.observeFieldScoped("closePlayer", "onClosePlayerChanged")
+  
+  m.top.screenLevel = constants.ui.screenLevels.foxVideoPlayerWrapperScreen
 End Function
 
 

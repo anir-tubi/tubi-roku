@@ -58,7 +58,7 @@
   <children>
     <Group>
       <Group id="infoPanelGroup"
-        translation="[0, 135]">
+        translation="[0, 147]">
         <InfoPanel
           id="infoPanel"
           maxHeight="354"
