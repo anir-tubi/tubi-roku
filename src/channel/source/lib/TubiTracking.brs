@@ -588,12 +588,12 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
     }
 
     account: {
-      manip: "" 'Manipulation enum - we only use "REGISTER_DEVICE" currently
+      manip: "" 'Manipulation enum
       current: "" 'User.AuthType enum
       linked: ""  'User.AuthType enum - not relevant for roku channel
       user_type: "" 'UserType enum
       message: ""
-      status: {} 'ActionStatus enum
+      status: "" 'ActionStatus enum
     }
 
     exposure: {

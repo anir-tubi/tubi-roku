@@ -876,6 +876,20 @@ Function onAuthInfoRefreshed()
   tubiLog("ContentController.onAuthInfoRefreshed")
   m.authInfoNeedsRefreshing = false
   m.authInfoRefreshed = true
+
+  ' send account analytics event signifying that auth info was transferred from another (mobile) device
+  m.trackingLoggingTask.trackEvent = {
+    type: "account"
+    values: {
+      manip: "SIGNIN"
+      current: "MOBILE_APP"
+      linked: ""
+      user_type: ""
+      message: ""
+      status: "SUCCESS"
+    }
+  }
+
   refreshUserInfoAndRunControllerStartSequence()
 End Function
 
