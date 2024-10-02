@@ -1208,6 +1208,7 @@ Function onModeChange()
     m.offset.itemSpacings = [13, 16, 13]
   else if m.top.mode = m.constants.ui.infoPanelModes.purpleCarpetEvent
     m.infoPanelGroup.appendChild(m.offset)
+    m.offset.appendChild(m.topHeaderGroup)
     m.offset.appendChild(m.title)
     m.offset.appendChild(m.twoLineInfo)
     m.offset.appendChild(m.descriptionGroup)

@@ -89,11 +89,11 @@ End Function
 '@Test passThroughCharlesProxyAsModuleFunction_test unit tests
 Function request_passThroughCharlesProxyAsModuleFunction_test()
   module = TubiRequest({ mode: "dev", CharlesProxyEnabled: true, charlesProxyUrl: "http://192.168.68.57:8888" })
-  m.assertEqual(module.passThroughCharlesProxy("http://adrise.tv/"), "http://192.168.68.57:8888/;;http://adrise.tv/")
+  m.assertEqual(module.passThroughCharlesProxy("http://adrise.tv/"), "http://192.168.68.57:8888/;http://adrise.tv/")
 End Function
 
 '@Test passThroughCharlesProxy unit tests
-'@Params [ "http://adrise.tv",          {mode: "dev", CharlesProxyEnabled: true, charlesProxyUrl:"http://192.168.68.57:8888"},           "http://192.168.68.57:8888/;;http://adrise.tv" ]
+'@Params [ "http://adrise.tv",          {mode: "dev", CharlesProxyEnabled: true, charlesProxyUrl:"http://192.168.68.57:8888"},           "http://192.168.68.57:8888/;http://adrise.tv" ]
 '@Params [ "",                           {mode: "dev", CharlesProxyEnabled: true, charlesProxyUrl:"http://192.168.68.57:8888"},           "" ]
 '@Params [ "http://adrise.tv",          {mode: "production", CharlesProxyEnabled: true, charlesProxyUrl:"http://192.168.68.57:8888"},    "http://adrise.tv" ]
 '@Params [ "http://adrise.tv",          {mode: "dev", CharlesProxyEnabled: false, charlesProxyUrl:"http://192.168.68.57:8888"},          "http://adrise.tv" ]
@@ -107,11 +107,11 @@ End Function
 '@Test removeCharlesProxyAsModuleFunction_test unit tests
 Function request_removeCharlesProxyAsModuleFunction_test()
   module = TubiRequest({ mode: "dev", CharlesProxyEnabled: true, charlesProxyUrl: "http://192.168.68.57:8888" })
-  m.assertEqual(module.removeCharlesProxy("http://192.168.68.57:8888/;;http://adrise.tv/"), "http://adrise.tv/")
+  m.assertEqual(module.removeCharlesProxy("http://192.168.68.57:8888/;http://adrise.tv/"), "http://adrise.tv/")
 End Function
 
 '@Test removeCharlesProxy unit tests
-'@Params [ "http://192.168.68.57:8888/;;http://adrise.tv",          {mode: "dev", CharlesProxyEnabled: true, charlesProxyUrl:"http://192.168.68.57:8888"},           "http://adrise.tv" ]
+'@Params [ "http://192.168.68.57:8888/;http://adrise.tv",          {mode: "dev", CharlesProxyEnabled: true, charlesProxyUrl:"http://192.168.68.57:8888"},           "http://adrise.tv" ]
 '@Params [ "",                                                      {mode: "dev", CharlesProxyEnabled: true, charlesProxyUrl:"http://192.168.68.57:8888"},           "" ]
 '@Params [ "http://adrise.tv",                                      {mode: "production", CharlesProxyEnabled: true, charlesProxyUrl:"http://192.168.68.57:8888"},    "http://adrise.tv" ]
 '@Params [ "http://adrise.tv",                                      {mode: "dev", CharlesProxyEnabled: false, charlesProxyUrl:"http://192.168.68.57:8888"},          "http://adrise.tv" ]

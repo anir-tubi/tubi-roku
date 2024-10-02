@@ -131,6 +131,13 @@ Function isIso8601String(strToCheck)
     return false
   end if
 
+  ' Since Z indicates UTC, allowing Z at the end.
+  ' Removing it from the end if present so that integer validation at line number 245 does not fail.
+  if strToCheck.EndsWith("Z") = true
+    strLen = strToCheck.len()
+    strToCheck = strToCheck.left(strLen - 1)
+  end if
+
   ' check we have the date and time parts
   dateTimeParts = strToCheck.split(" ")
   if dateTimeParts.count() <> 2
@@ -227,10 +234,6 @@ Function isIso8601String(strToCheck)
 
   if secsAndMillis.count() = 2
     milliseconds = secsAndMillis[1]
-    if milliseconds.len() <> 3
-      return false
-    end if
-
     millisecondsChars = milliseconds.split("")
     allTimeChars.append(millisecondsChars)
   end if
@@ -244,4 +247,24 @@ Function isIso8601String(strToCheck)
   end for
 
   return true
+End Function
+
+
+' Determines if the input date is greater than current time.
+' IMPORTANT: The ISO-8601 strings of the params must match the formats documented at
+' https://developer.roku.com/en-gb/docs/references/brightscript/interfaces/ifdatetime.md#fromiso8601stringdatestring-as-string-as-void
+'
+' @dateString: string, an ISO-8601 string representing the UTC time to check against the current UTC time
+Function isGreaterThanCurrentTime(dateString)
+  if isIso8601String(dateString) = true
+    dateTime = CreateObject("roDateTime")
+    nowSeconds = dateTime.AsSeconds()
+
+    dateTime.FromISO8601String(dateString)
+    dateSeconds = dateTime.AsSeconds()
+
+    return dateSeconds > nowSeconds
+  end if
+
+  return false
 End Function
