@@ -168,6 +168,14 @@ const elements = typeCheckElements({
       '/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid',
   },
 
+  categoryMyListMenuItemFocused: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuTextFocused', 
+  },
+
+  categoryMyListMenuItem: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuText', 
+  },
+
   /** Component for video preview playback. Useful for checking that video preview is playing the correct file */
   previewVideoPlayer: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#videoPreviewPlayer',
@@ -1014,10 +1022,14 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#ContentArea.#RowList.0.title.#CategoryName',
   },
 
+  resumeButton: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#Menu.0'
+  },
+
   //** CW Row populated (poster) */
   continueWatchingRowPoster: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#ContentArea.#RowList.0.items.0.1.#posterLayout.#Poster.#gradientPoster',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid.0.1.#posterLayout.#Poster',
   },
 
   //** Empty My List Container */
@@ -1450,6 +1462,10 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid',
   },
 
+  channelNetworksButtonFocused: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuTextFocused',
+  },
+
   channelSideNav: {
     keyPath:
        '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu'
@@ -1528,7 +1544,7 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#pageTitleAndCounter.#CategoryName',
   },
 
-  categoryPoster: {
+  categoryPosterFirst: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid.0.#poster',
   },
@@ -1643,6 +1659,11 @@ const elements = typeCheckElements({
   parentalControlsMenuTextFocused: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.2.#SettingsMenuGroup.#SettingsMenu.0.#DetailsMenuTextParent.#DetailsMenuTextFocused',
+  },
+
+  /** Continue Watching button in Categories */
+  continueWatchingButton: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuTextFocused',
   },
 
   /** Search grid */
@@ -1995,6 +2016,11 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#PageGroup.#ChannelCategoryGrid.1.#Title',
   },
 
+  networksCategoryButton: {
+    keyPath:
+    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuTextFocused',
+  },
+
   /** Networks page */
   networksPageGridPoster: {
     keyPath:
@@ -2005,6 +2031,11 @@ const elements = typeCheckElements({
   networksVideoGridPoster: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsVideoGrid.0.#poster',
+  },
+
+  networksContentGrid: {
+    keyPath:
+    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid',
   },
 
   /** Exit item */
@@ -2047,6 +2078,10 @@ const elements = typeCheckElements({
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid.0.#Title',
   },
+
+  continueWatchingPoster: {
+    keyPath: ' #ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid.0.1.#posterLayout.#Poster', 
+  }, 
 
   /** categories left nav */
   categoriesLeftNavButton: {
@@ -2118,6 +2153,10 @@ const elements = typeCheckElements({
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#channelListScreen.#PageGroup.#ChannelCategoryGrid',
   },
+
+  channelVideoGrid: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsVideoGrid', 
+  }, 
 
   categoriesVideoGridPoster: {
     keyPath:
@@ -2418,9 +2457,9 @@ const elements = typeCheckElements({
   },
 
   /** Continue Watching Row Title on Home page */
-  continueWatchingRowHomeTitle: {
+  categoryPageTitle: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsVideoGrid.0.1.#posterLayout.#Poster',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#pageTitleAndCounter.#CategoryName',
   },
 
   // title on the exit prompt of Sign up to Save Progress
