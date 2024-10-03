@@ -648,7 +648,59 @@ describe('Details Page', function () {
       await utils.sleep(4000); // Improvement
       expect(detailScreenTitle.text).to.not.be.empty;
 
+    });
 
+    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/705809 and https://tubi.testrail.io/index.php?/cases/view/705811
+    it('C705809 - Selecting "All Episodes" opens Season/Episode list screen,@sdp_1', async () => {
+      // While on Series Details page, lets play and check playback starts from the beginning
+      await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
+      await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+      // Select a Title
+      await ecp.sendKeypress(ecp.Key.Ok);
+
+      // Are we on Details page?
+      await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
+
+
+      // Select All Episodes button
+      await testUtils.waitForElementToFullyShowOnScreen('allEpisodesButton');
+      const episodesButtonText = await testUtils.getNodeForElement('allEpisodesButton');
+      expect(episodesButtonText.text).to.equal('All Episodes');
+      await ecp.sendKeypress(ecp.Key.Down);
+      await testUtils.waitForElementToFullyShowOnScreen('allEpisodesButtonFocused');
+      await ecp.sendKeypress(ecp.Key.Ok);
+
+      // Are we on the Episodes page?
+      await testUtils.waitForElementToFullyShowOnScreen('episodesScreenSeasonHeader');
+      await testUtils.waitForElementToShowOnScreen('episodesScreenRowList');
+      
+    });
+
+    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/705810
+    it('C705810 - "All Episodes" button is shown in series details page (guest user),@sdp_1', async () => {
+      // While on Series Details page, lets play and check playback starts from the beginning
+      await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: false });
+      await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+      // Select a Title
+      await ecp.sendKeypress(ecp.Key.Ok);
+
+      // Are we on Details page?
+      await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
+
+      // Select All Episodes button
+      await testUtils.waitForElementToFullyShowOnScreen('allEpisodesButton');
+      const episodesButtonText = await testUtils.getNodeForElement('allEpisodesButton');
+      expect(episodesButtonText.text).to.equal('All Episodes');
+      await ecp.sendKeypress(ecp.Key.Down);
+      await testUtils.waitForElementToFullyShowOnScreen('allEpisodesButtonFocused');
+      await ecp.sendKeypress(ecp.Key.Ok);
+
+      // Are we on the Episodes page?
+      await testUtils.waitForElementToFullyShowOnScreen('episodesScreenSeasonHeader');
+      await testUtils.waitForElementToShowOnScreen('episodesScreenRowList');
+      
     });
 
 

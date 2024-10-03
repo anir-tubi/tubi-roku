@@ -176,6 +176,16 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuText', 
   },
 
+  allEpisodesButton: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuText',
+  }, 
+
+  allEpisodesButtonFocused: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuTextFocused', 
+  }, 
+
+
+
   /** Component for video preview playback. Useful for checking that video preview is playing the correct file */
   previewVideoPlayer: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#videoPreviewPlayer',
@@ -1155,6 +1165,11 @@ const elements = typeCheckElements({
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#Menu.2.#DetailsMenuTextParent.#DetailsMenuText',
   },
+
+  episodesScreenRowList: {
+    keyPath: 
+    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#episodeScreen.#PageGroup.#RowList', 
+  }, 
 
   /** dialog box sign in button */
   dialogBoxSignInButton: {

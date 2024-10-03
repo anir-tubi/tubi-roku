@@ -158,7 +158,7 @@ describe('Video Preview', function () {
 
     // Navigate right to home page focus
     await utils.sleep(1500);
-    await ecp.sendKeypress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Right, {wait:1500});
   
     // Verify that video is playing
     await checkForPreview();
