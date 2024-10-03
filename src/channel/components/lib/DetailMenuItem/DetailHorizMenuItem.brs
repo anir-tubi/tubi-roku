@@ -2,7 +2,7 @@ Function init()
   topRef = m.top
   topRef.observeFieldScoped("itemContent", "onItemContentChange")
   topRef.observeFieldScoped("focusPercent", "onFocusPercentChange")
-  topRef.observeFieldScoped("gridHasFocus", "onGridHasFocusChange")
+  topRef.observeFieldScoped("gridHasFocus", "onFocusPercentChange")
 
   m.icon = topRef.findNode("menuItemIcon")
   m.iconFocused = topRef.findNode("menuItemIconFocused")
@@ -166,22 +166,15 @@ Function onItemContentChange()
 End Function
 
 
-Function onGridHasFocusChange()
-  if m.top.itemHasFocus = true
-    updateUnfocusedFraction(0)
-    updateFocusedFraction(1)
-  else
-    updateUnfocusedFraction(1)
-    updateFocusedFraction(0)
-  end if
-End Function
-
-
-Function onFocusPercentChange(msg)
-  focusPercent = msg.getData()
+Function onFocusPercentChange()
+  focusPercent = m.top.focusPercent
+  
   if m.top.gridHasFocus = true
     updateUnfocusedFraction(1 - focusPercent)
     updateFocusedFraction(focusPercent)
+  else
+    updateUnfocusedFraction(1)
+    updateFocusedFraction(0)
   end if
 End Function
 
