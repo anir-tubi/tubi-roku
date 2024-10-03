@@ -25,13 +25,12 @@
       id="menuItemBg"
       uri="pkg:/images/pill_button_$$RES$$.9.png"
       visible="false"
-      opacity="0.1"
       translation="[0,0]"/>
     <Poster
       id="menuItemBgFocused"
       opacity="0"
       translation="[0,0]"/>
-      
+
     <LayoutGroup
       horizAlignment="center"
       itemspacings="[48]"
@@ -88,7 +87,7 @@
           role="font"/>
       </Label>
     </Group>
-    
+
     <Group
       id="badgeFocused"
       opacity="0">

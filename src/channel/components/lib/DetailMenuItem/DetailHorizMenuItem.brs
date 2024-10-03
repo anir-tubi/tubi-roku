@@ -24,7 +24,7 @@ Function init()
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.title, typographyConstants.ids.bodyMediumStrong)
   setTypographyOfLabel(m.titleFocused, typographyConstants.ids.bodyMediumStrong)
-  
+
   setTypographyOfLabel(m.bottomItemText, typographyConstants.ids.bodySmallStrong)
 
   setTypographyOfLabel(m.badgeText, typographyConstants.ids.bodyExtraSmallStrong)
@@ -67,6 +67,7 @@ Function onThemeChange(msg = invalid)
 
     m.bottomItemText.color = theme.focusedColor
     m.buttonBgFocused.blendcolor = theme.focusedColor
+    m.buttonBg.blendcolor = theme.neutralColor2
   end if
 End Function
 
@@ -100,7 +101,7 @@ Function onItemContentChange()
 
       m.title.translation = m.defaultTitleTranslation
       m.titleFocused.translation = m.defaultTitleTranslation
-      
+
       badgeWidth = 0
       if item.badgeText <> ""
         m.badgeText.text = item.badgeText
@@ -108,7 +109,7 @@ Function onItemContentChange()
 
         badgeTextWidth = m.badgeText.boundingRect().width
         badgeWidth = badgeTextWidth + (18 * 2) ' 18 is the padding around text.
-        
+
         ' Setting the badge background width.
         m.badgeBackground.width = badgeWidth
         m.badgeBackgroundFocused.width = badgeWidth
