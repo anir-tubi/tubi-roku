@@ -891,7 +891,9 @@ Function onAirDateChange(msg)
   ' Checking if the current time is not greater than air date.
   if airDatetime.asSeconds() > currentDatetime.asSeconds()
     if index = -1
-      m.offset.insertChild(m.airDateCountdown, 0)
+      ' Finding the index of topheader and placing the airdatecountdown below the topheader.
+      topHeaderIndex = m.nodeHelpers.getChildIndex(m.offset, m.topHeaderGroup)
+      m.offset.insertChild(m.airDateCountdown, topHeaderIndex + 1)
     end if
     m.airDateCountdown.airDateTime = data
   else if index >= 0
