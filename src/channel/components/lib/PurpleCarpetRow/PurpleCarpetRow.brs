@@ -100,6 +100,7 @@ Function onContentChange()
 
       populateCtaButtonList()
       populateInfoPanelWithPurpleCarpetMode(m.top.primaryEventContent, m.infoPanel)
+      m.infoPanel.calculateHeight = true
     end if
   end if
 End Function
