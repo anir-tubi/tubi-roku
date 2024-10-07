@@ -234,6 +234,9 @@
       isPrimaryButton="true"
       iconUrl="pkg:/images/icon-play.webp"/>
     <DetailMenuItemContentNode
+      id="StartFromBeginningMenuItem"
+      iconUrl="pkg:/images/icon-resume.webp"/>
+    <DetailMenuItemContentNode
       id="LikeMenuItem"
       iconUrl="pkg:/images/icon-like.webp" />
     <DetailMenuItemContentNode
@@ -293,7 +296,7 @@
             itemSize="[105, 105]"
             itemSpacing="[16, 0]"
             rowHeights="[105]"
-            columnWidths="[204,105,105,105,105,105]"
+            columnWidths="[105,105,105,105,105,105]"
             columnSpacings="[16]"
             numColumns="9"
             numRows="1"

@@ -1217,18 +1217,20 @@ Function setIsHistory(detailScreen, isHistory)
   'reset the value in the case that remove from history button was pressed and title is currently "Removing..."
   detailScreen.stringNoHistoryButton = getTranslation("screenDetails_button_noHistory")
 
+  if m.detailScreenHorizMenuExp = false
+    if detailScreen.content <> invalid AND detailScreen.content.needsLogin = true AND isLoggedInUser() = false
+        detailScreen.stringPlayButton = getTranslation("registration_signIn_to_play_button") + ";" + getTranslation("registration_signup_button_free")
+    else if isHistory = true
+      detailScreen.stringPlayButton = getTranslation("screenDetails_button_startOver")
+    else
+      detailScreen.stringPlayButton = getTranslation("screenDetails_button_play")
+    end if
+else
 
   if detailScreen.content <> invalid AND detailScreen.content.needsLogin = true AND isLoggedInUser() = false
-    if m.detailScreenHorizMenuExp = true
-      detailScreen.stringPlayButton = getTranslation("registration_signIn_to_play_button")
-    else
-      detailScreen.stringPlayButton = getTranslation("registration_signIn_to_play_button") + ";" + getTranslation("registration_signup_button_free")
-    end if
-  else if isHistory = true
-    detailScreen.stringPlayButton = getTranslation("screenDetails_button_startOver")
-  else
-    detailScreen.stringPlayButton = getTranslation("screenDetails_button_play")
+    detailScreen.stringPlayButton = getTranslation("registration_signIn_to_play_button")
   end if
+end if
 
   detailScreen.isHistory = isHistory
 End Function
@@ -1600,6 +1602,7 @@ Function onRemoveFromHistory(detailScreen)
       removeHistoryLocally(contentId)
       detailScreen.isWaitingForServerResponse = false
       setIsHistory(detailScreen, false)
+      detailScreen.resumePoint = 0
     end if
 
   end if
@@ -1619,6 +1622,7 @@ Function onHistoryRemovedSuccess(_response) As Void
   detailScreen = getTopDetailScreenFromStack()
   if detailScreen <> invalid
     setIsHistory(detailScreen, false)
+    detailScreen.resumePoint = 0
     sendBookmarkAnalytics(detailScreen.content, "REMOVE_FROM_CONTINUE_WATCHING", m.Tracking, m.trackingLoggingTask, m.constants)
     handleHistoryChange()
   end if

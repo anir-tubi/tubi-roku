@@ -16,6 +16,7 @@ Function init()
   m.defaultMenuWidth = m.Menu.itemSize[0]
   m.ResumeMenuItem = m.top.findNode("ResumeMenuItem")
   m.PlayMenuItem = m.top.findNode("PlayMenuItem")
+  m.StartFromBeginningMenuItem = m.top.findNode("StartFromBeginningMenuItem")
   m.LikeMenuItem = m.top.findNode("LikeMenuItem")
   m.DislikeMenuItem = m.top.findNode("DislikeMenuItem")
   m.EpisodesMenuItem = m.top.findNode("EpisodesMenuItem")
@@ -65,6 +66,7 @@ Function init()
   m.top.observeFieldScoped("stringDislikeButton", "onStringChange")
   m.top.observeFieldScoped("stringLikeButton", "onStringChange")
   m.top.observeFieldScoped("stringPlayButton", "onStringChange")
+  m.top.observeFieldScoped("stringStartOverButton", "onStringChange")
 
   m.Menu.observeFieldScoped("itemSelected", "onMenuItemSelected")
   m.Menu.observeFieldScoped("itemFocused", "onMenuItemFocused")
@@ -133,6 +135,9 @@ End Function
 Function setDetailStrings()
   m.PlayMenuItem.title = getTranslation("screenDetails_button_play")
   m.PlayMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.PlayMenuItem.id]
+
+  m.StartFromBeginningMenuItem.title = getTranslation("screenDetails_button_startOver")
+  m.StartFromBeginningMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.StartFromBeginningMenuItem.id]
 
   m.LikeMenuItem.title = getTranslation("screenDetails_button_likeIt")
   m.LikeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.LikeMenuItem.id]
@@ -223,15 +228,9 @@ Function changeButtonText(sButtonStringId, sButtonText)
 
   else if sButtonStringId = "stringPlayButton"
     stringNode = m.PlayMenuItem
-
-    if sButtonText = getTranslation("screenDetails_button_startOver")
-      stringNode.isPrimaryButton = false
-      stringNode.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.startFromBeginningMenuItem]
-    else
-      stringNode.isPrimaryButton = true
-      stringNode.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.PlayMenuItem.id]
-    end if
-
+    stringNode.isPrimaryButton = true
+  else if sButtonStringId = "stringStartOverButton"
+    stringNode = m.StartFromBeginningMenuItem
   else if sButtonStringId = "stringResumeButton"
     stringNode = m.ResumeMenuItem
     stringNode.isPrimaryButton = true
@@ -353,13 +352,32 @@ Function onResumePointChange()
   resumeIndex = m.NodeHelpers.getChildIndexById(menuItems, m.ResumeMenuItem.id)
   m.ResumeMenuItem.playstart = m.top.resumePoint
 
+  'Always keep resume button and start over button together.
   if resumeIndex = -1 AND m.top.resumePoint > 0
     menuItems.insertChild(m.ResumeMenuItem, 0)
+
+    startOverIndex = m.NodeHelpers.getChildIndexById(menuItems, m.StartFromBeginningMenuItem.id)
+    if startOverIndex = -1
+      menuItems.insertChild(m.StartFromBeginningMenuItem, 1)
+    end if
+
+    playIndex = m.NodeHelpers.getChildIndexById(menuItems, m.PlayMenuItem.id)
+    if playIndex > -1
+      menuItems.removeChildIndex(playIndex)
+    end if
   else if resumeIndex > -1 AND m.top.resumePoint = 0
     menuItems.removeChildIndex(resumeIndex)
-    stringPlayButton = getTranslation("screenDetails_button_play")
-    changeButtonText("stringPlayButton", stringPlayButton)
-    m.PlayMenuItem.iconUrl = "pkg:/images/icon-play.webp"
+
+    startOverIndex = m.NodeHelpers.getChildIndexById(menuItems, m.StartFromBeginningMenuItem.id)
+    if startOverIndex > -1
+      menuItems.removeChildIndex(startOverIndex)
+    end if
+
+    playIndex = m.NodeHelpers.getChildIndexById(menuItems, m.PlayMenuItem.id)
+    if playIndex = -1
+      menuItems.insertChild(m.PlayMenuItem, 0)
+    end if
+
   end if
 
   'keep the sign up button at the 2 nd place
@@ -485,17 +503,6 @@ Function onIsHistory()
 
   bHasHistory = m.top.isHistory
 
-  if bHasHistory = false
-    'if removing from history, remove the resume button
-    resumeIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.ResumeMenuItem.id)
-    addRemoveMenuItem(bHasHistory, resumeIndex)
-  end if
-
-  if bHasHistory = false
-    m.PlayMenuItem.iconUrl = "pkg:/images/icon-play.webp"
-  else
-    m.PlayMenuItem.iconUrl = "pkg:/images/icon-resume.webp"
-  end if
 
   removeHistoryIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.RemoveHistoryMenuItem.id)
   previousItems = [m.watchTrailerMenuItem, m.dislikeMenuItem, m.likeMenuItem]
@@ -854,6 +861,8 @@ Function handleMenuItemSelected(itemSelected)
     else if itemSelected.id = m.constants.ui.detailScreenMenuItemIds.playMenuItem
       m.top.playSelected = true
       m.Menu.jumpToItem = 0 '//reset menu back to the first item after a video is requested to play
+    else if itemSelected.id = m.constants.ui.detailScreenMenuItemIds.startFromBeginningMenuItem
+      m.top.playSelected = true
     else if itemSelected.id = m.constants.ui.detailScreenMenuItemIds.likeMenuItem
       if m.likeMenuItem.title = getTranslation("screenDetails_button_changingRating")
         '//If it is still trying to change the rating then do nothing if this button is clicked again
