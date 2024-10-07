@@ -25,9 +25,11 @@
       id="menuItemBg"
       uri="pkg:/images/pill_button_$$RES$$.9.png"
       visible="false"
+      loadSync="true"
       translation="[0,0]"/>
     <Poster
       id="menuItemBgFocused"
+      loadSync="true"
       opacity="0"
       translation="[0,0]"/>
 
@@ -40,13 +42,15 @@
         <Poster
           id="menuItemIcon"
           height="36"
-          width="36"/>
+          width="36"
+          loadSync="true" />
 
         <Poster
           opacity="0"
           id="menuItemIconFocused"
           height="36"
-          width="36"/>
+          width="36"
+          loadSync="true" />
       </Group>
 
       <Label
