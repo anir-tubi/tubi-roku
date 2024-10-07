@@ -219,26 +219,6 @@ describe('Categories', function () {
 
     });
 
-    // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/C638441
-    it('C638441 - Focusing on a category will show a preview of the titles available within the container, @categories', async () => {
-      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
-
-      // Go to Categories Details page
-      await openLeftNav();
-      await selectCategories();
-
-      //Verify Recommended button at the top
-      await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
-
-      // Right to select the grid
-      await ecp.sendKeypress(ecp.Key.Right);
-
-      // Are we on the Video Grid and are the category titles available? 
-      await testUtils.waitForElementToFullyShowOnScreen('categoryPosterFirst');
-      await testUtils.waitForElementToShowOnScreen('channelCategoryGrid');
-
-    });
 
     // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/638443
     it('C638443 - "Networks" is shown near the top of the list, @categories', async () => {
@@ -256,7 +236,7 @@ describe('Categories', function () {
       
     });
 
-     // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/C638445
+     // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/C638445 and https://tubi.testrail.io/index.php?/cases/view/C638441
      it('C638445 - Selecting a network poster will display the category page view of all the titles in the network, @categories', async () => {
       await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
@@ -435,6 +415,40 @@ describe('Categories', function () {
       await testUtils.waitForElementToFullyShowOnScreen('categoryHeader');
       const headerName = await testUtils.getNodeForElement('categoryHeader');
       expect(headerName.text).to.equal('Networks');
+
+    });
+
+    // https://tubi.testrail.io/index.php?/cases/view/690606
+    it('690606 - Pressing "back" from details page takes user back to category tile screen, @categories', async () => {
+      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+      // Go to Categories Details page
+      await openLeftNav();
+      await selectCategories();
+
+      //Verify Recommended button at the top
+      await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
+      await ecp.sendKeypress(ecp.Key.Ok, {wait:1000});
+
+      // Select Category Button
+      await testUtils.waitForElementToFullyShowOnScreen('categoryPosterFirst');
+      await ecp.sendKeypress(ecp.Key.Ok, {wait:2000});
+
+      // Is the metadata Info panel present?
+      await testUtils.waitForElementToFullyShowOnScreen('categoriesDetailsPageInfo');
+
+      // Select a Title
+      await ecp.sendKeypress(ecp.Key.Ok, {wait:2000});
+
+      // Verify Details page opens
+      await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');  
+      
+      // Press back to go back to category title screen
+      await ecp.sendKeypress(ecp.Key.Back, {wait:2000});
+
+      // Is the metadata Info panel present?
+      await testUtils.waitForElementToFullyShowOnScreen('categoriesDetailsPageInfo');   
 
     });
 
