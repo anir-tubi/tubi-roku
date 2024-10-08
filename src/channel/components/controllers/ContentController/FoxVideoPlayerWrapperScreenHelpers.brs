@@ -149,7 +149,7 @@ Function getFoxVideoPlayerConfig()
         "specialDetail": "{foxApiRoot}/v2.0/screens/special-detail/{showCode}",
         "watch": "{foxApiRoot}/v2.0/screens/watch"
       },
-      foxApiRoot: "https://prod.api.haw.digitalvideoplatform.com"
+      foxApiRoot: m.constants.urls.foxApiBaseUrl
       key: "tubi_roku",
       mvpds: "{foxApiRoot}/v2.0/mvpds",
       watch: "{foxApiRoot}/v3.0/watchlive"

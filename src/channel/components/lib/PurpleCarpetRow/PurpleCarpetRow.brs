@@ -76,12 +76,16 @@ Function onContentChange()
     category = rowListContent.getChild(0)
     primaryEventContent = category.getChild(0)
 
-    ' field with key "json" is a json string that holds the complete response from the container api request.
-    ' Even though we are removing primary event from the category container on line number 78, "json" field will hold the complete response from backend.
-    singleContent = m.metadataTranslate.getContentFromCategoryJson(category, primaryEventContent.id, m.top.signedIn)
+    singleContent = invalid
 
-    ' Removing the primary event node from the rowlist content node.
-    category.removeChild(primaryEventContent)
+    if primaryEventContent <> invalid
+      ' field with key "json" is a json string that holds the complete response from the container api request.
+      ' Even though we are removing primary event from the category container on line number 78, "json" field will hold the complete response from backend.
+      singleContent = m.metadataTranslate.getContentFromCategoryJson(category, primaryEventContent.id, m.top.signedIn)
+
+      ' Removing the primary event node from the rowlist content node.
+      category.removeChild(primaryEventContent)
+    end if
 
     if singleContent <> invalid
       ' Making sure we add back the airdatetime and foxContentId to the content node since we are fetching updated data from css category json which will not have data added dynamically from listing api.
@@ -293,7 +297,7 @@ End Function
 
 
 Function onKeyEvent(key as String, press as Boolean) as Boolean
-  if press = true AND key = "right" AND m.ctaButtonList.isInFocusChain() = true
+  if press = true AND key = "right" AND m.ctaButtonList.isInFocusChain() = true AND m.rowList.content <> invalid AND m.rowList.content.getChildCount() > 0
     m.lastFocusedElement = "rowList"
     m.rowList.setFocus(true)
     return true

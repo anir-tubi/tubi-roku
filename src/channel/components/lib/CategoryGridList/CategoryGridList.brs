@@ -6,6 +6,7 @@ Function init()
   m.top.observeFieldScoped("focusedChild", "onComponentFocusChange")
   m.top.observeFieldScoped("jumpToRowItemByID", "onJumpToRowItemByIDChange")
   m.top.observeFieldScoped("contentUpdated", "onContentChange")
+  m.top.observeFieldScoped("purpleCarpetContentUpdated", "onPurpleCarpetContentUpdatedChange")
   m.top.observeFieldScoped("repopulateContent", "onRepopulateContent")
   m.top.observeFieldScoped("animateToCategory", "onAnimateToCategory")
   m.top.observeFieldScoped("removeFocusFromRowList", "onRemoveFocusFromRowList")
@@ -121,7 +122,7 @@ Function onComponentFocusChange()
       m.lastFocusedList = "spotlight"
       m.spotlightRow.opacity = 1
       m.spotlightRow.setFocus(true)
-    else if m.top.purpleCarpetContent <> invalid AND m.top.purpleCarpetContent.getChildCount() > 0 AND m.lastFocusedList <> "rowlist"
+    else if isPurpleCarpetContainerEmpty() = false AND m.lastFocusedList <> "rowlist"
       m.lastFocusedList = "purpleCarpetRow"
       m.purpleCarpetRow.opacity = 1
       m.purpleCarpetRow.setFocus(true)
@@ -192,7 +193,7 @@ Function onContentChange()
   ' Added an additional safety check of checking if the focus was not moved to rowlist. Only in the case where focus is on purple carpet or spotlight row then updating the translation.
   ' This handles cases where the user content is refreshed due to expiry or user button mashes down quickly before even the purple carpet row got focused.
   ' Also to handle the case where user navigates to side nav from the rowlist and Sign in or out which causes content to refresh.
-  if (m.top.spotlightContent <> invalid AND m.top.spotlightContent.getChildCount() > 0) OR (m.top.purpleCarpetContent <> invalid AND m.top.purpleCarpetContent.getChildCount() > 0) AND m.lastFocusedList <> "rowlist"
+  if ((m.top.spotlightContent <> invalid AND m.top.spotlightContent.getChildCount() > 0) OR isPurpleCarpetContainerEmpty() = false) AND m.lastFocusedList <> "rowlist"
     m.rowList.translation = [0, 384]
   else
     ' Resetting the state of the UI.
@@ -442,7 +443,7 @@ Function onRowItemSelected(msg)
   if m.top.content <> invalid 'should not be necessary but crash reports show that it is.
     ' If we have spotlight content than we need to increment y position by 1 since spotlight is first row.
     rowItemSelected = msg.getData()
-    if (m.top.spotlightContent <> invalid AND m.top.spotlightContent.getChildCount() > 0) OR (m.top.purpleCarpetContent <> invalid AND m.top.purpleCarpetContent.getChildCount() > 0)
+    if (m.top.spotlightContent <> invalid AND m.top.spotlightContent.getChildCount() > 0) OR isPurpleCarpetContainerEmpty() = false
       m.top.selectedPosition = [rowItemSelected[0] + 1, rowItemSelected[1]]
     else
       m.top.selectedPosition = rowItemSelected
@@ -748,6 +749,32 @@ Function onSignedInChange(msg)
 End Function
 
 
+Function isPurpleCarpetContainerEmpty()
+  purpleCarpetContent = m.top.purpleCarpetContent
+
+  if isNode(purpleCarpetContent) = true
+    child = purpleCarpetContent.getChild(0)
+
+    if child <> invalid AND child.getChildCount() > 0
+      return false
+    end if
+  end if
+
+  return true
+End Function
+
+
+Function onPurpleCarpetContentUpdatedChange()
+  ' Handling a use case where last focused list was purple carpet container but during refresh all items got removed due to event reaching end resetting the focus to rowlist.
+  if isPurpleCarpetContainerEmpty() = true AND m.lastFocusedList = "purpleCarpetRow"
+    m.rowList.translation = [0, 0]
+    m.purpleCarpetRow.opacity = 0
+    m.lastFocusedList = "rowlist"
+    m.RowList.setFocus(true)
+  end if
+End Function
+
+
 Function onKeyEvent(key as String, press as Boolean) as Boolean
   if press = true
     if key = "down" AND m.RowList.isInFocusChain() = false
@@ -767,7 +794,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         slideFade(m.spotlightRow, "below", "in", 0.3)
         m.lastFocusedList = "spotlight"
         slideTo(m.RowList, [0, 384], 0.3)
-      else if m.top.purpleCarpetContent <> invalid
+      else if isPurpleCarpetContainerEmpty() = false
         ' updating the itemFocused which in turn triggers onGridFocusChange inside homescreen.brs.
         ' Which causes the regular info panel to be hidden and the background to be updated to full screen version.
         ' The reason for calling this manually is because purple carept has cta button list and rowlist.

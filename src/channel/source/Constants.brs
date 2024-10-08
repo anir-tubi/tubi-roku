@@ -541,8 +541,7 @@ Function getConstants()
         constants.urls.tensor.cdn.container = constants.urls.tensor.cdn.urlBase + "/v4/containers"
         constants.urls.tensor.cdn.epgChannelIds = constants.urls.tensor.cdn.urlBase + "/v2/epg"
 
-        ' TODO: For now only enabling it for staging until we are ready to go.
-        if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
+        if constants.settings.mode <> "production" AND constants.settings.mode <> "staging"
           constants.urls.tensor.cdn.homescreen = constants.urls.tensor.cdn.urlBase + "/v5/homescreen"
           constants.urls.tensor.cdn.container = constants.urls.tensor.cdn.urlBase + "/v5/containers"
         end if
@@ -693,8 +692,14 @@ Function getConstants()
     constants.urls.nielsenPing = "https://audit.imrworldwide.com/cgi-bin/gn"
 
     constants.urls.rokuContinueWatchingEndpoint = "https://userdata.sr.roku.com/user-data/v1/content/continueWatching"
+    
+    if constants.settings.stagingApis = true
+      constants.urls.foxApiBaseUrl = "https://qa.api.haw.digitalvideoplatform.com"
+    else
+      constants.urls.foxApiBaseUrl = "https://prod.api.haw.digitalvideoplatform.com"
+    end if
 
-    constants.urls.foxListingEndpoint = "https://prod.api.haw.digitalvideoplatform.com/v3.0/listings"
+    constants.urls.foxListingEndpoint = constants.urls.foxApiBaseUrl + "/v3.0/listings"
 
   'http request types
   constants.reqTypes = {}

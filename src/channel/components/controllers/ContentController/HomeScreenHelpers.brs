@@ -1140,16 +1140,22 @@ End Function
 ' @param homeScreen, roSGNode - The HomeScreen component that contains the focused content.
 ' @param content, roSGNode - The CategoryContentNode for the spotlight row.
 Function updatePurpleCarpetRowContent(homeScreen, content)
-  if isNode(content) = true AND content.getChildCount() > 0
+  if isNode(content) = true
     rowContentNode = CreateObject("roSGNode", "ContentNode")
     rowContentNode.id = m.constants.ui.categoryIds.purpleCarpet
     content.update({
       gridItemType: m.constants.ui.gridItemTypes.purpleCarpet
     }, true)
     rowContentNode.appendChild(content)
-    primaryContent = content.getChild(0)
-    bookmark = getBookmark(primaryContent.id)
-    homeScreen.didUserSetReminderForEventContent = (bookmark <> invalid)
+
+    ' Since for limited ui we will not have any data in the initial but during lazy load of containers we will obtain all the data.
+    ' So we will proceed with creating a purple carpet container as long as backend returns top level container.
+    if content.getChildCount() > 0
+      primaryContent = content.getChild(0)
+      bookmark = getBookmark(primaryContent.id)
+      homeScreen.didUserSetReminderForEventContent = (bookmark <> invalid)
+    end if
+    
     homeScreen.purpleCarpetContent = rowContentNode
   else
     homeScreen.purpleCarpetContent = invalid

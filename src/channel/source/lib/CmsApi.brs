@@ -175,6 +175,7 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
   ' TODO: Temporary for testing will be removed.
   if m.constants.settings.mode <> "production"
     params["include_fox_live_events_banner"] = true
+    params["include_fox_live_events"] = true
   end if
 
   params["is_kids_mode"] = bKidsMode
