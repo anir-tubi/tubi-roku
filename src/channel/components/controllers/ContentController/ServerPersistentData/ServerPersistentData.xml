@@ -30,5 +30,8 @@
 
     <!-- hasPassword isn't stored in the registry so we access it from here -->
     <field id="hasPassword" type="boolean" value="false" />
+
+    <!-- hasPreviouslyRegistered holds the boolean value whether this device is already registered on Tubi -->
+    <field id="hasPreviouslyRegistered" type="boolean" value="false" />
   </interface>
 </component>

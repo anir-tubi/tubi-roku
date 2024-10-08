@@ -1212,6 +1212,7 @@ Function getConstants()
       constants.ui.screenLevels.emailInputScreen = 90
       constants.ui.screenLevels.signInScreen = 90
       constants.ui.screenLevels.ageGateScreen = 90
+      constants.ui.screenLevels.emailVerificationScreen = 90
       constants.ui.screenLevels.consentScreen = 120
       constants.ui.screenLevels.rokuContinueWatchingConsentScreen = 120
       constants.ui.screenLevels.managePreferencesScreen = 130
@@ -1236,6 +1237,7 @@ Function getConstants()
       constants.ui.screenIds.videoPlayerScreen = "videoPlayerScreen"
       constants.ui.screenIds.linearVideoPlayerScreen = "linearVideoPlayerScreen"
       constants.ui.screenIds.epgScreen = "epgScreen"
+      constants.ui.screenIds.emailVerificationScreen = "emailVerificationScreen"
       constants.ui.screenIds.forgotPasswordProcessingScreen = "forgotPasswordProcessingScreen"
       constants.ui.screenIds.screensaverScreen = "screensaverScreen"
       constants.ui.screenIds.consentScreen = "consentScreen"
@@ -1702,6 +1704,7 @@ Function getConstants()
       constants.serverPersistentDataKeys.email = "email"
       constants.serverPersistentDataKeys.parentalRating = "parental_rating"
       constants.serverPersistentDataKeys.hasPassword = "has_password"
+      constants.serverPersistentDataKeys.hasPreviouslyRegistered = "has_previously_registered"
 
       constants.persistentDataKeyConsentKeyMapping = {
         "enable_video_preview": constants.consentKeys.essential
@@ -1714,6 +1717,7 @@ Function getConstants()
         "email": constants.consentKeys.essential
         "parental_rating": constants.consentKeys.essential
         "has_password": constants.consentKeys.essential
+        "has_previously_registered": constants.consentKeys.essential
       }
 
   return constants

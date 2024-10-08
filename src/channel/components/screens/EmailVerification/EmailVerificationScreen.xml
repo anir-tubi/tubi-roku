@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - EmailVerificationScreen
+ -->
+<component name="EmailVerificationScreen" extends="BaseScreen">
+  <script type="text/brightscript" uri="EmailVerificationScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogs.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  
+  <interface>
+    <!-- INPUT -->
+
+    <!-- roku account's email address  -->
+    <field id="email" type="string" alias="email.text"/>
+
+    <!-- OUTPUT -->
+    <field id="selectedDifferentEmail" type="boolean" alwaysNotify="true"/>
+    <field id="backButtonSelected" type="boolean" alwaysNotify="true"/>
+    <field id="resendVerificationLink" type="boolean" alwaysNotify="true"/>
+    <!-- "uid" is only used as a state store and is not intended to be observed
+          unique identifier generated through magicLink for each user -->
+    <field id="uid" type="string"/>
+    <!-- "queryResponseError" is only used as a state store and is not intended to be observed  -->
+    <field id="queryResponseError" type="integer" value="0"/>
+  </interface>
+  
+  <children>
+    <Poster
+      id="backButtonPoster"
+      uri="pkg:/images/back_button.png"
+      translation="[126,60]"
+      width="171"
+      height="72"/>
+
+    <LayoutGroup
+      id="pageLayout"
+      translation="[960, 540]"
+      vertAlignment="center"
+      horizAlignment="center"
+      itemSpacings="[36, 18, 18, 60, 30]">
+
+      <Poster
+        id="emailNotificationPoster"
+        uri="pkg:/images/email_notification.webp"
+        width="150"
+        height="150"/>
+
+      <Label
+        id="pageHeading"
+        horizAlign="center"
+        width="1248">
+        <Font
+          role="font"/>
+      </Label>
+
+      <Label
+        id="pageSubHeading"
+        horizAlign="center"
+        width="1920">
+        <Font
+          role="font"/>
+      </Label>
+
+      <Label
+        id="email"
+        width="1248"
+        horizAlign="center"
+        vertAlign="bottom">
+        <Font
+          role="font"/>
+      </Label>
+
+      <Label
+        id="pageSubHeading2"
+        horizAlign="center"
+        width="1920">
+        <Font
+          role="font"/>
+      </Label>
+
+      <LayoutGroup
+        id="buttonGroup"
+        horizAlignment="center"
+        itemSpacings="[12]">
+
+        <SimpleButton
+          id="resendBtn"/>
+
+        <SimpleButton
+          id="changeEmailBtn"/>
+
+      </LayoutGroup>
+    </LayoutGroup>
+
+  </children>
+   
+</component>

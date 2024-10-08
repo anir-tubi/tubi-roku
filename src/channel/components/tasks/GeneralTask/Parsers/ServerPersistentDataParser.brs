@@ -4,6 +4,7 @@
 Function parseGetServerPersistentData(fullResponse, _reqInfo)
   serverPersistentData = {}
   data = fullResponse.data
+
   if isAA(data) = true
     serverPersistentDataKeyMap = m.constants.serverPersistentDataKeys
 
