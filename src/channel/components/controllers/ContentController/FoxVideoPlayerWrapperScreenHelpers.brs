@@ -605,9 +605,11 @@ Function setFoxContentId(purpleCarpetContainer, _screenId)
       if tubiContent <> invalid
         contentNode = m.nodeHelpers.getChildById(purpleCarpetContainer, tubiContent.id)
 
-        ' TODO: Add fallback logic if in case the selected item for some reason is not returned.
         if contentNode <> invalid AND contentNode.foxContentId <> invalid
           currentScreen.contentId = contentNode.foxContentId
+        else if isNonEmptyString(tubiContent.pubid)
+          ' Using pubid has fallback if listing api fails as per ccs contract this contains the fox content id.
+          currentScreen.contentId = tubiContent.pubid
         end if
       end if
     end if
