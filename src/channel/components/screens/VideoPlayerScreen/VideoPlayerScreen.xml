@@ -4,7 +4,6 @@
   <script type="text/brightscript" uri="VideoTransportHandling.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/UserMixin.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/MathUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
@@ -12,10 +11,13 @@
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/DeviceMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/EventMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiAds.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
   <script type="text/brightscript" uri="pkg:/source/3rdparty/google/gam_utils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Sentry.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/PlayerLogLib.brs" />
 
   <interface>
 
@@ -67,7 +69,7 @@
 
       <!--
         - Written to by AdsTask.
-        - Possible values: init, fetching, noAds, adsPending, adsPlaying, adsClosed
+        - Possible values: init, fetching, noAds, adsPending, adsPlaying, adsClosed, adsCompleted
         -->
       <field id="adState" type="string" value=""/>
 
@@ -126,6 +128,9 @@
 
       <!-- boolean field which can be set to true for showing the BrowseWhileWatching in full screen and set focus to BrowseWhileWatching -->
       <field id="showBrowseWhileWatchingInFullScreen" type="boolean" alwaysNotify="true"/>
+
+      <!-- time taken to load player screen in milliseconds -->
+      <field id="loadTime" type="integer"/>
 
     <!-- OUTPUT -->
       <!-- Set to true if the back button was pressed while the video player has focus -->

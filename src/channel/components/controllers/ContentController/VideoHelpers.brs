@@ -17,6 +17,7 @@ Function playVideoContent(content, playbackSource = {"srcForAnalytic": "unknown"
     callbackAfterSignInParams = {"content": content, "playbackSource": playbackSource, "position": position}
     startSignIn(AfterSignInPlayLockedContent, callbackAfterSignInParams)
   else
+    loadTime = CreateObject("roTimeSpan")
     videoPlayer = setupVideoPlayer(content, playbackSource, position)
     currentScreen = getCurrentScreen()
 
@@ -36,6 +37,7 @@ Function playVideoContent(content, playbackSource = {"srcForAnalytic": "unknown"
     end if
     '//send a copy of the videoSponsorExposureId to the videoPlayer
     videoPlayer.videoSponsorExposureId = m.videoSponsorExposureId
+    videoPlayer.loadTime = loadTime.totalMilliseconds()
     sendVideoPlayerCommand(videoPlayer, "play")
     updateRokuContinueWatchingInfo(content, position)
   end if
@@ -55,6 +57,7 @@ Function playVideoContentWhileSkippingDetailScreen(content, nowPos, currentTrack
     callbackAfterSignInParams = {"content": content, "nowPos": nowPos, "currentTrackingPageInfo": currentTrackingPageInfo, "trackingComponentInfo": trackingComponentInfo, "playbackSource": playbackSource}
     startSignIn(AfterSignInPlayLockedContentWhileSkippingDetailScreen, callbackAfterSignInParams)
   else
+    loadTime = CreateObject("roTimeSpan")
     videoPlayer = setupVideoPlayer(content, playbackSource, nowPos)
 
     ' send custom navigateToPage event, since a details screen was added to the screen stack but the user
@@ -70,6 +73,7 @@ Function playVideoContentWhileSkippingDetailScreen(content, nowPos, currentTrack
 
     '//send a copy of the videoSponsorExposureId to the videoPlayer
     videoPlayer.videoSponsorExposureId = m.videoSponsorExposureId
+    videoPlayer.loadTime = loadTime.totalMilliseconds()
     sendVideoPlayerCommand(videoPlayer, "play")
     updateRokuContinueWatchingInfo(content, nowPos)
   end if

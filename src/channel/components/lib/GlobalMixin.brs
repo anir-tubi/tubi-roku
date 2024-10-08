@@ -42,6 +42,19 @@ Function getExperimentsInfoFromGlobal()
 End Function
 
 
+' getGlobal gets the value of m.global, default invalid
+'
+Function getGlobal()
+  nodeGlobal = invalid
+  attempts = 0
+  while nodeGlobal = invalid AND attempts < 100
+    nodeGlobal = m.global
+    attempts += 1
+  end while
+  return nodeGlobal
+End Function
+
+
 ' getFieldFromGlobal finds the value on global based on the key input
 '
 ' @fieldName: string, the key on global variable

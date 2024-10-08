@@ -944,6 +944,7 @@ Function jumpToPosition(position)
     m.Video.control = "stop"
     m.top.adPosition = adPosition
     m.top.adControl = "seek"
+    updatePlayerLogLib(m.playerLogLib, "setAdType", "midroll")
   else
     m.seekReferenceQueue.push(position)
     seekToPosition(position) 'will load and play the video at the seeked to point

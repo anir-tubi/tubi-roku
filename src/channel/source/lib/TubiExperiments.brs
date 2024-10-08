@@ -65,6 +65,10 @@ Function TubiExperiments(experimentsInfo) as Object
         roku_spotlight_carousel_v1 : {"enabled": false}
       }
 
+      roku_player_client_log: {
+        roku_player_client_log_v1: {"enabled": false}
+      }
+
     }
 
     'public methods

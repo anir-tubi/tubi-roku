@@ -21,7 +21,9 @@
     <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
     <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
     <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+    <script type="text/brightscript" uri="pkg:/components/lib/EventMixin.brs" />
     <script type="text/brightscript" uri="pkg:/source/3rdparty/google/gam_utils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/PlayerLogLib.brs" />
 
     <interface>
       <!-- INPUT -->

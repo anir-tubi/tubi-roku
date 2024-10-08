@@ -37,6 +37,7 @@
   <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../lib/CacheValidationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/DeviceMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/EventMixin.brs" />
   <script type="text/brightscript" uri="../../screens/ModalDialogs.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
@@ -75,6 +76,7 @@
   <script type="text/brightscript" uri="RokuCWConsentScreenHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiExternalConfig.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/google/gam_utils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/PlayerLogLib.brs" />
 
   <interface>
 

@@ -24,6 +24,13 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
 
   'a port used for sending logging requests
   adMessagePort = CreateObject("roMessagePort")
+  requestQueue = requestQueue.create(adMessagePort)
+
+  playerLog = invalid
+  if constants.settings.playerLogEnabled = true AND getExperimentResource("roku_player_client_log", "roku_player_client_log_v1").enabled = true 'bs:disable-line 1140 LINT1001
+    logger = TubiLogger(m.constants, request, auth)
+    playerLog = PlayerLogLib(m.constants, requestQueue, logger)
+  end if
 
   if adContentType <> "hls" AND adContentType <> "mp4"
     adContentType = "mp4"  ' safety fallback
@@ -42,11 +49,12 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
     auth: auth
     request: request
     tracking: tracking
+    playerLogLib: playerLog
 
     ' private
     updateYouboraOptions: tubiAds_updateYouboraOptions
     parseOutNotUsedAdPodPixels: tubiAds_parseOutNotUsedAdPodPixels
-    requestQueue: requestQueue.create(adMessagePort)
+    requestQueue: requestQueue
     allAdUnitsList: []
     totalAdBreakAds: 0
     commercialDuration : 0
@@ -80,6 +88,7 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
     retrieveAds: tubiAds_retrieveAds
     replaceMacro: tubiAds_replaceMacro
     setLimitAdTracking: tubiAds_setLimitAdTracking
+
     appMode: "DEFAULT_MODE"
     notUsedAdPodPixels: {} ' List of pixels for the current ad pod that should be sent if playback is stopped before we get an impression for that ad
     tcfString: tcfString ' IAB TC String, currently stored in m.global.IABTCF_TCString from one trust sdk.
@@ -626,10 +635,17 @@ Function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
             ads = getGlobalAA().tubiAds
             ads.adBufferingCallback(eventType, ctx)
           end function, {}, 0)
-          m.roAdFramework.setTrackingCallback(function(_m, eventType, ctx)
+
+          ctx = {}
+          m.roAdFramework.setTrackingCallback(function(ctx, eventType, rafCtx)
             ads = getGlobalAA().tubiAds
+            ctx.append(rafCtx)
             ads.adTrackingCallback(eventType, ctx)
-          end function, {})
+          end function, ctx)
+
+          'start the Ad buffer time to calculate first_frame_time in AdStartupPerformance event for player log
+          updatePlayerLogLib(m.playerLogLib, "setAdBufferStartTime") 'bs:disable-line 1140 LINT1001
+
           adPod = adUnitsListContainer.adUnitsList[0]
           isCompleted = m.roAdFramework.showAds(adPod, screenCount, containerNode)
 
@@ -815,6 +831,9 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
 
       m.trackUserEvent("start_ad", startAdEvent, m.requestQueue)
 
+      updatePlayerLogLib(m.playerLogLib, "setAdCtx", ctx) 'bs:disable-line 1140 LINT1001
+      updatePlayerLogLib(m.playerLogLib, "setAdBufferEndTime") 'bs:disable-line 1140 LINT1001
+
       impressionCount = 0
       for i=0 to ctx.ad.tracking.count()-1
         if ctx.ad.tracking[i].event = "Impression"
@@ -823,6 +842,12 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
       end for
       youboraOptions = m.updateYouboraOptions(m.youboraTask, ctx, impressionCount)
     else if eventType = "Complete" or eventType = "Close"
+
+      if eventType = "Complete" AND ctx <> invalid AND ctx.adCount > ctx.adIndex
+        'start the Ad buffer time to calculate first_frame_time in AdStartupPerformance event for player log
+        updatePlayerLogLib(m.playerLogLib, "setAdBufferStartTime") 'bs:disable-line 1140 LINT1001
+      end if
+      
       'Close events fire when a user backs out of an ad, or when a user backs out of the interactive portion of an ad
       if eventType = "Close" AND m.isInteracting = true
         clickAdEvent = {

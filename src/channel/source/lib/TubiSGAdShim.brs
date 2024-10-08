@@ -143,6 +143,13 @@ Function tubiSGAdShim_handleControlMessage(state, control, episode, position)
       play: ""
       stop: "reset"
     }
+    "adsCompleted": {
+      preroll: "preroll"
+      midroll: "midroll"
+      seek: "resume"
+      play: ""
+      stop: "reset"
+    }
   }
 
   ' normalize the position since TubiAds expects the breakPos to align with one of
@@ -203,6 +210,8 @@ Function tubiSGAdShim_playAds(_episode, _cuepoint)
   status = m.ads.showCommercialBreakViaRoku(adContainer, m.videoPlayerNode)
   if status = m.constants_.player.playerResults.closed
     m.videoPlayerNode.adState = "adsClosed"
+  else if status = m.constants_.player.playerResults.completed
+    m.videoPlayerNode.adState = "adsCompleted" 
   else
     m.videoPlayerNode.adState = "noAds"
   end if

@@ -153,6 +153,12 @@ Function init()
     "srcForAds": m.constants.player.playbackOrigin.unknown
   }
 
+  m.playerLogLib = invalid
+
+  if m.constants.settings.playerLogEnabled = true AND getExperimentResource("roku_player_client_log", "roku_player_client_log_v1").enabled = true
+    m.playerLogLib = PlayerLogLib(m.constants)
+  end if
+
   ' Map to store the history whether cuePoints button were shown or not.
   ' skip button for each cuepoint should only be shown once per video
   m.cuePointsHistory = {}
@@ -498,8 +504,9 @@ Function playContent()
       end if
 
       if fetchPreroll = true
+        updatePlayerLogLib(m.playerLogLib, "setAdType", "preroll")
         ' Start pre-roll fetch
-        m.top.adControl = "preroll"
+        m.top.adControl = "preroll" 
       else
         m.Video.control = "play"
         setInitialCCAndAudioTracks()
@@ -583,13 +590,19 @@ End Function
 Function onControlChange()
   control = m.top.control
   tubiLog("VideoPlayer.onControlChange " + control)
+  updatePlayerLogLib(m.playerLogLib, "setVideoControl", control)
+
   if control = "play"
     if m.top.content <> invalid
+      updatePlayerLogLib(m.playerLogLib, "setPlayerLoadTime", m.top.loadTime)
+      updatePlayerLogLib(m.playerLogLib, "setPlayerSetupStartTime")
       prepareToStartVideo(m.top.content)
+      updatePlayerLogLib(m.playerLogLib, "setPlayerSetupEndTime")
       playContent()
     end if
 
   else if control = "stop" then
+
     stopAdsPlayback()
     cancelReplayCaptions()
     clearSkipCuepointsButtonAndTimer()
@@ -614,6 +627,7 @@ End Function
 Function onVideoStateChange(msg)
   tubiLog("VideoPlayer.onVideoStateChange " + msg.GetData())
   state = msg.GetData()
+  updatePlayerLogLib(m.playerLogLib, "setVideoState", state)
 
   if state = "buffering"
     m.bufferingTimer.observeFieldScoped("fire", "onBufferingTimerFired")
@@ -742,7 +756,7 @@ Function onVideoStateChange(msg)
       showAdBreakStoppedCallback()
     else if m.VideoState = "stop"  then
       ' player has stopped (not due to an ad break)
-      if m.top.adState = "noAds" or m.top.adState = "init"
+      if m.top.adState = "noAds" OR m.top.adState = "init" OR m.top.adState = "adsCompleted"
         if m.Video.content <> invalid
 
           ' the video has been stopped, send a final playProgressEvent
@@ -898,6 +912,7 @@ Function onVideoPositionChange(msg)
     positionLog = position.toStr()
   end if
   tubiLog("VideoPlayer.onVideoPositionChange position = " + positionLog)
+  updatePlayerLogLib(m.playerLogLib, "setVideoPosition", position)
 
   ' protects against video positions being updated after we've told the player to pause
   if m.VideoState = "play"
@@ -1040,6 +1055,7 @@ Function onVideoPositionChange(msg)
     if isCuepointPrefetchTimeReached = true AND m.UpNext.opacity = 0
       m.top.adPosition = potentialCuepoint
       m.top.adControl = "midroll"
+      updatePlayerLogLib(m.playerLogLib, "setAdType", "midroll")
     end if
 
     ' show the ads countdown if appropriate (show if ads are available and within adHeadsUpTime)
@@ -1078,7 +1094,7 @@ Function onVideoPositionChange(msg)
         ' system resources to the RAF video player
         showAdBreak()
         m.showRatings = true
-      else if adState = "noAds"
+      else if adState = "noAds" OR adState = "adsCompleted"
         ' when we reach the cuepoint, we find that the last ad call returned no ads
 
         if m.mostRecentCompletedCuepoint <> m.playerPosition
@@ -1133,8 +1149,11 @@ End Function
 '   "adsPlaying": ads are currently playing - RAF has control
 '   "adsClosed": a user has hit the back button while RAF has control, closing the ad experience
 '   "noAds": an ad response has been received but there are no ads in it. Or an ad break has played to completion.
+'   "adsCompleted": an ad break has played to completion.
 Function onAdStateChange(msg)
   adState = msg.getData()
+  updatePlayerLogLib(m.playerLogLib, "setAdState", adState)
+
   tubiLog("VideoPlayer.onAdStateChange adState = " + adState + " VideoState = " + m.VideoState + " Video.State = " + m.Video.state)
   if adState = "ready"
     m.top.adState = "init"
@@ -1150,7 +1169,7 @@ Function onAdStateChange(msg)
     ' pre-roll or resume-roll. Play ads right away
     showAdBreak()
     m.showRatings = true
-  else if adState = "noAds" AND (m.VideoState = "play" or m.VideoState = "pause" or m.VideoState = "ffw" or m.VideoState = "rew" or m.VideoState = "skip" or m.VideoState = "hop") AND m.Video.state <> "playing" then
+  else if (adState = "noAds" OR adState = "adsCompleted") AND (m.VideoState = "play" or m.VideoState = "pause" or m.VideoState = "ffw" or m.VideoState = "rew" or m.VideoState = "skip" or m.VideoState = "hop") AND m.Video.state <> "playing" then
     'The below check is to remove the resumeFrom ad param once we've already sent the resumeFrom param in the previous ad request to avoid sending it again for future midrolls if it is not expected.
     content = m.top.content
     if content.adParam <> invalid and content.adParam.resumeFrom <> invalid
@@ -1807,6 +1826,8 @@ Function setDrmOnContent(contentNode, resource, videoResourceIndex)
     contentNode.resolution = resource.resolution
     contentNode.currentVideoResourceIndex = videoResourceIndex
     contentNode.hdcpVersion = resource.hdcpVersion
+
+    updatePlayerLogLib(m.playerLogLib, "setVideoContent", contentNode)
 
     '//set youbora field
     youboraTracking = {}
