@@ -2565,6 +2565,20 @@ const elements = typeCheckElements({
   // Privacy Center Continue Watching Toggle
   privacyCenterContinueWatchingToggle: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.#privacyCenterPanel.#Offset.#panelContentSection.#managePreferences.#preferenceMenu.0.#contentSection.2.1.#toggleText'
+  },
+
+  /** Preview on button */
+  autoplayPreviewOn: {
+    keyPath:'#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#AutoplayPreviewMenu.0'
+  },
+
+  // Preview Off Checked
+  previewOffCheckMark: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.3.#Offset.#ContentGroup.#AutoplayPreviewMenu.1.#container.0.#checkIcon',
+  },
+  // Preview On Checked
+  previewOnCheckMark: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.3.#Offset.#ContentGroup.#AutoplayPreviewMenu.0.#container.0.#checkIcon',
   }
 });
 

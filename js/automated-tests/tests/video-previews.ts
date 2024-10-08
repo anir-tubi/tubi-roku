@@ -264,6 +264,53 @@ describe('Video Preview', function () {
     await checkForPreview();
 
   });
+
+  // https://tubi.testrail.io/index.php?/cases/view/676756
+   it('C676756 - "Autoplay Previews" setting defaults to "on" when user signs out @videopreview', async () => {
+
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Open Left Nav and Turn off Video Preview
+    await ecp.sendKeypress(ecp.Key.Left);
+    await testUtils.jumpToRowWithTitle('sideNavMenu', 'Settings');
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await testUtils.waitForCurrentScreenToEqual('settingsScreen');
+
+    await testUtils.jumpToRowWithTitle('settingsMenu', 'Autoplay Previews');
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await testUtils.waitForElementToFullyShowOnScreen('autoplayPreviewOn');
+    await ecp.sendKeypress(ecp.Key.Down);
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await testUtils.waitForElementToFullyShowOnScreen('previewOffCheckMark');
+
+    // Sign out
+    await ecp.sendKeypress(ecp.Key.Back, {count:2});
+    await testUtils.waitForCurrentScreenToEqual('homeScreen');
+    await ecp.sendKeypress(ecp.Key.Left);
+    await testUtils.jumpToRowWithTitle('sideNavMenu', 'Hi ');
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await testUtils.waitForCurrentScreenToEqual('settingsScreen');
+    await ecp.sendKeypress(ecp.Key.Ok);
+    const signOutVerificationModalMessage = await testUtils.getNodeForElement('signOutVerificationModalMessage');
+    expect(signOutVerificationModalMessage.text).to.equal('You are about to sign out of your Tubi account.');
+    await ecp.sendKeypress(ecp.Key.Ok);
+
+    await testUtils.waitForCurrentScreenToEqual('homeScreen');
+    // Verify that video is playing
+    await checkForPreview();
+
+    // Check Preview in Settings
+    await ecp.sendKeypress(ecp.Key.Left);
+    await testUtils.jumpToRowWithTitle('sideNavMenu', 'Settings');
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await testUtils.waitForCurrentScreenToEqual('settingsScreen');
+
+    await testUtils.jumpToRowWithTitle('settingsMenu', 'Autoplay Previews');
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await testUtils.waitForElementToFullyShowOnScreen('autoplayPreviewOn');
+    await testUtils.waitForElementToFullyShowOnScreen('previewOnCheckMark');
+  });
 });
 
 
