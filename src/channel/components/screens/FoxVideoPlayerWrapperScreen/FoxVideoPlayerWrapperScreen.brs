@@ -31,8 +31,22 @@ End Function
 
 Function playContentWithFoxVideoPlayer()
   contentId = m.top.contentId
+  isFoxVideoPlayerAvailable = m.top.isFoxVideoPlayerAvailable
+
+  logString = "FoxVideoPlayerWrapperScreen.playContentWithFoxVideoPlayer "
+  
+  if isNonEmptyString(contentId) = true
+    logString += "contentId: " + contentId + " "
+  end if
+
+  if isBoolean(isFoxVideoPlayerAvailable) = true
+    logString += "isFoxVideoPlayerAvailable: " + isFoxVideoPlayerAvailable.toStr()
+  end if
+
+  tubiLog(logString)
+
   ' Confirm all of our prerequisites are met before we start playback
-  if m.top.isFoxVideoPlayerAvailable = true AND contentId <> "" then
+  if isFoxVideoPlayerAvailable = true AND contentId <> "" then
     playerInfo = buildPlayerInfo(contentId)
 
     m.rpfPlaybackPage = createObject("roSGNode", "FoxVideoPlayer:RpfPlaybackPage")
@@ -51,7 +65,6 @@ End Function
 '@contentId: The id of the content to play as returned by the Fox listing api
 Function buildPlayerInfo(contentId)
   videoContentNode = CreateObject("roSGNode", "FoxVideoPlayer:RpfVideoContentNode")
-  context = {}
 
   context = {
     "action": "play",
@@ -70,6 +83,7 @@ Function buildPlayerInfo(contentId)
     "streamType": "live",
     "displayBrand": "fox",
     "network": "fox",
+    "videoType": "live"
   })
 
   videoContentNode.setFields({

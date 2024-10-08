@@ -91,7 +91,16 @@ Function updateUI()
     remainingSeconds = secondsUntilAirTime mod 86400
     hour = Fix(remainingSeconds / 3600)
     remainingSeconds = secondsUntilAirTime mod 3600
-    minutes = Fix(remainingSeconds / 60)
+
+    ' If the remainingSeconds is less than 60 seconds than using fix will cause the minutes to zero for like 50 seconds etc.
+    if remainingSeconds > 60
+      minutes = Fix(remainingSeconds / 60)
+    else if remainingSeconds > 0
+      ' Making sure until the seconds becomes zero we will still display 1 min since we do not have seconds component.
+      minutes = 1
+    else
+      minutes = 0
+    end if
 
     ' Position of components within the elementsgroup
     ' 0 - air date string for ex: displays like LIVE ON SEP 28
@@ -100,7 +109,7 @@ Function updateUI()
     ' 3 - remaining minutes until the air date.
 
     ' Since we re-use the same info panel between different items and we remove the fields if we do not have values we need to make sure they are added if needed.
-    if remainingDays > 0 AND remainingHours > 24
+    if remainingDays > 0 AND remainingHours >= 24
       if m.nodeHelpers.getChildIndex(m.elementsGroup, m.day) = -1
         m.elementsGroup.insertChild(m.day, 1)
       end if

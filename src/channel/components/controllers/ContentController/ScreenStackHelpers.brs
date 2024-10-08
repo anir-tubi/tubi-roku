@@ -237,6 +237,12 @@ Function onScreenChange()
   end if
   ' Processing any queued braze messaging if they are queued due to being in non whitelisted screens.
   processQueuedInAppMessage()
+
+  ' We will make a call to listing api only if the initial home screen tensor api call returned the purple carpet container
+  ' and m.purpleCarpetContainerContentNode is not equal to invalid.
+  if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen
+    getFoxListingItemsAndRefreshPurpleCarpetContainerData()
+  end if
 End Function
 
 

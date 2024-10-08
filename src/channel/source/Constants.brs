@@ -694,6 +694,8 @@ Function getConstants()
 
     constants.urls.rokuContinueWatchingEndpoint = "https://userdata.sr.roku.com/user-data/v1/content/continueWatching"
 
+    constants.urls.foxListingEndpoint = "https://prod.api.haw.digitalvideoplatform.com/v3.0/listings"
+
   'http request types
   constants.reqTypes = {}
     constants.reqTypes.get = "GET"

@@ -387,13 +387,18 @@ Function onGridFocusChange() as void
       if focusedContent.gridItemType <> m.constants.ui.gridItemTypes.purpleCarpet AND (m.isSpotlightRowEnabled = false OR focusedContent.gridItemType <> m.constants.ui.gridItemTypes.spotlight)
         populateInfoPanelByContent(focusedContent)
       end if
-
-      if focusedContent.gridItemType = m.constants.ui.gridItemTypes.purpleCarpet OR (m.isSpotlightRowEnabled = true AND focusedContent.gridItemType = m.constants.ui.gridItemTypes.spotlight)
+      
+      if focusedContent.gridItemType = m.constants.ui.gridItemTypes.purpleCarpet
+        fadeOutInfoPanel()
+        ' Since info panel always focus the information related to primary content and not the secondary rowlist item even if it gets focused.
+        m.top.backgroundUriList = determineBackgroundImage(m.top.primaryEventContent)
+      else if (m.isSpotlightRowEnabled = true AND focusedContent.gridItemType = m.constants.ui.gridItemTypes.spotlight)
         fadeOutInfoPanel()
         m.top.backgroundUriList = determineBackgroundImage(focusedContent)
       else
         fadeInContentArea()
       end if
+      
     end if
 
   end if
@@ -490,6 +495,9 @@ Function onItemToBeFocusedChange()
     ' Covers use cases where info panel was hidden but due to home screen container changes purple carpet or spotlight is removed and info panel was reset.
     fadeInContentArea()
     populateInfoPanelByContent(reloadedItemToBeFocused)
+  else
+    ' Making sure the background is also updated if a purple carpet or spotlight row is focused.
+    m.top.backgroundUriList = determineBackgroundImage(reloadedItemToBeFocused)
   end if
 End Function
 
@@ -543,7 +551,11 @@ Function setFocusOnCategoryGrid()
   tubiLog("Homescreen.setFocusOnCategoryGrid" + m.top.id)
   ' Only fade in content area if last focused was not spotlight or purple carept.
   focusedContent = m.categoryGridList.itemFocused
-  if focusedContent <> invalid AND (focusedContent.gridItemType = m.constants.ui.gridItemTypes.purpleCarpet OR (m.isSpotlightRowEnabled = true AND focusedContent.gridItemType = m.constants.ui.gridItemTypes.spotlight))
+  if focusedContent <> invalid AND focusedContent.gridItemType = m.constants.ui.gridItemTypes.purpleCarpet
+    fadeOutInfoPanel()
+    ' Since info panel always focus the information related to primary content and not the secondary rowlist item even if it gets focused.
+    m.top.backgroundUriList = determineBackgroundImage(m.top.primaryEventContent)
+  else if focusedContent <> invalid AND (m.isSpotlightRowEnabled = true AND focusedContent.gridItemType = m.constants.ui.gridItemTypes.spotlight)
     fadeOutInfoPanel()
     m.top.backgroundUriList = determineBackgroundImage(focusedContent)
   else

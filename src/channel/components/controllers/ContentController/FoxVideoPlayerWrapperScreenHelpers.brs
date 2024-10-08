@@ -8,7 +8,7 @@ Function playLinearVideoWithFoxPlayer(content)
     ' m.global.update({
     '   proxyParameters: {
     '     "isProxyEnabled": true
-    '     "proxyIp": "192.168.10.117"
+    '     "proxyIp": "192.168.1.153"
     '   }
     ' }, true)
 
@@ -35,6 +35,8 @@ Function playLinearVideoWithFoxPlayer(content)
     foxVideoPlayerWrapperScreen = createObject("roSGNode", "FoxVideoPlayerWrapperScreen")
     foxVideoPlayerWrapperScreen.id = m.constants.ui.screenIds.foxVideoPlayerWrapperScreen
     foxVideoPlayerWrapperScreen.observeFieldScoped("isPlayerClosed", "onFoxVideoPlayerIsPlayerClosed")
+    foxVideoPlayerWrapperScreen.tubiContent = content
+
     pushScreen(foxVideoPlayerWrapperScreen, false, false)
 
     ' If we haven't retrieved the fox player yet then start loading it
@@ -45,7 +47,7 @@ Function playLinearVideoWithFoxPlayer(content)
       foxVideoPlayerWrapperScreen.isFoxVideoPlayerAvailable = true
     end if
 
-    getChannelCurrentContentId()
+    getFoxListingItemsAndRefreshPurpleCarpetContainerData(setFoxContentId)
   end if
 End Function
 
@@ -147,10 +149,10 @@ Function getFoxVideoPlayerConfig()
         "specialDetail": "{foxApiRoot}/v2.0/screens/special-detail/{showCode}",
         "watch": "{foxApiRoot}/v2.0/screens/watch"
       },
-      foxApiRoot: "https://qa.api.venu.digitalvideoplatform.com"
-      key: "SBPOC2025",
+      foxApiRoot: "https://prod.api.haw.digitalvideoplatform.com"
+      key: "tubi_roku",
       mvpds: "{foxApiRoot}/v2.0/mvpds",
-      watch: "{foxApiRoot}/v2.0/watch"
+      watch: "{foxApiRoot}/v3.0/watchlive"
     },
     "analytics": {
       "conviva": {
@@ -567,41 +569,6 @@ Function onFoxVideoPlayerAlertDialogCancelledChange(msg)
 End Function
 
 
-Function getChannelCurrentContentId()
-  options = {
-    "headers": {
-      "x-request-token": "927d3eb9-d283-4712-bee0-1823096122f4"
-      "X-Requester-Service": "postman"
-    }
-  }
-
-  m.makeRequest({
-    url: "https://qa-rtlm.api.venu.digitalvideoplatform.com/v1/listingsdist/current?callsign=FS1"
-    requestType: m.constants.reqNames.generic
-    options: options
-    successCallback: getChannelCurrentContentIdRequestSuccess
-    errorCallback: getChannelCurrentContentIdRequestError
-    responseType: "assocarray"
-  })
-End Function
-
-
-Function getChannelCurrentContentIdRequestSuccess(response)
-  if response <> invalid then
-    currentScreen = getCurrentScreen()
-    if currentScreen.id = m.constants.ui.screenIds.foxVideoPlayerWrapperScreen then
-      currentScreen.contentId = response.id
-    end if
-  end if
-End Function
-
-
-Function getChannelCurrentContentIdRequestError(error)
-  tubiLog("getChannelCurrentContentIdRequestError failed to get current content id")
-  closeFoxVideoPlayer()
-End Function
-
-
 Function closeFoxVideoPlayer()
   foxVideoPlayerWrapperScreen = getScreenFromStackById(m.constants.ui.screenIds.foxVideoPlayerWrapperScreen)
   if foxVideoPlayerWrapperScreen <> invalid then
@@ -624,6 +591,25 @@ Function onFoxVideoPlayerIsPlayerClosed()
     if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.foxVideoPlayerWrapperScreen then
       ' Since this is the only screen in the stack, when we pop it, it will call startChannel() again which will display the homescreen
       popScreen(false, false)
+    end if
+  end if
+End Function
+
+
+Function setFoxContentId(purpleCarpetContainer, _screenId)
+  if purpleCarpetContainer <> invalid then
+    currentScreen = getCurrentScreen()
+    if currentScreen.id = m.constants.ui.screenIds.foxVideoPlayerWrapperScreen then
+      tubiContent = currentScreen.tubiContent
+
+      if tubiContent <> invalid
+        contentNode = m.nodeHelpers.getChildById(purpleCarpetContainer, tubiContent.id)
+
+        ' TODO: Add fallback logic if in case the selected item for some reason is not returned.
+        if contentNode <> invalid AND contentNode.foxContentId <> invalid
+          currentScreen.contentId = contentNode.foxContentId
+        end if
+      end if
     end if
   end if
 End Function

@@ -415,7 +415,19 @@ Function resolveAbbreviatedContent(content, rowItemIndex)
     end if
 
     if isNonEmptyString(contentId) = true
-      return m.metadataTranslate.getContentFromCategoryJson(category, contentId, m.top.signedIn) ' can return invalid
+      ' Making sure we add back the airdatetime and foxContentId to the content node since we are fetching updated data from css category json which will not have data added dynamically from listing api.
+      originalAirDateTime = content.airDateTime
+      foxContentId = content.foxContentId
+      singleContent = m.metadataTranslate.getContentFromCategoryJson(category, contentId, m.top.signedIn) ' can return invalid
+      
+      if singleContent <> invalid AND content.gridItemType = m.constants.ui.gridItemTypes.purpleCarpet
+        singleContent.update({
+          airDateTime: originalAirDateTime
+          foxContentId: foxContentId
+        }, true)
+      end if
+
+      return singleContent
     end if
   end if
 
@@ -693,7 +705,10 @@ End Function
 
 Function onReloadedItemToBeFocused(msg)
   ' Not creating a alias to avoid it becoming bi-directional field into the spotlight row.
-  m.top.reloadedItemToBeFocused = msg.getData()
+  itemToBeFocused = msg.getData()
+  if itemToBeFocused <> invalid
+    m.top.reloadedItemToBeFocused = itemToBeFocused
+  end if
 End Function
 
 
@@ -753,11 +768,11 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         m.lastFocusedList = "spotlight"
         slideTo(m.RowList, [0, 384], 0.3)
       else if m.top.purpleCarpetContent <> invalid
-        ' Calling onPurpleCarpetRowItemFocused() below updates the itemFocused which in turn triggers onGridFocusChange inside homescreen.brs.
+        ' updating the itemFocused which in turn triggers onGridFocusChange inside homescreen.brs.
         ' Which causes the regular info panel to be hidden and the background to be updated to full screen version.
         ' The reason for calling this manually is because purple carept has cta button list and rowlist.
         ' Since we need to update the info panel even when ctaButtonList we need to force call it here.
-        onPurpleCarpetRowItemFocused()
+        m.top.itemFocused = m.top.primaryEventContent
 
         m.purpleCarpetRow.setFocus(true)
         slideFade(m.purpleCarpetRow, "below", "in", 0.3)

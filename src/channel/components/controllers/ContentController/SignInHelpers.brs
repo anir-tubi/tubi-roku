@@ -1454,7 +1454,7 @@ Function startPurpleCarpetPlaybackAfterSignIn()
   screen = getCurrentScreen()
   primaryEventContent = screen.primaryEventContent
   if primaryEventContent <> invalid
-    processPlayEvent(primaryEventContent,  screen)
+    processPlayEvent(primaryEventContent, screen, true)
   end if
 
   setContentToRefreshAllPersonalizedScreens(true)

@@ -296,8 +296,20 @@ Function addControllerUi()
 
   ' Content node for a single purple carpet event. This is used in case of purple carpet event deeplinking and purple carpet banner click.
   m.singlePurpleCarpetEventContentNode = invalid
+  
   ' Callback triggered once the event details was completely loaded. This is used in case of purple carpet event deeplinking and purple carpet banner click.
   m.eventDetailsScreenLoadCompletionCallback = invalid
+
+  ' Holds the fox listing api response.
+  m.foxListingEndpointResponse = invalid
+
+  ' Storing the callback in m scope since we cannot pass down a method in response context.
+  ' This variable will hold the callback method which will be triggered upon completion of listing api call and
+  ' Filtering and update of purple carpet container programs based on the end time of program from listing api and also overriding ccs airdatetime with starttime from listing api.
+  m.onUpdateContainerWithProgramInfoFromFoxListingCompletionCallback = invalid
+
+  ' Holds the purple carpet container node.
+  m.purpleCarpetContainerContentNode = invalid
 
   ' The following fields are needed as a part of getUserInfo
   m.getHistoryIdsResponseReceived = false ' Have we received a response for history ids call (success or failure)
@@ -1672,14 +1684,10 @@ End Function
 
 Function setVideoContentScreenBackground(screen)
   currentScreen = getCurrentScreen()
-  if screen <> invalid AND currentScreen <> invalid AND screen.id = currentScreen.id
-    contentType = invalid
-    gridItemType = invalid
+  if screen <> invalid AND currentScreen <> invalid AND screen.id = currentScreen.id AND screen.contentFocused <> invalid
     contentFocused = screen.contentFocused
-    if contentFocused <> invalid
-      contentType = contentFocused.type
-      gridItemType = contentFocused.gridItemType
-    end if
+    contentType = contentFocused.type
+    gridItemType = contentFocused.gridItemType
     videoPreviewState = getVideoPreviewState()
 
     isVideoPreviewPlayQueued = false

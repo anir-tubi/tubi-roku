@@ -164,14 +164,14 @@ Function populateInfoPanelWithPurpleCarpetMode(content, infoPanel)
     infoPanel.titleImageUri = ""
   end if
 
-  infoPanel.airDateTime = content.airDateTime
-
   isEventLive = (isGreaterThanCurrentTime(content.airDateTime) = false)
 
   if isEventLive = true
     infoPanel.liveBadgeHeaderText = getTranslation("screenSearch_liveText")
+    infoPanel.airDateTime = ""
   else
     infoPanel.liveBadgeHeaderText = ""
+    infoPanel.airDateTime = content.airDateTime
   end if
 
   infoPanel.width = 960

@@ -37,7 +37,7 @@ Function init()
 
   ' Creating a timer to refresh the Call to actions button since we have button logic based on whether game is live vs not.
   m.ctaButtonListRefreshTimer = topRef.findNode("ctaButtonListRefreshTimer")
-  m.ctaButtonListRefreshTimer.observeFieldScoped("fire", "populateCtaButtonList")
+  m.ctaButtonListRefreshTimer.observeFieldScoped("fire", "onCtaButtonListRefreshTimerFired")
 End Function
 
 
@@ -70,20 +70,30 @@ End Function
 Function onContentChange()
   m.top.primaryEventContent = invalid
   m.rowList.content = invalid
-  if m.top.content <> invalid then
+  if isNode(m.top.content) = true AND m.top.content.getChild(0) <> invalid
     ' Creating a clone to avoid modifying the original content node.
     rowListContent = m.top.content.clone(true)
     category = rowListContent.getChild(0)
     primaryEventContent = category.getChild(0)
-    category.removeChild(primaryEventContent)
-    
+
     ' field with key "json" is a json string that holds the complete response from the container api request.
     ' Even though we are removing primary event from the category container on line number 78, "json" field will hold the complete response from backend.
     singleContent = m.metadataTranslate.getContentFromCategoryJson(category, primaryEventContent.id, m.top.signedIn)
-    if singleContent <> invalid
-      primaryEventContent = singleContent
-    end if
 
+    ' Removing the primary event node from the rowlist content node.
+    category.removeChild(primaryEventContent)
+
+    if singleContent <> invalid
+      ' Making sure we add back the airdatetime and foxContentId to the content node since we are fetching updated data from css category json which will not have data added dynamically from listing api.
+      originalAirDateTime = primaryEventContent.airDateTime
+      foxContentId = primaryEventContent.foxContentId
+      primaryEventContent = singleContent
+      primaryEventContent.update({
+        airDateTime: originalAirDateTime
+        foxContentId: foxContentId
+      }, true)
+    end if
+    
     if category.getChildCount() > 0
       size = m.constants.ui.imageSizes.largeLandscape
       posterHeight = size[1]
@@ -258,6 +268,13 @@ Function onDidSetReminderForEventContentChange(msg)
     ' Triggering a info panel update to display reminder state.
     m.infoPanel.reminderIsSet = reminderIsSet
   end if
+End Function
+
+
+Function onCtaButtonListRefreshTimerFired(msg)
+  populateCtaButtonList()
+  ' Refreshing the info panel so that the live badge appears and the countdown timer is removed.
+  populateInfoPanelWithPurpleCarpetMode(m.top.primaryEventContent, m.infoPanel)
 End Function
 
 
