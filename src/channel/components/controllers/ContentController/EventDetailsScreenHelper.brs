@@ -30,6 +30,8 @@ Function showEventDetailScreen(eventId, purpleCarpetContainerContent = invalid, 
   end if
   
   pushScreen(screen, true, true)
+  
+  m.wasUserShownPurpleCarpetAvailableAtToast = false
 End Function
 
 

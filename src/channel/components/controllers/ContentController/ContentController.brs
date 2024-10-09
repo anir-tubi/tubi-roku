@@ -311,6 +311,11 @@ Function addControllerUi()
   ' Holds the purple carpet container node.
   m.purpleCarpetContainerContentNode = invalid
 
+  ' Holds the status of if the user was shown the available at disabled button clicked toast.
+  ' We are restricting it to be shown once for the event details screen session.
+  ' If the user navigates to the same event screen again or a different contents event screen we will show the message again.
+  m.wasUserShownPurpleCarpetAvailableAtToast = false
+
   ' The following fields are needed as a part of getUserInfo
   m.getHistoryIdsResponseReceived = false ' Have we received a response for history ids call (success or failure)
   m.getQueueIdsResponseReceived = false ' Have we received a response for getQueueIds call (success or failure)

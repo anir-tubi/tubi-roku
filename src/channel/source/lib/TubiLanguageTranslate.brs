@@ -1955,6 +1955,14 @@ Function getTranslation_en_US()
     "auth_refresh_welcome_header": {
       "description": "A header for the message that let's the user know they've been signed in with the given email",
       "message": "Welcome!"
+    },
+    "available_at_toast_heading": {
+      "description": "Toast message heading that is displayed when we click on a available at button",
+      "message": "Content available at {time}"
+    },
+    "available_at_toast_subheading": {
+      "description": "Toast message subheading that is displayed when we click on a available at button",
+      "message": "We know you're excited. So are we!"
     }
   }
 End Function

@@ -1183,6 +1183,23 @@ Function onEventCtaListItemSelected(msg)
       else
         setOrRemovePurpleCarpetReminder()
       end if
+    else if id = "availableAt" AND m.wasUserShownPurpleCarpetAvailableAtToast = false
+      airDatetime = CreateObject("roDateTime")
+      airDatetime.FromISO8601String(primaryEventContent.airDateTime)
+      airDatetime.toLocalTime()
+      formattedTime = airDatetime.asTimeStringLoc("h:mm a")
+      message = getTranslation("available_at_toast_subheading")
+      replacements = {
+        "time": formattedTime
+      }
+      heading = getTranslation("available_at_toast_heading", replacements)
+      showToast({
+        "selfDestructTimer": 5
+        "headerText": heading
+        "message": message
+      })
+
+      m.wasUserShownPurpleCarpetAvailableAtToast = true
     end if
   end if
 End Function
