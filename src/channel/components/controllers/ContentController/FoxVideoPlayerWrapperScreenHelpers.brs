@@ -32,6 +32,8 @@ Function playLinearVideoWithFoxPlayer(content)
 
     m.trackingLoggingTask.trackEvent = event
 
+    showHideLogo(m.constants.logoType.hide)
+
     foxVideoPlayerWrapperScreen = createObject("roSGNode", "FoxVideoPlayerWrapperScreen")
     foxVideoPlayerWrapperScreen.id = m.constants.ui.screenIds.foxVideoPlayerWrapperScreen
     foxVideoPlayerWrapperScreen.observeFieldScoped("isPlayerClosed", "onFoxVideoPlayerIsPlayerClosed")
@@ -578,6 +580,8 @@ End Function
 
 
 Function onFoxVideoPlayerIsPlayerClosed()
+  showHideLogoBasedOnUiMode()
+
   if m.foxRpfInstance <> invalid AND m.foxRpfInstance.playerEvent <> invalid then
     sendFoxVideoPlayerLivePlayProgressEvent(m.foxRpfInstance.playerEvent.playerPosition, true)
   end if
