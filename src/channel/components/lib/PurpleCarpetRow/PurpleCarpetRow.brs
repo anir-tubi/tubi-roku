@@ -32,8 +32,8 @@ Function init()
   onThemeChange()
 
   ' Contains information about the last focused element, possible values "rowList","ctaButtonList".
-  ' Setting default value as rowlist since that is focused by default.
-  m.lastFocusedElement = "rowList"
+  ' Setting default value as ctaButtonList since that is focused by default.
+  m.lastFocusedElement = "ctaButtonList"
 
   ' Creating a timer to refresh the Call to actions button since we have button logic based on whether game is live vs not.
   m.ctaButtonListRefreshTimer = topRef.findNode("ctaButtonListRefreshTimer")
@@ -290,6 +290,7 @@ Function onKeyPressedChange(msg)
   if key = "left"
     if m.ctaButtonList.content <> invalid AND m.ctaButtonList.content.getChildCount() > 0
       m.lastFocusedElement = "ctaButtonList"
+      m.infoPanelGroup.opacity = 1
       m.ctaButtonList.setFocus(true)
     end if
   end if
@@ -299,6 +300,7 @@ End Function
 Function onKeyEvent(key as String, press as Boolean) as Boolean
   if press = true AND key = "right" AND m.ctaButtonList.isInFocusChain() = true AND m.rowList.content <> invalid AND m.rowList.content.getChildCount() > 0
     m.lastFocusedElement = "rowList"
+    m.infoPanelGroup.opacity = 0.6
     m.rowList.setFocus(true)
     return true
   end if
