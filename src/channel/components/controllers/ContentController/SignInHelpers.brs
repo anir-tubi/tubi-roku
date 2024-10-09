@@ -38,6 +38,28 @@ Function showRFIScreen()
   else
     ' This is the path expected to be taken in production
     currentScreen = getCurrentScreen()
+    dialogSubType = "email-prefill"
+
+    ' RFI screen is showing only if the channelStore node is stored in m variable
+    m.billing = CreateObject("roSGNode", "ChannelStore")
+    m.billing.observeFieldScoped("userData", "onRfiUserData")
+    requestedUserData = "email, firstname, lastname, gender" 
+
+    if m.pub_serverPersistentData <> invalid AND m.pub_serverPersistentData.hasPreviouslyRegistered = true
+
+      'fire exposure event for experiment roku_registration_with_magic_link_v2 only for previously registered user
+      if getExperimentResource("roku_registration_with_magic_link", "roku_registration_with_magic_link_v2").enabled = true
+        info = CreateObject("roSGNode", "ContentNode")
+        info.addFields({context: "signin"})
+        m.billing.requestedUserDataInfo = info
+        requestedUserData = "email" 
+        dialogSubType = "email-prefill-return"
+      end if
+
+    end if
+
+    m.billing.requestedUserData = requestedUserData
+    m.billing.command = "getUserData"
 
     if currentScreen <> invalid
       dialogEvent = {
@@ -46,31 +68,12 @@ Function showRFIScreen()
           dialog_type: "REGISTRATION"
           pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
           dialog_action: "SHOW"
-          dialog_sub_type: "email-prefill"
+          dialog_sub_type: dialogSubType
         }
       }
       m.trackingLoggingTask.trackEvent = dialogEvent
     end if
 
-    ' RFI screen is showing only if the channelStore node is stored in m variable
-    m.billing = CreateObject("roSGNode", "ChannelStore")
-    m.billing.observeFieldScoped("userData", "onRfiUserData")
-    requestedUserData = "email, firstname, lastname, gender" 
-
-    if m.pub_serverPersistentData <> invalid AND m.pub_serverPersistentData.hasPreviouslyRegistered = true
-      
-      'fire exposure event for experiment roku_registration_with_magic_link_v2 only for previously registered user
-      if getExperimentResource("roku_registration_with_magic_link", "roku_registration_with_magic_link_v2").enabled = true
-        info = CreateObject("roSGNode", "ContentNode")
-        info.addFields({context: "signin"})
-        m.billing.requestedUserDataInfo = info
-        requestedUserData = "email" 
-      end if
-
-    end if
-
-    m.billing.requestedUserData = requestedUserData
-    m.billing.command = "getUserData"
   end if
 End Function
 
@@ -83,6 +86,11 @@ Function onRfiUserData(msg)
   m.billing = invalid ' making m.billing as invalid to avoid using it another places
 
   currentScreen = getCurrentScreen()
+
+  dialogSubType = "email-prefill"
+  if m.pub_serverPersistentData <> invalid AND m.pub_serverPersistentData.hasPreviouslyRegistered = true AND getExperimentResource("roku_registration_with_magic_link", "roku_registration_with_magic_link_v2", false).enabled = true
+    dialogSubType = "email-prefill-return"
+  end if
 
   billing = msg.getRoSGNode()
   if billing <> invalid
@@ -97,7 +105,7 @@ Function onRfiUserData(msg)
         dialog_type: "REGISTRATION"
         pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
         dialog_action: "ACCEPT_DELIBERATE"
-        dialog_sub_type: "email-prefill"
+        dialog_sub_type: dialogSubType
       }
     }
     m.trackingLoggingTask.trackEvent = dialogEvent
@@ -122,7 +130,7 @@ Function onRfiUserData(msg)
         dialog_type: "REGISTRATION"
         pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
         dialog_action: "DISMISS_DELIBERATE"
-        dialog_sub_type: "email-prefill"
+        dialog_sub_type: dialogSubType
       }
     }
     m.trackingLoggingTask.trackEvent = dialogEvent
