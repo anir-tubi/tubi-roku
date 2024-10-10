@@ -152,10 +152,6 @@ Function tubiMetadataTranslate_getBackgroundImages(contentFromServer)
   imagesList = contentFromServer.images
   if imagesList <> invalid AND imagesList.background_tb <> invalid AND type(imagesList.background_tb) = "roArray" AND imagesList.background_tb.count() > 0
     backgrounds = imagesList.background_tb
-    ' If we do not have enough background images than back filling it with hero images.
-    if backgrounds.count() < 2 AND imagesList.hero_tb <> invalid AND type(imagesList.hero_tb) = "roArray" AND imagesList.hero_tb.count() > 0
-      backgrounds.push(imagesList.hero_tb[0])
-    end if
   else if contentFromServer.backgrounds <> invalid AND type(contentFromServer.backgrounds) = "roArray" AND contentFromServer.backgrounds.count() > 0
     backgrounds = contentFromServer.backgrounds
   end if

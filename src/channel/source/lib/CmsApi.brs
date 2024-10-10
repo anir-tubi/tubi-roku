@@ -198,7 +198,6 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
       imageParamTypes = [
         "poster"
         "landscape"
-        "hero"
         "background"
         "title"
         "spotlightLandscape"
@@ -207,7 +206,6 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
       imageParamTypes = [
         "poster"
         "landscape"
-        "hero"
         "background"
       ]
     end if
@@ -277,7 +275,6 @@ Function cmsApi_createMiniHomeScreenOnPlayerReqInfo(bKidsMode = false, passedOpt
     imageParamTypes = [
       "poster"
       "landscape"
-      "hero"
       "background"
     ]
     params = m.setImageParams(imageParamTypes, options.params, m.constants.ui.screenIds.homeScreen)
@@ -340,7 +337,6 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
       imageParamTypes = [
         "poster"
         "landscape"
-        "hero"
         "background"
         "title"
         "spotlightLandscape"
@@ -349,7 +345,6 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
       imageParamTypes = [
         "poster"
         "landscape"
-        "hero"
         "background"
       ]
     end if
@@ -393,7 +388,6 @@ Function cmsApi_createSearchRequestInfo(searchText, bKidsMode = false)
   options.params["is_kids_mode"] = bKidsMode
   imageParamTypes = [
     "poster"
-    "hero"
     "background"
   ]
   options.params = m.setImageParams(imageParamTypes, options.params, m.constants.ui.screenIds.searchScreen)
