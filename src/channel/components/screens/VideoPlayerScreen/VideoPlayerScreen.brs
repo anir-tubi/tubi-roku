@@ -478,14 +478,8 @@ Function playContent()
     updateVideoState("play")
 
     if m.top.enableAds = true then
-      inDetectPrerollExperiment = getExperimentResource("roku_detect_preroll_from_cue_point", "roku_detect_preroll_from_cue_point_v1").enabled
-
-      'fetchPreroll boolean is to fetch preroll or not, this value is updated based on cuepoint & roku_detect_preroll_from_cue_point experiment.
-      if inDetectPrerollExperiment = true
-        fetchPreroll = false
-      else
-        fetchPreroll = true
-      end if
+      'The fetchPreroll boolean determines whether to fetch the preroll. This value is updated based on the cue point, with a default setting of false.
+      fetchPreroll = false
 
       '//Set the midrolls of the videoplayer now and set the adControl state to preroll
       cuepoints = m.Video.content.cuepoints
@@ -495,7 +489,7 @@ Function playContent()
         for each cuepoint in cuepoints
           tubilog("VideoPlayer: MIDROLL: " + strI(cuepoint))
 
-          if inDetectPrerollExperiment = true AND Int(cuepoint) = 0
+          if Int(cuepoint) = 0
             fetchPreroll = true
           end if
 

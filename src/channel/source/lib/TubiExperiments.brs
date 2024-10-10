@@ -57,10 +57,6 @@ Function TubiExperiments(experimentsInfo) as Object
         roku_horizontal_menu_v2: {"enabled": false}
       }
 
-      roku_detect_preroll_from_cue_point: {
-        roku_detect_preroll_from_cue_point_v1: {"enabled": true}
-      }
-
       roku_spotlight_carousel: {
         roku_spotlight_carousel_v1 : {"enabled": false}
       }
