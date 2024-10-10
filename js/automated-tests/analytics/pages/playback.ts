@@ -56,6 +56,15 @@ const PlayBack = ({ content }) => {
 		}
 	}
 
+	async function checkIfSkipIntroIfPresent() {
+		let skipIntro;
+		await testUtils.retryWithTimeOut(async () => {
+			skipIntro = await elements.skipIntro();
+		});
+		return skipIntro.visible;
+	}
+
+
 	async function clickOnSkipIntro() {
 		await testUtils.retryWithTimeOut(async () => {
 			const skipIntro = await elements.skipIntro();
@@ -165,6 +174,11 @@ const PlayBack = ({ content }) => {
 	}
 
 	async function thirtySkipForward() {
+		if(await checkIfSkipIntroIfPresent()){
+			await utils.sleep(1000);	
+			await ecp.sendKeypress(ecp.Key.Down);
+			await utils.sleep(1000);
+		}
 		await ecp.sendKeypress(ecp.Key.Down);
 		await testUtils.retryWithTimeOut(async () => {
 			const playPauseButton = await elements.playPauseButton();
@@ -185,6 +199,10 @@ const PlayBack = ({ content }) => {
 		await allowPlaybackToPlayForSeconds(3500);
 	}
 	async function fastForwardNoWaitTime({ howFast = 1 } = {}) {
+		if (await checkIfSkipIntroIfPresent()){
+			await ecp.sendKeypress(ecp.Key.Down, { count: 1 });
+			await allowPlaybackToPlayForSeconds(1000); 
+		}
 		await ecp.sendKeypress(ecp.Key.Down, { count: 1 });
 		await testUtils.retryWithTimeOut(async () => {
 			const playPauseButton = await elements.playPauseButton();

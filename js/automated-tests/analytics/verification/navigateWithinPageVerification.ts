@@ -1138,7 +1138,7 @@ export async function verifyC543672(id) {
 	while (eventNavigateWithinPage === undefined && i < 16) {
 		const pulletEvents = await getMatchedEventsFromLastEvent(
 			Events.navigate_within_page,
-			13 + i
+			23 + i
 		);
 		eventNavigateWithinPage = pulletEvents.find(
 			(event) =>

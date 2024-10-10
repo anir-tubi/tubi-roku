@@ -33,6 +33,8 @@ const Container = () => {
 			expect(titleName.visible).to.equal(true);
 		});
 		await ecp.sendKeypress(ecp.Key.Ok);
+		await utils.sleep(2000)
+		await ecp.sendKeypress(ecp.Key.Ok);
 		const titleDetailsPage = TitleDetailsPage({ title: titleName.text });
 		await titleDetailsPage.pageDidLoad();
 		return titleDetailsPage;

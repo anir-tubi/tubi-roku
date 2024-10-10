@@ -1266,8 +1266,8 @@ const elements = typeCheckElements({
   },
 
   /** Live Icon */
-  liveIcon: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#RowList.7.items.0.1.#badgeGroup.0.#BadgeInfoLayout',
+  liveExpireTime: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#ExpireWarning',
   },
 
   loadingSpinnerLinear: {

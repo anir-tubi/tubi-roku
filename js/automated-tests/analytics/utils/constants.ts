@@ -18,7 +18,7 @@ export const LINEAR_NODES = {
 	LINEAR_NAVIGATION_PANEL: 'linearNavigationPanel',
 	LIVENEWS_SUBTITLES: 'btnCC_label',
 	LIVENEWS_SUBTITLES_PANEL: 'liveNewsSubtitlesPanel',
-	LIVE_ICON: 'liveIcon',
+	LIVE_EXPIRE_TIME: 'liveExpireTime',
 	COUNT_DOWN: 'countDownText',
 };
 

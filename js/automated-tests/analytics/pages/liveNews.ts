@@ -14,8 +14,8 @@ const LiveNews = () => {
 			await testUtils.getNodeForElement(LINEAR_NODES.LIVENEWS_SUBTITLES),
 		subtitlesNavigation: async () =>
 			await testUtils.getNodeForElement(LINEAR_NODES.LIVENEWS_SUBTITLES_PANEL),
-		liveIcon: async () =>
-			await testUtils.getNodeForElement(LINEAR_NODES.LIVE_ICON),
+		liveExpireTime: async () =>
+			await testUtils.getNodeForElement(LINEAR_NODES.LIVE_EXPIRE_TIME),
 		linearExpirationTimeText: async () =>
 			await testUtils.getNodeForElement('linearExpirationTimeText'),
 		loadingSpinnerLinear: async () =>
@@ -44,7 +44,7 @@ const LiveNews = () => {
 
 	async function checkIfLiveNewsShown() {
 		await testUtils.retryWithTimeOut(async () => {
-			const emblem = await elements.liveIcon();
+			const emblem = await elements.liveExpireTime();
 			expect(emblem.visible).to.equal(true);
 		});
 	}
@@ -53,7 +53,7 @@ const LiveNews = () => {
 		await testUtils.untilTrue(
 			async () => {
 				await utils.sleep(800);
-				const element = await elements.liveIcon();
+				const element = await elements.liveExpireTime();
 				let { visible } = element;
 				if (visible) {
 					return true;

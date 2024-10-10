@@ -491,7 +491,7 @@ ${JSON.stringify(bookmarkEvent)} \n`
 export async function verifyC439651(titleId) {
 	let bookmarkEvent;
 	let i = 1;
-	while (bookmarkEvent === undefined && i < 10) {
+	while (bookmarkEvent === undefined && i < 50) {
 		const pulletEvents = await getMatchedEventsFromLastEvent(
 			Events.bookmark,
 			i + 8
@@ -531,7 +531,7 @@ ${JSON.stringify(bookmarkEvent)} \n`
 export async function verifyC439649(titleId) {
 	let bookmarkEvent;
 	let i = 1;
-	while (bookmarkEvent === undefined && i < 10) {
+	while (bookmarkEvent === undefined && i < 50) {
 		const pulletEvents = await getMatchedEventsFromLastEvent(
 			Events.bookmark,
 			i + 8

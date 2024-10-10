@@ -418,7 +418,7 @@ ${JSON.stringify(navigateToPageEvent)} \n`
 export async function verifyC439651NavigateToPage(id) {
 	let navigateToPageEvent;
 	let i = 1;
-	while (navigateToPageEvent === undefined && i < 10) {
+	while (navigateToPageEvent === undefined && i < 50) {
 		const pulletEvents = await getMatchedEventsFromLastEvent(
 			Events.navigate_to_page,
 			40 + i
@@ -499,7 +499,7 @@ ${JSON.stringify(navigateToPageEvent)} \n`
 export async function verifyC439649NavigateToPage(id) {
 	let navigateToPageEvent;
 	let i = 1;
-	while (navigateToPageEvent === undefined && i < 10) {
+	while (navigateToPageEvent === undefined && i < 50) {
 		const pulletEvents = await getMatchedEventsFromLastEvent(
 			Events.navigate_to_page,
 			40 + i

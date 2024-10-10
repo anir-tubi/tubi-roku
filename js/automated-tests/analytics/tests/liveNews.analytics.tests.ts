@@ -21,7 +21,7 @@ describe('Live News Events', function () {
 		});
 	});
 
-	it('When the user changes focus of a new channel in the channel guide, it should send a "navigate_within_page" beacon C118157 @analyticsASet1', async () => {
+	it('When the user changes focus of a new channel in the channel guide, it should send a "navigate_within_page" beacon C118157 @analyticsASet1,@analyticsliveNews', async () => {
 		await testUtils.startApplicationAtPage('livefeed', {
 			shouldCreateNewUser: false,
 		});
@@ -30,7 +30,7 @@ describe('Live News Events', function () {
 		await liveNews.navigateThroughChannelsAndGoToNextCategory();
 		await verifyC118157();
 	});
-	it('When the user selects a channel from the channel guide, then it should send a "navigate_to_page" beacon C118158 and C118164 @analyticsASet1', async () => {
+	it('When the user selects a channel from the channel guide, then it should send a "navigate_to_page" beacon C118158 and C118164 @analyticsASet1,@analyticsliveNews', async () => {
 		const homePage = HomePage();
 		await homePage.pageDidLoad();
 		await homePage.navigateToLiveNewsAndSelect(true);
@@ -41,7 +41,7 @@ describe('Live News Events', function () {
 		await verifyC118164();
 	});
 	it('A "start_live_video_event" beacon should be sent at the start of the video playback. C118162 \
-      and UI: C114051 and UI: C114052 @analyticsASet1', async () => {
+      and UI: C114051 and UI: C114052 @analyticsASet1,@analyticsliveNews', async () => {
 		const homePage = HomePage();
 		await homePage.pageDidLoad();
 		await homePage.navigateToLiveNews();
@@ -51,7 +51,7 @@ describe('Live News Events', function () {
 		await verifyC118162();
 	});
 	it('A "fullscreen_toggle" beacon should be sent when the video exits fullscreen C118175 \
-      and C125523 and C125524 and UI:C114055 and C114061 @analyticsASet1', async () => {
+      and C125523 and C125524 and UI:C114055 and C114061 @analyticsASet1,@analyticsliveNews', async () => {
 		const homePage = HomePage();
 		await homePage.navigateToLiveNews();
 		const liveNews = LiveNews();
@@ -69,7 +69,7 @@ describe('Live News Events', function () {
 		await verifyC125524();
 	});
 
-	it('Subbtitles toggle when captions are turned off C120934 @analyticsASet1', async () => {
+	it('Subbtitles toggle when captions are turned off C120934 @analyticsASet1,@analyticsliveNews', async () => {
 		const homePage = HomePage();
 		await homePage.navigateToLiveNews();
 		const liveNews = LiveNews();

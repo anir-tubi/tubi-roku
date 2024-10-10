@@ -112,7 +112,7 @@ describe('Navigate Within Page', function () {
 		await verifyC425241(videoId);
 	});
 	it('When user navigates between menu options - GO_TO_NETWORK C42524 \
-	    and C425251 When user makes a selection from details page menu - GO_TO_NETWORK @analyticsASet2,@analyticsNavigateWithinPage', async () => {
+	    and C425251 When user makes a selection from details page menu - GO_TO_NETWORK @analyticsASet2,@analyticsNavigateWithinPageC44199', async () => {
 		await testUtils.startApplicationAtPage('home', {
 			shouldCreateNewUser: false,
 		});
