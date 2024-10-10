@@ -173,7 +173,7 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
   params["include_sponsorships"] = true
 
   ' TODO: Temporary for testing will be removed.
-  if m.constants.settings.mode <> "production"
+  if m.constants.settings.mode = "dev"
     params["include_fox_live_events_banner"] = true
     params["include_fox_live_events"] = true
   end if
@@ -501,7 +501,7 @@ Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = 
       category = homeScreen.purpleCarpetContent.getChild(0)
       if category <> invalid
         categoryReqInfo = m.createCategoryRequestInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode)
-        
+
         if categoryReqInfo <> invalid then
           requests.push(categoryReqInfo)
           category.state = "loading"
@@ -514,7 +514,7 @@ Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = 
       category = homeScreen.spotlightContent.getChild(0)
       if category <> invalid
         categoryReqInfo = m.createCategoryRequestInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode)
-        
+
         if categoryReqInfo <> invalid then
           requests.push(categoryReqInfo)
           category.state = "loading"
@@ -527,7 +527,7 @@ Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = 
       category = homeScreen.content.getChild(i)
       if category <> invalid
         categoryReqInfo = m.createCategoryRequestInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode)
-        
+
         if categoryReqInfo <> invalid then
           requests.push(categoryReqInfo)
           category.state = "loading"
