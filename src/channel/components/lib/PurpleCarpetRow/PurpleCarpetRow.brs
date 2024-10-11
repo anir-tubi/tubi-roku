@@ -113,7 +113,9 @@ Function onContentChange()
       m.top.primaryEventContent = primaryEventContent
 
       populateCtaButtonList()
-      populateInfoPanelWithPurpleCarpetMode(m.top.primaryEventContent, m.infoPanel)
+
+      isContentDetailsView = (m.top.isContentDetailsView = true)
+      populateInfoPanelWithPurpleCarpetMode(m.top.primaryEventContent, m.infoPanel, isContentDetailsView)
       m.infoPanel.calculateHeight = true
     end if
   end if
@@ -278,7 +280,8 @@ End Function
 Function onCtaButtonListRefreshTimerFired(msg)
   populateCtaButtonList()
   ' Refreshing the info panel so that the live badge appears and the countdown timer is removed.
-  populateInfoPanelWithPurpleCarpetMode(m.top.primaryEventContent, m.infoPanel)
+  isContentDetailsView = (m.top.isContentDetailsView = true)
+  populateInfoPanelWithPurpleCarpetMode(m.top.primaryEventContent, m.infoPanel, isContentDetailsView)
 End Function
 
 

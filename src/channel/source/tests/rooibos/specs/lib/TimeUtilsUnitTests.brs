@@ -212,3 +212,22 @@ Function timeUtils_isGreaterThanCurrentTime_test()
   m.assertFalse(isGreaterThanCurrentTime("1234567"))
   m.assertFalse(isGreaterThanCurrentTime(invalid))
 End Function
+
+
+'@Test compareDates unit tests
+Function timeUtils_compareDates_test()
+  dateTime = CreateObject("roDateTime")
+  nowSeconds = dateTime.AsSeconds()
+
+  currentDayString = dateTime.ToISOString()
+
+  dateTime.fromSeconds(nowSeconds + (24 * 60 * 60))
+  nextDayString = dateTime.ToISOString()
+
+  dateTime.fromSeconds(nowSeconds - (24 * 60 * 60))
+  yesterdayDayString = dateTime.ToISOString()
+
+  m.assertFalse(compareDates(currentDayString, nextDayString))
+  m.assertTrue(compareDates(currentDayString, yesterdayDayString))
+  m.assertFalse(compareDates(invalid, invalid))
+End Function

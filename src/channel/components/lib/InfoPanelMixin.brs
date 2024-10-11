@@ -129,9 +129,10 @@ End Function
 '
 ' @content: TubiContentNode, containing a sports event
 ' @infoPanel: InfoPanel node
+' @isEventDetailsScreen: true or false based on if we are displaying info panel in home or event details screen.
 '
 ' @sideEffects: updates fields on the passed in infoPanel node
-Function populateInfoPanelWithPurpleCarpetMode(content, infoPanel)
+Function populateInfoPanelWithPurpleCarpetMode(content, infoPanel, isEventDetailsScreen = false)
   infoPanel.title = content.title
 
   hasVideoresources = content.hasVideoresources
@@ -155,7 +156,7 @@ Function populateInfoPanelWithPurpleCarpetMode(content, infoPanel)
   infoPanel.lineOneData = lineOneData
   infoPanel.lineTwoData = lineTwoData
 
-  infoPanel.reminderIsSet = (availabilityType = m.constants.ui.contentTimings.upcoming AND getBookmark(content.id) <> invalid)
+  infoPanel.reminderIsSet = (isEventDetailsScreen = false AND availabilityType = m.constants.ui.contentTimings.upcoming AND getBookmark(content.id) <> invalid)
 
   infoPanel.description = content.description
   if content.titleImage <> invalid

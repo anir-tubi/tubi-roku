@@ -1344,11 +1344,31 @@ Function filterPurpleCarpetContainerItemsBasedOnListing(listing, purpleCarpetCon
   if isNonEmptyArray(listing) = true AND isNode(purpleCarpetContainer) = true
     mappedListings = {}
 
+    ' In case listing api returns multiple listings with same tubi_id, we will follow below logic.
+    ' startTime = Math.min(startDate of all listing items with the corresponding tubiId)
+    ' endTime = Math.max(endDate of all listing items with the corresponding tubiId)
+
     for each item in listing
       ' Only using the entry if we have valid tubi id and start and endate.
       asset = item.asset
       if asset <> invalid AND asset.listing <> invalid AND asset.listing.tubi_id <> invalid AND asset.listing.startDate <> invalid AND asset.listing.endDate <> invalid
-        mappedListings[asset.listing.tubi_id] = item
+        if mappedListings[asset.listing.tubi_id] = invalid
+          mappedListings[asset.listing.tubi_id] = item
+        else
+          mappedItem = mappedListings[asset.listing.tubi_id]
+
+          ' We are picking the oldest start date.
+          if compareDates(mappedItem.asset.listing.startDate, asset.listing.startDate) = true
+            mappedItem.asset.listing.startDate = asset.listing.startDate
+          end if
+
+          ' We are picking the largest future end date.
+          if compareDates(mappedItem.asset.listing.endDate, asset.listing.endDate) = false
+            mappedItem.asset.listing.endDate = asset.listing.endDate
+          end if
+
+          mappedListings[asset.listing.tubi_id] = mappedItem
+        end if
       end if
     end for
 
