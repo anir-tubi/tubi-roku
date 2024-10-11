@@ -25,6 +25,9 @@
     <field id="uid" type="string"/>
     <!-- "queryResponseError" is only used as a state store and is not intended to be observed  -->
     <field id="queryResponseError" type="integer" value="0"/>
+
+    <!-- "failureReason" is used to find the actual reason for signIn failure, it is used as value of message field in account event-->
+    <field id="failureReason" type="string"/>
   </interface>
   
   <children>

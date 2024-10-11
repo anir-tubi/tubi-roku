@@ -45,13 +45,20 @@ End Function
 
 '//When user presses the back button from the forgot password screen
 Function onForgotPasswordBackButtonSelected()
+  failureReason = "user-cancel"
+  currentScreen = getCurrentScreen()
+
+  if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.forgotPasswordProcessingScreen AND isNonEmptyString(currentScreen.failureReason) = true
+    failureReason = currentScreen.failureReason
+  end if
+
   m.trackingLoggingTask.trackEvent = {
     type: "account"
     values: {
       manip: "CHANGEPW"
-      current: "EMAIL"
+      user_type: "EXISTING_USER"
       status: "FAIL"
-      message: "user-cancel"
+      message: failureReason
     }
   }
 

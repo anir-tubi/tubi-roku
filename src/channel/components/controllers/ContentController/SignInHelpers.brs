@@ -1170,8 +1170,14 @@ Function onMagicLinkError(errorResponse)
   contextCode = m.constants.errors.context.forgotPasswordProcessingScreen
   currentScreen = getCurrentScreen()
 
-  if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.emailVerificationScreen
-    contextCode = m.constants.errors.context.emailVerificationScreen
+  if currentScreen <> invalid
+    if currentScreen.hasField("failureReason") = true
+      currentScreen.failureReason = "magiclink_server_err"
+    end if
+
+    if currentScreen.id = m.constants.ui.screenIds.emailVerificationScreen
+      contextCode = m.constants.errors.context.emailVerificationScreen
+    end if
   end if
 
   errorCode = getUserFacingErrorCode(contextCode, m.constants.errors.subtypes.networkError, errorResponse.code)
@@ -1193,7 +1199,7 @@ Function onMagicLinkError(errorResponse)
     trackingTask: m.trackingLoggingTask
   }
 
-  showErrorModal(modalInfo, invalid, invalid, onOkButtonClickedOnMagicLinkError, invalid, [getTranslation("dialog_button_ok")])
+  showErrorModal(modalInfo, invalid, invalid, invalid, invalid, [getTranslation("dialog_button_ok")])
 End Function
 
 
@@ -1226,6 +1232,9 @@ Function onQueryStatusOfMagicLinkResponse(response)
     if response <> invalid AND response.status = "PENDING"
       currentScreen.queryResponseError = 0
       m.emailVerificationTimer.control = "start"
+    else if response <> invalid AND response.status = "EXPIRED"
+      onStopAndClearEmailVerificationTimer()
+      handleSignInFailure()
     else if response <> invalid AND response.access_token <> invalid
       onStopAndClearEmailVerificationTimer()
       onSignInResponse(response)
@@ -1247,18 +1256,67 @@ End Function
 
 '//When user presses the back button from the email verification screen
 Function onEmailVerificationScreenBackButtonSelected()
+  failureReason = "user-cancel"
+  currentScreen = getCurrentScreen()
+  
+  if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.emailVerificationScreen AND isNonEmptyString(currentScreen.failureReason) = true
+    failureReason = currentScreen.failureReason
+  end if
+
   m.trackingLoggingTask.trackEvent = {
     type: "account"
     values: {
       manip: "LOGIN"
       current: "EMAIL"
       status: "FAIL"
-      message: "user-cancel"
+      message: failureReason
     }
   }
 
   onStopAndClearEmailVerificationTimer()
   popScreen()
+End Function
+
+
+Function handleSignInFailure(errorResponse = invalid)
+  currentScreen = getCurrentScreen()
+  contextCode = m.constants.errors.context.forgotPasswordProcessingScreen
+
+  if currentScreen <> invalid
+    if currentScreen.hasField("failureReason") = true
+      currentScreen.failureReason = "link_expired"
+    end if
+
+    if currentScreen.id = m.constants.ui.screenIds.emailVerificationScreen
+      contextCode = m.constants.errors.context.emailVerificationScreen
+    end if
+  end if
+
+  errorMessage = getTranslation("dialog_uidExpiraionError_description")
+  errorCode = ""
+
+  if errorResponse <> invalid AND isNonEmptyString(errorResponse.code) = true
+    errorCode = getUserFacingErrorCode(contextCode, m.constants.errors.subtypes.expireError, errorResponse.code)
+    errorMessage = getErrorMessage(errorMessage, errorCode)
+  end if
+
+  dialogEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "LOGIN_REQUEST" 'DialogType enum
+      pageOneof: m.Tracking.getAnalyticsPage("login_page", {"choice": "LINK"})
+      dialog_action: "SHOW"
+      dialog_sub_type: "link_expired"
+    }
+  }
+
+  modalInfo = {
+    title: getTranslation("dialog_uidExpiraionError_title")
+    message: errorMessage
+    openTrackEvent: dialogEvent
+    trackingTask: m.trackingLoggingTask
+  }
+  showErrorModal(modalInfo, invalid, invalid, invalid, invalid, [getTranslation("dialog_button_ok")])
 End Function
 
 
@@ -1271,33 +1329,7 @@ Function onQueryStatusOfMagicLinkError(errorResponse)
     if currentScreen.queryResponseError > 3
       '//if an error has been set more than 3 times, then show error modal to user as the error is probably not a temporary network or server issue
       currentScreen.queryResponseError = 0
-
-      contextCode = m.constants.errors.context.forgotPasswordProcessingScreen
-
-      if currentScreen.id = m.constants.ui.screenIds.emailVerificationScreen
-        contextCode = m.constants.errors.context.emailVerificationScreen
-      end if
-
-      errorCode = getUserFacingErrorCode(contextCode, m.constants.errors.subtypes.expireError, errorResponse.code)
-      errorMessage = getTranslation("dialog_uidExpiraionError_description")
-
-      dialogEvent = {
-        type: "dialog"
-        values: {
-          dialog_type: "LOGIN_REQUEST" 'DialogType enum
-          pageOneof: m.Tracking.getAnalyticsPage("login_page", {"choice": "LINK"})
-          dialog_action: "SHOW"
-          dialog_sub_type: "link_expired"
-        }
-      }
-
-      modalInfo = {
-        title: getTranslation("dialog_uidExpiraionError_title")
-        message:getErrorMessage(errorMessage, errorCode)
-        openTrackEvent: dialogEvent
-        trackingTask: m.trackingLoggingTask
-      }
-      showErrorModal(modalInfo, invalid, invalid, onOkButtonClickedOnLinkExpired, invalid, [getTranslation("dialog_button_ok")])
+      handleSignInFailure(errorResponse)
     else
       m.emailVerificationTimer.control = "start"
     end if
@@ -1322,34 +1354,6 @@ Function createMagicLinkRequest(email)
     errorCallback: onMagicLinkError
     responseType: "assocarray"
   })
-End Function
-
-
-Function onOkButtonClickedOnMagicLinkError()
-  dialogEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: "LOGIN_REQUEST"
-      pageOneof: m.Tracking.getAnalyticsPage("login_page", {"choice": "LINK"})
-      dialog_action: "ACCEPT_DELIBERATE"
-      dialog_sub_type: "magiclink_server_err"
-    }
-  }
-  m.trackingLoggingTask.trackEvent = dialogEvent
-End Function
-
-
-Function onOkButtonClickedOnLinkExpired()
-  dialogEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: "LOGIN_REQUEST"
-      pageOneof: m.Tracking.getAnalyticsPage("login_page", {"choice": "LINK"})
-      dialog_action: "ACCEPT_DELIBERATE"
-      dialog_sub_type: "link_expired"
-    }
-  }
-  m.trackingLoggingTask.trackEvent = dialogEvent
 End Function
 
 
