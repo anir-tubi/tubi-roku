@@ -1001,20 +1001,16 @@ Function getPlayProgressEvent(isFullScreen = true)
       videoPlayerType = "BANNER"
     end if
 
-    pageType = ""
-    if m.top.trackingPageContext <> invalid AND m.top.trackingPageContext.pageType <> invalid
-      pageType = m.top.trackingPageContext.pageType
-    end if
-
     viewTime = Int((m.playerPosition - m.lastPingTime) * 1000) 'ms
 
+    videoId = m.Video.content.id.toInt()
     playProgressEvent = {
       type: "live_play_progress"
       values: {
-        video_id: m.Video.content.id.toInt()
+        video_id: videoId
         view_time: viewTime
         video_player: videoPlayerType
-        page_type: pageType
+        pageOneof: m.tubiTrackingInfo.getAnalyticsPage("video_player_page", {video_id: videoId})
       }
     }
 

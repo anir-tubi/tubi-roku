@@ -540,26 +540,33 @@ End Function
 ' @param position: The current position of the video player
 ' @param alwaysSend: If true, the event will be sent even if the view time is less than 10 seconds
 Function sendFoxVideoPlayerLivePlayProgressEvent(position, alwaysSend = false)
-  if isNumber(position) = false then
-    tubiLog("sendFoxVideoPlayerLivePlayProgressEvent position is not a number")
+  ' The first position we get is a unix timestamp which we don't want to use for our progress events so we ignore that value by making sure the position isn't high like a unix timestamp would be
+  if isNumber(position) = false OR position > 999999999 then
+    tubiLog("sendFoxVideoPlayerLivePlayProgressEvent position is not a valid number")
   else
-    viewTime = position - m.lastSentFoxPlayerProgressPosition
-    if m.foxPlayerCurrentInputContent <> invalid AND (viewTime >= 10 OR (alwaysSend AND viewTime > 0)) then
-      event = {
-        type: "live_play_progress"
-        values: {
-          video_id: m.foxPlayerCurrentInputContent.id.toInt()
-          has_subtitles: ""
-          video_player: "DEFAULT"
-          video_codec_type: ""
-          video_resolution: ""
-          is_fullscreen: true
-          view_time: viewTime
-        }
-      }
-
-      m.trackingLoggingTask.trackEvent = event
+    if m.lastSentFoxPlayerProgressPosition = -1 then
       m.lastSentFoxPlayerProgressPosition = position
+    else
+      viewTime = position - m.lastSentFoxPlayerProgressPosition
+      if m.foxPlayerCurrentInputContent <> invalid AND (viewTime >= 10 OR (alwaysSend AND viewTime > 0)) then
+        videoId = m.foxPlayerCurrentInputContent.id.toInt()
+        event = {
+          type: "live_play_progress"
+          values: {
+            video_id: videoId
+            has_subtitles: ""
+            video_player: "DEFAULT"
+            video_codec_type: ""
+            video_resolution: ""
+            is_fullscreen: true
+            ' Convert to milliseconds
+            view_time: viewTime * 1000
+            pageOneof: m.Tracking.getAnalyticsPage("video_player_page", {video_id: videoId})
+          }
+        }
+        m.trackingLoggingTask.trackEvent = event
+        m.lastSentFoxPlayerProgressPosition = position
+      end if
     end if
   end if
 End Function

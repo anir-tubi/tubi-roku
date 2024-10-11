@@ -492,7 +492,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       video_id: -1
       view_time: -1 'ms
       video_player: "" 'VideoPlayer enum
-      page_type: "" 'current screen
+      pageOneof: {} 'a valid page type (see LivePlayProgressEvent in events.protos)
     }
 
     seek: {
