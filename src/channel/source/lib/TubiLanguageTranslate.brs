@@ -2080,6 +2080,18 @@ Function getTranslation_es_MX()
       "description": "The text to display on Show All Games tile",
       "message": "Mostrar Todo"
     },
+    "screenHome_button_spotlight_details": {
+      "description": "On the home screen of the spotlight row, this is the text of a details button that allows the user to go to the details screen",
+      "message": "Detalles"
+    },
+    "screenHome_button_spotlight_watch_live": {
+      "description": "On the home screen of the spotlight row, this is the text of a watch live button that allows the user to start playing focused live content",
+      "message": "Ver en Vivo"
+    },
+    "screenHome_button_spotlight_watch_now": {
+      "description": "On the home screen of the spotlight row, this is the text of a watch now button that allows the user to start playing focused linear content",
+      "message": "Ver Ahora"
+    },
     "loadingIndicator": {
       "description": "When something is loading, this text appears so the user knows something is loading.",
       "message": "Cargando..."
@@ -3562,25 +3574,57 @@ Function getTranslation_es_MX()
       "description": "Privacy disclaimer text displayed in Sign in and registration flow.",
       "message": "Al regístrarte o inicia sesión, acceptas que has leido y entendido la Politica de Privacidade de Tubi y aceptas los Términos de Uso de Tubi. Obtenga más información en {privacy_policy_url} y {terms_of_use_url}"
     },
-    "screenEndCard_nextUpIn": {
-      "description": "indicator for how many seconds until next video will start playing (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
-      "message": "Siguiente en"
-    },
-    "screenEndCard_nextUp": {
-      "description": "indicator for how many seconds until next video will start playing (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
-      "message": "Siguiente"
-    },
-    "screenEndCard_overlay_hint": {
-      "description": "hint text on the upnext overlay ",
-      "message": "¿Qué te pareció?"
-    },
-    "screenEndCard_overlay_improve_recommendations": {
-      "description": "hint text on the upnext overlay for recommendation",
-      "message": "Mejorar tus recomendaciones"
-    },
     "dialog_gdpr_manage_privacy_settings_error_description": {
       "description": "Error dialog description shown due to one trust component library failure when clicking manage privacy settings.",
       "message": "Reinicia Tubi para actualizar la configuración de privacidad. Por favor envíe un correo a support@tubi.tv si sigue pasando."
+    },
+    "live_on_date": {
+      "description": "date label used in air date countdown timer",
+      "message": "EN VIVO EN {month} {day}"
+    },
+    "live_on_date_today": {
+      "description": "date label used in air date countdown timer",
+      "message": "HOY A LAS {time}"
+    },
+    "live_on_day": {
+      "description": "day label used in air date countdown timer",
+      "message": "{day} D"
+    },
+    "live_on_hour": {
+      "description": "day label used in air date countdown timer",
+      "message": "{hour} HR"
+    },
+    "live_on_minute": {
+      "description": "day label used in air date countdown timer",
+      "message": "{min} MIN"
+    },
+    "screenHome_button_sign_in_watch": {
+      "description": "Sign in to watch live button label.",
+      "message": "Inicia Sesión para Ver"
+    },
+    "available_at": {
+      "description": "Sign in to watch live button label.",
+      "message": "Disponible a las {time}"
+    },
+    "watch_for_free": {
+      "description": "Sign in to watch live button label.",
+      "message": "Ver gratis el {date}."
+    },
+    "auth_refresh_welcome_message": {
+      "description": "A message that let's the user know they've been signed in with the given email",
+      "message": "Iniciado sesión como {email}"
+    },
+    "auth_refresh_welcome_header": {
+      "description": "A header for the message that let's the user know they've been signed in with the given email",
+      "message": "¡Bienvenido!"
+    },
+    "available_at_toast_heading": {
+      "description": "Toast message heading that is displayed when we click on a available at button",
+      "message": "Contenido disponible a las {time}"
+    },
+    "available_at_toast_subheading": {
+      "description": "Toast message subheading that is displayed when we click on a available at button",
+      "message": "Sabemos que estás emocionado. ¡Nosotros también!"
     }
   }
 End Function
@@ -3695,6 +3739,18 @@ Function getTranslation_fr_CA()
     "screenHome_item_showAllGames": {
       "description": "The text to display on Show All Games tile",
       "message": "Montrer tout"
+    },
+    "screenHome_button_spotlight_details": {
+      "description": "On the home screen of the spotlight row, this is the text of a details button that allows the user to go to the details screen",
+      "message": "Détails"
+    },
+    "screenHome_button_spotlight_watch_live": {
+      "description": "On the home screen of the spotlight row, this is the text of a watch live button that allows the user to start playing focused live content",
+      "message": "Regarder direct"
+    },
+    "screenHome_button_spotlight_watch_now": {
+      "description": "On the home screen of the spotlight row, this is the text of a watch now button that allows the user to start playing focused linear content",
+      "message": "Regarder"
     },
     "loadingIndicator": {
       "description": "When something is loading, this text appears so the user knows something is loading.",
@@ -5178,25 +5234,57 @@ Function getTranslation_fr_CA()
       "description": "Privacy disclaimer text displayed in Sign in and registration flow.",
       "message": "En vous inscrivant ou en vous connectant, vous reconnaissez avoir lu et compris la Politique de confidentialité de Tubi et acceptez les Conditions d'utilisation de Tubi. En savoir plus sur {privacy_policy_url} et {terms_of_use_url}"
     },
-    "screenEndCard_nextUpIn": {
-      "description": "indicator for how many seconds until next video will start playing (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
-      "message": "Ensuite dans"
-    },
-    "screenEndCard_nextUp": {
-      "description": "indicator for how many seconds until next video will start playing (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
-      "message": "Suivant"
-    },
-    "screenEndCard_overlay_hint": {
-      "description": "hint text on the upnext overlay ",
-      "message": "Qu'en pensez-vous?"
-    },
-    "screenEndCard_overlay_improve_recommendations": {
-      "description": "hint text on the upnext overlay for recommendation",
-      "message": "Améliorez vos recommandations"
-    },
     "dialog_gdpr_manage_privacy_settings_error_description": {
       "description": "Error dialog description shown due to one trust component library failure when clicking manage privacy settings.",
       "message": "Redémarrer Tubi pour mettre à jour les paramètres de confidentialité. S'il vous plaît email support@tubi.tv si ça continue."
+    },
+    "live_on_date": {
+      "description": "date label used in air date countdown timer",
+      "message": "EN DIRECT SUR {month} {day}"
+    },
+    "live_on_date_today": {
+      "description": "date label used in air date countdown timer",
+      "message": "AUJOURD'HUI À {time}"
+    },
+    "live_on_day": {
+      "description": "day label used in air date countdown timer",
+      "message": "{day} D"
+    },
+    "live_on_hour": {
+      "description": "day label used in air date countdown timer",
+      "message": "{hour} HR"
+    },
+    "live_on_minute": {
+      "description": "day label used in air date countdown timer",
+      "message": "{min} MIN"
+    },
+    "screenHome_button_sign_in_watch": {
+      "description": "Sign in to watch live button label.",
+      "message": "Connectez-vous pour regarder"
+    },
+    "available_at": {
+      "description": "Sign in to watch live button label.",
+      "message": "Disponible au {time}"
+    },
+    "watch_for_free": {
+      "description": "Sign in to watch live button label.",
+      "message": "Regardez gratuit sur {date}."
+    },
+    "auth_refresh_welcome_message": {
+      "description": "A message that let's the user know they've been signed in with the given email",
+      "message": "Connecté en tant que {email}"
+    },
+    "auth_refresh_welcome_header": {
+      "description": "A header for the message that let's the user know they've been signed in with the given email",
+      "message": "Bienvenue!"
+    },
+    "available_at_toast_heading": {
+      "description": "Toast message heading that is displayed when we click on a available at button",
+      "message": "Contenu disponible sur {time}"
+    },
+    "available_at_toast_subheading": {
+      "description": "Toast message subheading that is displayed when we click on a available at button",
+      "message": "Nous savons que vous êtes excité. Nous aussi!"
     }
   }
 End Function
