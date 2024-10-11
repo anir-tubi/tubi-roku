@@ -963,6 +963,10 @@ Function tubiTracking_getOneOfs()
 
   privacy_preferences_page = {}
 
+  linear_details_page = {
+    video_id: -1
+  }
+
   section_leftNav = {
     left_nav_section: "" ' Section enum
   }
@@ -1017,6 +1021,7 @@ Function tubiTracking_getOneOfs()
     upcoming_content_page: upcoming_content_page
     your_privacy_page: your_privacy_page
     privacy_preferences_page: privacy_preferences_page
+    linear_details_page: linear_details_page
     ' splash_page: splash_page
     ' forget_page: forget_page
   }
@@ -1050,6 +1055,7 @@ Function tubiTracking_getOneOfs()
     dest_upcoming_content_page: upcoming_content_page
     dest_your_privacy_page: your_privacy_page
     dest_privacy_preferences_page: privacy_preferences_page
+    dest_linear_details_page: linear_details_page
     ' dest_splash_page: splash_page
     ' dest_forget_page: forget_page
   }

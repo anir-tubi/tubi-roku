@@ -10,12 +10,19 @@ Function showEventDetailScreen(eventId, purpleCarpetContainerContent = invalid, 
   screen.observeFieldScoped("itemSelected", "onEventDetailsItemSelectedChange")
   screen.observeFieldScoped("eventCtaListItemSelected", "onEventCtaListItemSelected")
   screen.observeFieldScoped("backButtonPressed", "onDetailBackPressed")
+  screen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
 
   bookmark = getBookmark(eventId)
   screen.didUserSetReminderForEventContent = (bookmark <> invalid)
   authInfo = m.tubiAuthUpdate.getAuthInfo()
   screen.signedIn = isLoggedInUser(authInfo)
   screen.eventId = eventId
+  screen.trackingPageInfo = {
+    pageType: "linear_details_page"
+    pageValues: {
+      video_id: eventId
+    }
+  }
 
   if purpleCarpetContainerContent <> invalid
     screen.content = purpleCarpetContainerContent

@@ -9,18 +9,14 @@ Function init()
 
   topRef.observeFieldScoped("focusedChild", "onScreenFocusChange")
   topRef.observeFieldScoped("content", "onContentChange")
+  m.detailsPurpleCarpetRow.observeFieldScoped("ctaListItemSelected", "onEventCtaListItemSelectedChange")
   m.detailsPurpleCarpetRow.observeFieldScoped("rowItemSelected", "onRowItemSelectedChange")
 
   experimentsInfo = getExperimentsInfoFromGlobal()
   experiments = TubiExperiments(experimentsInfo)
   m.metadataTranslate = TubiMetadataTranslate(constants, experiments)
 
-  topRef.trackingPageInfo = {
-    pageType: "video_page"
-    pageValues: {
-      video_id: 0
-    }
-  }
+  m.tracking = TubiTrackingInfo(constants)
 End Function
 
 
@@ -88,4 +84,31 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
   end if
 
   return false
+End Function
+
+
+Function onEventCtaListItemSelectedChange(msg)
+  buttonId = msg.getData()
+
+  trackingPageInfo = m.top.trackingPageInfo
+  if buttonId = "reminder" AND m.top.primaryEventContent <> invalid AND trackingPageInfo <> invalid
+    componentValues = {
+      video_id: m.top.primaryEventContent.id
+    }
+  
+    if m.top.didUserSetReminderForEventContent = false
+      userInteractionValue = "TOGGLE_ON"
+    else
+      userInteractionValue = "TOGGLE_OFF"
+    end if
+  
+    pageOneof = m.tracking.getAnalyticsPage(trackingPageInfo.pagetype, trackingPageInfo.pageValues)
+    componentOneof = m.tracking.getAnalyticsComponent("reminder_component", componentValues)
+  
+    m.top.componentInteractionInfo =  {
+      pageOneof: pageOneof
+      componentOneof: componentOneof
+      user_interaction: userInteractionValue
+    }
+  end if
 End Function

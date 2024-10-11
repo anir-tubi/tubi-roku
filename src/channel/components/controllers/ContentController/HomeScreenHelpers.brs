@@ -54,6 +54,7 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.observeFieldScoped("pauseVideoPreview", "onPauseVideoPreview")
     homeScreen.observeFieldScoped("loadCategoryForIds", "onLoadCategoryForIds")
     homeScreen.observeFieldScoped("eventCtaListItemSelected", "onEventCtaListItemSelected")
+    homeScreen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
 
     m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop listening to timer before listing to it in case a previous screen started the timer
     m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
@@ -1207,8 +1208,8 @@ End Function
 
 Function setOrRemovePurpleCarpetReminder()
   screen = getCurrentScreen()
-  primaryEventContent = screen.primaryEventContent
-  if primaryEventContent <> invalid
+  if screen <> invalid AND screen.primaryEventContent <> invalid
+    primaryEventContent = screen.primaryEventContent
     ' Since we are overriding the content type to purple carpet.
     contentType = m.constants.uapiContentTypes.sportsEvent
     bookmark = getBookmark(primaryEventContent.id)

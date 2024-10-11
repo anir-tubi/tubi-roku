@@ -3,6 +3,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
 
   <interface>
     <!-- INPUTS -->

@@ -38,6 +38,7 @@ Function init()
   m.CategoryGridList.observeField("currFocusColumn", "onCurrFocusColumnChange")
   m.CategoryGridList.observeField("rowFocused", "onRowFocused")
   m.CategoryGridList.observeFieldScoped("vertFocusDirection", "onVertFocusDirectionChange")
+  m.CategoryGridList.observeFieldScoped("eventCtaListItemSelected", "onEventCtaListItemSelectedChange")
 
   'used to know when to send tracking info. Do not send focus tracking info when the grid is 1st loaded
   m.gridHasGainedInitialFocus = false
@@ -675,5 +676,32 @@ Function onVertFocusDirectionChange(msg)
   ' This is the reason we are maintaining our own directional scope variable.
   if direction <> "none"
     m.scrollDirection = direction
+  end if
+End Function
+
+
+Function onEventCtaListItemSelectedChange(msg)
+  buttonId = msg.getData()
+
+  trackingPageInfo = m.top.trackingPageInfo
+  if buttonId = "reminder" AND m.top.primaryEventContent <> invalid AND trackingPageInfo <> invalid
+    componentValues = {
+      video_id: m.top.primaryEventContent.id
+    }
+  
+    if m.top.didUserSetReminderForEventContent = false
+      userInteractionValue = "TOGGLE_ON"
+    else
+      userInteractionValue = "TOGGLE_OFF"
+    end if
+  
+    pageOneof = m.Tracking.getAnalyticsPage(trackingPageInfo.pagetype, trackingPageInfo.pageValues)
+    componentOneof = m.Tracking.getAnalyticsComponent("reminder_component", componentValues)
+  
+    m.top.componentInteractionInfo =  {
+      pageOneof: pageOneof
+      componentOneof: componentOneof
+      user_interaction: userInteractionValue
+    }
   end if
 End Function
