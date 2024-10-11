@@ -794,6 +794,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         slideFade(m.spotlightRow, "below", "in", 0.3)
         m.lastFocusedList = "spotlight"
         slideTo(m.RowList, [0, 384], 0.3)
+        return true
       else if isPurpleCarpetContainerEmpty() = false
         ' updating the itemFocused which in turn triggers onGridFocusChange inside homescreen.brs.
         ' Which causes the regular info panel to be hidden and the background to be updated to full screen version.
@@ -806,8 +807,8 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         m.lastFocusedList = "purpleCarpetRow"
         m.purpleCarpetRow.isContainerVisible = true
         slideTo(m.RowList, [0, 384], 0.3)
+        return true
       end if
-      return true
     end if
   end if
   return false
