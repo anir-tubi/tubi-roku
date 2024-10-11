@@ -1155,7 +1155,7 @@ Function updatePurpleCarpetRowContent(homeScreen, content)
       bookmark = getBookmark(primaryContent.id)
       homeScreen.didUserSetReminderForEventContent = (bookmark <> invalid)
     end if
-    
+
     homeScreen.purpleCarpetContent = rowContentNode
   else
     homeScreen.purpleCarpetContent = invalid
@@ -1306,6 +1306,7 @@ Function updateContainerWithProgramInfoFromFoxListing(responseContext, onComplet
       successCallback: getProgramInfoFromFoxListingComplete
       errorCallback: getProgramInfoFromFoxListingComplete
       responseType: "assocarray"
+      retries: 0
       responseContext: responseContext
     })
   else
@@ -1314,7 +1315,7 @@ Function updateContainerWithProgramInfoFromFoxListing(responseContext, onComplet
     if isFunction(m.onUpdateContainerWithProgramInfoFromFoxListingCompletionCallback) = true
       m.onUpdateContainerWithProgramInfoFromFoxListingCompletionCallback(purpleCarpetContainer, responseContext.screenId)
     end if
-    
+
   end if
 End Function
 
@@ -1353,7 +1354,7 @@ Function filterPurpleCarpetContainerItemsBasedOnListing(listing, purpleCarpetCon
 
     eventList = purpleCarpetContainer.getChildren(-1, 0)
     filteredEventList = []
-    
+
     if isNonEmptyArray(eventList) = true
 
       for each item in eventList
@@ -1373,7 +1374,7 @@ Function filterPurpleCarpetContainerItemsBasedOnListing(listing, purpleCarpetCon
                 ' overriding the value so that we do not have to pass down the listing data down to every place and we can have one common logic.
                 airDatetime: listing.startDate
 
-                ' will be passed to player for playback. 
+                ' will be passed to player for playback.
                 foxContentId: listing.id
               }, true)
             end if
