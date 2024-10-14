@@ -486,6 +486,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       video_resolution: "" 'The resolution of video resource
       is_fullscreen: true 'the video player is being played in full screen format
       input_device: ""  'InputDevice enum
+      pageOneof: {} 'a valid page type (see StartLiveVideoEvent in events.protos)
     }
 
     live_play_progress: {

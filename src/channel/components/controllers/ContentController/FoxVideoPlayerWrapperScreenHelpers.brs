@@ -17,16 +17,19 @@ Function playLinearVideoWithFoxPlayer(content)
 
     m.lastSentFoxPlayerProgressPosition = 0
 
+    videoId = content.id.toInt()
+
     event = {
       type: "start_live_video"
       values: {
-        video_id: content.id.toInt()
+        video_id: videoId
         has_subtitles: ""
         video_player: "DEFAULT"
         video_codec_type: ""
         video_resolution: ""
         is_fullscreen: true
         input_device: "UNKNOWN_DEVICE"
+        pageOneof: m.Tracking.getAnalyticsPage("video_player_page", {video_id: videoId})
       }
     }
 

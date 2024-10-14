@@ -162,9 +162,11 @@ Function playContent()
   tubiLog("LinearVideoPlayerScreen.playContent")
   m.lastButtonPressPos = 0
 
+  content = m.Video.content
+
   'start_live_video user event analytics
   hasSubtitles = false
-  if m.Video.globalCaptionMode = "On" AND m.Video.content.hasSubtitles = true AND m.top.fullscreen = true
+  if m.Video.globalCaptionMode = "On" AND content.hasSubtitles = true AND m.top.fullscreen = true
     hasSubtitles = true
   end if
 
@@ -176,33 +178,36 @@ Function playContent()
   end if
 
   resourceType = "VIDEO_RESOURCE_TYPE_UNKNOWN"
-  if m.top.content.drmType = m.constants.player.drmTypes.hlsv3
+  if content.drmType = m.constants.player.drmTypes.hlsv3
     resourceType = "VIDEO_RESOURCE_TYPE_HLSV3"
   end if
 
   codeType = "VIDEO_CODEC_UNKNOWN"
-  if isNonEmptyString(m.Video.content.codec) = true
-    codeType = "VIDEO_CODEC_" + m.Video.content.codec
+  if isNonEmptyString(content.codec) = true
+    codeType = "VIDEO_CODEC_" + content.codec
   end if
 
   resolution = "VIDEO_RESOLUTION_UNKNOWN"
-  if isNonEmptyString(m.Video.content.resolution) = true
-    resolution = "VIDEO_RESOLUTION_" + m.Video.content.resolution
+  if isNonEmptyString(content.resolution) = true
+    resolution = "VIDEO_RESOLUTION_" + content.resolution
   end if
+
+  videoId = content.id.toInt()
 
   trackEvent({
     type: "start_live_video"
     values: {
-      video_id: m.Video.content.id.toInt()
+      video_id: videoId
       current_cdn: "" 'not possible for Roku client
       has_subtitles: hasSubtitles 'the video player will show subtitles at start
-      video_resource_url: m.top.content.url
+      video_resource_url: content.url
       video_resource_type: resourceType
       video_player: videoPlayerType
       video_codec_type: codeType
       video_resolution: resolution
       is_fullscreen: isFullScreen
       input_device: "UNKNOWN_DEVICE" 'InputDevice enum
+      pageOneof: m.tubiTrackingInfo.getAnalyticsPage("video_player_page", {video_id: videoId})
     }
   })
 
