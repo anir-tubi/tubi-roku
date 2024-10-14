@@ -42,7 +42,7 @@ Function playLinearVideoWithFoxPlayer(content)
     foxVideoPlayerWrapperScreen.observeFieldScoped("isPlayerClosed", "onFoxVideoPlayerIsPlayerClosed")
     foxVideoPlayerWrapperScreen.tubiContent = content
 
-    pushScreen(foxVideoPlayerWrapperScreen, false, false)
+    pushScreen(foxVideoPlayerWrapperScreen, true, true)
 
     ' If we haven't retrieved the fox player yet then start loading it
     if m.isFoxPlayerLoadRequired = true

@@ -8,10 +8,17 @@ Function init()
   ' We have to wait until we get our content ID and the component library is loaded before we can start playback
   m.top.observeFieldScoped("contentId", "playContentWithFoxVideoPlayer")
   m.top.observeFieldScoped("isFoxVideoPlayerAvailable", "playContentWithFoxVideoPlayer")
+  m.top.observeFieldScoped("tubiContent", "onTubiContentChange")
 
   m.top.observeFieldScoped("closePlayer", "onClosePlayerChanged")
-  
+
   m.top.screenLevel = constants.ui.screenLevels.foxVideoPlayerWrapperScreen
+
+  trackingPageInfo = {
+    pageType: "video_player_page"
+    pageValues: {}
+  }
+  m.top.trackingPageInfo = trackingPageInfo
 End Function
 
 
@@ -34,7 +41,7 @@ Function playContentWithFoxVideoPlayer()
   isFoxVideoPlayerAvailable = m.top.isFoxVideoPlayerAvailable
 
   logString = "FoxVideoPlayerWrapperScreen.playContentWithFoxVideoPlayer "
-  
+
   if isNonEmptyString(contentId) = true
     logString += "contentId: " + contentId + " "
   end if
@@ -96,6 +103,23 @@ Function buildPlayerInfo(contentId)
     context: context,
     node: videoContentNode,
   }
+End Function
+
+
+Function onTubiContentChange(msg)
+  tubiLog("FoxVideoPlayerWrapperScreen.onTubiContentChange")
+
+  content = msg.getData()
+
+  if content <> invalid then
+    'set page tracking values for analytics
+    m.top.trackingPageInfo = {
+      pageType: "video_player_page"
+      pageValues: {
+        video_id: content.id.toInt()
+      }
+    }
+  end if
 End Function
 
 
