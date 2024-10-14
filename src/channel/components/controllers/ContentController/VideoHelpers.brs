@@ -776,10 +776,6 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEp
   'local variable helps to remove the episode list screen in between player and detail screen
   removeEpisodeScreen = false
 
-  ' Local variable which will hold true/false if we need to present the continue watching consent.
-  ' will be true if the user has partially watched the movie and backed out before credits.
-  shouldShowContinueWatchingConsentDialog = false
-
   if videoPlayer <> invalid
     stopVideoContent(videoPlayer)
 
@@ -844,7 +840,6 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEp
           ' request resolves.
           updateHistoryAndHandleResponse(videoContent, historyPosition)
           updateRokuContinueWatchingInfo(videoContent, historyPosition)
-          shouldShowContinueWatchingConsentDialog = (videoContent.isTrailer = false)
         end if
 
         ' update some info in the detail screen content and repopulate with that content
@@ -912,9 +907,6 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEp
           ' request resolves.
           updateHistoryAndHandleResponse(videoContent, historyPosition)
           updateRokuContinueWatchingInfo(videoContent, historyPosition)
-          if isEndReached = false
-            shouldShowContinueWatchingConsentDialog = (videoContent.isTrailer = false)
-          end if
         end if
         populateDetailScreen(detailScreen, detailContent, false, detailScreenResumePosition)
       end if
@@ -937,26 +929,6 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEp
     if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.episodeScreen
       popScreen(false, false)
     end if
-  end if
-
-  ' If the user has not given consent then showing the consent dialog.
-  if shouldShowContinueWatchingConsentDialog = true AND m.wasUserShownContinueWatchingConsentDialog = false AND isLoggedInUser() = true AND getConsentOptOutStatusByKey(m.constants.consentKeys.continueWatching) = true
-
-    ' Checking if the user is in US and allowed to manage consent(Adult or teen) and is in control group.
-    if isDeviceInUS() = true AND isUserAllowedToManageConsent() = true AND getExperimentResource("roku_cw_consent_existing_user", "roku_cw_consent_existing_user_after_playback_v4", true).enabled = true
-      lastRokuCwConsentPromptShownAt = m.pub_serverPersistentData.lastRokuCwConsentPromptShownAt
-      nowDate = CreateObject("roDateTime")
-      secondsFromEpoch = nowDate.AsSeconds()
-
-      ' Checking if the last shown cw consent was 30 days before.
-      if lastRokuCwConsentPromptShownAt = invalid OR (secondsFromEpoch - lastRokuCwConsentPromptShownAt) >= (86400 * 30)
-        showRokuContinueConsentDialog()
-        saveServerPersistentData({
-          "lastRokuCwConsentPromptShownAt": secondsFromEpoch
-        })
-      end if
-    end if
-
   end if
 End Function
 
@@ -1580,32 +1552,4 @@ Function onCloseBrowseWhileWatchingContentFetchErrorModal()
     videoPlayer.showBrowseWhileWatchingInFullScreen = true
   end if
 
-End Function
-
-
-Function showRokuContinueConsentDialog()
-  m.wasUserShownContinueWatchingConsentDialog = true
-  heading = getTranslation("roku_cw_consent_screen_heading")
-  message = getTranslation("roku_cw_consent_screen_sub_heading")
-  buttons = [getTranslation("accept_now_button_label"), getTranslation("maybe_later_button_label")]
-
-  currentScreen = getCurrentScreen()
-  dialogEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: "DEVICE_PERMISSIONS"
-      pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
-      dialog_action: "SHOW"
-      dialog_sub_type: "cw_consent"
-    }
-  }
-  simpleModalInfo = getSimpleModalInfo(heading, message, buttons, dialogEvent, m.trackingLoggingTask, onRokuContinueWatchingConsentDialogAcceptSelected)
-  showModal(simpleModalInfo.modalInfo, simpleModalInfo.buttonInfo)
-End Function
-
-
-Function onRokuContinueWatchingConsentDialogAcceptSelected()
-  body = {}
-  body[m.constants.consentKeys.continueWatching] = "opted_in"
-  setConsent(body)
 End Function

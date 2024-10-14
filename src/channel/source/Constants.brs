@@ -1705,7 +1705,6 @@ Function getConstants()
       constants.serverPersistentDataKeys.audioTrack = "audio_track"
       constants.serverPersistentDataKeys.isLikeToastNotificationShown = "enable_like_toast_notification"
       constants.serverPersistentDataKeys.isDisLikeToastNotificationShown = "enable_dislike_toast_notification"
-      constants.serverPersistentDataKeys.lastRokuCwConsentPromptShownAt = "last_roku_cw_consent_prompt_shown_at"
       constants.serverPersistentDataKeys.email = "email"
       constants.serverPersistentDataKeys.parentalRating = "parental_rating"
       constants.serverPersistentDataKeys.hasPassword = "has_password"
@@ -1718,7 +1717,6 @@ Function getConstants()
         "subtitle_track": constants.consentKeys.essential
         "enable_like_toast_notification": constants.consentKeys.essential
         "enable_dislike_toast_notification": constants.consentKeys.essential
-        "last_roku_cw_consent_prompt_shown_at": constants.consentKeys.essential
         "email": constants.consentKeys.essential
         "parental_rating": constants.consentKeys.essential
         "has_password": constants.consentKeys.essential

@@ -713,9 +713,6 @@ Function onPostSignInAuthInfoUpdated()
     else
       showRokuCWConsentScreen(startChannel)
     end if
-    saveServerPersistentData({
-      "lastRokuCwConsentPromptShownAt": createObject("roDateTime").asSeconds()
-    })
   else if m.callbackAfterSignIn <> invalid
     executeCallbackAfterSignIn()
   else
