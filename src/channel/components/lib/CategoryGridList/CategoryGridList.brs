@@ -568,7 +568,7 @@ Function onCategoryResponseInBatch(msg) As Void
 
     ' inform home screen of first content after content has been set on RowList
     ' Only proceed if we do not have spotlight content. Since this triggers info panel update for the first row of non spotlight content.
-    if shouldInformHomeScreen = true AND m.spotlightRow.content = invalid AND m.purpleCarpetRow.content = invalid
+    if shouldInformHomeScreen = true AND m.spotlightRow.content = invalid AND isPurpleCarpetContainerEmpty() = true
       ' set focus once we have content to focus on.
       ' will only affect limitedUI models as high spec models will set focus on m.RowList when m.top gains focus
       ' because their homescreen response contains content in it, but limitedUI models homescreen responses don't.
@@ -637,7 +637,7 @@ Function setRowListFocus()
       row = Int(m.RowList.currFocusRow)
       col = Int(m.RowList.currFocusColumn)
       reloadedItemIndex = [row, col]
-    else if m.RowList.rowItemFocused <> invalid AND m.RowList.rowItemFocused.count() > 1
+    else if isNonEmptyArray(m.RowList.rowItemFocused) = true AND m.RowList.rowItemFocused[0] > 0 AND m.RowList.rowItemFocused[1] > 0
       '//currFocusColumn is not available in firmware lower than Roku OS 10.5, so use rowItemFocused. It's imperfect, as it
       '// may think a different item is focused instead of the 1st colum/1st row,
       '// but it will not display a wrong metadata when the user quickly navigates away from 1st rowItem [0,0] as the content is loading
@@ -771,6 +771,15 @@ Function onPurpleCarpetContentUpdatedChange()
     m.purpleCarpetRow.opacity = 0
     m.lastFocusedList = "rowlist"
     m.RowList.setFocus(true)
+  else if m.constants.deviceInfo.limitedUi = true AND isPurpleCarpetContainerEmpty() = false AND m.RowList.rowItemFocused[1] = -1
+    ' Adding a condition to be executed in case of limited ui since initial request will always not have content returned.
+    ' This logic will only get executed for the initial load and not on refresh.
+    ' m.RowList.rowItemFocused[1] will be -1 before the rowlist gets focused.
+    m.rowList.translation = [0, 384]
+    m.lastFocusedList = "purpleCarpetRow"
+    m.purpleCarpetRow.opacity = 1
+    m.top.itemFocused = m.top.primaryEventContent
+    m.purpleCarpetRow.setFocus(true)
   end if
 End Function
 
