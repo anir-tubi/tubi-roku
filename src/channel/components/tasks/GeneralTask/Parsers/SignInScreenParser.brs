@@ -90,7 +90,17 @@ End Function
 ' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
 'side effects... overwrites the old authInfo in the registry with the new authInfo
 Function parsequeryStatusOfMagicLinkSuccess(fullResponse, _reqInfo)
-  return fullResponse.data
+  parsedResponse = {}
+
+  if isAA(fullResponse) = true
+    parsedResponse = fullResponse.data
+    
+    if isAA(parsedResponse) = true
+      parsedResponse.authType = "EMAIL"  'used for subsequent analytics requests
+    end if
+  end if
+
+  return parsedResponse
 End Function
 
 
