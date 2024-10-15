@@ -1718,6 +1718,12 @@ Function setVideoContentScreenBackground(screen)
         uriList: screen.backgroundUriList
       }
     end if
+  else if screen <> invalid AND screen.backgroundUriList <> invalid
+    ' Else logic gets executed in case of my stuff guest user where we do not have a valid focused content.
+    m.backgroundGroup.backgroundInfo = {
+      type: m.constants.ui.backgroundTypes.topRight
+      uriList: screen.backgroundUriList
+    }
   end if
 End Function
 

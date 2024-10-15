@@ -705,9 +705,12 @@ End Function
 
 
 Function onReloadedItemToBeFocused(msg)
-  ' Not creating a alias to avoid it becoming bi-directional field into the spotlight row.
+  ' Not creating a alias to avoid it becoming bi-directional field into the spotlight and purple carpet row.
+  ' Since we refresh the purple carpet container on every home screen reload.
+  ' Due to the fact that purple carpet container is not aware what was previously focused we will avoid overriding the previously 
+  ' focused info panel if it was not purple carpet. Below logic should only get triggered for initial load and when backing out to home screen if the user navigated from purple carpet or spotlight row.
   itemToBeFocused = msg.getData()
-  if itemToBeFocused <> invalid
+  if itemToBeFocused <> invalid AND m.lastFocusedList <> "rowlist"
     m.top.reloadedItemToBeFocused = itemToBeFocused
   end if
 End Function
