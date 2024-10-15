@@ -90,7 +90,8 @@
         showRowCounter="[false]"
         fadeFocusFeedbackWhenAutoScrolling="true"
         focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
-        focusFootprintBitmapUri="pkg:/images/transparent.png"
+        focusFootprintBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+        focusFootprintBlendColor="#00000000"
         rowFocusAnimationStyle="fixedFocusWrap"
         vertFocusAnimationStyle="fixedFocusWrap"
         id="rowList"/>
