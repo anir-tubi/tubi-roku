@@ -194,7 +194,8 @@ Function populateCtaButtonList()
     end if
 
     ' Only showing set reminder if the game is not happening on the same day as current day.
-    if isEventToday = false
+    ' Adding a safety check for a use case where start date is older than current day which will never happen real world but added as a safety.
+    if isEventToday = false AND isEventLive = false
       if m.top.didUserSetReminderForEventContent <> true
         reminderTranslationId = "screenDetails_button_set_reminder"
         iconUrl = "pkg:/images/set-reminder.webp"

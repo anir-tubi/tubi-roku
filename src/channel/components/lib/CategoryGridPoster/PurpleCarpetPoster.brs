@@ -53,18 +53,6 @@ Function onContentChange(msg)
 End Function
 
 
-Function onHandleFocus()
-  focusPercent = m.top.focusPercent
-  if m.lockIcon <> invalid
-    if focusPercent > 0 AND (m.top.rowHasFocus = true OR m.top.itemHasFocus = true)
-      m.lockIcon.opacity = focusPercent
-    else
-      m.lockIcon.opacity = 0.0
-    end if
-  end if
-End Function
-
-
 Function updateUIWithBadges()
   removeBadges()
   itemContent = m.top.itemContent
@@ -131,14 +119,10 @@ End Function
 Function setLockIcon()
   if m.lockIcon = invalid
     m.lockIcon = m.top.createChild("Poster")
-    m.lockIcon.opacity = 0.0
     m.lockIcon.width = 48
     m.lockIcon.height = 48
     m.lockIcon.uri = "pkg:/images/icon-lock.webp"
     m.lockIcon.translation = [m.top.width - 56, 8]
-    m.top.observeFieldScoped("focusPercent", "onHandleFocus")
-    m.top.observeFieldScoped("rowHasFocus", "onHandleFocus")
-    m.top.observeFieldScoped("itemHasFocus", "onHandleFocus")
   end if
 End Function
 
@@ -147,8 +131,5 @@ Function removeLockIcon()
   if m.lockIcon <> invalid
     m.top.removeChild(m.lockIcon)
     m.lockIcon = invalid
-    m.top.unObserveFieldScoped("focusPercent")
-    m.top.unObserveFieldScoped("rowHasFocus")
-    m.top.unObserveFieldScoped("itemHasFocus")
   end if
 End Function
