@@ -703,7 +703,7 @@ If you need to temporarily disable a runner then an easy way to do this is by go
 
 **Restart Office Self-hosted Github Action Runner**
 
-A linux machine has been dedicated in the San Francisco office to be used for GitHub PR unit testing. A Github Actions runner is running on this linux machine.  A roku device is connected to the linux machine.
+A linux machine has been dedicated in the San Francisco office to be used for GitHub PR unit testing. A Github Actions runner is running on this linux machine.  A roku device is connected to the linux machine. If for some reason the ip address for the Roku changes then it can be updated by going to [Settings > Secrets and variables > Actions and clicking over to the Variables tab](https://github.com/adRise/project-total-recall/settings/variables/actions). `UNIT_TEST_RUNNER_ROKU_IP_ADDRESS` is for the Roku's ip address and `UNIT_TEST_RUNNER_ROKU_PASSWORD` the password used for dev mode.
 
 When any PR is raised against master, the Github Actions runner triggers all of the project's unit tests. The PR will be allowed to merge based on the runner's test results.
 
