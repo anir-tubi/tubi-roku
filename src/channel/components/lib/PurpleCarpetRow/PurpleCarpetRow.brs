@@ -270,7 +270,7 @@ Function onDidSetReminderForEventContentChange(msg)
 
   populateCtaButtonList()
 
-  if m.infoPanel <> invalid
+  if m.infoPanel <> invalid AND m.top.isContentDetailsView = false
     ' Triggering a info panel update to display reminder state.
     m.infoPanel.reminderIsSet = reminderIsSet
   end if
