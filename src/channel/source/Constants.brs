@@ -537,15 +537,9 @@ Function getConstants()
         if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
           constants.urls.tensor.cdn.urlBase = "https://tensor-cdn.staging-public.tubi.io/api"
         end if
-        constants.urls.tensor.cdn.homescreen = constants.urls.tensor.cdn.urlBase + "/v4/homescreen"
-        constants.urls.tensor.cdn.container = constants.urls.tensor.cdn.urlBase + "/v4/containers"
+        constants.urls.tensor.cdn.homescreen = constants.urls.tensor.cdn.urlBase + "/v5/homescreen"
+        constants.urls.tensor.cdn.container = constants.urls.tensor.cdn.urlBase + "/v5/containers"
         constants.urls.tensor.cdn.epgChannelIds = constants.urls.tensor.cdn.urlBase + "/v2/epg"
-
-        if constants.settings.mode <> "production" AND constants.settings.mode <> "staging"
-          constants.urls.tensor.cdn.homescreen = constants.urls.tensor.cdn.urlBase + "/v5/homescreen"
-          constants.urls.tensor.cdn.container = constants.urls.tensor.cdn.urlBase + "/v5/containers"
-        end if
-
 
     'user devices url
     constants.urls.userDevice = {}
@@ -692,7 +686,7 @@ Function getConstants()
     constants.urls.nielsenPing = "https://audit.imrworldwide.com/cgi-bin/gn"
 
     constants.urls.rokuContinueWatchingEndpoint = "https://userdata.sr.roku.com/user-data/v1/content/continueWatching"
-    
+
     if constants.settings.stagingApis = true
       constants.urls.foxApiBaseUrl = "https://qa.api.haw.digitalvideoplatform.com"
     else
@@ -1163,7 +1157,7 @@ Function getConstants()
       constants.ui.contentTypes.epg = "epg"
       constants.ui.contentTypes.sportsEvent = "sports_event"
       constants.ui.contentTypes.purpleCarpetEvent = "purple_carpet_event"
-    
+
     constants.ui.playerTypes = {}
       constants.ui.playerTypes.fox = "fox"
       constants.ui.playerTypes.tubi = "tubi"
