@@ -68,6 +68,8 @@ describe('Activate events', function () {
 		await ecp.sendKeypress(ecp.Key.Back);
 		await verifyC148861(episodeId);
 		await ecp.sendKeypress(ecp.Key.Ok);
+		await utils.sleep(2000);
+		await ecp.sendKeypress(ecp.Key.Ok);
 		await verifyC450497(episodeId);
 		await utils.sleep(2000);
 		await ecp.sendKeypress(ecp.Key.Back);

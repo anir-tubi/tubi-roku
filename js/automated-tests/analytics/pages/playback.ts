@@ -217,6 +217,9 @@ const PlayBack = ({ content }) => {
 	}
 
 	async function rewindPlayback({ howFast = 1, howLong = 300 } = {}) {
+		if(await checkIfSkipIntroIfPresent()){
+			await ecp.sendKeypress(ecp.Key.Down, { count: 2,wait: 700 });
+		}
 		await ecp.sendKeypress(ecp.Key.Down);
 		await testUtils.retryWithTimeOut(async () => {
 			const playPauseButton = await elements.playPauseButton();

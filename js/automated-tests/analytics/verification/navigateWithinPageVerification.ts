@@ -1143,8 +1143,8 @@ export async function verifyC543672(id) {
 		eventNavigateWithinPage = pulletEvents.find(
 			(event) =>
 				event.navigate_within_page &&
-				event.navigate_within_page.video_page &&
-				event.navigate_within_page.video_page.video_id === parseInt(id)
+				event.navigate_within_page.video_player_page &&
+				event.navigate_within_page.video_player_page.video_id === parseInt(id)
 		);
 		i++;
 	}

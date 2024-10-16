@@ -17,6 +17,8 @@ const Container = () => {
 			),
 		categoryNameInCategoryDetailsPage: async () =>
 			await testUtils.getNodeForElement('categoryNameInCategoryDetailsPage'),
+		firstChannelName: async () =>
+			await testUtils.getNodeForElement('firstChannelNameInChannelPage'),
 	};
 
 	async function pageDidLoad() {
@@ -28,13 +30,13 @@ const Container = () => {
 
 	async function selectFocusedTitle() {
 		let titleName;
+		await ecp.sendKeypress(ecp.Key.Ok);
+		await utils.sleep(2500);
+		await ecp.sendKeypress(ecp.Key.Ok);
 		await testUtils.retryWithTimeOut(async () => {
 			titleName = await elements.titleName();
 			expect(titleName.visible).to.equal(true);
 		});
-		await ecp.sendKeypress(ecp.Key.Ok);
-		await utils.sleep(2000)
-		await ecp.sendKeypress(ecp.Key.Ok);
 		const titleDetailsPage = TitleDetailsPage({ title: titleName.text });
 		await titleDetailsPage.pageDidLoad();
 		return titleDetailsPage;
@@ -46,10 +48,21 @@ const Container = () => {
 		return categoryNameInCategoryDetailsPage.text;
 	}
 
+	async function getNameOfFirstChannel() {
+		let text = '';
+		await testUtils.retryWithTimeOut(async () => {
+			const channelPoster = await elements.firstChannelName();
+			expect(channelPoster.visible).to.equal(true);
+			text = channelPoster.text;
+		});
+		return text;
+	}
+
 	return {
 		pageDidLoad,
 		selectFocusedTitle,
 		getCategoryName,
+		getNameOfFirstChannel
 	};
 };
 
