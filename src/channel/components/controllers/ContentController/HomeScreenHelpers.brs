@@ -494,6 +494,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
       }
       updateContainerWithProgramInfoFromFoxListing(context, onHomeScreenContentUpdateComplete)
     else
+      m.purpleCarpetContainerContentNode = invalid
       homeScreen.purpleCarpetContent = invalid
       homeScreen.purpleCarpetContentUpdated = true
     end if
