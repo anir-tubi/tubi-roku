@@ -66,7 +66,7 @@ describe('Autoplay TV', function () {
 
         // Autoplay triggered?
         await checkForAutoPlayTrigger();
-        await testUtils.waitForElementFieldToEqual('autoPlayContentPoster', 'itemHasfocus', true);
+        await testUtils.waitForElementFieldToEqual('autoPlayContentPoster', 'itemHasfocus', true, 10000);
         await ecp.sendKeypress(ecp.Key.Play);
 
         // Has autoplay container disappeared?
@@ -128,14 +128,14 @@ async function triggerSeriesAutoplay() {
     // await ecp.sendKeypress(ecp.Key.Play,  {wait:5000});
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
     await ecp.sleep(2000);
-    await ecp.sendKeypress(ecp.Key.Play);
-    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','paused');
+    await ecp.sendKeypress(ecp.Key.Play, {wait:1000});
+     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','paused');
     await utils.sleep(2000);
     await testUtils.seekPlayerToRelativePosition('videoPlayerScreen', 0, 'end');
 }
 
 async function checkForAutoPlayTrigger() {
-    await testUtils.waitForElementToFullyShowOnScreen('countDownSeriesAutoPlay');
+    await testUtils.waitForElementToFullyShowOnScreen('countDownSeriesAutoPlay', 'countdown element not found', 5000);
     const countDownSeriesAutoPlay = await testUtils.getNodeForElement('countDownSeriesAutoPlay');
     expect(countDownSeriesAutoPlay.text).to.contain('Starting');
 }

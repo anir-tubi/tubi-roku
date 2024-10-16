@@ -64,7 +64,7 @@ describe('Sign In: On-Device Password Reset', function () {
     await ecp.sendKeypress(ecp.Key.Right);
     await ecp.sendKeypress(ecp.Key.Down, {count:4});
     await ecp.sleep(3000);
-    await ecp.sendKeypress(ecp.Key.Ok, {wait:1000});   
+    await ecp.sendKeypress(ecp.Key.Ok, {wait:2000});   
 
     // Oops! wrong password! screen is displayed
     await verifyWrongPasswordDialogDisplayed();

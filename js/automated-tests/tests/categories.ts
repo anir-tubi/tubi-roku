@@ -54,7 +54,7 @@ describe('Categories', function () {
       
       // Press OK to reach Details of title
       await testUtils.waitForElementToFullyShowOnScreen('categoryPageTitle');
-      await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRowPoster');
+      await testUtils.waitForElementToFullyShowOnScreen('continueWatchingCategoryPoster');
       await ecp.sendKeypress(ecp.Key.Right, {wait:2000});
       await ecp.sendKeypress(ecp.Key.Ok);
 

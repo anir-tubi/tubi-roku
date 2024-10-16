@@ -1039,9 +1039,14 @@ const elements = typeCheckElements({
   //** CW Row populated (poster) */
   continueWatchingRowPoster: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid.0.1.#posterLayout.#Poster',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#ContentArea.#RowList.0.items.0.1.#posterLayout.#Poster.#gradientPoster',
   },
 
+  //** CW Category Row poster */
+  continueWatchingCategoryPoster:{
+    keyPath:
+    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid.0.1.#posterLayout.#Poster',
+  },
   //** Empty My List Container */
   emptyMyStuffContainer: {
     keyPath:
@@ -1582,7 +1587,8 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#channelListScreen.#PageGroup.#ChannelCategoryGrid.0.#Titles',
   },
 
-  /** recommended tile on Categories page */
+  /** recommended tile on 
+   *  page */
   recommendedCategoryPage: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid.0.#Title',

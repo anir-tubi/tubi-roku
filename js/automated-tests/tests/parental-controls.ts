@@ -256,9 +256,8 @@ describe('Parental Controls', function () {
 
         // Are we on Categories page?
         await utils.sleep(2000);
-        const categoryPageCategory = testUtils.getNodeForElement('categoryPageCategory');
-        expect((await categoryPageCategory).visible).to.be.true;
-
+        await testUtils.waitForElementToFullyShowOnScreen('categoryPageCategory');
+    
         // Teens content?
         const artHouseFilms = testUtils.getNodeForElement('artHouseFilms');
         expect((await artHouseFilms).visible).to.be.true;

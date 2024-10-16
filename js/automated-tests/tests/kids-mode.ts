@@ -216,17 +216,14 @@ describe('Kids Mode', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Are we on the Kid's mode password screen?
-    const kidsModePasswordTest = await testUtils.getNodeForElement('passwordText');
-    expect(kidsModePasswordTest.visible).to.be.true;
+    await testUtils.waitForElementToFullyShowOnScreen('passwordText');
 
     // Enter Password
     await ecp.sendKeypress(ecp.Key.Ok);
     await ecp.sendText('111111');
     await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
     await utils.sleep(4000); // Improvement - try to work around sleeps
-    await ecp.sendKeypress(ecp.Key.Ok);
     await ecp.sendKeypress(ecp.Key.Right);
-    await ecp.sendKeypress(ecp.Key.Left);
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Parental Controls Settings Change
@@ -234,7 +231,7 @@ describe('Kids Mode', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Navigate to Left Nav
-    await ecp.sendKeypress(ecp.Key.Left, { count: 3 });
+    await ecp.sendKeypress(ecp.Key.Left, { count: 2});
 
     // Is the Exit Kids button grayed out?
     await checkForKidsModeGrayed();
