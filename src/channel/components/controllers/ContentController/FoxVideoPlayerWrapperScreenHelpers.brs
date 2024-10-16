@@ -509,27 +509,27 @@ Function getFoxVideoPlayerConfig()
 End Function
 
 Function onFoxVideoPlayerAnalyticsEvent(msg)
-  print "onFoxVideoPlayerAnalyticsEvent " msg.getData()
+  ' print "onFoxVideoPlayerAnalyticsEvent " msg.getData()
 End Function
 
 
 Function onFoxVideoPlayerPlaybackAnalyticsEvent(msg)
-  print "onFoxVideoPlayerPlaybackAnalyticsEvent " msg.getData()
+  ' print "onFoxVideoPlayerPlaybackAnalyticsEvent " msg.getData()
 End Function
 
 
 Function onFoxVideoPlayerLoaded(msg)
-  print "onFoxVideoPlayerLoaded " msg.getData()
+  ' print "onFoxVideoPlayerLoaded " msg.getData()
 End Function
 
 
 Function onFoxVideoPlayerError(msg)
-  print "onFoxVideoPlayerError " msg.getData()
+  ' print "onFoxVideoPlayerError " msg.getData()
 End Function
 
 
 Function onFoxVideoPlayerliveAssetInfoChange(msg)
-  print "onFoxVideoPlayerliveAssetInfoChange " msg.getData()
+  ' print "onFoxVideoPlayerliveAssetInfoChange " msg.getData()
 End Function
 
 
