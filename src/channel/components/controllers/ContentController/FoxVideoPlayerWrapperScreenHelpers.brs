@@ -86,6 +86,14 @@ Function onFoxVideoPlayerComponentLibraryLoadStatus(msg)
         foxRpfInstance = initializer.foxRpfInstance
         m.foxRpfInstance = foxRpfInstance
 
+
+        ' Set the strings for the fox player that we are overriding
+        strings = {
+          "error_contentUnavailableMessage": getTranslation("foxVideoPlayer_error_contentUnavailableMessage"),
+          "error_generic": getTranslation("foxVideoPlayer_error_generic"),
+        }
+        m.foxRpfInstance.callFunc("setStrings", strings)
+
         if foxRpfInstance.playerEvent <> invalid then
           foxRpfInstance.playerEvent.observeFieldScoped("liveAssetInfo", "onFoxVideoPlayerliveAssetInfoChange")
           foxRpfInstance.playerEvent.observeFieldScoped("playerPosition", "onFoxVideoPlayerPlayerPositionChange")
