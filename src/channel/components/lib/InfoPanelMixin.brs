@@ -191,6 +191,7 @@ End Function
 Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel, bInSpotlight = false)
   tubiLog("InfoPanelMixin.populateInfoPanelWithLinearProgramHomescreenMode")
   currentProgram = getCurrentLiveProgram(content)
+
   if bInSpotlight = true
     infoPanel.mode = m.constants.ui.infoPanelModes.spotlightLinearProgramHomescreen
   else
@@ -201,20 +202,20 @@ Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel, bI
   timeLeft = ""
   duration = ""
   channelTitle = ""
-  league = ""
+  leagueName = ""
   rating = ""
   genres = []
   lineOneData = {}
-  
+
   infoPanel.description = content.description
 
   if currentProgram <> invalid
-
     programTitle = currentProgram.title
     infoPanel.title = programTitle
     if currentProgram.epgProgramTitle <> programTitle
       infoPanel.episodeTitle = currentProgram.epgProgramTitle
     end if
+
     releaseDate = currentProgram.releaseDate
     infoPanel.description = currentProgram.description
 
@@ -236,7 +237,6 @@ Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel, bI
         startTime = currentProgram.hoursOfAiring.tokenize(" - ")[0]
         duration = getTranslation("epg_started_at") + " " + startTime
       end if
-
     else
       infoPanel.liveBadgeHeaderText = ""
       if currentProgram.epgProgramType = m.constants.ui.contentTypes.sportsEvent AND currentProgram.live = true
@@ -244,8 +244,8 @@ Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel, bI
           startTime = currentProgram.hoursOfAiring.tokenize(" - ")[0]
           duration = getTranslation("epg_started_at") + " " + startTime
         end if
-        'show the league only for sports Events which are live
-        league = currentProgram.league
+        'show the league name only for sports Events which are live
+        leagueName = currentProgram.leagueName
       end if
     end if
 
@@ -261,7 +261,6 @@ Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel, bI
         channelTitle = ""  '//reset channelTitle so it does not affect the lineTwoData
       end if
     end if
-
   else
     infoPanel.description = content.description
     infoPanel.episodeTitle = ""
@@ -277,21 +276,23 @@ Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel, bI
   lineOneData.programTimeLeft = timeleft
   lineOneData.rating = rating
 
-
   lineTwoData = {}
   ' if league is available, show it in the second line, else show genres
-  if league <> ""
-    lineTwoData.roundGroupInfo = league
+  if leagueName <> ""
+    lineTwoData.roundGroupInfo = leagueName
   else
     lineTwoData.genres = genres
   end if
-  if channelTitle <> "" then lineTwoData.channelName = channelTitle
+
+  if channelTitle <> ""
+    lineTwoData.channelName = channelTitle
+  end if
 
   if bInSpotlight = true
-
     for each prop in lineTwoData
       lineOneData[prop] = lineTwoData[prop]
     end for
+
     lineTwoData = {}
   end if
 
@@ -348,9 +349,9 @@ End Function
 ' else it retuns 'y mins left'
 Function getDurationHoursString(seconds As Integer) As String
   retVal = ""
+
   if seconds <> invalid
     hourValue = Int(seconds / 3600)
-
     minValue = StrI((Int(seconds / 60) mod 60) + 1) 'increase the min by one so that we dont show 0 min
 
     if hourValue > 0
@@ -370,10 +371,8 @@ Function calculateProgramTimeLeft(program) as String
 
   if isInt(program.endTime) = true AND program.endTime > now
     timeLeft = program.endTime - now
-
     retVal = getDurationHoursString(timeLeft)
-
   end if
-  return retVal
 
+  return retVal
 End Function

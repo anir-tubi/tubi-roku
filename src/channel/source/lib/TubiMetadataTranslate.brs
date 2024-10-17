@@ -328,7 +328,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     translatedContent.genres = contentFromServer.tags 'array of genres
     translatedContent.categories = contentFromServer.tags 'array of genres
   end if
-  
+
   if contentFromServer.slug <> invalid then translatedContent.slug = contentFromServer.slug
   if contentFromServer.lang <> invalid then translatedContent.language = contentFromServer.lang
   if contentFromServer.publisher_id <> invalid then translatedContent.pubId = contentFromServer.publisher_id
@@ -365,7 +365,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
   roundGroupInfo = ""
   league = contentFromServer.league
-  if league <> invalid AND league.round <> invalid
+  if isAA(league) AND league.round <> invalid
     roundGroupInfo = league.round
   end if
 
@@ -468,7 +468,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   end if
 
   backgrounds = m.getBackgroundImages(contentFromServer)
-  
+
   if backgrounds.count() > 0
     translatedContent.backgrounds = backgrounds
   end if
@@ -742,7 +742,7 @@ Function tubiMetadataTranslate_getContentFromCategoryJson(category, contentId, i
     if parsed <> invalid
       fullContent = parsed[contentId]
       translated = CreateObject("roSGNode", "TubiContentNode")
-      m.translateRecursive(fullContent, translated, isSignedInUser) 
+      m.translateRecursive(fullContent, translated, isSignedInUser)
       translated.parentId = category.id
       translated.parentType = category.type
       translated.parentTitle = category.title
@@ -2262,204 +2262,206 @@ End Function
 
 
 Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromServer, translatedProgram, requestorID, isUserSignedIn = false)
+  if isAA(channelFromServer) = true AND isAA(programFromServer) = true
 
-  if channelFromServer.content_id  <> invalid
-    translatedProgram.id = channelFromServer.content_id
-  end if
-
-  if translatedProgram.id = invalid
-    translatedProgram.id = programFromServer.id
-  end if
-
-  translatedProgram.title = programFromServer.title
-
-  if programFromServer.live <> invalid
-    translatedProgram.live = programFromServer.live
-  end if
-
-  'preserve the program type for some infopanel decisions like to show 'started at' instead of duration.
-  if programFromServer.type <> invalid
-    translatedProgram.epgProgramType = m.translateBackendTypeToClientSideType(programFromServer.type)
-  end if
-
-  'Add episode title
-  if isNonEmptyString(programFromServer.episode_title)
-    translatedProgram.epgProgramTitle = programFromServer.episode_title
-  end if
-
-  if isNonEmptyString(programFromServer.series_title) = true ' that means this is series type program.
-    translatedProgram.title = programFromServer.series_title
-    translatedProgram.epgProgramTitle = programFromServer.title
-  end if
-
-  startTime = ""
-  dayOfMonth = ""
-  dayOfWeek = ""
-  dateString = ""
-  startTimeFromServer = programFromServer.start_time
-  if isNonEmptyString(startTimeFromServer)
-    datetimeObj = CreateObject("roDateTime")
-    datetimeObj.FromISO8601String(startTimeFromServer)
-    datetimeObj.ToLocalTime()
-    translatedProgram.startTime = datetimeObj.asSeconds()
-    dateString = datetimeObj.AsDateString("short-date")
-    dayOfWeek = "day_" + StrI(datetimeObj.GetDayOfWeek()).trim()
-    dayOfMonth = StrI(datetimeObj.GetDayOfMonth()).trim()
-    startTime = GetAMPMTimeString(datetimeObj, false)
-  end if
-
-  endTime = ""
-  endTimeFromServer = programFromServer.end_time
-  if isNonEmptyString(endTimeFromServer)
-    datetimeObjEnd = CreateObject("roDateTime") 'create new dateTime object otherwise local time returned will be wrong.
-    datetimeObjEnd.FromISO8601String(endTimeFromServer)
-    datetimeObjEnd.ToLocalTime()
-    translatedProgram.endTime = datetimeObjEnd.asSeconds()
-
-    endTime = GetAMPMTimeString(datetimeObjEnd, false)
-  end if
-
-  sFDPosterURL = ""
-  sHDGridPosterURL = ""
-  if programFromServer.images <> invalid
-    if isNonEmptyArray(programFromServer.images.poster)
-      sFDPosterURL = programFromServer.images.poster[0]
+    if channelFromServer.content_id  <> invalid
+      translatedProgram.id = channelFromServer.content_id
     end if
-  end if
 
-  if  sFDPosterURL = "" AND channelFromServer.images <> invalid 'if program images are not available, consider channel images for substitute.
-    if isNonEmptyArray(channelFromServer.images.poster)
-      sFDPosterURL = channelFromServer.images.poster[0]
+    if translatedProgram.id = invalid
+      translatedProgram.id = programFromServer.id
     end if
-  end if
 
-  ' if a program = episode of a series, then series images are preffered
-  if programFromServer.series_id <> invalid AND programFromServer.series_images <> invalid
-    sHDGridPosterURL = m.getThumbnailImage(programFromServer, m.constants.ui.gridItemTypes.linear, true)'first choice for series/episode
-  else
-    sHDGridPosterURL = m.getThumbnailImage(programFromServer, m.constants.ui.gridItemTypes.linear) 'program images for non series/episode
-  end if
+    translatedProgram.title = programFromServer.title
 
+    if programFromServer.live <> invalid
+      translatedProgram.live = programFromServer.live
+    end if
 
-  if sHDGridPosterURL = ""
-    sHDGridPosterURL =  m.getThumbnailImage(channelFromServer, m.constants.ui.gridItemTypes.linear) 'channel image - default
-  end if
+    'preserve the program type for some infopanel decisions like to show 'started at' instead of duration.
+    if programFromServer.type <> invalid
+      translatedProgram.epgProgramType = m.translateBackendTypeToClientSideType(programFromServer.type)
+    end if
 
-  sFDPosterURL = m.getRoundedCornersURL(sFDPosterURL)
-  sHDGridPosterURL = m.getRoundedCornersURL(sHDGridPosterURL)
-  translatedProgram.FHDPosterUrl  = sFDPosterURL
-  translatedProgram.hdgridposterurl  = sHDGridPosterURL
+    'Add episode title
+    if isNonEmptyString(programFromServer.episode_title)
+      translatedProgram.epgProgramTitle = programFromServer.episode_title
+    end if
 
-  if programFromServer.has_subtitle <> invalid
-    translatedProgram.hasSubtitles = programFromServer.has_subtitle
-  end if
+    if isNonEmptyString(programFromServer.series_title) = true ' that means this is series type program.
+      translatedProgram.title = programFromServer.series_title
+      translatedProgram.epgProgramTitle = programFromServer.title
+    end if
 
-  year = programFromServer.year
-  if year <> invalid
-    if isInt(year) = true
-      if year > 0
-        translatedProgram.releaseDate = year.toStr()
+    startTime = ""
+    dayOfMonth = ""
+    dayOfWeek = ""
+    dateString = ""
+    startTimeFromServer = programFromServer.start_time
+    if isNonEmptyString(startTimeFromServer)
+      datetimeObj = CreateObject("roDateTime")
+      datetimeObj.FromISO8601String(startTimeFromServer)
+      datetimeObj.ToLocalTime()
+      translatedProgram.startTime = datetimeObj.asSeconds()
+      dateString = datetimeObj.AsDateString("short-date")
+      dayOfWeek = "day_" + StrI(datetimeObj.GetDayOfWeek()).trim()
+      dayOfMonth = StrI(datetimeObj.GetDayOfMonth()).trim()
+      startTime = GetAMPMTimeString(datetimeObj, false)
+    end if
+
+    endTime = ""
+    endTimeFromServer = programFromServer.end_time
+    if isNonEmptyString(endTimeFromServer)
+      datetimeObjEnd = CreateObject("roDateTime") 'create new dateTime object otherwise local time returned will be wrong.
+      datetimeObjEnd.FromISO8601String(endTimeFromServer)
+      datetimeObjEnd.ToLocalTime()
+      translatedProgram.endTime = datetimeObjEnd.asSeconds()
+
+      endTime = GetAMPMTimeString(datetimeObjEnd, false)
+    end if
+
+    sFDPosterURL = ""
+    sHDGridPosterURL = ""
+    if programFromServer.images <> invalid
+      if isNonEmptyArray(programFromServer.images.poster)
+        sFDPosterURL = programFromServer.images.poster[0]
       end if
+    end if
+
+    if  sFDPosterURL = "" AND channelFromServer.images <> invalid 'if program images are not available, consider channel images for substitute.
+      if isNonEmptyArray(channelFromServer.images.poster)
+        sFDPosterURL = channelFromServer.images.poster[0]
+      end if
+    end if
+
+    ' if a program = episode of a series, then series images are preffered
+    if programFromServer.series_id <> invalid AND programFromServer.series_images <> invalid
+      sHDGridPosterURL = m.getThumbnailImage(programFromServer, m.constants.ui.gridItemTypes.linear, true)'first choice for series/episode
     else
-      translatedProgram.releaseDate = year
+      sHDGridPosterURL = m.getThumbnailImage(programFromServer, m.constants.ui.gridItemTypes.linear) 'program images for non series/episode
     end if
-  end if
 
-  if startTime <> "" AND endTime <> ""
-    translatedProgram.hoursOfAiring = startTime + " - " +  endTime
-  end if
 
-  if programFromServer.ratings <> invalid AND programFromServer.ratings[0] <> invalid AND programFromServer.ratings[0].value <> invalid
-    translatedProgram.Rating = programFromServer.ratings[0].value
-  end if
+    if sHDGridPosterURL = ""
+      sHDGridPosterURL =  m.getThumbnailImage(channelFromServer, m.constants.ui.gridItemTypes.linear) 'channel image - default
+    end if
 
-  if channelFromServer.needs_login = true AND isUserSignedIn = false
-    translatedProgram.needsLogin = true
-    translatedProgram.loginReason = channelFromServer.login_reason
-  end if
+    sFDPosterURL = m.getRoundedCornersURL(sFDPosterURL)
+    sHDGridPosterURL = m.getRoundedCornersURL(sHDGridPosterURL)
+    translatedProgram.FHDPosterUrl  = sFDPosterURL
+    translatedProgram.hdgridposterurl  = sHDGridPosterURL
 
-  if programFromServer.videoRenditions <> invalid
-    ' for now, only worry about 4k
-    if programFromServer.videoRenditions[0] = m.constants.serverValues.tensorVideoRenditions.fourK
-      if m.constants.deviceInfo.videoMode.toInt() >= 2160
-        translatedProgram.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
+    if programFromServer.has_subtitle <> invalid
+      translatedProgram.hasSubtitles = programFromServer.has_subtitle
+    end if
+
+    year = programFromServer.year
+    if year <> invalid
+      if isInt(year) = true
+        if year > 0
+          translatedProgram.releaseDate = year.toStr()
+        end if
+      else
+        translatedProgram.releaseDate = year
       end if
     end if
-  end if
 
-  if programFromServer.description <> invalid and programFromServer.description <> ""
-    translatedProgram.description = programFromServer.description
-  else
-    translatedProgram.description = channelFromServer.description
-  end if
+    if startTime <> "" AND endTime <> ""
+      translatedProgram.hoursOfAiring = startTime + " - " +  endTime
+    end if
 
-  if programFromServer.tags <> invalid AND programFromServer.tags.Count() > 0
-    ' in case of epg programs
-    translatedProgram.descriptors = programFromServer.tags
-    ' in case of homescreen programs
-    translatedProgram.genres = programFromServer.tags 'array of genres
-  end if
+    if programFromServer.ratings <> invalid AND programFromServer.ratings[0] <> invalid AND programFromServer.ratings[0].value <> invalid
+      translatedProgram.Rating = programFromServer.ratings[0].value
+    end if
 
-  now  = CreateObject("roDateTime")
-  now.ToLocalTime()
-  nowTime = now.asSeconds()
-  tomorrowSecs = nowTime + 86400 'seconds per day
-  tomorrow = CreateObject("roDateTime")
-  tomorrow.FromSeconds(tomorrowSecs)
+    if channelFromServer.needs_login = true AND isUserSignedIn = false
+      translatedProgram.needsLogin = true
+      translatedProgram.loginReason = channelFromServer.login_reason
+    end if
 
-  'Today
-  if dateString = now.AsDateString("short-date")
-    if translatedProgram.startTime <= nowTime AND translatedProgram.endTime > nowTime  ' current program eg:20M left
-      timeLeft = (translatedProgram.endTime -  nowTime) / 60
-      translatedProgram.ShortDescriptionLine1 = getTranslation("epg_minutes_left", {minutes: toStr(convertSecondsToMins(translatedProgram.endTime - nowTime))})
-    else   'Today future program eg: 10:00 AM
+    if programFromServer.videoRenditions <> invalid
+      ' for now, only worry about 4k
+      if programFromServer.videoRenditions[0] = m.constants.serverValues.tensorVideoRenditions.fourK
+        if m.constants.deviceInfo.videoMode.toInt() >= 2160
+          translatedProgram.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
+        end if
+      end if
+    end if
+
+    if programFromServer.description <> invalid and programFromServer.description <> ""
+      translatedProgram.description = programFromServer.description
+    else
+      translatedProgram.description = channelFromServer.description
+    end if
+
+    if programFromServer.tags <> invalid AND programFromServer.tags.Count() > 0
+      ' in case of epg programs
+      translatedProgram.descriptors = programFromServer.tags
+      ' in case of homescreen programs
+      translatedProgram.genres = programFromServer.tags 'array of genres
+    end if
+
+    now  = CreateObject("roDateTime")
+    now.ToLocalTime()
+    nowTime = now.asSeconds()
+    tomorrowSecs = nowTime + 86400 'seconds per day
+    tomorrow = CreateObject("roDateTime")
+    tomorrow.FromSeconds(tomorrowSecs)
+
+    'Today
+    if dateString = now.AsDateString("short-date")
+      if translatedProgram.startTime <= nowTime AND translatedProgram.endTime > nowTime  ' current program eg:20M left
+        timeLeft = (translatedProgram.endTime -  nowTime) / 60
+        translatedProgram.ShortDescriptionLine1 = getTranslation("epg_minutes_left", {minutes: toStr(convertSecondsToMins(translatedProgram.endTime - nowTime))})
+      else   'Today future program eg: 10:00 AM
+        timeLeft = (translatedProgram.endTime - translatedProgram.startTime) / 60
+        translatedProgram.ShortDescriptionLine1 = startTime
+      end if
+    else if dateString = tomorrow.AsDateString("short-date") ' tomorrow programs eg: 10:00AM, TOMORROW
       timeLeft = (translatedProgram.endTime - translatedProgram.startTime) / 60
-      translatedProgram.ShortDescriptionLine1 = startTime
+      translatedTomorrow = getTranslation("tomorrow")
+      translatedProgram.ShortDescriptionLine1 =  startTime + ", " + translatedTomorrow
+    else 'future day programs eg: Jan, 8 10:00 AM
+      timeLeft = (translatedProgram.endTime - translatedProgram.startTime) / 60
+      translatedProgram.ShortDescriptionLine1 = startTime + ", " + getTranslation(dayOfWeek) + dayOfMonth
     end if
-  else if dateString = tomorrow.AsDateString("short-date") ' tomorrow programs eg: 10:00AM, TOMORROW
-    timeLeft = (translatedProgram.endTime - translatedProgram.startTime) / 60
-    translatedTomorrow = getTranslation("tomorrow")
-    translatedProgram.ShortDescriptionLine1 =  startTime + ", " + translatedTomorrow
-  else 'future day programs eg: Jan, 8 10:00 AM
-    timeLeft = (translatedProgram.endTime - translatedProgram.startTime) / 60
-    translatedProgram.ShortDescriptionLine1 = startTime + ", " + getTranslation(dayOfWeek) + dayOfMonth
+
+    'the value 19.2 is the width for every minute of the program as per the EPG Design. This value will change if EPG design changes in future.
+    '186 is min width
+    width = timeLeft * 19.2
+    if width < 186
+      translatedProgram.FHDItemWidth = 186
+    else
+      translatedProgram.FHDItemWidth = width
+    end if
+
+
+    if programFromServer.genres <> invalid AND programFromServer.genres.count() > 0
+      translatedProgram.Categories = programFromServer.genres
+    end if
+
+    if isAA(programFromServer.league) = true AND isNonEmptyString(programFromServer.league.name) = true
+      translatedProgram.leagueName = programFromServer.league.name
+    end if
+
+    selectedAttributeText = getTranslation("epg_starts_at") + " "
+
+    itemAttributes = {
+      "title" : selectedAttributeText
+    }
+
+    if programFromServer.keywords <> invalid AND programFromServer.keywords.count() > 0
+      for each keyword in programFromServer.keywords
+        if keyword = "EpisodeTitle_IsPreferred" and isNonEmptyString(programFromServer.episode_title)
+          itemAttributes["EpisodeTitle_IsPreferred"] = true
+          exit for
+        end if
+      end for
+
+    end if
+
+    translatedProgram.itemAttributes = itemAttributes
   end if
-
-  'the value 19.2 is the width for every minute of the program as per the EPG Design. This value will change if EPG design changes in future.
-  '186 is min width
-  width = timeLeft * 19.2
-  if width < 186
-    translatedProgram.FHDItemWidth = 186
-  else
-    translatedProgram.FHDItemWidth = width
-  end if
-
-
-  if programFromServer.genres <> invalid AND programFromServer.genres.count() > 0
-    translatedProgram.Categories = programFromServer.genres
-  end if
-
-  if isNonEmptyString(programFromServer.league) = true
-    translatedProgram.league = programFromServer.league
-  end if
-
-  selectedAttributeText = getTranslation("epg_starts_at") + " "
-
-  itemAttributes = {
-    "title" : selectedAttributeText
-  }
-
-  if programFromServer.keywords <> invalid AND programFromServer.keywords.count() > 0
-    for each keyword in programFromServer.keywords
-      if keyword = "EpisodeTitle_IsPreferred" and isNonEmptyString(programFromServer.episode_title)
-        itemAttributes["EpisodeTitle_IsPreferred"] = true
-        exit for
-      end if
-    end for
-
-  end if
-
-  translatedProgram.itemAttributes = itemAttributes
 
   End Function
 
