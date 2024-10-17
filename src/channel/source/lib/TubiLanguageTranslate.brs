@@ -2532,6 +2532,14 @@ Function getTranslation_es_MX()
       "description": "The label for the autoplay preview",
       "message": "Avance de Video"
     },
+    "screenSettings_menu_autoplayControls": {
+      "description": "The Label for the autoplay controls to turn video preview and autoplay of the next video on or off.",
+      "message": "Controles de Auto-Reproducción"
+    },
+    "screenSettings_menu_autoplayNextVideo": {
+      "description": "The label for the autoplay next video",
+      "message": "Auto-Reproducir Siguiente Video"
+    },
     "screenSettings_parentalControls_group_LittleKids": {
       "description": "Little Kids of the parental controls",
       "message": "Niños Pequeños",
@@ -2559,6 +2567,14 @@ Function getTranslation_es_MX()
     "screenSettings_autoplayPreview_instructions": {
       "description": "Description of the autoplay preview user choice screen",
       "message": "Puedes activar o desactivar la función de reproducción automática, que te permite ver el vídeo mientras navegas."
+    },
+    "screenSettings_autoplayTimer_instructions": {
+      "description": "Description of the autoplay timer user choice screen",
+      "message": "Contenido está configurado para Auto-Reproducir otro video cuando lo que estás viendo está por terminar."
+    },
+    "screenSettings_autoplayPreview_featureDisabledMessage": {
+      "description": "Message to display when the user has set Autoplay to false in Roku(not tubi) main settings.",
+      "message": "Reproducción automática se controla desde la configuración de Roku. Para cambiarla, ve a Configuración de Roku -> Accesibilidad -> Reproducción automática de video."
     },
     "screenSettings_menu_about": {
       "description": "A menu Item for the Settings screen",
@@ -2810,10 +2826,6 @@ Function getTranslation_es_MX()
     },
     "screenDetails_button_episodes": {
       "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
-      "message": "Todos los Capítulos"
-    },
-    "screenDetails_button_episodes_experiment": {
-      "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
       "message": "Todos Los Capítulos"
     },
     "screenDetails_relatedTitles": {
@@ -2927,10 +2939,6 @@ Function getTranslation_es_MX()
     "screenAgeVerification_error_prompt": {
       "description": "A message informing the user that they entered a date that is not acceptable",
       "message": "Por favor, ingresa un año de nacimiento válido"
-    },
-    "screenPlayer_button_like": {
-      "description": "Label of button to allow users to like the current video title",
-      "message": "Me gusta"
     },
     "metadata_fullscreen_countdown_plural": {
       "description": "label to indicate how many seconds it will take before the video player will automatically go fullscreen. This is the plural version but an attempt should be made to ensure the string is neither plural or singular by using a shorten form of seconds.",
@@ -4196,6 +4204,14 @@ Function getTranslation_fr_CA()
       "description": "The label for the autoplay preview",
       "message": "Aperçus automatiques"
     },
+    "screenSettings_menu_autoplayControls": {
+      "description": "The Label for the autoplay controls to turn video preview and autoplay of the next video on or off.",
+      "message": "Commandes Auto-Lecture"
+    },
+    "screenSettings_menu_autoplayNextVideo": {
+      "description": "The label for the autoplay next video",
+      "message": "Auto-Lecture Vidéo Suivante"
+    },
     "screenSettings_parentalControls_group_LittleKids": {
       "description": "Little Kids of the parental controls",
       "message": "Jeunes enfants",
@@ -4223,6 +4239,14 @@ Function getTranslation_fr_CA()
     "screenSettings_autoplayPreview_instructions": {
       "description": "Description of the autoplay preview user choice screen",
       "message": "Vous pouvez activer ou désactiver la fonction de lecture automatique qui vous permet de prévisualiser la vidéo pendant la navigation."
+    },
+    "screenSettings_autoplayTimer_instructions": {
+      "description": "Description of the autoplay timer user choice screen",
+      "message": "Contenu est configuré pour lire Auto-Lecture une autre vidéo lorsque vous regardez est sur le point de terminer."
+    },
+    "screenSettings_autoplayPreview_featureDisabledMessage": {
+      "description": "Message to display when the user has set Autoplay to false in Roku(not tubi) main settings.",
+      "message": "La lecture automatique est contrôlée dans les paramètres Roku. Pour la modifier, allez dans Paramètres Roku -> Accessibilité -> Lecture automatique de la vidéo."
     },
     "screenSettings_menu_about": {
       "description": "A menu Item for the Settings screen",
@@ -4474,10 +4498,6 @@ Function getTranslation_fr_CA()
     },
     "screenDetails_button_episodes": {
       "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
-      "message": "Tous les épisodes "
-    },
-    "screenDetails_button_episodes_experiment": {
-      "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
       "message": "Tous les épisodes"
     },
     "screenDetails_relatedTitles": {
@@ -4591,10 +4611,6 @@ Function getTranslation_fr_CA()
     "screenAgeVerification_error_prompt": {
       "description": "A message informing the user that they entered a date that is not acceptable",
       "message": "Veuillez entrer une année de naissance valide"
-    },
-    "screenPlayer_button_like": {
-      "description": "Label of button to allow users to like the current video title",
-      "message": "J'aime ça"
     },
     "metadata_fullscreen_countdown_plural": {
       "description": "label to indicate how many seconds it will take before the video player will automatically go fullscreen. This is the plural version but an attempt should be made to ensure the string is neither plural or singular by using a shorten form of seconds.",
