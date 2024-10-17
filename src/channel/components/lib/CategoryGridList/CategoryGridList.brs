@@ -297,7 +297,6 @@ Function setRowHeights()
   posterSize = m.constants.ui.imageSizes.largePoster
   landscapeSize = m.constants.ui.imageSizes.largeLandscape
   showRowLabel = []
-  rowSpacings = []
 
   for i=0 to m.top.content.getChildCount()-1
     category = m.top.content.getChild(i)
@@ -345,14 +344,12 @@ Function setRowHeights()
       focusXOffsets.push(0)
     end if
 
-    ' In future when we clean up purple carpet code we will should either add the spacings in xml or continue pushing 32 for each gridItemType's if block above.
     if gridItemType = gridItemTypes.banner
       showRowLabel.push(false)
-      ' Adding a negative margin so that we move the row up since the banner row does not any header.
-      rowSpacings.push(-32)
+      ' Just adding the spacing and not the row header component height.
+      rowHeightAdjustment = 18
     else
       showRowLabel.push(true)
-      rowSpacings.push(32)
     end if
 
     if category.sponsorImages <> invalid
@@ -373,7 +370,6 @@ Function setRowHeights()
     "numRows": numRows
     "rowItemSpacing": rowItemSpacings
     "focusXOffset" : focusXOffsets
-    "rowSpacings": rowSpacings
   })
   m.RowList.content = m.top.content
 End Function

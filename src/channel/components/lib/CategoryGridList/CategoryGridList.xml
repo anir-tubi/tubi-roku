@@ -186,6 +186,7 @@
       rowTitleComponentName="CategoryGridRowLabel"
       itemSize="[1776,0]"
       numRows="2"
+      itemSpacing="[0, 32]"
       rowItemSpacing="[[16,0]]"
       showRowCounter="[false]"
       fadeFocusFeedbackWhenAutoScrolling="true"
