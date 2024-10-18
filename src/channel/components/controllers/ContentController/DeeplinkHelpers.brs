@@ -90,6 +90,9 @@ Function createDeeplinkContentFromStartupArgs(args)
     else if args.mediaType = "episode"
       content.type = "video"
       content.deeplinkType = "episode"
+    else if args.mediaType = "shortform"
+      content.type = "video"
+      content.deeplinkType = "shortform"
     else if args.mediaType = "livefeed"
       content.type = "linear"
       content.deeplinkType = "linear"
@@ -278,6 +281,10 @@ Function handleDeeplinkContentByType()
     else if m.deepLinkContent.deeplinktype = "sports"
       ' TODO: Remove the additional request and call showSportsDetailsScreen directly.
       getSingleContentFromServer(m.deeplinkContent, onDeeplinkSportsContentSuccess, showDeeplinkErrorModal)
+    else if m.deepLinkContent.deeplinktype = "shortform"
+      ' Shortform media refers to content that is under 15 minutes long. Examples include movie trailers, news snippets, comedy clips, food reviews, and similar videos.
+      ' In our app, it primarily features movie trailers
+      getSingleContentFromServer(m.deeplinkContent, onDeeplinkShortFormContentSuccess, handleSingleContentDeeplinkError)
     else
       message = getTranslation("error_deeplink_page")
       showDeeplinkErrorModal(invalid, message)
@@ -778,6 +785,23 @@ Function handleDeeplinkVideoSuccessResponse(refreshedContent, successCb = invali
 End Function
 
 
+' success handler upon fetching the trailer in case of shortForm deeplinks.
+' @refreshedContent: roSGNode, success video response content
+' @successcb: success callback which will handle the success response after fetching the content metadata for the movie associated with the trailer that was deeplinked to.
+' @errorcb: errorCallback which will handle error while fetching video for provided contentId
+Function handleDeeplinkShortFormSuccessResponse(refreshedContent, successCb = invalid, errorCb = invalid) as void
+  emptyMovieNode = CreateObject("roSGNode", "TubiContentNode")
+  emptyMovieNode.type = m.constants.ui.contentTypes.movie
+
+  if refreshedContent <> invalid
+    emptyMovieNode.id = refreshedContent.parentId
+  end if
+
+  playbackSource = getPlaybackSourceForDeeplinkType()
+  showDetailScreen(emptyMovieNode, false, successCb, errorCb, playbackSource)
+End Function
+
+
 Function handleDeeplinkSeasonSuccessResponse(refreshedContent)
 
   if refreshedContent <> invalid
@@ -801,6 +825,27 @@ Function handleDeeplinkSeasonSuccessResponse(refreshedContent)
       detailScreen.contentFetchError = false
       populateDetailScreen(detailScreen, refreshedContent, false, -1)
       handleDetailScreenAfterFn(detailScreen, afterFn)
+    end if
+  else
+    showDeeplinkErrorModal()
+  end if
+End Function
+
+
+' @refreshedContent, roSGNode, success response of a trailer's parent content, most likely a movie.
+Function handleDeeplinkTrailerSuccessResponse(refreshedContent)
+  if refreshedContent <> invalid
+    afterFn = trailerHelper
+    detailScreen = getTopDetailScreenFromStack()
+
+    if detailScreen <> invalid
+      detailScreen.contentFetchError = false
+      populateDetailScreen(detailScreen, refreshedContent, false, -1)
+
+      if refreshedContent.needsLogin = false
+        ' only if content is not locked, then move past detail screen
+        handleDetailScreenAfterFn(detailScreen, afterFn)
+      end if
     end if
   else
     showDeeplinkErrorModal()
@@ -890,6 +935,17 @@ Function onDeeplinkSeasonContentSuccess(singleContent)
   tubilog("deeplinkHelpers.onDeeplinkSeasonContentSuccess")
   if singleContent.type = m.constants.ui.contentTypes.video
     handleDeeplinkVideoSuccessResponse(singleContent, handleDeeplinkSeasonSuccessResponse, handleSingleContentDeeplinkError)
+  else
+    showDeeplinkErrorModal()
+  end if
+End Function
+
+
+' @singleContent: roSGNode, contains metadata for a trailer or other short form content.
+Function onDeeplinkShortFormContentSuccess(singleContent)
+  tubilog("deeplinkHelpers.onDeeplinkShortFormContentSuccess")
+  if singleContent.type = m.constants.ui.contentTypes.video
+    handleDeeplinkShortFormSuccessResponse(singleContent, handleDeeplinkTrailerSuccessResponse, handleSingleContentDeeplinkError)
   else
     showDeeplinkErrorModal()
   end if
