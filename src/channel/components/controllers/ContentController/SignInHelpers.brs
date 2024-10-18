@@ -1263,7 +1263,7 @@ Function onEmailVerificationScreenBackButtonSelected()
   m.trackingLoggingTask.trackEvent = {
     type: "account"
     values: {
-      manip: "LOGIN"
+      manip: "SIGNIN"
       current: "EMAIL"
       status: "FAIL"
       message: failureReason
