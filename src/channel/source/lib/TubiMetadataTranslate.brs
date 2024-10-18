@@ -85,7 +85,7 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
   if gridType = ""
     gridType = gridItemTypes.portrait
   end if
-  
+
   if gridType = gridItemTypes.portrait OR gridType = gridItemTypes.portraitTopTen
     if canvasImages <> invalid AND type(canvasImages.poster_tb) = "roArray" AND isNonEmptyString(canvasImages.poster_tb[0]) = true
       '//A custom portrait size was requested, use this image instead of the default image
@@ -108,10 +108,6 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
       sThumbnailURL = contentFromServer.landscape_images[0] 'default channel image
     else if isNonEmptyArray(contentFromServer.thumbnails) = true
       sThumbnailURL = contentFromServer.thumbnails[0]
-    end if
-  else if gridType = gridItemTypes.linear
-    if isNonEmptyArray(contentFromServer.landscape_images)
-      sThumbnailURL = contentFromServer.landscape_images[0]
     end if
   else if gridType = gridItemTypes.spotlight
     if canvasImages <> invalid AND type(canvasImages.spotlight_landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.spotlight_landscape_tb[0])
@@ -138,7 +134,7 @@ Function tubiMetadataTranslate_getBannerTitleImageUrl(contentFromServer)
   if bannerImages <> invalid AND isNonEmptyString(bannerImages.title) = true
     return bannerImages.title
   end if
-  
+
   return ""
 End Function
 
@@ -240,7 +236,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
   if contentFromServer[typeVar] <> invalid
     sType = contentFromServer[typeVar]
-    
+
     ' We do not have any other differentiating parameter outside of player type to figure out if it is a purple carpet content or not.
     ' Backend content type is sports_event.
     if contentFromServer["player_type"] = m.constants.ui.playerTypes.fox
