@@ -272,8 +272,8 @@ describe('Browse While Watching', function () {
 
     });
 
-    //  Test Rail link: https://tubi.testrail.io/index.php?/cases/view/611448
-    it('C611400 - Continue Watching row is shown as one of the containers in YMAL section (Registered User), @browse_watching', async () => {
+    //  Test Rail link: https://tubi.testrail.io/index.php?/cases/view/611400
+    it('C61140 - Continue Watching row is shown as one of the containers in YMAL section (Registered User), @browse_watching', async () => {
 
         // Create user with history
         const user = await testUtils.createRegisteredUser();

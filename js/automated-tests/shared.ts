@@ -127,7 +127,7 @@ class Shared {
 
 
   async function selectOlderKidsFromParentalSettings() {
-    await ecp.sendKeypress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Right, {wait:1500});
     await ecp.sendKeypress(ecp.Key.Up, {count:2});
     await ecp.sendKeypress(ecp.Key.Ok);
   }

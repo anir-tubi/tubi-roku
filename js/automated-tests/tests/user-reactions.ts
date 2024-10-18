@@ -223,11 +223,11 @@ describe('User Reactions', function () {
       expect(parentalControlsHeader.text).to.equal('Parental Controls');
 
       // Set PC
-      await shared.selectOlderKidsFromParentalSettings();
+      await selectOlderKidsFromParentalSettings();
       await shared.enterPasswordSettingsChange();
 
       // Verify Older Kids PC Settings Change dialog
-      await testUtils.waitForElementToFullyShowOnScreen('parentalControlsSettingsOlderKids', 'Element not found', 20000);
+      await testUtils.waitForElementToFullyShowOnScreen('parentalControlsSettingsOlderKids', 'Element not found', 7000);
       const parentalControlsSettingsOlderKids = await testUtils.getNodeForElement('parentalControlsSettingsOlderKids');
       expect(parentalControlsSettingsOlderKids.text).to.equal('Parental controls setting has changed to Older Kids. Parental controls will be password protected after 5 minutes.');
       await ecp.sendKeypress(ecp.Key.Ok);
@@ -247,5 +247,11 @@ describe('User Reactions', function () {
       // Verify Older Kids PC Settings Change dialog
       const parentalControlsSettingsLittleKids = await testUtils.getNodeForElement('parentalControlsSettingsLittleKids');
       expect(parentalControlsSettingsLittleKids.text).to.equal('Parental controls setting has changed to Little Kids. Parental controls will be password protected after 5 minutes.');
+      await ecp.sendKeypress(ecp.Key.Ok);
+    }
+
+    async function selectOlderKidsFromParentalSettings() {
+      await ecp.sendKeypress(ecp.Key.Right, {wait:2000});
+      await ecp.sendKeypress(ecp.Key.Up, {count:2});
       await ecp.sendKeypress(ecp.Key.Ok);
     }

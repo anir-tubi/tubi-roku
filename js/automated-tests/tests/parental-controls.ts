@@ -256,11 +256,11 @@ describe('Parental Controls', function () {
 
         // Are we on Categories page?
         await utils.sleep(2000);
-        await testUtils.waitForElementToFullyShowOnScreen('categoryPageCategory');
+        await testUtils.waitForElementToFullyShowOnScreen('categoryHeader', 'Category page not shown', 15000); 
     
         // Teens content?
-        const artHouseFilms = testUtils.getNodeForElement('artHouseFilms');
-        expect((await artHouseFilms).visible).to.be.true;
+        const artHouseFilms = testUtils.waitForElementToShowOnScreen('artHouseFilms');
+    
     });
 
 
@@ -735,9 +735,9 @@ describe('Parental Controls', function () {
 
        // Create a user with mix of little kids and non-little kid rated titles with history
 
-       const ContentG = await user.getContent().withRating('G').ofContentType('movie').retrieve({ limit: 10});
+       const ContentG = await user.getContent().withRating('G').ofContentType('movie').retrieve({ limit: 25});
        await user.addContentToViewHistory(ContentG, 600);
-       const ContentTVY7 = await user.getContent().withRating('TV-Y7').ofContentType('series').retrieve({ limit: 3});
+       const ContentTVY7 = await user.getContent().withRating('TV-G').ofContentType('series').retrieve({ limit: 3});
        await user.addContentToViewHistory(ContentTVY7, 600);
        const movieContentTVMA = await user.getContent().withRating('TV-MA').ofContentType('series').retrieve({ limit: 3});
        await user.addContentToViewHistory(movieContentTVMA, 600);

@@ -66,7 +66,8 @@ describe('Autoplay TV', function () {
 
         // Autoplay triggered?
         await checkForAutoPlayTrigger();
-        await testUtils.waitForElementFieldToEqual('autoPlayContentPoster', 'itemHasfocus', true, 10000);
+        await utils.sleep(1000);
+        await testUtils.waitForElementFieldToEqual('autoPlayContentPoster', 'itemHasfocus', true, 5000);
         await ecp.sendKeypress(ecp.Key.Play);
 
         // Has autoplay container disappeared?

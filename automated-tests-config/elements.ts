@@ -1662,7 +1662,7 @@ const elements = typeCheckElements({
   /** Art-House Films for Teens Description */
   artHouseFilms: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid.5.#Title',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.7.#DetailsMenuTextParent.#DetailsMenuText',
   },
 
   bWWTitle: {
