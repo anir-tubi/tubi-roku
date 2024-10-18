@@ -1085,7 +1085,6 @@ Function getConstants()
       constants.ui.categoryIds.mostPopular = "most_popular"
       constants.ui.categoryIds.movieNight = "movie_night"
       constants.ui.categoryIds.seriesSpotlight = "series_spotlight"
-      constants.ui.categoryIds.favorites = "temp_linear_favorites"
       constants.ui.categoryIds.topSearched = "top_searched"
       constants.ui.categoryIds.topTenSeries = "top_10_tv_shows_on_tubi"
       ' Adding a constant entry so that it is easier to change for testing or future use if we need to pick other container outside of featured.

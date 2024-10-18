@@ -129,28 +129,6 @@ Function getLike(contentId)
 End Function
 
 
-' getLinearLike finds the like/dislike node based on linear contentId provided
-'
-' @contentId: string, the id of any content
-' returns a LikeContentNode of the given content
-Function getLinearLike(contentId)
-
-  likeNode = invalid
-
-  if contentId <> invalid
-    linearLikeIds = getFieldFromGlobal("linearLikeIds")
-
-    if linearLikeIds <> invalid
-      likeNode = linearLikeIds.findNode(contentId)
-    end if
-
-  end if
-
-  return likeNode
-
-End Function
-
-
 ' getBookmarks finds the bookmarks based on contentId provided
 '
 ' @contentId: string, the id of any content

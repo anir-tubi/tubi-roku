@@ -294,11 +294,6 @@ Function tubiAds_getRainmakerParams(content, breakPos = 0)
 
     playbackContainer = content.adParam.playbackContainer
 
-    'Note for graduation: if we still create favorites manually, please keep this logic since sending container_id that does not exist on backend creates data quality issues on rainmaker side.
-    if content.adParam.playbackContainer = m.constants.ui.categoryIds.favorites AND getExperimentResource("roku_linear_favorites", "roku_linear_favorites_v1", false).enabled = true 'bs:disable-line 1140 LINT1001
-      playbackContainer = ""
-    end if
-
     if isNonEmptyString(playbackContainer)
       params["container_id"] = playbackContainer
     end if
@@ -310,7 +305,7 @@ Function tubiAds_getRainmakerParams(content, breakPos = 0)
     consentKeys = m.constants.consentKeys
 
     ' 1 when the user has not opted-out of the analytics tubi purpose.
-    analyticsConsentStatus = 1    
+    analyticsConsentStatus = 1
     if m.userConsentsOptOutStatus[consentKeys.analytics] = true
       analyticsConsentStatus = 0
     end if
@@ -320,7 +315,7 @@ Function tubiAds_getRainmakerParams(content, breakPos = 0)
     if m.userConsentsOptOutStatus[consentKeys.personalization] = true
       personalizedAdsConsentStatus = 0
     end if
-    
+
     params["gdpr_analytics"] = analyticsConsentStatus
     params["gdpr_personalized_ads"] = personalizedAdsConsentStatus
   end if
@@ -361,7 +356,7 @@ Function tubiAds_retrieveAds(adsUrl, adInsertionMethod)
 
   requestOptions = {}
   requestOptions.headers = {}
-  
+
   if adInsertionMethod = "csai" then
     if m.googleAppSession = invalid then
       m.googleAppSession = newAppSession()
@@ -847,7 +842,7 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
         'start the Ad buffer time to calculate first_frame_time in AdStartupPerformance event for player log
         updatePlayerLogLib(m.playerLogLib, "setAdBufferStartTime") 'bs:disable-line 1140 LINT1001
       end if
-      
+
       'Close events fire when a user backs out of an ad, or when a user backs out of the interactive portion of an ad
       if eventType = "Close" AND m.isInteracting = true
         clickAdEvent = {

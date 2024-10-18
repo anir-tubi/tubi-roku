@@ -314,18 +314,6 @@ Function getTranslation_en_US()
       "description": "Program time Title when user selects a future program on EPG.",
       "message": "Starts at"
     },
-    "epg_favorites_toast_message": {
-      "description": "Message to be displayed on Toast-message when user favorites a lienar channel",
-      "message": "Find favorites at the top of program guide."
-    },
-    "epg_favorites_toast_header": {
-      "description": "header text to be displayed on Toast-message when user favorites a linear channel",
-      "message": "Added to Favorites"
-    },
-    "epg_unfavorites_toast_header": {
-      "description": "header text to be displayed on Toast-message when user unfavorites a linear channel",
-      "message": "Removed from Favorites"
-    },
     "epg_started_at": {
       "description": "Program time Title for live program.",
       "message": "Started at"
@@ -2016,18 +2004,6 @@ Function getTranslation_es_MX()
       "description": "Program time Title when user selects a future program on EPG.",
       "message": "Comienza en"
     },
-    "epg_favorites_toast_message": {
-      "description": "Message to be displayed on Toast-message when user favorites a lienar channel",
-      "message": "Busca favoritos en la parte superior de la guía de canales."
-    },
-    "epg_favorites_toast_header": {
-      "description": "header text to be displayed on Toast-message when user favorites a linear channel",
-      "message": "Añadido a Favoritos"
-    },
-    "epg_unfavorites_toast_header": {
-      "description": "header text to be displayed on Toast-message when user unfavorites a linear channel",
-      "message": "Eliminado de Favoritos"
-    },
     "epg_started_at": {
       "description": "Program time Title for live program.",
       "message": "Comenzó a las"
@@ -3684,18 +3660,6 @@ Function getTranslation_fr_CA()
       "description": "Program time Title when user selects a future program on EPG.",
       "message": "Commence à"
     },
-    "epg_favorites_toast_message": {
-      "description": "Message to be displayed on Toast-message when user favorites a lienar channel",
-      "message": "Retrouvez les favoris en haut du guide des programmes."
-    },
-    "epg_favorites_toast_header": {
-      "description": "header text to be displayed on Toast-message when user favorites a linear channel",
-      "message": "Ajouté aux favoris"
-    },
-    "epg_unfavorites_toast_header": {
-      "description": "header text to be displayed on Toast-message when user unfavorites a linear channel",
-      "message": "Retiré des favoris"
-    },
     "epg_started_at": {
       "description": "Program time Title for live program.",
       "message": "Commencé à"
@@ -5316,18 +5280,6 @@ End Function
 
 Function getTranslation_en_GB()
   return {
-    "epg_favorites_toast_message": {
-      "description": "Message to be displayed on Toast-message when user favorites a lienar channel",
-      "message": "Find favourites at the top of programme guide."
-    },
-    "epg_favorites_toast_header": {
-      "description": "header text to be displayed on Toast-message when user favorites a linear channel",
-      "message": "Added to Favourites"
-    },
-    "epg_unfavorites_toast_header": {
-      "description": "header text to be displayed on Toast-message when user unfavorites a linear channel",
-      "message": "Removed from Favourites"
-    },
     "screenSettings_about_description": {
       "description": "The description on the about screen",
       "message": "Tubi is the leading free, premium, video streaming app. We have a large and diverse library of content with many thousands of titles and 3x fewer adverts than other TV services."

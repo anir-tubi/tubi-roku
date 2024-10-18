@@ -125,7 +125,6 @@ Function onSignOutModalSelected()
   m.NodeHelpers.removeAllChildren(m.global.bookmarkIds)
   m.NodeHelpers.removeAllChildren(m.global.historyIds)
   m.NodeHelpers.removeAllChildren(m.global.likeIds)
-  m.NodeHelpers.removeAllChildren(m.global.linearLikeIds)
 
   m.spinner.visible = true
   m.spinner.setFocus(true)

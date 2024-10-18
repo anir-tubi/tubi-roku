@@ -8,8 +8,6 @@ Function TubiBookmarks(constants)
     translateHistoryIds: tubiBookmarks_translateHistoryIds
     addHistoryLocally: tubiBookmarks_addHistoryLocally
     updateLikesLocally: tubiBookmarks_updateLikesLocally
-    addLinearLikeLocally: tubiBookmarks_addLinearLikeLocally
-    removeLinearLikeLocally: tubiBookmarks_removeLinearLikeLocally
   }
 End Function
 
@@ -98,42 +96,6 @@ Function tubiBookmarks_updateLikesLocally(contentId as String, sRatingAction as 
         likeNode.id = contentId
       end if
       likeNode.state = sState
-    end if
-  end if
-End Function
-
-
-' @param contentId, String: Liked Channel's ID
-' @global: The global object is passed here to avoid rendezvous
-Function tubiBookmarks_addLinearLikeLocally(contentId as string, global = invalid)
-
-  if contentId <> invalid AND global <> invalid AND global.linearLikeIds <> invalid
-
-    linearLikeNode = getLinearLike(contentId) 'bs:disable-line 1140 LINT1001
-
-    '// save the linearChannel been liked
-    if linearLikeNode = invalid
-      linearLikeNode = global.linearLikeIds.createChild("LikeContentNode")
-      linearLikeNode.id = contentId
-    end if
-
-    linearLikeNode.state = m.constants.ui.likeDislikeStates.liked
-
-  end if
-
-End Function
-
-
-' @param contentId, String: Disliked Channel's ID.
-' @global: The global object is passed here to avoid rendezvous
-Function tubiBookmarks_removeLinearLikeLocally(contentId as string, global = invalid)
-  if contentId <> invalid AND global <> invalid AND global.linearLikeIds <> invalid
-
-    linearLikeNode = getLinearLike(contentId) 'bs:disable-line 1140 LINT1001
-
-    '//remove if linearChannel been disliked
-    if linearLikeNode <> invalid
-      global.linearLikeIds.removeChild(linearLikeNode)
     end if
   end if
 End Function

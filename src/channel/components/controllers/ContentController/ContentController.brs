@@ -172,8 +172,6 @@ Function addControllerUi()
   m.global.historyIds = CreateObject("roSGNode", "HistoryContentNode")
   m.global.addField("likeIds", "node", false)
   m.global.likeIds = CreateObject("roSGNode", "LikeContentNode")
-  m.global.addField("linearLikeIds", "node", false)
-  m.global.linearLikeIds = CreateObject("roSGNode", "LikeContentNode")
 
   ' isNewUser global variable is needed to show/hide onboarding, signup button on detail screen
   ' isNewUser will be set to true, if there is entry on firstVisit registry. Otherwise false
@@ -292,7 +290,7 @@ Function addControllerUi()
 
   ' Content node for a single purple carpet event. This is used in case of purple carpet event deeplinking and purple carpet banner click.
   m.singlePurpleCarpetEventContentNode = invalid
-  
+
   ' Callback triggered once the event details was completely loaded. This is used in case of purple carpet event deeplinking and purple carpet banner click.
   m.eventDetailsScreenLoadCompletionCallback = invalid
 
@@ -317,7 +315,6 @@ Function addControllerUi()
   m.getQueueIdsResponseReceived = false ' Have we received a response for getQueueIds call (success or failure)
   m.getUserPreferencesRateTitleLikedResponseReceived = false ' Have we received a response for getUserPreferencesRateTitleLiked call (success or failure)
   m.getUserPreferencesRateTitleDislikedResponseReceived = false ' Have we received a response for getUserPreferencesRateTitleDisliked call (success or failure)
-  m.getUserPreferencesRateLinearLikedResponseReceived = false ' Have we received a response for getUserPreferencesRateLinearLiked call (success or failure)
   m.getUserInfoCallback = invalid ' Callback that will be fired after all required calls from getUserInfo have been completed
 
   ' This needs to go last as this will immediately call runControllerStartSequence if not logged in and we want all the initial state to be setup before this happens
@@ -2736,7 +2733,7 @@ Function waitForVideoPlayerStoppedStateCallback(msg)
 End Function
 
 
-' Used to get the current authInfo and update it with info from userSettings as well updating bookmarkIds, historyIds, likeIds and linearLikeIds on global
+' Used to get the current authInfo and update it with info from userSettings as well updating bookmarkIds, historyIds, likeIds on global
 ' @callback: Function, callback that will be called after all information has been retrieved
 Function getUserInfo(callback)
   ' Set our callback for when everything is complete
@@ -2747,7 +2744,6 @@ Function getUserInfo(callback)
   m.getQueueIdsResponseReceived = false
   m.getUserPreferencesRateTitleLikedResponseReceived = false
   m.getUserPreferencesRateTitleDislikedResponseReceived = false
-  m.getUserPreferencesRateLinearLikedResponseReceived = false
 
   authInfo = m.tubiAuthUpdate.getAuthInfo()
   if isLoggedInUser(authInfo) = true then
@@ -2755,13 +2751,11 @@ Function getUserInfo(callback)
     getQueueIds(getQueueIdsSuccess, getQueueIdsError)
     getUserInfoGetContentRatingTitleLiked()
     getUserInfoGetContentRatingTitleDisliked()
-    getUserInfoGetContentRatingLinearLiked()
   else
     m.getHistoryIdsResponseReceived = true
     m.getQueueIdsResponseReceived = true
     m.getUserPreferencesRateTitleLikedResponseReceived = true
     m.getUserPreferencesRateTitleDislikedResponseReceived = true
-    m.getUserPreferencesRateLinearLikedResponseReceived = true
     checkIfAllUserInfoReceived()
   end if
 End Function
@@ -2851,35 +2845,6 @@ Function onGetUserInfoGetUserPreferencesRateTitleDislikedError(error)
 End Function
 
 
-Function getUserInfoGetContentRatingLinearLiked(nextPageId = invalid)
-  request = m.userDeviceApi.getContentRating("linear", m.constants.ui.likeDislikeStates.liked, nextPageId)
-  request.append({
-    "requestType": m.constants.reqNames.getContentRating
-    "responseType": "assocarray"
-    "successCallback": onGetUserInfoGetContentRatingLinearLikedSuccess
-    "errorCallback": onGetUserInfoGetContentRatingLinearLikedError
-  })
-  m.makeRequest(request)
-End Function
-
-
-Function onGetUserInfoGetContentRatingLinearLikedSuccess(response)
-  m.global.likeIds.appendChildren(response.nodes)
-  if response.nextPageId <> invalid then
-    onGetUserInfoGetContentRatingLinearLikedSuccess(response.nextPageId)
-  else
-    m.getUserPreferencesRateLinearLikedResponseReceived = true
-    checkIfAllUserInfoReceived()
-  end if
-End Function
-
-
-Function onGetUserInfoGetContentRatingLinearLikedError(error)
-  m.getUserPreferencesRateLinearLikedResponseReceived = true
-  checkIfAllUserInfoReceived()
-End Function
-
-
 Function checkIfAllUserInfoReceived()
   if m.getHistoryIdsResponseReceived <> true then
     return false
@@ -2894,10 +2859,6 @@ Function checkIfAllUserInfoReceived()
   end if
 
   if m.getUserPreferencesRateTitleDislikedResponseReceived <> true then
-    return false
-  end if
-
-  if m.getUserPreferencesRateLinearLikedResponseReceived <> true then
     return false
   end if
 

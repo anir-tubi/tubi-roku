@@ -43,7 +43,7 @@ Function showRFIScreen()
     ' RFI screen is showing only if the channelStore node is stored in m variable
     m.billing = CreateObject("roSGNode", "ChannelStore")
     m.billing.observeFieldScoped("userData", "onRfiUserData")
-    requestedUserData = "email, firstname, lastname, gender" 
+    requestedUserData = "email, firstname, lastname, gender"
 
     if m.pub_serverPersistentData <> invalid AND m.pub_serverPersistentData.hasPreviouslyRegistered = true
 
@@ -52,7 +52,7 @@ Function showRFIScreen()
         info = CreateObject("roSGNode", "ContentNode")
         info.addFields({context: "signin"})
         m.billing.requestedUserDataInfo = info
-        requestedUserData = "email" 
+        requestedUserData = "email"
         dialogSubType = "email-prefill-return"
       end if
 
@@ -861,7 +861,7 @@ Function handleUpdatedAuth()
   end if
 
   authInfo = m.tubiAuthUpdate.getAuthInfo()
-  
+
   if isLoggedInUser(authInfo) = true
     '//When signed in, then set the callback in case an endpoint indicates that the user should be signed out
     m.setSignOutErrorCallback(onSignedInUserNotExistError)
@@ -1255,7 +1255,7 @@ End Function
 Function onEmailVerificationScreenBackButtonSelected()
   failureReason = "user-cancel"
   currentScreen = getCurrentScreen()
-  
+
   if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.emailVerificationScreen AND isNonEmptyString(currentScreen.failureReason) = true
     failureReason = currentScreen.failureReason
   end if
@@ -1390,27 +1390,6 @@ Function AfterSignInPlayLockedContentWhileSkippingDetailScreen(params)
   refreshAllDetailScreens()
   setContentToRefreshAllPersonalizedScreens(true)
   showHideSpinner(false)
-
-End Function
-
-
-Function afterSignInLikeDislikeLinear(channelInfo)
-  tubilog("SignInHelpers.afterSignInLikeDislikeLinear")
-
-  if channelInfo <> invalid
-    setContentToRefreshAllPersonalizedScreens()
-    popScreenAfterSignInProcess()
-    showHideSpinner(false)
-    showHideLogo(m.constants.logoType.hide) ' for epgScreen or linearVideoplayerscreen do not show any logo
-    ' if user signIn on linearVideoplayer overlay then we need to pull fresh data because
-    ' EPG overlay data is pulled only when videoplayer maximizes.
-    currentScreen = getCurrentScreen()
-    if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen
-      getDataForVideoPlayerTimeGrid()
-    end if
-
-    updateLikeDislikeLinear(channelInfo)
-  end if
 
 End Function
 

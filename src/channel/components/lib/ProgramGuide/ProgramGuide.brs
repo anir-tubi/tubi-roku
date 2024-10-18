@@ -11,34 +11,21 @@ Function init()
   m.programGrid = m.top.findNode("programGrid")
   m.leftIcon = m.top.findNode("leftIcon")
   m.playOnFocusMode = true
-  ' focusedComponent will keep track of which component (programGrid or channels Grid) had last focus. This will help in handling focus back from sidenav/lienarvideoplayer.
-  m.focusedComponent = "programGrid"
 
-  ' canChannelBeFocused will indicate whether linearChannelFocused should get refreshed.
-  ' when a channel is added or removed, the rowlist automatically refocuses to a neighboring channel of the previously focused content. We will also be setting a value on the .jumpToItem field to force focus on the channel we want to be focused. We do not want to set m.top.linearChannelToPlay on the default focus update, only the focus update that we force. m.canChannelBeFocused keeps state such that we don't react to the default focus updates.
-  '                                   actions and hence linearChannelFocused should not get refreshed.
-  m.canChannelBeFocused = true
-
-  m.programGrid.observeFieldScoped("rowScrollFocused", "onProgramGridRowFocused")
   m.top.observeFieldScoped("jumpToLinearChannelID", "onJumpToLinearChannelID")
+
   m.top.observeFieldScoped("EPGFullMode", "onDisplayModeChange")
   m.programGrid.observeFieldScoped("rowItemSelected", "onProgramGridContentSelected")
   m.programGrid.observeFieldScoped("rowItemFocused", "onProgramGridContentFocused")
+  m.programGrid.observeFieldScoped("rowScrollFocused", "onProgramGridRowFocused")
+  m.programGrid.observeFieldScoped("okPressed", "onProgramGridOkPressed")
+
   m.top.observeFieldScoped("contentUpdated", "onContentChanged")
   m.top.observeField("focusedChild", "onTimeGridFocusChange")
   m.top.observeField("EPGChannelPlayMode", "onEPGChannelPlayModeChange")
   m.top.observeField("setFocusedToPlay", "onSetFocusedToPlay")
   m.updateMinsLeftTimer = m.top.findNode("updateMinsLeftTimer")
   m.updateMinsLeftTimer.observeField("fire", "onUpdateMinsLeftTimer")
-  m.programGrid.observeFieldScoped("okPressed", "onProgramGridOkPressed")
-
-  m.channelsGrid.observeFieldScoped("rowScrollFocused", "onChannelsGridRowFocused")
-  m.channelsGrid.observeFieldScoped("itemSelected", "onChannelsGridItemSelected")
-  m.channelsGrid.observeFieldScoped("itemFocused", "onChannelsGridContentFocused")
-  m.top.observeFieldScoped("jumpToChannelItem", "onJumpToChannelItem")
-
-  m.channelsGrid.observeFieldScoped("scrollingStatus", "onScrollingStatus")
-  m.programGrid.observeFieldScoped("scrollingStatus", "onScrollingStatus")
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.backToLiveText, typographyConstants.ids.bodySmallStrong)
@@ -48,8 +35,6 @@ Function init()
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
   onThemeChange()
-
-  m.favoritesExp = (getExperimentResource("roku_linear_favorites", "roku_linear_favorites_v1", false).enabled = true)
 
 End Function
 
@@ -183,12 +168,7 @@ Function onTimeGridFocusChange()
   tubiLog("ProgramGrid.onTimeGridFocusChange")
 
   if m.top.hasFocus() = true
-    getExperimentResource("roku_linear_favorites", "roku_linear_favorites_v1", true)
-    if m.focusedComponent = "programGrid"
-      m.ProgramGrid.setFocus(true)
-    else
-      m.channelsGrid.setFocus(true)
-    end if
+    m.ProgramGrid.setFocus(true)
 
     if m.updateMinsLeftTimer.control <> "start"
       m.updateMinsLeftTimer.control = "start"
@@ -219,21 +199,6 @@ Function onProgramGridRowFocused(_msg)
 End Function
 
 
-Function onChannelsGridRowFocused(_msg)
-
-  newFocus = m.channelsGrid.rowScrollFocused
-
-  if m.programGrid.preItemFocused <> newFocus
-    tubiLog("ProgramGrid.onChannelsGridRowFocused")
-    m.programGrid.jumpToItem = newFocus
-    if m.channelsGrid.content.getchild(newFocus) <> invalid
-      m.headerText.text = m.channelsGrid.content.getchild(newFocus).parentTitle
-    end if
-  end if
-
-End Function
-
-
 'based on m.top.jumpToLinearChannelID, this function will jump to channel
 Function onJumpToLinearChannelID()
   tubiLog("ProgramGuide.onJumpToLinearChannelID")
@@ -244,7 +209,6 @@ Function onJumpToLinearChannelID()
       if item.id = m.top.jumpToLinearChannelID[0] AND (containerId = "" OR containerId = item.parentId)
         m.programGrid.jumpToRowItem = [i, 0]
         m.programGrid.itemFocused = i
-        m.channelsGrid.jumpToItem = i
         if item <> invalid AND item.getChildCount() > 0
           program = item.getChild(0)
           m.top.linearChannelFocused = program
@@ -397,108 +361,6 @@ Function doesSendEvent(lastItemFocused, rowItemFocused)
   end if
   return isEqual
 End Function
-
-
-Function onKeyEvent(key As string, press As boolean) As boolean
-
-  if press
-    if m.favoritesExp = true
-      if key = "left" AND m.programGrid.isInFocusChain() = true AND m.channelsGrid.content <> invalid
-        m.channelsGrid.setFocus(true)
-        m.focusedComponent = "channelsGrid"
-        return true
-      else if key = "right" AND m.channelsGrid.hasFocus() = true AND m.programGrid.content <> invalid
-        m.programGrid.setFocus(true)
-        m.focusedComponent = "programGrid"
-        return true
-      end if
-    end if
-
-  end if
-
-  return false
-End Function
-
-
-Function onScrollingStatus(msg)
-  m.top.scrollingStatus = msg.getData()
-End Function
-
-
-Function onChannelsGridContentFocused(msg)
-  tubilog("programGrid.onChannelsGridContentFocused")
-
-  itemPosition = msg.getData()
-
-  if itemPosition <> invalid
-    channel = m.programGrid.content.getChild(itemPosition)
-
-    if m.playOnFocusMode = true OR m.top.linearChannelToPlay = invalid  'even when user is on channel logo, play the channel because otherwise whats playing does not match whats on EPG Overlay
-      if channel <> invalid AND channel.videoResources <> invalid AND m.canChannelBeFocused = true
-        epgTrackingComponentInfo = getEPGTrackingComponentInfo(itemPosition)
-        m.top.epgTrackingComponentInfo = {
-          componentType : "epg_component"
-          componentValues : epgTrackingComponentInfo
-        }
-        m.top.linearChannelToPlay = channel
-        m.top.linearChannelToPlayUpdated = true
-      end if
-
-      m.canChannelBeFocused = true
-    end if
-
-    if channel <> invalid AND channel.getChildCount() > 0
-      program = channel.getChild(0)
-      m.top.linearChannelFocused = program
-      m.top.linearChannelFocusedUpdated = true
-      fade(m.backToLive, "out", 0.1, 0, 0)
-    end if
-
-    ' send NavigationwithinPageEvent when user focuses on tiles on ChannelGrid
-    navPosition = [itemPosition, 0]
-    sendNavigationWithinPageEvent(navPosition)
-  end if
-
-End Function
-
-
-Function onChannelsGridItemSelected(msg)
-  tubilog("programGrid.onChannelsGridItemSelected")
-
-  itemSelected = msg.getData()
-
-  channelItem = m.channelsGrid.content.getChild(itemSelected)
-
-  m.canChannelBeFocused = false
-
-  if channelItem.selected = true
-    favAction = m.constants.ui.likeDislikeActions.dislike
-    channelItem.selected = false
-  else
-    favAction = m.constants.ui.likeDislikeActions.like
-    channelItem.selected = true
-  end if
-
-  'channel has been wrapped using AA to avoid channelLikeDislikeInfo interface getting triggered when
-  'channel get updated.
-  favActionAA = {
-    "channelNode": channelItem
-    "action": favAction
-  }
-
-  m.top.channelLikeDislikeInfo = favActionAA
-End Function
-
-
-' when we jump to a channelItem, the EPG screen does not refresh the metadata and header text.
-' This function handles refreshing metadata and header text in case of like/dislike a channel
-Function onJumpToChannelItem(msg)
-  row = msg.getData()
-  m.channelsGrid.jumpToItem = row
-  if m.channelsGrid.content.getchild(row) <> invalid
-    m.headerText.text = m.channelsGrid.content.getchild(row).parentTitle
-  end if
-End function
 
 
 Function sendNavigationWithinPageEvent(rowItemFocused)

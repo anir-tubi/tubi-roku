@@ -32,10 +32,6 @@ Function TubiExperiments(experimentsInfo) as Object
       roku_autoplay_timer: {
         roku_autoplay_timer_v1 : {"enabled": false}
       }
-      
-      roku_linear_favorites: {
-        roku_linear_favorites_v1: {"enabled": false}
-      }
 
       roku_async_stop: {
         roku_async_stop_v5: {"enabled": false}
@@ -59,7 +55,7 @@ Function TubiExperiments(experimentsInfo) as Object
 
       roku_registration_with_magic_link: {
         roku_registration_with_magic_link_v2 : {"enabled": false}
-      }  
+      }
 
       roku_player_client_log: {
         roku_player_client_log_v1: {"enabled": false}

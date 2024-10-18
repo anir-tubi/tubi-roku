@@ -82,10 +82,6 @@
       -->
       <field id="programGuidecomponentInteractionInfo" alias="EPG.componentInteractionInfo" />
 
-      <field id="channelLikeDislikeInfo" alias="EPG.channelLikeDislikeInfo" />
-
-      <field id="jumpToChannelItem" alias="EPG.jumpToChannelItem" />
-
       <!-- Keeps the information used for user tracking - structure looks like:
       {
         "componentType": "epg_component"
