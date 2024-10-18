@@ -74,7 +74,7 @@ describe('Kids Events', function () {
 		await settingsScreen.checkIfKidsLogoPresent();
 	});
 
-	it('UI Playback - When user presses Forward 30 seconds then playback advances 30 seconds forward: C4164 @analyticsASet1,@analyticsKids,@debug', async () => {
+	it('UI Playback - When user presses Forward 30 seconds then playback advances 30 seconds forward: C4164 @analyticsASet1,@analyticsKids', async () => {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);

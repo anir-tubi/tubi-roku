@@ -44,7 +44,7 @@ describe('Live News Events', function () {
       and UI: C114051 and UI: C114052 @analyticsASet1,@analyticsliveNews', async () => {
 		const homePage = HomePage();
 		await homePage.pageDidLoad();
-		await homePage.navigateToLiveNews();
+		await homePage.navigateToLiveNews(true);
 		const liveNews = LiveNews();
 		await liveNews.checkIfLiveNewsShown();
 		await liveNews.waitWhenGoFullScreen();
@@ -53,7 +53,7 @@ describe('Live News Events', function () {
 	it('A "fullscreen_toggle" beacon should be sent when the video exits fullscreen C118175 \
       and C125523 and C125524 and UI:C114055 and C114061 @analyticsASet1,@analyticsliveNews', async () => {
 		const homePage = HomePage();
-		await homePage.navigateToLiveNews();
+		await homePage.navigateToLiveNews(true);
 		const liveNews = LiveNews();
 		await liveNews.checkIfLiveNewsShown();
 		await liveNews.waitWhenGoFullScreen();
@@ -71,7 +71,7 @@ describe('Live News Events', function () {
 
 	it('Subbtitles toggle when captions are turned off C120934 @analyticsASet1,@analyticsliveNews', async () => {
 		const homePage = HomePage();
-		await homePage.navigateToLiveNews();
+		await homePage.navigateToLiveNews(true);
 		const liveNews = LiveNews();
 		await liveNews.checkIfLiveNewsShown();
 		await liveNews.waitWhenGoFullScreen();
