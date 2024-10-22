@@ -67,7 +67,11 @@ Function init()
   m.video.observeFieldScoped("availableAudioTracks", "onAvailableAudioTracksChange")
   m.video.observeFieldScoped("audioTrack", "onAudioTrackChanged")
   m.video.observeFieldScoped("subtitleTrack", "onSubtitleTrackChanged")
-  if getExperimentResource("roku_async_stop", "roku_async_stop_v5", false).enabled = true then
+
+
+  ' asyncStopSemantics was broken prior to 14.0 so we are not running it on older firmware versions
+  isFirmwareOk = createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
+  if isFirmwareOk = true AND getExperimentResource("roku_async_stop", "roku_async_stop_v6", false).enabled = true then
     m.video.asyncStopSemantics = true
   end if
 
@@ -500,7 +504,7 @@ Function playContent()
       if fetchPreroll = true
         updatePlayerLogLib(m.playerLogLib, "setAdType", "preroll")
         ' Start pre-roll fetch
-        m.top.adControl = "preroll" 
+        m.top.adControl = "preroll"
       else
         m.Video.control = "play"
         setInitialCCAndAudioTracks()
@@ -1426,7 +1430,10 @@ Function showAdBreak()
   else
     ' In order to try and change the behavior as little as possible we only want the async stop to rely on the onVideoStateChange callback and just trigger the callback right away here if in the control
     immediatelyTriggerCallback = true
-    if getExperimentResource("roku_async_stop", "roku_async_stop_v5", true).enabled = true then
+
+    ' asyncStopSemantics was broken prior to 14.0 so we are not running it on older firmware versions
+    isFirmwareOk = createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
+    if isFirmwareOk = true AND getExperimentResource("roku_async_stop", "roku_async_stop_v6", true).enabled = true then
       ' the ad break will be shown by showAdBreakStoppedCallback() which will be triggered by
       ' onVideoStateChange() when the video node's state is updated to "stopped".
       ' m.isShowAdBreakPendingStop keeps state to let us know if an break is waiting for the
@@ -1494,7 +1501,7 @@ Function prepareToStartVideo(content, videoResourceIndex = [0,0])
   end if
 
   setDrmOnContent(content, resource, videoResourceIndex)
-  
+
   m.top.content = content  'sends content to video node and makes current content available to contentController
   m.top.sendVideoTrackingStart = true
 End Function
@@ -1571,7 +1578,7 @@ End Function
 
 Function stopVideo()
   tubilog("VideoPlayer.stopVideo")
-  
+
   'unObserveClosedCaptionAndAudioTrack is required to prevent callbacks for the globalCaptionMode, subtitle, and audio track fields when user exits player or changes the video content
   unObserveClosedCaptionAndAudioTrack()
 
@@ -1593,7 +1600,11 @@ Function stopVideo()
   ' then state will switch to stopping and never switches to stopped.
   ' After much effort I am still unable to reproduce this behavior in a simple test app but it happens in our app for some reason
   if videoState <> "stop" AND m.Video.state <> "stopped" then
-    getExperimentResource("roku_async_stop", "roku_async_stop_v5", true)
+    ' asyncStopSemantics was broken prior to 14.0 so we are not running it on older firmware versions and don't want to expose for the experiment on older firmware versions
+    if createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
+      getExperimentResource("roku_async_stop", "roku_async_stop_v6", true)
+    end if
+
     m.Video.control = "stop"
   end if
 End Function

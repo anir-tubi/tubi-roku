@@ -25,7 +25,10 @@ Function init()
   m.Video = m.top.findNode("VideoNode") ' reference in case we change from extending Video to extending Group
   m.Video.observeField("position", "onVideoPositionChange")
   m.Video.observeField("state", "onVideoStateChange")
-  if getExperimentResource("roku_async_stop", "roku_async_stop_v5", false).enabled = true then
+
+  ' asyncStopSemantics was broken prior to 14.0 so we are not running it on older firmware versions
+  isFirmwareOk = createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
+  if isFirmwareOk = true AND getExperimentResource("roku_async_stop", "roku_async_stop_v6", false).enabled = true then
     m.Video.asyncStopSemantics = true
   end if
 
@@ -201,7 +204,12 @@ Function pauseContent()
   'added this check to avoid playing content once the buffering is completed when focus is on sidenav
   if m.videoState = "buffering"
     m.videoState = "stop"
-    getExperimentResource("roku_async_stop", "roku_async_stop_v5", true)
+
+    ' asyncStopSemantics was broken prior to 14.0 so we are not running it on older firmware versions and don't want to expose for the experiment on older firmware versions
+    if createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
+      getExperimentResource("roku_async_stop", "roku_async_stop_v6", true)
+    end if
+
     m.Video.control = "stop"
   else if m.videoState = "play"
     m.videoState = "pause"
@@ -218,7 +226,11 @@ Function stopContent()
       trackEvent(finishPreviewEvent)
     end if
 
-    getExperimentResource("roku_async_stop", "roku_async_stop_v5", true)
+    ' asyncStopSemantics was broken prior to 14.0 so we are not running it on older firmware versions and don't want to expose for the experiment on older firmware versions
+    if createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
+      getExperimentResource("roku_async_stop", "roku_async_stop_v6", true)
+    end if
+
     m.Video.control = "stop"
   end if
   m.videoState = "stop"
@@ -288,35 +300,6 @@ End Function
 
 'set hasCompleted to true when user watches the entire video preview, otherwise set it to false.
 Function getFinishPreviewEvent(hasCompleted = false)
-
-  if m.Video.content = invalid OR m.Video.content.id = invalid then
-    ' TODO remove after roku_async_stop_v5 experiment concludes
-    errorInfo = {}
-
-    if m.top.content <> invalid then
-      errorInfo["topContentId"] = m.top.content.id
-      errorInfo["topContentUrl"] = m.top.content.url
-    end if
-
-    if m.currentPageInfo <> invalid then
-      errorInfo["currentPage"] = m.currentPageInfo.pagetype
-    end if
-
-    if m.previousPageInfo <> invalid then
-      errorInfo["previousPage"] = m.previousPageInfo.pagetype
-    end if
-
-    errorInfo["videoState"] = m.videoState
-    errorInfo["playerPosition"] = m.playerPosition
-    errorInfo["playerErrorCode"] = m.Video.errorCode
-    errorInfo["playerErrorStr"] = m.Video.errorStr
-    errorInfo["playerState"] = m.Video.state
-    errorInfo["playerControl"] = m.Video.control
-    errorInfo["playerDuration"] = m.Video.duration
-
-    tubiLog(FormatJSON(errorInfo), "info", "clientInfo", "device-info")
-    return invalid
-  end if
 
   finishPreviewEvent = {
     type: "finish_preview"

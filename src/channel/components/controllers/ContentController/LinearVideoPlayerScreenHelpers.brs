@@ -746,7 +746,11 @@ Function stopLinearVideoContent()
     videoPlayer.unobserveFieldScoped("sendVideoTrackingStart")
     videoTrackingStop() 'stops youbora tracking
 
-    if getExperimentResource("roku_async_stop", "roku_async_stop_v5", false).enabled = true then
+
+
+    ' asyncStopSemantics was broken prior to 14.0 so we are not running it on older firmware versions
+    isFirmwareOk = createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
+    if isFirmwareOk = true AND getExperimentResource("roku_async_stop", "roku_async_stop_v6", false).enabled = true then
       waitForVideoPlayerStoppedState(videoPlayer)
     end if
 

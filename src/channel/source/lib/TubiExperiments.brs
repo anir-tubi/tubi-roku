@@ -34,7 +34,7 @@ Function TubiExperiments(experimentsInfo) as Object
       }
 
       roku_async_stop: {
-        roku_async_stop_v5: {"enabled": false}
+        roku_async_stop_v6: {"enabled": false}
       }
 
       roku_linear_player_view: {

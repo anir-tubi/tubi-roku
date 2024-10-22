@@ -29,7 +29,10 @@ Function init()
   m.Video.observeField("state", "onVideoStateChange")
   m.Video.observeField("bufferingStatus", "onBufferingStatus")
   m.Video.observeField("timedMetaData", "onId3")
-  if getExperimentResource("roku_async_stop", "roku_async_stop_v5", false).enabled = true then
+
+  ' asyncStopSemantics was broken prior to 14.0 so we are not running it on older firmware versions
+  isFirmwareOk = createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
+  if isFirmwareOk = true AND getExperimentResource("roku_async_stop", "roku_async_stop_v6", false).enabled = true then
     m.Video.asyncStopSemantics = true
   end if
 
@@ -749,7 +752,11 @@ Function stopVideo()
   ' if the video is already in a non playing state.
   videoNodeState = m.Video.state
   if videoNodeState <> "stopped" AND videoNodeState <> "finished" AND videoNodeState <> "none"
-    getExperimentResource("roku_async_stop", "roku_async_stop_v5", true)
+    ' asyncStopSemantics was broken prior to 14.0 so we are not running it on older firmware versions and don't want to expose for the experiment on older firmware versions
+    if createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
+      getExperimentResource("roku_async_stop", "roku_async_stop_v6", true)
+    end if
+
     m.Video.control = "stop"
   end if
 End Function
