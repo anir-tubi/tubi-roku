@@ -2,8 +2,8 @@
 const fs = require('fs');
 const log = require('fancy-log');
 const glob = require('glob');
-const {fetchJSONFromGithub, writeJSONToFile} = require('./network.js');
-const {NoStackError} = require('./utilities');
+const {fetchJSONFromGithub} = require('./network.js');
+const {NoStackError, writeJSONToFile} = require('./utilities');
 const sLocalRelativePath = 'themes/theme.json';
 
 
@@ -37,6 +37,15 @@ function findAndReplaceColorConstantsInFiles(aaListOfColors, files) {
 //  @data: string, The string to search thru to find the findString
 //  return: string, return the altered or unaltered string if the color constant was found or not.
 function findAndReplaceForStringInData(findString, replacementString, data) {
+  try {
+    //The replacement string is a stringified json string of an array of gradient objects
+    const aParsed = JSON.parse(replacementString);
+    if (Array.isArray(aParsed)) {
+      replacementString = JSON.stringify(aParsed);
+    }
+  } catch (e) {
+    //The replacement string is a hexadecimal color string
+  }
   const regExpFind = new RegExp(findString, "gi");
   data = data.replace(regExpFind, replacementString);
   log(`Replacing "${findString}" with the color string = ${replacementString}`);
@@ -45,7 +54,9 @@ function findAndReplaceForStringInData(findString, replacementString, data) {
 
 
 // getColorKeyValue()
-// Recursively process a JSON Node to flatten it into an associative array of color key/value combos
+// Recursively process a JSON Node to flatten it into an associative array of color key/value combos.
+// In the case of a simple color string, the key/value combo may look like: "defaultDarkPrimaryAccent": "0X000000FF"
+// In the case of a gradient, the key/value combo may look like: "defaultDarkGradientBrand": [{color: "0xFF0000FF", position: "0"}, {color: "0x000000FF", position: "1"}]
 // @sColor: string, the current processed color key path: "default" or "defaultDark" or "defaultDarkPrimary" 
 // @node: object, the JSON object that needs to be processed for colors
 // @colorAA: Associative Array, The AA with the current color key/value combos
@@ -53,6 +64,7 @@ function findAndReplaceForStringInData(findString, replacementString, data) {
 function getColorKeyValue(sColor, node, colorAA){
   const sColorConstantPrefix = `THEME_`
   const sColorConstantSuffix = `_THEME`
+  
   Object.entries(node).forEach(([colorName, colorNode]) => {
     if (colorName[0] !== `$`) {
       colorName = colorName.replace(/\-/gi, ""); //get rid of "-" as that cannot be used in a constant name in the Roku app
@@ -60,13 +72,53 @@ function getColorKeyValue(sColor, node, colorAA){
 
       if(colorNode.$value){
         const sColorValue = colorNode.$value;
-
-        if (sColorValue && sColorValue.length > 0) {
+      
+        let sKeyToBeReplaced = sColorConstantPrefix + sColorNew + sColorConstantSuffix
+        if (typeof sColorValue === 'string' && sColorValue.length > 0) {
 
           //switch from using the "#" to "0x" to proceed color values, and ensure there is a transparency value at the end of the string
           const formattedColorValue = sColorValue.replace("#", "0x").padEnd(10, "FF");
-          colorAA[sColorConstantPrefix + sColorNew + sColorConstantSuffix] = formattedColorValue;
-        }        
+          colorAA[sKeyToBeReplaced] = formattedColorValue;
+
+        } else if (sColorValue.stops && Array.isArray(sColorValue.stops)){
+          //This may be a gradient value
+            
+          const aGradientSource = sColorValue.stops;
+          let aGradientNew = [];
+          const length = aGradientSource.length;
+          for(let i = 0; i < length; i++){
+            const gradientObjectSource = aGradientSource[i];
+            let gradientObjectNew = {};
+            
+            if (gradientObjectSource.position >= 0 && gradientObjectSource.color && gradientObjectSource.color.length > 0) {
+              const formattedColorValue = gradientObjectSource.color.replace("#", "0x").padEnd(10, "FF");
+              
+              //Create new version of the gradient object with formatted color value
+              gradientObjectNew = {
+                color: formattedColorValue,
+                position: gradientObjectSource.position
+              };
+              aGradientNew.push(gradientObjectNew);
+            }
+          }
+
+          if (aGradientNew.length > 0) {
+            const sGradientNew = JSON.stringify(aGradientNew)
+
+            // Ensure to encapsulate the array index value (sKeyToBeReplaced) of colorAA with double quotes
+            // when the value represents a gradient array. The BRS file, which contains the key 
+            // to be replaced, expects a string value enclosed in quotes. Therefore, for non-string 
+            // values (like arrays), remove these quotes from the BRS when performing the key-value substitution.
+
+            // Example in context:
+            // If replacing "THEME_defaultDarkStatusOnNow_THEME" in BRS:
+            //   Original: "THEME_defaultDarkStatusOnNow_THEME"
+            //   Replacement for a hex color: "0x2948FFFF"
+            //   Replacement for an array: [{color: "0x2948FFFF", position:0}, {color: "0xA345DD00", position: 1}]
+            sKeyToBeReplaced = '"' + sKeyToBeReplaced + '"'
+            colorAA[sKeyToBeReplaced] = sGradientNew;
+          }
+        }     
       } else {
         colorAA = getColorKeyValue(sColorNew, colorNode, colorAA);
       }

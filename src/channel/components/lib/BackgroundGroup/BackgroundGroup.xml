@@ -11,6 +11,8 @@
   <script type="text/brightscript" uri="BackgroundGroup.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
 
@@ -28,6 +30,8 @@
     <field id="shouldRotateBackgrounds" type="bool" value="true" />
     <!--Tell the Background Group to hide or display the poster artwork-->
     <field id="posterVisible" type="boolean" value="true" />
+
+    <field id="circularMaskColor" type="string" />
   </interface>
 
   <children>
@@ -69,12 +73,29 @@
     <Group
       id="circularMaskLayer"
       opacity="0">
+      <!-- maskLayer10BlendColor2 is a vertical transparency/white gradient that will be colorized by the blend color. This works with maskLayer10 to make a vertical gradient of 2 differnt colors. maskLayer10BlendColor2 represents the bottom color of the gradient. -->
       <Poster
-        id="maskLayer10"
+        id="maskLayer10BlendColor2"
+        uri="pkg:/images/background-masks/mask-layer-1-0-blendColor2.webp"
         width="822"
         height="1080"/>
+      <!-- maskLayer10 is a vertical transparency/white gradient that will be colorized by the blend color. This works with maskLayer10BlendColor2 to make a vertical gradient of 2 differnt colors. maskLayer10 represents the top color of the gradient. -->
+      <Poster
+        id="maskLayer10"
+        uri="pkg:/images/background-masks/mask-layer-1-0-blendColor1.webp"
+        width="822"
+        height="1080"/>        
+      <!-- maskLayer11BlendColor2 is a vertical transparency/white gradient that will be colorized by the blend color. This works with maskLayer11 to make a vertical gradient of 2 differnt colors. maskLayer11BlendColor2 represents the bottom color of the gradient. -->
+      <Poster
+        id="maskLayer11BlendColor2"
+        uri="pkg:/images/background-masks/mask-layer-1-1-blendColor2.webp"
+        translation="[822, 0]"
+        width="266"
+        height="1080"/>
+      <!-- maskLayer11 is a vertical transparency/white gradient that will be colorized by the blend color. This works with maskLayer11BlendColor2 to make a vertical gradient of 2 differnt colors. maskLayer11 represents the top color of the gradient. -->
       <Poster
         id="maskLayer11"
+        uri="pkg:/images/background-masks/mask-layer-1-1-blendColor1.webp"
         translation="[822, 0]"
         width="266"
         height="1080"/>

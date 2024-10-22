@@ -1490,6 +1490,9 @@ Function getConstants()
     defaultDarkStatusAlert = "THEME_defaultDarkStatusAlert_THEME"
     defaultDarkStatusOnNow = "THEME_defaultDarkStatusOnNow_THEME"
 
+    '//This will be replaced by an array of associative arrays which contain the gradient color info. See the getColorKeyValue() function in colorreplace.js for formating of this array
+    defaultDarkGradientBrand = "THEME_defaultDarkGradientBrand_THEME"    
+
     '//default light sub theme
     defaultLightPrimaryBackground = "THEME_defaultLightPrimaryBackground_THEME"
     defaultLightPrimaryForeground = "THEME_defaultLightPrimaryForeground_THEME"
@@ -1515,6 +1518,9 @@ Function getConstants()
     kidsDarkStatusCaution = "THEME_kidsDarkStatusCaution_THEME"
     kidsDarkStatusAlert = "THEME_kidsDarkStatusAlert_THEME"
 
+    '//This will be replaced by an array of associative arrays which contain the gradient color info. See the getColorKeyValue() function in colorreplace.js for formating of this array
+    kidsDarkGradientBrand = "THEME_kidsDarkGradientBrand_THEME"
+
     '//kids light sub theme
     kidsLightPrimaryBackground = "THEME_kidsLightPrimaryBackground_THEME"
     kidsLightPrimaryForeground = "THEME_kidsLightPrimaryForeground_THEME"
@@ -1537,30 +1543,30 @@ Function getConstants()
       keyboard_focused_key: "pkg:/images/keyboard_search_focused_key.9.png"
       scrollbarThumbBitmapUri_hd: "pkg:/images/transport/sgplayer/hd/focused-progress-foreground.9.png"
       scrollbarThumbBitmapUri_fhd: "pkg:/images/transport/sgplayer/fhd/focused-progress-foreground.9.png"
-      gradientBlendColor: defaultDarkPrimaryBackground
+      gradientBlendColors: defaultDarkGradientBrand   '//value will be an array of associaive arrays that contain the gradient color info 
 
-        successColor: defaultDarkStatusSuccess
-        cautionColor: defaultDarkStatusCaution
-        backgroundColor: defaultDarkPrimaryBackground
-        neutralColor: defaultDarkTransparentForeground20
-        neutralColor2: defaultDarkTransparentForeground10
-        neutralColor3: defaultDarkTransparentForeground5
-        neutralSolidColor: defaultDarkSolidSurface10
-        neutralSolidColor2: defaultDarkSolidSurface20
-        backgroundColorLight: defaultDarkPrimaryForeground
-        backgroundColorLight2: defaultDarkTransparentForeground75
-        shadeColor: defaultDarkTransparentBackground75
-        shadeColor2: defaultDarkTransparentBackground50
-        focused2Color: defaultDarkStatusAlert
-        unfocusedColor: defaultDarkPrimaryForeground
-        selectedListItemColor: defaultDarkTransparentForeground5
-        primaryTextColor: defaultDarkPrimaryForeground
-        textDarkColor: defaultDarkPrimaryBackground
-        secondaryTextColor: defaultDarkTransparentForeground75
-        tertiaryTextColor: defaultDarkTransparentForeground50
-        focusedTextColor: defaultDarkPrimaryBackground
-        keyboardFocusedTextColor: defaultDarkPrimaryBackground
-        blueBadgeColor: defaultDarkStatusOnNow
+      successColor: defaultDarkStatusSuccess
+      cautionColor: defaultDarkStatusCaution
+      backgroundColor: defaultDarkPrimaryBackground
+      neutralColor: defaultDarkTransparentForeground20
+      neutralColor2: defaultDarkTransparentForeground10
+      neutralColor3: defaultDarkTransparentForeground5
+      neutralSolidColor: defaultDarkSolidSurface10
+      neutralSolidColor2: defaultDarkSolidSurface20
+      backgroundColorLight: defaultDarkPrimaryForeground
+      backgroundColorLight2: defaultDarkTransparentForeground75
+      shadeColor: defaultDarkTransparentBackground75
+      shadeColor2: defaultDarkTransparentBackground50
+      focused2Color: defaultDarkStatusAlert
+      unfocusedColor: defaultDarkPrimaryForeground
+      selectedListItemColor: defaultDarkTransparentForeground5
+      primaryTextColor: defaultDarkPrimaryForeground
+      textDarkColor: defaultDarkPrimaryBackground
+      secondaryTextColor: defaultDarkTransparentForeground75
+      tertiaryTextColor: defaultDarkTransparentForeground50
+      focusedTextColor: defaultDarkPrimaryBackground
+      keyboardFocusedTextColor: defaultDarkPrimaryBackground
+      blueBadgeColor: defaultDarkStatusOnNow
 
       inverseBackgroundColor: defaultLightPrimaryBackground
       inversePrimaryTextColor: defaultLightPrimaryForeground
@@ -1575,7 +1581,7 @@ Function getConstants()
       keyboard_focused_key: "pkg:/images/keyboard_search_focused_key_kidsMode.9.png"
       scrollbarThumbBitmapUri_hd: "pkg:/images/transport/sgplayer/hd/focused-progress-foreground_kidsMode.9.png"
       scrollbarThumbBitmapUri_fhd: "pkg:/images/transport/sgplayer/fhd/focused-progress-foreground_kidsMode.9.png"
-      gradientBlendColor: kidsDarkPrimaryBackground
+      gradientBlendColors: kidsDarkGradientBrand  '//value will be an array of associaive arrays that contain the gradient color info 
 
       cautionColor: kidsDarkStatusCaution
       backgroundColor: kidsDarkPrimaryBackground

@@ -6,6 +6,7 @@ Function init()
   topRef.observeFieldScoped("kidsMode", "onKidsModeChange")
   topRef.observeFieldScoped("posterVisible", "onPosterVisibleChange")
   topRef.observeFieldScoped("shouldRotateBackgrounds", "onShouldRotateBackgroundsChange")
+  topRef.observeFieldScoped("circularMaskColor", "onCircularMaskColorChange")
   'set background info defaults; the uriList is invalid at first. Must set the background to properly display background
   topRef.backgroundInfo = {
     type: m.constants.ui.backgroundTypes.fullScreen
@@ -32,7 +33,10 @@ Function init()
   m.posterGroupMask = topRef.findNode("posterGroupMask")
   m.maskLayer10 = topRef.findNode("maskLayer10")
   m.maskLayer11 = topRef.findNode("maskLayer11")
+  m.maskLayer10BlendColor2 = topRef.findNode("maskLayer10BlendColor2")
+  m.maskLayer11BlendColor2 = topRef.findNode("maskLayer11BlendColor2")
   m.maskLayer2 = topRef.findNode("maskLayer2")
+  
   m.fullScreenPosterGradient = topRef.findNode("fullScreenPosterGradient")
   m.fullScreenPosterLeftGradient = topRef.findNode("fullScreenPosterLeftGradient")
   m.fullScreenPosterBottomGradient = topRef.findNode("fullScreenPosterBottomGradient")
@@ -53,25 +57,60 @@ End Function
 
 
 Function setMaskLayerUris()
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    if theme <> invalid AND isNonEmptyArray(theme.gradientBlendColors) = true AND theme.gradientBlendColors.count() >= 2
+      colorBlend = theme.gradientBlendColors[1].color
+
+      m.maskLayer10BlendColor2.blendColor = colorBlend
+      m.maskLayer11BlendColor2.blendColor = colorBlend
+    end if
+  end if
+
   if m.top.kidsMode = true
     m.posterGroupMask.uri = "pkg:/images/background-masks/mask-layer-0-kids.webp"
     m.defaultBackground.uri = "pkg:/images/background-masks/mask-layer-1-0-kids.webp"
-    m.maskLayer10.uri = "pkg:/images/background-masks/mask-layer-1-0-kids.webp"
-    m.maskLayer11.uri = "pkg:/images/background-masks/mask-layer-1-1-kids.webp"
     m.maskLayer2.uri = "pkg:/images/background-masks/mask-layer-2-kids.webp"
 
     m.fullScreenPosterLeftGradient.uri = "pkg:/images/background-masks/kids-left.png"
     m.fullScreenPosterBottomGradient.uri = "pkg:/images/background-masks/kids-bottom.png"
+
   else
     m.posterGroupMask.uri = "pkg:/images/background-masks/mask-layer-0.webp"
     m.defaultBackground.uri = "pkg:/images/background-masks/mask-layer-1-0.webp"
-    m.maskLayer10.uri = "pkg:/images/background-masks/mask-layer-1-0.webp"
-    m.maskLayer11.uri = "pkg:/images/background-masks/mask-layer-1-1.webp"
     m.maskLayer2.uri = "pkg:/images/background-masks/mask-layer-2.webp"
 
     m.fullScreenPosterLeftGradient.uri = "pkg:/images/background-masks/left.png"
     m.fullScreenPosterBottomGradient.uri = "pkg:/images/background-masks/bottom.png"
   end if
+
+  setCircularMaskColor()
+End Function
+
+
+Function onCircularMaskColorChange()
+  setCircularMaskColor()
+End Function
+
+
+' set the top blend color of the circular mask
+Function setCircularMaskColor()
+  colorBlend = "" '//initialize variable
+
+  if isNonEmptyString(m.top.circularMaskColor) = true
+    colorBlend = m.top.circularMaskColor
+  else
+    theme = getThemeFromGlobal()
+    if theme <> invalid AND isNonEmptyArray(theme.gradientBlendColors) = true
+      colorBlend = theme.gradientBlendColors[0].color
+    end if
+
+    if isNonEmptyString(colorBlend) = false
+      colorBlend = "0x000000FF"
+    end if
+  end if
+  m.maskLayer10.blendColor = colorBlend
+  m.maskLayer11.blendColor = colorBlend
 End Function
 
 
