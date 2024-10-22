@@ -1968,6 +1968,14 @@ End Function
 ' Return the associative array associated with the esMX locale
 Function getTranslation_es_MX()
   return {
+    "foxVideoPlayer_error_contentUnavailableMessage": {
+      "description": "Used when the fox video player displays a dialog requiring the error_contentUnavailableMessage text string.",
+      "message": "Nuestras disculpas, pero el contenido no está disponible en este momento. Por favor, inténtelo más tarde.\nSi continúa teniendo este problema, visita help.tubitv.com."
+    },
+    "foxVideoPlayer_error_generic": {
+      "description": "Used when the fox video player displays a dialog requiring the error_generic text string.",
+      "message": "Nuestras disculpas, pero el contenido no está disponible en este momento. Por favor, inténtelo más tarde.\nSi continúa teniendo este problema, visita help.tubitv.com."
+    },
     "menu_signIn": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to sign into app.",
       "message": "Iniciar Sesión"
@@ -3624,6 +3632,14 @@ End Function
 
 Function getTranslation_fr_CA()
   return {
+    "foxVideoPlayer_error_contentUnavailableMessage": {
+      "description": "Used when the fox video player displays a dialog requiring the error_contentUnavailableMessage text string.",
+      "message": "Toutes nos excuses, mais le contenu n'est pas disponible pour le moment. Veuillez réessayer plus tard.\nSi vous continuez à rencontrer ce problème, veuillez visiter help.tubitv.com."
+    },
+    "foxVideoPlayer_error_generic": {
+      "description": "Used when the fox video player displays a dialog requiring the error_generic text string.",
+      "message": "Toutes nos excuses, mais le contenu n'est pas disponible pour le moment. Veuillez réessayer plus tard.\nSi vous continuez à rencontrer ce problème, veuillez visiter help.tubitv.com."
+    },
     "menu_signIn": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to sign into app.",
       "message": "Connexion"
