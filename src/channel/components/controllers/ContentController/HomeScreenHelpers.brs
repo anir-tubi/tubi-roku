@@ -1403,9 +1403,6 @@ Function filterPurpleCarpetContainerItemsBasedOnListing(listing, purpleCarpetCon
 
           end if
 
-        else
-          ' If the item is not been returned in the listing as a fallback displaying.
-          processedItem = item
         end if
 
         if processedItem <> invalid
@@ -1418,6 +1415,9 @@ Function filterPurpleCarpetContainerItemsBasedOnListing(listing, purpleCarpetCon
         purpleCarpetContainer.appendChildren(filteredEventList)
       end if
     end if
+  else if isNode(purpleCarpetContainer) = true
+    ' If listing api fails or returns empty response than removing all the items from the container so that it is hidden.
+    m.nodeHelpers.removeAllChildren(purpleCarpetContainer)
   end if
 
   return purpleCarpetContainer
