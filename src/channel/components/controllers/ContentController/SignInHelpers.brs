@@ -1514,8 +1514,11 @@ End Function
 
 Function startPurpleCarpetPlaybackAfterSignIn()
   popScreenAfterSignInProcess()
-  refreshUiAfterSignIn()
   screen = getCurrentScreen()
+  if screen <> invalid AND screen.hasField("signedIn") = true
+    screen.signedIn = isLoggedInUser()
+  end if
+  refreshUiAfterSignIn()
   primaryEventContent = screen.primaryEventContent
   if primaryEventContent <> invalid
     processPlayEvent(primaryEventContent, screen, true)
