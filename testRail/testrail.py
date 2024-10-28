@@ -114,7 +114,7 @@ client.password = 'Passw0rd'
 def create_test_run(build_ver):
     payload = json.dumps({
         "suite_id": suite_id,
-        "name": f"Roku {build_ver} Suitest Run (Hybrid)",
+        "name": f"Roku {build_ver} RTA Run",
         "description": f"RTA Run Result for {build_ver}",
         "include_all": False
     })
