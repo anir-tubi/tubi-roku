@@ -125,6 +125,10 @@ Function updateEventDetailsPurpleCarpetContent(purpleCarpetContainer, _screenId)
     rowListContent.appendChild(purpleCarpetContainer)
     screen.content = rowListContent
 
+    ' Updating the purpleCarpetContainerContentNode to updated value.
+    ' Covers use cases where we load event details directly during deeplink.
+    m.purpleCarpetContainerContentNode = purpleCarpetContainer.clone(true)
+
     callback = m.eventDetailsScreenLoadCompletionCallback
     if isFunction(callback) = true
       m.eventDetailsScreenLoadCompletionCallback = invalid
