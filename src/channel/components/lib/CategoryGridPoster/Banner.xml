@@ -34,6 +34,7 @@
     <Label
       id="title"
       width="873"
+      wrap="true"
       horizAlign="center"
       vertAlign="center">
       <Font

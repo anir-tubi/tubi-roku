@@ -42,16 +42,10 @@ Function onContentChange(msg)
 
     if itemContent.needsLogin = true
       setLockIcon()
-      m.title.text = getTranslation("registration_signIn_to_play_hint")
+      m.title.text = itemContent.bannertextguest
     else
       removeLockIcon()
-      if itemContent.airDate <> invalid
-        airDatetime = CreateObject("roDateTime")
-        airDatetime.FromISO8601String(itemContent.airDate)
-        airDatetime.toLocalTime()
-        dateString = airDatetime.asDateStringLoc("MMM d")
-        m.title.text = getTranslation("watch_for_free", {"date": dateString})
-      end if
+      m.title.text = itemContent.bannertextregistered
     end if
     m.title.translation = [(m.top.width / 2) - (m.title.width / 2), 0]
   end if

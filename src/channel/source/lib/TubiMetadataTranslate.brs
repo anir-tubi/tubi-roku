@@ -115,8 +115,8 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
     end if
   else if gridType = gridItemTypes.banner
     bannerImages = contentFromServer.banner_images
-    if bannerImages <> invalid AND isNonEmptyString(bannerImages.large_background) = true
-      sThumbnailURL = bannerImages.large_background
+    if bannerImages <> invalid AND isNonEmptyString(bannerImages.ott_banner_background) = true
+      sThumbnailURL = bannerImages.ott_banner_background
     end if
   end if
 
@@ -1475,6 +1475,11 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             titleImageUrl = m.getBannerTitleImageUrl(fullChild)
             if isNonEmptyString(titleImageUrl) = true
               childAA.bannerTitleImageUrl = titleImageUrl
+            end if
+
+            if isAA(fullChild.banner_texts) = true
+              childAA.bannerTextGuest = fullChild.banner_texts.banner_text_guest
+              childAA.bannerTextRegistered = fullChild.banner_texts.banner_text_registered
             end if
           end if
 

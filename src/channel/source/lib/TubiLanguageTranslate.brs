@@ -1644,10 +1644,6 @@ Function getTranslation_en_US()
       "description": "button text for when a non registered user focuses on details screen for sportsEvent",
       "message": "Sign In to Play"
     },
-    "registration_signIn_to_play_hint": {
-      "description": "hint text next to the Sign In to Play button when a non registered user focuses on details screen for sportsEvent",
-      "message": "Sign in to watch free. No subscription or credit card required."
-    },
     "registration_signIn_to_play_R_rated": {
       "description": "Hint message why we have locked the content.",
       "message": "Sign in required to protect younger audiences. No credit card needed."
