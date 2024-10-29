@@ -207,6 +207,7 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
         "poster"
         "landscape"
         "background"
+        "title"
       ]
     end if
 
@@ -773,7 +774,7 @@ Function cmsApi_createCategoryRequestInfo(category, homeScreen, bKidsMode, isSig
 
       imageTypes = invalid
 
-      if categoryId = m.constants.ui.categoryIds.purpleCarpet
+      if categoryId = m.constants.ui.categoryIds.purpleCarpet OR categoryId = m.constants.ui.categoryIds.purpleCarpetBanner
         imageTypes = [
           "poster"
           "landscape"
