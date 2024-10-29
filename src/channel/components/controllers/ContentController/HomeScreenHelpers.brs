@@ -894,8 +894,7 @@ Function onContentToPlay(msg)
 
   contentType = content.type
   if contentType = m.constants.ui.contentTypes.purpleCarpetEvent AND screen.purpleCarpetContent <> invalid
-    ' For now always sending to event details screen.
-    showEventDetailScreen(content.id, screen.purpleCarpetContent)
+    processPlayEvent(content, screen)
   else if contentType = m.constants.uapiContentTypes.channel
     showCategoryDetailsScreen(content)
   else if contentType = m.constants.ui.contentTypes.historySignedOutUser

@@ -307,6 +307,14 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
     m.infoPanelGroup.opacity = 0.6
     m.rowList.setFocus(true)
     return true
+  else if press = true AND key = "play" AND m.ctaButtonList.isInFocusChain() = true
+    nodeHelpers = TubiNodeHelpers()
+    index = nodeHelpers.getChildIndexById(m.ctaButtonList.content, "watchLive")
+
+    if index > -1
+      m.top.ctaListItemSelected = "watchLive"
+    end if
+    return true
   end if
 
   return false
