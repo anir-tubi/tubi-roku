@@ -159,6 +159,7 @@
       <field id="currFocusRow" alias="RowList.currFocusRow" />
       <field id="currFocusColumn" alias="RowList.currFocusColumn" />
       <field id="scrollingstatus" alias="RowList.scrollingstatus" />
+      <field id="rowHeights" alias="RowList.rowHeights" />
 
       <field id="currCategoryId" type="string" />
 
@@ -169,6 +170,8 @@
       <field id="eventCtaListItemSelected" alias="purpleCarpetRow.ctaListItemSelected" alwaysNotify="true" />
 
       <field id="primaryEventContent" alias="purpleCarpetRow.primaryEventContent" />
+
+      <field id="rowlistTranslation" alias="RowList.translation" />
 
   </interface>
 

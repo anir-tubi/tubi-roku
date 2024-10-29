@@ -14,7 +14,6 @@ Function init()
   m.HintGroupFade = fades.findNode("HintGroupFade")
 
   m.ContentArea.translation = [0, 516]
-  m.ContentArea.maskOffset = [-m.PageGroup.translation[0], 573]
 
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeFieldScoped("signedIn", "onSignedInChange")
@@ -38,6 +37,7 @@ Function init()
   m.CategoryGridList.observeField("currFocusColumn", "onCurrFocusColumnChange")
   m.CategoryGridList.observeField("rowFocused", "onRowFocused")
   m.CategoryGridList.observeFieldScoped("vertFocusDirection", "onVertFocusDirectionChange")
+  m.CategoryGridList.observeFieldScoped("rowlistTranslation", "onRowlistTranslationChange")
   m.CategoryGridList.observeFieldScoped("eventCtaListItemSelected", "onEventCtaListItemSelectedChange")
 
   'used to know when to send tracking info. Do not send focus tracking info when the grid is 1st loaded
@@ -61,15 +61,44 @@ Function init()
   m.currentColumn = -1
 
   m.sponsorSlideAmt = 29 'the amount the grid slides up to fit the sponsored header. This is the difference of the heights of the sponsored and normal row titles
-  m.sponsorMaskOffsetDiff = 119 'the diff in the amount the content area mask is offset in the up direction for sponsored rows. This is the difference of the heights of the sponsored and normal row titles
 
   m.originalContentAreaTranslation = m.ContentArea.translation
-  m.originalContentAreaMaskOffset = m.ContentArea.maskOffset
 
   m.scrollDirection = "none"
 
   ' Holds the boolean indicating if the spotlight experiment is enabled for the user or not.
   m.isSpotlightRowEnabled = (getExperimentResource("roku_spotlight_carousel", "roku_spotlight_carousel_v1", false).enabled = true)
+End Function
+
+
+' Move the mask to right below the row that should be completely visible. The mask image will fade out the rows underneath the focused row.
+' This assumes that up to one row is completely opaque - (unless nFocusRow is set to a row beyond the actual focused row.)
+' This also assumes that the mask height is constant.
+' If a special row is in focus, then setting nFocusRow to a negative number will make all rows of the rowlist translucent 
+' @param nFocusRow Integer, The row that is or will be in focus. 
+'     If nFocusRow < 0, then the mask will be placed on top of the 1st row
+' @param nFocusingPercent Number, When the row is in the process of gaining focus, this is a number from 0 to 1 indicating 
+'     how close the row is to its final state.
+Function moveContentAreaMask(nFocusRow = -1, nFocusingPercent = 1)
+  '//nMaskYNew will most likely be set to 0 w/ the following line unless the content rowList has been moved to make way for a special top row.
+  nMaskYNew = m.CategoryGridList.rowlistTranslation[1]
+  if nFocusRow >= 0 AND m.CategoryGridList.rowHeights <> invalid
+    nMaxRowHeights = m.CategoryGridList.rowHeights.count()
+    if nFocusRow > (nMaxRowHeights - 1)
+      '//If the rowHeights array doesn't contain as many row heights as the passed nFocusRow, then assume the current height is associated with the last item in the rowHeights array
+      nFocusRow = nMaxRowHeights - 1
+    end if
+    nCurrentFocusedRowHeight = m.CategoryGridList.rowHeights[nFocusRow]
+    if nFocusingPercent < 1
+      nOldMaskPositionY = m.ContentArea.maskOffset[1]
+      nDiff = (nCurrentFocusedRowHeight - nOldMaskPositionY) * nFocusingPercent
+      nMaskYNew = nMaskYNew + nOldMaskPositionY + nDiff
+    else
+      nMaskYNew = nMaskYNew + nCurrentFocusedRowHeight
+    end if
+  end if
+
+  m.ContentArea.maskOffset = [0, nMaskYNew]
 End Function
 
 
@@ -260,6 +289,15 @@ Function onCurrFocusRowChange()
     rowPercent = 1
   end if
 
+  if m.CategoryGridList.rowHeights <> invalid
+    nEnteringFocusedRowHeight = m.CategoryGridList.rowHeights[rowEnteringFocus]
+    nLosingFocusedRowHeight = m.CategoryGridList.rowHeights[rowLosingFocus]
+    if nLosingFocusedRowHeight <> nEnteringFocusedRowHeight
+      '//no need to move the mask if the previous and current rows have the same heights
+      moveContentAreaMask(rowEnteringFocus, rowPercent)
+    end if
+  end if
+
   categoryEnteringFocus = invalid
   categoryLosingFocus = invalid
   if m.CategoryGridList.content <> invalid
@@ -285,7 +323,6 @@ Function onCurrFocusRowChange()
   else if categoryLosingFocus <> invalid
     tubiLog("HomeScreen.onCurrFocusRowChange, elseIf categoryLosingFocus <> invalid ")
     '//::QUESTION:: When does this elseIF block ever get triggered. If never, then consider getting rid of this block
-
     contractContentAreaToOriginal(rowPercent)
 
   end if
@@ -300,25 +337,24 @@ End Function
 
 ' @rowPercent: float, the percentage that the row is focused
 Function contractContentAreaToOriginal(rowPercent)
+  tubiLog("HomeScreen.contractContentAreaToOriginal")
 
   if m.ContentArea.translation[1] <> m.originalContentAreaTranslation[1]
     'gradually reset back to original position
     if rowPercent < .95
       '//while the rowPercent is less than .75, then gradually shift the visual elements back to default state
       nDiffContentAreaTranslation_y = m.originalContentAreaTranslation[1] - m.ContentArea.translation[1]
-      nDiffContentAreaMaskOffset_y = m.originalContentAreaMaskOffset[1] - m.ContentArea.maskOffset[1]
 
       m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.ContentArea.translation[1] + nDiffContentAreaTranslation_y * rowPercent]
-      m.ContentArea.maskOffset = [m.originalContentAreaMaskOffset[0], m.ContentArea.maskOffset[1] + nDiffContentAreaMaskOffset_y * rowPercent]
       if m.InfoPanel.opacity < 1 AND m.InfoPanel.opacity < rowPercent
         m.InfoPanel.opacity = rowPercent
       end if
     else
       '//once the rowPercent has reached a certain percent, then immediately set everything back to original numbers to ensure it happens
       m.ContentArea.translation = m.originalContentAreaTranslation
-      m.ContentArea.maskOffset = m.originalContentAreaMaskOffset
       m.InfoPanel.opacity = 1
     end if
+    
   end if
 End Function
 
@@ -328,7 +364,6 @@ End Function
 ' @rowPercent: float, the percentage that the Sponsorship row is focused
 Function expandContentAreaForSponsorship(rowPercent)
   m.ContentArea.translation = [m.ContentArea.translation[0], m.originalContentAreaTranslation[1] - (m.sponsorSlideAmt * rowPercent)]
-  m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] + (m.sponsorMaskOffsetDiff * rowPercent)]
 End Function
 
 
@@ -677,6 +712,24 @@ Function onVertFocusDirectionChange(msg)
   if direction <> "none"
     m.scrollDirection = direction
   end if
+End Function
+
+
+' The content RowList within the categoryGridList is moving. 
+' Usually that means a special row or the content rowList is gaining focus.
+Function onRowlistTranslationChange(msg)
+  '//Determine if the rowlist or a special row is in focus
+  nRowInFocus = -1
+  focusedContent = m.CategoryGridList.itemFocused
+  if focusedContent <> invalid AND (focusedContent.gridItemType <> m.constants.ui.gridItemTypes.purpleCarpet) AND (m.isSpotlightRowEnabled = false OR focusedContent.gridItemType <> m.constants.ui.gridItemTypes.spotlight)
+    if m.CategoryGridList.cursorPosition <> invalid
+      nRowInFocus = m.CategoryGridList.cursorPosition[0]
+    else
+      nRowInFocus = 0
+    end if
+  end if
+  moveContentAreaMask(nRowInFocus)
+
 End Function
 
 
