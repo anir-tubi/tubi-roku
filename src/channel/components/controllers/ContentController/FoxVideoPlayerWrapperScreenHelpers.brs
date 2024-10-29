@@ -48,11 +48,29 @@ Function playLinearVideoWithFoxPlayer(content)
     if m.isFoxPlayerLoadRequired = true
       loadFoxVideoPlayerComponentLibrary()
     else if m.foxRpfInstance <> invalid then
+      assignProfileIdToFoxVideoPlayer(m.foxRpfInstance)
+
       ' If the fox player has finished loading then we can start playing the video. We check for this by looking if m.foxRpfInstance has been set which we set after load is completed. Else we will wait for the load to complete with the already set onFoxVideoPlayerComponentLibraryLoadStatus observer
       foxVideoPlayerWrapperScreen.isFoxVideoPlayerAvailable = true
     end if
 
     getFoxListingItemsAndRefreshPurpleCarpetContainerData(setFoxContentId)
+  end if
+End Function
+
+
+' Used to assign the profile id to the fox player for use in Conviva and mux.
+' Uses the user id if the user is logged in, otherwise uses the device id
+' @param foxRpfInstance: The fox player instance
+Function assignProfileIdToFoxVideoPlayer(foxRpfInstance)
+  profile = foxRpfInstance.profile
+  if isNode(profile) = true then
+    authInfo = m.tubiAuthUpdate.getAuthInfo()
+    if isLoggedInUser(authInfo) = true then
+      profile.profileId = authInfo.userId
+    else
+      profile.profileId = m.constants.deviceInfo.deviceId
+    end if
   end if
 End Function
 
@@ -80,19 +98,22 @@ Function onFoxVideoPlayerComponentLibraryLoadStatus(msg)
 
       ' Setting the config triggers the fox player to initialize
       initializer.config = getFoxVideoPlayerConfig()
-      if initializer.foxRpfInstance = invalid then
+
+      foxRpfInstance = initializer.foxRpfInstance
+
+      if foxRpfInstance = invalid then
         didFoxPlayerLoadFail = true
       else
-        foxRpfInstance = initializer.foxRpfInstance
         m.foxRpfInstance = foxRpfInstance
 
+        assignProfileIdToFoxVideoPlayer(foxRpfInstance)
 
         ' Set the strings for the fox player that we are overriding
         strings = {
           "error_contentUnavailableMessage": getTranslation("foxVideoPlayer_error_contentUnavailableMessage"),
           "error_generic": getTranslation("foxVideoPlayer_error_generic"),
         }
-        m.foxRpfInstance.callFunc("setStrings", strings)
+        foxRpfInstance.callFunc("setStrings", strings)
 
         if foxRpfInstance.playerEvent <> invalid then
           foxRpfInstance.playerEvent.observeFieldScoped("liveAssetInfo", "onFoxVideoPlayerliveAssetInfoChange")
