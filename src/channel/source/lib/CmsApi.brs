@@ -771,7 +771,18 @@ Function cmsApi_createCategoryRequestInfo(category, homeScreen, bKidsMode, isSig
 
       options.params.append(contentModeParam)
 
-      categoryReqInfo = m.createCategoryReqInfo(categoryId, bKidsMode, options, invalid, m.constants.ui.screenIds.homeScreen, category.gridItemType)
+      imageTypes = invalid
+
+      if categoryId = m.constants.ui.categoryIds.purpleCarpet
+        imageTypes = [
+          "poster"
+          "landscape"
+          "background"
+          "title"
+        ]
+      end if
+
+      categoryReqInfo = m.createCategoryReqInfo(categoryId, bKidsMode, options, imageTypes, m.constants.ui.screenIds.homeScreen, category.gridItemType)
       categoryReqInfo.requestType = reqName
       categoryReqInfo.responseType = "node"
       categoryReqInfo.isSignedInUser = isSignedInUser
