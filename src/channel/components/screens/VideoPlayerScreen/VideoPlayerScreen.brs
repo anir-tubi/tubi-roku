@@ -252,7 +252,7 @@ Function init()
   m.notificationInterval = 0.999 ' The interval that we are targeting for player position updates. We specify a value lower than a second in order to get a float value
   m.Video.notificationInterval = m.notificationInterval
 
-  'wasSignUpToSaveProgressModalAlreadyShown variable can be remove if we decide not to graduate the experiment roku_registration_player_signup_save_progress
+  'The field typically indicates whether a user has already seen a signup save progress modal or not.
   m.wasSignUpToSaveProgressModalAlreadyShown = false
 
   ' m.isSeeking is used keep track of the time from when m.Video.control = "seek" is set until the
@@ -1404,7 +1404,7 @@ Function backButtonExit()
   content = m.top.content
 
   'Guest user who is watching series and it's player position greater than or equal to 5 minutes then display prompt only once per session
-  if content <> invalid AND content.parentType = m.constants.ui.contentTypes.series AND m.top.appMode <> "KIDS_MODE" AND isLoggedInUser() = false AND m.playerPosition >= 300 AND m.wasSignUpToSaveProgressModalAlreadyShown = false AND getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_exit_prompt_v2", true).enabled
+  if content <> invalid AND content.parentType = m.constants.ui.contentTypes.series AND m.top.appMode <> "KIDS_MODE" AND isLoggedInUser() = false AND m.playerPosition >= 300 AND m.wasSignUpToSaveProgressModalAlreadyShown = false
     m.wasSignUpToSaveProgressModalAlreadyShown = true
     pauseVideo(false, false)
     m.top.showSignUpModal = true
