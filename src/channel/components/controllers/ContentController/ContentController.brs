@@ -41,6 +41,9 @@ Function init()
   ' The reason why we are also storing it's reference in m scope for better performance since we access the sdk instance a lot of items during the app session.
   m.oneTrust = invalid
 
+  ' Holds true or false based on if app suspend is in progress
+  m.isApplicationSuspendInProgress = false
+
   retrieveInitialAuthInfo()
 End Function
 
@@ -1951,6 +1954,7 @@ End Function
 ' Checking appExit reason and starting the appSuspendTimer in order to validate during resumeHandler callback
 Function onCustomSuspend(msg)
   tubiLog("ContentController.onCustomSuspend")
+  m.isApplicationSuspendInProgress = true
   customSuspendArgs = msg.getData()
 
   ' Firing any viewable impression if present in queue.
@@ -2040,6 +2044,7 @@ End Function
 ' also it restarts app every 4 days to retrieve starter/remote components
 Function onCustomResume(msg)
   tubiLog("ContentController.onCustomResume")
+  m.isApplicationSuspendInProgress = false
   args = msg.getData()
 
   lastSuspendOrResumeReason = invalid
@@ -2121,6 +2126,11 @@ Function onCustomResume(msg)
   else if lastSuspendOrResumeReason = "screensaver"
     ' Do nothing, but leave this as a place holder.
     ' The app will resume as normal for the screensaver.
+  end if
+
+  ' If the current screen has purple carpet container than starting the request to refresh the container data.
+  if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND currentScreen.purpleCarpetContent <> invalid
+    getFoxListingItemsAndRefreshPurpleCarpetContainerData()
   end if
 
 
