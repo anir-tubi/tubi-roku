@@ -126,6 +126,12 @@ Function onComponentFocusChange()
       m.lastFocusedList = "purpleCarpetRow"
       m.purpleCarpetRow.opacity = 1
       m.purpleCarpetRow.setFocus(true)
+    else if isPurpleCarpetContainerEmpty() = false AND m.top.resetGridPosition = true
+      ' Below logic is executed when user switches between kids mode and regular mode.
+      ' Due to the fact that kids mode does not have purple carpet we need to reset focus back to purple carpet container from rowlist.
+      setFocusToPurpleCarpetContainer()
+
+      m.top.resetGridPosition = false
     else
       ' Don't want to do any of this logic if we are already have an item we are going to jump to
       if itemToJumpTo = invalid then
@@ -783,6 +789,21 @@ Function onPurpleCarpetContentUpdatedChange()
 End Function
 
 
+Function setFocusToPurpleCarpetContainer()
+  ' updating the itemFocused which in turn triggers onGridFocusChange inside homescreen.brs.
+  ' Which causes the regular info panel to be hidden and the background to be updated to full screen version.
+  ' The reason for calling this manually is because purple carept has cta button list and rowlist.
+  ' Since we need to update the info panel even when ctaButtonList we need to force call it here.
+  m.top.itemFocused = m.top.primaryEventContent
+
+  m.purpleCarpetRow.setFocus(true)
+  slideFade(m.purpleCarpetRow, "below", "in", 0.3)
+  m.lastFocusedList = "purpleCarpetRow"
+  m.purpleCarpetRow.isContainerVisible = true
+  slideTo(m.RowList, [0, 384], 0.3)
+End Function
+
+
 Function onKeyEvent(key as String, press as Boolean) as Boolean
   if press = true
     if key = "down" AND m.RowList.isInFocusChain() = false
@@ -804,17 +825,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         slideTo(m.RowList, [0, 384], 0.3)
         return true
       else if isPurpleCarpetContainerEmpty() = false
-        ' updating the itemFocused which in turn triggers onGridFocusChange inside homescreen.brs.
-        ' Which causes the regular info panel to be hidden and the background to be updated to full screen version.
-        ' The reason for calling this manually is because purple carept has cta button list and rowlist.
-        ' Since we need to update the info panel even when ctaButtonList we need to force call it here.
-        m.top.itemFocused = m.top.primaryEventContent
-
-        m.purpleCarpetRow.setFocus(true)
-        slideFade(m.purpleCarpetRow, "below", "in", 0.3)
-        m.lastFocusedList = "purpleCarpetRow"
-        m.purpleCarpetRow.isContainerVisible = true
-        slideTo(m.RowList, [0, 384], 0.3)
+        setFocusToPurpleCarpetContainer()
         return true
       end if
     end if

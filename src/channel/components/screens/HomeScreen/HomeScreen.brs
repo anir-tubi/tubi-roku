@@ -139,6 +139,7 @@ Function onLoadingChange()
     m.CategoryGridList.content = invalid ' should be all categories with initial amounts of content in them
     m.CategoryGridList.spotlightContent = invalid
     m.CategoryGridList.purpleCarpetContent = invalid
+    m.CategoryGridList.purpleCarpetContentUpdated = true
   end if
 End Function
 
