@@ -128,7 +128,14 @@ Function processHomeScreenBatchResponse(response, screenId)
         purpleCarpetContainer: containerRow
         screenId: screenId
       }
-      updateContainerWithProgramInfoFromFoxListing(context, refreshPurpleCarpetContainer)
+
+      ' If the user has navigated away from the homescreen before the container info for the purple carpet has returned,
+      ' avoid making the Fox listing call since a request to the Fox listing API will be made when a user returns to the homescreen.
+      currentScreen = getCurrentScreen()
+      if currentScreen.id = screenId
+        updateContainerWithProgramInfoFromFoxListing(context, refreshPurpleCarpetContainer)
+      end if
+
     end if
 
     ' We have 2 different settings which are using to pick a row from response to be eligible for spotlight row.
