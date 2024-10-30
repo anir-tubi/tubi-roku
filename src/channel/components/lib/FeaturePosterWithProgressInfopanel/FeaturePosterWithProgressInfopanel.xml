@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - FeaturePosterWithProgressInfopanel is a component that displays a poster image with a progress bar and an infopanel on bottom.
+ -->
+<component name="FeaturePosterWithProgressInfopanel" extends="Group">
+
+  <script type="text/brightscript" uri="FeaturePosterWithProgressInfopanel.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib//GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+
+
+  <interface>
+    <field id="itemContent" type="node"/>
+    <field id="focusPercent" type="float"/>
+    <field id="rowHasFocus" type="boolean" />
+    <field id="itemHasFocus" type="boolean" />
+    <field id="width" type="float" />
+    <field id="height" type="float" />
+
+  </interface>
+
+  <children>
+    <Poster
+      id="EpisodePoster"
+      loadingBitmapUri="pkg:/images/placeholder-featured.webp"
+      failedBitmapUri="pkg:/images/placeholder-featured.webp"
+      width="521"
+      height="291"
+      translation="[0,0]" />
+
+    <TubiProgressBar
+      id="progressBar"
+      width="375"
+      height="9"
+      visible="false"/>
+
+    <InfoPanel
+      id="InfoPanel"
+      maxTitleLines="1"
+      maxHeight="195"
+      width="521"/>
+  </children>
+
+</component>

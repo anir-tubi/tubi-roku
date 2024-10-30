@@ -42,7 +42,7 @@ Function TubiExperiments(experimentsInfo) as Object
       }
 
       roku_horizontal_menu:{
-        roku_horizontal_menu_v2: {"enabled": false}
+        roku_horizontal_menu_v3: {"enabled": false}
       }
 
       roku_spotlight_carousel: {

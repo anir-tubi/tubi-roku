@@ -5,7 +5,11 @@ Function init()
   m.PageGroup = m.top.findNode("PageGroup")
   m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]
   m.Info = m.top.findNode("DetailInfoPanel")
+  m.AnimationGroup = m.top.findNode("AnimationGroup")
   m.Menu = m.top.findNode("Menu")
+  m.Menu.observeFieldScoped("focusedChild", "onMenuFocusChange")
+  m.Menu.observeFieldScoped("itemSelected", "onMenuItemSelected")
+  m.Menu.observeFieldScoped("itemFocused", "onMenuItemFocused")
   m.Menu.itemClippingRect = {
     height: 600.0
     width: 1732.0
@@ -19,28 +23,28 @@ Function init()
   m.StartFromBeginningMenuItem = m.top.findNode("StartFromBeginningMenuItem")
   m.LikeMenuItem = m.top.findNode("LikeMenuItem")
   m.DislikeMenuItem = m.top.findNode("DislikeMenuItem")
-  m.EpisodesMenuItem = m.top.findNode("EpisodesMenuItem")
   m.AddQueueMenuItem = m.top.findNode("AddQueueMenuItem")
   m.RemoveQueueMenuItem = m.top.findNode("RemoveQueueMenuItem")
   m.RemoveHistoryMenuItem = m.top.findNode("RemoveHistoryMenuItem")
   m.ChannelMenuItem = m.top.findNode("ChannelMenuItem")
   m.WatchTrailerMenuItem = m.top.findNode("WatchTrailerMenuItem")
   m.signUpMenuItem = m.top.findNode("signUpMenuItem")
-
   m.RelatedContentParentGroup = m.top.findNode("RelatedContentParentGroup")
-  m.RelatedContentGroup = m.RelatedContentParentGroup.findNode("RelatedContentGroup")
-  m.RelatedGrid = m.top.findNode("RelatedGrid")
-  m.RelatedTitle = m.top.findNode("RelatedTitle")
-  m.RelatedRowLabel = m.top.findNode("RelatedRowLabel")
-  m.AnimationGroup = m.top.findNode("AnimationGroup")
 
-  m.RelatedGrid.itemSize = m.constants.ui.imageSizes.largePoster
+  m.movieOverlay = m.top.findNode("MovieOverlay")
+  m.movieOverlay.observeFieldScoped("navigateWithinPageInfo", "onOverlayNavigateWithinPageInfo")
+  m.movieOverlay.observeFieldScoped("trackingComponentInfo", "onOverlayTrackingComponentInfo")
+  m.movieOverlay.observeFieldScoped("backgroundUriList", "onRelatedBackgroundUriListChange")
+
+  m.episodeOverlay = m.top.findNode("EpisodeOverlay")
+  m.episodeOverlay.observeFieldScoped("backgroundUriList", "onRelatedBackgroundUriListChange")
+  m.episodeOverlay.observeFieldScoped("relatedContentToPlayUpdated", "onEpisodeYMALContentUpdated")
+  m.episodeOverlay.observeFieldScoped("navigateWithinPageInfo", "onOverlayNavigateWithinPageInfo")
+
   m.menuFocused = false
 
-  'These are used to avoid sending the component_interaction event with toggle_off event when user selected an item from the main/secondary menu.
+  'These are used to avoid sending the component_interaction event with toggle_off event when user selected an item from the main menu.
   m.mainMenuSelected = false
-
-  m.Menu.observeFieldScoped("focusedChild", "onMenuFocusChange")
 
   m.top.observeFieldScoped("removeSignupButton", "onRemoveSignupButton")
   m.top.observeFieldScoped("length", "onLengthChange")
@@ -57,7 +61,6 @@ Function init()
   m.top.observeFieldScoped("isLoading", "onIsLoading")
   m.top.observeFieldScoped("disableBookmarks", "onDisableBookmarksChange")
   m.top.observeFieldScoped("transportVoiceRequest", "onTransportVoiceRequest")
-
   m.top.observeFieldScoped("stringSignUpButton", "onStringChange")
   m.top.observeFieldScoped("stringQueueButton", "onStringChange")
   m.top.observeFieldScoped("stringNoQueueButton", "onStringChange")
@@ -70,9 +73,9 @@ Function init()
 
   m.Menu.observeFieldScoped("itemSelected", "onMenuItemSelected")
   m.Menu.observeFieldScoped("itemFocused", "onMenuItemFocused")
+  m.top.observeFieldScoped("updateEpisodeOverlayContent", "onEpisodeOverlayContentChange")
   m.top.observeFieldScoped("relatedContent", "onRelatedContentChange")
-  m.RelatedGrid.observeFieldScoped("itemSelected", "onRelatedContentSelected")
-  m.RelatedGrid.observeFieldScoped("itemFocused", "onRelatedItemFocused")
+
   m.Info.observeFieldScoped("descriptionSelected", "onDescriptionSelected")
 
   setInitialMenuItems()
@@ -106,9 +109,6 @@ Function init()
   m.top.isStackable = true
   m.top.handlesTransportVoiceRequests = true
 
-  typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.RelatedTitle, typographyConstants.ids.bodyMedium)
-
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
@@ -124,8 +124,8 @@ Function onThemeChange(msg = invalid)
   end if
 
   if theme <> invalid
-    m.RelatedGrid.focusBitmapBlendColor = theme.focusedColor
-    m.RelatedTitle.color = theme.primaryTextColor
+    m.movieOverlay.focusBitmapBlendColor = theme.focusedColor
+    m.movieOverlay.primaryTextColor = theme.primaryTextColor
     m.Menu.focusBitmapBlendColor = theme.focusedColor
     m.Menu.focusFootprintBlendColor = theme.neutralColor2
   end if
@@ -148,9 +148,6 @@ Function setDetailStrings()
   m.ResumeMenuItem.title = getTranslation("screenDetails_button_resume_playing")
   m.ResumeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.ResumeMenuItem.id]
 
-  m.EpisodesMenuItem.title = getTranslation("screenDetails_button_episodes")
-  m.EpisodesMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.EpisodesMenuItem.id]
-
   m.WatchTrailerMenuItem.title = getTranslation("screenDetails_button_trailer")
   m.WatchTrailerMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.WatchTrailerMenuItem.id]
 
@@ -163,8 +160,6 @@ Function setDetailStrings()
   m.RemoveHistoryMenuItem.title = getTranslation("screenDetails_button_noHistory")
   m.RemoveHistoryMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.RemoveHistoryMenuItem.id]
 
-  RelatedRowLabelContent = m.top.findNode("RelatedRowLabelContent")
-  RelatedRowLabelContent.title = getTranslation("screenDetails_relatedTitles")
 
 End Function
 
@@ -326,7 +321,11 @@ Function onScreenFocusChange()
       end if
 
       if shouldRefresh(m.top.relatedContent) = true
-        m.RelatedContentGroup.visible = false
+        ' in case of series, there will be episodes in related content, so if ymal is missing still related grid can be visible.
+        if m.top.content.type <> m.constants.ui.contentTypes.series
+          m.RelatedContentParentGroup.visible = false
+        end if
+
         m.top.refreshRelatedContent = true
       end if
 
@@ -529,14 +528,23 @@ Function onIsChannel()
 End Function
 
 
-Function onIsSeries()
-  tubiLog("DetailScreenHoriz.onIsSeries")
-  episodeListIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.EpisodesMenuItem.id)
+Function onIsSeries(msg)
+  isSeries = msg.getData()
+  if isSeries = true
+    m.movieOverlay.visible = false
+    m.episodeOverlay.visible = true
+  else
+    m.movieOverlay.visible = true
+    m.episodeOverlay.visible = false
+  end if
+End Function
 
-  menuItems = [ m.signUpMenuItem, m.PlayMenuItem ]
 
-  m.menuFocused = false
-  addRemoveMenuItem(m.top.isSeries, episodeListIndex, m.EpisodesMenuItem, menuItems)
+Function onEpisodeOverlayContentChange()
+  if m.top.content <> invalid
+    m.episodeOverlay.content = m.top.content
+    m.episodeOverlay.updateContent = true
+  end if
 End Function
 
 
@@ -667,9 +675,9 @@ Function onIsLoading()
   end if
 
   if m.top.relatedContent <> invalid AND m.top.relatedContent.getChildCount() > 0
-    m.RelatedContentGroup.visible = not m.top.isLoading
+    m.RelatedContentParentGroup.visible = (m.top.isLoading <> true)
   else
-    m.RelatedContentGroup.visible = false
+    m.RelatedContentParentGroup.visible = false
   end if
 
   if m.top.isLoading = false
@@ -730,7 +738,7 @@ End Function
 ' add or remove a specific menu item
 ' @add: boolean, add an item if true, remove if false
 ' @itemIndex: int, index location of the item in the menuItems. -1 indicates the item does not exist in the menuItems.
-' @itemToAdd: one of the DetailMenuItemContentNode children of the DetailScreen (ie m.EpisodesMenuItem). This is optional for remove.
+' @itemToAdd: one of the DetailMenuItemContentNode children of the DetailScreen (ie m.PlayMenuItem). This is optional for remove.
 ' @previousItem: array, indicates which existing item the added item will follow. If the array contains multiple items,
 '                       the first item in the array that is found will dictate the placement of the new item,
 '                       and all other items will be disregarded.
@@ -885,8 +893,6 @@ Function handleMenuItemSelected(itemSelected)
 
     else if itemSelected.id = m.constants.ui.detailScreenMenuItemIds.watchTrailerMenuItem
       m.top.watchTrailerSelected = true
-    else if itemSelected.id = m.constants.ui.detailScreenMenuItemIds.episodesMenuItem
-      m.top.episodeListSelected = true
     else if itemSelected.id = m.constants.ui.detailScreenMenuItemIds.addQueueMenuItem
       m.top.addToQueueSelected = true
     else if itemSelected.id = m.constants.ui.detailScreenMenuItemIds.removeQueueMenuItem
@@ -910,14 +916,23 @@ Function onRelatedContentChange()
   tubiLog("DetailScreen.onRelatedContentChange")
   relatedContent = m.top.relatedContent
   if relatedContent <> invalid
+
     if relatedContent.getChildCount() > 0
-      m.RelatedContentGroup.visible = true
-      ' To force a single row in postergrid, set the columns
-      m.RelatedGrid.numColumns = relatedContent.getChildCount()
-      m.RelatedGrid.jumpToItem = m.RelatedGrid.itemFocused
+
+      if m.top.content <> invalid
+        if m.top.content.type = m.constants.ui.contentTypes.series
+          m.episodeOverlay.relatedContent = relatedContent
+        else
+          m.movieOverlay.content = relatedContent
+          m.movieOverlay.updateContent = true
+        end if
+      end if
     else
-      m.RelatedContentGroup.visible = false
-      if m.RelatedContentGroup.isInFocusChain() = true
+      if m.top.isSeries = false
+        m.RelatedContentParentGroup.visible = false
+      end if
+
+      if m.RelatedContentParentGroup.isInFocusChain() = true
         focusMenu()
       end if
     end if
@@ -925,72 +940,9 @@ Function onRelatedContentChange()
 End Function
 
 
-Function onRelatedContentSelected()
-  selectedContent = m.RelatedGrid.content.getChild(m.RelatedGrid.itemSelected)
-  handleRelatedContentSelected(selectedContent, m.RelatedGrid.itemSelected)
-End Function
-
-
-' @selectedContent: roSGNode, ContentNode that was selected from the RelatedGrid
-' @postion: integer, the horizontal position of the content in the RelatedGrid
-Function handleRelatedContentSelected(selectedContent, position)
-  m.relatedHasFocus = false
-
-  'set the component info so it can be used in navigate_to_page event
-  'Need to check NavigateToPageEvent for Upcoming or Replay
-  col = m.RelatedGrid.itemSelected + 1
-  row = 1
-  m.top.trackingComponentInfo = {
-    componentType: "related_component"
-    componentValues: {
-      content_tile: m.Tracking.getAnalyticsTile(selectedContent, col, row)
-    }
-  }
-
-  m.top.relatedContentSelected = position
-End Function
-
-
-Function onRelatedItemFocused()
-  tubiLog("DetailScreen.onRelatedItemFocused")
-  if m.RelatedGrid.content <> invalid
-    if m.top.isVideoPreviewOn = true
-      m.top.stopVideoPreview = true
-      ' force a background update
-      m.top.backgroundUriList = m.top.backgroundUriList
-    end if
-
-    focusedContent = m.RelatedGrid.content.getChild(m.RelatedGrid.itemFocused)
-    if focusedContent <> invalid
-      m.RelatedTitle.text = focusedContent.title
-
-      col = m.RelatedGrid.itemFocused + 1
-      row = 1
-
-      pageInfo = m.top.trackingPageInfo
-
-      ' trigger navigate_within_page events in ContentController
-      if m.relatedHasFocus = true
-        m.top.navigateWithinPageInfo = {
-          pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
-          componentOneof: m.Tracking.getAnalyticsComponent("related_component", m.oldYmalComponent) 'category_list_component doesn't exist in protos
-          means_of_navigation: "SCROLL" 'MeansOfNavigation enum
-          vertical_location: row '1 based index
-          horizontal_location: col
-        }
-        m.oldYmalComponent = {
-          content_tile: m.Tracking.getAnalyticsTile(focusedContent, col, row)
-        }
-      else
-        m.oldYmalComponent = {
-          content_tile: m.Tracking.getAnalyticsTile(focusedContent, col, row)
-        }
-      end if
-
-    end if
-
-    m.relatedHasFocus = true
-  end if
+Function onOverlayTrackingComponentInfo(msg)
+  tubiLog("DetailScreen.onOverlayTrackingComponentInfo")
+  m.top.trackingComponentInfo = msg.getData()
 End Function
 
 
@@ -998,12 +950,23 @@ Function focusMenu(immediately = false)
   m.focusTarget = m.Menu
   if immediately
     m.AnimationGroup.translation = [0, 0]
-    m.RelatedContentGroup.opacity = 0.2
+    m.RelatedContentParentGroup.opacity = 0.2
     m.Info.opacity = 1.0
+    m.Menu.opacity = 1.0
+    m.RelatedContentParentGroup.translation = [0, 900]
   else
-    slideTo(m.AnimationGroup, [0, 0], m.focusAnimationDuration)
-    animate(m.RelatedContentGroup, {opacity: 0.2, duration: m.focusAnimationDuration})
-    animate(m.Info, {opacity: 1.0, duration: m.focusAnimationDuration})
+    if m.top.isSeries = true
+      animate(m.Info, {opacity: 1.0, duration: m.focusAnimationDuration})
+      animate(m.Menu, {opacity: 1.0, duration: m.focusAnimationDuration})
+      '//TODO: add a better animation function to slide and fade to given opacity and translation
+      slideTo(m.RelatedContentParentGroup, [0, 900], m.focusAnimationDuration)
+      m.RelatedContentParentGroup.opacity = 0.2
+      m.top.backgroundUriList = m.top.content.backgrounds
+    else
+      slideTo(m.AnimationGroup, [0, 0], m.focusAnimationDuration)
+      animate(m.RelatedContentParentGroup, {opacity: 0.2, duration: m.focusAnimationDuration})
+      animate(m.Info, {opacity: 1.0, duration: m.focusAnimationDuration})
+    end if
   end if
 
   if m.top.isInFocusChain() = true
@@ -1015,14 +978,27 @@ End Function
 
 
 Function focusRelated()
-  m.focusTarget = m.RelatedGrid
-  if m.top.isInFocusChain() = true
-    m.RelatedGrid.setFocus(true)
+  if m.top.isVideoPreviewOn = true
+    m.top.stopVideoPreview = true
   end if
 
-  slideTo(m.AnimationGroup, [0, -392], m.focusAnimationDuration)
-  animate(m.RelatedContentGroup, {opacity: 1.0, duration: m.focusAnimationDuration})
-  animate(m.Info, {opacity: 0.2, duration: m.focusAnimationDuration})
+  if m.top.isSeries = true
+    m.focusTarget = m.episodeOverlay
+    m.episodeOverlay.setFocus(true)
+    m.top.backgroundUriList = m.episodeOverlay.backgroundUriList
+    animate(m.Info, {opacity: 0.0, duration: m.focusAnimationDuration})
+    animate(m.Menu, {opacity: 0.0, duration: m.focusAnimationDuration})
+    m.RelatedContentParentGroup.opacity = 1.0
+    slideTo(m.RelatedContentParentGroup, [0, 412], m.focusAnimationDuration)
+  else
+    m.focusTarget = m.movieOverlay
+    m.movieOverlay.setFocus(true)
+    slideTo(m.AnimationGroup, [0, -392], m.focusAnimationDuration)
+    animate(m.RelatedContentParentGroup, {opacity: 1.0, duration: m.focusAnimationDuration})
+    animate(m.Info, {opacity: 0.2, duration: m.focusAnimationDuration})
+  end if
+
+  m.relatedHasFocus = true
 
 End Function
 
@@ -1053,9 +1029,13 @@ Function onTransportVoiceRequest(msg)
       selection = m.Menu.content.getChild(m.Menu.itemFocused)
       handleMenuItemSelected(selection)
       response = "success"
-    else if m.RelatedGrid.isInFocusChain() = true
-      selectedContent = m.RelatedGrid.content.getChild(m.RelatedGrid.itemFocused)
-      handleRelatedContentSelected(selectedContent, m.RelatedGrid.itemFocused)
+    else if m.movieOverlay.isInFocusChain() = true
+      m.top.relatedContentToPlay = m.movieOverlay.relatedContentFocused
+      m.top.relatedContentToPlayUpdated = true
+      response = "success"
+    else if m.episodeOverlay.isInFocusChain() = true
+      m.top.relatedContentToPlay = m.episodeOverlay.relatedContentToPlay
+      m.top.relatedContentToPlayUpdated = true
       response = "success"
     end if
 
@@ -1077,9 +1057,11 @@ Function handlePlayInput()
     m.Menu.jumpToItem = 0 '//reset menu back to the top after a video is requested to play
   else if m.Menu.isInFocusChain() = true AND itemFocused.id = m.constants.ui.detailScreenMenuItemIds.watchTrailerMenuItem
     m.top.watchTrailerSelected = true
-  else if m.RelatedGrid.isInFocusChain() = true
-    selectedContent = m.RelatedGrid.content.getChild(m.RelatedGrid.itemFocused)
-    m.top.relatedContentToPlay = selectedContent
+  else if m.movieOverlay.isInFocusChain() = true
+    m.top.relatedContentToPlay = m.movieOverlay.relatedContentFocused
+    m.top.relatedContentToPlayUpdated = true
+  else if m.episodeOverlay.isInFocusChain() = true
+    m.top.relatedContentToPlay = m.episodeOverlay.relatedContentToPlay
     m.top.relatedContentToPlayUpdated = true
   else
     m.top.resumeSelected = true
@@ -1102,22 +1084,23 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         return true
       end if
     else if key = "left"
-      if m.RelatedGrid.isInFocusChain() = false
+      if m.RelatedContentParentGroup.isInFocusChain() = false
         m.top.backButtonPressed = true
         return true
       end if
-    ' Down presses arrive here if not consumed by the menu, meaning it's already at the bottom button
     else if key = "down"
-      if m.Menu.isInFocusChain() = true AND m.RelatedContentParentGroup.visible = true AND m.RelatedContentGroup.visible = true then
-        focusRelated()
-        return true
-      else if m.Info.isInFocusChain() = true
-        focusMenu()
-        return true
+      if m.Menu.isInFocusChain() = true
+        if m.top.isSeries = true
+          focusRelated()
+          return true
+        else if m.top.relatedContent <> invalid and m.top.relatedContent.getChildCount() > 0
+          focusRelated()
+          return true
+        end if
       end if
 
     else if key = "up"
-      if m.RelatedGrid.isInFocusChain() = true
+      if  m.RelatedContentParentGroup.isInFocusChain() = true
         focusMenu()
         return true
       else if m.Menu.isInFocusChain() = true AND m.Info.isDescriptionEllipsized = true
@@ -1190,4 +1173,23 @@ Function setComponentInteractionEventForMenu(componentInteractionValue, menuItem
       user_interaction: componentInteractionValue
     }
   end if
+End Function
+
+
+Function onRelatedBackgroundUriListChange(msg)
+  tubiLog("DetailScreen.onRelatedBackgroundUriListChange")
+  backgrounds = msg.getData()
+  m.top.backgroundUriList = backgrounds
+End Function
+
+
+Function onOverlayNavigateWithinPageInfo(msg)
+  trackingEvent = msg.getData()
+  m.top.navigateWithinPageInfo = trackingEvent
+End Function
+
+
+Function onEpisodeYMALContentUpdated()
+  m.top.relatedContentToPlay = m.episodeOverlay.relatedContentToPlay
+  m.top.relatedContentToPlayUpdated = true
 End Function

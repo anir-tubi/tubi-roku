@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="DetailScreenMovieOverlay" extends="BaseScreen">
+  <script type="text/brightscript" uri="DetailScreenMovieOverlay.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+
+  <interface>
+    <!-- INPUT -->
+
+      <!-- Full content of the item to show details for -->
+      <field id="content" type="node" />
+
+      <!-- Explicitly tell the content to update by using this field -->
+      <field id="updateContent" type="boolean" alwaysNotify="true" />
+
+      <!--This interface is used to avoid having theme in movie overlay because only focusBitmap changes color-->
+      <field id="focusBitmapBlendColor" alias="YMALMovieList.focusBitmapBlendColor" />
+
+      <field id="primaryTextColor" alias="RelatedTitle.color" />
+
+    <!--OUTPUT-->
+
+      <!-- mirrors YMALMovieList.itemSelected, but DetailScreen interjects before sending it to the ContentController -->
+      <field id="relatedContentSelected" type="integer" alwaysNotify="true" />
+
+      <field id="relatedContentFocused" type="node" />
+
+  </interface>
+
+  <children>
+
+    <Group
+      id="RelatedContentGroup">
+
+      <CategoryGridRowLabel
+        id="ymalMovieRowLabel"
+        translation="[0,0]">
+        <TubiContentNode
+          id="ymalMovieRowLabelContent"
+          role="content"/>
+      </CategoryGridRowLabel>
+
+      <MarkupGrid
+        id="YMALMovieList"
+        itemComponentName="StarterGridItem"
+        numRows="1"
+        itemSpacing="[15,15]"
+        fadeFocusFeedbackWhenAutoScrolling="true"
+        horizFocusAnimationStyle="fixedFocus"
+        focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+        translation="[0,63]"/>
+
+      <Label
+        id="RelatedTitle"
+        translation="[0,438]"
+        width="876"
+        wrap="false"
+        maxLines="1">
+        <Font
+          role="font"/>
+      </Label>
+    </Group>
+  </children>
+</component>

@@ -2,15 +2,14 @@
 <component name="DetailScreenHoriz" extends="BaseScreen">
 
   <script type="text/brightscript" uri="DetailScreenHoriz.brs" />
-  <script type="text/brightscript" uri="../../lib/CacheValidationMixin.brs" />
-  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
-  <script type="text/brightscript" uri="../../lib/UserMixin.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/CacheValidationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/UserMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
   <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
-
 
   <interface>
     <!-- INPUTS -->
@@ -45,7 +44,7 @@
       <field id="stringChannelButton" type="string"/>
       <field id="stringNoHistoryButton" type="string"/>
       <field id="stringSignUpButton" type="string"/>
-       <field id="stringLikeButton" type="string"/>
+      <field id="stringLikeButton" type="string"/>
       <field id="stringDislikeButton" type="string"/>
       <field id="stringPlayButton" type="string"/>
 
@@ -77,7 +76,7 @@
       <field id="length" type="integer" />
 
       <!-- Indicates if the video is an episode of a series -->
-      <field id="isSeries" type="boolean" value="false" />
+      <field id="isSeries" type="boolean" />
 
       <!-- Indicates whether the user is loggedIn or not -->
       <field id="needsLogin" alias="DetailInfoPanel.needsLogin" />
@@ -123,12 +122,14 @@
       <field id="disableBookmarks" type="boolean" />
 
       <!-- holds state info about if there was an error in retrieving the content for this page.
-           Is used to prevent multiple navigate_to_page and page_load events if a user retries to load content from the error modal.
-       -->
+          Is used to prevent multiple navigate_to_page and page_load events if a user retries to load content from the error modal.
+      -->
       <field id="contentFetchError" type="boolean" value="false" />
 
-      <!-- content to populated the RelatedGrid -->
-      <field id="relatedContent" alias="RelatedGrid.content" />
+      <!-- content to populated the YMAL -->
+      <field id="relatedContent" type="node" />
+
+      <field id="updateEpisodeOverlayContent" type="boolean" alwaysNotify="true" />
 
       <field id="content" type="node" />
 
@@ -189,10 +190,14 @@
       <!-- set to true when the user wants to sign-up -->
       <field id="signUpButtonSelected" type="boolean" alwaysNotify="true" />
 
-      <!-- mirrors RelatedGrid.itemSelected, but DetailScreen interjects before sending it to the ContentController -->
-      <field id="relatedContentSelected" type="integer" alwaysNotify="true" />
+      <!-- mirrors related YMAL Grid.itemSelected -->
+      <field id="relatedContentSelected" alias="MovieOverlay.relatedContentSelected" />
 
-      <!-- set to the contentNode of the RelatedGrid item which was focused when
+      <field id="episodeToPlay" alias="EpisodeOverlay.episodeToPlay" />
+
+      <field id="episodeSelected" alias="EpisodeOverlay.episodeSelected" />
+
+      <!-- set to the contentNode of the YMALMovieList item which was focused when
            the "play" input transport deeplink was triggered
       -->
       <field id="relatedContentToPlay" type="node" />
@@ -209,12 +214,12 @@
 
       <field id="backButtonPressed" type="boolean" alwaysNotify="true" />
 
-      <field id="refreshRelatedContent" type="boolean" alwaysNotify="true" />
+      <field id="refreshRelatedContent" type="boolean" alwaysNotify="true"  />
 
-      <field id="showRelatedContent" alias="RelatedContentGroup.visible" />
+      <field id="showRelatedContent" alias="RelatedContentParentGroup.visible" />
 
       <!-- Holds a load time start value [returned from UpTime()] that can be used to determine how long the page took to load.
-           Used when showing a series/episode page
+          Used when showing a series/episode page
       -->
       <field id="trackingLoadStartTime" type="integer" />
 
@@ -242,9 +247,6 @@
     <DetailMenuItemContentNode
       id="DislikeMenuItem"
       iconUrl="pkg:/images/icon-dislike.webp" />
-    <DetailMenuItemContentNode
-      id="EpisodesMenuItem"
-      iconUrl="pkg:/images/icon-all-episodes.webp"/>
     <DetailMenuItemContentNode
       id="AddQueueMenuItem"
       iconUrl="pkg:/images/icon-add-to-queue.webp"/>
@@ -282,13 +284,13 @@
       <Group
         id="AnimationGroup"
         translation="[0,0]">
-        <InfoPanel
-          id="DetailInfoPanel"
-          mode="item"
-          translation="[0,620]"
-          maxHeight="462"
-          maxTitleLines="2"
-          visible="false" />
+          <InfoPanel
+            id="DetailInfoPanel"
+            mode="item"
+            translation="[0,620]"
+            maxHeight="462"
+            maxTitleLines="2"
+            visible="false" />
 
           <MarkupGrid
             id="Menu"
@@ -305,38 +307,18 @@
             itemComponentName="DetailHorizMenuItem"/>
 
         <Group
-          id="RelatedContentParentGroup">
-          <Group
-            id="RelatedContentGroup"
-            translation="[0,900]"
-            visible="false"
-            opacity="0.2">
-            <CategoryGridRowLabel
-              id="RelatedRowLabel"
-              translation="[0,0]">
-              <TubiContentNode
-                id="RelatedRowLabelContent"
-                role="content"/>
-            </CategoryGridRowLabel>
-            <MarkupGrid
-              id="RelatedGrid"
-              itemComponentName="StarterGridItem"
-              numRows="1"
-              itemSpacing="[16,16]"
-              fadeFocusFeedbackWhenAutoScrolling="true"
-              horizFocusAnimationStyle="fixedFocus"
-              focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
-              translation="[0,63]"/>
-            <Label
-              id="RelatedTitle"
-              width="875"
-              wrap="false"
-              maxLines="1"
-              translation="[0,438]">
-              <Font
-                role="font"/>
-            </Label>
-          </Group>
+          id="RelatedContentParentGroup"
+          translation="[0,900]">
+
+          <DetailScreenMovieOverlay
+            id="MovieOverlay"
+            translation="[0,0]"
+            visible="true"/>
+
+          <DetailScreenEpisodeOverlay
+            id="EpisodeOverlay"
+            translation="[0,0]"
+            visible="false"/>
         </Group>
       </Group>
     </Group>

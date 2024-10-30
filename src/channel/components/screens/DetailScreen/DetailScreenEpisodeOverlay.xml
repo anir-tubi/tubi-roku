@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="DetailScreenEpisodeOverlay" extends="BaseScreen">
+
+  <script type="text/brightscript" uri="DetailScreenEpisodeOverlay.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
+
+  <interface>
+    <!-- INPUT -->
+      <!-- Full content of the item to show details for -->
+      <field id="content" type="node" />
+
+      <!-- Explicitly tell the content to update by using this field -->
+      <field id="updateContent" type="boolean" alwaysNotify="true" />
+
+      <field id="relatedContent" type="node" />
+
+    <!-- OUTPUT -->
+      <field id="episodeFocused" alias="EpisodeList.rowItemFocused" />
+
+      <field id="relatedContentFocused" type="node" />
+
+      <!-- Set to the content of the episode that was clicked on -->
+      <field id="episodeToPlay" type="node" />
+
+      <!-- Explicitly tell the CC to play the episode on episodeToPlay field
+          since we have single row, the vector will look like [0, x] where x=episode index on ymal row. -->
+      <field id="episodeSelected" type="vector2d" alwaysNotify="true" />
+
+      <field id="relatedContentToPlay" type="node" />
+
+      <!-- set to true when the relatedContentToPlay field is updated -->
+      <field id="relatedContentToPlayUpdated" type="boolean" alwaysNotify="true"/>
+  </interface>
+
+  <children>
+    <Group id="EpisodeParentGroup">
+      <Label
+        id="Title"
+        translation="[0,-147]"
+        width="1140"
+        wrap="true"
+        maxLines="2"
+        opacity="0.0"
+        vertAlign="bottom">
+        <Font
+          id="TitleFont"
+          role="font"/>
+      </Label>
+
+      <MarkupGrid
+        id="SeasonMenu"
+        translation="[0,-39]"
+        itemSize="[105, 60]"
+        columnWidths="[105]"
+        itemSpacing="[16, 0]"
+        rowHeights="[60]"
+        columnSpacings="[16]"
+        numColumns="8"
+        numRows="1"
+        opacity="0.0"
+        focusBitmapUri="pkg:/images/pill_button_hd.9.png"
+        focusFootprintBitmapUri="pkg:/images/pill_button_hd.9.png"
+        drawFocusFeedbackOnTop="false"
+        itemComponentName="DetailHorizSeasonItem"/>
+
+      <CategoryGridRowLabel
+        id="ymalEpisodesRowLabel"
+        translation="[0,0]">
+        <TubiContentNode
+          id="ymalEpisodesRowLabelContent"
+          role="content"/>
+      </CategoryGridRowLabel>
+
+      <RowList
+        id="EpisodeList"
+        translation="[0, 63]"
+        itemComponentName="FeaturePosterWithProgressInfopanel"
+        itemSpacing="[0,32]"
+        numRows="1"
+        rowSpacings="[32]"
+        rowItemSpacing="[[16,0]]"
+        showRowCounter="[false]"
+        fadeFocusFeedbackWhenAutoScrolling="true"
+        rowFocusAnimationStyle="floatingFocus"
+        vertFocusAnimationStyle="fixedFocus"
+        focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+        focusFootprintBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+        focusFootprintBlendColor="#00000000"/>
+    </Group>
+  </children>
+</component>

@@ -168,7 +168,7 @@ End Function
 
 Function onFocusPercentChange()
   focusPercent = m.top.focusPercent
-  
+
   if m.top.gridHasFocus = true
     updateUnfocusedFraction(1 - focusPercent)
     updateFocusedFraction(focusPercent)

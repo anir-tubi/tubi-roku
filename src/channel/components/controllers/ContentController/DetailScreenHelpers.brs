@@ -23,7 +23,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
       detailScreen = CreateObject("roSGNode", "DetailScreen")
     end if
 
-    getExperimentResource("roku_horizontal_menu", "roku_horizontal_menu_v2")
+    getExperimentResource("roku_horizontal_menu", "roku_horizontal_menu_v3")
     detailScreen.id = m.constants.ui.screenIds.detailScreen
     detailScreen.trackingLoadStartTime = Uptime(0)
     detailScreen.shouldFocusWhenPushed = m.top.fadeInContentController
@@ -52,6 +52,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     detailScreen.observeFieldScoped("stopVideoPreview", "onStopVideoPreview")
     detailScreen.observeFieldScoped("signUpButtonSelected", "onSignUpButtonSelected")
     detailScreen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
+    detailScreen.observeFieldScoped("episodeSelected", "onEpisodeSelectedFromEpisodeOverlay")
 
     ' Update tracking info - have to set the whole AA, can't update only a portion on the AA field
     detailScreen.trackingPageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
@@ -481,6 +482,11 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     'full content has been returned from the /contents API.
     detailScreen.trackingPageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
     detailScreen.content = content
+
+    'updateEpisodeOverlayContent is used to trigger the episode overlay updates with seasons/episode list.
+    if m.detailScreenHorizMenuExp = true AND content.type = m.constants.ui.contentTypes.series
+      detailScreen.updateEpisodeOverlayContent = true
+    end if
 
     if shouldResetButtonIndex = true
       detailScreen.jumpToItem = 0
@@ -2415,4 +2421,30 @@ Function resetRelatedContent(detailScreen)
       detailScreen.relatedContent = refreshedRelatedContent
     end if
   end if
+End Function
+
+
+Function onEpisodeSelectedFromEpisodeOverlay(msg)
+  detailScreen = msg.getRoSGNode()
+
+  if detailScreen <> invalid AND detailScreen.episodeToPlay <> invalid
+    content = detailScreen.episodeToPlay
+
+    nowPos = 0
+    ' find the position in global history
+    history = getHistory(content.id)
+
+    if history <> invalid AND history.nowPos > 0
+      nowPos = history.nowPos
+      content.nowPos = nowPos
+    end if
+
+    playbackSource = {
+      "srcForAnalytic": m.constants.player.playbackSource.unknown
+      "srcForAds": m.constants.player.playbackOrigin.ymal
+    }
+
+    playVideoContent(content, playbackSource, nowPos)
+  end if
+
 End Function

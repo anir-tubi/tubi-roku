@@ -251,7 +251,8 @@ Function addControllerUi()
   m.passwordCache = invalid
 
   'This variable is used to avoid multiple calls to getExperimentResource
-  m.detailScreenHorizMenuExp = (getExperimentResource("roku_horizontal_menu", "roku_horizontal_menu_v2", false).enabled = true)
+  m.detailScreenHorizMenuExp = (getExperimentResource("roku_horizontal_menu", "roku_horizontal_menu_v3", false).enabled = true)
+
   ' Format of data that should be set on viewableImpressionEventInfo
   ' {
   '   containerId: "" Contains the id of the row where the tile was displayed. ex: comedy etc.
