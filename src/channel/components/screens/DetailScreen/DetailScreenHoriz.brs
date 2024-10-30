@@ -918,6 +918,8 @@ Function onRelatedContentChange()
   if relatedContent <> invalid
 
     if relatedContent.getChildCount() > 0
+      'During refresh of related contents during sign In/ sign ups, CC will hide the RelatedContentParentGroup. So make it visible.
+      m.RelatedContentParentGroup.visible = true
 
       if m.top.content <> invalid
         if m.top.content.type = m.constants.ui.contentTypes.series
