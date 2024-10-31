@@ -1131,8 +1131,8 @@ Function getTranslation_en_US()
       "message": "All Episodes"
     },
     "screenDetails_button_episodes_more": {
-    "description": "Label displayed over episodes list + YMAL on the details Screen.",
-    "message": "Episodes And More"
+      "description": "Label displayed over episodes list + YMAL on the details Screen.",
+      "message": "Episodes And More"
     },
     "screenDetails_relatedTitles": {
       "description": "Label of button to allow users to view other video titles related to the current video title",
@@ -2820,6 +2820,10 @@ Function getTranslation_es_MX()
       "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
       "message": "Todos Los Capítulos"
     },
+    "screenDetails_button_episodes_more": {
+      "description": "Label displayed over episodes list + YMAL on the details Screen.",
+      "message": "Capítulos Y Más"
+    },
     "screenDetails_relatedTitles": {
       "description": "Label of button to allow users to view other video titles related to the current video title",
       "message": "Puede que también te guste"
@@ -3313,10 +3317,6 @@ Function getTranslation_es_MX()
     "registration_signIn_to_play_button": {
       "description": "button text for when a non registered user focuses on details screen for sportsEvent",
       "message": "Inicia Sesión para Ver"
-    },
-    "registration_signIn_to_play_hint": {
-      "description": "hint text next to the Sign In to Play button when a non registered user focuses on details screen for sportsEvent",
-      "message": "Inicia sesión para ver gratis. No se requiere tarjeta de crédito."
     },
     "registration_signIn_to_play_R_rated": {
       "description": "Hint message why we have locked the content.",
@@ -4488,6 +4488,10 @@ Function getTranslation_fr_CA()
       "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
       "message": "Tous les épisodes"
     },
+    "screenDetails_button_episodes_more": {
+      "description": "Label displayed over episodes list + YMAL on the details Screen.",
+      "message": "Épisodes et plus"
+    },
     "screenDetails_relatedTitles": {
       "description": "Label of button to allow users to view other video titles related to the current video title",
       "message": "Vous pourriez aussi aimer"
@@ -4981,10 +4985,6 @@ Function getTranslation_fr_CA()
     "registration_signIn_to_play_button": {
       "description": "button text for when a non registered user focuses on details screen for sportsEvent",
       "message": "Se connecter"
-    },
-    "registration_signIn_to_play_hint": {
-      "description": "hint text next to the Sign In to Play button when a non registered user focuses on details screen for sportsEvent",
-      "message": "Connectez-vous pour regarder gratuitement. Aucun abonnement ou carte de crédit requis."
     },
     "registration_signIn_to_play_R_rated": {
       "description": "Hint message why we have locked the content.",
