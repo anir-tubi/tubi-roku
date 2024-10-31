@@ -25,7 +25,7 @@
       failedBitmapUri="pkg:/images/placeholder.webp" />
     <Label
       id="title"
-      width="873"
+      width="900"
       wrap="true"
       horizAlign="center"
       vertAlign="center">

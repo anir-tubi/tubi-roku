@@ -30,11 +30,20 @@ Function onContentChange(msg)
 
     if itemContent.needsLogin = true
       setLockIcon()
-      m.title.text = itemContent.bannertextguest
+      titleText = itemContent.bannertextguest
     else
       removeLockIcon()
-      m.title.text = itemContent.bannertextregistered
+      titleText = itemContent.bannertextregistered
     end if
+
+    if itemContent.airDateTime <> invalid
+      airDatetime = CreateObject("roDateTime")
+      airDatetime.FromISO8601String(itemContent.airDateTime)
+      airDatetime.toLocalTime()
+
+      titleText = titleText.replace("{date}", airDatetime.asDateStringLoc("y-MM-dd"))
+    end if
+    m.title.text = titleText
     m.title.translation = [(m.top.width / 2) - (m.title.width / 2), 0]
   end if
 End Function

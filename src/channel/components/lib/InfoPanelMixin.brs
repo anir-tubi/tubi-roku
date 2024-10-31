@@ -341,6 +341,16 @@ Function populateInfoPanelWithPurpleCarpetBannerMode(content, infoPanel)
     infoPanel.titleImageUri = ""
   end if
 
+  hasVideoresources = content.hasVideoresources
+  airDatetime = content.airDatetime
+  info = getAvailabilityTypeBadgeAndMatchTimeValues(airDatetime, hasVideoresources)
+  availabilityType = info.availabilityType
+
+
+  infoPanel.reminderIsSet = (availabilityType = m.constants.ui.contentTimings.upcoming AND getBookmark(content.id) <> invalid)
+
+  infoPanel.airDateTime = content.airDateTime
+
   infoPanel.width = 960
 End Function
 
