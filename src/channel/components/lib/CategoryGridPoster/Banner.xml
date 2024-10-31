@@ -23,14 +23,6 @@
       id="poster"
       loadingBitmapUri="pkg:/images/placeholder.webp"
       failedBitmapUri="pkg:/images/placeholder.webp" />
-    <Poster
-      id="titleImage"
-      loadHeight="103"
-      loadWidth="309"
-      loadDisplayMode="scaleToFit"
-      height="103"
-      loadingBitmapUri="pkg:/images/placeholder.webp"
-      failedBitmapUri="pkg:/images/placeholder.webp" />
     <Label
       id="title"
       width="873"

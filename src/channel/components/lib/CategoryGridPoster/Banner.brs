@@ -2,7 +2,6 @@ Function init()
   topRef = m.top
   m.poster = topRef.findNode("poster")
   m.title = topRef.findNode("title")
-  m.titleImage = topRef.findNode("titleImage")
   topRef.observeFieldScoped("itemContent", "onContentChange")
 
   typographyConstants = getTypographyConstants()
@@ -27,17 +26,6 @@ Function onContentChange(msg)
 
     if isNonEmptyString(itemContent.hdgridposterurl) = true
       m.poster.uri = itemContent.hdgridposterurl
-    end if
-
-    if isNonEmptyString(itemContent.bannerTitleImageUrl) = true
-      m.titleImage.uri = itemContent.bannerTitleImageUrl
-
-      if itemContent.needsLogin = true
-        m.titleImage.translation = [132, 27]
-      else
-        m.titleImage.translation = [60, 27]
-      end if
-
     end if
 
     if itemContent.needsLogin = true

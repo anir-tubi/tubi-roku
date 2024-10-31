@@ -39,7 +39,6 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     fetchedAtTimestamp: tubiMetadataTranslate_fetchedAtTimestamp
     getGridItemType: tubiMetadataTranslate_getGridItemType
     getThumbnailImage: tubiMetadataTranslate_getThumbnailImage
-    getBannerTitleImageUrl: tubiMetadataTranslate_getBannerTitleImageUrl
     composeVideoResources: tubiMetadataTranslate_composeVideoResources
     getRoundedCornersURL: tubiMetadataTranslate_getRoundedCornersURL
     getBackgroundImages: tubiMetadataTranslate_getBackgroundImages
@@ -124,18 +123,6 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
   sThumbnailURL = m.getRoundedCornersURL(sThumbnailURL)
 
   return sThumbnailURL
-End Function
-
-
-' @contentFromServer: assocArray, AA representation of content metadata JSON as returned from server
-' @returns: String, returns the "title" image url for the purple carpet banner component displayed in the home grid.
-Function tubiMetadataTranslate_getBannerTitleImageUrl(contentFromServer)
-  bannerImages = contentFromServer.banner_images
-  if bannerImages <> invalid AND isNonEmptyString(bannerImages.title) = true
-    return bannerImages.title
-  end if
-
-  return ""
 End Function
 
 
@@ -1472,11 +1459,6 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           childAA.hdgridposterurl = sHDGridPosterURL
 
           if childAA.gridItemType = "banner"
-            titleImageUrl = m.getBannerTitleImageUrl(fullChild)
-            if isNonEmptyString(titleImageUrl) = true
-              childAA.bannerTitleImageUrl = titleImageUrl
-            end if
-
             if isAA(fullChild.banner_texts) = true
               childAA.bannerTextGuest = fullChild.banner_texts.banner_text_guest
               childAA.bannerTextRegistered = fullChild.banner_texts.banner_text_registered
