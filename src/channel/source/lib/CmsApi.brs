@@ -449,7 +449,7 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
         existingParams["images[background_tb]"] = "w" + fullScreenBackground[0].ToStr() + "h" + fullScreenBackground[1].ToStr() + "_background"
       end if
     else if imageType = "title"
-      existingParams["images[title_tb]"] = "w" + title[0].ToStr() + "h" + title[1].ToStr() + "_title"
+      existingParams["images[title_art]"] = "w" + title[0].ToStr() + "h" + title[1].ToStr() + "_title"
     else if imageType = "spotlightLandscape"
       existingParams["images[spotlight_landscape_tb]"] = "w" + spotlightLandscape[0].ToStr() + "h" + spotlightLandscape[1].ToStr() + "_landscape"
     end if

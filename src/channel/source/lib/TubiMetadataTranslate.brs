@@ -155,8 +155,8 @@ Function tubiMetadataTranslate_getTitleImageUrl(contentFromServer)
   title = ""
   if contentFromServer <> invalid
     imagesList = contentFromServer.images
-    if imagesList <> invalid AND imagesList.title_tb <> invalid AND type(imagesList.title_tb) = "roArray" AND imagesList.title_tb.count() > 0
-      title = imagesList.title_tb[0]
+    if imagesList <> invalid AND imagesList.title_art <> invalid AND type(imagesList.title_art) = "roArray" AND imagesList.title_art.count() > 0
+      title = imagesList.title_art[0]
     end if
   end if
 
