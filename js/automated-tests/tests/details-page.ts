@@ -442,12 +442,13 @@ describe('Details Page', function () {
 
       // Make sure we're on movies page
       await testUtils.waitForCurrentScreenToEqual('movieScreen');
+      await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
       //Select title
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Verify that we got the same item otherwise we aren't actually confirming if resume went away
-      await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle', 'Title not shown', 10000);
+      await testUtils.waitForElementToShowOnScreen('detailScreenTitle', 'Title not shown', 6000);
       const secondScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
       expect(firstScreenTitle.text).to.equal(secondScreenTitle.text);
 

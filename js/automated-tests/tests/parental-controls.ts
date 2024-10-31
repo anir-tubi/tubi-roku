@@ -206,11 +206,11 @@ describe('Parental Controls', function () {
         // Check Ratings label
         const categoryRatingsLabel = await testUtils.getNodeForElement('categoryRatingsLabel');
         await testUtils.waitForGridContentToLoad('categoryPageGrid');
-        const rowItemsContent = await testUtils.getAllGridItemsContent('categoryPageGrid');
+        const rowItemsContent = await testUtils.getAllGridItemsContent('channelsVideoGrid');
 
 
         for (const itemContent of rowItemsContent) {
-          const rating = itemContent.ratings[0].value;
+          const rating = itemContent.rating[0].value;
           expect(rating).to.not.equal('R');
           expect(rating).to.not.equal('MA');
           expect(rating).to.not.equal('PG-13');
@@ -452,7 +452,7 @@ describe('Parental Controls', function () {
 
       // Send adult title text
       await testUtils.waitForElementToFullyShowOnScreen('searchGrid');
-      await ecp.sendText('viewer discrection advised');
+      await ecp.sendText('sex');
       await testUtils.waitForElementToFullyShowOnScreen('noResultsMessage');
 
       // Verify no result for Older Kids level

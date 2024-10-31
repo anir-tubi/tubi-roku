@@ -87,10 +87,11 @@ describe('Live', function () {
     it('C114058 - Live News - When a user changes channels during playback, playback for the updated channel should be near instantaneous @live', async () => {
  
         // Navigate to the Live News Row
+        await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
         await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
 
         // Verify that linear preview video is playing
-        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 20000);
+        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 7000);
 
         // Navigate right
         await ecp.sendKeypress(ecp.Key.Right);

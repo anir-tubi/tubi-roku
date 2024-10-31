@@ -2510,27 +2510,27 @@ const elements = typeCheckElements({
 
   // Oops wrong password dialog
   wrongPasswordDialog: {
-    keyPath: '#ContentController.#ec0af27.#DialogBox.#ContentArea'
+    keyPath: '#ContentController.#3ed8ba8.#DialogBox.#ContentArea'
   },
 
   // Oops wrong password dialog title
   wrongPasswordTitle: {
-    keyPath: '#ContentController.#ec0af27.#DialogBox.#ContentArea.#Title'
+    keyPath: '#ContentController.#3ed8ba8.#DialogBox.#ContentArea.#Title'
   },
 
   // Oops wrong password dialog message
   wrongPasswordMessage: {
-    keyPath: '#ContentController.#ec0af27.#DialogBox.#ContentArea.#MessageGroup.#Message'
+    keyPath: '#ContentController.#3ed8ba8.#DialogBox.#ContentArea.#MessageGroup.#Message'
   },
 
   // Oops wrong password dialog Forgot Password button
   wrongPasswordForgotButton: {
-    keyPath: '#ContentController.#ec0af27.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText'
+    keyPath: '#ContentController.#3ed8ba8.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText'
   },
 
   // Oops wrong password dialog Retry button
   wrongPasswordRetryButton: {
-    keyPath: '#ContentController.#ec0af27.#DialogBox.#ContentArea.#ButtonList.1.#buttonTextParent.#buttonText'
+    keyPath: '#ContentController.#3ed8ba8.#DialogBox.#ContentArea.#ButtonList.1.#buttonTextParent.#buttonText'
   },
 
   // title of Help is on the way! screen after user select Forgot Password

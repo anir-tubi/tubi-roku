@@ -468,14 +468,14 @@ describe('Browse While Watching', function () {
         await verifyBrowseInPlayer();
 
         // Select another movie title from YMAL
-        await utils.sleep(700);
+        await utils.sleep(1500);
         await ecp.sendKeypress(ecp.Key.Right,  {count:2, wait:2000}); 
         await testUtils.waitForElementToFullyShowOnScreen('bWWTitle');
         const titleC = await testUtils.getNodeForElement('bWWTitle');
-        await ecp.sendKeypress(ecp.Key.Ok); 
+        await ecp.sendKeypress(ecp.Key.Ok, {wait:2000}); 
         
         // Create some history
-        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 15000);
+        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 5000);
         await ecp.sendKeypress(ecp.Key.Ok, {wait:2000});
         await ecp.sendKeypress(ecp.Key.Right, { count: 2 });
         await testUtils.waitForElementToFullyShowOnScreen('fastForwardButton');
