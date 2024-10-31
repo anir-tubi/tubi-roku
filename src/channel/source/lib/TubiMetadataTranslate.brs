@@ -296,7 +296,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     else if contentFromServer.series_id <> invalid
       translatedContent.parentId = "0" + contentFromServer.series_id
     else if contentFromServer.parent_id <> invalid
-      ' We are assigning the parent ID provided by the server to help identify the parent of trailers when using shortform deeplinks
+      ' We are assigning the parent ID provided by the server to help identify the parent of trailers when using shortFormVideo deeplinks
       translatedContent.parentId = contentFromServer.parent_id
     else
       translatedContent.parentId = invalid

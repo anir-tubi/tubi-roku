@@ -15,7 +15,7 @@
 ' Deep link args:
 '   contentId    - string identifier
 '   entry        - 'banner' or omitted for search source
-'   mediaType    - "season", "series", "episode", "movie", "shortform", "tvspecial" and "livefeed"
+'   mediaType    - "season", "series", "episode", "movie", "shortFormVideo", "tvspecial" and "livefeed"
 '   entry        - string, custom parameter, used for tracking the source of deeplinks, passed to referred analytics events
 '   deviceId     - string, custom paramater, the device id of the device sending the deeplink (used when mobile "casts" to roku)
 '   resumeTime   - integer, custom paramater, the position from which a deeplink should resume (used when mobile "casts" to roku)
@@ -90,9 +90,9 @@ Function createDeeplinkContentFromStartupArgs(args)
     else if args.mediaType = "episode"
       content.type = "video"
       content.deeplinkType = "episode"
-    else if args.mediaType = "shortform"
+    else if args.mediaType = "shortFormVideo"
       content.type = "video"
-      content.deeplinkType = "shortform"
+      content.deeplinkType = "shortFormVideo"
     else if args.mediaType = "livefeed"
       content.type = "linear"
       content.deeplinkType = "linear"
@@ -281,8 +281,8 @@ Function handleDeeplinkContentByType()
     else if m.deepLinkContent.deeplinktype = "sports"
       ' TODO: Remove the additional request and call showSportsDetailsScreen directly.
       getSingleContentFromServer(m.deeplinkContent, onDeeplinkSportsContentSuccess, showDeeplinkErrorModal)
-    else if m.deepLinkContent.deeplinktype = "shortform"
-      ' Shortform media refers to content that is under 15 minutes long. Examples include movie trailers, news snippets, comedy clips, food reviews, and similar videos.
+    else if m.deepLinkContent.deeplinktype = "shortFormVideo"
+      ' shortFormVideo media refers to content that is under 15 minutes long. Examples include movie trailers, news snippets, comedy clips, food reviews, and similar videos.
       ' In our app, it primarily features movie trailers
       getSingleContentFromServer(m.deeplinkContent, onDeeplinkShortFormContentSuccess, handleSingleContentDeeplinkError)
     else
@@ -785,7 +785,7 @@ Function handleDeeplinkVideoSuccessResponse(refreshedContent, successCb = invali
 End Function
 
 
-' success handler upon fetching the trailer in case of shortForm deeplinks.
+' success handler upon fetching the trailer in case of shortFormVideo deeplinks.
 ' @refreshedContent: roSGNode, success video response content
 ' @successcb: success callback which will handle the success response after fetching the content metadata for the movie associated with the trailer that was deeplinked to.
 ' @errorcb: errorCallback which will handle error while fetching video for provided contentId
