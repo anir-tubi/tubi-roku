@@ -929,14 +929,6 @@ Function onHomescreenContentReady(msg)
 
     if currentScreen <> invalid AND currentScreen.isSubType("HomeScreen") = true
       trackingPageInfo = homeScreen.trackingPageInfo
-      pageValues = trackingPageInfo.pageValues
-
-      ' pageValues will always be a valid aa, just adding a check for additional safety.
-      if pageValues <> invalid AND isNonEmptyString(homeScreen.personalizationId) = true
-        pageValues.personalization_id = homeScreen.personalizationId
-      end if
-      trackingPageInfo.pageValues = pageValues
-
       screenTrackingLoad(trackingPageInfo, loadTime)
 
       'show registration welcome Screen only to new user over homescreen.
@@ -944,9 +936,7 @@ Function onHomescreenContentReady(msg)
       if hasRegModalBeenShown() = false
         showRegistrationWelcomeModal()
       end if
-
     end if
-
   end if
 End Function
 
@@ -1034,7 +1024,6 @@ Function showRegistrationWelcomeModal()
     }
   }
 
-
   modalInfo = {
     header: header
     subHeader: subHeader
@@ -1068,7 +1057,6 @@ Function showRegistrationWelcomeModal()
   buttonInfo.push(buttonTwo)
 
   showMultiStyleModal(modalInfo, buttonInfo)
-
 End Function
 
 

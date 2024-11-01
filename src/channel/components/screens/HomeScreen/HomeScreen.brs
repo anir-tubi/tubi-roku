@@ -15,21 +15,23 @@ Function init()
 
   m.ContentArea.translation = [0, 516]
 
-  m.top.observeField("focusedChild", "onScreenFocusChange")
-  m.top.observeFieldScoped("signedIn", "onSignedInChange")
-  m.top.observeField("categoryMenuVisible", "onCategoryMenuVisible")
-  m.top.observeField("isLoading", "onLoadingChange")
-  m.top.observeField("resetContentAreaValues", "onResetContentAreaValues")
-  m.top.observeField("id", "onIDChange")
-  m.top.observeField("fullscreenCountdown", "onFullscreenCountdown")
-  m.top.observeField("transportVoiceRequest", "onTransportVoiceRequest")
-  m.CategoryRefreshTimer = m.top.findNode("CategoryRefreshTimer")
+  topRef = m.top
+  topRef.observeField("focusedChild", "onScreenFocusChange")
+  topRef.observeFieldScoped("signedIn", "onSignedInChange")
+  topRef.observeField("categoryMenuVisible", "onCategoryMenuVisible")
+  topRef.observeField("isLoading", "onLoadingChange")
+  topRef.observeField("resetContentAreaValues", "onResetContentAreaValues")
+  topRef.observeField("id", "onIDChange")
+  topRef.observeField("fullscreenCountdown", "onFullscreenCountdown")
+  topRef.observeField("transportVoiceRequest", "onTransportVoiceRequest")
+  topRef.observeFieldScoped("personalizationId", "onPersonalizationIdChanged")
+  m.CategoryRefreshTimer = topRef.findNode("CategoryRefreshTimer")
   m.CategoryRefreshTimer.duration = m.constants.timers.categoryContentRefreshTimeout
   m.CategoryRefreshTimer.observeField("fire", "onCategoryRefreshTimer")
   m.CategoryRefreshTimer.control = "start"
 
   'Content area
-  m.CategoryGridList = m.top.findNode("CategoryGridList")
+  m.CategoryGridList = topRef.findNode("CategoryGridList")
   m.CategoryGridList.observeField("itemSelected", "onGridItemSelected")
   m.CategoryGridList.observeField("itemFocused", "onGridFocusChange")
   m.CategoryGridList.observeField("reloadedItemToBeFocused", "onItemToBeFocusedChange")
@@ -44,14 +46,14 @@ Function init()
   m.gridHasGainedInitialFocus = false
 
   'set initial tracking values
-  m.top.trackingPageInfo = {
+  topRef.trackingPageInfo = {
     pageType: ""
     pageValues: {}
   }
 
-  m.top.handlesTransportVoiceRequests = true
+  topRef.handlesTransportVoiceRequests = true
 
-  m.top.screenLevel = m.constants.ui.screenLevels.homeScreen
+  topRef.screenLevel = m.constants.ui.screenLevels.homeScreen
 
   ' lastFocusPosition holds the state of currFocusRow the last time onCurrFocusRow() occurred.
   ' It is reset to -1 at the conclusion of a grid scroll animation.
@@ -124,6 +126,17 @@ Function onIDChange()
   m.top.trackingPageInfo = newTrackingPageInfo
   m.categoryGridList.parentScreenId = m.top.id
   m.categoryGridList.parentScreenTrackingPageInfo = newTrackingPageInfo
+End Function
+
+
+Function onPersonalizationIdChanged(msg)
+  personalizationId = msg.getData()
+  trackingPageInfo = m.top.trackingPageInfo
+
+  if isAA(trackingPageInfo) = true AND isAA(trackingPageInfo.pageValues) = true
+    trackingPageInfo.pageValues.personalization_id = personalizationId
+    m.top.trackingPageInfo = trackingPageInfo
+  end if
 End Function
 
 
