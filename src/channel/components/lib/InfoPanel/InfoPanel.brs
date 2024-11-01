@@ -12,7 +12,7 @@ Function init()
 
   m.title = m.top.findNode("Title")
   m.titleImage = m.top.findNode("TitleImage")
-  m.titleImage.loadWidth = 600
+  ' We are only limiting the height since title logo is displayed on it's own row we are good to let the width flow.
   m.titleImage.loadHeight = m.constants.ui.imageSizes.title[1]
   m.titleImage.height = m.constants.ui.imageSizes.title[1]
   m.episode = m.top.findNode("Episode")

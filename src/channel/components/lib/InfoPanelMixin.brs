@@ -335,11 +335,6 @@ Function populateInfoPanelWithPurpleCarpetBannerMode(content, infoPanel)
   infoPanel.lineTwoData = lineTwoData
 
   infoPanel.description = content.description
-  if content.titleImage <> invalid
-    infoPanel.titleImageUri = content.titleImage
-  else
-    infoPanel.titleImageUri = ""
-  end if
 
   hasVideoresources = content.hasVideoresources
   airDatetime = content.airDatetime
