@@ -239,8 +239,8 @@ Function onScreenChange()
   processQueuedInAppMessage()
 
   ' We will make a call to listing api only if the initial home screen tensor api call returned the purple carpet container
-  ' and m.purpleCarpetContainerContentNode is not equal to invalid.
-  if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND m.isApplicationSuspendInProgress = false
+  ' and purpleCarpetContent is not equal to invalid.
+  if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND m.isApplicationSuspendInProgress = false AND currentScreen.purpleCarpetContent <> invalid
     getFoxListingItemsAndRefreshPurpleCarpetContainerData()
   end if
 End Function

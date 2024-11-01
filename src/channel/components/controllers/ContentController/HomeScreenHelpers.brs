@@ -860,7 +860,7 @@ Function onContentSelected(msg)
   m.autoplayContext = homeScreen.currCategoryId
 
   contentType = content.type
-  if contentType = m.constants.ui.contentTypes.purpleCarpetEvent AND homeScreen.purpleCarpetContent <> invalid
+  if contentType = m.constants.ui.contentTypes.purpleCarpetEvent
     processPlayEvent(content, homeScreen)
   else if contentType = m.constants.uapiContentTypes.channel
     stopVideoPreview()
@@ -1284,7 +1284,7 @@ Function processPlayEvent(event, screen, wasPlayEventInitiatedFromCtaComponent =
     ' Reason behind conditional launching of details screen is because we use this helper across home and deeplinking and both rowlist and primary event button list
     ' If the user clicks sign in to watch from home CTA or event details CTA we do not want to land the user in details screen but just refresh the current screen UI.
     ' it will update the button from "signin to watch" to "details"
-    showEventDetailScreen(event.id, screen.purpleCarpetContent)
+    showEventDetailScreen(event.id, screen.purpleCarpetContent, event)
   end if
 End Function
 

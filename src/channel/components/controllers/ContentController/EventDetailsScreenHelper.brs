@@ -29,7 +29,9 @@ Function showEventDetailScreen(eventId, purpleCarpetContainerContent = invalid, 
     if onScreenLoadCompletionCallback <> invalid
       onScreenLoadCompletionCallback()
     end if
+    screen.contentIsReady = true
   else if eventContent <> invalid
+    screen.contentIsReady = false
     m.eventDetailsScreenLoadCompletionCallback = onScreenLoadCompletionCallback
     m.singlePurpleCarpetEventContentNode = eventContent
     ' Making a call to fetch container info.
@@ -134,6 +136,8 @@ Function updateEventDetailsPurpleCarpetContent(purpleCarpetContainer, _screenId)
       m.eventDetailsScreenLoadCompletionCallback = invalid
       callback()
     end if
+
+    screen.contentIsReady = true
   end if
 End Function
 

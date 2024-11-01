@@ -19,6 +19,8 @@
 
       <field id="trackingLoadStartTime" type="integer" />
 
+      <field id="contentIsReady" type="boolean" alias="detailsPurpleCarpetRow.visible" />
+
     <!-- OUTPUTS -->
       <field id="eventCtaListItemSelected" alias="detailsPurpleCarpetRow.ctaListItemSelected" alwaysNotify="true" />
 
