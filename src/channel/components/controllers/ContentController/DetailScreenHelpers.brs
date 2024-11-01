@@ -253,7 +253,14 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     detailScreen.isLoading = false
 
     ' don't show related content if the user is in any of the kids modes
-    detailScreen.showRelated = not isKidsUIOn()
+
+    if isKidsUIOn() = true
+      detailScreen.showRelated = false
+
+      if m.detailScreenHorizMenuExp = true AND content.type = m.constants.ui.contentTypes.series
+        detailScreen.showRelated = true
+      end if
+    end if
 
     ' don't allow add to/remove from my list if the user is age gated
     if m.uiMode = m.constants.ui.modes.kidsAgeGate
