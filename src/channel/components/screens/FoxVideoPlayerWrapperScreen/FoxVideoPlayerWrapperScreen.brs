@@ -78,11 +78,11 @@ Function buildPlayerInfo(contentId)
     "isautoplay": false,
     "isfola": true,
     "isliveplaybackstart": true,
-    "isplayback4k": false,
+    "isplayback4k": true,
     "playfrombeginning": false,
     "sourcename": "live",
     "sourcetype": "EPG",
-    "streamcapabilities": "720p",
+    "streamcapabilities": "HDR",
   }
 
   videoContentNode.setFields({

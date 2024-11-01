@@ -8,7 +8,7 @@ Function playLinearVideoWithFoxPlayer(content)
     ' m.global.update({
     '   proxyParameters: {
     '     "isProxyEnabled": true
-    '     "proxyIp": "192.168.1.153"
+    '     "proxyIp": "192.168.10.117"
     '   }
     ' }, true)
 
@@ -395,9 +395,6 @@ Function getFoxVideoPlayerConfig()
       "ppvLimitSeconds": 28800,
       "vodLimitSeconds": 28800
     },
-    "streamTypes": {
-      "disabled": true
-    },
     "theme": {
       "color": {
         "black": "#101010",
@@ -412,6 +409,40 @@ Function getFoxVideoPlayerConfig()
     "upNextDurationMovie": 60,
     "upNextDurationSeries": 30,
     "video": {
+      "streamTypes": {
+        "default": {
+          "colorSpace": "SDR",
+          "maxRes": "720p",
+          "value": "720p"
+        },
+        "disabled": false,
+        "headers": {
+          "X-Dcg-Capabilities": "maxRes={maxRes};maxColorSpace={colorSpace}"
+        },
+        "types": [
+          {
+            "id": "HDR",
+            "requires": {
+              "maxRes": "UHD",
+              "colorSpace": "HDR"
+            },
+            "value": "UHD/HDR"
+          },
+          {
+            "id": "SDR",
+            "requires": {
+              "maxRes": "UHD",
+              "colorSpace": "SDR"
+            },
+            "value": "UHD/SDR"
+          },
+          {
+            "id": "720p",
+            "requires": {},
+            "value": "720p"
+          }
+        ]
+      },
       "playback": {
         "autoplayContent": {
           "@reference": "DCGPDR-4833",
@@ -486,40 +517,6 @@ Function getFoxVideoPlayerConfig()
           "vod": {
             "startingBitRate": 2500
           }
-        },
-        "streamTypes": {
-          "default": {
-            "colorSpace": "SDR",
-            "maxRes": "720p",
-            "value": "720p"
-          },
-          "disabled": false,
-          "headers": {
-            "X-Dcg-Capabilities": "maxRes={maxRes};maxColorSpace={colorSpace}"
-          },
-          "types": [
-            {
-              "id": "HDR",
-              "requires": {
-                "maxRes": "UHD",
-                "colorSpace": "HDR"
-              },
-              "value": "UHD/HDR"
-            },
-            {
-              "id": "SDR",
-              "requires": {
-                "maxRes": "UHD",
-                "colorSpace": "SDR"
-              },
-              "value": "UHD/SDR"
-            },
-            {
-              "id": "720p",
-              "requires": {},
-              "value": "720p"
-            }
-          ]
         },
         "trickplay": {
           "enabled": true,
