@@ -119,6 +119,7 @@ Function populateInfoPanel(item)
     m.infoPanel.width = 510
     m.infoPanel.episodeTitle = item.title
     m.infoPanel.description = item.description
+    m.infoPanel.maxDescriptionLines = 2
 
     lineOneData = {}
     lineOneData.length = item.length

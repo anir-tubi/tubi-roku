@@ -1081,7 +1081,10 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
   tubiLog("DetailScreen.onKeyEvent key = " + key)
   if press then
     if key = "back"
-      if not m.top.isWaitingForServerResponse
+      if m.RelatedContentParentGroup.isInFocusChain() = true
+        focusMenu()
+        return true
+      else if (m.top.isWaitingForServerResponse <> true)
         m.top.backButtonPressed = true
         return true
       end if
