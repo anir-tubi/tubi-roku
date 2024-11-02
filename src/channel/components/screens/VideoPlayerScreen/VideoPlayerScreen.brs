@@ -1962,7 +1962,11 @@ Function getPlayProgressEvent(callSource = "")
     'but is still sent via this interface
     if m.Video.streamInfo <> invalid AND m.Video.streamInfo.measuredBitrate <> invalid
       'measuredBitrate appears to be reported in bits despite the documentation that it is kibibits
-      playProgressEvent.values.nominal_speed = Int(m.Video.streamInfo.measuredBitrate / (10^6))
+      measuredBitrate = Int(m.Video.streamInfo.measuredBitrate / 1000000) 'dividing by 10^6
+
+      if measuredBitrate >= 0
+        playProgressEvent.values.nominal_speed = measuredBitrate
+      end if
     end if
   end if
 
