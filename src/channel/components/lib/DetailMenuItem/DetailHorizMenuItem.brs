@@ -3,6 +3,7 @@ Function init()
   topRef.observeFieldScoped("itemContent", "onItemContentChange")
   topRef.observeFieldScoped("focusPercent", "onFocusPercentChange")
   topRef.observeFieldScoped("gridHasFocus", "onFocusPercentChange")
+  topRef.observeFieldScoped("itemHasFocus", "onFocusPercentChange")
 
   m.icon = topRef.findNode("menuItemIcon")
   m.iconFocused = topRef.findNode("menuItemIconFocused")
@@ -169,7 +170,7 @@ End Function
 Function onFocusPercentChange()
   focusPercent = m.top.focusPercent
 
-  if m.top.gridHasFocus = true
+  if m.top.gridHasFocus = true OR m.top.itemHasFocus = true
     updateUnfocusedFraction(1 - focusPercent)
     updateFocusedFraction(focusPercent)
   else
