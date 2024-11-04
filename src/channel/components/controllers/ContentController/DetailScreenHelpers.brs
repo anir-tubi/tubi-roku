@@ -2434,6 +2434,7 @@ End Function
 
 Function onEpisodeSelectedFromEpisodeOverlay(msg)
   detailScreen = msg.getRoSGNode()
+  index = msg.getData()
 
   if detailScreen <> invalid AND detailScreen.episodeToPlay <> invalid
     content = detailScreen.episodeToPlay
@@ -2445,6 +2446,17 @@ Function onEpisodeSelectedFromEpisodeOverlay(msg)
     if history <> invalid AND history.nowPos > 0
       nowPos = history.nowPos
       content.nowPos = nowPos
+    end if
+
+    if isArray(index) = true
+      col = index[1] + 1
+      row = index[0] + 1
+      detailScreen.trackingComponentInfo = {
+        componentType: "episode_video_list_component"
+        componentValues: {
+          content_tile: m.Tracking.getAnalyticsTile(content, col, row)
+        }
+      }
     end if
 
     playbackSource = {

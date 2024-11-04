@@ -927,6 +927,7 @@ Function onRelatedContentChange()
         else
           m.movieOverlay.content = relatedContent
           m.movieOverlay.updateContent = true
+          m.movieOverlay.visible = true
         end if
       end if
     else

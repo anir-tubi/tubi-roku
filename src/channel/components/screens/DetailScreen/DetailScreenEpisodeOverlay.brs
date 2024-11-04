@@ -42,7 +42,7 @@ Function init()
 
   'set initial tracking values
   m.top.trackingPageInfo = {
-    pageType: "episode_video_list_page"
+    pageType: "series_detail_page"
     pageValues: {
       series_id: 0
     }
@@ -201,7 +201,7 @@ Function getEpisodeVideoListTrackingPage(series)
   end if
 
   return {
-    type: "episode_video_list_page"
+    type: "series_detail_page"
     values: values
   }
 End Function
@@ -364,7 +364,7 @@ Function onEpisodeFocused(msg)
       m.top.navigateWithinPageInfo = {
         pageOneof: m.Tracking.getAnalyticsPage(seriesDetailPage.type, seriesDetailPage.values)
         componentOneof: m.Tracking.getAnalyticsComponent("episode_video_list_component", episodeListComponent)
-        means_of_navigation: "BUTTON" 'MeansOfNavigation enum
+        means_of_navigation: "SCROLL" 'MeansOfNavigation enum
         vertical_location: row '1 based index
         horizontal_location: col
       }
