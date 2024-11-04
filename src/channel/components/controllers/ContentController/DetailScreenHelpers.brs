@@ -230,7 +230,7 @@ End Function
 'when the content should be refreshed, make getRelatedContent to display the YMAL in detail screen
 Function onRefreshRelatedContentSignal(msg)
   detailScreen = msg.getRoSGNode()
-  detailScreen.showRelatedContent = false
+  detailScreen.showRelated = false
   getRelatedContent(detailScreen.content)
 End Function
 
@@ -493,6 +493,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     'updateEpisodeOverlayContent is used to trigger the episode overlay updates with seasons/episode list.
     if m.detailScreenHorizMenuExp = true AND content.type = m.constants.ui.contentTypes.series
       detailScreen.updateEpisodeOverlayContent = true
+      detailScreen.showRelated = true
     end if
 
     if shouldResetButtonIndex = true

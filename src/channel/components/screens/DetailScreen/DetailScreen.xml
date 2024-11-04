@@ -209,8 +209,6 @@
 
       <field id="refreshRelatedContent" type="boolean" alwaysNotify="true" />
 
-      <field id="showRelatedContent" alias="RelatedContentGroup.visible" />
-
       <!-- Holds a load time start value [returned from UpTime()] that can be used to determine how long the page took to load.
            Used when showing a series/episode page
       -->

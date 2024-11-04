@@ -930,13 +930,15 @@ Function onRelatedContentChange()
         end if
       end if
     else
-      if m.top.isSeries = false
+      if m.top.content <> invalid AND m.top.content.type = m.constants.ui.contentTypes.series
+        m.RelatedContentParentGroup.visible = true
+      else
         m.RelatedContentParentGroup.visible = false
+        if m.RelatedContentParentGroup.isInFocusChain() = true
+          focusMenu()
+        end if
       end if
 
-      if m.RelatedContentParentGroup.isInFocusChain() = true
-        focusMenu()
-      end if
     end if
   end if
 End Function
