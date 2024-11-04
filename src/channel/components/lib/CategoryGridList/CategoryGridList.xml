@@ -192,7 +192,6 @@
       itemSpacing="[0, 32]"
       rowItemSpacing="[[16,0]]"
       showRowCounter="[false]"
-      fadeFocusFeedbackWhenAutoScrolling="true"
       focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
       focusFootprintBitmapUri="pkg:/images/transparent.png"
       rowFocusAnimationStyle="floatingFocus"
