@@ -48,7 +48,7 @@ Function onEventDetailsBackgroundChange(msg)
   detailScreen = msg.getRoSGNode()
   if detailScreen.isInFocusChain() = true
     m.backgroundGroup.backgroundInfo = {
-      type: m.constants.ui.backgroundTypes.topright
+      type: m.constants.ui.backgroundTypes.spotlight
       uriList: detailScreen.backgroundUriList
     }
   end if

@@ -1698,8 +1698,9 @@ Function setVideoContentScreenBackground(screen)
     end if
 
     isSpotlightRowContent = isCurrentScreenHomeScreen() = true AND gridItemType = m.constants.ui.gridItemTypes.spotlight
+    isPurpleCarpetContent = (gridItemType = m.constants.ui.gridItemTypes.purpleCarpet)
     if videoPreviewState = "playing" OR videoPreviewState = "paused" OR videoPreviewState = "buffering" OR isVideoPreviewPlayQueued = true
-      if isSpotlightRowContent = true
+      if isSpotlightRowContent = true OR isPurpleCarpetContent = true
         backgroundType = m.constants.ui.backgroundTypes.spotlight
       else
         backgroundType = m.constants.ui.backgroundTypes.epg

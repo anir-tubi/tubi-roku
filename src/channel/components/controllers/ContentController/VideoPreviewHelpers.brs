@@ -98,8 +98,9 @@ Function onVideoPreviewStateChanged(msg)
       if currentScreen.subType() = "DetailScreen" OR currentScreen.subType() = "DetailScreenHoriz"
         item = currentScreen.content
       end if
-
-      isFullPlayerBlockedForUser = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR ( item <> invalid AND item.needsLogin = true AND isloggedInUser() = false)
+      
+      isPurpleCarpetContent = (item <> invalid AND item.gridItemType = m.constants.ui.gridItemTypes.purpleCarpet)
+      isFullPlayerBlockedForUser = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR ( item <> invalid AND item.needsLogin = true AND isloggedInUser() = false) OR (isPurpleCarpetContent = true)
 
       ' Don't want to continue playback if the user has their tv turned off
       if m.maintask.isHdmiStatusOk = true AND isFullPlayerBlockedForUser = false
@@ -144,7 +145,7 @@ Function startVideoPreview(content, pageInfo = {})
     videoPreview = m.videoPreviewPlayer
 
     ' If the experiment is enabled and focused content is from featured row than expand preview to full screen.
-    if content.gridItemType = m.constants.ui.gridItemTypes.spotlight
+    if content.gridItemType = m.constants.ui.gridItemTypes.spotlight OR content.gridItemType = m.constants.ui.gridItemTypes.purpleCarpet
       ' Reducing 1px from both width and height since the player is in background and keeping full width causes roku to display closed captioning overlay.
       ' To avoid any other Roku OS level default behaivour from kicking in reducing 1px to give a impression that player is not in full screen.
       updatePreviewPlayerToFullScreen()
@@ -222,6 +223,8 @@ Function setVideoPreviewAfterFocus(focusedContent, pageInfo = {})
             if isCurrentScreenHomeScreen() = true
               updatePreviewPlayerToFullScreen()
             end if
+          else if focusedContent.gridItemType = m.constants.ui.gridItemTypes.purpleCarpet
+            updatePreviewPlayerToFullScreen()
           end if
         end if
         m.backgroundGroup.posterVisible = false
