@@ -1689,5 +1689,29 @@
   "available_at_toast_subheading": {
     "description": "Toast message subheading that is displayed when we click on a available at button",
     "message": "We know you're excited. So are we!"
+  },
+  "sign_in_error_screen_heading": {
+    "description": "Sign in error screen heading default error",
+    "message": "We can't sign you in right now"
+  },
+  "sign_in_error_screen__default_subheading": {
+    "description": "Sign in error screen heading default error",
+    "message": "You can still watch your favorite movies and TV shows as a guest."
+  },
+  "sign_in_error_screen__purple_carpet_day_subheading": {
+    "description": "Sign in error screen heading default error",
+    "message": "You can still watch your favorite movies and TV shows as a guest, including the tournament!"
+  },
+  "sign_up_error_screen_heading": {
+    "description": "Sign in error screen heading default error",
+    "message": "We can't create an account for you right now"
+  },
+  "sign_up_error_screen__default_subheading": {
+    "description": "Sign in error screen heading default error",
+    "message": "You can still watch your favorite movies and TV shows as a guest.\nWe'll send you an email to try again later."
+  },
+  "sign_up_error_screen__purple_carpet_day_subheading": {
+    "description": "Sign in error screen heading default error",
+    "message": "You can still watch your favorite movies and TV shows as a guest, including the tournament!\nWe'll send you an email to try again later."
   }
 }

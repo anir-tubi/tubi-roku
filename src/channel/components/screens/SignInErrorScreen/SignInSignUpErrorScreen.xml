@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="SignInSignUpErrorScreen" extends="BaseScreen">
+  <script type="text/brightscript" uri="SignInSignUpErrorScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+
+  <interface>
+    <!-- INPUT -->
+    <!-- Holds the user action. Possible values "signIn", "signUp" -->
+    <field id="action" type="string" />
+
+    <!-- OUTPUT -->
+    <!-- Holds selected status for the exit button. -->
+    <field id="continueButtonSelected" type="string" alias="continueBtn.selected" alwaysNotify="true" />
+  </interface>
+
+  <children>
+     <LayoutGroup
+        horizAlignment="custom"
+        translation="[0, 297]"
+        itemSpacings="[24, 40, 72]" >
+        <Poster
+          width="270"
+          height="117"
+          translation="[825, 0]"
+          uri="pkg:/images/signin-error-screen-icon.webp"/>
+        <Label
+          id="heading"
+          horizAlign="center"
+          width="1920">
+          <Font
+            role="font"/>
+        </Label>
+        <Label
+          id="subheading"
+          horizAlign="center"
+          wrap="true"
+          width="1920">
+          <Font
+            role="font"/>
+        </Label>
+        <SimpleButton
+          id="continueBtn"
+          width="345"
+          height="72"
+          translation="[780, 0]"
+          fontSize="24"/>
+      </LayoutGroup>
+  </children>
+</component>

@@ -1462,6 +1462,10 @@ Function getConstants()
     constants.consentKeys.continueWatching = "data_sharing"
     constants.consentKeys.functional = "C0003"
 
+  constants.configHubFallbacks = {}
+    constants.configHubFallbacks.majorEventStart = "2025-02-09T05:00:00.000000Z"
+    constants.configHubFallbacks.majorEventEnd = "2025-02-10T08:00:00.000000Z"
+
 
 'THEME/COLOR START///////////////////////
 '//::TODO::colors - the following constants should be moved to themes. The app should not call these constants

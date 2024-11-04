@@ -1099,6 +1099,7 @@ Function popScreenAfterSignInProcess()
     "ConsentScreen": true
     "ManagePreferencesScreen": true
     "RokuCWConsentScreen": true
+    "SignInSignUpErrorScreen": true
   }
 
   count = m.screenStack.getChildCount()-1
@@ -1537,4 +1538,19 @@ Function setOrRemovePurpleCarpetReminderAfterSignIn()
   setOrRemovePurpleCarpetReminder()
   refreshUiAfterSignIn()
   setContentToRefreshAllPersonalizedScreens(true)
+End Function
+
+
+Function showSignInSignUpErrorScreen(action)
+  showContentGroupAndHideSpinner()
+  displayDefaultBackground()
+  screen = CreateObject("roSGNode", "SignInSignUpErrorScreen")
+  screen.action = action
+  pushScreen(screen, true, true)
+  screen.observeFieldScoped("continueButtonSelected", "onSignUpSignInErrorScreenContinueAsGuestUserButtonSelected")
+End Function
+
+
+Function onSignUpSignInErrorScreenContinueAsGuestUserButtonSelected(_)
+  popScreenAfterSignInProcess()
 End Function
