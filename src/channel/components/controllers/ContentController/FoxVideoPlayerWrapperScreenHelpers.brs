@@ -112,6 +112,8 @@ Function onFoxVideoPlayerComponentLibraryLoadStatus(msg)
         strings = {
           "error_contentUnavailableMessage": getTranslation("foxVideoPlayer_error_contentUnavailableMessage"),
           "error_generic": getTranslation("foxVideoPlayer_error_generic"),
+          "global_retryButton": getTranslation("retry"),
+          "global_cancelButton": getTranslation("dialog_button_cancel"),
         }
         foxRpfInstance.callFunc("setStrings", strings)
 
