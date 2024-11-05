@@ -292,6 +292,9 @@ Function addControllerUi()
   ' The content that is currently being used as input to play with the fox video player
   m.foxPlayerCurrentInputContent = invalid
 
+  ' We delay closing the fox video player when the end slate appears so we need to use store the timer for this on m to keep it alive
+  m.foxPlayerEndSlateCloseDelayTimer = invalid
+
   ' Content node for a single purple carpet event. This is used in case of purple carpet event deeplinking and purple carpet banner click.
   m.singlePurpleCarpetEventContentNode = invalid
 

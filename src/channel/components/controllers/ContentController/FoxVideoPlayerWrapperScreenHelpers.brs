@@ -118,12 +118,10 @@ Function onFoxVideoPlayerComponentLibraryLoadStatus(msg)
         foxRpfInstance.callFunc("setStrings", strings)
 
         if foxRpfInstance.playerEvent <> invalid then
-          foxRpfInstance.playerEvent.observeFieldScoped("liveAssetInfo", "onFoxVideoPlayerliveAssetInfoChange")
+          foxRpfInstance.playerEvent.observeFieldScoped("exitStream", "onFoxVideoPlayerExitStreamChange")
           foxRpfInstance.playerEvent.observeFieldScoped("playerPosition", "onFoxVideoPlayerPlayerPositionChange")
         end if
 
-        foxRpfInstance.observeFieldScoped("analyticsEvent", "onFoxVideoPlayerAnalyticsEvent")
-        foxRpfInstance.observeFieldScoped("playbackAnalyticsEvent", "onFoxVideoPlayerPlaybackAnalyticsEvent")
         foxRpfInstance.observeFieldScoped("playerLoaded", "onFoxVideoPlayerLoaded")
         foxRpfInstance.observeFieldScoped("errorInfo", "onFoxVideoPlayerError")
         foxRpfInstance.observeFieldScoped("alertDialogCancelled", "onFoxVideoPlayerAlertDialogCancelledChange")
@@ -493,6 +491,7 @@ Function getFoxVideoPlayerConfig()
           "enabled": false
         },
         "live": {
+          "immediateLiveExitEvent": true,
           "enableControls": true,
         },
         "loop": {
@@ -546,13 +545,18 @@ Function getFoxVideoPlayerConfig()
   return config
 End Function
 
-Function onFoxVideoPlayerAnalyticsEvent(msg)
-  ' print "onFoxVideoPlayerAnalyticsEvent " msg.getData()
+
+Function onFoxVideoPlayerExitStreamChange()
+  m.foxPlayerEndSlateCloseDelayTimer = createObject("roSGNode", "Timer")
+  m.foxPlayerEndSlateCloseDelayTimer.observeField("fire", "onFoxPlayerEndSlateCloseDelayTimerFired")
+  ' We want to delay 60 seconds before we close the player
+  m.foxPlayerEndSlateCloseDelayTimer.duration = 60
+  m.foxPlayerEndSlateCloseDelayTimer.control = "start"
 End Function
 
 
-Function onFoxVideoPlayerPlaybackAnalyticsEvent(msg)
-  ' print "onFoxVideoPlayerPlaybackAnalyticsEvent " msg.getData()
+Function onFoxPlayerEndSlateCloseDelayTimerFired()
+  closeFoxVideoPlayer()
 End Function
 
 
@@ -563,11 +567,6 @@ End Function
 
 Function onFoxVideoPlayerError(msg)
   ' print "onFoxVideoPlayerError " msg.getData()
-End Function
-
-
-Function onFoxVideoPlayerliveAssetInfoChange(msg)
-  ' print "onFoxVideoPlayerliveAssetInfoChange " msg.getData()
 End Function
 
 
@@ -620,6 +619,9 @@ End Function
 
 
 Function closeFoxVideoPlayer()
+  ' We invalidate the foxPlayerEndSlateCloseDelayTimer to prevent it from triggering after the player is closed
+  m.foxPlayerEndSlateCloseDelayTimer = invalid
+
   foxVideoPlayerWrapperScreen = getScreenFromStackById(m.constants.ui.screenIds.foxVideoPlayerWrapperScreen)
   if foxVideoPlayerWrapperScreen <> invalid then
     foxVideoPlayerWrapperScreen.closePlayer = true
@@ -636,15 +638,15 @@ Function onFoxVideoPlayerIsPlayerClosed()
 
   m.foxPlayerCurrentInputContent = invalid
 
-  if getScreenStackSize() > 1 then
-    removeTopMostScreenWithIDFromStack(m.constants.ui.screenIds.foxVideoPlayerWrapperScreen)
-  else
-    currentScreen = getCurrentScreen()
-    if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.foxVideoPlayerWrapperScreen then
-      ' Since this is the only screen in the stack, when we pop it, it will call startChannel() again which will display the homescreen
-      popScreen(false, false)
+  ' We want to remove all screens from the stack until we get to the homescreen. If we do not find the homescreen in the stack then we empty the stack and startChannel() will be called
+  for i=0 to getScreenStackSize() - 1
+    screen = getCurrentScreen()
+    if screen <> invalid AND screen.id = m.constants.ui.screenIds.homeScreen
+      exit for
     end if
-  end if
+
+    popScreen(false, false)
+  end for
 End Function
 
 
