@@ -232,6 +232,16 @@ Function getFoxVideoPlayerConfig()
       "default": "http://config.foxdcg.com/foxnow/roku/img/autoplay-fallback_fox.jpg"
     },
     "backgroundImage": "https://config.foxdcg.com/foxnow/roku/img/new_foxnow_background.png",
+    "beaconservice": {
+      "enabled": false,
+      "api": {
+        "host": "",
+        "path": "/mcvbs"
+      },
+      "concurrency": {
+        "frequency": 60
+      }
+    },
     "bookmarks": {
       "intervalInSeconds": 60,
       "localStorageLimit": 50,
