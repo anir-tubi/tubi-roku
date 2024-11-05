@@ -813,15 +813,17 @@ Function onMenuItemFocused()
     col = m.Menu.itemFocused + 1
 
     pageInfo = m.top.trackingPageInfo
-    m.top.navigateWithinPageInfo = {
-      pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
-      componentOneof: m.Tracking.getAnalyticsComponent("middle_nav_component", m.oldFocusedMenuAnalyticsSection)
-      dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent("dest_middle_nav_component", newFocusedMenuAnalyticsSection)
-      means_of_navigation: "SCROLL" 'MeansOfNavigation enum
+    if pageInfo <> invalid then
+      m.top.navigateWithinPageInfo = {
+        pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+        componentOneof: m.Tracking.getAnalyticsComponent("middle_nav_component", m.oldFocusedMenuAnalyticsSection)
+        dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent("dest_middle_nav_component", newFocusedMenuAnalyticsSection)
+        means_of_navigation: "SCROLL" 'MeansOfNavigation enum
 
-      vertical_location: row '//The row location of the menu item
-      horizontal_location: col '//The column location of the menu item
-    }
+        vertical_location: row '//The row location of the menu item
+        horizontal_location: col '//The column location of the menu item
+      }
+    end if
   end if
 
   m.oldFocusedMenuAnalyticsSection = newFocusedMenuAnalyticsSection
