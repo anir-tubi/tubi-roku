@@ -16,6 +16,8 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
   if content <> invalid
     tubiLog("LinearVideoPlayerScreenHelpers.playLinearVideoContent")
 
+    stopVideoPreview()
+
     if isNonEmptyString(content.playerType) = true AND content.playerType = "fox"
       if bMinimized = false then
         ' We only load when fullscreen

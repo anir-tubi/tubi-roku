@@ -802,8 +802,6 @@ Function selectLinearContent(content)
   '//stop timer and tell player to go fullscreen
   stopCountdownTimer()
   if content <> invalid AND content.type = m.constants.ui.contentTypes.linear
-    stopVideoPreview()
-
     linearContent = getCurrentLinearContent()
     if linearContent <> invalid AND linearContent.id <> invalid AND content.id = linearContent.id
       '//If the user selects the linear content that is already playing, then just maximize it.
