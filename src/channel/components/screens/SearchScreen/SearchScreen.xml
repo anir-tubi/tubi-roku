@@ -12,6 +12,9 @@
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/InfoPanelMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
 
   <interface>
     <!-- INPUT -->
