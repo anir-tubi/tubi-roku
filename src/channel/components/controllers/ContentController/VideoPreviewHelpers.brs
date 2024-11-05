@@ -98,8 +98,8 @@ Function onVideoPreviewStateChanged(msg)
       if currentScreen.subType() = "DetailScreen" OR currentScreen.subType() = "DetailScreenHoriz"
         item = currentScreen.content
       end if
-      
-      isPurpleCarpetContent = (item <> invalid AND item.gridItemType = m.constants.ui.gridItemTypes.purpleCarpet)
+
+      isPurpleCarpetContent = (item <> invalid AND (item.gridItemType = m.constants.ui.gridItemTypes.purpleCarpet OR item.gridItemType = m.constants.ui.gridItemTypes.banner))
       isFullPlayerBlockedForUser = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR ( item <> invalid AND item.needsLogin = true AND isloggedInUser() = false) OR (isPurpleCarpetContent = true)
 
       ' Don't want to continue playback if the user has their tv turned off

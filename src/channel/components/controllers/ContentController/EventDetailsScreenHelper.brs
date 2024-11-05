@@ -52,6 +52,16 @@ Function onEventDetailsBackgroundChange(msg)
       uriList: detailScreen.backgroundUriList
     }
   end if
+  
+  videoPreviewState = getVideoPreviewState()
+  isVideoPreviewPlayQueued = false
+  if m.videoPreviewPlayer <> invalid AND m.queuedVideoPlayerCommand <> invalid AND m.videoPreviewPlayer.isSameNode(m.queuedVideoPlayerCommand.videoPlayerNode) = true AND m.queuedVideoPlayerCommand.command = "play" then
+    isVideoPreviewPlayQueued = true
+  end if
+
+  if videoPreviewState = "playing" OR videoPreviewState = "paused" OR videoPreviewState = "buffering" OR isVideoPreviewPlayQueued = true
+    updatePreviewPlayerToFullScreen()
+  end if
 End Function
 
 
