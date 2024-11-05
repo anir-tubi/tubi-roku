@@ -141,6 +141,7 @@ Function populateInfoPanelWithPurpleCarpetMode(content, infoPanel, isEventDetail
   availabilityType = info.availabilityType
 
   lineOneData = {}
+  lineOneData.genres = content.genres
   lineOneData.hasCC = content.hasSubtitles
   lineOneData.hasAudioDescription = content.hasAudioDescription
   lineOneData.length = content.length
@@ -321,6 +322,7 @@ Function populateInfoPanelWithPurpleCarpetBannerMode(content, infoPanel)
   infoPanel.title = content.title
 
   lineOneData = {}
+  lineOneData.genres = content.genres
   lineOneData.hasCC = content.hasSubtitles
 
   if content.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
