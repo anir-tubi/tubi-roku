@@ -715,6 +715,8 @@ Function getConstants()
     constants.headers.json = {"Content-Type": "application/json"}
     constants.headers.platform =  {"x-client-platform": constants.platform}
     constants.headers.clientVersion = {"x-client-version": constants.deviceInfo.clientVersion}
+    constants.headers.tubiPlatform =  {"X-TUBI-PLATFORM": constants.analyticsPlatform}
+
     constants.headers.commonUapi = {}
       constants.headers.commonUapi.append(constants.headers.platform)
       constants.headers.commonUapi.append(constants.headers.clientVersion)
@@ -729,10 +731,6 @@ Function getConstants()
     constants.uapiContentTypes.channel = "channel"
     constants.uapiContentTypes.sportsEvent = "sports_event"
     constants.uapiContentTypes.container = "container"
-
-  constants.serverValues = {}
-    constants.serverValues.tensorVideoRenditions = {}
-      constants.serverValues.tensorVideoRenditions.fourK = "4K_READY"
 
   constants.timers = {}
     constants.timers.remoteComponentTimeout = 30000
@@ -1465,6 +1463,19 @@ Function getConstants()
   constants.configHubFallbacks = {}
     constants.configHubFallbacks.majorEventStart = "2025-02-09T05:00:00.000000Z"
     constants.configHubFallbacks.majorEventEnd = "2025-02-10T08:00:00.000000Z"
+  
+    constants.serverValues = {}
+    constants.serverValues.tensorVideoRenditions = {}
+      constants.serverValues.tensorVideoRenditions.fourK = "4K_READY"
+
+  ' Creates mapping against parental rating to a header string.
+  constants.serverValues.parentalControls = ["YOUNGER_CHILD", "OLDER_CHILD", "TEEN", "ADULT"]
+  
+  constants.serverValues.contentModeHeaders = {}
+    constants.serverValues.contentModeHeaders[constants.ui.contentMode.latino] = "LATINO"
+    constants.serverValues.contentModeHeaders[constants.ui.contentMode.movie] = "MOVIE"
+    constants.serverValues.contentModeHeaders[constants.ui.contentMode.tv] = "TV"
+    constants.serverValues.contentModeHeaders.kids = "KIDS"
 
 
 'THEME/COLOR START///////////////////////

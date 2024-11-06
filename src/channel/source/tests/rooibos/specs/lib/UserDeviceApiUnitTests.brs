@@ -4,7 +4,8 @@
 Function UserDeviceApiSetup()
 
   m.constants = getConstants()
-  utils = ApiUtils(m.constants)
+  pub_serverPersistentData = createObject("roSGNode", "ServerPersistentData")
+  utils = ApiUtils(m.constants, pub_serverPersistentData)
   m.userDeviceApi = UserDeviceApi(m.constants, utils)
   m.emailExistsUrl = m.constants.urls.account.emailExists
   m.signupUrl = m.constants.urls.account.signup

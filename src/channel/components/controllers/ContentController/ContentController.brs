@@ -71,16 +71,19 @@ Function addControllerUi()
   m.mainTask.observeFieldScoped("screensaverTimeout", "onScreensaverTimeoutChange") ' Declared in ScreensaverHelpers.brs
   m.mainTask.observeFieldScoped("lowMemoryEventInfo", "onLowMemoryEventInfoChange")
 
+  ' Holds the value for user/device level settings. For ex: isVideoPreviewOn  or Selected Audio track.
+  m.pub_serverPersistentData = createObject("roSGNode", "ServerPersistentData")
+
   m.Request = TubiRequest(m.constants.settings)
   m.NodeHelpers = TubiNodeHelpers()
-  apiUtilsLib = ApiUtils(m.constants)
+  apiUtilsLib = ApiUtils(m.constants, m.pub_serverPersistentData)
   m.Bookmarks = TubiBookmarks(m.constants)
   m.Tracking = TubiTracking(m.constants, m.tubiAuthUpdate)
   experimentsInfo = getExperimentsInfoFromGlobal()
   experiments = TubiExperiments(experimentsInfo)
   m.cmsApi = CmsApi(m.constants, apiUtilsLib, experiments)
   m.userDeviceApi = UserDeviceApi(m.constants, apiUtilsLib)
-  m.tensorapi = TensorApi(m.constants)
+  m.tensorapi = TensorApi(m.constants, m.pub_serverPersistentData)
   m.rainmakerApi = RainmakerApi(m.constants)
   m.pubSub = TubiPubSub(m)
 
@@ -210,9 +213,6 @@ Function addControllerUi()
   m.trackingLoggingTask.trackEvent = {
     trackType: "startApp"
   }
-
-  ' Holds the value for user/device level settings. For ex: isVideoPreviewOn  or Selected Audio track.
-  m.pub_serverPersistentData = createObject("roSGNode", "ServerPersistentData")
 
   ' Braze Task and Braze helper instance.
   m.brazeTask = invalid

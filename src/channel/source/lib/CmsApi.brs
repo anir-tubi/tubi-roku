@@ -48,7 +48,7 @@ End Function
 
 
 Function cmsApi_createRelatedContentReqInfo(contentId, bKidsMode = false)
-  options = m.getCommonOptions()
+  options = m.getCommonOptions(true)
   options.params["isKidsMode"] = bKidsMode
   options.params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
   options.params = m.setTupianPosterParam(options.params)
@@ -66,7 +66,7 @@ End Function
 Function cmsApi_createUpNextContentReqInfo(passedOptions)
   url = m.constants.urls.autopilot.upNextContent
 
-  options = m.getCommonOptions()
+  options = m.getCommonOptions(true)
   params = options.params
   headers = options.headers
   params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
@@ -98,7 +98,7 @@ End Function
 
 
 Function cmsApi_createSingleContentReqInfo(contentId, includeChannels=false, bKidsMode = false)
-  options = m.getCommonOptions()
+  options = m.getCommonOptions(true)
 
   options.params["content_id"] = contentId
   options.params["isKidsMode"] = bKidsMode
@@ -160,7 +160,7 @@ End Function
 '                 see request.brs for more info
 Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
 
-  options = m.getCommonOptions()
+  options = m.getCommonOptions(true)
   params = options.params
   headers = options.headers
   headers["Accept-Version"] = "6.0.0"
@@ -222,6 +222,14 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
   if passedOptions <> invalid
     if passedOptions.params <> invalid
       params.append(passedOptions.params)
+
+      contentModeHeader = "DEFAULT"
+      if bKidsMode = false AND isNonEmptyString(passedOptions.params.content_mode) = true AND isNonEmptyString(m.constants.serverValues.contentModeHeaders[passedOptions.params.content_mode]) = true
+        contentModeHeader = m.constants.serverValues.contentModeHeaders[passedOptions.params.content_mode]
+      else if bKidsMode = true
+        contentModeHeader = m.constants.serverValues.contentModeHeaders.kids
+      end if
+      headers["X-TUBI-MODE"] = contentModeHeader
     end if
 
     if passedOptions.headers <> invalid
@@ -250,7 +258,7 @@ End Function
 '                 see request.brs for more info
 Function cmsApi_createMiniHomeScreenOnPlayerReqInfo(bKidsMode = false, passedOptions = {})
 
-  options = m.getCommonOptions()
+  options = m.getCommonOptions(true)
   params = options.params
   headers = options.headers
   headers["Accept-Version"] = "6.0.0"
@@ -289,6 +297,14 @@ Function cmsApi_createMiniHomeScreenOnPlayerReqInfo(bKidsMode = false, passedOpt
   if passedOptions <> invalid
     if passedOptions.params <> invalid
       params.append(passedOptions.params)
+
+      contentModeHeader = "DEFAULT"
+      if bKidsMode = false AND isNonEmptyString(passedOptions.params.content_mode) = true AND isNonEmptyString(m.constants.serverValues.contentModeHeaders[passedOptions.params.content_mode]) = true
+        contentModeHeader = m.constants.serverValues.contentModeHeaders[passedOptions.params.content_mode]
+      else if bKidsMode = true
+        contentModeHeader = m.constants.serverValues.contentModeHeaders.kids
+      end if
+      headers["X-TUBI-MODE"] = contentModeHeader
     end if
 
     if passedOptions.headers <> invalid
@@ -316,7 +332,7 @@ End Function
 ' @screenId: String, id of the screen to which is requesting to get large poster sizes from Tupian.
 ' @containerGridItemType: String, gridItemType of the container for which we are making the request.
 Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptions = {}, imageParamTypes = invalid, screenId = "", containerGridItemType = invalid)
-  options = m.getCommonOptions()
+  options = m.getCommonOptions(true)
   params = options.params
   url = m.constants.urls.tensor.cdn.container + "/" + categoryId
 
@@ -359,6 +375,14 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
   if passedOptions <> invalid
     if passedOptions.params <> invalid
       params.append(passedOptions.params)
+
+      contentModeHeader = "DEFAULT"
+      if bKidsMode = false AND isNonEmptyString(passedOptions.params.content_mode) = true AND isNonEmptyString(m.constants.serverValues.contentModeHeaders[passedOptions.params.content_mode]) = true
+        contentModeHeader = m.constants.serverValues.contentModeHeaders[passedOptions.params.content_mode]
+      else if bKidsMode = true
+        contentModeHeader = m.constants.serverValues.contentModeHeaders.kids
+      end if
+      headers["X-TUBI-MODE"] = contentModeHeader
     end if
 
     if passedOptions.headers <> invalid

@@ -23,6 +23,7 @@ Function tubiExternalConfig_getConfigsRequestInfo(constants)
     headers:{}
   }
   options.headers.append(constants.headers.commonUapi)
+  options.headers.append(constants.headers.tubiPlatform)
 
   return {
     url: constants.urls.configHub.config

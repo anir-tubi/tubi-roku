@@ -3,7 +3,8 @@
 '@Setup
 Function CmsApiSetup()
   constants = getConstants()
-  utils = ApiUtils(constants)
+  pub_serverPersistentData = createObject("roSGNode", "ServerPersistentData")
+  utils = ApiUtils(constants, pub_serverPersistentData)
   m.cmsApi = CmsApi(constants, utils)
 End function
 

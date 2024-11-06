@@ -3,7 +3,8 @@
 '@Setup
 Function ApiUtilsSetup()
   constants = getConstants()
-  m.apiUtils = ApiUtils(constants)
+  pub_serverPersistentData = createObject("roSGNode", "ServerPersistentData")
+  m.apiUtils = ApiUtils(constants, pub_serverPersistentData)
 End function
 
 
@@ -38,9 +39,13 @@ Function apiUtils_getCommonOptions_test()
   m.assertEqual(commonOptions.params.app_id, appId)
   m.assertEqual(commonOptions.params.platform, platform)
   m.assertEqual(commonOptions.params.device_id, deviceId)
+  m.assertInvalid(commonOptions.headers["X-TUBI-PLATFORM"])
 
   m.assertEqual(commonOptions.headers["Content-Type"], "application/json")
   m.assertEqual(commonOptions.headers["x-client-platform"], platform)
   m.assertEqual(commonOptions.headers["x-client-version"], clientVersion)
+
+  commonOptions = m.apiUtils.getCommonOptions(true)
+  m.assertEqual(commonOptions.headers["X-TUBI-PLATFORM"], m.apiUtils.constants.analyticsPlatform)
 
 End Function

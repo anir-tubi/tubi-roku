@@ -3,7 +3,8 @@
 '@Setup
 Function TensorApiSetup()
   constants = getConstants()
-  m.tensorApi = TensorApi(constants)
+  pub_serverPersistentData = createObject("roSGNode", "ServerPersistentData")
+  m.tensorApi = TensorApi(constants, pub_serverPersistentData)
 End function
 
 

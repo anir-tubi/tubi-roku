@@ -1,10 +1,11 @@
 
 ' Thin wrapper for Tensor API requests.  Collected here to facilitate easy
 ' integration tests
-Function TensorApi(constants)
+Function TensorApi(constants, pubServerPersistentData)
   return {
     ' dependencies
     constants: constants
+    pubServerPersistentData: pubServerPersistentData
 
     ' public
     getEPGChannelIdsReqInfo: tensorApi_getEPGChannelIdsReqInfo
@@ -21,6 +22,11 @@ Function tensorApi_commonOptions()
   ' appending in this style is necessary to prevent m.constants.headers.commonUapi from being
   ' mutated by potential later appends, since assoc arrays are passed by reference.
   headers.append(m.constants.headers.commonUapi)
+
+  if m.pubServerPersistentData <> invalid AND m.pubServerPersistentData.parentalRating <> invalid
+    headers["X-TUBI-RATING"] = m.constants.serverValues.parentalControls[m.pubServerPersistentData.parentalRating]
+  end if
+  headers.append(m.constants.headers.tubiPlatform)
 
   options = {
     params: {
