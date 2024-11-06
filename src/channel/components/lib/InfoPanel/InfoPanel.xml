@@ -233,10 +233,8 @@
               width="57"
               loadDisplayMode="scaleToFit"
               loadSync="true"/>
-            <Poster
-              id="ResolutionPoster"
-              loadDisplayMode="scaleToFit"
-              loadSync="true"/>
+              <Badge
+                id="uhdAvailableBadge" />
             <Group
               id="Rating">
               <Poster

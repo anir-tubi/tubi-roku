@@ -22,7 +22,7 @@ Function init()
   m.firstLineAvailabilityBadge = m.firstLineGroup.findNode("FirstLineAvailabilityBadge")
   m.line1 = m.firstLineGroup.findNode("Line1")
   m.line1Bold = m.firstLineGroup.findNode("Line1Bold")
-  m.resolutionPoster = m.firstLineGroup.findNode("ResolutionPoster")
+  m.uhdAvailableBadge = m.firstLineGroup.findNode("uhdAvailableBadge")
   m.closedCaptions = m.firstLineGroup.findNode("ClosedCaptionPoster")
   m.tubiOriginal = m.top.findNode("TubiOriginal")
   m.audioDescriptionPoster = m.firstLineGroup.findNode("AudioDescriptionPoster")
@@ -84,11 +84,11 @@ Function init()
   m.rating.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.closedCaptions.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.audioDescriptionPoster.observeFieldScoped("loadStatus", "onPosterLoadStatus")
-  m.resolutionPoster.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.top.observeFieldScoped("airDateTime", "onAirDateChange")
   m.top.observeFieldScoped("timerShouldRun", "onTimerShouldRun")
 
   m.reminderTitle.text = getTranslation("info_panel_reminder_is_set")
+  m.uhdAvailableBadge.text = getTranslation("info_panel_available_in_4k")
 
   onWidthChange()
 
@@ -166,6 +166,8 @@ Function onThemeChange(msg = invalid)
     m.Description.color = theme.primaryTextColor
     m.Director.color = theme.primaryTextColor
     m.Starring.color = theme.primaryTextColor
+    m.uhdAvailableBadge.backgroundColor = theme.defaultDarkTransparentAccent20
+    m.uhdAvailableBadge.textColor = theme.highlightedTextColor
   end if
 End Function
 
@@ -445,7 +447,7 @@ Function onLineOneDataChange(msg)
       sGenresText = getGenreText(data.genres)
       if sGenresText.len() > 0
         if text.len() > 0
-          ' add 'dot' spacer only if there is metadata prior to the genre text 
+          ' add 'dot' spacer only if there is metadata prior to the genre text
           text += Chr(&hb7) + " "
         end if
         text += sGenresText + " "
@@ -466,7 +468,7 @@ Function onLineOneDataChange(msg)
     line1IsPresent = (m.line1.getParent() <> invalid)
     line1BoldIsPresent = (m.line1Bold.getParent() <> invalid)
     textIsPresent = (line1IsPresent = true OR line1BoldIsPresent = true)
-    
+
     if isNonEmptyString(text) = true
       if textIsPresent = false
         mode = m.top.mode
@@ -487,23 +489,6 @@ Function onLineOneDataChange(msg)
       end if
     end if
 
-    ' handle resolution poster (4k)
-    resolutionPosterIsPresent = (m.resolutionPoster.getParent() <> invalid)
-    if data.has4k = true
-      if resolutionPosterIsPresent = false
-        firstLineGroup.insertChild(m.resolutionPoster, insertIndex)
-      end if
-
-      insertIndex++
-      ' Although this uri does not change, if it is set in the component XML, the icon will appear
-      ' during the initial channel load, so set it dynamically when it should appear
-      m.resolutionPoster.uri = "pkg:/images/icon-4k-ready-badge.webp"
-    else
-      if resolutionPosterIsPresent = true
-        firstLineGroup.removeChild(m.resolutionPoster)
-      end if
-    end if
-
     ' handle closed captions
     closedCaptionsIsPresent = (m.closedCaptions.getParent() <> invalid)
     if data.hasCC = true
@@ -518,6 +503,19 @@ Function onLineOneDataChange(msg)
     else
       if closedCaptionsIsPresent = true
         firstLineGroup.removeChild(m.closedCaptions)
+      end if
+    end if
+
+    uhdAvailableBadgeIsPresent = (m.uhdAvailableBadge.getParent() <> invalid)
+    if data.has4k = true
+      if uhdAvailableBadgeIsPresent = false
+        firstLineGroup.insertChild(m.uhdAvailableBadge, insertIndex)
+      end if
+
+      insertIndex++
+    else
+      if uhdAvailableBadgeIsPresent = true
+        firstLineGroup.removeChild(m.uhdAvailableBadge)
       end if
     end if
 
@@ -629,7 +627,7 @@ Function onLineTwoDataChange(msg)
   tubiLog("InfoPanel.onLineTwoDataChange")
   data = msg.getData()
   secondLineGroup = m.secondLineGroup
-  secondLineGroupIsPresent = (secondLineGroup.getParent() <> invalid) 
+  secondLineGroupIsPresent = (secondLineGroup.getParent() <> invalid)
 
   if isAA(data) AND data.count() > 0 AND secondLineGroupIsPresent = false
     m.twoLineInfo.appendChild(secondLineGroup)
@@ -710,7 +708,7 @@ Function onTitleImageChange(msg)
       m.offset.insertChild(m.title, index)
       m.offset.removeChild(m.titleImage)
     end if
-    
+
     m.titleImage.uri = ""
   end if
 End Function
@@ -957,7 +955,6 @@ Function onModeChange()
     m.twoLineInfo.appendChild(m.firstLineGroup)
     m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
     m.firstLineGroup.appendChild(m.line1)
-    m.firstLineGroup.appendChild(m.resolutionPoster)
     m.firstLineGroup.appendChild(m.closedCaptionPoster)
     m.firstLineGroup.appendChild(m.audioDescriptionPoster)
     m.firstLineGroup.appendChild(m.rating)
@@ -980,7 +977,6 @@ Function onModeChange()
     m.twoLineInfo.appendChild(m.firstLineGroup)
     m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
     m.firstLineGroup.appendChild(m.line1)
-    m.firstLineGroup.appendChild(m.resolutionPoster)
     m.firstLineGroup.appendChild(m.closedCaptionPoster)
     m.firstLineGroup.appendChild(m.audioDescriptionPoster)
     m.firstLineGroup.appendChild(m.rating)
@@ -988,7 +984,7 @@ Function onModeChange()
     m.firstLineGroup.appendChild(m.expireWarning)
     m.firstLineGroup.appendChild(m.partnerLogo)
 
-    m.offset.itemSpacings = [13]  
+    m.offset.itemSpacings = [13]
 
   else if m.top.mode = m.constants.ui.infoPanelModes.movie
     ' used for movies on the details screen
@@ -1000,7 +996,6 @@ Function onModeChange()
     m.twoLineInfo.appendChild(m.firstLineGroup)
     m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
     m.firstLineGroup.appendChild(m.line1)
-    m.firstLineGroup.appendChild(m.resolutionPoster)
     m.firstLineGroup.appendChild(m.closedCaptionPoster)
     m.firstLineGroup.appendChild(m.audioDescriptionPoster)
     m.firstLineGroup.appendChild(m.rating)
@@ -1022,7 +1017,6 @@ Function onModeChange()
     m.twoLineInfo.appendChild(m.firstLineGroup)
     m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
     m.firstLineGroup.appendChild(m.line1)
-    m.firstLineGroup.appendChild(m.resolutionPoster)
     m.firstLineGroup.appendChild(m.closedCaptionPoster)
     m.firstLineGroup.appendChild(m.audioDescriptionPoster)
     m.firstLineGroup.appendChild(m.rating)
@@ -1045,7 +1039,6 @@ Function onModeChange()
     m.twoLineInfo.appendChild(m.firstLineGroup)
     m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
     m.firstLineGroup.appendChild(m.line1)
-    m.firstLineGroup.appendChild(m.resolutionPoster)
     m.firstLineGroup.appendChild(m.closedCaptionPoster)
     m.firstLineGroup.appendChild(m.audioDescriptionPoster)
     m.firstLineGroup.appendChild(m.rating)
@@ -1094,7 +1087,6 @@ Function onModeChange()
 
     m.twoLineInfo.appendChild(m.firstLineGroup)
     m.firstLineGroup.appendChild(m.line1)
-    m.firstLineGroup.appendChild(m.resolutionPoster)
     m.firstLineGroup.appendChild(m.closedCaptionPoster)
     m.firstLineGroup.appendChild(m.audioDescriptionPoster)
     m.firstLineGroup.appendChild(m.rating)
@@ -1114,7 +1106,6 @@ Function onModeChange()
 
     m.twoLineInfo.appendChild(m.firstLineGroup)
     m.firstLineGroup.appendChild(m.line1)
-    m.firstLineGroup.appendChild(m.resolutionPoster)
     m.firstLineGroup.appendChild(m.closedCaptionPoster)
     m.firstLineGroup.appendChild(m.audioDescriptionPoster)
     m.firstLineGroup.appendChild(m.rating)
@@ -1144,7 +1135,6 @@ Function onModeChange()
     m.twoLineInfo.appendChild(m.firstLineGroup)
     m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
     m.firstLineGroup.appendChild(m.line1Bold)
-    m.firstLineGroup.appendChild(m.resolutionPoster)
     m.firstLineGroup.appendChild(m.closedCaptionPoster)
     m.firstLineGroup.appendChild(m.audioDescriptionPoster)
 
@@ -1159,7 +1149,6 @@ Function onModeChange()
     m.twoLineInfo.appendChild(m.firstLineGroup)
     m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
     m.firstLineGroup.appendChild(m.line1Bold)
-    m.firstLineGroup.appendChild(m.resolutionPoster)
     m.firstLineGroup.appendChild(m.closedCaptionPoster)
     m.firstLineGroup.appendChild(m.audioDescriptionPoster)
 
@@ -1218,7 +1207,6 @@ Function onModeChange()
     m.twoLineInfo.appendChild(m.firstLineGroup)
     m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
     m.firstLineGroup.appendChild(m.line1Bold)
-    m.firstLineGroup.appendChild(m.resolutionPoster)
     m.firstLineGroup.appendChild(m.closedCaptionPoster)
     m.firstLineGroup.appendChild(m.audioDescriptionPoster)
 
@@ -1232,7 +1220,6 @@ Function onModeChange()
 
     m.twoLineInfo.appendChild(m.firstLineGroup)
     m.firstLineGroup.appendChild(m.line1)
-    m.firstLineGroup.appendChild(m.resolutionPoster)
     m.firstLineGroup.appendChild(m.closedCaptionPoster)
     m.twoLineInfo.appendChild(m.secondLineGroup)
     m.secondLineGroup.appendChild(m.line2)
@@ -1317,7 +1304,7 @@ End Function
 
 Function onTimerShouldRun(msg)
   isContainerVisible = msg.getData()
-  ' Passing down the information related to if the info panel is visible to user or is hidden. 
+  ' Passing down the information related to if the info panel is visible to user or is hidden.
   if m.airDateCountdown <> invalid
     m.airDateCountdown.timerShouldRun = (isContainerVisible = true)
   end if

@@ -103,7 +103,7 @@ Function populateInfoPanelWithHomescreenStyleSportsMode(content, infoPanel, bInS
 
   lineTwoData = {}
 
-  if bInSpotlight = true	
+  if bInSpotlight = true
     infoPanel.mode = m.constants.ui.infoPanelModes.spotlightSportsEvent
     lineOneData.roundGroupInfo = content.roundGroupInfo
   else
@@ -146,9 +146,11 @@ Function populateInfoPanelWithPurpleCarpetMode(content, infoPanel, isEventDetail
   lineOneData.hasAudioDescription = content.hasAudioDescription
   lineOneData.length = content.length
 
-  if content.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
+
+  ' TODO hard coding as true for now as backend has not been updated to pass video_metadata with a resolution of 2160p
+  ' if content.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
     lineOneData.has4k = true
-  end if
+  ' end if
 
   lineTwoData = {}
   infoPanel.mode = m.constants.ui.infoPanelModes.purpleCarpetEvent
@@ -325,9 +327,10 @@ Function populateInfoPanelWithPurpleCarpetBannerMode(content, infoPanel)
   lineOneData.genres = content.genres
   lineOneData.hasCC = content.hasSubtitles
 
-  if content.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
+  ' TODO hard coding as true for now as backend has not been updated to pass video_metadata with a resolution of 2160p
+  ' if content.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
     lineOneData.has4k = true
-  end if
+  ' end if
 
   lineTwoData = {}
   infoPanel.mode = m.constants.ui.infoPanelModes.purpleCarpetBanner

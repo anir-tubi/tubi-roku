@@ -1740,6 +1740,10 @@ Function getTranslation_en_US()
       "description": "Hint in the content metadata area informing the user that the reminder is set for this content",
       "message": "Reminder set"
     },
+    "info_panel_available_in_4k": {
+      "description": "Lets user know this content is available in 4k (although may not be available on their device)",
+      "message": "Available in 4k"
+    },
     "goBack_videoPlayer_ad": {
       "description": "Navigational instructions to users when pause Ad is displayed on video screen",
       "message": "Press any button to close the ad"

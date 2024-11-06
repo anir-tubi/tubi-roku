@@ -1506,7 +1506,7 @@ Function getConstants()
     defaultDarkStatusOnNow = "THEME_defaultDarkStatusOnNow_THEME"
 
     '//This will be replaced by an array of associative arrays which contain the gradient color info. See the getColorKeyValue() function in colorreplace.js for formating of this array
-    defaultDarkGradientBrand = "THEME_defaultDarkGradientBrand_THEME"    
+    defaultDarkGradientBrand = "THEME_defaultDarkGradientBrand_THEME"
 
     '//default light sub theme
     defaultLightPrimaryBackground = "THEME_defaultLightPrimaryBackground_THEME"
@@ -1514,6 +1514,7 @@ Function getConstants()
     defaultLightTransparentForeground75 = "THEME_defaultLightTransparentForeground75_THEME"
     defaultLightTransparentForeground10 = "THEME_defaultLightTransparentForeground10_THEME"
 
+    defaultDarkTransparentAccent20 = "THEME_defaultDarkTransparentAccent20_THEME"
 
 '//kids theme constants
     kidsDarkPrimaryAccent = "THEME_kidsDarkPrimaryAccent_THEME"
@@ -1558,7 +1559,7 @@ Function getConstants()
       keyboard_focused_key: "pkg:/images/keyboard_search_focused_key.9.png"
       scrollbarThumbBitmapUri_hd: "pkg:/images/transport/sgplayer/hd/focused-progress-foreground.9.png"
       scrollbarThumbBitmapUri_fhd: "pkg:/images/transport/sgplayer/fhd/focused-progress-foreground.9.png"
-      gradientBlendColors: defaultDarkGradientBrand   '//value will be an array of associaive arrays that contain the gradient color info 
+      gradientBlendColors: defaultDarkGradientBrand   '//value will be an array of associaive arrays that contain the gradient color info
 
       successColor: defaultDarkStatusSuccess
       cautionColor: defaultDarkStatusCaution
@@ -1587,6 +1588,7 @@ Function getConstants()
       inversePrimaryTextColor: defaultLightPrimaryForeground
       inverseSecondaryTextColor: defaultLightTransparentForeground75
       inverseNeutralColor2: defaultLightTransparentForeground10
+      defaultDarkTransparentAccent20: defaultDarkTransparentAccent20
     }
 
     constants.ui.themes.kidsMode = {
@@ -1596,7 +1598,7 @@ Function getConstants()
       keyboard_focused_key: "pkg:/images/keyboard_search_focused_key_kidsMode.9.png"
       scrollbarThumbBitmapUri_hd: "pkg:/images/transport/sgplayer/hd/focused-progress-foreground_kidsMode.9.png"
       scrollbarThumbBitmapUri_fhd: "pkg:/images/transport/sgplayer/fhd/focused-progress-foreground_kidsMode.9.png"
-      gradientBlendColors: kidsDarkGradientBrand  '//value will be an array of associaive arrays that contain the gradient color info 
+      gradientBlendColors: kidsDarkGradientBrand  '//value will be an array of associaive arrays that contain the gradient color info
 
       cautionColor: kidsDarkStatusCaution
       backgroundColor: kidsDarkPrimaryBackground
