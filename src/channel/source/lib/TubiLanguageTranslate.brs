@@ -3442,6 +3442,10 @@ Function getTranslation_es_MX()
       "description": "Hint in the content metadata area informing the user that the reminder is set for this content",
       "message": "Recordatorio programado"
     },
+    "info_panel_available_in_4k": {
+      "description": "Lets user know this content is available in 4k (although may not be available on their device)",
+      "message": "Disponible en 4K"
+    },
     "goBack_videoPlayer_ad": {
       "description": "Navigational instructions to users when pause Ad is displayed on video screen",
       "message": "Presiona cualquier botón para cerrar el anuncio"
@@ -3649,6 +3653,10 @@ Function getTranslation_es_MX()
     "auth_refresh_welcome_header": {
       "description": "A header for the message that let's the user know they've been signed in with the given email",
       "message": "¡Bienvenido!"
+    },
+    "resolution_full_hd": {
+      "description": "Title of the 1080p resolution label in the infopanel",
+      "message": "HD COMPLETO"
     },
     "available_at_toast_heading": {
       "description": "Toast message heading that is displayed when we click on a available at button",
@@ -5134,6 +5142,10 @@ Function getTranslation_fr_CA()
       "description": "Hint in the content metadata area informing the user that the reminder is set for this content",
       "message": "Rappel programmé"
     },
+    "info_panel_available_in_4k": {
+      "description": "Lets user know this content is available in 4k (although may not be available on their device)",
+      "message": "Disponible en 4K"
+    },
     "goBack_videoPlayer_ad": {
       "description": "Navigational instructions to users when pause Ad is displayed on video screen",
       "message": "Appuyez sur n'importe quel bouton pour fermer l'annonce"
@@ -5337,6 +5349,10 @@ Function getTranslation_fr_CA()
     "auth_refresh_welcome_header": {
       "description": "A header for the message that let's the user know they've been signed in with the given email",
       "message": "Bienvenue!"
+    },
+    "resolution_full_hd": {
+      "description": "Title of the 1080p resolution label in the infopanel",
+      "message": "PLEINE HD"
     },
     "available_at_toast_heading": {
       "description": "Toast message heading that is displayed when we click on a available at button",
