@@ -373,8 +373,6 @@ End Function
 ' @errorResponse : roSGNode, the error response (code, requestInput) of emailExists API in the form of AA
 Function onEmailExistsError(errorResponse)
   TubiLog("SignInHelpers.onEmailExistsError")
-  requestInput = errorResponse.requestInput
-
   accountEvent = {
     type: "account"
     values: {
@@ -385,28 +383,32 @@ Function onEmailExistsError(errorResponse)
     }
   }
   m.trackingLoggingTask.trackEvent = accountEvent
-
-  currentScreen = getCurrentScreen()
-  dialogEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: "REGISTRATION"
-      pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
-      dialog_action: "SHOW"
-      dialog_sub_type: "email-exists-error"
+  if shouldShowSignInSignUpErrorPage(errorResponse) = true
+    showSignInSignUpErrorScreen("signIn", invalid)
+  else
+    requestInput = errorResponse.requestInput
+    currentScreen = getCurrentScreen()
+    dialogEvent = {
+      type: "dialog"
+      values: {
+        dialog_type: "REGISTRATION"
+        pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
+        dialog_action: "SHOW"
+        dialog_sub_type: "email-exists-error"
+      }
     }
-  }
 
-  title =  getTranslation("dialog_defaultError_title")
-  message = getTranslation("could_not_verify_email") + ". " + getTranslation("dialog_defaultError_description")
-  buttons = [getTranslation("dialog_button_tryAgain"), getTranslation("dialog_button_cancel")]
-  simpleModalInfo = getSimpleModalInfo(title, message, buttons, dialogEvent, m.trackingLoggingTask, checkEmailExists, invalid, m.constants.instantResumeActions.restartApp)
+    title =  getTranslation("dialog_defaultError_title")
+    message = getTranslation("could_not_verify_email") + ". " + getTranslation("dialog_defaultError_description")
+    buttons = [getTranslation("dialog_button_tryAgain"), getTranslation("dialog_button_cancel")]
+    simpleModalInfo = getSimpleModalInfo(title, message, buttons, dialogEvent, m.trackingLoggingTask, checkEmailExists, invalid, m.constants.instantResumeActions.restartApp)
 
-  if simpleModalInfo <> invalid AND simpleModalInfo.buttonInfo <> invalid AND simpleModalInfo.buttonInfo[0] <> invalid
-    simpleModalInfo.buttonInfo[0].callbackParams = requestInput.rawInput
+    if simpleModalInfo <> invalid AND simpleModalInfo.buttonInfo <> invalid AND simpleModalInfo.buttonInfo[0] <> invalid
+      simpleModalInfo.buttonInfo[0].callbackParams = requestInput.rawInput
+    end if
+
+    showModal(simpleModalInfo.modalInfo, simpleModalInfo.buttonInfo)
   end if
-
-  showModal(simpleModalInfo.modalInfo, simpleModalInfo.buttonInfo)
 End Function
 
 
@@ -630,26 +632,29 @@ Function onSignInError(errorResponse)
 
   m.trackingLoggingTask.trackEvent = accountEvent
 
-  currentScreen = getCurrentScreen()
-  dialogEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: "SIGNIN_ERROR"
-      pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
-      dialog_action: "SHOW"
-      dialog_sub_type: "invalid_password"
+  if shouldShowSignInSignUpErrorPage(errorResponse) = true
+    showSignInSignUpErrorScreen("signIn", invalid)
+  else
+    currentScreen = getCurrentScreen()
+    dialogEvent = {
+      type: "dialog"
+      values: {
+        dialog_type: "SIGNIN_ERROR"
+        pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
+        dialog_action: "SHOW"
+        dialog_sub_type: "invalid_password"
+      }
     }
-  }
 
-  dialogEvent.values.dialog_type = "FORGOT_PASSWORD"
-  dialogEvent.values.dialog_sub_type = "forgot-password"
+    dialogEvent.values.dialog_type = "FORGOT_PASSWORD"
+    dialogEvent.values.dialog_sub_type = "forgot-password"
 
-  title =  getTranslation("invalid_oops_password_title")
-  invalidPasswordDesc = getTranslation("invalid_oops_password_description")
-  message = invalidPasswordDesc + chr(10) + requestInput.email
-  buttons = [getTranslation("dialog_button_forgot_password"), getTranslation("retry")]
-  showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onForgotPasswordDialogButtonSelected, onForgotPasswordDialogCancelSelected)
-
+    title =  getTranslation("invalid_oops_password_title")
+    invalidPasswordDesc = getTranslation("invalid_oops_password_description")
+    message = invalidPasswordDesc + chr(10) + requestInput.email
+    buttons = [getTranslation("dialog_button_forgot_password"), getTranslation("retry")]
+    showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onForgotPasswordDialogButtonSelected, onForgotPasswordDialogCancelSelected)
+  end if
 End Function
 
 
@@ -1153,8 +1158,7 @@ Function onMagicLinkResponse(response)
   if response <> invalid
     if currentScreen <> invalid AND (currentScreen.id = m.constants.ui.screenIds.emailVerificationScreen OR currentScreen.id = m.constants.ui.screenIds.forgotPasswordProcessingScreen)
       currentScreen.uid = response.uid
-      m.emailVerificationTimer = m.top.createChild("Timer")
-      m.emailVerificationTimer.repeat = false
+      m.emailVerificationTimer = CreateObject("roSGNode", "Timer")
       m.emailVerificationTimer.duration = 2
       m.emailVerificationTimer.observeFieldScoped("fire", "onEmailVerificationTimerFired")
       m.emailVerificationTimer.control = "start"
@@ -1165,46 +1169,49 @@ End Function
 
 Function onMagicLinkError(errorResponse)
   tubiLog("SignInHelpers.onMagicLinkError")
-  contextCode = m.constants.errors.context.forgotPasswordProcessingScreen
-  currentScreen = getCurrentScreen()
+  if shouldShowSignInSignUpErrorPage(errorResponse) = true
+    showSignInSignUpErrorScreen("signIn", invalid)
+  else
+    contextCode = m.constants.errors.context.forgotPasswordProcessingScreen
+    currentScreen = getCurrentScreen()
 
-  if currentScreen <> invalid
-    if currentScreen.hasField("failureReason") = true
-      currentScreen.failureReason = "magiclink_server_err"
+    if currentScreen <> invalid
+      if currentScreen.hasField("failureReason") = true
+        currentScreen.failureReason = "magiclink_server_err"
+      end if
+
+      if currentScreen.id = m.constants.ui.screenIds.emailVerificationScreen
+        contextCode = m.constants.errors.context.emailVerificationScreen
+      end if
     end if
 
-    if currentScreen.id = m.constants.ui.screenIds.emailVerificationScreen
-      contextCode = m.constants.errors.context.emailVerificationScreen
-    end if
-  end if
-
-  errorCode = getUserFacingErrorCode(contextCode, m.constants.errors.subtypes.networkError, errorResponse.code)
-  errorMessage = getTranslation("dialog_magicLink_error_description")
-  dialogEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: "LOGIN_REQUEST" 'DialogType enum
-      pageOneof: m.Tracking.getAnalyticsPage("login_page", {"choice": "LINK"})
-      dialog_action: "SHOW"
-      dialog_sub_type: "magiclink_server_err"
+    errorCode = getUserFacingErrorCode(contextCode, m.constants.errors.subtypes.networkError, errorResponse.code)
+    errorMessage = getTranslation("dialog_magicLink_error_description")
+    dialogEvent = {
+      type: "dialog"
+      values: {
+        dialog_type: "LOGIN_REQUEST" 'DialogType enum
+        pageOneof: m.Tracking.getAnalyticsPage("login_page", {"choice": "LINK"})
+        dialog_action: "SHOW"
+        dialog_sub_type: "magiclink_server_err"
+      }
     }
-  }
 
-  modalInfo = {
-    title: getTranslation("dialog_defaultError_title")
-    message:getErrorMessage(errorMessage, errorCode)
-    openTrackEvent: dialogEvent
-    trackingTask: m.trackingLoggingTask
-  }
+    modalInfo = {
+      title: getTranslation("dialog_defaultError_title")
+      message:getErrorMessage(errorMessage, errorCode)
+      openTrackEvent: dialogEvent
+      trackingTask: m.trackingLoggingTask
+    }
 
-  showErrorModal(modalInfo, invalid, invalid, invalid, invalid, [getTranslation("dialog_button_ok")])
+    showErrorModal(modalInfo, invalid, invalid, invalid, invalid, [getTranslation("dialog_button_ok")])
+  end if
 End Function
 
 
 Function onEmailVerificationTimerFired()
   tubiLog("SignInHelpers.onEmailVerificationTimerFired")
   'Make Request
-  uid = ""
   currentScreen = getCurrentScreen()
 
   if currentScreen <> invalid AND (currentScreen.id = m.constants.ui.screenIds.emailVerificationScreen OR currentScreen.id = m.constants.ui.screenIds.forgotPasswordProcessingScreen)
@@ -1232,7 +1239,11 @@ Function onQueryStatusOfMagicLinkResponse(response)
       m.emailVerificationTimer.control = "start"
     else if response <> invalid AND response.status = "EXPIRED"
       onStopAndClearEmailVerificationTimer()
-      handleSignInFailure()
+      if isMajorEventDay() = true
+        showSignInSignUpErrorScreen("signIn", invalid)
+      else
+        handleSignInFailure()
+      end if
     else if response <> invalid AND response.access_token <> invalid
       onStopAndClearEmailVerificationTimer()
       onSignInResponse(response)
@@ -1327,7 +1338,11 @@ Function onQueryStatusOfMagicLinkError(errorResponse)
     if currentScreen.queryResponseError > 3
       '//if an error has been set more than 3 times, then show error modal to user as the error is probably not a temporary network or server issue
       currentScreen.queryResponseError = 0
-      handleSignInFailure(errorResponse)
+      if shouldShowSignInSignUpErrorPage(errorResponse) = true
+        showSignInSignUpErrorScreen("signIn", invalid)
+      else
+        handleSignInFailure(errorResponse)
+      end if
     else
       m.emailVerificationTimer.control = "start"
     end if
@@ -1541,16 +1556,64 @@ Function setOrRemovePurpleCarpetReminderAfterSignIn()
 End Function
 
 
-Function showSignInSignUpErrorScreen(action)
+' @param action: string, Possible values "signIn", "signUp"
+' @param userInput: assocArray|invalid, Will contains user input data when the action is "signUp"
+Function showSignInSignUpErrorScreen(action, userInput)
   showContentGroupAndHideSpinner()
   displayDefaultBackground()
   screen = CreateObject("roSGNode", "SignInSignUpErrorScreen")
   screen.action = action
+  screen.userInput = userInput
   pushScreen(screen, true, true)
   screen.observeFieldScoped("continueButtonSelected", "onSignUpSignInErrorScreenContinueAsGuestUserButtonSelected")
 End Function
 
 
-Function onSignUpSignInErrorScreenContinueAsGuestUserButtonSelected(_)
-  popScreenAfterSignInProcess()
+Function onSignUpSignInErrorScreenContinueAsGuestUserButtonSelected(msg)
+
+  isMajorEventDay = isMajorEventDay()
+
+  if isGDPR() = false AND isMajorEventDay = true
+    currentTimeSeconds = CreateObject("roDateTime").AsSeconds()
+    ' 12 hours.
+    expiryTimeInSeconds = currentTimeSeconds + (12 * 3600)
+    regWrite("expiryTime", expiryTimeInSeconds.toStr(), m.constants.registrySectionIDs.registrationByPass)
+
+    currentScreen = msg.getRoSGNode()
+
+    if currentScreen.action = "signUp"
+      userInfo = FormatJson(currentScreen.userInput)
+      regWrite("userInfo", userInfo, m.constants.registrySectionIDs.registrationByPass)
+    end if
+    setContentToRefreshAllPersonalizedScreens(true)
+  end if
+
+  currentScreen = popScreenAfterSignInProcess()
+  m.spinner.visible = false
+  refreshAllDetailScreens()
+
+  if currentScreen <> invalid and (currentScreen.getSubtype() = "DetailScreen" OR currentScreen.getSubtype() = "DetailScreenHoriz")
+    currentScreen.jumpToItem = 0
+    currentScreen.setfocus(true)
+    currentScreen.refreshRelatedContent = true
+  end if
+  
+End Function
+
+
+Function isMajorEventDay()
+  majorEventStart = getExternalConfigValueFromGlobal("major_event_start", m.constants.configHubFallbacks.majorEventStart)
+  majorEventEnd = getExternalConfigValueFromGlobal("major_event_end", m.constants.configHubFallbacks.majorEventEnd)
+  isMajorEventDay = isNowWithinTimePeriod(majorEventStart, majorEventEnd)
+
+  return isMajorEventDay
+End Function
+
+
+Function shouldShowSignInSignUpErrorPage(errorResponse)
+  if errorResponse <> invalid AND errorResponse.code <> invalid AND (errorResponse.code >= 500 OR errorResponse.code = 429) AND isMajorEventDay() = true
+    return true
+  end if
+
+  return false
 End Function

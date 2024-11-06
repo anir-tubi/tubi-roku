@@ -1,6 +1,8 @@
 Function init()
   topRef = m.top
   m.constants = getConstantsFromGlobal()
+
+  topRef.screenLevel = m.constants.ui.screenLevels.signInSignUpErrorScreen
   topRef.observeFieldScoped("focusedChild", "onScreenFocusChange")
   topRef.observeFieldScoped("action", "onActionChange")
   

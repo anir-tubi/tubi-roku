@@ -482,45 +482,54 @@ End Function
 ' some network or API issue
 ' show generic "oops an error occurred" modal and allow users to retry/cancel
 Function handleNetworkErrorOnSignUp(err)
+  if shouldShowSignInSignUpErrorPage(err) = true
+    inputData = {}
 
-  signInInfo = {}
-  birthdate = ""
-
-  if err.reqInfo <> invalid
-    inputData = err.reqInfo
-    if inputData.signInInfo <> invalid
-      signInInfo = inputData.signInInfo
+    if err.reqInfo <> invalid
+      inputData = err.reqInfo
     end if
-    if inputData.birthdate <> invalid
-      birthdate = inputData.birthdate
-    end if
-  end if
 
-  screen = getCurrentScreen()
-  dialogEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: "NETWORK_ERROR" 'DialogType enum
-      pageOneof: m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pageType, screen.trackingPageInfo.pageValues)
-      dialog_action: "SHOW"
-      dialog_sub_type: "signup-failed"
+    showSignInSignUpErrorScreen("signUp", inputData)
+  else
+    signInInfo = {}
+    birthdate = ""
+
+    if err.reqInfo <> invalid
+      inputData = err.reqInfo
+      if inputData.signInInfo <> invalid
+        signInInfo = inputData.signInInfo
+      end if
+      if inputData.birthdate <> invalid
+        birthdate = inputData.birthdate
+      end if
+    end if
+
+    screen = getCurrentScreen()
+    dialogEvent = {
+      type: "dialog"
+      values: {
+        dialog_type: "NETWORK_ERROR" 'DialogType enum
+        pageOneof: m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pageType, screen.trackingPageInfo.pageValues)
+        dialog_action: "SHOW"
+        dialog_sub_type: "signup-failed"
+      }
     }
-  }
 
-  modalInfo = {
-    message: getTranslation("screenAgeVerification_network_issue")
-    openTrackEvent: dialogEvent
-    trackingTask: m.trackingLoggingTask
-  }
+    modalInfo = {
+      message: getTranslation("screenAgeVerification_network_issue")
+      openTrackEvent: dialogEvent
+      trackingTask: m.trackingLoggingTask
+    }
 
-  verifyAgeAtSignupParams = {}
-  verifyAgeAtSignupParams.signInInfo = signInInfo
-  verifyAgeAtSignupParams.birthdate = birthdate
+    verifyAgeAtSignupParams = {}
+    verifyAgeAtSignupParams.signInInfo = signInInfo
+    verifyAgeAtSignupParams.birthdate = birthdate
 
-  cancelSignUpButton = getTranslation("dialog_button_cancel") + " " + getTranslation("dialog_button_signUp")
-  buttons = [getTranslation("dialog_button_tryAgain"), cancelSignUpButton]
+    cancelSignUpButton = getTranslation("dialog_button_cancel") + " " + getTranslation("dialog_button_signUp")
+    buttons = [getTranslation("dialog_button_tryAgain"), cancelSignUpButton]
 
-  showErrorModal(modalInfo, verifyAgeAtSignupWrapper, verifyAgeAtSignupParams, runControllerStartSequenceAsAgeNotVerified, invalid, buttons)
+    showErrorModal(modalInfo, verifyAgeAtSignupWrapper, verifyAgeAtSignupParams, runControllerStartSequenceAsAgeNotVerified, invalid, buttons)
+  end if
 End Function
 
 

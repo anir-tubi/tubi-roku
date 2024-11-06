@@ -14,6 +14,8 @@ Function getConstants()
     constants.registrySectionIDs.deviceInfoSectionId = "deviceinfo"
     ' Creating a section to store all fallbacks in future to start with we are using for blocked analytics events.
     constants.registrySectionIDs.fallbacks = "fallbacks"
+    ' Creating a section to store user sign up information in case of registration failure.
+    constants.registrySectionIDs.registrationByPass = "registrationByPass"
 
   ' Roku's channel/app id for the production Tubi app. It is used with the continue watching feature to enable testing the feature in sideloaded/beta channels.
   constants.productionApplicationId = "41468"
@@ -1205,6 +1207,7 @@ Function getConstants()
       constants.ui.screenLevels.videoPlayerScreen = 60
       constants.ui.screenLevels.linearVideoPlayerScreen = 60
       constants.ui.screenLevels.foxVideoPlayerWrapperScreen = 60
+      constants.ui.screenLevels.signInSignUpErrorScreen = 60
       constants.ui.screenLevels.emailInputScreen = 90
       constants.ui.screenLevels.signInScreen = 90
       constants.ui.screenLevels.ageGateScreen = 90

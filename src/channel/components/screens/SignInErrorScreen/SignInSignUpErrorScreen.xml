@@ -8,6 +8,9 @@
     <!-- Holds the user action. Possible values "signIn", "signUp" -->
     <field id="action" type="string" />
 
+    <!-- A record of the Roku account's signin info: i.e. email, firstname, gender, etc. -->
+    <field id="userInput" type="assocarray" />
+
     <!-- OUTPUT -->
     <!-- Holds selected status for the exit button. -->
     <field id="continueButtonSelected" type="string" alias="continueBtn.selected" alwaysNotify="true" />

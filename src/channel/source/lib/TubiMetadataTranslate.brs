@@ -43,6 +43,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     getRoundedCornersURL: tubiMetadataTranslate_getRoundedCornersURL
     getBackgroundImages: tubiMetadataTranslate_getBackgroundImages
     getTitleImageUrl: tubiMetadataTranslate_getTitleImageUrl
+    checkIfUserIsInRegistrationByPassMode: tubiMetadataTranslate_checkIfUserIsInRegistrationByPassMode
   }
 End Function
 
@@ -323,7 +324,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.nowPos <> invalid then translatedContent.nowPos = contentFromServer.nowPos
   if contentFromServer.series_id <> invalid then translatedContent.seriesId = "0" + contentFromServer.series_id
 
-  if contentFromServer.needs_login = true and isSignedInUser = false
+  if contentFromServer.needs_login = true AND isSignedInUser = false AND m.checkIfUserIsInRegistrationByPassMode() = false
     translatedContent.needsLogin = true
     translatedContent.loginReason = contentFromServer.login_reason
   end if
@@ -1401,7 +1402,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             childAA.append({showAllText: fullChild.showAllText})
           end if
 
-          if fullChild.needs_login = true AND isSignedInUser = false
+          if fullChild.needs_login = true AND isSignedInUser = false AND m.checkIfUserIsInRegistrationByPassMode() = false
             childAA.needsLogin = true
             childAA.loginReason = fullChild.login_reason
           end if
@@ -2088,7 +2089,7 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
             channelContentNode.hasSubtitles = false
           end if
 
-          if channelFromServer.needs_login = true AND isUserSignedIn = false
+          if channelFromServer.needs_login = true AND isUserSignedIn = false AND m.checkIfUserIsInRegistrationByPassMode() = false
             channelContentNode.needsLogin = true
             channelContentNode.loginReason = channelFromServer.login_reason
           end if
@@ -2126,7 +2127,7 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
           end if
 
           'programlevel
-          if channelFromServer.needs_login = true AND isUserSignedIn = false
+          if channelFromServer.needs_login = true AND isUserSignedIn = false AND m.checkIfUserIsInRegistrationByPassMode() = false
             program.needsLogin = true
             program.loginReason = channelFromServer.login_reason
           end if
@@ -2218,7 +2219,7 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
       channelNode.state = "loaded"
 
       'channel level needs_login
-      if channelFromServer.needs_login = true AND isUserSignedIn = false
+      if channelFromServer.needs_login = true AND isUserSignedIn = false AND m.checkIfUserIsInRegistrationByPassMode() = false
         channelNode.needsLogin = true
         channelNode.loginReason = channelFromServer.login_reason
       end if
@@ -2359,7 +2360,7 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
       translatedProgram.Rating = programFromServer.ratings[0].value
     end if
 
-    if channelFromServer.needs_login = true AND isUserSignedIn = false
+    if channelFromServer.needs_login = true AND isUserSignedIn = false AND m.checkIfUserIsInRegistrationByPassMode() = false
       translatedProgram.needsLogin = true
       translatedProgram.loginReason = channelFromServer.login_reason
     end if
@@ -2602,4 +2603,20 @@ Function tubiMetadataTranslate_translateMiniHomescreen(contentToTranslate, conte
   end if
 
   return translated
+End Function
+
+
+Function tubiMetadataTranslate_checkIfUserIsInRegistrationByPassMode()
+  expiryTime = RegRead("expiryTime", m.constants.registrySectionIDs.registrationByPass)
+
+  if isNonEmptyString(expiryTime) = true
+    currentTimeSeconds = CreateObject("roDateTime").AsSeconds()
+    expiryTime = expiryTime.toInt()
+
+    if expiryTime > currentTimeSeconds
+      return true
+    end if
+  end if
+
+  return false
 End Function
