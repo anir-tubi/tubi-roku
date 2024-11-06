@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const shell = require('shelljs');
+const webFetch = require('node-fetch');
 shell.config.silent = true;
 
 const {getBuildTag, incrementBuildNumber, incrementRevisionNumber, getOneTrustBuildTag} = require('./config');
@@ -466,6 +467,51 @@ async function createGithubRelease(done) {
     done(new NoStackError(err));
   }
 }
+
+
+//function to send slack reminders to create experiments for PRs that have "Experiment:" in the release notes
+async function sendSlackReminders(done) {
+  log(`...Sending slack reminders to the team`);
+  const prodBranch = getProductionBranchName();
+  const currentBranch = getCurrentBranch(done);
+  const webHookUrl = "https://hooks.slack.com/services/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";
+
+  const pullRequestCommits = await findPullRequestCommitDifferences(done, currentBranch, prodBranch, true);
+
+  // filter down to pull requests from currentBranch that aren't on prodBranch
+  for (const commit of pullRequestCommits) {
+    const prId = commit.prId;
+
+    const response = await octokit().pulls.get({
+      owner: ghInfo.owner,
+      repo: ghInfo.rokuRepo,
+      pull_number: +prId
+    });
+
+    const prReleaseNotes = extractReleaseNotesFromPullRequestBody(response.data.body);
+
+    if (prReleaseNotes && prReleaseNotes.includes("Experiment:")) {
+      log(`...Sending slack reminder for PR #${prId}`);
+      const author = githubDeveloperInfo[response.data.user.login];
+      const memberId = author.slackId;
+      const message = `<@${memberId}> , Please create the experiment if needed for : \n\`\`\`  ${prReleaseNotes}\`\`\``;
+
+      //post and forget
+      webFetch(webHookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: message,
+        }),
+      });
+    }
+
+  }
+  done()
+}
+
 
 
 // Helper to work around the fact you can't fetch if you're already on the branch
@@ -996,6 +1042,7 @@ module.exports = {
   makeReleasePrs,
   pushTag,
   createGithubRelease,
+  sendSlackReminders,
   findCommitsNotOnProductionBranch,
   findCommitsNotOnCurrentBranch,
   addMissingImagesToRemoteLibrary,

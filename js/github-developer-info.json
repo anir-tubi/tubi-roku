@@ -1,23 +1,30 @@
 {
   "jackhand": {
-	"name": "Jack Hand"
+	  "name": "Jack Hand",
+    "slackId": "U02V9EK3J0Y"
   },
   "rigotubi": {
-	"name": "Rigo Dhason"
+	  "name": "Rigo Dhason",
+    "slackId": "UPQJH8VEC"
   },
   "triwav": {
-	"name": "Brian Leighty"
+	  "name": "Brian Leighty",
+    "slackId": "U02V9EK3J0Y"
   },
   "brybott-tubi": {
-	"name": "Bryan Elliott"
+	  "name": "Bryan Elliott",
+    "slackId": "U04BF61D6"
   },
   "anupamachandrappa": {
-	"name": "Anupama Chandrappa"
+	  "name": "Anupama Chandrappa",
+    "slackId": "U023E94U1UP"
   },
   "prajwalkshetty": {
-	"name": "Prajwal Shetty"
+	  "name": "Prajwal Shetty",
+    "slackId": "U04HFRMBWHE"
   },
   "jmedarametla": {
-    "name": "Jhansi Medarametla"
+    "name": "Jhansi Medarametla",
+    "slackId": "U0225SBALM8"
   }
 }
