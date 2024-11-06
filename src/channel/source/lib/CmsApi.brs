@@ -181,6 +181,8 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
   params["is_kids_mode"] = bKidsMode
   ' content_mode is mandatory param and its value needs to be passed as empty for fetching homescreen content
   params["content_mode"] = "" ' default contentMode
+  params["limit_resolutions"] = m.constants.player.limitResolutions
+  params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
 
   'passing device advertiser id to homescreen request for home screen personalization
   params["idfa"] = m.constants.deviceInfo.deviceAdId
@@ -342,6 +344,8 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
   params["include_sponsorships"] = true
   params["contents_limit"] = m.constants.performance.categoryGridList.finalBlockSize
   params["content_mode"] = ""
+  params["limit_resolutions"] = m.constants.player.limitResolutions
+  params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
 
   utmCampaignConfig = m.utmCampaignConfig
 
@@ -416,6 +420,8 @@ Function cmsApi_createSearchRequestInfo(searchText, bKidsMode = false)
     "background"
   ]
   options.params = m.setImageParams(imageParamTypes, options.params, m.constants.ui.screenIds.searchScreen)
+  options.params["limit_resolutions"] = m.constants.player.limitResolutions
+  options.params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
 
   if bKidsMode = false
     'setting the include_linear param to true will enable the linear content available for search screen from backend

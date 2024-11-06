@@ -1956,6 +1956,10 @@ Function getTranslation_en_US()
       "description": "A header for the message that let's the user know they've been signed in with the given email",
       "message": "Welcome!"
     },
+    "resolution_full_hd": {
+      "description": "Title of the 1080p resolution label in the infopanel",
+      "message": "FULL HD"
+    },
     "available_at_toast_heading": {
       "description": "Toast message heading that is displayed when we click on a available at button",
       "message": "Content available at {time}"

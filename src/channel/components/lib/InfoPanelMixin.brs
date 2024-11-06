@@ -48,7 +48,16 @@ Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel, bInSpo
     ' lineOneData.seasons =  '//If available, get the number of seasons and set the value here
   end if
 
-  if content.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
+  fullHDBadgeText = ""
+  if isNonEmptyString(content.resolution) = true
+    resolution = content.resolution
+    if resolution = "1080" AND getExperimentResource("roku_1080p_resolution", "roku_1080p_resolution_v1").enabled = true
+      fullHDBadgeText = getTranslation("resolution_full_hd")
+      lineOneData.fullHDBadgeText = fullHDBadgeText
+    end if
+  end if
+
+  if isNonEmptyString(fullHDBadgeText) = false AND content.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
     lineOneData.has4k = true
   end if
 
@@ -97,7 +106,16 @@ Function populateInfoPanelWithHomescreenStyleSportsMode(content, infoPanel, bInS
     lineOneData.hoursOfAiring = matchTime
   end if
 
-  if content.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
+  fullHDBadgeText = ""
+  if isNonEmptyString(content.resolution) = true
+    resolution = content.resolution
+    if resolution = "1080" AND getExperimentResource("roku_1080p_resolution", "roku_1080p_resolution_v1").enabled = true
+      fullHDBadgeText = getTranslation("resolution_full_hd")
+      lineOneData.fullHDBadgeText = fullHDBadgeText
+    end if
+  end if
+
+  if isNonEmptyString(fullHDBadgeText) = false AND content.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
     lineOneData.has4k = true
   end if
 
@@ -278,6 +296,16 @@ Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel, bI
   lineOneData.hasCC = content.hasSubtitles
   lineOneData.programTimeLeft = timeleft
   lineOneData.rating = rating
+
+  fullHDBadgeText = ""
+  if isNonEmptyString(content.resolution) = true
+    resolution = content.resolution
+    if resolution = "1080" AND getExperimentResource("roku_1080p_resolution", "roku_1080p_resolution_v1").enabled = true
+      fullHDBadgeText = getTranslation("resolution_full_hd")
+      lineOneData.fullHDBadgeText = fullHDBadgeText
+    end if
+  end if
+
 
   lineTwoData = {}
   ' if league is available, show it in the second line, else show genres

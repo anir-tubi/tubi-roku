@@ -357,7 +357,16 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     lineOneData.descriptorCode = content.descriptorCode
     lineOneData.partnerLogoUri = content.inlineLogoUri
 
-    if content.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
+    fullHDBadgeText = ""
+    if isNonEmptyString(content.resolution) = true
+      resolution = content.resolution
+      if resolution = "1080" AND getExperimentResource("roku_1080p_resolution", "roku_1080p_resolution_v1").enabled = true
+        fullHDBadgeText = getTranslation("resolution_full_hd")
+        lineOneData.fullHDBadgeText = fullHDBadgeText
+      end if
+    end if
+
+    if isNonEmptyString(fullHDBadgeText) = false AND content.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
       lineOneData.has4k = true
     end if
 

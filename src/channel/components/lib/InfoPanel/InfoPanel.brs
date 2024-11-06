@@ -32,6 +32,7 @@ Function init()
   m.descriptorCode = m.firstLineGroup.findNode("DescriptorCode")
   m.expireWarning = m.firstLineGroup.findNode("ExpireWarning")
   m.partnerLogo = m.firstLineGroup.findNode("PartnerLogo")
+  m.fullHDBadge = m.firstLineGroup.findNode("fullHDBadge")
 
   m.secondLineGroup = m.top.findNode("SecondLineGroup")
   m.secondLineAvailabilityBadge = m.secondLineGroup.findNode("SecondLineAvailabilityBadge")
@@ -607,7 +608,7 @@ Function onLineOneDataChange(msg)
 
     ' handle parter logos
     partnerLogoIsPresent = (m.partnerLogo.getParent() <> invalid)
-    if isNonEmptyString(data.partnerLogoUri)
+    if isNonEmptyString(data.partnerLogoUri) = true
       if partnerLogoIsPresent = false
         firstLineGroup.insertChild(m.partnerLogo, insertIndex)
       end if
@@ -619,6 +620,22 @@ Function onLineOneDataChange(msg)
         firstLineGroup.removeChild(m.partnerLogo)
       end if
     end if
+
+    'handle fullHDBadge present
+    isFullHdBadgePresent = (m.fullHDBadge.getParent() <> invalid)
+    if isNonEmptyString(data.fullHDBadgeText) = true
+      if isFullHdBadgePresent = false
+        firstLineGroup.insertChild(m.fullHDBadge, insertIndex)
+      end if
+
+      formatBadge(data.fullHDBadgeText, m.fullHDBadge)
+      insertIndex++
+    else
+      if isFullHdBadgePresent = true
+        firstLineGroup.removeChild(m.fullHDBadge)
+      end if
+    end if
+
   end if
 End Function
 
@@ -1292,7 +1309,7 @@ Function formatBadge(text, badgeComponent)
       badgeComponent.backgroundColor = theme.blueBadgeColor
       badgeComponent.textColor = m.primaryTextColor
     else
-      ' TODAY, TOMORROW, <<Date>> badge
+      ' TODAY, TOMORROW, <<Date>> badge and Full HD badge
       badgeComponent.backgroundColor = theme.neutralColor
       badgeComponent.textColor = theme.primaryTextColor
     end if

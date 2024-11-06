@@ -71,5 +71,5 @@ Function categoryDetailsScreen_populateInfoPanelItem_test()
   populatedInfoPanel = populateInfoPanel(emptyInfoPanel, content)
 
   ' can't test equality of nodes, so test if they have the same fields
-  return m.assertEqual(populatedInfoPanel.getFields(), controlInfoPanel.getFields())
+  m.assertEqual(populatedInfoPanel.getFields(), controlInfoPanel.getFields())
 End Function

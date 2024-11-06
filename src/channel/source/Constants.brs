@@ -909,7 +909,8 @@ Function getConstants()
 
       maxH265Resolution = videoResolution
       if videoResolution >= 2160
-        maxH265Resolution = 2160 ' max supported resolution is 2160p for H265 from backend
+        ' max supported resolution is 2160p for H265 from backend
+        maxH265Resolution = 2160  'bs:disable-line LINT1005
       end if
 
       maxH264Resolution = videoResolution
@@ -917,18 +918,27 @@ Function getConstants()
         maxH264Resolution = 1080 ' max supported resolution is 1080p for H264 from backend
       end if
 
-      ' if the device only supports H264, then we are sending limitResolutions as "H264_<maxH265Resolution>".
+      ' if the device only supports H264, then we are sending limitResolutions as "H264_<maxH264Resolution>".
       ' Backend will respond with multiple manifests (but all are H264)
-      constants.player.limitResolutions = [
-        avcCodec + "_" + maxH264Resolution.toStr() + "p"
+      if maxH264Resolution >= 1080
+        constants.player.limitResolutions = [
+          avcCodec + "_" + "1080" + "p"
+          avcCodec + "_" + "720" + "p"
+        ]
+      else
+        constants.player.limitResolutions = [
+          avcCodec + "_" + maxH264Resolution.toStr() + "p"
       ]
+      end if
 
       ' if the device supports H265, then we are sending limitResolutions as "H265_<maxH265Resolution>" & "H264_<maxH264Resolution>"
       ' Backend will respond with multiple manifests (both H265 & H264)
       if di.CanDecodeVideo({Codec: "hevc"}).result = true ' checking whether device is capable of playing H265 transcoded content
         constants.player.limitResolutions = [
-          hevcCodec + "_" + maxH265Resolution.toStr() + "p"
-          avcCodec + "_" + maxH264Resolution.toStr() + "p"
+          hevcCodec + "_" + "1080" + "p"
+          hevcCodec + "_" + "720" + "p"
+          avcCodec + "_" + "1080" + "p"
+          avcCodec + "_" + "720" + "p"
         ]
       end if
 
