@@ -3657,6 +3657,30 @@ Function getTranslation_es_MX()
     "available_at_toast_subheading": {
       "description": "Toast message subheading that is displayed when we click on a available at button",
       "message": "Sabemos que estás emocionado. ¡Nosotros también!"
+    },
+    "sign_in_error_screen_heading": {
+      "description": "Sign in error screen heading default error",
+      "message": "No podemos iniciar sesión en este momento"
+    },
+    "sign_in_error_screen__default_subheading": {
+      "description": "Sign in error screen heading default error",
+      "message": "Aún puedes ver tus películas y series de TV favoritos como invitado."
+    },
+    "sign_in_error_screen__purple_carpet_day_subheading": {
+      "description": "Sign in error screen heading default error",
+      "message": "Aún puedes ver tus películas y series de TV favoritos como invitado, ¡incluido el torneo!"
+    },
+    "sign_up_error_screen_heading": {
+      "description": "Sign in error screen heading default error",
+      "message": "No podemos crear tu cuenta en este momento"
+    },
+    "sign_up_error_screen__default_subheading": {
+      "description": "Sign in error screen heading default error",
+      "message": "Aún puedes ver tus películas y series de TV favoritos como invitado. \nTe enviaremos un correo para que vuelvas a intentarlo más tarde."
+    },
+    "sign_up_error_screen__purple_carpet_day_subheading": {
+      "description": "Sign in error screen heading default error",
+      "message": "¡Aún puedes ver tus películas y series de TV favoritos como invitado, ¡incluido el torneo!\nTe enviaremos un correo para que vuelvas a intentarlo más tarde."
     }
   }
 End Function
@@ -5321,6 +5345,30 @@ Function getTranslation_fr_CA()
     "available_at_toast_subheading": {
       "description": "Toast message subheading that is displayed when we click on a available at button",
       "message": "Nous savons que vous êtes excité. Nous aussi!"
+    },
+    "sign_in_error_screen_heading": {
+      "description": "Sign in error screen heading default error",
+      "message": "Nous ne pouvons pas vous connecter maintenant"
+    },
+    "sign_in_error_screen__default_subheading": {
+      "description": "Sign in error screen heading default error",
+      "message": "Vous pouvez toujours regarder vos films et série de TV préférés en tant qu'invité."
+    },
+    "sign_in_error_screen__purple_carpet_day_subheading": {
+      "description": "Sign in error screen heading default error",
+      "message": "Vous pouvez toujours regarder vos films et série de TV préférés en tant qu'invité, y compris le tournoi!"
+    },
+    "sign_up_error_screen_heading": {
+      "description": "Sign in error screen heading default error",
+      "message": "Nous ne pouvons pas créer votre compte pour le moment"
+    },
+    "sign_up_error_screen__default_subheading": {
+      "description": "Sign in error screen heading default error",
+      "message": "Vous pouvez toujours regarder vos films et série de TV préférés en tant qu'invité.\nNous vous enverrons un e-mail pour réessayer plus tard."
+    },
+    "sign_up_error_screen__purple_carpet_day_subheading": {
+      "description": "Sign in error screen heading default error",
+      "message": "Vous pouvez toujours regarder vos films et série de TV préférés en tant qu'invité, y compris le tournoi!\nNous vous enverrons un e-mail pour réessayer plus tard."
     }
   }
 End Function
