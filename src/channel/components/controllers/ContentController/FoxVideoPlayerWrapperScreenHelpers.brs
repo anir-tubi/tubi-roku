@@ -148,15 +148,15 @@ End Function
 
 Function getFoxVideoPlayerConfig()
   config = {
-    ads: {
-      raf: {
-        disableAdMeasurements: true
+    "ads": {
+      "raf": {
+        "disableAdMeasurements": true
       }
-      yospace: {
-        sdkDisabled: true
+      "yospace": {
+        "sdkDisabled": true
       }
     },
-    api: {
+    "api": {
       "content": {
         "@note": "Currently pointed at QA Tomato APIs for development.",
         "appConfig": "{foxApiRoot}/v2.0/appconfigs/foxsports-config",
@@ -183,12 +183,13 @@ Function getFoxVideoPlayerConfig()
         "specialDetail": "{foxApiRoot}/v2.0/screens/special-detail/{showCode}",
         "watch": "{foxApiRoot}/v2.0/screens/watch"
       },
-      foxApiRoot: m.constants.urls.foxApiBaseUrl
-      key: "tubi_roku",
-      mvpds: "{foxApiRoot}/v2.0/mvpds",
-      watch: "{foxApiRoot}/v3.0/watchlive"
+      "foxApiRoot": m.constants.urls.foxApiBaseUrl
+      "key": "tubi_roku",
+      "mvpds": "{foxApiRoot}/v2.0/mvpds",
+      "watch": "{foxApiRoot}/v3.0/watchlive"
     },
     "analytics": {
+      "appName": "Tubi",
       "conviva": {
         "customerKey": "611c005357f6991f5b731265d461ee49fe92a8cc",
         "disableConvivaLegacy": true,
@@ -317,8 +318,8 @@ Function getFoxVideoPlayerConfig()
       "FSP": "fspl",
       "default": "fbc-fox"
     },
-    logos: {
-      app: "",
+    "logos": {
+      "app": "",
       "playerCurtainRiser": "" ' Not using any longer
     }
     "playbackBrowse": {
@@ -338,7 +339,6 @@ Function getFoxVideoPlayerConfig()
       "liveChannelRefreshSeconds": 240,
       "liveRowDisabled": true
     },
-    ' "playbackStreamInfo": {},
     "playerDynamicNetworkBug": "",
     "playerDynamicRating": {
       "displayInSeconds_mid": 0,
@@ -412,7 +412,6 @@ Function getFoxVideoPlayerConfig()
         "greyLight": "#b0b0b0",
         "transparent": "#00000000"
       },
-      ' "textColors": ""
     },
     "upNextDurationClips": 4,
     "upNextDurationDefault": 7,
