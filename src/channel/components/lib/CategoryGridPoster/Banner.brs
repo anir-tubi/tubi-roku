@@ -28,12 +28,20 @@ Function onContentChange(msg)
       m.poster.uri = itemContent.hdgridposterurl
     end if
 
+    titleText = ""
+
     if itemContent.needsLogin = true
       setLockIcon()
-      titleText = itemContent.bannertextguest
+
+      if itemContent.bannerTextGuest <> invalid
+        titleText = itemContent.bannerTextGuest
+      end if
     else
       removeLockIcon()
-      titleText = itemContent.bannertextregistered
+
+      if itemContent.bannerTextRegistered <> invalid
+        titleText = itemContent.bannerTextRegistered
+      end if
     end if
 
     if itemContent.airDateTime <> invalid
