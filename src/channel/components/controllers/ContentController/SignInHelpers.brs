@@ -1530,6 +1530,7 @@ End Function
 
 Function startPurpleCarpetPlaybackAfterSignIn()
   popScreenAfterSignInProcess()
+  showContentGroupAndHideSpinner()
   screen = getCurrentScreen()
   if screen <> invalid AND screen.hasField("signedIn") = true
     screen.signedIn = isLoggedInUser()
