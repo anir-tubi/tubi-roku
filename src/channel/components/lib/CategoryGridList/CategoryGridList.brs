@@ -771,7 +771,8 @@ End Function
 
 Function onPurpleCarpetContentUpdatedChange()
   ' Handling a use case where last focused list was purple carpet container but during refresh all items got removed due to event reaching end resetting the focus to rowlist.
-  if isPurpleCarpetContainerEmpty() = true AND m.lastFocusedList = "purpleCarpetRow"
+  ' Checking to check to make sure the rowlist has content before setting focus to it.
+  if isPurpleCarpetContainerEmpty() = true AND m.lastFocusedList = "purpleCarpetRow" AND isNode(m.top.content) = true
     m.rowList.translation = [0, 0]
     m.purpleCarpetRow.opacity = 0
     m.lastFocusedList = "rowlist"
