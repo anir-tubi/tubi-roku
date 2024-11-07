@@ -379,7 +379,11 @@ Function onAgeNotVerifiedAtKidsModeExit(err)
       ' happens when user enters age less than 13
       handle_422_451_error(handle_422_451_errorAtKidsModeExitCallback)
     else
-      handleNetworkError(err, verifyAgeAtKidsModeExit, exitAgeVerificationScreenUnverified) ' happens when there is a network failure or some backend issue
+      if isMajorEventDay() = true
+        verifyAgeOnNetworkError(err, onAgeVerifiedAtKidsModeExit)
+      else
+        handleNetworkError(err, verifyAgeAtKidsModeExit, exitAgeVerificationScreenUnverified) ' happens when there is a network failure or some backend issue
+      end if
     end if
   end if
 End Function
@@ -919,4 +923,23 @@ Function onAgeGateErrorScreenExitButtonSelected(_)
   m.exitAppDelayTimer.duration = 1
   m.exitAppDelayTimer.observeFieldScoped("fire", "setExitApp")
   m.exitAppDelayTimer.control = "start"
+End Function
+
+
+'@ageVerifiedCallback: function, method that needs to be callback if users age is greater than minimum required age.
+Function verifyAgeOnNetworkError(errorResponse, ageVerifiedCallback)
+  userEnteredAge = 0
+          
+  if errorResponse.reqInfo <> invalid AND errorResponse.reqInfo.birthdate <> invalid
+    birthdate = errorResponse.reqInfo.birthdate
+    birthYear = birthdate.tokenize("-")[0]
+    currentYear = createObject("roDateTime").getYear()
+    userEnteredAge = currentYear - birthYear.toInt()
+  end if
+
+  if userEnteredAge >= m.constants.ui.ages.ageGate
+    ageVerifiedCallback(userEnteredAge)
+  else
+    handle_422_451_error(handle_422_451_errorAtKidsModeExitCallback)
+  end if
 End Function
