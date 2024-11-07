@@ -941,13 +941,10 @@ Function resetDefaultState()
     m.top.removeChild(m.playerCountdownGroup)
   end if
 
-  if m.airDateCountdown <> invalid
-    m.offset.removeChild(m.airDateCountdown)
-  end if
-
   ' reset any boolean INPUT state fields m.top
   m.top.needsLogin = false
   m.top.reminderIsSet = false
+  m.top.airDateTime = ""
 
 End Function
 
