@@ -103,7 +103,7 @@ Function init()
   setTypographyOfLabel(m.title, m.typographyConstants.ids.headerSmall)
   setTypographyOfLabel(m.episode, m.typographyConstants.ids.subheaderSmall)
   setTypographyOfLabel(m.Line1, m.typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.Line1Bold, m.typographyConstants.ids.subheaderSmall)
+  setTypographyOfLabel(m.Line1Bold, m.typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.DescriptorCode, m.typographyConstants.ids.bodyExtraSmallStrong)
   setTypographyOfLabel(m.RatingLabel, m.typographyConstants.ids.bodyExtraSmallStrong)
   setTypographyOfLabel(m.ExpireWarning, m.typographyConstants.ids.bodyMedium)
@@ -169,6 +169,7 @@ Function onThemeChange(msg = invalid)
     m.Starring.color = theme.primaryTextColor
     m.uhdAvailableBadge.backgroundColor = theme.defaultDarkTransparentAccent20
     m.uhdAvailableBadge.textColor = theme.highlightedTextColor
+    m.Line1Bold.color = theme.secondaryTextColor
   end if
 End Function
 
