@@ -786,9 +786,7 @@ Function cmsApi_createCategoryRequestInfo(category, homeScreen, bKidsMode, isSig
     if isNonEmptyString(categoryId) = true
       tubiLog("CategoryGridList.fetch whole: Asking GeneralTask for " + categoryId)
 
-      options = {
-        params: {}
-      }
+      params = {}
 
       if homeScreen.contentMode = m.constants.ui.contentMode.homescreen
         contentModeValue = ""
@@ -796,11 +794,17 @@ Function cmsApi_createCategoryRequestInfo(category, homeScreen, bKidsMode, isSig
         contentModeValue = homeScreen.contentMode
       end if
 
-      contentModeParam = {
-        "content_mode": contentModeValue
-      }
+      params["content_mode"] = contentModeValue
 
-      options.params.append(contentModeParam)
+      ' TODO: Temporary for testing will be removed.
+      if m.constants.settings.mode = "dev"
+        params["include_fox_live_events_banner"] = true
+        params["include_fox_live_events"] = true
+      end if
+
+      options = {
+        "params": params
+      }
 
       imageTypes = invalid
 
