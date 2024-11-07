@@ -418,6 +418,35 @@ Function getFoxVideoPlayerConfig()
     "upNextDurationMovie": 60,
     "upNextDurationSeries": 30,
     "video": {
+      "capabilities": {
+        "HDR": {
+          "HDR10": true,
+          "codecs": [
+            {
+              "codec": "hevc",
+              "profile": "main 10",
+              "level": "5.1"
+            }
+          ],
+          "refresh": 60
+        },
+        "SDR": {
+          "HDR10": false,
+          "codecs": [
+            {
+              "codec": "hevc",
+              "profile": "main",
+              "level": "4.0"
+            }
+          ],
+          "refresh": 60
+        },
+        "UHD": {
+          "HDCP": "2.2",
+          "refresh": 60,
+          "resolution": "2160p"
+        }
+      },
       "streamTypes": {
         "default": {
           "colorSpace": "SDR",
@@ -456,35 +485,6 @@ Function getFoxVideoPlayerConfig()
         "autoplayContent": {
           "@reference": "DCGPDR-4833",
           "goToFullScreenSeconds": 20
-        },
-        "capabilities": {
-          "HDR": {
-            "HDR10": true,
-            "codecs": [
-              {
-                "codec": "hevc",
-                "profile": "main 10",
-                "level": "5.1"
-              }
-            ],
-            "refresh": 60
-          },
-          "SDR": {
-            "HDR10": false,
-            "codecs": [
-              {
-                "codec": "hevc",
-                "profile": "main",
-                "level": "4.0"
-              }
-            ],
-            "refresh": 60
-          },
-          "UHD": {
-            "HDCP": "2.2",
-            "refresh": 60,
-            "resolution": "2160p"
-          }
         },
         "displayEndCardOnClips": {
           "enabled": false
