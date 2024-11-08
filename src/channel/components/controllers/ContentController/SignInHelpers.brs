@@ -1159,7 +1159,7 @@ Function onMagicLinkResponse(response)
     if currentScreen <> invalid AND (currentScreen.id = m.constants.ui.screenIds.emailVerificationScreen OR currentScreen.id = m.constants.ui.screenIds.forgotPasswordProcessingScreen)
       currentScreen.uid = response.uid
       m.emailVerificationTimer = CreateObject("roSGNode", "Timer")
-      m.emailVerificationTimer.duration = 2
+      m.emailVerificationTimer.duration = 5
       m.emailVerificationTimer.observeFieldScoped("fire", "onEmailVerificationTimerFired")
       m.emailVerificationTimer.control = "start"
     end if
