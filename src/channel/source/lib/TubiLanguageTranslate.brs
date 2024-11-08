@@ -1742,7 +1742,7 @@ Function getTranslation_en_US()
     },
     "info_panel_available_in_4k": {
       "description": "Lets user know this content is available in 4k (although may not be available on their device)",
-      "message": "Available in 4k"
+      "message": "Available in 4K"
     },
     "goBack_videoPlayer_ad": {
       "description": "Navigational instructions to users when pause Ad is displayed on video screen",
