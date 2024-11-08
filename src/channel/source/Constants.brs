@@ -557,10 +557,10 @@ Function getConstants()
 
     'remote Config hub url
     constants.urls.configHub = {}
-      constants.urls.configHub.urlBase = "http://config-hub.production-public.tubi.io"
+      constants.urls.configHub.urlBase = "https://config-hub.production-public.tubi.io"
 
       if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
-        constants.urls.configHub.urlBase = "http://config-hub.staging-public.tubi.io"
+        constants.urls.configHub.urlBase = "https://config-hub.staging-public.tubi.io"
       end if
 
       constants.urls.configHub.config = constants.urls.configHub.urlBase + "/api/v1/remote_config/" + constants.platform
