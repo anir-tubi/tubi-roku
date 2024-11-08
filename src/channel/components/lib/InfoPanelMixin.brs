@@ -54,11 +54,9 @@ Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel, bInSpo
     if resolution = "1080" AND getExperimentResource("roku_1080p_resolution", "roku_1080p_resolution_v1").enabled = true
       fullHDBadgeText = getTranslation("resolution_full_hd")
       lineOneData.fullHDBadgeText = fullHDBadgeText
+    else if resolution = "2160" then
+      lineOneData.has4k = true
     end if
-  end if
-
-  if isNonEmptyString(fullHDBadgeText) = false AND content.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
-    lineOneData.has4k = true
   end if
 
   if content.availabilityEnds <> invalid
@@ -112,11 +110,9 @@ Function populateInfoPanelWithHomescreenStyleSportsMode(content, infoPanel, bInS
     if resolution = "1080" AND getExperimentResource("roku_1080p_resolution", "roku_1080p_resolution_v1").enabled = true
       fullHDBadgeText = getTranslation("resolution_full_hd")
       lineOneData.fullHDBadgeText = fullHDBadgeText
+    else if resolution = "2160" then
+      lineOneData.has4k = true
     end if
-  end if
-
-  if isNonEmptyString(fullHDBadgeText) = false AND content.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
-    lineOneData.has4k = true
   end if
 
   lineTwoData = {}
@@ -164,11 +160,7 @@ Function populateInfoPanelWithPurpleCarpetMode(content, infoPanel, isEventDetail
   lineOneData.hasAudioDescription = content.hasAudioDescription
   lineOneData.length = content.length
 
-
-  ' TODO hard coding as true for now as backend has not been updated to pass video_metadata with a resolution of 2160p
-  ' if content.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
-    lineOneData.has4k = true
-  ' end if
+  lineOneData.has4k = (content.resolution = "2160")
 
   lineTwoData = {}
   infoPanel.mode = m.constants.ui.infoPanelModes.purpleCarpetEvent
@@ -355,10 +347,7 @@ Function populateInfoPanelWithPurpleCarpetBannerMode(content, infoPanel)
   lineOneData.genres = content.genres
   lineOneData.hasCC = content.hasSubtitles
 
-  ' TODO hard coding as true for now as backend has not been updated to pass video_metadata with a resolution of 2160p
-  ' if content.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
-    lineOneData.has4k = true
-  ' end if
+  lineOneData.has4k = (content.resolution = "2160")
 
   lineTwoData = {}
   infoPanel.mode = m.constants.ui.infoPanelModes.purpleCarpetBanner

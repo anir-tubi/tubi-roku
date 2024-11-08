@@ -68,9 +68,7 @@ Function updateInfoPanel(infoNode, content)
   lineOneData.hasCC = (content.hasSubtitles = true OR m._.empty(content.subtitleTracks) = false)
   lineOneData.hasAudioDescription = content.hasAudioDescription
 
-  if content.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
-    lineOneData.has4k = true
-  end if
+  lineOneData.has4k = (content.resolution = "2160")
 
   if content.availabilityEnds <> invalid
     lineOneData.availabilityEnds = content.availabilityEnds

@@ -1476,14 +1476,11 @@ Function getConstants()
   constants.configHubFallbacks = {}
     constants.configHubFallbacks.majorEventStart = "2025-02-09T05:00:00.000000Z"
     constants.configHubFallbacks.majorEventEnd = "2025-02-10T08:00:00.000000Z"
-  
-    constants.serverValues = {}
-    constants.serverValues.tensorVideoRenditions = {}
-      constants.serverValues.tensorVideoRenditions.fourK = "4K_READY"
 
+  constants.serverValues = {}
   ' Creates mapping against parental rating to a header string.
   constants.serverValues.parentalControls = ["YOUNGER_CHILD", "OLDER_CHILD", "TEEN", "ADULT"]
-  
+
   constants.serverValues.contentModeHeaders = {}
     constants.serverValues.contentModeHeaders[constants.ui.contentMode.latino] = "LATINO"
     constants.serverValues.contentModeHeaders[constants.ui.contentMode.movie] = "MOVIE"

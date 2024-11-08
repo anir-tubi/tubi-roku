@@ -487,7 +487,6 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     translatedContent.cuepoints = contentFromServer.monetization.cue_points
   end if
 
-  ' DRM encoded streams
   if isNonEmptyArray(contentFromServer.video_metadata) = true
     for i = 0 to contentFromServer.video_metadata.count() - 1
       videoMetadata = contentFromServer.video_metadata[i]
@@ -509,16 +508,6 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
   if contentFromServer.ad_languages <> invalid AND contentFromServer.ad_languages.Count() > 0
     translatedContent.hasAudioDescription = true
-  end if
-
-  ' compare list of renditions to device and environment capabilities to get the highest rendition
-  if contentFromServer.video_renditions <> invalid
-    ' for now, only worry about 4k
-    if contentFromServer.video_renditions[0] = m.constants.serverValues.tensorVideoRenditions.fourK
-      if m.constants.deviceInfo.videoMode.toInt() >= 2160
-        translatedContent.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
-      end if
-    end if
   end if
 
   ' linear subtitles
@@ -2390,15 +2379,6 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
     if channelFromServer.needs_login = true AND isUserSignedIn = false AND m.checkIfUserIsInRegistrationByPassMode() = false
       translatedProgram.needsLogin = true
       translatedProgram.loginReason = channelFromServer.login_reason
-    end if
-
-    if programFromServer.videoRenditions <> invalid
-      ' for now, only worry about 4k
-      if programFromServer.videoRenditions[0] = m.constants.serverValues.tensorVideoRenditions.fourK
-        if m.constants.deviceInfo.videoMode.toInt() >= 2160
-          translatedProgram.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
-        end if
-      end if
     end if
 
     if programFromServer.description <> invalid and programFromServer.description <> ""

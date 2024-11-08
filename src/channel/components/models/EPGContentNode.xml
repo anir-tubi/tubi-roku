@@ -17,9 +17,6 @@
     <!-- Field to tell whether program has audio description or not-->
     <field id="hasAudioDescription" type="boolean" />
 
-    <!-- Field to tell whether program has 4k content, 1080p content, etc-->
-    <field id="highestRendition" type="string" />
-
     <!-- This field is to avoid access global node in program items.
     Item Attributes has following formats
     title : is translated text "Starts at"

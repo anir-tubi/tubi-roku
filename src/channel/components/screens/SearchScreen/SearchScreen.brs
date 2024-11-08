@@ -509,11 +509,9 @@ Function onItemFocused(msg)
         if resolution = "1080" AND getExperimentResource("roku_1080p_resolution", "roku_1080p_resolution_v1").enabled = true
           fullHDBadgeText = getTranslation("resolution_full_hd")
           lineOneData.fullHDBadgeText = fullHDBadgeText
+        else if resolution = "2160" then
+          lineOneData.has4k = true
         end if
-      end if
-
-      if isNonEmptyString(fullHDBadgeText) = false AND focusedContent.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
-        lineOneData.has4k = true
       end if
 
       lineTwoData = {
@@ -527,7 +525,7 @@ Function onItemFocused(msg)
       end if
 
     else if focusedContent.type = m.constants.ui.contentTypes.purpleCarpetEvent
-      
+
       populateInfoPanelWithPurpleCarpetBannerMode(focusedContent, m.searchScreenInfoPanel)
 
     else
@@ -561,11 +559,11 @@ Function onItemFocused(msg)
         m.searchScreenInfoPanel.needsLogin = false
       end if
     end if
-    
+
     if focusedContent.type <> m.constants.ui.contentTypes.purpleCarpetEvent
       m.searchScreenInfoPanel.lineOneData = lineOneData
       m.searchScreenInfoPanel.lineTwoData = lineTwoData
-    end if 
+    end if
     m.searchScreenInfoPanel.calculateHeight = true
 
     ' Set up the info that the ContentController uses to send navigate_within_page events.
