@@ -16,8 +16,8 @@ Function init()
   end if
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.heading, typographyConstants.ids.headerMedium)
-  setTypographyOfLabel(m.subheading, typographyConstants.ids.bodyLarge)
+  setTypographyOfLabel(m.heading, typographyConstants.ids.headerLarge)
+  setTypographyOfLabel(m.subheading, typographyConstants.ids.bodyMedium)
 
   onThemeChange()
 

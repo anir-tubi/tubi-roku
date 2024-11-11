@@ -46,7 +46,7 @@
           width="345"
           height="72"
           translation="[780, 0]"
-          fontSize="24"/>
+          fontSize="28"/>
       </LayoutGroup>
   </children>
 </component>
