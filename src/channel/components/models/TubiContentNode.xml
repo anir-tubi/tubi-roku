@@ -121,5 +121,8 @@
 
     <field id="playerType" type="string" />
 
+    <!-- ID of a preview. It is used to send for analytic events -->
+    <field id="previewId" type="string" />
+
   </interface>
 </component>

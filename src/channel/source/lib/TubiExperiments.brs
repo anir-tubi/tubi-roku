@@ -57,6 +57,10 @@ Function TubiExperiments(experimentsInfo) as Object
         roku_player_client_log_v1: {"enabled": false}
       }
 
+      roku_multiple_video_preview_nav: {
+        roku_multiple_video_preview_nav_v1: {"enabled": false}
+      }
+      
       roku_1080p_resolution: {
         roku_1080p_resolution_v1 : {"enabled": false}
       }

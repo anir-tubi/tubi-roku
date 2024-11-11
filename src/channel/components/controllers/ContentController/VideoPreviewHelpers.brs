@@ -165,6 +165,11 @@ Function startVideoPreview(content, pageInfo = {})
     videoContent.id = content.id
     videoContent.streamformat = "mp4" ' backend will return always as mp4
 
+    if isNonEmptyString(content.previewId) = true
+      videoContent.addField("previewId", "string", false)
+      videoContent.previewId = content.previewId
+    end if
+
     videoPreview.content = videoContent
     videoPreview.updateContent = true
     sendVideoPlayerCommand(videoPreview, "play")

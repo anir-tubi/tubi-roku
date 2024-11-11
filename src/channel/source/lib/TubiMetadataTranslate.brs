@@ -601,10 +601,30 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   end if
 
   if contentFromServer.has_trailer = true then translatedContent.hasTrailer = true
-
-  ' video preview
-  if contentFromServer.video_preview_url <> invalid
-    translatedContent.videoPreviewUrl = contentFromServer.video_preview_url
+  if isNonEmptyArray(contentFromServer.video_previews) = true AND contentFromServer.video_previews.count() > 1
+    isMultipleVideoPreviewsExpEnabled = (m.experiments <> invalid AND m.experiments.getExperimentResource("roku_multiple_video_preview_nav", "roku_multiple_video_preview_nav_v1").enabled = true)
+    videoPreviews = contentFromServer.video_previews
+    if isMultipleVideoPreviewsExpEnabled = false
+      translatedContent.videoPreviewUrl = videoPreviews[0].url
+      translatedContent.previewId = videoPreviews[0].uuid
+    else if isMultipleVideoPreviewsExpEnabled = true
+      videoPreviewCount = contentFromServer.video_previews.count()
+      ' The Rnd() function generates a random integer between 1 and the specified maximum value (inclusive). For instance,
+      ' if we pass 3 as the argument (the length of the array), it will return either 1, 2, or 3.
+      ' Since we are using the first index for control purposes, we subtract 1 from the total count. As a result, it will return either 1 or 2.
+      ' Given that arrays start at index 0, this ensures that we only consider the last two values, with the first value reserved for control.
+      randomIndex = Rnd(videoPreviewCount - 1)
+      randomPreview = contentFromServer.video_previews[randomIndex]
+      if isAA(randomPreview) = true
+        translatedContent.videoPreviewUrl = randomPreview.url
+        translatedContent.previewId = randomPreview.uuid
+      end if
+    end if
+  else
+    ' video preview
+    if contentFromServer.video_preview_url <> invalid
+      translatedContent.videoPreviewUrl = contentFromServer.video_preview_url
+    end if
   end if
 
   'if this content is actually just a paginated response, set pagination data

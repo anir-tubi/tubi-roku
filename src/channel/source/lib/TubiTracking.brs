@@ -611,6 +611,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       video_id: -1
       is_fullscreen: false
       video_player: "BANNER"
+      preview_id: "" '// unique ID of a preview. Can be used to identify preview url
       pageOneof: {} 'current screen
     }
 
@@ -619,6 +620,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       end_position: -1 'ms
       pageOneof: {} 'current screen
       has_completed: false
+      preview_id: "" '// unique ID of a preview. Can be used to identify preview url
     }
 
     preview_play_progress: {
@@ -626,6 +628,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       position: -1  'ms
       view_time: -1 'ms
       video_player: "BANNER"
+      preview_id: "" '// unique ID of a preview. Can be used to identify preview url
       pageOneof: {} 'current screen
     }
 

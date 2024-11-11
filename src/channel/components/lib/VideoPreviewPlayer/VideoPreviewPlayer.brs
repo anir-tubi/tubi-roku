@@ -71,6 +71,10 @@ Function playContent()
   m.top.state = "playing" ' The player takes a little while to start playing. If we don't update the state here then setVideoPreviewAfterFocus will try to stop the video and then play it again even though it is the same content
   m.Video.control = "play"
 
+  if isNode(m.Video.content) = true AND isNonEmptyString(m.Video.content.previewId) = true
+    getExperimentResource("roku_multiple_video_preview_nav", "roku_multiple_video_preview_nav_v1")
+  end if
+
   m.lastPingTime = 0
   m.playerPosition = 0
 
@@ -82,6 +86,7 @@ Function playContent()
         video_id: m.Video.content.id.toInt()
         is_fullscreen: false
         video_player: "BANNER"
+        preview_id: m.Video.content.previewId
         pageOneof: m.tubiTrackingInfo.getAnalyticsPage(m.currentPageInfo.pageType, m.currentPageInfo.pageValues)
       }
     }
@@ -266,6 +271,7 @@ Function getPreviewProgressEvent(pageInfo, callSource)
         pgInfo = m.tubiTrackingInfo.getAnalyticsPage(pageInfo.pagetype, pageInfo.pageValues)
       end if
     end if
+
     previewProgressEvent = {
       type: "preview_play_progress"
       values: {
@@ -273,6 +279,7 @@ Function getPreviewProgressEvent(pageInfo, callSource)
         position: currentPosition
         view_time: viewTime
         video_player: "BANNER"
+        preview_id: m.Video.content.previewId
         pageOneof: pgInfo
       }
     }
@@ -306,6 +313,7 @@ Function getFinishPreviewEvent(hasCompleted = false)
     values: {
       video_id: m.Video.content.id.toInt()
       end_position: Int(m.playerPosition * 1000) 'ms
+      preview_id: m.Video.content.previewId
       pageOneof: m.tubiTrackingInfo.getAnalyticsPage(m.currentPageInfo.pageType, m.currentPageInfo.pageValues)
       has_completed: hasCompleted
     }
