@@ -307,7 +307,7 @@ Function tubiMetadataTranslate_composeVideoResources_test()
   m.assertNotInvalid(videoResource.length)
   m.assertEqual(videoResource.streamformat, "dash")
   m.assertEqual(videoResource.codec, "H265")
-  m.assertEqual(videoResource.resolution, "2160P")
+  m.assertEqual(videoResource.resolution, "2160")
 
   'Playready doesn't have drmParams
   videoResourcePlayReady = videoResources[0][1]
@@ -320,7 +320,7 @@ Function tubiMetadataTranslate_composeVideoResources_test()
   m.assertNotInvalid(videoResourcePlayReady.drmHeaders)
   m.assertEqual(videoResourcePlayReady.streamformat, "dash")
   m.assertEqual(videoResourcePlayReady.codec, "H265")
-  m.assertEqual(videoResourcePlayReady.resolution, "2160P")
+  m.assertEqual(videoResourcePlayReady.resolution, "2160")
 
   'HLS shouldn't have any drm fields
   videoResourceHls = videoResources[0][2]
@@ -331,7 +331,7 @@ Function tubiMetadataTranslate_composeVideoResources_test()
   m.assertEqual(videoResourceHls.type, "hlsv3")
   m.assertEqual(videoResourceHls.streamformat, "hls")
   m.assertEqual(videoResourceHls.codec, "H265")
-  m.assertEqual(videoResourceHls.resolution, "720P")
+  m.assertEqual(videoResourceHls.resolution, "720")
 
 End Function
 

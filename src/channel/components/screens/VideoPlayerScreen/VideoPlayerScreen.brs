@@ -859,7 +859,7 @@ Function fireStartVideoOrTrailerEvent()
 
     resolution = "VIDEO_RESOLUTION_UNKNOWN"
     if isNonEmptyString(m.Video.content.resolution) = true
-      resolution = "VIDEO_RESOLUTION_" + m.Video.content.resolution
+      resolution = "VIDEO_RESOLUTION_" + m.Video.content.resolution + "P"
     end if
 
     trackEvent({

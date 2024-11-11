@@ -1885,8 +1885,8 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
 
       resolution = ""
       if video.resolution <> invalid
-        resolution = getResolutionFromVideoResource(video)
-        resource.resolution = resolution
+        resolution = getIntegerResolutionFromVideoResource(video)
+        resource.resolution = resolution.toStr()
       end if
 
       validResource = false
@@ -1980,15 +1980,6 @@ End Function
 ' eg. H265
 Function getCodecFromVideoResource(resource as Object)
   return resource.codec.replace("VIDEO_CODEC_","")
-End Function
-
-
-' @resource: assocArray, video resource that content api responds
-'
-' returns resolution as string without prefix "VIDEO_RESOLUTION_"
-' eg. 1080P
-Function getResolutionFromVideoResource(resource as Object)
-  return resource.resolution.replace("VIDEO_RESOLUTION_","")
 End Function
 
 
