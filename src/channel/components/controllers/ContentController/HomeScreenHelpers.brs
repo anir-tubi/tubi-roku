@@ -1320,12 +1320,13 @@ Function getProgramInfoFromFoxListingComplete(response)
 
     purpleCarpetContainer = filterPurpleCarpetContainerItemsBasedOnListing(response.data, responseContext.purpleCarpetContainer, responseContext.screenId)
 
-    if isFunction(m.onUpdateContainerWithProgramInfoFromFoxListingCompletionCallback) = true
-      m.onUpdateContainerWithProgramInfoFromFoxListingCompletionCallback(purpleCarpetContainer, responseContext.screenId)
-    end if
-
     if response.data <> invalid
       m.foxListingEndpointResponse = response.data
+    end if
+
+    ' Note, m.foxListingEndpointResponse must be set before calling the callback as we use m.foxListingEndpointResponse in the callback.
+    if isFunction(m.onUpdateContainerWithProgramInfoFromFoxListingCompletionCallback) = true
+      m.onUpdateContainerWithProgramInfoFromFoxListingCompletionCallback(purpleCarpetContainer, responseContext.screenId)
     end if
   end if
 End Function
