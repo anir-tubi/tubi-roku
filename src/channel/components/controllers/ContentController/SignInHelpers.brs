@@ -1593,7 +1593,7 @@ Function onSignUpSignInErrorScreenContinueAsGuestUserButtonSelected(msg)
   currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
   refreshAllDetailScreens()
-
+  focusSideNavOption(m.constants.ui.sideNavIds.home)
   if currentScreen <> invalid and (currentScreen.getSubtype() = "DetailScreen" OR currentScreen.getSubtype() = "DetailScreenHoriz")
     currentScreen.jumpToItem = 0
     currentScreen.setfocus(true)
