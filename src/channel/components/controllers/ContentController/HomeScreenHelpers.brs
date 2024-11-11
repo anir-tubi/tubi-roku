@@ -1403,12 +1403,17 @@ Function filterPurpleCarpetContainerItemsBasedOnListing(listing, purpleCarpetCon
         end if
       end for
 
-      m.nodeHelpers.removeAllChildren(purpleCarpetContainer)
+      ' Since before the event we will not have listing api return the actual listing.
+      ' But user might still land on event details screen from banner or deeplink or search screen in which we need to use backend info.
+      ' If we get match for the tensor and listing then we good to proceed or else only removing for home screen.
       if isNonEmptyArray(filteredEventList) = true
+        m.nodeHelpers.removeAllChildren(purpleCarpetContainer)
         purpleCarpetContainer.appendChildren(filteredEventList)
+      else if screenId <> m.constants.ui.screenIds.eventDetailScreen
+        m.nodeHelpers.removeAllChildren(purpleCarpetContainer)
       end if
     end if
-  else if isNode(purpleCarpetContainer) = true
+  else if isNode(purpleCarpetContainer) = true AND screenId <> m.constants.ui.screenIds.eventDetailScreen
     ' If listing api fails or returns empty response than removing all the items from the container so that it is hidden.
     m.nodeHelpers.removeAllChildren(purpleCarpetContainer)
   end if

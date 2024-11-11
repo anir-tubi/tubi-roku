@@ -24,7 +24,7 @@ Function showEventDetailScreen(eventId, purpleCarpetContainerContent = invalid, 
     }
   }
 
-  if purpleCarpetContainerContent <> invalid
+  if isPurpleCarpetContainerEmpty(purpleCarpetContainerContent) = false
     screen.content = purpleCarpetContainerContent
     if onScreenLoadCompletionCallback <> invalid
       onScreenLoadCompletionCallback()
@@ -161,4 +161,17 @@ Function startPurpleCarpetDeeplinkedEventPlayback()
     ' primaryEventContent will contain the processed node which will also have updated values from listing endpoint.
     playLinearVideoContent(screen.primaryEventContent, false, m.constants.ui.screenIds.eventDetailScreen, false, playbackSource)
   end if
+End Function
+
+
+Function isPurpleCarpetContainerEmpty(purpleCarpetContent)
+  if isNode(purpleCarpetContent) = true
+    child = purpleCarpetContent.getChild(0)
+
+    if child <> invalid AND child.getChildCount() > 0
+      return false
+    end if
+  end if
+
+  return true
 End Function
