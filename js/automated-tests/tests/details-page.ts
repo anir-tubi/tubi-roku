@@ -135,7 +135,7 @@ describe('Details Page', function () {
       expect(position).to.be.lessThan(5000);
 
       // Clean up
-      await ecp.sendKeypress(ecp.Key.Back, {count:1});
+      await ecp.sendKeypress(ecp.Key.Back, {count:1, wait:2000});
       await testUtils.selectAndVerifyDetailPageMenuItem('removeFromHistory');
     });
 

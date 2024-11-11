@@ -36,8 +36,8 @@ describe('Sign up Save Progress TV', function () {
         await ecp.sendKeypress(ecp.Key.Ok, {wait:10000});
 
         // Are we on the sign in/sign up page?
-        const signInScreenPageHeader = await testUtils.getNodeForElement('signInScreenPageHeader', 2000);
-        expect(signInScreenPageHeader.text).to.equal('Sign In to Your Account');
+        await testUtils.waitForElementToFullyShowOnScreen('resendButtonMagicLink', 'Resend button not found');
+      
 
     });
 

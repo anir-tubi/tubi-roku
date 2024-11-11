@@ -35,9 +35,9 @@ describe('Welcome Registration', function () {
     // Press ok on Continue button
     await ecp.sendKeypress(ecp.Key.Ok);
 
-    // Verify if on the Sign In to Your Account age
-    const signInScreenPageHeader = await testUtils.getNodeForElement('signInScreenPageHeader');
-    expect(signInScreenPageHeader.text).to.equal('Sign In to Your Account');
+    // Verify if on the  Magic link Sign In 
+    await testUtils.waitForElementToFullyShowOnScreen('resendButtonMagicLink');
+    
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/450812
@@ -72,10 +72,10 @@ describe('Welcome Registration', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify if on the Sign In to Your Account age
-    const signInScreenPageHeader = await testUtils.getNodeForElement('signInScreenPageHeader');
-    expect(signInScreenPageHeader.text).to.equal('Sign In to Your Account');
+    await testUtils.waitForElementToFullyShowOnScreen('resendButtonMagicLink');
 
     // Press Back on the Sign In screen
+    await utils.sleep(2000); // Test fails without
     await ecp.sendKeypress(ecp.Key.Back);
 
     // Verify Welcome Modal not displayed and Homescreen displayed

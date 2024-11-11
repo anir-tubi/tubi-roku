@@ -317,6 +317,8 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.3.#DetailsMenuText',
   },
 
+
+
   /** Play Button */
   playListButton: {
     keyPath:
@@ -338,6 +340,15 @@ const elements = typeCheckElements({
   myStuffContinueWatchingRow: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#ContentArea.#RowList.1.title.#CategoryName',
+  },
+
+  emailTexEditBox: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#emailInputScreen.#emailLayout.1.#emailTextEditBox.0',
+  },
+
+  /** Resend button on Magic Link */
+  resendButtonMagicLink: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#emailVerificationScreen.#pageLayout.#buttonGroup.#resendBtn.#focus9Patch',
   },
 
   /** Progress bar on resumed button */

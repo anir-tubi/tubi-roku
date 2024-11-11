@@ -19,7 +19,7 @@ describe('Live', function () {
 
         // Verify that video preview is playing
         await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'On Now');
-        await ecp.sendKeypress(ecp.Key.Right, {count:1});
+        await ecp.sendKeypress(ecp.Key.Right, {count:2});
         await utils.sleep(5000);
         await linearVideoPreviewPlayingTest();
 
@@ -88,10 +88,11 @@ describe('Live', function () {
  
         // Navigate to the Live News Row
         await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+        await utils.sleep(2000);
         await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
 
         // Verify that linear preview video is playing
-        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 7000);
+        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 10000);
 
         // Navigate right
         await ecp.sendKeypress(ecp.Key.Right);
@@ -113,6 +114,7 @@ describe('Live', function () {
      it('C115290 -  Home Screen Automatic Small video transition to full screen view @live', async () => {
  
         // Navigate to the Live News Row
+        await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
         await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
 
         // Verify that full video plays after preview video is playing

@@ -393,18 +393,21 @@ async function signInUserFromParentalControls() {
 
   // Show request for info Roku overlay
   await ecp.sendKeypress(ecp.Key.Ok);
-  await utils.sleep(7000); // We can't get rid of this sleep since this is Roku's native panel and we have no way to observe when it is showing
-  await ecp.sendKeypress(ecp.Key.Down);
+  await utils.sleep(8000); // We can't get rid of this sleep since this is Roku's native panel and we have no way to observe when it is showing
   await ecp.sendKeypress(ecp.Key.Ok);
 
   // Now we need to make our user
   const user = await testUtils.createRegisteredUser();
 
-  // TODO expose userInfo in some way
+  // Enter email
   await ecp.sendText(user['userInfo'].email);
-
+  await ecp.sendKeypress(ecp.Key.Down);
+  await ecp.sendKeypress(ecp.Key.Ok);
+  await testUtils.waitForElementToFullyShowOnScreen('emailTexEditBox');
+  await ecp.sendText(user['userInfo'].email);
   await ecp.sendKeypress(ecp.Key.Down, { count: 4, wait:1500});
   await ecp.sendKeypress(ecp.Key.Ok);
+
 
   await testUtils.waitForElementToFullyShowOnScreen('signInScreenPasswordBox', 'Password box not found', 10000);
   await ecp.sendKeypress(ecp.Key.Ok);

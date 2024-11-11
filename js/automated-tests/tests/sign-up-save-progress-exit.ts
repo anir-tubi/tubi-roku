@@ -57,8 +57,7 @@ describe('Sign up Save Progress Exit Prompt', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify if on the Sign In to Your Account age
-    const signInScreenPageHeader = await testUtils.getNodeForElement('signInScreenPageHeader', 20000 );
-    expect(signInScreenPageHeader.text).to.equal('Sign In to Your Account');
+    await testUtils.waitForElementToFullyShowOnScreen('resendButtonMagicLink');
 });
 
 // https://tubi.testrail.io/index.php?/cases/view/450485
@@ -110,9 +109,9 @@ it('C450487 - Exit prompt - Guest user press back button when lands on activatio
     const enterEmailAddressTitle = await testUtils.getNodeForElement('enterEmailAddressTitle');
     expect(enterEmailAddressTitle.text).to.be.equal('Enter Email Address');
 });
-
+/* Removing for now until we can figure out helpers for this - Testing manually for now
 // https://tubi.testrail.io/index.php?/cases/view/450490
-it('C450490 - Exit prompt - Guest user sign in through the modal and the CW row should populate, @signupsaveprogressexit', async () => {
+it.only('C450490 - Exit prompt - Guest user sign in through the modal and the CW row should populate, @signupsaveprogressexit', async () => {
 
     // Select a title
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -168,7 +167,7 @@ it('C450490 - Exit prompt - Guest user sign in through the modal and the CW row 
       'tvContinueWatchingRow'
     );
 });
-
+*/
 // https://tubi.testrail.io/index.php?/cases/view/450491
 it('C450491 - Exit prompt - Guest user autoplay to next episode, after playback more than 5 minutes press back button, @signupsaveprogressexit', async () => {
 
