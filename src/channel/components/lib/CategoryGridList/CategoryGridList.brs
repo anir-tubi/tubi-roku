@@ -639,7 +639,7 @@ Function setRowListFocus()
       row = Int(m.RowList.currFocusRow)
       col = Int(m.RowList.currFocusColumn)
       reloadedItemIndex = [row, col]
-    else if isNonEmptyArray(m.RowList.rowItemFocused) = true AND m.RowList.rowItemFocused[0] > 0 AND m.RowList.rowItemFocused[1] > 0
+    else if isNonEmptyArray(m.RowList.rowItemFocused) = true AND m.RowList.rowItemFocused[0] >= 0 AND m.RowList.rowItemFocused[1] >= 0
       '//currFocusColumn is not available in firmware lower than Roku OS 10.5, so use rowItemFocused. It's imperfect, as it
       '// may think a different item is focused instead of the 1st colum/1st row,
       '// but it will not display a wrong metadata when the user quickly navigates away from 1st rowItem [0,0] as the content is loading
