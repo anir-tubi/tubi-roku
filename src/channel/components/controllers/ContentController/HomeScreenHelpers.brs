@@ -501,7 +501,10 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
       }
       updateContainerWithProgramInfoFromFoxListing(context, onHomeScreenContentUpdateComplete)
     else
-      m.purpleCarpetContainerContentNode = invalid
+      ' Since this callback is called for all types of home screen modes like shows and movies we should not resetting the m scope value.
+      if screenID = m.constants.ui.screenIds.homeScreen
+        m.purpleCarpetContainerContentNode = invalid
+      end if
       homeScreen.purpleCarpetContent = invalid
       homeScreen.purpleCarpetContentUpdated = true
     end if
