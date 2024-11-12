@@ -201,6 +201,7 @@ Function onContentChange()
   ' Also to handle the case where user navigates to side nav from the rowlist and Sign in or out which causes content to refresh.
   if ((m.top.spotlightContent <> invalid AND m.top.spotlightContent.getChildCount() > 0) OR isPurpleCarpetContainerEmpty() = false) AND m.lastFocusedList <> "rowlist"
     m.rowList.translation = [0, 384]
+    m.purpleCarpetRow.opacity = 1
   else
     ' Resetting the state of the UI.
     ' Below logic will be used in case of there is no purple carpet or spotlight on initial load.
