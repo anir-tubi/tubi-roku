@@ -587,7 +587,9 @@ Function sendFoxVideoPlayerLivePlayProgressEvent(position, alwaysSend = false)
       m.lastSentFoxPlayerProgressPosition = position
     else
       viewTime = position - m.lastSentFoxPlayerProgressPosition
-      if m.foxPlayerCurrentInputContent <> invalid AND (viewTime >= 10 OR (alwaysSend AND viewTime > 0)) then
+
+
+      if m.foxPlayerCurrentInputContent <> invalid AND (viewTime >= m.constants.player.pingFrequency OR (alwaysSend AND viewTime > 0)) then
         videoId = m.foxPlayerCurrentInputContent.id.toInt()
         event = {
           type: "live_play_progress"

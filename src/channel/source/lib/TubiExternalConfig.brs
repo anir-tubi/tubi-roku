@@ -34,20 +34,6 @@ Function tubiExternalConfig_getConfigsRequestInfo(constants)
 End Function
 
 
-' @responseData: string, the JSON object returned by req.runSynchronous() or req.response.data
-Function tubiExternalConfig_parseConfigs(responseData)
-  configs = invalid
-  if responseData <> invalid
-    configs = ParseJson(responseData)
-    if type(configs) = "roAssociativeArray"
-      configs.blocked_analytics_events_mapping = m.parseBlockedAnalyticsEvents(configs.blocked_analytics_events_mapping)
-    end if
-  end if
-
-  return configs
-End Function
-
-
 ' @blockedAnalyticsEvents: assocarray, {"essential": ["active"], "analytics": ["auto_play"]}
 Function tubiExternalConfig_parseBlockedAnalyticsEvents(blockedAnalyticsEvents)
   ' Converting to blocked_analytics_events_mapping from {"essential": ["active"], "analytics": ["auto_play"]} to {"active": "essential", "ad_click": "analytics"}.
