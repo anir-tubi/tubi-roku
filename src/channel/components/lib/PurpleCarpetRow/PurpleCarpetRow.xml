@@ -62,7 +62,7 @@
         translation="[0, 147]">
         <InfoPanel
           id="infoPanel"
-          maxHeight="471"
+          maxHeight="522"
           vertAlignment="bottom"
           width="960"
           translation="[0,10]"
