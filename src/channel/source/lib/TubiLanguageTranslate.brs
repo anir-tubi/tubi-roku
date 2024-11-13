@@ -2570,7 +2570,7 @@ Function getTranslation_es_MX()
     },
     "screenSettings_menu_autoplayControls": {
       "description": "The Label for the autoplay controls to turn video preview and autoplay of the next video on or off.",
-      "message": "Controles de Auto-Reproducción"
+      "message": "Controles de Auto-Reproducir"
     },
     "screenSettings_menu_autoplayNextVideo": {
       "description": "The label for the autoplay next video",
@@ -2983,6 +2983,14 @@ Function getTranslation_es_MX()
     "metadata_fullscreen_countdown_plural": {
       "description": "label to indicate how many seconds it will take before the video player will automatically go fullscreen. This is the plural version but an attempt should be made to ensure the string is neither plural or singular by using a shorten form of seconds.",
       "message": "Pantalla completa en {seconds} s"
+    },
+    "metadata_fullscreen_countdown_no_seconds": {
+      "description": "label to indicate how many seconds it will take before the video player will automatically go fullscreen. The word 'seconds' should NOT follow the number of seconds.",
+      "message": "Pantalla completa en {seconds}"
+    },
+    "metadata_watch_again": {
+      "description": "label to indicate a watched video can be watched again",
+      "message": "Ver de nuevo"
     },
     "metadata_expiresIn_plural": {
       "description": "label to indicate how long the user have to watch a video",
@@ -4684,6 +4692,14 @@ Function getTranslation_fr_CA()
       "description": "label to indicate how many seconds it will take before the video player will automatically go fullscreen. This is the plural version but an attempt should be made to ensure the string is neither plural or singular by using a shorten form of seconds.",
       "message": "Plein écran dans {seconds} sec"
     },
+    "metadata_fullscreen_countdown_no_seconds": {
+      "description": "label to indicate how many seconds it will take before the video player will automatically go fullscreen. The word 'seconds' should NOT follow the number of seconds.",
+      "message": "Plein écran dans {seconds}"
+    },
+    "metadata_watch_again": {
+      "description": "label to indicate a watched video can be watched again",
+      "message": "Regarde encore"
+    },
     "metadata_expiresIn_plural": {
       "description": "label to indicate how long the user have to watch a video",
       "message": "Expire dans {days} jours"
@@ -5476,6 +5492,22 @@ Function getTranslation_en_GB()
     "goBack_videoPlayer_ad": {
       "description": "Navigational instructions to users when pause Ad is displayed on video screen",
       "message": "Press any button to close the advert"
+    },
+    "sign_in_error_screen__default_subheading": {
+      "description": "Sign in error screen heading default error",
+      "message": "You can still watch your favourite movies and TV shows as a guest."
+    },
+    "sign_in_error_screen__purple_carpet_day_subheading": {
+      "description": "Sign in error screen heading default error",
+      "message": "You can still watch your favourite movies and TV shows as a guest, including the tournament!"
+    },
+    "sign_up_error_screen__default_subheading": {
+      "description": "Sign in error screen heading default error",
+      "message": "You can still watch your favourite movies and TV shows as a guest.\nWe'll send you an email to try again later."
+    },
+    "sign_up_error_screen__purple_carpet_day_subheading": {
+      "description": "Sign in error screen heading default error",
+      "message": "You can still watch your favourite movies and TV shows as a guest, including the tournament!\nWe'll send you an email to try again later."
     }
   }
 End Function
