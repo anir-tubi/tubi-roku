@@ -271,6 +271,7 @@ Function getConstants()
     constants.reqNames.checkBirthdayInfo = "checkBirthdayInfo" 'verify age
     constants.reqNames.patchUserSettings = "patchUserSettings"
     constants.reqNames.sponsorPixel = "sponsorPixel"
+    constants.reqNames.skinAdPixel = "skinAdPixel"
     constants.reqNames.getEPGChannelIds = "getEPGChannelIds"
     constants.reqNames.getEPGPrograms = "getEPGPrograms"
     constants.reqNames.postUserHistory = "postUserHistory"
@@ -348,7 +349,6 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getUserSettings] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.postLogout] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.postAnalytics] = true
-
 
   constants.anonymous = {}
     constants.anonymous.algorithm = "TUBI-HMAC-SHA256"
@@ -735,6 +735,7 @@ Function getConstants()
     constants.uapiContentTypes.container = "container"
 
   constants.timers = {}
+    constants.timers.skinAdTimeout = 5
     constants.timers.remoteComponentTimeout = 30000
 
     ' Time in seconds after which we force a refresh of the categoryscreen
@@ -1099,6 +1100,7 @@ Function getConstants()
       constants.ui.categoryIds.topTenSeries = "top_10_tv_shows_on_tubi"
       ' Adding a constant entry so that it is easier to change for testing or future use if we need to pick other container outside of featured.
       constants.ui.categoryIds.spotlight = "featured"
+      constants.ui.categoryIds.skinAd = "skinAd"
       constants.ui.categoryIds.purpleCarpet = "fox_live_events"
       constants.ui.categoryIds.purpleCarpetBanner = "fox_live_events_banner"
 
@@ -1166,6 +1168,7 @@ Function getConstants()
       constants.ui.contentTypes.epg = "epg"
       constants.ui.contentTypes.sportsEvent = "sports_event"
       constants.ui.contentTypes.purpleCarpetEvent = "purple_carpet_event"
+      constants.ui.contentTypes.skinAd = "skinAd"
 
     constants.ui.playerTypes = {}
       constants.ui.playerTypes.fox = "fox"
@@ -1183,6 +1186,8 @@ Function getConstants()
       constants.ui.backgroundTypes.rightScreen = "rightScreen"
       ' Introducing a new type of background due to difference of gradient between fullscreen version and spotlight variant.
       constants.ui.backgroundTypes.spotlight = "spotlight"
+      ' This acts the same as spotlight but makes changes to allow a seemless transition to a looping background video
+      constants.ui.backgroundTypes.skinAd = "skinAd"
 
     constants.ui.modes = {}
       constants.ui.modes.standard = "standard"
@@ -1215,6 +1220,7 @@ Function getConstants()
       constants.ui.screenLevels.episodeScreen = 50
       constants.ui.screenLevels.eventDetailScreen = 50
       constants.ui.screenLevels.videoPlayerScreen = 60
+      constants.ui.screenLevels.adPlayerScreen = 60
       constants.ui.screenLevels.linearVideoPlayerScreen = 60
       constants.ui.screenLevels.foxVideoPlayerWrapperScreen = 60
       constants.ui.screenLevels.signInSignUpErrorScreen = 60
@@ -1244,6 +1250,7 @@ Function getConstants()
       constants.ui.screenIds.emailInputScreen = "emailInputScreen"
       constants.ui.screenIds.signInScreen = "signInScreen"
       constants.ui.screenIds.videoPlayerScreen = "videoPlayerScreen"
+      constants.ui.screenIds.adPlayerScreen = "adPlayerScreen"
       constants.ui.screenIds.linearVideoPlayerScreen = "linearVideoPlayerScreen"
       constants.ui.screenIds.epgScreen = "epgScreen"
       constants.ui.screenIds.emailVerificationScreen = "emailVerificationScreen"
@@ -1296,6 +1303,18 @@ Function getConstants()
     constants.ui.translations = {}
     constants.ui.translations.marginX = 165
 
+    constants.ui.logoSizes = {}
+      constants.ui.logoSizes.skinAds = {}
+
+        constants.ui.logoSizes.skinAds.adPlayerScreen = {}
+          constants.ui.logoSizes.skinAds.adPlayerScreen.width = "216"
+        
+        constants.ui.logoSizes.skinAds.homeScreen = {}  
+          constants.ui.logoSizes.skinAds.homeScreen.width = "174"
+
+        constants.ui.logoSizes.skinAds.infoPanel = {}  
+          constants.ui.logoSizes.skinAds.infoPanel.width = "594"      
+
     constants.ui.imageSizes = {}
 
       'Sizes of portrait thumbnail that is used in genres row in homescreen.
@@ -1306,6 +1325,9 @@ Function getConstants()
 
       'Sizes of video title image (if available) that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images. The video title image is an image representation of the title metadata of the video. Not all videos may have this image.
       constants.ui.imageSizes.title = [0, 201]
+
+      'The maximum sizes of skinAd logo that is displayed in the right hand corner with the Tubi logo. If 0, then no maximum
+      constants.ui.imageSizes.logoSkinAdSmall = [0, 60]
 
       'Sizes of large poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.largePoster = [252, 360]
@@ -1343,6 +1365,7 @@ Function getConstants()
       end if
 
       constants.ui.imageSizes.spotlightLandscape = [252, 142]
+      constants.ui.imageSizes.skinAdLandscape = [520, 292]
 
       ' Size for the background image.
       if limitedUi = true
@@ -1430,6 +1453,7 @@ Function getConstants()
       constants.ui.gridItemTypes.historySignedOutUser = "continue_watching_signed_out_user"
       constants.ui.gridItemTypes.emptyContainer = "emptyContainer"
       constants.ui.gridItemTypes.portraitTopTen = "portraitTopTen"
+      constants.ui.gridItemTypes.skinAd = "skinAd"
       constants.ui.gridItemTypes.spotlight = "spotlight"
       ' Will be removed when purple carpet code is cleaned up.
       constants.ui.gridItemTypes.purpleCarpet = "purpleCarpet"
@@ -1508,6 +1532,7 @@ Function getConstants()
     defaultDarkTransparentForeground20 = "THEME_defaultDarkTransparentForeground20_THEME"
     defaultDarkTransparentForeground50 = "THEME_defaultDarkTransparentForeground50_THEME"
     defaultDarkTransparentForeground75 = "THEME_defaultDarkTransparentForeground75_THEME"
+    defaultDarkTransparentScrim = "THEME_defaultDarkTransparentScrim_THEME"
     defaultDarkSolidSurface10 = "THEME_defaultDarkSolidSurface10_THEME"
     defaultDarkSolidSurface20 = "THEME_defaultDarkSolidSurface20_THEME"
     defaultDarkStatusSuccess = "THEME_defaultDarkStatusSuccess_THEME"
@@ -1526,7 +1551,7 @@ Function getConstants()
 
     defaultDarkTransparentAccent20 = "THEME_defaultDarkTransparentAccent20_THEME"
 
-'//kids theme constants
+    '//kids theme constants
     kidsDarkPrimaryAccent = "THEME_kidsDarkPrimaryAccent_THEME"
     kidsDarkPrimaryBackground = "THEME_kidsDarkPrimaryBackground_THEME"
     kidsDarkPrimaryForeground = "THEME_kidsDarkPrimaryForeground_THEME"
@@ -1538,6 +1563,7 @@ Function getConstants()
     kidsDarkTransparentForeground20 = "THEME_kidsDarkTransparentForeground20_THEME"
     kidsDarkTransparentForeground50 = "THEME_kidsDarkTransparentForeground50_THEME"
     kidsDarkTransparentForeground75 = "THEME_kidsDarkTransparentForeground75_THEME"
+    kidsDarkTransparentScrim = "THEME_kidsDarkTransparentScrim_THEME"
     kidsDarkSolidSurface10 = "THEME_kidsDarkSolidSurface10_THEME"
     kidsDarkSolidSurface20 = "THEME_kidsDarkSolidSurface20_THEME"
     'kidsDarkStatusSuccess = "THEME_kidsDarkStatusSuccess_THEME"   '//::NOTE:: not currently being used
@@ -1583,6 +1609,7 @@ Function getConstants()
       backgroundColorLight2: defaultDarkTransparentForeground75
       shadeColor: defaultDarkTransparentBackground75
       shadeColor2: defaultDarkTransparentBackground50
+      shadeColor3:  defaultDarkTransparentScrim
       focused2Color: defaultDarkStatusAlert
       unfocusedColor: defaultDarkPrimaryForeground
       selectedListItemColor: defaultDarkTransparentForeground5
@@ -1621,6 +1648,7 @@ Function getConstants()
       backgroundColorLight2: kidsDarkTransparentForeground75
       shadeColor: kidsDarkTransparentBackground75
       shadeColor2: kidsDarkTransparentBackground50
+      shadeColor3:  kidsDarkTransparentScrim
       focused2Color: kidsDarkStatusAlert
       unfocusedColor: kidsDarkPrimaryForeground
       selectedListItemColor: kidsDarkTransparentForeground5

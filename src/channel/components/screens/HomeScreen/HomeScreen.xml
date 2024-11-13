@@ -30,12 +30,17 @@
       <!-- Spotlight content node, will contain a valid node only if the user is in spotlight experiment control group. -->
       <field id="spotlightContent" alias="CategoryGridList.spotlightContent" />
 
+      <!-- Skin Ad content node, will contain a valid node only if the user is in roku_skins_ad experiment variation group. -->
+      <field id="skinAdContent" alias="CategoryGridList.skinAdContent" />
+
       <!-- The helper class will call this when the new content is ready to be displayed on the screen. -->
       <field id="contentUpdated" alias="CategoryGridList.contentUpdated" />
 
       <!-- The helper will set this when the new spotlight content is ready to be displayed on the screen. -->
       <field id="spotlightContentUpdated" alias="CategoryGridList.spotlightContentUpdated" />
 
+      <!-- The helper will set this when the new skin Ad content is ready to be displayed on the screen. -->
+      <field id="skinAdContentUpdated" alias="CategoryGridList.skinAdContentUpdated" />
       <field id="purpleCarpetContentUpdated" alias="CategoryGridList.purpleCarpetContentUpdated" />
 
       <!-- What kind of content is this homeScreen displaying: movies, tv, normal, espanol etc -->
@@ -120,7 +125,7 @@
       <field id="contentToPlay" type="node"/>
 
       <!-- set to the tubi content of the item which was focused on -->
-      <field id="contentFocused" type="node"/>
+      <field id="contentFocused" type="node" />
 
       <!-- set to the tubi content of the new row container (row of contentFocused) which was focused on -->
       <field id="rowFocused" alias="CategoryGridList.rowFocused"/>

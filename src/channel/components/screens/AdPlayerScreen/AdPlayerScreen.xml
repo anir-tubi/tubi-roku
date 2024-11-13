@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="AdPlayerScreen" extends="BaseScreen" >
+  <script type="text/brightscript" uri="AdPlayerScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <interface>
+
+    <!-- INPUT -->
+      <field id="content" type="node"/>
+
+      <field id="updateContent" type="boolean" alwaysNotify="true"/>
+
+      <!-- Valid value are "play" -->
+      <field id="control" type="string" value="none" alwaysNotify="true"/>
+
+      <!--
+        - Written to by TubiAdsTask.
+        - Possible values: init, noAds, adsPlaying, adsClosed, adsCompleted
+        -->
+      <field id="adState" type="string" value="init"/>
+
+      <!-- WRITE-ONLY field tells if the ad player will be used for sending in AdServer-->
+      <field id="appMode" type="string" value="DEFAULT_MODE" />
+
+      <!--
+      - When the RAF changes the playback tracking state, this AA object is set]
+      - Possible keys are adcount, adindex, duration, rendersequence, type
+      - For an update set of keys, see where this object is set: TubiAds.tubiAds_adTrackingCallback
+      @see https://developer.roku.com/docs/developer-program/advertising/integrating-roku-advertising-framework.md#tracking
+      -->
+      <field id="adTrackingObject" type="assocarray" alwaysNotify="true"/>
+
+    <!-- OUTPUT -->
+      <!-- Set to true if the back button was pressed while the video player has focus -->
+      <field id="backButtonPressed" type="boolean" value="false" alwaysNotify="true" />
+
+      <field id="adProgress" type="integer" value="0" />
+
+      <!--
+      - Written to by the scene graph thread.
+      - Possible values: play, stop
+      -->
+      <field id="adControl" type="string" value="" alwaysNotify="true"/>
+  </interface>
+
+  <children>
+
+    <Group
+      id="Loading"
+      visible="false">
+      <Rectangle
+        id="LoadingBackground"
+        color="0x000000FF"
+        width="1920"
+        height="1080"/>
+      <Group
+        id="logoGroup">
+        <Poster
+          id="tubiLogo"
+          width="462"
+          height="135"
+          uri="pkg:/images/logo-xlarge.webp"
+          loadSync="true"
+          translation="[734,382]"/>
+      </Group>
+      <TubiProgressBar
+        id="LoadingProgressBar"
+        width="750"
+        progress="50"
+        translation="[584,696]"/>
+    </Group>
+
+    <Group
+      id="RAFAdContainer" />
+
+    <Group
+      id="adInfoGroup"
+      translation="[72, 879]">
+
+      <Poster 
+        id="adInfoBackground"
+        height="132"
+        width="471"
+        uri="pkg:/images/menu-focus-$$RES$$.9.png" />
+        
+        <LayoutGroup
+          layoutDirection="vert"
+          vertAlignment="top"
+          horizAlignment="left"
+          translation="[15,15]"
+          itemSpacings="[12]">
+
+          <Poster
+            id="offerLogo"
+            loadDisplayMode="scaleToFit"/>
+          <Label
+            id="offerDescription"
+            vertAlign="bottom"/>
+        </LayoutGroup>
+    </Group>
+
+    <TubiAdsTask
+      id="TubiAdsTask" />
+
+  </children>
+</component>

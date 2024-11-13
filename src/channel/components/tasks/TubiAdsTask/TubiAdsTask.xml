@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - AdsTask
+ -
+ -->
+<component name="TubiAdsTask" extends="BaseTaskNeedingAuth">
+    <script type="text/brightscript" uri="TubiAdsTask.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/RequestQueue.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
+    <script type="text/brightscript" uri="pkg:/components/lib/DeviceMixin.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TubiAds.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TubiSGPreloadedAdShim.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+    <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+    <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
+    <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+    <script type="text/brightscript" uri="pkg:/components/lib/EventMixin.brs" />
+    <script type="text/brightscript" uri="pkg:/source/3rdparty/google/gam_utils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/PlayerLogLib.brs" />
+
+    <interface>
+      <!-- INPUT -->
+        <field id="adPlayerNode" type="node" />
+        <field id="adContentType" type="string" value="mp4" />
+    </interface>
+</component>

@@ -50,5 +50,7 @@
 
     <field id="subtext" type="string" />
 
+    <field id="ads" type="node" />
+
   </interface>
 </component>

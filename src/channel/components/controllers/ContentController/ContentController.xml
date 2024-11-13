@@ -20,6 +20,7 @@
   <script type="text/brightscript" uri="EpisodeScreenHelpers.brs" />
   <script type="text/brightscript" uri="SideNavHelpers.brs" />
   <script type="text/brightscript" uri="VideoHelpers.brs" />
+  <script type="text/brightscript" uri="AdPlayerHelpers.brs" />
   <script type="text/brightscript" uri="SettingsScreenHelpers.brs" />
   <script type="text/brightscript" uri="ForgotPasswordHelpers.brs" />
   <script type="text/brightscript" uri="SignInHelpers.brs" />
@@ -76,6 +77,7 @@
   <script type="text/brightscript" uri="RokuCWConsentScreenHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiExternalConfig.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/google/gam_utils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
   <script type="text/brightscript" uri="pkg:/source/lib/PlayerLogLib.brs" />
 
   <interface>

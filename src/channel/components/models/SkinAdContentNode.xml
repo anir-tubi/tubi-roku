@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Extend the ContentNode so we can add some custom fields -->
+<component name = "SkinAdContentNode" extends="ContentNode">
+  <interface>
+    <!-- url of the footer image to be displayed when the app is sponsored -->
+    <field id="footerImageUrl" type="string"/>
+
+    <!-- The background color to be displayed on the homescreen when the app is sponsored  -->
+    <field id="bgColor" type="string"/>
+
+    <!-- The string that should be displayed before the title or titleImage (logo)  -->
+    <field id="titlePrefix" type="string"/>
+
+    <!-- The string that represents the text that is below the description. Usually this refers to the QR code.  -->
+    <field id="subDescription" type="string"/>
+
+    <!-- adInfo holds the required fields from response to play trailer ad -->
+    <field id="adInfo" type="assocarray"/>
+
+    <field id="imageImpTracking" type="array"/>
+
+    <field id="backgrounds" type="stringarray"/>
+
+    <field id="titleImage" type="string"/>
+
+    <field id="videoPreviewUrl" type="string"/>
+
+    <field id="gridItemType" type="string"/>
+
+    <field id="type" type="string" />
+
+  </interface>
+</component>

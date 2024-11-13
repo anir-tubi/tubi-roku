@@ -369,6 +369,7 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
         "background"
       ]
     end if
+
   end if
 
   params = m.setImageParams(imageParamTypes, params, screenId, containerGridItemType)
@@ -454,6 +455,7 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
   background = imageSizes.background
   title = imageSizes.title
   spotlightLandscape = imageSizes.spotlightLandscape
+  skinAdLandscape = imageSizes.skinAdLandscape
   fullScreenBackground = imageSizes.fullScreenBackground
 
   '//For now, ensure the large posters do not show up on the search screen
@@ -473,7 +475,7 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
     else if imageType = "hero"
       existingParams["images[hero_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_hero"
     else if imageType = "background"
-      if containerGridItemType <> m.constants.ui.gridItemTypes.spotlight
+      if containerGridItemType <> m.constants.ui.gridItemTypes.spotlight AND containerGridItemType <> m.constants.ui.gridItemTypes.skinAd
         existingParams["images[background_tb]"] = "w" + background[0].ToStr() + "h" + background[1].ToStr() + "_background"
       else
         existingParams["images[background_tb]"] = "w" + fullScreenBackground[0].ToStr() + "h" + fullScreenBackground[1].ToStr() + "_background"
@@ -482,6 +484,8 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
       existingParams["images[title_art]"] = "w" + title[0].ToStr() + "h" + title[1].ToStr() + "_title"
     else if imageType = "spotlightLandscape"
       existingParams["images[spotlight_landscape_tb]"] = "w" + spotlightLandscape[0].ToStr() + "h" + spotlightLandscape[1].ToStr() + "_landscape"
+    else if imageType = "skinAdLandscape"
+      existingParams["images[skinAd_landscape_tb]"] = "w" + skinAdLandscape[0].ToStr() + "h" + skinAdLandscape[1].ToStr() + "_landscape"
     end if
   end for
 

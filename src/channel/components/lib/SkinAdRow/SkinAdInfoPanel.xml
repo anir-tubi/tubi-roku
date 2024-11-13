@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<component name="SkinAdInfoPanel" extends="Group">
+  <script type="text/brightscript" uri="SkinAdInfoPanel.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+
+  <interface>
+    <!-- INPUT -->
+    <field id="content" type="node" />
+  </interface>
+
+  <children>
+    <LayoutGroup
+      id="infoPanelGroup"
+      itemSpacings="[16,8,32]">
+      
+      <Poster
+        id="tubiLogo"
+        height="48"
+        width="135"
+        uri="pkg:/images/logo-large.webp"/>
+        
+      <Label
+        id="presentedByLabel"
+        width="594">
+        <Font role="font"/>
+      </Label>
+
+      <Poster
+        id="TitleImage"
+        loadDisplayMode="scaleToFit"/>
+
+      <Label
+        id="Description"
+        width="594">
+        <Font
+          role="font"/>
+      </Label>
+
+    </LayoutGroup>
+  </children>
+</component>

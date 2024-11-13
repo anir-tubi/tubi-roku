@@ -33,6 +33,12 @@ Function parseHomeScreenContentSuccess(fullResponse, reqInfo)
 
   convertedMetadata = m.metadataTranslate.translateHomescreen(parsedResponse, contentMode, isKidsMode, uiMode,"homeScreen", isSignedInUser)
 
+  'AdSkin
+  ads = parsedResponse.ads
+  if ads <> invalid AND ads.Count() > 0
+    convertedMetadata.ads = m.metadataTranslate.translateAds(ads)
+  end if
+
   return convertedMetadata
 End Function
 

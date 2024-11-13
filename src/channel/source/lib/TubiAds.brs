@@ -66,11 +66,13 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
     googleAppSession: invalid ' Google's GAMUtils appsession or invalid
     googleContentSession: invalid ' Google's GAMUtils contentSession or invalid
     shouldSendGoogleBeacons: false ' Let's us know if during a given ad pod we should send beacons to Google or not
+    createRAFStructure: tubiAds_createRAFStructure
 
     ' public
     roAdFramework: roAdFramework
     reset: tubiAds_reset
     getAdsListViaRoku: tubiAds_getAdsListViaRoku
+    getAdsListViaTubi: tubiAds_getAdsListViaTubi
     hasAds: tubiAds_hasAds
     showCommercialBreakViaRoku: tubiAds_showCommercialBreakViaRoku
     cacheAdsList: tubiAds_cacheAdsList
@@ -333,6 +335,147 @@ Function tubiAds_getRainmakerParamsForLinear(content)
 End Function
 
 
+' This function converts the associative array into RAF Structure
+' @adInfo: assocArray, Ad information retrieved from API response
+Function tubiAds_createRAFStructure(adInfo)
+  currentAdUnitsList = []
+  stream = []
+  trackingPixels = []
+
+  if isAA(adInfo) = true
+    adId = adInfo.ad_id
+    media = adInfo.media
+
+    streamUrl = "" 
+    duration = 0
+    trackingEvents = {}
+
+    if isAA(media) = true
+      streamUrl = media.streamurl
+      duration = media.duration
+
+      if isAA(media.trackingevents) = true
+        trackingEvents = media.trackingevents
+      end if
+    end if
+
+    streamAA = {
+      id: adInfo.id
+      mimetype: "video/mp4"
+      provider: ""
+      url: streamUrl
+    }
+    stream.push(streamAA)
+
+    'Error tracking event
+    error = adInfo.error
+    if isNonEmptyString(error) = true
+      tracking = {}
+      tracking["event"] = "Error"
+      tracking["triggered"] = false
+      tracking["url"] = replaceCachebusterMacro(error)
+      trackingPixels.push(tracking)
+    end if
+
+    'Impression tracking event
+    impTracking = adInfo.imptracking
+
+    if isNonEmptyArray(impTracking) = true
+      for each pixelUrl in impTracking
+        tracking = {}
+        tracking["event"] = "Impression"
+        tracking["triggered"] = false
+        tracking["url"] = replaceCachebusterMacro(pixelUrl)
+        tracking["time"] = 0
+        trackingPixels.push(tracking)
+      end for
+    end if
+
+    trackingEventKeys = trackingEvents.Keys()
+    'Impression/FirstQuartile/Midpoint/ThirdQuartile/Complete tracking event
+
+    for each key in trackingEventKeys
+      pixelType = ""
+      pixelUrl = trackingEvents[key][0]
+      pixelValue = key.split("_")[1]
+
+      if pixelValue <> invalid
+        iPixelPercent = pixelValue.toInt()
+        time = 0
+
+        if iPixelPercent = 0
+          pixelType = "Impression"
+          time = 0
+        else if iPixelPercent = 25
+          pixelType = "FirstQuartile"
+          time = duration * 0.25
+        else if iPixelPercent = 50
+          pixelType = "Midpoint"
+          time = duration * 0.50
+        else if iPixelPercent = 75
+          pixelType = "ThirdQuartile"
+          time = duration * 0.75
+        else if iPixelPercent = 100
+          pixelType = "Complete"
+          time = duration
+        end if
+
+        tracking = {}
+        tracking["event"] = pixelType
+        tracking["triggered"] = false
+        tracking["url"] = replaceCachebusterMacro(pixelUrl)
+        tracking["time"] = time
+
+        if isNonEmptyString(pixelType) = true
+          trackingPixels.push(tracking)
+        end if
+      end if
+    end for
+
+    ads = []
+    adUnit = {
+      adid: adId
+      adserver: "Tubi"
+      creativeadid: adId
+      duration: duration
+      streamformat: "mp4"
+      streams: stream
+      tracking: trackingPixels
+    }
+    ads.push(adUnit)
+
+    currentAdUnitsList[0] = {
+      ads: ads
+      duration: duration
+      rendersequence: "preroll"
+      rendertime: 0
+      tracking: trackingPixels
+      viewed: false
+    }
+  end if
+
+  return currentAdUnitsList
+End Function
+
+
+'//the sStringToReplace is the agreed upon string that the backend will set to the param that is used for cachebusting.
+'//a cache busting string must be created within the Roku client and replace the sStringToReplace.
+'@pixelURL: String, pixel urls needs to be updated
+Function replaceCachebusterMacro(pixelURL as String)
+  sStringToReplace = "(ADRISE:CB)"
+  sCacheBuster = createCacheBusterString()
+  newPixelURL = pixelURL.replace(sStringToReplace, sCacheBuster)
+  encodedUrl = ""
+  
+  if isNonEmptyString(newPixelURL) = true
+    encodedUrl = newPixelURL.EncodeUri()
+  end if
+
+  return encodedUrl
+End function
+
+
+
 ' This function is used to retrieve ads for linear and VOD
 ' @adsUrl: string, The url that is used to retrieve the ads. This url is already decorated with rainmaker params.
 ' @adInsertionMethod: string, Defines how we will be inserting ads in the stream. Values are "yospace", "apollo" or "csai".
@@ -490,6 +633,7 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos)
   adFetchTimer = createObject("roTimeSpan")
 
   currentAdUnitsList = m.retrieveAds(rainmakerVastUrl, "csai")
+
   timeToFetch = adFetchTimer.totalMilliseconds()
 
   'log ad fetch errors
@@ -586,6 +730,94 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos)
 End Function
 
 
+'----------------------------------------------
+'  m.getAdsListViaTubi(episode, breakPos)
+' ----------------------------------------------
+' @content: node, TubiContentNode for a content
+Function tubiAds_getAdsListViaTubi(content)
+  m.allAdUnitsList = []
+  adInfo = content.adInfo
+  currentAdUnitsList = invalid
+
+  if isAA(adInfo) = true
+    currentAdUnitsList = m.createRAFStructure(adInfo)
+  end if
+
+  'check to see if the ad server returns an ad that can be used by RAF or needs to use our ad SDK
+  'traditional version of xml is in the clickThrough property/clickThrough VAST tag
+  'traditional is used if adId of the first ad object in the first ad pod is set equal to 'default'
+  if currentAdUnitsList <> invalid AND currentAdUnitsList.count() > 0 AND currentAdUnitsList[0] <> invalid AND currentAdUnitsList[0].ads <> invalid AND currentAdUnitsList[0].ads.count() > 0
+    adUnitType = "" 'keeps track of what kind adUnitsList/adPod is currently being built by the for loop - can be "adrise" or "roku"
+
+    'set up the duration for use by the adRise pre ad splash screen
+    if currentAdUnitsList[0].duration <> invalid AND currentAdUnitsList[0].duration > 0
+        m.commercialDuration = m.commercialDuration + currentAdUnitsList[0].duration
+    end if
+
+    adUnitsListContainer = {
+      type: ""
+      adUnitsList: []
+    }
+
+    'save the total number of ads in the ad break before we (potentially) start breaking them up into different ad unit lists
+    m.totalAdBreakAds = currentAdUnitsList[0].ads.count()
+
+    for each adUnit in currentAdUnitsList[0].ads
+
+      if adUnit.adId <> invalid
+        if m.constants.settings.mode = "qa" or m.constants.settings.mode = "staging"
+          print "AD ID "; adUnit.adId; " "; adUnit.creativeAdId
+        end if
+
+        if adUnit.adId <> invalid
+          'if adUnitType is different from the last adUnitType (meaning a new adUnitsListContainer is needed)
+          'push the last adUnitsListContainer to m.allAdUnitsList, otherwise we will just add to the last adUnitsListContainer
+          'set up the adContainer for roku type if needed
+          if adUnitType <> "roku"
+            if adUnitsListContainer.type <> "" 'means we've already built at least one adUnitsListContainer
+              m.allAdUnitsList.push(adUnitsListContainer)
+            end if
+            adUnitType = "roku"
+            adUnitsListContainer = {
+              type: adUnitType
+              adUnitsList: [
+                {
+                  viewed: currentAdUnitsList[0].viewed
+                  renderSequence: "preroll"
+                  duration: currentAdUnitsList[0].duration
+                  renderTime: currentAdUnitsList[0].renderTime
+                  ads: []
+                }
+              ]
+            }
+          end if
+
+          'make sure we have the appropriate stream format. if stream format is mp4, but file is an HLS, the ad won't play
+          for each stream in adUnit.streams
+            if stream.url <> invalid AND right(stream.url, 4) = "m3u8"
+              adUnit.streamFormat = "hls"
+            end if
+          end for
+
+          'add the roku ad unit to the adUnitsList in the current adUnitsListContainer
+          adUnitsListContainer.adUnitsList[0].ads.push(adUnit)
+
+          'add the duration to m.CommercialDuration for use in adRise pre ad splash screens (in case there are any)
+          if currentAdUnitsList[0].duration = invalid or currentAdUnitsList[0].duration <= 0
+            m.commercialDuration = m.commercialDuration + adUnit.duration
+          end if
+        end if
+      end if
+    end for
+
+    m.allAdUnitsList.push(adUnitsListContainer) 'push the last adUnitsListContainer
+    return m.allAdUnitsList
+  else
+    return invalid
+  end if
+End Function
+
+
 ' ----------------------------------------------
 ' showCommercialBreakViaRoku
 '
@@ -619,7 +851,10 @@ Function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
           ' loading bar to sit empty and look like nothing is happening.  It will
           ' also trigger the ads messaging to appear.
           m.controlNode.adProgress = 1
-          m.controlNode.displayAdLoadingMessage = true
+
+          if m.controlNode.hasField("displayAdLoadingMessage") = true
+            m.controlNode.displayAdLoadingMessage = true
+          end if
 
           ' Setting this is REQUIRED in order for setAdBufferRenderCallback to
           ' trigger callbacks.  The empty second argument just suppresses
@@ -647,7 +882,11 @@ Function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
           ' This will hide the buffering messaging and reset the progress bar
           ' before the video loading takes over status
           m.controlNode.adProgress = 0
-          m.controlNode.displayAdLoadingMessage = false
+
+          if m.controlNode.hasField("displayAdLoadingMessage") = true
+            m.controlNode.displayAdLoadingMessage = false
+          end if
+          
           m.containerNode.visible = false
           m.containerNode = invalid
           m.controlNode = invalid

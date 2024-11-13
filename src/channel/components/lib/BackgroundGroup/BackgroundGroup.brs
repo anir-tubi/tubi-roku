@@ -122,7 +122,14 @@ Function onPosterVisibleChange(msg)
     animationType = "out"
   end if
 
-  fade(m.topRightContentPosterGroup, animationType, 0.5)
+  nAnimationTime = 0.5
+
+  if m.aCurrentBackgroundInfo.type = m.constants.ui.backgroundTypes.skinAd
+    '//If this is a skinAd, then have the fade take longer so the background and looping video are seamless
+    nAnimationTime = 1.0
+  end if
+
+  fade(m.topRightContentPosterGroup, animationType, nAnimationTime)
 End Function
 
 
@@ -153,7 +160,7 @@ Function newBackgroundSet()
       fade(m.posterGroupMask, "out", 0.5)
       fade(m.defaultBackground, "in", 0.5)
       fade(m.fullScreenPosterGradient, "out", 0.5)
-    else if backgroundType = backgroundTypes.spotlight
+    else if backgroundType = backgroundTypes.spotlight OR backgroundType = backgroundTypes.skinAd
       fade(m.circularMaskLayer, "out", 0.5)
       fade(m.posterGroupMask, "out", 0.5)
       fade(m.defaultBackground, "out", 0.5)
@@ -377,7 +384,7 @@ Function startTransitionIn()
   else if m.newBackgroundType = m.constants.ui.backgroundTypes.epg
     m.newPoster.epgTransitionInControl = "start"
     m.newPoster.lastAnimationName = "epgTransitionIn"
-  else if m.newBackgroundType = m.constants.ui.backgroundTypes.fullScreen OR m.newBackgroundType = m.constants.ui.backgroundTypes.spotlight
+  else if m.newBackgroundType = m.constants.ui.backgroundTypes.fullScreen OR m.newBackgroundType = m.constants.ui.backgroundTypes.spotlight OR m.newBackgroundType = m.constants.ui.backgroundTypes.skinAd
     m.newPoster.fullScreenTransitionInControl = "start"
     m.newPoster.lastAnimationName = "FullScreenTransitionIn"
   else if m.newBackgroundType = m.constants.ui.backgroundTypes.rightScreen

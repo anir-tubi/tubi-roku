@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<component name="SkinAdRow" extends="Group">
+  <script type="text/brightscript" uri="SkinAdRow.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/ArrayUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeOffsetUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/InfoPanelMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ContentMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+
+  <interface>
+    <!-- INPUT -->
+      <field id="content" type="node" />
+
+      <!-- contentUpdated will be set when the new content is ready to be displayed on the screen. -->
+      <field id="contentUpdated" type="boolean" alwaysNotify="true"/>
+    <!-- OUTPUT -->
+      <field id="rowItemSelected" type="intarray" alwaysNotify="true" />
+
+      <field id="rowItemFocused" type="intarray" alwaysNotify="true" />
+
+      <field id="reloadedItemToBeFocused" type="node" />
+  </interface>
+
+  <children>
+    <!-- The timer that is used to countdown when the ad video should start playing and go fullscreen -->
+    <Timer
+      id="PlayerFullscreenCountdownTimer"
+      duration="1"
+      repeat="true"/>
+    <Group
+      id="infoPanelGroup"
+      translation="[0,0]"
+      opacity="0">
+      <SkinAdInfoPanel
+        id="InfoPanel"
+        translation="[0,10]"/>
+    </Group>
+    <RowList
+      id="rowList"
+      translation="[1072, 0]"
+      itemComponentName="StarterGridItem"
+      itemSize="[1776,0]"
+      numRows="1"
+      itemSpacing="[0,32]"
+      rowItemSpacing="[[16,0]]"
+      showRowCounter="[false]"
+      focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+      focusFootprintBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+      focusFootprintBlendColor="#00000000"
+      rowFocusAnimationStyle="fixedFocus"
+      vertFocusAnimationStyle="fixedFocus"/>
+    <CountdownTimer
+      id="CountdownGroup"
+      displayIcon="false"
+      secondsTranslationId="metadata_fullscreen_countdown_no_seconds"
+      translation="[1404, 15]"/>
+    <TextIcon
+      id="AdIndicator"
+      padding="[16, 4]"
+      uri="pkg:/images/tag-rounded-rectangle-background-pull-$$RES$$.9.png"
+      translation="[1509, 243]"/>
+
+  </children>
+</component>

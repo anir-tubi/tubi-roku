@@ -9,6 +9,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     translateContainer: tubiMetadataTranslate_translateContainer
     translateCategoryDetails: tubiMetadataTranslate_translateCategoryDetails
     translateHomescreen: tubiMetadataTranslate_translateHomescreen
+    translateAds: tubiMetadataTranslate_translateAds
     translateMiniHomescreen: tubiMetadataTranslate_translateMiniHomescreen
     translateCategoriesListScreen: tubiMetadataTranslate_translateCategoriesListScreen
     translateEPGChannelIds: tubiMetadataTranslate_translateEPGChannelIds
@@ -112,6 +113,10 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
   else if gridType = gridItemTypes.spotlight
     if canvasImages <> invalid AND type(canvasImages.spotlight_landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.spotlight_landscape_tb[0])
       sThumbnailURL = canvasImages.spotlight_landscape_tb[0]
+    end if
+  else if gridType = gridItemTypes.skinAd
+    if canvasImages <> invalid AND type(canvasImages.skinAd_landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.skinAd__landscape_tb[0]) = true
+      sThumbnailURL = canvasImages.skinAd_landscape_tb[0]
     end if
   else if gridType = gridItemTypes.banner
     bannerImages = contentFromServer.banner_images
@@ -815,6 +820,78 @@ Function tubiMetadataTranslate_translateRelatedContent(contentFromServer, isSign
   end if
 
   return translated
+End Function
+
+
+'@ads: array, ads received from homescreen response
+Function tubiMetadataTranslate_translateAds(ads = []) As Object
+  tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateAds")
+  skinAdContent = invalid
+  isNativeCustomVideoPresent = false
+  isVideoAdPresent = false
+
+  for each ad in ads
+    creatives = ad.creatives
+
+    if isNonEmptyArray(creatives) = true
+
+      for each creative in creatives
+        
+        if isAA(creative) = true AND creative.type = "native_custom_video"
+          isNativeCustomVideoPresent = true
+
+          if skinAdContent = invalid
+            skinAdContent = CreateObject("roSGNode", "SkinAdContentNode")
+          end if
+
+          skinAdContent.bgColor = creative.color
+          skinAdContent.backgrounds = [creative.image]
+
+          custom = creative.custom
+          if isAA(custom) = true
+            skinAdContent.HDGRIDPOSTERURL = custom.tile_img
+            skinAdContent.footerImageUrl = custom.footer_img
+          end if
+
+          offer = creative.offer
+          if isAA(offer) = true
+            skinAdContent.titleImage = offer.logo
+            skinAdContent.titlePrefix = offer.title
+            skinAdContent.description = offer.body
+            skinAdContent.subDescription = offer.cta
+          end if
+
+          media = creative.media
+          if isAA(media) = true
+            skinAdContent.videoPreviewUrl = media.streamurl
+          end if
+
+          skinAdContent.imageImptracking = creative.image_imptracking
+          skinAdContent.gridItemType = m.constants.ui.gridItemTypes.skinAd
+          skinAdContent.type = m.constants.ui.contentTypes.skinAd
+
+        elseif isAA(creative) = true AND creative.type = "video"
+          isVideoAdPresent = true
+
+          if skinAdContent = invalid
+            skinAdContent = CreateObject("roSGNode", "SkinAdContentNode")
+          end if
+
+          skinAdContent.id = creative.ad_id
+          skinAdContent.adInfo = creative
+        end if
+
+        if isNativeCustomVideoPresent = true AND isVideoAdPresent = true
+          exit for
+        end if
+
+      end for
+      exit for 'for now we are limiting by 1 as we expect only one Ad trailer
+
+    end if  
+  end for
+
+  return skinAdContent
 End Function
 
 

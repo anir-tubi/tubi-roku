@@ -2,8 +2,7 @@
 ' Push a screen on to the stack, allowing the back button to retrace steps
 Function pushScreen(screen As Object, sendNavigateEvents = true, sendLoadingEvents = true)
   tubiLog("ScreenStackHelpers.pushScreen " + screen.id)
-  m.sentSponsorPixels = {} '//refresh this associative array that keeps track of the viewing of the sponsor images. Only send out the sponsor pixels once per page load so refresh upon a loading of a new screen.
-  setSponsorshipBackground("") '//reset the sponsorship background whenever a screen is pushed
+  resetScreenStack()
 
   current = m.screenStack.current
   if current <> invalid
@@ -50,6 +49,15 @@ Function removeTopMostScreenWithIDFromStack(id)
 End Function
 
 
+' Called when a screen is pushed or popped from the screen stack.
+Function resetScreenStack()
+  m.sentSponsorPixels = {} '//refresh this associative array that keeps track of the viewing of the sponsor images. Only send out the sponsor pixels once per page load so refresh upon an unloading of a screen.
+  setSponsorshipBackground("") '//reset the sponsorship background whenever a screen needs to be reset
+  setSponsorshipFooter("") '//reset the sponsorship footer whenever a screen stack needs to be reset
+  setBackgroundColor("") '//reset the background color whenever a screen stack needs to be reset
+End FUnction
+
+
 ' Wrapper around the m.screenStack push interface to handle analytics events
 ' Remove the top-most screen of the stack, making the previous screen visible
 '
@@ -63,8 +71,7 @@ End Function
 '                              An example of this is when the user signs out.
 Function popScreen(sendNavigateEvents = true, sendLoadingEvents = true)
   tubiLog("ScreenStackHelpers.popScreen")
-  m.sentSponsorPixels = {} '//refresh this associative array that keeps track of the viewing of the sponsor images. Only send out the sponsor pixels once per page load so refresh upon an unloading of a screen.
-  setSponsorshipBackground("") '//reset the sponsorship background whenever a screen is popped
+  resetScreenStack()
 
   toBePopped = getCurrentScreen()
   topHidden = getHiddenScreen(1)

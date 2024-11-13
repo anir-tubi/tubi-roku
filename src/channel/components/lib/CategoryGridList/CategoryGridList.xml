@@ -42,6 +42,9 @@
 
       <field id="spotlightContentUpdated" alias="spotlightRow.contentUpdated" />
 
+      <field id="skinAdContent" type="node" alias="skinAdRow.content" />
+
+      <field id="skinAdContentUpdated" alias="skinAdRow.contentUpdated" />
       <!-- Purple carpet content node, will be populated if we receive purple carpet container from home screen response. -->
       <field id="purpleCarpetContent" type="node" alias="purpleCarpetRow.content" />
 
@@ -176,6 +179,10 @@
   </interface>
 
   <children>
+    <SkinAdRow 
+      id="skinAdRow"
+      opacity="0"
+      translation="[0,-12]" />
     <SpotlightRow 
       id="spotlightRow"
       opacity="0"

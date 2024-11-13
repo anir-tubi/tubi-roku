@@ -42,6 +42,10 @@
           id="SponsorshipBackgroundGroup"
           translation="[0,522]"/>
 
+        <!--Displays a footer image when the app is sponsored. -->
+        <SponsorshipFooterGroup
+          id="SponsorshipFooterGroup"/>
+
         <ScreenStack
           id="ScreenStack"/>
 
@@ -65,7 +69,7 @@
           <Poster
             id="tubiLogo"
             height="48"
-            width="134"
+            width="135"
             uri="pkg:/images/logo-large.webp"
             translation="[1698,54]"/>
           <Poster
@@ -78,10 +82,25 @@
           <Poster
             id="tubiEspanolLogo"
             height="93"
-            width="134"
+            width="135"
             uri="pkg:/images/logo-espanol-large.webp"
             translation="[1698,54]"
             visible="false"/>
+          <LayoutGroup
+            id="presentedByGroup"
+            layoutDirection="vert"
+            horizAlignment="center"
+            itemSpacings="[8]"
+            translation="[1764,108]">
+              <Label
+                id="presentedByLabel"
+                maxLines="1">
+                <Font role="font"/>
+              </Label>
+              <Poster
+                id="presentedByImage"
+                loadDisplayMode="scaleToFit"/>
+          </LayoutGroup>
         </Group>
         <TubiToast
           id="tubiToast"

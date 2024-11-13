@@ -1,15 +1,15 @@
 Function init()
-  m.SponsorBground = m.top.findNode("BackgroundPoster")
+  m.SponsorFooter = m.top.findNode("Footer")
   m.top.observeFieldScoped("uri", "onURIChange")
   m.FadingGroup = m.top.findNode("FadingGroup")
 
-  m.FadeInURL = ""  '//When a new background needs to replace an existing one, the existing background is faded and this variable is used to remember the URL of the background that needs to be faded in
+  m.FadeInURL = ""  '//When a new footer needs to replace an existing one, the existing background is faded and this variable is used to remember the URL of the background that needs to be faded in
 End Function
 
 
-Function onURIChange()
-  sCurrentBground = m.SponsorBground.uri
-  url = m.top.uri
+Function onURIChange(msg)
+  sCurrentBground = m.SponsorFooter.uri
+  url = msg.getData()
 
   if (sCurrentBground <> url OR m.FadingGroup.opacity < 1) AND m.FadeInURL <> url
     m.FadeInURL = url
@@ -48,7 +48,7 @@ End Function
 
 Function fadeInBackground()
   stopObservingFadeOutAnimation()
-  m.SponsorBground.uri = m.FadeInURL
+  m.SponsorFooter.uri = m.FadeInURL
   if m.FadeInURL <> ""
     fade(m.FadingGroup, "in", .25)
   end if

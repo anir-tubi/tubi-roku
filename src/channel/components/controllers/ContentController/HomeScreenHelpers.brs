@@ -33,6 +33,9 @@ Function showHomeScreen(constants, screenID = "")
     m.pubSub.subscribe("pub_serverPersistentData.isVideoPreviewOn", homeScreen, "isVideoPreviewOn")
 
     pushScreen(homeScreen, true, shouldSendPageLoadEvent)
+
+    '//when cached homescreen is displayed, then check UI needs to be updated
+    setHomeScreenAfterFocus(homeScreen.contentFocused, homeScreen)
   else
     showHideSpinner(true)
     homeScreen = CreateObject("roSGNode", "HomeScreen")
@@ -522,6 +525,11 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
       end if
     end if
 
+    ads = rawResponse.ads
+    if ads <> invalid AND getExperimentResource("ads_tubi_skins", "ads_tubi_skin_moana", false).enabled = true
+      updateSkinAdRowContent(homeScreen, ads)
+    end if
+
     homeScreen.personalizationId = rawResponse.personalizationId
     homeScreen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
 
@@ -727,10 +735,28 @@ End Function
 ' @param focusedContent, roSGNode - The TubiContentNode of the focused content
 ' @param homeScreen, roSGNode - The HomeScreen component that contains the focused content
 Function setHomeScreenAfterFocus(focusedContent, homeScreen)
+  tubiLog("HomeScreenHelpers.setHomeScreenAfterFocus")
   if focusedContent <> invalid
     currentScreen = getCurrentScreen()
 
     if currentScreen <> invalid AND currentScreen.id <> m.constants.ui.screenIds.linearVideoPlayerScreen
+      skinAdContent = currentScreen.skinAdContent
+      if currentScreen.id = m.constants.ui.screenIds.homeScreen AND skinAdContent <> invalid AND skinAdContent.getChildCount() > 0
+        if focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd
+          '//Hide the logo if the current row is a skinAd
+          showHideLogo(m.constants.logoType.hide)
+
+          sendSkinAdPixels(focusedContent.imageImpTracking)
+
+        else
+          showHideLogoBasedOnUiMode(skinAdContent.titleImage, skinAdContent.titlePrefix)
+        end if
+
+        '//set the footer image while the homescreen is visible
+        setSponsorshipFooter(skinAdContent.footerImageUrl)
+        setBackgroundColor(skinAdContent.bgColor)
+      end if
+
       '//unless told otherwise later in this function, the default for bStopCountdownTimer is to assume that
       '//we should stop the countdown timer
       bStopCountdownTimer = true
@@ -871,6 +897,8 @@ Function onContentSelected(msg)
     startSignIn(refreshScreenAndContentAfterSignIn)
   else if contentType = m.constants.ui.contentTypes.linear
     selectLinearContent(content)
+  else if contentType = m.constants.ui.contentTypes.skinAd
+    playAdContent(content)
   else
     playbackSource = {
       "srcForAnalytic": m.constants.player.playbackSource.unknown
@@ -908,6 +936,8 @@ Function onContentToPlay(msg)
   else if contentType = m.constants.ui.contentTypes.historySignedOutUser
     '//if a signed out user selects the continue watching row, then navigate him/her to the sign in screen
     startSignIn(refreshScreenAndContentAfterSignIn)
+  else if contentType = m.constants.ui.contentTypes.skinAd
+    playAdContent(content)
   else
     showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource)
   end if
@@ -1126,6 +1156,7 @@ End Function
 ' @param homeScreen, roSGNode - The HomeScreen component that contains the focused content.
 ' @param content, roSGNode - The CategoryContentNode for the spotlight row.
 Function updateSpotlightRowContent(homeScreen, content)
+  tubiLog("HomeScreenHelpers.updateSpotlightRowContent")
   rowContentNode = CreateObject("roSGNode", "ContentNode")
   content.gridItemType = m.constants.ui.gridItemTypes.spotlight
   rowContentNode.appendChild(content)
@@ -1135,6 +1166,34 @@ End Function
 
 
 ' @param homeScreen, roSGNode - The HomeScreen component that contains the focused content.
+' @param content, roSGNode - The ContentNode for the skin item.
+Function updateSkinAdRowContent(homeScreen, content)
+  tubiLog("HomeScreenHelpers.updateSkinAdRowContent")
+
+  if content <> invalid
+    rowContentNode = CreateObject("roSGNode", "SkinAdContentNode")
+    rowContentNode.id = content.id
+    rowContentNode.type = m.constants.ui.contentTypes.skinAd
+    rowContentNode.footerImageUrl = content.footerImageUrl
+    rowContentNode.bgColor = content.bgColor
+    rowContentNode.titleImage = content.titleImage
+    rowContentNode.titlePrefix = content.titlePrefix
+    rowContentNode.gridItemType = m.constants.ui.gridItemTypes.skinAd
+    rowContentNode.description = content.description
+    rowContentNode.adInfo = content.adInfo
+    rowContentNode.imageImpTracking = content.imageImpTracking
+  
+    categoryContentNode = CreateObject("roSGNode", "CategoryContentNode")
+    categoryContentNode.id = m.constants.ui.categoryIds.skinAd
+    categoryContentNode.appendChild(content)
+    rowContentNode.appendChild(categoryContentNode)
+    homeScreen.skinAdContent = rowContentNode
+    homeScreen.skinAdContentUpdated = true
+  end if
+
+End Function
+
+
 ' @param content, roSGNode - The CategoryContentNode for the spotlight row.
 Function updatePurpleCarpetRowContent(homeScreen, content)
   if isNode(content) = true
@@ -1428,6 +1487,7 @@ End Function
 ' @purpleCarpetContainer: ContentNode, the purple carpet container node. Node structure will be similar to rowlist content node.
 ' @screenId: string, id of the screen from where the call was made. constants.ui.screenIds.homeScreen or constants.ui.screenIds.eventDetailScreen
 Function onHomeScreenContentUpdateComplete(purpleCarpetContainer, screenId)
+  tubiLog("HomeScreenHelpers.onHomeScreenContentUpdateComplete")
   homeScreen = getFromScreenCache(screenId)
 
   if purpleCarpetContainer <> invalid

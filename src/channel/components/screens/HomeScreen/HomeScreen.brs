@@ -27,17 +27,17 @@ Function init()
   topRef.observeFieldScoped("personalizationId", "onPersonalizationIdChanged")
   m.CategoryRefreshTimer = topRef.findNode("CategoryRefreshTimer")
   m.CategoryRefreshTimer.duration = m.constants.timers.categoryContentRefreshTimeout
-  m.CategoryRefreshTimer.observeField("fire", "onCategoryRefreshTimer")
+  m.CategoryRefreshTimer.observeFieldScoped("fire", "onCategoryRefreshTimer")
   m.CategoryRefreshTimer.control = "start"
 
   'Content area
   m.CategoryGridList = topRef.findNode("CategoryGridList")
-  m.CategoryGridList.observeField("itemSelected", "onGridItemSelected")
-  m.CategoryGridList.observeField("itemFocused", "onGridFocusChange")
-  m.CategoryGridList.observeField("reloadedItemToBeFocused", "onItemToBeFocusedChange")
-  m.CategoryGridList.observeField("currFocusRow", "onCurrFocusRowChange")
-  m.CategoryGridList.observeField("currFocusColumn", "onCurrFocusColumnChange")
-  m.CategoryGridList.observeField("rowFocused", "onRowFocused")
+  m.CategoryGridList.observeFieldScoped("itemSelected", "onGridItemSelected")
+  m.CategoryGridList.observeFieldScoped("itemFocused", "onGridFocusChange")
+  m.CategoryGridList.observeFieldScoped("reloadedItemToBeFocused", "onItemToBeFocusedChange")
+  m.CategoryGridList.observeFieldScoped("currFocusRow", "onCurrFocusRowChange")
+  m.CategoryGridList.observeFieldScoped("currFocusColumn", "onCurrFocusColumnChange")
+  m.CategoryGridList.observeFieldScoped("rowFocused", "onRowFocused")
   m.CategoryGridList.observeFieldScoped("vertFocusDirection", "onVertFocusDirectionChange")
   m.CategoryGridList.observeFieldScoped("rowlistTranslation", "onRowlistTranslationChange")
   m.CategoryGridList.observeFieldScoped("eventCtaListItemSelected", "onEventCtaListItemSelectedChange")
@@ -152,6 +152,8 @@ Function onLoadingChange()
     m.CategoryGridList.content = invalid ' should be all categories with initial amounts of content in them
     m.CategoryGridList.spotlightContent = invalid
     m.CategoryGridList.purpleCarpetContent = invalid
+    m.CategoryGridList.skinAdContent = invalid
+    m.CategoryGridList.skinAdContentUpdated = true
     m.CategoryGridList.purpleCarpetContentUpdated = true
   end if
 End Function
@@ -423,7 +425,7 @@ Function onGridFocusChange() as void
   focusedContent = m.CategoryGridList.itemFocused
 
   if m.CategoryGridList.isInFocusChain() = true
-    '//if the CategoryGridList is in focus, then alter the UI.  d
+    '//if the CategoryGridList is in focus, then alter the UI.
     if focusedContent <> invalid
       if focusedContent.type <> m.constants.ui.gridItemTypes.linear AND oldFocusedContent <> invalid AND oldFocusedContent.type = m.constants.ui.gridItemTypes.linear
         m.top.stopLinearVideoPlayer = true
@@ -431,21 +433,16 @@ Function onGridFocusChange() as void
 
       m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(focusedContent, m.CategoryGridList.focusedPosition)
       m.top.contentFocused = focusedContent
-      ' Only proceed if row is not purple carpet.
-      ' Only proceed if the spotlight row is disabled or if parent id is not featured if user has spotlight enabled.
-      ' This is because the spotlight has seperate infopanel within category grid list.
-      if focusedContent.gridItemType <> m.constants.ui.gridItemTypes.purpleCarpet AND (m.isSpotlightRowEnabled = false OR focusedContent.gridItemType <> m.constants.ui.gridItemTypes.spotlight)
-        populateInfoPanelByContent(focusedContent)
-      end if
       
       if focusedContent.gridItemType = m.constants.ui.gridItemTypes.purpleCarpet
         fadeOutInfoPanel()
         ' Since info panel always focus the information related to primary content and not the secondary rowlist item even if it gets focused.
         m.top.backgroundUriList = determineBackgroundImage(m.top.primaryEventContent)
-      else if (m.isSpotlightRowEnabled = true AND focusedContent.gridItemType = m.constants.ui.gridItemTypes.spotlight)
+      else if (m.isSpotlightRowEnabled = true AND focusedContent.gridItemType = m.constants.ui.gridItemTypes.spotlight) OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd
         fadeOutInfoPanel()
         m.top.backgroundUriList = determineBackgroundImage(focusedContent)
       else
+        populateInfoPanelByContent(focusedContent)
         fadeInContentArea()
       end if
       
@@ -532,6 +529,7 @@ End Function
 
 ' Is called when CategoryGridList has content loaded but did not gain focus, so we need to update the infoPanel
 Function onItemToBeFocusedChange()
+  tubiLog("HomeScreen.onItemToBeFocusedChange")
   if m.top.contentReady = false
     m.top.contentReady = true
   end if
@@ -605,7 +603,7 @@ Function setFocusOnCategoryGrid()
     fadeOutInfoPanel()
     ' Since info panel always focus the information related to primary content and not the secondary rowlist item even if it gets focused.
     m.top.backgroundUriList = determineBackgroundImage(m.top.primaryEventContent)
-  else if focusedContent <> invalid AND (m.isSpotlightRowEnabled = true AND focusedContent.gridItemType = m.constants.ui.gridItemTypes.spotlight)
+  else if focusedContent <> invalid AND ((m.isSpotlightRowEnabled = true AND focusedContent.gridItemType = m.constants.ui.gridItemTypes.spotlight) OR (focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd))
     fadeOutInfoPanel()
     m.top.backgroundUriList = determineBackgroundImage(focusedContent)
   else
@@ -638,7 +636,8 @@ Function onKeyEvent(key, press) as boolean
   if press
     if key = "left" OR key = "back"
       ' This is required to stop videopreview
-      if m.top.isVideoPreviewOn = true
+      itemFocused = m.CategoryGridList.itemFocused
+      if m.top.isVideoPreviewOn = true OR itemFocused.gridItemType = m.constants.ui.gridItemTypes.skinAd
         m.top.pauseVideoPreview = true
       end if
 
@@ -683,12 +682,13 @@ End Function
 
 ' returns true if action was taken based on the "play" input and false if no action taken
 Function handlePlayInput()
+  tubilog("HomeScreen.handlePlayInput")
   if m.top.isLoading <> true
     itemFocused = m.CategoryGridList.itemFocused
     positionFocused = m.top.cursorPosition
     m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(itemFocused, positionFocused)
 
-    if m.top.isVideoPreviewOn = true
+    if m.top.isVideoPreviewOn = true OR itemFocused.gridItemType = m.constants.ui.gridItemTypes.skinAd
       m.top.stopVideoPreview = true
     end if
 
@@ -735,7 +735,7 @@ Function onRowlistTranslationChange(msg)
   '//Determine if the rowlist or a special row is in focus
   nRowInFocus = -1
   focusedContent = m.CategoryGridList.itemFocused
-  if focusedContent <> invalid AND (focusedContent.gridItemType <> m.constants.ui.gridItemTypes.purpleCarpet) AND (m.isSpotlightRowEnabled = false OR focusedContent.gridItemType <> m.constants.ui.gridItemTypes.spotlight)
+  if focusedContent <> invalid AND (focusedContent.gridItemType <> m.constants.ui.gridItemTypes.purpleCarpet) AND (m.isSpotlightRowEnabled = false OR focusedContent.gridItemType <> m.constants.ui.gridItemTypes.spotlight) AND focusedContent.gridItemType <> m.constants.ui.gridItemTypes.skinAd
     if m.CategoryGridList.cursorPosition <> invalid
       nRowInFocus = m.CategoryGridList.cursorPosition[0]
     else

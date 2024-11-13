@@ -933,6 +933,7 @@ function setAutomatedTestsConfig(done) {
         noAds: noAdsConfig,
         printReqAndResInfo: false,
         disableHdmiStatusChecks: true,
+        disableSkinAds: true,
         bs_const: {
           consoleLoggingEnabled: false,
           useQaAnalyticsProxy: useQaAnalyticsProxy

@@ -1250,6 +1250,14 @@ Function getTranslation_en_US()
       "description": "label to indicate how many seconds it will take before the video player will automatically go fullscreen. This is the plural version but an attempt should be made to ensure the string is neither plural or singular by using a shorten form of seconds.",
       "message": "Fullscreen in {seconds} sec"
     },
+    "metadata_fullscreen_countdown_no_seconds": {
+      "description": "label to indicate how many seconds it will take before the video player will automatically go fullscreen. The word 'seconds' should NOT follow the number of seconds.",
+      "message": "Fullscreen in {seconds}"
+    },
+    "metadata_watch_again": {
+      "description": "label to indicate a watched video can be watched again",
+      "message": "Watch again"
+    },
     "metadata_expiresIn_plural": {
       "description": "label to indicate how long the user have to watch a video",
       "message": "Expires in {days} days"
@@ -1731,6 +1739,10 @@ Function getTranslation_en_US()
     "reg_continue_as_guest_button_title": {
       "description": "Button text to be displayed on second button of registration welcome modal",
       "message": "Continue as Guest"
+    },
+    "ad": {
+      "description": "This label used for badge overlaid on top of a thumbnail to indicate it is associated with an AD. The text needs to be very few characters.",
+      "message": "AD"
     },
     "replay": {
       "description": "This label used for badge to indicate the content availability",

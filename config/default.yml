@@ -45,6 +45,9 @@ settings:
   # Setting the below value to true will turn off hdmi status checks to avoid issues with automated tests on Roku devices not hooked up to a display
   disableHdmiStatusChecks: false
 
+  # Setting the below value to true will turn off displaying the skin ads feature (if there is a skin ads campaign) to avoid issues with automated tests on Roku devices not hooked up to display the feature
+  disableSkinAds: false
+
   # Any configs added to the bs_const setting will be included in the various manifest
   # configurations via the handlebars templates
   bs_const:

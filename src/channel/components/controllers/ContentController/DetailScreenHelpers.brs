@@ -16,6 +16,9 @@
 ''//::TODO:: Remove pageOrigin once we fixed sending invalid component interaction events- added this for debugging purpose
 Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = invalid, errorCb = invalid, playbackSource = {"srcForAnalytic":"unknown","srcForAds":"unknown"})
   tubiLog("DetailScreenHelpers.showDetailScreen")
+  '//Update the logo based on the current detail screen UI. For example, the previous (home) screen may been showing a modified skinAd logo
+  showHideLogoBasedOnUiMode()
+
   if content <> invalid
     if m.detailScreenHorizMenuExp = true
       detailScreen = CreateObject("roSGNode", "DetailScreenHoriz")

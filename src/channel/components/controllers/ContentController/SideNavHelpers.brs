@@ -128,10 +128,8 @@ Function onSideNavItemSelected()
     '// If a new screen is to be called, then collapse the side nav and remember which side nav button was last clicked
     bNewScreenCalledSuccess = false
 
-    if isVideoPreviewOn() = true
-      ' stop the video preview when user selects any item from sidenav
-      stopVideoPreview()
-    end if
+    ' if a preview video is playing, then stop the video preview when user selects any item from sidenav
+    stopVideoPreview()
 
     ' set appropriate analytics component on the page being navigated from so NavigateToPageEvent
     ' contains all the requisite information -  NOTE: this analytic does not get reported when the user presses the sideNav button associated with the current screen
@@ -318,6 +316,18 @@ Function onSideNavItemSelected()
 
     if bNewScreenCalledSuccess = true
       hideNavMenu(false)
+
+      if itemSelectedId = m.constants.ui.sideNavIds.home OR itemSelectedId = m.constants.ui.sideNavIds.myList 
+        '// If the home button was clicked, then restart the preview video.
+        '// Due to race conditions, the preview video may not start when the current screen attempts to resume the preview player because the side nav is still open.
+        '// This code will ensure any focused item will resume a corresponding preview video after hideNavMenu() is called. 
+        currentScreen = getCurrentScreen()
+        focusedContent = currentScreen.contentFocused
+        if focusedContent <> invalid
+          setVideoPreviewAfterFocus(focusedContent, currentScreen.trackingPageInfo)
+        end if
+      end if
+      
     end if
   else
     '//if currentScreen no longer = the screen that

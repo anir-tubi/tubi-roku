@@ -89,6 +89,7 @@ Function addControllerUi()
 
   m.background = m.top.findNode("ContentBackground")
   m.SponsorBground = m.top.findNode("SponsorshipBackgroundGroup")
+  m.SponsorFooter = m.top.findNode("SponsorshipFooterGroup")
 
   m.contentGroup = m.top.findNode("ContentGroup")
   m.SideNav = m.top.findNode("SideNav")
@@ -106,6 +107,11 @@ Function addControllerUi()
   m.logo = m.logoGroup.findNode("tubiLogo")
   m.logoKids = m.logoGroup.findNode("tubiKidsLogo")
   m.logoEspanol = m.logoGroup.findNode("tubiEspanolLogo")
+  m.presentedByGroup = m.logoGroup.findNode("presentedByGroup")
+  m.presentedByLabel = m.presentedByGroup.findNode("presentedByLabel")
+  m.typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.presentedByLabel, m.typographyConstants.ids.bodyExtraSmallStrong)
+  m.presentedByImage = m.presentedByGroup.findNode("presentedByImage")
   m.clock = m.top.findNode("clock")
   m.spinner = m.top.findNode("ContentControllerSpinner")
   m.tubiToast = m.top.findNode("tubiToast")
@@ -147,6 +153,7 @@ Function addControllerUi()
   theme = getThemeFromGlobal()
   if theme <> invalid
     m.background.color = theme.backgroundColor
+    m.presentedByLabel.color = theme.primaryTextColor
   end if
 
   m.top.observeFieldScoped("focusedChild", "onComponentFocus")
@@ -1263,6 +1270,32 @@ Function resetVideoPlayerBrowseContent()
 End Function
 
 
+'@aPixelURLs: The array of pixel URLs that log when a skinAd container has been seen
+Function sendSkinAdPixels(aPixelURLs)
+  tubiLog("ContentController.sendSkinAdPixels")
+  if isNonEmptyArray(aPixelURLs) = true
+    for each pixelURL in aPixelURLs
+      '//the sStringToReplace is the agreed upon string that the backend will set to the param that is used for cachebusting.
+      '//a cache busting string must be created within the Roku client and replace the sStringToReplace.
+      sStringToReplace = "(ADRISE:CB)"
+      sCacheBuster = createCacheBusterString()
+      newPixelURL = pixelURL.replace(sStringToReplace, sCacheBuster)
+      
+      if isNonEmptyString(newPixelURL) = true
+        encodedUrl = newPixelURL.EncodeUri()
+
+        m.makeRequest({
+          url: encodedUrl
+          requestType: m.constants.reqNames.skinAdPixel
+          responseType: "assocarray"
+          silenceCallbackWarnings: true
+        })
+      end if
+    end for
+  end if
+End Function
+
+
 '@aPixelURLs: The array of pixel URLs that log when a sponsored container has been seen
 Function sendSponsorPixels(aPixelURLs)
   tubiLog("ContentController.sendSponsorPixels")
@@ -1273,9 +1306,9 @@ Function sendSponsorPixels(aPixelURLs)
       sStringToReplace = "(ADRISE:CB)"
       sCacheBuster = createCacheBusterString()
       newPixelURL = pixelURL.replace(sStringToReplace, sCacheBuster)
-      encodedUrl = newPixelURL.EncodeUri()
 
-      if isNonEmptyString(encodedUrl)
+      if isNonEmptyString(newPixelURL) = true
+        encodedUrl = newPixelURL.EncodeUri()
         m.makeRequest({
           url: encodedUrl
           requestType: m.constants.reqNames.sponsorPixel
@@ -1688,6 +1721,7 @@ End Function
 
 
 Function setVideoContentScreenBackground(screen)
+  tubiLog("ContentController.setVideoContentScreenBackground")
   currentScreen = getCurrentScreen()
   if screen <> invalid AND currentScreen <> invalid AND screen.id = currentScreen.id AND screen.contentFocused <> invalid
     contentFocused = screen.contentFocused
@@ -1700,9 +1734,10 @@ Function setVideoContentScreenBackground(screen)
       isVideoPreviewPlayQueued = true
     end if
 
+    isSkinAdRowContent = (isCurrentScreenHomeScreen() = true AND gridItemType = m.constants.ui.gridItemTypes.skinAd)
     isSpotlightRowContent = isCurrentScreenHomeScreen() = true AND gridItemType = m.constants.ui.gridItemTypes.spotlight
     isPurpleCarpetContent = (gridItemType = m.constants.ui.gridItemTypes.purpleCarpet)
-    if videoPreviewState = "playing" OR videoPreviewState = "paused" OR videoPreviewState = "buffering" OR isVideoPreviewPlayQueued = true
+    if (videoPreviewState = "playing" OR videoPreviewState = "paused" OR videoPreviewState = "buffering" OR isVideoPreviewPlayQueued = true) AND isSkinAdRowContent = false
       if isSpotlightRowContent = true OR isPurpleCarpetContent = true
         backgroundType = m.constants.ui.backgroundTypes.spotlight
       else
@@ -1712,9 +1747,18 @@ Function setVideoContentScreenBackground(screen)
         type: backgroundType
         uriList: [] ' setting uriList as empty, because don't need to rotate the background poster when video preview is playing. We can't use shouldRotateBackgrounds because we still need the gradients from backgroundGroup
       }
+    else if (videoPreviewState = "playing" OR videoPreviewState = "paused") AND isSkinAdRowContent = true
+
+      m.backgroundGroup.backgroundInfo = {
+        type: m.constants.ui.backgroundTypes.skinAd
+        uriList: screen.backgroundUriList
+      }
+
     else
       if isSpotlightRowContent = true OR gridItemType = m.constants.ui.gridItemTypes.purpleCarpet
         backgroundType = m.constants.ui.backgroundTypes.spotlight
+      else if isSkinAdRowContent = true
+        backgroundType = m.constants.ui.backgroundTypes.skinAd
       else
         backgroundType = getBackgroundType(screen.backgroundUriList, contentType)
       end if
@@ -1734,6 +1778,7 @@ End Function
 
 
 Function onSponsorshipBackgroundChanged(msg)
+  tubiLog("ContentController.onSponsorshipBackgroundChanged")
   screenWithSponsorship = msg.getRoSGNode()
   currentScreen = getCurrentScreen() 'gets the top screen in the screen stack
   if currentScreen <> invalid AND currentScreen.isSameNode(screenWithSponsorship)
@@ -1745,6 +1790,19 @@ End Function
 ' @url: string, The URL of the Sponsorship Background
 Function setSponsorshipBackground(url)
   m.SponsorBground.uri = url
+End Function
+
+
+' @url: string, The URL of the Sponsorship Background
+Function setSponsorshipFooter(url)
+  m.SponsorFooter.uri = url
+End Function
+
+
+' Setting a new background color. Usually this is not called unless there is a special case: i.e. sponsorship requiring different background color
+' @sColor: string, The color that the background should be. 
+Function setBackgroundColor(sColor)
+  m.backgroundGroup.circularMaskColor = sColor 
 End Function
 
 
@@ -2330,15 +2388,17 @@ End Function
 
 
 ' show appropriate logo based on the app mode like kids, espanol, standard
-Function showHideLogoBasedOnUiMode()
+' @presentedByURL : string, a url of an image which represents someone sponsoring the app
+' @presentedByText : string, a string to be displayed before the image representing the presentedByURL
+Function showHideLogoBasedOnUiMode(presentedByURL = "", presentedByText = "")
   mode = m.uiMode
 
   if mode = m.constants.ui.modes.standard
-    showHideLogo(m.constants.logoType.tubi)
+    showHideLogo(m.constants.logoType.tubi, presentedByURL, presentedByText)
   else if mode = m.constants.ui.modes.kids OR mode = m.constants.ui.modes.kidsAgeGate OR mode = m.constants.ui.modes.kidsParental
-    showHideLogo(m.constants.logoType.tubiKids)
+    showHideLogo(m.constants.logoType.tubiKids, presentedByURL, presentedByText)
   else if mode = m.constants.ui.modes.latino
-    showHideLogo(m.constants.logoType.tubiEspanol)
+    showHideLogo(m.constants.logoType.tubiEspanol, presentedByURL, presentedByText)
   end if
 
 End Function
@@ -2349,7 +2409,9 @@ End Function
           ' "tubi_kids" = show tubi kids logo,
           ' "tubi_espanol" = show espanol logo,
           ' "hide" = hide all logos
-Function showHideLogo(logoType)
+' @presentedByURL : string, a url of an image which represents someone sponsoring the app
+' @presentedByText : string, a string to be displayed before the image representing the presentedByURL
+Function showHideLogo(logoType, presentedByURL = "", presentedByText = "")
 
   if m.logoType <> logoType
     tubilog("ContentController.showHideLogo")
@@ -2358,6 +2420,7 @@ Function showHideLogo(logoType)
       m.logoEspanol.visible = false
       m.logoKids.visible = false
       m.logo.visible = false
+      m.presentedByGroup.visible = false
     else
       if logoType = m.constants.logoType.tubiKids
         m.logoKids.visible = true
@@ -2372,12 +2435,29 @@ Function showHideLogo(logoType)
         m.logoEspanol.visible = false
         m.logoKids.visible = false
       end if
+
     end if
 
     m.logoType = logoType
 
   end if
 
+  '//Display/hide sponsored info. 
+  '//Even if the logoType <> m.constants.logoType.hide, the presentedByGroup may need to be hidden.
+  if isNonEmptyString(presentedByURL) = true
+    m.presentedByGroup.visible = true
+    m.presentedByImage.uri = presentedByURL + "?w=" + m.constants.ui.logoSizes.skinAds.homeScreen.width
+
+    if isNonEmptyString(presentedByText) = true
+      m.presentedByLabel.text = presentedByText
+    else
+      m.presentedByLabel.text = ""
+    end if
+
+  else
+    m.presentedByGroup.visible = false
+  end if
+  
 End Function
 
 

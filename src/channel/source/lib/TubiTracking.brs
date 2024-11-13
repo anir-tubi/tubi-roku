@@ -720,6 +720,7 @@ End Function
 ' Build the structure for an ad message based on info collected from Rainmaker ad server
 ' @ctx: AA, the ctx passed to TubiAds.adTrackingCallback
 Function tubiTracking_getAnalyticsAd(ctx)
+
   adEvent = {
     ad_type: "VAST" 'adType enum
     ' advertiser_id: ""   'not currently available
@@ -749,6 +750,10 @@ Function tubiTracking_getAnalyticsAd(ctx)
       else if ad.companionads[0].provider = "brightline_RSG"
         adEvent.ad_type = "BRIGHTLINE"
       end if
+    end if
+
+    if ctx.adserver = "Tubi"
+      adEvent.ad_type = "WRAPPER"
     end if
 
     if ad.creativeAdId <> invalid then adEvent.ad_id = ad.creativeAdId

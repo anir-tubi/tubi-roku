@@ -5,6 +5,8 @@
   <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
 
   <interface>
@@ -12,8 +14,20 @@
       <!-- The number of seconds to display in the countdown timer. -->
       <field id="seconds" type="integer"/>
 
+      <!-- The ID of the translation string within the translation JSON to be used to display the seconds. The translation needs to accept the parameter 'seconds'. -->
+      <field id="secondsTranslationId" type="string" value=""/>
+
+      <!-- If the size of the label should be different than this component's default, then set the typography ID. -->
+      <field id="typographyLabelId" type="string"/>
+
+      <!-- The background color of the countdown if something other than the default is desired -->
+      <field id="bgcolor" type="string" alias="PlayerCountdownBground.blendColor"/>
+
       <!-- A way to tell the component to hide or display -->
       <field id="display" type="boolean" value="false"/>
+
+      <!-- A way to tell the component to hide or display the fullscreen icon -->
+      <field id="displayIcon" type="boolean" value="true"/>
 
     <!--OUTPUT-->
       <!-- The width of the UI element. Essentially the width of the background. -->
