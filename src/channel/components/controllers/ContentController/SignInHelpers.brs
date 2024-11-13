@@ -476,7 +476,7 @@ Function onSignUpResponse(response)
   ' Conditions to be met.
   ' Is the user in US.
   ' Is the user allowed to manage consent that is teen and above.
-  if isDeviceInUS() = true AND isUserAllowedToManageConsent() = true
+  if isDeviceInUS() = true AND isUserAllowedToManageConsent() = true AND isMajorEventDay() = false
     m.shouldShowRokuCWConsentScreen = true
   else
     m.shouldShowRokuCWConsentScreen = false

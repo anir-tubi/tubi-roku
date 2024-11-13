@@ -387,7 +387,7 @@ Function createPrivacyCenterPanel(title)
     focusable = false
     privacyCenterSettings = consentSettings.privacyCenterSettings
     privacyCenterPanel.consentSettings = consentSettings
-    if privacyCenterSettings.showConsentPreferences = true AND consentSettings.consents.Count() > 0
+    if privacyCenterSettings <> invalid AND privacyCenterSettings.showConsentPreferences = true AND consentSettings.consents.Count() > 0
       for i = 0 to consentSettings.consents.Count()-1
         if consentSettings.consents[i].value <> "required"
           focusable = true
@@ -396,7 +396,7 @@ Function createPrivacyCenterPanel(title)
       end for
     end if
 
-    if privacyCenterSettings.showTermsOfUse = true OR privacyCenterSettings.showPrivacyPolicy = true
+    if privacyCenterSettings <> invalid AND (privacyCenterSettings.showTermsOfUse = true OR privacyCenterSettings.showPrivacyPolicy = true)
       focusable = true
     end if
 

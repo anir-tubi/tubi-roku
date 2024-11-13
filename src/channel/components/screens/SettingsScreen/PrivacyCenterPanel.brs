@@ -113,6 +113,9 @@ Function onConsentSettingsChange(msg)
     end if
 
     m.managePreferences.visible = true
+  else
+    m.nonEditableModeWarningMessage.visible = false
+    m.qrCodeSections.translation = [0, 66]
   end if
 End Function
 

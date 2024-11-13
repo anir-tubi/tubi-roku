@@ -105,17 +105,27 @@ Function getConsent(onGetConsentCompletionCallback)
     m.oneTrustLib.observeField("loadStatus", "onOneTrustCompLibLoadStatusChanged")
     m.oneTrustLib.uri = m.constants.settings.oneTrustComponentsUrl
   else
-    ' If the user is not in GDPR country we will call account service get consent api.
-    ' Response from get consent will contain privacy center information and consent status for Roku's continue watching feature.
-    requestInfo = m.userDeviceApi.createGetConsentReqInfo()
-    m.makeRequest({
-      url: requestInfo.url
-      options: requestInfo.options
-      requestType: m.constants.reqNames.getConsent
-      successCallback: onGetConsentSuccess
-      responseType: "assocarray"
-      silenceCallbackWarnings: true
-    })
+
+    if isMajorEventDay() = false
+      ' If the user is not in GDPR country we will call account service get consent api.
+      ' Response from get consent will contain privacy center information and consent status for Roku's continue watching feature.
+      requestInfo = m.userDeviceApi.createGetConsentReqInfo()
+      m.makeRequest({
+        url: requestInfo.url
+        options: requestInfo.options
+        requestType: m.constants.reqNames.getConsent
+        successCallback: onGetConsentSuccess
+        responseType: "assocarray"
+        silenceCallbackWarnings: true
+      })
+    else
+      ' If the current date falls in between major event start and end we will avoid making consent call and fallback to default.
+      if m.onGetConsentCompletionCallback <> invalid
+        getConsentCompletionCallback = m.onGetConsentCompletionCallback
+        m.onGetConsentCompletionCallback = invalid
+        getConsentCompletionCallback()
+      end if
+    end if
   end if
 End Function
 
