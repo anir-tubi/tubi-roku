@@ -420,7 +420,8 @@ Function onAgeNotVerifiedAtSignup(error)
     info = error.info
     errorCode = invalid
 
-    if info <> invalid
+    ' info sometimes will return a html response so adding a check to make sure it is aa.
+    if isAA(info) = true
       ' Below error code field will hold the value from backend returned error object. ex: INVALID_PARAMS.
       errorCode = info.code
     end if
