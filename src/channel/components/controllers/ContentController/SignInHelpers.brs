@@ -8,6 +8,8 @@ Function startSignIn(callbackAfterSignIn=invalid , callbackAfterSignInParams = i
 
   tubiLog("SignInHelpers.startSignIn")
 
+  stopVideoPreview()
+
   ' setting the default callback that occurs after a user signs in
   if callbackAfterSignIn = invalid
     callbackAfterSignIn = onSideNavSignInCompleted

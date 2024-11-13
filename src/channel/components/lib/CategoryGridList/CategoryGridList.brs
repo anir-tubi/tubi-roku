@@ -141,6 +141,9 @@ Function onComponentFocusChange()
       m.purpleCarpetRow.opacity = 1
       m.skinAdRow.opacity = 0
       m.purpleCarpetRow.setFocus(true)
+      ' We are cloning so that itemfocused gets fired when user focuses back on the same item.
+      ' Ex: User focusing on purple carpet and moves focus to sidenav and then back to purple carpet.
+      m.top.itemFocused = m.top.primaryEventContent.clone(true)
     else if isPurpleCarpetContainerEmpty() = false AND m.top.resetGridPosition = true
       ' Below logic is executed when user switches between kids mode and regular mode.
       ' Due to the fact that kids mode does not have purple carpet we need to reset focus back to purple carpet container from rowlist.
