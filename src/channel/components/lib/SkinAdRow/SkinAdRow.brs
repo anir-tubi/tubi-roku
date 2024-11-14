@@ -13,7 +13,11 @@ Function init()
   topRef.observeFieldScoped("contentUpdated", "onContentChange")
   topRef.observeFieldScoped("focusedChild", "onComponentFocusChange")
   m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
-  m.countdownGroup.seconds = m.constants.timers.skinAdTimeout
+
+  if m.constants.deviceInfo.IsAutoplayEnabled = true
+    '//Respect the device autoplay setting by disabling the autoplay/countdown feature. Do this by not setting the seconds.
+    m.countdownGroup.seconds = m.constants.timers.skinAdTimeout
+  end if
 
   typographyConstants = getTypographyConstants()
   m.countdownGroup.typographyLabelId = typographyConstants.ids.bodyExtraSmallStrong
@@ -55,6 +59,7 @@ End Function
 Function onComponentFocusChange()
   if m.top.hasFocus() = true
     m.rowList.setFocus(true)
+    m.infoPanelGroup.opacity = 1
   end if
 
   if m.countdownGroup.seconds > 0
@@ -63,7 +68,6 @@ Function onComponentFocusChange()
       m.countdownGroup.seconds = m.constants.timers.skinAdTimeout
 
       ' If the countdown is still active and the row is in focus, then continue to countdown
-      m.infoPanelGroup.opacity = 1
       m.playerFullscreenCountdownTimer.control = "start"
     else
       m.playerFullscreenCountdownTimer.control = "stop"
@@ -151,9 +155,10 @@ Function selectVideoItem()
   if m.playerFullscreenCountdownTimer.control = "start"
     m.countdownGroup.seconds = 0  'set seconds to 0 so timer does not start again after selection
     m.playerFullscreenCountdownTimer.control = "stop"
-    m.countdownGroup.secondsTranslationId = "metadata_watch_again"
     m.countdownGroup.translation = [1425, m.countdownGroup.translation[1]]  '//move the countdown to the right after the text is changed
   end if
+  m.countdownGroup.display = true
+  m.countdownGroup.secondsTranslationId = "metadata_watch_again"
   m.top.rowItemSelected = m.rowList.rowItemFocused
 End Function
 

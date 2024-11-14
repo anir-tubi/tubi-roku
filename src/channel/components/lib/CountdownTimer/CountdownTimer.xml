@@ -12,7 +12,7 @@
   <interface>
     <!--INPUT-->
       <!-- The number of seconds to display in the countdown timer. -->
-      <field id="seconds" type="integer"/>
+      <field id="seconds" type="integer" value="-1"/>
 
       <!-- The ID of the translation string within the translation JSON to be used to display the seconds. The translation needs to accept the parameter 'seconds'. -->
       <field id="secondsTranslationId" type="string" value=""/>

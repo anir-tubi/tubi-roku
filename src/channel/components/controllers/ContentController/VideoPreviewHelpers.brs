@@ -154,7 +154,10 @@ End Function
 ' @pageInfo: assocarray, value can be { pagetype: "home_page", pagevalues: {}}
 Function startVideoPreview(content, pageInfo = {})
   tubiLog("VideoPreviewHelpers.startVideoPreview")
-  if content <> invalid AND (isVideoPreviewOn() = true OR content.gridItemType = m.constants.ui.gridItemTypes.skinAd)
+
+  
+  if content <> invalid AND (isVideoPreviewOn() = true OR (content.gridItemType = m.constants.ui.gridItemTypes.skinAd AND m.constants.deviceInfo.IsAutoplayEnabled = true AND m.constants.deviceInfo.limitedUi = false))
+    '//::NOTE:: if this is a skinAd content, the above conditional statement checks if the device auto play setting is on and that the device is not a limited UI device before playing the looping background video
     videoPreview = m.videoPreviewPlayer
 
     ' If the experiment is enabled and focused content is from featured row than expand preview to full screen.
