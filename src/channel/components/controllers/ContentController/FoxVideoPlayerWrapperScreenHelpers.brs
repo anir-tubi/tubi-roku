@@ -646,7 +646,7 @@ Function onFoxVideoPlayerIsPlayerClosed()
       exit for
     end if
 
-    popScreen(false, false)
+    popScreen(true, false)
   end for
 End Function
 
