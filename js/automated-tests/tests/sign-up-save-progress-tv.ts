@@ -1,4 +1,3 @@
-
 import { expect } from 'chai';
 import { ecp, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
@@ -36,12 +35,15 @@ describe('Sign up Save Progress TV', function () {
         // Click OK
         await ecp.sendKeypress(ecp.Key.Ok, {wait:10000});
 
-        // Are we on the sign in/sign up page?
-        await testUtils.waitForElementToFullyShowOnScreen('resendButtonMagicLink', 'Resend button not found');
+
+        // Are we on the magic link page?
+        await testUtils.waitForElementToFullyShowOnScreen('emailVerificationButton', 'Email Verification Button not found');
+       
       
 
-    });
 
+    });
+    /* Magic link issue - need workaround - removed from run, moved to manual
     // https://tubi.testrail.io/index.php?/cases/view/260844
     it('C260844 - Guest - When user completes registration after Sign Up to Save Progress, the user is returned to Series Details page with Play button replacing the sign up prompt,@signupsaveprogress', async () => {
 
@@ -101,6 +103,8 @@ describe('Sign up Save Progress TV', function () {
 
 
     });
+
+     /** Removed due to magic link graduation - need a workaround
     it('C260845 - Guest - When user  presses Play on the Series Details page after choosing to Sign Up to Save Progress, the  title plays,@signupsaveprogress', async () => {
 
         // Select a title
@@ -165,4 +169,5 @@ describe('Sign up Save Progress TV', function () {
         // Is video playing?
         await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 10000);
     });
+    */
 });

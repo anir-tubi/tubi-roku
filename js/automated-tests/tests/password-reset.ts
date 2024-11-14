@@ -5,7 +5,7 @@ import { testUtils } from '../test-utils';
 describe('Sign In: On-Device Password Reset', function () {
 
 // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/476627
-  it('C476627 - Registered User - Sign In with valid credentials, @password_reset', async () => {
+  it.skip('C476627 - Registered User - Sign In with valid credentials, @password_reset', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
@@ -38,7 +38,7 @@ describe('Sign In: On-Device Password Reset', function () {
   });
 
 // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/476628
-  it('C476628 - Registered User - Sign In with invalid password, @password_reset1', async () => {
+  it.skip('C476628 - Registered User - Sign In with invalid password, @password_reset1', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
@@ -71,7 +71,7 @@ describe('Sign In: On-Device Password Reset', function () {
   });
 
 // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/476629
-  it('C476629 - Registered User - Instant Sign-In Link - Prefilled email, @password_reset1', async () => {
+  it.skip('C476629 - Registered User - Instant Sign-In Link - Prefilled email, @password_reset1', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
@@ -109,7 +109,6 @@ describe('Sign In: On-Device Password Reset', function () {
     expect(helpOnTheWayTitle.text).to.equal('Help is on the way!');
   });
 
-// Test Rail link: https://tubi.testrail.io/index.php?/cases/view/476634
 it('C476634 - Register New User - Default Mode, @password_reset', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });

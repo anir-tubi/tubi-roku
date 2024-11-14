@@ -1,4 +1,3 @@
-
 import { expect } from 'chai';
 import { ecp, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
@@ -57,8 +56,10 @@ describe('Sign up Save Progress Exit Prompt', function () {
     //await ecp.sleep(5000);
     await ecp.sendKeypress(ecp.Key.Ok);
 
-    // Verify if on the Sign In to Your Account age
-    await testUtils.waitForElementToFullyShowOnScreen('resendButtonMagicLink');
+
+      // Verify if on the Sign In to Your Account age
+      await testUtils.waitForElementToFullyShowOnScreen('emailVerificationButton', 'Button Not Found');
+  
 });
 
 // https://tubi.testrail.io/index.php?/cases/view/450485
@@ -112,7 +113,7 @@ it('C450487 - Exit prompt - Guest user press back button when lands on activatio
 });
 /* Removing for now until we can figure out helpers for this - Testing manually for now
 // https://tubi.testrail.io/index.php?/cases/view/450490
-it.only('C450490 - Exit prompt - Guest user sign in through the modal and the CW row should populate, @signupsaveprogressexit', async () => {
+it('C450490 - Exit prompt - Guest user sign in through the modal and the CW row should populate, @signupsaveprogressexit', async () => {
 
     // Select a title
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -167,8 +168,9 @@ it.only('C450490 - Exit prompt - Guest user sign in through the modal and the CW
     await testUtils.waitForElementToFullyShowOnScreen(
       'tvContinueWatchingRow'
     );
-});
-*/
+    */
+
+
 // https://tubi.testrail.io/index.php?/cases/view/450491
 it('C450491 - Exit prompt - Guest user autoplay to next episode, after playback more than 5 minutes press back button, @signupsaveprogressexit', async () => {
 
