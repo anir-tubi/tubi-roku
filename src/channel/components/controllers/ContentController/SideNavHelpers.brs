@@ -208,13 +208,21 @@ Function onSideNavItemSelected()
 
       end if
     else if itemSelectedId = m.constants.ui.sideNavIds.search
-      '//display the search
-      if isKidsUIOn() <> true
-        setUiMode(m.constants.ui.modes.standard)
-      end if
+      if isMajorEventDay() = true
+        showToast({
+          "selfDestructTimer": 5
+          "headerText": getTranslation("search_disabled_message")
+          "imageUri": "pkg:/images/feature-disabled-icon.webp"
+        })
+      else
+        '//display the search
+        if isKidsUIOn() <> true
+          setUiMode(m.constants.ui.modes.standard)
+        end if
 
-      showSearchScreen()
-      bNewScreenCalledSuccess = true
+        showSearchScreen()
+        bNewScreenCalledSuccess = true
+      end if
     else if itemSelectedId = m.constants.ui.sideNavIds.home
       if isKidsUIOn() <> true
         setUiMode(m.constants.ui.modes.standard)
@@ -255,12 +263,20 @@ Function onSideNavItemSelected()
         bNewScreenCalledSuccess = true
       end if
     else if itemSelectedId = m.constants.ui.sideNavIds.myList
-      if isKidsUIOn() <> true
-        setUiMode(m.constants.ui.modes.standard)
-      end if
+      if isMajorEventDay() = true
+        showToast({
+          "selfDestructTimer": 5
+          "headerText": getTranslation("mylist_disabled_message")
+          "imageUri": "pkg:/images/feature-disabled-icon.webp"
+        })
+      else
+        if isKidsUIOn() <> true
+          setUiMode(m.constants.ui.modes.standard)
+        end if
 
-      showMyStuffScreen()
-      bNewScreenCalledSuccess = true
+        showMyStuffScreen()
+        bNewScreenCalledSuccess = true
+      end if
     else if itemSelectedId = m.constants.ui.sideNavIds.movies
       if isKidsUIOn() = true
         bNewScreenCalledSuccess = false

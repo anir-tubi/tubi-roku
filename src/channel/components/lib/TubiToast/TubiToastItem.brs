@@ -58,7 +58,7 @@ Function onShow(_msg)
     createHeaderText(inputArgs)
     headerWidth = m.header.boundingRect().width
 
-    if headerWidth > 546
+    if headerWidth + imageWidth >= 546
       m.header.width = 546 - imageWidth
     else
       m.header.width = headerWidth

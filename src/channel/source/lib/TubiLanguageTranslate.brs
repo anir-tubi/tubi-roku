@@ -2003,6 +2003,22 @@ Function getTranslation_en_US()
     "sign_up_error_screen__purple_carpet_day_subheading": {
       "description": "Sign in error screen heading default error",
       "message": "You can still watch your favorite movies and TV shows as a guest, including the tournament!\nWe'll send you an email to try again later."
+    },
+    "search_disabled_message": {
+      "description": "Search disabled toast message",
+      "message": "Search is currently unavailable."
+    },
+    "mylist_disabled_message": {
+      "description": "My List disabled toast message",
+      "message": "My Stuff is currently unavailable."
+    },
+    "rating_disabled_message": {
+      "description": "Like/Dislike disabled toast message",
+      "message": "Rating is currently unavailable."
+    },
+    "continue_watching_disabled_message": {
+      "description": "Continue watching disabled toast message",
+      "message": "Continue watching is currently unavailable."
     }
   }
 End Function

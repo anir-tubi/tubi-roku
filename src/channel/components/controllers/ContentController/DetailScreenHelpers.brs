@@ -971,8 +971,16 @@ End Function
 
 Function onAddToQueueSelected(msg)
   tubiLog("DetailScreenHelpers.onAddToQueueSelected")
-  detailScreen = msg.getRoSGNode()
-  onAddToQueue(detailScreen)
+  if isMajorEventDay() = true
+    showToast({
+      "selfDestructTimer": 5
+      "headerText": getTranslation("mylist_disabled_message")
+      "imageUri": "pkg:/images/feature-disabled-icon.webp"
+    })
+  else
+    detailScreen = msg.getRoSGNode()
+    onAddToQueue(detailScreen)
+  end if
 End Function
 
 
@@ -1262,8 +1270,16 @@ End Function
 
 Function onRemoveFromQueueSelected(msg)
   tubiLog("DetailScreenHelpers.onRemoveFromQueueSelected")
-  detailScreen = msg.getRoSGNode()
-  onRemoveFromQueue(detailScreen)
+  if isMajorEventDay() = true
+    showToast({
+      "selfDestructTimer": 5
+      "headerText": getTranslation("mylist_disabled_message")
+      "imageUri": "pkg:/images/feature-disabled-icon.webp"
+    })
+  else
+    detailScreen = msg.getRoSGNode()
+    onRemoveFromQueue(detailScreen)
+  end if
 End Function
 
 
@@ -1332,8 +1348,16 @@ End Function
 ' Observer that is called when the like button is selected
 Function onLikeSelected(msg)
   tubiLog("DetailScreenHelpers.onLikeSelected")
-  detailScreen = msg.getRoSGNode()
-  onLike(detailScreen)
+  if isMajorEventDay() = true
+    showToast({
+      "selfDestructTimer": 5
+      "headerText": getTranslation("rating_disabled_message")
+      "imageUri": "pkg:/images/feature-disabled-icon.webp"
+    })
+  else
+    detailScreen = msg.getRoSGNode()
+    onLike(detailScreen)
+  end if
 End Function
 
 
@@ -1353,8 +1377,16 @@ End Function
 ' Observer that is called when the dislike button is selected
 Function onDislikeSelected(msg)
   tubiLog("DetailScreenHelpers.onDislikeSelected")
-  detailScreen = msg.getRoSGNode()
-  onDislike(detailScreen)
+  if isMajorEventDay() = true
+    showToast({
+      "selfDestructTimer": 5
+      "headerText": getTranslation("rating_disabled_message")
+      "imageUri": "pkg:/images/feature-disabled-icon.webp"
+    })
+  else
+    detailScreen = msg.getRoSGNode()
+    onDislike(detailScreen)
+  end if
 End Function
 
 
@@ -1595,8 +1627,16 @@ End Function
 
 Function onRemoveFromHistorySelected(msg)
   tubiLog("DetailScreenHelpers.onRemoveFromHistorySelected")
-  detailScreen = msg.getRoSGNode()
-  onRemoveFromHistory(detailScreen)
+  if isMajorEventDay() = true
+    showToast({
+      "selfDestructTimer": 5
+      "headerText": getTranslation("continue_watching_disabled_message")
+      "imageUri": "pkg:/images/feature-disabled-icon.webp"
+    })
+  else
+    detailScreen = msg.getRoSGNode()
+    onRemoveFromHistory(detailScreen)
+  end if
 End Function
 
 
