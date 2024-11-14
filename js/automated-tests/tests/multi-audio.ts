@@ -96,7 +96,7 @@ describe('Multiple Audio', function () {
 
     // Navigate right to open Options
     await ecp.sendKeypress(ecp.Key.Right, { count: 4 });
-    await ecp.sendKeypress(ecp.Key.Ok, {wait:1500});
+    await ecp.sendKeypress(ecp.Key.Ok, {wait:2500});
 
     // Verify that AD is still enabled
     await testUtils.waitForElementToFullyShowOnScreen('audioDescriptionItemChecked');

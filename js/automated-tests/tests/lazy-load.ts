@@ -41,16 +41,15 @@ describe('LazyLoad', function () {
       await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
     
-        // Open side nav and navigate to Categories
+      // Open side nav and navigate to Categories
       await openLeftNav();
 
       // Select Categories
       await selectCategories();
       
-
       // Navigate to a category with < 200 titles and validate < 200
       await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
-      await ecp.sendKeypress(ecp.Key.Down, {count:2, wait:4000});
+      await ecp.sendKeypress(ecp.Key.Down, {count:3, wait:4000});
       await ecp.sendKeypress(ecp.Key.Right);
       await testUtils.waitForElementToFullyShowOnScreen('categoriesDetailsPageInfo');
 
@@ -82,7 +81,7 @@ describe('LazyLoad', function () {
         
       // Navigate to a category with 1000
       await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
-      await ecp.sendKeypress(ecp.Key.Down, {count:2, wait:4000});
+      await ecp.sendKeypress(ecp.Key.Down, {count:3, wait:4000});
       await testUtils.waitForElementToFullyShowOnScreen('actionButtonFocused');
       await ecp.sendKeypress(ecp.Key.Right);
       await testUtils.waitForElementToFullyShowOnScreen('categoriesDetailsPageInfo');

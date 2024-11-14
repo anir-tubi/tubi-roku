@@ -83,7 +83,7 @@ describe('Sign up Save Progress Movies', function () {
 
       
     });
-
+    /** Removed due to magic link graduation - need a workaround
     // https://tubi.testrail.io/index.php?/cases/view/260857
     it('C260857 - Guest - When user selects the "Sign Up to Save Progress" button and registers/signs in, the title can be played successfully, @signupsaveprogress', async () => {
         
@@ -146,4 +146,5 @@ describe('Sign up Save Progress Movies', function () {
         // Is video playing?
         await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 10000);
     });  
+    */
 });

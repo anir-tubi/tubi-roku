@@ -496,11 +496,11 @@ describe('Parental Controls', function () {
       await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Continue Watching', 5000);
 
 
-    // To Do : revisit once back end issue is addressed.
+      // To Do : revisit once back end issue is addressed.
       const rowItemsContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('homeScreenRowList');
 
-    // Add this for loop for all checks on Ratings.
-    //
+      // Add this for loop for all checks on Ratings.
+      //
       for (const itemContent of rowItemsContent) {
         expect(['PG','R','NR','PG-13', 'TV-14', 'TV-MA', 'MA'].includes(itemContent.type)).to.be.false;
       }

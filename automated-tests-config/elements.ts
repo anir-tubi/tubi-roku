@@ -76,7 +76,7 @@ const elements = typeCheckElements({
   /** Component on the Movie Screen that we can pull content for the Grid from */
   movieScreenRowList: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#ContentArea.#CategoryGridList.#RowList',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#PageGroup.#ContentArea.#CategoryGridList.#RowList',
   },
 
   /** Movie screen first row category name */
@@ -1422,6 +1422,11 @@ const elements = typeCheckElements({
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#ContentArea.#CategoryGridList.#RowList.5.items.0.#poster',
   },
+
+  emailVerificationButton: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#emailVerificationScreen.#pageLayout.#buttonGroup.#resendBtn.#focus9Patch',
+  },
+  
 
   /** settings screen header */
   settingsScreenHeader: {
