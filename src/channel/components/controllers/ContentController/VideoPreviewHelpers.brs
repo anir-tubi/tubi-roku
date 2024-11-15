@@ -104,7 +104,7 @@ Function onVideoPreviewStateChanged(msg)
         isReplay = true
       end if
 
-      isPurpleCarpetContent = (item <> invalid AND (item.gridItemType = m.constants.ui.gridItemTypes.purpleCarpet OR item.gridItemType = m.constants.ui.gridItemTypes.banner))
+      isPurpleCarpetContent = (item <> invalid AND item.type = m.constants.ui.contentTypes.purpleCarpetEvent)
       isFullPlayerBlockedForUser = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR ( item <> invalid AND item.needsLogin = true AND isloggedInUser() = false) OR (isPurpleCarpetContent = true)
 
       if isReplay = true

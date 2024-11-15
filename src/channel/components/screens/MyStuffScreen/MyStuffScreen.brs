@@ -316,6 +316,8 @@ Function onRowItemFocused(msg) as Boolean
       end if
 
       populateInfoPanel(mode, emptyContentNode) 'empties the info panel
+    else if itemFocused <> invalid AND itemFocused.type = m.constants.ui.contentTypes.purpleCarpetEvent
+      populateInfoPanelWithPurpleCarpetBannerMode(itemFocused, m.InfoPanel)
     else
       populateInfoPanelByContent(itemFocused)
     end if
