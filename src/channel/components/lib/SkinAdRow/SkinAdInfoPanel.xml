@@ -34,6 +34,7 @@
 
       <Poster
         id="TitleImage"
+        width="594"
         loadDisplayMode="scaleToFit"/>
 
       <Label

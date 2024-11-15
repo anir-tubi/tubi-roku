@@ -87,10 +87,11 @@
           vertAlignment="top"
           horizAlignment="left"
           translation="[15,15]"
-          itemSpacings="[12]">
+          itemSpacings="[8]">
 
           <Poster
             id="offerLogo"
+            width="216"
             loadDisplayMode="scaleToFit"/>
           <Label
             id="offerDescription"

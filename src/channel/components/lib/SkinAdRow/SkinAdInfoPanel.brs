@@ -8,7 +8,7 @@ Function init()
   m.top.observeFieldScoped("content", "onContentChange")
 
   m.typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.description, m.typographyConstants.ids.bodyMediumStrong)
+  setTypographyOfLabel(m.description, m.typographyConstants.ids.bodySmallStrong)
   setTypographyOfLabel(m.presentedByLabel, m.typographyConstants.ids.bodyExtraSmallStrong)
 
   '//::TODO::JHAND - fix gradient in kids mode

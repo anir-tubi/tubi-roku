@@ -99,6 +99,7 @@
               </Label>
               <Poster
                 id="presentedByImage"
+                width="174"
                 loadDisplayMode="scaleToFit"/>
           </LayoutGroup>
         </Group>
