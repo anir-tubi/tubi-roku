@@ -80,7 +80,7 @@
         id="adInfoBackground"
         height="132"
         width="471"
-        uri="pkg:/images/menu-focus-$$RES$$.9.png" />
+        uri="pkg:/images/tab_short_component_alt_$$RES$$.9.png" />
         
         <LayoutGroup
           layoutDirection="vert"
