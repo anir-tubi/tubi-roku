@@ -100,7 +100,7 @@ Function onVideoPreviewStateChanged(msg)
       end if
 
       isReplay = false
-      if item.gridItemType = m.constants.ui.gridItemTypes.skinAd
+      if item <> invalid AND item.gridItemType = m.constants.ui.gridItemTypes.skinAd
         isReplay = true
       end if
 

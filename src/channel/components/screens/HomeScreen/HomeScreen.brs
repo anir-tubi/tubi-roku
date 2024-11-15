@@ -539,7 +539,7 @@ Function onItemToBeFocusedChange()
   'Here we are updating the contentFocused, so it will play correct video preview when the content is updated.
   m.top.contentFocused = reloadedItemToBeFocused
 
-  if reloadedItemToBeFocused <> invalid AND reloadedItemToBeFocused.gridItemType <> m.constants.ui.gridItemTypes.spotlight AND reloadedItemToBeFocused.gridItemType <> m.constants.ui.gridItemTypes.purpleCarpet
+  if reloadedItemToBeFocused <> invalid AND reloadedItemToBeFocused.gridItemType <> m.constants.ui.gridItemTypes.spotlight AND reloadedItemToBeFocused.gridItemType <> m.constants.ui.gridItemTypes.purpleCarpet AND reloadedItemToBeFocused.gridItemType <> m.constants.ui.gridItemTypes.skinAd
     ' Covers use cases where info panel was hidden but due to home screen container changes purple carpet or spotlight is removed and info panel was reset.
     fadeInContentArea()
     populateInfoPanelByContent(reloadedItemToBeFocused)
