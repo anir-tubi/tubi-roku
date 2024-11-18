@@ -35,6 +35,9 @@ const {makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionB
 // Importing functions related to Github action runners
 const {setupAutomatedTestsGithubActionRunner, startAutomatedTestsGithubActionRunner, removeAutomatedTestsGithubActionRunner} = require('./js/action-runner');
 
+// importing functions related to client error config
+const {updateLocalClientErrorConfigFile, verifyLocalClientErrorConfigIsCurrent} = require('./js/local-client-error-config');
+
 /* Allow some environment variables to drive which config we're building.
    Environment variables are set on options, along with any parameters passed in
    to the gulp command line call.
@@ -258,6 +261,7 @@ function buildStarter() {
   ];
 
   if (settings.useFullStarterController) {
+    genUtilSrc.push('src/channel/source/localClientErrorConfig.brs'),
     genUtilSrc.push('src/channel/source/3rdparty/rta/typeUtils.brs');
   }
 
@@ -374,6 +378,7 @@ function buildRemote() {
     let sources = [
       // "src/channel/images/**/*",
       'src/channel/source/lib/**/*',
+      'src/channel/source/localClientErrorConfig.brs',
       'src/channel/source/3rdparty/**/*',
       'src/channel/components/**/*',
       //make sure not to include the following files
@@ -1138,9 +1143,9 @@ exports.bumpQa = exports.bumpQA; //Create bumpQA command alias
 exports.install = series(exports.build, conditionalPackage, sideLoad);
 exports.test = series(setTest, clean, preprocessTests, buildInstalled, sideLoad);
 exports.buildQaBranch = buildQaBranch;
-exports.stage = series(compareTranslations, setStaging, bumpRevision, exports.build, packageAll, pushStaging, pushBranch);
+exports.stage = series(verifyLocalClientErrorConfigIsCurrent, compareTranslations, setStaging, bumpRevision, exports.build, packageAll, pushStaging, pushBranch);
 exports.releaseOnGithub = series(tagBuild, pushTag, createGithubRelease);
-exports.release = series(confirmRelease, compareTranslations, setProduction, bumpBuild, exports.build, packageAll, makeReleasePrs, exports.releaseOnGithub, sendSlackReminders);
+exports.release = series(confirmRelease, verifyLocalClientErrorConfigIsCurrent, compareTranslations, setProduction, bumpBuild, exports.build, packageAll, makeReleasePrs, exports.releaseOnGithub, sendSlackReminders);
 exports.compareProd = findCommitsNotOnProductionBranch;
 exports.compareCheckedOut = findCommitsNotOnCurrentBranch;
 exports.addMissingImages = addMissingImagesToRemoteLibrary;
@@ -1223,4 +1228,7 @@ exports.compareTranslations = compareTranslations;
 
 exports.updateJsonTypography = updateTypographyJSON;
 exports.updateJsonColor = updateColorJSON;
+
 exports.buildFoxVideoPlayer = buildFoxVideoPlayer;
+
+exports.updateErrorConfig = updateLocalClientErrorConfigFile;

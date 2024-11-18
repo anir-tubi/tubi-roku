@@ -14,7 +14,7 @@ Function setupFullStarterController()
 
   m.tubiAuthUpdate = TubiAuthUpdate(m.constants)
 
-  retrieveInitialAuthInfo()
+  retrieveClientErrorConfig(retrieveClientErrorConfigSuccessCallbackTriggerRetrieveInitialAuthInfo, retrieveClientErrorConfigErrorCallbackTriggerRetrieveInitialAuthInfo)
 End Function
 
 

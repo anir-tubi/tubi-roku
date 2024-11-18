@@ -42,6 +42,18 @@ Function getExperimentsInfoFromGlobal()
 End Function
 
 
+' make sure client error config is set in the case that m.global is not immediately available
+' limits the number of attempts so the while loop doesn't block into perpetuity.
+Function getClientErrorConfigFromGlobal(fallback = {})
+  clientErrorConfig = getFieldFromGlobal("clientErrorConfig")
+  if clientErrorConfig = invalid then
+    clientErrorConfig = fallback
+  end if
+
+  return clientErrorConfig
+End Function
+
+
 ' getGlobal gets the value of m.global, default invalid
 '
 Function getGlobal()

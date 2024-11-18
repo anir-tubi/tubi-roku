@@ -1,4 +1,50 @@
 ' Provides a spot to put code shared between StarterController and ContentController to avoid them getting out of sync
+Function retrieveClientErrorConfig(successCallback = retrieveClientErrorConfigSuccessCallback, errorCallback = retrieveClientErrorConfigErrorCallback)
+  ' If the global field is not set then we need to add it.
+  if getClientErrorConfigFromGlobal(invalid) = invalid
+    m.global.update({
+      "clientErrorConfig" : {}
+    }, true)
+  end if
+
+  m.makeRequest({
+    url: m.constants.urls.clientErrorConfigEndpoint
+    requestType: m.constants.reqNames.generic
+    successCallback: successCallback
+    errorCallback: errorCallback
+    responseType: "assocarray"
+    retries: 0
+  })
+End Function
+
+
+Function retrieveClientErrorConfigSuccessCallback(response)
+  if response <> invalid
+    m.global.clientErrorConfig = response
+  else
+    tubiLog("Received invalid client error config. Falling back to built in version")
+    m.global.clientErrorConfig = getLocalClientErrorConfig()
+  end if
+End Function
+
+
+Function retrieveClientErrorConfigErrorCallback(_response)
+  tubiLog("Error retrieving remote client error config. Falling back to built in version")
+  m.global.clientErrorConfig = getLocalClientErrorConfig()
+End Function
+
+
+Function retrieveClientErrorConfigSuccessCallbackTriggerRetrieveInitialAuthInfo(response)
+  retrieveClientErrorConfigSuccessCallback(response)
+  retrieveInitialAuthInfo()
+End Function
+
+
+Function retrieveClientErrorConfigErrorCallbackTriggerRetrieveInitialAuthInfo(response)
+  retrieveClientErrorConfigErrorCallback(response)
+  retrieveInitialAuthInfo()
+End Function
+
 
 Function retrieveInitialAuthInfo()
   TubiLog("retrieveInitialAuthInfo")
@@ -11,6 +57,7 @@ Function onInitialAuthInfoRetrieved()
   ' Auth will be required first in the future but for now we aren't changing that flow so just load the other dependencies
   sendRequestForExperimentsAndConfig()
 End Function
+
 
 ' Performs network request to get experiments and external config.
 Function sendRequestForExperimentsAndConfig()
@@ -49,6 +96,7 @@ Function sendRequestForExperimentsAndConfig()
     m.makeRequest(externalConfigRequestInfo)
   end if
 End Function
+
 
 ' Callback triggered once the experiments request is successful.
 Function onExperimentsRequestSuccess(experimentsInfo)

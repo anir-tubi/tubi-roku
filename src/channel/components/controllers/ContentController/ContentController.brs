@@ -41,10 +41,9 @@ Function init()
   ' The reason why we are also storing it's reference in m scope for better performance since we access the sdk instance a lot of items during the app session.
   m.oneTrust = invalid
 
+  retrieveClientErrorConfig(retrieveClientErrorConfigSuccessCallbackTriggerRetrieveInitialAuthInfo, retrieveClientErrorConfigErrorCallbackTriggerRetrieveInitialAuthInfo)
   ' Holds true or false based on if app suspend is in progress
   m.isApplicationSuspendInProgress = false
-
-  retrieveInitialAuthInfo()
 End Function
 
 
@@ -1280,7 +1279,7 @@ Function sendSkinAdPixels(aPixelURLs)
       sStringToReplace = "(ADRISE:CB)"
       sCacheBuster = createCacheBusterString()
       newPixelURL = pixelURL.replace(sStringToReplace, sCacheBuster)
-      
+
       if isNonEmptyString(newPixelURL) = true
         encodedUrl = newPixelURL.EncodeUri()
 
@@ -1800,9 +1799,9 @@ End Function
 
 
 ' Setting a new background color. Usually this is not called unless there is a special case: i.e. sponsorship requiring different background color
-' @sColor: string, The color that the background should be. 
+' @sColor: string, The color that the background should be.
 Function setBackgroundColor(sColor)
-  m.backgroundGroup.circularMaskColor = sColor 
+  m.backgroundGroup.circularMaskColor = sColor
 End Function
 
 
@@ -2128,6 +2127,8 @@ Function onCustomResume(msg)
     lastAppSuspendInSecs = m.appSuspendTimer.TotalSeconds()
     lastAppRestartInDays = m.lastAppRestartTimer.TotalSeconds() / 24 / 60 / 60
 
+    retrieveClientErrorConfig()
+
     if (customResumeLaunchParams.contentId <> invalid AND customResumeLaunchParams.mediaType <> invalid) OR customResumeLaunchParams.page <> invalid
       ' if resuming due to a deeplink, restart the app. Deeplinking into a non standard state creates
       ' lots of edge cases, so for consistency, restarting the app is easiest.
@@ -2442,7 +2443,7 @@ Function showHideLogo(logoType, presentedByURL = "", presentedByText = "")
 
   end if
 
-  '//Display/hide sponsored info. 
+  '//Display/hide sponsored info.
   '//Even if the logoType <> m.constants.logoType.hide, the presentedByGroup may need to be hidden.
   if isNonEmptyString(presentedByURL) = true
     m.presentedByGroup.visible = true
@@ -2457,7 +2458,7 @@ Function showHideLogo(logoType, presentedByURL = "", presentedByText = "")
   else
     m.presentedByGroup.visible = false
   end if
-  
+
 End Function
 
 

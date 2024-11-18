@@ -695,6 +695,11 @@ After some time of features being added/removed, some translations may no longer
   gulp codeClean
   ```
 
+
+## Updating the client error config
+
+In an attempt to standardize and allow real time updates to the application's error response handling, we now load a client error config json file on app launch and resume. If we can not retrieve the remote client error config then we need to fallback to a local copy. To make sure this local copy stays in sync, we now run an extra check when `gulp stage` or `gulp release` is run. If the local config is not current then it will let you know to run `gulp updateErrorConfig` to update the local copy of the config.
+
 # Self-hosted Github Action Runners
 
 **Enable/Disable Self-hosted Github Action Runner**

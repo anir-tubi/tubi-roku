@@ -697,6 +697,8 @@ Function getConstants()
 
     constants.urls.foxListingEndpoint = constants.urls.foxApiBaseUrl + "/v3.0/listings"
 
+    constants.urls.clientErrorConfigEndpoint = "https://d0.tubitv.com/error-handler/client-error-config.json"
+
   'http request types
   constants.reqTypes = {}
     constants.reqTypes.get = "GET"
@@ -1308,12 +1310,12 @@ Function getConstants()
 
         constants.ui.logoSizes.skinAds.adPlayerScreen = {}
           constants.ui.logoSizes.skinAds.adPlayerScreen.width = "216"
-        
-        constants.ui.logoSizes.skinAds.homeScreen = {}  
+
+        constants.ui.logoSizes.skinAds.homeScreen = {}
           constants.ui.logoSizes.skinAds.homeScreen.width = "174"
 
-        constants.ui.logoSizes.skinAds.infoPanel = {}  
-          constants.ui.logoSizes.skinAds.infoPanel.width = "594"      
+        constants.ui.logoSizes.skinAds.infoPanel = {}
+          constants.ui.logoSizes.skinAds.infoPanel.width = "594"
 
     constants.ui.imageSizes = {}
 
