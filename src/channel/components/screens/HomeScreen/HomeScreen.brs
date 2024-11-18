@@ -203,12 +203,16 @@ End Function
 
 ' A new row has been focused in the CategoryGridList
 Function onRowFocused(msg)
+  tubiLog("HomeScreen.onRowFocused")
   row = msg.getData()
 
   if row <> invalid
     if isSponsoredRow(row) = true
       m.top.sponsoredRowFocused = true
     end if
+
+    '//When a new row is in focus, ensure the ContentArea Mask is at the proper location
+    moveContentAreaMaskBasedCurrentFocus()
   end if
 End Function
 
@@ -225,6 +229,7 @@ End Function
 
 ' When the column changes focus, then report to any observers.
 Function onCurrFocusColumnChange(msg)
+  tubiLog("HomeScreen.onCurrFocusColumnChange")
   column = msg.getData()
   newColumn = Int(column)
   if newColumn <> invalid AND newColumn <> m.currentColumn
@@ -238,6 +243,7 @@ End Function
 
 ' fires when the RowList is in the process of scrolling between rows
 Function onCurrFocusRowChange()
+  tubiLog("HomeScreen.onCurrFocusRowChange")
   'the focused row during the scroll as a float (ie. 2.3 is partially between 2nd and 3rd rows)
   currFocusRow = m.CategoryGridList.currFocusRow
 
@@ -732,9 +738,14 @@ End Function
 ' The content RowList within the categoryGridList is moving. 
 ' Usually that means a special row or the content rowList is gaining focus.
 Function onRowlistTranslationChange(msg)
-  '//Determine if the rowlist or a special row is in focus
+  moveContentAreaMaskBasedCurrentFocus()
+End Function
+
+
+'//Based on the current focused item, move the contentarea mask
+Function moveContentAreaMaskBasedCurrentFocus()  '//Determine if the rowlist or a special row is in focus
   nRowInFocus = -1
-  focusedContent = m.CategoryGridList.itemFocused
+  focusedContent = m.top.contentFocused
   if focusedContent <> invalid AND (focusedContent.gridItemType <> m.constants.ui.gridItemTypes.purpleCarpet) AND (m.isSpotlightRowEnabled = false OR focusedContent.gridItemType <> m.constants.ui.gridItemTypes.spotlight) AND focusedContent.gridItemType <> m.constants.ui.gridItemTypes.skinAd
     if m.CategoryGridList.cursorPosition <> invalid
       nRowInFocus = m.CategoryGridList.cursorPosition[0]
@@ -743,7 +754,6 @@ Function onRowlistTranslationChange(msg)
     end if
   end if
   moveContentAreaMask(nRowInFocus)
-
 End Function
 
 
