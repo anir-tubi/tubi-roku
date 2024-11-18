@@ -47,7 +47,7 @@
       opacity="0">
       <SkinAdInfoPanel
         id="InfoPanel"
-        translation="[0,10]"/>
+        translation="[0,282]"/>
     </Group>
     <RowList
       id="rowList"

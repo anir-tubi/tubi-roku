@@ -84,10 +84,10 @@
         
         <LayoutGroup
           layoutDirection="vert"
-          vertAlignment="top"
+          vertAlignment="center"
           horizAlignment="left"
-          translation="[15,15]"
-          itemSpacings="[8]">
+          translation="[15,60]"
+          itemSpacings="[9]">
 
           <Poster
             id="offerLogo"
@@ -95,7 +95,7 @@
             loadDisplayMode="scaleToFit"/>
           <Label
             id="offerDescription"
-            vertAlign="bottom"/>
+            width="441"/>
         </LayoutGroup>
     </Group>
 

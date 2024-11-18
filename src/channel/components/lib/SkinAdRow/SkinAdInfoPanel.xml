@@ -18,6 +18,7 @@
   <children>
     <LayoutGroup
       id="infoPanelGroup"
+      vertAlignment="bottom"
       itemSpacings="[16,8,32]">
       
       <Poster
