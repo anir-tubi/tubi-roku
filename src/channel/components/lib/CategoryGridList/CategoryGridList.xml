@@ -176,6 +176,9 @@
 
       <field id="rowlistTranslation" alias="RowList.translation" />
 
+      <!-- content on the home screen is loaded and spinner can be turned off -->
+      <field id="gridContentIsReady" type="boolean" value="false" alwaysNotify="true" />
+
   </interface>
 
   <children>

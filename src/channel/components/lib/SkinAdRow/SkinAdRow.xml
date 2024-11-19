@@ -31,8 +31,6 @@
       <field id="rowItemSelected" type="intarray" alwaysNotify="true" />
 
       <field id="rowItemFocused" type="intarray" alwaysNotify="true" />
-
-      <field id="reloadedItemToBeFocused" type="node" />
   </interface>
 
   <children>
@@ -43,8 +41,7 @@
       repeat="true"/>
     <Group
       id="infoPanelGroup"
-      translation="[0,0]"
-      opacity="0">
+      translation="[0,0]">
       <SkinAdInfoPanel
         id="InfoPanel"
         translation="[0,282]"/>

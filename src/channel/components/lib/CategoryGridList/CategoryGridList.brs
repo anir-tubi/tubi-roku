@@ -46,7 +46,6 @@ Function init()
   m.skinAdRow = m.top.findNode("skinAdRow")
   m.skinAdRow.observeFieldScoped("rowItemSelected", "onSkinAdRowItemSelected")
   m.skinAdRow.observeFieldScoped("rowItemFocused", "onSkinAdRowItemFocused")
-  m.skinAdRow.observeFieldScoped("reloadedItemToBeFocused", "onReloadedItemToBeFocused")
 
   m.purpleCarpetRow = m.top.findNode("purpleCarpetRow")
   m.purpleCarpetRow.observeFieldScoped("rowItemSelected", "onPurpleCarpetRowItemSelected")
@@ -225,7 +224,6 @@ Function onContentChange()
     else 
       m.purpleCarpetRow.opacity = 1
     end if
-
   else
     ' Resetting the state of the UI.
     ' Below logic will be used in case of there is no purple carpet or spotlight on initial load.
@@ -235,6 +233,8 @@ Function onContentChange()
     m.skinAdRow.opacity = 0
     setRowListFocus()
   end if
+
+  m.top.gridContentIsReady = true
 End Function
 
 

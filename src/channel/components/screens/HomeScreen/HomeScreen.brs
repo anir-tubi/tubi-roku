@@ -41,6 +41,7 @@ Function init()
   m.CategoryGridList.observeFieldScoped("vertFocusDirection", "onVertFocusDirectionChange")
   m.CategoryGridList.observeFieldScoped("rowlistTranslation", "onRowlistTranslationChange")
   m.CategoryGridList.observeFieldScoped("eventCtaListItemSelected", "onEventCtaListItemSelectedChange")
+  m.CategoryGridList.observeFieldScoped("gridContentIsReady", "onGridContentIsReadyChange")
 
   'used to know when to send tracking info. Do not send focus tracking info when the grid is 1st loaded
   m.gridHasGainedInitialFocus = false
@@ -780,5 +781,13 @@ Function onEventCtaListItemSelectedChange(msg)
       componentOneof: componentOneof
       user_interaction: userInteractionValue
     }
+  end if
+End Function
+
+
+Function onGridContentIsReadyChange(msg)
+  ' Not using alias to avoid making the field gridContentIsReady is ready bi-directional since contentReady inside homescreen.brs on other use cases.
+  if msg.getData() = true AND m.top.contentReady = false
+    m.top.contentReady = true
   end if
 End Function
