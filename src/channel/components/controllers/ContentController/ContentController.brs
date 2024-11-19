@@ -1672,7 +1672,8 @@ End Function
 
 
 Function sendNavigateWithinPageInfo(navigateWithinPageInfo)
-  if navigateWithinPageInfo <> invalid
+  ' Firing the event only if the current date is not within the range of major event start and end.
+  if navigateWithinPageInfo <> invalid AND isMajorEventDay() = false
     m.trackingLoggingTask.trackEvent = {
       type: "navigate_within_page"
       values: navigateWithinPageInfo
