@@ -1504,6 +1504,12 @@ Function getConstants()
     constants.configHubFallbacks.majorEventEnd = "2025-02-10T08:00:00.000000Z"
 
   constants.serverValues = {}
+
+  ' TODO DELETE WITH NEXT SUBMISSION RELEASE
+  constants.serverValues.tensorVideoRenditions = {}
+  ' TODO DELETE WITH NEXT SUBMISSION RELEASE
+  constants.serverValues.tensorVideoRenditions.fourK = "4K_READY"
+
   ' Creates mapping against parental rating to a header string.
   constants.serverValues.parentalControls = ["YOUNGER_CHILD", "OLDER_CHILD", "TEEN", "ADULT"]
 
