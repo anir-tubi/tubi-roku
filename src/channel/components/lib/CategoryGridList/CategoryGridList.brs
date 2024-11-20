@@ -221,8 +221,14 @@ Function onContentChange()
 
     if m.top.skinAdContent <> invalid AND m.top.skinAdContent.getChildCount() > 0
       m.skinAdRow.opacity = 1
+      category = m.top.skinAdContent.getChild(0)
+      if category <> invalid
+        content = category.getChild(0)
+        m.top.reloadedItemToBeFocused = content
+      end if
     else 
       m.purpleCarpetRow.opacity = 1
+      m.top.reloadedItemToBeFocused = m.top.primaryEventContent
     end if
   else
     ' Resetting the state of the UI.

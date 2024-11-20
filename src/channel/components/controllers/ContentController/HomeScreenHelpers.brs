@@ -706,7 +706,10 @@ Function onHomeScreenContentFocused(msg)
   tubiLog("HomeScreenHelpers.onHomeScreenContentFocused")
   focusedContent = msg.getData()
   homeScreen = msg.getRoSGNode()
-  setHomeScreenAfterFocus(focusedContent, homeScreen)
+  ' Content Focused needs to be updated even when home screen is not in focus so that background image gets displayed even when side nav is in focus.
+  if homeScreen.isInFocusChain() = true
+    setHomeScreenAfterFocus(focusedContent, homeScreen)
+  end if
 End Function
 
 
