@@ -177,12 +177,6 @@ Function updateConstantsValuesFromExternalConfig(config)
       m.constants.settings.playerLogEnabled = playerLogEnabled
     end if
 
-    ' Update the frequency we send playprogress events based on the remote config if available
-    pingFrequency = getExternalConfigValueFromGlobal("playprogress_interval", m.constants.player.pingFrequency)
-    if isNumber(pingFrequency) = true then
-      m.constants.player.pingFrequency = pingFrequency
-    end if
-
     ' Since we're modifying constants here we need to push up the changes to the global copy
     m.global.constants = m.constants
     m.updateGeneralTaskConstants(m.constants)
