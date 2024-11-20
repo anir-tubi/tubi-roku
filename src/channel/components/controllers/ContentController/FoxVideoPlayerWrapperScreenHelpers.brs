@@ -30,6 +30,7 @@ Function playLinearVideoWithFoxPlayer(content)
         is_fullscreen: true
         input_device: "UNKNOWN_DEVICE"
         pageOneof: m.Tracking.getAnalyticsPage("video_player_page", {video_id: videoId})
+        eventOrigin: "foxPlayer"
       }
     }
 
@@ -602,6 +603,7 @@ Function sendFoxVideoPlayerLivePlayProgressEvent(position, alwaysSend = false)
             ' Convert to milliseconds
             view_time: viewTime * 1000
             pageOneof: m.Tracking.getAnalyticsPage("video_player_page", {video_id: videoId})
+            eventOrigin: "foxPlayer"
           }
         }
         m.trackingLoggingTask.trackEvent = event

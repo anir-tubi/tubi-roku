@@ -640,6 +640,14 @@ Function getConstants()
 
       constants.urls.analytics.singleEvent = constants.urls.analytics.urlBase + "/v2/single-event" 'preferred by back end team
 
+      constants.urls.analytics.purpleCarpetUrlBase = "https://analytics-ingestion-sealion.staging-public.tubi.io/analytics-ingestion"
+      ' QA analytics proxy server
+      if mode = "production"
+        constants.urls.analytics.purpleCarpetUrlBase = "https://analytics-ingestion-sealion.production-public.tubi.io/analytics-ingestion"
+      end if
+
+      constants.urls.analytics.foxPlayerEvent = constants.urls.analytics.purpleCarpetUrlBase + "/v2/single-event" 'preferred by back end team
+
     constants.urls.impressionEvents = {}
       constants.urls.impressionEvents.urlBase = "https://user-signals.staging-public.tubi.io/user-signals"
       ' QA analytics proxy server

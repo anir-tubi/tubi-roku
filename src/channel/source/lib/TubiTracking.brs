@@ -117,6 +117,7 @@ End Function
 ' @requestQueue: assocArray, a request queue as returned by TubiRequestQueue().create()
 Function tubiTracking_trackUserEvent(eventType = "", eventValues = invalid, requestQueue = invalid)
   if eventType <> "" AND m.externalConfigInfo <> invalid
+    eventOrigin = eventValues.eventOrigin
     blockedAnalyticsEvents = m.externalConfigInfo.blocked_analytics_events_mapping
     userConsentsOptOutStatus = {}
     if isAA(m.userConsentsOptOutStatus) = true
@@ -133,7 +134,7 @@ Function tubiTracking_trackUserEvent(eventType = "", eventValues = invalid, requ
     ' If there is mapping than making sure we only proceed if a mapping is present in the userConsentsOptOutStatus and it is false.
     if eventConsentKey = invalid OR userConsentsOptOutStatus[eventConsentKey] = false
       trackData = m.getClientEvent(eventType, eventValues)
-      userRequest = m.getUserTrackingRequest(eventType, trackData)
+      userRequest = m.getUserTrackingRequest(eventType, trackData, eventOrigin)
       if userRequest <> invalid AND requestQueue <> invalid
         requestQueue.pushRequest(userRequest)
       end if
@@ -159,13 +160,14 @@ End Function
 
 '@eventType: string, the type of event we are sending, will be used as part of the request identifier
 '@trackData: assocArray, object returned from m.getTrackData()
-Function tubiTracking_getUserTrackingRequest(eventType, trackData) as Object
+'@eventOrigin: string or invalid, Possible value "foxPlayer"
+Function tubiTracking_getUserTrackingRequest(eventType, trackData, eventOrigin = invalid) as Object
   if m.request = invalid then
     print "Request object is invalid. Cannot send request. Note request should only be supplied in tasks"
     return invalid
   end if
 
-  reqInfo = m.createUserTrackingReqInfo(trackData)
+  reqInfo = m.createUserTrackingReqInfo(trackData, eventOrigin)
   trackUrl = reqInfo.url
   options = reqInfo.options
 
@@ -231,16 +233,24 @@ End Function
 
 
 ' @trackData: assocArray, object returned from m.getClientEvent()
-Function tubiTracking_createUserTrackingReqInfo(trackData)
+'@eventOrigin: string or invalid, Possible value "foxPlayer"
+Function tubiTracking_createUserTrackingReqInfo(trackData, eventOrigin)
   options = {
     method: m.constants.reqTypes.post
     body: FormatJson(trackData)
   }
 
-  reqInfo = {
-    url: m.constants.urls.analytics.singleEvent
-    options: options
-  }
+  if m.isString(eventOrigin) = true AND eventOrigin = "foxPlayer"
+    reqInfo = {
+      url: m.constants.urls.analytics.foxPlayerEvent
+      options: options
+    }
+  else
+    reqInfo = {
+      url: m.constants.urls.analytics.singleEvent
+      options: options
+    }
+  end if
 
   return reqInfo
 End Function
