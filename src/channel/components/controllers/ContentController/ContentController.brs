@@ -3145,7 +3145,7 @@ End Function
 
 
 Function sendImpressionEvent()
-  if m.viewableImpressionEvents <> invalid
+  if m.viewableImpressionEvents <> invalid AND isMajorEventDay() = false
     if m.viewableImpressionEvents.containers <> invalid AND m.viewableImpressionEvents.containers.count() > 0
       containers = []
       items = m.viewableImpressionEvents.containers.Items()
