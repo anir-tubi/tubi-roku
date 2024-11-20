@@ -232,8 +232,13 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
 
     ' by default setting sprites to invalid
     videoPlayer.sprites = invalid
+    
     ' get sprites / seek preview images
-    getSprites(content)
+    ' Disabling the call if the current date time falls within major event start and end range.
+    if isMajorEventDay() = false
+      ' get sprites / seek preview images
+      getSprites(content)
+    end if
 
     '//Stop the background artwork from transitioning
     m.backgroundGroup.shouldRotateBackgrounds = false
@@ -364,7 +369,7 @@ End Function
 '                            false to handle the history response (only needed when exiting playback)
 Function updateHistory(content, nowPos, isFireAndForget = true)
   ' Don't send history updates to the server if the user hasn't watched at least a certain amount of video
-  if nowPos >= m.constants.player.historyFrequency1Min AND isLoggedInUser() = true AND (content["type"] = m.constants.ui.contentTypes.video OR content["type"] = m.constants.ui.contentTypes.sportsEvent)
+  if nowPos >= m.constants.player.historyFrequency1Min AND isLoggedInUser() = true AND (content["type"] = m.constants.ui.contentTypes.video OR content["type"] = m.constants.ui.contentTypes.sportsEvent) AND isMajorEventDay() = false
     postUserHistory = m.userDeviceApi.getAddHistoryRequestInfo(content, nowPos)
 
     if postUserHistory <> invalid

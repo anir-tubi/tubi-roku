@@ -949,7 +949,7 @@ End Function
 
 ' called when a user's History is updated
 Function handleHistoryChange()
-  if isLoggedInUser() = true
+  if isLoggedInUser() = true AND isMajorEventDay() = false
     ' make request to get history/continue watching ids
     getHistoryIds(onHistoryRefresh)
 
@@ -2843,7 +2843,7 @@ Function getUserInfo(callback)
   m.getUserPreferencesRateTitleDislikedResponseReceived = false
 
   authInfo = m.tubiAuthUpdate.getAuthInfo()
-  if isLoggedInUser(authInfo) = true then
+  if isLoggedInUser(authInfo) = true  AND isMajorEventDay() = false
     getHistoryIds(getHistoryIdsSuccess, getHistoryIdsError)
     getQueueIds(getQueueIdsSuccess, getQueueIdsError)
     getUserInfoGetContentRatingTitleLiked()
