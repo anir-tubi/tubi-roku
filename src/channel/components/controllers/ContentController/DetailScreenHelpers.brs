@@ -20,13 +20,17 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
   showHideLogoBasedOnUiMode()
 
   if content <> invalid
-    if m.detailScreenHorizMenuExp = true
-      detailScreen = CreateObject("roSGNode", "DetailScreenHoriz")
+
+    if m.detailScreenVertMenuExp = true
+      detailScreen = CreateObject("roSGNode", "DetailScreenVert")
     else
       detailScreen = CreateObject("roSGNode", "DetailScreen")
     end if
 
-    getExperimentResource("roku_horizontal_menu", "roku_horizontal_menu_v3")
+    if content.type = m.constants.ui.contentTypes.series
+      getExperimentResource("roku_vertical_menu", "roku_episodes_under_vertical_menu_v1").enabled = true
+    end if
+
     detailScreen.id = m.constants.ui.screenIds.detailScreen
     detailScreen.trackingLoadStartTime = Uptime(0)
     detailScreen.shouldFocusWhenPushed = m.top.fadeInContentController
@@ -174,7 +178,7 @@ End Function
 ' @screen: roSGNode, a node with subtype BaseScreen
 ' @returns: boolean, true if the passed in parameter is a detail screen, false otherwise
 Function isDetailScreen(screen)
-  return (type(screen) = "roSGNode" AND (screen.isSubType("DetailScreen") = true OR screen.isSubType("detailScreenHoriz") = true))
+  return (type(screen) = "roSGNode" AND (screen.isSubType("DetailScreen") = true OR screen.isSubType("detailScreenHoriz") = true OR screen.isSubType("DetailScreenVert") = true))
 End Function
 
 
@@ -501,7 +505,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     detailScreen.content = content
 
     'updateEpisodeOverlayContent is used to trigger the episode overlay updates with seasons/episode list.
-    if m.detailScreenHorizMenuExp = true AND content.type = m.constants.ui.contentTypes.series
+    if (m.detailScreenHorizMenuExp = true OR m.detailScreenVertMenuExp = true) AND content.type = m.constants.ui.contentTypes.series
       detailScreen.updateEpisodeOverlayContent = true
       detailScreen.showRelated = true
     end if
@@ -540,7 +544,7 @@ End Function
 '@params: 4 index array containing params that should be passed to getSingleContentFromServer()
 Function getSingleContentFromServerRetry(params)
   if type(params) = "roArray" AND params.count() = 4
-    if type(params[3]) = "roSGNode" AND (params[3].subtype() = "DetailScreen" OR params[3].subtype() = "detailScreenHoriz")
+    if type(params[3]) = "roSGNode" AND (params[3].subtype() = "DetailScreen" OR params[3].subtype() = "detailScreenHoriz" OR params[3].subtype() = "DetailScreenVert")
       params[3].isLoading = true
     end if
 
@@ -763,7 +767,7 @@ Function handleRelatedResponse(relatedContent)
   if relatedContent <> invalid
     for i = 0 to m.screenStack.getChildCount() - 1
       screen = m.screenStack.getChild(i)
-      if (screen.subType() = "DetailScreen" OR screen.subType() = "DetailScreenHoriz") AND screen.content <> invalid AND screen.content.id = relatedContent.id
+      if (screen.subType() = "DetailScreen" OR screen.subType() = "DetailScreenHoriz" OR screen.subType() = "DetailScreenVert") AND screen.content <> invalid AND screen.content.id = relatedContent.id
 
         'After AutoPlay or refresh required and when pressing back from Player to detail screen
         'related content(YMAL) thumbnails are not loading. Resetting relatedContent node fixes the issue.
@@ -940,7 +944,7 @@ Function getDetailScreenContent(screen = invalid)
     screen = getTopDetailScreenFromStack()
   end if
 
-  if screen <> invalid AND (screen.subType() = "DetailScreen" OR screen.subType() = "DetailScreenHoriz") AND screen.content <> invalid
+  if screen <> invalid AND (screen.subType() = "DetailScreen" OR screen.subType() = "DetailScreenHoriz" OR screen.subType() = "DetailScreenVert") AND screen.content <> invalid
     return screen.content
   else
     return invalid
@@ -987,7 +991,7 @@ End Function
 Function onAddToQueue(detailScreen, callBackAfterSignIn = invalid)
   tubiLog("DetailScreenHelpers.onAddToQueue")
 
-  if (detailScreen.getSubtype() = "DetailScreen" OR detailScreen.getSubtype() = "DetailScreenHoriz")
+  if (detailScreen.getSubtype() = "DetailScreen" OR detailScreen.getSubtype() = "DetailScreenHoriz" OR detailScreen.getSubtype() = "DetailScreenVert")
     if isLoggedInUser() = false
 
       content = getDetailScreenContent(detailScreen)
@@ -996,7 +1000,7 @@ Function onAddToQueue(detailScreen, callBackAfterSignIn = invalid)
       title = getTranslation("screenDetails_error_addQueue_title")
       dialogType = "ADD_TO_QUEUE"
       dialogSubType = "sign-in-bookmark"
-      if content.type = m.constants.ui.contentTypes.series
+      if content <> invalid AND content.type = m.constants.ui.contentTypes.series
         message = getTranslation("screenDetails_error_addQueueSeries_description")
       else if detailScreen.availabilityType = m.constants.ui.contentTimings.upcoming
         dialogType = "SIGNIN_REQUIRED"
@@ -1249,20 +1253,20 @@ Function setIsHistory(detailScreen, isHistory)
   'reset the value in the case that remove from history button was pressed and title is currently "Removing..."
   detailScreen.stringNoHistoryButton = getTranslation("screenDetails_button_noHistory")
 
-  if m.detailScreenHorizMenuExp = false
+  if m.detailScreenHorizMenuExp = true
+
     if detailScreen.content <> invalid AND detailScreen.content.needsLogin = true AND isLoggedInUser() = false
-        detailScreen.stringPlayButton = getTranslation("registration_signIn_to_play_button") + ";" + getTranslation("registration_signup_button_free")
+      detailScreen.stringPlayButton = getTranslation("registration_signIn_to_play_button")
+    end if
+  else
+    if detailScreen.content <> invalid AND detailScreen.content.needsLogin = true AND isLoggedInUser() = false
+      detailScreen.stringPlayButton = getTranslation("registration_signIn_to_play_button") + ";" + getTranslation("registration_signup_button_free")
     else if isHistory = true
       detailScreen.stringPlayButton = getTranslation("screenDetails_button_startOver")
     else
       detailScreen.stringPlayButton = getTranslation("screenDetails_button_play")
     end if
-else
-
-  if detailScreen.content <> invalid AND detailScreen.content.needsLogin = true AND isLoggedInUser() = false
-    detailScreen.stringPlayButton = getTranslation("registration_signIn_to_play_button")
   end if
-end if
 
   detailScreen.isHistory = isHistory
 End Function
@@ -2467,7 +2471,7 @@ End Function
 '
 ' @detailScreen: roSGNode, an instance of a details screen
 Function resetRelatedContent(detailScreen)
-  if isNode(detailScreen) = true AND (detailScreen.isSubtype("DetailScreen") OR detailScreen.isSubtype("DetailScreenHoriz"))
+  if isNode(detailScreen) = true AND (detailScreen.isSubtype("DetailScreen") OR detailScreen.isSubtype("DetailScreenHoriz") OR detailScreen.isSubtype("DetailScreenVert"))
     relatedContent = detailScreen.relatedContent
 
     if isNode(relatedContent) = true

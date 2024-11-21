@@ -45,6 +45,10 @@ Function TubiExperiments(experimentsInfo) as Object
         roku_horizontal_menu_v3: {"enabled": false}
       }
 
+      roku_vertical_menu:{
+        roku_episodes_under_vertical_menu_v1: {"enabled": false}
+      }
+
       roku_spotlight_carousel: {
         roku_spotlight_carousel_v1 : {"enabled": false}
       }
@@ -64,7 +68,7 @@ Function TubiExperiments(experimentsInfo) as Object
       roku_multiple_video_preview_nav: {
         roku_multiple_video_preview_nav_v1: {"enabled": false}
       }
-      
+
       roku_1080p_resolution: {
         roku_1080p_resolution_v1 : {"enabled": false}
       }

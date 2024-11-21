@@ -95,7 +95,7 @@ Function onVideoPreviewStateChanged(msg)
       'Also dont auto start locked contents.
       item = currentScreen.contentFocused
 
-      if currentScreen.subType() = "DetailScreen" OR currentScreen.subType() = "DetailScreenHoriz"
+      if currentScreen.subType() = "DetailScreen" OR currentScreen.subType() = "DetailScreenHoriz" OR currentScreen.subType() = "DetailScreenVert"
         item = currentScreen.content
       end if
 
@@ -108,13 +108,13 @@ Function onVideoPreviewStateChanged(msg)
       isFullPlayerBlockedForUser = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR ( item <> invalid AND item.needsLogin = true AND isloggedInUser() = false) OR (isPurpleCarpetContent = true)
 
       if isReplay = true
-        '//Loop the video in this case 
+        '//Loop the video in this case
         if m.maintask.isHdmiStatusOk = true
           ' Don't want to continue playback if the user has their tv turned off
           sendVideoPlayerCommand(videoPreview, "play")
         end if
         m.backgroundGroup.posterVisible = true
-        
+
       else if m.maintask.isHdmiStatusOk = true AND isFullPlayerBlockedForUser = false
         ' Don't want to continue playback if the user has their tv turned off
         if currentScreen.subType() = "DetailScreen" OR currentScreen.subType() = "DetailScreenHoriz"
@@ -155,7 +155,7 @@ End Function
 Function startVideoPreview(content, pageInfo = {})
   tubiLog("VideoPreviewHelpers.startVideoPreview")
 
-  
+
   if content <> invalid AND (isVideoPreviewOn() = true OR (content.gridItemType = m.constants.ui.gridItemTypes.skinAd AND m.constants.deviceInfo.IsAutoplayEnabled = true AND m.constants.deviceInfo.limitedUi = false))
     '//::NOTE:: if this is a skinAd content, the above conditional statement checks if the device auto play setting is on and that the device is not a limited UI device before playing the looping background video
     videoPreview = m.videoPreviewPlayer
