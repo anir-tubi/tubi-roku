@@ -653,6 +653,9 @@ End Function
 
 
 Function setFoxContentId(purpleCarpetContainer, _screenId)
+  ' This happens during sign in process from purple carpet during which we are trying to start playback and also refreshing home screen.
+  ' This does not happen if we are not fast enough in sign in. Below logic provides additional safety to make sure preview is always stopped.
+  stopVideoPreview()
   if purpleCarpetContainer <> invalid then
     currentScreen = getCurrentScreen()
     if currentScreen.id = m.constants.ui.screenIds.foxVideoPlayerWrapperScreen then

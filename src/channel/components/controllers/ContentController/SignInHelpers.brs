@@ -139,6 +139,9 @@ Function onRfiUserData(msg)
     showEmailScreen()
   end if
 
+  ' Stopping the preview once the sign in process is initiated.
+  stopVideoPreview()
+
 End Function
 
 
