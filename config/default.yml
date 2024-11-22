@@ -27,6 +27,9 @@ settings:
   videoOverlayAutoHideTime: 5
   videoOverlayLiteAutoHideTime: 10
 
+  # When set to true will pass a header to enable fail safe testing.
+  enableFailSafe: false
+
   # useStarterComponents MUST ALWAYS BE TRUE FOR PRODUCTION
   useStarterComponents: true
   useRemoteComponents: false

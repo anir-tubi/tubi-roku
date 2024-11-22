@@ -501,25 +501,25 @@ Function getConstants()
     'contents content url
     constants.urls.content = {}
 
-      constants.urls.content.urlBase = "https://content.production-public.tubi.io/api"
+      constants.urls.content.urlBase = "https://content-cdn.production-public.tubi.io/api"
       if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
-        constants.urls.content.urlBase = "https://content.staging-public.tubi.io/api"
+        constants.urls.content.urlBase = "https://content-cdn.staging-public.tubi.io/api"
       end if
       constants.urls.content.singleContent = constants.urls.content.urlBase + "/v2/content"
 
       'epgProgram url
-      constants.urls.content.epgProgramContentUrlBase = "https://content.production-public.tubi.io"
+      constants.urls.content.epgProgramContentUrlBase = "https://epg-cdn.production-public.tubi.io"
       if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
-        constants.urls.content.epgProgramContentUrlBase = "https://content.staging-public.tubi.io"
+        constants.urls.content.epgProgramContentUrlBase = "https://epg-cdn.staging-public.tubi.io"
       end if
-      constants.urls.content.epgProgramContent = constants.urls.content.epgProgramContentUrlBase + "/epg/programming"
+      constants.urls.content.epgProgramContent = constants.urls.content.epgProgramContentUrlBase + "/content/epg/programming"
 
       'autopilot url
     constants.urls.autopilot = {}
-      constants.urls.autopilot.urlBase = "https://autopilot.production-public.tubi.io/api"
+      constants.urls.autopilot.urlBase = "https://autopilot-cdn.production-public.tubi.io/api"
 
       if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
-        constants.urls.autopilot.urlBase = "https://autopilot.staging-public.tubi.io/api"
+        constants.urls.autopilot.urlBase = "https://autopilot-cdn.staging-public.tubi.io/api"
       end if
 
       constants.urls.autopilot.relatedContent = constants.urls.autopilot.urlBase + "/v1/related"
@@ -557,10 +557,10 @@ Function getConstants()
 
     'remote Config hub url
     constants.urls.configHub = {}
-      constants.urls.configHub.urlBase = "https://config-hub.production-public.tubi.io"
+      constants.urls.configHub.urlBase = "https://config-hub-cdn.production-public.tubi.io"
 
       if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
-        constants.urls.configHub.urlBase = "https://config-hub.staging-public.tubi.io"
+        constants.urls.configHub.urlBase = "https://config-hub-cdn.staging-public.tubi.io"
       end if
 
       constants.urls.configHub.config = constants.urls.configHub.urlBase + "/api/v1/remote_config/" + constants.platform
@@ -728,6 +728,7 @@ Function getConstants()
     constants.headers.platform =  {"x-client-platform": constants.platform}
     constants.headers.clientVersion = {"x-client-version": constants.deviceInfo.clientVersion}
     constants.headers.tubiPlatform =  {"X-TUBI-PLATFORM": constants.analyticsPlatform}
+    constants.headers.triggerFailSafe =  {"X-TRIGGER-FAILSAFE": "GAME_DAY_EXPERIENCE"}
 
     constants.headers.commonUapi = {}
       constants.headers.commonUapi.append(constants.headers.platform)

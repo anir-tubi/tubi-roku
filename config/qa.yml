@@ -54,6 +54,9 @@ settings:
   # Setting the below value to true will enable player log tracking.
   playerLogEnabled: false
 
+  # When set to true will pass a header to enable fail safe testing.
+  enableFailSafe: false
+
   useStarterComponents: false
   useRemoteComponents: false
 

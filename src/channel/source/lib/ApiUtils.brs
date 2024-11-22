@@ -32,6 +32,10 @@ Function apiUtils_getCommonOptions(appendFailSafeHeaders = false)
     headers.append(m.constants.headers.tubiPlatform)
   end if
 
+  if m.constants.settings.enableFailSafe = true
+    headers.append(m.constants.headers.triggerFailSafe)
+  end if
+
   options = {
     params: {
       "app_id": m.constants.settings.shortAppName
