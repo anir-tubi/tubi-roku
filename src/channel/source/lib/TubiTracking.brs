@@ -40,6 +40,7 @@ Function TubiTracking(constants, auth, userConsentsOptOutStatus = {}, request = 
     isEmptyValue: tubiTracking_isEmptyValue
     isNumeric: tubiTracking_isNumeric
     isString: tubiTracking_isString
+    isNowWithinTimePeriod: tubiTracking_isNowWithinTimePeriod
     getHomePageContentModeMap: tubiTracking_getHomePageContentModeMap
     processRepeatedProperty: tubiTracking_processRepeatedProperty
 
@@ -86,6 +87,7 @@ Function TubiTrackingInfo(constants)
     isEmptyValue: tubiTracking_isEmptyValue
     isNumeric: tubiTracking_isNumeric
     isString: tubiTracking_isString
+    isNowWithinTimePeriod: tubiTracking_isNowWithinTimePeriod
     getHomePageContentModeMap: tubiTracking_getHomePageContentModeMap
 
     ' an AA structure of the valid "Oneofs" that are needed in various protos messages
@@ -130,9 +132,12 @@ Function tubiTracking_trackUserEvent(eventType = "", eventValues = invalid, requ
       eventConsentKey = blockedAnalyticsEvents[eventType]
     end if
 
+    isMajorEventDay = m.isNowWithinTimePeriod(m.externalConfigInfo.major_event_failsafe_start, m.externalConfigInfo.major_event_failsafe_end)
+    isEventInFailSafeBlockedList = isMajorEventDay = true AND m.externalConfigInfo.blocked_analytics_events <> invalid AND m.externalConfigInfo.blocked_analytics_events.doesExist(eventType) = true
+
     ' If the event name is not present in the blocked event list, we will proceed with sending the tracking request.
     ' If there is mapping than making sure we only proceed if a mapping is present in the userConsentsOptOutStatus and it is false.
-    if eventConsentKey = invalid OR userConsentsOptOutStatus[eventConsentKey] = false
+    if (eventConsentKey = invalid OR userConsentsOptOutStatus[eventConsentKey] = false) AND isEventInFailSafeBlockedList = false
       trackData = m.getClientEvent(eventType, eventValues)
       userRequest = m.getUserTrackingRequest(eventType, trackData, eventOrigin)
       if userRequest <> invalid AND requestQueue <> invalid
@@ -1384,4 +1389,28 @@ Function tubiTracking_createViewableImpressionTrackingReqInfo(trackData)
   }
 
   return reqInfo
+End Function
+
+' Copy of isNowWithinTimePeriod form time-utils since we cannot re-use that helper inside tubi tracking.
+' Determines if the current time is within the passed in startTime and endTime, inclusive.
+'
+' @startTime: string, an ISO-8601 string representing the earliest time in the period, UTC time
+' @endTime: string, an ISO-8601 string representing the latest time in the period, UTC time
+Function tubiTracking_isNowWithinTimePeriod(startTime, endTime)
+  if m.isString(startTime) = true AND m.isString(endTime) = true
+    dateTime = CreateObject("roDateTime")
+    nowSeconds = dateTime.AsSeconds()
+
+    dateTime.FromISO8601String(startTime)
+    startSeconds = dateTime.AsSeconds()
+
+    dateTime.FromISO8601String(endTime)
+    endSeconds = dateTime.AsSeconds()
+
+    if startSeconds <= nowSeconds AND endSeconds >= nowSeconds
+      return true
+    end if
+  end if
+
+  return false
 End Function

@@ -9,6 +9,19 @@ Function parseGetExternalConfigSuccess(fullResponse, _reqInfo)
     externalConfig = TubiExternalConfig(m.constants)
 
     config.blocked_analytics_events_mapping = externalConfig.parseBlockedAnalyticsEvents(config.blocked_analytics_events_mapping)
+
+    ' Convert blocked_analytics_events to aa. ["blocked_analytics_events"] to {"blocked_analytics_events": true}
+    ' So that we do not have to loop through during firing of analytics events.
+
+    eventsAA = {}
+    if type(config.blocked_analytics_events) = "roArray"
+      for each eventKey in config.blocked_analytics_events
+        eventsAA[eventKey] = true
+      end for
+    end if
+
+    config.blocked_analytics_events = eventsAA
+    
   end if
 
   return config
