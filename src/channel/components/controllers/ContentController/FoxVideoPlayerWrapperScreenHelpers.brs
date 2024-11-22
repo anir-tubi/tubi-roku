@@ -148,6 +148,16 @@ End Function
 
 
 Function getFoxVideoPlayerConfig()
+  muxEnvironmentKey = "aa7at5lkvspdg2ju2r42gf559"
+  if m.constants.settings.mode = "production" then
+    muxEnvironmentKey = "18lus0524edvcif1pa0hruc0e"
+  end if
+
+  convivaCustomerKey = "611c005357f6991f5b731265d461ee49fe92a8cc"
+  if m.constants.settings.mode = "production" then
+    muxEnvironmentKey = "1ff98d3f0df77fc9fdedf4209cc4db4cc1844a69"
+  end if
+
   config = {
     "ads": {
       "raf": {
@@ -192,7 +202,7 @@ Function getFoxVideoPlayerConfig()
     "analytics": {
       "appName": "Tubi",
       "conviva": {
-        "customerKey": "611c005357f6991f5b731265d461ee49fe92a8cc",
+        "customerKey": convivaCustomerKey,
         "disableConvivaLegacy": true,
         "touchstone": {
           "enabled": false,
@@ -201,7 +211,7 @@ Function getFoxVideoPlayerConfig()
       },
       "mux": {
         "enabled": true,
-        "environmentKey": "aa7at5lkvspdg2ju2r42gf559",
+        "environmentKey": muxEnvironmentKey,
         "trackProgramChanges": false
       }
     },
