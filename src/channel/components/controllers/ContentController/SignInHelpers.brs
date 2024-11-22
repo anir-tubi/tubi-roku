@@ -48,16 +48,11 @@ Function showRFIScreen()
     requestedUserData = "email, firstname, lastname, gender"
 
     if m.pub_serverPersistentData <> invalid AND m.pub_serverPersistentData.hasPreviouslyRegistered = true
-
-      'fire exposure event for experiment roku_registration_with_magic_link_v2 only for previously registered user
-      if getExperimentResource("roku_registration_with_magic_link", "roku_registration_with_magic_link_v2").enabled = true
-        info = CreateObject("roSGNode", "ContentNode")
-        info.addFields({context: "signin"})
-        m.billing.requestedUserDataInfo = info
-        requestedUserData = "email"
-        dialogSubType = "email-prefill-return"
-      end if
-
+      info = CreateObject("roSGNode", "ContentNode")
+      info.addFields({context: "signin"})
+      m.billing.requestedUserDataInfo = info
+      requestedUserData = "email"
+      dialogSubType = "email-prefill-return"
     end if
 
     m.billing.requestedUserData = requestedUserData
@@ -90,7 +85,7 @@ Function onRfiUserData(msg)
   currentScreen = getCurrentScreen()
 
   dialogSubType = "email-prefill"
-  if m.pub_serverPersistentData <> invalid AND m.pub_serverPersistentData.hasPreviouslyRegistered = true AND getExperimentResource("roku_registration_with_magic_link", "roku_registration_with_magic_link_v2", false).enabled = true
+  if m.pub_serverPersistentData <> invalid AND m.pub_serverPersistentData.hasPreviouslyRegistered = true
     dialogSubType = "email-prefill-return"
   end if
 
@@ -287,13 +282,8 @@ Function onEmailExistsResponse(response)
         end if
         m.email = email
 
-        if getExperimentResource("roku_registration_with_magic_link", "roku_registration_with_magic_link_v2").enabled = true
-          showEmailVerificationScreen(email)
-          createMagicLinkRequest(email)
-        else
-          showSignInScreen(rawInput)
-        end if
-
+        showEmailVerificationScreen(email)
+        createMagicLinkRequest(email)
       else
         if parsedResponse.code = "AVAILABLE"
           '//user's email address does not exist in Tubi servers, so sign user up with a new Tubi account

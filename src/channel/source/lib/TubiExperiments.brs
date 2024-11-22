@@ -53,10 +53,6 @@ Function TubiExperiments(experimentsInfo) as Object
         roku_spotlight_carousel_v1 : {"enabled": false}
       }
       
-      roku_registration_with_magic_link: {
-        roku_registration_with_magic_link_v2 : {"enabled": true}
-      }
-
       roku_player_client_log: {
         roku_player_client_log_v1: {"enabled": false}
       }
