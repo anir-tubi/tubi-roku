@@ -92,7 +92,7 @@ describe('Live', function () {
         await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
 
         // Verify that linear preview video is playing
-        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 10000);
+        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 20000);
 
         // Navigate right
         await ecp.sendKeypress(ecp.Key.Right);

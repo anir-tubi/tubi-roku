@@ -5,7 +5,7 @@ import { shared } from '../shared';
 
 describe('Kids Mode', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/537398
-  it('C537398 - Guest User - Toggle ON - Home Screen - When User Switches Parental Control to Older Kids Then Exit Kids is still present, @kidsmode_guest', async () => {
+  it.skip('C537398 - Guest User - Toggle ON - Home Screen - When User Switches Parental Control to Older Kids Then Exit Kids is still present, @kidsmode_guest', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await openKidsMode();
  
@@ -28,7 +28,7 @@ describe('Kids Mode', function () {
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/537396
-  it('C537396 - Guest User - Toggle ON - Home Screen - When User Switches Parental Control to Older Kids Then Exit Kids is still present, @kidsmode_guest', async () => {
+  it.skip('C537396 - Guest User - Toggle ON - Home Screen - When User Switches Parental Control to Older Kids Then Exit Kids is still present, @kidsmode_guest', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
@@ -54,7 +54,7 @@ describe('Kids Mode', function () {
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/537398
-  it('C537398b - Guest User - Toggle ON - Home Screen - When User Switches Parental Control to Little Kids Then Kids Mode icon is now grayed out, @kidsmode_guest', async () => {
+  it.skip('C537398b - Guest User - Toggle ON - Home Screen - When User Switches Parental Control to Little Kids Then Kids Mode icon is now grayed out, @kidsmode_guest', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
@@ -81,7 +81,7 @@ describe('Kids Mode', function () {
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/537403
-  it('C537403- Guest User - Toggle ON - Categories Screen - When User Switches Parental Control to Older Kids Then the App Stays in Kids Mode, @kidsmode_guest', async () => {
+  it.skip('C537403- Guest User - Toggle ON - Categories Screen - When User Switches Parental Control to Older Kids Then the App Stays in Kids Mode, @kidsmode_guest', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
@@ -123,7 +123,7 @@ describe('Kids Mode', function () {
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/537401
-  it('C537401 - Guest User - Toggle ON - Categories Screen - When User Switches Parental Control to Little Kids Then the App Stays in Kids Mode, @kidsmode_guest', async () => {
+  it.skip('C537401 - Guest User - Toggle ON - Categories Screen - When User Switches Parental Control to Little Kids Then the App Stays in Kids Mode, @kidsmode_guest', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 

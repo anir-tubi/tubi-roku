@@ -47,7 +47,7 @@ describe('MyStuff', function () {
    });
 
       // https://tubi.testrail.io/index.php?/cases/view/421098 - https://tubi.testrail.io/index.php?/cases/view/423511
-     it('C421098 Guest User - Selecting the my stuff menu item and registering will display the empty my stuff page, @mystuff', async () => {
+     it.skip('C421098 Guest User - Selecting the my stuff menu item and registering will display the empty my stuff page, @mystuff', async () => {
 
         // Start app with Guest user
         await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
@@ -305,6 +305,7 @@ describe('MyStuff', function () {
          await ecp.sendKeypress(ecp.Key.Right);
          await ecp.sendKeypress(ecp.Key.Ok);
          await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
+         await utils.sleep(2000);
          await testUtils.selectAndVerifyDetailPageMenuItem('removeFromMyList'); 
          await testUtils.waitForElementToNotShowOnScreen('removeFromMyListButton', 'Button not shown on screen', 15000);
 

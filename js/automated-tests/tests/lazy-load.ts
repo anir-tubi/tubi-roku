@@ -49,13 +49,13 @@ describe('LazyLoad', function () {
       
       // Navigate to a category with < 200 titles and validate < 200
       await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
-      await ecp.sendKeypress(ecp.Key.Down, {count:3, wait:4000});
+      await ecp.sendKeypress(ecp.Key.Down, {count:2, wait:4000});
       await ecp.sendKeypress(ecp.Key.Right);
       await testUtils.waitForElementToFullyShowOnScreen('categoriesDetailsPageInfo');
 
       // Navigate down 
       await ecp.sendKeypress(ecp.Key.Down, {count:26});
-      await utils.sleep(4000); // itemCounter update isn't recognized without sleep
+      await utils.sleep(5000); // itemCounter update isn't recognized without sleep
 
       await testUtils.waitForElementToFullyShowOnScreen('itemCounter');
       const itemCounter = await testUtils.getNodeForElement('itemCounter');
@@ -81,7 +81,7 @@ describe('LazyLoad', function () {
         
       // Navigate to a category with 1000
       await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
-      await ecp.sendKeypress(ecp.Key.Down, {count:3, wait:4000});
+      await ecp.sendKeypress(ecp.Key.Down, {count:2, wait:4000});
       await testUtils.waitForElementToFullyShowOnScreen('actionButtonFocused');
       await ecp.sendKeypress(ecp.Key.Right);
       await testUtils.waitForElementToFullyShowOnScreen('categoriesDetailsPageInfo');
