@@ -1607,16 +1607,6 @@ Function onSignUpSignInErrorScreenContinueAsGuestUserButtonSelected(msg)
     currentScreen.setfocus(true)
     currentScreen.refreshRelatedContent = true
   end if
-  
-End Function
-
-
-Function isMajorEventDay()
-  majorEventStart = getExternalConfigValueFromGlobal("major_event_start", m.constants.configHubFallbacks.majorEventStart)
-  majorEventEnd = getExternalConfigValueFromGlobal("major_event_end", m.constants.configHubFallbacks.majorEventEnd)
-  isMajorEventDay = isNowWithinTimePeriod(majorEventStart, majorEventEnd)
-
-  return isMajorEventDay
 End Function
 
 

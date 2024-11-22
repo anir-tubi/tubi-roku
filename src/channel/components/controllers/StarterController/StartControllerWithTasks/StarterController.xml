@@ -22,4 +22,6 @@
   <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/localClientErrorConfig.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
 </component>

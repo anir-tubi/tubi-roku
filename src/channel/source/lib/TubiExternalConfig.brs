@@ -15,7 +15,9 @@ End Function
 
 
 ' Returns of assoc array containing info related to get config request.
-Function tubiExternalConfig_getConfigsRequestInfo(constants)
+Function tubiExternalConfig_getConfigsRequestInfo()
+  constants = m.constants
+
   options = {
     params: {
       "device_id": constants.deviceInfo.deviceId

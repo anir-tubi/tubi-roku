@@ -282,8 +282,10 @@ function buildStarter() {
     genUtilSrc.push('src/channel/source/lib/TubiExperiments.brs');
     genUtilSrc.push('src/channel/source/lib/TubiExternalConfig.brs');
     genUtilSrc.push('src/channel/source/lib/TubiTracking.brs');
+    genUtilSrc.push('src/channel/source/lib/TimeUtils.brs');
     genUtilSrc.push('src/channel/source/lib/TimeOffsetUtils.brs');
     genUtilSrc.push('src/channel/source/lib/StringUtils.brs');
+    genUtilSrc.push('src/channel/source/lib/TubiLanguageTranslate.brs');
   }
 
 

@@ -55,19 +55,19 @@ End Function
 Function onInitialAuthInfoRetrieved()
   TubiLog("onInitialAuthInfoRetrieved")
   ' Auth will be required first in the future but for now we aren't changing that flow so just load the other dependencies
-  sendRequestForExperimentsAndConfig()
+  sendRequestForExternalConfig()
 End Function
 
 
 ' Performs network request to get experiments and external config.
-Function sendRequestForExperimentsAndConfig()
-  TubiLog("sendRequestForExperimentsAndConfig")
+Function sendRequestForExperiments()
+  TubiLog("sendRequestForExperiments")
   constants = m.constants
-  externalConfig = TubiExternalConfig(constants)
 
   ' Check if we already got our experiments
-  if getExperimentsInfoFromGlobal() <> invalid
+  if getExperimentsInfoFromGlobal() <> invalid OR isMajorEventDay() = true then
     m.isExperimentsConfigReady = true
+    runControllerStartSequence()
   else
     experiments = TubiExperiments({})
     experimentsRequestInfo = experiments.getNamespaceRequestInfo(constants)
@@ -81,6 +81,14 @@ Function sendRequestForExperimentsAndConfig()
       m.isExperimentsConfigReady = true
     end if
   end if
+End Function
+
+
+Function sendRequestForExternalConfig()
+  TubiLog("sendRequestForExternalConfig")
+
+  constants = m.constants
+  externalConfig = TubiExternalConfig(constants)
 
   config = getExternalConfigInfoFromGlobal(invalid)
   if config <> invalid then
@@ -89,7 +97,7 @@ Function sendRequestForExperimentsAndConfig()
     m.isExternalConfigReady = true
     runControllerStartSequence()
   else
-    externalConfigRequestInfo = externalConfig.getConfigsRequestInfo(constants)
+    externalConfigRequestInfo = externalConfig.getConfigsRequestInfo()
     externalConfigRequestInfo.successCallback = onExternalConfigRequestSuccess
     externalConfigRequestInfo.errorCallback = onExternalConfigRequestFailure
     externalConfigRequestInfo.timeoutInMilliSec = 5000
@@ -136,7 +144,8 @@ Function onExternalConfigRequestSuccess(config)
     m.updateGeneralTaskConstants(m.constants)
   end if
   m.isExternalConfigReady = true
-  runControllerStartSequence()
+
+  sendRequestForExperiments()
 End Function
 
 
@@ -155,7 +164,8 @@ Function onExternalConfigRequestFailure(_error)
   end if
 
   m.isExternalConfigReady = true
-  runControllerStartSequence()
+
+  sendRequestForExperiments()
 End Function
 
 
@@ -224,4 +234,13 @@ Function logout(callback = invalid)
   if isFunction(callback)
     callback()
   end if
+End Function
+
+
+Function isMajorEventDay()
+  majorEventStart = getExternalConfigValueFromGlobal("major_event_failsafe_start", m.constants.configHubFallbacks.majorEventStart)
+  majorEventEnd = getExternalConfigValueFromGlobal("major_event_failsafe_end", m.constants.configHubFallbacks.majorEventEnd)
+  isMajorEventDay = isNowWithinTimePeriod(majorEventStart, majorEventEnd)
+
+  return isMajorEventDay
 End Function
