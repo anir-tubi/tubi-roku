@@ -1335,7 +1335,7 @@ Function processPlayEvent(event, screen, wasPlayEventInitiatedFromCtaComponent =
   airDatetime = CreateObject("roDateTime")
   airDatetime.FromISO8601String(event.airDateTime)
   ' If current time is greater than the air date time that means the program is live and we will start playback if user is signed in.
-  if currentDatetime.asSeconds() >= airDatetime.asSeconds() AND (isLoggedInUser() = true OR event.needsLogin = false)
+  if currentDatetime.asSeconds() >= airDatetime.asSeconds() AND (isLoggedInUser() = true OR event.needsLogin = false OR getExternalConfigValueFromGlobal("bypass_registration_gate", false) = true)
     stopLinearVideoContent()
     playbackSource = {
       "srcForAnalytic": m.constants.player.playbackSource.unknown

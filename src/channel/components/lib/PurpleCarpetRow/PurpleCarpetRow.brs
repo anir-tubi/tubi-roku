@@ -153,7 +153,7 @@ Function populateCtaButtonList()
     ' Checking the event is happening on the same day as current day.
     isEventToday = (airDateMonth = currentMonth AND airDateDay = currentDayOfMonth)
     
-    if m.top.signedIn = false AND primaryEventContent.needsLogin = true
+    if m.top.signedIn = false AND primaryEventContent.needsLogin = true AND getExternalConfigValueFromGlobal("bypass_registration_gate", false) = false
       menuItems.push({
         id: "signInWatch"
         subType: "DetailMenuItemContentNode"
