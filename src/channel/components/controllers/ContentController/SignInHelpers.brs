@@ -178,13 +178,21 @@ End function
 Function onForgotPasswordDialogButtonSelected()
   TubiLog("SignInHelpers.onForgotPasswordDialogButtonSelected")
 
-  displayForgotPasswordProcessingScreen()
+  if getExternalConfigValueFromGlobal("auth_magic_link_enabled", true) = true
+    displayForgotPasswordProcessingScreen()
+  else
+    showSignInSignUpErrorScreen("signIn", invalid)
+  end if
 End Function
 
 
 ' When the user selects the "Forgot Password" button on the sign in screen
 Function onForgotPasswordButtonSelected()
-  displayForgotPasswordProcessingScreen()
+  if getExternalConfigValueFromGlobal("auth_magic_link_enabled", true) = true
+    displayForgotPasswordProcessingScreen()
+  else
+    showSignInSignUpErrorScreen("signIn", invalid)
+  end if
 End Function
 
 
@@ -282,8 +290,13 @@ Function onEmailExistsResponse(response)
         end if
         m.email = email
 
-        showEmailVerificationScreen(email)
-        createMagicLinkRequest(email)
+        if getExternalConfigValueFromGlobal("auth_magic_link_enabled", true) = true
+          showEmailVerificationScreen(email)
+          createMagicLinkRequest(email)
+        else
+          showSignInScreen(rawInput)
+        end if
+
       else
         if parsedResponse.code = "AVAILABLE"
           '//user's email address does not exist in Tubi servers, so sign user up with a new Tubi account
