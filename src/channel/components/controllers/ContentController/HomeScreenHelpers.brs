@@ -1413,18 +1413,22 @@ Function filterPurpleCarpetContainerItemsBasedOnListing(listing, purpleCarpetCon
       asset = item.asset
       if asset <> invalid AND asset.listing <> invalid AND asset.listing.tubi_id <> invalid AND asset.listing.startDate <> invalid AND asset.listing.endDate <> invalid
         if mappedListings[asset.listing.tubi_id] = invalid
-          mappedListings[asset.listing.tubi_id] = item
+          mappedListings[asset.listing.tubi_id] = {
+            id: item.id
+            startDate: asset.listing.startDate
+            endDate: asset.listing.endDate
+          }
         else
           mappedItem = mappedListings[asset.listing.tubi_id]
 
           ' We are picking the oldest start date.
-          if compareDates(mappedItem.asset.listing.startDate, asset.listing.startDate) = true
-            mappedItem.asset.listing.startDate = asset.listing.startDate
+          if compareDates(mappedItem.startDate, asset.listing.startDate) = true
+            mappedItem.startDate = asset.listing.startDate
           end if
 
           ' We are picking the largest future end date.
-          if compareDates(mappedItem.asset.listing.endDate, asset.listing.endDate) = false
-            mappedItem.asset.listing.endDate = asset.listing.endDate
+          if compareDates(mappedItem.endDate, asset.listing.endDate) = false
+            mappedItem.endDate = asset.listing.endDate
           end if
 
           mappedListings[asset.listing.tubi_id] = mappedItem
@@ -1443,19 +1447,18 @@ Function filterPurpleCarpetContainerItemsBasedOnListing(listing, purpleCarpetCon
         if mappedListings[item.id] <> invalid
           mappedListingItem = mappedListings[item.id]
 
-          if mappedListingItem.asset <> invalid AND mappedListingItem.asset.listing <> invalid
-            listing = mappedListingItem.asset.listing
+          if mappedListingItem <> invalid
 
             ' Checking the event has not ended.
-            if isGreaterThanCurrentTime(listing.endDate) = true
+            if isGreaterThanCurrentTime(mappedListingItem.endDate) = true
               processedItem = item
               processedItem.update({
                 ' Since across the purple carpet component and info panel and rest of the application we are using airDateTime
                 ' overriding the value so that we do not have to pass down the listing data down to every place and we can have one common logic.
-                airDatetime: listing.startDate
+                airDatetime: mappedListingItem.startDate
 
                 ' will be passed to player for playback.
-                foxContentId: listing.id
+                foxContentId: mappedListingItem.id
               }, true)
             end if
 
