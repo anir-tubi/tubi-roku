@@ -644,7 +644,7 @@ Function onKeyEvent(key, press) as boolean
     if key = "left" OR key = "back"
       ' This is required to stop videopreview
       itemFocused = m.CategoryGridList.itemFocused
-      if m.top.isVideoPreviewOn = true OR itemFocused.gridItemType = m.constants.ui.gridItemTypes.skinAd
+      if m.top.isVideoPreviewOn = true OR (itemFocused <> invalid AND itemFocused.gridItemType = m.constants.ui.gridItemTypes.skinAd)
         m.top.pauseVideoPreview = true
       end if
 
