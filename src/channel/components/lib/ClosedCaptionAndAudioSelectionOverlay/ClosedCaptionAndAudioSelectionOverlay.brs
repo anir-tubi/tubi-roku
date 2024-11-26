@@ -1,101 +1,241 @@
 Function init()
   topRef = m.top
-  m.overlayBackground = topRef.findNode("overlayBackground")
-  m.closedCaptionSection = topRef.findNode("closedCaptionSection")
-  m.closedCaptionSelector = topRef.findNode("closedCaptionSelector")
-  m.audioTrackSelector = topRef.findNode("audioTrackSelector")
-  m.audioTracksSection = topRef.findNode("audioTracksSection")
+
+  deviceInfo = CreateObject("roDeviceInfo")
+  modelType = deviceInfo.GetModelType()
+  m.captionModes = ["On", "Off", "Instant replay"]
+
+  if modelType = "TV"
+    m.captionModes.push("When mute")
+  end if
+
+  m.playerSideOverlay = invalid
+  m.closedCaptionAndAudioSettings = []
 
   topRef.observeFieldScoped("focusedChild", "onComponentFocus")
   topRef.observeFieldScoped("globalCaptionMode", "onGlobalCaptionModeChange")
-  m.closedCaptionSelector.observeFieldScoped("itemSelected", "onClosedCaptionSelectorItemSelectedChange")
-  m.audioTrackSelector.observeFieldScoped("itemSelected", "onAudioTrackSelectorItemSelectedChange")
-
-  closedCaptionSectionHeaderLabel = topRef.findNode("closedCaptionSectionHeaderLabel")
-  closedCaptionSectionHeaderLabel.text = getTranslation("cc_audio_overlay_subtitles")
-
-  audioTracksSectionHeaderLabel = topRef.findNode("audioTracksSectionHeaderLabel")
-  audioTracksSectionHeaderLabel.text = getTranslation("cc_audio_overlay_audio")
 
   m.constants = getConstantsFromGlobal()
   m.globalCaptionMode = "Off"
 
+  'The isCCOrAudioSelectedFromFirmware variable is a boolean flag used to identify the source of updates to Closed Captions (CC) or audio tracks.
+  'Source can be from Roku firmware overlay or our application's CC overlay. If the update happened via roku firmware overlay, then we need to hide our CCOverlay. 
+  m.isCCOrAudioSelectedFromFirmware = true
+
   m.tubiTrackingInfo = TubiTrackingInfo(m.constants)
 
   m.currentSubtitleTrack = ""
-  m.top.observeFieldScoped("currentSubtitleTrack", "onCurrentSubtitleTrackChanged")
+  topRef.observeFieldScoped("currentSubtitleTrack", "onCurrentSubtitleTrackChanged")
 
   m.currentAudioTrack = ""
-  m.top.observeFieldScoped("currentAudioTrack", "onCurrentAudioTrackChange")
-
-  typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(closedCaptionSectionHeaderLabel, typographyConstants.ids.subheaderMedium)
-  setTypographyOfLabel(audioTracksSectionHeaderLabel, typographyConstants.ids.subheaderMedium)
-
-
-  if m.global <> invalid
-    m.global.observeFieldScoped("theme", "onThemeChange")
-  end if
-  onThemeChange()
-End Function
-
-
-Function onThemeChange(msg = invalid)
-  if msg <> invalid
-    theme = msg.getData()
-  else
-    theme = getThemeFromGlobal()
-  end if
-
-  if theme <> invalid
-    m.closedCaptionSelector.focusBitmapBlendColor = theme.focusedColor
-    m.audioTrackSelector.focusBitmapBlendColor = theme.focusedColor
-    m.overlayBackground.blendColor = theme.neutralSolidColor
-  end if
+  topRef.observeFieldScoped("currentAudioTrack", "onCurrentAudioTrackChange")
 End Function
 
 
 Function onCurrentSubtitleTrackChanged(msg)
   m.currentSubtitleTrack = msg.getData()
-  updateSubtitleTrackSelectorUI()
+
+  if m.isCCOrAudioSelectedFromFirmware = true
+    m.top.wasBackButtonSelected = true
+  else
+    updateSubtitleModeAndSubtitleTrackUI()
+  end if
 End Function
 
 
 Function onCurrentAudioTrackChange(msg)
   m.currentAudioTrack = msg.getData()
 
-  if isNonEmptyArray(m.availableAudioTracks) = true
-    for i = 0 to m.availableAudioTracks.Count()-1
-      track = m.availableAudioTracks[i]
-      
-      if track.track = m.currentAudioTrack
-        'It is possible user may update the Audio Track in Roku firmware UI when the CCOverlay is open, At this time we need to update the audio track selection on CCOverlay as well to make it same.
-        m.audioTrackSelector.updateSelection = i
-        exit for
-      end if
-    end for
+  if m.isCCOrAudioSelectedFromFirmware = true
+    m.top.wasBackButtonSelected = true
+  else
+    updateAudioTrackUI()
+  end if
+End Function
+
+
+Function showClosedCaptionAndAudioSettings()
+  m.top.removeChild(m.playerSideOverlay)
+  m.playerSideOverlay = invalid
+  m.closedCaptionAndAudioSettings = []
+
+  subtitleModeAA = {}
+  subtitleModeAA.id = "subtitleModes"
+  subtitleModeAA.title = "Subtitles Mode"
+  subtitleModeAA.subtitle = invalid
+  subtitleModeAA.hasSubmenu = true
+
+  defaultCheckedItemIndex = 0
+  subtitleModeArray = []
+  captionModes = m.captionModes
+
+  for i = 0 to captionModes.Count()-1
+    captionMode = captionModes[i]
+
+    if captionMode = m.globalCaptionMode
+      defaultCheckedItemIndex = i
+      subtitleModeArray.push({
+        id: "subtitleMode"
+        title: getLocalizedSubtitleMode(captionMode)
+        checked: true
+        hasSubmenu: true
+      })
+    end if
+    
+  end for
+
+  subtitleModeContentNode = CreateObject("roSGNode", "ContentNode")
+  subtitleModeContentNode.update(subtitleModeArray, true)
+  subtitleModeAA.content = subtitleModeContentNode
+  subtitleModeAA.defaultCheckedItemIndex = defaultCheckedItemIndex
+  m.closedCaptionAndAudioSettings.push(subtitleModeAA)
+
+  'Subtitle
+  subtitleAA = {}
+  subtitleAA.title = getTranslation("cc_audio_overlay_subtitles")
+  subtitleAA.id = "subtitleTracks"
+  subtitleAA.subtitle = invalid
+  subtitleAA.hasSubmenu = false
+  tracks = renderAvailableClosedCaptionTracks()
+  subtitleNode = tracks.content
+  subtitleAA.content = subtitleNode
+  subtitleAA.defaultCheckedItemIndex = tracks.defaultCheckedItemIndex
+  subtitleCount = subtitleNode.getChildCount()
+
+  'Audio
+  audioTrackAA = {}
+  audioTrackAA.title = getTranslation("cc_audio_overlay_audio")
+  audioTrackAA.id = "audioTracks"
+  audioTrackAA.subtitle = invalid
+  audioTrackAA.hasSubmenu = false
+  tracks = renderAudioTracks()
+  audioTrackNode = tracks.content
+  audioTrackAA.content = audioTrackNode
+  audioTrackAA.defaultCheckedItemIndex = tracks.defaultCheckedItemIndex
+  audioTrackCount = audioTrackNode.getChildCount()
+
+  numRows = getNumRowsForSubtitleAndAudioTrack(subtitleCount, audioTrackCount)
+  subtitleAA.numRows = numRows.subtitle
+  audioTrackAA.numRows = numRows.audioTrack
+
+  if subtitleCount > 0 
+    m.closedCaptionAndAudioSettings.push(subtitleAA)
   end if
 
+  if audioTrackCount > 0
+    m.closedCaptionAndAudioSettings.push(audioTrackAA)
+  end if
+
+  m.playerSideOverlay = CreateObject("roSGNode", "PlayerSideOverlay")
+  m.playerSideOverlay.observeFieldScoped("itemUpdated", "onCCAndAudioOptionItemSelected")
+  m.playerSideOverlay.observeFieldScoped("backOrLeftKeyPress", "onCCAndAudioOptionBackKeyPressed")
+  m.top.appendChild(m.playerSideOverlay)
+
+  m.playerSideOverlay.itemList = m.closedCaptionAndAudioSettings
+  m.playerSideOverlay.setFocus(true)
+End Function
+
+
+' This function returns the localized subtitle modes. Eg. If we pass "Instant replay" to this, it will return "On Replay"
+'
+'mode: string, subtitle modes, possible values are "On", "Off", "Instant replay", "When mute"
+'returns (string) localized subtitle modes
+Function getLocalizedSubtitleMode(mode)
+  translatedMode = mode
+
+  if mode = "Instant replay"
+    translatedMode = "On Replay"
+  else if mode = "When mute"
+    translatedMode = "On Mute"
+  end if  
+
+  return translatedMode
+End Function
+
+
+Function onCCAndAudioOptionBackKeyPressed()
+  m.top.wasBackButtonSelected = true
+End Function
+
+
+Function onCCAndAudioOptionItemSelected(msg)
+  screen = msg.getRoSGNode()
+
+  if screen <> invalid
+    item = screen.content
+    
+    if item <> invalid AND item.checked = true
+      
+      if item.id = "subtitleMode"
+        showSubtitleModeSubMenu()
+      else if item.id = "subtitleTrack"
+        m.isCCOrAudioSelectedFromFirmware = false
+  
+        if item.title = "Off"
+  
+          m.globalCaptionMode = "Off"
+          m.top.globalCaptionChanged = m.globalCaptionMode
+  
+          m.top.trackingEventInfo = {
+            type: "subtitles_toggle"
+            values: {
+              video_id: m.top.videoId
+              toggle_state: "OFF"
+            }
+          }
+        else
+          if m.globalCaptionMode = "Off"
+            m.globalCaptionMode = "On"
+          end if
+  
+          languageCode = m.tubiTrackingInfo.getLanguageCode(item.language)
+  
+          m.top.trackingEventInfo = {
+            type: "subtitles_toggle"
+            values: {
+              video_id: m.top.videoId
+              toggle_state: "ON"
+              language_code: languageCode
+            }
+          }
+  
+          m.top.subtitleTrack = item.trackName
+          m.currentSubtitleTrack = item.trackName
+          m.top.globalCaptionChanged = m.globalCaptionMode
+  
+        end if  
+      else if item.id = "audioTrack"
+        m.isCCOrAudioSelectedFromFirmware = false
+        m.top.audioTrack = item.track
+        m.currentAudioTrack = item.track
+  
+        hasAccessibilityDescription = false
+        if item.name.instr(m.constants.player.audioTrack.audioDescriptionTrackNamePrefix) > -1
+          hasAccessibilityDescription = true
+        end if
+  
+        m.top.trackingEventInfo = {
+          type: "audio_selection"
+          values: {
+            video_id: m.top.videoId
+            language_code: m.tubiTrackingInfo.getLanguageCode(item.language)
+            descriptions_enabled: (hasAccessibilityDescription = true)
+          }
+        }
+      end if
+
+    end if
+  end if
+
+  'resetting isCCOrAudioSelectedFromFirmware
+  m.isCCOrAudioSelectedFromFirmware = true
 End Function
 
 
 ' Callback triggered when the component receives focus.
 Function onComponentFocus()
   if m.top.hasFocus() = true
-
-    totalSubtitleCount = renderAvailableClosedCaptionTracks()
-    totalAudioTrackCount = renderAudioTracks()
-    numRows = getNumRowsForSubtitleAndAudioTrack(totalSubtitleCount, totalAudioTrackCount)
-    m.closedCaptionSelector.numRows = numRows.subtitle
-    m.audioTrackSelector.numRows = numRows.audioTrack
-
-    ' Checking to make sure we have items in closed caption selector before setting focus.
-    if m.closedCaptionSelector.content <> invalid
-      m.closedCaptionSelector.setFocus(true)
-    else
-      ' We will never have a use case where both are empty since we do not show the overlay itself if both are empty.
-      m.audioTrackSelector.setFocus(true)
-    end if
+    showClosedCaptionAndAudioSettings()
   end if
 End Function
 
@@ -103,17 +243,20 @@ End Function
 Function renderAvailableClosedCaptionTracks()
   availableClosedCaptionTracks = m.top.availableClosedCaptionTracks
   subtitleTrack = m.currentSubtitleTrack
-  trackNodes = []
+
+  trackArray = []
+  content = CreateObject("roSGNode", "ContentNode")
+  defaultCheckedItemIndex = 0
 
   if availableClosedCaptionTracks.Count() > 0
     globalCaptionMode = m.globalCaptionMode
     ' Creating a item to disable closed captioning.
-    trackNodes = [{
+    trackArray = [{
+      id: "subtitleTrack"
       title: "Off"
       checked: (globalCaptionMode = "Off")
     }]
 
-    defaultCheckedItemIndex = 0
     index = 0
     ' Looping through the available tracks exposed by video node.
     for each track in availableClosedCaptionTracks
@@ -125,9 +268,12 @@ Function renderAvailableClosedCaptionTracks()
       localizedTitle = getLocalizedSubtitleLanguage(track.description)
 
       if localizedTitle <> invalid
-        trackNodes.push({
+        trackArray.push({
+          id: "subtitleTrack"
           title: localizedTitle
           checked: checked
+          trackName: track.trackName
+          language: track.Language
         })
 
         if checked = true
@@ -137,28 +283,15 @@ Function renderAvailableClosedCaptionTracks()
 
     end for
 
-    ' Setting the initial default checked item index.
-    m.closedCaptionSelector.defaultCheckedItemIndex = defaultCheckedItemIndex
-
-    node = CreateObject("roSGNode", "ContentNode")
-    node.update(trackNodes, true)
-
-    m.closedCaptionSelector.content = node
-  else
-    ' Resetting the content.
-    m.closedCaptionSelector.content = invalid
+    content.update(trackArray, true)
   end if
 
-  trackNodeCount = trackNodes.Count()
-  ' Hiding the closed caption section if there are no options available.
-  ' Using scale so that layout adjust position accordingly.
-  if trackNodeCount > 0
-    m.closedCaptionSection.scale = [1, 1]
-  else
-    m.closedCaptionSection.scale = [0, 0]
-  end if
+  tracks = {
+    content: content
+    defaultCheckedItemIndex: defaultCheckedItemIndex
+  }
 
-  return trackNodeCount
+  return tracks
 End Function
 
 
@@ -209,8 +342,10 @@ End Function
 Function renderAudioTracks()
   currentAudioTrack = m.currentAudioTrack
   m.availableAudioTracks = m.top.availableAudioTracks
-  trackNodeCount = 0
-  trackNodes = []
+
+  trackArray = []
+  content = CreateObject("roSGNode", "ContentNode")
+  defaultCheckedItemIndex = 0
 
   if m.availableAudioTracks.Count() > 1
     index = 0
@@ -223,57 +358,53 @@ Function renderAudioTracks()
         checked = (currentAudioTrack = track.track)
         localizedTitle = getLocalizedAudioTrackLanguage(track)
 
-        trackNodes.push({
+        trackArray.push({
+          id: "audioTrack"
           title: localizedTitle
           checked: checked
+          track: track.Track
+          name: track.Name
+          language: track.Language
         })
 
         if checked = true
-          m.audioTrackSelector.defaultCheckedItemIndex = index
+          defaultCheckedItemIndex = index
         end if
-
         index = index + 1
       end if
     end for
 
-    trackNodeCount = trackNodes.Count()
-
-    if trackNodeCount > 1
-      node = CreateObject("roSGNode", "ContentNode")
-      node.update(trackNodes, true)
-      m.audioTrackSelector.content = node
-    else
-      ' Resetting the content to invalid
-      m.audioTrackSelector.content = invalid
-    end if
+    content.update(trackArray, true)
   end if
 
-  ' Using scale so that layout adjust position accordingly.
-  if trackNodeCount > 1
-    m.audioTracksSection.scale = [1, 1]
-  else
-    m.audioTracksSection.scale = [0, 0]
-  end if
+  content = CreateObject("roSGNode", "ContentNode")
+  content.update(trackArray, true)
 
-  return trackNodeCount
+  tracks = {
+    content: content
+    defaultCheckedItemIndex: defaultCheckedItemIndex
+  }
+
+  return tracks
 End Function
 
 
 ' gets the numRows Count for Subtitle & AudioTrack
-' Maximum 8 items can be displayed on ClosedCaptionAndAudioSelectionOverlay at a time.
+' Maximum 7 items can be displayed on ClosedCaptionAndAudioSelectionOverlay at a time. In that, 1 item is dedicated for SubtitleMode
 ' Few examples:
-' If there are 8 subtitles & 3 audio tracks, it displays 5 subtitles & 3 audio tracks.
-' If there are 5 subtitles & 5 audio tracks, it displays 4 subtitles & 4 audio tracks.
-' If there are 8 subtitles & 0 audio tracks, it displays 8 subtitles & no audio tracks.
+' If there are 7 subtitles & 2 audio tracks, it displays 4 subtitles & 2 audio tracks.
+' If there are 7 subtitles & 3 audio tracks, it displays 3 subtitles & 3 audio tracks.
+' If there are 5 subtitles & 5 audio tracks, it displays 3 subtitles & 3 audio tracks.
+' If there are 6 subtitles & 0 audio tracks, it displays 6 subtitles & no audio tracks.
 '
 ' returns assocarray which has subtitle & audiotrack display count
 Function getNumRowsForSubtitleAndAudioTrack(totalSubtitleCount, totalAudioTrackCount)
   ' Maximum Subtitles & Audio Track can be displayed on Screen
-  maxSubtitleAndAudioTrackOnScreen = 8
-  ' Maximum Subtitles can be displayed on Screen if there are 4 of more Audio Tracks
-  maxSubtitleOnScreen = 4
-  ' Maximum Audio Track can be displayed on Screen if there are 4 of more Subtitles
-  maxAudioTrackOnScreen = 4
+  maxSubtitleAndAudioTrackOnScreen = 6
+  ' Maximum Subtitles can be displayed on Screen if there are 3 or more Audio Tracks
+  maxSubtitleOnScreen = 3
+  ' Maximum Audio Track can be displayed on Screen if there are 3 or more Subtitles
+  maxAudioTrackOnScreen = 3
 
   closedCaptionNumRows = totalSubtitleCount
   audioTrackNumRows = totalAudioTrackCount
@@ -348,118 +479,153 @@ Function getLocalizedAudioTrackLanguage(track)
 End Function
 
 
-' Callback triggered when the user changes the caption selection.
-Function onClosedCaptionSelectorItemSelectedChange(msg)
-  itemSelected = msg.getData()
-  languageCode = "Off"
+Function updateSubtitleModeAndSubtitleTrackUI()
+  closedCaptionAndAudioSettings = m.closedCaptionAndAudioSettings
+  closedCaptionAndAudioSettingsCount = closedCaptionAndAudioSettings.Count()
 
-  ' If the selected item is index position zero than turning off the captions.
-  if itemSelected = 0
-    m.top.globalCaptionTurnedOff = true
-    m.globalCaptionMode = "Off"
-    m.top.trackingEventInfo = {
-      type: "subtitles_toggle"
-      values: {
-        video_id: m.top.videoId
-        toggle_state: "OFF"
-      }
-    }
-  else
-    m.top.globalCaptionTurnedOn = true
-    m.globalCaptionMode = "On"
-    selectedTrack = m.top.availableClosedCaptionTracks[itemSelected - 1]
+  for i = 0 to closedCaptionAndAudioSettingsCount - 1
 
-    if selectedTrack <> invalid
-      languageCode = m.tubiTrackingInfo.getLanguageCode(selectedTrack.language)
-
-      m.top.trackingEventInfo = {
-        type: "subtitles_toggle"
-        values: {
-          video_id: m.top.videoId
-          toggle_state: "ON"
-          language_code: languageCode
-        }
-      }
-
-      m.top.subtitleTrack = selectedTrack.trackName
-      m.currentSubtitleTrack = selectedTrack.trackName
-
-    end if
-  end if
-
-End Function
-
-
-Function onAudioTrackSelectorItemSelectedChange(msg)
-  itemSelected = msg.getData()
-  selectedTrack = m.availableAudioTracks[itemSelected]
-
-  if selectedTrack <> invalid
-    m.top.audioTrack = selectedTrack.track
-    m.currentAudioTrack = selectedTrack.track
-
-    hasAccessibilityDescription = false
-    if selectedTrack.name.instr(m.constants.player.audioTrack.audioDescriptionTrackNamePrefix) > -1
-      hasAccessibilityDescription = true
+    if closedCaptionAndAudioSettings[i].id = "subtitleModes"
+      closedCaptionAndAudioSettings[i].content.getChild(0).title = getLocalizedSubtitleMode(m.globalCaptionMode)
     end if
 
-    m.top.trackingEventInfo = {
-      type: "audio_selection"
-      values: {
-        video_id: m.top.videoId
-        language_code: m.tubiTrackingInfo.getLanguageCode(selectedTrack.language)
-        descriptions_enabled: (hasAccessibilityDescription = true)
-      }
-    }
+    if closedCaptionAndAudioSettings[i].id = "subtitleTracks"
+      content = closedCaptionAndAudioSettings[i].content
 
-  end if
-End Function
+      if m.globalCaptionMode = "Off"
 
+        for j = 0 to content.getChildCount()-1
+          if content.getChild(j).title = "Off"
+            content.getChild(0).checked = true
+          else
+            content.getChild(j).checked = false
+          end if
+        end for
 
-Function updateSubtitleTrackSelectorUI()
-  availableClosedCaptionTracks = m.top.availableClosedCaptionTracks
+      else
 
-  if isNonEmptyArray(availableClosedCaptionTracks) = true
-    for i = 0 to availableClosedCaptionTracks.Count() - 1
-      track = availableClosedCaptionTracks[i]
+        for j = 0 to content.getChildCount()-1
+          trackName = content.getChild(j).trackName
 
-      if track.trackName = m.currentSubtitleTrack
-        'It is possible user may update the Audio Track in Roku firmware UI when the CCOverlay is open, At this time we need to update the audio track selection on CCOverlay as well to make it same.
-        'incrementing by 1 as we show "Off" as first item
-        index = i + 1
-        m.closedCaptionSelector.updateSelection = index
-        exit for
+          if m.currentSubtitleTrack = trackName
+            content.getChild(j).checked = true
+          else
+            content.getChild(j).checked = false
+          end if
+        end for
+
       end if
-    end for
-  end if
-  
+    end if
+
+  end for
+End Function
+
+
+Function updateAudioTrackUI()
+  closedCaptionAndAudioSettings = m.closedCaptionAndAudioSettings
+  closedCaptionAndAudioSettingsCount = closedCaptionAndAudioSettings.Count()
+
+  for i = 0 to closedCaptionAndAudioSettingsCount - 1
+
+    if closedCaptionAndAudioSettings[i].id = "audioTracks"
+      content = closedCaptionAndAudioSettings[i].content
+
+      for j = 0 to content.getChildCount()-1
+        track = content.getChild(j).track
+
+        if m.currentAudioTrack = track
+          content.getChild(j).checked = true
+        else
+          content.getChild(j).checked = false
+        end if
+      end for
+
+    end if
+
+  end for
 End Function
 
 
 Function onGlobalCaptionModeChange(msg)
   m.globalCaptionMode = msg.getData()
-  
-  if m.globalCaptionMode = "Off"
-    m.closedCaptionSelector.updateSelection = 0
-  else if m.globalCaptionMode = "On"
-    updateSubtitleTrackSelectorUI()
+
+  if m.isCCOrAudioSelectedFromFirmware = true
+    m.top.wasBackButtonSelected = true
+  else
+    updateSubtitleModeAndSubtitleTrackUI()
   end if
+
 End Function
 
 
-Function onKeyEvent(key as string, press as boolean) as boolean
-  if press = false
-    return false
-  end if
+Function showSubtitleModeSubMenu()
+  m.top.removeChild(m.playerSideOverlay)
+  m.playerSideOverlay = invalid
+  subtitleModeArray = []
+  captionModes = m.captionModes
 
-  if key = "down" AND m.closedCaptionSelector.isInFocusChain() = true AND m.audioTrackSelector.content <> invalid
-    return m.audioTrackSelector.setFocus(true)
-  else if key = "up" AND m.audioTrackSelector.isInFocusChain() = true AND m.closedCaptionSelector.content <> invalid
-    return m.closedCaptionSelector.setFocus(true)
-  else if key = "back"
-    m.top.wasBackButtonSelected = true
-    return true
-  end if
+  subtitleModeSubMenuAA = {}
+  subtitleModeSubMenuAA.id = "subtitleModeSubMenu"
+  subtitleModeSubMenuAA.title = getTranslation("cc_audio_overlay_subtitles_mode")
+  subtitleModeSubMenuAA.subtitle = invalid
+  subtitleModeSubMenuAA.hasSubmenu = false
+  defaultCheckedItemIndex = 0
 
-  return false
+  for i = 0 to captionModes.Count()-1
+    
+    if captionModes[i] = m.globalCaptionMode
+      checked = true
+      defaultCheckedItemIndex = i
+    else
+      checked = false  
+    end if
+
+    subtitleModeArray.push({
+      id: captionModes[i].trim()
+      title: getLocalizedSubtitleMode(captionModes[i])
+      checked: checked
+    })
+
+  end for
+
+  content = CreateObject("roSGNode", "ContentNode")
+  content.id = "subtitleMode"
+  content.update(subtitleModeArray, true)
+  
+  subtitleModeSubMenuAA.content = content
+  subtitleModeSubMenuAA.defaultCheckedItemIndex = defaultCheckedItemIndex
+  subtitleModeSubMenuAA.numRows = content.getChildCount()
+
+  m.closedCaptionAndAudioSettings = []
+  m.closedCaptionAndAudioSettings.push(subtitleModeSubMenuAA)
+
+  m.playerSideOverlay = CreateObject("roSGNode", "PlayerSideOverlay")
+  m.playerSideOverlay.observeFieldScoped("itemUpdated", "onSubtitleModeSubMenuItemSelected")
+  m.playerSideOverlay.observeFieldScoped("backOrLeftKeyPress", "onSubtitleModeBackKeyPressed")
+  m.top.appendChild(m.playerSideOverlay)
+
+  m.playerSideOverlay.itemList = m.closedCaptionAndAudioSettings
+  m.playerSideOverlay.setFocus(true)
+  
+End Function
+
+
+Function onSubtitleModeBackKeyPressed(msg)
+  showClosedCaptionAndAudioSettings()
+End Function
+
+
+Function onSubtitleModeSubMenuItemSelected(msg)
+  screen = msg.getRoSGNode()
+
+  if screen <> invalid
+    item = screen.content
+
+    if item <> invalid AND item.checked = true
+      m.isCCOrAudioSelectedFromFirmware = false
+      m.top.globalCaptionChanged = item.id
+      m.globalCaptionMode = item.id
+    end if
+
+  end if
 End Function

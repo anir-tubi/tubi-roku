@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="PlayerSideOverlay" extends="Group">
+  <script type="text/brightscript" uri="PlayerSideOverlay.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/source/lib/ArrayUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+
+    <field id="itemList" type="array" />
+    <field id="updateSelection" type="intarray"/>
+
+    <!-- OUTPUTS -->
+
+    <field id="backOrLeftKeyPress" type="boolean" value="false" alwaysNotify="true" />
+    <field id="content" type="node" />
+    <field id="itemUpdated" type="boolean" alwaysNotify="true"/>
+  </interface>
+
+  <children>
+    <Poster
+      id="overlayBackground"
+      width="630"
+      height="960"
+      uri="pkg:/images/menu-focus-$$RES$$.9.png"/>
+  </children>
+</component>

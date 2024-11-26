@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?> 
-<component name="CheckBoxList" extends="MarkupGrid">
-  <script type="text/brightscript" uri="CheckBoxList.brs" />
+<component name="CaretBoxList" extends="MarkupGrid">
+  <script type="text/brightscript" uri="CaretBoxList.brs" />
 
    <interface>
     <!-- INPUTS -->

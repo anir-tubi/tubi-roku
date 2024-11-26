@@ -7,7 +7,6 @@
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
   <script type="text/brightscript" uri="pkg:/source/lib/ArrayUtils.brs" />
 
   <interface>
@@ -41,7 +40,6 @@
     <!-- Holds the value of the global captions mode. Possible values are "Instant replay", "When mute", "On", "Off"  -->
     <field id="globalCaptionMode" type="string"/>
     <field id="videoId" type="integer" />
-
     <!-- OUTPUTS -->
 
     <!-- Will be set when the user selects a closed captioning track. This will be eventually be piped to videonode.  -->
@@ -56,56 +54,8 @@
     -->
     <field id="audioTrack" type="string" value="" />
     <field id="wasBackButtonSelected" type="boolean" value="false" alwaysNotify="true" />
-    <field id="globalCaptionTurnedOn" type="boolean" alwaysNotify="true" />
-    <field id="globalCaptionTurnedOff" type="boolean" alwaysNotify="true" />
+    <field id="globalCaptionChanged" type="string" alwaysNotify="true" />
     <field id="trackingEventInfo" type="assocarray" alwaysNotify="true" />
 
   </interface>
-
-  <children>
-    <Poster
-      id="overlayBackground"
-      width="630"
-      height="960"
-      uri="pkg:/images/menu-focus-$$RES$$.9.png">
-
-      <LayoutGroup
-        translation="[60, 60]">
-
-          <LayoutGroup
-            id="closedCaptionSection">
-            <Label
-              id="closedCaptionSectionHeaderLabel"
-              height="48">
-              <Font
-                role="font"/>
-            </Label>
-
-            <CheckBoxList
-              id="closedCaptionSelector"
-              itemSize="[510,72]"
-              numRows="3"
-              itemSpacing="[0,8]" />
-
-            <Rectangle width="0" height="36" />
-          </LayoutGroup>
-
-          <LayoutGroup
-            id="audioTracksSection">
-            <Label
-              id="audioTracksSectionHeaderLabel"
-              height="48">
-              <Font
-                role="font"/>
-            </Label>
-
-            <CheckBoxList
-              id="audioTrackSelector"
-              itemSize="[510,72]"
-              numRows="3"
-              itemSpacing="[0,8]" />
-          </LayoutGroup>
-      </LayoutGroup>
-    </Poster>
-  </children>
 </component>

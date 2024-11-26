@@ -1940,6 +1940,14 @@ Function getTranslation_en_US()
       "description": "day label used in air date countdown timer",
       "message": "{day} D"
     },
+    "dialog_gdpr_manage_privacy_settings_error_description": {
+      "description": "Error dialog description shown due to one trust component library failure when clicking manage privacy settings.",
+      "message": "Please try restarting Tubi to update the privacy settings. Please email support@tubi.tv if this keeps happening."
+    },
+    "cc_audio_overlay_subtitles_mode": {
+      "description": "Available modes displayed on closed caption overlay",
+      "message": "Subtitles Mode"
+    },
     "live_on_hour": {
       "description": "day label used in air date countdown timer",
       "message": "{hour} HR"

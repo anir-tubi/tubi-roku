@@ -92,8 +92,7 @@ Function init()
   m.hideComingUpTimer = topRef.findNode("hideComingUpTimer")
 
   m.closedCaptionAndAudioSelectionOverlay = topRef.findNode("closedCaptionAndAudioSelectionOverlay")
-  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("globalCaptionTurnedOn", "onGlobalCaptionTurnedOnChange")
-  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("globalCaptionTurnedOff", "onGlobalCaptionTurnedOffChange")
+  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("globalCaptionChanged", "onGlobalCaptionChanged")
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("wasBackButtonSelected", "onWasBackButtonSelectedWhenCCHasFocus")
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("trackingEventInfo", "onTrackingEventInfoChange")
   m.closedCaptionAndAudioSelectionOverlayGroup = topRef.findNode("closedCaptionAndAudioSelectionOverlayGroup")
@@ -335,17 +334,8 @@ Function onWasBackButtonSelectedWhenCCHasFocus(msg)
 End Function
 
 
-Function onGlobalCaptionTurnedOnChange(msg)
-  if msg.getData() = true
-    m.top.globalCaptionMode = "On"
-  end if
-End Function
-
-
-Function onGlobalCaptionTurnedOffChange(msg)
-  if msg.getData() = true
-    m.top.globalCaptionMode = "Off"
-  end if
+Function onGlobalCaptionChanged(msg)
+  m.top.globalCaptionMode = msg.getData()
 End Function
 
 

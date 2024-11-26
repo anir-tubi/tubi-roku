@@ -10,7 +10,6 @@ Function init()
 
   topRef.observeFieldScoped("itemSelected", "onItemSelectedChange")
   topRef.observeFieldScoped("defaultCheckedItemIndex", "onDefaultCheckedItemIndexChange")
-  topRef.observeFieldScoped("updateSelection", "onItemSelectedChange")
   m.currentCheckedItemIndex = topRef.defaultCheckedItemIndex
 End Function
 

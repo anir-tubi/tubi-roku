@@ -229,8 +229,7 @@ Function init()
   m.EndButton = m.TransportButtons.findNode("EndButton")
   m.closedCaptionAudioButton = m.top.findNode("closedCaptionAudioButton")
   m.closedCaptionAndAudioSelectionOverlay = m.top.findNode("closedCaptionAndAudioSelectionOverlay")
-  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("globalCaptionTurnedOn", "onGlobalCaptionTurnedOnChange")
-  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("globalCaptionTurnedOff", "onGlobalCaptionTurnedOffChange")
+  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("globalCaptionChanged", "onGlobalCaptionChanged")
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("wasBackButtonSelected", "onWasBackButtonSelectedChange")
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("trackingEventInfo", "onTrackingEventInfoChange")
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("subtitleTrack", "onSubtitleTrackChangedOnCCOverlay")
@@ -2141,19 +2140,15 @@ Function setCCAudioTransportBarVisibility()
 End Function
 
 
-Function onGlobalCaptionTurnedOnChange(msg)
-  if msg.getData() = true
-    m.Video.globalCaptionMode = "On"
-  end if
-  setAudioSubtitleTransportBarIcon("On")
-End Function
+Function onGlobalCaptionChanged(msg)
+  caption = msg.getData()
+  m.Video.globalCaptionMode = caption
 
-
-Function onGlobalCaptionTurnedOffChange(msg)
-  if msg.getData() = true
-    m.Video.globalCaptionMode = "Off"
+  if caption = "Off"
+    setAudioSubtitleTransportBarIcon("Off")
+  else
+    setAudioSubtitleTransportBarIcon("On")
   end if
-  setAudioSubtitleTransportBarIcon("Off")
 End Function
 
 
