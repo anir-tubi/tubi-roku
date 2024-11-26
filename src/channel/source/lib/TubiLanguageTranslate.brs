@@ -3725,6 +3725,18 @@ Function getTranslation_es_MX()
     "sign_up_error_screen__purple_carpet_day_subheading": {
       "description": "Sign in error screen heading default error",
       "message": "¡Aún puedes ver tus películas y series de TV favoritos como invitado, ¡incluido el torneo!\nTe enviaremos un correo para que vuelvas a intentarlo más tarde."
+    },
+    "mylist_disabled_message": {
+      "description": "My List disabled toast message",
+      "message": "Mis Cosas no están disponibles actualmente."
+    },
+    "rating_disabled_message": {
+      "description": "Like/Dislike disabled toast message",
+      "message": "Calificación no está disponible actualmente."
+    },
+    "continue_watching_disabled_message": {
+      "description": "Continue watching disabled toast message",
+      "message": "Seguir viendo no está disponible actualmente."
     }
   }
 End Function
@@ -5429,6 +5441,18 @@ Function getTranslation_fr_CA()
     "sign_up_error_screen__purple_carpet_day_subheading": {
       "description": "Sign in error screen heading default error",
       "message": "Vous pouvez toujours regarder vos films et série de TV préférés en tant qu'invité, y compris le tournoi!\nNous vous enverrons un e-mail pour réessayer plus tard."
+    },
+    "mylist_disabled_message": {
+      "description": "My List disabled toast message",
+      "message": "Mes affaires est actuellement indisponibles."
+    },
+    "rating_disabled_message": {
+      "description": "Like/Dislike disabled toast message",
+      "message": "Classement est actuellement indisponible."
+    },
+    "continue_watching_disabled_message": {
+      "description": "Continue watching disabled toast message",
+      "message": "Continuer à regarder est actuellement indisponible."
     }
   }
 End Function
