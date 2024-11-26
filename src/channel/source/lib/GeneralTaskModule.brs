@@ -13,6 +13,7 @@ Function GeneralTaskModule(context, generalTask)
     setSignOutErrorCallback: generalTask_setSignOutErrorCallback
     updateGeneralTaskConstants: generalTask_updateGeneralTaskConstants
     updateGeneralTaskExperimentsInfo: generalTask_updateGeneralTaskExperimentsInfo
+    updateGeneralTaskClientErrorConfig: generalTask_updateGeneralTaskClientErrorConfig
 
     ' private
     generalTask: generalTask
@@ -218,7 +219,7 @@ End Function
 
 
 ' generalTask_setSignOutErrorCallback
-' 
+'
 ' public method, which sets the error callback function for when the logged in user is reported to no longer exist.
 ' @errorCallback: function, the function to be used as the error callback function
 Function generalTask_setSignOutErrorCallback(errorCallback)
@@ -426,4 +427,9 @@ End Function
 
 Function generalTask_updateGeneralTaskExperimentsInfo(experimentsInfo)
   m.generalTask.newExperimentsInfo = experimentsInfo
+End Function
+
+
+Function generalTask_updateGeneralTaskClientErrorConfig(clientErrorConfig)
+  m.generalTask.newClientErrorConfig = clientErrorConfig
 End Function

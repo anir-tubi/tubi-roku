@@ -5,14 +5,23 @@ Function init()
   m.top.observeField("request", m.port)
   m.top.observeField("batchRequest", m.port)
   m.top.observeField("cancel", m.port)
+  m.top.observeField("newClientErrorConfig", m.port)
   m.top.observeField("newConstants", m.port)
   m.top.observeField("newExperimentsInfo", m.port)
   m.constants = getConstantsFromGlobal()
-  m.experimentsInfo = {} ' In order to be able to update the experiments without having pass it down manually we need an existing AA that we can just update the keys on
+
+  ' Used to know how we should handle error cases on network requests
+  m.clientErrorConfig = {}
+
+  ' In order to be able to update the experiments without having pass it down manually we need an existing AA that we can just update the keys on
+  m.experimentsInfo = {}
+
   ' Creating a scope variable that will be overridden by each sub task
   m.requestTypes = {}
+
   ' We store a local copy of the translations so we don't have to do a rendezvous each time we request a translation during parsing
   m.translationAA = getFieldFromGlobal("translationAA")
+
   m.top.functionName = "listen"
   m.top.control = "run"
 End Function
@@ -75,6 +84,11 @@ Function listen()
         if reqInfo <> invalid then
           cancelRequests(reqInfo)
         end if
+      else if field = "newClientErrorConfig" then
+        clientErrorConfig = msg.getData()
+        if clientErrorConfig <> invalid then
+          m.clientErrorConfig = clientErrorConfig
+        end if
       else if field = "newConstants" then
         constants = msg.getData()
 
@@ -122,18 +136,28 @@ Function listen()
       nTimeout = 0 'bs:disable-line 1001 Lint1005
       for each requestId in m.jobStore
         job = m.jobStore[requestId]
+        reqInfo = job.reqInfo
 
-        if job.startTime.totalMilliseconds() > job.reqInfo.timeoutInMilliSec
-          retries = job.reqInfo.retries
+        if job.startTime.totalMilliseconds() > reqInfo.timeoutInMilliSec
+          retries = reqInfo.retries
           m.jobStore.delete(requestId)
 
           if job.tubiReq <> invalid
             job.tubiReq.cancel() ' To avoid the danger of api showing up later than timeout
           end if
 
-          if retries > 0
-            job.reqInfo.retries = retries - 1
-            makeApiRequest(job.reqInfo, job.batchInfo) 'make api request because they have already waited for timeout
+          if reqInfo.retriesAttempted = invalid then
+            reqInfo.retriesAttempted = 0
+          end if
+
+          if retries > 0 AND reqInfo.retriesAttempted < retries then
+            retryAfter = clientErrorConfigCheckIfShouldRetryAfter(m.clientErrorConfig, reqInfo.url, job.tubiReq.method, "-1236", {}, invalid, reqInfo.retriesAttempted)
+            if retryAfter = -1 then
+              processTimeoutError(job)
+            else
+              reqInfo.retriesAttempted = reqInfo.retriesAttempted + 1
+              makeApiRequest(reqInfo, job.batchInfo) 'make api request because they have already waited for timeout
+            end if
           else
             processTimeoutError(job)
           end if
@@ -227,7 +251,7 @@ Function makeApiRequest(reqInfo, batchInfo = invalid) as Boolean
     ' If valid auth info isn't available then we want to request updated auth info and hold off the request until we get it
     if isValidAuthInfoAvailable = false then
       getUpdatedAuth()
-      handleBackoff(invalid, job, reqInfo.retries, 0)
+      handleBackoff(invalid, job, 0)
       return true
     else
       reqSent = tubiReq.start(m.port)
@@ -293,44 +317,42 @@ Function processResponse(msg)
     retries = reqInfo.retries
 
     if result <> invalid AND result.response <> invalid
-
-      if callbackTypes <> invalid
-        canRetry4xxCodes = {
-          "401": true  ' not authorized, get a new auth token and try again
-          "403": true  ' forbidden, get a new auth token and try again
-          "408": true  ' request timed out, might not time out next time
-        }
-
+      if callbackTypes = invalid then
+        tubiLog("BaseGeneralTask: Could not load callbackTypes for requestType: " + requestType, "warn")
+      else
         code = result.response.code
 
         if code >= 200 AND code < 400
           processSuccessResponse(result, callbackTypes, job)
-        else if code >= 400 AND code < 500 AND canRetry4xxCodes[code.toStr()] <> true
-          ' error expected to remain error on retry so don't bother retrying
-          processErrorResponse(result, callbackTypes, job)
-        else if (code = 403 OR code = 401) AND m.constants.reqNames.acceptsTubiAuth[requestType] = true AND checkIfTokenExpiredError(result.response) = true
-          if retries > 0
-            ' request could not be authed by backend so attempt to refresh the auth token and try again
-            getUpdatedAuth()
-            handleBackoff(result, job, retries, 0) ' let the request be handled by backoff after updated auth comes back
-          else
-            processErrorResponse(result, callbackTypes, job)
-          end if
         else
-          bUserNotFoundError = checkIfUserNotFoundError(result.response)
-          if retries > 0 AND bUserNotFoundError = false
-            handleBackoff(result, job, retries) 'pause before retry to relieve pressure on the backend
-          else
+          if reqInfo.retriesAttempted = invalid then
+            reqInfo.retriesAttempted = 0
+          end if
+
+          ' First check if we are limited by retries on our request side
+          if reqInfo.retriesAttempted >= retries then
             processErrorResponse(result, callbackTypes, job)
+          else if checkIfUserNotFoundError(result.response) = true then
+            ' Next check if this was a user not found error
+            processErrorResponse(result, callbackTypes, job)
+          else
+            ' Next check against client error config to see if we should retry
+            retryAfter = clientErrorConfigCheckIfShouldRetryAfter(m.clientErrorConfig, reqInfo.url, result.method, code.toStr(), result.response.headers, result.response.data, reqInfo.retriesAttempted)
+
+            ' If we are told not to then process the error
+            if retryAfter = -1 then
+              processErrorResponse(result, callbackTypes, job)
+            else if (code = 403 OR code = 401) AND m.constants.reqNames.acceptsTubiAuth[requestType] = true AND checkIfTokenExpiredError(result.response) = true then
+              getUpdatedAuth()
+              handleBackoff(result, job, retryAfter)
+            else
+              handleBackoff(result, job, retryAfter)
+            end if
           end if
         end if
-      else
-        tubiLog("BaseGeneralTask: Could not load callbackTypes for requestType: " + requestType, "warn")
       end if
-
       m.jobStore.delete(id) ' delete the job from assocarray after the response is sent to avoid memory leak
     end if
-
   end if
 End Function
 
@@ -583,25 +605,24 @@ End Function
 '
 ' @result : assocarray, this is the request handleEvent AA with response or invalid if we haven't sent the request yet
 ' @job: AssocArray, the job for this request as created in makeApiRequest
-' @retries: integer, the number of remaining retries for a request/request node
 ' @backoffDuration: integer, the amount of time to wait before retrying the request. This should only be changed if we want to overwrite the default backoff duration or the backoff duration included as part of the request info
 '
-' side effects: updates the retries and pause fields of the passed in reqInfo
-Function handleBackoff(result, job, retries, backoffDuration = -1)
+' side effects: updates the retriesAttempted and pause fields of the passed in reqInfo
+Function handleBackoff(result, job, backoffDuration)
   tubiLog("BaseGeneralTask.handleBackoff")
   if result <> invalid then
     sendApiErrorLog(result)
   end if
-  
+
   reqInfo = job.reqInfo
 
-  if backoffDuration <> -1 then
-    backoffFactor = reqInfo.backoffFactor
-    backoffDuration = reqInfo.pause * backoffFactor
+  reqInfo.pause = backoffDuration
+
+  if reqInfo.retriesAttempted = invalid then
+    reqInfo.retriesAttempted = 0
   end if
 
-  reqInfo.pause = backoffDuration
-  reqInfo.retries = retries - 1
+  reqInfo.retriesAttempted = reqInfo.retriesAttempted + 1
 
   m.backedOffJobs[reqInfo.id] = {
     "timespan": createObject("roTimespan")
@@ -718,19 +739,19 @@ End Function
 ' Checks the backend response to see if backend returned a user not found error.
 Function checkIfUserNotFoundError(response)
   data = invalid
-  
+
   if response <> invalid
-    if isNonEmptyString(response.data) = true 
+    if isNonEmptyString(response.data) = true
       data = parseJson(response.data)
     else if isAA(response.data) = true
       data = response.data
     end if
-  
+
     if isAA(data) = true AND isNonEmptyString(data.code) = true AND UCase(data.code) = UCase(m.constants.errors.codes.userNotFound)
       return true
     end if
   end if
-  
+
   return false
 End Function
 

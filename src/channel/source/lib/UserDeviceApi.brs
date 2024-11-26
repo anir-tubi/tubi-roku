@@ -208,7 +208,7 @@ End Function
 
 ' @email : string,  (either taken from roku account or user entered email)
 Function userDeviceApi_resetPassword(email)
-  url = m.constants.urls.userDevice.resetPassword
+  url = m.constants.urls.account.resetPassword
   options = m.getCommonOptions()
   options.params["email"] = email
   options["method"] = m.constants.reqTypes.post
@@ -535,7 +535,7 @@ End Function
 
 
 Function userDeviceApi_createPostLogoutReqInfo()
-  url = m.constants.urls.userDevice.logout
+  url = m.constants.urls.account.logout
   options = m.getCommonOptions()
   options["method"] = m.constants.reqTypes.post
   return {

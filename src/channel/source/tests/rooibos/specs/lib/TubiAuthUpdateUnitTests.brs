@@ -464,7 +464,7 @@ Function tubiAuth_getAnonymousSigningKeyRequestInfo_test()
   m.assertNotInvalid(anonymousSigningKeyReqInfo)
   m.assertAAHasKeys(anonymousSigningKeyReqInfo, m.requestObjKeys)
 
-  m.assertEqual(anonymousSigningKeyReqInfo.url, m.constants.urls.account.anonymous.signingKey)
+  m.assertEqual(anonymousSigningKeyReqInfo.url, m.constants.urls.account.anonymousSigningKey)
 
   options = anonymousSigningKeyReqInfo.options
   m.assertEqual(options.method, "POST")
@@ -495,7 +495,7 @@ Function tubiAuth_getAnonymousTokenRequestInfo_test()
   m.assertNotInvalid(tokenReqInfo)
   m.assertAAHasKeys(tokenReqInfo, m.requestObjKeys)
 
-  m.assertEqual(tokenReqInfo.url, m.constants.urls.account.anonymous.token)
+  m.assertEqual(tokenReqInfo.url, m.constants.urls.account.anonymousToken)
 
   options = tokenReqInfo.options
   m.assertEqual(options.method, "POST")
@@ -539,7 +539,7 @@ Function tubiAuth_getAnonymousRefreshTokenRequestInfo_test()
     "options"
   ])
 
-  m.assertEqual(tokenReqInfo.url, m.constants.urls.account.anonymous.refreshToken)
+  m.assertEqual(tokenReqInfo.url, m.constants.urls.account.anonymousRefreshToken)
 
   options = tokenReqInfo.options
   m.assertEqual(options.method, "POST")

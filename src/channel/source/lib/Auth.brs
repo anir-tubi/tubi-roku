@@ -236,7 +236,7 @@ Function tubiAuth_getAnonymousRefreshTokenRequestInfo(authInfo)
   bodyJson = FormatJSON(body)
 
   tokenReqInfo = {
-    url: m.constants.urls.account.anonymous.refreshToken
+    url: m.constants.urls.account.anonymousRefreshToken
     options: {
       body: bodyJson
       headers: headers
@@ -300,7 +300,7 @@ Function tubiAuth_getAnonymousTokenRequestInfo(verifier, signingKeyResponse)
   headers.append(m.constants.headers.commonUapi)
 
   tokenReqInfo = {
-    url: m.constants.urls.account.anonymous.token
+    url: m.constants.urls.account.anonymousToken
     options: {
       body: bodyJson
       headers: headers
@@ -358,7 +358,7 @@ Function tubiAuth_getAnonymousSigningKeyRequestInfo(verifier)
   }
 
   return {
-    "url": m.constants.urls.account.anonymous.signingKey
+    "url": m.constants.urls.account.anonymousSigningKey
     "options": options
   }
 End Function
@@ -651,7 +651,7 @@ Function tubiAuth_getTokenRefreshInfo(authInfo)
   headers = m.getAuthHeaders(authInfo.refreshToken)
 
   requestInfo = {
-    "url": m.constants.urls.userDevice.refreshToken
+    "url": m.constants.urls.account.refreshToken
     "options": {
       "method": m.constants.reqTypes.post
       "headers": headers
@@ -691,7 +691,7 @@ Function tubiAuth_getRequestTokenTransferInfo(externalAuthInfo)
   options["params"] = params
 
   return {
-    "url": m.constants.urls.userDevice.transferToken
+    "url": m.constants.urls.account.transferToken
     "options": options
   }
 End Function

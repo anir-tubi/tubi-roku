@@ -1,23 +1,27 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name="BaseGeneralTask" extends="BaseTaskNeedingAuth">
-    <script type="text/brightscript" uri="BaseGeneralTask.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
-    <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
-    <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/GeneralTaskModule.brs" />
+  <script type="text/brightscript" uri="BaseGeneralTask.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/GeneralTaskModule.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiClientErrorConfig.brs" />
 
-    <interface>
-      <field id="request" type="assocarray" />
-      <field id="batchRequest" type="assocarray" />
-      <field id="cancel" type="assocarray" />
+  <interface>
+    <field id="request" type="assocarray" />
+    <field id="batchRequest" type="assocarray" />
+    <field id="cancel" type="assocarray" />
 
-      <!-- We use the GeneralTask to make our auth network requests. This means the constants need to be updated after we have pulled in the external config. This is only used for updating m.constants and should not be accessed outside of the observer -->
-      <field id="newConstants" type="assocarray" />
+    <!-- We use the GeneralTask to make our client error config network requests. This means the config is not available at that time and we need to update it once loaded. This is only used for updating m.clientErrorConfig and should not be accessed outside of the observer -->
+    <field id="newClientErrorConfig" type="assocarray" />
 
-      <!-- We use the GeneralTask to make our auth network requests. This means the experiments are not available at that time and we need to update them once experiments have been loaded. This is only used for updating m.experimentsInfo and should not be accessed outside of the observer -->
-      <field id="newExperimentsInfo" type="assocarray" />
-    </interface>
+    <!-- We use the GeneralTask to make our auth network requests. This means the constants need to be updated after we have pulled in the external config. This is only used for updating m.constants and should not be accessed outside of the observer -->
+    <field id="newConstants" type="assocarray" />
+
+    <!-- We use the GeneralTask to make our auth network requests. This means the experiments are not available at that time and we need to update them once experiments have been loaded. This is only used for updating m.experimentsInfo and should not be accessed outside of the observer -->
+    <field id="newExperimentsInfo" type="assocarray" />
+  </interface>
 </component>

@@ -749,5 +749,5 @@ Function userDeviceApi_createPostLogoutReqInfo_test()
   m.assertNotInvalid(req)
   m.assertEqual(req.options.method, "POST")
   ' Since the request only requires token and no other parameters there is no options to verify.
-  m.assertEqual(m.constants.urls.userDevice.logout, req.url)
+  m.assertEqual(m.constants.urls.account.logout, req.url)
 End Function

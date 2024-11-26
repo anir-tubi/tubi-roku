@@ -78,6 +78,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/TubiExternalConfig.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/google/gam_utils.brs" />
   <script type="text/brightscript" uri="pkg:/source/localClientErrorConfig.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiClientErrorConfig.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
   <script type="text/brightscript" uri="pkg:/source/lib/PlayerLogLib.brs" />
 

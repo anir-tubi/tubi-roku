@@ -593,10 +593,15 @@ Function getConstants()
       constants.urls.account.deviceSettings = constants.urls.account.urlBase + "/device/settings"
       constants.urls.account.consent = constants.urls.account.urlBase + "/consent"
 
-      constants.urls.account.anonymous = {}
-      constants.urls.account.anonymous.signingKey = constants.urls.account.urlBase + "/device/anonymous/signing_key"
-      constants.urls.account.anonymous.token = constants.urls.account.urlBase + "/device/anonymous/token"
-      constants.urls.account.anonymous.refreshToken = constants.urls.account.urlBase + "/device/anonymous/refresh"
+      constants.urls.account.anonymousSigningKey = constants.urls.account.urlBase + "/device/anonymous/signing_key"
+      constants.urls.account.anonymousToken = constants.urls.account.urlBase + "/device/anonymous/token"
+      constants.urls.account.anonymousRefreshToken = constants.urls.account.urlBase + "/device/anonymous/refresh"
+
+      ' Moving userDevice urls under account for error standardization as these forward to the user device endpoints
+      constants.urls.account.refreshToken = constants.urls.account.urlBase + "/user_device/login/refresh"
+      constants.urls.account.transferToken = constants.urls.account.urlBase + "/user_device/login/transfer"
+      constants.urls.account.resetPassword = constants.urls.account.urlBase + "/user_device/password/reset"
+      constants.urls.account.logout = constants.urls.account.urlBase + "/user_device/logout"
 
     constants.urls.lishi = {}
       constants.urls.lishi.baseUrl = "https://lishi.production-public.tubi.io"
@@ -696,6 +701,8 @@ Function getConstants()
     constants.urls.nielsenPing = "https://audit.imrworldwide.com/cgi-bin/gn"
 
     constants.urls.rokuContinueWatchingEndpoint = "https://userdata.sr.roku.com/user-data/v1/content/continueWatching"
+
+    constants.urls.clientErrorConfigEndpoint = "https://d0.tubitv.com/error-handler/v2/client-error-config.json"
 
     if constants.settings.stagingApis = true
       constants.urls.foxApiBaseUrl = "https://qa.api.haw.digitalvideoplatform.com"

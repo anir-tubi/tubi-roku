@@ -5,7 +5,7 @@ const fs = require('fs');
 const {fetchJSON} = require('./network');
 const { NoStackError } = require('./utilities');
 
-const localClientErrorConfigUrl = 'https://d0.tubitv.com/error-handler/client-error-config.json';
+const localClientErrorConfigUrl = 'https://d0.tubitv.com/error-handler/v2/client-error-config.json';
 
 const localClientErrorConfigFilePath = 'src/channel/source/localClientErrorConfig.brs';
 

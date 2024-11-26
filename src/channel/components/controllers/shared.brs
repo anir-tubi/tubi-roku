@@ -20,17 +20,28 @@ End Function
 
 Function retrieveClientErrorConfigSuccessCallback(response)
   if response <> invalid
-    m.global.clientErrorConfig = response
+    clientErrorConfig = response
   else
     tubiLog("Received invalid client error config. Falling back to built in version")
-    m.global.clientErrorConfig = getLocalClientErrorConfig()
+    clientErrorConfig = getLocalClientErrorConfig()
   end if
+
+  updateAndConvertClientErrorConfig(clientErrorConfig)
 End Function
 
 
 Function retrieveClientErrorConfigErrorCallback(_response)
   tubiLog("Error retrieving remote client error config. Falling back to built in version")
-  m.global.clientErrorConfig = getLocalClientErrorConfig()
+  clientErrorConfig = getLocalClientErrorConfig()
+  updateAndConvertClientErrorConfig(clientErrorConfig)
+End Function
+
+
+' Standardized spot to convert and update the client error config to make sure everything is in sync and formatted properly
+Function updateAndConvertClientErrorConfig(clientErrorConfig)
+  clientErrorConfig = convertClientErrorConfig(clientErrorConfig)
+  m.updateGeneralTaskClientErrorConfig(clientErrorConfig)
+  m.global.clientErrorConfig = clientErrorConfig
 End Function
 
 
