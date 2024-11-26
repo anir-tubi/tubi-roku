@@ -120,14 +120,16 @@ Function onSignOutModalSelected()
     silenceCallbackWarnings: true
   })
   setSettingsScreenSignInInfo()
+
+  ' Setting focus to spinner before calling logout(), which triggers the home screen to refresh and gain focus.
+  m.spinner.visible = true
+  m.spinner.setFocus(true)
+
   logout(onSignOutCompleted)
 
   m.NodeHelpers.removeAllChildren(m.global.bookmarkIds)
   m.NodeHelpers.removeAllChildren(m.global.historyIds)
   m.NodeHelpers.removeAllChildren(m.global.likeIds)
-
-  m.spinner.visible = true
-  m.spinner.setFocus(true)
 End Function
 
 
