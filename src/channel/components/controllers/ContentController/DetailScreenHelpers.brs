@@ -1632,9 +1632,11 @@ End Function
 Function onRemoveFromHistorySelected(msg)
   tubiLog("DetailScreenHelpers.onRemoveFromHistorySelected")
   if isMajorEventDay() = true
+    ' Since we need to restrict toast width to a max value since this is a one of use case using message instead of header since message automatically wraps as supposed to header 
+    ' which is just one line.
     showToast({
       "selfDestructTimer": 5
-      "headerText": getTranslation("continue_watching_disabled_message")
+      "message": getTranslation("continue_watching_disabled_message")
       "imageUri": "pkg:/images/feature-disabled-icon.webp"
     })
   else
