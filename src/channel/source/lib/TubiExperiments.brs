@@ -52,11 +52,11 @@ Function TubiExperiments(experimentsInfo) as Object
       roku_spotlight_carousel: {
         roku_spotlight_carousel_v1 : {"enabled": false}
       }
-      
+
       roku_player_client_log: {
         roku_player_client_log_v1: {"enabled": false}
       }
-      
+
       ads_tubi_skins: {
         ads_tubi_skin_moana: {"enabled": true}
       }
@@ -136,7 +136,7 @@ End Function
 Function tubiExperiments_parseNamespace(namespace as Object) as Object
   'The API returns a resource JSON object that still needs to be parsed into a JSON object
   if namespace <> invalid AND namespace.resource <> invalid
-    namespace.resource = ParseJson(namespace.resource) 'bs:disable-line 1016 1019 1056
+    namespace.resource = ParseJson(namespace.resource) 'bs:disable-line 1016 1019
   end if
   return namespace    'can return invalid
 End Function

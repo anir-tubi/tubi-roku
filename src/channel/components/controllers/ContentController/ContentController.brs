@@ -3040,6 +3040,13 @@ Function getGuestUserHasAgeInfo()
   if hasAgeStored <> invalid
 
     hasAgeStored = ParseJson(hasAgeStored)
+    if hasAgeStored = invalid
+      hasAgeStored = {
+        hasAge: false
+        expireTime: 0
+      }
+    end if
+
     dateTime = CreateObject("roDateTime")
     nowTime = dateTime.AsSeconds()
 

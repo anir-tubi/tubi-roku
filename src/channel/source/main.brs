@@ -542,7 +542,12 @@ Function handleRegistryOperations(startupArgs)
 
       if startupArgs.setRegistry <> invalid then
         json = startupArgs.setRegistry
+
         sections = parseJson(json)
+        if sections = invalid then
+          sections = {}
+        end if
+
         for each section in sections
           registrySection = createObject("roRegistrySection", section)
           registrySection.writeMulti(sections[section])
@@ -563,6 +568,9 @@ Function addConstantsFromStartupArgs(startupArgs, constants)
   end if
 
   constantsUpdates = ParseJson(startupArgs.constantsUpdates)
+  if constantsUpdates = invalid then
+    constantsUpdates = {}
+  end if
 
   for each keyPath in constantsUpdates
     currentLevel = constants
