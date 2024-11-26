@@ -30,6 +30,9 @@ settings:
   # When set to true will pass a header to enable fail safe testing.
   enableFailSafe: false
 
+  # When set to true will enable the purple carpet container and banner when in qa mode. Used for writing automated tests for purple carpet.
+  enablePurpleCarpetContainerAndBanner: false
+
   # useStarterComponents MUST ALWAYS BE TRUE FOR PRODUCTION
   useStarterComponents: true
   useRemoteComponents: false

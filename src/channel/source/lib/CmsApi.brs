@@ -173,7 +173,7 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
   params["include_sponsorships"] = true
 
   ' TODO: Temporary for testing will be removed.
-  if m.constants.settings.mode = "dev"
+  if m.constants.settings.mode = "dev" OR (m.constants.settings.mode = "qa" AND m.constants.settings.enablePurpleCarpetContainerAndBanner = true) then
     params["include_fox_live_events_banner"] = true
     params["include_fox_live_events"] = true
   end if

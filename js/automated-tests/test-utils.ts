@@ -317,7 +317,7 @@ class TestUtils {
       deeplink['setRegistry'] = JSON.stringify(user.getRegistryAuthValues());
     }
 
-    let constantsUpdates;
+    let constantsUpdates = {};
 
     if (args.language) {
       let locale: string;
@@ -337,22 +337,18 @@ class TestUtils {
     }
 
     if (args.hideStartupModals !== undefined) {
-      if (!constantsUpdates) {
-        constantsUpdates = {};
-      }
-
       constantsUpdates['settings.hideStartupModals'] = args.hideStartupModals;
     }
 
     if (args.noAds !== undefined) {
-      if (!constantsUpdates) {
-        constantsUpdates = {};
-      }
-
       constantsUpdates['settings.noAds'] = args.noAds;
     }
 
-    if (constantsUpdates) {
+    if (args.enablePurpleCarpetContainerAndBanner !== undefined) {
+      constantsUpdates['settings.enablePurpleCarpetContainerAndBanner'] = args.enablePurpleCarpetContainerAndBanner;
+    }
+
+    if (constantsUpdates && Object.keys(constantsUpdates).length > 0) {
       deeplink['constantsUpdates'] = JSON.stringify(constantsUpdates);
     }
 
@@ -2346,6 +2342,9 @@ type StartApplicationArgs = {
 
   /** No ads are shown unless set to false */
   noAds?: boolean;
+
+  /* When set to true will enable the purple carpet container and banner. */
+  enablePurpleCarpetContainerAndBanner?: boolean;
 }
 
 
