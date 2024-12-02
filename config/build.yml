@@ -19,5 +19,5 @@ one_trust_library_manifest:
   build_version: 0
 fox_video_player_library_manifest:
   major_version: 1
-  minor_version: 23
-  build_version: 1
+  minor_version: 24
+  build_version: 0
