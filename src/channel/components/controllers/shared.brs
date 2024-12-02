@@ -75,6 +75,10 @@ Function sendRequestForExperiments()
   TubiLog("sendRequestForExperiments")
   constants = m.constants
 
+  if m.constants.settings.mode = "qa" AND m.constants.settings.disableExperiments = true then
+    m.global.experimentsInfo = {}
+  end if
+
   ' Check if we already got our experiments
   if getExperimentsInfoFromGlobal() <> invalid OR isMajorEventDay() = true then
     m.isExperimentsConfigReady = true
