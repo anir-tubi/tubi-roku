@@ -197,3 +197,32 @@ Function tubiLogger_sendLogging_test()
   m.assertTrue(requestQueue.queue.count() > 0)
   requestQueue.queue = []  'reset for next tests
 End Function
+
+
+'@Test isLoggingAllowed unit tests
+Function tubiLogger_isLoggingAllowed_test()
+  log = m.log
+  constants = m.constants
+  constants.configHubFallbacks.majorEventStart = invalid
+  constants.configHubFallbacks.majorEventEnd = invalid
+
+  constants.settings.clientLogsEnabled = true
+  isLoggingAllowed = log.isLoggingAllowed()
+  m.assertTrue(isLoggingAllowed)
+
+  constants.settings.clientLogsEnabled = false
+  isLoggingAllowed = log.isLoggingAllowed()
+  m.assertFalse(isLoggingAllowed)
+
+  constants.settings.clientLogsEnabled = "abc"
+  isLoggingAllowed = log.isLoggingAllowed()
+  m.assertFalse(isLoggingAllowed)
+
+  constants.settings.clientLogsEnabled = 123
+  isLoggingAllowed = log.isLoggingAllowed()
+  m.assertFalse(isLoggingAllowed)
+
+  constants.settings.clientLogsEnabled = invalid
+  isLoggingAllowed = log.isLoggingAllowed()
+  m.assertFalse(isLoggingAllowed)
+End Function

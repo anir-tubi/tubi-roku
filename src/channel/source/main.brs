@@ -2,6 +2,7 @@
 Function Main(startupArgs)
   m.appStartTime = UpTime(0)
   m.startupArgs = startupArgs
+
   ' The name of the component library lib provided by our remote component library. Will be updated by Starter Component Library
   m.remoteComponentLibProvided = "TubiRemoteLibrary"
   handleRegistryOperations(startupArgs)

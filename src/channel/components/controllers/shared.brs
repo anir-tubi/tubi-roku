@@ -202,6 +202,12 @@ Function updateConstantsValuesFromExternalConfig(config)
       m.constants.settings.playerLogEnabled = playerLogEnabled
     end if
 
+    'Client log disabled by the remote config
+    clientLogsEnabled = config.client_log_enabled
+    if clientLogsEnabled = false
+      m.constants.settings.clientLogsEnabled = clientLogsEnabled
+    end if
+
     ' Since we're modifying constants here we need to push up the changes to the global copy
     m.global.constants = m.constants
     m.updateGeneralTaskConstants(m.constants)
@@ -252,10 +258,9 @@ Function logout(callback = invalid)
 End Function
 
 
+' @returns: boolean, true if the current time is during a major event, false if not
 Function isMajorEventDay()
   majorEventStart = getExternalConfigValueFromGlobal("major_event_failsafe_start", m.constants.configHubFallbacks.majorEventStart)
   majorEventEnd = getExternalConfigValueFromGlobal("major_event_failsafe_end", m.constants.configHubFallbacks.majorEventEnd)
-  isMajorEventDay = isNowWithinTimePeriod(majorEventStart, majorEventEnd)
-
-  return isMajorEventDay
+  return isNowWithinTimePeriod(majorEventStart, majorEventEnd)
 End Function

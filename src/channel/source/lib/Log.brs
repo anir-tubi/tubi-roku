@@ -65,6 +65,12 @@ Function TubiLogger(constants, request, auth, sentry = invalid)
     getLoggingRequest: tubiLog_getLoggingRequest_
     sendSentryLogging: tubiLog_sendSentryLogging_
     getLogPrintout: tubiLog_getLogPrintout_
+    isLoggingAllowed: tubiLog_isLoggingAllowed
+    isSampled: tubiLog_isSampled
+
+    ' private methods to delete after purple carpet event
+    isNowWithinTimePeriod: tubiLog_isNowWithinTimePeriod
+    isIso8601String: tubiLog_isIso8601String
   }
 End Function
 
@@ -78,7 +84,7 @@ End Function
 Function tubiLog_debug(message = "" as String, serverTypeName = "" as String, subtype = "" as String, queue = invalid as Object, samplePercent = 1.0 as Float)
   logInfo = m.buildLogInfo(message, m.logConsts.debug.serverType[serverTypeName], subtype, m.logConsts.debug.name)
   m.printLogInfo(logInfo.level, logInfo.subtype, logInfo.message)
-  if isSampled(samplePercent) = true
+  if m.isLoggingAllowed() = true AND m.isSampled(samplePercent) = true
     m.sendLogging(logInfo, queue)
   end if
 End Function
@@ -87,7 +93,7 @@ End Function
 Function tubiLog_info(message = "" as String, serverTypeName = "" as String, subtype = "" as String, queue = invalid as Object, samplePercent = 1.0 as Float)
   logInfo = m.buildLogInfo(message, m.logConsts.info.serverType[serverTypeName], subtype, m.logConsts.info.name)
   m.printLogInfo(logInfo.level, logInfo.subtype, logInfo.message)
-  if isSampled(samplePercent) = true
+  if m.isLoggingAllowed() = true AND m.isSampled(samplePercent) = true
     m.sendLogging(logInfo, queue)
   end if
 End Function
@@ -96,7 +102,7 @@ End Function
 Function tubiLog_error(message = "" as String, serverTypeName = "" as String, subtype = "" as String, queue = invalid as Object, samplePercent = 1.0 as Float)
   logInfo = m.buildLogInfo(message, m.logConsts.error.serverType[serverTypeName], subtype, m.logConsts.error.name)
   m.printLogInfo(logInfo.level, logInfo.subtype, logInfo.message)
-  if isSampled(samplePercent) = true
+  if m.isLoggingAllowed() = true AND m.isSampled(samplePercent) = true
     m.sendLogging(logInfo, queue)
   end if
 End Function
@@ -105,7 +111,7 @@ End Function
 Function tubiLog_warn(message = "" as String, serverTypeName = "" as String, subtype = "" as String, queue = invalid as Object, samplePercent = 1.0 as Float)
   logInfo = m.buildLogInfo(message, m.logConsts.warn.serverType[serverTypeName], subtype, m.logConsts.warn.name)
   m.printLogInfo(logInfo.level, logInfo.subtype, logInfo.message)
-  if isSampled(samplePercent) = true
+  if m.isLoggingAllowed() = true AND m.isSampled(samplePercent) = true
     m.sendLogging(logInfo, queue)
   end if
 End Function
@@ -118,7 +124,7 @@ End Function
 Function tubiLog_exception(message = "" as Dynamic, level = "exception" as String, queue = invalid as Object, samplePercent = 1.0 as Float) as void
   m.printLogInfo(level, "", message)
 
-  if isSampled(samplePercent) = true AND m.sentry <> invalid
+  if m.isSampled(samplePercent) = true AND m.sentry <> invalid
     tubiToSentry = {}
     tubiToSentry[m.logConsts.error.name] = "error"
     tubiToSentry[m.logConsts.warn.name] = "warning"
@@ -131,10 +137,13 @@ End Function
 ' isSampled function invokes Rnd(0) to find the random number between given range, based on this the logs will be sent to server
 ' @samplePercent: float (optional), possible values are between 0 and 1. default is 1.0
 ' returns boolean
-Function isSampled(samplePercent)
+Function tubiLog_isSampled(samplePercent)
   ' send only sample percent logs to sentry sdk
   canLog = false
-  if samplePercent = 1
+
+  if m.constants.settings.useLogSampling = false AND m.constants.settings.mode <> "production"
+    canLog = true
+  else if samplePercent = 1
     canLog = true
   else if samplePercent > 0
     fRandom = Rnd(0)
@@ -142,7 +151,29 @@ Function isSampled(samplePercent)
       canLog = true
     end if
   end if
+
   return canLog
+End Function
+
+
+' returns true if config hub says we can send logs AND is not a major event day
+Function tubiLog_isLoggingAllowed()
+  if m.constants <> invalid AND m.constants.settings <> invalid
+    clientLogsEnabled = m.constants.settings.clientLogsEnabled
+    logsEnableType = type(clientLogsEnabled)
+
+    if (logsEnableType = "Boolean" OR logsEnableType = "roBoolean") AND clientLogsEnabled = true
+
+      ' remove isMajorEventDay logic after purple carpet event
+      isMajorEventDay = m.isNowWithinTimePeriod(m.constants.configHubFallbacks.majorEventStart, m.constants.configHubFallbacks.majorEventEnd)
+
+      if isMajorEventDay = false
+        return true
+      end if
+    end if
+  end if
+
+  return false
 End Function
 
 
@@ -384,3 +415,163 @@ End Function
 Function tubiLog(message = "" as Dynamic, level = "debug" as String, serverTypeName = "" as String, subtype = "" as String, samplePercent = 1.0 as Float) as Void
   tubiLog_helper("log", message, level, serverTypeName, subtype, samplePercent)
 End Function
+
+
+' Delete these time based functions that exist in TimeUtils.brs after the purple carpet event is over
+' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+' Determines if the current time is within the passed in startTime and endTime, inclusive.
+' IMPORTANT: The ISO-8601 strings of the params must match the formats documented at
+' https://developer.roku.com/en-gb/docs/references/brightscript/interfaces/ifdatetime.md#fromiso8601stringdatestring-as-string-as-void
+'
+' @startTime: string, an ISO-8601 string representing the earliest time in the period, UTC time
+' @endTime: string, an ISO-8601 string representing the latest time in the period, UTC time
+Function tubiLog_isNowWithinTimePeriod(startTime, endTime)
+  if m.isIso8601String(startTime) = true AND m.isIso8601String(endTime) = true
+    dateTime = CreateObject("roDateTime")
+    nowSeconds = dateTime.AsSeconds()
+
+    dateTime.FromISO8601String(startTime)
+    startSeconds = dateTime.AsSeconds()
+
+    dateTime.FromISO8601String(endTime)
+    endSeconds = dateTime.AsSeconds()
+
+    if startSeconds <= nowSeconds AND endSeconds >= nowSeconds
+      return true
+    end if
+  end if
+
+  return false
+End Function
+
+
+' @strToCheck: string, hopefully an ISO-861 formatted string as recognized by Roku
+'                      ie. in the format "2009-01-01 01:00:00.000" or "2009-01-01T01:00:00.000"
+Function tubiLog_isIso8601String(strToCheck)
+  ' check we have a string
+  typeStrToCheck = type(strToCheck)
+  if typeStrToCheck <> "roString" AND typeStrToCheck <> "String"
+    return false
+  end if
+
+  ' Since Z indicates UTC, allowing Z at the end.
+  ' Removing it from the end if present so that integer validation at line number 245 does not fail.
+  if strToCheck.EndsWith("Z") = true
+    strLen = strToCheck.len()
+    strToCheck = strToCheck.left(strLen - 1)
+  end if
+
+  ' check we have the date and time parts
+  dateTimeParts = strToCheck.split(" ")
+  if dateTimeParts.count() <> 2
+    dateTimeParts = strToCheck.split("T")
+    if dateTimeParts.count() <> 2
+      return false
+    end if
+  end if
+
+  ' check the date part is formatted correctly
+  date = dateTimeParts[0]
+  dateParts = date.split("-")
+  if dateParts.count() <> 3
+    return false
+  end if
+
+  year = dateParts[0]
+  month = dateParts[1]
+  day = dateParts[2]
+
+  if year.len() <> 4 OR month.len() <> 2 OR day.len() <> 2
+    return false
+  end if
+
+  ' check that only digits were used. toInt() returns 0 if the string contains letters
+  yearChars = year.split("")
+  monthChars = month.split("")
+  dayChars = day.split("")
+  allDateChars = []
+  allDateChars.append(yearChars)
+  allDateChars.append(monthChars)
+  allDateChars.append(dayChars)
+  for each char in allDateChars
+    asciiVal = Asc(char)
+    if asciiVal < 48 OR asciiVal > 57
+      return false
+    end if
+  end for
+
+  if month.toInt() < 1 OR month.toInt() > 12
+    return false
+  end if
+
+  if day.toInt() < 1 OR day.toInt() > 31
+    return false
+  end if
+
+  ' check the time part is formatted correctly
+  time = dateTimeParts[1]
+  timeParts = time.split(":")
+  if timeParts.count() <> 3
+    return false
+  end if
+
+  hours = timeParts[0]
+  minutes = timeParts[1]
+  seconds = timeParts[2]
+
+  hoursChars = hours.split("")
+  minutesChars = minutes.split("")
+  allTimeChars = []
+  allTimeChars.append(hoursChars)
+  allTimeChars.append(minutesChars)
+
+  if hours.len() <> 2 OR minutes.len() <> 2
+    return false
+  end if
+
+  if hours.toInt() < 0 OR hours.toInt() > 24
+    return false
+  end if
+
+  if minutes.toInt() < 0 OR minutes.toInt() > 59
+    return false
+  end if
+
+  ' check the seconds and milliseconds are formatted correctly
+  secsAndMillis = seconds.split(".")
+  if secsAndMillis.count() < 1 OR secsAndMillis.count() > 2
+    return false
+  end if
+
+  secs = secsAndMillis[0]
+  if secs.len() <> 2
+    return false
+  end if
+
+  if secs.toInt() < 0 OR secs.toInt() > 59
+    return false
+  end if
+
+  secondsChars = secs.split("")
+  allTimeChars.append(secondsChars)
+
+  if secsAndMillis.count() = 2
+    milliseconds = secsAndMillis[1]
+    millisecondsChars = milliseconds.split("")
+    allTimeChars.append(millisecondsChars)
+  end if
+
+  ' check that only digits were used. toInt() returns 0 if the string contains letters
+  for each char in allTimeChars
+    asciiVal = Asc(char)
+    if asciiVal < 48 OR asciiVal > 57
+      return false
+    end if
+  end for
+
+  return true
+End Function
+' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>

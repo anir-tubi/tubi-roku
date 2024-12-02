@@ -48,6 +48,12 @@ settings:
   # Setting the below value to true will enable player log tracking.
   playerLogEnabled: false
 
+  # Setting the below value to false will disable sending logs to client logs.
+  clientLogsEnabled: true
+
+  # Setting useLogSampling to false will send all client logs regardless of the sampling percentage to tubiLog().
+  useLogSampling: true
+
   # Setting the below value to true will turn off hdmi status checks to avoid issues with automated tests on Roku devices not hooked up to a display
   disableHdmiStatusChecks: false
 
