@@ -2026,7 +2026,7 @@ Function getTranslation_en_US()
     },
     "continue_watching_disabled_message": {
       "description": "Continue watching disabled toast message",
-      "message": "Continue watching is currently unavailable."
+      "message": "Continue Watching is currently unavailable."
     }
   }
 End Function

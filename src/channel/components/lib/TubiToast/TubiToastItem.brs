@@ -57,12 +57,8 @@ Function onShow(_msg)
   if inputArgs.headerText <> invalid AND inputArgs.headerText <> ""
     createHeaderText(inputArgs)
     headerWidth = m.header.boundingRect().width
-
-    if headerWidth + imageWidth >= 546
-      m.header.width = 546 - imageWidth
-    else
-      m.header.width = headerWidth
-    end if
+    ' Since header we are not allowing multiple lines allowing header text to be completely displayed without ellipsis.
+    m.header.width = headerWidth
   else if m.header <> invalid
     m.header.text = ""
     m.infoPaneMsgArea.removeChild(m.header)
@@ -94,7 +90,11 @@ Function onShow(_msg)
     m.infoPaneBg.blendColor = inputArgs.backGroundColor
   end if
 
-  if (msgWidth + imageWidth >= 546) OR (headerWidth + imageWidth >= 546)
+  ' TODO: Re-visit in future if we can remove all the calculations and make it dynamic with max width set for message element.
+  if headerWidth + imageWidth >= 546
+    componentWidth = m.top.boundingRect().width
+    m.infoPaneBg.width = componentWidth + 36
+  else if msgWidth + imageWidth >= 546
     m.infoPaneBg.width = 642
   else if (msgWidth + imageWidth < 345) AND (headerWidth +  imageWidth < 345)
     m.infoPaneBg.width = 441
@@ -167,11 +167,11 @@ Function createHeaderText(inputArgs)
     if theme <> invalid
       m.header.color = theme.primaryTextColor
     end if
-    m.header.maxLines = "1"
-    m.header.numLines = "1"
-    m.header.width = "0"
+    m.header.maxLines = 1
+    m.header.numLines = 1
+    m.header.width = 0
     m.header.text = inputArgs.headerText
-    m.header.wrap="false"
+    m.header.wrap = false
     font = CreateObject("roSGNode", "Font")
     m.header.font = font
     m.infoPaneMsgArea.insertChild(m.header, 0)

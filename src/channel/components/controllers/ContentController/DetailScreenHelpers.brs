@@ -1636,7 +1636,7 @@ Function onRemoveFromHistorySelected(msg)
     ' which is just one line.
     showToast({
       "selfDestructTimer": 5
-      "message": getTranslation("continue_watching_disabled_message")
+      "headerText": getTranslation("continue_watching_disabled_message")
       "imageUri": "pkg:/images/feature-disabled-icon.webp"
     })
   else
