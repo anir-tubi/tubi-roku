@@ -659,6 +659,9 @@ Function onFoxVideoPlayerIsPlayerClosed()
 
     popScreen(true, false)
   end for
+
+  ' Given that the playback can be initiated from the trending searches container on the search screen, we need to ensure that when all screens are closed and the home screen is displayed, the focus is reset to the 'Home' option in the side navigation.
+  focusSideNavOption(m.constants.ui.sideNavIds.home)
 End Function
 
 
