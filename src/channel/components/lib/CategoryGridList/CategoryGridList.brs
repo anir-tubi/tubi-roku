@@ -758,7 +758,7 @@ Function onSkinAdRowItemFocused(msg)
   content = m.top.skinAdContent
 
   'fire exposure event when skinAd row gains focus
-  getExperimentResource("ads_tubi_skins", "ads_tubi_skin_moana", true)
+  getExperimentResource("ads_tubi_skins", "ads_tubi_skin_mufasa", true)
 
   if content <> invalid    
     category = content.getChild(rowItemFocused[0])

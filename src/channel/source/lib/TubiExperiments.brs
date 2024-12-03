@@ -58,7 +58,7 @@ Function TubiExperiments(experimentsInfo) as Object
       }
 
       ads_tubi_skins: {
-        ads_tubi_skin_moana: {"enabled": true}
+        ads_tubi_skin_mufasa: {"enabled": true}
       }
 
       roku_multiple_video_preview_nav: {
