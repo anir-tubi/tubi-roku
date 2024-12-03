@@ -70,6 +70,11 @@ Function onRowItemSelectedChange(msg)
       if itemSelected <> invalid
         fullContent = m.metadataTranslate.getContentFromCategoryJson(container, itemSelected.id, m.top.signedIn)
         if fullContent <> invalid
+          ' Since air datetime should be used from listing and not from tensor updating the content node.
+          fullContent.update({
+            airDateTime: itemSelected.airDateTime
+            foxContentId: itemSelected.foxContentId
+          }, true)
           m.top.itemSelected = fullContent
         end if
       end if
