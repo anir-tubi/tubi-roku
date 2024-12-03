@@ -172,5 +172,8 @@ Function onTimerShouldRun(msg)
   timerShouldRun = msg.getData()
   if timerShouldRun = true
     m.timer.control = "start"
+
+    ' Updating the UI along with starting of the timer.
+    updateUI()
   end if
 End Function
