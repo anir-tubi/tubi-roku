@@ -549,6 +549,12 @@ Function hideNavMenu(shouldTrackComponentInteraction = true)
       end if
 
     end if
+
+    ' Below logic is to handle the case where certain side nav items are disabled and user tries to navigate to them.
+    ' We show a toast message to user that the feature is disabled. We need to reset the selected item indicator in the side nav to the current screen.
+    currentScreen = getCurrentScreen()
+    currentScreenSideNavId = getSideNavIdAssociatedWithScreen(currentScreen)
+    focusSideNavOption(currentScreenSideNavId)
   end if
 End Function
 
