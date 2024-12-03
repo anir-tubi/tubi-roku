@@ -7,6 +7,8 @@ Function init()
   m.detailsPurpleCarpetRow = topRef.findNode("detailsPurpleCarpetRow")
   m.detailsPurpleCarpetRow.translation = [constants.ui.translations.marginX, 516]
 
+  m.leftChevron = topRef.findNode("leftChevron")
+
   topRef.observeFieldScoped("focusedChild", "onScreenFocusChange")
   topRef.observeFieldScoped("content", "onContentChange")
   m.detailsPurpleCarpetRow.observeFieldScoped("ctaListItemSelected", "onEventCtaListItemSelectedChange")
@@ -57,6 +59,10 @@ Function onContentChange(msg)
       m.detailsPurpleCarpetRow.contentUpdated = true
     end if
   end if
+
+  if m.top.inDisasterMode = true
+    m.leftChevron.visible = false
+  end if
 End Function
 
 
@@ -84,8 +90,11 @@ End Function
 
 
 Function onKeyEvent(key As String, press As Boolean) as Boolean
-  if press = true AND key = "left" then
+  if press = true AND key = "left" AND m.top.inDisasterMode = false
     m.top.backButtonPressed = true
+  else if press = true AND key = "back" AND m.top.inDisasterMode = true
+    m.top.backButtonPressed = true
+    return true
   end if
 
   return false

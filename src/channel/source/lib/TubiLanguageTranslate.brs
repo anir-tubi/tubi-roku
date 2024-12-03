@@ -2027,6 +2027,14 @@ Function getTranslation_en_US()
     "continue_watching_disabled_message": {
       "description": "Continue watching disabled toast message",
       "message": "Continue Watching is currently unavailable."
+    },
+    "disaster_mode_toast_heading": {
+      "description": "Heading of the toast that is shown on disaster mode UI.",
+      "message": "We're having trouble connecting"
+    },
+    "disaster_mode_toast_subheading": {
+      "description": "Subheading of the toast that is shown on disaster mode UI.",
+      "message": "You can still watch the game!"
     }
   }
 End Function

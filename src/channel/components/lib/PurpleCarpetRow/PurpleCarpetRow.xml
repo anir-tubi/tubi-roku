@@ -42,6 +42,8 @@
       <!-- Holds true/false based on if container is visible or hidden. -->
       <field id="isContainerVisible" type="boolean" alias="infoPanel.isContainerVisible" />
 
+      <field id="inDisasterMode" type="boolean" />
+
     <!-- OUTPUT -->
       <!-- Content node used for populating the info panel. -->
       <field id="primaryEventContent" type="node" />

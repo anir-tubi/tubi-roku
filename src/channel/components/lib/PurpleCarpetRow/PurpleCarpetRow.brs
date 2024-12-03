@@ -214,6 +214,15 @@ Function populateCtaButtonList()
       })
     end if
 
+    if m.top.inDisasterMode = true
+      menuItems.push({
+        id: "goHome"
+        subType: "DetailMenuItemContentNode"
+        title: getTranslation("menu_goHome")
+        isPrimaryButton: true
+      })
+    end if
+
     content = CreateObject("roSGNode", "ContentNode")
     content.update({
       children: menuItems

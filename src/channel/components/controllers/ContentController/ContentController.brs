@@ -745,6 +745,8 @@ Function runControllerStartSequence()
       m.ageVerificationComplete = true
       runControllerStartSequence()
     end if
+  else if isMajorEventDay() = true AND getExternalConfigValueFromGlobal("disaster_mode_enabled", false) = true
+    showDisasterModeUI()
   else
     ' All of the above checked values are true, so we are ready to start the channel UI
 
@@ -2172,6 +2174,9 @@ Function onCustomResume(msg)
           end if
         else if currentScreen <> invalid
           if currentScreen.instantResumeAction = m.constants.instantResumeActions.restartApp
+            bRestartApp = true
+          else if currentScreen.id = m.constants.ui.screenIds.eventDetailScreen AND currentScreen.inDisasterMode = true
+            ' Force restarting the application in case user was in disaster mode when he pressed home.
             bRestartApp = true
           else if currentScreen.instantResumeAction = m.constants.instantResumeActions.startChannel
             'calling startChannel() instead of restartChannel() since restartChannel() can land a user on the ICTS screen, but we only want users to land on the home screen

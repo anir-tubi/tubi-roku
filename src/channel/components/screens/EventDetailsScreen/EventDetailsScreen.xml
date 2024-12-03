@@ -21,6 +21,8 @@
 
       <field id="contentIsReady" type="boolean" alias="detailsPurpleCarpetRow.visible" />
 
+      <field id="inDisasterMode" type="boolean" alias="detailsPurpleCarpetRow.inDisasterMode" />
+
     <!-- OUTPUTS -->
       <field id="eventCtaListItemSelected" alias="detailsPurpleCarpetRow.ctaListItemSelected" alwaysNotify="true" />
 

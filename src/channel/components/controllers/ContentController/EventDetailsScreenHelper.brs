@@ -175,3 +175,78 @@ Function isPurpleCarpetContainerEmpty(purpleCarpetContent)
 
   return true
 End Function
+
+
+Function showDisasterModeUI()
+  screen = CreateObject("roSGNode", "EventDetailsScreen")
+  screen.id = m.constants.ui.screenIds.eventDetailScreen
+  screen.observeFieldScoped("backgroundUriList", "onEventDetailsBackgroundChange")
+  screen.observeFieldScoped("eventCtaListItemSelected", "onEventCtaListItemSelected")
+  screen.inDisasterMode = true
+
+  authInfo = m.tubiAuthUpdate.getAuthInfo()
+  screen.signedIn = isLoggedInUser(authInfo)
+
+  m.makeRequest({
+    url: m.constants.urls.foxListingEndpoint
+    requestType: m.constants.reqNames.genericWithResponseContext
+    successCallback: renderEventDetailsUIFromListingInfo
+    responseType: "assocarray"
+    silenceCallbackWarnings: true
+    retries: 0
+  })
+
+  pushScreen(screen)
+End Function
+
+
+Function renderEventDetailsUIFromListingInfo(response)
+  nowPlayingListing = invalid
+  mainEventListing = invalid
+  for each item in response.data
+    if item.asset <> invalid AND item.asset.listing <> invalid then
+      listing = item.asset.listing
+
+      ' Check to see if this item is currently live.
+      ' Selecting english version of the game.
+      if listing.network <> "foxdep" AND isNowWithinTimePeriod(listing.startDate, listing.endDate) = true then
+        nowPlayingListing = item.asset
+      end if
+
+      if listing.main_event <> invalid AND listing.main_event = true
+        mainEventListing = item.asset
+      end if
+    end if
+  end for
+
+  if mainEventListing <> invalid AND mainEventListing.images <> invalid
+    eventContentNode = CreateObject("roSGNode", "ContentNode")
+    eventContentNode.update({
+      id: nowPlayingListing.listing.tubi_id
+      foxContentId: nowPlayingListing.listing.id
+      title: mainEventListing.headline
+      description: mainEventListing.description
+      hdGridPosterUrl: mainEventListing.images["dcg-mark-poster"]
+      backgrounds: [mainEventListing.images.seriesDetail]
+      titleImage: mainEventListing.images.logoCenter
+      genres: mainEventListing.genres
+      airDateTime: nowPlayingListing.listing.startDate
+      hasSubtitles: true
+      needsLogin: false
+      playerType: "fox"
+    }, true)
+    container = CreateObject("roSGNode", "ContentNode")
+    container.update({
+      children: [eventContentNode]
+    }, true)
+    showContentGroupAndHideSpinner()
+    updateEventDetailsPurpleCarpetContent(container, m.constants.ui.screenIds.eventDetailScreen)
+
+    showToast({
+      "selfDestructTimer": 5
+      "headerText": getTranslation("disaster_mode_toast_heading")
+      "message": getTranslation("disaster_mode_toast_subheading")
+      "imageUri": "pkg:/images/feature-disabled-icon.webp"
+    })
+  end if
+End Function

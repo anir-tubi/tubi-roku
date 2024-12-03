@@ -650,18 +650,22 @@ Function onFoxVideoPlayerIsPlayerClosed()
 
   m.foxPlayerCurrentInputContent = invalid
 
-  ' We want to remove all screens from the stack until we get to the homescreen. If we do not find the homescreen in the stack then we empty the stack and startChannel() will be called
-  for i=0 to getScreenStackSize() - 1
-    screen = getCurrentScreen()
-    if screen <> invalid AND screen.id = m.constants.ui.screenIds.homeScreen
-      exit for
-    end if
-
+  if isMajorEventDay() = true AND getExternalConfigValueFromGlobal("disaster_mode_enabled", false) = true
     popScreen(true, false)
-  end for
+  else
+    ' We want to remove all screens from the stack until we get to the homescreen. If we do not find the homescreen in the stack then we empty the stack and startChannel() will be called
+    for i=0 to getScreenStackSize() - 1
+      screen = getCurrentScreen()
+      if screen <> invalid AND screen.id = m.constants.ui.screenIds.homeScreen
+        exit for
+      end if
 
-  ' Given that the playback can be initiated from the trending searches container on the search screen, we need to ensure that when all screens are closed and the home screen is displayed, the focus is reset to the 'Home' option in the side navigation.
-  focusSideNavOption(m.constants.ui.sideNavIds.home)
+      popScreen(true, false)
+    end for
+
+    ' Given that the playback can be initiated from the trending searches container on the search screen, we need to ensure that when all screens are closed and the home screen is displayed, the focus is reset to the 'Home' option in the side navigation.
+    focusSideNavOption(m.constants.ui.sideNavIds.home)
+  end if
 End Function
 
 

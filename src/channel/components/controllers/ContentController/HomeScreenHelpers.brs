@@ -1259,6 +1259,8 @@ Function onEventCtaListItemSelected(msg)
       })
 
       m.wasUserShownPurpleCarpetAvailableAtToast = true
+    else if id = "goHome"
+      restartApp()
     end if
   end if
 End Function
