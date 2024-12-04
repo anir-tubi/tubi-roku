@@ -19,7 +19,7 @@ Function init()
   m.rowList.observeFieldScoped("currFocusColumn", "onRowItemFocused")
   topRef.observeFieldScoped("contentUpdated", "onContentChange")
   topRef.observeField("focusedChild", "onComponentFocusChange")
-  topRef.observeFieldScoped("signedIn", "populateCtaButtonList")
+  topRef.observeFieldScoped("signedIn", "onSignedInChange")
   topRef.observeFieldScoped("didUserSetReminderForEventContent", "onDidSetReminderForEventContentChange")
 
   experimentsInfo = getExperimentsInfoFromGlobal()
@@ -292,6 +292,28 @@ Function onCtaButtonListRefreshTimerFired(msg)
   ' Refreshing the info panel so that the live badge appears and the countdown timer is removed.
   isContentDetailsView = (m.top.isContentDetailsView = true)
   populateInfoPanelWithPurpleCarpetMode(m.top.primaryEventContent, m.infoPanel, isContentDetailsView)
+End Function
+
+
+Function onSignedInChange(msg)
+  signedIn = msg.getData()
+  populateCtaButtonList()
+
+  ' Since we do not refresh the event details screen when user signs in we need to remove the lock icon.
+  ' So we are updating the needsLogin field.
+  if signedIn = true
+    content = m.rowList.content
+    if content <> invalid
+      category = content.getChild(0)
+  
+      if category <> invalid
+        for i = 0 to category.getChildCount() - 1
+          item = category.getChild(i)
+          item.needsLogin = false
+        end for
+      end if
+    end if
+  end if
 End Function
 
 
