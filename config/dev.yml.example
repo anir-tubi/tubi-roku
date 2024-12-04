@@ -16,7 +16,6 @@ settings:
   mode: "dev"
   starterComponentsUrl: "http://{{localHostUri}}/tubi_starter_components_{{versionMinorUnderscored}}.{{fileType}}"
   remoteComponentsUrl: "http://{{localHostUri}}/tubi_remote_components_{{versionUnderscored}}.{{fileType}}"
-  foxVideoPlayerComponentsUrl: "https://rcdn-staging.tubitv.com/appFiles/fox-video-player-components/fox_video_player_{{foxVideoPlayerVersionUnderscored}}.pkg"
   # remoteComponentsExtension will fill in the {{fileType}} template value.
   remoteComponentsExtension: "zip"
 

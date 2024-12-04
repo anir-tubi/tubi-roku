@@ -200,6 +200,12 @@ function buildInstalled() {
 
   return build
     .then(() => {
+      // TODO remove after fox video player is removed
+      const foxBuildTag = getFoxVideoPlayerBuildTag(options);
+      const foxVideoPlayerPkgName = `fox_video_player_${foxBuildTag}.pkg`;
+
+      fs.mkdirSync('build/local/fox-video-player-components/');
+      fs.copyFileSync(`fox-video-player-components/${foxVideoPlayerPkgName}`, `build/local/fox-video-player-components/${foxVideoPlayerPkgName}`);
       replaceColorConstants('build/local');
       replaceTypographyConstants('build/local');
       createSettings(options, 'build/local/source/Settings.brs');
@@ -712,6 +718,7 @@ function sideLoad(done) {
   const { server, serverClose } = require('gulp-connect');
   const address = options.target;
   const buildTag = getBuildTag('revision');
+  console.log('buildTag', buildTag);
   const zipPath = `build/tubi_${buildTag}.zip`;
   return upload(zipPath)
   .then(() => {
