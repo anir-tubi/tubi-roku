@@ -34,7 +34,7 @@
       <field id="skinAdContent" alias="CategoryGridList.skinAdContent" />
 
       <!-- The helper class will call this when the new content is ready to be displayed on the screen. -->
-      <field id="contentUpdated" alias="CategoryGridList.contentUpdated" />
+      <field id="contentUpdated" alwaysNotify="true" alias="CategoryGridList.contentUpdated" />
 
       <!-- The helper will set this when the new spotlight content is ready to be displayed on the screen. -->
       <field id="spotlightContentUpdated" alias="CategoryGridList.spotlightContentUpdated" />
@@ -88,6 +88,9 @@
 
       <!-- kidsModeFeatureOn will be set based device countryCode -->
       <field id="kidsModeFeatureOn" type="boolean" />
+
+      <!--Is KidsMode On-->
+      <field id="kidsMode" type="boolean" />
 
       <!-- incoming metadata from GeneralTask
            type is node, so that it takes less time to send data from one file to another file when comparing to assocarray

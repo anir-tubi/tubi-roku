@@ -53,6 +53,10 @@ Function init()
   m.purpleCarpetRow.observeFieldScoped("primaryEventContent", "onReloadedItemToBeFocused")
   
   
+  m.originalTranslationSpotlightRow = m.spotlightRow.translation
+  m.originalTranslationPurpleCarpetRow = m.purpleCarpetRow.translation
+  m.originalTranslationSkinAdRow = m.skinAdRow.translation
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
@@ -124,7 +128,7 @@ Function onComponentFocusChange()
 
   ' If top has focus then we need to focus the RowList itself
   if m.top.hasFocus() = true then
-    if m.top.skinAdContent <> invalid AND m.top.skinAdContent.getChildCount() > 0 AND (m.lastFocusedList = "skinAdRow" OR m.lastFocusedList = "")
+    if (isSkinAdsAvailable() = true) AND (m.lastFocusedList = "skinAdRow" OR m.lastFocusedList = "")
       m.lastFocusedList = "skinAdRow"
       m.purpleCarpetRow.opacity = 0
       m.skinAdRow.opacity = 1
@@ -190,6 +194,43 @@ End Function
 
 Function onContentChange()
   tubiLog("CategoryGridList.onContentChange")
+
+  bSetRowListFocus = false
+  '//RESET position of 1st-row elements
+  m.skinAdRow.translation = m.originalTranslationSkinAdRow
+  m.spotlightRow.translation = m.originalTranslationSpotlightRow
+  m.purpleCarpetRow.translation = m.originalTranslationPurpleCarpetRow
+  
+  ' set the translation position of the page based on presense or absence of any 1st rows. 
+  ' DO this BEFORE setting the content of the rowList (later in this function) or else the translation will not be properly set.
+  if ((m.top.spotlightContent <> invalid AND m.top.spotlightContent.getChildCount() > 0) OR isPurpleCarpetContainerEmpty() = false OR isSkinAdsAvailable() = true)
+    m.rowList.translation = [0, 384]
+
+    if isSkinAdsAvailable() = true
+      m.skinAdRow.opacity = 1
+      m.lastFocusedList = "skinAdRow"
+      category = m.top.skinAdContent.getChild(0)
+      if category <> invalid
+        content = category.getChild(0)
+        m.top.reloadedItemToBeFocused = content
+      end if
+    else if isPurpleCarpetContainerEmpty() = false
+      m.lastFocusedList = "purpleCarpetRow"
+      slideFade(m.purpleCarpetRow, "below", "in", 0.3)
+      m.top.reloadedItemToBeFocused = m.top.primaryEventContent
+    else 
+      m.lastFocusedList = "spotlightRow"
+    end if
+  else    
+    ' Resetting the state of the UI.
+    ' Below logic will be used in case of there is no purple carpet or spotlight on initial load.
+    ' Also covers the case where user switches between different home screen modes or to kids mode in which purple carept container gets removed.
+    m.rowList.translation = [0, 0]
+    m.purpleCarpetRow.opacity = 0
+    m.skinAdRow.opacity = 0
+    bSetRowListFocus = true
+  end if
+
   if m.top.content = invalid
     m.RowList.content = invalid
     '//reset some values. According to the Roku documentation, these fields should be read only but they seem to be writable.
@@ -210,34 +251,10 @@ Function onContentChange()
       'At this point, there is a limited set (as defined in constants) of content in each category.
       'loadCategoriesIndex will get the rest of the content for each category.
       m.top.loadCategoriesIndex = 0
-    end if
-  end if
-
-  ' Added an additional safety check of checking if the focus was not moved to rowlist. Only in the case where focus is on purple carpet, skinAds, or spotlight row then updating the translation.
-  ' This handles cases where the user content is refreshed due to expiry or user button mashes down quickly before even the purple carpet row got focused.
-  ' Also to handle the case where user navigates to side nav from the rowlist and Sign in or out which causes content to refresh.
-  if ((m.top.spotlightContent <> invalid AND m.top.spotlightContent.getChildCount() > 0) OR isPurpleCarpetContainerEmpty() = false OR (m.top.skinAdContent <> invalid AND m.top.skinAdContent.getChildCount() > 0)) AND m.lastFocusedList <> "rowlist"
-    m.rowList.translation = [0, 384]
-
-    if m.top.skinAdContent <> invalid AND m.top.skinAdContent.getChildCount() > 0
-      m.skinAdRow.opacity = 1
-      category = m.top.skinAdContent.getChild(0)
-      if category <> invalid
-        content = category.getChild(0)
-        m.top.reloadedItemToBeFocused = content
+      if bSetRowListFocus = true
+        setRowListFocus()
       end if
-    else 
-      m.purpleCarpetRow.opacity = 1
-      m.top.reloadedItemToBeFocused = m.top.primaryEventContent
     end if
-  else
-    ' Resetting the state of the UI.
-    ' Below logic will be used in case of there is no purple carpet or spotlight on initial load.
-    ' Also covers the case where user switches between different home screen modes or to kids mode in which purple carept container gets removed.
-    m.rowList.translation = [0, 0]
-    m.purpleCarpetRow.opacity = 0
-    m.skinAdRow.opacity = 0
-    setRowListFocus()
   end if
 
   m.top.gridContentIsReady = true
@@ -848,11 +865,17 @@ Function isPurpleCarpetContainerEmpty()
 End Function
 
 
+Function isSkinAdsAvailable()
+  return (m.top.skinAdContent <> invalid AND m.top.skinAdContent.getChildCount() > 0)
+End Function
+
+
 Function onPurpleCarpetContentUpdatedChange()
   tubiLog("CategoryGridList.onPurpleCarpetContentUpdatedChange")
   ' Handling a use case where last focused list was purple carpet container but during refresh all items got removed due to event reaching end resetting the focus to rowlist.
   ' Checking to check to make sure the rowlist has content before setting focus to it.
   if isPurpleCarpetContainerEmpty() = true AND m.lastFocusedList = "purpleCarpetRow" AND isNode(m.top.content) = true
+
     m.rowList.translation = [0, 0]
     m.purpleCarpetRow.opacity = 0
     m.lastFocusedList = "rowlist"
@@ -864,6 +887,7 @@ Function onPurpleCarpetContentUpdatedChange()
     m.rowList.translation = [0, 384]
     m.lastFocusedList = "purpleCarpetRow"
     m.purpleCarpetRow.opacity = 1
+    
     m.top.itemFocused = m.top.primaryEventContent
     m.purpleCarpetRow.setFocus(true)
   end if
@@ -878,7 +902,9 @@ Function setFocusToPurpleCarpetContainer()
   m.top.itemFocused = m.top.primaryEventContent
 
   m.purpleCarpetRow.setFocus(true)
-  slideFade(m.purpleCarpetRow, "below", "in", 0.3)
+  if m.purpleCarpetRow.opacity < 1
+    slideFade(m.purpleCarpetRow, "below", "in", 0.3)
+  end if
   m.lastFocusedList = "purpleCarpetRow"
   m.purpleCarpetRow.isContainerVisible = true
   slideTo(m.RowList, [0, 384], 0.3)
@@ -888,7 +914,7 @@ End Function
 Function onKeyEvent(key as String, press as Boolean) as Boolean
   if press = true
     bSpotlightAvailable = m.top.spotlightContent <> invalid AND m.top.spotlightContent.getChildCount() > 0
-    bSkinAdAvailable = m.top.skinAdContent <> invalid AND m.top.skinAdContent.getChildCount() > 0
+    bSkinAdAvailable = (isSkinAdsAvailable() = true)
 
     if key = "down" AND m.skinAdRow.isInFocusChain() = true
       slideFade(m.skinAdRow, "above", "out", 0.3)

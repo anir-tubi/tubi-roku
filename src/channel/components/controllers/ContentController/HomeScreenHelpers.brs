@@ -79,6 +79,7 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.isVideoPreviewOn = m.pub_serverPersistentData.isVideoPreviewOn
     m.pubSub.subscribe("pub_serverPersistentData.isVideoPreviewOn", homeScreen, "isVideoPreviewOn")
     homeScreen.kidsModeFeatureOn = m.kidsModeFeatureOn
+    homeScreen.kidsMode = isKidsUIOn()
     homeScreen.canLoadCategories = true
     homeScreen.id = screenID
 

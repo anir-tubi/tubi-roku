@@ -25,6 +25,7 @@ Function init()
   topRef.observeField("fullscreenCountdown", "onFullscreenCountdown")
   topRef.observeField("transportVoiceRequest", "onTransportVoiceRequest")
   topRef.observeFieldScoped("personalizationId", "onPersonalizationIdChanged")
+  topRef.observeFieldScoped("contentUpdated", "onContentUpdated")
   m.CategoryRefreshTimer = topRef.findNode("CategoryRefreshTimer")
   m.CategoryRefreshTimer.duration = m.constants.timers.categoryContentRefreshTimeout
   m.CategoryRefreshTimer.observeFieldScoped("fire", "onCategoryRefreshTimer")
@@ -141,6 +142,17 @@ Function onPersonalizationIdChanged(msg)
 End Function
 
 
+Function onContentUpdated(msg)
+  '//the presense or absense of a 1st-Row will dictate the starting point of the peek row mask
+  if (m.top.kidsMode = false AND (m.top.spotlightContent <> invalid AND m.top.spotlightContent.getChildCount() > 0) OR (m.top.purpleCarpetContent <> invalid AND m.top.purpleCarpetContent.getChildCount() > 0) OR (m.top.skinAdContent <> invalid AND m.top.skinAdContent.getChildCount() > 0))
+    moveContentAreaMask(-1)
+    fadeOutInfoPanel()
+  else
+    moveContentAreaMask(0)
+  end if
+End Function
+
+
 Function onLoadingChange()
   tubiLog("HomeScreen.onLoadingChange")
   bLoaded = (m.top.isLoading = false)
@@ -211,9 +223,6 @@ Function onRowFocused(msg)
     if isSponsoredRow(row) = true
       m.top.sponsoredRowFocused = true
     end if
-
-    '//When a new row is in focus, ensure the ContentArea Mask is at the proper location
-    moveContentAreaMaskBasedCurrentFocus()
   end if
 End Function
 
@@ -312,11 +321,12 @@ Function onCurrFocusRowChange()
     rowPercent = 1
   end if
 
-  if m.CategoryGridList.rowHeights <> invalid
+  if m.CategoryGridList.rowHeights <> invalid AND m.CategoryGridList.isInFocusChain() = true
     nEnteringFocusedRowHeight = m.CategoryGridList.rowHeights[rowEnteringFocus]
     nLosingFocusedRowHeight = m.CategoryGridList.rowHeights[rowLosingFocus]
     if nLosingFocusedRowHeight <> nEnteringFocusedRowHeight
       '//no need to move the mask if the previous and current rows have the same heights
+
       moveContentAreaMask(rowEnteringFocus, rowPercent)
     end if
   end if
@@ -456,6 +466,9 @@ Function onGridFocusChange() as void
     end if
 
   end if
+
+  '//Ensure the ContentArea Mask is at the proper location when new focus has changed.
+  moveContentAreaMaskBasedCurrentFocus()
 
   'Set up the navigateWithinPageInfo to send to ContentController via Homescreen. Need for when CategoryGridList is in focus
   oldAnalyticsRow = m.CategoryGridList.oldCursorPosition[0] + 1
@@ -747,7 +760,8 @@ End Function
 Function moveContentAreaMaskBasedCurrentFocus()  '//Determine if the rowlist or a special row is in focus
   nRowInFocus = -1
   focusedContent = m.top.contentFocused
-  if focusedContent <> invalid AND (focusedContent.gridItemType <> m.constants.ui.gridItemTypes.purpleCarpet) AND (m.isSpotlightRowEnabled = false OR focusedContent.gridItemType <> m.constants.ui.gridItemTypes.spotlight) AND focusedContent.gridItemType <> m.constants.ui.gridItemTypes.skinAd
+
+  if m.top.kidsMode = true OR (focusedContent <> invalid AND focusedContent.gridItemType <> m.constants.ui.gridItemTypes.purpleCarpet AND (m.isSpotlightRowEnabled = false OR focusedContent.gridItemType <> m.constants.ui.gridItemTypes.spotlight) AND focusedContent.gridItemType <> m.constants.ui.gridItemTypes.skinAd)
     if m.CategoryGridList.cursorPosition <> invalid
       nRowInFocus = m.CategoryGridList.cursorPosition[0]
     else
