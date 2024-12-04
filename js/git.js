@@ -729,7 +729,7 @@ function getPullRequestCommitsForBranch(done, branch, commitCount, oneLine = fal
 // @includeAuthorName: boolean, based this value the author name will be displayed along with commit message. Default - false
 // @commitCount: number, the number of maximum number of commits you want to compare between the branches
 // @returns: string[], the PR ID like '1234'
-async function findPullRequestCommitDifferences(done, branchA, branchB, includeAuthorName = false, commitCount = 200) {
+async function findPullRequestCommitDifferences(done, branchA, branchB, includeAuthorName = false, commitCount = 400) {
   // verify clean working directory
   verifyGit(done);
 
