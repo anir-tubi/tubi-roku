@@ -739,27 +739,14 @@ End Function
 ' @param homeScreen, roSGNode - The HomeScreen component that contains the focused content
 Function setHomeScreenAfterFocus(focusedContent, homeScreen)
   tubiLog("HomeScreenHelpers.setHomeScreenAfterFocus")
+  
+  '//update the UI anytime the homescreen changes focus.
+  setUIBasedOnFocusedContent(focusedContent)
+  
   if focusedContent <> invalid
     currentScreen = getCurrentScreen()
 
     if currentScreen <> invalid AND currentScreen.id <> m.constants.ui.screenIds.linearVideoPlayerScreen
-      skinAdContent = currentScreen.skinAdContent
-      if currentScreen.id = m.constants.ui.screenIds.homeScreen AND skinAdContent <> invalid AND skinAdContent.getChildCount() > 0
-        if focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd
-          '//Hide the logo if the current row is a skinAd
-          showHideLogo(m.constants.logoType.hide)
-
-          sendSkinAdPixels(focusedContent.imageImpTracking)
-
-        else
-          showHideLogoBasedOnUiMode(skinAdContent.titleImage, skinAdContent.titlePrefix)
-        end if
-
-        '//set the footer image while the homescreen is visible
-        setSponsorshipFooter(skinAdContent.footerImageUrl)
-        setBackgroundColor(skinAdContent.bgColor)
-      end if
-
       '//unless told otherwise later in this function, the default for bStopCountdownTimer is to assume that
       '//we should stop the countdown timer
       bStopCountdownTimer = true
@@ -803,6 +790,34 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
       end if
     end if
   end if
+End Function
+
+
+' Call this function when the UI needs to be changed based on the content item that has (or if the side nav has focus, will have) focus
+Function setUIBasedOnFocusedContent(focusedContent)
+  if focusedContent <> invalid
+    currentScreen = getCurrentScreen()
+
+    if currentScreen <> invalid
+      skinAdContent = currentScreen.skinAdContent
+      if currentScreen.id = m.constants.ui.screenIds.homeScreen AND skinAdContent <> invalid AND skinAdContent.getChildCount() > 0
+        if focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd
+          '//Hide the logo if the current row is a skinAd
+          showHideLogo(m.constants.logoType.hide)
+
+          sendSkinAdPixels(focusedContent.imageImpTracking)
+
+        else
+          showHideLogoBasedOnUiMode(skinAdContent.titleImage, skinAdContent.titlePrefix)
+        end if
+
+        '//set the footer image while the homescreen is visible
+        setSponsorshipFooter(skinAdContent.footerImageUrl)
+        setBackgroundColor(skinAdContent.bgColor)
+      end if
+    end if
+  end if
+
 End Function
 
 
@@ -1503,6 +1518,8 @@ Function onHomeScreenContentUpdateComplete(purpleCarpetContainer, screenId)
   end if
 
   homeScreen.contentUpdated = true
+  '//update the UI after the content has loaded
+  setUIBasedOnFocusedContent(homeScreen.contentFocused)
 
   ' don't set focus on the home screen if side nav has focus, for example
   if homeScreen.isInFocusChain() = true
