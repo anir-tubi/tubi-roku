@@ -119,6 +119,11 @@ Function onContentChange()
       m.infoPanel.calculateHeight = true
     end if
   end if
+
+  ' Resetting the focus to ctaButtonList if after content change the row-list is empty.
+  if m.rowList.isInFocusChain() = true AND (m.rowList.content = invalid OR m.rowList.content.getChild(0) = invalid)
+    setFocusToCtaButtonList()
+  end if
 End Function
 
 
@@ -317,17 +322,22 @@ Function onSignedInChange(msg)
 End Function
 
 
+Function setFocusToCtaButtonList()
+  if m.ctaButtonList.content <> invalid AND m.ctaButtonList.content.getChildCount() > 0
+    m.lastFocusedElement = "ctaButtonList"
+    m.infoPanelGroup.opacity = 1
+    m.ctaButtonList.setFocus(true)
+  end if
+End Function
+
+
 ' Below method is used to handle navigation between the RowList and the CTA buttons.
 ' Since we are using wrap focus style for rowlist. We have to create a custom rowlist and handle the key events so that we can capture 
 ' left press on rowlist and provide a custom navigation or focus flow rather than just wrapping.
 Function onKeyPressedChange(msg)
   key = msg.getData()
   if key = "left"
-    if m.ctaButtonList.content <> invalid AND m.ctaButtonList.content.getChildCount() > 0
-      m.lastFocusedElement = "ctaButtonList"
-      m.infoPanelGroup.opacity = 1
-      m.ctaButtonList.setFocus(true)
-    end if
+    setFocusToCtaButtonList()
   end if
 End Function
 
