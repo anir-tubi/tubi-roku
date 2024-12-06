@@ -712,8 +712,6 @@ Function getConstants()
 
     constants.urls.foxListingEndpoint = constants.urls.foxApiBaseUrl + "/v3.0/listings"
 
-    constants.urls.clientErrorConfigEndpoint = "https://d0.tubitv.com/error-handler/client-error-config.json"
-
   'http request types
   constants.reqTypes = {}
     constants.reqTypes.get = "GET"
