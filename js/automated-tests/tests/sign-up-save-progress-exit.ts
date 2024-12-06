@@ -111,7 +111,7 @@ it('C450487 - Exit prompt - Guest user press back button when lands on activatio
     const enterEmailAddressTitle = await testUtils.getNodeForElement('enterEmailAddressTitle');
     expect(enterEmailAddressTitle.text).to.be.equal('Enter Email Address');
 });
-/* Removing for now until we can figure out helpers for this - Testing manually for now
+
 // https://tubi.testrail.io/index.php?/cases/view/450490
 it('C450490 - Exit prompt - Guest user sign in through the modal and the CW row should populate, @signupsaveprogressexit', async () => {
 
@@ -136,13 +136,13 @@ it('C450490 - Exit prompt - Guest user sign in through the modal and the CW row 
     const enterEmailAddressTitle = await testUtils.getNodeForElement('emailInputScreenHeader');
     expect(enterEmailAddressTitle.text).to.be.equal('Enter Email Address');
 
-    // Create a user
-    const user = await testUtils.createRegisteredUser();
-    const userInfo = user['userInfo'];
-
+    // Create a user email
+    const email = `build_roku_${Math.floor(Date.now() / 1000)}_${Math.floor(Math.random() * 1000)}@tubi.tv`;
+    
     // Enter user info email
-    await ecp.sendText(userInfo.email);
+    await ecp.sendText(email);
     await ecp.sendKeypress(ecp.Key.Down, {count:4});
+    await utils.sleep(2000);
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Enter password
@@ -168,7 +168,7 @@ it('C450490 - Exit prompt - Guest user sign in through the modal and the CW row 
     await testUtils.waitForElementToFullyShowOnScreen(
       'tvContinueWatchingRow'
     );
-    */
+    
 
 
 // https://tubi.testrail.io/index.php?/cases/view/450491
@@ -233,6 +233,7 @@ it('C450495 - Exit prompt - Only show this treatment once per viewing session, @
     await testUtils.waitForElementToNotShowOnScreen('signUpExitDialog');
     const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
     expect(detailScreenTitle.text).to.not.be.empty;
+});
 });
 });
 

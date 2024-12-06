@@ -126,6 +126,23 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#tvScreen.#ContentArea.#CategoryGridList.#RowList.0.title.#CategoryName',
   },
 
+  /** Sea Lion Sign In to Watch text */
+  slSignInToWatch:{
+    keyPath:
+    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#purpleCarpetRow.0.#infoPanelGroup.#ctaButtonList.0.#menuItemTextFocused',
+  },
+
+  slWatchLiveButton: {
+    keyPath:
+    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#purpleCarpetRow.0.#infoPanelGroup.#ctaButtonList.0.#menuItemBg',
+
+  },
+
+  slWatchLiveText:{
+    keyPath:
+    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#purpleCarpetRow.0.#infoPanelGroup.#ctaButtonList.0.#menuItemTextFocused',
+  },
+
   /** Live Show screen row list */
   liveScreenHeader: {
     keyPath:
@@ -961,6 +978,12 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#linearVideoPlayerScreen',
   },
 
+  /** Fox Player element ID */
+  foxPLayerElementID: {
+    keyPath: 
+    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#FoxVideoPlayerWrapperScreen.1.0',
+  },
+
   linearEPGFoxSportsEnEspanolDescription: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#epgScreen.#infoPanelParent.#infoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description',
@@ -1341,6 +1364,19 @@ const elements = typeCheckElements({
   enterEmailAddressTitle: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#emailInputScreen.#emailLayout.#pageHeading',
+  },
+
+  enterEmailAddressHeader: {
+    keyPath:
+    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#purpleCarpetRow.0.#infoPanelGroup.#ctaButtonList.0.#menuItemTextFocused',
+  },
+
+  ageVerificationPageHeader: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.#AgeVerificationPageText.#AgeVerificationPageHeader',
+  },
+
+  continueWatchingConsentScreen: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#rokuContinueWatchingConsentScreen.0.#heading',
   },
 
   confirmYourAgeText: {
@@ -2517,6 +2553,11 @@ const elements = typeCheckElements({
   // Sign up button on the exit prompt of Sign up to Save Progress
   signUpExitDialogSignUpButton: {
     keyPath: '#ContentController.#8dcd9fd.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText'
+  },
+
+  // Accept Now button
+  acceptNowButton: {
+    keyPath:'#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#purpleCarpetRow.0.#infoPanelGroup.#ctaButtonList.0.#menuItemTextFocused',
   },
 
   // Sign up later button on the exit prompt of Sign up to Save Progress

@@ -104,8 +104,8 @@ describe('Sign up Save Progress TV', function () {
 
     });
 
-     /** Removed due to magic link graduation - need a workaround
-    it('C260845 - Guest - When user  presses Play on the Series Details page after choosing to Sign Up to Save Progress, the  title plays,@signupsaveprogress', async () => {
+     // Removed due to magic link graduation - need a workaround
+    it('C260845 - Guest - When user  presses Play on the Series Details page after choosing to Sign Up to Save Progress, the title plays,@signupsaveprogress', async () => {
 
         // Select a title
         await ecp.sendKeypress(ecp.Key.Ok);
@@ -126,17 +126,18 @@ describe('Sign up Save Progress TV', function () {
         await ecp.sendKeypress(ecp.Key.Down);
         await ecp.sendKeypress(ecp.Key.Ok);
 
-        // Create user
-        const user = await testUtils.createRegisteredUser();
-        const userInfo = user['userInfo'];
+        // Create a user email
+        const email = `build_roku_${Math.floor(Date.now() / 1000)}_${Math.floor(Math.random() * 1000)}@tubi.tv`;
+    
 
-         // Are we on the Enter Email Address page?
+        // Are we on the Enter Email Address page?
         const  emailInputScreenHeader = await testUtils.getNodeForElement('emailInputScreenHeader');
         expect(emailInputScreenHeader.text).to.equal('Enter Email Address');
 
-        // Enter user info email
-        await ecp.sendText(userInfo.email);
+         // Enter user info email
+        await ecp.sendText(email);
         await ecp.sendKeypress(ecp.Key.Down, {count:4});
+        await utils.sleep(2000);
         await ecp.sendKeypress(ecp.Key.Ok);
 
         // Enter password
@@ -169,5 +170,6 @@ describe('Sign up Save Progress TV', function () {
         // Is video playing?
         await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 10000);
     });
-    */
+  
+*/
 });

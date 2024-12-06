@@ -2299,7 +2299,7 @@ type DeeplinkPage = 'movies' | 'livefeed' | 'genre' | 'network' | 'tv' | 'espano
 /**
  * List of element ids that can be used with our video player helpers
  */
-type VideoPlayerElementId = 'videoPlayerScreen' | 'previewVideoPlayer' | 'linearVideoPlayerScreen';
+type VideoPlayerElementId = 'videoPlayerScreen' | 'previewVideoPlayer' | 'linearVideoPlayerScreen' | 'foxPLayerElementID';
 
 
 enum ContentRatings {

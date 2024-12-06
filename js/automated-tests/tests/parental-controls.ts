@@ -452,7 +452,7 @@ describe('Parental Controls', function () {
 
       // Send adult title text
       await testUtils.waitForElementToFullyShowOnScreen('searchGrid');
-      await ecp.sendText('sex');
+      await ecp.sendText('drugs');
       await testUtils.waitForElementToFullyShowOnScreen('noResultsMessage');
 
       // Verify no result for Older Kids level
