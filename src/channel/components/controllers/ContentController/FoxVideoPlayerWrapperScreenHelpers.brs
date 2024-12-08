@@ -155,7 +155,7 @@ Function getFoxVideoPlayerConfig()
 
   convivaCustomerKey = "611c005357f6991f5b731265d461ee49fe92a8cc"
   if m.constants.settings.mode = "production" then
-    muxEnvironmentKey = "1ff98d3f0df77fc9fdedf4209cc4db4cc1844a69"
+    convivaCustomerKey = "1ff98d3f0df77fc9fdedf4209cc4db4cc1844a69"
   end if
 
   config = {
