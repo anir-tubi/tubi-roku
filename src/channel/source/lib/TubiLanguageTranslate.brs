@@ -1470,7 +1470,7 @@ Function getTranslation_en_US()
     },
     "why_ask_age_description": {
       "description": "The main message which explains why Tubi is asking for the users year of birth",
-      "message": "*We use this information to confirm that you're meeting the age requirements set out in our Terms of Use and to personalize you experience. Read Terms of Use at: www.tubitv.com/terms Questions? Let us know at: support@tubi.tv"
+      "message": "*We process this information as described in Tubi's Privacy Policy and Terms of Use. For more information, see www.tubi.tv/privacy and www.tubi.tv/terms. Questions? Let us know at www.tubi.tv/support"
     },
     "signIn_screen_heading": {
       "description": "Title on the signIn screen",
@@ -5543,7 +5543,7 @@ Function getTranslation_en_GB()
     },
     "why_ask_age_description": {
       "description": "The main message which explains why Tubi is asking for the users year of birth",
-      "message": "*We use this information to confirm that you meet the age requirements set out in our Terms of Use and to personalise your experience. Read Terms of Use at: www.tubitv.com/terms Questions? Let us know at: support@tubi.tv"
+      "message": "*We process this information as described in Tubi's Privacy Policy and Terms of Use. For more information, see www.tubi.tv/privacy and www.tubi.tv/terms. Questions? Let us know at www.tubi.tv/support"
     },
     "goBack_videoPlayer_ad": {
       "description": "Navigational instructions to users when pause Ad is displayed on video screen",
