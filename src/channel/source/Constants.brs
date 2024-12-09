@@ -751,7 +751,7 @@ Function getConstants()
     constants.uapiContentTypes.container = "container"
 
   constants.timers = {}
-    constants.timers.skinAdTimeout = 5
+    constants.timers.skinAdTimeout = 6
     constants.timers.remoteComponentTimeout = 30000
 
     ' Time in seconds after which we force a refresh of the categoryscreen

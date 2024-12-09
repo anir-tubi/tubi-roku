@@ -16,6 +16,7 @@ Function init()
 
   if m.constants.deviceInfo.IsAutoplayEnabled = true
     '//Respect the device autoplay setting by disabling the autoplay/countdown feature. Do this by not setting the seconds.
+    m.countdownGroup.maxSeconds = m.constants.timers.skinAdTimeout
     m.countdownGroup.seconds = m.constants.timers.skinAdTimeout
   end if
 

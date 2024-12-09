@@ -14,6 +14,9 @@
       <!-- The number of seconds to display in the countdown timer. -->
       <field id="seconds" type="integer" value="-1"/>
 
+      <!-- The number of seconds that the countdown timer starts from. This helps set the width. Set this value in the beginning of the setup and or as part of the XML schema of the CountdownTimer -->
+      <field id="maxSeconds" type="integer" value="-1"/>
+
       <!-- The ID of the translation string within the translation JSON to be used to display the seconds. The translation needs to accept the parameter 'seconds'. -->
       <field id="secondsTranslationId" type="string" value=""/>
 

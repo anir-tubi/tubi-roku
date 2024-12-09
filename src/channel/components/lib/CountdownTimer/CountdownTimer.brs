@@ -19,9 +19,33 @@ Function init()
 End Function
 
 
+'//This helper function is only used in the setBackgroundWidth() function.
+'//returns a string to be used to determine the width of the CountdownText textfield.
+Function getIntegerToSetWidth()
+  NumOfCharacters = 2
+
+  maxSeconds = m.top.maxSeconds
+  if maxSeconds > 0
+    sMaxSeconds = maxSeconds.ToStr()
+    nLength = sMaxSeconds.Len()
+    NumOfCharacters = nLength
+  end if
+
+  sReturnNumber = ""
+  for i = 0 to NumOfCharacters - 1
+    '//Use a wide number like "5" to determine the max width of a character.
+    sReturnNumber = sReturnNumber + "5"
+  end for
+
+  nReturnNumber = val(sReturnNumber)
+
+  return nReturnNumber
+End Function
+
+
 Function setBackgroundWidth()
   '//Use a 2 digit number to determine and set the max width of the background.
-  setSeconds(55)
+  setSeconds(getIntegerToSetWidth())
 
   nFullScreenIconWidth = 0
   nodeFullscreenIconParent = m.FullscreenIcon.getParent()
