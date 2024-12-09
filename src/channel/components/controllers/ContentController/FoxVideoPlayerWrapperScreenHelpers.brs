@@ -243,13 +243,13 @@ Function getFoxVideoPlayerConfig()
     },
     "backgroundImage": "https://config.foxdcg.com/foxnow/roku/img/new_foxnow_background.png",
     "beaconservice": {
-      "enabled": false,
+      "enabled": true,
       "api": {
-        "host": "",
+        "host": "https://prod.mcvbs.sb.digitalvideoplatform.com",
         "path": "/mcvbs"
       },
       "concurrency": {
-        "frequency": 60
+        "frequency": 10
       }
     },
     "bookmarks": {
