@@ -5,16 +5,8 @@ Function init()
 
   m.BadgeTypes = {
     live: "live"
-    onNow: "onNow"
-    tomorrow: "tomorrow"
     today: "today"
-    tonight: "tonight"
-    language: "language"
-  }
-
-  m.languages = {
-    spanish: "ESPAÑOL"
-    french: "FRANÇAIS"
+    upcoming: "upcoming"
   }
 
   setThemeColors()
@@ -56,18 +48,37 @@ End Function
 Function updateUIWithBadges()
   removeBadges()
   itemContent = m.top.itemContent
-  'TODO: Will be controlled by listing api in future for now using airdate time.
+  
   currentDatetime = CreateObject("roDateTime")
   airDatetime = CreateObject("roDateTime")
   if itemContent.airDatetime <> invalid
     airDatetime.FromISO8601String(itemContent.airDatetime)
 
-    if airDatetime.asSeconds() < currentDatetime.asSeconds()
+    ' Calculating the seconds until the air time.
+    secondsUntilAirTime = airDatetime.asSeconds() - currentDatetime.asSeconds()
+
+    ' Checking the event is happening on the same day as current day.
+    isEventToday = isToday(itemContent.airDatetime)
+
+    if airDatetime.asSeconds() <= currentDatetime.asSeconds()
       setBadge(m.badgeTypes.live)
+    else if isEventToday = true
+      airDatetime.toLocalTime()
+      formattedTime = airDatetime.asTimeStringLoc("h:mm a")
+      badgeText = getTranslation("live_on_date_today", {"time": formattedTime})
+      setBadge(m.badgeTypes.today, badgeText)
+    else
+      airDatetime.toLocalTime()
+      formattedMonth = airDatetime.asDateStringLoc("MMM")
+      formattedMonth = UCase(formattedMonth)
+
+      formattedDay = airDatetime.asDateStringLoc("d")
+      
+      badgeText = getTranslation("live_on_date", {"day": formattedDay, "month": formattedMonth})
+      setBadge(m.badgeTypes.upcoming, badgeText)
     end if
 
     if m.badgeRefreshTimer <> invalid
-      secondsUntilAirTime = airDatetime.asSeconds() - currentDatetime.asSeconds()
       if secondsUntilAirTime > 0
         m.badgeRefreshTimer.duration = secondsUntilAirTime
         m.badgeRefreshTimer.control = "stop"
@@ -87,21 +98,11 @@ Function setBadge(badgeType = "live", badgeText = "")
     badge.textColor = m.primaryTextColor
     badge.iconUri = "pkg:/images/live-icon-filled.webp"
     badge.text = UCase(getTranslation("screenSearch_liveText"))
-  else if badgeType = m.badgeTypes.onNow
+  else
     badge = m.badgeGroup.createChild("Badge")
-    badge.backgroundColor = m.blueBadgeColor
-    badge.textColor = m.primaryTextColor
-    badge.text = UCase(getTranslation("onNow"))
-  else if badgeType = m.badgeTypes.language
-    if badgeText <> ""
-      lang = Ucase(badgeText)
-      if lang <> "ENGLISH"
-        badge = m.badgeGroup.createChild("Badge")
-        badge.backgroundColor = m.neutralSolidcolor
-        badge.textColor = m.primaryTextColor
-        badge.text = m.languages[lang]
-      end if
-    end if
+    badge.backgroundColor = m.primaryTextColor
+    badge.textColor = m.neutralSolidColor
+    badge.text = badgeText
   end if
 
   translationX = m.top.width - m.badgeGroup.boundingRect().width - 16

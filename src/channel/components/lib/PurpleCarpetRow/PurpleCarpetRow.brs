@@ -150,13 +150,8 @@ Function populateCtaButtonList()
       end if
     end if
 
-    currentMonth = currentDatetime.getMonth()
-    currentDayOfMonth = currentDatetime.getDayOfMonth()
-    airDateMonth = airDatetime.GetMonth()
-    airDateDay = airDatetime.getDayOfMonth()
-
     ' Checking the event is happening on the same day as current day.
-    isEventToday = (airDateMonth = currentMonth AND airDateDay = currentDayOfMonth)
+    isEventToday = isToday(primaryEventContent.airDatetime)
     
     if m.top.signedIn = false AND primaryEventContent.needsLogin = true AND getExternalConfigValueFromGlobal("bypass_registration_gate", false) = false
       menuItems.push({

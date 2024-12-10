@@ -290,3 +290,26 @@ Function compareDates(dateString1, dateString2)
 
   return false
 End Function
+
+
+' Determines if the input date is current day. That is the month and day of the input date is same as current date.
+' @dateString: string, an ISO-8601 string representing the UTC time
+Function isToday(dateString)
+  if isIso8601String(dateString) = true
+    currentDatetime = CreateObject("roDateTime")
+    currentDatetime.toLocalTime()
+    currentMonth = currentDatetime.getMonth()
+    currentDayOfMonth = currentDatetime.getDayOfMonth()
+
+    inputDatetime = CreateObject("roDateTime")
+    inputDatetime.FromISO8601String(dateString)
+    inputDatetime.toLocalTime()
+
+    inputDateMonth = inputDatetime.GetMonth()
+    inputDateDay = inputDatetime.getDayOfMonth()
+
+    return inputDateMonth = currentMonth AND inputDateDay = currentDayOfMonth
+  end if
+
+  return false
+End Function

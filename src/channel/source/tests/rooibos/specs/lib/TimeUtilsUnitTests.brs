@@ -231,3 +231,23 @@ Function timeUtils_compareDates_test()
   m.assertTrue(compareDates(currentDayString, yesterdayDayString))
   m.assertFalse(compareDates(invalid, invalid))
 End Function
+
+
+'@Test isToday unit tests
+Function timeUtils_isToday_test()
+  dateTime = CreateObject("roDateTime")
+  nowSeconds = dateTime.AsSeconds()
+
+  currentDayString = dateTime.ToISOString()
+
+  dateTime.fromSeconds(nowSeconds + (24 * 60 * 60))
+  nextDayString = dateTime.ToISOString()
+
+  dateTime.fromSeconds(nowSeconds - (24 * 60 * 60))
+  yesterdayDayString = dateTime.ToISOString()
+
+  m.assertFalse(isToday(nextDayString))
+  m.assertFalse(isToday(yesterdayDayString))
+  m.assertTrue(isToday(currentDayString))
+  m.assertFalse(isToday(invalid))
+End Function
