@@ -1064,8 +1064,16 @@ Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate,
   '//::TODO:: have the backend filter and sort categories when they have more bandwidth
   'set up AAs for all categories including any nested categories
 
+  ' Check if there are any channel containers present only if present than add the networks menu item.
+  ' Below logic is required to hide the network tab during fail safe since we are not getting the channel containers in the response.
+  isChannelContainersPresent = false
+
   for i=0 to containers.count()-1
     container = containers[i]
+
+    if container.type = m.constants.ui.categoryTypes.channel
+      isChannelContainersPresent = true
+    end if
 
     if oLimitTypes[container.type] = true
       categoryAA = m.buildCategoryParentInfo(container)  'categoryAA is invalid if empty container
@@ -1115,7 +1123,7 @@ Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate,
 
   'Removed Channels from SideNav and adding it to the categories.
   catNetworkChannels = invalid
-  if bDisplayChannels = false
+  if bDisplayChannels = false AND isChannelContainersPresent = true
     catNetworkChannels = {
       id: "networks"
       isSpecial: true
