@@ -159,6 +159,10 @@ Function getFoxVideoPlayerConfig()
   end if
 
   config = {
+    "clientRemoteConfig": {
+      "clientKey": "tubi_roku",
+      "env": "dev"
+    },
     "ads": {
       "raf": {
         "disableAdMeasurements": true
