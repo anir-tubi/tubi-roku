@@ -47,7 +47,7 @@ Function onContentChange(msg)
   end if
 
   if isNonEmptyString(titleImageUri) = true
-    m.titleImage.uri = titleImageUri + "?w=" + m.constants.ui.logoSizes.skinAds.infoPanel.width
+    m.titleImage.uri = replaceURLParameter(titleImageUri, "w", m.constants.ui.logoSizes.skinAds.infoPanel.width, true)
   else
     m.titleImage.uri = ""
   end if
@@ -58,4 +58,3 @@ Function onContentChange(msg)
     m.description.text = ""  
   end if
 End Function
-
