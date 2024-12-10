@@ -123,7 +123,11 @@ Function onPurpleCarpetContainerRequestComplete(response)
       screenId: screen.id
     }
     
-    updateContainerWithProgramInfoFromFoxListing(context, updateEventDetailsPurpleCarpetContent)
+    if isNode(response) = true
+      updateContainerWithProgramInfoFromFoxListing(context, updateEventDetailsPurpleCarpetContent)
+    else
+      updateEventDetailsPurpleCarpetContent(container, screen.id)
+    end if
   end if
   
 End Function
