@@ -713,7 +713,6 @@ Function setFoxContentId(purpleCarpetContainer, _screenId)
             end for
           end if
 
-          currentScreen.contentId = contentNode.foxContentId
         end if
       end if
 
