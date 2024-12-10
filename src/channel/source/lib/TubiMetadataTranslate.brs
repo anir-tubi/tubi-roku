@@ -103,10 +103,10 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
     else if canvasImages <> invalid AND type(canvasImages.hero_tb) = "roArray" AND isNonEmptyString(canvasImages.hero_tb[0])
       '//A custom hero size was requested, use this image instead of the default image
       sThumbnailURL = canvasImages.hero_tb[0]
+    else if isNonEmptyArray(contentFromServer.landscape_images) = true
+      sThumbnailURL = contentFromServer.landscape_images[0]
     else if isNonEmptyArray(contentFromServer.hero_images) = true
       sThumbnailURL = contentFromServer.hero_images[0]
-    else if contentFromServer.type = "l" 'linear content in non-linear row
-      sThumbnailURL = contentFromServer.landscape_images[0] 'default channel image
     else if isNonEmptyArray(contentFromServer.thumbnails) = true
       sThumbnailURL = contentFromServer.thumbnails[0]
     end if
