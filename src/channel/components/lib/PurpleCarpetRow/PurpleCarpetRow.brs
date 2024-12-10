@@ -115,7 +115,7 @@ Function onContentChange()
       populateCtaButtonList()
 
       isContentDetailsView = (m.top.isContentDetailsView = true)
-      populateInfoPanelWithPurpleCarpetMode(m.top.primaryEventContent, m.infoPanel, isContentDetailsView)
+      populateInfoPanelWithPurpleCarpetMode(primaryEventContent, m.infoPanel, isContentDetailsView)
       m.infoPanel.calculateHeight = true
     end if
   end if
@@ -143,9 +143,9 @@ Function populateCtaButtonList()
 
     if m.ctaButtonListRefreshTimer <> invalid
       secondsUntilAirTime = airDatetime.asSeconds() - currentDatetime.asSeconds()
+      m.ctaButtonListRefreshTimer.control = "stop"
       if secondsUntilAirTime > 0
         m.ctaButtonListRefreshTimer.duration = secondsUntilAirTime
-        m.ctaButtonListRefreshTimer.control = "stop"
         m.ctaButtonListRefreshTimer.control = "start"
       end if
     end if
@@ -296,7 +296,9 @@ Function onCtaButtonListRefreshTimerFired(msg)
   populateCtaButtonList()
   ' Refreshing the info panel so that the live badge appears and the countdown timer is removed.
   isContentDetailsView = (m.top.isContentDetailsView = true)
-  populateInfoPanelWithPurpleCarpetMode(m.top.primaryEventContent, m.infoPanel, isContentDetailsView)
+  if m.top.primaryEventContent <> invalid
+    populateInfoPanelWithPurpleCarpetMode(m.top.primaryEventContent, m.infoPanel, isContentDetailsView)
+  end if
 End Function
 
 
