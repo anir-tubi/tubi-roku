@@ -310,7 +310,9 @@ Function processPlayAndDetailsScreenAction(uriParameters)
       "type": contentType
     }, true)
 
-    if action = "play"
+    if mediaType = m.constants.ui.contentTypes.purpleCarpetEvent
+      getSingleContentFromServer(content, onDeeplinkSportsContentSuccess, showDeeplinkErrorModal)
+    else if action = "play"
       showDetailScreen(content, false, skipDetailScreen, invalid, {})
     else
       showDetailScreen(content, true, invalid, invalid, {})
