@@ -354,7 +354,8 @@ End Function
 
 Function onAgeNotVerifiedAtSignIn(err)
   if err <> invalid AND err.code <> invalid
-    if err.code = 422 OR err.code = 451
+    errorCode = err.code
+    if errorCode = 422 OR errorCode = 451
       handle_422_451_error(restartChannelAfterAgeVerification) ' happens when user enters age less than 13
     else
       handleNetworkError(err, verifyAgeAtSignIn, runControllerStartSequenceAsAgeNotVerified) ' happens when there is a network failure or some backend issue
@@ -436,7 +437,7 @@ Function onAgeNotVerifiedAtSignup(error)
         resetAuthStateOnAgeGateError()
         showGDPRAgeGateErrorScreen()
       else
-        handle_422_451_error(restartChannelAfterAgeVerification) ' happens when user enters age less than 13
+        handle_422_451_error(restartChannelAfterAgeVerification, httpCode) ' happens when user enters age less than 13
       end if
 
     else if httpCode = 400 AND errorCode <> invalid AND (errorCode = errorCodes.invalidParams OR errorCode = errorCodes.invalidEmailDomain OR errorCode = errorCodes.blockedEmailDomain OR errorCode = errorCodes.emailExists)
@@ -539,10 +540,19 @@ End Function
 
 
 ' triggered when user enters age less than 13 on age gate screen
-Function handle_422_451_error(callback)
+'@errorCode: integer, used to send client log events when user not successfully signup
+Function handle_422_451_error(callback, errorCode = 0)
   ' 422: the user is not old enough to use Tubi except in kids mode according to COPPA (US only)
   ' 451: the user is not old enough to use Tubi except in kids mode for some international reasons
   m.guestUserHasAgeInfo = setGuestUserHasAgeInfo(false)
+
+  if errorCode > 0
+    logMsg = {
+      reason: "age_gate_" + errorCode.toStr()
+    }
+    logMsg = FormatJson(logMsg)
+    tubiLog(logMsg, "info", "clientInfo", "dont_complete_signup_after_rfi")
+  end if
 
   logout()
   setUiMode(m.constants.ui.modes.kidsAgeGate) ' setting ui mode to kids Age gate
@@ -778,9 +788,15 @@ Function onBackButtonPressed(msg)
   if isLoggedInUser() = true then
     displayExitModal(ageVerificationScreen.trackingPageInfo)
   else
+    logMsg = {
+      reason: "age_gate_back"
+    }
+    logMsg = FormatJson(logMsg)
+    tubiLog(logMsg, "info", "clientInfo", "dont_complete_signup_after_rfi")
     exitAgeVerificationScreenUnverified()
   end if
 End Function
+
 
 Function exitAgeVerificationScreenUnverified()
   currentScreen = getCurrentScreen()
