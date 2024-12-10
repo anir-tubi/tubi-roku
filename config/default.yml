@@ -28,6 +28,7 @@ settings:
   videoOverlayLiteAutoHideTime: 10
 
   # When set to true will pass a header to enable fail safe testing.
+  # This field is only used in controller scope.
   enableFailSafe: false
 
   # When set to true will enable the purple carpet container and banner when in qa mode. Used for writing automated tests for purple carpet.

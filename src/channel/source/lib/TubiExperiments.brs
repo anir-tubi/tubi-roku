@@ -69,6 +69,10 @@ Function TubiExperiments(experimentsInfo) as Object
         roku_1080p_resolution_v1 : {"enabled": false}
       }
 
+      webott_force_failsafe: {
+        webott_force_failsafe: {"force_failsafe": false}
+      }
+
     }
 
     'public methods
