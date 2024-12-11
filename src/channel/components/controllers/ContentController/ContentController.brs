@@ -2203,11 +2203,14 @@ Function onCustomResume(msg)
     ' The app will resume as normal for the screensaver.
   end if
 
-  ' If the current screen has purple carpet container than starting the request to refresh the container data.
-  if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND currentScreen.purpleCarpetContent <> invalid
-    getFoxListingItemsAndRefreshPurpleCarpetContainerData()
+  ' If the current screen has a purple carpet container, initiate a request to refresh the container data.
+  if currentScreen <> invalid AND isCurrentScreenHomeScreen() = true
+    if currentScreen.content <> invalid AND shouldRefresh(currentScreen.content) = true
+      bRestartApp = true
+    else if currentScreen.id = m.constants.ui.screenIds.homeScreen AND currentScreen.purpleCarpetContent <> invalid
+        getFoxListingItemsAndRefreshPurpleCarpetContainerData()
+    end if
   end if
-
 
   '// If the resume app action is to restart the app or start the channel, then 1st see if the previously played linear video can be played (if one exists)
   if bRestartApp = true
