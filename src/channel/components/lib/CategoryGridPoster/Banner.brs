@@ -45,7 +45,7 @@ Function onContentChange(msg)
       airDatetime.FromISO8601String(itemContent.airDateTime)
       airDatetime.toLocalTime()
 
-      titleText = titleText.replace("{date}", airDatetime.asDateStringLoc("MMM dd"))
+      titleText = titleText.replace("{date}", airDatetime.asDateStringLoc("MMM d"))
     end if
     m.title.text = titleText
     m.title.translation = [(m.top.width / 2) - (m.title.width / 2), 0]
