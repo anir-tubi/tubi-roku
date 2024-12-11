@@ -603,6 +603,12 @@ Function getConstants()
       constants.urls.account.resetPassword = constants.urls.account.urlBase + "/user_device/password/reset"
       constants.urls.account.logout = constants.urls.account.urlBase + "/user_device/logout"
 
+      ' TODO remove in next submission build only adding back to prevent crashes when falling back
+      constants.urls.account.anonymous = {}
+      constants.urls.account.anonymous.signingKey = constants.urls.account.urlBase + "/device/anonymous/signing_key"
+      constants.urls.account.anonymous.token = constants.urls.account.urlBase + "/device/anonymous/token"
+      constants.urls.account.anonymous.refreshToken = constants.urls.account.urlBase + "/device/anonymous/refresh"
+
     constants.urls.lishi = {}
       constants.urls.lishi.baseUrl = "https://lishi.production-public.tubi.io"
       if constants.settings.mode <> "production" AND constants.settings.stagingApis = true then
