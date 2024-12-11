@@ -945,7 +945,7 @@ End Function
 
 ' called when a user's My List/Bookmarks/Queue is updated
 Function handleQueueChange()
-  if isLoggedInUser() = true
+  if isLoggedInUser() = true AND isMajorEventDay() = false
     ' make request to get bookmarks/queue ids
     getQueueIds(onQueueRefresh)
 

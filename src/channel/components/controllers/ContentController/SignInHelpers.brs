@@ -776,8 +776,10 @@ Function onSideNavSignInCompleted()
   '    DetailScreen - just history/bookmarks
   '    EpisodeScreen - history
 
-  setDirtyUserCategories(m.constants.ui.categoryIds.queue)
-  setDirtyUserCategories(m.constants.ui.categoryIds.history)
+  if isMajorEventDay() = false
+    setDirtyUserCategories(m.constants.ui.categoryIds.queue)
+    setDirtyUserCategories(m.constants.ui.categoryIds.history)
+  end if
 
   setContentToRefreshAllPersonalizedScreens()
 
