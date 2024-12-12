@@ -128,9 +128,9 @@ Function onThemeChange(msg = invalid)
   end if
 
   if bIsKidsTheme = true
-    m.defaultBackgroundUri = "https://cdn.adrise.tv/image/roku_support_images/bgroundMyStuffDefault_kids.webp"
+    m.defaultBackgroundUri = "https://mcdn.tubitv.com/image/roku_support_images/bgroundMyStuffDefault_kids.webp"
   else
-    m.defaultBackgroundUri = "https://cdn.adrise.tv/image/roku_support_images/bgroundMyStuffDefault.webp"
+    m.defaultBackgroundUri = "https://mcdn.tubitv.com/image/roku_support_images/bgroundMyStuffDefault.webp"
   end if
 
 End Function

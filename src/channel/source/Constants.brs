@@ -677,30 +677,30 @@ Function getConstants()
     constants.urls.yourPrivacyChoicesUrl = "https://legal-asset.tubi.tv/your-privacy-choices.txt"
 
     'channels poster image urls
-    constants.urls.channelPosterUnbranded = "https://cdn.adrise.tv/image/roku_support_images/channel-poster-generic.png"
-    constants.urls.channelPosterBrandedPrefix = "https://cdn.adrise.tv/image/roku_support_images/channel-poster-"
+    constants.urls.channelPosterUnbranded = "https://mcdn.tubitv.com/image/roku_support_images/channel-poster-generic.png"
+    constants.urls.channelPosterBrandedPrefix = "https://mcdn.tubitv.com/image/roku_support_images/channel-poster-"
     constants.urls.channelPosterBrandedSuffix = ".png"
     'channels logo image urls
-    constants.urls.channelLogoBrandedPrefix = "https://cdn.adrise.tv/image/channels/"
+    constants.urls.channelLogoBrandedPrefix = "https://mcdn.tubitv.com/image/channels/"
     constants.urls.channelLogoBrandedSuffix = "/logo_center.png"
 
     ' animationLogo Url which plays during app launch
-    constants.urls.animationLogo = "http://cdn.adrise.tv/video/roku/animation_logo_3.mp4"
+    constants.urls.animationLogo = "https://mcdn.tubitv.com/video/roku/animation_logo_3.mp4"
 
     ' The background large images on the continue watching container row when the user is signed out
-    constants.urls.continueWatchingItemBackground_largePoster = "https://cdn.adrise.tv/image/roku_support_images/continueWatchingItemBackground_largePoster.webp"
-    constants.urls.continueWatchingItemBackground_largePoster_kidsMode = "https://cdn.adrise.tv/image/roku_support_images/continueWatchingItemBackground_largePoster_kids.webp"
+    constants.urls.continueWatchingItemBackground_largePoster = "https://mcdn.tubitv.com/image/roku_support_images/continueWatchingItemBackground_largePoster.webp"
+    constants.urls.continueWatchingItemBackground_largePoster_kidsMode = "https://mcdn.tubitv.com/image/roku_support_images/continueWatchingItemBackground_largePoster_kids.webp"
 
-    constants.urls.onBoardingBackground = "https://cdn.adrise.tv/image/roku_support_images/onboarding/onboarding-welcome-fhd.webp"
+    constants.urls.onBoardingBackground = "https://mcdn.tubitv.com/image/roku_support_images/onboarding/onboarding-welcome-fhd.webp"
     constants.urls.landingBackgroundUriList = [
-      "https://cdn.adrise.tv/image/roku_support_images/onboarding/onboarding-landing-fhd-1.webp"
-      "https://cdn.adrise.tv/image/roku_support_images/onboarding/onboarding-landing-fhd-2.webp"
-      "https://cdn.adrise.tv/image/roku_support_images/onboarding/onboarding-landing-fhd-3.webp"
-      "https://cdn.adrise.tv/image/roku_support_images/onboarding/onboarding-landing-fhd-4.webp"
-      "https://cdn.adrise.tv/image/roku_support_images/onboarding/onboarding-landing-fhd-5.webp"
-      "https://cdn.adrise.tv/image/roku_support_images/onboarding/onboarding-landing-fhd-6.webp"
-      "https://cdn.adrise.tv/image/roku_support_images/onboarding/onboarding-landing-fhd-7.webp"
-      "https://cdn.adrise.tv/image/roku_support_images/onboarding/onboarding-landing-fhd-8.webp"
+      "https://mcdn.tubitv.com/image/roku_support_images/onboarding/onboarding-landing-fhd-1.webp"
+      "https://mcdn.tubitv.com/image/roku_support_images/onboarding/onboarding-landing-fhd-2.webp"
+      "https://mcdn.tubitv.com/image/roku_support_images/onboarding/onboarding-landing-fhd-3.webp"
+      "https://mcdn.tubitv.com/image/roku_support_images/onboarding/onboarding-landing-fhd-4.webp"
+      "https://mcdn.tubitv.com/image/roku_support_images/onboarding/onboarding-landing-fhd-5.webp"
+      "https://mcdn.tubitv.com/image/roku_support_images/onboarding/onboarding-landing-fhd-6.webp"
+      "https://mcdn.tubitv.com/image/roku_support_images/onboarding/onboarding-landing-fhd-7.webp"
+      "https://mcdn.tubitv.com/image/roku_support_images/onboarding/onboarding-landing-fhd-8.webp"
     ]
 
     ' url for pinging Nielsen
@@ -1484,11 +1484,11 @@ Function getConstants()
 
     constants.ui.uris = {}
 
-      constants.ui.uris.defaultContentBackgroundUri = "https://cdn.adrise.tv/image/roku_support_images/bgroundMyStuffDefault.webp"
+      constants.ui.uris.defaultContentBackgroundUri = "https://mcdn.tubitv.com/image/roku_support_images/bgroundMyStuffDefault.webp"
 
       'category background thumbnails
       constants.ui.uris.categoryBackgrounds = {}
-        constants.ui.uris.categoryBackgrounds.urlBase = "https://cdn.adrise.tv/image/roku_support_images/category_"
+        constants.ui.uris.categoryBackgrounds.urlBase = "https://mcdn.tubitv.com/image/roku_support_images/category_"
         constants.ui.uris.categoryBackgrounds.urlEnding = "_thumbnail_1x242.png"
         constants.ui.uris.categoryBackgrounds.recommended = constants.ui.uris.categoryBackgrounds.urlBase + "recommended" + constants.ui.uris.categoryBackgrounds.urlEnding
         constants.ui.uris.categoryBackgrounds.continueWatching = constants.ui.uris.categoryBackgrounds.urlBase + "continuewatching" + constants.ui.uris.categoryBackgrounds.urlEnding

@@ -271,7 +271,7 @@ End Function
 Function tubiMetadataTranslate_generateChannelPosterUrl_test()
   channel = ParseJson(ReadAsciiFile("pkg:/source/tests/rooibos/units/channel.json"))
   posterUrl = m.translate.generateChannelPosterUrl(channel.container.id)
-  m.assertEqual(posterUrl, "https://cdn.adrise.tv/image/roku_support_images/channel-poster-cbs.png")
+  m.assertEqual(posterUrl, "https://mcdn.tubitv.com/image/roku_support_images/channel-poster-cbs.png")
 End Function
 
 

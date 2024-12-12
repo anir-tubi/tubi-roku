@@ -239,7 +239,7 @@ Function showSafeZoneImage(safeZone)
       res="FHD"
     end if
 
-    safeZone.uri = "https://cdn.adrise.tv/image/roku_support_images/Outline-Roku-Safe-Zones-" + res + ".png"
+    safeZone.uri = "https://mcdn.tubitv.com/image/roku_support_images/Outline-Roku-Safe-Zones-" + res + ".png"
     safeZone.translation = "[0,0]"
     safeZone.id = "safeZoneImage"
   end if
