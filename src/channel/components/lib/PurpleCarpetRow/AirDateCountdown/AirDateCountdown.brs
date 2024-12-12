@@ -68,7 +68,7 @@ Function updateUI()
 
   ' Checking if the current day and air date are same.
   if airDateMonth = currentMonth AND airDateDay = currentDayOfMonth
-    formattedTime = airDatetime.asTimeStringLoc("h:mm a")
+    formattedTime = UCase(airDatetime.asTimeStringLoc("h:mm a"))
     m.dateText.text = getTranslation("live_on_date_today", {"time": formattedTime})
   else
     formattedMonth = airDatetime.asDateStringLoc("MMM")

@@ -20,7 +20,7 @@ Function convertClientErrorConfig(clientErrorConfig)
           else if isAA(possibleUrls) = true then
             for each key in possibleUrls
               possibleUrl = possibleUrls[key]
-              if possibleUrl.instr(routePath) >= 0 then
+              if isString(possibleUrl) = true AND possibleUrl.instr(routePath) >= 0 then
                 foundUrl = possibleUrl
                 exit for
               end if

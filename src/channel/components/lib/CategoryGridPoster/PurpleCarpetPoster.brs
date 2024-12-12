@@ -64,7 +64,7 @@ Function updateUIWithBadges()
       setBadge(m.badgeTypes.live)
     else if isEventToday = true
       airDatetime.toLocalTime()
-      formattedTime = airDatetime.asTimeStringLoc("h:mm a")
+      formattedTime = UCase(airDatetime.asTimeStringLoc("h:mm a"))
       badgeText = getTranslation("live_on_date_today", {"time": formattedTime})
       setBadge(m.badgeTypes.today, badgeText)
     else
