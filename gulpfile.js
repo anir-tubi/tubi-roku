@@ -1027,15 +1027,15 @@ function pushStaging(done) {
   const minorBuildTag = getBuildTag('minor');
 
   const localRemoteComponentsPath = `build/tubi_remote_components_${buildTag}.pkg`;
-  const rcdnS3RemoteComponentsPath = `s3://tubi-rokucdn-source-staging/appFiles/components/tubi_remote_components_${buildTag}.pkg`;
+  const mrcdnS3RemoteComponentsPath = `s3://tubi-roku-multi-cdn-source-staging/appFiles/components/tubi_remote_components_${buildTag}.pkg`;
 
   const localStarterComponentsPath  = `build/tubi_starter_components_${minorBuildTag}.pkg`;
-  const rcdnS3starterComponentsPath = `s3://tubi-rokucdn-source-staging/appFiles/starter-components/tubi_starter_components_${minorBuildTag}.pkg`;
+  const mrcdnS3starterComponentsPath = `s3://tubi-roku-multi-cdn-source-staging/appFiles/starter-components/tubi_starter_components_${minorBuildTag}.pkg`;
 
-  let pushResult = shell.exec(`aws s3 cp ${localRemoteComponentsPath} ${rcdnS3RemoteComponentsPath} --profile $AWS_PROFILE`);
+  let pushResult = shell.exec(`aws s3 cp ${localRemoteComponentsPath} ${mrcdnS3RemoteComponentsPath} --profile $AWS_PROFILE`);
 
   if (!pushResult.stderr) {
-    pushResult = shell.exec(`aws s3 cp ${localStarterComponentsPath} ${rcdnS3starterComponentsPath} --profile $AWS_PROFILE`);
+    pushResult = shell.exec(`aws s3 cp ${localStarterComponentsPath} ${mrcdnS3starterComponentsPath} --profile $AWS_PROFILE`);
   }
 
    // invalidate the cloudfront so that new starter component can get replaced.
