@@ -2039,6 +2039,10 @@ Function getTranslation_en_US()
     "rating": {
       "description": "Like/Dislike feature",
       "message": "Rating"
+    },
+    "delayed_registration_message": {
+      "description": "Message displayed when user tries to register and the registration is delayed",
+      "message": "We'll try creating your account in the next 24 hours and if successful, we'll send you an email to finish setting up your account."
     }
   }
 End Function

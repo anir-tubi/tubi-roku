@@ -11,6 +11,9 @@
     <!-- A record of the Roku account's signin info: i.e. email, firstname, gender, etc. -->
     <field id="userInput" type="assocarray" />
 
+    <!-- Account service has implemented a queuing system in case there is heavy load on server. Below flag indicates if the registration was queued. -->
+    <field id="wasRegistrationQueued" type="boolean" value="false" />
+
     <!-- OUTPUT -->
     <!-- Holds selected status for the exit button. -->
     <field id="continueButtonSelected" type="string" alias="continueBtn.selected" alwaysNotify="true" />
@@ -20,7 +23,7 @@
      <LayoutGroup
         horizAlignment="custom"
         translation="[0, 297]"
-        itemSpacings="[24, 40, 72]" >
+        itemSpacings="[24, 40, 72, 24]" >
         <Poster
           width="270"
           height="117"
@@ -47,6 +50,14 @@
           height="72"
           translation="[780, 0]"
           fontSize="28"/>
+        <Label
+          id="footerText"
+          horizAlign="center"
+          wrap="true"
+          width="1920">
+          <Font
+            role="font"/>
+        </Label>
       </LayoutGroup>
   </children>
 </component>

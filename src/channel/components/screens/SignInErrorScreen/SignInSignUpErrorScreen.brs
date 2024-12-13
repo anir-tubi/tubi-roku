@@ -8,6 +8,8 @@ Function init()
   
   m.heading = topRef.findNode("heading")
   m.subheading = topRef.findNode("subheading")
+  m.footerText = topRef.findNode("footerText")
+  m.footerText.text = getTranslation("delayed_registration_message")
   m.continueBtn = topRef.findNode("continueBtn")
   m.continueBtn.text = getTranslation("reg_continue_as_guest_button_title")
 
@@ -18,6 +20,7 @@ Function init()
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.heading, typographyConstants.ids.headerLarge)
   setTypographyOfLabel(m.subheading, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.footerText, typographyConstants.ids.bodySmall)
 
   onThemeChange()
 
@@ -35,6 +38,7 @@ Function onThemeChange(msg = invalid)
   if theme <> invalid
     m.heading.color = theme.primaryTextColor
     m.subheading.color = theme.secondaryTextColor
+    m.footerText.color = theme.secondaryTextColor
   end if
 End Function
 
@@ -48,8 +52,8 @@ End Function
 
 Function onActionChange(msg)
   action = msg.getData()
-  majorEventStart = getExternalConfigValueFromGlobal("major_event_start", m.constants.configHubFallbacks.majorEventStart)
-  majorEventEnd = getExternalConfigValueFromGlobal("major_event_end", m.constants.configHubFallbacks.majorEventEnd)
+  majorEventStart = getExternalConfigValueFromGlobal("major_event_failsafe_start", m.constants.configHubFallbacks.majorEventStart)
+  majorEventEnd = getExternalConfigValueFromGlobal("major_event_failsafe_end", m.constants.configHubFallbacks.majorEventEnd)
   isMajorEventDay = isNowWithinTimePeriod(majorEventStart, majorEventEnd)
 
   if action = "signIn"
@@ -73,6 +77,8 @@ Function onActionChange(msg)
       subheadingKey = "sign_up_error_screen__default_subheading"
       trackingPageValue = "sign_up_error_1"
     end if
+
+    m.footerText.visible = (m.top.wasRegistrationQueued = true)
 
   end if
 

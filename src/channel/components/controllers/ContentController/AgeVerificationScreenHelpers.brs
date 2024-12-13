@@ -495,7 +495,9 @@ Function handleNetworkErrorOnSignUp(err)
       inputData = err.reqInfo
     end if
 
-    showSignInSignUpErrorScreen("signUp", inputData)
+    wasRegistrationQueued = err <> invalid AND isAA(err.info) = true AND err.info.code = "ACCOUNT_PENDING_PROCESSING"
+
+    showSignInSignUpErrorScreen("signUp", inputData, wasRegistrationQueued)
   else
     signInInfo = {}
     birthdate = ""

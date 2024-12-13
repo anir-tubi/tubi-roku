@@ -181,7 +181,7 @@ Function onForgotPasswordDialogButtonSelected()
   if getExternalConfigValueFromGlobal("auth_magic_link_enabled", true) = true
     displayForgotPasswordProcessingScreen()
   else
-    showSignInSignUpErrorScreen("signIn", invalid)
+    showSignInSignUpErrorScreen("signIn", invalid, false)
   end if
 End Function
 
@@ -191,7 +191,7 @@ Function onForgotPasswordButtonSelected()
   if getExternalConfigValueFromGlobal("auth_magic_link_enabled", true) = true
     displayForgotPasswordProcessingScreen()
   else
-    showSignInSignUpErrorScreen("signIn", invalid)
+    showSignInSignUpErrorScreen("signIn", invalid, false)
   end if
 End Function
 
@@ -392,7 +392,7 @@ Function onEmailExistsError(errorResponse)
   }
   m.trackingLoggingTask.trackEvent = accountEvent
   if shouldShowSignInSignUpErrorPage(errorResponse) = true
-    showSignInSignUpErrorScreen("signIn", invalid)
+    showSignInSignUpErrorScreen("signIn", invalid, false)
   else
     requestInput = errorResponse.requestInput
     currentScreen = getCurrentScreen()
@@ -641,7 +641,7 @@ Function onSignInError(errorResponse)
   m.trackingLoggingTask.trackEvent = accountEvent
 
   if shouldShowSignInSignUpErrorPage(errorResponse) = true
-    showSignInSignUpErrorScreen("signIn", invalid)
+    showSignInSignUpErrorScreen("signIn", invalid, false)
   else
     currentScreen = getCurrentScreen()
     dialogEvent = {
@@ -1180,7 +1180,7 @@ End Function
 Function onMagicLinkError(errorResponse)
   tubiLog("SignInHelpers.onMagicLinkError")
   if shouldShowSignInSignUpErrorPage(errorResponse) = true
-    showSignInSignUpErrorScreen("signIn", invalid)
+    showSignInSignUpErrorScreen("signIn", invalid, false)
   else
     contextCode = m.constants.errors.context.forgotPasswordProcessingScreen
     currentScreen = getCurrentScreen()
@@ -1250,7 +1250,7 @@ Function onQueryStatusOfMagicLinkResponse(response)
     else if response <> invalid AND response.status = "EXPIRED"
       onStopAndClearEmailVerificationTimer()
       if isMajorEventDay() = true
-        showSignInSignUpErrorScreen("signIn", invalid)
+        showSignInSignUpErrorScreen("signIn", invalid, false)
       else
         handleSignInFailure()
       end if
@@ -1349,7 +1349,7 @@ Function onQueryStatusOfMagicLinkError(errorResponse)
       '//if an error has been set more than 3 times, then show error modal to user as the error is probably not a temporary network or server issue
       currentScreen.queryResponseError = 0
       if shouldShowSignInSignUpErrorPage(errorResponse) = true
-        showSignInSignUpErrorScreen("signIn", invalid)
+        showSignInSignUpErrorScreen("signIn", invalid, false)
       else
         handleSignInFailure(errorResponse)
       end if
@@ -1570,12 +1570,14 @@ End Function
 
 ' @param action: string, Possible values "signIn", "signUp"
 ' @param userInput: assocArray|invalid, Will contains user input data when the action is "signUp"
-Function showSignInSignUpErrorScreen(action, userInput)
+' @param wasRegistrationQueued: boolean, indicates if the registration was queued.
+Function showSignInSignUpErrorScreen(action, userInput, wasRegistrationQueued = false)
   showContentGroupAndHideSpinner()
   displayDefaultBackground()
   screen = CreateObject("roSGNode", "SignInSignUpErrorScreen")
-  screen.action = action
+  screen.wasRegistrationQueued = wasRegistrationQueued
   screen.userInput = userInput
+  screen.action = action
   pushScreen(screen, true, true)
   screen.observeFieldScoped("continueButtonSelected", "onSignUpSignInErrorScreenContinueAsGuestUserButtonSelected")
 End Function
@@ -1585,7 +1587,9 @@ Function onSignUpSignInErrorScreenContinueAsGuestUserButtonSelected(msg)
 
   isMajorEventDay = isMajorEventDay()
 
-  if isGDPR() = false AND isMajorEventDay = true
+  screen = msg.getRoSGNode()
+
+  if isGDPR() = false AND (isMajorEventDay = true OR screen.wasRegistrationQueued = true)
     currentTimeSeconds = CreateObject("roDateTime").AsSeconds()
     ' 12 hours.
     expiryTimeInSeconds = currentTimeSeconds + (12 * 3600)
@@ -1613,8 +1617,11 @@ End Function
 
 
 Function shouldShowSignInSignUpErrorPage(errorResponse)
-  if errorResponse <> invalid AND errorResponse.code <> invalid AND (errorResponse.code >= 500 OR errorResponse.code = 429) AND isMajorEventDay() = true
-    return true
+  if errorResponse <> invalid AND errorResponse.code <> invalid AND (errorResponse.code >= 500 OR errorResponse.code = 429)
+    wasRegistrationQueued = isAA(errorResponse.info) = true AND errorResponse.info.code = "ACCOUNT_PENDING_PROCESSING"
+    if isMajorEventDay() = true OR wasRegistrationQueued = true
+      return true
+    end if
   end if
 
   return false
