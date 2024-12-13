@@ -209,11 +209,8 @@ Function onSideNavItemSelected()
       end if
     else if itemSelectedId = m.constants.ui.sideNavIds.search
       if isMajorEventDay() = true
-        showToast({
-          "selfDestructTimer": 5
-          "headerText": getTranslation("search_disabled_message")
-          "imageUri": "pkg:/images/feature-disabled-icon.webp"
-        })
+        feature = getTranslation("menu_search")
+        showFeatureDisabledToast(feature)
       else
         '//display the search
         if isKidsUIOn() <> true
@@ -264,11 +261,8 @@ Function onSideNavItemSelected()
       end if
     else if itemSelectedId = m.constants.ui.sideNavIds.myList
       if isMajorEventDay() = true
-        showToast({
-          "selfDestructTimer": 5
-          "headerText": getTranslation("mylist_disabled_message")
-          "imageUri": "pkg:/images/feature-disabled-icon.webp"
-        })
+        feature = getTranslation("menu_mystuff")
+        showFeatureDisabledToast(feature)
       else
         if isKidsUIOn() <> true
           setUiMode(m.constants.ui.modes.standard)

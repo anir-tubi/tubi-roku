@@ -976,11 +976,8 @@ End Function
 Function onAddToQueueSelected(msg)
   tubiLog("DetailScreenHelpers.onAddToQueueSelected")
   if isMajorEventDay() = true
-    showToast({
-      "selfDestructTimer": 5
-      "headerText": getTranslation("mylist_disabled_message")
-      "imageUri": "pkg:/images/feature-disabled-icon.webp"
-    })
+    feature = getTranslation("menu_mystuff")
+    showFeatureDisabledToast(feature)
   else
     detailScreen = msg.getRoSGNode()
     onAddToQueue(detailScreen)
@@ -1275,11 +1272,8 @@ End Function
 Function onRemoveFromQueueSelected(msg)
   tubiLog("DetailScreenHelpers.onRemoveFromQueueSelected")
   if isMajorEventDay() = true
-    showToast({
-      "selfDestructTimer": 5
-      "headerText": getTranslation("mylist_disabled_message")
-      "imageUri": "pkg:/images/feature-disabled-icon.webp"
-    })
+    feature = getTranslation("menu_mystuff")
+    showFeatureDisabledToast(feature)
   else
     detailScreen = msg.getRoSGNode()
     onRemoveFromQueue(detailScreen)
@@ -1353,11 +1347,8 @@ End Function
 Function onLikeSelected(msg)
   tubiLog("DetailScreenHelpers.onLikeSelected")
   if isMajorEventDay() = true
-    showToast({
-      "selfDestructTimer": 5
-      "headerText": getTranslation("rating_disabled_message")
-      "imageUri": "pkg:/images/feature-disabled-icon.webp"
-    })
+    feature = getTranslation("rating")
+    showFeatureDisabledToast(feature)
   else
     detailScreen = msg.getRoSGNode()
     onLike(detailScreen)
@@ -1382,11 +1373,8 @@ End Function
 Function onDislikeSelected(msg)
   tubiLog("DetailScreenHelpers.onDislikeSelected")
   if isMajorEventDay() = true
-    showToast({
-      "selfDestructTimer": 5
-      "headerText": getTranslation("rating_disabled_message")
-      "imageUri": "pkg:/images/feature-disabled-icon.webp"
-    })
+    feature = getTranslation("rating")
+    showFeatureDisabledToast(feature)
   else
     detailScreen = msg.getRoSGNode()
     onDislike(detailScreen)
@@ -1634,11 +1622,8 @@ Function onRemoveFromHistorySelected(msg)
   if isMajorEventDay() = true
     ' Since we need to restrict toast width to a max value since this is a one of use case using message instead of header since message automatically wraps as supposed to header 
     ' which is just one line.
-    showToast({
-      "selfDestructTimer": 5
-      "headerText": getTranslation("continue_watching_disabled_message")
-      "imageUri": "pkg:/images/feature-disabled-icon.webp"
-    })
+    feature = getTranslation("metadata_myStuff_empty_continueWatchingInfoPanel_title")
+    showFeatureDisabledToast(feature)
   else
     detailScreen = msg.getRoSGNode()
     onRemoveFromHistory(detailScreen)

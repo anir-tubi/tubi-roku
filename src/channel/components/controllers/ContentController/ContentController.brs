@@ -3237,3 +3237,48 @@ Function showToastAfterAuthRefreshFromMobile()
     showToast(toastInfo)
   end if
 End Function
+
+' @feature: string, translated string for the feature that is disabled. Ex: Search, My Stuff etc.
+Function showFeatureDisabledToast(feature)
+  langaugeSuffix = ""
+
+  locale = getLocale()
+  languageId = Left(locale, 2)
+
+  if languageId <> "en"
+    langaugeSuffix = "_" + languageId
+  end if
+
+  headerTextConfigKey = "major_event_failsafe_maintenance_header" + langaugeSuffix
+  messageConfigKey = "major_event_failsafe_maintenance_subtext" + langaugeSuffix
+  defaultFallback = getTranslation("disaster_mode_toast_heading")
+
+  majorEventEnd = getExternalConfigValueFromGlobal("major_event_failsafe_end", m.constants.configHubFallbacks.majorEventEnd)
+
+  ' Checking the event is happening on the same day as current day.
+  isEventToday = isToday(majorEventEnd)
+
+  majorEventEndDatetime = CreateObject("roDateTime")
+  majorEventEndDatetime.FromISO8601String(majorEventEnd)
+  majorEventEndDatetime.toLocalTime()
+  formattedTime = UCase(majorEventEndDatetime.asTimeStringLoc("h:mm a"))
+
+  if isEventToday = false
+    formattedTime = formattedTime + " " + getTranslation("tomorrow")
+  end if
+
+  headerText = getExternalConfigValueFromGlobal(headerTextConfigKey, defaultFallback)
+  headerText = headerText.replace("{feature}", feature)
+  headerText = headerText.replace("{time}", formattedTime)
+
+  message = getExternalConfigValueFromGlobal(messageConfigKey, "")
+  message = message.replace("{feature}", feature)
+  message = message.replace("{time}", formattedTime)
+
+  showToast({
+    "selfDestructTimer": 5
+    "headerText": headerText
+    "message": message
+    "imageUri": "pkg:/images/feature-disabled-icon.webp"
+  })
+End Function

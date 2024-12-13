@@ -2035,6 +2035,10 @@ Function getTranslation_en_US()
     "disaster_mode_toast_subheading": {
       "description": "Subheading of the toast that is shown on disaster mode UI.",
       "message": "You can still watch the game!"
+    },
+    "rating": {
+      "description": "Like/Dislike feature",
+      "message": "Rating"
     }
   }
 End Function
