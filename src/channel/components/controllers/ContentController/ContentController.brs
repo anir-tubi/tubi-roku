@@ -73,8 +73,11 @@ Function addControllerUi()
   ' Holds the value for user/device level settings. For ex: isVideoPreviewOn  or Selected Audio track.
   m.pub_serverPersistentData = createObject("roSGNode", "ServerPersistentData")
 
-  'TODO: Temporary hack and code to make the build setting controllable by experiments.
+
+  if m.constants.settings.enableFailSafe <> true then
+    'TODO: Temporary hack and code to make the build setting controllable by experiments.
   m.constants.settings.enableFailSafe = (getExperimentResource("webott_force_failsafe", "webott_force_failsafe", false).force_failsafe = true)
+  end if
 
   m.Request = TubiRequest(m.constants.settings)
   m.NodeHelpers = TubiNodeHelpers()

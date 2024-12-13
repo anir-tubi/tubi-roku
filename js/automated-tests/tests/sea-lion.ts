@@ -1,16 +1,13 @@
 import { expect } from 'chai';
 import { ecp, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
-import { shared } from '../shared';
-import { randomBytes } from 'crypto';
-import { PLAYER_NODES } from '../../../out/automated_tests_branch/js/automated-tests/analytics/utils/constants';
 
 
 describe('SLtests', function () {
 
   // SL as guest user test
   it('Guest User - SL launch as Guest user @sl', async () => {
-    await testUtils.startApplicationAtPage('home', {enablePurpleCarpetContainerAndBanner: true, shouldCreateNewUser: false});
+    await testUtils.startApplicationAtPage('home', {triggerFailSafe: 'gameDayExperience', shouldCreateNewUser: false});
     await testUtils.waitForElementToShowOnScreen('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Check for "Sign In to Watch Button"
@@ -54,7 +51,7 @@ describe('SLtests', function () {
   });
 
   it('Registered User - SL launch as Registered User user @sl', async () => {
-    await testUtils.startApplicationAtPage('home', {enablePurpleCarpetContainerAndBanner: true, shouldCreateNewUser: true});
+    await testUtils.startApplicationAtPage('home', {triggerFailSafe: 'gameDayExperience', shouldCreateNewUser: true});
     await testUtils.waitForElementToShowOnScreen('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Check for "Sign In to Watch Button"

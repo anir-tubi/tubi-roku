@@ -348,6 +348,10 @@ class TestUtils {
       constantsUpdates['settings.enablePurpleCarpetContainerAndBanner'] = args.enablePurpleCarpetContainerAndBanner;
     }
 
+    if (args.triggerFailSafe === 'gameDayExperience') {
+      constantsUpdates['settings.enableFailSafe'] = true;
+    }
+
     if (constantsUpdates && Object.keys(constantsUpdates).length > 0) {
       deeplink['constantsUpdates'] = JSON.stringify(constantsUpdates);
     }
@@ -2345,6 +2349,8 @@ type StartApplicationArgs = {
 
   /* When set to true will enable the purple carpet container and banner. */
   enablePurpleCarpetContainerAndBanner?: boolean;
+
+  triggerFailSafe?: 'gameDayExperience'
 }
 
 
