@@ -3267,7 +3267,7 @@ Function showFeatureDisabledToast(feature)
   formattedTime = UCase(majorEventEndDatetime.asTimeStringLoc("h:mm a"))
 
   if isEventToday = false
-    formattedTime = formattedTime + " " + getTranslation("tomorrow")
+    formattedTime = formattedTime + " " + LCase(getTranslation("tomorrow"))
   end if
 
   headerText = getExternalConfigValueFromGlobal(headerTextConfigKey, defaultFallback)
