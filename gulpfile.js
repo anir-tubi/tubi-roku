@@ -53,7 +53,7 @@ const options = {
 };
 
 // distribution ID of roku staging CDN pointing to s3 bucket tubi-rokucdn-source-staging
-const stagingCdnDistributionID = `E1TFU8FZM49RLM`;
+const stagingCdnDistributionID = `E2ZVLLDFJT12OF`;
 
 // overwrite the config and/or target default options with passed in arguments;
 // for example a -staging argument will set options.config to 'staging'
@@ -1027,9 +1027,11 @@ function pushStaging(done) {
   const minorBuildTag = getBuildTag('minor');
 
   const localRemoteComponentsPath = `build/tubi_remote_components_${buildTag}.pkg`;
+  const rcdnS3RemoteComponentsPath = `s3://tubi-rokucdn-source-staging/appFiles/components/tubi_remote_components_${buildTag}.pkg`;
   const mrcdnS3RemoteComponentsPath = `s3://tubi-roku-multi-cdn-source-staging/appFiles/components/tubi_remote_components_${buildTag}.pkg`;
 
   const localStarterComponentsPath  = `build/tubi_starter_components_${minorBuildTag}.pkg`;
+  const rcdnS3starterComponentsPath = `s3://tubi-rokucdn-source-staging/appFiles/starter-components/tubi_starter_components_${minorBuildTag}.pkg`;
   const mrcdnS3starterComponentsPath = `s3://tubi-roku-multi-cdn-source-staging/appFiles/starter-components/tubi_starter_components_${minorBuildTag}.pkg`;
 
   let pushResult = shell.exec(`aws s3 cp ${localRemoteComponentsPath} ${mrcdnS3RemoteComponentsPath} --profile $AWS_PROFILE`);
@@ -1038,9 +1040,24 @@ function pushStaging(done) {
     pushResult = shell.exec(`aws s3 cp ${localStarterComponentsPath} ${mrcdnS3starterComponentsPath} --profile $AWS_PROFILE`);
   }
 
+  // delete this part of the code during submission build
+  if (!pushResult.stderr) {
+    pushResult = shell.exec(`aws s3 cp ${localRemoteComponentsPath} ${rcdnS3RemoteComponentsPath} --profile $AWS_PROFILE`);
+  }
+
+  // delete this part of the code during submission build
+  if (!pushResult.stderr) {
+    pushResult = shell.exec(`aws s3 cp ${localStarterComponentsPath} ${rcdnS3starterComponentsPath} --profile $AWS_PROFILE`);
+  }
+
    // invalidate the cloudfront so that new starter component can get replaced.
   if (!pushResult.stderr) {
     pushResult = shell.exec(`aws cloudfront create-invalidation --distribution-id ${stagingCdnDistributionID} --paths "/*" --profile $AWS_PROFILE`);
+  }
+
+  // delete this part of the code during submission build
+  if (!pushResult.stderr) {
+    pushResult = shell.exec(`aws cloudfront create-invalidation --distribution-id E1TFU8FZM49RLM --paths "/*" --profile $AWS_PROFILE`);
   }
 
   if (!pushResult.stderr) {
