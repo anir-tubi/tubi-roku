@@ -304,8 +304,8 @@ Function addControllerUi()
   ' The position we last sent fox player progress from
   m.lastSentFoxPlayerProgressPosition = 0
 
-  ' The content that is currently being used as input to play with the fox video player
-  m.foxPlayerCurrentInputContent = invalid
+  ' The content id that is currently being played with the fox video player stored as an integer or invalid if no content is being played
+  m.foxPlayerCurrentContentId = invalid
 
   ' We delay closing the fox video player when the end slate appears so we need to use store the timer for this on m to keep it alive
   m.foxPlayerEndSlateCloseDelayTimer = invalid

@@ -23,16 +23,11 @@ End Function
 
 
 Function onClosePlayerChanged()
+  ' Note we want this to be triggered first so we get the correct playback position before we close the player
+  m.top.willPlayerClose = true
   if m.RpfPlaybackPage <> invalid
     m.RpfPlaybackPage.close = true
-  else
-    m.top.isPlayerClosed = true
   end if
-End Function
-
-
-Function onRpfPlaybackPageWasClosed()
-  m.top.isPlayerClosed = true
 End Function
 
 
@@ -57,7 +52,6 @@ Function playContentWithFoxVideoPlayer()
     playerInfo = buildPlayerInfo(contentId)
 
     m.rpfPlaybackPage = createObject("roSGNode", "FoxVideoPlayer:RpfPlaybackPage")
-    m.rpfPlaybackPage.observeFieldScoped("close", "onRpfPlaybackPageWasClosed")
     m.rpfPlaybackPage.context = playerInfo.context
     m.rpfPlaybackPage.video = playerInfo.node
 
@@ -125,8 +119,7 @@ End Function
 
 Function onKeyEvent(key as String, press as Boolean) as Boolean
   if press = true AND key = "back" then
-    ' If we call close on the fox player, it will clear out the playPosition which we don't want
-    m.top.isPlayerClosed = true
+    onClosePlayerChanged()
     return true
   end if
 

@@ -12,12 +12,13 @@ Function playLinearVideoWithFoxPlayer(content)
     '   }
     ' }, true)
 
-    ' We immediately show the player screen so we can show the loading spinner but have to wait until we are ready to actually try playing video
-    m.foxPlayerCurrentInputContent = content
-
-    m.lastSentFoxPlayerProgressPosition = 0
 
     videoId = content.id.toInt()
+
+    ' We immediately show the player screen so we can show the loading spinner but have to wait until we are ready to actually try playing video
+    m.foxPlayerCurrentContentId = videoId
+
+    m.lastSentFoxPlayerProgressPosition = 0
 
     event = {
       type: "start_live_video"
@@ -40,7 +41,7 @@ Function playLinearVideoWithFoxPlayer(content)
 
     foxVideoPlayerWrapperScreen = createObject("roSGNode", "FoxVideoPlayerWrapperScreen")
     foxVideoPlayerWrapperScreen.id = m.constants.ui.screenIds.foxVideoPlayerWrapperScreen
-    foxVideoPlayerWrapperScreen.observeFieldScoped("isPlayerClosed", "onFoxVideoPlayerIsPlayerClosed")
+    foxVideoPlayerWrapperScreen.observeFieldScoped("willPlayerClose", "onFoxVideoPlayerWillPlayerClose")
     foxVideoPlayerWrapperScreen.tubiContent = content
 
     pushScreen(foxVideoPlayerWrapperScreen, true, true)
@@ -120,6 +121,9 @@ Function onFoxVideoPlayerComponentLibraryLoadStatus(msg)
 
         if foxRpfInstance.playerEvent <> invalid then
           foxRpfInstance.playerEvent.observeFieldScoped("exitStream", "onFoxVideoPlayerExitStreamChange")
+
+          foxRpfInstance.playerEvent.observeFieldScoped("liveAssetInfo", "onLiveAssetInfoChange")
+
           foxRpfInstance.playerEvent.observeFieldScoped("playerPosition", "onFoxVideoPlayerPlayerPositionChange")
         end if
 
@@ -146,6 +150,22 @@ Function onFoxVideoPlayerComponentLibraryLoadStatus(msg)
   end if
 End Function
 
+Function onLiveAssetInfoChange(msg)
+  liveAssetInfo = msg.getData()
+  
+  if isArray(m.foxListingEndpointResponse) = true AND liveAssetInfo <> invalid AND isString(liveAssetInfo.id) = true then
+    for each item in m.foxListingEndpointResponse
+      if item.asset <> invalid AND item.asset.listing <> invalid then
+        listing = item.asset.listing
+        if isString(listing.id) = true AND listing.id = liveAssetInfo.id AND isString(listing.tubi_id) = true then
+          m.foxPlayerCurrentContentId = listing.tubi_id.toInt()
+          exit for
+        end if
+      end if
+    end for
+  end if
+End Function
+
 
 Function getFoxVideoPlayerConfig()
   muxEnvironmentKey = "aa7at5lkvspdg2ju2r42gf559"
@@ -158,10 +178,15 @@ Function getFoxVideoPlayerConfig()
     convivaCustomerKey = "1ff98d3f0df77fc9fdedf4209cc4db4cc1844a69"
   end if
 
+  clientRemoteConfigEnv = "dev"
+  if m.constants.settings.mode = "production" then
+    clientRemoteConfigEnv = "prod"
+  end if
+
   config = {
     "clientRemoteConfig": {
       "clientKey": "tubi_roku",
-      "env": "dev"
+      "env": clientRemoteConfigEnv
     },
     "ads": {
       "raf": {
@@ -182,7 +207,7 @@ Function getFoxVideoPlayerConfig()
         "find": "{foxApiRoot}/v2.0/screens/sports-find",
         "home": "{foxApiRoot}/v2.0/screens/main",
         "live": "{foxApiRoot}/v2.0/screens/foxsportsconnected-live",
-        "liveAssetInfo": "{foxApiRoot}/v2.0/assetinfo/{assetId}",
+        "liveAssetInfo": "{foxApiRoot}/v3.0/assetinfo/{assetId}",
         "liveUpNextInfo": "{foxApiRoot}/v2.0/upnext/epglistings/{epgListingId}",
         "liveEPGListingInfo": "{foxApiRoot}/v2.0/epglistings/{epgListingId}",
         "movieDetail": "{foxApiRoot}/v2.0/screens/movie-detail/{showCode}",
@@ -603,8 +628,8 @@ Function sendFoxVideoPlayerLivePlayProgressEvent(position, alwaysSend = false)
     else
       viewTime = position - m.lastSentFoxPlayerProgressPosition
 
-      if m.foxPlayerCurrentInputContent <> invalid AND (viewTime >= 60 OR (alwaysSend AND viewTime > 0)) then
-        videoId = m.foxPlayerCurrentInputContent.id.toInt()
+      videoId = m.foxPlayerCurrentContentId
+      if videoId <> invalid AND (viewTime >= 60 OR (alwaysSend = true AND viewTime > 0)) then
         event = {
           type: "live_play_progress"
           values: {
@@ -645,14 +670,14 @@ Function closeFoxVideoPlayer()
 End Function
 
 
-Function onFoxVideoPlayerIsPlayerClosed()
+Function onFoxVideoPlayerWillPlayerClose()
   showHideLogoBasedOnUiMode()
 
   if m.foxRpfInstance <> invalid AND m.foxRpfInstance.playerEvent <> invalid then
     sendFoxVideoPlayerLivePlayProgressEvent(m.foxRpfInstance.playerEvent.playerPosition, true)
   end if
 
-  m.foxPlayerCurrentInputContent = invalid
+  m.foxPlayerCurrentContentId = invalid
 
   if isMajorEventDay() = true AND getExternalConfigValueFromGlobal("disaster_mode_enabled", false) = true
     popScreen(true, false)

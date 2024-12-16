@@ -19,7 +19,7 @@
 
 
     <!-- OUTPUTS -->
-      <field id="isPlayerClosed" type="boolean" alwaysNotify="true" />
+      <field id="willPlayerClose" type="boolean" alwaysNotify="true" />
   </interface>
 
   <children>
