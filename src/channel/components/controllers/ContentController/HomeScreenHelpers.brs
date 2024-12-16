@@ -740,10 +740,10 @@ End Function
 ' @param homeScreen, roSGNode - The HomeScreen component that contains the focused content
 Function setHomeScreenAfterFocus(focusedContent, homeScreen)
   tubiLog("HomeScreenHelpers.setHomeScreenAfterFocus")
-  
+
   '//update the UI anytime the homescreen changes focus.
   setUIBasedOnFocusedContent(focusedContent)
-  
+
   if focusedContent <> invalid
     currentScreen = getCurrentScreen()
 
@@ -1161,7 +1161,7 @@ Function hasRegModalBeenShown()
       return true
   end if
 
-  if isNewUser() = true AND m.hasRegModalBeenShownWithinNewUserSession = false
+  if isNewUser() = true AND m.hasRegModalBeenShownWithinNewUserSession = false AND isMajorEventDay() = false
     if currentScreen.id = m.constants.ui.screenIds.homeScreen AND isLoggedInUser() = false
       m.hasRegModalBeenShownWithinNewUserSession = true
       return false
@@ -1201,7 +1201,7 @@ Function updateSkinAdRowContent(homeScreen, content)
     rowContentNode.description = content.description
     rowContentNode.adInfo = content.adInfo
     rowContentNode.imageImpTracking = content.imageImpTracking
-  
+
     categoryContentNode = CreateObject("roSGNode", "CategoryContentNode")
     categoryContentNode.id = m.constants.ui.categoryIds.skinAd
     categoryContentNode.appendChild(content)
