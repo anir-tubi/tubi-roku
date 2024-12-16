@@ -3224,7 +3224,7 @@ Function getTranslation_es_MX()
     },
     "why_ask_age_description": {
       "description": "The main message which explains why Tubi is asking for the users year of birth",
-      "message": "*Usamos esta información para confirmar si satisfaces los requerimientos de edad presentados en nuestros Términos de uso y para personalizar tu experiencia. Lee los Términos de uso en: www.tubitv.com/terms ¿Preguntas? Haznos saber a: support@tubi.tv"
+      "message": "*Procesamos esta información como se describe en la Política de Privacidad y los Términos de Uso de Tubi. Para obtener más información, consulte www.tubi.tv/privacy y www.tubi.tv/terms ¿Preguntas? Háganos saber en www.tubi.tv/support"
     },
     "signIn_screen_heading": {
       "description": "Title on the signIn screen",
@@ -3760,7 +3760,23 @@ Function getTranslation_es_MX()
     },
     "continue_watching_disabled_message": {
       "description": "Continue watching disabled toast message",
-      "message": "Seguir viendo no está disponible actualmente."
+      "message": "Seguir Viendo no está disponible actualmente."
+    },
+    "disaster_mode_toast_heading": {
+      "description": "Heading of the toast that is shown on disaster mode UI.",
+      "message": "Estamos teniendo problemas para conectarnos"
+    },
+    "disaster_mode_toast_subheading": {
+      "description": "Subheading of the toast that is shown on disaster mode UI.",
+      "message": "¡Todavía puedes ver el partido!"
+    },
+    "rating": {
+      "description": "Like/Dislike feature",
+      "message": "Calificación"
+    },
+    "delayed_registration_message": {
+      "description": "Message displayed when user tries to register and the registration is delayed",
+      "message": "Intentaremos crear tu cuenta en las próximas 24 horas y, si tiene éxito, te enviaremos un correo para finalizar la configuración de tu cuenta."
     }
   }
 End Function
@@ -4944,7 +4960,7 @@ Function getTranslation_fr_CA()
     },
     "why_ask_age_description": {
       "description": "The main message which explains why Tubi is asking for the users year of birth",
-      "message": "*Nous utilisons ces informations pour confirmer que vous répondez aux critères d'âge définis dans nos conditions d'utilisation et pour personnaliser votre expérience. Lisez les conditions d'utilisation à l'adresse : www.tubitv.com/terms Des questions ? Faites-nous en part à : support@tubi.tv"
+      "message": "*Nous traitons ces informations comme décrit dans la Politique de confidentialité et les Conditions d'utilisation de Tubi. Pour plus d'informations, voir www.tubi.tv/privacy et www.tubi.tv/terms Des questions? Faites-le nous savoir à www.tubi.tv/support"
     },
     "signIn_screen_heading": {
       "description": "Title on the signIn screen",
@@ -5477,6 +5493,22 @@ Function getTranslation_fr_CA()
     "continue_watching_disabled_message": {
       "description": "Continue watching disabled toast message",
       "message": "Continuer à regarder est actuellement indisponible."
+    },
+    "disaster_mode_toast_heading": {
+      "description": "Heading of the toast that is shown on disaster mode UI.",
+      "message": "Nous avons des problèmes de connexion"
+    },
+    "disaster_mode_toast_subheading": {
+      "description": "Subheading of the toast that is shown on disaster mode UI.",
+      "message": "Vous pouvez toujours regarder le match!"
+    },
+    "rating": {
+      "description": "Like/Dislike feature",
+      "message": "Classement"
+    },
+    "delayed_registration_message": {
+      "description": "Message displayed when user tries to register and the registration is delayed",
+      "message": "Nous essaierons de créer votre compte dans les prochaines 24 heures et en cas de succès, nous vous enverrons un e-mail pour terminer la configuration de votre compte."
     }
   }
 End Function
@@ -5548,10 +5580,6 @@ Function getTranslation_en_GB()
     "dialog_whoops_title": {
       "description": "A general whoops title for an dialog window",
       "message": "Oops!"
-    },
-    "why_ask_age_description": {
-      "description": "The main message which explains why Tubi is asking for the users year of birth",
-      "message": "*We process this information as described in Tubi's Privacy Policy and Terms of Use. For more information, see www.tubi.tv/privacy and www.tubi.tv/terms. Questions? Let us know at www.tubi.tv/support"
     },
     "goBack_videoPlayer_ad": {
       "description": "Navigational instructions to users when pause Ad is displayed on video screen",
