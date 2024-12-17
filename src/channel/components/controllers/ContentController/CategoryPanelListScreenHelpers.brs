@@ -433,9 +433,14 @@ Function onJumpToIDFailed(msg)
   tubiLog("CategoryPanelListScreenHelpers.onJumpToIDFailed")
   jumpToCategoryId = msg.getData()
 
-  contentNode = CreateObject("roSGNode", "CategoryContentNode")
-  contentNode.id = jumpToCategoryId
-  showCategoryDetailsScreen(contentNode, false) 
+  '//If the failed to load category is a user generated category, then the most likely reason for failing to jump to that category is because
+  '// there is no content for that category. So we do not want to attempt to show a detail screen for that screen or else it will result in an error.
+  '// Instead it is better to fail silently, without an error modal.
+  if jumpToCategoryId <> m.constants.ui.categoryIds.history AND jumpToCategoryId <> m.constants.ui.categoryIds.queue
+    contentNode = CreateObject("roSGNode", "CategoryContentNode")
+    contentNode.id = jumpToCategoryId
+    showCategoryDetailsScreen(contentNode, false)
+  end if
 End Function
 
 

@@ -83,6 +83,7 @@ End Function
 
 
 Function onCheckOnRefreshTriggerred()
+  tubiLog("CategoryDetailsPanel.onCheckOnRefreshTriggerred")
   checkOnRefresh()
 End Function
 

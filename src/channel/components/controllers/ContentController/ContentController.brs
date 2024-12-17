@@ -1648,7 +1648,7 @@ Function setContentToRefreshAllPersonalizedScreens(shouldRefetchHomescreen = tru
   setContentToRefresh(m.constants.ui.screenIds.espanolScreen)
   setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
   setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
-  setContentToRefresh(m.constants.ui.screenIds.categoryPanelListScreen)
+  deleteFromScreenCache(m.constants.ui.screenIds.categoryPanelListScreen)
   setContentToRefresh(m.constants.ui.screenIds.epgScreen)
   setContentToRefresh(m.constants.ui.screenIds.linearVideoPlayerScreen)
   setContentToRefresh(m.constants.ui.screenIds.myStuffScreen)
