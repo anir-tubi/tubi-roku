@@ -132,7 +132,7 @@ You should see a launch configuration called Build & Deploy. Clicking the play b
 
 ![Build configuration](/docs/vscode_build_2.png)
 
-You can also set a key press in your keybindings.json file to start and stop the configuration. For example in mine I have:
+You can also set a key press in your keybindings.json file to start and stop the configuration. For example:
 
 ```json
 { "key": "cmd+r", "command": "workbench.action.debug.stop", "when": "inDebugMode"},
@@ -171,6 +171,23 @@ If you are using vscode, it's a good idea to also check the Problems pane to loo
 You can also filter based on type of problem, only showing results from the current file or searching for a specific pattern.
 
 The goal is to reach 0 errors and warnings so we can start doing checks on PR reviews.
+
+### Roku Device View Panel
+
+Integrating the Roku Device View panel alongside the SceneGraph Inspector in VSCode can improve your development workflow. The Roku Device View allows you to mirror your device's screen directly onto your computer, where you can easily identify any UI element, obtaining its ID, position, and dimensions with a single click.
+
+This combination provides a deeper understanding of UI element properties:
+
+- Roku Device View mirrors your device's display, making it easy to locate elements visually.
+- SceneGraph Inspector then reveals detailed attributes of these elements.
+
+By default, both tools are accessible from the Debug Panel in VSCode's primary sidebar. For an optimal setup:
+
+- Place the Roku Device View in the bottom panel.
+- Position the SceneGraph Inspector in the secondary sidebar to your right, as shown in the image below.
+
+![Roku Device View panel](/docs/vscode_roku_device_view_panel.png)
+
 
 # Test
 
