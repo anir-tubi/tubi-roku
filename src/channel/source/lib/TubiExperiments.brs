@@ -25,10 +25,6 @@ Function TubiExperiments(experimentsInfo) as Object
         roku_screensaver_v2 : {"enabled": false}
       }
 
-      roku_category_redesign: {
-        roku_category_redesign_v2: {"enabled": true}
-      }
-
       roku_autoplay_timer: {
         roku_autoplay_timer_v1 : {"enabled": false}
       }

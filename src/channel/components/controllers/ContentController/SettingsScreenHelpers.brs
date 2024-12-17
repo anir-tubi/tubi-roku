@@ -356,7 +356,6 @@ Function refreshScreenAfterParentalChanges()
   setContentToRefresh(m.constants.ui.screenIds.movieScreen)
   setContentToRefresh(m.constants.ui.screenIds.espanolScreen)
   setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
-  setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
   deleteFromScreenCache(m.constants.ui.screenIds.categoryPanelListScreen)
   setContentToRefresh(m.constants.ui.screenIds.epgScreen)
   setContentToRefresh(m.constants.ui.screenIds.myStuffScreen)
@@ -375,8 +374,6 @@ Function refreshScreenAfterParentalChanges()
     if screen.id = m.constants.ui.screenIds.searchScreen
       screen.kidsModeEnabled = isKidsUIOn()
       screen.signedIn = true
-    else if screen.id = m.constants.ui.screenIds.channelListScreen OR screen.id = m.constants.ui.screenIds.categoryListScreen
-      refreshGridScreen(screen)
     else if screen.id = m.constants.ui.screenIds.categoryPanelListScreen
       refreshCategoryPanelListScreen(screen)
     else if screen.id = m.constants.ui.screenIds.settingsScreen

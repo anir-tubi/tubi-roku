@@ -5,7 +5,6 @@ Function init()
   m.top.observeFieldScoped("focusedChild", "onFocusChange")
   m.top.observeFieldScoped("stringSignIn", "onSignInChange")
   m.top.observeFieldScoped("displayEspanol", "onEspanolDisplayChanged")
-  m.top.observeFieldScoped("displayChannels", "onChannelsDisplayChanged")
   m.top.observeFieldScoped("displaySignIn", "onSignInDisplayChanged")
   m.top.observeFieldScoped("displayKids", "onKidsDisplayChanged")
   m.top.observeFieldScoped("espanolItemTurnedOn", "onEspanolItemTurnedOnChanged")
@@ -73,10 +72,6 @@ Function createMainContent(item)
     contentNode.title = getTranslation("menu_livetv")
     contentNode.iconUrl = "pkg:/images/live-icon.webp"
     contentNode.filledIconUrl = "pkg:/images/live-icon-filled.webp"
-  else if item = m.constants.ui.sideNavIds.channels
-    contentNode.title = getTranslation("menu_channels")
-    contentNode.iconUrl = "pkg:/images/sideNavChannels.webp"
-    contentNode.filledIconUrl = "pkg:/images/sideNavChannelsFilled.webp"
   else if item = m.constants.ui.sideNavIds.profile
     ' m.top.stringSignIn may have been set before SideNav.createMainContent() was called
     ' so use it if it exists
@@ -243,19 +238,6 @@ Function onEspanolDisplayChanged()
   else
     ' Display the menu item if it should be displayed
     insertMenuItemInMenuLists(m.constants.ui.sideNavIds.espanol)
-  end if
-End Function
-
-
-' Hide the Channels item if this is called
-Function onChannelsDisplayChanged()
-  if m.top.displayChannels = false
-    '//Remove Channels if that item should be hidden.
-    removeChannels()
-    verticallyCenterSideNav()
-  else
-    ' Display the menu item if it should be displayed
-    insertMenuItemInMenuLists(m.constants.ui.sideNavIds.channels)
   end if
 End Function
 

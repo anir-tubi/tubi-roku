@@ -232,20 +232,11 @@ Function processNavigateAction(uriParameters)
       showDefaultEPGScreen()
       focusSideNavOption(m.constants.ui.sideNavIds.linearEPG)
     else if page = "categories"
-      if (getExperimentResource("roku_category_redesign", "roku_category_redesign_v2", true).enabled = true)
-        showCategoryPanelListScreen(m.constants)
-      else
-        showCategoryListScreen(m.constants)
-      end if
+      showCategoryPanelListScreen(m.constants)
       focusSideNavOption(m.constants.ui.sideNavIds.categories)
     else if page = "channels"
-      if (getExperimentResource("roku_category_redesign", "roku_category_redesign_v2", true).enabled = true)
-        showCategoryPanelListScreen(m.constants, false, m.constants.ui.categoryIds.networks)
-        focusSideNavOption(m.constants.ui.sideNavIds.categories)
-      else
-        showChannelListScreen(m.constants)
-        focusSideNavOption(m.constants.ui.sideNavIds.channels)
-      end if
+      showCategoryPanelListScreen(m.constants, false, m.constants.ui.categoryIds.networks)
+      focusSideNavOption(m.constants.ui.sideNavIds.categories)
     else if page = "signin" OR page = "signup"
       isUserSigedIn = isLoggedInUser()
       if isUserSigedIn = false
@@ -264,7 +255,9 @@ Function processNavigateAction(uriParameters)
       end if
     else if page = "network" AND isNonEmptyString(uriParameters["network"]) = true
       navigateToNetworkDetailsScreen(uriParameters["network"])
-      focusSideNavOption(m.constants.ui.sideNavIds.channels)
+
+      '//::NOTE:: there is no longer a channels side nav option, so target the categories side nav item.
+      focusSideNavOption(m.constants.ui.sideNavIds.categories)
     else if page = "detail" AND isNonEmptyString(uriParameters["contentId"]) = true
       processPlayAndDetailsScreenAction(uriParameters)
     else

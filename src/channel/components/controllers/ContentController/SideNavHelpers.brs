@@ -12,8 +12,6 @@ Function initSideNav()
   if m.constants.deviceInfo.countryCode <> "US"
     '//Tell the sideNav to stop displaying the Espanol menu item
     m.SideNav.displayEspanol = false
-    '//Tell the sideNav to stop displaying the channel menu item
-    m.SideNav.displayChannels = false
   end if
 
   ' Display the Kids menu items only if the feature is allowed
@@ -227,25 +225,12 @@ Function onSideNavItemSelected()
 
       showHomeScreen(m.constants)
       bNewScreenCalledSuccess = true
-    else if itemSelectedId = m.constants.ui.sideNavIds.channels
-      if isKidsUIOn() = true
-        bNewScreenCalledSuccess = false
-        displayMenuItemDisabled(m.constants.ui.sideNavIds.channels)
-      else
-        setUiMode(m.constants.ui.modes.standard)
-        showChannelListScreen(m.constants)
-        bNewScreenCalledSuccess = true
-      end if
     else if itemSelectedId = m.constants.ui.sideNavIds.categories
       if isKidsUIOn() <> true
         setUiMode(m.constants.ui.modes.standard)
       end if
 
-      if (getExperimentResource("roku_category_redesign", "roku_category_redesign_v2", true).enabled = true)
-        showCategoryPanelListScreen(m.constants)
-      else
-        showCategoryListScreen(m.constants)
-      end if
+      showCategoryPanelListScreen(m.constants)
       bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.espanol
       if isKidsUIOn() = true
@@ -359,10 +344,7 @@ Function displayMenuItemDisabled(sMenuItemID, parental = "")
   currentScreenNow = getCurrentScreen()
   sTitle = getTranslation("dialog_errorOops_title")
   sDialogSubTypeValue = ""
-  if sMenuItemID = m.constants.ui.sideNavIds.channels
-    sTitle = getTranslation("dialog_channelsDisabled_title")
-    sDialogSubTypeValue = "kids-mode-channels"
-  else if sMenuItemID = m.constants.ui.sideNavIds.espanol
+  if sMenuItemID = m.constants.ui.sideNavIds.espanol
     sTitle = getTranslation("dialog_espanolDisabled_title")
     sDialogSubTypeValue = "kids-mode-espanol"
   else if sMenuItemID = m.constants.ui.sideNavIds.linearEPG

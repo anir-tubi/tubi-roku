@@ -1123,36 +1123,6 @@ Function setDirtyUserCategories(categoryId)
         isSignedInUser: isLoggedInUser()
       })
     end if
-
-    ' needed in case the image sizes on the homescreen are different than the image sizes
-    ' on the categoryDetailsScreen. We don't want to add large homescreen images sizes to the
-    ' content on the categoryDetailsScreen.
-    isCategoryInStack = false
-    if (getExperimentResource("roku_category_redesign", "roku_category_redesign_v2", false).enabled = false)
-      isCategoryInStack = isCategoryDetailScreenInStack(categoryId)
-    end if
-
-    if isCategoryInStack = true
-      optionCategoryDetail = {
-        params: {
-          content_mode: ""
-        }
-      }
-      categoryReqInfo = m.CmsApi.createCategoryReqInfo(categoryId, isKidsMode, optionCategoryDetail)
-
-      m.makeRequest({
-        url: categoryReqInfo.url
-        requestType: reqName
-        options: categoryReqInfo.options
-        successCallback: onReloadUserCategoriesResponseInCategoryDetailScreen
-        errorCallback: onErrorReloadUserCategoriesInCategoryDetailScreen
-        responseType: "node"
-        id: categoryId
-        isSignedInUser: isLoggedInUser()
-        screenId: m.constants.ui.screenIds.categoryDetailsScreen
-        uiMode: m.uiMode
-      })
-    end if
   end if
 End Function
 
@@ -1163,35 +1133,12 @@ Function onReloadUserCategoriesResponse(handledRequest)
   ' update the main home screen with the updated user category
   onReloadUserCategoriesInHomeScreen(handledRequest)
 
-  categoryListScreen = invalid
-  if (getExperimentResource("roku_category_redesign", "roku_category_redesign_v2", false).enabled = false)
-    ' inform the category list screen of the updated user category
-    categoryListScreen = getFromScreenCache(m.constants.ui.screenIds.categoryListScreen)
-  else
-    categoryListScreen = getFromScreenCache(m.constants.ui.screenIds.categoryPanelListScreen)
-  end if
-
+  categoryListScreen = getFromScreenCache(m.constants.ui.screenIds.categoryPanelListScreen)
   if categoryListScreen <> invalid
     categoryListScreen.reloadUserCategoriesResponse = handledRequest
   end if
 
-End Function
-
-
-Function onReloadUserCategoriesResponseInCategoryDetailScreen(handledRequest)
-  tubiLog("ContentController.onReloadUserCategoriesResponseInCategoryDetailScreen")
-
-  ' inform the category details screen for the specific user category of the update user category content
-  if handledRequest <> invalid
-    refreshStackedUserScreenWithChangedCategory(handledRequest.id)
-  end if
-End Function
-
-
-Function onErrorReloadUserCategoriesInCategoryDetailScreen(response)
-  tubiLog("ContentController.onErrorReloadUserCategoriesInCategoryDetailScreen")
-  onReloadUserCategoriesInHomeScreen(response, m.constants.ui.screenIds.categoryDetailsScreen)
-End Function
+End Function  
 
 
 ' @queueIds: roSGNode, a parent node with children nodes. Each child node representing an item in the user's queue.
@@ -1473,23 +1420,6 @@ Function refreshAllDetailScreens()
 End Function
 
 
-' Content for a category details screen has been updated.
-' Any screen that is displaying this category should be updated.
-' @sCategoryID: string, the category id we are searching for in the stack
-Function refreshStackedUserScreenWithChangedCategory(sCategoryID)
-  ' Tell the screen that contains the category associated with the passed ID to refresh the next time is is on screen by setting the validUntil variable to 0
-  for i = 0 to m.screenStack.getChildCount() - 1
-    screen = m.screenStack.getChild(i)
-    if screen <> invalid AND screen.isSubType("CategoryDetailsScreen") = true
-      content = screen.content
-      if content <> invalid AND content.id = sCategoryID
-        screen.content.validUntil = 0
-      end if
-    end if
-  end for
-End Function
-
-
 ' Makes the contentGroup (including the screen stack) on the screen visible which indicates the user
 ' has started the channel, so also send the ActiveEvent.
 ' Should only happen once per channel launch
@@ -1647,7 +1577,6 @@ Function setContentToRefreshAllPersonalizedScreens(shouldRefetchHomescreen = tru
   setContentToRefresh(m.constants.ui.screenIds.movieScreen)
   setContentToRefresh(m.constants.ui.screenIds.espanolScreen)
   setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
-  setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
   deleteFromScreenCache(m.constants.ui.screenIds.categoryPanelListScreen)
   setContentToRefresh(m.constants.ui.screenIds.epgScreen)
   setContentToRefresh(m.constants.ui.screenIds.linearVideoPlayerScreen)
@@ -2055,7 +1984,6 @@ Function onCustomSuspend(msg)
       ' Remove the parent screen from the cache so that it is reloaded if a user navigates back to it in order to prevent a UX bug such that the cached screen
       ' is displayed but nothing is displayed on the screen.
       deleteFromScreenCache(m.constants.ui.screenIds.channelListScreen)
-      deleteFromScreenCache(m.constants.ui.screenIds.categoryListScreen)
       deleteFromScreenCache(m.constants.ui.screenIds.categoryPanelListScreen)
     else
       ' if the focus is on live TV row, stop the playback

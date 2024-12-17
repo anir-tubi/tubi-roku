@@ -555,11 +555,7 @@ Function handleCategoryDeeplinkContent()
     if m.enteredFromDeepLink = true
       sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.category, m.Tracking, m.trackingLoggingTask, m.constants)
     end if
-    if (getExperimentResource("roku_category_redesign", "roku_category_redesign_v2", true).enabled = true)
-      showCategoryPanelListScreen(m.constants, true)
-    else
-      showCategoryListScreen(m.constants, true)
-    end if
+    showCategoryPanelListScreen(m.constants, true)
   end if
   sCatSideNavID = m.constants.ui.sideNavIds.categories
 
@@ -591,11 +587,7 @@ Function handleNetworkDeeplinkContent()
         sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.channel, m.Tracking, m.trackingLoggingTask, m.constants)
       end if
 
-      if (getExperimentResource("roku_category_redesign", "roku_category_redesign_v2", true).enabled = true)
-        showCategoryPanelListScreen(m.constants, true, m.constants.ui.categoryIds.networks)
-      else
-        showChannelListScreen(m.constants, true) 
-      end if
+      showCategoryPanelListScreen(m.constants, true, m.constants.ui.categoryIds.networks)
     end if
     setUiMode(m.constants.ui.modes.standard)
   end if

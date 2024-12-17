@@ -494,10 +494,6 @@ Function getTranslation_en_US()
       "description": "A general error title for an error dialog window",
       "message": "Oops!"
     },
-    "dialog_channelsDisabled_title": {
-      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav channels menu item but the item has been disabled",
-      "message": "Channels Disabled"
-    },
     "dialog_espanolDisabled_title": {
       "description": "Title of a Dialog Window that is shown when the user clicked the sidenav espanol menu item but the item has been disabled",
       "message": "Español Disabled"
@@ -961,10 +957,6 @@ Function getTranslation_en_US()
     "screenSettings_error_signInAutoplayPreview_description": {
       "description": "Description of message to let users know that they must be signed in to change the AutoplayPreview choice.",
       "message": "You must be signed in to change Autoplay Preview preferences."
-    },
-    "screenChannels_error_retrieve_message": {
-      "description": "Onscreen message to indicate channel content could not be gathered",
-      "message": "Could not retrieve channels content."
     },
     "screenCategories_error_retrieve_message": {
       "description": "Onscreen message to indicate categories content could not be gathered",
@@ -2268,10 +2260,6 @@ Function getTranslation_es_MX()
       "description": "A general error title for an error dialog window",
       "message": "¡Uy!"
     },
-    "dialog_channelsDisabled_title": {
-      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav channels menu item but the item has been disabled",
-      "message": "Canales desactivado"
-    },
     "dialog_espanolDisabled_title": {
       "description": "Title of a Dialog Window that is shown when the user clicked the sidenav espanol menu item but the item has been disabled",
       "message": "Español desactivado"
@@ -2735,10 +2723,6 @@ Function getTranslation_es_MX()
     "screenSettings_error_signInAutoplayPreview_description": {
       "description": "Description of message to let users know that they must be signed in to change the AutoplayPreview choice.",
       "message": "Debes iniciar sesión para cambiar las preferencias de reproducción automática."
-    },
-    "screenChannels_error_retrieve_message": {
-      "description": "Onscreen message to indicate channel content could not be gathered",
-      "message": "No se pudo recuperar el contenido de los canales."
     },
     "screenCategories_error_retrieve_message": {
       "description": "Onscreen message to indicate categories content could not be gathered",
@@ -4004,10 +3988,6 @@ Function getTranslation_fr_CA()
       "description": "A general error title for an error dialog window",
       "message": "Oups !"
     },
-    "dialog_channelsDisabled_title": {
-      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav channels menu item but the item has been disabled",
-      "message": "Chaînes désactivées"
-    },
     "dialog_espanolDisabled_title": {
       "description": "Title of a Dialog Window that is shown when the user clicked the sidenav espanol menu item but the item has been disabled",
       "message": "Espagnol désactivé"
@@ -4471,10 +4451,6 @@ Function getTranslation_fr_CA()
     "screenSettings_error_signInAutoplayPreview_description": {
       "description": "Description of message to let users know that they must be signed in to change the AutoplayPreview choice.",
       "message": "Vous devez être connecté(e) pour modifier les préférences de lecture automatique."
-    },
-    "screenChannels_error_retrieve_message": {
-      "description": "Onscreen message to indicate channel content could not be gathered",
-      "message": "Impossible de récupérer le contenu des chaînes."
     },
     "screenCategories_error_retrieve_message": {
       "description": "Onscreen message to indicate categories content could not be gathered",

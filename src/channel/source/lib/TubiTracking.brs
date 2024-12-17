@@ -1093,7 +1093,7 @@ Function tubiTracking_getOneOfs()
   ' At some point we may need to split the component "Oneof" like we did with the page and dest_page "Oneof"
   ' but for now this is sufficient
   componentOneof = {
-    browse_menu_component: { ' Used for category roku_category_redesign_v2 screen
+    browse_menu_component: { ' Used for category screen
       category_slug: ""
     }
 

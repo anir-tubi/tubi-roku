@@ -1261,7 +1261,6 @@ Function getConstants()
       constants.ui.screenIds.settingsScreen = "settingsScreen"
       constants.ui.screenIds.categoryDetailsScreen = "categoryDetailsScreen"
       constants.ui.screenIds.channelListScreen = "channelListScreen"
-      constants.ui.screenIds.categoryListScreen = "categoryListScreen"
       constants.ui.screenIds.categoryPanelListScreen = "categoryPanelListScreen"
       constants.ui.screenIds.espanolScreen = "espanolScreen"
       constants.ui.screenIds.movieScreen = "movieScreen"
@@ -1292,7 +1291,6 @@ Function getConstants()
     constants.ui.cacheableScreenIds = {}
       constants.ui.cacheableScreenIds[constants.ui.screenIds.homeScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.channelListScreen] = true
-      constants.ui.cacheableScreenIds[constants.ui.screenIds.categoryListScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.categoryPanelListScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.espanolScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.movieScreen] = true
@@ -1404,7 +1402,6 @@ Function getConstants()
 
     constants.ui.sideNavOpenIds = {}
       constants.ui.sideNavOpenIds[constants.ui.screenIds.homeScreen] = true
-      constants.ui.sideNavOpenIds[constants.ui.screenIds.categoryListScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.categoryPanelListScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.espanolScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.epgScreen] = true
@@ -1437,7 +1434,6 @@ Function getConstants()
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.homeScreen] = constants.ui.sideNavIds.home
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.searchScreen] = constants.ui.sideNavIds.search
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.channelListScreen] = constants.ui.sideNavIds.channels
-      constants.ui.screenIdToSideNavId[constants.ui.screenIds.categoryListScreen] = constants.ui.sideNavIds.categories
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.categoryPanelListScreen] = constants.ui.sideNavIds.categories
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.espanolScreen] = constants.ui.sideNavIds.espanol
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.myStuffScreen] = constants.ui.sideNavIds.myList

@@ -36,9 +36,6 @@
       <!-- Should the sideNav display the Espanol menu item? -->
       <field id="displayEspanol" value="true" type="boolean"/>
 
-      <!-- Should the sideNav display the channels menu item? -->
-      <field id="displayChannels" value="true" type="boolean"/>
-
       <!-- The following are the strings associated with this UI element that is changed from the helper/controller file -->
       <field id="stringSignIn" type="string"/>
 

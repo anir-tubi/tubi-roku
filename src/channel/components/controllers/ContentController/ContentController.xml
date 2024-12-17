@@ -10,7 +10,6 @@
   <script type="text/brightscript" uri="ContentController.brs" />
   <script type="text/brightscript" uri="pkg:/components/controllers/shared.brs" />
   <script type="text/brightscript" uri="CategoryDetailsScreenHelpers.brs" />
-  <script type="text/brightscript" uri="ChannelGridScreenHelpers.brs" />
   <script type="text/brightscript" uri="CategoryPanelListScreenHelpers.brs" />
   <script type="text/brightscript" uri="DetailScreenHelpers.brs" />
   <script type="text/brightscript" uri="HomeScreenHelpers.brs" />

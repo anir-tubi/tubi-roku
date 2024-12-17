@@ -224,10 +224,6 @@
     "description": "A general error title for an error dialog window",
     "message": "Oops!"
   },
-  "dialog_channelsDisabled_title": {
-    "description": "Title of a Dialog Window that is shown when the user clicked the sidenav channels menu item but the item has been disabled",
-    "message": "Channels Disabled"
-  },
   "dialog_espanolDisabled_title": {
     "description": "Title of a Dialog Window that is shown when the user clicked the sidenav espanol menu item but the item has been disabled",
     "message": "Español Disabled"
@@ -691,10 +687,6 @@
   "screenSettings_error_signInAutoplayPreview_description": {
     "description": "Description of message to let users know that they must be signed in to change the AutoplayPreview choice.",
     "message": "You must be signed in to change Autoplay Preview preferences."
-  },
-  "screenChannels_error_retrieve_message": {
-    "description": "Onscreen message to indicate channel content could not be gathered",
-    "message": "Could not retrieve channels content."
   },
   "screenCategories_error_retrieve_message": {
     "description": "Onscreen message to indicate categories content could not be gathered",
