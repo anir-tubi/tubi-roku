@@ -14,7 +14,7 @@ Function init()
   m.titleImage = m.top.findNode("TitleImage")
   ' We are only limiting the height since title logo is displayed on it's own row we are good to let the width flow.
   m.titleImage.loadHeight = m.constants.ui.imageSizes.title[1]
-  m.titleImage.height = m.constants.ui.imageSizes.title[1]
+  m.titleImage.loadWidth = m.constants.ui.imageSizes.title[0]
   m.episode = m.top.findNode("Episode")
   m.twoLineInfo = m.top.findNode("TwoLineInfo")
 
@@ -83,7 +83,6 @@ Function init()
   m.offset.observeFieldScoped("translation", "onOffsetTranslationChange")
   m.partnerLogo.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.rating.observeFieldScoped("loadStatus", "onPosterLoadStatus")
-  m.titleImage.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.closedCaptions.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.audioDescriptionPoster.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.top.observeFieldScoped("airDateTime", "onAirDateChange")

@@ -1344,7 +1344,7 @@ Function getConstants()
       constants.ui.imageSizes.poster = [186, 267]
 
       'Sizes of video title image (if available) that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images. The video title image is an image representation of the title metadata of the video. Not all videos may have this image.
-      constants.ui.imageSizes.title = [0, 201]
+      constants.ui.imageSizes.title = [600, 201]
 
       'The maximum sizes of skinAd logo that is displayed in the right hand corner with the Tubi logo. If 0, then no maximum
       constants.ui.imageSizes.logoSkinAdSmall = [0, 60]
