@@ -18,7 +18,7 @@ Function onFractionChanged(msg)
   fraction = msg.getData()
 
   if m.interpolatedNode = invalid then
-    fieldToInterpParts = m.top.fieldToInterp.split(".")
+    fieldToInterpParts = m.top.vector4DFieldToInterp.split(".")
     interpolatedField = fieldToInterpParts.pop()
     if interpolatedField <> invalid then
       m.interpolatedField = interpolatedField

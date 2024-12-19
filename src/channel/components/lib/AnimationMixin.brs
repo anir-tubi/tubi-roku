@@ -304,7 +304,7 @@ Function animate(target As Object, options as Object) As Object
       if targetClippingRect.x <> options.clippingRect[0] OR targetClippingRect.y <> options.clippingRect[1] OR targetClippingRect.width <> options.clippingRect[3] OR targetClippingRect.height <> options.clippingRect[4] then
         clippingRectInterpolator = animation.createChild("Vector4DFieldInterpolator")
         clippingRectInterpolator.id = "ClippingRectInterpolator-" + target.id
-        clippingRectInterpolator.fieldToInterp = target.id + ".clippingRect"
+        clippingRectInterpolator.vector4DFieldToInterp = target.id + ".clippingRect"
       end if
     else if clippingRectInterpolator <> invalid AND options.clippingRect = invalid then
       animation.removeChild(clippingRectInterpolator)

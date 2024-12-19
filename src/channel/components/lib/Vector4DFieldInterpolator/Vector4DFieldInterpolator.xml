@@ -9,5 +9,8 @@
     <!-- INPUT -->
     <!-- We have to extend an existing interpolator or else Animation appears to ignore it and not update the fraction field. Because of this we also need to add vector4DKeyValue as a new field as trying to override the existing keyValue field does not work. Each item in the array should be an array with four values like [x, y, width, height] -->
     <field id="vector4DKeyValue" type="array" />
+
+    <!-- To avoid warning in telnet we also need to use our own field for specifying the field to interpret -->
+    <field id="vector4DFieldToInterp" type="string" />
   </interface>
 </component>
