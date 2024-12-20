@@ -204,8 +204,8 @@ Function updateConstantsValuesFromExternalConfig(config)
 
     'Client log disabled by the remote config
     clientLogsEnabled = config.client_log_enabled
-    if clientLogsEnabled = false
-      m.constants.settings.clientLogsEnabled = clientLogsEnabled
+    if clientLogsEnabled = 0 OR clientLogsEnabled = false
+      m.constants.settings.clientLogsEnabled = false
     end if
 
     ' Since we're modifying constants here we need to push up the changes to the global copy
