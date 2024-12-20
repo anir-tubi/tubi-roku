@@ -708,7 +708,7 @@ Function getConstants()
 
     constants.urls.rokuContinueWatchingEndpoint = "https://userdata.sr.roku.com/user-data/v1/content/continueWatching"
 
-    constants.urls.clientErrorConfigEndpoint = "https://d0.tubitv.com/error-handler/v2/client-error-config.json"
+    constants.urls.clientErrorConfigEndpoint = "https://md0.tubitv.com/error-handler/v2/client-error-config.json"
 
     if constants.settings.stagingApis = true
       constants.urls.foxApiBaseUrl = "https://qa.api.haw.digitalvideoplatform.com"
