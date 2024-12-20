@@ -603,12 +603,6 @@ Function getConstants()
       constants.urls.account.resetPassword = constants.urls.account.urlBase + "/user_device/password/reset"
       constants.urls.account.logout = constants.urls.account.urlBase + "/user_device/logout"
 
-      ' TODO remove in next submission build only adding back to prevent crashes when falling back
-      constants.urls.account.anonymous = {}
-      constants.urls.account.anonymous.signingKey = constants.urls.account.urlBase + "/device/anonymous/signing_key"
-      constants.urls.account.anonymous.token = constants.urls.account.urlBase + "/device/anonymous/token"
-      constants.urls.account.anonymous.refreshToken = constants.urls.account.urlBase + "/device/anonymous/refresh"
-
     constants.urls.lishi = {}
       constants.urls.lishi.baseUrl = "https://lishi.production-public.tubi.io"
       if constants.settings.mode <> "production" AND constants.settings.stagingApis = true then
@@ -1520,11 +1514,6 @@ Function getConstants()
     constants.configHubFallbacks.majorEventEnd = "2025-02-10T08:00:00.000000Z"
 
   constants.serverValues = {}
-
-  ' TODO DELETE WITH NEXT SUBMISSION RELEASE
-  constants.serverValues.tensorVideoRenditions = {}
-  ' TODO DELETE WITH NEXT SUBMISSION RELEASE
-  constants.serverValues.tensorVideoRenditions.fourK = "4K_READY"
 
   ' Creates mapping against parental rating to a header string.
   constants.serverValues.parentalControls = ["YOUNGER_CHILD", "OLDER_CHILD", "TEEN", "ADULT"]
