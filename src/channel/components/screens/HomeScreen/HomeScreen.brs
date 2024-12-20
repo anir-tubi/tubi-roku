@@ -9,9 +9,6 @@ Function init()
   m.ContentArea = m.top.findNode("ContentArea")
   m.InfoPanel = m.top.findNode("InfoPanel")
   m.InfoPanelParent = m.top.findNode("InfoPanelParent")
-  m.HintGroup = m.top.findNode("UpHintGroup")
-  fades = m.top.findNode("Fades")
-  m.HintGroupFade = fades.findNode("HintGroupFade")
 
   m.ContentArea.translation = [0, 516]
 
