@@ -1478,6 +1478,11 @@ Function filterPurpleCarpetContainerItemsBasedOnListing(listing, purpleCarpetCon
                 ' will be passed to player for playback.
                 foxContentId: mappedListingItem.id
               }, true)
+
+              ' If the registration by pass is enabled then setting needs login to false.
+              if getExternalConfigValueFromGlobal("bypass_registration_gate", false) = true
+                processedItem.needsLogin = false
+              end if
             end if
 
           end if
