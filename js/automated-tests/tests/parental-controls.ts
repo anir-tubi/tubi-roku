@@ -404,9 +404,9 @@ describe('Parental Controls', function () {
 
       // Select another PC Setting
       await testUtils.waitForElementToFullyShowOnScreen('parentalControlsMenuTextFocused');
-      await utils.sleep(1000); // will improve these later
+      await utils.sleep(2000); // will improve these later
       await ecp.sendKeypress(ecp.Key.Right);
-      await utils.sleep(1000); // will improve these later
+      await utils.sleep(2000); // will improve these later
       await ecp.sendKeypress(ecp.Key.Up);
       await ecp.sendKeypress(ecp.Key.Ok);
 

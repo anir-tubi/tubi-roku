@@ -112,7 +112,8 @@ it('C450487 - Exit prompt - Guest user press back button when lands on activatio
     expect(enterEmailAddressTitle.text).to.be.equal('Enter Email Address');
 });
 
-// https://tubi.testrail.io/index.php?/cases/view/450490
+// https://tubi.testrail.io/index.php?/cases/view/450490 - Need to remove this because of Magic Link
+/*
 it('C450490 - Exit prompt - Guest user sign in through the modal and the CW row should populate, @signupsaveprogressexit', async () => {
 
     // Select a title
@@ -168,7 +169,7 @@ it('C450490 - Exit prompt - Guest user sign in through the modal and the CW row 
     await testUtils.waitForElementToFullyShowOnScreen(
       'tvContinueWatchingRow'
     );
-    
+    */
 
 
 // https://tubi.testrail.io/index.php?/cases/view/450491

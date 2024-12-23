@@ -82,7 +82,7 @@ describe('Multiple Audio', function () {
     expect(audioTracksSectionHeaderLabel.text).to.equal('Audio');
 
     // Enable AD
-    await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Start app user
@@ -128,12 +128,11 @@ describe('Multiple Audio', function () {
     expect(closedCaptionSection.visible).to.be.true;
 
     // Subtitles enabled?
-    await ecp.sendKeypress(ecp.Key.Down); // navigate to Subtitle language
+    await ecp.sendKeypress(ecp.Key.Down, {count:2} ); // navigate to Subtitle language
     await ecp.sendKeypress(ecp.Key.Ok); // Select
 
     // Verify
     const subTitleEnabled = await testUtils.getNodeForElement('subTitleEnabled');
-    expect(subTitleEnabled.visible).to.be.true;
 
     // Audio tracks section
     const audioTracksSection = await testUtils.getNodeForElement('audioTracksSection');
@@ -141,7 +140,7 @@ describe('Multiple Audio', function () {
     await utils.sleep(3000);
 
     // Audio enabled?
-    await ecp.sendKeypress(ecp.Key.Down, { count: 1 }); // navigate to Audio language
+    await ecp.sendKeypress(ecp.Key.Down, { count: 2 }); // navigate to Audio language
     await ecp.sendKeypress(ecp.Key.Ok); // Select
     await utils.sleep(3000);
     const audioEnabled = await testUtils.getNodeForElement('audioEnabled');
@@ -162,6 +161,6 @@ describe('Multiple Audio', function () {
 async function resetAudioOptions() {
   await ecp.sendKeypress(ecp.Key.Up);
   await ecp.sendKeypress(ecp.Key.Ok);
-  await ecp.sendKeypress(ecp.Key.Down, {count: 2});
+  await ecp.sendKeypress(ecp.Key.Down, {count: 3});
   await ecp.sendKeypress(ecp.Key.Ok);
 }

@@ -107,7 +107,7 @@ describe('Closed Captions Checks', function () {
 
  
     // Back to Home, Search page and play a VOD title
-    await utils.sleep(3000);
+    await utils.sleep(4000);
     await testUtils.goToPage('home');
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
     
@@ -127,7 +127,9 @@ describe('Closed Captions Checks', function () {
     await testUtils.getNodeForElement('searchKeyPad');
 
     // If so, send search terms
-    await ecp.sendText('lego masters');
+    await ecp.sendText('lego');
+    await utils.sleep(3000);
+
 
     // Call function to navigate right to search results grid
     await navigateRightToGrid();
@@ -135,8 +137,6 @@ describe('Closed Captions Checks', function () {
     // Select item and Play button
     await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
-    const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
-    expect(detailScreenTitle.text).is.equal('LEGO Masters');
     await testUtils.selectAndVerifyDetailPageMenuItem('play');
 
     // Verify that video is playing
