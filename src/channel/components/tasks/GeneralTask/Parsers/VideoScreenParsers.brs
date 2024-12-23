@@ -64,13 +64,13 @@ End Function
 ' contain the expected keys.
 Function parseHistorySuccess(fullResponse, reqInfo)
 
-  if fullResponse.code <> 200
+  if isAA(fullResponse) = false OR fullResponse.code <> 200
     return invalid
   end if
 
   response = fullResponse.data
 
-  if response = invalid OR response.content_id = invalid OR response.id = invalid OR response.content_type = invalid then
+  if isAA(response) = false OR response.content_id = invalid OR response.id = invalid OR response.content_type = invalid then
     return invalid
   end if
 
