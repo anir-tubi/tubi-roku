@@ -1262,7 +1262,7 @@ Function onEventCtaListItemSelected(msg)
       airDatetime = CreateObject("roDateTime")
       airDatetime.FromISO8601String(primaryEventContent.airDateTime)
       airDatetime.toLocalTime()
-      formattedTime = airDatetime.asTimeStringLoc("h:mm a")
+      formattedTime = localizedTimeString(airDatetime)
       message = getTranslation("available_at_toast_subheading")
       replacements = {
         "time": formattedTime
@@ -1481,7 +1481,9 @@ Function filterPurpleCarpetContainerItemsBasedOnListing(listing, purpleCarpetCon
 
               ' If the registration by pass is enabled then setting needs login to false.
               if getExternalConfigValueFromGlobal("bypass_registration_gate", false) = true
-                processedItem.needsLogin = false
+                processedItem.update({
+                  needsLogin: false
+                }, true)
               end if
             end if
 

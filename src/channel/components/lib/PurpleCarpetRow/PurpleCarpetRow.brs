@@ -182,7 +182,7 @@ Function populateCtaButtonList()
       ' Checking if the current day and air date are same.
       ' Since we only have asTimeStringLoc method to format by passing the time format but that returns in local time so converting the utc time to local format.
       airDatetime.toLocalTime()
-      formattedTime = airDatetime.asTimeStringLoc("h:mm a")
+      formattedTime = localizedTimeString(airDatetime)
 
       menuItems.push({
         id: "availableAt"

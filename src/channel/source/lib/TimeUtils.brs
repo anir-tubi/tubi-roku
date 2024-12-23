@@ -313,3 +313,30 @@ Function isToday(dateString)
 
   return false
 End Function
+
+
+' Wrapper to support for devices running below 12.0 OS. Returns a localized time string for the given UTC time.
+' @dateTime: roDateTime, representing the UTC time
+' @format: string, the format to return the time in. Default is "h:mm a"
+Function localizedTimeString(dateTime, format = "h:mm a")
+  if FindMemberFunction(dateTime, "asTimeStringLoc") <> invalid
+    return dateTime.asTimeStringLoc(format)
+  else
+    inputDateHours = dateTime.GetHours()
+    inputDateMins = dateTime.GetMinutes().toStr()
+
+    if inputDateMins.len() = 1
+      inputDateMins = "0" + inputDateMins
+    end if
+
+    meridiem = "am"
+
+    if inputDateHours > 11
+      meridiem = "pm"
+    end if
+
+    inputDate12Hours = inputDateHours mod 12
+
+    return Substitute("{0}:{1} {2}", inputDate12Hours.toStr(), inputDateMins, meridiem)
+  end if
+End Function

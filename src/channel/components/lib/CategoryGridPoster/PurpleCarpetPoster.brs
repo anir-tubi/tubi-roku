@@ -64,10 +64,11 @@ Function updateUIWithBadges()
       setBadge(m.badgeTypes.live)
     else if isEventToday = true
       airDatetime.toLocalTime()
-      formattedTime = UCase(airDatetime.asTimeStringLoc("h:mm a"))
+      formattedTime = UCase(localizedTimeString(airDatetime))
       badgeText = getTranslation("live_on_date_today", {"time": formattedTime})
       setBadge(m.badgeTypes.today, badgeText)
-    else
+    else if FindMemberFunction(airDatetime, "asDateStringLoc") <> invalid
+      ' Only showing the component for os versions that support asDateStringLoc.
       airDatetime.toLocalTime()
       formattedMonth = airDatetime.asDateStringLoc("MMM")
       formattedMonth = UCase(formattedMonth)

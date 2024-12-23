@@ -3192,7 +3192,7 @@ Function showFeatureDisabledToast(feature)
   majorEventEndDatetime = CreateObject("roDateTime")
   majorEventEndDatetime.FromISO8601String(majorEventEnd)
   majorEventEndDatetime.toLocalTime()
-  formattedTime = UCase(majorEventEndDatetime.asTimeStringLoc("h:mm a"))
+  formattedTime = UCase(localizedTimeString(majorEventEndDatetime))
 
   if isEventToday = false
     formattedTime = formattedTime + " " + LCase(getTranslation("tomorrow"))
