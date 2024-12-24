@@ -99,7 +99,7 @@ Function clientErrorConfigCheckIfShouldRetryAfter(clientErrorConfig, url, method
       jsonBody = parseJsonFromNetworkRequest(responseHeaders, responseBody, {})
       for each condition in matchedConfig.conditions
         conditionConfig = clientErrorConfig.conditions[condition]
-        if isAA(conditionConfig) = true then
+        if isAA(conditionConfig) = true AND isAA(jsonBody) = true then
           allConditionChecksMet = true
           if isString(conditionConfig.response_code) = true then
             if isString(jsonBody.response_code) <> true OR UCase(jsonBody.response_code) <> UCase(conditionConfig.response_code) then
