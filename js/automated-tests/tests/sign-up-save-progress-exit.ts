@@ -113,8 +113,8 @@ it('C450487 - Exit prompt - Guest user press back button when lands on activatio
 });
 
 // https://tubi.testrail.io/index.php?/cases/view/450490 - Need to remove this because of Magic Link
-/*
-it('C450490 - Exit prompt - Guest user sign in through the modal and the CW row should populate, @signupsaveprogressexit', async () => {
+
+it.skip('C450490 - Exit prompt - Guest user sign in through the modal and the CW row should populate, @signupsaveprogressexit', async () => {
 
     // Select a title
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -169,7 +169,7 @@ it('C450490 - Exit prompt - Guest user sign in through the modal and the CW row 
     await testUtils.waitForElementToFullyShowOnScreen(
       'tvContinueWatchingRow'
     );
-    */
+    
 
 
 // https://tubi.testrail.io/index.php?/cases/view/450491
