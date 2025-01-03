@@ -1073,7 +1073,7 @@ function pushOneTrustStaging(done) {
   const buildTag = getOneTrustBuildTag(options);
 
   const localPath = `build/tubi_one_trust_components_${buildTag}.pkg`;
-  const remotePath = `s3://tubi-rokucdn-source-staging/appFiles/one-trust-components/tubi_one_trust_components_${buildTag}.pkg`;
+  const remotePath = `s3://tubi-roku-multi-cdn-source-staging/appFiles/one-trust-components/tubi_one_trust_components_${buildTag}.pkg`;
 
   const result = shell.exec(`aws s3 cp ${localPath} ${remotePath} --profile $AWS_PROFILE`);
 
@@ -1088,7 +1088,7 @@ function pushOneTrustStaging(done) {
 async function pushFoxVideoPlayerStaging(done) {
   const pkgPath = await packageFoxVideoPlayer(done);
 
-  const remotePath = `s3://tubi-rokucdn-source-staging/appFiles/fox-video-player-components/${path.basename(pkgPath)}`;
+  const remotePath = `s3://tubi-roku-multi-cdn-source-staging/appFiles/fox-video-player-components/${path.basename(pkgPath)}`;
   const result = shell.exec(`aws s3 cp ${pkgPath} ${remotePath} --profile $AWS_PROFILE`);
 
   if (!result.stderr) {
