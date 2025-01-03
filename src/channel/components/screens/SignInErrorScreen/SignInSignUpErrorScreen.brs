@@ -82,8 +82,9 @@ Function onActionChange(msg)
 
   end if
 
-  m.heading.text = getTranslation(headingKey)
-  m.subheading.text = getTranslation(subheadingKey)
+  majorEventName = getExternalConfigValueFromGlobal("major_event_name", m.constants.configHubFallbacks.majorEventName)
+  m.heading.text = getTranslation(headingKey, {"major_event_name": majorEventName})
+  m.subheading.text = getTranslation(subheadingKey, {"major_event_name": majorEventName})
 
   m.top.trackingPageInfo = {
     pageType: "static_page"

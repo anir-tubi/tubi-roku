@@ -1512,6 +1512,7 @@ Function getConstants()
   constants.configHubFallbacks = {}
     constants.configHubFallbacks.majorEventStart = "2025-02-09T05:00:00.000000Z"
     constants.configHubFallbacks.majorEventEnd = "2025-02-10T08:00:00.000000Z"
+    constants.configHubFallbacks.majorEventName = "game"
 
   constants.serverValues = {}
 

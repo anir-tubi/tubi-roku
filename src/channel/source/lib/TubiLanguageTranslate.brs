@@ -1990,7 +1990,7 @@ Function getTranslation_en_US()
     },
     "sign_in_error_screen__purple_carpet_day_subheading": {
       "description": "Sign in error screen heading default error",
-      "message": "You can still watch your favorite movies and TV shows as a guest, including the tournament!"
+      "message": "You can still watch your favorite movies and TV shows as a guest, including {major_event_name}!"
     },
     "sign_up_error_screen_heading": {
       "description": "Sign in error screen heading default error",
@@ -2002,7 +2002,7 @@ Function getTranslation_en_US()
     },
     "sign_up_error_screen__purple_carpet_day_subheading": {
       "description": "Sign in error screen heading default error",
-      "message": "You can still watch your favorite movies and TV shows as a guest, including the tournament!\nWe'll send you an email to try again later."
+      "message": "You can still watch your favorite movies and TV shows as a guest, including {major_event_name}!\nWe'll send you an email to try again later."
     },
     "search_disabled_message": {
       "description": "Search disabled toast message",
@@ -2026,7 +2026,7 @@ Function getTranslation_en_US()
     },
     "disaster_mode_toast_subheading": {
       "description": "Subheading of the toast that is shown on disaster mode UI.",
-      "message": "You can still watch the game!"
+      "message": "You can still watch {major_event_name}!"
     },
     "rating": {
       "description": "Like/Dislike feature",
