@@ -9,22 +9,22 @@ import { expect } from 'chai';
 
 const SignInEmailPage = (emailPovided = true) => {
 	const elements = {
-		passwordField: async () =>
-			await testUtils.getNodeForElement('signInScreenPasswordBox'),
+		emailVerificationButton: async () =>
+			await testUtils.getNodeForElement('emailVerificationButton'),
 		continueButtonSignInPage: async () =>
 			await testUtils.getNodeForElement('continueButtonSignInPage'),
 	};
 
 	async function pageDidLoad() {
 		await testUtils.retryWithTimeOut(async () => {
-			const passwordField = await elements.passwordField();
+			const passwordField = await elements.emailVerificationButton();
 			expect(passwordField.visible).to.equal(true);
 		});
 	}
 
 	async function enterPasswordAndClickContinue(text) {
 		await testUtils.retryWithTimeOut(async () => {
-			const passwordField = await elements.passwordField();
+			const passwordField = await elements.emailVerificationButton();
 			expect(passwordField.visible).to.equal(true);
 		});
 		await utils.sleep(3000);

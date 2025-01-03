@@ -372,14 +372,14 @@ const PlayBack = ({ content }) => {
 
 	async function selectSubtitlesOff() {
 		await selectSubtitles();
-		await ecp.sendKeypress(ecp.Key.Up, { count: 2 });
+		await ecp.sendKeypress(ecp.Key.Down, { count: 1,wait: 400 });
 		await ecp.sendKeypress(ecp.Key.Ok);
 	}
 
 	async function selectSubtitlesOn() {
 		await selectSubtitles();
 		await utils.sleep(500);
-		await ecp.sendKeypress(ecp.Key.Down);
+		await ecp.sendKeypress(ecp.Key.Down, { count:2,wait: 400 });
 		await ecp.sendKeypress(ecp.Key.Ok);
 	}
 

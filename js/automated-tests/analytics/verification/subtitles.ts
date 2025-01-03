@@ -51,19 +51,19 @@ export async function verifyC543688(id) {
 		15
 	);
 	// no loop here, need to check that 2 events
-	expect(events[0].subtitles_toggle.video_id).equal(parseInt(id));
-	expect(events[0].subtitles_toggle.toggle_state).to.match(
+	expect(events[1].subtitles_toggle.video_id).equal(parseInt(id));
+	expect(events[1].subtitles_toggle.toggle_state).to.match(
 		/OFF/,
 		`event should event.subtitles_toggle.toggle_state===ON or OFF, Event: \n ${JSON.stringify(
 			events[0]
 		)} \n`
 	);
-	expect(events[1].subtitles_toggle.video_id).equal(parseInt(id));
-	expect(events[1].subtitles_toggle.language_code).equal('EN');
-	expect(events[1].subtitles_toggle.toggle_state).to.match(
+	expect(events[0].subtitles_toggle.video_id).equal(parseInt(id));
+	expect(events[0].subtitles_toggle.language_code).equal('EN');
+	expect(events[0].subtitles_toggle.toggle_state).to.match(
 		/ON/,
 		`event should event.subtitles_toggle.toggle_state===ON or OFF, Event: \n ${JSON.stringify(
-			events[1]
+			events[0]
 		)} \n`
 	);
 }

@@ -19,7 +19,7 @@ export async function verifyC148718() {
 				event.dialog.dialog_action &&
 				event.dialog.dialog_action === 'SHOW' &&
 				event.dialog.dialog_sub_type &&
-				event.dialog.dialog_sub_type === 'email-prefill'
+				event.dialog.dialog_sub_type === 'email-prefill-return'
 		);
 
 		i++;
@@ -30,8 +30,8 @@ export async function verifyC148718() {
 ${JSON.stringify(dialogEvent)} \n`
 	);
 	expect(dialogEvent.dialog.dialog_sub_type).equal(
-		'email-prefill',
-		`eventOne.dialog.dialog_sub_type===email-prefill, Event: \n
+		'email-prefill-return',
+		`eventOne.dialog.dialog_sub_type===email-prefill-return, Event: \n
 ${JSON.stringify(dialogEvent)} \n`
 	);
 	expect(dialogEvent.dialog.dialog_type).equal(

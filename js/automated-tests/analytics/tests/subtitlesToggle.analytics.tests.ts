@@ -26,7 +26,7 @@ describe('Subtitles events', function () {
 		const detailsPage = await homePage.selectFocusedTitleMovie();
 		await detailsPage.verifySubtitlesToglePresent();
 		const playback = await detailsPage.selectPlay();
-		await playback.selectSubtitlesOff();
+		await playback.selectSubtitlesOn();
 		await verifyC66349(titleId);
 		await verifyC434294();
 	});
@@ -36,10 +36,10 @@ describe('Subtitles events', function () {
 		const titleId = await homePage.getMovieTitleId();
 		await detailsPage.verifyRatingToglePresent();
 		const playback = await detailsPage.selectPlay();
-		await playback.selectSubtitlesOn();
+		await playback.selectSubtitlesOff();
 		await ecp.sendKeypress(ecp.Key.Back);
 		await utils.sleep(7000);
-		await playback.selectSubtitlesOff();
+		await playback.selectSubtitlesOn();
 		await verifyC543688(titleId);
 	});
 });

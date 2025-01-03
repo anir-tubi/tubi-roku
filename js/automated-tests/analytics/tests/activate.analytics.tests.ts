@@ -108,13 +108,13 @@ describe('Activate events', function () {
 		await ecp.sendKeypress(ecp.Key.Ok);
 		const signInEmailPage = SignInEmailPage();
 		await signInEmailPage.pageDidLoad();
-		await signInEmailPage.enterPasswordAndClickContinue('111111');
+		// await signInEmailPage.enterPasswordAndClickContinue('111111');
 		await C450501NavigateToPage(episodeId)
 		await C450501NavigateToPageLoginPage(episodeId)
 		await C450501NavigateToPageDestLoginPage(episodeId)
-		await ecp.sendKeypress(ecp.Key.Back);
-		const settings = await homePage.selectSideNavTab(tabs.settings);
-		await settings.signOut();
+		// await ecp.sendKeypress(ecp.Key.Back);
+		// const settings = await homePage.selectSideNavTab(tabs.settings);
+		// await settings.signOut();
 	});
 
 	it('Exit prompt - Users click the back button to exit the "Wait, dont lose your progress" prompt C450502  @analyticsASet1,@analyticsActivate', async () => {

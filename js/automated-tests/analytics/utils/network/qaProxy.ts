@@ -184,7 +184,7 @@ async function checkMandatoryElementsInEventsRoku(events) {
 			`Each event has to contain device.os event: \n ${jsonObject}`
 		);
 		expect(event.sent_timestamp).to.match(
-			/2024-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/,
+			/2025-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/,
 			`Each event has to contain sent_timestamp event: \n ${jsonObject}`
 		);
 		expect(event.connection.network).to.match(

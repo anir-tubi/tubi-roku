@@ -185,7 +185,7 @@ export async function C450501NavigateToPage(seriesId) {
 		);
 		i++;
 	}
-	expect(navigateToPageEvent.navigate_to_page.video_player_page.video_id).equal(
+	expect(navigateToPageEvent.navigate_to_page.dest_series_detail_page.series_id).equal(
 		seriesId,
 		`navigateToPageEvent.navigate_to_page.video_player_page.video_id===${seriesId}, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`

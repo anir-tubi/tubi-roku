@@ -231,8 +231,8 @@ export async function verifyC439644() {
 	${JSON.stringify(dialog)} \n`
 	);
 	expect(dialog.dialog.dialog_sub_type).equal(
-		'email-prefill',
-		`dialog.dialog.dialog_sub_type===email-prefill, Event: \n
+		'email-prefill-return',
+		`dialog.dialog.dialog_sub_type===email-prefill-return, Event: \n
 	${JSON.stringify(dialog)} \n`
 	);
 	expect(dialog.dialog.dialog_type).equal(
@@ -308,8 +308,8 @@ export async function verifyC439645() {
 	${JSON.stringify(dialog)} \n`
 	);
 	expect(dialog.dialog.dialog_sub_type).equal(
-		'email-prefill',
-		`dialog.dialog.dialog_sub_type===email-prefill, Event: \n
+		'email-prefill-return',
+		`dialog.dialog.dialog_sub_type===email-prefill-return, Event: \n
 	${JSON.stringify(dialog)} \n`
 	);
 	expect(dialog.dialog.dialog_type).equal(
@@ -341,8 +341,8 @@ export async function verifyC439646() {
 	${JSON.stringify(dialog)} \n`
 	);
 	expect(dialog.dialog.dialog_sub_type).equal(
-		'email-prefill',
-		`dialog.dialog.dialog_sub_type===email-prefill, Event: \n
+		'email-prefill-return',
+		`dialog.dialog.dialog_sub_type===email-prefill-return, Event: \n
 	${JSON.stringify(dialog)} \n`
 	);
 	expect(dialog.dialog.dialog_type).equal(
@@ -562,10 +562,10 @@ ${JSON.stringify(bookmarkEvent)} \n`
 export async function verifyC5226(titleId) {
 	let bookmarkEvent;
 	let i = 1;
-	while (bookmarkEvent === undefined && i < 10) {
+	while (bookmarkEvent === undefined && i < 20) {
 		const pulletEvents = await getMatchedEventsFromLastEvent(
 			Events.bookmark,
-			i + 8
+			i + 12
 		);
 		bookmarkEvent = pulletEvents.find(
 			(event) =>

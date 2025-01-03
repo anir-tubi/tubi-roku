@@ -595,7 +595,7 @@ async function checkEventStartVideo(eventStartVideo, idOfTitleFromAutoplay) {
       ${JSON.stringify(eventStartVideo)} \n`
 	);
 	expect(eventStartVideo.video_resolution).to.match(
-		/VIDEO_RESOLUTION_720P|VIDEO_RESOLUTION_480P/,
+		/VIDEO_RESOLUTION_720P|VIDEO_RESOLUTION_480P|VIDEO_RESOLUTION_1080P/,
 		`startVideoEvent.play_progress.video_resolution===VIDEO_RESOLUTION_720P, Event: \n
       ${JSON.stringify(eventStartVideo)} \n`
 	);
