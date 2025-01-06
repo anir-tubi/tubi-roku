@@ -578,8 +578,12 @@ async function buildReleaseNotes(done) {
 
 
 async function buildQaChanges(done) {
-  const prodBranch = getProductionBranchName();
+  let prodBranch = getProductionBranchName();
   const currentBranch = getCurrentBranch(done);
+
+  if (prodBranch === currentBranch) {
+    prodBranch = getPreviousProductionBranchName();
+  }
 
   let pullRequestCommits = await findPullRequestCommitDifferences(done, currentBranch, prodBranch);
   pullRequestCommits = pullRequestCommits.reverse();
@@ -782,6 +786,23 @@ async function findCommitsOnMasterNotOnBranch(done, compareBranch) {
 
 function getProductionBranchName() {
   const minorVersionNumber = getBuildTag('minor');
+  const prodBranch = `${minorVersionNumber}_branch`;
+  return prodBranch;
+}
+
+
+function getPreviousProductionBranchName() {
+  let minorVersionNumberParts = getBuildTag('minor').split('_');
+  let currentMinorVersionNumber = +minorVersionNumberParts[1];
+  if (currentMinorVersionNumber > 0) {
+    currentMinorVersionNumber -= 1;
+    minorVersionNumberParts[1] = currentMinorVersionNumber.toString();
+  } else {
+    throw new NoStackError(`Last production branch did not have the same major version as the current branch.`);
+  }
+
+  const minorVersionNumber = minorVersionNumberParts.join('_');
+
   const prodBranch = `${minorVersionNumber}_branch`;
   return prodBranch;
 }
