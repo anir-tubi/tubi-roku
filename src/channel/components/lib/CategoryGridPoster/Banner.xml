@@ -12,8 +12,8 @@
   <interface>
     <field id="itemContent" type="node" />
     <field id="focusPercent" type="float" />
-    <field id="width" alias="poster.width" />
-    <field id="height" alias="poster.height, title.height" />
+    <field id="width" alias="poster.width, disclaimer.width" />
+    <field id="height" alias="poster.height" />
     <field id="rowHasFocus" type="boolean" />
     <field id="itemHasFocus" type="boolean" />
   </interface>
@@ -23,14 +23,24 @@
       id="poster"
       loadingBitmapUri="pkg:/images/placeholder.webp"
       failedBitmapUri="pkg:/images/placeholder.webp" />
-    <Label
-      id="title"
-      width="900"
-      wrap="true"
-      horizAlign="center"
-      vertAlign="center">
-      <Font
-        role="font"/>
-    </Label>
+    <Group 
+      id="textGroup">
+      <Label
+        id="title"
+        width="900"
+        wrap="true"
+        horizAlign="center">
+        <Font
+          role="font"/>
+      </Label>
+
+      <Label
+        id="disclaimer"
+        wrap="true"
+        horizAlign="center">
+        <Font
+          role="font"/>
+      </Label>
+    </Group>
   </children>
 </component>

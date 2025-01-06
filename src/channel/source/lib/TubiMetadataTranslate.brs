@@ -1578,6 +1578,11 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             if isAA(fullChild.banner_texts) = true
               childAA.bannerTextGuest = fullChild.banner_texts.banner_text_guest
               childAA.bannerTextRegistered = fullChild.banner_texts.banner_text_registered
+              childAA.bannerDisclaimerText = fullChild.banner_texts.banner_text_disclaimer_guest
+            end if
+
+            if isAA(fullChild.banner_images) = true AND isNonEmptyString(fullChild.banner_images.ott_banner_background_guest) = true
+              childAA.bannerBackgroundGuest = fullChild.banner_images.ott_banner_background_guest
             end if
           end if
 
