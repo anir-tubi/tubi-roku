@@ -82,7 +82,8 @@ Function onActionChange(msg)
 
   end if
 
-  majorEventName = getExternalConfigValueFromGlobal("major_event_name", m.constants.configHubFallbacks.majorEventName)
+  majorEventNameFallback = getTranslation(m.constants.configHubFallbacks.majorEventNameTranslationKey)
+  majorEventName = getExternalConfigValueFromGlobal("major_event_name", majorEventNameFallback)
   m.heading.text = getTranslation(headingKey, {"major_event_name": majorEventName})
   m.subheading.text = getTranslation(subheadingKey, {"major_event_name": majorEventName})
 

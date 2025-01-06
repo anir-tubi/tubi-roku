@@ -245,7 +245,8 @@ Function renderEventDetailsUIFromListingInfo(response)
     }, true)
     showContentGroupAndHideSpinner()
     updateEventDetailsPurpleCarpetContent(container, m.constants.ui.screenIds.eventDetailScreen)
-    majorEventName = getExternalConfigValueFromGlobal("major_event_name", m.constants.configHubFallbacks.majorEventName)
+    majorEventNameFallback = getTranslation(m.constants.configHubFallbacks.majorEventNameTranslationKey)
+    majorEventName = getExternalConfigValueFromGlobal("major_event_name", majorEventNameFallback)
     showToast({
       "selfDestructTimer": 5
       "headerText": getTranslation("disaster_mode_toast_heading")
