@@ -58,7 +58,8 @@ End Function
 ' @inOrOut: "in" or "out", "in" to animate opacity to 1.0. "out" to animate opacity to 0.0
 ' @duration: float, the amount of time it will take the animation to complete, in seconds
 ' @delay: float, the amount of time to wait before starting the animation, in seconds
-Function slideFadeGeneral(target, endTranslation, inOrOut, duration=2.0, delay=0.0)
+' @endingOpacity: float, the final opacity of the target after the animation completes. If not passed, the opacity will be set to 0.0 for "out" and 1.0 for "in"
+Function slideFadeGeneral(target, endTranslation, inOrOut, duration=2.0, delay=0.0, endingOpacity = -1)
   animationOptions = {
     duration: duration
     delay: delay
@@ -79,11 +80,22 @@ Function slideFadeGeneral(target, endTranslation, inOrOut, duration=2.0, delay=0
     animationOptions.destination = [slideX, slideY]
   end if
 
-  if inOrOut = "in"
-    animationOptions.opacity = 1.0
+  opacity = endingOpacity
+
+  if endingOpacity < 0
+    if inOrOut = "out"
+      opacity = 0.0
+    else if inOrOut = "in"
+      opacity = 1.0
+    end if
   else
-    animationOptions.opacity = 0.0
+    '// If the ending opacity is passed then overwrite the value set by the outOrIn string
+    if endingOpacity > 1
+      opacity = 1.0
+    end if
   end if
+
+  animationOptions.opacity = opacity
 
   return animate(target, animationOptions)
 End Function
