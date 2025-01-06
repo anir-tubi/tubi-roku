@@ -727,21 +727,22 @@ Function setFoxContentId(purpleCarpetContainer, _screenId)
             end for
           end if
 
-          ' If we don't have a valid contentIdToPlay yet then we need to search through the Fox listing items to find what is currently playing
-          if isNonEmptyString(contentIdToPlay) = false then
-            for each item in m.foxListingEndpointResponse
-              if item.asset <> invalid AND item.asset.listing <> invalid then
-                listing = item.asset.listing
+        end if
 
-                ' Check to see if this item is currently live
-                if listing.network <> "foxdep" AND isNowWithinTimePeriod(listing.startDate, listing.endDate) = true then
-                  contentIdToPlay = listing.id
-                  exit for
-                end if
+
+        ' If we don't have a valid contentIdToPlay yet then we need to search through the Fox listing items to find what is currently playing
+        if isNonEmptyString(contentIdToPlay) = false then
+          for each item in m.foxListingEndpointResponse
+            if item.asset <> invalid AND item.asset.listing <> invalid then
+              listing = item.asset.listing
+
+              ' Check to see if this item is currently live
+              if listing.network <> "foxdep" AND isNowWithinTimePeriod(listing.startDate, listing.endDate) = true then
+                contentIdToPlay = listing.id
+                exit for
               end if
-            end for
-          end if
-
+            end if
+          end for
         end if
       end if
 
