@@ -40,7 +40,6 @@ Function init()
   m.Video.notificationInterval = m.notificationInterval
 
   m.Video.timedMetaDataSelectionKeys = ["*"]
-  m.isClosedCaptionAudioOverlayShowing = false
 
   m.top.observeField("fullscreen", "onFullScreenChange")
   m.top.observeField("updateContent", "onContentChange")
@@ -60,7 +59,6 @@ Function init()
 
   m.lastButtonPressPos = 0
   m.overlayAutoHideTime = m.constants.settings.videoOverlayAutoHideTime
-  m.overlayLiteAutoHideTime = m.constants.settings.videoOverlayLiteAutoHideTime
   m.bufferingInfo = invalid
 
   'm.lastPingTime helps to prevent extra live play progress event and also helps to send live play progress event in proper interval.
@@ -103,16 +101,10 @@ End Function
 
 ' set up the video player's overlay controls
 Function setupOverlay()
-  if getExperimentResource("roku_linear_player_view", "roku_linear_player_view_v2", false).enabled = true
-    m.VideoOverlay = m.top.findNode("VideoOverlayLite")
-    m.VideoOverlay.observeFieldScoped("isClosedCaptionAudioOverlayShowing", "OnClosedCaptionAudioOverlayShowing")
-    m.VideoOverlay.observeFieldScoped("trackingComponentInfo", "onTrackingComponentInfo")
-  else
-    m.VideoOverlay = m.top.findNode("VideoOverlay")
-    m.VideoOverlay.observeFieldScoped("okPressed", "onOKPressed")
-    m.VideoOverlay.observeFieldScoped("closedCaptioningSelectedLanguage", "onClosedCaptioningSelected")
-    m.VideoOverlay.observeFieldScoped("epgTrackingComponentInfo", "oneEPGTrackingComponentInfoChange")
-  end if
+  m.VideoOverlay = m.top.findNode("VideoOverlay")
+  m.VideoOverlay.observeFieldScoped("okPressed", "onOKPressed")
+  m.VideoOverlay.observeFieldScoped("closedCaptioningSelectedLanguage", "onClosedCaptioningSelected")
+  m.VideoOverlay.observeFieldScoped("epgTrackingComponentInfo", "oneEPGTrackingComponentInfoChange")
   m.VideoOverlay.observeFieldScoped("linearChannelToPlayUpdated", "onChannelSelectedToPlayChanged")
   m.VideoOverlay.observeFieldScoped("isDisplaying", "onVideoOverlayIsDisplayingChanged")
   m.VideoOverlay.observeFieldScoped("reactedToKeyPresss", "onOverlayReactedToKeyPress")
@@ -492,9 +484,7 @@ Function onVideoPositionChange(msg)
 
    '//After some time has elapsed and the channel guide isn't currently visible and loading, then hide the overlay
   if m.VideoState = "play" AND m.VideoOverlay <> invalid AND m.VideoOverlay.isDisplaying = true
-    if m.VideoOverlay.subtype() = "LinearVideoPlayerScreenOverlayLite" AND m.isClosedCaptionAudioOverlayShowing = false AND m.playerPosition > m.lastButtonPressPos + m.overlayLiteAutoHideTime
-      hideOverlay()
-    else if m.VideoOverlay.epgScrollingStatus = false AND m.playerPosition > m.lastButtonPressPos + m.overlayAutoHideTime
+    if m.VideoOverlay.epgScrollingStatus = false AND m.playerPosition > m.lastButtonPressPos + m.overlayAutoHideTime
       hideOverlay()
     end if
   end if
@@ -573,14 +563,10 @@ End Function
 Function onCaptionModeChange()
   tubiLog("LinearVideoPlayerScreen.onCaptionModeChange")
 
-  if m.VideoOverlay <> invalid
-    if m.VideoOverlay.subtype() = "LinearVideoPlayerScreenOverlay"
-      hideOverlay()
-      ' update the closed captions UI. It may look the same but the enabled icon may be different
-      createContentForClosedCaptioning()
-    else if m.VideoOverlay.subtype() = "LinearVideoPlayerScreenOverlayLite"
-      m.VideoOverlay.videoNode = m.Video
-    end if
+  if m.VideoOverlay <> invalid AND m.VideoOverlay.subtype() = "LinearVideoPlayerScreenOverlay"
+    hideOverlay()
+    ' update the closed captions UI. It may look the same but the enabled icon may be different
+    createContentForClosedCaptioning()
   end if
 
   if m.Video.globalCaptionMode = "On"
@@ -779,13 +765,9 @@ Function updateVideoPlayerState(content) as void
   ' make the content available to the video node
   m.Video.content = content
 
-  if m.VideoOverlay <> invalid
-    if m.VideoOverlay.subtype() = "LinearVideoPlayerScreenOverlayLite"
-      m.VideoOverlay.videoNode = m.Video
-    else if m.VideoOverlay.subtype() = "LinearVideoPlayerScreenOverlay"
-      'Update the closed captioning
-      createContentForClosedCaptioning()
-    end if
+  if m.VideoOverlay <> invalid AND m.VideoOverlay.subtype() = "LinearVideoPlayerScreenOverlay"
+    'Update the closed captioning
+    createContentForClosedCaptioning()
   end if
 End Function
 
@@ -1054,11 +1036,7 @@ End Function
 '@bDelay: boolean, the epg overlay displayed after a delay. Default is false
 '@key: String, remote key press
 Function showOverlay(bDelay = false, key = "")
-  if getExperimentResource("roku_linear_player_view", "roku_linear_player_view_v2", true).enabled = true
-    showLiteOverlay(key)
-  else
-    showEPGOverlay(bDelay)
-  end if
+  showEPGOverlay(bDelay)
 End Function
 
 
@@ -1070,22 +1048,6 @@ Function showEPGOverlay(bDelay = false)
   m.VideoOverlay.displayWithDelay = bDelay
   m.VideoOverlay.animationDuration = .15
   m.VideoOverlay.showOverlay = true
-End Function
-
-
-'showLiteOverlay displays the lite overlay
-'
-'@key: string, remote key press
-Function showLiteOverlay(key = "")
-  m.lastButtonPressPos = m.playerPosition
-
-  if key = "up"
-    m.VideoOverlay.decreaseChannel = true
-  else if key = "down"
-    m.VideoOverlay.increaseChannel = true
-  else
-    m.VideoOverlay.showOverlay = true
-  end if
 End Function
 
 

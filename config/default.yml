@@ -25,7 +25,6 @@ settings:
 
   #the number of seconds before the video overlay autohides in Live TV after last button pressed.
   videoOverlayAutoHideTime: 5
-  videoOverlayLiteAutoHideTime: 10
 
   # When set to true will pass a header to enable fail safe testing.
   # This field is only used in controller scope.

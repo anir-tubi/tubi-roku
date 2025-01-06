@@ -33,10 +33,6 @@ Function TubiExperiments(experimentsInfo) as Object
         roku_async_stop_v6: {"enabled": false}
       }
 
-      roku_linear_player_view: {
-        roku_linear_player_view_v2: {"enabled": false}
-      }
-
       roku_horizontal_menu:{
         roku_horizontal_menu_v3: {"enabled": false}
       }

@@ -959,9 +959,9 @@ Function getConstants()
         ]
       end if
 
+      '//TODO:Remove unsed constants.player.linear* with our next submission release
       'constants needed for the linear video player
       constants.player.linear = {}
-
         ' duration (in seconds) of coming up panel displayed within info panel
         constants.player.linear.comingUpInsideInfoPanelDuration = 300
         ' duration (in seconds) of coming up panel displayed outside info panel
@@ -1154,6 +1154,7 @@ Function getConstants()
       constants.ui.infoPanelModes.episode = "episode"
       constants.ui.infoPanelModes.linearHomeScreen = "linearHomeScreen"
       constants.ui.infoPanelModes.epg = "epg"
+      '//TODO:Remove unused constants.ui.infoPanelModes.simplifiedLinearPlayer with our next submission release
       constants.ui.infoPanelModes.simplifiedLinearPlayer = "simplifiedLinearPlayer"
       constants.ui.infoPanelModes.linearSearch = "linearSearch"
       constants.ui.infoPanelModes.linearProgramHomescreen = "linearProgramHomescreen"  'v4 api
