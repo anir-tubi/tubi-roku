@@ -67,7 +67,7 @@ Function onContentChange(msg)
     m.title.text = titleText
     m.title.translation = [(m.top.width / 2) - (m.title.width / 2), 0]
     titleHeight = m.title.boundingRect().height
-    m.disclaimer.translation = [0, titleHeight]
+    m.disclaimer.translation = [0, titleHeight + 4]
 
     textGroupHeight = m.textGroup.boundingRect().height
     m.textGroup.translation = [0, (m.top.height / 2) - (textGroupHeight / 2)]
