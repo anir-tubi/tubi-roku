@@ -3724,7 +3724,7 @@ Function getTranslation_es_MX()
     },
     "sign_in_error_screen__purple_carpet_day_subheading": {
       "description": "Sign in error screen heading default error",
-      "message": "Aún puedes ver tus películas y series de TV favoritos como invitado, ¡incluido el torneo!"
+      "message": "Aún puedes ver tus películas y series de TV favoritos como invitado, ¡incluido {major_event_name}!"
     },
     "sign_up_error_screen_heading": {
       "description": "Sign in error screen heading default error",
@@ -3736,7 +3736,7 @@ Function getTranslation_es_MX()
     },
     "sign_up_error_screen__purple_carpet_day_subheading": {
       "description": "Sign in error screen heading default error",
-      "message": "¡Aún puedes ver tus películas y series de TV favoritos como invitado, ¡incluido el torneo!\nTe enviaremos un correo para que vuelvas a intentarlo más tarde."
+      "message": "¡Aún puedes ver tus películas y series de TV favoritos como invitado, ¡incluido {major_event_name}!\nTe enviaremos un correo para que vuelvas a intentarlo más tarde."
     },
     "mylist_disabled_message": {
       "description": "My List disabled toast message",
@@ -3756,7 +3756,7 @@ Function getTranslation_es_MX()
     },
     "disaster_mode_toast_subheading": {
       "description": "Subheading of the toast that is shown on disaster mode UI.",
-      "message": "¡Todavía puedes ver el partido!"
+      "message": "¡Aún puedes ver {major_event_name}!"
     },
     "rating": {
       "description": "Like/Dislike feature",
@@ -3765,6 +3765,10 @@ Function getTranslation_es_MX()
     "delayed_registration_message": {
       "description": "Message displayed when user tries to register and the registration is delayed",
       "message": "Intentaremos crear tu cuenta en las próximas 24 horas y, si tiene éxito, te enviaremos un correo para finalizar la configuración de tu cuenta."
+    },
+    "game": {
+      "description": "Fallback string to be used when major event name is not available in remote config",
+      "message": "juego"
     }
   }
 End Function
@@ -5448,7 +5452,7 @@ Function getTranslation_fr_CA()
     },
     "sign_in_error_screen__purple_carpet_day_subheading": {
       "description": "Sign in error screen heading default error",
-      "message": "Vous pouvez toujours regarder vos films et série de TV préférés en tant qu'invité, y compris le tournoi!"
+      "message": "Vous pouvez toujours regarder vos films et série de TV préférés en tant qu'invité, y compris {major_event_name}!"
     },
     "sign_up_error_screen_heading": {
       "description": "Sign in error screen heading default error",
@@ -5460,7 +5464,7 @@ Function getTranslation_fr_CA()
     },
     "sign_up_error_screen__purple_carpet_day_subheading": {
       "description": "Sign in error screen heading default error",
-      "message": "Vous pouvez toujours regarder vos films et série de TV préférés en tant qu'invité, y compris le tournoi!\nNous vous enverrons un e-mail pour réessayer plus tard."
+      "message": "Vous pouvez toujours regarder vos films et série de TV préférés en tant qu'invité, y compris {major_event_name}!\nNous vous enverrons un e-mail pour réessayer plus tard."
     },
     "mylist_disabled_message": {
       "description": "My List disabled toast message",
@@ -5480,7 +5484,7 @@ Function getTranslation_fr_CA()
     },
     "disaster_mode_toast_subheading": {
       "description": "Subheading of the toast that is shown on disaster mode UI.",
-      "message": "Vous pouvez toujours regarder le match!"
+      "message": "Vous pouvez toujours regarder {major_event_name}!"
     },
     "rating": {
       "description": "Like/Dislike feature",
@@ -5489,6 +5493,10 @@ Function getTranslation_fr_CA()
     "delayed_registration_message": {
       "description": "Message displayed when user tries to register and the registration is delayed",
       "message": "Nous essaierons de créer votre compte dans les prochaines 24 heures et en cas de succès, nous vous enverrons un e-mail pour terminer la configuration de votre compte."
+    },
+    "game": {
+      "description": "Fallback string to be used when major event name is not available in remote config",
+      "message": "jeu"
     }
   }
 End Function
@@ -5571,7 +5579,7 @@ Function getTranslation_en_GB()
     },
     "sign_in_error_screen__purple_carpet_day_subheading": {
       "description": "Sign in error screen heading default error",
-      "message": "You can still watch your favourite movies and TV shows as a guest, including the tournament!"
+      "message": "You can still watch your favourite movies and TV shows as a guest, including {major_event_name}!"
     },
     "sign_up_error_screen__default_subheading": {
       "description": "Sign in error screen heading default error",
@@ -5579,7 +5587,7 @@ Function getTranslation_en_GB()
     },
     "sign_up_error_screen__purple_carpet_day_subheading": {
       "description": "Sign in error screen heading default error",
-      "message": "You can still watch your favourite movies and TV shows as a guest, including the tournament!\nWe'll send you an email to try again later."
+      "message": "You can still watch your favourite movies and TV shows as a guest, including {major_event_name}!\nWe'll send you an email to try again later."
     }
   }
 End Function
