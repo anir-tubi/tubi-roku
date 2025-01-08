@@ -238,9 +238,11 @@ End Function
 Function handleDeeplinkContentByType()
   tubilog("deeplinkHelpers.handleDeeplinkContentByType")
   if m.deepLinkContent <> invalid
-    if m.deepLinkContent.deeplinkType = "linear" OR m.deepLinkContent.deeplinkType = "liveTV"
+    if m.deepLinkContent.deeplinkType = "linear"
       ' TODO: Remove the additional request and call startDeeplinkedLinearPlayback directly.
       getSingleContentFromServer(m.deeplinkContent, onDeeplinkLiveTVContentSuccess, showDeeplinkErrorModal)
+    else if m.deepLinkContent.deeplinkType = "liveTV"
+      startDeeplinkedLinearPlayback()
     else if m.deepLinkContent.deeplinkType = "category"
       handleCategoryDeeplinkContent()
     else if m.deepLinkContent.deeplinkType = "channel"
