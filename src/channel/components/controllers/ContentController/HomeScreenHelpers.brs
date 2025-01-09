@@ -1189,7 +1189,8 @@ End Function
 Function updateSkinAdRowContent(homeScreen, content)
   tubiLog("HomeScreenHelpers.updateSkinAdRowContent")
 
-  if content <> invalid
+  if content <> invalid AND (isNonEmptyString(content.title) = true OR isNonEmptyString(content.titleImageUrl) = true) AND isNonEmptyString(content.id) = true AND (isNonEmptyString(content.videoPreviewUrl) = true OR isNonEmptyArray(content.backgrounds) = true) AND isNonEmptyString(content.HDGRIDPOSTERURL) = true
+    '//proceed if the content is valid and has the mandatory fields
     rowContentNode = CreateObject("roSGNode", "SkinAdContentNode")
     rowContentNode.id = content.id
     rowContentNode.type = m.constants.ui.contentTypes.skinAd
