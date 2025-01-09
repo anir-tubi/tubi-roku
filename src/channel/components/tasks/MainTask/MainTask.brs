@@ -6,9 +6,6 @@ Function init()
   ' Enabling low memory event. Adding it to m scope since roku does not fire the event if it is not in m scope.
   m.deviceInfo = CreateObject("roAppMemoryMonitor")
   m.deviceInfo.setMessagePort(m.port)
-  m.deviceInfo.EnableMemoryWarningEvent(true)
-  ' Since we only want to fire once for the user session to not have too many calls.
-  m.wasLowMemoryEventFired = false
 
   constants = getConstantsFromGlobal()
   disableHdmiStatusChecks = false
@@ -66,9 +63,6 @@ Function taskThread()
         if msg.getField() = "request" then
           handleRequest(msg.getData())
         end if
-    else if messageType = "roAppMemoryNotificationEvent" AND m.wasLowMemoryEventFired = false
-      m.wasLowMemoryEventFired = true
-      m.top.lowMemoryEventInfo = getLowMemoryEventInfo()
     end if
   end while
 End Function
@@ -88,14 +82,4 @@ Function getScreensaverTimeout()
   end if
 
   return createObject("roAppManager").getScreensaverTimeout() * 60
-End Function
-
-
-Function getLowMemoryEventInfo()
-  return {
-    ' Gets the total amount of time the user was using our application.
-    "upTime": createObject("roAppManager").getUptime().totalMilliseconds()
-    ' Total number of nodes present at the scene level. Doing it in task since it is better performant when done inside task.
-    "totalNodes": m.top.getAll().count()
-  }
 End Function

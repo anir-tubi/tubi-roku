@@ -21,8 +21,5 @@
 
     <!-- The amount of time before the screensaver will start playing in. Value is in seconds -->
     <field id="screensaverTimeout" type="integer" />
-
-    <!-- Will contain information related to the low memory event. -->
-    <field id="lowMemoryEventInfo" type="assocarray" />
   </interface>
 </component>

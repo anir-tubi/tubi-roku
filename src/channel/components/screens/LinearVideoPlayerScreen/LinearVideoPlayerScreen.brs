@@ -363,11 +363,6 @@ Function onVideoStateChange(msg)
     ' sending the logs to uapi
     tubiLog(jsonErrorInfo, "error", "videoPlayback", "video-playback", 0.1)
 
-    errorInfo.type = m.constants.errors.type.videoError + " " + m.video.errorCode.toStr()
-    errorInfo.name = m.constants.errors.message.linearVideoPlayer
-    ' sending the logs to sentry sdk
-    tubiException(errorInfo, "error", 0.1)
-
     m.top.sendYouboraError = true
 
     ' Set up the next DRM scheme. Playback of next DRM scheme is triggered when state = "finished",

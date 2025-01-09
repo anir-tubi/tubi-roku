@@ -68,7 +68,6 @@ Function addControllerUi()
   m.mainTask = createObject("roSGNode", "MainTask") ' initiate MainTask
   m.mainTask.observeFieldScoped("isHdmiStatusOk", "onIsHdmiStatusOkChange")
   m.mainTask.observeFieldScoped("screensaverTimeout", "onScreensaverTimeoutChange") ' Declared in ScreensaverHelpers.brs
-  m.mainTask.observeFieldScoped("lowMemoryEventInfo", "onLowMemoryEventInfoChange")
 
   ' Holds the value for user/device level settings. For ex: isVideoPreviewOn  or Selected Audio track.
   m.pub_serverPersistentData = createObject("roSGNode", "ServerPersistentData")
@@ -2493,32 +2492,6 @@ Function showToast(toastInfo, shouldSendTracking = false, dialogEventInfo = {})
       m.trackingLoggingTask.trackEvent = dialogEventInfo
     end if
   end if
-End Function
-
-
-Function onLowMemoryEventInfoChange(msg)
-  data = msg.getData()
-
-  screenIds = getScreenIdsFromStack()
-
-  ' Creating the info aa.
-  eventInfo = {
-    ' Total of number nodes cached in the tubi cache.
-    "totalCachedNodes": m.cache.getCachedNodeCount()
-    ' Total of number screens cached in the tubi cache. This number is different than number of screens in stack.
-    "totalCachedScreens": m.cache.getCachedScreenCount()
-    ' Total number of nodes at the scene level.
-    "totalNodes": data.totalNodes
-    ' Active BreadCrumb.
-    "screensInStack": screenIds.join(",")
-    ' How the user has been using the application.
-    "upTime": data.upTime
-    "type": m.constants.errors.type.lowMemoryWarning
-    "name": m.constants.errors.message.lowMemoryWarning
-  }
-
-  ' Setting the samplePercent to 1 so that we send it always since we anyways send it only once per user.
-  tubiException(eventInfo, "warn", 1)
 End Function
 
 

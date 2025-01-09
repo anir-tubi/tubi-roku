@@ -649,13 +649,6 @@ Function sendApiErrorLog(result)
   jsonErrorInfo = FormatJSON(errorInfo)
   ' sending error logs to uapi
   tubiLog(jsonErrorInfo, "error", "apiError", responseFromServer.name, 0.1)
-
-  errorInfo.type = m.constants.errors.type.apiError
-  errorInfo.method = result.method
-  errorInfo.body = result.body
-  errorInfo.headers = result.headers
-  ' sending error logs to sentry sdk
-  tubiException(errorInfo, "error", 0.1)
 End Function
 
 
