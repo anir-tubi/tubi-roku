@@ -976,7 +976,7 @@ End Function
 Function onAddToQueueSelected(msg)
   tubiLog("DetailScreenHelpers.onAddToQueueSelected")
   if isMajorEventDay() = true
-    feature = getTranslation("menu_mystuff")
+    feature = getTranslation("metadata_myStuff_empty_myListInfoPanel_title")
     showFeatureDisabledToast(feature)
   else
     detailScreen = msg.getRoSGNode()
@@ -1272,7 +1272,7 @@ End Function
 Function onRemoveFromQueueSelected(msg)
   tubiLog("DetailScreenHelpers.onRemoveFromQueueSelected")
   if isMajorEventDay() = true
-    feature = getTranslation("menu_mystuff")
+    feature = getTranslation("metadata_myStuff_empty_myListInfoPanel_title")
     showFeatureDisabledToast(feature)
   else
     detailScreen = msg.getRoSGNode()
