@@ -77,45 +77,47 @@ Function createDeeplinkContentFromStartupArgs(args)
   ' or page=network&contentId=fox
   ' See full list of mediaType at https://sdkdocs.roku.com/display/sdkdoc/External+Control+Guide
 
-  if content.id <> "" AND args.mediaType <> invalid ' video request expect for season
-    if args.mediaType = "series"
+  if isNonEmptyString(content.id) = true AND args.mediaType <> invalid ' video request expect for season
+    mediaType = LCase(args.mediaType)
+    if mediaType = "series"
       content.type = "series"
       content.deeplinkType = "series"
-    else if args.mediaType = "season"
+    else if mediaType = "season"
       content.type = "series"
       content.deeplinkType = "season"
-    else if args.mediaType = "movie" OR args.mediaType = "tvspecial"
+    else if mediaType = "movie" OR mediaType = "tvspecial"
       content.type = "video"
       content.deeplinkType = "movie"
-    else if args.mediaType = "episode"
+    else if mediaType = "episode"
       content.type = "video"
       content.deeplinkType = "episode"
-    else if args.mediaType = "shortFormVideo"
+    else if mediaType = "shortformvideo"
       content.type = "video"
       content.deeplinkType = "shortFormVideo"
-    else if args.mediaType = "livefeed"
+    else if mediaType = "livefeed"
       content.type = "linear"
       content.deeplinkType = "linear"
-    else if args.mediaType = "sports"
+    else if mediaType = "sports"
       content.type = "video"
       content.deeplinkType = "sports"
     end if
   else if args.mediaType = invalid AND args.page <> invalid ' page request
-    if args.page = "movies"
+    page = LCase(args.page)
+    if page = "movies"
       content.deeplinkType = "moviePage"
-    else if args.page = "livefeed"
+    else if page = "livefeed"
       content.deeplinkType = "liveTV"
-    else if args.page = "genre" OR args.page = "category" 
+    else if page = "genre" OR page = "category"
       content.deeplinkType = "category"
-    else if args.page = "network"
+    else if page = "network"
       content.deeplinkType = "channel"
-    else if args.page = "tv"
+    else if page = "tv"
       content.deeplinkType = "tvPage"
-    else if args.page = "espanol"
+    else if page = "espanol"
       content.deeplinkType = "espanolPage"
-    else if args.page = "kids"
+    else if page = "kids"
       content.deeplinkType = "kids"
-    else if args.page = "home"
+    else if page = "home"
       content.deeplinkType = "homePage"
     end if
   end if
