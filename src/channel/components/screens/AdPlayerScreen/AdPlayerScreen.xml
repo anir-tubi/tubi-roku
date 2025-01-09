@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name="AdPlayerScreen" extends="BaseScreen" >
   <script type="text/brightscript" uri="AdPlayerScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <interface>
 
     <!-- INPUT -->
@@ -73,6 +74,7 @@
 
     <SkinAdDescriptionPanel
       id="adDescriptionPanel"
+      opacity="0"
       translation="[72, 800]"/>
 
     <TubiAdsTask

@@ -73,6 +73,8 @@ Function onContentChange()
         video_id: m.top.content.id.toInt()
       }
     }
+
+    fade(m.adInfoGroup, "in", 0.4, 1)
   end if
 
  End Function
