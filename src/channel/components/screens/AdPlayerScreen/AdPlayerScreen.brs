@@ -74,7 +74,7 @@ Function onContentChange()
       }
     }
 
-    fade(m.adInfoGroup, "in", 0.4, 1)
+    fade(m.adDescriptionPanel, "in", 0.4, 1)
   end if
 
  End Function
