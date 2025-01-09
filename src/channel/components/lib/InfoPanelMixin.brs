@@ -29,8 +29,8 @@ Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel, bInSpo
   infoPanel.title = content.title
 
   if bInSpotlight = true
-    if content.titleImage <> invalid
-      infoPanel.titleImageUri = content.titleImage
+    if content.titleImageUrl <> invalid
+      infoPanel.titleImageUri = content.titleImageUrl
     else
       infoPanel.titleImageUri = ""
     end if
@@ -172,8 +172,8 @@ Function populateInfoPanelWithPurpleCarpetMode(content, infoPanel, isEventDetail
   infoPanel.reminderIsSet = (isEventDetailsScreen = false AND availabilityType = m.constants.ui.contentTimings.upcoming AND getBookmark(content.id) <> invalid)
 
   infoPanel.description = content.description
-  if content.titleImage <> invalid
-    infoPanel.titleImageUri = content.titleImage
+  if content.titleImageUrl <> invalid
+    infoPanel.titleImageUri = content.titleImageUrl
   else
     infoPanel.titleImageUri = ""
   end if

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<component name="SkinAdDescriptionPanel" extends="Group">
+  <script type="text/brightscript" uri="SkinAdDescriptionPanel.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+
+  <interface>
+    <!-- INPUT -->
+    <!-- content should be of type skinAdContentNode -->
+    <field id="content" type="node" />
+  </interface>
+
+  <children>
+    <Group
+      id="PanelGroup">
+      <Group
+        id="QRParentGroup">
+        <Poster 
+          id="QRBackground"
+          height="140"
+          uri="pkg:/images/menu-focus-$$RES$$.9.png" />
+
+        <LayoutGroup
+          id="QRBackgroundSpacing"
+          layoutDirection="vert"
+          horizAlignment="custom"
+          translation="[15,15]">
+          <LayoutGroup
+            id="QRContentParentGroup"
+            itemSpacings="[24]"
+            layoutDirection="horiz"
+            vertAlignment="center"
+            translation="[0,0]">
+            <Poster
+              id="QRCodeImage"
+              width="120" 
+              height="120"
+              loadDisplayMode="scaleToFit"/>
+            <LayoutGroup
+              id="DescriptionTextGroup"
+              itemSpacings="[12]">
+              <Group
+                id="TitleGroup">
+                <Poster
+                  id="TitleImage"
+                  height="72"
+                  loadDisplayMode="scaleToFit"/>
+                <Label
+                  id="Title"
+                  width="0"
+                  wrap="true"
+                  maxLines="2"
+                  vertAlign="bottom">
+                  <Font
+                    role="font"/>
+                </Label>
+              </Group>
+              <Label
+                id="Description"
+                width="0"
+                wrap="true"
+                maxLines="1"
+                vertAlign="bottom">
+                <Font
+                  role="font"/>
+              </Label>
+              <Label
+                id="SubDescription"
+                width="0"
+                wrap="true"
+                maxLines="1"
+                vertAlign="bottom">
+                <Font
+                  role="font"/>
+              </Label>
+            </LayoutGroup>
+          </LayoutGroup>
+        </LayoutGroup>
+      </Group>
+    </Group>
+  </children>
+</component>

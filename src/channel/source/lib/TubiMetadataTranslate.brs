@@ -473,7 +473,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
   titleImage = m.getTitleImageUrl(contentFromServer)
   if titleImage <> ""
-    translatedContent.titleImage = titleImage
+    translatedContent.titleImageUrl = titleImage
   end if
 
   if contentFromServer.ratings <> invalid AND contentFromServer.ratings[0] <> invalid AND contentFromServer.ratings[0].value <> invalid
@@ -864,10 +864,11 @@ Function tubiMetadataTranslate_translateAds(ads = []) As Object
 
           offer = creative.offer
           if isAA(offer) = true
-            skinAdContent.titleImage = offer.logo
+            skinAdContent.titleImageUrl = offer.logo
             skinAdContent.titlePrefix = offer.title
             skinAdContent.description = offer.body
             skinAdContent.subDescription = offer.cta
+            skinAdContent.qrCodeUrl = offer.landing_page
           end if
 
           media = creative.media
@@ -879,7 +880,7 @@ Function tubiMetadataTranslate_translateAds(ads = []) As Object
           skinAdContent.gridItemType = m.constants.ui.gridItemTypes.skinAd
           skinAdContent.type = m.constants.ui.contentTypes.skinAd
 
-        elseif isAA(creative) = true AND creative.type = "video"
+        else if isAA(creative) = true AND creative.type = "video"
           isVideoAdPresent = true
 
           if skinAdContent = invalid

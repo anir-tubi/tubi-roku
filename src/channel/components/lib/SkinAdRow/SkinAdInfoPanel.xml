@@ -29,22 +29,30 @@
         
       <Label
         id="presentedByLabel"
-        width="594">
+        width="0"
+        maxLines="1">
         <Font role="font"/>
       </Label>
 
-      <Poster
-        id="TitleImage"
-        width="594"
-        loadDisplayMode="scaleToFit"/>
+      <Group
+        id="titleGroup">
+        <Poster
+          id="titleImage"
+          loadDisplayMode="scaleToFit"/>
+        <Label
+          id="title"
+          width="1140"
+          wrap="true"
+          maxLines="2"
+          vertAlign="bottom">
+          <Font
+            role="font"/>
+        </Label>
+      </Group>
 
-      <Label
-        id="Description"
-        width="594">
-        <Font
-          role="font"/>
-      </Label>
-
+      <SkinAdDescriptionPanel 
+        id="descriptionPanel"/> 
+        
     </LayoutGroup>
   </children>
 </component>

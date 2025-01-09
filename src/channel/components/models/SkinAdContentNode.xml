@@ -11,8 +11,11 @@
     <!-- The string that should be displayed before the title or titleImage (logo)  -->
     <field id="titlePrefix" type="string"/>
 
-    <!-- The string that represents the text that is below the description. Usually this refers to the QR code.  -->
+    <!-- The string that represents the text that is below the description. Usually this text instructs the user what to do with the QR code.  -->
     <field id="subDescription" type="string"/>
+
+    <!-- url of the QR code -->
+    <field id="qrCodeUrl" type="string"/>
 
     <!-- adInfo holds the required fields from response to play trailer ad -->
     <field id="adInfo" type="assocarray"/>
@@ -21,7 +24,7 @@
 
     <field id="backgrounds" type="stringarray"/>
 
-    <field id="titleImage" type="string"/>
+    <field id="titleImageUrl" type="string"/>
 
     <field id="videoPreviewUrl" type="string"/>
 

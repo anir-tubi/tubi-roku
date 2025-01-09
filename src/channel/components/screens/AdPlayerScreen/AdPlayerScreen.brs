@@ -5,7 +5,7 @@ Function init()
   m.constants = getConstantsFromGlobal()
   m.top.screenLevel = m.constants.ui.screenLevels.adPlayerScreen
   m.top.id = m.constants.ui.screenIds.adPlayerScreen
-
+  
   m.top.trackingPageInfo = {
     pageType: "video_player_page"
     pageValues: {}
@@ -17,18 +17,13 @@ Function init()
   m.Loading = m.top.findNode("Loading")
   m.LoadingProgressBar = m.top.findNode("LoadingProgressBar")
 
-  m.adInfoBackground = m.top.findNode("adInfoBackground")
-  m.offerLogo = m.top.findNode("offerLogo")
-  m.offerDescription = m.top.findNode("offerDescription")
+  m.adDescriptionPanel = m.top.findNode("adDescriptionPanel")
 
   m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
   m.top.observeFieldScoped("updateContent", "onContentChange")
   m.top.observeFieldScoped("adState", "onAdStateChange")
   m.top.observeFieldScoped("control", "onControlChange")
   m.top.observeFieldScoped("adProgress", "onAdBufferingProgress")
-
-  m.typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.offerDescription, m.typographyConstants.ids.bodyMediumStrong)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -50,9 +45,6 @@ Function onThemeChange(msg = invalid)
   end if
 
   if theme <> invalid
-    m.offerDescription.color = theme.primaryTextColor
-    m.adInfoBackground.blendColor = theme.shadeColor3
-
     m.LoadingProgressBar.focusColor = theme.focusedColor
     m.LoadingProgressBar.unfocusColor = theme.focusedColor
     m.LoadingProgressBar.trackColor = theme.neutralColor2
@@ -72,8 +64,7 @@ Function onContentChange()
   content = m.top.content
   if content <> invalid
     m.top.adState = "init"
-    m.offerDescription.text = content.description
-    m.offerLogo.uri = content.titleImage + "?w=" + m.constants.ui.logoSizes.skinAds.adPlayerScreen.width
+    m.adDescriptionPanel.content = content
     
     'set page tracking values for analytics
     m.top.trackingPageInfo = {

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name="AdPlayerScreen" extends="BaseScreen" >
   <script type="text/brightscript" uri="AdPlayerScreen.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
   <interface>
 
     <!-- INPUT -->
@@ -72,35 +71,9 @@
     <Group
       id="RAFAdContainer" />
 
-    <Group
-      id="adInfoGroup"
-      translation="[72, 879]">
-
-      <Poster 
-        id="adInfoBackground"
-        height="132"
-        width="471"
-        uri="pkg:/images/tab_short_component_alt_$$RES$$.9.png" />
-        
-        <LayoutGroup
-          layoutDirection="vert"
-          vertAlignment="center"
-          horizAlignment="left"
-          translation="[15,60]"
-          addItemSpacingAfterChild="false"
-          itemSpacings="[9]">
-
-          <Poster
-            id="offerLogo"
-            width="216"
-            loadWidth="216"
-            loadHeight="72"
-            loadDisplayMode="limitSize"/>
-          <Label
-            id="offerDescription"
-            width="441"/>
-        </LayoutGroup>
-    </Group>
+    <SkinAdDescriptionPanel
+      id="adDescriptionPanel"
+      translation="[72, 800]"/>
 
     <TubiAdsTask
       id="TubiAdsTask" />

@@ -1,14 +1,22 @@
 Function init()
   m.constants = getConstantsFromGlobal()
+
+  m.nodeHelpers = TubiNodeHelpers()
+
+  m.infoPanelGroup = m.top.findNode("infoPanelGroup")
+
   m.tubiLogo = m.top.findNode("tubiLogo")
-  m.description = m.top.findNode("Description")
   m.presentedByLabel = m.top.findNode("presentedByLabel")
+  m.titleGroup = m.top.findNode("TitleGroup")
+  m.title = m.top.findNode("Title")
   m.titleImage = m.top.findNode("TitleImage")
+  m.titleImage.width = m.constants.ui.logoSizes.skinAds.infoPanel.width
+  m.descriptionPanel = m.top.findNode("DescriptionPanel")
 
   m.top.observeFieldScoped("content", "onContentChange")
 
   m.typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.description, m.typographyConstants.ids.bodySmallStrong)
+  setTypographyOfLabel(m.title, m.typographyConstants.ids.headerLarge)
   setTypographyOfLabel(m.presentedByLabel, m.typographyConstants.ids.bodyExtraSmallStrong)
 
   '//::TODO::JHAND - fix gradient in kids mode
@@ -28,7 +36,7 @@ Function onThemeChange(msg = invalid)
   end if
 
   if theme <> invalid
-    m.description.color = theme.primaryTextColor
+    m.title.color = theme.primaryTextColor
     m.presentedByLabel.color = theme.primaryTextColor
   end if
 End Function
@@ -36,25 +44,43 @@ End Function
 
 Function onContentChange(msg)
   content = msg.getData()
+  m.title.text = content.title
+  setTitleImage(content.titleImageUrl)
   sTitlePrefix = content.titlePrefix
-  titleImageUri = content.titleImage
-  sDescription = content.description
+
+  '//Create a new SkinAdContentNode to pass content data that you wish to pass to the description panel.
+  '//   Not all the fields in content should be passed: i.e. title and titleImageUrl.
+  '//   If the title fields were passed, then it would display the title twice: 1) in the infoPnel, and 2) in the descriptionPanel
+  descriptionPanelContent = CreateObject("roSGNode", "SkinAdContentNode")
+  descriptionPanelContent.description = content.description
+  descriptionPanelContent.subDescription = content.subDescription
+  descriptionPanelContent.qrCodeUrl = content.qrCodeUrl
+  m.descriptionPanel.content = descriptionPanelContent
+
+  '//Reset the labels
+  m.presentedByLabel.text = ""
 
   if isNonEmptyString(sTitlePrefix) = true
+    presentedByIndex = m.nodeHelpers.getChildIndex(m.infoPanelGroup, m.tubiLogo) + 1
+    m.infoPanelGroup.insertChild(m.presentedByLabel, presentedByIndex)
     m.presentedByLabel.text = sTitlePrefix
   else
-    m.presentedByLabel.text = ""  
+    m.infoPanelGroup.removeChild(m.presentedByLabel)
   end if
 
-  if isNonEmptyString(titleImageUri) = true
-    m.titleImage.uri = replaceURLParameter(titleImageUri, "w", m.constants.ui.logoSizes.skinAds.infoPanel.width, true)
-  else
-    m.titleImage.uri = ""
-  end if
+End Function
 
-  if isNonEmptyString(sDescription) = true
-    m.description.text = sDescription
-  else
-    m.description.text = ""  
-  end if
+
+Function setTitleImage(titleImageUri)
+    if isNonEmptyString(titleImageUri) = true
+      m.titleGroup.appendChild(m.titleImage)
+      m.titleGroup.removeChild(m.title)
+
+      m.titleImage.uri = replaceURLParameter(titleImageUri, "w", m.constants.ui.logoSizes.skinAds.infoPanel.width, true)
+    else
+      m.titleGroup.appendChild(m.title)
+      m.titleGroup.removeChild(m.titleImage)
+        
+      m.titleImage.uri = ""
+    end if
 End Function

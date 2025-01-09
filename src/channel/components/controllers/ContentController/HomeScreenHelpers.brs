@@ -809,7 +809,7 @@ Function setUIBasedOnFocusedContent(focusedContent)
           sendSkinAdPixels(focusedContent.imageImpTracking)
 
         else
-          showHideLogoBasedOnUiMode(skinAdContent.titleImage, skinAdContent.titlePrefix)
+          showHideLogoBasedOnUiMode(skinAdContent.titleImageUrl, skinAdContent.titlePrefix)
         end if
 
         '//set the footer image while the homescreen is visible
@@ -1195,10 +1195,13 @@ Function updateSkinAdRowContent(homeScreen, content)
     rowContentNode.type = m.constants.ui.contentTypes.skinAd
     rowContentNode.footerImageUrl = content.footerImageUrl
     rowContentNode.bgColor = content.bgColor
-    rowContentNode.titleImage = content.titleImage
+    rowContentNode.title = content.title
+    rowContentNode.titleImageUrl = content.titleImageUrl
     rowContentNode.titlePrefix = content.titlePrefix
     rowContentNode.gridItemType = m.constants.ui.gridItemTypes.skinAd
     rowContentNode.description = content.description
+    rowContentNode.subDescription = content.subDescription
+    rowContentNode.qrCodeUrl = content.qrCodeUrl
     rowContentNode.adInfo = content.adInfo
     rowContentNode.imageImpTracking = content.imageImpTracking
 
