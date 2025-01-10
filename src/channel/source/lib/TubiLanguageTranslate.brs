@@ -2039,6 +2039,10 @@ Function getTranslation_en_US()
     "game": {
       "description": "Fallback string to be used when major event name is not available in remote config",
       "message": "game"
+    },
+    "havent_received_email": {
+      "description": "Message displayed in sign in screen during major event day",
+      "message": "Haven't received an email? You can still continue as Guest."
     }
   }
 End Function
@@ -3769,6 +3773,10 @@ Function getTranslation_es_MX()
     "game": {
       "description": "Fallback string to be used when major event name is not available in remote config",
       "message": "juego"
+    },
+    "havent_received_email": {
+      "description": "Message displayed in sign in screen during major event day",
+      "message": "¿No has recibido un correo? Aún puedes continuar como Invitado."
     }
   }
 End Function
@@ -5497,6 +5505,10 @@ Function getTranslation_fr_CA()
     "game": {
       "description": "Fallback string to be used when major event name is not available in remote config",
       "message": "jeu"
+    },
+    "havent_received_email": {
+      "description": "Message displayed in sign in screen during major event day",
+      "message": "Vous n'avez pas reçu d'e-mail? Vous pouvez toujours continuer en tant qu'invité."
     }
   }
 End Function

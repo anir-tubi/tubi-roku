@@ -369,9 +369,11 @@ Function showEmailVerificationScreen(email)
   emailVerificationScreen = CreateObject("roSGNode", "EmailVerificationScreen")
   emailVerificationScreen.id = m.constants.ui.screenIds.emailVerificationScreen
   emailVerificationScreen.email = email
+  emailVerificationScreen.isMajorEventDay = isMajorEventDay()
   emailVerificationScreen.observeFieldScoped("selectedDifferentEmail", "showEmailScreen")
   emailVerificationScreen.observeFieldScoped("backButtonSelected", "onEmailVerificationScreenBackButtonSelected")
   emailVerificationScreen.observeFieldScoped("resendVerificationLink", "onResendVerificationLink")
+  emailVerificationScreen.observeFieldScoped("continueButtonSelected", "onEmailVerificationScreenContinueAsGuestUserButtonSelected")
   pushScreen(emailVerificationScreen, true, true)
   displayDefaultBackground()
 End Function
@@ -1626,4 +1628,22 @@ Function shouldShowSignInSignUpErrorPage(errorResponse)
   end if
 
   return false
+End Function
+
+
+Function onEmailVerificationScreenContinueAsGuestUserButtonSelected(msg)
+  currentTimeSeconds = CreateObject("roDateTime").AsSeconds()
+  expiryTimeInSeconds = currentTimeSeconds + (12 * 3600)
+  regWrite("expiryTime", expiryTimeInSeconds.toStr(), m.constants.registrySectionIDs.registrationByPass)
+  
+  setContentToRefreshAllPersonalizedScreens(true)
+  currentScreen = popScreenAfterSignInProcess()
+  m.spinner.visible = false
+  refreshAllDetailScreens()
+  focusSideNavOption(m.constants.ui.sideNavIds.home)
+  if currentScreen <> invalid and (currentScreen.getSubtype() = "DetailScreen" OR currentScreen.getSubtype() = "DetailScreenHoriz")
+    currentScreen.jumpToItem = 0
+    currentScreen.setfocus(true)
+    currentScreen.refreshRelatedContent = true
+  end if
 End Function

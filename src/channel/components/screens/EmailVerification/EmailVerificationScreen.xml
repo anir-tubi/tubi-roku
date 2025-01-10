@@ -28,6 +28,11 @@
 
     <!-- "failureReason" is used to find the actual reason for signIn failure, it is used as value of message field in account event-->
     <field id="failureReason" type="string"/>
+
+    <field id="isMajorEventDay" type="boolean" value="false" />
+
+    <!-- Holds selected status for the continueAsGuest button. -->
+    <field id="continueButtonSelected" type="string" alias="continueBtn.selected" alwaysNotify="true" />
   </interface>
   
   <children>
@@ -79,12 +84,13 @@
       <Label
         id="pageSubHeading2"
         horizAlign="center"
+        wrap="true"
         width="1920">
         <Font
           role="font"/>
       </Label>
 
-      <LayoutGroup
+      <FocusControlLayoutGroup
         id="buttonGroup"
         horizAlignment="center"
         itemSpacings="[12]">
@@ -95,7 +101,10 @@
         <SimpleButton
           id="changeEmailBtn"/>
 
-      </LayoutGroup>
+        <SimpleButton
+          id="continueBtn"/>
+
+      </FocusControlLayoutGroup>
     </LayoutGroup>
 
   </children>

@@ -19,6 +19,8 @@ Function init()
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.label, typographyConstants.ids.bodyMediumStrong)
 
+  m.top.focusable = true
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

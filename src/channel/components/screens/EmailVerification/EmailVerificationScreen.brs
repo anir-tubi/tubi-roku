@@ -33,6 +33,13 @@ Function init()
   m.changeEmailBtn.text = getTranslation("forgotPassword_screen_btn_different_email")
   m.changeEmailBtn.observeFieldScoped("selected", "onChangeEmailSelected")
 
+  m.continueBtn = m.top.findNode("continueBtn")
+  m.continueBtn.text = getTranslation("continueAsGuest_button")
+  m.continueBtn.observeFieldScoped("selected", "onChangeEmailSelected")
+
+  m.buttonGroup = m.top.findNode("buttonGroup")
+
+
   m.top.screenLevel = m.constants.ui.screenLevels.signInScreen
 
   typographyConstants = getTypographyConstants()
@@ -62,6 +69,7 @@ Function onThemeChange(msg = invalid)
     m.email.color = theme.primaryTextColor
     m.changeEmailBtn.color = theme.backgroundColorLight2
     m.resendBtn.color = theme.backgroundColorLight2
+    m.continueBtn.color = theme.backgroundColorLight2
   end if
 End Function
 
@@ -72,7 +80,19 @@ Function onScreenFocusChange()
   m.top.backgroundUriList = []
 
   if m.top.hasFocus() = true
-    m.resendBtn.setFocus(true)
+
+    if m.top.isMajorEventDay = true
+      m.continueBtn.visible = true
+      m.resendBtn.visible = false
+      m.resendBtn.scale = [0, 0]
+
+      m.pageSubHeading2.text = m.pageSubHeading2.text + Chr(10) + getTranslation("havent_received_email") 
+    else
+      m.resendBtn.visible = true
+      m.continueBtn.visible = false
+      m.continueBtn.scale = [0, 0]
+    end if
+    m.buttonGroup.setFocus(true)
   end if
 End Function
 
@@ -141,24 +161,10 @@ End Function
 
 
 Function onKeyEvent(key As String, press As Boolean) as Boolean
-  handled = false
-
-  if press
-    if key = "back"
-      handled = true
-      m.top.backButtonSelected = true
-    else if key = "down"
-      if m.resendBtn.hasFocus() = true
-        m.changeEmailBtn.setFocus(true)
-      end if
-      handled = true
-    else if key = "up"
-      if m.changeEmailBtn.hasFocus() = true
-        m.resendBtn.setFocus(true)
-      end if
-      handled = true
-    end if
+  if press AND key = "back"
+    m.top.backButtonSelected = true
+    return true
   end if
 
-  return handled
+  return false
 End Function
