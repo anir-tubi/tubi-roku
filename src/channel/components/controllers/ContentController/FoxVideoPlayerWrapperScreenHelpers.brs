@@ -132,7 +132,7 @@ Function onFoxVideoPlayerComponentLibraryLoadStatus(msg)
         foxRpfInstance.observeFieldScoped("alertDialogCancelled", "onFoxVideoPlayerAlertDialogCancelledChange")
 
         currentScreen = getCurrentScreen()
-        if currentScreen.id = m.constants.ui.screenIds.foxVideoPlayerWrapperScreen then
+        if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.foxVideoPlayerWrapperScreen then
           currentScreen.isFoxVideoPlayerAvailable = true
         end if
       end if
