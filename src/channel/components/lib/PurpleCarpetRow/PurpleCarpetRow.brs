@@ -353,6 +353,9 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       m.top.ctaListItemSelected = "watchLive"
     end if
     return true
+  else if press = true AND key = "play" AND m.rowList.isInFocusChain() = true
+    m.top.rowItemSelected = m.rowList.rowItemFocused
+    return true
   end if
 
   return false
