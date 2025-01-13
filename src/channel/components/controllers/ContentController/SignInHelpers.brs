@@ -1574,6 +1574,8 @@ End Function
 ' @param userInput: assocArray|invalid, Will contains user input data when the action is "signUp"
 ' @param wasRegistrationQueued: boolean, indicates if the registration was queued.
 Function showSignInSignUpErrorScreen(action, userInput, wasRegistrationQueued = false)
+  ' Force hiding the side nav in case the user click sign in from side nav and landed on this
+  hideNavMenu(false)
   showContentGroupAndHideSpinner()
   displayDefaultBackground()
   screen = CreateObject("roSGNode", "SignInSignUpErrorScreen")
