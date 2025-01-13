@@ -456,7 +456,7 @@ Function onItemFocused(msg)
   gridNode = msg.getRoSGNode()
   itemFocused = msg.getData()
   gridContent = gridNode.content
-  if gridContent <> invalid
+  if gridContent <> invalid AND itemFocused <> invalid AND gridContent.getChild(itemFocused) <> invalid
     focusedContent = gridContent.getChild(itemFocused)
     m.top.backgroundUriList = determineBackgroundImage(focusedContent)
     m.searchScreenInfoPanel.visible = true
