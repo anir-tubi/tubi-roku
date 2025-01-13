@@ -843,7 +843,7 @@ Function getConstants()
       constants.player.subtitle.localizedLanguage = {}
         constants.player.subtitle.localizedLanguage.english = "English"
         constants.player.subtitle.localizedLanguage.spanish = "Español"
-        constants.player.subtitle.localizedLanguage.castilian = "Español"
+        constants.player.subtitle.localizedLanguage.castilian = "Castellano"
         constants.player.subtitle.localizedLanguage.french = "Français"
         constants.player.subtitle.localizedLanguage.portuguese = "Português"
         constants.player.subtitle.localizedLanguage.german = "Deutsch"
