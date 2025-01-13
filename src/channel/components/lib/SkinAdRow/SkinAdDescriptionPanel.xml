@@ -47,7 +47,6 @@
                 id="TitleGroup">
                 <Poster
                   id="TitleImage"
-                  height="72"
                   loadDisplayMode="scaleToFit"/>
                 <Label
                   id="Title"

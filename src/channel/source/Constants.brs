@@ -1329,6 +1329,7 @@ Function getConstants()
 
         constants.ui.logoSizes.skinAds.infoPanel = {}
           constants.ui.logoSizes.skinAds.infoPanel.width = "594"
+          constants.ui.logoSizes.skinAds.infoPanel.height = "249"
 
     constants.ui.imageSizes = {}
 
