@@ -627,6 +627,11 @@ async function buildQaChanges(done) {
     }
 
     const userLogin = pullRequest.user.login;
+    if (!githubDeveloperInfo[userLogin]) {
+      // If the user is not in the list then don't include in the QA changes.
+      continue;
+    }
+
     const qaChange = {
         pullNumber: prId,
         commit: commitHash,
