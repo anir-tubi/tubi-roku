@@ -60,6 +60,8 @@ Function onSearchContentToPlay(msg)
 
   if content <> invalid AND content.type = m.constants.ui.contentTypes.linear
     playLinearVideoContent(content, false, searchScreen.id, false, playbackSource)
+  else if content <> invalid AND content.playerType = "fox"
+    processPlayEvent(content, searchScreen)
   else
     showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource)
   end if
