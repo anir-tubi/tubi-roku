@@ -33,7 +33,7 @@ Function showEventDetailScreen(eventId, purpleCarpetContainerContent = invalid, 
   else if eventContent <> invalid
     screen.contentIsReady = false
     m.eventDetailsScreenLoadCompletionCallback = onScreenLoadCompletionCallback
-    m.singlePurpleCarpetEventContentNode = eventContent
+    m.singlePurpleCarpetEventContentNode = eventContent.clone(true)
     ' Making a call to fetch container info.
     getPurpleCarpetContainerInfo()
   end if
