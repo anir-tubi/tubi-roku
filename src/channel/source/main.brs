@@ -272,6 +272,11 @@ Function runChannel(constants, log, request)
 
           componentsLoaded = true
           controller = loadPackagedComponents(tubiScene, port, startupArgs)
+
+          if starterController.fadeInRemoteComponent = true AND tubiScene <> invalid AND controller <> invalid
+            tubiScene.fadeOutSpinner = true
+            controller.fadeInContentController = true
+          end if
         end if
       else if field = "remoteComponentsUrl"
         ' Will get used later once the component library has finished loading
