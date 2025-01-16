@@ -339,7 +339,9 @@ Function onCategoryPanelContentSelected(msg)
   end if
 
   if categoryContent.id = m.constants.ui.categoryIds.networks
-    showCategoryDetailsScreen(categoryItemSelected) 
+    showCategoryDetailsScreen(categoryItemSelected)
+  else if categoryItemSelected <> invalid AND categoryItemSelected.playerType = m.constants.ui.playerTypes.fox
+      processPlayEvent(categoryItemSelected, categoryPanelScreen)
   else
     playbackSource = {
       "srcForAnalytic": m.constants.player.playbackSource.unknown
