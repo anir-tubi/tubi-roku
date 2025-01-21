@@ -2004,10 +2004,6 @@ Function getTranslation_en_US()
       "description": "Sign in error screen heading default error",
       "message": "You can still watch your favorite movies and TV shows as a guest, including {major_event_name}!\nWe'll send you an email to try again later."
     },
-    "search_disabled_message": {
-      "description": "Search disabled toast message",
-      "message": "Search is currently unavailable."
-    },
     "mylist_disabled_message": {
       "description": "My List disabled toast message",
       "message": "My Stuff is currently unavailable."
@@ -3677,6 +3673,10 @@ Function getTranslation_es_MX()
     "live_on_day": {
       "description": "day label used in air date countdown timer",
       "message": "{day} D"
+    },
+    "cc_audio_overlay_subtitles_mode": {
+      "description": "Available modes displayed on closed caption overlay",
+      "message": "Modo Subtítulos"
     },
     "live_on_hour": {
       "description": "day label used in air date countdown timer",
@@ -5409,6 +5409,10 @@ Function getTranslation_fr_CA()
     "live_on_day": {
       "description": "day label used in air date countdown timer",
       "message": "{day} D"
+    },
+    "cc_audio_overlay_subtitles_mode": {
+      "description": "Available modes displayed on closed caption overlay",
+      "message": "Mode Sous-Titres"
     },
     "live_on_hour": {
       "description": "day label used in air date countdown timer",
