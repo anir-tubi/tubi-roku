@@ -22,47 +22,83 @@ Function TubiExperiments(experimentsInfo) as Object
     defaultResources: {
 
       roku_screensaver: {
-        roku_screensaver_v2 : {"enabled": false}
+        roku_screensaver_v2 : {
+          default: {"enabled": false}
+          holdout_control: {"enabled": false}
+          holdout_winning: {"enabled": false}
+        }
       }
 
       roku_autoplay_timer: {
-        roku_autoplay_timer_v1 : {"enabled": false}
+        roku_autoplay_timer_v1 : {
+          default: {"enabled": false}
+          holdout_control: {"enabled": false}
+          holdout_winning: {"enabled": false}
+        }
       }
 
       roku_async_stop: {
-        roku_async_stop_v6: {"enabled": false}
+        roku_async_stop_v6: {
+          default: {"enabled": false}
+          holdout_control: {"enabled": false}
+          holdout_winning: {"enabled": false}
+        }
       }
 
       roku_horizontal_menu:{
-        roku_horizontal_menu_v3: {"enabled": false}
+        roku_horizontal_menu_v3: {
+          default: {"enabled": false}
+          holdout_control: {"enabled": false}
+          holdout_winning: {"enabled": false}}
       }
 
       roku_vertical_menu:{
-        roku_episodes_under_vertical_menu_v1: {"enabled": false}
+        roku_episodes_under_vertical_menu_v1: {
+          default: {"enabled": false}
+          holdout_control: {"enabled": false}
+          holdout_winning: {"enabled": false}}
       }
 
       roku_spotlight_carousel: {
-        roku_spotlight_carousel_v1 : {"enabled": false}
+        roku_spotlight_carousel_v1 : {
+          default: {"enabled": false}
+          holdout_control: {"enabled": false}
+          holdout_winning: {"enabled": false}}
       }
 
       roku_player_client_log: {
-        roku_player_client_log_v1: {"enabled": true}
+        roku_player_client_log_v1: {
+          default: {"enabled": true}
+          holdout_control: {"enabled": true}
+          holdout_winning: {"enabled": true}}
       }
 
       ads_tubi_skins: {
-        ads_tubi_skin_mufasa: {"enabled": true}
+        ads_tubi_skin_mufasa: {
+          default: {"enabled": true}
+          holdout_control: {"enabled": false}
+          holdout_winning: {"enabled": true}}
       }
 
       roku_multiple_video_preview_nav: {
-        roku_multiple_video_preview_nav_v1: {"enabled": false}
+        roku_multiple_video_preview_nav_v1: {
+          default: {"enabled": false}
+          holdout_control: {"enabled": false}
+          holdout_winning: {"enabled": false}}
       }
 
       roku_1080p_resolution: {
-        roku_1080p_resolution_v1 : {"enabled": false}
+        roku_1080p_resolution_v1 : {
+          default: {"enabled": false}
+          holdout_control: {"enabled": false}
+          holdout_winning: {"enabled": false}}
       }
 
       webott_force_failsafe: {
-        webott_force_failsafe: {"force_failsafe": false}
+        webott_force_failsafe: {
+          default: {"enabled": false}
+          holdout_control: {"enabled": false}
+          holdout_winning: {"enabled": false}}
       }
 
     }
@@ -73,11 +109,14 @@ Function TubiExperiments(experimentsInfo) as Object
     getNamespaceRequestInfo: tubiExperiments_getNamespaceRequestInfo
     getExperimentResult: tubiExperiments_getExperimentResult
     mapNamespaces: tubiExperiments_mapNamespaces
+    getHoldOutInfo: tubiExperiments_getHoldOutInfo
 
     'private methods
     parseNamespace: tubiExperiments_parseNamespace
     getDefaultResource: tubiExperiments_getDefaultResource
     getExperiment: tubiExperiments_getExperiment
+    getDefaultHoldOutControlResource: tubiExperiments_getDefaultHoldOutControlResource
+    getDefaultHoldOutWinningResource: tubiExperiments_getDefaultHoldOutWinningResource
   }
 End Function
 
@@ -153,6 +192,12 @@ Function tubiExperiments_getExperiment(namespaceName as string, experimentName a
         experiment = possibleExperiment
       else if possibleExperiment.experiment_result.experiment_name = whitelistedExperimentName
         experiment = possibleExperiment
+      else
+        '//the namespace has been chosen under holdout experiment, so now holdout experiment becomes the desired experiment.
+        holdOutInfo = possibleExperiment.experiment_result.holdout_info
+        if holdOutInfo <> invalid AND holdOutInfo.in_holdout = true
+          experiment = possibleExperiment
+        end if
       end if
     end if
   end if
@@ -176,6 +221,13 @@ Function tubiExperiments_getExperimentTracking(namespaceName as string, experime
 
       if experiment.experiment_result.experiment_name <> invalid
         experimentName = experiment.experiment_result.experiment_name
+      end if
+
+      'send the domain name if the experiment is in holdout instead of the namespace Name.
+      holdoutInfo = experiment.experiment_result.holdout_info
+
+      if holdoutInfo <> invalid AND holdoutInfo.in_holdout = true
+        namespaceName = holdoutInfo.domain
       end if
     end if
 
@@ -232,7 +284,25 @@ Function tubiExperiments_getExperimentResource(namespaceName as string, experime
   oReturn = m.getDefaultResource(namespaceName, experimentName)
   experiment = m.getExperiment(namespaceName, experimentName)
   if experiment <> invalid AND experiment.resource <> invalid
-    oReturn = experiment.resource
+
+    expResource = experiment.resource
+    inHoldOut = false
+    expResult = experiment.experiment_result
+
+    if expResult <> invalid AND expResult.holdout_info <> invalid
+      inHoldout = expResult.holdout_info.in_holdout
+    end if
+
+    if inHoldout = true
+      if expResult.treatment = "status_quo"
+        oReturn = m.getDefaultHoldOutControlResource(namespaceName, experimentName)
+      else
+        oReturn = m.getDefaultHoldOutWinningResource(namespaceName, experimentName)
+      end if
+    else
+      oReturn = expResource
+    end if
+
   end if
 
   return oReturn
@@ -248,8 +318,45 @@ End Function
 Function tubiExperiments_getDefaultResource(namespaceName as string, experimentName as string) as Object
   defaultResource = invalid
   if namespaceName <> invalid AND experimentName <> invalid
-    if m.defaultResources[namespaceName] <> invalid
-      defaultResource = m.defaultResources[namespaceName][experimentName]
+    if m.defaultResources[namespaceName] <> invalid AND m.defaultResources[namespaceName][experimentName] <> invalid
+      defaultResource = m.defaultResources[namespaceName][experimentName]["default"]
+    end if
+  end if
+
+  return defaultResource
+End Function
+
+
+Function tubiExperiments_getDefaultHoldOutControlResource(namespaceName as string, experimentName as string) as Object
+  defaultResource = invalid
+  if namespaceName <> invalid AND experimentName <> invalid
+    if m.defaultResources[namespaceName] <> invalid AND m.defaultResources[namespaceName][experimentName] <> invalid
+      defaultResource = m.defaultResources[namespaceName][experimentName]["holdout_control"]
+    end if
+  end if
+
+  return defaultResource
+End Function
+
+
+Function tubiExperiments_getHoldOutInfo(namespaceName as string, experimentName as string) as Object
+  holdoutInfo = {}
+  experiment = m.getExperiment(namespaceName, experimentName)
+
+  if experiment <> invalid AND experiment.experiment_result <> invalid AND experiment.experiment_result.holdout_info <> invalid
+    holdoutInfo = experiment.experiment_result.holdout_info
+  end if
+
+  return holdoutInfo
+
+End Function
+
+
+Function tubiExperiments_getDefaultHoldOutWinningResource(namespaceName as string, experimentName as string) as Object
+  defaultResource = invalid
+  if namespaceName <> invalid AND experimentName <> invalid
+    if m.defaultResources[namespaceName] <> invalid AND m.defaultResources[namespaceName][experimentName] <> invalid
+      defaultResource = m.defaultResources[namespaceName][experimentName]["holdout_winning"]
     end if
   end if
 
