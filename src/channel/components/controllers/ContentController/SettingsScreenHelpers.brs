@@ -221,9 +221,9 @@ End Function
 
 '@choice: boolean, true for on and false for off.
 Function saveAutoPlayNextVideoChoiceToServerPersistentData(choice)
-  saveServerPersistentData([{
+  saveServerPersistentData({
     "isAutoPlayTimerOn": choice
-  }])
+  })
 End Function
 
 
