@@ -27,17 +27,11 @@
       <!-- When the Helper receives valid category data from the server, it sets the new value to this field. -->
       <field id="content" alias="CategoryGridList.content" />
 
-      <!-- Spotlight content node, will contain a valid node only if the user is in spotlight experiment control group. -->
-      <field id="spotlightContent" alias="CategoryGridList.spotlightContent" />
-
       <!-- Skin Ad content node, will contain a valid node only if the user is in roku_skins_ad experiment variation group. -->
       <field id="skinAdContent" alias="CategoryGridList.skinAdContent" />
 
       <!-- The helper class will call this when the new content is ready to be displayed on the screen. -->
       <field id="contentUpdated" alwaysNotify="true" alias="CategoryGridList.contentUpdated" />
-
-      <!-- The helper will set this when the new spotlight content is ready to be displayed on the screen. -->
-      <field id="spotlightContentUpdated" alias="CategoryGridList.spotlightContentUpdated" />
 
       <!-- The helper will set this when the new skin Ad content is ready to be displayed on the screen. -->
       <field id="skinAdContentUpdated" alias="CategoryGridList.skinAdContentUpdated" />
@@ -84,7 +78,7 @@
       <field id="resetContentAreaValues" type="boolean" alwaysNotify="true" />
 
       <!-- The number that is used as how many more seconds until the linear video player will be going fullscreen -->
-      <field id="fullscreenCountdown" type="integer" alias="CategoryGridList.fullscreenCountdown" />
+      <field id="fullscreenCountdown" type="integer" />
 
       <!-- kidsModeFeatureOn will be set based device countryCode -->
       <field id="kidsModeFeatureOn" type="boolean" />
@@ -100,8 +94,6 @@
       <!-- This field is used to force remove focus from the rowlist. -->
       <field id="removeFocusFromRowList" type="boolean" alias="CategoryGridList.removeFocusFromRowList" />
 
-      <!-- This field is used to pass down the video preview progress down to the categorygrid list. -->
-      <field id="videoPreviewProgress" type="boolean" alias="CategoryGridList.videoPreviewProgress" />
       <!-- We have to create a field due to renderTracking events being async each itemComponent should be aware of what the mode was when it rendered. -->
       <field id="shouldTrackViewableImpressionEvent" type="boolean" value="true" alias="CategoryGridList.shouldTrackViewableImpressionEvent" />
 

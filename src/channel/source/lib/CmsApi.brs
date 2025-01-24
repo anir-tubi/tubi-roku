@@ -195,23 +195,12 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
   end if
 
   if params["content_mode"] <> m.constants.ui.contentMode.linear
-    ' don't send the Tupian image params for homescreen requests that are contentMode = "linear"
-    if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_spotlight_carousel", "roku_spotlight_carousel_v1").enabled = true
-      imageParamTypes = [
-        "poster"
-        "landscape"
-        "background"
-        "title"
-        "spotlightLandscape"
-      ]
-    else
-      imageParamTypes = [
-        "poster"
-        "landscape"
-        "background"
-        "title"
-      ]
-    end if
+    imageParamTypes = [
+      "poster"
+      "landscape"
+      "background"
+      "title"
+    ]
 
     params = m.setImageParams(imageParamTypes, options.params, m.constants.ui.screenIds.homeScreen)
   end if
@@ -354,22 +343,11 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
   end if
 
   if imageParamTypes = invalid
-    if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_spotlight_carousel", "roku_spotlight_carousel_v1").enabled = true AND categoryId = m.constants.ui.categoryIds.spotlight
-      imageParamTypes = [
-        "poster"
-        "landscape"
-        "background"
-        "title"
-        "spotlightLandscape"
-      ]
-    else
-      imageParamTypes = [
-        "poster"
-        "landscape"
-        "background"
-      ]
-    end if
-
+    imageParamTypes = [
+      "poster"
+      "landscape"
+      "background"
+    ]
   end if
 
   params = m.setImageParams(imageParamTypes, params, screenId, containerGridItemType)
@@ -444,7 +422,7 @@ End Function
 ' https://docs.google.com/document/d/1T9qL5otwgjIAEW4pPwvKiq0PxIYEK-ExKrFBYRkx6BY
 '
 ' @imageTypes, array - an array of strings corresponding to which types of images to request from Tupian
-'                      Accepted values are "poster", "landscape", "hero", "background", "title", "spotlightLandscape"
+'                      Accepted values are "poster", "landscape", "hero", "background", "title"
 ' @existingParams: assocArray, any parameters that have already been defined that need to be added to
 ' @screenId: id of the screen.
 ' @containerGridItemType: String, gridItemType of the container for which we are making the request.
@@ -454,7 +432,6 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
   landscapeSize = imageSizes.landscape
   background = imageSizes.background
   title = imageSizes.title
-  spotlightLandscape = imageSizes.spotlightLandscape
   skinAdLandscape = imageSizes.skinAdLandscape
   fullScreenBackground = imageSizes.fullScreenBackground
 
@@ -475,15 +452,13 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
     else if imageType = "hero"
       existingParams["images[hero_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_hero"
     else if imageType = "background"
-      if containerGridItemType <> m.constants.ui.gridItemTypes.spotlight AND containerGridItemType <> m.constants.ui.gridItemTypes.skinAd
+      if containerGridItemType <> m.constants.ui.gridItemTypes.skinAd
         existingParams["images[background_tb]"] = "w" + background[0].ToStr() + "h" + background[1].ToStr() + "_background"
       else
         existingParams["images[background_tb]"] = "w" + fullScreenBackground[0].ToStr() + "h" + fullScreenBackground[1].ToStr() + "_background"
       end if
     else if imageType = "title"
       existingParams["images[title_art]"] = "w" + title[0].ToStr() + "h" + title[1].ToStr() + "_title"
-    else if imageType = "spotlightLandscape"
-      existingParams["images[spotlight_landscape_tb]"] = "w" + spotlightLandscape[0].ToStr() + "h" + spotlightLandscape[1].ToStr() + "_landscape"
     else if imageType = "skinAdLandscape"
       existingParams["images[skinAd_landscape_tb]"] = "w" + skinAdLandscape[0].ToStr() + "h" + skinAdLandscape[1].ToStr() + "_landscape"
     end if
@@ -531,22 +506,9 @@ Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = 
     'Determine the window start and window size for lazy loading
   windowInfo = m.getWindowInfo(homeScreen, index)
   if windowInfo <> invalid
-    ' Adding spotlight or featured row into lazy loading.
+    ' Adding purple carpet into lazy loading.
     if homeScreen.purpleCarpetContent <> invalid
       category = homeScreen.purpleCarpetContent.getChild(0)
-      if category <> invalid
-        categoryReqInfo = m.createCategoryRequestInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode)
-
-        if categoryReqInfo <> invalid then
-          requests.push(categoryReqInfo)
-          category.state = "loading"
-        end if
-      end if
-    end if
-
-    ' Adding spotlight or featured row into lazy loading.
-    if homeScreen.spotlightContent <> invalid
-      category = homeScreen.spotlightContent.getChild(0)
       if category <> invalid
         categoryReqInfo = m.createCategoryRequestInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode)
 

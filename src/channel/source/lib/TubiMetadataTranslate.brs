@@ -1890,9 +1890,7 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
   gridItemTypes = constants.ui.gridItemTypes
   gridItemType = gridItemTypes.portrait
 
-  if container.id = constants.ui.categoryIds.spotlight AND container.containerRowIndex = constants.ui.spotlightContainerIndex AND m.experiments.getExperimentResource("roku_spotlight_carousel", "roku_spotlight_carousel_v1").enabled = true
-    gridItemType = gridItemTypes.spotlight
-  else if container.type = constants.ui.categoryTypes.linear
+  if container.type = constants.ui.categoryTypes.linear
     gridItemType = gridItemTypes.linear
   else if container.id = constants.ui.categoryIds.featured AND orientation <> gridItemTypes.portrait
     ' `orientation <> gridItemTypes.portrait` is required as the search screen container.id is featured but uses portrait imagery

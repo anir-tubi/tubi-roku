@@ -3,38 +3,22 @@
 '
 ' @content: TubiContentNode, containing a movie or series
 ' @infoPanel: InfoPanel node
-' @bInSpotlight: Boolean, Is this in the spotlight row
 '
 ' @sideEffects: updates fields on the passed in infoPanel node
-Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel, bInSpotlight = false)
+Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel)
   tubiLog("InfoPanelMixin.populateInfoPanelWithHomescreenStyleItemMode")
   ' used by homescreen, category details screen etc.
   ' IMPORTANT, still need to call infoPanel.calculateHeight after calling this function
   lineOneData = {}
-  if bInSpotlight = true
-    mode = m.constants.ui.infoPanelModes.spotlightItem
-    lineTwoData = {}
-    lineOneData.genres = content.genres
-    infoPanel.isTubiOriginal = content.isOriginal
-  else
-    mode = m.constants.ui.infoPanelModes.item
-    lineOneData.length = content.length
-    lineTwoData = {
-      genres: content.genres
-    }
-    infoPanel.description = content.description
-  end if
+  mode = m.constants.ui.infoPanelModes.item
+  lineOneData.length = content.length
+  lineTwoData = {
+    genres: content.genres
+  }
+  infoPanel.description = content.description
 
   infoPanel.mode = mode
   infoPanel.title = content.title
-
-  if bInSpotlight = true
-    if content.titleImageUrl <> invalid
-      infoPanel.titleImageUri = content.titleImageUrl
-    else
-      infoPanel.titleImageUri = ""
-    end if
-  end if
 
   lineOneData.releaseDate = content.releaseDate
   lineOneData.length = content.length
@@ -83,7 +67,7 @@ End Function
 ' @infoPanel: InfoPanel node
 '
 ' @sideEffects: updates fields on the passed in infoPanel node
-Function populateInfoPanelWithHomescreenStyleSportsMode(content, infoPanel, bInSpotlight = false)
+Function populateInfoPanelWithHomescreenStyleSportsMode(content, infoPanel)
   tubiLog("InfoPanelMixin.populateInfoPanelWithHomescreenStyleSportsMode")
 
   infoPanel.title = content.title
@@ -117,13 +101,8 @@ Function populateInfoPanelWithHomescreenStyleSportsMode(content, infoPanel, bInS
 
   lineTwoData = {}
 
-  if bInSpotlight = true
-    infoPanel.mode = m.constants.ui.infoPanelModes.spotlightSportsEvent
-    lineOneData.roundGroupInfo = content.roundGroupInfo
-  else
-    infoPanel.mode = m.constants.ui.infoPanelModes.sportsEvent
-    lineTwoData.roundGroupInfo = content.roundGroupInfo
-  end if
+  infoPanel.mode = m.constants.ui.infoPanelModes.sportsEvent
+  lineTwoData.roundGroupInfo = content.roundGroupInfo
 
   infoPanel.lineOneData = lineOneData
   infoPanel.lineTwoData = lineTwoData
@@ -197,19 +176,14 @@ End Function
 '
 ' @content: TubiContentNode, containing a linear channel with programs as children
 ' @infoPanel: InfoPanel node
-' @bInSpotlight: Boolean, Is this in the spotlight row
 '
 ' @sideEffects: updates fields on the passed in infoPanel node
 
-Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel, bInSpotlight = false)
+Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel)
   tubiLog("InfoPanelMixin.populateInfoPanelWithLinearProgramHomescreenMode")
   currentProgram = getCurrentLiveProgram(content)
 
-  if bInSpotlight = true
-    infoPanel.mode = m.constants.ui.infoPanelModes.spotlightLinearProgramHomescreen
-  else
-    infoPanel.mode = m.constants.ui.infoPanelModes.linearProgramHomescreen
-  end if
+  infoPanel.mode = m.constants.ui.infoPanelModes.linearProgramHomescreen
 
   releaseDate = ""
   timeLeft = ""
@@ -261,19 +235,6 @@ Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel, bI
         leagueName = currentProgram.leagueName
       end if
     end if
-
-    if bInSpotlight = true
-      if currentProgram.live = true
-        infoPanel.liveBadgeHeaderText = getTranslation("screenSearch_liveText")
-      else
-        infoPanel.liveBadgeHeaderText = getTranslation("onNow")
-      end if
-
-      if isNonEmptyString(channelTitle) = true
-        infoPanel.channelNameHeader = channelTitle
-        channelTitle = ""  '//reset channelTitle so it does not affect the lineTwoData
-      end if
-    end if
   else
     infoPanel.description = content.description
     infoPanel.episodeTitle = ""
@@ -309,14 +270,6 @@ Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel, bI
 
   if channelTitle <> ""
     lineTwoData.channelName = channelTitle
-  end if
-
-  if bInSpotlight = true
-    for each prop in lineTwoData
-      lineOneData[prop] = lineTwoData[prop]
-    end for
-
-    lineTwoData = {}
   end if
 
   infoPanel.lineOneData = lineOneData

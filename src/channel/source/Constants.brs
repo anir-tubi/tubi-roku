@@ -1115,7 +1115,6 @@ Function getConstants()
       constants.ui.categoryIds.topSearched = "top_searched"
       constants.ui.categoryIds.topTenSeries = "top_10_tv_shows_on_tubi"
       ' Adding a constant entry so that it is easier to change for testing or future use if we need to pick other container outside of featured.
-      constants.ui.categoryIds.spotlight = "featured"
       constants.ui.categoryIds.skinAd = "skinAd"
       constants.ui.categoryIds.purpleCarpet = "fox_live_events"
       constants.ui.categoryIds.purpleCarpetBanner = "fox_live_events_banner"
@@ -1145,7 +1144,6 @@ Function getConstants()
     constants.ui.infoPanelModes = {}
       'these map to different InfoPanel modes/types
       constants.ui.infoPanelModes.item = "item"
-      constants.ui.infoPanelModes.spotlightItem = "spotlightItem"
       constants.ui.infoPanelModes.continueWatching = "continueWatching"
       constants.ui.infoPanelModes.channel = "channel"
       constants.ui.infoPanelModes.movie = "movie"
@@ -1158,9 +1156,7 @@ Function getConstants()
       constants.ui.infoPanelModes.simplifiedLinearPlayer = "simplifiedLinearPlayer"
       constants.ui.infoPanelModes.linearSearch = "linearSearch"
       constants.ui.infoPanelModes.linearProgramHomescreen = "linearProgramHomescreen"  'v4 api
-      constants.ui.infoPanelModes.spotlightLinearProgramHomescreen = "spotlightLinearProgramHomescreen"
       constants.ui.infoPanelModes.sportsEvent = "sportsEvent"
-      constants.ui.infoPanelModes.spotlightSportsEvent = "spotlightSportsEvent"
       constants.ui.infoPanelModes.purpleCarpetBanner = "purpleCarpetBanner"
       constants.ui.infoPanelModes.purpleCarpetEvent = "purpleCarpetEvent"
 
@@ -1380,7 +1376,6 @@ Function getConstants()
         constants.ui.imageSizes.background = [1197, 675]
       end if
 
-      constants.ui.imageSizes.spotlightLandscape = [252, 142]
       constants.ui.imageSizes.skinAdLandscape = [520, 292]
 
       ' Size for the background image.
@@ -1468,7 +1463,6 @@ Function getConstants()
       constants.ui.gridItemTypes.emptyContainer = "emptyContainer"
       constants.ui.gridItemTypes.portraitTopTen = "portraitTopTen"
       constants.ui.gridItemTypes.skinAd = "skinAd"
-      constants.ui.gridItemTypes.spotlight = "spotlight"
       ' Will be removed when purple carpet code is cleaned up.
       constants.ui.gridItemTypes.purpleCarpet = "purpleCarpet"
       ' Will be removed when purple carpet code is cleaned up.

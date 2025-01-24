@@ -474,7 +474,7 @@ Function onLineOneDataChange(msg)
     if isNonEmptyString(text) = true
       if textIsPresent = false
         mode = m.top.mode
-        if mode = m.constants.ui.infoPanelModes.sportsEvent OR mode = m.constants.ui.infoPanelModes.spotlightSportsEvent
+        if mode = m.constants.ui.infoPanelModes.sportsEvent
           firstLineGroup.insertChild(m.line1Bold, insertIndex)
         else
           firstLineGroup.insertChild(m.line1, insertIndex)
@@ -537,7 +537,7 @@ Function onLineOneDataChange(msg)
 
     ' handle rating
     ratingIsPresent = (m.rating.getParent() <> invalid)
-    if isNonEmptyString(data.rating) = true AND m.top.mode <> m.constants.ui.infoPanelModes.sportsEvent AND m.top.mode <> m.constants.ui.infoPanelModes.spotlightSportsEvent
+    if isNonEmptyString(data.rating) = true AND m.top.mode <> m.constants.ui.infoPanelModes.sportsEvent
       if ratingIsPresent = false
         firstLineGroup.insertChild(m.rating, insertIndex)
       end if
@@ -980,27 +980,6 @@ Function onModeChange()
     m.secondLineGroup.appendChild(m.line2)
 
     m.offset.itemSpacings = [13]
-  else if m.top.mode = m.constants.ui.infoPanelModes.spotlightItem
-    ' used for movies and series on the homescreen and similar screens
-    m.infoPanelGroup.appendChild(m.offset)
-    m.offset.appendChild(m.tubiOriginal)
-    '//Featured items have larger title text
-    setTypographyOfLabel(m.title, m.typographyConstants.ids.headerMedium)
-    m.offset.appendChild(m.title)
-    m.offset.appendChild(m.twoLineInfo)
-
-    m.twoLineInfo.appendChild(m.firstLineGroup)
-    m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
-    m.firstLineGroup.appendChild(m.line1)
-    m.firstLineGroup.appendChild(m.closedCaptionPoster)
-    m.firstLineGroup.appendChild(m.audioDescriptionPoster)
-    m.firstLineGroup.appendChild(m.rating)
-    m.firstLineGroup.appendChild(m.descriptorCode)
-    m.firstLineGroup.appendChild(m.expireWarning)
-    m.firstLineGroup.appendChild(m.partnerLogo)
-
-    m.offset.itemSpacings = [13]
-
   else if m.top.mode = m.constants.ui.infoPanelModes.movie
     ' used for movies on the details screen
     m.infoPanelGroup.appendChild(m.offset)
@@ -1139,21 +1118,6 @@ Function onModeChange()
     m.twoLineInfo.appendChild(m.secondLineGroup)
     m.secondLineGroup.appendChild(m.line2)
     m.offset.itemSpacings = [15]
-  else if m.top.mode = m.constants.ui.infoPanelModes.spotlightSportsEvent
-    m.infoPanelGroup.appendChild(m.offset)
-    m.offset.appendChild(m.title)
-    m.offset.appendChild(m.twoLineInfo)
-
-    m.twoLineInfo.appendChild(m.firstLineGroup)
-    m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
-    m.firstLineGroup.appendChild(m.line1Bold)
-    m.firstLineGroup.appendChild(m.closedCaptionPoster)
-    m.firstLineGroup.appendChild(m.audioDescriptionPoster)
-
-    m.top.appendChild(m.playerCountdownGroup)
-    m.playerCountdownGroup.translation = [1215, -111]
-
-    m.offset.itemSpacings = [15]
   else if m.top.mode = m.constants.ui.infoPanelModes.linearProgramHomescreen
     ' This infopanel mode is for linear programs in response with V4 api
     m.infoPanelGroup.appendChild(m.offset)
@@ -1171,28 +1135,6 @@ Function onModeChange()
     m.secondLineGroup.appendChild(m.line2)
 
     m.offset.appendChild(m.descriptionGroup)
-
-    m.offset.itemSpacings = [13, 16, 13]
-  else if m.top.mode = m.constants.ui.infoPanelModes.spotlightLinearProgramHomescreen
-    ' This infopanel mode is for linear programs that appear in spotlight.
-    m.infoPanelGroup.appendChild(m.offset)
-    m.offset.appendChild(m.topHeaderGroup)
-    m.offset.appendChild(m.title)
-
-    if isNonEmptyString(m.episode.text)
-      m.offset.appendChild(m.episode)
-    end if
-
-    m.offset.appendChild(m.twoLineInfo)
-
-    m.twoLineInfo.appendChild(m.firstLineGroup)
-    m.firstLineGroup.appendChild(m.line1)
-
-    '//Featured items have larger title text
-    setTypographyOfLabel(m.title, m.typographyConstants.ids.headerMedium)
-
-    m.top.appendChild(m.playerCountdownGroup)
-    m.playerCountdownGroup.translation = [1185, -591]
 
     m.offset.itemSpacings = [13, 16, 13]
   else if m.top.mode = m.constants.ui.infoPanelModes.purpleCarpetEvent

@@ -141,19 +141,6 @@ Function processHomeScreenBatchResponse(response, screenId)
       end if
 
     end if
-
-    ' We have 2 different settings which are using to pick a row from response to be eligible for spotlight row.
-    ' spotlightContainerIndex - Holds the value of the position in the home response.
-    ' categoryIds.spotlight - Holds the slug of the container that we need to match.
-    ' The reason for choosing 2 setting is to provide flexibility and protection such that if backend returns a different container at spotlightContainerIndex than we could display a
-    ' different variant or experiment and have the container mentioned in categoryIds.spotlight fallback to default landscape variant.
-    if homeScreen.purpleCarpetContent = invalid
-      containerRow = response.getChild(m.constants.ui.spotlightContainerIndex)
-      if containerRow <> invalid AND containerRow.id = m.constants.ui.categoryIds.spotlight AND getExperimentResource("roku_spotlight_carousel", "roku_spotlight_carousel_v1", false).enabled = true
-        response.removeChild(containerRow)
-        updateSpotlightRowContent(homeScreen, containerRow)
-      end if
-    end if
     homeScreen.batchResponse = response
   end if
 End Function
@@ -511,19 +498,6 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
       end if
       homeScreen.purpleCarpetContent = invalid
       homeScreen.purpleCarpetContentUpdated = true
-    end if
-
-    ' We have 2 different settings which are using to pick a row from response to be eligible for spotlight row.
-    ' spotlightContainerIndex - Holds the value of the position in the home response.
-    ' categoryIds.spotlight - Holds the slug of the container that we need to match.
-    ' The reason for choosing 2 setting is to provide flexibility and protection such that if backend returns a different container at spotlightContainerIndex than we could display a
-    ' different variant or experiment and have the container mentioned in categoryIds.spotlight fallback to default landscape variant.
-    if homeScreen.purpleCarpetContent = invalid
-      containerRow = rawResponse.getChild(m.constants.ui.spotlightContainerIndex)
-      if containerRow.id = m.constants.ui.categoryIds.spotlight AND getExperimentResource("roku_spotlight_carousel", "roku_spotlight_carousel_v1", false).enabled = true
-        rawResponse.removeChild(containerRow)
-        updateSpotlightRowContent(homeScreen, containerRow)
-      end if
     end if
 
     ads = rawResponse.ads
@@ -1174,18 +1148,6 @@ End Function
 
 
 ' @param homeScreen, roSGNode - The HomeScreen component that contains the focused content.
-' @param content, roSGNode - The CategoryContentNode for the spotlight row.
-Function updateSpotlightRowContent(homeScreen, content)
-  tubiLog("HomeScreenHelpers.updateSpotlightRowContent")
-  rowContentNode = CreateObject("roSGNode", "ContentNode")
-  content.gridItemType = m.constants.ui.gridItemTypes.spotlight
-  rowContentNode.appendChild(content)
-  homeScreen.spotlightContent = rowContentNode
-  homeScreen.spotlightContentUpdated = true
-End Function
-
-
-' @param homeScreen, roSGNode - The HomeScreen component that contains the focused content.
 ' @param content, roSGNode - The ContentNode for the skin item.
 Function updateSkinAdRowContent(homeScreen, content)
   tubiLog("HomeScreenHelpers.updateSkinAdRowContent")
@@ -1218,7 +1180,7 @@ Function updateSkinAdRowContent(homeScreen, content)
 End Function
 
 
-' @param content, roSGNode - The CategoryContentNode for the spotlight row.
+' @param content, roSGNode - The CategoryContentNode for the purple carpet row.
 Function updatePurpleCarpetRowContent(homeScreen, content)
   if isNode(content) = true
     rowContentNode = CreateObject("roSGNode", "ContentNode")

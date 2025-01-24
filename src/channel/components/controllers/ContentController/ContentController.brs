@@ -1673,10 +1673,9 @@ Function setVideoContentScreenBackground(screen)
     end if
 
     isSkinAdRowContent = (isCurrentScreenHomeScreen() = true AND gridItemType = m.constants.ui.gridItemTypes.skinAd)
-    isSpotlightRowContent = isCurrentScreenHomeScreen() = true AND gridItemType = m.constants.ui.gridItemTypes.spotlight
     isPurpleCarpetContent = (gridItemType = m.constants.ui.gridItemTypes.purpleCarpet)
     if (videoPreviewState = "playing" OR videoPreviewState = "paused" OR videoPreviewState = "buffering" OR isVideoPreviewPlayQueued = true) AND isSkinAdRowContent = false
-      if isSpotlightRowContent = true OR isPurpleCarpetContent = true
+      if isPurpleCarpetContent = true
         backgroundType = m.constants.ui.backgroundTypes.spotlight
       else
         backgroundType = m.constants.ui.backgroundTypes.epg
@@ -1693,7 +1692,7 @@ Function setVideoContentScreenBackground(screen)
       }
 
     else
-      if isSpotlightRowContent = true OR gridItemType = m.constants.ui.gridItemTypes.purpleCarpet
+      if gridItemType = m.constants.ui.gridItemTypes.purpleCarpet
         backgroundType = m.constants.ui.backgroundTypes.spotlight
       else if isSkinAdRowContent = true
         backgroundType = m.constants.ui.backgroundTypes.skinAd

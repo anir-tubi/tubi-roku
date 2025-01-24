@@ -254,14 +254,8 @@ Function maximizeLinearPlayer(content)
 
     if videoPlayer.fullscreen = false
       '//stop the background artwork from transitioning and from displaying while player is in fullscreen. We can't use shouldRotateBackgrounds because we still need the gradients from backgroundGroup
-      if videoPlayer.content.gridItemType = m.constants.ui.gridItemTypes.spotlight
-        sBackgroundType = m.constants.ui.backgroundTypes.fullScreen
-      else
-        sBackgroundType = m.constants.ui.backgroundTypes.epg
-      end if
-
       m.backgroundGroup.backgroundInfo = {
-        type: sBackgroundType
+        type: m.constants.ui.backgroundTypes.epg
         uriList: []
       }
 
@@ -579,19 +573,10 @@ Function animateLinearVideoPlayerToMinState(nDuration = .25, bVisible = true)
 
     linearPlayerParentGroup = m.LinearPlayerGroup
 
-    if isCurrentScreenHomeScreen() = true AND videoPlayer.content <> invalid AND videoPlayer.content.gridItemType = m.constants.ui.gridItemTypes.spotlight
-      ' Reducing 1px from both width and height since the player is in background and keeping full width causes roku to display closed captioning overlay.
-      ' To avoid any other Roku OS level default behavior from kicking in reducing 1px to give a impression that player is not in full screen.
-      nWidth = 1919
-      nHeight = 1079
-      nPosition = [0, 0]
-      m.LinearVideoPlayerSpinner.translation = [828, 320]
-    else
-      nWidth = m.constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension[0]
-      nHeight = m.constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension[1]
-      nPosition = m.constants.ui.imageTranslations.epgLinearVideoPlayerOnEPGScreen_minimizedTranslation
-      m.LinearVideoPlayerSpinner.translation = [1260, 320]
-    end if
+    nWidth = m.constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension[0]
+    nHeight = m.constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension[1]
+    nPosition = m.constants.ui.imageTranslations.epgLinearVideoPlayerOnEPGScreen_minimizedTranslation
+    m.LinearVideoPlayerSpinner.translation = [1260, 320]
     linearPlayerParentGroup.appendChild(videoPlayer)
 
     clearMinimizedLinearPlayerAnimation()

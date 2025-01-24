@@ -59,13 +59,6 @@ Function TubiExperiments(experimentsInfo) as Object
           holdout_winning: {"enabled": false}}
       }
 
-      roku_spotlight_carousel: {
-        roku_spotlight_carousel_v1 : {
-          default: {"enabled": false}
-          holdout_control: {"enabled": false}
-          holdout_winning: {"enabled": false}}
-      }
-
       roku_player_client_log: {
         roku_player_client_log_v1: {
           default: {"enabled": true}

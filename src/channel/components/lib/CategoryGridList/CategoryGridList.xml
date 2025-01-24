@@ -38,10 +38,6 @@
       </CategoryContentNode> -->
       <field id="content" type="node"/>
 
-      <field id="spotlightContent" type="node" alias="spotlightRow.content" />
-
-      <field id="spotlightContentUpdated" alias="spotlightRow.contentUpdated" />
-
       <field id="skinAdContent" type="node" alias="skinAdRow.content" />
 
       <field id="skinAdContentUpdated" alias="skinAdRow.contentUpdated" />
@@ -119,12 +115,6 @@
       <!-- Contains the value of personalization_id returned from backend home screen api call. -->
       <field id="personalizationId" type="string" />
 
-      <!-- This field holds data related to video preview progress. -->
-      <field id="videoPreviewProgress" alias="spotlightRow.videoPreviewProgress" />
-
-      <!-- The number that is used as how many more seconds until the linear video player will be going fullscreen -->
-      <field id="fullscreenCountdown" alias="spotlightRow.fullscreenCountdown" />
-
       <!-- We have to create a field due to renderTracking events being async each itemComponent should be aware of what the mode was when it rendered. -->
       <field id="shouldTrackViewableImpressionEvent" type="boolean" />
 
@@ -186,10 +176,6 @@
       id="skinAdRow"
       opacity="0"
       translation="[0,-12]" />
-    <SpotlightRow 
-      id="spotlightRow"
-      opacity="0"
-      translation="[0,132]" />
     <PurpleCarpetRow
       opacity="0"
       id="purpleCarpetRow" />
