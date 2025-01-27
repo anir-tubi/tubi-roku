@@ -2644,6 +2644,10 @@ Function getTranslation_es_MX()
       "description": "Description of the autoplay timer user choice screen",
       "message": "Contenido está configurado para Auto-Reproducir otro video cuando lo que estás viendo está por terminar."
     },
+    "screenSettings_autoplayTimer_instructions_guest_users": {
+      "description": "Description of the autoplay timer user choice screen for guest users",
+      "message": "Contenido está configurado para Auto-Reproducir otro video cuando lo que estás viendo está por terminar. Debes iniciar sesión para usar esta función."
+    },
     "screenSettings_autoplayPreview_featureDisabledMessage": {
       "description": "Message to display when the user has set Autoplay to false in Roku(not tubi) main settings.",
       "message": "Reproducción automática se controla desde la configuración de Roku. Para cambiarla, ve a Configuración de Roku -> Accesibilidad -> Reproducción automática de video."
@@ -4384,6 +4388,10 @@ Function getTranslation_fr_CA()
       "description": "Description of the autoplay timer user choice screen",
       "message": "Contenu est configuré pour lire Auto-Lecture une autre vidéo lorsque vous regardez est sur le point de terminer."
     },
+    "screenSettings_autoplayTimer_instructions_guest_users": {
+      "description": "Description of the autoplay timer user choice screen for guest users",
+      "message": "Contenu est configuré pour lire Auto-Lecture une autre vidéo lorsque vous regardez est sur le point de terminer. Vous devez vous connecter pour utiliser cette fonctionnalité."
+    },
     "screenSettings_autoplayPreview_featureDisabledMessage": {
       "description": "Message to display when the user has set Autoplay to false in Roku(not tubi) main settings.",
       "message": "La lecture automatique est contrôlée dans les paramètres Roku. Pour la modifier, allez dans Paramètres Roku -> Accessibilité -> Lecture automatique de la vidéo."
@@ -5535,6 +5543,10 @@ Function getTranslation_en_GB()
     "screenSettings_parentalControls_instructions": {
       "description": "Description of the parental controls screen",
       "message": "Please select the appropriate viewing age for Tubi TV. Your selection will determine which film and show ratings you can view in the app. If this selection is changed, you will be required to enter your account password."
+    },
+    "screenSettings_autoplayTimer_instructions_guest_users": {
+      "description": "Description of the autoplay timer user choice screen for guest users",
+      "message": "Content is set up to automatically play another video when what you're watching is about to end. You need to sign in to use this feature."
     },
     "screenSettings_menu_PrivacyCenter": {
       "description": "A menu Item for the Settings screen",
