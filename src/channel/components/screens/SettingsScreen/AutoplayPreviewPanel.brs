@@ -54,6 +54,7 @@ Function init()
     checkItemHelper(m.top.autoPlayTimerSelectItem, m.AutoPlayTimerMenu)
     m.AutoPlayTimerContentGroup.visible = true
     m.top.observeField("autoPlayTimerSelectItem", "onAutoPlayTimerSelectItem")
+    m.top.observeFieldScoped("isUserSignedIn", "onUserSignedInfoChange")
   end if
 End Function
 
@@ -92,9 +93,8 @@ End Function
 
 Function setAutoplayTimerChoices()
   m.AutoPlayTimerTitle.text = getTranslation("screenSettings_menu_autoplayNextVideo")
-  m.AutoPlayTimerInstructions.text = getTranslation("screenSettings_autoplayTimer_instructions")
 
-  m.autoPlayTimerInstructionsText = m.AutoPlayTimerTitle.text + " " + m.AutoPlayTimerInstructions.text
+  onUserSignedInfoChange()
 
   onContentNode = CreateObject("roSGNode", "CheckButtonContentNode")
   onContentNode.id = "On"
@@ -120,6 +120,15 @@ Function setAutoplayTimerChoices()
   setTypographyOfLabel(m.AutoPlayTimerTitle, typographyConstants.ids.headerSmall)
   setTypographyOfLabel(m.AutoPlayTimerInstructions, typographyConstants.ids.bodyMedium)
 End Function
+
+
+Function onUserSignedInfoChange()
+  if m.top.isUserSignedIn = false
+    m.AutoPlayTimerInstructions.text = getTranslation("screenSettings_autoplayTimer_instructions_guest_users")
+  else
+    m.AutoPlayTimerInstructions.text = getTranslation("screenSettings_autoplayTimer_instructions")
+  end if
+end Function
 
 
 Function onComponentFocus()

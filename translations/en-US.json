@@ -600,6 +600,10 @@
     "description": "Description of the autoplay timer user choice screen",
     "message": "Content is set up to automatically play another video when what you're watching is about to end."
   },
+  "screenSettings_autoplayTimer_instructions_guest_users": {
+    "description": "Description of the autoplay timer user choice screen for guest users",
+    "message": "Content is set up to automatically play another video when what you're watching is about to end. You need to sign in to use this feature."
+  },
   "screenSettings_autoplayPreview_featureDisabledMessage": {
     "description": "Message to display when the user has set Autoplay to false in Roku(not tubi) main settings.",
     "message": "Autoplay is currently controlled in Roku Settings. To change this setting, go to Roku Settings -> Accessibility -> Auto-play video."

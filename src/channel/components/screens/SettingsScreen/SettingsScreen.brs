@@ -232,6 +232,12 @@ End Function
 
 Function createAutoPreviewPanel()
   videoPreviewPanel = CreateObject("roSGNode", "AutoplayPreviewPanel")
+
+  signInInfo = m.top.signInInfo
+  if isAA(signInInfo) = true AND isBoolean(signInInfo) = true
+    videoPreviewPanel.isUserSignedIn = signInInfo.signedIn
+  end if
+
   videoPreviewPanel.observeFieldScoped("itemSelected", "onAutoplayPreviewPanelItemSelected")
   videoPreviewPanel.observeFieldScoped("audioGuideText", "onAudioGuideTextChanged")
   videoPreviewPanel.observeFieldScoped("componentInteractionInfo", "onAutoPlayPreviewComponentInteractionInfo")

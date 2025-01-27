@@ -21,6 +21,9 @@
       <!-- make a autoplayTimer setting "checked" and focused -->
       <field id="autoPlayTimerSelectItem" type="integer" alwaysNotify="true"/>
 
+      <!-- Indicates whether the user is loggedIn or not -->
+      <field id="isUserSignedIn" type="boolean"  value="false"/>
+
       <field id="offset" alias="Offset.translation"/>
       <field id="isLoading" type="boolean"/>
 
