@@ -71,10 +71,6 @@ Function playContent()
   m.top.state = "playing" ' The player takes a little while to start playing. If we don't update the state here then setVideoPreviewAfterFocus will try to stop the video and then play it again even though it is the same content
   m.Video.control = "play"
 
-  if isNode(m.Video.content) = true AND isNonEmptyString(m.Video.content.previewId) = true
-    getExperimentResource("roku_multiple_video_preview_nav", "roku_multiple_video_preview_nav_v1")
-  end if
-
   m.lastPingTime = 0
   m.playerPosition = 0
 
@@ -130,6 +126,10 @@ Function onVideoStateChange(msg)
     m.videoState = state
   else if state = "playing"
     m.videoState = "play"
+
+    if isNode(m.Video.content) = true AND isNonEmptyString(m.Video.content.previewId) = true
+      getExperimentResource("roku_multiple_video_preview_nav", "roku_multiple_video_preview_nav_v1")
+    end if
   end if
 
   if state = "finished"
