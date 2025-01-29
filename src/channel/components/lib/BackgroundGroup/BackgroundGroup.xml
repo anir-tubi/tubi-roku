@@ -101,6 +101,7 @@
         height="1080"/>
       <Poster
         id="maskLayer2"
+        uri="pkg:/images/background-masks/mask-layer-2.webp"
         width="1920"
         height="1080"/> 
     </Group>

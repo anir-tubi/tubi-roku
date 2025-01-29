@@ -59,18 +59,12 @@ End Function
 Function setMaskLayerUris()
   theme = getThemeFromGlobal()
   if theme <> invalid
-    if theme <> invalid AND isNonEmptyArray(theme.gradientBlendColors) = true AND theme.gradientBlendColors.count() >= 2
-      colorBlend = theme.gradientBlendColors[1].color
-
-      m.maskLayer10BlendColor2.blendColor = colorBlend
-      m.maskLayer11BlendColor2.blendColor = colorBlend
-    end if
+    m.maskLayer2.blendColor = theme.backgroundColor
   end if
 
   if m.top.kidsMode = true
     m.posterGroupMask.uri = "pkg:/images/background-masks/mask-layer-0-kids.webp"
     m.defaultBackground.uri = "pkg:/images/background-masks/mask-layer-1-0-kids.webp"
-    m.maskLayer2.uri = "pkg:/images/background-masks/mask-layer-2-kids.webp"
 
     m.fullScreenPosterLeftGradient.uri = "pkg:/images/background-masks/kids-left.png"
     m.fullScreenPosterBottomGradient.uri = "pkg:/images/background-masks/kids-bottom.png"
@@ -78,7 +72,6 @@ Function setMaskLayerUris()
   else
     m.posterGroupMask.uri = "pkg:/images/background-masks/mask-layer-0.webp"
     m.defaultBackground.uri = "pkg:/images/background-masks/mask-layer-1-0.webp"
-    m.maskLayer2.uri = "pkg:/images/background-masks/mask-layer-2.webp"
 
     m.fullScreenPosterLeftGradient.uri = "pkg:/images/background-masks/left.png"
     m.fullScreenPosterBottomGradient.uri = "pkg:/images/background-masks/bottom.png"
@@ -95,22 +88,33 @@ End Function
 
 ' set the top blend color of the circular mask
 Function setCircularMaskColor()
-  colorBlend = "" '//initialize variable
+  colorBlendTop = "" '//initialize variable
+  colorBlendBottom = "" '//initialize variable
+
+  theme = getThemeFromGlobal()
+  if theme <> invalid AND isNonEmptyArray(theme.gradientBlendColors) = true AND theme.gradientBlendColors[0] <> invalid
+    colorBlendBottom = theme.gradientBlendColors[0].color
+  end if
+  if isNonEmptyString(colorBlendBottom) = false
+    colorBlendBottom = "0x000000FF"
+  end if
 
   if isNonEmptyString(m.top.circularMaskColor) = true
-    colorBlend = m.top.circularMaskColor
+    colorBlendTop = m.top.circularMaskColor
   else
-    theme = getThemeFromGlobal()
-    if theme <> invalid AND isNonEmptyArray(theme.gradientBlendColors) = true
-      colorBlend = theme.gradientBlendColors[0].color
+    if theme <> invalid AND isNonEmptyArray(theme.gradientBlendColors) = true AND theme.gradientBlendColors[1] <> invalid
+      colorBlendTop = theme.gradientBlendColors[1].color
     end if
 
-    if isNonEmptyString(colorBlend) = false
-      colorBlend = "0x000000FF"
+    if isNonEmptyString(colorBlendTop) = false
+      colorBlendTop = "0x000000FF"
     end if
   end if
-  m.maskLayer10.blendColor = colorBlend
-  m.maskLayer11.blendColor = colorBlend
+
+  m.maskLayer10.blendColor = colorBlendTop
+  m.maskLayer11.blendColor = colorBlendTop
+  m.maskLayer10BlendColor2.blendColor = colorBlendBottom
+  m.maskLayer11BlendColor2.blendColor = colorBlendBottom
 End Function
 
 
