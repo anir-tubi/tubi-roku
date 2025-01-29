@@ -153,8 +153,10 @@ Function tubiAuth_initOrUpdateAuthInfo(callback, forceUpdate = false)
     if m.checkIfAuthExpired(authInfo) = true OR forceUpdate = true then
       if authInfo.userId <> invalid
         m.refreshAuthToken(authInfo, controllerCallbackId)
-      else
+      else if isAA(authInfo) = true AND isString(authInfo.secretKey) = true then
         m.refreshAnonymousToken(authInfo, controllerCallbackId)
+      else
+        m.logout(callback)
       end if
     else
       ' authInfo is not expired so nothing to do. Just call the callback immediately
@@ -385,18 +387,24 @@ Function tubiAuth_handleAnonymousTokenResponse(response)
   token = response.data
   if token <> invalid
     if token.access_token <> invalid AND token.refresh_token <> invalid AND token.expires_in <> invalid
-      authInfo = m.formatAuthInfoFromServer(token)
-      authInfo["secretKey"] = response.responseContext.secretKey ' store secretKey in registry, we need it for refreshing anonymous token
-      m.saveAuthInfo(authInfo)
-      controllerCallbackId = response.responseContext.controllerCallbackId
-      callback = m[controllerCallbackId]
-      if callback <> invalid then
-        m[controllerCallbackId] = invalid
-        callback()
+      if isString(response.responseContext.secretKey) = true then
+        authInfo = m.formatAuthInfoFromServer(token)
+        authInfo["secretKey"] = response.responseContext.secretKey ' store secretKey in registry, we need it for refreshing anonymous token
+        m.saveAuthInfo(authInfo)
+      else
+        tubiLog("Secret Key is invalid", "warn")
       end if
     else
       tubiLog("Token response is invalid", "warn")
     end if
+  end if
+
+  ' We want to always call the callback so we don't get stuck waiting indefinitely
+  controllerCallbackId = response.responseContext.controllerCallbackId
+  callback = m[controllerCallbackId]
+  if callback <> invalid then
+    m[controllerCallbackId] = invalid
+    callback()
   end if
 End Function
 
