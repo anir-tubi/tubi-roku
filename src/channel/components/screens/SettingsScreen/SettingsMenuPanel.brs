@@ -118,7 +118,7 @@ Function setSettingsSidePanelMenuItems()
   end if
 
   ' Deleting the test aid if non qa or dev mode.
-  if m.constants.settings.mode <> "qa" AND  m.constants.settings.mode <> "dev" 'this is for extra protection not to restart the app
+  if m.constants.settings.mode = "production" 'this is for extra protection not to restart the app
     availablePanelItems.delete("testAid")
   end if
 

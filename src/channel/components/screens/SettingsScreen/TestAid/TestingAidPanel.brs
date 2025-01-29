@@ -145,19 +145,41 @@ End Function
 Function getCurrentExperiments()
 
   enabledExperiments = "Enabled Experiments" + chr(10) + "--------------------------------------------------" + chr(10)
-  notEnabledExperiments = chr(10) + chr(10) + "Not Enabled Experiments" + chr(10) + "--------------------------------------------------" + chr(10)
-  for each expNamespace in m.experiments.defaultResources.keys()
-    for each exp in m.experiments.defaultResources[expNamespace].keys()
-      if m.experiments.defaultResources[expNamespace][exp].enabled = true
-        enabledExperiments = enabledExperiments + exp + chr(10)
-      else
-        notEnabledExperiments =   notEnabledExperiments + exp + chr(10)
+  graduatedExperiments = chr(10) + chr(10) + "Graduated Experiments" + chr(10) + "--------------------------------------------------" + chr(10)
+  inHoldOutExperiments = chr(10) + chr(10) + "In Holdout Experiments" + chr(10) + "--------------------------------------------------" + chr(10)
+
+  for each expNamespace in m.experiments.defaultResources.keys() 'namespace
+
+    if m.experiments.experimentsinfo <> invalid AND m.experiments.experimentsinfo[expNamespace] <> invalid
+
+      expResult = m.experiments.experimentsinfo[expNamespace].experiment_result
+      if expResult <> invalid
+        exp = expResult.experiment_name
+        holdoutInfo = expResult.holdout_info
+
+        if holdoutInfo <> invalid AND holdoutInfo.in_holdout = true
+          inHoldOutExperiments = inHoldOutExperiments + exp + "->" + expResult.treatment + chr(10)
+        else
+          enabledExperiments = enabledExperiments + exp + "->" + expResult.treatment + chr(10)
+        end if
+      end if
+    end if
+
+    for each exp in m.experiments.defaultResources[expNamespace].keys() ' There might be rare case of 1+ experiments graduated.
+      if m.experiments.defaultResources[expNamespace][exp].default.enabled = true
+        graduatedExperiments = graduatedExperiments + exp + chr(10)
       end if
     end for
+
   end for
 
+  if m.experiments.experimentsinfo = invalid
+    enabledExperiments = enabledExperiments + "No Experiments enabled or popper api failed" + chr(10)
+    inHoldOutExperiments = inHoldOutExperiments + "No Experiments in holdouts or popper api failed" + chr(10)
+  end if
 
-  return enabledExperiments + notEnabledExperiments
+  return enabledExperiments + inHoldOutExperiments + graduatedExperiments
+
 End Function
 
 
