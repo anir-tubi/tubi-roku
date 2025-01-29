@@ -501,7 +501,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     end if
 
     ads = rawResponse.ads
-    if isKidsUIOn() = false AND ads <> invalid AND getExperimentResource("ads_tubi_skins", "ads_tubi_skin_mufasa", false).enabled = true
+    if isKidsUIOn() = false AND ads <> invalid AND getExperimentResource("ads_tubi_skins", "ads_tubi_skin_paddington", false).enabled = true
       updateSkinAdRowContent(homeScreen, ads)
     end if
 

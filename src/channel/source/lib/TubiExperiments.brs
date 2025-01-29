@@ -67,9 +67,9 @@ Function TubiExperiments(experimentsInfo) as Object
       }
 
       ads_tubi_skins: {
-        ads_tubi_skin_mufasa: {
+        ads_tubi_skin_paddington: {
           default: {"enabled": true}
-          holdout_control: {"enabled": false}
+          holdout_control: {"enabled": true}
           holdout_winning: {"enabled": true}}
       }
 
