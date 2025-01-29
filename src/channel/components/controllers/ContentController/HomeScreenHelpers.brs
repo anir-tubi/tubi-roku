@@ -923,7 +923,7 @@ Function onContentToPlay(msg)
 
   contentType = content.type
   ' Since category panel list screen re-uses the method allowing it to play the content.
-  if contentType = m.constants.ui.contentTypes.purpleCarpetEvent AND (screen.purpleCarpetContent <> invalid OR screen.id = m.constants.ui.screenIds.categoryPanelListScreen)
+  if contentType = m.constants.ui.contentTypes.purpleCarpetEvent
     processPlayEvent(content, screen)
   else if contentType = m.constants.uapiContentTypes.channel
     showCategoryDetailsScreen(content)
