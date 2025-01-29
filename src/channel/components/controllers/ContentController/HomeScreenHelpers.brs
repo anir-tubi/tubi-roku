@@ -501,7 +501,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     end if
 
     ads = rawResponse.ads
-    if isKidsUIOn() = false AND ads <> invalid AND getExperimentResource("ads_tubi_skins", "ads_tubi_skin_paddington", false).enabled = true
+    if isKidsUIOn() = false AND ads <> invalid
       updateSkinAdRowContent(homeScreen, ads)
     end if
 
@@ -1153,28 +1153,32 @@ Function updateSkinAdRowContent(homeScreen, content)
   tubiLog("HomeScreenHelpers.updateSkinAdRowContent")
 
   if content <> invalid AND (isNonEmptyString(content.title) = true OR isNonEmptyString(content.titleImageUrl) = true) AND isNonEmptyString(content.id) = true AND (isNonEmptyString(content.videoPreviewUrl) = true OR (isNonEmptyArray(content.backgrounds) = true AND isNonEmptyString(content.backgrounds[0]) = true) ) AND isNonEmptyString(content.HDGRIDPOSTERURL) = true
+    '//If this is a valid skinAds wrapper, then check if it is part of the experiment.
+    '// Fire the experiment's exposure event here, regardless.
+    if getExperimentResource("ads_tubi_skins", "ads_tubi_skin_paddington", true).enabled = true
     '//proceed if the content is valid and has the mandatory fields
-    rowContentNode = CreateObject("roSGNode", "SkinAdContentNode")
-    rowContentNode.id = content.id
-    rowContentNode.type = m.constants.ui.contentTypes.skinAd
-    rowContentNode.footerImageUrl = content.footerImageUrl
-    rowContentNode.bgColor = content.bgColor
-    rowContentNode.title = content.title
-    rowContentNode.titleImageUrl = content.titleImageUrl
-    rowContentNode.titlePrefix = content.titlePrefix
-    rowContentNode.gridItemType = m.constants.ui.gridItemTypes.skinAd
-    rowContentNode.description = content.description
-    rowContentNode.subDescription = content.subDescription
-    rowContentNode.qrCodeUrl = content.qrCodeUrl
-    rowContentNode.adInfo = content.adInfo
-    rowContentNode.imageImpTracking = content.imageImpTracking
+      rowContentNode = CreateObject("roSGNode", "SkinAdContentNode")
+      rowContentNode.id = content.id
+      rowContentNode.type = m.constants.ui.contentTypes.skinAd
+      rowContentNode.footerImageUrl = content.footerImageUrl
+      rowContentNode.bgColor = content.bgColor
+      rowContentNode.title = content.title
+      rowContentNode.titleImageUrl = content.titleImageUrl
+      rowContentNode.titlePrefix = content.titlePrefix
+      rowContentNode.gridItemType = m.constants.ui.gridItemTypes.skinAd
+      rowContentNode.description = content.description
+      rowContentNode.subDescription = content.subDescription
+      rowContentNode.qrCodeUrl = content.qrCodeUrl
+      rowContentNode.adInfo = content.adInfo
+      rowContentNode.imageImpTracking = content.imageImpTracking
 
-    categoryContentNode = CreateObject("roSGNode", "CategoryContentNode")
-    categoryContentNode.id = m.constants.ui.categoryIds.skinAd
-    categoryContentNode.appendChild(content)
-    rowContentNode.appendChild(categoryContentNode)
-    homeScreen.skinAdContent = rowContentNode
-    homeScreen.skinAdContentUpdated = true
+      categoryContentNode = CreateObject("roSGNode", "CategoryContentNode")
+      categoryContentNode.id = m.constants.ui.categoryIds.skinAd
+      categoryContentNode.appendChild(content)
+      rowContentNode.appendChild(categoryContentNode)
+      homeScreen.skinAdContent = rowContentNode
+      homeScreen.skinAdContentUpdated = true
+    end if
   end if
 
 End Function
