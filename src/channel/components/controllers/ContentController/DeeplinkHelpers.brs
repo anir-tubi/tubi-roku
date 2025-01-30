@@ -15,7 +15,7 @@
 ' Deep link args:
 '   contentId    - string identifier
 '   entry        - 'banner' or omitted for search source
-'   mediaType    - "season", "series", "episode", "movie", "shortFormVideo", "tvspecial" and "livefeed"
+'   mediaType    - "season", "series", "episode", "movie", "shortFormVideo", "tvspecial", "sportsevent", "livestream" and "livefeed"
 '   entry        - string, custom parameter, used for tracking the source of deeplinks, passed to referred analytics events
 '   deviceId     - string, custom paramater, the device id of the device sending the deeplink (used when mobile "casts" to roku)
 '   resumeTime   - integer, custom paramater, the position from which a deeplink should resume (used when mobile "casts" to roku)
@@ -94,7 +94,7 @@ Function createDeeplinkContentFromStartupArgs(args)
     else if mediaType = "shortformvideo"
       content.type = "video"
       content.deeplinkType = "shortFormVideo"
-    else if mediaType = "livefeed"
+    else if mediaType = "livefeed" OR mediaType = "livestream" OR mediaType = "sportsevent"
       content.type = "linear"
       content.deeplinkType = "linear"
     else if mediaType = "sports"
