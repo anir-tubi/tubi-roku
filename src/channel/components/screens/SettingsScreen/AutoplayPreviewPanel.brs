@@ -50,11 +50,11 @@ Function init()
   checkItemHelper(m.top.selectItem, m.Menu)
 
   if getExperimentResource("roku_autoplay_timer", "roku_autoplay_timer_v1", false).enabled = true
+    m.top.observeFieldScoped("isUserSignedIn", "onUserSignedInfoChange")
     setAutoplayTimerChoices()
     checkItemHelper(m.top.autoPlayTimerSelectItem, m.AutoPlayTimerMenu)
     m.AutoPlayTimerContentGroup.visible = true
     m.top.observeField("autoPlayTimerSelectItem", "onAutoPlayTimerSelectItem")
-    m.top.observeFieldScoped("isUserSignedIn", "onUserSignedInfoChange")
   end if
 End Function
 

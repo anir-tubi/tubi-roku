@@ -234,7 +234,7 @@ Function createAutoPreviewPanel()
   videoPreviewPanel = CreateObject("roSGNode", "AutoplayPreviewPanel")
 
   signInInfo = m.top.signInInfo
-  if isAA(signInInfo) = true AND isBoolean(signInInfo) = true
+  if isAA(signInInfo) = true AND isBoolean(signInInfo.signedIn) = true
     videoPreviewPanel.isUserSignedIn = signInInfo.signedIn
   end if
 
