@@ -39,7 +39,9 @@ Function init()
   'used to know when to send tracking info. Do not send focus tracking info when the rowlist is 1st loaded
   m.gridHasGainedInitialFocus = false
 
-  m.metadataTranslate = TubiMetadataTranslate(m.constants)
+  experimentsInfo = getExperimentsInfoFromGlobal()
+  m.experiments = TubiExperiments(experimentsInfo)
+  m.metadataTranslate = TubiMetadataTranslate(m.constants, m.experiments)
 
   'Content area
   m.RowList = m.top.findNode("RowList")
