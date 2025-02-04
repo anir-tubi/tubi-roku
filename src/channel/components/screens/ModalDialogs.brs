@@ -66,7 +66,6 @@ End Function
 '                 modalDialogTypes: <string>        - This value should be equal to - modalDialogTypes -> "multiStyle" to speicy that multistyle dialog to be used.
 '                 modalDialogStyles = <string>      - Enum values are defined in constants.brs -
 '                                                                                             "multiMessageGroup"
-'                                                                                             "imageAsBody"
 '
 '                 openTrackEvent: <assocArray>      - The analytics tracking info that was sent when the modal was shown,
 '                                                     will be re-purposed for sending the dismiss dialog tracking event.

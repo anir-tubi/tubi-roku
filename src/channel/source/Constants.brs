@@ -208,7 +208,6 @@ Function getConstants()
       constants.deviceInfo.isAdIdTrackingDisabled = di.IsRIDADisabled()
     end if
 
-    constants.deviceInfo.uiResolution = UCase(di.GetUiResolution().name)
     constants.deviceInfo.firmwareVersion = firmware.major + "." + firmware.minor + "." + firmware.revision + "." + firmware.build
     constants.deviceInfo.userAgent = "Roku/DVP-" + firmware.major + "." + firmware.minor + " (" + firmware.major + "." + firmware.minor + "." + firmware.revision + "." + firmware.build + ")"
     constants.deviceInfo.userAgentModel = "Roku/DVP-" + firmware.major + "." + firmware.minor + " (" + firmware.major + "." + firmware.minor + "." + firmware.revision + "." + firmware.build + ") " + deviceModel
@@ -226,7 +225,6 @@ Function getConstants()
     end if
     constants.deviceInfo.countryCode = constants.deviceInfo.rokuCountryCode
     constants.deviceInfo.channelStore = di.GetCountryCode()  'some channel store strings look like country codes
-    constants.deviceInfo.lowMemory = lowMemory
     constants.deviceInfo.fastCpu = fastCpu
     constants.deviceInfo.lowVram = lowVram
     constants.deviceInfo.firmwareCaptionMenu = firmwareCaptionMenu
@@ -280,7 +278,6 @@ Function getConstants()
     constants.reqNames.generic = "generic"
     constants.reqNames.genericWithResponseContext = "genericWithResponseContext"
     constants.reqNames.magicLink = "magicLink"
-    constants.reqNames.resetPassword = "resetPassword"
     constants.reqNames.queryStatusOfMagicLink = "queryStatusOfMagicLink"
     constants.reqNames.getContentRating = "getContentRating"
     constants.reqNames.setContentRating = "setContentRating"
@@ -445,14 +442,12 @@ Function getConstants()
 
   'Types of modal dialogs
   constants.modalDialogTypes = {}
-    constants.modalDialogTypes.simple = "simpleModal"
     constants.modalDialogTypes.multiStyle = "multiStyle"
 
 
   'Styles of modal Dialogs
   constants.modalDialogStyles = {}
     constants.modalDialogStyles.multiMessageGroup = "multiMessageGroup"
-    constants.modalDialogStyles.imageAsBody = "imageAsBody"
 
   'previously found in settings as "shortAppName"
   constants.appName = "tubitv"
@@ -495,7 +490,6 @@ Function getConstants()
         constants.urls.cms.urlBase = "https://uapi.staging-public.tubi.io/cms"
       end if
 
-      constants.urls.cms.relatedContent = constants.urls.cms.urlBase + "/content" ' + content_id + "/related"
       constants.urls.cms.thumbnails = constants.urls.cms.urlBase + "/content" ' + content_id + "/thumbnail_sprites"
 
     'contents content url
@@ -542,18 +536,6 @@ Function getConstants()
         constants.urls.tensor.cdn.homescreen = constants.urls.tensor.cdn.urlBase + "/v5/homescreen"
         constants.urls.tensor.cdn.container = constants.urls.tensor.cdn.urlBase + "/v5/containers"
         constants.urls.tensor.cdn.epgChannelIds = constants.urls.tensor.cdn.urlBase + "/v2/epg"
-
-    'user devices url
-    constants.urls.userDevice = {}
-      constants.urls.userDevice.urlBase = "https://uapi.adrise.tv/user_device"
-      if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
-        constants.urls.userDevice.urlBase = "https://uapi.staging-public.tubi.io/user_device"
-      end if
-
-      constants.urls.userDevice.refreshToken = constants.urls.userDevice.urlBase + "/login/refresh"
-      constants.urls.userDevice.transferToken = constants.urls.userDevice.urlBase + "/login/transfer"
-      constants.urls.userDevice.resetPassword = constants.urls.userDevice.urlBase + "/password/reset"
-      constants.urls.userDevice.logout = constants.urls.userDevice.urlBase + "/logout"
 
     'remote Config hub url
     constants.urls.configHub = {}
@@ -662,12 +644,7 @@ Function getConstants()
 
       constants.urls.impressionEvents.singleEvent = constants.urls.impressionEvents.urlBase + "/v1/single-event"
 
-    'cuepoints url
-    constants.urls.cuepointsBaseUrl = "https://ads.adrise.tv/cue-points/"
-
     'privacy statement text
-    constants.urls.privacyUrl = "https://legal-asset.tubi.tv/privacy-policy.txt"
-    constants.urls.termsOfUseUrl = "https://legal-asset.tubi.tv/terms-of-use.txt"
     constants.urls.yourPrivacyChoicesUrl = "https://legal-asset.tubi.tv/your-privacy-choices.txt"
 
     'channels poster image urls
@@ -684,18 +661,6 @@ Function getConstants()
     ' The background large images on the continue watching container row when the user is signed out
     constants.urls.continueWatchingItemBackground_largePoster = "https://mcdn.tubitv.com/image/roku_support_images/continueWatchingItemBackground_largePoster.webp"
     constants.urls.continueWatchingItemBackground_largePoster_kidsMode = "https://mcdn.tubitv.com/image/roku_support_images/continueWatchingItemBackground_largePoster_kids.webp"
-
-    constants.urls.onBoardingBackground = "https://mcdn.tubitv.com/image/roku_support_images/onboarding/onboarding-welcome-fhd.webp"
-    constants.urls.landingBackgroundUriList = [
-      "https://mcdn.tubitv.com/image/roku_support_images/onboarding/onboarding-landing-fhd-1.webp"
-      "https://mcdn.tubitv.com/image/roku_support_images/onboarding/onboarding-landing-fhd-2.webp"
-      "https://mcdn.tubitv.com/image/roku_support_images/onboarding/onboarding-landing-fhd-3.webp"
-      "https://mcdn.tubitv.com/image/roku_support_images/onboarding/onboarding-landing-fhd-4.webp"
-      "https://mcdn.tubitv.com/image/roku_support_images/onboarding/onboarding-landing-fhd-5.webp"
-      "https://mcdn.tubitv.com/image/roku_support_images/onboarding/onboarding-landing-fhd-6.webp"
-      "https://mcdn.tubitv.com/image/roku_support_images/onboarding/onboarding-landing-fhd-7.webp"
-      "https://mcdn.tubitv.com/image/roku_support_images/onboarding/onboarding-landing-fhd-8.webp"
-    ]
 
     ' url for pinging Nielsen
     constants.urls.nielsenPing = "https://audit.imrworldwide.com/cgi-bin/gn"
@@ -748,11 +713,9 @@ Function getConstants()
     constants.uapiContentTypes.episode = "episode"
     constants.uapiContentTypes.channel = "channel"
     constants.uapiContentTypes.sportsEvent = "sports_event"
-    constants.uapiContentTypes.container = "container"
 
   constants.timers = {}
     constants.timers.skinAdTimeout = 6
-    constants.timers.remoteComponentTimeout = 30000
 
     ' Time in seconds after which we force a refresh of the categoryscreen
     constants.timers.categoryContentRefreshTimeout = 12 * 60 * 60
@@ -959,14 +922,6 @@ Function getConstants()
         ]
       end if
 
-      '//TODO:Remove unsed constants.player.linear* with our next submission release
-      'constants needed for the linear video player
-      constants.player.linear = {}
-        ' duration (in seconds) of coming up panel displayed within info panel
-        constants.player.linear.comingUpInsideInfoPanelDuration = 300
-        ' duration (in seconds) of coming up panel displayed outside info panel
-        constants.player.linear.comingUpOutsideInfoPanelDuration = 15
-
       constants.player.browseContent = {}
         constants.player.browseContent.numContainers = 10
         constants.player.browseContent.numContents = 50
@@ -994,12 +949,8 @@ Function getConstants()
   constants.errors.context.homeScreen = "1"
   constants.errors.context.videoDetailScreen = "2"
   constants.errors.context.playerScreen = "3"
-  constants.errors.context.seriesDetailScreen = "4"
   constants.errors.context.episodeScreen = "5"
   constants.errors.context.categoryDetailsScreen = "6"
-  constants.errors.context.searchScreen = "7"
-  constants.errors.context.activateScreen = "8"
-  constants.errors.context.channelsScreen = "9"
   constants.errors.context.categoriesScreen = "10"
   constants.errors.context.linearPlayerScreen = "11"
   constants.errors.context.epgScreen = "12"
@@ -1020,7 +971,6 @@ Function getConstants()
   constants.errors.subtypes.ratingRemoveLikeError = "107"
   constants.errors.subtypes.ratingRemoveDislikeError = "108"
   'Could not setup player
-  constants.errors.subtypes.playerSetupError = "200"
   constants.errors.subtypes.playerPlaybackError = "201"
   constants.errors.subtypes.networkError = "300"
 
@@ -1045,7 +995,6 @@ Function getConstants()
     constants.errors.message.badResponse = "Bad Response"
     constants.errors.message.noResponse = "No Response"
     constants.errors.message.lowMemoryWarning = "Low Memory Warning"
-    constants.errors.message.userNotFound = "User Not Found"
 
   ' creating mapping to backend error codes.
   constants.errors.codes = {}
@@ -1054,7 +1003,6 @@ Function getConstants()
     constants.errors.codes.invalidEmailDomain = "INVALID_EMAIL_DOMAIN"
     constants.errors.codes.blockedEmailDomain = "BLOCKED_EMAIL_DOMAIN"
     constants.errors.codes.emailExists = "EMAIL_USER_EXISTS"
-    constants.errors.codes.invalidToken = "INVALID_TOKEN"
     constants.errors.codes.userNotFound = "USER_NOT_FOUND"
 
   ' pixel fires when static Ad is shown on video player during pause
@@ -1071,15 +1019,6 @@ Function getConstants()
 
     constants.ui.ages = {}
       constants.ui.ages.ageGate = 13
-
-    'static - pre defined text used in the app
-    'these terms are displayed on top of the page
-    'these terms are used as state as pageSource to indicate which page a user should return to when pressing the back button.
-    constants.ui.terms = {}
-      constants.ui.terms.categories = "Categories"
-      constants.ui.terms.channels = "Channels"
-      constants.ui.terms.menu = "Menu"
-      constants.ui.terms.home = "Home"
 
     constants.ui.ratings = {}
       aUS = []
@@ -1152,8 +1091,6 @@ Function getConstants()
       constants.ui.infoPanelModes.episode = "episode"
       constants.ui.infoPanelModes.linearHomeScreen = "linearHomeScreen"
       constants.ui.infoPanelModes.epg = "epg"
-      '//TODO:Remove unused constants.ui.infoPanelModes.simplifiedLinearPlayer with our next submission release
-      constants.ui.infoPanelModes.simplifiedLinearPlayer = "simplifiedLinearPlayer"
       constants.ui.infoPanelModes.linearSearch = "linearSearch"
       constants.ui.infoPanelModes.linearProgramHomescreen = "linearProgramHomescreen"  'v4 api
       constants.ui.infoPanelModes.sportsEvent = "sportsEvent"
@@ -1185,7 +1122,6 @@ Function getConstants()
 
     constants.ui.playerTypes = {}
       constants.ui.playerTypes.fox = "fox"
-      constants.ui.playerTypes.tubi = "tubi"
 
     '// Check if these are required for sports events
     constants.ui.contentTimings = {}
@@ -1224,9 +1160,7 @@ Function getConstants()
       constants.ui.screenLevels.searchScreen = 20
       constants.ui.screenLevels.myStuffScreen = 20
       constants.ui.screenLevels.settingsScreen = 20
-      constants.ui.screenLevels.categoryListScreen = 20
       constants.ui.screenLevels.categoryPanelListScreen = 20
-      constants.ui.screenLevels.channelListScreen = 30
       constants.ui.screenLevels.confirmPasswordScreen = 40
       constants.ui.screenLevels.categoryDetailsScreen = 40
       constants.ui.screenLevels.detailScreen = 50
@@ -1240,7 +1174,6 @@ Function getConstants()
       constants.ui.screenLevels.emailInputScreen = 90
       constants.ui.screenLevels.signInScreen = 90
       constants.ui.screenLevels.ageGateScreen = 90
-      constants.ui.screenLevels.emailVerificationScreen = 90
       constants.ui.screenLevels.consentScreen = 120
       constants.ui.screenLevels.rokuContinueWatchingConsentScreen = 120
       constants.ui.screenLevels.managePreferencesScreen = 130
@@ -1300,7 +1233,6 @@ Function getConstants()
       constants.ui.contentIds.categoryList = "categoriesList"
       constants.ui.contentIds.channelList = "channelsList"
       constants.ui.contentIds.timeGridContent = "timeGridContent"
-      constants.ui.contentIds.showAllGames = "showAllGames"
 
     constants.ui.loginReasons = {}
     constants.ui.loginReasons.matureContentGating = "MATURE_CONTENT_GATING"
@@ -1317,9 +1249,6 @@ Function getConstants()
     constants.ui.logoSizes = {}
       constants.ui.logoSizes.skinAds = {}
 
-        constants.ui.logoSizes.skinAds.adPlayerScreen = {}
-          constants.ui.logoSizes.skinAds.adPlayerScreen.width = "216"
-
         constants.ui.logoSizes.skinAds.homeScreen = {}
           constants.ui.logoSizes.skinAds.homeScreen.width = "174"
 
@@ -1329,17 +1258,11 @@ Function getConstants()
 
     constants.ui.imageSizes = {}
 
-      'Sizes of portrait thumbnail that is used in genres row in homescreen.
-      constants.ui.imageSizes.genrePortrait = [374, 736]
-
       'Sizes of poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.poster = [186, 267]
 
       'Sizes of video title image (if available) that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images. The video title image is an image representation of the title metadata of the video. Not all videos may have this image.
       constants.ui.imageSizes.title = [600, 201]
-
-      'The maximum sizes of skinAd logo that is displayed in the right hand corner with the Tubi logo. If 0, then no maximum
-      constants.ui.imageSizes.logoSkinAdSmall = [0, 60]
 
       'Sizes of large poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.largePoster = [252, 360]
@@ -1350,15 +1273,11 @@ Function getConstants()
       'Sizes of landscape thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.landscape = [386, 217]
 
-      'Sizes of landscape category tiles.
-      constants.ui.imageSizes.landscapeCategoryTile = [386, 224]
-
       'Sizes of large landscape thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.largeLandscape = [520, 292]
 
       'Sizes of linear to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.linear = [384, 144]
-      constants.ui.imageSizes.linearExperiment = [978, 660]
 
       'Sizes of the linear background and minimized linear video player
       constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension = [1120,630]
@@ -1446,7 +1365,6 @@ Function getConstants()
       constants.ui.detailScreenMenuItemIds.removeHistoryMenuItem = "RemoveHistoryMenuItem"
       constants.ui.detailScreenMenuItemIds.signUpMenuItem = "SignUpMenuItem"
       constants.ui.detailScreenMenuItemIds.channelMenuItem = "ChannelMenuItem"
-      constants.ui.detailScreenMenuItemIds.seeAllGamesMenuItem = "SeeAllGamesMenuItem"
       constants.ui.detailScreenMenuItemIds.setReminderMenuItem  = "SetReminderMenuItem"
       constants.ui.detailScreenMenuItemIds.removeReminderMenuItem  = "RemoveReminderMenuItem"
       constants.ui.detailScreenMenuItemIds.likeRemoveRatingMenuItem  = "LikeRemoveRatingMenuItem"
@@ -1503,7 +1421,6 @@ Function getConstants()
     constants.consentKeys.personalization = "C0004"
     constants.consentKeys.marketing = "C0005"
     constants.consentKeys.continueWatching = "data_sharing"
-    constants.consentKeys.functional = "C0003"
 
   constants.configHubFallbacks = {}
     constants.configHubFallbacks.majorEventStart = "2025-02-09T05:00:00.000000Z"
@@ -1536,7 +1453,6 @@ Function getConstants()
     defaultDarkPrimaryForeground = "THEME_defaultDarkPrimaryForeground_THEME"
     defaultDarkTransparentBackground50 = "THEME_defaultDarkTransparentBackground50_THEME"
     defaultDarkTransparentBackground75 = "THEME_defaultDarkTransparentBackground75_THEME"
-    ' defaultDarkTransparentForeground0 = "THEME_defaultDarktransparentforeground0_THEME"    '//::NOTE::  not currently being used
     defaultDarkTransparentForeground5 = "THEME_defaultDarkTransparentForeground5_THEME"
     defaultDarkTransparentForeground10 = "THEME_defaultDarkTransparentForeground10_THEME"
     defaultDarkTransparentForeground20 = "THEME_defaultDarkTransparentForeground20_THEME"
@@ -1554,9 +1470,7 @@ Function getConstants()
     defaultDarkGradientBrand = "THEME_defaultDarkGradientBrand_THEME"
 
     '//default light sub theme
-    defaultLightPrimaryBackground = "THEME_defaultLightPrimaryBackground_THEME"
     defaultLightPrimaryForeground = "THEME_defaultLightPrimaryForeground_THEME"
-    defaultLightTransparentForeground75 = "THEME_defaultLightTransparentForeground75_THEME"
     defaultLightTransparentForeground10 = "THEME_defaultLightTransparentForeground10_THEME"
 
     defaultDarkTransparentAccent20 = "THEME_defaultDarkTransparentAccent20_THEME"
@@ -1584,9 +1498,7 @@ Function getConstants()
     kidsDarkGradientBrand = "THEME_kidsDarkGradientBrand_THEME"
 
     '//kids light sub theme
-    kidsLightPrimaryBackground = "THEME_kidsLightPrimaryBackground_THEME"
     kidsLightPrimaryForeground = "THEME_kidsLightPrimaryForeground_THEME"
-    kidsLightTransparentForeground75 = "THEME_kidsLightTransparentForeground75_THEME"
 
   constants.ui.colors = {}
     constants.ui.colors.transparent = "0x00000000"
@@ -1602,7 +1514,6 @@ Function getConstants()
       id: constants.ui.themeIDs.default
       focusedColor: defaultDarkPrimaryAccent
       highlightedTextColor: defaultDarkPrimaryAccent
-      keyboard_focused_key: "pkg:/images/keyboard_search_focused_key.9.png"
       scrollbarThumbBitmapUri_hd: "pkg:/images/transport/sgplayer/hd/focused-progress-foreground.9.png"
       scrollbarThumbBitmapUri_fhd: "pkg:/images/transport/sgplayer/fhd/focused-progress-foreground.9.png"
       gradientBlendColors: defaultDarkGradientBrand   '//value will be an array of associaive arrays that contain the gradient color info
@@ -1631,9 +1542,7 @@ Function getConstants()
       keyboardFocusedTextColor: defaultDarkPrimaryBackground
       blueBadgeColor: defaultDarkStatusOnNow
 
-      inverseBackgroundColor: defaultLightPrimaryBackground
       inversePrimaryTextColor: defaultLightPrimaryForeground
-      inverseSecondaryTextColor: defaultLightTransparentForeground75
       inverseNeutralColor2: defaultLightTransparentForeground10
       defaultDarkTransparentAccent20: defaultDarkTransparentAccent20
     }
@@ -1642,7 +1551,6 @@ Function getConstants()
       id: constants.ui.themeIDs.kidsMode
       focusedColor: kidsDarkPrimaryAccent
       highlightedTextColor: kidsDarkPrimaryAccent
-      keyboard_focused_key: "pkg:/images/keyboard_search_focused_key_kidsMode.9.png"
       scrollbarThumbBitmapUri_hd: "pkg:/images/transport/sgplayer/hd/focused-progress-foreground_kidsMode.9.png"
       scrollbarThumbBitmapUri_fhd: "pkg:/images/transport/sgplayer/fhd/focused-progress-foreground_kidsMode.9.png"
       gradientBlendColors: kidsDarkGradientBrand  '//value will be an array of associaive arrays that contain the gradient color info
@@ -1669,9 +1577,7 @@ Function getConstants()
       focusedTextColor: kidsDarkPrimaryBackground
       keyboardFocusedTextColor: kidsDarkPrimaryBackground
 
-      inverseBackgroundColor: kidsLightPrimaryBackground
       inversePrimaryTextColor: kidsLightPrimaryForeground
-      inverseSecondaryTextColor: kidsLightTransparentForeground75
     }
 
     '//::NOTE::HARDCODED:: there is a BUG in the built in roku keyboard component
