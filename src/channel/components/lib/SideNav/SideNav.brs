@@ -107,7 +107,7 @@ End Function
 
 
 Function onCreateMenuItems()
-
+  sCountryCode = UCase(m.constants.deviceInfo.countryCode)
   m.mainItems = m.top.findNode("mainItems")
 
   menuItems = [
@@ -121,7 +121,10 @@ Function onCreateMenuItems()
   menuItems.push(m.constants.ui.sideNavIds.categories)
   menuItems.push(m.constants.ui.sideNavIds.myList)
 
-  if (UCase(m.constants.deviceInfo.countryCode) = "US" OR UCase(m.constants.deviceInfo.countryCode) = "CA")
+  bInMoviesSeriesExperimentUK = ((sCountryCode = "GB" OR sCountryCode = "UK") AND getExperimentResource("roku_add_movies_series", "roku_add_movies_series_uk_v1").enabled = true)
+  bInMoviesSeriesExperimentMX = (sCountryCode = "MX" AND getExperimentResource("roku_add_movies_series", "roku_add_movies_series_mx_v1").enabled = true) 
+
+  if (sCountryCode = "US" OR sCountryCode = "CA" OR bInMoviesSeriesExperimentUK = true OR bInMoviesSeriesExperimentMX = true)
     menuItems.push(m.constants.ui.sideNavIds.movies)
     menuItems.push(m.constants.ui.sideNavIds.tv)
   end if
