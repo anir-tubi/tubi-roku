@@ -324,7 +324,10 @@ End Function
 
 Function drawCountdown(labelNode, time)
   if m.top.isAutoPlayOff = false
+    labelNode.visible = true
     labelNode.text = getTranslation("screenEndCard_startingIn", {seconds: stri(time)})
+  else
+    labelNode.visible = false
   end if
 End Function
 
