@@ -224,6 +224,12 @@ Function createOrUpdateAutoPlayPreviewPanel(existingPanel = invalid)
         videoPreviewPanel.autoPlayTimerSelectItem = 0 ' default if not signed in
       end if
     end if
+
+    signInInfo = m.top.signInInfo
+    if isAA(signInInfo) = true AND isBoolean(signInInfo.signedIn) = true
+      videoPreviewPanel.isUserSignedIn = signInInfo.signedIn
+    end if
+
   end if
 
   return videoPreviewPanel
@@ -281,7 +287,10 @@ Function createAutoPreviewPanel()
   ' updates to ensure the correct values are maintained for both settings
   if isLoggedInUser() = true
     m.top.autoPreviewItemUpdated = videoPreviewPanel.selectItem
-    m.top.autoPlayTimerSettingSelected = videoPreviewPanel.autoPlayTimerSelectItem
+    if m.top.isUserSignedInFromSettingScreen = false
+      m.top.autoPlayTimerSettingSelected = videoPreviewPanel.autoPlayTimerSelectItem
+    end if
+
   end if
 
   return videoPreviewPanel

@@ -209,7 +209,7 @@ Function onAutoPlayTimerSettingSelected(msg)
   pageInfo = {
     pageType: "account_page"
     pageValues: {
-      account_page_type: "AUTOSTART"
+      account_page_type: "VIDEO_PREVIEW"
     }
   }
   componentInteractionInfo = getComponentInteractionInfo(userInteraction, pageInfo, "left_side_nav_component", leftSideNavComponent)

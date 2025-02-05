@@ -1120,6 +1120,13 @@ Function popScreenAfterSignInProcess()
   }
 
   count = m.screenStack.getChildCount()-1
+
+  'Will remove this code after the experiment.
+  settingsScreen = getScreenFromStackById(m.constants.ui.screenIds.settingsScreen)
+  if settingsScreen <> invalid
+    settingsScreen.isUserSignedInFromSettingScreen = true
+  end if
+
   for i = count to 0 step -1
     screen = m.screenStack.getChild(i)
     if screen <> invalid AND poppableScreenSubtypes[screen.getSubtype()] = true
