@@ -782,8 +782,8 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEp
   removeEpisodeScreen = false
 
   if videoPlayer <> invalid
+    videoPlayer.exitPlayer = true
     stopVideoContent(videoPlayer)
-
     ' get the top most detail screen
     detailScreen = getTopDetailScreenFromStack()
 
@@ -953,7 +953,6 @@ Function stopVideoContent(videoPlayer)
     videoPlayer.unobserveFieldScoped("backButtonPressed")
     videoPlayer.unobserveFieldScoped("showSignUpModal")
     videoPlayer.unobserveFieldScoped("state")
-    videoPlayer.unobserveFieldScoped("adTrackingObject")
     videoPlayer.unobserveFieldScoped("skipTrailer")
     videoPlayer.unobserveFieldScoped("historyPosition")
     videoPlayer.unobserveFieldScoped("sendVideoTrackingStart")

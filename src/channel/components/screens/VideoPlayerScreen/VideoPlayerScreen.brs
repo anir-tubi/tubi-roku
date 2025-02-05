@@ -96,6 +96,8 @@ Function init()
   m.top.observeField("displayAdLoadingMessage", "onDisplayAdLoadingMessage")
   m.top.observeField("seekTo", "onSeekToChange")
   m.top.observeFieldScoped("showBrowseWhileWatchingInFullScreen", "onShowBrowseWhileWatchingInFullScreen")
+  m.top.observeFieldScoped("adTrackingObject", "onAdTrackingObject")
+  m.top.observeFieldScoped("adBufferingObject", "onAdBufferingObject")
 
   'isPauseAdReqInProgress is the state of pauseAd requests in flight.
   'If pause ad request is in flight, we do not send another pause ad request
@@ -114,6 +116,7 @@ Function init()
 
   m.top.observeFieldScoped("sendPendingPauseAdPixel", "onSendPendingPauseAdPixel")
   m.top.observeFieldScoped("pauseAdResponse", "onPauseAdResponse")
+  m.top.observeFieldScoped("exitPlayer", "onExitPlayer")
   m.pauseAdOverlayTimer = m.top.findNode("PauseAdOverlayTimer")
   m.pauseAdOverlayTimer.observeFieldScoped("fire", "onPauseAdOverlayTimer")
   m.pauseAdOverlay = m.top.findNode("PauseAdOverlay")
@@ -159,9 +162,19 @@ Function init()
 
   m.playerLogLib = invalid
 
-  if m.constants.settings.playerLogEnabled = true AND getExperimentResource("roku_player_client_log", "roku_player_client_log_v1").enabled = true
+  if m.constants.settings.playerLogEnabled = true AND getExperimentResource("roku_player_client_log", "roku_player_client_log_v2").enabled = true
     m.playerLogLib = PlayerLogLib(m.constants)
   end if
+
+  'playerExitInfo has ad_counts, is_ad and is_buffering fields, which are used in player exit event
+  'ad_counts helps to find the total ads played during the single player session
+  'is_ad helps to find out whether the Ad is displayed when user exit the player
+  'is_buffering helps to find out whether the Ad is buffering or playing when user exit the player
+  m.playerExitInfo = {
+    ad_counts: 0
+    is_ad: false
+    is_buffering: false
+  }
 
   ' Map to store the history whether cuePoints button were shown or not.
   ' skip button for each cuepoint should only be shown once per video
@@ -595,11 +608,12 @@ Function onControlChange()
       updatePlayerLogLib(m.playerLogLib, "setPlayerSetupStartTime")
       prepareToStartVideo(m.top.content)
       updatePlayerLogLib(m.playerLogLib, "setPlayerSetupEndTime")
+      updatePlayerLogLib(m.playerLogLib, "setPlayerStage", "READY")
+      updatePlayerLogLib(m.playerLogLib, "setPlaybackSource", m.top.playbackSource)
       playContent()
     end if
 
   else if control = "stop" then
-
     stopAdsPlayback()
     cancelReplayCaptions()
     clearSkipCuepointsButtonAndTimer()
@@ -744,6 +758,7 @@ Function onVideoStateChange(msg)
     end if
 
     if m.didAdvanceDrm <> true
+      updatePlayerLogLib(m.playerLogLib, "setErrorModal", true)
       m.top.errorMsg = getTranslation("videoPlayer_error_playback_description")  'is used in error modal
       m.top.state = state   'triggers error modal in ContentController
     end if
@@ -1729,7 +1744,8 @@ Function advanceCodecOnContent(contentNode)
         end if
 
         if nextResource <> invalid and setDrmOnContent(contentNode, nextResource, [nextCodecIndex, nextDrmIndex]) = true
-
+          sendVideoResourceFallbackToPlayerLogLib(currentResource, nextResource, "CODEC")
+          
           fallbackInfo = {
             failed_url: removeExcessUrl(currentResource.url)
             failed_codec: currentResource.codec
@@ -1747,6 +1763,29 @@ Function advanceCodecOnContent(contentNode)
     end if
   end if
   return false
+End Function
+
+
+'sends the video information to playerloglib in order to fire VideoResourceFallbackEvent
+'@failedResource: assocarray, contains information about failed resource of current video
+'@fallbackResource: assocarray, contains information about fallback resource of current video
+'@failedType: string, possible values are CODEC, DRM
+'
+Function sendVideoResourceFallbackToPlayerLogLib(failedResource, fallbackResource, failedType)
+  if isAA(failedResource) = true AND isAA(fallbackResource) = true AND isNonEmptyString(failedType) = true
+    videoResourceFallback = {
+      type: "CODEC"
+      failed_video_resource_type: failedResource.type
+      failed_video_codec_type: failedResource.codec
+      failed_hdcp_version: failedResource.hdcpversion
+      failed_url: removeExcessUrl(failedResource.url)
+      fallback_video_resource_type: fallbackResource.type
+      fallback_video_codec_type: fallbackResource.codec
+      fallback_hdcp_version: fallbackResource.hdcpversion
+      fallback_url: removeExcessUrl(fallbackResource.url)
+    }
+    updatePlayerLogLib(m.playerLogLib, "fireVideoResourceFallbackEvent", videoResourceFallback)
+  end if
 End Function
 
 
@@ -1785,6 +1824,7 @@ Function advanceDrmOnContent(contentNode)
         end if
 
         if nextResource <> invalid and setDrmOnContent(contentNode, nextResource, [nextCodecIndex, nextDrmIndex]) = true
+          sendVideoResourceFallbackToPlayerLogLib(currentResource, nextResource, "DRM")
 
           fallbackInfo = {
             failed_url: removeExcessUrl(currentResource.url)
@@ -2416,4 +2456,42 @@ End Function
 
 Function onUserConsentsOptOutStatusChange(msg)
   m.adsLimited.userConsentsOptOutStatus = msg.getData()
+End Function
+
+
+Function onAdTrackingObject(msg)
+  adInfo = msg.getData()
+  adStatus = adInfo.type
+
+  m.playerExitInfo["is_ad"] = true
+  m.playerExitInfo["is_buffering"] = false
+
+  if adStatus = "Start"
+    m.playerExitInfo["ad_counts"] += 1 
+  else if adStatus = "PodComplete"
+    m.playerExitInfo["is_ad"] = false
+  end if
+End Function
+
+
+Function onAdBufferingObject(msg)
+  adBufferingInfo = msg.getData()
+  progress = adBufferingInfo.progress
+  m.playerExitInfo["is_buffering"] = (progress = invalid OR progress < 100)
+End Function
+
+
+Function onExitPlayer(msg)
+  exitPlayer = msg.getData()
+
+  if exitPlayer = true
+    updatePlayerLogLib(m.playerLogLib, "firePlayerPageExitEvent", m.playerExitInfo)
+    'reset playerExitInfo
+    m.playerExitInfo = {
+      ad_counts: 0
+      is_ad: false
+      is_buffering: false
+    }
+    m.top.exitPlayer = false
+  end if
 End Function

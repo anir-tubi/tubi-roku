@@ -82,6 +82,15 @@
         -->
       <field id="adTrackingObject" type="assocarray" alwaysNotify="true"/>
 
+
+      <!--
+        - When the RAF changes the playback tracking state, this AA object is set]
+        - Possible keys are adprogress, adindex, ad, canvaslayers
+        - For an update set of keys, see where this object is set: TubiAds.tubiAds_adBufferingCallback
+        @see https://developer.roku.com/docs/developer-program/advertising/integrating-roku-advertising-framework.md#tracking
+        -->
+      <field id="adBufferingObject" type="assocarray" alwaysNotify="true"/>
+
       <!--
         - Written to by the scene graph thread.
         - Possible values:  preroll, midroll, seek, play, stop
@@ -131,6 +140,9 @@
 
       <!-- time taken to load player screen in milliseconds -->
       <field id="loadTime" type="integer"/>
+
+      <!-- exitPlayer helps to find out when to fire playerExit event -->
+      <field id="exitPlayer" type="boolean"/>
 
     <!-- OUTPUT -->
       <!-- Set to true if the back button was pressed while the video player has focus -->

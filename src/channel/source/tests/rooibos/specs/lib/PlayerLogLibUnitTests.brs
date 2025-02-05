@@ -14,20 +14,20 @@ End function
 '@Test setAdType unit tests
 Function playerLogLib_setAdType_test()
   m.playerLogLib.setAdType("midroll")
-  adtype = m.playerLogLib.adtype
-  m.assertEqual(adtype, "midroll")
+  adType = m.playerLogLib.adType
+  m.assertEqual(adType, "midroll")
 
   m.playerLogLib.setAdType("prerooll")
-  adtype = m.playerLogLib.adtype
-  m.assertEqual(adtype, "preroll")
+  adType = m.playerLogLib.adType
+  m.assertEqual(adType, "preroll")
 
   m.playerLogLib.setAdType(2)
-  adtype = m.playerLogLib.adtype
-  m.assertEqual(adtype, "preroll")
+  adType = m.playerLogLib.adType
+  m.assertEqual(adType, "preroll")
 
   m.playerLogLib.setAdType(invalid)
-  adtype = m.playerLogLib.adtype
-  m.assertEqual(adtype, "preroll")
+  adType = m.playerLogLib.adType
+  m.assertEqual(adType, "preroll")
 End Function
 
 
@@ -106,6 +106,33 @@ Function playerLogLib_setAdState_test()
   m.playerLogLib.setAdState(invalid)
   adState = m.playerLogLib.adState
   m.assertEqual(adState, "")
+
+  playerPosition = m.videoPosition
+  if playerPosition = -1
+    m.playerPositionWhenAdsCompleted = 0
+  else
+    m.playerPositionWhenAdsCompleted = playerPosition
+  end if
+
+  m.playerLogLib.setVideoPosition(-1)
+  m.playerLogLib.setAdState("adsCompleted")
+  playerPositionWhenAdsCompleted = m.playerLogLib.playerPositionWhenAdsCompleted
+  m.assertEqual(playerPositionWhenAdsCompleted, 0)
+
+  m.playerLogLib.setVideoPosition(10)
+  m.playerLogLib.setAdState("adsCompleted")
+  playerPositionWhenAdsCompleted = m.playerLogLib.playerPositionWhenAdsCompleted
+  m.assertEqual(playerPositionWhenAdsCompleted, 10)
+
+  m.playerLogLib.setVideoPosition(-1)
+  m.playerLogLib.setAdState("adsPending")
+  playerPositionWhenAdsCompleted = m.playerLogLib.playerPositionWhenAdsCompleted
+  m.assertEqual(playerPositionWhenAdsCompleted, 10)
+
+  m.playerLogLib.setVideoPosition(-1)
+  m.playerLogLib.setAdState("adsPlaying")
+  playerPositionWhenAdsCompleted = m.playerLogLib.playerPositionWhenAdsCompleted
+  m.assertEqual(playerPositionWhenAdsCompleted, 10)
 End Function
 
 
@@ -127,38 +154,29 @@ End Function
 
 '@Test setVideoControl unit tests
 Function playerLogLib_setVideoControl_test()
-  trackId = m.global.playerLogTrackId
-
   m.playerLogLib.setVideoControl("play")
   isVideoPlayed = m.playerLogLib.isVideoPlayed
   m.assertEqual(isVideoPlayed, false)
 
-  isVideoPlayedPreviously = m.playerLogLib.isVideoPlayed
+  videoControlStatePreviously = m.playerLogLib.isVideoPlayed
   m.playerLogLib.setVideoControl("stop")
   isVideoPlayed = m.playerLogLib.isVideoPlayed
-  m.assertEqual(isVideoPlayedPreviously, isVideoPlayed)
-  m.assertNotEqual(trackId, m.global.playerLogTrackId)
+  m.assertEqual(videoControlStatePreviously, isVideoPlayed)
 
-  isVideoPlayedPreviously = m.playerLogLib.isVideoPlayed
-  trackId = m.global.playerLogTrackId
-
+  videoControlStatePreviously = m.playerLogLib.isVideoPlayed
   m.playerLogLib.setVideoControl("")
-  m.assertEqual(isVideoPlayed, isVideoPlayedPreviously)
-  m.assertEqual(trackId, m.global.playerLogTrackId)
+  isVideoPlayed = m.playerLogLib.isVideoPlayed
+  m.assertEqual(videoControlStatePreviously, isVideoPlayed)
 
-  isVideoPlayedPreviously = m.playerLogLib.isVideoPlayed
-  trackId = m.global.playerLogTrackId
-
+  videoControlStatePreviously = m.playerLogLib.isVideoPlayed
   m.playerLogLib.setVideoControl(2)
-  m.assertEqual(isVideoPlayed, isVideoPlayedPreviously)
-  m.assertEqual(trackId, m.global.playerLogTrackId)
+  isVideoPlayed = m.playerLogLib.isVideoPlayed
+  m.assertEqual(videoControlStatePreviously, isVideoPlayed)
 
-  isVideoPlayedPreviously = m.playerLogLib.isVideoPlayed
-  trackId = m.global.playerLogTrackId
-
+  videoControlStatePreviously = m.playerLogLib.isVideoPlayed
   m.playerLogLib.setVideoControl(invalid)
-  m.assertEqual(isVideoPlayed, isVideoPlayedPreviously)
-  m.assertEqual(trackId, m.global.playerLogTrackId)
+  isVideoPlayed = m.playerLogLib.isVideoPlayed
+  m.assertEqual(isVideoPlayed, videoControlStatePreviously)
 End Function
 
 
@@ -203,15 +221,15 @@ End Function
 '@Test setVideoPosition unit tests
 Function playerLogLib_setVideoPosition_test()
   m.playerLogLib.setVideoPosition(120)
-  playerPosition = m.playerLogLib.playerPosition
+  playerPosition = m.playerLogLib.videoPosition
   m.assertEqual(playerPosition, 120)
 
   m.playerLogLib.setVideoPosition("")
-  playerPosition = m.playerLogLib.playerPosition
+  playerPosition = m.playerLogLib.videoPosition
   m.assertEqual(playerPosition, -1)
 
   m.playerLogLib.setVideoPosition(invalid)
-  playerPosition = m.playerLogLib.playerPosition
+  playerPosition = m.playerLogLib.videoPosition
   m.assertEqual(playerPosition, -1)
 End Function
 
@@ -314,4 +332,88 @@ Function playerLogLib_setAdCtx_test()
   m.assertNotInvalid(adCtx)
   adindex = adCtx.adindex
   m.assertInvalid(adindex)
+End Function
+
+
+'@Test resetTrackId unit tests
+Function playerLogLib_resetTrackId_test()
+  playerLogTrackId = m.playerLogLib.getTrackId()
+  m.playerLogLib.resetTrackId()
+  m.assertNotEqual(m.playerLogLib.getTrackId(), playerLogTrackId)
+End Function
+
+
+'@Test resetPlayerStage unit tests
+Function playerLogLib_resetPlayerStage_test()
+  m.playerLogLib.resetPlayerStage()
+  playerStage = m.playerLogLib.playerStage
+  m.assertEqual(playerStage, "IDLE")
+End Function
+
+
+'@Test setPlayerFeedback unit tests
+Function playerLogLib_setPlayerFeedback_test()
+  m.playerLogLib.setPlayerFeedback("Video Buffering")
+  playerFeedback = m.playerLogLib.playerFeedback
+  m.assertEqual(playerFeedback, "Video Buffering")
+
+  m.playerLogLib.setPlayerFeedback("")
+  playerFeedback = m.playerLogLib.playerFeedback
+  m.assertEqual(playerFeedback, "Video Buffering")
+
+  m.playerLogLib.setPlayerFeedback(1)
+  playerFeedback = m.playerLogLib.playerFeedback
+  m.assertEqual(playerFeedback, "Video Buffering")
+
+  m.playerLogLib.setPlayerFeedback(invalid)
+  playerFeedback = m.playerLogLib.playerFeedback
+  m.assertEqual(playerFeedback, "Video Buffering")
+End Function
+
+
+'@Test setErrorModal unit tests
+Function playerLogLib_setErrorModal_test()
+  m.playerLogLib.setErrorModal(true)
+  hasErroModalShown = m.playerLogLib.hasErrorModalShown
+  m.assertEqual(hasErroModalShown, true)
+
+  m.playerLogLib.setErrorModal(false)
+  hasErroModalShown = m.playerLogLib.hasErrorModalShown
+  m.assertEqual(hasErroModalShown, false)
+
+  m.playerLogLib.setErrorModal()
+  hasErroModalShown = m.playerLogLib.hasErrorModalShown
+  m.assertEqual(hasErroModalShown, false)
+
+  m.playerLogLib.setErrorModal(1)
+  hasErroModalShown = m.playerLogLib.hasErrorModalShown
+  m.assertEqual(hasErroModalShown, false)
+
+  m.playerLogLib.setErrorModal(invalid)
+  hasErroModalShown = m.playerLogLib.hasErrorModalShown
+  m.assertEqual(hasErroModalShown, false)
+End Function
+
+
+'@Test setPlayerStage unit tests
+Function playerLogLib_setPlayerStage_test()
+  m.playerLogLib.setPlayerStage("IN STREAM")
+  playerStage = m.playerLogLib.playerStage
+  m.assertEqual(playerStage, "IN STREAM")
+
+  m.playerLogLib.setPlayerStage("")
+  playerStage = m.playerLogLib.playerStage
+  m.assertEqual(playerStage, "IN STREAM")
+
+  m.playerLogLib.setPlayerStage()
+  playerStage = m.playerLogLib.playerStage
+  m.assertEqual(playerStage, "IDLE")
+End Function
+
+
+'@Test resetAdMetrics unit tests
+Function playerLogLib_resetAdMetrics_test()
+  m.playerLogLib.resetAdMetrics()
+  m.assertEqual(m.playerLogLib.failedAdCount, 0)
+  m.assertEqual(m.playerLogLib.totalAdDuration, 0)
 End Function

@@ -43,6 +43,7 @@ Function tubiSGAdShim_run(videoPlayerNode) As boolean
   ' Re-using the port so that we can listen to ad tracking requests too in the same while loop.
   port = m.ads.adMessagePort
   m.videoPlayerNode.observeField("adControl", port)
+  m.videoPlayerNode.observeField("position", port)
   m.videoPlayerNode.observeFieldScoped("userConsentsOptOutStatus", port)
   m.videoPlayerNode.observeFieldScoped("tcfString", port)
   userConsentsOptOutStatus = videoPlayerNode.userConsentsOptOutStatus
@@ -65,14 +66,21 @@ Function tubiSGAdShim_run(videoPlayerNode) As boolean
           episode = m.videoPlayerNode.content.getFields()  ' clone the content node into a local AA to avoid messing with it
           '//Place the tracking info into the episode AA variable
           episode.videoSponsorExposureId = m.videoPlayerNode.videoSponsorExposureId
-
           position = m.videoPlayerNode.adPosition
+          m.ads.adPosition = m.videoPlayerNode.adPosition
+
+          if value = "preroll" OR value = "midroll" OR value = "seek"
+            m.ads.adControl = value
+          end if
+
           tubiLog("TubiSGAdShim: adControl = " + value + " position = " + stri(position) + "ad state " + m.videoPlayerNode.adState)
           m.ads.appMode = m.videoPlayerNode.appMode
           m.handleControlMessage(m.videoPlayerNode.adState, value, episode, position)
         else
           m.videoPlayerNode.adState = "noAds"  ' if video player content was changed before we got here, return no ads
         end if
+      else if msg.GetField() = "position"  
+        m.ads.videoPosition = msg.GetData()
       else if msg.GetField() = "userConsentsOptOutStatus"
         userConsentsOptOutStatus = msg.getData()
         m.ads.tracking.userConsentsOptOutStatus = userConsentsOptOutStatus
