@@ -196,7 +196,7 @@ Function onAutoPlayTimerSettingSelected(msg)
     end if
   else
     title = getTranslation("dialog_signIn_title")
-    message = getTranslation("screenSettings_error_signInAutoplayPreview_description")
+    message = getTranslation("screenSettings_error_signInAutoplayControls_description")
     buttons = [getTranslation("dialog_button_signIn"), getTranslation("dialog_button_cancel")]
 
     showSignInRequiredModal(title, message, buttons, m.settingsScreen, "sign-in-autoplay", m.Tracking, m.trackingLoggingTask, onSignInModalSelectedViaAutoplayNextVideo)
@@ -223,7 +223,7 @@ End Function
 Function saveAutoPlayNextVideoChoiceToServerPersistentData(choice)
   saveServerPersistentData({
     "isAutoPlayTimerOn": choice
-  })
+  }, "device")
 End Function
 
 

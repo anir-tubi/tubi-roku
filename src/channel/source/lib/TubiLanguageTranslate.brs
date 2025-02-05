@@ -962,6 +962,10 @@ Function getTranslation_en_US()
       "description": "Description of message to let users know that they must be signed in to change the AutoplayPreview choice.",
       "message": "You must be signed in to change Autoplay Preview preferences."
     },
+    "screenSettings_error_signInAutoplayControls_description": {
+      "description": "Description of message to let users know that they must be signed in to change the AutoplayPreview choice.",
+      "message": "You must be signed in to change Autoplay Controls preferences."
+    },
     "screenCategories_error_retrieve_message": {
       "description": "Onscreen message to indicate categories content could not be gathered",
       "message": "Could not retrieve categories content."

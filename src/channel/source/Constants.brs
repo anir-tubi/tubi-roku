@@ -1670,7 +1670,7 @@ Function getConstants()
       ' *************************************************
       constants.serverPersistentDataKeys = {}
       constants.serverPersistentDataKeys.isVideoPreviewOn = "enable_video_preview"
-      constants.serverPersistentDataKeys.isAutoPlayTimerOn = "enable_autoPlay_timer"
+      constants.serverPersistentDataKeys.isAutoPlayTimerOn = "enable_autoplay_timer"
       constants.serverPersistentDataKeys.subtitleTrack = "subtitle_track"
       constants.serverPersistentDataKeys.audioTrack = "audio_track"
       constants.serverPersistentDataKeys.isLikeToastNotificationShown = "enable_like_toast_notification"
