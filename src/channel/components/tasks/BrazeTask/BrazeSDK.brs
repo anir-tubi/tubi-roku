@@ -1,6 +1,6 @@
 function BrazeConstants() as object
   SDK_DATA = {
-    SDK_VERSION: "0.1.3"
+    SDK_VERSION: "2.2.0"
   }
 
   SCENE_GRAPH_EVENTS = {
@@ -64,7 +64,8 @@ function BrazeConstants() as object
     IAM_CONTROL_IMPRESSION: "iec",
     IAM_CLICK: "sc",
     IAM_BUTTON_CLICK: "sbc",
-    FF_IMPRESSION: "ffi"
+    FF_IMPRESSION: "ffi",
+    USER_ALIAS: "uae"
   }
 
   TRIGGER_FIELDS = {
@@ -193,6 +194,11 @@ function BrazeConstants() as object
     FTS: "fts"
   }
 
+  USER_ALIAS_EVENT_FIELDS = {
+    ALIAS_ID: "a",
+    LABEL_ID: "l"
+  }
+
   return {
     SCENE_GRAPH_EVENTS: SCENE_GRAPH_EVENTS
     SDK_DATA: SDK_DATA
@@ -216,6 +222,7 @@ function BrazeConstants() as object
     IAM_CLICK_EVENT_FIELDS: IAM_CLICK_EVENT_FIELDS
     IAM_BUTTON_CLICK_EVENT_FIELDS: IAM_BUTTON_CLICK_EVENT_FIELDS
     FF_IMPRESSION_EVENT_FIELDS: FF_IMPRESSION_EVENT_FIELDS
+    USER_ALIAS_EVENT_FIELDS: USER_ALIAS_EVENT_FIELDS
   }
 end function
 
@@ -294,9 +301,13 @@ function BrazeInit(config as object, messagePort as object)
 
     AppDataProvider: function() as object
       if m.cachedAppInfo = invalid then
+        ai = CreateObject("roAppInfo")
+        app_version = ai.GetVersion()
         m.cachedAppInfo = {
           sdk_version: BrazeConstants().SDK_DATA.SDK_VERSION
           api_key: Braze()._privateApi.config[BrazeConstants().BRAZE_CONFIG_FIELDS.API_KEY]
+          app_version_code: app_version + ".0"
+          app_version: app_version
         }
       end if
       return m.cachedAppInfo
@@ -380,8 +391,8 @@ function BrazeInit(config as object, messagePort as object)
                 if brazetask <> invalid
                   getBrazeTask().BrazeFeatureFlags = ff_data.feature_flags
                 end if
-              else
-                ' brazelogger.debug("stored feature flag data was invalid", ff_json)
+              else 
+                brazelogger.debug("stored feature flag data was invalid", ff_json)
               end if
             end if
           end if
@@ -419,8 +430,8 @@ function BrazeInit(config as object, messagePort as object)
 
           if m.cachedconfig.feature_flags_enabled = false
             storage.brazeDeleteData(BrazeConstants().BRAZE_STORAGE.FEATURE_FLAG_DATA_KEY, BrazeConstants().BRAZE_STORAGE.CONFIG_SECTION)
-            getBrazeTask().BrazeFeatureFlags = {}
-          end if
+            getBrazeTask().BrazeFeatureFlags = []
+          end if   
         end if
         if config_response <> invalid and config_response.triggers <> invalid
           m.cachedConfig.triggers = config_response.triggers
@@ -428,7 +439,7 @@ function BrazeInit(config as object, messagePort as object)
       end if
       return m.cachedConfig
     end function
-
+    
     syncForNewUser: function()
       config = m.ConfigProvider()
       if config <> invalid then
@@ -541,6 +552,21 @@ function BrazeInit(config as object, messagePort as object)
 
     isNumeric: function(input as object) as boolean
       return m.isFloat(input) or m.isInt(input) or m.isLongInt(input)
+    end function,
+
+    isBlankOrEmpty: function(input as object) as boolean
+      if input = invalid or input = ""
+        return true
+      end if
+      len = Len(input)
+      ' The Mid function is 1-indexed, not 0-indexed
+      ' https://developer.roku.com/docs/references/brightscript/language/global-string-functions.md#mids-as-string-p-as-integer-n-as-integer-as-string
+      for i = 1 to len step 1
+        if Mid(input, i, 1) <> " "
+          return false
+        end if
+      end for
+      return true
     end function,
 
     setToEmptyJSONArrayIfInvalid: function(input as dynamic) as string
@@ -799,10 +825,11 @@ function BrazeInit(config as object, messagePort as object)
 
       if ff_enabled = false
         brazelogger.debug("feature flags are not enabled, not refreshing", "")
+        getBrazeTask().BrazeFeatureFlagsUpdated = true
         return
       end if
 
-      last_update = cached_config.feature_flags_last_update
+      last_update = cached_config.feature_flags_last_update 
       rate_limit = cached_config.feature_flags_rate_limit
       now = Braze()._privateApi.timeUtils.getCurrentTimeSeconds()
 
@@ -823,12 +850,13 @@ function BrazeInit(config as object, messagePort as object)
           else
             brazelogger.debug("feature flag response could not be parsed", raw_response)
           end if
-        else
+        else 
           brazelogger.debug("feature flag response was invalid", "")
         end if
       else
         brazelogger.debug("refreshFeatureFlag called too soon. Seconds to wait", last_update + rate_limit - now)
       end if
+      getBrazeTask().BrazeFeatureFlagsUpdated = true
     end function,
 
     compareNumbers: function(value, comparator, comparison_value) as boolean
@@ -891,7 +919,7 @@ function BrazeInit(config as object, messagePort as object)
     end function,
 
     toColor: function(s as object) as dynamic
-      if s = invalid
+      if s = invalid 
         return invalid
       end if
       hex = stri(s, 16)
@@ -910,7 +938,7 @@ function BrazeInit(config as object, messagePort as object)
     logMessage: function(tag as string, message as string) as void
       ' *** Please do not remove the if condition for controlling logging when we make braze updates. ***
       #if brazeLoggingEnabled
-        print "Braze Roku SDK v" + BrazeConstants().SDK_DATA.SDK_VERSION + " - " + tag + " - " + message
+      print "Braze Roku SDK v" + BrazeConstants().SDK_DATA.SDK_VERSION + " - " + tag + " - " + message
       #end if
     end function
   }
@@ -987,6 +1015,14 @@ function BrazeInit(config as object, messagePort as object)
       event_data[BrazeConstants().FF_IMPRESSION_EVENT_FIELDS.FID] = ffId
       event_data[BrazeConstants().FF_IMPRESSION_EVENT_FIELDS.FTS] = fts
       event_object = m.createEventObject(BrazeConstants().EVENT_TYPES.FF_IMPRESSION, event_data)
+      return event_object
+    end function,
+
+    createUserAliasEvent: function(alias as string, label as string) as object
+      event_data = {}
+      event_data[BrazeConstants().USER_ALIAS_EVENT_FIELDS.ALIAS_ID] = alias
+      event_data[BrazeConstants().USER_ALIAS_EVENT_FIELDS.LABEL_ID] = label
+      event_object = m.createEventObject(BrazeConstants().EVENT_TYPES.USER_ALIAS, event_data)
       return event_object
     end function,
 
@@ -1114,7 +1150,7 @@ function BrazeInit(config as object, messagePort as object)
     postToUrl: function(url as string, postJson as object, headers = [] as object) as object
       request = CreateObject("roUrlTransfer")
       port = CreateObject("roMessagePort")
-      request.SetPort(port)
+      request.SetMessagePort(port)
       request.SetCertificatesFile("common:/certs/ca-bundle.crt")
       request.InitClientCertificates()
       request.SetUrl(url)
@@ -1376,10 +1412,24 @@ function BrazeInit(config as object, messagePort as object)
           m._privateapi.dataprovider.cachedconfig.feature_flags_sent_ffi[fts] = 1
           event_object = m._privateApi.eventHandler.createFeatureFlagImpressionEvent(ffId, fts)
           brazeLogger.debug("Logging a feature flag impression. ", FormatJson(args))
-          m._privateApi.eventHandler.logEvent(event_object)
+          m._privateApi.eventHandler.logEvent(event_object)  
         end if
-      else
+      else 
         brazeLogger.debug("Not logging a feature flag impression. The feature flag was not part of any matching campaign", FormatJson(args))
+      end if
+    end function,
+
+    addUserAlias: function(args as object) as void
+      m._privateApi.brazeLogger.debug("adding user alias", FormatJson(args))
+      utils = Braze()._privateApi.brazeUtils
+      alias = utils.truncateBrazeField(args.alias)
+      label = utils.truncateBrazeField(args.label)
+
+      if utils.isBlankOrEmpty(alias) or utils.isBlankOrEmpty(label)
+        m._privateApi.brazeLogger.debug("invalid args for addUserAlias", FormatJson(args))
+      else
+        event_object = m._privateApi.eventHandler.createUserAliasEvent(alias, label)
+        m._privateApi.eventHandler.logEvent(event_object)
       end if
     end function,
 
@@ -1458,7 +1508,7 @@ function BrazeInit(config as object, messagePort as object)
         m.sessionStart({})
       else
         m._privateApi.brazeLogger.debug("userid not changed", "")
-      end if
+      end if  
     end function
   }
 
@@ -1523,6 +1573,42 @@ function _createFeatureFlag(ff as object) as object
       for each prop in m.properties
         if prop = key
           if m.properties[prop].type = "number"
+            return m.properties[prop].value
+          else
+            return invalid
+          end if
+        end if
+      end for
+      return invalid
+    end function,
+    getTimestampProperty: function(key as string) as object
+      for each prop in m.properties
+        if prop = key
+          if m.properties[prop].type = "datetime"
+            return m.properties[prop].value
+          else
+            return invalid
+          end if
+        end if
+      end for
+      return invalid
+    end function,
+    getJSONProperty: function(key as string) as object
+      for each prop in m.properties
+        if prop = key
+          if m.properties[prop].type = "jsonobject"
+            return m.properties[prop].value
+          else
+            return invalid
+          end if
+        end if
+      end for
+      return invalid
+    end function,
+    getImageProperty: function(key as string) as object
+      for each prop in m.properties
+        if prop = key
+          if m.properties[prop].type = "image"
             return m.properties[prop].value
           else
             return invalid
@@ -1664,17 +1750,20 @@ function getBrazeInstance(task as object) as object
 
     getFeatureFlag: function(id as string) as object
       feature_flags = getBrazeTask().BrazeFeatureFlags
-      for each ff in feature_flags
+      for each ff in feature_flags 
         if ff.id = id
           return _createFeatureFlag(ff)
         end if
       end for
-      emptyFF = { "id": id, "enabled": false, properties: {} }
-      return _createFeatureFlag(emptyFF)
+      return invalid
     end function,
-
+    
     logFeatureFlagImpression: function(featureFlagId as string) as void
       m.callInstanceMethod("logFeatureFlagImpression", { ffId: featureFlagId })
+    end function,
+
+    addUserAlias: function(alias as string, label as string) as void
+      m.callInstanceMethod("addUserAlias", { alias: alias, label: label })
     end function,
 
     callInstanceMethod: function(methodName as string, args as object) as void
