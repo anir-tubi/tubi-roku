@@ -16,6 +16,15 @@ Function getConstants()
     constants.registrySectionIDs.fallbacks = "fallbacks"
     ' Creating a section to store user sign up information in case of registration failure.
     constants.registrySectionIDs.registrationByPass = "registrationByPass"
+    ' Used for storing proxy settings
+    constants.registrySectionIDs.proxySettings = "proxySettings"
+
+  proxySettings = RegReadAll(constants.registrySectionIDs.proxySettings)
+  if proxySettings <> invalid then
+    constants.settings.charlesProxyEnabled = (proxySettings.charlesProxyEnabled = "true")
+    constants.settings.charlesProxyUrl = proxySettings.charlesProxyUrl
+  end if
+  ' stop
 
   ' Roku's channel/app id for the production Tubi app. It is used with the continue watching feature to enable testing the feature in sideloaded/beta channels.
   constants.productionApplicationId = "41468"

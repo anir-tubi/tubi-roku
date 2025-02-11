@@ -772,6 +772,11 @@ charlesProxyEnabled: true
 
 If set up correctly the first time your Roku sends a request to Charles, Charles will ask you to approve the connection. Just click `Allow` and you should see the traffic in Charles(except Youbora and Santry related traffic).
 
+## Proxying Staging & Production
+
+As of 3.6.16 the Tubi application can now proxy requests in staging and production. In order to do this you first need to make sure the application is not running. The best way to ensure this is to go to Settings > Exit > Exit. To set the proxy run: `curl -d '' http://<ROKU-IP>:8060/launch/dev?setRegistry=%7B%22proxySettings%22%3A%7B%22charlesProxyEnabled%22%3A%22true%22%2C%22charlesProxyUrl%22%3A%22http%3A%2F%2F<COMPUTER-IP>%3A8888%22%7D%7D&password=499zsaHvENIYuEiVPMMa3S5w` replacing `<ROKU-IP>` and `<COMPUTER-IP>` as appropriate. To remove the proxy run:
+`curl -d '' http://<COMPUTER-IP>:8060/launch/dev?clearRegistry=true&password=499zsaHvENIYuEiVPMMa3S5w` This will clear the entire registry which can be useful for other things as well.
+
 # Publish a new version of One Trust Component Library
 
 Whenever we want to update to a newer version of One Trust Library, we have to publish a new one trust component library.
