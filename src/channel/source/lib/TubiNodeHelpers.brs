@@ -38,7 +38,7 @@ End Function
 ' can be used if the parent along with children have been cloned and getChildIndex won't work
 ' returns the index or -1 if the passed in child does not belong to the parent
 Function tubiNodeHelpers_getChildIndexById(parent, childId)
-  if parent.getChildCount() > 0
+  if parent <> invalid AND parent.getChildCount() > 0
     for i=0 to parent.getChildCount()-1
       if parent.getChild(i).id <> invalid AND parent.getChild(i).id = childId
         return i
