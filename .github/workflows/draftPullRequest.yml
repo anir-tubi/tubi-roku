@@ -20,12 +20,12 @@ jobs:
     runs-on: ubuntu-latest
     name: Add Remove Not Ready For Review Label
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     # npm command install all required packages
     - name: Cache node modules
       id: node-cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       env:
         cache-name: cache-node-modules
       with:
