@@ -30,7 +30,7 @@ const {replaceTypographyConstants, updateTypographyJSON} = require('./js/typogra
 const {NoStackError} = require('./js/utilities');
 
 // Importing functions with Git functionality
-const {makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges, buildQaBranch, bumpBuild, bumpBuildTen, bumpRevision, tagBuild, createCdnPullRequestForOneTrustSDK, createCdnPullRequestForFoxVideoPlayer, sendSlackReminders} = require('./js/git');
+const {makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges, buildQaBranch, bumpBuild, bumpBuildTen, bumpRevision, tagBuild, createCdnPullRequestForOneTrustSDK, createCdnPullRequestForFoxVideoPlayer, sendSlackReminders, getCurrentBranch, isRemoteTrackingPresent} = require('./js/git');
 
 // Importing functions related to Github action runners
 const {setupAutomatedTestsGithubActionRunner, startAutomatedTestsGithubActionRunner, removeAutomatedTestsGithubActionRunner} = require('./js/action-runner');
@@ -1157,6 +1157,40 @@ function listTasks(done) {
 }
 
 
+function validateBuildEnvironment(done) {
+  // Adding check to make sure we have all required environment variables added.
+  let requiredEnvVars = ['AWS_PROFILE', 'RCDN_GIT_DIRECTORY', 'ROKU_DEV_TARGET', 'DEV_PASSWORD', 'PKG_PASSWORD', 'INFRA_REPO_DIR'];
+  requiredEnvVars.forEach((envVar) => {
+    if (!process.env[envVar]) {
+      done(new NoStackError(`\x1b[31m Missing required environment variable: ${envVar} \x1b[0m`));
+    }
+  });
+
+  // Adding check to make sure we have a valid aws sso token.
+  // If we do not have a valid token then we will get error as follows - "Error when retrieving token from sso: Token has expired and refresh failed."
+  let response = shell.exec('aws sts get-caller-identity');
+  if(response.stderr) {
+    done(new NoStackError(`\x1b[31m AWS SSO error: ${response.stderr.replace(/[\r\n]+/g, '')}. \x1b[0m \x1b[33mHint: Make sure you have run valet aws command to get a new token.\x1b[0m`));
+  }
+
+  const currentBranch = getCurrentBranch(done);
+
+  if (!isRemoteTrackingPresent(done, currentBranch)) {
+    done(new NoStackError(`\x1b[31m ${currentBranch} does not have a remote tracking branch. \x1b[0m`));
+  }
+
+  const buildTag = getBuildTag('revision');
+  const releaseBranchName = `release_${buildTag}`;
+  const command = `git ls-remote --heads origin ${releaseBranchName}`;
+  const result = shell.exec(command, { silent: true });
+  if (result.stdout.trim()) {
+    done(new NoStackError(`\x1b[31m ${releaseBranchName} already exists. Please delete locally and remote in both rcdn and project-total-recall repo before proceeding. \x1b[0m`));
+  }
+  
+  done();
+}
+
+
 exports.codeClean = series(listUnusedImages, listUnusedTranslations);
 exports.build = series(clean, parallel(buildInstalled, buildStarter, buildRemote));
 exports.buildPlusFoxVideoPlayer = series(clean, parallel(buildInstalled, buildStarter, buildRemote, buildFoxVideoPlayer));
@@ -1170,9 +1204,9 @@ exports.bumpQa = exports.bumpQA; //Create bumpQA command alias
 exports.install = series(exports.build, conditionalPackage, sideLoad);
 exports.test = series(setTest, clean, preprocessTests, buildInstalled, sideLoad);
 exports.buildQaBranch = buildQaBranch;
-exports.stage = series(verifyLocalClientErrorConfigIsCurrent, compareTranslations, setStaging, bumpRevision, exports.build, packageAll, pushStaging, pushBranch);
+exports.stage = series(validateBuildEnvironment, verifyLocalClientErrorConfigIsCurrent, compareTranslations, setStaging, bumpRevision, exports.build, packageAll, pushStaging, pushBranch);
 exports.releaseOnGithub = series(tagBuild, pushTag, createGithubRelease);
-exports.release = series(confirmRelease, verifyLocalClientErrorConfigIsCurrent, compareTranslations, setProduction, bumpBuild, exports.build, packageAll, makeReleasePrs, exports.releaseOnGithub, sendSlackReminders);
+exports.release = series(validateBuildEnvironment, confirmRelease, verifyLocalClientErrorConfigIsCurrent, compareTranslations, setProduction, bumpBuild, exports.build, packageAll, makeReleasePrs, exports.releaseOnGithub, sendSlackReminders);
 exports.compareProd = findCommitsNotOnProductionBranch;
 exports.compareCheckedOut = findCommitsNotOnCurrentBranch;
 exports.addMissingImages = addMissingImagesToRemoteLibrary;
@@ -1181,6 +1215,7 @@ exports.pushOneTrustStagingCDN = series(buildOneTrust, packageOneTrust, pushOneT
 exports.pushFoxVideoPlayerStaging = series(buildFoxVideoPlayer, pushFoxVideoPlayerStaging);
 exports.releaseOneTrust = series(buildOneTrust, packageOneTrust, makeOneTrustReleasePrs);
 exports.makeFoxVideoPlayerPR = series(buildFoxVideoPlayer, makeFoxVideoPlayerPR);
+exports.validateBuildEnvironment = validateBuildEnvironment;
 
 // Automated test related
 // Because automated-tests has to call ts-node/register it takes over 300ms to load so we only want to load when necessary. We are adding wrappers for these functions here

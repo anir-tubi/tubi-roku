@@ -8,7 +8,7 @@ const shell = require('shelljs');
 const webFetch = require('node-fetch');
 shell.config.silent = true;
 
-const {getBuildTag, incrementBuildNumber, incrementRevisionNumber, getOneTrustBuildTag} = require('./config');
+const {getBuildTag, incrementBuildNumber, incrementRevisionNumber} = require('./config');
 const {NoStackError, execShellCommand} = require('./utilities');
 
 const githubDeveloperInfo = require('./github-developer-info.json');
@@ -1083,5 +1083,7 @@ module.exports = {
   bumpRevision,
   tagBuild,
   createCdnPullRequestForOneTrustSDK,
-  createCdnPullRequestForFoxVideoPlayer
+  createCdnPullRequestForFoxVideoPlayer,
+  getCurrentBranch,
+  isRemoteTrackingPresent
 };
