@@ -2804,6 +2804,10 @@ Function getTranslation_es_MX()
       "description": "Description of message to let users know that they must be signed in to change the AutoplayPreview choice.",
       "message": "Debes iniciar sesión para cambiar las preferencias de reproducción automática."
     },
+    "screenSettings_error_signInAutoplayControls_description": {
+      "description": "Description of message to let users know that they must be signed in to change the AutoplayPreview choice.",
+      "message": "Debes iniciar sesión para cambiar las preferencias de reproducción automática."
+    },
     "screenCategories_error_retrieve_message": {
       "description": "Onscreen message to indicate categories content could not be gathered",
       "message": "No se pudo recuperar el contenido de las categorías."
@@ -3577,6 +3581,86 @@ Function getTranslation_es_MX()
     "cc_audio_overlay_subtitles": {
       "description": "Available closed caption tracks section header label.",
       "message": "Subtítulos"
+    },
+    "thank_you_title": {
+      "description": "title on the qr code overlay after submitting the video playback feedback.",
+      "message": "¡Gracias!"
+    },
+    "send_feedback_submitted_description": {
+      "description": "description on the qr code overlay after submitting the video playback feedback.",
+      "message": "Tu problema ha sido enviado. En función a tus comentarios, mejoraremos tu experiencia."
+    },
+    "send_feedback_overlay_feedback_hint": {
+      "description": "Description on the qr code overlay to share more feedback using the link or qr code ",
+      "message": "Para compartir más con nosotros, escanee el código QR con tu dispositivo móvil o visite tubitv.com/static/support"
+    },
+    "send_feedback_overlay_title": {
+      "description": "Send feed back overlay title label.",
+      "message": "Enviar Comentarios"
+    },
+    "send_feedback_overlay_subtitle": {
+      "description": "Send feed back overlay subTitle label.",
+      "message": "Reproducción de Video"
+    },
+    "send_feedback_menuItem_start_from_beginning_after_ads": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Empieza Desde Principio Después Anuncios"
+    },
+    "send_feedback_menuItem_stuck_in_ads": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Atrapado en Anuncios"
+    },
+    "send_feedback_menuItem_freezing_after_ads": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Congelación Después Anuncios"
+    },
+    "send_feedback_menuItem_seeing_a_black_screen": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Viendo Pantalla Negra"
+    },
+    "send_feedback_menuItem_buffering_before_video": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Buffering Antes Del Inicio Del Video"
+    },
+    "send_feedback_menuItem_buffering_during_video": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Buffering Durante el Video"
+    },
+    "send_feedback_menuItem_buffering_after_ads": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Buffering Después De Anuncios"
+    },
+    "send_feedback_menuItem_captions_not_working": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Subtítulos No Funcionan"
+    },
+    "send_feedback_menuItem_audio_video_out_of_sync": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Audio y Video no están sincronizados"
+    },
+    "send_feedback_menuItem_fastforward_rewind_failed": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Falló el Avance Rápido o el Regreso"
+    },
+    "send_feedback_menuItem_caption_selection_not_persisting": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Elección de Subtítulos No Persiste"
+    },
+    "send_feedback_menuItem_captions_out_of_sync": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Subtítulos Desincronizados"
+    },
+    "send_feedback_menuItem_audio_not_working": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Audio No Funciona"
+    },
+    "send_feedback_menuItem_video_freeze": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Congelación de Video"
+    },
+    "send_feedback_menuItem_video_does_not_play": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Video No Reproduce"
     },
     "consent_screen_heading": {
       "description": "Consent screen heading.",
@@ -4540,6 +4624,10 @@ Function getTranslation_fr_CA()
       "description": "Description of message to let users know that they must be signed in to change the AutoplayPreview choice.",
       "message": "Vous devez être connecté(e) pour modifier les préférences de lecture automatique."
     },
+    "screenSettings_error_signInAutoplayControls_description": {
+      "description": "Description of message to let users know that they must be signed in to change the AutoplayPreview choice.",
+      "message": "Vous devez être connecté pour modifier les préférences de lecture automatique."
+    },
     "screenCategories_error_retrieve_message": {
       "description": "Onscreen message to indicate categories content could not be gathered",
       "message": "Impossible de récupérer le contenu des catégories."
@@ -5314,6 +5402,86 @@ Function getTranslation_fr_CA()
       "description": "Available closed caption tracks section header label.",
       "message": "Sous-titres"
     },
+    "thank_you_title": {
+      "description": "title on the qr code overlay after submitting the video playback feedback.",
+      "message": "Merci!"
+    },
+    "send_feedback_submitted_description": {
+      "description": "description on the qr code overlay after submitting the video playback feedback.",
+      "message": "Votre problème a été soumis. Base de vos commentaires, nous améliorerons votre expérience."
+    },
+    "send_feedback_overlay_feedback_hint": {
+      "description": "Description on the qr code overlay to share more feedback using the link or qr code ",
+      "message": "Partagez-en plus avec nous, scannez le code QR ci-dessous avec votre mobile ou visitez tubitv.com/static/support"
+    },
+    "send_feedback_overlay_title": {
+      "description": "Send feed back overlay title label.",
+      "message": "Envoyer des commentaires"
+    },
+    "send_feedback_overlay_subtitle": {
+      "description": "Send feed back overlay subTitle label.",
+      "message": "Lecture vidéo"
+    },
+    "send_feedback_menuItem_start_from_beginning_after_ads": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Commencez Par Le Début Après Annonces"
+    },
+    "send_feedback_menuItem_stuck_in_ads": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Coincé dans Ads"
+    },
+    "send_feedback_menuItem_freezing_after_ads": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Gel Après les Ads"
+    },
+    "send_feedback_menuItem_seeing_a_black_screen": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Voir Un Écran Noir"
+    },
+    "send_feedback_menuItem_buffering_before_video": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Buffering Avant le Début de Vidéo"
+    },
+    "send_feedback_menuItem_buffering_during_video": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Buffering Pendant Vidéo"
+    },
+    "send_feedback_menuItem_buffering_after_ads": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Buffering Après les Ads"
+    },
+    "send_feedback_menuItem_captions_not_working": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Sous-Titres Fonctionnent Pas"
+    },
+    "send_feedback_menuItem_audio_video_out_of_sync": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "L'audio et vidéo ne sont synchronisés"
+    },
+    "send_feedback_menuItem_fastforward_rewind_failed": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Avance ou retour échoué"
+    },
+    "send_feedback_menuItem_caption_selection_not_persisting": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "La Sélection De Légende Ne Persiste Pas"
+    },
+    "send_feedback_menuItem_captions_out_of_sync": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Sous-Titres désynchronisées"
+    },
+    "send_feedback_menuItem_audio_not_working": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "L'Audio Fonctionne Pas"
+    },
+    "send_feedback_menuItem_video_freeze": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Gel Vidéo"
+    },
+    "send_feedback_menuItem_video_does_not_play": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Vidéo ne joue pas"
+    },
     "consent_screen_heading": {
       "description": "Consent screen heading.",
       "message": "Votre Vie Privée"
@@ -5664,6 +5832,22 @@ Function getTranslation_en_GB()
     "goBack_videoPlayer_ad": {
       "description": "Navigational instructions to users when pause Ad is displayed on video screen",
       "message": "Press any button to close the advert"
+    },
+    "send_feedback_menuItem_start_from_beginning_after_ads": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Start From Beginning After Adverts"
+    },
+    "send_feedback_menuItem_stuck_in_ads": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Stuck in Adverts"
+    },
+    "send_feedback_menuItem_freezing_after_ads": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Freezing After Adverts"
+    },
+    "send_feedback_menuItem_buffering_after_ads": {
+      "description": "Title of one of the menu item in the send feedback menu.",
+      "message": "Buffering After Adverts"
     },
     "sign_in_error_screen__default_subheading": {
       "description": "Sign in error screen heading default error",
