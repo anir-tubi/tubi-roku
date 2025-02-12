@@ -1173,7 +1173,6 @@ Function getConstants()
       constants.ui.screenLevels.videoPlayerScreen = 60
       constants.ui.screenLevels.adPlayerScreen = 60
       constants.ui.screenLevels.linearVideoPlayerScreen = 60
-      constants.ui.screenLevels.foxVideoPlayerWrapperScreen = 60
       constants.ui.screenLevels.signInSignUpErrorScreen = 60
       constants.ui.screenLevels.emailInputScreen = 90
       constants.ui.screenLevels.signInScreen = 90
@@ -1209,7 +1208,6 @@ Function getConstants()
       constants.ui.screenIds.managePreferencesScreen = "managePreferencesScreen"
       constants.ui.screenIds.rokuContinueWatchingConsentScreen = "rokuContinueWatchingConsentScreen"
       constants.ui.screenIds.eventDetailScreen = "eventDetailScreen"
-      constants.ui.screenIds.foxVideoPlayerWrapperScreen = "FoxVideoPlayerWrapperScreen"
 
     ' notAllowedContainerIds are the containers which are not allowed to be displayed on category screen,
     ' because currently we support only portrait style in category detail screen

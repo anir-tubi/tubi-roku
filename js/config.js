@@ -96,7 +96,6 @@ function load(options) {
     versionMinorUnderscored: formatBuildTag(build, 'minor'),
     versionMinorDotted: formatBuildTag(build, 'minor', '.'),
     oneTrustVersionUnderscored: formatOneTrustBuildTag(build['one_trust_library_manifest']),
-    foxVideoPlayerVersionUnderscored: formatFoxVideoPlayerBuildTag(build['fox_video_player_library_manifest']),
     remoteComponentLibProvided: `TubiRemoteLib-${build.component_library_manifest.build_version}`,
     fileType: overWrittenDataPre.settings.remoteComponentsExtension,
     bsConst: getBsConstsFromSettings(overWrittenDataPre.settings),
@@ -182,22 +181,10 @@ function formatOneTrustBuildTag(buildConfig) {
   return `${buildConfig.major_version}_${buildConfig.minor_version}_${buildConfig.build_version}`;
 }
 
-
-function getFoxVideoPlayerBuildTag(options) {
-  const buildConfig = load(options)['fox_video_player_library_manifest'];
-  return formatFoxVideoPlayerBuildTag(buildConfig);
-}
-
-
-function formatFoxVideoPlayerBuildTag(buildConfig) {
-  return `${buildConfig.major_version}_${buildConfig.minor_version}_${buildConfig.build_version}`;
-}
-
 module.exports = {
   load,
   incrementBuildNumber,
   incrementRevisionNumber,
   getBuildTag,
-  getOneTrustBuildTag,
-  getFoxVideoPlayerBuildTag
+  getOneTrustBuildTag
 };

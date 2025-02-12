@@ -18,117 +18,110 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
 
     stopVideoPreview()
 
-    if isNonEmptyString(content.playerType) = true AND content.playerType = "fox"
-      if bMinimized = false then
-        ' We only load when fullscreen
-        playLinearVideoWithFoxPlayer(content)
+    ' we make changes to the content from this point forward. If we don't clone, those changes will initialize
+    ' a variety of unexpected and unwanted callbacks, as the passed in content potentially exists on a number
+    ' of fields that are being observed (for instance: HomeScreen.contentFocused)
+    clonedContent = content.clone(true)
+    if clonedContent.needsLogin = true AND isLoggedInUser() = false 'Check for user signed In status because we do not refetch the content and so it will not pass through metadata translate process.
+      if bMinimized = false
+        callbackAfterSignInParams = {"content": content, "bMinimized": false, "sAssociatedScreenID": clonedContent.associatedScreenID, "bAllowTransportToAppear": bAllowTransportToAppear, "playbackSource": playbackSource}
+        startSignIn(afterSignInPlayLockedLinearContent, callbackAfterSignInParams)
       end if
-    else
-      ' we make changes to the content from this point forward. If we don't clone, those changes will initialize
-      ' a variety of unexpected and unwanted callbacks, as the passed in content potentially exists on a number
-      ' of fields that are being observed (for instance: HomeScreen.contentFocused)
-      clonedContent = content.clone(true)
-      if clonedContent.needsLogin = true AND isLoggedInUser() = false 'Check for user signed In status because we do not refetch the content and so it will not pass through metadata translate process.
-        if bMinimized = false
-          callbackAfterSignInParams = {"content": content, "bMinimized": false, "sAssociatedScreenID": clonedContent.associatedScreenID, "bAllowTransportToAppear": bAllowTransportToAppear, "playbackSource": playbackSource}
-          startSignIn(afterSignInPlayLockedLinearContent, callbackAfterSignInParams)
+    else 'Content is not locked so just play the content
+      ' Limit to devices with 512Mb RAM as those are the most likely to crash from exceeding the memory limit during playback.
+      if m.constants.deviceInfo.lowVram = true
+        updateScreenCacheOnPlayback(m.constants.ui.screenIds.linearVideoPlayerScreen)
+      end if
+      videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
+
+      if videoPlayer = invalid
+        videoPlayer = CreateObject("roSGNode", "LinearVideoPlayerScreen")
+        videoPlayer.observeFieldScoped("navigateToEPGScreen", "onLinearVideoPlayerRequestingTVGuide")
+        videoPlayer.id = m.constants.ui.screenIds.linearVideoPlayerScreen
+
+        ' onVideoPlayerVisibleChange exists in ContentController
+        videoPlayer.observeFieldScoped("visible", "onLinearVideoPlayerVisibleFullscreenChange")
+        videoPlayer.observeFieldScoped("fullscreen", "onLinearVideoPlayerVisibleFullscreenChange")
+        videoPlayer.observeFieldScoped("channelSelectedUpdated", "onLinearChannelSelectedFromGuide")
+        videoPlayer.observeFieldScoped("linearOverlayNavigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+        videoPlayer.observeFieldScoped("linearOverlayComponentInteractionInfo", "onComponentInteractionInfoChange")
+        videoPlayer.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+        videoPlayer.observeFieldScoped("trackingLoggingEvent", "onTrackingLoggingEvent")
+
+        observeUpdateAuth(videoPlayer.task)
+
+        initVideoTracking(videoPlayer) 'initializeYoubora. Regular and linear video players share tracking functions, which are found in VideoHelpers
+        setInScreenCache(videoPlayer)
+
+        if getExperimentResource("roku_screensaver", "roku_screensaver_v2", false).enabled = true then
+          videoPlayer.disableScreensaver = true
         end if
-      else 'Content is not locked so just play the content
-        ' Limit to devices with 512Mb RAM as those are the most likely to crash from exceeding the memory limit during playback.
-        if m.constants.deviceInfo.lowVram = true
-          updateScreenCacheOnPlayback(m.constants.ui.screenIds.linearVideoPlayerScreen)
-        end if
-        videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
+      end if
 
-        if videoPlayer = invalid
-          videoPlayer = CreateObject("roSGNode", "LinearVideoPlayerScreen")
-          videoPlayer.observeFieldScoped("navigateToEPGScreen", "onLinearVideoPlayerRequestingTVGuide")
-          videoPlayer.id = m.constants.ui.screenIds.linearVideoPlayerScreen
+      screen = getFromScreenCache(sAssociatedScreenID)
+      if screen <> invalid
+        videoPlayer.trackingPageContext = screen.trackingPageInfo
+      end if
 
-          ' onVideoPlayerVisibleChange exists in ContentController
-          videoPlayer.observeFieldScoped("visible", "onLinearVideoPlayerVisibleFullscreenChange")
-          videoPlayer.observeFieldScoped("fullscreen", "onLinearVideoPlayerVisibleFullscreenChange")
-          videoPlayer.observeFieldScoped("channelSelectedUpdated", "onLinearChannelSelectedFromGuide")
-          videoPlayer.observeFieldScoped("linearOverlayNavigateWithinPageInfo", "onNavigateWithinPageInfoChange")
-          videoPlayer.observeFieldScoped("linearOverlayComponentInteractionInfo", "onComponentInteractionInfoChange")
-          videoPlayer.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
-          videoPlayer.observeFieldScoped("trackingLoggingEvent", "onTrackingLoggingEvent")
+      unobserveAllStateDependentLinearVideoPlayerFields(videoPlayer)
+      videoPlayer.associatedScreenID = sAssociatedScreenID
+      videoPlayer.allowTransportToAppear = bAllowTransportToAppear
+      ' set general observers for all content
+      videoPlayer.observeFieldScoped("sendVideoTrackingStart", "onVideoTrackingStart")
+      if videoPlayer.visible = false
+        videoPlayer.visible = true
+      end if
 
-          observeUpdateAuth(videoPlayer.task)
+      videoPlayer.userConsentsOptOutStatus = getConsentsOptOutStatus()
+      videoPlayer.tcfString = getTCFString()
 
-          initVideoTracking(videoPlayer) 'initializeYoubora. Regular and linear video players share tracking functions, which are found in VideoHelpers
-          setInScreenCache(videoPlayer)
+      ' it's necessary to push the screen after the content has been set on the videoPlayer component,
+      ' so NavigateToPage and PageLoad events contain the necessary content id information
 
-          if getExperimentResource("roku_screensaver", "roku_screensaver_v2", false).enabled = true then
-            videoPlayer.disableScreensaver = true
-          end if
-        end if
+      bLinearPlayerPlayingThisContent = isLinearPlayerPlayingThisContent(clonedContent)
+      if bLinearPlayerPlayingThisContent = false
+        videoPlayer.originalContent = content
 
-        screen = getFromScreenCache(sAssociatedScreenID)
-        if screen <> invalid
-          videoPlayer.trackingPageContext = screen.trackingPageInfo
+        if clonedContent.adParam = invalid
+          clonedContent.addField("adParam", "assocarray", false)
         end if
 
-        unobserveAllStateDependentLinearVideoPlayerFields(videoPlayer)
-        videoPlayer.associatedScreenID = sAssociatedScreenID
-        videoPlayer.allowTransportToAppear = bAllowTransportToAppear
-        ' set general observers for all content
-        videoPlayer.observeFieldScoped("sendVideoTrackingStart", "onVideoTrackingStart")
-        if videoPlayer.visible = false
-          videoPlayer.visible = true
-        end if
+        clonedContent.adParam = playbackSource
+        videoPlayer.content = clonedContent
+        videoPlayer.updateContent = true
+      end if
 
-        videoPlayer.userConsentsOptOutStatus = getConsentsOptOutStatus()
-        videoPlayer.tcfString = getTCFString()
+      if bMinimized = false
+        maximizeLinearPlayer(clonedContent)
+      else
+        '//play at minimized state
+        showHideLinearVideoPlayerSpinner(true)
+        videoPlayer.loading = true
+        animateLinearVideoPlayerToMinState(0, false)
+      end if
 
-        ' it's necessary to push the screen after the content has been set on the videoPlayer component,
-        ' so NavigateToPage and PageLoad events contain the necessary content id information
+      if bLinearPlayerPlayingThisContent = false
+        ' In order to prepare the linear stream, a number of actions need to be taken
+        ' 1) add the rainmaker parameters to the stream url - YoSpace will make calls to rainmaker in order to
+        '    to stitch the ads and needs the rainmaker parameters to make the rainmaker requests
+        ' 2) fetch the response from the hls manifest and parse out the YoSpace "analytics url" which is the url
+        '    that will be used to poll for ads
+        ' 3) compose the final stream url from the "analytics url" and the original stream url found in the
+        '    matrix/homescreen response
+        ' 4) pass the content with the updated stream url to the linear video player
 
-        bLinearPlayerPlayingThisContent = isLinearPlayerPlayingThisContent(clonedContent)
-        if bLinearPlayerPlayingThisContent = false
-          videoPlayer.originalContent = content
+        ' add ad params to video urls
+        updatedVideoResources = getUpdatedLinearVideoResources(clonedContent)
+        clonedContent.videoResources = updatedVideoResources
 
-          if clonedContent.adParam = invalid
-            clonedContent.addField("adParam", "assocarray", false)
-          end if
-
-          clonedContent.adParam = playbackSource
+        streamUrl = getLiveUrlFromResources(clonedContent)
+        if streamUrl <> invalid
+          ' store the content on videoPlayer so it can be retrieved after the manifest is fetched
           videoPlayer.content = clonedContent
-          videoPlayer.updateContent = true
-        end if
-
-        if bMinimized = false
-          maximizeLinearPlayer(clonedContent)
+          getLiveStreamManifest(streamUrl)
         else
-          '//play at minimized state
-          showHideLinearVideoPlayerSpinner(true)
-          videoPlayer.loading = true
-          animateLinearVideoPlayerToMinState(0, false)
-        end if
-
-        if bLinearPlayerPlayingThisContent = false
-          ' In order to prepare the linear stream, a number of actions need to be taken
-          ' 1) add the rainmaker parameters to the stream url - YoSpace will make calls to rainmaker in order to
-          '    to stitch the ads and needs the rainmaker parameters to make the rainmaker requests
-          ' 2) fetch the response from the hls manifest and parse out the YoSpace "analytics url" which is the url
-          '    that will be used to poll for ads
-          ' 3) compose the final stream url from the "analytics url" and the original stream url found in the
-          '    matrix/homescreen response
-          ' 4) pass the content with the updated stream url to the linear video player
-
-          ' add ad params to video urls
-          updatedVideoResources = getUpdatedLinearVideoResources(clonedContent)
-          clonedContent.videoResources = updatedVideoResources
-
-          streamUrl = getLiveUrlFromResources(clonedContent)
-          if streamUrl <> invalid
-            ' store the content on videoPlayer so it can be retrieved after the manifest is fetched
-            videoPlayer.content = clonedContent
-            getLiveStreamManifest(streamUrl)
-          else
-            ' no stream url so show an error
-            reactToLinearVideoPlayerErrorState()
-          end if
+          ' no stream url so show an error
+          reactToLinearVideoPlayerErrorState()
         end if
       end if
     end if

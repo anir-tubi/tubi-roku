@@ -2,5 +2,3 @@ settings:
   # Settings are added to constants.settings via getSettings
   # Any constants that need to be templatized should be added via settings
   mode: "production"
-
-  foxVideoPlayerComponentsUrl: "pkg:/fox-video-player-components/fox_video_player_{{foxVideoPlayerVersionUnderscored}}.pkg"

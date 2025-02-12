@@ -123,9 +123,6 @@ Function processHomeScreenBatchResponse(response, screenId)
     containerRow = m.nodeHelpers.getChildById(response, m.constants.ui.categoryIds.purpleCarpet)
     if containerRow <> invalid
       m.purpleCarpetContainerContentNode = containerRow.clone(true)
-      if m.isFoxPlayerLoadRequired = true then
-        loadFoxVideoPlayerComponentLibrary()
-      end if
 
       response.removeChild(containerRow)
       context = {

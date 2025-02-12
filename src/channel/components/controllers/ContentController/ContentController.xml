@@ -25,7 +25,6 @@
   <script type="text/brightscript" uri="SignInHelpers.brs" />
   <script type="text/brightscript" uri="ScreenStackHelpers.brs" />
   <script type="text/brightscript" uri="LinearVideoPlayerScreenHelpers.brs" />
-  <script type="text/brightscript" uri="FoxVideoPlayerWrapperScreenHelpers.brs" />
   <script type="text/brightscript" uri="AgeVerificationScreenHelpers.brs" />
   <script type="text/brightscript" uri="DeeplinkHelpers.brs" />
   <script type="text/brightscript" uri="VideoPreviewHelpers.brs" />

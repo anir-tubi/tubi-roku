@@ -294,29 +294,11 @@ Function addControllerUi()
   m.sendImpressionEventTimer.duration = 10
   m.sendImpressionEventTimer.observeFieldScoped("fire", "sendImpressionEvent")
 
-  ' Used to know if we need to load the fox video player component library at the appropriate time.
-  m.isFoxPlayerLoadRequired = true
-
-  ' Stores a reference to the fox provided video player interface node
-  m.foxRpfInstance = invalid
-
-  ' The position we last sent fox player progress from
-  m.lastSentFoxPlayerProgressPosition = 0
-
-  ' The content id that is currently being played with the fox video player stored as an integer or invalid if no content is being played
-  m.foxPlayerCurrentContentId = invalid
-
-  ' We delay closing the fox video player when the end slate appears so we need to use store the timer for this on m to keep it alive
-  m.foxPlayerEndSlateCloseDelayTimer = invalid
-
   ' Content node for a single purple carpet event. This is used in case of purple carpet event deeplinking and purple carpet banner click.
   m.singlePurpleCarpetEventContentNode = invalid
 
   ' Callback triggered once the event details was completely loaded. This is used in case of purple carpet event deeplinking and purple carpet banner click.
   m.eventDetailsScreenLoadCompletionCallback = invalid
-
-  ' Holds the fox listing api response.
-  m.foxListingEndpointResponse = invalid
 
   ' Storing the callback in m scope since we cannot pass down a method in response context.
   ' This variable will hold the callback method which will be triggered upon completion of listing api call and
@@ -1137,7 +1119,7 @@ Function onReloadUserCategoriesResponse(handledRequest)
     categoryListScreen.reloadUserCategoriesResponse = handledRequest
   end if
 
-End Function  
+End Function
 
 
 ' @queueIds: roSGNode, a parent node with children nodes. Each child node representing an item in the user's queue.
@@ -2020,8 +2002,6 @@ Function onCustomSuspend(msg)
     if oneTrustViews <> invalid
       m.NodeHelpers.removeAllChildren(oneTrustViews)
     end if
-
-    closeFoxVideoPlayer()
 
     ' When resuming from suspending the app, Roku force restores the currFocus row back to the state that existed at the time of suspending the app.
     ' This force restore happens after we set the focus appropriately using jumpToItem which rendering our jumpToItem action useless.
