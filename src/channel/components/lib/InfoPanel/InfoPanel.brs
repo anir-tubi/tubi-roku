@@ -85,8 +85,6 @@ Function init()
   m.rating.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.closedCaptions.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.audioDescriptionPoster.observeFieldScoped("loadStatus", "onPosterLoadStatus")
-  m.top.observeFieldScoped("airDateTime", "onAirDateChange")
-  m.top.observeFieldScoped("timerShouldRun", "onTimerShouldRun")
 
   m.reminderTitle.text = getTranslation("info_panel_reminder_is_set")
   m.uhdAvailableBadge.text = getTranslation("info_panel_available_in_4k")
@@ -138,9 +136,6 @@ Function init()
 
   DirectorRect.width = nMatchDirectorWidth + spacerWidth
   StarringRect.width = nMatchStarringWidth + spacerWidth
-
-  ' Holds the instance of AirDateCountDown component which will be used to display a timer based on event air date.
-  m.airDateCountdown = m.top.findNode("airDateCountdown")
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -897,27 +892,6 @@ Function onCalculateHeight()
 End Function
 
 
-Function onAirDateChange(msg)
-  data = msg.getData()
-
-  currentDatetime = CreateObject("roDateTime")
-  airDatetime = CreateObject("roDateTime")
-  airDatetime.FromISO8601String(data)
-  index = m.nodeHelpers.getChildIndex(m.offset, m.airDateCountdown)
-  ' Checking if the current time is not greater than air date.
-  if airDatetime.asSeconds() > currentDatetime.asSeconds()
-    if index = -1
-      ' Finding the index of topheader and placing the airdatecountdown below the topheader.
-      topHeaderIndex = m.nodeHelpers.getChildIndex(m.offset, m.topHeaderGroup)
-      m.offset.insertChild(m.airDateCountdown, topHeaderIndex + 1)
-    end if
-    m.airDateCountdown.airDateTime = data
-  else if index >= 0
-    m.offset.removeChild(m.airDateCountdown)
-  end if
-End Function
-
-
 Function resetDefaultState()
   infoPanelGroupChildrenCount = m.infoPanelGroup.getChildCount()
   m.infoPanelGroup.removeChildrenIndex(infoPanelGroupChildrenCount, 0)
@@ -1137,34 +1111,6 @@ Function onModeChange()
     m.offset.appendChild(m.descriptionGroup)
 
     m.offset.itemSpacings = [13, 16, 13]
-  else if m.top.mode = m.constants.ui.infoPanelModes.purpleCarpetEvent
-    m.infoPanelGroup.appendChild(m.offset)
-    m.offset.appendChild(m.topHeaderGroup)
-    m.offset.appendChild(m.title)
-    m.offset.appendChild(m.twoLineInfo)
-    m.offset.appendChild(m.descriptionGroup)
-
-    m.twoLineInfo.appendChild(m.firstLineGroup)
-    m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
-    m.firstLineGroup.appendChild(m.line1Bold)
-    m.firstLineGroup.appendChild(m.closedCaptionPoster)
-    m.firstLineGroup.appendChild(m.audioDescriptionPoster)
-
-    m.offset.itemSpacings = [15]
-  else if m.top.mode = m.constants.ui.infoPanelModes.purpleCarpetBanner
-    ' used for movies and series on the homescreen and similar screens
-    m.infoPanelGroup.appendChild(m.offset)
-    m.offset.appendChild(m.title)
-    m.offset.appendChild(m.twoLineInfo)
-    m.offset.appendChild(m.descriptionGroup)
-
-    m.twoLineInfo.appendChild(m.firstLineGroup)
-    m.firstLineGroup.appendChild(m.line1)
-    m.firstLineGroup.appendChild(m.closedCaptionPoster)
-    m.twoLineInfo.appendChild(m.secondLineGroup)
-    m.secondLineGroup.appendChild(m.line2)
-
-    m.offset.itemSpacings = [13]
   end if
 End Function
 
@@ -1239,15 +1185,6 @@ Function formatBadge(text, badgeComponent)
   end if
 
   badgeComponent.text = UCase(text)
-End Function
-
-
-Function onTimerShouldRun(msg)
-  isContainerVisible = msg.getData()
-  ' Passing down the information related to if the info panel is visible to user or is hidden.
-  if m.airDateCountdown <> invalid
-    m.airDateCountdown.timerShouldRun = (isContainerVisible = true)
-  end if
 End Function
 
 

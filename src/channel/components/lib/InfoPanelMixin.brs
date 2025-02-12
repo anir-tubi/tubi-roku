@@ -117,60 +117,6 @@ Function populateInfoPanelWithHomescreenStyleSportsMode(content, infoPanel)
 End Function
 
 
-' Populates the info panel with the fields necessary for the "sportsEvent" mode so that it looks
-' like the info panel on the homescreen
-'
-' @content: TubiContentNode, containing a sports event
-' @infoPanel: InfoPanel node
-' @isEventDetailsScreen: true or false based on if we are displaying info panel in home or event details screen.
-'
-' @sideEffects: updates fields on the passed in infoPanel node
-Function populateInfoPanelWithPurpleCarpetMode(content, infoPanel, isEventDetailsScreen = false)
-  infoPanel.title = content.title
-
-  hasVideoresources = content.hasVideoresources
-  airDatetime = content.airDatetime
-  info = getAvailabilityTypeBadgeAndMatchTimeValues(airDatetime, hasVideoresources)
-  availabilityType = info.availabilityType
-
-  lineOneData = {}
-  lineOneData.genres = content.genres
-  lineOneData.hasCC = content.hasSubtitles
-  lineOneData.hasAudioDescription = content.hasAudioDescription
-  lineOneData.length = content.length
-
-  lineOneData.has4k = (content.resolution = "2160")
-
-  lineTwoData = {}
-  infoPanel.mode = m.constants.ui.infoPanelModes.purpleCarpetEvent
-  lineOneData.roundGroupInfo = content.roundGroupInfo
-
-  infoPanel.lineOneData = lineOneData
-  infoPanel.lineTwoData = lineTwoData
-
-  infoPanel.reminderIsSet = (isEventDetailsScreen = false AND availabilityType = m.constants.ui.contentTimings.upcoming AND getBookmark(content.id) <> invalid)
-
-  infoPanel.description = content.description
-  if content.titleImageUrl <> invalid
-    infoPanel.titleImageUri = content.titleImageUrl
-  else
-    infoPanel.titleImageUri = ""
-  end if
-
-  isEventLive = (isGreaterThanCurrentTime(content.airDateTime) = false)
-
-  if isEventLive = true
-    infoPanel.liveBadgeHeaderText = getTranslation("screenSearch_liveText")
-    infoPanel.airDateTime = ""
-  else
-    infoPanel.liveBadgeHeaderText = ""
-    infoPanel.airDateTime = content.airDateTime
-  end if
-
-  infoPanel.width = 960
-End Function
-
-
 ' Populates the info panel with the fields necessary for the Linear programs in homeScreen(linear content on non-linear category) mode so that it looks
 ' like the info panel on the homescreen
 '
@@ -281,45 +227,6 @@ Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel)
   else
     infoPanel.needsLogin = false
   end if
-
-  infoPanel.width = 960
-End Function
-
-
-' Populates the info panel with the fields necessary for the "sportsEvent" mode so that it looks
-' like the info panel on the homescreen
-'
-' @content: TubiContentNode, containing a sports event
-' @infoPanel: InfoPanel node
-'
-' @sideEffects: updates fields on the passed in infoPanel node
-Function populateInfoPanelWithPurpleCarpetBannerMode(content, infoPanel)
-  infoPanel.title = content.title
-
-  lineOneData = {}
-  lineOneData.genres = content.genres
-  lineOneData.hasCC = content.hasSubtitles
-
-  lineOneData.has4k = (content.resolution = "2160")
-
-  lineTwoData = {}
-  infoPanel.mode = m.constants.ui.infoPanelModes.purpleCarpetBanner
-  lineOneData.roundGroupInfo = content.roundGroupInfo
-
-  infoPanel.lineOneData = lineOneData
-  infoPanel.lineTwoData = lineTwoData
-
-  infoPanel.description = content.description
-
-  hasVideoresources = content.hasVideoresources
-  airDatetime = content.airDatetime
-  info = getAvailabilityTypeBadgeAndMatchTimeValues(airDatetime, hasVideoresources)
-  availabilityType = info.availabilityType
-
-
-  infoPanel.reminderIsSet = (availabilityType = m.constants.ui.contentTimings.upcoming AND getBookmark(content.id) <> invalid)
-
-  infoPanel.airDateTime = content.airDateTime
 
   infoPanel.width = 960
 End Function

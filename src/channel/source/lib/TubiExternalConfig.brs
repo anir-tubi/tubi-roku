@@ -27,10 +27,6 @@ Function tubiExternalConfig_getConfigsRequestInfo()
   options.headers.append(constants.headers.commonUapi)
   options.headers.append(constants.headers.tubiPlatform)
 
-  if m.constants.settings.enableFailSafe = true
-    options.headers.append(constants.headers.triggerFailSafe)
-  end if
-
   return {
     url: constants.urls.configHub.config
     requestType: constants.reqNames.getExternalConfigs

@@ -344,9 +344,7 @@ End Function
 Function onMyStuffContentSelected(msg)
   tubiLog("MyStuffScreenHelpers.onMyStuffContentSelected")
   content = msg.getData()
-  if content.type = m.constants.ui.contentTypes.purpleCarpetEvent
-    processPlayEvent(content, getCurrentScreen())
-  else if content.type <> m.constants.ui.contentTypes.emptyContainer
+  if content.type <> m.constants.ui.contentTypes.emptyContainer
     '//NOTE: If the content type is empty, then it is most likely the user has no items in a myList row  (i.e. continue watching, myList)
     ' and the user attempted to click on an empty row.
     ' Nothing should happen.

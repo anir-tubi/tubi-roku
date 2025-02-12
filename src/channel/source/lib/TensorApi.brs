@@ -27,10 +27,6 @@ Function tensorApi_commonOptions()
     headers["X-TUBI-RATING"] = m.constants.serverValues.parentalControls[m.pubServerPersistentData.parentalRating]
   end if
   headers.append(m.constants.headers.tubiPlatform)
-  
-  if m.constants.settings.enableFailSafe = true
-    headers.append(m.constants.headers.triggerFailSafe)
-  end if
 
   options = {
     params: {

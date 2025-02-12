@@ -36,8 +36,6 @@ Function onSearchContentSelected(msg)
       "srcForAds":m.constants.player.playbackOrigin.search
     }
     playLinearVideoContent(selectedContent, false, searchScreen.id, false, playbackSource)
-  else if selectedContent <> invalid AND selectedContent.playerType = "fox"
-    processPlayEvent(selectedContent, searchScreen)
   else
     playbackSource = {
       "srcForAnalytic": m.constants.player.playbackSource.unknown
@@ -60,8 +58,6 @@ Function onSearchContentToPlay(msg)
 
   if content <> invalid AND content.type = m.constants.ui.contentTypes.linear
     playLinearVideoContent(content, false, searchScreen.id, false, playbackSource)
-  else if content <> invalid AND content.playerType = "fox"
-    processPlayEvent(content, searchScreen)
   else
     showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource)
   end if

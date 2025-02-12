@@ -41,10 +41,6 @@
       <field id="skinAdContent" type="node" alias="skinAdRow.content" />
 
       <field id="skinAdContentUpdated" alias="skinAdRow.contentUpdated" />
-      <!-- Purple carpet content node, will be populated if we receive purple carpet container from home screen response. -->
-      <field id="purpleCarpetContent" type="node" alias="purpleCarpetRow.content" />
-
-      <field id="purpleCarpetContentUpdated" alias="purpleCarpetRow.contentUpdated" />
 
       <!-- contentUpdated will be set when the new content is ready to be displayed on the screen. -->
       <field id="contentUpdated" type="boolean" alwaysNotify="true"/>
@@ -121,8 +117,6 @@
       <!-- Will be set to true if we want to reset the grid position back to [0,0] -->
       <field id="resetGridPosition" type="boolean" />
 
-      <field id="didUserSetReminderForEventContent" alias="purpleCarpetRow.didUserSetReminderForEventContent" />
-
     <!-- OUTPUT -->
       <field id="itemSelected" type="node"/>
 
@@ -160,10 +154,6 @@
 
       <field id="loadCategoriesIndex" type="integer" alwaysNotify="true" />
 
-      <field id="eventCtaListItemSelected" alias="purpleCarpetRow.ctaListItemSelected" alwaysNotify="true" />
-
-      <field id="primaryEventContent" alias="purpleCarpetRow.primaryEventContent" />
-
       <field id="rowlistTranslation" alias="RowList.translation" />
 
       <!-- content on the home screen is loaded and spinner can be turned off -->
@@ -176,9 +166,6 @@
       id="skinAdRow"
       opacity="0"
       translation="[0,-12]" />
-    <PurpleCarpetRow
-      opacity="0"
-      id="purpleCarpetRow" />
     <RowList
       id="RowList"
       itemComponentName="StarterGridItem"

@@ -102,12 +102,6 @@
     <field id="ratingVisible" alias="Rating.visible"/>
     <field id="airDateTime" type="string" />
 
-    <!-- will be set to true or false to indicate if the info panel and parent container that holds the info panel is visible to user or not.
-      Below field is currently only used by AirDateCountdown component When this field is set to true we will start the timer to update the AirDateCountdown or if false we will stop the timer so that
-      we do not perform any background updates.
-    -->
-    <field id="isContainerVisible" type="boolean" />
-
     <field id="vertAlignment" alias="infoPanelGroup.vertAlignment"/>
 
     <field id="maxDescriptionLines" alias="Description.maxLines" />
@@ -141,8 +135,6 @@
         layoutDirection="vert"
         horizAlignment="custom"
         translation="[0,0]">
-
-        <AirDateCountdown id="airDateCountdown" />
 
         <LayoutGroup
           id="topHeaderGroup"

@@ -58,11 +58,7 @@ Function onItemContentChange(msg)
     
     childGridItemComponent = invalid
     row = itemContent.getParent()
-    if gridItemType = "purpleCarpet"
-      childGridItemComponent = "PurpleCarpetPoster"
-    else if gridItemType = "banner"
-      childGridItemComponent = "Banner"
-    else if gridItemType = "emptyContainer" then
+    if gridItemType = "emptyContainer" then
       childGridItemComponent = "CategoryGridPoster"
     else if gridItemType = "landscapeInnerMetadata" then
       childGridItemComponent = "CategoryGridPoster"

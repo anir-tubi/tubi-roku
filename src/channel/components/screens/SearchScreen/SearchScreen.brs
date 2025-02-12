@@ -524,10 +524,6 @@ Function onItemFocused(msg)
         m.searchScreenInfoPanel.needsLogin = false
       end if
 
-    else if focusedContent.type = m.constants.ui.contentTypes.purpleCarpetEvent
-
-      populateInfoPanelWithPurpleCarpetBannerMode(focusedContent, m.searchScreenInfoPanel)
-
     else
       m.searchScreenInfoPanel.mode = m.constants.ui.infoPanelModes.item
       lineOneData = {
@@ -560,10 +556,8 @@ Function onItemFocused(msg)
       end if
     end if
 
-    if focusedContent.type <> m.constants.ui.contentTypes.purpleCarpetEvent
-      m.searchScreenInfoPanel.lineOneData = lineOneData
-      m.searchScreenInfoPanel.lineTwoData = lineTwoData
-    end if
+    m.searchScreenInfoPanel.lineOneData = lineOneData
+    m.searchScreenInfoPanel.lineTwoData = lineTwoData
     m.searchScreenInfoPanel.calculateHeight = true
 
     ' Set up the info that the ContentController uses to send navigate_within_page events.

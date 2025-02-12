@@ -104,8 +104,7 @@ Function onVideoPreviewStateChanged(msg)
         isReplay = true
       end if
 
-      isPurpleCarpetContent = (item <> invalid AND item.type = m.constants.ui.contentTypes.purpleCarpetEvent)
-      isFullPlayerBlockedForUser = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR ( item <> invalid AND item.needsLogin = true AND isloggedInUser() = false) OR (isPurpleCarpetContent = true)
+      isFullPlayerBlockedForUser = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR ( item <> invalid AND item.needsLogin = true AND isloggedInUser() = false)
 
       if isReplay = true
         '//Loop the video in this case
@@ -161,18 +160,18 @@ Function startVideoPreview(content, pageInfo = {})
     videoPreview = m.videoPreviewPlayer
 
     ' If the experiment is enabled and focused content is from featured row than expand preview to full screen.
-    if content.gridItemType = m.constants.ui.gridItemTypes.purpleCarpet OR content.gridItemType = m.constants.ui.gridItemTypes.skinAd
+    if content.gridItemType = m.constants.ui.gridItemTypes.skinAd
       ' Reducing 1px from both width and height since the player is in background and keeping full width causes roku to display closed captioning overlay.
-      ' To avoid any other Roku OS level default behaivour from kicking in reducing 1px to give a impression that player is not in full screen.
+      ' To avoid any other Roku OS level default behavior from kicking in reducing 1px to give a impression that player is not in full screen.
       updatePreviewPlayerToFullScreen()
-      videoPreview.unobserveFieldScoped("position")
+      videoPreview.unObserveFieldScoped("position")
       videoPreview.observeFieldScoped("position", "onVideoPreviewPositionChanged")
     else
       updatePreviewPlayerToCondensedView()
     end if
 
-    ' unobserve field just in case previous state was errorsstart observing a fresh status.
-    videoPreview.unobserveFieldScoped("state")
+    ' unObserve field just in case previous state was errorsstart observing a fresh status.
+    videoPreview.unObserveFieldScoped("state")
     videoPreview.observeFieldScoped("state", "onVideoPreviewStateChanged")
     setPageInfoForVideoPreview(pageInfo)
 
@@ -245,8 +244,6 @@ Function setVideoPreviewAfterFocus(focusedContent, pageInfo = {})
             if isCurrentScreenHomeScreen() = true
               updatePreviewPlayerToFullScreen()
             end if
-          else if focusedContent.gridItemType = m.constants.ui.gridItemTypes.purpleCarpet
-            updatePreviewPlayerToFullScreen()
           end if
         end if
         m.backgroundGroup.posterVisible = false

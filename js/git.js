@@ -292,21 +292,6 @@ async function createCdnPullRequestForOneTrustSDK(done, buildTag) {
 }
 
 
-async function createCdnPullRequestForFoxVideoPlayer(done, buildTag, pkgPath) {
-  const filePaths = [{
-    src: pkgPath,
-    dest: `appFiles/fox-video-player-components/${path.basename(pkgPath)}`
-  }];
-
-  const cdnBranchName = `roku_fox_video_player_${buildTag}`;
-  await createCdnPullRequest(done, {
-    cdnBranchName: cdnBranchName,
-    filePaths: filePaths,
-    commitMessage: `Updating the fox video player components for ${cdnBranchName}`
-  });
-}
-
-
 function pushTag(done) {
   const buildTag = getBuildTag('revision');
   log(`...Pushing the ${buildTag} tag to origin (Github)`);
@@ -1083,7 +1068,6 @@ module.exports = {
   bumpRevision,
   tagBuild,
   createCdnPullRequestForOneTrustSDK,
-  createCdnPullRequestForFoxVideoPlayer,
   getCurrentBranch,
   isRemoteTrackingPresent
 };

@@ -119,25 +119,6 @@ End Function
 Function processHomeScreenBatchResponse(response, screenId)
   homeScreen = getFromScreenCache(screenId)
   if homeScreen <> invalid
-
-    containerRow = m.nodeHelpers.getChildById(response, m.constants.ui.categoryIds.purpleCarpet)
-    if containerRow <> invalid
-      m.purpleCarpetContainerContentNode = containerRow.clone(true)
-
-      response.removeChild(containerRow)
-      context = {
-        purpleCarpetContainer: containerRow
-        screenId: screenId
-      }
-
-      ' If the user has navigated away from the homescreen before the container info for the purple carpet has returned,
-      ' avoid making the Fox listing call since a request to the Fox listing API will be made when a user returns to the homescreen.
-      currentScreen = getCurrentScreen()
-      if currentScreen.id = screenId
-        updateContainerWithProgramInfoFromFoxListing(context, refreshPurpleCarpetContainer)
-      end if
-
-    end if
     homeScreen.batchResponse = response
   end if
 End Function
@@ -420,31 +401,6 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     '   </CategoryContentNode>
     ' </CategoryContentNode>
 
-    containerRow = m.nodeHelpers.getChildById(rawResponse, m.constants.ui.categoryIds.purpleCarpet)
-    isPurpleCarpetContainerPresent = (containerRow <> invalid)
-
-    if containerRow <> invalid
-      ' Cloning it so that any modifications does not effect the original tensor response.
-      m.purpleCarpetContainerContentNode = containerRow.clone(true)
-    end if
-
-    if isPurpleCarpetContainerPresent = true
-      rawResponse.removeChild(containerRow)
-      m.foxListingEndpointResponse = invalid
-      context = {
-        purpleCarpetContainer: containerRow
-        screenId: homeScreen.id
-      }
-      updateContainerWithProgramInfoFromFoxListing(context, onHomeScreenContentUpdateComplete)
-    else
-      ' Since this callback is called for all types of home screen modes like shows and movies we should not resetting the m scope value.
-      if screenID = m.constants.ui.screenIds.homeScreen
-        m.purpleCarpetContainerContentNode = invalid
-      end if
-      homeScreen.purpleCarpetContent = invalid
-      homeScreen.purpleCarpetContentUpdated = true
-    end if
-
     ads = rawResponse.ads
     if isKidsUIOn() = false AND ads <> invalid
       updateSkinAdRowContent(homeScreen, ads)
@@ -455,11 +411,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
 
     homeScreen.content = rawResponse
 
-    ' If purple carpet container is not present than we can proceed with showing the home screen or else we need to wait until the filtering of the purple carpet data is completed.
-    ' which includes calling listing api and updated the tensor api data with listing api information to enable playback.
-    if isPurpleCarpetContainerPresent = false
-      onHomeScreenContentUpdateComplete(invalid, homeScreen.id)
-    end if
+    onHomeScreenContentUpdateComplete(homeScreen.id)
 
   end if
 End Function
@@ -825,9 +777,7 @@ Function onContentSelected(msg)
   m.autoplayContext = homeScreen.currCategoryId
 
   contentType = content.type
-  if contentType = m.constants.ui.contentTypes.purpleCarpetEvent
-    processPlayEvent(content, homeScreen)
-  else if contentType = m.constants.uapiContentTypes.channel
+  if contentType = m.constants.uapiContentTypes.channel
     stopVideoPreview()
     showCategoryDetailsScreen(content)
   else if contentType = m.constants.ui.contentTypes.historySignedOutUser
@@ -868,9 +818,7 @@ Function onContentToPlay(msg)
 
   contentType = content.type
   ' Since category panel list screen re-uses the method allowing it to play the content.
-  if contentType = m.constants.ui.contentTypes.purpleCarpetEvent
-    processPlayEvent(content, screen)
-  else if contentType = m.constants.uapiContentTypes.channel
+  if contentType = m.constants.uapiContentTypes.channel
     showCategoryDetailsScreen(content)
   else if contentType = m.constants.ui.contentTypes.historySignedOutUser
     '//if a signed out user selects the continue watching row, then navigate him/her to the sign in screen
@@ -1129,317 +1077,9 @@ Function updateSkinAdRowContent(homeScreen, content)
 End Function
 
 
-' @param content, roSGNode - The CategoryContentNode for the purple carpet row.
-Function updatePurpleCarpetRowContent(homeScreen, content)
-  if isNode(content) = true
-    rowContentNode = CreateObject("roSGNode", "ContentNode")
-    rowContentNode.id = m.constants.ui.categoryIds.purpleCarpet
-    content.update({
-      gridItemType: m.constants.ui.gridItemTypes.purpleCarpet
-    }, true)
-    rowContentNode.appendChild(content)
-
-    ' Since for limited ui we will not have any data in the initial but during lazy load of containers we will obtain all the data.
-    ' So we will proceed with creating a purple carpet container as long as backend returns top level container.
-    if content.getChildCount() > 0
-      primaryContent = content.getChild(0)
-      bookmark = getBookmark(primaryContent.id)
-      homeScreen.didUserSetReminderForEventContent = (bookmark <> invalid)
-    end if
-
-    homeScreen.purpleCarpetContent = rowContentNode
-  else
-    homeScreen.purpleCarpetContent = invalid
-  end if
-  homeScreen.purpleCarpetContentUpdated = true
-End Function
-
-
-Function onEventCtaListItemSelected(msg)
-  id = msg.getData()
-  screen = msg.getRoSGNode()
-  primaryEventContent = screen.primaryEventContent
-  purpleCarpetContent = screen.purpleCarpetContent
-
-  if primaryEventContent <> invalid
-    if id = "signInWatch"
-      startSignIn(startPurpleCarpetPlaybackAfterSignIn)
-    else if id = "details"
-      showEventDetailScreen(primaryEventContent.id, purpleCarpetContent)
-    else if id = "watchLive"
-      processPlayEvent(primaryEventContent, screen, true)
-    else if id = "reminder"
-      if isLoggedInUser() = false
-        startSignIn(setOrRemovePurpleCarpetReminderAfterSignIn)
-      else
-        setOrRemovePurpleCarpetReminder()
-      end if
-    else if id = "availableAt" AND m.wasUserShownPurpleCarpetAvailableAtToast = false
-      airDatetime = CreateObject("roDateTime")
-      airDatetime.FromISO8601String(primaryEventContent.airDateTime)
-      airDatetime.toLocalTime()
-      formattedTime = localizedTimeString(airDatetime)
-      message = getTranslation("available_at_toast_subheading")
-      replacements = {
-        "time": formattedTime
-      }
-      heading = getTranslation("available_at_toast_heading", replacements)
-      showToast({
-        "selfDestructTimer": 5
-        "headerText": heading
-        "message": message
-      })
-
-      m.wasUserShownPurpleCarpetAvailableAtToast = true
-    else if id = "goHome"
-      restartApp()
-    end if
-  end if
-End Function
-
-
-Function setOrRemovePurpleCarpetReminder()
-  screen = getCurrentScreen()
-  if screen <> invalid AND screen.primaryEventContent <> invalid
-    primaryEventContent = screen.primaryEventContent
-    ' Since we are overriding the content type to purple carpet.
-    contentType = m.constants.uapiContentTypes.sportsEvent
-    bookmark = getBookmark(primaryEventContent.id)
-    didUserSetReminderForEventContent = (bookmark <> invalid)
-
-    if didUserSetReminderForEventContent <> true
-      addToQueueReq = m.userDeviceApi.addToQueueReqInfo(primaryEventContent.id, m.constants.ui.contentTypes.sportsEvent, m.constants.userQueueType.remindMe)
-      m.makeRequest({
-        url: addToQueueReq.url
-        requestType: m.constants.reqNames.postToQueue
-        options: addToQueueReq.options
-        successCallback: onSetReminderSuccess
-        silenceCallbackWarnings: true
-        responseType: "assocarray"
-      })
-    else
-      removeFromQueueReq = m.userDeviceApi.removeFromQueueReqInfo(bookmark.bookmarkId, primaryEventContent.id, contentType)
-      m.makeRequest({
-        url: removeFromQueueReq.url
-        requestType: m.constants.reqNames.postToQueue
-        options: removeFromQueueReq.options
-        successCallback: onRemoveReminderSuccess
-        silenceCallbackWarnings: true
-      })
-    end if
-  end if
-End Function
-
-
-Function onSetReminderSuccess(_response)
-  updateReminderStatusOnScreens(true)
-  handleQueueChange()
-End Function
-
-
-Function onRemoveReminderSuccess(_response)
-  updateReminderStatusOnScreens(false)
-  handleQueueChange()
-End Function
-
-
-Function updateReminderStatusOnScreens(status)
-  screen = getCurrentScreen()
-
-  if screen.hasField("didUserSetReminderForEventContent") = true
-    screen.didUserSetReminderForEventContent = status
-  end if
-
-  ' Since we are using the same callback for both details and home. Making sure home screen is also updated with latest value.
-  if isCurrentScreenHomeScreen() = false
-    homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-    if homeScreen <> invalid
-      homeScreen.didUserSetReminderForEventContent = status
-    end if
-  end if
-End Function
-
-
-' Starts playback if the event is live or else navigates to details screen.
-' @event: contentNode, selected event content node.
-' @screen: sgnode, node of the screen from where the item was selected.
-' @wasPlayEventInitiatedFromCtaComponent: boolean, Indicates if the play request was initiated from cta.
-Function processPlayEvent(event, screen, wasPlayEventInitiatedFromCtaComponent = false)
-  currentDatetime = CreateObject("roDateTime")
-  airDatetime = CreateObject("roDateTime")
-  airDatetime.FromISO8601String(event.airDateTime)
-  ' If current time is greater than the air date time that means the program is live and we will start playback if user is signed in.
-  if currentDatetime.asSeconds() >= airDatetime.asSeconds() AND (isLoggedInUser() = true OR event.needsLogin = false OR getExternalConfigValueFromGlobal("bypass_registration_gate", false) = true)
-    stopLinearVideoContent()
-    playbackSource = {
-      "srcForAnalytic": m.constants.player.playbackSource.unknown
-      "srcForAds": m.constants.player.playbackOrigin.container
-      "playbackContainer": m.constants.ui.categoryIds.purpleCarpet
-    }
-    playLinearVideoContent(event, false, screen.id, false, playbackSource)
-  else if wasPlayEventInitiatedFromCtaComponent = false
-    ' Reason behind conditional launching of details screen is because we use this helper across home and deeplinking and both rowlist and primary event button list
-    ' If the user clicks sign in to watch from home CTA or event details CTA we do not want to land the user in details screen but just refresh the current screen UI.
-    ' it will update the button from "signin to watch" to "details"
-    showEventDetailScreen(event.id, screen.purpleCarpetContent, event)
-  end if
-End Function
-
-
-' @responseContext: assocarray, Will contain to 2 values. purpleCarpetContainer - Purple carpet container content node and screenId - id of the screen that initiated the request.
-' @onCompletionCallback: function, callback method that will get triggered once the filtering of purple carpet container data is complete.
-Function updateContainerWithProgramInfoFromFoxListing(responseContext, onCompletionCallback)
-  ' Storing the callback in m scope since we cannot pass down a method in response context.
-  m.onUpdateContainerWithProgramInfoFromFoxListingCompletionCallback = onCompletionCallback
-
-  if m.foxListingEndpointResponse = invalid
-    m.makeRequest({
-      url: m.constants.urls.foxListingEndpoint
-      requestType: m.constants.reqNames.genericWithResponseContext
-      successCallback: getProgramInfoFromFoxListingComplete
-      errorCallback: getProgramInfoFromFoxListingComplete
-      responseType: "assocarray"
-      retries: 0
-      responseContext: responseContext
-    })
-  else
-    purpleCarpetContainer = filterPurpleCarpetContainerItemsBasedOnListing(m.foxListingEndpointResponse, responseContext.purpleCarpetContainer, responseContext.screenId)
-
-    if isFunction(m.onUpdateContainerWithProgramInfoFromFoxListingCompletionCallback) = true
-      m.onUpdateContainerWithProgramInfoFromFoxListingCompletionCallback(purpleCarpetContainer, responseContext.screenId)
-    end if
-
-  end if
-End Function
-
-
-Function getProgramInfoFromFoxListingComplete(response)
-  if response <> invalid  AND response.responseContext <> invalid
-    responseContext = response.responseContext
-
-    purpleCarpetContainer = filterPurpleCarpetContainerItemsBasedOnListing(response.data, responseContext.purpleCarpetContainer, responseContext.screenId)
-
-    if response.data <> invalid
-      m.foxListingEndpointResponse = response.data
-    end if
-
-    ' Note, m.foxListingEndpointResponse must be set before calling the callback as we use m.foxListingEndpointResponse in the callback.
-    if isFunction(m.onUpdateContainerWithProgramInfoFromFoxListingCompletionCallback) = true
-      m.onUpdateContainerWithProgramInfoFromFoxListingCompletionCallback(purpleCarpetContainer, responseContext.screenId)
-    end if
-  end if
-End Function
-
-
-' @listing: array, array of listings items from fox listing api.
-' @purpleCarpetContainer: ContentNode, the purple carpet container node. Node structure will be similar to rowlist content node.
 ' @screenId: string, id of the screen from where the call was made. constants.ui.screenIds.homeScreen or constants.ui.screenIds.eventDetailScreen
-Function filterPurpleCarpetContainerItemsBasedOnListing(listing, purpleCarpetContainer, screenId)
-  if isNonEmptyArray(listing) = true AND isNode(purpleCarpetContainer) = true
-    mappedListings = {}
-
-    ' In case listing api returns multiple listings with same tubi_id, we will follow below logic.
-    ' startTime = Math.min(startDate of all listing items with the corresponding tubiId)
-    ' endTime = Math.max(endDate of all listing items with the corresponding tubiId)
-
-    for each item in listing
-      ' Only using the entry if we have valid tubi id and start and endate.
-      asset = item.asset
-      if asset <> invalid AND asset.listing <> invalid AND asset.listing.tubi_id <> invalid AND asset.listing.startDate <> invalid AND asset.listing.endDate <> invalid
-        if mappedListings[asset.listing.tubi_id] = invalid
-          mappedListings[asset.listing.tubi_id] = {
-            id: item.id
-            startDate: asset.listing.startDate
-            endDate: asset.listing.endDate
-          }
-        else
-          mappedItem = mappedListings[asset.listing.tubi_id]
-
-          ' We are picking the oldest start date.
-          if compareDates(mappedItem.startDate, asset.listing.startDate) = true
-            mappedItem.startDate = asset.listing.startDate
-          end if
-
-          ' We are picking the largest future end date.
-          if compareDates(mappedItem.endDate, asset.listing.endDate) = false
-            mappedItem.endDate = asset.listing.endDate
-          end if
-
-          mappedListings[asset.listing.tubi_id] = mappedItem
-        end if
-      end if
-    end for
-
-    eventList = purpleCarpetContainer.getChildren(-1, 0)
-    filteredEventList = []
-
-    if isNonEmptyArray(eventList) = true
-
-      for each item in eventList
-        processedItem = invalid
-
-        if mappedListings[item.id] <> invalid
-          mappedListingItem = mappedListings[item.id]
-
-          if mappedListingItem <> invalid
-
-            ' Checking the event has not ended.
-            if isGreaterThanCurrentTime(mappedListingItem.endDate) = true
-              processedItem = item
-              processedItem.update({
-                ' Since across the purple carpet component and info panel and rest of the application we are using airDateTime
-                ' overriding the value so that we do not have to pass down the listing data down to every place and we can have one common logic.
-                airDatetime: mappedListingItem.startDate
-
-                ' will be passed to player for playback.
-                foxContentId: mappedListingItem.id
-              }, true)
-
-              ' If the registration by pass is enabled then setting needs login to false.
-              if getExternalConfigValueFromGlobal("bypass_registration_gate", false) = true
-                processedItem.update({
-                  needsLogin: false
-                }, true)
-              end if
-            end if
-
-          end if
-
-        end if
-
-        if processedItem <> invalid
-          filteredEventList.push(processedItem)
-        end if
-      end for
-
-      ' Since before the event we will not have listing api return the actual listing.
-      ' But user might still land on event details screen from banner or deeplink or search screen in which we need to use backend info.
-      ' If we get match for the tensor and listing then we good to proceed or else only removing for home screen.
-      if isNonEmptyArray(filteredEventList) = true
-        m.nodeHelpers.removeAllChildren(purpleCarpetContainer)
-        purpleCarpetContainer.appendChildren(filteredEventList)
-      else if screenId <> m.constants.ui.screenIds.eventDetailScreen
-        m.nodeHelpers.removeAllChildren(purpleCarpetContainer)
-      end if
-    end if
-  else if isNode(purpleCarpetContainer) = true AND screenId <> m.constants.ui.screenIds.eventDetailScreen
-    ' If listing api fails or returns empty response than removing all the items from the container so that it is hidden.
-    m.nodeHelpers.removeAllChildren(purpleCarpetContainer)
-  end if
-
-  return purpleCarpetContainer
-End Function
-
-
-' @purpleCarpetContainer: ContentNode, the purple carpet container node. Node structure will be similar to rowlist content node.
-' @screenId: string, id of the screen from where the call was made. constants.ui.screenIds.homeScreen or constants.ui.screenIds.eventDetailScreen
-Function onHomeScreenContentUpdateComplete(purpleCarpetContainer, screenId)
-  tubiLog("HomeScreenHelpers.onHomeScreenContentUpdateComplete")
+Function onHomeScreenContentUpdateComplete(screenId)
   homeScreen = getFromScreenCache(screenId)
-
-  if purpleCarpetContainer <> invalid
-    updatePurpleCarpetRowContent(homeScreen, purpleCarpetContainer)
-  end if
 
   homeScreen.contentUpdated = true
   '//update the UI after the content has loaded
@@ -1452,29 +1092,4 @@ Function onHomeScreenContentUpdateComplete(purpleCarpetContainer, screenId)
 
   m.sendImpressionEventTimer.control = "stop"
   m.sendImpressionEventTimer.control = "start"
-End Function
-
-
-' @purpleCarpetContainer: ContentNode, the purple carpet container node. Node structure will be similar to rowlist content node.
-' @screenId: string, id of the screen from where the call was made. constants.ui.screenIds.homeScreen or constants.ui.screenIds.eventDetailScreen
-Function refreshPurpleCarpetContainer(purpleCarpetContainer, screenId)
-  screen = getFromScreenCache(screenId)
-  updatePurpleCarpetRowContent(screen, purpleCarpetContainer)
-End Function
-
-
-' @callback: function, callback to be triggered once the purple carpet container data is enriched with data from listing endpoint and games that got ended are removed.
-Function getFoxListingItemsAndRefreshPurpleCarpetContainerData(callback = refreshPurpleCarpetContainer)
-  if isNode(m.purpleCarpetContainerContentNode) = true
-
-    ' Setting invalid to the field forces a re-fetch of the listing API in updateContainerWithProgramInfoFromFoxListing.
-    m.foxListingEndpointResponse = invalid
-
-    contentNode = m.purpleCarpetContainerContentNode.clone(true)
-    context = {
-      purpleCarpetContainer: contentNode
-      screenId: m.constants.ui.screenIds.homeScreen
-    }
-    updateContainerWithProgramInfoFromFoxListing(context, callback)
-  end if
 End Function

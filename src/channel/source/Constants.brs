@@ -20,7 +20,7 @@ Function getConstants()
     constants.registrySectionIDs.proxySettings = "proxySettings"
 
   proxySettings = RegReadAll(constants.registrySectionIDs.proxySettings)
-  if proxySettings <> invalid then
+  if type(proxySettings) = "roAssociativeArray" AND proxySettings.count() > 0 then
     constants.settings.charlesProxyEnabled = (proxySettings.charlesProxyEnabled = "true")
     constants.settings.charlesProxyUrl = proxySettings.charlesProxyUrl
   end if
@@ -637,14 +637,6 @@ Function getConstants()
 
       constants.urls.analytics.singleEvent = constants.urls.analytics.urlBase + "/v2/single-event" 'preferred by back end team
 
-      constants.urls.analytics.purpleCarpetUrlBase = "https://analytics-ingestion-sealion.staging-public.tubi.io/analytics-ingestion"
-      ' QA analytics proxy server
-      if mode = "production"
-        constants.urls.analytics.purpleCarpetUrlBase = "https://analytics-ingestion-sealion.production-public.tubi.io/analytics-ingestion"
-      end if
-
-      constants.urls.analytics.foxPlayerEvent = constants.urls.analytics.purpleCarpetUrlBase + "/v2/single-event" 'preferred by back end team
-
     constants.urls.impressionEvents = {}
       constants.urls.impressionEvents.urlBase = "https://user-signals.staging-public.tubi.io/user-signals"
       ' QA analytics proxy server
@@ -1060,8 +1052,6 @@ Function getConstants()
       constants.ui.categoryIds.topTenSeries = "top_10_tv_shows_on_tubi"
       ' Adding a constant entry so that it is easier to change for testing or future use if we need to pick other container outside of featured.
       constants.ui.categoryIds.skinAd = "skinAd"
-      constants.ui.categoryIds.purpleCarpet = "fox_live_events"
-      constants.ui.categoryIds.purpleCarpetBanner = "fox_live_events_banner"
 
     constants.ui.categoryTypes = {}
       'these map to tensor api container types
@@ -1099,8 +1089,6 @@ Function getConstants()
       constants.ui.infoPanelModes.linearSearch = "linearSearch"
       constants.ui.infoPanelModes.linearProgramHomescreen = "linearProgramHomescreen"  'v4 api
       constants.ui.infoPanelModes.sportsEvent = "sportsEvent"
-      constants.ui.infoPanelModes.purpleCarpetBanner = "purpleCarpetBanner"
-      constants.ui.infoPanelModes.purpleCarpetEvent = "purpleCarpetEvent"
 
     constants.ui.contentMode = {}
       ' these are also used for the content experience choices but are the value that is sent to the back end in our api requests
@@ -1122,7 +1110,6 @@ Function getConstants()
       constants.ui.contentTypes.emptyContainer = "emptyContainer"
       constants.ui.contentTypes.epg = "epg"
       constants.ui.contentTypes.sportsEvent = "sports_event"
-      constants.ui.contentTypes.purpleCarpetEvent = "purple_carpet_event"
       constants.ui.contentTypes.skinAd = "skinAd"
 
     constants.ui.playerTypes = {}
@@ -1384,10 +1371,6 @@ Function getConstants()
       constants.ui.gridItemTypes.emptyContainer = "emptyContainer"
       constants.ui.gridItemTypes.portraitTopTen = "portraitTopTen"
       constants.ui.gridItemTypes.skinAd = "skinAd"
-      ' Will be removed when purple carpet code is cleaned up.
-      constants.ui.gridItemTypes.purpleCarpet = "purpleCarpet"
-      ' Will be removed when purple carpet code is cleaned up.
-      constants.ui.gridItemTypes.banner = "banner"
 
     constants.ui.uris = {}
 

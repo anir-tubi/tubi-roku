@@ -25,13 +25,6 @@ settings:
   #the number of seconds before the video overlay autohides in Live TV after last button pressed.
   videoOverlayAutoHideTime: 5
 
-  # When set to true will pass a header to enable fail safe testing.
-  # This field is only used in controller scope.
-  enableFailSafe: false
-
-  # When set to true will enable the purple carpet container and banner when in qa mode. Used for writing automated tests for purple carpet.
-  enablePurpleCarpetContainerAndBanner: false
-
   # useStarterComponents MUST ALWAYS BE TRUE FOR PRODUCTION
   useStarterComponents: true
   useRemoteComponents: false

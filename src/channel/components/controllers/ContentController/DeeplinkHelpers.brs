@@ -989,13 +989,7 @@ End Function
 ' Callback triggered once the request to fetch sports event information succeeds.
 Function onDeeplinkSportsContentSuccess(content)
   if content <> invalid
-    
-    if content.playerType = m.constants.ui.playerTypes.fox
-      processEventDeeplink(content)
-    else
-      showSportsDetailsScreen()
-    end if
-    
+    showSportsDetailsScreen()
   else
     showDeeplinkErrorModal()
   end if
@@ -1006,13 +1000,7 @@ End Function
 ' Callback triggered once the request to fetch sports event information succeeds.
 Function onDeeplinkLiveTVContentSuccess(content)
   if content <> invalid
-    
-    if content.playerType = m.constants.ui.playerTypes.fox
-      processEventDeeplink(content)
-    else
-      startDeeplinkedLinearPlayback()
-    end if
-    
+    startDeeplinkedLinearPlayback()
   else
     showDeeplinkErrorModal()
   end if

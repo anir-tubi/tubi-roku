@@ -72,12 +72,6 @@ Function addControllerUi()
   ' Holds the value for user/device level settings. For ex: isVideoPreviewOn  or Selected Audio track.
   m.pub_serverPersistentData = createObject("roSGNode", "ServerPersistentData")
 
-
-  if m.constants.settings.enableFailSafe <> true then
-    'TODO: Temporary hack and code to make the build setting controllable by experiments.
-  m.constants.settings.enableFailSafe = (getExperimentResource("webott_force_failsafe", "webott_force_failsafe", false).force_failsafe = true)
-  end if
-
   m.Request = TubiRequest(m.constants.settings)
   m.NodeHelpers = TubiNodeHelpers()
   apiUtilsLib = ApiUtils(m.constants, m.pub_serverPersistentData)
@@ -293,25 +287,6 @@ Function addControllerUi()
   m.sendImpressionEventTimer = CreateObject("roSGNode", "Timer")
   m.sendImpressionEventTimer.duration = 10
   m.sendImpressionEventTimer.observeFieldScoped("fire", "sendImpressionEvent")
-
-  ' Content node for a single purple carpet event. This is used in case of purple carpet event deeplinking and purple carpet banner click.
-  m.singlePurpleCarpetEventContentNode = invalid
-
-  ' Callback triggered once the event details was completely loaded. This is used in case of purple carpet event deeplinking and purple carpet banner click.
-  m.eventDetailsScreenLoadCompletionCallback = invalid
-
-  ' Storing the callback in m scope since we cannot pass down a method in response context.
-  ' This variable will hold the callback method which will be triggered upon completion of listing api call and
-  ' Filtering and update of purple carpet container programs based on the end time of program from listing api and also overriding ccs airdatetime with starttime from listing api.
-  m.onUpdateContainerWithProgramInfoFromFoxListingCompletionCallback = invalid
-
-  ' Holds the purple carpet container node.
-  m.purpleCarpetContainerContentNode = invalid
-
-  ' Holds the status of if the user was shown the available at disabled button clicked toast.
-  ' We are restricting it to be shown once for the event details screen session.
-  ' If the user navigates to the same event screen again or a different contents event screen we will show the message again.
-  m.wasUserShownPurpleCarpetAvailableAtToast = false
 
   ' The following fields are needed as a part of getUserInfo
   m.getHistoryIdsResponseReceived = false ' Have we received a response for history ids call (success or failure)
@@ -732,8 +707,6 @@ Function runControllerStartSequence()
       m.ageVerificationComplete = true
       runControllerStartSequence()
     end if
-  else if isMajorEventDay() = true AND getExternalConfigValueFromGlobal("disaster_mode_enabled", false) = true
-    showDisasterModeUI()
   else
     ' All of the above checked values are true, so we are ready to start the channel UI
 
@@ -1655,15 +1628,9 @@ Function setVideoContentScreenBackground(screen)
     end if
 
     isSkinAdRowContent = (isCurrentScreenHomeScreen() = true AND gridItemType = m.constants.ui.gridItemTypes.skinAd)
-    isPurpleCarpetContent = (gridItemType = m.constants.ui.gridItemTypes.purpleCarpet)
     if (videoPreviewState = "playing" OR videoPreviewState = "paused" OR videoPreviewState = "buffering" OR isVideoPreviewPlayQueued = true) AND isSkinAdRowContent = false
-      if isPurpleCarpetContent = true
-        backgroundType = m.constants.ui.backgroundTypes.spotlight
-      else
-        backgroundType = m.constants.ui.backgroundTypes.epg
-      end if
       m.backgroundGroup.backgroundInfo = {
-        type: backgroundType
+        type: m.constants.ui.backgroundTypes.epg
         uriList: [] ' setting uriList as empty, because don't need to rotate the background poster when video preview is playing. We can't use shouldRotateBackgrounds because we still need the gradients from backgroundGroup
       }
     else if (videoPreviewState = "playing" OR videoPreviewState = "paused") AND isSkinAdRowContent = true
@@ -1674,9 +1641,7 @@ Function setVideoContentScreenBackground(screen)
       }
 
     else
-      if gridItemType = m.constants.ui.gridItemTypes.purpleCarpet
-        backgroundType = m.constants.ui.backgroundTypes.spotlight
-      else if isSkinAdRowContent = true
+      if isSkinAdRowContent = true
         backgroundType = m.constants.ui.backgroundTypes.skinAd
       else
         backgroundType = getBackgroundType(screen.backgroundUriList, contentType)
@@ -2116,8 +2081,6 @@ Function onCustomResume(msg)
   if currentScreen <> invalid AND isCurrentScreenHomeScreen() = true
     if currentScreen.content <> invalid AND shouldRefresh(currentScreen.content) = true
       bRestartApp = true
-    else if currentScreen.id = m.constants.ui.screenIds.homeScreen AND currentScreen.purpleCarpetContent <> invalid
-        getFoxListingItemsAndRefreshPurpleCarpetContainerData()
     end if
   end if
 

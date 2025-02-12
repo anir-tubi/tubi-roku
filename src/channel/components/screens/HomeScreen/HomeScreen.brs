@@ -38,7 +38,6 @@ Function init()
   m.CategoryGridList.observeFieldScoped("rowFocused", "onRowFocused")
   m.CategoryGridList.observeFieldScoped("vertFocusDirection", "onVertFocusDirectionChange")
   m.CategoryGridList.observeFieldScoped("rowlistTranslation", "onRowlistTranslationChange")
-  m.CategoryGridList.observeFieldScoped("eventCtaListItemSelected", "onEventCtaListItemSelectedChange")
   m.CategoryGridList.observeFieldScoped("gridContentIsReady", "onGridContentIsReadyChange")
 
   'used to know when to send tracking info. Do not send focus tracking info when the grid is 1st loaded
@@ -138,7 +137,7 @@ End Function
 
 Function onContentUpdated(msg)
   '//the presense or absense of a 1st-Row will dictate the starting point of the peek row mask
-  if m.top.kidsMode = false AND ((m.top.purpleCarpetContent <> invalid AND m.top.purpleCarpetContent.getChildCount() > 0) OR (m.top.skinAdContent <> invalid AND m.top.skinAdContent.getChildCount() > 0))
+  if m.top.kidsMode = false AND (m.top.skinAdContent <> invalid AND m.top.skinAdContent.getChildCount() > 0)
     moveContentAreaMask(-1)
     fadeOutInfoPanel()
   else
@@ -157,10 +156,8 @@ Function onLoadingChange()
     emptyContentNode = CreateObject("roSGNode", "TubiContentNode")
     populateInfoPanel(m.constants.ui.infoPanelModes.item, emptyContentNode) 'empties the info panel
     m.CategoryGridList.content = invalid ' should be all categories with initial amounts of content in them
-    m.CategoryGridList.purpleCarpetContent = invalid
     m.CategoryGridList.skinAdContent = invalid
     m.CategoryGridList.skinAdContentUpdated = true
-    m.CategoryGridList.purpleCarpetContentUpdated = true
   end if
 End Function
 
@@ -402,8 +399,6 @@ Function populateInfoPanelByContent(focusedContent)
       populateInfoPanel(m.constants.ui.infoPanelModes.continueWatching, focusedContent)
     else if sType = m.constants.ui.contentTypes.sportsEvent
       populateInfoPanel(m.constants.ui.infoPanelModes.sportsEvent, focusedContent) 
-    else if sType = m.constants.ui.contentTypes.purpleCarpetEvent
-      populateInfoPanel(m.constants.ui.infoPanelModes.purpleCarpetBanner, focusedContent) 
     else
       populateInfoPanel(m.constants.ui.infoPanelModes.item, focusedContent)
     end if
@@ -444,11 +439,7 @@ Function onGridFocusChange() as void
       m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(focusedContent, m.CategoryGridList.focusedPosition)
       m.top.contentFocused = focusedContent
       
-      if focusedContent.gridItemType = m.constants.ui.gridItemTypes.purpleCarpet
-        fadeOutInfoPanel()
-        ' Since info panel always focus the information related to primary content and not the secondary rowlist item even if it gets focused.
-        m.top.backgroundUriList = determineBackgroundImage(m.top.primaryEventContent)
-      else if focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd
+      if focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd
         fadeOutInfoPanel()
         m.top.backgroundUriList = determineBackgroundImage(focusedContent)
       else
@@ -552,7 +543,7 @@ Function onItemToBeFocusedChange()
   'Here we are updating the contentFocused, so it will play correct video preview when the content is updated.
   m.top.contentFocused = reloadedItemToBeFocused
 
-  if reloadedItemToBeFocused <> invalid AND reloadedItemToBeFocused.gridItemType <> m.constants.ui.gridItemTypes.purpleCarpet AND reloadedItemToBeFocused.gridItemType <> m.constants.ui.gridItemTypes.skinAd
+  if reloadedItemToBeFocused <> invalid AND reloadedItemToBeFocused.gridItemType <> m.constants.ui.gridItemTypes.skinAd
     ' Covers use cases where info panel was hidden but due to home screen container changes purple carpet is removed and info panel was reset.
     fadeInContentArea()
     populateInfoPanelByContent(reloadedItemToBeFocused)
@@ -588,8 +579,6 @@ Function populateInfoPanel(mode, contentNode)
 
     else if mode = m.constants.ui.infoPanelModes.sportsEvent
       populateInfoPanelWithHomescreenStyleSportsMode(contentNode, m.InfoPanel)
-    else if mode = m.constants.ui.infoPanelModes.purpleCarpetBanner
-      populateInfoPanelWithPurpleCarpetBannerMode(contentNode, m.InfoPanel)
     end if
 
     m.InfoPanel.calculateHeight = true
@@ -612,11 +601,7 @@ Function setFocusOnCategoryGrid()
   tubiLog("Homescreen.setFocusOnCategoryGrid" + m.top.id)
   ' Only fade in content area if last focused was not purple carept.
   focusedContent = m.categoryGridList.itemFocused
-  if focusedContent <> invalid AND focusedContent.gridItemType = m.constants.ui.gridItemTypes.purpleCarpet
-    fadeOutInfoPanel()
-    ' Since info panel always focus the information related to primary content and not the secondary rowlist item even if it gets focused.
-    m.top.backgroundUriList = determineBackgroundImage(m.top.primaryEventContent)
-  else if focusedContent <> invalid AND focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd
+  if focusedContent <> invalid AND focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd
     fadeOutInfoPanel()
     m.top.backgroundUriList = determineBackgroundImage(focusedContent)
   else
@@ -754,7 +739,7 @@ Function moveContentAreaMaskBasedCurrentFocus()  '//Determine if the rowlist or 
   nRowInFocus = -1
   focusedContent = m.top.contentFocused
 
-  if m.top.kidsMode = true OR (focusedContent <> invalid AND focusedContent.gridItemType <> m.constants.ui.gridItemTypes.purpleCarpet AND focusedContent.gridItemType <> m.constants.ui.gridItemTypes.skinAd)
+  if m.top.kidsMode = true OR (focusedContent <> invalid AND focusedContent.gridItemType <> m.constants.ui.gridItemTypes.skinAd)
     if m.CategoryGridList.cursorPosition <> invalid
       nRowInFocus = m.CategoryGridList.cursorPosition[0]
     else
@@ -762,33 +747,6 @@ Function moveContentAreaMaskBasedCurrentFocus()  '//Determine if the rowlist or 
     end if
   end if
   moveContentAreaMask(nRowInFocus)
-End Function
-
-
-Function onEventCtaListItemSelectedChange(msg)
-  buttonId = msg.getData()
-
-  trackingPageInfo = m.top.trackingPageInfo
-  if buttonId = "reminder" AND m.top.primaryEventContent <> invalid AND trackingPageInfo <> invalid
-    componentValues = {
-      video_id: m.top.primaryEventContent.id
-    }
-  
-    if m.top.didUserSetReminderForEventContent = false
-      userInteractionValue = "TOGGLE_ON"
-    else
-      userInteractionValue = "TOGGLE_OFF"
-    end if
-  
-    pageOneof = m.Tracking.getAnalyticsPage(trackingPageInfo.pagetype, trackingPageInfo.pageValues)
-    componentOneof = m.Tracking.getAnalyticsComponent("reminder_component", componentValues)
-  
-    m.top.componentInteractionInfo =  {
-      pageOneof: pageOneof
-      componentOneof: componentOneof
-      user_interaction: userInteractionValue
-    }
-  end if
 End Function
 
 

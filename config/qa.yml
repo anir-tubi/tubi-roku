@@ -54,9 +54,6 @@ settings:
   # Setting useLogSampling to false will send all client logs regardless of the sampling percentage to tubiLog().
   useLogSampling: true
 
-  # When set to true will pass a header to enable fail safe testing.
-  enableFailSafe: false
-
   useStarterComponents: false
   useRemoteComponents: false
 

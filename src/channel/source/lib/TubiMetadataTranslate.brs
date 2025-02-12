@@ -96,7 +96,7 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
     else if isNonEmptyArray(contentFromServer.thumbnails) = true
       sThumbnailURL = contentFromServer.thumbnails[0]
     end if
-  else if gridType = gridItemTypes.landscape OR gridType = gridItemTypes.landscapeNoTitle OR gridType = gridItemTypes.landscapeInnerMetadata OR gridType = gridItemTypes.linear OR gridType = gridItemTypes.purpleCarpet
+  else if gridType = gridItemTypes.landscape OR gridType = gridItemTypes.landscapeNoTitle OR gridType = gridItemTypes.landscapeInnerMetadata OR gridType = gridItemTypes.linear
     if canvasImages <> invalid AND type(canvasImages.landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.landscape_tb[0])
       '//A custom landscape size was requested, use this image instead of the default image
       sThumbnailURL = canvasImages.landscape_tb[0]
@@ -239,9 +239,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
     ' We do not have any other differentiating parameter outside of player type to figure out if it is a purple carpet content or not.
     ' Backend content type is sports_event.
-    if contentFromServer["player_type"] = m.constants.ui.playerTypes.fox
-      sType = m.constants.ui.contentTypes.purpleCarpetEvent
-    else if contentFromServer[typeVar] <> m.constants.ui.contentTypes.emptyContainer
+    if contentFromServer[typeVar] <> m.constants.ui.contentTypes.emptyContainer
       sType = m.translateBackendTypeToClientSideType(contentFromServer[typeVar])
     end if
     translatedContent[typeVar] = sType
@@ -1899,10 +1897,6 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
     gridItemType = gridItemTypes.landscapeInnerMetadata
   else if container.id = constants.ui.categoryIds.topTenSeries AND screenId <> constants.ui.screenIds.categoryDetailsScreen
     gridItemType = gridItemTypes.portraitTopTen
-  else if container.id = constants.ui.categoryIds.purpleCarpet
-    gridItemType = gridItemTypes.purpleCarpet
-  else if container.id = constants.ui.categoryIds.purpleCarpetBanner
-    gridItemType = gridItemTypes.banner
   end if
 
   return gridItemType

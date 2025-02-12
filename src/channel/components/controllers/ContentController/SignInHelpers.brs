@@ -1547,36 +1547,6 @@ Function refreshUiAfterSignIn()
 End Function
 
 
-Function startPurpleCarpetPlaybackAfterSignIn()
-  popScreenAfterSignInProcess()
-  showContentGroupAndHideSpinner()
-  screen = getCurrentScreen()
-  if screen <> invalid AND screen.hasField("signedIn") = true
-    screen.signedIn = isLoggedInUser()
-  end if
-  refreshUiAfterSignIn()
-  primaryEventContent = screen.primaryEventContent
-  if primaryEventContent <> invalid
-    processPlayEvent(primaryEventContent, screen, true)
-  end if
-
-  setContentToRefreshAllPersonalizedScreens(true)
-End Function
-
-
-Function setOrRemovePurpleCarpetReminderAfterSignIn()
-  popScreenAfterSignInProcess()
-  showContentGroupAndHideSpinner()
-  screen = getCurrentScreen()
-  if screen <> invalid AND screen.hasField("signedIn") = true
-    screen.signedIn = isLoggedInUser()
-  end if
-  setOrRemovePurpleCarpetReminder()
-  refreshUiAfterSignIn()
-  setContentToRefreshAllPersonalizedScreens(true)
-End Function
-
-
 ' @param action: string, Possible values "signIn", "signUp"
 ' @param userInput: assocArray|invalid, Will contains user input data when the action is "signUp"
 ' @param wasRegistrationQueued: boolean, indicates if the registration was queued.
