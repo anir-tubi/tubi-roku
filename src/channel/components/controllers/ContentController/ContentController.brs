@@ -1007,7 +1007,7 @@ Function setDirtyUserCategories(categoryId)
       requestType: reqName
       options: categoryReqInfo.options
       successCallback: onReloadUserCategoriesResponse
-      errorCallback: onErrorReloadUserCategories
+      silenceCallbackWarnings: true
       responseType: "node"
       id: categoryId
       isSignedInUser: isLoggedInUser()
@@ -1029,7 +1029,7 @@ Function setDirtyUserCategories(categoryId)
         requestType: reqName
         options: categoryReqInfo.options
         successCallback: onReloadUserCategoriesResponseInMovieScreen
-        errorCallback: onErrorReloadUserCategoriesInMovieScreen
+        silenceCallbackWarnings: true
         responseType: "node"
         id: categoryId
         isSignedInUser: isLoggedInUser()
@@ -1051,8 +1051,8 @@ Function setDirtyUserCategories(categoryId)
         requestType: reqName
         options: categoryReqInfo.options
         successCallback: onReloadUserCategoriesResponseInTVScreen
-        errorCallback: onErrorReloadUserCategoriesInTVScreen
         responseType: "node"
+        silenceCallbackWarnings: true
         id: categoryId
         isSignedInUser: isLoggedInUser()
         screenId: m.constants.ui.screenIds.tvScreen
@@ -1074,7 +1074,7 @@ Function setDirtyUserCategories(categoryId)
         requestType: reqName
         options: categoryReqInfo.options
         successCallback: onReloadUserCategoriesResponseInEspanolScreen
-        errorCallback: onErrorReloadUserCategoriesInEspanolScreen
+        silenceCallbackWarnings: true
         responseType: "node"
         id: categoryId
         isSignedInUser: isLoggedInUser()

@@ -274,58 +274,6 @@ Function onReloadUserCategoriesInHomeScreen(response, screenID = "")
 End Function
 
 
-Function onErrorReloadUserCategoriesInEspanolScreen(response)
-  onErrorReloadUserCategories(response, m.constants.ui.screenIds.espanolScreen)
-End Function
-
-
-Function onErrorReloadUserCategoriesInMovieScreen(response)
-  onErrorReloadUserCategories(response, m.constants.ui.screenIds.movieScreen)
-End Function
-
-
-Function onErrorReloadUserCategoriesInTVScreen(response)
-  onErrorReloadUserCategories(response, m.constants.ui.screenIds.tvScreen)
-End Function
-
-
-Function onErrorReloadUserCategories(response, screenID = "")
-  tubiLog("HomeScreenHelpers.onErrorReloadUserCategories")
-
-  if screenID = ""
-    screenID = m.constants.ui.screenIds.homeScreen
-  end if
-  homeScreen = getFromScreenCache(screenID)
-
-  if homeScreen <> invalid AND response <> invalid
-    analyticsContentMode = m.Tracking.getAnalyticsHomePageContentMode(screenID)
-
-    ' if we were loading in the background, don't show an error modal
-    if homeScreen.isInFocusChain() = true
-      errorMessage = getTranslation("screenHome_error_fetchCategories_description")
-      errorCode = getUserFacingErrorCode(m.constants.errors.context.homeScreen, m.constants.errors.subtypes.fetchError, response.code)
-      dialogEvent = {
-        type: "dialog"
-        values: {
-          dialog_type: "PLAYER_ERROR"
-          pageOneof: m.Tracking.getAnalyticsPage("home_page", {content_mode: analyticsContentMode})
-          dialog_action: "SHOW"
-          dialog_sub_type: errorCode
-        }
-      }
-
-      modalInfo = {
-        message: getErrorMessage(errorMessage, errorCode)
-        openTrackEvent: dialogEvent
-        trackingTask: m.trackingLoggingTask
-      }
-
-      showErrorModal(modalInfo, onUserCategoriesFailed, screenID, invalid, invalid, [getTranslation("dialog_button_continue")])
-    end if
-  end if
-End Function
-
-
 '//If the homescreen is loading, then display the default background
 Function setHomeScreenLoading(homeScreen)
   screen = getCurrentScreen()
