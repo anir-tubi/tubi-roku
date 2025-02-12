@@ -24,7 +24,6 @@ Function getConstants()
     constants.settings.charlesProxyEnabled = (proxySettings.charlesProxyEnabled = "true")
     constants.settings.charlesProxyUrl = proxySettings.charlesProxyUrl
   end if
-  ' stop
 
   ' Roku's channel/app id for the production Tubi app. It is used with the continue watching feature to enable testing the feature in sideloaded/beta channels.
   constants.productionApplicationId = "41468"
