@@ -32,6 +32,7 @@ Function init()
 
   ' handle BaseScreen functionality (see BaseScreen.xml)
   m.constants = getConstantsFromGlobal()
+  m.auth = TubiAuth(m.constants)
   m.top.screenLevel = m.constants.ui.screenLevels.videoPlayerScreen
   m.top.trackingPageInfo = {
     pageType: "video_player_page"
@@ -249,6 +250,13 @@ Function init()
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("audioTrack", "onAudioTrackChangedOnCCOverlay")
   m.closedCaptionAndAudioSelectionOverlayGroup = m.top.findNode("closedCaptionAndAudioSelectionOverlayGroup")
 
+  m.sendFeedBackButton = m.top.findNode("sendFeedBackButton")
+  m.sendFeedbackSelectionOverlayGroup = m.top.findNode("sendFeedbackSelectionOverlayGroup")
+  m.sendFeedbackSelectionOverlay = m.top.findNode("sendFeedbackSelectionOverlay")
+
+  m.sendFeedbackSelectionOverlay.observeFieldScoped("backOrLeftKeyPress", "onWasBackORLeftButtonSelectedForSendFeedback")
+  m.sendFeedbackSelectionOverlay.observeFieldScoped("itemSelected", "onSendFeedBackOverlayItemSelected")
+
   'm.focusedNode holds the node/component which helps setting/unsetting focus to component/m.top on video player screen
   m.focusedNode = m.PlayPauseButton
 
@@ -284,6 +292,14 @@ Function init()
   ' callback referencing the value, which would lead to badly formed playProgressEvents.
   m.seekReferenceQueue = []
 
+  if getExperimentResource("roku_send_feedback_on_player", "roku_send_feedback_on_player_v1", false).enabled = true then
+    m.sendFeedBackButton.visible = true
+    m.closedCaptionAudioButton.translation = [1565,110]
+    m.sendFeedBackButton.translation = [1695,110]
+  else
+    m.closedCaptionAudioButton.translation = [1695,110]
+  end if
+
   m.analyticsInterval = m.constants.player.pingFrequency
   m.historyInterval1Min = m.constants.player.historyFrequency1Min 'historyInterval1Min is used for sending exposure event
 
@@ -315,6 +331,9 @@ Function init()
 
   ' Creating internal state to track when the overlay is visible to users.
   m.isClosedCaptionAudioOverlayShowing = false
+
+  ' Creating internal state to track when the sendfeedback overlay is visible to users.
+  m.isSendFeedbackOverlayShowing = false
 
   ' Now that we are using async stop we need to wait until we get stopped state on the Video node before starting the ad. This variable helps track if we have requested a stop and are waiting for it to complete.
   m.isShowAdBreakPendingStop = false
@@ -363,6 +382,114 @@ Function init()
   m.AdsTask = m.top.findNode("AdsTask")
   m.AdsTask.videoPlayerNode = m.top
   m.AdsTask.control = "RUN"
+End Function
+
+
+Function onSendFeedBackOverlayItemSelected(msg)
+  itemSelected = msg.getData()
+  if itemSelected <> invalid
+    'Send accept dialog event when user selected item on  overlay.
+    trackingPageInfo = m.top.trackingPageInfo
+    if trackingPageInfo <> invalid
+      trackEvent({
+        type: "dialog"
+        values: {
+          dialog_type: "INFORMATION"
+          pageOneof: m.Tracking.getAnalyticsPage(trackingPageInfo.pageType, trackingPageInfo.pageValues)
+          dialog_action: "ACCEPT_DELIBERATE"
+          dialog_sub_type: "player_problem"
+        }
+      })
+    end if
+
+    hideSendFeedbackOverlay()
+
+    selectedFeedbackTitle = itemSelected.title
+    if itemSelected.id <> "cancel"
+      ' send RequestForInfo analytics event
+      selectorValues = {
+        options: [selectedFeedbackTitle]
+        selections: []
+        string_selector_type: "GENERIC_SURVEY" 'StringSelectorComponent.type enum
+        sub_type: "report_problem_player"
+      }
+
+      trackEvent({
+        type: "request_for_info"
+        values: {
+          request_for_info_action: "SURVEY"
+          selectorOneOf: m.Tracking.getAnalyticsSelector("string_selector", selectorValues)
+        }
+      })
+
+      sendPlayerFeedbackInfo(selectedFeedbackTitle)
+      showQRCodeScreen()
+    end if
+  end if
+End Function
+
+
+'@feedbackIssue: string, The player issue that was chosen to send feedback on.
+Function sendPlayerFeedbackInfo(feedbackIssue)
+  playerContent = m.top.content
+  if playerContent <> invalid
+    sendFeedBackInfo = {
+    device_id: m.constants.deviceInfo.deviceId
+    platform: m.constants.platform
+    feedback_issue: feedbackIssue
+    is_live: false
+    content_id: playerContent.id
+    video_resource_type: playerContent.drmType
+    video_resource_resolution: playerContent.resolution
+    position: playerContent.position
+    current_buffering_duration: 0
+    userId: 0
+    }
+
+    authInfo = m.auth.getAuthInfo()
+    if authInfo <> invalid AND authInfo.userId <> invalid
+      sendFeedBackInfo.userId = authInfo.userId
+    end if
+
+    sendFeedBackInfo = formatJson(sendFeedBackInfo)
+
+    tubiLog(sendFeedBackInfo, "info", "videoInfo", "send-feedback-from-player")
+  end if
+End Function
+
+
+Function showQRCodeScreen()
+  'Create a component for QR code
+  sendFeedbackQRCodeOverlay = CreateObject("roSGNode", "SendFeedbackQRCodeOverlayOnPlayer")
+  sendFeedbackQRCodeOverlay.update({
+    title: getTranslation("thank_you_title")
+    subTitle: getTranslation("send_feedback_submitted_description")
+    sendFeedbackHintText: getTranslation("send_feedback_overlay_feedback_hint")
+    uri: "pkg:/images/sendFeedback.webp"
+    translation: [1230, 60]
+  })
+  m.top.appendChild(sendFeedbackQRCodeOverlay)
+
+  sendFeedbackQRCodeOverlay.observeFieldScoped("closeOverlay", "onCloseOverlay")
+  sendFeedbackQRCodeOverlay.setFocus(true)
+End Function
+
+
+Function onCloseOverlay(msg)
+  sendFeedbackQRCodeOverlay = msg.getRoSGNode()
+
+  if sendFeedbackQRCodeOverlay <> invalid
+    sendFeedbackQRCodeOverlay.setFocus(false)
+    m.top.removeChild(sendFeedbackQRCodeOverlay)
+    removeOverLayItems()
+    m.top.setFocus(true)
+  end if
+End Function
+
+
+Function removeOverLayItems()
+  childCount = m.sendFeedbackSelectionOverlay.getChildCount() - 1
+  m.sendFeedbackSelectionOverlay.removeChildrenIndex(childCount, 1)
 End Function
 
 
@@ -567,6 +694,7 @@ Function onThemeChange(msg = invalid)
     m.SkipCuepointsButton.color = theme.backgroundColorLight2
     m.skipCuepointsButton.notFilledBackgroundColor = theme.shadeColor2
     m.closedCaptionAndAudioSelectionOverlayGroup.color = theme.shadeColor
+    m.sendFeedbackSelectionOverlayGroup.color = theme.shadeColor
 
     if theme.id = m.constants.ui.themeIDs.kidsMode
       m.logo.visible = false
@@ -944,13 +1072,13 @@ Function onVideoPositionChange(msg)
   end if
 
   if m.focusedNode.isSameNode(m.BrowseWhileWatching) = true
-    if m.playerPosition > m.lastButtonPressPos + m.browseWhileWatchingAutoHideTime AND m.isClosedCaptionAudioOverlayShowing = false
+    if m.playerPosition > m.lastButtonPressPos + m.browseWhileWatchingAutoHideTime AND m.isClosedCaptionAudioOverlayShowing = false AND m.isSendFeedbackOverlayShowing = false
       animateTransport("out")
       hideBrowseWhileWatching()
       setFocusToPlaybackControl()
     end if
   else
-    if m.VideoState = "play" AND m.HUD.opacity = 1 AND m.playerPosition > m.lastButtonPressPos + m.transportAutoHideTime AND m.isClosedCaptionAudioOverlayShowing = false
+    if m.VideoState = "play" AND m.HUD.opacity = 1 AND m.playerPosition > m.lastButtonPressPos + m.transportAutoHideTime AND m.isClosedCaptionAudioOverlayShowing = false AND m.isSendFeedbackOverlayShowing = false
       animateTransport("out")
       hideBrowseWhileWatching()
       setFocusToPlaybackControl()
@@ -1002,6 +1130,12 @@ Function onVideoPositionChange(msg)
       historyPosition(m.playerPosition + 5)
 
       if m.UpNext.content <> invalid
+
+        ' When upNext UI appears, we will close the sendFeed overlay to avoid the focus issues.
+        if m.isSendFeedbackOverlayShowing = true
+          hideSendFeedbackOverlay()
+        end if
+
         animateTransport("out")
         hideBrowseWhileWatching()
         setFocusToPlaybackControl()
@@ -1468,6 +1602,7 @@ End Function
 Function showAdBreakStoppedCallback()
   m.isShowAdBreakPendingStop = false
   hideClosedCaptionAudioTrackOverlay()  ' if dialog is showing, it's awkward to have it still show after ad break
+  hideSendFeedbackOverlay()  ' if sendFeedback overlay is showing, it's awkward to have it still show after ad break
   m.top.adPosition = m.playerPosition
   m.top.adControl = "play"
 
@@ -1570,8 +1705,10 @@ Function resetVideoPlayerState(content = invalid)
   setAudioSubtitleTransportBarIcon(m.Video.globalCaptionMode)
   ' Hiding the closed caption and audio overlay on every playback start if in case it is open.
   m.isClosedCaptionAudioOverlayShowing = false
+  ' resetting the sendFeedbackOverlayShowing value incase if it is still true.
   m.closedCaptionAndAudioSelectionOverlayGroup.opacity = 0
-
+  m.sendFeedbackSelectionOverlayGroup.opacity = 0
+  m.isSendFeedbackOverlayShowing = false
 End Function
 
 
@@ -2193,10 +2330,17 @@ End Function
 
 
 Function onWasBackButtonSelectedChange(msg)
-  wasSelected = msg.getData()
-
-  if wasSelected = true
+  wasBackSelected = msg.getData()
+  if wasBackSelected = true
     hideClosedCaptionAudioTrackOverlay()
+  end if
+End Function
+
+
+Function onWasBackORLeftButtonSelectedForSendFeedback(msg)
+  wasBackOrLeftSelected = msg.getData()
+  if wasBackOrLeftSelected = true
+    hideSendFeedbackOverlay()
   end if
 End Function
 

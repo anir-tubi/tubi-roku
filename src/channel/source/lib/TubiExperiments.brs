@@ -53,6 +53,14 @@ Function TubiExperiments(experimentsInfo) as Object
         }
       }
 
+      roku_send_feedback_on_player: {
+        roku_send_feedback_on_player_v1 : {
+          default: {"enabled": false}
+          holdout_control: {"enabled": false}
+          holdout_winning: {"enabled": false}
+        }
+      }
+
       roku_async_stop: {
         roku_async_stop_v6: {
           default: {"enabled": false}

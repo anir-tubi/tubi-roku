@@ -3,6 +3,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
   ' Making sure when the closed captioning overlay is displayed playerscreen only handles back button and ignore rest of the events.
   if press
     m.lastButtonPressPos = m.playerPosition
+
     if isButtonPressAllowed(key, m.VideoState, m.Video)
       hidePauseAdOverlay() ' added for extra safety
 
@@ -511,6 +512,8 @@ Function handleOk()
         sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel, "exit_pre_pod")
       end if
       showClosedCaptionAudioTrackOverlay()
+    else if focusButtonId = m.sendFeedBackButton.id
+      showSendFeedbackOverlay()
     end if
   end if
 End Function
@@ -751,6 +754,144 @@ Function hideClosedCaptionAudioTrackOverlay()
   m.closedCaptionAndAudioSelectionOverlay.setFocus(false)
   fade(m.closedCaptionAndAudioSelectionOverlayGroup, "out", 0.6)
   m.top.setFocus(true)
+End Function
+
+
+' Displays the SendFeedback selection overlay.
+Function showSendFeedbackOverlay()
+  m.isSendFeedbackOverlayShowing = true
+  getExperimentResource("roku_send_feedback_on_player", "roku_send_feedback_on_player_v1")
+  setFocusToComponent(m.sendFeedBackButton)
+  fade(m.sendFeedbackSelectionOverlayGroup, "in", 0.6)
+  m.sendFeedbackSelectionOverlay.itemList = getItemListForSendFeedback()
+  m.sendFeedbackSelectionOverlay.setFocus(true)
+
+  'Send Dialog event when sendFeedback button clicked.
+  trackingPageInfo = m.top.trackingPageInfo
+  trackEvent({
+    type: "dialog"
+    values: {
+      dialog_type: "INFORMATION"
+      pageOneof: m.Tracking.getAnalyticsPage(trackingPageInfo.pageType, trackingPageInfo.pageValues)
+      dialog_action: "SHOW"
+      dialog_sub_type: "player_problem"
+    }
+  })
+End Function
+
+
+' Hides the send feedback on video player selection overlay.
+Function  hideSendFeedbackOverlay()
+  m.isSendFeedbackOverlayShowing = false
+  m.sendFeedbackSelectionOverlay.setFocus(false)
+  removeOverLayItems()
+  fade(m.sendFeedbackSelectionOverlayGroup, "out", 0.6)
+  m.top.setFocus(true)
+
+  'Send dismiss dialog event when user presses back or closed overlay.
+  trackingPageInfo = m.top.trackingPageInfo
+  if trackingPageInfo <> invalid AND isNonEmptyString(trackingPageInfo.pageType) = true
+    trackEvent({
+      type: "dialog"
+      values: {
+        dialog_type: "INFORMATION"
+        pageOneof: m.Tracking.getAnalyticsPage(trackingPageInfo.pageType, trackingPageInfo.pageValues)
+        dialog_action: "DISMISS_DELIBERATE"
+        dialog_sub_type: "player_problem"
+      }
+    })
+  end if
+End Function
+
+
+Function getItemListForSendFeedback()
+  sendFeedbackMenuItems = [
+    {
+      id: "cancel"
+      title: getTranslation("dialog_button_cancel")
+    },
+    {
+      id: "start_from_beginning_after_ads"
+      title: getTranslation("send_feedback_menuItem_start_from_beginning_after_ads")
+    },
+    {
+      id: "stuck_in_ads"
+      title: getTranslation("send_feedback_menuItem_stuck_in_ads")
+    },
+    {
+      id: "freezing_after_ads"
+      title: getTranslation("send_feedback_menuItem_freezing_after_ads")
+    },
+    {
+      id: "black_screen"
+      title: getTranslation("send_feedback_menuItem_seeing_a_black_screen")
+    },
+    {
+      id: "buffering_before_video"
+      title: getTranslation("send_feedback_menuItem_buffering_before_video")
+    },
+    {
+      id: "buffering_during_video"
+      title: getTranslation("send_feedback_menuItem_buffering_during_video")
+    },
+    {
+      id: "buffering_after_ads"
+      title: getTranslation("send_feedback_menuItem_buffering_after_ads")
+    },
+    {
+      id: "video_freeze"
+      title: getTranslation("send_feedback_menuItem_video_freeze")
+    },
+    {
+      id: "fast_forward_or_rewind_failed"
+      title: getTranslation("send_feedback_menuItem_fastforward_rewind_failed")
+    },
+    {
+      id: "captions_not_working"
+      title: getTranslation("send_feedback_menuItem_captions_not_working")
+    },
+    {
+      id: "audio_not_working"
+      title: getTranslation("send_feedback_menuItem_audio_not_working")
+    },
+    {
+      id: "audio_video_out_of_sync"
+      title: getTranslation("send_feedback_menuItem_audio_video_out_of_sync")
+    },
+    {
+      id: "caption_selection_not_persisting"
+      title: getTranslation("send_feedback_menuItem_caption_selection_not_persisting")
+    },
+    {
+      id: "captions_out_of_sync"
+      title: getTranslation("send_feedback_menuItem_captions_out_of_sync")
+    },
+    {
+      id: "audio_not_working"
+      title: getTranslation("send_feedback_menuItem_audio_not_working")
+    },
+    {
+      id: "video_does_not_play"
+      title: getTranslation("send_feedback_menuItem_video_does_not_play")
+    }
+  ]
+
+  node = CreateObject("roSGNode", "ContentNode")
+  node.id = "sendFeedbackMenu"
+  node.update(sendFeedbackMenuItems, true)
+
+  overlayItems = [
+    {
+      id: "sendFeedbackOnPlayer"
+      title: getTranslation("send_feedback_overlay_title")
+      subtitle: getTranslation("send_feedback_overlay_subtitle")
+      hasSubMenu: false
+      content: node
+      numRows: 9
+    }
+  ]
+
+  return overlayItems
 End Function
 
 
@@ -998,6 +1139,7 @@ Function resetTransportButtons()
   m.FastForwardButton.focusState = false
   m.EndButton.focusState = false
   m.closedCaptionAudioButton.focusState = false
+  m.sendFeedBackButton.focusState = false
 End Function
 
 
@@ -1149,6 +1291,8 @@ Function sayFocusedButtonAudioGuide(focusButtonId)
     audioGuideText = audioGuideHints.goToNextVideoButtonHint
   else if focusButtonId = m.closedCaptionAudioButton.id
     audioGuideText = audioGuideHints.closedCaptionAudioButtonHint
+  else if focusButtonId = m.sendFeedBackButton.id
+    audioGuideText = audioGuideHints.sendFeedbackButtonHint
   end if
 
   if isNonEmptyString(audioGuideText)
@@ -1297,6 +1441,10 @@ Function isButtonPressAllowed(key, videoState, videoNode)
     isAllowed = false
   end if
 
+  if m.isSendFeedbackOverlayShowing = true
+    isAllowed = false
+  end if
+
   return isAllowed
 End Function
 
@@ -1433,6 +1581,12 @@ End Function
 ' - sets the focus to pause ad overlay
 Function showPauseAd()
   animateTransport("out")
+
+  ' When PauseAd appears, we will close the sendFeed overlay to avoid the focus issues.
+  if m.isSendFeedbackOverlayShowing = true
+    hideSendFeedbackOverlay()
+  end if
+
   hideBrowseWhileWatching()
   m.pauseAdAnimation = fade(m.pauseAdOverlay, "in", 0.6, 0.4)
   sendPauseAdPixel(m.constants.pauseAd.pixelTypes.startPixel)

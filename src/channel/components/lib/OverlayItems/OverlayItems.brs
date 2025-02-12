@@ -1,0 +1,51 @@
+Function init()
+  m.overLayItemsLayoutGroup = m.top.findNode("OverLayItemsLayoutGroup")
+  m.top.observeFieldScoped("itemsInfo", "onItemInfoChanged")
+End Function
+
+
+Function onItemInfoChanged(msg)
+  items = msg.getData()
+  typographyConstants = getTypographyConstants()
+
+  if items.title <> invalid
+    titleLabel = createObject("roSGNode", "Label")
+    titleLabel.id = items.id.trim()
+    titleLabel.text = items.title
+    titleLabel.height = 40
+    m.overLayItemsLayoutGroup.appendChild(titleLabel)
+    setTypographyOfLabel(titleLabel, typographyConstants.ids.subheaderMedium)
+  end if
+
+  if items.subtitle <> invalid
+    subTitleLabel = createObject("roSGNode", "Label")
+    subTitleLabel.id = items.subtitle.trim()
+    subTitleLabel.text = items.subtitle
+    subTitleLabel.height = 40
+    m.overLayItemsLayoutGroup.appendChild(subTitleLabel)
+    setTypographyOfLabel(subTitleLabel, typographyConstants.ids.bodyMedium)
+  end if
+
+  if items.id <> "sendFeedbackOnPlayer"
+    rectangle = createObject("roSGNode", "Rectangle")
+    rectangle.width = 0
+    rectangle.height = 44
+    m.overLayItemsLayoutGroup.appendChild(rectangle)
+  end if
+
+  if items.hasSubmenu = true
+    checkBoxList = createObject("roSGNode", "CaretBoxList")
+  else
+    checkBoxList = createObject("roSGNode", "CheckBoxList")
+  end if
+
+  checkBoxList.id = items.id.trim()
+  checkBoxList.itemSize = [510,72]
+  checkBoxList.numRows = items.numRows
+  checkBoxList. rowSpacings = [8]
+  checkBoxList.content = items.content
+  checkBoxList.focusBitmapBlendColor = m.focusedColor
+  checkBoxList.observeFieldScoped("itemSelected", "onWasItemSelectedFromMenu")
+
+  m.overLayItemsLayoutGroup.appendChild(checkBoxList)
+End Function

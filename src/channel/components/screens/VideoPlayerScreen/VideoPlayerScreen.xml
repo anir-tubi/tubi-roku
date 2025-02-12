@@ -483,6 +483,13 @@
             width="60"
             height="60"
             uri="pkg:/images/transport/sgplayer/icon-subtitles.webp"
+            translation="[1565,110]"
+            visible="false" />
+          <TransportButton
+            id="sendFeedBackButton"
+            width="60"
+            height="60"
+            uri="pkg:/images/transport/sgplayer/icon-help.png"
             translation="[1695,110]"
             visible="false" />
         </Group>
@@ -578,6 +585,16 @@
       <ClosedCaptionAndAudioSelectionOverlay
         translation="[1230, 60]"
         id="closedCaptionAndAudioSelectionOverlay" />
+    </Rectangle>
+
+    <Rectangle
+      id="sendFeedbackSelectionOverlayGroup"
+      opacity="0"
+      width="1920"
+      height="1080">
+      <PlayerSideOverlay
+        translation="[1230, 60]"
+        id="sendFeedbackSelectionOverlay" />
     </Rectangle>
 
     <!-- RAF needs a parent group with no other elements, otherwise it will use

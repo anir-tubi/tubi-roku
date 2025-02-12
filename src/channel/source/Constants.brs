@@ -46,6 +46,7 @@ Function getConstants()
       constants.audioGuideHints.transportBarIcons.hopBackButtonHint = "Rewind"
       constants.audioGuideHints.transportBarIcons.fastForwardButtonHint = "Fast Forward Button"
       constants.audioGuideHints.transportBarIcons.closedCaptionAudioButtonHint = "Closed Caption And Audio Track Selection Button"
+      constants.audioGuideHints.transportBarIcons.sendFeedbackButtonHint = "Send Feedback Button"
 
 
   ' Device info

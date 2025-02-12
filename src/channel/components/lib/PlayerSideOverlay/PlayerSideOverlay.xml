@@ -15,11 +15,11 @@
     <!-- INPUTS -->
 
     <field id="itemList" type="array" />
-    <field id="updateSelection" type="intarray"/>
 
     <!-- OUTPUTS -->
 
     <field id="backOrLeftKeyPress" type="boolean" value="false" alwaysNotify="true" />
+    <field id="itemSelected" type="node" alwaysNotify="true" />
     <field id="content" type="node" />
     <field id="itemUpdated" type="boolean" alwaysNotify="true"/>
   </interface>

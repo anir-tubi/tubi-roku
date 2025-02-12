@@ -24,7 +24,6 @@ Function onItemListChanged(msg)
 
     ' This field is used to store all the menu items within this component and determine which one should be focused on
     m.focusArray = []
-    typographyConstants = getTypographyConstants()
 
     outerLayoutGroup = createObject("roSGNode", "LayoutGroup")
     outerLayoutGroup.layoutDirection = "vert"
@@ -33,58 +32,35 @@ Function onItemListChanged(msg)
     outerLayoutGroup.translation = [60, 60]
 
     for i = 0 to itemlist.Count() - 1
-      item = itemlist[i]
-      if item <> invalid
-        layoutGroup = createObject("roSGNode", "LayoutGroup")
+      items = itemlist[i]
 
-        if item.title <> invalid
-          titleLabel = createObject("roSGNode", "Label")
-          titleLabel.id = item.title.trim()
-          titleLabel.text = item.title
-          titleLabel.height = 40
-          layoutGroup.appendChild(titleLabel)
-          setTypographyOfLabel(titleLabel, typographyConstants.ids.subheaderMedium)
+      if items <> invalid
+        overlayItems = CreateObject("roSGNode", "OverlayItems")
+        overlayItems.itemsInfo = items
+
+        child =  overlayItems.getChild(0)
+        focusedChild = invalid
+        for j = 0 to child.getChildCount() - 1
+          if child.getChild(j).subtype() = "CheckBoxList" OR child.getChild(j).subtype() = "CaretBoxList"
+          focusedChild = child.getChild(j)
+          focusedChild.observeFieldScoped("itemSelected", "onWasItemSelectedFromMenu")
+          end if
+        end for
+
+        outerLayoutGroup.appendChild(overlayItems)
+        if focusedChild <> invalid
+          m.focusArray.push(focusedChild)
         end if
-
-        if item.subtitle <> invalid
-          subTitleLabel = createObject("roSGNode", "Label")
-          subTitleLabel.id = item.subtitle.trim()
-          subTitleLabel.text = item.subtitle
-          subTitleLabel.height = 40
-          layoutGroup.appendChild(subTitleLabel)
-          setTypographyOfLabel(subTitleLabel, typographyConstants.ids.bodyMedium)
-        end if
-
-        rectangle = createObject("roSGNode", "Rectangle")
-        rectangle.width = 0
-        rectangle.height = 44
-        layoutGroup.appendChild(rectangle)
-
-        if item.hasSubmenu = true
-          checkBoxList = createObject("roSGNode", "CaretBoxList")
-        else
-          checkBoxList = createObject("roSGNode", "CheckBoxList")
-        end if
-
-        checkBoxList.id = item.id.trim()
-        checkBoxList.itemSize = [510,72]
-        checkBoxList.numRows = item.numrows
-        checkBoxList.itemSpacing = [0,8]
-        checkBoxList.content = item.content
-        checkBoxList.defaultCheckedItemIndex = item.defaultcheckeditemindex
-        checkBoxList.focusBitmapBlendColor = m.focusedColor
-        checkBoxList.observeFieldScoped("itemSelected", "onWasItemSelectedFromMenu")
-        layoutGroup.appendChild(checkBoxList)
-
-        outerLayoutGroup.appendChild(layoutGroup)
-        m.focusArray.push(checkBoxList)
       end if
     end for
 
     m.top.appendChild(outerLayoutGroup)
-    if m.focusArray <> invalid AND m.focusArray.Count() > 0
+
+    'Setting focus to the first menu item in the focus array.
+    if isNonEmptyArray(m.focusArray) = true
       m.focusArray[0].setFocus(true)
     end if
+
   end if
 End Function
 
@@ -107,7 +83,7 @@ End Function
 Function onComponentFocus()
   if m.top.hasFocus() = true
 
-    if m.focusArray <> invalid AND m.focusArray.Count() > 0 AND m.focusArray[m.focusIndex] <> invalid
+    if isNonEmptyArray(m.focusArray) = true AND m.focusArray[m.focusIndex] <> invalid
       m.focusArray[m.focusIndex].setFocus(true)
     end if
   end if
@@ -118,7 +94,9 @@ Function onWasItemSelectedFromMenu(msg)
   index = msg.getData()
   list = msg.getROSGNode()
   if list <> invalid AND list.content <> invalid
-    m.top.content = list.content.getChild(index)
+    selectedItem = list.content.getChild(index)
+    m.top.itemSelected = selectedItem
+    m.top.content = selectedItem
     m.top.itemUpdated = true
   end if
 End Function
@@ -132,16 +110,16 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
   if key = "down"
     ' If the focusIndex is at the last item in the array, pressing down will have no effect.
     ' If it is not the last item, the focusIndex will be incremented to focus on the next menu item
-    if m.focusIndex < m.focusArray.count() - 1
+    if isNonEmptyArray(m.focusArray) = true AND m.focusIndex < m.focusArray.count() - 1
       m.focusIndex++
       handleFocusUpdate()
       return true
     end if
 
+  else if key = "up"
     ' If the focusIndex is at the first item in the array, pressing up will have no effect.
     ' If it is not the first item, the focusIndex will be decremented to focus on the previous menu item in the array.
-  else if key = "up"
-    if m.focusIndex > 0
+    if isNonEmptyArray(m.focusArray) = true AND m.focusIndex > 0
       m.focusIndex--
       handleFocusUpdate()
       return true
@@ -158,7 +136,7 @@ End Function
 
 Function handleFocusUpdate()
   ' For safety, if m.focusIndex exceeds the number of items in focusArray, we reset it to the count - 1 of focusArray
-  if m.focusIndex > m.focusArray.count() - 1
+  if isNonEmptyArray(m.focusArray) = true AND m.focusIndex > m.focusArray.count() - 1
     m.focusIndex = m.focusArray.count() - 1
   end if
 
@@ -167,7 +145,7 @@ Function handleFocusUpdate()
     m.focusIndex = 0
   end if
 
-  if m.focusArray <> invalid AND m.focusArray.Count() > 0
+  if isNonEmptyArray(m.focusArray) = true
     focusedNode = m.focusArray[m.focusIndex]
     if focusedNode <> invalid
       focusedNode.setFocus(true)

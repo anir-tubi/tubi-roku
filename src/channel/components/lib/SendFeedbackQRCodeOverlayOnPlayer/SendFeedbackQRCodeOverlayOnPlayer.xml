@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="SendFeedbackQRCodeOverlayOnPlayer" extends="Group">
+  <script type="text/brightscript" uri="SendFeedbackQRCodeOverlayOnPlayer.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <field id="title" alias="sendFeedbackHeaderLabel.text"/>
+    <field id="subTitle" alias="sendFeedbackSubHeaderLabel.text"/>
+    <field id="sendFeedbackHintText" alias="sendFeedbackHint.text"/>
+    <field id="uri" alias="qrCodePoster.uri"/>
+
+    <!-- OUTPUTS -->
+
+    <field id="closeOverlay" type="boolean" value="false" alwaysNotify="true" />
+  </interface>
+
+  <children>
+    <Poster
+      id="overlayBackground"
+      width="630"
+      height="960"
+      uri="pkg:/images/menu-focus-$$RES$$.9.png">
+
+      <LayoutGroup
+        id="sendFeedbackSection"
+        itemSpacings="[12, 45, 15, 90]"
+        translation="[60, 60]">
+        <Label
+          id="sendFeedbackHeaderLabel"
+          width="501">
+          <Font
+            role="font"/>
+        </Label>
+        <Label
+          id="sendFeedbackSubHeaderLabel"
+          wrap="true"
+          width="501">
+          <Font
+            role="font"/>
+        </Label>
+         <Label
+          id="sendFeedbackHint"
+          wrap="true"
+          width="501">
+          <Font
+            role="font"/>
+        </Label>
+        <Rectangle 
+          id="qrCodeHolder"
+          width="321"
+          height="321">
+          <Poster
+            id="qrCodePoster"
+            width="300"
+            height="300"
+            translation="[12, 12]"
+            loadDisplayMode="scaleToFit" />
+        </Rectangle>
+        <SimpleButton
+            id="closeButton"
+            width="447"/>
+      </LayoutGroup>
+    </Poster>
+  </children>
+</component>
