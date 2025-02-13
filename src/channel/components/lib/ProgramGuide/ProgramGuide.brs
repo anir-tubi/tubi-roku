@@ -209,6 +209,7 @@ Function onJumpToLinearChannelID()
       if item.id = m.top.jumpToLinearChannelID[0] AND (containerId = "" OR containerId = item.parentId)
         m.programGrid.jumpToRowItem = [i, 0]
         m.programGrid.itemFocused = i
+        m.channelsGrid.jumpToItem = i
         if item <> invalid AND item.getChildCount() > 0
           program = item.getChild(0)
           m.top.linearChannelFocused = program
