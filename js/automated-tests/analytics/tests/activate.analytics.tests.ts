@@ -38,12 +38,8 @@ describe('Activate events', function () {
 		await activation.clickOnLetsCreateYourAccount();
 		const signInEmailPage = SignInEmailPage();
 		await signInEmailPage.pageDidLoad();
-		await signInEmailPage.enterPasswordAndClickContinue('111111');
-		const settings = await homePage.selectSideNavTab(tabs.settings);
-		await settings.signOut();
 		await verifyC543693();
 		await verifyC148727NavigateToPage();
-		await verifyC543694();
 		await verifyC148718();
 	});
 

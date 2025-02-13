@@ -164,21 +164,22 @@ export async function verifyC130131(idOfTitleFromAutoplay) {
 	while (eventPageLoad === undefined && i < 30) {
 		let pulletEvents = await getMatchedEventsFromLastEvent(
 			Events.page_load,
-			i + 4
+			i + 6
 		);
+		
 		eventPageLoad = pulletEvents.find(
 			(event) =>
 				event.page_load.status === STATUS.success &&
 				event.page_load.video_player_page
 		);
 		i++;
+	}
 		expect(eventPageLoad.page_load.video_player_page.video_id).equal(
 			parseInt(idOfTitleFromAutoplay.id),
 			`event.auto_play.video_id===${idOfTitleFromAutoplay.id}, Event: \n
 			${JSON.stringify(eventPageLoad)} \n`
 		);
 	}
-}
 
 export async function verifyC21253() {
 	let pageLoad;

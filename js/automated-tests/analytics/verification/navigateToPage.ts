@@ -93,26 +93,22 @@ export async function verifyC543693() {
 			40 + i
 		);
 		navigateToPageEvent = pulletEvents.find(
-			(event) =>
-				event.navigate_to_page.dest_home_page &&
-				event.navigate_to_page.dest_home_page.content_mode &&
-				event.navigate_to_page.dest_home_page.content_mode ===
-					EventsValues.conentModeUnknown &&
-				event.navigate_to_page.login_page &&
-				event.navigate_to_page.login_page.choice &&
-				event.navigate_to_page.login_page.choice === 'EMAIL'
+			(event) =>	
+				event.navigate_to_page.dest_login_page &&
+				event.navigate_to_page.dest_login_page.choice &&
+				event.navigate_to_page.dest_login_page.choice === 'LINK'
 		);
 		i++;
 	}
 	expect(
-		navigateToPageEvent.navigate_to_page.dest_home_page.content_mode
+		navigateToPageEvent.navigate_to_page.home_page.content_mode
 	).equal(
 		EventsValues.conentModeUnknown,
 		`navigateToPageEvent.navigate_to_page.dest_home_page.content_mode===CONTENT_MODE_UNKNOWN, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
-	expect(navigateToPageEvent.navigate_to_page.login_page.choice).equal(
-		'EMAIL',
+	expect(navigateToPageEvent.navigate_to_page.dest_login_page.choice).equal(
+		'LINK',
 		`navigateToPageEvent.navigate_to_page.login_page.choice===EMAIL, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
@@ -278,7 +274,7 @@ ${JSON.stringify(navigateToPageEvent)} \n`
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(navigateToPageEvent.navigate_to_page.dest_login_page.choice).equal(
-		'EMAIL',
+		'LINK',
 		`navigateToPageEvent.navigate_to_page.login_page.choice===EMAIL, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
