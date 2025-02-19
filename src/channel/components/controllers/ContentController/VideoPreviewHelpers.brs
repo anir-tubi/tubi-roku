@@ -95,7 +95,7 @@ Function onVideoPreviewStateChanged(msg)
       'Also dont auto start locked contents.
       item = currentScreen.contentFocused
 
-      if currentScreen.subType() = "DetailScreen" OR currentScreen.subType() = "DetailScreenHoriz" OR currentScreen.subType() = "DetailScreenVert"
+      if currentScreen.subType() = "DetailScreen"
         item = currentScreen.content
       end if
 
@@ -116,7 +116,7 @@ Function onVideoPreviewStateChanged(msg)
 
       else if m.maintask.isHdmiStatusOk = true AND isFullPlayerBlockedForUser = false
         ' Don't want to continue playback if the user has their tv turned off
-        if currentScreen.subType() = "DetailScreen" OR currentScreen.subType() = "DetailScreenHoriz"
+        if currentScreen.subType() = "DetailScreen"
 
           playbackSource = {
             "srcForAnalytic": "previews"

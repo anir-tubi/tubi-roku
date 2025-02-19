@@ -255,12 +255,6 @@ Function addControllerUi()
   ' Used to store the password for a short period to allow not having to re-enter the password when changing parental controls
   m.passwordCache = invalid
 
-  'This variable is used to avoid multiple calls to getExperimentResource
-  m.detailScreenHorizMenuExp = (getExperimentResource("roku_horizontal_menu", "roku_horizontal_menu_v3", false).enabled = true)
-
-  'This variable is used to avoid multiple calls to getExperimentResource
-  m.detailScreenVertMenuExp = (getExperimentResource("roku_vertical_menu", "roku_episodes_under_vertical_menu_v1", false).enabled = true)
-
   ' Format of data that should be set on viewableImpressionEventInfo
   ' {
   '   containerId: "" Contains the id of the row where the tile was displayed. ex: comedy etc.
@@ -1353,7 +1347,7 @@ Function refreshAllDetailScreens()
   for i = 0 to m.screenStack.getChildCount() - 1
     screen = m.screenStack.getChild(i)
 
-    if screen.subType() = "DetailScreen" OR screen.subType() = "DetailScreenHoriz" OR screen.subType() = "DetailScreenVert"
+    if screen.subType() = "DetailScreen"
       content = screen.content 'No need to re fetch the content, just re populate the screen content
       populateDetailScreen(screen, content, false, -1)
       resetRelatedContent(screen)

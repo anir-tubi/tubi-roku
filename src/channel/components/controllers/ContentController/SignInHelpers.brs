@@ -802,7 +802,7 @@ Function onMatureContentWarningSignInCompleted()
   currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
 
-  if currentScreen <> invalid AND (currentScreen.getSubtype() = "DetailScreen" OR currentScreen.getSubtype() = "DetailScreenHoriz" OR currentScreen.getSubtype() = "DetailScreenVert")
+  if currentScreen <> invalid AND currentScreen.getSubtype() = "DetailScreen"
     refreshAllDetailScreens()
     currentScreen.jumpToItem = 0
   end if
@@ -904,7 +904,7 @@ Function onQueueAfterSignIn()
   currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
 
-  if currentScreen <> invalid AND (currentScreen.getSubtype() = "DetailScreen" OR currentScreen.getSubtype() = "DetailScreenHoriz" OR currentScreen.getSubtype() = "DetailScreenVert")
+  if currentScreen <> invalid AND currentScreen.getSubtype() = "DetailScreen"
     currentScreen.removeSignupButton = true
     currentScreen.jumpToItem = 0
     onAddToQueue(currentScreen, onBookmarkedAfterSignIn)
@@ -922,7 +922,7 @@ Function onLikeAfterSignIn()
   currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
 
-  if currentScreen <> invalid and (currentScreen.getSubtype() = "DetailScreen" OR currentScreen.getSubtype() = "DetailScreenHoriz" OR currentScreen.getSubtype() = "DetailScreenVert")
+  if currentScreen <> invalid and currentScreen.getSubtype() = "DetailScreen"
     currentScreen.removeSignupButton = true
     currentScreen.jumpToItem = 0
     onLike(currentScreen)
@@ -942,7 +942,7 @@ Function onDislikeAfterSignIn()
   currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
 
-  if currentScreen <> invalid and (currentScreen.getSubtype() = "DetailScreen" OR currentScreen.getSubtype() = "DetailScreenHoriz" OR currentScreen.getSubtype() = "DetailScreenVert")
+  if currentScreen <> invalid AND currentScreen.getSubtype() = "DetailScreen"
     currentScreen.removeSignupButton = true
     currentScreen.jumpToItem = 0
     onDislike(currentScreen)
@@ -974,7 +974,7 @@ Function onRegistrationProcessCompletedOnDetailsScreen()
   m.spinner.visible = false
   refreshAllDetailScreens()
 
-  if currentScreen <> invalid and (currentScreen.getSubtype() = "DetailScreen" OR currentScreen.getSubtype() = "DetailScreenHoriz" OR currentScreen.getSubtype() = "DetailScreenVert")
+  if currentScreen <> invalid AND currentScreen.getSubtype() = "DetailScreen"
     currentScreen.jumpToItem = 0
     currentScreen.setfocus(true)
     currentScreen.refreshRelatedContent = true
@@ -1589,7 +1589,7 @@ Function onSignUpSignInErrorScreenContinueAsGuestUserButtonSelected(msg)
   m.spinner.visible = false
   refreshAllDetailScreens()
   focusSideNavOption(m.constants.ui.sideNavIds.home)
-  if currentScreen <> invalid and (currentScreen.getSubtype() = "DetailScreen" OR currentScreen.getSubtype() = "DetailScreenHoriz")
+  if currentScreen <> invalid AND currentScreen.getSubtype() = "DetailScreen"
     currentScreen.jumpToItem = 0
     currentScreen.setfocus(true)
     currentScreen.refreshRelatedContent = true

@@ -69,26 +69,13 @@ Function TubiExperiments(experimentsInfo) as Object
         }
       }
 
-      roku_horizontal_menu:{
-        roku_horizontal_menu_v3: {
-          default: {"enabled": false}
-          holdout_control: {"enabled": false}
-          holdout_winning: {"enabled": false}}
-      }
-
-      roku_vertical_menu:{
-        roku_episodes_under_vertical_menu_v1: {
-          default: {"enabled": false}
-          holdout_control: {"enabled": false}
-          holdout_winning: {"enabled": false}}
-      }
 
       roku_player_client_log: {
         roku_player_client_log_v2: {
           default: {"enabled": false}
           holdout_control: {"enabled": false}
           holdout_winning: {"enabled": false}}
-      }    
+      }
 
       ads_tubi_skins: {
         ads_tubi_skin_paddington: {

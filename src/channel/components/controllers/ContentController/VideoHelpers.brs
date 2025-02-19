@@ -232,7 +232,7 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
 
     ' by default setting sprites to invalid
     videoPlayer.sprites = invalid
-    
+
     ' get sprites / seek preview images
     ' Disabling the call if the current date time falls within major event start and end range.
     if isMajorEventDay() = false
@@ -1044,7 +1044,7 @@ End Function
 Function onRetryPlayerError()
   ' try to resume the video from the last checkpoint
   screen = getCurrentScreen()
-  if screen.isSubtype("DetailScreen") = true OR screen.isSubtype("DetailScreenHoriz") = true OR screen.isSubtype("DetailScreenVert") = true
+  if screen.isSubtype("DetailScreen") = true
     if screen.watchTrailerSelected = true
       trailerHelper(screen)
     else

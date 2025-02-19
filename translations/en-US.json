@@ -852,10 +852,6 @@
     "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
     "message": "All Episodes"
   },
-  "screenDetails_button_episodes_more": {
-    "description": "Label displayed over episodes list + YMAL on the details Screen.",
-    "message": "Episodes And More"
-  },
   "screenDetails_relatedTitles": {
     "description": "Label of button to allow users to view other video titles related to the current video title",
     "message": "You Might Also Like"
