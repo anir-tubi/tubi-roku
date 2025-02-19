@@ -489,7 +489,7 @@
             id="sendFeedBackButton"
             width="60"
             height="60"
-            uri="pkg:/images/transport/sgplayer/icon-help.png"
+            uri="pkg:/images/transport/sgplayer/icon-help.webp"
             translation="[1695,110]"
             visible="false" />
         </Group>
