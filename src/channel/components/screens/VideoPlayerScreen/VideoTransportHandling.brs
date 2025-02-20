@@ -760,7 +760,6 @@ End Function
 ' Displays the SendFeedback selection overlay.
 Function showSendFeedbackOverlay()
   m.isSendFeedbackOverlayShowing = true
-  getExperimentResource("roku_send_feedback_on_player", "roku_send_feedback_on_player_v1")
   setFocusToComponent(m.sendFeedBackButton)
   fade(m.sendFeedbackSelectionOverlayGroup, "in", 0.6)
   m.sendFeedbackSelectionOverlay.itemList = getItemListForSendFeedback()
@@ -1307,6 +1306,9 @@ Function showTransport()
   updateTransport()
 
   updatePlayPauseUri()
+
+  'Send exposure event for send feedback when transport control is visible
+  getExperimentResource("roku_send_feedback_on_player", "roku_send_feedback_on_player_v1")
 
   creditCuePoints = getCreditCuepointsFromContent(m.top.content)
   if m.top.hasFocus() = true AND isSkipIntroCuePointsReached(creditCuePoints) = false
