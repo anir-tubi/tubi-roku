@@ -91,10 +91,12 @@ End Function
 
 
 Function onWasItemSelectedFromMenu(msg)
-  index = msg.getData()
   list = msg.getROSGNode()
+  index = round(list.currFocusRow)
+
   if list <> invalid AND list.content <> invalid
     selectedItem = list.content.getChild(index)
+    m.top.indexSelected = index
     m.top.itemSelected = selectedItem
     m.top.content = selectedItem
     m.top.itemUpdated = true

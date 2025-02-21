@@ -487,6 +487,7 @@
             visible="false" />
           <TransportButton
             id="sendFeedBackButton"
+            enabled="false"
             width="60"
             height="60"
             uri="pkg:/images/transport/sgplayer/icon-help.webp"

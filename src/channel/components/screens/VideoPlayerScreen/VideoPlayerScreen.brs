@@ -386,6 +386,8 @@ End Function
 
 Function onSendFeedBackOverlayItemSelected(msg)
   itemSelected = msg.getData()
+  feedbackOverlay = msg.getRoSGNode()
+
   if itemSelected <> invalid
     'Send accept dialog event when user selected item on  overlay.
     trackingPageInfo = m.top.trackingPageInfo
@@ -403,10 +405,16 @@ Function onSendFeedBackOverlayItemSelected(msg)
 
     selectedFeedbackTitle = itemSelected.title
     if itemSelected.id <> "cancel"
+      indexSelected = 1
+
+      if feedbackOverlay <> invalid
+        indexSelected = feedbackOverlay.indexSelected + 1
+      end if
+
       ' send RequestForInfo analytics event
       selectorValues = {
         options: [selectedFeedbackTitle]
-        selections: []
+        selections: [indexSelected]
         string_selector_type: "GENERIC_SURVEY" 'StringSelectorComponent.type enum
         sub_type: "report_problem_player"
       }
@@ -710,8 +718,10 @@ Function onContentChange() As Void
   stopVideo()
 
   if m.top.isTrailer = false AND m.top.appMode <> "KIDS_MODE" AND getExperimentResource("roku_send_feedback_on_player", "roku_send_feedback_on_player_v1", false).enabled = true
+    m.sendFeedBackButton.enabled = true
     m.sendFeedBackButton.visible = true
   else
+    m.sendFeedBackButton.enabled = false
     m.sendFeedBackButton.visible = false
   end if
 

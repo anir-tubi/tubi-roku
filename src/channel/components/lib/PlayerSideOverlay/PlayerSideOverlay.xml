@@ -2,6 +2,7 @@
 <component name="PlayerSideOverlay" extends="Group">
   <script type="text/brightscript" uri="PlayerSideOverlay.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/MathUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
@@ -20,6 +21,7 @@
 
     <field id="backOrLeftKeyPress" type="boolean" value="false" alwaysNotify="true" />
     <field id="itemSelected" type="node" alwaysNotify="true" />
+    <field id="indexSelected" type="integer" />
     <field id="content" type="node" />
     <field id="itemUpdated" type="boolean" alwaysNotify="true"/>
   </interface>
