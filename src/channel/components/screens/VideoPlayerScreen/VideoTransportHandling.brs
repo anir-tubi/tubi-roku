@@ -759,23 +759,25 @@ End Function
 
 ' Displays the SendFeedback selection overlay.
 Function showSendFeedbackOverlay()
-  m.isSendFeedbackOverlayShowing = true
-  setFocusToComponent(m.sendFeedBackButton)
-  fade(m.sendFeedbackSelectionOverlayGroup, "in", 0.6)
-  m.sendFeedbackSelectionOverlay.itemList = getItemListForSendFeedback()
-  m.sendFeedbackSelectionOverlay.setFocus(true)
+  if m.top.appMode <> "KIDS_MODE"
+    m.isSendFeedbackOverlayShowing = true
+    setFocusToComponent(m.sendFeedBackButton)
+    fade(m.sendFeedbackSelectionOverlayGroup, "in", 0.6)
+    m.sendFeedbackSelectionOverlay.itemList = getItemListForSendFeedback()
+    m.sendFeedbackSelectionOverlay.setFocus(true)
 
-  'Send Dialog event when sendFeedback button clicked.
-  trackingPageInfo = m.top.trackingPageInfo
-  trackEvent({
-    type: "dialog"
-    values: {
-      dialog_type: "INFORMATION"
-      pageOneof: m.Tracking.getAnalyticsPage(trackingPageInfo.pageType, trackingPageInfo.pageValues)
-      dialog_action: "SHOW"
-      dialog_sub_type: "player_problem"
-    }
-  })
+    'Send Dialog event when sendFeedback button clicked.
+    trackingPageInfo = m.top.trackingPageInfo
+    trackEvent({
+      type: "dialog"
+      values: {
+        dialog_type: "INFORMATION"
+        pageOneof: m.Tracking.getAnalyticsPage(trackingPageInfo.pageType, trackingPageInfo.pageValues)
+        dialog_action: "SHOW"
+        dialog_sub_type: "player_problem"
+      }
+    })
+  end if
 End Function
 
 
@@ -886,7 +888,7 @@ Function getItemListForSendFeedback()
       subtitle: getTranslation("send_feedback_overlay_subtitle")
       hasSubMenu: false
       content: node
-      numRows: 9
+      numRows: 10
     }
   ]
 
@@ -1308,7 +1310,9 @@ Function showTransport()
   updatePlayPauseUri()
 
   'Send exposure event for send feedback when transport control is visible
-  getExperimentResource("roku_send_feedback_on_player", "roku_send_feedback_on_player_v1")
+  if m.top.appMode <> "KIDS_MODE"
+    getExperimentResource("roku_send_feedback_on_player", "roku_send_feedback_on_player_v1")
+  end if
 
   creditCuePoints = getCreditCuepointsFromContent(m.top.content)
   if m.top.hasFocus() = true AND isSkipIntroCuePointsReached(creditCuePoints) = false

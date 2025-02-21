@@ -69,7 +69,6 @@ Function init()
   m.video.observeFieldScoped("audioTrack", "onAudioTrackChanged")
   m.video.observeFieldScoped("subtitleTrack", "onSubtitleTrackChanged")
 
-
   ' asyncStopSemantics was broken prior to 14.0 so we are not running it on older firmware versions
   isFirmwareOk = createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
   if isFirmwareOk = true AND getExperimentResource("roku_async_stop", "roku_async_stop_v6", false).enabled = true then
@@ -292,7 +291,7 @@ Function init()
   ' callback referencing the value, which would lead to badly formed playProgressEvents.
   m.seekReferenceQueue = []
 
-  if getExperimentResource("roku_send_feedback_on_player", "roku_send_feedback_on_player_v1", false).enabled = true then
+  if m.top.appMode <> "KIDS_MODE" AND getExperimentResource("roku_send_feedback_on_player", "roku_send_feedback_on_player_v1", false).enabled = true
     m.sendFeedBackButton.visible = true
     m.closedCaptionAudioButton.translation = [1565,110]
     m.sendFeedBackButton.translation = [1695,110]
@@ -402,8 +401,6 @@ Function onSendFeedBackOverlayItemSelected(msg)
       })
     end if
 
-    hideSendFeedbackOverlay()
-
     selectedFeedbackTitle = itemSelected.title
     if itemSelected.id <> "cancel"
       ' send RequestForInfo analytics event
@@ -424,6 +421,8 @@ Function onSendFeedBackOverlayItemSelected(msg)
 
       sendPlayerFeedbackInfo(selectedFeedbackTitle)
       showQRCodeScreen()
+    else
+      hideSendFeedbackOverlay()
     end if
   end if
 End Function
@@ -466,9 +465,9 @@ Function showQRCodeScreen()
     subTitle: getTranslation("send_feedback_submitted_description")
     sendFeedbackHintText: getTranslation("send_feedback_overlay_feedback_hint")
     uri: "pkg:/images/sendFeedback.webp"
-    translation: [1230, 60]
+    translation: [0, 0]
   })
-  m.top.appendChild(sendFeedbackQRCodeOverlay)
+  m.sendFeedbackSelectionOverlay.appendChild(sendFeedbackQRCodeOverlay)
 
   sendFeedbackQRCodeOverlay.observeFieldScoped("closeOverlay", "onCloseOverlay")
   sendFeedbackQRCodeOverlay.setFocus(true)
@@ -480,9 +479,8 @@ Function onCloseOverlay(msg)
 
   if sendFeedbackQRCodeOverlay <> invalid
     sendFeedbackQRCodeOverlay.setFocus(false)
-    m.top.removeChild(sendFeedbackQRCodeOverlay)
-    removeOverLayItems()
-    m.top.setFocus(true)
+    m.sendFeedbackSelectionOverlay.removeChild(sendFeedbackQRCodeOverlay)
+    m.sendFeedbackSelectionOverlay.setFocus(true)
   end if
 End Function
 
@@ -710,6 +708,12 @@ End Function
 Function onContentChange() As Void
   tubiLog("VideoPlayer.onContentChange")
   stopVideo()
+
+  if m.top.isTrailer = false AND m.top.appMode <> "KIDS_MODE" AND getExperimentResource("roku_send_feedback_on_player", "roku_send_feedback_on_player_v1", false).enabled = true
+    m.sendFeedBackButton.visible = true
+  else
+    m.sendFeedBackButton.visible = false
+  end if
 
   if m.top.content <> invalid
     'set page tracking values for analytics

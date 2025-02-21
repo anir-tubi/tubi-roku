@@ -1,6 +1,25 @@
 Function init()
   m.overLayItemsLayoutGroup = m.top.findNode("OverLayItemsLayoutGroup")
   m.top.observeFieldScoped("itemsInfo", "onItemInfoChanged")
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+
+  if theme <> invalid
+    m.focusedColor = theme.focusedColor
+  end if
 End Function
 
 
@@ -40,9 +59,10 @@ Function onItemInfoChanged(msg)
   end if
 
   checkBoxList.id = items.id.trim()
-  checkBoxList.itemSize = [510,72]
+  checkBoxList.itemSize = [510,69]
   checkBoxList.numRows = items.numRows
-  checkBoxList. rowSpacings = [8]
+  checkBoxList.itemComponentName = "CheckButton"
+  checkBoxList.rowSpacings = [8]
   checkBoxList.content = items.content
   checkBoxList.focusBitmapBlendColor = m.focusedColor
   checkBoxList.observeFieldScoped("itemSelected", "onWasItemSelectedFromMenu")

@@ -57,9 +57,8 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
   if press then
     if key = "back" OR key = "left"
       m.top.closeOverlay = true
-      return true
     end if
   end if
 
-  return false
+  return true
 End Function
