@@ -61,7 +61,7 @@ Function showClosedCaptionAndAudioSettings()
 
   subtitleModeAA = {}
   subtitleModeAA.id = "subtitleModes"
-  subtitleModeAA.title = "Subtitles Mode"
+  subtitleModeAA.title = getTranslation("cc_audio_overlay_subtitles_mode")
   subtitleModeAA.subtitle = invalid
   subtitleModeAA.hasSubmenu = true
 

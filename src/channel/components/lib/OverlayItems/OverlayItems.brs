@@ -50,18 +50,22 @@ Function onItemInfoChanged(msg)
     rectangle.width = 0
     rectangle.height = 44
     m.overLayItemsLayoutGroup.appendChild(rectangle)
+  else
+    m.overLayItemsLayoutGroup.itemSpacings = [15, 30]
   end if
 
   if items.hasSubmenu = true
     checkBoxList = createObject("roSGNode", "CaretBoxList")
+    itemComponentName = "CaretButton"
   else
     checkBoxList = createObject("roSGNode", "CheckBoxList")
+    itemComponentName = "CheckButton"
   end if
 
   checkBoxList.id = items.id.trim()
   checkBoxList.itemSize = [510,69]
   checkBoxList.numRows = items.numRows
-  checkBoxList.itemComponentName = "CheckButton"
+  checkBoxList.itemComponentName = itemComponentName
   checkBoxList.rowSpacings = [8]
   checkBoxList.content = items.content
 

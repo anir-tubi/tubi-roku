@@ -18,9 +18,9 @@ End Function
 
 
 Function onItemListChanged(msg)
-  itemlist = m.top.itemlist
+  itemList = m.top.itemList
 
-  if itemlist <> invalid
+  if itemList <> invalid
 
     ' This field is used to store all the menu items within this component and determine which one should be focused on
     m.focusArray = []
@@ -31,8 +31,8 @@ Function onItemListChanged(msg)
     outerLayoutGroup.itemSpacings = [40]
     outerLayoutGroup.translation = [60, 60]
 
-    for i = 0 to itemlist.Count() - 1
-      items = itemlist[i]
+    for i = 0 to itemList.Count() - 1
+      items = itemList[i]
 
       if items <> invalid
         overlayItems = CreateObject("roSGNode", "OverlayItems")
@@ -42,8 +42,8 @@ Function onItemListChanged(msg)
         focusedChild = invalid
         for j = 0 to child.getChildCount() - 1
           if child.getChild(j).subtype() = "CheckBoxList" OR child.getChild(j).subtype() = "CaretBoxList"
-          focusedChild = child.getChild(j)
-          focusedChild.observeFieldScoped("itemSelected", "onWasItemSelectedFromMenu")
+            focusedChild = child.getChild(j)
+            focusedChild.observeFieldScoped("itemSelected", "onWasItemSelectedFromMenu")
           end if
         end for
 
