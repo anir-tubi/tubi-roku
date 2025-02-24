@@ -64,6 +64,11 @@ Function onItemInfoChanged(msg)
   checkBoxList.itemComponentName = "CheckButton"
   checkBoxList.rowSpacings = [8]
   checkBoxList.content = items.content
+
+  if items.defaultCheckedItemIndex <> invalid
+    checkBoxList.defaultCheckedItemIndex = items.defaultCheckedItemIndex
+  end if
+  
   checkBoxList.focusBitmapBlendColor = m.focusedColor
   checkBoxList.observeFieldScoped("itemSelected", "onWasItemSelectedFromMenu")
 
