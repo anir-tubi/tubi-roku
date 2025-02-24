@@ -49,14 +49,14 @@ End Function
 
 
 Function onCloseSelected()
-  m.top.closeOverlay = true
+  m.top.closeSendFeedbackOverlay = true
 End Function
 
 
 Function onKeyEvent(key As String, press As Boolean) as Boolean
   if press then
     if key = "back" OR key = "left"
-      m.top.closeOverlay = true
+      m.top.closeQRCodeOverlay = true
     end if
   end if
 

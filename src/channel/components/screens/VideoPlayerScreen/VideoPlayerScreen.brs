@@ -477,12 +477,13 @@ Function showQRCodeScreen()
   })
   m.sendFeedbackSelectionOverlay.appendChild(sendFeedbackQRCodeOverlay)
 
-  sendFeedbackQRCodeOverlay.observeFieldScoped("closeOverlay", "onCloseOverlay")
+  sendFeedbackQRCodeOverlay.observeFieldScoped("closeQRCodeOverlay", "onCloseQRCodeOverlay")
+  sendFeedbackQRCodeOverlay.observeFieldScoped("closeSendFeedbackOverlay", "onCloseSendFeedbackOverlay")
   sendFeedbackQRCodeOverlay.setFocus(true)
 End Function
 
 
-Function onCloseOverlay(msg)
+Function onCloseQRCodeOverlay(msg)
   sendFeedbackQRCodeOverlay = msg.getRoSGNode()
 
   if sendFeedbackQRCodeOverlay <> invalid
@@ -490,6 +491,18 @@ Function onCloseOverlay(msg)
     m.sendFeedbackSelectionOverlay.removeChild(sendFeedbackQRCodeOverlay)
     m.sendFeedbackSelectionOverlay.setFocus(true)
   end if
+End Function
+
+
+Function onCloseSendFeedbackOverlay(msg)
+  isCloseSendFeedbackOverlay = msg.getData()
+  qrCodeOverlay = msg.getRoSGNode()
+
+  if isCloseSendFeedbackOverlay = true AND qrCodeOverlay <> invalid
+    hideSendFeedbackOverlay()
+    m.sendFeedbackSelectionOverlay.removeChild(qrCodeOverlay)
+  end if
+
 End Function
 
 

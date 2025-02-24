@@ -14,7 +14,8 @@
 
     <!-- OUTPUTS -->
 
-    <field id="closeOverlay" type="boolean" value="false" alwaysNotify="true" />
+    <field id="closeQRCodeOverlay" type="boolean" value="false" alwaysNotify="true" />
+    <field id="closeSendFeedbackOverlay" type="boolean" value="false" alwaysNotify="true" />
   </interface>
 
   <children>
