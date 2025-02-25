@@ -779,7 +779,11 @@ Function onContentSelected(msg)
   contentType = content.type
   if contentType = m.constants.uapiContentTypes.channel
     stopVideoPreview()
-    showCategoryDetailsScreen(content)
+    contentMode = ""
+    if homeScreen.contentMode <> m.constants.ui.contentMode.homescreen
+      contentMode = homeScreen.contentMode
+    end if
+    showCategoryDetailsScreen(content, true, contentMode)
   else if contentType = m.constants.ui.contentTypes.historySignedOutUser
     '//if a signed out user selects the continue watching row, then navigate him/her to the sign in screen
     startSignIn(refreshScreenAndContentAfterSignIn)
@@ -819,7 +823,11 @@ Function onContentToPlay(msg)
   contentType = content.type
   ' Since category panel list screen re-uses the method allowing it to play the content.
   if contentType = m.constants.uapiContentTypes.channel
-    showCategoryDetailsScreen(content)
+    contentMode = ""
+    if screen.contentMode <> m.constants.ui.contentMode.homescreen
+      contentMode = screen.contentMode
+    end if
+    showCategoryDetailsScreen(content, true, contentMode)
   else if contentType = m.constants.ui.contentTypes.historySignedOutUser
     '//if a signed out user selects the continue watching row, then navigate him/her to the sign in screen
     startSignIn(refreshScreenAndContentAfterSignIn)
