@@ -473,11 +473,6 @@ Function onRowItemFocused(msg)
         m.top.itemFocused = itemFocused
       end if
     end if
-
-    if m.firstTimeLinearProgramEnabled = false
-      m.firstTimeLinearProgramEnabled = true
-      getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v2", true)
-    end if
   end if
 End Function
 
