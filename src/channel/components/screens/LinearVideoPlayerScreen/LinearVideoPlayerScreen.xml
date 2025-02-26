@@ -35,13 +35,13 @@
       <field id="originalContent" type="node"/>
 
       <!--Timegrid content updated in batches-->
-      <field id="timeGridContent" type="node" alias="VideoOverlay.timeGridContent"/>
+      <field id="timeGridContent" type="node" alias="VideoOverlay.timeGridContent, VideoOverlayLite.timeGridContent"/>
 
       <!-- Content might be loading in batch. So render only when timeGridContent is set -->
-      <field id="updateTimeGridContent" type="boolean" alwaysNotify="true" alias="VideoOverlay.updateTimeGridContent"/>
+      <field id="updateTimeGridContent" type="boolean" alwaysNotify="true" alias="VideoOverlay.updateTimeGridContent, VideoOverlayLite.updateTimeGridContent"/>
 
       <!-- Is the content of the EPG component loading? -->
-      <field id="timeGridContentLoading" type="boolean" alwaysNotify="true" alias="VideoOverlay.timeGridContentLoading"/>
+      <field id="timeGridContentLoading" type="boolean" alwaysNotify="true" alias="VideoOverlay.timeGridContentLoading, VideoOverlayLite.timeGridContentLoading"/>
 
       <!-- content that is used to display a channel guide overlaid the video player -->
       <field id="channelsContent" type="node"/>
@@ -89,7 +89,7 @@
       <field id="backButtonPressed" type="boolean" value="false" alwaysNotify="true" />
 
       <!-- When this is called, then the helper should display the EPGScreen-->
-      <field id="navigateToEPGScreen" alias="VideoOverlay.navigateToEPGScreen"/>
+      <field id="navigateToEPGScreen" alias="VideoOverlay.navigateToEPGScreen, VideoOverlayLite.navigateToEPGScreen"/>
 
       <field id="state" type="string" />
 
@@ -141,8 +141,9 @@
 
       <!-- Timestamp of the last time we finished playing back video with this player. If -1 then we are currently playing back. -->
       <field id="timestampOfLastVideoPlayback" type="integer" value="0" />
-      <field id="isDisplayingOverlay" alias="VideoOverlay.isDisplaying" />
-      <field id="globalCaptionMode" alias="VideoNode.globalCaptionMode" />
+      <field id="isDisplayingOverlay" alias="VideoOverlay.isDisplaying, VideoOverlayLite.isDisplaying" />
+      <field id="linearOverlayLiteComponentInteractionInfo" alias="VideoOverlayLite.componentInteractionInfo" />
+      <field id="globalCaptionMode" alias="VideoOverlayLite.globalCaptionMode, VideoNode.globalCaptionMode" />
 
       <!-- This field is used to expose the task to allow us to be able to communicate directly with the task from the contentController context regarding auth -->
       <field id="task" type="node" />
@@ -203,6 +204,10 @@
     <LinearVideoPlayerScreenOverlay
       id="VideoOverlay"
       visible="false"/>
+
+    <LinearVideoPlayerScreenOverlayLite
+      id="VideoOverlayLite"
+      visible="false"/>  
 
     <AdsSSAITask
       id="PlayerAdsSSAITask" />

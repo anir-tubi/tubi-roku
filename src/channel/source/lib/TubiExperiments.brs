@@ -68,6 +68,12 @@ Function TubiExperiments(experimentsInfo) as Object
         }
       }
 
+      roku_linear_player_view: {
+        roku_linear_player_view_v2: {
+          default: {"enabled": false}
+          holdout_control: {"enabled": false}
+          holdout_winning: {"enabled": false}}
+      }
 
       roku_player_client_log: {
         roku_player_client_log_v2: {

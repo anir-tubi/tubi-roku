@@ -1065,6 +1065,23 @@ Function onModeChange()
 
     'The third item spacing is to add the space between description and needsLogin(signup text with lock icon)
     m.offset.itemSpacings = [12, 16, 13]
+  else if m.top.mode = m.constants.ui.infoPanelModes.simplifiedLinearPlayer
+    '//For when the linear player is on its own EPG screen
+    m.infoPanelGroup.appendChild(m.offset)
+    m.offset.appendChild(m.title)
+    m.offset.appendChild(m.twoLineInfo)
+    m.offset.appendChild(m.descriptionGroup)
+
+    m.twoLineInfo.appendChild(m.firstLineGroup)
+    m.firstLineGroup.appendChild(m.line1)
+    m.firstLineGroup.appendChild(m.closedCaptionPoster)
+    m.firstLineGroup.appendChild(m.audioDescriptionPoster)
+    m.firstLineGroup.appendChild(m.rating)
+    m.firstLineGroup.appendChild(m.descriptorCode)
+
+    m.top.appendChild(m.playerCountdownGroup)
+    m.playerCountdownGroup.translation = [1216, -78]
+    m.offset.itemSpacings = [12]  
   else if m.top.mode = m.constants.ui.infoPanelModes.linearSearch
     ' when linear content is focused on the search screen
     m.infoPanelGroup.appendChild(m.offset)

@@ -39,6 +39,7 @@ settings:
 
   #the number of seconds before the video overlay autohides in Live TV after last button pressed.
   videoOverlayAutoHideTime: 5
+  videoOverlayLiteAutoHideTime: 10
 
   # Setting the below value to true will enable youbora tracking.
   youboraEnabled: false
