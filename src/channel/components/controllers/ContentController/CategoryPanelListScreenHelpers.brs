@@ -372,7 +372,9 @@ Function onCategoryPanelBatchIndexChange(msg)
     '//If index is 0, then refresh the page
     categoryPanelScreen.categoryContent = invalid
     categoryPanelScreen.isCategoryLoading = true
-    fetchCategoryPanelDetails(categoryContent.id)
+    if categoryContent <> invalid
+      fetchCategoryPanelDetails(categoryContent.id)
+    end if
   end if
 End Function
 

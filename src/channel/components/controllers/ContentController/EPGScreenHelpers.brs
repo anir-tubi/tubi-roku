@@ -343,7 +343,7 @@ Function onEpgProgramError(response)
 
     toBeFetchedChannelCount = m.uniqueChannelIdsList.count()
 
-    ' if all the responses for Channel infomation errored out then timeGrid will not have any content.
+    ' if all the responses for Channel information errored out then timeGrid will not have any content.
     if screen.timeGridContent.getChildCount() = 0
       onEPGError(response)
     else if toBeFetchedChannelCount = 0 ' all the batches are over and there are channels in the list, show whatever has been fetched successfully.
