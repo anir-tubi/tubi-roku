@@ -115,8 +115,16 @@ Function onMyStuffBatchResponse(response)
     end if
 
     screen.isLoading = false
-    screen.content = response
-    screen.contentUpdated = true
+    if isNode(response) = true AND response.getChildCount() > 0
+      screen.content = response
+      screen.contentUpdated = true
+    else
+      modalInfo = {
+        message: getTranslation("error_noContent_description")
+      }
+
+      showErrorModal(modalInfo, fetchMyStuffCategoryDetails)
+    end if
 
     jumpToPreviousFocusedItem(screen)
     showHideSpinner(false)
