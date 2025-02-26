@@ -231,8 +231,8 @@ Function handleTransportVoiceEvent()
   tubiLog("VideoTransportHandling.handleTransportVoiceEvent " + command)
 
   response = "unhandled"
-  hidePauseAdOverlay()
   resetPauseAdOverlay()
+  hidePauseAdOverlay()
 
   if m.top.visible = true AND m.UpNext.opacity = 0
     response = "success"
