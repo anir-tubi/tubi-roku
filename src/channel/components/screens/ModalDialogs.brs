@@ -675,7 +675,7 @@ Function removeFocusFromRowlist()
     screen = getCurrentScreen() 'bs:disable-line 1140 LINT1001
     ' Due to a bug in roku when we set focus to rowlist and immediately set focus to modal.
     ' Modal does not seem to be receive focus properly. So we are force removing focus away from rowlist before displaying the modal.
-    if screen.hasField("removeFocusFromRowList") = true
+    if screen <> invalid AND screen.hasField("removeFocusFromRowList") = true
       screen.removeFocusFromRowList = true
     end if
   end if
