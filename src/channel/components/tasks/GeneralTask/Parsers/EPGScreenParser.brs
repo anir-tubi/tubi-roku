@@ -48,5 +48,6 @@ Function parseEPGProgramsError(fullResponse, reqInfo)
     code: getErrorCodeFromResponse(fullResponse)
     requestorID: reqInfo.requestorID
     contentID: contentId
+    fetchId: reqInfo.fetchId
   }
 End Function
