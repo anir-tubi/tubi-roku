@@ -1158,9 +1158,14 @@ Function onVideoPositionChange(msg)
 
       if m.UpNext.content <> invalid
 
-        ' When upNext UI appears, we will close the sendFeed overlay to avoid the focus issues.
+        ' When upNext UI appears, we will close the sendFeedback overlay to avoid the focus issues.
         if m.isSendFeedbackOverlayShowing = true
           hideSendFeedbackOverlay()
+        end if
+
+        ' Hiding the audio and closed captioning overlay.
+        if m.isClosedCaptionAudioOverlayShowing = true
+          hideClosedCaptionAudioTrackOverlay()
         end if
 
         animateTransport("out")
