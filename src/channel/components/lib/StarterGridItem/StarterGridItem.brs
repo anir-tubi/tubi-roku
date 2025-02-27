@@ -205,6 +205,12 @@ Function onRenderTrackingChange(msg)
           personalizationId: m.personalizationId
         }
 
+        ''//::TODO:: Remove this block once the row mismatch on client impression data is fixed
+        'We expect always the row as 1 for featured row
+        if row.id = "featured" AND itemInfo.row <> 1
+          tubiLog(FormatJSON(trackingInfo), "info", "clientInfo", "client-impression-mismatch")
+        end if
+
         m.global.viewableImpressionEventInfo = trackingInfo
       end if
 
