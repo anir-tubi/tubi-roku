@@ -68,6 +68,8 @@ Function init()
   m.video.observeFieldScoped("availableAudioTracks", "onAvailableAudioTracksChange")
   m.video.observeFieldScoped("audioTrack", "onAudioTrackChanged")
   m.video.observeFieldScoped("subtitleTrack", "onSubtitleTrackChanged")
+  'downloadedSegment is needed for player log - Quality Of Service event
+  m.video.observeFieldScoped("downloadedSegment", "onDownloadedSegment")
 
   ' asyncStopSemantics was broken prior to 14.0 so we are not running it on older firmware versions
   isFirmwareOk = createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
@@ -98,6 +100,7 @@ Function init()
   m.top.observeFieldScoped("showBrowseWhileWatchingInFullScreen", "onShowBrowseWhileWatchingInFullScreen")
   m.top.observeFieldScoped("adTrackingObject", "onAdTrackingObject")
   m.top.observeFieldScoped("adBufferingObject", "onAdBufferingObject")
+  m.top.observeFieldScoped("filledAdData", "onHandleFilledAdData")
 
   'isPauseAdReqInProgress is the state of pauseAd requests in flight.
   'If pause ad request is in flight, we do not send another pause ad request
@@ -175,6 +178,8 @@ Function init()
     is_ad: false
     is_buffering: false
   }
+
+  m.adCount = 0
 
   ' Map to store the history whether cuePoints button were shown or not.
   ' skip button for each cuepoint should only be shown once per video
@@ -427,6 +432,7 @@ Function onSendFeedBackOverlayItemSelected(msg)
         }
       })
 
+      updatePlayerLogLib(m.playerLogLib, "setPlayerFeedback", itemSelected.id)
       sendPlayerFeedbackInfo(selectedFeedbackTitle)
       showQRCodeScreen()
     else
@@ -759,10 +765,11 @@ Function onControlChange()
 
   if control = "play"
     if m.top.content <> invalid
-      updatePlayerLogLib(m.playerLogLib, "setPlayerLoadTime", m.top.loadTime)
-      updatePlayerLogLib(m.playerLogLib, "setPlayerSetupStartTime")
+      playerLoadTime = m.top.loadTime
+      updatePlayerLogLib(m.playerLogLib, "setPlayerInitialization", playerLoadTime)
       prepareToStartVideo(m.top.content)
       updatePlayerLogLib(m.playerLogLib, "setPlayerSetupEndTime")
+      updatePlayerLogLib(m.playerLogLib, "setLastStartStep", "START_LOAD")
       updatePlayerLogLib(m.playerLogLib, "setPlayerStage", "READY")
       updatePlayerLogLib(m.playerLogLib, "setPlaybackSource", m.top.playbackSource)
       playContent()
@@ -772,6 +779,7 @@ Function onControlChange()
     stopAdsPlayback()
     cancelReplayCaptions()
     clearSkipCuepointsButtonAndTimer()
+    updatePlayerLogLib(m.playerLogLib, "fireQualityOfServiceEvent")
     stopVideo()
     animateTransport("out")
     hideBrowseWhileWatching()
@@ -903,6 +911,7 @@ Function onVideoStateChange(msg)
     if content.isTrailer = true
       m.didAdvanceDrm = false
     else
+      updatePlayerLogLib(m.playerLogLib, "setBreakOffError", m.Video.errorCode)
       ' Set up the next DRM scheme. Playback of next DRM scheme is triggered when state = "finished",
       ' right after error state occurs.
       if m.Video.errorCode = -5 ' Media error; the media format is unknown or unsupported
@@ -913,6 +922,7 @@ Function onVideoStateChange(msg)
     end if
 
     if m.didAdvanceDrm <> true
+      updatePlayerLogLib(m.playerLogLib, "setErrorCode", m.Video.errorCode)
       updatePlayerLogLib(m.playerLogLib, "setErrorModal", true)
       m.top.errorMsg = getTranslation("videoPlayer_error_playback_description")  'is used in error modal
       m.top.state = state   'triggers error modal in ContentController
@@ -1399,6 +1409,7 @@ Function onAdStateChange(msg)
         }
       })
     else
+      updatePlayerLogLib(m.playerLogLib, "setErrorModal", true)
       errorMsg = getTranslation("videoPlayer_error_invalidURL_description")
       m.top.errorMsg = errorMsg
       m.top.state = "error"
@@ -2246,6 +2257,19 @@ Function onStreamingSegmentChange(msg)
 End Function
 
 
+Function onDownloadedSegment(msg)
+  downloadedSegment = msg.getData()
+  if isAA(downloadedSegment) = true
+    downloadedSegmentData = {
+      segSize: downloadedSegment.segSize
+      downloadDuration: downloadedSegment.downloadDuration
+      segDuration: downloadedSegment.segDuration
+    }
+    updatePlayerLogLib(m.playerLogLib, "setDownloadedSegmentData", downloadedSegmentData)
+  end if
+End Function
+
+
 ' showratingOverlay helps to show the rating overlay and start the timer to hide it after certain amount of time.
 Function showRatingOverlay()
 
@@ -2635,24 +2659,88 @@ Function onUserConsentsOptOutStatusChange(msg)
 End Function
 
 
+Function onHandleFilledAdData(msg)
+  filledAdData = msg.getData()
+  adPosition = m.top.adPosition
+
+  if isAA(filledAdData) = true AND isNumber(m.playerPosition) AND isNumber(adPosition) = true
+    adCount = 0
+    if isNumber(filledAdData.adCount) = true
+      adCount = filledAdData.adCount
+    end if
+
+    currentPosition = Int(m.playerPosition)
+    adPosition = Int(adPosition)
+    adControl = m.top.adControl
+    positionDeviation = currentPosition - adPosition 'Position minus cue point. We can know we might miss this cue point because it responds too slowly.
+
+    if adControl = "midroll"
+      adRequestPosition = adPosition - m.adPrefetchTime 'we prefetch 15 seconds before cuepoint
+    else
+      adRequestPosition = adPosition
+    end if
+
+    cuepointInfo = {
+      is_preroll: (adControl = "preroll")
+      position: currentPosition * 1000 'ms
+      request_position: adRequestPosition * 1000 'ms
+      position_deviation: positionDeviation * 1000 'ms
+      ad_count: adCount
+      cue_point: adPosition * 1000 'ms
+    }
+    updatePlayerLogLib(m.playerLogLib, "fireCuepointFilledEvent", cuepointInfo) 'bs:disable-line 1140 LINT1001
+  end if
+End Function
+
+
 Function onAdTrackingObject(msg)
   adInfo = msg.getData()
   adStatus = adInfo.type
 
-  m.playerExitInfo["is_ad"] = true
-  m.playerExitInfo["is_buffering"] = false
+  'possible adStatus are PodStart, Start, Complete, Error, PodComplete, Close
+  'adStatus=PodStart, when AdPod Starts
+  'adStatus=Start, when individual Ad starts
+  'adStatus=Complete, when individual Ad completes
+  'adStatus=Error, when there is an error in individual Ad
+  'adStatus=PodComplete, when AdPod completes
+  'adStatus=Close, when user closes the Ad
 
-  if adStatus = "Start"
+  if adStatus = "PodStart"
+    updatePlayerLogLib(m.playerLogLib, "resetAdMetrics")
+    updatePlayerLogLib(m.playerLogLib, "setAdCount", adInfo.adCount)   
+  else if adStatus = "Start"
     m.playerExitInfo["ad_counts"] += 1 
+    updatePlayerLogLib(m.playerLogLib, "fireAdStartupPerformanceEvent", adInfo)
+    updatePlayerLogLib(m.playerLogLib, "fireAdStartEvent", adInfo)
+  else if adStatus = "Complete"
+    updatePlayerLogLib(m.playerLogLib, "fireAdCompleteEvent", adInfo)  
+  else if adStatus = "Error"
+    'If the last ad in the ad pod returns an error, we need to reset is_buffering to false, as onAdBufferingObject won't be triggered afterward.
+    m.playerExitInfo["is_buffering"] = false
+    if adInfo.rendertime = 0
+      updatePlayerLogLib(m.playerLogLib, "setAdStartupFailureCount")  
+    end if
+    updatePlayerLogLib(m.playerLogLib, "fireAdDiscontinueEvent", adInfo)
   else if adStatus = "PodComplete"
-    m.playerExitInfo["is_ad"] = false
+    updatePlayerLogLib(m.playerLogLib, "fireAdPodCompleteEvent", adInfo)
   end if
+
+  isAd = (adStatus <> "PodComplete")
+  m.playerExitInfo["is_ad"] = isAd
+  updatePlayerLogLib(m.playerLogLib, "setIsAd", isAd)
 End Function
 
 
 Function onAdBufferingObject(msg)
   adBufferingInfo = msg.getData()
+  if isAA(adBufferingInfo) = true AND adBufferingInfo.eventType = "reBuffer"
+    updatePlayerLogLib(m.playerLogLib, "incrementAdReBuffer")
+  end if
+
   progress = adBufferingInfo.progress
+  if progress = invalid 'progress field will not present on adBufferingInfo when Ad begins to buffer, so checking against invalid
+    updatePlayerLogLib(m.playerLogLib, "setAdBufferStartTime")
+  end if
   m.playerExitInfo["is_buffering"] = (progress = invalid OR progress < 100)
 End Function
 

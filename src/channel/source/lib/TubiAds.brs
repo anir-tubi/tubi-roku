@@ -26,12 +26,6 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
   adMessagePort = CreateObject("roMessagePort")
   requestQueue = requestQueue.create(adMessagePort)
 
-  playerLog = invalid
-  if constants.settings.playerLogEnabled = true AND getExperimentResource("roku_player_client_log", "roku_player_client_log_v2", false).enabled = true 'bs:disable-line 1140 LINT1001
-    logger = TubiLogger(m.constants, request, auth)
-    playerLog = PlayerLogLib(m.constants, requestQueue, logger)
-  end if
-
   if adContentType <> "hls" AND adContentType <> "mp4"
     adContentType = "mp4"  ' safety fallback
   end if
@@ -49,7 +43,6 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
     auth: auth
     request: request
     tracking: tracking
-    playerLogLib: playerLog
 
     ' private
     updateYouboraOptions: tubiAds_updateYouboraOptions
@@ -93,9 +86,6 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
     replaceMacro: tubiAds_replaceMacro
     setLimitAdTracking: tubiAds_setLimitAdTracking
 
-    videoPosition: 0
-    adPosition: 0
-    adControl: "preroll"
     appMode: "DEFAULT_MODE"
     notUsedAdPodPixels: {} ' List of pixels for the current ad pod that should be sent if playback is stopped before we get an impression for that ad
     tcfString: tcfString ' IAB TC String, currently stored in m.global.IABTCF_TCString from one trust sdk.
@@ -679,27 +669,7 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos)
     'save the total number of ads in the ad break before we (potentially) start breaking them up into different ad unit lists
     m.totalAdBreakAds = currentAdUnitsList[0].ads.count()
 
-    if m.adControl = "seek"
-      position = m.adPosition
-      adRequestPosition = m.adPosition
-    else
-      position = m.videoPosition
-      adRequestPosition = m.videoPosition
-    end if
-
-    positionDeviation = position - breakPos
-    isPreroll = (m.adControl = "preroll")
-
-    cuepointInfo = {
-      is_preroll: isPreroll
-      position: position
-      request_position: adRequestPosition
-      position_deviation: positionDeviation
-      ad_count: m.totalAdBreakAds
-      cue_point: breakPos
-      video_id: episode.id
-    }
-    updatePlayerLogLib(m.playerLogLib, "fireCuepointFilledEvent", cuepointInfo) 'bs:disable-line 1140 LINT1001
+    
 
     for each adUnit in currentAdUnitsList[0].ads
 
@@ -900,9 +870,6 @@ Function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
             ads.adTrackingCallback(eventType, ctx)
           end function, ctx)
 
-          'start the Ad buffer time to calculate first_frame_time in AdStartupPerformance event for player log
-          updatePlayerLogLib(m.playerLogLib, "setAdBufferStartTime") 'bs:disable-line 1140 LINT1001
-
           adPod = adUnitsListContainer.adUnitsList[0]
           isCompleted = m.roAdFramework.showAds(adPod, screenCount, containerNode)
 
@@ -1019,6 +986,7 @@ Function tubiAds_adBufferingCallback(eventType, ctx)
     ' RebufferingStart will handle any subsequent buffer event during ad playback, including when adIndex = 1.
     m.containerNode.visible = false
   else if eventType = "ReBufferingStart" then
+    ctx.eventType = "reBuffer"
     m.containerNode.visible = false
   else if eventType = "BufferingEnd" OR eventType = "ReBufferingEnd" then
     m.containerNode.visible = true
@@ -1053,6 +1021,12 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
       if ctx.duration <> invalid
         adTrackingObject.duration = ctx.duration
       end if
+      if ctx.ad <> invalid
+        adTrackingObject.ad = ctx.ad
+      end if
+      if ctx.rendertime <> invalid
+        adTrackingObject.rendertime = ctx.rendertime
+      end if
 
       ' Overriding the ads context to reset the sequence since ROKU does not have a way to figure out render sequence properly for VAST ad format.
       ' And it always falls back to preroll. We are basing the value based on the current position when the break occurred.
@@ -1071,8 +1045,6 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
         m.controlNode.adTrackingObject = adTrackingObject
       end if
     end if
-
-    updatePlayerLogLib(m.playerLogLib, "setAdCtx", ctx) 'bs:disable-line 1140 LINT1001
 
     ' We have do the second check for start event because for Innovid interactive ads our Impression code block won't get called because m.adPlaybackPos is already 1. In other words, the position callback where ctx.time = 1 occurs prior to the Impression event for Innovid interactive ads.
 
@@ -1096,13 +1068,6 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
 
       m.trackUserEvent("start_ad", startAdEvent, m.requestQueue)
 
-      updatePlayerLogLib(m.playerLogLib, "setAdBufferEndTime") 'bs:disable-line 1140 LINT1001
-
-      adStartInfo = {
-        video_id: m.controlNode.content.id.toInt()
-      }
-      updatePlayerLogLib(m.playerLogLib, "fireAdStartEvent", adStartInfo) 'bs:disable-line 1140 LINT1001
-
       impressionCount = 0
       for i=0 to ctx.ad.tracking.count()-1
         if ctx.ad.tracking[i].event = "Impression"
@@ -1111,11 +1076,6 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
       end for
       youboraOptions = m.updateYouboraOptions(m.youboraTask, ctx, impressionCount)
     else if eventType = "Complete" or eventType = "Close"
-
-      if eventType = "Complete" AND ctx <> invalid AND ctx.adCount > ctx.adIndex
-        'start the Ad buffer time to calculate first_frame_time in AdStartupPerformance event for player log
-        updatePlayerLogLib(m.playerLogLib, "setAdBufferStartTime") 'bs:disable-line 1140 LINT1001
-      end if
 
       'Close events fire when a user backs out of an ad, or when a user backs out of the interactive portion of an ad
       if eventType = "Close" AND m.isInteracting = true
@@ -1129,10 +1089,6 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
       else
         endPosition = invalid
         if eventType = "Complete"
-          adCompleteInfo = {
-            video_id: m.controlNode.content.id.toInt()
-          }
-          updatePlayerLogLib(m.playerLogLib, "fireAdCompleteEvent", adCompleteInfo) 'bs:disable-line 1140 LINT1001
           endPosition = ctx.duration
         else if eventType = "Close"
           endPosition = m.adPlaybackPos
@@ -1166,21 +1122,10 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
     else if eventType = "Error" AND ctx <> invalid AND ctx.adIndex <> invalid then
       ' Clear out notUsed pixel for the current ad since RAF will fire the error pixel for this ad
       m.notUsedAdPodPixels.delete(ctx.adIndex.toStr())
-      adDiscontinueInfo = {
-        video_id: m.controlNode.content.id.toInt()
-      }
-      updatePlayerLogLib(m.playerLogLib, "fireAdDiscontinueEvent", adDiscontinueInfo) 'bs:disable-line 1140 LINT1001
     else if eventType = "Pause" then
       m.controlNode.timestampOfLastVideoPlayback = createObject("roDateTime").asSeconds()
     else if eventType = "Resume" then
       m.controlNode.timestampOfLastVideoPlayback = -1
-    else if eventType = "PodComplete"
-      adPodCompleteInfo = {
-        video_id: m.controlNode.content.id.toInt()
-      }
-      updatePlayerLogLib(m.playerLogLib, "fireAdPodCompleteEvent", adPodCompleteInfo) 'bs:disable-line 1140 LINT1001
-    else if eventType = "PodStart" 
-      updatePlayerLogLib(m.playerLogLib, "resetAdMetrics") 'bs:disable-line 1140 LINT1001
     end if
 
     ' GAMUtils integration

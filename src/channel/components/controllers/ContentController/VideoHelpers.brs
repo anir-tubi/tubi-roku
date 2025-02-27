@@ -782,8 +782,8 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEp
   removeEpisodeScreen = false
 
   if videoPlayer <> invalid
-    videoPlayer.exitPlayer = true
     stopVideoContent(videoPlayer)
+    videoPlayer.exitPlayer = true
     ' get the top most detail screen
     detailScreen = getTopDetailScreenFromStack()
 

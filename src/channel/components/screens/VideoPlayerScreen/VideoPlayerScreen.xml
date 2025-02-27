@@ -75,6 +75,11 @@
 
 
       <!--
+        - When the rainmaker receives the Ad response, adFilled will be set using TubiAds 
+        -->
+      <field id="filledAdData" type="assocarray" alwaysNotify="true"/>
+
+      <!--
         - When the RAF changes the playback tracking state, this AA object is set]
         - Possible keys are adcount, adindex, duration, rendersequence, type
         - For an update set of keys, see where this object is set: TubiAds.tubiAds_adTrackingCallback

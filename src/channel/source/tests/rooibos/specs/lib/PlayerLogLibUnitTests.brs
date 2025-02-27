@@ -284,73 +284,6 @@ Function playerLogLib_setAdBufferStartTime_test()
 End Function
 
 
-'@Test setAdBufferEndTime unit tests
-Function playerLogLib_setAdBufferEndTime_test()
-  m.playerLogLib.setAdBufferEndTime()
-  adBufferTime = m.playerLogLib.adBufferTime
-  m.assertNotInvalid(adBufferTime)
-End Function
-
-
-'@Test setAdCtx unit tests
-Function playerLogLib_setAdCtx_test()
-  adAA = {
-    adid: "5nJDDooAIM7Deyv7b5Dc"
-  }
-
-  adCtx = {
-    ad: adAA
-    adcount: 3
-    adindex: 1
-    adserver: "tmp:/local_raf_vast.xml"
-    duration: 15.018
-    rendersequence: "preroll"
-    rendertime: 0
-    type: "Impression"
-  }
-
-  m.playerLogLib.setAdCtx(adCtx)
-  adCtx = m.playerLogLib.adCtx
-  m.assertNotInvalid(adCtx)
-  adindex = adCtx.adindex
-  m.assertEqual(adindex, 1)
-
-  m.playerLogLib.setAdCtx("")
-  adCtx = m.playerLogLib.adCtx
-  m.assertNotInvalid(adCtx)
-  adindex = adCtx.adindex
-  m.assertInvalid(adindex)
-
-  m.playerLogLib.setAdCtx(2)
-  adCtx = m.playerLogLib.adCtx
-  m.assertNotInvalid(adCtx)
-  adindex = adCtx.adindex
-  m.assertInvalid(adindex)
-
-  m.playerLogLib.setAdCtx(invalid)
-  adCtx = m.playerLogLib.adCtx
-  m.assertNotInvalid(adCtx)
-  adindex = adCtx.adindex
-  m.assertInvalid(adindex)
-End Function
-
-
-'@Test resetTrackId unit tests
-Function playerLogLib_resetTrackId_test()
-  playerLogTrackId = m.playerLogLib.getTrackId()
-  m.playerLogLib.resetTrackId()
-  m.assertNotEqual(m.playerLogLib.getTrackId(), playerLogTrackId)
-End Function
-
-
-'@Test resetPlayerStage unit tests
-Function playerLogLib_resetPlayerStage_test()
-  m.playerLogLib.resetPlayerStage()
-  playerStage = m.playerLogLib.playerStage
-  m.assertEqual(playerStage, "IDLE")
-End Function
-
-
 '@Test setPlayerFeedback unit tests
 Function playerLogLib_setPlayerFeedback_test()
   m.playerLogLib.setPlayerFeedback("Video Buffering")
@@ -359,15 +292,15 @@ Function playerLogLib_setPlayerFeedback_test()
 
   m.playerLogLib.setPlayerFeedback("")
   playerFeedback = m.playerLogLib.playerFeedback
-  m.assertEqual(playerFeedback, "Video Buffering")
+  m.assertEqual(playerFeedback, "")
 
   m.playerLogLib.setPlayerFeedback(1)
   playerFeedback = m.playerLogLib.playerFeedback
-  m.assertEqual(playerFeedback, "Video Buffering")
+  m.assertEqual(playerFeedback, "")
 
   m.playerLogLib.setPlayerFeedback(invalid)
   playerFeedback = m.playerLogLib.playerFeedback
-  m.assertEqual(playerFeedback, "Video Buffering")
+  m.assertEqual(playerFeedback, "")
 End Function
 
 
@@ -414,6 +347,34 @@ End Function
 '@Test resetAdMetrics unit tests
 Function playerLogLib_resetAdMetrics_test()
   m.playerLogLib.resetAdMetrics()
-  m.assertEqual(m.playerLogLib.failedAdCount, 0)
-  m.assertEqual(m.playerLogLib.totalAdDuration, 0)
+  m.assertEqual(m.playerLogLib.failedAdCountPerTitle, 0)
+  m.assertEqual(m.playerLogLib.totalAdDurationPerTitle, 0)
+End Function
+
+
+'@Test setLastStartStep unit tests
+Function playerloglib_setLastStartStep_test()
+  m.playerLogLib.setLastStartStep("PLAY_STARTED")
+  lastStartStep = m.playerLogLib.lastStartStep
+  m.assertEqual(lastStartStep, "PLAY_STARTED")
+
+  m.playerLogLib.setLastStartStep("")
+  lastStartStep = m.playerLogLib.lastStartStep
+  m.assertEqual(lastStartStep, "PLAY_STARTED")
+
+  m.playerLogLib.setLastStartStep()
+  lastStartStep = m.playerLogLib.lastStartStep
+  m.assertEqual(lastStartStep, "UNKNOWN")
+End Function
+
+
+'@Test setIsAd unit tests
+Function playerloglib_setIsAd_test()
+  m.playerLogLib.setIsAd(true)
+  isAd = m.playerLogLib.isAd
+  m.assertEqual(isAd, true)
+
+  m.playerLogLib.setIsAd(false)
+  isAd = m.playerLogLib.isAd
+  m.assertEqual(isAd, false)
 End Function

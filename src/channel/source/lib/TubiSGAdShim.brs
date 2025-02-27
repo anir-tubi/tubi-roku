@@ -67,20 +67,12 @@ Function tubiSGAdShim_run(videoPlayerNode) As boolean
           '//Place the tracking info into the episode AA variable
           episode.videoSponsorExposureId = m.videoPlayerNode.videoSponsorExposureId
           position = m.videoPlayerNode.adPosition
-          m.ads.adPosition = m.videoPlayerNode.adPosition
-
-          if value = "preroll" OR value = "midroll" OR value = "seek"
-            m.ads.adControl = value
-          end if
-
           tubiLog("TubiSGAdShim: adControl = " + value + " position = " + stri(position) + "ad state " + m.videoPlayerNode.adState)
           m.ads.appMode = m.videoPlayerNode.appMode
           m.handleControlMessage(m.videoPlayerNode.adState, value, episode, position)
         else
           m.videoPlayerNode.adState = "noAds"  ' if video player content was changed before we got here, return no ads
         end if
-      else if msg.GetField() = "position"  
-        m.ads.videoPosition = msg.GetData()
       else if msg.GetField() = "userConsentsOptOutStatus"
         userConsentsOptOutStatus = msg.getData()
         m.ads.tracking.userConsentsOptOutStatus = userConsentsOptOutStatus
@@ -175,6 +167,7 @@ Function tubiSGAdShim_handleControlMessage(state, control, episode, position)
     end for
   end if
 
+
   functionName = stateMachine[state][control]
   tubiLog("TubiSGAdShim: state=" + state + " control=" + control + " function=" + functionName)
   if functionName <> "" then
@@ -196,6 +189,10 @@ Function tubiSGAdShim_preroll(episode, cuepoint)
   'attempt to get list of ads and play them for preroll
   m.ads.getAdsListViaRoku(episode, cuepoint)
   if m.ads.hasAds(m.ads.allAdUnitsList) = true
+    filledAdData = {
+      adCount: m.ads.totalAdBreakAds
+    }
+    m.videoPlayerNode.filledAdData = filledAdData
     m.videoPlayerNode.adState = "adsPending"
   else
     m.videoPlayerNode.adState = "noAds"
@@ -245,6 +242,10 @@ Function tubiSGAdShim_midroll(episode, cuepoint)
   m.videoPlayerNode.adState = "fetching"
   m.ads.cacheAdsList(episode, cuepoint)
   if m.ads.getCachedAdsList(episode, cuepoint) <> invalid then
+    filledAdData = {
+      adCount: m.ads.totalAdBreakAds
+    }
+    m.videoPlayerNode.filledAdData = filledAdData
     m.videoPlayerNode.adState = "adsPending"
   else
     m.videoPlayerNode.adState = "noAds"
@@ -262,6 +263,10 @@ Function tubiSGAdShim_resume(episode, cuepoint)
   'NOTE: TubiAds sets resumePlayAdsList on 'm' here
   if m.ads.getResumingPlayAds(episode, cuepoint) = true then
     tubiLog("Setting adState to adsPending")
+    filledAdData = {
+      adCount: m.ads.totalAdBreakAds
+    }
+    m.videoPlayerNode.filledAdData = filledAdData
     m.videoPlayerNode.adState = "adsPending"
   else
     tubiLog("Setting adState to noAds")

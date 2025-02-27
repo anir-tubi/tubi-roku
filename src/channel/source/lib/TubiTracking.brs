@@ -1381,6 +1381,7 @@ Function tubiTracking_createViewableImpressionTrackingReqInfo(trackData)
   return reqInfo
 End Function
 
+
 ' Copy of isNowWithinTimePeriod form time-utils since we cannot re-use that helper inside tubi tracking.
 ' Determines if the current time is within the passed in startTime and endTime, inclusive.
 '

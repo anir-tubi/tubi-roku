@@ -1034,6 +1034,8 @@ Function jumpToPosition(position)
     position = 0
   end if
 
+  updatePlayerLogLib(m.playerLogLib, "setSeekEndPosition", position)
+
   ' in case position is updated by the above block
   ' setting m.playerPosition here also ensures post ad break video playback at the correct position
   m.playerPosition = position
