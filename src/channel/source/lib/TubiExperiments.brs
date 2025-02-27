@@ -77,7 +77,7 @@ Function TubiExperiments(experimentsInfo) as Object
 
       roku_player_client_log: {
         roku_player_client_log_v2: {
-          default: {"enabled": true}
+          default: {"enabled": false}
           holdout_control: {"enabled": false}
           holdout_winning: {"enabled": false}}
       }
