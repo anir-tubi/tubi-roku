@@ -126,6 +126,9 @@ Function onItemContentChange(msg)
     m.personalizationId = ""
     m.shouldTrackViewableImpressionEvent = false
   end if
+
+  m.currRowIndex = m.top.rowIndex
+  m.currIndex = m.top.index
 End Function
 
 
@@ -205,13 +208,25 @@ Function onRenderTrackingChange(msg)
           personalizationId: m.personalizationId
         }
 
+        m.global.viewableImpressionEventInfo = trackingInfo
+
+
         ''//::TODO:: Remove this block once the row mismatch on client impression data is fixed
         'We expect always the row as 1 for featured row
-        if row.id = "featured" AND itemInfo.row <> 1
-          tubiLog(FormatJSON(trackingInfo), "info", "clientInfo", "client-impression-mismatch")
+        if m.currRowIndex <> topRef.rowIndex OR m.currIndex <> topRef.index
+          rowMismatch = {
+            currRowIndex: m.currRowIndex
+            currIndex: m.currIndex
+            rowIndex: topRef.rowIndex
+            index: topRef.index
+            containerId: row.id
+            itemInfo: itemInfo
+            screenId: m.parentScreenId
+            screenTrackingInfo: m.parentScreenTrackingPageInfo
+            personalizationId: m.personalizationId
+          }
+          tubiLog(FormatJSON(rowMismatch), "info", "clientInfo", "client-impression-mismatch")
         end if
-
-        m.global.viewableImpressionEventInfo = trackingInfo
       end if
 
       m.itemVisibleTimespan = invalid
