@@ -52,7 +52,7 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.observeFieldScoped("stopLinearVideoPlayer", "onStopLinearVideoPlayer")
     homeScreen.observeFieldScoped("sponsoredRowFocused", "onHomescreenSponsoredRowFocused")
     homeScreen.observeFieldScoped("columnFocused", "onColumnFocusChanged")
-    homeScreen.observeFieldScoped("currFocusRow", "onHomescreenRowFocusChanged")
+    homeScreen.observeFieldScoped("currFocusRow", "onHomeScreenRowFocusChanged")
     homeScreen.observeFieldScoped("stopVideoPreview", "onStopVideoPreview")
     homeScreen.observeFieldScoped("pauseVideoPreview", "onPauseVideoPreview")
     homeScreen.observeFieldScoped("loadCategoryForIds", "onLoadCategoryForIds")
@@ -595,7 +595,7 @@ Function onColumnFocusChanged()
 End Function
 
 
-Function onHomescreenRowFocusChanged()
+Function onHomeScreenRowFocusChanged()
   if isLinearPlayerLoadingORPlaying() = true
     '//as the rowlist is scrolling, if the the linear video player is playing or loading, then make sure the linear video player has stopped
     stopAndHideLinearVideoPlayer()

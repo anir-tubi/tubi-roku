@@ -232,6 +232,7 @@ Function onCurrFocusColumnChange(msg)
   tubiLog("HomeScreen.onCurrFocusColumnChange")
   column = msg.getData()
   newColumn = Int(column)
+
   if newColumn <> invalid AND newColumn <> m.currentColumn
     '//make sure we only report the new column for a whole integer
     m.currentColumn = newColumn
@@ -354,6 +355,7 @@ Function onCurrFocusRowChange()
   m.lastFocusPosition = currFocusRow
   if rowPercent = 1
     m.lastFocusPosition = -1
+    m.top.currFocusRow = currFocusRow
   end if
 End Function
 
