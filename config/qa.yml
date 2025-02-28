@@ -21,11 +21,6 @@ settings:
 
   #the number of seconds before the video overlay autohides in Live TV after last button pressed.
   videoOverlayAutoHideTime: 5
-  videoOverlayLiteAutoHideTime: 10
-
-  # When should we show the ComingUp title/time in Linear Video Player both inside & outside info panel
-  comingUpInsideInfoPanelDuration: 300 # time in seconds - default value is 300 seconds in constants.brs
-  comingUpOutsideInfoPanelDuration: 15 # time in seconds - default value is 15 seconds in constants.brs
 
   # hideStartupModals=true  ==> no startup modals are shown
   # hideStartupModals=false ==> Normal prod behaviour

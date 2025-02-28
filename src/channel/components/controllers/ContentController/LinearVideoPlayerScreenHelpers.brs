@@ -46,7 +46,6 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
         videoPlayer.observeFieldScoped("linearOverlayNavigateWithinPageInfo", "onNavigateWithinPageInfoChange")
         videoPlayer.observeFieldScoped("linearOverlayComponentInteractionInfo", "onComponentInteractionInfoChange")
         videoPlayer.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
-        videoPlayer.observeFieldScoped("linearOverlayLiteComponentInteractionInfo", "onComponentInteractionInfoChange")
         videoPlayer.observeFieldScoped("trackingLoggingEvent", "onTrackingLoggingEvent")
 
         observeUpdateAuth(videoPlayer.task)
