@@ -24,6 +24,7 @@ Function init()
   ' Doing it in init due to roku orphaning the itemcomponent when it deletes the item from the screen during navigation which causes getparent to be invalid.
   ' Performance tested the below code it was not adding a additional process time.
   m.parentArrayGrid = invalid
+  m.clientTrackingInfo = {}
   parent = m.top.getParent()
   for x = 1 to 10
     ' If at any point of view due to any reason parent is invalid and then exiting the for loop.
@@ -32,7 +33,7 @@ Function init()
       exit for
     end if
 
-    if parent.isSubType("CategoryGridList") = true
+    if parent.hasField("shouldTrackViewableImpressionEvent") = true AND parent.shouldTrackViewableImpressionEvent = true
       m.parentArrayGrid = parent
       ' Only enabling it if we find the parent values.
       ' Enabling only if we have parentScreenId. Below logic disables the renderTracking when CategoryGridList is placed in non home screen for now.
@@ -113,22 +114,50 @@ Function onItemContentChange(msg)
     end if
   end if
 
+  m.parentScreenId = ""
+  m.shouldTrackViewableImpressionEvent = false
   ' If the parent array grid is invalid then resetting the values.
   ' Getting the values in onItemContentChange due to the fact that Rowlist re-uses itemComponent when it does it does not call the init.
-  if m.parentArrayGrid <> invalid
+  if m.parentArrayGrid <> invalid AND itemContent <> invalid
     m.parentScreenId = m.parentArrayGrid.parentScreenId
-    m.parentScreenTrackingPageInfo = m.parentArrayGrid.parentScreenTrackingPageInfo
-    m.personalizationId = m.parentArrayGrid.personalizationId
+    parentScreenTrackingPageInfo = m.parentArrayGrid.parentScreenTrackingPageInfo
+    personalizationId = m.parentArrayGrid.personalizationId
     m.shouldTrackViewableImpressionEvent = m.parentArrayGrid.shouldTrackViewableImpressionEvent
-  else
-    m.parentScreenId = ""
-    m.parentScreenTrackingPageInfo = {}
-    m.personalizationId = ""
-    m.shouldTrackViewableImpressionEvent = false
-  end if
+    numColumns = m.parentArrayGrid.numColumns
 
-  m.currRowIndex = m.top.rowIndex
-  m.currIndex = m.top.index
+    row = itemContent.getParent()
+  
+    rowIndex = m.top.rowIndex
+    col = m.top.index
+
+    if isInteger(numColumns) = true AND numColumns > 0
+      rowIndex = Int(col / numColumns)
+      col = col MOD numColumns
+    end if
+    
+    itemInfo = {
+      row: rowIndex + 1
+      col: col + 1
+    }
+
+    if itemContent.type = "series"
+      seriesId = itemContent.id
+      if seriesId.startsWith("0") = true
+        seriesId = mid(seriesId, 2)
+      end if
+      itemInfo.series_id = seriesId
+    else
+      itemInfo.video_id = itemContent.id
+    end if
+
+    m.clientTrackingInfo = {
+      containerId: row.id
+      itemInfo: itemInfo
+      screenId: m.parentScreenId
+      screenTrackingInfo: parentScreenTrackingPageInfo
+      personalizationId: personalizationId
+    }
+  end if
 End Function
 
 
@@ -184,49 +213,10 @@ Function onRenderTrackingChange(msg)
       duration = m.itemVisibleTimespan.totalMilliSeconds()
       row = content.getParent()
       if duration >= MIN_VISIBLE_THRESHOLD AND row <> invalid AND m.parentScreenId <> invalid
-        itemInfo = {
-          row: topRef.rowIndex + 1
-          col: topRef.index + 1
-          duration: duration
-        }
-
-        if content.type = "series"
-          seriesId = content.id
-          if seriesId.startsWith("0") = true
-            seriesId = mid(seriesId, 2)
-          end if
-          itemInfo.series_id = seriesId
-        else
-          itemInfo.video_id = content.id
+        if m.clientTrackingInfo <> invalid AND m.clientTrackingInfo.itemInfo <> invalid
+          m.clientTrackingInfo.itemInfo.duration = duration
         end if
-
-        trackingInfo = {
-          containerId: row.id
-          itemInfo: itemInfo
-          screenId: m.parentScreenId
-          screenTrackingInfo: m.parentScreenTrackingPageInfo
-          personalizationId: m.personalizationId
-        }
-
-        m.global.viewableImpressionEventInfo = trackingInfo
-
-
-        ''//::TODO:: Remove this block once the row mismatch on client impression data is fixed
-        'We expect always the row as 1 for featured row
-        if m.currRowIndex <> topRef.rowIndex OR m.currIndex <> topRef.index
-          rowMismatch = {
-            currRowIndex: m.currRowIndex
-            currIndex: m.currIndex
-            rowIndex: topRef.rowIndex
-            index: topRef.index
-            containerId: row.id
-            itemInfo: itemInfo
-            screenId: m.parentScreenId
-            screenTrackingInfo: m.parentScreenTrackingPageInfo
-            personalizationId: m.personalizationId
-          }
-          tubiLog(FormatJSON(rowMismatch), "info", "clientInfo", "client-impression-mismatch")
-        end if
+        m.global.viewableImpressionEventInfo = m.clientTrackingInfo
       end if
 
       m.itemVisibleTimespan = invalid

@@ -18,6 +18,8 @@ Function showSearchScreen()
   searchScreen.id = m.constants.ui.screenIds.searchScreen
   searchScreen.searchText = "" '//Set searchText to "" to initiate the search screen and load the default "search results"
 
+  searchScreen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
+
   pushScreen(searchScreen, true, true)
   return searchScreen
 End Function
@@ -95,14 +97,6 @@ Function onSearchTextChanged(msg)
       isSignedInUser: isLoggedInUser()
     })
 
-    m.trackingLoggingTask.trackEvent = {
-      type: "search"
-      values: {
-        query: Left(searchText, 256)
-        search_type: "PAGE" 'SearchType enum
-      }
-    }
-
   else
     categoryId = m.constants.ui.categoryIds.featured
     requestOptions = {}
@@ -146,6 +140,18 @@ Function onSearchSuccessResponse(response)
   searchScreen = getSearchScreen()
   if searchScreen <> invalid AND response <> invalid
     searchScreen.content = response
+
+    pageValues = {
+      query: Left(searchScreen.searchText, 256)
+      search_type: "PAGE" 'SearchType enum
+      personalization_id: response.personalizationId
+    }
+
+    m.trackingLoggingTask.trackEvent = {
+      type: "search"
+      values: pageValues
+    }
+    
     searchScreen.contentUpdated = true
   end if
 End Function

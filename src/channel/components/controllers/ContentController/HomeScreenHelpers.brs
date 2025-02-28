@@ -1098,6 +1098,5 @@ Function onHomeScreenContentUpdateComplete(screenId)
     homeScreen.setFocus(true)
   end if
 
-  m.sendImpressionEventTimer.control = "stop"
-  m.sendImpressionEventTimer.control = "start"
+  startClientImpressionTimer()
 End Function

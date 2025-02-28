@@ -89,6 +89,22 @@ Function init()
     pageValues: {}
   }
 
+  screenId = m.constants.ui.screenIds.searchScreen
+
+  m.ResultGrid.update({
+    parentScreenId: screenId
+    parentScreenTrackingPageInfo: m.top.trackingPageInfo
+    personalizationId: ""
+    shouldTrackViewableImpressionEvent: m.top.shouldTrackViewableImpressionEvent
+  }, true)
+
+  m.trendingSearchResultGrid.update({
+    parentScreenId: screenId
+    parentScreenTrackingPageInfo: m.top.trackingPageInfo
+    personalizationId: ""
+    shouldTrackViewableImpressionEvent: m.top.shouldTrackViewableImpressionEvent
+  }, true)
+
   ' Used to determine if navigate_within_page events should be sent. Only send when the content grid already
   ' has focus, not when it gains focus.
   m.gridHasFocus = false
@@ -220,7 +236,7 @@ End Function
 ' On focus set to screen, push focus on keyboard or grid.
 ' This is used when the search screen regains focus after coming back from the details page.
 Function onScreenFocusChange()
-  if m.top.hasFocus() then
+  if m.top.hasFocus() = true then
     m.top.backgroundUriList = []
     if m.bResultsInFocus = true
       if m.isTrendingResultsGridInFocus = false AND m.ResultGrid.content <> invalid AND m.ResultGrid.content.getChildCount() > 0
@@ -235,6 +251,24 @@ Function onScreenFocusChange()
     end if
   else if m.top.isInFocusChain() = false
     m.keyboard.textEditBox.voiceEnabled = false
+  end if
+
+  updatePersonalizationIdInTrackingInfo()
+End Function
+
+
+Function updatePersonalizationIdInTrackingInfo()
+  trackingPageInfo = m.top.trackingPageInfo
+
+  if isAA(trackingPageInfo) = true AND isAA(trackingPageInfo.pageValues) = true
+    personalizationId = m.trendingSearchResultGrid.personalizationId
+
+    if m.ResultGrid.isInFocusChain() = true
+      personalizationId = m.ResultGrid.personalizationId
+    end if
+
+    trackingPageInfo.pageValues.personalization_id = personalizationId
+    m.top.trackingPageInfo = trackingPageInfo
   end if
 End Function
 
@@ -289,13 +323,10 @@ End Function
 Function updateTrackingInfo(content, position)
   m.top.trackingComponentInfo = getTrackingComponentInfo(position, m.ResultGrid.numColumns, content, m.Tracking)
 
-  if content <> invalid
-    m.top.trackingPageInfo = {
-      pageType: "search_page"
-      pageValues: {
-        query: Left(m.Keyboard.text, 256)
-      }
-    }
+  if content <> invalid AND isAA(m.top.trackingPageInfo.pageValues) = true
+    m.top.trackingPageInfo.pageValues.append({
+      query: Left(m.Keyboard.text, 256)
+    })
   end if
 End Function
 
@@ -310,12 +341,16 @@ Function onSearchContentChange()
 
   if content <> invalid AND content.getChildCount() > 0
     if content.isDefaultSearchResults <> true
+      m.ResultGrid.personalizationId = content.personalizationId
       m.ResultGrid.content = content
     else
+      m.trendingSearchResultGrid.personalizationId = content.personalizationId
       ' Setting it only if we received valid data from backend.
       m.trendingSearchResultGrid.content = content
     end if
   end if
+
+  updatePersonalizationIdInTrackingInfo()
 
   if content <> invalid AND content.getChildCount() > 0 then
     if content.isDefaultSearchResults = true
@@ -397,12 +432,11 @@ Function onSearchDebounce()
     loadSearchResults(true)
   end if
 
-  m.top.trackingPageInfo = {
-    pageType: "search_page"
-    pageValues: {
+  if isAA(m.top.trackingPageInfo.pageValues) = true
+    m.top.trackingPageInfo.pageValues.append({
       query: Left(m.Keyboard.text, 256)
-    }
-  }
+    })
+  end if
 
 End Function
 

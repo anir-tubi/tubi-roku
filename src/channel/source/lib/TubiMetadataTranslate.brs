@@ -1211,6 +1211,12 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
     categoryMetadata = m.buildCategoryAAWithInsert(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser, uiMode)
   end if
 
+  if contentToTranslate.personalization_id <> invalid
+    translated.update({
+      personalizationId: contentToTranslate.personalization_id
+    }, true)
+  end if
+
   if categoryMetadata = invalid  'happens if a container has no valid content in it (ie. all content is out of window)
     translated.id = container.id
     return translated
@@ -2738,7 +2744,7 @@ Function tubiMetadataTranslate_translateSearchResults(contentToTranslate, isSign
   containers = contentToTranslate.containers
   contents = contentToTranslate.contents
 
-  translated = CreateObject("roSGNode", "TubiContentNode")
+  translated = CreateObject("roSGNode", "ContentNode")
   if isNonEmptyArray(containers) = true AND isAA(contents) = true
     ' Using default content mode since search does not have a specific variant.
     ' Following similar approach as category details screen.
@@ -2747,6 +2753,12 @@ Function tubiMetadataTranslate_translateSearchResults(contentToTranslate, isSign
     results = m.buildCategoryAA(containers[0], contents, "", m.constants.ui.gridItemTypes.portrait, true, contentMode, screenId, isSignedInUser)
     if results <> invalid
       translated.update(results)
+    end if
+
+    if contentToTranslate.personalization_id <> invalid
+      translated.update({
+        personalizationId: contentToTranslate.personalization_id
+      }, true)
     end if
   end if
 

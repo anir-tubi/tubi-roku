@@ -454,6 +454,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
     search: {
       query: ""
       search_type: "" 'SearchType enum
+      personalization_id: ""
     }
 
     start_video: {
@@ -933,6 +934,7 @@ Function tubiTracking_getOneOfs()
 
   search_page = {
     query: "" 'There is no query associated with the search page
+    personalization_id: ""
   }
 
   auth_page = {'TODO: Find out if we need this page - I think no

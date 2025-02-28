@@ -46,6 +46,9 @@
 
       <!-- The current text that the user has entered to search -->
       <field id="isKidsModeAvailable" type="boolean" />
+
+      <!-- We have to create a field due to renderTracking events being async each itemComponent should be aware of what the mode was when it rendered. -->
+      <field id="shouldTrackViewableImpressionEvent" type="boolean" value="true" />
   </interface>
 
   <children>

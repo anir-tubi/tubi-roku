@@ -2958,7 +2958,7 @@ Function onViewableImpressionEventInfoChange(msg)
   ' The sequence of events are when navigating between home to movies. Home Screen items tracking info becomes none for all items and then the movies screen becomes full.
   data = msg.getData()
 
-  if data.screenId <> m.viewableImpressionEvents.screenId AND m.viewableImpressionEvents.screenId <> invalid
+  if m.viewableImpressionEvents.screenId <> invalid AND data.screenId <> m.viewableImpressionEvents.screenId AND m.viewableImpressionEvents.personalizationId <> invalid AND data.personalizationId <> m.viewableImpressionEvents.personalizationId
     ' After sending the events the m.viewableImpressionEvents will be reset.
     sendImpressionEvent()
   end if
@@ -3038,9 +3038,15 @@ Function sendImpressionEvent()
     screenId: ""
   }
 
+  startClientImpressionTimer()
+End Function
+
+
+Function startClientImpressionTimer()
   m.sendImpressionEventTimer.control = "stop"
-  ' For now since we are tracking only in home screen restarting only if the user is home screen.
-  if isCurrentScreenHomeScreen() = true
+    
+  currentScreen = getCurrentScreen()
+  if currentScreen <> invalid AND currentScreen.hasField("shouldTrackViewableImpressionEvent") = true AND currentScreen.shouldTrackViewableImpressionEvent = true
     m.sendImpressionEventTimer.control = "start"
   end if
 End Function
