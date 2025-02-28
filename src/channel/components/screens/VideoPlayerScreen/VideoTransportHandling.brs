@@ -783,24 +783,26 @@ End Function
 
 ' Hides the send feedback on video player selection overlay.
 Function  hideSendFeedbackOverlay()
-  m.isSendFeedbackOverlayShowing = false
-  m.sendFeedbackSelectionOverlay.setFocus(false)
-  removeOverLayItems()
-  fade(m.sendFeedbackSelectionOverlayGroup, "out", 0.6)
-  m.top.setFocus(true)
+  if m.isSendFeedbackOverlayShowing = true
+    m.isSendFeedbackOverlayShowing = false
+    m.sendFeedbackSelectionOverlay.setFocus(false)
+    removeOverLayItems()
+    fade(m.sendFeedbackSelectionOverlayGroup, "out", 0.6)
+    m.top.setFocus(true)
 
-  'Send dismiss dialog event when user presses back or closed overlay.
-  trackingPageInfo = m.top.trackingPageInfo
-  if trackingPageInfo <> invalid AND isNonEmptyString(trackingPageInfo.pageType) = true
-    trackEvent({
-      type: "dialog"
-      values: {
-        dialog_type: "INFORMATION"
-        pageOneof: m.Tracking.getAnalyticsPage(trackingPageInfo.pageType, trackingPageInfo.pageValues)
-        dialog_action: "DISMISS_DELIBERATE"
-        dialog_sub_type: "player_problem"
-      }
-    })
+    'Send dismiss dialog event when user presses back or closed overlay.
+    trackingPageInfo = m.top.trackingPageInfo
+    if trackingPageInfo <> invalid AND isNonEmptyString(trackingPageInfo.pageType) = true
+      trackEvent({
+        type: "dialog"
+        values: {
+          dialog_type: "INFORMATION"
+          pageOneof: m.Tracking.getAnalyticsPage(trackingPageInfo.pageType, trackingPageInfo.pageValues)
+          dialog_action: "DISMISS_DELIBERATE"
+          dialog_sub_type: "player_problem"
+        }
+      })
+    end if
   end if
 End Function
 
@@ -1591,9 +1593,7 @@ Function showPauseAd()
   animateTransport("out")
 
   ' When PauseAd appears, we will close the sendFeed overlay to avoid the focus issues.
-  if m.isSendFeedbackOverlayShowing = true
-    hideSendFeedbackOverlay()
-  end if
+  hideSendFeedbackOverlay()
 
   hideBrowseWhileWatching()
   m.pauseAdAnimation = fade(m.pauseAdOverlay, "in", 0.6, 0.4)
