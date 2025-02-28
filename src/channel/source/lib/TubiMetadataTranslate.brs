@@ -18,6 +18,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     upNextTranslateRecursiveWrapper: tubiMetadataTranslate_upNextTranslateRecursiveWrapper
     setDescriptorCodeAndDescription: tubiMetadataTranslate_setDescriptorCodeAndDescription
     translateProgram: tubiMetadataTranslate_translateProgram
+    translateSearchResults: tubiMetadataTranslate_translateSearchResults
 
     ' private
     constants: constants
@@ -1251,7 +1252,6 @@ End Function
 
 
 ' @contentToTranslate: assocArray, the AA resulting from JSON parsing the /container API response
-' @fullJson: string, the full JSON of the /container API response
 ' @isSignedInUser: boolean, value based on user logged In or not
 '
 ' @returns: roSGNode, a CategoryContentNode with children TubiContentNodes for each content in the container/category
@@ -2727,4 +2727,28 @@ Function tubiMetadataTranslate_checkIfUserIsInRegistrationByPassMode()
   end if
 
   return false
+End Function
+
+
+' @contentToTranslate: assocArray, the AA resulting from JSON parsing the /container API response
+' @isSignedInUser: boolean, value based on user logged In or not
+'
+' @returns: roSGNode, a CategoryContentNode with children TubiContentNodes for each content in the container/category
+Function tubiMetadataTranslate_translateSearchResults(contentToTranslate, isSignedInUser)
+  containers = contentToTranslate.containers
+  contents = contentToTranslate.contents
+
+  translated = CreateObject("roSGNode", "TubiContentNode")
+  if isNonEmptyArray(containers) = true AND isAA(contents) = true
+    ' Using default content mode since search does not have a specific variant.
+    ' Following similar approach as category details screen.
+    contentMode = m.constants.ui.contentMode.homescreen
+    screenId = m.constants.ui.screenIds.searchScreen
+    results = m.buildCategoryAA(containers[0], contents, "", m.constants.ui.gridItemTypes.portrait, true, contentMode, screenId, isSignedInUser)
+    if results <> invalid
+      translated.update(results)
+    end if
+  end if
+
+  return translated
 End Function

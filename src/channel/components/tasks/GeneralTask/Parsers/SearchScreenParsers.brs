@@ -44,6 +44,7 @@ Function parseSearchAPISuccess(fullResponse, reqInfo)
     isSignedInUser = reqInfo.isSignedInUser
   end if
 
-  convertedMetadata = m.metadataTranslate.translate(parsedResponse, isSignedInUser)
+  convertedMetadata = m.metadataTranslate.translateSearchResults(parsedResponse, isSignedInUser)
+  
   return convertedMetadata
 End Function
