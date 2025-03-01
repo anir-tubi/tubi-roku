@@ -29,7 +29,6 @@ Function showMyStuffScreen()
     screen.observeFieldScoped("homeButtonSelected", "onHomeButtonSelectedOnMyStuffScreen")
     screen.observeFieldScoped("refreshContent", "onRefreshContentSignalForMyStuffScreen")
     screen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
-    screen.observeFieldScoped("stopVideoPreview", "onStopVideoPreview")
     screen.observeFieldScoped("pauseVideoPreview", "onPauseVideoPreview")
 
     if bLoggedInUser = true

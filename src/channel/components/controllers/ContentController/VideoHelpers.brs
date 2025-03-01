@@ -622,12 +622,16 @@ Function onVideoPlayerState(msg)
         popScreen(true, true)
       end if
 
-      '//adding the onscreen error should happen after the popScreen() call so that the error modal keeps the focus
-      errorMessage = getTranslation("videoPlayer_error_failed_description")
-      if videoPlayer.errorMsg <> ""
-        errorMessage = videoPlayer.errorMsg
+      if checkIfMultipleVideoNodeError(videoPlayer.videoErrorMsg) = true
+        stopAllVideoPlayersAndRestartPlayback(onRetryPlayerError)
+      else
+        '//adding the onscreen error should happen after the popScreen() call so that the error modal keeps the focus
+        errorMessage = getTranslation("videoPlayer_error_failed_description")
+        if videoPlayer.errorMsg <> ""
+          errorMessage = videoPlayer.errorMsg
+        end if
+        showPlayerError(errorMessage, videoPlayer.videoErrorCode)
       end if
-      showPlayerError(errorMessage, videoPlayer.videoErrorCode)
     else if state = "finished"
       isAutoPlayOff = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR videoPlayer.isAutoPlayTimerOn = false
       finishedContent = videoPlayer.content
@@ -1558,4 +1562,25 @@ Function onCloseBrowseWhileWatchingContentFetchErrorModal()
     videoPlayer.showBrowseWhileWatchingInFullScreen = true
   end if
 
+End Function
+
+
+Function checkIfMultipleVideoNodeError(errorMsg)
+  return isNonEmptyString(errorMsg) = true AND LCase(errorMsg) = "player: only one playing instance supported."
+End Function
+
+
+Function stopAllVideoPlayersAndRestartPlayback(callback)
+  ' Calling stop on all the player to be on safer side.
+  stopVideoPreview()
+
+  if isLinearPlayerLoadingOrPlaying() = true
+    '//as the rowlist is scrolling, if the the linear video player is playing or loading, then make sure the linear video player has stopped
+    stopLinearVideoContent()
+  end if
+  
+  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
+  stopVideoContent(videoPlayer)
+
+  callback() 
 End Function

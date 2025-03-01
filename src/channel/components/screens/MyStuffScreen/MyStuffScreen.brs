@@ -582,9 +582,6 @@ End Function
 ' returns true if action was taken based on the "play" input and false if no action taken
 Function handlePlayInput()
   if m.top.isLoading <> true AND m.top.signedIn = true
-    if m.top.isVideoPreviewOn = true
-      m.top.stopVideoPreview = true
-    end if
 
     itemFocused = resolveAbbreviatedContent(m.RowList.rowItemFocused)
     positionFocused = m.top.cursorPosition

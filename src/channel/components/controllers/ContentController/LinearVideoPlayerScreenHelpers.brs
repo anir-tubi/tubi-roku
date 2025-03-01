@@ -769,43 +769,44 @@ Function reactToLinearVideoPlayerErrorState(error_message = "", errorCode = inva
 
       ' reset the video player state in case an error occurs during the next attempt at playing a video
       videoPlayer.state = ""
-
-      if errorCode = invalid
-        errorCode = ""
-      end if
-      userErrorCode = getUserFacingErrorCode(m.constants.errors.context.linearPlayerScreen, m.constants.errors.subtypes.playerPlaybackError, errorCode.toStr())
-
-      videoId = 0
-
-      if videoPlayer <> invalid AND videoPlayer.content <> invalid AND videoPlayer.content.id <> invalid
-        videoId = videoPlayer.content.id.toInt()
-      end if
-
-      dialogEvent = {
-        type: "dialog"
-        values: {
-          dialog_type: "PLAYER_ERROR"
-          pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: videoId})
-          dialog_action: "SHOW"
-          dialog_sub_type: userErrorCode
-        }
-      }
-
-      modalInfo = {
-        message: getErrorMessage(errorMessage, userErrorCode)
-        openTrackEvent: dialogEvent
-        trackingTask: m.trackingLoggingTask
-      }
-
-
-      'in case of error retrieving the player content, then stop the countdown timer and stop the video player. That way, focus on stay on the current content but not automatically try to play the error content.
-      if isAnEPGScreenID(videoPlayer.associatedScreenID) = true
-
-        showErrorModal(modalInfo, onRetryLinearPlayer, invalid, resetEPGScreenContent, invalid)
+      if checkIfMultipleVideoNodeError(videoPlayer.videoErrorMsg) = true
+        stopAllVideoPlayersAndRestartPlayback(onRetryLinearPlayer)
       else
-        showErrorModal(modalInfo, onRetryLinearPlayer, invalid)
+        stopLinearVideoContent() '//In case the video is still playing
+        if errorCode = invalid
+          errorCode = ""
+        end if
+        userErrorCode = getUserFacingErrorCode(m.constants.errors.context.linearPlayerScreen, m.constants.errors.subtypes.playerPlaybackError, errorCode.toStr())
+  
+        videoId = 0
+  
+        if videoPlayer <> invalid AND videoPlayer.content <> invalid AND videoPlayer.content.id <> invalid
+          videoId = videoPlayer.content.id.toInt()
+        end if
+  
+        dialogEvent = {
+          type: "dialog"
+          values: {
+            dialog_type: "PLAYER_ERROR"
+            pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: videoId})
+            dialog_action: "SHOW"
+            dialog_sub_type: userErrorCode
+          }
+        }
+  
+        modalInfo = {
+          message: getErrorMessage(errorMessage, userErrorCode)
+          openTrackEvent: dialogEvent
+          trackingTask: m.trackingLoggingTask
+        }
+
+        'in case of error retrieving the player content, then stop the countdown timer and stop the video player. That way, focus on stay on the current content but not automatically try to play the error content.
+        if isAnEPGScreenID(videoPlayer.associatedScreenID) = true
+          showErrorModal(modalInfo, onRetryLinearPlayer, invalid, resetEPGScreenContent, invalid)
+        else
+          showErrorModal(modalInfo, onRetryLinearPlayer, invalid)
+        end if
       end if
-      stopLinearVideoContent() '//In case the video is still playing
     else
       videoPlayer.displayVideoplayerBg = true
     end if

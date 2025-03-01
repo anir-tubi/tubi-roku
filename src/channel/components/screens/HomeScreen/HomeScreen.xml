@@ -155,9 +155,6 @@
       <!-- Communicates to the parent that the linear video player should be stopped -->
       <field id="stopLinearVideoPlayer" type="boolean" alwaysNotify="true" />
 
-      <!-- Communicates to the parent that the video preview should be stopped -->
-      <field id="stopVideoPreview" type="boolean" alwaysNotify="true"/>
-
       <!-- Communicates to the parent that the video preview should be paused -->
       <field id="pauseVideoPreview" type="boolean" alwaysNotify="true"/>
 

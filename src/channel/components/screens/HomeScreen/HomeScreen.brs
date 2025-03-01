@@ -688,10 +688,6 @@ Function handlePlayInput()
     positionFocused = m.top.cursorPosition
     m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(itemFocused, positionFocused)
 
-    if m.top.isVideoPreviewOn = true OR itemFocused.gridItemType = m.constants.ui.gridItemTypes.skinAd
-      m.top.stopVideoPreview = true
-    end if
-
     ' Content controller observes contentSelected to populate/push the detail screen
     if itemFocused <> invalid AND itemFocused.type <> m.constants.ui.contentTypes.linear
       m.top.contentToPlay = itemFocused
