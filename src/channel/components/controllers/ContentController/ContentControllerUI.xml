@@ -125,10 +125,6 @@
         duration="300"
         repeat="true"/>
 
-      <!-- The timer that is used to check if we should show the screensaver -->
-      <Timer
-        id="screensaverTimer" />
-
       <!-- Spinner primarily for sign-in/sign-out transitions -->
       <Spinner
         id="ContentControllerSpinner"

@@ -18,8 +18,5 @@
     <!-- OUTPUT -->
     <!-- Combination of roHdmiStatus and roCECStatus hdmi checks to know if we're ok to playback video -->
     <field id="isHdmiStatusOk" type="boolean" />
-
-    <!-- The amount of time before the screensaver will start playing in. Value is in seconds -->
-    <field id="screensaverTimeout" type="integer" />
   </interface>
 </component>

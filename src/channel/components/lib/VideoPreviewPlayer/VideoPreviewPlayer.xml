@@ -22,7 +22,6 @@
       <!-- Alias fields for the video node -->
       <field id="width" alias="VideoNode.width"/>
       <field id="height" alias="VideoNode.height"/>
-      <field id="disableScreensaver" alias="VideoNode.disableScreensaver" />
 
       <field id="content" type="node"/>
       <field id="updateContent" type="boolean" alwaysNotify="true"/>

@@ -19,7 +19,6 @@
     <script type="text/brightscript" uri="Parsers/AgeVerificationScreenParsers.brs" />
     <script type="text/brightscript" uri="Parsers/EPGScreenParser.brs" />
     <script type="text/brightscript" uri="Parsers/accountParsers.brs" />
-    <script type="text/brightscript" uri="Parsers/ScreenSaverParsers.brs" />
     <script type="text/brightscript" uri="Parsers/UncategorizedParsers.brs" />
     <script type="text/brightscript" uri="Parsers/ServerPersistentDataParser.brs" />
     <script type="text/brightscript" uri="Parsers/ConsentScreenParsers.brs" />

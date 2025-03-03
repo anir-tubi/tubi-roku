@@ -197,18 +197,6 @@ Function registerParsingCallbacks()
     parseError: parseGenericError
   }
 
-  'screen saver get container
-  m.requestTypes[m.constants.reqNames.getScreensaverContainer] = {
-    parseSuccess: parseGetScreensaverContainerSuccess
-    parseError: parseGenericError
-  }
-
-  'screen saver get home screen container ids
-  m.requestTypes[m.constants.reqNames.getScreensaverHomeScreenContainerIds] = {
-    parseSuccess: parseGetScreensaverHomeScreenContainerIdsSuccess
-    parseError: parseGenericError
-  }
-
   ' my stuff screen
   m.requestTypes[m.constants.reqNames.getMyStuffContainers] = {
     parseSuccess: parseCategoryMyStuffContentSuccess

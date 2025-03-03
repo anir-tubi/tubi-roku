@@ -21,8 +21,6 @@ Function CmsApi(constants, apiUtils, experiments=invalid)
     createHomeScreenBatchReqInfo: cmsApi_createHomeScreenBatchRequestInfo
     createMyStuffScreenBatchReqInfo: cmsApi_createMyStuffScreenBatchReqInfo
     createHomeScreenBatchRequestInfoForContainers: cmsApi_createHomeScreenBatchRequestInfoForContainers
-    createContainerForScreensaverReqInfo: cmsApi_createContainerForScreensaverReqInfo
-    createHomeScreenContainerIdsForScreensaverReqInfo: cmsApi_createHomeScreenContainerIdsForScreensaverReqInfo
 
     ' private
     setImageParams: cmsApi_setImageParams
@@ -678,47 +676,6 @@ Function cmsApi_createHomeScreenBatchRequestInfoForContainers(containerIds, cont
 
   return requests
 
-End Function
-
-
-'@containerId: string, container id that we should request the list of items for
-'@numberOfItemsPerContainer, integer - max number of items to request for each container request
-Function cmsApi_createContainerForScreensaverReqInfo(containerId, numberOfItemsPerContainer, isKidsMode)
-  reqInfo = m.createCategoryReqInfo(containerId, isKidsMode, {}, [])
-  reqInfo.requestType = m.constants.reqNames.getScreensaverContainer
-
-  params = {}
-  params.contents_limit = numberOfItemsPerContainer
-
-  imageWidth = 1920
-  imageHeight = 1080
-  if m.constants.deviceInfo.scaledUi = true then
-    imageWidth = 1280
-    imageHeight = 720
-  end if
-
-  params["images[landscape_tb]"] = "w" + imageWidth.toStr() + "h" + imageHeight.toStr() + "_hero"
-
-  reqInfo.options.params.append(params)
-
-  reqInfo.options.params.delete("include_channels")
-  reqInfo.options.params.delete("include_sponsorships")
-
-  return reqInfo
-End Function
-
-
-Function cmsApi_createHomeScreenContainerIdsForScreensaverReqInfo(kidsMode)
-  reqInfo = m.createHomeScreenReqInfo(kidsMode)
-
-  reqInfo.requestType = m.constants.reqNames.getScreensaverHomeScreenContainerIds
-
-  params = {}
-  params["group_size"] = 2 ' Only want first two container ids
-  params["contents_limit"] = 0 ' Do not need any items
-  reqInfo.options.params.append(params)
-
-  return reqInfo
 End Function
 
 

@@ -23,7 +23,6 @@
 
       <field id="width" alias="VideoNode.width"/>
       <field id="height" alias="VideoNode.height"/>
-      <field id="disableScreensaver" alias="VideoNode.disableScreensaver" />
 
       <!-- New content has been added to the video player -->
       <field id="content" type="node"/>

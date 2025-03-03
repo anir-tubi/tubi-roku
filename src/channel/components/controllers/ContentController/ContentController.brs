@@ -67,7 +67,6 @@ Function addControllerUi()
 
   m.mainTask = createObject("roSGNode", "MainTask") ' initiate MainTask
   m.mainTask.observeFieldScoped("isHdmiStatusOk", "onIsHdmiStatusOkChange")
-  m.mainTask.observeFieldScoped("screensaverTimeout", "onScreensaverTimeoutChange") ' Declared in ScreensaverHelpers.brs
 
   ' Holds the value for user/device level settings. For ex: isVideoPreviewOn  or Selected Audio track.
   m.pub_serverPersistentData = createObject("roSGNode", "ServerPersistentData")
@@ -93,9 +92,6 @@ Function addControllerUi()
   m.SideNav = m.top.findNode("SideNav")
 
   m.videoPreviewPlayer = m.top.findNode("videoPreviewPlayer")
-  if getExperimentResource("roku_screensaver", "roku_screensaver_v2", false).enabled = true then
-    m.videoPreviewPlayer.disableScreensaver = true
-  end if
 
   m.LinearPlayerGroup = m.top.findNode("LinearPlayerGroup")
   m.LinearPlayerGroupAboveScreenStack = m.top.findNode("LinearPlayerGroupAboveScreenStack")
@@ -116,8 +112,6 @@ Function addControllerUi()
   m.LinearVideoPlayerSpinner = m.top.findNode("LinearVideoPlayerSpinner")
   m.playerFullscreenCountdownTimer = m.top.findNode("PlayerFullscreenCountdownTimer")
   m.resumeAllowedTimer = m.top.findNode("ResumeAllowedTimer")
-  m.screensaverTimer = m.top.findNode("screensaverTimer")
-  m.screensaverTimer.observeFieldScoped("fire", "onScreensaverTimerFired") ' Declared in ScreensaverHelpers.brs
 
   m.screenStack = m.top.findNode("ScreenStack")
   m.screenStack.observeFieldScoped("isEmpty", "onScreenStackEmpty")
@@ -1933,11 +1927,6 @@ Function onCustomSuspend(msg)
       end if
     end if
 
-    screensaverScreen = getScreensaverScreen()
-    if screensaverScreen <> invalid then
-      closeScreensaverScreen()
-    end if
-
     'Modals with type errorDialog should made invisible and app should restarted on app relaunch.
     'Modals with type actionDialog should be closed and app should resume from the current screen
     modal = getTopModal()
@@ -2062,10 +2051,6 @@ Function onCustomResume(msg)
         end if
       end if
     end if
-
-    m.mainTask.request = {
-      "type": "updateScreensaverTimeout"
-    }
   else if lastSuspendOrResumeReason = "screensaver"
     ' Do nothing, but leave this as a place holder.
     ' The app will resume as normal for the screensaver.

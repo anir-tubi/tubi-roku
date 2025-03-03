@@ -294,8 +294,6 @@ Function getConstants()
     constants.reqNames.deleteFromQueue = "deleteFromQueue"
     constants.reqNames.postToQueue = "postToQueue"
     constants.reqNames.deleteHistory = "deleteHistory"
-    constants.reqNames.getScreenSaverContainer = "getScreenSaverContainer"
-    constants.reqNames.getScreenSaverHomeScreenContainerIds = "getScreenSaverHomeScreenContainerIds"
     constants.reqNames.getNamespaces = "getNamespaces"
     constants.reqNames.getExternalConfigs = "getExternalConfigs"
     constants.reqNames.getServerPersistentData = "getServerPersistentData"
@@ -346,8 +344,6 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.deviceRegister] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.deleteHistory] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getEPGChannelIds] = true
-      constants.reqNames.acceptsTubiAuth[constants.reqNames.getScreenSaverContainer] = true
-      constants.reqNames.acceptsTubiAuth[constants.reqNames.getScreenSaverHomeScreenContainerIds] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getServerPersistentData] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.patchServerPersistentData] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getConsent] = true
@@ -1173,7 +1169,6 @@ Function getConstants()
       constants.ui.screenLevels.consentScreen = 120
       constants.ui.screenLevels.rokuContinueWatchingConsentScreen = 120
       constants.ui.screenLevels.managePreferencesScreen = 130
-      constants.ui.screenLevels.screensaverScreen = 1100
 
     constants.ui.screenIds = {}
       constants.ui.screenIds.homeScreen = "homeScreen"
@@ -1196,7 +1191,6 @@ Function getConstants()
       constants.ui.screenIds.epgScreen = "epgScreen"
       constants.ui.screenIds.emailVerificationScreen = "emailVerificationScreen"
       constants.ui.screenIds.forgotPasswordProcessingScreen = "forgotPasswordProcessingScreen"
-      constants.ui.screenIds.screensaverScreen = "screensaverScreen"
       constants.ui.screenIds.consentScreen = "consentScreen"
       constants.ui.screenIds.managePreferencesScreen = "managePreferencesScreen"
       constants.ui.screenIds.rokuContinueWatchingConsentScreen = "rokuContinueWatchingConsentScreen"

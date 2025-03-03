@@ -907,30 +907,3 @@ Function cmsApi_setTupianLandscapeParam_test()
   m.assertNotInvalid(updatedParams["images[landscape_tb]"])
   m.assertEqual(updatedParams["images[landscape_tb]"], landscapeParam)
 End Function
-
-
-'@Test unit tests cmsApi_createContainerForScreensaverReqInfo
-Function cmsApi_createContainerForScreensaverReqInfo_test()
-  isKidsMode = false
-  numberOfItemsPerContainer = 42
-  reqInfo = m.cmsApi.createContainerForScreensaverReqInfo("featured", numberOfItemsPerContainer, isKidsMode)
-  params = reqInfo.options.params
-
-  m.assertInvalid(params.include_channels)
-  m.assertInvalid(params.include_sponsorships)
-  m.assertEqual(params.contents_limit, numberOfItemsPerContainer)
-  m.assertEqual(params.content_mode, "")
-  m.assertEqual(params.is_kids_mode, isKidsMode)
-End Function
-
-
-'@Test unit tests cmsApi_createHomeScreenContainerIdsForScreensaverReqInfo
-Function cmsApi_createHomeScreenContainerIdsForScreensaverReqInfo_test()
-  isKidsMode = false
-  reqInfo = m.cmsApi.createHomeScreenContainerIdsForScreensaverReqInfo(isKidsMode)
-  params = reqInfo.options.params
-
-  m.assertEqual(params.contents_limit, 0)
-  m.assertEqual(params.group_size, 2)
-  m.assertEqual(params.is_kids_mode, isKidsMode)
-End Function

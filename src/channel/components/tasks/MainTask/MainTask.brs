@@ -13,11 +13,6 @@ Function init()
     disableHdmiStatusChecks = true
   end if
 
-  settings = constants.settings
-  if settings.mode <> "production" then
-    m.overrideScreensaverTimeout = settings.overrideScreensaverTimeout
-  end if
-
   if disableHdmiStatusChecks <> true then
     m.cecStatus = createObject("roCECStatus")
     m.cecStatus.setMessagePort(m.port)
@@ -42,9 +37,6 @@ End Function
 
 ' All code run here is run on task thread
 Function taskThread()
-  ' We can not use roAppManager in the render thread so have to do it here
-  m.top.screensaverTimeout = getScreensaverTimeout()
-
   while true
     msg = wait(0, m.port)
     messageType = type(msg)
@@ -69,17 +61,6 @@ End Function
 
 
 Function handleRequest(request)
-  requestType = request.type
-  if requestType = "updateScreensaverTimeout" then
-    m.top.screensaverTimeout = getScreensaverTimeout()
-  end if
-End Function
-
-
-Function getScreensaverTimeout()
-  if m.overrideScreensaverTimeout <> invalid then
-    return  m.overrideScreensaverTimeout
-  end if
-
-  return createObject("roAppManager").getScreensaverTimeout() * 60
+  ' Not using for now
+  ' requestType = request.type
 End Function
