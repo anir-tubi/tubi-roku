@@ -886,15 +886,18 @@ async function addMissingImagesToRemoteLibrary(done) {
   const newImagesSinceFilePath = `new_images_since/new_images_since_${lastSubmissionMajorVersion}_${lastSubmissionMinorVersion}`;
   let newImagesSinceFileContents = fs.readFileSync(newImagesSinceFilePath, 'utf8');
   const imagesToAdd = [];
-  for (const changedImageFilePath of changedImageFilePaths) {
-    // First check the file exists as files that were deleted are also included in the diff
-    if (!fs.existsSync(changedImageFilePath)) {
-      continue;
-    }
 
-    const relativeChangedImageFilePath = changedImageFilePath.replace(baseChannelPath, '');
-    if (newImagesSinceFileContents.search(relativeChangedImageFilePath) === -1) {
-      imagesToAdd.push(relativeChangedImageFilePath);
+  if (changedImageFilePaths !== null){
+    for (const changedImageFilePath of changedImageFilePaths) {
+      // First check the file exists as files that were deleted are also included in the diff
+      if (!fs.existsSync(changedImageFilePath)) {
+        continue;
+      }
+  
+      const relativeChangedImageFilePath = changedImageFilePath.replace(baseChannelPath, '');
+      if (newImagesSinceFileContents.search(relativeChangedImageFilePath) === -1) {
+        imagesToAdd.push(relativeChangedImageFilePath);
+      }
     }
   }
 
