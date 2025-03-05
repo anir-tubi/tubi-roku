@@ -2156,6 +2156,12 @@ Function restartApp()
 End Function
 
 
+' If we get a user not found then we need to logout the user and restart the application. Added param to allow to be used in cases that expect the callback to take a param.
+Function logoutAndRestartApp(_ = invalid)
+  logout(restartApp)
+End Function
+
+
 ' resumes the app where the user left off.
 Function resumeApp()
   tubiLog("ContentController.resumeApp")

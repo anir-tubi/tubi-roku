@@ -879,13 +879,6 @@ Function handleUpdatedAuth()
 
   authInfo = m.tubiAuthUpdate.getAuthInfo()
 
-  if isLoggedInUser(authInfo) = true
-    '//When signed in, then set the callback in case an endpoint indicates that the user should be signed out
-    m.setSignOutErrorCallback(onSignedInUserNotExistError)
-  else
-    m.setSignOutErrorCallback(invalid)
-  end if
-
   setSideNavSignedInItem(authInfo)
 End Function
 

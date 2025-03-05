@@ -10,7 +10,6 @@ Function GeneralTaskModule(context, generalTask)
     makeRequest: generalTask_makeRequest
     makeBatchRequest: generalTask_makeBatchRequest
     cancelRequest: generalTask_cancelRequest
-    setSignOutErrorCallback: generalTask_setSignOutErrorCallback
     updateGeneralTaskConstants: generalTask_updateGeneralTaskConstants
     updateGeneralTaskExperimentsInfo: generalTask_updateGeneralTaskExperimentsInfo
     updateGeneralTaskClientErrorConfig: generalTask_updateGeneralTaskClientErrorConfig
@@ -18,7 +17,6 @@ Function GeneralTaskModule(context, generalTask)
     ' private
     generalTask: generalTask
     generalTaskCallbacks: {}
-    signOutCallback: invalid '//The error callback function if an endpoint indicates the user should be signed out
     verifyRequestInfo: generalTask_verifyRequestInfo
     addDefaultRequestValues: generalTask_addDefaultRequestValues
     constructCallbackNode: generalTask_constructCallbackNode
@@ -218,15 +216,6 @@ Function generalTask_makeRequest(reqInfo)
 End Function
 
 
-' generalTask_setSignOutErrorCallback
-'
-' public method, which sets the error callback function for when the logged in user is reported to no longer exist.
-' @errorCallback: function, the function to be used as the error callback function
-Function generalTask_setSignOutErrorCallback(errorCallback)
-  m.signOutCallback = errorCallback
-End Function
-
-
 ' generalTask_makeBatchRequest
 '
 ' public method, which dynamically creates callback node with response & error fields and sets batchRequest field of GeneralTask
@@ -316,7 +305,7 @@ Function errorCallbackWrapper(msg)
   callback = m.getGeneralTaskErrorCallback(callbackNode)
   if callback <> invalid then
     error = msg.getData()
-    if error.code = 401 AND error.data <> invalid AND (isString(error.data) = true OR isAA(error.data) = true) AND isFunction(m.signOutCallback) = true
+    if error.code = 401 AND (isString(error.data) = true OR isAA(error.data) = true) then
       if isString(error.data) = true
         data = parseJson(error.data)
       else
@@ -324,8 +313,8 @@ Function errorCallbackWrapper(msg)
       end if
 
       'if there is a callback associated with the userNotFound error, then use that callback instead
-      if isAA(data) = true AND isNonEmptyString(data.code) = true AND UCase(data.code) = UCase(m.constants.errors.codes.userNotFound)
-        callback = m.signOutCallback
+      if isAA(data) = true AND isNonEmptyString(data.code) = true AND UCase(data.code) = UCase(m.constants.errors.codes.userNotFound) AND isFunction(logoutAndRestartApp) = true then 'bs:disable-line 1001 LINT1001
+        callback = logoutAndRestartApp 'bs:disable-line 1001 LINT1001
       end if
     end if
 

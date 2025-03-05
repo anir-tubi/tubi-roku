@@ -734,7 +734,7 @@ Function checkIfUserNotFoundError(response)
   data = invalid
 
   if response <> invalid
-    if isNonEmptyString(response.data) = true
+    if isNonEmptyString(response.data) = true AND isAA(response.headers) = true AND Instr(1, response.headers["Content-Type"], "application/json") > 0 then
       data = parseJson(response.data)
     else if isAA(response.data) = true
       data = response.data
