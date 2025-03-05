@@ -730,11 +730,6 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       m.lastFocusedList = "skinAdRow"
       m.skinAdRow.setFocus(true)
       return true
-    else if key = "up" AND bSkinAdAvailable = true
-      slideFade(m.skinAdRow, "above", "in", 0.3)
-      m.lastFocusedList = "skinAdRow"
-      m.skinAdRow.setFocus(true)
-      return true
     end if
   end if
   return false
