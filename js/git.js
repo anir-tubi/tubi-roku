@@ -501,7 +501,7 @@ async function sendSlackReminders(done) {
 
 // Helper to work around the fact you can't fetch if you're already on the branch
 async function pullOrFetchBranch(done, branch) {
-  if (!isRemoteTrackingPresent(done, branch)) {
+  if (!isBranchTrackingPresent(done, branch)) {
     // Add a prompt asking if engineer wants to proceed with the build.
     const {proceedWithGitPull} = await prompts({
       type: 'confirm',
@@ -527,10 +527,11 @@ async function pullOrFetchBranch(done, branch) {
 
 
 // Checking if the branch has a remote branch tracking.
-function isRemoteTrackingPresent(done, branchName) {
+function isBranchTrackingPresent(done, branchName) {
   const remoteTrackingInfo = execShellCommand(done, `git ls-remote --heads origin ${branchName}`, `Could not execute get remote tracking info`);
 
-  return remoteTrackingInfo.trim().length > 0;
+  const result = shell.exec(`git rev-parse --abbrev-ref ${branchName}@{upstream}`, { silent: true });
+  return remoteTrackingInfo.trim().length > 0 && result.code === 0;
 }
 
 
@@ -1072,5 +1073,5 @@ module.exports = {
   tagBuild,
   createCdnPullRequestForOneTrustSDK,
   getCurrentBranch,
-  isRemoteTrackingPresent
+  isBranchTrackingPresent
 };

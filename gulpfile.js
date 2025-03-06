@@ -30,7 +30,7 @@ const {replaceTypographyConstants, updateTypographyJSON} = require('./js/typogra
 const {NoStackError} = require('./js/utilities');
 
 // Importing functions with Git functionality
-const {makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges, buildQaBranch, bumpBuild, bumpBuildTen, bumpRevision, tagBuild, createCdnPullRequestForOneTrustSDK, sendSlackReminders, getCurrentBranch, isRemoteTrackingPresent} = require('./js/git');
+const {makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges, buildQaBranch, bumpBuild, bumpBuildTen, bumpRevision, tagBuild, createCdnPullRequestForOneTrustSDK, sendSlackReminders, getCurrentBranch, isBranchTrackingPresent} = require('./js/git');
 
 // Importing functions related to Github action runners
 const {setupAutomatedTestsGithubActionRunner, startAutomatedTestsGithubActionRunner, removeAutomatedTestsGithubActionRunner} = require('./js/action-runner');
@@ -1022,7 +1022,7 @@ function validateBuildEnvironment(done) {
 
   const currentBranch = getCurrentBranch(done);
 
-  if (!isRemoteTrackingPresent(done, currentBranch)) {
+  if (!isBranchTrackingPresent(done, currentBranch)) {
     done(new NoStackError(`\x1b[31m ${currentBranch} does not have a remote tracking branch. \x1b[0m`));
   }
 
