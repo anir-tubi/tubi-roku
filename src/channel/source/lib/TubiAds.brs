@@ -992,7 +992,9 @@ Function tubiAds_adBufferingCallback(eventType, ctx)
     m.containerNode.visible = true
   end if
 
-  m.controlNode.adBufferingObject = ctx
+  if m.controlNode.hasField("adBufferingObject") = true
+    m.controlNode.adBufferingObject = ctx
+  end if
 
   if ctx.progress <> invalid
     m.controlNode.adProgress = ctx.progress
