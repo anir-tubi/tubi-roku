@@ -1406,6 +1406,7 @@ Function getConstants()
     constants.consentKeys.personalization = "C0004"
     constants.consentKeys.marketing = "C0005"
     constants.consentKeys.continueWatching = "data_sharing"
+    constants.consentKeys.functional = "C0003"
 
   constants.configHubFallbacks = {}
     constants.configHubFallbacks.majorEventStart = "2025-02-09T05:00:00.000000Z"
