@@ -16,11 +16,17 @@ Function TubiTracking(constants, auth, userConsentsOptOutStatus = {}, request = 
     getClientEvent: tubiTracking_getClientEvent
     getUserTrackingRequest: tubiTracking_getUserTrackingRequest
     createUserTrackingReqInfo: tubiTracking_createUserTrackingReqInfo
+
+    trackPlayerEvent: tubiTracking_trackPlayerEvent
+    getPlayerAnalyticsEvent: tubiTracking_getPlayerAnalyticsEvent
+    createPlayerTrackingReqInfo: tubiTracking_createPlayerTrackingReqInfo
+
     getViewableImpressionEvent: tubiTracking_getViewableImpressionEvent
     createViewableImpressionTrackingReqInfo: tubiTracking_createViewableImpressionTrackingReqInfo
 
     getAnalyticsRequestIdempotency: tubiTracking_getAnalyticsRequestIdempotency
     getAnalyticsTimestamp: tubiTracking_getAnalyticsTimestamp
+    getAnalyticsEventId: tubiTracking_getAnalyticsEventId
     getAnalyticsUser: tubiTracking_getAnalyticsUser
     getAnalyticsDevice: tubiTracking_getAnalyticsDevice
     getAnalyticsApp: tubiTracking_getAnalyticsApp
@@ -118,7 +124,7 @@ End Function
 ' @eventValues: assocArray, keys/values that correspond to the fields within the event type specified in @eventType
 ' @requestQueue: assocArray, a request queue as returned by TubiRequestQueue().create()
 Function tubiTracking_trackUserEvent(eventType = "", eventValues = invalid, requestQueue = invalid)
-  if eventType <> "" AND m.externalConfigInfo <> invalid
+if eventType <> "" AND m.externalConfigInfo <> invalid
     blockedAnalyticsEvents = m.externalConfigInfo.blocked_analytics_events_mapping
     userConsentsOptOutStatus = {}
     if isAA(m.userConsentsOptOutStatus) = true
@@ -133,7 +139,6 @@ Function tubiTracking_trackUserEvent(eventType = "", eventValues = invalid, requ
 
     isMajorEventDay = m.isNowWithinTimePeriod(m.externalConfigInfo.major_event_failsafe_start, m.externalConfigInfo.major_event_failsafe_end)
     isEventInFailSafeBlockedList = isMajorEventDay = true AND m.externalConfigInfo.blocked_analytics_events <> invalid AND m.externalConfigInfo.blocked_analytics_events.doesExist(eventType) = true
-
     ' If the event name is not present in the blocked event list, we will proceed with sending the tracking request.
     ' If there is mapping than making sure we only proceed if a mapping is present in the userConsentsOptOutStatus and it is false.
     if (eventConsentKey = invalid OR userConsentsOptOutStatus[eventConsentKey] = false) AND isEventInFailSafeBlockedList = false
@@ -269,6 +274,13 @@ Function tubiTracking_getAnalyticsTimestamp()
   time = CreateObject("roDateTime")
   timestamp = time.ToISOString("milliseconds") 'see protos.google.protobuf.timestamp.protos -> Timestamp
   return timestamp
+End Function
+
+
+' Generate a eventId for analytics
+Function tubiTracking_getAnalyticsEventId()
+  eventId = CreateObject("roDeviceInfo").GetRandomUUID()
+  return eventId
 End Function
 
 
@@ -1343,6 +1355,60 @@ Function tubiTracking_processRepeatedProperty(prop, list)
   end for
 
   return repeatedValues
+End Function
+
+
+'@trackData: assocArray, object returned from m.getPlayerAnalyticsEvent()
+'@requestQueue: assocArray, a request queue as returned by TubiRequestQueue().create()
+Function tubiTracking_trackPlayerEvent(trackData, requestQueue)
+  playerTrackingReqInfo = m.createPlayerTrackingReqInfo(trackData)
+  if playerTrackingReqInfo <> invalid AND requestQueue <> invalid
+    requestQueue.pushRequest(playerTrackingReqInfo)
+  end if
+End Function  
+
+
+'@trackData: assocArray, object returned from m.getPlayerAnalyticsEvent()
+Function tubiTracking_createPlayerTrackingReqInfo(trackData)
+  options = {
+    method: m.constants.reqTypes.post
+    body: FormatJson(trackData)
+  }
+
+  eventType = "player"
+  if isNonEmptyString(trackData.event_name) = true
+    eventType = trackData.event_name
+  end if
+  
+  requestUrl = m.constants.urls.analyticsV3.sendEvent
+  playerTrackingReqInfo = m.request.createAsync(requestUrl, eventType, options)
+
+  return playerTrackingReqInfo
+End Function
+
+
+'@eventType: string: one of the fields defined in the "oneof" definition within AppEvent. For example: "active" or "page_load"
+'@eventValues: assocArray, keys/values that correspond to the fields within the event type specified in @eventType
+Function tubiTracking_getPlayerAnalyticsEvent(eventType, eventValues) as Object
+  eventValues["device_id"] = m.constants.deviceInfo.deviceId
+  eventValues["platform"] = m.constants.analyticsPlatform
+  eventValues["log_version"] = m.constants.player.analyticsVersion
+  eventValues["version"] = m.constants.deviceInfo.clientVersion  
+
+  clientCommon = {
+    event_id: m.getAnalyticsEventId()
+    event_timestamp: m.getAnalyticsTimestamp()
+  }
+  eventValues["client_common"] = clientCommon
+
+  eventPayloads = []
+  eventPayloads.push(FormatJSON(eventValues))
+
+  playerEvent = {}
+  playerEvent["event_name"] = eventType
+  playerEvent["event_payloads"] = eventPayloads
+
+  return playerEvent
 End Function
 
 

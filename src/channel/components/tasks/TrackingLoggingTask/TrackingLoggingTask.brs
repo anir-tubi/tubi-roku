@@ -4,6 +4,7 @@ Function init()
   ' is running
   m.port = CreateObject("roMessagePort")
   m.top.observeField("trackEvent", m.port)
+  m.top.observeField("trackPlayerEvent", m.port)
   m.top.observeField("logMsg", m.port)
   m.top.observeField("logException", m.port)
   m.top.observeField("analyticsAppMode", m.port)
@@ -41,6 +42,8 @@ Function watchLoop()
       data = msg.GetData()
       if field = "trackEvent" then
         trackSceneGraphEvent(data, m.analyticsAppMode)
+      else if field = "trackPlayerEvent" then
+        trackSceneGraphPlayerEvent(data)  
       else if field = "logMsg" then
         sendSceneGraphLog(data)
       else if field = "logException" then
@@ -66,6 +69,16 @@ Function trackSceneGraphEvent(evtData, analyticsAppMode)
     tubiLog("TrackingLoggingTask.trackSceneGraphEvent for " + evtData.type)
     evtData.values.appMode = analyticsAppMode
     m.tracking.trackUserEvent(evtData.type, evtData.values, m.queue)  'creates a request and adds it to the requestQueue
+  end if
+End Function
+
+
+'@evtData: assocArray, has the following fields
+'           type: string, corresponds to one of the eventTypes found in m.tracking.getAnalyticsEvent()
+'           values: assocArray, fields that correspond to the fields specified for the eventType in m.tracking.getAnalyticsEvent()
+Function trackSceneGraphPlayerEvent(evtData)
+  if evtData <> invalid AND isAA(evtData) = true
+    m.tracking.trackPlayerEvent(evtData, m.queue)  'creates a request and adds it to the requestQueue
   end if
 End Function
 

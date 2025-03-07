@@ -735,6 +735,9 @@ Function getConstants()
   'constants needed for the video player
   constants.player = {}
 
+    'The analyticsVersion helps determine the specific version of the log in use. we may increment when we do bigger change in logging.
+    constants.player.analyticsVersion = "1.0"
+
     ' number of seconds that the "up next" screen will show
     constants.player.upNextCountdown = 30
 
@@ -925,6 +928,52 @@ Function getConstants()
         ]
       end if
 
+      'Video ResourceType
+      constants.player.videoResourcetype = {}
+        constants.player.videoResourcetype.unknown = 0
+        constants.player.videoResourcetype.hlsv3 = 1
+        constants.player.videoResourcetype.hlsv6 = 2
+        constants.player.videoResourcetype.dash_widevine = 3
+        constants.player.videoResourcetype.dash_playready = 4
+        constants.player.videoResourcetype.dash_fairplay = 5
+        constants.player.videoResourcetype.hlsv6_widevine = 6
+        constants.player.videoResourcetype.dash = 7
+        constants.player.videoResourcetype.hlsv6_playready = 8
+        constants.player.videoResourcetype.hlsv6_fairplay = 9
+        constants.player.videoResourcetype.hlsv6_playready_nonclearlead = 10
+        constants.player.videoResourcetype.dash_playready_psshv0 = 11
+        constants.player.videoResourcetype.hlsv6_widevine_nonclearlead = 12
+        constants.player.videoResourcetype.hlsv6_widevine_psshv0 = 13
+        constants.player.videoResourcetype.hlsv6_playready_psshv0 = 14
+        constants.player.videoResourcetype.dash_widevine_nonclearlead = 15
+        constants.player.videoResourcetype.playready_nonclearlead = 16
+        constants.player.videoResourcetype.dash_widevine_psshv0 = 17
+
+      'Video CodecType
+      constants.player.videoCodecType = {}
+        constants.player.videoCodecType.unknown = 0
+        constants.player.videoCodecType.h264 = 1
+        constants.player.videoCodecType.h265 = 2
+
+      'Video Resolution
+      constants.player.videoResolution = {}
+        constants.player.videoResolution.unknown = 0
+        constants.player.videoResolution["240"] = 1
+        constants.player.videoResolution["360"] = 2
+        constants.player.videoResolution["480"] = 3
+        constants.player.videoResolution["576"] = 4
+        constants.player.videoResolution["720"] = 5
+        constants.player.videoResolution["1080"] = 6
+        constants.player.videoResolution["2160"] = 7
+        constants.player.videoResolution["AUTO"] = 8
+
+      'Hdcp version
+      constants.player.hdcpVersion = {}
+        constants.player.hdcpVersion.hdcp_unknown = 0
+        constants.player.hdcpVersion.hdcp_v1 = 1
+        constants.player.hdcpVersion.hdcp_v2 = 2
+        constants.player.hdcpVersion.hdcp_disabled = 3
+      
       constants.player.browseContent = {}
         constants.player.browseContent.numContainers = 10
         constants.player.browseContent.numContents = 50

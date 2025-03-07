@@ -2,18 +2,17 @@
 ' Document - https://www.notion.so/tubi/RFC-Player-Analytics-Event-v1-0-b8bee0eb69d14cc891baf8e907635f2f
 ' 
 '@constants: assocArray, constants as set in Constants.brs
-'@requestQueue: assocArray, a request queue as returned by TubiRequestQueue().create(), default as invalid 
-'@logger: AA, TubiLogger returned as associative array, default as invalid 
+'@tracking: assocArray, a request queue as returned by TubiRequestQueue().create(), default as invalid 
 '
-Function PlayerLogLib(constants, requestQueue = invalid, logger = invalid)
+Function PlayerLogLib(constants, tracking)
   deviceInfo = CreateObject("roDeviceInfo")
- 
+
   return {
     constants: constants
-    requestQueue: requestQueue
-    logger: logger
+    tracking: tracking
     deviceInfo: deviceInfo
     playerLogTrackId: deviceInfo.GetRandomUUID() 'unique TrackId used in all events
+    trackingLoggingTask: getGlobalAA().global.trackingLoggingTask
 
     '//player fields
     playerLoadTime: -1 'used in playerSetupPerformance event
@@ -313,10 +312,34 @@ Function playerLogLib_setVideoContent(content = invalid)
   if type(content) = "roSGNode"
     m.content = content
     m.videoId = m.content.id
-    m.videoCodecType = m.content.codec
-    m.videoResolution = m.content.resolution
-    m.videoResourceType = m.content.drmType
-    m.hdcpVersion = m.content.hdcpVersion
+
+    if isNonEmptyString(m.content.codec) = true
+      codec = UCase(m.content.codec)
+      m.videoCodecType = m.constants.player.videoCodecType[codec]
+    else
+      m.videoCodecType = m.constants.player.videoCodecType["UNKNOWN"]
+    end if
+
+    if isNonEmptyString(m.content.resolution) = true
+      resolution = UCase(m.content.resolution)
+      m.videoResolution = m.constants.player.videoResolution[resolution]
+    else
+      m.videoResolution = m.constants.player.videoResolution["UNKNOWN"]
+    end if
+
+    if isNonEmptyString(m.content.drmType) = true
+      drmType = UCase(m.content.drmType)
+      m.videoResourceType = m.constants.player.videoResourceType[drmType]
+    else
+      m.videoResourceType = m.constants.player.videoResourceType["UNKNOWN"]
+    end if
+
+    if isNonEmptyString(m.content.hdcpVersion) = true
+      hdcpVersion = UCase(m.content.hdcpVersion)
+      m.hdcpVersion = m.constants.player.hdcpVersion[hdcpVersion]
+    else
+      m.hdcpVersion = m.constants.player.hdcpVersion["UNKNOWN"]
+    end if
 
     url = m.content.url
     m.cdn = ""
@@ -400,22 +423,26 @@ Function playerLogLib_firePlayerSetupPerformanceEvent()
     page_loaded_time: m.playerLoadTime
     player_setup_time: m.playerSetupTime
   }
-  m.sendEvent(data, "playerSetupPerformance", m.logger, m.requestQueue)
+  m.sendEvent(data, "player_setup_performance")
 
   m.playerLoadTime = -1
   m.playerSetupTime = -1
 End Function
 
 
-' playerLogLib_sendEvent helps to send the event to backend 
-' ad-related events are using the logger instead of directly calling tubiLog(). This is because TubiAds is already in the task, and we want to avoid creating a new task, as tubiLog() initiates its own task.
-' player-related events are using tubiLog() directly. Since the VideoPlayerScreen is not in the task, we cannot utilize the requestQueue object from the render thread. Therefore, we’re leveraging tubiLog(), which handles task creation automatically.
-Function playerLogLib_sendEvent(data = {} as Dynamic, subType = "" as String, logger = invalid, requestQueue = invalid)
-  message = FormatJSON(data)
-  if logger <> invalid AND requestQueue <> invalid
-    logger.info(message, "videoInfo", subType, requestQueue)
-  else
-    tubiLog(message, "info", "videoInfo", subType)
+' playerLogLib_sendEvent helps to send the event to backend through trackingLoggingTask
+'
+'@data: assocarray, the payload that needs to be sent
+'@subType: String, it is eventType
+Function playerLogLib_sendEvent(data = {} as Dynamic, subType = "" as String)
+  trackData = m.tracking.getPlayerAnalyticsEvent(subType, data)
+
+  if m.trackingLoggingTask = invalid then
+    m.trackingLoggingTask = getGlobalAA().global.trackingLoggingTask
+  end if
+
+  if m.trackingLoggingTask <> invalid then
+    m.trackingLoggingTask.trackPlayerEvent = trackData
   end if
 End Function
 
@@ -457,14 +484,14 @@ Function playerLogLib_fireContentStartupPerformanceEvent(isFromPreroll, isAfterA
     video_id: m.videoId
     video_resource_type: m.videoResourceType
     video_codec_type: m.videoCodecType
-    video_resolution: m.videoResolution
+    current_video_resolution: m.videoResolution
     start_position: startPosition
     is_after_ad: isAfterAd
     is_from_preroll: isFromPreroll
     first_frame_time: firstFrameTime
   }
 
-  m.sendEvent(data, "contentStartupPerformance", m.logger, m.requestQueue)
+  m.sendEvent(data, "content_startup_performance")
 End Function
 
 
@@ -526,7 +553,7 @@ Function playerLogLib_fireCuepointFilledEvent(cuepointInfo)
   if isAA(cuepointInfo) = true
     cuepointInfo["track_id"] = m.playerLogTrackId
     cuepointInfo["video_id"] = m.videoId
-    m.sendEvent(cuepointInfo, "cuePointFilled", m.logger, m.requestQueue)
+    m.sendEvent(cuepointInfo, "cue_point_filled")
   end if
 End Function
 
@@ -551,7 +578,7 @@ Function playerLogLib_firePlayerPageExitEvent(playerExitInfo)
       playerExitInfo["feedback"] = m.playerFeedback
     end if
   
-    m.sendEvent(playerExitInfo, "playerPageExit", m.logger, m.requestQueue)
+    m.sendEvent(playerExitInfo, "player_page_exit")
   end if
 
   m.hasErrorModalShown = false
@@ -589,7 +616,7 @@ Function playerLogLib_fireContentStartEvent(isFromPreroll, isAfterAd)
     is_from_autoplay: m.isFromAutoplay
   }
 
-  m.sendEvent(data, "contentStart", m.logger, m.requestQueue)
+  m.sendEvent(data, "content_start")
 End Function
 
 
@@ -600,7 +627,7 @@ Function playerLogLib_fireVideoResourceFallbackEvent(resourceInfo)
   if isAA(resourceInfo) = true
     resourceInfo["track_id"] = m.playerLogTrackId
     resourceInfo["video_id"] = m.videoId
-    m.sendEvent(resourceInfo, "fallback", m.logger, m.requestQueue)
+    m.sendEvent(resourceInfo, "fallback")
   end if
 End Function
 
@@ -615,7 +642,7 @@ Function playerLogLib_fireAdStartupPerformanceEvent(adCtx = {})
     adStartupPerformanceInfo = m.updateSingleAdInfo(adCtx)
     m.totalAdFirstFrameDuration += m.adBufferTime
     adStartupPerformanceInfo["first_frame_time"] = m.adBufferTime
-    m.sendEvent(adStartupPerformanceInfo, "adStartupPerformance", m.logger, m.requestQueue)
+    m.sendEvent(adStartupPerformanceInfo, "ad_startup_performance")
   end if
 End Function
 
@@ -626,7 +653,8 @@ End Function
 Function playerLogLib_fireAdStartEvent(adCtx = {})
   if isAA(adCtx) = true
     adStartInfo = m.updateSingleAdInfo(adCtx)
-    m.sendEvent(adStartInfo, "adStart", m.logger, m.requestQueue)   
+    adStartInfo["video_id"] = m.videoId
+    m.sendEvent(adStartInfo, "ad_start")   
   end if
 End Function
 
@@ -639,7 +667,8 @@ Function playerLogLib_fireAdCompleteEvent(adCtx = {})
     m.totalAdDurationPerTitle += adCtx.duration
 
     adCompleteInfo = m.updateSingleAdInfo(adCtx)
-    m.sendEvent(adCompleteInfo, "adComplete", m.logger, m.requestQueue)   
+    adCompleteInfo["video_id"] = m.videoId
+    m.sendEvent(adCompleteInfo, "ad_complete")   
   end if
 End Function
 
@@ -660,8 +689,9 @@ Function playerLogLib_fireAdDiscontinueEvent(adCtx = {})
     end if
 
     adDiscontinueInfo["ad_position"] = adPosition
+    adDiscontinueInfo["video_id"] = m.videoId
     adDiscontinueInfo["reason"] = "error"
-    m.sendEvent(adDiscontinueInfo, "adDiscontinue", m.logger, m.requestQueue)   
+    m.sendEvent(adDiscontinueInfo, "ad_discontinue")   
   end if
 
   'this is used in quality of service event 
@@ -681,8 +711,8 @@ Function playerLogLib_fireAdPodCompleteEvent(adCtx = {})
   adPodCompleteInfo["failed_count"] = m.failedAdCountPerTitle
   adPodCompleteInfo["is_preroll"] = (adCtx.rendersequence = "preroll")
   adPodCompleteInfo["video_id"] = m.videoId
-  adPodCompleteInfo["total_ads_duration"] = m.totalAdDurationPerTitle
-  m.sendEvent(adPodCompleteInfo, "adPodComplete", m.logger, m.requestQueue)
+  adPodCompleteInfo["total_ads_duration"] = Round(m.totalAdDurationPerTitle)
+  m.sendEvent(adPodCompleteInfo, "ad_pod_complete")
 End Function
 
 
@@ -709,13 +739,12 @@ Function playerLogLib_updateSingleAdInfo(adCtx = {})
 
     adInfo = {}
     adInfo["track_id"] = m.playerLogTrackId
-    adInfo["video_id"] = m.videoId
     adInfo["ad_id"] = adId
     adInfo["url"] = url
     adInfo["is_preroll"] = isPreroll
     adInfo["ad_index"] = adIndex
     adInfo["ad_count"] = adCtx.adCount
-    adInfo["duration"] = adCtx.duration
+    adInfo["duration"] = Round(adCtx.duration)
     return adInfo
   else
     return {}
@@ -878,22 +907,22 @@ End Function
 Function playerLogLib_fireQualityOfServiceEvent()
   qualityOfServiceInfo = {}
   qualityOfServiceInfo["track_id"] = m.playerLogTrackId
-  qualityOfServiceInfo["cffd"] = m.contentFirstFrameDuration
-  qualityOfServiceInfo["rc"] = m.resumeCount
+  qualityOfServiceInfo["cffd"] = Round(m.contentFirstFrameDuration)
+  qualityOfServiceInfo["rc"] = Round(m.resumeCount)
   qualityOfServiceInfo["last_ss"] = m.lastStartStep
-  qualityOfServiceInfo["errc"] = m.errorCode
-  qualityOfServiceInfo["first_errc"] = m.firstErrorCode
-  qualityOfServiceInfo["boc"] = m.breakOffCount
-  qualityOfServiceInfo["bc"] = m.videoBufferingCount
-  qualityOfServiceInfo["tbd"] = m.totalBufferingDuration
-  qualityOfServiceInfo["sc"] = m.seekCount
-  qualityOfServiceInfo["tsd"] = m.totalSeekDuration
-  qualityOfServiceInfo["tvt"] = m.totalViewTime * 1000 'ms
-  qualityOfServiceInfo["tcrffd"] = m.totalContentResumeFirstFrameDuration
-  qualityOfServiceInfo["ad_sfc"] = m.adStartupFailureCount
-  qualityOfServiceInfo["ad_eac"] = m.failedAdCount
-  qualityOfServiceInfo["ad_taffd"] = m.totalAdFirstFrameDuration
-  qualityOfServiceInfo["ad_bac"] = m.adReBuffer
+  qualityOfServiceInfo["errc"] = Round(m.errorCode)
+  qualityOfServiceInfo["first_errc"] = Round(m.firstErrorCode)
+  qualityOfServiceInfo["boc"] = Round(m.breakOffCount)
+  qualityOfServiceInfo["bc"] = Round(m.videoBufferingCount)
+  qualityOfServiceInfo["tbd"] = Round(m.totalBufferingDuration)
+  qualityOfServiceInfo["sc"] = Round(m.seekCount)
+  qualityOfServiceInfo["tsd"] = Round(m.totalSeekDuration)
+  qualityOfServiceInfo["tvt"] = Round(m.totalViewTime) * 1000 'ms
+  qualityOfServiceInfo["tcrffd"] = Round(m.totalContentResumeFirstFrameDuration)
+  qualityOfServiceInfo["ad_sfc"] = Round(m.adStartupFailureCount)
+  qualityOfServiceInfo["ad_eac"] = Round(m.failedAdCount)
+  qualityOfServiceInfo["ad_taffd"] = Round(m.totalAdFirstFrameDuration)
+  qualityOfServiceInfo["ad_bac"] = Round(m.adReBuffer)
   qualityOfServiceInfo["is_ad"] = m.isAd
   qualityOfServiceInfo["ad_ac"] = m.adCount
 
@@ -917,7 +946,7 @@ Function playerLogLib_fireQualityOfServiceEvent()
   qualityOfServiceInfo["codec"] = m.videoCodecType
   qualityOfServiceInfo["content_id"] = m.videoId
 
-  m.sendEvent(qualityOfServiceInfo, "qualityOfService", m.logger, m.requestQueue)
+  m.sendEvent(qualityOfServiceInfo, "quality_of_services")
   m.resetQoSAttributes()
 End Function
 

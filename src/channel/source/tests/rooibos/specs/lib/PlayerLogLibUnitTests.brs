@@ -3,8 +3,19 @@
 '@Setup
 Function PlayerLogLibSetup()
   constants = getConstants()
-  m.playerLogLib = PlayerLogLib(constants)
+  auth = TubiAuth(constants)
+  request = TubiRequest(constants.settings)
+  tracking = TubiTracking(constants, auth, {}, request)
+  m.playerLogLib = PlayerLogLib(constants, tracking)
+  m.playerLogLib.sendEvent = sendEvent
 End function
+
+
+Function sendEvent(data = {} as Dynamic, subType = "" as String)
+  trackData = m.tracking.getPlayerAnalyticsEvent(subType, data)
+  m.trackingLoggingTask = CreateObject("roSGNode", "TrackingLoggingTask")
+  m.trackingLoggingTask.trackPlayerEvent = trackData
+End Function
 
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

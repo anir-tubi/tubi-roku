@@ -45,9 +45,11 @@ Function init()
   m.top.handlesTransportVoiceRequests = true
   m._ = rodash()
   m.NodeHelpers = TubiNodeHelpers()
-  Auth = TubiAuth(m.constants)
-  m.Tracking = TubiTrackingInfo(m.constants)
-  m.adsLimited = TubiAdsLimited(m.constants, Auth, m.top.tcfString, m.top.userConsentsOptOutStatus, isGDPR())
+
+  request = TubiRequest(m.constants.settings)
+  m.Tracking = TubiTracking(m.constants, m.auth, m.top.userConsentsOptOutStatus, request)
+  isGDPRinArg = isGDPR()
+  m.adsLimited = TubiAdsLimited(m.constants, m.auth, m.top.tcfString, m.top.userConsentsOptOutStatus, isGDPRinArg)
   m.top.observeFieldScoped("tcfString", "onTCFStringChange")
   m.top.observeField("userConsentsOptOutStatus", "onUserConsentsOptOutStatusChange")
   m.Loading = m.top.findNode("Loading")
@@ -166,7 +168,7 @@ Function init()
   m.playerLogLib = invalid
 
   if m.constants.settings.playerLogEnabled = true AND getExperimentResource("roku_player_client_log", "roku_player_client_log_v2").enabled = true
-    m.playerLogLib = PlayerLogLib(m.constants)
+    m.playerLogLib = PlayerLogLib(m.constants, m.Tracking)
   end if
 
   'playerExitInfo has ad_counts, is_ad and is_buffering fields, which are used in player exit event
@@ -1951,15 +1953,58 @@ End Function
 '
 Function sendVideoResourceFallbackToPlayerLogLib(failedResource, fallbackResource, failedType)
   if isAA(failedResource) = true AND isAA(fallbackResource) = true AND isNonEmptyString(failedType) = true
+
+    if isNonEmptyString(failedResource.type) = true
+      resourceType = UCase(failedResource.type)
+      failedResourceType = m.constants.player.videoResourceType[resourceType]
+    else
+      failedResourceType = m.constants.player.videoResourceType["UNKNOWN"]  
+    end if
+
+    if isNonEmptyString(failedResource.codec) = true
+      resourceCodec = UCase(failedResource.codec)
+      failedCodecType = m.constants.player.videoCodecType[resourceCodec]
+    else
+      failedCodecType = m.constants.player.videoCodecType["UNKNOWN"]  
+    end if
+
+    if isNonEmptyString(failedResource.hdcpversion) = true
+      hdcpversion = UCase(failedResource.hdcpversion)
+      failedHdcpversion = m.constants.player.hdcpVersion[hdcpversion]
+    else
+      failedHdcpversion = m.constants.player.hdcpVersion["UNKNOWN"]  
+    end if
+
+    if isNonEmptyString(fallbackResource.type) = true
+      resourceType = UCase(fallbackResource.type)
+      fallbackResourceType = m.constants.player.videoResourceType[resourceType]
+    else
+      fallbackResourceType = m.constants.player.videoResourceType["UNKNOWN"]  
+    end if
+
+    if isNonEmptyString(fallbackResource.codec) = true
+      resourceCodec = UCase(fallbackResource.codec)
+      fallbackCodecType = m.constants.player.videoCodecType[resourceCodec]
+    else
+      fallbackCodecType = m.constants.player.videoCodecType["UNKNOWN"]  
+    end if
+
+    if isNonEmptyString(fallbackResource.hdcpversion) = true
+      hdcpversion = UCase(fallbackResource.hdcpversion)
+      fallbackHdcpversion = m.constants.player.hdcpVersion[hdcpversion]
+    else
+      fallbackHdcpversion = m.constants.player.hdcpVersion["UNKNOWN"]  
+    end if
+
     videoResourceFallback = {
-      type: "CODEC"
-      failed_video_resource_type: failedResource.type
-      failed_video_codec_type: failedResource.codec
-      failed_hdcp_version: failedResource.hdcpversion
+      type: failedType
+      failed_video_resource_type: failedResourceType
+      failed_video_codec_type: failedCodecType
+      failed_hdcp_version: failedHdcpversion
       failed_url: removeExcessUrl(failedResource.url)
-      fallback_video_resource_type: fallbackResource.type
-      fallback_video_codec_type: fallbackResource.codec
-      fallback_hdcp_version: fallbackResource.hdcpversion
+      fallback_video_resource_type: fallbackResourceType
+      fallback_video_codec_type: fallbackCodecType
+      fallback_hdcp_version: fallbackHdcpversion
       fallback_url: removeExcessUrl(fallbackResource.url)
     }
     updatePlayerLogLib(m.playerLogLib, "fireVideoResourceFallbackEvent", videoResourceFallback)
