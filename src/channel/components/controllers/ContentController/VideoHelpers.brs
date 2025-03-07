@@ -1281,8 +1281,6 @@ Function onUpNextResponse(upNextContent)
         isAutoPlayOff = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR videoPlayer.isAutoPlayTimerOn = false
         videoPlayer.isAutoPlayOff = isAutoPlayOff
         videoPlayer.upNextUpdateContent = true
-      else 'worst case there are no contents under upNextContent
-        returnToDetailScreenFromVideo()
       end if
     end if
   else
