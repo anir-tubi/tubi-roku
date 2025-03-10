@@ -71,7 +71,7 @@ Function onContentChange(msg)
     m.QRContentParentGroup.appendChild(m.descriptionTextGroup)
     m.panelGroup.appendChild(m.QRParentGroup)
   end if
-  
+
   bTitleAvailable = (isNonEmptyString(sTitle) = true or isNonEmptyString(sTitleImage) = true)
   if bTitleAvailable = false
     '//title not present so do not show
@@ -175,15 +175,7 @@ Function onTitleImageLoadStatusChange(msg)
   bresizeBgroundAndArrangeUI = false
   if (msg.getData() = "failed")
     tubiLog("SkinAdDescriptionPanel onTitleImageLoadStatusChange(), title image failed to load")
-
-    content = m.top.content
-    if content <> invalid AND isNonEmptyString(content.title) = true
-      '//Fallback to the title string if it exists
-      m.title.text = content.title
-    else
-      m.descriptionTextGroup.removeChild(m.titleGroup)
-    end if
-    
+        
     setTitleImage("")   '//attempt to display text-only version, if available
     bresizeBgroundAndArrangeUI = true
   else if (msg.getData() = "ready")
@@ -206,7 +198,14 @@ Function setTitleImage(titleImageUri)
   else
     m.titleGroup.appendChild(m.title)
     m.titleGroup.removeChild(m.titleImage)
-
+    content = m.top.content
+    if content <> invalid AND isNonEmptyString(content.title) = true
+      '//Fallback to the title string if it exists
+      m.title.text = content.title
+    else
+      m.descriptionTextGroup.removeChild(m.titleGroup)
+    end if
     m.titleImage.uri = ""
+    
   end if
 End Function

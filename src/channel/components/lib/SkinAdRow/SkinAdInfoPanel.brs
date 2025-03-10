@@ -54,7 +54,7 @@ Function onContentChange(msg)
 
   '//Create a new SkinAdContentNode to pass content data that you wish to pass to the description panel.
   '//   Not all the fields in content should be passed: i.e. title and titleImageUrl.
-  '//   If the title fields were passed, then it would display the title twice: 1) in the infoPnel, and 2) in the descriptionPanel
+  '//   If the title fields were passed, then it would display the title twice: 1) in the infoPanel, and 2) in the descriptionPanel
   descriptionPanelContent = CreateObject("roSGNode", "SkinAdContentNode")
   descriptionPanelContent.description = content.description
   descriptionPanelContent.subDescription = content.subDescription

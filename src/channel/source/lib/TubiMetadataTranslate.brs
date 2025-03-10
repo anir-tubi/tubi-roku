@@ -864,6 +864,7 @@ Function tubiMetadataTranslate_translateAds(ads = []) As Object
           offer = creative.offer
           if isAA(offer) = true
             skinAdContent.titleImageUrl = offer.logo
+            skinAdContent.title = offer.logo_text
             skinAdContent.titlePrefix = offer.title
             skinAdContent.description = offer.body
             skinAdContent.subDescription = offer.cta
