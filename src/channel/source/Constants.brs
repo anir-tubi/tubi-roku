@@ -967,6 +967,14 @@ Function getConstants()
         constants.player.videoResolution["2160"] = 7
         constants.player.videoResolution["AUTO"] = 8
 
+      '//TODO: Remove unsed constants.player.linear* with our next submission release.
+      'constants needed for the linear video player
+      constants.player.linear = {}
+        ' duration (in seconds) of coming up panel displayed within info panel
+        constants.player.linear.comingUpInsideInfoPanelDuration = 300
+        ' duration (in seconds) of coming up panel displayed outside info panel
+        constants.player.linear.comingUpOutsideInfoPanelDuration = 15
+
       'Hdcp version
       constants.player.hdcpVersion = {}
         constants.player.hdcpVersion.hdcp_unknown = 0
