@@ -950,6 +950,8 @@ Function beginScrub()
       trackEvent(playProgressEvent)
     end if
   end if
+
+  updatePlayerLogLib(m.playerLogLib, "setIsSeeking")
 End Function
 
 

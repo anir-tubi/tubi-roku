@@ -62,6 +62,7 @@ Function init()
   m.UpNext.observeField("autoplayMode", "onUpNextAutolayModeChange")
 
   m.Video = m.top.findNode("VideoNode")  ' reference in case we change from extending Video to extending Group
+  m.Video.observeField("streamInfo", "onStreamInfoChanged")
   m.Video.observeFieldScoped("position", "onVideoPositionChange")
   m.Video.observeField("state", "onVideoStateChange")
   m.Video.observeField("bufferingStatus", "onBufferingStatus")
@@ -434,6 +435,12 @@ Function onSendFeedBackOverlayItemSelected(msg)
         }
       })
 
+      userFeedbackInfo = {
+        "feedback_issue": itemSelected.id
+        "is_live": false
+      }
+      updatePlayerLogLib(m.playerLogLib, "setUserFeedback", userFeedbackInfo)
+
       updatePlayerLogLib(m.playerLogLib, "setPlayerFeedback", itemSelected.id)
       sendPlayerFeedbackInfo(selectedFeedbackTitle)
       showQRCodeScreen()
@@ -442,6 +449,12 @@ Function onSendFeedBackOverlayItemSelected(msg)
     end if
   end if
 End Function
+
+
+Function onStreamInfoChanged(msg)
+  streamInfo = msg.GetData()
+  updatePlayerLogLib(m.playerLogLib, "setStreamInfo", streamInfo)
+End function
 
 
 '@feedbackIssue: string, The player issue that was chosen to send feedback on.
@@ -699,6 +712,8 @@ Function setInitialCCAndAudioTracks()
   ' setInitialAudioTrack() may attempt to set a track that the current content does not contain in which
   ' case Roku's video player logic will choose an audio track
   setInitialAudioTrack(m.Video.availableAudioTracks)
+  updatePlayerLogLib(m.playerLogLib, "setCaptions", m.Video.availableSubtitleTracks)
+  updatePlayerLogLib(m.playerLogLib, "updateCaptionIndex", m.Video.subtitleTrack)
 End Function
 
 
@@ -2488,6 +2503,8 @@ Function onSubtitleTrackChanged(msg)
     end if
 
   end for
+
+  updatePlayerLogLib(m.playerLogLib, "updateCaptionIndex", subtitleTrack)
 End Function
 
 
@@ -2749,8 +2766,7 @@ Function onAdTrackingObject(msg)
   'adStatus=Close, when user closes the Ad
 
   if adStatus = "PodStart"
-    updatePlayerLogLib(m.playerLogLib, "resetAdMetrics")
-    updatePlayerLogLib(m.playerLogLib, "setAdCount", adInfo.adCount)   
+    updatePlayerLogLib(m.playerLogLib, "setAdPodStart", adInfo)
   else if adStatus = "Start"
     m.playerExitInfo["ad_counts"] += 1 
     updatePlayerLogLib(m.playerLogLib, "fireAdStartupPerformanceEvent", adInfo)
@@ -2767,6 +2783,9 @@ Function onAdTrackingObject(msg)
   else if adStatus = "PodComplete"
     updatePlayerLogLib(m.playerLogLib, "fireAdPodCompleteEvent", adInfo)
   end if
+
+  'This helps to set the different startup results like START_LOAD, VIEWED_FIRST_FRAME, PLAY_STARTED, UNKNOWN
+  updatePlayerLogLib(m.playerLogLib, "setAdPodStartupResult", adInfo)
 
   isAd = (adStatus <> "PodComplete")
   m.playerExitInfo["is_ad"] = isAd
