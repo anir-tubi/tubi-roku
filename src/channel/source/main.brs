@@ -236,7 +236,7 @@ Function runChannel(constants, log, request)
             resetComponentLibrary(componentLibrary, tubiScene, port)
           else if retries = maxRetries
 
-            if initSubmittedChannel(request, constants, tubiScene, port, startupArgs) = true
+            if initSubmittedChannel(request, constants, tubiScene, port, startupArgs, screen) = true
 
               message = libraryBeingFetched.id + " failed to load due to API error. Loading packed components"
 
@@ -342,7 +342,7 @@ Function runChannel(constants, log, request)
         sleep(pause)
         resetComponentLibrary(libraryBeingFetched, tubiScene, port)
       else if retries = maxRetries
-        if initSubmittedChannel(request, constants, tubiScene, port, startupArgs) = true
+        if initSubmittedChannel(request, constants, tubiScene, port, startupArgs, screen) = true
           message = libraryBeingFetched.id + " failed to load due to timeout. Loading Packed Components"
           messageInfo = {
             message: message
@@ -606,12 +606,16 @@ End Function
 ' @tubiScene: node, home scene node
 ' @port: port, used to create content controller
 ' startupArgs: assocArray, start up app arguments, used to create content controller
+' screen: node, screen instance.
 '
 ' returns: boolean, true if the app successfully loaded submitted version of the app,
 '                   false if app can not fallback on submitted version
-Function initSubmittedChannel(request, constants, tubiScene, port, startupArgs)
+Function initSubmittedChannel(request, constants, tubiScene, port, startupArgs, screen)
   print "loading the packed components"
 
+  ' Reverting the constants back to base channel version.
+  sgGlobal = screen.getGlobalNode()
+  sgGlobal.setField("constants", constants)
 
   canFallback = true
 
