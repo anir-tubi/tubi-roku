@@ -66,13 +66,6 @@ Function TubiExperiments(experimentsInfo) as Object
           holdout_winning: {"enabled": false}}
       }
 
-      ads_tubi_skins: {
-        ads_tubi_skin_paddington: {
-          default: {"enabled": true}
-          holdout_control: {"enabled": true}
-          holdout_winning: {"enabled": true}}
-      }
-
       roku_multiple_video_preview_nav: {
         roku_multiple_video_preview_nav_v1: {
           default: {"enabled": false}
