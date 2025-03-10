@@ -858,6 +858,14 @@ Function onAuthInfoRefreshed()
   m.authInfoNeedsRefreshing = false
   m.authInfoRefreshed = true
 
+  status = "FAIL"
+  authInfo = m.tubiAuthUpdate.getAuthInfo()
+
+  if isAA(authInfo) = true AND authInfo.authType = "MOBILE_APP"
+    status = "SUCCESS"
+  end if
+  
+
   ' send account analytics event signifying that auth info was transferred from another (mobile) device
   m.trackingLoggingTask.trackEvent = {
     type: "account"
@@ -867,7 +875,7 @@ Function onAuthInfoRefreshed()
       linked: ""
       user_type: ""
       message: ""
-      status: "SUCCESS"
+      status: status
     }
   }
 
