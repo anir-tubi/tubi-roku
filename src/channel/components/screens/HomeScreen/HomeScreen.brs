@@ -468,6 +468,7 @@ Function onGridFocusChange() as void
       categoryComponentInfo = {}
       categoryComponentInfo["category_slug"] = m.CategoryGridList.oldCategoryId
       categoryComponentInfo["category_row"] = oldAnalyticsRow
+      categoryComponentInfo["category_col"] = oldAnalyticsCol
       'row is hardcoded to 1 in the line below because the row represents the row within the category_component, not within the grid
       'and the current design only has one row per category
       tile = m.Tracking.getAnalyticsTile(oldFocusedContent, oldAnalyticsCol, 1)
@@ -518,6 +519,7 @@ Function getTrackingComponentInfoOfCategoryGridList(gridItem, itemPosition)
     componentValues = {}
     componentValues["category_slug"] = m.top.currCategoryId
     componentValues["category_row"] = itemPosition[0] + 1 'all analytics are 1 based
+    componentValues["category_col"] = itemPosition[1] + 1 'all analytics are 1 based
     tile = m.Tracking.getAnalyticsTile(gridItem, itemPosition[1] + 1)
 
     componentValues["content_tile"] = tile
