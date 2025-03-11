@@ -294,6 +294,8 @@ Function getConstants()
     constants.reqNames.deleteFromQueue = "deleteFromQueue"
     constants.reqNames.postToQueue = "postToQueue"
     constants.reqNames.deleteHistory = "deleteHistory"
+    constants.reqNames.getScreenSaverContainer = "getScreenSaverContainer"
+    constants.reqNames.getScreenSaverHomeScreenContainerIds = "getScreenSaverHomeScreenContainerIds"
     constants.reqNames.getNamespaces = "getNamespaces"
     constants.reqNames.getExternalConfigs = "getExternalConfigs"
     constants.reqNames.getServerPersistentData = "getServerPersistentData"
