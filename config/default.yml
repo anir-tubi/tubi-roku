@@ -37,9 +37,6 @@ settings:
   # Setting the below value to true will enable youbora request logging into the console.
   youboraDebugEnabled: false
 
-  # Setting the below value to true will enable player log tracking.
-  playerLogEnabled: false
-
   # Setting the below value to false will disable sending logs to client logs.
   clientLogsEnabled: true
 

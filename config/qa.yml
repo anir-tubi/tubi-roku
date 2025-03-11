@@ -48,9 +48,6 @@ settings:
   # Setting the below value to true will turn off displaying the skin ads feature (if there is a skin ads campaign) to avoid issues with automated tests on Roku devices not hooked up to display the feature
   disableSkinAds: false
 
-  # Setting the below value to true will enable player log tracking.
-  playerLogEnabled: false
-
   # Setting the below value to false will disable sending logs to client logs.
   clientLogsEnabled: true
 

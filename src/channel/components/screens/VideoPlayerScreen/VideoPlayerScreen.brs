@@ -168,7 +168,7 @@ Function init()
 
   m.playerLogLib = invalid
 
-  if m.constants.settings.playerLogEnabled = true AND getExperimentResource("roku_player_client_log", "roku_player_client_log_v2").enabled = true
+  if m.constants.settings.clientLogsEnabled = true AND getExperimentResource("roku_player_client_log", "roku_player_client_log_v2").enabled = true
     m.playerLogLib = PlayerLogLib(m.constants, m.Tracking)
   end if
 

@@ -196,12 +196,6 @@ Function updateConstantsValuesFromExternalConfig(config)
       m.constants.settings.youboraEnabled = youboraEnabled
     end if
 
-    'Let player log be enabled by the remote config
-    playerLogEnabled = config.player_log_enabled
-    if playerLogEnabled = true
-      m.constants.settings.playerLogEnabled = playerLogEnabled
-    end if
-
     'Client log disabled by the remote config
     clientLogsEnabled = config.client_log_enabled
     if clientLogsEnabled = 0 OR clientLogsEnabled = false
