@@ -36,9 +36,9 @@ Function TubiExperiments(experimentsInfo) as Object
 
       roku_autoplay_timer: {
         roku_autoplay_timer_v1 : {
-          default: {"enabled": false}
+          default: {"enabled": true}
           holdout_control: {"enabled": false}
-          holdout_winning: {"enabled": false}
+          holdout_winning: {"enabled": true}
         }
       }
 
