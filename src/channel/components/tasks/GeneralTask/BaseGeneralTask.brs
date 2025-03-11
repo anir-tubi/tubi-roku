@@ -342,7 +342,7 @@ Function processResponse(msg)
             ' If we are told not to then process the error
             if retryAfter = -1 then
               processErrorResponse(result, callbackTypes, job)
-            else if (code = 403 OR code = 401) AND m.constants.reqNames.acceptsTubiAuth[requestType] = true AND checkIfTokenExpiredError(result.response) = true then
+            else if (code = 403 OR code = 401) AND m.constants.reqNames.acceptsTubiAuth[requestType] = true AND checkIfTokenExpiredOrInvalidError(result.response) = true then
               getUpdatedAuth()
               handleBackoff(result, job, retryAfter)
             else
@@ -717,10 +717,10 @@ End Function
 
 
 ' Checks the backend response to see if backend returned a error code with expired token.
-Function checkIfTokenExpiredError(response)
+Function checkIfTokenExpiredOrInvalidError(response)
   if response <> invalid AND isNonEmptyString(response.data) = true
     parsedResponse = parseJson(response.data)
-    if isAA(parsedResponse) = true AND parsedResponse["code"] = m.constants.errors.codes.expiredToken
+    if isAA(parsedResponse) = true AND (parsedResponse["code"] = m.constants.errors.codes.expiredToken OR parsedResponse["code"] = m.constants.errors.codes.invalidToken)
       return true
     end if
   end if

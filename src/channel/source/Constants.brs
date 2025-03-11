@@ -1061,6 +1061,7 @@ Function getConstants()
     constants.errors.codes.blockedEmailDomain = "BLOCKED_EMAIL_DOMAIN"
     constants.errors.codes.emailExists = "EMAIL_USER_EXISTS"
     constants.errors.codes.userNotFound = "USER_NOT_FOUND"
+    constants.errors.codes.invalidToken = "INVALID_TOKEN"
 
   ' pixel fires when static Ad is shown on video player during pause
   constants.pauseAd = {}
