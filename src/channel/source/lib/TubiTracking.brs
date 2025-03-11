@@ -163,6 +163,23 @@ Function tubiTracking_getClientEvent(eventType, eventValues) as Object
     event: m.getAnalyticsEvent(eventType, eventValues)
     ' location: {} 'roku unable to provide location
   }
+
+  ' Adding personalization_id to the client event if it is present in the eventValues.
+  ' If personalization id is either passed directly for indirectly through pageOneOf, we will add it to top level the client event.
+  ' First condition cover use case where we want to pass it only for specific events like 'search' where we have multiple personalization_id per screen.
+  ' https://github.com/adRise/protos/blob/221b838a29cf66e20550477e154c7d780ed32973/tubi/analytics/events.proto#L61
+  if isNonEmptyString(eventValues.personalization_id) = true
+    clientEvent.personalization_id = eventValues.personalization_id
+  else if isAA(eventValues.pageOneOf) = true
+    items =  eventValues.pageOneOf.Items()
+    if isNonEmptyArray(items) = true
+      pageOneOf = items[0].value
+      if isNonEmptyString(pageOneOf.personalization_id) = true
+        clientEvent.personalization_id = pageOneOf.personalization_id
+      end if
+    end if
+  end if
+
   return clientEvent
 End Function
 
@@ -466,7 +483,6 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
     search: {
       query: ""
       search_type: "" 'SearchType enum
-      personalization_id: ""
     }
 
     start_video: {
