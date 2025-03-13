@@ -56,7 +56,7 @@ Function onItemContentChange(msg)
 
   if itemContent <> invalid
     gridItemType = itemContent.gridItemType
-    
+
     childGridItemComponent = invalid
     row = itemContent.getParent()
     if gridItemType = "emptyContainer" then
@@ -81,6 +81,8 @@ Function onItemContentChange(msg)
       end if
     end if
 
+    requiresParenting = false
+
     if childGridItemComponent = invalid then
       ' If we're only using the starter component then we want to unobserve all of the conditionally observed fields
       if m.childGridItem <> invalid then
@@ -96,13 +98,15 @@ Function onItemContentChange(msg)
       m.poster.visible = false
       if m.childGridItem = invalid then
         ' Create the child grid item component and setup observers to pass along data to it
-        m.childGridItem = m.top.createChild(childGridItemComponent)
+        m.childGridItem = createObject("roSgNode", childGridItemComponent)
+        requiresParenting = true
         removeConditionalFieldObservers()
         addConditionalFieldObservers(m.childGridItem)
       else if m.childGridItem.subtype() <> childGridItemComponent then
         ' If our childGridItemComponent doesn't match then we need to throw it out and build the new component
         m.top.removeChild(m.childGridItem)
-        m.childGridItem = m.top.createChild(childGridItemComponent)
+        requiresParenting = true
+        m.childGridItem = createObject("roSgNode", childGridItemComponent)
         removeConditionalFieldObservers()
         addConditionalFieldObservers(m.childGridItem)
       end if
@@ -110,6 +114,11 @@ Function onItemContentChange(msg)
       if m.childGridItem <> invalid then
         ' Pass along the itemContent to the child
         m.childGridItem.itemContent = itemContent
+
+        ' Don't parent until after itemContent is set to improve performance as discussed in Roku talk from 2023
+        if requiresParenting = true then
+          m.top.appendChild(m.childGridItem)
+        end if
       end if
     end if
   end if
@@ -126,7 +135,7 @@ Function onItemContentChange(msg)
     numColumns = m.parentArrayGrid.numColumns
 
     row = itemContent.getParent()
-  
+
     rowIndex = m.top.rowIndex
     col = m.top.index
 
@@ -134,7 +143,7 @@ Function onItemContentChange(msg)
       rowIndex = Int(col / numColumns)
       col = col MOD numColumns
     end if
-    
+
     itemInfo = {
       row: rowIndex + 1
       col: col + 1
