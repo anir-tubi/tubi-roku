@@ -810,6 +810,7 @@ function setAutomatedTestsConfig(done) {
         disableHdmiStatusChecks: true,
         disableSkinAds: true,
         disableExperiments: true,
+        charlesProxyEnabled: true,
         bs_const: {
           consoleLoggingEnabled: false,
           useQaAnalyticsProxy: useQaAnalyticsProxy

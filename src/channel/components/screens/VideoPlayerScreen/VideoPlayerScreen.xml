@@ -13,7 +13,6 @@
   <script type="text/brightscript" uri="pkg:/components/lib/DeviceMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/EventMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiAds.brs" />
-  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
   <script type="text/brightscript" uri="pkg:/source/3rdparty/google/gam_utils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Sentry.brs" />
@@ -74,7 +73,7 @@
 
 
       <!--
-        - When the rainmaker receives the Ad response, adFilled will be set using TubiAds 
+        - When the rainmaker receives the Ad response, adFilled will be set using TubiAds
         -->
       <field id="filledAdData" type="assocarray" alwaysNotify="true"/>
 

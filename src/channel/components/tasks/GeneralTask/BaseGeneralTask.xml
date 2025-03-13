@@ -9,6 +9,7 @@
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/GeneralTaskModule.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiClientErrorConfig.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
 
   <interface>
     <field id="request" type="assocarray" />

@@ -2,7 +2,6 @@
 <component name="StarterGridItem" extends="Group" >
   <script type="text/brightscript" uri="StarterGridItem.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />

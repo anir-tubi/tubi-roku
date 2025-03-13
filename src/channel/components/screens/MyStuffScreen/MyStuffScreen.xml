@@ -11,7 +11,6 @@
   <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
-  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/ContentMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />

@@ -13,6 +13,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/ArrayUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TimeOffsetUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
 
   <interface>
     <!-- INPUT -->

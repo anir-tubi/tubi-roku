@@ -4,7 +4,6 @@
   <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="PrivacyCenterPanel.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
@@ -18,7 +17,7 @@
     <field id="consentSettings" type="assocarray"/>
     <field id="title" type="string" alias="heading.text"/>
     <field id="offset" alias="Offset.translation"/>
-    
+
     <!-- Holds the true/false based on if the user is in adults mode and not in kids mode, and not in teens parental controls.  -->
     <field id="isAllowedToManageConsent" type="boolean" />
 

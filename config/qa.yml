@@ -23,7 +23,7 @@ settings:
   videoOverlayAutoHideTime: 5
 
   # hideStartupModals=true  ==> no startup modals are shown
-  # hideStartupModals=false ==> Normal prod behaviour
+  # hideStartupModals=false ==> Normal prod behavior
   hideStartupModals: false
 
   # A date which will be used as the current date within the app. Use this to simulate a date in the past or future. If a date is provided this gets converted to a time offset in seconds to allow testing of features only available at a particular time

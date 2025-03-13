@@ -8,7 +8,6 @@
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs"/>
   <script type="text/brightscript" uri="../../lib/UserMixin.brs" />
   <script type="text/brightscript" uri="../../lib/FocusMixin.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
