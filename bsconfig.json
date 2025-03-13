@@ -1,6 +1,9 @@
 {
   "rootDir": "./src/channel",
-  "plugins": [ "@rokucommunity/bslint" ],
+  "plugins": [
+    "@rokucommunity/bslint",
+    "brighterscript-xml-plugin"
+  ],
   "files": [
     "manifest",
     "source/**/*.*",
