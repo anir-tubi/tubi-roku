@@ -2956,8 +2956,8 @@ Function onViewableImpressionEventInfoChange(msg)
   ' We are checking in this if the screen is different from what is stored in m.viewableImpressionEvents then we fire the events.
   ' The sequence of events are when navigating between home to movies. Home Screen items tracking info becomes none for all items and then the movies screen becomes full.
   data = msg.getData()
-
-  if m.viewableImpressionEvents.screenId <> invalid AND data.screenId <> m.viewableImpressionEvents.screenId AND m.viewableImpressionEvents.personalizationId <> invalid AND data.personalizationId <> m.viewableImpressionEvents.personalizationId
+  
+  if (m.viewableImpressionEvents.screenId <> invalid AND data.screenId <> m.viewableImpressionEvents.screenId) OR (m.viewableImpressionEvents.personalizationId <> invalid AND data.personalizationId <> m.viewableImpressionEvents.personalizationId)
     ' After sending the events the m.viewableImpressionEvents will be reset.
     sendImpressionEvent()
   end if

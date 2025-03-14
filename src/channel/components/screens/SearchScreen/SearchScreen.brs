@@ -323,11 +323,7 @@ End Function
 Function updateTrackingInfo(content, position)
   m.top.trackingComponentInfo = getTrackingComponentInfo(position, m.ResultGrid.numColumns, content, m.Tracking)
 
-  if content <> invalid AND isAA(m.top.trackingPageInfo.pageValues) = true
-    m.top.trackingPageInfo.pageValues.append({
-      query: Left(m.Keyboard.text, 256)
-    })
-  end if
+  updateTrackingInfoWithSearchQuery()
 End Function
 
 
@@ -337,8 +333,10 @@ End Function
 ' When the server returns with search content, this function will be called.
 Function onSearchContentChange()
   displayLoading(false)
+  ' Resetting result grid once request is complete and not when we start the request.
+  ' This is done to provide enough time for Roku to fire render tracking for search results that are getting hidden
+  m.ResultGrid.content = invalid
   content = m.top.content
-
   if content <> invalid AND content.getChildCount() > 0
     if content.isDefaultSearchResults <> true
       m.ResultGrid.personalizationId = content.personalizationId
@@ -424,20 +422,13 @@ End Function
 
 
 Function onSearchDebounce()
-
+  updateTrackingInfoWithSearchQuery()
   if m.Keyboard.text <> invalid AND m.Keyboard.text.trim().len() > 0 then
     loadSearchResults()
   else
     '//if the search text was empty, clear out any existing results and display the default search results
     loadSearchResults(true)
   end if
-
-  if isAA(m.top.trackingPageInfo.pageValues) = true
-    m.top.trackingPageInfo.pageValues.append({
-      query: Left(m.Keyboard.text, 256)
-    })
-  end if
-
 End Function
 
 
@@ -451,7 +442,6 @@ Function onKeyboardTextChanged()
   '//display spinner
   displayLoading()
   '//hide previous content
-  m.ResultGrid.content = invalid
   m.noMatchingResultsMessage.visible = false
   m.trendingResultsHint.visible = false
   m.trendingSearchResultsContainer.visible = false
@@ -838,4 +828,16 @@ Function onIsKidsModeAvailableChange(msg)
   isKidsModeAvailable = msg.getData()
   kidsModeGroup = m.top.findNode("kidsModeGroup")
   kidsModeGroup.visible = isKidsModeAvailable
+End Function
+
+
+Function updateTrackingInfoWithSearchQuery()
+  trackingPageInfo = m.top.trackingPageInfo
+  if isAA(trackingPageInfo.pageValues) = true
+    trackingPageInfo.pageValues.query = Left(m.Keyboard.text, 256)
+    m.top.trackingPageInfo = trackingPageInfo
+    m.ResultGrid.update({
+      parentScreenTrackingPageInfo: trackingPageInfo
+    }, true)
+  end if
 End Function
