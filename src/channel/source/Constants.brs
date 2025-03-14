@@ -257,6 +257,7 @@ Function getConstants()
 
   'names given to different request types for identification purposes (for example in the General Task)
   constants.reqNames = {}
+    constants.reqNames.getAutocomplete = "getAutocomplete"
     constants.reqNames.getSearchScreen = "getSearchScreen"
     constants.reqNames.getHomescreen = "getHomescreen"
     constants.reqNames.getMiniHomescreen = "getMiniHomescreen"
@@ -319,6 +320,7 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getHistory] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.patchUserSettings] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.checkBirthdayInfo] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getAutocomplete] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getSearchScreen] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getHomescreen] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getMiniHomescreen] = true
@@ -530,6 +532,12 @@ Function getConstants()
     constants.urls.search = "https://search.production-public.tubi.io/api/v2/search"
     if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
       constants.urls.search = "https://search.staging-public.tubi.io/api/v2/search"
+    end if
+
+    'autocomplete search url
+    constants.urls.autocomplete = "https://search.production-public.tubi.io/api/v1/autocomplete"
+    if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
+      constants.urls.autocomplete = "https://search.staging-public.tubi.io/api/v1/autocomplete"
     end if
 
     'tensor url

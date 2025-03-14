@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Extend the ContentNode so we can add some custom fields -->
+<component name="SearchContentNode" extends="ContentNode">
+  <interface>
+    <!-- The text that was used to get the search results. -->
+    <field id="searchText" type="string" />
+
+    <!-- For when the search results is the default search results. -->
+    <field id="isDefaultSearchResults" value="false" type="boolean" />
+    
+    <!-- The TubiContentNode node that represents the search results. -->
+    <field id="results" type="node" />
+  </interface>
+</component>

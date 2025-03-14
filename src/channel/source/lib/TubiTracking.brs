@@ -1018,6 +1018,10 @@ Function tubiTracking_getOneOfs()
     middle_nav_section: "" ' Section enum
   }
 
+  search_suggestions_component = {
+    search_suggestion: "" 
+  }
+
   ' splash_page = {}   'not currently used
   ' forget_page = {}   'not currently used
 
@@ -1107,6 +1111,8 @@ Function tubiTracking_getOneOfs()
     dest_left_side_nav_component: section_leftNav
 
     dest_middle_nav_component: section_middleNav
+
+    dest_search_suggestions_component: search_suggestions_component
   }
 
   ' At some point we may need to split the component "Oneof" like we did with the page and dest_page "Oneof"
@@ -1164,6 +1170,8 @@ Function tubiTracking_getOneOfs()
       button_type: "" 'ButtonType enum
       button_value: ""
     }
+
+    search_suggestions_component: search_suggestions_component
 
     reminder_component: {
       video_id: -1

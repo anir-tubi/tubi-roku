@@ -173,6 +173,12 @@ Function registerParsingCallbacks()
     parseError: parseGenericError
   }
 
+  ' getAutocomplete
+  m.requestTypes[m.constants.reqNames.getAutocomplete] = {
+    parseSuccess: parseAutocompleteAPISuccess
+    parseError: parseGenericError
+  }
+
   ' getSearchScreen
   m.requestTypes[m.constants.reqNames.getSearchScreen] = {
     parseSuccess: parseSearchAPISuccess

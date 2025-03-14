@@ -753,6 +753,44 @@ Function cmsApi_createCategoryReqInfo_test()
 End Function
 
 
+'@Test unit tests createAutocompleteReqInfo
+Function cmsApi_createAutocompleteReqInfo_test()
+  infoKeys = [
+    "url"
+    "options"
+  ]
+  params = [
+    "app_id"
+    "platform"
+    "device_id"
+    "search"
+  ]
+
+  autocompleteUrl = m.cmsApi.constants.urls.autocomplete
+
+  autocompleteOptions = {
+    params: {
+      "app_id": m.cmsApi.constants.settings.shortAppName
+      "platform": m.cmsApi.constants.platform
+      "device_id": m.cmsApi.constants.deviceInfo.deviceId
+      "search": "search_text"
+    }
+  }
+  
+  autocompleteInfo = m.cmsApi.createAutocompleteReqInfo("search_text")
+
+  m.assertEqual(autocompleteInfo.count(), 2)
+  m.assertAAHasKeys(autocompleteInfo, infoKeys)
+  m.assertEqual(autocompleteInfo.url, autocompleteUrl)
+  m.assertAAHasKeys(autocompleteInfo.options.params, params)
+  m.assertEqual(autocompleteInfo.options.params["app_id"], autocompleteOptions.params["app_id"])
+  m.assertEqual(autocompleteInfo.options.params["platform"],  autocompleteOptions.params["platform"])
+  m.assertEqual(autocompleteInfo.options.params["device_id"], autocompleteOptions.params["device_id"])
+  m.assertEqual(autocompleteInfo.options.params["search"], autocompleteOptions.params["search"])
+
+End Function
+
+
 '@Test unit tests createSearchReqInfo
 Function cmsApi_createSearchReqInfo_test()
   infoKeys = [

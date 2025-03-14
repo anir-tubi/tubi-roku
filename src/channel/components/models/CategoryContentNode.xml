@@ -36,9 +36,6 @@
 
     <field id="slug" type="string" />
 
-    <!-- For when CategoryContentNode is used as SearchResults: indicate if this is a default search result. -->
-    <field id="isDefaultSearchResults" type="boolean" />
-
     <!-- if UpTime(0) > validUntil, then refetch metadata for this container/category. We have 2 special values of 0 which indicates it will be refreshed always and -1 which indicates content does not need to be refreshed ever. -->
     <field id="validUntil" type="integer"/>
 

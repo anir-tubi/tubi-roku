@@ -88,6 +88,8 @@ End Function
 
 Function onHeightChange()
   m.buttonBG.height = m.top.height
+  m.DetailsMenuText.height = m.top.height
+  m.DetailsMenuTextFocused.height = m.top.height
 End Function
 
 

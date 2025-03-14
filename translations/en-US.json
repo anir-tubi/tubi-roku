@@ -400,6 +400,14 @@
     "description": "text after number of search results for searchedString",
     "message": "titles matching"
   },
+  "screenSearch_matchingTitles_plural": {
+    "description": "text after number of search results for searchedString (plural versions)",
+    "message": "{matches} titles found"
+  },
+  "screenSearch_matchingTitles_singular": {
+    "description": "text after number of search results for searchedString (singular versions)",
+    "message": "1 title found"
+  },
   "screenSearch_liveText": {
     "description": "The label on the search results poster next to the live streaming icon",
     "message": "Live"
@@ -1326,9 +1334,9 @@
     "description": "The button on the forgot password screen that corresponds to the action 'Use Different Email",
     "message": "Use Different Email"
   },
-  "search_hint": {
-    "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed immediately after the last word of this translation and the icon will be considered part of the sentence.",
-    "message": "To use your voice enabled remote, press and hold"
+  "search_suggestions": {
+    "description": "The heading of the autocomplete search suggestions",
+    "message": "Search Suggestions"
   },
   "search_voice_hint": {
     "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed at the beginning of the sentence.",

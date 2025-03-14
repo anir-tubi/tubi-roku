@@ -1013,7 +1013,7 @@ Function onLoadCategoryForIds(msg)
     contentMode = homeScreen.contentMode
   end if
 
-  batchRequests = m.cmsApi.createHomeScreenBatchRequestInfoForContainers(categoryIDs, contentMode, isKidsMode, isSignedInUser)
+  batchRequests = m.cmsApi.createHomeScreenBatchReqInfoForContainers(categoryIDs, contentMode, isKidsMode, isSignedInUser)
 
   if batchRequests <> invalid
     m.makeBatchRequest({

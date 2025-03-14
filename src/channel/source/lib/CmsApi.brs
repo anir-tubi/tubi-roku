@@ -17,10 +17,11 @@ Function CmsApi(constants, apiUtils, experiments=invalid)
     createHomeScreenReqInfo: cmsApi_createHomeScreenReqInfo
     createMiniHomeScreenOnPlayerReqInfo: cmsApi_createMiniHomeScreenOnPlayerReqInfo
     createCategoryReqInfo: cmsApi_createCategoryReqInfo
-    createSearchReqInfo: cmsApi_createSearchRequestInfo
-    createHomeScreenBatchReqInfo: cmsApi_createHomeScreenBatchRequestInfo
+    createSearchReqInfo: cmsApi_createSearchReqInfo
+    createAutocompleteReqInfo: cmsApi_createAutocompleteReqInfo
+    createHomeScreenBatchReqInfo: cmsApi_createHomeScreenBatchReqInfo
     createMyStuffScreenBatchReqInfo: cmsApi_createMyStuffScreenBatchReqInfo
-    createHomeScreenBatchRequestInfoForContainers: cmsApi_createHomeScreenBatchRequestInfoForContainers
+    createHomeScreenBatchReqInfoForContainers: cmsApi_createHomeScreenBatchReqInfoForContainers
 
     ' private
     setImageParams: cmsApi_setImageParams
@@ -29,7 +30,7 @@ Function CmsApi(constants, apiUtils, experiments=invalid)
     setTupianBackgroundParam: cmsApi_setTupianBackgroundParam
     getWindowInfo: cmsApi_getWindowInfo
     getFullCategoryId: cmsApi_getFullCategoryId
-    createCategoryRequestInfo: cmsApi_createCategoryRequestInfo
+    createPrivateCategoryReqInfo: cmsApi_createPrivateCategoryReqInfo
   }
 
   cmsApi = {}
@@ -378,8 +379,10 @@ End Function
 
 
 ' @searchText: string, the text the user is attempting to search for
-' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
-Function cmsApi_createSearchRequestInfo(searchText, bKidsMode = false)
+' @bKidsMode: boolean, Are we in kids mode (and parental controls is not set to kids)?
+' @sAutoCompleteSessionID: string, If this is a search requesting stemming from an autocomplete suggestion, then 
+'       send the personalization_id that was sent back from the autocomplete request
+Function cmsApi_createSearchReqInfo(searchText, bKidsMode = false, sAutoCompleteSessionID = invalid)
   url = m.constants.urls.search
   options = m.getCommonOptions()
   options.params["search"] = searchText
@@ -388,6 +391,10 @@ Function cmsApi_createSearchRequestInfo(searchText, bKidsMode = false)
     "poster"
     "background"
   ]
+  if isNonEmptyString(sAutoCompleteSessionID) = true
+    options.params["session_id"] = sAutoCompleteSessionID
+  end if 
+
   options.params = m.setImageParams(imageParamTypes, options.params, m.constants.ui.screenIds.searchScreen)
   options.params["limit_resolutions"] = m.constants.player.limitResolutions
   options.params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
@@ -396,6 +403,21 @@ Function cmsApi_createSearchRequestInfo(searchText, bKidsMode = false)
     'setting the include_linear param to true will enable the linear content available for search screen from backend
     options.params["include_linear"] = true
   end if
+
+  return {
+    url: url
+    options: options
+  }
+End Function
+
+
+' As the user types searchText, suggestions can be displayed to him/her. This request will get suggestions based on the searchText.
+' @searchText: string, the text the user is attempting to search for
+Function cmsApi_createAutocompleteReqInfo(searchText)
+  url = m.constants.urls.autocomplete
+  options = m.getCommonOptions()
+  options.params["search"] = searchText
+  options.params["limit"] = "10"
 
   return {
     url: url
@@ -479,7 +501,7 @@ Function cmsApi_setTupianBackgroundParam(existingParams = {})
 End Function
 
 
-' cmsApi_createHomeScreenBatchRequestInfo
+' cmsApi_createHomeScreenBatchReqInfo
 '
 ' @homeScreen: roSGNode, homescreen
 ' @index: integer
@@ -488,7 +510,7 @@ End Function
 ' @uiMode: string, one of the allowed values from constants.ui.modes
 '
 ' returns batch requests
-Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = false, isSignedInUser = false, uiMode="standard")
+Function cmsApi_createHomeScreenBatchReqInfo(homeScreen, index, bKidsMode = false, isSignedInUser = false, uiMode="standard")
 
   m.categoryWindowSize = m.constants.performance.categoryGridList.categoryWindowSize
 
@@ -501,7 +523,7 @@ Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = 
     for i = windowInfo.start to (windowInfo.start + windowInfo.size)-1
       category = homeScreen.content.getChild(i)
       if category <> invalid
-        categoryReqInfo = m.createCategoryRequestInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode)
+        categoryReqInfo = m.createPrivateCategoryReqInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode)
 
         if categoryReqInfo <> invalid then
           requests.push(categoryReqInfo)
@@ -639,7 +661,7 @@ End Function
 ' @uiMode: string, one of the allowed values from constants.ui.modes
 '
 ' returns batch requests
-Function cmsApi_createHomeScreenBatchRequestInfoForContainers(containerIds, contentMode = "", bKidsMode = false, isSignedInUser = false, uiMode="standard", screenId="")
+Function cmsApi_createHomeScreenBatchReqInfoForContainers(containerIds, contentMode = "", bKidsMode = false, isSignedInUser = false, uiMode="standard", screenId="")
 
   reqName = m.constants.reqNames.getCategory
   if screenId = ""
@@ -679,7 +701,7 @@ Function cmsApi_createHomeScreenBatchRequestInfoForContainers(containerIds, cont
 End Function
 
 
-Function cmsApi_createCategoryRequestInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode)
+Function cmsApi_createPrivateCategoryReqInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode)
   categoryReqInfo = invalid
   if category.state = "partial" or category.state = "none"
     reqName = m.constants.reqNames.getCategory

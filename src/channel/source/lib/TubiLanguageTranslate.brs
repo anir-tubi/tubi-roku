@@ -670,6 +670,14 @@ Function getTranslation_en_US()
       "description": "text after number of search results for searchedString",
       "message": "titles matching"
     },
+    "screenSearch_matchingTitles_plural": {
+      "description": "text after number of search results for searchedString (plural versions)",
+      "message": "{matches} titles found"
+    },
+    "screenSearch_matchingTitles_singular": {
+      "description": "text after number of search results for searchedString (singular versions)",
+      "message": "1 title found"
+    },
     "screenSearch_liveText": {
       "description": "The label on the search results poster next to the live streaming icon",
       "message": "Live"
@@ -1121,10 +1129,6 @@ Function getTranslation_en_US()
     "screenDetails_button_episodes": {
       "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
       "message": "All Episodes"
-    },
-    "screenDetails_button_episodes_more": {
-      "description": "Label displayed over episodes list + YMAL on the details Screen.",
-      "message": "Episodes And More"
     },
     "screenDetails_relatedTitles": {
       "description": "Label of button to allow users to view other video titles related to the current video title",
@@ -1600,9 +1604,9 @@ Function getTranslation_en_US()
       "description": "The button on the forgot password screen that corresponds to the action 'Use Different Email",
       "message": "Use Different Email"
     },
-    "search_hint": {
-      "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed immediately after the last word of this translation and the icon will be considered part of the sentence.",
-      "message": "To use your voice enabled remote, press and hold"
+    "search_suggestions": {
+      "description": "The heading of the autocomplete search suggestions",
+      "message": "Search Suggestions"
     },
     "search_voice_hint": {
       "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed at the beginning of the sentence.",

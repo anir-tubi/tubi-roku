@@ -20,6 +20,15 @@ Function TubiExperiments(experimentsInfo) as Object
     ' For more info on on the experiment backend, see: https://github.com/adRise/popper-config
 
     defaultResources: {
+
+      roku_search_autocomplete: {
+        roku_search_autocomplete_v1 : {
+          default: {"enabled": false}
+          holdout_control: {"enabled": false}
+          holdout_winning: {"enabled": false}
+        }
+      }
+
       roku_add_movies_series: {
         roku_add_movies_series_uk_v1 : {
           default: {"enabled": false}
