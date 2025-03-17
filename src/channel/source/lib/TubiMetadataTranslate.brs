@@ -675,11 +675,6 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     translatedContent.validUntil = UpTime(0) + m.constants.cacheTimes.content
   end if
 
-  ' Below field will be used to determine which player to use. Possible values: "tubi","fox".
-  if contentFromServer.player_type <> invalid
-    translatedContent.playerType = contentFromServer.player_type
-  end if
-
   'take care of any children the content might have
   if contentFromServer.children <> invalid AND contentFromServer.children.count() > 0
 

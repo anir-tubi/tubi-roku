@@ -1181,9 +1181,6 @@ Function getConstants()
       constants.ui.contentTypes.sportsEvent = "sports_event"
       constants.ui.contentTypes.skinAd = "skinAd"
 
-    constants.ui.playerTypes = {}
-      constants.ui.playerTypes.fox = "fox"
-
     '// Check if these are required for sports events
     constants.ui.contentTimings = {}
       constants.ui.contentTimings.upcoming = "upcoming"

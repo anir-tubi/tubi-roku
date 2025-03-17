@@ -132,8 +132,7 @@ Function onContentChange(msg)
 
     info = getAvailabilityTypeBadgeAndMatchTimeValues(airDatetime, hasVideoresources)
     badgeText = info.badgeText
-    ' TODO: Remove the player type condition when we remove purple carpet code.
-    if isNonEmptyString(badgeText) = true AND itemContent.playerType <> "fox"
+    if isNonEmptyString(badgeText) = true
       setReplayOrUpcomingBadge(badgeText)
     end if
 
