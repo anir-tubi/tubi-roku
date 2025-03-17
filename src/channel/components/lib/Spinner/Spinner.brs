@@ -20,7 +20,8 @@ Function init()
   loadingMessage.text = getTranslation("loadingIndicator")
   if m.limitedUi <> true
     m.Animation = m.top.findNode("SpinnerAnimation")
-    m.top.observeField("visible", "onVisibilityChange")
+    m.top.observeField("visible", "onVisibleChange")
+    m.top.observeField("opacity", "onOpacityChange")
     if m.top.visible then
       m.Animation.control = "start"
     end if
@@ -58,13 +59,23 @@ Function onThemeChange(msg = invalid)
 End Function
 
 
-Function onVisibilityChange()
-  if m.top.visible = true and m.Animation.state <> "running" then
+Function onVisibleChange(msg)
+  visibility = msg.getData()
+  if visibility = true and m.Animation.state <> "running" then
     m.Animation.control = "start"
-  else if m.top.visible = false then
+  else if visibility = false then
     m.Animation.control = "stop"
   end if
 End Function
+
+
+Function onOpacityChange(msg)
+  opacity = msg.getData()
+  if opacity = 0 then
+    m.top.visible = false
+  end if
+End Function
+
 
 Function onDimensionsChange()
   ' shade always takes up full size of bounding rect
