@@ -962,6 +962,7 @@ Function tubiTracking_getOneOfs()
 
   search_page = {
     query: "" 'There is no query associated with the search page
+    personalization_id: ""
   }
 
   auth_page = {'TODO: Find out if we need this page - I think no
