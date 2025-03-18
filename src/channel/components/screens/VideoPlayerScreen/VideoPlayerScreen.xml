@@ -310,21 +310,24 @@
       id="AdHeadsUp"
       visible="false"
       opacity="1.0">
-      <Poster
-        id="AdHeadsUpGradient"
-        width="1920"
-        height="317"
-        translation="[0,0]"
-        uri="pkg:/images/ads-countdown-gradient.9.png"/>
-      <Label
-        id="AdHeadsUpText"
-        translation="[0,72]"
-        height="66"
-        horizAlign="center"
-        vertAlign="center">
-        <Font
-          role="font"/>
-      </Label>
+      <Group id="adHeadsUpGroup">
+        <Poster
+          id="AdHeadsUpGradient"
+          width="1920"
+          height="317"
+          translation="[0,0]"
+          uri="pkg:/images/ads-countdown-gradient.9.png"/>
+        <Label
+          id="AdHeadsUpText"
+          translation="[0,72]"
+          height="66"
+          horizAlign="center"
+          vertAlign="center">
+          <Font
+            role="font"/>
+        </Label>
+      </Group>
+      <AdBreakStartsInOverlay translation="[81, 81]" id="adBreakStartsInOverlay" visible="false" />
     </Group>
 
     <Poster

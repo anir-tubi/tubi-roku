@@ -2123,6 +2123,22 @@ Function getTranslation_en_US()
     "havent_received_email": {
       "description": "Message displayed in sign in screen during major event day",
       "message": "Haven't received an email? You can still continue as Guest."
+    },
+    "ad_countdown_text": {
+      "description": "Message displayed in ad countdown overlay",
+      "message": "Ad {0} of {1}"
+    },
+    "ad_countdown_title_resume_in": {
+      "description": "Message displayed in ad countdown overlay",
+      "message": "Ad {0} of {1}. Your title will resume in"
+    },
+    "ad_countdown_current_ad_ends_in": {
+      "description": "Message displayed in ad countdown overlay",
+      "message": "Ad {0} of {1}. This ad will end in"
+    },
+    "videoPlayer_adBreakStartsIn": {
+      "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "Ad break starts in"
     }
   }
 End Function

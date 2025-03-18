@@ -88,12 +88,14 @@ Function TubiExperiments(experimentsInfo) as Object
           holdout_control: {"enabled": false}
           holdout_winning: {"enabled": false}}
       }
-
-      webott_force_failsafe: {
-        webott_force_failsafe: {
-          default: {"enabled": false}
-          holdout_control: {"enabled": false}
-          holdout_winning: {"enabled": false}}
+      
+      ' We will run 4 overlay types. Possible values are none, variant1, variant2, variant3, variant4
+      roku_player_ui_refresh: {
+        roku_ads_overlay_v1 : {
+          default: {"overlay_type": "none"}
+          holdout_control: {"overlay_type": "none"}
+          holdout_winning: {"overlay_type": "none"}
+        }
       }
 
     }

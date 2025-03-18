@@ -51,6 +51,7 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
     allAdUnitsList: []
     totalAdBreakAds: 0
     commercialDuration : 0
+    totalAdDurationInCurrentPod: 0
     adPlaybackPos: 0
     isInteracting: false
     _: rodash()
@@ -170,6 +171,7 @@ Function tubiAds_reset()
   m.adPlaybackPos = 0
   m.isInteracting = false
   m.breakPos = 0
+  m.totalAdDurationInCurrentPod = 0
 End Function
 
 
@@ -670,13 +672,15 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos)
     m.totalAdBreakAds = currentAdUnitsList[0].ads.count()
 
     
-
+    m.totalAdDurationInCurrentPod = 0
     for each adUnit in currentAdUnitsList[0].ads
 
       if adUnit.adId <> invalid
         if m.constants.settings.mode = "qa" or m.constants.settings.mode = "staging"
           print "AD ID "; adUnit.adId; " "; adUnit.creativeAdId
         end if
+
+        m.totalAdDurationInCurrentPod = m.totalAdDurationInCurrentPod + adUnit.duration
 
         if adUnit.adId <> "empty"
           'if adUnitType is different from the last adUnitType (meaning a new adUnitsListContainer is needed)
@@ -750,7 +754,7 @@ Function tubiAds_getAdsListViaTubi(content)
     if currentAdUnitsList[0].duration <> invalid AND currentAdUnitsList[0].duration > 0
         m.commercialDuration = m.commercialDuration + currentAdUnitsList[0].duration
     end if
-
+    
     adUnitsListContainer = {
       type: ""
       adUnitsList: []
@@ -758,7 +762,7 @@ Function tubiAds_getAdsListViaTubi(content)
 
     'save the total number of ads in the ad break before we (potentially) start breaking them up into different ad unit lists
     m.totalAdBreakAds = currentAdUnitsList[0].ads.count()
-
+    m.totalAdDurationInCurrentPod = 0
     for each adUnit in currentAdUnitsList[0].ads
 
       if adUnit.adId <> invalid
@@ -802,6 +806,10 @@ Function tubiAds_getAdsListViaTubi(content)
           'add the duration to m.CommercialDuration for use in adRise pre ad splash screens (in case there are any)
           if currentAdUnitsList[0].duration = invalid or currentAdUnitsList[0].duration <= 0
             m.commercialDuration = m.commercialDuration + adUnit.duration
+          end if
+
+          if isNumber(adUnit.duration) = true
+            m.totalAdDurationInCurrentPod = m.totalAdDurationInCurrentPod + adUnit.duration
           end if
         end if
       end if
@@ -1009,7 +1017,6 @@ End Function
 Function tubiAds_adTrackingCallback(eventType, ctx)
   impressionCount = invalid
   youboraOptions = invalid
-
   if eventType <> invalid
     if ctx <> invalid
       '//make a subset of ctx and set it to m.controlNode.adTrackingObject
@@ -1043,6 +1050,11 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
       if ctx.type <> invalid
         adTrackingObject.type = ctx.type
       end if
+
+      if m.totalAdDurationInCurrentPod <> invalid
+        adTrackingObject.totalAdDurationInCurrentPod = Int(m.totalAdDurationInCurrentPod)
+      end if
+
       if m.controlNode <> invalid
         m.controlNode.adTrackingObject = adTrackingObject
       end if

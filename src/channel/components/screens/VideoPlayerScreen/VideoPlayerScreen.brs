@@ -154,6 +154,8 @@ Function init()
   m.ScrubTimer = m.top.findNode("ScrubTimer")
   m.HUD = m.top.findNode("HUD")
   m.AdHeadsUp = m.top.findNode("AdHeadsUp")
+  m.adHeadsUpGroup = m.top.findNode("adHeadsUpGroup")
+  m.adBreakStartsInOverlay = m.top.findNode("AdBreakStartsInOverlay")
   m.AdHeadsUpText = m.top.findNode("AdHeadsUpText")
   m.Thumbnail = m.top.findNode("Thumbnail")
   m.VideoOverlay = m.top.findNode("VideoOverlay")
@@ -379,6 +381,13 @@ Function init()
   m.RemainingLabel.translation = [1920 - m.constants.ui.translations.marginX - m.RemainingLabel.boundingRect().width, m.RemainingLabel.translation[1]]
   m.ProgressBar.translation = [m.constants.ui.translations.marginX, m.ProgressBar.translation[1]]
   m.ProgressBar.width = 1920 -  (m.constants.ui.translations.marginX * 2)
+
+  m.isAdsOverlayExperimentEnabled = getExperimentResource("roku_player_ui_refresh", "roku_ads_overlay_v1", false).overlay_type <> "none"
+  if m.isAdsOverlayExperimentEnabled = true
+    m.adCountdownOverlay = CreateObject("roSGNode", "AdCountdownOverlay")
+    m.adCountdownOverlay.id = "adCountdownOverlay"
+    m.adCountdownOverlay.translation = [81, 81]
+  end if
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -1331,8 +1340,15 @@ Function showAdHeadUpText(cuepoint)
 
   m.AdHeadsUp.visible = true
   seconds = stri(cuepoint - m.playerPosition).trim()
-  m.AdHeadsUpText.text = getTranslation("videoPlayer_adHeadsUp", {seconds: seconds})
 
+  if m.isAdsOverlayExperimentEnabled = true
+    m.adBreakStartsInOverlay.visible = true
+    m.adBreakStartsInOverlay.timeRemaining = seconds
+  else
+    m.adBreakStartsInOverlay.visible = false
+    m.AdHeadsUpText.text = getTranslation("videoPlayer_adHeadsUp", {seconds: seconds})
+    m.adBreakStartsInOverlay.reCalculateWidth = true
+  end if
 End Function
 
 
@@ -2756,7 +2772,6 @@ End Function
 Function onAdTrackingObject(msg)
   adInfo = msg.getData()
   adStatus = adInfo.type
-
   'possible adStatus are PodStart, Start, Complete, Error, PodComplete, Close
   'adStatus=PodStart, when AdPod Starts
   'adStatus=Start, when individual Ad starts
@@ -2765,19 +2780,34 @@ Function onAdTrackingObject(msg)
   'adStatus=PodComplete, when AdPod completes
   'adStatus=Close, when user closes the Ad
 
+  if m.isAdsOverlayExperimentEnabled = true
+    m.adCountdownOverlay.adInfo = adInfo
+  end if
+
   if adStatus = "PodStart"
+    ' Firing the exposure event when ad is loaded.
+    getExperimentResource("roku_player_ui_refresh", "roku_ads_overlay_v1", true)
     updatePlayerLogLib(m.playerLogLib, "setAdPodStart", adInfo)
+  else if adStatus = "Impression" AND m.isAdsOverlayExperimentEnabled = true
+    ' Since Roku clears out the node when the ad is complete, we need to re-append the adCountdownOverlay to the RAFAdContainer.
+    overlay = m.RAFAdContainer.findNode("adCountdownOverlay")
+    if overlay = invalid
+      rafRender = m.RAFAdContainer.getChild(0)
+      if rafRender <> invalid
+        rafRender.appendChild(m.adCountdownOverlay)
+      end if
+    end if
   else if adStatus = "Start"
-    m.playerExitInfo["ad_counts"] += 1 
+    m.playerExitInfo["ad_counts"] += 1
     updatePlayerLogLib(m.playerLogLib, "fireAdStartupPerformanceEvent", adInfo)
     updatePlayerLogLib(m.playerLogLib, "fireAdStartEvent", adInfo)
   else if adStatus = "Complete"
-    updatePlayerLogLib(m.playerLogLib, "fireAdCompleteEvent", adInfo)  
+    updatePlayerLogLib(m.playerLogLib, "fireAdCompleteEvent", adInfo)
   else if adStatus = "Error"
     'If the last ad in the ad pod returns an error, we need to reset is_buffering to false, as onAdBufferingObject won't be triggered afterward.
     m.playerExitInfo["is_buffering"] = false
     if adInfo.rendertime = 0
-      updatePlayerLogLib(m.playerLogLib, "setAdStartupFailureCount")  
+      updatePlayerLogLib(m.playerLogLib, "setAdStartupFailureCount")
     end if
     updatePlayerLogLib(m.playerLogLib, "fireAdDiscontinueEvent", adInfo)
   else if adStatus = "PodComplete"
@@ -2804,6 +2834,18 @@ Function onAdBufferingObject(msg)
     updatePlayerLogLib(m.playerLogLib, "setAdBufferStartTime")
   end if
   m.playerExitInfo["is_buffering"] = (progress = invalid OR progress < 100)
+  
+  if m.isAdsOverlayExperimentEnabled = true
+    ' Adding a check for optimization so that we do not have to perform find node always.
+    if progress = 100
+      ' Hide the overlay when the ad is fully buffered.
+      overlay = m.RAFAdContainer.findNode("overlay")
+      if overlay <> invalid
+        overlay.opacity = 0
+      end if
+    end if
+    m.adCountdownOverlay.adInfo = adBufferingInfo
+  end if
 End Function
 
 

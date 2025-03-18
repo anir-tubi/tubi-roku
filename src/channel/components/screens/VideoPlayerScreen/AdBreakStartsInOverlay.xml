@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<component name="AdBreakStartsInOverlay" extends="Group">
+  <script type="text/brightscript" uri="AdBreakStartsInOverlay.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+
+  <interface>
+    <!-- INPUT -->
+      <field id="timeRemaining" type="int" />
+      <field id="reCalculateWidth" type="boolean" value="true" />
+  </interface>
+
+  <children>
+    <Poster
+      id="background"
+      width="234"
+      visible="true"
+      height="52"
+      uri="pkg:/images/menu-focus-$$RES$$.9.png">
+      <LayoutGroup
+        translation="[8, 0]"
+        id="elementsGroup"
+        layoutDirection="horiz"
+        vertAlignment="custom"
+        itemSpacings="[8]">
+        <Label
+          id="countdownText"
+          height="52"
+          vertAlign="center">
+          <Font
+            role="font"/>
+        </Label>
+
+        <Poster
+          id="timeRemainingBackground"
+          translation="[0, 4]"
+          height="45"
+          uri="pkg:/images/menu-focus-$$RES$$.9.png">
+          <Label
+            id="timeRemainingText"
+            height="45"
+            horizAlign="center"
+            vertAlign="center">
+            <Font
+              role="font"/>
+          </Label>
+        </Poster>
+      </LayoutGroup>
+    </Poster>
+  </children>
+</component>
