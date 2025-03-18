@@ -98,6 +98,7 @@ Function init()
   m.top.observeFieldScoped("autocompleteContent", "onAutocompleteChange")
   m.top.observeField("transportVoiceRequest", "onTransportVoiceRequest")
   m.top.observeFieldScoped("isKidsModeAvailable", "onIsKidsModeAvailableChange")
+  m.top.observeFieldScoped("shouldTrackViewableImpressionEvent", "onShouldTrackViewableImpressionEventChange")
 
   'set initial tracking values
   m.top.trackingPageInfo = {
@@ -145,7 +146,7 @@ Function init()
   setTypographyOfLabel(m.SearchText, typographyConstants.ids.subheaderMedium)
   setTypographyOfLabel(m.trendingSearchHeading, typographyConstants.ids.subheaderMedium)
   setTypographyOfLabel(m.NoResultsMessage, typographyConstants.ids.bodyMedium)
-setTypographyOfLabel(m.autocompleteHeading, typographyConstants.ids.bodySmallStrong)
+  setTypographyOfLabel(m.autocompleteHeading, typographyConstants.ids.bodySmallStrong)
   setTypographyOfLabel(m.trendingResultsHint, typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.noMatchingResultsMessage, typographyConstants.ids.bodyMedium)
 
@@ -183,6 +184,14 @@ Function onThemeChange(msg = invalid)
     displayKidsMessage(bNotKidsMode)
   end if
 End Function
+
+
+Function onShouldTrackViewableImpressionEventChange(msg)
+  shouldTrackViewableImpressionEvent = msg.getData()
+  m.ResultGrid.shouldTrackViewableImpressionEvent = shouldTrackViewableImpressionEvent
+  m.trendingSearchResultGrid.shouldTrackViewableImpressionEvent = shouldTrackViewableImpressionEvent
+End Function
+
 
 '//@b : boolean, Should the Kids message be displayed? This param will be overriden if m.top.isKidsModeAvailable = false
 Function displayKidsMessage(b = true)
