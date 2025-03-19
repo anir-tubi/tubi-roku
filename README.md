@@ -778,8 +778,10 @@ If set up correctly the first time your Roku sends a request to Charles, Charles
 
 ## Proxying Staging & Production
 
-As of 3.6.16 the Tubi application can now proxy requests in staging and production. In order to do this you first need to make sure the application is not running. The best way to ensure this is to go to Settings > Exit > Exit. To set the proxy run: `curl -d '' http://<ROKU-IP>:8060/launch/dev?setRegistry=%7B%22proxySettings%22%3A%7B%22charlesProxyEnabled%22%3A%22true%22%2C%22charlesProxyUrl%22%3A%22http%3A%2F%2F<COMPUTER-IP>%3A8888%22%7D%7D&password=499zsaHvENIYuEiVPMMa3S5w` replacing `<ROKU-IP>` and `<COMPUTER-IP>` as appropriate. To remove the proxy run:
-`curl -d '' http://<COMPUTER-IP>:8060/launch/dev?clearRegistry=true&password=499zsaHvENIYuEiVPMMa3S5w` This will clear the entire registry which can be useful for other things as well.
+As of 3.6.16 the Tubi application can now proxy requests in staging and production. In order to do this you first need to make sure the application is not running. The best way to ensure this is to go to Settings > Exit > Exit. To set the proxy run: `curl -d '' 'http://<ROKU-IP>:8060/launch/41468?setRegistry=%7B%22proxySettings%22%3A%7B%22charlesProxyEnabled%22%3A%22true%22%2C%22charlesProxyUrl%22%3A%22http%3A%2F%2F<COMPUTER-IP>%3A8888%22%7D%7D&password=499zsaHvENIYuEiVPMMa3S5w` replacing `<ROKU-IP>` and `<COMPUTER-IP>` as appropriate. To remove the proxy run:
+`curl -d '' http://<COMPUTER-IP>:8060/launch/41468?clearRegistry=true&password=499zsaHvENIYuEiVPMMa3S5w'` This will clear the entire registry which can be useful for other things as well.
+
+>Note 41468 is channel id for the production channel. If you want to use on a staging channel you need to get the correct channel id and replace you can do so by running `http://<ROKU-IP>:8060/query/apps`
 
 # Publish a new version of One Trust Component Library
 

@@ -394,28 +394,27 @@ End Function
 
 Function tubihttp_passThroughCharlesProxy(url as String) as string
   proxiedUrl = url
+
   if m.charlesProxyEnabled
-    configMode = m.configMode
-    if configMode <> "production" then
-      charlesProxyUrl = m.charlesProxyUrl
+    charlesProxyUrl = m.charlesProxyUrl
 
-      ' Used to allow proxying in RTA automated tests
-      if configMode = "qa" then
-        proxyHost = RegRead("proxyAddress", "rokuTestAutomation")
-        if isnonemptystr(proxyHost) = true then
-          charlesProxyUrl = "http://" + proxyHost
-        end if
+    ' Used to allow proxying in RTA automated tests
+    if m.configMode = "qa" then
+      proxyHost = RegRead("proxyAddress", "rokuTestAutomation")
+      if isnonemptystr(proxyHost) = true then
+        charlesProxyUrl = "http://" + proxyHost
       end if
+    end if
 
-      if charlesProxyUrl <> "" then
-        reg_exp = CreateObject("roRegex", "^(http|https)://", "")
-        checkurlAA = reg_exp.Split(url)
-        if checkurlAA[1] <> invalid AND Len(checkurlAA[1]) > 0 AND url.instr(charlesProxyUrl) = -1
-          proxiedUrl = charlesProxyUrl + "/;" + url
-        end if
+    if charlesProxyUrl <> "" then
+      reg_exp = CreateObject("roRegex", "^(http|https)://", "")
+      checkurlAA = reg_exp.Split(url)
+      if checkurlAA[1] <> invalid AND Len(checkurlAA[1]) > 0 AND url.instr(charlesProxyUrl) = -1
+        proxiedUrl = charlesProxyUrl + "/;" + url
       end if
     end if
   end if
+
   return proxiedUrl
 End Function
 
@@ -423,7 +422,7 @@ End Function
 Function tubihttp_removeCharlesProxy(proxiedUrl as String) as String
   returnUrl = proxiedUrl
   if m.charlesProxyEnabled
-    if m.configMode <> "production" AND proxiedUrl <> "" AND m.charlesProxyUrl <> ""
+    if proxiedUrl <> "" AND m.charlesProxyUrl <> ""
       proxyAddress = m.charlesProxyUrl + "/;"
       returnUrl = proxiedUrl.Replace(proxyAddress, "")
     end if

@@ -1,4 +1,4 @@
-'@TestSuite [Request] Request.brs 
+'@TestSuite [Request] Request.brs
 
 '@Setup
 Function RequestSetup()
@@ -29,7 +29,7 @@ Function request_startWithUrlTransfer_test()
   urltransfer = CreateObject("roUrlTransfer")
   m.assertTrue(m.request.start(urltransfer))
 End Function
-    
+
 
 '@Test cancel unit tests
 Function request_cancel_test()
@@ -80,7 +80,7 @@ End Function
 '@Params [ "http://adrise.tv/?x=",    { e: 1 },     "http://adrise.tv/?x=&e=1" ]
 '@Params [ "http://adrise.tv/?x=&",   { f: 1 },     "http://adrise.tv/?x=&f=1" ]
 '@Params [ "http://adrise.tv/?x=1",   { g: 1 },     "http://adrise.tv/?x=1&g=1" ]
-'@Params [ "http://adrise.tv/?x=1&",  { h: 1 },     "http://adrise.tv/?x=1&h=1" ]    
+'@Params [ "http://adrise.tv/?x=1&",  { h: 1 },     "http://adrise.tv/?x=1&h=1" ]
 Function request_addParamsToUrl_test(url, params, expectedResult)
   request = TubiRequest().createAsync("http://localhost/")
   m.assertEqual( request.addParamsToUrl_(url, params), expectedResult)
@@ -95,7 +95,7 @@ End Function
 '@Test passThroughCharlesProxy unit tests
 '@Params [ "http://adrise.tv",          {mode: "dev", CharlesProxyEnabled: true, charlesProxyUrl:"http://192.168.68.57:8888"},           "http://192.168.68.57:8888/;http://adrise.tv" ]
 '@Params [ "",                           {mode: "dev", CharlesProxyEnabled: true, charlesProxyUrl:"http://192.168.68.57:8888"},           "" ]
-'@Params [ "http://adrise.tv",          {mode: "production", CharlesProxyEnabled: true, charlesProxyUrl:"http://192.168.68.57:8888"},    "http://adrise.tv" ]
+'@Params [ "http://adrise.tv",          {mode: "production", CharlesProxyEnabled: false, charlesProxyUrl:"http://192.168.68.57:8888"},    "http://adrise.tv" ]
 '@Params [ "http://adrise.tv",          {mode: "dev", CharlesProxyEnabled: false, charlesProxyUrl:"http://192.168.68.57:8888"},          "http://adrise.tv" ]
 '@Params [ "http://adrise.tv",          {mode: "dev", CharlesProxyEnabled: true, charlesProxyUrl:""},                                    "http://adrise.tv" ]
 '@Params [ "http://adrise.tv",          {mode: "dev", CharlesProxyEnabled: false, charlesProxyUrl:""},                                   "http://adrise.tv" ]
