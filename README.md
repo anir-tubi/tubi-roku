@@ -2,6 +2,8 @@
 
 [![Build Status](https://github.com/adRise/project-total-recall/tree/master)](https://github.com/adRise/project-total-recall/actions/workflows/executeUnitTests.yml)
 
+This README covers details and procedures specific to this repository. For broader information relevant to the Roku department, check out the [Additional Information page](MORE.md).
+
 ## Production Channel
 
 ![Staging Channel Logo](channel-store/channel-store-poster-540x405.png)
