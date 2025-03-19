@@ -811,6 +811,7 @@ function setAutomatedTestsConfig(done) {
         disableSkinAds: true,
         disableExperiments: true,
         charlesProxyEnabled: true,
+        charlesProxyUrl: '',
         bs_const: {
           consoleLoggingEnabled: false,
           useQaAnalyticsProxy: useQaAnalyticsProxy
@@ -1027,7 +1028,7 @@ function validateBuildEnvironment(done) {
 
   const commandResult = shell.exec(`git rev-list --count ${currentBranch}..origin/${releaseBranch}`, { silent: true });
   const behindCount = parseInt(commandResult.stdout.trim());
-  
+
   if (behindCount > 0) {
     done(new NoStackError(`\x1b[31m ${currentBranch} is behind ${releaseBranch}. Possible reasons hot fix. Please merge changes from ${releaseBranch} to ${currentBranch}. \x1b[0m`));
   }
