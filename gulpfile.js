@@ -1022,6 +1022,15 @@ function validateBuildEnvironment(done) {
   }
 
   const currentBranch = getCurrentBranch(done);
+  const majorVersion = getBuildTag('major');
+  const releaseBranch = `${majorVersion}_branch`;
+
+  const commandResult = shell.exec(`git rev-list --count ${currentBranch}..origin/${releaseBranch}`, { silent: true });
+  const behindCount = parseInt(commandResult.stdout.trim());
+  
+  if (behindCount > 0) {
+    done(new NoStackError(`\x1b[31m ${currentBranch} is behind ${releaseBranch}. Possible reasons hot fix. Please merge changes from ${releaseBranch} to ${currentBranch}. \x1b[0m`));
+  }
 
   if (!isBranchTrackingPresent(done, currentBranch)) {
     done(new NoStackError(`\x1b[31m ${currentBranch} does not have a remote tracking branch. \x1b[0m`));
