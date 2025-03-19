@@ -551,6 +551,7 @@ Function getConstants()
         constants.urls.tensor.cdn.homescreen = constants.urls.tensor.cdn.urlBase + "/v5/homescreen"
         constants.urls.tensor.cdn.container = constants.urls.tensor.cdn.urlBase + "/v5/containers"
         constants.urls.tensor.cdn.epgChannelIds = constants.urls.tensor.cdn.urlBase + "/v2/epg"
+        constants.urls.tensor.cdn.browserList = constants.urls.tensor.cdn.urlBase + "/v1/browser_list"
 
     'remote Config hub url
     constants.urls.configHub = {}
@@ -1263,8 +1264,11 @@ Function getConstants()
 
     ' notAllowedContainerIds are the containers which are not allowed to be displayed on category screen,
     ' because currently we support only portrait style in category detail screen
+    ' TODO: Remove in submission release.
     constants.ui.notAllowedContainerIds = {}
       constants.ui.notAllowedContainerIds[constants.ui.categoryIds.featured] = true
+
+    constants.ui.excludedCategories = [constants.ui.categoryIds.featured]
 
     constants.ui.cacheableScreenIds = {}
       constants.ui.cacheableScreenIds[constants.ui.screenIds.homeScreen] = true

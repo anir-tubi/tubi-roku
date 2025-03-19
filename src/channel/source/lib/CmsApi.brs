@@ -135,18 +135,37 @@ End Function
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
 '
 Function cmsApi_createCategoriesListReqInfo(bKidsMode = false)
-  options = {
-    params: {}
-    headers: {}
+  
+  options = m.getCommonOptions(true)
+  params = options.params
+
+  params.append({
+    contents_limit: 0
+    excluded_containers: m.constants.ui.excludedCategories
+    is_kids_mode: bKidsMode
+    content_mode: ""
+    idfa: m.constants.deviceInfo.deviceAdId
+  })
+
+  utmCampaignConfig = m.utmCampaignConfig
+  if isString(utmCampaignConfig) = true then
+    params["utm_campaign_config"] = utmCampaignConfig
+  end if
+
+  options.params = params
+
+  headers = options.headers
+  headers.append({
+    "Accept-Version": "6.0.0"
+    "X-TUBI-MODE": "DEFAULT"
+  })
+
+  options.headers = headers
+
+  return {
+    url: m.constants.urls.tensor.cdn.browserList
+    options: options
   }
-
-  options.headers["x-tubi-include-browser-list"] = "true"
-  options.params["include_browser_list"] = true
-  options.params["contents_limit"] = 0
-  options.params["include_empty_history"] = "false"
-  options.params["include_empty_queue"] = "false"
-
-  return m.createHomeScreenReqInfo(bKidsMode, options)
 End Function
 
 

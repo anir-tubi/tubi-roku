@@ -31,9 +31,6 @@
     <!-- A thumbnail that will be displayed as the background of channel and category containers -->
     <field id="thumbnail" type="string" />
 
-    <!-- special categories are "Recommended", "Continue Watching", and "Queue" -->
-    <field id="isSpecial" type="boolean" />
-
     <field id="slug" type="string" />
 
     <!-- if UpTime(0) > validUntil, then refetch metadata for this container/category. We have 2 special values of 0 which indicates it will be refreshed always and -1 which indicates content does not need to be refreshed ever. -->

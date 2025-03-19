@@ -1028,8 +1028,9 @@ End Function
 ' Translate a response from matrix/categories or matrix/channels for use in ChannelGridScreen
 Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate, bDisplayChannels = true) As Object
   tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateCategoriesListScreen()")
-  sID_queue = m.constants.ui.categoryIds.queue
-  sID_continue_watching = m.constants.ui.categoryIds.history
+  queueCategoryId = m.constants.ui.categoryIds.queue
+  continueWatchingCategoryId = m.constants.ui.categoryIds.history
+  recommendedForYouCategoryID = m.constants.ui.categoryIds.recommendedForYou
 
   screenContentId = ""
   oLimitTypes = {}
@@ -1049,7 +1050,7 @@ Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate,
 
   '//The following is a modifed version of the tubiMetadataTranslate_translateHomescreen() method
   translated = CreateObject("roSGNode", "CategoryContentNode")
-  homescreenAA = {
+  categoryList = {
     id: screenContentId
     title: ""
     validUntil: 0
@@ -1057,12 +1058,10 @@ Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate,
   }
 
   if contentToTranslate.valid_duration <> invalid
-    homescreenAA.validUntil = Uptime(0) + contentToTranslate.valid_duration
+    categoryList.validUntil = Uptime(0) + contentToTranslate.valid_duration
   else
-    homescreenAA.validUntil = Uptime(0) + m.constants.cacheTimes.homescreen
+    categoryList.validUntil = Uptime(0) + m.constants.cacheTimes.homescreen
   end if
-
-  containers = contentToTranslate.browser_list
 
   '//The following code adds a transparency to the thumbnails and for categories, it shifts a few categories to the top of the list
   '//::HARDCODED:: If this is categories, then place few categories in the front and get rid of featured
@@ -1073,8 +1072,7 @@ Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate,
   ' Below logic is required to hide the network tab during fail safe since we are not getting the channel containers in the response.
   isChannelContainersPresent = false
 
-  for i=0 to containers.count()-1
-    container = containers[i]
+  for each container in contentToTranslate.containers
 
     if container.type = m.constants.ui.categoryTypes.channel
       isChannelContainersPresent = true
@@ -1091,79 +1089,48 @@ Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate,
         end if
 
         sID = ""
-        if categoryAA.id <> invalid
+        if isNonEmptyString(categoryAA.id) = true
           sID = LCase(categoryAA.id)
         end if
 
-        validContainer = true
-        ' do not show the containers on Category screen which has landscape images on it
-        if m.constants.ui.notAllowedContainerIds[sID] = true
-          validContainer = false
-        end if
-
-        if validContainer = true
-          if sID = m.constants.ui.categoryIds.recommendedForYou
-            catRecommend = categoryAA
-            catRecommend.isSpecial = true
-            catRecommend.thumbnail = m.constants.ui.uris.categoryBackgrounds.recommended
-          else if sID = sID_continue_watching
-            catContinueWatching = categoryAA
-            catContinueWatching.isSpecial = true
-            catContinueWatching.thumbnail = m.constants.ui.uris.categoryBackgrounds.continueWatching
-          else if sID = sID_queue
-            catQueue = categoryAA
-            catQueue.isSpecial = true
-            catQueue.thumbnail = m.constants.ui.uris.categoryBackgrounds.queue
-          else
-            homescreenAA.children.push(categoryAA)
-          end if
+        if sID = recommendedForYouCategoryID
+          catRecommend = categoryAA
+        else if sID = continueWatchingCategoryId
+          catContinueWatching = categoryAA
+        else if sID = queueCategoryId
+          catQueue = categoryAA
+        else
+          categoryList.children.push(categoryAA)
         end if
       end if
     end if
   end for
 
-  homescreenAA.children.SortBy("title")
+  categoryList.children.SortBy("title")
 
-  'Removed Channels from SideNav and adding it to the categories.
-  catNetworkChannels = invalid
+  ' Removed Channels from SideNav and adding it to the categories.
   if bDisplayChannels = false AND isChannelContainersPresent = true
-    catNetworkChannels = {
+    categoryList.children.unShift({
       id: "networks"
-      isSpecial: true
       slug: "networks"
       title: getTranslation("menu_networks")
       type: "channel"
-  }
-  end if
-
-  '//Move the following items to the front of the list if they exist
-  if catNetworkChannels <> invalid
-    homescreenAA.children.Unshift(catNetworkChannels)
+    })
   end if
 
   if catQueue <> invalid
-    homescreenAA.children.Unshift(catQueue)
+    categoryList.children.unShift(catQueue)
   end if
 
   if catContinueWatching <> invalid
-    homescreenAA.children.Unshift(catContinueWatching)
+    categoryList.children.unShift(catContinueWatching)
   end if
 
   if catRecommend <> invalid
-    homescreenAA.children.Unshift(catRecommend)
+    categoryList.children.unShift(catRecommend)
   end if
 
-  ' use gradient images that reside on the CDN for category/channel poster images
-  for i=0 to homescreenAA.children.count()-1
-    categoryAA = homescreenAA.children[i]
-
-    if categoryAA.isSpecial <> true
-      thumbnailNumber = (i MOD 11) + 1
-      categoryAA.thumbnail = m.constants.ui.uris.categoryBackgrounds.urlBase + thumbnailNumber.toStr() + m.constants.ui.uris.categoryBackgrounds.urlEnding
-    end if
-  end for
-
-  translated.update(homescreenAA)
+  translated.update(categoryList)
   node_count = 1 + translated.getChildCount()
   tubiLog("TranslateMetadata converted " + stri(node_count) + " nodes")
 
