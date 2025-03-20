@@ -38,6 +38,7 @@ Function PlayerLogLib(constants, tracking)
     'If isVideoPlayed is true, it means the event has already been triggered for this session.
     isVideoPlayed: false
 
+    isTrailer: false 'No player logs are sent for trailer
     isSeeking: false 'used in userFeedback event
     videoState: "" 'various events are fired based on videoState
     videoId: "" 'used used in various events
@@ -361,6 +362,12 @@ Function playerLogLib_setVideoContent(content = invalid)
       m.hdcpVersion = m.constants.player.hdcpVersion["UNKNOWN"]
     end if
 
+    if isBoolean(m.content.isTrailer) = true
+      m.isTrailer = m.content.isTrailer
+    else
+      m.isTrailer = true
+    end if
+
     m.isContinueWatching = (m.content.nowPos > 0)
     m.duration = m.content.length
     url = m.content.url
@@ -385,6 +392,7 @@ Function playerLogLib_setVideoContent(content = invalid)
     m.cdn = ""
     m.isContinueWatching = false
     m.duration = 0
+    m.isTrailer = true
   end if
 End Function
 
@@ -441,13 +449,20 @@ End Function
 ' It will calculate the duration cost from the user pressing play/resume button to player setup
 '
 Function playerLogLib_firePlayerSetupPerformanceEvent()
+  eventBase = {
+    track_id: ""
+    video_id: ""
+    page_loaded_time: ""
+    player_setup_time: ""
+  }
+
   data = {
     track_id: m.playerLogTrackId
     video_id: m.videoId
     page_loaded_time: m.playerLoadTime
     player_setup_time: m.playerSetupTime
   }
-  m.sendEvent(data, "player_setup_performance")
+  m.sendEvent(data, "player_setup_performance", eventBase)
 
   m.playerLoadTime = -1
   m.playerSetupTime = -1
@@ -458,15 +473,27 @@ End Function
 '
 '@data: assocarray, the payload that needs to be sent
 '@subType: String, it is eventType
-Function playerLogLib_sendEvent(data = {} as Dynamic, subType = "" as String)
-  trackData = m.tracking.getPlayerAnalyticsEvent(subType, data)
+'@eventbase: assocArray, a list of fields for each message as defined in this file (which should match the protos specs on the server)
+Function playerLogLib_sendEvent(data = {} as Dynamic, subType = "" as String, eventBase = {})
+  'Do not send player events for trailers
+  if m.isTrailer = false
+    eventInfo = m.tracking.populateMessage(subType, data, eventBase)
 
-  if m.trackingLoggingTask = invalid then
-    m.trackingLoggingTask = getGlobalAA().global.trackingLoggingTask
-  end if
+    if eventInfo <> invalid
+      eventValues =  eventInfo[subType]
 
-  if m.trackingLoggingTask <> invalid then
-    m.trackingLoggingTask.trackPlayerEvent = trackData
+      if isAA(eventValues) = true
+        trackData = m.tracking.getPlayerAnalyticsEvent(subType, eventValues)
+    
+        if m.trackingLoggingTask = invalid then
+          m.trackingLoggingTask = getGlobalAA().global.trackingLoggingTask
+        end if
+    
+        if m.trackingLoggingTask <> invalid then
+          m.trackingLoggingTask.trackPlayerEvent = trackData
+        end if
+      end if
+    end if
   end if
 End Function
 
@@ -503,6 +530,18 @@ Function playerLogLib_fireContentStartupPerformanceEvent(isFromPreroll, isAfterA
     end if
   end if
 
+  eventBase = {
+    track_id: ""
+    video_id: ""
+    video_resource_type: ""
+    video_codec_type: ""
+    current_video_resolution: ""
+    start_position: ""
+    is_after_ad: ""
+    is_from_preroll: ""
+    first_frame_time: ""
+  }
+
   data = {
     track_id: m.playerLogTrackId
     video_id: m.videoId
@@ -515,7 +554,7 @@ Function playerLogLib_fireContentStartupPerformanceEvent(isFromPreroll, isAfterA
     first_frame_time: firstFrameTime
   }
 
-  m.sendEvent(data, "content_startup_performance")
+  m.sendEvent(data, "content_startup_performance", eventBase)
 End Function
 
 
@@ -574,10 +613,23 @@ End Function
 '
 '@cuepointInfo: assocarray, contains  ad_count, cuepoint
 Function playerLogLib_fireCuepointFilledEvent(cuepointInfo)
+  eventBase = {
+    track_id: ""
+    video_id: ""
+    position: ""
+    request_position: ""
+    position_deviation: ""
+    cue_point: ""
+    ad_response_time: ""
+    is_preroll: ""
+    ad_count: ""
+    message: ""
+  }
+
   if isAA(cuepointInfo) = true
     cuepointInfo["track_id"] = m.playerLogTrackId
     cuepointInfo["video_id"] = m.videoId
-    m.sendEvent(cuepointInfo, "cue_point_filled")
+    m.sendEvent(cuepointInfo, "cue_point_filled", eventBase)
   end if
 End Function
 
@@ -592,6 +644,22 @@ End Function
 '
 '@playerExitInfo: assocarray, contains ad_counts, is_ad, is_buffering
 Function playerLogLib_firePlayerPageExitEvent(playerExitInfo)
+  eventBase = {
+    track_id: ""
+    feedback: ""
+    has_error_modal: ""
+    content_counts: ""
+    ad_counts: ""
+    is_ad: ""
+    is_buffering: ""
+    stage: ""
+    cause: ""
+    doubts: ""
+    content_duration: ""
+    current_position: ""
+    message: ""
+  }
+
   if isAA(playerExitInfo) = true
     playerExitInfo["track_id"] = m.playerLogTrackId
     playerExitInfo["has_error_modal"] = m.hasErrorModalShown
@@ -602,7 +670,7 @@ Function playerLogLib_firePlayerPageExitEvent(playerExitInfo)
       playerExitInfo["feedback"] = m.playerFeedback
     end if
   
-    m.sendEvent(playerExitInfo, "player_page_exit")
+    m.sendEvent(playerExitInfo, "player_page_exit", eventBase)
   end if
 
   m.hasErrorModalShown = false
@@ -629,6 +697,17 @@ Function playerLogLib_fireContentStartEvent(isFromPreroll, isAfterAd)
     startPosition = m.content.nowPos
   end if
 
+  eventBase = {
+    track_id: ""
+    video_id: ""
+    video_resource_type: ""
+    video_codec_type: ""
+    start_position: ""
+    is_after_ad: ""
+    is_from_preroll: ""
+    is_from_autoplay: ""
+  }
+
   data = {
     track_id: m.playerLogTrackId
     video_id: m.videoId
@@ -640,7 +719,7 @@ Function playerLogLib_fireContentStartEvent(isFromPreroll, isAfterAd)
     is_from_autoplay: m.isFromAutoplay
   }
 
-  m.sendEvent(data, "content_start")
+  m.sendEvent(data, "content_start", eventBase)
 End Function
 
 
@@ -648,10 +727,27 @@ End Function
 '
 'resourceInfo: assocarray, contains failedType(possible values are CODEC/DRM), currentResource(failed) & nextResource(fallback) which is needed for sending event
 Function playerLogLib_fireVideoResourceFallbackEvent(resourceInfo)
+  eventBase = {
+    track_id: ""
+    video_id: ""
+    type: ""
+    failed_video_resource_type: ""
+    failed_video_codec_type: ""
+    failed_hdcp_version: ""
+    failed_max_video_resolution: ""
+    failed_url: ""
+    fallback_video_resource_type: ""
+    fallback_video_codec_type: ""
+    fallback_hdcp_version: ""
+    fallback_max_video_resolution: ""
+    fallback_url: ""
+    message: ""
+  }
+
   if isAA(resourceInfo) = true
     resourceInfo["track_id"] = m.playerLogTrackId
     resourceInfo["video_id"] = m.videoId
-    m.sendEvent(resourceInfo, "fallback")
+    m.sendEvent(resourceInfo, "fallback", eventBase)
   end if
 End Function
 
@@ -661,12 +757,28 @@ End Function
 '
 '@adCtx: assocArray: holds ad related information (eg. adCount, adIndex, adServer, duration etc.,)
 Function playerLogLib_fireAdStartupPerformanceEvent(adCtx = {})
+  eventBase = {
+    track_id: ""
+    ad_id: ""
+    url: ""
+    is_preroll: ""
+    ad_index: ""
+    ad_count: ""
+    duration: ""
+    first_frame_time: ""
+    frag_loaded_time: ""
+    variant_loaded_time: ""
+    manifest_loaded_time: ""
+    preloaded: ""
+    message: ""
+  }
+
   if adCtx <> invalid AND adCtx.ad <> invalid
     m.adBufferTime = m.adBufferTimer.totalMilliseconds()
     adStartupPerformanceInfo = m.updateSingleAdInfo(adCtx)
     m.totalAdFirstFrameDuration += m.adBufferTime
     adStartupPerformanceInfo["first_frame_time"] = m.adBufferTime
-    m.sendEvent(adStartupPerformanceInfo, "ad_startup_performance")
+    m.sendEvent(adStartupPerformanceInfo, "ad_startup_performance", eventBase)
   end if
 End Function
 
@@ -689,10 +801,22 @@ End Function
 '
 '@adCtx: assocarray, contains ad information
 Function playerLogLib_fireAdStartEvent(adCtx = {})
+  eventBase = {
+    track_id: ""
+    video_id: ""
+    ad_id: ""
+    url: ""
+    is_preroll: ""
+    ad_index: ""
+    ad_count: ""
+    duration: ""
+    message: ""
+  }
+
   if isAA(adCtx) = true
     adStartInfo = m.updateSingleAdInfo(adCtx)
     adStartInfo["video_id"] = m.videoId
-    m.sendEvent(adStartInfo, "ad_start")   
+    m.sendEvent(adStartInfo, "ad_start", eventBase)   
   end if
 End Function
 
@@ -701,12 +825,25 @@ End Function
 '
 '@adCtx: assocarray, contains ad information
 Function playerLogLib_fireAdCompleteEvent(adCtx = {})
+  eventBase = {
+    track_id: ""
+    video_id: ""
+    ad_id: ""
+    url: ""
+    is_preroll: ""
+    ad_index: ""
+    ad_count: ""
+    duration: ""
+    play_time_exclude_pause_time: ""
+    message: ""
+  }
+
   if isAA(adCtx) = true
     m.totalAdDurationPerTitle += adCtx.duration
 
     adCompleteInfo = m.updateSingleAdInfo(adCtx)
     adCompleteInfo["video_id"] = m.videoId
-    m.sendEvent(adCompleteInfo, "ad_complete")   
+    m.sendEvent(adCompleteInfo, "ad_complete", eventBase)   
   end if
 End Function
 
@@ -717,6 +854,20 @@ End Function
 Function playerLogLib_fireAdDiscontinueEvent(adCtx = {})
   m.failedAdCountPerTitle += 1
   m.totalAdDurationPerTitle += adCtx.duration
+
+  eventBase = {
+    track_id: ""
+    video_id: ""
+    ad_id: ""
+    url: ""
+    is_preroll: ""
+    ad_index: ""
+    ad_count: ""
+    duration: ""
+    reason: ""
+    ad_position: ""
+    message: ""
+  }
 
   if isAA(adCtx) = true
     adDiscontinueInfo = m.updateSingleAdInfo(adCtx)
@@ -729,7 +880,7 @@ Function playerLogLib_fireAdDiscontinueEvent(adCtx = {})
     adDiscontinueInfo["ad_position"] = adPosition
     adDiscontinueInfo["video_id"] = m.videoId
     adDiscontinueInfo["reason"] = "error"
-    m.sendEvent(adDiscontinueInfo, "ad_discontinue")   
+    m.sendEvent(adDiscontinueInfo, "ad_discontinue", eventBase)   
   end if
 
   'this is used in quality of service event 
@@ -741,6 +892,18 @@ End Function
 '
 '@adCtx: assocarray, contains video_id
 Function playerLogLib_fireAdPodCompleteEvent(adCtx = {})
+  eventBase = {
+    track_id: ""
+    video_id: ""
+    ad_count: ""
+    successful_count: ""
+    failed_count: ""
+    total_ads_duration: ""
+    play_time_exclude_pause_time: ""
+    is_preroll: ""
+    message: ""
+  }
+
   adCount = adCtx.adCount
   adPodCompleteInfo = {}
   adPodCompleteInfo["track_id"] = m.playerLogTrackId
@@ -750,7 +913,7 @@ Function playerLogLib_fireAdPodCompleteEvent(adCtx = {})
   adPodCompleteInfo["is_preroll"] = (adCtx.rendersequence = "preroll")
   adPodCompleteInfo["video_id"] = m.videoId
   adPodCompleteInfo["total_ads_duration"] = Round(m.totalAdDurationPerTitle)
-  m.sendEvent(adPodCompleteInfo, "ad_pod_complete")
+  m.sendEvent(adPodCompleteInfo, "ad_pod_complete", eventBase)
 End Function
 
 
@@ -959,6 +1122,37 @@ End Function
 '
 '@qualityOfServiceInfo: assocarray
 Function playerLogLib_fireQualityOfServiceEvent()
+  eventBase = {
+    track_id: ""
+    cffd: ""
+    rc: ""
+    last_ss: ""
+    errc: ""
+    first_errc: ""
+    boc: ""
+    bc: ""
+    tbd: ""
+    sc: ""
+    tsd: ""
+    tvt: ""
+    tcrffd: ""
+    ad_ac: ""
+    ad_sfc: ""
+    ad_eac: ""
+    ad_taffd: ""
+    ad_bac: ""
+    is_ad: ""
+    download_speed: ""
+    cdn: ""
+    resource_type: ""
+    hdcp: ""
+    codec: ""
+    content_id: ""
+    message: ""
+    download_frag_bitrate: ""
+    ad_imp: ""
+  }
+
   qualityOfServiceInfo = {}
   qualityOfServiceInfo["track_id"] = m.playerLogTrackId
   qualityOfServiceInfo["cffd"] = Round(m.contentFirstFrameDuration)
@@ -1000,7 +1194,7 @@ Function playerLogLib_fireQualityOfServiceEvent()
   qualityOfServiceInfo["codec"] = m.videoCodecType
   qualityOfServiceInfo["content_id"] = m.videoId
 
-  m.sendEvent(qualityOfServiceInfo, "quality_of_services")
+  m.sendEvent(qualityOfServiceInfo, "quality_of_services", eventBase)
   m.resetQoSAttributes()
 End Function
 
@@ -1048,6 +1242,35 @@ End Function
 '
 '@userfeedbackInfo: assocarray, which holds the feedback information
 Function playerLogLib_setUserFeedback(userfeedbackInfo = {})
+  eventBase = {
+    track_id: ""
+    feedback_issue: ""
+    page_source: ""
+    is_live: ""
+    content_id: ""
+    video_resource_type: ""
+    video_resource_codec: ""
+    video_resource_hdcp: ""
+    video_resource_resolution: ""
+    is_auto_resolution: ""
+    position: ""
+    bitrate_estimate: ""
+    buffering: ""
+    current_buffering_duration: ""
+    seeking: ""
+    current_seeking_duration: ""
+    captions_index: ""
+    captions_list: ""
+    latest_startup_result: ""
+    latest_ad_pod_startup_result: ""
+    is_continue_watching: ""
+    logged_in: ""
+    bitrate: ""
+    frame_rate: ""
+    duration: ""
+    message: ""
+  }
+
   userfeedbackInfo["device_id"] = m.constants.deviceInfo.deviceId
   userfeedbackInfo["manufacturer"] = m.constants.deviceInfo.vendorName
   userfeedbackInfo["device_model"] = m.constants.deviceInfo.model
@@ -1097,7 +1320,7 @@ Function playerLogLib_setUserFeedback(userfeedbackInfo = {})
     userfeedbackInfo["bitrate"] = (m.streamBitrate / 1000) 'kbps
   end if
 
-  m.sendEvent(userfeedbackInfo, "user_feedback")
+  m.sendEvent(userfeedbackInfo, "user_feedback", eventBase)
 End Function
 
 

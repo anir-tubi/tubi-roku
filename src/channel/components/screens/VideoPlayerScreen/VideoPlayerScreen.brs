@@ -2142,6 +2142,8 @@ Function setDrmOnContent(contentNode, resource, videoResourceIndex)
       contentNode.encodingKey = resource.encodingKey
     end if
     return true
+  else
+    updatePlayerLogLib(m.playerLogLib, "setVideoContent", contentNode)  
   end if
   return false
 End Function

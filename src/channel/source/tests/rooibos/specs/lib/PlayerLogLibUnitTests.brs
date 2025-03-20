@@ -11,8 +11,10 @@ Function PlayerLogLibSetup()
 End function
 
 
-Function sendEvent(data = {} as Dynamic, subType = "" as String)
-  trackData = m.tracking.getPlayerAnalyticsEvent(subType, data)
+Function sendEvent(data = {} as Dynamic, subType = "" as String, eventBase = {})
+  eventInfo = m.tracking.populateMessage(subType, data, eventBase)
+  eventValues =  eventInfo[subType]
+  trackData = m.tracking.getPlayerAnalyticsEvent(subType, eventValues)
   m.trackingLoggingTask = CreateObject("roSGNode", "TrackingLoggingTask")
   m.trackingLoggingTask.trackPlayerEvent = trackData
 End Function
