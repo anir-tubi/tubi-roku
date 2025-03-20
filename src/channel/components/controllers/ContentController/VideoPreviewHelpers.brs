@@ -176,13 +176,21 @@ Function startVideoPreview(content, pageInfo = {})
     setPageInfoForVideoPreview(pageInfo)
 
     videoContent = createObject("RoSGNode", "ContentNode")
-    videoContent.url = content.videoPreviewUrl
     videoContent.id = content.id
-    videoContent.streamformat = "mp4" ' backend will return always as mp4
 
-    if isNonEmptyString(content.previewId) = true
-      videoContent.addField("previewId", "string", false)
-      videoContent.previewId = content.previewId
+    trailerInfo = content.trailerInfo
+    if  getExperimentResource("roku_trailer_vs_preview_nav", "roku_trailer_vs_preview_nav_v1", false).enabled = true AND isAA(trailerInfo) = true AND isNonEmptyString(content.videoPreviewUrl) = true
+      videoContent.addField("trailerId", "string", false)
+      videoContent.url = trailerInfo.url
+      videoContent.trailerId = trailerInfo.id
+      videoContent.streamformat = trailerInfo.streamFormat ' this is for trailers playing as preview for roku_trailer_vs_preview_nav_v1 experiment
+    else
+      if isNonEmptyString(content.previewId) = true
+        videoContent.addField("previewId", "string", false)
+        videoContent.previewId = content.previewId
+      end if
+      videoContent.url = content.videoPreviewUrl
+      videoContent.streamformat = "mp4" ' backend will return always as mp4 for video previews
     end if
 
     videoPreview.content = videoContent

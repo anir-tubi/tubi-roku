@@ -76,13 +76,18 @@ Function playContent()
 
   if m.Video.content.id <> invalid
 
+    previewId = m.Video.content.previewId
+    if isNonEmptyString(m.Video.content.trailerId) = true
+      previewId = m.Video.content.trailerId
+    end if
+
     startPreviewEvent = {
       type: "start_preview"
       values: {
         video_id: m.Video.content.id.toInt()
         is_fullscreen: false
         video_player: "BANNER"
-        preview_id: m.Video.content.previewId
+        preview_id: previewId
         pageOneof: m.tubiTrackingInfo.getAnalyticsPage(m.currentPageInfo.pageType, m.currentPageInfo.pageValues)
       }
     }
@@ -129,6 +134,10 @@ Function onVideoStateChange(msg)
 
     if isNode(m.Video.content) = true AND isNonEmptyString(m.Video.content.previewId) = true
       getExperimentResource("roku_multiple_video_preview_nav", "roku_multiple_video_preview_nav_v1")
+    end if
+
+    if isNode(m.Video.content) = true AND isNonEmptyString(m.Video.content.trailerId) = true
+      getExperimentResource("roku_trailer_vs_preview_nav", "roku_trailer_vs_preview_nav_v1")
     end if
   end if
 

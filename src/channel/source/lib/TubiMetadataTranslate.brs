@@ -596,7 +596,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   end if
 
   ' trailers
-  if contentFromServer.trailers <> invalid AND type(contentFromServer.trailers) = "roArray" AND contentFromServer.trailers.count() > 0
+  if isNonEmptyArray(contentFromServer.trailers) = true
     trailerInfo = contentFromServer.trailers[0]
 
     if trailerInfo <> invalid AND isNonEmptyString(trailerInfo.url)
@@ -612,6 +612,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   end if
 
   if contentFromServer.has_trailer = true then translatedContent.hasTrailer = true
+
   if isNonEmptyArray(contentFromServer.video_previews) = true AND contentFromServer.video_previews.count() > 1
     isMultipleVideoPreviewsExpEnabled = (m.experiments <> invalid AND m.experiments.getExperimentResource("roku_multiple_video_preview_nav", "roku_multiple_video_preview_nav_v1").enabled = true)
     videoPreviews = contentFromServer.video_previews
