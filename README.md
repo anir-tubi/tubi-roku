@@ -604,7 +604,7 @@ For each experiment that needs to be added to the roku popper staging environmen
 
 Once all experiment branches for the release have been merged into the `roku_popper_staging` branch, then:
 
-1. Go to https://github.com/adRise/popper-config/actions/workflows/deploy.yml. Click the `Run workflow` dropdown on the right and make sure the branch is `roku_popper_staging` and Target Popper Environment is `roku_staging`. Once confirmed, click the `Run workflow` button.
+1. Go to https://github.com/adRise/popper-config/actions/workflows/deploy.yml. Click the `Run workflow` dropdown on the right and make sure the branch is `roku_popper_staging` and Target Popper Environment is `staging_roku`. Once confirmed, click the `Run workflow` button.
 2. This should make a new Deploy workflow. Click into it. It will take some time to complete. Once it gets to the "Create Git Tag" step, look at that step's output. It should look something like:
 `* [new tag]           20220525.205906Z_ea68a278 -> 20220525.205906Z_ea68a278`
 In this case `20220525.205906Z_ea68a278` is our build id.
