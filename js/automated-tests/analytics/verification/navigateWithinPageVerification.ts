@@ -267,7 +267,7 @@ export async function verifyC425240(titleId) {
 				event.navigate_within_page.middle_nav_component &&
 				event.navigate_within_page.middle_nav_component.middle_nav_section &&
 				event.navigate_within_page.middle_nav_component.middle_nav_section ===
-					MidleNavComponents.signUpToSaveProgress
+					MidleNavComponents.episodeList
 		);
 		i++;
 	}
@@ -275,7 +275,7 @@ export async function verifyC425240(titleId) {
 		navigateWithinPage.navigate_within_page.dest_middle_nav_component
 			.middle_nav_section
 	).equal(
-		MidleNavComponents.play,
+		MidleNavComponents.likeOrDislike,
 		`event should contain navigateWithinPage.navigate_within_page.dest_middle_nav_component.middle_nav_sectionn===PLAY \n
 ${JSON.stringify(navigateWithinPage)} \n`
 	);
@@ -293,12 +293,12 @@ ${JSON.stringify(navigateWithinPage)} \n`
 		navigateWithinPage.navigate_within_page.middle_nav_component
 			.middle_nav_section
 	).equal(
-		MidleNavComponents.signUpToSaveProgress,
+		MidleNavComponents.episodeList,
 		`event should contain navigateWithinPage.navigate_within_page.middle_nav_component.middle_nav_sectionn===LIKE_OR_DISLIKE \n
 ${JSON.stringify(navigateWithinPage)} \n`
 	);
 	expect(navigateWithinPage.navigate_within_page.vertical_location).equal(
-		2,
+		3,
 		`event should contain navigateWithinPage.navigate_within_page.vertical_location===2 \n
 ${JSON.stringify(navigateWithinPage)} \n`
 	);

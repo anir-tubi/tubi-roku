@@ -144,20 +144,21 @@ export async function verifyC450499(episodeId) {
 			Events.navigate_to_page,
 			40 + i
 		);
+		pulletEvents[1].navigate_to_page.dest_login_page
 		navigateToPageEvent = pulletEvents.find(
 			(event) =>
-				event.navigate_to_page.dest_register_page &&
-				event.navigate_to_page.dest_register_page.auth_method ===
-					DialogTypes.email
+				event.navigate_to_page.dest_login_page &&
+				event.navigate_to_page.dest_login_page.choice ===
+					'LINK'
 		);
 		i++;
 	}
 	expect(
-		navigateToPageEvent.navigate_to_page.dest_register_page.auth_method
+		navigateToPageEvent.navigate_to_page.dest_login_page.choice
 	).equal(
-		DialogTypes.email,
+		'LINK',
 		`navigateToPageEvent.navigate_to_page.dest_register_page.auth_method===${
-			DialogTypes.email
+			'LINK'
 		}, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
@@ -198,51 +199,23 @@ export async function C450501NavigateToPageLoginPage(seriesId) {
 		);
 		navigateToPageEvent = pulletEvents.find(
 			(event) =>
-				event.navigate_to_page.dest_video_player_page &&
-				event.navigate_to_page.dest_video_player_page.video_id &&
-				event.navigate_to_page.login_page &&
-				event.navigate_to_page.login_page.choice == 'EMAIL'
+				event.navigate_to_page.video_player_page &&
+				event.navigate_to_page.video_player_page.video_id &&
+				event.navigate_to_page.dest_login_page &&
+				event.navigate_to_page.dest_login_page.choice == 'LINK'
 		);
 		i++;
 	}
 	expect(
-		navigateToPageEvent.navigate_to_page.dest_video_player_page.video_id
+		navigateToPageEvent.navigate_to_page.video_player_page.video_id
 	).equal(
 		seriesId,
 		`navigateToPageEvent.navigate_to_page.dest_series_detail_page.series_id===${seriesId}, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
-	expect(navigateToPageEvent.navigate_to_page.login_page.choice).equal(
-		'EMAIL',
-		`navigateToPageEvent.navigate_to_page.login_page.choice==='EMAIL', Event: \n
-${JSON.stringify(navigateToPageEvent)} \n`
-	);
-}
-
-export async function C450501NavigateToPageDestLoginPage(seriesId) {
-	let navigateToPageEvent;
-	let i = 1;
-	while (navigateToPageEvent === undefined && i < 10) {
-		const pulletEvents = await getMatchedEventsFromLastEvent(
-			Events.navigate_to_page,
-			40 + i
-		);
-		navigateToPageEvent = pulletEvents.find(
-			(event) =>
-				event.navigate_to_page.dest_login_page &&
-				event.navigate_to_page.dest_login_page.choice == 'EMAIL' &&
-				event.navigate_to_page.video_player_page 
-		);
-		i++;
-	}
-	expect(navigateToPageEvent.navigate_to_page.video_player_page.video_id).equal(
-		seriesId,
-		`navigateToPageEvent.navigate_to_page.dest_series_detail_page.series_id===${seriesId}, Event: \n
-${JSON.stringify(navigateToPageEvent)} \n`
-	);
 	expect(navigateToPageEvent.navigate_to_page.dest_login_page.choice).equal(
-		'EMAIL',
-		`navigateToPageEvent.navigate_to_page.dest_login_page.choice==='EMAIL', Event: \n
+		'LINK',
+		`navigateToPageEvent.navigate_to_page.login_page.choice==='LINK', Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 }

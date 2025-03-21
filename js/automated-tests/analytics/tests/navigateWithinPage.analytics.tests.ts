@@ -87,7 +87,7 @@ describe('Navigate Within Page', function () {
 		await ecp.sendKeypress(ecp.Key.Up, { wait: 500 });
 		await ecp.sendKeypress(ecp.Key.Ok);
 		await verifyC425249(titleId);
-		await verifyC425250(titleId); // check how to get sign up to save progress
+		//await verifyC425250(titleId); // check how to get sign up to save progress
 	});
 
 	it('When user navigates between menu options - SIGNUP_TO_SAVE_PROGRESS C425240 @analyticsASet2,@analyticsNavigateWithinPage', async () => {

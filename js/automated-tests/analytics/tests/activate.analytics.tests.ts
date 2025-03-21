@@ -11,8 +11,7 @@ import {
 	verifyC450499,
 	verifyC450500NavigateToPage,
 	C450501NavigateToPage,
-	C450501NavigateToPageLoginPage,
-	C450501NavigateToPageDestLoginPage
+	C450501NavigateToPageLoginPage
 } from '../verification/navigateToPage';
 import {
 	verifyC148718,
@@ -95,6 +94,7 @@ describe('Activate events', function () {
 		const homePage = HomePage();
 		const detailsPage = await homePage.selectFocusedTitleTVShow();
 		const episodeId = detailsPage.getEpisodeId();
+		const titleId = detailsPage.getTitleId();
 		const playback = await detailsPage.clickOnPlay();
 		await playback.allowPlaybackToPlayForSeconds(350000);
 		await ecp.sendKeypress(ecp.Key.Back,{ wait: 3000 });
@@ -105,9 +105,8 @@ describe('Activate events', function () {
 		const signInEmailPage = SignInEmailPage();
 		await signInEmailPage.pageDidLoad();
 		// await signInEmailPage.enterPasswordAndClickContinue('111111');
-		await C450501NavigateToPage(episodeId)
+		await C450501NavigateToPage(titleId)
 		await C450501NavigateToPageLoginPage(episodeId)
-		await C450501NavigateToPageDestLoginPage(episodeId)
 		// await ecp.sendKeypress(ecp.Key.Back);
 		// const settings = await homePage.selectSideNavTab(tabs.settings);
 		// await settings.signOut();
