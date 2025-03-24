@@ -2540,6 +2540,14 @@ Function getTranslation_es_MX()
       "description": "text after number of search results for searchedString",
       "message": "títulos coinciden"
     },
+    "screenSearch_matchingTitles_plural": {
+      "description": "text after number of search results for searchedString (plural versions)",
+      "message": "{matches} títulos encontrados"
+    },
+    "screenSearch_matchingTitles_singular": {
+      "description": "text after number of search results for searchedString (singular versions)",
+      "message": "1 título encontrado"
+    },
     "screenSearch_liveText": {
       "description": "The label on the search results poster next to the live streaming icon",
       "message": "En Vivo"
@@ -2694,7 +2702,7 @@ Function getTranslation_es_MX()
     },
     "screenSettings_menu_autoplayControls": {
       "description": "The Label for the autoplay controls to turn video preview and autoplay of the next video on or off.",
-      "message": "Controles de Auto-Reproducir"
+      "message": "Auto-Reproducir"
     },
     "screenSettings_menu_autoplayNextVideo": {
       "description": "The label for the autoplay next video",
@@ -2991,10 +2999,6 @@ Function getTranslation_es_MX()
     "screenDetails_button_episodes": {
       "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
       "message": "Todos Los Capítulos"
-    },
-    "screenDetails_button_episodes_more": {
-      "description": "Label displayed over episodes list + YMAL on the details Screen.",
-      "message": "Capítulos Y Más"
     },
     "screenDetails_relatedTitles": {
       "description": "Label of button to allow users to view other video titles related to the current video title",
@@ -3450,9 +3454,9 @@ Function getTranslation_es_MX()
       "description": "The button on the forgot password screen that corresponds to the action 'Use Different Email",
       "message": "Usa correo electrónico diferente"
     },
-    "search_hint": {
-      "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed immediately after the last word of this translation and the icon will be considered part of the sentence.",
-      "message": "Para habilitar el control de voz, oprime y mantén"
+    "search_suggestions": {
+      "description": "The heading of the autocomplete search suggestions",
+      "message": "Sugerencias de Búsqueda"
     },
     "search_voice_hint": {
       "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed at the beginning of the sentence.",
@@ -3850,10 +3854,6 @@ Function getTranslation_es_MX()
       "description": "date label used in air date countdown timer",
       "message": "HOY A LAS {time}"
     },
-    "live_on_day": {
-      "description": "day label used in air date countdown timer",
-      "message": "{day} D"
-    },
     "cc_audio_overlay_subtitles_mode": {
       "description": "Available modes displayed on closed caption overlay",
       "message": "Modo Subtítulos"
@@ -3957,6 +3957,22 @@ Function getTranslation_es_MX()
     "havent_received_email": {
       "description": "Message displayed in sign in screen during major event day",
       "message": "¿No has recibido un correo? Aún puedes continuar como Invitado."
+    },
+    "ad_countdown_text": {
+      "description": "Message displayed in ad countdown overlay",
+      "message": "Ad {0} de {1}"
+    },
+    "ad_countdown_title_resume_in": {
+      "description": "Message displayed in ad countdown overlay",
+      "message": "Ad {0} de {1}. Su título se reanudará en"
+    },
+    "ad_countdown_current_ad_ends_in": {
+      "description": "Message displayed in ad countdown overlay",
+      "message": "Ad {0} de {1}. Este ad terminará en"
+    },
+    "videoPlayer_adBreakStartsIn": {
+      "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "Pausa publicitaria en"
     }
   }
 End Function
@@ -4359,6 +4375,14 @@ Function getTranslation_fr_CA()
     "screenSearch_matchingTitles": {
       "description": "text after number of search results for searchedString",
       "message": "titres correspondants"
+    },
+    "screenSearch_matchingTitles_plural": {
+      "description": "text after number of search results for searchedString (plural versions)",
+      "message": "{matches} titres trouvés"
+    },
+    "screenSearch_matchingTitles_singular": {
+      "description": "text after number of search results for searchedString (singular versions)",
+      "message": "1 titre trouvé"
     },
     "screenSearch_liveText": {
       "description": "The label on the search results poster next to the live streaming icon",
@@ -4811,10 +4835,6 @@ Function getTranslation_fr_CA()
     "screenDetails_button_episodes": {
       "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
       "message": "Tous les épisodes"
-    },
-    "screenDetails_button_episodes_more": {
-      "description": "Label displayed over episodes list + YMAL on the details Screen.",
-      "message": "Épisodes et plus"
     },
     "screenDetails_relatedTitles": {
       "description": "Label of button to allow users to view other video titles related to the current video title",
@@ -5270,9 +5290,9 @@ Function getTranslation_fr_CA()
       "description": "The button on the forgot password screen that corresponds to the action 'Use Different Email",
       "message": "Utiliser un courriel différent"
     },
-    "search_hint": {
-      "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed immediately after the last word of this translation and the icon will be considered part of the sentence.",
-      "message": "Pour utiliser votre télécommande vocale, appuyez et maintenez"
+    "search_suggestions": {
+      "description": "The heading of the autocomplete search suggestions",
+      "message": "Suggestions de Recherche"
     },
     "search_voice_hint": {
       "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed at the beginning of the sentence.",
@@ -5666,10 +5686,6 @@ Function getTranslation_fr_CA()
       "description": "date label used in air date countdown timer",
       "message": "AUJOURD'HUI À {time}"
     },
-    "live_on_day": {
-      "description": "day label used in air date countdown timer",
-      "message": "{day} D"
-    },
     "cc_audio_overlay_subtitles_mode": {
       "description": "Available modes displayed on closed caption overlay",
       "message": "Mode Sous-Titres"
@@ -5773,6 +5789,22 @@ Function getTranslation_fr_CA()
     "havent_received_email": {
       "description": "Message displayed in sign in screen during major event day",
       "message": "Vous n'avez pas reçu d'e-mail? Vous pouvez toujours continuer en tant qu'invité."
+    },
+    "ad_countdown_text": {
+      "description": "Message displayed in ad countdown overlay",
+      "message": "Ad {0} du {1}"
+    },
+    "ad_countdown_title_resume_in": {
+      "description": "Message displayed in ad countdown overlay",
+      "message": "Ad {0} du {1}. Votre titre reprendra dans"
+    },
+    "ad_countdown_current_ad_ends_in": {
+      "description": "Message displayed in ad countdown overlay",
+      "message": "Ad {0} du {1}. Cette ad se terminera dan"
+    },
+    "videoPlayer_adBreakStartsIn": {
+      "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "Pause pub dans"
     }
   }
 End Function
@@ -5884,6 +5916,22 @@ Function getTranslation_en_GB()
     "sign_up_error_screen__purple_carpet_day_subheading": {
       "description": "Sign in error screen heading default error",
       "message": "You can still watch your favourite movies and TV shows as a guest, including {major_event_name}!\nWe'll send you an email to try again later."
+    },
+    "ad_countdown_text": {
+      "description": "Message displayed in ad countdown overlay",
+      "message": "Advert {0} of {1}"
+    },
+    "ad_countdown_title_resume_in": {
+      "description": "Message displayed in ad countdown overlay",
+      "message": "Advert {0} of {1}. Your title will resume in"
+    },
+    "ad_countdown_current_ad_ends_in": {
+      "description": "Message displayed in ad countdown overlay",
+      "message": "Advert {0} of {1}. This ad will end in"
+    },
+    "videoPlayer_adBreakStartsIn": {
+      "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "Adverts start in"
     }
   }
 End Function
