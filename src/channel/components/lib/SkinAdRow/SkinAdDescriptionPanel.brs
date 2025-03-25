@@ -172,17 +172,17 @@ End Function
 
 
 Function onTitleImageLoadStatusChange(msg)
-  bresizeBgroundAndArrangeUI = false
+  bResizeBgroundAndArrangeUI = false
   if (msg.getData() = "failed")
     tubiLog("SkinAdDescriptionPanel onTitleImageLoadStatusChange(), title image failed to load")
         
     setTitleImage("")   '//attempt to display text-only version, if available
-    bresizeBgroundAndArrangeUI = true
+    bResizeBgroundAndArrangeUI = true
   else if (msg.getData() = "ready")
-    bresizeBgroundAndArrangeUI = true
+    bResizeBgroundAndArrangeUI = true
   end if
 
-  if bresizeBgroundAndArrangeUI = true
+  if bResizeBgroundAndArrangeUI = true
     '//after a successful or failed attempt to load the title image, arrange everything so labels are properly spaced/oriented and the background is the proper size.
     resizeBgroundAndArrangeUI()
   end if
