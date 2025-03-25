@@ -401,7 +401,8 @@ End Function
 ' @bKidsMode: boolean, Are we in kids mode (and parental controls is not set to kids)?
 ' @sAutoCompleteSessionID: string, If this is a search requesting stemming from an autocomplete suggestion, then 
 '       send the personalization_id that was sent back from the autocomplete request
-Function cmsApi_createSearchReqInfo(searchText, bKidsMode = false, sAutoCompleteSessionID = invalid)
+' @includeLinear: boolean, should linear content be included in the search results
+Function cmsApi_createSearchReqInfo(searchText, bKidsMode = false, sAutoCompleteSessionID = invalid, includeLinear = true)
   url = m.constants.urls.search
   options = m.getCommonOptions()
   options.params["search"] = searchText
@@ -418,7 +419,7 @@ Function cmsApi_createSearchReqInfo(searchText, bKidsMode = false, sAutoComplete
   options.params["limit_resolutions"] = m.constants.player.limitResolutions
   options.params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
 
-  if bKidsMode = false
+  if includeLinear = true
     'setting the include_linear param to true will enable the linear content available for search screen from backend
     options.params["include_linear"] = true
   end if

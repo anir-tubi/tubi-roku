@@ -118,8 +118,8 @@ Function searchFromScreen(searchText, personalizationID = invalid)
   kidsMode = shouldKidsModeBeSentToServer()
 
   if bSearchNonDefaultResults = true
-
-    searchReqInfo = m.CmsApi.createSearchReqInfo(searchText, kidsMode, personalizationID)
+    includeLinear = isUserInAdultsMode() = true AND isKidsUIOn() = false
+    searchReqInfo = m.CmsApi.createSearchReqInfo(searchText, kidsMode, personalizationID, includeLinear)
     m.currentSearchScreenRequestInfo = m.makeRequest({
       url: searchReqInfo.url
       requestType: m.constants.reqNames.getSearchScreen
