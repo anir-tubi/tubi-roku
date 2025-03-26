@@ -12,7 +12,6 @@
     <field id="landscape" type="string" />
     <field id="portrait" type="string" />
     <field id="genres" type="stringarray" />
-    <field id="rokuGenres" type="stringarray" />
     <field id="hasSubtitles" type="boolean" />
     <field id="hasAudioDescription" type="boolean" />
     <field id="language" type="string" />

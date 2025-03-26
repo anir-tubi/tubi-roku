@@ -320,7 +320,6 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.duration <> invalid then translatedContent.length = contentFromServer.duration
   if contentFromServer.title <> invalid then translatedContent.title = contentFromServer.title
   if contentFromServer.actors <> invalid then translatedContent.actors = contentFromServer.actors 'array of actors
-  if contentFromServer.roku_genres <> invalid then translatedContent.rokuGenres = contentFromServer.roku_genres 'array of roku genres
   if contentFromServer.tags <> invalid then
     translatedContent.genres = contentFromServer.tags 'array of genres
     translatedContent.categories = contentFromServer.tags 'array of genres
@@ -838,7 +837,7 @@ Function tubiMetadataTranslate_translateAds(ads = []) As Object
     if isNonEmptyArray(creatives) = true
 
       for each creative in creatives
-        
+
         if isAA(creative) = true AND creative.type = "native_custom_video"
           isNativeCustomVideoPresent = true
 
@@ -894,7 +893,7 @@ Function tubiMetadataTranslate_translateAds(ads = []) As Object
       end for
       exit for 'for now we are limiting by 1 as we expect only one Ad trailer
 
-    end if  
+    end if
   end for
 
   return skinAdContent

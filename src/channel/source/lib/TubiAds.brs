@@ -14,8 +14,11 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
   'set the Nielsen application id for Tubi TV
   roAdFramework.setNielsenAppId(constants.thirdParty.nielsen.rafToken)
 
-  'turn on debug output for RAF
+  'turn off debug output for RAF
   roAdFramework.setDebugOutput(false)
+
+  roAdFramework.enableAdMeasurements(true)
+
   #if consoleLoggingEnabled
     if constants.settings.mode = "qa" or constants.settings.mode = "staging"
       roAdFramework.setDebugOutput(true)
@@ -343,7 +346,7 @@ Function tubiAds_createRAFStructure(adInfo)
     adId = adInfo.ad_id
     media = adInfo.media
 
-    streamUrl = "" 
+    streamUrl = ""
     duration = 0
     trackingEvents = {}
 
@@ -463,7 +466,7 @@ Function replaceCachebusterMacro(pixelURL as String)
   sCacheBuster = createCacheBusterString()
   newPixelURL = pixelURL.replace(sStringToReplace, sCacheBuster)
   encodedUrl = ""
-  
+
   if isNonEmptyString(newPixelURL) = true
     encodedUrl = newPixelURL.EncodeUri()
   end if
@@ -596,33 +599,61 @@ End Function
 Function tubiAds_getAdsListViaRoku(episode, breakPos)
   m.allAdUnitsList = []
 
-  nielsenGenres = "" 'nielsenGenres may be set as an array of strings later
-  nielsenProgramId = ""
-
   authInfo = m.auth.getAuthInfo()
 
   ' Storing the breakPos in m scope so that we can use it override the render sequence sent to youbora plugin.
   m.breakPos = breakPos
 
   ' don't pass content information for child directed content if the user is not logged in
-  if episode.isCdc = false or (authInfo <> invalid AND authInfo.userId <> invalid)
-    nielsenGenres = ["GV"] 'default Nielsen genre in case backend didn't associate any with this content
+  if episode.isCdc = false OR (authInfo <> invalid AND authInfo.userId <> invalid)
+    genres = []
+    if isNonEmptyArray(episode.genres) = true then
+      tubiToRokuGenreMap = {
+        "Action": "Action"
+        "Adventure": "Adventure"
+        "Animation": "Animated"
+        "Anime": "Anime"
+        "Biography": "Biography"
+        "Comedy": "Comedy"
+        "Crime": "Crime"
+        "Documentary": "Documentary"
+        "Drama": "Drama"
+        "Entertainment": "Entertainment"
+        "Fantasy": "Fantasy"
+        "Game Show": "Gaming"
+        "History": "History"
+        "Horror": "Horror"
+        "Music": "Music"
+        "Musical": "Musicals"
+        "Mystery": "Mystery"
+        "Science & Nature": "Nature"
+        "Reality": "Reality"
+        "Romance": "Romance"
+        "Sci-Fi": "Science fiction"
+        "News": "News"
+        "Sport": "Sports"
+        "Talk Show": "Talk"
+        "Thriller": "Thriller"
+        "War": "War"
+        "Western": "Western"
+      }
 
-    'set the content genre (as stated in RAF documentation for Nielsen functionality)
-    if episode.rokuGenres <> invalid AND episode.rokuGenres.count() > 0
-      nielsenGenres = episode.rokuGenres
+      for each genre in episode.genres
+        if tubiToRokuGenreMap[genre] <> invalid then
+          genres.push(tubiToRokuGenreMap[genre])
+        end if
+      end for
     end if
 
-    'set the program id/title (as stated in RAF documentation for Nielsen functionality)
-    if episode.parentType = m.constants.ui.contentTypes.series AND episode.parentTitle <> invalid
-      nielsenProgramId = episode.parentTitle
-    else if episode.title <> invalid
-      nielsenProgramId = episode.title
+    isChildDirected = (episode.isCdc = true)
+    m.roAdFramework.setContentGenre(genres.join(","), isChildDirected)
+
+    ' We are not sending setContentId because our contract does not require it.
+
+    if isNumber(episode.length) = true then
+      m.roAdFramework.setContentLength(Int(episode.length))
     end if
   end if
-
-  m.roAdFramework.setNielsenGenre(nielsenGenres)
-  m.roAdFramework.setNielsenProgramId(nielsenProgramId)
 
   'get the url for making the ad call
   rainmakerVastUrl = m.populateUrlRainmaker(episode, breakPos)
@@ -671,7 +702,7 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos)
     'save the total number of ads in the ad break before we (potentially) start breaking them up into different ad unit lists
     m.totalAdBreakAds = currentAdUnitsList[0].ads.count()
 
-    
+
     m.totalAdDurationInCurrentPod = 0
     for each adUnit in currentAdUnitsList[0].ads
 
@@ -754,7 +785,7 @@ Function tubiAds_getAdsListViaTubi(content)
     if currentAdUnitsList[0].duration <> invalid AND currentAdUnitsList[0].duration > 0
         m.commercialDuration = m.commercialDuration + currentAdUnitsList[0].duration
     end if
-    
+
     adUnitsListContainer = {
       type: ""
       adUnitsList: []
@@ -888,7 +919,7 @@ Function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
           if m.controlNode.hasField("displayAdLoadingMessage") = true
             m.controlNode.displayAdLoadingMessage = false
           end if
-          
+
           m.containerNode.visible = false
           m.containerNode = invalid
           m.controlNode = invalid
