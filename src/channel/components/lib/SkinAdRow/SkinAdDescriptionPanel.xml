@@ -12,6 +12,11 @@
     <!-- INPUT -->
     <!-- content should be of type skinAdContentNode -->
     <field id="content" type="node" />
+
+    <!-- OUTPUT -->
+    <!-- READ ONLY - The height of this component. -->
+    <field id="backgroundHeight" type="integer" alias="QRBackground.height"/>
+
   </interface>
 
   <children>
@@ -21,7 +26,6 @@
         id="QRParentGroup">
         <Poster 
           id="QRBackground"
-          height="140"
           uri="pkg:/images/menu-focus-$$RES$$.9.png" />
 
         <LayoutGroup

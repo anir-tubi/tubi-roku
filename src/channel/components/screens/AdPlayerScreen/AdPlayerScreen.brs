@@ -17,7 +17,9 @@ Function init()
   m.Loading = m.top.findNode("Loading")
   m.LoadingProgressBar = m.top.findNode("LoadingProgressBar")
 
+  m.LoadingBackground = m.top.findNode("LoadingBackground")
   m.adDescriptionPanel = m.top.findNode("adDescriptionPanel")
+  m.adDescriptionPanel.observeFieldScoped("backgroundHeight", "onAdDescriptionPanelHeightChange")
 
   m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
   m.top.observeFieldScoped("updateContent", "onContentChange")
@@ -98,6 +100,14 @@ Function onScreenFocusChange()
       end if
     end if
   end if
+End Function
+
+
+'//When the Height of the AdDescriptionPanel changes, then move it to the same number of pixels from the edge of the screen
+Function onAdDescriptionPanelHeightChange()
+  nDistanceFromEdge = 69
+  y = m.LoadingBackground.height - nDistanceFromEdge - m.adDescriptionPanel.backgroundHeight
+  m.adDescriptionPanel.translation = [m.adDescriptionPanel.translation[0], y]
 End Function
 
 

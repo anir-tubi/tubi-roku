@@ -12,6 +12,7 @@ Function init()
   m.QRParentGroup = m.top.findNode("QRParentGroup")
   m.QRContentParentGroup = m.top.findNode("QRContentParentGroup")
   m.QRBackground = m.top.findNode("QRBackground")
+  m.QRBackground.height = 140
   m.QRBackgroundSpacing = m.top.findNode("QRBackgroundSpacing")
   m.descriptionTextGroup = m.top.findNode("DescriptionTextGroup")
 

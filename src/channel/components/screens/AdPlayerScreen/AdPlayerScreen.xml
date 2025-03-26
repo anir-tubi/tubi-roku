@@ -75,7 +75,7 @@
     <SkinAdDescriptionPanel
       id="adDescriptionPanel"
       opacity="0"
-      translation="[72, 800]"/>
+      translation="[72, 878]"/>
 
     <TubiAdsTask
       id="TubiAdsTask" />
