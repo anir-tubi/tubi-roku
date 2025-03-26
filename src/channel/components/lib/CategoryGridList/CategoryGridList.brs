@@ -21,7 +21,7 @@ Function init()
   m.eagerLoad = m.constants.performance.categoryGridList.eagerLoad
 
   ' If eager loading, we don't need to listen for row changes
-  if not m.eagerLoad
+  if not m.eagerLoad OR getExperimentResource("roku_home_screen_lazy_load", "roku_home_screen_lazy_load_v1", true).enabled = true
     m.RowList.observeFieldScoped("itemFocused", "onItemFocused")
   end if
 
@@ -529,7 +529,9 @@ Function onCategoryResponseInBatch(msg) As Void
     end for
 
     if m.eagerLoad then
-      m.top.loadCategoriesIndex = batchMaxIndex + 1
+      if getExperimentResource("roku_home_screen_lazy_load", "roku_home_screen_lazy_load_v1", false).enabled = false
+        m.top.loadCategoriesIndex = batchMaxIndex + 1
+      end if
     end if
 
     if m.top.content <> invalid

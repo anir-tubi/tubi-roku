@@ -107,6 +107,14 @@ Function TubiExperiments(experimentsInfo) as Object
         }
       }
 
+      'This experiment will not be under holdout and will clean up once we take the decision.
+      roku_home_screen_lazy_load: {
+        roku_home_screen_lazy_load_v1: {
+          default: {"enabled": false}
+          holdout_control: {"enabled": false}
+          holdout_winning: {"enabled": false}}
+      }
+
     }
 
     'public methods
