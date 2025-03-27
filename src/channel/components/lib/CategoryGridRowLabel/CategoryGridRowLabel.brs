@@ -30,6 +30,8 @@ Function init()
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
   onThemeChange()
+
+  m.isLazyLoadExpInfo = getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v1", false)
 End Function
 
 
@@ -130,7 +132,7 @@ Function onContentChange()
 
     drawItemCount()
 
-    if (item.gridItemType = "linear" OR item.gridItemType = "continue_watching_signed_out_user" OR item.gridItemType = "emptyContainer") = false
+    if (item.gridItemType = "linear" OR item.gridItemType = "continue_watching_signed_out_user" OR item.gridItemType = "emptyContainer" OR (m.isLazyLoadExpInfo.enabled = true AND m.isLazyLoadExpInfo.hide_counter = true)) = false
       m.CategoryCount.visible = true
     else
       m.CategoryCount.visible = false
@@ -141,12 +143,18 @@ End Function
 
 
 Function drawItemCount()
-  cursorIndex = m.top.content.focusIndex
+  category = m.top.content
+  cursorIndex = category.focusIndex
   if cursorIndex = invalid or cursorIndex = -1 then
     cursorIndex = 0
   end if
-  if m.top.content.getChildCount() > 0
-    m.ItemCount.text = " " + Chr(&hb7) + " " + stri(m.top.content.getChildCount()).trim()
+  totalItems = category.getChildCount()
+  if totalItems > 0
+    if m.isLazyLoadExpInfo.enabled = true AND m.isLazyLoadExpInfo.hide_counter = false AND category.paginationInfo <> invalid AND category.paginationInfo.hasMoreContent = true
+      m.ItemCount.text = " " + Chr(&hb7) + " " + stri(totalItems).trim() + "+"
+    else
+      m.ItemCount.text = " " + Chr(&hb7) + " " + stri(totalItems).trim()
+    end if
     m.FocusIndex.text = stri(cursorIndex + 1).trim()
   else
     ' It's odd to see '0 of 0' so we hide the counter

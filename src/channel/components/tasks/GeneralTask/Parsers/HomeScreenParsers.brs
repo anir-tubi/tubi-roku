@@ -78,6 +78,13 @@ Function parseCategoryContentSuccess(fullResponse, reqInfo)
 
   end if
 
+  ' Noticed a small bug in tensor response that sometimes cursor is not returned from backend using our request information.
+  if parsedResponse <> invalid AND parsedResponse.container <> invalid AND parsedResponse.container.cursor = invalid
+    if reqInfo <> invalid AND reqInfo.options <> invalid AND reqInfo.options.params <> invalid AND reqInfo.options.params.cursor <> invalid AND reqInfo.options.params.contents_limit <> invalid
+      parsedResponse.container.cursor = reqInfo.options.params.cursor + reqInfo.options.params.contents_limit
+    end if
+  end if
+
   convertedMetadata = m.metadataTranslate.translateContainer(parsedResponse, fullJson, orientation, bFullData, contentMode, screenId, isSignedInUser, isKidsMode, uiMode)
   return convertedMetadata  'may return an empty container
 End Function

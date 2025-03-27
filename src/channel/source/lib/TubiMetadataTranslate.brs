@@ -1189,6 +1189,18 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
     ' buildCategoryAA always returns AA.state = "partial",
     ' but any single category request should be considered fully loaded
     categoryMetadata.state = "loaded"
+    totalItems = container.children.Count()
+    
+    cursor = 0
+    if container.cursor <> invalid
+      cursor = container.cursor
+    end if
+    ' Checking if the next page start position is more than or equal to max items to be displayed which is defined by m.constants.performance.categoryGridList.finalBlockSize
+    hasMoreContent = totalItems >= m.constants.performance.categoryGridList.lazyLoadItemsPerBatch AND cursor < m.constants.performance.categoryGridList.finalBlockSize
+    categoryMetadata.paginationInfo = {
+      "cursor": container.cursor
+      "hasMoreContent": hasMoreContent
+    }
     translated.update(categoryMetadata, true)
     nodeCount = 1 + translated.getChildCount()
   end if

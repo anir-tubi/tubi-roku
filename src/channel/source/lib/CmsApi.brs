@@ -22,6 +22,7 @@ Function CmsApi(constants, apiUtils, experiments=invalid)
     createHomeScreenBatchReqInfo: cmsApi_createHomeScreenBatchReqInfo
     createMyStuffScreenBatchReqInfo: cmsApi_createMyStuffScreenBatchReqInfo
     createHomeScreenBatchReqInfoForContainers: cmsApi_createHomeScreenBatchReqInfoForContainers
+    createGetCategoryContentsReqInfo: cmsApi_createGetCategoryContentsReqInfo
 
     ' private
     setImageParams: cmsApi_setImageParams
@@ -30,7 +31,6 @@ Function CmsApi(constants, apiUtils, experiments=invalid)
     setTupianBackgroundParam: cmsApi_setTupianBackgroundParam
     getWindowInfo: cmsApi_getWindowInfo
     getFullCategoryId: cmsApi_getFullCategoryId
-    createPrivateCategoryReqInfo: cmsApi_createPrivateCategoryReqInfo
   }
 
   cmsApi = {}
@@ -332,16 +332,26 @@ End Function
 ' @imageParamTypes: Array, What image types/sizes should be requested from the backend. If none are passed, then a default set of types will be used.
 ' @screenId: String, id of the screen to which is requesting to get large poster sizes from Tupian.
 ' @containerGridItemType: String, gridItemType of the container for which we are making the request.
-Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptions = {}, imageParamTypes = invalid, screenId = "", containerGridItemType = invalid)
+' @cursor: Integer, cursor value for lazy loading
+Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptions = {}, imageParamTypes = invalid, screenId = "", containerGridItemType = invalid, cursor = 0)
+  isLazyLoadExpEnabled = (m.experiments <> invalid AND m.experiments.getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v1").enabled = true)
   options = m.getCommonOptions(true)
   params = options.params
   url = m.constants.urls.tensor.cdn.container + "/" + categoryId
 
   params["is_kids_mode"] = bKidsMode
   params["include_channels"] = true
-  params["cursor"] = 0
+  if isLazyLoadExpEnabled = true
+    params["cursor"] = cursor
+  else
+    params["cursor"] = 0
+  end if
   params["include_sponsorships"] = true
-  params["contents_limit"] = m.constants.performance.categoryGridList.finalBlockSize
+  if screenId = m.constants.ui.screenIds.homeScreen AND isLazyLoadExpEnabled = true
+    params["contents_limit"] = m.constants.performance.categoryGridList.lazyLoadItemsPerBatch
+  else
+    params["contents_limit"] = m.constants.performance.categoryGridList.finalBlockSize
+  end if
   params["content_mode"] = ""
   params["limit_resolutions"] = m.constants.player.limitResolutions
   params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
@@ -547,7 +557,7 @@ Function cmsApi_createHomeScreenBatchReqInfo(homeScreen, index, bKidsMode = fals
     for i = windowInfo.start to (windowInfo.start + windowInfo.size)-1
       category = homeScreen.content.getChild(i)
       if category <> invalid
-        categoryReqInfo = m.createPrivateCategoryReqInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode)
+        categoryReqInfo = m.createGetCategoryContentsReqInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode)
 
         if categoryReqInfo <> invalid then
           requests.push(categoryReqInfo)
@@ -725,9 +735,11 @@ Function cmsApi_createHomeScreenBatchReqInfoForContainers(containerIds, contentM
 End Function
 
 
-Function cmsApi_createPrivateCategoryReqInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode)
+Function cmsApi_createGetCategoryContentsReqInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode)
   categoryReqInfo = invalid
-  if category.state = "partial" or category.state = "none"
+  paginationInfo = category.paginationInfo
+  isLazyLoadExpEnabled = (m.experiments <> invalid AND m.experiments.getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v1").enabled = true)
+  if category.state = "partial" OR category.state = "none" OR (isLazyLoadExpEnabled = true AND paginationInfo <> invalid AND paginationInfo.hasMoreContent = true)
     reqName = m.constants.reqNames.getCategory
 
     categoryId = m.getFullCategoryId(category)
@@ -750,8 +762,11 @@ Function cmsApi_createPrivateCategoryReqInfo(category, homeScreen, bKidsMode, is
       }
 
       imageTypes = invalid
-
-      categoryReqInfo = m.createCategoryReqInfo(categoryId, bKidsMode, options, imageTypes, m.constants.ui.screenIds.homeScreen, category.gridItemType)
+      cursor = 0
+      if paginationInfo <> invalid AND paginationInfo.cursor <> invalid AND isLazyLoadExpEnabled = true
+        cursor = paginationInfo.cursor
+      end if
+      categoryReqInfo = m.createCategoryReqInfo(categoryId, bKidsMode, options, imageTypes, m.constants.ui.screenIds.homeScreen, category.gridItemType, cursor)
       categoryReqInfo.requestType = reqName
       categoryReqInfo.responseType = "node"
       categoryReqInfo.isSignedInUser = isSignedInUser

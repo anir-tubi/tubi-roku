@@ -412,6 +412,8 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
 
     onHomeScreenContentUpdateComplete(homeScreen.id)
 
+    getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v1", true)
+
   end if
 End Function
 
@@ -584,12 +586,64 @@ Function onHomeScreenContentFocused(msg)
 End Function
 
 
-'//when a new column of the rowlist begins to gain partial focus during a horizontal scroll, then do something
-Function onColumnFocusChanged()
+'//when a new column of the row list begins to gain partial focus during a horizontal scroll, then do something
+Function onColumnFocusChanged(msg)
   tubiLog("HomeScreenHelpers.onColumnFocusChanged")
   if isLinearPlayerLoadingOrPlaying() = true
-    '//as the rowlist is scrolling, if the the linear video player is playing or loading, then make sure the linear video player has stopped
+    ' as the row list is scrolling, if the the linear video player is playing or loading, then make sure the linear video player is stopped.
     stopAndHideLinearVideoPlayer()
+  end if
+
+  columnFocused = msg.getData()
+  homeScreen = msg.getRoSGNode()
+  rowFocused = homeScreen.currFocusRow
+
+  if isNumber(rowFocused) = true AND homeScreen.content <> invalid
+    category = homeScreen.content.getChild(rowFocused)
+    
+    if isNode(category) = true AND category.paginationInfo <> invalid
+      cursor = category.paginationInfo.cursor
+      hasMoreContent = category.paginationInfo.hasMoreContent
+      if hasMoreContent = true AND cursor = columnFocused + 10
+        isKidsMode = shouldKidsModeBeSentToServer()
+        isSignedInUser = isLoggedInUser()
+        categoryReqInfo = m.cmsApi.createGetCategoryContentsReqInfo(category, homeScreen, isKidsMode, isSignedInUser, m.uiMode)
+        if categoryReqInfo <> invalid
+          m.makeRequest({
+            url: categoryReqInfo.url
+            requestType: categoryReqInfo.requestType
+            options: categoryReqInfo.options
+            successCallback: onContainerMoreItemsSuccess
+            silenceCallbackWarnings: true
+            responseType: "node"
+            isSignedInUser: isLoggedInUser()
+            uiMode: m.uiMode
+          })
+        end if
+      end if
+    end if
+  end if
+End Function
+
+
+Function onContainerMoreItemsSuccess(response)
+  homeScreen = getCurrentScreen()
+  rowFocused = homeScreen.currFocusRow
+  category = homeScreen.content.getChild(rowFocused)
+
+  if homeScreen <> invalid AND homeScreen.content <> invalid AND isNode(response) = true
+    category = m.NodeHelpers.getChildById(homeScreen.content, response.id)
+    items = response.getChildren(-1, 0)
+    if isNonEmptyArray(items) = true
+      fullJson = ParseJson(category.json)
+      newJson = ParseJson(response.json)
+      if fullJson <> invalid AND newJson <> invalid
+        fullJson.append(newJson)
+        category.paginationInfo = response.paginationInfo
+        category.json = FormatJson(fullJson)
+        category.appendChildren(items)
+      end if
+    end if
   end if
 End Function
 
