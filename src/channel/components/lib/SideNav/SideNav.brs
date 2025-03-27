@@ -121,10 +121,9 @@ Function onCreateMenuItems()
   menuItems.push(m.constants.ui.sideNavIds.categories)
   menuItems.push(m.constants.ui.sideNavIds.myList)
 
-  bInMoviesSeriesExperimentUK = ((sCountryCode = "GB" OR sCountryCode = "UK") AND getExperimentResource("roku_add_movies_series", "roku_add_movies_series_uk_v1").enabled = true)
-  bInMoviesSeriesExperimentMX = (sCountryCode = "MX" AND getExperimentResource("roku_add_movies_series", "roku_add_movies_series_mx_v1").enabled = true) 
+  bInMoviesSeriesExperimentUK = ((sCountryCode = "GB" OR sCountryCode = "UK") AND getExperimentResource("roku_add_movies_series", "roku_add_movies_series_uk_v2").enabled = true)
 
-  if (sCountryCode = "US" OR sCountryCode = "CA" OR bInMoviesSeriesExperimentUK = true OR bInMoviesSeriesExperimentMX = true)
+  if (sCountryCode = "US" OR sCountryCode = "CA" OR sCountryCode = "MX" OR bInMoviesSeriesExperimentUK = true)
     menuItems.push(m.constants.ui.sideNavIds.movies)
     menuItems.push(m.constants.ui.sideNavIds.tv)
   end if

@@ -30,14 +30,8 @@ Function TubiExperiments(experimentsInfo) as Object
       }
 
       roku_add_movies_series: {
-        roku_add_movies_series_uk_v1 : {
+        roku_add_movies_series_uk_v2 : {
           default: {"enabled": false}
-          holdout_control: {"enabled": false}
-          holdout_winning: {"enabled": false}
-        }
-
-        roku_add_movies_series_mx_v1 : {
-          default: {"enabled": true}
           holdout_control: {"enabled": false}
           holdout_winning: {"enabled": false}
         }
