@@ -32,7 +32,7 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0)
   m.settingsScreen.observeFieldScoped("didUserSelectManagePrivacySettingsButton", "onDidUserSelectManagePrivacySettingsButton")
   m.settingsScreen.observeFieldScoped("selectedConsent", "onSelectedConsentChange")
   m.settingsScreen.observeFieldScoped("selectedQrCodeSectionInfo", "onSelectedQrCodeSectionInfoChanged")
-  if m.constants.settings.mode = "qa" OR  m.constants.settings.mode = "dev" 'this is for extra protection not to restart the app
+  if m.constants.settings.mode = "qa" OR  m.constants.settings.mode = "dev" OR m.constants.settings.mode = "staging"  'this is for extra protection not to restart the app
     m.settingsScreen.observeFieldScoped("appRestartRequested", "onAppRestartRequested")
   end if
 

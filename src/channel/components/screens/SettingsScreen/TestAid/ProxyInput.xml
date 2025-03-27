@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<component name="ProxyInput" extends="Group" >
+
+  <script type="text/brightscript" uri="ProxyInput.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+
+  <interface>
+    <field id="proxyAddress" type="string"/>
+    <field id="removeProxy" type="boolean" alias="removeProxyBt.selected"/>
+  </interface>
+
+  <children>
+    <Group
+      id="ipAddressGroup"
+      translation="[700,150]">
+
+      <DynamicCustomKeyboard
+        id="proxyKB"
+        translation="[0, 20]"/>
+      <SimpleButton
+        translation="[0,520]"
+        id="addProxyBt"
+        text="Add Proxy"
+        width="200"/>
+      <SimpleButton
+        translation="[270,520]"
+        id="removeProxyBt"
+        text="Remove Proxy"
+        width="200"/>
+    </Group>
+  </children>
+</component>

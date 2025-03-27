@@ -64,6 +64,9 @@
             <CheckButtonContentNode
               id="overlay"
               title="Show/Hide Grid Overlay"/>
+            <CheckButtonContentNode
+              id="addProxy"
+              title="Add/Remove Proxy"/>
           </ContentNode>
         </MarkupList>
 

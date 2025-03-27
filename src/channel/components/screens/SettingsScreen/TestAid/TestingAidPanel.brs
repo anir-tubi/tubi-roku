@@ -45,6 +45,7 @@ End Function
 
 Function onItemFocused(msg)
   buttonFocused = msg.getData()
+
   if buttonFocused = 0
     m.infoArea.text = "Current Registry values are printed by each section. Press OK to see full registry."
   else if buttonFocused = 1
@@ -56,7 +57,86 @@ Function onItemFocused(msg)
     m.infoArea.text = "It will overlay all the screens with safe zone guidelines."
   else if buttonFocused = 4
     m.infoArea.text = "It will overlay a Grid of 10 px over all of the screens. If you want better control, use devOverlay.brs"
+  else if buttonFocused = 5
+    proxyInfo = "It will add/remove a proxy to the app and restart the app."
+
+    if m.constants.settings.charlesProxyEnabled = true
+      m.infoArea.text = proxyInfo + chr(10) + "Current Proxy: " + m.constants.settings.charlesProxyUrl
+    else
+      m.infoArea.text =  proxyInfo + chr(10) + "Current Proxy: None"
+    end if
   end if
+
+  displayProxyKB(buttonFocused = 5)
+End Function
+
+
+Function displayProxyKB(show = false)
+  if show = true
+
+    if m.proxyinputDialog = invalid
+      m.proxyinputDialog = createObject("roSGNode", "ProxyInput")
+      m.proxyinputDialog.observeFieldScoped("proxyAddress", "addProxy")
+      m.proxyinputDialog.observeFieldScoped("removeProxy", "removeProxy")
+      m.top.appendChild(m.proxyinputDialog)
+    end if
+
+    m.proxyinputDialog.visible = true
+  else
+    if m.proxyinputDialog <> invalid
+      m.proxyinputDialog.visible = false
+    end if
+  end if
+End Function
+
+
+Function removeProxy(msg)
+  if msg.getData() = true
+
+    registry = CreateObject("roRegistry")
+    sections = registry.GetSectionList()
+
+    for each sectionName in sections
+      if sectionName = m.constants.registrySectionIDs.proxySettings
+        registry.Delete(sectionName)
+        registry.Flush()
+        print sectionName + " is Deleted "
+        exit for
+      end if
+    end for
+
+    'after registry been deleted restart the app.
+    m.top.appRestartRequested = true
+  end if
+End Function
+
+
+Function addProxy(msg)
+  ipAddress = msg.getData()
+
+  registrySection = CreateObject("roRegistrySection", m.constants.registrySectionIDs.proxySettings) ' Create a registry section object
+  registrySection.write("charlesProxyEnabled", "true")
+  registrySection.write("charlesProxyUrl", "http://" + ipAddress + ":8888")
+  registrySection.flush()
+
+  'after registry been updated restart the app.
+  m.top.appRestartRequested = true
+End Function
+
+
+Function onKeyEvent(key as String, press as Boolean) as boolean
+  handled = false
+  if press = true
+    if key = "left" AND m.proxyinputDialog <> invalid AND m.proxyinputDialog.isInFocusChain() = true
+      m.Menu.setfocus(true)
+      handled = true
+    else if key = "right" AND m.Menu.hasFocus() = true AND m.proxyinputDialog <> invalid
+      m.proxyinputDialog.setFocus(true)
+      handled = true
+    end if
+  end if
+  return handled
+
 
 End Function
 
@@ -106,7 +186,12 @@ Function onTestingAidPanelItemSelected(msg)
       item.title = "Show Grid Overlay"
       hideDevOverlay(overlay)
     end if
-
+  else if item.id = "addProxy"
+    if m.proxyinputDialog <> invalid
+      m.proxyinputDialog.setFocus(true)
+    else
+      displayProxyKB(true)
+    end if
 
   end if
 
