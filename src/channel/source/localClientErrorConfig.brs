@@ -141,6 +141,13 @@ Function getLocalClientErrorConfig()
               "retry_strategy": "no_retry"
             }
           }
+        },
+        "/user/settings": {
+          "status_codes": {
+            "409": {
+              "retry_strategy": "no_retry"
+            }
+          }
         }
       }
     },
