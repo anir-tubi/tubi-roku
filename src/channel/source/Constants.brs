@@ -1695,7 +1695,7 @@ Function getConstants()
         constants.performance.categoryGridList.eagerLoad = true
       end if
 
-      constants.performance.categoryGridList.lazyLoadItemsPerBatch = 50
+      constants.performance.categoryGridList.lazyLoadItemsPerBatch = 30
 
       constants.deeplinks = {}
       constants.deeplinks["homescreen"] = "homescreen"
