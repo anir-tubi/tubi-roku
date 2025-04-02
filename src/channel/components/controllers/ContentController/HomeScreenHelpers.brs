@@ -325,7 +325,13 @@ Function fetchHomeScreen(homeScreen)
       params["group_size"] = m.constants.settings.numContainers
     end if
 
-    params[limitParamName] = m.constants.performance.categoryGridList.initialBlockSize
+    initialBlockSize = m.constants.performance.categoryGridList.initialBlockSize
+
+    if initialBlockSize > 0 AND getExperimentResource("roku_home_screen_reduce_contents_limit", "roku_home_screen_reduce_contents_limit_v1", true).enabled = true
+      initialBlockSize = 7
+    end if
+
+    params[limitParamName] = initialBlockSize
 
     options.params = params
     options.headers = headers
