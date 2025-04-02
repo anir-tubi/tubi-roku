@@ -252,6 +252,8 @@ Function tubiAds_getRainmakerParams(content, breakPos = 0)
     app_mode: m.appMode
     client_version: m.constants.deviceInfo.clientVersion
     nsid: m.getNielsenSessionId(m.constants)
+    os: m.constants.deviceInfo.operatingSystem
+    os_version: m.constants.deviceInfo.firmwareVersion
 
     ' the debug parameter must be set to 1 in order to use the following "limit" parameters for testing
     ' limit_to_campaign_id: 0   'only allow ads with that particular campaign id through the pre-qual filters

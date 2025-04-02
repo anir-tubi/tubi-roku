@@ -336,7 +336,7 @@ Function tubiTracking_getAnalyticsDevice(eventValues = invalid)
     device_id: m.constants.deviceInfo.deviceId
     manufacturer: m.constants.deviceInfo.vendorName
     model: m.constants.deviceInfo.model
-    os: "Roku OS"
+    os: m.constants.deviceInfo.operatingSystem
     os_version: m.constants.deviceInfo.firmwareVersion
     user_agent: m.constants.deviceInfo.userAgent
     is_mobile: false
@@ -1020,7 +1020,7 @@ Function tubiTracking_getOneOfs()
   }
 
   search_suggestions_component = {
-    search_suggestion: "" 
+    search_suggestion: ""
   }
 
   ' splash_page = {}   'not currently used
@@ -1389,7 +1389,7 @@ Function tubiTracking_trackPlayerEvent(trackData, requestQueue)
   if playerTrackingReqInfo <> invalid AND requestQueue <> invalid
     requestQueue.pushRequest(playerTrackingReqInfo)
   end if
-End Function  
+End Function
 
 
 '@trackData: assocArray, object returned from m.getPlayerAnalyticsEvent()
@@ -1403,7 +1403,7 @@ Function tubiTracking_createPlayerTrackingReqInfo(trackData)
   if isNonEmptyString(trackData.event_name) = true
     eventType = trackData.event_name
   end if
-  
+
   requestUrl = m.constants.urls.analyticsV3.sendEvent
   playerTrackingReqInfo = m.request.createAsync(requestUrl, eventType, options)
 
@@ -1417,7 +1417,7 @@ Function tubiTracking_getPlayerAnalyticsEvent(eventType, eventValues) as Object
   eventValues["device_id"] = m.constants.deviceInfo.deviceId
   eventValues["platform"] = m.constants.analyticsPlatform
   eventValues["log_version"] = m.constants.player.analyticsVersion
-  eventValues["version"] = m.constants.deviceInfo.clientVersion  
+  eventValues["version"] = m.constants.deviceInfo.clientVersion
 
   clientCommon = {
     event_id: m.getAnalyticsEventId()

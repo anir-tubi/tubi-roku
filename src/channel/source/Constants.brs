@@ -217,6 +217,7 @@ Function getConstants()
       constants.deviceInfo.isAdIdTrackingDisabled = di.IsRIDADisabled()
     end if
 
+    constants.deviceInfo.operatingSystem = "Roku OS"
     constants.deviceInfo.firmwareVersion = firmware.major + "." + firmware.minor + "." + firmware.revision + "." + firmware.build
     constants.deviceInfo.userAgent = "Roku/DVP-" + firmware.major + "." + firmware.minor + " (" + firmware.major + "." + firmware.minor + "." + firmware.revision + "." + firmware.build + ")"
     constants.deviceInfo.userAgentModel = "Roku/DVP-" + firmware.major + "." + firmware.minor + " (" + firmware.major + "." + firmware.minor + "." + firmware.revision + "." + firmware.build + ") " + deviceModel
@@ -648,7 +649,7 @@ Function getConstants()
       if mode = "production"
         constants.urls.analyticsV3.sendEvent = "https://analytics-ingestion-v3.main-production-custom.production.k8s.tubi.io/analytics-ingestion/v3/events/send?sendBeacon=true"
       end if
-    
+
     constants.urls.impressionEvents = {}
       constants.urls.impressionEvents.urlBase = "https://user-signals.staging-public.tubi.io/user-signals"
       ' QA analytics proxy server
@@ -992,7 +993,7 @@ Function getConstants()
         constants.player.hdcpVersion.hdcp_v1 = 1
         constants.player.hdcpVersion.hdcp_v2 = 2
         constants.player.hdcpVersion.hdcp_disabled = 3
-      
+
       constants.player.browseContent = {}
         constants.player.browseContent.numContainers = 10
         constants.player.browseContent.numContents = 50
@@ -1181,7 +1182,7 @@ Function getConstants()
       constants.ui.contentTypes.epg = "epg"
       constants.ui.contentTypes.sportsEvent = "sports_event"
       constants.ui.contentTypes.skinAd = "skinAd"
-    
+
     constants.ui.playerTypes = {}
       constants.ui.playerTypes.fox = "fox"
 
