@@ -277,6 +277,11 @@ Function getPreviewProgressEvent(pageInfo, callSource)
       end if
     end if
 
+    previewId = m.Video.content.previewId
+    if isNonEmptyString(m.Video.content.trailerId) = true
+      previewId = m.Video.content.trailerId
+    end if
+
     previewProgressEvent = {
       type: "preview_play_progress"
       values: {
@@ -284,7 +289,7 @@ Function getPreviewProgressEvent(pageInfo, callSource)
         position: currentPosition
         view_time: viewTime
         video_player: "BANNER"
-        preview_id: m.Video.content.previewId
+        preview_id: previewId
         pageOneof: pgInfo
       }
     }
@@ -313,12 +318,17 @@ End Function
 'set hasCompleted to true when user watches the entire video preview, otherwise set it to false.
 Function getFinishPreviewEvent(hasCompleted = false)
 
+  previewId = m.Video.content.previewId
+  if isNonEmptyString(m.Video.content.trailerId) = true
+    previewId = m.Video.content.trailerId
+  end if
+
   finishPreviewEvent = {
     type: "finish_preview"
     values: {
       video_id: m.Video.content.id.toInt()
       end_position: Int(m.playerPosition * 1000) 'ms
-      preview_id: m.Video.content.previewId
+      preview_id: previewId
       pageOneof: m.tubiTrackingInfo.getAnalyticsPage(m.currentPageInfo.pageType, m.currentPageInfo.pageValues)
       has_completed: hasCompleted
     }
