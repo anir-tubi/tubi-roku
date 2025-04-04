@@ -184,8 +184,6 @@ Function init()
     is_buffering: false
   }
 
-  m.adCount = 0
-
   ' Map to store the history whether cuePoints button were shown or not.
   ' skip button for each cuepoint should only be shown once per video
   m.cuePointsHistory = {}
@@ -805,6 +803,53 @@ Function onControlChange()
     stopAdsPlayback()
     cancelReplayCaptions()
     clearSkipCuepointsButtonAndTimer()
+
+    adState = m.top.adState
+
+    if adState = "adsClosed" OR adState = "adsPlaying" OR adState = "fetching" OR adState = "adsPending"
+      filledAdData = m.top.filledAdData
+
+      'Determine the reason for the missed ad event
+      'possible reasons are autoPlay, exitDuringPlayback, exitBeforeResponse, exitBeforePlayback
+      if m.top.goToNext = true
+        reason = "autoPlay"
+      else
+        if adState = "adsClosed" OR adState = "adsPlaying"
+          reason = "exitDuringPlayback"
+        else if adState = "fetching"
+          reason = "exitBeforeResponse"
+        else 'adsPending
+          reason = "exitBeforePlayback"
+        end if
+      end if
+
+      adMissedInfo = {
+        reason: reason
+        position: Int(m.playerPosition) * 1000 'ms
+        cue_point: Int(m.top.adPosition) * 1000 'ms
+      }
+
+      if isAA(filledAdData) = true
+
+        if filledAdData.adResponseTime <> invalid AND filledAdData.adResponseTime <> -1
+          adMissedInfo.response_time = filledAdData.adResponseTime * 1000 'ms
+        end if
+
+        if filledAdData.adCount <> invalid AND filledAdData.adCount > 0
+          adMissedInfo.ad_count = filledAdData.adCount
+        end if
+
+        if filledAdData.totalAdsDuration <> invalid AND filledAdData.totalAdsDuration > 0
+          adMissedInfo.total_ads_duration = Int(filledAdData.totalAdsDuration) * 1000 'ms
+        end if
+
+      end if
+      
+      updatePlayerLogLib(m.playerLogLib, "fireAdMissedEvent", adMissedInfo)
+      'Reset filledAdData to prevent it from being used for future events.
+      m.top.filledAdData = {}
+    end if
+
     updatePlayerLogLib(m.playerLogLib, "fireQualityOfServiceEvent")
     stopVideo()
     animateTransport("out")
@@ -1750,6 +1795,7 @@ Function resetVideoPlayerState(content = invalid)
   m.AdHeadsUp.visible = false
   m.didSeeAdCountdown = false
   m.top.adPosition = 0
+  m.top.goToNext = false
 
   m.pauseAdOverlay.opacity = 0
   m.ratingOverlay.opacity = 0

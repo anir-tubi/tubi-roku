@@ -163,7 +163,7 @@
 
       <!-- Set to true if the "go to end" button was pressed on the transport,
            acts as an event and holds state, so must be reset -->
-      <field id="goToNext" type="boolean" value="false" alwaysNotify="true" />
+      <field id="goToNext" type="boolean" value="false" />
 
       <field id="state" type="string" />
 

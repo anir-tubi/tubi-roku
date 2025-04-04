@@ -150,6 +150,7 @@ Function PlayerLogLib(constants, tracking)
     fireQualityOfServiceEvent: playerLogLib_fireQualityOfServiceEvent
     firePlayerPageExitEvent: playerLogLib_firePlayerPageExitEvent
     fireAdStartupPerformanceEvent: playerLogLib_fireAdStartupPerformanceEvent
+    fireAdMissedEvent: playerLogLib_fireAdMissedEvent
     setAdPodStart: playerLogLib_setAdPodStart
 
     '//private methods
@@ -1404,4 +1405,44 @@ Function playerLogLib_setAdPodStartupResult(adCtx = {})
       m.latestAdPodStartupResult[adId] = "UNKNOWN"  
     end if
   end if
+End Function
+
+
+'The Ad Missed event will be triggered when any ad pod is missed to play due to 
+'autoplay, exitBeforeResponse, exitBeforePlayback, exitDuringPlayback
+'
+'@adMissedInfo: assocarray, contains reason, response_time, ad_count, total_ads_duration, position, cue_point
+Function playerLogLib_fireAdMissedEvent(adMissedInfo = {})
+  eventBase = {
+    device_id: ""
+    platform: ""
+    version: ""
+    log_version: ""
+    track_id: ""
+    is_preroll: ""
+    position: ""
+    cue_point: ""
+    ad_count: ""
+    total_ads_duration: ""
+    reason: ""
+    response_time: ""
+    video_id: ""
+    message: ""
+  }
+
+  adMissedInfo["device_id"] = m.constants.deviceInfo.deviceId
+  adMissedInfo["platform"] = m.constants.platform
+  adMissedInfo["version"] = m.constants.deviceInfo.clientVersion
+  adMissedInfo["log_version"] = m.constants.player.analyticsVersion
+  adMissedInfo["track_id"] = m.playerLogTrackId
+  adMissedInfo["video_id"] = m.videoId
+
+  if m.adType = "preroll"
+    isPreroll = true
+  else
+    isPreroll = false
+  end if
+
+  adMissedInfo.is_preroll = isPreroll
+  m.sendEvent(adMissedInfo, "ad_missed", eventBase)
 End Function

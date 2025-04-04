@@ -64,7 +64,7 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
     googleContentSession: invalid ' Google's GAMUtils contentSession or invalid
     shouldSendGoogleBeacons: false ' Let's us know if during a given ad pod we should send beacons to Google or not
     createRAFStructure: tubiAds_createRAFStructure
-
+    adResponseTime: -1
     totalAdBreakAdsPerSession: 0
 
     ' public
@@ -657,14 +657,13 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos)
     end if
   end if
 
+  m.adResponseTime = -1
   'get the url for making the ad call
   rainmakerVastUrl = m.populateUrlRainmaker(episode, breakPos)
-
   adFetchTimer = createObject("roTimeSpan")
-
   currentAdUnitsList = m.retrieveAds(rainmakerVastUrl, "csai")
-
   timeToFetch = adFetchTimer.totalMilliseconds()
+  m.adResponseTime = timeToFetch
 
   'log ad fetch errors
   if currentAdUnitsList = invalid

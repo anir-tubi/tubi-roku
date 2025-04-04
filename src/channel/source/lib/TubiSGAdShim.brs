@@ -191,6 +191,8 @@ Function tubiSGAdShim_preroll(episode, cuepoint)
   if m.ads.hasAds(m.ads.allAdUnitsList) = true
     filledAdData = {
       adCount: m.ads.totalAdBreakAds
+      totalAdsDuration: m.ads.totalAdDurationInCurrentPod
+      adResponseTime: m.ads.adResponseTime
     }
     m.videoPlayerNode.filledAdData = filledAdData
     m.videoPlayerNode.adState = "adsPending"
@@ -244,6 +246,8 @@ Function tubiSGAdShim_midroll(episode, cuepoint)
   if m.ads.getCachedAdsList(episode, cuepoint) <> invalid then
     filledAdData = {
       adCount: m.ads.totalAdBreakAds
+      totalAdsDuration: m.ads.totalAdDurationInCurrentPod
+      adResponseTime: m.ads.adResponseTime
     }
     m.videoPlayerNode.filledAdData = filledAdData
     m.videoPlayerNode.adState = "adsPending"
@@ -265,6 +269,8 @@ Function tubiSGAdShim_resume(episode, cuepoint)
     tubiLog("Setting adState to adsPending")
     filledAdData = {
       adCount: m.ads.totalAdBreakAds
+      totalAdsDuration: m.ads.totalAdDurationInCurrentPod
+      adResponseTime: m.ads.adResponseTime
     }
     m.videoPlayerNode.filledAdData = filledAdData
     m.videoPlayerNode.adState = "adsPending"
