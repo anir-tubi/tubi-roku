@@ -201,7 +201,7 @@ Function playContent()
       video_codec_type: codeType
       video_resolution: resolution
       is_fullscreen: isFullScreen
-      input_device: "UNKNOWN_DEVICE" 'InputDevice enum
+      input_device: m.constants.inputDevices.unknown 'InputDevice enum
       pageOneof: m.tubiTrackingInfo.getAnalyticsPage("video_player_page", {video_id: videoId})
     }
   })

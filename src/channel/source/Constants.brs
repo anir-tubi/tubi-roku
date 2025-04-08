@@ -1073,6 +1073,13 @@ Function getConstants()
     constants.errors.codes.userNotFound = "USER_NOT_FOUND"
     constants.errors.codes.invalidToken = "INVALID_TOKEN"
 
+  ' IDs for input devices, https://docs.tubi.io/protos/index#analytics.SearchEvent.input_device
+  constants.inputDevices = {}
+    constants.inputDevices.unknown = "UNKNOWN_DEVICE"
+    constants.inputDevices.remote = "NATIVE"
+    constants.inputDevices.externalKeyboard = "KEYBOARD"
+    constants.inputDevices.voice = "VOICE"
+
   ' pixel fires when static Ad is shown on video player during pause
   constants.pauseAd = {}
     constants.pauseAd.pixelTypes = {}

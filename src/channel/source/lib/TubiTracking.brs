@@ -422,7 +422,7 @@ End Function
 '       }
 '
 Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
-  ' The eventTypes below act as a source of truth for the varios information to be collected for each event type on the client.
+  ' The eventTypes below act as a source of truth for the various information to be collected for each event type on the client.
   ' They should be updated as the protobuf's spec is updated.
   eventTypes = {
     active: {
@@ -483,6 +483,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
     search: {
       query: ""
       search_type: "" 'SearchType enum
+      input_device: ""
     }
 
     start_video: {

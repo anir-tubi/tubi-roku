@@ -53,6 +53,7 @@ Function parseSearchAPISuccess(fullResponse, reqInfo)
   
   parsedData = CreateObject("roSGNode", "SearchContentNode")
   parsedData.searchText = reqInfo.searchText
+  parsedData.inputDevice = reqInfo.inputDevice
   parsedData.results = convertedMetadata
   return parsedData
 End Function

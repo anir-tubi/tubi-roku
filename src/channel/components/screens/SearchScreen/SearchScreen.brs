@@ -569,6 +569,13 @@ End Function
 Function onKeyboardTextChanged()
   tubiLog("SearchScreen.onKeyboardTextChanged " + m.Keyboard.text)
 
+  if m.Keyboard.textEditBox.isDictating = true
+    inputDevice = m.constants.inputDevices.voice
+  else
+    inputDevice = m.constants.inputDevices.remote
+  end if
+
+  m.top.inputDeviceLastUsedForSearch = inputDevice
   prepareScreenForSearchChange()
   '//new search so new autocomplete suggestions needed
   m.autocomplete.visible = false
@@ -587,7 +594,7 @@ Function onKeyboardTextChanged()
       '// when searchMenuText is on the right side when the roku_search_autocomplete_v1 experiment is enabled,
       '// then do not display the search title as it looks out of place
         m.searchMenuText.text = ""
-else
+    else
       m.searchMenuText.text = m.searchTitleText
     end if
   end if
@@ -1162,6 +1169,8 @@ Function onAutocompleteSelected(msg)
       
       m.autocomplete.visible = false
       m.autocompleteMenu.content = invalid
+
+      m.top.inputDeviceLastUsedForSearch = m.constants.inputDevices.remote
       m.top.autoCompleteSearchText = itemTitle
     end if
   end if

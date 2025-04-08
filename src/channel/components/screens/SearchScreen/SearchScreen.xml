@@ -44,6 +44,9 @@
       -->
       <field id="contentToPlay" type="node" alwaysNotify="true"/>
 
+      <!-- The last input device used that affected the value of the searchText field. -->
+      <field id="inputDeviceLastUsedForSearch" type="string" value=""/>
+
       <!-- The current text that the user has entered to search -->
       <field id="searchText" type="string" value="" alwaysNotify="true" />
 

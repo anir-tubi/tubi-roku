@@ -5,6 +5,9 @@
     <!-- The text that was used to get the search results. -->
     <field id="searchText" type="string" />
 
+    <!-- The input device that was used to get the search results. -->
+    <field id="inputDevice" type="string" />
+
     <!-- For when the search results is the default search results. -->
     <field id="isDefaultSearchResults" value="false" type="boolean" />
     

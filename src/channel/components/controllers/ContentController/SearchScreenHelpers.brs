@@ -100,11 +100,11 @@ Function onSearchTextChanged(msg)
   ' cancel any in-flight requests
   searchScreen = msg.getRoSGNode()
   searchText = searchScreen.searchText
-  searchFromScreen(searchText)
+  searchFromScreen(searchText, invalid, searchScreen.inputDeviceLastUsedForSearch)
 End Function
 
 
-Function searchFromScreen(searchText, personalizationID = invalid)
+Function searchFromScreen(searchText, personalizationID = invalid, inputDevice = "")
   bSearchNonDefaultResults = (searchText <> invalid AND Len(searchText) > 0)
 
   if m.currentSearchScreenRequestInfo <> invalid
@@ -119,6 +119,10 @@ Function searchFromScreen(searchText, personalizationID = invalid)
 
   if bSearchNonDefaultResults = true
     includeLinear = isUserInAdultsMode() = true AND isKidsUIOn() = false
+    if isNonEmptyString(inputDevice) = false
+      ' assume the input device is remote unless specified otherwise.
+      inputDevice = m.constants.inputDevices.remote
+    end if
     searchReqInfo = m.CmsApi.createSearchReqInfo(searchText, kidsMode, personalizationID, includeLinear)
     m.currentSearchScreenRequestInfo = m.makeRequest({
       url: searchReqInfo.url
@@ -130,6 +134,7 @@ Function searchFromScreen(searchText, personalizationID = invalid)
       screenId: m.constants.ui.screenIds.searchScreen
       isSignedInUser: isLoggedInUser()
       searchText: searchText
+      inputDevice: inputDevice
     })
 
     if isKidsUIOn() = false AND getExperimentResource("roku_search_autocomplete", "roku_search_autocomplete_v1", true).enabled = true
@@ -189,9 +194,10 @@ Function onSearchSuccessResponse(response)
     searchScreen.content = response
 
     pageValues = {
-      query: Left(searchScreen.searchText, 256)
+      query: Left(response.searchText, 256)
       search_type: "PAGE" 'SearchType enum
-      personalization_id: response.personalizationId
+      personalization_id: response.results.personalizationId
+      input_device: response.inputDevice
     }
 
     m.trackingLoggingTask.trackEvent = {
