@@ -67,6 +67,8 @@ Function TubiLogger(constants, request, auth, sentry = invalid)
     getLogPrintout: tubiLog_getLogPrintout_
     isLoggingAllowed: tubiLog_isLoggingAllowed
     isSampled: tubiLog_isSampled
+    getClientLogEvent: tubiLog_getClientLogEvent
+    populateMessage: tubiLog_populateMessage
 
     ' private methods to delete after purple carpet event
     isNowWithinTimePeriod: tubiLog_isNowWithinTimePeriod
@@ -219,6 +221,7 @@ End Function
 '    level: "error"
 '    subtype: "video-failure"
 '    message: "Video with id: 1234 failed to play"
+'    message_map: {}
 '    type: "CLIENT:ERROR"
 '  }
 '  logInfo.type may be invalid
@@ -265,34 +268,115 @@ End Function
 'uses Request().createAsync() to build a request that is ready to be sent to the logging API
 '@logInfo: associativeArray, a logInfo object as returned by m.buildLogInfo()
 Function tubiLog_getLoggingRequest_(logInfo as Object) as Object
-  loggingReqBody = {
-    app_id: m.constants.appName
-    platform: m.constants.platform
-    device_id: m.constants.deviceInfo.deviceId
-    ua: m.constants.deviceInfo.userAgentModel
-    version: m.constants.deviceInfo.clientVersion
-  }
-  loggingReqBody.append(logInfo)
-
-  loggingReqBody["user_id"] = 0
-
-  authInfo = m.auth.getAuthInfo()
-  if authInfo <> invalid AND authInfo.userId <> invalid
-    loggingReqBody["user_id"] = authInfo.userId.ToInt()
-  end if
-
+  body = m.getClientLogEvent(logInfo)
   reqOptions = {
-    body: FormatJson(loggingReqBody)
+    body: FormatJson(body)
     method: m.constants.reqTypes.post
-    headers: {}
+    headers: m.constants.headers.commonUapi
     retries: 0
   }
-  reqOptions.headers.append(m.constants.headers.commonUapi)
-  url = m.constants.urls.datascience.logging
 
-  loggingRequest = m.request.createAsync(url, "scenegraphLog " + logInfo.level, reqOptions)
+  loggingRequest = m.request.createAsync(m.constants.urls.analyticsV3.sendEvent, "client_log_" + logInfo.level, reqOptions)
 
   return loggingRequest
+End Function
+
+
+Function tubiLog_getClientLogEvent(eventValues) as Object
+  eventBase = {
+    log_type: ""
+    log_subtype: ""
+    level: ""
+    video_id: ""
+    message: ""
+    message_map: {}
+  }
+
+  if eventValues.type <> invalid
+    eventValues.log_type = eventValues.type
+  end if
+
+  if eventValues.subtype <> invalid
+    eventValues.log_subtype = eventValues.subtype
+  end if
+
+  message_map = {}
+  if eventValues.message_map <> invalid
+    message_map = eventValues.message_map
+  end if
+
+  message_map.append({
+    model: m.constants.deviceInfo.model
+    rokuCountryCode: m.constants.deviceInfo.rokuCountryCode
+    firmwareVersion: m.constants.deviceInfo.firmwareVersion
+  })
+
+  eventValues.message_map = message_map
+  
+  eventInfo = m.populateMessage("client_logs", eventValues, eventBase)
+  
+  authInfo = m.auth.getAuthInfo()
+  userId = 0
+  if authInfo <> invalid AND authInfo.userId <> invalid
+    userId = authInfo.userId.toInt()
+  end if
+
+  eventId = CreateObject("roDeviceInfo").GetRandomUUID()
+  time = CreateObject("roDateTime")
+  timestamp = time.ToISOString("milliseconds")
+
+  clientLogEvent = {
+    device_id: m.constants.deviceInfo.deviceId
+    platform: m.constants.analyticsPlatform
+    user_id: userId
+    client_common: {
+      event_id: eventId
+      event_timestamp: timestamp
+    }
+    version: m.constants.deviceInfo.clientVersion
+    app_id: m.constants.appName
+  }
+
+  ' Appending the event data.
+  if eventInfo.client_logs <> invalid
+    clientLogEvent.append(eventInfo.client_logs)
+  end if
+
+  clientLogEvent = FormatJson(clientLogEvent)
+
+  return {
+    "event_name": "client_logs"
+    "event_payloads": [clientLogEvent]
+  }
+End Function
+
+
+Function tubiLog_populateMessage(messageType, messageValues, messageBase)
+  if messageBase <> invalid
+    message = {}
+    messageFields = {}
+    for each prop in messageValues
+      'only allow values that exist on the messageBase (ie. the source of truth for the data format)
+      if messageBase[prop] <> invalid
+        value = messageValues[prop]
+        if value <> invalid
+          if type(value) <> "roAssociativeArray"
+            value = value.toStr()
+            if value <> ""
+              messageFields.addReplace(prop, value)
+            end if
+          else
+            messageFields.addReplace(prop, value)
+          end if
+        end if
+      end if
+    end for
+
+    message.addReplace(messageType, messageFields)
+    return message
+  else
+    return invalid
+  end if
 End Function
 
 

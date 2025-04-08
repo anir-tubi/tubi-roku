@@ -645,9 +645,9 @@ Function getConstants()
       constants.urls.analytics.singleEvent = constants.urls.analytics.urlBase + "/v2/single-event" 'preferred by back end team
 
     constants.urls.analyticsV3 = {}
-      constants.urls.analyticsV3.sendEvent = "https://analytics-ingestion-v3.main-staging-custom.staging.k8s.tubi.io/analytics-ingestion/v3/events/send?sendBeacon=true"
+      constants.urls.analyticsV3.sendEvent = "https://analytics-ingestion-v3.main-staging-custom.staging.k8s.tubi.io/analytics-ingestion/v3/events/send"
       if mode = "production"
-        constants.urls.analyticsV3.sendEvent = "https://analytics-ingestion-v3.main-production-custom.production.k8s.tubi.io/analytics-ingestion/v3/events/send?sendBeacon=true"
+        constants.urls.analyticsV3.sendEvent = "https://analytics-ingestion-v3.main-production-custom.production.k8s.tubi.io/analytics-ingestion/v3/events/send"
       end if
 
     constants.urls.impressionEvents = {}

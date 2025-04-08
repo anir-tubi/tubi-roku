@@ -1397,6 +1397,9 @@ Function tubiTracking_createPlayerTrackingReqInfo(trackData)
   options = {
     method: m.constants.reqTypes.post
     body: FormatJson(trackData)
+    params: {
+      sendBeacon: true
+    }
   }
 
   eventType = "player"
