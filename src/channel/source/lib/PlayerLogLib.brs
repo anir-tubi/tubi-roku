@@ -1428,6 +1428,7 @@ Function playerLogLib_fireAdMissedEvent(adMissedInfo = {})
     response_time: ""
     video_id: ""
     message: ""
+    message_map: {}
   }
 
   adMissedInfo["device_id"] = m.constants.deviceInfo.deviceId

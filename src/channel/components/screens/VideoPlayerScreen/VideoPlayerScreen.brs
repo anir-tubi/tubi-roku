@@ -279,6 +279,11 @@ Function init()
   m.notificationInterval = 0.999 ' The interval that we are targeting for player position updates. We specify a value lower than a second in order to get a float value
   m.Video.notificationInterval = m.notificationInterval
 
+  'This variable holds the value of Ad information from rainmaker response
+  m.filledAdData = {}
+  'This variable is used to send an AdMissed event if the previous cue point was missed
+  m.missedAdReported = true
+
   'The field typically indicates whether a user has already seen a signup save progress modal or not.
   m.wasSignUpToSaveProgressModalAlreadyShown = false
 
@@ -806,11 +811,7 @@ Function onControlChange()
 
     adState = m.top.adState
 
-    if adState = "adsClosed" OR adState = "adsPlaying" OR adState = "fetching" OR adState = "adsPending"
-      filledAdData = m.top.filledAdData
-
-      'Determine the reason for the missed ad event
-      'possible reasons are autoPlay, exitDuringPlayback, exitBeforeResponse, exitBeforePlayback
+    if m.missedAdReported = false AND (adState = "adsClosed" OR adState = "adsPlaying" OR adState = "fetching" OR adState = "adsPending")
       if m.top.goToNext = true
         reason = "autoPlay"
       else
@@ -823,31 +824,11 @@ Function onControlChange()
         end if
       end if
 
-      adMissedInfo = {
-        reason: reason
-        position: Int(m.playerPosition) * 1000 'ms
-        cue_point: Int(m.top.adPosition) * 1000 'ms
-      }
+      sendAdMissedEvent(reason)
+      m.missedAdReported = true
 
-      if isAA(filledAdData) = true
-
-        if filledAdData.adResponseTime <> invalid AND filledAdData.adResponseTime <> -1
-          adMissedInfo.response_time = filledAdData.adResponseTime * 1000 'ms
-        end if
-
-        if filledAdData.adCount <> invalid AND filledAdData.adCount > 0
-          adMissedInfo.ad_count = filledAdData.adCount
-        end if
-
-        if filledAdData.totalAdsDuration <> invalid AND filledAdData.totalAdsDuration > 0
-          adMissedInfo.total_ads_duration = Int(filledAdData.totalAdsDuration) * 1000 'ms
-        end if
-
-      end if
-      
-      updatePlayerLogLib(m.playerLogLib, "fireAdMissedEvent", adMissedInfo)
       'Reset filledAdData to prevent it from being used for future events.
-      m.top.filledAdData = {}
+      m.filledAdData = {}
     end if
 
     updatePlayerLogLib(m.playerLogLib, "fireQualityOfServiceEvent")
@@ -1309,6 +1290,7 @@ Function onVideoPositionChange(msg)
     ' attempt to fetch midroll ads before actual cuepoint
     potentialCuepoint = m.playerPosition + m.adPrefetchTime
     isCuepointPrefetchTimeReached = m.midrolls[strI(potentialCuepoint)]
+
     if isCuepointPrefetchTimeReached = true AND m.UpNext.opacity = 0
       m.top.adPosition = potentialCuepoint
       m.top.adControl = "midroll"
@@ -1330,6 +1312,17 @@ Function onVideoPositionChange(msg)
 
     ' check midroll and fire if any
     isCuepointReached = m.midrolls[strI(m.playerPosition)]
+    
+    'A pending ad from the previous cue point was not played for some reason. we need to fire the AdMissed event for the previous one.
+    if adState = "adsPending" AND m.missedAdReported = false AND Int(m.playerPosition) > Int(m.top.adPosition)
+      
+      sendAdMissedEvent("exitAfterCuePointPassed")
+      m.missedAdReported = true
+
+      'Reset filledAdData to prevent it from being used for future events.
+      m.filledAdData = {}
+    end if
+
     if isCuepointReached = true AND m.UpNext.opacity = 0
 
       m.AdHeadsUp.visible = false
@@ -1417,6 +1410,11 @@ End Function
 Function onAdStateChange(msg)
   adState = msg.getData()
   updatePlayerLogLib(m.playerLogLib, "setAdState", adState)
+
+  'if ads are pending, reset the flag to indicate that the missed ad has not yet been reported
+  if adState = "adsPending"
+    m.missedAdReported = false
+  end if
 
   tubiLog("VideoPlayer.onAdStateChange adState = " + adState + " VideoState = " + m.VideoState + " Video.State = " + m.Video.state)
   if adState = "ready"
@@ -2784,13 +2782,14 @@ End Function
 
 
 Function onHandleFilledAdData(msg)
-  filledAdData = msg.getData()
+  m.filledAdData = msg.getData()
+
   adPosition = m.top.adPosition
 
-  if isAA(filledAdData) = true AND isNumber(m.playerPosition) AND isNumber(adPosition) = true
+  if isAA(m.filledAdData) = true AND isNumber(m.playerPosition) AND isNumber(adPosition) = true
     adCount = 0
-    if isNumber(filledAdData.adCount) = true
-      adCount = filledAdData.adCount
+    if isNumber(m.filledAdData.adCount) = true
+      adCount = m.filledAdData.adCount
     end if
 
     currentPosition = Int(m.playerPosition)
@@ -2910,4 +2909,35 @@ Function onExitPlayer(msg)
     }
     m.top.exitPlayer = false
   end if
+End Function
+
+
+'Determine the reason for the missed ad event
+'@reason: string, possible values are autoPlay, exitDuringPlayback, exitBeforeResponse, exitBeforePlayback, exitAfterCuePointPassed
+'
+Function sendAdMissedEvent(reason)
+  adMissedInfo = {
+    reason: reason
+    position: Int(m.playerPosition) * 1000 'ms
+    cue_point: Int(m.top.adPosition) * 1000 'ms
+  }
+
+  if isAA(m.filledAdData) = true
+
+    if m.filledAdData.adResponseTime <> invalid AND m.filledAdData.adResponseTime <> -1
+      adMissedInfo.response_time = m.filledAdData.adResponseTime * 1000 'ms
+    end if
+
+    if m.filledAdData.adCount <> invalid AND m.filledAdData.adCount > 0
+      adMissedInfo.ad_count = m.filledAdData.adCount
+    end if
+
+    if m.filledAdData.totalAdsDuration <> invalid AND m.filledAdData.totalAdsDuration > 0
+      adMissedInfo.total_ads_duration = Int(m.filledAdData.totalAdsDuration) * 1000 'ms
+    end if
+
+  end if
+
+  adMissedInfo.message_map = FormatJson({playerPositionArr: m.positionArr})
+  updatePlayerLogLib(m.playerLogLib, "fireAdMissedEvent", adMissedInfo)
 End Function

@@ -1084,11 +1084,27 @@ Function jumpToPosition(position)
 
   if m.didSeeAdCountdown = true
     '//if the user saw the ad-countdown before seeking, then start playing the ad immediately after the seek is done.
+
+    adMissedInfo = {
+      adPosition: adPosition * 1000 'ms
+    }
+    if m.top.adState = "adsPending"
+      tubiLog(formatJson(adMissedInfo), "info", "videoInfo", "ad-missed-recovered")
+    end if
+
     showAdBreak()
     m.showRatings = true
   else if shouldAdBreak = true
     unObserveClosedCaptionAndAudioTrack()
     ' leave m.VideoState = "play" because from the component's perspective video is still playing
+
+    adMissedInfo = {
+      adPosition: adPosition * 1000 'ms
+    }
+    if m.top.adState = "adsPending"
+      tubiLog(formatJson(adMissedInfo), "info", "videoInfo", "ad-missed-recovered")
+    end if
+
     m.Video.control = "stop"
     m.top.adPosition = adPosition
     m.top.adControl = "seek"
