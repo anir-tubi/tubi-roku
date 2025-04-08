@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import { ecp, utils } from 'roku-test-automation';
 import { CONTAINER_PAGE_NODES } from '../utils/constants';
 import TitleDetailsPage from './titleDetailsPage';
+import { title } from 'process';
 const Container = () => {
 	const elements = {
 		grid: async () =>
@@ -15,6 +16,10 @@ const Container = () => {
 			await testUtils.getNodeForElement(
 				CONTAINER_PAGE_NODES.TITLE_NAME_IN_CONTAINER
 			),
+		channelDescriptionCategoryDetailsPage: async () =>
+			await testUtils.getNodeForElement('channelDescription'),
+		titleDetailsDescriptionContainer: async () =>
+			await testUtils.getNodeForElement('titleDetailsDescriptionContainer'),
 		categoryNameInCategoryDetailsPage: async () =>
 			await testUtils.getNodeForElement('categoryNameInCategoryDetailsPage'),
 		firstChannelName: async () =>
@@ -28,17 +33,27 @@ const Container = () => {
 		});
 	}
 
-	async function selectFocusedTitle() {
-		let titleName;
-		await ecp.sendKeypress(ecp.Key.Ok);
-		await utils.sleep(2500);
-		await ecp.sendKeypress(ecp.Key.Ok);
+	async function selectFocusedChannel() {
 		await testUtils.retryWithTimeOut(async () => {
-			titleName = await elements.titleName();
-			expect(titleName.visible).to.equal(true);
+			const titleDescription = await elements.channelDescriptionCategoryDetailsPage();
+			expect(titleDescription.visible).to.equal(true);
 		});
+		const titleName = await elements.titleName();
+		await ecp.sendKeypress(ecp.Key.Ok);
 		const titleDetailsPage = TitleDetailsPage({ title: titleName.text });
-		await titleDetailsPage.pageDidLoad();
+		await titleDetailsPage.pageDidLoad(false);
+		return titleDetailsPage;
+	}
+
+	async function selectFocusedTitle() {
+		await testUtils.retryWithTimeOut(async () => {
+			const titleDescription = await elements.titleDetailsDescriptionContainer();
+			expect(titleDescription.visible).to.equal(true);
+		});
+		const titleName = await elements.titleName();
+		await ecp.sendKeypress(ecp.Key.Ok);
+		const titleDetailsPage = TitleDetailsPage({ title: titleName.text });
+		await titleDetailsPage.pageDidLoad(false);
 		return titleDetailsPage;
 	}
 
@@ -60,9 +75,10 @@ const Container = () => {
 
 	return {
 		pageDidLoad,
-		selectFocusedTitle,
+		selectFocusedChannel,
 		getCategoryName,
-		getNameOfFirstChannel
+		getNameOfFirstChannel,
+		selectFocusedTitle,
 	};
 };
 

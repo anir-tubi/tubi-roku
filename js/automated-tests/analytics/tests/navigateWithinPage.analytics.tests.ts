@@ -19,13 +19,16 @@ import {
 	verifyC425233,
 	verifyC268959,
 	verifyC268957WithinPage,
-	verifyC524595
+	verifyC524595,
+	verifyC690744,
+	verifyC690748,
 } from '../verification/navigateWithinPageVerification';
 import {
 	verifyC268956ComponentInteraction,
 	verifyC268957,
 } from '../verification/componentInteraction';
 import { ecp, utils } from 'roku-test-automation';
+import Categories from '../pages/categories';
 
 describe('Navigate Within Page', function () {
 	beforeEach(async () => {
@@ -112,15 +115,15 @@ describe('Navigate Within Page', function () {
 		await verifyC425241(videoId);
 	});
 	it('When user navigates between menu options - GO_TO_NETWORK C42524 \
-	    and C425251 When user makes a selection from details page menu - GO_TO_NETWORK @analyticsASet2,@analyticsNavigateWithinPageC44199', async () => {
+	    and C425251 When user makes a selection from details page menu - GO_TO_NETWORK @analyticsASet2,@analyticsNavigateWithinPage', async () => {
 		await testUtils.startApplicationAtPage('home', {
 			shouldCreateNewUser: false,
 		});
 		await testUtils.waitForAppLaunchBeaconToFire();
 		await testUtils.goToPage('network');
-		const channelsPage = ChannelsPage();
-		await channelsPage.pageDidLoad();
-		const container = await channelsPage.selectChannelByName('cj_enm');
+		const categories = Categories();
+		await categories.pageDidLoad();
+		const container = await categories.selectChannelByName('cj_enm');
 		const titleDetailsPage = await container.selectFocusedTitle();
 		const videoId = titleDetailsPage.getTitleId();
 		await titleDetailsPage.highlightAddToMyList();
@@ -175,6 +178,34 @@ describe('Navigate Within Page', function () {
 		await video.allowPlaybackToPlayForSeconds(10000);
 		await ecp.sendKeypress(ecp.Key.Back);
 		await verifyC524595();
+	});
+
+	it('C690744	User scrolls vertically and navigates within the left side navigation page  @analyticsASet2,@analyticsNavigateWithinPage', async () => {
+		const homePage = HomePage();
+		const channelsPage = await homePage.highlightedSideNavTab(tabs.categories, 7);
+		await utils.sleep(2000);
+		await ecp.sendKeypress(ecp.Key.Up);
+		await utils.sleep(2000);
+		await ecp.sendKeypress(ecp.Key.Down, { count: 2 });
+		await verifyC690744();
+	});
+
+	it('C690746	User scrolls vertically and navigates within the categories listed on the category list page  @analyticsASet2,@analyticsNavigateWithinPage', async () => {
+		const homePage = HomePage();
+		const categories = await homePage.selectSideNavTab(tabs.categories, 7);
+		await ecp.sendKeypress(ecp.Key.Up);
+		await utils.sleep(2000);
+		await ecp.sendKeypress(ecp.Key.Down, { count: 2 });
+		await verifyC690744();
+	});
+
+	it('C690748	User browses the titles in a given category on the category page  @analyticsASet2,@analyticsNavigateWithinPage', async () => {
+		const homePage = HomePage();
+		const categories = await homePage.selectSideNavTab(tabs.categories, 7);
+		const container = await categories.selectCategoryByName('action');
+		const slugCategory = await container.getCategoryName();
+		await ecp.sendKeypress(ecp.Key.Right, { count: 4, wait: 2000 });
+		await verifyC690748(slugCategory);
 	});
 
 });

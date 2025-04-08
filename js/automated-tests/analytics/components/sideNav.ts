@@ -99,9 +99,17 @@ const SideNav = () => {
 		return nextPage;
 	}
 
+	async function highlightedSideNavTab(tab, currentRow = ui.row, isAuth = false) {
+		ui.row = currentRow;
+		await ecp.sendKeypress(ecp.Key.Left);
+		await testUtils.waitForSideNavMenuToBeExpanded();
+		await moveToRow(ui.row - tab.row);
+	}
+
 	return {
 		selectSideNavTab,
 		selectSideNavTabNoPageReturn,
+		highlightedSideNavTab,
 	};
 };
 

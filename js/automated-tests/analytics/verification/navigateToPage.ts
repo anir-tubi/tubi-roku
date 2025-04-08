@@ -17,41 +17,6 @@ import {
 } from '../utils/network/qaProxy';
 import { expect } from 'chai';
 
-export async function verifyC112683() {
-	let navigateToPageEvent;
-	let i = 1;
-	while (navigateToPageEvent === undefined && i < 10) {
-		const pulletEvents = await getMatchedEventsFromLastEvent(
-			Events.navigate_to_page,
-			40 + i
-		);
-		navigateToPageEvent = pulletEvents.find(
-			(event) =>
-				event.navigate_to_page &&
-				event.navigate_to_page.left_side_nav_component &&
-				event.navigate_to_page.left_side_nav_component.left_nav_section &&
-				event.navigate_to_page.left_side_nav_component.left_nav_section ===
-					LEFT_NAV_SECTIONS.CHANNEL
-		);
-		i++;
-	}
-	expect(
-		navigateToPageEvent.navigate_to_page.left_side_nav_component
-			.left_nav_section
-	).equal(
-		LEFT_NAV_SECTIONS.CHANNEL,
-		`event should contain     navigateToPageEvent.navigate_to_page.left_side_nav_component.left_nav_section=LEFT_NAV_SECTIONS.CATEGORIES Event: \n
-	${JSON.stringify(navigateToPageEvent)} \n`
-	);
-	expect(navigateToPageEvent.navigate_to_page.home_page.content_mode).equal(
-		EventsValues.conentModeMovie,
-		`event should contain     navigateToPageEvent.navigate_to_page.home_page.content_moden- EventsValues.conentModeUnknown Event: \n
-	${JSON.stringify(navigateToPageEvent)} \n`
-	);
-	expect(navigateToPageEvent.navigate_to_page.dest_channel_list_page).to.be
-		.empty;
-}
-
 export async function verifyC543694() {
 	let accountEvent;
 	let i = 1;
@@ -93,7 +58,7 @@ export async function verifyC543693() {
 			40 + i
 		);
 		navigateToPageEvent = pulletEvents.find(
-			(event) =>	
+			(event) =>
 				event.navigate_to_page.dest_login_page &&
 				event.navigate_to_page.dest_login_page.choice &&
 				event.navigate_to_page.dest_login_page.choice === 'LINK'
@@ -149,7 +114,7 @@ export async function verifyC450499(episodeId) {
 			(event) =>
 				event.navigate_to_page.dest_login_page &&
 				event.navigate_to_page.dest_login_page.choice ===
-					'LINK'
+				'LINK'
 		);
 		i++;
 	}
@@ -157,8 +122,7 @@ export async function verifyC450499(episodeId) {
 		navigateToPageEvent.navigate_to_page.dest_login_page.choice
 	).equal(
 		'LINK',
-		`navigateToPageEvent.navigate_to_page.dest_register_page.auth_method===${
-			'LINK'
+		`navigateToPageEvent.navigate_to_page.dest_register_page.auth_method===${'LINK'
 		}, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
@@ -318,7 +282,7 @@ export async function verifyC439651NavigateToPageMovie(id) {
 				event.navigate_to_page.category_component &&
 				event.navigate_to_page.category_component.category_slug &&
 				event.navigate_to_page.category_component.category_slug ===
-					CAT_SLUG.queue
+				CAT_SLUG.queue
 		);
 		i++;
 	}
@@ -376,7 +340,9 @@ ${JSON.stringify(navigateToPageEvent)} \n`
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
-		parseInt(navigateToPageEvent.navigate_to_page.dest_video_page.video_id)
+		parseInt(
+			navigateToPageEvent.navigate_to_page.dest_video_page.video_id
+		)
 	).equal(
 		id,
 		`navigateToPageEvent.navigate_to_page.category_component.content_tile.video_id===, Event: \n
@@ -397,7 +363,7 @@ export async function verifyC439651NavigateToPage(id) {
 				event.navigate_to_page.category_component &&
 				event.navigate_to_page.category_component.category_slug &&
 				event.navigate_to_page.category_component.category_slug ===
-					CAT_SLUG.queue
+				CAT_SLUG.queue
 		);
 		i++;
 	}
@@ -478,7 +444,7 @@ export async function verifyC439649NavigateToPage(id) {
 				event.navigate_to_page.category_component &&
 				event.navigate_to_page.category_component.category_slug &&
 				event.navigate_to_page.category_component.category_slug ===
-					CAT_SLUG.continueWatching
+				CAT_SLUG.continueWatching
 		);
 		i++;
 	}
@@ -558,7 +524,7 @@ export async function verifyC118158() {
 				event.navigate_to_page.category_component &&
 				event.navigate_to_page.category_component.category_slug &&
 				event.navigate_to_page.category_component.category_slug ===
-					'recommended_linear_channels'
+				'recommended_linear_channels'
 		);
 		i++;
 	}
@@ -738,14 +704,13 @@ export async function verifyC3854() {
 				event.navigate_to_page.left_side_nav_component &&
 				event.navigate_to_page.left_side_nav_component.left_nav_section &&
 				event.navigate_to_page.left_side_nav_component.left_nav_section ===
-					'SEARCH'
+				'SEARCH'
 		);
 		i++;
 	}
 	expect(eventNavigateToPage.navigate_to_page.home_page.content_mode).equal(
 		EventsValues.conentModeUnknown,
-		`Event should contain eventNavigateToPage.navigate_to_page.home_page.content_mode=${
-			EventsValues.conentModeUnknown
+		`Event should contain eventNavigateToPage.navigate_to_page.home_page.content_mode=${EventsValues.conentModeUnknown
 		}, Event: \n ${JSON.stringify(eventNavigateToPage)}
 			\n`
 	);
@@ -777,14 +742,13 @@ export async function verifyC145000() {
 				event.navigate_to_page.left_side_nav_component &&
 				event.navigate_to_page.left_side_nav_component.left_nav_section &&
 				event.navigate_to_page.left_side_nav_component.left_nav_section ===
-					'QUEUE'
+				'QUEUE'
 		);
 		i++;
 	}
 	expect(eventNavigateToPage.navigate_to_page.home_page.content_mode).equal(
 		EventsValues.conentModeUnknown,
-		`Event should contain eventNavigateToPage.navigate_to_page.home_page.content_mode=${
-			EventsValues.conentModeUnknown
+		`Event should contain eventNavigateToPage.navigate_to_page.home_page.content_mode=${EventsValues.conentModeUnknown
 		}, Event: \n ${JSON.stringify(eventNavigateToPage)}
 			\n`
 	);
@@ -815,7 +779,7 @@ export async function verifyC112680() {
 				event.navigate_to_page.dest_home_page &&
 				event.navigate_to_page.dest_home_page.content_mode &&
 				event.navigate_to_page.dest_home_page.content_mode ===
-					EventsValues.conentModeMovie
+				EventsValues.conentModeMovie
 		);
 		i++;
 	}
@@ -882,7 +846,7 @@ export async function verifyC112681() {
 				event.navigate_to_page.dest_home_page &&
 				event.navigate_to_page.dest_home_page.content_mode &&
 				event.navigate_to_page.dest_home_page.content_mode ===
-					EventsValues.conentModeTv
+				EventsValues.conentModeTv
 		);
 		i++;
 	}
@@ -968,7 +932,7 @@ export async function verifyC112684() {
 				event.navigate_to_page.left_side_nav_component &&
 				event.navigate_to_page.left_side_nav_component.left_nav_section &&
 				event.navigate_to_page.left_side_nav_component.left_nav_section ===
-					LEFT_NAV_SECTIONS.SETTINGS
+				LEFT_NAV_SECTIONS.SETTINGS
 		);
 		i++;
 	}
@@ -1008,7 +972,7 @@ export async function verifyC112682() {
 				event.navigate_to_page.left_side_nav_component &&
 				event.navigate_to_page.left_side_nav_component.left_nav_section &&
 				event.navigate_to_page.left_side_nav_component.left_nav_section ===
-					LEFT_NAV_SECTIONS.CATEGORIES
+				LEFT_NAV_SECTIONS.CATEGORIES
 		);
 		i++;
 	}
@@ -1028,3 +992,61 @@ export async function verifyC112682() {
 	expect(navigateToPageEvent.navigate_to_page.dest_category_list_page).to.be
 		.empty;
 }
+
+
+
+export async function verifyC690749NavigatetToPage() {
+	let navigateToPageEvent;
+	let i = 1;
+	while (navigateToPageEvent === undefined && i < 10) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.navigate_to_page,
+			40 + i
+		);
+		navigateToPageEvent = pulletEvents.find(
+			(event) =>
+				event.navigate_to_page &&
+				event.navigate_to_page.left_side_nav_component &&
+				event.navigate_to_page.left_side_nav_component.left_nav_section &&
+				event.navigate_to_page.left_side_nav_component.left_nav_section ===
+				LEFT_NAV_SECTIONS.CATEGORIES
+		);
+		i++;
+	}
+}
+
+export async function verifyC690749NavigateToPage() {
+	let navigateToPageEvent;
+	let i = 1;
+	while (navigateToPageEvent === undefined && i < 10) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.navigate_to_page,
+			40 + i
+		);
+		navigateToPageEvent = pulletEvents.find(
+			(event) =>
+				event.navigate_to_page &&
+				event.navigate_to_page.dest_category_list_page &&
+				event.navigate_to_page.home_page &&
+				event.navigate_to_page.home_page.content_mode === EventsValues.conentModeMovie &&
+				event.navigate_to_page.left_side_nav_component &&
+				event.navigate_to_page.left_side_nav_component.left_nav_section === LEFT_NAV_SECTIONS.CATEGORIES
+		);
+		i++;
+	}
+	expect(navigateToPageEvent.navigate_to_page.dest_category_list_page).to.be.empty;
+	expect(navigateToPageEvent.navigate_to_page.home_page.content_mode).equal(
+		EventsValues.conentModeMovie,
+		`navigateToPageEvent.navigate_to_page.home_page.content_mode===CONTENT_MODE_MOVIE, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(
+		navigateToPageEvent.navigate_to_page.left_side_nav_component.left_nav_section
+	).equal(
+		LEFT_NAV_SECTIONS.CATEGORIES,
+		`navigateToPageEvent.navigate_to_page.left_side_nav_component.left_nav_section===CATEGORIES, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+}
+
+

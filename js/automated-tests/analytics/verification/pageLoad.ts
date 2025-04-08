@@ -245,30 +245,6 @@ export async function verifyC21254PlayerLoad(id) {
 	expect(pageLoad.page_load.video_player_page.video_id).equal(parseInt(id));
 }
 
-export async function verifyC76715PageLoad() {
-	let pageLoad;
-	let i = 1;
-	while (pageLoad === undefined && i < 10) {
-		const pulletEvents = await getMatchedEventsFromLastEvent(
-			Events.page_load,
-			60 + i
-		);
-		pageLoad = pulletEvents.find(
-			(event) => event.page_load && event.page_load.channel_list_page
-		);
-		i++;
-	}
-	expect(pageLoad.page_load.channel_list_page).to.be.empty;
-	expect(pageLoad.page_load.status).equal(
-		'SUCCESS',
-		`event should contains page_load.status=SUCCESS, Event: \n
-${JSON.stringify(pageLoad)}\n`
-	);
-	expect(pageLoad.page_load.load_time).to.match(
-		/\d/,
-		`Each event has to contain load_time event: \n ${pageLoad}`
-	);
-}
 
 export async function verifyC543703() {
 	let pageLoad;
@@ -307,7 +283,8 @@ export async function verifyC76715(slugCategory) {
 			(event) =>
 				event.page_load &&
 				event.page_load.category_page &&
-				event.page_load.category_page.category_slug
+				event.page_load.category_page.category_slug &&
+				event.page_load.category_page.category_slug == slugCategory.toLowerCase()
 		);
 		i++;
 	}
@@ -317,7 +294,7 @@ export async function verifyC76715(slugCategory) {
 ${JSON.stringify(pageLoad)}\n`
 	);
 	expect(pageLoad.page_load.category_page.category_slug).equal(
-		slugCategory,
+		slugCategory.toLowerCase(),
 		`event should contains page_load.category_page.category_slug==${slugCategory}, Event: \n
 ${JSON.stringify(pageLoad)}\n`
 	);

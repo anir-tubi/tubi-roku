@@ -40,7 +40,7 @@ const TitleDetailsPage = (titleDetails) => {
 			await testUtils.getNodeForElement('accountNeededErrorMessage'),
 	};
 
-	async function pageDidLoad() {
+	async function pageDidLoad(verifyTitleName: boolean = true) {
 		let detailScreenTitle;
 		await testUtils.retryWithTimeOut(async () => {
 			detailScreenTitle = await elements.detailsScreenTitle();
@@ -54,11 +54,13 @@ const TitleDetailsPage = (titleDetails) => {
 			const detailsPageMenu = await elements.detailsPageMenu();
 			expect(detailsPageMenu).to.exist;
 		});
+		if(verifyTitleName){
 		if (titleDetails.title !== undefined) {
 			expect(detailScreenTitle.text).to.equal(titleDetails.title);
 		} else {
 			expect(detailScreenTitle.text).to.equal(titleDetails);
 		}
+	}
 		detailScreenTitle = await elements.detailsScreen();
 		if (detailScreenTitle != undefined) {
 			titleDetails = detailScreenTitle;

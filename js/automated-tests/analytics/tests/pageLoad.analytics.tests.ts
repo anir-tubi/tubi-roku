@@ -11,18 +11,22 @@ import {
 	verifyC543704,
 	verifyC543703,
 	verifyC76715,
-	verifyC76715PageLoad,
 } from '../verification/pageLoad';
 import {
 	verifyC112682,
 	verifyC690749,
-	verifyC112683,
 } from '../verification/navigateToPage';
 
 import {
 	verifyC76717,
 	verifyC76715NavigateWithinPage,
+	verifyC690751NavigateWithinPage,
+	verifyC690753NavigateWithinPage,
 } from '../verification/navigateWithinPageVerification';
+import {
+	verifyC690745ComponentInteraction,
+} from '../verification/componentInteraction';
+import { verifyC690749NavigateToPage } from '../verification/navigateToPage';
 
 describe('Page Load Analytics', function () {
 	beforeEach(async () => {
@@ -43,9 +47,9 @@ describe('Page Load Analytics', function () {
 		await verifyC21254PlayerLoad(titleId);
 	});
 
-	it('When browse is loaded then first key is ""categoryListPage"" in the logs C543703 and Page Load - When category container is loaded then first key is ""categoryPage"" with categorySlug C543704 and HomePage to CategoryPage by CategoryComponent C543705 and C21260 and C76712 and C76713 and C76714 and C3857 and C3858 and C3860 @analyticsASet3,@analyticsPageLoad', async () => {
+	it('When browse is loaded then first key is ""categoryListPage"" in the logs C543703 and Page Load - When category container is loaded then first key is ""categoryPage"" with categorySlug C543704 and HomePage to CategoryPage by CategoryComponent C543705 and C690745 and C21260 and C76712 and C76713 and C76714 and C3857 and C3858 and C3860 and C690747 @analyticsASet3,@analyticsPageLoad', async () => {
 		const homePage = HomePage();
-		const categories = await homePage.selectSideNavTab(tabs.categories,7);
+		const categories = await homePage.selectSideNavTab(tabs.categories, 7);
 		const container = await categories.selectCategoryByName('action');
 		const slugCategory = await container.getCategoryName();
 		await container.selectFocusedTitle();
@@ -53,20 +57,42 @@ describe('Page Load Analytics', function () {
 		await verifyC543704(slugCategory);
 		await verifyC543703();
 		await verifyC690749(slugCategory);
+		await verifyC690745ComponentInteraction(slugCategory);
 	});
-	it('When channels page displayed C76715 and C76716 and C76717 and C3859 and UI: C44199 @analyticsASet3,@analyticsPageLoad', async () => {
+
+	it('When channels page displayed C76715 and C76716 and C76717 and C3859 and C690750 and C690752 and C690754 and UI: C44199 @analyticsASet3,@analyticsPageLoad', async () => {
 		const homePage = HomePage();
-		const categories = await homePage.selectSideNavTab(tabs.categories,7);
-		const channels = await categories.selectCategoryByName('Networks');
-		const firstSlugCategory = await channels.getNameOfFirstChannel();
-		const container = await channels.selectChannelByName('cj_enm');
+		const categories = await homePage.selectSideNavTab(tabs.categories, 7);
+		await categories.selectCategoryByName('Networks');
+		const container = await categories.selectChannelByName('cj_enm');
 		const slugCategory = await container.getCategoryName();
-		const details = await container.selectFocusedTitle();
+		const details = await container.selectFocusedChannel();
 		await details.selectPlay();
-		await verifyC112683();
 		await verifyC76717(slugCategory);
 		await verifyC76715(slugCategory);
-		await verifyC76715PageLoad();
-		await verifyC76715NavigateWithinPage(firstSlugCategory);
+		await verifyC76715NavigateWithinPage(slugCategory);
+		await verifyC690749NavigateToPage();
 	});
-});
+
+	it('C690751	User browses the Network channels on the category list page @analyticsASet3,@analyticsPageLoad', async () => {
+		const homePage = HomePage();
+		const categories = await homePage.selectSideNavTab(tabs.categories, 7);
+		await categories.selectCategoryByName('Networks');
+		await ecp.sendKeypress(ecp.Key.Right);
+		await utils.sleep(2000);
+		await ecp.sendKeypress(ecp.Key.Down, { count: 2 });
+		await verifyC690751NavigateWithinPage('networks');
+	});
+
+	it('C690753	User browses the titles in a given channel on the channel category page  @analyticsASet3,@analyticsPageLoad', async () => {
+		const homePage = HomePage();
+		const categories = await homePage.selectSideNavTab(tabs.categories, 7);
+		await categories.selectCategoryByName('Networks');
+		const container = await categories.selectChannelByName('cj_enm');
+		const slugCategory = await container.getCategoryName();
+		await ecp.sendKeypress(ecp.Key.Right);
+		await utils.sleep(2000);
+		await ecp.sendKeypress(ecp.Key.Down, { count: 2 });
+		await verifyC690753NavigateWithinPage(slugCategory);
+	});
+}); 

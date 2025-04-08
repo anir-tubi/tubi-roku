@@ -27,11 +27,11 @@ export async function verifyC268957WithinPage() {
 				event.navigate_within_page.home_page &&
 				event.navigate_within_page.home_page.content_mode &&
 				event.navigate_within_page.home_page.content_mode ===
-					EventsValues.conentModeUnknown &&
+				EventsValues.conentModeUnknown &&
 				event.navigate_within_page.left_side_nav_component &&
 				event.navigate_within_page.left_side_nav_component.left_nav_section &&
 				event.navigate_within_page.left_side_nav_component.left_nav_section ===
-					'LINEAR'
+				'LINEAR'
 		);
 		i++;
 	}
@@ -44,6 +44,139 @@ export async function verifyC268957WithinPage() {
 	).equal('LINEAR');
 	expect(navigateWithinPage.navigate_within_page.vertical_location).equal(10);
 	expect(navigateWithinPage.navigate_within_page.horizontal_location).equal(1);
+}
+
+export async function verifyC690751NavigateWithinPage(slugCategory) {
+	let navigateWithinPage;
+	let i = 1;
+	while (navigateWithinPage === undefined && i < 16) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.navigate_within_page,
+			25 + i
+		);
+		navigateWithinPage = pulletEvents.find(
+			(event) =>
+				event.navigate_within_page &&
+				event.navigate_within_page.category_component &&
+				event.navigate_within_page.category_component.category_slug &&
+				event.navigate_within_page.category_component.category_slug ===
+				slugCategory.toLowerCase()
+		);
+		i++;
+	}
+	expect(
+		navigateWithinPage.navigate_within_page.category_component.category_slug
+	).equal(
+		slugCategory.toLowerCase(),
+		`event should contains navigate_within_page.category_component.category_slug==${slugCategory}, Event: \n
+${JSON.stringify(navigateWithinPage)}\n`
+	);
+}
+
+export async function verifyC690753NavigateWithinPage(slugCategory: string) {
+	let navigateWithinPage;
+	let i = 1;
+
+	// Loop to fetch and find the matching event
+	while (navigateWithinPage === undefined && i < 16) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.navigate_within_page,
+			25 + i
+		);
+
+		navigateWithinPage = pulletEvents.find(
+			(event) =>
+				event.navigate_within_page &&
+				event.navigate_within_page.category_component &&
+				event.navigate_within_page.category_component.category_slug &&
+				event.navigate_within_page.category_component.category_slug ===
+				slugCategory.toLowerCase() &&
+				event.navigate_within_page.category_component.category_col === 1
+		);
+		i++;
+	}
+
+	// Assertions to verify the object structure and values
+	expect(
+		navigateWithinPage.navigate_within_page.category_component.category_slug
+	).equal(
+		slugCategory.toLowerCase(),
+		`event should contain navigate_within_page.category_component.category_slug==${slugCategory}, Event: \n${JSON.stringify(
+			navigateWithinPage
+		)}\n`
+	);
+
+	expect(
+		navigateWithinPage.navigate_within_page.category_component.category_col
+	).equal(
+		1,
+		`event should contain navigate_within_page.category_component.category_col===1, Event: \n${JSON.stringify(
+			navigateWithinPage
+		)}\n`
+	);
+
+	expect(
+		navigateWithinPage.navigate_within_page.category_component.category_row
+	).equal(
+		1,
+		`event should contain navigate_within_page.category_component.category_row===1, Event: \n${JSON.stringify(
+			navigateWithinPage
+		)}\n`
+	);
+
+	expect(
+		navigateWithinPage.navigate_within_page.category_component.content_tile.col
+	).equal(
+		1,
+		`event should contain navigate_within_page.category_component.content_tile.col===1, Event: \n${JSON.stringify(
+			navigateWithinPage
+		)}\n`
+	);
+
+	expect(
+		navigateWithinPage.navigate_within_page.category_component.content_tile.row
+	).equal(
+		1,
+		`event should contain navigate_within_page.category_component.content_tile.row===1, Event: \n${JSON.stringify(
+			navigateWithinPage
+		)}\n`
+	);
+
+	expect(
+		navigateWithinPage.navigate_within_page.category_page.category_slug
+	).equal(
+		slugCategory.toLowerCase(),
+		`event should contain navigate_within_page.category_page.category_slug==${slugCategory}, Event: \n${JSON.stringify(
+			navigateWithinPage
+		)}\n`
+	);
+
+	expect(
+		navigateWithinPage.navigate_within_page.horizontal_location
+	).to.match(
+		/\d/,
+		`event should contain navigate_within_page.horizontal_location===1, Event: \n${JSON.stringify(
+			navigateWithinPage
+		)}\n`
+	);
+
+	expect(
+		navigateWithinPage.navigate_within_page.means_of_navigation
+	).equal(
+		"BUTTON",
+		`event should contain navigate_within_page.means_of_navigation===BUTTON, Event: \n${JSON.stringify(
+			navigateWithinPage
+		)}\n`
+	);
+
+	expect(
+		navigateWithinPage.navigate_within_page.vertical_location
+	).to.match(
+		/\d/,
+		`event should contain navigate_within_page.vertical_location===1, Event: \n${JSON.stringify(
+			navigateWithinPage
+		)}\n`
+	);
 }
 
 export async function verifyC76715NavigateWithinPage(slugCategory) {
@@ -60,14 +193,14 @@ export async function verifyC76715NavigateWithinPage(slugCategory) {
 				event.navigate_within_page.category_component &&
 				event.navigate_within_page.category_component.category_slug &&
 				event.navigate_within_page.category_component.category_slug ===
-					slugCategory
+				slugCategory.toLowerCase()
 		);
 		i++;
 	}
 	expect(
 		navigateWithinPage.navigate_within_page.category_component.category_slug
 	).equal(
-		slugCategory,
+		slugCategory.toLowerCase(),
 		`event should contains navigate_within_page.category_component.category_slug==${slugCategory}, Event: \n
 ${JSON.stringify(navigateWithinPage)}\n`
 	);
@@ -87,14 +220,14 @@ export async function verifyC76717(slugCategory) {
 				event.navigate_within_page.category_component &&
 				event.navigate_within_page.category_component.category_slug &&
 				event.navigate_within_page.category_component.category_slug ===
-					slugCategory
+				slugCategory.toLowerCase()
 		);
 		i++;
 	}
 	expect(
 		navigateWithinPage.navigate_within_page.category_component.category_slug
 	).equal(
-		slugCategory,
+		slugCategory.toLowerCase(),
 		`event should contains navigate_within_page.category_component.category_slug==${slugCategory}, Event: \n
 ${JSON.stringify(navigateWithinPage)}\n`
 	);
@@ -114,13 +247,13 @@ export async function verifyC268959() {
 				event.navigate_within_page.home_page &&
 				event.navigate_within_page.home_page.content_mode &&
 				event.navigate_within_page.home_page.content_mode ===
-					EventsValues.conentModeUnknown &&
+				EventsValues.conentModeUnknown &&
 				event.navigate_within_page.means_of_navigation &&
 				event.navigate_within_page.means_of_navigation === 'SCROLL' &&
 				event.navigate_within_page.left_side_nav_component &&
 				event.navigate_within_page.left_side_nav_component.left_nav_section &&
 				event.navigate_within_page.left_side_nav_component.left_nav_section ===
-					'HOME'
+				'HOME'
 		);
 		i++;
 	}
@@ -162,7 +295,7 @@ export async function verifyC543668andC543669(titleId) {
 				event.navigate_within_page.category_component &&
 				event.navigate_within_page.category_component.category_slug &&
 				event.navigate_within_page.category_component.category_slug ===
-					'featured'
+				'featured'
 		);
 		i++;
 	}
@@ -210,7 +343,7 @@ export async function verifyC543671(details) {
 				event.navigate_within_page.category_component &&
 				event.navigate_within_page.category_component.category_slug &&
 				event.navigate_within_page.category_component.category_slug ===
-					'featured' &&
+				'featured' &&
 				event.navigate_within_page.horizontal_location === 1
 		);
 		i++;
@@ -267,7 +400,7 @@ export async function verifyC425240(titleId) {
 				event.navigate_within_page.middle_nav_component &&
 				event.navigate_within_page.middle_nav_component.middle_nav_section &&
 				event.navigate_within_page.middle_nav_component.middle_nav_section ===
-					MidleNavComponents.episodeList
+				MidleNavComponents.episodeList
 		);
 		i++;
 	}
@@ -324,7 +457,7 @@ export async function verifyC118157() {
 				event.navigate_within_page.epg_component &&
 				event.navigate_within_page.epg_component.category_slug &&
 				event.navigate_within_page.epg_component.category_slug ===
-					CategorySlug.FEATURED_CHANNELS
+				CategorySlug.FEATURED_CHANNELS
 		);
 		i++;
 	}
@@ -388,7 +521,7 @@ export async function verifyC425233(titleId) {
 				event.navigate_within_page.middle_nav_component &&
 				event.navigate_within_page.middle_nav_component.middle_nav_section &&
 				event.navigate_within_page.middle_nav_component.middle_nav_section ===
-					MidleNavComponents.watchTrailer
+				MidleNavComponents.watchTrailer
 		);
 		i++;
 	}
@@ -430,6 +563,110 @@ export async function verifyC425233(titleId) {
 	);
 }
 
+export async function verifyC690744() {
+	let navigateWithinPage;
+	let i = 1;
+	while (navigateWithinPage === undefined && i < 16) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.navigate_within_page,
+			25 + i
+		);
+		navigateWithinPage = pulletEvents.find(
+			(event) =>
+				event.navigate_within_page.category_list_page &&
+				event.navigate_within_page.browse_menu_component &&
+				event.navigate_within_page.browse_menu_component.category_slug
+		);
+		i++;
+	}
+	expect(navigateWithinPage.navigate_within_page.browse_menu_component
+		.category_slug).to.match(
+			/^.+$/,
+			`event should contain navigateWithinPage.navigate_within_page.browse_menu_page.category_slug===slug \n
+	${JSON.stringify(navigateWithinPage)} \n`
+		);
+	expect(navigateWithinPage.navigate_within_page.category_list_page).to.be.empty
+}
+
+export async function verifyC690748(categorySlug) {
+	let navigateWithinPage;
+	let i = 1;
+	while (navigateWithinPage === undefined && i < 16) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.navigate_within_page,
+			25 + i
+		);
+		navigateWithinPage = pulletEvents.find(
+			(event) =>
+				event.navigate_within_page.category_page &&
+				event.navigate_within_page.category_page.category_slug
+		);
+		i++;
+	}
+	expect(navigateWithinPage.navigate_within_page.vertical_location).equal(
+		1,
+		`event should contain navigateWithinPage.navigate_within_page.vertical_location===1 \n
+	${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(navigateWithinPage.navigate_within_page.horizontal_location).to.match(
+		/\d/,
+		`event should contain navigateWithinPage.navigate_within_page.horizontal_location== \n
+	${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(navigateWithinPage.navigate_within_page.means_of_navigation).equal(
+		'BUTTON',
+		`event should contain navigateWithinPage.navigate_within_page.means_of_navigation===BUTTON \n
+	${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(
+		navigateWithinPage.navigate_within_page.category_component
+			.category_slug
+	).equal(
+		categorySlug,
+		`event should contain navigateWithinPage.navigate_within_page.category_component.category_slug===featured \n
+	${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(
+		navigateWithinPage.navigate_within_page.category_page
+			.category_slug
+	).equal(
+		categorySlug,
+		`event should contain navigateWithinPage.navigate_within_page.category_component.category_slug===featured \n
+	${JSON.stringify(navigateWithinPage)} \n`
+	);
+}
+
+
+export async function verifyC690746() {
+	let navigateWithinPage;
+	let i = 1;
+	while (navigateWithinPage === undefined && i < 16) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.navigate_within_page,
+			25 + i
+		);
+		navigateWithinPage = pulletEvents.find(
+			(event) =>
+				event.navigate_within_page.left_side_nav_component &&
+				event.navigate_within_page.left_side_nav_component.left_nav_section &&
+				event.navigate_within_page.left_side_nav_component.left_nav_section ===
+				'CATEGORIES'
+		);
+		i++;
+	}
+	expect(navigateWithinPage.navigate_within_page.home_page
+		.content_mode).equal(
+			EventsValues.conentModeMovie,
+			`event should contain navigateWithinPage.navigate_within_page.home_page.content_mode  \n
+	${JSON.stringify(navigateWithinPage)} \n`
+		);
+	expect(navigateWithinPage.navigate_within_page.left_side_nav_component.left_nav_section).equal(
+		'CATEGORIES',
+		`event should contain navigateWithinPage.navigate_within_page.left_side_nav_component.left_nav_section===CATEGORIES \n
+	${JSON.stringify(navigateWithinPage)} \n`
+	);
+}
+
 export async function verifyC524595() {
 	let navigateWithinPage;
 	let i = 1;
@@ -447,10 +684,10 @@ export async function verifyC524595() {
 	}
 	expect(navigateWithinPage.navigate_within_page.video_player_page
 		.video_id).to.match(
-		/\d/,
-		`event should contain navigateWithinPage.navigate_within_page.video_player_page.video_id===id \n
+			/\d/,
+			`event should contain navigateWithinPage.navigate_within_page.video_player_page.video_id===id \n
 	${JSON.stringify(navigateWithinPage)} \n`
-	);
+		);
 	expect(navigateWithinPage.navigate_within_page.horizontal_location).equal(
 		2,
 		`event should contain navigateWithinPage.navigate_within_page.horizontal_location===1 \n
@@ -489,7 +726,7 @@ export async function verifyC425236(titleId) {
 				event.navigate_within_page.middle_nav_component &&
 				event.navigate_within_page.middle_nav_component.middle_nav_section &&
 				event.navigate_within_page.middle_nav_component.middle_nav_section ===
-					MidleNavComponents.dislike
+				MidleNavComponents.dislike
 		);
 		i++;
 	}
@@ -544,7 +781,7 @@ export async function verifyC425235(titleId) {
 				event.navigate_within_page.middle_nav_component &&
 				event.navigate_within_page.middle_nav_component.middle_nav_section &&
 				event.navigate_within_page.middle_nav_component.middle_nav_section ===
-					MidleNavComponents.like
+				MidleNavComponents.like
 		);
 		i++;
 	}
@@ -599,7 +836,7 @@ export async function verifyC425251(videoId) {
 				event.component_interaction.middle_nav_component &&
 				event.component_interaction.middle_nav_component.middle_nav_section &&
 				event.component_interaction.middle_nav_component.middle_nav_section ===
-					MidleNavComponents.goToNetwork &&
+				MidleNavComponents.goToNetwork &&
 				event.component_interaction.user_interaction &&
 				event.component_interaction.user_interaction === 'CONFIRM'
 		);
@@ -642,7 +879,7 @@ export async function verifyC425244() {
 				event.navigate_within_page.middle_nav_component &&
 				event.navigate_within_page.middle_nav_component.middle_nav_section &&
 				event.navigate_within_page.middle_nav_component.middle_nav_section ===
-					MidleNavComponents.addToMyList
+				MidleNavComponents.addToMyList
 		);
 		i++;
 	}
@@ -937,7 +1174,7 @@ export async function verifyC425242(titleId) {
 				event.navigate_within_page.dest_middle_nav_component
 					.middle_nav_section === MidleNavComponents.removeFromMyList &&
 				event.navigate_within_page.middle_nav_component.middle_nav_section ===
-					MidleNavComponents.addToMyList
+				MidleNavComponents.addToMyList
 		);
 		i++;
 	}
@@ -1006,7 +1243,7 @@ export async function verifyC425250(videoId) {
 				event.component_interaction.middle_nav_component &&
 				event.component_interaction.middle_nav_component.middle_nav_section &&
 				event.component_interaction.middle_nav_component.middle_nav_section ===
-					MidleNavComponents.signUpToSaveProgress &&
+				MidleNavComponents.signUpToSaveProgress &&
 				event.component_interaction.user_interaction &&
 				event.component_interaction.user_interaction === 'CONFIRM'
 		);
@@ -1047,7 +1284,7 @@ export async function verifyC425249(videoId) {
 				event.component_interaction.middle_nav_component &&
 				event.component_interaction.middle_nav_component.middle_nav_section &&
 				event.component_interaction.middle_nav_component.middle_nav_section ===
-					MidleNavComponents.episodeList &&
+				MidleNavComponents.episodeList &&
 				event.component_interaction.user_interaction &&
 				event.component_interaction.user_interaction === 'CONFIRM'
 		);
@@ -1088,7 +1325,7 @@ export async function verifyC425239(titleId) {
 				event.navigate_within_page.middle_nav_component &&
 				event.navigate_within_page.middle_nav_component.middle_nav_section &&
 				event.navigate_within_page.middle_nav_component.middle_nav_section ===
-					MidleNavComponents.play
+				MidleNavComponents.play
 		);
 		i++;
 	}

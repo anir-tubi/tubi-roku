@@ -1,4 +1,3 @@
-
 import type { BaseType } from 'roku-test-automation';
 
 type Element = {
@@ -449,6 +448,14 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.3.#subTxt',
     xpath:
       '/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent[4]/Label',
+  },
+
+  channelDescription: {
+   keyPath:'#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsInfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description',
+  },
+
+  titleDetailsDescriptionContainer: {
+   keyPath:'#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsInfoPanel.#infoPanelGroup.#Offset.#Title',
   },
 
   homeRowList: {
@@ -1634,9 +1641,9 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#SkipCuepointsButton',
   },
 
-  firstChannelNameInChannelPage: {
+  titleNameInCategories: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#channelListScreen.#PageGroup.#ChannelCategoryGrid.0.#Titles',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsInfoPanel.#infoPanelGroup.#Offset.#Title'
   },
 
   /** recommended tile on 

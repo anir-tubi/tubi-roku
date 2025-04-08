@@ -45,7 +45,7 @@ export async function verifyC439647ComponentInteraction() {
 				event.component_interaction.left_side_nav_component &&
 				event.component_interaction.left_side_nav_component.left_nav_section &&
 				event.component_interaction.left_side_nav_component.left_nav_section ===
-					LeftNavSection.queue
+				LeftNavSection.queue
 		);
 		i++;
 	}
@@ -83,10 +83,10 @@ export async function verifyC439648ComponentInteraction() {
 			(event) =>
 				event.component_interaction.user_interaction &&
 				event.component_interaction.user_interaction ===
-					UserInteraction.CONFIRM &&
+				UserInteraction.CONFIRM &&
 				event.component_interaction.button_component &&
 				event.component_interaction.button_component.button_value ===
-					MidleNavComponents.goToHome
+				MidleNavComponents.goToHome
 		);
 		i++;
 	}
@@ -125,10 +125,10 @@ export async function verifyC374782(id) {
 				event.component_interaction.middle_nav_component &&
 				event.component_interaction.middle_nav_component.middle_nav_section &&
 				event.component_interaction.middle_nav_component.middle_nav_section ===
-					ButtomValues.DISLIKE &&
+				ButtomValues.DISLIKE &&
 				event.component_interaction.user_interaction &&
 				event.component_interaction.user_interaction ===
-					UserInteraction.TOGGLE_OFF
+				UserInteraction.TOGGLE_OFF
 		);
 		i++;
 	}
@@ -167,7 +167,7 @@ export async function verifyC374790(id) {
 				event.component_interaction.middle_nav_component &&
 				event.component_interaction.middle_nav_component.middle_nav_section &&
 				event.component_interaction.middle_nav_component.middle_nav_section ===
-					ButtomValues.DISLIKE &&
+				ButtomValues.DISLIKE &&
 				event.component_interaction.user_interaction === UserInteraction.CONFIRM
 		);
 		i++;
@@ -207,10 +207,10 @@ export async function verifyC374783(id) {
 				event.component_interaction.middle_nav_component &&
 				event.component_interaction.middle_nav_component.middle_nav_section &&
 				event.component_interaction.middle_nav_component.middle_nav_section ===
-					ButtomValues.DISLIKE &&
+				ButtomValues.DISLIKE &&
 				event.component_interaction.user_interaction &&
 				event.component_interaction.user_interaction ===
-					UserInteraction.TOGGLE_OFF
+				UserInteraction.TOGGLE_OFF
 		);
 		i++;
 	}
@@ -247,7 +247,7 @@ export async function verifyC374787(id) {
 				event.component_interaction.middle_nav_component &&
 				event.component_interaction.middle_nav_component.middle_nav_section &&
 				event.component_interaction.middle_nav_component.middle_nav_section ===
-					ButtomValues.DISLIKE &&
+				ButtomValues.DISLIKE &&
 				event.component_interaction.user_interaction &&
 				event.component_interaction.user_interaction === UserInteraction.CONFIRM
 		);
@@ -286,9 +286,9 @@ export async function verifyC374779(id) {
 				event.component_interaction.middle_nav_component &&
 				event.component_interaction.middle_nav_component.middle_nav_section &&
 				event.component_interaction.middle_nav_component.middle_nav_section ===
-					ButtomValues.LIKE &&
+				ButtomValues.LIKE &&
 				event.component_interaction.user_interaction ===
-					UserInteraction.TOGGLE_OFF
+				UserInteraction.TOGGLE_OFF
 		);
 		i++;
 	}
@@ -327,7 +327,7 @@ export async function verifyC374785(id) {
 				event.component_interaction.middle_nav_component &&
 				event.component_interaction.middle_nav_component.middle_nav_section &&
 				event.component_interaction.middle_nav_component.middle_nav_section ===
-					ButtomValues.LIKE &&
+				ButtomValues.LIKE &&
 				event.component_interaction.user_interaction === UserInteraction.CONFIRM
 		);
 		i++;
@@ -367,9 +367,9 @@ export async function verifyC374778(id) {
 				event.component_interaction.middle_nav_component &&
 				event.component_interaction.middle_nav_component.middle_nav_section &&
 				event.component_interaction.middle_nav_component.middle_nav_section ===
-					ButtomValues.LIKE &&
+				ButtomValues.LIKE &&
 				event.component_interaction.user_interaction ===
-					UserInteraction.TOGGLE_OFF
+				UserInteraction.TOGGLE_OFF
 		);
 		i++;
 	}
@@ -406,7 +406,7 @@ export async function verifyC374784(id) {
 				event.component_interaction.middle_nav_component &&
 				event.component_interaction.middle_nav_component.middle_nav_section &&
 				event.component_interaction.middle_nav_component.middle_nav_section ===
-					ButtomValues.LIKE &&
+				ButtomValues.LIKE &&
 				event.component_interaction.user_interaction === UserInteraction.CONFIRM
 		);
 		i++;
@@ -444,7 +444,7 @@ export async function verifyC374774(id) {
 				event.component_interaction.middle_nav_component &&
 				event.component_interaction.middle_nav_component.middle_nav_section &&
 				event.component_interaction.middle_nav_component.middle_nav_section ===
-					ButtomValues.LIKE_OR_DISLIKE &&
+				ButtomValues.LIKE_OR_DISLIKE &&
 				event.component_interaction.user_interaction &&
 				event.component_interaction.user_interaction === UserInteraction.CONFIRM
 		);
@@ -485,10 +485,10 @@ export async function verifyC374777(id) {
 				event.component_interaction.middle_nav_component &&
 				event.component_interaction.middle_nav_component.middle_nav_section &&
 				event.component_interaction.middle_nav_component.middle_nav_section ===
-					ButtomValues.LIKE &&
+				ButtomValues.LIKE &&
 				event.component_interaction.user_interaction &&
 				event.component_interaction.user_interaction ===
-					UserInteraction.TOGGLE_ON
+				UserInteraction.TOGGLE_ON
 		);
 		i++;
 	}
@@ -527,10 +527,10 @@ export async function verifyC374771(id) {
 				event.component_interaction.middle_nav_component &&
 				event.component_interaction.middle_nav_component.middle_nav_section &&
 				event.component_interaction.middle_nav_component.middle_nav_section ===
-					ButtomValues.LIKE_OR_DISLIKE &&
+				ButtomValues.LIKE_OR_DISLIKE &&
 				event.component_interaction.user_interaction &&
 				event.component_interaction.user_interaction ===
-					UserInteraction.TOGGLE_ON
+				UserInteraction.TOGGLE_ON
 		);
 		i++;
 	}
@@ -569,7 +569,7 @@ export async function verifyC374775(id) {
 				event.component_interaction.middle_nav_component &&
 				event.component_interaction.middle_nav_component.middle_nav_section &&
 				event.component_interaction.middle_nav_component.middle_nav_section ===
-					ButtomValues.LIKE_OR_DISLIKE &&
+				ButtomValues.LIKE_OR_DISLIKE &&
 				event.component_interaction.user_interaction &&
 				event.component_interaction.user_interaction === UserInteraction.CONFIRM
 		);
@@ -608,10 +608,10 @@ export async function verifyC374776(id) {
 				event.component_interaction.middle_nav_component &&
 				event.component_interaction.middle_nav_component.middle_nav_section &&
 				event.component_interaction.middle_nav_component.middle_nav_section ===
-					ButtomValues.LIKE &&
+				ButtomValues.LIKE &&
 				event.component_interaction.user_interaction &&
 				event.component_interaction.user_interaction ===
-					UserInteraction.TOGGLE_ON
+				UserInteraction.TOGGLE_ON
 		);
 		i++;
 	}
@@ -648,9 +648,9 @@ export async function verifyC374770(id) {
 				event.component_interaction.middle_nav_component &&
 				event.component_interaction.middle_nav_component.middle_nav_section &&
 				event.component_interaction.middle_nav_component.middle_nav_section ===
-					ButtomValues.LIKE_OR_DISLIKE &&
+				ButtomValues.LIKE_OR_DISLIKE &&
 				event.component_interaction.user_interaction ===
-					UserInteraction.TOGGLE_ON
+				UserInteraction.TOGGLE_ON
 		);
 		i++;
 	}
@@ -689,11 +689,11 @@ export async function verifyC268957() {
 				event.component_interaction.home_page &&
 				event.component_interaction.home_page.content_mode &&
 				event.component_interaction.home_page.content_mode ===
-					EventsValues.conentModeLatino &&
+				EventsValues.conentModeLatino &&
 				event.component_interaction.left_side_nav_component &&
 				event.component_interaction.left_side_nav_component.left_nav_section &&
 				event.component_interaction.left_side_nav_component.left_nav_section ===
-					`ESPANOL`
+				`ESPANOL`
 		);
 		i++;
 	}
@@ -739,11 +739,11 @@ export async function verifyC268956ComponentInteraction() {
 				event.component_interaction.home_page &&
 				event.component_interaction.home_page.content_mode &&
 				event.component_interaction.home_page.content_mode ===
-					EventsValues.conentModeUnknown &&
+				EventsValues.conentModeUnknown &&
 				event.component_interaction.left_side_nav_component &&
 				event.component_interaction.left_side_nav_component.left_nav_section &&
 				event.component_interaction.left_side_nav_component.left_nav_section ===
-					`ESPANOL`
+				`ESPANOL`
 		);
 		i++;
 	}
@@ -761,6 +761,57 @@ export async function verifyC268956ComponentInteraction() {
 			.left_nav_section
 	).equal(
 		`ESPANOL`,
+		`Event should contain  componentInteractionEvent.component_interaction.left_side_nav_component..left_nav_section=ESPANOL, Event: \n ${JSON.stringify(
+			componentInteraction
+		)}
+\n`
+	);
+	expect(componentInteraction.component_interaction.user_interaction).equal(
+		`CONFIRM`,
+		`Event should contain componentInteractionEvent.component_interaction.user_interaction=CONFIRM, Event: \n ${JSON.stringify(
+			componentInteraction
+		)}
+		\n`
+	);
+}
+
+
+export async function verifyC690745ComponentInteraction() {
+	let componentInteraction;
+	let i = 1;
+	while (componentInteraction === undefined && i < 16) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.component_interaction,
+			10 + i
+		);
+		componentInteraction = pulletEvents.find(
+			(event) =>
+				event.component_interaction &&
+				event.component_interaction.home_page &&
+				event.component_interaction.home_page.content_mode &&
+				event.component_interaction.home_page.content_mode ===
+				EventsValues.conentModeMovie &&
+				event.component_interaction.left_side_nav_component &&
+				event.component_interaction.left_side_nav_component.left_nav_section &&
+				event.component_interaction.left_side_nav_component.left_nav_section ===
+				`CATEGORIES`
+		);
+		i++;
+	}
+	expect(
+		componentInteraction.component_interaction.home_page.content_mode
+	).equal(
+		EventsValues.conentModeMovie,
+		`Event should contain componentInteractionEvent.home_page.content_mode=CONTENT_MODE_UNKNOWN, Event: \n ${JSON.stringify(
+			componentInteraction
+		)}
+		\n`
+	);
+	expect(
+		componentInteraction.component_interaction.left_side_nav_component
+			.left_nav_section
+	).equal(
+		`CATEGORIES`,
 		`Event should contain  componentInteractionEvent.component_interaction.left_side_nav_component..left_nav_section=ESPANOL, Event: \n ${JSON.stringify(
 			componentInteraction
 		)}

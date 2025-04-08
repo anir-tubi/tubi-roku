@@ -93,7 +93,7 @@ export const CHANNELS_PAGE_NODES = {
 export const CONTAINER_PAGE_NODES = {
 	GRID: 'categoriesVideoGrid',
 	TITLE_DESCRIPTION: 'titleDescriptionInChannelGrid',
-	TITLE_NAME_IN_CONTAINER: 'titleNameInContainer',
+	TITLE_NAME_IN_CONTAINER: 'titleNameInCategories',
 };
 
 export const ELEMENTS_FOCUSED = {

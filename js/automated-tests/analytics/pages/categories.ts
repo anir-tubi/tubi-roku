@@ -10,6 +10,8 @@ const Categories = () => {
 			await testUtils.getNodeForElement('channelCategoryGrid'),
 		channelSideNavigation: async () =>
 			await testUtils.getNodeForElement('channelSideNav'),
+		titleName: async () =>
+			await testUtils.getNodeForElement('titleNameInCategories'),
 	};
 
 	async function pageDidLoad() {
@@ -35,10 +37,32 @@ const Categories = () => {
 		return container;
 	}
 
+	async function selectChannelByName(channelName) {
+		await ecp.sendKeypress(ecp.Key.Right);
+		await utils.sleep(1500);
+		await testUtils.jumpToRowWithTitle('channelsListScreenGrid', channelName);
+		await ecp.sendKeypress(ecp.Key.Ok);
+		const container = Container();
+		await container.pageDidLoad();
+		return container;
+	}
+
+	async function getNameOfHighlighteditle() {
+		let text = '';
+		await testUtils.retryWithTimeOut(async () => {
+			const channelPoster = await elements.titleName();
+			expect(channelPoster.visible).to.equal(true);
+			text = channelPoster.text;
+		});
+		return text;
+	}
+
 	return {
 		selectCategoryByName,
 		selectFocusedCategory,
 		pageDidLoad,
+		getNameOfHighlighteditle,
+		selectChannelByName,
 	};
 };
 
