@@ -420,6 +420,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
 
     getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v1", true)
 
+    getExperimentResource("roku_no_change_experiment", "roku_no_change_experiment_v1", true)
   end if
 End Function
 
@@ -606,7 +607,7 @@ Function onColumnFocusChanged(msg)
 
   if isNumber(rowFocused) = true AND homeScreen.content <> invalid
     category = homeScreen.content.getChild(rowFocused)
-    
+
     if isNode(category) = true AND category.paginationInfo <> invalid
       cursor = category.paginationInfo.cursor
       hasMoreContent = category.paginationInfo.hasMoreContent
