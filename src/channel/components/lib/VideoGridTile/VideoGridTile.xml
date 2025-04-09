@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="VideoGridTile" extends="Group">
+
+  <script type="text/brightscript" uri="VideoGridTile.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+
+  <interface>
+    <field id="itemContent" type="node" />
+    <field id="width" alias="poster.width,videoGridMetadata.width" />
+    <field id="height" alias="poster.height,videoGridMetadata.height" />
+    <field id="itemHasFocus" type="boolean" />
+  </interface>
+
+  <children>
+    <Poster
+      id="poster"
+      width="789"
+      height="330"
+      uri="pkg:/images/placeholder-featured.webp"
+      loadingBitmapUri="pkg:/images/placeholder-featured.webp"
+      failedBitmapUri="pkg:/images/placeholder-featured.webp" />
+
+    <VideoGridMetadata id="videoGridMetadata" />
+
+  </children>
+</component>

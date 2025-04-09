@@ -90,11 +90,15 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
 
       if bMinimized = false
         maximizeLinearPlayer(clonedContent)
-      else
-        '//play at minimized state
-        showHideLinearVideoPlayerSpinner(true)
-        videoPlayer.loading = true
-        animateLinearVideoPlayerToMinState(0, false)
+      else        
+        if content.gridItemType = m.constants.ui.gridItemTypes.landscapeWithMetadata
+          switchLinearToInlineGridMode(videoPlayer)
+        else
+          '//play at minimized state
+          showHideLinearVideoPlayerSpinner(true)
+          videoPlayer.loading = true
+          animateLinearVideoPlayerToMinState(0, false)
+        end if
       end if
 
       if bLinearPlayerPlayingThisContent = false
@@ -700,8 +704,12 @@ Function returnToPreviousScreenFromLinearVideo(bContinueToPlay = true)
         end if
         popScreen(true, true)
 
-        '//animate the video player into the corner
-        animateLinearVideoPlayerToMinState()
+        if videoPlayer.originalContent <> invalid AND videoPlayer.originalContent.gridItemType = m.constants.ui.gridItemTypes.landscapeWithMetadata
+          switchLinearToInlineGridMode(videoPlayer)
+        else
+          '//animate the video player into the corner
+          animateLinearVideoPlayerToMinState()
+        end if
       end if
     else
       ' remove the video player screen to reveal the home screen/epg Screen
@@ -823,7 +831,11 @@ Function reactToLinearVideoPlayerErrorStateInNonFullscreenState()
   ' to start playback. If an error occurs heres, not showing an error modal allows users to continue navigating.
   stopAndHideLinearVideoPlayer()
   homescreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-  setVideoContentScreenBackground(homescreen)
+  if homescreen.lastFocusedList = "featuredRowList"
+    displayDefaultBackground()
+  else
+    setVideoContentScreenBackground(homescreen)
+  end if
 End Function
 
 
@@ -917,4 +929,31 @@ Function onTrackingLoggingEvent(event)
   if event <> invalid
     m.trackingLoggingTask.trackEvent =  trackEvent
   end if
+End Function
+
+
+Function switchLinearToInlineGridMode(linearPlayer)
+  linearPlayer.width = 795
+  linearPlayer.height = 330
+  linearPlayer.translation = [0, 0]
+  linearPlayer.reParent(m.inlineVideoPreviewPlayerContainer, false)
+  m.inlineVideoMetadataOverlay.reParent(m.inlineVideoPreviewPlayerContainer, false)
+  m.inlinePreviewFocusIndicator.reParent(m.inlineVideoPreviewPlayerContainer, false)
+
+  linearPlayer.visible = false
+  if linearPlayer.fullscreen <> false
+    linearPlayer.fullscreen = false
+  end if
+
+  linearPlayer.unObserveFieldScoped("state")
+  linearPlayer.observeFieldScoped("state", "onLinearInlineVideoPlayerStateWhileInMinState")
+End Function
+
+
+Function onLinearInlineVideoPlayerStateWhileInMinState(msg)
+  state = msg.getData()
+  if state = "playing"
+    m.inlineVideoMetadataOverlay.visible = true
+  end if
+  onLinearVideoPlayerStateWhileInMinState(msg)
 End Function

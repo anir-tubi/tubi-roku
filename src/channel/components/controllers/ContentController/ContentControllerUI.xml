@@ -28,8 +28,11 @@
         id="ContentGroup"
         visible="false">
 
-        <VideoPreviewPlayer
-          id="videoPreviewPlayer" />
+        <Group
+          id="backgroundVideoPreviewPlayerContainer">
+          <VideoPreviewPlayer
+            id="videoPreviewPlayer" />
+        </Group>
 
         <!--  Group that contains the linear video player when it is not in its fullscreen state -->
         <Group
@@ -46,8 +49,30 @@
         <SponsorshipFooterGroup
           id="SponsorshipFooterGroup"/>
 
-        <ScreenStack
-          id="ScreenStack"/>
+        <Group
+          id="screenStackGroup">
+          
+          <ScreenStack
+            id="ScreenStack"/>
+            
+          <Group
+            id="inlineVideoPreviewPlayerContainer"
+            visible="false"
+            translation="[159, 189]" >
+            <VideoGridMetadata 
+              visible="false"
+              width="789"
+              height="330"
+              translation="[5,4]"
+              id="inlineVideoMetadataOverlay" />
+            <Poster
+              width="801"
+              height="340"
+              id="inlinePreviewFocusIndicator"
+              uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
+          </Group>
+
+        </Group>
 
         <!--  Group that contains the linear video player when it is not in its fullscreen state, and when the player needs to be above the screen stack layer. -->
         <Group

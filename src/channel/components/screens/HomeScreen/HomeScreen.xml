@@ -32,6 +32,9 @@
       <!-- The helper class will call this when the new content is ready to be displayed on the screen. -->
       <field id="contentUpdated" alwaysNotify="true" alias="CategoryGridList.contentUpdated" />
 
+       <!-- Featured row content node -->
+      <field id="featuredRowContent" alias="CategoryGridList.featuredRowContent" />
+
       <!-- The helper will set this when the new skin Ad content is ready to be displayed on the screen. -->
       <field id="skinAdContentUpdated" alias="CategoryGridList.skinAdContentUpdated" />
 
@@ -98,6 +101,10 @@
       <!-- Will be set to true if we want to reset the grid position back to [0,0] -->
       <field id="resetGridPosition" alias="CategoryGridList.resetGridPosition" />
 
+      <field id="featuredRowFocusedItem" alias="CategoryGridList.featuredRowFocusedItem" />
+
+      <field id="hideInfoPanel" alias="InfoPanel.visible,CategoryGridList.hideInfoPanel" />
+
     <!-- OUTPUTS -->
       <!-- Trigger the content to be loaded.  This field is used to delay
            the initial category content loading until after the stateful
@@ -106,6 +113,8 @@
 
       <!-- Communicates an index to use as a starting point for fetch a batch of categories -->
       <field id="loadCategoriesIndex" type="integer" alias="CategoryGridList.loadCategoriesIndex"/>
+
+      <field id="featuredRowCurrFocusColumn" alias="CategoryGridList.featuredRowCurrFocusColumn" />
 
       <!-- set to the contentNode of the CategoryGridList item which was clicked on -->
       <field id="contentSelected" type="node"/>
@@ -159,6 +168,14 @@
 
        <!--Communicates to the parent that some of the containers has expired and to be loaded-->
       <field id="loadCategoryForIds" type="array" alwaysNotify="true"/>
+
+      <!-- Communicates to the parent if the featured list has focus. -->
+      <field id="featuredListHasFocus" alias="CategoryGridList.featuredListHasFocus" />
+      
+      <field id="currentFocusedItemBoundingRect" alias="CategoryGridList.currentFocusedItemBoundingRect" />
+      
+      <!-- Communicates to parent what was the last focused list was. -->
+      <field id="lastFocusedList" alias="CategoryGridList.lastFocusedList" />
 
     <!-- DATA STORE (Anything defined below are not meant to be used as output or input fields which will triggered change events. ) -->
       <field id="personalizationId" type="string" alias="CategoryGridList.personalizationId" />

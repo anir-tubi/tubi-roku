@@ -64,7 +64,7 @@ Function parseCategoryContentSuccess(fullResponse, reqInfo)
 
     options = reqInfo.options
     if options <> invalid AND options.params <> invalid
-      contentMode = options.params.contentMode
+      contentMode = options.params.content_mode
       isKidsMode = options.params.is_kids_mode
     end if
 

@@ -1,9 +1,10 @@
 ' gets the video player state for content passed as param
 ' @content : TubiContentNode, which has the details about the title/video
 ' returns state : string, the state of videopreview
-Function getVideoPreviewStateForThisContent(content = invalid)
+Function getVideoPreviewStateForThisContent(content = invalid, isInFeaturedRowExp = false)
   tubiLog("VideoPreviewHelpers.getVideoPreviewStateForThisContent")
   state = "none"
+
   videoPreview = m.videoPreviewPlayer
   if content <> invalid AND videoPreview <> invalid AND videoPreview.content <> invalid
     if videoPreview.content.id = content.id
@@ -71,12 +72,15 @@ Function onVideoPreviewStateChanged(msg)
   videoPreviewState = msg.getData()
   currentScreen = getCurrentScreen()
 
-  if videoPreviewState = "playing" OR videoPreviewState = "paused"
-    if videoPreview <> invalid
+  if (videoPreviewState = "playing" OR videoPreviewState = "paused") AND videoPreview <> invalid AND videoPreview.isBufferingComplete = true
+    ' Adding a safety check to make sure if a new debounce was started we do not show the player instead just pause it.
+    if m.videoPreviewDebounce.control = "start"
+      videoPreview.visible = false
+      pauseVideoPreview()
+    else
       videoPreview.visible = true
+      m.backgroundGroup.posterVisible = false
     end if
-
-    m.backgroundGroup.posterVisible = false
   else if videoPreviewState = "error"
     ' unobserve the state if we have any error while playing mp4 video previews to avoid autostarting the focused content on autostart variant of experiment.
     videoPreview.unobserveFieldScoped("state")
@@ -135,7 +139,13 @@ Function onVideoPreviewStateChanged(msg)
             "srcForAds": m.constants.player.playbackOrigin.container
             "playbackContainer": currentScreen.currCategoryId
           }
-          showDetailScreen(currentScreen.contentFocused, false, skipDetailScreen, invalid, playbackSource)
+
+          contentFocused = currentScreen.contentFocused
+          if isNonEmptyString(currentScreen.lastFocusedList) = true AND currentScreen.lastFocusedList = "featuredRowList"
+            contentFocused = currentScreen.featuredRowFocusedItem
+          end if
+
+          showDetailScreen(contentFocused, false, skipDetailScreen, invalid, playbackSource)
         end if
       else if isFullPlayerBlockedForUser = true
         'Updating backgroundUriList once video preview finished to show the background images instead of black backgroud.
@@ -148,16 +158,25 @@ Function onVideoPreviewStateChanged(msg)
 End Function
 
 
+Function onVideoBufferingStatusChanged(msg)
+  bufferingStatus = msg.getData()
+  videoPreview = msg.getRoSGNode()
+  if bufferingStatus <> invalid
+    videoPreview.isBufferingComplete = (bufferingStatus.percentage = 100)
+  end if
+End Function
+
+
 ' starts the video preview
 ' @content : TubiContentNode, it has all the required information to start the video preview
 ' @pageInfo: assocarray, value can be { pagetype: "home_page", pagevalues: {}}
 Function startVideoPreview(content, pageInfo = {})
   tubiLog("VideoPreviewHelpers.startVideoPreview")
-
-
+  
   if content <> invalid AND (isVideoPreviewOn() = true OR (content.gridItemType = m.constants.ui.gridItemTypes.skinAd AND m.constants.deviceInfo.IsAutoplayEnabled = true AND m.constants.deviceInfo.limitedUi = false))
     '//::NOTE:: if this is a skinAd content, the above conditional statement checks if the device auto play setting is on and that the device is not a limited UI device before playing the looping background video
     videoPreview = m.videoPreviewPlayer
+    videoPreview.isBufferingComplete = false
 
     ' If the experiment is enabled and focused content is from featured row than expand preview to full screen.
     if content.gridItemType = m.constants.ui.gridItemTypes.skinAd
@@ -166,6 +185,8 @@ Function startVideoPreview(content, pageInfo = {})
       updatePreviewPlayerToFullScreen()
       videoPreview.unObserveFieldScoped("position")
       videoPreview.observeFieldScoped("position", "onVideoPreviewPositionChanged")
+    else if content.gridItemType = m.constants.ui.gridItemTypes.landscapeWithMetadata
+      updatePreviewPlayerToInlineView()
     else
       updatePreviewPlayerToCondensedView()
     end if
@@ -173,6 +194,7 @@ Function startVideoPreview(content, pageInfo = {})
     ' unObserve field just in case previous state was errorsstart observing a fresh status.
     videoPreview.unObserveFieldScoped("state")
     videoPreview.observeFieldScoped("state", "onVideoPreviewStateChanged")
+    videoPreview.observeFieldScoped("bufferingStatus", "onVideoBufferingStatusChanged")
     setPageInfoForVideoPreview(pageInfo)
 
     videoContent = createObject("RoSGNode", "ContentNode")
@@ -198,6 +220,13 @@ Function startVideoPreview(content, pageInfo = {})
       videoContent.streamformat = "mp4" ' backend will return always as mp4 for video previews
     end if
 
+    homescreenDesignType = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v1", false).design_type
+
+    if content.parentId = m.constants.ui.categoryIds.featured AND (homescreenDesignType <> "none")
+      videoContent.addField("parentCategory", "string", false)
+      videoContent.parentCategory = content.parentId
+    end if
+
     videoPreview.content = videoContent
     videoPreview.updateContent = true
     sendVideoPlayerCommand(videoPreview, "play")
@@ -207,11 +236,39 @@ End Function
 
 
 Function updatePreviewPlayerToCondensedView()
+  tubiLog("VideoPreviewHelpers.updatePreviewPlayerToCondensedView")
+  m.videoPreviewPlayer.reParent(m.backgroundVideoPreviewPlayerContainer, false)
+  m.videoPreviewPlayer.clippingRect = [0, 0, 1920, 1080]
   resizeToLocation(m.videoPreviewPlayer, 1120, 630, [799, 0], 0)
 End Function
 
 
+Function updatePreviewPlayerToInlineView()
+  if isCurrentScreenHomeScreen() = true
+    screen = getCurrentScreen()
+    if m.videoPreviewPlayer.getParent().isSameNode(m.inlineVideoPreviewPlayerContainer) = false
+      m.videoPreviewPlayer.clippingRect = [0, 57, 792, 329]
+      m.videoPreviewPlayer.width = 795
+      m.videoPreviewPlayer.height = 441
+      m.videoPreviewPlayer.reParent(m.inlineVideoPreviewPlayerContainer, false)
+      m.inlineVideoMetadataOverlay.reParent(m.inlineVideoPreviewPlayerContainer, false)
+      m.inlinePreviewFocusIndicator.reParent(m.inlineVideoPreviewPlayerContainer, false)
+    end if
+    m.videoPreviewPlayer.translation = [3, -52]
+    offsetX = 0
+    rectX = screen.currentFocusedItemBoundingRect.x
+    ' Using static offset to avoid a bug where scroll hangs due to freeze of UI thread.
+    if isNumber(rectX) = true AND rectX > 0
+      offsetX = 802
+    end if
+    m.inlineVideoPreviewPlayerContainer.translation = [159 + offsetX, 189]
+  end if
+End Function
+
+
 Function updatePreviewPlayerToFullScreen()
+  m.videoPreviewPlayer.reParent(m.backgroundVideoPreviewPlayerContainer, false)
+  m.videoPreviewPlayer.clippingRect = [0, 0, 1920, 1080]
   resizeToLocation(m.videoPreviewPlayer, 1919, 1079, [0, 0], 0)
 End Function
 
@@ -257,6 +314,8 @@ Function setVideoPreviewAfterFocus(focusedContent, pageInfo = {})
             if isCurrentScreenHomeScreen() = true
               updatePreviewPlayerToFullScreen()
             end if
+          else if focusedContent.gridItemType = m.constants.ui.gridItemTypes.landscapeWithMetadata
+            updatePreviewPlayerToInlineView()
           end if
         end if
         m.backgroundGroup.posterVisible = false

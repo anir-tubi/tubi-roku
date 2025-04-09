@@ -169,13 +169,10 @@ Function onDetailBackgroundChange(msg)
   detailScreen = msg.getRoSGNode()
   if detailScreen.isInFocusChain()
     if isVideoPreviewOn() = true
-      previewState = getVideoPreviewState()
-      if previewState <> "playing"
-        m.backgroundGroup.backgroundInfo = {
-          type: m.constants.ui.backgroundTypes.topright
-          uriList: detailScreen.backgroundUriList
-        }
-      end if
+      m.backgroundGroup.backgroundInfo = {
+        type: m.constants.ui.backgroundTypes.topright
+        uriList: detailScreen.backgroundUriList
+      }
     else
       m.backgroundGroup.backgroundInfo = {
         type: m.constants.ui.backgroundTypes.topright

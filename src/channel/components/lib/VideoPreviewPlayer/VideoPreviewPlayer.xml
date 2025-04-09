@@ -45,6 +45,8 @@
 
       <field id="position" alias="VideoNode.position"/>
       <field id="duration" alias="VideoNode.duration"/>
+      <field id="bufferingStatus" alias="VideoNode.bufferingStatus" />
+      <field id="isBufferingComplete" type="boolean" />
   </interface>
 
   <children>

@@ -81,12 +81,17 @@ Function playContent()
       previewId = m.Video.content.trailerId
     end if
 
+    playerType = "BANNER"
+    if isNonEmptyString(m.Video.content.parentCategory) = true AND m.Video.content.parentCategory = m.constants.ui.categoryIds.featured
+      playerType = "VIDEO_IN_GRID"
+    end if
+
     startPreviewEvent = {
       type: "start_preview"
       values: {
         video_id: m.Video.content.id.toInt()
         is_fullscreen: false
-        video_player: "BANNER"
+        video_player: playerType
         preview_id: previewId
         pageOneof: m.tubiTrackingInfo.getAnalyticsPage(m.currentPageInfo.pageType, m.currentPageInfo.pageValues)
       }
@@ -277,6 +282,11 @@ Function getPreviewProgressEvent(pageInfo, callSource)
       end if
     end if
 
+    playerType = "BANNER"
+    if isNonEmptyString(m.Video.content.parentCategory) = true AND m.Video.content.parentCategory = m.constants.ui.categoryIds.featured
+      playerType = "VIDEO_IN_GRID"
+    end if
+
     previewId = m.Video.content.previewId
     if isNonEmptyString(m.Video.content.trailerId) = true
       previewId = m.Video.content.trailerId
@@ -288,7 +298,7 @@ Function getPreviewProgressEvent(pageInfo, callSource)
         video_id: videoId
         position: currentPosition
         view_time: viewTime
-        video_player: "BANNER"
+        video_player: playerType
         preview_id: previewId
         pageOneof: pgInfo
       }

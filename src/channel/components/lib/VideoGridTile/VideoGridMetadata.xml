@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="VideoGridMetadata" extends="Group">
+
+  <script type="text/brightscript" uri="VideoGridMetadata.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <field id="itemContent" type="node" />
+    <field id="width" alias="videoInGridGradient.width" />
+    <field id="height" alias="videoInGridGradient.height" />
+  </interface>
+
+  <children>
+    <Poster
+      id="videoInGridGradient"
+      width="789"
+      height="330"
+      uri="pkg:/images/video_in_gri_gradient_$$RES$$.9.png"/>
+
+    <Poster
+      id="LeftHeaderImage"
+      width="72"
+      height="72"
+      translation="[20, 242]"
+      loadDisplayMode="scaleToFit"/>
+
+    <LayoutGroup
+      id="metadataGroup"
+      layoutDirection="horiz"
+      horizAlignment="left"
+      translation="[20, 232]"
+      itemSpacings="[12]">
+
+      <LayoutGroup
+        id="Offset"
+        vertAlignment="bottom"
+        layoutDirection="vert"
+        horizAlignment="custom"
+        itemSpacings="[12]" >
+
+        <Poster
+          id="TitleImage"
+          loadDisplayMode="limitSize"/>
+
+        <Label
+          id="Title"
+          width="650"
+          wrap="true"
+          maxLines="2"
+          vertAlign="bottom">
+          <Font
+            id="TitleFont"
+            role="font"/>
+        </Label>
+
+        <LayoutGroup
+          id="FirstLineGroup"
+          layoutDirection="horiz"
+          itemSpacings="[10]"
+          vertAlignment="center"
+          addItemSpacingAfterChild="true">
+          <Label
+            id="lineOneData"
+            vertAlign="bottom" >
+            <Font
+              role="font" />
+          </Label>
+          <Group
+            id="Rating">
+            <Poster
+              id="RatingBackground"
+              height="30"
+              uri="pkg:/images/rating_background_video_tile.png"
+              loadDisplayMode="scaleToFit"
+              loadSync="true"/>
+            <Label
+              id="RatingLabel"
+              height="30"
+              width="0"
+              opacity="0.8"
+              numLines="1"
+              wrap="false"
+              horizAlign="center"
+              vertAlign="center">
+              <Font
+                role="font"/>
+            </Label>
+          </Group>
+        </LayoutGroup>
+
+      </LayoutGroup>
+
+    </LayoutGroup>
+    
+  </children>
+</component>

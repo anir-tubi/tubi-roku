@@ -105,11 +105,12 @@ End Function
 ' slideTo
 '
 ' simple helper to slide the component to the destination.
-Function slideTo(target As Object, destination As Object, duration As Float, delay=0.0 As Float)
+Function slideTo(target As Object, destination As Object, duration As Float, delay=0.0 As Float, completeCallback = invalid)
   animationOptions = {
     duration: duration
     delay: delay
     destination: destination
+    completeCallback: completeCallback
   }
   return animate(target, animationOptions)
 End Function
@@ -194,7 +195,7 @@ Function colorChange(target As Object, color As String, duration As Float, delay
 End Function
 
 
-Function fade(target As Object, outOrIn As String, duration As Float, delay=0.0 As Float, endingOpacity = -1)
+Function fade(target As Object, outOrIn As String, duration As Float, delay=0.0 As Float, endingOpacity = -1, completeCallback = invalid)
   animationOptions = {
     duration: duration
     delay: delay
@@ -218,6 +219,10 @@ Function fade(target As Object, outOrIn As String, duration As Float, delay=0.0 
     '//The desired opacity has already been reached, so no need to animate
     animationOptions.duration = 0
     animationOptions.delay = 0
+  end if
+
+  if completeCallback <> invalid
+    animationOptions.completeCallback = completeCallback
   end if
 
   return animate(target, animationOptions)

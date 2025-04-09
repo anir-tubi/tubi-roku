@@ -57,6 +57,9 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.observeFieldScoped("loadCategoryForIds", "onLoadCategoryForIds")
     homeScreen.observeFieldScoped("eventCtaListItemSelected", "onEventCtaListItemSelected")
     homeScreen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
+    homeScreen.observeFieldScoped("featuredRowCurrFocusColumn", "onFeaturedRowCurrFocusColumnChange")
+    homeScreen.observeFieldScoped("featuredRowFocusedItem", "onFeaturedRowFocusedItemChange")
+    homeScreen.observeFieldScoped("featuredListHasFocus", "onFeaturedListHasFocusChange")
 
     m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop listening to timer before listing to it in case a previous screen started the timer
     m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
@@ -118,6 +121,11 @@ End Function
 Function processHomeScreenBatchResponse(response, screenId)
   homeScreen = getFromScreenCache(screenId)
   if homeScreen <> invalid
+    homescreenDesignType = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v1", false).design_type
+
+    if (homescreenDesignType <> "none") AND response.getChild(0).id = m.constants.ui.categoryIds.featured AND homeScreen.contentMode = m.constants.ui.contentMode.homescreen
+      updateCategoryGridWithFeaturedList(response, homeScreen)
+    end if
     homeScreen.batchResponse = response
   end if
 End Function
@@ -414,10 +422,18 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     homeScreen.personalizationId = rawResponse.personalizationId
     homeScreen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
 
+    homescreenDesignType = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v1", false).design_type
+
+    if (homescreenDesignType <> "none") AND rawResponse.getChild(0).id = m.constants.ui.categoryIds.featured AND homeScreen.id = m.constants.ui.screenIds.homescreen
+      updateCategoryGridWithFeaturedList(rawResponse, homeScreen)
+    end if
+
     homeScreen.content = rawResponse
 
     onHomeScreenContentUpdateComplete(homeScreen.id)
 
+    getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v1", true)
+    
     getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v1", true)
 
     getExperimentResource("roku_no_change_experiment", "roku_no_change_experiment_v1", true)
@@ -674,7 +690,6 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
 
   '//update the UI anytime the homescreen changes focus.
   setUIBasedOnFocusedContent(focusedContent)
-
   if focusedContent <> invalid
     currentScreen = getCurrentScreen()
 
@@ -713,7 +728,7 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
         end if
       end if
 
-      if currentScreen.isSameNode(homeScreen) = true AND currentScreen.isInFocusChain() = true  'if there are any modals over home screen or focus has been lost to side nav
+      if currentScreen.isSameNode(homeScreen) = true AND currentScreen.isInFocusChain() = true 'if there are any modals over home screen or focus has been lost to side nav
         setVideoPreviewAfterFocus(focusedContent, currentScreen.trackingPageInfo)
       end if
 
@@ -1159,4 +1174,129 @@ Function onHomeScreenContentUpdateComplete(screenId)
   end if
 
   startClientImpressionTimer()
+End Function
+
+
+Function onFeaturedRowCurrFocusColumnChange()
+  m.videoPreviewDebounce.control = "stop"
+  screen = getCurrentScreen()
+  columnFocused = screen.featuredRowCurrFocusColumn
+  
+  if isNumber(columnFocused) = false OR columnFocused < 0
+    columnFocused = 0
+  end if
+
+  displayDefaultBackground()
+  if screen <> invalid AND screen.featuredRowContent <> invalid
+    if columnFocused <> Int(columnFocused)
+      videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
+      if videoPlayer <> invalid
+        videoPlayer.visible = false
+      end if
+      m.videoPreviewPlayer.visible = false
+      m.inlineVideoMetadataOverlay.visible = false
+      m.inlinePreviewFocusIndicator.visible = false
+    else
+      updatePreviewPlayerToInlineView()
+      m.videoPreviewDebounce.control = "start"
+      if isLinearPlayerLoadingOrPlaying() = true
+        stopAndHideLinearVideoPlayer()
+      end if
+      m.inlinePreviewFocusIndicator.visible = true
+    end if
+  end if
+
+End Function
+
+
+Function startFeaturedInlinePreview()
+  if isCurrentScreenHomeScreen() = true
+    screen = getCurrentScreen()
+    stopVideoPreview()
+    stopAndHideLinearVideoPlayer()
+    if screen.featuredRowContent <> invalid AND screen.featuredRowFocusedItem <> invalid
+      content = screen.featuredRowFocusedItem
+      columnFocused = screen.featuredRowCurrFocusColumn
+      if isNumber(columnFocused) = false OR columnFocused < 0
+        columnFocused = 0
+      end if
+
+      itemContent = screen.featuredRowContent.getChild(0).getChild(columnFocused)
+      m.inlineVideoMetadataOverlay.itemContent = itemContent
+
+      if content.type = m.constants.ui.categoryTypes.linear AND m.constants.deviceInfo.isAutoPlayEnabled = true
+        playLinearInlineGridView(content, screen)
+      else
+        setVideoPreviewAfterFocus(content, screen.trackingPageInfo)
+      end if      
+    end if
+  end if
+End Function
+
+
+Function playLinearInlineGridView(content, screen)
+  screen = getCurrentScreen()
+
+  if isCurrentScreenHomeScreen() = true
+    stopLinearVideoContent()
+    playbackSource = {
+      "srcForAnalytic": m.constants.player.playbackSource.unknown
+      "srcForAds": m.constants.player.playbackOrigin.container
+      "playbackContainer": screen.currCategoryId
+    }
+    playLinearVideoContent(content, true, screen.id, true, playbackSource)
+
+    screen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+    offsetX = 0
+  
+    if isNumber(screen.currentFocusedItemBoundingRect.x) = true
+      offsetX = screen.currentFocusedItemBoundingRect.x
+    end if
+    m.inlineVideoPreviewPlayerContainer.translation = [159 + offsetX, 189]
+  end if
+End Function
+
+
+Function onFeaturedListHasFocusChange(msg)
+  hasFeaturedListFocus = msg.getData()
+  m.inlineVideoPreviewPlayerContainer.visible = hasFeaturedListFocus
+  screen = getCurrentScreen()
+  content = screen.featuredRowFocusedItem
+  previewContent = m.videoPreviewPlayer.content
+  m.videoPreviewPlayer.visible = (isCurrentScreenHomeScreen() = false OR (content <> invalid AND previewContent <> invalid AND content.id = previewContent.id))
+  if hasFeaturedListFocus = true
+    ' Resetting the content focused when the featured row list receives focus.
+    screen.contentFocused = invalid
+    previewState = getVideoPreviewStateForThisContent(content)
+    if previewState = "paused"
+      resumeVideoPreview()
+    else if previewState = "playing"
+      displayDefaultBackground()
+      updatePreviewPlayerToInlineView()
+    else
+      onFeaturedRowCurrFocusColumnChange()
+    end if
+  else if isCurrentScreenHomeScreen() = true
+    m.videoPreviewPlayer.visible = false
+    if screen.lastFocusedList = "featuredRowList"
+      pauseVideoPreview()
+    end if
+  else
+    updatePreviewPlayerToCondensedView()
+  end if
+End Function
+
+
+Function onVideoPreviewPlayerVisibleChange(msg)
+  visible = msg.getData()
+
+  m.inlineVideoMetadataOverlay.visible = visible
+End Function
+
+
+Function updateCategoryGridWithFeaturedList(response, screen)
+  featuredContent = createObject("roSGNode", "CategoryContentNode")
+  featuredContent.id = "featuredGrid"
+  response.getChild(0).reParent(featuredContent, false)
+  screen.featuredRowContent = featuredContent
 End Function

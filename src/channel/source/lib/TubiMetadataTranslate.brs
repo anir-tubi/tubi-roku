@@ -112,6 +112,10 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
     else if isNonEmptyArray(contentFromServer.thumbnails) = true
       sThumbnailURL = contentFromServer.thumbnails[0]
     end if
+  else if gridType = gridItemTypes.landscapeWithMetadata
+    if canvasImages <> invalid AND type(canvasImages.hero_tb) = "roArray" AND isNonEmptyString(canvasImages.hero_tb[0])
+      sThumbnailURL = canvasImages.hero_tb[0]
+    end if
   else if gridType = gridItemTypes.spotlight
     if canvasImages <> invalid AND type(canvasImages.spotlight_landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.spotlight_landscape_tb[0])
       sThumbnailURL = canvasImages.spotlight_landscape_tb[0]
@@ -1275,9 +1279,8 @@ End Function
 ' returns an associative array that can be passed to ContentNode.update() to populate the ContentNode and it's children
 Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode = "homeScreen", screenId = "", isSignedInUser = false)
 
-  categoryParent = m.buildCategoryParentInfo(container, sOrientation)
-
-  gridItemType = m.getGridItemType(container, sOrientation, m.constants, screenId)
+  categoryParent = m.buildCategoryParentInfo(container, sOrientation, contentMode)
+  gridItemType = m.getGridItemType(container, sOrientation, m.constants, screenId, contentMode)
   categoryChildrenInfo = m.buildCategoryChildrenInfo(container, contents, contentsJson, gridItemType, bFullData, isSignedInUser)
 
   categoryParent.children = categoryChildrenInfo.children
@@ -1371,7 +1374,7 @@ End Function
 ' @sOrientation: string, should the thumbnail be a "portrait" or "landscape" (match against m.constants.ui.gridItemTypes values)
 '
 ' @returns: assocArray, an AA that can be used with node.update() to create a TubiCategoryNode
-Function tubiMetadataTranslate_buildCategoryParentInfo(container, sOrientation = "")
+Function tubiMetadataTranslate_buildCategoryParentInfo(container, sOrientation = "", contentMode = invalid)
   updateMetadata = {}
 
   if type(container) = "roAssociativeArray"
@@ -1398,7 +1401,7 @@ Function tubiMetadataTranslate_buildCategoryParentInfo(container, sOrientation =
     m.categorySubtexts[m.constants.ui.categoryIds.recommendedForYou] = getTranslation("registration_signIn_recommended")
 
     if sOrientation <> "" then
-      updateMetadata.gridItemType = m.getGridItemType(container, sOrientation, m.constants)
+      updateMetadata.gridItemType = m.getGridItemType(container, sOrientation, m.constants, "", contentMode)
     end if
 
     updateMetadata = m.setSponsorshipInfo(updateMetadata, container.sponsorship)
@@ -1487,14 +1490,48 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           end if
 
           sContentType = m.translateBackendTypeToClientSideType(fullChild.type)
-          childAA = {
-            id: fullChild.id
-            title: fullChild.title
-            description: fullChild.description
-            length: fullChild.duration
-            subtype: sType
-            type: sContentType
-          }
+          titleImage = ""
+          if isAA(fullChild.images)  = true AND fullChild.images.count() > 0 AND isNonEmptyArray(fullChild.images.title_art) = true then
+            titleImage = fullChild.images.title_art[0]
+          end if
+
+          thumbnailUri = ""
+          if isNonEmptyArray(fullChild.thumbnails) = true
+            thumbnailUri = fullChild.thumbnails[0]
+          end if
+
+          seasons = 0
+          if fullChild.num_seasons <> invalid
+            seasons = fullChild.num_seasons
+          end if
+
+          isHomescreenRedesignExperiementEnabled = (m.experiments <> invalid AND m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v1").design_type <> "none")
+          if container.id = m.constants.ui.categoryIds.featured AND (isHomescreenRedesignExperiementEnabled = true)
+            childAA = {
+              id: fullChild.id
+              title: fullChild.title
+              description: fullChild.description
+              length: fullChild.duration
+              subtype: sType
+              tags:fullChild.tags
+              year: fullChild.year
+              duration: fullChild.length
+              ratings:  fullChild.ratings
+              titleImageUri: titleImage
+              thumbnailUri: thumbnailUri
+              seasons: seasons
+              type: sContentType
+            }
+          else
+            childAA = {
+              id: fullChild.id
+              title: fullChild.title
+              description: fullChild.description
+              length: fullChild.duration
+              subtype: sType
+              type: sContentType
+            }
+          end if
 
           if fullChild.showAllText <> invalid
             childAA.append({showAllText: fullChild.showAllText})
@@ -1870,11 +1907,14 @@ End Function
 ' @orientation: string, "landscape" or "portrait"
 ' @constants: assocArray, m.constants
 ' returns: string, one of the gridItemTypes as found in m.constants.ui.gridItemTypes
-Function tubiMetadataTranslate_getGridItemType(container, orientation, constants, screenId = "")
+Function tubiMetadataTranslate_getGridItemType(container, orientation, constants, screenId = "", contentMode = "")
   gridItemTypes = constants.ui.gridItemTypes
   gridItemType = gridItemTypes.portrait
+  isHomescreenRedesignExperiementEnabled = (m.experiments <> invalid AND m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v1").design_type <> "none")
 
-  if container.type = constants.ui.categoryTypes.linear
+  if container.id = constants.ui.categoryIds.featured AND (isHomescreenRedesignExperiementEnabled = true) AND (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
+    gridItemType = gridItemTypes.landscapeWithMetadata
+  else if container.type = constants.ui.categoryTypes.linear
     gridItemType = gridItemTypes.linear
   else if container.id = constants.ui.categoryIds.featured AND orientation <> gridItemTypes.portrait
     ' `orientation <> gridItemTypes.portrait` is required as the search screen container.id is featured but uses portrait imagery

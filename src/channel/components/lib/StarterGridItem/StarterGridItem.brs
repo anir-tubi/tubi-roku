@@ -2,7 +2,6 @@ Function init()
   m.poster = m.top.findNode("poster")
 
   m.top.observeFieldScoped("itemContent", "onItemContentChange")
-
   ' List of fields that will only be observed if we have a child grid item component with that field
   m.conditionallyObservedFields = [
     "itemHasFocus"
@@ -24,6 +23,7 @@ Function init()
   ' Doing it in init due to roku orphaning the itemcomponent when it deletes the item from the screen during navigation which causes getparent to be invalid.
   ' Performance tested the below code it was not adding a additional process time.
   m.parentArrayGrid = invalid
+  m.rowIndexBoost = 0
   m.clientTrackingInfo = {}
   parent = m.top.getParent()
   for x = 1 to 10
@@ -31,6 +31,10 @@ Function init()
     ' parent can be invalid if the starterGridItem is used outside of rowlist.
     if parent = invalid
       exit for
+    end if
+
+    if parent.rowIndexBoost <> invalid
+      m.rowIndexBoost = parent.rowIndexBoost
     end if
 
     if parent.hasField("shouldTrackViewableImpressionEvent") = true AND parent.shouldTrackViewableImpressionEvent = true
@@ -61,6 +65,12 @@ Function onItemContentChange(msg)
     row = itemContent.getParent()
     if gridItemType = "emptyContainer" then
       childGridItemComponent = "CategoryGridPoster"
+    else if gridItemType = "landscapeWithMetadata"
+      if getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v1", false).design_type = "withDescription"
+        childGridItemComponent = "VideoGridTileWithDescription"
+      else
+        childGridItemComponent = "VideoGridTile"
+      end if
     else if gridItemType = "landscapeInnerMetadata" then
       childGridItemComponent = "CategoryGridPoster"
     else if gridItemType = "continue_watching_signed_out_user" then
@@ -119,6 +129,7 @@ Function onItemContentChange(msg)
         if requiresParenting = true then
           m.top.appendChild(m.childGridItem)
         end if
+
       end if
     end if
   end if
@@ -145,7 +156,7 @@ Function onItemContentChange(msg)
     end if
 
     itemInfo = {
-      row: rowIndex + 1
+      row: rowIndex + 1 + m.rowIndexBoost
       col: col + 1
     }
 

@@ -91,7 +91,13 @@ Function addControllerUi()
   m.contentGroup = m.top.findNode("ContentGroup")
   m.SideNav = m.top.findNode("SideNav")
 
+  m.backgroundVideoPreviewPlayerContainer = m.top.findNode("backgroundVideoPreviewPlayerContainer")
+  m.inlineVideoPreviewPlayerContainer = m.top.findNode("inlineVideoPreviewPlayerContainer")
   m.videoPreviewPlayer = m.top.findNode("videoPreviewPlayer")
+  m.inlinePreviewFocusIndicator = m.top.findNode("inlinePreviewFocusIndicator")
+  m.inlineVideoMetadataOverlay = m.top.findNode("inlineVideoMetadataOverlay")
+
+  m.videoPreviewPlayer.observeFieldScoped("visible", "onVideoPreviewPlayerVisibleChange")
 
   m.LinearPlayerGroup = m.top.findNode("LinearPlayerGroup")
   m.LinearPlayerGroupAboveScreenStack = m.top.findNode("LinearPlayerGroupAboveScreenStack")
@@ -113,6 +119,7 @@ Function addControllerUi()
   m.playerFullscreenCountdownTimer = m.top.findNode("PlayerFullscreenCountdownTimer")
   m.resumeAllowedTimer = m.top.findNode("ResumeAllowedTimer")
 
+  m.screenStackGroup = m.top.findNode("ScreenStackGroup")
   m.screenStack = m.top.findNode("ScreenStack")
   m.screenStack.observeFieldScoped("isEmpty", "onScreenStackEmpty")
   m.screenStack.observeFieldScoped("currentUpdated", "onScreenChange")
@@ -146,6 +153,7 @@ Function addControllerUi()
   if theme <> invalid
     m.background.color = theme.backgroundColor
     m.presentedByLabel.color = theme.primaryTextColor
+    m.inlinePreviewFocusIndicator.blendColor = theme.focusedColor
   end if
 
   m.top.observeFieldScoped("focusedChild", "onComponentFocus")
@@ -285,6 +293,11 @@ Function addControllerUi()
 
   ' This needs to go last as this will immediately call runControllerStartSequence if not logged in and we want all the initial state to be setup before this happens
   getUserInfo(onStartupAuthInfoReceived)
+
+
+  m.videoPreviewDebounce = CreateObject("roSGNode", "Timer")
+  m.videoPreviewDebounce.duration = m.constants.player.videoPreviewDebounce
+  m.videoPreviewDebounce.observeFieldScoped("fire", "startFeaturedInlinePreview")
 End Function
 
 
@@ -2220,6 +2233,9 @@ Function onFullscreenCountdown()
     if screen.id = m.constants.ui.screenIds.homeScreen OR isAnEpgScreen(screen) = true
       if screen.id = m.constants.ui.screenIds.homeScreen
         contentToPlay = screen.contentFocused
+        if screen.featuredListHasFocus = true
+          contentToPlay = screen.featuredRowFocusedItem
+        end if
       else
         contentToPlay = screen.linearChannelToPlay
       end if

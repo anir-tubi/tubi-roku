@@ -41,6 +41,8 @@
 
       <field id="skinAdContentUpdated" alias="skinAdRow.contentUpdated" />
 
+      <field id="featuredRowContent" type="node" alias="FeaturedRowList.content" />
+
       <!-- contentUpdated will be set when the new content is ready to be displayed on the screen. -->
       <field id="contentUpdated" type="boolean" alwaysNotify="true"/>
 
@@ -116,12 +118,16 @@
       <!-- Will be set to true if we want to reset the grid position back to [0,0] -->
       <field id="resetGridPosition" type="boolean" />
 
+      <field id="lastFocusedList" type="string" />
+
     <!-- OUTPUT -->
       <field id="itemSelected" type="node"/>
 
       <field id="itemFocused" type="node" />
 
       <field id="oldItemFocused" type="node" />
+
+      <field id="featuredItemSelected" type="node"/>
 
       <!-- set to the tubi content of the new row container (row of contentFocused) which was focused on -->
       <field id="rowFocused" type="node" alwaysNotify="true" />
@@ -147,6 +153,10 @@
       <field id="scrollingstatus" alias="RowList.scrollingstatus" />
       <field id="rowHeights" alias="RowList.rowHeights" />
 
+      <field id="featuredRowCurrFocusColumn" alias="FeaturedRowList.currFocusColumn" />
+
+      <field id="featuredRowFocusedItem" type="node" />
+
       <field id="currCategoryId" type="string" />
 
       <field id="oldCategoryId" type="string" />
@@ -158,6 +168,10 @@
       <!-- content on the home screen is loaded and spinner can be turned off -->
       <field id="gridContentIsReady" type="boolean" value="false" alwaysNotify="true" />
 
+      <field id="featuredListHasFocus" type="boolean" value="false" />
+      <field id="currentFocusedItemBoundingRect" type="assocArray" value="{}" />
+      <field id="hideInfoPanel" type="boolean" />
+
   </interface>
 
   <children>
@@ -165,6 +179,21 @@
       id="skinAdRow"
       opacity="0"
       translation="[0,-12]" />
+
+    <RowList
+      id="FeaturedRowList"
+      itemComponentName="StarterGridItem"
+      rowTitleComponentName="CategoryGridRowLabel"
+      itemSize="[1752, 350]"
+      numRows="1"
+      rowItemSpacing="[[12,0]]"
+      showRowCounter="[false]"
+      focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+      focusFootprintBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+      focusFootprintBlendColor="#00000000"
+      rowFocusAnimationStyle="floatingFocus"
+      vertFocusAnimationStyle="fixedFocus"/>
+
     <RowList
       id="RowList"
       itemComponentName="StarterGridItem"
@@ -175,7 +204,8 @@
       rowItemSpacing="[[16,0]]"
       showRowCounter="[false]"
       focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
-      focusFootprintBitmapUri="pkg:/images/transparent.png"
+      focusFootprintBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+      focusFootprintBlendColor="#00000000"
       rowFocusAnimationStyle="floatingFocus"
       vertFocusAnimationStyle="fixedFocus"/>
     <Timer

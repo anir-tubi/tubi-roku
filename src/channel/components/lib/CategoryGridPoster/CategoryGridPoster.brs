@@ -39,6 +39,7 @@ Function init()
     landscape: "landscape"
     landscapeNoTitle: "landscapeNoTitle"
     landscapeInnerMetadata: "landscapeInnerMetadata"
+    landscapeWithMetadata: "landscapeWithMetadata"
     linear: "linear"
     historySignedOutUser: "continue_watching_signed_out_user"
     emptyContainer: "emptyContainer"

@@ -214,6 +214,11 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
       "title"
     ]
 
+    ' Appending it only for home tab.
+    if isNonEmptyString(params["content_mode"]) = false
+      imageParamTypes.push("featured")
+    end if
+
     params = m.setImageParams(imageParamTypes, options.params, m.constants.ui.screenIds.homeScreen)
   end if
 
@@ -362,7 +367,15 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
     params["utm_campaign_config"] = utmCampaignConfig
   end if
 
-  if imageParamTypes = invalid
+  if containerGridItemType = m.constants.ui.gridItemTypes.landscapeWithMetadata AND imageParamTypes = invalid
+    imageParamTypes = [
+      "poster"
+      "landscape"
+      "background"
+      "featured"
+      "title"
+    ]
+  else if imageParamTypes = invalid
     imageParamTypes = [
       "poster"
       "landscape"
@@ -476,6 +489,7 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
   title = imageSizes.title
   skinAdLandscape = imageSizes.skinAdLandscape
   fullScreenBackground = imageSizes.fullScreenBackground
+  featuredRowPoster = imageSizes.featuredRowPoster
 
   '//For now, ensure the large posters do not show up on the search screen
   isNonLargePostersScreen = (isNonEmptyString(screenId) = true AND screenId = m.constants.ui.screenIds.searchScreen)
@@ -493,6 +507,8 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
       existingParams["images[landscape_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_landscape"
     else if imageType = "hero"
       existingParams["images[hero_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_hero"
+    else if imageType = "featured"
+      existingParams["images[hero_tb]"] = "w" + featuredRowPoster[0].ToStr() + "h" + featuredRowPoster[1].ToStr() + "_hero"
     else if imageType = "background"
       if containerGridItemType <> m.constants.ui.gridItemTypes.skinAd
         existingParams["images[background_tb]"] = "w" + background[0].ToStr() + "h" + background[1].ToStr() + "_background"
@@ -552,6 +568,19 @@ Function cmsApi_createHomeScreenBatchReqInfo(homeScreen, index, bKidsMode = fals
     'Determine the window start and window size for lazy loading
   windowInfo = m.getWindowInfo(homeScreen, index)
   if windowInfo <> invalid
+
+    if windowInfo.start = 0 AND homeScreen.featuredRowContent <> invalid
+      featuredCategory = homeScreen.featuredRowContent.getChild(0)
+      if featuredCategory <> invalid
+        categoryReqInfo = m.createGetCategoryContentsReqInfo(featuredCategory, homeScreen, bKidsMode, isSignedInUser, uiMode)
+
+        if categoryReqInfo <> invalid
+          requests.push(categoryReqInfo)
+          featuredCategory.state = "loading"
+        end if
+      end if
+      windowInfo.size -= 1
+    end if
 
     'Create requests for each category in the window
     for i = windowInfo.start to (windowInfo.start + windowInfo.size)-1

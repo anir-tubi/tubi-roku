@@ -998,6 +998,8 @@ Function getConstants()
         constants.player.browseContent.numContainers = 10
         constants.player.browseContent.numContents = 50
 
+      constants.player.videoPreviewDebounce = 0.5
+
   ' constants used for EPG
   constants.EPGChannelPlayMode = {}
   constants.EPGChannelPlayMode.playItemOnSelect = "playItemOnSelect"
@@ -1336,6 +1338,9 @@ Function getConstants()
       'Sizes of large poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.largePoster = [252, 360]
 
+      'Sizes of featured row  poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
+      constants.ui.imageSizes.featuredRowPoster = [789, 330]
+
       'Size of the thumbnail/background of the single element representing an empty container that we wish to show: i.e. on the MyStuff Screen
       constants.ui.imageSizes.emptyContainer = [1572, 267]
 
@@ -1444,6 +1449,7 @@ Function getConstants()
       constants.ui.gridItemTypes.portrait = "portrait"
       constants.ui.gridItemTypes.landscape = "landscape"
       constants.ui.gridItemTypes.landscapeInnerMetadata = "landscapeInnerMetadata"
+      constants.ui.gridItemTypes.landscapeWithMetadata = "landscapeWithMetadata"
       constants.ui.gridItemTypes.landscapeNoTitle = "landscapeNoTitle"
       constants.ui.gridItemTypes.linear = "linear"
       constants.ui.gridItemTypes.historySignedOutUser = "continue_watching_signed_out_user"

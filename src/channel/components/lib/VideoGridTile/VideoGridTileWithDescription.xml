@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="VideoGridTileWithDescription" extends="LayoutGroup">
+
+  <script type="text/brightscript" uri="VideoGridTileWithDescription.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="../AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+
+  <interface>
+    <field id="itemContent" type="node" />
+    <field id="width" alias="VideoGridTile.width,description.width" />
+    <field id="height" alias="VideoGridTile.height" />
+    <field id="itemHasFocus" type="boolean" />
+    <field id="rowListHasFocus" type="boolean" />
+    <field id="focusPercent" type="float" />
+  </interface>
+
+  <children>
+    <VideoGridTile id="VideoGridTile" />
+    <Label
+      id="description"
+      opacity="0"
+      maxLines="3"
+      wrap="true">
+      <Font
+        id="DescriptionFont"
+        role="font"/>
+    </Label>
+  </children>
+</component>

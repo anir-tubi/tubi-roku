@@ -32,6 +32,7 @@ Function init()
   m.CategoryGridList = topRef.findNode("CategoryGridList")
   m.CategoryGridList.observeFieldScoped("itemSelected", "onGridItemSelected")
   m.CategoryGridList.observeFieldScoped("itemFocused", "onGridFocusChange")
+  m.CategoryGridList.observeFieldScoped("featuredItemSelected", "onFeaturedItemSelected")
   m.CategoryGridList.observeFieldScoped("reloadedItemToBeFocused", "onItemToBeFocusedChange")
   m.CategoryGridList.observeFieldScoped("currFocusRow", "onCurrFocusRowChange")
   m.CategoryGridList.observeFieldScoped("currFocusColumn", "onCurrFocusColumnChange")
@@ -39,6 +40,8 @@ Function init()
   m.CategoryGridList.observeFieldScoped("vertFocusDirection", "onVertFocusDirectionChange")
   m.CategoryGridList.observeFieldScoped("rowlistTranslation", "onRowlistTranslationChange")
   m.CategoryGridList.observeFieldScoped("gridContentIsReady", "onGridContentIsReadyChange")
+  m.CategoryGridList.observeFieldScoped("featuredListHasFocus", "onFeaturedListHasFocusChange")
+  m.CategoryGridList.observeFieldScoped("featuredRowFocusedItem", "fireNavigateWithinPageEvent")
 
   'used to know when to send tracking info. Do not send focus tracking info when the grid is 1st loaded
   m.gridHasGainedInitialFocus = false
@@ -414,6 +417,26 @@ Function populateInfoPanelByContent(focusedContent)
 End Function
 
 
+Function onFeaturedListHasFocusChange(msg)
+  featuredListHasFocus = msg.getData()
+  m.InfoPanel.visible = false
+  if featuredListHasFocus = false AND m.CategoryGridList.lastFocusedList = "skinAdRow"
+    m.ContentArea.translation = [0, 516]
+  else
+    m.ContentArea.translation = [0, 130]
+  end if
+  'Make sure Content is in correct location
+  moveContentAreaMaskBasedCurrentFocus()
+  m.gridHasGainedInitialFocus = true
+End Function
+
+
+Function onFeaturedItemSelected()
+  selectedItem = m.CategoryGridList.featuredItemSelected
+  handleItemSelected(selectedItem, m.top.selectedPosition)
+End Function
+
+
 '''''''''''''''''''''
 ' onGridFocusChange
 '
@@ -456,11 +479,24 @@ Function onGridFocusChange() as void
   '//Ensure the ContentArea Mask is at the proper location when new focus has changed.
   moveContentAreaMaskBasedCurrentFocus()
 
+  fireNavigateWithinPageEvent()
+  
+  isHomeScreenRedesignExperimentEnabled = (getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v1", false).design_type <> "none") AND focusedContent.parentId = m.constants.ui.categoryIds.featured
+
+  if isHomeScreenRedesignExperimentEnabled = false
+   m.gridHasGainedInitialFocus = true
+  end if
+
+End Function
+
+
+Function fireNavigateWithinPageEvent()
   'Set up the navigateWithinPageInfo to send to ContentController via Homescreen. Need for when CategoryGridList is in focus
   oldAnalyticsRow = m.CategoryGridList.oldCursorPosition[0] + 1
   oldAnalyticsCol = m.CategoryGridList.oldCursorPosition[1] + 1
   newAnalyticsRow = m.CategoryGridList.cursorPosition[0] + 1
   newAnalyticsCol = m.CategoryGridList.cursorPosition[1] + 1
+  oldFocusedContent = m.CategoryGridList.oldItemFocused
 
   if m.gridHasGainedInitialFocus = true AND oldAnalyticsRow > 0 AND oldAnalyticsCol > 0
     if oldAnalyticsRow <> newAnalyticsRow OR oldAnalyticsCol <> newAnalyticsCol
@@ -485,8 +521,6 @@ Function onGridFocusChange() as void
       }
     end if
   end if
-  m.gridHasGainedInitialFocus = true
-
 End Function
 
 
@@ -561,7 +595,10 @@ End Function
 '@mode: string, one of the valid constants.ui.infoPanelModes info panel modes (see InfoPanel.xml for details)
 '@contentNode: content node
 Function populateInfoPanel(mode, contentNode)
-  if contentNode <> invalid
+  isHomeScreenRedesignForFeaturedEnabled = (getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v1", false).design_type <> "none") AND contentNode.parentId = m.constants.ui.categoryIds.featured 
+
+  if contentNode <> invalid AND (isHomeScreenRedesignForFeaturedEnabled = false OR m.top.contentMode <> m.constants.ui.contentMode.homescreen)
+    m.InfoPanel.visible = true
     if mode = m.constants.ui.infoPanelModes.item
       populateInfoPanelWithHomescreenStyleItemMode(contentNode, m.InfoPanel)
     else if mode = m.constants.ui.infoPanelModes.linearProgramHomescreen
@@ -586,6 +623,9 @@ Function populateInfoPanel(mode, contentNode)
     end if
 
     m.InfoPanel.calculateHeight = true
+  else
+    m.InfoPanel.visible = false
+    m.ContentArea.translation = [0, 130]
   end if
 End Function
 
@@ -686,7 +726,12 @@ End Function
 Function handlePlayInput()
   tubilog("HomeScreen.handlePlayInput")
   if m.top.isLoading <> true
-    itemFocused = m.CategoryGridList.itemFocused
+    if m.CategoryGridList.lastFocusedList = "featuredRowList"
+      itemFocused = m.CategoryGridList.featuredRowFocusedItem
+    else
+      itemFocused = m.CategoryGridList.itemFocused
+    end if
+
     positionFocused = m.top.cursorPosition
     m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(itemFocused, positionFocused)
 
@@ -703,6 +748,14 @@ End Function
 Function refreshHomeScreenContainers()
   tubilog("HomeScreen.refreshHomeScreenContainers")
   loadCategoryForIds = []
+
+  if m.CategoryGridList.featuredRowContent <> invalid
+    featuredContainer = m.CategoryGridList.featuredRowContent.getChild(0)
+    if shouldRefresh(featuredContainer) = true
+      loadCategoryForIds.push(featuredContainer.id)
+    end if
+  end if
+
   for i = 0 to m.CategoryGridList.content.getChildCount() - 1
     container = m.CategoryGridList.content.getChild(i)
     if shouldRefresh(container) = true

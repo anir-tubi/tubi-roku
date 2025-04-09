@@ -102,6 +102,15 @@ Function TubiExperiments(experimentsInfo) as Object
       }
 
       'This experiment will not be under holdout and will clean up once we take the decision.
+      roku_home_screen_redesign: {
+        roku_home_screen_redesign_v1 : {
+          default: {"design_type": "none" } ' Possible values are "withOutDescription", "withDescription", "none"
+          holdout_control: {"design_type": "none"}
+          holdout_winning: {"design_type": "none"}
+         }
+       }
+
+      'This experiment will not be under holdout and will clean up once we take the decision.
       roku_home_screen_lazy_load: {
         roku_home_screen_lazy_load_v1: {
           default: {"enabled": false}
