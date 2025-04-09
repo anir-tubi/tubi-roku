@@ -630,7 +630,7 @@ Function onColumnFocusChanged(msg)
       if hasMoreContent = true AND cursor = columnFocused + 10
         isKidsMode = shouldKidsModeBeSentToServer()
         isSignedInUser = isLoggedInUser()
-        categoryReqInfo = m.cmsApi.createGetCategoryContentsReqInfo(category, homeScreen, isKidsMode, isSignedInUser, m.uiMode)
+        categoryReqInfo = m.cmsApi.createGetContainerContentsReqInfo(category, homeScreen, isKidsMode, isSignedInUser, m.uiMode)
         if categoryReqInfo <> invalid
           m.makeRequest({
             url: categoryReqInfo.url

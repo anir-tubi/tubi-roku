@@ -22,7 +22,7 @@ Function CmsApi(constants, apiUtils, experiments=invalid)
     createHomeScreenBatchReqInfo: cmsApi_createHomeScreenBatchReqInfo
     createMyStuffScreenBatchReqInfo: cmsApi_createMyStuffScreenBatchReqInfo
     createHomeScreenBatchReqInfoForContainers: cmsApi_createHomeScreenBatchReqInfoForContainers
-    createGetCategoryContentsReqInfo: cmsApi_createGetCategoryContentsReqInfo
+    createGetContainerContentsReqInfo: cmsApi_createGetContainerContentsReqInfo
 
     ' private
     setImageParams: cmsApi_setImageParams
@@ -572,7 +572,7 @@ Function cmsApi_createHomeScreenBatchReqInfo(homeScreen, index, bKidsMode = fals
     if windowInfo.start = 0 AND homeScreen.featuredRowContent <> invalid
       featuredCategory = homeScreen.featuredRowContent.getChild(0)
       if featuredCategory <> invalid
-        categoryReqInfo = m.createGetCategoryContentsReqInfo(featuredCategory, homeScreen, bKidsMode, isSignedInUser, uiMode)
+        categoryReqInfo = m.createGetContainerContentsReqInfo(featuredCategory, homeScreen, bKidsMode, isSignedInUser, uiMode)
 
         if categoryReqInfo <> invalid
           requests.push(categoryReqInfo)
@@ -586,7 +586,7 @@ Function cmsApi_createHomeScreenBatchReqInfo(homeScreen, index, bKidsMode = fals
     for i = windowInfo.start to (windowInfo.start + windowInfo.size)-1
       category = homeScreen.content.getChild(i)
       if category <> invalid
-        categoryReqInfo = m.createGetCategoryContentsReqInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode)
+        categoryReqInfo = m.createGetContainerContentsReqInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode)
 
         if categoryReqInfo <> invalid then
           requests.push(categoryReqInfo)
@@ -764,7 +764,7 @@ Function cmsApi_createHomeScreenBatchReqInfoForContainers(containerIds, contentM
 End Function
 
 
-Function cmsApi_createGetCategoryContentsReqInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode)
+Function cmsApi_createGetContainerContentsReqInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode)
   categoryReqInfo = invalid
   paginationInfo = category.paginationInfo
   isLazyLoadExpEnabled = (m.experiments <> invalid AND m.experiments.getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v1").enabled = true)
@@ -807,3 +807,4 @@ Function cmsApi_createGetCategoryContentsReqInfo(category, homeScreen, bKidsMode
 
   return categoryReqInfo
 End Function
+
