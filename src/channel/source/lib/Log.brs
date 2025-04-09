@@ -342,8 +342,6 @@ Function tubiLog_getClientLogEvent(eventValues) as Object
     clientLogEvent.append(eventInfo.client_logs)
   end if
 
-  clientLogEvent = FormatJson(clientLogEvent)
-
   return {
     "event_name": "client_logs"
     "event_payloads": [clientLogEvent]

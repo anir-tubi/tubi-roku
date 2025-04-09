@@ -92,7 +92,7 @@ Function tubiLogger_getLoggingRequest_test()
   m.assertTrue(type(logRequest.body) = "String")
   m.assertTrue(logRequest.body.len() > 0)
   logRequestBody = ParseJson(logRequest.body)
-  eventPayLoad = ParseJson(logRequestBody["event_payloads"][0])
+  eventPayLoad = logRequestBody["event_payloads"][0]
   m.assertNotInvalid(eventPayLoad["app_id"])
   m.assertNotInvalid(eventPayLoad.platform)
   m.assertNotInvalid(eventPayLoad["device_id"])

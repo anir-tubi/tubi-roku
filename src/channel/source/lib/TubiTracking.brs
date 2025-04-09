@@ -1429,12 +1429,10 @@ Function tubiTracking_getPlayerAnalyticsEvent(eventType, eventValues) as Object
   }
   eventValues["client_common"] = clientCommon
 
-  eventPayloads = []
-  eventPayloads.push(FormatJSON(eventValues))
-
-  playerEvent = {}
-  playerEvent["event_name"] = eventType
-  playerEvent["event_payloads"] = eventPayloads
+  playerEvent = {
+    event_name: eventType
+    event_payloads: [eventValues]
+  }
 
   return playerEvent
 End Function
