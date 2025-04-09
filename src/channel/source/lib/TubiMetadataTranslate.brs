@@ -1912,7 +1912,7 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
   gridItemType = gridItemTypes.portrait
   isHomescreenRedesignExperiementEnabled = (m.experiments <> invalid AND m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v1").design_type <> "none")
 
-  if container.id = constants.ui.categoryIds.featured AND (isHomescreenRedesignExperiementEnabled = true) AND (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
+  if screenId = m.constants.ui.screenIds.homeScreen AND container.id = constants.ui.categoryIds.featured AND (isHomescreenRedesignExperiementEnabled = true) AND (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
     gridItemType = gridItemTypes.landscapeWithMetadata
   else if container.type = constants.ui.categoryTypes.linear
     gridItemType = gridItemTypes.linear
