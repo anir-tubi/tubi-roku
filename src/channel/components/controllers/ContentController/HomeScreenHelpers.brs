@@ -123,7 +123,7 @@ Function processHomeScreenBatchResponse(response, screenId)
   if homeScreen <> invalid
     homescreenDesignType = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v1", false).design_type
 
-    if (homescreenDesignType <> "none") AND response.getChild(0).id = m.constants.ui.categoryIds.featured AND homeScreen.contentMode = m.constants.ui.contentMode.homescreen
+    if (homescreenDesignType <> "none") AND isNode(response) = true AND response.getChildCount() > 0 AND response.getChild(0).id = m.constants.ui.categoryIds.featured AND homeScreen.contentMode = m.constants.ui.contentMode.homescreen
       updateCategoryGridWithFeaturedList(response, homeScreen)
     end if
     homeScreen.batchResponse = response
@@ -424,7 +424,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
 
     homescreenDesignType = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v1", false).design_type
 
-    if (homescreenDesignType <> "none") AND rawResponse.getChild(0).id = m.constants.ui.categoryIds.featured AND homeScreen.id = m.constants.ui.screenIds.homescreen
+    if (homescreenDesignType <> "none") AND isNode(rawResponse) = true AND rawResponse.getChildCount() > 0 AND rawResponse.getChild(0).id = m.constants.ui.categoryIds.featured AND homeScreen.id = m.constants.ui.screenIds.homescreen
       updateCategoryGridWithFeaturedList(rawResponse, homeScreen)
     end if
 
