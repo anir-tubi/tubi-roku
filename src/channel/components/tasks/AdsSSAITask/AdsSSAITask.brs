@@ -415,7 +415,7 @@ Function onPlaybackStopped()
         ad_poll_url: m.pollUrl
       }
       logMsg = FormatJson(logMsg)
-      tubiLog(logMsg, "info", "clientInfo", "linear-missed-impressions")
+      logInfo(logMsg, "clientInfo", "linear-missed-impressions")
     end if
   end if
 End Function

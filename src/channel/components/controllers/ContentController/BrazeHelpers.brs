@@ -49,7 +49,7 @@ End Function
 ' @error: assocarray: {code: 401} contains the status code.
 Function onBrazeMergeUsersError(error)
   ' Logging braze error so that we can monitor if we are noticing any unexpected errors.
-  tubiLog(FormatJSON(error), "error", "apiError", "braze-merge-users-error")
+  logError(FormatJSON(error), "apiError", "braze-merge-users-error")
 End Function
 
 

@@ -158,7 +158,7 @@ Function onVideoStateChange(msg)
     content = m.video.content
     errorInfo = getPlaybackErrorInfo(m.video.position, m.video.streamInfo, m.video.errorCode, m.video.errorMsg, content)
     jsonErrorInfo = FormatJSON(errorInfo)
-    tubiLog(jsonErrorInfo, "error", "videoPlayback", "video-preview-playback", 0.1)
+    logError(jsonErrorInfo, "videoPlayback", "video-preview-playback", 0.1)
 
     m.videoState = "stop"
   end if
@@ -315,7 +315,7 @@ Function getPreviewProgressEvent(pageInfo, callSource)
       videoInfo.playerPosition = m.playerPosition
       videoInfo.lastPingTime = m.lastPingTime
       videoInfo.callSource = callSource
-      tubiLog(FormatJSON(videoInfo), "info", "videoInfo", "preview-view-time-exceeds")
+      logInfo(FormatJSON(videoInfo), "videoInfo", "preview-view-time-exceeds")
     end if
 
   end if

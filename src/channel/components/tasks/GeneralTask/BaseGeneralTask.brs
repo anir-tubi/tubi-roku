@@ -648,7 +648,7 @@ Function sendApiErrorLog(result)
 
   jsonErrorInfo = FormatJSON(errorInfo)
   ' sending error logs to uapi
-  tubiLog(jsonErrorInfo, "error", "apiError", responseFromServer.name, 0.1)
+  logError(jsonErrorInfo, "apiError", responseFromServer.name, 0.1)
 End Function
 
 

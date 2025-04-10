@@ -579,7 +579,7 @@ Function tubiAds_retrieveAds(adsUrl, adInsertionMethod)
           }
           jsonErrorInfo = FormatJSON(errorInfo)
           ' sending error logs to uapi
-          tubiLog(jsonErrorInfo, "warn", "adBadResponse", "ad-bad-response", 0.1)
+          logWarn(jsonErrorInfo, "adBadResponse", "ad-bad-response", 0.1)
 
           errorInfo.type = m.constants.errors.type.adError + " " + responseCode.tostr()
           errorInfo.name = m.constants.errors.message.badResponse
@@ -676,7 +676,7 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos)
     }
     jsonTimeToFetchMessage = FormatJSON(timeToFetchMessage)
     ' sending error logs to uapi
-    tubiLog(jsonTimeToFetchMessage, "error", "adError", "no-ad-response", 0.1)
+    logError(jsonTimeToFetchMessage, "adError", "no-ad-response", 0.1)
 
     timeToFetchMessage.type = m.constants.errors.type.adError
     timeToFetchMessage.name = m.constants.errors.message.noResponse

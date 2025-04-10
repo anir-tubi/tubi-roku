@@ -493,7 +493,7 @@ Function sendPlayerFeedbackInfo(feedbackIssue)
 
     sendFeedBackInfo = formatJson(sendFeedBackInfo)
 
-    tubiLog(sendFeedBackInfo, "info", "videoInfo", "send-feedback-from-player")
+    logInfo(sendFeedBackInfo, "videoInfo", "send-feedback-from-player")
   end if
 End Function
 
@@ -953,7 +953,7 @@ Function onVideoStateChange(msg)
 
     jsonErrorInfo = FormatJSON(errorInfo)
     ' sending the logs to uapi
-    tubiLog(jsonErrorInfo, "error", "videoPlayback", "video-playback", 0.1)
+    logError(jsonErrorInfo, "videoPlayback", "video-playback", 0.1)
 
     ' sending the logs to sentry sdk
     tubiException(errorInfo, "error", 0.1)
@@ -1312,10 +1312,10 @@ Function onVideoPositionChange(msg)
 
     ' check midroll and fire if any
     isCuepointReached = m.midrolls[strI(m.playerPosition)]
-    
+
     'A pending ad from the previous cue point was not played for some reason. we need to fire the AdMissed event for the previous one.
     if adState = "adsPending" AND m.missedAdReported = false AND Int(m.playerPosition) > Int(m.top.adPosition)
-      
+
       sendAdMissedEvent("exitAfterCuePointPassed")
       m.missedAdReported = true
 
@@ -1494,7 +1494,7 @@ Function onAdStateChange(msg)
       }
       jsonErrorInfo = FormatJSON(errorInfo)
       ' sending the logs to uapi
-      tubiLog(jsonErrorInfo, "error", "videoPlayback", "invalid-video-url", 0.1)
+      logError(jsonErrorInfo, "videoPlayback", "invalid-video-url", 0.1)
 
       errorInfo.type = m.constants.errors.type.videoError
       errorInfo.name = m.constants.errors.message.invalidVideoUrl
@@ -1616,9 +1616,9 @@ Function onBufferingTimerFired()
   errorInfo = getPlaybackErrorInfo(m.Video.position, m.Video.downloadedSegment, m.Video.streamingSegment, m.Video.streamingInfo, m.Video.errorCode, m.Video.errorStr, content)
 
   if m.startUpBuffering = true
-    tubiLog(FormatJSON(errorInfo), "warn", "videoBuffer", "video-buffer-startup", 0.1)
+    logWarn(FormatJSON(errorInfo), "videoBuffer", "video-buffer-startup", 0.1)
   else
-    tubiLog(FormatJSON(errorInfo), "warn", "videoBuffer", "video-re-buffer", 0.1)
+    logWarn(FormatJSON(errorInfo), "videoBuffer", "video-re-buffer", 0.1)
   end if
 
 End Function
@@ -2000,7 +2000,7 @@ Function advanceCodecOnContent(contentNode)
 
         if nextResource <> invalid and setDrmOnContent(contentNode, nextResource, [nextCodecIndex, nextDrmIndex]) = true
           sendVideoResourceFallbackToPlayerLogLib(currentResource, nextResource, "CODEC")
-          
+
           fallbackInfo = {
             failed_url: removeExcessUrl(currentResource.url)
             failed_codec: currentResource.codec
@@ -2011,7 +2011,7 @@ Function advanceCodecOnContent(contentNode)
           }
 
           ' log that we fell back to the next playback option after playback failed due to Codec
-          tubiLog(FormatJSON(fallbackInfo), "error", "videoLoad", "codec-fallback", 0.1)
+          logError(FormatJSON(fallbackInfo), "videoLoad", "codec-fallback", 0.1)
           return true
         end if
       end if
@@ -2033,42 +2033,42 @@ Function sendVideoResourceFallbackToPlayerLogLib(failedResource, fallbackResourc
       resourceType = UCase(failedResource.type)
       failedResourceType = m.constants.player.videoResourceType[resourceType]
     else
-      failedResourceType = m.constants.player.videoResourceType["UNKNOWN"]  
+      failedResourceType = m.constants.player.videoResourceType["UNKNOWN"]
     end if
 
     if isNonEmptyString(failedResource.codec) = true
       resourceCodec = UCase(failedResource.codec)
       failedCodecType = m.constants.player.videoCodecType[resourceCodec]
     else
-      failedCodecType = m.constants.player.videoCodecType["UNKNOWN"]  
+      failedCodecType = m.constants.player.videoCodecType["UNKNOWN"]
     end if
 
     if isNonEmptyString(failedResource.hdcpversion) = true
       hdcpversion = UCase(failedResource.hdcpversion)
       failedHdcpversion = m.constants.player.hdcpVersion[hdcpversion]
     else
-      failedHdcpversion = m.constants.player.hdcpVersion["UNKNOWN"]  
+      failedHdcpversion = m.constants.player.hdcpVersion["UNKNOWN"]
     end if
 
     if isNonEmptyString(fallbackResource.type) = true
       resourceType = UCase(fallbackResource.type)
       fallbackResourceType = m.constants.player.videoResourceType[resourceType]
     else
-      fallbackResourceType = m.constants.player.videoResourceType["UNKNOWN"]  
+      fallbackResourceType = m.constants.player.videoResourceType["UNKNOWN"]
     end if
 
     if isNonEmptyString(fallbackResource.codec) = true
       resourceCodec = UCase(fallbackResource.codec)
       fallbackCodecType = m.constants.player.videoCodecType[resourceCodec]
     else
-      fallbackCodecType = m.constants.player.videoCodecType["UNKNOWN"]  
+      fallbackCodecType = m.constants.player.videoCodecType["UNKNOWN"]
     end if
 
     if isNonEmptyString(fallbackResource.hdcpversion) = true
       hdcpversion = UCase(fallbackResource.hdcpversion)
       fallbackHdcpversion = m.constants.player.hdcpVersion[hdcpversion]
     else
-      fallbackHdcpversion = m.constants.player.hdcpVersion["UNKNOWN"]  
+      fallbackHdcpversion = m.constants.player.hdcpVersion["UNKNOWN"]
     end if
 
     videoResourceFallback = {
@@ -2134,7 +2134,7 @@ Function advanceDrmOnContent(contentNode)
           }
 
           ' log that we fell back to the next playback option after playback failed due to DRM
-          tubiLog(FormatJSON(fallbackInfo), "error", "videoLoad", "drm-fallback", 0.1)
+          logError(FormatJSON(fallbackInfo), "videoLoad", "drm-fallback", 0.1)
           return true
         end if
       end if
@@ -2187,7 +2187,7 @@ Function setDrmOnContent(contentNode, resource, videoResourceIndex)
     end if
     return true
   else
-    updatePlayerLogLib(m.playerLogLib, "setVideoContent", contentNode)  
+    updatePlayerLogLib(m.playerLogLib, "setVideoContent", contentNode)
   end if
   return false
 End Function
@@ -2285,7 +2285,7 @@ Function getPlayProgressEvent(callSource = "")
       videoInfo.callSource = callSource
       videoInfo.previousCallSource = m.previousPlayProgressCallSource
       videoInfo.positionArr = m.positionArr
-      tubiLog(FormatJSON(videoInfo), "info", "videoInfo", "view-time-exceeds")
+      logInfo(FormatJSON(videoInfo), "videoInfo", "view-time-exceeds")
     end if
 
     ' resetting m.positionArr everytime play progress event gets fires
@@ -2881,7 +2881,7 @@ Function onAdBufferingObject(msg)
     updatePlayerLogLib(m.playerLogLib, "setAdBufferStartTime")
   end if
   m.playerExitInfo["is_buffering"] = (progress = invalid OR progress < 100)
-  
+
   if m.isAdsOverlayExperimentEnabled = true
     ' Adding a check for optimization so that we do not have to perform find node always.
     if progress = 100

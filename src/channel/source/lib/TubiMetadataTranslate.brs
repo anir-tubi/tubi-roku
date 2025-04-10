@@ -1195,7 +1195,7 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
     ' but any single category request should be considered fully loaded
     categoryMetadata.state = "loaded"
     totalItems = container.children.Count()
-    
+
     cursor = 0
     if container.cursor <> invalid
       cursor = container.cursor
@@ -1693,7 +1693,7 @@ Function tubiMetadataTranslate_getContentsJson(parsedJson, fullJson)
 
   'the optimization didn't update contentsJson, so do the slower but more faithful way (FormatJSON)
   if contentsJson = invalid AND parsedJson.contents <> invalid
-    tubiLog("Formatted JSON for category metadata", "warn", "clientWarn", "category-metadata-format-json")
+    logWarn("Formatted JSON for category metadata", "clientWarn", "category-metadata-format-json")
     contentsJson = FormatJSON(parsedJson.contents)
   end if
 

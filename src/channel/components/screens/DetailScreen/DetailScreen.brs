@@ -1314,7 +1314,7 @@ Function setComponentInteractionEventForMenu(componentInteractionValue, menuItem
     pageValuesInfo.isSeries = topReference.isSeries
     pageValuesInfo.seriesId = pageValues.series_id
     pageValuesInfo.contentIsInvalid = (topReference.content = invalid)
-    tubiLog(FormatJSON(pageValuesInfo), "info", "videoInfo", "series-id-invalid")
+    logInfo(FormatJSON(pageValuesInfo), "videoInfo", "series-id-invalid")
   end if
 
   if isNonEmptyString(pageType) = true

@@ -553,7 +553,7 @@ Function handle_422_451_error(callback, errorCode = 0)
       reason: "age_gate_" + errorCode.toStr()
     }
     logMsg = FormatJson(logMsg)
-    tubiLog(logMsg, "info", "clientInfo", "dont_complete_signup_after_rfi")
+    logInfo(logMsg, "clientInfo", "dont_complete_signup_after_rfi")
   end if
 
   logout()
@@ -794,7 +794,7 @@ Function onBackButtonPressed(msg)
       reason: "age_gate_back"
     }
     logMsg = FormatJson(logMsg)
-    tubiLog(logMsg, "info", "clientInfo", "dont_complete_signup_after_rfi")
+    logInfo(logMsg, "clientInfo", "dont_complete_signup_after_rfi")
     exitAgeVerificationScreenUnverified()
   end if
 End Function
@@ -948,7 +948,7 @@ End Function
 '@ageVerifiedCallback: function, method that needs to be callback if users age is greater than minimum required age.
 Function verifyAgeOnNetworkError(errorResponse, ageVerifiedCallback)
   userEnteredAge = 0
-          
+
   if errorResponse.reqInfo <> invalid AND errorResponse.reqInfo.birthdate <> invalid
     birthdate = errorResponse.reqInfo.birthdate
     birthYear = birthdate.tokenize("-")[0]

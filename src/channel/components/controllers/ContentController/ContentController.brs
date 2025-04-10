@@ -768,7 +768,7 @@ Function sendDeviceEnvironmentSettingsLog()
     videoMode: videoMode
     isHevcCompatible: isHevcCompatible
   }
-  tubiLog(FormatJSON(deviceInfo), "info", "clientInfo", "device-info", 0.2) 'send info to server
+  logInfo(FormatJSON(deviceInfo), "clientInfo", "device-info", 0.2) 'send info to server
 
 End Function
 
@@ -877,7 +877,7 @@ Function onAuthInfoRefreshed()
   if isAA(authInfo) = true AND authInfo.authType = "MOBILE_APP"
     status = "SUCCESS"
   end if
-  
+
 
   ' send account analytics event signifying that auth info was transferred from another (mobile) device
   m.trackingLoggingTask.trackEvent = {
@@ -1759,7 +1759,7 @@ Function fireAppLoadTimeEvent(loadTime)
     loadtime: loadTime
     model: m.constants.deviceInfo.model
   }
-  tubiLog(FormatJSON(messageInfo), "info", "clientInfo", "time-to-load", 0.1) 'send info to server
+  logInfo(FormatJSON(messageInfo), "clientInfo", "time-to-load", 0.1) 'send info to server
 End Function
 
 
@@ -2972,7 +2972,7 @@ Function onViewableImpressionEventInfoChange(msg)
   ' We are checking in this if the screen is different from what is stored in m.viewableImpressionEvents then we fire the events.
   ' The sequence of events are when navigating between home to movies. Home Screen items tracking info becomes none for all items and then the movies screen becomes full.
   data = msg.getData()
-  
+
   if (m.viewableImpressionEvents.screenId <> invalid AND data.screenId <> m.viewableImpressionEvents.screenId) OR (m.viewableImpressionEvents.personalizationId <> invalid AND data.personalizationId <> m.viewableImpressionEvents.personalizationId)
     ' After sending the events the m.viewableImpressionEvents will be reset.
     sendImpressionEvent()
@@ -3059,7 +3059,7 @@ End Function
 
 Function startClientImpressionTimer()
   m.sendImpressionEventTimer.control = "stop"
-    
+
   currentScreen = getCurrentScreen()
   if currentScreen <> invalid AND currentScreen.hasField("shouldTrackViewableImpressionEvent") = true AND currentScreen.shouldTrackViewableImpressionEvent = true
     m.sendImpressionEventTimer.control = "start"

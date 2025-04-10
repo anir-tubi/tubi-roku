@@ -361,7 +361,7 @@ Function onVideoStateChange(msg)
     errorInfo = getPlaybackErrorInfo(m.Video.position, m.Video.downloadedSegment, m.Video.streamingSegment, m.Video.streamingInfo, m.Video.errorCode, m.Video.errorMsg, content)
     jsonErrorInfo = FormatJSON(errorInfo)
     ' sending the logs to uapi
-    tubiLog(jsonErrorInfo, "error", "videoPlayback", "video-playback", 0.1)
+    logError(jsonErrorInfo, "videoPlayback", "video-playback", 0.1)
 
     m.top.sendYouboraError = true
 
@@ -562,7 +562,7 @@ Function onCaptionModeChange()
     hideOverlay()
     ' update the closed captions UI. It may look the same but the enabled icon may be different
     createContentForClosedCaptioning()
-  end if  
+  end if
 
   if m.Video.globalCaptionMode = "On"
     toggleState = "ON"
@@ -804,7 +804,7 @@ Function advanceCodecOnContent(contentNode)
           }
 
           ' log that we fell back to the next playback option after playback failed due to Codec
-          tubiLog(FormatJSON(fallbackInfo), "error", "videoLoad", "codec-fallback", 0.1)
+          logError(FormatJSON(fallbackInfo), "videoLoad", "codec-fallback", 0.1)
           return true
         end if
       end if
@@ -862,7 +862,7 @@ Function advanceDrmOnContent(contentNode)
           }
 
           ' log that we fell back to the next playback option after playback failed due to DRM
-          tubiLog(FormatJSON(fallbackInfo), "error", "videoLoad", "drm-fallback", 0.1)
+          logError(FormatJSON(fallbackInfo), "videoLoad", "drm-fallback", 0.1)
           return true
         end if
       end if
@@ -1014,7 +1014,7 @@ Function getPlayProgressEvent(isFullScreen = true)
       if content <> invalid AND content.id <> invalid
         videoInfo.video_id = content.id
       end if
-      tubiLog(FormatJSON(videoInfo), "info", "videoInfo", "live-view-time-exceeds")
+      logInfo(FormatJSON(videoInfo), "videoInfo", "live-view-time-exceeds")
     end if
 
     ' resetting m.positionArr everytime play progress event gets fires

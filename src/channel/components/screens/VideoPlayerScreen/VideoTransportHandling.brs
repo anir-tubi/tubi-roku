@@ -1089,7 +1089,7 @@ Function jumpToPosition(position)
       adPosition: adPosition * 1000 'ms
     }
     if m.top.adState = "adsPending"
-      tubiLog(formatJson(adMissedInfo), "info", "videoInfo", "ad-missed-recovered")
+      logInfo(formatJson(adMissedInfo), "videoInfo", "ad-missed-recovered")
     end if
 
     showAdBreak()
@@ -1102,7 +1102,7 @@ Function jumpToPosition(position)
       adPosition: adPosition * 1000 'ms
     }
     if m.top.adState = "adsPending"
-      tubiLog(formatJson(adMissedInfo), "info", "videoInfo", "ad-missed-recovered")
+      logInfo(formatJson(adMissedInfo), "videoInfo", "ad-missed-recovered")
     end if
 
     m.Video.control = "stop"

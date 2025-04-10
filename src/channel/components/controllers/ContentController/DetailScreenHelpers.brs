@@ -152,7 +152,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     ' that indicate it might be possible that getDetailScreenContent() as called by ContentController.returnToDetailScreenFromVideo()
     ' may return invalid, which may get passed to this function as the content argument.
     message = "DetailScreenHelpers.showDetailScreen, content is invalid"
-    tubiLog(message, "warn", "clientWarn", "showdetailscreen-invalid-content")
+    logWarn(message, "clientWarn", "showdetailscreen-invalid-content")
   end if
 End Function
 

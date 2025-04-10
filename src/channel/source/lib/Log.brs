@@ -312,9 +312,9 @@ Function tubiLog_getClientLogEvent(eventValues) as Object
   })
 
   eventValues.message_map = message_map
-  
+
   eventInfo = m.populateMessage("client_logs", eventValues, eventBase)
-  
+
   authInfo = m.auth.getAuthInfo()
   userId = 0
   if authInfo <> invalid AND authInfo.userId <> invalid
@@ -494,8 +494,31 @@ Function tubiException(message = "" as Dynamic, level = "error" as String, sampl
 End Function
 
 
-Function tubiLog(message = "" as Dynamic, level = "debug" as String, serverTypeName = "" as String, subtype = "" as String, samplePercent = 1.0 as Float) as Void
-  tubiLog_helper("log", message, level, serverTypeName, subtype, samplePercent)
+Function tubiLog(message = "" as Dynamic, level = "debug" as String) as Void
+  tubiLog_helper("log", message, level)
+End Function
+
+
+' Note logDebug purposely can't send to a backend server. This is to allow optimization in our build process in the future
+Function logDebug(message = "" as Dynamic, subtype = "" as String)
+  #if consoleLoggingEnabled
+    tubiLog_helper("log", message, "debug", "", subtype)
+  #end if
+End Function
+
+
+Function logInfo(message = "" as Dynamic, serverTypeName = "" as String, subtype = "" as String, samplePercent = 1.0 as Float)
+  tubiLog_helper("log", message, "info", serverTypeName, subtype, samplePercent)
+End Function
+
+
+Function logWarn(message = "" as Dynamic, serverTypeName = "" as String, subtype = "" as String, samplePercent = 1.0 as Float)
+  tubiLog_helper("log", message, "warn", serverTypeName, subtype, samplePercent)
+End Function
+
+
+Function logError(message = "" as Dynamic, serverTypeName = "" as String, subtype = "" as String, samplePercent = 1.0 as Float)
+  tubiLog_helper("log", message, "error", serverTypeName, subtype, samplePercent)
 End Function
 
 

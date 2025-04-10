@@ -15,6 +15,8 @@ const clipboardy = require('clipboardy');
 // Uncomment the next line if there are connection issues to the Roku device
 // const requestDebug = require('request-debug')(request);
 
+const REMOVE_TUBI_LOGS_REGEX = /(?<!Function.*)(tubiLog|logDebug)\s*\(.*$/gim;
+
 //Importing old build functions
 const {load, getBuildTag, getOneTrustBuildTag} = require('./js/config');
 const {createManifest, createSettings} = require('./js/build');
@@ -190,8 +192,15 @@ function buildInstalled() {
       base: 'src/channel'
     };
 
-    let stream = collect(sources, srcOptions)
-      .pipe(dest('build/local'));
+    let stream = collect(sources, srcOptions);
+
+    if (options.config === 'production' || options.config === 'staging') {
+      stream = stream.pipe(
+        replace(REMOVE_TUBI_LOGS_REGEX, `' $&`) // Case-insensitive match for tubiLog or logDebug followed by '('
+      );
+    }
+
+    stream = stream.pipe(dest('build/local'));
 
     stream.on('end', () => {
       res();
@@ -363,6 +372,16 @@ function buildStarter() {
       replaceTypographyConstants('build/starter');
       createSettings(options, 'build/starter/source/Settings.brs');
       createManifest(options, 'build/starter/manifest', 'starter_library_manifest');
+
+      if (options.config === 'production' || options.config === 'staging') {
+        // Create a new stream to process files
+        return src('build/starter/**/*.brs') // Adjust the glob pattern to match your BrightScript files
+          .pipe(
+            replace(REMOVE_TUBI_LOGS_REGEX, `' $&`) // Case-insensitive match for tubiLog or logDebug followed by '('
+          )
+          .pipe(dest('build/starter')); // Write the modified files back to the same directory
+      }
+
       return zipAsPromise('build/starter/**/*', `tubi_starter_components_${minorBuildTag}.zip`, 'build/');
     });
 }
@@ -524,6 +543,15 @@ function buildRemote() {
     replaceColorConstants('build/remote');
     replaceTypographyConstants('build/remote');
     createManifest(options, 'build/remote/manifest', 'component_library_manifest');
+
+    if (options.config === 'production' || options.config === 'staging') {
+      // Create a new stream to process files
+      return src('build/remote/**/*.brs') // Adjust the glob pattern to match your BrightScript files
+        .pipe(
+          replace(REMOVE_TUBI_LOGS_REGEX, `' $&`) // Case-insensitive match for tubiLog or logDebug followed by '('
+        )
+        .pipe(dest('build/remote')); // Write the modified files back to the same directory
+    }
     return zipAsPromise('build/remote/**/*', `tubi_remote_components_${buildTag}.zip`, 'build/');
   });
 }

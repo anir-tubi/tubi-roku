@@ -259,7 +259,7 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
       videoInfo = {}
       videoInfo.callSource = videoPlayer.playbackSource
       videoInfo.contentId = content.id
-      tubiLog(FormatJSON(videoInfo), "info", "videoInfo", "video-title-undefined")
+      logInfo(FormatJSON(videoInfo), "videoInfo", "video-title-undefined")
     end if
 
     videoPlayer.userConsentsOptOutStatus = getConsentsOptOutStatus()
@@ -561,7 +561,7 @@ Function playUpNextContent(nextContent, playbackSource = {"srcForAnalytic": "unk
         error_code: -1   ' is it even needed?
       }
 
-      tubiLog(formatJson(errorInfo), "warn", "videoLoad", "r-rated-upnext", 0.1)
+      logWarn(formatJson(errorInfo), "videoLoad", "r-rated-upnext", 0.1)
 
       returnToDetailScreenFromVideo()
     else
@@ -1572,9 +1572,9 @@ Function stopAllVideoPlayersAndRestartPlayback(callback)
     '//as the rowlist is scrolling, if the the linear video player is playing or loading, then make sure the linear video player has stopped
     stopLinearVideoContent()
   end if
-  
+
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
   stopVideoContent(videoPlayer)
 
-  callback() 
+  callback()
 End Function
