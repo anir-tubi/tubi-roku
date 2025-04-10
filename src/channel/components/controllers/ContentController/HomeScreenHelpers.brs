@@ -1259,13 +1259,16 @@ End Function
 
 Function onFeaturedListHasFocusChange(msg)
   hasFeaturedListFocus = msg.getData()
-  m.inlineVideoPreviewPlayerContainer.visible = hasFeaturedListFocus
-  screen = getCurrentScreen()
+  screen = msg.getRoSGNode()
+  m.inlineVideoPreviewPlayerContainer.visible = hasFeaturedListFocus AND screen.featuredRowContent <> invalid
   content = screen.featuredRowFocusedItem
   previewContent = m.videoPreviewPlayer.content
   m.videoPreviewPlayer.visible = (isCurrentScreenHomeScreen() = false OR (content <> invalid AND previewContent <> invalid AND content.id = previewContent.id))
   if hasFeaturedListFocus = true
     ' Resetting the content focused when the featured row list receives focus.
+    if screen.hasField("contentFocused") = true
+      screen.contentFocused = invalid
+    end if
     screen.contentFocused = invalid
     previewState = getVideoPreviewStateForThisContent(content)
     if previewState = "paused"

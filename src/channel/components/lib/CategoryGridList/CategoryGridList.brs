@@ -183,8 +183,7 @@ Function onComponentFocusChange(msg)
   if itemToJumpTo <> invalid then
     m.RowList.jumpToRowItem = itemToJumpTo
   end if
-
-  m.top.featuredListHasFocus = m.top.isInFocusChain() = true AND m.top.lastFocusedList = "featuredRowList"
+  m.top.featuredListHasFocus = m.top.isInFocusChain() = true AND m.top.lastFocusedList = "featuredRowList" AND m.top.featuredRowContent <> invalid
 End Function
 
 

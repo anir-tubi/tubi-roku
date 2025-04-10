@@ -160,6 +160,7 @@ Function onLoadingChange()
     populateInfoPanel(m.constants.ui.infoPanelModes.item, emptyContentNode) 'empties the info panel
     m.CategoryGridList.content = invalid ' should be all categories with initial amounts of content in them
     m.CategoryGridList.skinAdContent = invalid
+    m.CategoryGridList.featuredRowContent = invalid
     m.CategoryGridList.skinAdContentUpdated = true
   end if
 End Function
