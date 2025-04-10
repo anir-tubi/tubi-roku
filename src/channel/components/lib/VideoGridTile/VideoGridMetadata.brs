@@ -64,6 +64,11 @@ Function setTitle(titleImageUri)
       m.offset.removeChild(m.title)
     end if
 
+    if m.top.titleImageScale < 1.0
+      m.titleImage.loadHeight = 90 * 0.75
+      m.titleImage.loadWidth = 320 * 0.75
+    end if
+
     m.titleImage.uri = titleImageUri
   else
     parent = m.titleImage.getParent()

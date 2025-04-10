@@ -63,6 +63,7 @@
               visible="false"
               width="789"
               height="330"
+              titleImageScale="0.75"
               translation="[5,4]"
               id="inlineVideoMetadataOverlay" />
             <Poster

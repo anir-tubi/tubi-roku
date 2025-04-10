@@ -16,6 +16,7 @@
   <interface>
     <field id="itemContent" type="node" />
     <field id="width" alias="videoInGridGradient.width" />
+    <field id="titleImageScale" type="float" value="1.0" />
     <field id="height" alias="videoInGridGradient.loadHeight,videoInGridGradient.height" />
   </interface>
 
