@@ -162,6 +162,9 @@ Function onLoadingChange()
     m.CategoryGridList.skinAdContent = invalid
     m.CategoryGridList.featuredRowContent = invalid
     m.CategoryGridList.skinAdContentUpdated = true
+    ' Resetting last focus list when reloading the screen.
+    ' To Cover cases where skin ad is shown and then gets removed.
+    m.CategoryGridList.lastFocusedList = ""
   end if
 End Function
 
@@ -422,7 +425,7 @@ Function onFeaturedListHasFocusChange(msg)
   featuredListHasFocus = msg.getData()
   m.InfoPanel.visible = false
   if featuredListHasFocus = false AND m.CategoryGridList.lastFocusedList = "skinAdRow"
-    m.ContentArea.translation = [0, 516]
+    m.ContentArea.translation = m.originalContentAreaTranslation
   else
     m.ContentArea.translation = [0, 130]
   end if
@@ -808,5 +811,11 @@ Function onGridContentIsReadyChange(msg)
   ' Not using alias to avoid making the field gridContentIsReady is ready bi-directional since contentReady inside homescreen.brs on other use cases.
   if msg.getData() = true AND m.top.contentReady = false
     m.top.contentReady = true
+
+    if m.top.featuredListHasFocus = false AND m.CategoryGridList.lastFocusedList = "skinAdRow"
+      m.ContentArea.translation = m.originalContentAreaTranslation
+    else
+      m.ContentArea.translation = [0, 130]
+    end if
   end if
 End Function

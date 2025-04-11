@@ -211,12 +211,13 @@ Function onContentChange()
       content = category.getChild(0)
       m.top.reloadedItemToBeFocused = content
     end if
-  else    
+  else
+    m.FeaturedRowList.translation = [0, 0]
     ' Resetting the state of the UI.
     if m.top.featuredRowContent <> invalid
-      if m.homescreenDesignType = "withDescription"
+      if m.homeScreenDesignType = "withDescription"
         m.rowList.translation =  [0, 545]
-      else if m.homescreenDesignType = "withOutDescription"
+      else if m.homeScreenDesignType = "withOutDescription"
         m.rowList.translation =  [0, 420]
       else
         m.rowList.translation = [0, 0]
