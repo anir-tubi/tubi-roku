@@ -179,7 +179,19 @@ Function metadataOnPosterContent(itemContent)
     end if
 
     lengthString = formatLengthSelectedLocale(length)
-    text += lengthString.replace("min", "m") + " "
+    firstSubString = lengthString.split("h")
+    secondSubString = ""
+
+    if isNonEmptyArray(firstSubString) = true AND firstSubString[1] <> invalid
+      secondSubString = firstSubString[1].split("min")
+    end if
+    if isNonEmptyArray(secondSubString) = true
+      finalString = firstSubString[0].trim() + "h" + " " + secondSubString[0].trim() + "m"
+    else
+      finalString = firstSubString
+    end if
+
+    text += finalString + " "
   end if
 
   if isNonEmptyString(text) = true
