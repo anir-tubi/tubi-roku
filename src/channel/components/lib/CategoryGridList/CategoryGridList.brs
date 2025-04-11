@@ -19,6 +19,8 @@ Function init()
   m.featuredRowList.observeFieldScoped("rowItemSelected", "onFeaturedRowItemSelected")
   m.featuredRowList.observeFieldScoped("currFocusColumn", "onFeaturedRowCurrFocusColumnChange")
 
+  m.rowListTranslationYOffset = 0
+
   m.homeScreenDesignType = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v1", false).design_type
 
   ' Parameters for the metadata block cache. Window size is number of items to fetch, page delimiter
@@ -199,7 +201,7 @@ Function onContentChange()
   if isSkinAdsAvailable() = true
     if m.top.featuredRowContent <> invalid
       m.FeaturedRowList.translation =  [0, 384]
-      m.rowList.translation =  [0, 565]
+      m.rowList.translation =  [0, 565 + m.rowListTranslationYOffset]
     else
       m.rowList.translation =  [0, 384]
     end if
@@ -216,9 +218,9 @@ Function onContentChange()
     ' Resetting the state of the UI.
     if m.top.featuredRowContent <> invalid
       if m.homeScreenDesignType = "withDescription"
-        m.rowList.translation =  [0, 545]
+        m.rowList.translation =  [0, 545 + m.rowListTranslationYOffset]
       else if m.homeScreenDesignType = "withOutDescription"
-        m.rowList.translation =  [0, 420]
+        m.rowList.translation =  [0, 420 + m.rowListTranslationYOffset]
       else
         m.rowList.translation = [0, 0]
       end if
@@ -449,10 +451,23 @@ Function setRowHeights()
     "focusXOffset" : focusXOffsets
   })
 
+  featuredCategory = invalid
+  if m.top.featuredRowContent <> invalid
+    featuredCategory = m.top.featuredRowContent.getChild(0)
+  end if
+  featuredRowHeights = featuredRowPoster[1] + 220
+  if featuredCategory <> invalid AND featuredCategory.sponsorImages <> invalid
+    '//if this is a sponsored row, then adjust the spacing so row includes the header size of the sponsored row
+    featuredRowHeights = featuredRowHeights + 32
+    m.rowListTranslationYOffset = 31
+  else
+    m.rowListTranslationYOffset = 0
+  end if
+
   m.FeaturedRowlist.update({
     "showRowLabel": [true]
     "rowItemSize": [featuredRowPoster]
-    "rowHeights": [featuredRowPoster[1] + 220]
+    "rowHeights": [featuredRowHeights]
     "focusXOffset" : [0]
   })
 
@@ -539,7 +554,7 @@ Function onRowItemFocused(msg)
 
   rowCountBooster = 0
   rowItemFocused = msg.getData()
-  if m.homescreenDesignType <> "none"
+  if m.homeScreenDesignType <> "none"
     m.top.focusedPosition = [rowItemFocused[0] + 1 , rowItemFocused[1]]
   else
     m.top.focusedPosition = rowItemFocused
@@ -839,10 +854,11 @@ End Function
 
 Function translateFeaturedListAndSetFocus()
   if m.homeScreenDesignType = "withDescription"
-    slideTo(m.RowList, [0, 545], 0.3)
+    slideTo(m.RowList, [0, 545 + m.rowListTranslationYOffset], 0.3)
   else if m.homeScreenDesignType = "withOutDescription"
-    slideTo(m.RowList, [0, 420], 0.3)
+    slideTo(m.RowList, [0, 420 + m.rowListTranslationYOffset], 0.3)
   end if
+
   callback = sub()
     m.top.lastFocusedList = "featuredRowList"
     m.FeaturedRowList.setFocus(true)
@@ -879,12 +895,12 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       m.top.lastFocusedList = "rowList"
       fade(m.FeaturedRowList, "out", 0.3)
       if m.homeScreenDesignType = "withDescription"
-        slideTo(m.RowList, [0, 420], 0.3)
+        slideTo(m.RowList, [0, 420 + m.rowListTranslationYOffset], 0.3)
       end if
       m.RowList.setFocus(true)
       return true
     else if key = "up" AND m.FeaturedRowList.isInFocusChain() = true AND bSkinAdAvailable = true
-      slideTo(m.RowList, [0, 565], 0.3)
+      slideTo(m.RowList, [0, 565 + m.rowListTranslationYOffset], 0.3)
       slideTo(m.FeaturedRowList, [0, 384], 0.3)
       m.top.lastFocusedList = "skinAdRow"
       m.skinAdRow.setFocus(true)
