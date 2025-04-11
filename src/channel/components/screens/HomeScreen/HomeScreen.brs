@@ -341,7 +341,9 @@ Function onCurrFocusRowChange()
 
     if categoryEnteringFocus.sponsorImages <> invalid
       '//if the entering row is sponsored, then take into account the extra room that the sponsor artwork takes up in the row header
-      expandContentAreaForSponsorship(rowPercent)
+      if m.top.featuredRowContent = invalid
+        expandContentAreaForSponsorship(rowPercent)
+      end if
       if m.constants.deviceInfo.limitedUi = false AND categoryEnteringFocus.sponsorImages.brandBackground <> ""
         sSponsorBackgroundURL = categoryEnteringFocus.sponsorImages.brandBackground
       else if categoryEnteringFocus.sponsorImages.brandColor <> ""
@@ -812,7 +814,7 @@ Function onGridContentIsReadyChange(msg)
   if msg.getData() = true AND m.top.contentReady = false
     m.top.contentReady = true
 
-    if m.top.featuredListHasFocus = false AND m.CategoryGridList.lastFocusedList = "skinAdRow"
+    if (m.top.featuredListHasFocus = false AND m.CategoryGridList.lastFocusedList = "skinAdRow") OR m.top.featuredRowContent = invalid
       m.ContentArea.translation = m.originalContentAreaTranslation
     else
       m.ContentArea.translation = [0, 130]

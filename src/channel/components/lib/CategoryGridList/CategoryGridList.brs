@@ -185,7 +185,10 @@ Function onComponentFocusChange(msg)
   if itemToJumpTo <> invalid then
     m.RowList.jumpToRowItem = itemToJumpTo
   end if
-  m.top.featuredListHasFocus = m.top.isInFocusChain() = true AND m.top.lastFocusedList = "featuredRowList" AND m.top.featuredRowContent <> invalid
+
+  if m.homeScreenDesignType <> "none"
+    m.top.featuredListHasFocus = m.top.isInFocusChain() = true AND m.top.lastFocusedList = "featuredRowList" AND m.top.featuredRowContent <> invalid
+  end if
 End Function
 
 
@@ -195,6 +198,15 @@ Function onContentChange()
   bSetRowListFocus = false
   '//RESET position of 1st-row elements
   m.skinAdRow.translation = m.originalTranslationSkinAdRow
+
+  ' Since set row heights is called later we need to duplicate the logic of checking sponsor images.
+  m.rowListTranslationYOffset = 0
+  if m.top.featuredRowContent <> invalid
+    featuredCategory = m.top.featuredRowContent.getChild(0)
+    if featuredCategory <> invalid AND featuredCategory.sponsorImages <> invalid
+      m.rowListTranslationYOffset = 31
+    end if  
+  end if
   
   ' set the translation position of the page based on presense or absence of any 1st rows. 
   ' DO this BEFORE setting the content of the rowList (later in this function) or else the translation will not be properly set.
@@ -459,9 +471,6 @@ Function setRowHeights()
   if featuredCategory <> invalid AND featuredCategory.sponsorImages <> invalid
     '//if this is a sponsored row, then adjust the spacing so row includes the header size of the sponsored row
     featuredRowHeights = featuredRowHeights + 32
-    m.rowListTranslationYOffset = 31
-  else
-    m.rowListTranslationYOffset = 0
   end if
 
   m.FeaturedRowlist.update({
@@ -825,6 +834,7 @@ Function onFeaturedRowItemFocused()
   if rowItemFocused <> invalid
     itemFocused = resolveAbbreviatedContent(m.top.featuredRowContent, rowItemFocused)
     if itemFocused <> invalid
+      m.top.currentFocusedItemBoundingRect = m.FeaturedRowList.subBoundingRect("item0_" + rowItemFocused[1].toStr())
       m.top.oldCategoryId = m.top.currCategoryId
       category = m.top.featuredRowContent.getChild(rowItemFocused[0])
       category.focusIndex = rowItemFocused[1]
@@ -835,7 +845,6 @@ Function onFeaturedRowItemFocused()
       m.top.oldItemFocused = itemFocused
       m.top.featuredRowFocusedItem = itemFocused
     end if
-    m.FeaturedRowList.drawFocusFeedback = true
   end if
 End Function
 
@@ -843,7 +852,6 @@ End Function
 Function onFeaturedRowCurrFocusColumnChange(msg)
   currentFocusColumn = Int(msg.getData())
   m.top.currentFocusedItemBoundingRect = m.FeaturedRowList.subBoundingRect("item0_" + currentFocusColumn.toStr())
-  m.FeaturedRowList.drawFocusFeedback = true
 End Function
 
 

@@ -1185,8 +1185,12 @@ Function onFeaturedRowCurrFocusColumnChange()
   if isNumber(columnFocused) = false OR columnFocused < 0
     columnFocused = 0
   end if
+  
+  ' Only process if the screen is the home screen.
+  if isCurrentScreenHomeScreen() = true
+    displayDefaultBackground()
+  end if
 
-  displayDefaultBackground()
   isScrolling = columnFocused <> Int(columnFocused)
   if screen <> invalid AND screen.featuredRowContent <> invalid
     if isScrolling = true AND m.inlineVideoMetadataOverlay.visible = true
@@ -1306,4 +1310,9 @@ Function updateCategoryGridWithFeaturedList(response, screen)
   featuredContent.id = "featuredGrid"
   response.getChild(0).reParent(featuredContent, false)
   screen.featuredRowContent = featuredContent
+End Function
+
+
+Function onFeaturedRowFocusedItemChange(msg)
+  updatePreviewPlayerToInlineView()
 End Function

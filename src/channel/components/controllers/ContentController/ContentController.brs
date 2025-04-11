@@ -1946,6 +1946,13 @@ Function onCustomSuspend(msg)
         closeLinearVideoPlayerTransport()
         linearVideoPlayer.control = "stop"
       end if
+      
+      ' Remove this line if we do not graduated roku_home_screen_redesign_v1.
+      ' This is needed to avoid having to use alwaysnotify on featuredListHasFocus and when app is suspended it does not fire focus change event on home screen.
+      homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+      if homeScreen <> invalid
+        homeScreen.featuredListHasFocus = false
+      end if
     end if
 
     'Modals with type errorDialog should made invisible and app should restarted on app relaunch.

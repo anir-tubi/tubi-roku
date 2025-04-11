@@ -257,11 +257,19 @@ Function updatePreviewPlayerToInlineView()
     m.videoPreviewPlayer.translation = [3, -52]
     offsetX = 0
     rectX = screen.currentFocusedItemBoundingRect.x
+    rectY = screen.currentFocusedItemBoundingRect.y
     ' Using static offset to avoid a bug where scroll hangs due to freeze of UI thread.
     if isNumber(rectX) = true AND rectX > 0
       offsetX = 802
     end if
-    m.inlineVideoPreviewPlayerContainer.translation = [159 + offsetX, 189]
+    
+   ' Adjust accordingly if we have sponsored row.
+    offsetY = 0
+    if isNumber(rectY) = true AND rectY > 0
+      offsetY = rectY - 63.5
+    end if
+
+   m.inlineVideoPreviewPlayerContainer.translation = [159 + offsetX, 189 + offsetY]
   end if
 End Function
 
