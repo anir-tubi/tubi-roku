@@ -1141,6 +1141,11 @@ Function tubiTracking_getOneOfs()
       utility_tile: {} ' UtilityTile message - optional
     }
 
+    mystuff_component: {' Used for mystuff screen
+      category_slug: ""
+      content_tile: {} ' ContentTile message - optional
+    }
+
     ' sub_category_component: { 'Does not currently exist in roku UI
     '   category_slug: ""
     '   sub_category_slug: ""

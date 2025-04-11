@@ -341,7 +341,7 @@ Function onRowItemFocused(msg) as Boolean
         myStuffComponentInfo["category_col"] = oldAnalyticsCol
         m.top.navigateWithinPageInfo = {
           pageOneof: m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pageType, m.top.trackingPageInfo.pageValues)
-          componentOneof: m.Tracking.getAnalyticsComponent("category_component", myStuffComponentInfo)
+          componentOneof: m.Tracking.getAnalyticsComponent("mystuff_component", myStuffComponentInfo)
           means_of_navigation: "BUTTON" 'MeansOfNavigation enum
           vertical_location: newAnalyticsRow
           horizontal_location: newAnalyticsCol
@@ -496,7 +496,7 @@ Function getTrackingComponentInfoOfRowList(gridItem, itemPosition)
 
     ' Set the tracking component of the gridItem that was passed so it can be accessed as part of the navigateToPage event
     trackingComponentInfo = {
-      componentType: "category_component"
+      componentType: "mystuff_component"
       componentValues: componentValues
     }
   end if
