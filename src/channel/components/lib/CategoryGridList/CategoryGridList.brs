@@ -195,6 +195,12 @@ End Function
 Function onContentChange()
   tubiLog("CategoryGridList.onContentChange")
 
+  ' Resetting the state of the UI. Below condition face guards against any rowList background refresh.
+  ' Like item getting added to CW row or queue row.
+  if m.lastFocusedList <> "rowList"
+    m.FeaturedRowList.opacity = 1
+  end if
+
   bSetRowListFocus = false
   '//RESET position of 1st-row elements
   m.skinAdRow.translation = m.originalTranslationSkinAdRow

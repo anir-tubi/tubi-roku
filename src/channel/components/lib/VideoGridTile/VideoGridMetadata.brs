@@ -184,6 +184,10 @@ Function metadataOnPosterContent(itemContent)
 
     if isNonEmptyArray(firstSubString) = true AND firstSubString[1] <> invalid
       secondSubString = firstSubString[1].split("min")
+    else
+      ' To handle cases where we only have minutes.
+      arr = lengthString.split("min")
+      firstSubString = arr[0].trim() + "m"
     end if
     if isNonEmptyArray(secondSubString) = true
       finalString = firstSubString[0].trim() + "h" + " " + secondSubString[0].trim() + "m"

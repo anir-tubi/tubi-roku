@@ -1193,7 +1193,7 @@ Function onFeaturedRowCurrFocusColumnChange()
 
   isScrolling = columnFocused <> Int(columnFocused)
   if screen <> invalid AND screen.featuredRowContent <> invalid
-    if isScrolling = true AND m.inlineVideoMetadataOverlay.visible = true
+    if isScrolling = true AND (m.inlineVideoMetadataOverlay.visible = true OR m.inlinePreviewFocusIndicator.visible = true)
       videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
       if videoPlayer <> invalid
         videoPlayer.visible = false
