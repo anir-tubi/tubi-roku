@@ -655,6 +655,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       end_position: -1 'ms
       pageOneof: {} 'current screen
       has_completed: false
+      video_player: "BANNER"
       preview_id: "" '// unique ID of a preview. Can be used to identify preview url
     }
 

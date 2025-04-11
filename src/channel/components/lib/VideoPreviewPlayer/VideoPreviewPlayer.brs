@@ -333,12 +333,18 @@ Function getFinishPreviewEvent(hasCompleted = false)
     previewId = m.Video.content.trailerId
   end if
 
+  playerType = "BANNER"
+  if isNonEmptyString(m.Video.content.parentCategory) = true AND m.Video.content.parentCategory = m.constants.ui.categoryIds.featured
+    playerType = "VIDEO_IN_GRID"
+  end if
+
   finishPreviewEvent = {
     type: "finish_preview"
     values: {
       video_id: m.Video.content.id.toInt()
       end_position: Int(m.playerPosition * 1000) 'ms
       preview_id: previewId
+      video_player: playerType
       pageOneof: m.tubiTrackingInfo.getAnalyticsPage(m.currentPageInfo.pageType, m.currentPageInfo.pageValues)
       has_completed: hasCompleted
     }
