@@ -1187,8 +1187,9 @@ Function onFeaturedRowCurrFocusColumnChange()
   end if
 
   displayDefaultBackground()
+  isScrolling = columnFocused <> Int(columnFocused)
   if screen <> invalid AND screen.featuredRowContent <> invalid
-    if columnFocused <> Int(columnFocused)
+    if isScrolling = true AND m.inlineVideoMetadataOverlay.visible = true
       videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
       if videoPlayer <> invalid
         videoPlayer.visible = false
@@ -1196,7 +1197,10 @@ Function onFeaturedRowCurrFocusColumnChange()
       m.videoPreviewPlayer.visible = false
       m.inlineVideoMetadataOverlay.visible = false
       m.inlinePreviewFocusIndicator.visible = false
-    else
+      if getVideoPreviewState() = "playing"
+        pauseVideoPreview()
+      end if
+    else if isScrolling = false
       updatePreviewPlayerToInlineView()
       m.videoPreviewDebounce.control = "start"
       if isLinearPlayerLoadingOrPlaying() = true
