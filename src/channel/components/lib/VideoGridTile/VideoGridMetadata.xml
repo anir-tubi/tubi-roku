@@ -85,7 +85,6 @@
               id="RatingLabel"
               height="30"
               width="0"
-              opacity="0.8"
               numLines="1"
               wrap="false"
               horizAlign="center"
