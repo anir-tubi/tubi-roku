@@ -540,6 +540,7 @@ Function repositionLinearVideoPlayerToMaxState(bAnimate)
     end if
 
     clearMinimizedLinearPlayerAnimation()
+    videoPlayer.clippingRect = [0, 0, 1920, 1080]
     resizeToLocation(videoPlayer, 1920, 1080, [0, 0], nDuration)
     videoPlayer.fullscreen = true
   end if
@@ -571,6 +572,7 @@ Function animateLinearVideoPlayerToMinState(nDuration = .25, bVisible = true)
     nHeight = m.constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension[1]
     nPosition = m.constants.ui.imageTranslations.epgLinearVideoPlayerOnEPGScreen_minimizedTranslation
     m.LinearVideoPlayerSpinner.translation = [1260, 320]
+    videoPlayer.clippingRect = [0, 0, 1920, 1080]
     linearPlayerParentGroup.appendChild(videoPlayer)
 
     clearMinimizedLinearPlayerAnimation()
@@ -933,9 +935,10 @@ End Function
 
 
 Function switchLinearToInlineGridMode(linearPlayer)
+  linearPlayer.clippingRect = [0, 57, 792, 329]
   linearPlayer.width = 795
-  linearPlayer.height = 330
-  linearPlayer.translation = [0, 0]
+  linearPlayer.height = 441
+  linearPlayer.translation = [3, -52]
   linearPlayer.reParent(m.inlineVideoPreviewPlayerContainer, false)
   m.inlineVideoMetadataOverlay.reParent(m.inlineVideoPreviewPlayerContainer, false)
   m.inlinePreviewFocusIndicator.reParent(m.inlineVideoPreviewPlayerContainer, false)
