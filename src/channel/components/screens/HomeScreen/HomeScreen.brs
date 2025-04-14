@@ -82,7 +82,11 @@ End Function
 Function moveContentAreaMask(nFocusRow = -1, nFocusingPercent = 1)
   '//nMaskYNew will most likely be set to 0 w/ the following line unless the content rowList has been moved to make way for a special top row.
   nMaskYNew = m.CategoryGridList.rowlistTranslation[1]
-  if nFocusRow >= 0 AND isNonEmptyArray(m.CategoryGridList.rowHeights) = true
+  ' Since we have 2 full rows visible we are setting the mask offset to make sure the first row of the category grid is visible.
+  if m.top.lastFocusedList = "featuredRowList"
+    nMaskYNew = nMaskYNew + m.CategoryGridList.rowHeights[0]
+  end if
+  if nFocusRow >= 0 AND isNonEmptyArray(m.CategoryGridList.rowHeights) = true AND (m.top.lastFocusedList = "rowList" OR m.top.lastFocusedList = "")
     nMaxRowHeights = m.CategoryGridList.rowHeights.count()
     if nFocusRow > (nMaxRowHeights - 1)
       '//If the rowHeights array doesn't contain as many row heights as the passed nFocusRow, then assume the current height is associated with the last item in the rowHeights array
@@ -797,7 +801,6 @@ End Function
 Function moveContentAreaMaskBasedCurrentFocus()  '//Determine if the rowlist or a special row is in focus
   nRowInFocus = -1
   focusedContent = m.top.contentFocused
-
   if m.top.kidsMode = true OR (focusedContent <> invalid AND focusedContent.gridItemType <> m.constants.ui.gridItemTypes.skinAd)
     if m.CategoryGridList.cursorPosition <> invalid
       nRowInFocus = m.CategoryGridList.cursorPosition[0]
