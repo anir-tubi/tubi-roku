@@ -2139,6 +2139,14 @@ Function getTranslation_en_US()
     "videoPlayer_adBreakStartsIn": {
       "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
       "message": "Ad break starts in"
+    },
+    "h_m_left":{
+      "description": "Indicates time left in the format 'x h y m left'",
+      "message": "{hour}h {minutes}m left"
+    },
+    "m_left":{
+      "description": "Indicates time left in the format 'y m left'",
+      "message": "{minutes}m left"
     }
   }
 End Function

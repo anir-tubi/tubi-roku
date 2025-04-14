@@ -26,11 +26,17 @@
       uri="pkg:/images/video_in_gri_gradient_$$RES$$.9.png"/>
 
     <Poster
-      id="LeftHeaderImage"
+      id="logoBackground"
       width="72"
       height="72"
       translation="[20, 242]"
-      loadDisplayMode="scaleToFit"/>
+      uri="pkg:/images/logo_background.png">
+      <Poster
+        id="LeftHeaderImage"
+        width="54"
+        height="54"
+        translation="[9, 9]" />
+    </Poster>
 
     <LayoutGroup
       id="metadataGroup"

@@ -4,6 +4,7 @@ Function init()
   m.metadataGroup = m.top.findNode("metadataGroup")
   m.constants = getConstantsFromGlobal()
   m.leftHeaderImage = m.top.findNode("LeftHeaderImage")
+  m.logoBackground = m.top.findNode("logoBackground")
   m.offset = m.top.findNode("Offset")
   m.title = m.top.findNode("Title")
   m.titleImage = m.top.findNode("TitleImage")
@@ -85,15 +86,15 @@ End Function
 
 
 Function setThumbnailImage(thumbnailUri, contentType)
-  leftHeaderIsPresent = (m.leftHeaderImage.getParent() <> invalid)
+  leftHeaderIsPresent = (m.logoBackground.getParent() <> invalid)
   if isNonEmptyString(thumbnailUri) = true AND (contentType = m.constants.ui.contentTypes.sportsEvent OR contentType = m.constants.ui.contentTypes.linear)
     if leftHeaderIsPresent = false
-      m.top.insertChild(m.leftHeaderImage, 0)
+      m.top.insertChild(m.logoBackground, 0)
     end if
 
     m.leftHeaderImage.uri = thumbnailUri
   else if leftHeaderIsPresent = true
-    m.top.removeChild(m.leftHeaderImage)
+    m.top.removeChild(m.logoBackground)
   end if
 End Function
 
@@ -124,9 +125,8 @@ Function onItemContentChange(msg)
 
   else
     'Remove thumbnail image and badge we showed for live
-    leftHeaderIsPresent = (m.leftHeaderImage.getParent() <> invalid)
-    if leftHeaderIsPresent = true
-      m.top.removeChild(m.leftHeaderImage)
+    if m.logoBackground.getParent() <> invalid
+      m.top.removeChild(m.logoBackground)
     end if
 
     badgePresent = (m.badge <> invalid AND m.badge.getParent() <> invalid)
@@ -189,6 +189,7 @@ Function metadataOnPosterContent(itemContent)
       arr = lengthString.split("min")
       firstSubString = arr[0].trim() + "m"
     end if
+    
     if isNonEmptyArray(secondSubString) = true
       finalString = firstSubString[0].trim() + "h" + " " + secondSubString[0].trim() + "m"
     else
@@ -232,18 +233,18 @@ Function metadataOnLivePosterContent(currentProgram, content)
 
   text = ""
 
-  if isNonEmptyArray(content.title) = true
+  if isNonEmptyString(content.title) = true
     text = content.title + " "
   end if
 
-  timeleft = calculateProgramTimeLeft(currentProgram)
+  timeLeft = calculateProgramTimeLeft(currentProgram)
 
-  if timeleft <> invalid
+  if timeLeft <> invalid
     if text.len() > 0
       text += Chr(&hb7) + " "
     end if
 
-    text += timeleft.replace("min", "m") + " "
+    text += timeLeft + " "
   end if
 
   if isNonEmptyString(text) = true
@@ -253,7 +254,7 @@ Function metadataOnLivePosterContent(currentProgram, content)
 
   ' handle rating
   ratingIsPresent = (m.rating.getParent() <> invalid)
-  if isNonEmptyArray(currentProgram.rating) = true
+  if isNonEmptyString(currentProgram.rating) = true
     if ratingIsPresent = false
       firstLineGroup.insertChild(m.rating, insertIndex)
     end if
@@ -320,9 +321,9 @@ Function getDurationHoursString(seconds As Integer) As String
     minValue = StrI((Int(seconds / 60) mod 60) + 1) 'increase the min by one so that we dont show 0 min
 
     if hourValue > 0
-      retVal =  getTranslation("hour_mins_left", {"hour": StrI(hourValue), "minutes": minValue})
+      retVal =  getTranslation("h_m_left", {"hour": StrI(hourValue), "minutes": minValue})
     else
-      retVal = getTranslation("mins_left", {"minutes": minValue})
+      retVal = getTranslation("m_left", {"minutes": minValue})
     end if
   end if
 
@@ -346,9 +347,9 @@ Function adjustMetadataGroupTranslation()
     yTranslation = 330 - height - 16
   end if
 
-  if m.leftHeaderImage.getParent() <> invalid
+  if m.logoBackground.getParent() <> invalid
     'If the live have thumbnail we will add thumbnail width and 21 px gap for the metadaGroup translation.
-    leftHeaderImageWidth = m.leftHeaderImage.boundingRect().width
+    leftHeaderImageWidth = m.logoBackground.boundingRect().width
     m.metadataGroup.translation = [20 + leftHeaderImageWidth + 21, yTranslation]
   else
     m.metadataGroup.translation = [20, yTranslation]
