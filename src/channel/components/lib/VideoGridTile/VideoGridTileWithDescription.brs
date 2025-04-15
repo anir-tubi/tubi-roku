@@ -6,9 +6,6 @@ Function init()
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.description, typographyConstants.ids.bodySmall)
 
-  if m.global <> invalid
-    m.global.observeFieldScoped("theme", "onThemeChange")
-  end if
   onThemeChange()
 
   m.top.observeFieldScoped("itemContent", "onItemContentChange")
@@ -16,12 +13,8 @@ Function init()
 End Function
 
 
-Function onThemeChange(msg = invalid)
-  if msg <> invalid
-    theme = msg.getData()
-  else
-    theme = getThemeFromGlobal()
-  end if
+Function onThemeChange()
+  theme = getThemeFromGlobal()
 
   if theme <> invalid
     m.description.color = theme.secondaryTextColor
@@ -32,7 +25,17 @@ End Function
 Function onItemContentChange(msg)
   itemContent = msg.getData()
   m.VideoGridTile.itemContent = itemContent
-  m.description.text = itemContent.description
+
+  currentProgram = invalid
+  if itemContent.type = "linear"
+    currentProgram = getCurrentLiveProgram(itemContent)
+  end if
+
+  if currentProgram <> invalid AND isNonEmptyString(currentProgram.description) = true
+    m.description.text = currentProgram.description
+  else
+    m.description.text = itemContent.description
+  end if
 End Function
 
 

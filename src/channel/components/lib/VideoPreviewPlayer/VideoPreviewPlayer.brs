@@ -74,24 +74,21 @@ Function playContent()
   m.lastPingTime = 0
   m.playerPosition = 0
 
-  if m.Video.content.id <> invalid
+  videoContent = m.Video.content
 
-    previewId = m.Video.content.previewId
-    if isNonEmptyString(m.Video.content.trailerId) = true
-      previewId = m.Video.content.trailerId
-    end if
-
-    playerType = "BANNER"
-    if isNonEmptyString(m.Video.content.parentCategory) = true AND m.Video.content.parentCategory = m.constants.ui.categoryIds.featured
-      playerType = "VIDEO_IN_GRID"
+  if videoContent.id <> invalid
+    previewId = videoContent.previewId
+    'We will remove the trailerId once we remove the roku_trailer_vs_preview_nav_v1 experiment code 
+    if isNonEmptyString(videoContent.trailerId) = true
+      previewId = videoContent.trailerId
     end if
 
     startPreviewEvent = {
       type: "start_preview"
       values: {
-        video_id: m.Video.content.id.toInt()
+        video_id: videoContent.id.toInt()
         is_fullscreen: false
-        video_player: playerType
+        video_player: m.top.videoPlayerType
         preview_id: previewId
         pageOneof: m.tubiTrackingInfo.getAnalyticsPage(m.currentPageInfo.pageType, m.currentPageInfo.pageValues)
       }
@@ -271,7 +268,13 @@ Function getPreviewProgressEvent(pageInfo, callSource)
   if m.playerPosition > m.lastPingTime AND m.videoState = "play"
     viewTime = Int((m.playerPosition - m.lastPingTime) * 1000) 'ms
     currentPosition = Int(m.playerPosition * 1000) 'ms
-    videoId = m.Video.content.id.toInt()
+    videoContent = m.Video.content
+    videoId = 0
+
+    if isNonEmptyString(videoContent.id) = true
+      videoId = videoContent.id.toInt()
+    End if
+
     pgInfo = {}
 
     if pageInfo <> invalid
@@ -282,14 +285,10 @@ Function getPreviewProgressEvent(pageInfo, callSource)
       end if
     end if
 
-    playerType = "BANNER"
-    if isNonEmptyString(m.Video.content.parentCategory) = true AND m.Video.content.parentCategory = m.constants.ui.categoryIds.featured
-      playerType = "VIDEO_IN_GRID"
-    end if
-
-    previewId = m.Video.content.previewId
-    if isNonEmptyString(m.Video.content.trailerId) = true
-      previewId = m.Video.content.trailerId
+    previewId = videoContent.previewId
+    'We will remove the trailerId once we remove the roku_trailer_vs_preview_nav_v1 experiment code 
+    if isNonEmptyString(videoContent.trailerId) = true
+      previewId = videoContent.trailerId
     end if
 
     previewProgressEvent = {
@@ -298,7 +297,7 @@ Function getPreviewProgressEvent(pageInfo, callSource)
         video_id: videoId
         position: currentPosition
         view_time: viewTime
-        video_player: playerType
+        video_player: m.top.videoPlayerType
         preview_id: previewId
         pageOneof: pgInfo
       }
@@ -328,14 +327,11 @@ End Function
 'set hasCompleted to true when user watches the entire video preview, otherwise set it to false.
 Function getFinishPreviewEvent(hasCompleted = false)
 
-  previewId = m.Video.content.previewId
-  if isNonEmptyString(m.Video.content.trailerId) = true
-    previewId = m.Video.content.trailerId
-  end if
-
-  playerType = "BANNER"
-  if isNonEmptyString(m.Video.content.parentCategory) = true AND m.Video.content.parentCategory = m.constants.ui.categoryIds.featured
-    playerType = "VIDEO_IN_GRID"
+  videoContent = m.Video.content
+  previewId = videoContent.previewId
+  'We will remove the trailerId once we remove the roku_trailer_vs_preview_nav_v1 experiment code 
+  if isNonEmptyString(videoContent.trailerId) = true
+    previewId = videoContent.trailerId
   end if
 
   finishPreviewEvent = {
@@ -344,7 +340,7 @@ Function getFinishPreviewEvent(hasCompleted = false)
       video_id: m.Video.content.id.toInt()
       end_position: Int(m.playerPosition * 1000) 'ms
       preview_id: previewId
-      video_player: playerType
+      video_player: m.top.videoPlayerType
       pageOneof: m.tubiTrackingInfo.getAnalyticsPage(m.currentPageInfo.pageType, m.currentPageInfo.pageValues)
       has_completed: hasCompleted
     }

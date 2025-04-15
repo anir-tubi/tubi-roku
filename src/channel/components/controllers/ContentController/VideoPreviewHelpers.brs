@@ -202,6 +202,7 @@ Function startVideoPreview(content, pageInfo = {})
 
     trailerInfo = content.trailerInfo
     if isAA(trailerInfo) = true AND isNonEmptyString(content.videoPreviewUrl) = true
+      ' 'We will remove the trailerId once we remove the roku_trailer_vs_preview_nav_v1 experiment code 
       videoContent.addField("trailerId", "string", false)
       videoContent.trailerId = trailerInfo.id
       if getExperimentResource("roku_trailer_vs_preview_nav", "roku_trailer_vs_preview_nav_v1", false).enabled = true
@@ -237,6 +238,7 @@ End Function
 
 Function updatePreviewPlayerToCondensedView()
   tubiLog("VideoPreviewHelpers.updatePreviewPlayerToCondensedView")
+  m.videoPreviewPlayer.videoPlayerType = "BANNER"
   m.videoPreviewPlayer.reParent(m.backgroundVideoPreviewPlayerContainer, false)
   m.videoPreviewPlayer.clippingRect = [0, 0, 1920, 1080]
   resizeToLocation(m.videoPreviewPlayer, 1120, 630, [799, 0], 0)
@@ -246,6 +248,7 @@ End Function
 Function updatePreviewPlayerToInlineView()
   if isCurrentScreenHomeScreen() = true
     screen = getCurrentScreen()
+    m.videoPreviewPlayer.videoPlayerType = "VIDEO_IN_GRID"
     if m.videoPreviewPlayer.getParent().isSameNode(m.inlineVideoPreviewPlayerContainer) = false
       m.videoPreviewPlayer.clippingRect = [0, 57, 792, 329]
       m.videoPreviewPlayer.width = 795

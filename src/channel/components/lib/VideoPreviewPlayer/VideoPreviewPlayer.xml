@@ -26,6 +26,8 @@
       <field id="content" type="node"/>
       <field id="updateContent" type="boolean" alwaysNotify="true"/>
 
+      <field id="videoPlayerType" type="string" value="BANNER" />
+
       <!-- pageInfoForAnalytics is the pageInfo of VideoPreview's parent screen -->
       <field id="pageInfoForAnalytics" type="assocarray" value="{}" />
 

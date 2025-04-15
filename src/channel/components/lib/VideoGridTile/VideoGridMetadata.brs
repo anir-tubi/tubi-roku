@@ -8,6 +8,7 @@ Function init()
   m.offset = m.top.findNode("Offset")
   m.title = m.top.findNode("Title")
   m.titleImage = m.top.findNode("TitleImage")
+  m.episode = m.top.findNode("episode")
 
   m.BadgeTypes = {
     live: "live"
@@ -29,6 +30,7 @@ Function init()
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.title, typographyConstants.ids.bodyMediumStrong)
+  setTypographyOfLabel(m.episode, typographyConstants.ids.bodyExtraSmallStrong)
   setTypographyOfLabel(m.lineOneData, typographyConstants.ids.bodyExtraSmallStrong)
   setTypographyOfLabel(m.ratingLabel, typographyConstants.ids.bodyExtraSmallStrong)
 
@@ -48,6 +50,7 @@ Function onThemeChange(msg = invalid)
 
   if theme <> invalid
     m.title.color = theme.primaryTextColor
+    m.episode.color = theme.primaryTextColor
     m.lineOneData.color = theme.primaryTextColor
     m.RatingLabel.color = theme.primaryTextColor
     m.focused2Color = theme.focused2Color
@@ -147,6 +150,12 @@ Function metadataOnPosterContent(itemContent)
   insertIndex = 0
 
   text = ""
+
+  episodePresent = (m.episode.getParent() <> invalid)
+
+  if episodePresent = true
+    m.offset.removeChild(m.episode)
+  end if
 
   if isNonEmptyArray(itemContent.tags) = true
     text = itemContent.tags[0] + " "
@@ -272,6 +281,18 @@ Function metadataOnLivePosterContent(currentProgram, content)
   end if
 
   m.title.text = currentProgram.title
+  episodePresent = (m.episode.getParent() <> invalid)
+  if isNonEmptyString(currentProgram.epgProgramTitle) = true
+    parent = m.title.getParent()
+    if episodePresent = false
+      programEpisodeIndex = m.nodeHelpers.getChildIndex(parent, m.title) + 1
+      m.offset.insertChild(m.episode, programEpisodeIndex)
+    end if
+    m.episode.text = currentProgram.epgProgramTitle
+  else if episodePresent = true
+      m.offset.removeChild(m.episode)
+  end if
+
   setTitle(content.titleImageUri)
 End Function
 
@@ -351,6 +372,9 @@ Function adjustMetadataGroupTranslation()
     'If the live have thumbnail we will add thumbnail width and 21 px gap for the metadaGroup translation.
     leftHeaderImageWidth = m.logoBackground.boundingRect().width
     m.metadataGroup.translation = [20 + leftHeaderImageWidth + 21, yTranslation]
+    translationX = m.logoBackground.translation[0]
+    translationY = 330 - m.logoBackground.boundingRect().height - 21
+    m.logoBackground.translation = [translationX, translationY]
   else
     m.metadataGroup.translation = [20, yTranslation]
   end if

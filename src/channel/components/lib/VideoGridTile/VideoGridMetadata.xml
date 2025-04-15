@@ -67,6 +67,13 @@
             role="font"/>
         </Label>
 
+        <Label
+          id="episode"
+          vertAlign="bottom" >
+          <Font
+            role="font"/>
+        </Label>
+
         <LayoutGroup
           id="FirstLineGroup"
           layoutDirection="horiz"
