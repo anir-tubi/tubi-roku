@@ -22,7 +22,7 @@ Function TubiExperiments(experimentsInfo) as Object
     defaultResources: {
 
       roku_search_autocomplete: {
-        roku_search_autocomplete_v1 : {
+        roku_search_autocomplete_v2 : {
           default: {"enabled": false}
           holdout_control: {"enabled": false}
           holdout_winning: {"enabled": false}
