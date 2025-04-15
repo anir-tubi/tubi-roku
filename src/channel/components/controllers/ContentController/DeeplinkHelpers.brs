@@ -241,8 +241,13 @@ Function handleDeeplinkContentByType()
   tubilog("deeplinkHelpers.handleDeeplinkContentByType")
   if m.deepLinkContent <> invalid
     if m.deepLinkContent.deeplinkType = "linear"
-      ' TODO: Remove the additional request and call startDeeplinkedLinearPlayback directly.
-      getSingleContentFromServer(m.deeplinkContent, onDeeplinkLiveTVContentSuccess, showDeeplinkErrorModal)
+     'if fadeInContentController has not be set true, then linear content can not play.
+      'in that case, we are setting a callback to call handleLinearDeeplinkContent after fadeInContentController is triggered
+      if m.top.fadeInContentController = true
+        handleLinearDeeplinkContent()
+      else
+        m.linearScreenAfterFn = handleLinearDeeplinkContent
+      end if
     else if m.deepLinkContent.deeplinkType = "liveTV"
       startDeeplinkedLinearPlayback()
     else if m.deepLinkContent.deeplinkType = "category"
@@ -283,8 +288,10 @@ Function handleDeeplinkContentByType()
       showDetailScreen(m.deeplinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource)
 
     else if m.deepLinkContent.deeplinktype = "sports"
-      ' TODO: Remove the additional request and call showSportsDetailsScreen directly.
-      getSingleContentFromServer(m.deeplinkContent, onDeeplinkSportsContentSuccess, showDeeplinkErrorModal)
+      playbackSource = getPlaybackSourceForDeeplinkType()
+      showDetailScreen(m.deeplinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource)
+      sideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
+      focusSideNavOption(sideNavID)
     else if m.deepLinkContent.deeplinktype = "shortFormVideo"
       ' shortFormVideo media refers to content that is under 15 minutes long. Examples include movie trailers, news snippets, comedy clips, food reviews, and similar videos.
       ' In our app, it primarily features movie trailers
