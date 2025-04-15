@@ -237,7 +237,7 @@ Function parseMiniHomeScreenContentSuccess(fullResponse, reqInfo)
     isSignedInUser = reqInfo.isSignedInUser
   end if
 
-  convertedMetadata = m.metadataTranslate.translateMiniHomescreen(parsedResponse, contentMode, "homeScreen", isSignedInUser)
+  convertedMetadata = m.metadataTranslate.translateMiniHomescreen(parsedResponse, contentMode, "videoPlayerScreen", isSignedInUser)
 
   return convertedMetadata
 End Function
