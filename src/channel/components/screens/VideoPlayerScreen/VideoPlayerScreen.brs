@@ -2938,6 +2938,14 @@ Function sendAdMissedEvent(reason)
 
   end if
 
-  adMissedInfo.message_map = FormatJson({playerPositionArr: m.positionArr})
+  if isNonEmptyArray(m.positionArr) = true
+    sPositionArr = []
+
+    for each arr in m.positionArr
+      sPositionArr.push(arr.toStr())
+    end for
+
+    adMissedInfo.message_map = {playerPositionArr: sPositionArr.join(",")}
+  end if
   updatePlayerLogLib(m.playerLogLib, "fireAdMissedEvent", adMissedInfo)
 End Function
