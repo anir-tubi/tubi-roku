@@ -1667,7 +1667,7 @@ Function getConstants()
     ' Set some performance parameters based on device profile
     constants.performance = {}
       constants.performance.categoryGridList = {}
-      constants.performance.categoryGridList.initialBlockSize = 12
+      constants.performance.categoryGridList.initialBlockSize = 7
 
       if limitedUi
         ' Notes:

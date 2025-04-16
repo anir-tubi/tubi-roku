@@ -128,15 +128,6 @@ Function TubiExperiments(experimentsInfo) as Object
 
 
       'This experiment will not be under holdout and will clean up once we take the decision.
-      roku_home_screen_reduce_contents_limit: {
-        roku_home_screen_reduce_contents_limit_v1: {
-          default: {"enabled": false}
-          holdout_control: {"enabled": false}
-          holdout_winning: {"enabled": false}}
-      }
-
-
-      'This experiment will not be under holdout and will clean up once we take the decision.
       roku_no_change_experiment: {
         roku_no_change_experiment_v1: {
           default: {"enabled": false}
