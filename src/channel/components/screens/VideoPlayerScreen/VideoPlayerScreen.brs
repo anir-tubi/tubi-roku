@@ -279,6 +279,9 @@ Function init()
   m.notificationInterval = 0.999 ' The interval that we are targeting for player position updates. We specify a value lower than a second in order to get a float value
   m.Video.notificationInterval = m.notificationInterval
 
+  'This information is used in quality of service event
+  m.adImpressionMap = {"0": 0, "1": 0, "2": 0, "3": 0, "4": 0}
+
   'This variable holds the value of Ad information from rainmaker response
   m.filledAdData = {}
   'This variable is used to send an AdMissed event if the previous cue point was missed
@@ -831,7 +834,9 @@ Function onControlChange()
       m.filledAdData = {}
     end if
 
-    updatePlayerLogLib(m.playerLogLib, "fireQualityOfServiceEvent")
+    updatePlayerLogLib(m.playerLogLib, "fireQualityOfServiceEvent", m.adImpressionMap)
+    m.adImpressionMap = {"0": 0, "1": 0, "2": 0, "3": 0, "4": 0} 'reset adImpressionMap after sending QualityOfService event
+    
     stopVideo()
     animateTransport("out")
     hideBrowseWhileWatching()
@@ -2829,6 +2834,30 @@ Function onAdTrackingObject(msg)
 
   if m.isAdsOverlayExperimentEnabled = true
     m.adCountdownOverlay.adInfo = adInfo
+  end if
+
+  pixelsFiredStatus = adInfo.pixelsFiredStatus
+
+  if isAA(pixelsFiredStatus) = true
+    if pixelsFiredStatus["Impression"] = true
+      m.adImpressionMap["0"] += 1
+    end if  
+
+    if pixelsFiredStatus["FirstQuartile"] = true
+      m.adImpressionMap["1"] += 1
+    end if
+
+    if pixelsFiredStatus["Midpoint"] = true
+      m.adImpressionMap["2"] += 1
+    end if
+
+    if pixelsFiredStatus["ThirdQuartile"] = true
+      m.adImpressionMap["3"] += 1
+    end if
+
+    if pixelsFiredStatus["Complete"] = true
+      m.adImpressionMap["4"] += 1
+    end if
   end if
 
   if adStatus = "PodStart"

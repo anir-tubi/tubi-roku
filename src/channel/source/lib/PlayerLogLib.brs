@@ -1121,8 +1121,8 @@ End Function
 
 'The fireQualityOfService event will be triggered when a playback session ends
 '
-'@qualityOfServiceInfo: assocarray
-Function playerLogLib_fireQualityOfServiceEvent()
+'@adImp: assocarray, example: {"0": 0, "1": 0, "2": 0, "3": 0, "4": 0}
+Function playerLogLib_fireQualityOfServiceEvent(adImp = {})
   eventBase = {
     track_id: ""
     cffd: ""
@@ -1194,6 +1194,7 @@ Function playerLogLib_fireQualityOfServiceEvent()
   qualityOfServiceInfo["hdcp"] = m.hdcpVersion
   qualityOfServiceInfo["codec"] = m.videoCodecType
   qualityOfServiceInfo["content_id"] = m.videoId
+  qualityOfServiceInfo["ad_imp"] = FormatJson(adImp)
 
   m.sendEvent(qualityOfServiceInfo, "quality_of_services", eventBase)
   m.resetQoSAttributes()

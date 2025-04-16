@@ -67,6 +67,9 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
     adResponseTime: -1
     totalAdBreakAdsPerSession: 0
 
+    'pixelsFiredStatus is used in PlayerLog QualityOfService event
+    pixelsFiredStatus: {} 'example: {"Impression": true, "FirstQuartile": true, "Midpoint": true, "ThirdQuartile": true, "Complete": true}
+
     ' public
     roAdFramework: roAdFramework
     reset: tubiAds_reset
@@ -906,6 +909,11 @@ Function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
           ctx = {}
           m.roAdFramework.setTrackingCallback(function(ctx, eventType, rafCtx)
             ads = getGlobalAA().tubiAds
+            'The ctx object retains the previous ad's time and only resets after a Start event.
+            'To ensure accurate pixel tracking per ad, we manually reset the time field during the Impression event.
+            if rafCtx.type = "Impression"
+              rafCtx.time = 0
+            end if
             ctx.append(rafCtx)
             ads.adTrackingCallback(eventType, ctx)
           end function, ctx)
@@ -1049,6 +1057,29 @@ End Function
 Function tubiAds_adTrackingCallback(eventType, ctx)
   impressionCount = invalid
   youboraOptions = invalid
+
+  if ctx.type <> invalid AND ctx.type = "Impression"
+    m.pixelsFiredStatus["Impression"] = true
+  else if ctx.type <> invalid AND ctx.type = "Complete"
+    m.pixelsFiredStatus["Complete"] = true
+  else
+    time = ctx.time
+    duration = ctx.duration
+    
+    if time <> invalid AND duration <> invalid AND time > 0 AND duration > 0
+      progress = time / duration
+
+      if progress >= 0.75
+        m.pixelsFiredStatus["ThirdQuartile"] = true
+      else if progress >= 0.50
+        m.pixelsFiredStatus["Midpoint"] = true
+      else if progress >= 0.25
+        m.pixelsFiredStatus["FirstQuartile"] = true
+      end if
+    end if  
+
+  end if
+
   if eventType <> invalid
     if ctx <> invalid
       '//make a subset of ctx and set it to m.controlNode.adTrackingObject
@@ -1085,6 +1116,11 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
 
       if m.totalAdDurationInCurrentPod <> invalid
         adTrackingObject.totalAdDurationInCurrentPod = Int(m.totalAdDurationInCurrentPod)
+      end if
+
+      if eventType = "Close" OR eventType = "Complete" OR eventType = "Error"
+        adTrackingObject.pixelsFiredStatus = m.pixelsFiredStatus
+        m.pixelsFiredStatus = {} 'resets after setting pixelsFiredStatus to video player
       end if
 
       if m.controlNode <> invalid
