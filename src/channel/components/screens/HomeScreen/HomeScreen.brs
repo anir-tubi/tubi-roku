@@ -531,6 +531,11 @@ Function fireNavigateWithinPageEvent()
       }
     end if
   end if
+
+  if m.CategoryGridList.lastFocusedList = "featuredRowList"
+    focusedContent = m.CategoryGridList.featuredRowFocusedItem
+    m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(focusedContent, m.CategoryGridList.cursorPosition)
+  end if
 End Function
 
 
