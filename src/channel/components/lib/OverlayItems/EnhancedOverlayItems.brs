@@ -19,6 +19,7 @@ Function onThemeChange(msg = invalid)
 
   if theme <> invalid
     m.focusedColor = theme.focusedColor
+    m.tertiaryTextColor = theme.tertiaryTextColor
   end if
 End Function
 
@@ -32,8 +33,9 @@ Function onItemInfoChanged(msg)
     titleLabel.id = items.id.trim()
     titleLabel.text = items.title
     titleLabel.height = 40
+    titleLabel.color = m.tertiaryTextColor
     m.overLayItemsLayoutGroup.appendChild(titleLabel)
-    setTypographyOfLabel(titleLabel, typographyConstants.ids.subheaderMedium)
+    setTypographyOfLabel(titleLabel, typographyConstants.ids.bodyMediumStrong)
   end if
 
   if items.subtitle <> invalid
@@ -42,7 +44,7 @@ Function onItemInfoChanged(msg)
     subTitleLabel.text = items.subtitle
     subTitleLabel.height = 40
     m.overLayItemsLayoutGroup.appendChild(subTitleLabel)
-    setTypographyOfLabel(subTitleLabel, typographyConstants.ids.bodyMedium)
+    setTypographyOfLabel(subTitleLabel, typographyConstants.ids.bodyMediumStrong)
   end if
 
   if items.id <> "sendFeedbackOnPlayer"
@@ -51,18 +53,18 @@ Function onItemInfoChanged(msg)
     rectangle.height = 44
     m.overLayItemsLayoutGroup.appendChild(rectangle)
   else
-    m.overLayItemsLayoutGroup.itemSpacings = [15, 30]
+    m.overLayItemsLayoutGroup.itemSpacings = [15]
   end if
 
   if items.hasSubmenu = true
     checkBoxList = createObject("roSGNode", "CaretBoxList")
-    itemComponentName = "CaretButton"
+    itemComponentName = "EnhancedCaretButton"
   else
     checkBoxList = createObject("roSGNode", "CheckBoxList")
-    itemComponentName = "CheckButton"
+    itemComponentName = "EnhancedCheckButton"
   end if
 
-  checkBoxList.focusBitmapUri = "pkg:/images/menu-focus-$$RES$$.9.png" 
+  checkBoxList.focusBitmapUri = "pkg:/images/pill_top_nav_$$RES$$.9.png"
   checkBoxList.id = items.id.trim()
   checkBoxList.itemSize = [510,69]
   checkBoxList.numRows = items.numRows

@@ -306,6 +306,13 @@
         translation="[584,696]"/>
     </Group>
 
+    <Spinner
+      id="LoadingSpinner"
+      visible="false"
+      width="1920"
+      height="1080"
+      translation="[0,0]"/>  
+
     <Group
       id="AdHeadsUp"
       visible="false"
@@ -348,31 +355,24 @@
 
     <Group
       id="TopOverlay"
-      translation="[0,155]"
+      translation="[0, 80]"
       opacity="0.0">
 
-      <Label
-        id="VideoOverlayTitle"
-        translation="[0,0]"
-        width="1311"
-        ellipsizeOnBoundary="true"
-        height="73"
-        vertAlign="center">
-        <Font
-          id="Vaud22px"
-          role="font"/>
-      </Label>
-      <Label
-        id="VideoOverlayEpisodeTitle"
-        translation="[0,66]"
-        width="1311"
-        ellipsizeOnBoundary="true"
-        height="46"
-        vertAlign="center">
-        <Font
-          id="Vaud22px"
-          role="font"/>
-      </Label>
+      <LayoutGroup
+        id="TitleGroup"
+        layoutDirection="vert"
+        vertAlignment="top"
+        horizAlignment="left"
+        itemSpacings="[6]"/>
+
+      <IconWithLabel
+        id="sendFeedBackButtonTopRight"
+        visible="false"
+        width="72"
+        height="72"
+        text="Send Feedback"
+        focusUri="pkg:/images/transport/sgplayer/icon-feedback-focus.webp"
+        unFocusUri="pkg:/images/transport/sgplayer/icon-feedback-unfocused.webp"/>
 
     </Group>
 
@@ -380,14 +380,52 @@
       id="PauseAdOverlay"
       opacity="0.0"/>
 
-    <SimpleButton
-      id="SkipCuepointsButton"
-      visible="false" />
-
     <Group
       id="HUD"
       visible="true"
       opacity="0.0" >
+
+      <Label
+        id="quickSeekLabel"
+        visible="false"/>
+
+      <LayoutGroup
+        id="seekGroup"
+        layoutDirection="horiz"
+        vertAlignment="center"
+        horizAlignment="center"
+        itemSpacings="[12]"
+        visible="false">
+       
+        <Label
+          id="currentSeekLabel"/>
+
+        <Poster
+          id="seekBackground"
+          width="60"
+          height="36"
+          uri="pkg:/images/tag-rounded-rectangle-background-pull-$$RES$$.9.png">
+          <LayoutGroup
+            id="seekControlGroup"
+            layoutDirection="horiz"
+            vertAlignment="center"
+            horizAlignment="left"
+            itemSpacings="[3]"
+            translation="[10,18]">
+            <Poster
+              id="seekIcon"
+              width="19"
+              height="12"
+              uri="pkg:/images/transport/sgplayer/icon-vector-fwd.webp"
+              loadSync="true"/>
+            <SimpleLabel
+              id="seekSpeedLabel"
+              width="18"
+              text="1"/>
+          </LayoutGroup>    
+        </Poster>  
+
+      </LayoutGroup>
 
       <SpritePoster
         id="Thumbnail"
@@ -395,114 +433,27 @@
         height="192"
         spriteDirection="horiz"/>
 
-      <Group
+      <LayoutGroup
         id="Transport"
-        opacity="1.0">
-
-        <TubiProgressBar
-          id="ProgressBar"
-          translation="[84, 48]"/>
-
-        <!-- Time -->
-        <Label
-          id="ElapsedLabel"
-          text="00:00:00"
-          width="500"
-          translation="[75, 0]">
-          <Font
-            id="Vaud34px"
-            role="font"/>
-        </Label>
-        <Label
-          id="RemainingLabel"
-          text="-00:00:00"
-          width="0"
-          translation="[1695, 0]">
-          <Font
-            id="Vaud34px"
-            role="font"/>
-        </Label>
-
-        <!-- Transport buttons - Transport buttons must be in the order they appear on the screen (from left to right) -->
-        <Group
-          id="TransportButtons" >
-          <TransportButton
-            id="SkipTrailerButton"
-            width="260"
-            height="80"
-            translation="[0,96]"
-            uri="">
-            <Label
-              id="SkipTrailerButtonLabel"
-              text="Watch Movie"
-              font="dictionary:Vaud34px"
-              width="260"
-              height="86"
-              horizAlign="center"
-              vertAlign="center" />
-          </TransportButton>
-          <TransportButton
-            id="StartButton"
-            width="60"
-            height="60"
-            uri="pkg:/images/transport/sgplayer/icon-to-start.webp"
-            translation="[540,110]" />
-          <TransportButton
-            id="RewindButton"
-            width="60"
-            height="60"
-            uri="pkg:/images/transport/sgplayer/icon-rew.webp"
-            translation="[672,110]" />
-          <TransportButton
-            id="HopBackButton"
-            width="60"
-            height="60"
-            uri="pkg:/images/transport/sgplayer/icon-rew-30s.webp"
-            translation="[800,110]" />
-          <!-- play/pause uri will update based on playing state of video -->
-          <TransportButton
-            id="PlayPauseButton"
-            width="60"
-            height="60"
-            uri="pkg:/images/transport/sgplayer/icon-play.webp"
-            translation="[930,110]" />
-          <TransportButton
-            id="HopForwardButton"
-            width="60"
-            height="60"
-            uri="pkg:/images/transport/sgplayer/icon-fwd-30s.webp"
-            translation="[1060,110]" />
-          <TransportButton
-            id="FastForwardButton"
-            width="60"
-            height="60"
-            uri="pkg:/images/transport/sgplayer/icon-ffw.webp"
-            translation="[1190,110]" />
-          <TransportButton
-            id="EndButton"
-            width="60"
-            height="60"
-            uri="pkg:/images/transport/sgplayer/icon-to-end.webp"
-            translation="[1320,110]" />
-          <TransportButton
-            id="closedCaptionAudioButton"
-            width="60"
-            height="60"
-            uri="pkg:/images/transport/sgplayer/icon-subtitles.webp"
-            translation="[1565,110]"
-            visible="false" />
-          <TransportButton
-            id="sendFeedBackButton"
-            enabled="false"
-            width="60"
-            height="60"
-            uri="pkg:/images/transport/sgplayer/icon-help.webp"
-            translation="[1695,110]"
-            visible="false" />
-        </Group>
-      </Group>  <!-- Transport -->
+        layoutDirection="vert"
+        vertAlignment="top"
+        horizAlignment="left"
+        opacity="1.0"
+        itemSpacings="[9, 18]"/>
 
     </Group>  <!-- HUD -->
+
+    <SimpleButton
+      id="skipCuepointsSimpleButton"
+      visible="false"/>
+
+    <TextIconButton
+      id="skipCuepointsTextIconButton"
+      uri="pkg:/images/transport/sgplayer/icon-skip-intro-nonfocus.webp"
+      hasUnfocusedBackground="true"
+      iconWidth="27"
+      iconHeight="15"
+      visible="false"/>
 
     <Group
       id="ratingOverlay"
@@ -518,7 +469,7 @@
         id="ratingBarAndLabel"
         vertAlignment="top"
         layoutDirection="horiz"
-        translation="[126,142]"
+        translation="[192,80]"
         itemSpacings="[12]">
         <Rectangle
           id="ratingBar"
@@ -527,15 +478,16 @@
         <LayoutGroup
           id="ratingAndGenre"
           layoutDirection="vert"
+          vertAlignment="center"
           itemSpacings="[18]">
           <LayoutGroup
             id="ratingLayout"
             layoutDirection="horiz"
-            itemSpacings="[8]"
+            itemSpacings="[6]"
             vertAlignment="center">
             <Label
               height="42"
-              vertAlign="bottom"
+              vertAlign="center"
               id="ratedLabel">
               <Font
                 role="font"/>
@@ -577,6 +529,14 @@
       </LayoutGroup>
     </Group>
 
+    <Poster
+      id="controlIcon"
+      width="48"
+      height="48"
+      loadSync="true"
+      translation="[936, 515]"
+      opacity="0.0"/>
+
     <UpNext
       id="UpNext"
       opacity="0.0" />
@@ -590,7 +550,7 @@
       width="1920"
       height="1080">
       <ClosedCaptionAndAudioSelectionOverlay
-        translation="[1230, 60]"
+        translation="[1170, 105]"
         id="closedCaptionAndAudioSelectionOverlay" />
     </Rectangle>
 
@@ -600,7 +560,6 @@
       width="1920"
       height="1080">
       <PlayerSideOverlay
-        translation="[1230, 60]"
         id="sendFeedbackSelectionOverlay" />
     </Rectangle>
 

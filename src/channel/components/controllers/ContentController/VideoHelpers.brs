@@ -108,6 +108,7 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
     videoPlayer.observeFieldScoped("subtitleTrackSettings", "onSubtitleTrackSettingsChange")
     videoPlayer.observeFieldScoped("audioTrackSettings", "onAudioTrackSettingsChange")
     videoPlayer.observeFieldScoped("homescreenContentToPlayUpdated", "onPlayerHomeScreenContentToPlay")
+    videoPlayer.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
     observeUpdateAuth(videoPlayer.task)
 
     initVideoTracking(videoPlayer) 'initializeYoubora

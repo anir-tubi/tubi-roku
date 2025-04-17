@@ -25,6 +25,9 @@
       <field id="focusColor"    type="color"/>
       <field id="unfocusColor"  type="color"/>
 
+      <!-- enable this field to show black scrubber on progress bar -->
+      <field id="highlightPointer" type="boolean" />
+
       <field id="scaledUI"      type="boolean" value="false" />
   </interface>
 
@@ -40,5 +43,12 @@
       uri="pkg:/images/transport/sgplayer/fhd/white-progress-foreground.9.png"
       loadSync="true"
       visible="false"/>
+
+    <Poster
+      id="pointer"
+      width="32"
+      height="32"
+      uri="pkg:/images/transport/sgplayer/icon-pointer.webp"
+      visible="false"/>  
   </children>
 </component>

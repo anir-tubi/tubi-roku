@@ -8,6 +8,12 @@ Function init()
   m.closeButton = m.top.findNode("closeButton")
   m.closeButton.text = getTranslation("dialog_button_close")
 
+  playerControlExperimentType = getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v1", false).type
+
+  if playerControlExperimentType = "variant2" OR playerControlExperimentType = "variant3"
+    m.closeButton.uri = "pkg:/images/pill_top_nav_$$RES$$.9.png"
+  end if
+
   m.closeButton.observeFieldScoped("selected", "onCloseSelected")
   m.top.observeField("focusedChild", "onScreenFocusChange")
 

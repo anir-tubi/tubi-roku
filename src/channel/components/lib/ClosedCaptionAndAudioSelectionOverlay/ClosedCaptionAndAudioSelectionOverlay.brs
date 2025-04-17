@@ -1,5 +1,6 @@
 Function init()
   topRef = m.top
+  m.playerControlExperimentType = getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v1", false).type
 
   deviceInfo = CreateObject("roDeviceInfo")
   modelType = deviceInfo.GetModelType()
@@ -127,6 +128,15 @@ Function showClosedCaptionAndAudioSettings()
   end if
 
   m.playerSideOverlay = CreateObject("roSGNode", "PlayerSideOverlay")
+
+  if m.playerControlExperimentType = "none" OR m.playerControlExperimentType = "variant1"
+    m.playerSideOverlay.width = 630
+    m.playerSideOverlay.height = 960
+  else
+    m.playerSideOverlay.width = 558
+    m.playerSideOverlay.height = 744
+  end if
+
   m.playerSideOverlay.observeFieldScoped("itemUpdated", "onCCAndAudioOptionItemSelected")
   m.playerSideOverlay.observeFieldScoped("backOrLeftKeyPress", "onCCAndAudioOptionBackKeyPressed")
   m.top.appendChild(m.playerSideOverlay)
@@ -600,6 +610,15 @@ Function showSubtitleModeSubMenu()
   m.closedCaptionAndAudioSettings.push(subtitleModeSubMenuAA)
 
   m.playerSideOverlay = CreateObject("roSGNode", "PlayerSideOverlay")
+
+  if m.playerControlExperimentType = "none" OR m.playerControlExperimentType = "variant1"
+    m.playerSideOverlay.width = 630
+    m.playerSideOverlay.height = 960
+  else
+    m.playerSideOverlay.width = 558
+    m.playerSideOverlay.height = 744
+  end if
+
   m.playerSideOverlay.observeFieldScoped("itemUpdated", "onSubtitleModeSubMenuItemSelected")
   m.playerSideOverlay.observeFieldScoped("backOrLeftKeyPress", "onSubtitleModeBackKeyPressed")
   m.top.appendChild(m.playerSideOverlay)

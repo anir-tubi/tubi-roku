@@ -92,12 +92,18 @@ Function TubiExperiments(experimentsInfo) as Object
           holdout_winning: {"enabled": false}}
       }
 
-      ' We will run 4 overlay types. Possible values are none, variant1, variant2, variant3, variant4
       roku_player_ui_refresh: {
+        ' We will run 4 overlay types. Possible values are none, variant1, variant2, variant3, variant4
         roku_ads_overlay_v1 : {
           default: {"overlay_type": "none"}
           holdout_control: {"overlay_type": "none"}
           holdout_winning: {"overlay_type": "none"}
+        },
+        ' We will run 4 ui control types including control. Possible values are none, variant1, variant2, variant3
+        roku_player_control_ui_refresh_v1: {
+          default: {"type": "none"}
+          holdout_control: {"type": "none"}
+          holdout_winning: {"type": "none"}
         }
       }
 

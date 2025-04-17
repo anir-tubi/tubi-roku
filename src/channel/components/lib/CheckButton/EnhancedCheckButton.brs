@@ -2,19 +2,13 @@ Function init()
   topRef = m.top
   m.label = topRef.findNode("label")
   m.labelFocused = topRef.findNode("labelFocused")
+  m.checkIcon = topRef.findNode("checkIcon")
+  m.checkIconFocused = topRef.findNode("checkIconFocused")
   m.background = topRef.findNode("background")
   m.container = topRef.findNode("container")
-  m.caret = topRef.findNode("caret")
-  m.caretFocused = topRef.findNode("caretFocused")
-  m.caretFocused.opacity = 0
 
-  playerControlExperimentType = getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v1", false).type
-
-  if playerControlExperimentType = "variant2" OR playerControlExperimentType = "variant3"
-    m.background.uri = "pkg:/images/tab_component_alt_$$RES$$.9.png"
-  else
-    m.background.uri = "pkg:/images/menu-focus-$$RES$$.9.png" 
-  end if
+  m.labelFocused.opacity = 0
+  m.checkIconFocused.opacity = 0
 
   topRef.observeFieldScoped("itemContent", "onItemContentChange")
   topRef.observeFieldScoped("height", "onHeightChange")
@@ -62,10 +56,9 @@ Function onItemContentChange(msg)
     checked = itemContent.checked
 
     ' Setting the visibility of the check icon based on the checked value.
-    hasSubmenu = itemContent.hasSubmenu
-    m.caret.visible = (hasSubmenu = true)
-    m.caretFocused.visible = (hasSubmenu = true)
-    m.background.visible = (checked = true)
+    m.checkIcon.visible = (checked = true)
+    m.checkIconFocused.visible = (checked = true)
+    m.background.visible = false
 
     ' Used in settings screen to calculate the list width dynamically based on the text width of each item.
     nBoundingTextWidth = m.label.boundingRect().width
@@ -73,8 +66,8 @@ Function onItemContentChange(msg)
   else
     m.label.text = ""
     m.labelFocused.text = ""
-    m.caret.visible = false
-    m.caretFocused.visible = false
+    m.checkIcon.visible = false
+    m.checkIconFocused.visible = false
   end if
 End Function
 
@@ -99,7 +92,7 @@ End Function
 ' Returns the width that needs to be subtracted from the width.
 Function getWidthMinusText()
   ' The width include the checkbox, the space in between the checkbox and the label, and the space before the 1st and last elements of the checkbutton
-  return m.caret.width + m.container.itemSpacings[0] + m.container.translation[0]*2
+  return m.checkIcon.width + m.container.itemSpacings[0] + m.container.translation[0]*2
 End Function
 
 
@@ -115,15 +108,15 @@ Function onFocusPercentChange(msg)
     focusPercent = msg.getData()
     m.background.opacity = 1 - focusPercent
     m.labelFocused.opacity = focusPercent
-    m.caretFocused.opacity = focusPercent
+    m.checkIconFocused.opacity = focusPercent
   else
     m.labelFocused.opacity = 0
-    m.caretFocused.opacity = 0
+    m.checkIconFocused.opacity = 0
   end if
 End Function
 
 
-Function onListHasFocusChange()
+Function onListHasFocusChange(_msg)
   if m.top.itemHasFocus = true
     m.background.opacity = 0
   else
@@ -134,10 +127,10 @@ Function onListHasFocusChange()
 
   if hasFocus = true AND m.top.itemHasFocus = true
     m.labelFocused.opacity = 1
-    m.caretFocused.opacity = 1
+    m.checkIconFocused.opacity = 1
   else
     m.labelFocused.opacity = 0
-    m.caretFocused.opacity = 0
+    m.checkIconFocused.opacity = 0
   end if
 End Function
 
@@ -145,8 +138,8 @@ End Function
 Function applyStyling()
   m.label.color = m.unfocusedThemeColor
   m.labelFocused.color = m.focusedThemeColor
-  m.caret.blendColor = m.unfocusedThemeColor
-  m.caretFocused.blendColor = m.focusedThemeColor
+  m.checkIcon.blendColor = m.unfocusedThemeColor
+  m.checkIconFocused.blendColor = m.focusedThemeColor
 End Function
 
 

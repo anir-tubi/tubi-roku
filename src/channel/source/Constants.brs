@@ -1317,6 +1317,9 @@ Function getConstants()
     constants.ui.translations = {}
     constants.ui.translations.marginX = 165
 
+    constants.ui.translations.player = {}
+      constants.ui.translations.player.marginX = 192
+
     constants.ui.logoSizes = {}
       constants.ui.logoSizes.skinAds = {}
 

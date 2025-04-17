@@ -1,5 +1,6 @@
 Function init()
   m.overlayBackground = m.top.findNode("overlayBackground")
+  m.playerControlExperimentType = getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v1", false).type
 
   m.top.observeFieldScoped("focusedChild", "onComponentFocus")
   m.top.observeFieldScoped("itemList", "onItemListChanged")
@@ -29,13 +30,23 @@ Function onItemListChanged(msg)
     outerLayoutGroup.layoutDirection = "vert"
     outerLayoutGroup.vertAlignment = "custom"
     outerLayoutGroup.itemSpacings = [40]
-    outerLayoutGroup.translation = [60, 60]
+
+    if m.playerControlExperimentType = "none" OR m.playerControlExperimentType = "variant1"
+      outerLayoutGroup.translation = [60, 60]
+    else
+      outerLayoutGroup.translation = [24, 24]
+    end if
 
     for i = 0 to itemList.Count() - 1
       items = itemList[i]
 
       if items <> invalid
-        overlayItems = CreateObject("roSGNode", "OverlayItems")
+
+        if m.playerControlExperimentType = "none" OR m.playerControlExperimentType = "variant1"
+          overlayItems = CreateObject("roSGNode", "OverlayItems")
+        else
+          overlayItems = CreateObject("roSGNode", "EnhancedOverlayItems")
+        end if
         overlayItems.itemsInfo = items
 
         child =  overlayItems.getChild(0)

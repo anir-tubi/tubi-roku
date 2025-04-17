@@ -107,6 +107,10 @@ Function cmsApi_createSingleContentReqInfo(contentId, includeChannels=false, bKi
   options.params = m.setTupianLandscapeParam(options.params)
   options.params = m.setTupianBackgroundParam(options.params)
 
+  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v1").type = "variant3"
+    options.params = m.setImageParams(["title"], options.params)
+  end if
+
   capability = formatJson({"content_types" :["se"]})
   options.headers.append({"x-capability": capability})
   url = m.constants.urls.content.singleContent

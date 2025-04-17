@@ -10,12 +10,33 @@ Function init()
   m.top.observeField("thumbnailHeight", "showSprite")
   m.top.observeField("spriteDirection", "showSprite")
   m.top.observeField("jumpToSprite", "showSprite")
+  m.top.observeField("showBorder", "onShowBorder")
+  m.border = m.top.findNode("Border")
   m.preload = m.top.findNode("Preload")
   m.preload2 = m.top.findNode("Preload2")
   m.poster = m.top.findNode("Poster")
   m.poster.observeField("loadStatus", "onLoadStatus")
   m.timer = CreateObject("roTimespan")
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
 End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+
+  if theme <> invalid
+    m.border.blendColor = theme.focusedColor
+  end if
+End function
+
 
 Function onLoadStatus()
   if m.poster.loadStatus = "ready"
@@ -24,6 +45,12 @@ Function onLoadStatus()
     m.startLoadTime = m.timer.TotalMilliseconds()
   end if
 End Function
+
+
+Function onShowBorder(msg)
+  m.border.visible = true
+End function
+
 
 ' Set the component offset and clipping rect
 Function showSprite()
@@ -57,6 +84,9 @@ Function showSprite()
   m.poster.width = m.top.width * nColumns
   m.poster.height = m.top.height * nRows
 
+  m.border.width = m.top.width + 5
+  m.border.height = m.top.height + 5
+
   loadDisplayMode = "noScale"
   loadWidth = 0
   loadHeight = 0
@@ -89,6 +119,7 @@ Function showSprite()
   m.poster.loadDisplayMode = loadDisplayMode
   m.poster.loadWidth = loadWidth
   m.poster.loadHeight = loadHeight
+
   m.preload.loadDisplayMode = loadDisplayMode
   m.preload.loadWidth = loadWidth
   m.preload.loadHeight = loadHeight

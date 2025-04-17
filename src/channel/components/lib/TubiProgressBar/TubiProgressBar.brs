@@ -2,6 +2,7 @@ Function init()
   m.background = m.top.findNode("ProgressBarBackground")
   m.background.observeField("bitmapWidth", "drawProgressBar")
   m.foreground = m.top.findNode("ProgressBarForeground")
+  m.pointer = m.top.findNode("pointer")
 
   theme = getThemeFromGlobal()
   if theme <> invalid
@@ -69,16 +70,26 @@ Function drawProgressBar()
     percentComplete = 0
   end if
 
+  foregroundWidth = minWidth + (percentComplete / 100.0) * (maxWidth - minWidth)
+
   if percentComplete = 0
     m.foreground.visible = false
   else
     m.foreground.visible = true
-    m.foreground.width = minWidth + (percentComplete / 100.0) * (maxWidth - minWidth)
+    m.foreground.width = foregroundWidth
   end if
 
   if m.top.isInFocusChain() then
     m.foreground.blendColor = m.top.focusColor
+
+    if m.top.highlightPointer = true
+      m.pointer.translation = [foregroundWidth - 15, -5]
+      m.pointer.visible = true
+    else
+      m.pointer.visible = false
+    end if
   else
     m.foreground.blendColor = m.top.unfocusColor
+    m.pointer.visible = false
   end if
 End Function

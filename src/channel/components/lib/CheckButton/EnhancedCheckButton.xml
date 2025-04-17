@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <!--
- - CheckButton
+ - EnhancedCheckButton
  -
- - This component is used in use cases where we need to provide a selectable item inside list component.
+ - This component is same as CheckButton with few changes in background image, This is done as part of roku_player_control_ui_refresh_v1 experiment.
+ - This file can be kept if we graduate variant2 & variant3. Else, we will remove it
  -
  -->
-<component name="CheckButton" extends="Group" >
-  <script type="text/brightscript" uri="CheckButton.brs" />
+<component name="EnhancedCheckButton" extends="Group" >
+  <script type="text/brightscript" uri="EnhancedCheckButton.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
@@ -39,7 +40,7 @@
   <children>
     <Poster 
       id="background"
-      uri="pkg:/images/menu-focus-$$RES$$.9.png" />
+      uri="pkg:/images/pill_top_nav_$$RES$$.9.png"/>
     <LayoutGroup
       id="container"
       vertAlignment="center"

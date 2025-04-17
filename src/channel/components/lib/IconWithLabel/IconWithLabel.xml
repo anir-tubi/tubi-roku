@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="IconWithLabel" extends="Group" >
+  <script type="text/brightscript" uri="IconWithLabel.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+
+  <interface>
+    <field id="text" alias="label.text" />
+    <field id="focusUri" type="string"/>
+    <field id="unFocusUri" type="string"/>
+    <field id="width" alias="icon.width" />
+    <field id="height" alias="icon.height" />
+  </interface>
+
+  <children>
+    <LayoutGroup
+      id="sendFeedBackButtonGroup"
+      vertAlignment="center"
+      horizAlignment="left"
+      layoutDirection="horiz"
+      translation="[0, 0]"
+      itemSpacings="[15]">
+
+      <Label
+        id="label"
+        vertAlign="botton"
+        translation="[0, 30]"
+        visible="false"/>
+
+      <Poster
+        translation="[0, -30]"
+        id="icon"/>
+
+    </LayoutGroup>  
+  </children>
+</component>

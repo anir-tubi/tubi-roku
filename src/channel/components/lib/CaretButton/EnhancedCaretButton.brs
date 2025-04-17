@@ -8,14 +8,6 @@ Function init()
   m.caretFocused = topRef.findNode("caretFocused")
   m.caretFocused.opacity = 0
 
-  playerControlExperimentType = getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v1", false).type
-
-  if playerControlExperimentType = "variant2" OR playerControlExperimentType = "variant3"
-    m.background.uri = "pkg:/images/tab_component_alt_$$RES$$.9.png"
-  else
-    m.background.uri = "pkg:/images/menu-focus-$$RES$$.9.png" 
-  end if
-
   topRef.observeFieldScoped("itemContent", "onItemContentChange")
   topRef.observeFieldScoped("height", "onHeightChange")
   topRef.observeFieldScoped("width", "onWidthChange")
@@ -59,13 +51,12 @@ Function onItemContentChange(msg)
   if itemContent <> invalid then
     m.label.text = itemContent.title
     m.labelFocused.text = itemContent.title
-    checked = itemContent.checked
 
     ' Setting the visibility of the check icon based on the checked value.
     hasSubmenu = itemContent.hasSubmenu
     m.caret.visible = (hasSubmenu = true)
     m.caretFocused.visible = (hasSubmenu = true)
-    m.background.visible = (checked = true)
+    m.background.visible = false
 
     ' Used in settings screen to calculate the list width dynamically based on the text width of each item.
     nBoundingTextWidth = m.label.boundingRect().width

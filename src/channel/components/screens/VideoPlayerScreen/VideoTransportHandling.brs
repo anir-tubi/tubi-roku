@@ -15,24 +15,16 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       if key = "OK"
         handleOk()
       else if key = "play"
-        if m.PlayPauseButton.enabled then
-          handlePlayPause()
-        end if
+        handlePlayPause()
 
       else if key = "fastforward"
-        if m.FastForwardButton.enabled then
-          handleFastForward()
-        end if
+        handleFastForward()
 
       else if key = "rewind"
-        if m.RewindButton.enabled then
-          handleRewind()
-        end if
+        handleRewind()
 
       else if key = "replay"
-        if m.HopBackButton.enabled then
-          handleHopBack(true, 20)
-        end if
+        handleHopBack(true, 20)
 
       else if key = "options"
         if m.ignoreOptionsKey = false then
@@ -62,13 +54,21 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         else if m.focusedNode.isSameNode(m.progressBar) = true AND isActiveVideoState(m.VideoState, m.Video)
           handleSkipVideo(-10)
 
+        else if (m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3") AND m.focusedNode.isSameNode(m.sendFeedBackButton) = true
+          setFocusToComponent(m.sendFeedBackButton)
         else
           'navigate the transport buttons, skipping disabled ones
           if m.focusedButtonIndex = 0
             return false
           else
+
+            buttonComponent = m.TransportButtons
+            if m.TransportLayoutGroup <> invalid
+              buttonComponent = m.TransportLayoutGroup
+            end if
+
             for i=m.focusedButtonIndex-1 to 0 step -1
-              button = m.TransportButtons.getChild(i)
+              button = buttonComponent.getChild(i)
               if button.enabled then
                 setFocusToComponent(button, true)
                 exit for
@@ -86,47 +86,107 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         else if m.focusedNode.isSameNode(m.progressBar) = true AND isActiveVideoState(m.VideoState, m.Video)
           handleSkipVideo(10)
 
+        else if (m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3") AND m.focusedNode.isSameNode(m.sendFeedBackButton) = true
+          setFocusToComponent(m.sendFeedBackButton)
         else
-          if m.focusedButtonIndex = m.TransportButtons.getChildCount()-1
+
+          buttonComponent = m.TransportButtons
+          if m.TransportLayoutGroup <> invalid
+            buttonComponent = m.TransportLayoutGroup
+          end if
+
+          buttonCount = buttonComponent.getChildCount()
+          if m.focusedButtonIndex = buttonCount-1
             return false
           else
             'navigate the transport buttons, skipping disabled ones
-            for i=m.focusedButtonIndex+1 to m.TransportButtons.getChildCount()-1
-              button = m.TransportButtons.getChild(i)
+            for i=m.focusedButtonIndex + 1 to buttonCount-1
+              button = buttonComponent.getChild(i)
               if button.enabled then
                 setFocusToComponent(button, true)
                 exit for
               end if
             end for
           end if
+
         end if
 
       else if key = "up"
         if m.focusedNode.isSameNode(m.BrowseWhileWatching) = true
           animateTransportAndBrowseWhileWatching("out")
-          setFocusToPlaybackControl()
-        else if m.TopOverlay.opacity = 0 AND m.focusedNode.isSameNode(m.BrowseWhileWatching) = false
+
+          if m.playerControlExperimentType = "none"
+            setFocusToPlaybackControl()
+          else if m.playerControlExperimentType = "variant1"
+            if m.top.isTrailer = true
+              setFocusToComponent(m.SkipTrailerButton, true)
+            else
+              setFocusToComponent(m.closedCaptionAudioButton, true)
+            end if
+          else if m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3"
+            if m.top.isTrailer = true
+              setFocusToComponent(m.SkipTrailerButton, true)
+            else
+              setFocusToComponent(m.PlayFromBeginning, true)
+            end if
+          end if
+
+        else if m.Thumbnail.visible = false AND m.TopOverlay.opacity = 0 AND m.focusedNode.isSameNode(m.BrowseWhileWatching) = false
           showTransport()
           showBrowseWhileWatching()
-        else if m.focusedNode.isSameNode(m.progressBar) = false AND m.skipCuepointsButton.hasFocus() = false
-          setFocusToComponent(m.ProgressBar)
-        else if m.focusedNode.isSameNode(m.progressBar) = false
-          setFocusToComponent(m.ProgressBar)
-        else if m.focusedNode.isSameNode(m.progressBar) = true AND m.skipCuepointsButton <> invalid AND m.skipCuepointsButton.visible = true
+        else if m.focusedNode.isSameNode(m.progressBar) = true AND m.skipCuepointsButton.visible = true
           setFocusToComponent(m.skipCuepointsButton)
+        else if m.focusedNode.isSameNode(m.progressBar) = true
+          if (m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3") AND m.TopOverlay.opacity = 1.0 AND m.sendFeedBackButton.visible = true
+            setFocusToComponent(m.sendFeedBackButton)
+          else
+            setFocusToComponent(m.progressBar)
+          end if
+        else if m.skipCuepointsButton.hasFocus() = true
+          if (m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3") AND m.TopOverlay.opacity = 1.0 AND m.sendFeedBackButton.visible = true
+            setFocusToComponent(m.sendFeedBackButton)
+          else
+            setFocusToComponent(m.progressBar)
+          end if
+        else if m.focusedNode.isSameNode(m.progressBar) = false  
+          if m.focusedNode.isSameNode(m.sendFeedBackButton) = true AND (m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3")
+            'do nothing
+          else
+            setFocusToComponent(m.progressBar)
+          end if
         else
           return false
         end if
 
       else if key = "down"
-        if m.TopOverlay.opacity = 0 AND m.focusedNode.isSameNode(m.BrowseWhileWatching) = false
+        if (m.TopOverlay.opacity = 0 AND m.Thumbnail.visible = false) AND m.focusedNode.isSameNode(m.BrowseWhileWatching) = false
           showTransport()
           showBrowseWhileWatching()
         else if m.focusedNode.isSameNode(m.progressBar) = true
-          setFocusToComponent(m.PlayPauseButton, true)
+          if m.playerControlExperimentType = "none"
+            setFocusToComponent(m.PlayPauseButton, true)
+          else if m.playerControlExperimentType = "variant1"
+            if m.top.isTrailer = true
+              setFocusToComponent(m.SkipTrailerButton, true)
+            else
+              setFocusToComponent(m.closedCaptionAudioButton, true)
+            end if
+          else if m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3"
+            if m.top.isTrailer = true
+              setFocusToComponent(m.SkipTrailerButton, true)
+            else
+              setFocusToComponent(m.PlayFromBeginning, true)
+            end if
+          end if
         else if m.skipCuepointsButton.hasFocus() = true
           setFocusToComponent(m.ProgressBar)
-        else if isFocusOnPlayerControl() = true AND m.TopOverlay.opacity = 1 AND m.top.isTrailer = false
+        else if (m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3") AND m.focusedNode.isSameNode(m.sendFeedBackButton) = true
+          if m.skipCuepointsButton.visible = true
+            m.skipCuepointsButton.setFocus(true)
+          else
+            setFocusToComponent(m.ProgressBar)
+          end if
+        else if isFocusOnPlayerControl() = true AND m.top.isTrailer = false
           relatedContent = m.top.browseContent
 
           if relatedContent <> invalid AND relatedContent.getChildCount() > 0
@@ -179,7 +239,13 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         else if m.VideoState = "pause"
             resumeFromPause(true)
         else if m.VideoState = "rew" or m.VideoState = "ffw"
-          setFocusToComponent(m.PlayPauseButton)
+
+          if m.playerControlExperimentType = "none"
+            setFocusToComponent(m.PlayPauseButton)
+          else
+            setFocusToComponent(m.progressBar)
+          end if
+
           endScrub(true)
         else if m.VideoState = "skip"
           resumeFromSkip()
@@ -305,6 +371,14 @@ End Function
 
 'pause the video player
 Function pauseVideo(shouldShowTransport, shouldSendAnalytics = true)
+
+  if m.playerControlExperimentType = "variant1" OR m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3"
+    m.controlIcon.uri = "pkg:/images/transport/sgplayer/icon-pause.webp"
+    fade(m.controlIcon, "in", 0.6)
+  else
+    fade(m.controlIcon, "out", 0.2)
+  end if
+
   m.Video.control = "pause"
   updateVideoState("pause")
 
@@ -316,13 +390,20 @@ Function pauseVideo(shouldShowTransport, shouldSendAnalytics = true)
     showBrowseWhileWatching()
   end if
 
-  if m.focusedNode.isSameNode(m.BrowseWhileWatching) = true
-    animateTransportAndBrowseWhileWatching("out")
-    setFocusToPlaybackControl()
+  if m.playerControlExperimentType = "none"
+    if m.focusedNode.isSameNode(m.BrowseWhileWatching) = true
+      animateTransportAndBrowseWhileWatching("out")
+      setFocusToPlaybackControl()
+    end if
+  
+    m.PlayPauseButton.uri = m.buttonUris.play
+    setFocusToComponent(m.PlayPauseButton)
+  else
+    if m.focusedNode.isSameNode(m.BrowseWhileWatching) = true
+      animateTransportAndBrowseWhileWatching("out")
+    end if
+    setFocusToComponent(m.progressBar) 
   end if
-
-  m.PlayPauseButton.uri = m.buttonUris.play
-  setFocusToComponent(m.PlayPauseButton)
 
   if shouldSendAnalytics = true
     trackEvent({
@@ -382,8 +463,17 @@ Function resumeFromPause(shouldSendAnalytics)
     end if
   end if
 
-  m.PlayPauseButton.uri = m.buttonUris.pause
-  setFocusToComponent(m.PlayPauseButton)
+  if m.playerControlExperimentType <> "none"
+    m.controlIcon.uri = "pkg:/images/transport/sgplayer/icon-play.webp"
+    fade(m.controlIcon, "in", 0.6)
+    fade(m.controlIcon, "out", 0.2)
+    setFocusToComponent(m.progressBar)
+  else
+    fade(m.controlIcon, "out", 0.2)
+    m.PlayPauseButton.uri = m.buttonUris.pause
+    setFocusToComponent(m.PlayPauseButton)
+  end if
+
 End Function
 
 
@@ -407,7 +497,12 @@ Function resumeFromSkip()
     updateVideoState("play")
   end if
   m.PlayPauseButton.uri = m.buttonUris.pause
-  setFocusToComponent(m.PlayPauseButton)
+
+  if m.playerControlExperimentType = "none"
+    setFocusToComponent(m.PlayPauseButton)
+  else
+    setFocusToComponent(m.progressBar)
+  end if
 End Function
 
 
@@ -425,7 +520,12 @@ Function handleSkipTrailer()
   animateTransport("out")
   hideBrowseWhileWatching()
   resetTransportButtons()
-  setFocusToComponent(m.PlayPauseButton)
+
+  if m.playerControlExperimentType = "none"
+    setFocusToComponent(m.PlayPauseButton)
+  else
+    setFocusToComponent(m.progressBar)
+  end if
 End Function
 
 
@@ -439,7 +539,11 @@ Function goToStart()
 
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub(false)
-    setFocusToComponent(m.StartButton)
+    if m.playerControlExperimentType = "none"
+      setFocusToComponent(m.StartButton)
+    else
+      setFocusToComponent(m.progressBar)
+    end if
   else if m.VideoState <> "skip"
     playProgressEvent = getPlayProgressEvent("goToStart")
     if playProgressEvent <> invalid
@@ -484,15 +588,28 @@ End Function
 
 
 Function handleOk()
+
   if m.HUD.opacity = 0 AND m.skipCuepointsButton.hasFocus() = false
     showTransport()
     showBrowseWhileWatching()
+  else if (m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3") AND m.sendFeedBackButton.hasFocus() = true
+    showSendFeedbackOverlay()
+  else if (m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3") AND m.focusedNode.isSameNode(m.ProgressBar) = true 
+    handlePlayPause()
   else
     'do action based on the current focused button
-    focusButtonId = m.TransportButtons.getChild(m.focusedButtonIndex).id
+    buttonComponent = m.TransportButtons
+    if m.TransportLayoutGroup <> invalid
+      buttonComponent = m.TransportLayoutGroup
+    end if
+
+    focusButtonId = buttonComponent.getChild(m.focusedButtonIndex).id
     if focusButtonId = m.SkipTrailerButton.id
       handleSkipTrailer()
-    else if focusButtonId = m.StartButton.id
+    else if focusButtonId = m.StartButton.id OR focusButtonId = m.PlayFromBeginning.id
+      if focusButtonId = m.PlayFromBeginning.id
+        setComponentInteractionInfo("play_from_beginning")
+      end if
       goToStart()
     else if focusButtonId = m.RewindButton.id
       handleRewind()
@@ -504,7 +621,10 @@ Function handleOk()
       handleHopForward(30)
     else if focusButtonId = m.FastForwardButton.id
       handleFastForward()
-    else if focusButtonId = m.EndButton.id
+    else if focusButtonId = m.EndButton.id OR focusButtonId = m.NextEpisode.id
+      if focusButtonId = m.NextEpisode.id
+        setComponentInteractionInfo("next_episode")
+      end if
       goToNext()
     else if focusButtonId = m.closedCaptionAudioButton.id
       stopPauseAdTimer()
@@ -531,7 +651,12 @@ Function handlePlayPause()
   else if m.VideoState = "skip"
     resumeFromSkip()
   end if
-  setFocusToComponent(m.PlayPauseButton)
+
+  if m.playerControlExperimentType = "none"
+    setFocusToComponent(m.PlayPauseButton)
+  else
+    setFocusToComponent(m.progressBar) 
+  end if
 End Function
 
 
@@ -549,6 +674,7 @@ Function handleFastForward()
     m.scrubAmt = 0
     m.RewindButton.uri = m.buttonUris.rewind
     m.FastForwardButton.uri = m.buttonUris.fastForwardLevels[0]
+    seekSpeed = m.scrubAmt + 1
 
   'increase the fast forward speed
   else if m.VideoState = "ffw"
@@ -558,6 +684,7 @@ Function handleFastForward()
       m.scrubAmt = 0
     end if
     m.FastForwardButton.uri = m.buttonUris.fastForwardLevels[m.scrubAmt]
+    seekSpeed = m.scrubAmt + 1
 
   'start the fast forward
   else
@@ -566,9 +693,24 @@ Function handleFastForward()
     updateVideoState("ffw")
     m.FastForwardButton.uri = m.buttonUris.fastForwardLevels[0]
     m.PlayPauseButton.uri = m.buttonUris.play
+    seekSpeed = 1
   end if
 
-  setFocusToComponent(m.FastForwardButton)
+  if m.playerControlExperimentType <> "none"
+    m.seekIcon.uri = "pkg:/images/transport/sgplayer/icon-vector-fwd.webp"
+    m.seekSpeed.text = seekSpeed
+    childrenCount = m.seekControlGroup.getChildCount()
+    m.seekControlGroup.removeChildrenIndex(childrenCount, 0)
+    m.seekControlGroup.appendChild(m.seekIcon)
+    m.seekControlGroup.appendChild(m.seekSpeed)
+    m.thumbnail.showBorder = true
+  end if
+
+  if m.playerControlExperimentType = "none"
+    setFocusToComponent(m.FastForwardButton)
+  else
+    setFocusToComponent(m.progressBar)
+  end if
 End Function
 
 
@@ -585,6 +727,7 @@ Function handleRewind()
     m.scrubAmt = 0
     m.FastForwardButton.uri = m.buttonUris.fastforward
     m.RewindButton.uri = m.buttonUris.rewindLevels[0]
+    seekSpeed = m.scrubAmt + 1
 
   'increase the rewind speed
   else if m.VideoState = "rew"
@@ -594,6 +737,7 @@ Function handleRewind()
       m.scrubAmt = 0
     end if
     m.RewindButton.uri = m.buttonUris.rewindLevels[m.scrubAmt]
+    seekSpeed = m.scrubAmt + 1
 
   'start the rewind
   else
@@ -602,9 +746,24 @@ Function handleRewind()
     updateVideoState("rew")
     m.RewindButton.uri = m.buttonUris.rewindLevels[0]
     m.PlayPauseButton.uri = m.buttonUris.play
+    seekSpeed = 1
   end if
 
-  setFocusToComponent(m.RewindButton)
+  if m.playerControlExperimentType <> "none"
+    m.seekIcon.uri = "pkg:/images/transport/sgplayer/icon-vector-rew.webp"
+    m.seekSpeed.text = seekSpeed
+    childrenCount = m.seekControlGroup.getChildCount()
+    m.seekControlGroup.removeChildrenIndex(childrenCount, 0)
+    m.seekControlGroup.appendChild(m.seekSpeed)
+    m.seekControlGroup.appendChild(m.seekIcon)
+    m.thumbnail.showBorder = true
+  end if
+
+  if m.playerControlExperimentType = "none"
+    setFocusToComponent(m.RewindButton)
+  else
+    setFocusToComponent(m.progressBar)
+  end if
 End Function
 
 
@@ -612,7 +771,11 @@ End Function
 Function handleHopForward(duration)
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub(false)
-    setFocusToComponent(m.HopForwardButton)
+    if m.playerControlExperimentType = "none"
+      setFocusToComponent(m.HopForwardButton)
+    else
+      setFocusToComponent(m.progressBar)
+    end if
   else if m.VideoState <> "skip"
     playProgressEvent = getPlayProgressEvent("handleHopForward")
     if playProgressEvent <> invalid
@@ -641,7 +804,11 @@ End Function
 ' remoteReplayButton - true/false (true - if replay button on remote is pressed/voice input, false - if replay icon is pressed or seek voice input)
 ' duration is seek/skip/replay in seconds.
 Function handleHopBack(remoteReplayButton, duration)
-  setFocusToComponent(m.HopBackButton) 'necessary because there is a dedicated hop back button on certain roku remotes
+  if m.playerControlExperimentType = "none"
+    setFocusToComponent(m.HopBackButton) 'necessary because there is a dedicated hop back button on certain roku remotes
+  else
+    setFocusToComponent(m.progressBar)
+  end if
 
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub(false)
@@ -717,7 +884,38 @@ Function handleSkipVideo(amt)
   if m.focusedNode.isSameNode(m.ProgressBar) = false
     setFocusToComponent(m.ProgressBar)
   end if
+
+  if m.playerControlExperimentType = "variant3"
+    hideTopOverlay()
+  end if
+  
   showThumbnail()
+  hideSeekGroup()
+
+  if m.playerControlExperimentType <> "none"
+    if amt = 10
+      m.quickSeekIcon.uri = "pkg:/images/transport/sgplayer/forward-10.webp"
+    else
+      m.quickSeekIcon.uri = "pkg:/images/transport/sgplayer/rewind-10.webp"
+    end if
+    
+    duration = m.Video.duration
+    position = m.playerPosition + amt
+
+    if duration <> invalid then
+  
+      if duration < 3600
+        currentSeekPosition = formatLengthasMinsAndSecs(position)
+      else
+        currentSeekPosition = formatLengthAsTimestamp(position)
+      end if
+
+      m.quickSeekLabel.text = currentSeekPosition
+      showQuickSeekLabelAndIcon()
+
+    end if  
+    
+  end if
 
   updatePlayerPosition(amt)
 End Function
@@ -782,13 +980,18 @@ End Function
 
 
 ' Hides the send feedback on video player selection overlay.
-Function  hideSendFeedbackOverlay()
+Function hideSendFeedbackOverlay()
   if m.isSendFeedbackOverlayShowing = true
     m.isSendFeedbackOverlayShowing = false
     m.sendFeedbackSelectionOverlay.setFocus(false)
     removeOverLayItems()
-    fade(m.sendFeedbackSelectionOverlayGroup, "out", 0.6)
-    m.top.setFocus(true)
+    fade(m.sendFeedbackSelectionOverlayGroup, "out", 0.1)
+
+    if m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3"
+      m.sendFeedBackButton.setFocus(true)
+    else
+      m.top.setFocus(true)
+    end if
 
     'Send dismiss dialog event when user presses back or closed overlay.
     trackingPageInfo = m.top.trackingPageInfo
@@ -886,13 +1089,16 @@ Function getItemListForSendFeedback()
   overlayItems = [
     {
       id: "sendFeedbackOnPlayer"
-      title: getTranslation("send_feedback_overlay_title")
-      subtitle: getTranslation("send_feedback_overlay_subtitle")
       hasSubMenu: false
       content: node
       numRows: 10
     }
   ]
+
+  if m.playerControlExperimentType = "none" OR m.playerControlExperimentType = "variant1"
+    overlayItems[0].title = getTranslation("send_feedback_overlay_title")
+    overlayItems[0].subtitle = getTranslation("send_feedback_overlay_subtitle")
+  end if
 
   return overlayItems
 End Function
@@ -940,7 +1146,17 @@ Function beginScrub()
   end if
 
   showBrowseWhileWatching()
+  if m.playerControlExperimentType = "variant3"
+    hideTopOverlay()
+  end if
+  fade(m.controlIcon, "out", 0.2)
   showThumbnail()
+
+  if m.playerControlExperimentType <> "none"
+    hideQuickSeekLabelAndIcon()
+    showSeekGroup()
+  end if
+  
   m.scrubTimespan.mark()
 
   ' playProgress analytics
@@ -974,7 +1190,13 @@ Function endScrub(shouldJump = false)
   hideBrowseWhileWatching(false)
   resetTransportButtons()
   m.PlayPauseButton.uri = m.buttonUris.pause
-  setFocusToComponent(m.PlayPauseButton)
+
+  if m.playerControlExperimentType = "none"
+    setFocusToComponent(m.PlayPauseButton)
+  else
+    setFocusToComponent(m.progressBar)
+    fade(m.controlIcon, "out", 0.2)
+  end if
 
   if shouldJump = true
     jumpToPosition(m.playerPosition)
@@ -1071,6 +1293,9 @@ Function jumpToPosition(position)
   updateLastPingTime(m.playerPosition)
 
   m.Thumbnail.visible = false
+  hideSeekGroup()
+  hideQuickSeekLabelAndIcon()
+
   ' seek analytics
   trackEvent({
     type: "seek"
@@ -1132,9 +1357,9 @@ Function updateTransportThumbnail()
     percentComplete = (m.playerPosition / m.Video.duration)
     m.ProgressBar.progress = percentComplete * 100
 
-    progressBarRight = m.ProgressBar.translation[0] + (m.ProgressBar.width * percentComplete)
-
+    progressBarRight = 192 + (m.ProgressBar.width * percentComplete)
     thumbnailXOffset = progressBarRight - m.Thumbnail.width / 2
+
     if thumbnailXOffset > m.thumbnailMaxXOffset
       thumbnailXOffset = m.thumbnailMaxXOffset
     end if
@@ -1144,6 +1369,9 @@ Function updateTransportThumbnail()
 
     m.Thumbnail.translation = [thumbnailXOffset, m.Thumbnail.translation[1]]
     m.Thumbnail.jumpToSprite = m.playerPosition \ m.constants.player.thumbnailFrequency
+    quickSeekLabelWidth = m.quickSeekLabel.boundingRect().width
+    m.quickSeekLabel.translation = [thumbnailXOffset + m.Thumbnail.width / 2 - quickSeekLabelWidth / 2, m.Thumbnail.translation[1] - 40]
+    m.seekGroup.translation = [thumbnailXOffset + m.Thumbnail.width / 2, m.Thumbnail.translation[1] - 30]
   end if
 End Function
 
@@ -1162,19 +1390,25 @@ Function resetTransportButtons()
   m.FastForwardButton.focusState = false
   m.EndButton.focusState = false
   m.closedCaptionAudioButton.focusState = false
-  m.sendFeedBackButton.focusState = false
+  if m.sendFeedBackButton.hasField("focusState") = true
+    m.sendFeedBackButton.focusState = false
+  end if
 End Function
 
 
 '@sayAudioText: boolean, true if we want to announce the audio guide.
 Function setFocusToPlaybackControl(sayAudioText = false)
 
-  if m.VideoState = "ffw"
-    setFocusToComponent(m.FastForwardButton, sayAudioText)
-  else if m.VideoState = "rew"
-    setFocusToComponent(m.RewindButton, sayAudioText)
+  if m.playerControlExperimentType = "none"
+    if m.VideoState = "ffw"
+      setFocusToComponent(m.FastForwardButton, sayAudioText)
+    else if m.VideoState = "rew"
+      setFocusToComponent(m.RewindButton, sayAudioText)
+    else
+      setFocusToComponent(m.PlayPauseButton, sayAudioText)
+    end if
   else
-    setFocusToComponent(m.PlayPauseButton, sayAudioText)
+    setFocusToComponent(m.progressBar)
   end if
 
 End Function
@@ -1189,14 +1423,19 @@ End Function
 'side effects... if the passed component is button, then it updates the m.focusedButtonIndex with button index
 Function setFocusToComponent(component, sayAudioText = false)
   m.focusedNode = component
-
   'set focused/unfocused UI on each button in the transport bar as necessary
-  for i=0 to m.TransportButtons.getChildCount()-1
-    button = m.TransportButtons.getChild(i)
-    if component.id = button.id
+
+  buttonComponent = m.TransportButtons
+  if m.TransportLayoutGroup <> invalid
+    buttonComponent = m.TransportLayoutGroup
+  end if
+
+  for i=0 to buttonComponent.getChildCount()-1
+    button = buttonComponent.getChild(i)
+    if component.id = button.id AND button.hasField("focusState") = true
       m.focusedButtonIndex = i
       button.focusState = true
-    else
+    else if button.hasField("focusState") = true
       button.focusState = false
     end if
   end for
@@ -1234,6 +1473,8 @@ Function isFocusable(component)
     focusable = true
   else if component.isSameNode(m.progressBar) = true
     focusable = true
+  else if component.isSameNode(m.sendFeedBackButton) = true
+    focusable = true
   end if
 
   return focusable
@@ -1267,13 +1508,22 @@ Function removeFocusForAllChildComponents()
     m.progressBar.setFocus(false)
   end if
 
+  if m.sendFeedbackButton.isInFocusChain() = true
+    m.sendFeedbackButton.setFocus(false)
+  end if
+
 End Function
 
 
 Function isFocusOnPlayerControl()
 
-  for i=0 to m.TransportButtons.getChildCount()-1
-    transportButton = m.TransportButtons.getChild(i)
+  buttonComponent = m.TransportButtons
+  if m.TransportLayoutGroup <> invalid
+    buttonComponent = m.TransportLayoutGroup
+  end if
+
+  for i=0 to buttonComponent.getChildCount()-1
+    transportButton = buttonComponent.getChild(i)
 
     if m.focusedNode.isSameNode(transportButton)
       return true
@@ -1329,7 +1579,9 @@ Function showTransport()
   ' update transport thumbnails before showing the transport UI
   updateTransport()
 
-  updatePlayPauseUri()
+  if m.playerControlExperimentType = "none"
+    updatePlayPauseUri()
+  end if
 
   'Send exposure event for send feedback when transport control is visible
   if m.top.appMode <> "KIDS_MODE"
@@ -1340,7 +1592,16 @@ Function showTransport()
   if m.top.hasFocus() = true AND isSkipIntroCuePointsReached(creditCuePoints) = false
     ' Only set focus on the play/pause button if the video player has focus (as opposed to some other UI)
     ' and the skip cuepoints button should not be focused (ie. nowPos is not within intro)
-    setFocusToComponent(m.PlayPauseButton)
+
+    if m.playerControlExperimentType <> "none"
+      m.focusedNode = m.progressBar
+    else
+       'm.focusedNode holds the node/component which helps setting/unsetting focus to component/m.top on video player screen
+      m.focusedNode = m.PlayPauseButton
+    end if
+
+    setFocusToComponent(m.focusedNode)
+
   end if
 
   animateTransport("in")
@@ -1376,7 +1637,19 @@ Function animateTransport(direction)
     fade(m.TransportButtons, "in", 0.4)
   end if
 
-  slideFade(m.HUD, "below", direction, 0.6)
+  m.hudState = slideFade(m.HUD, "below", direction, 0.6)
+  m.hudState.observeFieldScoped("state" , "onHudStateChanged")
+End Function
+
+
+Function onHudStateChanged(msg)
+  state = msg.getData()
+  if state = "stopped" AND m.HUD.opacity = 0
+    if m.skipCuepointsButton.visible = true
+      skipCuepointsButtonTransLation = m.skipCuepointsButton.translation
+      slideTo(m.skipCuepointsButton,[skipCuepointsButtonTransLation[0], m.skipCuepointsButtonDownTranslation], 0.6)
+    end if
+  end if
 End Function
 
 
@@ -1409,9 +1682,22 @@ End Function
 
 ' update the progress bar time
 Function updateTransportTimes()
-  m.ElapsedLabel.text = formatLengthAsTimestamp(m.playerPosition)
-  if m.Video.duration <> invalid then
-    m.RemainingLabel.text = "-" + formatLengthAsTimestamp(m.Video.duration - m.playerPosition)
+  duration = m.Video.duration
+
+  if duration <> invalid then
+
+    if m.playerControlExperimentType <> "none" AND duration < 3600
+      currentSeekPosition = formatLengthasMinsAndSecs(m.playerPosition)
+      remainingTime = formatLengthasMinsAndSecs(duration - m.playerPosition)
+    else
+      currentSeekPosition = formatLengthAsTimestamp(m.playerPosition)
+      remainingTime = formatLengthAsTimestamp(duration - m.playerPosition)
+    end if
+
+    m.ElapsedLabel.text = currentSeekPosition
+    m.currentSeekLabel.text = currentSeekPosition
+    m.RemainingLabel.text = "-" + remainingTime
+    m.RemainingLabel.translation = [1920 - m.marginX - m.RemainingLabel.boundingRect().width - 10, m.RemainingLabel.translation[1]]
   end if
 End Function
 
@@ -1422,7 +1708,31 @@ Function showThumbnail()
     m.Thumbnail.visible = true
   else
     m.Thumbnail.visible = false
+    hideSeekGroup()
+    hideQuickSeekLabelAndIcon()
   end if
+End Function
+
+
+Function showSeekGroup()
+  m.seekGroup.visible = true
+End Function
+
+
+Function hideSeekGroup()
+  m.seekGroup.visible = false
+End Function
+
+
+Function showQuickSeekLabelAndIcon()
+  m.quickSeekLabel.visible = true
+  m.quickSeekIcon.visible = true
+End Function
+
+
+Function hideQuickSeekLabelAndIcon()
+  m.quickSeekLabel.visible = false
+  m.quickSeekIcon.visible = false
 End Function
 
 
@@ -1794,6 +2104,8 @@ Function animateTransportAndBrowseWhileWatching(direction)
 
   if direction = "in"
     m.Thumbnail.visible = false
+    hideSeekGroup()
+    hideQuickSeekLabelAndIcon()
 
     handleSkipCuepointsButtonOnAnimateTransport("out")
     fade(m.TopOverlay, "out", 0.4)
@@ -1803,21 +2115,41 @@ Function animateTransportAndBrowseWhileWatching(direction)
     hideRatingOverlay()
     slideTo(m.HUD, [0, -696], 0.6)
     m.BrowseWhileWatching.open = true
+
+    if m.playerControlExperimentType <> "none"
+      fade(m.controlIcon, "out", 0.6)
+    end if
+
   else
     if m.skipCuepointsButtonTimer <> invalid
       showSkipCuepointsButton()
     end if
 
     if m.VideoState = "ffw" or m.VideoState = "rew"
+      if m.playerControlExperimentType = "variant3"
+        hideTopOverlay()
+      end if
+      if m.playerControlExperimentType <> "none"
+        hideQuickSeekLabelAndIcon()
+        showSeekGroup()
+      end if
       m.Thumbnail.visible = true
+    else
+      fade(m.TopOverlay, "in", 0.6, 0.2)
     end if
 
     fade(m.VideoBrowseWhileWatchingOverlay, "out", 0.4)
     fade(m.VideoOverlay, "in", 0.4)
-    fade(m.TopOverlay, "in", 0.6, 0.2)
     slideTo(m.HUD, [0, 0], 0.6)
     m.BrowseWhileWatching.close = true
     fade(m.TransportButtons, "in", 0.4)
+
+    if m.playerControlExperimentType <> "none"
+      if m.videoState = "pause"
+        fade(m.controlIcon, "in", 0.6)
+      end if
+    end if
+
   end if
 
 End Function
@@ -1886,7 +2218,7 @@ End Function
 
 
 Function hideTopOverlay()
-  fade(m.TopOverlay, "out", 0.6)
+  fade(m.TopOverlay, "out", 0.2)
 End Function
 
 
@@ -1896,4 +2228,27 @@ Function onShowBrowseWhileWatchingInFullScreen()
   fade(m.HUD, "in", 0.6)
   m.BrowseWhileWatching.showInFullScreen = true
   m.BrowseWhileWatching.setFocus(true)
+End Function
+
+
+'@buttonValue: String, value used in button_value attribute of analytic event
+Function setComponentInteractionInfo(buttonValue)
+  componentValues = {
+    button_type: "TEXT"
+    button_value: buttonValue
+  }
+
+  pageValues =  {video_id: m.top.content.id.toInt()}
+
+  if pageValues.video_id <> invalid
+    trackingPageInfo = m.top.trackingPageInfo
+    pageOneof = m.Tracking.getAnalyticsPage(trackingPageInfo.pageType, trackingPageInfo.pageValues)
+    componentOneof = m.tubiTrackingInfo.getAnalyticsComponent("button_component", componentValues)
+
+    m.top.componentInteractionInfo = {
+      pageOneof: pageOneof
+      componentOneof: componentOneof
+      user_interaction: "CONFIRM"
+    }
+  end if
 End Function

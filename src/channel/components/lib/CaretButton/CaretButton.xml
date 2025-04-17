@@ -10,6 +10,8 @@
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
 
   <interface>
     <!-- Content expected for a item:
@@ -36,8 +38,7 @@
 
   <children>
     <Poster 
-      id="background"
-      uri="pkg:/images/menu-focus-$$RES$$.9.png" />
+      id="background"/>
     <LayoutGroup
       id="container"
       vertAlignment="center"

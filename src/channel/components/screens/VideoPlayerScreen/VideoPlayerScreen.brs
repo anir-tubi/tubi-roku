@@ -55,7 +55,9 @@ Function init()
   m.Loading = m.top.findNode("Loading")
   m.LoadingProgressBar = m.top.findNode("LoadingProgressBar")
   m.LoadingMessage = m.top.findNode("LoadingMessage")
-  m.Transport = m.top.findNode("Transport")
+
+  m.LoadingSpinner = m.top.findNode("LoadingSpinner")
+  
   m.UpNext = m.top.findNode("UpNext")
   m.UpNext.observeField("contentSelected", "onUpNextContentSelected")
   m.UpNext.observeField("opacity", "onUpNextOpacityChange")
@@ -80,11 +82,18 @@ Function init()
     m.video.asyncStopSemantics = true
   end if
 
+  m.playerControlExperimentType = getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v1", false).type
+  m.marginX = m.constants.ui.translations.player.marginX
+
+  if m.playerControlExperimentType = "none"
+    m.marginX = m.constants.ui.translations.marginX
+  end if
+
   BrowseWhileWatchingRow = m.top.findNode("BrowseWhileWatchingRow")
   m.BrowseWhileWatching = BrowseWhileWatchingRow.createChild("BrowseContentOnPlayer")
   m.BrowseWhileWatching.observeFieldScoped("selectedRelatedContentItemUpdated", "onBrowseContentSelected")
 
-  m.BrowseWhileWatching.translation = "[171, 550]"
+  m.BrowseWhileWatching.translation = [m.marginX, 550]
   m.BrowseWhileWatching.associatedPageName = "video_player_page"
   m.BrowseWhileWatching.observeFieldScoped("trackingComponentInfo", "onTrackingComponentInfo")
   m.BrowseWhileWatching.observeFieldScoped("isRelatedContentFocused", "onRelatedItemFocused")
@@ -132,7 +141,7 @@ Function init()
   m.logoKids = m.top.findNode("tubiKidsLogo")
 
   '//Variable to keep track where the m.ratingOverlay UI element should animated when the down button is pressed.
-  m.ratingOverlayAnimatedPositionY = 144
+  m.ratingOverlayAnimatedPositionY = 150
 
   m.ratingOverlay = m.top.findNode("ratingOverlay")
   m.ratingBarAndLabel = m.top.findNode("ratingBarAndLabel")
@@ -147,9 +156,6 @@ Function init()
   m.ratingOverlayTimer = m.top.findNode("ratingOverlayTimer")
   m.ratingOverlayTimer.observeField("fire", "hideRatingOverlay")
 
-  m.ElapsedLabel = m.top.findNode("ElapsedLabel")
-  m.RemainingLabel = m.top.findNode("RemainingLabel")
-  m.ProgressBar = m.top.findNode("ProgressBar")
   m.TopOverlay = m.top.findNode("TopOverlay")
   m.ScrubTimer = m.top.findNode("ScrubTimer")
   m.HUD = m.top.findNode("HUD")
@@ -161,8 +167,14 @@ Function init()
   m.VideoOverlay = m.top.findNode("VideoOverlay")
   m.VideoBrowseWhileWatchingOverlay = m.top.findNode("VideoBrowseWhileWatchingOverlay")
 
-  m.skipCuepointsButton = m.top.findNode("SkipCuepointsButton")
+  if m.playerControlExperimentType = "none" OR m.playerControlExperimentType = "variant1"
+    m.skipCuepointsButton = m.top.findNode("skipCuepointsSimpleButton")
+  else
+    m.skipCuepointsButton = m.top.findNode("skipCuepointsTextIconButton")
+  end if
+  m.skipCuepointsButton.visible = true
   m.skipCuepointsButton.observeFieldScoped("selected", "onSkipCuepointsButtonSelected")
+
   m.top.playbackSource = {
     "srcForAnalytic": m.constants.player.playbackSource.unknown
     "srcForAds": m.constants.player.playbackOrigin.unknown
@@ -238,34 +250,63 @@ Function init()
   m.bufferingTimer.duration = 10
   m.bufferingTimer.repeat = false
 
-  'buttons
-  m.TransportButtons = m.top.findNode("TransportButtons")
-  m.SkipTrailerButton = m.TransportButtons.findNode("SkipTrailerButton")
-  m.StartButton = m.TransportButtons.findNode("StartButton")
-  m.RewindButton = m.TransportButtons.findNode("RewindButton")
-  m.HopBackButton = m.TransportButtons.findNode("HopBackButton")
-  m.PlayPauseButton = m.TransportButtons.findNode("PlayPauseButton")
-  m.HopForwardButton = m.TransportButtons.findNode("HopForwardButton")
-  m.FastForwardButton = m.TransportButtons.findNode("FastForwardButton")
-  m.EndButton = m.TransportButtons.findNode("EndButton")
-  m.closedCaptionAudioButton = m.top.findNode("closedCaptionAudioButton")
-  m.closedCaptionAndAudioSelectionOverlay = m.top.findNode("closedCaptionAndAudioSelectionOverlay")
-  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("globalCaptionChanged", "onGlobalCaptionChanged")
-  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("wasBackButtonSelected", "onWasBackButtonSelectedChange")
-  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("trackingEventInfo", "onTrackingEventInfoChange")
-  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("subtitleTrack", "onSubtitleTrackChangedOnCCOverlay")
-  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("audioTrack", "onAudioTrackChangedOnCCOverlay")
-  m.closedCaptionAndAudioSelectionOverlayGroup = m.top.findNode("closedCaptionAndAudioSelectionOverlayGroup")
+  m.controlIcon = m.top.findNode("controlIcon")
+  m.Transport = m.top.findNode("Transport")
 
-  m.sendFeedBackButton = m.top.findNode("sendFeedBackButton")
-  m.sendFeedbackSelectionOverlayGroup = m.top.findNode("sendFeedbackSelectionOverlayGroup")
-  m.sendFeedbackSelectionOverlay = m.top.findNode("sendFeedbackSelectionOverlay")
+  m.ProgressBar = createObject("roSGNode", "TubiProgressBar")
+  m.timeGroup = createObject("roSGNode", "Group")
 
-  m.sendFeedbackSelectionOverlay.observeFieldScoped("backOrLeftKeyPress", "onWasBackORLeftButtonSelectedForSendFeedback")
-  m.sendFeedbackSelectionOverlay.observeFieldScoped("itemSelected", "onSendFeedBackOverlayItemSelected")
+  m.ElapsedLabel = createObject("roSGNode", "Label")
+  m.ElapsedLabel.id = "ElapsedLabel"
+  m.ElapsedLabel.text = "00:00:00"
+  m.ElapsedLabel.width = 500
+  m.ElapsedLabel.translation = [m.marginX, 0]
+  m.timeGroup.appendChild(m.ElapsedLabel)
 
-  'm.focusedNode holds the node/component which helps setting/unsetting focus to component/m.top on video player screen
-  m.focusedNode = m.PlayPauseButton
+  m.quickSeekIcon = createObject("roSGNode", "Poster")
+  m.quickSeekIcon.id = "quickSeekIcon"
+  m.quickSeekIcon.width = 36
+  m.quickSeekIcon.width = 36
+  m.quickSeekIcon.translation = [m.marginX + 120, -2]
+  m.quickSeekIcon.visible = false
+  m.timeGroup.appendChild(m.quickSeekIcon)
+
+  m.RemainingLabel = createObject("roSGNode", "Label")
+  m.RemainingLabel.id = "RemainingLabel"
+  m.RemainingLabel.text = "-00:00:00"
+  m.RemainingLabel.translation = "[1695, 0]"
+  m.timeGroup.appendChild(m.RemainingLabel)
+
+  m.TransportButtons = createObject("roSGNode", "Group")
+  m.TransportButtons.id = "TransportButtons"
+
+  if m.playerControlExperimentType = "none"
+    m.Transport.appendChild(m.timeGroup)
+    m.Transport.appendChild(m.ProgressBar)
+    m.Transport.appendChild(m.TransportButtons)
+  else
+    m.Transport.appendChild(m.ProgressBar)
+    m.Transport.appendChild(m.timeGroup)
+    m.Transport.appendChild(m.TransportButtons)
+  end if
+
+  'seekUI for variant1, variant2 and variant3
+  m.seekGroup = m.top.findNode("seekGroup")
+  m.currentSeekLabel = m.top.findNode("currentSeekLabel")
+  m.seekControlGroup = m.top.findNode("seekControlGroup")
+  m.seekSpeed = m.top.findNode("seekSpeedLabel")
+  m.seekIcon = m.top.findNode("seekIcon")
+  m.quickSeekLabel = m.top.findNode("quickSeekLabel")
+
+  m.typographyConstants = getTypographyConstants()
+  createTransportButtons()
+
+  if m.playerControlExperimentType = "variant1" OR m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3"
+    m.focusedNode = m.progressBar
+  else
+     'm.focusedNode holds the node/component which helps setting/unsetting focus to component/m.top on video player screen
+    m.focusedNode = m.PlayPauseButton
+  end if
 
   m.buttonUris = m.constants.player.transportButtons
   m.focusedButtonIndex = 0
@@ -307,22 +348,14 @@ Function init()
   ' callback referencing the value, which would lead to badly formed playProgressEvents.
   m.seekReferenceQueue = []
 
-  if m.top.appMode <> "KIDS_MODE" AND getExperimentResource("roku_send_feedback_on_player", "roku_send_feedback_on_player_v1", false).enabled = true
-    m.sendFeedBackButton.visible = true
-    m.closedCaptionAudioButton.translation = [1565,110]
-    m.sendFeedBackButton.translation = [1695,110]
-  else
-    m.closedCaptionAudioButton.translation = [1695,110]
-  end if
-
   m.analyticsInterval = m.constants.player.pingFrequency
   m.historyInterval1Min = m.constants.player.historyFrequency1Min 'historyInterval1Min is used for sending exposure event
 
   ' set to the end position of replay if caption mode is temporarily turned on during a replay
   m.replayCaptionEnd = 0
 
-  m.thumbnailMinXOffset = 238 ' based on zeplin designs
-  m.thumbnailMaxXOffset = 1920 - 238 - m.Thumbnail.width
+  m.thumbnailMinXOffset = m.marginX
+  m.thumbnailMaxXOffset = 1920 - m.marginX - m.Thumbnail.width
 
   isScaledUI = m.constants.deviceInfo.scaledUi
   if isScaledUI = true then
@@ -353,40 +386,84 @@ Function init()
   ' Now that we are using async stop we need to wait until we get stopped state on the Video node before starting the ad. This variable helps track if we have requested a stop and are waiting for it to complete.
   m.isShowAdBreakPendingStop = false
 
-  m.skipCuepointsButtonUpTranslation = 681
-  m.skipCuepointsButtonDownTranslation = 780
-  m.thumbnailMaxYOffset = 825
-  m.Transport.translation = [0,783]
+  m.skipCuepointsButtonUpTranslation = 648
+  m.skipCuepointsButtonDownTranslation = 900
+  m.thumbnailMaxYOffset = 750
+  m.Transport.translation = [m.marginX, 762]
 
-  setFocusToComponent(m.PlayPauseButton)
+  setFocusToComponent(m.focusedNode)
 
-  m.title = m.TopOverlay.findNode("VideoOverlayTitle")
-  m.episodeTitle = m.TopOverlay.findNode("VideoOverlayEpisodeTitle")
+  m.TitleGroup = m.TopOverlay.findNode("TitleGroup")
+
+  m.title = CreateObject("roSGNode", "Label")
+  m.title.id = "VideoOverlayTitle"
+  m.title.width = "1311"
+  m.title.height = "57"
+  m.title.ellipsizeOnBoundary = "true"
+  m.title.vertAlign = "top"
+
+  m.titleImage = CreateObject("roSGNode", "Poster")
+  m.titleImage.id = "VideoOverlayTitleImage"
+  m.titleImage.width = "366"
+  m.titleImage.height = "57"
+
+  m.episodeTitle = CreateObject("roSGNode", "Label")
+  m.episodeTitle.id = "VideoOverlayEpisodeTitle"
+  m.episodeTitle.translation = [0, 66]
+  m.episodeTitle.width = "1311"
+  m.episodeTitle.height = "57"
+  m.episodeTitle.ellipsizeOnBoundary = "true"
+  m.episodeTitle.vertAlign = "top"
+
   SkipTrailerButtonLabel = m.TopOverlay.findNode("SkipTrailerButtonLabel")
 
-  typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.title, typographyConstants.ids.headerSmall)
-  setTypographyOfLabel(m.episodeTitle, typographyConstants.ids.bodyLarge)
-  setTypographyOfLabel(m.AdHeadsUpText, typographyConstants.ids.subheaderMedium)
-  setTypographyOfLabel(m.ratedLabel, typographyConstants.ids.bodyMediumStrong)
-  setTypographyOfLabel(m.ratingLabel, typographyConstants.ids.bodySmallStrong)
-  setTypographyOfLabel(SkipTrailerButtonLabel, typographyConstants.ids.bodyLargeStrong)
-  setTypographyOfLabel(m.ElapsedLabel, typographyConstants.ids.bodyLargeStrong)
-  setTypographyOfLabel(m.LoadingMessage, typographyConstants.ids.subheaderMedium)
-  setTypographyOfLabel(m.RemainingLabel, typographyConstants.ids.bodyLargeStrong)
-  setTypographyOfLabel(m.descriptorCode, typographyConstants.ids.bodyMediumStrong)
-  setTypographyOfLabel(m.descriptorDesc, typographyConstants.ids.bodySmall)
+  setTypographyOfLabel(m.title, m.typographyConstants.ids.subheaderLarge)
+  setTypographyOfLabel(m.episodeTitle, m.typographyConstants.ids.bodyMediumStrong)
+  setTypographyOfLabel(m.AdHeadsUpText, m.typographyConstants.ids.subheaderMedium)
+  setTypographyOfLabel(m.ratedLabel, m.typographyConstants.ids.bodySmallStrong)
+  setTypographyOfLabel(m.ratingLabel, m.typographyConstants.ids.bodyExtraSmallStrong)
+  setTypographyOfLabel(SkipTrailerButtonLabel, m.typographyConstants.ids.bodyLargeStrong)
+  setTypographyOfLabel(m.ElapsedLabel, m.typographyConstants.ids.bodySmallStrong)
+  setTypographyOfLabel(m.currentSeekLabel, m.typographyConstants.ids.bodySmallStrong)
+  setTypographyOfLabel(m.quickSeekLabel, m.typographyConstants.ids.bodySmallStrong)
+  setTypographyOfLabel(m.LoadingMessage, m.typographyConstants.ids.subheaderMedium)
+  setTypographyOfLabel(m.RemainingLabel, m.typographyConstants.ids.bodySmallStrong)
+  setTypographyOfLabel(m.descriptorCode, m.typographyConstants.ids.bodyExtraSmallStrong)
+  setTypographyOfLabel(m.descriptorDesc, m.typographyConstants.ids.bodySmall)
+  setTypographyOfLabel(m.seekSpeed, m.typographyConstants.ids.bodySmallStrong)
 
   '//Position elements based on the margin set in constants
-  m.SkipTrailerButton.translation = [m.constants.ui.translations.marginX, m.SkipTrailerButton.translation[1]]
-  m.AdHeadsUpText.translation = [m.constants.ui.translations.marginX, m.AdHeadsUpText.translation[1]]
-  m.ratingBarAndLabel.translation = [m.constants.ui.translations.marginX, m.ratingBarAndLabel.translation[1]]
-  m.descriptorDesc.translation = [m.constants.ui.translations.marginX + 27, m.descriptorDesc.translation[1]]
-  m.TopOverlay.translation = [m.constants.ui.translations.marginX, m.TopOverlay.translation[1]]
-  m.ElapsedLabel.translation = [m.constants.ui.translations.marginX, m.ElapsedLabel.translation[1]]
-  m.RemainingLabel.translation = [1920 - m.constants.ui.translations.marginX - m.RemainingLabel.boundingRect().width, m.RemainingLabel.translation[1]]
-  m.ProgressBar.translation = [m.constants.ui.translations.marginX, m.ProgressBar.translation[1]]
-  m.ProgressBar.width = 1920 -  (m.constants.ui.translations.marginX * 2)
+  
+  m.AdHeadsUpText.translation = [m.marginX, m.AdHeadsUpText.translation[1]]
+  m.ratingBarAndLabel.translation = [m.marginX, m.ratingBarAndLabel.translation[1]]
+  m.descriptorDesc.translation = [m.marginX + 27, m.descriptorDesc.translation[1]]
+  m.ElapsedLabel.translation = [m.marginX, m.ElapsedLabel.translation[1]]
+  m.RemainingLabel.translation = [1920 - m.marginX - m.RemainingLabel.boundingRect().width - 10, m.RemainingLabel.translation[1]]
+  m.ProgressBar.width = 1920 -  (m.marginX * 2)
+
+  m.closedCaptionAndAudioSelectionOverlay = m.top.findNode("closedCaptionAndAudioSelectionOverlay")
+  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("globalCaptionChanged", "onGlobalCaptionChanged")
+  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("wasBackButtonSelected", "onWasBackButtonSelectedChange")
+  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("trackingEventInfo", "onTrackingEventInfoChange")
+  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("subtitleTrack", "onSubtitleTrackChangedOnCCOverlay")
+  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("audioTrack", "onAudioTrackChangedOnCCOverlay")
+  m.closedCaptionAndAudioSelectionOverlayGroup = m.top.findNode("closedCaptionAndAudioSelectionOverlayGroup")
+
+  m.sendFeedbackSelectionOverlayGroup = m.top.findNode("sendFeedbackSelectionOverlayGroup")
+  m.sendFeedbackSelectionOverlay = m.top.findNode("sendFeedbackSelectionOverlay")
+
+  if m.playerControlExperimentType = "none" OR m.playerControlExperimentType = "variant1"
+    m.sendFeedbackSelectionOverlay.translation = [1230, 60]
+    m.sendFeedbackSelectionOverlay.width = 630
+    m.sendFeedbackSelectionOverlay.height = 960
+  else
+    m.sendFeedbackSelectionOverlay.translation = [1170, 176]
+    m.sendFeedbackSelectionOverlay.width = 558
+    m.sendFeedbackSelectionOverlay.height = 768
+  end if
+
+  m.sendFeedbackSelectionOverlay.observeFieldScoped("backOrLeftKeyPress", "onWasBackORLeftButtonSelectedForSendFeedback")
+  m.sendFeedbackSelectionOverlay.observeFieldScoped("itemSelected", "onSendFeedBackOverlayItemSelected")
 
   m.isAdsOverlayExperimentEnabled = getExperimentResource("roku_player_ui_refresh", "roku_ads_overlay_v1", false).overlay_type <> "none"
   if m.isAdsOverlayExperimentEnabled = true
@@ -509,8 +586,18 @@ Function showQRCodeScreen()
     subTitle: getTranslation("send_feedback_submitted_description")
     sendFeedbackHintText: getTranslation("send_feedback_overlay_feedback_hint")
     uri: "pkg:/images/sendFeedback.webp"
-    translation: [0, 0]
   })
+
+  if m.playerControlExperimentType = "none" OR m.playerControlExperimentType = "variant1"
+    sendFeedbackQRCodeOverlay.translation = [0, 0]
+    sendFeedbackQRCodeOverlay.width = 630
+    sendFeedbackQRCodeOverlay.height = 960
+  else
+    sendFeedbackQRCodeOverlay.translation = [10, -96]
+    sendFeedbackQRCodeOverlay.width = 660
+    sendFeedbackQRCodeOverlay.height = 920
+  end if
+
   m.sendFeedbackSelectionOverlay.appendChild(sendFeedbackQRCodeOverlay)
 
   sendFeedbackQRCodeOverlay.observeFieldScoped("closeQRCodeOverlay", "onCloseQRCodeOverlay")
@@ -581,7 +668,7 @@ End Function
 Function showSkipCuepointsButton()
   tubiLog("videoPlayerScreen.showSkipCuepointsButton")
 
-  xPosition = m.top.width - (m.skipCuepointsButton.boundingRect().width + 60)
+  xPosition = m.top.width - (m.skipCuepointsButton.boundingRect().width + m.marginX)
 
   if m.HUD.opacity = 1
     m.skipCuepointsButton.translation = [xPosition, m.skipCuepointsButtonUpTranslation]
@@ -748,10 +835,10 @@ Function onThemeChange(msg = invalid)
     m.ratingLabel.color = theme.primaryTextColor
     m.LoadingProgressBar.trackColor = theme.neutralColor2
     m.ProgressBar.trackColor = theme.neutralColor2
-    m.SkipCuepointsButton.color = theme.backgroundColorLight2
-    m.skipCuepointsButton.notFilledBackgroundColor = theme.shadeColor2
     m.closedCaptionAndAudioSelectionOverlayGroup.color = theme.shadeColor
     m.sendFeedbackSelectionOverlayGroup.color = theme.shadeColor
+    m.seekSpeed.color = theme.backgroundColor
+    m.LoadingSpinner.blendColor = m.focusedColor
 
     if theme.id = m.constants.ui.themeIDs.kidsMode
       m.logo.visible = false
@@ -1017,11 +1104,19 @@ Function onVideoStateChange(msg)
 
   ' Loading page visibility
   if state = "playing" or state = "paused"
-    m.Loading.visible = false
+    if m.playerControlExperimentType <> "none"
+      m.LoadingSpinner.visible = false
+    else
+      m.Loading.visible = false  
+    end if
     m.top.state = state
   else
-    m.LoadingProgressBar.progress = 0
-    m.Loading.visible = true
+    if m.playerControlExperimentType <> "none"
+      m.LoadingSpinner.visible = true
+    else
+      m.LoadingProgressBar.progress = 0
+      m.Loading.visible = true  
+    end if
   end if
 
   if state = "playing"
@@ -1534,8 +1629,12 @@ Function onSpritesReceived(msg)
       m.Thumbnail.thumbnailWidth = thumbnailsInfo.thumbnailSize[0]
       m.Thumbnail.thumbnailHeight = thumbnailsInfo.thumbnailSize[1]
       m.Thumbnail.width = m.Thumbnail.height * thumbnailAspect
-      m.thumbnailMaxXOffset = 1920 - 238 - m.Thumbnail.width
+      m.thumbnailMaxXOffset = 1920 - m.marginX - m.Thumbnail.width
       m.Thumbnail.translation = [m.thumbnailMinXOffset, m.thumbnailMaxYOffset - m.Thumbnail.height]
+
+      quickSeekLabelWidth = m.quickSeekLabel.boundingRect().width
+      m.quickSeekLabel.translation = [m.thumbnailMinXOffset + thumbnailsInfo.thumbnailSize[0] / 2 - quickSeekLabelWidth / 2, m.thumbnailMaxYOffset - m.Thumbnail.height - 110]
+      m.seekGroup.translation = [m.thumbnailMinXOffset + thumbnailsInfo.thumbnailSize[0] / 2, m.thumbnailMaxYOffset - m.Thumbnail.height - 100]
     else
       ' reset the sprites
       m.Thumbnail.visible = false
@@ -1799,7 +1898,9 @@ Function resetVideoPlayerState(content = invalid)
   m.didSeeAdCountdown = false
   m.top.adPosition = 0
   m.top.goToNext = false
-
+  m.controlIcon.opacity = 0
+  hideSeekGroup()
+  hideQuickSeekLabelAndIcon()
   m.pauseAdOverlay.opacity = 0
   m.ratingOverlay.opacity = 0
   m.showRatings = true
@@ -1819,8 +1920,13 @@ Function resetVideoPlayerState(content = invalid)
   m.shouldShowUpNext = true
   m.UpNext.resetContent = true
 
-  m.RewindButton.uri = m.buttonUris.rewind
-  m.FastForwardButton.uri = m.buttonUris.fastforward
+  if m.RewindButton <> invalid
+    m.RewindButton.uri = m.buttonUris.rewind
+  end if
+
+  if m.FastForwardButton <> invalid
+    m.FastForwardButton.uri = m.buttonUris.fastforward
+  end if
 
   clearSkipCuepointsButtonAndTimer()
   m.cuePointsHistory = {}
@@ -1901,6 +2007,7 @@ End Function
 ' Set video player state based on passed in content
 ' @content: TubiContentNode
 Function updateVideoPlayerState(content) as Void
+
   if type(content) <> "roSGNode" then return
   ' make the content available to the video node
   m.Video.content = content
@@ -1956,27 +2063,273 @@ Function updateVideoPlayerState(content) as Void
     m.episodeTitle.text = ""
   end if
 
-  m.ratingOverlayAnimatedPositionY = 90
+  m.ratingOverlayAnimatedPositionY = 80
   if m.episodeTitle.text <> ""
     '//if the episode title has text, then move the rating y position down to fit the episode title.
-    m.ratingOverlayAnimatedPositionY = 144
+    m.ratingOverlayAnimatedPositionY = 150
   end if
 
-  'if it's not a trailer, remove the skip trailer button
-  if content.isTrailer = false
-    m.TransportButtons.removeChild(m.SkipTrailerButton)
+  if m.playerControlExperimentType = "variant3"
+    m.ratingOverlayAnimatedPositionY = 0
+  end if
 
-  'add the skip trailer button if it's a trailer and it doesn't already exist on the transport
+  childrenCount = m.titleGroup.getChildCount()
+  m.titleGroup.removeChildrenIndex(childrenCount, 0)
+
+  if m.playerControlExperimentType = "variant3"
+    if content.titleImageUrl <> ""
+      m.titleImage.uri = content.titleImageUrl
+      m.titleGroup.appendChild(m.titleImage)
+    else
+      m.titleGroup.appendChild(m.title)
+    end if
   else
+    m.titleGroup.appendChild(m.title)
+  end if
+  m.titleGroup.appendChild(m.episodeTitle)
 
-    if isNonEmptyString(content.loginReason) = true
-      m.TransportButtons.removeChild(m.SkipTrailerButton)
-    else if m.NodeHelpers.getChildIndex(m.TransportButtons, m.SkipTrailerButton) < 0
-      m.TransportButtons.insertChild(m.SkipTrailerButton, 0)
+  updateTransportButtons(content)
+End Function
+
+
+Function updateTransportButtons(content)
+  if m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3"
+    m.ProgressBar.highlightPointer = true 'to show black srubber on progresBar
+
+    childrenCount = m.TransportLayoutGroup.getChildCount()
+    m.TransportLayoutGroup.removeChildrenIndex(childrenCount, 0)
+    m.TransportButtons.removeChild(m.TransportLayoutGroup)
+    m.TransportButtons.removeChild(m.SkipTrailerButton)
+    
+    if content.isTrailer = true
+      m.TransportLayoutGroup.appendChild(m.SkipTrailerButton)
+      m.SkipTrailerButton.visible = true
+    end if
+
+    m.TransportLayoutGroup.appendChild(m.PlayFromBeginning)
+
+    if content.parentType = "series"
+      m.TransportLayoutGroup.appendChild(m.NextEpisode)
+    end if
+
+    width =  m.TransportLayoutGroup.boundingRect().width
+    spacer = CreateObject("roSGNode", "Rectangle")
+    spacer.addField("enabled", "boolean", false)
+    spacer.enabled = false
+    spacer.width = 1200 - width - 40
+    m.TransportLayoutGroup.appendChild(spacer)
+
+    m.TransportLayoutGroup.appendChild(m.closedCaptionAudioButton)
+    m.TransportButtons.appendChild(m.TransportLayoutGroup)
+
+  else if m.playerControlExperimentType = "variant1"
+    m.ProgressBar.highlightPointer = false 
+
+    childrenCount = m.TransportButtons.getChildCount()
+    m.TransportButtons.removeChildrenIndex(childrenCount, 0)
+
+    if content.isTrailer = true
+      m.SkipTrailerButton.enabled = true
+      m.SkipTrailerButton.visible = true
+      m.TransportButtons.appendChild(m.SkipTrailerButton)
+    else
+      
+      spacer = CreateObject("roSGNode", "Rectangle")
+      spacer.addField("enabled", "boolean", false)
+      spacer.enabled = false
+      spacer.width = 800
+      m.TransportButtons.appendChild(spacer)
+      m.closedCaptionAudioButton.translation = [1330, 0]
+      m.sendFeedBackButton.translation = [1470, 0]
+      m.TransportButtons.appendChild(m.closedCaptionAudioButton)
+      m.TransportButtons.appendChild(m.sendFeedBackButton)
+    end if
+
+  else if m.playerControlExperimentType = "none"
+    m.ProgressBar.highlightPointer = false 
+
+    childrenCount = m.TransportButtons.getChildCount()
+    m.TransportButtons.removeChildrenIndex(childrenCount, 0)
+
+    if content.isTrailer = true
+      m.SkipTrailerButton.enabled = true
+      m.SkipTrailerButton.visible = true
+      m.TransportButtons.appendChild(m.SkipTrailerButton)
+    else
+      m.SkipTrailerButton.enabled = false
+      m.SkipTrailerButton.visible = false
+      m.TransportButtons.appendChild(m.SkipTrailerButton)
+    end if
+
+    m.TransportButtons.appendChild(m.StartButton)
+    m.TransportButtons.appendChild(m.RewindButton)
+    m.TransportButtons.appendChild(m.HopBackButton)
+    m.TransportButtons.appendChild(m.PlayPauseButton)
+    m.TransportButtons.appendChild(m.HopForwardButton)
+    m.TransportButtons.appendChild(m.FastForwardButton)
+    m.TransportButtons.appendChild(m.EndButton)
+
+    if content.isTrailer = false
+      m.TransportButtons.appendChild(m.closedCaptionAudioButton)
+      m.TransportButtons.appendChild(m.sendFeedBackButton)
     end if
 
   end if
+
+  if m.playerControlExperimentType = "variant3"
+    if content.parentType = "series"
+      m.TitleGroup.translation = [m.constants.ui.translations.player.marginX, 540]
+    else
+      m.TitleGroup.translation = [m.constants.ui.translations.player.marginX, 580]
+    end if
+  else if m.playerControlExperimentType = "variant1" OR  m.playerControlExperimentType = "variant2"  
+    m.TitleGroup.translation = [m.constants.ui.translations.player.marginX, 0]
+  else
+    m.TitleGroup.translation = [m.constants.ui.translations.marginX, 0]
+  end if
 End Function
+
+
+Function createTransportButtons()
+  m.SkipTrailerButton = CreateObject("roSGNode", "TransportButton")
+  m.SkipTrailerButton.id = "SkipTrailerButton"
+  m.SkipTrailerButton.width = 260
+  m.SkipTrailerButton.height = 80
+  m.SkipTrailerButton.translation = "[0,96]"
+  m.SkipTrailerButton.uri = ""
+
+  m.SkipTrailerButtonLabel = CreateObject("roSGNode", "Label")
+  m.SkipTrailerButtonLabel.id = "SkipTrailerButtonLabel"
+  m.SkipTrailerButtonLabel.text = "Watch Movie"
+  m.SkipTrailerButtonLabel.width = 260
+  m.SkipTrailerButtonLabel.height = 80
+  m.SkipTrailerButtonLabel.horizAlign = "center"
+  m.SkipTrailerButtonLabel.vertAlign = "center"
+
+  setTypographyOfLabel(m.SkipTrailerButtonLabel, m.typographyConstants.ids.bodyLargeStrong)
+  m.SkipTrailerButton.appendChild(m.SkipTrailerButtonLabel)
+
+  m.StartButton = CreateObject("roSGNode", "TransportButton")
+  m.StartButton.id = "StartButton"
+  m.StartButton.width = 60
+  m.StartButton.height = 60
+  m.StartButton.translation = "[540,110]"
+  m.StartButton.uri = "pkg:/images/transport/sgplayer/icon-to-start.webp"
+
+  m.RewindButton = CreateObject("roSGNode", "TransportButton")
+  m.RewindButton.id = "RewindButton"
+  m.RewindButton.width = 60
+  m.RewindButton.height = 60
+  m.RewindButton.translation = "[672,110]"
+  m.RewindButton.uri = "pkg:/images/transport/sgplayer/icon-rew.webp"
+
+  m.HopBackButton = CreateObject("roSGNode", "TransportButton")
+  m.HopBackButton.id = "HopBackButton"
+  m.HopBackButton.width = 60
+  m.HopBackButton.height = 60
+  m.HopBackButton.translation = "[800,110]"
+  m.HopBackButton.uri = "pkg:/images/transport/sgplayer/icon-rew-30s.webp"
+
+  m.PlayPauseButton = CreateObject("roSGNode", "TransportButton")
+  m.PlayPauseButton.id = "PlayPauseButton"
+  m.PlayPauseButton.width = 60
+  m.PlayPauseButton.height = 60
+  m.PlayPauseButton.translation = "[930,110]"
+  m.PlayPauseButton.uri = "pkg:/images/transport/sgplayer/icon-play.webp"
+
+  m.HopForwardButton = CreateObject("roSGNode", "TransportButton")
+  m.HopForwardButton.id = "HopForwardButton"
+  m.HopForwardButton.width = 60
+  m.HopForwardButton.height = 60
+  m.HopForwardButton.translation = "[1060,110]"
+  m.HopForwardButton.uri = "pkg:/images/transport/sgplayer/icon-fwd-30s.webp"
+
+  m.FastForwardButton = CreateObject("roSGNode", "TransportButton")
+  m.FastForwardButton.id = "FastForwardButton"
+  m.FastForwardButton.width = 60
+  m.FastForwardButton.height = 60
+  m.FastForwardButton.translation = "[1190,110]"
+  m.FastForwardButton.uri = "pkg:/images/transport/sgplayer/icon-ffw.webp"
+
+  m.EndButton = CreateObject("roSGNode", "TransportButton")
+  m.EndButton.id = "EndButton"
+  m.EndButton.width = 60
+  m.EndButton.height = 60
+  m.EndButton.translation = "[1320,110]"
+  m.EndButton.uri = "pkg:/images/transport/sgplayer/icon-to-end.webp"
+
+  m.closedCaptionAudioButton = CreateObject("roSGNode", "TransportButton")
+  m.closedCaptionAudioButton.id = "closedCaptionAudioButton"
+  m.closedCaptionAudioButton.width = 60
+  m.closedCaptionAudioButton.height = 60
+  m.closedCaptionAudioButton.translation = "[1520,110]"
+  m.closedCaptionAudioButton.uri = "pkg:/images/transport/sgplayer/icon-subtitles.webp"
+  
+  m.sendFeedBackButton = CreateObject("roSGNode", "TransportButton")
+  m.sendFeedBackButton.id = "sendFeedBackButton"
+  m.sendFeedBackButton.enabled = false
+  m.sendFeedBackButton.width = 60
+  m.sendFeedBackButton.height = 60
+  m.sendFeedBackButton.translation = "[1655,110]"
+  m.sendFeedBackButton.uri = "pkg:/images/transport/sgplayer/icon-help.webp"
+  
+  m.PlayFromBeginning = CreateObject("roSGNode", "TextIconButton")
+  m.PlayFromBeginning.id = "PlayFromBeginning"
+  m.PlayFromBeginning.translation = [m.marginX, 0]
+  m.PlayFromBeginning.uri = "pkg:/images/icon-resume.webp"
+  m.PlayFromBeginning.text = "Play From Beginning"
+
+  m.NextEpisode = CreateObject("roSGNode", "TextIconButton")
+  m.NextEpisode.id = "NextEpisode"
+  m.NextEpisode.uri = "pkg:/images/transport/sgplayer/icon-to-end.webp"
+  m.NextEpisode.text = "Next Episode"
+
+  m.SkipTrailerButton.translation = [m.marginX, m.SkipTrailerButton.translation[1]]
+
+  if m.playerControlExperimentType = "none"
+    m.focusedNode = m.PlayPauseButton
+
+  else if m.playerControlExperimentType = "variant1"
+    m.focusedNode = m.progressBar
+
+  else if m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3"
+
+    m.TransportLayoutGroup = CreateObject("roSGNode", "LayoutGroup")
+    m.TransportLayoutGroup.id = "TransportLayoutGroup"
+    m.TransportLayoutGroup.layoutDirection = "horiz"
+    m.TransportLayoutGroup.vertAlignment = "top"
+    m.TransportLayoutGroup.horizAlignment = "left"
+    m.TransportLayoutGroup.itemSpacings = "[12]"
+
+    m.SkipTrailerButton = CreateObject("roSGNode", "TextIconButton")
+    m.SkipTrailerButton.id = "SkipTrailerButton"
+    m.SkipTrailerButton.visible = false
+    m.SkipTrailerButton.uri = "pkg:/images/transport/sgplayer/icon-play.webp"
+    m.SkipTrailerButton.text = "Watch Movie"
+
+    m.closedCaptionAudioButton = CreateObject("roSGNode", "TextIconButton")
+    m.closedCaptionAudioButton.id = "closedCaptionAudioButton"
+    m.closedCaptionAudioButton.uri = "pkg:/images/transport/sgplayer/icon-subtitles.webp"
+    m.closedCaptionAudioButton.text = "Audio & Subtitles"
+
+    m.sendFeedBackButton = m.top.findNode("sendFeedBackButtonTopRight")
+    m.focusedNode = m.progressBar
+  end if
+
+  if m.top.appMode <> "KIDS_MODE" AND getExperimentResource("roku_send_feedback_on_player", "roku_send_feedback_on_player_v1", false).enabled = true
+    m.sendFeedBackButton.visible = true
+    m.closedCaptionAudioButton.translation = [1520, 110]
+
+    if m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3"
+      m.sendFeedBackButton.translation = [1458, 30]
+    else
+      m.sendFeedBackButton.translation = [1655, 110]
+    end if
+  else
+    m.closedCaptionAudioButton.translation = [1655, 110]
+  end if
+
+End function
 
 
 ' advanceCodecOnContent function gets triggered when player error occurs due to codec capability
@@ -2404,7 +2757,7 @@ Function showRatingOverlay()
     if m.TopOverlay.opacity > 0.0
       m.ratingOverlay.translation = [0, m.ratingOverlayAnimatedPositionY]
     else
-      m.ratingOverlay.translation = [0,0]
+      m.ratingOverlay.translation = [0, 0]
     end if
     m.ratingOverlayTimer.control = "start"
   end if
@@ -2729,15 +3082,11 @@ Function onKeyPressWhenBrowseWhileWatchingHasFocus(msg)
   keyPress = msg.getData()
 
   if keyPress = "fastforward"
-    if m.FastForwardButton.enabled = true then
-      animateTransportAndBrowseWhileWatching("out")
-      handleFastForward()
-    end if
+    animateTransportAndBrowseWhileWatching("out")
+    handleFastForward()
   else if keyPress = "rewind"
-    if m.RewindButton.enabled = true then
-      animateTransportAndBrowseWhileWatching("out")
-      handleRewind()
-    end if
+    animateTransportAndBrowseWhileWatching("out")
+    handleRewind()
   end if
 
 End Function

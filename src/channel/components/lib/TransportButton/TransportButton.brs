@@ -1,6 +1,6 @@
 Function init()
-  m.top.observeField("focusState", "onFocusUpdate")
-  m.top.observeField("enabled", "onFocusUpdate")
+  m.top.observeFieldScoped("focusState", "onFocusUpdate")
+  m.top.observeFieldScoped("enabled", "onFocusUpdate")
 
   theme = getThemeFromGlobal()
 

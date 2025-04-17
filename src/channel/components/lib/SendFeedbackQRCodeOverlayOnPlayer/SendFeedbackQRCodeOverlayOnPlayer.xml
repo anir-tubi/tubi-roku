@@ -5,12 +5,17 @@
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
   <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
 
   <interface>
     <field id="title" alias="sendFeedbackHeaderLabel.text"/>
     <field id="subTitle" alias="sendFeedbackSubHeaderLabel.text"/>
     <field id="sendFeedbackHintText" alias="sendFeedbackHint.text"/>
     <field id="uri" alias="qrCodePoster.uri"/>
+
+    <field id="width" alias="overlayBackground.width"/>
+    <field id="height" alias="overlayBackground.height"/>
 
     <!-- OUTPUTS -->
 
@@ -21,8 +26,6 @@
   <children>
     <Poster
       id="overlayBackground"
-      width="630"
-      height="960"
       uri="pkg:/images/menu-focus-$$RES$$.9.png">
 
       <LayoutGroup

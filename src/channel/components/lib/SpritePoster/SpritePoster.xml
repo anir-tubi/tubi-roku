@@ -25,6 +25,8 @@
 
       <!-- Jump to the specified zero-index sprite -->
       <field id="jumpToSprite" type="integer" value="0"/>
+
+      <field id="showBorder" type="boolean" value="false"/>
   </interface>
   <children>
     <Poster
@@ -38,5 +40,10 @@
     <Poster
       id="Preload2"
       visible="false"/>
+    <Poster
+      id="Border"
+      translation="[-3,-3]"
+      visible="false"
+      uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>  
   </children>
 </component>

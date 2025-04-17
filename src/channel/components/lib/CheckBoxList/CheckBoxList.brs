@@ -3,7 +3,6 @@ Function init()
   topRef.update({
     itemComponentName: "CheckButton"
     focusFootprintBitmapUri: "pkg:/images/transparent.png"
-    focusBitmapUri: "pkg:/images/menu-focus-$$RES$$.9.png"
     vertFocusAnimationStyle: "floatingFocus"
     drawFocusFeedbackOnTop: false
   })
