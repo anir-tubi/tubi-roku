@@ -700,7 +700,9 @@ End Function
 Function getRelatedContent(content, callback = handleRelatedResponse)
   ' get related (You May Also Like) content along with metadata for the content
   ' (but not if in any of the kids modes, since it won't be displayed)
+
   if content <> invalid AND isKidsUIOn() = false
+
     relatedRequestInfo = m.cmsApi.createRelatedContentReqInfo(content.id, shouldKidsModeBeSentToServer())
     requestType = m.constants.reqNames.getRelatedContent
 
@@ -715,6 +717,7 @@ Function getRelatedContent(content, callback = handleRelatedResponse)
       isSignedInUser: isLoggedInUser()
     })
   end if
+
 End Function
 
 

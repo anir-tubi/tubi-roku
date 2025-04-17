@@ -67,6 +67,8 @@ Function init()
   m.top.observeFieldScoped("stringLikeDislikeButton", "onStringChange")
   m.top.observeFieldScoped("stringPlayButton", "onStringChange")
 
+  m.top.observeFieldScoped("focusRelatedContent", "onFocusRelatedContent")
+
   m.Menu.observeFieldScoped("itemSelected", "onMenuItemSelected")
   m.Menu.observeFieldScoped("itemFocused", "onMenuItemFocused")
   m.SecondaryMenu.observeFieldScoped("itemSelected", "onSecondaryMenuItemSelected")
@@ -75,6 +77,7 @@ Function init()
   m.RelatedGrid.observeFieldScoped("itemSelected", "onRelatedContentSelected")
   m.RelatedGrid.observeFieldScoped("itemFocused", "onRelatedItemFocused")
   m.Info.observeFieldScoped("descriptionSelected", "onDescriptionSelected")
+
 
   setInitialMenuItems()
   setInitialSecondaryMenuItems()
@@ -1343,4 +1346,13 @@ Function isItemInMenu(item)
   end if
 
   return false
+End Function
+
+
+' This function will be deleted once we have done with roku_ymal_only_deeplink. We will not graduate this experiment
+Function onFocusRelatedContent()
+  tubiLog("DetailScreen.onFocusRelatedContent")
+  if m.top.focusRelatedContent = true AND m.top.isInKidsMode = false AND m.RelatedGrid.content <> invalid AND m.RelatedGrid.content.getChildCount() > 0
+    focusRelated()
+  end if
 End Function

@@ -143,6 +143,9 @@
       <!-- Used to store state to determine if we should resume playback at a later time -->
       <field id="shouldResumePlayback" type="boolean" value="false" />
 
+      <!-- Used to focus the related content group when user enters from deeplink and then come back to detailscreen -->
+      <field id="focusRelatedContent" type="boolean" value="false" />
+
     <!-- OUTPUTS -->
 
       <!-- Should the full description be displayed -->
