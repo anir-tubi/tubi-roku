@@ -877,8 +877,9 @@ Function translateFeaturedListAndSetFocus()
     m.top.lastFocusedList = "featuredRowList"
     m.FeaturedRowList.setFocus(true)
   end sub
-
-  if m.FeaturedRowList.opacity = 0
+  ' Checking for less than 1 to avoid use case where scrolling fast up and down causes the animation to be skipped.
+  ' opacity stays like 0.03 or 0.5 etc.
+  if m.FeaturedRowList.opacity < 1
     fade(m.FeaturedRowList, "in", 0.3, 0, -1, callback)
     m.FeaturedRowList.translation = [0, 0]
   else
