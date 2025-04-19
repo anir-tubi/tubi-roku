@@ -1254,7 +1254,7 @@ Function playLinearInlineGridView(content, screen)
     if isNumber(screen.currentFocusedItemBoundingRect.x) = true
       offsetX = screen.currentFocusedItemBoundingRect.x
     end if
-    m.inlineVideoPreviewPlayerContainer.translation = [159 + offsetX, 189]
+    m.inlineVideoPreviewPlayerContainer.translation = [159 + offsetX, 161]
   end if
 End Function
 

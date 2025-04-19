@@ -58,7 +58,7 @@
           <Group
             id="inlineVideoPreviewPlayerContainer"
             visible="false"
-            translation="[159, 189]" >
+            translation="[159, 161]" >
             <VideoGridMetadata 
               visible="false"
               width="789"

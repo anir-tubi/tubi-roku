@@ -272,7 +272,7 @@ Function updatePreviewPlayerToInlineView()
       offsetY = rectY - 63.5
     end if
 
-   m.inlineVideoPreviewPlayerContainer.translation = [159 + offsetX, 189 + offsetY]
+   m.inlineVideoPreviewPlayerContainer.translation = [159 + offsetX, 161 + offsetY]
   end if
 End Function
 

@@ -105,42 +105,44 @@ End Function
 Function onItemContentChange(msg)
   itemContent = msg.getData()
 
-  m.title.visible = false
-  m.title.lineSpacing = 0
-
-  if itemContent.type = m.constants.ui.contentTypes.linear
-    setThumbnailImage(itemContent.thumbnailUri,  itemContent.type)
-    currentProgram = getCurrentLiveProgram(itemContent)
-
-    if currentProgram <> invalid
-
-      if currentProgram.live = true
-        setBadge(m.badgeTypes.live)
+  if itemContent <> invalid
+    m.title.visible = false
+    m.title.lineSpacing = 0
+  
+    if itemContent.type = m.constants.ui.contentTypes.linear
+      setThumbnailImage(itemContent.thumbnailUri,  itemContent.type)
+      currentProgram = getCurrentLiveProgram(itemContent)
+  
+      if currentProgram <> invalid
+  
+        if currentProgram.live = true
+          setBadge(m.badgeTypes.live)
+        else
+          setBadge(m.badgeTypes.onNow)
+        end if
+  
+        metadataOnLivePosterContent(currentProgram, itemContent)
       else
         setBadge(m.badgeTypes.onNow)
+        metadataOnPosterContent(itemContent)
       end if
-
-      metadataOnLivePosterContent(currentProgram, itemContent)
+  
     else
-      setBadge(m.badgeTypes.onNow)
+      'Remove thumbnail image and badge we showed for live
+      if m.logoBackground.getParent() <> invalid
+        m.top.removeChild(m.logoBackground)
+      end if
+  
+      badgePresent = (m.badge <> invalid AND m.badge.getParent() <> invalid)
+      if badgePresent = true
+        m.top.removeChild(m.badge)
+      end if
+  
       metadataOnPosterContent(itemContent)
     end if
-
-  else
-    'Remove thumbnail image and badge we showed for live
-    if m.logoBackground.getParent() <> invalid
-      m.top.removeChild(m.logoBackground)
-    end if
-
-    badgePresent = (m.badge <> invalid AND m.badge.getParent() <> invalid)
-    if badgePresent = true
-      m.top.removeChild(m.badge)
-    end if
-
-    metadataOnPosterContent(itemContent)
+  
+    adjustMetadataGroupTranslation()
   end if
-
-  adjustMetadataGroupTranslation()
 End Function
 
 

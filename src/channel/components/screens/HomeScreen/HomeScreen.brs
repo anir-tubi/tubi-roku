@@ -67,6 +67,8 @@ Function init()
 
   m.originalContentAreaTranslation = m.ContentArea.translation
 
+  m.homeRedesignExpContentAreaTranslation = [0, 102]
+
   m.scrollDirection = "none"
 End Function
 
@@ -433,7 +435,7 @@ Function onFeaturedListHasFocusChange(msg)
   if featuredListHasFocus = false AND m.CategoryGridList.lastFocusedList = "skinAdRow"
     m.ContentArea.translation = m.originalContentAreaTranslation
   else
-    m.ContentArea.translation = [0, 130]
+    m.ContentArea.translation = m.homeRedesignExpContentAreaTranslation
   end if
   'Make sure Content is in correct location
   moveContentAreaMaskBasedCurrentFocus()
@@ -640,7 +642,7 @@ Function populateInfoPanel(mode, contentNode)
     m.InfoPanel.calculateHeight = true
   else
     m.InfoPanel.visible = false
-    m.ContentArea.translation = [0, 130]
+    m.ContentArea.translation = m.homeRedesignExpContentAreaTranslation
   end if
 End Function
 
@@ -825,7 +827,7 @@ Function onGridContentIsReadyChange(msg)
     if (m.top.featuredListHasFocus = false AND m.CategoryGridList.lastFocusedList = "skinAdRow") OR m.top.featuredRowContent = invalid
       m.ContentArea.translation = m.originalContentAreaTranslation
     else
-      m.ContentArea.translation = [0, 130]
+      m.ContentArea.translation = m.homeRedesignExpContentAreaTranslation
     end if
   end if
 End Function
