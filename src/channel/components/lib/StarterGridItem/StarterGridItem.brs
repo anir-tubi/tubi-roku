@@ -66,7 +66,7 @@ Function onItemContentChange(msg)
     if gridItemType = "emptyContainer" then
       childGridItemComponent = "CategoryGridPoster"
     else if gridItemType = "landscapeWithMetadata"
-      if getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v1", false).design_type = "withDescription"
+      if getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v2", false).design_type = "withDescription"
         childGridItemComponent = "VideoGridTileWithDescription"
       else
         childGridItemComponent = "VideoGridTile"

@@ -1504,7 +1504,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             seasons = fullChild.num_seasons
           end if
 
-          isHomescreenRedesignExperiementEnabled = (m.experiments <> invalid AND m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v1").design_type <> "none")
+          isHomescreenRedesignExperiementEnabled = (m.experiments <> invalid AND m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v2").design_type <> "none")
           if container.id = m.constants.ui.categoryIds.featured AND (isHomescreenRedesignExperiementEnabled = true)
             childAA = {
               id: fullChild.id
@@ -1909,7 +1909,7 @@ End Function
 Function tubiMetadataTranslate_getGridItemType(container, orientation, constants, screenId = "", contentMode = "")
   gridItemTypes = constants.ui.gridItemTypes
   gridItemType = gridItemTypes.portrait
-  isHomescreenRedesignExperiementEnabled = (m.experiments <> invalid AND m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v1").design_type <> "none")
+  isHomescreenRedesignExperiementEnabled = (m.experiments <> invalid AND m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v2").design_type <> "none")
 
   if screenId = m.constants.ui.screenIds.homeScreen AND container.id = constants.ui.categoryIds.featured AND (isHomescreenRedesignExperiementEnabled = true) AND (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
     gridItemType = gridItemTypes.landscapeWithMetadata

@@ -67,7 +67,7 @@ Function init()
 
   m.originalContentAreaTranslation = m.ContentArea.translation
 
-  m.homeRedesignExpContentAreaTranslation = [0, 102]
+  m.homeRedesignExpContentAreaTranslation = [0, 96]
 
   m.scrollDirection = "none"
 End Function
@@ -493,7 +493,7 @@ Function onGridFocusChange() as void
 
   fireNavigateWithinPageEvent()
   
-  isHomeScreenRedesignExperimentEnabled = (getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v1", false).design_type <> "none") AND focusedContent.parentId = m.constants.ui.categoryIds.featured
+  isHomeScreenRedesignExperimentEnabled = (getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v2", false).design_type <> "none") AND focusedContent.parentId = m.constants.ui.categoryIds.featured
 
   if isHomeScreenRedesignExperimentEnabled = false
    m.gridHasGainedInitialFocus = true
@@ -612,7 +612,7 @@ End Function
 '@mode: string, one of the valid constants.ui.infoPanelModes info panel modes (see InfoPanel.xml for details)
 '@contentNode: content node
 Function populateInfoPanel(mode, contentNode)
-  isHomeScreenRedesignForFeaturedEnabled = (getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v1", false).design_type <> "none") AND contentNode.parentId = m.constants.ui.categoryIds.featured 
+  isHomeScreenRedesignForFeaturedEnabled = (getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v2", false).design_type <> "none") AND contentNode.parentId = m.constants.ui.categoryIds.featured 
 
   if contentNode <> invalid AND (isHomeScreenRedesignForFeaturedEnabled = false OR m.top.contentMode <> m.constants.ui.contentMode.homescreen)
     m.InfoPanel.visible = true

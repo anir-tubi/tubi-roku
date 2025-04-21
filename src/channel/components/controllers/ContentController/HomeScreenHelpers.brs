@@ -121,7 +121,7 @@ End Function
 Function processHomeScreenBatchResponse(response, screenId)
   homeScreen = getFromScreenCache(screenId)
   if homeScreen <> invalid
-    homescreenDesignType = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v1", false).design_type
+    homescreenDesignType = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v2", false).design_type
 
     if (homescreenDesignType <> "none") AND isNode(response) = true AND response.getChildCount() > 0 AND response.getChild(0).id = m.constants.ui.categoryIds.featured AND homeScreen.contentMode = m.constants.ui.contentMode.homescreen
       updateCategoryGridWithFeaturedList(response, homeScreen)
@@ -416,7 +416,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     homeScreen.personalizationId = rawResponse.personalizationId
     homeScreen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
 
-    homescreenDesignType = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v1", false).design_type
+    homescreenDesignType = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v2", false).design_type
 
     if (homescreenDesignType <> "none") AND isNode(rawResponse) = true AND rawResponse.getChildCount() > 0 AND rawResponse.getChild(0).id = m.constants.ui.categoryIds.featured AND homeScreen.id = m.constants.ui.screenIds.homescreen
       updateCategoryGridWithFeaturedList(rawResponse, homeScreen)
@@ -426,7 +426,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
 
     onHomeScreenContentUpdateComplete(homeScreen.id)
 
-    getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v1", true)
+    getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v2", true)
     
     getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v1", true)
 
@@ -1254,7 +1254,7 @@ Function playLinearInlineGridView(content, screen)
     if isNumber(screen.currentFocusedItemBoundingRect.x) = true
       offsetX = screen.currentFocusedItemBoundingRect.x
     end if
-    m.inlineVideoPreviewPlayerContainer.translation = [159 + offsetX, 161]
+    m.inlineVideoPreviewPlayerContainer.translation = [159 + offsetX, 155]
   end if
 End Function
 

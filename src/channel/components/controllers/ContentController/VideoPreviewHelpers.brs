@@ -221,7 +221,7 @@ Function startVideoPreview(content, pageInfo = {})
       videoContent.streamformat = "mp4" ' backend will return always as mp4 for video previews
     end if
 
-    homescreenDesignType = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v1", false).design_type
+    homescreenDesignType = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v2", false).design_type
 
     if content.parentId = m.constants.ui.categoryIds.featured AND (homescreenDesignType <> "none")
       videoContent.addField("parentCategory", "string", false)
@@ -272,7 +272,7 @@ Function updatePreviewPlayerToInlineView()
       offsetY = rectY - 63.5
     end if
 
-   m.inlineVideoPreviewPlayerContainer.translation = [159 + offsetX, 161 + offsetY]
+   m.inlineVideoPreviewPlayerContainer.translation = [159 + offsetX, 155 + offsetY]
   end if
 End Function
 

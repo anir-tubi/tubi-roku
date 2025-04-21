@@ -21,7 +21,7 @@ Function init()
 
   m.rowListTranslationYOffset = 0
 
-  m.homeScreenDesignType = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v1", false).design_type
+  m.homeScreenDesignType = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v2", false).design_type
 
   ' Parameters for the metadata block cache. Window size is number of items to fetch, page delimiter
   ' is what focus thresholds trigger a fetch.
