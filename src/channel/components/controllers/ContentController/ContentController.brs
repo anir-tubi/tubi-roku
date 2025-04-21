@@ -2011,6 +2011,10 @@ Function onCustomResume(msg)
   if args <> invalid
     customResumeLaunchParams = args.launchParams
     lastSuspendOrResumeReason = args.lastSuspendOrResumeReason
+    if isAA(customResumeLaunchParams) = true AND customResumeLaunchParams.clearRegistry <> invalid OR customResumeLaunchParams.setRegistry <> invalid then
+      ' If the application is already running and we want to mess with the registry then we close the application to allow the registry code to be centralized in one spot.
+      setExitApp()
+    end if
   end if
   currentScreen = getCurrentScreen()
   if lastSuspendOrResumeReason = "home" AND customResumeLaunchParams <> invalid

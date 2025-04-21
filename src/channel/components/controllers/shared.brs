@@ -143,21 +143,25 @@ End Function
 ' Callback triggered once the config request is successful.
 Function onExternalConfigRequestSuccess(config)
   TubiLog("onExternalConfigRequestSuccess")
-  if config <> invalid
-    m.global.externalConfigInfo = config
-    updateConstantsValuesFromExternalConfig(config)
 
-    if isAA(config.blocked_analytics_events_mapping) = true
-      ' Storing the value of blocked analytics event to registry as a fallback in future if the external config call fails.
-      RegWrite("blocked_analytics_events_mapping", FormatJson(config.blocked_analytics_events_mapping), m.constants.registrySectionIDs.fallbacks)
-    end if
-
-    m.global.externalConfigInfo = config
-
-    ' Since we're modifying constants here we need to push up the changes to the global copy
-    m.global.constants = m.constants
-    m.updateGeneralTaskConstants(m.constants)
+  if config = invalid then
+    TubiLog("onExternalConfigRequestSuccess: Invalid config received")
+    config = {}
   end if
+
+  externalConfigOverrides = getExternalConfigOverrides()
+  if externalConfigOverrides <> invalid then
+    config.append(externalConfigOverrides)
+  end if
+
+  m.global.externalConfigInfo = config
+  updateConstantsValuesFromExternalConfig(config)
+
+  if isAA(config.blocked_analytics_events_mapping) = true
+    ' Storing the value of blocked analytics event to registry as a fallback in future if the external config call fails.
+    RegWrite("blocked_analytics_events_mapping", FormatJson(config.blocked_analytics_events_mapping), m.constants.registrySectionIDs.fallbacks)
+  end if
+
   m.isExternalConfigReady = true
 
   sendRequestForExperiments()
@@ -167,20 +171,43 @@ End Function
 ' Callback triggered once the config request is fails.
 Function onExternalConfigRequestFailure(_error)
   TubiLog("onExperimentsRequestFailure")
+
+  config = {}
+
   ' Reading the fallback data if present from the registry and setting it to constants.
   blockedEventsList = RegRead("blocked_analytics_events_mapping", m.constants.registrySectionIDs.fallbacks)
   if blockedEventsList <> invalid
     blockedEventsList = ParseJson(blockedEventsList)
     if isAA(blockedEventsList) = true
-      m.global.externalConfigInfo = {
+      config = {
         "blocked_analytics_events_mapping": blockedEventsList
       }
     end if
   end if
 
+  externalConfigOverrides = getExternalConfigOverrides()
+  if externalConfigOverrides <> invalid then
+    config.append(externalConfigOverrides)
+  end if
+
+  m.global.externalConfigInfo = config
+  updateConstantsValuesFromExternalConfig(config)
+
   m.isExternalConfigReady = true
 
   sendRequestForExperiments()
+End Function
+
+
+' Retrieves the external config overrides from the registry.
+' @returns: The external config overrides from the registry. If the registry value is not set or is not a string, then invalid is returned.
+Function getExternalConfigOverrides()
+  overrides = regReadAll(m.constants.registrySectionIDs.overrides)
+  if isString(overrides.externalConfig) = true then
+    return parseJson(overrides.externalConfig)
+  end if
+
+  return invalid
 End Function
 
 

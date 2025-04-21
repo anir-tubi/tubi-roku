@@ -12,12 +12,18 @@ Function getConstants()
   'Registry Section IDs used to store things in a particular section of the registry
   constants.registrySectionIDs = {}
     constants.registrySectionIDs.deviceInfoSectionId = "deviceinfo"
+
     ' Creating a section to store all fallbacks in future to start with we are using for blocked analytics events.
     constants.registrySectionIDs.fallbacks = "fallbacks"
+
     ' Creating a section to store user sign up information in case of registration failure.
     constants.registrySectionIDs.registrationByPass = "registrationByPass"
+
     ' Used for storing proxy settings
     constants.registrySectionIDs.proxySettings = "proxySettings"
+
+    ' Used to store overrides like for the external config like for disabling magiclink for Roku. Stores a json inside that needs to be parsed.
+    constants.registrySectionIDs.overrides = "overrides"
 
   proxySettings = RegReadAll(constants.registrySectionIDs.proxySettings)
   if type(proxySettings) = "roAssociativeArray" AND proxySettings.count() > 0 then

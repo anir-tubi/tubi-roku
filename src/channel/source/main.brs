@@ -138,8 +138,8 @@ Function runChannel(constants, log, request)
     msgType = type(msg)
 
     if msgType = "roInputEvent"
-      if controller <> invalid AND msg.GetInfo() <> invalid
-        inputInfo = msg.GetInfo()
+      inputInfo = msg.GetInfo()
+      if controller <> invalid AND inputInfo <> invalid
         if inputInfo.rale = invalid
           ' We don't want to handle rale events in our deeplinking code
           if inputInfo.type = invalid
