@@ -430,7 +430,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     
     getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v1", true)
 
-    getExperimentResource("roku_no_change_experiment", "roku_no_change_experiment_v1", true)
+    getExperimentResource("roku_no_change_experiment", "roku_no_change_experiment_v2", true)
   end if
 End Function
 
