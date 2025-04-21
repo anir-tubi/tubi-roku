@@ -238,6 +238,11 @@ End Function
 
 Function updatePreviewPlayerToCondensedView()
   tubiLog("VideoPreviewHelpers.updatePreviewPlayerToCondensedView")
+  currentScreen = getCurrentScreen()
+  if currentScreen <> invalid
+    setPageInfoForVideoPreview(currentScreen.trackingPageInfo) ' this will help to trigger analytics
+  end if
+
   m.videoPreviewPlayer.videoPlayerType = "BANNER"
   m.videoPreviewPlayer.reParent(m.backgroundVideoPreviewPlayerContainer, false)
   m.videoPreviewPlayer.clippingRect = [0, 0, 1920, 1080]
@@ -248,6 +253,11 @@ End Function
 Function updatePreviewPlayerToInlineView()
   if isCurrentScreenHomeScreen() = true
     screen = getCurrentScreen()
+
+    if screen <> invalid
+      setPageInfoForVideoPreview(screen.trackingPageInfo)
+    end if
+
     m.videoPreviewPlayer.videoPlayerType = "VIDEO_IN_GRID"
     if m.videoPreviewPlayer.getParent().isSameNode(m.inlineVideoPreviewPlayerContainer) = false
       m.videoPreviewPlayer.clippingRect = [0, 57, 792, 329]
