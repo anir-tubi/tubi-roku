@@ -561,8 +561,7 @@ End Function
 '
 ' returns batch requests
 Function cmsApi_createHomeScreenBatchReqInfo(homeScreen, index, bKidsMode = false, isSignedInUser = false, uiMode="standard")
-  isLazyLoadExpEnabled = (m.experiments <> invalid AND m.experiments.getExperimentResource("roku_home_screen_lazy_load", "roku_home_screen_lazy_load_v1").enabled = true)
-  if index = 0 OR isLazyLoadExpEnabled = false
+  if index = 0
     m.categoryWindowSize = m.constants.performance.categoryGridList.categoryWindowSize
   else
     m.categoryWindowSize = 3
