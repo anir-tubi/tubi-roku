@@ -2292,6 +2292,10 @@ Function getTranslation_es_MX()
       "description": "The contact info displayed in an error dialog",
       "message": "Por favor, ponte en contacto con: support@tubi.tv si esto sigue sucediendo."
     },
+    "dialog_errorMessageDescription": {
+      "description": "The message info displayed in an error dialog",
+      "message": "Encontramos un error inesperado."
+    },
     "dialog_button_exit": {
       "description": "In a popup dialog that asks if the user if they wish to exit the app. This is the button that will confirm their exit.",
       "message": "Salir"
@@ -3981,6 +3985,14 @@ Function getTranslation_es_MX()
     "videoPlayer_adBreakStartsIn": {
       "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
       "message": "Pausa publicitaria en"
+    },
+    "h_m_left": {
+      "description": "Indicates time left in the format 'x h y m left'",
+      "message": "{hour}h {minutes}m quedan"
+    },
+    "m_left": {
+      "description": "Indicates time left in the format 'y m left'",
+      "message": "{minutes}m quedan"
     }
   }
 End Function
@@ -4127,6 +4139,10 @@ Function getTranslation_fr_CA()
     "dialog_errorMessageContact": {
       "description": "The contact info displayed in an error dialog",
       "message": "Veuillez envoyer un e-mail à support@tubi.tv si ce problème persiste."
+    },
+    "dialog_errorMessageDescription": {
+      "description": "The message info displayed in an error dialog",
+      "message": "Nous avons rencontré une erreur inattendue."
     },
     "dialog_button_exit": {
       "description": "In a popup dialog that asks if the user if they wish to exit the app. This is the button that will confirm their exit.",
@@ -5813,6 +5829,14 @@ Function getTranslation_fr_CA()
     "videoPlayer_adBreakStartsIn": {
       "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
       "message": "Pause pub dans"
+    },
+    "h_m_left": {
+      "description": "Indicates time left in the format 'x h y m left'",
+      "message": "{hour}h {minutes}m restantes"
+    },
+    "m_left": {
+      "description": "Indicates time left in the format 'y m left'",
+      "message": "{minutes}m restantes"
     }
   }
 End Function
