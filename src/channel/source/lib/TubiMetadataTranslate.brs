@@ -1039,12 +1039,17 @@ Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate,
     title: ""
     validUntil: 0
     children: []    'categories
+    personalizationId: ""
   }
 
   if contentToTranslate.valid_duration <> invalid
     categoryList.validUntil = Uptime(0) + contentToTranslate.valid_duration
   else
     categoryList.validUntil = Uptime(0) + m.constants.cacheTimes.homescreen
+  end if
+
+  if contentToTranslate.personalization_id <> invalid
+    categoryList.personalizationId = contentToTranslate.personalization_id
   end if
 
   '//The following code adds a transparency to the thumbnails and for categories, it shifts a few categories to the top of the list
@@ -1114,7 +1119,7 @@ Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate,
     categoryList.children.unShift(catRecommend)
   end if
 
-  translated.update(categoryList)
+  translated.update(categoryList, true)
   node_count = 1 + translated.getChildCount()
   tubiLog("TranslateMetadata converted " + stri(node_count) + " nodes")
 
@@ -1234,8 +1239,12 @@ Function tubiMetadataTranslate_translateCategoryDetails(contentToTranslate, isSi
 
   categoryMetadata = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser)
 
+  if contentToTranslate.personalization_id <> invalid
+    categoryMetadata.personalizationId = contentToTranslate.personalization_id
+  end if
+
   if categoryMetadata <> invalid
-    translated.update(categoryMetadata)
+    translated.update(categoryMetadata, true)
   else if container <> invalid
     ' ensure we at least store the container id, even if there is no content
     translated.id = container.id

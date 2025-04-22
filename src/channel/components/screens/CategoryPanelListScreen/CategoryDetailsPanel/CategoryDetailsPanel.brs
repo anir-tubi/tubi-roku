@@ -315,6 +315,10 @@ Function createTrackingPageInfo(channel)
     }
   }
 
+  if channel <> invalid
+    trackingInfo.pageValues.personalization_id = channel.personalizationId
+  end if
+
   return trackingInfo
 End Function
 

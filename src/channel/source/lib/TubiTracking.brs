@@ -919,6 +919,7 @@ Function tubiTracking_getOneOfs()
   }
 
   for_you_page = {
+    personalization_id: ""
   }
 
   news_browse_page = {
@@ -935,6 +936,7 @@ Function tubiTracking_getOneOfs()
 
   category_page = {
     category_slug: ""
+    personalization_id: ""
   }
 
   sub_category_page = {  'TODO: Determine if we need this - I think no.
@@ -942,9 +944,13 @@ Function tubiTracking_getOneOfs()
     sub_category_slug: ""
   }
 
-  category_list_page = {}
+  category_list_page = {
+    personalization_id: ""
+  }
 
-  channel_list_page = {}
+  channel_list_page = {
+    personalization_id: ""
+  }
 
   video_page = {  'This corresponds to our details page
     video_id: -1

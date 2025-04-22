@@ -194,6 +194,12 @@ Function onCategoryDetailPanelResponse(categoryContent)
         screen.categoryContent = invalid
       end if
 
+      if categoryContent <> invalid AND categoryContent.personalizationId <> invalid
+        trackingPageInfo = screen.categoryTrackingPageInfo
+        trackingPageInfo.pageValues.personalization_id = categoryContent.personalizationId
+        screen.categoryTrackingPageInfo = trackingPageInfo
+      end if
+
       if m.refreshingCategoryDetailsCache = false
         loadTime = Int((Uptime(0) - screen.categoryTrackingLoadStartTime) * 1000) 'in ms
         screenTrackingLoad(screen.categoryTrackingPageInfo, loadTime) 
@@ -422,6 +428,9 @@ Function onCategoriesPanelListSuccess(response)
 
       if m.refreshingChannelGridCache <> true
         loadTime = Int((Uptime(0) - screen.trackingLoadStartTime) * 1000) 'in ms
+        trackingPageInfo = screen.trackingPageInfo
+        trackingPageInfo.pageValues.personalization_id = response.personalizationId
+        screen.trackingPageInfo = trackingPageInfo
         screenTrackingLoad(screen.trackingPageInfo, loadTime)
       end if
     end if

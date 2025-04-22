@@ -227,6 +227,11 @@ Function onCategoryDetailResponse(categoryContent)
 
     if m.refreshingCategoryDetailsCache <> true
       loadTime = Int((Uptime(0) - screen.trackingLoadStartTime) * 1000) 'in ms
+      if categoryContent <> invalid
+        trackingPageInfo = screen.trackingPageInfo
+        trackingPageInfo.pageValues.personalization_id = categoryContent.personalizationId
+        screen.trackingPageInfo = trackingPageInfo
+      end if
       screenTrackingLoad(screen.trackingPageInfo, loadTime)
     else
       m.refreshingCategoryDetailsCache = false
