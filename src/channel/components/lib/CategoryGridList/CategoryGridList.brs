@@ -27,9 +27,13 @@ Function init()
   ' is what focus thresholds trigger a fetch.
   m.initialBlockSize = m.constants.performance.categoryGridList.initialBlockSize
   m.finalBlockSize = m.constants.performance.categoryGridList.finalBlockSize
+  m.eagerLoad = m.constants.performance.categoryGridList.eagerLoad
 
-  m.RowList.observeFieldScoped("itemFocused", "onItemFocused")
-  m.FeaturedRowList.observeFieldScoped("itemFocused", "onFeaturedItemFocused")
+  ' If eager loading, we don't need to listen for row changes
+  if not m.eagerLoad OR getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v1", true).enabled = true
+    m.RowList.observeFieldScoped("itemFocused", "onItemFocused")
+    m.FeaturedRowList.observeFieldScoped("itemFocused", "onFeaturedItemFocused")
+  end if
 
   experimentsInfo = getExperimentsInfoFromGlobal()
   experiments = TubiExperiments(experimentsInfo)
@@ -644,6 +648,12 @@ Function onCategoryResponseInBatch(msg) As Void
 
       end if
     end for
+
+    if m.eagerLoad then
+      if getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v1", false).enabled = false
+        m.top.loadCategoriesIndex = batchMaxIndex + 1
+      end if
+    end if
 
     if m.top.content <> invalid
       if removableCategories.count() > 0

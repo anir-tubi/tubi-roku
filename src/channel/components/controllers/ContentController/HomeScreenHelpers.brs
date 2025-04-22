@@ -333,7 +333,13 @@ Function fetchHomeScreen(homeScreen)
       params["group_size"] = m.constants.settings.numContainers
     end if
 
-    params[limitParamName] = m.constants.performance.categoryGridList.initialBlockSize
+    initialBlockSize = m.constants.performance.categoryGridList.initialBlockSize
+
+    if initialBlockSize > 0 AND getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v1", true).enabled = true
+      initialBlockSize = 7
+    end if
+
+    params[limitParamName] = initialBlockSize
 
     options.params = params
     options.headers = headers
@@ -614,18 +620,18 @@ Function onColumnFocusChanged(msg)
   columnFocused = msg.getData()
   homeScreen = msg.getRoSGNode()
   rowFocused = homeScreen.currFocusRow
-
   if isNumber(rowFocused) = true AND homeScreen.content <> invalid
     category = homeScreen.content.getChild(rowFocused)
 
     if isNode(category) = true AND category.paginationInfo <> invalid
       cursor = category.paginationInfo.cursor
       hasMoreContent = category.paginationInfo.hasMoreContent
-      if hasMoreContent = true AND cursor = columnFocused + 10
+      if hasMoreContent = true AND  columnFocused >= (cursor - 10) AND category.state <> "containerPaginationRequestPending"
         isKidsMode = shouldKidsModeBeSentToServer()
         isSignedInUser = isLoggedInUser()
-        categoryReqInfo = m.cmsApi.createGetContainerContentsReqInfo(category, homeScreen, isKidsMode, isSignedInUser, m.uiMode)
+        categoryReqInfo = m.cmsApi.createGetContainerContentsReqInfo(category, homeScreen, isKidsMode, isSignedInUser, m.uiMode, false)
         if categoryReqInfo <> invalid
+          category.state = "containerPaginationRequestPending"
           m.makeRequest({
             url: categoryReqInfo.url
             requestType: categoryReqInfo.requestType
@@ -658,6 +664,7 @@ Function onContainerMoreItemsSuccess(response)
         fullJson.append(newJson)
         category.paginationInfo = response.paginationInfo
         category.json = FormatJson(fullJson)
+        category.state = response.state
         category.appendChildren(items)
       end if
     end if

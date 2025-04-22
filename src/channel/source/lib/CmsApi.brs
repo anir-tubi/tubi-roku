@@ -561,7 +561,8 @@ End Function
 '
 ' returns batch requests
 Function cmsApi_createHomeScreenBatchReqInfo(homeScreen, index, bKidsMode = false, isSignedInUser = false, uiMode="standard")
-  if index = 0
+  isLazyLoadExpEnabled = (m.experiments <> invalid AND m.experiments.getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v1").enabled = true)
+  if index = 0 OR isLazyLoadExpEnabled = false
     m.categoryWindowSize = m.constants.performance.categoryGridList.categoryWindowSize
   else
     m.categoryWindowSize = 3
@@ -575,7 +576,7 @@ Function cmsApi_createHomeScreenBatchReqInfo(homeScreen, index, bKidsMode = fals
     if windowInfo.start = 0 AND homeScreen.featuredRowContent <> invalid
       featuredCategory = homeScreen.featuredRowContent.getChild(0)
       if featuredCategory <> invalid
-        categoryReqInfo = m.createGetContainerContentsReqInfo(featuredCategory, homeScreen, bKidsMode, isSignedInUser, uiMode)
+        categoryReqInfo = m.createGetContainerContentsReqInfo(featuredCategory, homeScreen, bKidsMode, isSignedInUser, uiMode, true)
 
         if categoryReqInfo <> invalid
           requests.push(categoryReqInfo)
@@ -589,7 +590,7 @@ Function cmsApi_createHomeScreenBatchReqInfo(homeScreen, index, bKidsMode = fals
     for i = windowInfo.start to (windowInfo.start + windowInfo.size)-1
       category = homeScreen.content.getChild(i)
       if category <> invalid
-        categoryReqInfo = m.createGetContainerContentsReqInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode)
+        categoryReqInfo = m.createGetContainerContentsReqInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode, true)
 
         if categoryReqInfo <> invalid then
           requests.push(categoryReqInfo)
@@ -767,11 +768,12 @@ Function cmsApi_createHomeScreenBatchReqInfoForContainers(containerIds, contentM
 End Function
 
 
-Function cmsApi_createGetContainerContentsReqInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode)
+Function cmsApi_createGetContainerContentsReqInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode, isVerticalLoad = false)
   categoryReqInfo = invalid
   paginationInfo = category.paginationInfo
   isLazyLoadExpEnabled = (m.experiments <> invalid AND m.experiments.getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v1").enabled = true)
-  if category.state = "partial" OR category.state = "none" OR (isLazyLoadExpEnabled = true AND paginationInfo <> invalid AND paginationInfo.hasMoreContent = true)
+  ' Adding a check to allow only on horizontal scroll or initial vertical scroll if we have not fetched the container.
+  if category.state = "partial" OR category.state = "none" OR (isLazyLoadExpEnabled = true AND paginationInfo <> invalid AND paginationInfo.hasMoreContent = true AND (isVerticalLoad = false OR category.state <> "loaded") )
     reqName = m.constants.reqNames.getCategory
 
     categoryId = m.getFullCategoryId(category)
