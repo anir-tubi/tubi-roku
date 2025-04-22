@@ -77,14 +77,6 @@ Function TubiExperiments(experimentsInfo) as Object
           holdout_winning: {"enabled": false}}
       }
 
-      'This experiment will not be under holdout and will clean up once we take the decision.
-      roku_trailer_vs_preview_nav: {
-        roku_trailer_vs_preview_nav_v1: {
-          default: {"enabled": false}
-          holdout_control: {"enabled": false}
-          holdout_winning: {"enabled": false}}
-      }
-
       roku_1080p_resolution: {
         roku_1080p_resolution_v1 : {
           default: {"enabled": false}

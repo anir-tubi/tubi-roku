@@ -78,10 +78,6 @@ Function playContent()
 
   if videoContent.id <> invalid
     previewId = videoContent.previewId
-    'We will remove the trailerId once we remove the roku_trailer_vs_preview_nav_v1 experiment code 
-    if isNonEmptyString(videoContent.trailerId) = true
-      previewId = videoContent.trailerId
-    end if
 
     startPreviewEvent = {
       type: "start_preview"
@@ -138,9 +134,6 @@ Function onVideoStateChange(msg)
       getExperimentResource("roku_multiple_video_preview_nav", "roku_multiple_video_preview_nav_v1")
     end if
 
-    if isNode(m.Video.content) = true AND isNonEmptyString(m.Video.content.trailerId) = true
-      getExperimentResource("roku_trailer_vs_preview_nav", "roku_trailer_vs_preview_nav_v1")
-    end if
   end if
 
   if state = "finished"
@@ -286,10 +279,6 @@ Function getPreviewProgressEvent(pageInfo, callSource)
     end if
 
     previewId = videoContent.previewId
-    'We will remove the trailerId once we remove the roku_trailer_vs_preview_nav_v1 experiment code 
-    if isNonEmptyString(videoContent.trailerId) = true
-      previewId = videoContent.trailerId
-    end if
 
     previewProgressEvent = {
       type: "preview_play_progress"
@@ -329,10 +318,6 @@ Function getFinishPreviewEvent(hasCompleted = false)
 
   videoContent = m.Video.content
   previewId = videoContent.previewId
-  'We will remove the trailerId once we remove the roku_trailer_vs_preview_nav_v1 experiment code 
-  if isNonEmptyString(videoContent.trailerId) = true
-    previewId = videoContent.trailerId
-  end if
 
   finishPreviewEvent = {
     type: "finish_preview"

@@ -200,26 +200,14 @@ Function startVideoPreview(content, pageInfo = {})
     videoContent = createObject("RoSGNode", "ContentNode")
     videoContent.id = content.id
 
-    trailerInfo = content.trailerInfo
-    if isAA(trailerInfo) = true AND isNonEmptyString(content.videoPreviewUrl) = true
-      ' 'We will remove the trailerId once we remove the roku_trailer_vs_preview_nav_v1 experiment code 
-      videoContent.addField("trailerId", "string", false)
-      videoContent.trailerId = trailerInfo.id
-      if getExperimentResource("roku_trailer_vs_preview_nav", "roku_trailer_vs_preview_nav_v1", false).enabled = true
-        videoContent.streamformat = trailerInfo.streamFormat ' this is for trailers playing as preview for roku_trailer_vs_preview_nav_v1 experiment
-        videoContent.url = trailerInfo.url
-      else
-        videoContent.url = content.videoPreviewUrl
-        videoContent.streamformat = "mp4" ' backend will return always as mp4 for video previews
-      end if
+    videoContent.addField("previewId", "string", false)
+    if isNonEmptyString(content.previewId) = true
+      videoContent.previewId = content.previewId
     else
-      if isNonEmptyString(content.previewId) = true
-        videoContent.addField("previewId", "string", false)
-        videoContent.previewId = content.previewId
-      end if
-      videoContent.url = content.videoPreviewUrl
-      videoContent.streamformat = "mp4" ' backend will return always as mp4 for video previews
+      videoContent.previewId = ""
     end if
+    videoContent.url = content.videoPreviewUrl
+    videoContent.streamformat = "mp4" ' backend will return always as mp4 for video previews
 
     homescreenDesignType = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v2", false).design_type
 
