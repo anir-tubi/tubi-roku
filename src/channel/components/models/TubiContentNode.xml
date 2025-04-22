@@ -118,8 +118,5 @@
 
     <field id="adParam" type="assocArray" />-->
 
-    <!-- ID of a preview. It is used to send for analytic events -->
-    <field id="previewId" type="string" />
-
   </interface>
 </component>

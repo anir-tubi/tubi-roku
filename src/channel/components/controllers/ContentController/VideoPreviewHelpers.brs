@@ -199,13 +199,6 @@ Function startVideoPreview(content, pageInfo = {})
 
     videoContent = createObject("RoSGNode", "ContentNode")
     videoContent.id = content.id
-
-    videoContent.addField("previewId", "string", false)
-    if isNonEmptyString(content.previewId) = true
-      videoContent.previewId = content.previewId
-    else
-      videoContent.previewId = ""
-    end if
     videoContent.url = content.videoPreviewUrl
     videoContent.streamformat = "mp4" ' backend will return always as mp4 for video previews
 

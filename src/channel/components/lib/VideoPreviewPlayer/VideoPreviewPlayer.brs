@@ -77,7 +77,6 @@ Function playContent()
   videoContent = m.Video.content
 
   if videoContent.id <> invalid
-    previewId = videoContent.previewId
 
     startPreviewEvent = {
       type: "start_preview"
@@ -85,7 +84,6 @@ Function playContent()
         video_id: videoContent.id.toInt()
         is_fullscreen: false
         video_player: m.top.videoPlayerType
-        preview_id: previewId
         pageOneof: m.tubiTrackingInfo.getAnalyticsPage(m.currentPageInfo.pageType, m.currentPageInfo.pageValues)
       }
     }
@@ -129,10 +127,6 @@ Function onVideoStateChange(msg)
     m.videoState = state
   else if state = "playing"
     m.videoState = "play"
-
-    if isNode(m.Video.content) = true AND isNonEmptyString(m.Video.content.previewId) = true
-      getExperimentResource("roku_multiple_video_preview_nav", "roku_multiple_video_preview_nav_v1")
-    end if
 
   end if
 
@@ -278,7 +272,6 @@ Function getPreviewProgressEvent(pageInfo, callSource)
       end if
     end if
 
-    previewId = videoContent.previewId
 
     previewProgressEvent = {
       type: "preview_play_progress"
@@ -287,7 +280,6 @@ Function getPreviewProgressEvent(pageInfo, callSource)
         position: currentPosition
         view_time: viewTime
         video_player: m.top.videoPlayerType
-        preview_id: previewId
         pageOneof: pgInfo
       }
     }
@@ -316,15 +308,11 @@ End Function
 'set hasCompleted to true when user watches the entire video preview, otherwise set it to false.
 Function getFinishPreviewEvent(hasCompleted = false)
 
-  videoContent = m.Video.content
-  previewId = videoContent.previewId
-
   finishPreviewEvent = {
     type: "finish_preview"
     values: {
       video_id: m.Video.content.id.toInt()
       end_position: Int(m.playerPosition * 1000) 'ms
-      preview_id: previewId
       video_player: m.top.videoPlayerType
       pageOneof: m.tubiTrackingInfo.getAnalyticsPage(m.currentPageInfo.pageType, m.currentPageInfo.pageValues)
       has_completed: hasCompleted
