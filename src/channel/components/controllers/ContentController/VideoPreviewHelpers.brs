@@ -202,6 +202,13 @@ Function startVideoPreview(content, pageInfo = {})
     videoContent.url = content.videoPreviewUrl
     videoContent.streamformat = "mp4" ' backend will return always as mp4 for video previews
 
+    videoContent.addField("previewId", "string", false)
+    if isString(content.previewId) = true
+      videoContent.previewId = content.previewId
+    else
+      videoContent.previewId = ""
+    end if
+
     homescreenDesignType = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v2", false).design_type
 
     if content.parentId = m.constants.ui.categoryIds.featured AND (homescreenDesignType <> "none")

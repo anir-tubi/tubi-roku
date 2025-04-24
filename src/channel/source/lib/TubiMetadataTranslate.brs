@@ -618,8 +618,13 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.has_trailer = true then translatedContent.hasTrailer = true
 
   ' video preview
-  if contentFromServer.video_preview_url <> invalid
+  if isNonEmptyArray(contentFromServer.video_previews) = true AND isAA(contentFromServer.video_previews[0])
+    videoPreview = contentFromServer.video_previews[0]
+    translatedContent.videoPreviewUrl = videoPreview.url
+    translatedContent.previewId = videoPreview.uuid
+  else if contentFromServer.video_preview_url <> invalid
     translatedContent.videoPreviewUrl = contentFromServer.video_preview_url
+    translatedContent.previewId = ""
   end if
 
   'if this content is actually just a paginated response, set pagination data

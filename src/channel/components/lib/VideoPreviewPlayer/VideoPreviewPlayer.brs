@@ -77,6 +77,7 @@ Function playContent()
   videoContent = m.Video.content
 
   if videoContent.id <> invalid
+    previewId = videoContent.previewId
 
     startPreviewEvent = {
       type: "start_preview"
@@ -84,6 +85,7 @@ Function playContent()
         video_id: videoContent.id.toInt()
         is_fullscreen: false
         video_player: m.top.videoPlayerType
+        preview_id: previewId
         pageOneof: m.tubiTrackingInfo.getAnalyticsPage(m.currentPageInfo.pageType, m.currentPageInfo.pageValues)
       }
     }
@@ -127,12 +129,15 @@ Function onVideoStateChange(msg)
     m.videoState = state
   else if state = "playing"
     m.videoState = "play"
-
   end if
 
   if state = "finished"
     finishPreviewEvent = getFinishPreviewEvent(true)
-    trackEvent(finishPreviewEvent)
+
+    if finishPreviewEvent <> invalid
+      trackEvent(finishPreviewEvent)
+    end if
+
     m.top.content = invalid
     m.videoState = "stop"
   else if state = "stopped" then
@@ -222,7 +227,11 @@ Function stopContent()
   if m.videoState <> "stop" AND m.Video.state <> "stopped" then
     if m.Video.content.id <> invalid AND m.playerPosition > 0
       finishPreviewEvent = getFinishPreviewEvent()
-      trackEvent(finishPreviewEvent)
+
+      if finishPreviewEvent <> invalid
+        trackEvent(finishPreviewEvent)
+      end if
+
     end if
 
     ' asyncStopSemantics was broken prior to 14.0 so we are not running it on older firmware versions and don't want to expose for the experiment on older firmware versions
@@ -272,6 +281,7 @@ Function getPreviewProgressEvent(pageInfo, callSource)
       end if
     end if
 
+    previewId = videoContent.previewId
 
     previewProgressEvent = {
       type: "preview_play_progress"
@@ -280,6 +290,7 @@ Function getPreviewProgressEvent(pageInfo, callSource)
         position: currentPosition
         view_time: viewTime
         video_player: m.top.videoPlayerType
+        preview_id: previewId
         pageOneof: pgInfo
       }
     }
@@ -308,16 +319,24 @@ End Function
 'set hasCompleted to true when user watches the entire video preview, otherwise set it to false.
 Function getFinishPreviewEvent(hasCompleted = false)
 
-  finishPreviewEvent = {
-    type: "finish_preview"
-    values: {
-      video_id: m.Video.content.id.toInt()
-      end_position: Int(m.playerPosition * 1000) 'ms
-      video_player: m.top.videoPlayerType
-      pageOneof: m.tubiTrackingInfo.getAnalyticsPage(m.currentPageInfo.pageType, m.currentPageInfo.pageValues)
-      has_completed: hasCompleted
+  videoContent = m.Video.content
+  finishPreviewEvent = invalid
+  if videoContent <> invalid
+    previewId = videoContent.previewId
+
+    finishPreviewEvent = {
+      type: "finish_preview"
+      values: {
+        video_id: videoContent.id.toInt()
+        end_position: Int(m.playerPosition * 1000) 'ms
+        preview_id: previewId
+        video_player: m.top.videoPlayerType
+        pageOneof: m.tubiTrackingInfo.getAnalyticsPage(m.currentPageInfo.pageType, m.currentPageInfo.pageValues)
+        has_completed: hasCompleted
+      }
     }
-  }
+  end if
+
   return finishPreviewEvent
 
 End Function
