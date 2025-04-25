@@ -594,7 +594,7 @@ Function handleOk()
     showBrowseWhileWatching()
   else if (m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3") AND m.sendFeedBackButton.hasFocus() = true
     showSendFeedbackOverlay()
-  else if (m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3") AND m.focusedNode.isSameNode(m.ProgressBar) = true 
+  else if m.focusedNode.isSameNode(m.ProgressBar) = true 
     handlePlayPause()
   else
     'do action based on the current focused button
