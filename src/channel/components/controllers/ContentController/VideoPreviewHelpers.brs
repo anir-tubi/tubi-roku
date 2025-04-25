@@ -170,7 +170,8 @@ End Function
 ' starts the video preview
 ' @content : TubiContentNode, it has all the required information to start the video preview
 ' @pageInfo: assocarray, value can be { pagetype: "home_page", pagevalues: {}}
-Function startVideoPreview(content, pageInfo = {})
+' @componentInfo: assocarray, value can be { componentType: "category_page", componentValues: {}}
+Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
   tubiLog("VideoPreviewHelpers.startVideoPreview")
   
   if content <> invalid AND (isVideoPreviewOn() = true OR (content.gridItemType = m.constants.ui.gridItemTypes.skinAd AND m.constants.deviceInfo.IsAutoplayEnabled = true AND m.constants.deviceInfo.limitedUi = false))
@@ -196,6 +197,8 @@ Function startVideoPreview(content, pageInfo = {})
     videoPreview.observeFieldScoped("state", "onVideoPreviewStateChanged")
     videoPreview.observeFieldScoped("bufferingStatus", "onVideoBufferingStatusChanged")
     setPageInfoForVideoPreview(pageInfo)
+    ' Add componentInfo to the video preview player node for analytics
+    videoPreview.componentInfoForAnalytics = componentInfo
 
     videoContent = createObject("RoSGNode", "ContentNode")
     videoContent.id = content.id
@@ -306,7 +309,8 @@ End Function
 ' setVideoPreviewAfterFocus sets the proper state of the video preview video player when a video content has gained focus
 ' @param focusedContent, roSGNode - The TubiContentNode of the focused content
 ' @pageInfo: assocarray, value can be { pagetype: "home_page", pagevalues: {}}
-Function setVideoPreviewAfterFocus(focusedContent, pageInfo = {})
+' @componentInfo: assocarray, value can be { componentType: "category_page", componentValues: {}}
+Function setVideoPreviewAfterFocus(focusedContent, pageInfo = {}, componentInfo = {})
   tubiLog("VideoPreviewHelpers.setVideoPreviewAfterFocus")
   if focusedContent <> invalid AND focusedContent.type <> invalid AND m.SideNav.opened <> true
     if isVideoPreviewOn() = true OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd
@@ -340,7 +344,7 @@ Function setVideoPreviewAfterFocus(focusedContent, pageInfo = {})
         end if
 
         if focusedContent.videoPreviewUrl <> ""
-          startVideoPreview(focusedContent, pageInfo)
+          startVideoPreview(focusedContent, pageInfo, componentInfo)
         end if
 
       end if

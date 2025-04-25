@@ -150,6 +150,7 @@ Function onItemFocused(_msg)
     if content <> invalid
       ' setting the focused content's Id to contentFocusedId field, later it will be used for setting focus on previous screen(home)
       m.top.contentFocusedId = content.id
+      m.top.contentFocused = content
 
       ' Update the info panel
       populateInfoPanel(m.InfoPanel, content)
@@ -254,6 +255,7 @@ Function updateTrackingInfo(category, content, itemSelected)
       componentValues: {
         category_slug: categorySlug
         category_row: 1
+        category_col: 1
         content_tile: m.Tracking.getAnalyticsTile(content, col, row)
       }
     }

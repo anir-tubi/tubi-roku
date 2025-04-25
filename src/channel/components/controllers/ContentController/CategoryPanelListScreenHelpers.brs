@@ -27,12 +27,17 @@ Function showCategoryPanelListScreen(constants, sendNavigationLoadEvents = true,
     panelScreen.observeFieldScoped("refreshContent", "onRefreshCategoryPanelListSignal")
     panelScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     panelScreen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
-    panelScreen.observeFieldScoped("contentFocused", "onCategoryListContentFocused")
+    panelScreen.observeFieldScoped("categoryListItemFocused", "onCategoryListContentFocused")
     panelScreen.observeFieldScoped("categoryContentSelected", "onCategoryPanelContentSelected")
     panelScreen.observeFieldScoped("contentToPlay", "onContentToPlay")
     panelScreen.observeFieldScoped("categoryBatchIndex", "onCategoryPanelBatchIndexChange")
     panelScreen.observeFieldScoped("visible", "onCategoryPanelListScreenVisibleChange")
     panelScreen.observeFieldScoped("failedJumpToItemByID", "onJumpToIDFailed")
+
+    if isVideoPreviewOn() = true AND getExperimentResource("roku_category_page_video_previews", "roku_category_page_video_previews_v1", true).enabled = true
+      panelScreen.observeFieldScoped("contentFocused", "onCategoryContentFocused")
+      panelScreen.observeFieldScoped("contentGridHasFocus", "onContentGridHasFocusChange")
+    end if
 
     ' Stores state if the categoryPanelScreen is in the process of refreshing/fetching content from API.
     ' Is used to determine when to send the PageLoad analytics event (don't send on refresh)
@@ -128,7 +133,7 @@ End Function
 Function onCategoryDetailPanelResponse(categoryContent)
   tubiLog("CategoryPanelListScreenHelpers.onCategoryDetailPanelResponse")
   screen = getCurrentScreen()
-  focusedItem = screen.contentFocused
+  focusedItem = screen.categoryListItemFocused
 
   if screen.id = m.constants.ui.screenIds.categoryPanelListScreen AND focusedItem <> invalid
     ' the category details screen is still the top screen after receiving the response
@@ -307,7 +312,7 @@ End Function
 ' @param screen, The CategoryPanelListScreen
 Function refreshCategoryPanelListDetailScreen(screen)
   'If the user selects networks from CategoryList Screen we are showing the ChannelListScreen with list of channels.
-  focusedItem = screen.contentFocused
+  focusedItem = screen.categoryListItemFocused
   
   if focusedItem <> invalid
     screen.isCategoryLoading = true
@@ -491,5 +496,30 @@ Function onCategoriesPanelListError(errorInfo)
     showErrorModal(modalInfo, invalid, invalid, removeTopScreen)
     loadTime = Int((Uptime(0) - screen.trackingLoadStartTime) * 1000) 'in ms
     screenTrackingLoad(screen.trackingPageInfo, loadTime, false)
+  end if
+End Function
+
+
+Function onCategoryContentFocused(msg)
+  focusedContent = msg.getData()
+  screen = msg.getRoSGNode()
+  if screen.trackingPageInfo <> invalid
+    setVideoPreviewAfterFocus(focusedContent, screen.trackingPageInfo, screen.componentInteractionInfo)
+  end if
+End Function
+
+
+Function onContentGridHasFocusChange(msg)
+  screen = msg.getRoSGNode()
+  if msg.getData() = false
+    pauseVideoPreview()
+  else
+    focusedContent = screen.contentFocused
+    if focusedContent <> invalid
+      previewState = getVideoPreviewStateForThisContent(focusedContent)
+      if previewState = "paused"
+        resumeVideoPreview()
+      end if
+    end if
   end if
 End Function

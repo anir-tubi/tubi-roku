@@ -123,6 +123,7 @@ Function setUIBasedOnFocus(bAnimateOn = true)
     m.top.backgroundUriList = []
   end if
 
+  m.top.contentGridHasFocus = (m.ContentGrid.isInFocusChain() = true)
 End Function
 
 
@@ -248,6 +249,7 @@ Function onItemFocused(msg)
 
       end if
       m.top.itemFocused = item
+      m.top.contentFocused = focusedContent
     else
       '//if content is not valid, then we should refresh the screen.
       '//Most likely what happened is that the content was modified while the screen is off screen: i.e. ContinuedWatching screen no longer has any content so refreshing the page will most likely result in a content error.

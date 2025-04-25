@@ -138,7 +138,8 @@ Function createNextPanel(content)
     categoryDetailsPanel.observeFieldScoped("categoryBatchIndex", "onCategoryBatchIndexChange")
     categoryDetailsPanel.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
     categoryDetailsPanel.observeFieldScoped("contentToPlay", "onContentToPlay")
-
+    categoryDetailsPanel.observeFieldScoped("contentFocused", "onCategoryContentFocused")
+    categoryDetailsPanel.observeFieldScoped("contentGridHasFocus", "onContentGridHasFocusChange")
     categoryDetailsPanel.categoryId = content.id
     categoryDetailsPanel.isLoading = true
 
@@ -237,6 +238,11 @@ Function onContentToPlay(msg)
 End Function
 
 
+Function onCategoryContentFocused(msg)
+  m.top.contentFocused = msg.getData()
+End Function
+
+
 Function onTransportVoiceResponse(msg)
   TubiLog("CategoryPanelListScreen.onTransportVoiceResponse")
   m.top.transportVoiceResponse = msg.getData()
@@ -312,7 +318,7 @@ End Function
 
 Function onLoadCategoryContent()
   tubiLog("CategoryPanelListScreen.onLoadCategoryContent")
-  if m.top.categoryContent <> invalid AND m.top.contentFocused <> invalid AND m.top.contentFocused.id = m.top.categoryContent.id
+  if m.top.categoryContent <> invalid AND m.top.categoryListItemFocused <> invalid AND m.top.categoryListItemFocused.id = m.top.categoryContent.id
     items = m.top.categoryContent
     categoryDetailsPanel = m.CategoryMenuPanel.nextPanel
     categoryDetailsPanel.content = items
@@ -371,7 +377,7 @@ Function createNextPanelAtIndex(nIndex)
         m.top.categoryTrackingPageInfo = nextPanel.trackingPageInfo
         m.top.categoryId = buttonContent.id
         m.top.categoryContent = invalid
-        m.top.contentFocused = buttonContent
+        m.top.categoryListItemFocused = buttonContent
       end if
     end if
     
@@ -538,4 +544,10 @@ Function onTransportVoiceRequest(msg)
     inputInfo.response = response
     m.top.transportVoiceResponse = inputInfo
   end if
+End Function
+
+
+Function onContentGridHasFocusChange(msg)
+  ' Cannot use alias since the component is created dynamically.
+  m.top.contentGridHasFocus = msg.getData()
 End Function

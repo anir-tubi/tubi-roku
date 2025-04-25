@@ -65,7 +65,7 @@
       <field id="itemFocused" type="integer" alwaysNotify="true"/> 
 
       <!-- the content node representing the item (from the vertical list of categories on the left side) which is in focus -->
-      <field id="contentFocused" type="node" alwaysNotify="true"/>
+      <field id="categoryListItemFocused" type="node" alwaysNotify="true"/>
 
       <!-- the content node representing the item (from the vertical list of categories on the left side) which was clicked on -->
       <field id="contentSelected" type="node" alwaysNotify="true"/>
@@ -73,6 +73,9 @@
 
       <!-- the content node representing the video tile which was clicked on. In case of a screen like networks, the content node will be associated with a network tile -->
       <field id="categoryContentSelected" type="node" alwaysNotify="true"/>
+
+      <!-- the content node representing the video tile which was focused on. In case of a screen like networks, the content node will be associated with a network tile -->
+      <field id="contentFocused" type="node" alwaysNotify="true"/>
 
       <!-- set to the contentNode of the ChannelsVideoGrid content item which was focused when
            the "play" input transport deeplink was triggered
@@ -95,6 +98,8 @@
       <!-- Holds a load time start value [returned from UpTime()] that can be used to determine how long the category panel took to load. -->
       <field id="categoryTrackingLoadStartTime" type="integer" />
 
+      <!-- Indicates if the content grid has focus -->
+      <field id="contentGridHasFocus" type="boolean" />
   </interface>
 
   <children>

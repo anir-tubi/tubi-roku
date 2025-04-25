@@ -89,6 +89,12 @@ Function playContent()
         pageOneof: m.tubiTrackingInfo.getAnalyticsPage(m.currentPageInfo.pageType, m.currentPageInfo.pageValues)
       }
     }
+
+    componentInfo = m.top.componentInfoForAnalytics
+    if isAA(componentInfo) = true AND isAA(componentInfo.componentOneof) = true
+      startPreviewEvent.values.componentOneof = componentInfo.componentOneof
+    end if
+
     trackEvent(startPreviewEvent)
   end if
 
@@ -295,6 +301,11 @@ Function getPreviewProgressEvent(pageInfo, callSource)
       }
     }
 
+    componentInfo = m.top.componentInfoForAnalytics
+    if isAA(componentInfo) = true AND isAA(componentInfo.componentOneof) = true
+      previewProgressEvent.values.componentOneof = componentInfo.componentOneof
+    end if
+
 
     '//TODO:: Below block is added for debugging large viewtime issue. It can be removed when there are no (or very less) large viewtime(>=15000) in preview play_progress event by verifying the datadog logs.
     'Note: This is client bug and we made a possible fix.
@@ -337,8 +348,12 @@ Function getFinishPreviewEvent(hasCompleted = false)
     }
   end if
 
-  return finishPreviewEvent
+  componentInfo = m.top.componentInfoForAnalytics
+  if isAA(componentInfo) = true AND isAA(componentInfo.componentOneof) = true
+    finishPreviewEvent.values.componentOneof = componentInfo.componentOneof
+  end if
 
+  return finishPreviewEvent
 End Function
 
 

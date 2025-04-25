@@ -31,6 +31,9 @@
       <!-- pageInfoForAnalytics is the pageInfo of VideoPreview's parent screen -->
       <field id="pageInfoForAnalytics" type="assocarray" value="{}" />
 
+      <!-- componentInfoForAnalytics is the pageInfo of VideoPreview's parent component -->
+      <field id="componentInfoForAnalytics" type="assocarray" value="{}" />
+
       <!-- supports "play", "stop", "pause" -->
       <field id="control" type="string" value="none" alwaysNotify="true"/>
 

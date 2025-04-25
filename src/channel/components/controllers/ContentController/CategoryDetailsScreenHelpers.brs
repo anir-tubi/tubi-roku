@@ -18,6 +18,9 @@ Function showCategoryDetailsScreen(content, sendNavigationLoadEvents = true, con
   categoryDetailsScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
   categoryDetailsScreen.observeFieldScoped("contentToPlay", "onContentToPlay")
   categoryDetailsScreen.observeFieldScoped("backButtonPressed", "onCategoryDetailsScreenBackButtonPressed")
+  if isVideoPreviewOn() = true AND getExperimentResource("roku_category_page_video_previews", "roku_category_page_video_previews_v1", false).enabled = true
+    categoryDetailsScreen.observeFieldScoped("contentFocused", "onCategoryContentFocused")
+  end if
   categoryDetailsScreen.id = m.constants.ui.screenIds.categoryDetailsScreen
   categoryDetailsScreen.categoryId = content.id
   categoryDetailsScreen.isLoading = true

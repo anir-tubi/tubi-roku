@@ -85,6 +85,9 @@
       -->
       <field id="contentToPlay" type="node" alwaysNotify="true"/>
 
+      <!-- the content node representing the item which was focused on -->
+      <field id="contentFocused" type="node" />
+
       <!-- This field accomplishes 2 things:
               1. tells ContentController/CategoryDetailsScreenHelpers that the category metadata
                   for the category content is out of the cache window and should be updated, value = 0
@@ -117,6 +120,8 @@
       -->
       <field id="trackingPageInfo" type="assocarray" />
       <field id="trackingComponentInfo" type="assocarray" />
+
+      <field id="contentGridHasFocus" type="boolean" />
   </interface>
 
   <children>
