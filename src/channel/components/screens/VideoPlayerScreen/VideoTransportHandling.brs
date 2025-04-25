@@ -927,7 +927,7 @@ Function showClosedCaptionAudioTrackOverlay()
   m.closedCaptionAndAudioSelectionOverlay.availableClosedCaptionTracks = m.video.availableSubtitleTracks
   m.closedCaptionAndAudioSelectionOverlay.availableAudioTracks = m.video.availableAudioTracks
   m.closedCaptionAndAudioSelectionOverlay.setFocus(true)
-  setFocusToComponent(m.closedCaptionAudioButton)
+  m.closedCaptionAudioButton.focusState = false
   fade(m.closedCaptionAndAudioSelectionOverlayGroup, "in", 0.6)
   m.isClosedCaptionAudioOverlayShowing = true
   trackingPageInfo = m.top.trackingPageInfo

@@ -445,7 +445,7 @@ Function init()
 
   m.closedCaptionAndAudioSelectionOverlay = m.top.findNode("closedCaptionAndAudioSelectionOverlay")
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("globalCaptionChanged", "onGlobalCaptionChanged")
-  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("wasBackButtonSelected", "onWasBackButtonSelectedChange")
+  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("wasBackButtonSelected", "onWasCCBackButtonSelectedChange")
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("trackingEventInfo", "onTrackingEventInfoChange")
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("subtitleTrack", "onSubtitleTrackChangedOnCCOverlay")
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("audioTrack", "onAudioTrackChangedOnCCOverlay")
@@ -2902,10 +2902,11 @@ Function onGlobalCaptionChanged(msg)
 End Function
 
 
-Function onWasBackButtonSelectedChange(msg)
+Function onWasCCBackButtonSelectedChange(msg)
   wasBackSelected = msg.getData()
   if wasBackSelected = true
     hideClosedCaptionAudioTrackOverlay()
+    m.closedCaptionAudioButton.focusState = true
   end if
 End Function
 

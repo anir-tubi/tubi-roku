@@ -550,7 +550,7 @@
       width="1920"
       height="1080">
       <ClosedCaptionAndAudioSelectionOverlay
-        translation="[1170, 105]"
+        translation="[1170, 90]"
         id="closedCaptionAndAudioSelectionOverlay" />
     </Rectangle>
 
