@@ -1132,7 +1132,7 @@ Function updateSkinAdRowContent(homeScreen, content)
   if content <> invalid AND (isNonEmptyString(content.title) = true OR isNonEmptyString(content.titleImageUrl) = true) AND isNonEmptyString(content.id) = true AND (isNonEmptyString(content.videoPreviewUrl) = true OR (isNonEmptyArray(content.backgrounds) = true AND isNonEmptyString(content.backgrounds[0]) = true) ) AND isNonEmptyString(content.HDGRIDPOSTERURL) = true
     '//If this is a valid skinAds wrapper, then check if it is part of the experiment.
     '// Fire the experiment's exposure event here, regardless.
-    if m.constants.settings.disableSkinAds = false
+    if m.constants.settings.disableSkinAds = false AND getExperimentResource("ads_tubi_skins", "ads_tubi_skins_v1", true).enabled = true
       '//proceed if the content is valid and has the mandatory fields
       rowContentNode = CreateObject("roSGNode", "SkinAdContentNode")
       rowContentNode.id = content.id

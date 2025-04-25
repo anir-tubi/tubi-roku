@@ -26,7 +26,7 @@
       <!-- When the Helper receives valid category data from the server, it sets the new value to this field. -->
       <field id="content" alias="CategoryGridList.content" />
 
-      <!-- Skin Ad content node, will contain a valid node only if the user is in roku_skins_ad experiment variation group. -->
+      <!-- Skin Ad content node to display a skin ad wrapper campaign on homescreen . -->
       <field id="skinAdContent" alias="CategoryGridList.skinAdContent" />
 
       <!-- The helper class will call this when the new content is ready to be displayed on the screen. -->
