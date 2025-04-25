@@ -959,10 +959,13 @@ End Function
 Function showSendFeedbackOverlay()
   if m.top.appMode <> "KIDS_MODE"
     m.isSendFeedbackOverlayShowing = true
-    setFocusToComponent(m.sendFeedBackButton)
     fade(m.sendFeedbackSelectionOverlayGroup, "in", 0.6)
     m.sendFeedbackSelectionOverlay.itemList = getItemListForSendFeedback()
     m.sendFeedbackSelectionOverlay.setFocus(true)
+
+    if m.sendFeedBackButton.hasField("showLabel") = true
+      m.sendFeedBackButton.showLabel = true
+    end if
 
     'Send Dialog event when sendFeedback button clicked.
     trackingPageInfo = m.top.trackingPageInfo

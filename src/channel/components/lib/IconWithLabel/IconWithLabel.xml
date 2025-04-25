@@ -11,6 +11,7 @@
     <field id="unFocusUri" type="string"/>
     <field id="width" alias="icon.width" />
     <field id="height" alias="icon.height" />
+    <field id="showLabel" alias="label.visible" />
   </interface>
 
   <children>

@@ -595,7 +595,7 @@ Function showQRCodeScreen()
     sendFeedbackQRCodeOverlay.width = 630
     sendFeedbackQRCodeOverlay.height = 960
   else
-    sendFeedbackQRCodeOverlay.translation = [10, -96]
+    sendFeedbackQRCodeOverlay.translation = [0, -96]
     sendFeedbackQRCodeOverlay.width = 660
     sendFeedbackQRCodeOverlay.height = 920
   end if
