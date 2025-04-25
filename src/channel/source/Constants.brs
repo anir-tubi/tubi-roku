@@ -26,7 +26,7 @@ Function getConstants()
     constants.registrySectionIDs.overrides = "overrides"
 
   proxySettings = RegReadAll(constants.registrySectionIDs.proxySettings)
-  if type(proxySettings) = "roAssociativeArray" AND proxySettings.count() > 0 then
+  if type(proxySettings) = "roAssociativeArray" AND proxySettings.charlesProxyEnabled <> invalid AND proxySettings.charlesProxyUrl <> invalid  then
     constants.settings.charlesProxyEnabled = (proxySettings.charlesProxyEnabled = "true")
     constants.settings.charlesProxyUrl = proxySettings.charlesProxyUrl
   end if
