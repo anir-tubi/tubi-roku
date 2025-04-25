@@ -2139,7 +2139,22 @@ Function updateTransportButtons(content)
       spacer.enabled = false
       spacer.width = 800
       m.TransportButtons.appendChild(spacer)
-      m.closedCaptionAudioButton.translation = [1330, 0]
+
+      m.StartButton.uri = "pkg:/images/icon-resume.webp"
+
+      if content.parentType = "series"
+        m.StartButton.translation = [1170, 0]
+      else
+        m.StartButton.translation = [1270, 0]  
+      end if
+      m.TransportButtons.appendChild(m.StartButton)
+
+      if content.parentType = "series"
+        m.EndButton.translation = [1270, 0]
+        m.TransportButtons.appendChild(m.EndButton)
+      end if
+
+      m.closedCaptionAudioButton.translation = [1370, 0]
       m.sendFeedBackButton.translation = [1470, 0]
       m.TransportButtons.appendChild(m.closedCaptionAudioButton)
       m.TransportButtons.appendChild(m.sendFeedBackButton)

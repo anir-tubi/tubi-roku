@@ -121,7 +121,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
             if m.top.isTrailer = true
               setFocusToComponent(m.SkipTrailerButton, true)
             else
-              setFocusToComponent(m.closedCaptionAudioButton, true)
+              setFocusToComponent(m.StartButton, true)
             end if
           else if m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3"
             if m.top.isTrailer = true
@@ -169,7 +169,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
             if m.top.isTrailer = true
               setFocusToComponent(m.SkipTrailerButton, true)
             else
-              setFocusToComponent(m.closedCaptionAudioButton, true)
+              setFocusToComponent(m.StartButton, true)
             end if
           else if m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3"
             if m.top.isTrailer = true
