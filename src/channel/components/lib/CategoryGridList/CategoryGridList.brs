@@ -670,6 +670,13 @@ Function onCategoryResponseInBatch(msg) As Void
     ' Delayed setting of Rowlist content until first batch arrives
     if m.RowList.content = invalid then
       m.RowList.content = m.top.content
+    else if m.RowList.currFocusColumn > -1
+      ' TODO: Remove if we do not graduate roku_home_screen_container_items_lazy_load_v1 experiment.
+      ' This mainly happens because of reloading of the content in the category.
+      category = m.RowList.content.getChild(m.RowList.currFocusRow)
+      if category <> invalid AND category.focusIndex <> m.RowList.currFocusColumn
+        m.RowList.jumpToRowItem = m.RowList.rowItemFocused
+      end if
     end if
 
     ' inform home screen of first content after content has been set on RowList
