@@ -370,7 +370,6 @@
         visible="false"
         width="72"
         height="72"
-        text="Send Feedback"
         focusUri="pkg:/images/transport/sgplayer/icon-feedback-focus.webp"
         unFocusUri="pkg:/images/transport/sgplayer/icon-feedback-unfocused.webp"/>
 

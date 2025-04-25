@@ -1877,5 +1877,17 @@
   "m_left":{
     "description": "Indicates time left in the format 'y m left'",
     "message": "{minutes}m left"
+  },
+  "videoPlayer_button_nextEpisode": {
+    "description": "Label of button to allow users to play next episode",
+    "message": "Next Episode"
+  },
+  "videoPlayer_button_audio_subtitles": {
+    "description": "Label of button to allow users to open CC overlay",
+    "message": "Audio & Subtitles"
+  },
+  "videoPlayer_button_watchMovie": {
+    "description": "Label of button to allow users to watch movie from trailer screen",
+    "message": "Watch Movie"
   }
 }

@@ -2239,7 +2239,7 @@ Function createTransportButtons()
 
   m.SkipTrailerButtonLabel = CreateObject("roSGNode", "Label")
   m.SkipTrailerButtonLabel.id = "SkipTrailerButtonLabel"
-  m.SkipTrailerButtonLabel.text = "Watch Movie"
+  m.SkipTrailerButtonLabel.text = getTranslation("videoPlayer_button_watchMovie")
   m.SkipTrailerButtonLabel.width = 260
   m.SkipTrailerButtonLabel.height = 80
   m.SkipTrailerButtonLabel.horizAlign = "center"
@@ -2316,12 +2316,12 @@ Function createTransportButtons()
   m.PlayFromBeginning.id = "PlayFromBeginning"
   m.PlayFromBeginning.translation = [m.marginX, 0]
   m.PlayFromBeginning.uri = "pkg:/images/icon-resume.webp"
-  m.PlayFromBeginning.text = "Play From Beginning"
+  m.PlayFromBeginning.text = getTranslation("screenDetails_button_startOver")
 
   m.NextEpisode = CreateObject("roSGNode", "TextIconButton")
   m.NextEpisode.id = "NextEpisode"
   m.NextEpisode.uri = "pkg:/images/transport/sgplayer/icon-to-end.webp"
-  m.NextEpisode.text = "Next Episode"
+  m.NextEpisode.text = getTranslation("videoPlayer_button_nextEpisode")
 
   m.SkipTrailerButton.translation = [m.marginX, m.SkipTrailerButton.translation[1]]
 
@@ -2344,14 +2344,15 @@ Function createTransportButtons()
     m.SkipTrailerButton.id = "SkipTrailerButton"
     m.SkipTrailerButton.visible = false
     m.SkipTrailerButton.uri = "pkg:/images/transport/sgplayer/icon-play.webp"
-    m.SkipTrailerButton.text = "Watch Movie"
+    m.SkipTrailerButton.text = getTranslation("videoPlayer_button_watchMovie")
 
     m.closedCaptionAudioButton = CreateObject("roSGNode", "TextIconButton")
     m.closedCaptionAudioButton.id = "closedCaptionAudioButton"
     m.closedCaptionAudioButton.uri = "pkg:/images/transport/sgplayer/icon-subtitles.webp"
-    m.closedCaptionAudioButton.text = "Audio & Subtitles"
+    m.closedCaptionAudioButton.text = getTranslation("videoPlayer_button_audio_subtitles")
 
     m.sendFeedBackButton = m.top.findNode("sendFeedBackButtonTopRight")
+    m.sendFeedBackButton.text = getTranslation("send_feedback_overlay_title")
     m.focusedNode = m.progressBar
   end if
 
