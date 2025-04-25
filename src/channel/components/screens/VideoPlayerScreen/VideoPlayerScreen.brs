@@ -404,8 +404,10 @@ Function init()
 
   m.titleImage = CreateObject("roSGNode", "Poster")
   m.titleImage.id = "VideoOverlayTitleImage"
-  m.titleImage.width = "366"
-  m.titleImage.height = "57"
+  m.titleImage.loadWidth = 366
+  m.titleImage.loadHeight = 57
+  m.titleImage.loadDisplayMode = "limitSize"
+  m.titleImage.observeFieldScoped("loadStatus" , "onDisplayTitleArt")
 
   m.episodeTitle = CreateObject("roSGNode", "Label")
   m.episodeTitle.id = "VideoOverlayEpisodeTitle"
@@ -2078,6 +2080,7 @@ Function updateVideoPlayerState(content) as Void
 
   if m.playerControlExperimentType = "variant3"
     if content.titleImageUrl <> ""
+      m.titleImage.uri = ""
       m.titleImage.uri = content.titleImageUrl
       m.titleGroup.appendChild(m.titleImage)
     else
@@ -2089,6 +2092,27 @@ Function updateVideoPlayerState(content) as Void
   m.titleGroup.appendChild(m.episodeTitle)
 
   updateTransportButtons(content)
+End Function
+
+
+Function onDisplayTitleArt(msg)
+  loadStatus = msg.getData()
+
+  if loadStatus = "failed"
+    content = m.top.content
+
+    if content.parentType = "series"
+      m.TitleGroup.translation = [m.constants.ui.translations.player.marginX, 540]
+    else
+      m.TitleGroup.translation = [m.constants.ui.translations.player.marginX, 580]
+    end if
+
+    m.titleGroup.removeChild(m.titleImage)
+    m.titleGroup.insertChild(m.title, 0)
+  else if loadStatus = "ready"
+    m.titleGroup.removeChild(m.title) 'needed this line, because this function gets triggered twice as we are setting empty uri before setting actual uri for poster
+    m.TitleGroup.translation = [m.constants.ui.translations.player.marginX, 580]
+  end if
 End Function
 
 
