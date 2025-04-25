@@ -115,6 +115,8 @@ Function onComponentFocus()
       m.GridSeries.setFocus(true)
     end if
   else if m.top.isInFocusChain() <> true
+    m.top.itemFocused = 0
+    m.GridMovie.jumpToItem = 0
     m.isUpNextFocused = false
     m.GridMovie.setFocus(false)
     m.GridSeries.setFocus(false)
@@ -401,7 +403,6 @@ Function onHide()
   fade(m.UpNextGradient, "out", 0.75)
   fade(m.UpNextUI, "out", 0.75)
   m.isUpNextFocused = false
-  m.GridMovie.jumpToItem = 0
 End Function
 
 
