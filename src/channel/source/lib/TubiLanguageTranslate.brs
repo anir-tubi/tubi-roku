@@ -2304,10 +2304,6 @@ Function getTranslation_es_MX()
       "description": "The contact info displayed in an error dialog",
       "message": "Por favor, ponte en contacto con: support@tubi.tv si esto sigue sucediendo."
     },
-    "dialog_errorMessageDescription": {
-      "description": "The message info displayed in an error dialog",
-      "message": "Encontramos un error inesperado."
-    },
     "dialog_button_exit": {
       "description": "In a popup dialog that asks if the user if they wish to exit the app. This is the button that will confirm their exit.",
       "message": "Salir"
@@ -4005,6 +4001,18 @@ Function getTranslation_es_MX()
     "m_left": {
       "description": "Indicates time left in the format 'y m left'",
       "message": "{minutes}m quedan"
+    },
+    "videoPlayer_button_nextEpisode": {
+      "description": "Label of button to allow users to play next episode",
+      "message": "Siguiente Capítulo"
+    },
+    "videoPlayer_button_audio_subtitles": {
+      "description": "Label of button to allow users to open CC overlay",
+      "message": "Audio y Subtítulos"
+    },
+    "videoPlayer_button_watchMovie": {
+      "description": "Label of button to allow users to watch movie from trailer screen",
+      "message": "Ver Película"
     }
   }
 End Function
@@ -4151,10 +4159,6 @@ Function getTranslation_fr_CA()
     "dialog_errorMessageContact": {
       "description": "The contact info displayed in an error dialog",
       "message": "Veuillez envoyer un e-mail à support@tubi.tv si ce problème persiste."
-    },
-    "dialog_errorMessageDescription": {
-      "description": "The message info displayed in an error dialog",
-      "message": "Nous avons rencontré une erreur inattendue."
     },
     "dialog_button_exit": {
       "description": "In a popup dialog that asks if the user if they wish to exit the app. This is the button that will confirm their exit.",
@@ -5849,6 +5853,18 @@ Function getTranslation_fr_CA()
     "m_left": {
       "description": "Indicates time left in the format 'y m left'",
       "message": "{minutes}m restantes"
+    },
+    "videoPlayer_button_nextEpisode": {
+      "description": "Label of button to allow users to play next episode",
+      "message": "Prochain épisode"
+    },
+    "videoPlayer_button_audio_subtitles": {
+      "description": "Label of button to allow users to open CC overlay",
+      "message": "Audio et sous-titres"
+    },
+    "videoPlayer_button_watchMovie": {
+      "description": "Label of button to allow users to watch movie from trailer screen",
+      "message": "Regarder film"
     }
   }
 End Function
