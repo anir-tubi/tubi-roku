@@ -1591,6 +1591,9 @@ Function showTransport()
     getExperimentResource("roku_send_feedback_on_player", "roku_send_feedback_on_player_v1")
   end if
 
+  'Firing the exposure event when transport UI is displayed.
+  getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v1")
+
   creditCuePoints = getCreditCuepointsFromContent(m.top.content)
   if m.top.hasFocus() = true AND isSkipIntroCuePointsReached(creditCuePoints) = false
     ' Only set focus on the play/pause button if the video player has focus (as opposed to some other UI)
