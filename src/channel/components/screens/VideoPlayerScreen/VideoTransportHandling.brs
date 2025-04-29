@@ -1655,7 +1655,9 @@ Function animateTransport(direction)
   end if
 
   m.hudState = slideFade(m.HUD, "below", direction, 0.6)
-  m.hudState.observeFieldScoped("state" , "onHudStateChanged")
+  if m.hudState <> invalid
+    m.hudState.observeFieldScoped("state" , "onHudStateChanged")
+  end if
 End Function
 
 
