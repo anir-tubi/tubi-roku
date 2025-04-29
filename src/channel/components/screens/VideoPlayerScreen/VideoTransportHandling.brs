@@ -159,6 +159,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         end if
 
       else if key = "down"
+
         if (m.TopOverlay.opacity = 0 AND m.Thumbnail.visible = false) AND m.focusedNode.isSameNode(m.BrowseWhileWatching) = false
           showTransport()
           showBrowseWhileWatching()
@@ -182,7 +183,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           setFocusToComponent(m.ProgressBar)
         else if (m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3") AND m.focusedNode.isSameNode(m.sendFeedBackButton) = true
           if m.skipCuepointsButton.visible = true
-            m.skipCuepointsButton.setFocus(true)
+            setFocusToComponent(m.skipCuepointsButton)
           else
             setFocusToComponent(m.ProgressBar)
           end if
@@ -596,6 +597,8 @@ Function handleOk()
     showSendFeedbackOverlay()
   else if m.focusedNode.isSameNode(m.ProgressBar) = true 
     handlePlayPause()
+  else if m.focusedNode.isSameNode(m.skipCuepointsButton) = true 
+    onSkipCuepointsButtonSelected()  
   else
     'do action based on the current focused button
     buttonComponent = m.TransportButtons
@@ -604,6 +607,7 @@ Function handleOk()
     end if
 
     focusButtonId = buttonComponent.getChild(m.focusedButtonIndex).id
+
     if focusButtonId = m.SkipTrailerButton.id
       handleSkipTrailer()
     else if focusButtonId = m.StartButton.id OR focusButtonId = m.PlayFromBeginning.id
@@ -1678,7 +1682,7 @@ Function handleSkipCuepointsButtonOnAnimateTransport(direction)
       hideSkipCuepointsButton()
     else if m.skipCuepointsButton.visible = true AND m.skipCuepointsButtonTimer <> invalid
       slideTo(m.skipCuepointsButton,[skipCuepointsButtonTransLation[0], m.skipCuepointsButtonDownTranslation], 0.6)
-      m.skipCuepointsButton.setFocus(true)
+      setFocusToComponent(m.skipCuepointsButton)
     else if m.skipCuepointsButton.visible = true AND m.skipCuepointsButtonTimer = invalid
       hideSkipCuepointsButton()
     end if
