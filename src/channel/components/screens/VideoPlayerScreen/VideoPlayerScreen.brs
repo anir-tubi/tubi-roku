@@ -426,11 +426,18 @@ Function init()
   setTypographyOfLabel(m.ratedLabel, m.typographyConstants.ids.bodySmallStrong)
   setTypographyOfLabel(m.ratingLabel, m.typographyConstants.ids.bodyExtraSmallStrong)
   setTypographyOfLabel(SkipTrailerButtonLabel, m.typographyConstants.ids.bodyLargeStrong)
-  setTypographyOfLabel(m.ElapsedLabel, m.typographyConstants.ids.bodySmallStrong)
+
+  if m.playerControlExperimentType = "none"
+    setTypographyOfLabel(m.ElapsedLabel, m.typographyConstants.ids.bodyLargeStrong)
+    setTypographyOfLabel(m.RemainingLabel, m.typographyConstants.ids.bodyLargeStrong)
+  else
+    setTypographyOfLabel(m.ElapsedLabel, m.typographyConstants.ids.bodySmallStrong)
+    setTypographyOfLabel(m.RemainingLabel, m.typographyConstants.ids.bodySmallStrong)
+  end if
+
   setTypographyOfLabel(m.currentSeekLabel, m.typographyConstants.ids.bodySmallStrong)
   setTypographyOfLabel(m.quickSeekLabel, m.typographyConstants.ids.bodySmallStrong)
   setTypographyOfLabel(m.LoadingMessage, m.typographyConstants.ids.subheaderMedium)
-  setTypographyOfLabel(m.RemainingLabel, m.typographyConstants.ids.bodySmallStrong)
   setTypographyOfLabel(m.descriptorCode, m.typographyConstants.ids.bodyExtraSmallStrong)
   setTypographyOfLabel(m.descriptorDesc, m.typographyConstants.ids.bodySmall)
   setTypographyOfLabel(m.seekSpeed, m.typographyConstants.ids.bodySmallStrong)
