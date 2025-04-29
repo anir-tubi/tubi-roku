@@ -259,7 +259,6 @@ Function init()
   m.ElapsedLabel = createObject("roSGNode", "Label")
   m.ElapsedLabel.id = "ElapsedLabel"
   m.ElapsedLabel.text = "00:00:00"
-  m.ElapsedLabel.width = 500
   m.ElapsedLabel.translation = [m.marginX, 0]
   m.timeGroup.appendChild(m.ElapsedLabel)
 
@@ -867,10 +866,14 @@ Function onContentChange() As Void
   stopVideo()
 
   if m.top.isTrailer = false AND m.top.appMode <> "KIDS_MODE" AND getExperimentResource("roku_send_feedback_on_player", "roku_send_feedback_on_player_v1", false).enabled = true
-    m.sendFeedBackButton.enabled = true
+    if m.sendFeedBackButton.hasField("enabled") = true
+      m.sendFeedBackButton.enabled = true
+    end if
     m.sendFeedBackButton.visible = true
   else
-    m.sendFeedBackButton.enabled = false
+    if m.sendFeedBackButton.hasField("enabled") = true
+      m.sendFeedBackButton.enabled = false
+    end if
     m.sendFeedBackButton.visible = false
   end if
 
@@ -2126,9 +2129,11 @@ End Function
 
 
 Function updateTransportButtons(content)
-  if m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3"
+  if m.playerControlExperimentType <> "none"
     m.ProgressBar.highlightPointer = true 'to show black srubber on progresBar
+  end if  
 
+  if m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3"
     childrenCount = m.TransportLayoutGroup.getChildCount()
     m.TransportLayoutGroup.removeChildrenIndex(childrenCount, 0)
     m.TransportButtons.removeChild(m.TransportLayoutGroup)
@@ -2175,20 +2180,25 @@ Function updateTransportButtons(content)
 
       m.StartButton.uri = "pkg:/images/icon-resume.webp"
 
+      extraPadding = 0
+      if m.top.appMode = "KIDS_MODE"
+        extraPadding = 100
+      end if
+
       if content.parentType = "series"
-        m.StartButton.translation = [1170, 0]
+        m.StartButton.translation = [1170 + extraPadding, 0]
       else
-        m.StartButton.translation = [1270, 0]  
+        m.StartButton.translation = [1270 + extraPadding, 0]  
       end if
       m.TransportButtons.appendChild(m.StartButton)
 
       if content.parentType = "series"
-        m.EndButton.translation = [1270, 0]
+        m.EndButton.translation = [1270 + extraPadding, 0]
         m.TransportButtons.appendChild(m.EndButton)
       end if
 
-      m.closedCaptionAudioButton.translation = [1370, 0]
-      m.sendFeedBackButton.translation = [1470, 0]
+      m.closedCaptionAudioButton.translation = [1370 + extraPadding, 0]
+      m.sendFeedBackButton.translation = [1470 + extraPadding, 0]
       m.TransportButtons.appendChild(m.closedCaptionAudioButton)
       m.TransportButtons.appendChild(m.sendFeedBackButton)
     end if

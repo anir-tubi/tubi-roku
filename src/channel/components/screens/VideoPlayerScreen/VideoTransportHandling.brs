@@ -145,8 +145,6 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         else if m.skipCuepointsButton.hasFocus() = true
           if (m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3") AND m.TopOverlay.opacity = 1.0 AND m.sendFeedBackButton.visible = true
             setFocusToComponent(m.sendFeedBackButton)
-          else
-            setFocusToComponent(m.progressBar)
           end if
         else if m.focusedNode.isSameNode(m.progressBar) = false  
           if m.focusedNode.isSameNode(m.sendFeedBackButton) = true AND (m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3")
@@ -915,7 +913,12 @@ Function handleSkipVideo(amt)
       end if
 
       m.quickSeekLabel.text = currentSeekPosition
-      showQuickSeekLabelAndIcon()
+
+      if isNonEmptyString(currentSeekPosition) = true
+        showQuickSeekLabelAndIcon()
+      else
+        hideQuickSeekLabelAndIcon()  
+      end if
 
     end if  
     
@@ -1298,6 +1301,10 @@ Function jumpToPosition(position)
   historyPosition(m.positionAtJumpStart)
 
   updateLastPingTime(m.playerPosition)
+
+  if m.playerControlExperimentType <> "none"
+    fade(m.controlIcon, "out", 0.6)
+  end if
 
   m.Thumbnail.visible = false
   hideSeekGroup()
@@ -1715,6 +1722,10 @@ End Function
 Function showThumbnail()
   tubiLog("videoTransportHandling.showThumbnail")
   if m.Thumbnail.spriteUrls <> invalid AND m.Thumbnail.spriteUrls.count() > 0
+    if m.playerControlExperimentType <> "none"
+      m.thumbnail.showBorder = true
+    end if
+
     m.Thumbnail.visible = true
   else
     m.Thumbnail.visible = false
@@ -1736,6 +1747,13 @@ End Function
 
 Function showQuickSeekLabelAndIcon()
   m.quickSeekLabel.visible = true
+  elapsedLabelWidth = m.ElapsedLabel.boundingRect().width
+
+  if elapsedLabelWidth = 0
+    elapsedLabelWidth = 100
+  end if
+
+  m.quickSeekIcon.translation = [m.marginX + elapsedLabelWidth + 10, -2]
   m.quickSeekIcon.visible = true
 End Function
 
@@ -2140,9 +2158,11 @@ Function animateTransportAndBrowseWhileWatching(direction)
         hideTopOverlay()
       end if
       if m.playerControlExperimentType <> "none"
+        m.thumbnail.showBorder = true
         hideQuickSeekLabelAndIcon()
         showSeekGroup()
       end if
+      
       m.Thumbnail.visible = true
     else
       fade(m.TopOverlay, "in", 0.6, 0.2)

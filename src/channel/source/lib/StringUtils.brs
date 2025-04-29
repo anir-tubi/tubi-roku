@@ -3,8 +3,8 @@
 '
 ' take a float or integer length in seconds, transform to timestamp "HH:MM:SS".
 Function formatLengthAsTimestamp(length As Dynamic) As String
-  if type(length) = "roFloat" or type(length) = "Double" then length = Int(length)
-  if (type(length) = "Integer" or type(length) = "roInteger") AND length > 0 then
+  if type(length) = "Float" OR type(length) = "roFloat" OR type(length) = "Double" then length = Int(length)
+  if (type(length) = "Integer" OR type(length) = "roInteger") AND length > 0 then
     hours = length \ 3600
     minutes = (length mod 3600) \ 60
     seconds = length mod 60
@@ -22,8 +22,8 @@ End Function
 ' take a float or integer length in seconds, transform to timestamp "MM:SS".
 ' if the length is >= 3600, then it will return as "HH:MM:SS"
 Function formatLengthasMinsAndSecs(length As Dynamic) As String
-  if type(length) = "roFloat" or type(length) = "Double" then length = Int(length)
-  if (type(length) = "Integer" or type(length) = "roInteger") AND length >= 0 then
+  if type(length) = "Float" OR type(length) = "roFloat" or type(length) = "Double" then length = Int(length)
+  if (type(length) = "Integer" OR type(length) = "roInteger") AND length >= 0 then
     minutes = (length mod 3600) \ 60
     seconds = length mod 60
     result = padString(stri(minutes), 2, "0") + ":" + padString(stri(seconds), 2, "0")
