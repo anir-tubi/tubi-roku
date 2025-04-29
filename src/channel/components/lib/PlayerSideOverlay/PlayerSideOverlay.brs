@@ -29,12 +29,13 @@ Function onItemListChanged(msg)
     outerLayoutGroup = createObject("roSGNode", "LayoutGroup")
     outerLayoutGroup.layoutDirection = "vert"
     outerLayoutGroup.vertAlignment = "custom"
-    outerLayoutGroup.itemSpacings = [40]
 
     if m.playerControlExperimentType = "none" OR m.playerControlExperimentType = "variant1"
       outerLayoutGroup.translation = [60, 60]
+      outerLayoutGroup.itemSpacings = [40]
     else
       outerLayoutGroup.translation = [24, 24]
+      outerLayoutGroup.itemSpacings = [24]
     end if
 
     for i = 0 to itemList.Count() - 1

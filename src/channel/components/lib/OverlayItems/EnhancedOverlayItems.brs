@@ -32,7 +32,7 @@ Function onItemInfoChanged(msg)
     titleLabel = createObject("roSGNode", "Label")
     titleLabel.id = items.id.trim()
     titleLabel.text = items.title
-    titleLabel.height = 40
+    titleLabel.height = 24
     titleLabel.color = m.tertiaryTextColor
     m.overLayItemsLayoutGroup.appendChild(titleLabel)
     setTypographyOfLabel(titleLabel, typographyConstants.ids.bodyMediumStrong)
