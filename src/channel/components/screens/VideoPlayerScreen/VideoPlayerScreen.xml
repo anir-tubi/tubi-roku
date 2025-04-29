@@ -412,16 +412,15 @@
             horizAlignment="left"
             itemSpacings="[3]"
             translation="[10,18]">
+            <SimpleLabel
+              id="seekSpeedLabel"
+              text="1"/>
             <Poster
               id="seekIcon"
               width="19"
               height="12"
               uri="pkg:/images/transport/sgplayer/icon-vector-fwd.webp"
               loadSync="true"/>
-            <SimpleLabel
-              id="seekSpeedLabel"
-              width="18"
-              text="1"/>
           </LayoutGroup>    
         </Poster>  
 

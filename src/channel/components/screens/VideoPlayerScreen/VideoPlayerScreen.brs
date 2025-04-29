@@ -294,6 +294,7 @@ Function init()
   m.seekGroup = m.top.findNode("seekGroup")
   m.currentSeekLabel = m.top.findNode("currentSeekLabel")
   m.seekControlGroup = m.top.findNode("seekControlGroup")
+
   m.seekSpeed = m.top.findNode("seekSpeedLabel")
   m.seekIcon = m.top.findNode("seekIcon")
   m.quickSeekLabel = m.top.findNode("quickSeekLabel")
@@ -841,6 +842,7 @@ Function onThemeChange(msg = invalid)
     m.sendFeedbackSelectionOverlayGroup.color = theme.shadeColor
     m.seekSpeed.color = theme.backgroundColor
     m.LoadingSpinner.blendColor = m.focusedColor
+    m.seekIcon.blendColor = theme.backgroundColor
 
     if theme.id = m.constants.ui.themeIDs.kidsMode
       m.logo.visible = false

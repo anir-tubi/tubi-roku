@@ -701,8 +701,8 @@ Function handleFastForward()
     m.seekSpeed.text = seekSpeed
     childrenCount = m.seekControlGroup.getChildCount()
     m.seekControlGroup.removeChildrenIndex(childrenCount, 0)
-    m.seekControlGroup.appendChild(m.seekIcon)
     m.seekControlGroup.appendChild(m.seekSpeed)
+    m.seekControlGroup.appendChild(m.seekIcon)
     m.thumbnail.showBorder = true
   end if
 
@@ -754,8 +754,8 @@ Function handleRewind()
     m.seekSpeed.text = seekSpeed
     childrenCount = m.seekControlGroup.getChildCount()
     m.seekControlGroup.removeChildrenIndex(childrenCount, 0)
-    m.seekControlGroup.appendChild(m.seekSpeed)
     m.seekControlGroup.appendChild(m.seekIcon)
+    m.seekControlGroup.appendChild(m.seekSpeed)
     m.thumbnail.showBorder = true
   end if
 
