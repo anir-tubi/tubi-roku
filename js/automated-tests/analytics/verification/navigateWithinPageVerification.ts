@@ -702,12 +702,12 @@ export async function verifyC524595() {
 		navigateWithinPage.navigate_within_page.category_component
 			.category_slug
 	).equal(
-		'featured',
+		'recommended_for_you',
 		`event should contain navigateWithinPage.navigate_within_page.category_component.category_slug===featured \n
 	${JSON.stringify(navigateWithinPage)} \n`
 	);
 	expect(navigateWithinPage.navigate_within_page.vertical_location).equal(
-		1,
+		2,
 		`event should contain navigateWithinPage.navigate_within_page.vertical_location===2 \n
 	${JSON.stringify(navigateWithinPage)} \n`
 	);

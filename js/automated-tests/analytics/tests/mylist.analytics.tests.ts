@@ -84,7 +84,7 @@ describe('My List events', function () {
 
 	it('when toggle left side nav on My List page C150666 and C150672 and C150665 and C439643 and C439644 and C439645 @analyticsASet2,@analyticsMyList', async () => {
 		const homePage = HomePage();
-		const myStuff = await homePage.selectSideNavTab(tabs.myStuff,7);
+		const myStuff = await homePage.selectSideNavTab(tabs.myStuff, 7);
 		const activate = await myStuff.selectUnlockNow();
 		await activate.clickOnLetsCreateYourAccount();
 		await verifyC150666andC150672andC150665();
@@ -96,7 +96,7 @@ describe('My List events', function () {
 
 	it('Analytics: Guest User - How many users click “Cancel” on “Lets create your Tubi account” modal? C439646 @analyticsASet2,@analyticsMyList', async () => {
 		const homePage = HomePage();
-		const myStuff = await homePage.selectSideNavTab(tabs.myStuff,7);
+		const myStuff = await homePage.selectSideNavTab(tabs.myStuff, 7);
 		const activate = await myStuff.selectUnlockNow();
 		await activate.clickCancelForCreateAccount();
 		await verifyC439646();
@@ -104,7 +104,7 @@ describe('My List events', function () {
 
 	it('Analytics: Guest User - Dialog event when selecting the my stuff menu item and registering C348169 and C348170 and C150665 and C3840 C151880 @analyticsASet2,@analyticsMyList', async () => {
 		const homePage = HomePage();
-		const myStuff = await homePage.selectSideNavTab(tabs.myStuff,7);
+		const myStuff = await homePage.selectSideNavTab(tabs.myStuff, 7);
 		const activate = await myStuff.selectUnlockNow();
 		await verifyC348168();
 		await verifyC3840();
@@ -165,7 +165,7 @@ describe('My List events', function () {
 		await verifyC439649(342067);
 	});
 
-  it('Analytics: Registered User - How many users select one TV Show title within My List and land on the titleâ€™s details page? C439651 @analyticsASet2,@analyticsMyList', async () => {
+	it('Analytics: Registered User - How many users select one TV Show title within My List and land on the titleâ€™s details page? C439651 @analyticsASet2,@analyticsMyList', async () => {
 		const user = await testUtils.createRegisteredUser();
 		await addTheFreakBrothersTVShowToMyList(user);
 		await testUtils.startApplicationAtPage('home', { user: user });

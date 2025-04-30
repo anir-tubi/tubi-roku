@@ -4,6 +4,7 @@ export const NODES = {
 	TITLE_DESCRIPTION_MOVIE: 'titleDescriptionOnHomeScreen',
 	ESPANOL_SCREEN_ROW_LIST: 'espanolScreenRowList',
 	HOME_SCREEN_ROW_LIST: 'homeRowList',
+	TITLE_DESCRIPTION_HOME: 'titleDescriptionHomesScreen',
 };
 
 export const ButtomValues = {

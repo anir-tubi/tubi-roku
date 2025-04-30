@@ -40,7 +40,7 @@ const elements = typeCheckElements({
   },
 
   previewOff: {
-    keyPath:'#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.3.#Offset.#ContentGroup.#AutoplayPreviewMenu.1.#container',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.3.#Offset.#ContentGroup.#AutoplayPreviewMenu.1.#container',
   },
 
   episodesList: {
@@ -97,9 +97,9 @@ const elements = typeCheckElements({
   },
 
   /** Categories details page */
-  categoriesDetailsPageInfo:{
+  categoriesDetailsPageInfo: {
     keyPath:
-    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsInfoPanel.#infoPanelGroup.#Offset',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsInfoPanel.#infoPanelGroup.#Offset',
   },
 
   categoryGridTitle: {
@@ -110,7 +110,7 @@ const elements = typeCheckElements({
   /** Network page infopanel */
   networkPageInfoPanelDescription: {
     keyPath:
-    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsInfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsInfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description',
   },
 
   /** TV Shows screen row list */
@@ -126,20 +126,20 @@ const elements = typeCheckElements({
   },
 
   /** Sea Lion Sign In to Watch text */
-  slSignInToWatch:{
+  slSignInToWatch: {
     keyPath:
-    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#purpleCarpetRow.0.#infoPanelGroup.#ctaButtonList.0.#menuItemTextFocused',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#purpleCarpetRow.0.#infoPanelGroup.#ctaButtonList.0.#menuItemTextFocused',
   },
 
   slWatchLiveButton: {
     keyPath:
-    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#purpleCarpetRow.0.#infoPanelGroup.#ctaButtonList.0.#menuItemBg',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#purpleCarpetRow.0.#infoPanelGroup.#ctaButtonList.0.#menuItemBg',
 
   },
 
-  slWatchLiveText:{
+  slWatchLiveText: {
     keyPath:
-    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#purpleCarpetRow.0.#infoPanelGroup.#ctaButtonList.0.#menuItemTextFocused',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#purpleCarpetRow.0.#infoPanelGroup.#ctaButtonList.0.#menuItemTextFocused',
   },
 
   /** Live Show screen row list */
@@ -185,20 +185,20 @@ const elements = typeCheckElements({
   },
 
   categoryMyListMenuItemFocused: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuTextFocused', 
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuTextFocused',
   },
 
   categoryMyListMenuItem: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuText', 
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuText',
   },
 
   allEpisodesButton: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuText',
-  }, 
+  },
 
   allEpisodesButtonFocused: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuTextFocused', 
-  }, 
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuTextFocused',
+  },
 
 
 
@@ -241,8 +241,8 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.0.#password',
   },
 
-   /** Password Entry Box */
-   pcPasswordEntryBox: {
+  /** Password Entry Box */
+  pcPasswordEntryBox: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.#contentGroup.#password.#rectBG',
   },
@@ -451,11 +451,11 @@ const elements = typeCheckElements({
   },
 
   channelDescription: {
-   keyPath:'#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsInfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsInfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description',
   },
 
   titleDetailsDescriptionContainer: {
-   keyPath:'#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsInfoPanel.#infoPanelGroup.#Offset.#Title',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsInfoPanel.#infoPanelGroup.#Offset.#Title',
   },
 
   homeRowList: {
@@ -733,26 +733,26 @@ const elements = typeCheckElements({
       '/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/Group/Label',
   },
 
-   /** BWW Row list Poster */
-   browseWhileWatchingRowListPoster: {
+  /** BWW Row list Poster */
+  browseWhileWatchingRowListPoster: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#YmalRow.0.#YmalGroup.#YmalRow.#CategoryGridList.#RowList.0.items.0.#poster',
   },
 
-    /** YMAL detail title */
-    ymalDetailsTitle: {
-      keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#YmalRow.0.#YmalGroup.#Info.#infoPanelGroup.#Offset.#Title',
-    },
+  /** YMAL detail title */
+  ymalDetailsTitle: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#YmalRow.0.#YmalGroup.#Info.#infoPanelGroup.#Offset.#Title',
+  },
 
 
   /** YMAL player poster */
-  videoPlayYmalPoster:{
+  videoPlayYmalPoster: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#YmalRow.0.#YmalGroup.#YmalRow.#CategoryGridList.#RowList.0.items.0.#poster',
   },
 
-    /** BWW Featured header */
-    browseWhileWatchingHeader: {
-      keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#BrowseWhileWatchingRow.0.#BrowseWhileWatchingGroup.#BrowseWhileWatchingRow.#CategoryGridList.#RowList.0.title.#CategoryName',
-    },
+  /** BWW Featured header */
+  browseWhileWatchingHeader: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#BrowseWhileWatchingRow.0.#BrowseWhileWatchingGroup.#BrowseWhileWatchingRow.#CategoryGridList.#RowList.0.title.#CategoryName',
+  },
 
   /** rewind button icon */
   rewindButton: {
@@ -870,11 +870,11 @@ const elements = typeCheckElements({
 
   directorTag: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#DirectorGroup.#DirectorPrefix.#DirectorTag',
-  }, 
+  },
 
   starringTag: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#StarringGroup.#StarringPrefix.#StarringTag',
-  }, 
+  },
 
   searchResultsText: {
     keyPath:
@@ -915,7 +915,7 @@ const elements = typeCheckElements({
   },
 
   trendingSearchResultsGrid: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#PageGroup.#ResultArea.#gridContainer.#trendingSearchResultsContainer.#trendingSearchResultGrid',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#PageGroup.#rightSide.#ResultArea.#gridContainer.#trendingSearchResultsContainer.#trendingSearchResultGrid',
   },
 
   kidsSearchSelected: {
@@ -987,8 +987,8 @@ const elements = typeCheckElements({
 
   /** Fox Player element ID */
   foxPLayerElementID: {
-    keyPath: 
-    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#FoxVideoPlayerWrapperScreen.1.0',
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#FoxVideoPlayerWrapperScreen.1.0',
   },
 
   linearEPGFoxSportsEnEspanolDescription: {
@@ -1084,9 +1084,9 @@ const elements = typeCheckElements({
   },
 
   //** CW Category Row poster */
-  continueWatchingCategoryPoster:{
+  continueWatchingCategoryPoster: {
     keyPath:
-    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid.0.1.#posterLayout.#Poster',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid.0.1.#posterLayout.#Poster',
   },
   //** Empty My List Container */
   emptyMyStuffContainer: {
@@ -1213,9 +1213,9 @@ const elements = typeCheckElements({
   },
 
   episodesScreenRowList: {
-    keyPath: 
-    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#episodeScreen.#PageGroup.#RowList', 
-  }, 
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#episodeScreen.#PageGroup.#RowList',
+  },
 
   /** dialog box sign in button */
   dialogBoxSignInButton: {
@@ -1283,7 +1283,7 @@ const elements = typeCheckElements({
     keyPath:
       '#ContentController.#c25f262.#DialogBox.#ContentArea.#MessageGroup.#Message',
   },
-   /** Group for PC Settings Change */
+  /** Group for PC Settings Change */
   parentalControlsSettingsGroup: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.3.#Offset.#ContentGroup',
   },
@@ -1317,7 +1317,7 @@ const elements = typeCheckElements({
   },
 
   loadingSpinnerLinear: {
-    keyPath:'#ContentController.#uiGroup.#LinearVideoPlayerSpinner.#PosterOrMessage.#SpinnerPoster',
+    keyPath: '#ContentController.#uiGroup.#LinearVideoPlayerSpinner.#PosterOrMessage.#SpinnerPoster',
   },
 
   liveBadgeText: {
@@ -1375,7 +1375,7 @@ const elements = typeCheckElements({
 
   enterEmailAddressHeader: {
     keyPath:
-    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#purpleCarpetRow.0.#infoPanelGroup.#ctaButtonList.0.#menuItemTextFocused',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#purpleCarpetRow.0.#infoPanelGroup.#ctaButtonList.0.#menuItemTextFocused',
   },
 
   ageVerificationPageHeader: {
@@ -1393,7 +1393,7 @@ const elements = typeCheckElements({
 
   ageGateHeaderInRegistrationFlow: {
     keyPath:
-    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.#AgeVerificationPageText.#AgeVerificationPageHeader'
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.#AgeVerificationPageText.#AgeVerificationPageHeader'
   },
 
   /** age gate year box */
@@ -1469,7 +1469,7 @@ const elements = typeCheckElements({
   emailVerificationButton: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#emailVerificationScreen.#pageLayout.#buttonGroup.#resendBtn.#focus9Patch',
   },
-  
+
 
   /** settings screen header */
   settingsScreenHeader: {
@@ -1547,25 +1547,25 @@ const elements = typeCheckElements({
 
   channelSideNav: {
     keyPath:
-       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu'
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu'
   },
 
   channelRecommendedButton: {
     keyPath:
 
-    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.0.#DetailsMenuTextParent.#DetailsMenuTextFocused',
-    },
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.0.#DetailsMenuTextParent.#DetailsMenuTextFocused',
+  },
 
 
   /** channel Info Panel */
   channelInfoPanel: {
     keyPath:
-    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsInfoPanel.#infoPanelGroup.#Offset',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsInfoPanel.#infoPanelGroup.#Offset',
   },
 
   networksInfoPanel: {
     keyPath:
-    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsInfoPanel.#infoPanelGroup.#Offset',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsInfoPanel.#infoPanelGroup.#Offset',
   },
 
   /** Category  Action */
@@ -1589,32 +1589,32 @@ const elements = typeCheckElements({
   /** Kid's category page */
   kidsCategory: {
     keyPath:
-    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid',
   },
 
   /** Kids menu item text */
   littleKidsMenuItemText: {
     keyPath:
-    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.2.#DetailsMenuTextParent.#DetailsMenuTextFocused',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.2.#DetailsMenuTextParent.#DetailsMenuTextFocused',
   },
 
   //** Category Page Grid */
-  categoryPageGrid:{
+  categoryPageGrid: {
     keyPath:
-    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid',
   },
 
   // ** Category Header */
   categoryHeader: {
     keyPath:
-    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#pageTitleAndCounter.#CategoryName',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#pageTitleAndCounter.#CategoryName',
   },
 
 
   /** Category ratings label */
   categoryRatingsLabel: {
     keyPath:
-    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsInfoPanel.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#Rating.#RatingBackground',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsInfoPanel.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#Rating.#RatingBackground',
   },
 
 
@@ -1630,7 +1630,7 @@ const elements = typeCheckElements({
 
   actionButtonFocused: {
     keyPath:
-    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.2',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.2',
   },
 
   /** Networks page header */
@@ -1638,7 +1638,8 @@ const elements = typeCheckElements({
 
   skipIntro: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#SkipCuepointsButton',
+      //#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#skipCuepointsSimpleButton
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#skipCuepointsSimpleButton',
   },
 
   titleNameInCategories: {
@@ -1685,6 +1686,11 @@ const elements = typeCheckElements({
       'ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#PageGroup.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description',
   },
 
+  titleDescriptionHomesScreen: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description',
+  },
+
   titleDescriptionOnHomeScreen: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description',
@@ -1726,7 +1732,7 @@ const elements = typeCheckElements({
 
   bWWTitle: {
     keyPath:
-    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#BrowseWhileWatchingRow.0.#BrowseWhileWatchingGroup.#Info.#infoPanelGroup.#Offset.#Title',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#BrowseWhileWatchingRow.0.#BrowseWhileWatchingGroup.#Info.#infoPanelGroup.#Offset.#Title',
   },
 
   /** Kids left nav option */
@@ -2098,7 +2104,7 @@ const elements = typeCheckElements({
 
   networksCategoryButton: {
     keyPath:
-    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuTextFocused',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuTextFocused',
   },
 
   /** Networks page */
@@ -2115,7 +2121,7 @@ const elements = typeCheckElements({
 
   networksContentGrid: {
     keyPath:
-    '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid',
   },
 
   /** Exit item */
@@ -2160,8 +2166,8 @@ const elements = typeCheckElements({
   },
 
   continueWatchingPoster: {
-    keyPath: ' #ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid.0.1.#posterLayout.#Poster', 
-  }, 
+    keyPath: ' #ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid.0.1.#posterLayout.#Poster',
+  },
 
   /** categories left nav */
   categoriesLeftNavButton: {
@@ -2235,8 +2241,8 @@ const elements = typeCheckElements({
   },
 
   channelVideoGrid: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsVideoGrid', 
-  }, 
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsVideoGrid',
+  },
 
   categoriesVideoGridPoster: {
     keyPath:
@@ -2564,7 +2570,7 @@ const elements = typeCheckElements({
 
   // Accept Now button
   acceptNowButton: {
-    keyPath:'#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#purpleCarpetRow.0.#infoPanelGroup.#ctaButtonList.0.#menuItemTextFocused',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#purpleCarpetRow.0.#infoPanelGroup.#ctaButtonList.0.#menuItemTextFocused',
   },
 
   // Sign up later button on the exit prompt of Sign up to Save Progress
@@ -2639,7 +2645,7 @@ const elements = typeCheckElements({
 
   /** Preview on button */
   autoplayPreviewOn: {
-    keyPath:'#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#AutoplayPreviewMenu.0'
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#AutoplayPreviewMenu.0'
   },
 
   // Preview Off Checked

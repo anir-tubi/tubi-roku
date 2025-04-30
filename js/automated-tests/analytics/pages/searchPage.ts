@@ -28,13 +28,37 @@ const SearchPage = () => {
 			await testUtils.getNodeForElement('foundTitlesSearch'),
 		searchResultsText: async () =>
 			await testUtils.getNodeForElement('searchResultsText'),
+		trendingSearchResultsGrid: async () =>
+			await testUtils.getNodeForElement('trendingSearchResultsGrid')
 	};
 
 	async function pageDidLoad() {
 		await testUtils.retryWithTimeOut(async () => {
-			const grid = await elements.searchGrid();
+			const grid = await elements.trendingSearchResultsGrid();
 			expect(grid.visible).to.equal(true);
 		});
+	}
+
+	async function getTitleIdSarchScreenVertical({ amount }) {
+		const ids = [];
+		const content = await testUtils.getAllGridItemsContent(
+			'trendingSearchResultsGrid'
+		);
+		for (let i = 0; i < amount; i++) {
+			ids.push(content[i].id);
+		}
+		return ids;
+	}
+
+	async function getRangeTitleIdSarchScreenVertical({ from, to }) {
+		const ids = [];
+		const content = await testUtils.getAllGridItemsContent(
+			'trendingSearchResultsGrid'
+		);
+		for (let i = from; i < to; i++) {
+			ids.push(content[i].id);
+		}
+		return ids;
 	}
 
 	async function enterSearch(text) {
@@ -71,11 +95,18 @@ const SearchPage = () => {
 
 	async function goToTitleInPosition(opts) {
 		const { row, col } = opts;
+		await utils.sleep(4000);
 		await moveToTitleGrid();
 		await moveToGrid({ grid: ui.titleGrid, destCol: row, destRow: col });
 		ui.titleGrid.row = row;
 		ui.titleGrid.col = col;
 	}
+
+
+	async function navigateToSideNav() {
+		await ecp.sendKeypress(ecp.Key.Left, { count: 7, wait: 500 });
+	}
+
 
 	async function checkIfKidsLogoPresent() {
 		await testUtils.retryWithTimeOut(async () => {
@@ -103,6 +134,9 @@ const SearchPage = () => {
 		moveToTitleGrid,
 		goToTitleInPosition,
 		selectFocusedTitle,
+		getTitleIdSarchScreenVertical,
+		getRangeTitleIdSarchScreenVertical,
+		navigateToSideNav,
 	};
 };
 

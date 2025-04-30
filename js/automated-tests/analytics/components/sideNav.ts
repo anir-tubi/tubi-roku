@@ -47,7 +47,7 @@ export const tabs = {
 		page: () => Home(),
 	},
 	liveTV: {
-		row: 8,
+		row: 9,
 		page: () => LiveNews(),
 	},
 	espanol: {
@@ -110,6 +110,7 @@ const SideNav = () => {
 		selectSideNavTab,
 		selectSideNavTabNoPageReturn,
 		highlightedSideNavTab,
+		selectTabNoPageReturn,
 	};
 };
 

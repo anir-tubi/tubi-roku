@@ -49,7 +49,7 @@ describe('Kids Events', function () {
 
 	it('UI Categories Page - Kids Mode ON - When user goes to Categories page then page is displayed:C6478 and C6479 and C44199 @analyticsASet1,@analyticsKids', async () => {
 		const homePage = HomePage();
-		const kidsHome = await homePage.selectSideNavTab(tabs.kids,4);
+		const kidsHome = await homePage.selectSideNavTab(tabs.kids, 4);
 		await ecp.sendKeypress(ecp.Key.Right);
 		await kidsHome.selectSideNavTab(tabs.categories, 4);
 		await utils.sleep(1000);

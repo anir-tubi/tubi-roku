@@ -15,8 +15,12 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 			await testUtils.getNodeForElement(NODES.TV_SHOW_SCREEN_ROW_LIST),
 		espanolRowList: async () =>
 			await testUtils.getNodeForElement(NODES.ESPANOL_SCREEN_ROW_LIST),
+		homeRowList: async () =>
+			await testUtils.getNodeForElement(NODES.HOME_SCREEN_ROW_LIST),
 		movieDescription: async () =>
 			await testUtils.getNodeForElement(NODES.TITLE_DESCRIPTION_MOVIE),
+		description: async () =>
+			await testUtils.getNodeForElement(NODES.TITLE_DESCRIPTION_HOME),
 		homeScreenPoster: async () =>
 			await testUtils.getNodeForElement('homeScreenPoster'),
 		homeScreenKidsLogo: async () =>
@@ -28,6 +32,10 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 		tvShowsSeriesLabel: async () =>
 			await testUtils.getNodeForElement('tvShowsSeriesLabel'),
 		moviesLabel: async () => await testUtils.getNodeForElement('moviesLabel'),
+	};
+
+	const ui = {
+		currentPosition: 0,
 	};
 
 	// expect(tvScreenRowList.visible).to.equal(true);
@@ -42,6 +50,94 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 			NODES.MOVIE_SCREEN_ROW_LIST
 		);
 		return parseInt(content.id);
+	}
+
+	async function getTitleIdHomeScreenHorizontal({ row, amount }) {
+		const ids = [];
+		await testUtils.retryWithTimeOut(async () => {
+			const homeScreenPoster = await elements.homeScreenPoster();
+			expect(homeScreenPoster.visible).to.equal(true);
+		});
+		const content = await testUtils.getAllRowListItemsContentGroupedByRow(
+			NODES.HOME_SCREEN_ROW_LIST
+		);
+		content[row].slice(0, amount).map((item) => ids.push(parseInt(item.id)));
+		return ids;
+	}
+
+	async function getTitleIdEspanolScreenHorizontal({ row, amount }) {
+		const ids = [];
+		await testUtils.retryWithTimeOut(async () => {
+			const homeScreenPoster = await elements.homeScreenPoster();
+			expect(homeScreenPoster.visible).to.equal(true);
+		});
+		const content = await testUtils.getAllRowListItemsContentGroupedByRow(
+			NODES.ESPANOL_SCREEN_ROW_LIST
+		);
+		content[row].slice(0, amount).map((item) => ids.push(parseInt(item.id)));
+		return ids;
+	}
+
+	async function getTitleIdHomeScreenVertical({ amount }) {
+		const ids = [];
+		await testUtils.retryWithTimeOut(async () => {
+			const homeScreenPoster = await elements.homeScreenPoster();
+			expect(homeScreenPoster.visible).to.equal(true);
+		});
+		const content = await testUtils.getAllRowListItemsContentGroupedByRow(
+			NODES.HOME_SCREEN_ROW_LIST
+		);
+		for (let i = 0; i < amount; i++) {
+			content[i].slice(0, 1).map((item) => ids.push(parseInt(item.id)));
+		}
+		return ids;
+	}
+
+	async function getTitleIdMoviesScreen({ row, amount }) {
+		const ids = [];
+		await testUtils.retryWithTimeOut(async () => {
+			const homeScreenPoster = await elements.homeScreenPoster();
+			expect(homeScreenPoster.visible).to.equal(true);
+		});
+		const content = await testUtils.getAllRowListItemsContentGroupedByRow(
+			NODES.MOVIE_SCREEN_ROW_LIST
+		);
+		content[row].slice(0, amount).map((item) => ids.push(parseInt(item.id)));
+		return ids;
+	}
+
+	async function getTitleIdTVShowsScreen({ row, amount }) {
+		const ids = [];
+		await testUtils.retryWithTimeOut(async () => {
+			const homeScreenPoster = await elements.homeScreenPoster();
+			expect(homeScreenPoster.visible).to.equal(true);
+		});
+		const content = await testUtils.getAllRowListItemsContentGroupedByRow(
+			NODES.TV_SHOW_SCREEN_ROW_LIST
+		);
+		content[row].slice(0, amount).map((item) => ids.push(parseInt(item.id)));
+		return ids;
+	}
+
+	async function navigateToFirstColumn() {
+		while (ui.currentPosition >= 0) {
+			await ecp.sendKeypress(ecp.Key.Left, { count: 1, wait: 1000 });
+			ui.currentPosition--;
+		}
+	}
+
+	async function navigateRightAndGetTitleIdsOnSameRow(numberOfTitles: number): Promise<number[]> {
+		const titleIds: number[] = [];
+		for (let i = 0; i < numberOfTitles; i++) {
+			const titleId = await getTitleId();
+			if (titleId) {
+				titleIds.push(titleId);
+			}
+			await ecp.sendKeypress(ecp.Key.Right);
+			await utils.sleep(1000);
+			ui.currentPosition = i;
+		}
+		return titleIds;
 	}
 
 	async function highlightTitleWithVideoPreview() {
@@ -96,6 +192,14 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 		const detailScreenTitle = await elements.movieDescription();
 		const [categorySlug, contentId] = detailScreenTitle.text.split(' ');
 		return { contentId: contentId, categorySlug: categorySlug };
+	}
+
+	async function getHomeCategoryName() {
+		const homeScreenRowList = await elements.homeRowList();
+		expect(homeScreenRowList.visible).to.equal(true);
+		const detailScreenTitle = await elements.description();
+		const [categorySlug] = detailScreenTitle.text.split(' ');
+		return { categorySlug: categorySlug };
 	}
 
 	async function getTVShowTitleId() {
@@ -415,6 +519,14 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 		selectFocusedTitleMovieWithSubtitles,
 		navigateToContinueWatchingAndSelectIt,
 		getPopupMessageKids,
+		navigateRightAndGetTitleIdsOnSameRow,
+		navigateToFirstColumn,
+		getTitleIdHomeScreenHorizontal,
+		getTitleIdMoviesScreen,
+		getTitleIdTVShowsScreen,
+		getTitleIdHomeScreenVertical,
+		getHomeCategoryName,
+		getTitleIdEspanolScreenHorizontal,
 		...SideNav(),
 	};
 };

@@ -61,7 +61,8 @@ const LiveNews = () => {
 			},
 			'Live icon not present',
 			15000
-		);}
+		);
+	}
 
 	async function waitWhenGoFullScreen() {
 		await waitLiveIconPresent();
