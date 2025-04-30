@@ -8,6 +8,7 @@ End Function
 Function onRectChange()
   m.Poster.width = m.top.currRect.width
   m.Poster.height = m.top.currRect.height
+  setLockIconPosition()
 End Function
 
 Function onContentChange()
@@ -19,7 +20,11 @@ Function onContentChange()
     if item.seriesId <> invalid and item.seriesId <> ""
       sURI = item.landscape
     else
-      sURI = item.hdgridposterurl
+      if getExperimentResource("roku_video_autostart_ui_refresh", "roku_video_autostart_ui_refresh_v1", false).enabled = true
+        sURI = item.landscape
+      else
+        sURI = item.hdgridposterurl
+      end if
     end if
 
     m.poster.uri = sURI
@@ -42,8 +47,15 @@ Function setLockIcon()
     m.lockIcon.width = 21
     m.lockIcon.height = 24
     m.lockIcon.uri = "pkg:/images/icon-lock.webp"
-    m.lockIcon.translation = [184, 8]
     m.top.observeFieldscoped("focusPercent", "onFocusPercent")
+  end if
+  setLockIconPosition()
+End Function
+
+
+Function setLockIconPosition()
+  if m.lockIcon <> invalid
+    m.lockIcon.translation = [m.Poster.width - (m.lockIcon.width * 2), 8]
   end if
 End Function
 

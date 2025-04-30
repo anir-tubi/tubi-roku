@@ -64,6 +64,12 @@
     </Group>
 
     <Poster
+      id="fullScreenPosterGradient2"
+      opacity="0"
+      width="1920"
+      height="1080"/>
+
+    <Poster
         id="posterGroupMask"
         width="1122"
         opacity="0"

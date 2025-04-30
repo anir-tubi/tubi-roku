@@ -11,16 +11,35 @@ Function init()
   m.top.observeField("resetContent", "onResetContent")
   m.top.observeField("command", "onCommand")
 
-  '//::NOTE:: the translation of m.UpNextUI is modifed by AnimationMixin,
+  '//::NOTE:: the translation of m.UpNextUI is modified by AnimationMixin,
   '// so the translation of the UpNextUI element should not be changed directly.
   '// UpNextParent can be used if we need to change the translation of the up next component.
   m.UpNextUI = m.top.findNode("UpNextUI")
   m.UpNextUI.observeField("opacity", "onUpNextUIOpacityChange")
   m.UpNextParent = m.top.findNode("UpNextParent")
-  m.UpNextParent.translation = [m.constants.ui.translations.marginX, m.UpNextParent.translation[1]]
   m.UpNextGradient = m.top.findNode("UpNextGradient")
   m.InfoMovie = m.top.findNode("InfoMovie")
   m.InfoSeries = m.top.findNode("InfoSeries")
+  
+  m.MovieContainerTitle = m.top.findNode("MovieContainerTitle")
+  m.bgcolorParent = m.top.findNode("BgcolorParent")
+  m.bgcolorOverlay = m.top.findNode("BgcolorOverlay")
+  m.backgroundGroup = m.top.findNode("BackgroundGroup")
+  m.countdownGroup = m.top.findNode("CountdownGroup")
+  m.countdownGroup.secondsTranslationId = "screenEndCard_upNextIn"
+  m.countdownGroup.maxSeconds = m.constants.player.upNextCountdownForSeries
+
+  m.UpNextSeriesMenu = m.top.findNode("UpNextSeriesMenu")
+  m.UpNextSeriesMenu.observeFieldScoped("itemSelected", "onSeriesItemSelected")
+  upNextSeriesMenuButtonContent = m.top.findNode("UpNextSeriesMenuButtonContent")
+  upNextSeriesMenuButtonContent.title = getTranslation("screenEndCard_nextEpisode")
+  
+  '//Resize the button based on the string length
+  tempChannelMenuItem = CreateObject("roSGNode", "DetailMenuItem")
+  tempChannelMenuItem.itemContent = upNextSeriesMenuButtonContent
+  potentialWidth = tempChannelMenuItem.calculatedTextWidth + tempChannelMenuItem.leftTextPadding + tempChannelMenuItem.rightTextPadding
+  m.UpNextSeriesMenu.itemSize = [potentialWidth, m.UpNextSeriesMenu.itemSize[1]]
+
   m.Timer = m.top.findNode("UpNextCountdownTimer")
   m.CountdownMovie = m.top.findNode("CountdownLabelMovie")
   m.CountdownSeries = m.top.findNode("CountdownLabelSeries")
@@ -29,52 +48,77 @@ Function init()
   m.GridMovie = m.top.findNode("GridMovie")
   m.GridMovie.observeField("itemFocused", "onMovieItemFocused")
   m.GridMovie.observeField("itemSelected", "onMovieItemSelected")
+  m.GridMovie.observeField("itemUnfocused", "onMovieItemUnFocused")
   m.GridSeries = m.top.findNode("GridSeries")
-  m.GridSeries.itemSize = m.constants.ui.imageSizes.largeLandscape
-  m.InfoSeries.maxHeight = m.constants.ui.imageSizes.largeLandscape[1]
 
+  m.isSeries = false 'keep track if this is a series or movie
+  
   m.GridSeries.observeField("itemFocused", "onSeriesItemFocused")
   m.GridSeries.observeField("itemSelected", "onSeriesItemSelected")
+  
+  m.metadataSeries = m.top.findNode("metadataSeries")
+  
+  bAutoStartExperimentEnabled = (getExperimentResource("roku_video_autostart_ui_refresh", "roku_video_autostart_ui_refresh_v1", false).enabled = true)
 
-  focusBox = m.top.findNode("FocusBox")
+  if bAutoStartExperimentEnabled = true
+    nThumbnailWidth = m.constants.ui.imageSizes.landscape[0]
+    nThumbnailHeight = m.constants.ui.imageSizes.landscape[1]
+    m.metadata = m.top.findNode("metadata")
+    m.metadata.translation = [0, 0]
+    m.movieTiles = m.top.findNode("movieTiles")
+    m.movieTiles.translation = [0, 0]
+    m.UpNextGradient.visible = false
+    m.CountdownMovie.visible = false
+    m.CountdownSeries.visible = false
+    m.MovieContainerTitle.text = getTranslation("screenEndCard_upNextTitles")
+    m.InfoMovie.maxTitleLines = 1
+    m.GridSeries.itemSize = m.constants.ui.imageSizes.largestLandscape
+    m.InfoSeries.width = m.constants.ui.imageSizes.largestLandscape[0]
+    m.InfoSeries.maxTitleLines = 1
+  else
+    nThumbnailWidth = m.constants.ui.imageSizes.largePoster[0]
+    nThumbnailHeight = m.constants.ui.imageSizes.largePoster[1]
+    m.InfoMovie.maxHeight = nThumbnailHeight
+
+    m.GridSeries.itemSize = m.constants.ui.imageSizes.largeLandscape
+    m.InfoSeries.maxHeight = m.constants.ui.imageSizes.largeLandscape[1]
+  end if
+
+  m.focusBox = m.top.findNode("FocusBox")
   if m.constants.deviceInfo.scaledUi = true then
     focusBoxMargin = 4
   else
     focusBoxMargin = 6
   end if
 
-  theme = getThemeFromGlobal()
-  if theme <> invalid
-    focusBox.blendColor = theme.focusedColor
-    m.GridSeries.focusBitmapBlendColor = theme.focusedColor
-    m.CountdownMovie.color = theme.highlightedTextColor
-    m.CountdownSeries.color = theme.highlightedTextColor
-  end if
-
-  focusBox.width = m.constants.ui.imageSizes.largePoster[0] + focusBoxMargin * 2
-  focusBox.height = m.constants.ui.imageSizes.largePoster[1] + focusBoxMargin * 2
-  focusBox.translation = [- focusBoxMargin, - focusBoxMargin]
-  m.InfoMovie.maxHeight = m.constants.ui.imageSizes.largePoster[1]
+  m.focusBox.width = nThumbnailWidth + focusBoxMargin * 2
+  m.focusBox.height = nThumbnailHeight + focusBoxMargin * 2
+  m.focusBox.translation = [- focusBoxMargin, - focusBoxMargin]
 
 
   targetSet = CreateObject("roSGNode", "TargetSet")
   nSpacing = 16
-  nStartX = -m.constants.ui.imageSizes.largePoster[0] - nSpacing
-  nArrayElements = 5
+  nStartX = -nThumbnailWidth - nSpacing
+  if bAutoStartExperimentEnabled = true
+    nArrayElements = 7
+  else
+    nArrayElements = 5
+  end if
   aTargetRects = CreateObject("roArray", nArrayElements, true)
+  
   for i = 0 to nArrayElements-1
     aaTargetRect = {
       x: nStartX
       y: 0
-      width: m.constants.ui.imageSizes.largePoster[0]
-      height: m.constants.ui.imageSizes.largePoster[1]
+      width: nThumbnailWidth
+      height: nThumbnailHeight
     }
 
     aTargetRects.push(aaTargetRect)
 
     '//New start position of the next poster image
-    if i <> 1
-      nStartX = nStartX + m.constants.ui.imageSizes.largePoster[0] + nSpacing
+    if i <> 1 OR bAutoStartExperimentEnabled = true
+      nStartX = nStartX + nThumbnailWidth + nSpacing
     else
       '//Move the images AFTER the 2nd image to the right of the upNext UI
       nStartX = 1071
@@ -93,10 +137,33 @@ Function init()
   ' has focus, not when it gains focus.
   m.isUpNextFocused = false
 
-  typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.CountdownMovie, typographyConstants.ids.subheaderSmall)
-  setTypographyOfLabel(m.CountdownSeries, typographyConstants.ids.subheaderSmall)
+  m.typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.CountdownMovie, m.typographyConstants.ids.subheaderSmall)
+  setTypographyOfLabel(m.CountdownSeries, m.typographyConstants.ids.subheaderSmall)
+  setTypographyOfLabel(m.MovieContainerTitle, m.typographyConstants.ids.subheaderMedium)
+  m.countdownGroup.typographyLabelId = m.typographyConstants.ids.bodyMediumStrong
 
+End Function
+
+
+Function setThemeColors()
+  theme = getThemeFromGlobal()
+
+  if theme <> invalid
+    isKidsMode = (theme.id = m.constants.ui.themeIDs.kidsMode)
+    m.backgroundGroup.kidsMode = isKidsMode
+    m.focusBox.blendColor = theme.focusedColor
+    m.GridSeries.focusBitmapBlendColor = theme.focusedColor
+    m.CountdownMovie.color = theme.highlightedTextColor
+    m.CountdownSeries.color = theme.highlightedTextColor
+    m.MovieContainerTitle.color = theme.primaryTextColor
+    '//::TODO::JHAND - when there is a theme color for this background color, then use it instead of hardcoding the color.
+    ' m.bgcolorOverlay.color = theme.backgroundColor
+    m.bgcolorOverlay.color = "0x000000FF"
+
+    m.countdownGroup.textColor = theme.textDarkColor
+    m.countdownGroup.bgcolor = theme.backgroundColorLight2
+  end if
 End Function
 
 
@@ -112,14 +179,22 @@ Function onComponentFocus()
     if m.MovieGroup.visible = true
       m.GridMovie.setFocus(true)
     else if m.SeriesGroup.visible = true
-      m.GridSeries.setFocus(true)
+      if getExperimentResource("roku_video_autostart_ui_refresh", "roku_video_autostart_ui_refresh_v1", false).enabled = true 
+        m.UpNextSeriesMenu.setFocus(true)
+      else
+        m.GridSeries.setFocus(true)
+      end if
     end if
+    m.focusBox.visible = true
   else if m.top.isInFocusChain() <> true
     m.top.itemFocused = 0
     m.GridMovie.jumpToItem = 0
     m.isUpNextFocused = false
     m.GridMovie.setFocus(false)
     m.GridSeries.setFocus(false)
+    m.UpNextSeriesMenu.setFocus(false)
+    m.focusBox.visible = false
+    m.CountdownGroup.visible = true
   end if
 End Function
 
@@ -129,33 +204,77 @@ Function onResetContent()
   m.top.contentFocused = invalid
   m.top.contentSelected = invalid
   m.top.autoplayMode = "unknown"
+  m.bgcolorParent.visible = false
 End Function
 
 
 Function onContentChange()
   tubiLog("UpNext.onContentChange")
   if m.top.content <> invalid AND m.top.content.getChildCount() > 0
+    setThemeColors()  '//Update the theme every time the content changes to ensure the correct theme is used.
+
+    bAutoStartExperimentEnabled = (getExperimentResource("roku_video_autostart_ui_refresh", "roku_video_autostart_ui_refresh_v1", false).enabled = true)
     firstContent = m.top.content.getChild(0)
-    if firstContent.seriesId <> invalid AND firstContent.seriesId <> ""
+    if isNonEmptyString(firstContent.seriesId) = true
       ' show the episode experience
-      m.UpNextParent.translation = [m.UpNextParent.translation[0], 608]
       m.MovieGroup.visible = false
       m.SeriesGroup.visible = true
       singleContent = CreateObject("roSGNode", "ContentNode")
       singleContent.appendChild(firstContent.clone(false))
       m.GridSeries.content = singleContent
+      
+      if bAutoStartExperimentEnabled = true
+        m.UpNextParent.translation = [1068, 339]
+        m.metadataSeries.translation = [0, m.GridSeries.translation[1] + m.GridSeries.itemSize[1] + 15]
+        m.InfoSeries.translation = [0,0]
+        m.CountdownGroup.translation = [454, 366]
+        drawCountdown(m.CountdownGroup, m.timeRemaining)
+        m.InfoSeries.titleTypography = m.typographyConstants.ids.subheaderSmall
+
+        m.bgcolorParent.visible = true
+        m.bgcolorOverlay.visible = false
+        m.backgroundGroup.visible = true
+        m.backgroundGroup.backgroundInfo = {
+          type: m.constants.ui.backgroundTypes.fullScreen2
+          uriList: []
+        }
+      else
+        m.UpNextParent.translation = [m.constants.ui.translations.marginX, 608]
+        drawCountdown(m.CountdownSeries, m.timeRemaining)
+        m.metadataSeries.translation = [597,0]
+        m.InfoSeries.translation = [0,58]
+      end if
+
       m.timeRemaining = m.constants.player.upNextCountdownForSeries
-      drawCountdown(m.CountdownSeries, m.timeRemaining)
       updateInfoPanel(m.InfoSeries, m.GridSeries.content.getChild(0))
     else
       ' show the movie experience
-      m.UpNextParent.translation = [m.UpNextParent.translation[0], 540]
       m.MovieGroup.visible = true
       m.SeriesGroup.visible = false
       m.GridMovie.content = m.top.content
       m.timeRemaining = m.constants.player.upNextCountdown
-      drawCountdown(m.CountdownMovie, m.timeRemaining)
       updateInfoPanel(m.InfoMovie, m.GridMovie.content.getChild(0))
+      if bAutoStartExperimentEnabled = true
+        m.UpNextParent.translation = [m.constants.ui.translations.marginX, 729]
+        m.CountdownGroup.translation = [177, 159]
+        m.bgcolorParent.visible = true
+        m.bgcolorOverlay.visible = true
+        m.backgroundGroup.visible = true
+        m.backgroundGroup.backgroundInfo = {
+          type: m.constants.ui.backgroundTypes.fullScreen2
+          uriList: []
+        }
+
+        sSpacingLabelFromGrid = 30
+        sSpacingInfoFromLabel= 27
+        m.MovieContainerTitle.translation = [0, -m.MovieContainerTitle.BoundingRect().height-sSpacingLabelFromGrid]
+        m.InfoMovie.translation = [0, m.MovieContainerTitle.translation[1] -m.InfoMovie.calculatedHeight - sSpacingInfoFromLabel]
+
+        drawCountdown(m.CountdownGroup, m.timeRemaining)
+      else
+        drawCountdown(m.CountdownMovie, m.timeRemaining)
+        m.UpNextParent.translation = [m.constants.ui.translations.marginX, 540]
+      end if
     end if
   else
     ' default hide both experiences
@@ -212,12 +331,29 @@ Function onCommand(msg)
 End Function
 
 
+Function onMovieItemUnFocused()
+  ' hide the countdown when the movie item is unfocused
+  m.CountdownGroup.display = false
+  m.CountdownGroup.visible = false
+End Function
+
 Function onMovieItemFocused()
   tubiLog("UpNext.onMovieItemFocused")
   itemFocused = m.GridMovie.itemFocused
   col = itemFocused + 1 '1 based index
   row = 1
   itemFocusedHelper(m.GridMovie, m.InfoMovie) 'updates m.top.contentFocused
+  drawCountdown(m.CountdownMovie, m.timeRemaining)
+  m.CountdownGroup.visible = true
+
+  if getExperimentResource("roku_video_autostart_ui_refresh", "roku_video_autostart_ui_refresh_v1", false).enabled = true AND m.GridMovie.content <> invalid
+    content = m.GridMovie.content.getChild(m.GridMovie.itemFocused)
+    m.backgroundGroup.visible = true
+    m.backgroundGroup.backgroundInfo = {
+      type: m.constants.ui.backgroundTypes.fullScreen2
+      uriList: determineBackgroundImage(content)
+    }
+  end if
 
   'Set the navigateWithinPageInfo value which will pass through to ContentController via videoHelpers.brs
   'to fire a navigate_within_page analytics event.
@@ -252,19 +388,29 @@ Function handleMovieItemSelected(position)
   m.top.contentSelected = m.GridMovie.content.getChild(position)
 End Function
 
+Function determineBackgroundImage(content)
+  if isNode(content) = true AND isNonEmptyArray(content.backgrounds) = true then
+    return content.backgrounds
+  else
+    return []
+  end if
+End Function
+
 
 Function itemFocusedHelper(grid, info)
   if grid.content <> invalid
     content = grid.content.getChild(grid.itemFocused)
     if content <> invalid
-      updateInfoPanel(info, content)
-      m.top.contentFocused = content
-      m.top.itemFocused = grid.itemFocused
-      ' reset countdown while user is interacting
-      if content.seriesId <> invalid AND content.seriesId <> ""
-        m.timeRemaining = m.constants.player.upNextCountdownForSeries
-      else
-        m.timeRemaining = m.constants.player.upNextCountdown
+      if isNonEmptyString(info.title) = false OR info.title <> content.title  '//only update if need be.
+        updateInfoPanel(info, content)
+        m.top.contentFocused = content
+        m.top.itemFocused = grid.itemFocused
+        ' reset countdown while user is interacting
+        if isNonEmptyString(content.seriesId) = true
+          m.timeRemaining = m.constants.player.upNextCountdownForSeries
+        else
+          m.timeRemaining = m.constants.player.upNextCountdown
+        end if
       end if
     end if
   end if
@@ -279,7 +425,7 @@ End Function
 
 Function onSeriesItemSelected()
   tubiLog("UpNext.onSeriesItemSelected")
-  handleSeriesItemSelected(m.GridSeries.itemSelected)
+  handleSeriesItemSelected(0) '//It can be assumed that there is only one item in the series
 End Function
 
 
@@ -325,20 +471,37 @@ End Function
 
 
 Function drawCountdown(labelNode, time)
+  bAutoStartExperimentEnabled = (getExperimentResource("roku_video_autostart_ui_refresh", "roku_video_autostart_ui_refresh_v1", false).enabled = true)
+  if bAutoStartExperimentEnabled = true
+    '//if the experiment gets graduated, then simplify this code so it only takes into account m.CountdownGroup
+    labelNode = m.CountdownGroup
+  end if
   if m.top.isAutoPlayOff = false
-    labelNode.visible = true
-    labelNode.text = getTranslation("screenEndCard_startingIn", {seconds: stri(time)})
+
+    if bAutoStartExperimentEnabled = true
+      labelNode.seconds = time
+      labelNode.display = true
+    else
+      labelNode.visible = true
+      labelNode.text = getTranslation("screenEndCard_startingIn", {seconds: stri(time)})
+    end if
   else
-    labelNode.visible = false
+    if bAutoStartExperimentEnabled = true
+      labelNode.display = false
+    else
+      labelNode.visible = false
+    end if
   end if
 End Function
 
 
 Function updateInfoPanel(infoNode, content)
   infoNode.title = content.title
-
+  bAutoStartExperimentEnabled = (getExperimentResource("roku_video_autostart_ui_refresh", "roku_video_autostart_ui_refresh_v1", false).enabled = true)
   lineOneData = {}
-  if content.type = m.constants.ui.contentTypes.series
+  isSeries = (isNonEmptyString(content.seriesId) = true)
+
+  if isSeries = true
     lineOneData.type = m.constants.ui.contentTypes.series
   end if
   lineOneData.releaseDate = content.releaseDate
@@ -359,12 +522,19 @@ Function updateInfoPanel(infoNode, content)
   lineTwoData = {
     genres: content.genres
   }
+  description = content.description
+  if bAutoStartExperimentEnabled = false
+    infoNode.starring = content.actors
+    infoNode.directors = content.directors
+  else if isSeries = true
+    '//if this part of the roku_video_autostart_ui_refresh_v1 experiment, then change what is passed to the info panel if this is a series
+    description = ""
+    lineTwoData = {}
+  end if
 
   infoNode.lineOneData = lineOneData
   infoNode.lineTwoData = lineTwoData
-  infoNode.description = content.description
-  infoNode.starring = content.actors
-  infoNode.directors = content.directors
+  infoNode.description = description
 
   if content.needsLogin = true AND isLoggedinUser() = false
     infoNode.loginReason = content.loginReason 'set loginReason before needs login
@@ -380,6 +550,9 @@ End Function
 
 Function onShow()
   tubiLog("UpNext.onShow")
+
+  '//fire the experiment event when the up next UI is shown
+  getExperimentResource("roku_video_autostart_ui_refresh", "roku_video_autostart_ui_refresh_v1", true)
 
   ' reset the countdown timer prior to fading in the up next content so that
   ' the timer doesn't flash an old time from the previous time the up next UI was visible.
@@ -402,6 +575,7 @@ Function onHide()
   tubiLog("UpNext.onHide")
   fade(m.UpNextGradient, "out", 0.75)
   fade(m.UpNextUI, "out", 0.75)
+  stopTimer()
   m.isUpNextFocused = false
 End Function
 

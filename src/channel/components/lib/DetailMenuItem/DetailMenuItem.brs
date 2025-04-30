@@ -24,6 +24,12 @@ Function init()
   m.badgeLabelFocused.padding = [12, 9]
   m.badgeLabelFocused.opacity = 0
 
+  parent = m.top.getParent()
+  if parent <> invalid AND isNonEmptyString(parent.focusBitmapUri) = true
+    '//match the buttonBG with the parent focusBitmapUri
+    m.buttonBG.uri = parent.focusBitmapUri
+  end if
+
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.DetailsMenuText, typographyConstants.ids.bodyMediumStrong)
   setTypographyOfLabel(m.DetailsMenuTextFocused, typographyConstants.ids.bodyMediumStrong)
@@ -114,7 +120,7 @@ Function onItemContentChange()
     bVisibleImage = true
     bVisibleBadgeText = true
     'adding extra width for focus if icon is present
-    if item.iconUrl <> invalid AND item.iconUrl <> ""
+    if isNonEmptyString(item.iconUrl) = true
       m.Icon.uri = item.iconUrl
       m.IconFocused.uri = item.iconUrl
       m.DetailsMenuTextParent.translation = [72, 0]

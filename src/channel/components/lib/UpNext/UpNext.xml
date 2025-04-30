@@ -13,6 +13,9 @@
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/UserMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -37,11 +40,11 @@
       <field id="command" type="string" alwaysNotify="true"/>
 
       <!-- any command value aside from the allowed values.
-        innvalidCommand is used when a "pause" or "stop" voice command has been issued.
+        invalidCommand is used when a "pause" or "stop" voice command has been issued.
         The onCommand callback will not take any action from a "pause" or "stop" voice command.
         In addition to a voice command, the firmware will initiate a "play" key press if the user
         says "pause" or "stop" into the remote, which will trigger an onKeyEvent callback to fire.
-        In this case the presense of invalidCommand is used to determine if a "play" key event
+        In this case the presence of invalidCommand is used to determine if a "play" key event
         is actually a user pressing the "play" button on the remote, or is created by a user saying
         "pause" or "stop" into the remote. The logic around invalidCommand may break the UI if the
         firmware makes updates to how it behaves with respect to voice commands.
@@ -68,6 +71,19 @@
       id="UpNextCountdownTimer"
       duration="1.0"
       repeat="true"/>
+
+    <!--Handles the background images -->
+    <Group
+      id="BgcolorParent"
+      visible="false">
+      <Rectangle
+        id="BgcolorOverlay"
+        width="1920"
+        height="1080"/>
+      <BackgroundGroup
+        id="BackgroundGroup"/>
+    </Group>
+
     <Poster
       id="UpNextGradient"
       width="1920"
@@ -85,6 +101,11 @@
         <Group
           id="UpNextMovieGroup"
           visible="false">
+          <Label
+            id="MovieContainerTitle">
+            <Font
+            role="font"/>
+          </Label>
           <Group
             id="movieTiles"
             translation="[0,46]">
@@ -145,8 +166,28 @@
               translation="[0,58]"
               maxTitleLines="2"/>
           </Group>
+
+        <!-- ::TODO:: If roku_video_autostart_ui_refresh_v1 experiment is graduated, should we revisit this so we can create the button w/o needing a markupGrid  -->
+        <FilledButtonMarkupGrid
+          id="UpNextSeriesMenu"
+          translation="[387,552]"
+          itemSize="[465,72]"
+          bgURL="pkg:/images/pill_top_nav_$$RES$$.9.png"
+          itemComponentName="DetailMenuItem">
+          <ContentNode
+            id="UpNextSeriesMenuContent"
+            role="content">
+            <DetailMenuItemContentNode
+              id="UpNextSeriesMenuButtonContent"
+              isUnfocusedFootprintEnabled="true"
+              iconUrl="pkg:/images/transport/sgplayer/icon-to-end.webp"/>
+          </ContentNode>
+        </FilledButtonMarkupGrid>
         </Group>
-      </Group>
+        <CountdownTimer
+          id="CountdownGroup"
+          displayIcon="false"/>
+        </Group>
     </Group>
   </children>
 </component>

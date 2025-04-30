@@ -30,6 +30,7 @@ Function init()
 
   m.circularMaskLayer = topRef.findNode("circularMaskLayer")
   m.defaultBackground = topRef.findNode("defaultBackground")
+  m.fullScreenPosterGradient2 = topRef.findNode("fullScreenPosterGradient2")
   m.posterGroupMask = topRef.findNode("posterGroupMask")
   m.maskLayer10 = topRef.findNode("maskLayer10")
   m.maskLayer11 = topRef.findNode("maskLayer11")
@@ -60,8 +61,11 @@ Function setMaskLayerUris()
   theme = getThemeFromGlobal()
   if theme <> invalid
     m.maskLayer2.blendColor = theme.backgroundColor
+    '//::TODO::JHAND - when there is a theme color for this gradient, then use it instead of hardcoding the color.
+    m.fullScreenPosterGradient2.blendColor = "0x000000FF"
   end if
 
+  m.fullScreenPosterGradient2.uri = "pkg:/images/background-masks/fullScreenPosterGradient2.png"
   if m.top.kidsMode = true
     m.posterGroupMask.uri = "pkg:/images/background-masks/mask-layer-0-kids.webp"
     m.defaultBackground.uri = "pkg:/images/background-masks/mask-layer-1-0-kids.webp"
@@ -72,7 +76,6 @@ Function setMaskLayerUris()
   else
     m.posterGroupMask.uri = "pkg:/images/background-masks/mask-layer-0.webp"
     m.defaultBackground.uri = "pkg:/images/background-masks/mask-layer-1-0.webp"
-
     m.fullScreenPosterLeftGradient.uri = "pkg:/images/background-masks/left.png"
     m.fullScreenPosterBottomGradient.uri = "pkg:/images/background-masks/bottom.png"
   end if
@@ -160,21 +163,32 @@ Function newBackgroundSet()
     backgroundType = m.aCurrentBackgroundInfo.type
 
     if backgroundType = backgroundTypes.fullScreen
+      '// fullScreen2 displays the images in full screen with two gradient overlays, 1) a vertical gradient overlay that is more opaque on the bottom and 2) a horizontal gradient overlay that is more opaque on the left
       fade(m.circularMaskLayer, "out", 0.5)
       fade(m.posterGroupMask, "out", 0.5)
       fade(m.defaultBackground, "in", 0.5)
       fade(m.fullScreenPosterGradient, "out", 0.5)
+      fade(m.fullScreenPosterGradient2, "out", 0.5)
+    else if backgroundType = backgroundTypes.fullScreen2
+      '// fullScreen2 displays the images in full screen with a vertical gradient overlay that is more opaque on the bottom. 
+      fade(m.circularMaskLayer, "out", 0.5)
+      fade(m.posterGroupMask, "out", 0.5)
+      fade(m.defaultBackground, "out", 0.5)
+      fade(m.fullScreenPosterGradient, "out", 0.5)
+      fade(m.fullScreenPosterGradient2, "in", 0.5)
     else if backgroundType = backgroundTypes.spotlight OR backgroundType = backgroundTypes.skinAd
       fade(m.circularMaskLayer, "out", 0.5)
       fade(m.posterGroupMask, "out", 0.5)
       fade(m.defaultBackground, "out", 0.5)
       fade(m.fullScreenPosterGradient, "in", 0.5)
+      fade(m.fullScreenPosterGradient2, "out", 0.5)
     else
-      fade(m.defaultBackground, "out", 0.5)
       fade(m.circularMaskLayer, "in", 0.5)
       ' Showing the poster group. Posters will automatically animate with width shrink effect due to update in the background info.
       fade(m.posterGroupMask, "in", 0.5)
+      fade(m.defaultBackground, "out", 0.5)
       fade(m.fullScreenPosterGradient, "out", 0.5)
+      fade(m.fullScreenPosterGradient2, "out", 0.5)
     end if
   end if
   
@@ -388,7 +402,7 @@ Function startTransitionIn()
   else if m.newBackgroundType = m.constants.ui.backgroundTypes.epg
     m.newPoster.epgTransitionInControl = "start"
     m.newPoster.lastAnimationName = "epgTransitionIn"
-  else if m.newBackgroundType = m.constants.ui.backgroundTypes.fullScreen OR m.newBackgroundType = m.constants.ui.backgroundTypes.spotlight OR m.newBackgroundType = m.constants.ui.backgroundTypes.skinAd
+  else if m.newBackgroundType = m.constants.ui.backgroundTypes.fullScreen OR m.newBackgroundType = m.constants.ui.backgroundTypes.fullScreen2 OR m.newBackgroundType = m.constants.ui.backgroundTypes.spotlight OR m.newBackgroundType = m.constants.ui.backgroundTypes.skinAd
     m.newPoster.fullScreenTransitionInControl = "start"
     m.newPoster.lastAnimationName = "FullScreenTransitionIn"
   else if m.newBackgroundType = m.constants.ui.backgroundTypes.rightScreen

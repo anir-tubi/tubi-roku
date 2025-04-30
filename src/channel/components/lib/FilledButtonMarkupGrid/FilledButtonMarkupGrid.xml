@@ -9,4 +9,11 @@
 
   <script type="text/brightscript" uri="FilledButtonMarkupGrid.brs" />
   <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+    <!-- Change the background image -->
+    <field id="bgURL" type="string"/>
+  </interface>
+
 </component>

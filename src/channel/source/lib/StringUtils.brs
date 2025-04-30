@@ -17,12 +17,28 @@ End Function
 
 
 '''''''''''''''''''
-' formatLengthasMinsAndSecs
+' formatLengthAsTimestampWithoutHours
+'
+' take a float or integer length in seconds, transform to timestamp "MM:SS".
+Function formatLengthAsTimestampWithoutHours(length As Dynamic) As String
+  if type(length) = "roFloat" OR type(length) = "Double" then length = Int(length)
+  if (type(length) = "Integer" OR type(length) = "roInteger") AND length > 0 then
+    minutes = length \ 60
+    seconds = length mod 60
+    result = padString(stri(minutes), 2, "0") + ":" + padString(stri(seconds), 2, "0")
+    return result
+  else
+    return ""
+  end if
+End Function
+
+
+' formatLengthAsMinsAndSecs
 '
 ' take a float or integer length in seconds, transform to timestamp "MM:SS".
 ' if the length is >= 3600, then it will return as "HH:MM:SS"
 Function formatLengthasMinsAndSecs(length As Dynamic) As String
-  if type(length) = "Float" OR type(length) = "roFloat" or type(length) = "Double" then length = Int(length)
+  if type(length) = "Float" OR type(length) = "roFloat" OR type(length) = "Double" then length = Int(length)
   if (type(length) = "Integer" OR type(length) = "roInteger") AND length >= 0 then
     minutes = (length mod 3600) \ 60
     seconds = length mod 60
@@ -139,7 +155,7 @@ Function getUrlParts(url, paramsSeparator = "?")
   }
 
   ' simple checks for valid url
-  if isString(url) = false or Instr(0, url, "://") = 0 or Instr(0, url, "://") = 1
+  if isString(url) = false OR Instr(0, url, "://") = 0 OR Instr(0, url, "://") = 1
     return invalid
   end if
 
@@ -231,7 +247,7 @@ End Function
 Function convertFunctionToString(func)
 
   functionStr = ""
-  if type(func) = "roFunction" or type(func) = "Function"
+  if type(func) = "roFunction" OR type(func) = "Function"
     functionStr = func.ToStr().Replace("Function: ","")
   end if
   return functionStr

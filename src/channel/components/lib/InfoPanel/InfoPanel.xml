@@ -46,6 +46,7 @@
 
     <field id="title" alias="Title.text" />
     <field id="titleImageUri" type="string" alwaysNotify="true" />
+    <field id="titleTypography" type="string" alwaysNotify="true" />
     <field id="leftHeaderImageUri" type="string" />
     <field id="liveBadgeHeaderText" type="string" />
     <field id="channelNameHeader" type="string" alias="channelNameHeader.text" />
@@ -107,6 +108,10 @@
 
     <!-- OUTPUTS -->
     <field id="descriptionSelected" type="boolean" alwaysNotify="true" />
+
+
+    <!-- This is the height of the infoPanel. It re-calculated whenever calculateHeight is set to true.  -->
+    <field id="calculatedHeight" type="float"/>
 
     <!-- Parent can use this to determine whether it makes sense to give InfoPanel focus -->
     <field id="isDescriptionEllipsized" alias="Description.isTextEllipsized" />

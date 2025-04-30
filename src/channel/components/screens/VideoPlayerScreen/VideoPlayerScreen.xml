@@ -256,12 +256,62 @@
       id="VideoNode"
       width="1920"
       height="1080"
-      translation="[0,0]"
       enableUI="false"
       cgms = "3"
       enableTrickPlay="false"
       visible="true" />
 
+    <Group
+      id="RemainingMinimizedGroup"
+      visible="false">
+      <Poster
+        id="RemainingMinimizedBground"
+        uri="pkg:/images/bgroundRemainingTime.9.png"/>
+      <Label
+        id="RemainingMinimizedLabel"
+        text="-00:00"
+        translation="[6,6]"
+        horizAlign="center"
+        vertAlign="center"
+        width="0">
+        <Font
+          role="font"/>
+      </Label>
+    </Group>
+
+    <Group
+      id="MinimizedAssets"
+      translation="[1240,40]">
+      <Group
+        id="LoadingMinimized"
+        visible="false">
+        <Rectangle
+          color="0x000000FF"
+          width="640"
+          height="360"/>
+        <Group
+          id="logoGroupMinimized">
+          <Poster
+            id="tubiLogoMinimized"
+            width="134"
+            height="48"
+            uri="pkg:/images/logo-large.webp"
+            translation="[246,127]"/>
+          <Poster
+            id="tubiKidsLogoMinimized"
+            width="256"
+            height="48"
+            uri="pkg:/images/logo-kids-large.webp"
+            visible="false"
+            translation="[201,127]"/>
+        </Group>
+      </Group>
+
+        <Poster
+          id="VideoBorder"
+          visible="false"
+          uri="pkg:/images/selector-$$RES$$.9.png"/>
+      </Group>
 
     <Group
       id="Loading"
@@ -535,10 +585,13 @@
       loadSync="true"
       translation="[936, 515]"
       opacity="0.0"/>
-
-    <UpNext
-      id="UpNext"
-      opacity="0.0" />
+      
+    <Group
+      id="UpNextParent">
+      <UpNext
+        id="UpNext"
+        opacity="0.0" />
+    </Group>
 
     <Group
       id="BrowseWhileWatchingRow"/>

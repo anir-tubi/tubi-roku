@@ -38,6 +38,7 @@ Function init()
     pageType: "video_player_page"
     pageValues: {}
   }
+  m.bAutostartRefreshExperimentEnabled = getExperimentResource("roku_video_autostart_ui_refresh", "roku_video_autostart_ui_refresh_v1", false).enabled = true
 
   m.tubiTrackingInfo = TubiTrackingInfo(m.constants)
   m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
@@ -53,16 +54,18 @@ Function init()
   m.top.observeFieldScoped("tcfString", "onTCFStringChange")
   m.top.observeField("userConsentsOptOutStatus", "onUserConsentsOptOutStatusChange")
   m.Loading = m.top.findNode("Loading")
+  m.MinimizedAssets = m.top.findNode("MinimizedAssets")
+  m.LoadingMinimized = m.top.findNode("LoadingMinimized")
   m.LoadingProgressBar = m.top.findNode("LoadingProgressBar")
   m.LoadingMessage = m.top.findNode("LoadingMessage")
 
   m.LoadingSpinner = m.top.findNode("LoadingSpinner")
   
   m.UpNext = m.top.findNode("UpNext")
+  m.UpNextParent = m.top.findNode("UpNextParent")
   m.UpNext.observeField("contentSelected", "onUpNextContentSelected")
   m.UpNext.observeField("opacity", "onUpNextOpacityChange")
   m.UpNext.observeField("autoplayMode", "onUpNextAutolayModeChange")
-
   m.Video = m.top.findNode("VideoNode")  ' reference in case we change from extending Video to extending Group
   m.Video.observeField("streamInfo", "onStreamInfoChanged")
   m.Video.observeFieldScoped("position", "onVideoPositionChange")
@@ -75,7 +78,8 @@ Function init()
   m.video.observeFieldScoped("subtitleTrack", "onSubtitleTrackChanged")
   'downloadedSegment is needed for player log - Quality Of Service event
   m.video.observeFieldScoped("downloadedSegment", "onDownloadedSegment")
-
+  m.videoBorder = m.top.findNode("VideoBorder")
+  
   ' asyncStopSemantics was broken prior to 14.0 so we are not running it on older firmware versions
   isFirmwareOk = createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
   if isFirmwareOk = true AND getExperimentResource("roku_async_stop", "roku_async_stop_v6", false).enabled = true then
@@ -140,6 +144,9 @@ Function init()
   m.logo = m.top.findNode("tubiLogo")
   m.logoKids = m.top.findNode("tubiKidsLogo")
 
+  m.logoMinimized = m.top.findNode("tubiLogoMinimized")
+  m.logoKidsMinimized = m.top.findNode("tubiKidsLogoMinimized")
+
   '//Variable to keep track where the m.ratingOverlay UI element should animated when the down button is pressed.
   m.ratingOverlayAnimatedPositionY = 150
 
@@ -156,6 +163,13 @@ Function init()
   m.ratingOverlayTimer = m.top.findNode("ratingOverlayTimer")
   m.ratingOverlayTimer.observeField("fire", "hideRatingOverlay")
 
+  m.ElapsedLabel = m.top.findNode("ElapsedLabel")
+  m.RemainingLabel = m.top.findNode("RemainingLabel")
+  m.RemainingMinimizedGroup = m.top.findNode("RemainingMinimizedGroup")
+  m.RemainingMinimizedBground = m.top.findNode("RemainingMinimizedBground")
+  m.RemainingMinimizedLabel = m.top.findNode("RemainingMinimizedLabel")
+
+  m.ProgressBar = m.top.findNode("ProgressBar")
   m.TopOverlay = m.top.findNode("TopOverlay")
   m.ScrubTimer = m.top.findNode("ScrubTimer")
   m.HUD = m.top.findNode("HUD")
@@ -440,15 +454,23 @@ Function init()
   setTypographyOfLabel(m.descriptorCode, m.typographyConstants.ids.bodyExtraSmallStrong)
   setTypographyOfLabel(m.descriptorDesc, m.typographyConstants.ids.bodySmall)
   setTypographyOfLabel(m.seekSpeed, m.typographyConstants.ids.bodySmallStrong)
+  setTypographyOfLabel(m.RemainingMinimizedLabel, m.typographyConstants.ids.bodySmallStrong)
+
+  '//Once the Typography has been set for RemainingMinimizedLabel, then set the width and height of the RemainingMinimizedBground 
+  boundingRectRemainingMinimizedLabel = m.RemainingMinimizedLabel.boundingRect()
+  m.RemainingMinimizedBground.width = boundingRectRemainingMinimizedLabel.width + m.RemainingMinimizedLabel.translation[0]*2
+  m.RemainingMinimizedBground.height = boundingRectRemainingMinimizedLabel.height + m.RemainingMinimizedLabel.translation[1]*2
 
   '//Position elements based on the margin set in constants
-  
+  m.SkipTrailerButton.translation = [m.marginX, m.SkipTrailerButton.translation[1]]
   m.AdHeadsUpText.translation = [m.marginX, m.AdHeadsUpText.translation[1]]
   m.ratingBarAndLabel.translation = [m.marginX, m.ratingBarAndLabel.translation[1]]
   m.descriptorDesc.translation = [m.marginX + 27, m.descriptorDesc.translation[1]]
   m.ElapsedLabel.translation = [m.marginX, m.ElapsedLabel.translation[1]]
   m.RemainingLabel.translation = [1920 - m.marginX - m.RemainingLabel.boundingRect().width - 10, m.RemainingLabel.translation[1]]
-  m.ProgressBar.width = 1920 -  (m.marginX * 2)
+  m.RemainingMinimizedGroup.translation = [1779,346]
+  m.ProgressBar.translation = [m.constants.ui.translations.marginX, m.ProgressBar.translation[1]]
+  m.ProgressBar.width = 1920 - (m.marginX * 2)
 
   m.closedCaptionAndAudioSelectionOverlay = m.top.findNode("closedCaptionAndAudioSelectionOverlay")
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("globalCaptionChanged", "onGlobalCaptionChanged")
@@ -846,6 +868,9 @@ Function onThemeChange(msg = invalid)
     m.ProgressBar.trackColor = theme.neutralColor2
     m.closedCaptionAndAudioSelectionOverlayGroup.color = theme.shadeColor
     m.sendFeedbackSelectionOverlayGroup.color = theme.shadeColor
+    m.videoBorder.blendColor = theme.focusedColor
+    m.RemainingLabel.color = theme.primaryTextColor
+    m.RemainingMinimizedLabel.color = theme.primaryTextColor
     m.seekSpeed.color = theme.backgroundColor
     m.LoadingSpinner.blendColor = m.focusedColor
     m.seekIcon.blendColor = theme.backgroundColor
@@ -853,9 +878,13 @@ Function onThemeChange(msg = invalid)
     if theme.id = m.constants.ui.themeIDs.kidsMode
       m.logo.visible = false
       m.logoKids.visible = true
+      m.logoMinimized.visible = false
+      m.logoKidsMinimized.visible = true
     else
       m.logo.visible = true
       m.logoKids.visible = false
+      m.logoMinimized.visible = true
+      m.logoKidsMinimized.visible = false
     end if
   end if
 End Function
@@ -944,6 +973,7 @@ Function onControlChange()
     setFocusToPlaybackControl()
     m.UpNext.stopAutoPlayTimer = true
     m.UpNext.hide = true
+    resetVideoPlayerBackToOriginalPosition()
 
     'in the case where an ad break has started, but RAF does not yet have control, we want to break out of ads on back button pressed
     m.top.adControl = "stop"
@@ -1117,7 +1147,7 @@ Function onVideoStateChange(msg)
   end if
 
   ' Loading page visibility
-  if state = "playing" or state = "paused"
+  if state = "playing" OR state = "paused"
     if m.playerControlExperimentType <> "none"
       m.LoadingSpinner.visible = false
     else
@@ -1125,7 +1155,11 @@ Function onVideoStateChange(msg)
     end if
     m.top.state = state
   else
-    if m.playerControlExperimentType <> "none"
+    if m.bAutostartRefreshExperimentEnabled = true AND m.UpNext.opacity > 0 AND m.Video.width <> 1920
+      '//the video player is not in full screen mode and the up next component is visible, so do not display the loading screen
+      m.RemainingMinimizedGroup.opacity = 0
+      m.LoadingMinimized.visible = true
+    else if m.playerControlExperimentType <> "none"
       m.LoadingSpinner.visible = true
     else
       m.LoadingProgressBar.progress = 0
@@ -1346,7 +1380,25 @@ Function onVideoPositionChange(msg)
         hideBrowseWhileWatching()
         setFocusToPlaybackControl()
         clearSkipCuepointsButtonAndTimer()
-
+        
+        if m.bAutostartRefreshExperimentEnabled = true
+          if m.top.content.parentType = "series"
+            '//Make sure the upNext component is located in the original layer
+            m.UpNextParent.insertChild(m.UpNext, 0)
+          else
+            '//Minimize the movie player if this is a movie
+            m.top.insertChild(m.UpNext, 0)
+            nVideoMinimizedTranslation = m.MinimizedAssets.translation
+            resizeToLocation(m.Video, 640, 360, nVideoMinimizedTranslation, .5) ' Resize the video player to a smaller size for the UpNext screen
+            m.RemainingMinimizedGroup.opacity = 0
+            fade(m.RemainingMinimizedGroup, "in", 0.5, 0.5)
+            updateMinimizedTimes()
+            m.RemainingMinimizedGroup.visible = true
+            m.VideoBorder.width = 640
+            m.VideoBorder.height = 360
+          end if
+        end if
+     
         m.UpNext.show = true
         m.UpNext.setFocus(true)
         m.shouldShowUpNext = false
@@ -1673,6 +1725,7 @@ Function onUpNextContentSelected(msg)
   if contentSelected <> invalid
     tubiLog("VideoPlayer.onUpNextContentSelected")
     m.UpNext.hide = true
+    resetVideoPlayerBackToOriginalPosition()
   end if
 
   m.top.trackingComponentInfo = {
@@ -1934,6 +1987,9 @@ Function resetVideoPlayerState(content = invalid)
   m.shouldShowUpNext = true
   m.UpNext.resetContent = true
 
+  resetVideoPlayerBackToOriginalPosition()
+  setFocusToPlaybackControl()
+
   if m.RewindButton <> invalid
     m.RewindButton.uri = m.buttonUris.rewind
   end if
@@ -1952,6 +2008,14 @@ Function resetVideoPlayerState(content = invalid)
   m.closedCaptionAndAudioSelectionOverlayGroup.opacity = 0
   m.sendFeedbackSelectionOverlayGroup.opacity = 0
   m.isSendFeedbackOverlayShowing = false
+End Function
+
+
+Function resetVideoPlayerBackToOriginalPosition()
+  resizeToLocation(m.Video, 1920, 1080, [0, 0], 0) ' reset the video player to full screen
+  m.RemainingMinimizedGroup.visible = false
+  m.LoadingMinimized.visible = false
+  m.VideoBorder.visible = false
 End Function
 
 

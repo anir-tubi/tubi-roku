@@ -62,3 +62,16 @@ Function roundDown(value)
   return result
   
 End Function
+
+
+' maxVal function is used to get the maximum value of two values
+' @a : float/double/integer, the first value
+' @b : float/double/integer, the second value
+' returns maximum value
+Function maxVal(a as dynamic, b as dynamic) as dynamic
+  if a > b
+      return a
+  else
+      return b
+  end if
+End Function

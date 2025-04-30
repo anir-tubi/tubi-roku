@@ -128,7 +128,7 @@ Function onUserSignedInfoChange()
   else
     m.AutoPlayTimerInstructions.text = getTranslation("screenSettings_autoplayTimer_instructions")
   end if
-end Function
+End Function
 
 
 Function onComponentFocus()

@@ -408,7 +408,7 @@
 								"$description": "secondary copy, input placeholder text, input strokes hover"
 							},
 							"scrim": {
-								"$value": "##0b001999",
+								"$value": "#0b001999",
 								"$description": "modal overlay"
 							}
 						},

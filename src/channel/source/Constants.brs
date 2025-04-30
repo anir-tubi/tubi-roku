@@ -1208,6 +1208,7 @@ Function getConstants()
 
     constants.ui.backgroundTypes = {}
       constants.ui.backgroundTypes.fullScreen = "fullscreen"
+      constants.ui.backgroundTypes.fullScreen2 = "fullscreen2"
       constants.ui.backgroundTypes.topRight = "topright"
       constants.ui.backgroundTypes.epg = "epg"
       constants.ui.backgroundTypes.rightScreen = "rightScreen"
@@ -1358,6 +1359,9 @@ Function getConstants()
 
       'Sizes of large landscape thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.largeLandscape = [520, 292]
+
+      'Sizes of large landscape thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
+      constants.ui.imageSizes.largestLandscape = [661, 372]
 
       'Sizes of linear to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.linear = [384, 144]
@@ -1777,4 +1781,4 @@ Function getConstants()
       }
 
   return constants
-end Function
+End Function

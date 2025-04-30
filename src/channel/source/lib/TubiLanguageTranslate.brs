@@ -1362,6 +1362,18 @@ Function getTranslation_en_US()
       "description": "indicator for how many seconds until next video will start playing (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
       "message": "Starting in {seconds} s"
     },
+    "screenEndCard_upNextTitles": {
+      "description": "Label of button to allow users to view other video titles after the current video title is done playing",
+      "message": "Up Next"
+    },
+    "screenEndCard_nextEpisode": {
+      "description": "Label of button to allow users to start playing the next episode of the current show",
+      "message": "Next Episode"
+    },
+    "screenEndCard_upNextIn": {
+      "description": "indicator for how many seconds until next video will start playing",
+      "message": "Up Next in {seconds}"
+    },
     "videoPlayer_trailerTitle": {
       "description": "Label for the video preview associated with the current video title",
       "message": "Trailer ({title})"

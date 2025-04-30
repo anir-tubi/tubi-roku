@@ -4,7 +4,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
   if press
     m.lastButtonPressPos = m.playerPosition
 
-    if isButtonPressAllowed(key, m.VideoState, m.Video)
+    if isButtonPressAllowed(key, m.VideoState, m.Video) = true
       hidePauseAdOverlay() ' added for extra safety
 
       ' Resetting the timer when there is any user interaction during pause
@@ -112,7 +112,10 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         end if
 
       else if key = "up"
-        if m.focusedNode.isSameNode(m.BrowseWhileWatching) = true
+        if(m.bAutostartRefreshExperimentEnabled = true AND isNonEmptyString(m.Video.content.seriesId) = false AND m.UpNext.isInFocusChain() = true)
+          m.Video.setFocus(true)
+          m.VideoBorder.visible = true
+        else if m.focusedNode.isSameNode(m.BrowseWhileWatching) = true
           animateTransportAndBrowseWhileWatching("out")
 
           if m.playerControlExperimentType = "none"
@@ -157,8 +160,10 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         end if
 
       else if key = "down"
-
-        if (m.TopOverlay.opacity = 0 AND m.Thumbnail.visible = false) AND m.focusedNode.isSameNode(m.BrowseWhileWatching) = false
+        if(m.bAutostartRefreshExperimentEnabled = true AND m.Video.hasFocus() = true AND m.UpNext.opacity <> 0)
+          m.UpNext.setFocus(true)
+          m.VideoBorder.visible = false
+        else if (m.TopOverlay.opacity = 0 AND m.Thumbnail.visible = false) AND m.focusedNode.isSameNode(m.BrowseWhileWatching) = false
           showTransport()
           showBrowseWhileWatching()
         else if m.focusedNode.isSameNode(m.progressBar) = true
@@ -194,35 +199,13 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           else
             return false
           end if
-
         else
           return false
         end if
 
       else if key = "back"
-        if m.UpNext.isInFocusChain()
-          m.UpNext.hide = true
-          if m.UpNext.isAutoPlayOff = true AND m.VideoState = "stop"
-            backButtonExit()
-          else
-            trackEvent({
-              type: "auto_play"
-              values: {
-                video_id: m.top.content.id.toInt()
-                auto_play_action: "DISMISS" 'AutoPlayAction enum
-              }
-            })
-
-            ' if the next video plays after this point it will be considered automatic since the user
-            ' will not be interacting with the autoplay UI again.
-            setAutoplayMode("automatic")
-
-            if m.VideoState = "stop" AND m.UpNext.contentFocused <> invalid
-              m.top.upNextContentToAutoplay = m.UpNext.contentFocused
-            end if
-
-            setFocusToPlaybackControl()
-          end if
+        if m.UpNext.isInFocusChain() = true OR (m.bAutostartRefreshExperimentEnabled = true AND m.Video.hasFocus() = true AND m.UpNext.opacity <> 0)
+          backOutOfUpNext()
         else if m.VideoState = "play"
           hideBrowseWhileWatching()
           setFocusToPlaybackControl()
@@ -260,6 +243,40 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
 End Function
 
 
+' This function is called when the user exits the UpNext screen
+Function backOutOfUpNext()
+  if m.bAutostartRefreshExperimentEnabled = true AND m.Video.width <> 1920
+    resizeToLocation(m.Video, 1920, 1080, [0, 0], .25) ' reset the video player
+    m.RemainingMinimizedGroup.visible = false
+    m.VideoBorder.visible = false
+    m.LoadingMinimized.visible = false
+  end if
+
+  m.UpNext.hide = true
+  if m.UpNext.isAutoPlayOff = true AND m.VideoState = "stop"
+    backButtonExit()
+  else
+    trackEvent({
+      type: "auto_play"
+      values: {
+        video_id: m.top.content.id.toInt()
+        auto_play_action: "DISMISS" 'AutoPlayAction enum
+      }
+    })
+
+    ' if the next video plays after this point it will be considered automatic since the user
+    ' will not be interacting with the autoplay UI again.
+    setAutoplayMode("automatic")
+
+    if m.VideoState = "stop" AND m.UpNext.contentFocused <> invalid
+      m.top.upNextContentToAutoplay = m.UpNext.contentFocused
+    end if
+
+    setFocusToPlaybackControl()
+  end if
+End Function
+
+
 ' m.playerPosition is the main source of truth for position.
 ' It can be updated by the video node or by calculations made while scrubbing
 ' @amt: integer, the amount of time in seconds by which m.playerPosition should be updated
@@ -282,6 +299,10 @@ Function updatePlayerPosition(amt = 0)
   ' update transport details only when it is shown
   if m.HUD.opacity > 0 or amt <> 0
     updateTransport()
+  end if
+
+  if m.UpNext.opacity > 0 or amt <> 0
+    updateMinimizedTimes()
   end if
 End Function
 
@@ -587,8 +608,9 @@ End Function
 
 
 Function handleOk()
-
-  if m.HUD.opacity = 0 AND m.skipCuepointsButton.hasFocus() = false
+  if m.bAutostartRefreshExperimentEnabled = true AND m.Video.isInFocusChain() = true AND m.UpNext.opacity <> 0
+    backOutOfUpNext()
+  else if m.HUD.opacity = 0 AND m.skipCuepointsButton.hasFocus() = false
     showTransport()
     showBrowseWhileWatching()
   else if (m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3") AND m.sendFeedBackButton.hasFocus() = true
@@ -907,7 +929,7 @@ Function handleSkipVideo(amt)
     if duration <> invalid then
   
       if duration < 3600
-        currentSeekPosition = formatLengthasMinsAndSecs(position)
+        currentSeekPosition = formatLengthAsMinsAndSecs(position)
       else
         currentSeekPosition = formatLengthAsTimestamp(position)
       end if
@@ -1514,6 +1536,10 @@ Function removeFocusForAllChildComponents()
     m.UpNext.setFocus(false)
   end if
 
+  if m.Video.isInFocusChain() = true
+    m.Video.setFocus(false)
+  end if
+
   if m.pauseAdOverlay.isInFocusChain() = true
     m.pauseAdOverlay.setFocus(false)
   end if
@@ -1706,8 +1732,8 @@ Function updateTransportTimes()
   if duration <> invalid then
 
     if m.playerControlExperimentType <> "none" AND duration < 3600
-      currentSeekPosition = formatLengthasMinsAndSecs(m.playerPosition)
-      remainingTime = formatLengthasMinsAndSecs(duration - m.playerPosition)
+      currentSeekPosition = formatLengthAsMinsAndSecs(m.playerPosition)
+      remainingTime = formatLengthAsMinsAndSecs(duration - m.playerPosition)
     else
       currentSeekPosition = formatLengthAsTimestamp(m.playerPosition)
       remainingTime = formatLengthAsTimestamp(duration - m.playerPosition)
@@ -1717,6 +1743,21 @@ Function updateTransportTimes()
     m.currentSeekLabel.text = currentSeekPosition
     m.RemainingLabel.text = "-" + remainingTime
     m.RemainingLabel.translation = [1920 - m.marginX - m.RemainingLabel.boundingRect().width - 10, m.RemainingLabel.translation[1]]
+  end if
+End Function
+
+
+' update the minimized state time
+Function updateMinimizedTimes()
+  if m.Video.duration <> invalid then
+    nTimeRemaining = m.Video.duration - m.playerPosition
+    if nTimeRemaining >= 1
+      sRemainingTime = "-" + formatLengthAsTimestampWithoutHours(nTimeRemaining)
+    else
+      '//Hide the remaining time label if the video is less than 1 second
+      sRemainingTime = ""
+    end if
+    m.RemainingMinimizedLabel.text = sRemainingTime
   end if
 End Function
 
@@ -1799,9 +1840,18 @@ Function isButtonPressAllowed(key, videoState, videoNode)
     isAllowed = false
   end if
 
-  'When upnext is focused, only back keys are allowed.
-  if m.UpNext.isInFocusChain() = true AND disabledKeys[key] = true
-    isAllowed = false
+  'When upNext is focused, only back keys are allowed.
+  if m.UpNext.isInFocusChain() = true AND (disabledKeys[key] = true)
+    if isNonEmptyString(m.Video.content.seriesId) = true OR m.bAutostartRefreshExperimentEnabled = false OR key <> "up"
+      isAllowed = false
+    end if
+  end if
+
+  'When the video player is focused, only down and OK keys are allowed.
+  if m.Video.isInFocusChain() = true AND (disabledKeys[key] = true)
+    if m.bAutostartRefreshExperimentEnabled = false OR (key <> "down" AND key <> "OK")
+      isAllowed = false
+    end if
   end if
 
   ' If closed caption and audio overlay is showing then we ignore button press in the screen level.
@@ -1826,12 +1876,15 @@ Function isActiveVideoState(videoState, videoNode)
   }
 
   isActive = true
-  if disactiveStates[videoState] = true
-    isActive = false
-  end if
+  if m.bAutostartRefreshExperimentEnabled = false OR NOT ((videoState = "stop" OR videoNode.state = "stopped") AND m.UpNext.opacity > 0 AND isNonEmptyString(m.Video.content.seriesId) = false)
+    '//if the upNext UI is showing after a movie is done playing while in the roku_video_autostart_ui_refresh_v1 experiment, then we do not want to disable the active video state
+    if disactiveStates[videoState] = true
+      isActive = false
+    end if
 
-  if videoNode.state = "buffering" OR videoNode.state = "stopped"
-    isActive = false
+    if videoNode.state = "buffering" OR videoNode.state = "stopped"
+      isActive = false
+    end if
   end if
 
   return isActive

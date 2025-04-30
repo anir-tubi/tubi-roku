@@ -8,6 +8,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
 
   <interface>
     <!--INPUT-->
@@ -23,6 +24,9 @@
       <!-- If the size of the label should be different than this component's default, then set the typography ID. -->
       <field id="typographyLabelId" type="string"/>
 
+      <!-- The text color of the countdown text if something other than the default is desired -->
+      <field id="textColor" type="string" alias="CountdownText.color"/>
+
       <!-- The background color of the countdown if something other than the default is desired -->
       <field id="bgcolor" type="string" alias="PlayerCountdownBground.blendColor"/>
 
@@ -35,6 +39,8 @@
     <!--OUTPUT-->
       <!-- The width of the UI element. Essentially the width of the background. -->
       <field id="width" type="float"/>
+      <!-- The height of the UI element. Essentially the height of the background. -->
+      <field id="height" type="float"/>
 
   </interface>
   <children>
@@ -45,27 +51,30 @@
         id="PlayerCountdownBground"
         width="210"
         height="41"
-        uri="pkg:/images/tab_short_component_alt_$$RES$$.9.png"/>
-      <LayoutGroup
-        id="TextAndIconLayoutGroup"
-        layoutDirection="horiz"
-        vertAlignment="center"
-        translation="[20,23]"
-        itemSpacings="[8]">
-          <Poster
-            id="FullscreenIcon"
-            uri="pkg:/images/icon-fullScreen.png"
-            width="20"
-            height="22"
-            loadDisplayMode="scaleToFit"
-            loadSync="true"/>
-          <Label
-            id="CountdownText"
-            width="0">
-            <Font
-              role="font"/>
-          </Label>
-        </LayoutGroup>
+        uri="pkg:/images/bgroundCountdown-$$RES$$.9.png"/>
+      <Group
+          id="TextAndIconParentGroup"
+          translation="[12,6]">
+          <LayoutGroup
+            id="TextAndIconLayoutGroup"
+            layoutDirection="horiz"
+            vertAlignment="center"
+            itemSpacings="[8]">
+              <Poster
+                id="FullscreenIcon"
+                uri="pkg:/images/icon-fullScreen.png"
+                width="20"
+                height="22"
+                loadDisplayMode="scaleToFit"
+                loadSync="true"/>
+              <Label
+                id="CountdownText"
+                width="0">
+                <Font
+                  role="font"/>
+              </Label>
+            </LayoutGroup>
+        </Group>
       </Group>
   </children>
 </component>

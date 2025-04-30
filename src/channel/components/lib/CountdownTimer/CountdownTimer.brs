@@ -3,6 +3,7 @@ Function init()
   m.CountdownTimerParent = m.top.findNode("CountdownTimerParent")
   m.FullscreenIcon = m.top.findNode("FullscreenIcon")
   m.TextAndIconLayoutGroup = m.top.findNode("TextAndIconLayoutGroup")
+  m.TextAndIconParentGroup = m.top.findNode("TextAndIconParentGroup")
   m.PlayerCountdownBground = m.top.findNode("PlayerCountdownBground")
   m.top.observeFieldScoped("seconds", "onSecondChange")
   m.top.observeFieldScoped("display", "onDisplayChange")
@@ -52,8 +53,8 @@ Function setBackgroundWidth()
   if nodeFullscreenIconParent <> invalid AND nodeFullscreenIconParent.id = m.TextAndIconLayoutGroup.id
     nFullScreenIconWidth = m.FullscreenIcon.width + m.TextAndIconLayoutGroup.itemSpacings[0]
   end if
-
-  m.PlayerCountdownBground.width = (m.TextAndIconLayoutGroup.translation[0] * 2) + nFullScreenIconWidth +  m.CountdownText.boundingRect().width
+  
+  m.PlayerCountdownBground.width = (m.TextAndIconParentGroup.translation[0] * 2) + nFullScreenIconWidth +  m.CountdownText.boundingRect().width
   m.top.width = m.PlayerCountdownBground.width
   
   '//reset the seconds back to what they were before this function
@@ -109,8 +110,6 @@ End Function
 
 
 Function onTypographyLabelIdChange(msg)
-  typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.CountdownText, typographyConstants.ids.bodyMedium)
   setTypographyOfCountdownLabel(msg.getData())
 End Function
   
@@ -121,7 +120,20 @@ Function setTypographyOfCountdownLabel(sTypographyId = "")
     sTypographyId = typographyConstants.ids.bodyMedium
   end if
   
+  '//vertically center the label and icon
+  m.CountdownText.height = 0
   setTypographyOfLabel(m.CountdownText, sTypographyId)
+  setSeconds(getIntegerToSetWidth())
+  nLabelHeight = m.CountdownText.boundingRect().height
+  m.PlayerCountdownBground.height = nLabelHeight + (m.TextAndIconParentGroup.translation[1] * 2)
+  nMaxHeight = maxVal(nLabelHeight, m.FullscreenIcon.height)
+  m.TextAndIconLayoutGroup.translation = [m.TextAndIconLayoutGroup.translation[0], nMaxHeight/2]
+  m.top.height = m.PlayerCountdownBground.height
+
+  '//reset the seconds back to what they were before this function
+  if m.top.seconds >= 0
+    setSeconds(m.top.seconds)
+  end if
 
   '//Reset the background width when the text-size changes
   setBackgroundWidth()

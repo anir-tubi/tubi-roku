@@ -62,6 +62,7 @@ Function init()
   m.playerCountdownGroup = m.top.findNode("PlayerCountdownGroup")
 
   m.top.observeFieldScoped("mode", "onModeChange")
+  m.top.observeFieldScoped("titleTypography", "onTitleTypographyChange")
   m.top.observeFieldScoped("width", "onWidthChange")
   m.top.observeFieldScoped("leftHeaderImageUri", "onLeftHeaderImageUriChange")
   m.top.observeFieldScoped("titleImageUri", "onTitleImageChange")
@@ -263,6 +264,7 @@ Function onEpisodeTitleChange(msg)
       m.episode.text = ""
       m.offset.removeChild(m.episode)
   end if
+  shouldCalculateHeight()
 End Function
 
 
@@ -633,6 +635,8 @@ Function onLineOneDataChange(msg)
     end if
 
   end if
+
+  shouldCalculateHeight()
 End Function
 
 
@@ -685,6 +689,7 @@ Function onLineTwoDataChange(msg)
     end if
 
   end if
+  shouldCalculateHeight()
 End Function
 
 
@@ -698,6 +703,7 @@ Function onDescriptionChange(msg)
   else
     m.description.visible = false
   end if
+  shouldCalculateHeight()
 End Function
 
 
@@ -724,6 +730,7 @@ Function onTitleImageChange(msg)
 
     m.titleImage.uri = ""
   end if
+  shouldCalculateHeight()
 End Function
 
 
@@ -770,6 +777,7 @@ Function onDirectorsChange(msg)
   end if
 
   m.director.text = text
+  shouldCalculateHeight()
 End Function
 
 
@@ -814,6 +822,7 @@ Function onStarringChange(msg)
   end if
 
   m.starring.text = text
+  shouldCalculateHeight()
 End Function
 
 
@@ -825,6 +834,7 @@ Function onSeasonEpisodeCountChange(msg)
   else
     m.line2.text = ""
   end if
+  shouldCalculateHeight()
 End Function
 
 
@@ -889,6 +899,7 @@ Function onCalculateHeight()
     m.descriptionFocusButton.height = updatedDescriptionBoundingHeight + bottomMargin
   end if
 
+  m.top.calculatedHeight = m.offset.BoundingRect().height
 End Function
 
 
@@ -923,6 +934,25 @@ Function resetDefaultState()
 End Function
 
 
+' Change the font size of the title
+Function onTitleTypographyChange(msg)
+  titleTypography = msg.getData()
+  if isNonEmptyString(titleTypography) = false
+    titleTypography = m.typographyConstants.ids.headerSmall
+  end if
+  setTypographyOfLabel(m.title, titleTypography)
+  shouldCalculateHeight()
+End Function
+
+
+'// Anything that may affect the height of the info panel should call this function to recalculate the height
+Function shouldCalculateHeight()
+  if m.top.calculateHeight = true
+    onCalculateHeight()
+  end if
+End Function
+
+
 '''''''''''''''''''
 ' onModeChange
 '
@@ -931,8 +961,6 @@ End Function
 Function onModeChange()
   tubiLog("InfoPanel.onModeChange")
   resetDefaultState()
-
-  setTypographyOfLabel(m.title, m.typographyConstants.ids.headerSmall)
 
   if m.top.mode = m.constants.ui.infoPanelModes.item
     ' used for movies and series on the homescreen and similar screens

@@ -62,7 +62,8 @@ End Function
 
 
 ' @passedOptions: assocArray, options to be added to the request object as created by Request().createAsync()
-Function cmsApi_createUpNextContentReqInfo(passedOptions)
+' @bDisplayLargestLandscape: boolean, should the largest landscape image be used for the UpNext poster?
+Function cmsApi_createUpNextContentReqInfo(passedOptions, bDisplayLargestLandscape = false)
   url = m.constants.urls.autopilot.upNextContent
 
   options = m.getCommonOptions(true)
@@ -87,7 +88,13 @@ Function cmsApi_createUpNextContentReqInfo(passedOptions)
 
   options.params = params
   options.params = m.setTupianPosterParam(options.params)
-  options.params = m.setTupianLandscapeParam(options.params)
+
+  if bDisplayLargestLandscape = true
+    '//::NOTE:: if the roku_video_autostart_ui_refresh_v1 is graduated, replace bDisplayLargestLandscape with isSeries, in which case the largest landscape image will be used for series only
+    options.params = m.setImageParams(["largestLandscape"], options.params)
+  else
+    options.params = m.setTupianLandscapeParam(options.params)
+  end if
 
   return {
     url: url
@@ -489,6 +496,7 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
   imageSizes = m.constants.ui.imageSizes
   posterSize = imageSizes.poster
   landscapeSize = imageSizes.landscape
+  largestLandscapeSize = imageSizes.largestLandscape
   background = imageSizes.background
   title = imageSizes.title
   skinAdLandscape = imageSizes.skinAdLandscape
@@ -509,6 +517,8 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
       existingParams["images[poster_tb]"] = "w" + posterSize[0].ToStr() + "h" + posterSize[1].ToStr() + "_poster"
     else if imageType = "landscape"
       existingParams["images[landscape_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_landscape"
+    else if imageType = "largestLandscape"
+      existingParams["images[landscape_tb]"] = "w" + largestLandscapeSize[0].ToStr() + "h" + largestLandscapeSize[1].ToStr() + "_landscape"
     else if imageType = "hero"
       existingParams["images[hero_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_hero"
     else if imageType = "featured"

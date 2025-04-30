@@ -1243,7 +1243,8 @@ Function fetchUpNextContent(videoPlayer)
       options.params.delete("container_id")
     end if
 
-    upNextReqInfo = m.cmsApi.createUpNextContentReqInfo(options)
+    bUseLargestLandscapeImage = getExperimentResource("roku_video_autostart_ui_refresh", "roku_video_autostart_ui_refresh_v1", false).enabled = true AND videoPlayer.content.parentType = "series"
+    upNextReqInfo = m.cmsApi.createUpNextContentReqInfo(options, bUseLargestLandscapeImage)
 
     return m.makeRequest({
       requestType: m.constants.reqNames.getUpNextContent
