@@ -265,7 +265,7 @@ Function init()
   m.quickSeekIcon = createObject("roSGNode", "Poster")
   m.quickSeekIcon.id = "quickSeekIcon"
   m.quickSeekIcon.width = 36
-  m.quickSeekIcon.width = 36
+  m.quickSeekIcon.height = 36
   m.quickSeekIcon.translation = [m.marginX + 120, -2]
   m.quickSeekIcon.visible = false
   m.timeGroup.appendChild(m.quickSeekIcon)
