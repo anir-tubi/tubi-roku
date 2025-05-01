@@ -81,6 +81,8 @@ End Function
 Function onFeaturedRowItemSelected(msg)
   tubiLog("CategoryGridList.onFeaturedRowItemSelected")
   featuredItemSelected = msg.getData()
+  m.top.selectedPosition = featuredItemSelected
+
   itemSelected = resolveAbbreviatedContent(m.top.featuredRowContent, featuredItemSelected)
   if itemSelected <> invalid
     m.top.featuredItemSelected = itemSelected
