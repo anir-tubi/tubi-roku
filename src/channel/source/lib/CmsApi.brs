@@ -198,7 +198,6 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
 
   params["include_empty_history"] = true
   params["include_empty_queue"] = true
-  params["include_channels"] = true
   params["include_sponsorships"] = true
 
   ' this is just to remove most popular linear containers; rest if any shows up will be removed in tubimetadataTranslate
@@ -361,7 +360,6 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
   url = m.constants.urls.tensor.cdn.container + "/" + categoryId
 
   params["is_kids_mode"] = bKidsMode
-  params["include_channels"] = true
   if isLazyLoadExpEnabled = true
     params["cursor"] = cursor
   else

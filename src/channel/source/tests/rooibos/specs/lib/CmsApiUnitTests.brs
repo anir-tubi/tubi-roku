@@ -589,7 +589,6 @@ Function cmsApi_createCategoryReqInfo_test()
     "platform"
     "device_id"
     "is_kids_mode"
-    "include_channels"
     "cursor"
     "contents_limit"
     "images[landscape_tb]"
@@ -610,7 +609,6 @@ Function cmsApi_createCategoryReqInfo_test()
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
       "is_kids_mode": false
-      "include_channels": true
       "cursor": 0
       "contents_limit": 19
       "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largePoster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largePoster[1].ToStr() + "_poster"
@@ -646,7 +644,6 @@ Function cmsApi_createCategoryReqInfo_test()
   m.assertEqual(categoryInfo.options.params["platform"], categoryOptions.params["platform"])
   m.assertEqual(categoryInfo.options.params["device_id"], categoryOptions.params["device_id"])
   m.assertEqual(categoryInfo.options.params["is_kids_mode"], categoryOptions.params["is_kids_mode"])
-  m.assertEqual(categoryInfo.options.params["include_channels"], categoryOptions.params["include_channels"])
   m.assertEqual(categoryInfo.options.params["images[poster_tb]"], categoryOptions.params["images[poster_tb]"])
   m.assertEqual(categoryInfo.options.params["images[landscape_tb]"], categoryOptions.params["images[landscape_tb]"])
   m.assertEqual(categoryInfo.options.params["contentMode"], categoryOptions.params["contentMode"])
@@ -668,7 +665,6 @@ Function cmsApi_createCategoryReqInfo_test()
   m.assertEqual(categoryInfo.options.params["platform"], categoryOptions.params["platform"])
   m.assertEqual(categoryInfo.options.params["device_id"], categoryOptions.params["device_id"])
   m.assertEqual(categoryInfo.options.params["is_kids_mode"], categoryOptions.params["is_kids_mode"])
-  m.assertEqual(categoryInfo.options.params["include_channels"], categoryOptions.params["include_channels"])
   m.assertEqual(categoryInfo.options.params["images[poster_tb]"], categoryOptions.params["images[poster_tb]"])
   m.assertEqual(categoryInfo.options.params["images[landscape_tb]"], categoryOptions.params["images[landscape_tb]"])
   m.assertEqual(categoryInfo.options.params["contentMode"], categoryOptions.params["contentMode"])
@@ -692,7 +688,6 @@ Function cmsApi_createCategoryReqInfo_test()
   m.assertEqual(categoryInfo.options.params["platform"], categoryOptions.params["platform"])
   m.assertEqual(categoryInfo.options.params["device_id"], categoryOptions.params["device_id"])
   m.assertEqual(categoryInfo.options.params["is_kids_mode"], categoryOptions.params["is_kids_mode"])
-  m.assertEqual(categoryInfo.options.params["include_channels"], categoryOptions.params["include_channels"])
   m.assertEqual(categoryInfo.options.params["images[poster_tb]"], categoryOptions.params["images[poster_tb]"])
   m.assertEqual(categoryInfo.options.params["images[landscape_tb]"], categoryOptions.params["images[landscape_tb]"])
   m.assertEqual(categoryInfo.options.params["contentMode"], categoryOptions.params["contentMode"])
@@ -710,7 +705,6 @@ Function cmsApi_createCategoryReqInfo_test()
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
       "is_kids_mode": false
-      "include_channels": true
       "cursor": 10
       "contents_limit": m.cmsApi.constants.performance.categoryGridList.lazyLoadBatchSize
       "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largePoster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largePoster[1].ToStr() + "_poster"
@@ -741,7 +735,6 @@ Function cmsApi_createCategoryReqInfo_test()
   m.assertEqual(categoryInfo.options.params["platform"], lazyCategoryOptions.params["platform"])
   m.assertEqual(categoryInfo.options.params["device_id"], lazyCategoryOptions.params["device_id"])
   m.assertEqual(categoryInfo.options.params["is_kids_mode"], lazyCategoryOptions.params["is_kids_mode"])
-  m.assertEqual(categoryInfo.options.params["include_channels"], lazyCategoryOptions.params["include_channels"])
   m.assertEqual(categoryInfo.options.params["images[poster_tb]"], lazyCategoryOptions.params["images[poster_tb]"])
   m.assertEqual(categoryInfo.options.params["images[landscape_tb]"], lazyCategoryOptions.params["images[landscape_tb]"])
   m.assertEqual(categoryInfo.options.params["cursor"], lazyCategoryOptions.params["cursor"])
@@ -776,7 +769,7 @@ Function cmsApi_createAutocompleteReqInfo_test()
       "search": "search_text"
     }
   }
-  
+
   autocompleteInfo = m.cmsApi.createAutocompleteReqInfo("search_text")
 
   m.assertEqual(autocompleteInfo.count(), 2)
