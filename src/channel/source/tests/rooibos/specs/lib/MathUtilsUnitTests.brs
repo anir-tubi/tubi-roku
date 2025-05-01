@@ -41,6 +41,54 @@ Function mathUtils_round_test()
 End Function
 
 
+'@Test maxValue unit tests
+Function mathUtils_max_value_test()
+  ' maxValue test with integers (positive)
+  result = maxValue(5, 3)
+  m.AssertEqual(result, 5)
+  m.AssertTrue(isInt(result))
+  
+  ' maxValue test with integers (reverse order)
+  result = maxValue(3, 5)
+  m.AssertEqual(result, 5)
+  m.AssertTrue(isInt(result))
+
+  ' maxValue test with floats
+  result = maxValue(3.14, 2.71)
+  m.AssertEqual(result, 3.14)
+  m.AssertTrue(isFloat(result) OR isDouble(result))
+
+  ' maxValue test with mixed types (integer and float)
+  result = maxValue(5, 4.9)
+  m.AssertEqual(result, 5)
+  m.AssertTrue(isInt(result))
+
+  ' maxValue test with equal values
+  result = maxValue(10, 10)
+  m.AssertEqual(result, 10)
+  m.AssertTrue(isInt(result))
+
+  ' maxValue test with negative numbers
+  result = maxValue(-1, -5)
+  m.AssertEqual(result, -1)
+  m.AssertTrue(isInt(result))
+
+  ' maxValue test with zero and positive
+  result = maxValue(0, 8)
+  m.AssertEqual(result, 8)
+  m.AssertTrue(isInt(result))
+
+  ' maxValue test with invalid input (string)
+  result = maxValue("2", 3)
+  m.AssertInvalid(result) ' Expect invalid instead of 0
+
+  ' maxValue test with invalid input (array)
+  result = maxValue([1], 2)
+  m.AssertInvalid(result) ' Expect invalid instead of 0
+
+End Function
+
+
 '@Test round up unit tests
 Function mathUtils_round_up_test()
 

@@ -25,7 +25,7 @@
       <field id="typographyLabelId" type="string"/>
 
       <!-- The text color of the countdown text if something other than the default is desired -->
-      <field id="textColor" type="string" alias="CountdownText.color"/>
+      <field id="textColor" type="string" alias="CountdownText.color, CountdownSeconds.color"/>
 
       <!-- The background color of the countdown if something other than the default is desired -->
       <field id="bgcolor" type="string" alias="PlayerCountdownBground.blendColor"/>
@@ -67,12 +67,24 @@
                 height="22"
                 loadDisplayMode="scaleToFit"
                 loadSync="true"/>
-              <Label
-                id="CountdownText"
-                width="0">
-                <Font
-                  role="font"/>
-              </Label>
+              <LayoutGroup
+                id=""
+                layoutDirection="horiz"
+                vertAlignment="center">
+                <Label
+                  id="CountdownText"
+                  width="0">
+                  <Font
+                    role="font"/>
+                </Label>
+                <Label
+                  id="CountdownSeconds"
+                  horizAlign="right"
+                  width="0">
+                  <Font
+                    role="font"/>
+                </Label>
+              </LayoutGroup>
             </LayoutGroup>
         </Group>
       </Group>

@@ -17,6 +17,25 @@ Function round(value)
   
 End Function
 
+' maxValue function is used to get the max value of two values
+' @a : dynamic, the first value
+' @b : dynamic, the second value
+' returns value as dynamic; or invalid if one of the inputs is not valid numeric type
+Function maxValue(a as dynamic, b as dynamic) as dynamic
+  ' Return invalid to indicate that the inputs are not valid numeric types
+  if isNumber(a) = false
+    return invalid
+  else if isNumber(b) = false
+    return invalid
+  end if
+  
+  if a > b
+      return a
+  else
+      return b
+  end if
+End Function
+
 
 ' roundUp function is used to round the value up
 ' eg. if the value is 3.1, then it rounds to 4

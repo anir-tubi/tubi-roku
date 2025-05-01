@@ -1,5 +1,6 @@
 Function init()
   m.CountdownText = m.top.findNode("CountdownText")
+  m.CountdownSeconds = m.top.findNode("CountdownSeconds")
   m.CountdownTimerParent = m.top.findNode("CountdownTimerParent")
   m.FullscreenIcon = m.top.findNode("FullscreenIcon")
   m.TextAndIconLayoutGroup = m.top.findNode("TextAndIconLayoutGroup")
@@ -46,15 +47,23 @@ End Function
 
 Function setBackgroundWidth()
   '//Use a 2 digit number to determine and set the max width of the background.
+  m.CountdownSeconds.width = 0
   setSeconds(getIntegerToSetWidth())
+  m.CountdownSeconds.width = m.CountdownSeconds.boundingRect().width '//set the width of the seconds textfield so the seconds can be right aligned.
 
+  '// Workaround for potential Roku rendering issue: Add 1 pixel to the width to ensure the seconds label remains 
+  '// right-aligned when displaying fewer characters than the maximum (e.g., "5" vs. "55"). Without this, the text may appear 
+  '// misaligned if the width matches the maximum character count exactly.'
+  m.CountdownSeconds.width = m.CountdownSeconds.width + 1
+
+  nItemSpacing = m.TextAndIconLayoutGroup.itemSpacings[0]
   nFullScreenIconWidth = 0
   nodeFullscreenIconParent = m.FullscreenIcon.getParent()
   if nodeFullscreenIconParent <> invalid AND nodeFullscreenIconParent.id = m.TextAndIconLayoutGroup.id
-    nFullScreenIconWidth = m.FullscreenIcon.width + m.TextAndIconLayoutGroup.itemSpacings[0]
+    nFullScreenIconWidth = m.FullscreenIcon.width + nItemSpacing
   end if
-  
-  m.PlayerCountdownBground.width = (m.TextAndIconParentGroup.translation[0] * 2) + nFullScreenIconWidth +  m.CountdownText.boundingRect().width
+
+  m.PlayerCountdownBground.width = (m.TextAndIconParentGroup.translation[0] * 2) + nFullScreenIconWidth +  m.CountdownText.boundingRect().width + m.CountdownSeconds.boundingRect().width
   m.top.width = m.PlayerCountdownBground.width
   
   '//reset the seconds back to what they were before this function
@@ -73,6 +82,7 @@ Function onThemeChange(msg = invalid)
 
   if theme <> invalid
     m.CountdownText.color = theme.primaryTextColor
+    m.CountdownSeconds.color = theme.primaryTextColor
     m.PlayerCountdownBground.blendColor = theme.neutralColor
   end if
 End Function
@@ -122,12 +132,19 @@ Function setTypographyOfCountdownLabel(sTypographyId = "")
   
   '//vertically center the label and icon
   m.CountdownText.height = 0
+  m.CountdownSeconds.height = 0
   setTypographyOfLabel(m.CountdownText, sTypographyId)
+  setTypographyOfLabel(m.CountdownSeconds, sTypographyId)
   setSeconds(getIntegerToSetWidth())
   nLabelHeight = m.CountdownText.boundingRect().height
+
   m.PlayerCountdownBground.height = nLabelHeight + (m.TextAndIconParentGroup.translation[1] * 2)
-  nMaxHeight = maxVal(nLabelHeight, m.FullscreenIcon.height)
-  m.TextAndIconLayoutGroup.translation = [m.TextAndIconLayoutGroup.translation[0], nMaxHeight/2]
+  nMaxHeight = maxValue(nLabelHeight, m.FullscreenIcon.height)
+  if nMaxHeight <> invalid
+    m.TextAndIconLayoutGroup.translation = [m.TextAndIconLayoutGroup.translation[0], nMaxHeight/2]
+  end if
+  m.CountdownText.height = m.CountdownText.boundingRect().height
+  m.CountdownSeconds.height = m.CountdownSeconds.boundingRect().height
   m.top.height = m.PlayerCountdownBground.height
 
   '//reset the seconds back to what they were before this function
@@ -144,8 +161,11 @@ Function setSeconds(nSeconds)
   if isNonEmptyString(m.top.secondsTranslationId) = true
     sTranslationId = m.top.secondsTranslationId
   else
-    sTranslationId = "metadata_fullscreen_countdown_plural"
+    sTranslationId = "metadata_fullscreen_countdown_no_seconds"
   end if
 
-  m.CountdownText.text = getTranslation(sTranslationId, {seconds: nSeconds.toStr()})
+  m.CountdownText.text = getTranslation(sTranslationId)
+
+  m.CountdownSeconds.horizAlign="right"
+  m.CountdownSeconds.text = nSeconds.toStr()
 End Function

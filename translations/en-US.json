@@ -978,7 +978,7 @@
   },
   "metadata_fullscreen_countdown_no_seconds": {
     "description": "label to indicate how many seconds it will take before the video player will automatically go fullscreen. The word 'seconds' should NOT follow the number of seconds.",
-    "message": "Fullscreen in {seconds}"
+    "message": "Fullscreen in "
   },
   "metadata_watch_again": {
     "description": "label to indicate a watched video can be watched again",
