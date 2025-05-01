@@ -367,19 +367,23 @@ function buildStarter() {
   });
   // Adding a promise all which will make sure that success callback will be triggered only after all file moving is completed.
   return Promise.all(promises)
-    .then(() => {
+    .then(async () => {
       replaceColorConstants('build/starter');
       replaceTypographyConstants('build/starter');
       createSettings(options, 'build/starter/source/Settings.brs');
       createManifest(options, 'build/starter/manifest', 'starter_library_manifest');
 
       if (options.config === 'production' || options.config === 'staging') {
-        // Create a new stream to process files
-        return src('build/starter/**/*.brs') // Adjust the glob pattern to match your BrightScript files
+        await new Promise((resolve, reject) => {
+          // Create a new stream to process files
+          src('build/starter/**/*.brs') // Adjust the glob pattern to match your BrightScript files
           .pipe(
             replace(REMOVE_TUBI_LOGS_REGEX, `' $&`) // Case-insensitive match for tubiLog or logDebug followed by '('
           )
-          .pipe(dest('build/starter')); // Write the modified files back to the same directory
+          .pipe(dest('build/starter'))
+          .on('end', resolve)
+          .on('error', reject);
+        });
       }
 
       return zipAsPromise('build/starter/**/*', `tubi_starter_components_${minorBuildTag}.zip`, 'build/');
@@ -539,18 +543,20 @@ function buildRemote() {
 
   // zip up the remote components
   return build
-  .then(() => {
+  .then(async() => {
     replaceColorConstants('build/remote');
     replaceTypographyConstants('build/remote');
     createManifest(options, 'build/remote/manifest', 'component_library_manifest');
 
     if (options.config === 'production' || options.config === 'staging') {
       // Create a new stream to process files
-      return src('build/remote/**/*.brs') // Adjust the glob pattern to match your BrightScript files
-        .pipe(
-          replace(REMOVE_TUBI_LOGS_REGEX, `' $&`) // Case-insensitive match for tubiLog or logDebug followed by '('
-        )
-        .pipe(dest('build/remote')); // Write the modified files back to the same directory
+      await new Promise((resolve, reject) => {
+        src('build/remote/**/*.brs')
+          .pipe(replace(REMOVE_TUBI_LOGS_REGEX, `' $&`))
+          .pipe(dest('build/remote'))
+          .on('end', resolve)
+          .on('error', reject);
+      });
     }
     return zipAsPromise('build/remote/**/*', `tubi_remote_components_${buildTag}.zip`, 'build/');
   });
