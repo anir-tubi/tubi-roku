@@ -36,9 +36,7 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0)
     m.settingsScreen.observeFieldScoped("appRestartRequested", "onAppRestartRequested")
   end if
 
-  if getExperimentResource("roku_autoplay_timer", "roku_autoplay_timer_v1").enabled = true
-    m.settingsScreen.observeFieldScoped("autoPlayTimerSettingSelected", "onAutoPlayTimerSettingSelected")
-  end if
+  m.settingsScreen.observeFieldScoped("autoPlayTimerSettingSelected", "onAutoPlayTimerSettingSelected")
 
   if screenLevel <> 0
     m.settingsScreen.screenLevel = screenLevel

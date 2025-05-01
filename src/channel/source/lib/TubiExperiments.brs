@@ -45,14 +45,6 @@ Function TubiExperiments(experimentsInfo) as Object
         }
       }
 
-      roku_autoplay_timer: {
-        roku_autoplay_timer_v1 : {
-          default: {"enabled": true}
-          holdout_control: {"enabled": false}
-          holdout_winning: {"enabled": true}
-        }
-      }
-
       'This experiment will not be under holdout and will clean up once we take the decision.
       roku_send_feedback_on_player: {
         roku_send_feedback_on_player_v1 : {

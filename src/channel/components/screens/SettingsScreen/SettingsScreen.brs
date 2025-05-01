@@ -12,8 +12,6 @@ Function init()
   m.Title = m.top.findNode("Title")
   m.Title.text = getTranslation("menu_settings")
 
-  m.isAutoPlaySettingsExperimentEnabled = getExperimentResource("roku_autoplay_timer", "roku_autoplay_timer_v1", false).enabled
-
   ' Create the menu
   m.SettingsMenuPanel = createSettingsMenuPanel()
   m.SettingsMenuPanel.observeField("createNextPanelIndex", "onCreateNextPanelIndex")
@@ -215,14 +213,10 @@ Function createOrUpdateAutoPlayPreviewPanel(existingPanel = invalid)
     videoPreviewPanel = existingPanel
     if isSignedIn() = true
       videoPreviewPanel.selectItem = m.top.autoPreviewItemUpdated
-      if m.isAutoPlaySettingsExperimentEnabled = true
-        videoPreviewPanel.autoPlayTimerSelectItem = m.top.autoPlayTimerSettingSelected
-      end if
+      videoPreviewPanel.autoPlayTimerSelectItem = m.top.autoPlayTimerSettingSelected
     else
       videoPreviewPanel.selectItem = 0 ' default if not signed in
-      if m.isAutoPlaySettingsExperimentEnabled = true
-        videoPreviewPanel.autoPlayTimerSelectItem = 0 ' default if not signed in
-      end if
+      videoPreviewPanel.autoPlayTimerSelectItem = 0 ' default if not signed in
     end if
 
     signInInfo = m.top.signInInfo
@@ -248,13 +242,11 @@ Function createAutoPreviewPanel()
   videoPreviewPanel.observeFieldScoped("audioGuideText", "onAudioGuideTextChanged")
   videoPreviewPanel.observeFieldScoped("componentInteractionInfo", "onAutoPlayPreviewComponentInteractionInfo")
 
-  if m.isAutoPlaySettingsExperimentEnabled = true
-    videoPreviewPanel.observeFieldScoped("autoPlayTimerItemSelected", "onAutoplayTimerItemSelected")
-  end if
+  videoPreviewPanel.observeFieldScoped("autoPlayTimerItemSelected", "onAutoplayTimerItemSelected")
 
   videoPreviewPanel.width = m.rightPanelWidth
   'if user has set Roku->settings->autoplay to off, then do not let them change tubi settings.
-  if m.constants.deviceInfo.IsAutoplayEnabled = true OR  m.isAutoPlaySettingsExperimentEnabled = true
+  if m.constants.deviceInfo.IsAutoplayEnabled = true
     videoPreviewPanel.focusable = true
   else
     videoPreviewPanel.focusable = false
@@ -271,12 +263,10 @@ Function createAutoPreviewPanel()
     videoPreviewPanel.selectItem = 1
   end if
 
-  if m.isAutoPlaySettingsExperimentEnabled = true
-    if m.top.isAutoPlayTimerOn = true
-      videoPreviewPanel.autoPlayTimerSelectItem = 0
-    else
-      videoPreviewPanel.autoPlayTimerSelectItem = 1
-    end if
+  if m.top.isAutoPlayTimerOn = true
+    videoPreviewPanel.autoPlayTimerSelectItem = 0
+  else
+    videoPreviewPanel.autoPlayTimerSelectItem = 1
   end if
 
   ' To prevent unintended changes to the autoPlayTimer setting when adjusting the autoPlayPreview setting, ensure

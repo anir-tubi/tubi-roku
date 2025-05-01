@@ -49,13 +49,11 @@ Function init()
   m.Spinner = m.top.findNode("Spinner")
   checkItemHelper(m.top.selectItem, m.Menu)
 
-  if getExperimentResource("roku_autoplay_timer", "roku_autoplay_timer_v1", false).enabled = true
-    m.top.observeFieldScoped("isUserSignedIn", "onUserSignedInfoChange")
-    setAutoplayTimerChoices()
-    checkItemHelper(m.top.autoPlayTimerSelectItem, m.AutoPlayTimerMenu)
-    m.AutoPlayTimerContentGroup.visible = true
-    m.top.observeField("autoPlayTimerSelectItem", "onAutoPlayTimerSelectItem")
-  end if
+  m.top.observeFieldScoped("isUserSignedIn", "onUserSignedInfoChange")
+  setAutoplayTimerChoices()
+  checkItemHelper(m.top.autoPlayTimerSelectItem, m.AutoPlayTimerMenu)
+  m.AutoPlayTimerContentGroup.visible = true
+  m.top.observeField("autoPlayTimerSelectItem", "onAutoPlayTimerSelectItem")
 End Function
 
 
