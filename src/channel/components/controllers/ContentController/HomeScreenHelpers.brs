@@ -651,10 +651,9 @@ End Function
 
 Function onContainerMoreItemsSuccess(response)
   homeScreen = getCurrentScreen()
-  rowFocused = homeScreen.currFocusRow
-  category = homeScreen.content.getChild(rowFocused)
-
   if homeScreen <> invalid AND homeScreen.content <> invalid AND isNode(response) = true
+    rowFocused = homeScreen.currFocusRow
+    category = homeScreen.content.getChild(rowFocused)
     category = m.NodeHelpers.getChildById(homeScreen.content, response.id)
     items = response.getChildren(-1, 0)
     if isNonEmptyArray(items) = true
