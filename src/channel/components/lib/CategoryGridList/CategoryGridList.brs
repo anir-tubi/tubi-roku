@@ -572,14 +572,11 @@ Function onRowItemFocused(msg)
   rowCountBooster = 0
   rowItemFocused = msg.getData()
   if m.homeScreenDesignType <> "none"
-    m.top.focusedPosition = [rowItemFocused[0] + 1 , rowItemFocused[1]]
-  else
-    m.top.focusedPosition = rowItemFocused
+    rowCountBooster = m.FeaturedRowList.content.getChildCount()
   end if
 
   m.top.focusedPosition = [rowItemFocused[0] + rowCountBooster , rowItemFocused[1]]
 
-  m.top.focusedPosition = rowItemFocused
   if m.top.content <> invalid AND rowItemFocused <> invalid
     category = m.top.content.getChild(rowItemFocused[0])
     if category <> invalid then
@@ -590,7 +587,7 @@ Function onRowItemFocused(msg)
       itemFocused = resolveAbbreviatedContent(m.top.content, rowItemFocused)
       if itemFocused <> invalid
         m.top.oldCursorPosition = m.top.cursorPosition
-        m.top.cursorPosition = [rowItemFocused[0] + rowCountBooster , rowItemFocused[1]]
+        m.top.cursorPosition = m.top.focusedPosition
         m.top.oldItemFocused = m.top.itemFocused
         m.top.rowFocused = m.top.content.getChild(rowItemFocused[0])
         m.top.itemFocused = itemFocused
