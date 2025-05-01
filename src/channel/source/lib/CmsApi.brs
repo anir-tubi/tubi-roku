@@ -146,7 +146,7 @@ End Function
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
 '
 Function cmsApi_createCategoriesListReqInfo(bKidsMode = false)
-  
+
   options = m.getCommonOptions(true)
   params = options.params
 
@@ -200,6 +200,11 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
   params["include_empty_queue"] = true
   params["include_channels"] = true
   params["include_sponsorships"] = true
+
+  ' this is just to remove most popular linear containers; rest if any shows up will be removed in tubimetadataTranslate
+  if m.experiments <> invalid AND m.experiments.getExperimentResource("linear_no_show", "linear_no_show_v1").enabled = true
+    params["excluded_containers"] = ["live_news", "sports_on_tubi", "recommended_linear_channels", "news", "featured_channels"]
+  end if
 
   params["is_kids_mode"] = bKidsMode
   ' content_mode is mandatory param and its value needs to be passed as empty for fetching homescreen content
@@ -433,7 +438,7 @@ End Function
 
 ' @searchText: string, the text the user is attempting to search for
 ' @bKidsMode: boolean, Are we in kids mode (and parental controls is not set to kids)?
-' @sAutoCompleteSessionID: string, If this is a search requesting stemming from an autocomplete suggestion, then 
+' @sAutoCompleteSessionID: string, If this is a search requesting stemming from an autocomplete suggestion, then
 '       send the personalization_id that was sent back from the autocomplete request
 ' @includeLinear: boolean, should linear content be included in the search results
 Function cmsApi_createSearchReqInfo(searchText, bKidsMode = false, sAutoCompleteSessionID = invalid, includeLinear = true)
@@ -447,7 +452,7 @@ Function cmsApi_createSearchReqInfo(searchText, bKidsMode = false, sAutoComplete
   ]
   if isNonEmptyString(sAutoCompleteSessionID) = true
     options.params["session_id"] = sAutoCompleteSessionID
-  end if 
+  end if
 
   options.params = m.setImageParams(imageParamTypes, options.params, m.constants.ui.screenIds.searchScreen)
   options.params["limit_resolutions"] = m.constants.player.limitResolutions
@@ -822,4 +827,3 @@ Function cmsApi_createGetContainerContentsReqInfo(category, homeScreen, bKidsMod
 
   return categoryReqInfo
 End Function
-

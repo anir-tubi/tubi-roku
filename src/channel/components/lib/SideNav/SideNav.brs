@@ -128,7 +128,7 @@ Function onCreateMenuItems()
     menuItems.push(m.constants.ui.sideNavIds.tv)
   end if
 
-  if getExternalConfigValueFromGlobal("livetv", false) = true
+  if getExternalConfigValueFromGlobal("livetv", false) = true AND getExperimentResource("linear_no_show", "linear_no_show_v1", true).enabled = false then
     menuItems.push(m.constants.ui.sideNavIds.linearEPG)
   end if
 

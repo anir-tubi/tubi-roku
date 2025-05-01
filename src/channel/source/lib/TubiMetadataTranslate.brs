@@ -988,6 +988,8 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
         '//if continue watching container while user is signed out,
         ' then ensure row is empty except for 1 item that will entice users to sign in
         categoryAA = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode)
+      else if container.type = "linear" AND m.experiments <> invalid AND m.experiments.getExperimentResource("linear_no_show", "linear_no_show_v1").enabled = true
+        categoryAA = invalid
       else
         categoryAA = m.buildCategoryAAWithInsert(container, contents, "", "", false, contentMode, screenId, isSignedInUser, uiMode)
       end if
@@ -1615,11 +1617,13 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             childAA.id = "0" + sFullChildID
           end if
 
-          if childIsPushable = true and jsonAA <> invalid
-            jsonAA[childAA.id] = fullChild
-          end if
+          if fullChild.type <> "l" OR (m.experiments <> invalid AND m.experiments.getExperimentResource("linear_no_show", "linear_no_show_v1").enabled = false)
+            if childIsPushable = true and jsonAA <> invalid
+              jsonAA[childAA.id] = fullChild
+            end if
 
-          childrenReturn.push(childAA)
+            childrenReturn.push(childAA)
+          end if
         end if
       end for
     end if

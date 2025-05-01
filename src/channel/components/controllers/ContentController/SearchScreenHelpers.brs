@@ -16,7 +16,7 @@ Function showSearchScreen()
   if isGDPR() = false
     searchScreen.isKidsModeAvailable = true
   end if
-  
+
   searchScreen.id = m.constants.ui.screenIds.searchScreen
   searchScreen.searchText = "" '//Set searchText to "" to initiate the search screen and load the default "search results"
 
@@ -118,7 +118,7 @@ Function searchFromScreen(searchText, personalizationID = invalid, inputDevice =
   kidsMode = shouldKidsModeBeSentToServer()
 
   if bSearchNonDefaultResults = true
-    includeLinear = isUserInAdultsMode() = true AND isKidsUIOn() = false
+    includeLinear = isUserInAdultsMode() = true AND isKidsUIOn() = false AND getExperimentResource("linear_no_show", "linear_no_show_v1", false).enabled = false
     if isNonEmptyString(inputDevice) = false
       ' assume the input device is remote unless specified otherwise.
       inputDevice = m.constants.inputDevices.remote
@@ -204,7 +204,7 @@ Function onSearchSuccessResponse(response)
       type: "search"
       values: pageValues
     }
-    
+
     searchScreen.contentUpdated = true
   end if
 End Function
