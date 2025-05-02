@@ -49,10 +49,10 @@
       <!-- set the RowList.rowHeights and RowList.rowItemSize arrays since the category order has changed. -->
       <field id="repopulateContent" type="boolean" alwaysNotify="true"/>
 
-      <!-- expected to be category ids(continue_waching/queue) if new continue_waching/queue got added, helps to set focus to correct row -->
+      <!-- expected to be category ids(continue_watching/queue) if new continue_watching/queue got added, helps to set focus to correct row -->
       <field id="rowAdded" type="string"/>
 
-      <!-- expected to be category ids(continue_waching/queue) if new continue_waching/queue got removed, helps to set focus to correct row -->
+      <!-- expected to be category ids(continue_watching/queue) if new continue_watching/queue got removed, helps to set focus to correct row -->
       <field id="rowRemoved" type="string"/>
 
       <!-- What kind of filter if any does this list use? For example, "tv", "movies", "latino" -->
