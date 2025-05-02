@@ -571,7 +571,7 @@ Function onRowItemFocused(msg)
 
   rowCountBooster = 0
   rowItemFocused = msg.getData()
-  if m.homeScreenDesignType <> "none"
+  if m.homeScreenDesignType <> "none" AND m.FeaturedRowList.content <> invalid
     rowCountBooster = m.FeaturedRowList.content.getChildCount()
   end if
 
