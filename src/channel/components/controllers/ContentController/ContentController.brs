@@ -2180,6 +2180,7 @@ Function restartApp()
 
   ' Forces the external config to be retrieved again on startup
   m.global.externalConfigInfo = invalid
+  m.global.experimentsInfo = invalid
 
   m.top.disableInstantResume = true
   m.mainTask.control = "done"
