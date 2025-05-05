@@ -651,7 +651,7 @@ End Function
 
 Function onContainerMoreItemsSuccess(response)
   homeScreen = getCurrentScreen()
-  if homeScreen <> invalid AND homeScreen.content <> invalid AND isNode(response) = true
+  if homeScreen <> invalid AND homeScreen.content <> invalid AND isNode(response) = true AND homeScreen.currFocusRow <> invalid
     rowFocused = homeScreen.currFocusRow
     category = homeScreen.content.getChild(rowFocused)
     category = m.NodeHelpers.getChildById(homeScreen.content, response.id)
