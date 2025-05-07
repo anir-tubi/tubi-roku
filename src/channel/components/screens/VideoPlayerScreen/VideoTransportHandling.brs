@@ -438,7 +438,7 @@ Function pauseVideo(shouldShowTransport, shouldSendAnalytics = true)
 
   m.top.videoPositionForPauseAdRequest = m.playerPosition 'this position is used in pauseAd request
 
-  if m.top.isTrailer = false and m.top.hasFocus() = true
+  if m.top.isTrailer = false and m.top.isInFocusChain() = true
 
     if m.isPauseAdReqInProgress = false AND m.isPixelFiredForCurrentPauseAd = true
       resetPauseAd()
@@ -1632,7 +1632,8 @@ Function showTransport()
   getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v1")
 
   creditCuePoints = getCreditCuepointsFromContent(m.top.content)
-  if m.top.hasFocus() = true AND isSkipIntroCuePointsReached(creditCuePoints) = false
+
+  if m.top.isInFocusChain() = true AND isSkipIntroCuePointsReached(creditCuePoints) = false
     ' Only set focus on the play/pause button if the video player has focus (as opposed to some other UI)
     ' and the skip cuepoints button should not be focused (ie. nowPos is not within intro)
 
@@ -1901,7 +1902,7 @@ Function onPauseAdResponse(msg)
       m.isPixelFiredForCurrentPauseAd = false
     end if
 
-    if m.top.hasFocus()
+    if m.top.isInFocusChain() = true
       m.pauseAdOverlay.posterUri = pauseAdResponse.mediaUrl
     else
       if m.lastFiredPixelType = m.constants.pauseAd.pixelTypes.startPixel

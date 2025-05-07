@@ -426,10 +426,6 @@
 
     </Group>
 
-    <PauseAdOverlay
-      id="PauseAdOverlay"
-      opacity="0.0"/>
-
     <Group
       id="HUD"
       visible="true"
@@ -614,6 +610,10 @@
       <PlayerSideOverlay
         id="sendFeedbackSelectionOverlay" />
     </Rectangle>
+
+    <PauseAdOverlay
+      id="PauseAdOverlay"
+      opacity="0.0"/>
 
     <!-- RAF needs a parent group with no other elements, otherwise it will use
       - the Group dimensions set by the other children and not scale appropriately.

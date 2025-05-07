@@ -668,7 +668,7 @@ End Function
 
 Function onScreenFocusChange()
 
-  if m.top.hasFocus() = true then
+  if m.top.isInFocusChain() = true
     if m.top.adState = "adsPlaying" then
       ' If the screensaver screen takes over while an ad is paused when they leave the screensaver they are brought back to the video player screen but the focus is on the screen itself not the RAF renderer. We are manually setting it back so a user can properly resume the ad.
       rafChild = m.RAFAdContainer.getChild(0)
