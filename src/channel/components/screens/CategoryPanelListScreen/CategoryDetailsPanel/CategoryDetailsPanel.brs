@@ -311,7 +311,7 @@ Function createTrackingPageInfo(channel)
   end if
 
   trackingInfo = {
-    pageType: "category_page"
+    pageType: "category_list_page"
     pageValues: {
       category_slug: slug
     }
@@ -363,7 +363,8 @@ Function updateTrackingInfo(category, content, itemSelected)
       componentType: "category_component"
       componentValues: {
         category_slug: categorySlug
-        category_row: 1
+        category_row: row
+        category_col: col
         content_tile: m.Tracking.getAnalyticsTile(content, col, row)
       }
     }

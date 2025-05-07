@@ -100,6 +100,8 @@
 
       <!-- Indicates if the content grid has focus -->
       <field id="contentGridHasFocus" type="boolean" />
+
+      <field id="componentTrackingInfo" type="assocarray" />
   </interface>
 
   <children>

@@ -504,7 +504,7 @@ Function onCategoryContentFocused(msg)
   focusedContent = msg.getData()
   screen = msg.getRoSGNode()
   if screen.trackingPageInfo <> invalid
-    setVideoPreviewAfterFocus(focusedContent, screen.trackingPageInfo, screen.componentInteractionInfo)
+    setVideoPreviewAfterFocus(focusedContent, screen.trackingPageInfo, screen.componentTrackingInfo)
   end if
 End Function
 

@@ -140,6 +140,7 @@ Function createNextPanel(content)
     categoryDetailsPanel.observeFieldScoped("contentToPlay", "onContentToPlay")
     categoryDetailsPanel.observeFieldScoped("contentFocused", "onCategoryContentFocused")
     categoryDetailsPanel.observeFieldScoped("contentGridHasFocus", "onContentGridHasFocusChange")
+    categoryDetailsPanel.observeFieldScoped("trackingComponentInfo", "onTrackingComponentInfoChange")
     categoryDetailsPanel.categoryId = content.id
     categoryDetailsPanel.isLoading = true
 
@@ -151,7 +152,7 @@ Function createNextPanel(content)
     categoryDetailsPanel.offset = m.rightPanelOffset
 
     categoryDetailsPanel.trackingPageInfo = {
-      pageType: "category_page"
+      pageType: "category_list_page"
       pageValues: {
         category_slug: content.id
       }
@@ -550,4 +551,15 @@ End Function
 Function onContentGridHasFocusChange(msg)
   ' Cannot use alias since the component is created dynamically.
   m.top.contentGridHasFocus = msg.getData()
+End Function
+
+
+Function onTrackingComponentInfoChange(msg)
+  componentTrackingInfo = msg.getData()
+  screen = msg.getRoSGNode()
+  pageInfo = screen.trackingPageInfo
+  m.top.componentTrackingInfo = {
+    pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+    componentOneof: m.Tracking.getAnalyticsComponent(componentTrackingInfo.componentType, componentTrackingInfo.componentValues)
+  }
 End Function
