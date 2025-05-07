@@ -67,6 +67,7 @@ Function addControllerUi()
 
   m.mainTask = createObject("roSGNode", "MainTask") ' initiate MainTask
   m.mainTask.observeFieldScoped("isHdmiStatusOk", "onIsHdmiStatusOkChange")
+  m.mainTask.observeFieldScoped("lastExitInfo", "onLastExitInfoChange")
 
   ' Holds the value for user/device level settings. For ex: isVideoPreviewOn  or Selected Audio track.
   m.pub_serverPersistentData = createObject("roSGNode", "ServerPersistentData")
@@ -1946,7 +1947,7 @@ Function onCustomSuspend(msg)
         closeLinearVideoPlayerTransport()
         linearVideoPlayer.control = "stop"
       end if
-      
+
       ' Remove this line if we do not graduated roku_home_screen_redesign_v2.
       ' This is needed to avoid having to use alwaysnotify on featuredListHasFocus and when app is suspended it does not fire focus change event on home screen.
       homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
@@ -2413,6 +2414,29 @@ Function onIsHdmiStatusOkChange(msg)
       end if
     end if
   end if
+End Function
+
+
+Function onLastExitInfoChange(msg)
+  tubiLog("ContentController.onLastExitInfoChange")
+  lastExitInfo = msg.getData()
+
+  messageMap = lastExitInfo
+  messageMap["connectionType"] = createObject("roDeviceInfo").getConnectionType()
+  getExperimentsInfoFromGlobal()
+
+  experiments = getExperimentsInfoFromGlobal()
+  if experiments <> invalid then
+    experimentsMapped = {}
+
+    for each experimentKey in experiments
+      experiment = experiments[experimentKey]
+      experimentsMapped[experimentKey] = experiment.resource
+    end for
+    messageMap["experiments"] = formatJson(experimentsMapped)
+  end if
+
+  logInfo(messageMap, "clientInfo", "last-exit-info-experiments")
 End Function
 
 

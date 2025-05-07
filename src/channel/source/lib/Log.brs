@@ -83,7 +83,7 @@ End Function
 'however, anything worthy of warn or error severity should be sent to the server (ie. fill all the parameters for warn and error)
 
 'debug will only send logging to the server if the device id is in m.idsToLog
-Function tubiLog_debug(message = "" as String, serverTypeName = "" as String, subtype = "" as String, queue = invalid as Object, samplePercent = 1.0 as Float)
+Function tubiLog_debug(message = "" as Dynamic, serverTypeName = "" as String, subtype = "" as String, queue = invalid as Object, samplePercent = 1.0 as Float)
   logInfo = m.buildLogInfo(message, m.logConsts.debug.serverType[serverTypeName], subtype, m.logConsts.debug.name)
   m.printLogInfo(logInfo.level, logInfo.subtype, logInfo.message)
   if m.isLoggingAllowed() = true AND m.isSampled(samplePercent) = true
@@ -92,7 +92,7 @@ Function tubiLog_debug(message = "" as String, serverTypeName = "" as String, su
 End Function
 
 
-Function tubiLog_info(message = "" as String, serverTypeName = "" as String, subtype = "" as String, queue = invalid as Object, samplePercent = 1.0 as Float)
+Function tubiLog_info(message = "" as Dynamic, serverTypeName = "" as String, subtype = "" as String, queue = invalid as Object, samplePercent = 1.0 as Float)
   logInfo = m.buildLogInfo(message, m.logConsts.info.serverType[serverTypeName], subtype, m.logConsts.info.name)
   m.printLogInfo(logInfo.level, logInfo.subtype, logInfo.message)
   if m.isLoggingAllowed() = true AND m.isSampled(samplePercent) = true
@@ -101,7 +101,7 @@ Function tubiLog_info(message = "" as String, serverTypeName = "" as String, sub
 End Function
 
 
-Function tubiLog_error(message = "" as String, serverTypeName = "" as String, subtype = "" as String, queue = invalid as Object, samplePercent = 1.0 as Float)
+Function tubiLog_error(message = "" as Dynamic, serverTypeName = "" as String, subtype = "" as String, queue = invalid as Object, samplePercent = 1.0 as Float)
   logInfo = m.buildLogInfo(message, m.logConsts.error.serverType[serverTypeName], subtype, m.logConsts.error.name)
   m.printLogInfo(logInfo.level, logInfo.subtype, logInfo.message)
   if m.isLoggingAllowed() = true AND m.isSampled(samplePercent) = true
@@ -110,7 +110,7 @@ Function tubiLog_error(message = "" as String, serverTypeName = "" as String, su
 End Function
 
 
-Function tubiLog_warn(message = "" as String, serverTypeName = "" as String, subtype = "" as String, queue = invalid as Object, samplePercent = 1.0 as Float)
+Function tubiLog_warn(message = "" as Dynamic, serverTypeName = "" as String, subtype = "" as String, queue = invalid as Object, samplePercent = 1.0 as Float)
   logInfo = m.buildLogInfo(message, m.logConsts.warn.serverType[serverTypeName], subtype, m.logConsts.warn.name)
   m.printLogInfo(logInfo.level, logInfo.subtype, logInfo.message)
   if m.isLoggingAllowed() = true AND m.isSampled(samplePercent) = true
@@ -165,8 +165,6 @@ Function tubiLog_isLoggingAllowed()
     logsEnableType = type(clientLogsEnabled)
 
     if (logsEnableType = "Boolean" OR logsEnableType = "roBoolean") AND clientLogsEnabled = true
-
-      ' remove isMajorEventDay logic after purple carpet event
       isMajorEventDay = m.isNowWithinTimePeriod(m.constants.configHubFallbacks.majorEventStart, m.constants.configHubFallbacks.majorEventEnd)
 
       if isMajorEventDay = false
@@ -197,9 +195,15 @@ Function tubiLog_printLogInfo_(level as String, subType as String, message as Dy
 End Function
 
 
-Function tubiLog_buildLogInfo_(message as String, serverType as Dynamic, subtype as String, level as String) as Object
+Function tubiLog_buildLogInfo_(message as Dynamic, serverType as Dynamic, subtype as String, level as String) as Object
   if subtype = ""
     subtype = "client_generic"
+  end if
+
+  messageMap = invalid
+  if type(message) = "roAssociativeArray" then
+    messageMap = message
+    message = FormatJson(message)
   end if
 
   logInfo = {
@@ -207,6 +211,10 @@ Function tubiLog_buildLogInfo_(message as String, serverType as Dynamic, subtype
     subtype: subtype
     message: message
   }
+
+  if messageMap <> invalid then
+    logInfo["message_map"] = messageMap
+  end if
 
   'serverType may be invalid
   logInfo["type"] = serverType
@@ -305,11 +313,36 @@ Function tubiLog_getClientLogEvent(eventValues) as Object
     message_map = eventValues.message_map
   end if
 
+  deviceInfo = m.constants.deviceInfo
+
   message_map.append({
-    model: m.constants.deviceInfo.model
-    rokuCountryCode: m.constants.deviceInfo.rokuCountryCode
-    firmwareVersion: m.constants.deviceInfo.firmwareVersion
+    "model": deviceInfo.model
+    "rokuCountryCode": deviceInfo.rokuCountryCode
+    "firmwareVersion": deviceInfo.firmwareVersion
   })
+
+  ' Remove any properties that are invalid as that will cause the request to be rejected on the backend. Also try to convert any non-string values to strings if possible
+  propertiesToDelete = []
+  for each key in message_map
+    value = message_map[key]
+    if value = invalid
+      propertiesToDelete.push(key)
+    end if
+
+    valueType = type(value)
+    if (valueType <> "String") AND (valueType <> "roString") then
+      ' Not an a string so we either need to convert or remove it.
+      if getInterface(value, "ifToStr") <> invalid then
+        message_map[key] = value.toStr()
+      else
+        propertiesToDelete.push(key)
+      end if
+    end if
+  end for
+
+  for each key in propertiesToDelete
+    message_map.delete(key)
+  end for
 
   eventValues.message_map = message_map
 

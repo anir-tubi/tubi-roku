@@ -37,6 +37,8 @@ End Function
 
 ' All code run here is run on task thread
 Function taskThread()
+  handleLastExitInfo()
+
   while true
     msg = wait(0, m.port)
     messageType = type(msg)
@@ -57,6 +59,45 @@ Function taskThread()
         end if
     end if
   end while
+End Function
+
+
+Function handleLastExitInfo()
+  ' We can't call getLastExitInfo() on the render thread so have to get the info here and pass back to the render thread. To avoid extra rendezvouses we only send back if we have an exit code we want to send to the server
+
+  appManager = createObject("roAppManager")
+  if findMemberFunction(appManager, "getLastExitInfo") <> invalid then
+    lastExitInfo = appManager.getLastExitInfo()
+    if lastExitInfo <> invalid AND lastExitInfo.exit_code <> invalid then
+      whitelist = {
+        "EXIT_OUT_OF_MEMORY": true
+        "EXIT_IDLE_AUTO_EXIT": false ' may eventually be interested in sending
+        "EXIT_BRIGHTSCRIPT_CRASH": true
+        "EXIT_BRIGHTSCRIPT_STOP": true
+        "EXIT_BRIGHTSCRIPT_UNK_FUNC": true
+        "EXIT_BRIGHTSCRIPT_TIMEOUT": true
+        "EXIT_USER_KILL": true
+        "EXIT_SYSTEM_KILL": true
+        "EXIT_GRAPHICS_NOT_RELEASED": true
+        "EXIT_DECODER_NOT_RELEASED": true
+        "EXIT_RUNNING_AFTER_SUSPEND": true
+        "EXIT_NOT_RESUMED": true
+        "EXIT_SIGNAL_TIMEOUT": true
+        "EXIT_APP_ERROR": true
+        "EXIT_UNLOADED": true
+        "EXIT_OS_UPDATE": true
+        "EXIT_CHANNEL_UPDATE": true
+        "EXIT_CHANNEL_RESTART": true
+        "EXIT_CHANNEL_MEM_LIMIT_FG": true
+        "EXIT_CHANNEL_MEM_LIMIT_BG": true
+        "EXIT_SOFTFAIL": true
+      }
+
+      if whitelist[lastExitInfo.exit_code] = true then
+        m.top.lastExitInfo = lastExitInfo
+      end if
+    end if
+  end if
 End Function
 
 
