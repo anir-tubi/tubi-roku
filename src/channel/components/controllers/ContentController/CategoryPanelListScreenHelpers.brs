@@ -512,7 +512,11 @@ End Function
 Function onContentGridHasFocusChange(msg)
   screen = msg.getRoSGNode()
   if msg.getData() = false
-    pauseVideoPreview()
+    ' Adding a check here so that we only pause when user navigates to filter items and not when user navigates to details screen.
+    currentScreen = getCurrentScreen()
+    if currentScreen <> invalid AND currentScreen.id <> m.constants.ui.screenIds.detailScreen
+      pauseVideoPreview()
+    end if
   else
     focusedContent = screen.contentFocused
     if focusedContent <> invalid
