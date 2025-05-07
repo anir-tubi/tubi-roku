@@ -373,5 +373,8 @@ Function onCategoryDetailsScreenBackButtonPressed(msg)
     end if
   end if
 
+  ' Stopping video preview when user navigates back from category details screen.
+  stopVideoPreview()
+
   onKeyEvent("back", true)
 End Function
