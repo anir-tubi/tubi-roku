@@ -2,7 +2,7 @@
 <!--
  - EnhancedCheckButton
  -
- - This component is same as CheckButton with few changes in background image, This is done as part of roku_player_control_ui_refresh_v1 experiment.
+ - This component is same as CheckButton with few changes in background image, This is done as part of roku_player_control_ui_refresh_v2 experiment.
  - This file can be kept if we graduate variant2 & variant3. Else, we will remove it
  -
  -->

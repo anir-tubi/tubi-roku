@@ -1,6 +1,6 @@
 Function init()
   topRef = m.top
-  m.playerControlExperimentType = getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v1", false).type
+  m.playerControlExperimentType = getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v2", false).type
 
   deviceInfo = CreateObject("roDeviceInfo")
   modelType = deviceInfo.GetModelType()

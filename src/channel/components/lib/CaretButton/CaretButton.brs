@@ -8,7 +8,7 @@ Function init()
   m.caretFocused = topRef.findNode("caretFocused")
   m.caretFocused.opacity = 0
 
-  playerControlExperimentType = getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v1", false).type
+  playerControlExperimentType = getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v2", false).type
 
   if playerControlExperimentType = "variant2" OR playerControlExperimentType = "variant3"
     m.background.uri = "pkg:/images/tab_component_alt_$$RES$$.9.png"

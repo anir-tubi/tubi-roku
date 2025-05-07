@@ -86,7 +86,7 @@ Function init()
     m.video.asyncStopSemantics = true
   end if
 
-  m.playerControlExperimentType = getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v1", false).type
+  m.playerControlExperimentType = getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v2", false).type
   m.marginX = m.constants.ui.translations.player.marginX
 
   if m.playerControlExperimentType = "none"
