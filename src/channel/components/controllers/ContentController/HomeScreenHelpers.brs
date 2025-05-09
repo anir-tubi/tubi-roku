@@ -283,7 +283,7 @@ Function onLoadAllCategories(msg)
 End Function
 
 
-Function fetchHomeScreen(homeScreen)
+Function fetchHomeScreen(homeScreen, useCache = false)
   tubiLog("HomeScreenHelpers.fetchHomeScreen")
   ' This check causes all category fetches to be skipped prior to the field
   ' being set to true.  Then, once true categories reload any time fetchHomeScreen() is
@@ -341,6 +341,10 @@ Function fetchHomeScreen(homeScreen)
 
     params[limitParamName] = initialBlockSize
 
+    if homeScreen <> invalid AND homeScreen.content <> invalid AND useCache = true AND homeScreen.content.lastModified <> invalid AND getExperimentResource("roku_home_screen_if_modified_since", "roku_home_screen_if_modified_since_v1", false).enabled = true
+      headers["If-Modified-Since"] = homeScreen.content.lastModified
+    end if
+
     options.params = params
     options.headers = headers
 
@@ -356,8 +360,10 @@ Function fetchHomeScreen(homeScreen)
       uiMode: m.uiMode
     })
 
-    homeScreen.resetContentAreaValues = true
-    setHomeScreenLoading(homeScreen)
+    if useCache = false
+      homeScreen.resetContentAreaValues = true
+      setHomeScreenLoading(homeScreen)
+    end if
   end if
 End Function
 
@@ -437,6 +443,8 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v1", true)
 
     getExperimentResource("roku_no_change_experiment", "roku_no_change_experiment_v2", true)
+
+    getExperimentResource("roku_home_screen_if_modified_since", "roku_home_screen_if_modified_since_v1", true)
   end if
 End Function
 
@@ -469,7 +477,10 @@ End Function
 ' onHomeScreenErrorResponse
 '
 Function onHomeScreenErrorResponse(response)
-  handleHomeScreenErrorResponse(m.constants.ui.screenIds.homeScreen, response)
+  screen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  if response.httpStatusCode <> 304 OR screen.content = invalid
+    handleHomeScreenErrorResponse(m.constants.ui.screenIds.homeScreen, response)
+  end if
 End Function
 
 

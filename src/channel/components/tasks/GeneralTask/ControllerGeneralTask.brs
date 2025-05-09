@@ -159,6 +159,7 @@ Function registerParsingCallbacks()
   m.requestTypes[m.constants.reqNames.getHomescreen] = {
     parseSuccess: parseHomeScreenContentSuccess
     parseError: parseGenericError
+    passRawResponse: true
   }
 
   ' minihomescreen

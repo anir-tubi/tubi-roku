@@ -418,7 +418,12 @@ Function processSuccessResponse(result, callbackTypes, job)
     ' some requests may not require handling of the response and therefore may not
     ' have a parseSuccess callback.
     if parserCallback <> invalid
-      output = parserCallback(result.response, job.reqInfo)
+      if callbackTypes.passRawResponse = true
+        result.responseHeaders = responseHeaders
+        output = parserCallback(result, job.reqInfo)
+      else
+        output = parserCallback(result.response, job.reqInfo)
+      end if
 
       ' this block will execute only for batch responses
       if job.batchInfo <> invalid AND job.batchInfo.id <> invalid

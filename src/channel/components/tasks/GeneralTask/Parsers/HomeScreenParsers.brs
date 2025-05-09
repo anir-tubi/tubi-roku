@@ -2,7 +2,8 @@
 '                            .data value converted from JSON to AA already
 ' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
 Function parseHomeScreenContentSuccess(fullResponse, reqInfo)
-  parsedResponse = fullResponse.data
+  headers = fullResponse.responseHeaders
+  parsedResponse = fullResponse.response.data
 
   contentMode = invalid
   isKidsMode = invalid
@@ -37,6 +38,12 @@ Function parseHomeScreenContentSuccess(fullResponse, reqInfo)
   ads = parsedResponse.ads
   if ads <> invalid AND ads.Count() > 0
     convertedMetadata.ads = m.metadataTranslate.translateAds(ads)
+  end if
+
+  if headers <> invalid AND headers["last-modified"] <> invalid
+    convertedMetadata.update({
+      lastModified: headers["Last-Modified"]
+    }, true)
   end if
 
   return convertedMetadata
