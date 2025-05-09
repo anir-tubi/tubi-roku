@@ -1253,7 +1253,7 @@ Function tubiMetadataTranslate_translateCategoryDetails(contentToTranslate, isSi
 
   categoryMetadata = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser)
 
-  if contentToTranslate.personalization_id <> invalid
+  if categoryMetadata <> invalid AND contentToTranslate.personalization_id <> invalid
     categoryMetadata.personalizationId = contentToTranslate.personalization_id
   end if
 
