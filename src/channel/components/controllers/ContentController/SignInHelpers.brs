@@ -974,7 +974,7 @@ Function onRegistrationProcessCompletedOnPlayerBackPress()
   setContentToRefreshAllPersonalizedScreens(true)
   popScreenAfterSignInProcess()
   m.spinner.visible = false
-  returnToDetailScreenFromVideo()
+  returnToDetailScreenFromVideo(true, true, "registration")
 End Function
 
 

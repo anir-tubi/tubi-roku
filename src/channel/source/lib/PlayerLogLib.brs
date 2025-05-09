@@ -55,12 +55,32 @@ Function PlayerLogLib(constants, tracking)
     errorCode: 0 'used in qualityOfService event
     firstErrorCode: 0 'used in qualityOfService event
     breakOffCount: 0 'used in qualityOfService event
+
     videoBufferingCount: 0 'used in qualityOfService event
-    totalBufferingDuration: 0 'used in qualityOfService event
-    isTotalBufferingDurationExceededLimit: false 'limit is 3600000ms(singleBufferingThreshold), used in qualityOfService event
     seekCount: 0 'used in qualityOfService event
+
+    'totalBufferingDuration is referenced in Qos -> tbd.
+    'videoBufferingTimer starts when mid-playback buffering begins and ends when the player returns to the "playing" state.
+    'Buffering caused by ads is excluded.
+    'Buffering due to seek operations, error retries, content startup, or resuming from preroll/midroll ads is also excluded.
+    'Single buffering events shorter than 200 milliseconds are ignored.
+    'Extremely long single buffering durations are capped at a maximum of 3,600,000 ms (1 hour) to prevent outliers from skewing dashboard metrics.
+    totalBufferingDuration: 0 'used in qualityOfService event
+
+    'totalSeekDuration is referenced in Qos -> tsd.
+    'Duration is measured during buffering that follows a user-initiated seek.
+    'Timer starts after the seek triggers buffering and ends when playback resumes or Ad resumes.
+    'Seeks that occur during error retries, content startup, or resuming from preroll/midroll ads are excluded.
+    'Extremely long seek durations are capped at 3,600,000 ms (1 hour) to avoid anomalies affecting the dashboard.
+    'totalSeekDurationTimer helps to set this value
     totalSeekDuration: 0 'used in qualityOfService event
-    isSeekExceededLimit: false 'limit is 3600000ms(singleSeekThreshold), used in qualityOfService event
+
+    'totalBufferingDuration is referenced in PlayerPageExit -> message_map -> bufferLength.
+    'It represents the duration of the most recent buffering event. It measures the time between when buffering starts and when playback resumes. 
+    'When a new buffering event occurs, the previous value should be reset.
+    'mostRecentBufferingTimer helps to set this value
+    mostRecentBufferDuration: 0 'used on playerExit message_map
+
     totalViewTime: 0 'used in qualityOfService event
     totalContentResumeFirstFrameDuration: 0 'used in qualityOfService event
     totalSegSize: 0 'used in qualityOfService event
@@ -72,6 +92,15 @@ Function PlayerLogLib(constants, tracking)
     captionsIndex: 0 'used in userFeedback event
     isContinueWatching: false 'used in userFeedback event
     errorCodeList: [] 'used in userFeedback event
+
+    'possible values are "ffw", "rew", "hop", "play", "pause", "stop", "skip". it helps to find what are the actions user did on player screen
+    playerAction: ""
+
+    'possible values are "buffering", "playing", "paused", "stopping", "finished", "stopped", "error". it helps to find what are the player state when exiting player
+    playerStateWhenExitingPlayer: ""
+
+    'possible values are "buffering", "playing", "paused", "stopping", "finished", "stopped", "error". it helps to find what are the video state when exiting player
+    videoStateWhenExitingPlayer: ""
 
     '//ad fields
     adBufferTime: -1 'used in adStartupPerformance event
@@ -92,6 +121,9 @@ Function PlayerLogLib(constants, tracking)
     failedAdCount: 0 'used in qualityOfService event
     adCount: 0 'used in qualityOfService event
     latestAdPodStartupResult: {} 'used in userFeedback event
+    playbackSource: {} 'used on playerExit message_map
+    fallbackCount: 0 'used on playerExit message_map
+    adPlayed: false 'used on playerExit message_map
 
     '//timers
     playerSetupTimer: CreateObject("roTimespan") 'helps to calculate playerSetupTime for playerSetupPerformance event
@@ -100,6 +132,9 @@ Function PlayerLogLib(constants, tracking)
     firstFrameTimerForContentStart: CreateObject("roTimeSpan") 'used to calculate contentFirstFrameDuration
     firstFrameTimerForContentStartAfterMidroll: CreateObject("roTimeSpan") 'used to calculate totalContentResumeFirstFrameDuration
     seekingTimer: CreateObject("roTimespan") 'helps to calculate seeking duration for userFeedback event
+    timeOnPlayerScreen: CreateObject("roTimespan") 'helps to calculate time spent on player screen before hitting exit, used in message_map of playerExit event
+    mostRecentBufferingTimer: invalid 'used for message_map in Player page exit event
+    totalSeekDurationTimer: invalid 'helps to calculate total seeking duration for QoS event
 
     '//public methods
 
@@ -110,11 +145,16 @@ Function PlayerLogLib(constants, tracking)
     setVideoPosition: playerLogLib_setVideoPosition
     setErrorCode: playerLogLib_setErrorCode
     setBreakOffError: playerLogLib_setBreakOffError
+
+    setMostRecentBufferStartTime: playerLogLib_setMostRecentBufferStartTime
+    setMostRecentBufferEndTime: playerLogLib_setMostRecentBufferEndTime
     setVideoBufferingStartTime: playerLogLib_setVideoBufferingStartTime
     setVideoBufferingEndTime: playerLogLib_setVideoBufferingEndTime
-    setSeekEndPosition: playerLogLib_setSeekEndPosition
+    setSeekStartTime: playerLogLib_setSeekStartTime
+    setSeekEndTime: playerLogLib_setSeekEndTime
     setDownloadedSegmentData: playerLogLib_setDownloadedSegmentData
     setIsSeeking: playerLogLib_setIsSeeking
+    setVideoStateWhenExitingPlayer: playerLogLib_setVideoStateWhenExitingPlayer
 
     'player
     setPlayerInitialization: playerLogLib_setPlayerInitialization
@@ -129,6 +169,8 @@ Function PlayerLogLib(constants, tracking)
     setCaptions: playerLogLib_setCaptions
     getCaptionsList: playerLogLib_getCaptionsList
     updateCaptionIndex: playerLogLib_updateCaptionIndex
+    setPlayerAction: playerLogLib_setPlayerAction
+    setPlayerStateWhenExitingPlayer: playerLogLib_setPlayerStateWhenExitingPlayer
 
     'ad
     setIsAd: playerLogLib_setIsAd
@@ -140,6 +182,7 @@ Function PlayerLogLib(constants, tracking)
     setAdCount: playerLogLib_setAdCount
     setAdStartupFailureCount: playerLogLib_setAdStartupFailureCount
     setAdPodStartupResult: playerLogLib_setAdPodStartupResult
+    setAdPlayed: playerLogLib_setAdPlayed
 
     'public functions which fire events
     fireCuepointFilledEvent: playerLogLib_fireCuepointFilledEvent
@@ -159,6 +202,7 @@ Function PlayerLogLib(constants, tracking)
     setPlayerLoadTime: playerLogLib_setPlayerLoadTime
     setFirstFrameForContentStart: playerLogLib_setFirstFrameForContentStart
     setFirstFrameForContentStartAfterMidRoll: playerLogLib_setFirstFrameForContentStartAfterMidRoll
+    setTimeOnPlayerScreen: playerLogLib_setTimeOnPlayerScreen
     updateSingleAdInfo: playerLogLib_updateSingleAdInfo
 
     'private functions which fire events
@@ -171,6 +215,7 @@ Function PlayerLogLib(constants, tracking)
     resetAdState: playerLogLib_resetAdState
     resetQoSAttributes: playerLogLib_resetQoSAttributes
     resetTrackId: playerLogLib_resetTrackId
+    resetAdType: playerLogLib_resetAdType
 
     sendEvent: playerLogLib_sendEvent
   }
@@ -188,6 +233,45 @@ Function playerLogLib_setAdType(adType = "preroll")
 End Function
 
 
+' resets the m.adType to default value as "preroll"
+Function playerLogLib_resetAdType()
+  m.adType = "preroll"
+End Function
+
+
+'@playerStateWhenExitingPlayer: String, possible values are "buffering", "playing", "paused", "stopping", "finished", "stopped", "error"
+'
+Function playerLogLib_setPlayerStateWhenExitingPlayer(playerStateWhenExitingPlayer = "")
+  if isString(playerStateWhenExitingPlayer) = true
+    m.playerStateWhenExitingPlayer = playerStateWhenExitingPlayer
+  else
+    m.playerStateWhenExitingPlayer = ""  
+  end if
+End Function
+
+
+'@videoStateWhenExitingPlayer: String, possible values are "buffering", "playing", "paused", "stopping", "finished", "stopped","error"
+'
+Function playerLogLib_setVideoStateWhenExitingPlayer(videoStateWhenExitingPlayer = "")
+  if isString(videoStateWhenExitingPlayer) = true
+    m.videoStateWhenExitingPlayer = videoStateWhenExitingPlayer
+  else
+    m.videoStateWhenExitingPlayer = ""  
+  end if
+End Function
+
+
+'@playerAction: String, possible values are "ffw", "rew", "hop", "play", "pause", "stop", "skip"
+'
+Function playerLogLib_setPlayerAction(playerAction = "")
+  if isString(playerAction) = true
+    m.playerAction = playerAction
+  else
+    m.playerAction = ""  
+  end if
+End Function
+
+
 '@videoState: String, possible values are "buffering", "playing", "paused", "stopping", "stopped", "finished", "error", "none"
 '
 Function playerLogLib_setVideoState(videoState = "")
@@ -198,17 +282,31 @@ Function playerLogLib_setVideoState(videoState = "")
   end if
 
   if m.videoState = "buffering"
+    m.setMostRecentBufferStartTime()
 
-    if m.isVideoPlayed = true
-      m.videoBufferingTimer = CreateObject("roTimespan")
-      m.videoBufferingTimer.mark()
+    if m.isVideoPlayed = true AND m.adState <> "adsCompleted" AND m.playerAction = ""
+      m.setVideoBufferingStartTime()
     end if
+
   else if m.videoState = "playing"
+    m.playerAction = ""
+
+    if m.mostRecentBufferingTimer <> invalid
+      mostRecentBufferDuration = m.mostRecentBufferingTimer.totalMilliseconds()
+      m.setMostRecentBufferEndTime(mostRecentBufferDuration)
+      m.mostRecentBufferingTimer = invalid
+    end if
 
     if m.isVideoPlayed = true AND m.videoBufferingTimer <> invalid
       videoBufferingDuration = m.videoBufferingTimer.totalMilliseconds()
       m.setVideoBufferingEndTime(videoBufferingDuration)
       m.videoBufferingTimer = invalid
+    end if
+
+    if m.isVideoPlayed = true AND m.totalSeekDurationTimer <> invalid
+      totalSeekDuration = m.totalSeekDurationTimer.totalMilliseconds()
+      m.setSeekEndTime(totalSeekDuration)
+      m.totalSeekDurationTimer = invalid
     end if
 
     if m.adState = "adsCompleted"
@@ -235,10 +333,24 @@ Function playerLogLib_setVideoState(videoState = "")
       end if  
     end if
     m.isVideoPlayed = true
+
+  else if m.videoState = "stopped"
+
+    if m.mostRecentBufferingTimer <> invalid
+      mostRecentBufferDuration = m.mostRecentBufferingTimer.totalMilliseconds()
+      m.setMostRecentBufferEndTime(mostRecentBufferDuration)
+      m.mostRecentBufferingTimer = invalid
+    end if
+
+    if m.isVideoPlayed = true AND m.totalSeekDurationTimer <> invalid
+      totalSeekDuration = m.totalSeekDurationTimer.totalMilliseconds()
+      m.setSeekEndTime(totalSeekDuration)
+      m.totalSeekDurationTimer = invalid
+    end if
+
   else if m.videoState = "finished"
     m.isVideoPlayed = false 'reset isVideoPlayed for every new playback session
   end if
-
 End Function
 
 
@@ -248,6 +360,11 @@ End Function
 '
 Function playerLogLib_setPlayerStage(playerStage = "IDLE")
   if isNonEmptyString(playerStage) = true
+
+    if playerStage = "READY"
+      m.setTimeOnPlayerScreen()
+    end if
+
     m.playerStage = playerStage
   end if
 End Function
@@ -276,6 +393,7 @@ Function playerLogLib_setAdState(adState = "")
     else
       m.setPlayerStage("MIDROLL") 
     end if
+    m.setAdPlayed(true)
   else if m.adState = "adsCompleted"
 
     playerPosition = m.videoPosition
@@ -296,6 +414,12 @@ Function playerLogLib_setAdState(adState = "")
   if m.adState = "init" OR m.adState = "noAds" OR m.adState = "adsCompleted"
     m.setFirstFrameForContentStart()
   end if
+End Function
+
+
+'@adPlayed: boolean, set the isAdPlayed based on Ad played for a playback session
+Function playerLogLib_setAdPlayed(adPlayed)
+  m.adPlayed = adPlayed
 End Function
 
 
@@ -322,7 +446,17 @@ End Function
 Function playerLogLib_setVideoControl(videoControl = "")
   if isNonEmptyString(videoControl) = true
     if videoControl = "play"
-      m.isVideoPlayed = false 'reset isVideoPlayed for every new playback session
+      m.resetQoSAttributes()
+      m.resetAdState()
+      m.resetAdType()
+      m.setAdPlayed(false)
+      'reset below for every new playback session
+      m.playerStateWhenExitingPlayer = ""
+      m.videoStateWhenExitingPlayer = ""
+      m.playerAction = ""
+      m.isVideoPlayed = false
+      m.mostRecentBufferDuration = 0
+      m.fallbackCount = 0
     end if
   end if
 End Function
@@ -360,7 +494,7 @@ Function playerLogLib_setVideoContent(content = invalid)
       hdcpVersion = UCase(m.content.hdcpVersion)
       m.hdcpVersion = m.constants.player.hdcpVersion[hdcpVersion]
     else
-      m.hdcpVersion = m.constants.player.hdcpVersion["UNKNOWN"]
+      m.hdcpVersion = m.constants.player.hdcpVersion["hdcp_unknown"]
     end if
 
     if isBoolean(m.content.isTrailer) = true
@@ -582,6 +716,7 @@ End Function
 
 'setPlaybackSource sets the value for isFromAutoplay which helps to identify whether video playing through autoplay or not
 Function playerLogLib_setPlaybackSource(playbackSource = {})
+  m.playbackSource = playbackSource
   m.isFromAutoplay = false
 
   if isAA(playbackSource) = true
@@ -659,6 +794,7 @@ Function playerLogLib_firePlayerPageExitEvent(playerExitInfo)
     content_duration: ""
     current_position: ""
     message: ""
+    message_map: {}
   }
 
   if isAA(playerExitInfo) = true
@@ -670,7 +806,26 @@ Function playerLogLib_firePlayerPageExitEvent(playerExitInfo)
     if isNonEmptyString(m.playerFeedback) = true
       playerExitInfo["feedback"] = m.playerFeedback
     end if
-  
+
+    playerExitInfo.message_map.adState = m.adState
+    playerExitInfo.message_map.video_id = m.videoId
+    playerExitInfo.message_map.video_resource_type = m.videoResourceType.toStr()
+    playerExitInfo.message_map.video_codec_type = m.videoCodecType.toStr()
+    playerExitInfo.message_map.is_from_autoplay = m.isFromAutoplay.toStr()
+    playerExitInfo.message_map.video_resource_hdcp = m.hdcpVersion.toStr()
+    playerExitInfo.message_map.video_resource_resolution = m.videoResolution.toStr()
+    playerExitInfo.message_map.streamformat = m.content.streamformat
+    playerExitInfo.message_map.videoPosition = m.videoPosition.toStr()
+    playerExitInfo.message_map.videoStateWhenExitingPlayer = m.videoStateWhenExitingPlayer
+    playerExitInfo.message_map.playbackSource = FormatJson(m.playbackSource)
+    playerExitInfo.message_map.durationSinceEnterPlayerPage = m.timeOnPlayerScreen.totalMilliseconds().toStr()
+    playerExitInfo.message_map.fallbackCount = m.fallbackCount.toStr()
+    playerExitInfo.message_map.lastStartStep = m.lastStartStep
+    playerExitInfo.message_map.bufferLength = m.mostRecentBufferDuration.toStr()
+    playerExitInfo.message_map.errorCodeList = m.errorCodeList.join(",")
+    playerExitInfo.message_map.playerStateWhenExitingPlayer = m.playerStateWhenExitingPlayer
+    playerExitInfo.message_map.adPlayed = m.adPlayed.toStr()
+
     m.sendEvent(playerExitInfo, "player_page_exit", eventBase)
   end if
 
@@ -728,6 +883,8 @@ End Function
 '
 'resourceInfo: assocarray, contains failedType(possible values are CODEC/DRM), currentResource(failed) & nextResource(fallback) which is needed for sending event
 Function playerLogLib_fireVideoResourceFallbackEvent(resourceInfo)
+  m.fallbackCount += 1  
+
   eventBase = {
     track_id: ""
     video_id: ""
@@ -1036,8 +1193,27 @@ Function playerLogLib_setErrorCode(errorCode)
 End Function
 
 
+'setMostRecentBufferStartTime marks the roTimeSpan
+Function playerLogLib_setMostRecentBufferStartTime()
+  m.mostRecentBufferDuration = 0
+  m.mostRecentBufferingTimer = CreateObject("roTimespan")
+  m.mostRecentBufferingTimer.mark() 'used in player page exit message_map
+End Function
+
+
+'setMostRecentBufferEndTime sets the last buffer length of the video
+'
+'@mostRecentBufferDuration: integer, this is the pre-buffering or mid-buffering duration
+Function playerLogLib_setMostRecentBufferEndTime(mostRecentBufferDuration)
+  if isNumber(mostRecentBufferDuration) = true
+    m.mostRecentBufferDuration = mostRecentBufferDuration
+  end if
+End Function
+
+
 'setVideoBufferingStartTime marks the roTimeSpan
 Function playerLogLib_setVideoBufferingStartTime()
+  m.videoBufferingTimer = CreateObject("roTimespan")
   m.videoBufferingTimer.mark()
 End Function
 
@@ -1046,42 +1222,39 @@ End Function
 '
 '@videoBufferingDuration: integer, this is the mid-buffering duration
 Function playerLogLib_setVideoBufferingEndTime(videoBufferingDuration)
-  'The valid buffering threshold is set to 50ms, as users are unlikely to notice a buffering screen for durations shorter than this.
-  if isNumber(videoBufferingDuration) = true AND videoBufferingDuration > 50
-    m.videoBufferingCount += 1
+  'The valid buffering threshold is set to 200ms, as users are unlikely to notice a buffering screen for durations shorter than this.
+  if isNumber(videoBufferingDuration) = true AND videoBufferingDuration > 200
+    m.videoBufferingCount += 1 'bc
 
-    if m.isTotalBufferingDurationExceededLimit = false
-      if (videoBufferingDuration >= m.singleBufferingThreshold) OR (videoBufferingDuration + m.totalBufferingDuration) >= m.singleBufferingThreshold
-        m.totalBufferingDuration = m.singleBufferingThreshold
-        m.isTotalBufferingDurationExceededLimit = true
-      else
-        m.totalBufferingDuration += videoBufferingDuration
-      end if
+    if (videoBufferingDuration >= m.singleBufferingThreshold)
+      m.totalBufferingDuration += m.singleBufferingThreshold
+    else
+      m.totalBufferingDuration += videoBufferingDuration
     end if
   end if
 End Function
 
 
-'setSeekEndPosition calculates the seek_count & total_seek_duration for Quality Of Service event
+'setSeekStartTime calculates the seek_count & total_seek_duration for Quality Of Service event
 '
-'@seekEndPosition: integer, this is the position where video resume after seek
-Function playerLogLib_setSeekEndPosition(seekEndPosition)
-  if isNumber(seekEndPosition) = true
+Function playerLogLib_setSeekStartTime()
+  m.totalSeekDurationTimer = CreateObject("roTimespan")
+  m.totalSeekDurationTimer.mark()
+End function
+
+
+'@seekDuration: integer, this is the seekDuration
+Function playerLogLib_setSeekEndTime(seekDuration)
+  if isNumber(seekDuration) = true
     m.seekCount += 1
     m.isSeeking = false
 
-    if m.videoPosition > -1 AND m.isSeekExceededLimit = false
-      seekDuration = Abs(seekEndPosition - m.videoPosition)
-
-      if seekDuration * 1000 >= m.singleSeekThreshold
-        m.totalSeekDuration = m.singleSeekThreshold
-        m.isSeekExceededLimit = True
-      else
-        m.totalSeekDuration += seekDuration
-      end if
-    end if  
-
-  end if  
+    if (seekDuration >= m.singleSeekThreshold)
+      m.totalSeekDuration += m.singleSeekThreshold
+    else
+      m.totalSeekDuration += seekDuration
+    end if
+  end if
 End Function
 
 
@@ -1197,7 +1370,6 @@ Function playerLogLib_fireQualityOfServiceEvent(adImp = {})
   qualityOfServiceInfo["ad_imp"] = FormatJson(adImp)
 
   m.sendEvent(qualityOfServiceInfo, "quality_of_services", eventBase)
-  m.resetQoSAttributes()
 End Function
 
 
@@ -1223,7 +1395,6 @@ Function playerLogLib_resetQoSAttributes()
   m.adReBuffer = 0
   m.isAd = false
   m.adCount = 0
-  m.isTotalBufferingDurationExceededLimit = false
 End Function
 
 
@@ -1447,4 +1618,10 @@ Function playerLogLib_fireAdMissedEvent(adMissedInfo = {})
 
   adMissedInfo.is_preroll = isPreroll
   m.sendEvent(adMissedInfo, "ad_missed", eventBase)
+End Function
+
+
+'setTimeOnPlayerScreen marks the roTimeSpan
+Function playerLogLib_setTimeOnPlayerScreen()
+  m.timeOnPlayerScreen.mark()
 End Function

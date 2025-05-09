@@ -467,13 +467,13 @@ Function onGoToNext(msg)
             playUpNextContent(nextContent, playbackSource)
           end if
         else
-          returnToDetailScreenFromVideo()
+          returnToDetailScreenFromVideo(true, true, "upnext")
         end if
       else if m.upNextRequest = invalid
         m.upNextRequest = fetchUpNextContent(videoPlayer)
       end if
     else
-      returnToDetailScreenFromVideo()
+      returnToDetailScreenFromVideo(true, true, "upnext")
     end if
   end if
 End Function
@@ -564,7 +564,7 @@ Function playUpNextContent(nextContent, playbackSource = {"srcForAnalytic": "unk
 
       logWarn(formatJson(errorInfo), "videoLoad", "r-rated-upnext", 0.1)
 
-      returnToDetailScreenFromVideo()
+      returnToDetailScreenFromVideo(true, true, "upnext")
     else
       nowPos = processResume(content)
       playVideoContent(content, playbackSource, nowPos)
@@ -616,6 +616,8 @@ Function onVideoPlayerState(msg)
 
       currentScreen = getCurrentScreen()
       if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
+        currentScreen.exitReason = "error"
+        currentScreen.exitPlayer = true
         popScreen(true, true)
       end if
 
@@ -633,7 +635,7 @@ Function onVideoPlayerState(msg)
       isAutoPlayOff = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR videoPlayer.isAutoPlayTimerOn = false
       finishedContent = videoPlayer.content
       if finishedContent.isTrailer
-        returnToDetailScreenFromVideo()
+        returnToDetailScreenFromVideo(true, true, "trailer")
       else if videoPlayer.upNextContentToAutoplay <> invalid
         ' the video ended while the autoplay UI was still present, now autoplay the chosen video
         ' or autoplay the video that was focused when the timer expired
@@ -664,11 +666,11 @@ Function onVideoPlayerState(msg)
           }
           playUpNextContent(autoplayContent, playbackSource)
         else
-          returnToDetailScreenFromVideo()
+          returnToDetailScreenFromVideo(true, true, "upnext")
         end if
       else
         ' there was no autoplay content, so return to details screen
-        returnToDetailScreenFromVideo()
+        returnToDetailScreenFromVideo(true, true, "upnext")
       end if
     end if
 
@@ -702,7 +704,6 @@ End Function
 
 Function onPauseAdResponse(response)
   videoPlayerScreen = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
-
   if response <> invalid
     if videoPlayerScreen <> invalid
       videoPlayerScreen.pauseAdResponse = response
@@ -716,7 +717,7 @@ End Function
 
 Function onVideoPlayerBackPressed()
   tubiLog("VideoHelpers.onVideoPlayerBackPressed")
-  returnToDetailScreenFromVideo()
+  returnToDetailScreenFromVideo(true, true, "back")
 End Function
 
 
@@ -756,13 +757,14 @@ End Function
 
 
 Function onSignUpLaterInPlayerExitModalSelected()
-  returnToDetailScreenFromVideo()
+  returnToDetailScreenFromVideo(true, true, "back")
 End Function
 
 
 ' Stop the video player and refresh detail screen with the relevant content
 ' @sendAnalyticsEvent: boolean, based on this parameter the pageload/navigate event will be fired during popScreen
 ' @shouldUpdateEpisodeScreenContent: boolean, based on this parameter we will decide if we need to refresh the episode list screen or not.
+' @reason: possible values are back/ home/ upnext/ hdmi/ registration/ deeplink
 '
 ' Use cases:                                                Actions:
 '   - Exit video player movie                                 : 1 - redraw detail screen with existing detail content to update resume position; preserve related items
@@ -775,7 +777,7 @@ End Function
 '   - Deep link: exit video player movie after autoplay       : 2 - redraw detail screen with autoplayed content from video player; fetch new related items
 '   - Deep link: Exit video player series                     : 3 - redraw detail screen with existing detail content to updated resume positions; preserve related items
 '   - Deep link: Exit video player series after autoplay      : 4 - redraw detail screen with autoplayed episode metadata, but maintain series content; preserve related items
-Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEpisodeScreenContent = true)
+Function returnToDetailScreenFromVideo(sendAnalyticsEvent, shouldUpdateEpisodeScreenContent, reason)
   tubiLog("VideoHelpers.returnToDetailScreenFromVideo")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
 
@@ -784,6 +786,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEp
 
   if videoPlayer <> invalid
     stopVideoContent(videoPlayer)
+    videoPlayer.exitReason = reason
     videoPlayer.exitPlayer = true
     ' get the top most detail screen
     detailScreen = getTopDetailScreenFromStack()
@@ -1282,7 +1285,7 @@ Function onUpNextResponse(upNextContent)
 
           playUpNextContent(firstUpNextItem, playbackSource)
         else
-          returnToDetailScreenFromVideo()
+          returnToDetailScreenFromVideo(true, true, "upnext")
         end if
       else if upNextContent.getChildCount() > 0
         videoPlayer.upNextContent = upNextContent
@@ -1292,13 +1295,13 @@ Function onUpNextResponse(upNextContent)
       end if
     end if
   else
-    returnToDetailScreenFromVideo()
+    returnToDetailScreenFromVideo(true, true, "upnext")
   end if
 End Function
 
 Function onUpNextError(_errorInfo)
   if m.receivedGoToNextPressed = true
-    returnToDetailScreenFromVideo()
+    returnToDetailScreenFromVideo(true, true, "upnext")
   end if
 End Function
 

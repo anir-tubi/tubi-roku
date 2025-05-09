@@ -1933,7 +1933,7 @@ Function onCustomSuspend(msg)
     if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
       currentScreen.sendPendingPauseAdPixel = true
       ' don't send analytics event when user presses "home" button during playback, so sending param as false.
-      returnToDetailScreenFromVideo(false, false)
+      returnToDetailScreenFromVideo(false, false, "home")
     else if currentScreen <> invalid AND (currentScreen.id = m.constants.ui.screenIds.categoryDetailsScreen OR currentScreen.id = m.constants.ui.screenIds.categoryPanelListScreen)
       ' if current screen is categoryDetailsScreen, instant resume action is to start the channel from the homescreen (not a full channel restart).
       ' Remove the parent screen from the cache so that it is reloaded if a user navigates back to it in order to prevent a UX bug such that the cached screen
@@ -2391,7 +2391,7 @@ Function onIsHdmiStatusOkChange(msg)
     else if currentScreenId = screenIds.videoPlayerScreen then
       state = currentScreen.state
       if state <> "finished" AND state <> "error" AND isHdmiStatusOk = false then
-        returnToDetailScreenFromVideo(false)
+        returnToDetailScreenFromVideo(false, true, "hdmi")
         currentScreen = getCurrentScreen()
         currentScreen.shouldResumePlayback = true
       end if

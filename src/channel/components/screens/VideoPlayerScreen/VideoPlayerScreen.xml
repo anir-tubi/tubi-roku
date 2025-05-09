@@ -147,6 +147,9 @@
       <!-- exitPlayer helps to find out when to fire playerExit event -->
       <field id="exitPlayer" type="boolean"/>
 
+      <!-- exitReason helps to find out how the player screen got exited/closed -->
+      <field id="exitReason" type="string"/>
+
     <!-- OUTPUT -->
       <!-- Set to true if the back button was pressed while the video player has focus -->
       <field id="backButtonPressed" type="boolean" value="false" alwaysNotify="true" />

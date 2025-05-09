@@ -977,7 +977,7 @@ Function handleSingleContentDeeplinkError(error)
     if currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen
       returnToPreviousScreenFromLinearVideo(false)
     else if currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
-      returnToDetailScreenFromVideo(true)
+      returnToDetailScreenFromVideo(true, true, "deeplink")
     end if
   end if
 
