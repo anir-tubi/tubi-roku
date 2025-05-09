@@ -1013,6 +1013,13 @@ Function onRelatedContentChange()
       ' To force a single row in postergrid, set the columns
       m.RelatedGrid.numColumns = relatedContent.getChildCount()
       m.RelatedGrid.jumpToItem = m.RelatedGrid.itemFocused
+
+      m.RelatedGrid.update({
+        parentScreenId: m.constants.ui.screenIds.detailScreen
+        parentScreenTrackingPageInfo: m.top.trackingPageInfo
+        personalizationId: relatedContent.personalizationId
+        shouldTrackViewableImpressionEvent: m.top.shouldTrackViewableImpressionEvent
+      }, true)
     else
       m.RelatedContentGroup.visible = false
       if m.RelatedContentGroup.isInFocusChain() = true

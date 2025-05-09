@@ -53,6 +53,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
 
     ' Update tracking info - have to set the whole AA, can't update only a portion on the AA field
     detailScreen.trackingPageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
+    detailScreen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
 
     if isVideoPreviewOn() = true
       previewState = getVideoPreviewStateForThisContent(content)
@@ -731,7 +732,10 @@ Function handleRelatedResponse(relatedContent)
         'After AutoPlay or refresh required and when pressing back from Player to detail screen
         'related content(YMAL) thumbnails are not loading. Resetting relatedContent node fixes the issue.
         screen.relatedContent = invalid
+        ' Providing user friendly id to related content node to for analytics purposes.
+        relatedContent.id = "you_may_also_like"
         screen.relatedContent = relatedContent
+        exit for
       end if
     end for
   end if

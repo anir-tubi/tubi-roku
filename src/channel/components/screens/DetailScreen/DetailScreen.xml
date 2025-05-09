@@ -146,6 +146,9 @@
       <!-- Used to focus the related content group when user enters from deeplink and then come back to detailscreen -->
       <field id="focusRelatedContent" type="boolean" value="false" />
 
+      <!-- We have to create a field due to renderTracking events being async each itemComponent should be aware of what the mode was when it rendered. -->
+      <field id="shouldTrackViewableImpressionEvent" type="boolean" value="true" />
+
     <!-- OUTPUTS -->
 
       <!-- Should the full description be displayed -->

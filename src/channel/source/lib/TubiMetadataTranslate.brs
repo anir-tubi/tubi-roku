@@ -807,6 +807,13 @@ Function tubiMetadataTranslate_translateRelatedContent(contentFromServer, isSign
         translated.validUntil = Uptime(0) + m.constants.cacheTimes.category
       end if
     end if
+
+    personalizationId = contentFromServer.personalization_id
+    if personalizationId <> invalid
+      translated.update({
+        personalizationId: personalizationId
+      }, true)
+    end if
   end if
 
   return translated
