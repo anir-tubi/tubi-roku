@@ -193,13 +193,16 @@
           maxTitleLines="2"/>
       </Group>
 
-      <MaskGroup
-        id="ContentArea"
-        maskUri="pkg:/images/poster-mask.png"
-        maskSize="[0,0]">
-        <CategoryGridList
-          id="CategoryGridList"/>
-      </MaskGroup>
+      <Group
+        id="ContentAreaParent">
+        <MaskGroup
+          id="ContentArea"
+          maskUri="pkg:/images/poster-mask.png"
+          maskSize="[0,0]">
+          <CategoryGridList
+            id="CategoryGridList"/>
+        </MaskGroup>
+      </Group>
     </Group>
 
     <!-- For viewers that watch a REALLY long time, or just never close the app, force a refresh -->

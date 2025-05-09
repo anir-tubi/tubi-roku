@@ -6,11 +6,10 @@ Function init()
   m.Tracking = TubiTrackingInfo(m.constants)
   m.PageGroup = m.top.findNode("PageGroup")
   m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]
+  m.ContentAreaParent = m.top.findNode("ContentAreaParent")
   m.ContentArea = m.top.findNode("ContentArea")
   m.InfoPanel = m.top.findNode("InfoPanel")
   m.InfoPanelParent = m.top.findNode("InfoPanelParent")
-
-  m.ContentArea.translation = [0, 516]
 
   topRef = m.top
   topRef.observeField("focusedChild", "onScreenFocusChange")
@@ -65,11 +64,26 @@ Function init()
 
   m.sponsorSlideAmt = 29 'the amount the grid slides up to fit the sponsored header. This is the difference of the heights of the sponsored and normal row titles
 
-  m.originalContentAreaTranslation = m.ContentArea.translation
-
+  m.originalContentAreaTranslation = [0, 516]
   m.homeRedesignExpContentAreaTranslation = [0, 96]
+  setContentAreaState()
 
   m.scrollDirection = "none"
+End Function
+
+
+Function setContentAreaState(state = invalid)
+  tubiLog("HomeScreen.setToRedesignContentArea")
+
+  isHomeScreenRedesignForFeaturedEnabled = (getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v2", false).design_type <> "none")
+
+  if isHomeScreenRedesignForFeaturedEnabled = false OR (m.top.featuredListHasFocus = false AND m.CategoryGridList.lastFocusedList = "skinAdRow") OR m.top.featuredRowContent = invalid
+    m.currentContentAreaTranslation = m.originalContentAreaTranslation
+  else
+    m.currentContentAreaTranslation = m.homeRedesignExpContentAreaTranslation
+  end if
+
+  m.ContentAreaParent.translation = m.currentContentAreaTranslation
 End Function
 
 
@@ -379,19 +393,19 @@ End Function
 Function contractContentAreaToOriginal(rowPercent)
   tubiLog("HomeScreen.contractContentAreaToOriginal")
 
-  if m.ContentArea.translation[1] <> m.originalContentAreaTranslation[1]
+  if m.ContentAreaParent.translation[1] <> m.currentContentAreaTranslation[1]
     'gradually reset back to original position
     if rowPercent < .95
       '//while the rowPercent is less than .75, then gradually shift the visual elements back to default state
-      nDiffContentAreaTranslation_y = m.originalContentAreaTranslation[1] - m.ContentArea.translation[1]
+      nDiffContentAreaTranslation_y = m.currentContentAreaTranslation[1] - m.ContentAreaParent.translation[1]
 
-      m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.ContentArea.translation[1] + nDiffContentAreaTranslation_y * rowPercent]
+      m.ContentAreaParent.translation = [m.currentContentAreaTranslation[0], m.ContentAreaParent.translation[1] + nDiffContentAreaTranslation_y * rowPercent]
       if m.InfoPanel.opacity < 1 AND m.InfoPanel.opacity < rowPercent
         m.InfoPanel.opacity = rowPercent
       end if
     else
       '//once the rowPercent has reached a certain percent, then immediately set everything back to original numbers to ensure it happens
-      m.ContentArea.translation = m.originalContentAreaTranslation
+      m.ContentAreaParent.translation = m.currentContentAreaTranslation
       m.InfoPanel.opacity = 1
     end if
     
@@ -403,7 +417,16 @@ End Function
 '   So if a gridType already adjusted the rowList's position, then adjust it more but relative to where it already had been adjusted.
 ' @rowPercent: float, the percentage that the Sponsorship row is focused
 Function expandContentAreaForSponsorship(rowPercent)
-  m.ContentArea.translation = [m.ContentArea.translation[0], m.originalContentAreaTranslation[1] - (m.sponsorSlideAmt * rowPercent)]
+  m.ContentAreaParent.translation = [m.ContentAreaParent.translation[0], m.currentContentAreaTranslation[1] - (m.sponsorSlideAmt * rowPercent)]
+
+  if m.InfoPanel.opacity < 0
+    '//gradually display the info panel as the sponsorship row comes into view
+    if rowPercent < .95
+      m.InfoPanel.opacity = rowPercent
+    else
+      m.InfoPanel.opacity = 1
+    end if
+  end if
 End Function
 
 
@@ -430,13 +453,8 @@ End Function
 
 
 Function onFeaturedListHasFocusChange(msg)
-  featuredListHasFocus = msg.getData()
   m.InfoPanel.visible = false
-  if featuredListHasFocus = false AND m.CategoryGridList.lastFocusedList = "skinAdRow"
-    m.ContentArea.translation = m.originalContentAreaTranslation
-  else
-    m.ContentArea.translation = m.homeRedesignExpContentAreaTranslation
-  end if
+  setContentAreaState()
   'Make sure Content is in correct location
   moveContentAreaMaskBasedCurrentFocus()
   m.gridHasGainedInitialFocus = true
@@ -642,7 +660,7 @@ Function populateInfoPanel(mode, contentNode)
     m.InfoPanel.calculateHeight = true
   else
     m.InfoPanel.visible = false
-    m.ContentArea.translation = m.homeRedesignExpContentAreaTranslation
+    setContentAreaState()
   end if
 End Function
 
@@ -823,11 +841,6 @@ Function onGridContentIsReadyChange(msg)
   ' Not using alias to avoid making the field gridContentIsReady is ready bi-directional since contentReady inside homescreen.brs on other use cases.
   if msg.getData() = true AND m.top.contentReady = false
     m.top.contentReady = true
-
-    if (m.top.featuredListHasFocus = false AND m.CategoryGridList.lastFocusedList = "skinAdRow") OR m.top.featuredRowContent = invalid
-      m.ContentArea.translation = m.originalContentAreaTranslation
-    else
-      m.ContentArea.translation = m.homeRedesignExpContentAreaTranslation
-    end if
+    setContentAreaState()
   end if
 End Function
