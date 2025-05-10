@@ -381,7 +381,15 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
     params["utm_campaign_config"] = utmCampaignConfig
   end if
 
-  if containerGridItemType = m.constants.ui.gridItemTypes.landscapeWithMetadata AND imageParamTypes = invalid
+  tileDesignType = "none"
+  experimentContainerId = "none"
+  if m.experiments <> invalid
+    experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3")
+    tileDesignType = experiment.design_type
+    experimentContainerId = experiment.container_id
+  end if
+
+  if imageParamTypes = invalid AND categoryId = experimentContainerId AND tileDesignType <> invalid AND tileDesignType <> "none"
     imageParamTypes = [
       "poster"
       "landscape"
@@ -505,6 +513,7 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
   skinAdLandscape = imageSizes.skinAdLandscape
   fullScreenBackground = imageSizes.fullScreenBackground
   featuredRowPoster = imageSizes.featuredRowPoster
+  featuredPortraitSmall = imageSizes.featuredPortraitSmall
 
   '//For now, ensure the large posters do not show up on the search screen
   isNonLargePostersScreen = (isNonEmptyString(screenId) = true AND screenId = m.constants.ui.screenIds.searchScreen)
@@ -514,20 +523,27 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
     landscapeSize = imageSizes.largeLandscape
   end if
 
+  gridItemTypes = m.constants.ui.gridItemTypes
+
   for each imageType in imageTypes
     if imageType = "poster"
       '//Tell backend to provide a specific sized image
       existingParams["images[poster_tb]"] = "w" + posterSize[0].ToStr() + "h" + posterSize[1].ToStr() + "_poster"
     else if imageType = "landscape"
-      existingParams["images[landscape_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_landscape"
+      if containerGridItemType = gridItemTypes.featuredPortraitSmall
+        existingParams["images[landscape_tb]"] = "w" + featuredRowPoster[0].ToStr() + "h" + featuredRowPoster[1].ToStr() + "_landscape"
+      else
+        existingParams["images[landscape_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_landscape"
+      end if
     else if imageType = "largestLandscape"
       existingParams["images[landscape_tb]"] = "w" + largestLandscapeSize[0].ToStr() + "h" + largestLandscapeSize[1].ToStr() + "_landscape"
     else if imageType = "hero"
       existingParams["images[hero_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_hero"
     else if imageType = "featured"
       existingParams["images[hero_tb]"] = "w" + featuredRowPoster[0].ToStr() + "h" + featuredRowPoster[1].ToStr() + "_hero"
+      existingParams["images[featured_portrait_tb]"] = "w" + featuredPortraitSmall[0].ToStr() + "h" + featuredPortraitSmall[1].ToStr() + "_poster"
     else if imageType = "background"
-      if containerGridItemType <> m.constants.ui.gridItemTypes.skinAd
+      if containerGridItemType <> gridItemTypes.skinAd
         existingParams["images[background_tb]"] = "w" + background[0].ToStr() + "h" + background[1].ToStr() + "_background"
       else
         existingParams["images[background_tb]"] = "w" + fullScreenBackground[0].ToStr() + "h" + fullScreenBackground[1].ToStr() + "_background"

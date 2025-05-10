@@ -511,7 +511,8 @@ Function onGridFocusChange() as void
 
   fireNavigateWithinPageEvent()
   
-  isHomeScreenRedesignExperimentEnabled = (getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v2", false).design_type <> "none") AND focusedContent.parentId = m.constants.ui.categoryIds.featured
+  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
+  isHomeScreenRedesignExperimentEnabled = (experiment.design_type = "withDescriptionPortraitSmall") AND focusedContent <> invalid AND focusedContent.parentId = experiment.container_id
 
   if isHomeScreenRedesignExperimentEnabled = false
    m.gridHasGainedInitialFocus = true
@@ -522,10 +523,11 @@ End Function
 
 Function fireNavigateWithinPageEvent()
   'Set up the navigateWithinPageInfo to send to ContentController via Homescreen. Need for when CategoryGridList is in focus
-  oldAnalyticsRow = m.CategoryGridList.oldCursorPosition[0] + 1
-  oldAnalyticsCol = m.CategoryGridList.oldCursorPosition[1] + 1
-  newAnalyticsRow = m.CategoryGridList.cursorPosition[0] + 1
-  newAnalyticsCol = m.CategoryGridList.cursorPosition[1] + 1
+  rowIndexBoost = m.categoryGridList.rowIndexBoost + 1
+  oldAnalyticsRow = m.CategoryGridList.oldCursorPosition[0] + rowIndexBoost
+  oldAnalyticsCol = m.CategoryGridList.oldCursorPosition[1] + rowIndexBoost
+  newAnalyticsRow = m.CategoryGridList.cursorPosition[0] + rowIndexBoost
+  newAnalyticsCol = m.CategoryGridList.cursorPosition[1] + rowIndexBoost
   oldFocusedContent = m.CategoryGridList.oldItemFocused
 
   if m.gridHasGainedInitialFocus = true AND oldAnalyticsRow > 0 AND oldAnalyticsCol > 0
@@ -587,9 +589,10 @@ Function getTrackingComponentInfoOfCategoryGridList(gridItem, itemPosition)
   if gridItem <> invalid AND itemPosition <> invalid AND itemPosition.Count() = 2
     componentValues = {}
     componentValues["category_slug"] = m.top.currCategoryId
-    componentValues["category_row"] = itemPosition[0] + 1 'all analytics are 1 based
-    componentValues["category_col"] = itemPosition[1] + 1 'all analytics are 1 based
-    tile = m.Tracking.getAnalyticsTile(gridItem, itemPosition[1] + 1)
+    rowIndexBoost = m.categoryGridList.rowIndexBoost + 1
+    componentValues["category_row"] = itemPosition[0] + rowIndexBoost 'all analytics are 1 based
+    componentValues["category_col"] = itemPosition[1] + rowIndexBoost 'all analytics are 1 based
+    tile = m.Tracking.getAnalyticsTile(gridItem, itemPosition[1] + rowIndexBoost)
 
     componentValues["content_tile"] = tile
 
@@ -630,10 +633,19 @@ End Function
 '@mode: string, one of the valid constants.ui.infoPanelModes info panel modes (see InfoPanel.xml for details)
 '@contentNode: content node
 Function populateInfoPanel(mode, contentNode)
-  isHomeScreenRedesignForFeaturedEnabled = (getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v2", false).design_type <> "none") AND contentNode.parentId = m.constants.ui.categoryIds.featured 
+  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
+  isHomeScreenRedesignForFeaturedEnabled = (experiment.design_type = "withDescriptionPortraitSmall") AND contentNode.parentId = experiment.container_id
 
   if contentNode <> invalid AND (isHomeScreenRedesignForFeaturedEnabled = false OR m.top.contentMode <> m.constants.ui.contentMode.homescreen)
-    m.InfoPanel.visible = true
+    
+    ' The below is to ensure that there is slight delay in showing the info panel so that there is no overlap with any row that is gaining focus.
+    if m.InfoPanel.visible = false
+      callback = sub()
+        m.InfoPanel.visible = true
+      end sub
+      slideTo(m.CategoryGridList, [0, 0], 0.05, 0, callback)
+    end if
+    
     if mode = m.constants.ui.infoPanelModes.item
       populateInfoPanelWithHomescreenStyleItemMode(contentNode, m.InfoPanel)
     else if mode = m.constants.ui.infoPanelModes.linearProgramHomescreen

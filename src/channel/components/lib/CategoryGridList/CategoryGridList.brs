@@ -21,7 +21,7 @@ Function init()
 
   m.rowListTranslationYOffset = 0
 
-  m.homeScreenDesignType = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v2", false).design_type
+  m.homeScreenDesignType = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false).design_type
 
   ' Parameters for the metadata block cache. Window size is number of items to fetch, page delimiter
   ' is what focus thresholds trigger a fetch.
@@ -61,6 +61,9 @@ Function init()
   ' Holds the value of last focused list, possible values are "", "skinAdRow" "rowlist".
   ' These IDs match with the IDs of the components in the XML. 
   m.top.lastFocusedList = ""
+
+  m.lastCurrentFocusColumn = 0
+  m.lastFocusColumnIndex = 0
 End Function
 
 
@@ -146,7 +149,7 @@ Function onComponentFocusChange(msg)
       m.top.lastFocusedList = "skinAdRow"
       m.skinAdRow.opacity = 1
       m.skinAdRow.setFocus(true)
-    else if m.homeScreenDesignType <> "none" AND m.FeaturedRowList.content <> invalid AND (m.top.lastFocusedList = "featuredRowList" OR m.top.lastFocusedList = "")
+    else if m.homeScreenDesignType = "withDescriptionPortraitSmall" AND m.FeaturedRowList.content <> invalid AND (m.top.lastFocusedList = "featuredRowList" OR m.top.lastFocusedList = "")
       m.top.lastFocusedList = "featuredRowList"
       m.FeaturedRowList.setFocus(true)
     else
@@ -188,7 +191,7 @@ Function onComponentFocusChange(msg)
     m.RowList.jumpToRowItem = itemToJumpTo
   end if
 
-  if m.homeScreenDesignType <> "none"
+  if m.homeScreenDesignType = "withDescriptionPortraitSmall"
     m.top.featuredListHasFocus = m.top.isInFocusChain() = true AND m.top.lastFocusedList = "featuredRowList" AND m.top.featuredRowContent <> invalid
   end if
 End Function
@@ -237,8 +240,8 @@ Function onContentChange()
     m.FeaturedRowList.translation = [0, 0]
     ' Resetting the state of the UI.
     if m.top.featuredRowContent <> invalid
-      if m.homeScreenDesignType = "withDescription"
-        m.rowList.translation =  [0, 545 + m.rowListTranslationYOffset]
+      if m.homeScreenDesignType = "withDescriptionPortraitSmall"
+        m.rowList.translation =  [0, 705 + m.rowListTranslationYOffset]
       else if m.homeScreenDesignType = "withOutDescription"
         m.rowList.translation =  [0, 420 + m.rowListTranslationYOffset]
       else
@@ -287,6 +290,8 @@ Function onContentChange()
   m.RowList.update({
     "rowIndexBoost" : rowIndexBoost
   }, true)
+
+  m.top.rowIndexBoost = rowIndexBoost
   
   m.top.gridContentIsReady = true
 End Function
@@ -386,9 +391,12 @@ Function setRowHeights()
   rowItemSpacings = []
   focusXOffsets = []
   numRows = 2
-  posterSize = m.constants.ui.imageSizes.largePoster
-  landscapeSize = m.constants.ui.imageSizes.largeLandscape
-  featuredRowPoster = m.constants.ui.imageSizes.featuredRowPoster
+  imageSizes = m.constants.ui.imageSizes
+  posterSize = imageSizes.largePoster
+  landscapeSize = imageSizes.largeLandscape
+  featuredRowPoster = imageSizes.featuredRowPoster
+  featuredPortraitSmall = imageSizes.featuredPortraitSmall
+
   showRowLabel = []
 
   for i=0 to m.top.content.getChildCount()-1
@@ -481,16 +489,26 @@ Function setRowHeights()
     featuredRowHeights = featuredRowHeights + 32
   end if
 
+  m.RowList.content = m.top.content
+
+  featuredPosterSize = featuredRowPoster
+  if m.homeScreenDesignType = "withDescriptionPortraitSmall"
+    featuredPosterSize = featuredPortraitSmall
+  end if
   m.FeaturedRowlist.update({
     "showRowLabel": [true]
-    "rowItemSize": [featuredRowPoster]
+    "rowItemSize": [featuredPosterSize]
     "rowHeights": [featuredRowHeights]
     "focusXOffset" : [0]
   })
 
-  m.RowList.content = m.top.content
+  if m.homeScreenDesignType = "withDescriptionPortraitSmall"
+    m.featuredRowList.focusXOffset = [482]
+  end if
+
   m.FeaturedRowList.content = m.top.featuredRowContent
 End Function
+
 
 ' animateToCategory doesn't cause rowItemFocused or itemFocused to be triggered unless
 ' the RowList has focus.  We capture this in order to load categories even when the
@@ -568,14 +586,8 @@ End Function
 ' onRowItemFocused - RowList.rowItemFocused event handler.
 Function onRowItemFocused(msg)
   tubiLog("CategoryGridList.onRowItemFocused")
-
-  rowCountBooster = 0
   rowItemFocused = msg.getData()
-  if m.homeScreenDesignType <> "none" AND m.FeaturedRowList.content <> invalid
-    rowCountBooster = m.FeaturedRowList.content.getChildCount()
-  end if
-
-  m.top.focusedPosition = [rowItemFocused[0] + rowCountBooster , rowItemFocused[1]]
+  m.top.focusedPosition = rowItemFocused
 
   if m.top.content <> invalid AND rowItemFocused <> invalid
     category = m.top.content.getChild(rowItemFocused[0])
@@ -862,8 +874,27 @@ End Function
 
 
 Function onFeaturedRowCurrFocusColumnChange(msg)
-  currentFocusColumn = Int(msg.getData())
-  m.top.currentFocusedItemBoundingRect = m.FeaturedRowList.subBoundingRect("item0_" + currentFocusColumn.toStr())
+  currentFocusColumn = msg.getData()
+  m.top.currentFocusedItemBoundingRect = m.FeaturedRowList.subBoundingRect("item0_" + Int(msg.getData()).toStr())
+
+  absCurCol = Int(currentFocusColumn)
+  ' To account for fast scrolling.
+  diff = Abs(absCurCol - m.lastFocusColumnIndex)
+  
+  if currentFocusColumn <> absCurCol AND diff <= 1
+    if currentFocusColumn > m.lastCurrentFocusColumn
+      featuredRowCurrFocusColumn = m.lastFocusColumnIndex + 1
+    else
+      featuredRowCurrFocusColumn = m.lastFocusColumnIndex - 1
+    end if
+    m.top.featuredRowCurrFocusColumn = featuredRowCurrFocusColumn
+  else
+    m.lastFocusColumnIndex = absCurCol
+    if m.lastFocusColumnIndex <> m.top.featuredRowCurrFocusColumn
+      m.top.featuredRowCurrFocusColumn = m.lastFocusColumnIndex
+    end if
+  end if
+  m.lastCurrentFocusColumn = currentFocusColumn
 End Function
 
 
@@ -873,10 +904,8 @@ End Function
 
 
 Function translateFeaturedListAndSetFocus()
-  if m.homeScreenDesignType = "withDescription"
-    slideTo(m.RowList, [0, 545 + m.rowListTranslationYOffset], 0.3)
-  else if m.homeScreenDesignType = "withOutDescription"
-    slideTo(m.RowList, [0, 420 + m.rowListTranslationYOffset], 0.3)
+  if m.homeScreenDesignType = "withDescriptionPortraitSmall"
+    slideTo(m.RowList, [0, 705 + m.rowListTranslationYOffset], 0.3)
   end if
 
   callback = sub()
@@ -915,7 +944,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
     else if key = "down" AND m.FeaturedRowList.isInFocusChain() = true
       m.top.lastFocusedList = "rowList"
       fade(m.FeaturedRowList, "out", 0.3)
-      if m.homeScreenDesignType = "withDescription"
+      if m.homeScreenDesignType = "withDescriptionPortraitSmall"
         slideTo(m.RowList, [0, 420 + m.rowListTranslationYOffset], 0.3)
       end if
       m.RowList.setFocus(true)

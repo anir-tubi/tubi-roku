@@ -57,13 +57,9 @@
             
           <Group
             id="inlineVideoPreviewPlayerContainer"
-            visible="false"
+            opacity="0"
             translation="[159, 155]" >
-            <VideoGridMetadata 
-              visible="false"
-              width="789"
-              height="330"
-              titleImageScale="0.75"
+            <ExpandedVideoGridTile
               translation="[5,4]"
               id="inlineVideoMetadataOverlay" />
             <Poster

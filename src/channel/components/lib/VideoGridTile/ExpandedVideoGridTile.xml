@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="ExpandedVideoGridTile" extends="Group">
+
+  <script type="text/brightscript" uri="ExpandedVideoGridTile.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+
+  <interface>
+    <field id="itemContent" type="node" />
+    <field id="width" alias="poster.width,videoGridMetadata.width, videoInGridGradient.width" />
+    <field id="height" alias="poster.height,videoGridMetadata.height, videoInGridGradient.height" />
+    <field id="itemHasFocus" type="boolean" />
+    <field id="showContentPoster" alias="poster.visible,videoInGridGradient.visible" value="true" />
+  </interface>
+
+  <children>
+    <LayoutGroup
+      itemSpacings="[24]">
+
+      <Group 
+        id="posterGroup">
+        <Poster
+          id="poster"
+          loadSync="true"
+          uri="pkg:/images/placeholder-featured.webp"
+          loadingBitmapUri="pkg:/images/placeholder-featured.webp"
+          failedBitmapUri="pkg:/images/placeholder-featured.webp" />
+        <Poster
+          id="videoInGridGradient"
+          loadDisplayMode="scaleToFill"
+          uri="pkg:/images/video_in_gri_gradient_$$RES$$.9.png"/>
+
+        <Poster
+          id="titleImage"
+          loadDisplayMode="limitSize"/>
+
+        <Label
+          id="title"
+          width="650"
+          wrap="true"
+          maxLines="2"
+          visible="false"
+          vertAlign="bottom">
+          <Font
+            id="TitleFont"
+            role="font"/>
+        </Label>
+      </Group>
+      <ExpandedTileMetadata id="videoGridMetadata" />
+    </LayoutGroup>
+
+  </children>
+</component>

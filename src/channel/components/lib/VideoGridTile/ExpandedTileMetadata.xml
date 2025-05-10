@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="ExpandedTileMetadata" extends="Group">
+
+  <script type="text/brightscript" uri="ExpandedTileMetadata.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <field id="itemContent" type="node" />
+    <field id="width" alias="description.width" />
+  </interface>
+
+  <children>
+    <LayoutGroup
+      id="metadataGroup"
+      horizAlignment="left"
+      itemSpacings="[12]">
+
+      <LayoutGroup
+        id="firstLineGroup"
+        layoutDirection="horiz"
+        itemSpacings="[10]"
+        vertAlignment="center">
+        <Poster
+          id="channelLogo"
+          width="40"
+          height="40" />
+        <Label
+          id="lineOneData"
+          vertAlign="bottom" >
+          <Font
+            role="font" />
+        </Label>
+        <Group
+          id="Rating">
+          <Poster
+            id="RatingBackground"
+            height="30"
+            uri="pkg:/images/rating_background_video_tile.png"
+            loadDisplayMode="scaleToFit"
+            loadSync="true"/>
+          <Label
+            id="RatingLabel"
+            height="30"
+            width="0"
+            numLines="1"
+            wrap="false"
+            horizAlign="center"
+            vertAlign="center">
+            <Font
+              role="font"/>
+          </Label>
+        </Group>
+        <Poster
+          id="ClosedCaptionPoster"
+          uri="pkg:/images/icon-closed-caption.webp"
+          height="36"
+          width="36"
+          loadDisplayMode="scaleToFit"
+          loadSync="true"/>
+      </LayoutGroup>
+
+      <Label
+        id="description"
+        maxLines="3"
+        wrap="true">
+        <Font
+          id="DescriptionFont"
+          role="font"/>
+      </Label>
+
+    </LayoutGroup>
+    
+  </children>
+</component>

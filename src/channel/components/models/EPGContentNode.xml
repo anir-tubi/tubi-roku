@@ -57,6 +57,8 @@
 
     <field id="genres" type="stringarray" />
 
+    <field id="landscapePosterUrl" type="string" />
+
     <!--NOTE: THE FOLLOWING FIELDS ARE DEFAULT CONTENTNODE FIELDS. CREATED ONLY AFTER INITIALIZATION.
       These needs to be initialized with "=" or SetFields() or setField(). Otherwise, this field will not exist.
       Title

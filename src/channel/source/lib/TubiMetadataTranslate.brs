@@ -98,6 +98,8 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
     else if isNonEmptyArray(contentFromServer.thumbnails) = true
       sThumbnailURL = contentFromServer.thumbnails[0]
     end if
+  else if gridType = gridItemTypes.featuredPortraitSmall AND canvasImages <> invalid AND isNonEmptyArray(canvasImages.featured_portrait_tb) = true
+    sThumbnailURL = canvasImages.featured_portrait_tb[0]
   else if gridType = gridItemTypes.landscape OR gridType = gridItemTypes.landscapeNoTitle OR gridType = gridItemTypes.landscapeInnerMetadata OR gridType = gridItemTypes.linear
     if canvasImages <> invalid AND type(canvasImages.landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.landscape_tb[0])
       '//A custom landscape size was requested, use this image instead of the default image
@@ -701,6 +703,11 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
         if programFromServer <> invalid
           translatedChild = translatedContent.createChild("EPGContentNode")
+          if translatedContent.gridItemType <> invalid
+            translatedChild.update({
+              gridItemType: translatedContent.gridItemType
+            }, true)
+          end if
           m.translateProgram(contentFromServer, programFromServer, translatedChild, m.constants.ui.screenIds.homeScreen, isSignedInUser)
           count = count + 1
         end if
@@ -718,6 +725,9 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
           translatedChild = {
             "subtype": "EPGContentNode"
           }
+          if translatedContent.gridItemType <> invalid
+            translatedChild.gridItemType = translatedContent.gridItemType
+          end if
           m.translateProgram(contentFromServer, programFromServer, translatedChild, m.constants.ui.screenIds.homeScreen, isSignedInUser)
           count = count + 1
           translatedContent.children.push(translatedChild)
@@ -1507,8 +1517,18 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             seasons = fullChild.num_seasons
           end if
 
-          isHomescreenRedesignExperiementEnabled = (m.experiments <> invalid AND m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v2").design_type <> "none")
-          if container.id = m.constants.ui.categoryIds.featured AND (isHomescreenRedesignExperiementEnabled = true)
+          tileDesignType = "none"
+          isHomescreenRedesignExperiementEnabled = false
+          experimentContainerId = "none"
+          if m.experiments <> invalid
+            experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3")
+            tileDesignType = experiment.design_type
+            experimentContainerId = experiment.container_id
+            isHomescreenRedesignExperiementEnabled = (tileDesignType <> "none")
+          end if
+
+          if container.id = experimentContainerId AND (isHomescreenRedesignExperiementEnabled = true)
+            featuredLandscape = m.getRoundedCornersURL(m.getThumbnailImage(fullChild, m.constants.ui.gridItemTypes.landscapeWithMetadata))
             childAA = {
               id: fullChild.id
               title: fullChild.title
@@ -1523,6 +1543,10 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
               thumbnailUri: thumbnailUri
               seasons: seasons
               type: sContentType
+              tileDesignType: tileDesignType
+              featuredLandscape: featuredLandscape
+              hasCC: (fullChild.hasSubtitles = true OR (fullChild.subtitleTracks <> invalid AND fullChild.subtitleTracks.isEmpty() = false))
+              gridItemType: parentGridItemType
             }
           else
             childAA = {
@@ -1628,7 +1652,6 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             if childIsPushable = true and jsonAA <> invalid
               jsonAA[childAA.id] = fullChild
             end if
-
             childrenReturn.push(childAA)
           end if
         end if
@@ -1914,10 +1937,23 @@ End Function
 Function tubiMetadataTranslate_getGridItemType(container, orientation, constants, screenId = "", contentMode = "")
   gridItemTypes = constants.ui.gridItemTypes
   gridItemType = gridItemTypes.portrait
-  isHomescreenRedesignExperiementEnabled = (m.experiments <> invalid AND m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v2").design_type <> "none")
-
-  if screenId = m.constants.ui.screenIds.homeScreen AND container.id = constants.ui.categoryIds.featured AND (isHomescreenRedesignExperiementEnabled = true) AND (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
-    gridItemType = gridItemTypes.landscapeWithMetadata
+  
+  tileDesignType = "none"
+  isHomescreenRedesignExperiementEnabled = false
+  experimentContainerId = "none"
+  if m.experiments <> invalid
+    experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3")
+    tileDesignType = experiment.design_type
+    experimentContainerId = experiment.container_id
+    isHomescreenRedesignExperiementEnabled = (tileDesignType <> "none")
+  end if
+  
+  if screenId = m.constants.ui.screenIds.homeScreen AND tileDesignType = "withDescriptionPortraitSmall" AND container.id = experimentContainerId AND isHomescreenRedesignExperiementEnabled = true AND (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
+    gridItemType = gridItemTypes.featuredPortraitSmall
+  else if tileDesignType = "controlReOrderContainers" AND container.id = experimentContainerId
+    gridItemType = gridItemTypes.landscape
+  else if tileDesignType <> "none" AND container.id = constants.ui.categoryIds.featured
+    gridItemType = gridItemTypes.portrait
   else if container.type = constants.ui.categoryTypes.linear
     gridItemType = gridItemTypes.linear
   else if container.id = constants.ui.categoryIds.featured AND orientation <> gridItemTypes.portrait
@@ -2467,16 +2503,33 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
       end if
     end if
 
+    gridItemType = m.constants.ui.gridItemTypes.linear
+
+    if translatedProgram.gridItemType <> invalid
+      gridItemType = translatedProgram.gridItemType
+    end if
+
+    if gridItemType = m.constants.ui.gridItemTypes.featuredPortraitSmall
+      useSeriesImage = (programFromServer.series_id <> invalid AND programFromServer.series_images <> invalid)
+      landscapePosterUrl = m.getRoundedCornersURL(m.getThumbnailImage(programFromServer, m.constants.ui.gridItemTypes.linear, useSeriesImage))
+
+      if isNonEmptyString(landscapePosterUrl) = false
+        landscapePosterUrl = m.getRoundedCornersURL(m.getThumbnailImage(channelFromServer, m.constants.ui.gridItemTypes.linear))
+      end if
+
+      translatedProgram.landscapePosterUrl = landscapePosterUrl
+    end if
+
     ' if a program = episode of a series, then series images are preffered
     if programFromServer.series_id <> invalid AND programFromServer.series_images <> invalid
-      sHDGridPosterURL = m.getThumbnailImage(programFromServer, m.constants.ui.gridItemTypes.linear, true)'first choice for series/episode
+      sHDGridPosterURL = m.getThumbnailImage(programFromServer, gridItemType, true)'first choice for series/episode
     else
-      sHDGridPosterURL = m.getThumbnailImage(programFromServer, m.constants.ui.gridItemTypes.linear) 'program images for non series/episode
+      sHDGridPosterURL = m.getThumbnailImage(programFromServer, gridItemType) 'program images for non series/episode
     end if
 
 
     if sHDGridPosterURL = ""
-      sHDGridPosterURL =  m.getThumbnailImage(channelFromServer, m.constants.ui.gridItemTypes.linear) 'channel image - default
+      sHDGridPosterURL =  m.getThumbnailImage(channelFromServer, gridItemType) 'channel image - default
     end if
 
     sFDPosterURL = m.getRoundedCornersURL(sFDPosterURL)

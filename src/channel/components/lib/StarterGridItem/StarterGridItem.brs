@@ -66,11 +66,13 @@ Function onItemContentChange(msg)
     if gridItemType = "emptyContainer" then
       childGridItemComponent = "CategoryGridPoster"
     else if gridItemType = "landscapeWithMetadata"
-      if getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v2", false).design_type = "withDescription"
+      if itemContent.tileDesignType = "withDescription"
         childGridItemComponent = "VideoGridTileWithDescription"
       else
         childGridItemComponent = "VideoGridTile"
       end if
+    else if gridItemType = "featuredPortraitSmall"
+      childGridItemComponent = "PortraitVideoGridTile"
     else if gridItemType = "landscapeInnerMetadata" then
       childGridItemComponent = "CategoryGridPoster"
     else if gridItemType = "continue_watching_signed_out_user" then

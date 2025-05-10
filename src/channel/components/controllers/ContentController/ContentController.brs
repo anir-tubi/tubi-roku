@@ -97,8 +97,11 @@ Function addControllerUi()
   m.videoPreviewPlayer = m.top.findNode("videoPreviewPlayer")
   m.inlinePreviewFocusIndicator = m.top.findNode("inlinePreviewFocusIndicator")
   m.inlineVideoMetadataOverlay = m.top.findNode("inlineVideoMetadataOverlay")
+  featuredRowPoster = m.constants.ui.featuredRow.playerSize
+  m.inlineVideoMetadataOverlay.width = featuredRowPoster[0]
+  m.inlineVideoMetadataOverlay.height = featuredRowPoster[1]
 
-  m.videoPreviewPlayer.observeFieldScoped("visible", "onVideoPreviewPlayerVisibleChange")
+  m.inlinePreviewFocusIndicator.height = m.constants.ui.featuredRow.playerSize[1]
 
   m.LinearPlayerGroup = m.top.findNode("LinearPlayerGroup")
   m.LinearPlayerGroupAboveScreenStack = m.top.findNode("LinearPlayerGroupAboveScreenStack")
@@ -1947,8 +1950,8 @@ Function onCustomSuspend(msg)
         closeLinearVideoPlayerTransport()
         linearVideoPlayer.control = "stop"
       end if
-
-      ' Remove this line if we do not graduated roku_home_screen_redesign_v2.
+      
+      ' Remove this line if we do not graduated roku_home_screen_redesign_v3.
       ' This is needed to avoid having to use alwaysnotify on featuredListHasFocus and when app is suspended it does not fire focus change event on home screen.
       homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
       if homeScreen <> invalid

@@ -71,15 +71,18 @@ Function onVideoPreviewStateChanged(msg)
   videoPreview = msg.getRoSGNode()
   videoPreviewState = msg.getData()
   currentScreen = getCurrentScreen()
-
+  m.inlineVideoMetadataOverlay.showContentPoster = true
   if (videoPreviewState = "playing" OR videoPreviewState = "paused") AND videoPreview <> invalid AND videoPreview.isBufferingComplete = true
     ' Adding a safety check to make sure if a new debounce was started we do not show the player instead just pause it.
-    if m.videoPreviewDebounce.control = "start"
+    ' Only doing it for featured row list since that is the only row that has debounce for now.
+    ' TODO: Remove the and condition to check featuredListHasFocus once we have debounce for all rows.
+    if m.videoPreviewDebounce.control = "start" AND currentScreen.featuredListHasFocus = true
       videoPreview.visible = false
       pauseVideoPreview()
     else
-      videoPreview.visible = true
-      m.backgroundGroup.posterVisible = false
+      showVideoPreviewPlayer = (currentScreen <> invalid AND currentScreen.isInFocusChain() = true) OR currentScreen.lastFocusedList <> "featuredRowList"
+      videoPreview.visible = (showVideoPreviewPlayer = true)
+      m.backgroundGroup.posterVisible = (showVideoPreviewPlayer = false)
     end if
   else if videoPreviewState = "error"
     ' unobserve the state if we have any error while playing mp4 video previews to avoid autostarting the focused content on autostart variant of experiment.
@@ -181,16 +184,11 @@ Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
 
     ' If the experiment is enabled and focused content is from featured row than expand preview to full screen.
     if content.gridItemType = m.constants.ui.gridItemTypes.skinAd
-      ' Reducing 1px from both width and height since the player is in background and keeping full width causes roku to display closed captioning overlay.
-      ' To avoid any other Roku OS level default behavior from kicking in reducing 1px to give a impression that player is not in full screen.
-      updatePreviewPlayerToFullScreen()
       videoPreview.unObserveFieldScoped("position")
       videoPreview.observeFieldScoped("position", "onVideoPreviewPositionChanged")
-    else if content.gridItemType = m.constants.ui.gridItemTypes.landscapeWithMetadata
-      updatePreviewPlayerToInlineView()
-    else
-      updatePreviewPlayerToCondensedView()
     end if
+
+    updatePlayerLayoutBasedOnFocusedContent(content)
 
     ' unObserve field just in case previous state was errorsstart observing a fresh status.
     videoPreview.unObserveFieldScoped("state")
@@ -212,9 +210,8 @@ Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
       videoContent.previewId = ""
     end if
 
-    homescreenDesignType = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v2", false).design_type
-
-    if content.parentId = m.constants.ui.categoryIds.featured AND (homescreenDesignType <> "none")
+    experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
+    if content.parentId = experiment.container_id AND (experiment.design_type <> "none")
       videoContent.addField("parentCategory", "string", false)
       videoContent.parentCategory = content.parentId
     end if
@@ -238,6 +235,7 @@ Function updatePreviewPlayerToCondensedView()
   m.videoPreviewPlayer.reParent(m.backgroundVideoPreviewPlayerContainer, false)
   m.videoPreviewPlayer.clippingRect = [0, 0, 1920, 1080]
   resizeToLocation(m.videoPreviewPlayer, 1120, 630, [799, 0], 0)
+  m.videoPreviewPlayer.unObserveFieldScoped("position")
 End Function
 
 
@@ -251,22 +249,22 @@ Function updatePreviewPlayerToInlineView()
 
     m.videoPreviewPlayer.videoPlayerType = "VIDEO_IN_GRID"
     if m.videoPreviewPlayer.getParent().isSameNode(m.inlineVideoPreviewPlayerContainer) = false
-      m.videoPreviewPlayer.clippingRect = [0, 57, 792, 329]
-      m.videoPreviewPlayer.width = 795
-      m.videoPreviewPlayer.height = 441
+      playerSize = m.constants.ui.featuredRow.playerSize
+      m.videoPreviewPlayer.width = playerSize[0]
+      m.videoPreviewPlayer.height = playerSize[1]
       m.videoPreviewPlayer.reParent(m.inlineVideoPreviewPlayerContainer, false)
       m.inlineVideoMetadataOverlay.reParent(m.inlineVideoPreviewPlayerContainer, false)
       m.inlinePreviewFocusIndicator.reParent(m.inlineVideoPreviewPlayerContainer, false)
     end if
-    m.videoPreviewPlayer.translation = [3, -52]
-    offsetX = 0
-    rectX = screen.currentFocusedItemBoundingRect.x
+
+
+    m.videoPreviewPlayer.unObserveFieldScoped("position")
+    m.videoPreviewPlayer.observeFieldScoped("position", "onInlineVideoPreviewPositionChanged")
+
+    m.videoPreviewPlayer.translation = [3, 0]
     rectY = screen.currentFocusedItemBoundingRect.y
-    ' Using static offset to avoid a bug where scroll hangs due to freeze of UI thread.
-    if isNumber(rectX) = true AND rectX > 0
-      offsetX = 802
-    end if
-    
+
+    offsetX = 0    
    ' Adjust accordingly if we have sponsored row.
     offsetY = 0
     if isNumber(rectY) = true AND rectY > 0
@@ -315,20 +313,13 @@ Function setVideoPreviewAfterFocus(focusedContent, pageInfo = {}, componentInfo 
   if focusedContent <> invalid AND focusedContent.type <> invalid AND m.SideNav.opened <> true
     if isVideoPreviewOn() = true OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd
       previewState = getVideoPreviewStateForThisContent(focusedContent)
+      updatePlayerLayoutBasedOnFocusedContent(focusedContent)
       if previewState = "buffering" OR previewState = "playing"
         videoPreview = m.videoPreviewPlayer
         if videoPreview <> invalid
           setPageInfoForVideoPreview(pageInfo)
           if previewState = "buffering"
             resumeVideoPreview()
-          end if
-
-          if focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd
-            if isCurrentScreenHomeScreen() = true
-              updatePreviewPlayerToFullScreen()
-            end if
-          else if focusedContent.gridItemType = m.constants.ui.gridItemTypes.landscapeWithMetadata
-            updatePreviewPlayerToInlineView()
           end if
         end if
         m.backgroundGroup.posterVisible = false
@@ -371,5 +362,34 @@ Function onVideoPreviewPositionChanged(msg)
       '//this is a loop video. Display the background poster while the video buffers to show again
       m.backgroundGroup.posterVisible = true
     end if
+  end if
+End Function
+
+
+Function onInlineVideoPreviewPositionChanged(msg)
+  position = msg.getData()
+  screen = getCurrentScreen()
+  content = screen.featuredRowFocusedItem
+  if content <> invalid
+    previewState = getVideoPreviewStateForThisContent(content)
+    if m.videoPreviewPlayer.visible = true AND position > 0 AND previewState = "playing"
+      m.inlineVideoMetadataOverlay.showContentPoster = false
+    end if
+  end if
+End Function
+
+
+Function updatePlayerLayoutBasedOnFocusedContent(content)
+  currentScreen = getCurrentScreen()
+  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
+  ' If the experiment is enabled and focused content is from featured row than expand preview to full screen.
+  if content.gridItemType = m.constants.ui.gridItemTypes.skinAd
+    ' Reducing 1px from both width and height since the player is in background and keeping full width causes roku to display closed captioning overlay.
+    ' To avoid any other Roku OS level default behavior from kicking in reducing 1px to give a impression that player is not in full screen.
+    updatePreviewPlayerToFullScreen()
+  else if content.tileDesignType = "withDescriptionPortraitSmall" OR (experiment.design_type = "withDescriptionPortraitSmall" AND content.parentId = experiment.container_id AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen)
+    updatePreviewPlayerToInlineView()
+  else
+    updatePreviewPlayerToCondensedView()
   end if
 End Function

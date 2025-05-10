@@ -15,7 +15,6 @@
 Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID = "", bAllowTransportToAppear = false, playbackSource = {"srcForAnalytic": "unknown", "srcForAds": "unknown"})
   if content <> invalid
     tubiLog("LinearVideoPlayerScreenHelpers.playLinearVideoContent")
-
     stopVideoPreview()
 
     ' we make changes to the content from this point forward. If we don't clone, those changes will initialize
@@ -90,8 +89,10 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
 
       if bMinimized = false
         maximizeLinearPlayer(clonedContent)
-      else        
-        if content.gridItemType = m.constants.ui.gridItemTypes.landscapeWithMetadata
+      else
+        experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
+        currentScreen = getCurrentScreen()
+        if content.tileDesignType = "withDescriptionPortraitSmall" OR (experiment.design_type = "withDescriptionPortraitSmall" AND content.parentId = experiment.container_id  AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen)
           switchLinearToInlineGridMode(videoPlayer)
         else
           '//play at minimized state
@@ -706,7 +707,9 @@ Function returnToPreviousScreenFromLinearVideo(bContinueToPlay = true)
         end if
         popScreen(true, true)
 
-        if videoPlayer.originalContent <> invalid AND videoPlayer.originalContent.gridItemType = m.constants.ui.gridItemTypes.landscapeWithMetadata
+        originalContent = videoPlayer.originalContent
+        experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
+        if originalContent <> invalid AND originalContent.gridItemType = m.constants.ui.gridItemTypes.featuredPortraitSmall AND originalContent.parentId = experiment.container_id
           switchLinearToInlineGridMode(videoPlayer)
         else
           '//animate the video player into the corner
@@ -935,10 +938,11 @@ End Function
 
 
 Function switchLinearToInlineGridMode(linearPlayer)
-  linearPlayer.clippingRect = [0, 57, 792, 329]
-  linearPlayer.width = 795
-  linearPlayer.height = 441
-  linearPlayer.translation = [3, -52]
+  playerSize = m.constants.ui.featuredRow.playerSize
+  linearPlayer.width = playerSize[0]
+  linearPlayer.height = playerSize[1]
+
+  linearPlayer.translation = [3, 0]
   linearPlayer.reParent(m.inlineVideoPreviewPlayerContainer, false)
   m.inlineVideoMetadataOverlay.reParent(m.inlineVideoPreviewPlayerContainer, false)
   m.inlinePreviewFocusIndicator.reParent(m.inlineVideoPreviewPlayerContainer, false)
@@ -955,8 +959,6 @@ End Function
 
 Function onLinearInlineVideoPlayerStateWhileInMinState(msg)
   state = msg.getData()
-  if state = "playing"
-    m.inlineVideoMetadataOverlay.visible = true
-  end if
+  m.inlineVideoMetadataOverlay.showContentPoster = not (state = "playing")
   onLinearVideoPlayerStateWhileInMinState(msg)
 End Function

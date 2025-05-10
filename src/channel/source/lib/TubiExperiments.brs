@@ -93,8 +93,10 @@ Function TubiExperiments(experimentsInfo) as Object
 
       'This experiment will not be under holdout and will clean up once we take the decision.
       roku_home_screen_redesign: {
-        roku_home_screen_redesign_v2 : {
-          default: {"design_type": "none" } ' Possible values are "withOutDescription", "withDescription", "none"
+        roku_home_screen_redesign_v3 : {
+          ' Possible values for design_type are "withDescriptionPortraitSmall", "controlReOrderContainers",  "none"
+          ' Possible values for container_id are "featured" or any other tensor container id
+          default: {"design_type": "none", container_id: "none" }
           holdout_control: {"design_type": "none"}
           holdout_winning: {"design_type": "none"}
          }

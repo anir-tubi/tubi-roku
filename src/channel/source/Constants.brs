@@ -1349,7 +1349,7 @@ Function getConstants()
       constants.ui.imageSizes.largePoster = [252, 360]
 
       'Sizes of featured row  poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
-      constants.ui.imageSizes.featuredRowPoster = [789, 330]
+      constants.ui.imageSizes.featuredRowPoster = [789, 442]
 
       'Size of the thumbnail/background of the single element representing an empty container that we wish to show: i.e. on the MyStuff Screen
       constants.ui.imageSizes.emptyContainer = [1572, 267]
@@ -1373,6 +1373,9 @@ Function getConstants()
       ' Will be removed when purple carpet code is cleaned up.
       constants.ui.imageSizes.banner = [1693, 162]
 
+      'Sizes of featured row  poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
+      constants.ui.imageSizes.featuredPortraitSmall = [310, 442]
+
       ' Size for the background image.
       if limitedUi = true
         constants.ui.imageSizes.background = [399, 225]
@@ -1392,6 +1395,9 @@ Function getConstants()
       else
         constants.ui.imageSizes.fullScreenBackground = [1920, 1080]
       end if
+    
+    constants.ui.featuredRow = {}
+      constants.ui.featuredRow.playerSize = [constants.ui.imageSizes.featuredRowPoster[0] + 4, constants.ui.imageSizes.featuredRowPoster[1] + 10]
 
     constants.ui.imageTranslations = {}
       'Location of the linear background and minimized linear video player
@@ -1469,6 +1475,7 @@ Function getConstants()
       constants.ui.gridItemTypes.emptyContainer = "emptyContainer"
       constants.ui.gridItemTypes.portraitTopTen = "portraitTopTen"
       constants.ui.gridItemTypes.skinAd = "skinAd"
+      constants.ui.gridItemTypes.featuredPortraitSmall = "featuredPortraitSmall"
 
     constants.ui.uris = {}
 
