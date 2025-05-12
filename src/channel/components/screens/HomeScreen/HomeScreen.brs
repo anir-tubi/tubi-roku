@@ -75,7 +75,7 @@ End Function
 Function setContentAreaState(state = invalid)
   tubiLog("HomeScreen.setToRedesignContentArea")
 
-  isHomeScreenRedesignForFeaturedEnabled = (getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v2", false).design_type <> "none")
+  isHomeScreenRedesignForFeaturedEnabled = (getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false).design_type <> "none")
 
   if isHomeScreenRedesignForFeaturedEnabled = false OR (m.top.featuredListHasFocus = false AND m.CategoryGridList.lastFocusedList = "skinAdRow") OR m.top.featuredRowContent = invalid
     m.currentContentAreaTranslation = m.originalContentAreaTranslation
