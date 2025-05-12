@@ -122,7 +122,7 @@ Function TubiExperiments(experimentsInfo) as Object
       'ads_tubi_skins_v1 is enabled by default to ensure users see ads if no response from popper
       ads_tubi_skins: {
         ads_tubi_skins_v1: {
-          default: {"enabled": false}
+          default: {"enabled": true}
           holdout_control: {"enabled": false}
           holdout_winning: {"enabled": false}
         }
