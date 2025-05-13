@@ -159,6 +159,8 @@ Function selectVideoItem()
     m.countdownGroup.translation = [1425, m.countdownGroup.translation[1]]  '//move the countdown to the right after the text is changed
   end if
   m.countdownGroup.display = true
+  m.countdownGroup.maxSeconds = 0
+  m.countdownGroup.seconds = -1
   m.countdownGroup.secondsTranslationId = "metadata_watch_again"
   m.top.rowItemSelected = m.rowList.rowItemFocused
 End Function

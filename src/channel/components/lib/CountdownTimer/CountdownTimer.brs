@@ -31,15 +31,18 @@ Function getIntegerToSetWidth()
     sMaxSeconds = maxSeconds.ToStr()
     nLength = sMaxSeconds.Len()
     NumOfCharacters = nLength
+
+    sReturnNumber = ""
+    for i = 0 to NumOfCharacters - 1
+      '//Use a wide number like "5" to determine the max width of a character.
+      sReturnNumber = sReturnNumber + "5"
+    end for
+
+    nReturnNumber = val(sReturnNumber)
+  else
+    nReturnNumber = -1
   end if
 
-  sReturnNumber = ""
-  for i = 0 to NumOfCharacters - 1
-    '//Use a wide number like "5" to determine the max width of a character.
-    sReturnNumber = sReturnNumber + "5"
-  end for
-
-  nReturnNumber = val(sReturnNumber)
 
   return nReturnNumber
 End Function
@@ -67,9 +70,7 @@ Function setBackgroundWidth()
   m.top.width = m.PlayerCountdownBground.width
   
   '//reset the seconds back to what they were before this function
-  if m.top.seconds >= 0
-    setSeconds(m.top.seconds)
-  end if
+  setSeconds(m.top.seconds)
 End Function
 
 
@@ -144,7 +145,7 @@ Function setTypographyOfCountdownLabel(sTypographyId = "")
     m.TextAndIconLayoutGroup.translation = [m.TextAndIconLayoutGroup.translation[0], nMaxHeight/2]
   end if
   m.CountdownText.height = m.CountdownText.boundingRect().height
-  m.CountdownSeconds.height = m.CountdownSeconds.boundingRect().height
+  m.CountdownSeconds.height = m.CountdownText.boundingRect().height
   m.top.height = m.PlayerCountdownBground.height
 
   '//reset the seconds back to what they were before this function
@@ -167,5 +168,9 @@ Function setSeconds(nSeconds)
   m.CountdownText.text = getTranslation(sTranslationId)
 
   m.CountdownSeconds.horizAlign="right"
-  m.CountdownSeconds.text = nSeconds.toStr()
+  if nSeconds >= 0 
+    m.CountdownSeconds.text = nSeconds.toStr()
+  else
+    m.CountdownSeconds.text = ""
+  end if
 End Function
