@@ -189,6 +189,7 @@
       itemSize="[1752, 350]"
       numRows="1"
       rowItemSpacing="[[16,0]]"
+      rowLabelOffset="[[0, -12]]"
       showRowCounter="[false]"
       drawFocusFeedback="false"
       rowFocusAnimationStyle="fixedFocus"

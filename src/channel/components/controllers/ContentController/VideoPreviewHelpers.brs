@@ -367,12 +367,11 @@ End Function
 
 
 Function onInlineVideoPreviewPositionChanged(msg)
-  position = msg.getData()
   screen = getCurrentScreen()
   content = screen.featuredRowFocusedItem
   if content <> invalid
     previewState = getVideoPreviewStateForThisContent(content)
-    if m.videoPreviewPlayer.visible = true AND position > 0 AND previewState = "playing"
+    if m.videoPreviewPlayer.visible = true AND previewState = "playing"
       m.inlineVideoMetadataOverlay.showContentPoster = false
     end if
   end if

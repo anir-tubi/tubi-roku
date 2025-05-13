@@ -97,9 +97,10 @@ Function addControllerUi()
   m.videoPreviewPlayer = m.top.findNode("videoPreviewPlayer")
   m.inlinePreviewFocusIndicator = m.top.findNode("inlinePreviewFocusIndicator")
   m.inlineVideoMetadataOverlay = m.top.findNode("inlineVideoMetadataOverlay")
-  featuredRowPoster = m.constants.ui.featuredRow.playerSize
-  m.inlineVideoMetadataOverlay.width = featuredRowPoster[0]
-  m.inlineVideoMetadataOverlay.height = featuredRowPoster[1]
+  featuredRowPoster = m.constants.ui.imageSizes.featuredRowPoster
+  ' Adjusting the size of the metadata overlay with some additional padding to account for the focus indicator.
+  m.inlineVideoMetadataOverlay.width = featuredRowPoster[0] + 4
+  m.inlineVideoMetadataOverlay.height = featuredRowPoster[1] + 2
 
   m.inlinePreviewFocusIndicator.height = m.constants.ui.featuredRow.playerSize[1]
 

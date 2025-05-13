@@ -22,6 +22,7 @@ Function init()
   m.rowListTranslationYOffset = 0
 
   m.homeScreenDesignType = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false).design_type
+  m.isWithDescPortraitSmallExpEnabled = (m.homeScreenDesignType = "withDescriptionPortraitSmall")
 
   ' Parameters for the metadata block cache. Window size is number of items to fetch, page delimiter
   ' is what focus thresholds trigger a fetch.
@@ -149,7 +150,7 @@ Function onComponentFocusChange(msg)
       m.top.lastFocusedList = "skinAdRow"
       m.skinAdRow.opacity = 1
       m.skinAdRow.setFocus(true)
-    else if m.homeScreenDesignType = "withDescriptionPortraitSmall" AND m.FeaturedRowList.content <> invalid AND (m.top.lastFocusedList = "featuredRowList" OR m.top.lastFocusedList = "")
+    else if m.isWithDescPortraitSmallExpEnabled = true AND m.FeaturedRowList.content <> invalid AND (m.top.lastFocusedList = "featuredRowList" OR m.top.lastFocusedList = "")
       m.top.lastFocusedList = "featuredRowList"
       m.FeaturedRowList.setFocus(true)
     else
@@ -191,7 +192,7 @@ Function onComponentFocusChange(msg)
     m.RowList.jumpToRowItem = itemToJumpTo
   end if
 
-  if m.homeScreenDesignType = "withDescriptionPortraitSmall"
+  if m.isWithDescPortraitSmallExpEnabled = true
     m.top.featuredListHasFocus = m.top.isInFocusChain() = true AND m.top.lastFocusedList = "featuredRowList" AND m.top.featuredRowContent <> invalid
   end if
 End Function
@@ -240,8 +241,8 @@ Function onContentChange()
     m.FeaturedRowList.translation = [0, 0]
     ' Resetting the state of the UI.
     if m.top.featuredRowContent <> invalid
-      if m.homeScreenDesignType = "withDescriptionPortraitSmall"
-        m.rowList.translation =  [0, 705 + m.rowListTranslationYOffset]
+      if m.isWithDescPortraitSmallExpEnabled = true
+        m.rowList.translation =  [0, 534 + m.rowListTranslationYOffset]
       else if m.homeScreenDesignType = "withOutDescription"
         m.rowList.translation =  [0, 420 + m.rowListTranslationYOffset]
       else
@@ -293,6 +294,10 @@ Function onContentChange()
 
   m.top.rowIndexBoost = rowIndexBoost
   
+  ' Below is to add animation of slide down of the row list for the first time when screen is loaded.
+  if m.top.featuredRowContent <> invalid AND isSkinAdsAvailable() = false AND m.isWithDescPortraitSmallExpEnabled = true
+    slideTo(m.RowList, [0, 705 + m.rowListTranslationYOffset], 0.3, 0.3)
+  end if
   m.top.gridContentIsReady = true
 End Function
 
@@ -492,9 +497,10 @@ Function setRowHeights()
   m.RowList.content = m.top.content
 
   featuredPosterSize = featuredRowPoster
-  if m.homeScreenDesignType = "withDescriptionPortraitSmall"
+  if m.isWithDescPortraitSmallExpEnabled = true
     featuredPosterSize = featuredPortraitSmall
   end if
+
   m.FeaturedRowlist.update({
     "showRowLabel": [true]
     "rowItemSize": [featuredPosterSize]
@@ -502,7 +508,7 @@ Function setRowHeights()
     "focusXOffset" : [0]
   })
 
-  if m.homeScreenDesignType = "withDescriptionPortraitSmall"
+  if m.isWithDescPortraitSmallExpEnabled = true
     m.featuredRowList.focusXOffset = [482]
   end if
 
@@ -904,7 +910,7 @@ End Function
 
 
 Function translateFeaturedListAndSetFocus()
-  if m.homeScreenDesignType = "withDescriptionPortraitSmall"
+  if m.isWithDescPortraitSmallExpEnabled = true
     slideTo(m.RowList, [0, 705 + m.rowListTranslationYOffset], 0.3)
   end if
 
@@ -915,10 +921,10 @@ Function translateFeaturedListAndSetFocus()
   ' Checking for less than 1 to avoid use case where scrolling fast up and down causes the animation to be skipped.
   ' opacity stays like 0.03 or 0.5 etc.
   if m.FeaturedRowList.opacity < 1
-    fade(m.FeaturedRowList, "in", 0.3, 0, -1, callback)
+    fade(m.FeaturedRowList, "in", 0.5, 0, -1, callback)
     m.FeaturedRowList.translation = [0, 0]
   else
-    slideTo(m.FeaturedRowList, [0, 0], 0.3, 0, callback)
+    slideTo(m.FeaturedRowList, [0, 0], 0.5, 0, callback)
   end if
   m.top.hideInfoPanel = false
   onFeaturedRowItemFocused()
@@ -944,8 +950,8 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
     else if key = "down" AND m.FeaturedRowList.isInFocusChain() = true
       m.top.lastFocusedList = "rowList"
       fade(m.FeaturedRowList, "out", 0.3)
-      if m.homeScreenDesignType = "withDescriptionPortraitSmall"
-        slideTo(m.RowList, [0, 420 + m.rowListTranslationYOffset], 0.3)
+      if m.isWithDescPortraitSmallExpEnabled = true
+        slideTo(m.RowList, [0, 420 + m.rowListTranslationYOffset], 0.3, 0.1)
       end if
       m.RowList.setFocus(true)
       return true

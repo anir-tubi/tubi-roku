@@ -24,6 +24,10 @@ Function init()
   topRef.observeFieldScoped("showContentPoster", "onShowContentPosterChange")
 
   onThemeChange()
+
+  m.metadataFadeDelay = 0.5
+
+  m.titleAnimation = invalid
 End Function
 
 
@@ -71,6 +75,9 @@ Function onItemContentChange(msg)
     end if
 
     m.videoGridMetadata.itemContent = itemContent
+    m.videoGridMetadata.opacity = 0
+    fade(m.videoGridMetadata, "in", 0.5, m.metadataFadeDelay)
+    m.metadataFadeDelay = 0
   end if
 End Function
 
@@ -79,13 +86,21 @@ Function setTitle(title = "", titleImageUri = "")
   m.title.text = title
   titleImageUri = titleImageUri
   m.titleImage.scale = [1.0, 1.0]
+  m.title.opacity = 0
+  m.titleImage.opacity = 0
+
+  ' Stopping any existing animations
+  if m.titleAnimation <> invalid
+    m.titleAnimation.control = "stop"
+    m.titleAnimation = invalid
+  end if
+  
   if isNonEmptyString(titleImageUri) = true
     m.titleImage.uri = titleImageUri
-    m.title.visible = false
   else
     m.titleImage.uri = ""
     m.title.translation = [16, m.top.height - 16 - m.title.boundingRect().height]
-    m.title.visible = true
+    m.titleAnimation = fade(m.title, "in", 0.5)
   end if
 End Function
 
@@ -93,6 +108,7 @@ End Function
 Function onTitleImageLoadStatus(msg)
   if msg.getData() = "ready"
     adjustTitleImageTranslation()
+    m.titleAnimation = fade(m.titleImage, "in", 0.5)
   end if
 End Function
 

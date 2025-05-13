@@ -643,7 +643,7 @@ Function populateInfoPanel(mode, contentNode)
       callback = sub()
         m.InfoPanel.visible = true
       end sub
-      slideTo(m.CategoryGridList, [0, 0], 0.05, 0, callback)
+      slideTo(m.CategoryGridList, [0, 0], 0.3, 0, callback)
     end if
     
     if mode = m.constants.ui.infoPanelModes.item

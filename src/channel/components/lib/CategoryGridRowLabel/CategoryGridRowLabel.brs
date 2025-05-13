@@ -132,7 +132,8 @@ Function onContentChange()
 
     drawItemCount()
 
-    if (item.gridItemType = "linear" OR item.gridItemType = "continue_watching_signed_out_user" OR item.gridItemType = "emptyContainer" OR (m.isLazyLoadExpInfo.enabled = true AND m.isLazyLoadExpInfo.hide_counter = true)) = false
+    gridItemType = item.gridItemType
+    if (gridItemType = "linear" OR gridItemType = "continue_watching_signed_out_user" OR gridItemType = "emptyContainer" OR gridItemType = "featuredPortraitSmall" OR (m.isLazyLoadExpInfo.enabled = true AND m.isLazyLoadExpInfo.hide_counter = true)) = false
       m.CategoryCount.visible = true
     else
       m.CategoryCount.visible = false

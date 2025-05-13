@@ -11,6 +11,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
 
   <interface>
     <field id="itemContent" type="node" />
@@ -39,6 +40,7 @@
 
         <Poster
           id="titleImage"
+          opacity="0"
           loadDisplayMode="limitSize"/>
 
         <Label
@@ -46,7 +48,7 @@
           width="650"
           wrap="true"
           maxLines="2"
-          visible="false"
+          opacity="0"
           vertAlign="bottom">
           <Font
             id="TitleFont"

@@ -1342,7 +1342,7 @@ Function updateInlineVideoMetadataOverlayVisibility(duration = 0)
       stopVideoPreview()
       fade(m.inlineVideoPreviewPlayerContainer, "in", duration)
     else
-      fade(m.inlineVideoPreviewPlayerContainer, "out", duration)
+      fade(m.inlineVideoPreviewPlayerContainer, "out", duration, 0.1)
     end if
   end if
 End Function
