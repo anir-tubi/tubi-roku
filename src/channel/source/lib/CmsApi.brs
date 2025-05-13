@@ -201,7 +201,7 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
   params["include_sponsorships"] = true
 
   ' this is just to remove most popular linear containers; rest if any shows up will be removed in tubimetadataTranslate
-  if UCase(m.constants.deviceInfo.countryCode) = "US" AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_linear_no_show", "roku_linear_no_show_v1").enabled = true
+  if UCase(m.constants.deviceInfo.countryCode) = "US" AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_linear_no_show", "roku_linear_no_show_v2").enabled = true
     params["excluded_containers"] = ["live_news", "sports_on_tubi", "recommended_linear_channels", "news", "featured_channels"]
   end if
 

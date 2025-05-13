@@ -118,7 +118,7 @@ Function searchFromScreen(searchText, personalizationID = invalid, inputDevice =
   kidsMode = shouldKidsModeBeSentToServer()
 
   if bSearchNonDefaultResults = true
-    includeLinear = isUserInAdultsMode() = true AND isKidsUIOn() = false AND (isDeviceInUS() = false OR getExperimentResource("roku_linear_no_show", "roku_linear_no_show_v1", false).enabled = false)
+    includeLinear = isUserInAdultsMode() = true AND isKidsUIOn() = false AND (isDeviceInUS() = false OR getExperimentResource("roku_linear_no_show", "roku_linear_no_show_v2", false).enabled = false)
     if isNonEmptyString(inputDevice) = false
       ' assume the input device is remote unless specified otherwise.
       inputDevice = m.constants.inputDevices.remote

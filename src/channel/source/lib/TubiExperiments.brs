@@ -138,7 +138,7 @@ Function TubiExperiments(experimentsInfo) as Object
 
       'Experiment to control LiveTV feature visibility
       roku_linear_no_show: {
-        roku_linear_no_show_v1: {
+        roku_linear_no_show_v2: {
           default: {"enabled": false}
           holdout_control: {"enabled": false}
           holdout_winning: {"enabled": false}
