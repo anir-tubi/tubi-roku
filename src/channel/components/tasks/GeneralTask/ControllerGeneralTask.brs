@@ -169,13 +169,17 @@ Function registerParsingCallbacks()
   }
 
   ' category
-  m.requestTypes[m.constants.reqNames.getCategory] = {
+  ' Crash debugging so making local variable to have it show up in crash report
+  reqNamesGetCategory = m.constants.reqNames.getCategory
+  m.requestTypes[reqNamesGetCategory] = {
     parseSuccess: parseCategoryContentSuccess
     parseError: parseGenericError
   }
 
   ' getAutocomplete
-  m.requestTypes[m.constants.reqNames.getAutocomplete] = {
+  ' Crash debugging so making local variable to have it show up in crash report
+  reqNamesGetAutocomplete = m.constants.reqNames.getAutocomplete
+  m.requestTypes[reqNamesGetAutocomplete] = {
     parseSuccess: parseAutocompleteAPISuccess
     parseError: parseGenericError
   }
