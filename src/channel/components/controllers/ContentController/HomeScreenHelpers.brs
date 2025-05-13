@@ -1333,16 +1333,19 @@ End Function
 
 Function updateInlineVideoMetadataOverlayVisibility(duration = 0)
   screen = getCurrentScreen()
-  currCategoryId = screen.currCategoryId
-  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
-  if experiment <> invalid AND experiment.design_type = "withDescriptionPortraitSmall"
-    currentScreen = getCurrentScreen()
-    if screen <> invalid AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND currCategoryId = experiment.container_id AND currentScreen.featuredRowContent <> invalid
-      m.inlineVideoMetadataOverlay.showContentPoster = true
-      stopVideoPreview()
-      fade(m.inlineVideoPreviewPlayerContainer, "in", duration)
-    else
-      fade(m.inlineVideoPreviewPlayerContainer, "out", duration, 0.1)
+
+  if screen <> invalid
+    currCategoryId = screen.currCategoryId
+    experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
+    if experiment <> invalid AND experiment.design_type = "withDescriptionPortraitSmall"
+      currentScreen = getCurrentScreen()
+      if screen <> invalid AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND currCategoryId = experiment.container_id AND currentScreen.featuredRowContent <> invalid
+        m.inlineVideoMetadataOverlay.showContentPoster = true
+        stopVideoPreview()
+        fade(m.inlineVideoPreviewPlayerContainer, "in", duration)
+      else
+        fade(m.inlineVideoPreviewPlayerContainer, "out", duration, 0.1)
+      end if
     end if
   end if
 End Function
