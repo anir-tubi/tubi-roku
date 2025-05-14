@@ -73,7 +73,7 @@
         maxLines="3"
         wrap="true">
         <Font
-          id="DescriptionFont"
+          id="RedesignDescriptionFont"
           role="font"/>
       </Label>
 

@@ -92,11 +92,14 @@ Function setTypographyOfLabel(labelNode, typographyId)
         labelNode.fontUri = sFontFile
         labelNode.fontSize = nFontSize
       else if labelNode.subType() = "Label" OR labelNode.subType() = "ScrollableText"
-        if nLineSpacing >= 0
+        fontNode = labelNode.font
+
+        if fontNode.id = "RedesignDescriptionFont"
+          labelNode.lineSpacing = 2
+        else if nLineSpacing >= 0
           labelNode.lineSpacing = nLineSpacing
         end if
 
-        fontNode = labelNode.font
         if fontNode <> invalid AND fontNode.subType() = "Font"
           fontNode.uri = sFontFile
           fontNode.size = nFontSize

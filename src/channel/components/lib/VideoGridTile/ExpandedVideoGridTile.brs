@@ -144,13 +144,7 @@ End Function
 
 
 Function onShowContentPosterChange(msg)
-  showContentPoster = msg.getData()
   if isNonEmptyString(m.titleImage.uri) = true
-    if showContentPoster = true
-      m.titleImage.scale = [1.0, 1.0]
-    else
-      m.titleImage.scale = [0.75, 0.75]
-    end if
     adjustTitleImageTranslation()
   end if
 End Function
