@@ -55,7 +55,6 @@ Function init()
   m.top.observeField("userConsentsOptOutStatus", "onUserConsentsOptOutStatusChange")
   m.Loading = m.top.findNode("Loading")
   m.MinimizedAssets = m.top.findNode("MinimizedAssets")
-  m.LoadingMinimized = m.top.findNode("LoadingMinimized")
   m.LoadingProgressBar = m.top.findNode("LoadingProgressBar")
   m.LoadingMessage = m.top.findNode("LoadingMessage")
 
@@ -143,9 +142,6 @@ Function init()
 
   m.logo = m.top.findNode("tubiLogo")
   m.logoKids = m.top.findNode("tubiKidsLogo")
-
-  m.logoMinimized = m.top.findNode("tubiLogoMinimized")
-  m.logoKidsMinimized = m.top.findNode("tubiKidsLogoMinimized")
 
   '//Variable to keep track where the m.ratingOverlay UI element should animated when the down button is pressed.
   m.ratingOverlayAnimatedPositionY = 150
@@ -880,13 +876,9 @@ Function onThemeChange(msg = invalid)
     if theme.id = m.constants.ui.themeIDs.kidsMode
       m.logo.visible = false
       m.logoKids.visible = true
-      m.logoMinimized.visible = false
-      m.logoKidsMinimized.visible = true
     else
       m.logo.visible = true
       m.logoKids.visible = false
-      m.logoMinimized.visible = true
-      m.logoKidsMinimized.visible = false
     end if
   end if
 End Function
@@ -1167,7 +1159,11 @@ Function onVideoStateChange(msg)
     if m.bAutostartRefreshExperimentEnabled = true AND m.UpNext.opacity > 0 AND m.Video.width <> 1920
       '//the video player is not in full screen mode and the up next component is visible, so do not display the loading screen
       m.RemainingMinimizedGroup.opacity = 0
-      m.LoadingMinimized.visible = true
+      m.Video.opacity = 0
+      if m.VideoBorder.visible = true
+        m.VideoBorder.visible = false
+        m.UpNext.setFocus(true)
+      end if
     else if m.playerControlExperimentType <> "none"
       m.LoadingSpinner.visible = true
     else
@@ -2022,8 +2018,8 @@ End Function
 
 Function resetVideoPlayerBackToOriginalPosition()
   resizeToLocation(m.Video, 1920, 1080, [0, 0], 0) ' reset the video player to full screen
+  m.Video.opacity = 1
   m.RemainingMinimizedGroup.visible = false
-  m.LoadingMinimized.visible = false
   m.VideoBorder.visible = false
 End Function
 

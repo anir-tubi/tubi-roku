@@ -285,31 +285,6 @@
     <Group
       id="MinimizedAssets"
       translation="[1240,40]">
-      <Group
-        id="LoadingMinimized"
-        visible="false">
-        <Rectangle
-          color="0x000000FF"
-          width="640"
-          height="360"/>
-        <Group
-          id="logoGroupMinimized">
-          <Poster
-            id="tubiLogoMinimized"
-            width="134"
-            height="48"
-            uri="pkg:/images/logo-large.webp"
-            translation="[246,127]"/>
-          <Poster
-            id="tubiKidsLogoMinimized"
-            width="256"
-            height="48"
-            uri="pkg:/images/logo-kids-large.webp"
-            visible="false"
-            translation="[201,127]"/>
-        </Group>
-      </Group>
-
         <Poster
           id="VideoBorder"
           visible="false"

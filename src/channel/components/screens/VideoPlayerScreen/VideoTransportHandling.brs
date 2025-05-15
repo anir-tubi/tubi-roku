@@ -113,6 +113,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
 
       else if key = "up"
         if(m.bAutostartRefreshExperimentEnabled = true AND isNonEmptyString(m.Video.content.seriesId) = false AND m.UpNext.isInFocusChain() = true)
+          '//::TODO::JHAND - upNext - disable the focus Up if the video is not visible
           m.Video.setFocus(true)
           m.VideoBorder.visible = true
         else if m.focusedNode.isSameNode(m.BrowseWhileWatching) = true
@@ -247,9 +248,9 @@ End Function
 Function backOutOfUpNext()
   if m.bAutostartRefreshExperimentEnabled = true AND m.Video.width <> 1920
     resizeToLocation(m.Video, 1920, 1080, [0, 0], .25) ' reset the video player
+    m.Video.opacity = 1
     m.RemainingMinimizedGroup.visible = false
     m.VideoBorder.visible = false
-    m.LoadingMinimized.visible = false
   end if
 
   m.UpNext.hide = true
@@ -1844,7 +1845,7 @@ Function isButtonPressAllowed(key, videoState, videoNode)
 
   'When upNext is focused, only back keys are allowed.
   if m.UpNext.isInFocusChain() = true AND (disabledKeys[key] = true)
-    if isNonEmptyString(m.Video.content.seriesId) = true OR m.bAutostartRefreshExperimentEnabled = false OR key <> "up"
+    if isNonEmptyString(m.Video.content.seriesId) = true OR m.bAutostartRefreshExperimentEnabled = false OR key <> "up" OR m.Video.opacity < 1
       isAllowed = false
     end if
   end if
