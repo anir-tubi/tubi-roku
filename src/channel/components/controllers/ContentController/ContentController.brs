@@ -1545,7 +1545,7 @@ Function setContentToRefreshAllPersonalizedScreens(shouldRefetchHomescreen = tru
   setContentToRefresh(m.constants.ui.screenIds.movieScreen)
   setContentToRefresh(m.constants.ui.screenIds.espanolScreen)
   setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
-  deleteFromScreenCache(m.constants.ui.screenIds.categoryPanelListScreen)
+  setContentToRefresh(m.constants.ui.screenIds.categoryPanelListScreen)
   setContentToRefresh(m.constants.ui.screenIds.epgScreen)
   setContentToRefresh(m.constants.ui.screenIds.linearVideoPlayerScreen)
   setContentToRefresh(m.constants.ui.screenIds.myStuffScreen)
@@ -1951,7 +1951,7 @@ Function onCustomSuspend(msg)
         closeLinearVideoPlayerTransport()
         linearVideoPlayer.control = "stop"
       end if
-      
+
       ' Remove this line if we do not graduated roku_home_screen_redesign_v3.
       ' This is needed to avoid having to use alwaysnotify on featuredListHasFocus and when app is suspended it does not fire focus change event on home screen.
       homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)

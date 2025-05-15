@@ -354,7 +354,7 @@ Function refreshScreenAfterParentalChanges()
   setContentToRefresh(m.constants.ui.screenIds.movieScreen)
   setContentToRefresh(m.constants.ui.screenIds.espanolScreen)
   setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
-  deleteFromScreenCache(m.constants.ui.screenIds.categoryPanelListScreen)
+  setContentToRefresh(m.constants.ui.screenIds.categoryPanelListScreen)
   setContentToRefresh(m.constants.ui.screenIds.epgScreen)
   setContentToRefresh(m.constants.ui.screenIds.myStuffScreen)
 
