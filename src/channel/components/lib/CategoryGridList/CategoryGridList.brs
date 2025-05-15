@@ -508,7 +508,7 @@ Function setRowHeights()
     "focusXOffset" : [0]
   })
 
-  if m.isWithDescPortraitSmallExpEnabled = true
+  if m.isWithDescPortraitSmallExpEnabled = true AND isSkinAdsAvailable() = false
     m.featuredRowList.focusXOffset = [482]
   end if
 
@@ -937,6 +937,9 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
 
     if key = "down" AND m.skinAdRow.isInFocusChain() = true
       if m.FeaturedRowList.content <> invalid
+        if m.isWithDescPortraitSmallExpEnabled = true
+          m.featuredRowList.focusXOffset = [482]
+        end if
         m.top.lastFocusedList = "featuredRowList"
         fade(m.skinAdRow, "out", 0.3)
         translateFeaturedListAndSetFocus()
@@ -959,6 +962,9 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       slideTo(m.RowList, [0, 565 + m.rowListTranslationYOffset], 0.3)
       slideTo(m.FeaturedRowList, [0, 384], 0.3)
       m.top.lastFocusedList = "skinAdRow"
+      if m.isWithDescPortraitSmallExpEnabled = true
+        m.featuredRowList.focusXOffset = [0]
+      end if
       m.skinAdRow.setFocus(true)
       fade(m.skinAdRow, "in", 0.3)
 

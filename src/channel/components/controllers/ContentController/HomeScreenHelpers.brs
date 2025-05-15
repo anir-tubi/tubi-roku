@@ -1342,9 +1342,17 @@ Function updateInlineVideoMetadataOverlayVisibility(duration = 0)
       if screen <> invalid AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND currCategoryId = experiment.container_id AND currentScreen.featuredRowContent <> invalid
         m.inlineVideoMetadataOverlay.showContentPoster = true
         stopVideoPreview()
-        fade(m.inlineVideoPreviewPlayerContainer, "in", duration)
+        if screen.skinAdContent <> invalid
+          fade(m.inlineVideoPreviewPlayerContainer, "in", duration)
+        else
+          fade(m.inlineVideoPreviewPlayerContainer, "in", 0)
+        end if
       else
-        fade(m.inlineVideoPreviewPlayerContainer, "out", duration, 0.1)
+        if screen.skinAdContent <> invalid
+          fade(m.inlineVideoPreviewPlayerContainer, "out", 0.1 , 0.1)
+        else
+          fade(m.inlineVideoPreviewPlayerContainer, "out", duration, 0.1)
+        end if
       end if
     end if
   end if
