@@ -36,8 +36,9 @@ Function showCategoryPanelListScreen(constants, sendNavigationLoadEvents = true,
 
     if isVideoPreviewOn() = true AND getExperimentResource("roku_category_page_video_previews", "roku_category_page_video_previews_v1", true).enabled = true
       panelScreen.observeFieldScoped("contentFocused", "onCategoryContentFocused")
-      panelScreen.observeFieldScoped("contentGridHasFocus", "onContentGridHasFocusChange")
     end if
+
+    panelScreen.observeFieldScoped("contentGridHasFocus", "onContentGridHasFocusChange")
 
     ' Stores state if the categoryPanelScreen is in the process of refreshing/fetching content from API.
     ' Is used to determine when to send the PageLoad analytics event (don't send on refresh)
@@ -511,19 +512,26 @@ End Function
 
 Function onContentGridHasFocusChange(msg)
   screen = msg.getRoSGNode()
-  if msg.getData() = false
-    ' Adding a check here so that we only pause when user navigates to filter items and not when user navigates to details screen.
-    currentScreen = getCurrentScreen()
-    if currentScreen <> invalid AND currentScreen.id <> m.constants.ui.screenIds.detailScreen
-      pauseVideoPreview()
+  currentScreen = getCurrentScreen()
+
+  if isVideoPreviewOn() = true AND getExperimentResource("roku_category_page_video_previews", "roku_category_page_video_previews_v1", false).enabled = true
+    if msg.getData() = false
+      ' Adding a check here so that we only pause when user navigates to filter items and not when user navigates to details screen.
+      if currentScreen <> invalid AND currentScreen.id <> m.constants.ui.screenIds.detailScreen
+        pauseVideoPreview()
+      end if
+    else
+      focusedContent = screen.contentFocused
+      if focusedContent <> invalid
+        previewState = getVideoPreviewStateForThisContent(focusedContent)
+        if previewState = "paused"
+          resumeVideoPreview()
+        end if
+      end if
     end if
   else
-    focusedContent = screen.contentFocused
-    if focusedContent <> invalid
-      previewState = getVideoPreviewStateForThisContent(focusedContent)
-      if previewState = "paused"
-        resumeVideoPreview()
-      end if
+    if msg.getData() = false AND currentScreen.subtype() = "CategoryPanelListScreen"
+      currentScreen.isBackPressedFromCategoryDetailPanel = true
     end if
   end if
 End Function

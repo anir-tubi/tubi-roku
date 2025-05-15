@@ -40,6 +40,7 @@ Function init()
   m.top.observeFieldScoped("jumpToItemByID", "onJumpToItem")
   m.top.observeFieldScoped("jumpToCategoryItemByID", "onJumpToCategoryItem")
   m.top.observeFieldScoped("transportVoiceRequest", "onTransportVoiceRequest")
+  m.top.observeFieldScoped("isBackPressedFromCategoryDetailPanel", "isBackPressedFromCategoryDetailPanelChange")
 
 End Function
 
@@ -175,31 +176,42 @@ Function onCategoryPanelFocusChanged(msg)
   if sOldRightPanelInFocusID = invalid AND isNonEmptyString(m.rightPanelInFocusID) = true 
     '//The right-side category details panel gained focus by the user pressing the OK or RIGHT keys from the left-side Category List Menu
 
-    '//Report a toggle_off from the category list menu
-    pageInfo = m.top.trackingPageInfo
-    item = m.CategoryMenuPanel.itemFocused
-    categoryItem = m.top.content.getChild(item)
-    trackingComponentInfo = {
-      componentType: "browse_menu_component"
-      componentValues: getTrackingCategoryComponent(item, m.CategoryMenuPanel.numColumns, categoryItem)
-    }
-    m.top.componentInteractionInfo = {
-      pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
-      componentOneof: m.Tracking.getAnalyticsComponent(trackingComponentInfo.componentType, trackingComponentInfo.componentValues)
-      user_interaction: "TOGGLE_OFF"
-    }
-
-    
-    '//Report a toggle_on to the category detail panel
-    pageInfo = m.CategoryMenuPanel.nextPanel.trackingPageInfo
-    trackingComponentInfo = m.CategoryMenuPanel.nextPanel.trackingComponentInfo
-    m.top.componentInteractionInfo = {
-      pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
-      componentOneof: m.Tracking.getAnalyticsComponent(trackingComponentInfo.componentType, trackingComponentInfo.componentValues)
-      user_interaction: "TOGGLE_ON"
-    }
+    setCategoryPanelComponentInteractionEvents()
 
   end if
+End Function
+
+Function isBackPressedFromCategoryDetailPanelChange(msg)
+  isBackPressedFromCategoryDetailPanel = msg.getData()
+  if isBackPressedFromCategoryDetailPanel = true
+    setCategoryPanelComponentInteractionEvents()
+  end if
+End Function
+
+
+Function setCategoryPanelComponentInteractionEvents()
+  pageInfo = m.top.trackingPageInfo
+  item = m.CategoryMenuPanel.itemFocused
+  categoryItem = m.top.content.getChild(item)
+  trackingComponentInfo = {
+    componentType: "browse_menu_component"
+    componentValues: getTrackingCategoryComponent(item, m.CategoryMenuPanel.numColumns, categoryItem)
+  }
+  m.top.componentInteractionInfo = {
+    pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+    componentOneof: m.Tracking.getAnalyticsComponent(trackingComponentInfo.componentType, trackingComponentInfo.componentValues)
+    user_interaction: "TOGGLE_OFF"
+  }
+
+
+  '//Report a toggle_on to the category detail panel
+  pageInfo = m.CategoryMenuPanel.nextPanel.trackingPageInfo
+  trackingComponentInfo = m.CategoryMenuPanel.nextPanel.trackingComponentInfo
+  m.top.componentInteractionInfo = {
+    pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+    componentOneof: m.Tracking.getAnalyticsComponent(trackingComponentInfo.componentType, trackingComponentInfo.componentValues)
+    user_interaction: "TOGGLE_ON"
+  }
 End Function
 
 
@@ -294,6 +306,7 @@ Function setFocusOnRightPanel()
     m.CategoryMenuPanel.nextPanel.shouldAnimateOnFocus = false
     '//temporarilly turn off the nextPanel's animated transition while it regains focus.
     '//   We can assume the user is coming back to this screen/panel from a detail screen judging by the value of the rightPanelInFocusID property
+    m.top.isBackPressedFromCategoryDetailPanel = false
     m.CategoryMenuPanel.nextPanel.setFocus(true)
     m.CategoryMenuPanel.nextPanel.shouldAnimateOnFocus = true
   end if
