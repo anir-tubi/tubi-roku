@@ -9,8 +9,8 @@ Function init()
   m.titleImage = topRef.findNode("titleImage")
   m.posterGroup = topRef.findNode("posterGroup")
   ' We are only limiting the height since title logo is displayed on it's own row we are good to let the width flow.
-  m.titleImage.loadHeight = 90
-  m.titleImage.loadWidth = 320
+  m.titleImage.loadHeight = 68
+  m.titleImage.loadWidth = 240
 
   m.BadgeTypes = {
     live: "live"
