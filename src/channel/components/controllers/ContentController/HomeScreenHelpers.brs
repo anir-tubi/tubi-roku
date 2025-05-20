@@ -61,6 +61,8 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.observeFieldScoped("featuredRowFocusedItem", "onFeaturedRowFocusedItemChange")
     homeScreen.observeFieldScoped("featuredListHasFocus", "onFeaturedListHasFocusChange")
     homeScreen.observeFieldScoped("currCategoryId", "onCurrCategoryIdChange")
+    homeScreen.observeFieldScoped("currentFocusedItemBoundingRect", "onFeaturedRowListTranslationChange")
+    homeScreen.observeFieldScoped("featuredRowListTranslation", "onFeaturedRowListTranslationChange")
 
     m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop listening to timer before listing to it in case a previous screen started the timer
     m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
@@ -1271,7 +1273,7 @@ Function playLinearInlineGridView(content, screen)
     playLinearVideoContent(content, true, screen.id, true, playbackSource)
 
     screen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-    m.inlineVideoPreviewPlayerContainer.translation = [159, 155]
+    m.inlineVideoPreviewPlayerContainer.translation = [159, 141]
   end if
 End Function
 
@@ -1317,6 +1319,12 @@ Function updateCategoryGridWithFeaturedList(response, screen)
     featuredContent.id = "featuredGrid"  
     containerRow.reParent(featuredContent, false)
     screen.featuredRowContent = featuredContent
+
+    if screen.skinAdContent <> invalid
+      m.inlineVideoPreviewPlayerContainer.opacity = 1
+      m.inlineVideoPreviewPlayerContainer.translation = [m.inlineVideoPreviewPlayerContainer.translation[0], 951.5]
+      setInlineVideoMetadataOverlay(0, featuredContent)
+    end if
   end if
 End Function
 
@@ -1333,27 +1341,43 @@ End Function
 
 Function updateInlineVideoMetadataOverlayVisibility(duration = 0)
   screen = getCurrentScreen()
-
   if screen <> invalid
     currCategoryId = screen.currCategoryId
     experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
     if experiment <> invalid AND experiment.design_type = "withDescriptionPortraitSmall"
       currentScreen = getCurrentScreen()
       if screen <> invalid AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND currCategoryId = experiment.container_id AND currentScreen.featuredRowContent <> invalid
-        m.inlineVideoMetadataOverlay.showContentPoster = true
-        stopVideoPreview()
-        if screen.skinAdContent <> invalid
-          fade(m.inlineVideoPreviewPlayerContainer, "in", duration)
-        else
-          fade(m.inlineVideoPreviewPlayerContainer, "in", 0)
+        content = screen.featuredRowFocusedItem
+        if getVideoPreviewStateForThisContent(content) <> "playing"
+          m.inlineVideoMetadataOverlay.showContentPoster = true
+          stopVideoPreview()
         end if
+        fade(m.inlineVideoPreviewPlayerContainer, "in", duration)
       else
-        if screen.skinAdContent <> invalid
-          fade(m.inlineVideoPreviewPlayerContainer, "out", 0.1 , 0.1)
-        else
+        ' Below logic handles displaying the large preview poster when skin ad is focused and during navigating back from ad player.
+        if screen <> invalid AND screen.lastFocusedList <> "skinAdRow"
           fade(m.inlineVideoPreviewPlayerContainer, "out", duration, 0.1)
+        else
+          fade(m.inlineVideoPreviewPlayerContainer, "in", duration)
         end if
       end if
+    end if
+  end if
+End Function
+
+
+Function onFeaturedRowListTranslationChange(msg)
+  screen = msg.getRoSGNode()
+  translation = screen.featuredRowListTranslation
+  if translation <> invalid
+    rectY = 52
+    if screen.currentFocusedItemBoundingRect <> invalid AND screen.currentFocusedItemBoundingRect.y <> 0
+      rectY = screen.currentFocusedItemBoundingRect.y
+    end if
+
+    if isNumber(rectY) = true
+      inlineVideoPreviewPlayerContainer = m.inlineVideoPreviewPlayerContainer.translation
+      m.inlineVideoPreviewPlayerContainer.translation = [inlineVideoPreviewPlayerContainer[0], translation[1] + rectY - 6]
     end if
   end if
 End Function

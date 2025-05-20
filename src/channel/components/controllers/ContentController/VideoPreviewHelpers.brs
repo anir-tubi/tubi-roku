@@ -262,16 +262,6 @@ Function updatePreviewPlayerToInlineView()
     m.videoPreviewPlayer.observeFieldScoped("position", "onInlineVideoPreviewPositionChanged")
 
     m.videoPreviewPlayer.translation = [3, 0]
-    rectY = screen.currentFocusedItemBoundingRect.y
-
-    offsetX = 0    
-   ' Adjust accordingly if we have sponsored row.
-    offsetY = 0
-    if isNumber(rectY) = true AND rectY > 0
-      offsetY = rectY - 63.5
-    end if
-
-   m.inlineVideoPreviewPlayerContainer.translation = [159 + offsetX, 155 + offsetY]
   end if
 End Function
 

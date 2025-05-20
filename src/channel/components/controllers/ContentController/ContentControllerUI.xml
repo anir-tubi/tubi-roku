@@ -65,6 +65,7 @@
             <Poster
               width="801"
               height="340"
+              visible="false"
               id="inlinePreviewFocusIndicator"
               uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
           </Group>

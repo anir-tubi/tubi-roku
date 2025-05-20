@@ -101,9 +101,7 @@
       <!-- Will be set to true if we want to reset the grid position back to [0,0] -->
       <field id="resetGridPosition" alias="CategoryGridList.resetGridPosition" />
 
-      <field id="featuredRowFocusedItem" alias="CategoryGridList.featuredRowFocusedItem" />
-
-      <field id="hideInfoPanel" alias="InfoPanel.visible,CategoryGridList.hideInfoPanel" />
+      <field id="featuredRowFocusedItem" alias="CategoryGridList.featuredRowFocusedItem" alwaysNotify="true" />
 
     <!-- OUTPUTS -->
       <!-- Trigger the content to be loaded.  This field is used to delay
@@ -176,6 +174,8 @@
       
       <!-- Communicates to parent what was the last focused list was. -->
       <field id="lastFocusedList" alias="CategoryGridList.lastFocusedList" />
+
+      <field id="featuredRowListTranslation" type="array" alwaysNotify="true" />
 
     <!-- DATA STORE (Anything defined below are not meant to be used as output or input fields which will triggered change events. ) -->
       <field id="personalizationId" type="string" alias="CategoryGridList.personalizationId" />

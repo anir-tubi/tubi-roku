@@ -298,6 +298,9 @@ Function onContentChange()
   if m.top.featuredRowContent <> invalid AND isSkinAdsAvailable() = false AND m.isWithDescPortraitSmallExpEnabled = true
     slideTo(m.RowList, [0, 705 + m.rowListTranslationYOffset], 0.3, 0.3)
   end if
+  
+  updateCurrentFocusedItemBoundingRect(0)
+
   m.top.gridContentIsReady = true
 End Function
 
@@ -508,7 +511,7 @@ Function setRowHeights()
     "focusXOffset" : [0]
   })
 
-  if m.isWithDescPortraitSmallExpEnabled = true AND isSkinAdsAvailable() = false
+  if m.isWithDescPortraitSmallExpEnabled = true
     m.featuredRowList.focusXOffset = [482]
   end if
 
@@ -789,7 +792,7 @@ Function setRowListFocus()
       end if
       m.top.rowFocused = m.RowList.content.getChild(reloadedItemIndex[0])
       m.top.reloadedItemToBeFocused = resolveAbbreviatedContent(m.top.content, reloadedItemIndex)
-    else if  m.FeaturedRowList.isInFocusChain() = true
+    else if m.FeaturedRowList.isInFocusChain() = true
       m.FeaturedRowList.setFocus(true)
     end if
   end if
@@ -864,7 +867,7 @@ Function onFeaturedRowItemFocused()
   if rowItemFocused <> invalid
     itemFocused = resolveAbbreviatedContent(m.top.featuredRowContent, rowItemFocused)
     if itemFocused <> invalid
-      m.top.currentFocusedItemBoundingRect = m.FeaturedRowList.subBoundingRect("item0_" + rowItemFocused[1].toStr())
+      updateCurrentFocusedItemBoundingRect(rowItemFocused[1])
       m.top.oldCategoryId = m.top.currCategoryId
       category = m.top.featuredRowContent.getChild(rowItemFocused[0])
       category.focusIndex = rowItemFocused[1]
@@ -881,7 +884,6 @@ End Function
 
 Function onFeaturedRowCurrFocusColumnChange(msg)
   currentFocusColumn = msg.getData()
-  m.top.currentFocusedItemBoundingRect = m.FeaturedRowList.subBoundingRect("item0_" + Int(msg.getData()).toStr())
 
   absCurCol = Int(currentFocusColumn)
   ' To account for fast scrolling.
@@ -909,25 +911,31 @@ Function isSkinAdsAvailable()
 End Function
 
 
-Function translateFeaturedListAndSetFocus()
-  if m.isWithDescPortraitSmallExpEnabled = true
-    slideTo(m.RowList, [0, 705 + m.rowListTranslationYOffset], 0.3)
-  end if
-
+Function translateFeaturedListAndSetFocus(delayFeaturedFocus = false)
   callback = sub()
     m.top.lastFocusedList = "featuredRowList"
     m.FeaturedRowList.setFocus(true)
   end sub
-  ' Checking for less than 1 to avoid use case where scrolling fast up and down causes the animation to be skipped.
-  ' opacity stays like 0.03 or 0.5 etc.
-  if m.FeaturedRowList.opacity < 1
-    fade(m.FeaturedRowList, "in", 0.3, 0, -1, callback)
-    m.FeaturedRowList.translation = [0, 0]
-  else
-    slideTo(m.FeaturedRowList, [0, 0], 0.3, 0, callback)
+  
+  ' Below logic handles logic to smoothen navigation around skin ads.
+  if delayFeaturedFocus = false
+    callback()
+    callback = invalid
   end if
+  
+  slideFadeGeneral(m.FeaturedRowList, [0, 0], "in", 0.3, 0, 1, true, callback)
+  if m.isWithDescPortraitSmallExpEnabled = true
+    slideTo(m.RowList, [0, 705 + m.rowListTranslationYOffset], 0.3)
+  end if
+
   m.top.hideInfoPanel = false
   onFeaturedRowItemFocused()
+End Function
+
+
+Function updateCurrentFocusedItemBoundingRect(columnFocused)
+  boundingRect = m.FeaturedRowList.subBoundingRect("item0_" + columnFocused.toStr())
+  m.top.currentFocusedItemBoundingRect = boundingRect
 End Function
 
 
@@ -937,12 +945,8 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
 
     if key = "down" AND m.skinAdRow.isInFocusChain() = true
       if m.FeaturedRowList.content <> invalid
-        if m.isWithDescPortraitSmallExpEnabled = true
-          m.featuredRowList.focusXOffset = [482]
-        end if
-        m.top.lastFocusedList = "featuredRowList"
         fade(m.skinAdRow, "out", 0.3)
-        translateFeaturedListAndSetFocus()
+        translateFeaturedListAndSetFocus(true)
       else
         m.top.lastFocusedList = "rowList"
         slideFade(m.skinAdRow, "above", "out", 0.3)
@@ -952,21 +956,19 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       return true
     else if key = "down" AND m.FeaturedRowList.isInFocusChain() = true
       m.top.lastFocusedList = "rowList"
-      fade(m.FeaturedRowList, "out", 0.3)
+      slideFadeGeneral(m.featuredRowList, [0, -700], "out", 0.3, 0, -1, true)
       if m.isWithDescPortraitSmallExpEnabled = true
         slideTo(m.RowList, [0, 420 + m.rowListTranslationYOffset], 0.3, 0.1)
       end if
       m.RowList.setFocus(true)
       return true
     else if key = "up" AND m.FeaturedRowList.isInFocusChain() = true AND bSkinAdAvailable = true
+      m.top.lastFocusedList = "skinAdRow"
+      m.skinAdRow.setFocus(true)
       slideTo(m.RowList, [0, 565 + m.rowListTranslationYOffset], 0.3)
       slideTo(m.FeaturedRowList, [0, 384], 0.3)
-      m.top.lastFocusedList = "skinAdRow"
-      if m.isWithDescPortraitSmallExpEnabled = true
-        m.featuredRowList.focusXOffset = [0]
-      end if
-      m.skinAdRow.setFocus(true)
       fade(m.skinAdRow, "in", 0.3)
+      updateCurrentFocusedItemBoundingRect(0)
 
       return true
     else if key = "up" AND m.RowList.isInFocusChain() = true

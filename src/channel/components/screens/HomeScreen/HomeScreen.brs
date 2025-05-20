@@ -41,6 +41,9 @@ Function init()
   m.CategoryGridList.observeFieldScoped("gridContentIsReady", "onGridContentIsReadyChange")
   m.CategoryGridList.observeFieldScoped("featuredListHasFocus", "onFeaturedListHasFocusChange")
   m.CategoryGridList.observeFieldScoped("featuredRowFocusedItem", "fireNavigateWithinPageEvent")
+  m.CategoryGridList.observeFieldScoped("hideInfoPanel", "onHideInfoPanelChange")
+  m.CategoryGridList.observeFieldScoped("featuredRowListTranslation", "updateFeaturedRowListTranslation")
+  m.ContentAreaParent.observeFieldScoped("translation", "updateFeaturedRowListTranslation")
 
   'used to know when to send tracking info. Do not send focus tracking info when the grid is 1st loaded
   m.gridHasGainedInitialFocus = false
@@ -83,7 +86,8 @@ Function setContentAreaState(state = invalid)
     m.currentContentAreaTranslation = m.homeRedesignExpContentAreaTranslation
   end if
 
-  m.ContentAreaParent.translation = m.currentContentAreaTranslation
+  slideTo(m.ContentAreaParent, m.currentContentAreaTranslation, 0.2)
+  updateFeaturedRowListTranslation()
 End Function
 
 
@@ -453,7 +457,7 @@ End Function
 
 
 Function onFeaturedListHasFocusChange(msg)
-  m.InfoPanel.visible = false
+  slideFadeGeneral(m.InfoPanelParent, [0, -50], "out", 0.2)
   setContentAreaState()
   'Make sure Content is in correct location
   moveContentAreaMaskBasedCurrentFocus()
@@ -640,10 +644,7 @@ Function populateInfoPanel(mode, contentNode)
     
     ' The below is to ensure that there is slight delay in showing the info panel so that there is no overlap with any row that is gaining focus.
     if m.InfoPanel.visible = false
-      callback = sub()
-        m.InfoPanel.visible = true
-      end sub
-      slideTo(m.CategoryGridList, [0, 0], 0.3, 0, callback)
+      slideFadeGeneral(m.InfoPanelParent, [0, 0], "in", 0.2)
     end if
     
     if mode = m.constants.ui.infoPanelModes.item
@@ -671,7 +672,7 @@ Function populateInfoPanel(mode, contentNode)
 
     m.InfoPanel.calculateHeight = true
   else
-    m.InfoPanel.visible = false
+    slideFadeGeneral(m.InfoPanelParent, [0, -50], "out", 0.2)
     setContentAreaState()
   end if
 End Function
@@ -710,7 +711,7 @@ Function fadeInContentArea()
 
   stopAnimation(m.infoPanelFade)
   if m.InfoPanelParent.opacity < 1
-    m.infoPanelFade = fade(m.InfoPanelParent, "in", .4, 0.0, 1)
+    m.infoPanelFade = slideFadeGeneral(m.InfoPanelParent, [0, 0], "in", 0.2)
   end if
 End Function
 
@@ -856,3 +857,20 @@ Function onGridContentIsReadyChange(msg)
     setContentAreaState()
   end if
 End Function
+
+
+Function onHideInfoPanelChange(msg)
+  visible = msg.getData()
+  if visible = true
+    slideFadeGeneral(m.InfoPanelParent, [0, 0], "in", 0.2)
+  else
+    slideFadeGeneral(m.InfoPanelParent, [0, -50], "out", 0.2)
+  end if
+End Function
+
+
+Function updateFeaturedRowListTranslation()
+  translation = m.categoryGridList.featuredRowListTranslation
+  translation[1] = translation[1] + m.ContentAreaParent.translation[1]
+  m.top.featuredRowListTranslation = translation
+end function

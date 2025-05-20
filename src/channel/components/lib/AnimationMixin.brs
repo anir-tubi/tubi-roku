@@ -59,18 +59,25 @@ End Function
 ' @duration: float, the amount of time it will take the animation to complete, in seconds
 ' @delay: float, the amount of time to wait before starting the animation, in seconds
 ' @endingOpacity: float, the final opacity of the target after the animation completes. If not passed, the opacity will be set to 0.0 for "out" and 1.0 for "in"
-Function slideFadeGeneral(target, endTranslation, inOrOut, duration=2.0, delay=0.0, endingOpacity = -1)
+' @skipSlideFadeOrigin: boolean, if true, the slideFadeOrigin will not be set
+Function slideFadeGeneral(target, endTranslation, inOrOut, duration=2.0, delay=0.0, endingOpacity = -1, skipSlideFadeOrigin = false, completeCallback = invalid)
   animationOptions = {
     duration: duration
     delay: delay
   }
 
+  if completeCallback <> invalid
+    animationOptions.completeCallback = completeCallback
+  end if
+
   ' this function persists an origin so the caller doesn't have to
-  if target.hasField("slideFadeOrigin") then
-    target.translation = target.slideFadeOrigin
-  else
-    target.addField("slideFadeOrigin", "vector2d", false)
-    target.slideFadeOrigin = target.translation
+  if skipSlideFadeOrigin = false
+    if target.hasField("slideFadeOrigin") then
+      target.translation = target.slideFadeOrigin
+    else
+      target.addField("slideFadeOrigin", "vector2d", false)
+      target.slideFadeOrigin = target.translation
+    end if
   end if
 
   if type(endTranslation) = "roArray" AND endTranslation.count() = 2
