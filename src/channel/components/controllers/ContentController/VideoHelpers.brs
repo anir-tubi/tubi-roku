@@ -751,8 +751,13 @@ End Function
 
 
 Function onSignUpToSaveProgressInPlayerExitModalSelected()
-  m.signUpToSaveProgressCancelledCallback = returnToDetailScreenFromVideo
+  m.signUpToSaveProgressCancelledCallback = signUpToSaveProgressCancelledFromVideoCallback
   startSignIn(onRegistrationProcessCompletedOnPlayerBackPress)
+End Function
+
+
+Function signUpToSaveProgressCancelledFromVideoCallback()
+  returnToDetailScreenFromVideo(true, true, "registration")
 End Function
 
 
