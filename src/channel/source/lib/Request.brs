@@ -457,21 +457,6 @@ Function tubi_handleHttpEventV2(message As Object) As Object
         name: m.name
       }
 
-      if code < 0 then
-        dnsInfo = {}
-        dnsInfo["targetIpAddress"] = message.getTargetIpAddress()
-        di = createObject("roDeviceInfo")
-        connection = di.getConnectionInfo()
-        for i = 0 to 5
-          keyName = "dns." + i.toStr()
-          currentDns = connection[keyName]
-          if currentDns <> invalid then
-            dnsInfo[keyName] = currentDns
-          end if
-        end for
-        response["dnsInfo"] = dnsInfo
-      end if
-
       m.response = response
 
       ' print response info for debugging
