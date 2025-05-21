@@ -119,6 +119,8 @@ Function onControlChange()
       resumeContent()
     else if m.top.control = "stop"
       stopContent()
+    else if m.top.control = "prebuffer"
+      m.video.control = "prebuffer"
     end if
   end if
 

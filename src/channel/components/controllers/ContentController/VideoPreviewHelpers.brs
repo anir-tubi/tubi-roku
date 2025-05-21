@@ -53,6 +53,12 @@ End Function
 
 Function onPauseVideoPreview()
   tubiLog("VideoPreviewHelpers.onPauseVideoPreview")
+  isHomeScreenRedesignForFeaturedEnabled = (getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false).design_type <> "none")
+
+  if isHomeScreenRedesignForFeaturedEnabled = true
+    m.inlineVideoMetadataOverlay.showContentPoster = true
+  end if
+
   pauseVideoPreview()
 End Function
 
@@ -71,15 +77,23 @@ Function onVideoPreviewStateChanged(msg)
   videoPreview = msg.getRoSGNode()
   videoPreviewState = msg.getData()
   currentScreen = getCurrentScreen()
-  m.inlineVideoMetadataOverlay.showContentPoster = true
   if (videoPreviewState = "playing" OR videoPreviewState = "paused") AND videoPreview <> invalid AND videoPreview.isBufferingComplete = true
     ' Adding a safety check to make sure if a new debounce was started we do not show the player instead just pause it.
     ' Only doing it for featured row list since that is the only row that has debounce for now.
     ' TODO: Remove the and condition to check featuredListHasFocus once we have debounce for all rows.
     if m.videoPreviewDebounce.control = "start" AND currentScreen.featuredListHasFocus = true
       videoPreview.visible = false
+      m.inlineVideoMetadataOverlay.showContentPoster = true
       pauseVideoPreview()
     else
+      isHomeScreenRedesignForFeaturedEnabled = (getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false).design_type <> "none")
+
+      if currentScreen.featuredListHasFocus = false AND isHomeScreenRedesignForFeaturedEnabled = true
+        m.inlineVideoMetadataOverlay.showContentPoster = true
+      else
+        m.inlineVideoMetadataOverlay.showContentPoster = false
+      end if
+
       showVideoPreviewPlayer = (currentScreen <> invalid AND currentScreen.isInFocusChain() = true) OR currentScreen.lastFocusedList <> "featuredRowList"
       videoPreview.visible = (showVideoPreviewPlayer = true)
       m.backgroundGroup.posterVisible = (showVideoPreviewPlayer = false)
@@ -166,6 +180,9 @@ Function onVideoBufferingStatusChanged(msg)
   videoPreview = msg.getRoSGNode()
   if bufferingStatus <> invalid
     videoPreview.isBufferingComplete = (bufferingStatus.percentage = 100)
+    if videoPreview.isBufferingComplete  = true AND videoPreview.control = "prebuffer"
+      sendVideoPlayerCommand(videoPreview, "play")
+    end if
   end if
 End Function
 
@@ -218,7 +235,7 @@ Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
 
     videoPreview.content = videoContent
     videoPreview.updateContent = true
-    sendVideoPlayerCommand(videoPreview, "play")
+    sendVideoPlayerCommand(videoPreview, "prebuffer")
   end if
 
 End Function
