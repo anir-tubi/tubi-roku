@@ -383,7 +383,7 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
 
   tileDesignType = "none"
   experimentContainerId = "none"
-  if m.experiments <> invalid
+  if m.experiments <> invalid AND bKidsMode = false
     experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3")
     tileDesignType = experiment.design_type
     experimentContainerId = experiment.container_id

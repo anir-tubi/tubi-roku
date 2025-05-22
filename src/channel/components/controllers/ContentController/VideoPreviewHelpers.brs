@@ -228,7 +228,7 @@ Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
     end if
 
     experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
-    if content.parentId = experiment.container_id AND (experiment.design_type <> "none")
+    if isKidsUIOn() = false AND content.parentId = experiment.container_id AND (experiment.design_type <> "none")
       videoContent.addField("parentCategory", "string", false)
       videoContent.parentCategory = content.parentId
     end if
@@ -393,7 +393,7 @@ Function updatePlayerLayoutBasedOnFocusedContent(content)
     ' Reducing 1px from both width and height since the player is in background and keeping full width causes roku to display closed captioning overlay.
     ' To avoid any other Roku OS level default behavior from kicking in reducing 1px to give a impression that player is not in full screen.
     updatePreviewPlayerToFullScreen()
-  else if content.tileDesignType = "withDescriptionPortraitSmall" OR (experiment.design_type = "withDescriptionPortraitSmall" AND content.parentId = experiment.container_id AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen)
+  else if isKidsUIOn() = false AND (content.tileDesignType = "withDescriptionPortraitSmall" OR (experiment.design_type = "withDescriptionPortraitSmall" AND content.parentId = experiment.container_id AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen))
     updatePreviewPlayerToInlineView()
   else
     updatePreviewPlayerToCondensedView()

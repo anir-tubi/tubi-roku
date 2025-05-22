@@ -1289,11 +1289,11 @@ End Function
 ' @contentMode: string, one of the contentModes found at m.constants.ui.contentMode
 ' @isSignedInUser: boolean, value based on user logged In or not
 ' returns an associative array that can be passed to ContentNode.update() to populate the ContentNode and it's children
-Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode = "homeScreen", screenId = "", isSignedInUser = false)
+Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode = "homeScreen", screenId = "", isSignedInUser = false, uiMode = "standard")
 
-  categoryParent = m.buildCategoryParentInfo(container, sOrientation, contentMode)
-  gridItemType = m.getGridItemType(container, sOrientation, m.constants, screenId, contentMode)
-  categoryChildrenInfo = m.buildCategoryChildrenInfo(container, contents, contentsJson, gridItemType, bFullData, isSignedInUser)
+  categoryParent = m.buildCategoryParentInfo(container, sOrientation, contentMode, uiMode)
+  gridItemType = m.getGridItemType(container, sOrientation, m.constants, screenId, contentMode, uiMode)
+  categoryChildrenInfo = m.buildCategoryChildrenInfo(container, contents, contentsJson, gridItemType, bFullData, isSignedInUser, uiMode)
 
   categoryParent.children = categoryChildrenInfo.children
   categoryParent.json = categoryChildrenInfo.contentsJson
@@ -1370,9 +1370,9 @@ Function tubiMetadataTranslate_buildCategoryAAWithInsert(container, contents, co
       contentsWithPrepend.append(contents)
       ' force contentsJson to be regenerated with the prepended content in buildCategoryAA()
       contentsJson = invalid
-      categoryAA = m.buildCategoryAA(container, contentsWithPrepend, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser)
+      categoryAA = m.buildCategoryAA(container, contentsWithPrepend, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser, uiMode)
     else
-      categoryAA = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser)
+      categoryAA = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser, uiMode)
     end if
 
   end if
@@ -1386,7 +1386,7 @@ End Function
 ' @sOrientation: string, should the thumbnail be a "portrait" or "landscape" (match against m.constants.ui.gridItemTypes values)
 '
 ' @returns: assocArray, an AA that can be used with node.update() to create a TubiCategoryNode
-Function tubiMetadataTranslate_buildCategoryParentInfo(container, sOrientation = "", contentMode = invalid)
+Function tubiMetadataTranslate_buildCategoryParentInfo(container, sOrientation = "", contentMode = invalid, uiMode = "standard")
   updateMetadata = {}
 
   if type(container) = "roAssociativeArray"
@@ -1465,7 +1465,7 @@ End Function
 ' @returns: assocArray, an AA with keys:
 '                       "children", as an array of AAs containing content metadata
 '                       "contentsJson", a JSON formatted string of contents belonging to the container/category
-Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, contentsJson, parentGridItemType, bFullData, isSignedInUser = false)
+Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, contentsJson, parentGridItemType, bFullData, isSignedInUser = false, uiMode = "standard")
   childrenReturn = CreateObject("roArray", 0, false)
 
   if type(container) = "roAssociativeArray" AND type(container.children) = "roArray"
@@ -1524,7 +1524,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3")
             tileDesignType = experiment.design_type
             experimentContainerId = experiment.container_id
-            isHomescreenRedesignExperiementEnabled = (tileDesignType <> "none")
+            isHomescreenRedesignExperiementEnabled = (tileDesignType <> "none") AND uiMode = "standard"
           end if
 
           if container.id = experimentContainerId AND (isHomescreenRedesignExperiementEnabled = true)
@@ -1934,7 +1934,7 @@ End Function
 ' @orientation: string, "landscape" or "portrait"
 ' @constants: assocArray, m.constants
 ' returns: string, one of the gridItemTypes as found in m.constants.ui.gridItemTypes
-Function tubiMetadataTranslate_getGridItemType(container, orientation, constants, screenId = "", contentMode = "")
+Function tubiMetadataTranslate_getGridItemType(container, orientation, constants, screenId = "", contentMode = "", uiMode = "standard")
   gridItemTypes = constants.ui.gridItemTypes
   gridItemType = gridItemTypes.portrait
 
@@ -1945,14 +1945,14 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
     experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3")
     tileDesignType = experiment.design_type
     experimentContainerId = experiment.container_id
-    isHomescreenRedesignExperiementEnabled = (tileDesignType <> "none")
+    isHomescreenRedesignExperiementEnabled = (tileDesignType <> "none") AND uiMode = "standard"
   end if
 
   if screenId = m.constants.ui.screenIds.homeScreen AND tileDesignType = "withDescriptionPortraitSmall" AND container.id = experimentContainerId AND isHomescreenRedesignExperiementEnabled = true AND (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
     gridItemType = gridItemTypes.featuredPortraitSmall
-  else if tileDesignType = "controlReOrderContainers" AND container.id = experimentContainerId
+  else if (tileDesignType = "controlReOrderContainers" AND container.id = experimentContainerId) AND isHomescreenRedesignExperiementEnabled = true
     gridItemType = gridItemTypes.landscape
-  else if tileDesignType <> "none" AND container.id = constants.ui.categoryIds.featured
+  else if tileDesignType <> "none" AND container.id = constants.ui.categoryIds.featured AND isHomescreenRedesignExperiementEnabled = true
     gridItemType = gridItemTypes.portrait
   else if container.type = constants.ui.categoryTypes.linear
     gridItemType = gridItemTypes.linear

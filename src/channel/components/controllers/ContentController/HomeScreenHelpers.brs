@@ -28,6 +28,7 @@ Function showHomeScreen(constants, screenID = "")
 
     authInfo = m.tubiAuthUpdate.getAuthInfo()
     homeScreen.signedIn = isLoggedInUser(authInfo)
+    updateInlineVideoMetadataOverlayVisibility()
 
     homeScreen.isVideoPreviewOn = m.pub_serverPersistentData.isVideoPreviewOn
     m.pubSub.subscribe("pub_serverPersistentData.isVideoPreviewOn", homeScreen, "isVideoPreviewOn")
@@ -85,6 +86,7 @@ Function showHomeScreen(constants, screenID = "")
     m.pubSub.subscribe("pub_serverPersistentData.isVideoPreviewOn", homeScreen, "isVideoPreviewOn")
     homeScreen.kidsModeFeatureOn = m.kidsModeFeatureOn
     homeScreen.kidsMode = isKidsUIOn()
+    updateInlineVideoMetadataOverlayVisibility()
     homeScreen.canLoadCategories = true
     homeScreen.id = screenID
 
@@ -125,7 +127,7 @@ Function processHomeScreenBatchResponse(response, screenId)
   homeScreen = getFromScreenCache(screenId)
   if homeScreen <> invalid
     experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
-    if experiment.design_type = "withDescriptionPortraitSmall" AND isNode(response) = true AND response.getChildCount() > 0 AND homeScreen.contentMode = m.constants.ui.contentMode.homescreen
+    if isKidsUIOn() = false AND experiment.design_type = "withDescriptionPortraitSmall" AND isNode(response) = true AND response.getChildCount() > 0 AND homeScreen.contentMode = m.constants.ui.contentMode.homescreen
       updateCategoryGridWithFeaturedList(response, homeScreen)
     end if
     homeScreen.batchResponse = response
@@ -437,7 +439,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     rawResponse.removeChild(containerRow)
     rawResponse.insertChild(redesignRow, 0)
 
-    if (experiment.design_type = "withDescriptionPortraitSmall") AND isNode(rawResponse) = true AND rawResponse.getChildCount() > 0 AND homeScreen.id = m.constants.ui.screenIds.homescreen
+    if isKidsUIOn() = false AND (experiment.design_type = "withDescriptionPortraitSmall") AND isNode(rawResponse) = true AND rawResponse.getChildCount() > 0 AND homeScreen.id = m.constants.ui.screenIds.homescreen
       updateCategoryGridWithFeaturedList(rawResponse, homeScreen)
     end if
 
@@ -1348,7 +1350,7 @@ Function updateInlineVideoMetadataOverlayVisibility(duration = 0)
   if screen <> invalid
     currCategoryId = screen.currCategoryId
     experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
-    if experiment <> invalid AND experiment.design_type = "withDescriptionPortraitSmall"
+    if experiment <> invalid AND experiment.design_type = "withDescriptionPortraitSmall" AND isKidsUIOn() = false
       currentScreen = getCurrentScreen()
       if screen <> invalid AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND currCategoryId = experiment.container_id AND currentScreen.featuredRowContent <> invalid
         content = screen.featuredRowFocusedItem
@@ -1365,6 +1367,8 @@ Function updateInlineVideoMetadataOverlayVisibility(duration = 0)
           fade(m.inlineVideoPreviewPlayerContainer, "in", duration)
         end if
       end if
+    else
+      m.inlineVideoPreviewPlayerContainer.opacity = 0
     end if
   end if
 End Function

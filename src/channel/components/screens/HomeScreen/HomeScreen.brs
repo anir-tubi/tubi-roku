@@ -516,7 +516,7 @@ Function onGridFocusChange() as void
   fireNavigateWithinPageEvent()
   
   experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
-  isHomeScreenRedesignExperimentEnabled = (experiment.design_type = "withDescriptionPortraitSmall") AND focusedContent <> invalid AND focusedContent.parentId = experiment.container_id
+  isHomeScreenRedesignExperimentEnabled = (m.top.featuredRowContent <> invalid AND (experiment.design_type = "withDescriptionPortraitSmall")) AND focusedContent <> invalid AND focusedContent.parentId = experiment.container_id
 
   if isHomeScreenRedesignExperimentEnabled = false
    m.gridHasGainedInitialFocus = true
@@ -638,7 +638,7 @@ End Function
 '@contentNode: content node
 Function populateInfoPanel(mode, contentNode)
   experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
-  isHomeScreenRedesignForFeaturedEnabled = (experiment.design_type = "withDescriptionPortraitSmall") AND contentNode.parentId = experiment.container_id
+  isHomeScreenRedesignForFeaturedEnabled = (m.top.featuredRowContent <> invalid AND (experiment.design_type = "withDescriptionPortraitSmall") AND contentNode.parentId = experiment.container_id)
 
   if contentNode <> invalid AND (isHomeScreenRedesignForFeaturedEnabled = false OR m.top.contentMode <> m.constants.ui.contentMode.homescreen)
     

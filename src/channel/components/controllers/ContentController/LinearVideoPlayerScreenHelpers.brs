@@ -92,7 +92,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
       else
         experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
         currentScreen = getCurrentScreen()
-        if content.tileDesignType = "withDescriptionPortraitSmall" OR (experiment.design_type = "withDescriptionPortraitSmall" AND content.parentId = experiment.container_id  AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen)
+        if isKidsUIOn() = false AND ((content.tileDesignType = "withDescriptionPortraitSmall") OR (experiment.design_type = "withDescriptionPortraitSmall" AND content.parentId = experiment.container_id  AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen))
           switchLinearToInlineGridMode(videoPlayer)
         else
           '//play at minimized state
@@ -709,7 +709,7 @@ Function returnToPreviousScreenFromLinearVideo(bContinueToPlay = true)
 
         originalContent = videoPlayer.originalContent
         experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
-        if originalContent <> invalid AND originalContent.gridItemType = m.constants.ui.gridItemTypes.featuredPortraitSmall AND originalContent.parentId = experiment.container_id
+        if isKidsUIOn() = false AND originalContent <> invalid AND originalContent.gridItemType = m.constants.ui.gridItemTypes.featuredPortraitSmall AND originalContent.parentId = experiment.container_id
           switchLinearToInlineGridMode(videoPlayer)
         else
           '//animate the video player into the corner
