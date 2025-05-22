@@ -335,7 +335,7 @@ Function setVideoPreviewAfterFocus(focusedContent, pageInfo = {}, componentInfo 
       else
         ' this block is needed if user focuses to different content,
         ' it stops the preview of current content & starts the preview of new content
-        stopVideoPreview()
+        pauseVideoPreview()
 
         if isLinearPlayerPlayingThisContent(focusedContent) = false
           m.backgroundGroup.posterVisible = true

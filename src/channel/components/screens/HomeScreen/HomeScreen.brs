@@ -80,13 +80,19 @@ Function setContentAreaState(state = invalid)
 
   isHomeScreenRedesignForFeaturedEnabled = (getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false).design_type <> "none")
 
+  shouldAnimate = false
   if isHomeScreenRedesignForFeaturedEnabled = false OR (m.top.featuredListHasFocus = false AND m.CategoryGridList.lastFocusedList = "skinAdRow") OR m.top.featuredRowContent = invalid
     m.currentContentAreaTranslation = m.originalContentAreaTranslation
+    shouldAnimate = true
   else
     m.currentContentAreaTranslation = m.homeRedesignExpContentAreaTranslation
   end if
 
-  slideTo(m.ContentAreaParent, m.currentContentAreaTranslation, 0.2)
+  if shouldAnimate = true
+    slideTo(m.ContentAreaParent, m.currentContentAreaTranslation, 0.2)
+  else
+    m.ContentAreaParent.translation = m.currentContentAreaTranslation
+  end if
   updateFeaturedRowListTranslation()
 End Function
 
