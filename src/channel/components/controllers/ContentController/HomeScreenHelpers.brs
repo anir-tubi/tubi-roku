@@ -1320,10 +1320,14 @@ Function updateCategoryGridWithFeaturedList(response, screen)
     containerRow.reParent(featuredContent, false)
     screen.featuredRowContent = featuredContent
 
-    if screen.skinAdContent <> invalid
+    if screen.skinAdContent <> invalid OR (screen.featuredListHasFocus = false AND isKidsUIOn() = false)
       m.inlineVideoPreviewPlayerContainer.opacity = 1
-      m.inlineVideoPreviewPlayerContainer.translation = [m.inlineVideoPreviewPlayerContainer.translation[0], 951.5]
       setInlineVideoMetadataOverlay(0, featuredContent)
+      m.inlineVideoMetadataOverlay.showContentPoster = true
+
+      if screen.skinAdContent <> invalid
+        m.inlineVideoPreviewPlayerContainer.translation = [m.inlineVideoPreviewPlayerContainer.translation[0], 951.5]
+      end if
     end if
   end if
 End Function
