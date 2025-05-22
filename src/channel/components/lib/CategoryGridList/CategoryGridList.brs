@@ -775,7 +775,12 @@ Function setRowListFocus()
       m.RowList.setFocus(true)
     end if
   else
-    if m.RowList.isInFocusChain() = true
+    ' If the rowlist is in focus chain or we do not have a featured row.
+    ' Then we need to show the default info panel.
+    ' Below logic handles the use case where home screen is refreshed but the focus after refresh is on the screen but modal or side nav.
+    ' Since featured row does not have info panel we need to check for presence of featured row content.
+    ' Featured row landscape poster logic is handled in homescreen helpers.
+    if m.RowList.isInFocusChain() = true OR m.isWithDescPortraitSmallExpEnabled = false
       if m.RowList.currFocusRow <> invalid AND m.RowList.currFocusRow >= 0 AND m.RowList.currFocusColumn <> invalid AND m.RowList.currFocusColumn >= 0
         '//If rowList is not in focus and new content is set, then one would think that rowItemFocused should be [0,0] but it isn't,
         '//so that is why we use currFocusRow and currFocusColumn - to ensure the proper item is announced
