@@ -32,6 +32,7 @@ Function rainmakerApi_pauseAdsRequestInfo(content as Object, nowPos as Integer, 
     client_version: m.constants.deviceInfo.clientVersion
     os: m.constants.deviceInfo.operatingSystem
     os_version: m.constants.deviceInfo.firmwareVersion
+    make: m.constants.deviceInfo.vendorName
   }
 
   if m.constants.deviceInfo.deviceAdId <> invalid
