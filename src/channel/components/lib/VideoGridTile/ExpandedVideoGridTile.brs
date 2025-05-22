@@ -144,14 +144,6 @@ End Function
 
 
 Function onShowContentPosterChange(msg)
-  showContentPoster = msg.getData()
-
-  if showContentPoster = false
-    m.posterGroup.visible = false
-  else
-    m.posterGroup.visible = true
-  end if
-
   if isNonEmptyString(m.titleImage.uri) = true
     adjustTitleImageTranslation()
   end if
