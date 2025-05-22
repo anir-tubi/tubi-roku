@@ -1102,7 +1102,7 @@
   },
   "screenEndCard_upNextIn": {
     "description": "indicator for how many seconds until next video will start playing",
-    "message": "Up Next in {seconds}"
+    "message": "Up Next in "
   },
   "videoPlayer_trailerTitle": {
     "description": "Label for the video preview associated with the current video title",
