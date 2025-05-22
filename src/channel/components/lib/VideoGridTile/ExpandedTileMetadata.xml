@@ -44,7 +44,6 @@
           <Poster
             id="RatingBackground"
             height="30"
-            uri="pkg:/images/rating_background_video_tile.png"
             loadDisplayMode="scaleToFit"
             loadSync="true"/>
           <Label
@@ -61,6 +60,7 @@
         </Group>
         <Poster
           id="ClosedCaptionPoster"
+          visible="false"
           uri="pkg:/images/icon-closed-caption.webp"
           height="36"
           width="36"

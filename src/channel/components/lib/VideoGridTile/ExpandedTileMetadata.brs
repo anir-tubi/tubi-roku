@@ -174,6 +174,13 @@ Function metadataOnPosterContent(itemContent)
       firstLineGroup.removeChild(m.rating)
     end if
   end if
+
+  if itemContent.hascc = true
+    m.closedCaptions.visible = true
+  else
+    m.closedCaptions.visible = false
+  end if
+
 End Function
 
 Function metadataOnLivePosterContent(currentProgram, content)
@@ -211,11 +218,14 @@ Function metadataOnLivePosterContent(currentProgram, content)
     m.ratingLabel.width = 0
     m.ratingLabel.text = UCase(currentProgram.rating)
 
+    m.ratingBackground.uri = "pkg:/images/rating_background_video_tile.png"
+
     nRatingBoundingBoxIncrease = m.ratingLabel.boundingRect().width + 24
     m.ratingBackground.width = nRatingBoundingBoxIncrease
     m.ratingLabel.width = nRatingBoundingBoxIncrease
   else
     if ratingIsPresent = true
+      m.ratingBackground.uri = ""
       firstLineGroup.removeChild(m.rating)
     end if
   end if
