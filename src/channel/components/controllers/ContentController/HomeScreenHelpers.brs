@@ -1243,8 +1243,17 @@ Function startFeaturedInlinePreview()
       if content.type = m.constants.ui.categoryTypes.linear AND m.constants.deviceInfo.isAutoPlayEnabled = true
         playLinearInlineGridView(content, screen)
       else
-        setVideoPreviewAfterFocus(content, screen.trackingPageInfo)
-      end if      
+        componentTrackingInfo = invalid
+        if screen.trackingComponentInfo <> invalid AND screen.trackingPageInfo <> invalid
+          componentTrackingInfo = screen.trackingComponentInfo
+          pageInfo = screen.trackingPageInfo
+          componentTrackingInfo = {
+            pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+            componentOneof: m.Tracking.getAnalyticsComponent(componentTrackingInfo.componentType, componentTrackingInfo.componentValues)
+          }
+        end if
+        setVideoPreviewAfterFocus(content, screen.trackingPageInfo, componentTrackingInfo)
+      end if
     end if
   end if
 End Function
