@@ -467,7 +467,6 @@ Function onFeaturedListHasFocusChange(msg)
   setContentAreaState()
   'Make sure Content is in correct location
   moveContentAreaMaskBasedCurrentFocus()
-  m.gridHasGainedInitialFocus = true
 End Function
 
 
@@ -521,13 +520,6 @@ Function onGridFocusChange() as void
 
   fireNavigateWithinPageEvent()
   
-  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
-  isHomeScreenRedesignExperimentEnabled = (m.top.featuredRowContent <> invalid AND (experiment.design_type = "withDescriptionPortraitSmall")) AND focusedContent <> invalid AND focusedContent.parentId = experiment.container_id
-
-  if isHomeScreenRedesignExperimentEnabled = false
-   m.gridHasGainedInitialFocus = true
-  end if
-
 End Function
 
 
@@ -563,6 +555,8 @@ Function fireNavigateWithinPageEvent()
       }
     end if
   end if
+
+  m.gridHasGainedInitialFocus = true
 
   if m.CategoryGridList.lastFocusedList = "featuredRowList"
     focusedContent = m.CategoryGridList.featuredRowFocusedItem
