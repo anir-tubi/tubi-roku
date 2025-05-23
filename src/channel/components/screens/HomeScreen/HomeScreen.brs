@@ -525,7 +525,14 @@ End Function
 
 Function fireNavigateWithinPageEvent()
   'Set up the navigateWithinPageInfo to send to ContentController via Homescreen. Need for when CategoryGridList is in focus
-  rowIndexBoost = m.categoryGridList.rowIndexBoost + 1
+  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
+
+  if m.top.kidsMode = false AND experiment.design_type = "withDescriptionPortraitSmall"
+    rowIndexBoost = m.categoryGridList.rowIndexBoost
+  else
+    rowIndexBoost = m.categoryGridList.rowIndexBoost + 1
+  end if
+
   oldAnalyticsRow = m.CategoryGridList.oldCursorPosition[0] + rowIndexBoost
   oldAnalyticsCol = m.CategoryGridList.oldCursorPosition[1] + rowIndexBoost
   newAnalyticsRow = m.CategoryGridList.cursorPosition[0] + rowIndexBoost
@@ -593,7 +600,15 @@ Function getTrackingComponentInfoOfCategoryGridList(gridItem, itemPosition)
   if gridItem <> invalid AND itemPosition <> invalid AND itemPosition.Count() = 2
     componentValues = {}
     componentValues["category_slug"] = m.top.currCategoryId
-    rowIndexBoost = m.categoryGridList.rowIndexBoost + 1
+
+    experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
+
+    if m.top.kidsMode = false AND experiment.design_type = "withDescriptionPortraitSmall"
+      rowIndexBoost = m.categoryGridList.rowIndexBoost
+    else
+      rowIndexBoost = m.categoryGridList.rowIndexBoost + 1
+    end if
+
     componentValues["category_row"] = itemPosition[0] + rowIndexBoost 'all analytics are 1 based
     componentValues["category_col"] = itemPosition[1] + rowIndexBoost 'all analytics are 1 based
     tile = m.Tracking.getAnalyticsTile(gridItem, itemPosition[1] + rowIndexBoost)
