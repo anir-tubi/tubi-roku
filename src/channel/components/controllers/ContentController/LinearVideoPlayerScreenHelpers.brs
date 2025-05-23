@@ -555,30 +555,36 @@ Function animateLinearVideoPlayerToMinState(nDuration = .25, bVisible = true)
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   if videoPlayer <> invalid
 
-    screen = getFromScreenCache(videoPlayer.associatedScreenID)
-    if screen <> invalid
-      videoPlayer.trackingPageContext = screen.trackingPageInfo
+    originalContent = videoPlayer.originalContent
+    experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
+    if isKidsUIOn() = false AND originalContent <> invalid AND originalContent.gridItemType = m.constants.ui.gridItemTypes.featuredPortraitSmall AND originalContent.parentId = experiment.container_id
+      switchLinearToInlineGridMode(videoPlayer)
+    else
+      screen = getFromScreenCache(videoPlayer.associatedScreenID)
+      if screen <> invalid
+        videoPlayer.trackingPageContext = screen.trackingPageInfo
+      end if
+
+      if videoPlayer.fullscreen <> false
+        videoPlayer.fullscreen = false
+      end if
+
+      videoPlayer.unobserveFieldScoped("state")
+      videoPlayer.observeFieldScoped("state", "onLinearVideoPlayerStateWhileInMinState")
+
+      linearPlayerParentGroup = m.LinearPlayerGroup
+
+      nWidth = m.constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension[0]
+      nHeight = m.constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension[1]
+      nPosition = m.constants.ui.imageTranslations.epgLinearVideoPlayerOnEPGScreen_minimizedTranslation
+      m.LinearVideoPlayerSpinner.translation = [1260, 320]
+      videoPlayer.clippingRect = [0, 0, 1920, 1080]
+      linearPlayerParentGroup.appendChild(videoPlayer)
+
+      clearMinimizedLinearPlayerAnimation()
+      m.animationMinimizedLinearPlayer = resizeToLocation(videoPlayer, nWidth, nHeight, nPosition, nDuration)
+      videoPlayer.visible = bVisible
     end if
-
-    if videoPlayer.fullscreen <> false
-      videoPlayer.fullscreen = false
-    end if
-
-    videoPlayer.unobserveFieldScoped("state")
-    videoPlayer.observeFieldScoped("state", "onLinearVideoPlayerStateWhileInMinState")
-
-    linearPlayerParentGroup = m.LinearPlayerGroup
-
-    nWidth = m.constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension[0]
-    nHeight = m.constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension[1]
-    nPosition = m.constants.ui.imageTranslations.epgLinearVideoPlayerOnEPGScreen_minimizedTranslation
-    m.LinearVideoPlayerSpinner.translation = [1260, 320]
-    videoPlayer.clippingRect = [0, 0, 1920, 1080]
-    linearPlayerParentGroup.appendChild(videoPlayer)
-
-    clearMinimizedLinearPlayerAnimation()
-    m.animationMinimizedLinearPlayer = resizeToLocation(videoPlayer, nWidth, nHeight, nPosition, nDuration)
-    videoPlayer.visible = bVisible
   end if
 End Function
 
@@ -707,14 +713,7 @@ Function returnToPreviousScreenFromLinearVideo(bContinueToPlay = true)
         end if
         popScreen(true, true)
 
-        originalContent = videoPlayer.originalContent
-        experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
-        if isKidsUIOn() = false AND originalContent <> invalid AND originalContent.gridItemType = m.constants.ui.gridItemTypes.featuredPortraitSmall AND originalContent.parentId = experiment.container_id
-          switchLinearToInlineGridMode(videoPlayer)
-        else
-          '//animate the video player into the corner
-          animateLinearVideoPlayerToMinState()
-        end if
+        animateLinearVideoPlayerToMinState()
       end if
     else
       ' remove the video player screen to reveal the home screen/epg Screen
