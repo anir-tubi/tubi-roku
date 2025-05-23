@@ -3158,7 +3158,7 @@ Function getTranslation_es_MX()
     },
     "metadata_fullscreen_countdown_no_seconds": {
       "description": "label to indicate how many seconds it will take before the video player will automatically go fullscreen. The word 'seconds' should NOT follow the number of seconds.",
-      "message": "Pantalla completa en {seconds}"
+      "message": "Pantalla completa en "
     },
     "metadata_watch_again": {
       "description": "label to indicate a watched video can be watched again",
@@ -3251,6 +3251,18 @@ Function getTranslation_es_MX()
     "screenEndCard_startingIn": {
       "description": "indicator for how many seconds until next video will start playing (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
       "message": "Comenzando en {seconds} s"
+    },
+    "screenEndCard_upNextTitles": {
+      "description": "Label of button to allow users to view other video titles after the current video title is done playing",
+      "message": "Siguiente"
+    },
+    "screenEndCard_nextEpisode": {
+      "description": "Label of button to allow users to start playing the next episode of the current show",
+      "message": "Siguiente Capítulo"
+    },
+    "screenEndCard_upNextIn": {
+      "description": "indicator for how many seconds until next video will start playing",
+      "message": "A continuación en "
     },
     "videoPlayer_trailerTitle": {
       "description": "Label for the video preview associated with the current video title",
@@ -5014,7 +5026,7 @@ Function getTranslation_fr_CA()
     },
     "metadata_fullscreen_countdown_no_seconds": {
       "description": "label to indicate how many seconds it will take before the video player will automatically go fullscreen. The word 'seconds' should NOT follow the number of seconds.",
-      "message": "Plein écran dans {seconds}"
+      "message": "Plein écran dans "
     },
     "metadata_watch_again": {
       "description": "label to indicate a watched video can be watched again",
@@ -5111,6 +5123,18 @@ Function getTranslation_fr_CA()
     "screenEndCard_startingIn": {
       "description": "indicator for how many seconds until next video will start playing (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
       "message": "Commence dans {seconds} sec."
+    },
+    "screenEndCard_upNextTitles": {
+      "description": "Label of button to allow users to view other video titles after the current video title is done playing",
+      "message": "Suivant"
+    },
+    "screenEndCard_nextEpisode": {
+      "description": "Label of button to allow users to start playing the next episode of the current show",
+      "message": "Prochain épisode"
+    },
+    "screenEndCard_upNextIn": {
+      "description": "indicator for how many seconds until next video will start playing",
+      "message": "Suivant dans "
     },
     "videoPlayer_trailerTitle": {
       "description": "Label for the video preview associated with the current video title",
