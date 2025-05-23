@@ -1328,7 +1328,7 @@ Function updateCategoryGridWithFeaturedList(response, screen)
       m.inlineVideoMetadataOverlay.showContentPoster = true
 
       if screen.skinAdContent <> invalid
-        m.inlineVideoPreviewPlayerContainer.translation = [m.inlineVideoPreviewPlayerContainer.translation[0], 951.5]
+        m.inlineVideoPreviewPlayerContainer.translation = [m.inlineVideoPreviewPlayerContainer.translation[0], 945.5]
       end if
     end if
   end if
