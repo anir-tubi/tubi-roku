@@ -164,6 +164,9 @@ End Function
 
 Function onShowContentPosterChange(msg)
   if isNonEmptyString(m.titleImage.uri) = true
+    if m.titleImage.loadStatus = "ready" AND m.titleImage.opacity = 0
+      m.titleAnimation = fade(m.titleImage, "in", 0.5)
+    end if
     adjustTitleImageTranslation()
   end if
 End Function
