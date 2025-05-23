@@ -77,6 +77,7 @@ Function onVideoPreviewStateChanged(msg)
   videoPreview = msg.getRoSGNode()
   videoPreviewState = msg.getData()
   currentScreen = getCurrentScreen()
+
   if (videoPreviewState = "playing" OR videoPreviewState = "paused") AND videoPreview <> invalid AND videoPreview.isBufferingComplete = true
     ' Adding a safety check to make sure if a new debounce was started we do not show the player instead just pause it.
     ' Only doing it for featured row list since that is the only row that has debounce for now.
@@ -269,8 +270,8 @@ Function updatePreviewPlayerToInlineView()
       playerSize = m.constants.ui.featuredRow.playerSize
       m.videoPreviewPlayer.width = playerSize[0]
       m.videoPreviewPlayer.height = playerSize[1]
-      m.videoPreviewPlayer.reParent(m.inlineVideoPreviewPlayerContainer, false)
       m.inlineVideoMetadataOverlay.reParent(m.inlineVideoPreviewPlayerContainer, false)
+      m.videoPreviewPlayer.reParent(m.inlineVideoPreviewPlayerContainer, false)
       m.inlinePreviewFocusIndicator.reParent(m.inlineVideoPreviewPlayerContainer, false)
     end if
 

@@ -942,8 +942,8 @@ Function switchLinearToInlineGridMode(linearPlayer)
   linearPlayer.height = playerSize[1]
 
   linearPlayer.translation = [3, 0]
-  linearPlayer.reParent(m.inlineVideoPreviewPlayerContainer, false)
   m.inlineVideoMetadataOverlay.reParent(m.inlineVideoPreviewPlayerContainer, false)
+  linearPlayer.reParent(m.inlineVideoPreviewPlayerContainer, false)
   m.inlinePreviewFocusIndicator.reParent(m.inlineVideoPreviewPlayerContainer, false)
 
   linearPlayer.visible = false
