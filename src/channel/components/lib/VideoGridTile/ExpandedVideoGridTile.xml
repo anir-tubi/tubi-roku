@@ -43,17 +43,26 @@
           opacity="0"
           loadDisplayMode="limitSize"/>
 
-        <Label
-          id="title"
-          width="650"
-          wrap="true"
-          maxLines="2"
+        <LayoutGroup
           opacity="0"
-          vertAlign="bottom">
-          <Font
-            id="TitleFont"
-            role="font"/>
-        </Label>
+          id="titleGroup">
+          <Label
+            id="title"
+            width="650"
+            vertAlign="bottom">
+            <Font
+              id="TitleFont"
+              role="font"/>
+          </Label>
+          <Label
+            id="subtitle"
+            width="650"
+            vertAlign="bottom">
+            <Font
+              id="SubTitleFont"
+              role="font"/>
+          </Label>
+        </LayoutGroup>
       </Group>
       <ExpandedTileMetadata id="videoGridMetadata" />
     </LayoutGroup>
