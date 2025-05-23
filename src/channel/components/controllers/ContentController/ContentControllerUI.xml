@@ -114,7 +114,7 @@
             layoutDirection="vert"
             horizAlignment="center"
             itemSpacings="[8]"
-            translation="[1764,108]">
+            translation="[1764,54]">
               <Label
                 id="presentedByLabel"
                 maxLines="1">
@@ -123,6 +123,7 @@
               <Poster
                 id="presentedByImage"
                 width="174"
+                height="48"
                 loadDisplayMode="scaleToFit"/>
           </LayoutGroup>
         </Group>

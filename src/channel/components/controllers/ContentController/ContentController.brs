@@ -2367,8 +2367,15 @@ Function showHideLogo(logoType, presentedByURL = "", presentedByText = "")
       m.presentedByLabel.text = ""
     end if
 
+    presentedWidth = m.presentedByGroup.boundingRect().width
+    logoWidth = m.logo.boundingRect().width
+    x = 1809 - (logoWidth + presentedWidth) ' 1920 - total - (135 - logo width + 24 space + 87 -margin + presentedWidth)
+    x1 = x + logoWidth + 24 + (presentedWidth / 2) ' 159 =  135 + 24 
+    m.presentedByGroup.translation = [x1, 54] 
+    m.logo.translation = [x, 54]
   else
     m.presentedByGroup.visible = false
+    m.logo.translation = [1698, 54]
   end if
 
 End Function
