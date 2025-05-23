@@ -525,18 +525,19 @@ End Function
 
 Function fireNavigateWithinPageEvent()
   'Set up the navigateWithinPageInfo to send to ContentController via Homescreen. Need for when CategoryGridList is in focus
+  rowIndexBoost = m.categoryGridList.rowIndexBoost
+  
   experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
+  isHomeScreenRedesignForFeaturedEnabled = m.top.kidsMode = false AND (m.top.featuredRowContent <> invalid AND (experiment.design_type = "withDescriptionPortraitSmall") AND m.CategoryGridList.oldCategoryId = experiment.container_id)
 
-  if m.top.kidsMode = false AND experiment.design_type = "withDescriptionPortraitSmall"
-    rowIndexBoost = m.categoryGridList.rowIndexBoost
-  else
-    rowIndexBoost = m.categoryGridList.rowIndexBoost + 1
+  if isHomeScreenRedesignForFeaturedEnabled = false
+    rowIndexBoost = rowIndexBoost + 1
   end if
 
   oldAnalyticsRow = m.CategoryGridList.oldCursorPosition[0] + rowIndexBoost
-  oldAnalyticsCol = m.CategoryGridList.oldCursorPosition[1] + rowIndexBoost
+  oldAnalyticsCol = m.CategoryGridList.oldCursorPosition[1] + 1
   newAnalyticsRow = m.CategoryGridList.cursorPosition[0] + rowIndexBoost
-  newAnalyticsCol = m.CategoryGridList.cursorPosition[1] + rowIndexBoost
+  newAnalyticsCol = m.CategoryGridList.cursorPosition[1] + 1
   oldFocusedContent = m.CategoryGridList.oldItemFocused
 
   if m.gridHasGainedInitialFocus = true AND oldAnalyticsRow > 0 AND oldAnalyticsCol > 0
@@ -601,17 +602,17 @@ Function getTrackingComponentInfoOfCategoryGridList(gridItem, itemPosition)
     componentValues = {}
     componentValues["category_slug"] = m.top.currCategoryId
 
+    rowIndexBoost = m.categoryGridList.rowIndexBoost
     experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
+    isHomeScreenRedesignForFeaturedEnabled = m.top.kidsMode = false AND (m.top.featuredRowContent <> invalid AND (experiment.design_type = "withDescriptionPortraitSmall") AND m.top.currCategoryId = experiment.container_id)
 
-    if m.top.kidsMode = false AND experiment.design_type = "withDescriptionPortraitSmall"
-      rowIndexBoost = m.categoryGridList.rowIndexBoost
-    else
-      rowIndexBoost = m.categoryGridList.rowIndexBoost + 1
+    if isHomeScreenRedesignForFeaturedEnabled = false
+      rowIndexBoost = rowIndexBoost + 1
     end if
 
     componentValues["category_row"] = itemPosition[0] + rowIndexBoost 'all analytics are 1 based
-    componentValues["category_col"] = itemPosition[1] + rowIndexBoost 'all analytics are 1 based
-    tile = m.Tracking.getAnalyticsTile(gridItem, itemPosition[1] + rowIndexBoost)
+    componentValues["category_col"] = itemPosition[1] + 1 'all analytics are 1 based
+    tile = m.Tracking.getAnalyticsTile(gridItem, itemPosition[1] + 1)
 
     componentValues["content_tile"] = tile
 
