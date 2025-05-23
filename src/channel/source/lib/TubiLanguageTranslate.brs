@@ -2171,6 +2171,14 @@ Function getTranslation_en_US()
     "videoPlayer_button_watchMovie": {
       "description": "Label of button to allow users to watch movie from trailer screen",
       "message": "Watch Movie"
+    },
+    "h_m_duration":{
+      "description": "Indicates time in the format 'x h y m'",
+      "message": "{hour}h {minutes}m"
+    },
+    "m_duration":{
+      "description": "Indicates time in the format 'y m'",
+      "message": "{minutes}m"
     }
   }
 End Function

@@ -39,6 +39,24 @@
           <Font
             role="font" />
         </Label>
+        <Rectangle
+          id="progressBarGroup"
+          width="40"
+          height="6"
+          color="#00000000">
+          <TubiProgressBar
+            id="progressBar"
+            width="40"
+            height="6"
+            margin="[0, 25]"
+            visible="false"/>
+        </Rectangle>
+        <Label
+          id="lineTwoData"
+          vertAlign="bottom" >
+          <Font
+            role="font" />
+        </Label>
         <Group
           id="Rating">
           <Poster

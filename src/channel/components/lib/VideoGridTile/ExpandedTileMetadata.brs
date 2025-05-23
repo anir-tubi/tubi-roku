@@ -7,6 +7,9 @@ Function init()
   m.firstLineGroup = m.top.findNode("firstLineGroup")
   m.description = m.top.findNode("description")
   m.lineOneData = m.firstLineGroup.findNode("lineOneData")
+  m.lineTwoData = m.top.findNode("lineTwoData")
+  m.progressBar = m.top.findNode("progressBar")
+  m.progressBarGroup = m.top.findNode("progressBarGroup")
   m.rating = m.firstLineGroup.findNode("Rating")
   m.ratingBackground = m.rating.findNode("RatingBackground")
   m.ratingLabel = m.rating.findNode("RatingLabel")
@@ -17,7 +20,8 @@ Function init()
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.description, typographyConstants.ids.bodySmall)
   setTypographyOfLabel(m.lineOneData, typographyConstants.ids.bodySmall)
-  setTypographyOfLabel(m.ratingLabel, typographyConstants.ids.bodySmall)
+  setTypographyOfLabel(m.lineTwoData, typographyConstants.ids.bodySmall)
+  setTypographyOfLabel(m.ratingLabel, typographyConstants.ids.bodyExtraSmallStrong)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -35,11 +39,15 @@ Function onThemeChange(msg = invalid)
 
   if theme <> invalid
     m.lineOneData.color = theme.secondaryTextColor
+    m.lineTwoData.color = theme.secondaryTextColor
     m.RatingLabel.color = theme.secondaryTextColor
     m.description.color = theme.primaryTextColor
+
+    m.progressBar.focusColor = theme.focusedcolor
+    m.progressBar.trackColor = theme.neutralcolor
+    m.progressBar.unfocusColor = theme.focusedcolor
   end if
 End Function
-
 
 
 Function setThumbnailImage(thumbnailUri, contentType)
@@ -69,15 +77,46 @@ Function onItemContentChange(msg)
         if isNonEmptyString(currentProgram.description) = true
           m.description.text = currentProgram.description
         end if
+
+        progress = getLinearProgramProgress(currentProgram)
+        m.progressBar.progress = progress
+        m.progressBar.visible = true
+
+        if m.progressBarGroup.getParent() = invalid
+          index = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.lineOneData)
+          m.firstLineGroup.insertChild(m.progressBarGroup, index + 1)
+        end if
+  
+        if m.lineTwoData.getParent() = invalid
+          index = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.progressBarGroup)
+          m.firstLineGroup.insertChild(m.lineTwoData, index + 1)
+        end if
+        
       else
         metadataOnPosterContent(itemContent)
         m.description.text = itemContent.description
+        
+        if m.lineTwoData.getParent() <> invalid
+          m.firstLineGroup.removeChild(m.lineTwoData)
+        end if
+
+        if m.progressBarGroup.getParent() <> invalid
+          m.firstLineGroup.removeChild(m.progressBarGroup)
+        end if
       end if
   
     else
       'Remove thumbnail image and badge we showed for live
       if m.channelLogo.getParent() <> invalid
         m.firstLineGroup.removeChild(m.channelLogo)
+      end if
+
+      if m.lineTwoData.getParent() <> invalid
+        m.firstLineGroup.removeChild(m.lineTwoData)
+      end if
+
+      if m.progressBarGroup.getParent() <> invalid
+        m.firstLineGroup.removeChild(m.progressBarGroup)
       end if
       
       m.description.text = itemContent.description
@@ -185,34 +224,44 @@ End Function
 
 Function metadataOnLivePosterContent(currentProgram, content)
   firstLineGroup = m.firstLineGroup
-  insertIndex = 0
 
   text = ""
 
-  if isNonEmptyString(content.title) = true
-    text = content.title + " "
-  end if
-
-  timeLeft = calculateProgramTimeLeft(currentProgram)
-
-  if timeLeft <> invalid
+  if currentProgram.year <> invalid
+    ' add 'dot' spacer only if we had a tag/genre
     if text.len() > 0
       text += Chr(&hb7) + " "
     end if
+    text += currentProgram.year.toStr() + " "
+  end if
 
-    text += timeLeft + " "
+  duration = calculateProgramTime(currentProgram)
+
+  if isNonEmptyString(duration) = true
+    if text.len() > 0
+      text += Chr(&hb7)
+    end if
+
+    text += duration + " "
+  end if
+
+  timeLeft = calculateProgramTimeLeft(currentProgram)
+  twoLineText = ""
+  if timeLeft <> invalid
+    twoLineText = timeLeft
+    m.lineTwoData.text = twoLineText
   end if
 
   if isNonEmptyString(text) = true
     m.lineOneData.text = text
-    insertIndex++
   end if
 
   ' handle rating
   ratingIsPresent = (m.rating.getParent() <> invalid)
   if isNonEmptyString(currentProgram.rating) = true
     if ratingIsPresent = false
-      firstLineGroup.insertChild(m.rating, insertIndex)
+      insertIndex = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.lineTwoData)
+      firstLineGroup.insertChild(m.rating, insertIndex + 1)
     end if
 
     m.ratingLabel.width = 0
@@ -242,6 +291,18 @@ Function calculateProgramTimeLeft(program) as String
 End Function
 
 
+Function calculateProgramTime(program) as String
+  retVal = ""
+
+  if isInt(program.endTime) = true AND isInt(program.startTime) = true
+    duration = program.endTime - program.startTime
+    retVal = convertSecondsToHoursString(duration)
+  end if
+
+  return retVal
+End Function
+
+
 'helper function which returns the time left in the format 'x hour and y mins left' if timeleft is more than an hour
 ' else it retuns 'y mins left'
 Function getDurationHoursString(seconds As Integer) As String
@@ -255,6 +316,24 @@ Function getDurationHoursString(seconds As Integer) As String
       retVal =  getTranslation("h_m_left", {"hour": StrI(hourValue), "minutes": minValue})
     else
       retVal = getTranslation("m_left", {"minutes": minValue})
+    end if
+  end if
+
+  return retVal
+End Function
+
+
+Function convertSecondsToHoursString(seconds As Integer) As String
+  retVal = ""
+
+  if seconds <> invalid
+    hourValue = Int(seconds / 3600)
+    minValue = StrI((Int(seconds / 60) mod 60) + 1) 'increase the min by one so that we dont show 0 min
+
+    if hourValue > 0
+      retVal =  getTranslation("h_m_duration", {"hour": StrI(hourValue), "minutes": minValue})
+    else
+      retVal = getTranslation("m_duration", {"minutes": minValue})
     end if
   end if
 
