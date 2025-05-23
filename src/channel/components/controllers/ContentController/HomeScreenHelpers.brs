@@ -1202,7 +1202,7 @@ Function onFeaturedRowCurrFocusColumnChange()
   if isNumber(columnFocused) = false OR columnFocused < 0
     columnFocused = 0
   end if
-  
+
   ' Only process if the screen is the home screen.
   if isCurrentScreenHomeScreen() = true
     displayDefaultBackground()
@@ -1323,7 +1323,11 @@ Function updateCategoryGridWithFeaturedList(response, screen)
     screen.featuredRowContent = featuredContent
 
     if screen.skinAdContent <> invalid OR (screen.featuredListHasFocus = false AND isKidsUIOn() = false)
-      m.inlineVideoPreviewPlayerContainer.opacity = 1
+      currentScreen = getCurrentScreen()
+      isCurrScreenHomeScreen = currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen
+      if isCurrScreenHomeScreen = true
+        m.inlineVideoPreviewPlayerContainer.opacity = 1
+      end if
       setInlineVideoMetadataOverlay(0, featuredContent)
       m.inlineVideoMetadataOverlay.showContentPoster = true
 
