@@ -56,6 +56,7 @@ Function onItemContentChange(msg)
       setBadge(m.badgeTypes.onNow)
     else if m.badge <> invalid
         m.posterGroup.removeChild(m.badge)
+        m.badge = invalid
     end if
 
     if currentProgram <> invalid
