@@ -1545,7 +1545,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
               type: sContentType
               tileDesignType: tileDesignType
               featuredLandscape: featuredLandscape
-              hasCC: (fullChild.hasSubtitles = true OR (fullChild.subtitleTracks <> invalid AND fullChild.subtitleTracks.isEmpty() = false))
+              hasCC: (fullChild.hasSubtitles = true OR fullChild.has_subtitle = true OR (fullChild.subtitleTracks <> invalid AND fullChild.subtitleTracks.isEmpty() = false))
               gridItemType: parentGridItemType
             }
           else

@@ -44,6 +44,7 @@
           <Poster
             id="RatingBackground"
             height="30"
+            uri="pkg:/images/rating_background_video_tile.png"
             loadDisplayMode="scaleToFit"
             loadSync="true"/>
           <Label
