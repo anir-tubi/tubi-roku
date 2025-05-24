@@ -1369,7 +1369,7 @@ Function updateInlineVideoMetadataOverlayVisibility(duration = 0)
         content = screen.featuredRowFocusedItem
         if getVideoPreviewStateForThisContent(content) <> "playing"
           m.inlineVideoMetadataOverlay.showContentPoster = true
-          pauseVideoPreview()
+          stopVideoPreview()
         end if
         fade(m.inlineVideoPreviewPlayerContainer, "in", duration)
       else
