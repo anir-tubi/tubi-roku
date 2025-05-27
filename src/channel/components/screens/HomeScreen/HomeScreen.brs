@@ -528,8 +528,7 @@ Function fireNavigateWithinPageEvent()
   rowIndexBoost = m.categoryGridList.rowIndexBoost
   
   experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
-  isHomeScreenRedesignForFeaturedEnabled = m.top.kidsMode = false AND (m.top.featuredRowContent <> invalid AND (experiment.design_type = "withDescriptionPortraitSmall") AND m.CategoryGridList.oldCategoryId = experiment.container_id)
-
+  isHomeScreenRedesignForFeaturedEnabled = m.top.kidsMode = false AND (m.top.featuredRowContent <> invalid AND (experiment.design_type = "withDescriptionPortraitSmall") AND m.CategoryGridList.currCategoryId = experiment.container_id)
   if isHomeScreenRedesignForFeaturedEnabled = false
     rowIndexBoost = rowIndexBoost + 1
   end if
