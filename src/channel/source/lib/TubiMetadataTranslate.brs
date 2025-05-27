@@ -1950,9 +1950,9 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
 
   if screenId = m.constants.ui.screenIds.homeScreen AND tileDesignType = "withDescriptionPortraitSmall" AND container.id = experimentContainerId AND isHomescreenRedesignExperiementEnabled = true AND (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
     gridItemType = gridItemTypes.featuredPortraitSmall
-  else if (tileDesignType = "controlReOrderContainers" AND container.id = experimentContainerId) AND isHomescreenRedesignExperiementEnabled = true
+  else if (tileDesignType = "controlReOrderContainers" AND container.id = experimentContainerId) AND isHomescreenRedesignExperiementEnabled = true AND (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
     gridItemType = gridItemTypes.landscape
-  else if tileDesignType <> "none" AND container.id = constants.ui.categoryIds.featured AND isHomescreenRedesignExperiementEnabled = true
+  else if tileDesignType <> "none" AND container.id = constants.ui.categoryIds.featured AND isHomescreenRedesignExperiementEnabled = true AND (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
     gridItemType = gridItemTypes.portrait
   else if container.type = constants.ui.categoryTypes.linear
     gridItemType = gridItemTypes.linear

@@ -432,14 +432,18 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     homeScreen.personalizationId = rawResponse.personalizationId
     homeScreen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
 
-    experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", true)
-    containerRow = m.nodeHelpers.getChildById(rawResponse, experiment.container_id)
-    redesignRow = containerRow
+    experiment = invalid
 
-    rawResponse.removeChild(containerRow)
-    rawResponse.insertChild(redesignRow, 0)
+    if isKidsUIOn() = false AND screenID = m.constants.ui.screenIds.homeScreen
+      experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", true)
+      containerRow = m.nodeHelpers.getChildById(rawResponse, experiment.container_id)
+      redesignRow = containerRow
 
-    if isKidsUIOn() = false AND (experiment.design_type = "withDescriptionPortraitSmall") AND isNode(rawResponse) = true AND rawResponse.getChildCount() > 0 AND homeScreen.id = m.constants.ui.screenIds.homescreen
+      rawResponse.removeChild(containerRow)
+      rawResponse.insertChild(redesignRow, 0)
+    end if
+
+    if isAA(experiment) = true AND (experiment.design_type = "withDescriptionPortraitSmall") AND isNode(rawResponse) = true AND rawResponse.getChildCount() > 0 AND homeScreen.id = m.constants.ui.screenIds.homescreen
       updateCategoryGridWithFeaturedList(rawResponse, homeScreen)
     end if
 
