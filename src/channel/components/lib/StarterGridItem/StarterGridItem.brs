@@ -33,10 +33,6 @@ Function init()
       exit for
     end if
 
-    if parent.rowIndexBoost <> invalid
-      m.rowIndexBoost = parent.rowIndexBoost
-    end if
-
     if parent.hasField("shouldTrackViewableImpressionEvent") = true AND parent.shouldTrackViewableImpressionEvent = true
       m.parentArrayGrid = parent
       ' Only enabling it if we find the parent values.
@@ -146,19 +142,23 @@ Function onItemContentChange(msg)
     personalizationId = m.parentArrayGrid.personalizationId
     m.shouldTrackViewableImpressionEvent = m.parentArrayGrid.shouldTrackViewableImpressionEvent
     numColumns = m.parentArrayGrid.numColumns
+    rowIndexBoost = 0
+    if m.parentArrayGrid.rowIndexBoost <> invalid
+      rowIndexBoost = m.parentArrayGrid.rowIndexBoost
+    end if
 
     row = itemContent.getParent()
 
     rowIndex = m.top.rowIndex
     col = m.top.index
 
-    if isInteger(numColumns) = true AND numColumns > 0
+    if isInteger(numColumns) = true AND numColumns > 0 AND m.parentArrayGrid.subType() <> "RowList"
       rowIndex = Int(col / numColumns)
       col = col MOD numColumns
     end if
 
     itemInfo = {
-      row: rowIndex + 1 + m.rowIndexBoost
+      row: rowIndex + 1 + rowIndexBoost
       col: col + 1
     }
 

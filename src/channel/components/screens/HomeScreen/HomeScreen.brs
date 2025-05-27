@@ -164,6 +164,7 @@ Function onPersonalizationIdChanged(msg)
   if isAA(trackingPageInfo) = true AND isAA(trackingPageInfo.pageValues) = true
     trackingPageInfo.pageValues.personalization_id = personalizationId
     m.top.trackingPageInfo = trackingPageInfo
+    m.categoryGridList.parentScreenTrackingPageInfo = trackingPageInfo
   end if
 End Function
 
@@ -525,20 +526,26 @@ End Function
 
 Function fireNavigateWithinPageEvent()
   'Set up the navigateWithinPageInfo to send to ContentController via Homescreen. Need for when CategoryGridList is in focus
-  rowIndexBoost = m.categoryGridList.rowIndexBoost
+  oldRowIndexBoost = m.categoryGridList.rowIndexBoost
+  newRowIndexBoost = m.categoryGridList.rowIndexBoost
   
   experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
-  isHomeScreenRedesignForFeaturedEnabled = m.top.kidsMode = false AND (m.top.featuredRowContent <> invalid AND (experiment.design_type = "withDescriptionPortraitSmall") AND m.CategoryGridList.currCategoryId = experiment.container_id)
-  if isHomeScreenRedesignForFeaturedEnabled = false
-    rowIndexBoost = rowIndexBoost + 1
+  isHomeScreenRedesignForFeaturedEnabled = m.top.kidsMode = false AND m.top.featuredRowContent <> invalid AND (experiment.design_type = "withDescriptionPortraitSmall")
+  
+  if (isHomeScreenRedesignForFeaturedEnabled = true AND m.CategoryGridList.oldCategoryId <> experiment.container_id) OR isHomeScreenRedesignForFeaturedEnabled = false
+    oldRowIndexBoost = oldRowIndexBoost + 1
   end if
 
-  oldAnalyticsRow = m.CategoryGridList.oldCursorPosition[0] + rowIndexBoost
+  if (isHomeScreenRedesignForFeaturedEnabled = true AND m.CategoryGridList.currCategoryId <> experiment.container_id) OR isHomeScreenRedesignForFeaturedEnabled = false
+    newRowIndexBoost = newRowIndexBoost + 1
+  end if
+
+  oldAnalyticsRow = m.CategoryGridList.oldCursorPosition[0] + oldRowIndexBoost
   oldAnalyticsCol = m.CategoryGridList.oldCursorPosition[1] + 1
-  newAnalyticsRow = m.CategoryGridList.cursorPosition[0] + rowIndexBoost
+  newAnalyticsRow = m.CategoryGridList.cursorPosition[0] + newRowIndexBoost
   newAnalyticsCol = m.CategoryGridList.cursorPosition[1] + 1
   oldFocusedContent = m.CategoryGridList.oldItemFocused
-
+  
   if m.gridHasGainedInitialFocus = true AND oldAnalyticsRow > 0 AND oldAnalyticsCol > 0
     if oldAnalyticsRow <> newAnalyticsRow OR oldAnalyticsCol <> newAnalyticsCol
 

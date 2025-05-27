@@ -10,6 +10,7 @@ Function init()
   m.top.observeFieldScoped("animateToCategory", "onAnimateToCategory")
   m.top.observeFieldScoped("removeFocusFromRowList", "onRemoveFocusFromRowList")
   m.top.observeFieldScoped("signedIn", "onSignedInChange")
+  m.top.observeFieldScoped("parentScreenTrackingPageInfo", "onParentScreenTrackingPageInfoChange")
   m.RowList = m.top.findNode("RowList")
   m.RowList.observeFieldScoped("rowItemFocused", "onRowItemFocused")
   m.RowList.observeFieldScoped("rowItemSelected", "onRowItemSelected")
@@ -289,7 +290,19 @@ Function onContentChange()
 
   ' Since we are splitting grid content into two RowLists, we need to take into account rows that are in above rows.
   m.RowList.update({
-    "rowIndexBoost" : rowIndexBoost
+    parentScreenId: m.top.parentScreenId
+    parentScreenTrackingPageInfo: m.top.parentScreenTrackingPageInfo
+    personalizationId: m.top.personalizationId
+    shouldTrackViewableImpressionEvent: m.top.shouldTrackViewableImpressionEvent
+    rowIndexBoost: rowIndexBoost
+  }, true)
+
+  m.FeaturedRowList.update({
+    parentScreenId: m.top.parentScreenId
+    parentScreenTrackingPageInfo: m.top.parentScreenTrackingPageInfo
+    personalizationId: m.top.personalizationId
+    shouldTrackViewableImpressionEvent: m.top.shouldTrackViewableImpressionEvent
+    rowIndexBoost: 0
   }, true)
 
   m.top.rowIndexBoost = rowIndexBoost
@@ -302,6 +315,20 @@ Function onContentChange()
   updateCurrentFocusedItemBoundingRect(0)
 
   m.top.gridContentIsReady = true
+End Function
+
+
+Function onParentScreenTrackingPageInfoChange(msg)
+  ' Since we are splitting grid content into two RowLists, we need to take into account rows that are in above rows.
+  m.RowList.update({
+    parentScreenTrackingPageInfo: m.top.parentScreenTrackingPageInfo
+    personalizationId: m.top.personalizationId
+  }, true)
+
+  m.FeaturedRowList.update({
+    parentScreenTrackingPageInfo: m.top.parentScreenTrackingPageInfo
+    personalizationId: m.top.personalizationId
+  }, true)
 End Function
 
 
