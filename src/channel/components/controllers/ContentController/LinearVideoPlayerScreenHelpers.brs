@@ -90,9 +90,9 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
       if bMinimized = false
         maximizeLinearPlayer(clonedContent)
       else
-        experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
         currentScreen = getCurrentScreen()
-        if isKidsUIOn() = false AND ((content.tileDesignType = "withDescriptionPortraitSmall") OR (experiment.design_type = "withDescriptionPortraitSmall" AND content.parentId = experiment.container_id  AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen))
+        ' If the current screen is the home screen and the featured list has focus, then switch to inline grid mode.
+        if isKidsUIOn() = false AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND currentScreen.featuredListHasFocus = true
           switchLinearToInlineGridMode(videoPlayer)
         else
           '//play at minimized state
@@ -555,9 +555,8 @@ Function animateLinearVideoPlayerToMinState(nDuration = .25, bVisible = true)
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   if videoPlayer <> invalid
 
-    originalContent = videoPlayer.originalContent
-    experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
-    if isKidsUIOn() = false AND originalContent <> invalid AND originalContent.gridItemType = m.constants.ui.gridItemTypes.featuredPortraitSmall AND originalContent.parentId = experiment.container_id
+    currentScreen = getCurrentScreen()
+    if isKidsUIOn() = false AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND currentScreen.featuredListHasFocus = true
       switchLinearToInlineGridMode(videoPlayer)
     else
       screen = getFromScreenCache(videoPlayer.associatedScreenID)
@@ -944,6 +943,7 @@ Function switchLinearToInlineGridMode(linearPlayer)
   linearPlayer.translation = [3, 0]
   m.inlineVideoMetadataOverlay.reParent(m.inlineVideoPreviewPlayerContainer, false)
   linearPlayer.reParent(m.inlineVideoPreviewPlayerContainer, false)
+  m.inlineVideoGridTitleLogo.reParent(m.inlineVideoPreviewPlayerContainer, false)
   m.inlinePreviewFocusIndicator.reParent(m.inlineVideoPreviewPlayerContainer, false)
 
   linearPlayer.visible = false

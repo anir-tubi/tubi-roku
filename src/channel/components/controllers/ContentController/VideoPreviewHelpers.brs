@@ -177,8 +177,13 @@ End Function
 
 
 Function onVideoBufferingStatusChanged(msg)
-  bufferingStatus = msg.getData()
-  videoPreview = msg.getRoSGNode()
+  startVideoPreviewIfBufferingComplete()
+End Function
+
+
+Function startVideoPreviewIfBufferingComplete()
+  videoPreview = m.videoPreviewPlayer
+  bufferingStatus = m.videoPreviewPlayer.bufferingStatus
   if bufferingStatus <> invalid
     videoPreview.isBufferingComplete = (bufferingStatus.percentage = 100)
     if videoPreview.isBufferingComplete  = true AND videoPreview.control = "prebuffer"
@@ -272,6 +277,7 @@ Function updatePreviewPlayerToInlineView()
       m.videoPreviewPlayer.height = playerSize[1]
       m.inlineVideoMetadataOverlay.reParent(m.inlineVideoPreviewPlayerContainer, false)
       m.videoPreviewPlayer.reParent(m.inlineVideoPreviewPlayerContainer, false)
+      m.inlineVideoGridTitleLogo.reParent(m.inlineVideoPreviewPlayerContainer, false)
       m.inlinePreviewFocusIndicator.reParent(m.inlineVideoPreviewPlayerContainer, false)
     end if
 
@@ -327,7 +333,7 @@ Function setVideoPreviewAfterFocus(focusedContent, pageInfo = {}, componentInfo 
         if videoPreview <> invalid
           setPageInfoForVideoPreview(pageInfo)
           if previewState = "buffering"
-            resumeVideoPreview()
+            startVideoPreviewIfBufferingComplete()
           end if
         end if
         m.backgroundGroup.posterVisible = false

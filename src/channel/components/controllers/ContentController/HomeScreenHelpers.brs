@@ -1268,6 +1268,7 @@ Function setInlineVideoMetadataOverlay(columnFocused, featuredRowContent)
 
   itemContent = featuredRowContent.getChild(0).getChild(columnFocused)
   m.inlineVideoMetadataOverlay.itemContent = itemContent
+  m.inlineVideoGridTitleLogo.itemContent = itemContent
 End Function
 
 
@@ -1335,13 +1336,13 @@ Function updateCategoryGridWithFeaturedList(response, screen)
     if screen.skinAdContent <> invalid OR (screen.featuredListHasFocus = false AND isKidsUIOn() = false)
       currentScreen = getCurrentScreen()
       isCurrScreenHomeScreen = currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen
-      if isCurrScreenHomeScreen = true
+      if isCurrScreenHomeScreen = true AND screen.isInFocusChain() = false
         m.inlineVideoPreviewPlayerContainer.opacity = 1
       end if
       setInlineVideoMetadataOverlay(0, featuredContent)
       m.inlineVideoMetadataOverlay.showContentPoster = true
 
-      if screen.skinAdContent <> invalid
+      if screen.skinAdContent <> invalid AND screen.isInFocusChain() = false
         m.inlineVideoPreviewPlayerContainer.translation = [m.inlineVideoPreviewPlayerContainer.translation[0], 945.5]
       end if
     end if

@@ -62,6 +62,9 @@
             <ExpandedVideoGridTile
               translation="[5,4]"
               id="inlineVideoMetadataOverlay" />
+            <VideoGridTitleLogo
+              translation="[5,4]"
+              id="inlineVideoGridTitleLogo" />
             <Poster
               width="801"
               height="340"

@@ -102,6 +102,10 @@ Function addControllerUi()
   m.inlineVideoMetadataOverlay.width = featuredRowPoster[0] + 4
   m.inlineVideoMetadataOverlay.height = featuredRowPoster[1] + 2
 
+  m.inlineVideoGridTitleLogo = m.top.findNode("inlineVideoGridTitleLogo")
+  m.inlineVideoGridTitleLogo.width = featuredRowPoster[0] + 4
+  m.inlineVideoGridTitleLogo.height = featuredRowPoster[1] + 2
+
   m.inlinePreviewFocusIndicator.height = m.constants.ui.featuredRow.playerSize[1]
 
   m.LinearPlayerGroup = m.top.findNode("LinearPlayerGroup")

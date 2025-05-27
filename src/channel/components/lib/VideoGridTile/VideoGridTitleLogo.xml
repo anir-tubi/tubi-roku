@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="VideoGridTitleLogo" extends="Group">
+
+  <script type="text/brightscript" uri="VideoGridTitleLogo.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+
+  <interface>
+    <field id="itemContent" type="node" />
+    <field id="width" alias="videoInGridGradient.width" />
+    <field id="height" alias="videoInGridGradient.height" />
+    <field id="itemHasFocus" type="boolean" />
+    <field id="showContentPoster" type="boolean" value="true" />
+  </interface>
+
+  <children>
+    <LayoutGroup
+      itemSpacings="[24]">
+
+      <Group 
+        id="posterGroup">
+        <Poster
+          id="videoInGridGradient"
+          loadDisplayMode="scaleToFill"
+          uri="pkg:/images/video_in_gri_gradient_$$RES$$.9.png"/>
+
+        <Poster
+          id="titleImage"
+          opacity="0"
+          loadDisplayMode="limitSize"/>
+
+        <LayoutGroup
+          opacity="0"
+          id="titleGroup">
+          <Label
+            id="title"
+            width="650"
+            vertAlign="bottom">
+            <Font
+              id="TitleFont"
+              role="font"/>
+          </Label>
+          <Label
+            id="subtitle"
+            width="650"
+            vertAlign="bottom">
+            <Font
+              id="SubTitleFont"
+              role="font"/>
+          </Label>
+        </LayoutGroup>
+      </Group>
+    </LayoutGroup>
+
+  </children>
+</component>
