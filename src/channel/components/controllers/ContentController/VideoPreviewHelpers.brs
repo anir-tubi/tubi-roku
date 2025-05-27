@@ -241,6 +241,13 @@ Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
 
     videoPreview.content = videoContent
     videoPreview.updateContent = true
+
+    if isKidsUIOn() = false AND content.parentId = experiment.container_id AND experiment.design_type = "withDescriptionPortraitSmall"
+      m.videoPreviewPlayer.videoPlayerType = "VIDEO_IN_GRID"
+    else
+      m.videoPreviewPlayer.videoPlayerType = "BANNER"
+    end if
+
     sendVideoPlayerCommand(videoPreview, "prebuffer")
   end if
 
@@ -254,7 +261,6 @@ Function updatePreviewPlayerToCondensedView()
     setPageInfoForVideoPreview(currentScreen.trackingPageInfo) ' this will help to trigger analytics
   end if
 
-  m.videoPreviewPlayer.videoPlayerType = "BANNER"
   m.videoPreviewPlayer.reParent(m.backgroundVideoPreviewPlayerContainer, false)
   m.videoPreviewPlayer.clippingRect = [0, 0, 1920, 1080]
   resizeToLocation(m.videoPreviewPlayer, 1120, 630, [799, 0], 0)
@@ -270,7 +276,6 @@ Function updatePreviewPlayerToInlineView()
       setPageInfoForVideoPreview(screen.trackingPageInfo)
     end if
 
-    m.videoPreviewPlayer.videoPlayerType = "VIDEO_IN_GRID"
     if m.videoPreviewPlayer.getParent().isSameNode(m.inlineVideoPreviewPlayerContainer) = false
       playerSize = m.constants.ui.featuredRow.playerSize
       m.videoPreviewPlayer.width = playerSize[0]
