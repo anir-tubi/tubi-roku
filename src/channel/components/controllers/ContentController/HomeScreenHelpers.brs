@@ -1310,6 +1310,7 @@ Function onFeaturedListHasFocusChange(msg)
     else
       onFeaturedRowCurrFocusColumnChange()
     end if
+    setUIBasedOnFocusedContent(content)
   else if isCurrentScreenHomeScreen() = true
     m.videoPreviewPlayer.visible = false
     m.inlinePreviewFocusIndicator.visible = false
