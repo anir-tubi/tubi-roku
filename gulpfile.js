@@ -1138,6 +1138,11 @@ function buildTestAccountCli(done) {
 }
 
 
+function runAutomatedAnalyticsTests(done) {
+  return automatedTests().runAutomatedAnalyticsTests(done);
+}
+
+
 function runAutomatedAnalyticsTestsCli(done) {
   return automatedTests().runAutomatedAnalyticsTestsCli(done);
 }
@@ -1158,6 +1163,7 @@ exports.outputAvailableAutomatedTestTags = outputAvailableAutomatedTestTags;
 exports.autotest = runAutomatedTestsCli;
 exports.buildTestAccount = buildTestAccountCli;
 exports.runAutomatedAnalyticsTestsCli = runAutomatedAnalyticsTestsCli;
+exports.runAutomatedAnalyticsTests = runAutomatedAnalyticsTests;
 exports.runAutomatedAnalyticsTestsForAdsCli = runAutomatedAnalyticsTestsForAdsCli;
 exports.runAutomatedTestsSmoke = runAutomatedTestsSmoke;
 

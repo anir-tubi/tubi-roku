@@ -249,6 +249,11 @@ function runAutomatedTestsSmoke(done) {
 }
 
 
+function runAutomatedAnalyticsTests(done) {
+  return runAutomatedTests(done, '', [], 'js/automated-tests/analytics/tests/*.ts');
+}
+
+
 async function runAutomatedTests(done, branch = '', tags = [], testsPath = 'js/automated-tests/tests/*.ts', shouldUseExistingBranch = false) {
   // Load env file to allow overrides while developing tests
   const envPath = '.vscode/.env';
@@ -463,5 +468,6 @@ module.exports = {
   runAutomatedTests,
   outputAvailableAutomatedTestTags,
   jsonReportOutputPath,
-  runAutomatedTestsSmoke
+  runAutomatedTestsSmoke,
+  runAutomatedAnalyticsTests
 };

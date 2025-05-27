@@ -62,8 +62,9 @@ export async function waitForClientImpressionEvent(filter: (impressionEvent: Imp
         if (args.url.includes('user-signals')) {
           console.log('Request intercepted', args.requestBody);
           checkMandatoryElements([args.requestBody]);
+          return filter(args.requestBody);
         }
-        return filter(args.requestBody)
+        return false;
       },
       processRequest(args) {
         console.log('Request intercepted', args.url);
