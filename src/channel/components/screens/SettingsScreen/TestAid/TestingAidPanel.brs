@@ -14,6 +14,7 @@ Function init()
 
   if theme <> invalid
     m.Menu.focusBitmapBlendColor = theme.focusedColor
+    m.focusedColor = theme.focusedColor
   end if
   ' Adding a transparent 1px image since leaving it empty causes roku to use it's default.
   ' We do not want to show unfocused background as per designs.
@@ -44,20 +45,22 @@ End Function
 
 
 Function onItemFocused(msg)
-  buttonFocused = msg.getData()
+  itemSelected = msg.GetData()
 
-  if buttonFocused = 0
+  item = m.Menu.Content.getChild(itemSelected)
+
+  if item.id = "viewRegistry"
     m.infoArea.text = "Current Registry values are printed by each section. Press OK to see full registry."
-  else if buttonFocused = 1
+  else if item.id = "clearRegistry"
     m.infoArea.text = "It will delete all the registry values and restart the app."
-  else if buttonFocused = 2
+  else if item.id = "showEnabledExp"
     currExperiments = getCurrentExperiments()
     m.infoArea.text = "Experiments enabled:" + chr(10) + chr(10) + currExperiments
-  else if buttonFocused = 3
+  else if item.id = "safeZone"
     m.infoArea.text = "It will overlay all the screens with safe zone guidelines."
-  else if buttonFocused = 4
+  else if item.id = "overlay"
     m.infoArea.text = "It will overlay a Grid of 10 px over all of the screens. If you want better control, use devOverlay.brs"
-  else if buttonFocused = 5
+  else if item.id = "addProxy"
     proxyInfo = "It will add/remove a proxy to the app and restart the app."
 
     if m.constants.settings.charlesProxyEnabled = true
@@ -65,9 +68,12 @@ Function onItemFocused(msg)
     else
       m.infoArea.text =  proxyInfo + chr(10) + "Current Proxy: None"
     end if
-  end if
+  else if item.id = "changeCountry"
+    m.infoArea.text = "Select the country. It will work for White listed IPs only. Contact CSS for whitelisting" + chr(10) + "Current Country: " + m.constants.deviceInfo.countryCode
 
-  displayProxyKB(buttonFocused = 5)
+  end if
+  showCountryList(item.id = "changeCountry")
+  displayProxyKB(item.id = "addProxy")
 End Function
 
 
@@ -97,7 +103,7 @@ Function removeProxy(msg)
     sections = registry.GetSectionList()
 
     for each sectionName in sections
-      if sectionName = m.constants.registrySectionIDs.proxySettings
+      if sectionName = m.constants.registrySectionIDs.settingsOverride
         registry.Delete(sectionName)
         registry.Flush()
         print sectionName + " is Deleted "
@@ -114,7 +120,7 @@ End Function
 Function addProxy(msg)
   ipAddress = msg.getData()
 
-  registrySection = CreateObject("roRegistrySection", m.constants.registrySectionIDs.proxySettings) ' Create a registry section object
+  registrySection = CreateObject("roRegistrySection", m.constants.registrySectionIDs.settingsOverride) ' Create a registry section object
   registrySection.write("charlesProxyEnabled", "true")
   registrySection.write("charlesProxyUrl", "http://" + ipAddress + ":8888")
   registrySection.flush()
@@ -127,16 +133,25 @@ End Function
 Function onKeyEvent(key as String, press as Boolean) as boolean
   handled = false
   if press = true
-    if key = "left" AND m.proxyinputDialog <> invalid AND m.proxyinputDialog.isInFocusChain() = true
-      m.Menu.setfocus(true)
-      handled = true
-    else if key = "right" AND m.Menu.hasFocus() = true AND m.proxyinputDialog <> invalid
-      m.proxyinputDialog.setFocus(true)
-      handled = true
+    if key = "left"
+      if m.proxyinputDialog <> invalid AND m.proxyinputDialog.isInFocusChain() = true
+        m.Menu.setfocus(true)
+        handled = true
+      else if m.countryListMenu <> invalid AND m.countryListMenu.isInFocusChain() = true
+        m.Menu.setFocus(true)
+        handled = true
+      end if
+    else if key = "right"
+      if m.Menu.hasFocus() = true AND m.proxyinputDialog <> invalid AND m.proxyinputDialog.visible = true
+        m.proxyinputDialog.setFocus(true)
+        handled = true
+      else if m.Menu.hasFocus() = true AND m.countryListMenu <> invalid AND m.countryListMenu.visible = true
+        m.countryListMenu.setFocus(true)
+        handled = true
+      end if
     end if
   end if
   return handled
-
 
 End Function
 
@@ -371,5 +386,111 @@ Function hideSafeZoneImage(safeZone)
   if safeZone <> invalid
     m.top.getScene().removeChild(safeZone)
   end if
+
+End Function
+
+
+Function showCountryList(show = false)
+  if show = true
+    if m.countryListMenu = invalid
+      m.countryListMenu = createObject("roSGNode", "markupList")
+      m.countryListMenu.numRows ="5"
+      m.countryListMenu.itemSize ="[585,72]"
+      m.countryListMenu.itemSpacing ="[0,8]"
+      m.countryListMenu.focusBitmapBlendColor = m.focusedColor
+      m.countryListMenu.itemComponentName ="CheckButton"
+      m.countryListMenu.vertFocusAnimationStyle = "floatingFocus"
+      m.countryListMenu.translation = "[700,200]"
+      m.countryListMenu.id = "countryListMenu"
+      countryList = createObject("roSGNode", "ContentNode")
+      countryList.id = "countryList"
+      item = createObject("roSGNode","ContentNode")
+      item.id = "US"
+      item.title = "United States"
+      countryList.appendChild(item)
+
+      item = createObject("roSGNode","ContentNode")
+      item.id = "GB"
+      item.title = "United Kingdom"
+      countryList.appendChild(item)
+
+      item = createObject("roSGNode","ContentNode")
+      item.id = "AU"
+      item.title = "Australia"
+      countryList.appendChild(item)
+
+      item = createObject("roSGNode","ContentNode")
+      item.id = "CA"
+      item.title = "Canada"
+      countryList.appendChild(item)
+
+      item = createObject("roSGNode","ContentNode")
+      item.id = "NZ"
+      item.title = "New Zealand"
+      countryList.appendChild(item)
+
+      item = createObject("roSGNode","ContentNode")
+      item.id = "MX"
+      item.title = "Mexico"
+      countryList.appendChild(item)
+
+      item = createObject("roSGNode","ContentNode")
+      item.id = "CR"
+      item.title = "Costa Rica"
+      countryList.appendChild(item)
+
+      item = createObject("roSGNode","ContentNode")
+      item.id = "GT"
+      item.title = "Guatemala"
+      countryList.appendChild(item)
+
+      item = createObject("roSGNode","ContentNode")
+      item.id = "EC"
+      item.title = "Ecuador"
+      countryList.appendChild(item)
+
+      item = createObject("roSGNode","ContentNode")
+      item.id = "PA"
+      item.title = "Panama"
+      countryList.appendChild(item)
+
+      item = createObject("roSGNode","ContentNode")
+      item.id = "SV"
+      item.title = "El Salvador"
+      countryList.appendChild(item)
+
+      item = createObject("roSGNode","ContentNode")
+      item.id = "OTHER"
+      item.title = "Other"
+      countryList.appendChild(item)
+
+      m.countryListMenu.content = countryList
+
+      m.top.appendChild(m.countryListMenu)
+      m.countryListMenu.observeFieldScoped("itemSelected", "onCountryListMenuChanged")
+    end if
+    m.countryListMenu.visible = true
+else
+  if m.countryListMenu <> invalid
+    m.countryListMenu.visible = false
+  end if
+end if
+End Function
+
+
+Function onCountryListMenuChanged(msg)
+  itemSelected = msg.getData()
+  if itemSelected <> invalid AND itemSelected >= 0
+    selectedCountry = m.countryListMenu.content.getChild(itemSelected).id
+  else
+    selectedCountry = "US"
+  end if
+
+
+  registrySection = CreateObject("roRegistrySection", m.constants.registrySectionIDs.settingsOverride) ' Create a registry section object
+  registrySection.write("sudoCountry", selectedCountry)
+  registrySection.flush()
+  'after registry been updated restart the app.
+  m.top.appRestartRequested = true
 
 End Function

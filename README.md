@@ -780,7 +780,7 @@ If set up correctly the first time your Roku sends a request to Charles, Charles
 
 ## Proxying Staging & Production
 
-As of 3.6.16 the Tubi application can now proxy requests in staging and production. To set the proxy run: `curl -d '' 'http://<ROKU-IP>:8060/launch/41468?setRegistry=%7B%22proxySettings%22%3A%7B%22charlesProxyEnabled%22%3A%22true%22%2C%22charlesProxyUrl%22%3A%22http%3A%2F%2F<COMPUTER-IP>%3A8888%22%7D%7D&password=499zsaHvENIYuEiVPMMa3S5w'` replacing `<ROKU-IP>` and `<COMPUTER-IP>` as appropriate. To remove the proxy run:
+As of 3.6.16 the Tubi application can now proxy requests in staging and production. To set the proxy run: `curl -d '' 'http://<ROKU-IP>:8060/launch/41468?setRegistry=%7B%22settingsOverride%22%3A%7B%22charlesProxyEnabled%22%3A%22true%22%2C%22charlesProxyUrl%22%3A%22http%3A%2F%2F<COMPUTER-IP>%3A8888%22%7D%7D&password=499zsaHvENIYuEiVPMMa3S5w'` replacing `<ROKU-IP>` and `<COMPUTER-IP>` as appropriate. To remove the proxy run:
 `curl -d '' 'http://<COMPUTER-IP>:8060/launch/41468?clearRegistry=true&password=499zsaHvENIYuEiVPMMa3S5w'` This will clear the entire registry which can be useful for other things as well. The application must not be running for these changes. To simplify using these commands if the application is running it will close. Running the command again will update the registry.
 
 >Note 41468 is channel id for the production channel. If you want to use on a staging channel you need to get the correct channel id and replace you can do so by running `http://<ROKU-IP>:8060/query/apps`
@@ -861,6 +861,34 @@ In a situation where the currently released version needs to be rolled back to t
   11. Follow the regular release deployment procress:
 
   - Deploy to the Roku CDN by running the Infra Script which is detailed in the [RCDN README file](https://github.com/adRise/rcdn#readme)..
+
+# In app dev tools
+  To access dev tools, got to sideNav->settings->TestAid. This menu is available for dev/qa/staging mode.
+
+## To Clear Registry:
+  if your app does not respond or has issues, please use settings->clear registry to start clean start of the app.
+
+## To change Country of the app
+ 1. To change the country of the app, first white list your public IP using
+  [Staging Allow List](https://livebook-apps.main-staging-custom.staging.k8s.tubi.io/apps/country-override-ip-list)
+
+  [Production Allow List](https://livebook-apps.main-production-custom.production.k8s.tubi.io/apps/country-override-ip-list)
+
+  These allow lists are gated behind Okta. If you don’t have access, you can request it from [Robert Brown](mailto:rbrown@tubi.tv) or [Zhihui Zhang](mailto:zhihuizhang@tubi.tv).
+
+  2. Make sure you have following variables set to true in respective yml.
+
+    useStarterComponents: true
+    useRemoteComponents: true
+
+  3. you can change the country using settings->Test Aid->Change Country
+
+  Note: To side load app into a country you can specify following variables in respective yml:
+
+    sudoCountry: "CA"
+    useStarterComponents: true
+    useRemoteComponents: true
+
 
 
 # Contributing

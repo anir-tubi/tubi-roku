@@ -67,6 +67,9 @@
             <CheckButtonContentNode
               id="addProxy"
               title="Add/Remove Proxy"/>
+            <CheckButtonContentNode
+              id="changeCountry"
+              title="Change Country"/>
           </ContentNode>
         </MarkupList>
 

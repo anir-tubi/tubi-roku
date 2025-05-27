@@ -30,6 +30,11 @@ settings:
   # setting printReqAndResInfo as true will print log for all api request information
   printReqAndResInfo: true
 
+  # Setting sudoCountry and restarting the app will change the country of the app. For this to work, your public IP address must be white listed in
+  # https://livebook-apps.main-staging-custom.staging.k8s.tubi.io/apps/country-override-ip-list
+  # please contact CSS if you do not have access to this tool.
+  # sudoCountry: "US"
+
   # To enable the Charles Proxy, set CharlesProxyEnabled true
   charlesProxyUrl: "http://{{localHostAddress}}:8888"
   charlesProxyEnabled: false

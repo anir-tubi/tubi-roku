@@ -42,7 +42,9 @@ End Function
 ' returns: boolean, true if the app should be restarted, false if the app should be closed
 Function runChannel(constants, log, request)
   startupArgs = {}
-  startupArgs.append(m.startupArgs)
+  if m.startupArgs <> invalid
+    startupArgs.append(m.startupArgs)
+  end if
   m.startupArgs = invalid
 
   ' Load scene graph

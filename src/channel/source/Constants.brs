@@ -20,15 +20,19 @@ Function getConstants()
     constants.registrySectionIDs.registrationByPass = "registrationByPass"
 
     ' Used for storing proxy settings
-    constants.registrySectionIDs.proxySettings = "proxySettings"
+    constants.registrySectionIDs.settingsOverride = "settingsOverride"
 
     ' Used to store overrides like for the external config like for disabling magiclink for Roku. Stores a json inside that needs to be parsed.
     constants.registrySectionIDs.overrides = "overrides"
 
-  proxySettings = RegReadAll(constants.registrySectionIDs.proxySettings)
-  if type(proxySettings) = "roAssociativeArray" AND proxySettings.charlesProxyEnabled <> invalid AND proxySettings.charlesProxyUrl <> invalid  then
-    constants.settings.charlesProxyEnabled = (proxySettings.charlesProxyEnabled = "true")
-    constants.settings.charlesProxyUrl = proxySettings.charlesProxyUrl
+    settingsOverride = RegReadAll(constants.registrySectionIDs.settingsOverride)
+  if type(settingsOverride) = "roAssociativeArray" AND settingsOverride.charlesProxyEnabled <> invalid AND settingsOverride.charlesProxyUrl <> invalid  then
+    constants.settings.charlesProxyEnabled = (settingsOverride.charlesProxyEnabled = "true")
+    constants.settings.charlesProxyUrl = settingsOverride.charlesProxyUrl
+  end if
+
+  if type(settingsOverride) = "roAssociativeArray" AND settingsOverride.sudoCountry <> invalid then
+    constants.settings.sudoCountry = settingsOverride.sudoCountry
   end if
 
   ' Roku's channel/app id for the production Tubi app. It is used with the continue watching feature to enable testing the feature in sideloaded/beta channels.

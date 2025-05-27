@@ -18,6 +18,7 @@ Function TubiRequest(settings = {mode: "production",CharlesProxyEnabled: false, 
     getLocale: tubihttp_getLocale_
     passThroughCharlesProxy: tubihttp_passThroughCharlesProxy
     removeCharlesProxy: tubihttp_removeCharlesProxy
+    sudoCountry: settings.sudoCountry
   }
 End Function
 
@@ -81,6 +82,9 @@ Function createAsyncHTTPRequest(url as String, name = "" as String, options={} a
       end if
       if mergedOptions[o].DoesExist("Accept-Language") = false
         mergedOptions[o].Append({"Accept-Language": m.getLocale()})
+      end if
+      if m.sudoCountry <> invalid
+        mergedOptions[o].Append({"x-sudo-country": m.sudoCountry})
       end if
     end if
 
