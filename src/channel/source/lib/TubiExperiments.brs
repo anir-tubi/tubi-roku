@@ -105,7 +105,7 @@ Function TubiExperiments(experimentsInfo) as Object
        'This experiment will not be under holdout and will clean up once we take the decision.
        roku_ymal_only_deeplink: {
         roku_ymal_only_deeplink_v1: {
-          default: {"enabled": false}
+          default: {"enabled": true}
           holdout_control: {"enabled": false}
           holdout_winning: {"enabled": false}}
       }
