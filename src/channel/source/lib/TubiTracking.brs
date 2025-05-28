@@ -893,8 +893,6 @@ Function tubiTracking_isEmptyValue(value)
       return true
     else if (type(value) = "roArray" OR type(value) = "roAssociativeArray") AND value.isEmpty()
       return true
-    else if m.isNumeric(value) AND value < 0
-      return true
     else
       return false
     end if

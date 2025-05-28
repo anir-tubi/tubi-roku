@@ -538,7 +538,11 @@ End Function
 Function playerLogLib_setVideoPosition(playerPosition = -1)
   if isNumber(playerPosition) = true AND isNumber(m.playerPositionWhenAdsCompleted) = true
     m.videoPosition = playerPosition
-    m.totalViewTime += 1
+
+    'we calculate tvt only when after video starts playing 
+    if m.lastStartStep <> "START_LOAD" AND m.lastStartStep <> "UNKNOWN"
+      m.totalViewTime += 1
+    end if
 
     'After 60 seconds to playback, the playerStage is set as IN_STREAM. the lastStartStep is set as PLAY_STARTED
     if playerPosition - m.playerPositionWhenAdsCompleted >= 60
