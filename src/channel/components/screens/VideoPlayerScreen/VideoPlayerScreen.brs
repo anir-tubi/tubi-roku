@@ -196,15 +196,13 @@ Function init()
     m.playerLogLib = PlayerLogLib(m.constants, m.Tracking)
   end if
 
-  'playerExitInfo has ad_counts, is_ad and is_buffering fields, which are used in player exit event
+  'playerExitInfo has ad_counts, is_ad fields, which are used in player exit event
   'ad_counts helps to find the total ads played during the single player session
   'is_ad helps to find out whether the Ad is displayed when user exit the player
-  'is_buffering helps to find out whether the Ad is buffering or playing when user exit the player
   'message_map helps to add additional logs which may be needed for debugging
   m.playerExitInfo = {
     ad_counts: 0
     is_ad: false
-    is_buffering: false
     message_map: {}
   }
 
@@ -989,13 +987,9 @@ Function onVideoStateChange(msg)
   updatePlayerLogLib(m.playerLogLib, "setVideoState", state)
 
   if state = "buffering"
-    m.playerExitInfo["is_buffering"] = true
     m.bufferingTimer.observeFieldScoped("fire", "onBufferingTimerFired")
     m.bufferingTimer.control = "start"
   else
-    if state = "playing"
-      m.playerExitInfo["is_buffering"] = false
-    end if
     ' setting startUpBuffering to false as this block will be triggered when the video is not buffering.
     m.startUpBuffering = false
     m.bufferingTimer.unobserveFieldScoped("fire")
@@ -3359,7 +3353,7 @@ Function onAdTrackingObject(msg)
     updatePlayerLogLib(m.playerLogLib, "fireAdCompleteEvent", adInfo)
   else if adStatus = "Error"
     'If the last ad in the ad pod returns an error, we need to reset is_buffering to false, as onAdBufferingObject won't be triggered afterward.
-    m.playerExitInfo["is_buffering"] = false
+    updatePlayerLogLib(m.playerLogLib, "setIsBuffering", false)
     if adInfo.rendertime = 0
       updatePlayerLogLib(m.playerLogLib, "setAdStartupFailureCount")
     end if
@@ -3381,13 +3375,15 @@ Function onAdBufferingObject(msg)
   adBufferingInfo = msg.getData()
   if isAA(adBufferingInfo) = true AND adBufferingInfo.eventType = "reBuffer"
     updatePlayerLogLib(m.playerLogLib, "incrementAdReBuffer")
+    updatePlayerLogLib(m.playerLogLib, "setIsBuffering", true)
+  else
+    updatePlayerLogLib(m.playerLogLib, "setIsBuffering", false)
   end if
 
   progress = adBufferingInfo.progress
   if progress = invalid 'progress field will not present on adBufferingInfo when Ad begins to buffer, so checking against invalid
     updatePlayerLogLib(m.playerLogLib, "setAdBufferStartTime")
   end if
-  m.playerExitInfo["is_buffering"] = (progress = invalid OR progress < 100)
 
   if m.isAdsOverlayExperimentEnabled = true
     ' Adding a check for optimization so that we do not have to perform find node always.
@@ -3414,7 +3410,6 @@ Function onExitPlayer(msg)
     m.playerExitInfo = {
       ad_counts: 0
       is_ad: false
-      is_buffering: false
       message_map: {}
     }
     m.top.exitReason = ""

@@ -23,6 +23,9 @@ Function PlayerLogLib(constants, tracking)
     playerFeedback: "" 'used in playerPageExit event
     lastStartStep: "UNKNOWN" 'used in qualityOfService event
 
+    'is_buffering is true when buffering occurs during content or ads without user action; otherwise, it is false.
+    isBuffering: false 'used in playerPageExit event
+
     streamBitrate: 0 'the current bitrate being used for streaming, used in userFeedback event
     measuredBitrate: 0 'actual bitrate that is being measured at the network level, used in userFeedback
 
@@ -171,6 +174,7 @@ Function PlayerLogLib(constants, tracking)
     updateCaptionIndex: playerLogLib_updateCaptionIndex
     setPlayerAction: playerLogLib_setPlayerAction
     setPlayerStateWhenExitingPlayer: playerLogLib_setPlayerStateWhenExitingPlayer
+    setIsBuffering: playerLogLib_setIsBuffering
 
     'ad
     setIsAd: playerLogLib_setIsAd
@@ -286,10 +290,14 @@ Function playerLogLib_setVideoState(videoState = "")
 
     if m.isVideoPlayed = true AND m.adState <> "adsCompleted" AND m.playerAction = ""
       m.setVideoBufferingStartTime()
+      m.isBuffering = true
+    else
+      m.isBuffering = false
     end if
 
   else if m.videoState = "playing"
     m.playerAction = ""
+    m.isBuffering = false
 
     if m.mostRecentBufferingTimer <> invalid
       mostRecentBufferDuration = m.mostRecentBufferingTimer.totalMilliseconds()
@@ -349,6 +357,7 @@ Function playerLogLib_setVideoState(videoState = "")
     end if
 
   else if m.videoState = "finished"
+    m.isBuffering = false
     m.isVideoPlayed = false 'reset isVideoPlayed for every new playback session
   end if
 End Function
@@ -806,6 +815,7 @@ Function playerLogLib_firePlayerPageExitEvent(playerExitInfo)
     playerExitInfo["has_error_modal"] = m.hasErrorModalShown
     playerExitInfo["content_counts"] = m.contentCount
     playerExitInfo["stage"] = m.playerStage
+    playerExitInfo["is_buffering"] = m.isBuffering
   
     if isNonEmptyString(m.playerFeedback) = true
       playerExitInfo["feedback"] = m.playerFeedback
@@ -837,6 +847,7 @@ Function playerLogLib_firePlayerPageExitEvent(playerExitInfo)
   m.contentCount = 0
   m.playerStage = "IDLE"
   m.playerFeedback = ""
+  m.isBuffering = false
 End Function
 
 
@@ -1628,4 +1639,14 @@ End Function
 'setTimeOnPlayerScreen marks the roTimeSpan
 Function playerLogLib_setTimeOnPlayerScreen()
   m.timeOnPlayerScreen.mark()
+End Function
+
+
+'@isBuffering: boolean, true/false - midbuffering of content/ad
+Function playerLogLib_setIsBuffering(isBuffering)
+  if isBoolean(isBuffering) = true
+    m.isBuffering = isBuffering
+  else
+    m.isBuffering = false      
+  end if
 End Function
