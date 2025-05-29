@@ -245,13 +245,6 @@ Function createAutoPreviewPanel()
   videoPreviewPanel.observeFieldScoped("autoPlayTimerItemSelected", "onAutoplayTimerItemSelected")
 
   videoPreviewPanel.width = m.rightPanelWidth
-  'if user has set Roku->settings->autoplay to off, then do not let them change tubi settings.
-  if m.constants.deviceInfo.IsAutoplayEnabled = true
-    videoPreviewPanel.focusable = true
-  else
-    videoPreviewPanel.focusable = false
-  end if
-
   videoPreviewPanel.hasNextPanel = false
   videoPreviewPanel.leftOnly = false
   videoPreviewPanel.selectButtonMovesPanelForward = false
