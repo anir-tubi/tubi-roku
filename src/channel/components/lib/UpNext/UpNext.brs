@@ -210,11 +210,12 @@ End Function
 
 Function onContentChange()
   tubiLog("UpNext.onContentChange")
-  if m.top.content <> invalid AND m.top.content.getChildCount() > 0
+  content = m.top.content
+  if content <> invalid AND content.getChildCount() > 0
     setThemeColors()  '//Update the theme every time the content changes to ensure the correct theme is used.
 
     bAutoStartExperimentEnabled = (getExperimentResource("roku_video_autostart_ui_refresh", "roku_video_autostart_ui_refresh_v1", false).enabled = true)
-    firstContent = m.top.content.getChild(0)
+    firstContent = content.getChild(0)
     if isNonEmptyString(firstContent.seriesId) = true
       ' show the episode experience
       m.MovieGroup.visible = false
@@ -248,10 +249,19 @@ Function onContentChange()
       m.timeRemaining = m.constants.player.upNextCountdownForSeries
       updateInfoPanel(m.InfoSeries, m.GridSeries.content.getChild(0))
     else
+
+      if bAutoStartExperimentEnabled = true
+        for i = 0 to content.getChildCount() - 1
+          item = content.getChild(i)
+          '//roku_video_autostart_ui_refresh_v1 - if this is graduated, then use the landscape URL instead of hdgridposterurl in UpNextPoster.brs. Get rid of this if/for loop.
+          item.hdgridposterurl = item.landscape
+        end for
+      end if
+
       ' show the movie experience
       m.MovieGroup.visible = true
       m.SeriesGroup.visible = false
-      m.GridMovie.content = m.top.content
+      m.GridMovie.content = content
       m.timeRemaining = m.constants.player.upNextCountdown
       updateInfoPanel(m.InfoMovie, m.GridMovie.content.getChild(0))
       if bAutoStartExperimentEnabled = true
