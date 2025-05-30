@@ -7,6 +7,7 @@ Function init()
   m.TextAndIconParentGroup = m.top.findNode("TextAndIconParentGroup")
   m.PlayerCountdownBground = m.top.findNode("PlayerCountdownBground")
   m.top.observeFieldScoped("seconds", "onSecondChange")
+  m.top.observeFieldScoped("maxSeconds", "onMaxSecondChange")
   m.top.observeFieldScoped("display", "onDisplayChange")
   m.top.observeFieldScoped("displayIcon", "onDisplayIconChange")
   m.top.observeFieldScoped("secondsTranslationId", "onSecondsTranslationIdChange")
@@ -94,6 +95,11 @@ Function onSecondChange()
 End Function
 
 
+Function onMaxSecondChange()
+  setBackgroundWidth()
+End Function
+
+
 Function onDisplayChange()
   if m.top.display = true
     fade(m.CountdownTimerParent, "in", .5, .5)
@@ -168,7 +174,11 @@ Function setSeconds(nSeconds)
   m.CountdownText.text = getTranslation(sTranslationId)
 
   m.CountdownSeconds.horizAlign="right"
-  if nSeconds >= 0 
+  if nSeconds >= 0
+    if m.top.maxSeconds < 0
+      '//Set the maxSeconds if had never been set and the number of seconds is greater than or equal to 0.
+      m.top.maxSeconds = nSeconds
+    end if
     m.CountdownSeconds.text = nSeconds.toStr()
   else
     m.CountdownSeconds.text = ""
