@@ -130,7 +130,7 @@ Function TubiExperiments(experimentsInfo) as Object
 
       'This experiment will not be under holdout and will clean up once we take the decision.
       roku_no_change_experiment: {
-        roku_no_change_experiment_v2: {
+        roku_no_change_experiment_v3: {
           default: {"enabled": false}
           holdout_control: {"enabled": false}
           holdout_winning: {"enabled": false}}
@@ -187,6 +187,8 @@ Function tubiExperiments_getNamespaceRequestInfo(constants)
   requestInfo = invalid
   namespaces = m.defaultResources
   url = constants.urls.experiments.evaluate + "?request_context.device_id=" + constants.deviceInfo.deviceId
+  url += "&request_context.platform=" + constants.analyticsPlatform
+  url += "&request_context.country=" + UCase(constants.deviceInfo.countryCode)
 
   nameSpaceQuery = ""
   for each namespace in namespaces
