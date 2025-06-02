@@ -102,7 +102,7 @@ Function clientErrorConfigCheckIfShouldRetryAfter(clientErrorConfig, url, method
         if isAA(conditionConfig) = true AND isAA(jsonBody) = true then
           allConditionChecksMet = true
           if isString(conditionConfig.response_code) = true then
-            if isString(jsonBody.response_code) <> true OR UCase(jsonBody.response_code) <> UCase(conditionConfig.response_code) then
+            if isString(jsonBody.code) <> true OR UCase(jsonBody.code) <> UCase(conditionConfig.response_code) then
               allConditionChecksMet = false
             end if
           end if
