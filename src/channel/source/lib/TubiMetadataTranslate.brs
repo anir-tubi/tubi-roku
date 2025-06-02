@@ -990,6 +990,9 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
     continueWatchingIndex = 4
     queueIndex = 5
 
+    isInUS = UCase(m.constants.deviceInfo.countryCode) = "US"
+    isUserInLinearNoShowExperiment = m.experiments <> invalid AND m.experiments.getExperimentResource("roku_linear_no_show", "roku_linear_no_show_v2").enabled = true
+
     'set up AAs for all categories
     for i = 0 to containers.count() - 1
       container = containers[i]
@@ -1005,7 +1008,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
         '//if continue watching container while user is signed out,
         ' then ensure row is empty except for 1 item that will entice users to sign in
         categoryAA = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode)
-      else if container.type = "linear" AND UCase(m.constants.deviceInfo.countryCode) = "US" AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_linear_no_show", "roku_linear_no_show_v2").enabled = true
+      else if container.type = "linear" AND isInUS = true AND isUserInLinearNoShowExperiment = true
         categoryAA = invalid
       else
         categoryAA = m.buildCategoryAAWithInsert(container, contents, "", "", false, contentMode, screenId, isSignedInUser, uiMode)
@@ -1467,6 +1470,8 @@ End Function
 '                       "contentsJson", a JSON formatted string of contents belonging to the container/category
 Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, contentsJson, parentGridItemType, bFullData, isSignedInUser = false, uiMode = "standard")
   childrenReturn = CreateObject("roArray", 0, false)
+  countryCode = UCase(m.constants.deviceInfo.countryCode)
+  isUserInLinearNoShowExperiment = m.experiments <> invalid AND m.experiments.getExperimentResource("roku_linear_no_show", "roku_linear_no_show_v2").enabled = false
 
   if type(container) = "roAssociativeArray" AND type(container.children) = "roArray"
     childrenReturn = CreateObject("roArray", container.children.count(), false)
@@ -1648,7 +1653,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             childAA.id = "0" + sFullChildID
           end if
 
-          if fullChild.type <> "l" OR (UCase(m.constants.deviceInfo.countryCode) = "US" AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_linear_no_show", "roku_linear_no_show_v2").enabled = false)
+          if fullChild.type <> "l" OR countryCode <> "US" OR isUserInLinearNoShowExperiment = false
             if childIsPushable = true and jsonAA <> invalid
               jsonAA[childAA.id] = fullChild
             end if
