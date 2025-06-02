@@ -1220,7 +1220,7 @@ Function onFeaturedRowCurrFocusColumnChange()
       end if
       m.videoPreviewPlayer.visible = false
       if getVideoPreviewState() = "playing"
-        pauseVideoPreview()
+        stopVideoPreview()
       end if
     end if
 
