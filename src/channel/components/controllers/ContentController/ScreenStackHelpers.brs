@@ -246,11 +246,7 @@ Function onScreenChange()
   processQueuedInAppMessage()
 
   updateInlineVideoMetadataOverlayVisibility()
-  ' We will make a call to listing api only if the initial home screen tensor api call returned the purple carpet container
-  ' and purpleCarpetContent is not equal to invalid.
-  if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND m.isApplicationSuspendInProgress = false AND currentScreen.content <> invalid AND getExperimentResource("roku_home_screen_if_modified_since", "roku_home_screen_if_modified_since_v1", false).enabled = true
-    fetchHomeScreen(currentScreen, true)
-  end if
+  
 End Function
 
 

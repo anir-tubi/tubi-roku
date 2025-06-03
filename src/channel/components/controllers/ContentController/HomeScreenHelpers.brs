@@ -283,7 +283,11 @@ End Function
 Function onLoadAllCategories(msg)
   tubiLog("HomeScreenHelpers.onLoadAllCategories")
   homeScreen = msg.getRoSGNode()
-  fetchHomescreen(homeScreen)
+  if getExperimentResource("roku_home_screen_if_modified_since", "roku_home_screen_if_modified_since_v1", false).enabled = true
+    fetchHomescreen(homeScreen, true)
+  else
+    fetchHomescreen(homeScreen)
+  end if
 End Function
 
 
