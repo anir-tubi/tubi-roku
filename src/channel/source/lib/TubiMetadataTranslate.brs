@@ -1471,7 +1471,7 @@ End Function
 Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, contentsJson, parentGridItemType, bFullData, isSignedInUser = false, uiMode = "standard")
   childrenReturn = CreateObject("roArray", 0, false)
   countryCode = UCase(m.constants.deviceInfo.countryCode)
-  isUserInLinearNoShowExperiment = m.experiments <> invalid AND m.experiments.getExperimentResource("roku_linear_no_show", "roku_linear_no_show_v2").enabled = false
+  isUserInLinearNoShowExperiment = m.experiments <> invalid AND m.experiments.getExperimentResource("roku_linear_no_show", "roku_linear_no_show_v2").enabled = true
 
   if type(container) = "roAssociativeArray" AND type(container.children) = "roArray"
     childrenReturn = CreateObject("roArray", container.children.count(), false)
