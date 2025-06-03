@@ -467,6 +467,12 @@ Function animate(target As Object, options as Object) As Object
       animation.control = "start"
       return animation
     else
+      if options.completeCallback <> invalid then
+        ' if we are not animating, then we need to call the complete callback immediately
+        completeCallback = options.completeCallback
+        completeCallback()
+      end if
+
       return invalid
     end if
   else
