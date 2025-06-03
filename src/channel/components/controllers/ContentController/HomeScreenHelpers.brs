@@ -751,7 +751,8 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
       end if
 
       if currentScreen.isSameNode(homeScreen) = true AND currentScreen.isInFocusChain() = true 'if there are any modals over home screen or focus has been lost to side nav
-        setVideoPreviewAfterFocus(focusedContent, currentScreen.trackingPageInfo)
+        componentTrackingInfo = getCategoryComponentTrackingInfo(currentScreen)
+        setVideoPreviewAfterFocus(focusedContent, currentScreen.trackingPageInfo, componentTrackingInfo)
       end if
 
       if bStopCountdownTimer = true
@@ -1247,15 +1248,7 @@ Function startFeaturedInlinePreview()
       if content.type = m.constants.ui.categoryTypes.linear AND m.constants.deviceInfo.isAutoPlayEnabled = true
         playLinearInlineGridView(content, screen)
       else
-        componentTrackingInfo = invalid
-        if screen.trackingComponentInfo <> invalid AND screen.trackingPageInfo <> invalid
-          componentTrackingInfo = screen.trackingComponentInfo
-          pageInfo = screen.trackingPageInfo
-          componentTrackingInfo = {
-            pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
-            componentOneof: m.Tracking.getAnalyticsComponent(componentTrackingInfo.componentType, componentTrackingInfo.componentValues)
-          }
-        end if
+        componentTrackingInfo = getCategoryComponentTrackingInfo(screen)
         setVideoPreviewAfterFocus(content, screen.trackingPageInfo, componentTrackingInfo)
       end if
     end if
@@ -1407,4 +1400,19 @@ Function onFeaturedRowListTranslationChange(msg)
       m.inlineVideoPreviewPlayerContainer.translation = [inlineVideoPreviewPlayerContainer[0], translation[1] + rectY - 6]
     end if
   end if
+End Function
+
+
+Function getCategoryComponentTrackingInfo(screen)
+  componentTrackingInfo = invalid
+  if screen <> invalid AND screen.trackingComponentInfo <> invalid AND screen.trackingPageInfo <> invalid
+    componentTrackingInfo = screen.trackingComponentInfo
+    pageInfo = screen.trackingPageInfo
+    componentTrackingInfo = {
+      pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+      componentOneof: m.Tracking.getAnalyticsComponent(componentTrackingInfo.componentType, componentTrackingInfo.componentValues)
+    }
+  end if
+
+  return componentTrackingInfo
 End Function

@@ -319,7 +319,8 @@ Function onSideNavItemSelected()
         currentScreen = getCurrentScreen()
         focusedContent = currentScreen.contentFocused
         if focusedContent <> invalid
-          setVideoPreviewAfterFocus(focusedContent, currentScreen.trackingPageInfo)
+          componentTrackingInfo = getCategoryComponentTrackingInfo(currentScreen)
+          setVideoPreviewAfterFocus(focusedContent, currentScreen.trackingPageInfo, componentTrackingInfo)
         end if
       end if
       
