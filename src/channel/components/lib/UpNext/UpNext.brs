@@ -188,7 +188,6 @@ Function onComponentFocus()
     m.focusBox.visible = true
   else if m.top.isInFocusChain() <> true
     m.top.itemFocused = 0
-    m.GridMovie.jumpToItem = 0
     m.isUpNextFocused = false
     m.GridMovie.setFocus(false)
     m.GridSeries.setFocus(false)
@@ -572,6 +571,7 @@ Function onShow()
     drawCountdown(m.CountdownSeries, m.timeRemaining)
   end if
 
+  m.GridMovie.jumpToItem = 0
   fade(m.UpNextGradient, "in", 1.0)
   slideFade(m.UpNextUI, "right", "in", 1.0)
 

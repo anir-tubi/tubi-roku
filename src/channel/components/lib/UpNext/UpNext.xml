@@ -95,8 +95,8 @@
       id="UpNextUI"
       opacity="0.0">
       <Group
-      id="UpNextParent"
-      translation="[0,540]">
+        id="UpNextParent"
+        translation="[0,540]">
         <!-- Movies shows a navigable grid with a few suggestions -->
         <Group
           id="UpNextMovieGroup"
