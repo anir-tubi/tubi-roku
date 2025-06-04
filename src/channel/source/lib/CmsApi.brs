@@ -355,23 +355,14 @@ End Function
 ' @containerGridItemType: String, gridItemType of the container for which we are making the request.
 ' @cursor: Integer, cursor value for lazy loading
 Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptions = {}, imageParamTypes = invalid, screenId = "", containerGridItemType = invalid, cursor = 0)
-  isLazyLoadExpEnabled = (m.experiments <> invalid AND m.experiments.getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v1").enabled = true)
   options = m.getCommonOptions(true)
   params = options.params
   url = m.constants.urls.tensor.cdn.container + "/" + categoryId
 
   params["is_kids_mode"] = bKidsMode
-  if isLazyLoadExpEnabled = true
-    params["cursor"] = cursor
-  else
-    params["cursor"] = 0
-  end if
+  params["cursor"] = cursor
   params["include_sponsorships"] = true
-  if screenId = m.constants.ui.screenIds.homeScreen AND isLazyLoadExpEnabled = true
-    params["contents_limit"] = m.constants.performance.categoryGridList.lazyLoadItemsPerBatch
-  else
-    params["contents_limit"] = m.constants.performance.categoryGridList.finalBlockSize
-  end if
+  params["contents_limit"] = m.constants.performance.categoryGridList.lazyLoadItemsPerBatch
   params["content_mode"] = ""
   params["limit_resolutions"] = m.constants.player.limitResolutions
   params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
@@ -591,8 +582,7 @@ End Function
 '
 ' returns batch requests
 Function cmsApi_createHomeScreenBatchReqInfo(homeScreen, index, bKidsMode = false, isSignedInUser = false, uiMode="standard")
-  isLazyLoadExpEnabled = (m.experiments <> invalid AND m.experiments.getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v1").enabled = true)
-  if index = 0 OR isLazyLoadExpEnabled = false
+  if index = 0
     m.categoryWindowSize = m.constants.performance.categoryGridList.categoryWindowSize
   else
     m.categoryWindowSize = 3
@@ -801,9 +791,8 @@ End Function
 Function cmsApi_createGetContainerContentsReqInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode, isVerticalLoad = false)
   categoryReqInfo = invalid
   paginationInfo = category.paginationInfo
-  isLazyLoadExpEnabled = (m.experiments <> invalid AND m.experiments.getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v1").enabled = true)
   ' Adding a check to allow only on horizontal scroll or initial vertical scroll if we have not fetched the container.
-  if category.state = "partial" OR category.state = "none" OR (isLazyLoadExpEnabled = true AND paginationInfo <> invalid AND paginationInfo.hasMoreContent = true AND (isVerticalLoad = false OR category.state <> "loaded") )
+  if category.state = "partial" OR category.state = "none" OR (paginationInfo <> invalid AND paginationInfo.hasMoreContent = true AND (isVerticalLoad = false OR category.state <> "loaded") )
     reqName = m.constants.reqNames.getCategory
 
     categoryId = m.getFullCategoryId(category)
@@ -827,7 +816,7 @@ Function cmsApi_createGetContainerContentsReqInfo(category, homeScreen, bKidsMod
 
       imageTypes = invalid
       cursor = 0
-      if paginationInfo <> invalid AND paginationInfo.cursor <> invalid AND isLazyLoadExpEnabled = true
+      if paginationInfo <> invalid AND paginationInfo.cursor <> invalid
         cursor = paginationInfo.cursor
       end if
       categoryReqInfo = m.createCategoryReqInfo(categoryId, bKidsMode, options, imageTypes, m.constants.ui.screenIds.homeScreen, category.gridItemType, cursor)

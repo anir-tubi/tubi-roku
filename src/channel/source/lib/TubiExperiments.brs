@@ -111,14 +111,6 @@ Function TubiExperiments(experimentsInfo) as Object
           holdout_winning: {"enabled": false}}
       }
 
-      'This experiment will not be under holdout and will clean up once we take the decision.
-      roku_home_screen_container_items_lazy_load: {
-        roku_home_screen_container_items_lazy_load_v1: {
-          default: {"enabled": false, "hide_counter": false}
-          holdout_control: {"enabled": false}
-          holdout_winning: {"enabled": false}}
-      }
-
       'This experiment will enable any skinAds wrapper campaigns.
       'ads_tubi_skins_v1 is enabled by default to ensure users see ads if no response from popper
       ads_tubi_skins: {

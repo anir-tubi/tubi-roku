@@ -1,28 +1,19 @@
 Function init()
   tubiLog("CategoryGridRowLabel.init")
-  m.ItemCount = m.top.findNode("ItemCount")
-  m.FocusIndex = m.top.findNode("FocusIndex")
   m.CategoryName = m.top.findNode("CategoryName")
   m.SponsorPoster = m.top.findNode("SponsorPoster")
   m.SponsoredBy = m.top.findNode("SponsoredBy")
   m.SponsoredByText = m.top.findNode("SponsoredByText")
   m.SponsoredByPoster = m.top.findNode("SponsoredByPoster")
-  m.CategoryCount = m.top.findNode("CategoryCount")
   m.subText = m.top.findNode("subText")
 
   m.top.observeFieldScoped("content", "onContentChange")
-  m.top.observeFieldScoped("currentIndex", "onIndexChange")
-  m.top.observeFieldScoped("isFullyLoaded", "onIsFullyLoaded")
-  m.top.observeFieldScoped("countTranslationXPos", "onCountTranslationXPosChanged")
 
   '//Keep a record of what the original transitions are for certain elements in case they need to be adjusted during sponsorships and then returned back to the original transition when the component does not have a sponsorship
   m.originalTranslation_CategoryName = m.CategoryName.translation
-  m.originalTranslation_CategoryCount = m.CategoryCount.translation
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.subText, typographyConstants.ids.bodySmall)
-  setTypographyOfLabel(m.FocusIndex, typographyConstants.ids.subheaderSmall)
-  setTypographyOfLabel(m.ItemCount, typographyConstants.ids.subheaderSmall)
   setTypographyOfLabel(m.SponsoredByText, typographyConstants.ids.bodySmall)
   setTypographyOfLabel(m.CategoryName, typographyConstants.ids.subheaderMedium)
 
@@ -30,8 +21,6 @@ Function init()
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
   onThemeChange()
-
-  m.isLazyLoadExpInfo = getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v1", false)
 End Function
 
 
@@ -43,7 +32,6 @@ Function onThemeChange(msg = invalid)
   end if
 
   if theme <> invalid
-    m.FocusIndex.color = theme.focusedColor
     m.subText.color = theme.primaryTextColor
     m.CategoryName.color = theme.primaryTextColor
   end if
@@ -75,7 +63,6 @@ Function onContentChange()
 
     '//reset translations back to the original locations
     m.CategoryName.translation = m.originalTranslation_CategoryName
-    m.CategoryCount.translation = m.originalTranslation_CategoryCount
 
     m.CategoryName.width = 1000
     m.subText.visible = false
@@ -114,7 +101,6 @@ Function onContentChange()
       m.SponsoredBy.visible = true
       m.SponsorPoster.visible = true
       m.CategoryName.translation = [m.SponsoredBy.translation[0], 7]
-      m.CategoryCount.translation = [m.CategoryCount.translation[0], 72]
       m.SponsoredBy.translation = [m.SponsoredBy.translation[0], 74]
     else
       '//reset the assets in case the label is reused for other container rows that do not have sponsorships
@@ -129,71 +115,5 @@ Function onContentChange()
       m.SponsoredByPoster.height = 0
       m.SponsoredBy.translation = [m.SponsoredBy.translation[0], 0]
     end if
-
-    drawItemCount()
-
-    gridItemType = item.gridItemType
-    if (gridItemType = "linear" OR gridItemType = "continue_watching_signed_out_user" OR gridItemType = "emptyContainer" OR gridItemType = "featuredPortraitSmall" OR (m.isLazyLoadExpInfo.enabled = true AND m.isLazyLoadExpInfo.hide_counter = true)) = false
-      m.CategoryCount.visible = true
-    else
-      m.CategoryCount.visible = false
-    end if
-
   end if
-End Function
-
-
-Function drawItemCount()
-  category = m.top.content
-  cursorIndex = category.focusIndex
-  if cursorIndex = invalid or cursorIndex = -1 then
-    cursorIndex = 0
-  end if
-  totalItems = category.getChildCount()
-  if totalItems > 0
-    if m.isLazyLoadExpInfo.enabled = true AND m.isLazyLoadExpInfo.hide_counter = false AND category.paginationInfo <> invalid AND category.paginationInfo.hasMoreContent = true
-      m.ItemCount.text = " " + Chr(&hb7) + " " + stri(totalItems).trim() + "+"
-    else
-      m.ItemCount.text = " " + Chr(&hb7) + " " + stri(totalItems).trim()
-    end if
-    m.FocusIndex.text = stri(cursorIndex + 1).trim()
-  else
-    ' It's odd to see '0 of 0' so we hide the counter
-    m.ItemCount.text = ""
-    m.FocusIndex.text = ""
-  end if
-End Function
-
-
-Function onIndexChange(msg)
-  tubiLog("CategoryGridRowLabel.onIndexChange")
-  focusIndex = msg.GetData()
-  if focusIndex >= 0
-    m.FocusIndex.text = stri(focusIndex + 1).trim()
-  end if
-End Function
-
-
-Function onIsFullyLoaded(msg)
-  isFullyLoaded = msg.getData()
-
-  if m.ItemCount.text <> ""
-
-    if isFullyLoaded = false
-      m.ItemCount.text = m.ItemCount.text + "+"
-    else
-      countStr = m.ItemCount.text 'Not sure why directly calling replace does not work
-      m.ItemCount.text = countStr.Replace("+", "")
-    end if
-
-  end if
-
-End Function
-
-
-'//Change the horizontal position of the count UI element
-Function onCountTranslationXPosChanged(msg)
-  XPos = msg.getData()
-  m.originalTranslation_CategoryCount = [XPos, m.originalTranslation_CategoryCount[1]]
-  m.CategoryCount.translation = [XPos, m.CategoryCount.translation[1]]
 End Function

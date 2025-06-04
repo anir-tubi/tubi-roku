@@ -46,7 +46,6 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     getBackgroundImages: tubiMetadataTranslate_getBackgroundImages
     getTitleImageUrl: tubiMetadataTranslate_getTitleImageUrl
     checkIfUserIsInRegistrationByPassMode: tubiMetadataTranslate_checkIfUserIsInRegistrationByPassMode
-    getInitialBlockSize: tubiMetadataTranslate_getInitialBlockSize
   }
 End Function
 
@@ -1396,7 +1395,7 @@ Function tubiMetadataTranslate_buildCategoryParentInfo(container, sOrientation =
     ' the metadata for the category
     sTitle = container.title
 
-    initialBlockSize = m.getInitialBlockSize()
+    initialBlockSize = m.constants.performance.categoryGridList.initialBlockSize
 
     updateMetadata = {
       id: container.id
@@ -1783,7 +1782,7 @@ End Function
 Function tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA(container, bKidsMode = false)
   updateMetadata = {}
   if container <> invalid
-    initialBlockSize = m.getInitialBlockSize()
+    initialBlockSize = m.constants.performance.categoryGridList.initialBlockSize
     updateMetadata = {
       id: container.id
       slug: container.slug
@@ -1842,7 +1841,7 @@ End Function
 Function tubiMetadataTranslate_buildEmptyMyStuffCategoryAA(container)
   updateMetadata = {}
   if container <> invalid
-    initialBlockSize = m.getInitialBlockSize()
+    initialBlockSize = m.constants.performance.categoryGridList.initialBlockSize
     updateMetadata = {
       id: container.id
       slug: container.slug
@@ -2845,16 +2844,4 @@ Function tubiMetadataTranslate_translateSearchResults(contentToTranslate, isSign
   end if
 
   return translated
-End Function
-
-
-Function tubiMetadataTranslate_getInitialBlockSize()
-  isExperimentEnabled = (m.experiments <> invalid AND m.experiments.getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v1").enabled = true)
-  initialBlockSize = m.constants.performance.categoryGridList.initialBlockSize
-
-  if initialBlockSize > 0 AND isExperimentEnabled = true
-    initialBlockSize = 7
-  end if
-
-  return initialBlockSize
 End Function

@@ -25,17 +25,8 @@ Function init()
   m.homeScreenDesignType = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false).design_type
   m.isWithDescPortraitSmallExpEnabled = (m.homeScreenDesignType = "withDescriptionPortraitSmall")
 
-  ' Parameters for the metadata block cache. Window size is number of items to fetch, page delimiter
-  ' is what focus thresholds trigger a fetch.
-  m.initialBlockSize = m.constants.performance.categoryGridList.initialBlockSize
-  m.finalBlockSize = m.constants.performance.categoryGridList.finalBlockSize
-  m.eagerLoad = m.constants.performance.categoryGridList.eagerLoad
-
-  ' If eager loading, we don't need to listen for row changes
-  if not m.eagerLoad OR getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v1", true).enabled = true
-    m.RowList.observeFieldScoped("itemFocused", "onItemFocused")
-    m.FeaturedRowList.observeFieldScoped("itemFocused", "onFeaturedItemFocused")
-  end if
+  m.RowList.observeFieldScoped("itemFocused", "onItemFocused")
+  m.FeaturedRowList.observeFieldScoped("itemFocused", "onFeaturedItemFocused")
 
   experimentsInfo = getExperimentsInfoFromGlobal()
   experiments = TubiExperiments(experimentsInfo)
@@ -696,12 +687,6 @@ Function onCategoryResponseInBatch(msg) As Void
       end if
     end for
 
-    if m.eagerLoad then
-      if getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v1", false).enabled = false
-        m.top.loadCategoriesIndex = batchMaxIndex + 1
-      end if
-    end if
-
     if m.top.content <> invalid
       if removableCategories.count() > 0
         for i = m.top.content.getChildCount() - 1 to 0 step -1
@@ -718,7 +703,6 @@ Function onCategoryResponseInBatch(msg) As Void
     if m.RowList.content = invalid then
       m.RowList.content = m.top.content
     else if m.RowList.currFocusColumn > -1
-      ' TODO: Remove if we do not graduate roku_home_screen_container_items_lazy_load_v1 experiment.
       ' This mainly happens because of reloading of the content in the category.
       category = m.RowList.content.getChild(m.RowList.currFocusRow)
       if category <> invalid AND category.focusIndex <> m.RowList.currFocusColumn

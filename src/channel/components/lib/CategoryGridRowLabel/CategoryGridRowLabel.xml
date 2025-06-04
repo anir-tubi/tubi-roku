@@ -82,28 +82,6 @@
         id="SponsoredByPoster"
         visible="false"/>
     </LayoutGroup>
-    <LayoutGroup
-      id="CategoryCount"
-      layoutDirection="horiz"
-      horizAlignment="right"
-      translation="[1593,12]">
-      <Label
-        id="FocusIndex"
-        text=""
-        height="0"
-        horizAlign="right">
-        <Font
-          role="font"/>
-      </Label>
-      <Label
-        id="ItemCount"
-        text=""
-        height="0"
-        horizAlign="right">
-        <Font
-          role="font"/>
-      </Label>
-    </LayoutGroup>
 
   </children>
 </component>

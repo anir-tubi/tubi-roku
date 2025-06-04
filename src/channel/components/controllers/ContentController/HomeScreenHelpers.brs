@@ -341,13 +341,7 @@ Function fetchHomeScreen(homeScreen, useCache = false)
       params["group_size"] = m.constants.settings.numContainers
     end if
 
-    initialBlockSize = m.constants.performance.categoryGridList.initialBlockSize
-
-    if initialBlockSize > 0 AND getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v1", true).enabled = true
-      initialBlockSize = 7
-    end if
-
-    params[limitParamName] = initialBlockSize
+    params[limitParamName] = m.constants.performance.categoryGridList.initialBlockSize
 
     if homeScreen <> invalid AND homeScreen.content <> invalid AND useCache = true AND homeScreen.content.lastModified <> invalid AND getExperimentResource("roku_home_screen_if_modified_since", "roku_home_screen_if_modified_since_v1", false).enabled = true
       headers["If-Modified-Since"] = homeScreen.content.lastModified
@@ -454,8 +448,6 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     homeScreen.content = rawResponse
 
     onHomeScreenContentUpdateComplete(homeScreen.id)
-    
-    getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v1", true)
 
     getExperimentResource("roku_no_change_experiment", "roku_no_change_experiment_v3", true)
 
