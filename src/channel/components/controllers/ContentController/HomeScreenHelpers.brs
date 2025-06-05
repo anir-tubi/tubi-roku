@@ -283,11 +283,8 @@ End Function
 Function onLoadAllCategories(msg)
   tubiLog("HomeScreenHelpers.onLoadAllCategories")
   homeScreen = msg.getRoSGNode()
-  if getExperimentResource("roku_home_screen_if_modified_since", "roku_home_screen_if_modified_since_v1", false).enabled = true
-    fetchHomescreen(homeScreen, true)
-  else
-    fetchHomescreen(homeScreen)
-  end if
+
+  fetchHomescreen(homeScreen, true)
 End Function
 
 
@@ -343,7 +340,7 @@ Function fetchHomeScreen(homeScreen, useCache = false)
 
     params[limitParamName] = m.constants.performance.categoryGridList.initialBlockSize
 
-    if homeScreen <> invalid AND homeScreen.content <> invalid AND useCache = true AND homeScreen.content.lastModified <> invalid AND getExperimentResource("roku_home_screen_if_modified_since", "roku_home_screen_if_modified_since_v1", false).enabled = true
+    if homeScreen <> invalid AND homeScreen.content <> invalid AND useCache = true AND homeScreen.content.lastModified <> invalid
       headers["If-Modified-Since"] = homeScreen.content.lastModified
     end if
 
@@ -362,7 +359,8 @@ Function fetchHomeScreen(homeScreen, useCache = false)
       uiMode: m.uiMode
     })
 
-    if useCache = false
+    if useCache = false 
+
       homeScreen.resetContentAreaValues = true
       setHomeScreenLoading(homeScreen)
     end if
@@ -451,7 +449,6 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
 
     getExperimentResource("roku_no_change_experiment", "roku_no_change_experiment_v3", true)
 
-    getExperimentResource("roku_home_screen_if_modified_since", "roku_home_screen_if_modified_since_v1", true)
   end if
 End Function
 
@@ -1404,10 +1401,12 @@ Function getCategoryComponentTrackingInfo(screen)
   if screen <> invalid AND screen.trackingComponentInfo <> invalid AND screen.trackingPageInfo <> invalid
     componentTrackingInfo = screen.trackingComponentInfo
     pageInfo = screen.trackingPageInfo
-    componentTrackingInfo = {
-      pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
-      componentOneof: m.Tracking.getAnalyticsComponent(componentTrackingInfo.componentType, componentTrackingInfo.componentValues)
-    }
+    if isNonEmptyString(pageInfo.pageType) = true AND isNonEmptyString(componentTrackingInfo.componentType) = true
+      componentTrackingInfo = {
+        pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+        componentOneof: m.Tracking.getAnalyticsComponent(componentTrackingInfo.componentType, componentTrackingInfo.componentValues)
+      }
+    end if
   end if
 
   return componentTrackingInfo

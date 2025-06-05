@@ -213,6 +213,7 @@ Function onScreenFocusChange()
     if m.CategoryGridList.content <> invalid
       if shouldRefresh(m.CategoryGridList.content) = true
         m.top.loadAllCategories = true
+        
       else 'check if any containers has expired
         refreshHomeScreenContainers()
       end if
