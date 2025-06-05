@@ -73,5 +73,7 @@
               content = content playing
         -->
         <field id="nowPlaying" type="string" value="content" />
+
+         <field id="trackAdEvent"  type="assocarray" alwaysNotify="true"/>
     </interface>
 </component>

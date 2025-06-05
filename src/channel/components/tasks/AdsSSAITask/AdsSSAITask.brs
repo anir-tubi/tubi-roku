@@ -47,6 +47,8 @@ Function execAdsSSAITask()
   ' have multiple segments, but ID3 tags only give us the position within a single segment.
   m.positionWithinAd = 0
 
+  m.totalAdDuration = 0
+
   ' ad pod as returned by raf.getAds()[0]
   ' see https://developer.roku.com/en-gb/docs/developer-program/advertising/integrating-roku-advertising-framework.md#ad-structure
   m.adPod = {}
@@ -168,6 +170,7 @@ Function pollForAds(url)
   if isNonEmptyString(url) = true AND m.isPlayingAds <> true AND m.isPlayingAdFiller <> true then
     ' Retrieves ads and also sets m.notUsedAdPodPixels
     adPods = m.adLib.retrieveAds(url, m.ssaiUsed)
+
     if adPods <> invalid AND adPods.count() > 0
       if adPods[0].ads <> invalid
         m.adPod = adPods[0]
@@ -427,6 +430,7 @@ Function resetAdState()
   updateNowPlaying("content")
   m.currentAdInPod = invalid 'will be populated with an ad AA taken from the ad pod parsed from the VAST response'
   m.adPod = {}
+  m.totalAdDuration = 0
   m.positionAtLastId3 = -1
   m.pixelRecordForAd = {}
 End Function
@@ -437,7 +441,6 @@ Function handleStartAdTracking()
   if m.currentAdInPod <> invalid
 
     ssaiAdId = m.currentAdInPod.ssaiId
-
 
     if m.pixelRecordForAd[ssaiAdId] = invalid
       ' add the pixel record state for the new ad
@@ -461,8 +464,40 @@ Function handleStartAdTracking()
       exit_type: "AUTO" 'Reason enum
       is_fullscreen: m.videoIsFullscreen
     }
-
     m.tracking.trackUserEvent("start_ad", startAdValues, m.requestQueue)
+
+    ad = m.currentAdInPod
+    adDuration = ad.duration
+    m.totalAdDuration += adDuration
+    podCount = m.adPod.ads.count()
+
+    if ad.streams <> invalid AND ad.streams[0] <> invalid
+      adUrl = ad.streams[0].url
+    else
+      adUrl = ""
+    end if
+
+    if isNonEmptyString(m.ssaiUsed) = true
+      ssaiVersion = m.constants.player.linear.ssaiVersion[lcase(m.ssaiUsed)]
+    else
+      ssaiVersion = m.constants.player.linear.ssaiVersion.unknown
+    end if
+
+    adInfo = {
+      ad_id: ad.adid
+      url: adUrl
+      ad_index: ad.sequence
+      ad_count: podCount
+      duration: ad.duration
+      ssai_version: ssaiVersion
+    }
+
+    trackAdEvent = {
+      adType: "adStart"
+      adInfo: adInfo
+    }
+
+    m.top.trackAdEvent = trackAdEvent
   end if
 End Function
 
@@ -540,8 +575,56 @@ Function handleFinishAdTrackingOnComplete()
     ' send 4th quartile/completed ad pixels and any previous pixels from the ad that were not fired
     fireCurrentAndPreviousPixels(m.currentAdInPod, pixelRecord, 1.0)
 
+    ad = m.currentAdInPod
+    podCount = m.adPod.ads.count()
+
+    if ad.streams <> invalid AND ad.streams[0] <> invalid
+      adUrl = ad.streams[0].url
+    else
+      adUrl = ""  
+    end if
+
+    if isNonEmptyString(m.ssaiUsed) = true
+      ssaiVersion = m.constants.player.linear.ssaiVersion[lcase(m.ssaiUsed)]
+    else
+      ssaiVersion = m.constants.player.linear.ssaiVersion.unknown
+    end if
+
+    adInfo = {
+      ad_id: ad.adid
+      url: adUrl
+      ad_index: ad.sequence
+      ad_count: podCount
+      duration: ad.duration
+      ssai_version: ssaiVersion
+    }
+
+    trackAdEvent = {
+      adType: "adComplete"
+      adInfo: adInfo
+    }
+
+    m.top.trackAdEvent = trackAdEvent
+
     ' send FinishAdEvent tracking
     sendFinishAdAnalytics(m.currentAdInPod)
+
+    if ad.sequence = podCount
+
+      adInfo = {
+        total_count: podCount
+        total_ads_duration: m.totalAdDuration
+        ssai_version: ssaiVersion
+      }
+
+      trackAdEvent = {
+        adType: "adPodComplete"
+        adInfo: adInfo
+      }
+
+      m.top.trackAdEvent = trackAdEvent
+    end if
+
   end if
 End Function
 

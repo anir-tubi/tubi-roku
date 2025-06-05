@@ -324,6 +324,12 @@ Function getLiveStreamManifest(streamUrl)
   tubiLog("LinearVideoPlayerScreenHelpers.getLiveStreamManifest")
   liveManifestReqType = m.constants.reqNames.getLiveManifest
 
+  if m.manifestLoadTimer = invalid
+    m.manifestLoadTimer = CreateObject("roTimespan")
+  end if
+
+  m.manifestLoadTimer.mark()
+
   if isString(streamUrl)
     streamUrl = streamUrl.trim()
   end if
@@ -346,6 +352,7 @@ Function onLiveStreamManifestResponse(response)
     ' ("analytics url" is the YoSpace name for the url that will be polled for ad responses)
     pollUrl = invalid
     ssaiUsed = "yospace"
+    manifestLoadedTime = m.manifestLoadTimer.totalMilliseconds()
 
     lines = response.res.split(chr(10))
     for each line in lines
@@ -378,6 +385,7 @@ Function onLiveStreamManifestResponse(response)
 
     content = invalid
     if videoPlayer <> invalid then
+      videoPlayer.manifestLoadedTime = manifestLoadedTime
       content = videoPlayer.content
 
       ' piece together the modified playback url
@@ -406,6 +414,7 @@ Function onLiveStreamManifestResponse(response)
                 ' session id, we need to use the original YoSpace stream url and not the video resource url
                 ' provided by UAPI. We get the original YoSpace stream url from the "location" header since
                 ' it is a redirect.
+
                 if response.headers <> invalid AND response.headers.location <> invalid
                   originalUrl = m.request.removeCharlesProxy(response.headers.location) ' Remove Charles proxy appended by Charles rule for clean redirect.
                 else
@@ -448,6 +457,7 @@ Function onManifestError(error)
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   if videoPlayer <> invalid
     code = invalid
+
     if error <> invalid
       code = error.code
     end if
@@ -732,8 +742,6 @@ Function stopLinearVideoContent()
     videoPlayer.loading = false
     videoPlayer.unobserveFieldScoped("sendVideoTrackingStart")
     videoTrackingStop() 'stops youbora tracking
-
-
 
     ' asyncStopSemantics was broken prior to 14.0 so we are not running it on older firmware versions
     isFirmwareOk = createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14

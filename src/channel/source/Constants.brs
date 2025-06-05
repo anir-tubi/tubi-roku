@@ -492,9 +492,9 @@ Function getConstants()
   constants.urls = {}
     'ad server url
     constants.urls.adsBaseUrlRainmaker = "https://rainmaker.staging-public.tubi.io/api/v2/rev/vod/"
-    if constants.settings.mode = "production" or constants.settings.mode = "staging"
+    'if constants.settings.mode = "production" or constants.settings.mode = "staging"
       constants.urls.adsBaseUrlRainmaker = "https://rainmaker.production-public.tubi.io/api/v2/rev/vod/"
-    end if
+    'end if
 
     'pause ad server url
     constants.urls.pauseAdsUrl = "https://ads.production-public.tubi.io/pause/v1/" + constants.analyticsPlatform
@@ -996,6 +996,17 @@ Function getConstants()
         constants.player.linear.comingUpInsideInfoPanelDuration = 300
         ' duration (in seconds) of coming up panel displayed outside info panel
         constants.player.linear.comingUpOutsideInfoPanelDuration = 15
+
+        'Linear ssai version
+        constants.player.linear.ssaiVersion = {}
+        constants.player.linear.ssaiVersion.unknown = 0
+        constants.player.linear.ssaiVersion.apollo = 1
+        constants.player.linear.ssaiVersion.youspace = 2   
+
+        'Linear player_type
+        constants.player.linear.player_type_unspecified = 0
+        constants.player.linear.player_type_default = 1
+        constants.player.linear.player_type_banner = 2  
 
       'Hdcp version
       constants.player.hdcpVersion = {}

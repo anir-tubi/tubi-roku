@@ -23,12 +23,15 @@ Function init()
   m.AdsSSAITask = m.top.findNode("PlayerAdsSSAITask")
   m.top.task = m.AdsSSAITask
   m.AdsSSAITask.observeField("nowPlaying", "onAdChange")
+  m.AdsSSAITask.observeField("trackAdEvent", "onTrackAdEventChange")
 
   m.Video = m.top.findNode("VideoNode") ' reference in case we change from extending Video to extending Group
   m.Video.observeFieldScoped("position", "onVideoPositionChange")
   m.Video.observeField("state", "onVideoStateChange")
   m.Video.observeField("bufferingStatus", "onBufferingStatus")
   m.Video.observeField("timedMetaData", "onId3")
+  'downloadedSegment is needed for live player log - Quality Of Service event
+  m.Video.observeFieldScoped("downloadedSegment", "onDownloadedSegment")
 
   ' asyncStopSemantics was broken prior to 14.0 so we are not running it on older firmware versions
   isFirmwareOk = createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
@@ -96,6 +99,15 @@ Function init()
   ' content = content playing
   m.isPlayingAdsPreviousState = "content"
   m.isPlayingAdsCurrentState = "content"
+
+  request = TubiRequest(m.constants.settings)
+  auth = TubiAuth(m.constants)
+  m.Tracking = TubiTracking(m.constants, auth, {}, request)
+  m.playerLogLib = invalid
+
+  if m.constants.settings.clientLogsEnabled = true
+    m.playerLogLib = LivePlayerLogLib(m.constants, m.Tracking)
+  end if
 End Function
 
 
@@ -156,7 +168,6 @@ End Function
 Function playContent()
   tubiLog("LinearVideoPlayerScreen.playContent")
   m.lastButtonPressPos = 0
-
   content = m.Video.content
 
   'start_live_video user event analytics
@@ -166,7 +177,6 @@ Function playContent()
   end if
 
   isFullScreen = m.top.fullScreen
-
   videoPlayerType = "DEFAULT"
   if isFullScreen = false
     videoPlayerType = "BANNER"
@@ -308,20 +318,25 @@ End Function
 
 Function onControlChange()
   tubiLog("LinearVideoPlayerScreen.onControlChange " + m.top.control)
-  if m.top.control = "play"
+  control = m.top.control
+  updatePlayerLogLib(m.playerLogLib, "setVideoControl", control)
+
+  if control = "play"
+    updatePlayerLogLib(m.playerLogLib, "setManifestLoadedTime", m.top.manifestLoadedTime)
     if m.top.content <> invalid
       prepareToStartVideo(m.top.content)
+      updatePlayerLogLib(m.playerLogLib, "setLastStartStep", "START_LOAD")
       playContent()
     end if
 
-  else if m.top.control = "stop" then
+  else if control = "stop" then
     m.AdsSSAITask.playbackStopped = true
     stopVideo()
-  else if m.top.control = "pause" then
+  else if control = "pause" then
     pauseVideo()
-  else if m.top.control = "resume" AND m.Video.state = "paused" then
+  else if control = "resume" AND m.Video.state = "paused" then
     resumeFromPause()
-  else if m.top.control = "error"
+  else if control = "error"
     stopVideo()
     m.top.errorMsg = getTranslation("videoPlayer_error_playback_description") 'is used in error modal
     m.top.state = "error"
@@ -334,6 +349,8 @@ Function onVideoStateChange(msg)
 
   state = msg.GetData()
   tubiLog("LinearVideoPlayerScreen.onVideoStateChange, state = " + state)
+
+  updatePlayerLogLib(m.playerLogLib, "setVideoState", state)
 
   sPreviousState = m.top.state
   if state = "finished" AND m.VideoState = "play"
@@ -364,6 +381,8 @@ Function onVideoStateChange(msg)
     logError(jsonErrorInfo, "videoPlayback", "video-playback", 0.1)
 
     m.top.sendYouboraError = true
+    
+    updatePlayerLogLib(m.playerLogLib, "setBreakOffError", m.Video.errorCode)
 
     ' Set up the next DRM scheme. Playback of next DRM scheme is triggered when state = "finished",
     ' right after error state occurs.
@@ -374,6 +393,8 @@ Function onVideoStateChange(msg)
     end if
 
     if m.didAdvanceDrm <> true
+      updatePlayerLogLib(m.playerLogLib, "setErrorCode", m.Video.errorCode)
+      updatePlayerLogLib(m.playerLogLib, "setErrorModal", true)
       m.top.errorMsg = getTranslation("videoPlayer_error_playback_description") 'is used in error modal
       m.top.state = state 'triggers error modal in ContentController
     end if
@@ -470,6 +491,7 @@ Function onVideoPositionChange(msg)
   end if
 
   m.positionArr.push(position)
+  updatePlayerLogLib(m.playerLogLib, "setVideoPosition", position)
 
   ' protects against video positions being updated after we've told the player to pause
   if m.VideoState = "play"
@@ -508,6 +530,8 @@ End Function
 
 
 Function onFullScreenChange()
+  updatePlayerLogLib(m.playerLogLib, "setPlayerType", m.top.fullScreen)
+
   ' When the linear video player changes sizes, we want to send a play progress event for the previous size.
   if m.isPlayingAdsCurrentState = "content"
     isFullScreenForPlayProgressEvent = (m.top.fullScreen <> true)
@@ -728,6 +752,17 @@ End Function
 
 Function stopVideo()
   tubiLog("LinearVideoPlayerScreen.stopVideo")
+
+  if m.Video.state = "playing" OR m.Video.state = "buffering" OR m.Video.state = "error"
+    updatePlayerLogLib(m.playerLogLib, "fireQualityOfServiceEvent")
+    updatePlayerLogLib(m.playerLogLib, "firePlayerPageExitEvent")
+  end if
+
+  m.playerExitInfo = {
+    is_buffering: false
+  }
+  updatePlayerLogLib(m.playerLogLib, "setVideoContent", invalid)
+
   m.VideoState = "stop"
   ' add check so that onVideoStateChange doesn't get called
   ' if the video is already in a non playing state.
@@ -895,6 +930,8 @@ Function setDrmOnContent(contentNode, resource, videoResourceIndex)
     contentNode.currentVideoResourceIndex = videoResourceIndex
     contentNode.hdcpVersion = resource.hdcpVersion
 
+    updatePlayerLogLib(m.playerLogLib, "setVideoContent", contentNode)
+
     '//set youbora field
     youboraTracking = {}
     trackingKeys = m.constants.thirdParty.youbora.trackingKeys
@@ -911,6 +948,8 @@ Function setDrmOnContent(contentNode, resource, videoResourceIndex)
       contentNode.encodingKey = resource.encodingKey
     end if
     return true
+  else
+    updatePlayerLogLib(m.playerLogLib, "setVideoContent", contentNode)
   end if
   return false
 End Function
@@ -1139,4 +1178,38 @@ End Function
 
 Function oneEPGTrackingComponentInfoChange(msg)
   m.top.trackingComponentInfo = msg.getData()
+End Function
+
+
+Function onDownloadedSegment(msg)
+  downloadedSegment = msg.getData()
+  
+  if isAA(downloadedSegment) = true
+    downloadedSegmentData = {
+      segSize: downloadedSegment.segSize
+      downloadDuration: downloadedSegment.downloadDuration
+      segDuration: downloadedSegment.segDuration
+      segUrl: downloadedSegment.SegUrl
+    }
+    updatePlayerLogLib(m.playerLogLib, "setDownloadedSegmentData", downloadedSegmentData)
+  end if
+End Function
+
+
+Function onTrackAdEventChange(msg)
+  adData = msg.getData()
+
+  if isAA(adData) = true
+    adType = adData.adType
+    adInfo = adData.adInfo
+    
+    if adType = "adStart"
+      updatePlayerLogLib(m.playerLogLib, "fireAdStartEvent", adInfo)
+    else if adType = "adComplete"
+      updatePlayerLogLib(m.playerLogLib, "fireAdCompleteEvent", adInfo)
+    else if adType = "adPodComplete"
+      updatePlayerLogLib(m.playerLogLib, "fireAdPodCompleteEvent", adInfo)
+    end if
+  end if
+
 End Function
