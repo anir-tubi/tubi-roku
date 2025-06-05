@@ -217,25 +217,30 @@ Function makeApiRequest(reqInfo, batchInfo = invalid) as Boolean
 
     isValidAuthInfoAvailable = true
 
-    if m.constants.reqNames.acceptsTubiAuth[requestType] = true
-      authInfo = m.auth.getAuthInfo()
-      ' It is expected that the authInfo should never be invalid when accessed here. It is possible that the token is expired but for simplicity we send the request and when we get the 403 response we will retry after updating the auth info. This allows for a simpler process and more consistent behavior.
-      if authInfo <> invalid AND authInfo.accessToken <> invalid AND m.auth.checkIfAuthExpired(authInfo) = false then
-
-        ' We are proactively retrieving updated auth info if it expires in the next ten minutes
-        if m.auth.checkIfAuthExpired(authInfo, 60 * 10) = true then
-          getUpdatedAuth()
-        end if
-
-        headers = m.auth.getAuthHeaders(authInfo.accessToken)
-        if headers <> invalid
-          if options.headers = invalid
-            options.headers = {}
-          end if
-          options.headers.append(headers)
-        end if
-      else
+    if m.constants.reqNames.acceptsTubiAuth[requestType] = true then
+      if m.waitingForUpdatedAuthInfo = true
+        ' If we are waiting for updated auth info then we don't want to send the request yet
         isValidAuthInfoAvailable = false
+      else
+        authInfo = m.auth.getAuthInfo()
+        ' It is expected that the authInfo should never be invalid when accessed here. It is possible that the token is expired but for simplicity we send the request and when we get the 403 response we will retry after updating the auth info. This allows for a simpler process and more consistent behavior.
+        if authInfo <> invalid AND authInfo.accessToken <> invalid AND m.auth.checkIfAuthExpired(authInfo) = false then
+
+          ' We are proactively retrieving updated auth info if it expires in the next ten minutes
+          if m.auth.checkIfAuthExpired(authInfo, 60 * 10) = true then
+            getUpdatedAuth()
+          end if
+
+          headers = m.auth.getAuthHeaders(authInfo.accessToken)
+          if headers <> invalid
+            if options.headers = invalid
+              options.headers = {}
+            end if
+            options.headers.append(headers)
+          end if
+        else
+          isValidAuthInfoAvailable = false
+        end if
       end if
     end if
 
@@ -332,9 +337,6 @@ Function processResponse(msg)
           ' First check if we are limited by retries on our request side
           if reqInfo.retriesAttempted >= retries then
             processErrorResponse(result, callbackTypes, job)
-          else if checkIfUserNotFoundError(result.response) = true then
-            ' Next check if this was a user not found error
-            processErrorResponse(result, callbackTypes, job)
           else
             ' Next check against client error config to see if we should retry
             retryAfter = clientErrorConfigCheckIfShouldRetryAfter(m.clientErrorConfig, reqInfo.url, result.method, code.toStr(), result.response.headers, result.response.data, reqInfo.retriesAttempted)
@@ -342,9 +344,6 @@ Function processResponse(msg)
             ' If we are told not to then process the error
             if retryAfter = -1 then
               processErrorResponse(result, callbackTypes, job)
-            else if (code = 403 OR code = 401) AND m.constants.reqNames.acceptsTubiAuth[requestType] = true AND checkIfTokenExpiredOrInvalidError(result.response) = true then
-              getUpdatedAuth()
-              handleBackoff(result, job, retryAfter)
             else
               handleBackoff(result, job, retryAfter)
             end if
@@ -554,20 +553,11 @@ Function processErrorResponse(result, callbackTypes, job)
     parserCallback = callbackTypes.parseError
   end if
 
-  bUserNotFoundError = checkIfUserNotFoundError(result.response)
-
   sendApiErrorLog(result)
 
   ' some requests might not require error handling, and therefore may not have a parseError callback
-  if parserCallback <> invalid OR bUserNotFoundError = true
-    if bUserNotFoundError = true
-      output = {
-        code: result.response.code
-        data: result.response.data
-      }
-    else
-      output = parserCallback(result.response, job.reqInfo)
-    end if
+  if parserCallback <> invalid then
+    output = parserCallback(result.response, job.reqInfo)
 
     ' this block will execute only for batch responses
     if job.batchInfo <> invalid AND job.batchInfo.id <> invalid
@@ -726,26 +716,6 @@ Function checkIfTokenExpiredOrInvalidError(response)
   if response <> invalid AND isNonEmptyString(response.data) = true
     parsedResponse = parseJson(response.data)
     if isAA(parsedResponse) = true AND (parsedResponse["code"] = m.constants.errors.codes.expiredToken OR parsedResponse["code"] = m.constants.errors.codes.invalidToken)
-      return true
-    end if
-  end if
-
-  return false
-End Function
-
-
-' Checks the backend response to see if backend returned a user not found error.
-Function checkIfUserNotFoundError(response)
-  data = invalid
-
-  if response <> invalid
-    if isNonEmptyString(response.data) = true AND isAA(response.headers) = true AND isString(response.headers["Content-Type"]) = true AND Instr(1, response.headers["Content-Type"], "application/json") > 0 then
-      data = parseJson(response.data)
-    else if isAA(response.data) = true
-      data = response.data
-    end if
-
-    if isAA(data) = true AND isNonEmptyString(data.code) = true AND UCase(data.code) = UCase(m.constants.errors.codes.userNotFound)
       return true
     end if
   end if

@@ -80,3 +80,8 @@ Function getAuthUpdatedNodesList()
   nodes.push(m.generalTask)
   return nodes
 End Function
+
+
+Function handleUpdatedAuth()
+  ' Would be used to handle auth updates in StarterController but currently not needed other than to prevent crash from function not existing
+End Function

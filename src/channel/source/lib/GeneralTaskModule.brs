@@ -305,18 +305,6 @@ Function errorCallbackWrapper(msg)
   callback = m.getGeneralTaskErrorCallback(callbackNode)
   if callback <> invalid then
     error = msg.getData()
-    if error.code = 401 AND (isString(error.data) = true OR isAA(error.data) = true) then
-      if isString(error.data) = true
-        data = parseJson(error.data)
-      else
-        data = error.data
-      end if
-
-      'if there is a callback associated with the userNotFound error, then use that callback instead
-      if isAA(data) = true AND isNonEmptyString(data.code) = true AND UCase(data.code) = UCase(m.constants.errors.codes.userNotFound) AND isFunction(logoutAndRestartApp) = true then 'bs:disable-line 1001 LINT1001
-        callback = logoutAndRestartApp 'bs:disable-line 1001 LINT1001
-      end if
-    end if
 
     callback(error)
   end if

@@ -692,7 +692,7 @@ Function getConstants()
 
     constants.urls.rokuContinueWatchingEndpoint = "https://userdata.sr.roku.com/user-data/v1/content/continueWatching"
 
-    constants.urls.clientErrorConfigEndpoint = "https://md0.tubitv.com/error-handler/v2/client-error-config.json"
+    constants.urls.clientErrorConfigEndpoint = "https://md0.tubitv.com/error-handler/v2/client-error-config-invalid.json"
 
     if constants.settings.stagingApis = true
       constants.urls.foxApiBaseUrl = "https://qa.api.haw.digitalvideoplatform.com"
@@ -1082,6 +1082,7 @@ Function getConstants()
     constants.errors.codes.invalidEmailDomain = "INVALID_EMAIL_DOMAIN"
     constants.errors.codes.blockedEmailDomain = "BLOCKED_EMAIL_DOMAIN"
     constants.errors.codes.emailExists = "EMAIL_USER_EXISTS"
+    ' TODO remove in next submission release
     constants.errors.codes.userNotFound = "USER_NOT_FOUND"
     constants.errors.codes.invalidToken = "INVALID_TOKEN"
 
@@ -1399,7 +1400,7 @@ Function getConstants()
       else
         constants.ui.imageSizes.fullScreenBackground = [1920, 1080]
       end if
-    
+
     constants.ui.featuredRow = {}
       constants.ui.featuredRow.playerSize = [constants.ui.imageSizes.featuredRowPoster[0] + 4, constants.ui.imageSizes.featuredRowPoster[1] + 10]
 

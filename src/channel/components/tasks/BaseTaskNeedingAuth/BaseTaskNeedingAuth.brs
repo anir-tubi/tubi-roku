@@ -5,10 +5,11 @@ End Function
 
 ' When it is discovered that we need updated auth, use this function to start the process to retrieve it. If called multiple times it will only trigger the process once if the updated auth request is still in progress.
 Function getUpdatedAuth(port = invalid)
-  tubiLog("BaseTaskNeedungAuth.getUpdatedAuth")
+  tubiLog("BaseTaskNeedingAuth.getUpdatedAuth")
   ' If we are already requesting updated auth info, then don't do it again
   if m.waitingForUpdatedAuthInfo = false then
     m.waitingForUpdatedAuthInfo = true
+    tubiLog("Requesting updated auth for " + m.top.subtype())
 
     if port = invalid then
       port = m.port
@@ -29,6 +30,7 @@ End Function
 Function conditionallyProcessAuthUpdatedMessage(msg)
   if type(msg) = "roSGNodeEvent" then
     if msg.getField() = "authUpdated" then
+      tubiLog("No longer waiting for updated auth info")
       m.waitingForUpdatedAuthInfo = false
       m.top.unobserveFieldScoped("authUpdated")
 

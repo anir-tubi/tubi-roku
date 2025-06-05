@@ -264,6 +264,8 @@ Function onUpdatedAuthRetrieved()
   for each node in nodes
     node.authUpdated = true
   end for
+
+  handleUpdatedAuth()
 End Function
 
 

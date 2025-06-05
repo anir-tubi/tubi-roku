@@ -120,6 +120,15 @@ Function clientErrorConfigCheckIfShouldRetryAfter(clientErrorConfig, url, method
 
     ' Make sure we have a retry_strategy
     if isString(matchedConfig.retry_strategy) = true then
+      if matchedConfig.retry_strategy = "new_token" then
+        ' bs:disable-next-line 1001 LINT1001
+        if isFunction(getUpdatedAuth) = true then
+          getUpdatedAuth() 'bs:disable-line 1140 LINT1001
+        else
+          print "getUpdatedAuth is not in scope"
+        end if
+      end if
+
       retryStrategy = clientErrorConfig.retry_strategies[matchedConfig.retry_strategy]
       if isAA(retryStrategy) = true then
         if retriesAttempted >= retryStrategy.max_retries then
