@@ -4,7 +4,7 @@
 Function parseVideoScreenSpritesSuccess(fullResponse, _reqInfo)
   parsedResponse = fullResponse.data
   spritesContentNode = invalid
-  if parsedResponse <> invalid then
+  if isAA(parsedResponse) = true AND isNonEmptyArray(parsedResponse.sprites) = true then
     spritesContentNode = CreateObject("roSGNode", "TubiContentNode")
     spritesContentNode.id = parsedResponse.id
     spritesContentNode.thumbnailUrls = parsedResponse.sprites
