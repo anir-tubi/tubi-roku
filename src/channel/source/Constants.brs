@@ -505,9 +505,9 @@ Function getConstants()
     'contents cms url
     constants.urls.cms = {}
 
-      constants.urls.cms.urlBase = "https://uapi.adrise.tv/cms"
+      constants.urls.cms.urlBase = "https://content-cdn.production-public.tubi.io/cms"
       if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
-        constants.urls.cms.urlBase = "https://uapi.staging-public.tubi.io/cms"
+        constants.urls.cms.urlBase = "https://content-cdn.staging-public.tubi.io/cms"
       end if
 
       constants.urls.cms.thumbnails = constants.urls.cms.urlBase + "/content" ' + content_id + "/thumbnail_sprites"
