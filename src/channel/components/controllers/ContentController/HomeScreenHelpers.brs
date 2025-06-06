@@ -359,8 +359,7 @@ Function fetchHomeScreen(homeScreen, useCache = false)
       uiMode: m.uiMode
     })
 
-    if useCache = false 
-
+    if useCache = false
       homeScreen.resetContentAreaValues = true
       setHomeScreenLoading(homeScreen)
     end if
@@ -423,6 +422,8 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     ads = rawResponse.ads
     if isKidsUIOn() = false AND ads <> invalid
       updateSkinAdRowContent(homeScreen, ads)
+    else
+      updateSkinAdRowContent(homeScreen, invalid)
     end if
 
     homeScreen.personalizationId = rawResponse.personalizationId
@@ -1171,6 +1172,9 @@ Function updateSkinAdRowContent(homeScreen, content)
       homeScreen.skinAdContent = rowContentNode
       homeScreen.skinAdContentUpdated = true
     end if
+  else
+    homeScreen.skinAdContent = invalid
+    homeScreen.skinAdContentUpdated = true
   end if
 
 End Function

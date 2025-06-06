@@ -193,9 +193,19 @@ End Function
 Function onContentChange()
   tubiLog("CategoryGridList.onContentChange")
 
-  ' Resetting the state of the UI. Below condition face guards against any rowList background refresh.
+  ' Resetting the state of the UI. Below condition safe guards against any rowList background refresh.
   ' Like item getting added to CW row or queue row.
-  if m.lastFocusedList <> "rowList"
+
+  ' Below condition is needed to handle a case where skinAdRow was visible.
+  ' But during refresh it has been removed.
+  if m.top.lastFocusedList = "skinAdRow" AND isSkinAdsAvailable() = false
+    m.skinAdRow.opacity = 0
+    m.top.lastFocusedList = ""
+  end if
+
+  ' When the rowlist is in focus, we need to hide the featuredRowList.
+  ' In place of featuredRowList, we will show the info panel.
+  if m.top.lastFocusedList <> "rowList" AND m.top.featuredRowContent <> invalid
     m.FeaturedRowList.opacity = 1
   end if
 
@@ -214,7 +224,9 @@ Function onContentChange()
   
   ' set the translation position of the page based on presense or absence of any 1st rows. 
   ' DO this BEFORE setting the content of the rowList (later in this function) or else the translation will not be properly set.
-  if isSkinAdsAvailable() = true
+  ' This is need mainly for the initial load and if skinAdRow is focused.
+  ' When any other list is focused, we will not show the skin ads.
+  if isSkinAdsAvailable() = true AND (m.top.lastFocusedList = "skinAdRow" OR m.top.lastFocusedList = "")
     if m.top.featuredRowContent <> invalid
       m.FeaturedRowList.translation =  [0, 384]
       m.rowList.translation =  [0, 565 + m.rowListTranslationYOffset]
@@ -230,15 +242,17 @@ Function onContentChange()
       m.top.reloadedItemToBeFocused = content
     end if
   else
-    m.FeaturedRowList.translation = [0, 0]
     ' Resetting the state of the UI.
     if m.top.featuredRowContent <> invalid
-      if m.isWithDescPortraitSmallExpEnabled = true
-        m.rowList.translation =  [0, 534 + m.rowListTranslationYOffset]
-      else if m.homeScreenDesignType = "withOutDescription"
-        m.rowList.translation =  [0, 420 + m.rowListTranslationYOffset]
-      else
-        m.rowList.translation = [0, 0]
+      ' This is needed only for initial load and not needed for subsequent loads.
+      ' This is required for initial slide down animation.
+      if m.top.lastFocusedList = ""
+        m.FeaturedRowList.translation = [0, 0]
+        if m.isWithDescPortraitSmallExpEnabled = true
+          m.rowList.translation =  [0, 534 + m.rowListTranslationYOffset]
+        else
+          m.rowList.translation = [0, 0]
+        end if
       end if
     else
       m.rowList.translation = [0, 0]
@@ -299,7 +313,7 @@ Function onContentChange()
   m.top.rowIndexBoost = rowIndexBoost
   
   ' Below is to add animation of slide down of the row list for the first time when screen is loaded.
-  if m.top.featuredRowContent <> invalid AND isSkinAdsAvailable() = false AND m.isWithDescPortraitSmallExpEnabled = true
+  if m.top.featuredRowContent <> invalid AND isSkinAdsAvailable() = false AND m.isWithDescPortraitSmallExpEnabled = true AND m.top.lastFocusedList <> "rowList"
     slideTo(m.RowList, [0, 705 + m.rowListTranslationYOffset], 0.3, 0.3)
   end if
   
@@ -782,7 +796,7 @@ Function setRowListFocus()
       m.top.lastFocusedList = "featuredRowList"
       m.FeaturedRowList.setFocus(true)
     else
-      m.lastFocusedList = "rowlist"
+      m.top.lastFocusedList = "rowlist"
       m.RowList.setFocus(true)
     end if
   else
@@ -972,7 +986,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       return true
     else if key = "down" AND m.FeaturedRowList.isInFocusChain() = true
       m.top.lastFocusedList = "rowList"
-      slideFadeGeneral(m.featuredRowList, [0, -700], "out", 0.3, 0, -1, true)
+      slideFadeGeneral(m.featuredRowList, [0, -760], "out", 0.3, 0, -1, true)
       if m.isWithDescPortraitSmallExpEnabled = true
         slideTo(m.RowList, [0, 420 + m.rowListTranslationYOffset], 0.3, 0.1)
       end if

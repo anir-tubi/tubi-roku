@@ -171,7 +171,7 @@ End Function
 
 Function onContentUpdated(msg)
   '//the presense or absense of a 1st-Row will dictate the starting point of the peek row mask
-  if m.top.kidsMode = false AND (m.top.skinAdContent <> invalid AND m.top.skinAdContent.getChildCount() > 0)
+  if m.top.kidsMode = false AND (m.top.skinAdContent <> invalid AND m.top.skinAdContent.getChildCount() > 0) AND (m.top.lastFocusedList = "skinAdRow" OR m.top.lastFocusedList = "")
     moveContentAreaMask(-1)
     fadeOutInfoPanel()
   else
