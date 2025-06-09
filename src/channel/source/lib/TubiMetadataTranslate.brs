@@ -975,8 +975,12 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
   if contentToTranslate <> invalid
     if contentToTranslate.valid_duration <> invalid
       homescreenAA.validUntil = Uptime(0) + contentToTranslate.valid_duration
+      ' This is required so that we can regenerate validUntil during 304.
+      homescreenAA.validDuration = contentToTranslate.valid_duration
     else
       homescreenAA.validUntil = Uptime(0) + m.constants.cacheTimes.homescreen
+      ' This is required so that we can regenerate validUntil during 304.
+      homescreenAA.validDuration = m.constants.cacheTimes.homescreen
     end if
 
     homescreenAA.personalizationId = contentToTranslate.personalization_id

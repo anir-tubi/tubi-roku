@@ -485,6 +485,9 @@ Function onHomeScreenErrorResponse(response)
   screen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
   if response.httpStatusCode <> 304 OR screen.content = invalid
     handleHomeScreenErrorResponse(m.constants.ui.screenIds.homeScreen, response)
+  else if screen.content <> invalid AND screen.content.validDuration <> invalid
+    ' Updating the valid_duration.
+    screen.content.validUntil = Uptime(0) + screen.content.validDuration
   end if
 End Function
 
