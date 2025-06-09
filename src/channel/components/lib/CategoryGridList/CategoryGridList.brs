@@ -529,7 +529,17 @@ Function setRowHeights()
     featuredRowHeights = featuredRowHeights + 32
   end if
 
+  lastFocusedRowItemIndex = m.RowList.rowItemFocused
   m.RowList.content = m.top.content
+
+  ' Since we only load initial 9 items if the user has scroll past 9 then setting jumpToRowItem resets to zero.
+  ' For now only maintaining the vertical position during refresh and horizontal position is not maintained.
+  ' Since both during initial load and refresh in the first set we load 9 items and load more items. it causes a sudden jump in position once we receive more items from first position.
+  ' This is slight upgrade from production where we reset both horizontal and vertical position.
+  ' TODO: In future revisit this logic to see when refresh if we can combine both initial and batch data together and set to screen.
+  if isNonEmptyArray(lastFocusedRowItemIndex) = true
+    m.RowList.jumpToItem = lastFocusedRowItemIndex[0]
+  end if
 
   featuredPosterSize = featuredRowPoster
   if m.isWithDescPortraitSmallExpEnabled = true
