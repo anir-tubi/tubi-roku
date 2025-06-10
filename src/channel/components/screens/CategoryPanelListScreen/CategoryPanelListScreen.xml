@@ -57,7 +57,7 @@
       -->
        <field id="jumpToCategoryItemByID" type="assocarray" value="" />
 
-      <field id="isBackPressedFromCategoryDetailPanel"  type="boolean" />
+      <field id="isBackPressedFromCategoryDetailPanel" type="boolean" alwaysNotify="true"/>
 
     <!-- OUTPUT -->
       <!--failedJumpToItemByID is the category ID that had been assigned to jumpToItemByID. When the content loads and the category ID cannot be found, this param is set in attempt load a categoryDetailScreen -->

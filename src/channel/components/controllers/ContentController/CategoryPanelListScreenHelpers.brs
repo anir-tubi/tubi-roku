@@ -529,9 +529,9 @@ Function onContentGridHasFocusChange(msg)
         end if
       end if
     end if
-  else
-    if msg.getData() = false AND currentScreen.subtype() = "CategoryPanelListScreen"
-      currentScreen.isBackPressedFromCategoryDetailPanel = true
-    end if
+  end if
+
+  if msg.getData() = false AND currentScreen.subtype() = "CategoryPanelListScreen"
+    currentScreen.isBackPressedFromCategoryDetailPanel = true
   end if
 End Function
