@@ -2418,11 +2418,9 @@ Function resetRelatedContent(detailScreen)
     relatedContent = detailScreen.relatedContent
 
     if isNode(relatedContent) = true
-      relatedContentChildren = relatedContent.getChildren(-1, 0)
-      refreshedRelatedContent = CreateObject("roSGNode", "CategoryContentNode")
-      refreshedRelatedContent.appendChildren(relatedContentChildren)
-      ' Using the existing valid until so that it does not make a new api call since the content is still valid.
-      refreshedRelatedContent.validUntil = relatedContent.validUntil
+      ' Using clone instead of creating a new CategoryContentNode and appending children because it will not be scalable
+      ' because we need to update this piece logic everytime we append a new field at the categoryContentNode level. For ex: personalizationId was introduced as a part of client side impression.
+      refreshedRelatedContent = relatedContent.clone(true)
       detailScreen.relatedContent = refreshedRelatedContent
     end if
   end if
