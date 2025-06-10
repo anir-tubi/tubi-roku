@@ -806,7 +806,7 @@ Function setRowListFocus()
       m.top.lastFocusedList = "featuredRowList"
       m.FeaturedRowList.setFocus(true)
     else
-      m.top.lastFocusedList = "rowlist"
+      m.top.lastFocusedList = "rowList"
       m.RowList.setFocus(true)
     end if
   else
