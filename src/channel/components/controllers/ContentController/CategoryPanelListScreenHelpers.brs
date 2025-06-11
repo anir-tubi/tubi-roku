@@ -34,7 +34,7 @@ Function showCategoryPanelListScreen(constants, sendNavigationLoadEvents = true,
     panelScreen.observeFieldScoped("visible", "onCategoryPanelListScreenVisibleChange")
     panelScreen.observeFieldScoped("failedJumpToItemByID", "onJumpToIDFailed")
 
-    if isVideoPreviewOn() = true AND getExperimentResource("roku_category_page_video_previews", "roku_category_page_video_previews_v1", true).enabled = true
+    if isVideoPreviewOn() = true
       panelScreen.observeFieldScoped("contentFocused", "onCategoryContentFocused")
     end if
 
@@ -514,7 +514,7 @@ Function onContentGridHasFocusChange(msg)
   screen = msg.getRoSGNode()
   currentScreen = getCurrentScreen()
 
-  if isVideoPreviewOn() = true AND getExperimentResource("roku_category_page_video_previews", "roku_category_page_video_previews_v1", false).enabled = true
+  if isVideoPreviewOn() = true
     if msg.getData() = false
       ' Adding a check here so that we only pause when user navigates to filter items and not when user navigates to details screen.
       if currentScreen <> invalid AND currentScreen.id <> m.constants.ui.screenIds.detailScreen

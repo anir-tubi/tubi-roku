@@ -138,14 +138,6 @@ Function TubiExperiments(experimentsInfo) as Object
         }
       }
 
-      roku_category_page_video_previews: {
-        roku_category_page_video_previews_v1: {
-          default: {"enabled": true}
-          holdout_control: {"enabled": false}
-          holdout_winning: {"enabled": false}
-        }
-      }
-
 
     }
 
