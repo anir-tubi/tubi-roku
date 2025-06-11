@@ -346,8 +346,8 @@ Function fetchHomeScreen(homeScreen, useCache = false)
 
     options.params = params
     options.headers = headers
-
-    homeScreenReqInfo = m.CmsApi.createHomeScreenReqInfo(isKidsMode, options)
+    isLinearBlock = isLinearBlocked()
+    homeScreenReqInfo = m.CmsApi.createHomeScreenReqInfo(isKidsMode, options, isLinearBlock)
     m.makeRequest({
       url: homeScreenReqInfo.url
       requestType: reqName
@@ -356,6 +356,7 @@ Function fetchHomeScreen(homeScreen, useCache = false)
       errorCallback: errorHandler
       responseType: "node"
       isSignedInUser: isLoggedInUser()
+      isLinearBlock: isLinearBlock
       uiMode: m.uiMode
     })
 
@@ -648,7 +649,8 @@ Function onColumnFocusChanged(msg)
       if hasMoreContent = true AND  columnFocused >= (cursor - 10) AND category.state <> "containerPaginationRequestPending"
         isKidsMode = shouldKidsModeBeSentToServer()
         isSignedInUser = isLoggedInUser()
-        categoryReqInfo = m.cmsApi.createGetContainerContentsReqInfo(category, homeScreen, isKidsMode, isSignedInUser, m.uiMode, false)
+        isLinearBlock = isLinearBlocked()
+        categoryReqInfo = m.cmsApi.createGetContainerContentsReqInfo(category, homeScreen, isKidsMode, isSignedInUser, m.uiMode, false, isLinearBlock)
         if categoryReqInfo <> invalid
           category.state = "containerPaginationRequestPending"
           m.makeRequest({
@@ -658,7 +660,8 @@ Function onColumnFocusChanged(msg)
             successCallback: onContainerMoreItemsSuccess
             silenceCallbackWarnings: true
             responseType: "node"
-            isSignedInUser: isLoggedInUser()
+            isSignedInUser: isSignedInUser
+            isLinearBlock: isLinearBlock
             uiMode: m.uiMode
           })
         end if
@@ -992,8 +995,9 @@ Function onLoadCategoriesIndex(msg)
 
   isKidsMode = shouldKidsModeBeSentToServer()
   isSignedInUser = isLoggedInUser()
+  isLinearBlock = isLinearBlocked()
   uiMode = m.uiMode
-  batchRequests = m.cmsApi.createHomeScreenBatchReqInfo(homeScreen, index, isKidsMode, isSignedInUser, uiMode)
+  batchRequests = m.cmsApi.createHomeScreenBatchReqInfo(homeScreen, index, isKidsMode, isSignedInUser, uiMode, isLinearBlock)
 
   if batchRequests <> invalid
     m.makeBatchRequest({
@@ -1102,6 +1106,7 @@ Function onLoadCategoryForIds(msg)
 
   isKidsMode = shouldKidsModeBeSentToServer()
   isSignedInUser = isLoggedInUser()
+  isLinearBlock = isLinearBlocked()
 
   if homeScreen.contentMode = m.constants.ui.contentMode.homescreen
     contentMode = ""
@@ -1109,7 +1114,7 @@ Function onLoadCategoryForIds(msg)
     contentMode = homeScreen.contentMode
   end if
 
-  batchRequests = m.cmsApi.createHomeScreenBatchReqInfoForContainers(categoryIDs, contentMode, isKidsMode, isSignedInUser)
+  batchRequests = m.cmsApi.createHomeScreenBatchReqInfoForContainers(categoryIDs, contentMode, isKidsMode, isSignedInUser,"standard","", isLinearBlock)
 
   if batchRequests <> invalid
     m.makeBatchRequest({
@@ -1417,4 +1422,40 @@ Function getCategoryComponentTrackingInfo(screen)
   end if
 
   return componentTrackingInfo
+End Function
+
+
+' This function is part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated. 
+Function isLinearBlocked()
+  'only apply to US new users and only to users under the experiment. 
+  if UCase(m.constants.deviceInfo.countryCode) = "US" AND getExperimentResult("roku_linear_no_show", "roku_linear_no_show_v2") <> invalid
+    if isNewUser() = true
+      'all newUsers are under linear holdout experiment
+      if getExperimentResource("roku_linear_no_show", "roku_linear_no_show_v2", true).enabled = true ' if experiment is not running there wont be any exposure events.
+        saveServerPersistentData({
+          "isLinearBlocked": "linearblocked"
+        }, "device")
+        return true
+      else   ' isLinearBlocked only if experiment is running in popper.
+        saveServerPersistentData({
+          "isLinearBlocked": "linearshow"
+        }, "device")
+        return false
+      end if
+    else
+      if m.pub_serverPersistentData.isLinearBlocked = "linearblocked"
+
+        getExperimentResource("roku_linear_no_show", "roku_linear_no_show_v2", true)
+        return true
+      else if m.pub_serverPersistentData.isLinearBlocked = "linearshow"
+        getExperimentResource("roku_linear_no_show", "roku_linear_no_show_v2", true)
+        return false
+      else ' returning user never was in experiment
+        return false
+      end if
+    end if
+  end if
+
+  return false 'default case for non us users, not experiment started etc
+
 End Function

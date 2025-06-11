@@ -1789,6 +1789,7 @@ Function getConstants()
       constants.serverPersistentDataKeys.parentalRating = "parental_rating"
       constants.serverPersistentDataKeys.hasPassword = "has_password"
       constants.serverPersistentDataKeys.hasPreviouslyRegistered = "has_previously_registered"
+      constants.serverPersistentDataKeys.isLinearBlocked = "is_linear_blocked"
 
       constants.persistentDataKeyConsentKeyMapping = {
         "enable_video_preview": constants.consentKeys.essential
@@ -1801,6 +1802,7 @@ Function getConstants()
         "parental_rating": constants.consentKeys.essential
         "has_password": constants.consentKeys.essential
         "has_previously_registered": constants.consentKeys.essential
+        "is_linear_blocked": constants.consentKeys.essential
       }
 
   return constants

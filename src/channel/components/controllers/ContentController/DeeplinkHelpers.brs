@@ -499,7 +499,7 @@ End Function
 Function handleLinearDeeplinkContent()
   tubilog("DeeplinkHelpers.handleLinearDeeplinkContent")
 
-  if isDeviceInUS() = true AND getExperimentResource("roku_linear_no_show", "roku_linear_no_show_v2", true).enabled = true
+  if isLinearBlocked() = true
     showDeeplinkErrorModal(invalid)
   else if isParentalControlsAdultLevel() = false OR m.uiMode = m.constants.ui.modes.kidsAgeGate
     ' Display error message indicating to turn off the parental controls

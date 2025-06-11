@@ -58,6 +58,11 @@
       <!-- createMenuItems is used to create menu items on side nav, invoked from controller  -->
       <field id="createMenuItems" type="boolean"/>
 
+      <!-- isLinearBlock is used to check if user is part of linear_no_show experiment.
+        this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  
+      Exp will be never graduated.  -->
+      <field id="isLinearBlock" type="boolean"/>
+
     <!-- OUTPUT -->
       <!-- The sideNavContentNode for the side nav menu item that was selected. This field should not be observed, as
       the contents of the node can change frequently, even if the node itself remains the same. It can be checked for the

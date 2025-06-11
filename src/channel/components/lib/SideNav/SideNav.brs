@@ -128,7 +128,7 @@ Function onCreateMenuItems()
     menuItems.push(m.constants.ui.sideNavIds.tv)
   end if
 
-  if getExternalConfigValueFromGlobal("livetv", false) = true AND (sCountryCode <> "US" OR getExperimentResource("roku_linear_no_show", "roku_linear_no_show_v2", true).enabled = false)
+  if getExternalConfigValueFromGlobal("livetv", false) = true AND m.top.isLinearBlock = false ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated. 
     menuItems.push(m.constants.ui.sideNavIds.linearEPG)
   end if
 

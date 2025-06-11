@@ -985,6 +985,7 @@ Function setDirtyUserCategories(categoryId)
 
     isKidsMode = shouldKidsModeBeSentToServer()
     reqName = m.constants.reqNames.getCategory
+    isLinearBlock = isLinearBlocked()
 
     options = {}
     params = {}
@@ -1002,6 +1003,7 @@ Function setDirtyUserCategories(categoryId)
       responseType: "node"
       id: categoryId
       isSignedInUser: isLoggedInUser()
+      isLinearBlock: isLinearBlock
       screenId: m.constants.ui.screenIds.homeScreen
       uiMode: m.uiMode
     })
