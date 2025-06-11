@@ -39,6 +39,10 @@
 								"$value": "#0B001980",
 								"$description": "button alt background"
 							},
+							"background-20": {
+								"$value": "#0B001933",
+								"$description": "label background"
+							},
 							"background-10": {
 								"$value": "#0B00191A",
 								"$description": "overlay gradient stop"
@@ -81,6 +85,10 @@
 							"surface-10": {
 								"$value": "#161324",
 								"$description": "overlay background"
+							},
+							"surface-10-inverse": {
+								"$value": "#C9C2FF",
+								"$description": "tooltip background"
 							},
 							"surface-20": {
 								"$value": "#29253F",
@@ -136,6 +144,39 @@
 										},
 										{
 											"color": "#8C00E5",
+											"position": "1"
+										}
+									]
+								}
+							},
+							"holographic": {
+								"$type": "linear-gradient",
+								"$description": "Full HD label",
+								"$value": {
+									"angle": "75deg",
+									"stops": [
+										{
+											"color": "#C9C2FF",
+											"position": "0"
+										},
+										{
+											"color": "#E4E3EC",
+											"position": "0.15"
+										},
+										{
+											"color": "#EBDEFF",
+											"position": "0.4"
+										},
+										{
+											"color": "#E3E1FF",
+											"position": "0.6"
+										},
+										{
+											"color": "#B3CAFF",
+											"position": "0.85"
+										},
+										{
+											"color": "#D7BCFF",
 											"position": "1"
 										}
 									]
@@ -206,6 +247,10 @@
 								"$value": "#FFFFFF80",
 								"$description": "button alt background"
 							},
+							"background-20": {
+								"$value": "#FFFFFF33",
+								"$description": "label background"
+							},
 							"background-10": {
 								"$value": "#FFFFFF1A",
 								"$description": "overlay gradient stop"
@@ -248,6 +293,10 @@
 							"surface-10": {
 								"$value": "#E4E3EC",
 								"$description": "overlay background"
+							},
+							"surface-10-inverse": {
+								"$value": "#3D375B",
+								"$description": "tooltip background"
 							},
 							"surface-20": {
 								"$value": "#CAC8DB",
@@ -303,6 +352,39 @@
 										},
 										{
 											"color": "#8C00E5",
+											"position": "1"
+										}
+									]
+								}
+							},
+							"holographic": {
+								"$type": "linear-gradient",
+								"$description": "Full HD label",
+								"$value": {
+									"angle": "75deg",
+									"stops": [
+										{
+											"color": "#C9C2FF",
+											"position": "0"
+										},
+										{
+											"color": "#E4E3EC",
+											"position": "0.15"
+										},
+										{
+											"color": "#EBDEFF",
+											"position": "0.4"
+										},
+										{
+											"color": "#E3E1FF",
+											"position": "0.6"
+										},
+										{
+											"color": "#B3CAFF",
+											"position": "0.85"
+										},
+										{
+											"color": "#D7BCFF",
 											"position": "1"
 										}
 									]
@@ -375,6 +457,10 @@
 								"$value": "#1D00F280",
 								"$description": "modal overlay"
 							},
+							"background-20": {
+								"$value": "#1D00F233",
+								"$description": "label background"
+							},
 							"background-10": {
 								"$value": "#1D00F21A",
 								"$description": "overlay gradient stop"
@@ -408,7 +494,7 @@
 								"$description": "secondary copy, input placeholder text, input strokes hover"
 							},
 							"scrim": {
-								"$value": "#0b001999",
+								"$value": "##0b001999",
 								"$description": "modal overlay"
 							}
 						},
@@ -417,6 +503,10 @@
 							"surface-10": {
 								"$value": "#2948FF",
 								"$description": "overlay background"
+							},
+							"surface-10-inverse": {
+								"$value": "#D9E5FF",
+								"$description": "tooltip background"
 							},
 							"surface-20": {
 								"$value": "#4771FF",
@@ -472,6 +562,39 @@
 										},
 										{
 											"color": "#8C00E5",
+											"position": "1"
+										}
+									]
+								}
+							},
+							"holographic": {
+								"$type": "linear-gradient",
+								"$description": "Full HD label",
+								"$value": {
+									"angle": "75deg",
+									"stops": [
+										{
+											"color": "#C9C2FF",
+											"position": "0"
+										},
+										{
+											"color": "#E4E3EC",
+											"position": "0.15"
+										},
+										{
+											"color": "#EBDEFF",
+											"position": "0.4"
+										},
+										{
+											"color": "#E3E1FF",
+											"position": "0.6"
+										},
+										{
+											"color": "#B3CAFF",
+											"position": "0.85"
+										},
+										{
+											"color": "#D7BCFF",
 											"position": "1"
 										}
 									]
