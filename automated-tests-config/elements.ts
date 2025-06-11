@@ -2367,17 +2367,13 @@ const elements = typeCheckElements({
       '#ContentController.#2694d4e.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText',
   },
 
-  /** Subtitles On */
-  closedCaptionOn: {
+  /** CC Menu */
+  closedCaptionCheckBoxList: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.0.1.1.#subtitleTracks.1.#container',
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.0.1.1.#OverLayItemsLayoutGroup.2',
   },
 
-  /** Subtitles Off */
-  closedCaptionOff: {
-    keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.0.1.1.#subtitleTracks.0.#container',
-  },
+ 
 
   /** Sign Up to Save Progress Series detail menu item button text */
   seriesSignUpToSaveProgressButtonText: {

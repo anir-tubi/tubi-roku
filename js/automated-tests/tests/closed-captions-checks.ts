@@ -15,7 +15,7 @@ describe('Closed Captions Checks', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/438464
-  it('C438464 - Closed Caption toggle = ON is in sync between VOD and Linear @closed_captions', async () => {
+  it('C438464 - Closed Caption toggle = ON is in sync between VOD and Linear, @closed_captions', async () => {
 
     // Navigate to the Live News Row from Home screen
     // Jump to Recommended Channels row
@@ -72,18 +72,19 @@ describe('Closed Captions Checks', function () {
     // Verify that video is playing
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 20000);
 
-    // Check CC state for VOD
+    // Check CC state is On for VOD title
     await ecp.sendKeypress(ecp.Key.Up);
     await ecp.sendKeypress(ecp.Key.Right, {count:4});
     await ecp.sendKeypress(ecp.Key.Ok);
     await ecp.sendKeypress(ecp.Key.Down);
-    await testUtils.waitForElementToFullyShowOnScreen('closedCaptionOn', 'CC checkmark not found', 25000);
-  
-   
+    const content = await testUtils.getAllGridItemsContent('closedCaptionCheckBoxList');
+    const closedCaptionOn = content.find(item => item.title === 'English');
+    expect(closedCaptionOn.checked).to.be.true;
+
   }); 
 
  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/438466
- it('C438466 - Closed Caption toggle = OFF is in sync between VOD and Linear @closed_captions', async () => {
+ it('C438466 - Closed Caption toggle = OFF is in sync between VOD and Linear, @closed_captions', async () => {
 
     // Navigate to the Live News Row from Home screen
     await testUtils.goToPage('home');
@@ -92,19 +93,19 @@ describe('Closed Captions Checks', function () {
     await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
 
     // Start a live feed
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok, {count: 2});
     
     // Verify that video is playing
     await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 20000);
 
     // Turn OFF Linear CC
-    await ecp.sendKeypress(ecp.Key.Left);
+    await ecp.sendKeypress(ecp.Key.Left, {count:2});
     await ecp.sendKeypress(ecp.Key.Up);
     await ecp.sendKeypress(ecp.Key.Ok);
     await ecp.sendKeypress(ecp.Key.Right);
     await ecp.sendKeypress(ecp.Key.Left);
     await ecp.sendKeypress(ecp.Key.Ok);
-
+ 
  
     // Back to Home, Search page and play a VOD title
     await utils.sleep(4000);
@@ -142,13 +143,14 @@ describe('Closed Captions Checks', function () {
     // Verify that video is playing
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
-    // Check CC state for VOD title
+    // Check CC state is Off for VOD title
     await ecp.sendKeypress(ecp.Key.Up);
     await ecp.sendKeypress(ecp.Key.Right, {count:4});
     await ecp.sendKeypress(ecp.Key.Ok);
     await ecp.sendKeypress(ecp.Key.Down);
-    await testUtils.waitForElementToFullyShowOnScreen('closedCaptionOff');
-
+    const content = await testUtils.getAllGridItemsContent('closedCaptionCheckBoxList');
+    const closedCaptionOff = content.find(item => item.title === 'Off');
+    expect(closedCaptionOff.checked).to.be.true;
   }); 
 
 });

@@ -104,14 +104,14 @@ describe('Autoplay TV', function () {
 
         // Search for a Series title
         await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
-        await ecp.sendText('lego masters');
+        await ecp.sendText('everbody hates chris');
 
         // Call function to navigate right to search results grid
         await shared.navigateRightToGrid();
 
         await testUtils.retryWithTimeOut(async () => {
             const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-            expect(searchResultsText.text).to.equal('LEGO Masters');
+            expect(searchResultsText.text).to.equal('Everybody Hates Chris');
         });
 
         //Play title, trigger autoplay
@@ -120,6 +120,7 @@ describe('Autoplay TV', function () {
 
         // Autoplay triggered?
         await checkForAutoPlayTrigger();
+
     });
 });
 
