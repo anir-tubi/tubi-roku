@@ -37,6 +37,7 @@ Function TubiTracking(constants, auth, userConsentsOptOutStatus = {}, request = 
     getAnalyticsDestinationComponent: tubiTracking_getAnalyticsDestinationComponent
     getAnalyticsSelector: tubiTracking_getAnalyticsSelector
     getAnalyticsTile: tubiTracking_getAnalyticsTile
+    getUtilityTile: tubiTracking_getUtilityTile
     getAnalyticsAd: tubiTracking_getAnalyticsAd
     getAnalyticsHomePageContentMode: tubiTracking_getAnalyticsHomePageContentMode
     getLanguageCode: tubiTracking_getLanguageCode
@@ -85,6 +86,7 @@ Function TubiTrackingInfo(constants)
     getAnalyticsDestinationComponent: tubiTracking_getAnalyticsDestinationComponent
     getAnalyticsSelector: tubiTracking_getAnalyticsSelector
     getAnalyticsTile: tubiTracking_getAnalyticsTile
+    getUtilityTile: tubiTracking_getUtilityTile
     getAnalyticsAd: tubiTracking_getAnalyticsAd
     getAnalyticsHomePageContentMode: tubiTracking_getAnalyticsHomePageContentMode
     getLanguageCode: tubiTracking_getLanguageCode
@@ -750,6 +752,22 @@ Function tubiTracking_getAnalyticsTile(contentNode, colPos = 1, rowPos = 1)
     tile.col = colPos
     tile.row = rowPos
 
+  end if
+
+  return tile
+End Function
+
+
+' Build the structure for a UtilityTile message
+Function tubiTracking_getUtilityTile(contentNode, colPos = 1, rowPos = 1)
+  tile = invalid
+
+  if contentNode <> invalid
+    tile = {
+      id: contentNode.id
+      col: colPos
+      row: rowPos
+    }
   end if
 
   return tile

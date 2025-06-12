@@ -331,12 +331,19 @@ Function getTrackingComponentInfo(itemIndex, numColumns, category, trackingLib)
     row = 1 + (itemIndex \ numColumns)
     content = category.getChild(itemIndex)
 
-    return {
+    componentInfo = {
       category_slug: category.slug
       category_row: row
       category_col: column
-      content_tile: m.Tracking.getAnalyticsTile(content, column, row)
     }
+
+    if content.type  = m.constants.ui.contentTypes.channel
+      componentInfo.utility_tile = m.Tracking.getUtilityTile(content, column, row)
+    else
+      componentInfo.content_tile = m.Tracking.getAnalyticsTile(content, column, row)
+    end if
+
+    return componentInfo
   end if
 
   return invalid
@@ -358,15 +365,23 @@ Function updateTrackingInfo(category, content, itemSelected)
     numColumns = m.ContentGrid.numColumns
     col = 1 + (itemSelected MOD numColumns)
     row = 1 + (itemSelected \ numColumns)
+
+    componentInfo = {
+      category_slug: categorySlug
+      category_row: row
+      category_col: col
+    }
+
+    if content.type  = m.constants.ui.contentTypes.channel
+      componentInfo.utility_tile = m.Tracking.getUtilityTile(content, col, row)
+    else
+      componentInfo.content_tile = m.Tracking.getAnalyticsTile(content, col, row)
+    end if
+    
     'Set the tracking component of the item that was selected so it can be accessed as part of the navigateToPage event
     m.top.trackingComponentInfo = {
       componentType: "category_component"
-      componentValues: {
-        category_slug: categorySlug
-        category_row: row
-        category_col: col
-        content_tile: m.Tracking.getAnalyticsTile(content, col, row)
-      }
+      componentValues: componentInfo
     }
   end if
 End Function

@@ -334,7 +334,10 @@ Function getFinishPreviewEvent(hasCompleted = false)
 
   videoContent = m.Video.content
   finishPreviewEvent = invalid
-  if videoContent <> invalid
+  ' Adding a check to make sure we fire the event only when the video preview content is valid and has a valid url.
+  ' This covers cases where user focus on a non video tile like in networks and then navigate to a video tile.
+  ' Since we call stopVideoPreview it triggers the finish_preview event with invalid video_id.
+  if videoContent <> invalid AND isNonEmptyString(videoContent.url) = true
     previewId = videoContent.previewId
 
     finishPreviewEvent = {
@@ -351,7 +354,7 @@ Function getFinishPreviewEvent(hasCompleted = false)
   end if
 
   componentInfo = m.top.componentInfoForAnalytics
-  if isAA(componentInfo) = true AND isAA(componentInfo.componentOneof) = true
+  if finishPreviewEvent <> invalid AND isAA(componentInfo) = true AND isAA(componentInfo.componentOneof) = true
     finishPreviewEvent.values.componentOneof = componentInfo.componentOneof
   end if
 
