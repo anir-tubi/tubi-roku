@@ -4,10 +4,10 @@
 		"ott": {
 			"display": {
 				"large": {
-					"$description": "172/206 - Black",
+					"$description": "148/148 - Black",
 					"fontSize": {
 						"$type": "dimension",
-						"$value": 172
+						"$value": 148
 					},
 					"fontFamily": {
 						"$type": "string",
@@ -23,7 +23,7 @@
 					},
 					"lineHeight": {
 						"$type": "dimension",
-						"$value": 206
+						"$value": 148
 					}
 				},
 				"medium": {
@@ -500,6 +500,52 @@
 				}
 			},
 			"body": {
+				"large-strong": {
+					"$description": "18/24 - Bold",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 18
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "Inter"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 700
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": 0
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 24
+					}
+				},
+				"large": {
+					"$description": "186/24 - Medium",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 18
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "Inter"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 500
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": 0
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 24
+					}
+				},
 				"medium-strong": {
 					"$description": "16/24 - Bold",
 					"fontSize": {
