@@ -14,15 +14,16 @@ Function init()
   topRef.observeFieldScoped("focusedChild", "onComponentFocusChange")
   m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
 
+  typographyConstants = getTypographyConstants()
+  m.countdownGroup.typographyLabelId = typographyConstants.ids.bodyExtraSmallStrong
+  setTypographyOfLabel(m.adIndicator, typographyConstants.ids.bodyExtraSmallStrong)
+
   if m.constants.deviceInfo.IsAutoplayEnabled = true
     '//Respect the device autoplay setting by disabling the autoplay/countdown feature. Do this by not setting the seconds.
     m.countdownGroup.maxSeconds = m.constants.timers.skinAdTimeout
     m.countdownGroup.seconds = m.constants.timers.skinAdTimeout
+    setCountdownTranslation()
   end if
-
-  typographyConstants = getTypographyConstants()
-  m.countdownGroup.typographyLabelId = typographyConstants.ids.bodyExtraSmallStrong
-  setTypographyOfLabel(m.adIndicator, typographyConstants.ids.bodyExtraSmallStrong)
 
   m.adIndicator.text = getTranslation("ad")
 
@@ -39,6 +40,13 @@ Function init()
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
   onThemeChange()
+End Function
+
+
+Function setCountdownTranslation()
+  tubiLog("SkinAdRow.setCountdownTranslation")
+  nXCountDownTranslation = m.rowList.translation[0] + m.constants.ui.imageSizes.skinAdLandscape[0] - m.countdownGroup.width - 25 '//move the countdown to the right so it does not overlap with the ad indicator
+  m.countdownGroup.translation = [nXCountDownTranslation, m.countdownGroup.translation[1]]  '//move the countdown to the right so it does not overlap with the ad indicator
 End Function
 
 
@@ -153,15 +161,14 @@ End function
 
 Function selectVideoItem()
   tubiLog("SkinAdRow.selectVideoItem")
-  if m.playerFullscreenCountdownTimer.control = "start"
-    m.countdownGroup.seconds = 0  'set seconds to 0 so timer does not start again after selection
-    m.playerFullscreenCountdownTimer.control = "stop"
-    m.countdownGroup.translation = [1425, m.countdownGroup.translation[1]]  '//move the countdown to the right after the text is changed
-  end if
   m.countdownGroup.display = true
   m.countdownGroup.maxSeconds = 0
   m.countdownGroup.seconds = -1
   m.countdownGroup.secondsTranslationId = "metadata_watch_again"
+  if m.playerFullscreenCountdownTimer.control = "start"
+    m.playerFullscreenCountdownTimer.control = "stop"
+    setCountdownTranslation()
+  end if
   m.top.rowItemSelected = m.rowList.rowItemFocused
 End Function
 
