@@ -1625,11 +1625,6 @@ Function showTransport()
     updatePlayPauseUri()
   end if
 
-  'Send exposure event for send feedback when transport control is visible
-  if m.top.appMode <> "KIDS_MODE"
-    getExperimentResource("roku_send_feedback_on_player", "roku_send_feedback_on_player_v1")
-  end if
-
   'Firing the exposure event when transport UI is displayed.
   getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v2")
 

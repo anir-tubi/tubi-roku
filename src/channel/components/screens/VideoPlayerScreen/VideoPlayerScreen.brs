@@ -886,7 +886,7 @@ Function onContentChange() As Void
   tubiLog("VideoPlayer.onContentChange")
   stopVideo()
 
-  if m.top.isTrailer = false AND m.top.appMode <> "KIDS_MODE" AND getExperimentResource("roku_send_feedback_on_player", "roku_send_feedback_on_player_v1", false).enabled = true
+  if m.top.isTrailer = false AND m.top.appMode <> "KIDS_MODE"
     if m.sendFeedBackButton.hasField("enabled") = true
       m.sendFeedBackButton.enabled = true
     end if
@@ -2438,7 +2438,7 @@ Function createTransportButtons()
     m.focusedNode = m.progressBar
   end if
 
-  if m.top.appMode <> "KIDS_MODE" AND getExperimentResource("roku_send_feedback_on_player", "roku_send_feedback_on_player_v1", false).enabled = true
+  if m.top.appMode <> "KIDS_MODE"
     m.sendFeedBackButton.visible = true
     m.closedCaptionAudioButton.translation = [1520, 110]
 
