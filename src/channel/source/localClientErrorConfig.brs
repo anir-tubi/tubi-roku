@@ -18,15 +18,28 @@ Function getLocalClientErrorConfig()
       "retry_base_millis": 0,
       "retry_exponent": 2,
       "retry_cap_millis": 0,
-      "retry_jitter_ratio": 0.0,
-      "error_actions": ["invalidate_token"]
+      "retry_jitter_ratio": 0,
+      "error_actions": [
+        "invalidate_token"
+      ]
     },
     "sign_off": {
       "max_retries": 0,
-      "error_actions": ["sign_off"]
+      "error_actions": [
+        "sign_off"
+      ]
     }
   },
-  "conditions": {},
+  "conditions": {
+    "user_not_found": {
+      "response_code": "user_not_found",
+      "retry_strategy": "sign_off"
+    },
+    "expired_token": {
+      "response_code": "expired_token",
+      "retry_strategy": "new_token"
+    }
+  },
   "default": {
     "errors": {
       "default": {
@@ -38,10 +51,16 @@ Function getLocalClientErrorConfig()
         "retry_strategy": "no_retry"
       },
       "401": {
-        "retry_strategy": "new_token"
+        "retry_strategy": "new_token",
+        "conditions": [
+          "user_not_found"
+        ]
       },
       "403": {
-        "retry_strategy": "new_token"
+        "retry_strategy": "no_retry",
+        "conditions": [
+          "expired_token"
+        ]
       },
       "404": {
         "retry_strategy": "no_retry"
@@ -119,6 +138,13 @@ Function getLocalClientErrorConfig()
         "/device/anonymous/token": {
           "status_codes": {
             "403": {
+              "retry_strategy": "no_retry"
+            }
+          }
+        },
+        "/user/settings": {
+          "status_codes": {
+            "409": {
               "retry_strategy": "no_retry"
             }
           }
