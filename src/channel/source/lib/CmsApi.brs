@@ -363,7 +363,7 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
   params["is_kids_mode"] = bKidsMode
   params["cursor"] = cursor
   params["include_sponsorships"] = true
-  params["contents_limit"] = m.constants.performance.categoryGridList.lazyLoadItemsPerBatch
+  params["contents_limit"] = m.constants.performance.categoryGridList.finalBlockSize
   params["content_mode"] = ""
   params["limit_resolutions"] = m.constants.player.limitResolutions
   params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
@@ -764,7 +764,9 @@ Function cmsApi_createHomeScreenBatchReqInfoForContainers(containerIds, contentM
       categoryReqInfo = invalid
       if isNonEmptyString(containerId) = true
         options = {
-          params: {}
+          params: {
+            contents_limit: m.constants.performance.categoryGridList.lazyLoadItemsPerBatch
+          }
         }
 
         contentModeParam = {
@@ -807,7 +809,9 @@ Function cmsApi_createGetContainerContentsReqInfo(category, homeScreen, bKidsMod
     if isNonEmptyString(categoryId) = true
       tubiLog("CategoryGridList.fetch whole: Asking GeneralTask for " + categoryId)
 
-      params = {}
+      params = {
+        contents_limit: m.constants.performance.categoryGridList.lazyLoadItemsPerBatch
+      }
 
       if homeScreen.contentMode = m.constants.ui.contentMode.homescreen
         contentModeValue = ""
