@@ -553,7 +553,7 @@ End Function
 
 Function onAppRestartRequested()
   tubilog("SettingsScreenHelpers.onAppRestartRequested")
-  if m.constants.settings.mode = "qa" OR  m.constants.settings.mode = "dev" 'this is for extra protection not to restart the app
+  if m.constants.settings.mode = "qa" OR  m.constants.settings.mode = "dev" OR m.constants.settings.mode = "staging" 'this is for extra protection not to restart the app
     restartApp()
   end if
 End Function
