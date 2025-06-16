@@ -511,13 +511,17 @@ End Function
 
 
 '@authToken can be the server access_token or refresh_token depending on the call being made
-Function tubiAuth_getAuthHeaders(authToken)
+Function tubiAuth_getAuthHeaders(authToken, authorizationHeaderOnly = false)
   if isString(authToken) = true
     headers = {
       Authorization: "Bearer " + authToken
     }
-    headers.append(m.constants.headers.json)
-    headers.append(m.constants.headers.commonUapi)
+
+    ' In some cases we don't want to append these headers and just want to use the Authorization header
+    if authorizationHeaderOnly = false then
+      headers.append(m.constants.headers.json)
+      headers.append(m.constants.headers.commonUapi)
+    end if
 
     return headers
   else

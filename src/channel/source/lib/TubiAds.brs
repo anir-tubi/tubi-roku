@@ -504,7 +504,15 @@ Function tubiAds_retrieveAds(adsUrl, adInsertionMethod)
 
 
   requestOptions = {}
-  requestOptions.headers = {}
+
+  headers = {}
+
+  authInfo = m.auth.getAuthInfo()
+  if authInfo <> invalid AND authInfo.accessToken <> invalid then
+    headers = m.auth.getAuthHeaders(authInfo.accessToken, true)
+  end if
+
+  requestOptions.headers = headers
 
   if adInsertionMethod = "csai" then
     if m.googleAppSession = invalid then

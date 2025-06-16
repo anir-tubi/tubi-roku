@@ -366,6 +366,12 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getUserSettings] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.postLogout] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.postAnalytics] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.postViewableImpression] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getPauseAd] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getNamespaces] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getExternalConfigs] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getLiveManifest] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getEPGPrograms] = true
 
   constants.anonymous = {}
     constants.anonymous.algorithm = "TUBI-HMAC-SHA256"
@@ -1001,12 +1007,12 @@ Function getConstants()
         constants.player.linear.ssaiVersion = {}
         constants.player.linear.ssaiVersion.unknown = 0
         constants.player.linear.ssaiVersion.apollo = 1
-        constants.player.linear.ssaiVersion.youspace = 2   
+        constants.player.linear.ssaiVersion.youspace = 2
 
         'Linear player_type
         constants.player.linear.player_type_unspecified = 0
         constants.player.linear.player_type_default = 1
-        constants.player.linear.player_type_banner = 2  
+        constants.player.linear.player_type_banner = 2
 
       'Hdcp version
       constants.player.hdcpVersion = {}
