@@ -269,6 +269,8 @@
               loadDisplayMode="scaleToFit"/>
             <Badge
               id="fullHDBadge"/>
+            <Badge
+              id="rottenTomatoBadge"/>
           </LayoutGroup>
           <LayoutGroup
             id="SecondLineGroup"

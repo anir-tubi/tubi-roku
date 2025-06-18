@@ -43,6 +43,10 @@ Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel)
     end if
   end if
 
+  if isNonEmptyString(content.rottenTomatoScore) = true
+    lineOneData.rottenTomatoText = content.rottenTomatoScore
+  end if
+
   if content.availabilityEnds <> invalid
     lineOneData.availabilityEnds = content.availabilityEnds
   end if

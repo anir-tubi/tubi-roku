@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="CertifiedFreshPoster" extends="Group">
+
+  <script type="text/brightscript" uri="CertfiedFreshPoster.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+   <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+
+  <interface>
+    <field id="itemContent" type="node" />
+    <field id="focusPercent" type="float" />
+    <field id="width" alias="Poster.width" />
+    <field id="height" alias="Poster.height" />
+  </interface>
+
+ <children>
+    <Poster
+      id="Poster"
+      loadingBitmapUri="pkg:/images/placeholder.webp"
+      failedBitmapUri="pkg:/images/placeholder.webp" />
+
+    <LayoutGroup
+      layoutDirection="horiz"
+      id="badgeGroup"
+      itemSpacings="[9]" />
+
+  </children>
+</component>

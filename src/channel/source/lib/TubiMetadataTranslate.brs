@@ -88,7 +88,7 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
     gridType = gridItemTypes.portrait
   end if
 
-  if gridType = gridItemTypes.portrait OR gridType = gridItemTypes.portraitTopTen
+  if gridType = gridItemTypes.portrait OR gridType = gridItemTypes.portraitTopTen OR gridType = gridItemTypes.certifiedFresh
     if canvasImages <> invalid AND type(canvasImages.poster_tb) = "roArray" AND isNonEmptyString(canvasImages.poster_tb[0]) = true
       '//A custom portrait size was requested, use this image instead of the default image
       sThumbnailURL = canvasImages.poster_tb[0]
@@ -343,6 +343,10 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.needs_login = true AND isSignedInUser = false AND m.checkIfUserIsInRegistrationByPassMode() = false
     translatedContent.needsLogin = true
     translatedContent.loginReason = contentFromServer.login_reason
+  end if
+
+  if  isAA(contentFromServer.content_tags) = true AND isArray(contentFromServer.content_tags.rotten_tomatoes_certified_fresh) = true
+    translatedContent.rottenTomatoScore = contentFromServer.content_tags.rotten_tomatoes_certified_fresh[0] + "%"
   end if
 
   ' in case isCdc was already set from the parent above, don't overwrite
@@ -1555,11 +1559,17 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
               gridItemType: parentGridItemType
             }
           else
+            rottenTomotoScore = 0
+            if isAA(fullChild.content_tags) = true AND isNonEmptyArray(fullChild.content_tags.rotten_tomatoes_certified_fresh) = true
+              rottenTomotoScore = fullChild.content_tags.rotten_tomatoes_certified_fresh[0].toInt()
+            end if
+
             childAA = {
               id: fullChild.id
               title: fullChild.title
               description: fullChild.description
               length: fullChild.duration
+              userStarRating: rottenTomotoScore
               subtype: sType
               type: sContentType
             }
@@ -1962,6 +1972,8 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
     gridItemType = gridItemTypes.portrait
   else if container.type = constants.ui.categoryTypes.linear
     gridItemType = gridItemTypes.linear
+  else if container.id = constants.ui.categoryIds.certifiedFresh
+    gridItemType = gridItemTypes.certifiedFresh
   else if container.id = constants.ui.categoryIds.featured AND orientation <> gridItemTypes.portrait
     ' `orientation <> gridItemTypes.portrait` is required as the search screen container.id is featured but uses portrait imagery
     gridItemType = gridItemTypes.landscapeNoTitle

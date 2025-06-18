@@ -1158,6 +1158,7 @@ Function getConstants()
       constants.ui.categoryIds.seriesSpotlight = "series_spotlight"
       constants.ui.categoryIds.topSearched = "top_searched"
       constants.ui.categoryIds.topTenSeries = "top_10_tv_shows_on_tubi"
+      constants.ui.categoryIds.certifiedFresh = "certified_fresh"
       ' Adding a constant entry so that it is easier to change for testing or future use if we need to pick other container outside of featured.
       constants.ui.categoryIds.skinAd = "skinAd"
 
@@ -1498,6 +1499,7 @@ Function getConstants()
       constants.ui.gridItemTypes.portraitTopTen = "portraitTopTen"
       constants.ui.gridItemTypes.skinAd = "skinAd"
       constants.ui.gridItemTypes.featuredPortraitSmall = "featuredPortraitSmall"
+      constants.ui.gridItemTypes.certifiedFresh = "certifiedFresh"
 
     constants.ui.uris = {}
 

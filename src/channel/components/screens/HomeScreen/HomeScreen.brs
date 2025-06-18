@@ -381,6 +381,8 @@ Function onCurrFocusRowChange()
       else if categoryEnteringFocus.sponsorImages.brandColor <> ""
         sSponsorBackgroundURL = categoryEnteringFocus.sponsorImages.brandColor
       end if
+    else if categoryEnteringFocus.id = m.constants.ui.categoryIds.certifiedFresh
+      expandContentAreaForSponsorship(rowPercent)
     end if
 
     m.top.sponsorshipBackground = sSponsorBackgroundURL

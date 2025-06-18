@@ -102,6 +102,13 @@ Function onContentChange()
       m.SponsorPoster.visible = true
       m.CategoryName.translation = [m.SponsoredBy.translation[0], 7]
       m.SponsoredBy.translation = [m.SponsoredBy.translation[0], 74]
+    else if item.id = "certified_fresh"
+      m.SponsorPoster.uri = "pkg:/images/certified-fresh.png"
+      m.SponsorPoster.height = 48
+      m.SponsorPoster.width = 48
+      m.SponsorPoster.opacity = 1
+      m.SponsorPoster.visible = true
+      m.CategoryName.translation = [m.SponsorPoster.translation[0] + 57 , m.CategoryName.translation[1]]
     else
       '//reset the assets in case the label is reused for other container rows that do not have sponsorships
       m.SponsoredByPoster.unobserveField("loadStatus")

@@ -458,7 +458,7 @@ Function setRowHeights()
       rowHeight = bannerSize[1]
       rowItemSpacings.push([10, 0])
       focusXOffsets.push(0)
-    else if gridItemType = gridItemTypes.portrait
+    else if gridItemType = gridItemTypes.portrait OR gridItemType = gridItemTypes.certifiedFresh
       posterWidth = posterSize[0]
       posterHeight = posterSize[1]
       rowItemSize.push([posterWidth, posterHeight])

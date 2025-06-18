@@ -6,7 +6,7 @@ Function init()
   m.top.observeFieldScoped("height", "onPosterSizeChange")
   m.top.observeFieldScoped("width", "onPosterSizeChange")
 
-    if m.global <> invalid
+  if m.global <> invalid
     m.global.observeFieldScoped("refreshLinearChannels", "onRefreshLinearChannels")
   end if
 

@@ -33,6 +33,7 @@ Function init()
   m.expireWarning = m.firstLineGroup.findNode("ExpireWarning")
   m.partnerLogo = m.firstLineGroup.findNode("PartnerLogo")
   m.fullHDBadge = m.firstLineGroup.findNode("fullHDBadge")
+  m.rottenTomatoBadge = m.firstLineGroup.findNode("rottenTomatoBadge")
 
   m.secondLineGroup = m.top.findNode("SecondLineGroup")
   m.secondLineAvailabilityBadge = m.secondLineGroup.findNode("SecondLineAvailabilityBadge")
@@ -103,6 +104,7 @@ Function init()
   setTypographyOfLabel(m.episode, m.typographyConstants.ids.subheaderSmall)
   setTypographyOfLabel(m.Line1, m.typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.Line1Bold, m.typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.rottenTomatoBadge, m.typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.DescriptorCode, m.typographyConstants.ids.bodyExtraSmallStrong)
   setTypographyOfLabel(m.RatingLabel, m.typographyConstants.ids.bodyExtraSmallStrong)
   setTypographyOfLabel(m.ExpireWarning, m.typographyConstants.ids.bodyMedium)
@@ -631,6 +633,21 @@ Function onLineOneDataChange(msg)
     else
       if isFullHdBadgePresent = true
         firstLineGroup.removeChild(m.fullHDBadge)
+      end if
+    end if
+
+    'handle Rotten Tomatoes present
+    isRottenTomatoScorePresent = (m.rottenTomatoBadge.getParent() <> invalid)
+    if isNonEmptyString(data.rottenTomatoText) = true
+      if isRottenTomatoScorePresent = false
+        firstLineGroup.insertChild(m.rottenTomatoBadge, insertIndex)
+      end if
+
+      formatBadge(data.rottenTomatoText, m.rottenTomatoBadge)
+      insertIndex++
+    else
+      if isRottenTomatoScorePresent = true
+        firstLineGroup.removeChild(m.rottenTomatoBadge)
       end if
     end if
 
@@ -1205,6 +1222,9 @@ Function formatBadge(text, badgeComponent)
     else if UCase(text) = UCase(getTranslation("onNow"))
       badgeComponent.backgroundColor = theme.blueBadgeColor
       badgeComponent.textColor = m.primaryTextColor
+    else if badgeComponent.id = m.rottenTomatoBadge.id
+      badgeComponent.iconUri = "pkg:/images/certified-fresh.png"
+      badgeComponent.textColor = theme.focusedTextColor
     else
       ' TODAY, TOMORROW, <<Date>> badge and Full HD badge
       badgeComponent.backgroundColor = theme.neutralColor
@@ -1212,7 +1232,11 @@ Function formatBadge(text, badgeComponent)
     end if
   end if
 
-  badgeComponent.text = UCase(text)
+  if badgeComponent.id = m.rottenTomatoBadge.id
+    badgeComponent.text = text
+  else
+    badgeComponent.text = UCase(text)
+  end if
 End Function
 
 

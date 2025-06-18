@@ -83,6 +83,8 @@ Function onItemContentChange(msg)
       end if
     else if itemContent.needsLogin = true AND isLoggedInUser() = false '//TBD : isLoggedInUser accesses m.global for every item. Try to remove this
       childGridItemComponent = "CategoryGridPoster"
+    else if gridItemType = "certifiedFresh"
+      childGridItemComponent = "CertifiedFreshPoster"
     else
       if row <> invalid AND row.id = "continue_watching"
         childGridItemComponent = "CategoryGridPoster"
