@@ -345,7 +345,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     translatedContent.loginReason = contentFromServer.login_reason
   end if
 
-  if  isAA(contentFromServer.content_tags) = true AND isArray(contentFromServer.content_tags.rotten_tomatoes_certified_fresh) = true
+  if  isAA(contentFromServer.content_tags) = true AND isNonEmptyArray(contentFromServer.content_tags.rotten_tomatoes_certified_fresh) = true
     translatedContent.rottenTomatoScore = contentFromServer.content_tags.rotten_tomatoes_certified_fresh[0] + "%"
   end if
 
