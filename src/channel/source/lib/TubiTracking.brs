@@ -743,7 +743,7 @@ Function tubiTracking_getAnalyticsTile(contentNode, colPos = 1, rowPos = 1)
         contentId = Mid(contentNode.id, 2)
       end if
       tile.series_id = contentId.toInt()
-    else if contentNode.type = m.constants.ui.contentTypes.video OR contentNode.type = m.constants.ui.contentTypes.linear
+    else if contentNode.type = m.constants.ui.contentTypes.video OR contentNode.type = m.constants.ui.contentTypes.linear OR contentNode.type = m.constants.ui.contentTypes.skinAd
       tile.video_id = contentId.toInt()
     else if contentNode.type = m.constants.ui.contentTypes.genre
       tile.id = contentId
