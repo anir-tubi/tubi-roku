@@ -298,6 +298,12 @@ Function onScreenFocusChange()
   end if
 
   updatePersonalizationIdInTrackingInfo()
+
+  if shouldRefresh(m.ResultGrid.content) = true
+    m.keyboard.text = ""
+    loadSearchResults(true)
+    m.trendingSearchResultGrid.setFocus(true)
+  end if
 End Function
 
 
@@ -788,19 +794,21 @@ Function onResultGridCurrFocusRowChange(msg)
   currFocusRow = msg.getData()
   gridContent = gridNode.content
 
-  totalItems = gridContent.getChildCount()
-  totalRows = totalItems \ 5
-  if totalItems MOD 5 <> 0
-    totalRows = totalRows + 1
-  end if
+  if gridContent <> invalid
+    totalItems = gridContent.getChildCount()
+    totalRows = totalItems \ 5
+    if totalItems MOD 5 <> 0
+      totalRows = totalRows + 1
+    end if
 
-  fraction = totalRows - 1 - currFocusRow
-  if fraction < 1 AND m.top.isUserEligibleForTrendingSearchContents = true
-    translationY = 672 - ((1 - fraction) * 298)
-    m.trendingSearchResultsContainer.translation = [0, translationY]
-    m.trendingResultsHint.visible = true
-  else
-    m.trendingResultsHint.visible = false
+    fraction = totalRows - 1 - currFocusRow
+    if fraction < 1 AND m.top.isUserEligibleForTrendingSearchContents = true
+      translationY = 672 - ((1 - fraction) * 298)
+      m.trendingSearchResultsContainer.translation = [0, translationY]
+      m.trendingResultsHint.visible = true
+    else
+      m.trendingResultsHint.visible = false
+    end if
   end if
 End Function
 

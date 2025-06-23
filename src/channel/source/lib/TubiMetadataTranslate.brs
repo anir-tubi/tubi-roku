@@ -2855,6 +2855,12 @@ Function tubiMetadataTranslate_translateSearchResults(contentToTranslate, isSign
         personalizationId: contentToTranslate.personalization_id
       }, true)
     end if
+
+    if contentToTranslate.valid_duration <> invalid
+      translated.update({
+        validUntil: UpTime(0) + contentToTranslate.valid_duration
+      }, true)
+    end if
   end if
 
   return translated

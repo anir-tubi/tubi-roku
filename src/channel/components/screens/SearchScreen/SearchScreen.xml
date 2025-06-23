@@ -15,6 +15,7 @@
   <script type="text/brightscript" uri="pkg:/components/lib/InfoPanelMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/CacheValidationMixin.brs" />
 
   <interface>
     <!-- INPUT -->
