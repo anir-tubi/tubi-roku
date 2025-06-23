@@ -1104,6 +1104,19 @@ Function onVideoStateChange(msg)
       end if
     end if
 
+    contentErrorInfo = {}
+    contentErrorInfo["error_code"] = m.Video.errorCode
+    contentErrorInfo["error_details"] =  m.Video.errorMsg
+    
+    if m.didAdvanceDrm <> true
+      isFatal = true
+    else
+      isFatal = false
+    end if
+
+    contentErrorInfo["fatal"] =  isFatal
+    updatePlayerLogLib(m.playerLogLib, "fireContentErrorEvent", contentErrorInfo)
+
     if m.didAdvanceDrm <> true
       updatePlayerLogLib(m.playerLogLib, "setErrorCode", m.Video.errorCode)
       updatePlayerLogLib(m.playerLogLib, "setErrorModal", true)

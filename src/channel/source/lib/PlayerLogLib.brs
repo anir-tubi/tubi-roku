@@ -202,6 +202,7 @@ Function PlayerLogLib(constants, tracking)
     firePlayerPageExitEvent: playerLogLib_firePlayerPageExitEvent
     fireAdStartupPerformanceEvent: playerLogLib_fireAdStartupPerformanceEvent
     fireAdMissedEvent: playerLogLib_fireAdMissedEvent
+    fireContentErrorEvent: playerLogLib_fireContentErrorEvent
     setAdPodStart: playerLogLib_setAdPodStart
 
     '//private methods
@@ -1501,7 +1502,13 @@ Function playerLogLib_setUserFeedback(userfeedbackInfo = {})
   userfeedbackInfo["video_resource_codec"] = m.videoCodecType
   userfeedbackInfo["video_resource_hdcp"] = m.hdcpVersion
   userfeedbackInfo["video_resource_resolution"] = m.videoResolution
-  userfeedbackInfo["position"] = m.videoPosition
+
+  position = m.videoPosition
+  if position = -1
+    position = 0
+  end if
+
+  userfeedbackInfo["position"] = position * 1000 'ms
   userfeedbackInfo["captions_index"] = m.captionsIndex
   userfeedbackInfo["captions_list"] = m.getCaptionsList()
   userfeedbackInfo["is_continue_watching"] = m.isContinueWatching
@@ -1681,4 +1688,50 @@ Function playerLogLib_setIsBuffering(isBuffering)
   else
     m.isBuffering = false      
   end if
+End Function
+
+
+'The Content Error event will be triggered when there is any playback error
+'
+'@contentErrorInfo: assocarray, contains error_code, error_details, fatal
+Function playerLogLib_fireContentErrorEvent(contentErrorInfo)
+  eventBase = {
+    device_id: ""
+    platform: ""
+    version: ""
+    log_version: ""
+    track_id: ""
+    video_id: ""
+    position: ""
+    tvt: ""
+    error_code: ""
+    error_details: ""
+    fatal: ""
+    message_map: {}
+  }
+
+  contentErrorInfo["device_id"] = m.constants.deviceInfo.deviceId
+  contentErrorInfo["platform"] = m.constants.platform
+  contentErrorInfo["version"] = m.constants.deviceInfo.clientVersion
+  contentErrorInfo["log_version"] = m.constants.player.analyticsVersion
+  contentErrorInfo["track_id"] = m.playerLogTrackId
+  contentErrorInfo["video_id"] = m.videoId
+
+  position = m.videoPosition
+  if position = -1
+    position = 0
+  end if
+
+  contentErrorInfo["position"] = position * 1000 'ms
+  contentErrorInfo["tvt"] = m.totalViewTime * 1000 'ms
+
+  messageMap = {
+    video_resource_type: m.videoResourceType
+    video_codec_type: m.videoCodecType
+    hdcp_version: m.hdcpVersion
+    current_video_resolution: m.videoResolution
+  }
+  contentErrorInfo["message_map"] = messageMap
+
+  m.sendEvent(contentErrorInfo, "content_error", eventBase)
 End Function
