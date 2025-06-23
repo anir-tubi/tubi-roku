@@ -2859,13 +2859,9 @@ End Function
 
 Function onDownloadedSegment(msg)
   downloadedSegment = msg.getData()
+  
   if isAA(downloadedSegment) = true
-    downloadedSegmentData = {
-      segSize: downloadedSegment.segSize
-      downloadDuration: downloadedSegment.downloadDuration
-      segDuration: downloadedSegment.segDuration
-    }
-    updatePlayerLogLib(m.playerLogLib, "setDownloadedSegmentData", downloadedSegmentData)
+    updatePlayerLogLib(m.playerLogLib, "setDownloadedSegmentData", downloadedSegment)
   end if
 End Function
 

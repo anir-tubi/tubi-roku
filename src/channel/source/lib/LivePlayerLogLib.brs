@@ -47,9 +47,11 @@ Function LivePlayerLogLib(constants, tracking)
     totalViewTime: 0 'used in QoS event
     isBuffering: false 'used in playerPageExit event
 
-    totalSegSize: 0 'used in Qos event
-    totalDownloadDuration: 0 'used in Qos event
-    totalSegDuration: 0 'used in Qos event
+    'used to calculate download_frag_bitrate & download_speed in QoS event
+    totalSegSize: 0
+    totalAudioSegDuration: 0
+    totalVideoSegDuration: 0
+    totalDownloadDuration: 0
 
     contentFirstFrameDuration: -1 'used in Qos event
     breakOffCount: 0 'used in QoS event
@@ -422,11 +424,22 @@ End Function
 '@downloadedSegment: assocarray, which contains segSize, downloadDuration, segDuration
 Function playerLogLib_setLiveDownloadedSegmentData(downloadedSegment)
   if isAA(downloadedSegment) = true AND isNonEmptyString(m.cdn) = false
-    m.totalSegSize += downloadedSegment.segSize
-    m.totalDownloadDuration += downloadedSegment.downloadDuration
-    m.totalSegDuration += downloadedSegment.segDuration
+    segType = downloadedSegment.segType
     segUrl = downloadedSegment.segUrl
-    m.setCDN(segUrl)
+
+    if segType = 0 OR segType = 1 OR segType = 2
+      m.totalSegSize += downloadedSegment.segSize 'in bytes
+      m.totalDownloadDuration += downloadedSegment.downloadDuration 'in milliseconds
+
+      if segType = 1 'audio for hlsv6
+        m.totalAudioSegDuration += downloadedSegment.segDuration 'in milliseconds
+      else if segType = 2 'video for hlsv6
+        m.totalVideoSegDuration += downloadedSegment.segDuration 'in milliseconds
+      else if segType = 0 'mux (video & audio) for hlsv3
+        m.totalVideoSegDuration += downloadedSegment.segDuration 'in milliseconds
+      end if
+      m.setCDN(segUrl)
+    end if
   end if
 End Function
 
@@ -495,18 +508,31 @@ Function playerLogLib_fireLiveQualityOfServiceEvent()
   qualityOfServiceInfo["ssai_version"] = m.ssaiVersion
   qualityOfServiceInfo["cdn"] = m.cdn
 
+  'download_speed represents the download speed (in kbits/s) within a playback session. 
+  'It is calculated by dividing the total size of downloaded fragments (total video fragments size + total audio fragments size) 
+  'by the total fragment download duration.
   if m.totalSegSize > 0 AND m.totalDownloadDuration > 0
-    downloadSpeed = m.totalSegSize / m.totalDownloadDuration
+    downloadSpeed = (m.totalSegSize * 8 / 1000) / (m.totalDownloadDuration / 1000)
   else
     downloadSpeed = 0  
   end if
   qualityOfServiceInfo["download_speed"] = downloadSpeed
 
-  if m.totalSegSize > 0 AND m.totalSegDuration > 0
-    downloadFragBitrate = m.totalSegSize / m.totalSegDuration
-  else
-    downloadFragBitrate = 0  
+  'download_frag_bitrate represents the average playback bitrate (in kbits/s) within a playback session. 
+  'It is calculated by dividing the total size of downloaded fragments (total video fragments size + total audio fragments size) 
+  'by the total fragment duration(maximum of total video fragments duration and total audio fragments duration).
+  downloadFragBitrate = 0
+
+  if m.totalSegSize > 0 
+    if m.totalAudioSegDuration > 0 AND m.totalVideoSegDuration > 0
+      downloadFragBitrate = (m.totalSegSize * 8 / 1000) / (maxValue(m.totalAudioSegDuration, m.totalVideoSegDuration) / 1000)
+    else if m.totalAudioSegDuration > 0
+      downloadFragBitrate = (m.totalSegSize * 8 / 1000) / (m.totalAudioSegDuration / 1000)
+    else if m.totalVideoSegDuration > 0
+      downloadFragBitrate = (m.totalSegSize * 8 / 1000) / (m.totalVideoSegDuration / 1000)
+    end if
   end if
+
   qualityOfServiceInfo["download_frag_bitrate"] = downloadFragBitrate
 
   m.sendEvent(qualityOfServiceInfo, "live_quality_of_services", eventBase)
@@ -665,6 +691,10 @@ Function playerLogLib_resetAttributes()
   m.cdn = ""
   m.isVideoPlayed = false
   m.hasErrorModalShown = false
+  m.totalSegSize = 0
+  m.totalAudioSegDuration = 0
+  m.totalVideoSegDuration = 0
+  m.totalDownloadDuration = 0
 End Function
 
 
