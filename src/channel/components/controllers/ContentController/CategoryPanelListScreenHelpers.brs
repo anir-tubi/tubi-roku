@@ -65,6 +65,7 @@ Function showCategoryPanelListScreen(constants, sendNavigationLoadEvents = true,
     end if
 
     getCategoryPanelListDataFromServer(panelScreen)
+    getExperimentResource("roku_categories_screen_filters_reorder", "roku_categories_screen_filters_reorder_v1", true)
   end if
 End Function
 

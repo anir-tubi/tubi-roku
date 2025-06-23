@@ -129,6 +129,14 @@ Function TubiExperiments(experimentsInfo) as Object
         }
       }
 
+      roku_categories_screen_filters_reorder: {
+        roku_categories_screen_filters_reorder_v1: {
+          default: {"enabled": false}
+          holdout_control: {"enabled": false}
+          holdout_winning: {"enabled": false}
+        }
+      }
+
 
     }
 

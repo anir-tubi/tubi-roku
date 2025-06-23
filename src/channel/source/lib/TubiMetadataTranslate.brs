@@ -1093,6 +1093,11 @@ Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate,
   ' Below logic is required to hide the network tab during fail safe since we are not getting the channel containers in the response.
   isChannelContainersPresent = false
 
+  isCategoriesScreenFiltersReorderEnabled = false
+  if m.experiments <> invalid
+    isCategoriesScreenFiltersReorderEnabled = m.experiments.getExperimentResource("roku_categories_screen_filters_reorder", "roku_categories_screen_filters_reorder_v1").enabled
+  end if
+
   for each container in contentToTranslate.containers
 
     if container.type = m.constants.ui.categoryTypes.channel
@@ -1113,12 +1118,12 @@ Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate,
         if isNonEmptyString(categoryAA.id) = true
           sID = LCase(categoryAA.id)
         end if
-
+        
         if sID = recommendedForYouCategoryID
           catRecommend = categoryAA
-        else if sID = continueWatchingCategoryId
+        else if sID = continueWatchingCategoryId AND isCategoriesScreenFiltersReorderEnabled = false
           catContinueWatching = categoryAA
-        else if sID = queueCategoryId
+        else if sID = queueCategoryId AND isCategoriesScreenFiltersReorderEnabled = false
           catQueue = categoryAA
         else
           categoryList.children.push(categoryAA)
