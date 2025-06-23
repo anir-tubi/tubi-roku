@@ -1156,6 +1156,36 @@ function runAutomatedTestsSmoke(done) {
 }
 
 
+async function installCompanionChannel(done) {
+  const rokuDeploy = require('roku-deploy');
+  const env = process.env;
+
+  const options = rokuDeploy.getOptions({project: 'companion-channel/bsconfig.json'});
+  await rokuDeploy.deploy({
+    ...options,
+    host: env.ROKU_DEV_TARGET,
+    password: env.DEV_PASSWORD,
+    rootDir: 'companion-channel'
+  });
+}
+
+async function packageCompanionChannel(done) {
+  const rokuDeploy = require('roku-deploy');
+  const env = process.env;
+
+  const options = rokuDeploy.getOptions({project: 'companion-channel/bsconfig.json'});
+  await rokuDeploy.deployAndSignPackage({
+    ...options,
+    host: env.ROKU_DEV_TARGET,
+    password: env.DEV_PASSWORD,
+    rootDir: 'companion-channel',
+    signingPassword: env.PKG_PASSWORD,
+    outDir: 'build',
+    outFile: 'companion-channel'
+  });
+}
+
+
 exports.buildAutomatedTests = series(setAutomatedTestsConfig, clean, buildInstalled);
 exports.runAutomatedTests = series(setAutomatedTestsConfig, runAutomatedTests);
 exports.runAutomatedTestsCli = runAutomatedTestsCli;
@@ -1168,6 +1198,9 @@ exports.runAutomatedAnalyticsTestsForAdsCli = runAutomatedAnalyticsTestsForAdsCl
 exports.runAutomatedTestsSmoke = runAutomatedTestsSmoke;
 
 exports.runToolingTests = series(setAutomatedTestsConfig, clean, buildInstalled, runToolingTests);
+
+exports.installCompanionChannel = installCompanionChannel;
+exports.packageCompanionChannel = packageCompanionChannel;
 
 exports.buildReleaseNotes = buildReleaseNotesOutput;
 exports.buildQaChanges = buildQaChangesOutput;

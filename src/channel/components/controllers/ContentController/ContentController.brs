@@ -2037,7 +2037,10 @@ Function onCustomResume(msg)
 
     retrieveClientErrorConfig()
 
-    if (customResumeLaunchParams.contentId <> invalid AND customResumeLaunchParams.mediaType <> invalid) OR customResumeLaunchParams.page <> invalid
+    if RegRead("applicationRestartRequired", m.constants.registrySectionIDs.settingsOverride) = "true" then
+      RegDelete("applicationRestartRequired", m.constants.registrySectionIDs.settingsOverride)
+      bRestartApp = true
+    else if (customResumeLaunchParams.contentId <> invalid AND customResumeLaunchParams.mediaType <> invalid) OR customResumeLaunchParams.page <> invalid
       ' if resuming due to a deeplink, restart the app. Deeplinking into a non standard state creates
       ' lots of edge cases, so for consistency, restarting the app is easiest.
       bRestartApp = true
@@ -2376,8 +2379,8 @@ Function showHideLogo(logoType, presentedByURL = "", presentedByText = "")
     presentedWidth = m.presentedByGroup.boundingRect().width
     logoWidth = m.logo.boundingRect().width
     x = 1809 - (logoWidth + presentedWidth) ' 1920 - total - (135 - logo width + 24 space + 87 -margin + presentedWidth)
-    x1 = x + logoWidth + 24 + (presentedWidth / 2) ' 159 =  135 + 24 
-    m.presentedByGroup.translation = [x1, 33] 
+    x1 = x + logoWidth + 24 + (presentedWidth / 2) ' 159 =  135 + 24
+    m.presentedByGroup.translation = [x1, 33]
     m.logo.translation = [x, 54]
   else
     m.presentedByGroup.visible = false

@@ -1,0 +1,18 @@
+title=Tubi Companion Channel
+
+major_version=1
+minor_version=0
+build_version=0
+
+mm_icon_focus_hd=pkg:/images/channel-icon-hd-290x218.png
+mm_icon_focus_sd=pkg:/images/channel-icon-sd-246x140.png
+
+splash_screen_hd=pkg:/images/black.png
+splash_screen_fhd=pkg:/images/black.png
+
+splash_color=#000000
+splash_min_time=0
+
+ui_resolutions=fhd
+
+bs_const=consoleLoggingEnabled=false;consoleLoggingIncludeTimestamp=false;useQaAnalyticsProxy=false;linearQaProxyEnabled=false;brazeLoggingEnabled=false

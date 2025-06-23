@@ -1,0 +1,30 @@
+{
+  "rootDir": "./",
+  "plugins": [
+    "@rokucommunity/bslint",
+    "brighterscript-xml-plugin"
+  ],
+  "files": [
+    "manifest",
+    "source/**/*.*",
+    "components/**/*.*",
+    "images/**/*.*",
+    {
+      "src": "../src/channel/components/lib/FocusControlLayoutGroup/**/*.*",
+      "dest": "components/FocusControlLayoutGroup/"
+    },
+    {
+      "src": "../src/channel/source/3rdparty/roku/generalUtils.brs",
+      "dest": "source/3rdparty/roku/generalUtils.brs"
+    },
+    {
+      "src": "../src/channel/source/Constants.brs",
+      "dest": "source/Constants.brs"
+    },
+    {
+      "src": "../src/channel/source/3rdparty/rta/typeUtils.brs",
+      "dest": "source/3rdparty/rta/typeUtils.brs"
+    },
+
+  ]
+}

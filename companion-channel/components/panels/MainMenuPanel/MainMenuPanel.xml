@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="MainMenuPanel" extends="ListPanel">
+  <script type="text/brightscript" uri="MainMenuPanel.brs" />
+  <children>
+    <LabelList id="labelList">
+      <ContentNode role="content">
+        <MainMenuListItem title="Proxy Setup" subtype="ProxySetupPanel" />
+        <MainMenuListItem title="View Registry" subtype="ViewRegistryPanel" />
+      </ContentNode>
+    </LabelList>
+  </children>
+</component>

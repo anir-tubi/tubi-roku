@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="ViewRegistryPanel" extends="BasePanel" >
+  <script type="text/brightscript" uri="ViewRegistryPanel.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+
+  <children>
+    <ScrollableText
+      id="scrollableText"
+      translation="[15,15]"
+      height="700"
+      width="1100" />
+  </children>
+</component>

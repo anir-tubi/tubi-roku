@@ -889,7 +889,9 @@ In a situation where the currently released version needs to be rolled back to t
     useStarterComponents: true
     useRemoteComponents: true
 
+# External dev tools
 
+The companion channel can help set various settings in the staging and production channel that previously weren't possible. In order to develop additional features for the companion channel you can either use `gulp install` or load the companion-channel folder in vscode. When you want to upload a new version to the Roku portal you can run `gulp packageCompanionChannel` similar to how we do for that main channel.
 
 # Contributing
 

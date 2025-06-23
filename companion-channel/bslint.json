@@ -1,0 +1,18 @@
+{
+  "rules": {
+    "unsafe-path-loop": "error",
+    "aa-comma-style": "off",
+    "named-function-style": "off",
+    "case-sensitivity": "error",
+    "unused-variable": "error",
+    "block-if-style": "off",
+    "inline-if-style": "off",
+    "assign-all-paths": "error",
+    "condition-style": "off",
+    "anon-function-style": "off",
+    "eol-last": "off",
+    "unsafe-iterators": "error",
+    "consistent-return": "error",
+    "no-stop": "error"
+  }
+}

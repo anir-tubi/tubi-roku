@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="ProxySetupPanel" extends="BasePanel" >
+  <script type="text/brightscript" uri="ProxySetupPanel.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+
+  <children>
+    <FocusControlLayoutGroup
+      id="focusControlLayoutGroup"
+      translation="[15,15]">
+      <AppButton id="ipAddressButton" maxWidth="520" minWidth="520" />
+      <AppButton id="portButton" maxWidth="520" minWidth="520" />
+      <AppButton id="enabledButton" maxWidth="520" minWidth="520"/>
+    </FocusControlLayoutGroup>
+  </children>
+</component>

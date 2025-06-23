@@ -25,14 +25,20 @@ Function getConstants()
     ' Used to store overrides like for the external config like for disabling magiclink for Roku. Stores a json inside that needs to be parsed.
     constants.registrySectionIDs.overrides = "overrides"
 
-    settingsOverride = RegReadAll(constants.registrySectionIDs.settingsOverride)
-  if type(settingsOverride) = "roAssociativeArray" AND settingsOverride.charlesProxyEnabled <> invalid AND settingsOverride.charlesProxyUrl <> invalid  then
-    constants.settings.charlesProxyEnabled = (settingsOverride.charlesProxyEnabled = "true")
-    constants.settings.charlesProxyUrl = settingsOverride.charlesProxyUrl
-  end if
+  settingsOverride = RegReadAll(constants.registrySectionIDs.settingsOverride)
+  if type(settingsOverride) = "roAssociativeArray" then
+    if settingsOverride.charlesProxyEnabled <> invalid then
+      constants.settings.charlesProxyEnabled = (settingsOverride.charlesProxyEnabled = "true")
+      if settingsOverride.charlesProxyIp <> invalid AND settingsOverride.charlesProxyPort <> invalid then
+        constants.settings.charlesProxyUrl = "http://" + settingsOverride.charlesProxyIp + ":" + settingsOverride.charlesProxyPort
+      else if settingsOverride.charlesProxyUrl <> invalid then
+        constants.settings.charlesProxyUrl = settingsOverride.charlesProxyUrl
+      end if
+    end if
 
-  if type(settingsOverride) = "roAssociativeArray" AND settingsOverride.sudoCountry <> invalid then
-    constants.settings.sudoCountry = settingsOverride.sudoCountry
+    if settingsOverride.sudoCountry <> invalid then
+      constants.settings.sudoCountry = settingsOverride.sudoCountry
+    end if
   end if
 
   ' Roku's channel/app id for the production Tubi app. It is used with the continue watching feature to enable testing the feature in sideloaded/beta channels.
