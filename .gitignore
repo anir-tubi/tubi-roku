@@ -9,3 +9,4 @@ out/
 .markdownlint.jsonc
 rta-config.json
 .idea
+src/experiments/*
