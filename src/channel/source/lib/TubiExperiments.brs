@@ -137,6 +137,13 @@ Function TubiExperiments(experimentsInfo) as Object
         }
       }
 
+      roku_home_screen_container_items_lazy_load: {
+        roku_home_screen_container_items_lazy_load_v3: {
+          default: {"enabled": false}
+          holdout_control: {"enabled": false}
+          holdout_winning: {"enabled": false}
+        }
+      }
 
     }
 

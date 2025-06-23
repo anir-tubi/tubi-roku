@@ -57,6 +57,9 @@ Function init()
 
   m.lastCurrentFocusColumn = 0
   m.lastFocusColumnIndex = 0
+
+  experimentsInfo = getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v3", false)
+  m.isLazyLoadExperimentEnabled = (experimentsInfo <> invalid AND experimentsInfo.enabled = true)
 End Function
 
 
@@ -281,7 +284,10 @@ Function onContentChange()
 
       'At this point, there is a limited set (as defined in constants) of content in each category.
       'loadCategoriesIndex will get the rest of the content for each category.
-      m.top.loadCategoriesIndex = 0
+      if m.isLazyLoadExperimentEnabled = false
+        m.top.loadCategoriesIndex = 0
+      end if
+      
       if bSetRowListFocus = true
         setRowListFocus()
       end if

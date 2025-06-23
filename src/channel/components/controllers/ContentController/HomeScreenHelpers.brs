@@ -338,7 +338,13 @@ Function fetchHomeScreen(homeScreen, useCache = false)
       params["group_size"] = m.constants.settings.numContainers
     end if
 
-    params[limitParamName] = m.constants.performance.categoryGridList.initialBlockSize
+    ' Remove hardcoding 9 and move to use initialBlockSize.
+    experiment = getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v3", false)
+    if isAA(experiment) = true AND experiment.enabled = true
+      params[limitParamName] = 9
+    else
+      params[limitParamName] = m.constants.performance.categoryGridList.initialBlockSize
+    end if
 
     if homeScreen <> invalid AND homeScreen.content <> invalid AND useCache = true AND homeScreen.content.lastModified <> invalid
       headers["If-Modified-Since"] = homeScreen.content.lastModified
@@ -450,6 +456,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     onHomeScreenContentUpdateComplete(homeScreen.id)
 
     getExperimentResource("roku_no_change_experiment", "roku_no_change_experiment_v3", true)
+    getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v3", true)
 
   end if
 End Function
@@ -642,11 +649,11 @@ Function onColumnFocusChanged(msg)
   rowFocused = homeScreen.currFocusRow
   if isNumber(rowFocused) = true AND homeScreen.content <> invalid
     category = homeScreen.content.getChild(rowFocused)
-
-    if isNode(category) = true AND category.paginationInfo <> invalid
+    ' TODO: When we graduate roku_home_screen_container_items_lazy_load_v3, we need to remove hardcoding 9 and move to use initialBlockSize.
+    if isNode(category) = true AND category.paginationInfo <> invalid AND columnFocused >= 5
       cursor = category.paginationInfo.cursor
       hasMoreContent = category.paginationInfo.hasMoreContent
-      if hasMoreContent = true AND  columnFocused >= (cursor - 10) AND category.state <> "containerPaginationRequestPending"
+      if hasMoreContent = true AND columnFocused >= (cursor - 10) AND category.state <> "containerPaginationRequestPending"
         isKidsMode = shouldKidsModeBeSentToServer()
         isSignedInUser = isLoggedInUser()
         isLinearBlock = isLinearBlocked()
@@ -980,7 +987,10 @@ Function onLoadCategoriesIndex(msg)
   homeScreen = msg.getRoSGNode()
   index = msg.getData()
 
-  if homeScreen = invalid OR homeScreen.content = invalid OR index < 0
+  experimentsInfo = getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v3", false)
+  isLazyLoadExperimentEnabled = (experimentsInfo <> invalid AND experimentsInfo.enabled = true)
+
+  if homeScreen = invalid OR homeScreen.content = invalid OR index < 0 OR isLazyLoadExperimentEnabled = true
     return false
   end if
 
