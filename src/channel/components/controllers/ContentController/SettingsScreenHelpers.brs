@@ -373,7 +373,12 @@ Function refreshScreenAfterParentalChanges()
       screen.kidsModeEnabled = isKidsUIOn()
       screen.signedIn = true
     else if screen.id = m.constants.ui.screenIds.categoryPanelListScreen
-      refreshCategoryPanelListScreen(screen)
+      ' Deleting the screen content cache to avoid showing the old content.
+      ' Since category filters shown in different parental modes are totally different.
+      ' For ex: In kids mode recommended filter is not available.
+      ' If we try to retain old filters and try to refresh them it will result in 404s.
+      ' Deleting the screen will result in a fresh load of the screen.
+      deleteFromScreenCache(screen.id)
     else if screen.id = m.constants.ui.screenIds.settingsScreen
       ' Updating the value after parentalControls had been changed.
       m.settingsScreen.isAllowedToManageConsent = isUserAllowedToManageConsent()
