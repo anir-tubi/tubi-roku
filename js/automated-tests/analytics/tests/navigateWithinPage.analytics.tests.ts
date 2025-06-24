@@ -138,6 +138,7 @@ describe('Navigate Within Page', function () {
 		const movieDetailsPage = await homePage.selectMovieTitleWithNoTrailer();
 		const videoId = movieDetailsPage.getTitleId();
 		await movieDetailsPage.selectLikeOrDislike();
+		await utils.sleep(1500);
 		await ecp.sendKeypress(ecp.Key.Down);
 		await utils.sleep(1500);
 		await ecp.sendKeypress(ecp.Key.Up);
@@ -183,10 +184,11 @@ describe('Navigate Within Page', function () {
 	it('C690744	User scrolls vertically and navigates within the left side navigation page  @analyticsASet2,@analyticsNavigateWithinPage', async () => {
 		const homePage = HomePage();
 		const channelsPage = await homePage.highlightedSideNavTab(tabs.categories, 7);
-		await utils.sleep(2000);
+		await utils.sleep(3000);
 		await ecp.sendKeypress(ecp.Key.Up);
-		await utils.sleep(2000);
+		await utils.sleep(3000);
 		await ecp.sendKeypress(ecp.Key.Down, { count: 2 });
+		await utils.sleep(3000);
 		await verifyC690744();
 	});
 

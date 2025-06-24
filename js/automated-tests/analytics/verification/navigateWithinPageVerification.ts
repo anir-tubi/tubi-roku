@@ -573,19 +573,17 @@ export async function verifyC690744() {
 		);
 		navigateWithinPage = pulletEvents.find(
 			(event) =>
-				event.navigate_within_page.category_list_page &&
-				event.navigate_within_page.browse_menu_component &&
-				event.navigate_within_page.browse_menu_component.category_slug
+				event.navigate_within_page.left_side_nav_component &&
+				event.navigate_within_page.left_side_nav_component.left_nav_section &&
+				event.navigate_within_page.left_side_nav_component.left_nav_section === 'CATEGORIES'
 		);
 		i++;
 	}
-	expect(navigateWithinPage.navigate_within_page.browse_menu_component
-		.category_slug).to.match(
-			/^.+$/,
-			`event should contain navigateWithinPage.navigate_within_page.browse_menu_page.category_slug===slug \n
+	expect(navigateWithinPage.navigate_within_page.left_side_nav_component
+		.left_nav_section).equal(
+			'CATEGORIES', `event should contain navigateWithinPage.navigate_within_page.browse_menu_page.category_slug===slug \n
 	${JSON.stringify(navigateWithinPage)} \n`
 		);
-	expect(navigateWithinPage.navigate_within_page.category_list_page).to.be.empty
 }
 
 export async function verifyC690748(categorySlug) {
@@ -598,8 +596,8 @@ export async function verifyC690748(categorySlug) {
 		);
 		navigateWithinPage = pulletEvents.find(
 			(event) =>
-				event.navigate_within_page.category_page &&
-				event.navigate_within_page.category_page.category_slug
+				event.navigate_within_page.category_component &&
+				event.navigate_within_page.category_component.category_slug
 		);
 		i++;
 	}
@@ -620,14 +618,6 @@ export async function verifyC690748(categorySlug) {
 	);
 	expect(
 		navigateWithinPage.navigate_within_page.category_component
-			.category_slug
-	).equal(
-		categorySlug,
-		`event should contain navigateWithinPage.navigate_within_page.category_component.category_slug===featured \n
-	${JSON.stringify(navigateWithinPage)} \n`
-	);
-	expect(
-		navigateWithinPage.navigate_within_page.category_page
 			.category_slug
 	).equal(
 		categorySlug,

@@ -360,64 +360,46 @@ export async function verifyC439651NavigateToPage(id) {
 		);
 		navigateToPageEvent = pulletEvents.find(
 			(event) =>
-				event.navigate_to_page.category_component &&
-				event.navigate_to_page.category_component.category_slug &&
-				event.navigate_to_page.category_component.category_slug ===
+				event.navigate_to_page.mystuff_component &&
+				event.navigate_to_page.mystuff_component.category_slug &&
+				event.navigate_to_page.mystuff_component.category_slug ===
 				CAT_SLUG.queue
 		);
 		i++;
 	}
 	expect(
-		navigateToPageEvent.navigate_to_page.category_component.category_slug
+		navigateToPageEvent.navigate_to_page.mystuff_component.category_slug
 	).equal(
 		CAT_SLUG.queue,
-		`navigateToPageEvent.navigate_to_page.category_component.category_slug===CAT_SLUG.queue, Event: \n
+		`navigateToPageEvent.navigate_to_page.mystuff_component.category_slug===CAT_SLUG.queue, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
 		parseInt(
-			navigateToPageEvent.navigate_to_page.category_component.category_row
-		)
-	).equal(
-		2,
-		`navigateToPageEvent.navigate_to_page.category_component.category_row===1, Event: \n
-${JSON.stringify(navigateToPageEvent)} \n`
-	);
-	expect(
-		parseInt(
-			navigateToPageEvent.navigate_to_page.category_component.category_col
+			navigateToPageEvent.navigate_to_page.mystuff_component.content_tile.col
 		)
 	).equal(
 		1,
-		`navigateToPageEvent.navigate_to_page.category_component.category_col===1, Event: \n
+		`navigateToPageEvent.navigate_to_page.mystuff_component.content_tile.col===1, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
 		parseInt(
-			navigateToPageEvent.navigate_to_page.category_component.content_tile.col
+			navigateToPageEvent.navigate_to_page.mystuff_component.content_tile.row
 		)
 	).equal(
 		1,
-		`navigateToPageEvent.navigate_to_page.category_component.content_tile.col===1, Event: \n
+		`navigateToPageEvent.navigate_to_page.mystuff_component.content_tile.row===1, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
 		parseInt(
-			navigateToPageEvent.navigate_to_page.category_component.content_tile.row
-		)
-	).equal(
-		1,
-		`navigateToPageEvent.navigate_to_page.category_component.content_tile.row===1, Event: \n
-${JSON.stringify(navigateToPageEvent)} \n`
-	);
-	expect(
-		parseInt(
-			navigateToPageEvent.navigate_to_page.category_component.content_tile
+			navigateToPageEvent.navigate_to_page.mystuff_component.content_tile
 				.series_id
 		)
 	).equal(
 		id,
-		`navigateToPageEvent.navigate_to_page.category_component.content_tile.video_id===, Event: \n
+		`navigateToPageEvent.navigate_to_page.mystuff_component.content_tile.video_id===, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
@@ -441,15 +423,15 @@ export async function verifyC439649NavigateToPage(id) {
 		);
 		navigateToPageEvent = pulletEvents.find(
 			(event) =>
-				event.navigate_to_page.category_component &&
-				event.navigate_to_page.category_component.category_slug &&
-				event.navigate_to_page.category_component.category_slug ===
+				event.navigate_to_page.mystuff_component &&
+				event.navigate_to_page.mystuff_component.category_slug &&
+				event.navigate_to_page.mystuff_component.category_slug ===
 				CAT_SLUG.continueWatching
 		);
 		i++;
 	}
 	expect(
-		navigateToPageEvent.navigate_to_page.category_component.category_slug
+		navigateToPageEvent.navigate_to_page.mystuff_component.category_slug
 	).equal(
 		CAT_SLUG.continueWatching,
 		`navigateToPageEvent.navigate_to_page.category_component.category_slug===CAT_SLUG.continueWatching, Event: \n
@@ -457,7 +439,7 @@ ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
 		parseInt(
-			navigateToPageEvent.navigate_to_page.category_component.category_row
+			navigateToPageEvent.navigate_to_page.mystuff_component.content_tile.col
 		)
 	).equal(
 		1,
@@ -466,25 +448,7 @@ ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
 		parseInt(
-			navigateToPageEvent.navigate_to_page.category_component.category_col
-		)
-	).equal(
-		1,
-		`navigateToPageEvent.navigate_to_page.category_component.category_col===1, Event: \n
-${JSON.stringify(navigateToPageEvent)} \n`
-	);
-	expect(
-		parseInt(
-			navigateToPageEvent.navigate_to_page.category_component.content_tile.col
-		)
-	).equal(
-		1,
-		`navigateToPageEvent.navigate_to_page.category_component.content_tile.col===1, Event: \n
-${JSON.stringify(navigateToPageEvent)} \n`
-	);
-	expect(
-		parseInt(
-			navigateToPageEvent.navigate_to_page.category_component.content_tile.row
+			navigateToPageEvent.navigate_to_page.mystuff_component.content_tile.row
 		)
 	).equal(
 		1,
@@ -493,7 +457,7 @@ ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
 		parseInt(
-			navigateToPageEvent.navigate_to_page.category_component.content_tile
+			navigateToPageEvent.navigate_to_page.mystuff_component.content_tile
 				.video_id
 		)
 	).equal(

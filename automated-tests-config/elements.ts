@@ -2150,7 +2150,7 @@ const elements = typeCheckElements({
 
   foundTitlesSearch: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#leftSide.0.#searchHintText',
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#searchScreen.#PageGroup.#rightSide.#rightSideTextGroup.#searchDirectionsGroup.#searchMenuText',
   },
 
   /** side nav element component */

@@ -71,7 +71,7 @@ const SearchPage = () => {
 		await utils.sleep(5000);
 		await testUtils.retryWithTimeOut(async () => {
 			const searchResultsText = await elements.foundSearch();
-			const foundText = searchResultsText.text.split('"')[1];
+			const foundText = searchResultsText.text;
 			expect(foundText).to.equal(text);
 		});
 	}
