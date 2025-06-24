@@ -69,7 +69,7 @@ Function clientErrorConfigCheckIfShouldRetryAfter_test(url, method, statusCode, 
     responseHeaders["Content-Type"] = "application/json"
 
     responseBody = formatJson({
-      response_code: responseCode
+      code: responseCode
     })
   end if
 
