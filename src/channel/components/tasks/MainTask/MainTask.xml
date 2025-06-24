@@ -18,8 +18,5 @@
     <!-- OUTPUT -->
     <!-- Combination of roHdmiStatus and roCECStatus hdmi checks to know if we're ok to playback video -->
     <field id="isHdmiStatusOk" type="boolean" />
-
-    <!-- Will have exit info populated if the reason is whitelisted as returned by https://developer.roku.com/docs/references/brightscript/interfaces/ifappmanager.md#getlastexitinfo-as-object -->
-    <field id="lastExitInfo" type="assocarray" />
   </interface>
 </component>

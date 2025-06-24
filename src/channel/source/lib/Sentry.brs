@@ -211,7 +211,6 @@ Function sentry_getReqInfo(message = "" as Dynamic, level = "info" as String) as
   event = {}
   sentry_deepAppend(event, m._defaultEvent)
   event["event_id"] = m._generateEventId()
-  event["timestamp"] = CreateObject("roDateTime").ToISOString()
   event["level"] = LCase(level)
 
   errorType = "Error"
@@ -226,10 +225,18 @@ Function sentry_getReqInfo(message = "" as Dynamic, level = "info" as String) as
     extra.delete("type")
     ' extra values will be shown in additional info in sentry dashboard
     event["extra"] = extra
+
+    if message.timestamp <> invalid then
+      event["timestamp"] = message.timestamp
+    end if
   else
     errorType = message
     name = message
     event["message"] = message
+  end if
+
+  if event["timestamp"] = invalid then
+    event["timestamp"] = CreateObject("roDateTime").toISOString()
   end if
 
   if errorType = invalid OR errorType = ""

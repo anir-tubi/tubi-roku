@@ -477,40 +477,53 @@ Function showStartupErrorDialog(screen, constants)
 End Function
 
 
-Function logCrashesOnStartup(args, log, constants)
-  ' These are reasons we don't care about
-  reasonBlacklist = {
-    "EXIT_UNKNOWN": true ' default exit reason
-    "EXIT_POWER_MODE": true
-    "EXIT_DIAL_DELETE": true
-    "EXIT_IDLE_AUTO_EXIT": true
-    "EXIT_AM_LOWRESOURCE": true ' exited in the background because foreground application needed more memory
-    "EXIT_SETTINGS_UPDATE": true ' User changed setting like their resolution which caused application to close
-    "EXIT_USER_NAV": true ' User pressed home button to exit application
+Function logCrashesOnStartup(startupArgs, log, constants)
+  reason = startupArgs.lastExitOrTerminationReason
+
+  whitelist = {
+    "EXIT_OUT_OF_MEMORY": true
+    "EXIT_IDLE_AUTO_EXIT": false ' may eventually be interested in sending
+    "EXIT_BRIGHTSCRIPT_CRASH": true
+    "EXIT_BRIGHTSCRIPT_STOP": true
+    "EXIT_BRIGHTSCRIPT_UNK_FUNC": true
+    "EXIT_BRIGHTSCRIPT_TIMEOUT": true
+    "EXIT_USER_KILL": true
+    "EXIT_SYSTEM_KILL": true
+    "EXIT_GRAPHICS_NOT_RELEASED": true
+    "EXIT_DECODER_NOT_RELEASED": true
+    "EXIT_RUNNING_AFTER_SUSPEND": true
+    "EXIT_NOT_RESUMED": true
+    "EXIT_SIGNAL_TIMEOUT": true
+    "EXIT_APP_ERROR": true
+    "EXIT_UNLOADED": true
+    "EXIT_OS_UPDATE": true
+    "EXIT_CHANNEL_UPDATE": true
+    "EXIT_CHANNEL_RESTART": true
+    "EXIT_CHANNEL_MEM_LIMIT_FG": true
+    "EXIT_CHANNEL_MEM_LIMIT_BG": true
+    "EXIT_SOFTFAIL": true
   }
 
-  reason = args.lastExitOrTerminationReason
-  if reason <> invalid AND reasonBlacklist[reason] <> true
+  if reason <> invalid AND whitelist[reason] = true then
     appManager = createObject("roAppManager")
 
     ' Check if we can use the new method available in 13+ firmware
     if findMemberFunction(appManager, "getLastExitInfo") <> invalid then
-      baseMessageContents = appManager.getLastExitInfo()
+      lastExitInfo = appManager.getLastExitInfo()
+
+      ' We want to assign the lastExitInfo to ContentController's startupArgs to allow sending a request after the app has started to be able to send additional information such as experiments to client logs. Assigned by reference
+      startupArgs.lastExitInfo = lastExitInfo
+
+      baseMessageContents = {}
+      baseMessageContents.append(lastExitInfo)
+
       baseMessageContents["connectionType"] = createObject("roDeviceInfo").getConnectionType()
       baseMessageContents["model"] = constants.deviceInfo.model
 
       clientLogsMessageContents = {}
       clientLogsMessageContents.append(baseMessageContents)
 
-      ' Check if we are too big to send the full console_logs to client logs
-      clientLogsMessage = formatJson(clientLogsMessageContents)
-      if clientLogsMessage.len() > 1700 then
-        ' If so then trim it
-        clientLogsMessageContents.console_log = "..." + right(clientLogsMessageContents.console_log, 1500)
-        clientLogsMessage = formatJson(clientLogsMessageContents)
-      end if
-
-      log.info(clientLogsMessage, "clientInfo", "last-exit-info", m.queue, 1)
+      log.info(clientLogsMessageContents, "clientInfo", "last-exit-info", m.queue, 1)
 
       sentryMessageContents = baseMessageContents
       sentryMessageContents.append({

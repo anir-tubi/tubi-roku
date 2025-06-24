@@ -67,7 +67,6 @@ Function addControllerUi()
 
   m.mainTask = createObject("roSGNode", "MainTask") ' initiate MainTask
   m.mainTask.observeFieldScoped("isHdmiStatusOk", "onIsHdmiStatusOkChange")
-  m.mainTask.observeFieldScoped("lastExitInfo", "onLastExitInfoChange")
 
   ' Holds the value for user/device level settings. For ex: isVideoPreviewOn  or Selected Audio track.
   m.pub_serverPersistentData = createObject("roSGNode", "ServerPersistentData")
@@ -797,6 +796,10 @@ Function handleStartUpArgs()
     m.deeplinkContent = createDeeplinkContentFromStartupArgs(startupArgs)
     utmCampaignConfig = generateUtmCampaignConfig(startupArgs)
     m.cmsApi.setUtmCampaignConfig(utmCampaignConfig)
+
+    if startupArgs.lastExitInfo <> invalid then
+      sendLastExitInfoExperimentsClientLog(startupArgs.lastExitInfo)
+    end if
   end if
 
   ' First see if the user is logged in. If they are then we don't use the external auth info.
@@ -2437,10 +2440,8 @@ Function onIsHdmiStatusOkChange(msg)
 End Function
 
 
-Function onLastExitInfoChange(msg)
+Function sendLastExitInfoExperimentsClientLog(lastExitInfo)
   tubiLog("ContentController.onLastExitInfoChange")
-  lastExitInfo = msg.getData()
-
   messageMap = lastExitInfo
   messageMap["connectionType"] = createObject("roDeviceInfo").getConnectionType()
   getExperimentsInfoFromGlobal()
