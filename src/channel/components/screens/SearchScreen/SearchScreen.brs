@@ -85,6 +85,20 @@ Function init()
   m.trendingSearchResultGrid.observeFieldScoped("itemSelected", "onResultSelected")
   m.trendingSearchResultGrid.observeFieldScoped("itemFocused", "onItemFocused")
 
+  m.rokuSearchLargerPoster = (getExperimentResource("roku_search_larger_poster", "roku_search_larger_poster_v1", true).enabled = true)
+
+  if m.rokuSearchLargerPoster = true
+    m.ResultGrid.itemSize = m.constants.ui.imageSizes.largePoster
+    m.ResultGrid.numColumns = 4
+    m.trendingSearchResultGrid.itemSize = m.constants.ui.imageSizes.largePoster
+    m.trendingSearchResultGrid.numColumns = 4
+  else
+    m.ResultGrid.itemSize = [198,282]
+    m.ResultGrid.numColumns = 5
+    m.trendingSearchResultGrid.itemSize = [198,282]
+    m.trendingSearchResultGrid.numColumns = 5
+  end if
+
   m.trendingResultsHint.text = getTranslation("trending_search_results_hint")
 
   m.gridContainer = m.top.findNode("gridContainer")
@@ -454,11 +468,20 @@ Function onSearchContentChange()
         m.ResultGrid.visible = false
         m.trendingSearchResultsContainer.translation = [0, 0]
       else
-        if resultsContent.getChildCount() > 5
-          m.trendingSearchResultsContainer.translation = [0, 672]
+        if m.rokuSearchLargerPoster = true
+          if resultsContent.getChildCount() > 4
+            m.trendingSearchResultsContainer.translation = [0, 752]
+          else
+            ' If the result count is less than or equal to 5. We will show the trending searches.
+            m.trendingSearchResultsContainer.translation = [0, 430]
+          end if
         else
-          ' If the result count is less than or equal to 5. We will show the trending searches.
-          m.trendingSearchResultsContainer.translation = [0, 372]
+          if resultsContent.getChildCount() > 5
+            m.trendingSearchResultsContainer.translation = [0, 672]
+          else
+            ' If the result count is less than or equal to 5. We will show the trending searches.
+            m.trendingSearchResultsContainer.translation = [0, 372]
+          end if
         end if
       end if
     else
@@ -487,12 +510,21 @@ Function onSearchContentChange()
         m.trendingResultsHint.visible = false
         if m.top.isUserEligibleForTrendingSearchContents = true
           m.trendingSearchResultsContainer.visible = true
-          if results.getChildCount() > 5
-            m.trendingSearchResultsContainer.translation = [0, 672]
+          if m.rokuSearchLargerPoster = true
+            if results.getChildCount() > 4
+              m.trendingSearchResultsContainer.translation = [0, 752]
+            else
+              m.trendingResultsHint.visible = true
+              m.trendingSearchResultsContainer.translation = [0, 430]
+            end if
           else
-            m.trendingResultsHint.visible = true
-            ' If the result count is less than or equal to 5. We will show the trending searches.
-            m.trendingSearchResultsContainer.translation = [0, 372]
+            if results.getChildCount() > 5
+              m.trendingSearchResultsContainer.translation = [0, 672]
+            else
+              m.trendingResultsHint.visible = true
+              ' If the result count is less than or equal to 5. We will show the trending searches.
+              m.trendingSearchResultsContainer.translation = [0, 372]
+            end if
           end if
         else
           m.trendingSearchResultsContainer.visible = false
@@ -796,19 +828,33 @@ Function onResultGridCurrFocusRowChange(msg)
 
   if gridContent <> invalid
     totalItems = gridContent.getChildCount()
+  else
+    totalItems = 0
+  end if
+
+  if m.rokuSearchLargerPoster = true
+    totalRows = totalItems \ 4
+    if totalItems MOD 4 <> 0
+      totalRows = totalRows + 1
+    end if
+  else
     totalRows = totalItems \ 5
     if totalItems MOD 5 <> 0
       totalRows = totalRows + 1
     end if
+  end if
 
-    fraction = totalRows - 1 - currFocusRow
-    if fraction < 1 AND m.top.isUserEligibleForTrendingSearchContents = true
-      translationY = 672 - ((1 - fraction) * 298)
-      m.trendingSearchResultsContainer.translation = [0, translationY]
-      m.trendingResultsHint.visible = true
+  fraction = totalRows - 1 - currFocusRow
+  if fraction < 1 AND m.top.isUserEligibleForTrendingSearchContents = true
+    if m.rokuSearchLargerPoster = true
+      translationY = 752 - ((1 - fraction) * 318)
     else
-      m.trendingResultsHint.visible = false
+      translationY = 672 - ((1 - fraction) * 298)
     end if
+    m.trendingSearchResultsContainer.translation = [0, translationY]
+    m.trendingResultsHint.visible = true
+  else
+    m.trendingResultsHint.visible = false
   end if
 End Function
 
@@ -937,7 +983,11 @@ Function onKeyEvent(key As string, press As boolean) As boolean
     else if key = "down" AND m.trendingSearchResultsContainer.visible = true AND m.ResultGrid.isInFocusChain() = true AND m.trendingSearchResultGrid.content <> invalid AND m.trendingSearchResultGrid.content.getChildCount() > 0
       m.trendingSearchResultGrid.setFocus(true)
       m.isTrendingResultsGridInFocus = true
-      slideTo(m.gridContainer, [0, -375], 0.3)
+      if m.rokuSearchLargerPoster = true
+        slideTo(m.gridContainer, [0, -430], 0.3)
+      else
+        slideTo(m.gridContainer, [0, -375], 0.3)
+      end if
     else if key = "up" AND m.trendingSearchResultGrid.isInFocusChain() = true AND (m.ResultGrid.content <> invalid AND m.ResultGrid.content.getChildCount() > 0)
       slideTo(m.gridContainer, [0, 0], 0.3)
       m.ResultGrid.setFocus(true)
