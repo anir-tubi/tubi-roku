@@ -1646,6 +1646,7 @@ Function showTransport()
   end if
 
   animateTransport("in")
+  updatePlayerLogLib(m.playerLogLib, "setDidUserSeeBwwPeek", true)
 End Function
 
 
@@ -2196,6 +2197,7 @@ Function animateTransportAndBrowseWhileWatching(direction)
     hideRatingOverlay()
     slideTo(m.HUD, [0, -696], 0.6)
     m.BrowseWhileWatching.open = true
+    updatePlayerLogLib(m.playerLogLib, "updateBrowseWhileWatchingOpenCount")
 
     if m.playerControlExperimentType <> "none"
       fade(m.controlIcon, "out", 0.6)
@@ -2250,7 +2252,6 @@ Function showBrowseWhileWatching()
     end if
 
     m.BrowseWhileWatching.show = true
-
   end if
 End Function
 

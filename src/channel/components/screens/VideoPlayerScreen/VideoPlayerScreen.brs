@@ -956,6 +956,7 @@ Function onControlChange()
       m.filledAdData = {}
     end if
 
+    fireBrowseWhileWatchingPlaybackSessionEndEvent()
     updatePlayerLogLib(m.playerLogLib, "fireQualityOfServiceEvent", m.adImpressionMap)
     m.adImpressionMap = {"0": 0, "1": 0, "2": 0, "3": 0, "4": 0} 'reset adImpressionMap after sending QualityOfService event
     
@@ -3206,6 +3207,8 @@ Function onBrowseContentSelected(msg)
     m.top.homescreenContentToPlay = selectedContent
     m.top.homescreenContentToPlayUpdated = true
     resetTransportButtons()
+
+    updatePlayerLogLib(m.playerLogLib, "setBrowseWhileWatchingDidConvert", true)
   end if
 End Function
 
@@ -3464,3 +3467,19 @@ Function sendAdMissedEvent(reason)
   end if
   updatePlayerLogLib(m.playerLogLib, "fireAdMissedEvent", adMissedInfo)
 End Function
+
+
+Function fireBrowseWhileWatchingPlaybackSessionEndEvent()
+  if m.playerLogLib.didUserSeeBwwPeek = true
+    isSeries = m.content <> invalid AND m.content.parentType = "series"
+    
+    data = {
+      "openCount": m.playerLogLib.bwwOpenCount
+      "didConvert": m.playerLogLib.bwwDidConvert
+      "isSeries": isSeries
+    }
+  
+    logInfo(FormatJson(data),  "videoInfo", "browseWhileWatchingPlaybackSessionEnd")
+  end if
+End Function
+

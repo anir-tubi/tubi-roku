@@ -33,7 +33,7 @@ Function PlayerLogLib(constants, tracking)
     singleBufferingThreshold: 3600000 'threshold of single buffering duration in milliseconds 
 
     '//video fields
-    content: invalid 'node which hols the content information, used in various events
+    content: invalid 'node which holds the content information, used in various events
     
     'The contentStartPerformance event should be triggered in the following situations: when the content starts or resumes playback, and after each AdPod. 
     'The variable m.isVideoPlayed helps determine when to trigger this event. 
@@ -143,6 +143,11 @@ Function PlayerLogLib(constants, tracking)
     mostRecentBufferingTimer: invalid 'used for message_map in Player page exit event
     totalSeekDurationTimer: invalid 'helps to calculate total seeking duration for QoS event
 
+    '//browse while watching fields
+    bwwOpenCount: 0 ' tracks total number of times user opens browse while watching tray.
+    bwwDidConvert: false ' tracks if user converted to a new title after opening browse while watching tray.
+    didUserSeeBwwPeek: false ' tracks if user saw the browse while watching tray peek.
+
     '//public methods
 
     'video
@@ -204,6 +209,11 @@ Function PlayerLogLib(constants, tracking)
     fireAdMissedEvent: playerLogLib_fireAdMissedEvent
     fireContentErrorEvent: playerLogLib_fireContentErrorEvent
     setAdPodStart: playerLogLib_setAdPodStart
+
+    ' public functions to track browse while watching
+    updateBrowseWhileWatchingOpenCount: playerLogLib_updateBrowseWhileWatchingOpenCount
+    setBrowseWhileWatchingDidConvert: playerLogLib_setBrowseWhileWatchingDidConvert
+    setDidUserSeeBwwPeek: playerLogLib_setDidUserSeeBwwPeek
 
     '//private methods
 
@@ -1356,6 +1366,7 @@ Function playerLogLib_fireQualityOfServiceEvent(adImp = {})
     message: ""
     download_frag_bitrate: ""
     ad_imp: ""
+    message_map: {}
   }
 
   qualityOfServiceInfo = {}
@@ -1413,6 +1424,11 @@ Function playerLogLib_fireQualityOfServiceEvent(adImp = {})
   qualityOfServiceInfo["content_id"] = m.videoId
   qualityOfServiceInfo["ad_imp"] = FormatJson(adImp)
 
+  qualityOfServiceInfo.message_map = {
+    "bww_oc": m.bwwOpenCount.toStr(),
+    "bww_dc": m.bwwDidConvert.toStr()
+  }
+
   m.sendEvent(qualityOfServiceInfo, "quality_of_services", eventBase)
 End Function
 
@@ -1439,6 +1455,11 @@ Function playerLogLib_resetQoSAttributes()
   m.adReBuffer = 0
   m.isAd = false
   m.adCount = 0
+
+  m.bwwOpenCount = 0
+  m.bwwDidConvert = false
+  m.didUserSeeBwwPeek = false
+  
   m.totalSegSize = 0
   m.totalAudioSegDuration = 0
   m.totalVideoSegDuration = 0
@@ -1688,6 +1709,21 @@ Function playerLogLib_setIsBuffering(isBuffering)
   else
     m.isBuffering = false      
   end if
+End Function
+
+
+Function playerLogLib_updateBrowseWhileWatchingOpenCount()
+  m.bwwOpenCount++
+End Function
+
+
+Function playerLogLib_setBrowseWhileWatchingDidConvert(didConvert = false)
+  m.bwwDidConvert = didConvert
+End Function
+
+
+Function playerLogLib_setDidUserSeeBwwPeek(didUserSeeBwwPeek = false)
+  m.didUserSeeBwwPeek = didUserSeeBwwPeek
 End Function
 
 
