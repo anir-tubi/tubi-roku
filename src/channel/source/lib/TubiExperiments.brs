@@ -86,12 +86,15 @@ Function TubiExperiments(experimentsInfo) as Object
 
       'This experiment will not be under holdout and will clean up once we take the decision.
       roku_home_screen_redesign: {
-        roku_home_screen_redesign_v3 : {
+        roku_home_screen_redesign_v4 : {
           ' Possible values for design_type are "withDescriptionPortraitSmall", "controlReOrderContainers",  "none"
           ' Possible values for container_id are "featured" or any other tensor container id
-          default: {"design_type": "none", container_id: "none" }
-          holdout_control: {"design_type": "none"}
-          holdout_winning: {"design_type": "none"}
+          ' Possible values for gridItemSize are [310, 442] or [252, 360]
+          ' Possible values for featuredRowPosterSize are [788, 442] or [720, 360]
+          ' sample ex: default: {"design_type": "withDescriptionPortraitSmall", container_id: "featured", gridItemSize: [252, 360], featuredRowPosterSize: [720, 360] }
+          default: {"design_type": "none", container_id: "none", gridItemSize: [], featuredRowPosterSize: [] }
+          holdout_control: {"design_type": "none", container_id: "none", gridItemSize: [], featuredRowPosterSize: [] }
+          holdout_winning: {"design_type": "none", container_id: "none", gridItemSize: [], featuredRowPosterSize: [] }
          }
        }
 

@@ -126,7 +126,7 @@ End Function
 Function processHomeScreenBatchResponse(response, screenId)
   homeScreen = getFromScreenCache(screenId)
   if homeScreen <> invalid
-    experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
+    experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
     if isKidsUIOn() = false AND experiment.design_type = "withDescriptionPortraitSmall" AND isNode(response) = true AND response.getChildCount() > 0 AND homeScreen.contentMode = m.constants.ui.contentMode.homescreen
       updateCategoryGridWithFeaturedList(response, homeScreen)
     end if
@@ -439,7 +439,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     experiment = invalid
 
     if isKidsUIOn() = false AND screenID = m.constants.ui.screenIds.homeScreen
-      experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", true)
+      experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", true)
       containerRow = m.nodeHelpers.getChildById(rawResponse, experiment.container_id)
       redesignRow = containerRow
 
@@ -1295,9 +1295,6 @@ Function playLinearInlineGridView(content, screen)
       "playbackContainer": screen.currCategoryId
     }
     playLinearVideoContent(content, true, screen.id, true, playbackSource)
-
-    screen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-    m.inlineVideoPreviewPlayerContainer.translation = [159, 141]
   end if
 End Function
 
@@ -1337,7 +1334,7 @@ End Function
 
 
 Function updateCategoryGridWithFeaturedList(response, screen)
-  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
+  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
   containerRow = m.nodeHelpers.getChildById(response, experiment.container_id)
   if containerRow <> invalid
     featuredContent = createObject("roSGNode", "CategoryContentNode")
@@ -1376,7 +1373,7 @@ Function updateInlineVideoMetadataOverlayVisibility(duration = 0)
   screen = getCurrentScreen()
   if screen <> invalid
     currCategoryId = screen.currCategoryId
-    experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
+    experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
     if experiment <> invalid AND experiment.design_type = "withDescriptionPortraitSmall" AND isKidsUIOn() = false
       currentScreen = getCurrentScreen()
       if screen <> invalid AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND currCategoryId = experiment.container_id AND currentScreen.featuredRowContent <> invalid
@@ -1412,7 +1409,7 @@ Function onFeaturedRowListTranslationChange(msg)
 
     if isNumber(rectY) = true
       inlineVideoPreviewPlayerContainer = m.inlineVideoPreviewPlayerContainer.translation
-      m.inlineVideoPreviewPlayerContainer.translation = [inlineVideoPreviewPlayerContainer[0], translation[1] + rectY - 6]
+      m.inlineVideoPreviewPlayerContainer.translation = [inlineVideoPreviewPlayerContainer[0], translation[1] + rectY - 3]
     end if
   end if
 End Function

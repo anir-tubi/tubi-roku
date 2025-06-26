@@ -15,7 +15,7 @@
 
   <interface>
     <field id="itemContent" type="node" />
-    <field id="width" alias="poster.width,videoGridMetadata.width, videoInGridGradient.width" />
+    <field id="width" alias="poster.width, videoInGridGradient.width" />
     <field id="height" alias="poster.height,videoGridMetadata.height, videoInGridGradient.height" />
     <field id="itemHasFocus" type="boolean" />
     <field id="showContentPoster" type="boolean" value="true" />

@@ -1432,6 +1432,17 @@ Function tubiMetadataTranslate_buildCategoryParentInfo(container, sOrientation =
       subtext: ""
     }
 
+    if m.experiments <> invalid
+      experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4")
+      tileDesignType = experiment.design_type
+      isHomescreenRedesignExperiementEnabled = (tileDesignType <> "none") AND uiMode = "standard"
+
+      if isHomescreenRedesignExperiementEnabled = true
+        updateMetadata.gridItemSize = experiment.gridItemSize
+        updateMetadata.featuredRowPosterSize = experiment.featuredRowPosterSize
+      end if
+    end if
+
     m.categorySubtexts  = {}
     m.categorySubtexts[m.constants.ui.categoryIds.recommendedForYou] = getTranslation("registration_signIn_recommended")
 
@@ -1545,7 +1556,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           isHomescreenRedesignExperiementEnabled = false
           experimentContainerId = "none"
           if m.experiments <> invalid
-            experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3")
+            experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4")
             tileDesignType = experiment.design_type
             experimentContainerId = experiment.container_id
             isHomescreenRedesignExperiementEnabled = (tileDesignType <> "none") AND uiMode = "standard"
@@ -1972,7 +1983,7 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
   isHomescreenRedesignExperiementEnabled = false
   experimentContainerId = "none"
   if m.experiments <> invalid
-    experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3")
+    experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4")
     tileDesignType = experiment.design_type
     experimentContainerId = experiment.container_id
     isHomescreenRedesignExperiementEnabled = (tileDesignType <> "none") AND uiMode = "standard"

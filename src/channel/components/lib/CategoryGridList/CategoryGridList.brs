@@ -22,7 +22,7 @@ Function init()
 
   m.rowListTranslationYOffset = 0
 
-  m.homeScreenDesignType = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false).design_type
+  m.homeScreenDesignType = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false).design_type
   m.isWithDescPortraitSmallExpEnabled = (m.homeScreenDesignType = "withDescriptionPortraitSmall")
 
   m.RowList.observeFieldScoped("itemFocused", "onItemFocused")
@@ -60,6 +60,19 @@ Function init()
 
   experimentsInfo = getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v3", false)
   m.isLazyLoadExperimentEnabled = (experimentsInfo <> invalid AND experimentsInfo.enabled = true)
+
+
+  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
+  if experiment.featuredRowPosterSize <> invalid
+    m.featuredRowPoster = experiment.featuredRowPosterSize
+  else
+    m.featuredRowPoster = m.constants.ui.imageSizes.featuredRowPoster
+  end if
+
+  ' 263 is the height of the metadata section displayed beneath the featured focused tile.
+  ' 263 also includes the space between the last line of the description and container below it.
+  m.rowListPosition = [0, 263 + m.featuredRowPoster[1]]
+
 End Function
 
 
@@ -252,7 +265,9 @@ Function onContentChange()
       if m.top.lastFocusedList = ""
         m.FeaturedRowList.translation = [0, 0]
         if m.isWithDescPortraitSmallExpEnabled = true
-          m.rowList.translation =  [0, 534 + m.rowListTranslationYOffset]
+          ' 92 is the amount of px we need to animate down to create a required initial animation.
+          ' This allows to create a slide down animation.
+          m.rowList.translation =  [0, m.featuredRowPoster[1] + 92 + m.rowListTranslationYOffset]
         else
           m.rowList.translation = [0, 0]
         end if
@@ -320,7 +335,7 @@ Function onContentChange()
   
   ' Below is to add animation of slide down of the row list for the first time when screen is loaded.
   if m.top.featuredRowContent <> invalid AND isSkinAdsAvailable() = false AND m.isWithDescPortraitSmallExpEnabled = true AND m.top.lastFocusedList <> "rowList"
-    slideTo(m.RowList, [0, 705 + m.rowListTranslationYOffset], 0.3, 0.3)
+    slideTo(m.RowList, [m.rowListPosition[0], m.rowListPosition[1] + m.rowListTranslationYOffset], 0.3, 0.3)
   end if
   
   updateCurrentFocusedItemBoundingRect(0)
@@ -442,6 +457,8 @@ Function setRowHeights()
   landscapeSize = imageSizes.largeLandscape
   featuredRowPoster = imageSizes.featuredRowPoster
   featuredPortraitSmall = imageSizes.featuredPortraitSmall
+  gridItemSize = invalid
+  featuredRowPosterSize = invalid
 
   showRowLabel = []
 
@@ -451,6 +468,8 @@ Function setRowHeights()
     rowHeightAdjustment = 57 '//The height of the row container heading and its vertical spacing
     gridItemType = category.gridItemType
     gridItemTypes = m.constants.ui.gridItemTypes
+    gridItemSize = category.gridItemSize
+    featuredRowPosterSize = category.featuredRowPosterSize
 
     if gridItemType = gridItemTypes.historySignedOutUser
       posterHeight = posterSize[1]
@@ -549,7 +568,11 @@ Function setRowHeights()
 
   featuredPosterSize = featuredRowPoster
   if m.isWithDescPortraitSmallExpEnabled = true
-    featuredPosterSize = featuredPortraitSmall
+    if gridItemSize <> invalid
+      featuredPosterSize = gridItemSize
+    else
+      featuredPosterSize = featuredPortraitSmall
+    end if
   end if
 
   m.FeaturedRowlist.update({
@@ -560,7 +583,11 @@ Function setRowHeights()
   })
 
   if m.isWithDescPortraitSmallExpEnabled = true
-    m.featuredRowList.focusXOffset = [482]
+    if isNonEmptyArray(featuredRowPosterSize) = true AND isNonEmptyArray(gridItemSize) = true
+      m.featuredRowList.focusXOffset = [featuredRowPosterSize[0] - gridItemSize[0] + 4]
+    else
+      m.featuredRowList.focusXOffset = [482]
+    end if
   end if
 
   m.FeaturedRowList.content = m.top.featuredRowContent
@@ -971,7 +998,7 @@ Function translateFeaturedListAndSetFocus(delayFeaturedFocus = false)
   
   slideFadeGeneral(m.FeaturedRowList, [0, 0], "in", 0.3, 0, 1, true, callback)
   if m.isWithDescPortraitSmallExpEnabled = true
-    slideTo(m.RowList, [0, 705 + m.rowListTranslationYOffset], 0.3)
+    slideTo(m.RowList, [m.rowListPosition[0], m.rowListPosition[1] + m.rowListTranslationYOffset], 0.3)
   end if
 
   m.top.hideInfoPanel = false

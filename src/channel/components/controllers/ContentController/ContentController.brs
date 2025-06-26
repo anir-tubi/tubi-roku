@@ -96,7 +96,13 @@ Function addControllerUi()
   m.videoPreviewPlayer = m.top.findNode("videoPreviewPlayer")
   m.inlinePreviewFocusIndicator = m.top.findNode("inlinePreviewFocusIndicator")
   m.inlineVideoMetadataOverlay = m.top.findNode("inlineVideoMetadataOverlay")
-  featuredRowPoster = m.constants.ui.imageSizes.featuredRowPoster
+
+  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
+  if experiment.featuredRowPosterSize <> invalid
+    featuredRowPoster = experiment.featuredRowPosterSize
+  else
+    featuredRowPoster = m.constants.ui.imageSizes.featuredRowPoster
+  end if
   ' Adjusting the size of the metadata overlay with some additional padding to account for the focus indicator.
   m.inlineVideoMetadataOverlay.width = featuredRowPoster[0] + 4
   m.inlineVideoMetadataOverlay.height = featuredRowPoster[1] + 2
@@ -105,7 +111,9 @@ Function addControllerUi()
   m.inlineVideoGridTitleLogo.width = featuredRowPoster[0] + 4
   m.inlineVideoGridTitleLogo.height = featuredRowPoster[1] + 2
 
-  m.inlinePreviewFocusIndicator.height = m.constants.ui.featuredRow.playerSize[1]
+  playerSize = getFeaturedPlayerSize()
+  m.inlinePreviewFocusIndicator.height = playerSize[1]
+  m.inlinePreviewFocusIndicator.width = playerSize[0] + 12
 
   m.LinearPlayerGroup = m.top.findNode("LinearPlayerGroup")
   m.LinearPlayerGroupAboveScreenStack = m.top.findNode("LinearPlayerGroupAboveScreenStack")
@@ -1961,7 +1969,7 @@ Function onCustomSuspend(msg)
         linearVideoPlayer.control = "stop"
       end if
 
-      ' Remove this line if we do not graduated roku_home_screen_redesign_v3.
+      ' Remove this line if we do not graduated roku_home_screen_redesign_v4.
       ' This is needed to avoid having to use alwaysnotify on featuredListHasFocus and when app is suspended it does not fire focus change event on home screen.
       homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
       if homeScreen <> invalid
@@ -3199,4 +3207,41 @@ Function showFeatureDisabledToast(feature)
     "message": message
     "imageUri": "pkg:/images/feature-disabled-icon.webp"
   })
+End Function
+
+
+' Returns the size of the featured preivew player.
+' @return: array, the size of the player
+Function getFeaturedPlayerSize()
+  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
+  if experiment.featuredRowPosterSize <> invalid
+    featuredRowPoster = experiment.featuredRowPosterSize
+  else
+    featuredRowPoster = m.constants.ui.imageSizes.featuredRowPoster
+  end if
+
+  ' Adding 4px to the width and 10px to the height to account for the border and rounded corners.
+  ' Since we cannot achieve the rounded corners for video player and the focus indicator has rounded corners.
+  ' We are adjusting the size of the player so the edges are aligned beneath the focus indicator.
+  playerSize = [featuredRowPoster[0] + 4, featuredRowPoster[1] + 10]
+
+  return playerSize
+End Function
+
+
+' Checks if the aspect ratio is close to 16:9
+' @param size: array, the size of the player
+' @return: boolean, true if the aspect ratio is close to 16:9, false otherwise
+Function isCloseTo16By9AspectRatio(size)
+  tolerance = 0.05
+  ' Calculate the actual aspect ratio
+  actualRatio = size[0] / size[1]
+  ' 16:9 aspect ratio = 1.777777...
+  targetRatio = 16.0 / 9.0
+  
+  ' Calculate the difference as a percentage
+  difference = Abs(actualRatio - targetRatio) / targetRatio
+  
+  ' Return true if within tolerance
+  return difference <= tolerance
 End Function

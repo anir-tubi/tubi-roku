@@ -23,6 +23,8 @@ Function init()
   setTypographyOfLabel(m.lineTwoData, typographyConstants.ids.bodySmall)
   setTypographyOfLabel(m.ratingLabel, typographyConstants.ids.bodyExtraSmallStrong)
 
+  m.description.observeFieldScoped("isTextEllipsized", "onIsTextEllipsizedChange")
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
@@ -67,7 +69,8 @@ End Function
 Function onItemContentChange(msg)
   itemContent = msg.getData()
 
-  if itemContent <> invalid 
+  if itemContent <> invalid
+    m.description.width = m.top.width
     if itemContent.type = m.constants.ui.contentTypes.linear
       setThumbnailImage(itemContent.thumbnailUri,  itemContent.type)
       currentProgram = getCurrentLiveProgram(itemContent)
@@ -338,4 +341,13 @@ Function convertSecondsToHoursString(seconds As Integer) As String
   end if
 
   return retVal
+End Function
+
+
+' Triggers when the description text is ellipsized.
+Function onIsTextEllipsizedChange(msg)
+  isTextEllipsized = msg.getData()
+  if isTextEllipsized = true
+    m.description.width = 884
+  end if
 End Function

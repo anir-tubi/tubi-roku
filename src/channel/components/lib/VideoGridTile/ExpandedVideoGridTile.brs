@@ -25,6 +25,7 @@ Function init()
 
   m.titleImage.observeFieldScoped("loadStatus", "onTitleImageLoadStatus")
   topRef.observeFieldScoped("showContentPoster", "onShowContentPosterChange")
+  topRef.observeFieldScoped("width", "onWidthChange")
 
   onThemeChange()
 
@@ -175,4 +176,12 @@ End Function
 Function adjustTitleImageTranslation()
   translationY = m.top.height - 16 - m.titleImage.boundingRect().height
   m.titleImage.translation = [16, translationY]
+End Function
+
+
+Function onWidthChange(msg)
+  width = msg.getData()
+  if width > 0
+    m.videoGridMetadata.width = width
+  end if
 End Function

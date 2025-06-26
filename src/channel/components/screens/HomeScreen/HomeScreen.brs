@@ -78,7 +78,7 @@ End Function
 Function setContentAreaState(state = invalid)
   tubiLog("HomeScreen.setToRedesignContentArea")
 
-  isHomeScreenRedesignForFeaturedEnabled = (getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false).design_type <> "none")
+  isHomeScreenRedesignForFeaturedEnabled = (getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false).design_type <> "none")
 
   shouldAnimate = false
   if isHomeScreenRedesignForFeaturedEnabled = false OR (m.top.featuredListHasFocus = false AND m.CategoryGridList.lastFocusedList = "skinAdRow") OR m.top.featuredRowContent = invalid
@@ -532,7 +532,7 @@ Function fireNavigateWithinPageEvent()
   oldRowIndexBoost = m.categoryGridList.rowIndexBoost
   newRowIndexBoost = m.categoryGridList.rowIndexBoost
   
-  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
+  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
   isHomeScreenRedesignForFeaturedEnabled = m.top.kidsMode = false AND m.top.featuredRowContent <> invalid AND (experiment.design_type = "withDescriptionPortraitSmall")
   
   if (isHomeScreenRedesignForFeaturedEnabled = true AND m.CategoryGridList.oldCategoryId <> experiment.container_id) OR isHomeScreenRedesignForFeaturedEnabled = false
@@ -612,7 +612,7 @@ Function getTrackingComponentInfoOfCategoryGridList(gridItem, itemPosition)
     componentValues["category_slug"] = m.top.currCategoryId
 
     rowIndexBoost = m.categoryGridList.rowIndexBoost
-    experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
+    experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
     isHomeScreenRedesignForFeaturedEnabled = m.top.kidsMode = false AND (m.top.featuredRowContent <> invalid AND (experiment.design_type = "withDescriptionPortraitSmall") AND m.top.currCategoryId = experiment.container_id)
 
     if isHomeScreenRedesignForFeaturedEnabled = false
@@ -662,7 +662,7 @@ End Function
 '@mode: string, one of the valid constants.ui.infoPanelModes info panel modes (see InfoPanel.xml for details)
 '@contentNode: content node
 Function populateInfoPanel(mode, contentNode)
-  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
+  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
   isHomeScreenRedesignForFeaturedEnabled = (m.top.featuredRowContent <> invalid AND (experiment.design_type = "withDescriptionPortraitSmall") AND contentNode.parentId = experiment.container_id)
 
   if contentNode <> invalid AND (isHomeScreenRedesignForFeaturedEnabled = false OR m.top.contentMode <> m.constants.ui.contentMode.homescreen)

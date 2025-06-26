@@ -944,11 +944,35 @@ End Function
 
 
 Function switchLinearToInlineGridMode(linearPlayer)
-  playerSize = m.constants.ui.featuredRow.playerSize
-  linearPlayer.width = playerSize[0]
-  linearPlayer.height = playerSize[1]
+  playerTranslationY = 0
+  playerSize = getFeaturedPlayerSize()
 
-  linearPlayer.translation = [3, 0]
+  isCloseTo16By9 = isCloseTo16By9AspectRatio(playerSize)
+  if isCloseTo16By9 = false
+    ' If the aspect ratio is not close to 16:9, adjust the height to 16:9
+    adjustedHeight = playerSize[0] * (9/16)
+    playerTranslationY = (playerSize[1] - adjustedHeight) / 2
+  end if  
+
+  linearPlayer.width = playerSize[0]
+  if isCloseTo16By9AspectRatio(playerSize) = true
+    linearPlayer.height = playerSize[1]
+  else
+    linearPlayer.height = playerSize[0] * (9/16)
+  end if
+
+  linearPlayer.width = playerSize[0]
+
+  if isCloseTo16By9 = false
+    ' If the aspect ratio is not close to 16:9, adjust the height to 16:9
+    adjustedHeight = playerSize[0] * (9/16)
+    linearPlayer.height = adjustedHeight
+    linearPlayer.clippingRect = [0, Abs(playerTranslationY), playerSize[0], playerSize[1]]
+  else
+    linearPlayer.height = playerSize[1]
+  end if
+
+  linearPlayer.translation = [6, playerTranslationY]
   m.inlineVideoMetadataOverlay.reParent(m.inlineVideoPreviewPlayerContainer, false)
   linearPlayer.reParent(m.inlineVideoPreviewPlayerContainer, false)
   m.inlineVideoGridTitleLogo.reParent(m.inlineVideoPreviewPlayerContainer, false)

@@ -53,7 +53,7 @@ End Function
 
 Function onPauseVideoPreview()
   tubiLog("VideoPreviewHelpers.onPauseVideoPreview")
-  isHomeScreenRedesignForFeaturedEnabled = (getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false).design_type <> "none")
+  isHomeScreenRedesignForFeaturedEnabled = (getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false).design_type <> "none")
 
   if isHomeScreenRedesignForFeaturedEnabled = true
     m.inlineVideoMetadataOverlay.showContentPoster = true
@@ -87,7 +87,7 @@ Function onVideoPreviewStateChanged(msg)
       m.inlineVideoMetadataOverlay.showContentPoster = true
       pauseVideoPreview()
     else
-      isHomeScreenRedesignForFeaturedEnabled = (getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false).design_type <> "none")
+      isHomeScreenRedesignForFeaturedEnabled = (getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false).design_type <> "none")
 
       if currentScreen.featuredListHasFocus = false AND isHomeScreenRedesignForFeaturedEnabled = true
         m.inlineVideoMetadataOverlay.showContentPoster = true
@@ -233,7 +233,7 @@ Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
       videoContent.previewId = ""
     end if
 
-    experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
+    experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
     if isKidsUIOn() = false AND content.parentId = experiment.container_id AND (experiment.design_type <> "none")
       videoContent.addField("parentCategory", "string", false)
       videoContent.parentCategory = content.parentId
@@ -275,11 +275,27 @@ Function updatePreviewPlayerToInlineView()
     if screen <> invalid
       setPageInfoForVideoPreview(screen.trackingPageInfo)
     end if
+    playerTranslationY = 0
+    playerSize = getFeaturedPlayerSize()
+
+    isCloseTo16By9 = isCloseTo16By9AspectRatio(playerSize)
+    if isCloseTo16By9 = false
+      ' If the aspect ratio is not close to 16:9, adjust the height to 16:9
+      adjustedHeight = playerSize[0] * (9/16)
+      playerTranslationY = (playerSize[1] - adjustedHeight) / 2
+    end if
 
     if m.videoPreviewPlayer.getParent().isSameNode(m.inlineVideoPreviewPlayerContainer) = false
-      playerSize = m.constants.ui.featuredRow.playerSize
       m.videoPreviewPlayer.width = playerSize[0]
-      m.videoPreviewPlayer.height = playerSize[1]
+
+      if isCloseTo16By9 = false
+        ' If the aspect ratio is not close to 16:9, adjust the height to 16:9
+        adjustedHeight = playerSize[0] * (9/16)
+        m.videoPreviewPlayer.height = adjustedHeight
+        m.videoPreviewPlayer.clippingRect = [0, Abs(playerTranslationY), playerSize[0], playerSize[1]]
+      else
+        m.videoPreviewPlayer.height = playerSize[1]
+      end if
       m.inlineVideoMetadataOverlay.reParent(m.inlineVideoPreviewPlayerContainer, false)
       m.videoPreviewPlayer.reParent(m.inlineVideoPreviewPlayerContainer, false)
       m.inlineVideoGridTitleLogo.reParent(m.inlineVideoPreviewPlayerContainer, false)
@@ -289,8 +305,7 @@ Function updatePreviewPlayerToInlineView()
 
     m.videoPreviewPlayer.unObserveFieldScoped("position")
     m.videoPreviewPlayer.observeFieldScoped("position", "onInlineVideoPreviewPositionChanged")
-
-    m.videoPreviewPlayer.translation = [3, 0]
+    m.videoPreviewPlayer.translation = [6, playerTranslationY]
   end if
 End Function
 
@@ -399,7 +414,7 @@ End Function
 
 Function updatePlayerLayoutBasedOnFocusedContent(content)
   currentScreen = getCurrentScreen()
-  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v3", false)
+  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
   ' If the experiment is enabled and focused content is from featured row than expand preview to full screen.
   if content.gridItemType = m.constants.ui.gridItemTypes.skinAd
     ' Reducing 1px from both width and height since the player is in background and keeping full width causes roku to display closed captioning overlay.

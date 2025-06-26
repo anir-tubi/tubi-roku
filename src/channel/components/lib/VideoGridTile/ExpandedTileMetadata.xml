@@ -15,7 +15,7 @@
 
   <interface>
     <field id="itemContent" type="node" />
-    <field id="width" alias="description.width" />
+    <field id="width" type="float" />
   </interface>
 
   <children>
