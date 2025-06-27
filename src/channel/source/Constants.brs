@@ -1317,7 +1317,7 @@ Function getConstants()
     constants.ui.notAllowedContainerIds = {}
       constants.ui.notAllowedContainerIds[constants.ui.categoryIds.featured] = true
 
-    constants.ui.excludedCategories = [constants.ui.categoryIds.featured]
+    constants.ui.excludedCategories = [constants.ui.categoryIds.featured, constants.ui.categoryIds.certifiedFresh]
 
     constants.ui.cacheableScreenIds = {}
       constants.ui.cacheableScreenIds[constants.ui.screenIds.homeScreen] = true
