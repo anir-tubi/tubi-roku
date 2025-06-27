@@ -98,7 +98,7 @@ Function addControllerUi()
   m.inlineVideoMetadataOverlay = m.top.findNode("inlineVideoMetadataOverlay")
 
   experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
-  if experiment.featuredRowPosterSize <> invalid
+  if isNonEmptyArray(experiment.featuredRowPosterSize) = true
     featuredRowPoster = experiment.featuredRowPosterSize
   else
     featuredRowPoster = m.constants.ui.imageSizes.featuredRowPoster
@@ -3214,7 +3214,7 @@ End Function
 ' @return: array, the size of the player
 Function getFeaturedPlayerSize()
   experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
-  if experiment.featuredRowPosterSize <> invalid
+  if isNonEmptyArray(experiment.featuredRowPosterSize) = true
     featuredRowPoster = experiment.featuredRowPosterSize
   else
     featuredRowPoster = m.constants.ui.imageSizes.featuredRowPoster

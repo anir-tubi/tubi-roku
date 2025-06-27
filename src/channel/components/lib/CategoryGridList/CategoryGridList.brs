@@ -63,7 +63,7 @@ Function init()
 
 
   experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
-  if experiment.featuredRowPosterSize <> invalid
+  if isNonEmptyArray(experiment.featuredRowPosterSize) = true
     m.featuredRowPoster = experiment.featuredRowPosterSize
   else
     m.featuredRowPoster = m.constants.ui.imageSizes.featuredRowPoster
