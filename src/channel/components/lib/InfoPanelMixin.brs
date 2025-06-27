@@ -3,9 +3,10 @@
 '
 ' @content: TubiContentNode, containing a movie or series
 ' @infoPanel: InfoPanel node
+'@isHomeScreen: Boolean, used to add rottentomato score, we will remove this once we SOT implemented.
 '
 ' @sideEffects: updates fields on the passed in infoPanel node
-Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel)
+Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel, isHomeScreen = false)
   tubiLog("InfoPanelMixin.populateInfoPanelWithHomescreenStyleItemMode")
   ' used by homescreen, category details screen etc.
   ' IMPORTANT, still need to call infoPanel.calculateHeight after calling this function
@@ -16,9 +17,10 @@ Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel)
     genres: content.genres
   }
 
-  if isNonEmptyString(content.rottenTomatoScore) = true
+  if isHomeScreen = true AND isNonEmptyString(content.rottenTomatoScore) = true
     lineTwoData.rottenTomatoText = content.rottenTomatoScore
   end if
+
   infoPanel.description = content.description
 
   infoPanel.mode = mode

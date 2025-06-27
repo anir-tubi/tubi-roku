@@ -673,7 +673,7 @@ Function populateInfoPanel(mode, contentNode)
     end if
     
     if mode = m.constants.ui.infoPanelModes.item
-      populateInfoPanelWithHomescreenStyleItemMode(contentNode, m.InfoPanel)
+      populateInfoPanelWithHomescreenStyleItemMode(contentNode, m.InfoPanel, true)
     else if mode = m.constants.ui.infoPanelModes.linearProgramHomescreen
       populateInfoPanelWithLinearProgramHomescreenMode(contentNode, m.InfoPanel) 'V4 api
     else if mode = m.constants.ui.infoPanelModes.continueWatching
