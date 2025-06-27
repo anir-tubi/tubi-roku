@@ -15,6 +15,10 @@ Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel)
   lineTwoData = {
     genres: content.genres
   }
+
+  if isNonEmptyString(content.rottenTomatoScore) = true
+    lineTwoData.rottenTomatoText = content.rottenTomatoScore
+  end if
   infoPanel.description = content.description
 
   infoPanel.mode = mode
@@ -41,10 +45,6 @@ Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel)
     else if resolution = "2160" then
       lineOneData.has4k = true
     end if
-  end if
-
-  if isNonEmptyString(content.rottenTomatoScore) = true
-    lineOneData.rottenTomatoText = content.rottenTomatoScore
   end if
 
   if content.availabilityEnds <> invalid

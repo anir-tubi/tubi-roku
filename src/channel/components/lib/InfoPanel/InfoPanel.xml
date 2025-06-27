@@ -269,8 +269,6 @@
               loadDisplayMode="scaleToFit"/>
             <Badge
               id="fullHDBadge"/>
-            <Badge
-              id="rottenTomatoBadge"/>
           </LayoutGroup>
           <LayoutGroup
             id="SecondLineGroup"
@@ -282,11 +280,12 @@
             <Label
               id="Line2"
               opacity="0.5"
-              width="1140"
               ellipsizeOnBoundary="true">
               <Font
                 role="font"/>
             </Label>
+            <Badge
+              id="rottenTomatoBadge"/>
           </LayoutGroup>
         </LayoutGroup>
 

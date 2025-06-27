@@ -12,6 +12,7 @@
     <field id="iconUri" type="string"/>
     <field id="text" type="string"/>
     <field id="width" type="string" alias="BadgeBackground.width"/>
+    <field id="showBackground" alias="BadgeBackground.visible" value="true" />
   </interface>
 
   <children>

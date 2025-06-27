@@ -33,11 +33,11 @@ Function init()
   m.expireWarning = m.firstLineGroup.findNode("ExpireWarning")
   m.partnerLogo = m.firstLineGroup.findNode("PartnerLogo")
   m.fullHDBadge = m.firstLineGroup.findNode("fullHDBadge")
-  m.rottenTomatoBadge = m.firstLineGroup.findNode("rottenTomatoBadge")
 
   m.secondLineGroup = m.top.findNode("SecondLineGroup")
   m.secondLineAvailabilityBadge = m.secondLineGroup.findNode("SecondLineAvailabilityBadge")
   m.line2 = m.secondLineGroup.findNode("Line2")
+  m.rottenTomatoBadge = m.secondLineGroup.findNode("rottenTomatoBadge")
 
   m.descriptionGroup = m.top.findNode("DescriptionGroup")
   m.description = m.top.findNode("Description")
@@ -218,7 +218,6 @@ Function onWidthChange()
   end if
 
   m.episode.width = topWidth - m.episode.translation[0]
-  m.line2.width = topWidth - m.twoLineInfo.translation[0]
 
   ' The description text needs a right margin which matches its left margin
   m.description.width = topWidth - 2 * m.description.translation[0]
@@ -636,21 +635,6 @@ Function onLineOneDataChange(msg)
       end if
     end if
 
-    'handle Rotten Tomatoes present
-    isRottenTomatoScorePresent = (m.rottenTomatoBadge.getParent() <> invalid)
-    if isNonEmptyString(data.rottenTomatoText) = true
-      if isRottenTomatoScorePresent = false
-        firstLineGroup.insertChild(m.rottenTomatoBadge, insertIndex)
-      end if
-
-      formatBadge(data.rottenTomatoText, m.rottenTomatoBadge)
-      insertIndex++
-    else
-      if isRottenTomatoScorePresent = true
-        firstLineGroup.removeChild(m.rottenTomatoBadge)
-      end if
-    end if
-
   end if
 
   shouldCalculateHeight()
@@ -704,6 +688,21 @@ Function onLineTwoDataChange(msg)
         secondLineGroup.removeChild(m.line2)
       end if
     end if
+
+     'handle Rotten Tomatoes present
+     isRottenTomatoScorePresent = (m.rottenTomatoBadge.getParent() <> invalid)
+     if isNonEmptyString(data.rottenTomatoText) = true
+       if isRottenTomatoScorePresent = false
+        secondLineGroup.insertChild(m.rottenTomatoBadge, insertIndex)
+       end if
+ 
+       formatBadge(data.rottenTomatoText, m.rottenTomatoBadge)
+       insertIndex++
+     else
+       if isRottenTomatoScorePresent = true
+        secondLineGroup.removeChild(m.rottenTomatoBadge)
+       end if
+     end if
 
   end if
   shouldCalculateHeight()
@@ -1018,6 +1017,7 @@ Function onModeChange()
 
     m.twoLineInfo.appendChild(m.secondLineGroup)
     m.secondLineGroup.appendChild(m.line2)
+    m.secondLineGroup.appendChild(m.rottenTomatoBadge)
 
     m.offset.itemSpacings = [13]
   else if m.top.mode = m.constants.ui.infoPanelModes.series
@@ -1040,6 +1040,7 @@ Function onModeChange()
     m.twoLineInfo.appendChild(m.secondLineGroup)
 
     m.secondLineGroup.appendChild(m.line2)
+    m.secondLineGroup.appendChild(m.rottenTomatoBadge)
     m.offset.itemSpacings = [13, 16, 13]
   else if m.top.mode = m.constants.ui.infoPanelModes.episode
     ' used for episodes on the episode list screen
@@ -1061,6 +1062,7 @@ Function onModeChange()
 
     m.twoLineInfo.appendChild(m.secondLineGroup)
     m.secondLineGroup.appendChild(m.line2)
+    m.secondLineGroup.appendChild(m.rottenTomatoBadge)
 
     m.offset.itemSpacings = [13, 16, 13]
   else if m.top.mode = m.constants.ui.infoPanelModes.season
@@ -1223,8 +1225,9 @@ Function formatBadge(text, badgeComponent)
       badgeComponent.backgroundColor = theme.blueBadgeColor
       badgeComponent.textColor = m.primaryTextColor
     else if badgeComponent.id = m.rottenTomatoBadge.id
+      badgeComponent.showBackground = false
       badgeComponent.iconUri = "pkg:/images/certified-fresh.png"
-      badgeComponent.textColor = theme.focusedTextColor
+      badgeComponent.textColor = theme.primaryTextColor
     else
       ' TODAY, TOMORROW, <<Date>> badge and Full HD badge
       badgeComponent.backgroundColor = theme.neutralColor
