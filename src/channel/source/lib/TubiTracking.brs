@@ -816,7 +816,7 @@ Function tubiTracking_getAnalyticsAd(ctx)
     if ad.creativeAdId <> invalid then adEvent.ad_id = ad.creativeAdId
     if ad.creativeId <> invalid then adEvent.creative_id = ad.creativeId.toInt()
     if ad.adId <> invalid then adEvent.parent_id = ad.adId
-    if ad.duration <> invalid then adEvent.reported_duration = ad.duration * 1000 'ms
+    if ad.duration <> invalid then adEvent.reported_duration = Int(ad.duration * 1000) 'ms
     if ctx.adIndex <> invalid then adEvent.index = ctx.adIndex
     if ctx.adCount <> invalid then adEvent.pod_size = ctx.adCount
   end if

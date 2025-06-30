@@ -1194,7 +1194,7 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
         finishAdEvent = {
           ad_finished: m.tracking.getAnalyticsAd(ctx)
           video_id: m.controlNode.content.id.toInt()
-          end_position: endPosition * 1000
+          end_position: Int(endPosition * 1000)
           reason: "DETECTED"
         }
         m.trackUserEvent("finish_ad", finishAdEvent, m.requestQueue)
@@ -1205,7 +1205,7 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
       clickAdEvent = {
         ad_clicked: m.tracking.getAnalyticsAd(ctx)
         video_id: m.controlNode.content.id.toInt()
-        position: m.adPlaybackPos
+        position: Int(m.adPlaybackPos)
         ad_interaction: "OPEN"
       }
       m.trackUserEvent("ad_click", clickAdEvent, m.requestQueue)
