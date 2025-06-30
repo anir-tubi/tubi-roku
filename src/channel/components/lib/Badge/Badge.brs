@@ -35,6 +35,9 @@ Function adjustBadgeSize()
   xAxis = 0
   if m.top.showBackground = true
     xAxis = (m.badgeBackground.width - badgeInfoLayoutWidth)/2
+  else
+    typographyConstants = getTypographyConstants()
+    setTypographyOfLabel(m.badgeText, typographyConstants.ids.bodySmallStrong)
   end if
   m.badgeInfoLayout.translation = [xAxis, 20]
 End Function

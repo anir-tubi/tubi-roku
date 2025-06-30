@@ -17,7 +17,7 @@ Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel, isHome
     genres: content.genres
   }
 
-  if isHomeScreen = true AND isNonEmptyString(content.rottenTomatoScore) = true
+  if isHomeScreen = true AND content.parentId = m.constants.ui.categoryIds.certifiedFresh AND isNonEmptyString(content.rottenTomatoScore) = true
     lineTwoData.rottenTomatoText = content.rottenTomatoScore
   end if
 
