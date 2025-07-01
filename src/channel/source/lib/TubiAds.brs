@@ -560,23 +560,27 @@ Function tubiAds_retrieveAds(adsUrl, adInsertionMethod)
 
         ' If we got a valid result write it to tmp and then have RAF read it from there
         rainmakerResponse = msg.getString()
-        localRafVastUrl = "tmp:/local_raf_vast.xml"
-        if writeAsciiFile(localRafVastUrl, rainmakerResponse) = true then
-          notUsedAdPodPixels = m.parseOutNotUsedAdPodPixels(rainmakerResponse)
-          ' Need to check that count is greater than zero as linear will keep polling even after receiving the upcoming ads which would then override the existing notUsed pixels
-          if notUsedAdPodPixels.count() > 0 then
-            m.notUsedAdPodPixels = notUsedAdPodPixels
+
+        ' We only want to write to tmp and pass through RAF if the response is not empty. We use 100 characters as a threshold as we should always be larger than that if we had ads included
+        if rainmakerResponse.len() > 100 then
+          localRafVastUrl = "tmp:/local_raf_vast.xml"
+          if writeAsciiFile(localRafVastUrl, rainmakerResponse) = true then
+            notUsedAdPodPixels = m.parseOutNotUsedAdPodPixels(rainmakerResponse)
+            ' Need to check that count is greater than zero as linear will keep polling even after receiving the upcoming ads which would then override the existing notUsed pixels
+            if notUsedAdPodPixels.count() > 0 then
+              m.notUsedAdPodPixels = notUsedAdPodPixels
+            end if
+
+            m.roAdFramework.setAdUrl(localRafVastUrl)
+            'get the array of ad units back from the Roku Advertising Framework(RAF)
+            'adUnits are called adPods in RAF documentation
+            currentAdUnitsList = m.roAdFramework.getAds()
+          else
+            tubiLog("Failed to write local vast response to " + localRafVastUrl)
           end if
 
-          m.roAdFramework.setAdUrl(localRafVastUrl)
-          'get the array of ad units back from the Roku Advertising Framework(RAF)
-          'adUnits are called adPods in RAF documentation
-          currentAdUnitsList = m.roAdFramework.getAds()
-        else
-          tubiLog("Failed to write local vast response to " + localRafVastUrl)
+          deleteFile(localRafVastUrl)
         end if
-
-        deleteFile(localRafVastUrl)
       else
         code = responseCode.tostr()
         if code = "404" AND adInsertionMethod = "apollo"
@@ -601,6 +605,7 @@ Function tubiAds_retrieveAds(adsUrl, adInsertionMethod)
       end if
     end if
   end if
+
   return currentAdUnitsList
 End Function
 
