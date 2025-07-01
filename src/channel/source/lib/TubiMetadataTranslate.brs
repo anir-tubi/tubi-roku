@@ -210,17 +210,16 @@ End Function
 ' Convert the URL to that of a URL with rounded corners
 ' @sPosterURL: string, url that needs to be updated
 ' @borderRadiusValue: integer, the param value used for border_radius. default is -1
-Function tubiMetadataTranslate_getRoundedCornersURL(sPosterURL, borderRadiusValue = -1)
-  borderRadius = "default"
+' @imageFormat: string, the param value used to force the image format. default is "wp". Available values to allow rounded corners are "wp" (webp lossless), "wpl" (webp lossy), "png". Check that the device supports the image format before using it.
+Function tubiMetadataTranslate_getRoundedCornersURL(sPosterURL, borderRadiusValue = -1, imageFormat = "wp")
+  borderRadius = "8"
   if isNumber(borderRadiusValue) = true AND borderRadiusValue >= 0
     borderRadius = borderRadiusValue.toStr()
   end if
 
   sPosterURL = replaceURLParameter(sPosterURL, "border_radius", borderRadius, true)
-  '//::TODO::roku_rounded_corners_v1 - linear thumbnails with a border_radius=8 are cached in the CDN with square corners.
-  '// So we are setting the border_radius param to "normal" (which is the same thing as "8") to ensure we display rounded corners and not worry about the cached version of the border_radius=9 URL
-  '//   When linear thumnails come from Tupian (sometime in October 2023), then we can set the border radius back to "8" instead of "default", and then we should see the rounded corners.
-  ' sPosterURL = replaceURLParameter(sPosterURL, "border_radius", "8", true)
+  sPosterURL = replaceURLParameter(sPosterURL, "f", imageFormat, true)
+  
   return sPosterURL
 End Function
 
