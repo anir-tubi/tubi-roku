@@ -972,22 +972,28 @@ Function onKeyEvent(key As string, press As boolean) As boolean
     else if key = "back" AND (m.ResultGrid.isInFocusChain() = true OR m.trendingSearchResultGrid.isInFocusChain() = true) then
       '//when the user hits BACK, then set the keyboard to focus
       '//jump to left most visible thumbnail in the grid
-      nFocused = m.ResultGrid.itemFocused
-      nColumns = m.ResultGrid.numColumns
-      nJumpTo = Int(nFocused / nColumns) * nColumns
+      if m.ResultGrid.isInFocusChain() = true
+        nFocused = m.ResultGrid.itemFocused
+        nColumns = m.ResultGrid.numColumns
+        nJumpTo = Int(nFocused / nColumns) * nColumns
 
-      m.ResultGrid.jumpToItem = nJumpTo
+        m.ResultGrid.jumpToItem = nJumpTo
+      end if
 
       navigateLeftFromSearchResults()
       return true
-    else if key = "down" AND m.trendingSearchResultsContainer.visible = true AND m.ResultGrid.isInFocusChain() = true AND m.trendingSearchResultGrid.content <> invalid AND m.trendingSearchResultGrid.content.getChildCount() > 0
+    else if key = "down" AND m.trendingSearchResultsContainer.visible = true AND m.ResultGrid.isInFocusChain() = true AND m.ResultGrid.content <> invalid AND m.trendingSearchResultGrid.content <> invalid AND m.trendingSearchResultGrid.content.getChildCount() > 0
+      lastItemIndex = m.ResultGrid.content.getChildCount() - 1
+      translationY = m.ResultGrid.subBoundingRect("item" + lastItemIndex.toStr()).y
       m.trendingSearchResultGrid.setFocus(true)
       m.isTrendingResultsGridInFocus = true
       if m.rokuSearchLargerPoster = true
-        slideTo(m.gridContainer, [0, -430], 0.3)
+        translationY = 430 + translationY
       else
-        slideTo(m.gridContainer, [0, -375], 0.3)
+        translationY = 375 + translationY
       end if
+      slideTo(m.gridContainer, [0, -(translationY)], 0.3)
+      
     else if key = "up" AND m.trendingSearchResultGrid.isInFocusChain() = true AND (m.ResultGrid.content <> invalid AND m.ResultGrid.content.getChildCount() > 0)
       slideTo(m.gridContainer, [0, 0], 0.3)
       m.ResultGrid.setFocus(true)
