@@ -27,8 +27,8 @@ Function init()
 
   m.Video = m.top.findNode("VideoNode") ' reference in case we change from extending Video to extending Group
   m.Video.observeFieldScoped("position", "onVideoPositionChange")
-  m.Video.observeField("state", "onVideoStateChange")
-  m.Video.observeField("bufferingStatus", "onBufferingStatus")
+  m.Video.observeFieldScoped("state", "onVideoStateChange")
+  m.Video.observeFieldScoped("bufferingStatus", "onBufferingStatus")
   m.Video.observeField("timedMetaData", "onId3")
   'downloadedSegment is needed for live player log - Quality Of Service event
   m.Video.observeFieldScoped("downloadedSegment", "onDownloadedSegment")

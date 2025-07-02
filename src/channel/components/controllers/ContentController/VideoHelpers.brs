@@ -115,6 +115,8 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
     setInScreenCache(videoPlayer)
   end if
 
+  passVideoReferenceToYouboraPlugin(videoPlayer)
+
   ' Passing current user selected subtitle track.
   if m.pub_serverPersistentData <> invalid
     videoPlayer.preferredSubtitleTrack = m.pub_serverPersistentData.subtitleTrack
@@ -1136,8 +1138,17 @@ Function initVideoTracking(videoPlayer)
         'and re-observe the video node attributes.
         m.youboraTask.taskState = "stop"
       end if
-      m.youboraTask.videoplayer = videoPlayer.findNode("VideoNode")
     end if
+  end if
+End Function
+
+
+'This is needed when switching from VOD -> Live OR Live -> VOD to fire the Youbora joinTime events.
+Function passVideoReferenceToYouboraPlugin(videoPlayer)
+  if videoPlayer <> invalid
+    player = videoPlayer.findNode("VideoNode")
+    'Pass Video reference to Youbora plugin
+    m.youboraTask.updateplayer = {player: player, unobserveGlobalScope: false}
   end if
 End Function
 

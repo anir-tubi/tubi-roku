@@ -54,6 +54,8 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
 
       end if
 
+      passVideoReferenceToYouboraPlugin(videoPlayer)
+
       screen = getFromScreenCache(sAssociatedScreenID)
       if screen <> invalid
         videoPlayer.trackingPageContext = screen.trackingPageInfo
