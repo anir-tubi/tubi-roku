@@ -752,7 +752,7 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
           m.backgroundGroup.posterVisible = false
         end if
       else
-        if isLinearPlayerLoadingORPlaying() = true
+        if isLinearPlayerLoadingOrPlaying() = true
           stopAndHideLinearVideoPlayer()
         end if
       end if
@@ -1239,10 +1239,11 @@ Function onFeaturedRowCurrFocusColumnChange()
         stopVideoPreview()
       end if
     end if
-
-    updatePreviewPlayerToInlineView()
+    isLinearPlayerPlaying = isLinearPlayerLoadingOrPlaying()
+    shouldForceInline = isLinearPlayerPlaying = true
+    updatePreviewPlayerToInlineView(shouldForceInline)
     m.videoPreviewDebounce.control = "start"
-    if isLinearPlayerLoadingOrPlaying() = true
+    if isLinearPlayerPlaying = true
       stopAndHideLinearVideoPlayer()
     end if
     m.inlineVideoPreviewPlayerContainer.opacity = 1

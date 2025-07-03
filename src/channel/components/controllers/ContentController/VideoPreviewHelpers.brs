@@ -268,7 +268,7 @@ Function updatePreviewPlayerToCondensedView()
 End Function
 
 
-Function updatePreviewPlayerToInlineView()
+Function updatePreviewPlayerToInlineView(shouldForceInline = false)
   if isCurrentScreenHomeScreen() = true
     screen = getCurrentScreen()
 
@@ -285,7 +285,7 @@ Function updatePreviewPlayerToInlineView()
       playerTranslationY = (playerSize[1] - adjustedHeight) / 2
     end if
 
-    if m.videoPreviewPlayer.getParent().isSameNode(m.inlineVideoPreviewPlayerContainer) = false
+    if m.videoPreviewPlayer.getParent().isSameNode(m.inlineVideoPreviewPlayerContainer) = false OR shouldForceInline = true
       m.videoPreviewPlayer.width = playerSize[0]
 
       if isCloseTo16By9 = false
