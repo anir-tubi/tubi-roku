@@ -1409,7 +1409,7 @@ Function onFeaturedRowListTranslationChange(msg)
 
     if isNumber(rectY) = true
       inlineVideoPreviewPlayerContainer = m.inlineVideoPreviewPlayerContainer.translation
-      m.inlineVideoPreviewPlayerContainer.translation = [inlineVideoPreviewPlayerContainer[0], translation[1] + rectY - 3]
+      m.inlineVideoPreviewPlayerContainer.translation = [inlineVideoPreviewPlayerContainer[0], translation[1] + rectY - 4]
     end if
   end if
 End Function

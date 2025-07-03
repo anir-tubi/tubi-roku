@@ -58,7 +58,7 @@
           <Group
             id="inlineVideoPreviewPlayerContainer"
             opacity="0"
-            translation="[159, 155]" >
+            translation="[160, 155]" >
             <ExpandedVideoGridTile
               translation="[5,4]"
               id="inlineVideoMetadataOverlay" />
