@@ -412,28 +412,75 @@ Function processSuccessResponse(result, callbackTypes, job)
     ' JSON/XML, so we should treat it as an error
     processErrorResponse(result, callbackTypes, job)
   else
-    parserCallback = callbackTypes.parseSuccess
+    try
+      parserCallback = callbackTypes.parseSuccess
 
-    ' some requests may not require handling of the response and therefore may not
-    ' have a parseSuccess callback.
-    if parserCallback <> invalid
-      if callbackTypes.passRawResponse = true
-        result.responseHeaders = responseHeaders
-        output = parserCallback(result, job.reqInfo)
-      else
-        output = parserCallback(result.response, job.reqInfo)
-      end if
+      ' some requests may not require handling of the response and therefore may not
+      ' have a parseSuccess callback.
+      if parserCallback <> invalid
+        if callbackTypes.passRawResponse = true
+          result.responseHeaders = responseHeaders
+          output = parserCallback(result, job.reqInfo)
+        else
+          output = parserCallback(result.response, job.reqInfo)
+        end if
 
-      ' this block will execute only for batch responses
-      if job.batchInfo <> invalid AND job.batchInfo.id <> invalid
-        accumulateBatchResponse(job, output)
+        ' this block will execute only for batch responses
+        if job.batchInfo <> invalid AND job.batchInfo.id <> invalid
+          accumulateBatchResponse(job, output)
+        else
+          ' Adding a check if parser output type does not match expected type for callback field as if it does not match then we can get stuck in the bootstrap flow
+          expectedType = job.reqInfo.callbackNode.getFieldType("response")
+          outputTypeMatches = true
+
+          if expectedType = "associativearray" then
+            if isAA(output) = false then
+              outputTypeMatches = false
+            end if
+          else if expectedType = "string" then
+            if isString(output) = false then
+              outputTypeMatches = false
+            end if
+          else if expectedType = "node" then
+            if isNode(output) = false then
+              outputTypeMatches = false
+            end if
+          else
+            tubiLog("BaseGeneralTask.processSuccessResponse: Unchecked type: " + expectedType)
+          end if
+
+          if outputTypeMatches = true then
+            ' If the output matches the expected type then we can set it as the response
+            job.reqInfo.callbackNode.response = output
+          else
+            message = {
+              "expectedType": expectedType
+              "outputType": type(output)
+              "url": result.url
+              "responseCode": result.response.code
+            }
+
+            ' If the output does not match the expected type then we should log an error
+            logInfo(message, "clientInfo", "parser-output-type-mismatch", 1)
+
+            processErrorResponse(result, callbackTypes, job)
+          end if
+        end if
       else
-        job.reqInfo.callbackNode.response = output
+        ' Default responseType is string so we send back an empty string to at least let someone know the request succeeded
+        job.reqInfo.callbackNode.response = ""
       end if
-    else
-      ' Default responseType is string so we send back an empty string to at least let someone know the request succeeded
-      job.reqInfo.callbackNode.response = ""
-    end if
+    catch e
+      message = {
+        "url": result.url
+        "responseCode": result.response.code
+      }
+
+      message.append(e)
+
+      logInfo(message, "clientInfo", "caught-crash", 1)
+      processErrorResponse(result, callbackTypes, job)
+    end try
   end if
 
 End Function
@@ -543,7 +590,7 @@ Function processErrorResponse(result, callbackTypes, job)
   responseFromServer = result.response
   responseHeaders = responseFromServer.headers
 
-  if responseHeaders <> invalid AND responseHeaders["Content-Type"] = "application/json"
+  if responseHeaders <> invalid AND responseHeaders["Content-Type"] = "application/json" AND isString(result.response.data) = true then
     responseFromServer.data = parseJson(result.response.data)
   end if
 
