@@ -24,6 +24,8 @@ Function init()
   m.titleImage.observeFieldScoped("loadStatus", "onTitleImageLoadStatus")
   topRef.observeFieldScoped("showContentPoster", "onShowContentPosterChange")
 
+  m.title.lineSpacing = 0
+
   onThemeChange()
 
   m.titleAnimation = invalid
@@ -59,6 +61,12 @@ Function onItemContentChange(msg)
       if currentProgram.live = true
         setBadge(m.badgeTypes.live)
       end if
+    end if
+
+    if itemContent.type = "linear"
+      m.title.maxLines = 1
+    else
+      m.title.maxLines = 2
     end if
 
     ' For Linear content, we are using the title from the current program.

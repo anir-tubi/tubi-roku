@@ -49,6 +49,7 @@
           <Label
             id="title"
             width="650"
+            wrap="true"
             vertAlign="bottom">
             <Font
               id="TitleFont"

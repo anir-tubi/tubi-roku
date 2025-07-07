@@ -30,6 +30,7 @@ Function init()
   onThemeChange()
 
   m.metadataFadeDelay = 0.5
+  m.title.lineSpacing = 0
 
   m.titleAnimation = invalid
 End Function
@@ -58,6 +59,12 @@ Function onItemContentChange(msg)
     else if m.badge <> invalid
         m.posterGroup.removeChild(m.badge)
         m.badge = invalid
+    end if
+
+    if itemContent.type = "linear"
+      m.title.maxLines = 1
+    else
+      m.title.maxLines = 2
     end if
 
     if currentProgram <> invalid

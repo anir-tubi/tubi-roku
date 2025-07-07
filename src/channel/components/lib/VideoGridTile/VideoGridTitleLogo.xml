@@ -42,6 +42,7 @@
           id="titleGroup">
           <Label
             id="title"
+            wrap="true"
             width="650"
             vertAlign="bottom">
             <Font
