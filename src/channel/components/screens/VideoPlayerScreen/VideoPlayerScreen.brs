@@ -499,6 +499,10 @@ Function init()
     m.adCountdownOverlay.translation = [81, 81]
   end if
 
+  ' Will be used to track the current subtitle and audio language for analytics purposes.
+  m.currentSubtitleLanguage = "en"
+  m.currentAudioLanguage = "en"
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
@@ -785,8 +789,6 @@ Function playContent()
       updateLastPingTime(0)
     end if
 
-    fireStartVideoOrTrailerEvent()
-
     updateVideoState("play")
 
     if m.top.enableAds = true then
@@ -822,7 +824,7 @@ Function playContent()
       m.Video.control = "play"
       setInitialCCAndAudioTracks()
     end if
-
+    fireStartVideoOrTrailerEvent()
   end if
 
 End Function
@@ -1270,6 +1272,8 @@ Function fireStartVideoOrTrailerEvent()
         video_resource_url: m.Video.content.URL
         video_codec_type: codeType
         video_resolution: resolution
+        audio_language: UCase(m.currentAudioLanguage)
+        subtitle_language: UCase(m.currentSubtitleLanguage)
       }
     })
   end if
@@ -3094,6 +3098,7 @@ End Function
 
 Function setInitialSubtitleTrack(availableSubtitleTracks)
   preferredSubtitleTrack = m.top.preferredSubtitleTrack
+  m.currentSubtitleLanguage = ""
 
   ' Proceeding only if we have stored device level settings.
   if availableSubtitleTracks <> invalid AND availableSubtitleTracks.Count() > 0 AND isAA(preferredSubtitleTrack) = true AND isNonEmptyString(preferredSubtitleTrack.language) = true
@@ -3106,6 +3111,7 @@ Function setInitialSubtitleTrack(availableSubtitleTracks)
         languageCode = m.tubiTrackingInfo.getLanguageCode(track.language)
         if languageCode = preferredSubtitleTrack.language
           updatedSubtitleTrack = track
+          m.currentSubtitleLanguage = languageCode
           exit for
         end if
       end if
@@ -3122,12 +3128,14 @@ Function setInitialSubtitleTrack(availableSubtitleTracks)
   else if availableSubtitleTracks <> invalid AND availableSubtitleTracks.Count() > 0 AND isNonEmptyString(m.video.currentSubtitleTrack) = true
     ' This else block will handle case where we do not have a preferred subtitle track saved for device.
     m.closedCaptionAndAudioSelectionOverlay.currentSubtitleTrack = m.video.currentSubtitleTrack
+    m.currentSubtitleLanguage = m.tubiTrackingInfo.getLanguageCode(availableSubtitleTracks[0].language)
   end if
 End Function
 
 
 Function setInitialAudioTrack(availableAudioTracks)
   preferredAudioTrack = m.top.preferredAudioTrack
+  m.currentAudioLanguage = "en"
 
   ' Proceeding only if we have stored device/user level settings.
   if availableAudioTracks <> invalid AND availableAudioTracks.Count() > 1 AND isAA(preferredAudioTrack) = true AND isNonEmptyString(preferredAudioTrack.language) = true
@@ -3145,6 +3153,7 @@ Function setInitialAudioTrack(availableAudioTracks)
         languageCode = m.tubiTrackingInfo.getLanguageCode(track.language)
 
         if languageCode = preferredAudioTrack.language
+          m.currentAudioLanguage = languageCode
           ' If it is normal audio track and user did not prefer one with audio description.
           if hasAccessibilityDescription = false AND preferredAudioTrack.role = m.constants.player.audioTrack.roles.main
             updatedAudioTrack = track

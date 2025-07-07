@@ -502,6 +502,8 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       video_player: "" 'VideoPlayer enum
       video_codec_type: "" ' The codec type of video resource
       video_resolution: "" 'The resolution of video resource
+      audio_language: "" 'LanguageCode enum
+      subtitle_language: "" 'LanguageCode enum
     }
 
     play_progress: {
