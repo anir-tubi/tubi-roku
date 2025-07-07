@@ -316,6 +316,8 @@ Function onScreenFocusChange()
   if shouldRefresh(m.ResultGrid.content) = true
     m.keyboard.text = ""
     loadSearchResults(true)
+    ' Due to some bug in Roku it is returning both results grid and trending search grid in focus chain.
+    m.ResultGrid.setFocus(false)
     m.trendingSearchResultGrid.setFocus(true)
   end if
 End Function
@@ -1049,11 +1051,11 @@ End Function
 Function handlePlayInput()
   selectedContent = invalid
   itemFocused = 0
-
-  if m.ResultGrid.isInFocusChain() = true
+  
+  if m.ResultGrid.isInFocusChain() = true AND m.ResultGrid.content <> invalid
     itemFocused = m.ResultGrid.itemFocused
     selectedContent = m.ResultGrid.content.getChild(itemFocused)
-  else if m.trendingSearchResultGrid.isInFocusChain() = true
+  else if m.trendingSearchResultGrid.isInFocusChain() = true AND m.trendingSearchResultGrid.content <> invalid
     itemFocused = m.trendingSearchResultGrid.itemFocused
     selectedContent = m.trendingSearchResultGrid.content.getChild(itemFocused)
   end if
