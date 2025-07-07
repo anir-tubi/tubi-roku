@@ -22,6 +22,7 @@ Function init()
   topRef.observeField("transportVoiceRequest", "onTransportVoiceRequest")
   topRef.observeFieldScoped("personalizationId", "onPersonalizationIdChanged")
   topRef.observeFieldScoped("contentUpdated", "onContentUpdated")
+  topRef.observeFieldScoped("kidsMode", "onKidsModeChange")
   m.CategoryRefreshTimer = topRef.findNode("CategoryRefreshTimer")
   m.CategoryRefreshTimer.duration = m.constants.timers.categoryContentRefreshTimeout
   m.CategoryRefreshTimer.observeFieldScoped("fire", "onCategoryRefreshTimer")
@@ -898,4 +899,13 @@ Function updateFeaturedRowListTranslation()
   translation = m.categoryGridList.featuredRowListTranslation
   translation[1] = translation[1] + m.ContentAreaParent.translation[1]
   m.top.featuredRowListTranslation = translation
-end function
+End Function
+
+
+Function onKidsModeChange(msg)
+  kidsMode = msg.getData()
+  isHomeScreenRedesignForFeaturedEnabled = (getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false).design_type <> "none")
+  if isHomeScreenRedesignForFeaturedEnabled = true AND kidsMode = true
+    m.ContentAreaParent.translation = m.originalContentAreaTranslation
+  end if
+End Function

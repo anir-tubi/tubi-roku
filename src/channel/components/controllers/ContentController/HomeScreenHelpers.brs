@@ -32,6 +32,7 @@ Function showHomeScreen(constants, screenID = "")
 
     homeScreen.isVideoPreviewOn = m.pub_serverPersistentData.isVideoPreviewOn
     m.pubSub.subscribe("pub_serverPersistentData.isVideoPreviewOn", homeScreen, "isVideoPreviewOn")
+    homeScreen.kidsMode = isKidsUIOn()
 
     pushScreen(homeScreen, true, shouldSendPageLoadEvent)
 

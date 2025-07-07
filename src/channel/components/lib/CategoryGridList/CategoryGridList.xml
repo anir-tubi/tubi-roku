@@ -120,6 +120,8 @@
 
       <field id="lastFocusedList" type="string" />
 
+      <field id="kidsMode" type="boolean" />
+
     <!-- OUTPUT -->
       <field id="itemSelected" type="node"/>
 

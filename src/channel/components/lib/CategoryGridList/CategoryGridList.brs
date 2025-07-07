@@ -11,6 +11,8 @@ Function init()
   m.top.observeFieldScoped("removeFocusFromRowList", "onRemoveFocusFromRowList")
   m.top.observeFieldScoped("signedIn", "onSignedInChange")
   m.top.observeFieldScoped("parentScreenTrackingPageInfo", "onParentScreenTrackingPageInfoChange")
+  m.top.observeFieldScoped("kidsMode", "onKidsModeChange")
+
   m.RowList = m.top.findNode("RowList")
   m.RowList.observeFieldScoped("rowItemFocused", "onRowItemFocused")
   m.RowList.observeFieldScoped("rowItemSelected", "onRowItemSelected")
@@ -999,6 +1001,13 @@ End Function
 Function updateCurrentFocusedItemBoundingRect(columnFocused)
   boundingRect = m.FeaturedRowList.subBoundingRect("item0_" + columnFocused.toStr())
   m.top.currentFocusedItemBoundingRect = boundingRect
+End Function
+
+
+' Kids mode is a special case where we want to disable the small portrait description experiment.
+Function onKidsModeChange(msg)
+  kidsMode = msg.getData()
+  m.isWithDescPortraitSmallExpEnabled = (m.homeScreenDesignType = "withDescriptionPortraitSmall" AND kidsMode = false)
 End Function
 
 

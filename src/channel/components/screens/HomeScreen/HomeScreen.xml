@@ -85,7 +85,7 @@
       <field id="kidsModeFeatureOn" type="boolean" />
 
       <!--Is KidsMode On-->
-      <field id="kidsMode" type="boolean" />
+      <field id="kidsMode" alias="CategoryGridList.kidsMode" />
 
       <!-- incoming metadata from GeneralTask
            type is node, so that it takes less time to send data from one file to another file when comparing to assocarray
