@@ -735,6 +735,7 @@ Function handleRelatedResponse(relatedContent)
         ' Providing user friendly id to related content node to for analytics purposes.
         relatedContent.id = "you_may_also_like"
         screen.relatedContent = relatedContent
+        screen.showRelated = true
         exit for
       end if
     end for
