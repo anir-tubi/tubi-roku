@@ -150,6 +150,14 @@ Function TubiExperiments(experimentsInfo) as Object
         }
       }
 
+      roku_home_screen_fixed_focus: {
+        roku_home_screen_fixed_focus_v1: {
+          default: {"enabled": false}
+          holdout_control: {"enabled": false}
+          holdout_winning: {"enabled": false}
+        }
+      }
+
     }
 
     'public methods

@@ -458,6 +458,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
 
     getExperimentResource("roku_no_change_experiment", "roku_no_change_experiment_v3", true)
     getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v3", true)
+    getExperimentResource("roku_home_screen_fixed_focus", "roku_home_screen_fixed_focus_v1", true)
 
   end if
 End Function

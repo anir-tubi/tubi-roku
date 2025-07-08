@@ -75,6 +75,12 @@ Function init()
   ' 263 also includes the space between the last line of the description and container below it.
   m.rowListPosition = [0, 263 + m.featuredRowPoster[1]]
 
+
+  if getExperimentResource("roku_home_screen_fixed_focus", "roku_home_screen_fixed_focus_v1", false).enabled = true
+    m.RowList.rowFocusAnimationStyle = "fixedFocus"
+  else
+    m.RowList.rowFocusAnimationStyle = "floatingFocus"
+  end if
 End Function
 
 
