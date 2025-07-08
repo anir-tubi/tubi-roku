@@ -306,6 +306,7 @@ Function updatePreviewPlayerToInlineView(shouldForceInline = false)
     m.videoPreviewPlayer.unObserveFieldScoped("position")
     m.videoPreviewPlayer.observeFieldScoped("position", "onInlineVideoPreviewPositionChanged")
     m.videoPreviewPlayer.translation = [6, playerTranslationY]
+    m.videoPreviewPlayer.videoPlayerType = "VIDEO_IN_GRID"
   end if
 End Function
 
@@ -313,6 +314,7 @@ End Function
 Function updatePreviewPlayerToFullScreen()
   m.videoPreviewPlayer.reParent(m.backgroundVideoPreviewPlayerContainer, false)
   m.videoPreviewPlayer.clippingRect = [0, 0, 1920, 1080]
+  m.videoPreviewPlayer.videoPlayerType = "BANNER"
   resizeToLocation(m.videoPreviewPlayer, 1919, 1079, [0, 0], 0)
 End Function
 
