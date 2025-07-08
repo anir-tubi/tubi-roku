@@ -82,7 +82,8 @@ describe('Multiple Audio', function () {
     expect(audioTracksSectionHeaderLabel.text).to.equal('Audio');
 
     // Enable AD
-    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
+    // Adding a slight delay between key downs.
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4, wait: 100 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Start app user
