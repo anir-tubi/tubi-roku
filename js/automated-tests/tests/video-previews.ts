@@ -278,7 +278,7 @@ describe('Video Preview', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForCurrentScreenToEqual('settingsScreen');
 
-    await testUtils.jumpToRowWithTitle('settingsMenu', 'Autoplay Previews');
+    await testUtils.jumpToRowWithTitle('settingsMenu', 'Autoplay Controls');
     await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForElementToFullyShowOnScreen('autoplayPreviewOn');
     await ecp.sendKeypress(ecp.Key.Down);
@@ -307,7 +307,7 @@ describe('Video Preview', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForCurrentScreenToEqual('settingsScreen');
 
-    await testUtils.jumpToRowWithTitle('settingsMenu', 'Autoplay Previews');
+    await testUtils.jumpToRowWithTitle('settingsMenu', 'Autoplay Controls');
     await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForElementToFullyShowOnScreen('autoplayPreviewOn');
     await testUtils.waitForElementToFullyShowOnScreen('previewOnCheckMark');
