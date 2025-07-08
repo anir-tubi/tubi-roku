@@ -938,29 +938,18 @@ Function getConstants()
         maxH264Resolution = 1080 ' max supported resolution is 1080p for H264 from backend
       end if
 
-      ' if the device only supports H264, then we are sending limitResolutions as "H264_<maxH264Resolution>".
+      ' if the device only supports H264, then we are sending limitResolutions as "H264_<maxH265Resolution>".
       ' Backend will respond with multiple manifests (but all are H264)
-      if maxH264Resolution >= 1080
-        constants.player.limitResolutions = [
-          avcCodec + "_" + "1080" + "p"
-          avcCodec + "_" + "720" + "p"
-        ]
-      else
-        constants.player.limitResolutions = [
-          avcCodec + "_" + maxH264Resolution.toStr() + "p"
+      constants.player.limitResolutions = [
+        avcCodec + "_" + maxH264Resolution.toStr() + "p"
       ]
-      end if
 
       ' if the device supports H265, then we are sending limitResolutions as "H265_<maxH265Resolution>" & "H264_<maxH264Resolution>"
       ' Backend will respond with multiple manifests (both H265 & H264)
-      if di.CanDecodeVideo({Codec: "hevc"}).result = true ' checking whether device is capable of playing H265 transcoded content
-        constants.player.limitResolutions = [
-          hevcCodec + "_" + "1080" + "p"
-          hevcCodec + "_" + "720" + "p"
-          avcCodec + "_" + "1080" + "p"
-          avcCodec + "_" + "720" + "p"
-        ]
-      end if
+      constants.player.limitResolutions = [
+        hevcCodec + "_" + maxH265Resolution.toStr() + "p"
+        avcCodec + "_" + maxH264Resolution.toStr() + "p"
+      ]
 
       'Video ResourceType
       constants.player.videoResourcetype = {}
@@ -1550,6 +1539,9 @@ Function getConstants()
     constants.configHubFallbacks.majorEventNameTranslationKey = "game"
 
   constants.serverValues = {}
+
+  constants.serverValues.tensorVideoRenditions = {}
+  constants.serverValues.tensorVideoRenditions.fourK = "4K_READY"
 
   ' Creates mapping against parental rating to a header string.
   constants.serverValues.parentalControls = ["YOUNGER_CHILD", "OLDER_CHILD", "TEEN", "ADULT"]

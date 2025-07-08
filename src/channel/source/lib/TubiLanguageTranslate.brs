@@ -2064,10 +2064,6 @@ Function getTranslation_en_US()
       "description": "A header for the message that let's the user know they've been signed in with the given email",
       "message": "Welcome!"
     },
-    "resolution_full_hd": {
-      "description": "Title of the 1080p resolution label in the infopanel",
-      "message": "FULL HD"
-    },
     "available_at_toast_heading": {
       "description": "Toast message heading that is displayed when we click on a available at button",
       "message": "Content available at {time}"
@@ -2171,14 +2167,6 @@ Function getTranslation_en_US()
     "videoPlayer_button_watchMovie": {
       "description": "Label of button to allow users to watch movie from trailer screen",
       "message": "Watch Movie"
-    },
-    "h_m_duration":{
-      "description": "Indicates time in the format 'x h y m'",
-      "message": "{hour}h {minutes}m"
-    },
-    "m_duration":{
-      "description": "Indicates time in the format 'y m'",
-      "message": "{minutes}m"
     }
   }
 End Function

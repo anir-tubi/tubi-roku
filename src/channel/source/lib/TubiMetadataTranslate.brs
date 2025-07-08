@@ -507,20 +507,6 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     translatedContent.cuepoints = contentFromServer.monetization.cue_points
   end if
 
-  if isNonEmptyArray(contentFromServer.video_metadata) = true
-    for i = 0 to contentFromServer.video_metadata.count() - 1
-      videoMetadata = contentFromServer.video_metadata[i]
-      if isAA(videoMetadata) = true
-        resolution = getIntegerResolutionFromVideoResource(videoMetadata)
-        translatedContent.resolution = resolution.toStr()
-        if resolution >= 1080
-          'If we have 1080P resolution we don't need to look for other, so exit the loop.
-          exit for
-        end if
-      end if
-    end for
-  end if
-
   translatedContent.videoResources = m.composeVideoResources(translatedContent, contentFromServer)
 
   'take care of any subtitles if they exist - should only happen on videos

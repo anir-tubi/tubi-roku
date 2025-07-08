@@ -62,13 +62,6 @@ Function TubiExperiments(experimentsInfo) as Object
           holdout_winning: {"enabled": true}}
       }
 
-      roku_1080p_resolution: {
-        roku_1080p_resolution_v1 : {
-          default: {"enabled": false}
-          holdout_control: {"enabled": false}
-          holdout_winning: {"enabled": false}}
-      }
-
       roku_player_ui_refresh: {
         ' We will run 4 overlay types. Possible values are none, variant1, variant2, variant3, variant4
         roku_ads_overlay_v1 : {

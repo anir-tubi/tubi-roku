@@ -729,15 +729,8 @@ Function onItemFocused(msg)
         hasAudioDescription: focusedContent.hasAudioDescription
       }
 
-      fullHDBadgeText = ""
-      if isNonEmptyString(focusedContent.resolution) = true
-        resolution = focusedContent.resolution
-        if resolution = "1080" AND getExperimentResource("roku_1080p_resolution", "roku_1080p_resolution_v1").enabled = true
-          fullHDBadgeText = getTranslation("resolution_full_hd")
-          lineOneData.fullHDBadgeText = fullHDBadgeText
-        else if resolution = "2160" then
-          lineOneData.has4k = true
-        end if
+      if focusedContent.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
+        lineOneData.has4k = true
       end if
 
       lineTwoData = {
@@ -761,14 +754,6 @@ Function onItemFocused(msg)
         availabilityEnds: focusedContent.availabilityEnds
         hasAudioDescription: focusedContent.hasAudioDescription
       }
-
-      if isNonEmptyString(focusedContent.resolution) = true
-        resolution = focusedContent.resolution
-        if resolution = "1080" AND getExperimentResource("roku_1080p_resolution", "roku_1080p_resolution_v1").enabled = true
-          fullHDBadgeText = getTranslation("resolution_full_hd")
-          lineOneData.fullHDBadgeText = fullHDBadgeText
-        end if
-      end if
 
       lineTwoData = {
         genres: focusedContent.genres
