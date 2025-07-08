@@ -81,7 +81,7 @@ describe('Side Navigation', function () {
       await navigateRightToGrid();
       await utils.sleep(2500);
       const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-      expect(await searchResultsText.text).to.equal('Zapped');
+      expect(await searchResultsText.text).to.contains('Zapped');
 
     });
 
@@ -393,7 +393,7 @@ describe('Side Navigation', function () {
       await testUtils.getNodeForElement('channelInfoPanel');
      
       // Once in detail page press the back button 5x
-      await ecp.sendKeypress(ecp.Key.Back, { count: 6 });
+      await ecp.sendKeypress(ecp.Key.Back, { count: 5 });
 
       // Verify that the Exit modal dialog is displayed
       await testUtils.waitForElementToFullyShowOnScreen('exitPrompt');

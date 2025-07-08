@@ -1275,13 +1275,13 @@ const elements = typeCheckElements({
   /** Dialog box text for PC Settings Change for Little Kids */
   parentalControlsSettingsLittleKids: {
     keyPath:
-      '#ContentController.#08fb5e0.#DialogBox.#ContentArea.#MessageGroup.#Message',
+      '#ContentController.#DialogBox.#ContentArea.#MessageGroup.#Message',
   },
 
   /** Dialog box text for PC Settings Change for Teens */
   parentalControlsSettingsTeens: {
     keyPath:
-      '#ContentController.#c25f262.#DialogBox.#ContentArea.#MessageGroup.#Message',
+      '#ContentController.#DialogBox.#ContentArea.#MessageGroup.#Message',
   },
   /** Group for PC Settings Change */
   parentalControlsSettingsGroup: {
@@ -1290,7 +1290,7 @@ const elements = typeCheckElements({
 
   /** PC Dialog Settings Change box */
   parentalControlsChangeDialog: {
-    keyPath: '#ContentController.#c25f262.#DialogBox.#ContentArea',
+    keyPath: '#ContentController.#DialogBox.#ContentArea',
   },
 
   /** Sign in password */
@@ -1302,7 +1302,7 @@ const elements = typeCheckElements({
   /** Dialog box text for PC Settings Change for Older Kids */
   parentalControlsSettingsOlderKidsMessage: {
     keyPath:
-      '#ContentController.#d15a38c.#DialogBox.#ContentArea.#MessageGroup.#Message',
+      '#ContentController.#DialogBox.#ContentArea.#MessageGroup.#Message',
   },
 
   /** Adult control in PC is selected */
@@ -1334,13 +1334,13 @@ const elements = typeCheckElements({
   /** Autoplay sign in dialog Message */
   autoPlaySignInDialogMessage: {
     keyPath:
-      '#ContentController.#4ec6117.#DialogBox.#ContentArea.#MessageGroup.#Message',
+      '#ContentController.#DialogBox.#ContentArea.#MessageGroup.#Message',
   },
 
   /** Sign in Button */
   signInButton: {
     keyPath:
-      '#ContentController.#4ec6117.#DialogBox.#ContentArea.#ButtonList.0',
+      '#ContentController.#DialogBox.#ContentArea.#ButtonList.0',
   },
 
   /** TV Shows Series text */
@@ -1497,7 +1497,7 @@ const elements = typeCheckElements({
   /** Full Device message */
   fullDeviceMessage: {
     keyPath:
-      '#ContentController.#188da7a.#DialogBox.#ContentArea.#MessageGroup.#Message',
+      '#ContentController.#DialogBox.#ContentArea.#MessageGroup.#Message',
   },
 
   /** help page text */
