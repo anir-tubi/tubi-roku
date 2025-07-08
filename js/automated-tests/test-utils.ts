@@ -1998,12 +1998,12 @@ class RegisteredUser extends User {
         console.warn('Tried to add unsupported type to view history. Skipping...');
         continue;
       }
-
+      // Using slice instead of at(-1) since at was introduced in ES2022.
       const body = {
         content_id: contentId,
         content_type: contentType as string,
         parent_id: null,
-        position: positions[index] ?? positions.at(-1)
+        position: positions[index] ?? positions.slice(-1)[0]
       };
 
       let promise;
@@ -2107,7 +2107,7 @@ class RegisteredUser extends User {
 
     return await this.sendTubiAuthNetworkRequest({
       method: 'get',
-      url: 'https://uapi.adrise.tv/cms/content',
+      url: 'https://content-cdn.production-public.tubi.io/api/v2/content',
       params: params
     });
   }

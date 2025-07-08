@@ -454,6 +454,8 @@ describe('MyStuff', function () {
 
          // Turn off video previews
          await ecp.sendKeypress(ecp.Key.Down);
+         // Waiting until the autoplay preview section is fully shown on screen.
+         await testUtils.waitForElementToFullyShowOnScreen('autoplayPreviewOn');
          await ecp.sendKeypress(ecp.Key.Ok);
          await utils.sleep(2000); // Improvement
          await ecp.sendKeypress(ecp.Key.Down);
@@ -753,6 +755,8 @@ describe('MyStuff', function () {
 
          // Turn off video previews
          await ecp.sendKeypress(ecp.Key.Down);
+         // Waiting until the autoplay preview section is fully shown on screen.
+         await testUtils.waitForElementToFullyShowOnScreen('autoplayPreviewOn');
          await ecp.sendKeypress(ecp.Key.Ok);
          await utils.sleep(2000); // Improvement
          await ecp.sendKeypress(ecp.Key.Down);
