@@ -2373,7 +2373,7 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.0.1.1.#OverLayItemsLayoutGroup.2',
   },
 
- 
+
 
   /** Sign Up to Save Progress Series detail menu item button text */
   seriesSignUpToSaveProgressButtonText: {

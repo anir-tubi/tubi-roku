@@ -127,7 +127,9 @@ describe('Navigate Within Page', function () {
 		const titleDetailsPage = await container.selectFocusedTitle();
 		const videoId = titleDetailsPage.getTitleId();
 		await titleDetailsPage.highlightAddToMyList();
+		await ecp.sleep(1000);
 		await ecp.sendKeypress(ecp.Key.Down);
+		await ecp.sleep(1000);
 		await ecp.sendKeypress(ecp.Key.Ok);
 		await verifyC425244();
 		await verifyC425251(videoId);

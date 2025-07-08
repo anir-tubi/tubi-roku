@@ -143,10 +143,10 @@ export async function verifyC690753NavigateWithinPage(slugCategory: string) {
 	);
 
 	expect(
-		navigateWithinPage.navigate_within_page.category_page.category_slug
-	).equal(
-		slugCategory.toLowerCase(),
-		`event should contain navigate_within_page.category_page.category_slug==${slugCategory}, Event: \n${JSON.stringify(
+		navigateWithinPage.navigate_within_page.category_list_page.personalization_id
+	).to.match(
+		/^[a-f0-9\-]{36}$/,
+		`event should contain navigateWithinPage.navigate_within_page.category_list_page.personalization_id==id, Event: \n${JSON.stringify(
 			navigateWithinPage
 		)}\n`
 	);

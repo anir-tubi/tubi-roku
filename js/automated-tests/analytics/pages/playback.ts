@@ -174,8 +174,8 @@ const PlayBack = ({ content }) => {
 	}
 
 	async function thirtySkipForward() {
-		if(await checkIfSkipIntroIfPresent()){
-			await utils.sleep(1000);	
+		if (await checkIfSkipIntroIfPresent()) {
+			await utils.sleep(1000);
 			await ecp.sendKeypress(ecp.Key.Down);
 			await utils.sleep(1000);
 		}
@@ -199,9 +199,9 @@ const PlayBack = ({ content }) => {
 		await allowPlaybackToPlayForSeconds(3500);
 	}
 	async function fastForwardNoWaitTime({ howFast = 1 } = {}) {
-		if (await checkIfSkipIntroIfPresent()){
+		if (await checkIfSkipIntroIfPresent()) {
 			await ecp.sendKeypress(ecp.Key.Down, { count: 1 });
-			await allowPlaybackToPlayForSeconds(1000); 
+			await allowPlaybackToPlayForSeconds(1000);
 		}
 		await ecp.sendKeypress(ecp.Key.Down, { count: 1 });
 		await testUtils.retryWithTimeOut(async () => {
@@ -217,8 +217,8 @@ const PlayBack = ({ content }) => {
 	}
 
 	async function rewindPlayback({ howFast = 1, howLong = 300 } = {}) {
-		if(await checkIfSkipIntroIfPresent()){
-			await ecp.sendKeypress(ecp.Key.Down, { count: 2,wait: 700 });
+		if (await checkIfSkipIntroIfPresent()) {
+			await ecp.sendKeypress(ecp.Key.Down, { count: 2, wait: 700 });
 		}
 		await ecp.sendKeypress(ecp.Key.Down);
 		await testUtils.retryWithTimeOut(async () => {
@@ -372,14 +372,14 @@ const PlayBack = ({ content }) => {
 
 	async function selectSubtitlesOff() {
 		await selectSubtitles();
-		await ecp.sendKeypress(ecp.Key.Down, { count: 1,wait: 400 });
+		await ecp.sendKeypress(ecp.Key.Down, { count: 1, wait: 400 });
 		await ecp.sendKeypress(ecp.Key.Ok);
 	}
 
 	async function selectSubtitlesOn() {
 		await selectSubtitles();
 		await utils.sleep(500);
-		await ecp.sendKeypress(ecp.Key.Down, { count:2,wait: 400 });
+		await ecp.sendKeypress(ecp.Key.Down, { count: 2, wait: 400 });
 		await ecp.sendKeypress(ecp.Key.Ok);
 	}
 

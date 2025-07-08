@@ -8,9 +8,8 @@ import {
 	verifyC21253,
 	verifyC21254,
 	verifyC21254PlayerLoad,
-	verifyC543704,
+	verifyC690745,
 	verifyC543703,
-	verifyC76715,
 } from '../verification/pageLoad';
 import {
 	verifyC112682,
@@ -47,20 +46,20 @@ describe('Page Load Analytics', function () {
 		await verifyC21254PlayerLoad(titleId);
 	});
 
-	it('When browse is loaded then first key is ""categoryListPage"" in the logs C543703 and Page Load - When category container is loaded then first key is ""categoryPage"" with categorySlug C543704 and HomePage to CategoryPage by CategoryComponent C543705 and C690745 and C21260 and C76712 and C76713 and C76714 and C3857 and C3858 and C3860 and C690747 @analyticsASet3,@analyticsPageLoad', async () => {
+	it('When browse is loaded then first key is ""categoryListPage"" in the logs C543703 and Page Load - When category container is loaded then first key is ""categoryPage"" with categorySlug C690747 and HomePage to CategoryPage by CategoryComponent C543705 and C690745 and C21260 and C76712 and C76713 and C76714 and C3857 and C3858 and C3860 and C690747 @analyticsASet3,@analyticsPageLoad', async () => {
 		const homePage = HomePage();
 		const categories = await homePage.selectSideNavTab(tabs.categories, 7);
 		const container = await categories.selectCategoryByName('action');
 		const slugCategory = await container.getCategoryName();
 		await container.selectFocusedTitle();
 		await verifyC112682();
-		await verifyC543704(slugCategory);
+		await verifyC690745(slugCategory);
 		await verifyC543703();
 		await verifyC690749(slugCategory);
-		await verifyC690745ComponentInteraction(slugCategory);
+		await verifyC690745ComponentInteraction();
 	});
 
-	it('When channels page displayed C76715 and C76716 and C76717 and C3859 and C690750 and C690752 and C690754 and UI: C44199 @analyticsASet3,@analyticsPageLoad', async () => {
+	it('User shifts focus from a Network category name to browse the titles in that category on the Category List page C76716 and C76717 and C3859 and C690750 and C690752 and C690754 and UI: C44199 @analyticsASet3,@analyticsPageLoad', async () => {
 		const homePage = HomePage();
 		const categories = await homePage.selectSideNavTab(tabs.categories, 7);
 		await categories.selectCategoryByName('Networks');
@@ -69,7 +68,6 @@ describe('Page Load Analytics', function () {
 		const details = await container.selectFocusedChannel();
 		await details.selectPlay();
 		await verifyC76717(slugCategory);
-		await verifyC76715(slugCategory);
 		await verifyC76715NavigateWithinPage(slugCategory);
 		await verifyC690749NavigateToPage();
 	});
