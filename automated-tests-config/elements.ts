@@ -1299,6 +1299,11 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.0.#password.#Text',
   },
 
+  keyboardBackButton: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.0.#buttonGroup.#back.#focus9Patch',
+  },
+
   /** Dialog box text for PC Settings Change for Older Kids */
   parentalControlsSettingsOlderKidsMessage: {
     keyPath:

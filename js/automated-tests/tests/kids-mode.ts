@@ -199,7 +199,7 @@ describe('Kids Mode', function () {
 
   });
 
-  // https://tubi.testrail.io/index.php?/cases/view/537690
+  // https://tubi.testrail.io/index.php?/cases/view/219725
   it('C537690 - Registered User - Toggle ON - Home Screen - When User Switches Parental Control to Little Kids Then the App Stays in Kids Mode, @kidsmode_registered', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
@@ -212,7 +212,7 @@ describe('Kids Mode', function () {
 
     // Select Little Kids ParentalControls
     await ecp.sendKeypress(ecp.Key.Right);
-    await ecp.sendKeypress(ecp.Key.Up, { count: 3 });
+    await ecp.sendKeypress(ecp.Key.Up, { count: 3, wait: 100 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Are we on the Kid's mode password screen?
@@ -221,9 +221,12 @@ describe('Kids Mode', function () {
     // Enter Password
     await ecp.sendKeypress(ecp.Key.Ok);
     await ecp.sendText('111111');
-    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4, wait: 100 });
     await utils.sleep(4000); // Improvement - try to work around sleeps
-    await ecp.sendKeypress(ecp.Key.Right);
+    const keyboardBackButton = await testUtils.getNodeForElement('keyboardBackButton');
+    if (keyboardBackButton.opacity == 1) {
+      await ecp.sendKeypress(ecp.Key.Right);
+    }
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Parental Controls Settings Change
