@@ -9,12 +9,20 @@ Function init()
 
   m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
   m.top.handlesTransportVoiceRequests = true
-  m.leftPanelWidth = 495
 
-  '//Hardcode the right panel width so the right panel's loading spinner is centered to the panel
-  m.rightPanelWidth = 1062
-  '//The offset sets the right panel to be placed at a different position than the menu list
-  m.rightPanelOffset = [0, -36]
+  if getExperimentResource("roku_category_large_poster","roku_category_large_poster_v1", true).enabled = true
+    m.leftPanelWidth = 384
+    '//Hardcode the right panel width so the right panel's loading spinner is centered to the panel
+    m.rightPanelWidth = 1212
+    '//The offset sets the right panel to be placed at a different position than the menu list
+    m.rightPanelOffset = [68, -58]
+  else
+    m.leftPanelWidth = 495
+    '//Hardcode the right panel width so the right panel's loading spinner is centered to the panel
+    m.rightPanelWidth = 1062
+    '//The offset sets the right panel to be placed at a different position than the menu list
+    m.rightPanelOffset = [0, -36]
+  end if
 
   m.Tracking = TubiTrackingInfo(m.constants)
 

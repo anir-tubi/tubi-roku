@@ -3,7 +3,7 @@
   <script type="text/brightscript" uri="CategoryMenuPanelList.brs"/>
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
-
+  
   <interface>
     <!-- INPUTS -->
       <field id="content" alias="Menu.content"/>
