@@ -302,11 +302,9 @@ describe('Categories', function () {
 
       // Is the first poster now selected? 
       await testUtils.waitForElementToFullyShowOnScreen('categoryPosterFirst');
-      
-      // Is the Background Poster present?
-      await testUtils.waitForElementToShowOnScreen('backgroundPoster');
 
       // Is the metadate Info panel present?
+      // Checking for metadata info panel only because background poster will not be visible when autoplay is enabled and preview video plays.
       await testUtils.waitForElementToFullyShowOnScreen('categoriesDetailsPageInfo');   
 
     });
@@ -324,7 +322,6 @@ describe('Categories', function () {
       await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
 
       // Select Category Button
-      await testUtils.waitForElementToFullyShowOnScreen('categoryPosterFirst');
       await ecp.sendKeypress(ecp.Key.Ok, {wait:2000});
 
       // Is the first poster now selected? 
@@ -348,28 +345,23 @@ describe('Categories', function () {
       await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
 
       // Select Category Button
-      await testUtils.waitForElementToFullyShowOnScreen('categoryPosterFirst');
       await ecp.sendKeypress(ecp.Key.Ok, {wait:2000});
-
+      
       // Is the first poster now selected? 
       await testUtils.waitForElementToFullyShowOnScreen('categoryPosterFirst');
       
-      // Is the Background Poster present?
-      await testUtils.waitForElementToShowOnScreen('backgroundPoster');
-
-      // Is the metadate Info panel present?
+      // Is the metadata Info panel present?
+      // Not checking for background poster because it will depend on whether autoplay is enabled or not.
+      // Since when autoplay is enabled, preview video will play and background poster will not be visible.
+      // Just checking for metadata info panel should be enough.
       await testUtils.waitForElementToFullyShowOnScreen('categoriesDetailsPageInfo');  
       
       // Press back and check background poster and metadata info is no longer present
       await ecp.sendKeypress(ecp.Key.Back, {wait:2000});
-
-      // Is the Background Poster present?
-      await testUtils.waitForElementToNotShowOnScreen('backgroundPoster');
-
-      // Is the metadate Info panel present?
+      // Is the metadata Info panel present?
       await testUtils.waitForElementToNotShowOnScreen('categoriesDetailsPageInfo');  
 
-      // Is the category menu item selected? 
+      // Is the category menu item selected?
       await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
 
     });
@@ -383,15 +375,14 @@ describe('Categories', function () {
       await openLeftNav();
       await selectCategories();
 
-      //Verify Recommended button at the top
+      // Verify Recommended button at the top
       await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
       await ecp.sendKeypress(ecp.Key.Ok, {wait:1000});
 
-      // Select Category Button
+      // Wait until the first content tile is shown.
       await testUtils.waitForElementToFullyShowOnScreen('categoryPosterFirst');
-      await ecp.sendKeypress(ecp.Key.Ok, {wait:2000});
 
-      // Is the metadate Info panel present?
+      // Is the metadata Info panel present?
       await testUtils.waitForElementToFullyShowOnScreen('categoriesDetailsPageInfo');
 
       // Select a Title

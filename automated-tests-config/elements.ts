@@ -1557,7 +1557,6 @@ const elements = typeCheckElements({
 
   channelRecommendedButton: {
     keyPath:
-
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.0.#DetailsMenuTextParent.#DetailsMenuTextFocused',
   },
 
