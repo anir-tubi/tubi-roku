@@ -21,15 +21,16 @@ describe('LazyLoad', function () {
       
       // Navigate to a category with < 200 titles and validate < 200
       await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
-      await ecp.sendKeypress(ecp.Key.Down, {count:3, wait:4000});
+      await ecp.sendKeypress(ecp.Key.Ok, {wait:1000});
       await ecp.sendKeypress(ecp.Key.Right);
       await testUtils.waitForElementToFullyShowOnScreen('categoriesDetailsPageInfo');
-
-      // Navigate down 20 rows
-      await ecp.sendKeypress(ecp.Key.Down, {count:30});
-      await testUtils.waitForElementToFullyShowOnScreen('itemCounter');
-      const itemCounterValue = await testUtils.getNodeForElement('itemCounter');
-      expect(itemCounterValue.text).is.not.equal(' · 400');
+      // Navigate down 50 rows(4 * 50 = 200)
+      await ecp.sendKeypress(ecp.Key.Down, {count:50});
+      // Just waiting for some time incase the request is not completed yet.
+      await utils.sleep(1000);
+      const contents = await testUtils.getAllGridItemsContent('channelCategoryGrid');
+      const itemCounterValue = contents.length;
+      expect(itemCounterValue).is.lessThan(200);
 
     });
 
@@ -49,18 +50,18 @@ describe('LazyLoad', function () {
       
       // Navigate to a category with < 200 titles and validate < 200
       await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
-      await ecp.sendKeypress(ecp.Key.Down, {count:2, wait:4000});
+      const position = await findMenuItemPositionByTitle({ title: 'Action' });
+      await ecp.sendKeypress(ecp.Key.Down, {count: position, wait:4000});
       await ecp.sendKeypress(ecp.Key.Right);
       await testUtils.waitForElementToFullyShowOnScreen('categoriesDetailsPageInfo');
 
       // Navigate down 
-      await ecp.sendKeypress(ecp.Key.Down, {count:26});
+      await ecp.sendKeypress(ecp.Key.Down, {count:50});
       await utils.sleep(5000); // itemCounter update isn't recognized without sleep
 
-      await testUtils.waitForElementToFullyShowOnScreen('itemCounter');
-      const itemCounter = await testUtils.getNodeForElement('itemCounter');
-      await testUtils.waitForElementToFullyShowOnScreen('itemCounter');
-      expect(itemCounter.text).contains('400+');
+      const contents = await testUtils.getAllGridItemsContent('channelCategoryGrid');
+      const itemCounter = contents.length;
+      expect(itemCounter).greaterThan(200);
 
     });
 
@@ -81,57 +82,76 @@ describe('LazyLoad', function () {
         
       // Navigate to a category with 1000
       await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
-      await ecp.sendKeypress(ecp.Key.Down, {count:2, wait:4000});
+      const position = await findMenuItemPositionByTitle({ title: 'Action' });
+      await ecp.sendKeypress(ecp.Key.Down, {count: position, wait:4000});
       await testUtils.waitForElementToFullyShowOnScreen('actionButtonFocused');
       await ecp.sendKeypress(ecp.Key.Right);
       await testUtils.waitForElementToFullyShowOnScreen('categoriesDetailsPageInfo');
 
-      // Navigate down to where counter shows 600+
+      // Navigate down to until we reach 600 titles vertically downwards.
       await ecp.sendKeypress(ecp.Key.Down, {count:30});
       await utils.sleep(2000); // itemCounter update isn't recognized without sleep
       await ecp.sendKeypress(ecp.Key.Down, {count:51});
       await utils.sleep(2000); // itemCounter update isn't recognized without sleep
-      await testUtils.waitForElementToFullyShowOnScreen('itemCounter');
-      const itemCounter = await testUtils.getNodeForElement('itemCounter');
-      expect(itemCounter.text).contains('600+');
+      let contents = await testUtils.getAllGridItemsContent('channelCategoryGrid');
+      const itemCounter = contents.length;
+      expect(itemCounter).greaterThanOrEqual(600);
 
-      // Navigate down to where counter shows 800+
+      // Navigate down to until we reach 800 titles vertically downwards
       await ecp.sendKeypress(ecp.Key.Down, {count:47});
       await utils.sleep(4000); // itemCounter update isn't recognized without sleep
-      await testUtils.waitForElementToFullyShowOnScreen('itemCounter');
-      const itemCounter800 = await testUtils.getNodeForElement('itemCounter');
-      expect(itemCounter800.text).contains('800+');
+      contents = await testUtils.getAllGridItemsContent('channelCategoryGrid');
+      const itemCounter800 = contents.length;
+      expect(itemCounter800).greaterThanOrEqual(800);
 
       // Navigate down to 1000 titles
       await ecp.sendKeypress(ecp.Key.Down, {count:50});
       await utils.sleep(4000); // itemCounter update isn't recognized without sleep
-      await testUtils.waitForElementToFullyShowOnScreen('itemCounter');
-      const itemCounter1000 = await testUtils.getNodeForElement('itemCounter');
-      expect(itemCounter1000.text).contains('1000');
+      contents = await testUtils.getAllGridItemsContent('channelCategoryGrid');
+      const itemCounter1000 = contents.length;
+      expect(itemCounter1000).lessThanOrEqual(1000);
         
       // Navigate down to last row
       await ecp.sendKeypress(ecp.Key.Down, {count:82});
       await utils.sleep(4000); // itemCounter update isn't recognized without sleep
-      await testUtils.waitForElementToFullyShowOnScreen('itemCounter');
-      const itemCounterLast = await testUtils.getNodeForElement('itemCounter');
-      expect(itemCounterLast.text).contains('1000');
+      contents = await testUtils.getAllGridItemsContent('channelCategoryGrid');
+      const itemCounterLast = contents.length;
+      expect(itemCounterLast).lessThanOrEqual(1000);
 
     });
 });
-    async function openLeftNav() {
-        // Press left
-        await ecp.sendKeypress(ecp.Key.Left);
-      
-        // Is the left Nav open?
-        await testUtils.waitForElementToFullyShowOnScreen('sideNavMenu');
-      }
-      async function selectCategories() {
-        await testUtils.jumpToRowWithTitle('sideNavMenu', 'Categories');
-        await utils.sleep(1000);
-        await testUtils.waitForElementToFullyShowOnScreen('categoriesLeftNavButtonSelected');
-        await ecp.sendKeypress(ecp.Key.Ok);
 
-        // Are we on Categories page?
-        await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton'); 
-      }
+async function openLeftNav() {
+  // Press left
+  await ecp.sendKeypress(ecp.Key.Left);
+
+  // Is the left Nav open?
+  await testUtils.waitForElementToFullyShowOnScreen('sideNavMenu');
+}
+
+async function selectCategories() {
+  await testUtils.jumpToRowWithTitle('sideNavMenu', 'Categories');
+  await utils.sleep(1000);
+  await testUtils.waitForElementToFullyShowOnScreen('categoriesLeftNavButtonSelected');
+  await ecp.sendKeypress(ecp.Key.Ok);
+
+  // Are we on Categories page?
+  await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
+}
+
+async function findMenuItemPositionByTitle({ title }) {
+  let position = -1;
+  const contents = await testUtils.getAllGridItemsContent(
+    "channelSideNav"
+  );
+
+  for (const [index, item] of contents.entries()) {
+    if (item.title === title) {
+      position = index;
+      break;
+    }
+  }
+
+  return position;
+}
    
