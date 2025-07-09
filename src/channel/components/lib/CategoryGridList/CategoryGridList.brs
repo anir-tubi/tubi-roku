@@ -7,7 +7,6 @@ Function init()
   m.top.observeFieldScoped("jumpToRowItemByID", "onJumpToRowItemByIDChange")
   m.top.observeFieldScoped("contentUpdated", "onContentChange")
   m.top.observeFieldScoped("repopulateContent", "onRepopulateContent")
-  m.top.observeFieldScoped("animateToCategory", "onAnimateToCategory")
   m.top.observeFieldScoped("removeFocusFromRowList", "onRemoveFocusFromRowList")
   m.top.observeFieldScoped("signedIn", "onSignedInChange")
   m.top.observeFieldScoped("parentScreenTrackingPageInfo", "onParentScreenTrackingPageInfoChange")
@@ -26,9 +25,6 @@ Function init()
 
   m.homeScreenDesignType = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false).design_type
   m.isWithDescPortraitSmallExpEnabled = (m.homeScreenDesignType = "withDescriptionPortraitSmall")
-
-  m.RowList.observeFieldScoped("itemFocused", "onItemFocused")
-  m.FeaturedRowList.observeFieldScoped("itemFocused", "onFeaturedItemFocused")
 
   experimentsInfo = getExperimentsInfoFromGlobal()
   experiments = TubiExperiments(experimentsInfo)
@@ -59,10 +55,6 @@ Function init()
 
   m.lastCurrentFocusColumn = 0
   m.lastFocusColumnIndex = 0
-
-  experimentsInfo = getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v3", false)
-  m.isLazyLoadExperimentEnabled = (experimentsInfo <> invalid AND experimentsInfo.enabled = true)
-
 
   experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
   if isNonEmptyArray(experiment.featuredRowPosterSize) = true
@@ -304,12 +296,6 @@ Function onContentChange()
     m.RowList.content = invalid
     if m.top.content <> invalid then
       setRowHeights()
-
-      'At this point, there is a limited set (as defined in constants) of content in each category.
-      'loadCategoriesIndex will get the rest of the content for each category.
-      if m.isLazyLoadExperimentEnabled = false
-        m.top.loadCategoriesIndex = 0
-      end if
       
       if bSetRowListFocus = true
         setRowListFocus()
@@ -589,31 +575,6 @@ Function setRowHeights()
   end if
 
   m.FeaturedRowList.content = m.top.featuredRowContent
-End Function
-
-
-' animateToCategory doesn't cause rowItemFocused or itemFocused to be triggered unless
-' the RowList has focus.  We capture this in order to load categories even when the
-' RowList doesn't have focus.
-Function onAnimateToCategory()
-  tubiLog("CategoryGridList.onAnimateToCategory")
-
-  m.top.loadCategoriesIndex = m.top.animateToCategory
-End Function
-
-
-'''''''''''''''''''''
-' onItemFocused
-'
-' The RowList has changed to a new category row
-Function onItemFocused()
-  tubiLog("CategoryGridList.onItemFocused")
-  m.top.loadCategoriesIndex = m.RowList.itemFocused
-End Function
-
-
-Function onFeaturedItemFocused()
-  m.top.loadCategoriesIndex = m.RowList.itemFocused
 End Function
 
 

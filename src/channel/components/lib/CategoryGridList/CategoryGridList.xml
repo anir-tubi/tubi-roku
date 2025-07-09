@@ -156,14 +156,13 @@
       <field id="rowHeights" alias="RowList.rowHeights" />
 
       <field id="featuredRowCurrFocusColumn" type="integer" />
+      <field id="featuredListCurrFocusRow" alias="FeaturedRowList.currFocusRow" />
 
       <field id="featuredRowFocusedItem" type="node" />
 
       <field id="currCategoryId" type="string" />
 
       <field id="oldCategoryId" type="string" />
-
-      <field id="loadCategoriesIndex" type="integer" alwaysNotify="true" />
 
       <field id="rowlistTranslation" alias="RowList.translation" />
 

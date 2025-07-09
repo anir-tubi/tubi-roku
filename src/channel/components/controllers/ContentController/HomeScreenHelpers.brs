@@ -50,11 +50,10 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.observeFieldScoped("contentSelected", "onContentSelected")
     homeScreen.observeFieldScoped("contentToPlay", "onContentToPlay")
     homeScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
-    homeScreen.observeFieldScoped("loadCategoriesIndex", "onLoadCategoriesIndex")
     homeScreen.observeFieldScoped("stopLinearVideoPlayer", "onStopLinearVideoPlayer")
-    homeScreen.observeFieldScoped("sponsoredRowFocused", "onHomescreenSponsoredRowFocused")
+    homeScreen.observeFieldScoped("sponsoredRowFocused", "onHomeScreenSponsoredRowFocused")
     homeScreen.observeFieldScoped("columnFocused", "onColumnFocusChanged")
-    homeScreen.observeFieldScoped("currFocusRow", "onHomescreenRowFocusChanged")
+    homeScreen.observeFieldScoped("currFocusRow", "onHomeScreenRowFocusChanged")
     homeScreen.observeFieldScoped("pauseVideoPreview", "onPauseVideoPreview")
     homeScreen.observeFieldScoped("loadCategoryForIds", "onLoadCategoryForIds")
     homeScreen.observeFieldScoped("eventCtaListItemSelected", "onEventCtaListItemSelected")
@@ -339,13 +338,7 @@ Function fetchHomeScreen(homeScreen, useCache = false)
       params["group_size"] = m.constants.settings.numContainers
     end if
 
-    ' Remove hardcoding 9 and move to use initialBlockSize.
-    experiment = getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v3", false)
-    if isAA(experiment) = true AND experiment.enabled = true
-      params[limitParamName] = 9
-    else
-      params[limitParamName] = m.constants.performance.categoryGridList.initialBlockSize
-    end if
+    params[limitParamName] = m.constants.performance.categoryGridList.initialBlockSize
 
     if homeScreen <> invalid AND homeScreen.content <> invalid AND useCache = true AND homeScreen.content.lastModified <> invalid
       headers["If-Modified-Since"] = homeScreen.content.lastModified
@@ -457,7 +450,6 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     onHomeScreenContentUpdateComplete(homeScreen.id)
 
     getExperimentResource("roku_no_change_experiment", "roku_no_change_experiment_v3", true)
-    getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v3", true)
     getExperimentResource("roku_home_screen_fixed_focus", "roku_home_screen_fixed_focus_v1", true)
 
   end if
@@ -593,14 +585,14 @@ End Function
 
 
 ' the homescreen has communicated that a sponsored row has been focused
-Function onHomescreenSponsoredRowFocused(msg)
+Function onHomeScreenSponsoredRowFocused(msg)
   isSponsoredRowFocused = msg.getData()
   homeScreen = msg.getRoSGNode()
   currentScreen = getCurrentScreen()
   if isSponsoredRowFocused = true AND homeScreen <> invalid AND currentScreen <> invalid AND currentScreen.isSameNode(homeScreen)
     row = homeScreen.rowFocused
     if row <> invalid
-      manageHomescreenSponsorPixels(row)
+      manageHomeScreenSponsorPixels(row)
       setSponsorshipBackground(homeScreen.sponsorshipBackground)
     end if
   end if
@@ -651,31 +643,7 @@ Function onColumnFocusChanged(msg)
   rowFocused = homeScreen.currFocusRow
   if isNumber(rowFocused) = true AND homeScreen.content <> invalid
     category = homeScreen.content.getChild(rowFocused)
-    ' TODO: When we graduate roku_home_screen_container_items_lazy_load_v3, we need to remove hardcoding 9 and move to use initialBlockSize.
-    if isNode(category) = true AND category.paginationInfo <> invalid AND columnFocused >= 5
-      cursor = category.paginationInfo.cursor
-      hasMoreContent = category.paginationInfo.hasMoreContent
-      if hasMoreContent = true AND columnFocused >= (cursor - 10) AND category.state <> "containerPaginationRequestPending"
-        isKidsMode = shouldKidsModeBeSentToServer()
-        isSignedInUser = isLoggedInUser()
-        isLinearBlock = isLinearBlocked()
-        categoryReqInfo = m.cmsApi.createGetContainerContentsReqInfo(category, homeScreen, isKidsMode, isSignedInUser, m.uiMode, false, isLinearBlock)
-        if categoryReqInfo <> invalid
-          category.state = "containerPaginationRequestPending"
-          m.makeRequest({
-            url: categoryReqInfo.url
-            requestType: categoryReqInfo.requestType
-            options: categoryReqInfo.options
-            successCallback: onContainerMoreItemsSuccess
-            silenceCallbackWarnings: true
-            responseType: "node"
-            isSignedInUser: isSignedInUser
-            isLinearBlock: isLinearBlock
-            uiMode: m.uiMode
-          })
-        end if
-      end if
-    end if
+    makeContainerRequest(category, columnFocused, homeScreen)
   end if
 End Function
 
@@ -684,19 +652,79 @@ Function onContainerMoreItemsSuccess(response)
   homeScreen = getCurrentScreen()
   if homeScreen <> invalid AND homeScreen.content <> invalid AND isNode(response) = true AND homeScreen.currFocusRow <> invalid
     rowFocused = homeScreen.currFocusRow
-    category = homeScreen.content.getChild(rowFocused)
-    category = m.NodeHelpers.getChildById(homeScreen.content, response.id)
-    items = response.getChildren(-1, 0)
-    if isNonEmptyArray(items) = true
-      fullJson = ParseJson(category.json)
-      newJson = ParseJson(response.json)
-      if fullJson <> invalid AND newJson <> invalid
-        fullJson.append(newJson)
-        category.paginationInfo = response.paginationInfo
-        category.json = FormatJson(fullJson)
-        category.state = response.state
-        category.appendChildren(items)
+    appendContentToCategory(response, homeScreen.content, rowFocused)
+  end if
+End Function
+
+
+Function onVideoTilesListMoreItemsSuccess(response)
+  homeScreen = getCurrentScreen()
+  if homeScreen <> invalid AND homeScreen.featuredRowContent <> invalid AND isNode(response) = true AND homeScreen.featuredListCurrFocusRow <> invalid
+    rowFocused = homeScreen.featuredListCurrFocusRow
+    appendContentToCategory(response, homeScreen.featuredRowContent, rowFocused)
+  end if
+End Function
+
+
+' Make a request to the server to get more items for a category.
+' @category, roSGNode, the category node to make the request for.
+' @columnFocused, integer, the column index of the category that is focused.
+' @homeScreen, roSGNode, the home screen node.
+' @successCallback, function, the function to call when the request is successful.
+Function makeContainerRequest(category, columnFocused, homeScreen, successCallback = onContainerMoreItemsSuccess)
+  ' 4 indicates amount of items left to scroll before we start to load more items.
+  firstBatchLimit = m.constants.performance.categoryGridList.initialBlockSize - 4
+  ' Code tied to the roku_home_screen_fixed_focus experiment.
+  if m.isUserInFixedFocusExperiment = true
+    ' We will start fetching more items when the user has scrolled 3 items.
+    ' This is to give enough lead time for us to fetch more items before user reaches the end of the list.
+    firstBatchLimit = 2
+  end if
+  
+  if isNode(category) = true and category.paginationInfo <> invalid and columnFocused >= firstBatchLimit
+    cursor = category.paginationInfo.cursor
+    hasMoreContent = category.paginationInfo.hasMoreContent
+    if hasMoreContent = true and columnFocused >= (cursor - 10) and category.state <> "containerPaginationRequestPending"
+      isKidsMode = shouldKidsModeBeSentToServer()
+      isSignedInUser = isLoggedInUser()
+      isLinearBlock = isLinearBlocked()
+      categoryReqInfo = m.cmsApi.createGetContainerContentsReqInfo(category, homeScreen, isKidsMode, isSignedInUser, m.uiMode, false, isLinearBlock)
+      if categoryReqInfo <> invalid
+        category.state = "containerPaginationRequestPending"
+        m.makeRequest({
+          url: categoryReqInfo.url
+          requestType: categoryReqInfo.requestType
+          options: categoryReqInfo.options
+          successCallback: successCallback
+          silenceCallbackWarnings: true
+          responseType: "node"
+          isSignedInUser: isSignedInUser
+          isLinearBlock: isLinearBlock
+          uiMode: m.uiMode
+        })
       end if
+    end if
+  end if
+End Function
+
+
+' Append the content to the individual category container.
+' @response, roSGNode, the response from the server.
+' @contentNode, roSGNode, the content node to append the content to.
+' @rowFocused, integer, the row index of the category that is focused.
+Function appendContentToCategory(response, contentNode, rowFocused)
+  category = contentNode.getChild(rowFocused)
+  category = m.NodeHelpers.getChildById(contentNode, response.id)
+  items = response.getChildren(-1, 0)
+  if isNonEmptyArray(items) = true
+    fullJson = ParseJson(category.json)
+    newJson = ParseJson(response.json)
+    if fullJson <> invalid AND newJson <> invalid
+      fullJson.append(newJson)
+      category.paginationInfo = response.paginationInfo
+      category.json = FormatJson(fullJson)
+      category.state = response.state
+      category.appendChildren(items)
     end if
   end if
 End Function
@@ -707,7 +735,6 @@ Function onHomeScreenRowFocusChanged()
     '//as the rowlist is scrolling, if the the linear video player is playing or loading, then make sure the linear video player has stopped
     stopAndHideLinearVideoPlayer()
   end if
-
 End Function
 
 
@@ -802,7 +829,7 @@ End Function
 
 '//Check the focused row if it is a sponsored container and if so, possibly send out the pixels
 ' @rowFocused: roSGNode, a CategoryContentNode
-Function manageHomescreenSponsorPixels(rowFocused)
+Function manageHomeScreenSponsorPixels(rowFocused)
   if rowFocused <> invalid
     m.videoSponsorExposureId = ""
     '//When a sponsored container is made visible, then call the pixels
@@ -980,46 +1007,6 @@ Function onUserCategoriesFailed(screenID)
   if homeScreen <> invalid AND homeScreen.content = invalid
     fetchHomescreen(homeScreen)
   end if
-End Function
-
-
-' load category content
-Function onLoadCategoriesIndex(msg)
-  tubiLog("HomeScreenHelpers.onLoadCategoriesIndex")
-  homeScreen = msg.getRoSGNode()
-  index = msg.getData()
-
-  experimentsInfo = getExperimentResource("roku_home_screen_container_items_lazy_load", "roku_home_screen_container_items_lazy_load_v3", false)
-  isLazyLoadExperimentEnabled = (experimentsInfo <> invalid AND experimentsInfo.enabled = true)
-
-  if homeScreen = invalid OR homeScreen.content = invalid OR index < 0 OR isLazyLoadExperimentEnabled = true
-    return false
-  end if
-
-  batchResponseHandler = homeBatchResponse
-  if homeScreen.id = m.constants.ui.screenIds.movieScreen
-    batchResponseHandler = movieBatchResponse
-  else if homeScreen.id = m.constants.ui.screenIds.tvScreen
-    batchResponseHandler = tvBatchResponse
-  else if homeScreen.id = m.constants.ui.screenIds.espanolScreen
-    batchResponseHandler = espanolBatchResponse
-  end if
-
-  isKidsMode = shouldKidsModeBeSentToServer()
-  isSignedInUser = isLoggedInUser()
-  isLinearBlock = isLinearBlocked()
-  uiMode = m.uiMode
-  batchRequests = m.cmsApi.createHomeScreenBatchReqInfo(homeScreen, index, isKidsMode, isSignedInUser, uiMode, isLinearBlock)
-
-  if batchRequests <> invalid
-    m.makeBatchRequest({
-      requests: batchRequests
-      responseType: "node"
-      successCallback: batchResponseHandler
-    })
-  end if
-
-  return true
 End Function
 
 
@@ -1250,6 +1237,12 @@ Function onFeaturedRowCurrFocusColumnChange()
     end if
     m.inlineVideoPreviewPlayerContainer.opacity = 1
     setInlineVideoMetadataOverlay(columnFocused, screen.featuredRowContent)
+
+    ' Calling lazy load for the next batch of items.
+    if isNumber(columnFocused) = true AND screen.featuredRowContent <> invalid AND screen.featuredListCurrFocusRow <> invalid
+      category = screen.featuredRowContent.getChild(screen.featuredListCurrFocusRow)
+      makeContainerRequest(category, columnFocused, screen, onVideoTilesListMoreItemsSuccess)
+    end if
   end if
 
 End Function

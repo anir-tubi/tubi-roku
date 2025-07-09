@@ -109,10 +109,9 @@
            fields have been set (e.g. signedIn) -->
       <field id="loadAllCategories" type="boolean" value="false" alwaysNotify="true"/>
 
-      <!-- Communicates an index to use as a starting point for fetch a batch of categories -->
-      <field id="loadCategoriesIndex" type="integer" alias="CategoryGridList.loadCategoriesIndex"/>
-
       <field id="featuredRowCurrFocusColumn" alias="CategoryGridList.featuredRowCurrFocusColumn" />
+
+      <field id="featuredListCurrFocusRow" alias="CategoryGridList.featuredListCurrFocusRow" />
 
       <!-- set to the contentNode of the CategoryGridList item which was clicked on -->
       <field id="contentSelected" type="node"/>
