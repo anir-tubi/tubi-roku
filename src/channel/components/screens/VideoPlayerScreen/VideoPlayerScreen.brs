@@ -3481,11 +3481,17 @@ End Function
 Function fireBrowseWhileWatchingPlaybackSessionEndEvent()
   if m.playerLogLib.didUserSeeBwwPeek = true
     isSeries = m.content <> invalid AND m.content.parentType = "series"
-    
+    playbackSource = m.playerLogLib.playbackSource
+    isFromDeeplink = false
+    if isAA(playbackSource) = true
+      srcForAds = playbackSource.srcForAds
+      isFromDeeplink = (srcForAds = m.constants.player.playbackOrigin.deeplink)
+    end if
     data = {
       "openCount": m.playerLogLib.bwwOpenCount
       "didConvert": m.playerLogLib.bwwDidConvert
       "isSeries": isSeries
+      "isDeeplink": isFromDeeplink
     }
   
     logInfo(FormatJson(data),  "videoInfo", "browseWhileWatchingPlaybackSessionEnd")
