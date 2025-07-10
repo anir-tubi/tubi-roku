@@ -55,13 +55,6 @@ Function TubiExperiments(experimentsInfo) as Object
         }
       }
 
-      roku_player_client_log: {
-        roku_player_client_log_v2: {
-          default: {"enabled": true}
-          holdout_control: {"enabled": false}
-          holdout_winning: {"enabled": true}}
-      }
-
       roku_player_ui_refresh: {
         ' We will run 4 overlay types. Possible values are none, variant1, variant2, variant3, variant4
         roku_ads_overlay_v1 : {
