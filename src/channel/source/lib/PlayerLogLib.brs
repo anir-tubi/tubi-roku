@@ -1762,10 +1762,10 @@ Function playerLogLib_fireContentErrorEvent(contentErrorInfo)
   contentErrorInfo["tvt"] = m.totalViewTime * 1000 'ms
 
   messageMap = {
-    video_resource_type: m.videoResourceType
-    video_codec_type: m.videoCodecType
-    hdcp_version: m.hdcpVersion
-    current_video_resolution: m.videoResolution
+    video_resource_type: m.videoResourceType.toStr()
+    video_codec_type: m.videoCodecType.toStr()
+    hdcp_version: m.hdcpVersion.toStr()
+    current_video_resolution: m.videoResolution.toStr()
   }
   contentErrorInfo["message_map"] = messageMap
 
