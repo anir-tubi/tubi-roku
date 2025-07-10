@@ -1145,10 +1145,12 @@ End Function
 
 'This is needed when switching from VOD -> Live OR Live -> VOD to fire the Youbora joinTime events.
 Function passVideoReferenceToYouboraPlugin(videoPlayer)
-  if videoPlayer <> invalid
+  if videoPlayer <> invalid AND m.constants.settings.youboraEnabled = true
     player = videoPlayer.findNode("VideoNode")
     'Pass Video reference to Youbora plugin
-    m.youboraTask.updateplayer = {player: player, unobserveGlobalScope: false}
+    if m.youboraTask <> invalid
+      m.youboraTask.updateplayer = {player: player, unobserveGlobalScope: false}
+    end if
   end if
 End Function
 
