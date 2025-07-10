@@ -428,6 +428,9 @@ Function processSuccessResponse(result, callbackTypes, job)
         ' this block will execute only for batch responses
         if job.batchInfo <> invalid AND job.batchInfo.id <> invalid
           accumulateBatchResponse(job, output)
+        else if job.reqInfo <> invalid AND job.reqInfo.silenceCallbackWarnings = true
+          ' In case of fire and forget requests, we don't care about the output.
+          job.reqInfo.callbackNode.response = output
         else
           ' Adding a check if parser output type does not match expected type for callback field as if it does not match then we can get stuck in the bootstrap flow
           expectedType = job.reqInfo.callbackNode.getFieldType("response")
