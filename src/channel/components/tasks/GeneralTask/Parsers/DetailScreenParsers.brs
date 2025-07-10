@@ -42,7 +42,7 @@ End Function
 Function parseContentRateSuccess(_fullResponse, reqInfo)
   returnResponse = {}
   if reqInfo <> invalid AND reqInfo.options <> invalid AND reqInfo.options.body <> invalid
-    returnResponse = reqInfo.options.body
+    returnResponse = parseJSON(reqInfo.options.body)
   end if
 
   return returnResponse

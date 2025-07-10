@@ -436,6 +436,22 @@ Function processSuccessResponse(result, callbackTypes, job)
           if expectedType = "associativearray" then
             if isAA(output) = false then
               outputTypeMatches = false
+              if isString(output) = true then
+                output = parseJSON(output)
+                if isAA(output) = true then
+                  message = {
+                    "expectedType": expectedType
+                    "outputType": type(output)
+                    "url": result.url
+                    "responseCode": result.response.code
+                  }
+      
+                  ' If the output does not match the expected type then we should log an error
+                  logInfo(message, "clientInfo", "parser-json-aa-conversion", 1)
+
+                  outputTypeMatches = true
+                end if
+              end if
             end if
           else if expectedType = "string" then
             if isString(output) = false then
