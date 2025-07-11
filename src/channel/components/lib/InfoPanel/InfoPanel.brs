@@ -151,7 +151,10 @@ Function onThemeChange(msg = invalid)
     theme = msg.getData()
   else
     theme = getThemeFromGlobal()
+    
   end if
+
+  m.theme = theme
 
   if theme <> invalid
     m.descriptionFocusButton.blendColor = theme.focusedColor
@@ -188,7 +191,7 @@ End Function
 
 Function onComponentFocus()
   tubiLog("InfoPanel.onComponentFocus")
-  theme = getThemeFromGlobal()
+  theme = m.theme
   if m.top.isInFocusChain() AND  m.top.description <> invalid AND m.top.description <> ""
     m.descriptionFocusButton.visible = true
     if theme <> invalid
@@ -1194,7 +1197,8 @@ End Function
 ' @badgeComponent: a Badge node
 Function formatBadge(text, badgeComponent)
   tubiLog("InfoPanel.formatBadge")
-  theme = getThemeFromGlobal()
+  theme = m.theme
+
   if theme <> invalid
     if UCase(text) = UCase(getTranslation("screenSearch_liveText"))
       ' LIVE badge
