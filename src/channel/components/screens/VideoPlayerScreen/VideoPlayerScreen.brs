@@ -500,8 +500,13 @@ Function init()
   end if
 
   ' Will be used to track the current subtitle and audio language for analytics purposes.
-  m.currentSubtitleLanguage = "en"
-  m.currentAudioLanguage = "en"
+  m.currentSubtitleLanguage = ""
+  m.currentAudioLanguage = ""
+
+  ' Since we will not be able to get audio track language until the video is playing, 
+  ' we will not fire the start video event until the video is playing.
+  ' To avoid from code firing multiple start video events, we will set this variable to track when to fire vs not.
+  m.shouldFireStartVideoEvent = false
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -824,7 +829,7 @@ Function playContent()
       m.Video.control = "play"
       setInitialCCAndAudioTracks()
     end if
-    fireStartVideoOrTrailerEvent()
+    m.shouldFireStartVideoEvent = true
   end if
 
 End Function
@@ -988,6 +993,15 @@ Function onVideoStateChange(msg)
   tubiLog("VideoPlayer.onVideoStateChange " + msg.GetData())
   state = msg.GetData()
   updatePlayerLogLib(m.playerLogLib, "setVideoState", state)
+
+  if m.shouldFireStartVideoEvent = true AND (state = "playing" OR state = "error")
+    ' Covers a case where we only have one audio track but that is non english.
+    if isNonEmptyString(m.currentAudioLanguage) = false AND isNonEmptyArray(m.Video.availableAudioTracks) = true AND isNonEmptyString(m.Video.availableAudioTracks[0].language) = true
+      m.currentAudioLanguage = m.tubiTrackingInfo.getLanguageCode(m.Video.availableAudioTracks[0].language)
+    end if
+    m.shouldFireStartVideoEvent = false
+    fireStartVideoOrTrailerEvent()
+  end if
 
   if state = "buffering"
     m.bufferingTimer.observeFieldScoped("fire", "onBufferingTimerFired")
@@ -3135,8 +3149,8 @@ End Function
 
 Function setInitialAudioTrack(availableAudioTracks)
   preferredAudioTrack = m.top.preferredAudioTrack
-  m.currentAudioLanguage = "en"
-
+  m.currentAudioLanguage = ""
+  
   ' Proceeding only if we have stored device/user level settings.
   if availableAudioTracks <> invalid AND availableAudioTracks.Count() > 1 AND isAA(preferredAudioTrack) = true AND isNonEmptyString(preferredAudioTrack.language) = true
     ' Holds the value of the audioTrack to be set to the video node.
