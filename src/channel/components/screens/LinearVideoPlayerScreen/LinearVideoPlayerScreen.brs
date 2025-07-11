@@ -1199,8 +1199,13 @@ Function onTrackAdEventChange(msg)
 
     if adInfo <> invalid
       adDuration = adInfo.duration
-      if adDuration <> invalid AND isNumber(adDuration) = true
+      if isNumber(adDuration) = true
         adInfo["duration"] = Round(adDuration) 'Rounding float to int for proto compatibility
+      end if
+
+      totalAdsDuration = adInfo.total_ads_duration
+      if isNumber(totalAdsDuration) = true
+        adInfo["total_ads_duration"] = Round(totalAdsDuration) 'Rounding float to int for proto compatibility
       end if
     end if
     
