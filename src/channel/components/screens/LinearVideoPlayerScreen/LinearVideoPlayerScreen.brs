@@ -1196,6 +1196,13 @@ Function onTrackAdEventChange(msg)
   if isAA(adData) = true
     adType = adData.adType
     adInfo = adData.adInfo
+
+    if adInfo <> invalid
+      adDuration = adInfo.duration
+      if adDuration <> invalid AND isNumber(adDuration) = true
+        adInfo["duration"] = Round(adDuration) 'Rounding float to int for proto compatibility
+      end if
+    end if
     
     if adType = "adStart"
       updatePlayerLogLib(m.playerLogLib, "fireAdStartEvent", adInfo)
