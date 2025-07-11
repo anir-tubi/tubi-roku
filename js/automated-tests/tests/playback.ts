@@ -220,6 +220,10 @@ describe('Playback', function () {
     await utils.sleep(3000);
     await ecp.sendKeypress(ecp.Key.Back);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing');
+    const videoPlayerScreenTopOverlay = await testUtils.getNodeForElement('videoPlayerScreenTopOverlay');
+    if (videoPlayerScreenTopOverlay.opacity == 1) {
+      await ecp.sendKeypress(ecp.Key.Back);
+    }
     await ecp.sendKeypress(ecp.Key.Back);
 
 
@@ -418,12 +422,15 @@ async function verifyResumeWithinRangeWhenBackToScreen() {
   await ecp.sendKeypress(ecp.Key.Play);// PLay to create history
   await createHistory(); // Create history function
   await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
-  const currentposition = await testUtils.getPlayerPosition();
-  console.log('current', currentposition);
+  const currentPosition = await testUtils.getPlayerPosition();
+  await utils.sleep(2000);
+  const videoPlayerScreenTopOverlay = await testUtils.getNodeForElement('videoPlayerScreenTopOverlay');
+  if (videoPlayerScreenTopOverlay.opacity == 1) {
+    await ecp.sendKeypress(ecp.Key.Back);
+  }
   await ecp.sendKeypress(ecp.Key.Back);
-
   // Are we on the details page?
- await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
+  await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
 
   // Back to previous screen
   await ecp.sendKeypress(ecp.Key.Back);
@@ -437,10 +444,8 @@ async function verifyResumeWithinRangeWhenBackToScreen() {
   await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
 
   // Find resume position
-  const resumeposition = await testUtils.getPlayerPosition();
-  console.log('resume', resumeposition);
-  const difference = (resumeposition - currentposition);
-  console.log('diff', difference);
+  const resumePosition = await testUtils.getPlayerPosition();
+  const difference = (resumePosition - currentPosition);
 
   // Find out if current postion and resume postion are within range
   const min = -9000;

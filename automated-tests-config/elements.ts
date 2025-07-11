@@ -250,11 +250,11 @@ const elements = typeCheckElements({
   /** Dialog box text for PC Settings Change for Older Kids */
   parentalControlsSettingsOlderKids: {
     keyPath:
-      '#ContentController.#d15a38c.#DialogBox.#ContentArea.#MessageGroup.#Message',
+      '#ContentController.#DialogBox.#ContentArea.#MessageGroup.#Message',
   },
   /** PC Controls Settings Change Dialog */
   parentalControlsSettingsDialogBox: {
-    keyPath: '#ContentController.#c25f262.#DialogBox.#ContentArea',
+    keyPath: '#ContentController.#DialogBox.#ContentArea',
   },
 
   /** Exit Kids Menu item in Kids more is grayed out */
@@ -282,13 +282,13 @@ const elements = typeCheckElements({
 
   exitToUseThisFeatureMesage: {
     keyPath:
-      '#ContentController.#9b8346e.#DialogBox.#ContentArea.#MessageGroup.#Message',
+      '#ContentController.#DialogBox.#ContentArea.#MessageGroup.#Message',
   },
 
 
   exitToUseThisFeatureMesageKids: {
     keyPath:
-      '#ContentController.#9b8346e.#DialogBox.#ContentArea.#MessageGroup.#Message',
+      '#ContentController.#DialogBox.#ContentArea.#MessageGroup.#Message',
   },
 
 
@@ -821,6 +821,11 @@ const elements = typeCheckElements({
       '/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/Video',
   },
 
+  videoPlayerScreenTopOverlay: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#TopOverlay',
+  },
+
   autoplayNextEpisodeLabel: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextSeriesGroup.#InfoSeries.#infoPanelGroup.#Offset.#Title',
@@ -1220,7 +1225,7 @@ const elements = typeCheckElements({
   /** dialog box sign in button */
   dialogBoxSignInButton: {
     keyPath:
-      '#ContentController.#3206c4d.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText',
+      '#ContentController.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText',
   },
 
   /** Sign in screen password box */
@@ -1242,12 +1247,12 @@ const elements = typeCheckElements({
 
   /** Enter your password meesage on dialog box */
   enterPasswordDialogMessage: {
-    keyPath: '#ContentController.#390640d.#DialogBox.#ContentArea.#Title',
+    keyPath: '#ContentController.#DialogBox.#ContentArea.#Title',
   },
 
   /** Enter your password meesage on dialog box */
   enterPasswordContentMessage: {
-    keyPath: '#ContentController.#390640d.#DialogBox.#ContentArea.#MessageGroup.#Message',
+    keyPath: '#ContentController.#DialogBox.#ContentArea.#MessageGroup.#Message',
   },
 
   /** Password screen keyboard */
@@ -1258,12 +1263,12 @@ const elements = typeCheckElements({
 
   /** exit Prompt */
   exitPrompt: {
-    keyPath: '#ContentController.#2694d4e.#DialogBox.#ContentArea.#Title',
+    keyPath: '#ContentController.#DialogBox.#ContentArea.#Title',
   },
 
   /** kids exit prompt */
   kidsExitPrompt: {
-    keyPath: '#ContentController.#cf0de03.#DialogBox.#ContentArea.#Title',
+    keyPath: '#ContentController.#DialogBox.#ContentArea.#Title',
   },
 
   /** Player controls element */
@@ -1415,18 +1420,18 @@ const elements = typeCheckElements({
 
   /** Cannot exit kids mode modal */
   cannotExitKidsMode: {
-    keyPath: '#ContentController.#c4796af.#DialogBox.#ContentArea',
+    keyPath: '#ContentController.#DialogBox.#ContentArea',
   },
 
   /** Cannot exit kids mode title */
   cannotExitKidsModeTitle: {
-    keyPath: '#ContentController.#c4796af.#DialogBox.#ContentArea.#Title',
+    keyPath: '#ContentController.#DialogBox.#ContentArea.#Title',
   },
 
   /** Button Close text */
   buttonTextClose: {
     keyPath:
-      '#ContentController.#c4796af.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText',
+      '#ContentController.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText',
   },
 
   /** age gate error prompt */
@@ -1490,7 +1495,7 @@ const elements = typeCheckElements({
 
   /** full device ID  */
   fullDeviceID: {
-    keyPath: '#ContentController.#188da7a.#DialogBox.#ContentArea.#Title',
+    keyPath: '#ContentController.#DialogBox.#ContentArea.#Title',
   },
 
   /** About menu item */
@@ -1713,7 +1718,7 @@ const elements = typeCheckElements({
   /**  Invalid deep link dialog */
   invalidDeepLinkDialog: {
     keyPath:
-      '#ContentController.#0e63aed.#DialogBox.#ContentArea.#MessageGroup.#Message',
+      '#ContentController.#DialogBox.#ContentArea.#MessageGroup.#Message',
   },
 
   /** Horses and Ponies, Little Kids Tile in Categories */
@@ -1911,7 +1916,7 @@ const elements = typeCheckElements({
 
   /** Dialog box for Device ID */
   dialogBoxContentAreaDeviceID: {
-    keyPath: '#ContentController.#2f12a2f.#DialogBox.#ContentArea',
+    keyPath: '#ContentController.#DialogBox.#ContentArea',
   },
 
   /** My Stuff Left Nav option */
@@ -2192,7 +2197,7 @@ const elements = typeCheckElements({
   },
 
   accountNeededErrorMessage: {
-    keyPath: '#ContentController.#6190234.#DialogBox.#ContentArea.#Title',
+    keyPath: '#ContentController.#DialogBox.#ContentArea.#Title',
   },
 
   unlockNowForMyStuff: {
@@ -2303,36 +2308,36 @@ const elements = typeCheckElements({
 
   /** title of Espanol Disabled dialog box */
   espanolDisabledTitle: {
-    keyPath: '#ContentController.#c441913.#DialogBox.#ContentArea.#Title',
+    keyPath: '#ContentController.#DialogBox.#ContentArea.#Title',
   },
 
   /** title of Espanol Disabled dialog box for teens */
   espanolDisabledTitleTeens: {
-    keyPath: '#ContentController.#dd0197e.#DialogBox.#ContentArea.#Title',
+    keyPath: '#ContentController.#DialogBox.#ContentArea.#Title',
   },
 
   /** message in Espanol Disabled dialog box */
   espanolDisabledMessage: {
     keyPath:
-      '#ContentController.#c441913.#DialogBox.#ContentArea.#MessageGroup.#Message',
+      '#ContentController.#DialogBox.#ContentArea.#MessageGroup.#Message',
   },
 
   /** message in Espanol Disabled box for teens */
   espanolDisabledMessageTeens: {
     keyPath:
-      '#ContentController.#dd0197e.#DialogBox.#ContentArea.#MessageGroup.#Message',
+      '#ContentController.#DialogBox.#ContentArea.#MessageGroup.#Message',
   },
 
   /** button in Espanol Disabled dialog box */
   espanolDisabledButton: {
     keyPath:
-      '#ContentController.#c441913.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText',
+      '#ContentController.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText',
   },
 
   /** button in Espanol Disabled dialog box for Teens */
   espanolDisabledButtonTeens: {
     keyPath:
-      '#ContentController.#dd0197e.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText',
+      '#ContentController.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText',
   },
 
   /** tubi espanol logo */
@@ -2362,7 +2367,7 @@ const elements = typeCheckElements({
   /** Exit Button Text */
   exitDialogButtonText: {
     keyPath:
-      '#ContentController.#2694d4e.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText',
+      '#ContentController.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText',
   },
 
   /** CC Menu */
@@ -2441,7 +2446,7 @@ const elements = typeCheckElements({
   /** The grid containing search results on SearchScreen */
   searchResultGrid: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#PageGroup.#ResultArea.#gridContainer.#resultsContainer.#ResultGrid',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#PageGroup.#rightSide.#ResultArea.#gridContainer.#resultsContainer.#ResultGrid',
   },
 
   //** Kids Search menu item selected */
@@ -2458,30 +2463,30 @@ const elements = typeCheckElements({
 
   /* Welcome registration modal */
   welcomeRegModal: {
-    keyPath: '#ContentController.#af05b2f.#dialogBox.#mask',
+    keyPath: '#ContentController.#dialogBox.#mask',
   },
 
   /* Welcome registration modal header*/
   welcomeRegModalHeader: {
-    keyPath: '#ContentController.#af05b2f.#dialogBox.#contentArea.0.#header',
+    keyPath: '#ContentController.#dialogBox.#contentArea.0.#header',
   },
 
   /* Welcome registration modal sign in button focused*/
   welcomeRegModalSignInButtonFocused: {
     keyPath:
-      '#ContentController.#af05b2f.#dialogBox.#contentArea.#buttonList.0.#buttonTextParent.#labelFocused',
+      '#ContentController.#dialogBox.#contentArea.#buttonList.0.#buttonTextParent.#labelFocused',
   },
 
   /* Welcome registration modal sign in button*/
   welcomeRegModalContinueAsGuestButton: {
     keyPath:
-      '#ContentController.#af05b2f.#dialogBox.#contentArea.#buttonList.1.#buttonTextParent.#label',
+      '#ContentController.#dialogBox.#contentArea.#buttonList.1.#buttonTextParent.#label',
   },
 
   /* Welcome registration modal sign in button focused*/
   welcomeRegModalContinueAsGuestButtonFocused: {
     keyPath:
-      '#ContentController.#af05b2f.#dialogBox.#contentArea.#buttonList.1.#buttonTextParent.#labelFocused',
+      '#ContentController.#dialogBox.#contentArea.#buttonList.1.#buttonTextParent.#labelFocused',
   },
 
   /** Reaction button Liked */
@@ -2544,22 +2549,22 @@ const elements = typeCheckElements({
 
   // title on the exit prompt of Sign up to Save Progress
   signUpExitDialogTitle: {
-    keyPath: '#ContentController.#8dcd9fd.#DialogBox.#ContentArea.#Title'
+    keyPath: '#ContentController.#DialogBox.#ContentArea.#Title'
   },
 
   //exit prompt of Sign up to Save Progress
   signUpExitDialog: {
-    keyPath: '#ContentController.#8dcd9fd.#DialogBox'
+    keyPath: '#ContentController.#DialogBox'
   },
 
   // Description on the exit prompt of Sign up to Save Progress
   signUpExitDialogDescription: {
-    keyPath: '#ContentController.#8dcd9fd.#DialogBox.#ContentArea.#MessageGroup.#Message'
+    keyPath: '#ContentController.#DialogBox.#ContentArea.#MessageGroup.#Message'
   },
 
   // Sign up button on the exit prompt of Sign up to Save Progress
   signUpExitDialogSignUpButton: {
-    keyPath: '#ContentController.#8dcd9fd.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText'
+    keyPath: '#ContentController.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText'
   },
 
   // Accept Now button
@@ -2569,32 +2574,32 @@ const elements = typeCheckElements({
 
   // Sign up later button on the exit prompt of Sign up to Save Progress
   signUpExitDialogLaterButton: {
-    keyPath: '#ContentController.#8dcd9fd.#DialogBox.#ContentArea.#ButtonList.1.#buttonTextParent.#buttonText'
+    keyPath: '#ContentController.#DialogBox.#ContentArea.#ButtonList.1.#buttonTextParent.#buttonText'
   },
 
   // Oops wrong password dialog
   wrongPasswordDialog: {
-    keyPath: '#ContentController.#3ed8ba8.#DialogBox.#ContentArea'
+    keyPath: '#ContentController.#DialogBox.#ContentArea'
   },
 
   // Oops wrong password dialog title
   wrongPasswordTitle: {
-    keyPath: '#ContentController.#3ed8ba8.#DialogBox.#ContentArea.#Title'
+    keyPath: '#ContentController.#DialogBox.#ContentArea.#Title'
   },
 
   // Oops wrong password dialog message
   wrongPasswordMessage: {
-    keyPath: '#ContentController.#3ed8ba8.#DialogBox.#ContentArea.#MessageGroup.#Message'
+    keyPath: '#ContentController.#DialogBox.#ContentArea.#MessageGroup.#Message'
   },
 
   // Oops wrong password dialog Forgot Password button
   wrongPasswordForgotButton: {
-    keyPath: '#ContentController.#3ed8ba8.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText'
+    keyPath: '#ContentController.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText'
   },
 
   // Oops wrong password dialog Retry button
   wrongPasswordRetryButton: {
-    keyPath: '#ContentController.#3ed8ba8.#DialogBox.#ContentArea.#ButtonList.1.#buttonTextParent.#buttonText'
+    keyPath: '#ContentController.#DialogBox.#ContentArea.#ButtonList.1.#buttonTextParent.#buttonText'
   },
 
   // title of Help is on the way! screen after user select Forgot Password
@@ -2614,12 +2619,12 @@ const elements = typeCheckElements({
 
   // Welcome To Tubi Kids
   welcomeToTubiKidsTitle: {
-    keyPath: '#ContentController.#9a73203.#DialogBox.#ContentArea.#Title'
+    keyPath: '#ContentController.#DialogBox.#ContentArea.#Title'
   },
 
   // OK Button on the Welcome To Tubi Kids Dialog
   welcomeToTubiKidsOKButton: {
-    keyPath: '#ContentController.#9a73203.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonTextFocused'
+    keyPath: '#ContentController.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonTextFocused'
   },
 
   // Loading Progress Bar

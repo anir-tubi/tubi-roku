@@ -152,7 +152,6 @@ describe('MyStuff', function () {
         const emptyMyListContainerContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('emptyMyStuffContainer');
         expect(emptyMyListContainerContent[0].title).to.equal('You\'re All Caught Up!');
         expect(emptyMyListContainerContent[0].description).to.equal('Movies and series you haven’t finished will show up here.');
-        
 
         // Select a title from home page, let it stream for more than > 1 minute
         await testUtils.goToPage('home');
@@ -177,8 +176,8 @@ describe('MyStuff', function () {
         expect(continueWatchingRowPoster.width).to.equal(520);
         await ecp.sendKeypress(ecp.Key.Ok);
         await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
-        const detailScreenTitle2 = testUtils.getNodeForElement('detailScreenTitle');
-        const detailScreenTitleMatch = detailScreenTitle.text;
+        const detailScreenTitle2 = await testUtils.getNodeForElement('detailScreenTitle');
+        const detailScreenTitleMatch = detailScreenTitle2.text;
         expect(detailScreenTitleMatch).to.equal(detailScreenTitle1);             
  
      });

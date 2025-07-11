@@ -14,7 +14,7 @@ class Shared {
 
     // Create history function
     public async createHistory() {
-        await testUtils.expectPlayerStateToEventuallyEqual('play', 15000);
+        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
         await ecp.sendKeypress(ecp.Key.Forward, { count: 3 });
         await utils.sleep(3000);
         await ecp.sendKeypress(ecp.Key.Play);
@@ -32,7 +32,7 @@ class Shared {
 
         // Select Resume and check for playback
         await testUtils.selectAndVerifyDetailPageMenuItem('resume');
-        await testUtils.expectPlayerStateToEventuallyEqual('play', 15000);
+        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
 
         // Find resume position
         const resumeposition = await testUtils.getPlayerPosition();
@@ -67,20 +67,16 @@ class Shared {
 
     async selectLittleKidsFromParentalSettings() {
       await testUtils.waitForElementToFullyShowOnScreen('parentalControlsSettingsGroup');
-      await ecp.sendKeypress(ecp.Key.Right);
-      await utils.sleep(2000);
-      await ecp.sendKeypress(ecp.Key.Up, {count:3});
-      await utils.sleep(2000);
+      await ecp.sendKeypress(ecp.Key.Right, {wait: 200});
+      await ecp.sendKeypress(ecp.Key.Up, {count:3, wait: 200});
       await ecp.sendKeypress(ecp.Key.Ok);
     }
 
 
     async selectOlderKidsFromParentalSettings() {
       await testUtils.waitForElementToFullyShowOnScreen('parentalControlsSettingsGroup');
-      await ecp.sendKeypress(ecp.Key.Right);
-      await utils.sleep(2000);
-      await ecp.sendKeypress(ecp.Key.Up, {count:2});
-      await utils.sleep(2000);
+      await ecp.sendKeypress(ecp.Key.Right, {wait: 200});
+      await ecp.sendKeypress(ecp.Key.Up, {count:2, wait: 200});
       await ecp.sendKeypress(ecp.Key.Ok);
     }
 
@@ -99,10 +95,11 @@ class Shared {
 
       await ecp.sendKeypress(ecp.Key.Ok);
       await ecp.sendText('111111');
-      await ecp.sendKeypress(ecp.Key.Down, {count:4});
-      await utils.sleep(4000);
-      await ecp.sendKeypress(ecp.Key.Right);
-      await ecp.sendKeypress(ecp.Key.Left);
+      await ecp.sendKeypress(ecp.Key.Down, {count:4, wait: 200});
+      const keyboardBackButton = await testUtils.getNodeForElement('keyboardBackButton');
+      if (keyboardBackButton.opacity == 1) {
+        await ecp.sendKeypress(ecp.Key.Right);
+      }
       await ecp.sendKeypress(ecp.Key.Ok);
   }
 

@@ -92,7 +92,7 @@ describe('Search', function () {
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Verify that the linear channel plays
-      await testUtils.expectPlayerStateToEventuallyEqual('play', 10000);
+      await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 10000);
 
       // Press left to access the EPG left nav and verify the closed captions button exists
       await ecp.sendKeypress(ecp.Key.Left, { count: 2 });
@@ -170,7 +170,7 @@ describe('Search', function () {
       await ecp.sendKeypress(ecp.Key.Play);
 
       // Verify that the Linear channel plays
-      await testUtils.expectPlayerStateToEventuallyEqual('play', 10000);
+      await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 10000);
 
       // Press the back button and verify that the user is redirected back to the Search result page
       await ecp.sendKeypress(ecp.Key.Back);
