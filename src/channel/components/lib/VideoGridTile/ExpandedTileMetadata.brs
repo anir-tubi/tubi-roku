@@ -230,12 +230,12 @@ Function metadataOnLivePosterContent(currentProgram, content)
 
   text = ""
 
-  if currentProgram.year <> invalid
-    ' add 'dot' spacer only if we had a tag/genre
-    if text.len() > 0
-      text += Chr(&hb7) + " "
+  releaseDate = currentProgram.releaseDate
+  if releaseDate <> invalid
+    releaseDate = releaseDate.toStr()
+    if isNonEmptyString(releaseDate) = true
+      text = text + releaseDate.toStr() + " " + Chr(&hb7) + " "
     end if
-    text += currentProgram.year.toStr() + " "
   end if
 
   duration = calculateProgramTime(currentProgram)
