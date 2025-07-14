@@ -3494,7 +3494,7 @@ End Function
 
 Function fireBrowseWhileWatchingPlaybackSessionEndEvent()
   if m.playerLogLib <> invalid AND m.playerLogLib.didUserSeeBwwPeek = true
-    isSeries = m.content <> invalid AND m.content.parentType = "series"
+    isSeries = m.top.content <> invalid AND m.top.content.parentType = "series"
     playbackSource = m.playerLogLib.playbackSource
     isFromDeeplink = false
     if isAA(playbackSource) = true
