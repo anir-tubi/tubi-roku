@@ -410,16 +410,14 @@ Function itemFocusedHelper(grid, info)
   if grid.content <> invalid
     content = grid.content.getChild(grid.itemFocused)
     if content <> invalid
-      if isNonEmptyString(info.title) = false OR info.title <> content.title  '//only update if need be.
-        updateInfoPanel(info, content)
-        m.top.contentFocused = content
-        m.top.itemFocused = grid.itemFocused
-        ' reset countdown while user is interacting
-        if isNonEmptyString(content.seriesId) = true
-          m.timeRemaining = m.constants.player.upNextCountdownForSeries
-        else
-          m.timeRemaining = m.constants.player.upNextCountdown
-        end if
+      updateInfoPanel(info, content)
+      m.top.contentFocused = content
+      m.top.itemFocused = grid.itemFocused
+      ' reset countdown while user is interacting
+      if isNonEmptyString(content.seriesId) = true
+        m.timeRemaining = m.constants.player.upNextCountdownForSeries
+      else
+        m.timeRemaining = m.constants.player.upNextCountdown
       end if
     end if
   end if
