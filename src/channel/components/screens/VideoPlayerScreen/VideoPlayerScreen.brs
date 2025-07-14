@@ -892,6 +892,7 @@ End Function
 Function onContentChange() As Void
   tubiLog("VideoPlayer.onContentChange")
   stopVideo()
+  m.isBWWShownForDeeplinkUser = false
 
   if m.top.isTrailer = false AND m.top.appMode <> "KIDS_MODE"
     if m.sendFeedBackButton.hasField("enabled") = true
@@ -1199,8 +1200,13 @@ Function onVideoStateChange(msg)
   if state = "playing"
     if m.showRatings = true AND m.ratingOverlay.opacity  = 0.0 AND m.AdHeadsUp.visible = false
       m.showRatings = false
-      showRatingOverlay()
+      if isAA(m.top.playbackSource) = true AND m.top.playbackSource.srcForAds = m.constants.player.playbackOrigin.deeplink AND getExperimentResource("roku_bww_deeplinked_content", "roku_bww_deeplinked_content_v1", true).enabled = true AND m.isBWWShownForDeeplinkUser = false
+        showRatingOverlay(deeplinkBWWCallBack)
+      else
+        showRatingOverlay()
+      end if
     end if
+
   end if
 
   if state = "stopped" OR state = "finished" OR state = "error" OR state = "paused" then
@@ -2898,12 +2904,28 @@ Function onDownloadedSegment(msg)
 End Function
 
 
+' This function can be deleted if roku_bww_deeplinked_content experiment does not graduate.
+Function deeplinkBWWCallBack()
+  showTransport()
+  showBrowseWhileWatching()   
+  m.isBWWShownForDeeplinkUser = true
+End Function
+
+
 ' showratingOverlay helps to show the rating overlay and start the timer to hide it after certain amount of time.
-Function showRatingOverlay()
+' @callback: function, optional callback function to be called after the rating overlay is shown.
+'            this parameter should be deleted if roku_bww_deeplinked_content experiment does not graduate.  
+Function showRatingOverlay(callback = invalid)
 
   content = m.Video.content
+
   if content <> invalid AND isNonEmptyString(content.rating) = true
-    fade(m.ratingOverlay, "in", 0.6)
+    if callback <> invalid
+      fade(m.ratingOverlay, "in", 0.1, 0, -1, callback)
+    else
+      fade(m.ratingOverlay, "in", 0.6)
+    end if
+
     if m.TopOverlay.opacity > 0.0
       m.ratingOverlay.translation = [0, m.ratingOverlayAnimatedPositionY]
     else
@@ -3511,4 +3533,3 @@ Function fireBrowseWhileWatchingPlaybackSessionEndEvent()
     logInfo(FormatJson(data),  "videoInfo", "browseWhileWatchingPlaybackSessionEnd")
   end if
 End Function
-

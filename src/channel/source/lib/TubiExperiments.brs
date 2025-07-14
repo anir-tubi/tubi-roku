@@ -110,6 +110,14 @@ Function TubiExperiments(experimentsInfo) as Object
           holdout_winning: {"enabled": false}}
       }
 
+      'This experiment will not be under holdout and will clean up once we take the decision.
+      roku_bww_deeplinked_content: {
+        roku_bww_deeplinked_content_v1: {
+          default: {"enabled": false}
+          holdout_control: {"enabled": false}
+          holdout_winning: {"enabled": false}}
+      }
+
       'Experiment to control LiveTV feature visibility
       roku_linear_no_show: {
         roku_linear_no_show_v2: {
