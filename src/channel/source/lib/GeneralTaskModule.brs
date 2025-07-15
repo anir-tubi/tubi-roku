@@ -13,6 +13,7 @@ Function GeneralTaskModule(context, generalTask)
     updateGeneralTaskConstants: generalTask_updateGeneralTaskConstants
     updateGeneralTaskExperimentsInfo: generalTask_updateGeneralTaskExperimentsInfo
     updateGeneralTaskClientErrorConfig: generalTask_updateGeneralTaskClientErrorConfig
+    updateGeneralTaskSoTStaticConfig: generalTask_updateGeneralTaskSoTStaticConfig
 
     ' private
     generalTask: generalTask
@@ -409,4 +410,8 @@ End Function
 
 Function generalTask_updateGeneralTaskClientErrorConfig(clientErrorConfig)
   m.generalTask.newClientErrorConfig = clientErrorConfig
+End Function
+
+Function generalTask_updateGeneralTaskSoTStaticConfig(soTStaticConfig)
+  m.generalTask.newSoTStaticConfig = soTStaticConfig
 End Function

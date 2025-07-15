@@ -41,7 +41,8 @@ Function init()
 
   experimentsInfo = getExperimentsInfoFromGlobal()
   m.experiments = TubiExperiments(experimentsInfo)
-  m.metadataTranslate = TubiMetadataTranslate(m.constants, m.experiments)
+  m.soTStaticConfig = getSoTStaticConfigFromGlobal()
+  m.metadataTranslate = TubiMetadataTranslate(m.constants, m.experiments, m.soTStaticConfig)
 
   'Content area
   m.RowList = m.top.findNode("RowList")

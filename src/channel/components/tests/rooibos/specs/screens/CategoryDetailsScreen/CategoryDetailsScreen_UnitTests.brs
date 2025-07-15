@@ -46,14 +46,12 @@ Function categoryDetailsScreen_populateInfoPanelItem_test()
   content = m.itemContent
   controlInfoPanel = CreateObject("roSGNode", "InfoPanel")
   controlInfoPanel.title = content.title
-  controlInfoPanel.releaseDate = content.releaseDate
-  controlInfoPanel.length = content.length
-  controlInfoPanel.hasCC = content.hasSubtitles
-  controlInfoPanel.rating = content.rating
-  controlInfoPanel.partnerLogoUri = content.inlineLogoUri
   controlInfoPanel.description = content.description
   controlInfoPanel.mode = "item"
   controlInfoPanel.calculateHeight = true
+  controlInfoPanel.sotMarkers = {}
+  controlInfoPanel.sotMetaData = invalid
+  controlInfoPanel.sotTopLabelSignals = []
   controlInfoPanel.lineOneData = {
     hasCC: content.hasSubtitles
     hasAudioDescription: content.hasAudioDescription

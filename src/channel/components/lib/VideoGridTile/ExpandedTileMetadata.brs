@@ -13,6 +13,7 @@ Function init()
   m.rating = m.firstLineGroup.findNode("Rating")
   m.ratingBackground = m.rating.findNode("RatingBackground")
   m.ratingLabel = m.rating.findNode("RatingLabel")
+  m.sotBadge = m.firstLineGroup.findNode("sotBadge")
   m.closedCaptions = m.firstLineGroup.findNode("ClosedCaptionPoster")
 
   m.top.observeFieldScoped("itemContent", "onItemContentChange")
@@ -22,6 +23,7 @@ Function init()
   setTypographyOfLabel(m.lineOneData, typographyConstants.ids.bodySmall)
   setTypographyOfLabel(m.lineTwoData, typographyConstants.ids.bodySmall)
   setTypographyOfLabel(m.ratingLabel, typographyConstants.ids.bodyExtraSmallStrong)
+  m.badgeTextFont = typographyConstants.ids.bodySmallStrong
 
   m.description.observeFieldScoped("isTextEllipsized", "onIsTextEllipsizedChange")
 
@@ -40,10 +42,11 @@ Function onThemeChange(msg = invalid)
   end if
 
   if theme <> invalid
+    m.primaryTextColor = theme.primaryTextColor
     m.lineOneData.color = theme.secondaryTextColor
     m.lineTwoData.color = theme.secondaryTextColor
     m.RatingLabel.color = theme.secondaryTextColor
-    m.description.color = theme.primaryTextColor
+    m.description.color = m.primaryTextColor
 
     m.progressBar.focusColor = theme.focusedcolor
     m.progressBar.trackColor = theme.neutralcolor
@@ -95,6 +98,9 @@ Function onItemContentChange(msg)
           m.firstLineGroup.insertChild(m.lineTwoData, index + 1)
         end if
         
+        if m.sotBadge.getParent() <> invalid
+          m.firstLineGroup.removeChild(m.sotBadge)
+        end if
       else
         metadataOnPosterContent(itemContent)
         m.description.text = itemContent.description
@@ -215,6 +221,23 @@ Function metadataOnPosterContent(itemContent)
     if ratingIsPresent = true
       firstLineGroup.removeChild(m.rating)
     end if
+  end if
+
+  isSotBadgePresent = (m.sotBadge.getParent() <> invalid)
+  sotBadge = itemContent.sotPosterLabels
+  if itemContent.type <> "linear" AND isAA(sotBadge) = true AND sotBadge.count() > 0
+    if isSotBadgePresent = false
+      firstLineGroup.insertChild(m.sotBadge, insertIndex)
+    end if
+
+    m.sotBadge.textColor = m.primaryTextColor
+    m.sotBadge.showBackground = false
+    m.sotBadge.badgeTextFont = m.badgeTextFont
+    m.sotBadge.text = sotBadge.sotLabelText
+    m.sotBadge.iconUri = sotBadge.sotIcon
+
+  else if isSotBadgePresent = true
+    firstLineGroup.removeChild(m.sotBadge)
   end if
 
   if itemContent.hascc = true

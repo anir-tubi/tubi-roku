@@ -17,6 +17,7 @@ Function init()
   m.BadgeTypes = {
     live: "live"
     onNow: "onNow"
+    sot: "sot"
   }
 
   typographyConstants = getTypographyConstants()
@@ -40,10 +41,13 @@ Function onThemeChange()
   theme = getThemeFromGlobal()
 
   if theme <> invalid
-    m.title.color = theme.primaryTextColor
-    m.subtitle.color = theme.primaryTextColor
+    m.primaryTextColor = theme.primaryTextColor
+    m.title.color = m.primaryTextColor
+    m.subtitle.color = m.primaryTextColor
     m.focused2Color = theme.focused2Color
     m.blueBadgeColor = theme.blueBadgeColor
+    m.focusedTextColor = theme.focusedTextColor
+    m.primaryTextColor = theme.primaryTextColor
   end if
 End Function
 
@@ -52,13 +56,18 @@ Function onItemContentChange(msg)
   itemContent = msg.getData()
 
   if itemContent <> invalid
+    isBadgeAdded = false
+
     currentProgram = invalid
+    if m.badge <> invalid
+      m.posterGroup.removeChild(m.badge)
+      m.badge = invalid
+    end if
+
     if itemContent.type = "linear"
       currentProgram = getCurrentLiveProgram(itemContent)
+      isBadgeAdded = true
       setBadge(m.badgeTypes.onNow)
-    else if m.badge <> invalid
-        m.posterGroup.removeChild(m.badge)
-        m.badge = invalid
     end if
 
     if itemContent.type = "linear"
@@ -69,6 +78,7 @@ Function onItemContentChange(msg)
 
     if currentProgram <> invalid
       if currentProgram.live = true
+        isBadgeAdded = true
         setBadge(m.badgeTypes.live)
       end if
       if isNonEmptyString(currentProgram.landscapePosterUrl) = true
@@ -95,6 +105,10 @@ Function onItemContentChange(msg)
     m.videoGridMetadata.opacity = 0
     fade(m.videoGridMetadata, "in", 0.5, m.metadataFadeDelay)
     m.metadataFadeDelay = 0
+
+    if isBadgeAdded = false AND isAA(itemContent.sotPosterLabels) = true AND itemContent.sotPosterLabels.count() > 0
+      setBadge(m.badgeTypes.sot, itemContent.sotPosterLabels)
+    end if
   end if
 End Function
 
@@ -142,13 +156,15 @@ End Function
 
 '@badgeType - string, Indicating format of the badge
 '@badgeText - string, Indicating text on the badge
-Function setBadge(badgeType = "live", badgeText = "")
+Function setBadge(badgeType = "live", badgeInfo = {})
 
   if m.badge = invalid
     m.badge = m.posterGroup.createChild("Badge")
     m.badge.textColor = m.primaryTextColor
     m.badge.translation = [16, 16]
   end if
+
+  m.badge.badgeTextWidth = 0
 
   if badgeType = m.badgeTypes.live
     m.badge.backgroundColor = m.focused2Color
@@ -157,6 +173,11 @@ Function setBadge(badgeType = "live", badgeText = "")
   else if badgeType = m.badgeTypes.onNow
     m.badge.backgroundColor = m.blueBadgeColor
     m.badge.text = UCase(getTranslation("onNow"))
+  else if badgeType = m.badgeTypes.sot
+    m.badge.badgeTextWidth = 80
+    m.badge.text = badgeInfo.sotLabelText
+    m.badge.iconUri = badgeInfo.sotIcon
+    m.badge.textColor = m.focusedTextColor
   end if
 
 End Function

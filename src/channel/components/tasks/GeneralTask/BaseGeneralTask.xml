@@ -24,5 +24,8 @@
 
     <!-- We use the GeneralTask to make our auth network requests. This means the experiments are not available at that time and we need to update them once experiments have been loaded. This is only used for updating m.experimentsInfo and should not be accessed outside of the observer -->
     <field id="newExperimentsInfo" type="assocarray" />
+
+    <!-- We use the GeneralTask to make our soTStaticConfig network requests. This means the soTStaticConfig is not available at that time and we need to update it once loaded. This is only used for updating m.soTStaticConfig and should not be accessed outside of the observer -->
+    <field id="newSoTStaticConfig" type="assocarray" />
   </interface>
 </component>

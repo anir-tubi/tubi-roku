@@ -77,6 +77,8 @@
               role="font"/>
           </Label>
         </Group>
+        <Badge
+          id="sotBadge"/>
         <Poster
           id="ClosedCaptionPoster"
           visible="false"

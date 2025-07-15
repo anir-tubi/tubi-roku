@@ -330,6 +330,7 @@ Function getConstants()
     constants.reqNames.postBrazeMergeUsers = "postBrazeMergeUsers"
     constants.reqNames.postLogout = "postLogout"
     constants.reqNames.postViewableImpression = "postViewableImpression"
+    constants.reqNames.getSoTStaticConfig = "getSoTStaticConfig"
 
     ' a list of reqnames that the general task will inject auth headers and should expect to handle 403 errors for
     constants.reqNames.acceptsTubiAuth = {}
@@ -575,6 +576,7 @@ Function getConstants()
         constants.urls.tensor.cdn.container = constants.urls.tensor.cdn.urlBase + "/v6/containers"
         constants.urls.tensor.cdn.epgChannelIds = constants.urls.tensor.cdn.urlBase + "/v2/epg"
         constants.urls.tensor.cdn.browserList = constants.urls.tensor.cdn.urlBase + "/v1/browse_list"
+        constants.urls.tensor.SoTStaticConfig = constants.urls.tensor.cdn.urlBase +  "/v1/ui_customization/static_config"
 
     'remote Config hub url
     constants.urls.configHub = {}

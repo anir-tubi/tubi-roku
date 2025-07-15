@@ -7,7 +7,8 @@
   <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
-   <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
 
   <interface>
     <field id="itemContent" type="node" />
@@ -21,5 +22,10 @@
       uri="pkg:/images/placeholder-featured.webp"
       loadingBitmapUri="pkg:/images/placeholder-featured.webp"
       failedBitmapUri="pkg:/images/placeholder-featured.webp" />
+    <Badge
+      id="sotBadge"
+      visible="false"
+      badgeTextWidth="80"
+      translation="[6, 6]"/>
   </children>
 </component>

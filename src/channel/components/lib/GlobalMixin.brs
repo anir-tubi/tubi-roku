@@ -42,6 +42,11 @@ Function getExperimentsInfoFromGlobal()
 End Function
 
 
+Function getSoTStaticConfigFromGlobal()
+  return getFieldFromGlobal("soTStaticConfig")
+End Function
+
+
 ' make sure client error config is set in the case that m.global is not immediately available
 ' limits the number of attempts so the while loop doesn't block into perpetuity.
 Function getClientErrorConfigFromGlobal(fallback = {})

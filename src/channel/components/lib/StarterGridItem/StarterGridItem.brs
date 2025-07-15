@@ -1,5 +1,6 @@
 Function init()
   m.poster = m.top.findNode("poster")
+  m.sotBadge = m.top.findNode("sotBadge")
 
   m.top.observeFieldScoped("itemContent", "onItemContentChange")
   ' List of fields that will only be observed if we have a child grid item component with that field
@@ -48,6 +49,17 @@ Function init()
     end if
     parent = parent.getParent()
   end for
+
+  setThemeColors()
+End Function
+
+
+Function setThemeColors()
+  theme = getThemeFromGlobal()
+
+  if theme <> invalid
+    m.focusedTextColor = theme.focusedTextColor
+  end if
 End Function
 
 
@@ -134,6 +146,15 @@ Function onItemContentChange(msg)
     end if
   end if
 
+  'Adding the Badge info on the poster. Currently we are not adding the badge for linear content. It might be added in future.
+
+  sotPosterLabels = itemContent.sotPosterLabels
+  if itemContent.type <> "linear" AND isAA(sotPosterLabels) = true AND sotPosterLabels.count() > 0
+    badgeUri = sotPosterLabels.sotIcon
+    badgeText =  sotPosterLabels.sotLabelText
+    setSotBadge(badgeUri, badgeText)
+  end if
+
   m.parentScreenId = ""
   m.shouldTrackViewableImpressionEvent = false
   ' If the parent array grid is invalid then resetting the values.
@@ -198,6 +219,20 @@ Function addConditionalFieldObservers(childGridItem)
     end for
   end if
 End Function
+
+
+Function setSotBadge(badgeUri, badgeText)
+  if isNonEmptyString(badgeUri) = true AND isNonEmptyString(badgeText) = true
+    m.sotBadge.textColor = m.focusedTextColor
+    m.sotBadge.iconUri = badgeUri
+    m.sotBadge.maxWidth = m.poster.width - 12
+    m.sotBadge.text = badgeText
+    m.sotBadge.visible = true
+  else
+    m.sotBadge.visible = false
+  end if
+End Function
+
 
 
 Function removeConditionalFieldObservers()

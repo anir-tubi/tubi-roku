@@ -4,15 +4,20 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
-
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  
   <interface>
     <field id="backgroundUri" type="string" alias="BadgeBackground.uri"/>
     <field id="backgroundColor" type="string" alias="BadgeBackground.blendColor"/>
     <field id="textColor" type="string" alias="BadgeText.color"/>
     <field id="iconUri" type="string"/>
     <field id="text" type="string"/>
-    <field id="width" type="string" alias="BadgeBackground.width"/>
+    <field id="width" type="integer" alias="BadgeBackground.width"/>
+    <field id="badgeTextWidth" type="integer" alias="BadgeText.width"/>
     <field id="showBackground" alias="BadgeBackground.visible" value="true" />
+    <!-- This field is used to set the font style/size of the badge text when showBackground is false. Values can be any typographyConstants ids. -->
+    <field id="badgeTextFont" type="string" />
+    <field id="maxWidth" type="integer" />
   </interface>
 
   <children>
@@ -32,7 +37,9 @@
         height="21"
         width="0"/>
       <Label
-        id="BadgeText">
+        id="BadgeText"
+        ellipsizeOnBoundary="true"
+        maxLines="1">
         <Font
           role="font"/>
       </Label>

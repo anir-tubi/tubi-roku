@@ -6,6 +6,7 @@ Function init()
   m.offset = m.top.findNode("Offset")
   m.infoPanelGroup = m.top.findNode("infoPanelGroup")
   m.topHeaderGroup = m.top.findNode("topHeaderGroup")
+  m.sotTopLabelGroup = m.top.findNode("sotTopLabelGroup")
   m.liveBadgeHeader = m.top.findNode("liveBadgeHeader")
   m.channelNameHeader = m.top.findNode("channelNameHeader")
   m.leftHeaderImage = m.top.findNode("LeftHeaderImage")
@@ -50,6 +51,8 @@ Function init()
   m.reminderGroup = m.top.findNode("ReminderGroup")
   m.reminderTitle = m.top.findNode("ReminderTitle")
 
+  m.sotMarker = m.top.findNode("SotMarker")
+
   m.directorGroup = m.top.findNode("DirectorGroup")
   m.director = m.top.findNode("Director")
   m.directorTag = m.top.findNode("DirectorTag")
@@ -61,10 +64,13 @@ Function init()
 
   m.playerCountdownGroup = m.top.findNode("PlayerCountdownGroup")
 
+  m.sotTopLabel = m.top.findNode("sotTopLabel")
+
   m.top.observeFieldScoped("mode", "onModeChange")
   m.top.observeFieldScoped("titleTypography", "onTitleTypographyChange")
   m.top.observeFieldScoped("width", "onWidthChange")
   m.top.observeFieldScoped("leftHeaderImageUri", "onLeftHeaderImageUriChange")
+  m.top.observeFieldScoped("sotTopLabelSignals", "onSotTopLabelSignalsChange")
   m.top.observeFieldScoped("titleImageUri", "onTitleImageChange")
   m.top.observeFieldScoped("description", "onDescriptionChange")
   m.top.observeFieldScoped("lineOneData", "onLineOneDataChange")
@@ -81,6 +87,7 @@ Function init()
   m.top.observeFieldScoped("loginReason", "onLoginReasonChange")
   m.top.observeFieldScoped("liveBadgeHeaderText", "onLiveBadgeHeaderTextChange")
   m.top.observeFieldScoped("isTubiOriginal", "onIsTubiOriginalChange")
+  m.top.observeFieldScoped("sotMarkers", "onSotMarkersChange")
   m.offset.observeFieldScoped("translation", "onOffsetTranslationChange")
   m.partnerLogo.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.rating.observeFieldScoped("loadStatus", "onPosterLoadStatus")
@@ -117,6 +124,12 @@ Function init()
   setTypographyOfLabel(m.Starring, m.typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.channelNameHeader, m.typographyConstants.ids.subheaderSmall)
 
+
+  m.BadgeTypes = {
+    sotTopLabel: "sotTopLabel"
+    sotMetaData: "sotMetaData"
+    sotMarker: "sotMarker"
+  }
 
   m.starringTag.width = 0
   m.directorTag.width = 0
@@ -289,21 +302,42 @@ Function onNeedsLoginChange(msg)
       m.offset.appendChild(m.playerCountdownGroup)
     else if m.top.reminderIsSet = true
       m.offset.appendChild(m.reminderGroup)
+    else if isAA(m.top.sotMarkers) = true AND m.top.sotMarkers.count() > 0
+      m.offset.appendChild(m.sotMarker)
     end if
   else if needsLogin = true AND signInGroupIsPresent = false
     ' login info overwrites countdown timer or reminder text if the user is not logged in
     ' remove them back as appropriate, if login info is necessary
     countdownTimerPresent = (m.playerCountdownGroup.getParent() <> invalid AND modesWithTimerAtBottom[mode] = true)
     reminderPresent = (m.reminderGroup.getParent() <> invalid)
+    sotMarkerPresent = (m.sotMarker.getParent() <> invalid)
 
     if countdownTimerPresent = true
       m.offset.removeChild(m.playerCountdownGroup)
     else if reminderPresent = true
       m.offset.removeChild(m.reminderGroup)
+    else if sotMarkerPresent = true
+      m.offset.removeChild(m.sotMarker)
     end if
 
     m.offset.appendChild(m.signInGroup)
   end if
+End Function
+
+
+Function onSotMarkersChange(msg)
+  sotMarker = msg.getData()
+
+  if m.sotMarker.getParent() <> invalid
+    m.offset.removeChild(m.sotMarker)
+  end if
+
+  shouldAddMarker = (isAA(sotMarker) = true AND sotMarker.count() > 0)
+  if shouldAddMarker = true
+    formatBadge(sotMarker.sotLabelText, m.sotMarker, sotMarker.sotIcon)
+    m.offset.appendChild(m.sotMarker)
+  end if
+  
 End Function
 
 
@@ -339,6 +373,54 @@ End Function
 Function onIsTubiOriginalChange(msg)
   isTubiOriginal = msg.getData()
   m.tubiOriginal.visible = (isTubiOriginal = true)
+End Function
+
+
+Function onSotTopLabelSignalsChange(msg)
+  sotTopLabelSignals = msg.getData()
+
+   'Remove all the previous badges before adding the new one
+   m.nodeHelpers.removeAllChildren(m.sotTopLabelGroup)
+
+  ' handle availability badge
+  if isNonEmptyArray(sotTopLabelSignals) = true
+    setSoTSignal(sotTopLabelSignals, m.BadgeTypes.sotTopLabel, m.sotTopLabelGroup, false)
+  end if
+
+End Function
+
+
+' @signals: roArray, one of SOT, it will have text and icon
+' @signalType: String, one of the value from m.BadgeTypes
+' @badgeGroup; layOutGroup, used to add the badges
+' @iconRequired: boolean, used to show/hide the icon
+Function setSoTSignal(signals, signalType, badgeGroup, iconRequired = true)
+  theme = m.theme
+
+  for each signal in signals
+    badge = badgeGroup.createChild("Badge")
+    badge.backgroundColor = theme.neutralColor
+    badge.textColor =  theme.primaryTextColor
+    if iconRequired = true AND isNonEmptyString(signal.sotIcon) = true
+      badge.iconUri = signal.sotIcon
+    end if
+
+    if signalType = m.BadgeTypes.sotMetaData
+      badge.showBackground = false
+      badge.badgeTextFont = m.typographyConstants.ids.bodySmallStrong
+    end if
+
+    if signalType = m.BadgeTypes.sotTopLabel AND (isNonEmptyString(signal.sotIcon) = true OR isString(signal) = true)
+      'Incase of Top Signal, we are just storing the strings in an array, so we are accessing with signal
+      'topSignal = ["Just Added", "Top 10"]
+      ' otherSignals = [{sotLabelText: "75%", icon: "rt.png"}]
+      badge.text = signal
+    else
+      badge.text = signal.sotLabelText
+    end if
+
+  end for
+
 End Function
 
 
@@ -640,6 +722,8 @@ Function onLineTwoDataChange(msg)
     m.twoLineInfo.removeChild(secondLineGroup)
   end if
 
+  m.nodeHelpers.removeAllChildren(secondLineGroup)
+
   if isAA(data) = true
     insertIndex = 0
 
@@ -676,22 +760,27 @@ Function onLineTwoDataChange(msg)
       end if
     end if
 
-     'handle Rotten Tomatoes present
-     isRottenTomatoScorePresent = (m.rottenTomatoBadge.getParent() <> invalid)
-     if isNonEmptyString(data.rottenTomatoText) = true
-       if isRottenTomatoScorePresent = false
+    'handle Rotten Tomatoes present
+    isRottenTomatoScorePresent = (m.rottenTomatoBadge.getParent() <> invalid)
+    if isNonEmptyString(data.rottenTomatoText) = true
+      if isRottenTomatoScorePresent = false
         secondLineGroup.insertChild(m.rottenTomatoBadge, insertIndex)
-       end if
- 
-       formatBadge(data.rottenTomatoText, m.rottenTomatoBadge)
-       insertIndex++
-     else
-       if isRottenTomatoScorePresent = true
+      end if
+
+      formatBadge(data.rottenTomatoText, m.rottenTomatoBadge)
+      insertIndex++
+    else
+      if isRottenTomatoScorePresent = true
         secondLineGroup.removeChild(m.rottenTomatoBadge)
-       end if
-     end if
+      end if
+    end if
+
+    if isNonEmptyArray(data.sotMetaData) = true
+      setSoTSignal(data.sotMetaData, m.BadgeTypes.sotMetaData, secondLineGroup, true)
+    end if
 
   end if
+
   shouldCalculateHeight()
 End Function
 
@@ -968,6 +1057,7 @@ Function onModeChange()
   if m.top.mode = m.constants.ui.infoPanelModes.item
     ' used for movies and series on the homescreen and similar screens
     m.infoPanelGroup.appendChild(m.offset)
+    m.offset.appendChild(m.sotTopLabelGroup)
     m.offset.appendChild(m.title)
     m.offset.appendChild(m.twoLineInfo)
     m.offset.appendChild(m.descriptionGroup)
@@ -1192,42 +1282,49 @@ Function getSecondLineText(data)
   return text
 End Function
 
-
+' TODO: Need to refactor this function based on component/text
 ' @text: string, the translated text that will appear on the badge
 ' @badgeComponent: a Badge node
-Function formatBadge(text, badgeComponent)
+Function formatBadge(text, badgeComponent, iconUri = "")
   tubiLog("InfoPanel.formatBadge")
   theme = m.theme
-
+  uText = UCase(text)
   if theme <> invalid
-    if UCase(text) = UCase(getTranslation("screenSearch_liveText"))
+    if  uText = UCase(getTranslation("screenSearch_liveText"))
       ' LIVE badge
       badgeComponent.backgroundColor = theme.focused2Color
       badgeComponent.textColor = theme.primaryTextColor
       badgeComponent.iconUri = "pkg:/images/live-icon-filled.webp"
-    else if UCase(text) = UCase(getTranslation("replay"))
+      badgeComponent.text = uText
+    else if uText = UCase(getTranslation("replay"))
       ' REPLAY badge
       badgeComponent.backgroundColor = theme.backgroundColorLight
       badgeComponent.textColor = theme.textDarkColor
-    else if UCase(text) = UCase(getTranslation("onNow"))
+      badgeComponent.text = uText
+    else if uText = UCase(getTranslation("onNow"))
       badgeComponent.backgroundColor = theme.blueBadgeColor
       badgeComponent.textColor = m.primaryTextColor
+      badgeComponent.text = uText
     else if badgeComponent.id = m.rottenTomatoBadge.id
       badgeComponent.showBackground = false
       badgeComponent.iconUri = "pkg:/images/certified-fresh.png"
       badgeComponent.textColor = theme.primaryTextColor
+      badgeComponent.badgeTextFont = m.typographyConstants.ids.bodySmallStrong
+      badgeComponent.text = text
+    else if badgeComponent.id = m.sotMarker.id
+      badgeComponent.iconUri = iconUri
+      badgeComponent.badgeTextFont = m.typographyConstants.ids.bodyMediumStrong
+      badgeComponent.text = text
+      badgeComponent.showBackground = false
+      badgeComponent.textColor = theme.cautionColor
     else
       ' TODAY, TOMORROW, <<Date>> badge
       badgeComponent.backgroundColor = theme.neutralColor
       badgeComponent.textColor = theme.primaryTextColor
+      badgeComponent.text = uText
     end if
   end if
 
-  if badgeComponent.id = m.rottenTomatoBadge.id
-    badgeComponent.text = text
-  else
-    badgeComponent.text = UCase(text)
-  end if
 End Function
 
 

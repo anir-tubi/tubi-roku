@@ -8,6 +8,7 @@ Function init()
   m.top.observeField("newClientErrorConfig", m.port)
   m.top.observeField("newConstants", m.port)
   m.top.observeField("newExperimentsInfo", m.port)
+  m.top.observeField("newSoTStaticConfig", m.port)
   m.constants = getConstantsFromGlobal()
 
   ' Used to know how we should handle error cases on network requests
@@ -15,6 +16,9 @@ Function init()
 
   ' In order to be able to update the experiments without having pass it down manually we need an existing AA that we can just update the keys on
   m.experimentsInfo = {}
+
+  ' In order to be able to update the soTStaticConfig without having pass it down manually we need an existing AA that we can just update the keys on
+  m.soTStaticConfig = {}
 
   ' Creating a scope variable that will be overridden by each sub task
   m.requestTypes = {}
@@ -111,6 +115,11 @@ Function listen()
         end for
 
         m.experimentsInfo.append(experimentsInfo)
+      else if field = "newSoTStaticConfig"
+        soTStaticConfig = msg.getData()
+        for each key in soTStaticConfig
+          m.soTStaticConfig[key] = soTStaticConfig[key]
+        end for
       else
         conditionallyProcessAuthUpdatedMessage(msg)
       end if

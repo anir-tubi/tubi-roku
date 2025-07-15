@@ -1,4 +1,4 @@
-Function TubiMetadataTranslate(constants, experiments = invalid)
+Function TubiMetadataTranslate(constants, experiments = invalid, soTStaticConfig = invalid)
   return {
     ' public
     translateBackendTypeToClientSideType: tubiMetadataTranslate_translateBackendTypeToClientSideType
@@ -26,7 +26,8 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     creditsDuration: constants.player.creditsDuration
     allowAfterHours: constants.settings.allowAfterHours
     experiments: experiments
-
+    soTStaticConfig: soTStaticConfig
+    
     dedupeBackgrounds: tubiMetadataTranslate_dedupeBackgrounds
     setTotalCount: tubiMetadataTranslate_setTotalCount
     setSponsorshipInfo: tubiMetadataTranslate_setSponsorshipInfo
@@ -46,6 +47,9 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     getBackgroundImages: tubiMetadataTranslate_getBackgroundImages
     getTitleImageUrl: tubiMetadataTranslate_getTitleImageUrl
     checkIfUserIsInRegistrationByPassMode: tubiMetadataTranslate_checkIfUserIsInRegistrationByPassMode
+    getTheIconAndTextFromConfig: tubiMetadataTranslate_getTheIconAndTextFromConfig
+    getTextFromPath: tubiMetadataTranslate_getTextFromPath
+    getSignalTrustInfo: tubiMetadataTranslate_getSignalTrustInfo
   }
 End Function
 
@@ -233,7 +237,7 @@ End Function
 ' @contentFromServer: assocArray, AA representation of content metadata JSON as returned from server
 ' @translatedContent: empty ContentNode or AA that will be populated with content metadata
 ' @isSignedInUser: boolean, value based on user logged In or not
-Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, translatedContent As Object, isSignedInUser = false) as integer
+Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, translatedContent As Object, isSignedInUser = false, container = {}) as integer
   if contentFromServer = invalid or type(contentFromServer) <> "roAssociativeArray" then return 0
 
   count = 1
@@ -352,6 +356,32 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
     translatedContent.rottenTomatoScore = rottenTomatoScore + "%"
   end if
+
+  sotInfo = {}
+
+  sotCustomization = {}
+  if isAA(container) = true OR isNode(container) = true
+    sotCustomization = container.childUICustomization
+  end if
+
+  if isAA(sotCustomization) = true AND sotCustomization.count() > 0 AND isAA(m.soTStaticConfig) = true AND m.soTStaticConfig.count() > 0
+    'If the current children match any of the children in child_ui_customization, we will retrieve the SOT labels to display.
+
+    contentId = contentFromServer.id
+    ' normalize ids for series, should always be zero-prefixed
+    if contentFromServer.type = "s" OR contentFromServer.type = "a"
+      contentId = "0" + contentId
+    end if
+
+    sotChild = sotCustomization[contentId]
+
+    if sotChild <> invalid
+      sotInfo = m.getSignalTrustInfo(sotChild, contentFromServer)
+    end if
+
+  end if
+
+  translatedContent.sotInfo = sotInfo
 
   ' in case isCdc was already set from the parent above, don't overwrite
   if translatedContent.isCdc <> true AND contentFromServer.is_cdc <> invalid
@@ -669,10 +699,10 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     for each childContentFromServer in contentFromServer.children
       if type(translatedContent) = "roSGNode"
         translatedChild = translatedContent.createChild("TubiContentNode")
-        count = count + m.translateRecursive(childContentFromServer, translatedChild, isSignedInUser)
+        count = count + m.translateRecursive(childContentFromServer, translatedChild, isSignedInUser, container)
       else if type(translatedContent) = "roAssociativeArray"
         translatedChild = CreateObject("roAssociativeArray")
-        count = count + m.translateRecursive(childContentFromServer, translatedChild, isSignedInUser)
+        count = count + m.translateRecursive(childContentFromServer, translatedChild, isSignedInUser, container)
 
         if translatedContent.children = invalid
           translatedContent.children = []
@@ -749,7 +779,7 @@ Function tubiMetadataTranslate_getContentFromCategoryJson(category, contentId, i
     if parsed <> invalid
       fullContent = parsed[contentId]
       translated = CreateObject("roSGNode", "TubiContentNode")
-      m.translateRecursive(fullContent, translated, isSignedInUser)
+      m.translateRecursive(fullContent, translated, isSignedInUser, category)
       translated.parentId = category.id
       translated.parentType = category.type
       translated.parentTitle = category.title
@@ -1201,6 +1231,12 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
     }, true)
   end if
 
+  if isAA(container.child_ui_customization) = true
+    translated.update({
+      childUICustomization: container.child_ui_customization
+    }, true)
+  end if
+
   if categoryMetadata = invalid  'happens if a container has no valid content in it (ie. all content is out of window)
     translated.id = container.id
     return translated
@@ -1413,6 +1449,7 @@ Function tubiMetadataTranslate_buildCategoryParentInfo(container, sOrientation =
       state: "partial"
       gridItemType: ""
       subtext: ""
+      childUICustomization: container.child_ui_customization
     }
 
     if m.experiments <> invalid
@@ -1545,6 +1582,37 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             isHomescreenRedesignExperiementEnabled = (tileDesignType <> "none") AND uiMode = "standard"
           end if
 
+          rottenTomatoScore = 0
+          if isAA(fullChild.content_tags) = true AND isNonEmptyArray(fullChild.content_tags.rotten_tomatoes_certified_fresh) = true
+            rottenTomatoScore = fullChild.content_tags.rotten_tomatoes_certified_fresh[0]
+            if isString(rottenTomatoScore) = true
+              rottenTomatoScore = rottenTomatoScore.toInt()
+            end if
+          end if
+
+          sotCustomization = container.child_ui_customization
+          sotPosterLabels = {}
+
+          if isAA(sotCustomization) = true AND sotCustomization.count() > 0 AND isAA(m.soTStaticConfig) = true AND m.soTStaticConfig.count() > 0
+
+            contentId = fullChild.id
+            ' normalize ids for series, should always be zero-prefixed
+            if fullChild.type = "s" OR fullChild.type = "a"
+              contentId = "0" + contentId
+            end if
+
+            sotChild = sotCustomization[contentId]
+
+            if sotChild <> invalid
+              posterLables = sotChild.poster_labels
+              if isNonEmptyArray(posterLables) = true
+                ' We are displaying a maximum of one poster label, so we're selecting the first index instead of considering the entire child count.
+                sotPosterLabels = m.getTheIconAndTextFromConfig(posterLables[0], fullChild)
+              end if
+            end if
+
+          end if
+
           if container.id = experimentContainerId AND (isHomescreenRedesignExperiementEnabled = true)
             featuredLandscape = m.getRoundedCornersURL(m.getThumbnailImage(fullChild, m.constants.ui.gridItemTypes.landscapeWithMetadata))
             childAA = {
@@ -1561,26 +1629,22 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
               thumbnailUri: thumbnailUri
               seasons: seasons
               type: sContentType
+              userStarRating: rottenTomatoScore
               tileDesignType: tileDesignType
               featuredLandscape: featuredLandscape
+              sotPosterLabels: sotPosterLabels
               hasCC: (fullChild.hasSubtitles = true OR fullChild.has_subtitle = true OR (fullChild.subtitleTracks <> invalid AND fullChild.subtitleTracks.isEmpty() = false))
               gridItemType: parentGridItemType
             }
           else
-            rottenTomotoScore = 0
-            if isAA(fullChild.content_tags) = true AND isNonEmptyArray(fullChild.content_tags.rotten_tomatoes_certified_fresh) = true
-              rottenTomotoScore = fullChild.content_tags.rotten_tomatoes_certified_fresh[0]
-              if isString(rottenTomotoScore) = true then
-                rottenTomotoScore = rottenTomotoScore.toInt()
-              end if
-            end if
 
             childAA = {
               id: fullChild.id
               title: fullChild.title
               description: fullChild.description
               length: fullChild.duration
-              userStarRating: rottenTomotoScore
+              userStarRating: rottenTomatoScore
+              sotPosterLabels: sotPosterLabels
               subtype: sType
               type: sContentType
             }
@@ -1630,7 +1694,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
 
           if bFullData = true OR bSingleContentFullData = true
             'mutates childAA by populating all fields on childAA
-            m.translateRecursive(fullChild, childAA, isSignedInUser)
+            m.translateRecursive(fullChild, childAA, isSignedInUser, container)
           end if
 
           gridType = ""
@@ -1671,7 +1735,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           childAA.id = sFullChildID
 
           ' normalize ids for series, should always be zero-prefixed
-          if fullChild.type = "s" or fullChild.type = "a"
+          if fullChild.type = "s" OR fullChild.type = "a"
             childAA.id = "0" + sFullChildID
           end if
 
@@ -2873,4 +2937,151 @@ Function tubiMetadataTranslate_translateSearchResults(contentToTranslate, isSign
   end if
 
   return translated
+End Function
+
+
+' @sotSignal: roAssocArray, SOT Signal with template and icon
+' @content: roAssocArray, content from the server of a specific container
+' @includeIcon: boolean, used for adding icon
+Function tubiMetadataTranslate_getTheIconAndTextFromConfig(sotSignal, content, includeIcon = true)
+  soTStaticConfig = m.soTStaticConfig
+  sotIcon = ""
+  sotLabelText = ""
+
+  if isAA(sotSignal) = true AND isAA(soTStaticConfig) = true AND isAA(soTStaticConfig.customizations) = true
+    customizations = soTStaticConfig.customizations
+    signalMap = customizations[sotSignal.type]
+
+    if isAA(signalMap) = true
+      templateFromConfig = signalMap.template
+
+      if isNonEmptyString(templateFromConfig) = true
+        ' Here, we're replacing all the values inside the braces with their actual values: {{content.content_tags_imdb_score}}.
+        regex = CreateObject("roRegex", "\{\{(.*?)\}\}", "i")
+        matches = regex.MatchAll(templateFromConfig)
+
+        if isNonEmptyArray(matches) = true
+          for i = 0 to matches.count() - 1
+            getPath = matches[i]
+            convertedText = m.getTextFromPath(sotSignal, getPath[1], "")
+            if isInteger(convertedText) = true OR isNumber(convertedText) = true
+              convertedText = convertedText.toStr()
+            end if
+            if isNonEmptyString(convertedText) = false
+              convertedText = m.getTextFromPath(content, getPath[1], "")
+            end if
+
+            if isString(convertedText) = true
+              templateFromConfig = templateFromConfig.replace(getPath[0], convertedText)
+            end if
+          end for
+
+        end if
+
+        if includeIcon = true AND isNonEmptyString(signalMap.icon) = true
+          sotIcon = signalMap.icon
+        end if
+
+        sotLabelText = templateFromConfig
+      end if
+
+    end if
+  end if
+
+  return {
+    sotLabelText: sotLabelText
+    sotIcon: sotIcon
+  }
+End Function
+
+
+'This function is used to get the value from the path
+'
+'@content; roAssocArray, wither a content from the server or sor signal from child_ui_customization
+'@path: String, path to access the actual values. Example content.content_tags.imdb_score
+'@defaultValue: String, if we don't find the value from the path we will return the default value
+Function tubiMetadataTranslate_getTextFromPath(content, path, defaultValue = "")
+
+  segments = []
+  if isString(path) = true
+    segments = path.split(".")
+  end if
+
+  result = invalid
+
+  while segments.count() > 0
+    key = segments.shift()
+
+    'This is to ignore the lookup of .content
+    if key = "content"
+      key = segments.shift()
+    end if
+
+    if isNode(content) = true AND isNumber(key) = true
+      if key < 0 OR key >= content.getChildCount() then
+        result = invalid
+        exit while
+      end if
+
+      result = content.getChild(key)
+    else
+      result = content[key]
+    end if
+
+    if segments.count() = 0
+      exit while
+    end if
+
+    if not (isAA(result) = true OR isArray(result) = true OR isNode(result) =true)
+      result = invalid
+    end if
+
+    if result = invalid
+      exit while
+    end if
+
+    content = result
+  end while
+
+  if result = invalid then return defaultValue
+
+  return result
+
+End Function
+
+
+Function tubiMetadataTranslate_getSignalTrustInfo(sotChild, content)
+  sotInfo = {}
+  sotLabels = sotChild.metadata_labels
+  sotMetaDataTopLabels = []
+  if isNonEmptyArray(sotLabels) = true
+    for i = 0 to sotLabels.count() - 1
+      topLabel = m.getTheIconAndTextFromConfig(sotLabels[i], content, false)
+      sotMetaDataTopLabels.push(topLabel)
+    end for
+  end if
+
+  markers = sotChild.markers
+  sotMarkers = {}
+  if isNonEmptyArray(markers) = true
+      ' We are displaying a maximum of one marker label, so we're selecting the first index instead of considering the entire child count.
+      sotMarkers = m.getTheIconAndTextFromConfig(markers[0], content)
+  end if
+
+  metaData = sotChild.metadata
+  sotMetaData = []
+  if isNonEmptyArray(metaData) = true
+    ' We are displaying the maximum number of metadata labels, so we're considering the entire child count.
+    for i = 0 to metaData.count() - 1
+      sotMetadataLabels = m.getTheIconAndTextFromConfig(metaData[i], content)
+      sotMetaData.push(sotMetadataLabels)
+    end for
+  end if
+
+  sotInfo.sotMetaDataTopLabels = sotMetaDataTopLabels
+  sotInfo.sotMarkers = sotMarkers
+  sotInfo.sotMetaData = sotMetaData
+
+  return sotInfo
+
 End Function

@@ -29,7 +29,8 @@ Function init()
 
   experimentsInfo = getExperimentsInfoFromGlobal()
   experiments = TubiExperiments(experimentsInfo)
-  m.metadataTranslate = TubiMetadataTranslate(m.constants, experiments)
+  soTStaticConfig = getSoTStaticConfigFromGlobal()
+  m.metadataTranslate = TubiMetadataTranslate(m.constants, experiments, soTStaticConfig)
 
   ' Holds the value of last focused column in the row. This is used to determine if user is scrolling within the row.
   m.lastFocusedColumn = -1

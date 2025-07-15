@@ -42,6 +42,17 @@
 
     <field id="hasVideoResources" type="boolean" />
 
+    <!-- sotInfo will have 4 signals which used to display on infopanel as well as poster.
+     Structure as follows
+     sotInfo = {
+       sotMetaData: [{icon: "rt.png", text: "76%"}, {icon: "imdb.png", text: "7.5"}]
+       sotMarkers: "{icon: "award.png", text: "Award Winning"}
+       sotTopLabelSignals: ["Just added", "Leaving Soon"]
+       sotPosterLabel: {icon: "rt.png", text: "76%"}
+     }
+    -->
+    <field id="sotInfo" type="assocarray" />
+
     <!-- tracking info to be used specifically by youbora. The names of the keys of this AA will be under: constants.thirdParty.youbora.trackingKeys -->
     <field id="youboraTracking" type="assocarray" value="{}"/>
 

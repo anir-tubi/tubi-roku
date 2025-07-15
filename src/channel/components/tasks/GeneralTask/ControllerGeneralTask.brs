@@ -270,11 +270,16 @@ Function registerParsingCallbacks()
     parseSuccess: parseTubiExperimentsNamespaceRequestSuccess
     parseError: parseGenericError
   }
+
+  m.requestTypes[m.constants.reqNames.getSoTStaticConfig] = {
+    parseSuccess: parseSoTStaticConfigSuccess
+    parseError: parseGenericError
+  }
 End Function
 
 
 ' Called from the base general task listen method. Below overridden method will be used to register helpers/utilities.
 Function instantiateLibs()
   m.experiments = TubiExperiments(m.experimentsInfo)
-  m.metadataTranslate = TubiMetadataTranslate(m.constants, m.experiments)
+  m.metadataTranslate = TubiMetadataTranslate(m.constants, m.experiments, m.soTStaticConfig)
 End Function

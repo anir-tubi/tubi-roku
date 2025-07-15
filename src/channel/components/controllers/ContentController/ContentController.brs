@@ -42,6 +42,8 @@ Function init()
   m.oneTrust = invalid
 
   retrieveClientErrorConfig(retrieveClientErrorConfigSuccessCallbackTriggerRetrieveInitialAuthInfo, retrieveClientErrorConfigErrorCallbackTriggerRetrieveInitialAuthInfo)
+
+  
   ' Holds true or false based on if app suspend is in progress
   m.isApplicationSuspendInProgress = false
 End Function
@@ -220,6 +222,8 @@ Function addControllerUi()
   ' used to keep state if we went through the process to refresh auth after receiving a transfer token from
   ' a mobile device deeplink. Used to determine if we should show a toast message or not.
   m.authInfoRefreshed = false
+
+  m.soTStaticConfigComplete = false
 
   ' indicates if we are building the app in a deep link state
   ' is set to true when a deeplink occurs, and set back to false after the deeplink has been handled

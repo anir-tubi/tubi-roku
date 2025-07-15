@@ -26,6 +26,24 @@ Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel, isHome
   infoPanel.mode = mode
   infoPanel.title = content.title
 
+  sotInfo = content.sotInfo
+  if isAA(sotInfo) = true
+    if isArray(sotInfo.sotMetaDataTopLabels) = true
+      infoPanel.sotTopLabelSignals = sotInfo.sotMetaDataTopLabels
+    end if
+
+    if isNonEmptyArray(sotInfo.sotMetaData) = true
+      lineTwoData.sotMetaData = sotInfo.sotMetaData
+    end if
+
+    if isAA(sotInfo.sotMarkers) = true
+      infoPanel.sotMarkers = sotInfo.sotMarkers
+    end if
+  else
+    infoPanel.sotTopLabelSignals = []
+    infoPanel.sotMarkers = {}
+  end if
+
   lineOneData.releaseDate = content.releaseDate
   lineOneData.length = content.length
   lineOneData.hasCC = (content.hasSubtitles = true OR (content.subtitleTracks <> invalid AND content.subtitleTracks.isEmpty() = false))

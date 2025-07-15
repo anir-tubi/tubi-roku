@@ -24,6 +24,7 @@ Function CmsApi(constants, apiUtils, experiments=invalid)
     createHomeScreenBatchReqInfoForContainers: cmsApi_createHomeScreenBatchReqInfoForContainers
     createGetContainerContentsReqInfo: cmsApi_createGetContainerContentsReqInfo
 
+
     ' private
     setImageParams: cmsApi_setImageParams
     setTupianPosterParam: cmsApi_setTupianPosterParam
@@ -200,6 +201,7 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {}, i
   params["include_empty_history"] = true
   params["include_empty_queue"] = true
   params["include_sponsorships"] = true
+  params["include_ui_customization"] = true
 
   ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated. 
   if isLinearBlock = true
@@ -367,6 +369,7 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
   params["content_mode"] = ""
   params["limit_resolutions"] = m.constants.player.limitResolutions
   params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
+  params["include_ui_customization"] = true
 
   utmCampaignConfig = m.utmCampaignConfig
 

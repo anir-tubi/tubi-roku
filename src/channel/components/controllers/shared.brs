@@ -165,6 +165,7 @@ Function onExternalConfigRequestSuccess(config)
   m.isExternalConfigReady = true
 
   sendRequestForExperiments()
+  retrieveSoTStaticConfig()
 End Function
 
 
@@ -196,6 +197,7 @@ Function onExternalConfigRequestFailure(_error)
   m.isExternalConfigReady = true
 
   sendRequestForExperiments()
+  retrieveSoTStaticConfig()
 End Function
 
 
@@ -286,4 +288,42 @@ Function isMajorEventDay()
   majorEventStart = getExternalConfigValueFromGlobal("major_event_failsafe_start", m.constants.configHubFallbacks.majorEventStart)
   majorEventEnd = getExternalConfigValueFromGlobal("major_event_failsafe_end", m.constants.configHubFallbacks.majorEventEnd)
   return isNowWithinTimePeriod(majorEventStart, majorEventEnd)
+End Function
+
+
+' This function is used to retrieve the soTStaticConfig from the tensor api.
+Function retrieveSoTStaticConfig()
+
+  m.makeRequest({
+    url: m.constants.urls.tensor.SoTStaticConfig
+    requestType: m.constants.reqNames.getSoTStaticConfig
+    successCallback: retrieveSoTStaticConfigSuccessCallback
+    errorCallback: retrieveSoTStaticConfigErrorCallback
+    responseType: "assocarray"
+    timeoutInMilliSec: 5000
+  })
+End Function
+
+
+Function retrieveSoTStaticConfigSuccessCallback(staticConfig)
+  if staticConfig <> invalid AND m.global <> invalid 
+    m.global.update({"soTStaticConfig": staticConfig}, true)
+    m.updateGeneralTaskSoTStaticConfig(staticConfig)
+    setSoTStaticConfigComplete() 
+  else
+    retrieveSoTStaticConfigErrorCallback()
+  end if
+End Function
+
+
+Function retrieveSoTStaticConfigErrorCallback(_error = invalid)
+  setSoTStaticConfigComplete()
+End Function
+
+
+Function setSoTStaticConfigComplete()
+
+  m.soTStaticConfigComplete = true
+
+  runControllerStartSequence()
 End Function

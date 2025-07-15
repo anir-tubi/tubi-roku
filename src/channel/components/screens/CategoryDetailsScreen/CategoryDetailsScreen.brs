@@ -8,7 +8,8 @@ Function init()
   m.Tracking = TubiTracking(m.constants, m.auth)
   experimentsInfo = getExperimentsInfoFromGlobal()
   m.experiments = TubiExperiments(experimentsInfo)
-  m.metadataTranslate = TubiMetadataTranslate(m.constants, m.experiments)
+  soTStaticConfig = getSoTStaticConfigFromGlobal()
+  m.metadataTranslate = TubiMetadataTranslate(m.constants, m.experiments, soTStaticConfig)
 
   m.itemsInRowCount = 8
 
