@@ -562,7 +562,10 @@ Function tubiAds_retrieveAds(adsUrl, adInsertionMethod)
         rainmakerResponse = msg.getString()
 
         ' We only want to write to tmp and pass through RAF if the response is not empty. We use 100 characters as a threshold as we should always be larger than that if we had ads included
-        if rainmakerResponse.len() > 100 then
+        if rainmakerResponse.len() <= 100 then
+          ' Have to return an empty array instead of invalid since we send logging if we return invalid that we don't want to send
+          currentAdUnitsList = []
+        else
           localRafVastUrl = "tmp:/local_raf_vast.xml"
           if writeAsciiFile(localRafVastUrl, rainmakerResponse) = true then
             notUsedAdPodPixels = m.parseOutNotUsedAdPodPixels(rainmakerResponse)
