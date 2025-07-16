@@ -948,10 +948,10 @@ Function getConstants()
 
       ' if the device supports H265, then we are sending limitResolutions as "H265_<maxH265Resolution>" & "H264_<maxH264Resolution>"
       ' Backend will respond with multiple manifests (both H265 & H264)
-      constants.player.limitResolutions = [
-        hevcCodec + "_" + maxH265Resolution.toStr() + "p"
-        avcCodec + "_" + maxH264Resolution.toStr() + "p"
-      ]
+      ' checking whether device is capable of playing H265 transcoded content
+      if di.CanDecodeVideo({Codec: "hevc"}).result = true
+        constants.player.limitResolutions.push(hevcCodec + "_" + maxH265Resolution.toStr() + "p")
+      end if
 
       'Video ResourceType
       constants.player.videoResourcetype = {}
