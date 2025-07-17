@@ -2942,8 +2942,7 @@ End Function
 
 ' @sotSignal: roAssocArray, SOT Signal with template and icon
 ' @content: roAssocArray, content from the server of a specific container
-' @includeIcon: boolean, used for adding icon
-Function tubiMetadataTranslate_getTheIconAndTextFromConfig(sotSignal, content, includeIcon = true)
+Function tubiMetadataTranslate_getTheIconAndTextFromConfig(sotSignal, content)
   soTStaticConfig = m.soTStaticConfig
   sotIcon = ""
   sotLabelText = ""
@@ -2978,7 +2977,7 @@ Function tubiMetadataTranslate_getTheIconAndTextFromConfig(sotSignal, content, i
 
         end if
 
-        if includeIcon = true AND isNonEmptyString(signalMap.icon) = true
+        if isNonEmptyString(signalMap.icon) = true
           sotIcon = signalMap.icon
         end if
 
@@ -3056,7 +3055,7 @@ Function tubiMetadataTranslate_getSignalTrustInfo(sotChild, content)
   sotMetaDataTopLabels = []
   if isNonEmptyArray(sotLabels) = true
     for i = 0 to sotLabels.count() - 1
-      topLabel = m.getTheIconAndTextFromConfig(sotLabels[i], content, false)
+      topLabel = m.getTheIconAndTextFromConfig(sotLabels[i], content)
       sotMetaDataTopLabels.push(topLabel)
     end for
   end if

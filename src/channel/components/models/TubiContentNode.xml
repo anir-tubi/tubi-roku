@@ -47,7 +47,7 @@
      sotInfo = {
        sotMetaData: [{icon: "rt.png", text: "76%"}, {icon: "imdb.png", text: "7.5"}]
        sotMarkers: "{icon: "award.png", text: "Award Winning"}
-       sotTopLabelSignals: ["Just added", "Leaving Soon"]
+       sotTopLabelSignals:  "{icon: "", text: "Just added"} ' Top labels doesn't have any icons
        sotPosterLabel: {icon: "rt.png", text: "76%"}
      }
     -->

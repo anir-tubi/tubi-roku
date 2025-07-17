@@ -410,14 +410,7 @@ Function setSoTSignal(signals, signalType, badgeGroup, iconRequired = true)
       badge.badgeTextFont = m.typographyConstants.ids.bodySmallStrong
     end if
 
-    if signalType = m.BadgeTypes.sotTopLabel AND (isNonEmptyString(signal.sotIcon) = true OR isString(signal) = true)
-      'Incase of Top Signal, we are just storing the strings in an array, so we are accessing with signal
-      'topSignal = ["Just Added", "Top 10"]
-      ' otherSignals = [{sotLabelText: "75%", icon: "rt.png"}]
-      badge.text = signal
-    else
-      badge.text = signal.sotLabelText
-    end if
+    badge.text = signal.sotLabelText
 
   end for
 
