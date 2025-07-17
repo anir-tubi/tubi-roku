@@ -720,8 +720,17 @@ Function appendContentToCategory(response, contentNode, rowFocused)
     fullJson = ParseJson(category.json)
     newJson = ParseJson(response.json)
     if fullJson <> invalid AND newJson <> invalid
+      childUICustomization = {}
+      if isAA(category.child_ui_customization) = true
+        childUICustomization = category.child_ui_customization
+        if isAA(response.child_ui_customization) = true
+          childUICustomization.append(response.child_ui_customization)
+        end if
+      end if
+
       fullJson.append(newJson)
       category.paginationInfo = response.paginationInfo
+      category.child_ui_customization = childUICustomization
       category.json = FormatJson(fullJson)
       category.state = response.state
       category.appendChildren(items)
