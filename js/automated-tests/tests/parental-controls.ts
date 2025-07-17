@@ -755,15 +755,15 @@ async function createHistory(user) {
   await user.addContentToViewHistory(ContentTVY7, 600);
   const movieContentTVMA = await user.getContent().withRating('TV-MA').ofContentType('series').retrieve({ limit: 3 });
   await user.addContentToViewHistory(movieContentTVMA, 600);
-  const movieContentR = await user.getContent().withRating('R').ofContentType('movies').retrieve({ limit: 2 });
+  const movieContentR = await user.getContent().withRating('R').ofContentType('movie').retrieve({ limit: 2 });
   await user.addContentToViewHistory(movieContentR, 500);
-  const movieContentPG = await user.getContent().withRating('PG').ofContentType('movies').retrieve({ limit: 2 });
+  const movieContentPG = await user.getContent().withRating('PG').ofContentType('movie').retrieve({ limit: 2 });
   await user.addContentToViewHistory(movieContentPG, 500);
-  const movieContentPG13 = await user.getContent().withRating('PG-13').ofContentType('movies').retrieve({ limit: 2 });
+  const movieContentPG13 = await user.getContent().withRating('PG-13').ofContentType('movie').retrieve({ limit: 2 });
   await user.addContentToViewHistory(movieContentPG13, 500);
   const movieContentTV14 = await user.getContent().withRating('TV-14').ofContentType('series').retrieve({ limit: 2 });
   await user.addContentToViewHistory(movieContentTV14, 500);
-  const movieContentNR = await user.getContent().withRating('NR').ofContentType('movies').retrieve({ limit: 2 });
+  const movieContentNR = await user.getContent().withRating('NR').ofContentType('movie').retrieve({ limit: 2 });
   await user.addContentToViewHistory(movieContentNR, 500);
 
 }
@@ -774,7 +774,7 @@ async function createWatchList(user) {
 
   const ContentTVG = await user.getContent().ofContentType(['series']).withRating('TV-G').retrieve({ limit: 6 });
   await user.addContentToWatchList(ContentTVG);
-  const ContentG = await user.getContent().ofContentType(['movie']).withRating('G').retrieve({ limit: 6 });
+  const ContentG = await user.getContent().ofContentType('movie').withRating('G').retrieve({ limit: 6 });
   await user.addContentToWatchList(ContentG);
   const movieContentTVY7 = await user.getContent().ofContentType(['series']).withRating('TV-Y7').retrieve({ limit: 3 });
   await user.addContentToWatchList(movieContentTVY7);

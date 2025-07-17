@@ -204,6 +204,10 @@ const elements = typeCheckElements({
 
   /** Component for video preview playback. Useful for checking that video preview is playing the correct file */
   previewVideoPlayer: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#videoPreviewPlayer.#VideoNode',
+  },
+
+  previewVideoPlayerScreen: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#videoPreviewPlayer',
   },
 
@@ -1091,7 +1095,7 @@ const elements = typeCheckElements({
   //** CW Category Row poster */
   continueWatchingCategoryPoster: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid.0.1.#posterLayout.#Poster',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid.0.#posterLayout.#Poster',
   },
   //** Empty My List Container */
   emptyMyStuffContainer: {
@@ -2169,7 +2173,7 @@ const elements = typeCheckElements({
   },
 
   continueWatchingPoster: {
-    keyPath: ' #ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid.0.1.#posterLayout.#Poster',
+    keyPath: ' #ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid.0.#posterLayout.#Poster',
   },
 
   /** categories left nav */

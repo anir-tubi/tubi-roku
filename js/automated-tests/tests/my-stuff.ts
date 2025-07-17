@@ -816,9 +816,9 @@ describe('MyStuff', function () {
         await user.addContentToViewHistory(ContentTVY7, 600);
         const movieContentTVMA = await user.getContent().withRating('TV-MA').ofContentType('series').retrieve({ limit: 3});
         await user.addContentToViewHistory(movieContentTVMA, 600);
-        const movieContentR = await user.getContent().withRating('R').ofContentType('movies').retrieve({ limit: 2});
+        const movieContentR = await user.getContent().withRating('R').ofContentType('movie').retrieve({ limit: 2});
         await user.addContentToViewHistory(movieContentR, 500);
-        const movieContentPG = await user.getContent().withRating('PG').ofContentType('movies').retrieve({ limit: 2});
+        const movieContentPG = await user.getContent().withRating('PG').ofContentType('movie').retrieve({ limit: 2});
         await user.addContentToViewHistory(movieContentPG, 500);
  
      }
@@ -826,9 +826,9 @@ describe('MyStuff', function () {
 
         // Create a user with mix of little kids and non-little kid rated titles with history
   
-        const ContentTVG = await user.getContent().ofContentType(['series']).withRating('TV-G').retrieve({ limit: 6});
+        const ContentTVG = await user.getContent().ofContentType('series').withRating('TV-G').retrieve({ limit: 6});
         await user.addContentToWatchList(ContentTVG);
-        const ContentG = await user.getContent().ofContentType(['movie']).withRating('G').retrieve({ limit: 6});
+        const ContentG = await user.getContent().ofContentType('movie').withRating('G').retrieve({ limit: 6});
         await user.addContentToWatchList(ContentG);
 
      }
@@ -879,7 +879,7 @@ describe('MyStuff', function () {
 
          // Create a user with 3 titles in watch list
 
-         const ContentG = await user.getContent().ofContentType(['movie']).withRating('R').retrieve({ limit: 3});
+         const ContentG = await user.getContent().ofContentType('movie').withRating('R').retrieve({ limit: 3});
          await user.addContentToWatchList(ContentG);
 
       }

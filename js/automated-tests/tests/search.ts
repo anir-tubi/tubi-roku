@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { ecp, odc, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
 import { moveToGrid } from '../analytics/utils/helpers';
+import { shared } from '../shared';
 
 
 describe('Search', function () {
@@ -237,13 +238,7 @@ async function findContentPositionInGridByTitle({ title, gridId }) {
     }
     }
   
-  return position > -1 ? positionToRowCol(position) : [];
-}
-
-function positionToRowCol(position: number, columns: number = 5): [number, number] {
-  const row = Math.floor(position / columns);
-  const col = position % columns;
-  return [row, col];
+  return position > -1 ? shared.positionToRowCol(position) : [];
 }
 
 async function navigateToContentInSearchResults({ title }) {
