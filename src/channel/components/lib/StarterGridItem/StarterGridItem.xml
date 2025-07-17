@@ -25,9 +25,5 @@
       id="poster"
       loadingBitmapUri="pkg:/images/placeholder.webp"
       failedBitmapUri="pkg:/images/placeholder.webp" />
-    <Badge
-      id="sotBadge"
-      visible="false"
-      translation="[6, 6]"/>
   </children>
 </component>

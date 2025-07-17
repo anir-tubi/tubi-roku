@@ -1305,6 +1305,7 @@ Function formatBadge(text, badgeComponent, iconUri = "")
       badgeComponent.badgeTextFont = m.typographyConstants.ids.bodySmallStrong
       badgeComponent.text = text
     else if badgeComponent.id = m.sotMarker.id
+      badgeComponent.maxWidth = m.top.width
       badgeComponent.iconUri = iconUri
       badgeComponent.badgeTextFont = m.typographyConstants.ids.bodyMediumStrong
       badgeComponent.text = text

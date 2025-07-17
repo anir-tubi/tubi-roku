@@ -117,9 +117,13 @@ Function listen()
         m.experimentsInfo.append(experimentsInfo)
       else if field = "newSoTStaticConfig"
         soTStaticConfig = msg.getData()
-        for each key in soTStaticConfig
-          m.soTStaticConfig[key] = soTStaticConfig[key]
+        for each key in m.soTStaticConfig
+          if soTStaticConfig[key] = invalid
+            m.soTStaticConfig.delete(key)
+          end if
         end for
+
+        m.soTStaticConfig.append(soTStaticConfig)
       else
         conditionallyProcessAuthUpdatedMessage(msg)
       end if

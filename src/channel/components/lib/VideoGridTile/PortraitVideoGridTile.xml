@@ -22,10 +22,5 @@
       uri="pkg:/images/placeholder-featured.webp"
       loadingBitmapUri="pkg:/images/placeholder-featured.webp"
       failedBitmapUri="pkg:/images/placeholder-featured.webp" />
-    <Badge
-      id="sotBadge"
-      visible="false"
-      badgeTextWidth="80"
-      translation="[6, 6]"/>
   </children>
 </component>

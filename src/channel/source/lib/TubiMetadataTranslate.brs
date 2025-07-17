@@ -361,7 +361,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
   sotCustomization = {}
   if isAA(container) = true OR isNode(container) = true
-    sotCustomization = container.childUICustomization
+    sotCustomization = container.child_ui_customization
   end if
 
   if isAA(sotCustomization) = true AND sotCustomization.count() > 0 AND isAA(m.soTStaticConfig) = true AND m.soTStaticConfig.count() > 0
@@ -1233,7 +1233,7 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
 
   if isAA(container.child_ui_customization) = true
     translated.update({
-      childUICustomization: container.child_ui_customization
+      child_ui_customization: container.child_ui_customization 'child_ui_customization is the not camel case because we are trying to store the container filed as is field name
     }, true)
   end if
 
@@ -1449,7 +1449,7 @@ Function tubiMetadataTranslate_buildCategoryParentInfo(container, sOrientation =
       state: "partial"
       gridItemType: ""
       subtext: ""
-      childUICustomization: container.child_ui_customization
+      child_ui_customization: container.child_ui_customization 'child_ui_customization is the not camel case because we are trying to store the container filed as is in field name
     }
 
     if m.experiments <> invalid

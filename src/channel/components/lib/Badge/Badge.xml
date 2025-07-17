@@ -12,12 +12,12 @@
     <field id="textColor" type="string" alias="BadgeText.color"/>
     <field id="iconUri" type="string"/>
     <field id="text" type="string"/>
-    <field id="width" type="integer" alias="BadgeBackground.width"/>
-    <field id="badgeTextWidth" type="integer" alias="BadgeText.width"/>
+    <field id="width" type="float" alias="BadgeBackground.width"/>
+    <field id="badgeTextWidth" type="float" alias="BadgeText.width"/>
     <field id="showBackground" alias="BadgeBackground.visible" value="true" />
     <!-- This field is used to set the font style/size of the badge text when showBackground is false. Values can be any typographyConstants ids. -->
     <field id="badgeTextFont" type="string" />
-    <field id="maxWidth" type="integer" />
+    <field id="maxWidth" type="float" />
   </interface>
 
   <children>

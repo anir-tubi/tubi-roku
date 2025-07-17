@@ -38,6 +38,8 @@ Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel, isHome
 
     if isAA(sotInfo.sotMarkers) = true
       infoPanel.sotMarkers = sotInfo.sotMarkers
+    else
+      infoPanel.sotMarkers = {}
     end if
   else
     infoPanel.sotTopLabelSignals = []

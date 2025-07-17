@@ -1,6 +1,5 @@
 Function init()
   m.poster = m.top.findNode("poster")
-  m.sotBadge = m.top.findNode("sotBadge")
 
   m.top.observeFieldScoped("itemContent", "onItemContentChange")
   ' List of fields that will only be observed if we have a child grid item component with that field
@@ -50,12 +49,20 @@ Function init()
     parent = parent.getParent()
   end for
 
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "setThemeColors")
+  end if
+
   setThemeColors()
 End Function
 
 
-Function setThemeColors()
-  theme = getThemeFromGlobal()
+Function setThemeColors(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
 
   if theme <> invalid
     m.focusedTextColor = theme.focusedTextColor
@@ -144,15 +151,20 @@ Function onItemContentChange(msg)
 
       end if
     end if
-  end if
 
-  'Adding the Badge info on the poster. Currently we are not adding the badge for linear content. It might be added in future.
-
-  sotPosterLabels = itemContent.sotPosterLabels
-  if itemContent.type <> "linear" AND isAA(sotPosterLabels) = true AND sotPosterLabels.count() > 0
-    badgeUri = sotPosterLabels.sotIcon
-    badgeText =  sotPosterLabels.sotLabelText
-    setSotBadge(badgeUri, badgeText)
+    'Adding the Badge info on the poster. Currently we are not adding the badge for linear content. It might be added in future.
+    sotPosterLabels = itemContent.sotPosterLabels
+    ' this is to avoid rowlist reusing the same badge without adjusting to the new text.
+    if m.sotBadge <> invalid
+      m.top.removeChild(m.sotBadge)
+      m.sotBadge = invalid
+    end if
+    
+    if itemContent.type <> "linear" AND isAA(sotPosterLabels) = true AND sotPosterLabels.count() > 0
+      badgeUri = sotPosterLabels.sotIcon
+      badgeText =  sotPosterLabels.sotLabelText
+      setSotBadge(badgeUri, badgeText)
+    end if
   end if
 
   m.parentScreenId = ""
@@ -223,13 +235,19 @@ End Function
 
 Function setSotBadge(badgeUri, badgeText)
   if isNonEmptyString(badgeUri) = true AND isNonEmptyString(badgeText) = true
+    if m.sotBadge = invalid
+      m.sotBadge = createObject("roSGNode", "Badge")
+      m.sotBadge.id="sotBadge"
+      m.sotBadge.translation=[6, 6]
+    end if
+
     m.sotBadge.textColor = m.focusedTextColor
     m.sotBadge.iconUri = badgeUri
     m.sotBadge.maxWidth = m.poster.width - 12
     m.sotBadge.text = badgeText
     m.sotBadge.visible = true
-  else
-    m.sotBadge.visible = false
+    m.top.appendChild(m.sotBadge)
+  
   end if
 End Function
 
