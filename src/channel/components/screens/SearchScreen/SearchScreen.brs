@@ -768,21 +768,12 @@ Function onItemFocused(msg)
 
       sotInfo = focusedContent.sotInfo
       if isAA(sotInfo) = true
-        if isArray(sotInfo.sotMetaDataTopLabels) = true
-          m.searchScreenInfoPanel.sotTopLabelSignals = sotInfo.sotMetaDataTopLabels
-        end if
-
-        if isNonEmptyArray(sotInfo.sotMetaData) = true
-          lineTwoData.sotMetaData = sotInfo.sotMetaData
-        end if
-
-        if isAA(sotInfo.sotMarkers) = true
-          m.searchScreenInfoPanel.sotMarkers = sotInfo.sotMarkers
-        else
-          m.searchScreenInfoPanel.sotMarkers = {}
-        end if
+        m.searchScreenInfoPanel.sotTopLabelSignals = sotInfo.sotMetaDataTopLabels
+        lineTwoData.sotMetaData = sotInfo.sotMetaData
+        m.searchScreenInfoPanel.sotMarkers = sotInfo.sotMarkers
       else
         m.searchScreenInfoPanel.sotTopLabelSignals = []
+        lineTwoData.sotMetaData = []
         m.searchScreenInfoPanel.sotMarkers = {}
       end if
     end if

@@ -28,21 +28,12 @@ Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel, isHome
 
   sotInfo = content.sotInfo
   if isAA(sotInfo) = true
-    if isArray(sotInfo.sotMetaDataTopLabels) = true
-      infoPanel.sotTopLabelSignals = sotInfo.sotMetaDataTopLabels
-    end if
-
-    if isNonEmptyArray(sotInfo.sotMetaData) = true
-      lineTwoData.sotMetaData = sotInfo.sotMetaData
-    end if
-
-    if isAA(sotInfo.sotMarkers) = true
-      infoPanel.sotMarkers = sotInfo.sotMarkers
-    else
-      infoPanel.sotMarkers = {}
-    end if
+    infoPanel.sotTopLabelSignals = sotInfo.sotMetaDataTopLabels
+    lineTwoData.sotMetaData = sotInfo.sotMetaData
+    infoPanel.sotMarkers = sotInfo.sotMarkers
   else
     infoPanel.sotTopLabelSignals = []
+    lineTwoData.sotMetaData = []
     infoPanel.sotMarkers = {}
   end if
 

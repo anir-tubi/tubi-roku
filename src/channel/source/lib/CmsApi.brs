@@ -318,6 +318,8 @@ Function cmsApi_createMiniHomeScreenOnPlayerReqInfo(bKidsMode = false, passedOpt
     params["utm_campaign_config"] = utmCampaignConfig
   end if
 
+  params["include_ui_customization"] = true
+
   if passedOptions <> invalid
     if passedOptions.params <> invalid
       params.append(passedOptions.params)
