@@ -929,7 +929,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent, shouldUpdateEpisodeSc
     end if
 
 
-    if detailScreen <> invalid AND isAA(detailScreen.playbackSource) = true AND detailScreen.playbackSource.srcForAds = "deeplink" AND getExperimentResource("roku_ymal_only_deeplink", "roku_ymal_only_deeplink_v1", true).enabled = true
+    if detailScreen <> invalid AND isAA(detailScreen.playbackSource) = true AND detailScreen.playbackSource.srcForAds = "deeplink"
       detailScreen.focusRelatedContent = true
     end if
 

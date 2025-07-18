@@ -1356,7 +1356,6 @@ Function isItemInMenu(item)
 End Function
 
 
-' This function will be deleted once we have done with roku_ymal_only_deeplink. We will not graduate this experiment
 Function onFocusRelatedContent()
   tubiLog("DetailScreen.onFocusRelatedContent")
   if m.top.focusRelatedContent = true AND m.top.isInKidsMode = false AND m.RelatedGrid.content <> invalid AND m.RelatedGrid.content.getChildCount() > 0
