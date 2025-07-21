@@ -49,9 +49,6 @@ Function adjustBadgeSize()
     
     ' Recalculate width after constraining text
     badgeInfoLayoutWidth = m.badgeInfoLayout.boundingRect().width
-  else
-    ' Reset text width if no constraint or constraint not exceeded
-    m.badgeText.width = 0
   end if
 
   xAxis = 0
