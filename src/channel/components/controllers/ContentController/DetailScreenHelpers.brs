@@ -92,6 +92,13 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     ' We expect to overwrite this in populateDetailScreen() which occurs after the full info has been fetched from the /content API
     detailScreen.content = content
 
+    sotInfo = content.sotInfo
+    if isAA(sotInfo) = true
+      detailScreen.sotTopLabelSignals = sotInfo.sotMetaDataTopLabels
+      detailScreen.sotMetaData = sotInfo.sotMetaData
+      detailScreen.sotMarkers = sotInfo.sotMarkers
+    end if
+
     ' waiting to populate the details screen for series until after we fetch episode data
     if m.deepLinkContent <> invalid or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video AND content.seriesId <> invalid AND content.seriesId <> "")
       detailScreen.isLoading = true
@@ -366,6 +373,14 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
       lineOneData.availabilityEnds = episode.availabilityEnds
     end if
 
+    ' Refresh the SoT info panel after the content is fetched. SoT info is not part of the Content, so we need to refresh it here.
+    sotTopLabelSignals = detailScreen.sotTopLabelSignals
+    sotMetaData = detailScreen.sotMetaData
+    sotMarkers = detailScreen.sotMarkers
+
+    detailScreen.sotTopLabelSignals = sotTopLabelSignals
+    lineTwoData.sotMetaData = sotMetaData
+
     detailScreen.title = content.title
     detailScreen.description = stateSource.description
     detailScreen.lineOneData = lineOneData
@@ -379,6 +394,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     else
       detailScreen.needsLoginHint = false
     end if
+    detailScreen.sotMarkers = sotMarkers
 
     detailScreen.infoPanelVisible = true
 

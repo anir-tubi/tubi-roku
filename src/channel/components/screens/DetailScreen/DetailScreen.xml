@@ -149,6 +149,11 @@
       <!-- We have to create a field due to renderTracking events being async each itemComponent should be aware of what the mode was when it rendered. -->
       <field id="shouldTrackViewableImpressionEvent" type="boolean" value="true" />
 
+      <!-- Sot on info panel -->
+      <field id="sotMarkers" alias="DetailInfoPanel.sotMarkers" />
+      <field id="sotMetaData" alias="DetailInfoPanel.sotMetaData" />
+      <field id="sotTopLabelSignals" alias="DetailInfoPanel.sotTopLabelSignals" />
+
     <!-- OUTPUTS -->
 
       <!-- Should the full description be displayed -->

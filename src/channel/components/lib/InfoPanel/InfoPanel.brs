@@ -399,21 +399,22 @@ Function setSoTSignal(signals, signalType, badgeGroup, iconRequired = true)
 
   for each signal in signals
     if isNonEmptyString(signal.sotLabelText) = true
-      badge = badgeGroup.createChild("Badge")
+      badge = createObject("roSGNode", "Badge")
       badge.backgroundColor = theme.neutralColor
       badge.textColor =  theme.primaryTextColor
       if iconRequired = true AND isNonEmptyString(signal.sotIcon) = true
         badge.iconUri = signal.sotIcon
       end if
 
-      if signalType = m.BadgeTypes.sotMetaData
-        badge.showBackground = false
-        badge.badgeTextFont = m.typographyConstants.ids.bodySmallStrong
-      end if
+        if signalType = m.BadgeTypes.sotMetaData
+          badge.showBackground = false
+          badge.badgeTextFont = m.typographyConstants.ids.bodySmallStrong
+        end if
 
-      badge.text = signal.sotLabelText
+        badge.text = signal.sotLabelText
+
+      badgeGroup.appendChild(badge)
     end if
-
   end for
 
 End Function
@@ -1073,6 +1074,7 @@ Function onModeChange()
   else if m.top.mode = m.constants.ui.infoPanelModes.movie
     ' used for movies on the details screen
     m.infoPanelGroup.appendChild(m.offset)
+    m.offset.appendChild(m.sotTopLabelGroup)
     m.offset.appendChild(m.title)
     m.offset.appendChild(m.twoLineInfo)
     m.offset.appendChild(m.descriptionGroup)
@@ -1095,6 +1097,7 @@ Function onModeChange()
   else if m.top.mode = m.constants.ui.infoPanelModes.series
     ' used for episodes/series on the details screen
     m.infoPanelGroup.appendChild(m.offset)
+    m.offset.appendChild(m.sotTopLabelGroup)
     m.offset.appendChild(m.title)
     m.offset.appendChild(m.episode)
     m.offset.appendChild(m.twoLineInfo)
