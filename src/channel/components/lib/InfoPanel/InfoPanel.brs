@@ -398,19 +398,21 @@ Function setSoTSignal(signals, signalType, badgeGroup, iconRequired = true)
   theme = m.theme
 
   for each signal in signals
-    badge = badgeGroup.createChild("Badge")
-    badge.backgroundColor = theme.neutralColor
-    badge.textColor =  theme.primaryTextColor
-    if iconRequired = true AND isNonEmptyString(signal.sotIcon) = true
-      badge.iconUri = signal.sotIcon
-    end if
+    if isNonEmptyString(signal.sotLabelText) = true
+      badge = badgeGroup.createChild("Badge")
+      badge.backgroundColor = theme.neutralColor
+      badge.textColor =  theme.primaryTextColor
+      if iconRequired = true AND isNonEmptyString(signal.sotIcon) = true
+        badge.iconUri = signal.sotIcon
+      end if
 
-    if signalType = m.BadgeTypes.sotMetaData
-      badge.showBackground = false
-      badge.badgeTextFont = m.typographyConstants.ids.bodySmallStrong
-    end if
+      if signalType = m.BadgeTypes.sotMetaData
+        badge.showBackground = false
+        badge.badgeTextFont = m.typographyConstants.ids.bodySmallStrong
+      end if
 
-    badge.text = signal.sotLabelText
+      badge.text = signal.sotLabelText
+    end if
 
   end for
 
