@@ -185,9 +185,9 @@
 
       <InfoPanel
         id="InfoPanel"
-        translation="[0,130]"
+        translation="[0,105]"
         visible="false"
-        maxHeight="354"
+        maxHeight="387"
         maxTitleLines="2"/>
       <MaskGroup
         id="ContentArea"

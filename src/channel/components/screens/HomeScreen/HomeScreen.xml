@@ -186,9 +186,9 @@
         id="InfoPanelParent">
         <InfoPanel
           id="InfoPanel"
-          maxHeight="354"
+          maxHeight="387"
           width="960"
-          translation="[0,130]"
+          translation="[0,105]"
           maxTitleLines="2"/>
       </Group>
 

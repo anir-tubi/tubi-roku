@@ -130,8 +130,8 @@
         <InfoPanel
           id="ChannelsInfoPanel"
           mode="item"
-          translation="[0,165]"
-          maxHeight="355"
+          translation="[0,105]"
+          maxHeight="387"
           maxTitleLines="2"
           opacity="0"/>
         <CategoryGridRowLabel
