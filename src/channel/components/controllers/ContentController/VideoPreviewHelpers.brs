@@ -44,7 +44,15 @@ Function stopVideoPreview(node = invalid)
     node = m.videoPreviewPlayer
   end if
 
-  if node <> invalid AND node.subType() = "VideoPreviewPlayer"
+  ' TODO: Remove if we do not graduate roku_home_screen_redesign_v_1_3 experiment.
+  ' This is needed to provide smooth scrolling experience when the user is scrolling the list because calling video stop causes glitchy behavior.
+  isListScrolling = false
+  screen = getCurrentScreen()
+  if screen <> invalid AND screen.hasField("featuredListScrollingStatus") = true
+    isListScrolling = screen.featuredListScrollingStatus
+  end if
+
+  if node <> invalid AND node.subType() = "VideoPreviewPlayer" AND isListScrolling = false
     sendVideoPlayerCommand(node, "stop")
     node.visible = false
   end if
@@ -53,9 +61,7 @@ End Function
 
 Function onPauseVideoPreview()
   tubiLog("VideoPreviewHelpers.onPauseVideoPreview")
-  isHomeScreenRedesignForFeaturedEnabled = (getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false).design_type <> "none")
-
-  if isHomeScreenRedesignForFeaturedEnabled = true
+  if m.isUserInVideoTilesExperiment = true
     m.inlineVideoMetadataOverlay.showContentPoster = true
   end if
 
@@ -87,9 +93,7 @@ Function onVideoPreviewStateChanged(msg)
       m.inlineVideoMetadataOverlay.showContentPoster = true
       pauseVideoPreview()
     else
-      isHomeScreenRedesignForFeaturedEnabled = (getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false).design_type <> "none")
-
-      if currentScreen.featuredListHasFocus = false AND isHomeScreenRedesignForFeaturedEnabled = true
+      if currentScreen.featuredListHasFocus = false AND m.isUserInVideoTilesExperiment = true
         m.inlineVideoMetadataOverlay.showContentPoster = true
       else
         m.inlineVideoMetadataOverlay.showContentPoster = false
@@ -233,8 +237,7 @@ Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
       videoContent.previewId = ""
     end if
 
-    experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
-    if isKidsUIOn() = false AND content.parentId = experiment.container_id AND (experiment.design_type <> "none")
+    if isKidsUIOn() = false AND m.isUserInVideoTilesExperiment = true
       videoContent.addField("parentCategory", "string", false)
       videoContent.parentCategory = content.parentId
     end if
@@ -242,7 +245,7 @@ Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
     videoPreview.content = videoContent
     videoPreview.updateContent = true
 
-    if isKidsUIOn() = false AND content.parentId = experiment.container_id AND experiment.design_type = "withDescriptionPortraitSmall"
+    if isKidsUIOn() = false AND m.isUserInVideoTilesExperiment = true
       m.videoPreviewPlayer.videoPlayerType = "VIDEO_IN_GRID"
     else
       m.videoPreviewPlayer.videoPlayerType = "BANNER"
@@ -416,15 +419,21 @@ End Function
 
 Function updatePlayerLayoutBasedOnFocusedContent(content)
   currentScreen = getCurrentScreen()
-  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
   ' If the experiment is enabled and focused content is from featured row than expand preview to full screen.
   if content.gridItemType = m.constants.ui.gridItemTypes.skinAd
     ' Reducing 1px from both width and height since the player is in background and keeping full width causes roku to display closed captioning overlay.
     ' To avoid any other Roku OS level default behavior from kicking in reducing 1px to give a impression that player is not in full screen.
     updatePreviewPlayerToFullScreen()
-  else if isKidsUIOn() = false AND (content.tileDesignType = "withDescriptionPortraitSmall" OR (experiment.design_type = "withDescriptionPortraitSmall" AND content.parentId = experiment.container_id AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen))
+  else if isKidsUIOn() = false AND (content.tileDesignType = "withDescriptionPortraitSmall" OR (m.isUserInVideoTilesExperiment = true AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen))
     updatePreviewPlayerToInlineView()
   else
     updatePreviewPlayerToCondensedView()
   end if
+End Function
+
+
+' isVideoPreviewPlaying checks if the video preview is playing
+' returns true if the video preview is playing, false otherwise
+Function isVideoPreviewPlaying()
+  return getVideoPreviewState() = "playing"
 End Function

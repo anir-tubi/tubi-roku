@@ -91,7 +91,11 @@ Function onItemContentChange(msg)
     else if gridItemType = "landscapeInnerMetadata" then
       childGridItemComponent = "CategoryGridPoster"
     else if gridItemType = "continue_watching_signed_out_user" then
-      childGridItemComponent = "CategoryGridPoster"
+      if row.useVideoTilesFormat = true
+        childGridItemComponent = "GuestUserContinueWatchingTile"
+      else
+        childGridItemComponent = "CategoryGridPoster"
+      end if
     else if gridItemType = "linear" then 'For any linear content use CategoryGridPoster to add badges/progress bar etc
       childGridItemComponent = "CategoryGridLinearPoster"
     else if gridItemType = "portraitTopTen"

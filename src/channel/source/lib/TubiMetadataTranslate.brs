@@ -1453,11 +1453,11 @@ Function tubiMetadataTranslate_buildCategoryParentInfo(container, sOrientation =
     }
 
     if m.experiments <> invalid
-      experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4")
+      experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_3")
       tileDesignType = experiment.design_type
-      isHomescreenRedesignExperiementEnabled = (tileDesignType <> "none") AND uiMode = "standard"
+      isUserInVideoTilesExp = (tileDesignType = "withDescriptionPortraitSmall") AND uiMode = "standard"
 
-      if isHomescreenRedesignExperiementEnabled = true
+      if isUserInVideoTilesExp = true
         updateMetadata.gridItemSize = experiment.gridItemSize
         updateMetadata.featuredRowPosterSize = experiment.featuredRowPosterSize
       end if
@@ -1573,13 +1573,11 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           end if
 
           tileDesignType = "none"
-          isHomescreenRedesignExperiementEnabled = false
-          experimentContainerId = "none"
+          isUserInVideoTilesExp = false
           if m.experiments <> invalid
-            experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4")
+            experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_3")
             tileDesignType = experiment.design_type
-            experimentContainerId = experiment.container_id
-            isHomescreenRedesignExperiementEnabled = (tileDesignType <> "none") AND uiMode = "standard"
+            isUserInVideoTilesExp = (tileDesignType = "withDescriptionPortraitSmall") AND uiMode = "standard"
           end if
 
           rottenTomatoScore = 0
@@ -1613,7 +1611,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
 
           end if
 
-          if container.id = experimentContainerId AND (isHomescreenRedesignExperiementEnabled = true)
+          if isUserInVideoTilesExp = true
             featuredLandscape = m.getRoundedCornersURL(m.getThumbnailImage(fullChild, m.constants.ui.gridItemTypes.landscapeWithMetadata))
             childAA = {
               id: fullChild.id
@@ -1869,6 +1867,14 @@ End Function
 Function tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA(container, bKidsMode = false)
   updateMetadata = {}
   if container <> invalid
+    ' Remove useVideoTilesFormat field irrespective of whether we graduate or not graduate the experiment.
+    ' Since this field is temporary since we need to support both formats for now.
+    useVideoTilesFormat = false
+    if m.experiments <> invalid
+      experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_3")
+      useVideoTilesFormat = (isAA(experiment) = true AND experiment.design_type = "withDescriptionPortraitSmall")
+    end if
+
     updateMetadata = {
       id: container.id
       slug: container.slug
@@ -1881,6 +1887,7 @@ Function tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA(cont
       state: "full"
       gridItemType: m.constants.ui.gridItemTypes.historySignedOutUser
       type: m.contentTypes.historySignedOutUser
+      useVideoTilesFormat: useVideoTilesFormat
     }
 
     jsonAA = {}
@@ -2028,26 +2035,28 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
   gridItemType = gridItemTypes.portrait
 
   tileDesignType = "none"
-  isHomescreenRedesignExperiementEnabled = false
+  isUserInVideoTilesExperiment = false
   experimentContainerId = "none"
   if m.experiments <> invalid
-    experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4")
+    experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_3")
     tileDesignType = experiment.design_type
     experimentContainerId = experiment.container_id
-    isHomescreenRedesignExperiementEnabled = (tileDesignType <> "none") AND uiMode = "standard"
+    isUserInVideoTilesExperiment = (tileDesignType = "withDescriptionPortraitSmall") AND uiMode = "standard"
   end if
 
-  if screenId = m.constants.ui.screenIds.homeScreen AND tileDesignType = "withDescriptionPortraitSmall" AND container.id = experimentContainerId AND isHomescreenRedesignExperiementEnabled = true AND (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
+  isContentModeHomeScreen = (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
+
+  if screenId = m.constants.ui.screenIds.homeScreen AND isUserInVideoTilesExperiment = true AND isContentModeHomeScreen
     gridItemType = gridItemTypes.featuredPortraitSmall
-  else if (tileDesignType = "controlReOrderContainers" AND container.id = experimentContainerId) AND isHomescreenRedesignExperiementEnabled = true AND (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
+  else if (tileDesignType = "controlReOrderContainers" AND container.id = experimentContainerId) AND isContentModeHomeScreen AND uiMode = "standard"
     gridItemType = gridItemTypes.landscape
-  else if tileDesignType <> "none" AND container.id = constants.ui.categoryIds.featured AND isHomescreenRedesignExperiementEnabled = true AND (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
+  else if tileDesignType = "withDescriptionPortraitSmall" AND isUserInVideoTilesExperiment = true AND isContentModeHomeScreen
     gridItemType = gridItemTypes.portrait
   else if container.type = constants.ui.categoryTypes.linear
     gridItemType = gridItemTypes.linear
   else if container.id = constants.ui.categoryIds.certifiedFresh
     gridItemType = gridItemTypes.certifiedFresh
-  else if container.id = constants.ui.categoryIds.featured AND orientation <> gridItemTypes.portrait
+  else if container.id = constants.ui.categoryIds.featured AND orientation <> gridItemTypes.portrait AND tileDesignType <> "controlReOrderContainers"
     ' `orientation <> gridItemTypes.portrait` is required as the search screen container.id is featured but uses portrait imagery
     gridItemType = gridItemTypes.landscapeNoTitle
   else if orientation = gridItemTypes.landscapeInnerMetadata

@@ -48,9 +48,9 @@ Function onThemeChange(msg = invalid)
     m.RatingLabel.color = theme.secondaryTextColor
     m.description.color = m.primaryTextColor
 
-    m.progressBar.focusColor = theme.focusedcolor
-    m.progressBar.trackColor = theme.neutralcolor
-    m.progressBar.unfocusColor = theme.focusedcolor
+    m.progressBar.focusColor = theme.focusedColor
+    m.progressBar.trackColor = theme.neutralColor
+    m.progressBar.unfocusColor = theme.focusedColor
   end if
 End Function
 
@@ -73,6 +73,9 @@ Function onItemContentChange(msg)
   itemContent = msg.getData()
 
   if itemContent <> invalid
+    ' Resetting the visibility of the rating and sot badge.
+    m.rating.visible = true
+    m.sotBadge.visible = true
     m.description.width = m.top.width
     if itemContent.type = m.constants.ui.contentTypes.linear
       setThumbnailImage(itemContent.thumbnailUri,  itemContent.type)
@@ -129,8 +132,13 @@ Function onItemContentChange(msg)
       end if
       
       m.description.text = itemContent.description
-  
-      metadataOnPosterContent(itemContent)
+      
+      categoryContent = itemContent.getParent()
+      if categoryContent <> invalid AND categoryContent.id = "continue_watching"
+        metadataOnContinueWatchingContent(itemContent)
+      else
+        metadataOnPosterContent(itemContent)
+      end if
     end if
   end if
 End Function
@@ -245,8 +253,41 @@ Function metadataOnPosterContent(itemContent)
   else
     m.closedCaptions.visible = false
   end if
-
 End Function
+
+
+Function metadataOnContinueWatchingContent(itemContent)
+  m.lineOneData.text = ""
+  m.closedCaptions.visible = false
+  m.rating.visible = false
+  ' Sot badge is will not be present in the continue watching content portrait mode.
+  ' Due to progress bar being present in the poster already.
+  m.sotBadge.visible = false
+
+  history = getHistory(itemContent.id)
+  nowPos = 0
+  if history <> invalid AND isNumber(history.nowPos) = true
+    nowPos = history.nowPos
+  end if
+  duration = itemContent.length
+  if nowPos > 0 AND isNumber(duration) = true AND duration > 0
+    percentage = nowPos / duration
+    m.progressBar.progress = (percentage * 100)
+    m.progressBar.visible = true
+
+    if m.progressBarGroup.getParent() = invalid
+      index = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.lineOneData)
+      timeLeft = getDurationHoursString(duration - nowPos)
+      if isNonEmptyString(timeLeft) = true
+        m.lineTwoData.text = timeLeft
+        m.firstLineGroup.insertChild(m.lineTwoData, index + 1)
+      end if
+
+      m.firstLineGroup.insertChild(m.progressBarGroup, index + 1)
+    end if
+  end if
+End Function
+
 
 Function metadataOnLivePosterContent(currentProgram, content)
   firstLineGroup = m.firstLineGroup

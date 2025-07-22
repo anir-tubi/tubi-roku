@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="GuestUserContinueWatchingTile" extends="Group" >
+  <script type="text/brightscript" uri="GuestUserContinueWatchingTile.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+
+  <interface>
+    <field id="itemContent" type="node" />
+    <field id="width" alias="border.width" />
+    <field id="height" alias="border.height" />
+    <field id="itemHasFocus" type="boolean" />
+    <field id="rowHasFocus" type="boolean" />
+  </interface>
+
+  <children>
+    <Poster
+      id="border"
+      uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+    />
+    <LayoutGroup
+      itemSpacings="[164]"
+      id="contentSection"
+      layoutDirection="horiz">
+      <LayoutGroup
+        itemSpacings="[15]">
+        <Label
+          id="title"
+          height="56"
+          vertAlign="center">
+          <Font
+            role="font"/>
+        </Label>
+        <Label
+          id="description"
+          width="654"
+          wrap="true"
+          vertAlign="center">
+          <Font
+            role="font"/>
+        </Label>
+      </LayoutGroup>
+      <LayoutGroup
+        horizAlignment="center"
+        itemSpacings="[15]">
+        <Label
+          id="subTitle"
+          height="56"
+          vertAlign="center">
+          <Font
+            role="font"/>
+        </Label>
+        <SimpleButton
+          isFilled="true"
+          id="signUpButton"/>
+      </LayoutGroup>
+    </LayoutGroup>
+  </children>
+</component>

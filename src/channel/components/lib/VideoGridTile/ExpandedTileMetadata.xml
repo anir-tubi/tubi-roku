@@ -21,8 +21,7 @@
   <children>
     <LayoutGroup
       id="metadataGroup"
-      horizAlignment="left"
-      itemSpacings="[12]">
+      horizAlignment="left">
 
       <LayoutGroup
         id="firstLineGroup"

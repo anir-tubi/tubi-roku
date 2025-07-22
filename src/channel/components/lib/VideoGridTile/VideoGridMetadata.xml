@@ -23,7 +23,7 @@
   <children>
     <Poster
       id="videoInGridGradient"
-      uri="pkg:/images/video_in_gri_gradient_$$RES$$.9.png"/>
+      uri="pkg:/images/video_in_grid_gradient_$$RES$$.9.png"/>
 
     <Poster
       id="logoBackground"

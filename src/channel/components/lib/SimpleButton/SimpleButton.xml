@@ -29,6 +29,7 @@
       <field id="isFilled" type="boolean" value="true" />
       <field id="text" type="String" />
       <field id="unfocusedBackgroundOpacity" type="float" value="0.17"/>
+      <field id="itemHasFocus" type="boolean" />
 
     <!-- OUTPUTS -->
       <field id="selected" type="boolean" alwaysNotify="true" />

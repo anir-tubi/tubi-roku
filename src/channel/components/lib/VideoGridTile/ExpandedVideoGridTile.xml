@@ -19,11 +19,12 @@
     <field id="height" alias="poster.height,videoGridMetadata.height, videoInGridGradient.height" />
     <field id="itemHasFocus" type="boolean" />
     <field id="showContentPoster" type="boolean" value="true" />
+    <field id="skipAnimation" type="boolean" />
   </interface>
 
   <children>
     <LayoutGroup
-      itemSpacings="[24]">
+      itemSpacings="[18]">
 
       <Group 
         id="posterGroup">
@@ -35,8 +36,9 @@
           failedBitmapUri="pkg:/images/placeholder-featured.webp" />
         <Poster
           id="videoInGridGradient"
+          translation="[0, 1]"
           loadDisplayMode="scaleToFill"
-          uri="pkg:/images/video_in_gri_gradient_$$RES$$.9.png"/>
+          uri="pkg:/images/video_in_grid_gradient_$$RES$$.9.png"/>
 
         <Poster
           id="titleImage"

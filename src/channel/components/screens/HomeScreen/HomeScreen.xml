@@ -113,6 +113,9 @@
 
       <field id="featuredListCurrFocusRow" alias="CategoryGridList.featuredListCurrFocusRow" />
 
+      <field id="featuredListScrollingStatus" alias="CategoryGridList.featuredListScrollingStatus" />
+      <field id="featuredListScrollDirection" alias="CategoryGridList.featuredListScrollDirection" />
+
       <!-- set to the contentNode of the CategoryGridList item which was clicked on -->
       <field id="contentSelected" type="node"/>
 
@@ -170,6 +173,7 @@
       <field id="featuredListHasFocus" alias="CategoryGridList.featuredListHasFocus" />
       
       <field id="currentFocusedItemBoundingRect" alias="CategoryGridList.currentFocusedItemBoundingRect" />
+      <field id="inTransitCurrentFocusedItemBoundingRect" alias="CategoryGridList.inTransitCurrentFocusedItemBoundingRect" />
       
       <!-- Communicates to parent what was the last focused list was. -->
       <field id="lastFocusedList" alias="CategoryGridList.lastFocusedList" />

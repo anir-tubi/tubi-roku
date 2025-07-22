@@ -1395,6 +1395,9 @@ Function getConstants()
 
       'Sizes of featured row  poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.featuredPortraitSmall = [310, 442]
+      
+      ' Size of guest user continue watching container.
+      constants.ui.imageSizes.guestContinueWatchingTile = [1613, 378]
 
       ' Size for the background image.
       if limitedUi = true
@@ -1497,6 +1500,12 @@ Function getConstants()
       constants.ui.gridItemTypes.skinAd = "skinAd"
       constants.ui.gridItemTypes.featuredPortraitSmall = "featuredPortraitSmall"
       constants.ui.gridItemTypes.certifiedFresh = "certifiedFresh"
+
+    ' Holds the container ids which are not video tile containers.
+    ' This will help us to avoid showing the expanded video tile.
+    ' We will include ads containers in this list in future.
+    constants.ui.nonVideoTileGridItemTypes = [constants.ui.gridItemTypes.historySignedOutUser]
+    constants.ui.videoTilesListTranslation = [0, 144]
 
     constants.ui.uris = {}
 

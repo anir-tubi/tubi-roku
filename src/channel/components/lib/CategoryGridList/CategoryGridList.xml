@@ -152,11 +152,14 @@
 
       <field id="currFocusRow" alias="RowList.currFocusRow" />
       <field id="currFocusColumn" alias="RowList.currFocusColumn" />
-      <field id="scrollingstatus" alias="RowList.scrollingstatus" />
+      <field id="scrollingStatus" alias="RowList.scrollingStatus" />
       <field id="rowHeights" alias="RowList.rowHeights" />
 
       <field id="featuredRowCurrFocusColumn" type="integer" />
       <field id="featuredListCurrFocusRow" alias="FeaturedRowList.currFocusRow" />
+      <field id="featuredListScrollingStatus" alias="FeaturedRowList.scrollingStatus" />
+      <field id="featuredListScrollDirection" type="string" value="none" />
+      <field id="featuredRowHeights" alias="FeaturedRowList.rowHeights" />
 
       <field id="featuredRowFocusedItem" type="node" />
 
@@ -171,6 +174,7 @@
 
       <field id="featuredListHasFocus" type="boolean" value="false" />
       <field id="currentFocusedItemBoundingRect" type="assocArray" value="{}" />
+      <field id="inTransitCurrentFocusedItemBoundingRect" type="assocArray" value="{}" />
       <field id="hideInfoPanel" type="boolean" alwaysNotify="true" />
 
       <field id="rowIndexBoost" type="integer" value="0" />
@@ -189,9 +193,9 @@
       itemComponentName="StarterGridItem"
       rowTitleComponentName="CategoryGridRowLabel"
       itemSize="[1752, 350]"
-      numRows="1"
+      numRows="2"
       rowItemSpacing="[[16,0]]"
-      rowLabelOffset="[[0, -12]]"
+      rowLabelOffset="[[0, 0]]"
       showRowCounter="[false]"
       drawFocusFeedback="false"
       rowFocusAnimationStyle="fixedFocus"

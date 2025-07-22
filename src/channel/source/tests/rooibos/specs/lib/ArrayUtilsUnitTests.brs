@@ -34,3 +34,10 @@ Function arrayUtils_insertItemIntoArray_test()
   m.assertEqual(expectedResult, newArray)
 
 End Function
+
+
+'@Test arrayIncludes unit tests
+Function arrayUtils_arrayIncludes_test()
+  m.assertEqual(arrayIncludes(["1", "2", "3"], "1"), true)
+  m.assertEqual(arrayIncludes(["1", "2", "3"], "4"), false)
+End Function

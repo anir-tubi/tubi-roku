@@ -15,6 +15,7 @@ Function init()
   m.top.observeFieldScoped("width", "onWidthChanged")
   m.top.observeFieldScoped("text", "onTextChanged")
   m.top.observeFieldScoped("isFilled", "onIsFilledChange")
+  m.top.observeFieldScoped("itemHasFocus", "onItemHasFocusChange")
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.label, typographyConstants.ids.bodyMediumStrong)
@@ -37,8 +38,11 @@ Function onThemeChange(msg = invalid)
 
   if theme <> invalid
     m.theme = theme
+    m.focusedColor = theme.focusedColor
+    m.primaryTextColor = theme.primaryTextColor
     m.label.color = theme.primaryTextColor
     m.originalColor = theme.unfocusedColor
+    m.focusedTextColor = theme.focusedTextColor
   end if
 End Function
 
@@ -94,14 +98,33 @@ End Function
 
 Function onScreenFocusChange()
   tubiLog("SimpleButton.onScreenFocusChange")
+  updateFocusState(m.top.hasFocus())
+End Function
 
-  if m.top.hasFocus() then
+
+Function onOpacityChanged()
+  if m.top.isFilled = false
+    m.focus9Patch.opacity = 1.0
+  else if m.top.hasFocus() = false
+    m.focus9Patch.opacity = m.top.unfocusedBackgroundOpacity
+  end if
+End Function
+
+' Allows us to override the background color when the 
+Function onItemHasFocusChange(msg)
+  itemHasFocus = msg.getData()
+  updateFocusState(itemHasFocus)
+End Function
+
+
+Function updateFocusState(isFocused = false)
+  if isFocused = true then
     if m.theme <> invalid
-      m.focus9Patch.blendColor = m.theme.focusedColor
+      m.focus9Patch.blendColor = m.focusedColor
       if m.top.isFilled = false
-        m.label.color = m.theme.primaryTextColor
+        m.label.color = m.primaryTextColor
       else
-        m.label.color = m.theme.focusedTextColor
+        m.label.color = m.focusedTextColor
       end if
     end if
     m.focus9Patch.opacity = 1.0
@@ -113,9 +136,7 @@ Function onScreenFocusChange()
       m.focus9Patch.blendColor = m.originalColor
     end if
 
-    if m.theme <> invalid
-      m.label.color = m.theme.primaryTextColor
-    end if
+    m.label.color = m.primaryTextColor
 
     if m.top.isFilled = false
       m.focus9Patch.opacity = 1.0
@@ -123,18 +144,6 @@ Function onScreenFocusChange()
       m.focus9Patch.opacity = m.top.unfocusedBackgroundOpacity
     end if
   end if
-
-End Function
-
-
-Function onOpacityChanged()
-
-  if m.top.isFilled = false
-    m.focus9Patch.opacity = 1.0
-  else if m.top.hasFocus() = false
-    m.focus9Patch.opacity = m.top.unfocusedBackgroundOpacity
-  end if
-
 End Function
 
 

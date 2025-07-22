@@ -59,11 +59,14 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.observeFieldScoped("eventCtaListItemSelected", "onEventCtaListItemSelected")
     homeScreen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
     homeScreen.observeFieldScoped("featuredRowCurrFocusColumn", "onFeaturedRowCurrFocusColumnChange")
+    homeScreen.observeFieldScoped("featuredListCurrFocusRow", "onFeaturedRowCurrFocusRowChange")
     homeScreen.observeFieldScoped("featuredRowFocusedItem", "onFeaturedRowFocusedItemChange")
     homeScreen.observeFieldScoped("featuredListHasFocus", "onFeaturedListHasFocusChange")
     homeScreen.observeFieldScoped("currCategoryId", "onCurrCategoryIdChange")
     homeScreen.observeFieldScoped("currentFocusedItemBoundingRect", "onFeaturedRowListTranslationChange")
     homeScreen.observeFieldScoped("featuredRowListTranslation", "onFeaturedRowListTranslationChange")
+    homeScreen.observeFieldScoped("featuredListScrollDirection", "onFeaturedListScrollDirectionChange")
+    homeScreen.observeFieldScoped("featuredListScrollingStatus", "onFeaturedListScrollingStatusChange")
 
     m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop listening to timer before listing to it in case a previous screen started the timer
     m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
@@ -126,8 +129,7 @@ End Function
 Function processHomeScreenBatchResponse(response, screenId)
   homeScreen = getFromScreenCache(screenId)
   if homeScreen <> invalid
-    experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
-    if isKidsUIOn() = false AND experiment.design_type = "withDescriptionPortraitSmall" AND isNode(response) = true AND response.getChildCount() > 0 AND homeScreen.contentMode = m.constants.ui.contentMode.homescreen
+    if isKidsUIOn() = false AND m.isUserInVideoTilesExperiment = true AND isNode(response) = true AND response.getChildCount() > 0 AND homeScreen.contentMode = m.constants.ui.contentMode.homescreen
       updateCategoryGridWithFeaturedList(response, homeScreen)
     end if
     homeScreen.batchResponse = response
@@ -190,7 +192,15 @@ Function onReloadUserCategoriesInHomeScreen(response, screenID = "")
   homeScreen = getFromScreenCache(screenID)
 
   if homeScreen <> invalid
-    if homeScreen.content <> invalid
+    ' For video tiles experiment, we need to update the featured row content.
+    ' Since all the rows will be using new video tiles format.
+    if m.isUserInVideoTilesExperiment = true
+      content = homeScreen.featuredRowContent
+    else
+      content = homeScreen.content
+    end if
+
+    if content <> invalid
       newCategory = invalid
       oldCategory = invalid
 
@@ -199,7 +209,7 @@ Function onReloadUserCategoriesInHomeScreen(response, screenID = "")
           newCategory = response
         end if
 
-        oldCategory = homeScreen.content.findNode(response.id)
+        oldCategory = content.findNode(response.id)
       end if
 
       homeScreen.rowAdded = ""
@@ -212,7 +222,7 @@ Function onReloadUserCategoriesInHomeScreen(response, screenID = "")
       ' 4) new category doesn't have content (will be invalid), old category doesn't exist - do nothing
       if newCategory <> invalid AND oldCategory <> invalid
         'replace old category with new category
-        homeScreen.content.replaceChild(newCategory, m.NodeHelpers.getChildIndex(homeScreen.content, oldCategory))
+        content.replaceChild(newCategory, m.NodeHelpers.getChildIndex(content, oldCategory))
         homeScreen.repopulateContent = true
       else if newCategory <> invalid AND oldCategory = invalid
         'add new category
@@ -221,7 +231,6 @@ Function onReloadUserCategoriesInHomeScreen(response, screenID = "")
         if newCategory.id = m.constants.ui.categoryIds.queue OR newCategory.id = m.constants.ui.categoryIds.history then
           homeScreen.rowAdded = newCategory.id
 
-          content = homeScreen.content
           if newCategory.id = m.constants.ui.categoryIds.queue then
             insertIndex = content.queueIndex
           else
@@ -252,7 +261,7 @@ Function onReloadUserCategoriesInHomeScreen(response, screenID = "")
         end if
 
         'remove old category
-        homeScreen.content.removeChild(oldCategory)
+        content.removeChild(oldCategory)
 
         homeScreen.repopulateContent = true '//In case the rows are of different heights, tell homescreen to refresh to display rows correctly
       else if newCategory = invalid AND oldCategory = invalid
@@ -430,19 +439,24 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     homeScreen.personalizationId = rawResponse.personalizationId
     homeScreen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
 
-    experiment = invalid
-
     if isKidsUIOn() = false AND screenID = m.constants.ui.screenIds.homeScreen
-      experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", true)
-      containerRow = m.nodeHelpers.getChildById(rawResponse, experiment.container_id)
-      redesignRow = containerRow
+      ' Below logic is for the control reorder containers experiment.
+      ' For now we are using for swapping featured row and recommended row.
+      experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_3", true)
+      isUserInControlReOrderContainersExperiment = (experiment <> invalid AND experiment.design_type = "controlReOrderContainers")
+      if isUserInControlReOrderContainersExperiment = true
+        containerToBeReOrdered = m.nodeHelpers.getChildById(rawResponse, experiment.container_id)
+        rawResponse.removeChild(containerToBeReOrdered)
+        rawResponse.insertChild(containerToBeReOrdered, 0)
+      end if
 
-      rawResponse.removeChild(containerRow)
-      rawResponse.insertChild(redesignRow, 0)
-    end if
-
-    if isAA(experiment) = true AND (experiment.design_type = "withDescriptionPortraitSmall") AND isNode(rawResponse) = true AND rawResponse.getChildCount() > 0 AND homeScreen.id = m.constants.ui.screenIds.homescreen
-      updateCategoryGridWithFeaturedList(rawResponse, homeScreen)
+      if m.isUserInVideoTilesExperiment = true AND isNode(rawResponse) = true AND rawResponse.getChildCount() > 0
+        m.videoTileOverlayGroup.visible = true
+        updateCategoryGridWithFeaturedList(rawResponse, homeScreen)
+        rawResponse = invalid
+      end if
+    else
+      m.videoTileOverlayGroup.visible = false
     end if
 
     homeScreen.content = rawResponse
@@ -713,10 +727,9 @@ End Function
 ' @contentNode, roSGNode, the content node to append the content to.
 ' @rowFocused, integer, the row index of the category that is focused.
 Function appendContentToCategory(response, contentNode, rowFocused)
-  category = contentNode.getChild(rowFocused)
   category = m.NodeHelpers.getChildById(contentNode, response.id)
   items = response.getChildren(-1, 0)
-  if isNonEmptyArray(items) = true
+  if isNonEmptyArray(items) = true AND category <> invalid
     fullJson = ParseJson(category.json)
     newJson = ParseJson(response.json)
     if fullJson <> invalid AND newJson <> invalid
@@ -1213,15 +1226,82 @@ Function onHomeScreenContentUpdateComplete(screenId)
 End Function
 
 
+' Fade in and out the focus indicator when the user is scrolling through the rows.
+' Provides similar better as row list fadeFocusWhileScrolling experience.
+' @param msg: roSGNode, the message object.
+Function onFeaturedRowCurrFocusRowChange(msg)
+  currFocusRow = msg.getData()
+  m.inlineVideoMetadataOverlay.skipAnimation = true
+  ' Avoid the focus indicator from being shown when the row is scrolling.
+  ' Start fade in when the user is half way through the scroll.
+  if currFocusRow = CInt(currFocusRow)
+    fade(m.inlinePreviewFocusIndicator, "in", 0.1)
+  else if m.inlinePreviewFocusIndicator.opacity = 1
+    fade(m.inlinePreviewFocusIndicator, "out", 0.1)
+  end if
+End Function
+
+
+' Triggers a callback when list has started and stopped scrolling through the rows.
+' @param msg: roSGNode, the message object.
+Function onFeaturedListScrollingStatusChange(msg)
+  scrollingStatus = msg.getData()
+  ' Below logic helps to avoid us from updating the in transit video metadata overlay when the user is scrolling up or down.
+  if scrollingStatus = false
+    updateInTransitVideoMetadataOverlay()
+    if isVideoPreviewPlaying() = true
+      stopVideoPreview()
+    end if
+  end if
+End Function
+
+
+' Updates the in transit video metadata overlay when the user is scrolling up or down.
+Function updateInTransitVideoMetadataOverlay()
+  screen = getCurrentScreen()
+  ' Avoid the focus indicator from being shown when the row is scrolling.
+  if screen <> invalid AND isNode(screen.featuredRowContent) = true
+    currFocusRow = screen.featuredListCurrFocusRow
+    category = screen.featuredRowContent.getChild(currFocusRow)
+    columnFocused = 0
+    if category <> invalid AND isNumber(category.focusIndex) = true AND category.focusIndex > 0
+      columnFocused = category.focusIndex
+    end if
+    updateVideoTileOnFocusChange(currFocusRow, columnFocused, screen)
+  end if
+End Function
+
+
+' Triggers a callback when the user is scrolling through the columns of the row.
 Function onFeaturedRowCurrFocusColumnChange()
+  m.inlineVideoMetadataOverlay.skipAnimation = false
   m.videoPreviewDebounce.control = "stop"
   screen = getCurrentScreen()
-  columnFocused = screen.featuredRowCurrFocusColumn
-  if isNumber(columnFocused) = false OR columnFocused < 0
-    columnFocused = 0
-  end if
+  if screen <> invalid
+    columnFocused = screen.featuredRowCurrFocusColumn
+    if isNumber(columnFocused) = false OR columnFocused < 0
+      columnFocused = 0
+    end if
 
+    rowFocused = screen.featuredListCurrFocusRow
+    updateVideoTileOnFocusChange(rowFocused, columnFocused, screen)
+
+    ' Calling lazy load for the next batch of items.
+    if isNumber(columnFocused) = true AND isNumber(rowFocused) = true AND screen.featuredRowContent <> invalid
+      category = screen.featuredRowContent.getChild(rowFocused)
+      makeContainerRequest(category, columnFocused, screen, onVideoTilesListMoreItemsSuccess)
+    end if
+  end if
+End Function
+
+
+' Updates the video tile metadata overlay on focus change.
+' @param rowFocused: int, the row index of the focused item.
+' @param columnFocused: int, the column index of the focused item.
+' @param screen: roSGNode, the screen node.
+Function updateVideoTileOnFocusChange(rowFocused, columnFocused, screen)
   ' Only process if the screen is the home screen.
+  ' Since all others screens are using topRight background variant vs home screen will use full screen background.
   if isCurrentScreenHomeScreen() = true
     displayDefaultBackground()
   end if
@@ -1234,7 +1314,10 @@ Function onFeaturedRowCurrFocusColumnChange()
       end if
       m.videoPreviewPlayer.visible = false
       if getVideoPreviewState() = "playing"
-        stopVideoPreview()
+        ' Gives better scrolling experience if we pause the video preview.
+        ' We are calling stopVideoPreview once we are done with scrolling.
+        ' We are pausing to avoid audio from playing in the background when user is scrolling.
+        pauseVideoPreview()
       end if
     end if
     isLinearPlayerPlaying = isLinearPlayerLoadingOrPlaying()
@@ -1245,25 +1328,18 @@ Function onFeaturedRowCurrFocusColumnChange()
       stopAndHideLinearVideoPlayer()
     end if
     m.inlineVideoPreviewPlayerContainer.opacity = 1
-    setInlineVideoMetadataOverlay(columnFocused, screen.featuredRowContent)
-
-    ' Calling lazy load for the next batch of items.
-    if isNumber(columnFocused) = true AND screen.featuredRowContent <> invalid AND screen.featuredListCurrFocusRow <> invalid
-      category = screen.featuredRowContent.getChild(screen.featuredListCurrFocusRow)
-      makeContainerRequest(category, columnFocused, screen, onVideoTilesListMoreItemsSuccess)
-    end if
+    setInlineVideoMetadataOverlay(screen.featuredRowContent, columnFocused, rowFocused)
   end if
-
 End Function
 
 
+' Starts the inline preview when the featured row list has focus.
 Function startFeaturedInlinePreview()
   screen = getCurrentScreen()
   if isCurrentScreenHomeScreen() = true AND screen.featuredListHasFocus = true
     stopAndHideLinearVideoPlayer()
     if screen.featuredRowContent <> invalid AND screen.featuredRowFocusedItem <> invalid
       content = screen.featuredRowFocusedItem
-      setInlineVideoMetadataOverlay(screen.featuredRowCurrFocusColumn, screen.featuredRowContent)
 
       if content.type = m.constants.ui.categoryTypes.linear AND m.constants.deviceInfo.isAutoPlayEnabled = true
         playLinearInlineGridView(content, screen)
@@ -1276,16 +1352,51 @@ Function startFeaturedInlinePreview()
 End Function
 
 
-Function setInlineVideoMetadataOverlay(columnFocused, featuredRowContent)
-  if isNumber(columnFocused) = false OR columnFocused < 0
+' Sets the inline video metadata overlay.
+' @param featuredRowContent: roSGNode, the featured row content.
+' @param columnFocused: int, the column index of the focused item.
+' @param rowFocused: int, the row index of the focused item.
+Function setInlineVideoMetadataOverlay(featuredRowContent, columnFocused, rowFocused)
+  if (isNumber(columnFocused) = false OR columnFocused < 0)
     columnFocused = 0
   end if
+  
+  if (isNumber(rowFocused) = false OR rowFocused < 0)
+    rowFocused = 0
+  end if
 
-  columnFocused = CINT(columnFocused)
+  columnFocused = CInt(columnFocused)
+  rowFocused = CInt(rowFocused)
 
-  itemContent = featuredRowContent.getChild(0).getChild(columnFocused)
-  m.inlineVideoMetadataOverlay.itemContent = itemContent
-  m.inlineVideoGridTitleLogo.itemContent = itemContent
+  currCategory = featuredRowContent.getChild(rowFocused)
+  if currCategory <> invalid
+    itemContent = currCategory.getChild(columnFocused)
+    m.inlineVideoMetadataOverlay.itemContent = itemContent
+    m.inlineVideoGridTitleLogo.itemContent = itemContent  
+  end if
+
+  ' Predicting the next row to be focused based on current scroll direction.
+  ' We will reset the metadata if user changes the scroll direction inside onFeaturedListScrollDirectionChange.
+  screen = getCurrentScreen()
+  nextRow = rowFocused
+  if screen.featuredListScrollDirection = "down"
+    nextRow = rowFocused + 1
+  else
+    nextRow = rowFocused - 1
+  end if
+
+  nextCategory = featuredRowContent.getChild(nextRow)
+  if nextCategory <> invalid
+    ' Accessing column index from the category node since we preserve user previous focus index.
+    columnFocused = nextCategory.focusIndex
+    if isNumber(columnFocused) = false OR columnFocused < 0
+      columnFocused = 0
+    end if
+    isNonVideoTile = arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, nextCategory.gridItemType)
+    m.inTransitInlineVideoMetadataOverlay.visible = (isNonVideoTile = false)
+    inTransitItemContent = nextCategory.getChild(columnFocused)
+    m.inTransitInlineVideoMetadataOverlay.itemContent = inTransitItemContent
+  end if
 End Function
 
 
@@ -1306,11 +1417,13 @@ End Function
 
 Function onFeaturedListHasFocusChange(msg)
   hasFeaturedListFocus = msg.getData()
+  m.videoTileOverlayGroup.visible = (isCurrentScreenHomeScreen() = true AND isKidsUIOn() = false)
   screen = msg.getRoSGNode()
   content = screen.featuredRowFocusedItem
   previewContent = m.videoPreviewPlayer.content
   m.videoPreviewPlayer.visible = (isCurrentScreenHomeScreen() = false OR (content <> invalid AND previewContent <> invalid AND content.id = previewContent.id))
   if hasFeaturedListFocus = true
+    displayDefaultBackground()
     ' Resetting the content focused when the featured row list receives focus.
     if screen.hasField("contentFocused") = true
       screen.contentFocused = invalid
@@ -1322,8 +1435,6 @@ Function onFeaturedListHasFocusChange(msg)
     else if previewState = "playing"
       displayDefaultBackground()
       updatePreviewPlayerToInlineView()
-    else
-      onFeaturedRowCurrFocusColumnChange()
     end if
     setUIBasedOnFocusedContent(content)
   else if isCurrentScreenHomeScreen() = true
@@ -1339,33 +1450,44 @@ End Function
 
 
 Function updateCategoryGridWithFeaturedList(response, screen)
-  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
-  containerRow = m.nodeHelpers.getChildById(response, experiment.container_id)
-  if containerRow <> invalid
-    featuredContent = createObject("roSGNode", "CategoryContentNode")
-    featuredContent.id = "featuredGrid"  
-    containerRow.reParent(featuredContent, false)
-    screen.featuredRowContent = featuredContent
+  screen.featuredRowContent = response
 
-    if screen.skinAdContent <> invalid OR (screen.featuredListHasFocus = false AND isKidsUIOn() = false)
-      currentScreen = getCurrentScreen()
-      isCurrScreenHomeScreen = currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen
-      if isCurrScreenHomeScreen = true AND screen.isInFocusChain() = false
-        m.inlineVideoPreviewPlayerContainer.opacity = 1
-      end if
-      setInlineVideoMetadataOverlay(0, featuredContent)
-      m.inlineVideoMetadataOverlay.showContentPoster = true
+  if screen.skinAdContent <> invalid OR (screen.featuredListHasFocus = false AND isKidsUIOn() = false)
+    currentScreen = getCurrentScreen()
+    isCurrScreenHomeScreen = currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen
+    if isCurrScreenHomeScreen = true AND screen.isInFocusChain() = false
+      m.inlineVideoPreviewPlayerContainer.opacity = 1
+    end if
+    setInlineVideoMetadataOverlay(response, 0 , 0)
+    m.inlineVideoMetadataOverlay.showContentPoster = true
 
-      if screen.skinAdContent <> invalid AND screen.isInFocusChain() = false
-        m.inlineVideoPreviewPlayerContainer.translation = [m.inlineVideoPreviewPlayerContainer.translation[0], 945.5]
-      end if
+    if screen.skinAdContent <> invalid AND screen.isInFocusChain() = false
+      m.inlineVideoPreviewPlayerContainer.translation = [m.inlineVideoPreviewPlayerContainer.translation[0], 945.5]
     end if
   end if
 End Function
 
 
 Function onFeaturedRowFocusedItemChange(msg)
-  updatePreviewPlayerToInlineView()
+  focusedItem = msg.getData()
+  ' Only process if the focused item is a video tile.
+  if focusedItem <> invalid AND arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, focusedItem.gridItemType) = false
+    m.inlineVideoPreviewPlayerContainer.visible = true
+    ' In certain cases where the focused item is not the same as the itemContent, we need to update the itemContent.
+    ' For ex: One instance is Continue watching row getting updated with the new item or existing item been deleted.
+    if isNode(m.inlineVideoMetadataOverlay.itemContent) = true AND focusedItem.title <> m.inlineVideoMetadataOverlay.itemContent.title
+      updateInTransitVideoMetadataOverlay()
+    end if
+    updatePreviewPlayerToInlineView()
+
+    ' If VideoPreview is on and we have not started the debounce, we will start it.
+    ' This is needed in case where for initial load and refresh cases where columnFocusChange is not triggered.
+    if isVideoPreviewOn() = true AND m.videoPreviewDebounce.control = "stop"
+      m.videoPreviewDebounce.control = "start"
+    end if
+  else
+    m.inlineVideoPreviewPlayerContainer.visible = false
+  end if
 End Function
 
 
@@ -1377,17 +1499,16 @@ End Function
 Function updateInlineVideoMetadataOverlayVisibility(duration = 0)
   screen = getCurrentScreen()
   if screen <> invalid
-    currCategoryId = screen.currCategoryId
-    experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
-    if experiment <> invalid AND experiment.design_type = "withDescriptionPortraitSmall" AND isKidsUIOn() = false
+    if m.isUserInVideoTilesExperiment = true AND isKidsUIOn() = false
       currentScreen = getCurrentScreen()
-      if screen <> invalid AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND currCategoryId = experiment.container_id AND currentScreen.featuredRowContent <> invalid
+      if screen <> invalid AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND currentScreen.featuredRowContent <> invalid
         content = screen.featuredRowFocusedItem
         if getVideoPreviewStateForThisContent(content) <> "playing"
           m.inlineVideoMetadataOverlay.showContentPoster = true
-          stopVideoPreview()
+          ' Gives better scrolling experience if we pause the video preview.
+          ' We are calling stopVideoPreview once we are done with scrolling.
+          pauseVideoPreview()
         end if
-        fade(m.inlineVideoPreviewPlayerContainer, "in", duration)
       else
         ' Below logic handles displaying the large preview poster when skin ad is focused and during navigating back from ad player.
         if screen <> invalid AND screen.lastFocusedList <> "skinAdRow"
@@ -1414,7 +1535,24 @@ Function onFeaturedRowListTranslationChange(msg)
 
     if isNumber(rectY) = true
       inlineVideoPreviewPlayerContainer = m.inlineVideoPreviewPlayerContainer.translation
-      m.inlineVideoPreviewPlayerContainer.translation = [inlineVideoPreviewPlayerContainer[0], translation[1] + rectY - 4]
+      ' Below logic is required to avoid having the flickering effect when we update the translation of the focused expanded video tile once the scroll stops.
+      if screen.featuredListScrollingStatus = false
+        m.inlineVideoPreviewPlayerContainer.opacity = 0
+      end if
+      m.inlineVideoPreviewPlayerContainer.translation = [inlineVideoPreviewPlayerContainer[0], translation[1] + rectY]
+      m.inlineVideoPreviewPlayerContainer.opacity = 1
+    end if
+
+    ' For Performance optimization reasons not processing it unless user is scrolling vertically.
+    if arrayIncludes(["down", "up"], screen.featuredListScrollDirection) AND screen.inTransitCurrentFocusedItemBoundingRect <> invalid AND screen.inTransitCurrentFocusedItemBoundingRect.y <> 0
+      inTransitRectY = screen.inTransitCurrentFocusedItemBoundingRect.y
+      ' As soon as the scrolling stops we will hide the in transit video metadata overlay.
+      if screen.featuredListScrollingStatus = true
+        m.inTransitInlineVideoMetadataOverlay.opacity = 1
+        m.inTransitInlineVideoMetadataOverlay.translation = [165, translation[1] + inTransitRectY + 5]
+      else
+        m.inTransitInlineVideoMetadataOverlay.opacity = 0
+      end if
     end if
   end if
 End Function
@@ -1434,6 +1572,18 @@ Function getCategoryComponentTrackingInfo(screen)
   end if
 
   return componentTrackingInfo
+End Function
+
+
+' Triggers callback when user switches the scroll direction.
+' This ensure we update the in transit video metadata overlay when the user is switching direction.
+' Below when user is scrolling down we use next container poster vs previous container poster.
+' @param msg: roSGNode, the message object.
+Function onFeaturedListScrollDirectionChange(msg)
+  scrollDirection = msg.getData()
+  if scrollDirection = "down" OR scrollDirection = "up"
+    updateInTransitVideoMetadataOverlay()
+  end if
 End Function
 
 

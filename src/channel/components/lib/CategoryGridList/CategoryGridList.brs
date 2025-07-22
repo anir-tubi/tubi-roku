@@ -20,11 +20,8 @@ Function init()
   m.featuredRowList.observeFieldScoped("rowItemFocused", "onFeaturedRowItemFocused")
   m.featuredRowList.observeFieldScoped("rowItemSelected", "onFeaturedRowItemSelected")
   m.featuredRowList.observeFieldScoped("currFocusColumn", "onFeaturedRowCurrFocusColumnChange")
-
-  m.rowListTranslationYOffset = 0
-
-  m.homeScreenDesignType = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false).design_type
-  m.isWithDescPortraitSmallExpEnabled = (m.homeScreenDesignType = "withDescriptionPortraitSmall")
+  m.featuredRowList.observeFieldScoped("currFocusRow", "onFeaturedListCurrFocusRowChange")
+  m.featuredRowList.observeFieldScoped("vertFocusDirection", "onVertFocusDirectionChange")
 
   experimentsInfo = getExperimentsInfoFromGlobal()
   experiments = TubiExperiments(experimentsInfo)
@@ -57,16 +54,26 @@ Function init()
   m.lastCurrentFocusColumn = 0
   m.lastFocusColumnIndex = 0
 
-  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
+  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_3", false)
   if isNonEmptyArray(experiment.featuredRowPosterSize) = true
     m.featuredRowPoster = experiment.featuredRowPosterSize
   else
     m.featuredRowPoster = m.constants.ui.imageSizes.featuredRowPoster
   end if
 
+  if isNonEmptyArray(experiment.gridItemSize) = true
+    m.gridItemSize = experiment.gridItemSize
+  else
+    m.gridItemSize = m.constants.ui.imageSizes.featuredPortraitSmall
+  end if
+
+  m.expandedTileFocusXOffset = m.featuredRowPoster[0] - m.gridItemSize[0] + 4
+
   ' 263 is the height of the metadata section displayed beneath the featured focused tile.
   ' 263 also includes the space between the last line of the description and container below it.
   m.rowListPosition = [0, 263 + m.featuredRowPoster[1]]
+  m.homeScreenDesignType = experiment.design_type
+  m.isWithDescPortraitSmallExpEnabled = (m.homeScreenDesignType = "withDescriptionPortraitSmall")
 
 
   if getExperimentResource("roku_home_screen_fixed_focus", "roku_home_screen_fixed_focus_v1", false).enabled = true
@@ -74,6 +81,8 @@ Function init()
   else
     m.RowList.rowFocusAnimationStyle = "floatingFocus"
   end if
+
+  m.ignoreCurrColumnChange = false
 End Function
 
 
@@ -230,14 +239,6 @@ Function onContentChange()
   '//RESET position of 1st-row elements
   m.skinAdRow.translation = m.originalTranslationSkinAdRow
 
-  ' Since set row heights is called later we need to duplicate the logic of checking sponsor images.
-  m.rowListTranslationYOffset = 0
-  if m.top.featuredRowContent <> invalid
-    featuredCategory = m.top.featuredRowContent.getChild(0)
-    if featuredCategory <> invalid AND featuredCategory.sponsorImages <> invalid
-      m.rowListTranslationYOffset = 31
-    end if  
-  end if
   
   ' set the translation position of the page based on presense or absence of any 1st rows. 
   ' DO this BEFORE setting the content of the rowList (later in this function) or else the translation will not be properly set.
@@ -246,7 +247,6 @@ Function onContentChange()
   if isSkinAdsAvailable() = true AND (m.top.lastFocusedList = "skinAdRow" OR m.top.lastFocusedList = "")
     if m.top.featuredRowContent <> invalid
       m.FeaturedRowList.translation =  [0, 384]
-      m.rowList.translation =  [0, 565 + m.rowListTranslationYOffset]
     else
       m.rowList.translation =  [0, 384]
     end if
@@ -268,7 +268,7 @@ Function onContentChange()
         if m.isWithDescPortraitSmallExpEnabled = true
           ' 92 is the amount of px we need to animate down to create a required initial animation.
           ' This allows to create a slide down animation.
-          m.rowList.translation =  [0, m.featuredRowPoster[1] + 92 + m.rowListTranslationYOffset]
+          m.rowList.translation =  [0, m.featuredRowPoster[1] + 92]
         else
           m.rowList.translation = [0, 0]
         end if
@@ -289,7 +289,12 @@ Function onContentChange()
     end if
     m.RowList.rowItemFocused = [0,0]
     m.RowList.currFocusRow = 0
-  ' This is a verbose check that makes sure we only refresh the whole RowList content if the root node is different
+    if m.top.featuredRowContent <> invalid
+      setFeaturedRowHeights()
+      if bSetRowListFocus = true
+        setRowListFocus()
+      end if
+    end if
   else
     ' Setting RowList invalid here will empty the grid.  It will be set after the first batch of
     ' metadata is received.  Setting RowList.content with a few full categories will cause it to prefetch
@@ -330,10 +335,10 @@ Function onContentChange()
   
   ' Below is to add animation of slide down of the row list for the first time when screen is loaded.
   if m.top.featuredRowContent <> invalid AND isSkinAdsAvailable() = false AND m.isWithDescPortraitSmallExpEnabled = true AND m.top.lastFocusedList <> "rowList"
-    slideTo(m.RowList, [m.rowListPosition[0], m.rowListPosition[1] + m.rowListTranslationYOffset], 0.3, 0.3)
+    slideTo(m.RowList, [m.rowListPosition[0], m.rowListPosition[1] ], 0.3, 0.3)
   end if
   
-  updateCurrentFocusedItemBoundingRect(0)
+  updateCurrentFocusedItemBoundingRect()
 
   m.top.gridContentIsReady = true
 End Function
@@ -356,7 +361,9 @@ End Function
 ' onRepopulateContent callback gets triggered when adding/removing any row
 ' it sets RowHeight and jumps the focus to a specified content.
 Function onRepopulateContent()
-  setRowHeights()
+  if m.top.content <> invalid
+    setRowHeights()
+  end if
 
   rowItemFocused = m.RowList.rowItemFocused
   if m.itemToJumpTo <> invalid
@@ -437,6 +444,11 @@ Function onRepopulateContent()
       end if
     end if
   end if
+
+  ' We need to make sure the focused item is updated to account for cases where container content is updated.
+  if m.isWithDescPortraitSmallExpEnabled = true
+    updateFeaturedRowItemFocused()
+  end if
 End Function
 
 
@@ -451,10 +463,6 @@ Function setRowHeights()
   posterSize = imageSizes.largePoster
   landscapeSize = imageSizes.largeLandscape
   featuredRowPoster = imageSizes.featuredRowPoster
-  featuredPortraitSmall = imageSizes.featuredPortraitSmall
-  gridItemSize = invalid
-  featuredRowPosterSize = invalid
-
   showRowLabel = []
 
   for i=0 to m.top.content.getChildCount()-1
@@ -463,8 +471,6 @@ Function setRowHeights()
     rowHeightAdjustment = 57 '//The height of the row container heading and its vertical spacing
     gridItemType = category.gridItemType
     gridItemTypes = m.constants.ui.gridItemTypes
-    gridItemSize = category.gridItemSize
-    featuredRowPosterSize = category.featuredRowPosterSize
 
     if gridItemType = gridItemTypes.historySignedOutUser
       posterHeight = posterSize[1]
@@ -538,44 +544,51 @@ Function setRowHeights()
     "rowItemSpacing": rowItemSpacings
     "focusXOffset" : focusXOffsets
   })
-
-  featuredCategory = invalid
-  if m.top.featuredRowContent <> invalid
-    featuredCategory = m.top.featuredRowContent.getChild(0)
-  end if
-  featuredRowHeights = featuredRowPoster[1] + 220
-  if featuredCategory <> invalid AND featuredCategory.sponsorImages <> invalid
-    '//if this is a sponsored row, then adjust the spacing so row includes the header size of the sponsored row
-    featuredRowHeights = featuredRowHeights + 32
-  end if
-
   m.RowList.content = m.top.content
+  setFeaturedRowHeights()
+End Function
 
-  featuredPosterSize = featuredRowPoster
-  if m.isWithDescPortraitSmallExpEnabled = true
-    if gridItemSize <> invalid
-      featuredPosterSize = gridItemSize
-    else
-      featuredPosterSize = featuredPortraitSmall
-    end if
+
+Function setFeaturedRowHeights()
+  guestCWPosterSize = m.constants.ui.imageSizes.guestContinueWatchingTile
+
+  gridItemTypes = m.constants.ui.gridItemTypes
+  featuredRowContent = m.top.featuredRowContent
+
+  if isNode(featuredRowContent) = true
+    heights = []
+    rowItemSize = []
+    for i=0 to featuredRowContent.getChildCount()-1
+      category = featuredRowContent.getChild(i)
+      gridItemType = category.gridItemType
+
+      ' 246 is the height of the metadata section displayed beneath the featured focused tile.
+      featuredRowHeight = m.featuredRowPoster[1] + 246
+      if category.sponsorImages <> invalid
+        '// if this is a sponsored row, then adjust the spacing so row includes the header size of the sponsored row
+        featuredRowHeight = featuredRowHeight + 32
+      end if
+
+      if gridItemType = gridItemTypes.historySignedOutUser
+        rowItemSize.push(guestCWPosterSize)
+        ' 80 is the padding below the poster.
+        heights.push(guestCWPosterSize[1] + 80)
+      else
+        rowItemSize.push(m.gridItemSize)
+        heights.push(featuredRowHeight)
+      end if
+    end for
+
+    m.FeaturedRowList.update({
+      "showRowLabel": [true]
+      "rowItemSize": rowItemSize
+      "rowHeights": heights
+      "focusXOffset" : [0]
+    })
+
+    m.featuredRowList.focusXOffset = [m.expandedTileFocusXOffset, 0]
+    m.FeaturedRowList.content = m.top.featuredRowContent
   end if
-
-  m.FeaturedRowlist.update({
-    "showRowLabel": [true]
-    "rowItemSize": [featuredPosterSize]
-    "rowHeights": [featuredRowHeights]
-    "focusXOffset" : [0]
-  })
-
-  if m.isWithDescPortraitSmallExpEnabled = true
-    if isNonEmptyArray(featuredRowPosterSize) = true AND isNonEmptyArray(gridItemSize) = true
-      m.featuredRowList.focusXOffset = [featuredRowPosterSize[0] - gridItemSize[0] + 4]
-    else
-      m.featuredRowList.focusXOffset = [482]
-    end if
-  end if
-
-  m.FeaturedRowList.content = m.top.featuredRowContent
 End Function
 
 
@@ -895,47 +908,157 @@ Function onReloadedItemToBeFocused(msg)
 End Function
 
 
-Function onFeaturedRowItemFocused()
+Function onFeaturedRowItemFocused(_msg)
+  updateFeaturedRowItemFocused()
+End Function
+
+
+Function updateFeaturedRowItemFocused()
   rowItemFocused = m.featuredRowList.rowItemFocused
   if rowItemFocused <> invalid
     itemFocused = resolveAbbreviatedContent(m.top.featuredRowContent, rowItemFocused)
     if itemFocused <> invalid
-      updateCurrentFocusedItemBoundingRect(rowItemFocused[1])
-      m.top.oldCategoryId = m.top.currCategoryId
-      category = m.top.featuredRowContent.getChild(rowItemFocused[0])
+      topRef = m.top
+      topRef.oldCategoryId = topRef.currCategoryId
+      category = topRef.featuredRowContent.getChild(rowItemFocused[0])
       category.focusIndex = rowItemFocused[1]
-      m.top.oldCategoryId = m.top.currCategoryId
-      m.top.currCategoryId = category.id
-      m.top.oldCursorPosition = m.top.cursorPosition
-      m.top.cursorPosition = rowItemFocused
-      m.top.oldItemFocused = itemFocused
-      m.top.featuredRowFocusedItem = itemFocused
+      topRef.oldCategoryId = topRef.currCategoryId
+      topRef.currCategoryId = category.id
+      topRef.oldCursorPosition = topRef.cursorPosition
+      topRef.cursorPosition = rowItemFocused
+      topRef.oldItemFocused = itemFocused
+      topRef.featuredRowFocusedItem = itemFocused
+      updateCurrentFocusedItemBoundingRect()
+      updateFocusXOffset(rowItemFocused[0])
     end if
   end if
 End Function
 
 
-Function onFeaturedRowCurrFocusColumnChange(msg)
-  currentFocusColumn = msg.getData()
+' Observer that gets fired when the rowlist vertical focus direction field changes.
+Function onVertFocusDirectionChange(msg)
+  direction = msg.getData()
+  ' Since the direction gets reset during the flow.
+  ' The value of m.scrollDirection gets reset to none after the value changes to up or down during scrolling.
+  ' This is the reason we are maintaining our own directional scope variable.
+  if direction <> "none"
+    m.top.featuredListScrollDirection = direction
+  end if
+End Function
 
-  absCurCol = Int(currentFocusColumn)
-  ' To account for fast scrolling.
-  diff = Abs(absCurCol - m.lastFocusColumnIndex)
-  
-  if currentFocusColumn <> absCurCol AND diff <= 1
-    if currentFocusColumn > m.lastCurrentFocusColumn
-      featuredRowCurrFocusColumn = m.lastFocusColumnIndex + 1
-    else
-      featuredRowCurrFocusColumn = m.lastFocusColumnIndex - 1
-    end if
-    m.top.featuredRowCurrFocusColumn = featuredRowCurrFocusColumn
-  else
-    m.lastFocusColumnIndex = absCurCol
-    if m.lastFocusColumnIndex <> m.top.featuredRowCurrFocusColumn
-      m.top.featuredRowCurrFocusColumn = m.lastFocusColumnIndex
+
+Function updateFocusXOffset(currFocusRow, isInTransit = false)
+  featuredRowContent = m.top.featuredRowContent
+  focusXOffsets = m.featuredRowList.focusXOffset
+  if isNode(featuredRowContent) = true AND isNonEmptyArray(focusXOffsets) = true
+    focusXOffset = []
+    gridItemTypes = m.constants.ui.gridItemTypes
+    
+    for i = 0 to featuredRowContent.getChildCount() - 1
+      category = featuredRowContent.getChild(i)
+      gridItemType = category.gridItemType
+
+      if (i = currFocusRow OR (isInTransit = true AND i = currFocusRow + 1)) AND gridItemType <> gridItemTypes.historySignedOutUser
+        focusXOffset.push(m.expandedTileFocusXOffset)
+      else
+        focusXOffset.push(0)
+      end if  
+    end for
+    ' To Avoid unnecessary updates to the focusXOffset field, doing a simple array comparison.
+    if FormatJson(focusXOffset) <> FormatJson(m.featuredRowList.focusXOffset)
+      m.ignoreCurrColumnChange = true
+      m.featuredRowList.focusXOffset = focusXOffset
+      m.ignoreCurrColumnChange = false
     end if
   end if
-  m.lastCurrentFocusColumn = currentFocusColumn
+End Function
+
+
+Function onFeaturedListCurrFocusRowChange(msg)
+  currFocusRow = 0
+  featuredRowContent = m.top.featuredRowContent
+  if isNode(featuredRowContent) = true
+    rowItemFocused = m.featuredRowList.rowItemFocused
+    if isNonEmptyArray(rowItemFocused) = true
+      currFocusRow = rowItemFocused[0]
+    end if
+
+    if m.top.featuredListScrollDirection = "down"
+      nextFocusRow = currFocusRow + 1
+    else
+      nextFocusRow = currFocusRow - 1
+    end if
+
+    updateFocusXOffset(nextFocusRow, m.top.featuredListScrollDirection = "up")
+
+    updateCurrentFocusedItemBoundingRect()
+  end if
+End Function
+
+
+Function updateCurrentFocusedItemBoundingRect()
+  rowItemFocused = m.featuredRowList.rowItemFocused
+  featuredRowContent = m.top.featuredRowContent
+  if isNonEmptyArray(rowItemFocused) = true AND isNode(featuredRowContent) = true
+    currFocusRow = rowItemFocused[0]
+    ' Since we are trying to update the bounding rect as the user scrolls we cannot use any of the row list fields to figure out the next row.
+    ' Based on the scroll direction we are updating the next focus row.
+    if m.top.featuredListScrollDirection = "down"
+      nextFocusRow = currFocusRow + 1
+    else
+      nextFocusRow = currFocusRow - 1
+    end if
+
+    ' Updating the bounding rect for the next focus row.
+    category = featuredRowContent.getChild(nextFocusRow)
+    if category <> invalid AND category.focusIndex <> invalid
+      columnFocused = category.focusIndex
+      nextBoundingRect = m.FeaturedRowList.subBoundingRect("item"+ nextFocusRow.toStr() + "_" + columnFocused.toStr())
+      m.top.inTransitCurrentFocusedItemBoundingRect = nextBoundingRect
+    end if
+
+    ' Updating the bounding rect for the current focus row.
+    columnFocused = rowItemFocused[1]
+    boundingRect = m.FeaturedRowList.subBoundingRect("item"+ currFocusRow.toStr() + "_" + columnFocused.toStr())
+    m.top.currentFocusedItemBoundingRect = boundingRect
+  end if
+End Function
+
+
+' Observer that gets fired when the featured row column focus changes.
+' @msg: object, the message object containing the new focus column.
+Function onFeaturedRowCurrFocusColumnChange(msg)
+  ' ignoreCurrColumnChange is set to true when the user is scrolling through the columns of the row.
+  ' Updating the focusXOffset field triggers currFocusColumnChange twice one for the row which we are removing the offset and one for which we are adding the offset.
+  ' This optimizes the performance when unnecessary updates been triggered.
+  if m.ignoreCurrColumnChange = false
+    currentFocusColumn = msg.getData()
+    absCurCol = Int(currentFocusColumn)
+    ' To account for fast scrolling.
+    diff = Abs(absCurCol - m.lastFocusColumnIndex)
+    
+    ' Ignoring all updates when user is fast scrolling through the columns of the row.
+    ' When the user stops the scrolling we will process the column change.
+    if currentFocusColumn <> absCurCol AND diff <= 1
+      ' If the current focus column is greater than the last current focus column, then we are scrolling right.
+      ' If the current focus column is less than the last current focus column, then we are scrolling left.
+      if currentFocusColumn > m.lastCurrentFocusColumn
+        featuredRowCurrFocusColumn = m.lastFocusColumnIndex + 1
+        m.top.featuredListScrollDirection = "right"
+      else
+        featuredRowCurrFocusColumn = m.lastFocusColumnIndex - 1
+        m.top.featuredListScrollDirection = "left"
+      end if
+      m.top.featuredRowCurrFocusColumn = featuredRowCurrFocusColumn
+    else
+      m.lastFocusColumnIndex = absCurCol
+      if m.lastFocusColumnIndex <> m.top.featuredRowCurrFocusColumn
+        m.top.featuredRowCurrFocusColumn = m.lastFocusColumnIndex
+      end if
+    end if
+    
+    m.lastCurrentFocusColumn = currentFocusColumn
+  end if
 End Function
 
 
@@ -958,17 +1081,11 @@ Function translateFeaturedListAndSetFocus(delayFeaturedFocus = false)
   
   slideFadeGeneral(m.FeaturedRowList, [0, 0], "in", 0.3, 0, 1, true, callback)
   if m.isWithDescPortraitSmallExpEnabled = true
-    slideTo(m.RowList, [m.rowListPosition[0], m.rowListPosition[1] + m.rowListTranslationYOffset], 0.3)
+    slideTo(m.RowList, [m.rowListPosition[0], m.rowListPosition[1]], 0.3)
   end if
 
   m.top.hideInfoPanel = false
-  onFeaturedRowItemFocused()
-End Function
-
-
-Function updateCurrentFocusedItemBoundingRect(columnFocused)
-  boundingRect = m.FeaturedRowList.subBoundingRect("item0_" + columnFocused.toStr())
-  m.top.currentFocusedItemBoundingRect = boundingRect
+  updateFeaturedRowItemFocused()
 End Function
 
 
@@ -994,21 +1111,21 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         slideTo(m.RowList, [0, 0], 0.3)
       end if
       return true
-    else if key = "down" AND m.FeaturedRowList.isInFocusChain() = true
+    else if key = "down" AND m.FeaturedRowList.isInFocusChain() = true AND isNode(m.rowList.content) = true
       m.top.lastFocusedList = "rowList"
       slideFadeGeneral(m.featuredRowList, [0, -760], "out", 0.3, 0, -1, true)
       if m.isWithDescPortraitSmallExpEnabled = true
-        slideTo(m.RowList, [0, 420 + m.rowListTranslationYOffset], 0.3, 0.1)
+        slideTo(m.RowList, [0, 420], 0.3, 0.1)
       end if
       m.RowList.setFocus(true)
       return true
     else if key = "up" AND m.FeaturedRowList.isInFocusChain() = true AND bSkinAdAvailable = true
       m.top.lastFocusedList = "skinAdRow"
       m.skinAdRow.setFocus(true)
-      slideTo(m.RowList, [0, 565 + m.rowListTranslationYOffset], 0.3)
+      slideTo(m.RowList, [0, 565], 0.3)
       slideTo(m.FeaturedRowList, [0, 384], 0.3)
       fade(m.skinAdRow, "in", 0.3)
-      updateCurrentFocusedItemBoundingRect(0)
+      updateCurrentFocusedItemBoundingRect()
 
       return true
     else if key = "up" AND m.RowList.isInFocusChain() = true

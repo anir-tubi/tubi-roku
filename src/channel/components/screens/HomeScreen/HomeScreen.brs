@@ -69,24 +69,26 @@ Function init()
   m.sponsorSlideAmt = 29 'the amount the grid slides up to fit the sponsored header. This is the difference of the heights of the sponsored and normal row titles
 
   m.originalContentAreaTranslation = [0, 516]
-  m.homeRedesignExpContentAreaTranslation = [0, 96]
   setContentAreaState()
 
   m.scrollDirection = "none"
+
+
+  experimentInfo = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_3", false)
+  m.isUserInVideoTilesExperiment = isAA(experimentInfo) AND experimentInfo.design_type = "withDescriptionPortraitSmall"
+  m.shouldDimPeekRow = isAA(experimentInfo) AND experimentInfo.should_dim = true
 End Function
 
 
 Function setContentAreaState(state = invalid)
   tubiLog("HomeScreen.setToRedesignContentArea")
 
-  isHomeScreenRedesignForFeaturedEnabled = (getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false).design_type <> "none")
-
   shouldAnimate = false
-  if isHomeScreenRedesignForFeaturedEnabled = false OR (m.top.featuredListHasFocus = false AND m.CategoryGridList.lastFocusedList = "skinAdRow") OR m.top.featuredRowContent = invalid
+  if m.isUserInVideoTilesExperiment = false OR (m.top.featuredListHasFocus = false AND m.CategoryGridList.lastFocusedList = "skinAdRow") OR m.top.featuredRowContent = invalid
     m.currentContentAreaTranslation = m.originalContentAreaTranslation
     shouldAnimate = true
   else
-    m.currentContentAreaTranslation = m.homeRedesignExpContentAreaTranslation
+    m.currentContentAreaTranslation = m.constants.ui.videoTilesListTranslation
   end if
 
   if shouldAnimate = true
@@ -109,17 +111,28 @@ End Function
 Function moveContentAreaMask(nFocusRow = -1, nFocusingPercent = 1)
   '//nMaskYNew will most likely be set to 0 w/ the following line unless the content rowList has been moved to make way for a special top row.
   nMaskYNew = m.CategoryGridList.rowlistTranslation[1]
+  rowHeights = m.CategoryGridList.rowHeights
+  featuredRowHeights = m.CategoryGridList.featuredRowHeights
   ' Since we have 2 full rows visible we are setting the mask offset to make sure the first row of the category grid is visible.
-  if m.top.lastFocusedList = "featuredRowList"
-    nMaskYNew = nMaskYNew + m.CategoryGridList.rowHeights[0]
+  if m.top.lastFocusedList = "featuredRowList" AND isNonEmptyArray(featuredRowHeights) = true
+    if m.shouldDimPeekRow = true
+      ' Where 60 represents the height of the container title component.
+      rowTileComponentHeight = 100
+      nMaskYNew = featuredRowHeights[0] - rowTileComponentHeight
+    else
+      ' Setting mask offset to be outside of view bounds.
+      ' If we decide to graduate non dimmed peek row, then we can remove this.
+      ' TODO: Revisit once we have a decision on the roku_home_screen_redesign experiment.
+      nMaskYNew = 1080
+    end if
   end if
-  if nFocusRow >= 0 AND isNonEmptyArray(m.CategoryGridList.rowHeights) = true AND (m.top.lastFocusedList = "rowList" OR m.top.lastFocusedList = "")
-    nMaxRowHeights = m.CategoryGridList.rowHeights.count()
+  if nFocusRow >= 0 AND isNonEmptyArray(rowHeights) = true AND (m.top.lastFocusedList = "rowList" OR m.top.lastFocusedList = "")
+    nMaxRowHeights = rowHeights.count()
     if nFocusRow > (nMaxRowHeights - 1)
       '//If the rowHeights array doesn't contain as many row heights as the passed nFocusRow, then assume the current height is associated with the last item in the rowHeights array
       nFocusRow = nMaxRowHeights - 1
     end if
-    nCurrentFocusedRowHeight = m.CategoryGridList.rowHeights[nFocusRow]
+    nCurrentFocusedRowHeight = rowHeights[nFocusRow]
     if nFocusingPercent < 1
       nOldMaskPositionY = m.ContentArea.maskOffset[1]
       nDiff = (nCurrentFocusedRowHeight - nOldMaskPositionY) * nFocusingPercent
@@ -194,6 +207,11 @@ Function onLoadingChange()
     m.CategoryGridList.skinAdContent = invalid
     m.CategoryGridList.featuredRowContent = invalid
     m.CategoryGridList.skinAdContentUpdated = true
+
+    ' Resetting the previous state variables.
+    m.CategoryGridList.featuredListCurrFocusRow = -1
+    m.CategoryGridList.featuredRowCurrFocusColumn = -1
+
     ' Resetting last focus list when reloading the screen.
     ' To Cover cases where skin ad is shown and then gets removed.
     m.CategoryGridList.lastFocusedList = ""
@@ -532,17 +550,6 @@ Function fireNavigateWithinPageEvent()
   'Set up the navigateWithinPageInfo to send to ContentController via Homescreen. Need for when CategoryGridList is in focus
   oldRowIndexBoost = m.categoryGridList.rowIndexBoost
   newRowIndexBoost = m.categoryGridList.rowIndexBoost
-  
-  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
-  isHomeScreenRedesignForFeaturedEnabled = m.top.kidsMode = false AND m.top.featuredRowContent <> invalid AND (experiment.design_type = "withDescriptionPortraitSmall")
-  
-  if (isHomeScreenRedesignForFeaturedEnabled = true AND m.CategoryGridList.oldCategoryId <> experiment.container_id) OR isHomeScreenRedesignForFeaturedEnabled = false
-    oldRowIndexBoost = oldRowIndexBoost + 1
-  end if
-
-  if (isHomeScreenRedesignForFeaturedEnabled = true AND m.CategoryGridList.currCategoryId <> experiment.container_id) OR isHomeScreenRedesignForFeaturedEnabled = false
-    newRowIndexBoost = newRowIndexBoost + 1
-  end if
 
   oldAnalyticsRow = m.CategoryGridList.oldCursorPosition[0] + oldRowIndexBoost
   oldAnalyticsCol = m.CategoryGridList.oldCursorPosition[1] + 1
@@ -611,14 +618,7 @@ Function getTrackingComponentInfoOfCategoryGridList(gridItem, itemPosition)
   if gridItem <> invalid AND itemPosition <> invalid AND itemPosition.Count() = 2
     componentValues = {}
     componentValues["category_slug"] = m.top.currCategoryId
-
     rowIndexBoost = m.categoryGridList.rowIndexBoost
-    experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
-    isHomeScreenRedesignForFeaturedEnabled = m.top.kidsMode = false AND (m.top.featuredRowContent <> invalid AND (experiment.design_type = "withDescriptionPortraitSmall") AND m.top.currCategoryId = experiment.container_id)
-
-    if isHomeScreenRedesignForFeaturedEnabled = false
-      rowIndexBoost = rowIndexBoost + 1
-    end if
 
     componentValues["category_row"] = itemPosition[0] + rowIndexBoost 'all analytics are 1 based
     componentValues["category_col"] = itemPosition[1] + 1 'all analytics are 1 based
@@ -663,11 +663,8 @@ End Function
 '@mode: string, one of the valid constants.ui.infoPanelModes info panel modes (see InfoPanel.xml for details)
 '@contentNode: content node
 Function populateInfoPanel(mode, contentNode)
-  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
-  isHomeScreenRedesignForFeaturedEnabled = (m.top.featuredRowContent <> invalid AND (experiment.design_type = "withDescriptionPortraitSmall") AND contentNode.parentId = experiment.container_id)
 
-  if contentNode <> invalid AND (isHomeScreenRedesignForFeaturedEnabled = false OR m.top.contentMode <> m.constants.ui.contentMode.homescreen)
-    
+  if contentNode <> invalid  
     ' The below is to ensure that there is slight delay in showing the info panel so that there is no overlap with any row that is gaining focus.
     if m.InfoPanel.visible = false
       slideFadeGeneral(m.InfoPanelParent, [0, 0], "in", 0.2)
@@ -904,8 +901,7 @@ End Function
 
 Function onKidsModeChange(msg)
   kidsMode = msg.getData()
-  isHomeScreenRedesignForFeaturedEnabled = (getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false).design_type <> "none")
-  if isHomeScreenRedesignForFeaturedEnabled = true AND kidsMode = true
+  if m.isUserInVideoTilesExperiment = true AND kidsMode = true
     m.ContentAreaParent.translation = m.originalContentAreaTranslation
   end if
 End Function

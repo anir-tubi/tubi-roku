@@ -380,14 +380,12 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
   end if
 
   tileDesignType = "none"
-  experimentContainerId = "none"
   if m.experiments <> invalid AND bKidsMode = false
-    experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4")
+    experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_3")
     tileDesignType = experiment.design_type
-    experimentContainerId = experiment.container_id
   end if
 
-  if imageParamTypes = invalid AND categoryId = experimentContainerId AND tileDesignType <> invalid AND tileDesignType <> "none"
+  if imageParamTypes = invalid AND tileDesignType = "withDescriptionPortraitSmall"
     imageParamTypes = [
       "poster"
       "landscape"

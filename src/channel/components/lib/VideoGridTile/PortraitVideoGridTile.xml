@@ -12,7 +12,7 @@
 
   <interface>
     <field id="itemContent" type="node" />
-    <field id="width" alias="poster.width" />
+    <field id="width" alias="poster.width, gradient.width" />
     <field id="height" alias="poster.height" />
   </interface>
 
@@ -22,5 +22,23 @@
       uri="pkg:/images/placeholder-featured.webp"
       loadingBitmapUri="pkg:/images/placeholder-featured.webp"
       failedBitmapUri="pkg:/images/placeholder-featured.webp" />
+    <Group
+      id="progressBarGroup">
+      <Poster
+        id="gradient"
+        height="76"
+        loadDisplayMode="scaleToFill"
+        uri="pkg:/images/video_in_grid_gradient_$$RES$$.9.png"/>
+      <TubiProgressBar
+        id="progressBar"
+        translation="[18, 54]"
+        width="270"
+        height="6"/>
+    </Group>
+    <Badge
+      id="sotBadge"
+      visible="false"
+      badgeTextWidth="80"
+      translation="[6, 6]"/>
   </children>
 </component>

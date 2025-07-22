@@ -100,19 +100,36 @@ Function addControllerUi()
   m.inlinePreviewFocusIndicator = m.top.findNode("inlinePreviewFocusIndicator")
   m.inlineVideoMetadataOverlay = m.top.findNode("inlineVideoMetadataOverlay")
 
-  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
+  ' Video tiles experiment related node.
+  ' Holds the poster for the video tile that is in transit.That is in case of user scrolling down next container poster vs previous container poster when scrolling up.
+  m.inTransitInlineVideoMetadataOverlay = m.top.findNode("inTransitInlineVideoMetadataOverlay")
+  m.videoTileOverlayGroup = m.top.findNode("videoTileOverlayGroup")
+  videoTilesListTranslation = m.constants.ui.videoTilesListTranslation
+  ' Using clipping rect to ensure that when scrolling up the video tile gets clipped along with the rest of the row list tiles
+  m.videoTileOverlayGroup.clippingRect = [videoTilesListTranslation[0], videoTilesListTranslation[1], 1920, 1080]
+
+  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_3", false)
+  ' This is used to track if the user is in the video tiles experiment.
+  m.isUserInVideoTilesExperiment = (experiment <> invalid AND experiment.design_type = "withDescriptionPortraitSmall")
+
   if isNonEmptyArray(experiment.featuredRowPosterSize) = true
     featuredRowPoster = experiment.featuredRowPosterSize
   else
     featuredRowPoster = m.constants.ui.imageSizes.featuredRowPoster
   end if
+  ' 4 is the padding to account for the focus indicator.
+  paddingToAccountForFocusIndicator = 4
+  width = featuredRowPoster[0] + paddingToAccountForFocusIndicator
+  height = featuredRowPoster[1] + paddingToAccountForFocusIndicator
   ' Adjusting the size of the metadata overlay with some additional padding to account for the focus indicator.
-  m.inlineVideoMetadataOverlay.width = featuredRowPoster[0] + 4
-  m.inlineVideoMetadataOverlay.height = featuredRowPoster[1] + 2
+  m.inlineVideoMetadataOverlay.width = width
+  m.inlineVideoMetadataOverlay.height = height
+  m.inTransitInlineVideoMetadataOverlay.width = width
+  m.inTransitInlineVideoMetadataOverlay.height = height
 
   m.inlineVideoGridTitleLogo = m.top.findNode("inlineVideoGridTitleLogo")
-  m.inlineVideoGridTitleLogo.width = featuredRowPoster[0] + 4
-  m.inlineVideoGridTitleLogo.height = featuredRowPoster[1] + 2
+  m.inlineVideoGridTitleLogo.width = width
+  m.inlineVideoGridTitleLogo.height = height
 
   playerSize = getFeaturedPlayerSize()
   m.inlinePreviewFocusIndicator.height = playerSize[1]
@@ -1984,7 +2001,7 @@ Function onCustomSuspend(msg)
         linearVideoPlayer.control = "stop"
       end if
 
-      ' Remove this line if we do not graduated roku_home_screen_redesign_v4.
+      ' Remove this line if we do not graduated roku_home_screen_redesign_v_1_3.
       ' This is needed to avoid having to use alwaysnotify on featuredListHasFocus and when app is suspended it does not fire focus change event on home screen.
       homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
       if homeScreen <> invalid
@@ -3228,7 +3245,7 @@ End Function
 ' Returns the size of the featured preivew player.
 ' @return: array, the size of the player
 Function getFeaturedPlayerSize()
-  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v4", false)
+  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_3", false)
   if isNonEmptyArray(experiment.featuredRowPosterSize) = true
     featuredRowPoster = experiment.featuredRowPosterSize
   else

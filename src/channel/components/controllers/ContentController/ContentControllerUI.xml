@@ -56,21 +56,30 @@
             id="ScreenStack"/>
             
           <Group
-            id="inlineVideoPreviewPlayerContainer"
-            opacity="0"
-            translation="[160, 155]" >
+            translation="[0, -4]"
+            id="videoTileOverlayGroup">
             <ExpandedVideoGridTile
-              translation="[5,4]"
-              id="inlineVideoMetadataOverlay" />
-            <VideoGridTitleLogo
-              translation="[5,4]"
-              id="inlineVideoGridTitleLogo" />
-            <Poster
-              width="801"
-              height="340"
-              visible="false"
-              id="inlinePreviewFocusIndicator"
-              uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
+              opacity="0"
+              skipAnimation="true"
+              id="inTransitInlineVideoMetadataOverlay" />
+            <Group
+              id="inlineVideoPreviewPlayerContainer"
+              opacity="0"
+              translation="[160, 155]" >
+              <ExpandedVideoGridTile
+                translation="[5,4]"
+                id="inlineVideoMetadataOverlay" />
+              <VideoGridTitleLogo
+                translation="[5,4]"
+                visible="false"
+                id="inlineVideoGridTitleLogo" />
+              <Poster
+                width="801"
+                height="340"
+                visible="false"
+                id="inlinePreviewFocusIndicator"
+                uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
+            </Group>
           </Group>
 
         </Group>
