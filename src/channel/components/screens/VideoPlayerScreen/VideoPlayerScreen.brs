@@ -989,6 +989,21 @@ Function onControlChange()
 End Function
 
 
+'Occurs when the fallback timer fires.
+'This is used to advance the codec on the content in the case where the codec is not supported.
+Function onFallbackTimerFired()
+  m.fallbackTimer.unObserveFieldScoped("fire")
+  m.fallbackTimer = invalid
+
+  if isNode(m.Video) AND m.Video.errorCode = -5 ' Media error; the media format is unknown or unsupported
+    advanceCodecOnContent(m.Video.content)
+  else
+    advanceDrmOnContent(m.Video.content)
+  end if
+  playContent()
+End Function
+
+
 'Occurs when m.Video.state changes (not when m.top.state changes)
 Function onVideoStateChange(msg)
   tubiLog("VideoPlayer.onVideoStateChange " + msg.GetData())
@@ -1024,7 +1039,13 @@ Function onVideoStateChange(msg)
       if m.Video.content <> invalid AND m.playerPosition >= 0
         m.Video.content.nowPos = m.playerPosition
       end if
-      playContent()
+      ' Adding a small timer so that we move the execution to the next frame rather than immediately executing the fallback logic
+      ' This is that video player state gets out of the error state.
+      m.fallbackTimer = createObject("roSGNode", "Timer")
+      ' We just need a minute delay to ensure that the video player state gets out of the error state.
+      m.fallbackTimer.duration = 0.01
+      m.fallbackTimer.observeFieldScoped("fire", "onFallbackTimerFired")
+      m.fallbackTimer.control = "start"
     else
       ' the video reached the end
       if m.Video.content <> invalid
@@ -1116,9 +1137,9 @@ Function onVideoStateChange(msg)
       ' Set up the next DRM scheme. Playback of next DRM scheme is triggered when state = "finished",
       ' right after error state occurs.
       if m.Video.errorCode = -5 ' Media error; the media format is unknown or unsupported
-        m.didAdvanceDrm = advanceCodecOnContent(content)
+        m.didAdvanceDrm = checkIfCodecFallbackIsAvailable(content)
       else
-        m.didAdvanceDrm = advanceDrmOnContent(content)
+        m.didAdvanceDrm = checkIfDRMFallbackIsAvailable(content)
       end if
     end if
 
@@ -2532,6 +2553,61 @@ Function advanceCodecOnContent(contentNode)
           logError(FormatJSON(fallbackInfo), "videoLoad", "codec-fallback", 0.1)
           return true
         end if
+      end if
+    end if
+  end if
+  return false
+End Function
+
+
+' checkIfCodecFallbackIsAvailable function checks if a codec fallback is available.
+' @contentNode: roSGNode, a TubiContentNode
+Function checkIfCodecFallbackIsAvailable(contentNode)
+  tubiLog("VideoPlayer.advanceCodecOnContent")
+
+  if contentNode <> invalid
+    videoResources = contentNode.videoResources
+    currentVideoResourceIndex = contentNode.currentVideoResourceIndex
+
+    if videoResources <> invalid AND currentVideoResourceIndex <> invalid AND currentVideoResourceIndex.Count() >= 2
+      currentCodecIndex = currentVideoResourceIndex[0]
+      nextCodecIndex = currentCodecIndex + 1
+      if videoResources[currentCodecIndex] <> invalid AND videoResources[nextCodecIndex] <> invalid
+        return videoResources[nextCodecIndex][0] <> invalid
+      end if
+    end if
+  end if
+  return false
+End Function
+
+
+' checkIfDRMFallbackIsAvailable function checks if a DRM fallback is available.
+' @contentNode: roSGNode, a TubiContentNode
+Function checkIfDRMFallbackIsAvailable(contentNode)
+  tubiLog("VideoPlayer.advanceDrmOnContent")
+
+  if contentNode <> invalid
+    videoResources = contentNode.videoResources
+    currentVideoResourceIndex = contentNode.currentVideoResourceIndex
+    if videoResources <> invalid AND currentVideoResourceIndex <> invalid AND currentVideoResourceIndex.Count() >= 2
+
+      currentCodecIndex = currentVideoResourceIndex[0]
+      currentDrmIndex = currentVideoResourceIndex[1]
+
+      if videoResources[currentCodecIndex] <> invalid
+        nextDrmIndex = currentDrmIndex + 1
+        nextResource = videoResources[currentCodecIndex][nextDrmIndex]
+
+        if nextResource = invalid
+          nextCodecIndex = currentCodecIndex + 1
+          nextDrmIndex = 0
+
+          if videoResources[nextCodecIndex] <> invalid
+            nextResource = videoResources[nextCodecIndex][nextDrmIndex]
+          end if
+        end if
+
+        return nextResource <> invalid
       end if
     end if
   end if
