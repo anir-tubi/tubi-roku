@@ -32,7 +32,8 @@ Function init()
 
   m.isExternalConfigReady = false ' Used to know when external config has been loaded so we know if we can proceed
   m.isExperimentsConfigReady = false ' Used to know when experiments have been loaded so we know if we can proceed
-
+  m.soTStaticConfigComplete = false ' Used to know when the SoT static config has been loaded so we know if we can proceed
+  
   ' Holds the callback method value which will be called once the initial get consent request is completed.
   m.onGetConsentCompletionCallback = invalid
 
@@ -222,8 +223,6 @@ Function addControllerUi()
   ' used to keep state if we went through the process to refresh auth after receiving a transfer token from
   ' a mobile device deeplink. Used to determine if we should show a toast message or not.
   m.authInfoRefreshed = false
-
-  m.soTStaticConfigComplete = false
 
   ' indicates if we are building the app in a deep link state
   ' is set to true when a deeplink occurs, and set back to false after the deeplink has been handled
