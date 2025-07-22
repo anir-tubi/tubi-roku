@@ -309,10 +309,9 @@ Function retrieveSoTStaticConfigSuccessCallback(staticConfig)
   if staticConfig <> invalid AND m.global <> invalid 
     m.global.update({"soTStaticConfig": staticConfig}, true)
     m.updateGeneralTaskSoTStaticConfig(staticConfig)
-    setSoTStaticConfigComplete() 
-  else
-    retrieveSoTStaticConfigErrorCallback()
   end if
+
+  setSoTStaticConfigComplete() 
 End Function
 
 
@@ -320,10 +319,9 @@ Function retrieveSoTStaticConfigErrorCallback(_error = invalid)
   setSoTStaticConfigComplete()
 End Function
 
-
+' Check : if this function can be removed. Calling runControllerStartSequence() here waits for SoT static config to be complete which 
+' increases the time to load the app. Since SoT is nice to have and not a blocker for the app to load, we can remove this function in the future.
 Function setSoTStaticConfigComplete()
-
   m.soTStaticConfigComplete = true
-
   runControllerStartSequence()
 End Function

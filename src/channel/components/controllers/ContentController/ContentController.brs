@@ -735,6 +735,11 @@ Function runControllerStartSequence()
       m.ageVerificationComplete = true
       runControllerStartSequence()
     end if
+  else if m.soTStaticConfigComplete = false
+    ' Wait until the SoT static config is complete before proceeding.
+    ' This is required because we call runControllerStartSequence() from the success or failure callback of the SoT static config request.
+    ' If for some reason request is delayed and completes after all the other conditions are true then we will load the home / side nav. 
+    ' After which it will again try to load side nav and try to attach observers twice.
   else
     ' All of the above checked values are true, so we are ready to start the channel UI
 
