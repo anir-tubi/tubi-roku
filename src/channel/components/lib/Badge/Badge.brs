@@ -34,6 +34,9 @@ End Function
 Function adjustBadgeSize()
   badgeInfoLayoutWidth = m.badgeInfoLayout.boundingRect().width
   maxWidthValue = m.top.maxWidth
+  height = m.badgeText.boundingRect().height
+  m.badgeIcon.height = height
+
   ' Apply maxWidth constraint if set
   if maxWidthValue > 0 AND badgeInfoLayoutWidth > maxWidthValue
     ' Adjust badge text width to fit within maxWidth
@@ -80,4 +83,5 @@ Function onSetTypography(msg)
   else
     setTypographyOfLabel(m.badgeText, m.typographyConstants.ids.bodySmallStrong)
   end if
+
 End Function
