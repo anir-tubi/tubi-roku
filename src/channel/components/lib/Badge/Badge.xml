@@ -35,7 +35,8 @@
       <Poster
         id="BadgeIcon"
         height="21"
-        width="0"/>
+        width="0"
+        loadDisplayMode="scaleToFit"/>
       <Label
         id="BadgeText"
         ellipsizeOnBoundary="true"

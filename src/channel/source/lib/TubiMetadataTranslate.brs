@@ -3053,6 +3053,8 @@ Function tubiMetadataTranslate_getTextFromPath(content, path, defaultValue = "")
 
   if result = invalid then return defaultValue
 
+  if isNumber(result) = true then result = result.toStr()
+
   return result
 
 End Function

@@ -73,7 +73,7 @@ End Function
 
 
 Function setSotBadge(badgeUri, badgeText)
-  if isNonEmptyString(badgeUri) = true AND isNonEmptyString(badgeText) = true
+  if isNonEmptyString(badgeText) = true
     if m.sotBadge = invalid
       m.sotBadge = createObject("roSGNode", "Badge")
       m.sotBadge.id="sotBadge"
