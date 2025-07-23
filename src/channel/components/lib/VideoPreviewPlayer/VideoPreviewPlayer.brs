@@ -74,30 +74,6 @@ Function playContent()
   m.lastPingTime = 0
   m.playerPosition = 0
 
-  videoContent = m.Video.content
-
-  if videoContent.id <> invalid
-    previewId = videoContent.previewId
-
-    startPreviewEvent = {
-      type: "start_preview"
-      values: {
-        video_id: videoContent.id.toInt()
-        is_fullscreen: false
-        video_player: m.top.videoPlayerType
-        preview_id: previewId
-        pageOneof: m.tubiTrackingInfo.getAnalyticsPage(m.currentPageInfo.pageType, m.currentPageInfo.pageValues)
-      }
-    }
-
-    componentInfo = m.top.componentInfoForAnalytics
-    if isAA(componentInfo) = true AND isAA(componentInfo.componentOneof) = true
-      startPreviewEvent.values.componentOneof = componentInfo.componentOneof
-    end if
-
-    trackEvent(startPreviewEvent)
-  end if
-
 End Function
 
 
@@ -137,6 +113,11 @@ Function onVideoStateChange(msg)
     m.videoState = state
   else if state = "playing"
     m.videoState = "play"
+
+    'We're adding a check here to prevent sending the start_preview event when resuming the preview, in order to avoid triggering an unnecessary event.
+    if m.video.position = 0
+      fireStartPreviewEvent()
+    end if
   end if
 
   if state = "finished"
@@ -359,6 +340,36 @@ Function getFinishPreviewEvent(hasCompleted = false)
   end if
 
   return finishPreviewEvent
+End Function
+
+
+Function fireStartPreviewEvent()
+  videoContent = m.Video.content
+  startPreviewEvent = invalid
+
+  if videoContent.id <> invalid
+    previewId = videoContent.previewId
+
+    startPreviewEvent = {
+      type: "start_preview"
+      values: {
+        video_id: videoContent.id.toInt()
+        is_fullscreen: false
+        video_player: m.top.videoPlayerType
+        preview_id: previewId
+        pageOneof: m.tubiTrackingInfo.getAnalyticsPage(m.currentPageInfo.pageType, m.currentPageInfo.pageValues)
+      }
+    }
+
+    componentInfo = m.top.componentInfoForAnalytics
+    if isAA(componentInfo) = true AND isAA(componentInfo.componentOneof) = true
+      startPreviewEvent.values.componentOneof = componentInfo.componentOneof
+    end if
+
+    trackEvent(startPreviewEvent)
+
+  end if
+
 End Function
 
 
