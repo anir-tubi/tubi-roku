@@ -548,8 +548,8 @@ End Function
 
 Function fireNavigateWithinPageEvent()
   'Set up the navigateWithinPageInfo to send to ContentController via Homescreen. Need for when CategoryGridList is in focus
-  oldRowIndexBoost = m.categoryGridList.rowIndexBoost
-  newRowIndexBoost = m.categoryGridList.rowIndexBoost
+  oldRowIndexBoost = m.categoryGridList.rowIndexBoost + 1
+  newRowIndexBoost = m.categoryGridList.rowIndexBoost + 1
 
   oldAnalyticsRow = m.CategoryGridList.oldCursorPosition[0] + oldRowIndexBoost
   oldAnalyticsCol = m.CategoryGridList.oldCursorPosition[1] + 1
@@ -618,7 +618,8 @@ Function getTrackingComponentInfoOfCategoryGridList(gridItem, itemPosition)
   if gridItem <> invalid AND itemPosition <> invalid AND itemPosition.Count() = 2
     componentValues = {}
     componentValues["category_slug"] = m.top.currCategoryId
-    rowIndexBoost = m.categoryGridList.rowIndexBoost
+    ' The rowIndexBoost is 1 based. And Roku row list index is 0 based.
+    rowIndexBoost = m.categoryGridList.rowIndexBoost + 1
 
     componentValues["category_row"] = itemPosition[0] + rowIndexBoost 'all analytics are 1 based
     componentValues["category_col"] = itemPosition[1] + 1 'all analytics are 1 based
