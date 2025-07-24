@@ -1007,7 +1007,18 @@ Function onSkipTrailer(msg)
       if getHiddenScreen() <> invalid AND getHiddenScreen().id = m.constants.ui.screenIds.detailScreen
         detailScreen = getHiddenScreen()
         detailScreenContent = getDetailScreenContent(detailScreen)
-        playVideoContent(detailScreenContent)
+        if detailScreenContent <> invalid AND detailScreenContent.type = "series"
+          episode = getEpisodeContent(detailScreen.content)
+          if episode <> invalid then
+            nowPos = processResume(episode)
+            if nowPos >= 0
+              playVideoContent(episode, detailScreen.playbackSource, nowPos)
+            end if
+          end if
+        else
+          nowPos = processResume(detailScreenContent)
+          playVideoContent(detailScreenContent, detailScreen.playbackSource, nowPos)
+        end if
       end if
     end if
   end if
