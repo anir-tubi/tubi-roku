@@ -818,6 +818,16 @@ const elements = typeCheckElements({
       '/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/UpNext/Group/Group[2]/TargetList',
   },
 
+  autoplayGridMovie: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextMovieGroup.#GridMovie'
+  },
+
+  autoplayCountdownTimerSection: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#CountdownTimerParent'
+  },
+
   videoPlayerActual: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#VideoNode',
@@ -868,6 +878,10 @@ const elements = typeCheckElements({
 
   browseWhileWatchingRowList: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#BrowseWhileWatchingRow.0.#BrowseWhileWatchingGroup.#BrowseWhileWatchingRow.#CategoryGridList.#RowList',
+  },
+
+  browseWhileWatchingInfoPanel: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#BrowseWhileWatchingRow.#BrowseWhileWatchingGroup.#Info',
   },
 
   searchResultChannelNameABC: {
@@ -1871,15 +1885,30 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextParent.#UpNextSeriesGroup.#GridSeries.0'
   },
 
-  /** autoplay countdown movies */
-  countDownMovieAutoPlay: {
+  /** autoplay countdown */
+  countDownAutoPlay: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextMovieGroup.#CountdownLabelMovie',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#CountdownGroup.#CountdownText',
+  },
+
+  countDownSecondsAutoPlay: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#CountdownGroup.#CountdownSeconds',
   },
 
   countDownSeriesAutoPlay: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextParent.#UpNextSeriesGroup.#metadataSeries.#CountdownLabelSeries',
+  },
+
+  autoplayUINextEpisodeButton: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextParent.#UpNextSeriesGroup.#UpNextSeriesMenu',
+  },
+
+  autoplayUISeriesGrid: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextParent.#UpNextSeriesGroup.#GridSeries',
   },
 
   /** remaining time in player timer */
@@ -2658,7 +2687,12 @@ const elements = typeCheckElements({
   // Preview On Checked
   previewOnCheckMark: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.3.#Offset.#ContentGroup.#AutoplayPreviewMenu.0.#container.0.#checkIcon',
+  },
+
+  autoplayNextVideoMenu: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.#AutoPlayTimerMenu'
   }
+  
 });
 
 export {

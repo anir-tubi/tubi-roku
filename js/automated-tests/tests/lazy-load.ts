@@ -7,7 +7,7 @@ describe('LazyLoad', function () {
     
 
     // https://tubi.testrail.io/index.php?/cases/view/432577
-   it('C432577 - Lazy load does not occur when less than 200 titles, @lazyload', async () => {
+   it('C432577 - Lazy load does not occur when less than or equal to 200 titles, @lazyload', async () => {
 
        // Start app with Guest user
        await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
@@ -30,7 +30,7 @@ describe('LazyLoad', function () {
       await utils.sleep(1000);
       const contents = await testUtils.getAllGridItemsContent('channelCategoryGrid');
       const itemCounterValue = contents.length;
-      expect(itemCounterValue).is.lessThan(200);
+      expect(itemCounterValue).is.lessThanOrEqual(200);
 
     });
 

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { odc, ecp, utils } from 'roku-test-automation';
 import { testUtils } from './test-utils';
-
+import { moveToGrid } from './analytics/utils/helpers';
 
 
 
@@ -121,7 +121,31 @@ class Shared {
       });
       return id === 'ResultGrid';
     }, 'ResultGrid never obtained focus');
+  }
 
+
+  public async findContentPositionInGridByTitle({ title, gridId }) {
+    let position = -1;
+    const content = await testUtils.getAllGridItemsContent(
+      gridId
+    );
+
+    for (const [index, item] of content.entries()) {
+      if (item.title === title) {
+        position = index;
+        break;
+      }
+      }
+    
+    return position > -1 ? this.positionToRowCol(position) : [];
+  }
+
+  async navigateToContentInSearchResults({ title }) {
+    await this.navigateRightToGrid();
+    const position = await this.findContentPositionInGridByTitle({ title: title, gridId: 'searchResultGrid' });
+    if (position.length > 0) {
+      await moveToGrid({grid: {row: 0, col: 0}, destRow: position[0], destCol: position[1]});
+    }
   }
 
   public positionToRowCol(position: number, columns: number = 5): [number, number] {
@@ -148,6 +172,68 @@ class Shared {
     
     return position > -1 ? this.positionToRowCol(position, columnsPerRow) : [];
   }
+
+
+  async turnOnAutoplay() {
+    //Open left nav
+    await ecp.sendKeypress(ecp.Key.Left);
+  
+    // Open settings
+    await this.openSettings();
+  
+    // Turn off video previews
+    await ecp.sendKeypress(ecp.Key.Down);
+    await ecp.sendKeypress(ecp.Key.Ok);
+
+    await ecp.sendKeypress(ecp.Key.Down);
+    const { node } = await odc.getFocusedNode();
+    if (node.id === 'AutoplayPreviewMenu') {
+      await ecp.sendKeypress(ecp.Key.Down);
+    }
+    await testUtils.waitForElementToHaveFocus('autoplayNextVideoMenu', 'Timed out waiting for Autoplay Next Video Menu to have focus', 15000);
+
+    await testUtils.jumpToRowIndex('autoplayNextVideoMenu', 0);
+    await ecp.sendKeypress(ecp.Key.Ok);
+    // Provide some time for the request to complete before restarting the app.
+    await utils.sleep(3000);
+    // Go back to home page and verify that autoplay is off
+    await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
+  }
+
+  async turnOffAutoplay() {
+    //Open left nav
+    await ecp.sendKeypress(ecp.Key.Left);
+
+    // Open settings
+    await this.openSettings();
+
+    // Turn off video previews
+    await ecp.sendKeypress(ecp.Key.Down);
+    await ecp.sendKeypress(ecp.Key.Ok);
+
+    await ecp.sendKeypress(ecp.Key.Down);
+    const { node } = await odc.getFocusedNode();
+    if (node.id === 'AutoplayPreviewMenu') {
+      await ecp.sendKeypress(ecp.Key.Down);
+    }
+
+    await testUtils.waitForElementToHaveFocus('autoplayNextVideoMenu', 'Timed out waiting for Autoplay Next Video Menu to have focus', 15000);
+    await testUtils.jumpToRowIndex('autoplayNextVideoMenu', 1);
+    await ecp.sendKeypress(ecp.Key.Ok);
+    // Provide some time for the request to complete before restarting the app.
+    await utils.sleep(3000);
+    // Go back to home page and verify that autoplay is off
+    await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
+  }
+
+  public async openMovies() {
+    await testUtils.goToPage('movies');
+  }
+
+  public async openSeries() {
+    await testUtils.goToPage('series');
+  }
+
 }
 
 const shared = new Shared();

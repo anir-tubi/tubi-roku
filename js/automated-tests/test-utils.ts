@@ -403,16 +403,20 @@ class TestUtils {
 
 
   // Helper for going to a different page in the application
-  public async goToPage(page: DeeplinkPage | 'search' | 'settings' | 'myStuff') {
-    if (page === 'search') {
+  public async goToPage(page: DeeplinkPage | 'search' | 'settings' | 'myStuff' | 'movies' | 'series') {
+
+    var pageTileMapping = {
+      'movies': 'Movies',
+      'series': 'TV Shows',
+      'home': 'Home',
+      'search': 'Search',
+      'myStuff': 'My Stuff',
+      'settings': 'Settings'
+    }
+    const selectedPage = pageTileMapping[page];
+    if (selectedPage) {
       // We don't have a deeplink for these so we access it on the side nav menu instead
-      await this.selectMenuItem('sideNavMenu', 'Search', undefined);
-    } else if (page === 'settings') {
-      // We don't have a deeplink for these so we access it on the side nav menu instead
-      await this.selectMenuItem('sideNavMenu', 'Settings', undefined);
-    } else if (page === 'myStuff') {
-      // We don't have a deeplink for these so we access it on the side nav menu instead
-      await this.selectMenuItem('sideNavMenu', 'My Stuff', undefined);
+      await this.selectMenuItem('sideNavMenu', selectedPage, undefined);
     } else {
       await ecp.sendInput({
         params: {

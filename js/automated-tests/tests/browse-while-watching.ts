@@ -503,7 +503,7 @@ describe('Browse While Watching', function () {
     }
 
     async function selectSeriesTitle() {
-        await testUtils.goToPage('tv');
+        await testUtils.goToPage('series');
         await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'TV screen row not found', 15000);
         await ecp.sendKeypress(ecp.Key.Play); 
     }

@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { ecp, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
+import { shared } from '../shared';
 
 describe('Homescreen Navigation - TV Shows Filter', function () {
   before(async () => {
@@ -12,7 +13,10 @@ describe('Homescreen Navigation - TV Shows Filter', function () {
     const movieContent = await user.getContent().ofContentType('movie').retrieve({ limit: 5 });
     await user.addContentToViewHistory(movieContent, 500);
     await user.addContentToWatchList(movieContent);
-    await testUtils.startApplicationAtPage('tv', { user: user });
+    await testUtils.startApplicationAtPage('home', { user: user });
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
+    await shared.openSeries();
+    await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
   });
 
   //https://tubi.testrail.io/index.php?/cases/view/63513

@@ -16,7 +16,7 @@ describe('Search', function () {
       await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for element to have focus',10000);
       await ecp.sendText('nbc');
 
-      await navigateToContentInSearchResults({title: LINEAR_CHANNEL_TITLE});
+      await shared.navigateToContentInSearchResults({title: LINEAR_CHANNEL_TITLE});
       await testUtils.retryWithTimeOut(async () => {
         const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
         expect(searchResultsText.text).to.equal(LINEAR_CHANNEL_TITLE);
@@ -33,7 +33,7 @@ describe('Search', function () {
       await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for element to have focus',10000);
       await ecp.sendText('nbc');
 
-      await navigateToContentInSearchResults({title: LINEAR_CHANNEL_TITLE});
+      await shared.navigateToContentInSearchResults({title: LINEAR_CHANNEL_TITLE});
       await testUtils.retryWithTimeOut(async () => {
         const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
         expect(searchResultsText.text).to.equal(LINEAR_CHANNEL_TITLE);
@@ -54,7 +54,7 @@ describe('Search', function () {
       await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for element to have focus',10000);
       await ecp.sendText('nbc');
 
-      await navigateToContentInSearchResults({title: LINEAR_CHANNEL_TITLE});
+      await shared.navigateToContentInSearchResults({title: LINEAR_CHANNEL_TITLE});
       await testUtils.retryWithTimeOut(async () => {
         const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
         expect(searchResultsText.text).to.equal(LINEAR_CHANNEL_TITLE);
@@ -82,7 +82,7 @@ describe('Search', function () {
       await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for element to have focus',10000);
       await ecp.sendText('nbc');
 
-      await navigateToContentInSearchResults({title: LINEAR_CHANNEL_TITLE});
+      await shared.navigateToContentInSearchResults({title: LINEAR_CHANNEL_TITLE});
       await testUtils.retryWithTimeOut(async () => {
         const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
         expect(searchResultsText.text).to.equal(LINEAR_CHANNEL_TITLE);
@@ -109,26 +109,6 @@ describe('Search', function () {
       });
     });
 
-    /* ML driven, removing
-    // https://tubi.testrail.io/index.php?/cases/view/244261
-    it('C244261  When a user searches for a linear channel, the channel matching to the search term should show up in the search results as primary results', async () => {
-      await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
-      await ecp.sendText('nbc');
-
-      // Call function to navigate right to search results grid
-      await navigateRightToGrid();
-
-      // Verify search results and live icon
-      await testUtils.retryWithTimeOut(async () => {
-        const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-        expect(searchResultsText.text).to.equal('NBC News NOW');
-      });
-
-      const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
-      expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon.webp');
-    });
-    */
-
     it('C244271  Ensure that when the user hover over a channel search result the channel name and description is displayed on the top left corner @search', async () => {
       await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
@@ -136,7 +116,7 @@ describe('Search', function () {
       await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for element to have focus',10000);
       await ecp.sendText('nbc');
 
-      await navigateToContentInSearchResults({title: LINEAR_CHANNEL_TITLE});
+      await shared.navigateToContentInSearchResults({title: LINEAR_CHANNEL_TITLE});
       await testUtils.retryWithTimeOut(async () => {
         const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
         expect(searchResultsText.text).to.equal(LINEAR_CHANNEL_TITLE);
@@ -156,11 +136,11 @@ describe('Search', function () {
     it('C406434 When a user taps "Play" button on linear channel, backing out takes user back to search results @search', async () => {
       await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
-      await testUtils.goToPage('search');await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
+      await testUtils.goToPage('search');
       await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for element to have focus',10000);
       await ecp.sendText('nbc');
 
-      await navigateToContentInSearchResults({title: LINEAR_CHANNEL_TITLE});
+      await shared.navigateToContentInSearchResults({title: LINEAR_CHANNEL_TITLE});
       await testUtils.retryWithTimeOut(async () => {
         const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
         expect(searchResultsText.text).to.equal(LINEAR_CHANNEL_TITLE);
@@ -209,42 +189,4 @@ describe('Search', function () {
   });
     
 });
- 
 
-// Navigate right until the grid is in focus
-async function navigateRightToGrid() {
-  await testUtils.waitForElementToShowOnScreen('searchResultGrid');
-  await testUtils.untilTrue(async () => {
-    await ecp.sendKeypress(ecp.Key.Right);
-    const { value: id } = await odc.getValue({
-      base: 'focusedNode',
-      keyPath: 'id'
-    });
-    return id === 'ResultGrid';
-  }, 'ResultGrid never obtained focus');
-}
-
-
-async function findContentPositionInGridByTitle({ title, gridId }) {
-  let position = -1;
-  const content = await testUtils.getAllGridItemsContent(
-    gridId
-  );
-
-  for (const [index, item] of content.entries()) {
-    if (item.title === title) {
-      position = index;
-      break;
-    }
-    }
-  
-  return position > -1 ? shared.positionToRowCol(position) : [];
-}
-
-async function navigateToContentInSearchResults({ title }) {
-  await navigateRightToGrid();
-  const position = await findContentPositionInGridByTitle({ title: title, gridId: 'searchResultGrid' });
-  if (position.length > 0) {
-    await moveToGrid({grid: {row: 0, col: 0}, destRow: position[0], destCol: position[1]});
-  }
-}

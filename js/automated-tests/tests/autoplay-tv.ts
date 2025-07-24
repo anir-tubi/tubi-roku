@@ -1,144 +1,181 @@
 import { expect } from 'chai';
-import { ecp, utils } from 'roku-test-automation';
+import { ecp, odc, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
+
 import { shared } from '../shared';
+import { waitForDebugger } from 'inspector';
 
-describe('Autoplay TV', function () {
-    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/70577
-    it('C70577 - Autoplay - Series - When series reaches the credit cue point then autoplay triggers @autoplay', async () => {
-        await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
-        await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
+describe('Autoplay Series', function () {
 
-        await ecp.sendKeypress(ecp.Key.Play,  {wait:5000});
-        // Trigger Series Autoplay
-        await triggerSeriesAutoplay();
+  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/768087
+  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535750
+  it('C768087 - Autoplay Next Video On - Autoplay next title @autoplay', async () => {
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    await shared.turnOnAutoplay();
+    await shared.openSeries();
+    // Are we on the series page?
+    await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
+    await ecp.sendKeypress(ecp.Key.Play);
+    await seekToTriggerCuePoint();
 
-        // Autoplay triggered?
-        await checkForAutoPlayTrigger();
-        
+    // Autoplay triggered?
+    await checkIfSeriesAutoPlayUIisShowing();
 
+    await testUtils.waitForElementToHaveFocus('autoplayUINextEpisodeButton', 'Timed out waiting for Next Episode button to have focus', 15000);
+
+    // Testing to make sure it is auto plays to the next title.
+    const gridContents = await testUtils.getAllGridItemsContent(
+      'autoplayUISeriesGrid'
+    );
+    // TODO Optimize in future by providing a way for automation to override the value.
+    // 16 seconds is a long wait. We need to update to pull from settings then from constants.
+    await utils.sleep(16000);
+    const videoNode2 = await testUtils.getNodeForElement('videoPlayerActual');
+    const newVideoId = videoNode2.content.id;
+    expect(newVideoId).to.be.equal(gridContents[0].id);
+
+    // Testing to make sure the new video is playing.
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
+  });
+
+  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/768088
+  it('C768088 - Autoplay Next Video On - Press back during Autoplay countdown @autoplay', async () => {
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
+    await shared.openSeries();
+    // Are we on the series page?
+    await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
+    await ecp.sendKeypress(ecp.Key.Play);
+    await seekToTriggerCuePoint();
+
+    // Autoplay triggered?
+    await checkIfSeriesAutoPlayUIisShowing();
+
+    await ecp.sendKeypress(ecp.Key.Back);
+    const { node } = await odc.getFocusedNode();
+    expect(node.id).to.equal('videoPlayerScreen');
+  });
+
+  //Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/148693
+  it('C148693 - Autoplay - Series- When user searches for a Series and initiates playback, Autoplay should work @autoplay', async () => {
+    // Search for a Series title
+    await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
+    await testUtils.waitForElementToFullyShowOnScreen('searchKeyPad');
+    const TITLE = "everybody hates chris";
+    await ecp.sendText(TITLE);
+
+    await shared.navigateToContentInSearchResults({ title: TITLE });
+    await testUtils.retryWithTimeOut(async () => {
+      const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
+      expect(searchResultsText.text.toLowerCase()).to.contain(TITLE);
     });
 
-    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535750
-    it('C535750 - Autoplay - Series - When autoplay timer expires then next episode autoplays @autoplay', async () => {
+    //Play title, trigger autoplay
+    await ecp.sendKeypress(ecp.Key.Play);
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
+    await seekToTriggerCuePoint();
 
-        await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
-        await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    // Autoplay triggered?
+    await checkIfSeriesAutoPlayUIisShowing();
+  });
 
-        await ecp.sendKeypress(ecp.Key.Play,  {wait:5000});
-        // Trigger Series Autoplay
-        await triggerSeriesAutoplay();
 
-        // Autoplay triggered?
-        await checkForAutoPlayTrigger();
+  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535854
+  it('C535854 - Autoplay - Series - Next episode plays after multiple consecutive auto plays @autoplay', async () => {
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
+    await shared.openSeries();
+    // Are we on the Series page?
+    await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
+    await ecp.sendKeypress(ecp.Key.Play);
 
-        // Has autoplay container disappeared?
-        await testUtils.waitForElementFieldToEqual('autoPlayContentPoster', 'itemHasfocus', false, 20000);
-        // Is next episode playing?
-        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 16000);
+    await seekToEndToTriggerCuePointAndCheckIfNextEpisodePlays();
 
-    });
+    await seekToEndToTriggerCuePointAndCheckIfNextEpisodePlays();
 
-    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535854
-    it('C535854 - Autoplay - Series - Next episode plays after multiple consecutive autoplays @autoplay', async () => {
+    await seekToEndToTriggerCuePointAndCheckIfNextEpisodePlays();
 
-        await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
-        await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
-        await ecp.sendKeypress(ecp.Key.Down);
+    await seekToEndToTriggerCuePointAndCheckIfNextEpisodePlays();
+  });
 
-    
-        // Trigger Series Autoplay
-        await ecp.sendKeypress(ecp.Key.Play,  {wait:5000});
-        await triggerSeriesAutoplay();
 
-        // Autoplay triggered?
-        await checkForAutoPlayTrigger();
-        // Wait for count down end
-        await testUtils.waitForElementFieldToEqual('autoPlayContentPoster', 'itemHasfocus', false, 20000);
-        
-        // Is next episode playing? Wait for loading bar to make sure it is playing the next episode
-        await testUtils.waitForElementToFullyShowOnScreen('loadingProgressBar');
-        await testUtils.waitForElementToNotShowOnScreen('loadingProgressBar');
-        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
+  async function seekToEndToTriggerCuePointAndCheckIfNextEpisodePlays() {
+    await seekToTriggerCuePoint();
+    // Autoplay triggered?
+    await checkIfSeriesAutoPlayUIisShowing();
+    await testUtils.waitForElementToHaveFocus('autoplayUINextEpisodeButton', 'Timed out waiting for Next Episode button to have focus', 15000);
+    // Testing to make sure it is auto plays to the next title.
+    const gridContents = await testUtils.getAllGridItemsContent(
+      'autoplayUISeriesGrid'
+    );
+    await ecp.sendKeypress(ecp.Key.Ok);
+    const videoNode2 = await testUtils.getNodeForElement('videoPlayerActual');
+    const newVideoId = videoNode2.content.id;
+    expect(newVideoId).to.be.equal(gridContents[0].id);
 
-        // Play Next Episode
-        await triggerSeriesAutoplay();
+    // Testing to make sure the new video is playing.
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
+  }
 
-        // Autoplay triggered?
-        await checkForAutoPlayTrigger();
-        await utils.sleep(1000);
-        await testUtils.waitForElementFieldToEqual('autoPlayContentPoster', 'itemHasfocus', true, 5000);
-        await ecp.sendKeypress(ecp.Key.Play);
+  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/768089
+  it('C768089 - Autoplay Next Video Off - Do not Autoplay next episode @autoplay', async () => {
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
 
-        // Has autoplay container disappeared?
-        await testUtils.waitForElementFieldToEqual('autoPlayContentPoster', 'itemHasfocus', false);
-        // Is next episode playing?
-        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 20000);
+    await shared.turnOffAutoplay();
+    await validateAutoplayNextVideoUINotShowing();
+  });
 
-    });
+  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/768094
+  it('C768094 - Autoplay Next Video Off - Press Back button @autoplay', async () => {
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
 
-    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535749
-    it('C535749 - Autoplay - Series - When user presses the Back button then series autoplay UI is dismissed @autoplay', async () => {
+    await shared.turnOffAutoplay();
+    await validateAutoplayNextVideoUINotShowing();
 
-        await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
-        await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await ecp.sendKeypress(ecp.Key.Back);
+    const { node } = await odc.getFocusedNode();
+    expect(node.id).to.equal('videoPlayerScreen');
 
-        // Trigger Series Autoplay
-        await ecp.sendKeypress(ecp.Key.Play,  {wait:5000});
-        await triggerSeriesAutoplay();
+    await testUtils.waitForCurrentScreenToEqual('detailScreen');
+  });
 
-        // Autoplay triggered?
-        await checkForAutoPlayTrigger();
-
-        // Press Back
-        await ecp.sendKeypress(ecp.Key.Back);
-
-        // Is Autoplay dismissed?
-        await testUtils.waitForElementToNotShowOnScreen('countDownSeriesAutoPlay');
-       
-
-    });
-
-    //Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/148693
-    it('C148693 - Autoplay - Series- When user searches for a Series and initiates playback, Autoplay should work @autoplay', async () => {
-
-        // Search for a Series title
-        await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
-        await ecp.sendText('everbody hates chris');
-
-        // Call function to navigate right to search results grid
-        await shared.navigateRightToGrid();
-
-        await testUtils.retryWithTimeOut(async () => {
-            const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-            expect(searchResultsText.text).to.equal('Everybody Hates Chris');
-        });
-
-        //Play title, trigger autoplay
-        await ecp.sendKeypress(ecp.Key.Play,  {wait:5000});
-        await triggerSeriesAutoplay();
-
-        // Autoplay triggered?
-        await checkForAutoPlayTrigger();
-
-    });
 });
 
-async function triggerSeriesAutoplay() {
-    //Play title, seek to autoplay cue point
-    
-    // await ecp.sendKeypress(ecp.Key.Play,  {wait:5000});
-    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
-    await ecp.sleep(2000);
-    await ecp.sendKeypress(ecp.Key.Play, {wait:1000});
-     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','paused');
-    await utils.sleep(2000);
-    await testUtils.seekPlayerToRelativePosition('videoPlayerScreen', 0, 'end');
+async function seekToTriggerCuePoint() {
+  await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
+  await testUtils.seekPlayerToRelativePosition('videoPlayerScreen', 0, 'end');
 }
 
-async function checkForAutoPlayTrigger() {
-    await testUtils.waitForElementToFullyShowOnScreen('countDownSeriesAutoPlay', 'countdown element not found', 5000);
-    const countDownSeriesAutoPlay = await testUtils.getNodeForElement('countDownSeriesAutoPlay');
-    expect(countDownSeriesAutoPlay.text).to.contain('Starting');
+async function checkIfSeriesAutoPlayUIisShowing() {
+  await testUtils.waitForElementToFullyShowOnScreen('countDownAutoPlay');
+  const countDownAutoPlay = await testUtils.getNodeForElement('countDownAutoPlay');
+  // Testing to make sure countdown is showing.
+  expect(countDownAutoPlay.text).to.contain('Up Next in');
+
+  // Testing to make sure countdown is counting down.
+  await testUtils.waitForElementToFullyShowOnScreen('countDownSecondsAutoPlay');
+  await utils.sleep(1000);
+  var countDownNode = await testUtils.getNodeForElement('countDownSecondsAutoPlay');
+  var seconds = parseInt(countDownNode.text);
+  if ((typeof seconds === 'number' && !Number.isNaN(seconds)) === false) {
+    await utils.sleep(1000);
+    countDownNode = await testUtils.getNodeForElement('countDownSecondsAutoPlay');
+    seconds = parseInt(countDownNode.text);
+  }
+  await utils.sleep(2000);
+  const countDownNode2 = await testUtils.getNodeForElement('countDownSecondsAutoPlay');
+  expect(seconds).to.be.greaterThan(parseInt(countDownNode2.text));
 }
 
+async function validateAutoplayNextVideoUINotShowing() {
+  await testUtils.goToPage('series');
+  await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
+
+  await ecp.sendKeypress(ecp.Key.Play);
+  await seekToTriggerCuePoint();
+  await testUtils.waitForElementToHaveFocus('autoplayUINextEpisodeButton', 'Timed out waiting for next episode button to have focus', 15000);
+
+  await testUtils.waitForElementToNotShowOnScreen('autoplayCountdownTimerSection', 'Countdown timer section is still showing', 10000);
+}
