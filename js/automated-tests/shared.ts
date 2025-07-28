@@ -234,6 +234,22 @@ class Shared {
     await testUtils.goToPage('series');
   }
 
+  async openSeriesScreenAndWaitUntilListIsFocused(shouldCreateNewUser: boolean = true) {
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: shouldCreateNewUser });
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+  
+    await shared.openSeries();
+    await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
+  }
+
+  async openMoviesScreenAndWaitUntilListIsFocused(shouldCreateNewUser: boolean = true) {
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: shouldCreateNewUser });
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+  
+    await shared.openMovies();
+    await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
+  }
+
 }
 
 const shared = new Shared();

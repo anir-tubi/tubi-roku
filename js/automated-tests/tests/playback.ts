@@ -237,10 +237,7 @@ describe('Playback', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535850
   it('C535850 - Resume from series details page play @playback_1,@registered_user,@regression', async () => {
-    await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
-
-    // Are we on the series page?
-    await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await shared.openSeriesScreenAndWaitUntilListIsFocused();
 
     // verify resume when user goes back to series screen and selects/plays title again
     await verifyResumeWithinRangeWhenBackToScreen();
@@ -252,10 +249,7 @@ describe('Playback', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/536522
   it('C536522 -  Resume from series details page episode play @playback_1,@registered_user,@regression', async () => {
-    await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
-    
-    // Are we on the series page?
-    await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus', 10000);
+    await shared.openSeriesScreenAndWaitUntilListIsFocused();
 
     // Enter Details page to get to Episodes list
     await ecp.sendKeypress(ecp.Key.Ok);

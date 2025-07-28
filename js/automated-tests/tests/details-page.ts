@@ -266,10 +266,7 @@ describe('Details Page', function () {
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/537688
     it('C537688 - Movies - Details Page Displays History Progress Bar @mdp_1,@registered_user', async () => {
       // Launch to Home> Movies page with registered user
-      await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
-
-      // On Movies page?
-      await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
+      await shared.openMoviesScreenAndWaitUntilListIsFocused();
 
 
       //Select title
@@ -300,11 +297,7 @@ describe('Details Page', function () {
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/48643
     it('C48643 - Movie - No History - When title is removed from queue then Remove from Queue changed to Add to Queue @mdp_1,@registered_user', async () => {
 
-      // Launch to Home> Movies page with registered user
-      await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
-
-      // On Movies page?
-      await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
+      await shared.openMoviesScreenAndWaitUntilListIsFocused();
 
       //Select title
       await ecp.sendKeypress(ecp.Key.Right);
@@ -323,11 +316,7 @@ describe('Details Page', function () {
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/76705
     it('C76705 - Movie Details - When Movie Details page is opened then runtime is displayed @mdp_1,@registered_user', async () => {
 
-      // Launch to Home> Movies page with registered user
-      await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
-
-      // On Movies page?
-      await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
+      await shared.openMoviesScreenAndWaitUntilListIsFocused();
 
       //Select title
       await ecp.sendKeypress(ecp.Key.Ok);
@@ -343,11 +332,7 @@ describe('Details Page', function () {
 
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/141195
     it('C141195 Selecting YMAL video on Details page after viewing should work - Movies @registered_user,@smoke,@mdp_1', async () => {
-      //Go to a movie detail page and click play.
-      await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
-
-      // On Movies page?
-      await testUtils.waitForCurrentScreenToEqual('movieScreen');
+      await shared.openMoviesScreenAndWaitUntilListIsFocused();
 
       // Used to wait until the rowlist content is loaded
       await testUtils.getCurrentlyFocusedGridItemIndex('movieScreenRowList');
@@ -380,10 +365,7 @@ describe('Details Page', function () {
 
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/307688
     it('C307688 Registered User - Details page has Play button selected by Default @registered_user,@smoke,@mdp_1', async () => {
-      // Start Application at Movies page with logged in user
-      await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
-       // On Movies page?
-      await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
+      await shared.openMoviesScreenAndWaitUntilListIsFocused();
 
 
       // Used to wait until the rowlist content is loaded
@@ -400,11 +382,7 @@ describe('Details Page', function () {
 
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/https://tubi.testrail.io/index.php?/cases/view/537368
     it('C537368 - Movie Details - No History present - Guest - Resume Playback from beginning @smoke,@mdp_1', async () => {
-      // Start Application at Movies page with Guest user
-      await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: false });
-
-      // On Movies page?
-      await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
+      await shared.openMoviesScreenAndWaitUntilListIsFocused(false);
 
       // Used to wait until the rowlist content is loaded
       await testUtils.getCurrentlyFocusedGridItemIndex('movieScreenRowList');
@@ -490,9 +468,7 @@ describe('Details Page', function () {
     let itemData;
 
     before(async () => {
-      await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
-
-      await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
+      await shared.openSeriesScreenAndWaitUntilListIsFocused();
 
       // We now want to find a piece of content that doesn't have a video preview
       const rowListElement = testUtils.getElementKeyPath('tvScreenRowList');
@@ -535,8 +511,7 @@ describe('Details Page', function () {
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/537454
     it('C537454 - Series - No History - When "Add to My List" selected then series is added to queue,@registered_user,@sdp_1', async () => {
 
-      await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
-      await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
+      await shared.openSeriesScreenAndWaitUntilListIsFocused();
 
       // Select a title
       await ecp.sendKeypress(ecp.Key.Ok);
@@ -574,8 +549,7 @@ describe('Details Page', function () {
 
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535820
     it('C535820 Series - No History - When title is removed from queue then Remove From Queue changed to Add To Queue @sdp_1,@regression,@registered_user', async () => {
-      await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
-      await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
+      await shared.openSeriesScreenAndWaitUntilListIsFocused();
 
       // Select a Title
       await ecp.sendKeypress(ecp.Key.Ok);
@@ -592,8 +566,7 @@ describe('Details Page', function () {
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535821
     it('C535821 - Series - No History - When episode is chosen then playback should triggered from the beginning @sdp_1,@smoke,@regression,@registered_user', async () => {
       // While on Series Details page, lets play and check playback starts from the beginning
-      await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
-      await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
+      await shared.openSeriesScreenAndWaitUntilListIsFocused();
 
       // Select a Title
       await ecp.sendKeypress(ecp.Key.Ok);
@@ -606,8 +579,7 @@ describe('Details Page', function () {
 
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/536524
     it('C536524 - Series - With History - When episode is played back from bookmark then playback will resume from saved history @registered_user,@sdp_1,@regression', async () => {
-      await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
-      await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
+      await shared.openSeriesScreenAndWaitUntilListIsFocused();
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Verify we are on the details page
@@ -654,8 +626,7 @@ describe('Details Page', function () {
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/705809 and https://tubi.testrail.io/index.php?/cases/view/705811
     it('C705809 - Selecting "All Episodes" opens Season/Episode list screen,@sdp_1', async () => {
       // While on Series Details page, lets play and check playback starts from the beginning
-      await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
-      await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
+      await shared.openSeriesScreenAndWaitUntilListIsFocused();
 
       // Select a Title
       await ecp.sendKeypress(ecp.Key.Ok);
