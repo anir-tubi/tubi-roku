@@ -71,7 +71,7 @@ const PlayBack = ({ content }) => {
 			expect(skipIntro.visible).to.equal(true);
 		});
 		await ecp.sendKeypress(ecp.Key.Up), { wait: 300 };
-		await ecp.sendKeypress(ecp.Key.Ok, { wait: 500, count: 2 });
+		await ecp.sendKeypress(ecp.Key.Ok, { wait: 500, count: 1 });
 	}
 
 	async function getIdOfCurrentTitle() {
@@ -262,6 +262,7 @@ const PlayBack = ({ content }) => {
 
 	async function seekToAutoplay() {
 		await clickOnSkipIntroIfPresent();
+		await ecp.sleep(1000);
 		await fastForwardNoWaitTime({ howFast: 3 });
 		const arr = new Array<number>();
 		let latestPorgress;
@@ -292,7 +293,7 @@ const PlayBack = ({ content }) => {
 				countDownAutoPlay = await elements.countDownAutoplay();
 			}
 			expect(countDownAutoPlay.visible).to.equal(true);
-		});
+		}, 150000);
 	}
 
 	async function seekToTheEndAndDismissAutoplay() {
@@ -325,7 +326,7 @@ const PlayBack = ({ content }) => {
 					countDownAutoplay = await elements.countDownAutoplay();
 				}
 				const text = countDownAutoplay.text;
-				const [start, inn, space, seconds] = countDownAutoplay.text.split(' ');
+				const seconds = countDownAutoplay.text;
 				if (content.mode === 'series' || content.type === 's') {
 					if (
 						parseInt(seconds) === 14 ||
@@ -383,6 +384,20 @@ const PlayBack = ({ content }) => {
 		await ecp.sendKeypress(ecp.Key.Ok);
 	}
 
+	async function waitForPlaybackControlsDisappear() {
+		await testUtils.retryWithTimeOut(async () => {
+			const playPauseButton = await elements.playPauseButton();
+			expect(playPauseButton.visible).to.equal(false);
+		}, 5000);
+	}
+
+	async function waitForPlaybackControlsAppear() {
+		await testUtils.retryWithTimeOut(async () => {
+			const playPauseButton = await elements.playPauseButton();
+			expect(playPauseButton.visible).to.equal(true);
+		}, 5000);
+	}
+
 	async function waitForAutoplayToDisappearByTimer() {
 		let passedHalf = false;
 		await testUtils.untilTrue(
@@ -392,8 +407,8 @@ const PlayBack = ({ content }) => {
 					countDownAutoplay = await elements.countDownAutoplay();
 					expect(countDownAutoplay.visible).to.equal(true);
 				}, 110000);
-				const [start, inn, space, seconds] = countDownAutoplay.text.split(' ');
-				if (seconds < 15) {
+				const seconds = countDownAutoplay.text;
+				if (parseInt(seconds) < 15) {
 					passedHalf = true;
 				}
 				if (
@@ -455,6 +470,7 @@ const PlayBack = ({ content }) => {
 		fastForwardNoWaitTime,
 		clickOnSkipIntro,
 		selectFirstTitleFromBrowseWhileWatching,
+		waitForPlaybackControlsDisappear,
 	};
 };
 

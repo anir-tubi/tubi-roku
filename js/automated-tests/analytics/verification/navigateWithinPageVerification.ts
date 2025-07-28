@@ -91,7 +91,9 @@ export async function verifyC690753NavigateWithinPage(slugCategory: string) {
 				event.navigate_within_page.category_component.category_slug &&
 				event.navigate_within_page.category_component.category_slug ===
 				slugCategory.toLowerCase() &&
-				event.navigate_within_page.category_component.category_col === 1
+				event.navigate_within_page.category_component.category_col === 1 &&
+				event.navigate_within_page.category_component.content_tile &&
+				event.navigate_within_page.category_component.content_tile.col === 1
 		);
 		i++;
 	}

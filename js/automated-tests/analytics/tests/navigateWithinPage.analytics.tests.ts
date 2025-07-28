@@ -197,6 +197,7 @@ describe('Navigate Within Page', function () {
 	it('C690746	User scrolls vertically and navigates within the categories listed on the category list page  @analyticsASet2,@analyticsNavigateWithinPage', async () => {
 		const homePage = HomePage();
 		const categories = await homePage.selectSideNavTab(tabs.categories, 7);
+		await utils.sleep(2000);
 		await ecp.sendKeypress(ecp.Key.Up);
 		await utils.sleep(2000);
 		await ecp.sendKeypress(ecp.Key.Down, { count: 2 });
