@@ -44,10 +44,5 @@
         width="270"
         height="6"/>
     </Group>
-    <Badge
-      id="sotBadge"
-      visible="false"
-      badgeTextWidth="80"
-      translation="[6, 6]"/>
   </children>
 </component>

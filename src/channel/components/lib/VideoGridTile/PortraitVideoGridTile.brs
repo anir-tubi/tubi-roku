@@ -1,7 +1,6 @@
 Function init()
   topRef = m.top
   m.poster = topRef.findNode("Poster")
-  m.sotBadge = topRef.findNode("sotBadge")
   m.progressBar = topRef.findNode("progressBar")
   m.progressBarGroup = topRef.findNode("progressBarGroup")
   m.timeLeftLabel = topRef.findNode("timeLeftLabel")

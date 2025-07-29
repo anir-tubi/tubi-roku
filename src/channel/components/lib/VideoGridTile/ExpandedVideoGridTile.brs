@@ -202,7 +202,7 @@ Function setBadge(badgeType = "live", badgeInfo = {})
     m.badge.backgroundColor = m.blueBadgeColor
     m.badge.text = UCase(getTranslation("onNow"))
   else if badgeType = m.badgeTypes.sot
-    m.badge.badgeTextWidth = 80.0
+    m.badge.maxWidth = m.poster.width - 12
     m.badge.text = badgeInfo.sotLabelText
     m.badge.iconUri = badgeInfo.sotIcon
     m.badge.textColor = m.focusedTextColor
