@@ -130,7 +130,7 @@
         <InfoPanel
           id="ChannelsInfoPanel"
           mode="item"
-          translation="[0,105]"
+          translation="[0,130]"
           maxHeight="387"
           maxTitleLines="2"
           opacity="0"/>

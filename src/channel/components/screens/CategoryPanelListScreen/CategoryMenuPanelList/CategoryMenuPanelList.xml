@@ -3,7 +3,12 @@
   <script type="text/brightscript" uri="CategoryMenuPanelList.brs"/>
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
-  
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+
+
   <interface>
     <!-- INPUTS -->
       <field id="content" alias="Menu.content"/>

@@ -15,7 +15,7 @@ Function init()
     '//Hardcode the right panel width so the right panel's loading spinner is centered to the panel
     m.rightPanelWidth = 1212
     '//The offset sets the right panel to be placed at a different position than the menu list
-    m.rightPanelOffset = [68, -58]
+    m.rightPanelOffset = [-18, -58]
   else
     m.leftPanelWidth = 495
     '//Hardcode the right panel width so the right panel's loading spinner is centered to the panel

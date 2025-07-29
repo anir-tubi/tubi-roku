@@ -20,7 +20,7 @@ Function init()
   m.InfoPanel = m.top.findNode("ChannelsInfoPanel")
   m.PageTitleAndCounter = m.top.findNode("pageTitleAndCounter")
   m.ContentGrid = m.top.findNode("ChannelsContentGrid")
-  if getExperimentResource("roku_category_large_poster","roku_category_large_poster_v1", true).enabled = true
+  if getExperimentResource("roku_category_large_poster","roku_category_large_poster_v1", false).enabled = true
     m.ContentGrid.itemSize = [291, 417]
   else
     m.ContentGrid.itemSize = m.constants.ui.imageSizes.largePoster
