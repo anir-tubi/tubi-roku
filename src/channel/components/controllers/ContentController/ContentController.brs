@@ -334,13 +334,6 @@ Function addControllerUi()
   m.videoPreviewDebounce = CreateObject("roSGNode", "Timer")
   m.videoPreviewDebounce.duration = m.constants.player.videoPreviewDebounce
   m.videoPreviewDebounce.observeFieldScoped("fire", "startFeaturedInlinePreview")
-
-  ' This is used to track if the user is in the fixed focus experiment.
-  m.isUserInFixedFocusExperiment = false
-  experiment = getExperimentResource("roku_home_screen_fixed_focus", "roku_home_screen_fixed_focus_v1", false)
-  if experiment <> invalid AND experiment.enabled = true
-    m.isUserInFixedFocusExperiment = true
-  end if
 End Function
 
 

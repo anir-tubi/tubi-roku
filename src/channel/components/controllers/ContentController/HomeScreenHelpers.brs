@@ -464,7 +464,6 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     onHomeScreenContentUpdateComplete(homeScreen.id)
 
     getExperimentResource("roku_no_change_experiment", "roku_no_change_experiment_v3", true)
-    getExperimentResource("roku_home_screen_fixed_focus", "roku_home_screen_fixed_focus_v1", true)
 
   end if
 End Function
@@ -686,14 +685,9 @@ End Function
 ' @homeScreen, roSGNode, the home screen node.
 ' @successCallback, function, the function to call when the request is successful.
 Function makeContainerRequest(category, columnFocused, homeScreen, successCallback = onContainerMoreItemsSuccess)
-  ' 4 indicates amount of items left to scroll before we start to load more items.
-  firstBatchLimit = m.constants.performance.categoryGridList.initialBlockSize - 4
-  ' Code tied to the roku_home_screen_fixed_focus experiment.
-  if m.isUserInFixedFocusExperiment = true
-    ' We will start fetching more items when the user has scrolled 3 items.
-    ' This is to give enough lead time for us to fetch more items before user reaches the end of the list.
-    firstBatchLimit = 2
-  end if
+  ' We will start fetching more items when the user has scrolled 3 items.
+  ' This is to give enough lead time for us to fetch more items before user reaches the end of the list.
+  firstBatchLimit = 2
   
   if isNode(category) = true and category.paginationInfo <> invalid and columnFocused >= firstBatchLimit
     cursor = category.paginationInfo.cursor

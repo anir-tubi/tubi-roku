@@ -75,13 +75,6 @@ Function init()
   m.homeScreenDesignType = experiment.design_type
   m.isWithDescPortraitSmallExpEnabled = (m.homeScreenDesignType = "withDescriptionPortraitSmall")
 
-
-  if getExperimentResource("roku_home_screen_fixed_focus", "roku_home_screen_fixed_focus_v1", false).enabled = true
-    m.RowList.rowFocusAnimationStyle = "fixedFocus"
-  else
-    m.RowList.rowFocusAnimationStyle = "floatingFocus"
-  end if
-
   m.ignoreCurrColumnChange = false
 End Function
 
