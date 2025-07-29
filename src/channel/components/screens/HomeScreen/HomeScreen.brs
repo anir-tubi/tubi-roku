@@ -570,9 +570,13 @@ Function fireNavigateWithinPageEvent()
       categoryComponentInfo["category_col"] = oldAnalyticsCol
       'row is hardcoded to 1 in the line below because the row represents the row within the category_component, not within the grid
       'and the current design only has one row per category
-      tile = m.Tracking.getAnalyticsTile(oldFocusedContent, oldAnalyticsCol, 1)
-
-      categoryComponentInfo["content_tile"] = tile
+      if oldFocusedContent <> invalid AND oldFocusedContent.type = m.constants.ui.contentTypes.channel
+        tile = m.Tracking.getUtilityTile(oldFocusedContent, oldAnalyticsCol, 1)
+        categoryComponentInfo["utility_tile"] = tile
+      else
+        tile = m.Tracking.getAnalyticsTile(oldFocusedContent, oldAnalyticsCol, 1)
+        categoryComponentInfo["content_tile"] = tile
+      end if
 
 
       m.top.navigateWithinPageInfo = {
@@ -627,9 +631,13 @@ Function getTrackingComponentInfoOfCategoryGridList(gridItem, itemPosition)
 
     componentValues["category_row"] = itemPosition[0] + rowIndexBoost 'all analytics are 1 based
     componentValues["category_col"] = itemPosition[1] + 1 'all analytics are 1 based
-    tile = m.Tracking.getAnalyticsTile(gridItem, itemPosition[1] + 1)
-
-    componentValues["content_tile"] = tile
+    if gridItem.type = m.constants.ui.contentTypes.channel
+      tile = m.Tracking.getUtilityTile(gridItem, itemPosition[1] + 1)
+      componentValues["utility_tile"] = tile
+    else
+      tile = m.Tracking.getAnalyticsTile(gridItem, itemPosition[1] + 1)
+      componentValues["content_tile"] = tile
+    end if
 
     ' Set the tracking component of the gridItem that was passed so it can be accessed as part of the navigateToPage event
     trackingComponentInfo = {
