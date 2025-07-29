@@ -186,25 +186,8 @@ Function metadataOnPosterContent(itemContent)
       text += Chr(&hb7) + " "
     end if
 
-    lengthString = formatLengthSelectedLocale(length)
-    firstSubString = lengthString.split("h")
-    secondSubString = ""
-
-    if isNonEmptyArray(firstSubString) = true AND firstSubString[1] <> invalid
-      secondSubString = firstSubString[1].split("min")
-    else
-      ' To handle cases where we only have minutes.
-      arr = lengthString.split("min")
-      firstSubString = arr[0].trim() + "m"
-    end if
-    
-    if isNonEmptyArray(secondSubString) = true
-      finalString = firstSubString[0].trim() + "h" + " " + secondSubString[0].trim() + "m"
-    else
-      finalString = firstSubString
-    end if
-
-    text += finalString + " "
+    lengthString = convertSecondsToHoursString(length)
+    text += lengthString
   end if
 
   if isNonEmptyString(text) = true
@@ -298,18 +281,17 @@ Function metadataOnLivePosterContent(currentProgram, content)
   if releaseDate <> invalid
     releaseDate = releaseDate.toStr()
     if isNonEmptyString(releaseDate) = true
-      text = text + releaseDate.toStr() + " " + Chr(&hb7) + " "
+      text = text + releaseDate
     end if
   end if
 
   duration = calculateProgramTime(currentProgram)
-
   if isNonEmptyString(duration) = true
     if text.len() > 0
-      text += Chr(&hb7)
+      text += " " + Chr(&hb7) + " "
     end if
 
-    text += duration + " "
+    text += duration
   end if
 
   timeLeft = calculateProgramTimeLeft(currentProgram)
@@ -370,8 +352,8 @@ Function calculateProgramTime(program) as String
 End Function
 
 
-'helper function which returns the time left in the format 'x hour and y mins left' if timeleft is more than an hour
-' else it retuns 'y mins left'
+'helper function which returns the time left in the format 'x hour and y mins left' if time left is more than an hour
+' else it returns 'y mins left'
 Function getDurationHoursString(seconds As Integer) As String
   retVal = ""
 
@@ -395,12 +377,18 @@ Function convertSecondsToHoursString(seconds As Integer) As String
 
   if seconds <> invalid
     hourValue = Int(seconds / 3600)
-    minValue = StrI((Int(seconds / 60) mod 60) + 1) 'increase the min by one so that we dont show 0 min
-
-    if hourValue > 0
-      retVal =  getTranslation("h_m_duration", {"hour": StrI(hourValue), "minutes": minValue})
+    minValue = Int(seconds / 60) mod 60
+    ' Not using translation for better performance since in all languages h and m are same.
+    ' Please refer h_m_left for reference.
+    if hourValue > 0 AND minValue > 0
+      retVal =  Substitute("{0}h {1}m", hourValue.toStr(), minValue.toStr())
+    else if hourValue > 0
+      retVal = Substitute("{0}h", hourValue.toStr())
     else
-      retVal = getTranslation("m_duration", {"minutes": minValue})
+      if minValue < 1
+        minValue = 1
+      end if
+      retVal = Substitute("{0}m", minValue.toStr())
     end if
   end if
 
