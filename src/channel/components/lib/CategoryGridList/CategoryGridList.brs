@@ -11,6 +11,7 @@ Function init()
   m.top.observeFieldScoped("signedIn", "onSignedInChange")
   m.top.observeFieldScoped("parentScreenTrackingPageInfo", "onParentScreenTrackingPageInfoChange")
   m.top.observeFieldScoped("kidsMode", "onKidsModeChange")
+  m.top.observeFieldScoped("containerAppendMoreTilesStatus", "onContainerAppendMoreTilesStatusChange")
 
   m.RowList = m.top.findNode("RowList")
   m.RowList.observeFieldScoped("rowItemFocused", "onRowItemFocused")
@@ -110,6 +111,38 @@ Function onRemoveFocusFromRowList()
 End Function
 
 
+' This function is used to handle the case where the row list is focused and we are appending more tiles to the row list.
+' @param msg - The message object containing the status of the container append more tiles operation.
+Function onContainerAppendMoreTilesStatusChange(msg)
+  status = msg.getData()
+
+  ' NOTE: This is to handle a edge case bug only happens when we fast scroll by press and hold.
+  ' NOTE: Theory is that when we fast scroll and when roku is trying to scroll through items rapidly and we are also appending items at the same time it messes up internal logic of row list.
+  ' The idea around below logic is to handle the case where when we append more tiles to the row list, we need to reset the focus to the correct item.
+  ' This is required because whenever we append more children to the row list, the focus position is reset to zero.
+  ' So in the below logic before we start appending we check if there is a difference between currFocusColumn and rowItemFocused[1], this indicates to us that user is fast scrolling because when user press and hold only currFocusColumn changes and rowItemFocused[1] is updated only when user releases the press.
+  ' So we store the value of where the user position is when we start appending and then we jump to that position when we are done appending.
+  ' This way user press and hold is seem less.
+  ' TODO: Revisit the logic below and remove either if or else based on whether we graduated roku_home_screen_redesign_v_1_3 experiment.
+  ' TODO: Revisit logic inside onComponentFocusChange since that gets triggered a lot of times during navigation we might not need that logic. Not changing now to avoid scope creep for this PR.
+  if m.isWithDescPortraitSmallExpEnabled = true
+    if status = "start" AND isNonEmptyArray(m.featuredRowList.rowItemFocused) = true AND (m.featuredRowList.rowItemFocused[0] = m.featuredRowList.currFocusRow AND m.featuredRowList.rowItemFocused[1] <> m.top.featuredRowCurrFocusColumn)
+      m.resetListPositionOnRepopulateToIndex = [m.featuredRowList.currFocusRow, m.top.featuredRowCurrFocusColumn]
+    else if isNonEmptyArray(m.resetListPositionOnRepopulateToIndex) = true
+      m.FeaturedRowList.jumpToRowItem = m.resetListPositionOnRepopulateToIndex
+      m.resetListPositionOnRepopulateToIndex = invalid
+    end if
+  else
+    if status = "start" AND isNonEmptyArray(m.RowList.rowItemFocused) = true AND (m.RowList.rowItemFocused[0] = m.RowList.currFocusRow AND m.rowList.rowItemFocused[1] <> m.rowList.currFocusColumn)
+      m.resetListPositionOnRepopulateToIndex = [m.RowList.currFocusRow, CInt(m.RowList.currFocusColumn)]
+    else if isNonEmptyArray(m.resetListPositionOnRepopulateToIndex) = true
+      m.RowList.jumpToRowItem = m.resetListPositionOnRepopulateToIndex
+      m.resetListPositionOnRepopulateToIndex = invalid
+    end if
+  end if
+End Function
+
+
 Function onJumpToRowItemByIDChange()
   tubiLog("CategoryGridList.onJumpToRowItemByIDChange")
   sDesiredContainerID = ""
@@ -119,16 +152,26 @@ Function onJumpToRowItemByIDChange()
     sDesiredContainerID = m.top.jumpToRowItemByID[1]
   end if
 
+  if m.isWithDescPortraitSmallExpEnabled = true AND m.featuredRowList.content <> invalid
+    content = m.featuredRowList.content
+  else
+    content = m.RowList.content
+  end if
+
   '//Loop thru the containers to find the content item with an ID that matches sContentID and focus on that content item
-  for i=0 to m.RowList.content.getChildCount()-1
-    container = m.RowList.content.getChild(i)
+  for i=0 to content.getChildCount()-1
+    container = content.getChild(i)
     sTempContainerID = container.id
     if sDesiredContainerID = sTempContainerID or sDesiredContainerID = ""
       for j=0 to container.getChildCount()-1
         item = container.getChild(j)
         if item.id = sContentID
           'focus on the item
-          m.RowList.jumpToRowItem = [i,j]
+          if m.isWithDescPortraitSmallExpEnabled = true
+            m.featuredRowList.jumpToRowItem = [i,j]
+          else
+            m.RowList.jumpToRowItem = [i,j]
+          end if
           return true
         end if
       end for

@@ -9,11 +9,13 @@
   <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
 
   <interface>
     <field id="itemContent" type="node" />
     <field id="width" alias="poster.width, gradient.width" />
-    <field id="height" alias="poster.height" />
+    <field id="height" alias="poster.height, gradient.height" />
   </interface>
 
   <children>
@@ -22,13 +24,20 @@
       uri="pkg:/images/placeholder-featured.webp"
       loadingBitmapUri="pkg:/images/placeholder-featured.webp"
       failedBitmapUri="pkg:/images/placeholder-featured.webp" />
+    <Poster
+      id="gradient"
+      translation="[0, 1]"
+      loadDisplayMode="scaleToFill"
+      uri="pkg:/images/video_in_grid_gradient_$$RES$$.9.png"/>
     <Group
       id="progressBarGroup">
-      <Poster
-        id="gradient"
-        height="76"
-        loadDisplayMode="scaleToFill"
-        uri="pkg:/images/video_in_grid_gradient_$$RES$$.9.png"/>
+      <Label
+        id="timeLeftLabel"
+        translation="[18, 27]"
+        vertAlign="bottom" >
+        <Font
+          role="font" />
+      </Label>
       <TubiProgressBar
         id="progressBar"
         translation="[18, 54]"

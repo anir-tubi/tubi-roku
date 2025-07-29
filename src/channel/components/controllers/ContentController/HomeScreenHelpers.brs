@@ -704,12 +704,34 @@ Function makeContainerRequest(category, columnFocused, homeScreen, successCallba
           requestType: categoryReqInfo.requestType
           options: categoryReqInfo.options
           successCallback: successCallback
+          errorCallback: onContainerMoreItemsError
           silenceCallbackWarnings: true
           responseType: "node"
           isSignedInUser: isSignedInUser
           isLinearBlock: isLinearBlock
           uiMode: m.uiMode
+          categoryId: category.id
         })
+      end if
+    end if
+  end if
+End Function
+
+
+Function onContainerMoreItemsError(error)
+  ' Adding a logic to account for any failures in the container pagination request.
+  homeScreen = getCurrentScreen()
+  if homeScreen <> invalid
+    if m.isUserInVideoTilesExperiment = true
+      content = homeScreen.featuredRowContent
+    else
+      content = homeScreen.content
+    end if
+    if content <> invalid
+      category = m.NodeHelpers.getChildById(content, error.categoryId)
+      if category <> invalid
+        ' Reset the state of the category to none so that we can retry the request as the user scrolls through the list again or re-focuses the row list.
+        category.state = "none"
       end if
     end if
   end if
@@ -736,11 +758,15 @@ Function appendContentToCategory(response, contentNode, rowFocused)
       end if
 
       fullJson.append(newJson)
+      screen = getCurrentScreen()
+      screen.containerAppendMoreTilesStatus = "start"
+
       category.paginationInfo = response.paginationInfo
       category.child_ui_customization = childUICustomization
       category.json = FormatJson(fullJson)
       category.state = response.state
       category.appendChildren(items)
+      screen.containerAppendMoreTilesStatus = "complete"
     end if
   end if
 End Function
@@ -1225,6 +1251,7 @@ End Function
 ' @param msg: roSGNode, the message object.
 Function onFeaturedRowCurrFocusRowChange(msg)
   currFocusRow = msg.getData()
+  screen = msg.getRoSGNode()
   m.inlineVideoMetadataOverlay.skipAnimation = true
   ' Avoid the focus indicator from being shown when the row is scrolling.
   ' Start fade in when the user is half way through the scroll.
@@ -1232,6 +1259,11 @@ Function onFeaturedRowCurrFocusRowChange(msg)
     fade(m.inlinePreviewFocusIndicator, "in", 0.1)
   else if m.inlinePreviewFocusIndicator.opacity = 1
     fade(m.inlinePreviewFocusIndicator, "out", 0.1)
+  end if
+  pauseVideoPreviewAndShowPoster()
+  ' So that we call at the end of transition.
+  if currFocusRow = Fix(currFocusRow)
+    checkAndSetSponsorshipBackground(screen.featuredRowContent, currFocusRow)
   end if
 End Function
 
@@ -1301,29 +1333,36 @@ Function updateVideoTileOnFocusChange(rowFocused, columnFocused, screen)
   end if
 
   if screen <> invalid AND screen.featuredRowContent <> invalid
-    if m.inlineVideoPreviewPlayerContainer.opacity = 1
-      videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
-      if videoPlayer <> invalid
-        videoPlayer.visible = false
-      end if
-      m.videoPreviewPlayer.visible = false
-      if getVideoPreviewState() = "playing"
-        ' Gives better scrolling experience if we pause the video preview.
-        ' We are calling stopVideoPreview once we are done with scrolling.
-        ' We are pausing to avoid audio from playing in the background when user is scrolling.
-        pauseVideoPreview()
-      end if
-    end if
-    isLinearPlayerPlaying = isLinearPlayerLoadingOrPlaying()
-    shouldForceInline = isLinearPlayerPlaying = true
-    updatePreviewPlayerToInlineView(shouldForceInline)
+    pauseVideoPreviewAndShowPoster()
     m.videoPreviewDebounce.control = "start"
-    if isLinearPlayerPlaying = true
-      stopAndHideLinearVideoPlayer()
-    end if
-    m.inlineVideoPreviewPlayerContainer.opacity = 1
     setInlineVideoMetadataOverlay(screen.featuredRowContent, columnFocused, rowFocused)
   end if
+End Function
+
+
+Function pauseVideoPreviewAndShowPoster()
+ ' If the video preview is playing, we will pause it and show the poster.
+ ' This helps with smoother scrolling experience.
+  if m.inlineVideoPreviewPlayerContainer.opacity = 1
+    videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
+    if videoPlayer <> invalid
+      videoPlayer.visible = false
+    end if
+    m.videoPreviewPlayer.visible = false
+    if getVideoPreviewState() = "playing"
+      ' Gives better scrolling experience if we pause the video preview.
+      ' We are calling stopVideoPreview once we are done with scrolling.
+      ' We are pausing to avoid audio from playing in the background when user is scrolling.
+      pauseVideoPreview()
+    end if
+  end if
+  isLinearPlayerPlaying = isLinearPlayerLoadingOrPlaying()
+  shouldForceInline = (isLinearPlayerPlaying = true)
+  updatePreviewPlayerToInlineView(shouldForceInline)
+  if isLinearPlayerPlaying = true
+    stopAndHideLinearVideoPlayer()
+  end if
+  m.inlineVideoPreviewPlayerContainer.opacity = 1
 End Function
 
 
@@ -1527,10 +1566,12 @@ Function onFeaturedRowListTranslationChange(msg)
       rectY = screen.currentFocusedItemBoundingRect.y
     end if
 
+    isVerticalScroll = arrayIncludes(["down", "up"], screen.featuredListScrollDirection)
+
     if isNumber(rectY) = true
       inlineVideoPreviewPlayerContainer = m.inlineVideoPreviewPlayerContainer.translation
       ' Below logic is required to avoid having the flickering effect when we update the translation of the focused expanded video tile once the scroll stops.
-      if screen.featuredListScrollingStatus = false
+      if isVerticalScroll = true AND screen.featuredListScrollingStatus = false
         m.inlineVideoPreviewPlayerContainer.opacity = 0
       end if
       m.inlineVideoPreviewPlayerContainer.translation = [inlineVideoPreviewPlayerContainer[0], translation[1] + rectY]
@@ -1538,7 +1579,7 @@ Function onFeaturedRowListTranslationChange(msg)
     end if
 
     ' For Performance optimization reasons not processing it unless user is scrolling vertically.
-    if arrayIncludes(["down", "up"], screen.featuredListScrollDirection) AND screen.inTransitCurrentFocusedItemBoundingRect <> invalid AND screen.inTransitCurrentFocusedItemBoundingRect.y <> 0
+    if isVerticalScroll = true AND screen.inTransitCurrentFocusedItemBoundingRect <> invalid AND screen.inTransitCurrentFocusedItemBoundingRect.y <> 0
       inTransitRectY = screen.inTransitCurrentFocusedItemBoundingRect.y
       ' As soon as the scrolling stops we will hide the in transit video metadata overlay.
       if screen.featuredListScrollingStatus = true
@@ -1614,4 +1655,26 @@ Function isLinearBlocked()
 
   return false 'default case for non us users, not experiment started etc
 
+End Function
+
+
+' Checks if the row is sponsored and sets the sponsorship background.
+' @param content: roSGNode, the content of the featured list.
+' @param rowIndex: int, the index of the row.
+Function checkAndSetSponsorshipBackground(content, rowIndex)
+  if content <> invalid
+    category = content.getChild(rowIndex)
+    background = ""
+
+    if category <> invalid AND category.sponsorImages <> invalid AND category.sponsorImages.pixels <> invalid AND category.sponsorImages.pixels.homescreen <> invalid
+      ' Low end devices we only support brand color.
+      if m.constants.deviceInfo.limitedUi = false
+        background = category.sponsorImages.brandBackground
+      else
+        background = category.sponsorImages.brandColor
+      end if
+      manageHomeScreenSponsorPixels(category)
+    end if
+    setSponsorshipBackground(background)
+  end if
 End Function

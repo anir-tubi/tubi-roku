@@ -71,7 +71,6 @@
                 id="inlineVideoMetadataOverlay" />
               <VideoGridTitleLogo
                 translation="[5,4]"
-                visible="false"
                 id="inlineVideoGridTitleLogo" />
               <Poster
                 width="801"

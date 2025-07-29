@@ -103,6 +103,9 @@
 
       <field id="featuredRowFocusedItem" alias="CategoryGridList.featuredRowFocusedItem" alwaysNotify="true" />
 
+      <!-- Informs CategoryGridList add more content was appended to the category container during lazy loading. -->
+      <field id="containerAppendMoreTilesStatus" alias="CategoryGridList.containerAppendMoreTilesStatus" />
+
     <!-- OUTPUTS -->
       <!-- Trigger the content to be loaded.  This field is used to delay
            the initial category content loading until after the stateful

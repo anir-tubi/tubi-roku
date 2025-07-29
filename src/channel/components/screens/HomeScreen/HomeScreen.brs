@@ -77,6 +77,10 @@ Function init()
   experimentInfo = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_3", false)
   m.isUserInVideoTilesExperiment = isAA(experimentInfo) AND experimentInfo.design_type = "withDescriptionPortraitSmall"
   m.shouldDimPeekRow = isAA(experimentInfo) AND experimentInfo.should_dim = true
+
+  if m.isUserInVideoTilesExperiment = true AND m.shouldDimPeekRow = true
+    m.ContentArea.maskUri = "pkg:/images/poster-mask-75.png"
+  end if
 End Function
 
 
@@ -116,8 +120,8 @@ Function moveContentAreaMask(nFocusRow = -1, nFocusingPercent = 1)
   ' Since we have 2 full rows visible we are setting the mask offset to make sure the first row of the category grid is visible.
   if m.top.lastFocusedList = "featuredRowList" AND isNonEmptyArray(featuredRowHeights) = true
     if m.shouldDimPeekRow = true
-      ' Where 60 represents the height of the container title component.
-      rowTileComponentHeight = 100
+      ' Where 150 represents the height of the container title component + padding.
+      rowTileComponentHeight = 150
       nMaskYNew = featuredRowHeights[0] - rowTileComponentHeight
     else
       ' Setting mask offset to be outside of view bounds.

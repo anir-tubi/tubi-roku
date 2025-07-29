@@ -47,7 +47,7 @@
             id="progressBar"
             width="40"
             height="6"
-            margin="[0, 25]"
+            pointerHeight="6"
             visible="false"/>
         </Rectangle>
         <Label

@@ -29,6 +29,7 @@
         id="posterGroup">
         <Poster
           id="videoInGridGradient"
+          translation="[0, 1]"
           loadDisplayMode="scaleToFill"
           uri="pkg:/images/video_in_grid_gradient_$$RES$$.9.png"/>
 

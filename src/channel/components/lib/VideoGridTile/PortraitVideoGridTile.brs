@@ -4,7 +4,12 @@ Function init()
   m.sotBadge = topRef.findNode("sotBadge")
   m.progressBar = topRef.findNode("progressBar")
   m.progressBarGroup = topRef.findNode("progressBarGroup")
+  m.timeLeftLabel = topRef.findNode("timeLeftLabel")
+  m.gradient = topRef.findNode("gradient")
   topRef.observeFieldScoped("height", "onHeightChange")
+
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.timeLeftLabel, typographyConstants.ids.bodyExtraSmall)
 
   m.top.observeFieldScoped("itemContent", "onItemContentChange")
   if m.global <> invalid
@@ -27,6 +32,7 @@ Function setThemeColors(msg = invalid)
     m.progressBar.focusColor = theme.focusedColor
     m.progressBar.trackColor = theme.neutralColor
     m.progressBar.unfocusColor = theme.focusedColor
+    m.timeLeftLabel.color = theme.primaryTextColor
   end if
 End Function
 
@@ -64,6 +70,7 @@ Function onItemContentChange(msg)
   end if
 
     m.progressBarGroup.visible = false
+    m.gradient.visible = false
     categoryContent = itemContent.getParent()
     if categoryContent <> invalid AND categoryContent.id = "continue_watching"
       drawHistoryProgressBar()
@@ -102,7 +109,9 @@ Function drawHistoryProgressBar()
   if nowPos > 0 AND isNumber(duration) = true AND duration > 0
     percentage = nowPos / duration
     m.progressBar.progress = (percentage * 100)
+    m.timeLeftLabel.text = getDurationHoursString(duration - nowPos)
     m.progressBarGroup.visible = true
+    m.gradient.visible = true
   end if
 End Function
 
@@ -110,4 +119,24 @@ End Function
 Function onHeightChange(msg)
   height = msg.getData()
   m.progressBarGroup.translation = [0, (height - 76)]
+End Function
+
+
+' helper function which returns the time left in the format 'x hour and y mins left' if time left is more than an hour.
+Function getDurationHoursString(seconds As Integer) As String
+  formattedString = ""
+
+  if seconds <> invalid
+    hourValue = Int(seconds / 3600)
+    minValue = StrI((Int(seconds / 60) mod 60) + 1) 'increase the min by one so that we don't show 0 min
+
+    ' Since h and m are same in all languages skipping translation for better performance.
+    if hourValue > 0
+      formattedString =  Substitute("{0}h {1}m", StrI(hourValue), minValue)
+    else
+      formattedString = Substitute("{0}m", minValue)
+    end if
+  end if
+
+  return formattedString
 End Function

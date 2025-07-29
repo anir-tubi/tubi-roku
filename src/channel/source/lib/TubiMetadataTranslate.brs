@@ -1032,7 +1032,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
       if container.id = m.constants.ui.categoryIds.history AND isSignedInUser = false AND uiMode <> m.constants.ui.modes.kidsAgeGate
         '//if continue watching container while user is signed out,
         ' then ensure row is empty except for 1 item that will entice users to sign in
-        categoryAA = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode)
+        categoryAA = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode, contentMode)
       else if container.type = "linear" AND isLinearBlock = true ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
         categoryAA = invalid
       else
@@ -1220,7 +1220,7 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
   if container.id = m.constants.ui.categoryIds.history AND isSignedInUser = false AND uiMode <> m.constants.ui.modes.kidsAgeGate
     '//if continue watching container while user is signed out,
     ' then ensure row is empty except for 1 item that will entice users to sign in
-    categoryMetadata = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode)
+    categoryMetadata = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode, contentMode)
   else
     categoryMetadata = m.buildCategoryAAWithInsert(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser, uiMode, isLinearBlock) 'isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
   end if
@@ -1864,9 +1864,10 @@ Function tubiMetadataTranslate_translate(contentToTranslate, isSignedInUser = fa
 End Function
 
 
-Function tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA(container, bKidsMode = false)
+Function tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA(container, bKidsMode = false, contentMode = "")
   updateMetadata = {}
   if container <> invalid
+    isContentModeHomeScreen = (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
     ' Remove useVideoTilesFormat field irrespective of whether we graduate or not graduate the experiment.
     ' Since this field is temporary since we need to support both formats for now.
     useVideoTilesFormat = false
@@ -1887,7 +1888,7 @@ Function tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA(cont
       state: "full"
       gridItemType: m.constants.ui.gridItemTypes.historySignedOutUser
       type: m.contentTypes.historySignedOutUser
-      useVideoTilesFormat: useVideoTilesFormat
+      useVideoTilesFormat: useVideoTilesFormat AND isContentModeHomeScreen
     }
 
     jsonAA = {}

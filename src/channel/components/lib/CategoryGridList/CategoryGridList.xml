@@ -180,6 +180,8 @@
       <field id="rowIndexBoost" type="integer" value="0" />
       <field id="featuredRowListTranslation" alias="FeaturedRowList.translation" alwaysNotify="true" />
 
+      <!-- Possible values "none", "start", "complete". -->
+      <field id="containerAppendMoreTilesStatus" type="string" value="none" />
   </interface>
 
   <children>

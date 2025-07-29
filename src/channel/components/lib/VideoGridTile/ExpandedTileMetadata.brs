@@ -134,7 +134,7 @@ Function onItemContentChange(msg)
       m.description.text = itemContent.description
       
       categoryContent = itemContent.getParent()
-      if categoryContent <> invalid AND categoryContent.id = "continue_watching"
+      if categoryContent <> invalid AND categoryContent.id = "continue_watching" AND itemContent.type <> m.constants.ui.contentTypes.series
         metadataOnContinueWatchingContent(itemContent)
       else
         metadataOnPosterContent(itemContent)

@@ -173,7 +173,7 @@ Function registerParsingCallbacks()
   reqNamesGetCategory = m.constants.reqNames.getCategory
   m.requestTypes[reqNamesGetCategory] = {
     parseSuccess: parseCategoryContentSuccess
-    parseError: parseGenericError
+    parseError: parseCategoryContentError
   }
 
   ' getAutocomplete
