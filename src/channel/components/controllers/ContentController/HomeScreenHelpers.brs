@@ -452,7 +452,10 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
       end if
 
       if m.isUserInVideoTilesExperiment = true AND isNode(rawResponse) = true AND rawResponse.getChildCount() > 0
-        m.videoTileOverlayGroup.visible = (isSkinAdsAvailable = false)
+        ' Only show the video tile overlay group if the screen is the home screen and the skin ads are not available.
+        ' This is needed because we refresh home screen behind the scenes during parent controls change.
+        screen = getCurrentScreen()
+        m.videoTileOverlayGroup.visible = (isSkinAdsAvailable = false AND screen <> invalid AND screen.id = m.constants.ui.screenIds.homeScreen)
         updateCategoryGridWithFeaturedList(rawResponse, homeScreen)
         rawResponse = invalid
       end if
@@ -1533,9 +1536,10 @@ End Function
 Function updateInlineVideoMetadataOverlayVisibility(duration = 0)
   screen = getCurrentScreen()
   if screen <> invalid
+    isHomeScreen = (screen <> invalid AND screen.id = m.constants.ui.screenIds.homeScreen)
+    m.videoTileOverlayGroup.visible = isHomeScreen
     if m.isUserInVideoTilesExperiment = true AND isKidsUIOn() = false
-      currentScreen = getCurrentScreen()
-      if screen <> invalid AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND currentScreen.featuredRowContent <> invalid
+      if isHomeScreen AND screen.featuredRowContent <> invalid
         content = screen.featuredRowFocusedItem
         if getVideoPreviewStateForThisContent(content) <> "playing"
           m.inlineVideoMetadataOverlay.showContentPoster = true

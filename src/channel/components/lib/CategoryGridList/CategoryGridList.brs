@@ -872,8 +872,10 @@ Function setRowListFocus()
       else
         reloadedItemIndex = [0, 0]
       end if
-      m.top.rowFocused = m.RowList.content.getChild(reloadedItemIndex[0])
-      m.top.reloadedItemToBeFocused = resolveAbbreviatedContent(m.top.content, reloadedItemIndex)
+      if m.RowList.content <> invalid
+        m.top.rowFocused = m.RowList.content.getChild(reloadedItemIndex[0])
+        m.top.reloadedItemToBeFocused = resolveAbbreviatedContent(m.top.content, reloadedItemIndex)
+      end if
     else if m.FeaturedRowList.isInFocusChain() = true
       m.FeaturedRowList.setFocus(true)
     end if
