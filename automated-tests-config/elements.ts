@@ -1885,6 +1885,10 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextParent.#UpNextSeriesGroup.#GridSeries.0'
   },
 
+  countDownAutoPlay: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#CountdownGroup.#CountdownText',
+  },
+
   /** autoplay countdown movies */
   countDownMovieAutoPlay: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextParent.#CountdownGroup.#CountdownTimerParent.#TextAndIconParentGroup.#TextAndIconLayoutGroup.0.#CountdownSeconds',
