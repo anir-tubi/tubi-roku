@@ -215,15 +215,34 @@ Function tubiMetadataTranslate_translateContainer_channel_test()
   translated = m.translate.translateContainer(ParseJson(channelJson), channelJson)
   m.assertNotInvalid(translated)
   m.assertEqual(translated.id, "cbs")
-  m.assertTrue(translated.totalCount = 96)
-  m.assertTrue(translated.getChildCount() = 96)
-  m.assertEqual(translated.getChild(0).id, "cbs")
+  m.assertTrue(translated.totalCount = 95)
+  m.assertTrue(translated.getChildCount() = 95)
   m.assertNotInvalid(translated.json)
   ' make sure the embedded JSON is also correct
   fullChannelJson = ParseJson(translated.json)
   m.assertNotInvalid(type(fullChannelJson) = "roAssociativeArray")
-  m.assertNotInvalid(fullChannelJson["cbs"])
-  m.assertTrue(fullChannelJson.count() = 96)
+  m.assertTrue(fullChannelJson.count() = 95)
+End Function
+
+
+'@Test buildCategoryAAWithInsert channel unit tests
+Function tubiMetadataTranslate_buildCategoryAAWithInsert_channel_test()
+  channelJson = ReadAsciiFile("pkg:/source/tests/rooibos/units/channel.json")
+  translated = CreateObject("roSGNode", "CategoryContentNode")
+  contentToTranslate = ParseJson(channelJson)
+  container = contentToTranslate.container
+  contents = contentToTranslate.contents
+  contentsJson = m.translate.getContentsJson(contentToTranslate, channelJson)
+
+  translated = m.translate.buildCategoryAAWithInsert(container, contents, contentsJson, "", false, "homeScreen", "", false, "standard", false, true)
+  m.assertNotInvalid(translated)
+  m.assertEqual(translated.id, "cbs")
+  m.assertTrue(translated.totalCount = 96)
+
+  translated = m.translate.buildCategoryAAWithInsert(container, contents, contentsJson)
+  m.assertNotInvalid(translated)
+  m.assertEqual(translated.id, "cbs")
+  m.assertTrue(translated.totalCount = 95)
 End Function
 
 

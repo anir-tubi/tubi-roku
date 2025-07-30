@@ -25,6 +25,11 @@
       loadingBitmapUri="pkg:/images/placeholder-featured.webp"
       failedBitmapUri="pkg:/images/placeholder-featured.webp" />
     <Poster
+      id="channelLogo"
+      visible="false"
+      width="147"
+      height="147" />
+    <Poster
       id="gradient"
       translation="[0, 1]"
       loadDisplayMode="scaleToFill"

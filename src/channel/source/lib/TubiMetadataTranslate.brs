@@ -1036,7 +1036,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
       else if container.type = "linear" AND isLinearBlock = true ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
         categoryAA = invalid
       else
-        categoryAA = m.buildCategoryAAWithInsert(container, contents, "", "", false, contentMode, screenId, isSignedInUser, uiMode, isLinearBlock) ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
+        categoryAA = m.buildCategoryAAWithInsert(container, contents, "", "", false, contentMode, screenId, isSignedInUser, uiMode, isLinearBlock, true) ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
       end if
 
       if categoryAA <> invalid
@@ -1382,8 +1382,9 @@ End Function
 ' @isSignedInUser: boolean, value based on user logged In or not
 ' @uiMode: string, one of the allowed values from constants.ui.modes
 ' @isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
+' @shouldInsertChannelTile: boolean, true if the channel tile should be inserted into the container, false otherwise
 ' returns an associative array that can be passed to ContentNode.update() to populate the ContentNode and it's children
-Function tubiMetadataTranslate_buildCategoryAAWithInsert(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode="homeScreen", screenId="", isSignedInUser = false, uiMode = "standard", isLinearBlock = false)
+Function tubiMetadataTranslate_buildCategoryAAWithInsert(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode="homeScreen", screenId="", isSignedInUser = false, uiMode = "standard", isLinearBlock = false, shouldInsertChannelTile = false)
   categoryAA = invalid
 
   if container <> invalid AND container.children <> invalid
@@ -1395,7 +1396,7 @@ Function tubiMetadataTranslate_buildCategoryAAWithInsert(container, contents, co
 
     if childrenCount > 0 then
 
-      if container.type = m.contentTypes.channel
+      if container.type = m.contentTypes.channel AND shouldInsertChannelTile = true
         ' create and add a new content to the contents which hold the container metadata
         insertContent = {}
         insertContent.append(container)
@@ -1871,7 +1872,7 @@ Function tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA(cont
     ' Remove useVideoTilesFormat field irrespective of whether we graduate or not graduate the experiment.
     ' Since this field is temporary since we need to support both formats for now.
     useVideoTilesFormat = false
-    if m.experiments <> invalid
+    if m.experiments <> invalid AND isContentModeHomeScreen = true AND bKidsMode <> true
       experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_3")
       useVideoTilesFormat = (isAA(experiment) = true AND experiment.design_type = "withDescriptionPortraitSmall")
     end if
@@ -1888,7 +1889,7 @@ Function tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA(cont
       state: "full"
       gridItemType: m.constants.ui.gridItemTypes.historySignedOutUser
       type: m.contentTypes.historySignedOutUser
-      useVideoTilesFormat: useVideoTilesFormat AND isContentModeHomeScreen
+      useVideoTilesFormat: useVideoTilesFormat
     }
 
     jsonAA = {}

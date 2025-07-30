@@ -5,7 +5,9 @@ Function init()
   m.progressBarGroup = topRef.findNode("progressBarGroup")
   m.timeLeftLabel = topRef.findNode("timeLeftLabel")
   m.gradient = topRef.findNode("gradient")
+  m.channelLogo = topRef.findNode("channelLogo")
   topRef.observeFieldScoped("height", "onHeightChange")
+  topRef.observeFieldScoped("width", "onWidthChange")
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.timeLeftLabel, typographyConstants.ids.bodyExtraSmall)
@@ -32,6 +34,7 @@ Function setThemeColors(msg = invalid)
     m.progressBar.trackColor = theme.neutralColor
     m.progressBar.unfocusColor = theme.focusedColor
     m.timeLeftLabel.color = theme.primaryTextColor
+    m.backgroundColor = theme.neutralSolidColor
   end if
 End Function
 
@@ -40,6 +43,9 @@ Function onItemContentChange(msg)
   itemContent = msg.getData()
 
   if itemContent <> invalid
+    m.channelLogo.visible = false
+    ' Resetting the blend color to default.
+    m.poster.blendColor = "#FFFFFFFF"
     currentProgram = invalid
     if itemContent.type = "linear"
       currentProgram = getCurrentLiveProgram(itemContent)
@@ -54,6 +60,14 @@ Function onItemContentChange(msg)
       m.poster.uri = itemContent.hdGridPosterUrl
     else if isNonEmptyString(itemContent.portrait) = true
       m.poster.uri = itemContent.portrait
+    else if itemContent.type = "channel"
+      category = itemContent.getParent()
+      if category <> invalid AND isNonEmptyString(category.logoUri) = true
+        m.poster.uri = "pkg:/images/placeholder-featured.webp"
+        m.poster.blendColor = m.backgroundColor
+        m.channelLogo.uri = category.logoUri
+        m.channelLogo.visible = true
+      end if
     end if
 
   ' this is to avoid rowlist reusing the same badge without adjusting for the new text.
@@ -118,8 +132,18 @@ End Function
 Function onHeightChange(msg)
   height = msg.getData()
   m.progressBarGroup.translation = [0, (height - 76)]
+  translation = m.channelLogo.translation
+  translation[1] = (height - m.channelLogo.height) / 2
+  m.channelLogo.translation = translation
 End Function
 
+
+Function onWidthChange(msg)
+  width = msg.getData()
+  translation = m.channelLogo.translation
+  translation[0] = (width - m.channelLogo.width) / 2
+  m.channelLogo.translation = translation
+End Function
 
 ' helper function which returns the time left in the format 'x hour and y mins left' if time left is more than an hour.
 Function getDurationHoursString(seconds As Integer) As String

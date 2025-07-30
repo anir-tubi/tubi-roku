@@ -57,6 +57,7 @@
             
           <Group
             translation="[0, -4]"
+            visible="false"
             id="videoTileOverlayGroup">
             <ExpandedVideoGridTile
               opacity="0"

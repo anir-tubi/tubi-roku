@@ -1034,6 +1034,7 @@ End Function
 
 Function updateCurrentFocusedItemBoundingRect()
   rowItemFocused = m.featuredRowList.rowItemFocused
+  
   featuredRowContent = m.top.featuredRowContent
   if isNonEmptyArray(rowItemFocused) = true AND isNode(featuredRowContent) = true
     currFocusRow = rowItemFocused[0]
@@ -1162,6 +1163,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       slideTo(m.FeaturedRowList, [0, 384], 0.3)
       fade(m.skinAdRow, "in", 0.3)
       updateCurrentFocusedItemBoundingRect()
+      updateFocusXOffset(-1)
 
       return true
     else if key = "up" AND m.RowList.isInFocusChain() = true

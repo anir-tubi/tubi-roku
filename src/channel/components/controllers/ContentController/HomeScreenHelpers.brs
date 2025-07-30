@@ -430,7 +430,8 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     ' </CategoryContentNode>
 
     ads = rawResponse.ads
-    if isKidsUIOn() = false AND ads <> invalid
+    isSkinAdsAvailable = isKidsUIOn() = false AND ads <> invalid
+    if isSkinAdsAvailable = true
       updateSkinAdRowContent(homeScreen, ads)
     else
       updateSkinAdRowContent(homeScreen, invalid)
@@ -451,7 +452,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
       end if
 
       if m.isUserInVideoTilesExperiment = true AND isNode(rawResponse) = true AND rawResponse.getChildCount() > 0
-        m.videoTileOverlayGroup.visible = true
+        m.videoTileOverlayGroup.visible = (isSkinAdsAvailable = false)
         updateCategoryGridWithFeaturedList(rawResponse, homeScreen)
         rawResponse = invalid
       end if
@@ -1450,8 +1451,8 @@ End Function
 
 Function onFeaturedListHasFocusChange(msg)
   hasFeaturedListFocus = msg.getData()
-  m.videoTileOverlayGroup.visible = (isCurrentScreenHomeScreen() = true AND isKidsUIOn() = false)
   screen = msg.getRoSGNode()
+  m.videoTileOverlayGroup.visible = (isCurrentScreenHomeScreen() = true AND isKidsUIOn() = false AND screen.lastFocusedList = "featuredRowList")
   content = screen.featuredRowFocusedItem
   previewContent = m.videoPreviewPlayer.content
   m.videoPreviewPlayer.visible = (isCurrentScreenHomeScreen() = false OR (content <> invalid AND previewContent <> invalid AND content.id = previewContent.id))
