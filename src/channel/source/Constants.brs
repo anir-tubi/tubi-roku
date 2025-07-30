@@ -379,6 +379,7 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getExternalConfigs] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getLiveManifest] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getEPGPrograms] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getSoTStaticConfig] = true
 
   constants.anonymous = {}
     constants.anonymous.algorithm = "TUBI-HMAC-SHA256"
