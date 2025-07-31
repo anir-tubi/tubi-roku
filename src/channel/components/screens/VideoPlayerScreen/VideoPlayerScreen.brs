@@ -1297,11 +1297,16 @@ Function fireStartVideoOrTrailerEvent()
       resolution = "VIDEO_RESOLUTION_" + m.Video.content.resolution + "P"
     end if
 
+    startPosition = Int(m.playerPosition * 1000)
+    if startPosition < 0
+      startPosition = 0  'reset the player position to 0 since we do not know why 
+    end if
+
     trackEvent({
       type: "start_video"
       values: {
         video_id: m.Video.content.id.toInt()
-        start_position: Int(m.playerPosition * 1000)
+        start_position: startPosition
         current_cdn: ""   'not possible for Roku client
         has_subtitles: hasSubtitles  'the video player will show subtitles at start
         is_livetv: isLiveTv
