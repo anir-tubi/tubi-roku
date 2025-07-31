@@ -1310,11 +1310,11 @@ Function formatBadge(text, badgeComponent, iconUri = "")
       badgeComponent.badgeTextFont = m.typographyConstants.ids.bodySmallStrong
       badgeComponent.text = text
     else if badgeComponent.id = m.sotMarker.id
+      badgeComponent.showBackground = false 'make sure to set this before maxWidth to ensure proper calculations in badge
       badgeComponent.maxWidth = m.top.width
       badgeComponent.iconUri = iconUri
       badgeComponent.badgeTextFont = m.typographyConstants.ids.bodyMediumStrong
       badgeComponent.text = text
-      badgeComponent.showBackground = false
       badgeComponent.textColor = theme.cautionColor
     else
       ' TODAY, TOMORROW, <<Date>> badge
