@@ -84,19 +84,22 @@ End Function
 ' @authInfo: AA, authInfo as stored in the registry
 Function setSideNavSignedInItem(authInfo)
   tubiLog("SideNavHelpers.setSideNavSignedInItem")
-  sName = getTranslation("menu_signIn")
 
-  if isLoggedInUser(authInfo)
-    '//User is signed in
-    sName = ""
-    if authInfo.firstName <> invalid
-      sName = authInfo.firstName
-    else if authInfo.name <> invalid
-      sName = authInfo.name
+  if m.SideNav <> invalid then
+    sName = getTranslation("menu_signIn")
+
+    if isLoggedInUser(authInfo)
+      '//User is signed in
+      sName = ""
+      if authInfo.firstName <> invalid
+        sName = authInfo.firstName
+      else if authInfo.name <> invalid
+        sName = authInfo.name
+      end if
+      sName = getTranslation("menu_signedIn", { name: sName })
     end if
-    sName = getTranslation("menu_signedIn", { name: sName })
+    m.SideNav.stringSignIn = sName
   end if
-  m.SideNav.stringSignIn = sName
 End Function
 
 
@@ -313,10 +316,10 @@ Function onSideNavItemSelected()
     if bNewScreenCalledSuccess = true
       hideNavMenu(false)
 
-      if itemSelectedId = m.constants.ui.sideNavIds.home OR itemSelectedId = m.constants.ui.sideNavIds.myList 
+      if itemSelectedId = m.constants.ui.sideNavIds.home OR itemSelectedId = m.constants.ui.sideNavIds.myList
         '// If the home button was clicked, then restart the preview video.
         '// Due to race conditions, the preview video may not start when the current screen attempts to resume the preview player because the side nav is still open.
-        '// This code will ensure any focused item will resume a corresponding preview video after hideNavMenu() is called. 
+        '// This code will ensure any focused item will resume a corresponding preview video after hideNavMenu() is called.
         currentScreen = getCurrentScreen()
         focusedContent = currentScreen.contentFocused
         if focusedContent <> invalid
@@ -324,7 +327,7 @@ Function onSideNavItemSelected()
           setVideoPreviewAfterFocus(focusedContent, currentScreen.trackingPageInfo, componentTrackingInfo)
         end if
       end if
-      
+
     end if
   else
     '//if currentScreen no longer = the screen that

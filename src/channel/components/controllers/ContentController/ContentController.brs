@@ -33,7 +33,7 @@ Function init()
   m.isExternalConfigReady = false ' Used to know when external config has been loaded so we know if we can proceed
   m.isExperimentsConfigReady = false ' Used to know when experiments have been loaded so we know if we can proceed
   m.soTStaticConfigComplete = false ' Used to know when the SoT static config has been loaded so we know if we can proceed
-  
+
   ' Holds the callback method value which will be called once the initial get consent request is completed.
   m.onGetConsentCompletionCallback = invalid
 
@@ -44,7 +44,7 @@ Function init()
 
   retrieveClientErrorConfig(retrieveClientErrorConfigSuccessCallbackTriggerRetrieveInitialAuthInfo, retrieveClientErrorConfigErrorCallbackTriggerRetrieveInitialAuthInfo)
 
-  
+
   ' Holds true or false based on if app suspend is in progress
   m.isApplicationSuspendInProgress = false
 End Function
@@ -747,7 +747,7 @@ Function runControllerStartSequence()
   else if m.soTStaticConfigComplete = false
     ' Wait until the SoT static config is complete before proceeding.
     ' This is required because we call runControllerStartSequence() from the success or failure callback of the SoT static config request.
-    ' If for some reason request is delayed and completes after all the other conditions are true then we will load the home / side nav. 
+    ' If for some reason request is delayed and completes after all the other conditions are true then we will load the home / side nav.
     ' After which it will again try to load side nav and try to attach observers twice.
   else
     ' All of the above checked values are true, so we are ready to start the channel UI
@@ -2946,8 +2946,11 @@ End Function
 Function getAuthUpdatedNodesList()
   nodes = [
     m.generalTask
-    m.trackingLoggingTask
   ]
+
+  if m.trackingLoggingTask <> invalid then
+    nodes.push(m.trackingLoggingTask)
+  end if
 
   screens = getScreensInStack()
   for each screen in screens
@@ -3263,10 +3266,10 @@ Function isCloseTo16By9AspectRatio(size)
   actualRatio = size[0] / size[1]
   ' 16:9 aspect ratio = 1.777777...
   targetRatio = 16.0 / 9.0
-  
+
   ' Calculate the difference as a percentage
   difference = Abs(actualRatio - targetRatio) / targetRatio
-  
+
   ' Return true if within tolerance
   return difference <= tolerance
 End Function

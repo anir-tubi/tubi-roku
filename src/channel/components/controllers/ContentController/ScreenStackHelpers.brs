@@ -152,7 +152,7 @@ Function screenTrackingNavigate(oldTrackingPageInfo, newTrackingPageInfo, tracki
 
   trackingComponentType = ""
   trackingComponentValues = {}
-  
+
   if trackingComponentInfo <> invalid AND trackingComponentInfo.componentType <> invalid
     trackingComponentType = trackingComponentInfo.componentType
     trackingComponentValues = trackingComponentInfo.componentValues
@@ -246,7 +246,7 @@ Function onScreenChange()
   processQueuedInAppMessage()
 
   updateInlineVideoMetadataOverlayVisibility()
-  
+
 End Function
 
 
@@ -265,5 +265,9 @@ End Function
 
 ' Returns all the screens in the screen stack in an array
 Function getScreensInStack()
-  return m.screenStack.getChildren(-1, 0)
+  if m.screenStack <> invalid then
+    return m.screenStack.getChildren(-1, 0)
+  end if
+
+  return []
 End Function
