@@ -444,8 +444,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
       ' Below logic is for the control reorder containers experiment.
       ' For now we are using for swapping featured row and recommended row.
       experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_3", true)
-      isUserInControlReOrderContainersExperiment = (experiment <> invalid AND experiment.design_type = "controlReOrderContainers")
-      if isUserInControlReOrderContainersExperiment = true
+      if m.isUserInVideoTilesExperiment = true AND isNonEmptyString(experiment.container_id) AND experiment.container_id <> "none"
         containerToBeReOrdered = m.nodeHelpers.getChildById(rawResponse, experiment.container_id)
         rawResponse.removeChild(containerToBeReOrdered)
         rawResponse.insertChild(containerToBeReOrdered, 0)
@@ -455,6 +454,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
         ' Only show the video tile overlay group if the screen is the home screen and the skin ads are not available.
         ' This is needed because we refresh home screen behind the scenes during parent controls change.
         screen = getCurrentScreen()
+        isSkinAdsAvailable = (homeScreen.skinAdContent <> invalid)
         m.videoTileOverlayGroup.visible = (isSkinAdsAvailable = false AND screen <> invalid AND screen.id = m.constants.ui.screenIds.homeScreen)
         updateCategoryGridWithFeaturedList(rawResponse, homeScreen)
         rawResponse = invalid

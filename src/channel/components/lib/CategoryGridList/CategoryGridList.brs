@@ -1021,9 +1021,10 @@ Function onFeaturedListCurrFocusRowChange(msg)
       currFocusRow = rowItemFocused[0]
     end if
 
+    nextFocusRow = 0
     if m.top.featuredListScrollDirection = "down"
       nextFocusRow = currFocusRow + 1
-    else
+    else if currFocusRow > 0
       nextFocusRow = currFocusRow - 1
     end if
 
