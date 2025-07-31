@@ -131,7 +131,7 @@ Function TubiExperiments(experimentsInfo) as Object
 
       roku_search_larger_poster:{
         roku_search_larger_poster_v1: {
-          default: {"enabled": false}
+          default: {"enabled": true}
           holdout_control: {"enabled": false}
           holdout_winning: {"enabled": false}
         }
