@@ -20,7 +20,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Setup ReviewDog
       uses: "reviewdog/action-setup@v1"
@@ -61,3 +61,7 @@ jobs:
 
     - name: Check remote output folder with bsc
       run: npx bsc --project ./build-config/remote-bsconfig.json --create-package false --copy-to-staging false
+    
+    - name: Check formatting consistency
+      run: |
+        npx ts-node ./js/workflows/prFormatVerify.ts

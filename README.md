@@ -190,6 +190,21 @@ By default, both tools are accessible from the Debug Panel in VSCode's primary s
 
 ![Roku Device View panel](/docs/vscode_roku_device_view_panel.png)
 
+### Formatting
+
+To ensure consistent formatting, you can enable automatic formatting on save through the settings. 
+![Format on Save option](./docs/vscode-format-on-save.png)
+
+
+
+If you prefer manual formatting, you can use the shortcut: 
+
+`option+shift+F`
+
+Or the command `Format Document`
+
+![Format command](./docs/vscode-format-command.png)
+
 
 # Test
 
