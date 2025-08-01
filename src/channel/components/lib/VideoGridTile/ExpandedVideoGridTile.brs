@@ -265,7 +265,8 @@ End Function
 
 Function onPreloadPosterTimerFire(msg)
   if isNonEmptyString(m.preloadPoster.uri) = true
-    m.poster.uri = m.preloadPoster.uri
+    ' If the image is taking more time to load switching to placeholder image until the image is loaded.
+    m.poster.uri = "pkg:/images/placeholder-featured.webp"
   end if
 End Function
 
