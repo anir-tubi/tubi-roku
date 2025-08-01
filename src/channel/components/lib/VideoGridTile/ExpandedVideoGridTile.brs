@@ -86,7 +86,12 @@ Function onItemContentChange(msg)
     if itemContent.type = "linear"
       currentProgram = getCurrentLiveProgram(itemContent)
       isBadgeAdded = true
-      setBadge(m.badgeTypes.onNow)
+      ' Only add the onNow badge if there is no live program or the live program is not live.
+      if currentProgram = invalid OR currentProgram.live = false
+        setBadge(m.badgeTypes.onNow)
+      else
+        setBadge(m.badgeTypes.live)
+      end if
     end if
 
     if itemContent.type = "linear"
@@ -94,13 +99,9 @@ Function onItemContentChange(msg)
     else
       m.title.maxLines = 2
     end if
-    
+
     posterUri = ""
     if currentProgram <> invalid
-      if currentProgram.live = true
-        isBadgeAdded = true
-        setBadge(m.badgeTypes.live)
-      end if
       if isNonEmptyString(currentProgram.landscapePosterUrl) = true
         posterUri = currentProgram.landscapePosterUrl
       end if
@@ -159,7 +160,7 @@ Function setTitle(title = "", titleImageUri = "")
     m.titleAnimation.control = "stop"
     m.titleAnimation = invalid
   end if
-  
+
   if isNonEmptyString(titleImageUri) = true
     m.titleImage.uri = titleImageUri
   else

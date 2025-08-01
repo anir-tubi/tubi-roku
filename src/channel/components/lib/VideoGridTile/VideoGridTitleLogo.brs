@@ -48,17 +48,19 @@ Function onItemContentChange(msg)
   itemContent = msg.getData()
 
   if itemContent <> invalid
+    ' Remove the badge if it exists.
+    if m.badge <> invalid
+      m.posterGroup.removeChild(m.badge)
+      m.badge = invalid
+    end if
+
     currentProgram = invalid
     if itemContent.type = "linear"
       currentProgram = getCurrentLiveProgram(itemContent)
-      setBadge(m.badgeTypes.onNow)
-    else if m.badge <> invalid
-        m.posterGroup.removeChild(m.badge)
-        m.badge = invalid
-    end if
-
-    if currentProgram <> invalid
-      if currentProgram.live = true
+      ' Only add the onNow badge if there is no live program or the live program is not live.
+      if currentProgram = invalid OR currentProgram.live = false
+        setBadge(m.badgeTypes.onNow)
+      else
         setBadge(m.badgeTypes.live)
       end if
     end if
@@ -79,7 +81,7 @@ Function onItemContentChange(msg)
       end if
       setTitle(itemContent.title, itemContent.titleImageUri)
     end if
- end if
+  end if
 End Function
 
 
@@ -95,7 +97,7 @@ Function setTitle(title = "", titleImageUri = "")
     m.titleAnimation.control = "stop"
     m.titleAnimation = invalid
   end if
-  
+
   if isNonEmptyString(titleImageUri) = true
     m.titleImage.uri = titleImageUri
   else
