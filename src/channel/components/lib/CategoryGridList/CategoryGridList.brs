@@ -49,7 +49,7 @@ Function init()
   onThemeChange()
 
   ' Holds the value of last focused list, possible values are "", "skinAdRow" "rowlist".
-  ' These IDs match with the IDs of the components in the XML. 
+  ' These IDs match with the IDs of the components in the XML.
   m.top.lastFocusedList = ""
 
   m.lastCurrentFocusColumn = 0
@@ -159,18 +159,18 @@ Function onJumpToRowItemByIDChange()
   end if
 
   '//Loop thru the containers to find the content item with an ID that matches sContentID and focus on that content item
-  for i=0 to content.getChildCount()-1
+  for i = 0 to content.getChildCount() - 1
     container = content.getChild(i)
     sTempContainerID = container.id
-    if sDesiredContainerID = sTempContainerID or sDesiredContainerID = ""
-      for j=0 to container.getChildCount()-1
+    if sDesiredContainerID = sTempContainerID OR sDesiredContainerID = ""
+      for j = 0 to container.getChildCount() - 1
         item = container.getChild(j)
         if item.id = sContentID
           'focus on the item
           if m.isWithDescPortraitSmallExpEnabled = true
-            m.featuredRowList.jumpToRowItem = [i,j]
+            m.featuredRowList.jumpToRowItem = [i, j]
           else
-            m.RowList.jumpToRowItem = [i,j]
+            m.RowList.jumpToRowItem = [i, j]
           end if
           return true
         end if
@@ -275,16 +275,16 @@ Function onContentChange()
   '//RESET position of 1st-row elements
   m.skinAdRow.translation = m.originalTranslationSkinAdRow
 
-  
-  ' set the translation position of the page based on presense or absence of any 1st rows. 
+
+  ' set the translation position of the page based on presense or absence of any 1st rows.
   ' DO this BEFORE setting the content of the rowList (later in this function) or else the translation will not be properly set.
   ' This is need mainly for the initial load and if skinAdRow is focused.
   ' When any other list is focused, we will not show the skin ads.
   if isSkinAdsAvailable() = true AND (m.top.lastFocusedList = "skinAdRow" OR m.top.lastFocusedList = "")
     if m.top.featuredRowContent <> invalid
-      m.FeaturedRowList.translation =  [0, 384]
+      m.FeaturedRowList.translation = [0, 384]
     else
-      m.rowList.translation =  [0, 384]
+      m.rowList.translation = [0, 384]
     end if
 
     m.skinAdRow.opacity = 1
@@ -304,7 +304,7 @@ Function onContentChange()
         if m.isWithDescPortraitSmallExpEnabled = true
           ' 92 is the amount of px we need to animate down to create a required initial animation.
           ' This allows to create a slide down animation.
-          m.rowList.translation =  [0, m.featuredRowPoster[1] + 92]
+          m.rowList.translation = [0, m.featuredRowPoster[1] + 92]
         else
           m.rowList.translation = [0, 0]
         end if
@@ -323,7 +323,7 @@ Function onContentChange()
     if m.RowList.currFocusColumn <> invalid
       m.RowList.currFocusColumn = 0
     end if
-    m.RowList.rowItemFocused = [0,0]
+    m.RowList.rowItemFocused = [0, 0]
     m.RowList.currFocusRow = 0
     if m.top.featuredRowContent <> invalid
       setFeaturedRowHeights()
@@ -338,7 +338,7 @@ Function onContentChange()
     m.RowList.content = invalid
     if m.top.content <> invalid then
       setRowHeights()
-      
+
       if bSetRowListFocus = true
         setRowListFocus()
       end if
@@ -368,12 +368,12 @@ Function onContentChange()
   }, true)
 
   m.top.rowIndexBoost = rowIndexBoost
-  
+
   ' Below is to add animation of slide down of the row list for the first time when screen is loaded.
   if m.top.featuredRowContent <> invalid AND isSkinAdsAvailable() = false AND m.isWithDescPortraitSmallExpEnabled = true AND m.top.lastFocusedList <> "rowList"
-    slideTo(m.RowList, [m.rowListPosition[0], m.rowListPosition[1] ], 0.3, 0.3)
+    slideTo(m.RowList, [m.rowListPosition[0], m.rowListPosition[1]], 0.3, 0.3)
   end if
-  
+
   updateCurrentFocusedItemBoundingRect()
 
   m.top.gridContentIsReady = true
@@ -407,7 +407,7 @@ Function onRepopulateContent()
   end if
 
   if rowItemFocused = invalid
-    rowItemFocused = [0,0]
+    rowItemFocused = [0, 0]
   end if
 
   rowAdded = m.top.rowAdded
@@ -501,7 +501,7 @@ Function setRowHeights()
   featuredRowPoster = imageSizes.featuredRowPoster
   showRowLabel = []
 
-  for i=0 to m.top.content.getChildCount()-1
+  for i = 0 to m.top.content.getChildCount() - 1
     category = m.top.content.getChild(i)
     rowHeight = 0
     rowHeightAdjustment = 57 '//The height of the row container heading and its vertical spacing
@@ -572,13 +572,13 @@ Function setRowHeights()
   '//However, just in case the height of a row is not defined, then it will default to the height defined by itemSize
   itemSize = [1752, posterSize[1]]
   m.Rowlist.update({
-    "itemSize" : itemSize
+    "itemSize": itemSize
     "rowItemSize": rowItemSize
     "rowHeights": rowHeights
     "showRowLabel": showRowLabel
     "numRows": numRows
     "rowItemSpacing": rowItemSpacings
-    "focusXOffset" : focusXOffsets
+    "focusXOffset": focusXOffsets
   })
   m.RowList.content = m.top.content
   setFeaturedRowHeights()
@@ -594,7 +594,7 @@ Function setFeaturedRowHeights()
   if isNode(featuredRowContent) = true
     heights = []
     rowItemSize = []
-    for i=0 to featuredRowContent.getChildCount()-1
+    for i = 0 to featuredRowContent.getChildCount() - 1
       category = featuredRowContent.getChild(i)
       gridItemType = category.gridItemType
 
@@ -619,11 +619,17 @@ Function setFeaturedRowHeights()
       "showRowLabel": [true]
       "rowItemSize": rowItemSize
       "rowHeights": heights
-      "focusXOffset" : [0]
+      "focusXOffset": [0]
     })
 
     m.featuredRowList.focusXOffset = [m.expandedTileFocusXOffset, 0]
     m.FeaturedRowList.content = m.top.featuredRowContent
+    if m.top.featuredRowFocusedItem = invalid AND m.skinAdRow.content = invalid
+      m.FeaturedRowList.rowItemFocused = [0, 0]
+      if m.isWithDescPortraitSmallExpEnabled = true
+        m.top.lastFocusedList = "featuredRowList"
+      end if
+    end if
   end if
 End Function
 
@@ -661,7 +667,7 @@ Function onRowItemSelected(msg)
   if m.top.content <> invalid 'should not be necessary but crash reports show that it is.
     rowItemSelected = msg.getData()
     m.top.selectedPosition = rowItemSelected
-    
+
     category = m.top.content.getChild(rowItemSelected[0])
     if category <> invalid
       m.top.oldCategoryId = m.top.currCategoryId
@@ -702,7 +708,7 @@ Function onRowItemFocused(msg)
 End Function
 
 
-Function onCategoryResponseInBatch(msg) As Void
+Function onCategoryResponseInBatch(msg) as void
   tubiLog("CategoryGridList.categoryResponseInBatch")
 
   response = msg.getData()
@@ -777,11 +783,11 @@ Function onCategoryResponseInBatch(msg) As Void
     end if
 
     ' inform home screen of first content after content has been set on RowList
-    if shouldInformHomeScreen = true AND m.skinAdRow.content = invalid 
+    if shouldInformHomeScreen = true AND m.skinAdRow.content = invalid
       ' set focus once we have content to focus on.
       ' will only affect limitedUI models as high spec models will set focus on m.RowList when m.top gains focus
       ' because their homescreen response contains content in it, but limitedUI models homescreen responses don't.
-      setRowListFocus()   'only happens if m.top has focus, ie. when the app is launched or signin/signout
+      setRowListFocus() 'only happens if m.top has focus, ie. when the app is launched or signin/signout
     end if
 
     ' free references to the batch so that it can be garbage collected
@@ -800,7 +806,7 @@ Function mergeMetadata(fetchedContent)
   end if
 
   if categories <> invalid AND fetchedContent <> invalid AND fetchedContent.id <> invalid
-    for i=0 to categories.count()-1
+    for i = 0 to categories.count() - 1
       if categories[i].id = fetchedContent.id then
         index = i
         exit for
@@ -814,7 +820,7 @@ Function mergeMetadata(fetchedContent)
 
     ' Check if a response arrives but the cache has been flushed and categories moved, such as adding or removing user categories
     if parentCategory = invalid then
-      if index = -1 and fetchedContent.id = "featured"
+      if index = -1 AND fetchedContent.id = "featured"
         fetchedContent.state = "loaded"
         m.top.featuredRowContent.replaceChild(fetchedContent, 0)
         return -2
@@ -897,7 +903,7 @@ Function onSkinAdRowItemSelected(msg)
   content = m.top.skinAdContent
   rowItemSelected = msg.getData()
 
-  if content <> invalid 
+  if content <> invalid
     m.top.oldCategoryId = m.top.currCategoryId
     m.top.currCategoryId = "skinAdRow"
     m.top.selectedPosition = rowItemSelected
@@ -911,9 +917,9 @@ Function onSkinAdRowItemFocused(msg)
   rowItemFocused = msg.getData()
   content = m.top.skinAdContent
 
-  if content <> invalid    
+  if content <> invalid
     category = content.getChild(rowItemFocused[0])
-    
+
     if category <> invalid then
       category.focusIndex = rowItemFocused[1]
       m.top.oldCategoryId = m.top.currCategoryId
@@ -929,7 +935,7 @@ Function onSkinAdRowItemFocused(msg)
         m.top.focusedPosition = rowItemFocused
       end if
     end if
-end if
+  end if
 End Function
 
 
@@ -991,7 +997,7 @@ Function updateFocusXOffset(currFocusRow, isInTransit = false)
   if isNode(featuredRowContent) = true AND isNonEmptyArray(focusXOffsets) = true
     focusXOffset = []
     gridItemTypes = m.constants.ui.gridItemTypes
-    
+
     for i = 0 to featuredRowContent.getChildCount() - 1
       category = featuredRowContent.getChild(i)
       gridItemType = category.gridItemType
@@ -1000,7 +1006,7 @@ Function updateFocusXOffset(currFocusRow, isInTransit = false)
         focusXOffset.push(m.expandedTileFocusXOffset)
       else
         focusXOffset.push(0)
-      end if  
+      end if
     end for
     ' To Avoid unnecessary updates to the focusXOffset field, doing a simple array comparison.
     if FormatJson(focusXOffset) <> FormatJson(m.featuredRowList.focusXOffset)
@@ -1037,7 +1043,7 @@ End Function
 
 Function updateCurrentFocusedItemBoundingRect()
   rowItemFocused = m.featuredRowList.rowItemFocused
-  
+
   featuredRowContent = m.top.featuredRowContent
   if isNonEmptyArray(rowItemFocused) = true AND isNode(featuredRowContent) = true
     currFocusRow = rowItemFocused[0]
@@ -1053,13 +1059,13 @@ Function updateCurrentFocusedItemBoundingRect()
     category = featuredRowContent.getChild(nextFocusRow)
     if category <> invalid AND category.focusIndex <> invalid
       columnFocused = category.focusIndex
-      nextBoundingRect = m.FeaturedRowList.subBoundingRect("item"+ nextFocusRow.toStr() + "_" + columnFocused.toStr())
+      nextBoundingRect = m.FeaturedRowList.subBoundingRect("item" + nextFocusRow.toStr() + "_" + columnFocused.toStr())
       m.top.inTransitCurrentFocusedItemBoundingRect = nextBoundingRect
     end if
 
     ' Updating the bounding rect for the current focus row.
     columnFocused = rowItemFocused[1]
-    boundingRect = m.FeaturedRowList.subBoundingRect("item"+ currFocusRow.toStr() + "_" + columnFocused.toStr())
+    boundingRect = m.FeaturedRowList.subBoundingRect("item" + currFocusRow.toStr() + "_" + columnFocused.toStr())
     m.top.currentFocusedItemBoundingRect = boundingRect
   end if
 End Function
@@ -1076,7 +1082,7 @@ Function onFeaturedRowCurrFocusColumnChange(msg)
     absCurCol = Int(currentFocusColumn)
     ' To account for fast scrolling.
     diff = Abs(absCurCol - m.lastFocusColumnIndex)
-    
+
     ' Ignoring all updates when user is fast scrolling through the columns of the row.
     ' When the user stops the scrolling we will process the column change.
     if currentFocusColumn <> absCurCol AND diff <= 1
@@ -1096,7 +1102,7 @@ Function onFeaturedRowCurrFocusColumnChange(msg)
         m.top.featuredRowCurrFocusColumn = m.lastFocusColumnIndex
       end if
     end if
-    
+
     m.lastCurrentFocusColumn = currentFocusColumn
   end if
 End Function
@@ -1112,13 +1118,13 @@ Function translateFeaturedListAndSetFocus(delayFeaturedFocus = false)
     m.top.lastFocusedList = "featuredRowList"
     m.FeaturedRowList.setFocus(true)
   end sub
-  
+
   ' Below logic handles logic to smoothen navigation around skin ads.
   if delayFeaturedFocus = false
     callback()
     callback = invalid
   end if
-  
+
   slideFadeGeneral(m.FeaturedRowList, [0, 0], "in", 0.3, 0, 1, true, callback)
   if m.isWithDescPortraitSmallExpEnabled = true
     slideTo(m.RowList, [m.rowListPosition[0], m.rowListPosition[1]], 0.3)
@@ -1136,7 +1142,7 @@ Function onKidsModeChange(msg)
 End Function
 
 
-Function onKeyEvent(key as String, press as Boolean) as Boolean
+Function onKeyEvent(key as string, press as boolean) as boolean
   if press = true
     bSkinAdAvailable = (isSkinAdsAvailable() = true)
 
@@ -1178,7 +1184,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         m.top.lastFocusedList = "skinAdRow"
         m.skinAdRow.setFocus(true)
         slideTo(m.RowList, [0, 384], 0.3)
-        return true 
+        return true
       end if
     end if
   end if

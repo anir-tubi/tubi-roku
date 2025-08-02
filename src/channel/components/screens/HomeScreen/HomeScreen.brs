@@ -107,10 +107,10 @@ End Function
 ' Move the mask to right below the row that should be completely visible. The mask image will fade out the rows underneath the focused row.
 ' This assumes that up to one row is completely opaque - (unless nFocusRow is set to a row beyond the actual focused row.)
 ' This also assumes that the mask height is constant.
-' If a special row is in focus, then setting nFocusRow to a negative number will make all rows of the rowlist translucent 
-' @param nFocusRow Integer, The row that is or will be in focus. 
+' If a special row is in focus, then setting nFocusRow to a negative number will make all rows of the rowlist translucent
+' @param nFocusRow Integer, The row that is or will be in focus.
 '     If nFocusRow < 0, then the mask will be placed on top of the 1st row
-' @param nFocusingPercent Number, When the row is in the process of gaining focus, this is a number from 0 to 1 indicating 
+' @param nFocusingPercent Number, When the row is in the process of gaining focus, this is a number from 0 to 1 indicating
 '     how close the row is to its final state.
 Function moveContentAreaMask(nFocusRow = -1, nFocusingPercent = 1)
   '//nMaskYNew will most likely be set to 0 w/ the following line unless the content rowList has been moved to make way for a special top row.
@@ -157,7 +157,7 @@ Function onIDChange()
   analyticsContentMode = m.Tracking.getAnalyticsHomePageContentMode(m.top.id)
 
   newTrackingPageInfo.pageType = "home_page"
-  newTrackingPageInfo.pageValues = {content_mode: analyticsContentMode}
+  newTrackingPageInfo.pageValues = { content_mode: analyticsContentMode }
 
   if m.top.id = m.constants.ui.screenIds.movieScreen
     m.top.screenLevel = m.constants.ui.screenLevels.movieScreen
@@ -215,6 +215,8 @@ Function onLoadingChange()
     ' Resetting the previous state variables.
     m.CategoryGridList.featuredListCurrFocusRow = -1
     m.CategoryGridList.featuredRowCurrFocusColumn = -1
+    m.CategoryGridList.featuredListScrollDirection = "none"
+    m.CategoryGridList.featuredRowFocusedItem = invalid
 
     ' Resetting last focus list when reloading the screen.
     ' To Cover cases where skin ad is shown and then gets removed.
@@ -236,7 +238,7 @@ Function onScreenFocusChange()
     if m.CategoryGridList.content <> invalid
       if shouldRefresh(m.CategoryGridList.content) = true
         m.top.loadAllCategories = true
-        
+
       else 'check if any containers has expired
         refreshHomeScreenContainers()
       end if
@@ -445,7 +447,7 @@ Function contractContentAreaToOriginal(rowPercent)
       m.ContentAreaParent.translation = m.currentContentAreaTranslation
       m.InfoPanel.opacity = 1
     end if
-    
+
   end if
 End Function
 
@@ -475,7 +477,7 @@ Function populateInfoPanelByContent(focusedContent)
     else if sType = m.constants.ui.contentTypes.historySignedOutUser
       populateInfoPanel(m.constants.ui.infoPanelModes.continueWatching, focusedContent)
     else if sType = m.constants.ui.contentTypes.sportsEvent
-      populateInfoPanel(m.constants.ui.infoPanelModes.sportsEvent, focusedContent) 
+      populateInfoPanel(m.constants.ui.infoPanelModes.sportsEvent, focusedContent)
     else
       populateInfoPanel(m.constants.ui.infoPanelModes.item, focusedContent)
     end if
@@ -529,7 +531,7 @@ Function onGridFocusChange() as void
 
       m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(focusedContent, m.CategoryGridList.focusedPosition)
       m.top.contentFocused = focusedContent
-      
+
       if focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd
         fadeOutInfoPanel()
         m.top.backgroundUriList = determineBackgroundImage(focusedContent)
@@ -537,7 +539,7 @@ Function onGridFocusChange() as void
         populateInfoPanelByContent(focusedContent)
         fadeInContentArea()
       end if
-      
+
     end if
 
   end if
@@ -546,7 +548,7 @@ Function onGridFocusChange() as void
   moveContentAreaMaskBasedCurrentFocus()
 
   fireNavigateWithinPageEvent()
-  
+
 End Function
 
 
@@ -560,8 +562,8 @@ Function fireNavigateWithinPageEvent()
   newAnalyticsRow = m.CategoryGridList.cursorPosition[0] + newRowIndexBoost
   newAnalyticsCol = m.CategoryGridList.cursorPosition[1] + 1
   oldFocusedContent = m.CategoryGridList.oldItemFocused
-  
-  if m.gridHasGainedInitialFocus = true AND oldAnalyticsRow > 0 AND oldAnalyticsCol > 0
+
+  if m.gridHasGainedInitialFocus = true AND oldAnalyticsRow > 0 AND oldAnalyticsCol > 0 AND m.top.isInFocusChain() = true
     if oldAnalyticsRow <> newAnalyticsRow OR oldAnalyticsCol <> newAnalyticsCol
 
       categoryComponentInfo = {}
@@ -677,12 +679,12 @@ End Function
 '@contentNode: content node
 Function populateInfoPanel(mode, contentNode)
 
-  if contentNode <> invalid  
+  if contentNode <> invalid
     ' The below is to ensure that there is slight delay in showing the info panel so that there is no overlap with any row that is gaining focus.
     if m.InfoPanel.visible = false
       slideFadeGeneral(m.InfoPanelParent, [0, 0], "in", 0.2)
     end if
-    
+
     if mode = m.constants.ui.infoPanelModes.item
       populateInfoPanelWithHomescreenStyleItemMode(contentNode, m.InfoPanel, true)
     else if mode = m.constants.ui.infoPanelModes.linearProgramHomescreen
@@ -864,7 +866,7 @@ Function onVertFocusDirectionChange(msg)
 End Function
 
 
-' The content RowList within the categoryGridList is moving. 
+' The content RowList within the categoryGridList is moving.
 ' Usually that means a special row or the content rowList is gaining focus.
 Function onRowlistTranslationChange(msg)
   moveContentAreaMaskBasedCurrentFocus()
@@ -872,7 +874,7 @@ End Function
 
 
 '//Based on the current focused item, move the contentarea mask
-Function moveContentAreaMaskBasedCurrentFocus()  '//Determine if the rowlist or a special row is in focus
+Function moveContentAreaMaskBasedCurrentFocus() '//Determine if the rowlist or a special row is in focus
   nRowInFocus = -1
   focusedContent = m.top.contentFocused
   if m.top.kidsMode = true OR (focusedContent <> invalid AND focusedContent.gridItemType <> m.constants.ui.gridItemTypes.skinAd)
