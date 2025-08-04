@@ -488,10 +488,13 @@ Function onIsSeries()
   if isLoggedInUser() = false AND isNewUser() = false AND m.top.availabilityType <> m.constants.ui.contentTimings.upcoming
 
     if isSeries = true AND signUpIndex = 1
-      'Remove the signup button at 1st index and make signup button as default for series.
-      addRemoveMenuItem(false, signUpIndex)
-      addRemoveMenuItem(true, -1, m.signUpMenuItem, [])
-      menuItems = [m.PlayMenuItem, m.signUpMenuItem]
+      experiment = getExperimentResource("roku_swap_play_sign_up_button_order", "roku_swap_play_sign_up_button_order_v1", true)
+      if (experiment = invalid OR experiment.enabled = false)
+        'Remove the signup button at 1st index and make signup button as default for series.
+        addRemoveMenuItem(false, signUpIndex)
+        addRemoveMenuItem(true, -1, m.signUpMenuItem, [])
+        menuItems = [m.PlayMenuItem, m.signUpMenuItem]
+      end if
     else if isSeries = false AND signUpIndex = 0
       'Add sign up button after the Play button for movies
       addRemoveMenuItem(false, signUpIndex)
@@ -641,7 +644,7 @@ End Function
 '
 ' Detail screen always has at least a play button and "add to queue" button
 ' Set basic buttons first, additional buttons will be added based on the input fields of the details screen
-Function setInitialMenuItems() As Void
+Function setInitialMenuItems() as Void
   tubiLog("DetailScreen.setInitialMenuItems")
   menuItems = CreateObject("roSGNode", "ContentNode")
   menuItems.appendChild(m.PlayMenuItem)
@@ -666,7 +669,7 @@ End Function
 ' The secondary menu currently only displays the like/dislike options when
 '   the "like or dislike" button of the main menu is focused. However, since it is possible other menu items
 '   will need a secondary menu, let's set up the secondary menu like how we set up the main menu.
-Function setInitialSecondaryMenuItems() As Void
+Function setInitialSecondaryMenuItems() as Void
   tubiLog("DetailScreen.setInitialSecondaryMenuItems")
   menuItems = CreateObject("roSGNode", "ContentNode")
   menuItems.appendChild(m.LikeMenuItem)
@@ -686,7 +689,7 @@ End Function
 '                       the first item in the array that is found will dictate the placement of the new item,
 '                       and all other items will be disregarded.
 ' Set basic buttons first, additional buttons will be added based on the input fields of the details screen
-Function addRemoveMenuItem(add, itemIndex, itemToAdd = invalid, previousItems = []) As Void
+Function addRemoveMenuItem(add, itemIndex, itemToAdd = invalid, previousItems = []) as Void
   menuItems = m.Menu.content
 
   if add = false AND itemIndex > -1
@@ -1106,8 +1109,8 @@ Function focusMenu(immediately = false)
     m.Info.opacity = 1.0
   else
     slideTo(m.AnimationGroup, [0, 0], m.focusAnimationDuration)
-    animate(m.RelatedContentGroup, {opacity: 0.2, duration: m.focusAnimationDuration})
-    animate(m.Info, {opacity: 1.0, duration: m.focusAnimationDuration})
+    animate(m.RelatedContentGroup, { opacity: 0.2, duration: m.focusAnimationDuration })
+    animate(m.Info, { opacity: 1.0, duration: m.focusAnimationDuration })
   end if
 
   if m.top.isInFocusChain() = true
@@ -1134,8 +1137,8 @@ Function focusRelated()
   end if
 
   slideTo(m.AnimationGroup, [0, -392], m.focusAnimationDuration)
-  animate(m.RelatedContentGroup, {opacity: 1.0, duration: m.focusAnimationDuration})
-  animate(m.Info, {opacity: 0.2, duration: m.focusAnimationDuration})
+  animate(m.RelatedContentGroup, { opacity: 1.0, duration: m.focusAnimationDuration })
+  animate(m.Info, { opacity: 0.2, duration: m.focusAnimationDuration })
 
   setVisibilityOfSecondaryMenu()
 End Function
@@ -1209,7 +1212,7 @@ End Function
 '
 ' Hijack any back button presses before they make it to the screen stack if we are waiting for a server
 ' response from any of add/remove queue/history so that we make sure the category screen can update with new user category content
-Function onKeyEvent(key As String, press As Boolean) as Boolean
+Function onKeyEvent(key as String, press as Boolean) as Boolean
   tubiLog("DetailScreen.onKeyEvent key = " + key)
   if press then
     if key = "back"
@@ -1218,7 +1221,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         return true
       end if
 
-    ' Down presses arrive here if not consumed by the menu, meaning it's already at the bottom button
+      ' Down presses arrive here if not consumed by the menu, meaning it's already at the bottom button
     else if key = "down"
       if m.Menu.isInFocusChain() = true AND m.RelatedContentParentGroup.visible = true AND m.RelatedContentGroup.visible = true then
         focusRelated()
@@ -1314,7 +1317,7 @@ Function setComponentInteractionEventForMenu(componentInteractionValue, menuItem
     if pageOriginDetails <> invalid
       pageValuesInfo.sourceOrigin = pageOriginDetails.pageOrigin
       pageValuesInfo.functionName = pageOriginDetails.functionName
-      pageValuesInfo.previousScreen =  pageOriginDetails.previousScreen
+      pageValuesInfo.previousScreen = pageOriginDetails.previousScreen
       pageValuesInfo.errorResponseContentId = pageOriginDetails.errorResponseContentId
       pageValuesInfo.errorCode = pageOriginDetails.errorCode
     end if

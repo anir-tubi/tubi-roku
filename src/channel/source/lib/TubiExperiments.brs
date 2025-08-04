@@ -23,125 +23,133 @@ Function TubiExperiments(experimentsInfo) as Object
 
       '//This will be added to the holdout
       roku_search_autocomplete: {
-        roku_search_autocomplete_v3 : {
-          default: {"enabled": true}
-          holdout_control: {"enabled": false}
-          holdout_winning: {"enabled": true}
+        roku_search_autocomplete_v3: {
+          default: { "enabled": true }
+          holdout_control: { "enabled": false }
+          holdout_winning: { "enabled": true }
         }
       }
 
       'This experiment will be under holdout
       roku_video_autostart_ui_refresh: {
-        roku_video_autostart_ui_refresh_v1 : {
-          default: {"enabled": true}
-          holdout_control: {"enabled": false}
-          holdout_winning: {"enabled": true}
+        roku_video_autostart_ui_refresh_v1: {
+          default: { "enabled": true }
+          holdout_control: { "enabled": false }
+          holdout_winning: { "enabled": true }
         }
       }
 
       roku_add_movies_series: {
-        roku_add_movies_series_uk_v2 : {
-          default: {"enabled": false}
-          holdout_control: {"enabled": false}
-          holdout_winning: {"enabled": false}
+        roku_add_movies_series_uk_v2: {
+          default: { "enabled": false }
+          holdout_control: { "enabled": false }
+          holdout_winning: { "enabled": false }
         }
       }
 
       roku_async_stop: {
         roku_async_stop_v6: {
-          default: {"enabled": false}
-          holdout_control: {"enabled": false}
-          holdout_winning: {"enabled": false}
+          default: { "enabled": false }
+          holdout_control: { "enabled": false }
+          holdout_winning: { "enabled": false }
         }
       }
 
       roku_player_ui_refresh: {
         ' We will run 4 overlay types. Possible values are none, variant1, variant2, variant3, variant4
-        roku_ads_overlay_v1 : {
-          default: {"overlay_type": "none"}
-          holdout_control: {"overlay_type": "none"}
-          holdout_winning: {"overlay_type": "none"}
+        roku_ads_overlay_v1: {
+          default: { "overlay_type": "none" }
+          holdout_control: { "overlay_type": "none" }
+          holdout_winning: { "overlay_type": "none" }
         },
         ' We will run 4 ui control types including control. Possible values are none, variant1, variant2, variant3
         roku_player_control_ui_refresh_v2: {
-          default: {"type": "none"}
-          holdout_control: {"type": "none"}
-          holdout_winning: {"type": "none"}
+          default: { "type": "none" }
+          holdout_control: { "type": "none" }
+          holdout_winning: { "type": "none" }
         }
       }
 
       'This experiment will not be under holdout and will clean up once we take the decision.
       roku_home_screen_redesign: {
-        roku_home_screen_redesign_v_1_3 : {
+        roku_home_screen_redesign_v_1_3: {
           ' Possible values for design_type are "withDescriptionPortraitSmall", "controlReOrderContainers",  "none"
           ' Possible values for container_id are "featured" or any other tensor container id
           ' Possible values for gridItemSize are [310, 442] or [252, 360]
           ' Possible values for featuredRowPosterSize are [788, 442] or [720, 360]
           ' sample ex: default: {"design_type": "withDescriptionPortraitSmall", container_id: "featured", gridItemSize: [252, 360], featuredRowPosterSize: [720, 360] }
           ' default: {"design_type": "withDescriptionPortraitSmall", should_dim: true, gridItemSize: [310, 442], featuredRowPosterSize: [788, 442] }
-          default: {"design_type": "none", container_id: "none", gridItemSize: [], featuredRowPosterSize: [] }
-          holdout_control: {"design_type": "none", container_id: "none", gridItemSize: [], featuredRowPosterSize: [] }
-          holdout_winning: {"design_type": "none", container_id: "none", gridItemSize: [], featuredRowPosterSize: [] }
-         }
-       }
+          default: { "design_type": "none", container_id: "none", gridItemSize: [], featuredRowPosterSize: [] }
+          holdout_control: { "design_type": "none", container_id: "none", gridItemSize: [], featuredRowPosterSize: [] }
+          holdout_winning: { "design_type": "none", container_id: "none", gridItemSize: [], featuredRowPosterSize: [] }
+        }
+      }
 
 
       'This experiment will enable any skinAds wrapper campaigns.
       'ads_tubi_skins_v1 is enabled by default to ensure users see ads if no response from popper
       ads_tubi_skins: {
         ads_tubi_skins_v1: {
-          default: {"enabled": true}
-          holdout_control: {"enabled": false}
-          holdout_winning: {"enabled": false}
+          default: { "enabled": true }
+          holdout_control: { "enabled": false }
+          holdout_winning: { "enabled": false }
         }
       }
 
       'This experiment will not be under holdout and will clean up once we take the decision.
       roku_no_change_experiment: {
         roku_no_change_experiment_v3: {
-          default: {"enabled": false}
-          holdout_control: {"enabled": false}
-          holdout_winning: {"enabled": false}}
+          default: { "enabled": false }
+          holdout_control: { "enabled": false }
+          holdout_winning: { "enabled": false } }
       }
 
       'This experiment will not be under holdout and will clean up once we take the decision.
       roku_bww_deeplinked_content: {
         roku_bww_deeplinked_content_v1: {
-          default: {"enabled": false}
-          holdout_control: {"enabled": false}
-          holdout_winning: {"enabled": false}}
+          default: { "enabled": false }
+          holdout_control: { "enabled": false }
+          holdout_winning: { "enabled": false } }
       }
 
       'Experiment to control LiveTV feature visibility
       roku_linear_no_show: {
         roku_linear_no_show_v2: {
-          default: {"enabled": false}
-          holdout_control: {"enabled": false}
-          holdout_winning: {"enabled": false}
+          default: { "enabled": false }
+          holdout_control: { "enabled": false }
+          holdout_winning: { "enabled": false }
         }
       }
 
       roku_categories_screen_filters_reorder: {
         roku_categories_screen_filters_reorder_v1: {
-          default: {"enabled": false}
-          holdout_control: {"enabled": false}
-          holdout_winning: {"enabled": false}
+          default: { "enabled": false }
+          holdout_control: { "enabled": false }
+          holdout_winning: { "enabled": false }
         }
       }
 
-      roku_search_larger_poster:{
+      roku_search_larger_poster: {
         roku_search_larger_poster_v1: {
-          default: {"enabled": true}
-          holdout_control: {"enabled": false}
-          holdout_winning: {"enabled": false}
+          default: { "enabled": true }
+          holdout_control: { "enabled": false }
+          holdout_winning: { "enabled": false }
         }
       }
 
       roku_category_large_poster: {
         roku_category_large_poster_v1: {
-          default: {"enabled": false}
-          holdout_control: {"enabled": false}
-          holdout_winning: {"enabled": false}
+          default: { "enabled": false }
+          holdout_control: { "enabled": false }
+          holdout_winning: { "enabled": false }
+        }
+      }
+
+      roku_swap_play_sign_up_button_order: {
+        roku_swap_play_sign_up_button_order_v1: {
+          default: { "enabled": false }
+          holdout_control: { "enabled": false }
+          holdout_winning: { "enabled": false }
         }
       }
 
@@ -219,11 +227,11 @@ Function tubiExperiments_parseNamespace(namespace as Object) as Object
   if namespace <> invalid AND namespace.resource <> invalid
     namespace.resource = ParseJson(namespace.resource) 'bs:disable-line 1016 1019
   end if
-  return namespace    'can return invalid
+  return namespace 'can return invalid
 End Function
 
 
-Function tubiExperiments_getExperiment(namespaceName as string, experimentName as string) as Object
+Function tubiExperiments_getExperiment(namespaceName as String, experimentName as String) as Object
   whitelistedExperimentName = "qa." + experimentName
 
   experiment = invalid
@@ -252,7 +260,7 @@ Function tubiExperiments_getExperiment(namespaceName as string, experimentName a
 End Function
 
 
-Function tubiExperiments_getExperimentTracking(namespaceName as string, experimentName as string) as Object
+Function tubiExperiments_getExperimentTracking(namespaceName as String, experimentName as String) as Object
   treatmentName = invalid
   trackInfo = invalid
   saltId = invalid
@@ -309,7 +317,7 @@ End Function
 '       "treatment": "in_pod_stitching",
 '       "segment": "WHITELISTED"
 ' this result can be used in youbora requests
-Function tubiExperiments_getExperimentResult(namespaceName as string, experimentName as string) as Object
+Function tubiExperiments_getExperimentResult(namespaceName as String, experimentName as String) as Object
   experimentResult = invalid
   experiment = m.getExperiment(namespaceName, experimentName)
 
@@ -325,7 +333,7 @@ End Function
 '
 ' Get more info about the experiment. This is an associative array that is defined when the experiment is set up on the popper server
 ' The AA can include anything and be formatted in anyway. It depends on how you set up the experiment on the popper server.
-Function tubiExperiments_getExperimentResource(namespaceName as string, experimentName as string) as Object
+Function tubiExperiments_getExperimentResource(namespaceName as String, experimentName as String) as Object
 
   oReturn = m.getDefaultResource(namespaceName, experimentName)
   experiment = m.getExperiment(namespaceName, experimentName)
@@ -361,7 +369,7 @@ End Function
 '
 '@namespaceName: string, the name of the namespace in which we will find the experiment
 '@experimentName: string, the name of the experiment as found in the experiment definition
-Function tubiExperiments_getDefaultResource(namespaceName as string, experimentName as string) as Object
+Function tubiExperiments_getDefaultResource(namespaceName as String, experimentName as String) as Object
   defaultResource = invalid
   if namespaceName <> invalid AND experimentName <> invalid
     if m.defaultResources[namespaceName] <> invalid AND m.defaultResources[namespaceName][experimentName] <> invalid
@@ -373,7 +381,7 @@ Function tubiExperiments_getDefaultResource(namespaceName as string, experimentN
 End Function
 
 
-Function tubiExperiments_getDefaultHoldOutControlResource(namespaceName as string, experimentName as string) as Object
+Function tubiExperiments_getDefaultHoldOutControlResource(namespaceName as String, experimentName as String) as Object
   defaultResource = invalid
   if namespaceName <> invalid AND experimentName <> invalid
     if m.defaultResources[namespaceName] <> invalid AND m.defaultResources[namespaceName][experimentName] <> invalid
@@ -385,7 +393,7 @@ Function tubiExperiments_getDefaultHoldOutControlResource(namespaceName as strin
 End Function
 
 
-Function tubiExperiments_getHoldOutInfo(namespaceName as string, experimentName as string) as Object
+Function tubiExperiments_getHoldOutInfo(namespaceName as String, experimentName as String) as Object
   holdoutInfo = {}
   experiment = m.getExperiment(namespaceName, experimentName)
 
@@ -398,7 +406,7 @@ Function tubiExperiments_getHoldOutInfo(namespaceName as string, experimentName 
 End Function
 
 
-Function tubiExperiments_getDefaultHoldOutWinningResource(namespaceName as string, experimentName as string) as Object
+Function tubiExperiments_getDefaultHoldOutWinningResource(namespaceName as String, experimentName as String) as Object
   defaultResource = invalid
   if namespaceName <> invalid AND experimentName <> invalid
     if m.defaultResources[namespaceName] <> invalid AND m.defaultResources[namespaceName][experimentName] <> invalid
