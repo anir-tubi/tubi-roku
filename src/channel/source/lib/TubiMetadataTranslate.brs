@@ -27,7 +27,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid, soTStaticConfig
     allowAfterHours: constants.settings.allowAfterHours
     experiments: experiments
     soTStaticConfig: soTStaticConfig
-    
+
     dedupeBackgrounds: tubiMetadataTranslate_dedupeBackgrounds
     setTotalCount: tubiMetadataTranslate_setTotalCount
     setSponsorshipInfo: tubiMetadataTranslate_setSponsorshipInfo
@@ -54,7 +54,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid, soTStaticConfig
 End Function
 
 
-Function tubiMetadataTranslate_dedupeBackgrounds(backgroundsFromServer) As Object
+Function tubiMetadataTranslate_dedupeBackgrounds(backgroundsFromServer) as Object
   deduped = {}
 
   for each background in backgroundsFromServer
@@ -65,7 +65,7 @@ Function tubiMetadataTranslate_dedupeBackgrounds(backgroundsFromServer) As Objec
 End Function
 
 
-Function tubiMetadataTranslate_setTotalCount(metadata As Object)
+Function tubiMetadataTranslate_setTotalCount(metadata as Object)
   if metadata.totalCount = -1 AND metadata.getChildCount() <> 0 then
     metadata.totalCount = metadata.getChildCount()
   end if
@@ -190,7 +190,7 @@ Function tubiMetadataTranslate_translateBackendTypeToClientSideType(sBackendType
     sReturn = m.contentTypes.category
   else if sBackendType = "cwso"
     sReturn = m.contentTypes.historySignedOutUser
-  else if sBackendType = "v" or sBackendType = "clip"
+  else if sBackendType = "v" OR sBackendType = "clip"
     sReturn = m.contentTypes.video
   else if sBackendType = "s"
     sReturn = m.contentTypes.series
@@ -237,8 +237,8 @@ End Function
 ' @contentFromServer: assocArray, AA representation of content metadata JSON as returned from server
 ' @translatedContent: empty ContentNode or AA that will be populated with content metadata
 ' @isSignedInUser: boolean, value based on user logged In or not
-Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, translatedContent As Object, isSignedInUser = false, container = {}) as integer
-  if contentFromServer = invalid or type(contentFromServer) <> "roAssociativeArray" then return 0
+Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, translatedContent as Object, isSignedInUser = false, container = {}) as Integer
+  if contentFromServer = invalid OR type(contentFromServer) <> "roAssociativeArray" then return 0
 
   count = 1
   if contentFromServer.id <> invalid then translatedContent.id = contentFromServer.id
@@ -348,7 +348,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     translatedContent.loginReason = contentFromServer.login_reason
   end if
 
-  if  isAA(contentFromServer.content_tags) = true AND isNonEmptyArray(contentFromServer.content_tags.rotten_tomatoes_certified_fresh) = true
+  if isAA(contentFromServer.content_tags) = true AND isNonEmptyArray(contentFromServer.content_tags.rotten_tomatoes_certified_fresh) = true
     rottenTomatoScore = contentFromServer.content_tags.rotten_tomatoes_certified_fresh[0]
     if isString(rottenTomatoScore) = false then
       rottenTomatoScore = rottenTomatoScore.toStr()
@@ -501,7 +501,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     translatedContent.HDGRIDPOSTERURL = sPortraitURL
   end if
 
-  if (translatedContent.HDGRIDPOSTERURL = invalid or translatedContent.HDGRIDPOSTERURL = "") AND contentFromServer.HDGRIDPOSTERURL <> invalid
+  if (translatedContent.HDGRIDPOSTERURL = invalid OR translatedContent.HDGRIDPOSTERURL = "") AND contentFromServer.HDGRIDPOSTERURL <> invalid
     '//If the contentFromServer already set HDGRIDPOSTERURL then use that value.
     sHDGridPosterURL = m.getRoundedCornersURL(contentFromServer.HDGRIDPOSTERURL)
     translatedContent.HDGRIDPOSTERURL = sHDGridPosterURL
@@ -527,10 +527,10 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   end if
 
   if contentFromServer.url <> invalid
-    if Lcase(contentFromServer.url).instr(1,".m3u8") > 0
+    if Lcase(contentFromServer.url).instr(1, ".m3u8") > 0
       translatedContent.url = contentFromServer.url
       translatedContent.streamformat = "hls"
-    else if Lcase(contentFromServer.url).instr(1,".mp4") > 0
+    else if Lcase(contentFromServer.url).instr(1, ".mp4") > 0
       translatedContent.url = contentFromServer.url
       translatedContent.streamformat = "mp4"
     end if
@@ -559,12 +559,12 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     '//   MAYBE, in a future Roku firmware update, captions will be known. However, we currently do not know when or if any future update will have this ability.
     subtitleTracks = []
     subtitleTracks.push({
-        language: "eng"
-        description: "English"
-        trackname: "eia608/CC1"
-      })
+      language: "eng"
+      description: "English"
+      trackname: "eia608/CC1"
+    })
     translatedContent.subtitleTracks = subtitleTracks
-    translatedContent.subtitleConfig = {TrackName: "eia608/CC1"}
+    translatedContent.subtitleConfig = { TrackName: "eia608/CC1" }
   else if contentFromServer.subtitles <> invalid AND type(contentFromServer.subtitles) = "roArray" AND contentFromServer.subtitles.count() > 0
     '//subtitles for non-linear video
     subtitleTracks = []
@@ -611,9 +611,9 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
     ' This is needed to make subtitles work on Roku 3 (and other models... 3900, 3800, etc.)
     if subtitleTracks.Count() > 0
-      translatedContent.subtitleConfig = {trackname: subtitleTracks[0].trackname}
+      translatedContent.subtitleConfig = { trackname: subtitleTracks[0].trackname }
     else
-      translatedContent.subtitleConfig = {trackname: contentFromServer.subtitles[0].url}
+      translatedContent.subtitleConfig = { trackname: contentFromServer.subtitles[0].url }
     end if
 
   end if
@@ -630,13 +630,13 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
     if trailerInfo <> invalid AND isNonEmptyString(trailerInfo.url)
 
-        if Lcase(trailerInfo.url).instr(1, ".mpd") > 0
-          trailerInfo.streamFormat = "dash"
-          translatedContent.trailerInfo = trailerInfo
-        else if Lcase(trailerInfo.url).instr(1, ".m3u8") > 0
-          trailerInfo.streamFormat = "hls"
-          translatedContent.trailerInfo = trailerInfo
-        end if
+      if Lcase(trailerInfo.url).instr(1, ".mpd") > 0
+        trailerInfo.streamFormat = "dash"
+        translatedContent.trailerInfo = trailerInfo
+      else if Lcase(trailerInfo.url).instr(1, ".m3u8") > 0
+        trailerInfo.streamFormat = "hls"
+        translatedContent.trailerInfo = trailerInfo
+      end if
     end if
   end if
 
@@ -854,7 +854,7 @@ End Function
 
 
 '@ads: array, ads received from homescreen response
-Function tubiMetadataTranslate_translateAds(ads = []) As Object
+Function tubiMetadataTranslate_translateAds(ads = []) as Object
   tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateAds")
   skinAdContent = invalid
   isNativeCustomVideoPresent = false
@@ -985,7 +985,7 @@ End Function
 ' @screenId: string, the id of the screen
 ' @isSignedInUser: boolean, value based on user logged In or not
 ' @isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
-Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMode="homescreen", isKidsMode=false, uiMode="standard", screenId="", isSignedInUser = false, isLinearBlock = false) As Object
+Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMode = "homescreen", isKidsMode = false, uiMode = "standard", screenId = "", isSignedInUser = false, isLinearBlock = false) as Object
   tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateHomescreen()")
 
   translated = CreateObject("roSGNode", "CategoryContentNode")
@@ -993,7 +993,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
     id: m.constants.ui.contentIds.homegrid
     title: ""
     validUntil: 0
-    children: []    'categories
+    children: [] 'categories
     personalizationId: ""
   }
 
@@ -1036,7 +1036,12 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
       else if container.type = "linear" AND isLinearBlock = true ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
         categoryAA = invalid
       else
-        categoryAA = m.buildCategoryAAWithInsert(container, contents, "", "", false, contentMode, screenId, isSignedInUser, uiMode, isLinearBlock, true) ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
+        shouldInsertChannelTile = true
+        isContentModeHomeScreen = (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
+        if isContentModeHomeScreen = true AND uiMode = "standard" AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_3").design_type = "withDescriptionPortraitSmall"
+          shouldInsertChannelTile = false
+        end if
+        categoryAA = m.buildCategoryAAWithInsert(container, contents, "", "", false, contentMode, screenId, isSignedInUser, uiMode, isLinearBlock, shouldInsertChannelTile) ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
       end if
 
       if categoryAA <> invalid
@@ -1066,7 +1071,7 @@ End Function
 ' translateCategoriesListScreen
 '
 ' Translate a response from matrix/categories or matrix/channels for use in ChannelGridScreen
-Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate, bDisplayChannels = true) As Object
+Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate, bDisplayChannels = true) as Object
   tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateCategoriesListScreen()")
   queueCategoryId = m.constants.ui.categoryIds.queue
   continueWatchingCategoryId = m.constants.ui.categoryIds.history
@@ -1094,7 +1099,7 @@ Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate,
     id: screenContentId
     title: ""
     validUntil: 0
-    children: []    'categories
+    children: [] 'categories
     personalizationId: ""
   }
 
@@ -1129,7 +1134,7 @@ Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate,
     end if
 
     if oLimitTypes[container.type] = true
-      categoryAA = m.buildCategoryParentInfo(container)  'categoryAA is invalid if empty container
+      categoryAA = m.buildCategoryParentInfo(container) 'categoryAA is invalid if empty container
       if categoryAA <> invalid
         if bDisplayChannels = true
           categoryAA.type = m.contentTypes.channel
@@ -1208,7 +1213,7 @@ End Function
 ' @uiMode: string, one of the allowed values from constants.ui.modes
 ' @isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
 
-Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, sOrientation = "", bFullData = false, contentMode="homeScreen", screenId="", isSignedInUser = false, isKidsMode=false, uiMode="standard", isLinearBlock = false) As Object
+Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, sOrientation = "", bFullData = false, contentMode = "homeScreen", screenId = "", isSignedInUser = false, isKidsMode = false, uiMode = "standard", isLinearBlock = false) as Object
   tubiLog("TubiMetadataTranslate.translateContainer")
   translated = CreateObject("roSGNode", "CategoryContentNode")
   container = contentToTranslate.container
@@ -1237,7 +1242,7 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
     }, true)
   end if
 
-  if categoryMetadata = invalid  'happens if a container has no valid content in it (ie. all content is out of window)
+  if categoryMetadata = invalid 'happens if a container has no valid content in it (ie. all content is out of window)
     translated.id = container.id
     return translated
   end if
@@ -1271,7 +1276,7 @@ End Function
 ' translateEmptyMyStuffContainer
 '
 ' @contentToTranslate: assocArray, the AA resulting from JSON parsing the /container API response
-Function tubiMetadataTranslate_translateEmptyMyStuffContainer(contentToTranslate) As Object
+Function tubiMetadataTranslate_translateEmptyMyStuffContainer(contentToTranslate) as Object
   tubiLog("TubiMetadataTranslate.translateEmptyMyStuffContainer")
   translated = CreateObject("roSGNode", "CategoryContentNode")
   container = contentToTranslate.container
@@ -1384,7 +1389,7 @@ End Function
 ' @isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
 ' @shouldInsertChannelTile: boolean, true if the channel tile should be inserted into the container, false otherwise
 ' returns an associative array that can be passed to ContentNode.update() to populate the ContentNode and it's children
-Function tubiMetadataTranslate_buildCategoryAAWithInsert(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode="homeScreen", screenId="", isSignedInUser = false, uiMode = "standard", isLinearBlock = false, shouldInsertChannelTile = false)
+Function tubiMetadataTranslate_buildCategoryAAWithInsert(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode = "homeScreen", screenId = "", isSignedInUser = false, uiMode = "standard", isLinearBlock = false, shouldInsertChannelTile = false)
   categoryAA = invalid
 
   if container <> invalid AND container.children <> invalid
@@ -1400,7 +1405,7 @@ Function tubiMetadataTranslate_buildCategoryAAWithInsert(container, contents, co
         ' create and add a new content to the contents which hold the container metadata
         insertContent = {}
         insertContent.append(container)
-        insertContent.delete("children")  ' need to make sure there isn't a recursion later when getContentFromCategoryJson is called
+        insertContent.delete("children") ' need to make sure there isn't a recursion later when getContentFromCategoryJson is called
         insertContent.posterarts = [m.generateChannelPosterUrl(container.id)]
         insertPosition = 0
       end if
@@ -1464,7 +1469,7 @@ Function tubiMetadataTranslate_buildCategoryParentInfo(container, sOrientation =
       end if
     end if
 
-    m.categorySubtexts  = {}
+    m.categorySubtexts = {}
     m.categorySubtexts[m.constants.ui.categoryIds.recommendedForYou] = getTranslation("registration_signIn_recommended")
 
     if sOrientation <> "" then
@@ -1559,7 +1564,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
 
           sContentType = m.translateBackendTypeToClientSideType(fullChild.type)
           titleImage = ""
-          if isAA(fullChild.images)  = true AND fullChild.images.count() > 0 AND isNonEmptyArray(fullChild.images.title_art) = true then
+          if isAA(fullChild.images) = true AND fullChild.images.count() > 0 AND isNonEmptyArray(fullChild.images.title_art) = true then
             titleImage = fullChild.images.title_art[0]
           end if
 
@@ -1620,10 +1625,10 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
               description: fullChild.description
               length: fullChild.duration
               subtype: sType
-              tags:fullChild.tags
+              tags: fullChild.tags
               year: fullChild.year
               duration: fullChild.length
-              ratings:  fullChild.ratings
+              ratings: fullChild.ratings
               titleImageUri: titleImage
               thumbnailUri: thumbnailUri
               seasons: seasons
@@ -1650,7 +1655,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           end if
 
           if fullChild.showAllText <> invalid
-            childAA.append({showAllText: fullChild.showAllText})
+            childAA.append({ showAllText: fullChild.showAllText })
           end if
 
           if fullChild.needs_login = true AND isSignedInUser = false AND m.checkIfUserIsInRegistrationByPassMode() = false
@@ -1662,7 +1667,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             childAA.hasVideoResources = true
           end if
 
-          if fullChild.air_datetime <> invalid and fullChild.air_datetime <> ""
+          if fullChild.air_datetime <> invalid AND fullChild.air_datetime <> ""
             childAA.airDateTime = fullChild.air_datetime
           end if
 
@@ -1739,7 +1744,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           end if
 
           if fullChild.type <> "l" OR isLinearBlock = false 'isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
-            if childIsPushable = true and jsonAA <> invalid
+            if childIsPushable = true AND jsonAA <> invalid
               jsonAA[childAA.id] = fullChild
             end if
             childrenReturn.push(childAA)
@@ -1748,7 +1753,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
       end for
     end if
 
-    if jsonAA <> invalid and isNonEmptyString(contentsJson) = false
+    if jsonAA <> invalid AND isNonEmptyString(contentsJson) = false
       contentsJson = FormatJSON(jsonAA)
     else if bFullData = true
       ' no need for contents Json if contents have the full data (bFullData = true)
@@ -1774,7 +1779,7 @@ Function tubiMetadataTranslate_getContentsJson(parsedJson, fullJson)
   contentsJson = ""
 
   'Doing string operations to isolate the contents portion of the JSON matrix response is ~4x faster than re-formatting the JSON
-  contentsIdentifier =  Chr(34) + "contents" + Chr(34) + ":{"
+  contentsIdentifier = Chr(34) + "contents" + Chr(34) + ":{"
   safetyEject = false
 
   contentsIdentifierPos = Instr(1, fullJson, contentsIdentifier)
@@ -1782,11 +1787,11 @@ Function tubiMetadataTranslate_getContentsJson(parsedJson, fullJson)
   'make sure the content key exists exactly once in the JSON string
   if contentsIdentifierPos > 0 AND Instr(contentsIdentifierPos + 1, fullJson, contentsIdentifier) < 1
     contentsStartPos = contentsIdentifierPos + contentsIdentifier.len() - 1
-    contentsEndPos = fullJson.len()  'set default assuming contents is the last key in the AA json
+    contentsEndPos = fullJson.len() 'set default assuming contents is the last key in the AA json
 
     for each key in parsedJson
       if key <> "contents"
-        keyIdentifier = Chr(34) + key + Chr(34) + ":"   ' ex: "container":  'can't guarantee AA so don't include bracket
+        keyIdentifier = Chr(34) + key + Chr(34) + ":" ' ex: "container":  'can't guarantee AA so don't include bracket
         keyPos = Instr(1, fullJson, keyIdentifier)
         'make sure the key exists exactly once in the JSON string
         if keyPos > 0 AND Instr(keyPos + 1, fullJson, keyIdentifier) < 1
@@ -1794,7 +1799,7 @@ Function tubiMetadataTranslate_getContentsJson(parsedJson, fullJson)
             contentsEndPos = keyPos - 1
           end if
         else
-          safetyEject = true  ' key not found, or found multiple times in string, can't be trusted
+          safetyEject = true ' key not found, or found multiple times in string, can't be trusted
           exit for
         end if
       end if
@@ -1826,7 +1831,7 @@ End Function
 ' Translates content from server into format that roku understands
 ' contentToTranslate should be parsed from JSON before it hits this Function
 ' @isSignedInUser: boolean, value based on user logged In or not
-Function tubiMetadataTranslate_translate(contentToTranslate, isSignedInUser = false) As Object
+Function tubiMetadataTranslate_translate(contentToTranslate, isSignedInUser = false) as Object
   translated = CreateObject("roSGNode", "TubiContentNode")
   node_count = 0
 
@@ -1834,7 +1839,7 @@ Function tubiMetadataTranslate_translate(contentToTranslate, isSignedInUser = fa
     'expect a list of categories with one category filled with content or a list of contents
     if type(contentToTranslate) = "roArray"
       for each content in contentToTranslate
-        if content.title <> "After Hours" or m.allowAfterHours = true
+        if content.title <> "After Hours" OR m.allowAfterHours = true
           node = translated.createChild("TubiContentNode")
           node_count = node_count + m.translateRecursive(content, node, isSignedInUser)
         end if
@@ -2013,7 +2018,7 @@ End Function
 
 
 Function tubiMetadataTranslate_generateChannelPosterUrl(channelId)
-  if (type(channelId) = "String" or type(channelId) = "roString") AND channelId <> ""
+  if (type(channelId) = "String" OR type(channelId) = "roString") AND channelId <> ""
     return m.constants.urls.channelPosterBrandedPrefix + channelId + m.constants.urls.channelPosterBrandedSuffix
   else
     return m.constants.urls.channelPosterUnbranded
@@ -2237,7 +2242,7 @@ End Function
 ' returns codec as string without prefix "VIDEO_CODEC_"
 ' eg. H265
 Function getCodecFromVideoResource(resource as Object)
-  return resource.codec.replace("VIDEO_CODEC_","")
+  return resource.codec.replace("VIDEO_CODEC_", "")
 End Function
 
 
@@ -2248,7 +2253,7 @@ End Function
 ' eg. 1080
 Function getIntegerResolutionFromVideoResource(resource as Object)
   if resource <> invalid AND resource.resolution <> invalid
-    return resource.resolution.replace("VIDEO_RESOLUTION_","").replace("P", "").toInt()
+    return resource.resolution.replace("VIDEO_RESOLUTION_", "").replace("P", "").toInt()
   else
     return 0
   end if
@@ -2299,7 +2304,7 @@ End Function
 '
 '
 ' @contentToTranslate: AA, json parsed response from the epgChannelIds endpoint
-Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, requestorID, isUserSignedIn = false, fetchId = 0) As Object
+Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, requestorID, isUserSignedIn = false, fetchId = 0) as Object
   tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateEPGChannelIds")
 
   translated = CreateObject("roSGNode", "ContentNode")
@@ -2356,7 +2361,7 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
             channelContentNode.hasSubtitles = true
             subtitleTracks = channelFromServer.subtitles
 
-            if  subtitleTracks[0] <> invalid
+            if subtitleTracks[0] <> invalid
               langDescription = subtitleTracks[0].language
             else
               langDescription = "English"
@@ -2369,7 +2374,7 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
               trackname: "eia608/CC1"
             })
             channelContentNode.subtitleTracks = subtitleTracks
-            channelContentNode.subtitleConfig = {TrackName: "eia608/CC1"}
+            channelContentNode.subtitleConfig = { TrackName: "eia608/CC1" }
           else
             channelContentNode.hasSubtitles = false
           end if
@@ -2397,7 +2402,7 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
               program.FHDPosterUrl = channelFromServer.images.poster[0]
             end if
 
-            if  channelFromServer.images.thumbnail <> invalid
+            if channelFromServer.images.thumbnail <> invalid
               channelContentNode.HDSMALLICONURL = channelFromServer.images.thumbnail[0]
             end if
 
@@ -2426,10 +2431,10 @@ End Function
 
 
 ' @contentToTranslate: AA, json parsed response from the epgProgramming endpoint
-Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requestorID, isUserSignedIn = false, fetchId = 0 )
+Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requestorID, isUserSignedIn = false, fetchId = 0)
   tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateEPGPrograms()")
   contentNode = CreateObject("roSGNode", "ContentNode")
-  channelArray= []
+  channelArray = []
   updateAA = {
     "requestorID": requestorID
     "fetchId": fetchId
@@ -2493,7 +2498,7 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
             trackname: "eia608/CC1"
           })
           channelNode.subtitleTracks = subtitleTracks
-          channelNode.subtitleConfig = {TrackName: "eia608/CC1"}
+          channelNode.subtitleConfig = { TrackName: "eia608/CC1" }
         end if
       end if
 
@@ -2514,7 +2519,7 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
       programs = channelFromServer.programs
       programCount = programs.count()
 
-      for i=0 to programCount -1
+      for i = 0 to programCount - 1
         programFromServer = programs[i]
         if programFromServer <> invalid
           translatedProgram = {
@@ -2535,7 +2540,7 @@ End Function
 Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromServer, translatedProgram, requestorID, isUserSignedIn = false)
   if isAA(channelFromServer) = true AND isAA(programFromServer) = true
 
-    if channelFromServer.content_id  <> invalid
+    if channelFromServer.content_id <> invalid
       translatedProgram.id = channelFromServer.content_id
     end if
 
@@ -2599,7 +2604,7 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
       end if
     end if
 
-    if  sFDPosterURL = "" AND channelFromServer.images <> invalid 'if program images are not available, consider channel images for substitute.
+    if sFDPosterURL = "" AND channelFromServer.images <> invalid 'if program images are not available, consider channel images for substitute.
       if isNonEmptyArray(channelFromServer.images.poster)
         sFDPosterURL = channelFromServer.images.poster[0]
       end if
@@ -2631,13 +2636,13 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
 
 
     if sHDGridPosterURL = ""
-      sHDGridPosterURL =  m.getThumbnailImage(channelFromServer, gridItemType) 'channel image - default
+      sHDGridPosterURL = m.getThumbnailImage(channelFromServer, gridItemType) 'channel image - default
     end if
 
     sFDPosterURL = m.getRoundedCornersURL(sFDPosterURL)
     sHDGridPosterURL = m.getRoundedCornersURL(sHDGridPosterURL)
-    translatedProgram.FHDPosterUrl  = sFDPosterURL
-    translatedProgram.hdgridposterurl  = sHDGridPosterURL
+    translatedProgram.FHDPosterUrl = sFDPosterURL
+    translatedProgram.hdgridposterurl = sHDGridPosterURL
 
     if programFromServer.has_subtitle <> invalid
       translatedProgram.hasSubtitles = programFromServer.has_subtitle
@@ -2655,7 +2660,7 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
     end if
 
     if startTime <> "" AND endTime <> ""
-      translatedProgram.hoursOfAiring = startTime + " - " +  endTime
+      translatedProgram.hoursOfAiring = startTime + " - " + endTime
     end if
 
     if programFromServer.ratings <> invalid AND programFromServer.ratings[0] <> invalid AND programFromServer.ratings[0].value <> invalid
@@ -2667,7 +2672,7 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
       translatedProgram.loginReason = channelFromServer.login_reason
     end if
 
-    if programFromServer.description <> invalid and programFromServer.description <> ""
+    if programFromServer.description <> invalid AND programFromServer.description <> ""
       translatedProgram.description = programFromServer.description
     else
       translatedProgram.description = channelFromServer.description
@@ -2680,7 +2685,7 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
       translatedProgram.genres = programFromServer.tags 'array of genres
     end if
 
-    now  = CreateObject("roDateTime")
+    now = CreateObject("roDateTime")
     now.ToLocalTime()
     nowTime = now.asSeconds()
     tomorrowSecs = nowTime + 86400 'seconds per day
@@ -2689,17 +2694,17 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
 
     'Today
     if dateString = now.AsDateString("short-date")
-      if translatedProgram.startTime <= nowTime AND translatedProgram.endTime > nowTime  ' current program eg:20M left
-        timeLeft = (translatedProgram.endTime -  nowTime) / 60
-        translatedProgram.ShortDescriptionLine1 = getTranslation("epg_minutes_left", {minutes: toStr(convertSecondsToMins(translatedProgram.endTime - nowTime))})
-      else   'Today future program eg: 10:00 AM
+      if translatedProgram.startTime <= nowTime AND translatedProgram.endTime > nowTime ' current program eg:20M left
+        timeLeft = (translatedProgram.endTime - nowTime) / 60
+        translatedProgram.ShortDescriptionLine1 = getTranslation("epg_minutes_left", { minutes: toStr(convertSecondsToMins(translatedProgram.endTime - nowTime)) })
+      else 'Today future program eg: 10:00 AM
         timeLeft = (translatedProgram.endTime - translatedProgram.startTime) / 60
         translatedProgram.ShortDescriptionLine1 = startTime
       end if
     else if dateString = tomorrow.AsDateString("short-date") ' tomorrow programs eg: 10:00AM, TOMORROW
       timeLeft = (translatedProgram.endTime - translatedProgram.startTime) / 60
       translatedTomorrow = getTranslation("tomorrow")
-      translatedProgram.ShortDescriptionLine1 =  startTime + ", " + translatedTomorrow
+      translatedProgram.ShortDescriptionLine1 = startTime + ", " + translatedTomorrow
     else 'future day programs eg: Jan, 8 10:00 AM
       timeLeft = (translatedProgram.endTime - translatedProgram.startTime) / 60
       translatedProgram.ShortDescriptionLine1 = startTime + ", " + getTranslation(dayOfWeek) + dayOfMonth
@@ -2726,12 +2731,12 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
     selectedAttributeText = getTranslation("epg_starts_at") + " "
 
     itemAttributes = {
-      "title" : selectedAttributeText
+      "title": selectedAttributeText
     }
 
     if programFromServer.keywords <> invalid AND programFromServer.keywords.count() > 0
       for each keyword in programFromServer.keywords
-        if keyword = "EpisodeTitle_IsPreferred" and isNonEmptyString(programFromServer.episode_title)
+        if keyword = "EpisodeTitle_IsPreferred" AND isNonEmptyString(programFromServer.episode_title)
           itemAttributes["EpisodeTitle_IsPreferred"] = true
           exit for
         end if
@@ -2742,7 +2747,7 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
     translatedProgram.itemAttributes = itemAttributes
   end if
 
-  End Function
+End Function
 
 
 ' @content: roAssocArray, series/movie content directly from the server
@@ -2761,9 +2766,9 @@ Function tubiMetadataTranslate_upNextTranslateRecursiveWrapper(content, upnextCo
         if content.children.count() <= 0 'no seasons
           bInclude = false
         else if content.children.count() > 0 'there are seasons so check each season for emptiness
-          for i = content.children.count() -1 to 0 step -1
+          for i = content.children.count() - 1 to 0 step -1
             season = content.children[i]
-            if season.children = invalid or (season.children <> invalid AND season.children.count() <= 0) 'empty season
+            if season.children = invalid OR (season.children <> invalid AND season.children.count() <= 0) 'empty season
               content.children.delete(i) 'remove season
             end if
           end for
@@ -2836,7 +2841,7 @@ End Function
 ' @contentMode: string, the value of the contentMode parameter as sent as part of the matrix/homescreen request
 ' @screenId: string, the id of the screen
 ' @isSignedInUser: boolean, value based on user logged In or not
-Function tubiMetadataTranslate_translateMiniHomescreen(contentToTranslate, contentMode="homescreen", screenId="", isSignedInUser = false) As Object
+Function tubiMetadataTranslate_translateMiniHomescreen(contentToTranslate, contentMode = "homescreen", screenId = "", isSignedInUser = false) as Object
   tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateMiniHomescreen()")
 
   translated = CreateObject("roSGNode", "CategoryContentNode")
@@ -2844,7 +2849,7 @@ Function tubiMetadataTranslate_translateMiniHomescreen(contentToTranslate, conte
     id: m.constants.ui.contentIds.homegrid
     title: ""
     validUntil: 0
-    children: []    'categories
+    children: [] 'categories
   }
 
   if contentToTranslate <> invalid
@@ -3042,7 +3047,7 @@ Function tubiMetadataTranslate_getTextFromPath(content, path, defaultValue = "")
       exit while
     end if
 
-    if not (isAA(result) = true OR isArray(result) = true OR isNode(result) =true)
+    if not (isAA(result) = true OR isArray(result) = true OR isNode(result) = true)
       result = invalid
     end if
 
@@ -3076,8 +3081,8 @@ Function tubiMetadataTranslate_getSignalTrustInfo(sotChild, content)
   markers = sotChild.markers
   sotMarkers = {}
   if isNonEmptyArray(markers) = true
-      ' We are displaying a maximum of one marker label, so we're selecting the first index instead of considering the entire child count.
-      sotMarkers = m.getTheIconAndTextFromConfig(markers[0], content)
+    ' We are displaying a maximum of one marker label, so we're selecting the first index instead of considering the entire child count.
+    sotMarkers = m.getTheIconAndTextFromConfig(markers[0], content)
   end if
 
   metaData = sotChild.metadata

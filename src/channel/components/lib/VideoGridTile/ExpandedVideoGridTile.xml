@@ -35,15 +35,6 @@
           loadingBitmapUri="pkg:/images/placeholder-featured.webp"
           failedBitmapUri="pkg:/images/placeholder-featured.webp" />
         <Poster
-          id="channelLogo"
-          visible="false"
-          width="147"
-          height="147"
-          loadSync="true"
-          uri="pkg:/images/placeholder-featured.webp"
-          loadingBitmapUri="pkg:/images/placeholder-featured.webp"
-          failedBitmapUri="pkg:/images/placeholder-featured.webp" />
-        <Poster
           id="videoInGridGradient"
           translation="[0, 1]"
           loadDisplayMode="scaleToFill"

@@ -10,7 +10,6 @@ Function init()
   m.titleGroup = topRef.findNode("titleGroup")
   m.titleImage = topRef.findNode("titleImage")
   m.posterGroup = topRef.findNode("posterGroup")
-  m.channelLogo = topRef.findNode("channelLogo")
   ' We are only limiting the height since title logo is displayed on it's own row we are good to let the width flow.
   m.titleImage.loadHeight = 68
   m.titleImage.loadWidth = 240
@@ -72,9 +71,6 @@ Function onItemContentChange(msg)
   itemContent = msg.getData()
 
   if itemContent <> invalid
-    m.channelLogo.visible = false
-    ' Resetting the blend color to default.
-    m.poster.blendColor = "#FFFFFFFF"
     isBadgeAdded = false
 
     currentProgram = invalid
@@ -109,14 +105,6 @@ Function onItemContentChange(msg)
       posterUri = itemContent.featuredLandscape
     else if isNonEmptyString(itemContent.landscape) = true
       posterUri = itemContent.landscape
-    else if itemContent.type = "channel"
-      category = itemContent.getParent()
-      if category <> invalid
-        m.poster.uri = "pkg:/images/placeholder-featured.webp"
-        m.poster.blendColor = m.backgroundColor
-        m.channelLogo.uri = category.logoUri
-        m.channelLogo.visible = true
-      end if
     end if
 
     if isNonEmptyString(posterUri) = true
@@ -229,9 +217,6 @@ Function onHeightChange(msg)
   height = msg.getData()
   if height > 0
     m.videoInGridGradient.height = height
-    translation = m.channelLogo.translation
-    translation[1] = (height - m.channelLogo.height) / 2
-    m.channelLogo.translation = translation
   end if
 End Function
 
@@ -256,9 +241,6 @@ Function onWidthChange(msg)
   width = msg.getData()
   if width > 0
     m.videoGridMetadata.width = width
-    translation = m.channelLogo.translation
-    translation[0] = (width - m.channelLogo.width) / 2
-    m.channelLogo.translation = translation
   end if
 End Function
 

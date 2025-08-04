@@ -5,9 +5,7 @@ Function init()
   m.progressBarGroup = topRef.findNode("progressBarGroup")
   m.timeLeftLabel = topRef.findNode("timeLeftLabel")
   m.gradient = topRef.findNode("gradient")
-  m.channelLogo = topRef.findNode("channelLogo")
   topRef.observeFieldScoped("height", "onHeightChange")
-  topRef.observeFieldScoped("width", "onWidthChange")
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.timeLeftLabel, typographyConstants.ids.bodyExtraSmall)
@@ -43,9 +41,6 @@ Function onItemContentChange(msg)
   itemContent = msg.getData()
 
   if itemContent <> invalid
-    m.channelLogo.visible = false
-    ' Resetting the blend color to default.
-    m.poster.blendColor = "#FFFFFFFF"
     currentProgram = invalid
     if itemContent.type = "linear"
       currentProgram = getCurrentLiveProgram(itemContent)
@@ -60,27 +55,19 @@ Function onItemContentChange(msg)
       m.poster.uri = itemContent.hdGridPosterUrl
     else if isNonEmptyString(itemContent.portrait) = true
       m.poster.uri = itemContent.portrait
-    else if itemContent.type = "channel"
-      category = itemContent.getParent()
-      if category <> invalid AND isNonEmptyString(category.logoUri) = true
-        m.poster.uri = "pkg:/images/placeholder-featured.webp"
-        m.poster.blendColor = m.backgroundColor
-        m.channelLogo.uri = category.logoUri
-        m.channelLogo.visible = true
-      end if
     end if
 
-  ' this is to avoid rowlist reusing the same badge without adjusting for the new text.
-  if m.sotBadge <> invalid
-    m.top.removeChild(m.sotBadge)
-    m.sotBadge = invalid
-  end if
+    ' this is to avoid rowlist reusing the same badge without adjusting for the new text.
+    if m.sotBadge <> invalid
+      m.top.removeChild(m.sotBadge)
+      m.sotBadge = invalid
+    end if
 
-  if isAA(itemContent.sotPosterLabels) = true AND itemContent.sotPosterLabels.count() > 0
-    badgeUri = itemContent.sotPosterLabels.sotIcon
-    badgeText =  itemContent.sotPosterLabels.sotLabelText
-    setSotBadge(badgeUri, badgeText)
-  end if
+    if isAA(itemContent.sotPosterLabels) = true AND itemContent.sotPosterLabels.count() > 0
+      badgeUri = itemContent.sotPosterLabels.sotIcon
+      badgeText = itemContent.sotPosterLabels.sotLabelText
+      setSotBadge(badgeUri, badgeText)
+    end if
 
     m.progressBarGroup.visible = false
     m.gradient.visible = false
@@ -96,8 +83,8 @@ Function setSotBadge(badgeUri, badgeText)
   if isNonEmptyString(badgeText) = true
     if m.sotBadge = invalid
       m.sotBadge = createObject("roSGNode", "Badge")
-      m.sotBadge.id="sotBadge"
-      m.sotBadge.translation=[6, 6]
+      m.sotBadge.id = "sotBadge"
+      m.sotBadge.translation = [6, 6]
     end if
 
     m.sotBadge.textColor = m.focusedTextColor
@@ -132,21 +119,10 @@ End Function
 Function onHeightChange(msg)
   height = msg.getData()
   m.progressBarGroup.translation = [0, (height - 76)]
-  translation = m.channelLogo.translation
-  translation[1] = (height - m.channelLogo.height) / 2
-  m.channelLogo.translation = translation
-End Function
-
-
-Function onWidthChange(msg)
-  width = msg.getData()
-  translation = m.channelLogo.translation
-  translation[0] = (width - m.channelLogo.width) / 2
-  m.channelLogo.translation = translation
 End Function
 
 ' helper function which returns the time left in the format 'x hour and y mins left' if time left is more than an hour.
-Function getDurationHoursString(seconds As Integer) As String
+Function getDurationHoursString(seconds as Integer) as String
   formattedString = ""
 
   if seconds <> invalid
@@ -155,7 +131,7 @@ Function getDurationHoursString(seconds As Integer) As String
 
     ' Since h and m are same in all languages skipping translation for better performance.
     if hourValue > 0
-      formattedString =  Substitute("{0}h {1}m", StrI(hourValue), minValue)
+      formattedString = Substitute("{0}h {1}m", StrI(hourValue), minValue)
     else
       formattedString = Substitute("{0}m", minValue)
     end if
