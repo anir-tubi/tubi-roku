@@ -3,7 +3,7 @@
 'returns current time in UTC seconds
 '******************************************************
 
-Function getCurrentUTCTime() as integer
+Function getCurrentUTCTime() as Integer
   now = CreateObject("roDateTime")
   return now.AsSeconds()
 End Function
@@ -14,7 +14,7 @@ End Function
 'returns current time in UTC seconds
 '******************************************************
 
-Function getCurrentLocalTime() as integer
+Function getCurrentLocalTime() as Integer
   now = CreateObject("roDateTime")
   now.ToLocalTime()
   return now.AsSeconds()
@@ -27,7 +27,7 @@ End Function
 ' For example, passing in 12 would return 1. Passing in 119 would return 2.
 ' @param seconds : integer
 '******************************************************
-Function convertSecondsToMins(seconds As Integer) As Integer
+Function convertSecondsToMins(seconds as Integer) as Integer
   mins = (seconds / 60) + 1
   return fix(mins)
 End Function
@@ -38,7 +38,7 @@ End Function
 'returns number of days since Unix epoch
 '******************************************************
 
-Function getNumberOfDaysSinceEpoch() as integer
+Function getNumberOfDaysSinceEpoch() as Integer
   nowDate = CreateObject("roDateTime")
   secondsFromEpoch = nowDate.AsSeconds()
   daysFromEpoch = Int(secondsFromEpoch / 60 / 60 / 24)
@@ -81,7 +81,7 @@ Function getMonthAndDay(datetime)
   day = datetime.GetDayOfMonth().toStr()
   shortVersionOfDateFormat = getShortVersionOfDateFormat(month, day)
   ' replacing "," with empty string as the string does not have year.
-  return shortVersionOfDateFormat.replace(",","")
+  return shortVersionOfDateFormat.replace(",", "")
 End Function
 
 
@@ -339,4 +339,19 @@ Function localizedTimeString(dateTime, format = "h:mm a")
 
     return Substitute("{0}:{1} {2}", inputDate12Hours.toStr(), inputDateMins, meridiem)
   end if
+End Function
+
+
+' This function converts seconds to years.
+' The function returns the given number of seconds converted to years (accounting for leap years).
+' Uses 365.25 days per year to account for leap years (31,557,600 seconds per year).
+' @param seconds : integer or long integer - number of seconds to convert
+' @return integer - number of complete years
+'******************************************************
+Function convertSecondsToYears(seconds as Longinteger) as Integer
+  ' 1 year = 365.25 days * 24 hours * 60 minutes * 60 seconds = 31,557,600 seconds
+  secondsPerYear = 31557600
+  years = seconds \ secondsPerYear
+
+  return years ' Return only complete years
 End Function

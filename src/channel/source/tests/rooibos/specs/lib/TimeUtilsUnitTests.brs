@@ -75,20 +75,20 @@ Function timeUtils_convertSecondsToMins_test()
   mins = CreateObject("roInt") ' Interface equivalent for intrinsic type 'Integer' which is the return type of function
   mins.setInt(90 / 60)
   totalmins = convertSecondsToMins(90)
-  m.AssertEqual(mins+1,totalmins)
+  m.AssertEqual(mins + 1, totalmins)
 
   mins.setInt(0)
   totalmins = convertSecondsToMins(0)
-  m.AssertEqual(mins+1, totalmins)
+  m.AssertEqual(mins + 1, totalmins)
 
   mins.setInt(123456789 / 60)
   totalmins = convertSecondsToMins(123456789)
-  m.AssertEqual(mins+1, totalmins)
+  m.AssertEqual(mins + 1, totalmins)
 
 
-  mins.SetInt(-90/60)
+  mins.SetInt(-90 / 60)
   totalmins = convertSecondsToMins(-90)
-  m.AssertEqual(mins+1, totalmins)
+  m.AssertEqual(mins + 1, totalmins)
 
 
 End Function
@@ -250,4 +250,34 @@ Function timeUtils_isToday_test()
   m.assertFalse(isToday(yesterdayDayString))
   m.assertTrue(isToday(currentDayString))
   m.assertFalse(isToday(invalid))
+End Function
+
+
+'@Test convertSecondsToYears unit tests
+'@only
+Function timeUtils_convertSecondsToYears_test()
+  dateTime = CreateObject("roDateTime")
+  ' Adding 00:00:00Z to the birthday string to make it a valid ISO-8601 string.
+  dateTime.FromISO8601String("1985-01-01T00:00:00Z")
+  birthdaySeconds = dateTime.asSeconds()
+
+  secondDateTime = CreateObject("roDateTime")
+  secondDateTime.FromISO8601String("2025-01-01T00:00:00Z")
+  nowSeconds = secondDateTime.asSeconds()
+
+  m.assertEqual(convertSecondsToYears(nowSeconds - birthdaySeconds), 40)
+
+  secondDateTime.FromISO8601String("2020-01-02T00:00:00Z")
+  nowSeconds = secondDateTime.asSeconds()
+  m.assertEqual(convertSecondsToYears(nowSeconds - birthdaySeconds), 35)
+
+
+  secondDateTime.FromISO8601String("2010-01-01T00:00:00Z")
+  nowSeconds = secondDateTime.asSeconds()
+  m.assertEqual(convertSecondsToYears(nowSeconds - birthdaySeconds), 24)
+
+
+  secondDateTime.FromISO8601String("1998-01-01T00:00:00Z")
+  nowSeconds = secondDateTime.asSeconds()
+  m.assertEqual(convertSecondsToYears(nowSeconds - birthdaySeconds), 12)
 End Function

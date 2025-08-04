@@ -673,7 +673,7 @@ Function runControllerStartSequence()
   tubiLog("ContentController.runControllerStartSequence")
   cleanRegistry()
   if m.isExternalConfigReady <> true OR m.isExperimentsConfigReady <> true then
-      ' Wait for external and experiments config to be ready before proceeding
+    ' Wait for external and experiments config to be ready before proceeding
   else if m.uiGroup = invalid then
     ' checks if the controller's UI has been added as children
     addControllerUi()
@@ -797,7 +797,7 @@ Function sendDeviceEnvironmentSettingsLog()
   model = deviceInfo.GetModel()
   modelType = deviceInfo.GetModelType()
   videoMode = deviceInfo.GetVideoMode().toInt()
-  isHevcCompatible = (deviceInfo.CanDecodeVideo({Codec: "hevc"}).result = true)
+  isHevcCompatible = (deviceInfo.CanDecodeVideo({ Codec: "hevc" }).result = true)
 
   deviceInfo = {
     isVideoPreviewOn: (isVideoPreviewOn() = true)
@@ -1623,10 +1623,11 @@ End Function
 
 Function sendNavigateWithinPageInfo(navigateWithinPageInfo)
   if navigateWithinPageInfo <> invalid
-    m.trackingLoggingTask.trackEvent = {
+    event = {
       type: "navigate_within_page"
       values: navigateWithinPageInfo
     }
+    fireUserTrackingEvent(event)
   end if
 End Function
 
@@ -1640,10 +1641,12 @@ End Function
 
 Function sendcomponentInteractionInfo(componentInteractionInfo)
   if componentInteractionInfo <> invalid
-    m.trackingLoggingTask.trackEvent = {
+    event = {
       type: "component_interaction"
       values: componentInteractionInfo
     }
+
+    fireUserTrackingEvent(event)
   end if
 End Function
 
@@ -1844,7 +1847,7 @@ Function showUpgradeModal(shouldAlert, trackingLib, trackingTask)
       type: "dialog"
       values: {
         dialog_type: "UPGRADE" 'DialogType enum
-        pageOneof: trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_UNKNOWN"})
+        pageOneof: trackingLib.getAnalyticsPage("home_page", { content_mode: "CONTENT_MODE_UNKNOWN" })
         dialog_action: "SHOW"
         dialog_sub_type: ""
       }
@@ -1857,18 +1860,18 @@ End Function
 Function showPackedVersionLoadedModal(trackingLib, trackingTask)
   buttons = [getTranslation("dialog_button_ok")]
 
-  userErrorCode = getUserFacingErrorCode("1", "300","" )
+  userErrorCode = getUserFacingErrorCode("1", "300", "")
 
   title = getTranslation("dialog_defaultError_title")
 
-  template = {"errCode":  userErrorCode}
+  template = { "errCode": userErrorCode }
   message = getTranslation("component_library_failed", template)
 
   dialogEvent = {
     type: "dialog"
     values: {
       dialog_type: "NETWORK_ERROR" 'DialogType enum
-      pageOneof: trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_UNKNOWN"})
+      pageOneof: trackingLib.getAnalyticsPage("home_page", { content_mode: "CONTENT_MODE_UNKNOWN" })
       dialog_action: "SHOW"
       dialog_sub_type: "component-lib-failed"
     }
@@ -2302,7 +2305,7 @@ Function onFullscreenCountdown()
         contentToPlay = screen.linearChannelToPlay
       end if
 
-      if contentToPlay <> invalid and contentToPlay.needsLogin = true
+      if contentToPlay <> invalid AND contentToPlay.needsLogin = true
         'if Content is locked and do not show countDown.
         screen.fullscreenCountdown = -1
       else
@@ -2363,10 +2366,10 @@ End Function
 
 
 ' @logoType : string, one of the following from m.constants.ui.modes
-          ' "tubi" =  show tubi logo,
-          ' "tubi_kids" = show tubi kids logo,
-          ' "tubi_espanol" = show espanol logo,
-          ' "hide" = hide all logos
+' "tubi" =  show tubi logo,
+' "tubi_kids" = show tubi kids logo,
+' "tubi_espanol" = show espanol logo,
+' "hide" = hide all logos
 ' @presentedByURL : string, a url of an image which represents someone sponsoring the app
 ' @presentedByText : string, a string to be displayed before the image representing the presentedByURL
 Function showHideLogo(logoType, presentedByURL = "", presentedByText = "")
@@ -2510,17 +2513,17 @@ End Function
 '   min height = 112
 '
 '@toastInfo: assocArray, it contains below
-  '{
-    ' @message: string,  message to be displayed
-    ' @headerText : string, title
-    ' @imageUri: string, image to be displayed left side of message
-    ' @selfDestructTimer: integer, number of seconds toast should be displayed
-    ' @headerColor: colorstring for HeaderText
-    ' @messageColor: colorString for message
-    ' @backGroundColor : toast background color
-    ' @imageWidth: interger, width of the image if imageUri is provided.
-    ' @imageHeight: interger, height of the image if imageUri is provided.
-  '}
+'{
+' @message: string,  message to be displayed
+' @headerText : string, title
+' @imageUri: string, image to be displayed left side of message
+' @selfDestructTimer: integer, number of seconds toast should be displayed
+' @headerColor: colorstring for HeaderText
+' @messageColor: colorString for message
+' @backGroundColor : toast background color
+' @imageWidth: interger, width of the image if imageUri is provided.
+' @imageHeight: interger, height of the image if imageUri is provided.
+'}
 ' @shouldSendTracking: boolean, true if we are sending an event for toast message, otherwise false
 ' @dialogEventInfo: assocArray, contains the info necessary to send a dialog analytics event, has keys: "type" and "values"
 Function showToast(toastInfo, shouldSendTracking = false, dialogEventInfo = {})
@@ -2801,7 +2804,7 @@ Function getUserInfo(callback)
   m.getUserPreferencesRateTitleDislikedResponseReceived = false
 
   authInfo = m.tubiAuthUpdate.getAuthInfo()
-  if isLoggedInUser(authInfo) = true  AND isMajorEventDay() = false
+  if isLoggedInUser(authInfo) = true AND isMajorEventDay() = false
     getHistoryIds(getHistoryIdsSuccess, getHistoryIdsError)
     getQueueIds(getQueueIdsSuccess, getQueueIdsError)
     getUserInfoGetContentRatingTitleLiked()
@@ -3178,7 +3181,7 @@ Function showToastAfterAuthRefreshFromMobile()
       email = m.pub_serverPersistentData.email
     end if
 
-    message = getTranslation("auth_refresh_welcome_message", {email: email})
+    message = getTranslation("auth_refresh_welcome_message", { email: email })
     headerText = getTranslation("auth_refresh_welcome_header")
 
     toastInfo = {
@@ -3272,4 +3275,40 @@ Function isCloseTo16By9AspectRatio(size)
 
   ' Return true if within tolerance
   return difference <= tolerance
+End Function
+
+
+' Creating a wrapper function to append the additional context values to the event.values
+Function fireUserTrackingEvent(event)
+  ' TODO: For now only updating where it is required to limit the scope of the change.
+  currentScreen = getCurrentScreen()
+  if currentScreen <> invalid AND currentScreen.trackingPageInfo <> invalid AND currentScreen.trackingPageInfo.additionalContextValues <> invalid
+    event.values.append(currentScreen.trackingPageInfo.additionalContextValues)
+  end if
+
+  m.trackingLoggingTask.trackEvent = event
+End Function
+
+
+Function checkIfUserIsAdultByParentalRatingAndBirthday()
+  isAdult = true
+  ' If the parental rating is not 3, the user is not an adult.
+  if m.pub_serverPersistentData.parentalRating <> 3
+    isAdult = false
+  end if
+
+  birthday = m.pub_serverPersistentData.birthday
+  if isNonEmptyString(birthday) = true AND isAdult = true
+    dateTime = CreateObject("roDateTime")
+    ' Adding 00:00:00Z to the birthday string to make it a valid ISO-8601 string.
+    dateTime.FromISO8601String(birthday + "T00:00:00Z")
+    birthdaySeconds = dateTime.asSeconds()
+    nowSeconds = CreateObject("roDateTime").asSeconds()
+    age = convertSecondsToYears(nowSeconds - birthdaySeconds)
+    if age < 18
+      isAdult = false
+    end if
+  end if
+
+  return isAdult
 End Function

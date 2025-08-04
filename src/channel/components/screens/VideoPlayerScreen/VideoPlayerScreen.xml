@@ -17,6 +17,7 @@
   <script type="text/brightscript" uri="pkg:/source/3rdparty/google/gam_utils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Sentry.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/PlayerLogLib.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnalyticsMixin.brs" />
 
   <interface>
 
@@ -149,6 +150,9 @@
 
       <!-- exitReason helps to find out how the player screen got exited/closed -->
       <field id="exitReason" type="string"/>
+
+      <!-- isAdultParentalLevel will be set to true if the user is at the adult parental level -->
+      <field id="isAdultParentalLevel" type="boolean" value="false" />
 
     <!-- OUTPUT -->
       <!-- Set to true if the back button was pressed while the video player has focus -->

@@ -19,5 +19,5 @@
         "or": "upper"
     },
     "removeTrailingWhiteSpace": true,
-    "typeCase": "lower"
+    "typeCase": "title"
 }

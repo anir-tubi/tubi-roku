@@ -126,7 +126,7 @@ End Function
 ' @eventValues: assocArray, keys/values that correspond to the fields within the event type specified in @eventType
 ' @requestQueue: assocArray, a request queue as returned by TubiRequestQueue().create()
 Function tubiTracking_trackUserEvent(eventType = "", eventValues = invalid, requestQueue = invalid)
-if eventType <> "" AND m.externalConfigInfo <> invalid
+  if eventType <> "" AND m.externalConfigInfo <> invalid
     blockedAnalyticsEvents = m.externalConfigInfo.blocked_analytics_events_mapping
     userConsentsOptOutStatus = {}
     if isAA(m.userConsentsOptOutStatus) = true
@@ -173,7 +173,7 @@ Function tubiTracking_getClientEvent(eventType, eventValues) as Object
   if isNonEmptyString(eventValues.personalization_id) = true
     clientEvent.personalization_id = eventValues.personalization_id
   else if isAA(eventValues.pageOneOf) = true
-    items =  eventValues.pageOneOf.Items()
+    items = eventValues.pageOneOf.Items()
     if isNonEmptyArray(items) = true
       pageOneOf = items[0].value
       if isNonEmptyString(pageOneOf.personalization_id) = true
@@ -279,7 +279,8 @@ End Function
 ' See protos.analytics.events.protos -> ClientEvent
 Function tubiTracking_getAnalyticsRequestIdempotency()
   deviceInfo = CreateObject("roDeviceInfo")
-  idempotency = {   'see protos.headers.request.proto -> Idempotency
+  idempotency = {
+    'see protos.headers.request.proto -> Idempotency
     key: deviceInfo.GetRandomUUID()
     ' ttl_hint: "5s"    'see protos.google.protobuf.duration.proto -> Duration but not necessary to send
   }
@@ -347,7 +348,14 @@ Function tubiTracking_getAnalyticsDevice(eventValues = invalid)
     advertiser_id: "00000000-0000-0000-0000-000000000000"
     locale: currentLocale
   }
-  if m.constants.deviceInfo.isAdIdTrackingDisabled <> true AND (eventValues = invalid OR eventValues.appMode <> "KIDS_MODE")
+
+  user = m.getAnalyticsUser()
+  doNotTrackAdId = false
+  if eventValues <> invalid AND eventValues.isCdc = true AND (user.user_id = 0 OR eventValues.isAdultParentalLevel = false)
+    doNotTrackAdId = true
+  end if
+
+  if m.constants.deviceInfo.isAdIdTrackingDisabled <> true AND (eventValues = invalid OR eventValues.appMode <> "KIDS_MODE") AND doNotTrackAdId = false
     device.advertiser_id = m.constants.deviceInfo.deviceAdId
   end if
   return device
@@ -508,8 +516,8 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
 
     play_progress: {
       video_id: -1
-      position: -1   'ms
-      view_time: -1  'ms
+      position: -1 'ms
+      view_time: -1 'ms
       playback_source: ""
       video_player: "" 'VideoPlayer enum
     }
@@ -524,7 +532,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       video_codec_type: "" ' The codec type of video resource
       video_resolution: "" 'The resolution of video resource
       is_fullscreen: true 'the video player is being played in full screen format
-      input_device: ""  'InputDevice enum
+      input_device: "" 'InputDevice enum
       pageOneof: {} 'a valid page type (see StartLiveVideoEvent in events.protos)
     }
 
@@ -537,9 +545,9 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
 
     seek: {
       video_id: -1
-      from_position: -1  'ms
-      to_position: -1    'ms
-      video_player: ""  'VideoPlayer enum
+      from_position: -1 'ms
+      to_position: -1 'ms
+      video_player: "" 'VideoPlayer enum
     }
 
     pause_toggle: {
@@ -556,7 +564,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
 
     audio_selection: {
       video_id: -1
-      language_code: ""  'LanguageCode enum
+      language_code: "" 'LanguageCode enum
       descriptions_enabled: false ' Will be true/false based on which track was used.
     }
 
@@ -565,7 +573,8 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       toggle_state: "" 'ToggleState enum
     }
 
-    auto_play: {   'This event is fired when a user interacts with the autoplay/Up Next UI, not when an autoplay occurs
+    auto_play: {
+      'This event is fired when a user interacts with the autoplay/Up Next UI, not when an autoplay occurs
       video_id: -1
       auto_play_action: "" 'AutoPlayAction enum
     }
@@ -582,10 +591,10 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
     }
 
     trailer_play_progress: {
-      video_id: -1   'the content id of the trailer
-      position: -1   'ms
-      view_time: -1  'ms
-      video_player: ""  'VideoPlayer enum
+      video_id: -1 'the content id of the trailer
+      position: -1 'ms
+      view_time: -1 'ms
+      video_player: "" 'VideoPlayer enum
     }
 
     finish_trailer: {
@@ -630,7 +639,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
     account: {
       manip: "" 'Manipulation enum
       current: "" 'User.AuthType enum
-      linked: ""  'User.AuthType enum - not relevant for roku channel
+      linked: "" 'User.AuthType enum - not relevant for roku channel
       user_type: "" 'UserType enum
       message: ""
       status: "" 'ActionStatus enum
@@ -667,7 +676,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
 
     preview_play_progress: {
       video_id: -1
-      position: -1  'ms
+      position: -1 'ms
       view_time: -1 'ms
       video_player: "BANNER"
       preview_id: "" '// unique ID of a preview. Can be used to identify preview url
@@ -876,8 +885,8 @@ Function tubiTracking_populateMessage(messageType, messageValues, messageBase)
         'if so, add the valid key that exists inside the "Oneof" to the message
         if m.allOneofs[prop] <> invalid
           if messageValues[prop] <> invalid
-            for each key in messageValues[prop]  'should only actually be one key, something like "home_page"
-              if m.allOneofs[prop][key] <> invalid  'ex. m.allOneofs["pageOneof"]["home_page"]
+            for each key in messageValues[prop] 'should only actually be one key, something like "home_page"
+              if m.allOneofs[prop][key] <> invalid 'ex. m.allOneofs["pageOneof"]["home_page"]
                 messageFields.addReplace(key, messageValues[prop][key])
               end if
             end for
@@ -944,15 +953,15 @@ Function tubiTracking_getOneOfs()
   }
 
   news_browse_page = {
-    i: "i"  'filler because empty fields are removed
+    i: "i" 'filler because empty fields are removed
   }
 
   sports_browse_page = {
-    i: "i"  'filler because empty fields are removed
+    i: "i" 'filler because empty fields are removed
   }
 
   entertainment_browse_page = {
-    i: "i"  'filler because empty fields are removed
+    i: "i" 'filler because empty fields are removed
   }
 
   category_page = {
@@ -960,7 +969,8 @@ Function tubiTracking_getOneOfs()
     personalization_id: ""
   }
 
-  sub_category_page = {  'TODO: Determine if we need this - I think no.
+  sub_category_page = {
+    'TODO: Determine if we need this - I think no.
     category_slug: ""
     sub_category_slug: ""
   }
@@ -973,7 +983,8 @@ Function tubiTracking_getOneOfs()
     personalization_id: ""
   }
 
-  video_page = {  'This corresponds to our details page
+  video_page = {
+    'This corresponds to our details page
     video_id: -1
   }
 
@@ -994,11 +1005,13 @@ Function tubiTracking_getOneOfs()
     personalization_id: ""
   }
 
-  auth_page = {'TODO: Find out if we need this page - I think no
+  auth_page = {
+    'TODO: Find out if we need this page - I think no
     auth_action: "" 'Action enum
   }
 
-  login_page = {'TODO: Find out if we need this page - I think no
+  login_page = {
+    'TODO: Find out if we need this page - I think no
     choice: "" 'Choice enum
   }
 
@@ -1148,11 +1161,13 @@ Function tubiTracking_getOneOfs()
   ' At some point we may need to split the component "Oneof" like we did with the page and dest_page "Oneof"
   ' but for now this is sufficient
   componentOneof = {
-    browse_menu_component: { ' Used for category screen
+    browse_menu_component: {
+      ' Used for category screen
       category_slug: ""
     }
 
-    generic_component: {' Used for components that are not yet defined in protos
+    generic_component: {
+      ' Used for components that are not yet defined in protos
       generic_component_type: "" ' GenericComponentType enum
     }
 
@@ -1160,7 +1175,8 @@ Function tubiTracking_getOneOfs()
 
     middle_nav_component: section_middleNav
 
-    category_component: {' Used for category screen, channel details screen, channel/category grid screen
+    category_component: {
+      ' Used for category screen, channel details screen, channel/category grid screen
       category_slug: ""
       category_row: -1 ' 1 based index
       category_col: -1 ' 1 based index
@@ -1168,7 +1184,8 @@ Function tubiTracking_getOneOfs()
       utility_tile: {} ' UtilityTile message - optional
     }
 
-    mystuff_component: {' Used for mystuff screen
+    mystuff_component: {
+      ' Used for mystuff screen
       category_slug: ""
       content_tile: {} ' ContentTile message - optional
     }

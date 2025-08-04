@@ -34,5 +34,8 @@
     <!--isLinearBlocked holds the string value whether linear is blocked for the user-->
     <field id="isLinearBlocked" type="string" value="none" />
 
+    <!-- birthday holds the string value of the user's birthday -->
+    <field id="birthday" type="string" value="" />
+
   </interface>
 </component>

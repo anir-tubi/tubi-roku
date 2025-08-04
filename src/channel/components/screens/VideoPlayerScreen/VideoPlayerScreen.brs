@@ -59,13 +59,13 @@ Function init()
   m.LoadingMessage = m.top.findNode("LoadingMessage")
 
   m.LoadingSpinner = m.top.findNode("LoadingSpinner")
-  
+
   m.UpNext = m.top.findNode("UpNext")
   m.UpNextParent = m.top.findNode("UpNextParent")
   m.UpNext.observeField("contentSelected", "onUpNextContentSelected")
   m.UpNext.observeField("opacity", "onUpNextOpacityChange")
   m.UpNext.observeField("autoplayMode", "onUpNextAutolayModeChange")
-  m.Video = m.top.findNode("VideoNode")  ' reference in case we change from extending Video to extending Group
+  m.Video = m.top.findNode("VideoNode") ' reference in case we change from extending Video to extending Group
   m.Video.observeField("streamInfo", "onStreamInfoChanged")
   m.Video.observeFieldScoped("position", "onVideoPositionChange")
   m.Video.observeFieldScoped("state", "onVideoStateChange")
@@ -78,7 +78,7 @@ Function init()
   'downloadedSegment is needed for player log - Quality Of Service event
   m.video.observeFieldScoped("downloadedSegment", "onDownloadedSegment")
   m.videoBorder = m.top.findNode("VideoBorder")
-  
+
   ' asyncStopSemantics was broken prior to 14.0 so we are not running it on older firmware versions
   isFirmwareOk = createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
   if isFirmwareOk = true AND getExperimentResource("roku_async_stop", "roku_async_stop_v6", false).enabled = true then
@@ -314,7 +314,7 @@ Function init()
   if m.playerControlExperimentType = "variant1" OR m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3"
     m.focusedNode = m.progressBar
   else
-     'm.focusedNode holds the node/component which helps setting/unsetting focus to component/m.top on video player screen
+    'm.focusedNode holds the node/component which helps setting/unsetting focus to component/m.top on video player screen
     m.focusedNode = m.PlayPauseButton
   end if
 
@@ -331,7 +331,7 @@ Function init()
   m.Video.notificationInterval = m.notificationInterval
 
   'This information is used in quality of service event
-  m.adImpressionMap = {"0": 0, "1": 0, "2": 0, "3": 0, "4": 0}
+  m.adImpressionMap = { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0 }
 
   'This variable holds the value of Ad information from rainmaker response
   m.filledAdData = {}
@@ -417,7 +417,7 @@ Function init()
   m.titleImage.loadWidth = 366
   m.titleImage.loadHeight = 57
   m.titleImage.loadDisplayMode = "limitSize"
-  m.titleImage.observeFieldScoped("loadStatus" , "onDisplayTitleArt")
+  m.titleImage.observeFieldScoped("loadStatus", "onDisplayTitleArt")
 
   m.episodeTitle = CreateObject("roSGNode", "Label")
   m.episodeTitle.id = "VideoOverlayEpisodeTitle"
@@ -452,10 +452,10 @@ Function init()
   setTypographyOfLabel(m.seekSpeed, m.typographyConstants.ids.bodySmallStrong)
   setTypographyOfLabel(m.RemainingMinimizedLabel, m.typographyConstants.ids.bodySmallStrong)
 
-  '//Once the Typography has been set for RemainingMinimizedLabel, then set the width and height of the RemainingMinimizedBground 
+  '//Once the Typography has been set for RemainingMinimizedLabel, then set the width and height of the RemainingMinimizedBground
   boundingRectRemainingMinimizedLabel = m.RemainingMinimizedLabel.boundingRect()
-  m.RemainingMinimizedBground.width = boundingRectRemainingMinimizedLabel.width + m.RemainingMinimizedLabel.translation[0]*2
-  m.RemainingMinimizedBground.height = boundingRectRemainingMinimizedLabel.height + m.RemainingMinimizedLabel.translation[1]*2
+  m.RemainingMinimizedBground.width = boundingRectRemainingMinimizedLabel.width + m.RemainingMinimizedLabel.translation[0] * 2
+  m.RemainingMinimizedBground.height = boundingRectRemainingMinimizedLabel.height + m.RemainingMinimizedLabel.translation[1] * 2
 
   '//Position elements based on the margin set in constants
   m.SkipTrailerButton.translation = [m.marginX, m.SkipTrailerButton.translation[1]]
@@ -464,7 +464,7 @@ Function init()
   m.descriptorDesc.translation = [m.marginX + 27, m.descriptorDesc.translation[1]]
   m.ElapsedLabel.translation = [m.marginX, m.ElapsedLabel.translation[1]]
   m.RemainingLabel.translation = [1920 - m.marginX - m.RemainingLabel.boundingRect().width - 10, m.RemainingLabel.translation[1]]
-  m.RemainingMinimizedGroup.translation = [1779,346]
+  m.RemainingMinimizedGroup.translation = [1779, 346]
   m.ProgressBar.translation = [m.constants.ui.translations.marginX, m.ProgressBar.translation[1]]
   m.ProgressBar.width = 1920 - (m.marginX * 2)
 
@@ -503,7 +503,7 @@ Function init()
   m.currentSubtitleLanguage = ""
   m.currentAudioLanguage = ""
 
-  ' Since we will not be able to get audio track language until the video is playing, 
+  ' Since we will not be able to get audio track language until the video is playing,
   ' we will not fire the start video event until the video is playing.
   ' To avoid from code firing multiple start video events, we will set this variable to track when to fire vs not.
   m.shouldFireStartVideoEvent = false
@@ -582,7 +582,7 @@ End Function
 Function onStreamInfoChanged(msg)
   streamInfo = msg.GetData()
   updatePlayerLogLib(m.playerLogLib, "setStreamInfo", streamInfo)
-End function
+End Function
 
 
 '@feedbackIssue: string, The player issue that was chosen to send feedback on.
@@ -590,16 +590,16 @@ Function sendPlayerFeedbackInfo(feedbackIssue)
   playerContent = m.top.content
   if playerContent <> invalid
     sendFeedBackInfo = {
-    device_id: m.constants.deviceInfo.deviceId
-    platform: m.constants.platform
-    feedback_issue: feedbackIssue
-    is_live: false
-    content_id: playerContent.id
-    video_resource_type: playerContent.drmType
-    video_resource_resolution: playerContent.resolution
-    position: playerContent.position
-    current_buffering_duration: 0
-    userId: 0
+      device_id: m.constants.deviceInfo.deviceId
+      platform: m.constants.platform
+      feedback_issue: feedbackIssue
+      is_live: false
+      content_id: playerContent.id
+      video_resource_type: playerContent.drmType
+      video_resource_resolution: playerContent.resolution
+      position: playerContent.position
+      current_buffering_duration: 0
+      userId: 0
     }
 
     authInfo = m.auth.getAuthInfo()
@@ -687,7 +687,7 @@ End Function
 
 'set the text for skipCuepoints button, making it visible and timer to autohide
 '@skipCuepointsTitle: string, text of the skipCuepoints button
-Function setSkipCuepointsButtonTextAndTimer(skipCuepointsTitle as string) As Void
+Function setSkipCuepointsButtonTextAndTimer(skipCuepointsTitle as String) as Void
   tubiLog("VideoPlayer.setSkipCuepointsButtonTextAndTimer")
   m.skipCuepointsButtonTimer = m.top.createChild("Timer")
   m.skipCuepointsButtonTimer.duration = 10
@@ -889,7 +889,7 @@ Function onThemeChange(msg = invalid)
 End Function
 
 
-Function onContentChange() As Void
+Function onContentChange() as Void
   tubiLog("VideoPlayer.onContentChange")
   stopVideo()
   m.isBWWShownForDeeplinkUser = false
@@ -912,6 +912,10 @@ Function onContentChange() As Void
       pageType: m.top.trackingPageInfo.pageType
       pageValues: {
         video_id: m.top.content.id.toInt()
+      }
+      additionalContextValues: {
+        isCdc: m.top.content.isCdc
+        isAdultParentalLevel: m.top.isAdultParentalLevel
       }
     }
 
@@ -966,8 +970,8 @@ Function onControlChange()
 
     fireBrowseWhileWatchingPlaybackSessionEndEvent()
     updatePlayerLogLib(m.playerLogLib, "fireQualityOfServiceEvent", m.adImpressionMap)
-    m.adImpressionMap = {"0": 0, "1": 0, "2": 0, "3": 0, "4": 0} 'reset adImpressionMap after sending QualityOfService event
-    
+    m.adImpressionMap = { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0 } 'reset adImpressionMap after sending QualityOfService event
+
     updatePlayerLogLib(m.playerLogLib, "setVideoStateWhenExitingPlayer", m.video.state)
     updatePlayerLogLib(m.playerLogLib, "setPlayerStateWhenExitingPlayer", m.top.state)
 
@@ -1077,7 +1081,7 @@ Function onVideoStateChange(msg)
     end if
   else if state = "error"
     content = m.Video.content
-    errorInfo = getPlaybackErrorInfo(m.Video.position, m.Video.downloadedSegment, m.Video.streamingSegment, m.Video.streamingInfo,m.Video.errorCode, m.Video.errorStr, content)
+    errorInfo = getPlaybackErrorInfo(m.Video.position, m.Video.downloadedSegment, m.Video.streamingSegment, m.Video.streamingInfo, m.Video.errorCode, m.Video.errorStr, content)
 
     errorCode = m.video.errorCode
     errorInfo.type = m.constants.errors.type.videoError + " " + errorCode.toStr()
@@ -1145,28 +1149,28 @@ Function onVideoStateChange(msg)
 
     contentErrorInfo = {}
     contentErrorInfo["error_code"] = m.Video.errorCode
-    contentErrorInfo["error_details"] =  m.Video.errorMsg
-    
+    contentErrorInfo["error_details"] = m.Video.errorMsg
+
     if m.didAdvanceDrm <> true
       isFatal = true
     else
       isFatal = false
     end if
 
-    contentErrorInfo["fatal"] =  isFatal
+    contentErrorInfo["fatal"] = isFatal
     updatePlayerLogLib(m.playerLogLib, "fireContentErrorEvent", contentErrorInfo)
 
     if m.didAdvanceDrm <> true
       updatePlayerLogLib(m.playerLogLib, "setErrorCode", m.Video.errorCode)
       updatePlayerLogLib(m.playerLogLib, "setErrorModal", true)
-      m.top.errorMsg = getTranslation("videoPlayer_error_playback_description")  'is used in error modal
-      m.top.state = state   'triggers error modal in ContentController
+      m.top.errorMsg = getTranslation("videoPlayer_error_playback_description") 'is used in error modal
+      m.top.state = state 'triggers error modal in ContentController
     end if
   else if state = "stopped" then
 
     if m.isShowAdBreakPendingStop = true then
       showAdBreakStoppedCallback()
-    else if m.VideoState = "stop"  then
+    else if m.VideoState = "stop" then
       ' player has stopped (not due to an ad break)
       if m.top.adState = "noAds" OR m.top.adState = "init" OR m.top.adState = "adsCompleted"
         if m.Video.content <> invalid
@@ -1198,7 +1202,7 @@ Function onVideoStateChange(msg)
     if m.playerControlExperimentType <> "none"
       m.LoadingSpinner.visible = false
     else
-      m.Loading.visible = false  
+      m.Loading.visible = false
     end if
     m.top.state = state
   else
@@ -1214,12 +1218,12 @@ Function onVideoStateChange(msg)
       m.LoadingSpinner.visible = true
     else
       m.LoadingProgressBar.progress = 0
-      m.Loading.visible = true  
+      m.Loading.visible = true
     end if
   end if
 
   if state = "playing"
-    if m.showRatings = true AND m.ratingOverlay.opacity  = 0.0 AND m.AdHeadsUp.visible = false
+    if m.showRatings = true AND m.ratingOverlay.opacity = 0.0 AND m.AdHeadsUp.visible = false
       m.showRatings = false
       if isAA(m.top.playbackSource) = true AND m.top.playbackSource.srcForAds = m.constants.player.playbackOrigin.deeplink AND getExperimentResource("roku_bww_deeplinked_content", "roku_bww_deeplinked_content_v1", true).enabled = true AND m.isBWWShownForDeeplinkUser = false
         showRatingOverlay(deeplinkBWWCallBack)
@@ -1299,7 +1303,7 @@ Function fireStartVideoOrTrailerEvent()
 
     startPosition = Int(m.playerPosition * 1000)
     if startPosition < 0
-      startPosition = 0  'reset the player position to 0 since we do not know why 
+      startPosition = 0 'reset the player position to 0 since we do not know why
     end if
 
     trackEvent({
@@ -1307,8 +1311,8 @@ Function fireStartVideoOrTrailerEvent()
       values: {
         video_id: m.Video.content.id.toInt()
         start_position: startPosition
-        current_cdn: ""   'not possible for Roku client
-        has_subtitles: hasSubtitles  'the video player will show subtitles at start
+        current_cdn: "" 'not possible for Roku client
+        has_subtitles: hasSubtitles 'the video player will show subtitles at start
         is_livetv: isLiveTv
         is_embedded: isEmbedded
         is_fullscreen: isFullScreen
@@ -1356,12 +1360,12 @@ Function onVideoPositionChange(msg)
 
   ' protects against video positions being updated after we've told the player to pause
   if m.VideoState = "play"
-    updatePlayerPosition()  'updates m.playerPosition with m.Video.position
+    updatePlayerPosition() 'updates m.playerPosition with m.Video.position
     m.ratingInterval = m.ratingInterval + m.Video.notificationInterval
   end if
 
   ' show the TV Rating/Descriptors every hour
-  if m.ratingInterval  >= (60 * 60) AND m.ratingOverlay.opacity = 0.0 AND m.AdHeadsUp.visible = false
+  if m.ratingInterval >= (60 * 60) AND m.ratingOverlay.opacity = 0.0 AND m.AdHeadsUp.visible = false
     showRatingOverlay()
   end if
 
@@ -1443,7 +1447,7 @@ Function onVideoPositionChange(msg)
         hideBrowseWhileWatching()
         setFocusToPlaybackControl()
         clearSkipCuepointsButtonAndTimer()
-        
+
         if m.bAutostartRefreshExperimentEnabled = true
           if m.top.content.parentType = "series"
             '//Make sure the upNext component is located in the original layer
@@ -1461,7 +1465,7 @@ Function onVideoPositionChange(msg)
             m.VideoBorder.height = 360
           end if
         end if
-     
+
         m.UpNext.show = true
         m.UpNext.setFocus(true)
         m.shouldShowUpNext = false
@@ -1514,7 +1518,7 @@ Function onVideoPositionChange(msg)
 
   'Advertisements
   if m.top.enableAds = true AND m.midrolls.count() > 0 then
-    m.AdHeadsUp.visible = false  ' default to AdHeadsUp being off; this will catch ff, replay, rew during the countdown
+    m.AdHeadsUp.visible = false ' default to AdHeadsUp being off; this will catch ff, replay, rew during the countdown
 
     ' attempt to fetch midroll ads before actual cuepoint
     potentialCuepoint = m.playerPosition + m.adPrefetchTime
@@ -1587,7 +1591,7 @@ Function onVideoPositionChange(msg)
             type: "resume_after_break"
             values: {
               video_id: m.Video.content.id.toInt()
-              position: Int(m.playerPosition * 1000)  'without Int(), can return scientific notation, causing API error
+              position: Int(m.playerPosition * 1000) 'without Int(), can return scientific notation, causing API error
             }
           })
         end if
@@ -1613,7 +1617,7 @@ Function showAdHeadUpText(cuepoint)
     m.adBreakStartsInOverlay.timeRemaining = seconds
   else
     m.adBreakStartsInOverlay.visible = false
-    m.AdHeadsUpText.text = getTranslation("videoPlayer_adHeadsUp", {seconds: seconds})
+    m.AdHeadsUpText.text = getTranslation("videoPlayer_adHeadsUp", { seconds: seconds })
     m.adBreakStartsInOverlay.reCalculateWidth = true
   end if
 End Function
@@ -1654,16 +1658,16 @@ Function onAdStateChange(msg)
       ' to fix the issue.
       m.top.adControl = m.top.adControl
     end if
-  else if adState = "adsPending" AND (m.top.adControl = "preroll" or m.top.adControl = "seek") AND m.top.enableAds = true then
+  else if adState = "adsPending" AND (m.top.adControl = "preroll" OR m.top.adControl = "seek") AND m.top.enableAds = true then
     ' Midrolls are triggered from position changes since they are prefetched.  Other ad breaks have
     ' video playback stopped and should play right away when we get adsPending.
     ' pre-roll or resume-roll. Play ads right away
     showAdBreak()
     m.showRatings = true
-  else if (adState = "noAds" OR adState = "adsCompleted") AND (m.VideoState = "play" or m.VideoState = "pause" or m.VideoState = "ffw" or m.VideoState = "rew" or m.VideoState = "skip" or m.VideoState = "hop") AND m.Video.state <> "playing" then
+  else if (adState = "noAds" OR adState = "adsCompleted") AND (m.VideoState = "play" OR m.VideoState = "pause" OR m.VideoState = "ffw" OR m.VideoState = "rew" OR m.VideoState = "skip" OR m.VideoState = "hop") AND m.Video.state <> "playing" then
     'The below check is to remove the resumeFrom ad param once we've already sent the resumeFrom param in the previous ad request to avoid sending it again for future midrolls if it is not expected.
     content = m.top.content
-    if content.adParam <> invalid and content.adParam.resumeFrom <> invalid
+    if content.adParam <> invalid AND content.adParam.resumeFrom <> invalid
       adParams = content.adParam
       adParams.resumeFrom = invalid
       content.adParam = adParams
@@ -1708,7 +1712,7 @@ Function onAdStateChange(msg)
         type: "resume_after_break"
         values: {
           video_id: m.Video.content.id.toInt()
-          position: Int(m.playerPosition * 1000)    'without Int(), can return scientific notation, causing API error
+          position: Int(m.playerPosition * 1000) 'without Int(), can return scientific notation, causing API error
         }
       })
     else
@@ -1738,9 +1742,9 @@ End Function
 
 
 Function onSpritesReceived(msg)
-  thumbnailsInfo = msg.getData()  'expect a TubiContentNode with thumbnail fields populated
+  thumbnailsInfo = msg.getData() 'expect a TubiContentNode with thumbnail fields populated
 
-  m.Thumbnail.visible = false   ' always start with thumbnail invisible, then show it when scrubbing
+  m.Thumbnail.visible = false ' always start with thumbnail invisible, then show it when scrubbing
 
   if thumbnailsInfo <> invalid
     ' sprites are reset to invalid when video playback stops. Don't log when that happens because
@@ -1860,14 +1864,15 @@ End Function
 
 
 ' Helper function to prevent tracking events being sent for trailers
-Function trackEvent(event As Object)
+Function trackEvent(event as Object)
   allowedTrailerEvents = {
     "start_trailer": true
     "trailer_play_progress": true
     "finish_trailer": true
   }
 
-  if m.top.isTrailer = false or allowedTrailerEvents[event.type] = true
+  if m.top.isTrailer = false OR allowedTrailerEvents[event.type] = true
+    appendContentUserContextValues(event.values, m.top.content, m.top.isAdultParentalLevel)
     m.global.trackingLoggingTask.trackEvent = event
   end if
 End Function
@@ -1915,7 +1920,7 @@ End Function
 
 ' Make sure the Video node is stopped and we have an accurate playback position before launching ads
 Function showAdBreak()
-  m.didSeeAdCountdown = false   'reset the variable
+  m.didSeeAdCountdown = false 'reset the variable
 
   'un-observing globalCaptionMode, subtitle and audioTrack to avoid callbacks of those video node fields when Ad starts/ends
   unObserveClosedCaptionAndAudioTrack()
@@ -1952,8 +1957,8 @@ End Function
 ' Now that we are using async stop we need to wait until we get stopped state on the Video node before starting the ad
 Function showAdBreakStoppedCallback()
   m.isShowAdBreakPendingStop = false
-  hideClosedCaptionAudioTrackOverlay()  ' if dialog is showing, it's awkward to have it still show after ad break
-  hideSendFeedbackOverlay()  ' if sendFeedback overlay is showing, it's awkward to have it still show after ad break
+  hideClosedCaptionAudioTrackOverlay() ' if dialog is showing, it's awkward to have it still show after ad break
+  hideSendFeedbackOverlay() ' if sendFeedback overlay is showing, it's awkward to have it still show after ad break
   m.top.adPosition = m.playerPosition
   m.top.adControl = "play"
 
@@ -1979,7 +1984,7 @@ End Function
 ' Helper function that aggregates any tasks that need to be done before playing a new video
 ' @contentNode: roSGNode, a TubiContentNode
 ' @videoResourceIndex: intarray, [0] -> codexIndex & [1] -> drmIndex
-Function prepareToStartVideo(content, videoResourceIndex = [0,0])
+Function prepareToStartVideo(content, videoResourceIndex = [0, 0])
 
   'To prevent duplicate callbacks for the globalCaptionMode, subtitle, and audio track fields when a new video starts or when there are changes to the subtitle or audio track, unobserve these fields.
   unObserveClosedCaptionAndAudioTrack()
@@ -2002,7 +2007,7 @@ Function prepareToStartVideo(content, videoResourceIndex = [0,0])
 
   setDrmOnContent(content, resource, videoResourceIndex)
 
-  m.top.content = content  'sends content to video node and makes current content available to contentController
+  m.top.content = content 'sends content to video node and makes current content available to contentController
   m.top.sendVideoTrackingStart = true
 End Function
 
@@ -2187,11 +2192,11 @@ Function updateVideoPlayerState(content) as Void
   if content.parentType = "series"
     m.title.text = content.parentTitle
     m.episodeTitle.text = content.title
-  'TODO: check once the API data is ready and remove the hardcoded values
+    'TODO: check once the API data is ready and remove the hardcoded values
   else if content.parentType = m.constants.uapiContentTypes.sportsEvent
     m.title.text = content.title
     episodeTitleText = ""
-    if content.length <> invalid and content.length <> 0
+    if content.length <> invalid AND content.length <> 0
       ' add 'dot' spacer only if we had a release date
       if episodeTitleText.len() > 0
         episodeTitleText = episodeTitleText + Chr(&hb7) + " "
@@ -2258,14 +2263,14 @@ End Function
 Function updateTransportButtons(content)
   if m.playerControlExperimentType <> "none"
     m.ProgressBar.highlightPointer = true 'to show black srubber on progresBar
-  end if  
+  end if
 
   if m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3"
     childrenCount = m.TransportLayoutGroup.getChildCount()
     m.TransportLayoutGroup.removeChildrenIndex(childrenCount, 0)
     m.TransportButtons.removeChild(m.TransportLayoutGroup)
     m.TransportButtons.removeChild(m.SkipTrailerButton)
-    
+
     if content.isTrailer = true
       m.TransportLayoutGroup.appendChild(m.SkipTrailerButton)
       m.SkipTrailerButton.visible = true
@@ -2277,7 +2282,7 @@ Function updateTransportButtons(content)
       m.TransportLayoutGroup.appendChild(m.NextEpisode)
     end if
 
-    width =  m.TransportLayoutGroup.boundingRect().width
+    width = m.TransportLayoutGroup.boundingRect().width
     spacer = CreateObject("roSGNode", "Rectangle")
     spacer.addField("enabled", "boolean", false)
     spacer.enabled = false
@@ -2288,7 +2293,7 @@ Function updateTransportButtons(content)
     m.TransportButtons.appendChild(m.TransportLayoutGroup)
 
   else if m.playerControlExperimentType = "variant1"
-    m.ProgressBar.highlightPointer = false 
+    m.ProgressBar.highlightPointer = false
 
     childrenCount = m.TransportButtons.getChildCount()
     m.TransportButtons.removeChildrenIndex(childrenCount, 0)
@@ -2298,7 +2303,7 @@ Function updateTransportButtons(content)
       m.SkipTrailerButton.visible = true
       m.TransportButtons.appendChild(m.SkipTrailerButton)
     else
-      
+
       spacer = CreateObject("roSGNode", "Rectangle")
       spacer.addField("enabled", "boolean", false)
       spacer.enabled = false
@@ -2315,7 +2320,7 @@ Function updateTransportButtons(content)
       if content.parentType = "series"
         m.StartButton.translation = [1170 + extraPadding, 0]
       else
-        m.StartButton.translation = [1270 + extraPadding, 0]  
+        m.StartButton.translation = [1270 + extraPadding, 0]
       end if
       m.TransportButtons.appendChild(m.StartButton)
 
@@ -2331,7 +2336,7 @@ Function updateTransportButtons(content)
     end if
 
   else if m.playerControlExperimentType = "none"
-    m.ProgressBar.highlightPointer = false 
+    m.ProgressBar.highlightPointer = false
 
     childrenCount = m.TransportButtons.getChildCount()
     m.TransportButtons.removeChildrenIndex(childrenCount, 0)
@@ -2367,7 +2372,7 @@ Function updateTransportButtons(content)
     else
       m.TitleGroup.translation = [m.constants.ui.translations.player.marginX, 580]
     end if
-  else if m.playerControlExperimentType = "variant1" OR  m.playerControlExperimentType = "variant2"  
+  else if m.playerControlExperimentType = "variant1" OR m.playerControlExperimentType = "variant2"
     m.TitleGroup.translation = [m.constants.ui.translations.player.marginX, 0]
   else
     m.TitleGroup.translation = [m.constants.ui.translations.marginX, 0]
@@ -2449,7 +2454,7 @@ Function createTransportButtons()
   m.closedCaptionAudioButton.height = 60
   m.closedCaptionAudioButton.translation = "[1520,110]"
   m.closedCaptionAudioButton.uri = "pkg:/images/transport/sgplayer/icon-subtitles.webp"
-  
+
   m.sendFeedBackButton = CreateObject("roSGNode", "TransportButton")
   m.sendFeedBackButton.id = "sendFeedBackButton"
   m.sendFeedBackButton.enabled = false
@@ -2457,7 +2462,7 @@ Function createTransportButtons()
   m.sendFeedBackButton.height = 60
   m.sendFeedBackButton.translation = "[1655,110]"
   m.sendFeedBackButton.uri = "pkg:/images/transport/sgplayer/icon-help.webp"
-  
+
   m.PlayFromBeginning = CreateObject("roSGNode", "TextIconButton")
   m.PlayFromBeginning.id = "PlayFromBeginning"
   m.PlayFromBeginning.translation = [m.marginX, 0]
@@ -2515,7 +2520,7 @@ Function createTransportButtons()
     m.closedCaptionAudioButton.translation = [1655, 110]
   end if
 
-End function
+End Function
 
 
 ' advanceCodecOnContent function gets triggered when player error occurs due to codec capability
@@ -2542,7 +2547,7 @@ Function advanceCodecOnContent(contentNode)
           nextResource = videoResources[nextCodecIndex][nextDrmIndex]
         end if
 
-        if nextResource <> invalid and setDrmOnContent(contentNode, nextResource, [nextCodecIndex, nextDrmIndex]) = true
+        if nextResource <> invalid AND setDrmOnContent(contentNode, nextResource, [nextCodecIndex, nextDrmIndex]) = true
           sendVideoResourceFallbackToPlayerLogLib(currentResource, nextResource, "CODEC")
 
           fallbackInfo = {
@@ -2720,7 +2725,7 @@ Function advanceDrmOnContent(contentNode)
           end if
         end if
 
-        if nextResource <> invalid and setDrmOnContent(contentNode, nextResource, [nextCodecIndex, nextDrmIndex]) = true
+        if nextResource <> invalid AND setDrmOnContent(contentNode, nextResource, [nextCodecIndex, nextDrmIndex]) = true
           sendVideoResourceFallbackToPlayerLogLib(currentResource, nextResource, "DRM")
 
           fallbackInfo = {
@@ -2836,7 +2841,7 @@ End Function
 'Helper function that removes all characters after the ? in the url
 Function removeExcessUrl(url)
   cutUrl = ""
-  if type(url) = "roString" or type(url) = "String"
+  if type(url) = "roString" OR type(url) = "String"
     position = url.Instr(Chr(63)) 'checks for the position of the "?" in the url string
     if position > -1
       cutUrl = url.Left(position)
@@ -2860,13 +2865,13 @@ Function getPlayProgressEvent(callSource = "")
   playProgressEvent = invalid
   if m.playerPosition > m.lastPingTime
 
-    viewTime = Int((m.playerPosition - m.lastPingTime) * 1000)   'ms
+    viewTime = Int((m.playerPosition - m.lastPingTime) * 1000) 'ms
 
     playProgressEvent = {
       type: "play_progress"
       values: {
         video_id: m.Video.content.id.toInt()
-        position: Int(m.playerPosition * 1000)   'ms - without Int(), can return scientific notation, causing API error
+        position: Int(m.playerPosition * 1000) 'ms - without Int(), can return scientific notation, causing API error
         view_time: viewTime
         video_player: "DEFAULT"
       }
@@ -2924,7 +2929,7 @@ Function positionInSeekReferenceQueue(position, seekReferenceQueue)
   ' do not have this function called on them, so we clean out the queue when a seek position is successfully found
   ' in the queue.
 
-  for i=0 to seekReferenceQueue.count() - 1
+  for i = 0 to seekReferenceQueue.count() - 1
     positionMatchesWithSeekReferenceQueue = (seekReferenceQueue[i] <= position) ' this handles if video node not returned any callback position
 
     if positionMatchesWithSeekReferenceQueue = true
@@ -2970,7 +2975,7 @@ Function onStreamingSegmentChange(msg)
   streamingSegment = msg.GetData()
 
   'setting segInfo except for audio
-  if streamingSegment <> invalid AND streamingSegment.segBitrateBps <> invalid AND (streamingSegment.segType = invalid or streamingSegment.segType = 2 or streamingSegment.segType = 0) then
+  if streamingSegment <> invalid AND streamingSegment.segBitrateBps <> invalid AND (streamingSegment.segType = invalid OR streamingSegment.segType = 2 OR streamingSegment.segType = 0) then
     m.top.segInfo = streamingSegment
   end if
 End Function
@@ -2978,7 +2983,7 @@ End Function
 
 Function onDownloadedSegment(msg)
   downloadedSegment = msg.getData()
-  
+
   if isAA(downloadedSegment) = true
     updatePlayerLogLib(m.playerLogLib, "setDownloadedSegmentData", downloadedSegment)
   end if
@@ -2988,14 +2993,14 @@ End Function
 ' This function can be deleted if roku_bww_deeplinked_content experiment does not graduate.
 Function deeplinkBWWCallBack()
   showTransport()
-  showBrowseWhileWatching()   
+  showBrowseWhileWatching()
   m.isBWWShownForDeeplinkUser = true
 End Function
 
 
 ' showratingOverlay helps to show the rating overlay and start the timer to hide it after certain amount of time.
 ' @callback: function, optional callback function to be called after the rating overlay is shown.
-'            this parameter should be deleted if roku_bww_deeplinked_content experiment does not graduate.  
+'            this parameter should be deleted if roku_bww_deeplinked_content experiment does not graduate.
 Function showRatingOverlay(callback = invalid)
 
   content = m.Video.content
@@ -3021,7 +3026,7 @@ End Function
 ' hideRatingOverlay helps to hide the rating overlay and reset the rating Interval.
 Function hideRatingOverlay()
 
-  if m.ratingOverlay.opacity  > 0
+  if m.ratingOverlay.opacity > 0
     ' resetting ratingInterval to zero, because we don't want to show the ratingOverlay immediately after hiding
     m.ratingInterval = 0
     fade(m.ratingOverlay, "out", 0.6)
@@ -3089,7 +3094,7 @@ End Function
 ' @content: roSGNode, ContentNode
 Function getCreditCuepointsFromContent(content)
   creditCuePoints = {}
-  if content <> invalid and content.creditCuePoints <> invalid
+  if content <> invalid AND content.creditCuePoints <> invalid
     creditCuePoints = content.creditCuePoints
   end if
 
@@ -3253,7 +3258,7 @@ End Function
 Function setInitialAudioTrack(availableAudioTracks)
   preferredAudioTrack = m.top.preferredAudioTrack
   m.currentAudioLanguage = ""
-  
+
   ' Proceeding only if we have stored device/user level settings.
   if availableAudioTracks <> invalid AND availableAudioTracks.Count() > 1 AND isAA(preferredAudioTrack) = true AND isNonEmptyString(preferredAudioTrack.language) = true
     ' Holds the value of the audioTrack to be set to the video node.
@@ -3374,6 +3379,7 @@ End Function
 
 Function onNavigateWithinPageInfoChange(msg)
   navigateWithinPageInfo = msg.getData()
+  appendContentUserContextValues(navigateWithinPageInfo, m.top.content, m.top.isAdultParentalLevel)
   m.top.relatedNavigateWithinPageInfo = navigateWithinPageInfo
 End Function
 
@@ -3381,6 +3387,7 @@ End Function
 Function onTrackingComponentInfo(msg)
   componentInfo = msg.getData()
   if componentInfo <> invalid
+    appendContentUserContextValues(componentInfo, m.top.content, m.top.isAdultParentalLevel)
     m.top.trackingComponentInfo = componentInfo
   end if
 End Function
@@ -3451,7 +3458,7 @@ Function onAdTrackingObject(msg)
   if isAA(pixelsFiredStatus) = true
     if pixelsFiredStatus["Impression"] = true
       m.adImpressionMap["0"] += 1
-    end if  
+    end if
 
     if pixelsFiredStatus["FirstQuartile"] = true
       m.adImpressionMap["1"] += 1
@@ -3589,7 +3596,7 @@ Function sendAdMissedEvent(reason)
       sPositionArr.push(arr.toStr())
     end for
 
-    adMissedInfo.message_map = {playerPositionArr: sPositionArr.join(",")}
+    adMissedInfo.message_map = { playerPositionArr: sPositionArr.join(",") }
   end if
   updatePlayerLogLib(m.playerLogLib, "fireAdMissedEvent", adMissedInfo)
 End Function
@@ -3610,7 +3617,7 @@ Function fireBrowseWhileWatchingPlaybackSessionEndEvent()
       "isSeries": isSeries
       "isDeeplink": isFromDeeplink
     }
-  
-    logInfo(FormatJson(data),  "videoInfo", "browseWhileWatchingPlaybackSessionEnd")
+
+    logInfo(FormatJson(data), "videoInfo", "browseWhileWatchingPlaybackSessionEnd")
   end if
 End Function

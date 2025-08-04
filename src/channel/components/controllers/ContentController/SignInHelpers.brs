@@ -4,7 +4,7 @@
 ' Defer to the sign-in controller for sign in experience
 ' @callbackAfterSignIn: function, the function to run after the signIn process is complete.
 ' @callbackAfterSignInParams: AA of parameters to be passed to callback function after sign In.
-Function startSignIn(callbackAfterSignIn=invalid , callbackAfterSignInParams = invalid)
+Function startSignIn(callbackAfterSignIn = invalid, callbackAfterSignInParams = invalid)
 
   tubiLog("SignInHelpers.startSignIn")
 
@@ -49,7 +49,7 @@ Function showRFIScreen()
 
     if m.pub_serverPersistentData <> invalid AND m.pub_serverPersistentData.hasPreviouslyRegistered = true
       info = CreateObject("roSGNode", "ContentNode")
-      info.addFields({context: "signin"})
+      info.addFields({ context: "signin" })
       m.billing.requestedUserDataInfo = info
       requestedUserData = "email"
       dialogSubType = "email-prefill-return"
@@ -68,7 +68,7 @@ Function showRFIScreen()
           dialog_sub_type: dialogSubType
         }
       }
-      m.trackingLoggingTask.trackEvent = dialogEvent
+      fireUserTrackingEvent(dialogEvent)
     end if
 
   end if
@@ -105,7 +105,7 @@ Function onRfiUserData(msg)
         dialog_sub_type: dialogSubType
       }
     }
-    m.trackingLoggingTask.trackEvent = dialogEvent
+    fireUserTrackingEvent(dialogEvent)
 
     input = {}
     '//userdata comes from https://developer.roku.com/en-gb/docs/references/scenegraph/control-nodes/channelstore.md#getuserdata
@@ -130,7 +130,7 @@ Function onRfiUserData(msg)
         dialog_sub_type: dialogSubType
       }
     }
-    m.trackingLoggingTask.trackEvent = dialogEvent
+    fireUserTrackingEvent(dialogEvent)
     showEmailScreen()
   end if
 
@@ -171,7 +171,7 @@ Function onForgotPasswordDialogCancelSelected()
   if currentScreen <> invalid AND currentScreen.getSubtype() = "SignInScreen"
     currentScreen.setFocusToKeyboard = true
   end if
-End function
+End Function
 
 
 '//The "forgot password" button in the modal was clicked
@@ -199,7 +199,7 @@ End Function
 ' onEmailInputBackButtonSelected callback triggers when user clicks back button from Email Input screen
 Function onEmailInputBackButtonSelected()
 
-  m.trackingLoggingTask.trackEvent = {
+  event = {
     type: "account"
     values: {
       manip: "SIGNUP"
@@ -208,6 +208,7 @@ Function onEmailInputBackButtonSelected()
       message: "user-cancel"
     }
   }
+  fireUserTrackingEvent(event)
   popScreen(true, true)
   onStopAndClearEmailVerificationTimer()
 
@@ -314,8 +315,8 @@ Function onEmailExistsResponse(response)
             '// If user enters email as somename@domain.com, then it takes firstName as "somename"
             if emailSplitArrayCount = 2
               firstName = emailSplitArr[0]
-            '// If user enters email with multiple "@" symbol, eg. some@name@domain.com, so@me@name@domain.com etc
-            '// then also it takes firstName as "somename"
+              '// If user enters email with multiple "@" symbol, eg. some@name@domain.com, so@me@name@domain.com etc
+              '// then also it takes firstName as "somename"
             else if emailSplitArrayCount > 2
               for i = 0 to emailSplitArrayCount - 2
                 firstName += emailSplitArr[i]
@@ -324,7 +325,7 @@ Function onEmailExistsResponse(response)
           end if
 
           ' Removing below special characters from firstName/lastName fields as it is not accepted in backend.
-          regex = CreateObject("roRegex", "[<>&,`'!@$%()=+{}[\]\""]", "")  '" quote comment to aid in syntax highlighting
+          regex = CreateObject("roRegex", "[<>&,`'!@$%()=+{}[\]\""]", "") '" quote comment to aid in syntax highlighting
           firstName = regex.replaceAll(firstName, "")
           lastName = regex.replaceAll(lastName, "")
 
@@ -392,7 +393,7 @@ Function onEmailExistsError(errorResponse)
       status: "FAIL"
     }
   }
-  m.trackingLoggingTask.trackEvent = accountEvent
+  fireUserTrackingEvent(accountEvent)
   if shouldShowSignInSignUpErrorPage(errorResponse) = true
     showSignInSignUpErrorScreen("signIn", invalid, false)
   else
@@ -408,7 +409,7 @@ Function onEmailExistsError(errorResponse)
       }
     }
 
-    title =  getTranslation("dialog_defaultError_title")
+    title = getTranslation("dialog_defaultError_title")
     message = getTranslation("could_not_verify_email") + ". " + getTranslation("dialog_defaultError_description")
     buttons = [getTranslation("dialog_button_tryAgain"), getTranslation("dialog_button_cancel")]
     simpleModalInfo = getSimpleModalInfo(title, message, buttons, dialogEvent, m.trackingLoggingTask, checkEmailExists, invalid, m.constants.instantResumeActions.restartApp)
@@ -474,7 +475,7 @@ End Function
 Function onSignUpResponse(response)
   m.tubiAuthUpdate.handleRegistration(response)
 
-  m.trackingLoggingTask.trackEvent = {
+  event = {
     type: "account"
     values: {
       manip: "SIGNUP"
@@ -482,6 +483,7 @@ Function onSignUpResponse(response)
       status: "SUCCESS"
     }
   }
+  fireUserTrackingEvent(event)
 
   ' Conditions to be met.
   ' Is the user in US.
@@ -544,7 +546,7 @@ End Function
 Function onSignInResponse(response)
   m.tubiAuthUpdate.handleRegistration(response)
 
-  m.trackingLoggingTask.trackEvent = {
+  event = {
     type: "account"
     values: {
       manip: "SIGNIN"
@@ -552,6 +554,7 @@ Function onSignInResponse(response)
       status: "SUCCESS"
     }
   }
+  fireUserTrackingEvent(event)
 
   rfiSignInInfo = invalid
   requestInput = invalid
@@ -618,7 +621,7 @@ Function onSignInError(errorResponse)
     }
   }
 
-  m.trackingLoggingTask.trackEvent = accountEvent
+  fireUserTrackingEvent(accountEvent)
 
   if shouldShowSignInSignUpErrorPage(errorResponse) = true
     showSignInSignUpErrorScreen("signIn", invalid, false)
@@ -637,7 +640,7 @@ Function onSignInError(errorResponse)
     dialogEvent.values.dialog_type = "FORGOT_PASSWORD"
     dialogEvent.values.dialog_sub_type = "forgot-password"
 
-    title =  getTranslation("invalid_oops_password_title")
+    title = getTranslation("invalid_oops_password_title")
     invalidPasswordDesc = getTranslation("invalid_oops_password_description")
     message = invalidPasswordDesc + chr(10) + requestInput.email
     buttons = [getTranslation("dialog_button_forgot_password"), getTranslation("retry")]
@@ -679,7 +682,7 @@ Function showConsentScreenOrRefreshServerPersistentData()
   else
     refreshServerPersistentDataAfterSignIn()
   end if
-end function
+End Function
 
 
 Function refreshServerPersistentDataAfterSignIn()
@@ -695,7 +698,7 @@ Function onPostSignInAuthInfoUpdated()
     signInInfo = invalid
 
     signInInfo = {}
-    signInInfo.email  = authInfo.email
+    signInInfo.email = authInfo.email
     signInInfo.firstname = authInfo.firstname
     signInInfo.gender = authInfo.gender
     showAgeVerificationScreenAtSignIn(signInInfo)
@@ -790,7 +793,7 @@ End Function
 Function onSignOutCompleted()
   tubiLog("SignInHelpers.onSignOutCompleted")
 
-  m.trackingLoggingTask.trackEvent = {
+  event = {
     type: "account"
     values: {
       manip: "SIGNOUT"
@@ -798,8 +801,9 @@ Function onSignOutCompleted()
       status: "SUCCESS"
     }
   }
+  fireUserTrackingEvent(event)
 
-  saveLocalServerPresistantData([{
+  saveLocalServerPersistentData([{
     "isVideoPreviewOn": true
     "isAutoPlayTimerOn": true
   }])
@@ -820,7 +824,7 @@ Function showConsentScreenOrRefreshServerPersistentDataAfterSignOut()
   else
     onPostSignOutServerPersistentDataRefresh()
   end if
-end function
+End Function
 
 
 Function onPostSignOutServerPersistentDataRefresh()
@@ -893,7 +897,7 @@ Function onLikeAfterSignIn()
   currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
 
-  if currentScreen <> invalid and currentScreen.getSubtype() = "DetailScreen"
+  if currentScreen <> invalid AND currentScreen.getSubtype() = "DetailScreen"
     currentScreen.removeSignupButton = true
     currentScreen.jumpToItem = 0
     onLike(currentScreen)
@@ -992,7 +996,7 @@ Function onParentalControlAfterSignIn()
     currentScreen.setFocus(true)
 
     '//before signing in, the user selected a new parental setting, so take user to parental change screen
-    refreshUiAfterSignIn()  '//in case the user cancels out of the confirm password screen, ensure the mode matches with the newly signed in user's saved mode
+    refreshUiAfterSignIn() '//in case the user cancels out of the confirm password screen, ensure the mode matches with the newly signed in user's saved mode
     onParentalSettingSelected()
 
 
@@ -1090,7 +1094,7 @@ Function popScreenAfterSignInProcess()
     "SignInSignUpErrorScreen": true
   }
 
-  count = m.screenStack.getChildCount()-1
+  count = m.screenStack.getChildCount() - 1
 
   'Will remove this code after the experiment.
   settingsScreen = getScreenFromStackById(m.constants.ui.screenIds.settingsScreen)
@@ -1133,7 +1137,7 @@ Function signUserUpForQAAutomation()
   signInInfo = {
     email: "build_roku_" + secondsFromEpoch.ToStr() + "@tubi.tv"
     emailType: "manual"
-    firstName:  "Automation"
+    firstName: "Automation"
     automation: true ' setting automation as true, so password will be set to 111111 during signup
   }
   birthdate = "2000-01-01"
@@ -1181,7 +1185,7 @@ Function onMagicLinkError(errorResponse)
       type: "dialog"
       values: {
         dialog_type: "LOGIN_REQUEST" 'DialogType enum
-        pageOneof: m.Tracking.getAnalyticsPage("login_page", {"choice": "LINK"})
+        pageOneof: m.Tracking.getAnalyticsPage("login_page", { "choice": "LINK" })
         dialog_action: "SHOW"
         dialog_sub_type: "magiclink_server_err"
       }
@@ -1189,7 +1193,7 @@ Function onMagicLinkError(errorResponse)
 
     modalInfo = {
       title: getTranslation("dialog_defaultError_title")
-      message:getErrorMessage(errorMessage, errorCode)
+      message: getErrorMessage(errorMessage, errorCode)
       openTrackEvent: dialogEvent
       trackingTask: m.trackingLoggingTask
     }
@@ -1262,7 +1266,7 @@ Function onEmailVerificationScreenBackButtonSelected()
     failureReason = currentScreen.failureReason
   end if
 
-  m.trackingLoggingTask.trackEvent = {
+  event = {
     type: "account"
     values: {
       manip: "SIGNIN"
@@ -1271,6 +1275,7 @@ Function onEmailVerificationScreenBackButtonSelected()
       message: failureReason
     }
   }
+  fireUserTrackingEvent(event)
 
   onStopAndClearEmailVerificationTimer()
   popScreen()
@@ -1303,7 +1308,7 @@ Function handleSignInFailure(errorResponse = invalid)
     type: "dialog"
     values: {
       dialog_type: "LOGIN_REQUEST" 'DialogType enum
-      pageOneof: m.Tracking.getAnalyticsPage("login_page", {"choice": "LINK"})
+      pageOneof: m.Tracking.getAnalyticsPage("login_page", { "choice": "LINK" })
       dialog_action: "SHOW"
       dialog_sub_type: "link_expired"
     }
@@ -1364,7 +1369,7 @@ Function afterSignInPlayLockedLinearContent(callbackAfterSignInParams = invalid)
   tubilog("SignInHelpers.afterSignInPlayLockedLinearContent")
   popScreenAfterSignInProcess()
   if callbackAfterSignInParams <> invalid
-    playLinearVideoContent(callbackAfterSignInParams.content, callbackAfterSignInParams.bMinimized, callbackAfterSignInParams.AssociatedScreenID, callbackAfterSignInParams.bAllowTransportToAppear, callbackAfterSignInParams.playbackSource )
+    playLinearVideoContent(callbackAfterSignInParams.content, callbackAfterSignInParams.bMinimized, callbackAfterSignInParams.AssociatedScreenID, callbackAfterSignInParams.bAllowTransportToAppear, callbackAfterSignInParams.playbackSource)
   end if
   showHideSpinner(false)
   setContentToRefreshAllPersonalizedScreens(true)
@@ -1488,13 +1493,13 @@ Function onEmailVerificationScreenContinueAsGuestUserButtonSelected(msg)
   currentTimeSeconds = CreateObject("roDateTime").AsSeconds()
   expiryTimeInSeconds = currentTimeSeconds + (12 * 3600)
   regWrite("expiryTime", expiryTimeInSeconds.toStr(), m.constants.registrySectionIDs.registrationByPass)
-  
+
   setContentToRefreshAllPersonalizedScreens(true)
   currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
   refreshAllDetailScreens()
   focusSideNavOption(m.constants.ui.sideNavIds.home)
-  if currentScreen <> invalid and (currentScreen.getSubtype() = "DetailScreen" OR currentScreen.getSubtype() = "DetailScreenHoriz")
+  if currentScreen <> invalid AND (currentScreen.getSubtype() = "DetailScreen" OR currentScreen.getSubtype() = "DetailScreenHoriz")
     currentScreen.jumpToItem = 0
     currentScreen.setfocus(true)
     currentScreen.refreshRelatedContent = true

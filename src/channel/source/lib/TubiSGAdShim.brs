@@ -30,12 +30,12 @@ End Function
 ' Attach to the scene graph VideoPlayer node and listen for events
 ' This is a blocking call
 '@videoPlayerNode: node, VideoPlayerScreen node
-Function tubiSGAdShim_run(videoPlayerNode) As boolean
+Function tubiSGAdShim_run(videoPlayerNode) as Boolean
   tubiLog("TubSGAdShim.Run")
 
   m.videoPlayerNode = videoPlayerNode
 
-  if type(m.videoPlayerNode) <> "roSGNode" or m.videoPlayerNode.subtype() <> "VideoPlayerScreen"
+  if type(m.videoPlayerNode) <> "roSGNode" OR m.videoPlayerNode.subtype() <> "VideoPlayerScreen"
     tubiLog("TubSGAdShim.Run: videoPlayerNode is not component type VideoPlayer")
     return false
   end if
@@ -63,15 +63,16 @@ Function tubiSGAdShim_run(videoPlayerNode) As boolean
       else if msg.GetField() = "adControl"
         value = msg.GetData()
         if m.videoPlayerNode.content <> invalid
-          episode = m.videoPlayerNode.content.getFields()  ' clone the content node into a local AA to avoid messing with it
+          episode = m.videoPlayerNode.content.getFields() ' clone the content node into a local AA to avoid messing with it
           '//Place the tracking info into the episode AA variable
           episode.videoSponsorExposureId = m.videoPlayerNode.videoSponsorExposureId
           position = m.videoPlayerNode.adPosition
           tubiLog("TubiSGAdShim: adControl = " + value + " position = " + stri(position) + "ad state " + m.videoPlayerNode.adState)
           m.ads.appMode = m.videoPlayerNode.appMode
+          m.ads.isAdultParentalLevel = m.videoPlayerNode.isAdultParentalLevel
           m.handleControlMessage(m.videoPlayerNode.adState, value, episode, position)
         else
-          m.videoPlayerNode.adState = "noAds"  ' if video player content was changed before we got here, return no ads
+          m.videoPlayerNode.adState = "noAds" ' if video player content was changed before we got here, return no ads
         end if
       else if msg.GetField() = "userConsentsOptOutStatus"
         userConsentsOptOutStatus = msg.getData()
@@ -218,7 +219,7 @@ Function tubiSGAdShim_playAds(_episode, _cuepoint)
   if status = m.constants_.player.playerResults.closed
     m.videoPlayerNode.adState = "adsClosed"
   else if status = m.constants_.player.playerResults.completed
-    m.videoPlayerNode.adState = "adsCompleted" 
+    m.videoPlayerNode.adState = "adsCompleted"
   else
     m.videoPlayerNode.adState = "noAds"
   end if

@@ -14,7 +14,7 @@
 
 '                                               playbackContainer - if srcForAds = container, then playbackContainer is set to the id of the container that was the source, otherwise not used.
 ''//::TODO:: Remove pageOrigin once we fixed sending invalid component interaction events- added this for debugging purpose
-Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = invalid, errorCb = invalid, playbackSource = {"srcForAnalytic":"unknown","srcForAds":"unknown"})
+Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = invalid, errorCb = invalid, playbackSource = { "srcForAnalytic": "unknown", "srcForAds": "unknown" })
   tubiLog("DetailScreenHelpers.showDetailScreen")
   '//Update the logo based on the current detail screen UI. For example, the previous (home) screen may been showing a modified skinAd logo
   showHideLogoBasedOnUiMode()
@@ -60,7 +60,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
       if m.videoPreviewPlayer <> invalid
         m.videoPreviewPlayer.videoPlayerType = "BANNER"
       end if
-      if previewState = "buffering" or previewState = "playing"
+      if previewState = "buffering" OR previewState = "playing"
         setPageInfoForVideoPreview(detailScreen.trackingPageInfo) ' this will help to trigger analytics
       else
         previewState = getVideoPreviewState()
@@ -100,7 +100,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     end if
 
     ' waiting to populate the details screen for series until after we fetch episode data
-    if m.deepLinkContent <> invalid or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video AND content.seriesId <> invalid AND content.seriesId <> "")
+    if m.deepLinkContent <> invalid OR content.type = m.constants.ui.contentTypes.series OR (content.type = m.constants.ui.contentTypes.video AND content.seriesId <> invalid AND content.seriesId <> "")
       detailScreen.isLoading = true
     else if successCb <> invalid
       detailScreen.isLoading = true
@@ -347,7 +347,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     lineOneData.partnerLogoUri = content.inlineLogoUri
 
     if content.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
-        lineOneData.has4k = true
+      lineOneData.has4k = true
     end if
 
     lineOneData.hasCC = false
@@ -408,7 +408,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
 
     '//right now in kids mode, there are no channels showing up, so hardcode it so the channel's button doesn't show
     detailScreen.isChannelItem = (content.channelId <> invalid AND content.channelId <> "" AND isKidsUIOn() = false)
-    detailScreen.stringChannelButton = getTranslation("screenDetails_button_gotoChannel", {channel: content.channelName})
+    detailScreen.stringChannelButton = getTranslation("screenDetails_button_gotoChannel", { channel: content.channelName })
     detailScreen.length = stateSource.length 'needed to compute the resume bar on the resume button
 
     nResumePoint = 0
@@ -536,7 +536,7 @@ End Function
 
 ' @refreshedContent: ContentNode, a contentNode for a single piece of content, can be video or series
 ' @sendTracking: boolean, indicates if NavigateToPage and PageLoad events should be triggered from this function
-Function handleSingleContentResponse(refreshedContent, sendTracking = true) As Void
+Function handleSingleContentResponse(refreshedContent, sendTracking = true) as Void
   tubiLog("DetailScreenHelpers.handleSingleContentResponse")
   detailScreen = getTopDetailScreenFromStack()
 
@@ -605,7 +605,7 @@ End Function
 '@afterFn: callback which will be triggered after fetching data from backend
 Function handleDetailScreenAfterFn(detailScreen, afterFn)
   ' making sure the app launch animation logo is completed before invoking playHelper/resumeHelper
-  if m.top.fadeInContentController = true or afterFn = episodesHelper
+  if m.top.fadeInContentController = true OR afterFn = episodesHelper
     if afterFn <> invalid
       afterFn(detailScreen)
     end if
@@ -1004,7 +1004,7 @@ Function onAddToQueue(detailScreen, callBackAfterSignIn = invalid)
 
       if content.type = m.constants.ui.contentTypes.video
         contentType = m.constants.uapiContentTypes.movie
-      else if content <> invalid and isNonEmptyString(content.type) = true
+      else if content <> invalid AND isNonEmptyString(content.type) = true
         contentType = content.type
       end if
 
@@ -1116,10 +1116,10 @@ Function onBookmarkedAfterSignIn(response)
       if isNonEmptyString(detailScreen.title) = true
         title = detailScreen.title
       end if
-      if detailScreen.availabilityType <> invalid and detailScreen.availabilityType = m.constants.ui.contentTimings.upcoming
-        description = getTranslation("screenDetails_queue_added_to_reminder_list_description", {"upcomingTitle": title})
+      if detailScreen.availabilityType <> invalid AND detailScreen.availabilityType = m.constants.ui.contentTimings.upcoming
+        description = getTranslation("screenDetails_queue_added_to_reminder_list_description", { "upcomingTitle": title })
       else
-        description = getTranslation("screenDetails_queue_added_to_list_description", {"contentTitle": title})
+        description = getTranslation("screenDetails_queue_added_to_list_description", { "contentTitle": title })
       end if
 
       showSimpleInstantResumableModal("Success", description, [], dialogEvent, m.trackingLoggingTask)
@@ -1641,7 +1641,7 @@ Function onRemoveFromHistoryRetry(params)
 End Function
 
 
-Function onHistoryRemovedSuccess(_response) As Void
+Function onHistoryRemovedSuccess(_response) as Void
   tubiLog("DetailScreenHelpers.onHistoryRemoved")
   detailScreen = getTopDetailScreenFromStack()
   if detailScreen <> invalid
@@ -1735,7 +1735,7 @@ End Function
 Function onSignUpButtonSelected()
   tubiLog("DetailScreenHelper.onSignUpButtonSelected")
   startSignIn(onRegistrationProcessCompletedOnDetailsScreen)
-End function
+End Function
 
 
 Function onDescriptionSelected(msg)
@@ -1745,7 +1745,7 @@ Function onDescriptionSelected(msg)
     type: "dialog"
     values: {
       dialog_type: "FULL_VIDEO_DESCRIPTION"
-      pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: detailScreen.content.id.toInt()})
+      pageOneof: m.Tracking.getAnalyticsPage("video_page", { video_id: detailScreen.content.id.toInt() })
       dialog_action: "SHOW" 'Action enum
       dialog_sub_type: "video-description" 'max 20 character string
     }
@@ -1775,11 +1775,13 @@ Function trailerHelper(screen)
       end if
 
       if content.title <> invalid
-        trailerContent.title = getTranslation("videoPlayer_trailerTitle", {title: content.title})
+        trailerContent.title = getTranslation("videoPlayer_trailerTitle", { title: content.title })
       end if
 
       trailerContent.nowPos = 0
       trailerContent.isTrailer = true
+      ' Since Trailer inherits the isCdc value from the content, we need to set it here.
+      trailerContent.isCdc = content.isCdc
 
       if content.hasTrailer AND content.trailerInfo <> invalid AND content.trailerInfo.url <> invalid
         trailerContent.url = content.trailerInfo.url
@@ -1898,7 +1900,7 @@ End Function
 '                                                    valid values are "deeplink" , "ap_auto", "ap_select", "container", "ymal", "search", "epg", "unknown"
 
 '                                               playbackContainer - if srcForAds = container, then playbackContainer is set to the id of the container that was the source, otherwise not used.
-Function resumeVideoDetailScreen(detailScreen, playbackSource = {"srcForAnalytic":"unknown", "srcForAds":"unknown"})
+Function resumeVideoDetailScreen(detailScreen, playbackSource = { "srcForAnalytic": "unknown", "srcForAds": "unknown" })
   tubiLog("DetailScreenHelpers.resumeVideoDetailScreen")
   if detailScreen <> invalid AND isFetchingInProgress(detailScreen) <> true
     detailScreen.playbackSource = playbackSource
@@ -1935,7 +1937,7 @@ End Function
 
 '                                               playbackContainer - if srcForAds = container, then playbackContainer is set to the id of the container that was the source, otherwise not used.
 
-Function playVideoDetailScreen(detailScreen, playbackSource = {"srcForAnalytic":"unknown","srcForAds":"unknown"})
+Function playVideoDetailScreen(detailScreen, playbackSource = { "srcForAnalytic": "unknown", "srcForAds": "unknown" })
   tubiLog("DetailScreenHelpers.playVideoDetailScreen")
   if detailScreen <> invalid AND isFetchingInProgress(detailScreen) <> true
     detailScreen.playbackSource = playbackSource
@@ -2146,6 +2148,10 @@ Function sendBookmarkAnalytics(content, operation, trackingLib, trackingTask, co
     bookmarkAnalyticsEvent.contentOneof.video_id = content.id.toInt()
   end if
 
+  detailScreen = getCurrentScreen()
+  isAdultParentalLevel = checkIfUserIsAdultByParentalRatingAndBirthday()
+  appendContentUserContextValues(bookmarkAnalyticsEvent, detailScreen.content, isAdultParentalLevel)
+
   trackingTask.trackEvent = {
     type: "bookmark"
     values: bookmarkAnalyticsEvent
@@ -2190,6 +2196,9 @@ Function sendLikeSelectAnalytics(screen, sLikeEventEnum)
   explicitFeedbackEvent.targetOneof = targetOneof
   explicitFeedbackEvent.pageOneof = pageOneof
 
+  isAdultParentalLevel = checkIfUserIsAdultByParentalRatingAndBirthday()
+  appendContentUserContextValues(explicitFeedbackEvent, screen.content, isAdultParentalLevel)
+
   m.trackingLoggingTask.trackEvent = {
     type: "explicit_feedback"
     values: explicitFeedbackEvent
@@ -2226,7 +2235,8 @@ Function getDetailScreenDialogAnalyticEvent(content, dialogType, dialogSubtype, 
   end if
 
   dialogAnalyticsEvent = getDialogAnalyticEvent(dialogType, dialogSubtype, pageInfo)
-
+  isAdultParentalLevel = checkIfUserIsAdultByParentalRatingAndBirthday()
+  appendContentUserContextValues(dialogAnalyticsEvent.values, content, isAdultParentalLevel)
   return dialogAnalyticsEvent
 End Function
 
@@ -2279,7 +2289,11 @@ Function getDetailScreenAnalyticsPageInfo(content, constants)
         }
       end if
     end if
-
+    ' Cannot use appendContentUserContextValues here because screen is not yet created in some cases.
+    additionalContextValues = {}
+    isAdultParentalLevel = checkIfUserIsAdultByParentalRatingAndBirthday()
+    appendContentUserContextValues(additionalContextValues, content, isAdultParentalLevel)
+    pageInfo.additionalContextValues = additionalContextValues
   end if
 
   return pageInfo
@@ -2373,7 +2387,7 @@ Function addToQueueErrorResponse(error)
     detailScreen.isWaitingForServerResponse = false
     bookmarkFailed(detailScreen, error)
   end if
-End function
+End Function
 
 ' REMOVE BELOW CODE IF SET REMINDER FUNCTIONALITY OF SE CONTENT BEEN REMOVED.
 ' @screen: node - screen node
@@ -2394,11 +2408,14 @@ Function setComponentInteractionEventForReminder(screen, isReminderSet)
   pageOneof = m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pagetype, screen.trackingPageInfo.pageValues)
   componentOneof = m.Tracking.getAnalyticsComponent("reminder_component", componentValues)
 
-  componentInteractionEvent =  {
+  componentInteractionEvent = {
     pageOneof: pageOneof
     componentOneof: componentOneof
     user_interaction: userInteractionValue
   }
+  isAdultParentalLevel = checkIfUserIsAdultByParentalRatingAndBirthday()
+  appendContentUserContextValues(componentInteractionEvent, screen.content, isAdultParentalLevel)
+
   m.trackingLoggingTask.trackEvent = {
     type: "component_interaction"
     values: componentInteractionEvent
@@ -2412,7 +2429,7 @@ Function onRelatedContentToPlay(msg)
     content = screen.relatedContentToPlay
     playbackSource = {
       "srcForAnalytic": m.constants.player.playbackSource.unknown
-      "srcForAds":m.constants.player.playbackOrigin.ymal
+      "srcForAds": m.constants.player.playbackOrigin.ymal
     }
 
     showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource)

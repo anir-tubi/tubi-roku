@@ -20,7 +20,7 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
   roAdFramework.enableAdMeasurements(true)
 
   #if consoleLoggingEnabled
-    if constants.settings.mode = "qa" or constants.settings.mode = "staging"
+    if constants.settings.mode = "qa" OR constants.settings.mode = "staging"
       roAdFramework.setDebugOutput(true)
     end if
   #end if
@@ -30,7 +30,7 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
   requestQueue = requestQueue.create(adMessagePort)
 
   if adContentType <> "hls" AND adContentType <> "mp4"
-    adContentType = "mp4"  ' safety fallback
+    adContentType = "mp4" ' safety fallback
   end if
 
   if isFunction(roAdFramework.setLimitAdTracking) = true AND userConsentsOptOutStatus <> invalid then
@@ -53,12 +53,12 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
     requestQueue: requestQueue
     allAdUnitsList: []
     totalAdBreakAds: 0
-    commercialDuration : 0
+    commercialDuration: 0
     totalAdDurationInCurrentPod: 0
     adPlaybackPos: 0
     isInteracting: false
     _: rodash()
-    adContentType: adContentType  ' "hls" or "mp4"
+    adContentType: adContentType ' "hls" or "mp4"
     breakPos: 0
     googleAppSession: invalid ' Google's GAMUtils appsession or invalid
     googleContentSession: invalid ' Google's GAMUtils contentSession or invalid
@@ -99,6 +99,7 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
     userConsentsOptOutStatus: userConsentsOptOutStatus ' assoc array of consent to purpose key mapping. ex: {"functional": true, "analytics": true}
     isGDPR: isGDPR
     adMessagePort: adMessagePort
+    isAdultParentalLevel: true
   }
 End Function
 
@@ -188,7 +189,7 @@ End Function
 ' we keep the most recently cached ad break at m.lastAdsList
 ' ----------------------------------------------
 Function tubiAds_cacheAdsList(episode, breakPos)
-  if(m.lastAdsList = invalid or m.lastAdsList.breakPos <> breakPos or m.lastAdsList.cid <> episode.adrise_contentId)
+  if(m.lastAdsList = invalid OR m.lastAdsList.breakPos <> breakPos OR m.lastAdsList.cid <> episode.adrise_contentId)
     m.getAdsListViaRoku(episode, breakPos)
 
     list = invalid
@@ -223,7 +224,7 @@ End Function
 ' ----------------------------------------------
 ' @episode: node, TubiContentNode for a video (movie or episode)
 ' @breakPos: integer, the preroll or midroll playback position at which the break occurs
-Function tubiAds_populateUrlRainmaker(episode, breakPos = 0) As String
+Function tubiAds_populateUrlRainmaker(episode, breakPos = 0) as String
   params = m.getRainmakerParams(episode, breakPos)
   baseUrl = m.constants.urls.adsBaseUrlRainmaker + m.constants.analyticsPlatform
   paramAddedUrl = m.request.addParamsToUrl(baseUrl, params)
@@ -272,8 +273,11 @@ Function tubiAds_getRainmakerParams(content, breakPos = 0)
     params["spon_exp"] = content.videoSponsorExposureId
   end if
 
-  ' add Roku Advertiser Id (RIDA) to ad call url
-  if m.constants.deviceInfo.deviceAdId <> invalid
+  isCdc = false
+  if content.isCdc <> invalid
+    isCdc = content.isCdc
+  end if
+  if m.constants.deviceInfo.deviceAdId <> invalid AND (isCdc = false OR m.isAdultParentalLevel = true)
     params["adv_id"] = m.constants.deviceInfo.deviceAdId
   end if
 
@@ -283,7 +287,7 @@ Function tubiAds_getRainmakerParams(content, breakPos = 0)
     params["opt_out"] = "false"
   end if
 
- if content.adParam <> invalid AND isNonEmptyString(content.adParam.resumeFrom) = true
+  if content.adParam <> invalid AND isNonEmptyString(content.adParam.resumeFrom) = true
     params["resume_from"] = content.adParam.resumeFrom
   end if
 
@@ -293,7 +297,7 @@ Function tubiAds_getRainmakerParams(content, breakPos = 0)
     params["user_id"] = authInfo.userId
   end if
 
-  origin =  m.constants.player.playbackOrigin.unknown
+  origin = m.constants.player.playbackOrigin.unknown
 
   if content.adParam <> invalid
     if content.adParam.srcForAds <> invalid
@@ -478,7 +482,7 @@ Function replaceCachebusterMacro(pixelURL as String)
   end if
 
   return encodedUrl
-End function
+End Function
 
 
 
@@ -712,7 +716,7 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos)
 
     'set up the duration for use by the adRise pre ad splash screen
     if currentAdUnitsList[0].duration <> invalid AND currentAdUnitsList[0].duration > 0
-        m.commercialDuration = m.commercialDuration + currentAdUnitsList[0].duration
+      m.commercialDuration = m.commercialDuration + currentAdUnitsList[0].duration
     end if
 
     adUnitsListContainer = {
@@ -728,7 +732,7 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos)
     for each adUnit in currentAdUnitsList[0].ads
 
       if adUnit.adId <> invalid
-        if m.constants.settings.mode = "qa" or m.constants.settings.mode = "staging"
+        if m.constants.settings.mode = "qa" OR m.constants.settings.mode = "staging"
           print "AD ID "; adUnit.adId; " "; adUnit.creativeAdId
         end if
 
@@ -768,7 +772,7 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos)
           adUnitsListContainer.adUnitsList[0].ads.push(adUnit)
 
           'add the duration to m.CommercialDuration for use in adRise pre ad splash screens (in case there are any)
-          if currentAdUnitsList[0].duration = invalid or currentAdUnitsList[0].duration <= 0
+          if currentAdUnitsList[0].duration = invalid OR currentAdUnitsList[0].duration <= 0
             m.commercialDuration = m.commercialDuration + adUnit.duration
           end if
         end if
@@ -804,7 +808,7 @@ Function tubiAds_getAdsListViaTubi(content)
 
     'set up the duration for use by the adRise pre ad splash screen
     if currentAdUnitsList[0].duration <> invalid AND currentAdUnitsList[0].duration > 0
-        m.commercialDuration = m.commercialDuration + currentAdUnitsList[0].duration
+      m.commercialDuration = m.commercialDuration + currentAdUnitsList[0].duration
     end if
 
     adUnitsListContainer = {
@@ -818,7 +822,7 @@ Function tubiAds_getAdsListViaTubi(content)
     for each adUnit in currentAdUnitsList[0].ads
 
       if adUnit.adId <> invalid
-        if m.constants.settings.mode = "qa" or m.constants.settings.mode = "staging"
+        if m.constants.settings.mode = "qa" OR m.constants.settings.mode = "staging"
           print "AD ID "; adUnit.adId; " "; adUnit.creativeAdId
         end if
 
@@ -856,7 +860,7 @@ Function tubiAds_getAdsListViaTubi(content)
           adUnitsListContainer.adUnitsList[0].ads.push(adUnit)
 
           'add the duration to m.CommercialDuration for use in adRise pre ad splash screens (in case there are any)
-          if currentAdUnitsList[0].duration = invalid or currentAdUnitsList[0].duration <= 0
+          if currentAdUnitsList[0].duration = invalid OR currentAdUnitsList[0].duration <= 0
             m.commercialDuration = m.commercialDuration + adUnit.duration
           end if
 
@@ -884,7 +888,7 @@ End Function
 Function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
   ' ShowVariable(m.allAdUnitsList, "ALL AD UNITS LIST", 4)
   scene = containerNode.getScene()
-  m.youboraTask = scene.findNode("Youbora")  'created in ContentController.initVideoTracking
+  m.youboraTask = scene.findNode("Youbora") 'created in ContentController.initVideoTracking
 
   if m.hasAds(m.allAdUnitsList) = true
     currentAdPosition = 1
@@ -900,8 +904,8 @@ Function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
 
           m.containerNode = containerNode
           m.containerNode.visible = false
-          ' controlnode has progress bar
-          m.controlnode = controlNode
+          ' controlNode has progress bar
+          m.controlNode = controlNode
 
           ' This should happen before any buffering.  We set this here because
           ' interactive ads don't have buffering callbacks and we don't want the
@@ -918,13 +922,13 @@ Function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
           ' any ad buffering visual.
           m.roAdFramework.setAdBufferScreenLayer(2, [{}])
           ' Simple shim to make a global-scope callback into a module-scoped method call
-          m.roAdFramework.setAdBufferRenderCallback(function(_m, eventType, ctx)
+          m.roAdFramework.setAdBufferRenderCallback(Function(_m, eventType, ctx)
             ads = getGlobalAA().tubiAds
             ads.adBufferingCallback(eventType, ctx)
-          end function, {}, 0)
+          End Function, {}, 0)
 
           ctx = {}
-          m.roAdFramework.setTrackingCallback(function(ctx, eventType, rafCtx)
+          m.roAdFramework.setTrackingCallback(Function(ctx, eventType, rafCtx)
             ads = getGlobalAA().tubiAds
             'The ctx object retains the previous ad's time and only resets after a Start event.
             'To ensure accurate pixel tracking per ad, we manually reset the time field during the Impression event.
@@ -933,7 +937,7 @@ Function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
             end if
             ctx.append(rafCtx)
             ads.adTrackingCallback(eventType, ctx)
-          end function, ctx)
+          End Function, ctx)
 
           adPod = adUnitsListContainer.adUnitsList[0]
           isCompleted = m.roAdFramework.showAds(adPod, screenCount, containerNode)
@@ -1168,13 +1172,13 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
       m.trackUserEvent("start_ad", startAdEvent, m.requestQueue)
 
       impressionCount = 0
-      for i=0 to ctx.ad.tracking.count()-1
+      for i = 0 to ctx.ad.tracking.count() - 1
         if ctx.ad.tracking[i].event = "Impression"
           impressionCount += 1
         end if
       end for
       youboraOptions = m.updateYouboraOptions(m.youboraTask, ctx, impressionCount)
-    else if eventType = "Complete" or eventType = "Close"
+    else if eventType = "Complete" OR eventType = "Close"
 
       'Close events fire when a user backs out of an ad, or when a user backs out of the interactive portion of an ad
       if eventType = "Close" AND m.isInteracting = true
@@ -1296,7 +1300,7 @@ End Function
 
 
 ' Wraps m.tracking.trackUserEvent() but adds the appropriate app mode value
-Function tubiAds_trackUserEvent(eventType="", eventValues=invalid, requestQueue=invalid)
+Function tubiAds_trackUserEvent(eventType = "", eventValues = invalid, requestQueue = invalid)
   if eventValues <> invalid
     eventValues.appMode = m.appMode
     m.tracking.trackUserEvent(eventType, eventValues, requestQueue)

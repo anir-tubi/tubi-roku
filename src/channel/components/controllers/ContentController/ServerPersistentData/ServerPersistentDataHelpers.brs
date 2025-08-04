@@ -33,14 +33,14 @@ Function onGetBatchServerPersistentDataComplete(serverPersistentData)
     serverPersistentData.deviceSettings
     serverPersistentData.userSettings
   ]
-  saveLocalServerPresistantData(updates)
+  saveLocalServerPersistentData(updates)
   markUserDeviceSettingsRequestCompleteAndExecuteCallback()
 End Function
 
 
 Function onGetServerPersistentDataComplete(serverPersistentData)
   ' Updates the node with the data from the parser.
-  saveLocalServerPresistantData([serverPersistentData])
+  saveLocalServerPersistentData([serverPersistentData])
   markUserDeviceSettingsRequestCompleteAndExecuteCallback()
 End Function
 
@@ -104,39 +104,39 @@ Function saveServerPersistentData(serverPersistentData, saveInto = "")
     })
 
     ' Updating the local copy with the new value.
-    saveLocalServerPresistantData([serverPersistentData])
+    saveLocalServerPersistentData([serverPersistentData])
   end if
 End Function
 
 
-'@newServerPersistantData: array, structured as an array of assocarrays to update the local copy with new value.
-  ' If array has 2 items
-  ' [
-  '    {
-  '     isdisliketoastnotificationshown: true
-  '     isliketoastnotificationshown: true
-  '   }
+'@newServerPersistentData: array, structured as an array of assocarrays to update the local copy with new value.
+' If array has 2 items
+' [
+'    {
+'     isdisliketoastnotificationshown: true
+'     isliketoastnotificationshown: true
+'   }
 
-  '   {
-  '     isvideopreviewon: false
-  '   }
-  ' ]
+'   {
+'     isvideopreviewon: false
+'   }
+' ]
 
-  'If array has only 1 item
+'If array has only 1 item
 
-  ' [
-  '   {
-  '     isvideopreviewon: false
-  '   }
-  ' ]
-Function saveLocalServerPresistantData(newServerPersistantData)
+' [
+'   {
+'     isvideopreviewon: false
+'   }
+' ]
+Function saveLocalServerPersistentData(newServerPersistentData)
   ' We are adding checks both during save and using the backend response to cover a use case if
   ' someone carries the device to GDPR country we do not use their settings from US.
   serverPersistentDataKeys = m.constants.serverPersistentDataKeys
   persistentDataKeyConsentKeyMapping = m.constants.persistentDataKeyConsentKeyMapping
 
-  for i = 0 to newServerPersistantData.count() - 1
-    entries = newServerPersistantData[i]
+  for i = 0 to newServerPersistentData.count() - 1
+    entries = newServerPersistentData[i]
     for each key in entries
       persistentDataKey = serverPersistentDataKeys[key]
       if persistentDataKey <> invalid

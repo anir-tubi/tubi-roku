@@ -1,6 +1,6 @@
 ' Wrapper around the m.screenStack push interface to handle analytics events
 ' Push a screen on to the stack, allowing the back button to retrace steps
-Function pushScreen(screen As Object, sendNavigateEvents = true, sendLoadingEvents = true)
+Function pushScreen(screen as Object, sendNavigateEvents = true, sendLoadingEvents = true)
   tubiLog("ScreenStackHelpers.pushScreen " + screen.id)
   resetScreenStack()
 
@@ -55,7 +55,7 @@ Function resetScreenStack()
   setSponsorshipBackground("") '//reset the sponsorship background whenever a screen needs to be reset
   setSponsorshipFooter("") '//reset the sponsorship footer whenever a screen stack needs to be reset
   setBackgroundColor("") '//reset the background color whenever a screen stack needs to be reset
-End FUnction
+End Function
 
 
 ' Wrapper around the m.screenStack push interface to handle analytics events
@@ -158,13 +158,22 @@ Function screenTrackingNavigate(oldTrackingPageInfo, newTrackingPageInfo, tracki
     trackingComponentValues = trackingComponentInfo.componentValues
   end if
 
+  eventValues = {
+    pageOneof: m.Tracking.getAnalyticsPage(sourcePageType, sourcePageValues) 'page navigating from - a valid page type (see NavigateToPageEvent in events.protos)
+    componentOneof: m.Tracking.getAnalyticsComponent(trackingComponentType, trackingComponentValues)
+    dest_pageOneof: m.Tracking.getAnalyticsPage(destPageType, destPageValues) 'page navigating to - a valid page type (see NavigateToPageEvent in events.protos)
+  }
+
+  if newTrackingPageInfo.additionalContextValues <> invalid
+    eventValues.append(newTrackingPageInfo.additionalContextValues)
+  else if oldTrackingPageInfo.additionalContextValues <> invalid
+    ' Handles the case where user is navigating to other screen from the CDC details screen. For ex: registration flow.
+    eventValues.append(oldTrackingPageInfo.additionalContextValues)
+  end if
+
   m.trackingLoggingTask.trackEvent = {
     type: "navigate_to_page"
-    values: {
-      pageOneof: m.Tracking.getAnalyticsPage(sourcePageType, sourcePageValues)  'page navigating from - a valid page type (see NavigateToPageEvent in events.protos)
-      componentOneof: m.Tracking.getAnalyticsComponent(trackingComponentType, trackingComponentValues)
-      dest_pageOneof: m.Tracking.getAnalyticsPage(destPageType, destPageValues) 'page navigating to - a valid page type (see NavigateToPageEvent in events.protos)
-    }
+    values: eventValues
   }
 End Function
 
@@ -173,7 +182,7 @@ End Function
 ' screenTrackingLoad
 '
 ' tracking for loading a new screen
-Function screenTrackingLoad(trackingPageInfo, loadTime=0, success=true)
+Function screenTrackingLoad(trackingPageInfo, loadTime = 0, success = true)
   pageType = ""
   pageValues = {}
   if trackingPageInfo <> invalid
@@ -187,20 +196,27 @@ Function screenTrackingLoad(trackingPageInfo, loadTime=0, success=true)
     status = "FAIL"
   end if
 
+  eventValues = {
+    pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues) 'a valid page type (see PageLoadEvent in events.protos)
+    load_time: loadTime
+    status: status 'ActionStatus enum
+  }
+
+  if trackingPageInfo.additionalContextValues <> invalid
+    eventValues.append(trackingPageInfo.additionalContextValues)
+  end if
+
+  ' TODO: Create a ticket to refactor our tracking code to make sure all the calls are piped to single method so that it is easier to add additional context in future.
   'tracking for loading screen
   m.trackingLoggingTask.trackEvent = {
     type: "page_load"
-    values: {
-      pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues)  'a valid page type (see PageLoadEvent in events.protos)
-      load_time: loadTime
-      status: status  'ActionStatus enum
-    }
+    values: eventValues
   }
 End Function
 
 
 Function printScreenStack()
-  for i=0 to m.screenStack.getChildCount()-1
+  for i = 0 to m.screenStack.getChildCount() - 1
     screen = m.ScreenStack.getChild(i)
     print "stack["; i;"]: "; screen.subtype(); " id = "; screen.id
   end for
@@ -240,7 +256,7 @@ Function onScreenChange()
   currentScreen = getCurrentScreen()
 
   if currentScreen <> invalid AND currentScreen.id <> invalid
-    m.sideNav.visible =  (m.constants.ui.sideNavOpenIds[currentScreen.id] = true)
+    m.sideNav.visible = (m.constants.ui.sideNavOpenIds[currentScreen.id] = true)
   end if
   ' Processing any queued braze messaging if they are queued due to being in non whitelisted screens.
   processQueuedInAppMessage()

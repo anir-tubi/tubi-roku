@@ -32,7 +32,7 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0)
   m.settingsScreen.observeFieldScoped("didUserSelectManagePrivacySettingsButton", "onDidUserSelectManagePrivacySettingsButton")
   m.settingsScreen.observeFieldScoped("selectedConsent", "onSelectedConsentChange")
   m.settingsScreen.observeFieldScoped("selectedQrCodeSectionInfo", "onSelectedQrCodeSectionInfoChanged")
-  if m.constants.settings.mode = "qa" OR  m.constants.settings.mode = "dev" OR m.constants.settings.mode = "staging"  'this is for extra protection not to restart the app
+  if m.constants.settings.mode = "qa" OR m.constants.settings.mode = "dev" OR m.constants.settings.mode = "staging" 'this is for extra protection not to restart the app
     m.settingsScreen.observeFieldScoped("appRestartRequested", "onAppRestartRequested")
   end if
 
@@ -77,7 +77,7 @@ Function setSettingsScreenSignInInfo()
 End Function
 
 
-Function getNowSeconds() as integer
+Function getNowSeconds() as Integer
   nowDate = CreateObject("roDateTime")
   return nowDate.AsSeconds()
 End Function
@@ -89,7 +89,7 @@ Function onSettingsSignOutSelected()
     type: "dialog"
     values: {
       dialog_type: "INFORMATION" 'DialogType enum - TODO use a "SIGN_OUT" type when it becomes available in protos
-      pageOneof: m.Tracking.getAnalyticsPage("account_page", {account_page_type: "PARENTAL"})  'settings_page doesn't exist in protos
+      pageOneof: m.Tracking.getAnalyticsPage("account_page", { account_page_type: "PARENTAL" }) 'settings_page doesn't exist in protos
       dialog_action: "SHOW"
       dialog_sub_type: "sign-out-settings"
     }
@@ -167,7 +167,7 @@ Function onAutoPreviewSettingSelected()
     message = getTranslation("screenSettings_error_signInAutoplayPreview_description")
     buttons = [getTranslation("dialog_button_signIn"), getTranslation("dialog_button_cancel")]
 
-    showSignInRequiredModal(title, message, buttons, m.settingsScreen, "sign-in-videopreview",  m.Tracking, m.trackingLoggingTask, onSignInModalSelectedViaAutoplayPreview)
+    showSignInRequiredModal(title, message, buttons, m.settingsScreen, "sign-in-videopreview", m.Tracking, m.trackingLoggingTask, onSignInModalSelectedViaAutoplayPreview)
   end if
 
 End Function
@@ -243,13 +243,13 @@ Function onParentalSettingSelected()
       if m.pub_serverPersistentData.hasPassword <> true
         pageInfo = m.settingsScreen.trackingPageInfo
 
-        dialogEvent =  {
+        dialogEvent = {
           type: "dialog"
           values: {
-          dialog_type: "PASSWORD_REQUIRED"   'DialogType enum
-          pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
-          dialog_action: "SHOW"
-          dialog_sub_type: "parental-updated-" + m.settingsScreen.parentalSettingSelected.toStr()
+            dialog_type: "PASSWORD_REQUIRED" 'DialogType enum
+            pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+            dialog_action: "SHOW"
+            dialog_sub_type: "parental-updated-" + m.settingsScreen.parentalSettingSelected.toStr()
           }
         }
 
@@ -300,7 +300,7 @@ Function onParentalSettingSelected()
 End Function
 
 
-Function isConfirmPasswordScreen() as boolean
+Function isConfirmPasswordScreen() as Boolean
   '//Is the current screen the confirmPasswordScreen?
   screen = getCurrentScreen()
   b = (m.confirmPasswordScreen <> invalid AND m.confirmPasswordScreen.subType() = screen.subType())
@@ -397,7 +397,7 @@ Function updateParentalSettingsSuccessResponse(response)
   m.confirmPasswordScreen.isLoading = false
 
   if response <> invalid
-    saveLocalServerPresistantData([{parentalRating: m.settingsScreen.parentalSettingSelected}])
+    saveLocalServerPersistentData([{ parentalRating: m.settingsScreen.parentalSettingSelected }])
     if isConfirmPasswordScreen() = true
       '//If ConfirmPasswordScreen visible, then pop the Screen and save the password
       popScreen(true, true) ' remove the ConfirmPasswordScreen
@@ -512,10 +512,10 @@ Function onShowDeviceModal()
   dialogEvent = {
     type: "dialog"
     values: {
-    dialog_type: "INFORMATION"
-    pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
-    dialog_action: "SHOW"
-    dialog_sub_type: "device-id"
+      dialog_type: "INFORMATION"
+      pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+      dialog_action: "SHOW"
+      dialog_sub_type: "device-id"
     }
   }
   showInfoModal(getTranslation("screenSettings_fullDeviceID"), deviceId, dialogEvent, m.trackingLoggingTask)
@@ -558,7 +558,7 @@ End Function
 
 Function onAppRestartRequested()
   tubilog("SettingsScreenHelpers.onAppRestartRequested")
-  if m.constants.settings.mode = "qa" OR  m.constants.settings.mode = "dev" OR m.constants.settings.mode = "staging" 'this is for extra protection not to restart the app
+  if m.constants.settings.mode = "qa" OR m.constants.settings.mode = "dev" OR m.constants.settings.mode = "staging" 'this is for extra protection not to restart the app
     restartApp()
   end if
 End Function
@@ -597,7 +597,7 @@ Function onSelectedConsentChange(msg)
     pageOneof = m.Tracking.getAnalyticsPage("account_page", pageValues)
     componentOneof = m.Tracking.getAnalyticsComponent("button_component", componentValues)
 
-    componentInteractionEvent =  {
+    componentInteractionEvent = {
       pageOneof: pageOneof
       componentOneof: componentOneof
       user_interaction: userInteractionValue
@@ -647,7 +647,7 @@ End Function
 
 
 Function onSettingsScreenGetUserSettingsSuccess(userSettings)
-    m.settingsScreen.userSettings = userSettings
+  m.settingsScreen.userSettings = userSettings
 End Function
 
 

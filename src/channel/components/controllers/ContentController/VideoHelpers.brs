@@ -11,10 +11,10 @@
 '                                               playbackContainer - if srcForAds = container, then playbackContainer is set to the id of the container that was the source, otherwise not used.
 
 ' @position: integer, the position from which to start video playback
-Function playVideoContent(content, playbackSource = {"srcForAnalytic": "unknown", "srcForAds": "unknown"}, position = 0)
+Function playVideoContent(content, playbackSource = { "srcForAnalytic": "unknown", "srcForAds": "unknown" }, position = 0)
   tubiLog("VideoHelpers.playVideoContent")
-  if content <> invalid and (content.needsLogin = true AND isLoggedInUser() = false) 'Check for user sign in status because we do not refetch the content and so it will not pass through metadata translate process.
-    callbackAfterSignInParams = {"content": content, "playbackSource": playbackSource, "position": position}
+  if content <> invalid AND (content.needsLogin = true AND isLoggedInUser() = false) 'Check for user sign in status because we do not refetch the content and so it will not pass through metadata translate process.
+    callbackAfterSignInParams = { "content": content, "playbackSource": playbackSource, "position": position }
     startSignIn(AfterSignInPlayLockedContent, callbackAfterSignInParams)
   else
     loadTime = CreateObject("roTimeSpan")
@@ -52,9 +52,9 @@ End Function
 ' @nowPos: integer, the position from which the video playback should be resumed
 ' @currentTrackingPageInfo: assocArray, trackingPageInfo of the screen being navigated from
 ' @trackingComponentInfo: assocArray, trackingComponentInfo of the component being navigated from
-Function playVideoContentWhileSkippingDetailScreen(content, nowPos, currentTrackingPageInfo, trackingComponentInfo = invalid, playbackSource = {"srcForAnalytic": "unknown", "srcForAds": "unknown"})
-  if content <> invalid and content.needsLogin = true
-    callbackAfterSignInParams = {"content": content, "nowPos": nowPos, "currentTrackingPageInfo": currentTrackingPageInfo, "trackingComponentInfo": trackingComponentInfo, "playbackSource": playbackSource}
+Function playVideoContentWhileSkippingDetailScreen(content, nowPos, currentTrackingPageInfo, trackingComponentInfo = invalid, playbackSource = { "srcForAnalytic": "unknown", "srcForAds": "unknown" })
+  if content <> invalid AND content.needsLogin = true
+    callbackAfterSignInParams = { "content": content, "nowPos": nowPos, "currentTrackingPageInfo": currentTrackingPageInfo, "trackingComponentInfo": trackingComponentInfo, "playbackSource": playbackSource }
     startSignIn(AfterSignInPlayLockedContentWhileSkippingDetailScreen, callbackAfterSignInParams)
   else
     loadTime = CreateObject("roTimeSpan")
@@ -67,7 +67,7 @@ Function playVideoContentWhileSkippingDetailScreen(content, nowPos, currentTrack
       screenTrackingNavigate(currentTrackingPageInfo, videoPlayer.trackingPageInfo, trackingComponentInfo)
     end if
 
-    if getCurrentScreen() = invalid or getCurrentScreen().id <> m.constants.ui.screenIds.videoPlayerScreen
+    if getCurrentScreen() = invalid OR getCurrentScreen().id <> m.constants.ui.screenIds.videoPlayerScreen
       pushScreen(videoPlayer, false, true)
     end if
 
@@ -89,7 +89,7 @@ End Function
 
 '                                               playbackContainer - if srcForAds = container, then playbackContainer is set to the id of the container that was the source, otherwise not used.
 ' @position: integer, the position from which to start video playback
-Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown", "srcForAds": "unknown"}, position = 0)
+Function setupVideoPlayer(content, playbackSource = { "srcForAnalytic": "unknown", "srcForAds": "unknown" }, position = 0)
   ' Limit to devices with 512Mb RAM as those are the most likely to crash from exceeding the memory limit during playback.
   if m.constants.deviceInfo.lowVram = true
     updateScreenCacheOnPlayback(m.constants.ui.screenIds.VideoPlayerScreen)
@@ -128,6 +128,8 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
   if m.pub_serverPersistentData <> invalid
     videoPlayer.preferredAudioTrack = m.pub_serverPersistentData.audioTrack
   end if
+
+  videoPlayer.isAdultParentalLevel = checkIfUserIsAdultByParentalRatingAndBirthday()
 
   videoPlayer.isAutoPlayTimerOn = isAutoPlayTimerOn()
 
@@ -424,7 +426,7 @@ End Function
 ' updateHistoryLocally
 '
 ' updates the history locally for signedIn user & guest user
-Function updateHistoryLocally(content as object, position as integer)
+Function updateHistoryLocally(content as Object, position as Integer)
   m.Bookmarks.addHistoryLocally(content, position, m.global)
 End Function
 
@@ -489,7 +491,7 @@ End Function
 
 '                                               playbackContainer - if srcForAds = container, then playbackContainer is set to the id of the container that was the source, otherwise not used.
 ' @refetch: boolean, this param tells whether the nextContent should be refetched from server or not. default is false
-Function playUpNextContent(nextContent, playbackSource = {"srcForAnalytic": "unknown", "srcForAds": "unknown"}, refetch = false)
+Function playUpNextContent(nextContent, playbackSource = { "srcForAnalytic": "unknown", "srcForAds": "unknown" }, refetch = false)
   tubiLog("VideoHelpers.playUpNextContent")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
 
@@ -561,7 +563,7 @@ Function playUpNextContent(nextContent, playbackSource = {"srcForAnalytic": "unk
         video_id: content.id
         video_url: content.url
         error_message: "Locked content cannot be played"
-        error_code: -1   ' is it even needed?
+        error_code: -1 ' is it even needed?
       }
 
       logWarn(formatJson(errorInfo), "videoLoad", "r-rated-upnext", 0.1)
@@ -815,7 +817,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent, shouldUpdateEpisodeSc
     ' number then there is still a screen redraw issue: i.e. user watches only 2 seconds of a video.
     ' The local number is 2 seconds and displays the resume button, but the backend determines that 2
     ' seconds is not enough to warrant a resume button and returns 0 as the resume point.
-    if detailScreenResumePosition < m.constants.player.historyFrequency1Min or (isEndReached = true AND detailContent <> invalid AND detailContent.type <> m.constants.ui.contentTypes.series)
+    if detailScreenResumePosition < m.constants.player.historyFrequency1Min OR (isEndReached = true AND detailContent <> invalid AND detailContent.type <> m.constants.ui.contentTypes.series)
       '//If the video is either at the very beginning or at the very end, then it should pass the local resume point as 0.
       ' if content type is series, we do not need to reset the resumepoint to 0 because it will lose the watch history. But in case of movies,
       ' if user watches till the end, we need to reset the resumepoint to 0.
@@ -844,7 +846,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent, shouldUpdateEpisodeSc
         ' Still in the same series - possibly autoplayed, or possibly same episode
 
         'updating the history if user has watched more than historyFrequency or postlude reached
-        if historyPosition > m.constants.player.historyFrequency1Min or isEndReached = true
+        if historyPosition > m.constants.player.historyFrequency1Min OR isEndReached = true
           ' For SignedIn/guest user, update resume point to global variable
           updateHistoryLocally(videoContent, historyPosition)
 
@@ -911,7 +913,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent, shouldUpdateEpisodeSc
         ' Returning to the detail screen for the same movie as was started, no autoplay
         ' Just repopulate the detail screen with the same content
         'updating the history if user has watched more than historyFrequency or postlude reached
-        if historyPosition > m.constants.player.historyFrequency1Min or isEndReached = true
+        if historyPosition > m.constants.player.historyFrequency1Min OR isEndReached = true
           ' For SignedIn/guest user, update resume point to global variable.
           updateHistoryLocally(videoContent, historyPosition)
 
@@ -1052,7 +1054,7 @@ Function showPlayerError(errorMessage, errorCode)
       type: "dialog"
       values: {
         dialog_type: "PLAYER_ERROR"
-        pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: videoId})
+        pageOneof: m.Tracking.getAnalyticsPage("video_page", { video_id: videoId })
         dialog_action: "SHOW"
         dialog_sub_type: userErrorCode
       }
@@ -1140,7 +1142,7 @@ Function initVideoTracking(videoPlayer)
         m.youboraTask = m.top.createChild("YBPluginRokuVideo")
         m.youboraTask.id = "Youbora"
         m.youboraTask.options = m.constants.thirdParty.youbora.config
-        m.global.addFields({YouboraLogActive: m.constants.settings.youboraDebugEnabled})
+        m.global.addFields({ YouboraLogActive: m.constants.settings.youboraDebugEnabled })
         m.youboraTask.control = "RUN"
       else
         'Setting m.youboraTask.taskState to "stop" triggers the youboraTask to
@@ -1160,7 +1162,7 @@ Function passVideoReferenceToYouboraPlugin(videoPlayer)
     player = videoPlayer.findNode("VideoNode")
     'Pass Video reference to Youbora plugin
     if m.youboraTask <> invalid
-      m.youboraTask.updateplayer = {player: player, unobserveGlobalScope: false}
+      m.youboraTask.updateplayer = { player: player, unobserveGlobalScope: false }
     end if
   end if
 End Function
@@ -1217,14 +1219,14 @@ Function onVideoTrackingStart(msg)
     youboraConfig["content.encoding.videoCodec"] = content.codec
 
     m.youboraTask.options = youboraConfig
-    m.youboraTask.event = {handler: "play"}
+    m.youboraTask.event = { handler: "play" }
   end if
 End Function
 
 
 Function videoTrackingStop()
   if m.constants.settings.youboraEnabled = true
-    m.youboraTask.event = {handler: "stop"}
+    m.youboraTask.event = { handler: "stop" }
   end if
 End Function
 
@@ -1341,11 +1343,11 @@ Function onSegInfoChange(msg)
   if m.youboraTask <> invalid
     youboraOptions = m.youboraTask.options
     if youboraOptions <> invalid
-       rendition = constructYouboraRendition(segInfo)
-       if rendition <> invalid
-         youboraOptions["content.rendition"] = rendition
-         m.youboraTask.options = youboraOptions
-       end if
+      rendition = constructYouboraRendition(segInfo)
+      if rendition <> invalid
+        youboraOptions["content.rendition"] = rendition
+        m.youboraTask.options = youboraOptions
+      end if
     end if
   end if
 End Function
