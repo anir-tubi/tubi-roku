@@ -217,10 +217,12 @@ Function onLoadingChange()
     m.CategoryGridList.featuredRowCurrFocusColumn = -1
     m.CategoryGridList.featuredListScrollDirection = "none"
     m.CategoryGridList.featuredRowFocusedItem = invalid
+    m.CategoryGridList.featuredListHasFocus = false
 
     ' Resetting last focus list when reloading the screen.
     ' To Cover cases where skin ad is shown and then gets removed.
     m.CategoryGridList.lastFocusedList = ""
+    setContentAreaState()
   end if
 End Function
 
@@ -509,7 +511,7 @@ End Function
 ' onGridFocusChange
 '
 ' On grid focus change, update the info panel
-Function onGridFocusChange() as void
+Function onGridFocusChange() as Void
   tubiLog("HomeScreen.onGridFocusChange")
   if m.top.contentReady = false
     m.top.contentReady = true
@@ -600,7 +602,7 @@ Function fireNavigateWithinPageEvent()
 End Function
 
 
-Function onGridItemSelected() as void
+Function onGridItemSelected() as Void
   tubiLog("HomeScreen.onGridItemSelected")
   selectedItem = m.CategoryGridList.itemSelected
   handleItemSelected(selectedItem, m.top.selectedPosition)
@@ -760,7 +762,7 @@ Function fadeOutInfoPanel()
 End Function
 
 
-Function onKeyEvent(key, press) as boolean
+Function onKeyEvent(key, press) as Boolean
   if press
     if key = "left" OR key = "back"
       ' This is required to stop videopreview

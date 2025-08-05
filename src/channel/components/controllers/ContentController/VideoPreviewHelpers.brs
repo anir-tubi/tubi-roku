@@ -130,7 +130,7 @@ Function onVideoPreviewStateChanged(msg)
         isReplay = true
       end if
 
-      isFullPlayerBlockedForUser = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR ( item <> invalid AND item.needsLogin = true AND isloggedInUser() = false)
+      isFullPlayerBlockedForUser = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR (item <> invalid AND item.needsLogin = true AND isloggedInUser() = false)
 
       if isReplay = true
         '//Loop the video in this case
@@ -190,7 +190,7 @@ Function startVideoPreviewIfBufferingComplete()
   bufferingStatus = m.videoPreviewPlayer.bufferingStatus
   if bufferingStatus <> invalid
     videoPreview.isBufferingComplete = (bufferingStatus.percentage = 100)
-    if videoPreview.isBufferingComplete  = true AND videoPreview.control = "prebuffer"
+    if videoPreview.isBufferingComplete = true AND videoPreview.control = "prebuffer"
       sendVideoPlayerCommand(videoPreview, "play")
     end if
   end if
@@ -203,7 +203,7 @@ End Function
 ' @componentInfo: assocarray, value can be { componentType: "category_page", componentValues: {}}
 Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
   tubiLog("VideoPreviewHelpers.startVideoPreview")
-  
+
   if content <> invalid AND (isVideoPreviewOn() = true OR (content.gridItemType = m.constants.ui.gridItemTypes.skinAd AND m.constants.deviceInfo.IsAutoplayEnabled = true AND m.constants.deviceInfo.limitedUi = false))
     '//::NOTE:: if this is a skinAd content, the above conditional statement checks if the device auto play setting is on and that the device is not a limited UI device before playing the looping background video
     videoPreview = m.videoPreviewPlayer
@@ -271,7 +271,7 @@ Function updatePreviewPlayerToCondensedView()
 End Function
 
 
-Function updatePreviewPlayerToInlineView(shouldForceInline = false)
+Function updatePreviewPlayerToInlineView()
   if isCurrentScreenHomeScreen() = true
     screen = getCurrentScreen()
 
@@ -284,16 +284,17 @@ Function updatePreviewPlayerToInlineView(shouldForceInline = false)
     isCloseTo16By9 = isCloseTo16By9AspectRatio(playerSize)
     if isCloseTo16By9 = false
       ' If the aspect ratio is not close to 16:9, adjust the height to 16:9
-      adjustedHeight = playerSize[0] * (9/16)
+      adjustedHeight = playerSize[0] * (9 / 16)
       playerTranslationY = (playerSize[1] - adjustedHeight) / 2
     end if
 
-    if m.videoPreviewPlayer.getParent().isSameNode(m.inlineVideoPreviewPlayerContainer) = false OR shouldForceInline = true
+    index = m.nodeHelpers.getChildIndex(m.inlineVideoPreviewPlayerContainer, m.inlineVideoMetadataOverlay)
+    if m.videoPreviewPlayer.getParent().isSameNode(m.inlineVideoPreviewPlayerContainer) = false OR index <> 0
       m.videoPreviewPlayer.width = playerSize[0]
 
       if isCloseTo16By9 = false
         ' If the aspect ratio is not close to 16:9, adjust the height to 16:9
-        adjustedHeight = playerSize[0] * (9/16)
+        adjustedHeight = playerSize[0] * (9 / 16)
         m.videoPreviewPlayer.height = adjustedHeight
         m.videoPreviewPlayer.clippingRect = [0, Abs(playerTranslationY), playerSize[0], playerSize[1]]
       else

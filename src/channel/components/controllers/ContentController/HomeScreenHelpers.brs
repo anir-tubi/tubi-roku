@@ -692,11 +692,11 @@ Function makeContainerRequest(category, columnFocused, homeScreen, successCallba
   ' We will start fetching more items when the user has scrolled 3 items.
   ' This is to give enough lead time for us to fetch more items before user reaches the end of the list.
   firstBatchLimit = 2
-  
-  if isNode(category) = true and category.paginationInfo <> invalid and columnFocused >= firstBatchLimit
+
+  if isNode(category) = true AND category.paginationInfo <> invalid AND columnFocused >= firstBatchLimit
     cursor = category.paginationInfo.cursor
     hasMoreContent = category.paginationInfo.hasMoreContent
-    if hasMoreContent = true and columnFocused >= (cursor - 10) and category.state <> "containerPaginationRequestPending"
+    if hasMoreContent = true AND columnFocused >= (cursor - 10) AND category.state <> "containerPaginationRequestPending"
       isKidsMode = shouldKidsModeBeSentToServer()
       isSignedInUser = isLoggedInUser()
       isLinearBlock = isLinearBlocked()
@@ -996,7 +996,7 @@ Function onContentToPlay(msg)
 
   playbackSource = {
     "srcForAnalytic": m.constants.player.playbackSource.unknown
-    "srcForAds":m.constants.player.playbackOrigin.container
+    "srcForAds": m.constants.player.playbackOrigin.container
     "playbackContainer": containerId
   }
 
@@ -1088,7 +1088,7 @@ Function showRegistrationWelcomeModal()
     type: "dialog"
     values: {
       dialog_type: "INFORMATION"
-      pageOneof: m.Tracking.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_UNKNOWN"})
+      pageOneof: m.Tracking.getAnalyticsPage("home_page", { content_mode: "CONTENT_MODE_UNKNOWN" })
       dialog_action: "SHOW"
       dialog_sub_type: "reg_intro"
     }
@@ -1097,7 +1097,7 @@ Function showRegistrationWelcomeModal()
   modalInfo = {
     header: header
     subHeader: subHeader
-    message: ""               'message is not used in case of multistyle dialog
+    message: "" 'message is not used in case of multistyle dialog
     modalDialogTypes: m.constants.modalDialogTypes.multiStyle
     modalDialogStyles: m.constants.modalDialogStyles.multiMessageGroup
     multiStyleMessage: multiMessage
@@ -1159,7 +1159,7 @@ Function onLoadCategoryForIds(msg)
     contentMode = homeScreen.contentMode
   end if
 
-  batchRequests = m.cmsApi.createHomeScreenBatchReqInfoForContainers(categoryIDs, contentMode, isKidsMode, isSignedInUser,"standard","", isLinearBlock)
+  batchRequests = m.cmsApi.createHomeScreenBatchReqInfoForContainers(categoryIDs, contentMode, isKidsMode, isSignedInUser, "standard", "", isLinearBlock)
 
   if batchRequests <> invalid
     m.makeBatchRequest({
@@ -1179,7 +1179,7 @@ End Function
 Function hasRegModalBeenShown()
   currentScreen = getCurrentScreen()
   if m.constants.settings.mode = "qa" AND m.constants.settings.hideStartupModals = true
-      return true
+    return true
   end if
 
   if isNewUser() = true AND m.hasRegModalBeenShownWithinNewUserSession = false AND isMajorEventDay() = false
@@ -1198,7 +1198,7 @@ End Function
 Function updateSkinAdRowContent(homeScreen, content)
   tubiLog("HomeScreenHelpers.updateSkinAdRowContent")
 
-  if content <> invalid AND (isNonEmptyString(content.title) = true OR isNonEmptyString(content.titleImageUrl) = true) AND isNonEmptyString(content.id) = true AND (isNonEmptyString(content.videoPreviewUrl) = true OR (isNonEmptyArray(content.backgrounds) = true AND isNonEmptyString(content.backgrounds[0]) = true) ) AND isNonEmptyString(content.HDGRIDPOSTERURL) = true
+  if content <> invalid AND (isNonEmptyString(content.title) = true OR isNonEmptyString(content.titleImageUrl) = true) AND isNonEmptyString(content.id) = true AND (isNonEmptyString(content.videoPreviewUrl) = true OR (isNonEmptyArray(content.backgrounds) = true AND isNonEmptyString(content.backgrounds[0]) = true)) AND isNonEmptyString(content.HDGRIDPOSTERURL) = true
     '//If this is a valid skinAds wrapper, then check if it is part of the experiment.
     '// Fire the experiment's exposure event here, regardless.
     if m.constants.settings.disableSkinAds = false AND getExperimentResource("ads_tubi_skins", "ads_tubi_skins_v1", true).enabled = true
@@ -1254,20 +1254,22 @@ End Function
 ' Provides similar better as row list fadeFocusWhileScrolling experience.
 ' @param msg: roSGNode, the message object.
 Function onFeaturedRowCurrFocusRowChange(msg)
-  currFocusRow = msg.getData()
   screen = msg.getRoSGNode()
-  m.inlineVideoMetadataOverlay.skipAnimation = true
-  ' Avoid the focus indicator from being shown when the row is scrolling.
-  ' Start fade in when the user is half way through the scroll.
-  if currFocusRow = CInt(currFocusRow)
-    fade(m.inlinePreviewFocusIndicator, "in", 0.1)
-  else if m.inlinePreviewFocusIndicator.opacity = 1
-    fade(m.inlinePreviewFocusIndicator, "out", 0.1)
-  end if
-  pauseVideoPreviewAndShowPoster()
-  ' So that we call at the end of transition.
-  if currFocusRow = Fix(currFocusRow)
-    checkAndSetSponsorshipBackground(screen.featuredRowContent, currFocusRow)
+  if screen.lastFocusedList = "featuredRowList"
+    currFocusRow = msg.getData()
+    m.inlineVideoMetadataOverlay.skipAnimation = true
+    ' Avoid the focus indicator from being shown when the row is scrolling.
+    ' Start fade in when the user is half way through the scroll.
+    if currFocusRow = CInt(currFocusRow)
+      fade(m.inlinePreviewFocusIndicator, "in", 0.1)
+    else if m.inlinePreviewFocusIndicator.opacity = 1
+      fade(m.inlinePreviewFocusIndicator, "out", 0.1)
+    end if
+    pauseVideoPreviewAndShowPoster()
+    ' So that we call at the end of transition.
+    if currFocusRow = Fix(currFocusRow)
+      checkAndSetSponsorshipBackground(screen.featuredRowContent, currFocusRow)
+    end if
   end if
 End Function
 
@@ -1345,8 +1347,8 @@ End Function
 
 
 Function pauseVideoPreviewAndShowPoster()
- ' If the video preview is playing, we will pause it and show the poster.
- ' This helps with smoother scrolling experience.
+  ' If the video preview is playing, we will pause it and show the poster.
+  ' This helps with smoother scrolling experience.
   if m.inlineVideoPreviewPlayerContainer.opacity = 1
     videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
     if videoPlayer <> invalid
@@ -1361,8 +1363,7 @@ Function pauseVideoPreviewAndShowPoster()
     end if
   end if
   isLinearPlayerPlaying = isLinearPlayerLoadingOrPlaying()
-  shouldForceInline = (isLinearPlayerPlaying = true)
-  updatePreviewPlayerToInlineView(shouldForceInline)
+  updatePreviewPlayerToInlineView()
   if isLinearPlayerPlaying = true
     stopAndHideLinearVideoPlayer()
   end if
@@ -1397,7 +1398,7 @@ Function setInlineVideoMetadataOverlay(featuredRowContent, columnFocused, rowFoc
   if (isNumber(columnFocused) = false OR columnFocused < 0)
     columnFocused = 0
   end if
-  
+
   if (isNumber(rowFocused) = false OR rowFocused < 0)
     rowFocused = 0
   end if
@@ -1409,7 +1410,7 @@ Function setInlineVideoMetadataOverlay(featuredRowContent, columnFocused, rowFoc
   if currCategory <> invalid
     itemContent = currCategory.getChild(columnFocused)
     m.inlineVideoMetadataOverlay.itemContent = itemContent
-    m.inlineVideoGridTitleLogo.itemContent = itemContent  
+    m.inlineVideoGridTitleLogo.itemContent = itemContent
   end if
 
   ' Predicting the next row to be focused based on current scroll direction.
@@ -1495,7 +1496,7 @@ Function updateCategoryGridWithFeaturedList(response, screen)
     if isCurrScreenHomeScreen = true AND screen.isInFocusChain() = false
       m.inlineVideoPreviewPlayerContainer.opacity = 1
     end if
-    setInlineVideoMetadataOverlay(response, 0 , 0)
+    setInlineVideoMetadataOverlay(response, 0, 0)
     m.inlineVideoMetadataOverlay.showContentPoster = true
 
     if screen.skinAdContent <> invalid AND screen.isInFocusChain() = false
@@ -1515,7 +1516,6 @@ Function onFeaturedRowFocusedItemChange(msg)
     if isNode(m.inlineVideoMetadataOverlay.itemContent) = true AND focusedItem.title <> m.inlineVideoMetadataOverlay.itemContent.title
       updateInTransitVideoMetadataOverlay()
     end if
-    updatePreviewPlayerToInlineView()
 
     ' If VideoPreview is on and we have not started the debounce, we will start it.
     ' This is needed in case where for initial load and refresh cases where columnFocusChange is not triggered.
@@ -1627,9 +1627,9 @@ Function onFeaturedListScrollDirectionChange(msg)
 End Function
 
 
-' This function is part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated. 
+' This function is part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
 Function isLinearBlocked()
-  'only apply to US new users and only to users under the experiment. 
+  'only apply to US new users and only to users under the experiment.
   if UCase(m.constants.deviceInfo.countryCode) = "US" AND getExperimentResult("roku_linear_no_show", "roku_linear_no_show_v2") <> invalid
     if isNewUser() = true
       'all newUsers are under linear holdout experiment
@@ -1638,7 +1638,7 @@ Function isLinearBlocked()
           "isLinearBlocked": "linearblocked"
         }, "device")
         return true
-      else   ' isLinearBlocked only if experiment is running in popper.
+      else ' isLinearBlocked only if experiment is running in popper.
         saveServerPersistentData({
           "isLinearBlocked": "linearshow"
         }, "device")

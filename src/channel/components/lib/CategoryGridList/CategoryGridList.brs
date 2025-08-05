@@ -345,18 +345,13 @@ Function onContentChange()
     end if
   end if
 
-  rowIndexBoost = 0
-  if m.top.featuredRowContent <> invalid
-    rowIndexBoost++
-  end if
-
   ' Since we are splitting grid content into two RowLists, we need to take into account rows that are in above rows.
   m.RowList.update({
     parentScreenId: m.top.parentScreenId
     parentScreenTrackingPageInfo: m.top.parentScreenTrackingPageInfo
     personalizationId: m.top.personalizationId
     shouldTrackViewableImpressionEvent: m.top.shouldTrackViewableImpressionEvent
-    rowIndexBoost: rowIndexBoost
+    rowIndexBoost: 0
   }, true)
 
   m.FeaturedRowList.update({
@@ -366,8 +361,6 @@ Function onContentChange()
     shouldTrackViewableImpressionEvent: m.top.shouldTrackViewableImpressionEvent
     rowIndexBoost: 0
   }, true)
-
-  m.top.rowIndexBoost = rowIndexBoost
 
   ' Below is to add animation of slide down of the row list for the first time when screen is loaded.
   if m.top.featuredRowContent <> invalid AND isSkinAdsAvailable() = false AND m.isWithDescPortraitSmallExpEnabled = true AND m.top.lastFocusedList <> "rowList"
@@ -622,9 +615,9 @@ Function setFeaturedRowHeights()
       "focusXOffset": [0]
     })
 
-    m.featuredRowList.focusXOffset = [m.expandedTileFocusXOffset, 0]
     m.FeaturedRowList.content = m.top.featuredRowContent
     if m.top.featuredRowFocusedItem = invalid AND m.skinAdRow.content = invalid
+      m.featuredRowList.focusXOffset = [m.expandedTileFocusXOffset, 0]
       m.FeaturedRowList.rowItemFocused = [0, 0]
       if m.isWithDescPortraitSmallExpEnabled = true
         m.top.lastFocusedList = "featuredRowList"
@@ -708,7 +701,7 @@ Function onRowItemFocused(msg)
 End Function
 
 
-Function onCategoryResponseInBatch(msg) as void
+Function onCategoryResponseInBatch(msg) as Void
   tubiLog("CategoryGridList.categoryResponseInBatch")
 
   response = msg.getData()
@@ -1021,7 +1014,7 @@ End Function
 Function onFeaturedListCurrFocusRowChange(msg)
   currFocusRow = 0
   featuredRowContent = m.top.featuredRowContent
-  if isNode(featuredRowContent) = true
+  if isNode(featuredRowContent) = true AND m.top.lastFocusedList = "featuredRowList"
     rowItemFocused = m.featuredRowList.rowItemFocused
     if isNonEmptyArray(rowItemFocused) = true
       currFocusRow = rowItemFocused[0]
@@ -1142,7 +1135,7 @@ Function onKidsModeChange(msg)
 End Function
 
 
-Function onKeyEvent(key as string, press as boolean) as boolean
+Function onKeyEvent(key as String, press as Boolean) as Boolean
   if press = true
     bSkinAdAvailable = (isSkinAdsAvailable() = true)
 

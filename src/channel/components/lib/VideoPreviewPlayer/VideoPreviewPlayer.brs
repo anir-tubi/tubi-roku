@@ -155,7 +155,7 @@ End Function
 ' onVideoPositionChange
 '
 Function onVideoPositionChange(msg)
-  TRY
+  try
     m.playerPosition = msg.GetData()
     deviceId = m.constants.deviceInfo.deviceId
     ' Analytics
@@ -166,9 +166,9 @@ Function onVideoPositionChange(msg)
         m.lastPingTime = m.playerPosition
       end if
     end if
-  CATCH e
-    ?  deviceId
-  END TRY
+  catch e
+    ? deviceId
+  end try
 
 End Function
 
@@ -258,7 +258,7 @@ Function getPreviewProgressEvent(pageInfo, callSource)
 
     if isNonEmptyString(videoContent.id) = true
       videoId = videoContent.id.toInt()
-    End if
+    end if
 
     pgInfo = {}
 
