@@ -56,7 +56,7 @@
             id="ScreenStack"/>
             
           <Group
-            translation="[0, -4]"
+            translation="[0, -6]"
             visible="false"
             id="videoTileOverlayGroup">
             <ExpandedVideoGridTile
