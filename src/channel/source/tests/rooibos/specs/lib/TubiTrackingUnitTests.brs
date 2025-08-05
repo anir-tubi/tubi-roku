@@ -3,7 +3,7 @@
 '@Setup
 Function TubiTrackingSetup()
   m.Tracking = tubiTracking_createTubiTracking_testHelper()
-End function
+End Function
 
 
 Function tubiTracking_createTubiTracking_testHelper()
@@ -26,7 +26,7 @@ Function tubiTracking_getAnalyticsRequestIdempotency_test()
 
   'test that the key named "key" exists and the value is a string
   m.assertNotInvalid(idempotency.key)
-  m.assertTrue(type(idempotency.key) = "roString" or type(idempotency.key) = "String")
+  m.assertTrue(type(idempotency.key) = "roString" OR type(idempotency.key) = "String")
 
   'test the value has the form of a UUID
   uuidBlocks = idempotency.key.split("-")
@@ -97,7 +97,7 @@ End Function
 '@Test getAnalyticsApp unit tests
 Function tubiTracking_getAnalyticsApp_test()
   Tracking = m.Tracking
-  app = Tracking.getAnalyticsApp({appMode: ""})
+  app = Tracking.getAnalyticsApp({ appMode: "" })
 
   m.assertNotInvalid(app.platform)
   m.assertNotInvalid(app.app_version)
@@ -122,7 +122,7 @@ Function tubiTracking_getAnalyticsConnection_test()
   m.assertNotInvalid(connection.nominal_speed)
   m.assertInvalid(connection.isp)
   m.assertInvalid(connection.carrier)
-  m.assertTrue(connection.network = "WIFI" or connection.network = "ETHERNET" or connection.network = "UNKNOWN_NETWORK")
+  m.assertTrue(connection.network = "WIFI" OR connection.network = "ETHERNET" OR connection.network = "UNKNOWN_NETWORK")
 
 
   'event values without nominal_speed (ie. play_progress)
@@ -133,7 +133,7 @@ Function tubiTracking_getAnalyticsConnection_test()
   m.assertInvalid(connection.nominal_speed)
   m.assertInvalid(connection.isp)
   m.assertInvalid(connection.carrier)
-  m.assertTrue(connection.network = "WIFI" or connection.network = "ETHERNET" or connection.network = "UNKNOWN_NETWORK")
+  m.assertTrue(connection.network = "WIFI" OR connection.network = "ETHERNET" OR connection.network = "UNKNOWN_NETWORK")
 
 End Function
 
@@ -197,16 +197,16 @@ Function tubiTracking_getAnalyticsPage_test()
   Tracking = m.Tracking
 
   'valid page
-  page = Tracking.getAnalyticsPage("search_page", {query: "home"})
+  page = Tracking.getAnalyticsPage("search_page", { query: "home" })
   m.assertNotInvalid(page.search_page.query)
   m.assertTrue(page.search_page.query = "home")
 
   'valid page, empty value
-  page = Tracking.getAnalyticsPage("search_page", {query: ""})
+  page = Tracking.getAnalyticsPage("search_page", { query: "" })
   m.assertInvalid(page.search_page.query)
 
   'not valid page
-  page = Tracking.getAnalyticsPage("fake_page", {query: "home"})
+  page = Tracking.getAnalyticsPage("fake_page", { query: "home" })
   m.assertInvalid(page)
 
 End Function
@@ -385,13 +385,13 @@ Function tubiTracking_getAnalyticsAd_test()
   adVideoId = "10001694"
   streams = [
     {
-        bitrate: 635
-        height: 240
-        mimetype: "video/mp4"
-        provider: ""
-        url: "http://paella.adrise.tv/020267/" + adVideoId + "/v1101141528-640x360-SD-762k.mp4"
-        width: 320
-        id: adVideoId
+      bitrate: 635
+      height: 240
+      mimetype: "video/mp4"
+      provider: ""
+      url: "http://paella.adrise.tv/020267/" + adVideoId + "/v1101141528-640x360-SD-762k.mp4"
+      width: 320
+      id: adVideoId
     }
   ]
 
@@ -407,7 +407,7 @@ Function tubiTracking_getAnalyticsAd_test()
   ]
 
   clickthrough = {
-    breaks: [0.0,512.0,911.0,1423.0,1875.0,2569.0,3175.0,3640.0,4249.0]
+    breaks: [0.0, 512.0, 911.0, 1423.0, 1875.0, 2569.0, 3175.0, 3640.0, 4249.0]
     request_id: parentId
     impression_id: impressionId
     ad_video_id: adVideoId
@@ -470,13 +470,13 @@ Function tubiTracking_populateMessage_test()
   messageType = "subtitles_toggle"
   messageBase = {
     video_id: -1
-    toggle_state: ""  'ToggleState enum
-    language_code: ""  'Language enum
+    toggle_state: "" 'ToggleState enum
+    language_code: "" 'Language enum
   }
   messageValues = {
     video_id: 111770
-    toggle_state: "ON"  'ToggleState enum
-    language_code: "EN"  'Language enum
+    toggle_state: "ON" 'ToggleState enum
+    language_code: "EN" 'Language enum
   }
 
   'with message base
@@ -491,8 +491,8 @@ Function tubiTracking_populateMessage_test()
 
   'with empty message values
   messageValues = {
-    toggle_state: ""  'ToggleState enum
-    language_code: "EN"  'Language enum
+    toggle_state: "" 'ToggleState enum
+    language_code: "EN" 'Language enum
   }
   populatedMessage = Tracking.populateMessage(messageType, messageValues, messageBase)
   m.assertInvalid(populatedMessage.subtitles_toggle.video_id)
@@ -518,7 +518,7 @@ Function tubiTracking_isEmptyValue_test()
   emptyArray = []
   fullArray = ["a"]
   emptyAA = {}
-  fullAA = {a: "hi"}
+  fullAA = { a: "hi" }
 
   m.assertTrue(Tracking.isEmptyValue(emptyString))
   m.assertFalse(Tracking.isEmptyValue(fullString))
@@ -546,7 +546,7 @@ Function tubiTracking_isNumeric_test()
   f = 1.23
   s = "hi"
   a = [0]
-  aa = {a:0}
+  aa = { a: 0 }
   n = CreateObject("roSGNode", "ContentNode")
   inv = invalid
 
@@ -584,7 +584,7 @@ Function tubiTracking_getLanguageCode_test()
   m.assertEqual(languageCode, "FR")
 
   languageCode = m.Tracking.getLanguageCode("fr")
-  m.assertEqual(languageCode, "FR")  
+  m.assertEqual(languageCode, "FR")
 
   languageCode = m.Tracking.getLanguageCode("GER")
   m.assertEqual(languageCode, "DE")
@@ -690,4 +690,58 @@ Function tubiTracking_getViewableImpressionEvent_test()
   m.assertEqual(eventInfo.platform, constants.analyticsPlatform)
   m.assertArrayCount(eventInfo.containers, 1)
   m.assertAAHasKey(eventInfo, "user_id")
+End Function
+
+
+'@Test generateQoSRealtimeMetrics unit tests
+Function tubiTracking_generateQoSRealtimeMetrics_test()
+  tracking = m.tracking
+
+  data = {
+    adViewTime: 0
+    contentFirstFrameDuration: 1445
+    startupFailure: 0
+    viewTime: 5
+    adFirstFrameDuration: 3
+    dummyInfo: 8
+    seekCount: 2
+  }
+
+  cdn = "cloudfront"
+  trackData = tracking.generateQoSRealtimeMetrics(data, cdn)
+  m.assertNotInvalid(trackData)
+  m.assertNotInvalid(trackData.distribution)
+  m.assertArrayCount(trackData.distribution, 2)
+  m.assertEqual(trackData.distribution[0].tags.cdn, "cloudfront")
+  m.assertNotInvalid(trackData.increment)
+  m.assertArrayCount(trackData.increment, 4)
+  m.assertEqual(trackData.increment[0].tags.cdn, "cloudfront")
+
+  data = {
+    adViewTime: 0
+    contentFirstFrameDuration: 1445
+    viewTime: 5
+    adFirstFrameDuration: 3
+    dummyInfo: 8
+  }
+
+  cdn = "akamai"
+  trackData = tracking.generateQoSRealtimeMetrics(data, cdn)
+  m.assertNotInvalid(trackData)
+  m.assertNotInvalid(trackData.distribution)
+  m.assertArrayCount(trackData.distribution, 0)
+  m.assertNotInvalid(trackData.increment)
+  m.assertArrayCount(trackData.increment, 4)
+  m.assertEqual(trackData.increment[0].tags.cdn, "akamai")
+
+  data = {
+    dummyInfo: 8
+  }
+
+  trackData = tracking.generateQoSRealtimeMetrics(data, cdn)
+  m.assertNotInvalid(trackData)
+  m.assertNotInvalid(trackData.distribution)
+  m.assertArrayCount(trackData.distribution, 0)
+  m.assertNotInvalid(trackData.increment)
+  m.assertArrayCount(trackData.increment, 0)
 End Function

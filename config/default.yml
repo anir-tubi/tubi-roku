@@ -40,6 +40,9 @@ settings:
   # Setting the below value to false will disable sending logs to client logs.
   clientLogsEnabled: true
 
+  # Setting the below value to false will disable sending realtime metrics to Datadog.
+  realtimeMetricsEnabled: true
+
   # Setting useLogSampling to false will send all client logs regardless of the sampling percentage to tubiLog().
   useLogSampling: true
 

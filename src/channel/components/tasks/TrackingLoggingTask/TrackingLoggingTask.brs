@@ -9,6 +9,7 @@ Function init()
   m.top.observeField("logException", m.port)
   m.top.observeField("analyticsAppMode", m.port)
   m.top.observeField("userConsentsOptOutStatus", m.port)
+  m.top.observeField("trackRealtimeEvent", m.port)
 
   m.constants = getConstantsFromGlobal()
   m.externalConfigInfo = getExternalConfigInfoFromGlobal()
@@ -43,7 +44,9 @@ Function watchLoop()
       if field = "trackEvent" then
         trackSceneGraphEvent(data, m.analyticsAppMode)
       else if field = "trackPlayerEvent" then
-        trackSceneGraphPlayerEvent(data)  
+        trackSceneGraphPlayerEvent(data)
+      else if field = "trackRealtimeEvent" then
+        trackSceneGraphRealtimeEvent(data)
       else if field = "logMsg" then
         sendSceneGraphLog(data)
       else if field = "logException" then
@@ -68,7 +71,7 @@ Function trackSceneGraphEvent(evtData, analyticsAppMode)
   if evtData <> invalid AND type(evtData.type) = "roString"
     tubiLog("TrackingLoggingTask.trackSceneGraphEvent for " + evtData.type)
     evtData.values.appMode = analyticsAppMode
-    m.tracking.trackUserEvent(evtData.type, evtData.values, m.queue)  'creates a request and adds it to the requestQueue
+    m.tracking.trackUserEvent(evtData.type, evtData.values, m.queue) 'creates a request and adds it to the requestQueue
   end if
 End Function
 
@@ -78,7 +81,17 @@ End Function
 '           values: assocArray, fields that correspond to the fields specified for the eventType in m.tracking.getAnalyticsEvent()
 Function trackSceneGraphPlayerEvent(evtData)
   if evtData <> invalid AND isAA(evtData) = true
-    m.tracking.trackPlayerEvent(evtData, m.queue)  'creates a request and adds it to the requestQueue
+    m.tracking.trackPlayerEvent(evtData, m.queue) 'creates a request and adds it to the requestQueue
+  end if
+End Function
+
+
+'@evtData: assocArray, has the following fields
+'           type: string, corresponds to one of the eventTypes found in m.tracking.getAnalyticsEvent()
+'           values: assocArray, fields that correspond to the fields specified for the eventType in m.tracking.getAnalyticsEvent()
+Function trackSceneGraphRealtimeEvent(evtData)
+  if evtData <> invalid AND isAA(evtData) = true
+    m.tracking.trackRealtimeEvent(evtData, m.queue) 'creates a request and adds it to the requestQueue
   end if
 End Function
 

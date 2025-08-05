@@ -675,6 +675,22 @@ Function getConstants()
     constants.urls.analyticsV3.sendEvent = "https://analytics-ingestion-v3.main-production-custom.production.k8s.tubi.io/ingestion/v3/events"
   end if
 
+  constants.urls.realtime = {}
+  constants.urls.realtime.urlBase = "https://realtime-logger.staging-public.tubi.io"
+  if mode = "production"
+    constants.urls.realtime.urlBase = "https://realtime-logger.production-public.tubi.io"
+  end if
+
+  constants.urls.realtime.increment = constants.urls.realtime.urlBase + "/metric/increment"
+  constants.urls.realtime.distribution = constants.urls.realtime.urlBase + "/metric/distribution"
+
+  constants.urls.impressionEvents = {}
+  constants.urls.impressionEvents.urlBase = "https://user-signals.staging-public.tubi.io/user-signals"
+  ' QA analytics proxy server
+  if mode = "production"
+    constants.urls.impressionEvents.urlBase = "https://user-signals.production-public.tubi.io/user-signals"
+  end if
+
   constants.urls.impressionEvents = {}
   constants.urls.impressionEvents.urlBase = "https://user-signals.staging-public.tubi.io/user-signals"
   ' QA analytics proxy server
@@ -1557,6 +1573,31 @@ Function getConstants()
 
   ' Creates mapping against parental rating to a header string.
   constants.serverValues.parentalControls = ["YOUNGER_CHILD", "OLDER_CHILD", "TEEN", "ADULT"]
+
+  constants.urls.realtime.distributionMapping = {
+    "viewTime": true,
+    "bufferingCount": true,
+    "bufferingDuration": true,
+    "seekDuration": true,
+    "contentFirstFrameDuration": true,
+    "resumeFirstFrameDuration": true,
+    "adViewTime": true,
+    "adFirstFrameDuration": true,
+    "adBufferingDuration": true
+  }
+
+  constants.urls.realtime.incrementMapping = {
+    "startupFailure": true,
+    "playFailure": true,
+    "playBreakOff": true,
+    "seekCount": true,
+    "resumeFailureAfterMidroll": true,
+    "resumeCount": true,
+    "adCount": true,
+    "adNotStartupCount": true,
+    "bufferingAdCount": true,
+    "errorAdCount": true
+  }
 
   constants.serverValues.contentModeHeaders = {}
   constants.serverValues.contentModeHeaders[constants.ui.contentMode.latino] = "LATINO"

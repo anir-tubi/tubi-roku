@@ -3,7 +3,7 @@ Function retrieveClientErrorConfig(successCallback = retrieveClientErrorConfigSu
   ' If the global field is not set then we need to add it.
   if getClientErrorConfigFromGlobal(invalid) = invalid
     m.global.update({
-      "clientErrorConfig" : {}
+      "clientErrorConfig": {}
     }, true)
   end if
 
@@ -231,6 +231,12 @@ Function updateConstantsValuesFromExternalConfig(config)
       m.constants.settings.clientLogsEnabled = false
     end if
 
+    'realtime metric disabled by the remote config
+    realtimeMetricsEnabled = config.realtime_metric_enabled
+    if realtimeMetricsEnabled = 0 OR realtimeMetricsEnabled = false
+      m.constants.settings.realtimeMetricsEnabled = false
+    end if
+
     ' Since we're modifying constants here we need to push up the changes to the global copy
     m.global.constants = m.constants
     m.updateGeneralTaskConstants(m.constants)
@@ -306,12 +312,12 @@ End Function
 
 
 Function retrieveSoTStaticConfigSuccessCallback(staticConfig)
-  if staticConfig <> invalid AND m.global <> invalid 
-    m.global.update({"soTStaticConfig": staticConfig}, true)
+  if staticConfig <> invalid AND m.global <> invalid
+    m.global.update({ "soTStaticConfig": staticConfig }, true)
     m.updateGeneralTaskSoTStaticConfig(staticConfig)
   end if
 
-  setSoTStaticConfigComplete() 
+  setSoTStaticConfigComplete()
 End Function
 
 
@@ -319,7 +325,7 @@ Function retrieveSoTStaticConfigErrorCallback(_error = invalid)
   setSoTStaticConfigComplete()
 End Function
 
-' Check : if this function can be removed. Calling runControllerStartSequence() here waits for SoT static config to be complete which 
+' Check : if this function can be removed. Calling runControllerStartSequence() here waits for SoT static config to be complete which
 ' increases the time to load the app. Since SoT is nice to have and not a blocker for the app to load, we can remove this function in the future.
 Function setSoTStaticConfigComplete()
   m.soTStaticConfigComplete = true

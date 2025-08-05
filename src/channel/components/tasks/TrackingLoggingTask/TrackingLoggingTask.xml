@@ -65,5 +65,7 @@
 
       <!-- Holds the consent opt out status for all individual preferences like marketing,analytics etc. -->
       <field id="userConsentsOptOutStatus" type="assocarray" value="{}"/>
+
+      <field id="trackRealtimeEvent" type="assocarray" alwaysNotify="true"/>
   </interface>
 </component>

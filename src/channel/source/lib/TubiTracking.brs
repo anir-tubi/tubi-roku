@@ -21,6 +21,10 @@ Function TubiTracking(constants, auth, userConsentsOptOutStatus = {}, request = 
     getPlayerAnalyticsEvent: tubiTracking_getPlayerAnalyticsEvent
     createPlayerTrackingReqInfo: tubiTracking_createPlayerTrackingReqInfo
 
+    trackRealtimeEvent: tubiTracking_trackRealtimeEvent
+    generateQoSRealtimeMetrics: tubiTracking_generateQoSRealtimeMetrics
+    getRealtimeTrackingRequest: tubiTracking_getRealtimeTrackingRequest
+
     getViewableImpressionEvent: tubiTracking_getViewableImpressionEvent
     createViewableImpressionTrackingReqInfo: tubiTracking_createViewableImpressionTrackingReqInfo
 
@@ -1488,6 +1492,67 @@ Function tubiTracking_getPlayerAnalyticsEvent(eventType, eventValues) as Object
 End Function
 
 
+'@trackData: assocArray, object returned from m.generateQoSRealtimeMetrics()
+'@requestQueue: assocArray, a request queue as returned by TubiRequestQueue().create()
+Function tubiTracking_trackRealtimeEvent(trackData, requestQueue)
+  incrementData = trackData.increment
+  incrementRequestUrl = m.constants.urls.realtime.increment
+  incrementRealtimeRequest = invalid
+
+  if isNonEmptyArray(incrementData) = true
+    incrementRealtimeRequest = m.getRealtimeTrackingRequest(incrementData, incrementRequestUrl)
+  end if
+
+  if incrementRealtimeRequest <> invalid AND requestQueue <> invalid
+    requestQueue.pushRequest(incrementRealtimeRequest)
+  end if
+
+  distributionData = trackData.distribution
+  distributionRequestUrl = m.constants.urls.realtime.distribution
+  distributionRealtimeRequest = invalid
+
+  if isNonEmptyArray(distributionData) = true
+    distributionRealtimeRequest = m.getRealtimeTrackingRequest(distributionData, distributionRequestUrl)
+  end if
+
+  if distributionRealtimeRequest <> invalid AND requestQueue <> invalid
+    requestQueue.pushRequest(distributionRealtimeRequest)
+  end if
+End Function
+
+
+'@keyValuePairs: assocarray, keys from constants.urls.realtime.distributionMetrics/constants.urls.realtime.incrementMetrics
+'@cdn: string, possible values are cloudfront, fastly, akamai
+Function tubiTracking_generateQoSRealtimeMetrics(keyValuePairs as Object, cdn as String) as Object
+  incrementMetrics = []
+  distributionMetrics = []
+
+  for each key in keyValuePairs
+    metricKey = "web-ott.performance.metrics.vodQos." + key
+    metric = {
+      "metric": metricKey,
+      "value": keyValuePairs[key],
+      "tags": {
+        "cdn": cdn
+      }
+    }
+
+    if m.constants.urls.realtime.distributionMapping.DoesExist(key) = true
+      incrementMetrics.push(metric)
+    else if m.constants.urls.realtime.incrementMapping.DoesExist(key) = true
+      distributionMetrics.push(metric)
+    else
+      tubiLog("realtime QoS key does not exists in increment or distribution metric map", "warn")
+    end if
+  end for
+
+  return {
+    "increment": incrementMetrics,
+    "distribution": distributionMetrics
+  }
+End Function
+
+
 Function tubiTracking_getViewableImpressionEvent(eventValues) as Object
   eventBase = {
     containers: [] ' Repeated property of type container.
@@ -1548,4 +1613,78 @@ Function tubiTracking_isNowWithinTimePeriod(startTime, endTime)
   end if
 
   return false
+End Function
+
+
+'@trackData: assocArray, object returned from m.getTrackData()
+'@requestUrl: String, url of the request
+Function tubiTracking_getRealtimeTrackingRequest(trackData, requestUrl) as Object
+  if m.request = invalid then
+    print "Request object is invalid. Cannot send request. Note request should only be supplied in tasks"
+    return invalid
+  end if
+
+  options = {
+    method: m.constants.reqTypes.post
+    body: FormatJson(trackData)
+  }
+
+  canCreateRequest = true
+
+  authInfo = m.auth.getAuthInfo()
+  if authInfo = invalid OR m.auth.checkIfAuthExpired(authInfo) = true then
+    ' bs:disable-next-line 1001 LINT1001
+    if isFunction(getUpdatedAuth) = true then
+      ' If we need updated auth then we are blocking the request here while we get the updated auth with a 10 second time out
+      port = createObject("roMessagePort")
+      getUpdatedAuth(port) 'bs:disable-line 1140 LINT1001
+      ts = createObject("roTimespan")
+      while true
+        msg = wait(100, port)
+
+        if ts.totalMilliseconds() >= 10000 then
+          tubiLog("Failed to get updated auth info. Timed out after 10 seconds", "warn")
+          exit while
+        end if
+
+        'bs:disable-next-line 1140 LINT1001
+        if conditionallyProcessAuthUpdatedMessage(msg) = true then
+          exit while
+        end if
+      end while
+
+      authInfo = m.auth.getAuthInfo()
+      if authInfo = invalid OR m.auth.checkIfAuthExpired(authInfo) = true then
+        tubiLog("Failed to get updated auth info. Can not create tracking request", "warn")
+        canCreateRequest = false
+      end if
+    else
+      tubiLog("getUpdatedAuth() function is not defined. Cannot send request.", "warn")
+      canCreateRequest = false
+    end if
+  else if m.auth.checkIfAuthExpired(authInfo, 60 * 10) = true then
+    ' We are proactively retrieving updated auth info if it expires in the next ten minutes. In this case we are not blocking the request while we get the updated auth
+
+    ' bs:disable-next-line 1001 LINT1001
+    if isFunction(getUpdatedAuth) = true then
+      getUpdatedAuth() 'bs:disable-line 1140 LINT1001
+    else
+      tubiLog("getUpdatedAuth() function is not defined. Continuing for now without updating auth.", "warn")
+    end if
+  end if
+
+  if canCreateRequest = true then
+    headers = m.auth.getAuthHeaders(authInfo.accessToken)
+    if headers <> invalid
+      if options.headers = invalid
+        options.headers = {}
+      end if
+      options.headers.append(headers)
+    end if
+
+    userRequest = m.request.createAsync(requestUrl, "realtime", options)
+    return userRequest
+  else
+    return invalid
+  end if
 End Function

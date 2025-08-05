@@ -1,8 +1,8 @@
 ' This file is used to send playerlogs. Please refer to the document below for details on all events:
 ' Document - https://www.notion.so/tubi/RFC-Player-Analytics-Event-v1-0-b8bee0eb69d14cc891baf8e907635f2f
-' 
+'
 '@constants: assocArray, constants as set in Constants.brs
-'@tracking: assocArray, a request queue as returned by TubiRequestQueue().create(), default as invalid 
+'@tracking: assocArray, a request queue as returned by TubiRequestQueue().create(), default as invalid
 '
 Function PlayerLogLib(constants, tracking)
   deviceInfo = CreateObject("roDeviceInfo")
@@ -29,15 +29,15 @@ Function PlayerLogLib(constants, tracking)
     streamBitrate: 0 'the current bitrate being used for streaming, used in userFeedback event
     measuredBitrate: 0 'actual bitrate that is being measured at the network level, used in userFeedback
 
-    singleSeekThreshold: 3600000 'threshold of single seek duration in milliseconds 
-    singleBufferingThreshold: 3600000 'threshold of single buffering duration in milliseconds 
+    singleSeekThreshold: 3600000 'threshold of single seek duration in milliseconds
+    singleBufferingThreshold: 3600000 'threshold of single buffering duration in milliseconds
 
     '//video fields
     content: invalid 'node which holds the content information, used in various events
-    
-    'The contentStartPerformance event should be triggered in the following situations: when the content starts or resumes playback, and after each AdPod. 
-    'The variable m.isVideoPlayed helps determine when to trigger this event. 
-    'If isVideoPlayed is set to false, it indicates that the contentStartPerformance event has not been fired during the current playback session. 
+
+    'The contentStartPerformance event should be triggered in the following situations: when the content starts or resumes playback, and after each AdPod.
+    'The variable m.isVideoPlayed helps determine when to trigger this event.
+    'If isVideoPlayed is set to false, it indicates that the contentStartPerformance event has not been fired during the current playback session.
     'If isVideoPlayed is true, it means the event has already been triggered for this session.
     isVideoPlayed: false
 
@@ -79,21 +79,21 @@ Function PlayerLogLib(constants, tracking)
     totalSeekDuration: 0 'used in qualityOfService event
 
     'totalBufferingDuration is referenced in PlayerPageExit -> message_map -> bufferLength.
-    'It represents the duration of the most recent buffering event. It measures the time between when buffering starts and when playback resumes. 
+    'It represents the duration of the most recent buffering event. It measures the time between when buffering starts and when playback resumes.
     'When a new buffering event occurs, the previous value should be reset.
     'mostRecentBufferingTimer helps to set this value
     mostRecentBufferDuration: 0 'used on playerExit message_map
 
     totalViewTime: 0 'used in qualityOfService event
     totalContentResumeFirstFrameDuration: 0 'used in qualityOfService event
-    
+
     'used to calculate download_frag_bitrate & download_speed in qualityOfService event
     totalSegSize: 0
     totalAudioSegDuration: 0
     totalVideoSegDuration: 0
     totalDownloadDuration: 0
-    
-    isAutoResolution: false 'used in qualityOfService event  
+
+    isAutoResolution: false 'used in qualityOfService event
     duration: 0 'used in userFeedback event
     captions: [] 'used in find the index of selected caption for userFeedback event
     captionsIndex: 0 'used in userFeedback event
@@ -124,13 +124,15 @@ Function PlayerLogLib(constants, tracking)
     adStartupFailureCount: 0 'used in qualityOfService event
     adReBuffer: 0 'used in qualityOfService event
     totalAdFirstFrameDuration: 0 'used in qualityOfService event
-    adStartupFailureCount: 0 'used in qualityOfService event
     failedAdCount: 0 'used in qualityOfService event
     adCount: 0 'used in qualityOfService event
     latestAdPodStartupResult: {} 'used in userFeedback event
     playbackSource: {} 'used on playerExit message_map
     fallbackCount: 0 'used on playerExit message_map
     adPlayed: false 'used on playerExit message_map
+    adBufferingDuration: 0 'used in realtime->Qos event
+    adBestStatus: {} 'tracks the best status each ad ever achieved, used to calculate adNotStartupCount in Realtime->Qos event
+    adReBufferTracker: {} 'tracks which ads have experienced re-buffering to count unique ads only once
 
     '//timers
     playerSetupTimer: CreateObject("roTimespan") 'helps to calculate playerSetupTime for playerSetupPerformance event
@@ -142,6 +144,7 @@ Function PlayerLogLib(constants, tracking)
     timeOnPlayerScreen: CreateObject("roTimespan") 'helps to calculate time spent on player screen before hitting exit, used in message_map of playerExit event
     mostRecentBufferingTimer: invalid 'used for message_map in Player page exit event
     totalSeekDurationTimer: invalid 'helps to calculate total seeking duration for QoS event
+    adBufferingDurationTimer: CreateObject("roTimespan") 'helps to calculate adBufferingDuration for Realtime->QoS event
 
     '//browse while watching fields
     bwwOpenCount: 0 ' tracks total number of times user opens browse while watching tray.
@@ -191,11 +194,14 @@ Function PlayerLogLib(constants, tracking)
     setAdType: playerLogLib_setAdType
     setAdBufferStartTime: playerLogLib_setAdBufferStartTime
     resetAdMetrics: playerLogLib_resetAdMetrics
-    incrementAdReBuffer: playerLogLib_incrementAdReBuffer
+    trackAdReBuffer: playerLogLib_trackAdReBuffer
     setAdCount: playerLogLib_setAdCount
     setAdStartupFailureCount: playerLogLib_setAdStartupFailureCount
     setAdPodStartupResult: playerLogLib_setAdPodStartupResult
     setAdPlayed: playerLogLib_setAdPlayed
+    setAdBufferingDurationStartTime: playerLogLib_setAdBufferingDurationStartTime
+    setAdBufferingDurationEndTime: playerLogLib_setAdBufferingDurationEndTime
+    getAdsExitedBeforeFirstFrame: playerLogLib_getAdsExitedBeforeFirstFrame
 
     'public functions which fire events
     fireCuepointFilledEvent: playerLogLib_fireCuepointFilledEvent
@@ -207,6 +213,7 @@ Function PlayerLogLib(constants, tracking)
     firePlayerPageExitEvent: playerLogLib_firePlayerPageExitEvent
     fireAdStartupPerformanceEvent: playerLogLib_fireAdStartupPerformanceEvent
     fireAdMissedEvent: playerLogLib_fireAdMissedEvent
+    fireRealtimeQoSEvent: playerLogLib_fireRealtimeQoSEvent
     fireContentErrorEvent: playerLogLib_fireContentErrorEvent
     setAdPodStart: playerLogLib_setAdPodStart
 
@@ -237,8 +244,9 @@ Function PlayerLogLib(constants, tracking)
     resetAdType: playerLogLib_resetAdType
 
     sendEvent: playerLogLib_sendEvent
+    sendRealtimeEvent: playerLogLib_sendRealtimeEvent
   }
-End Function 
+End Function
 
 
 '@adType: String, possible values are "preroll", "seek", "midroll"
@@ -264,7 +272,7 @@ Function playerLogLib_setPlayerStateWhenExitingPlayer(playerStateWhenExitingPlay
   if isString(playerStateWhenExitingPlayer) = true
     m.playerStateWhenExitingPlayer = playerStateWhenExitingPlayer
   else
-    m.playerStateWhenExitingPlayer = ""  
+    m.playerStateWhenExitingPlayer = ""
   end if
 End Function
 
@@ -275,7 +283,7 @@ Function playerLogLib_setVideoStateWhenExitingPlayer(videoStateWhenExitingPlayer
   if isString(videoStateWhenExitingPlayer) = true
     m.videoStateWhenExitingPlayer = videoStateWhenExitingPlayer
   else
-    m.videoStateWhenExitingPlayer = ""  
+    m.videoStateWhenExitingPlayer = ""
   end if
 End Function
 
@@ -286,7 +294,7 @@ Function playerLogLib_setPlayerAction(playerAction = "")
   if isString(playerAction) = true
     m.playerAction = playerAction
   else
-    m.playerAction = ""  
+    m.playerAction = ""
   end if
 End Function
 
@@ -353,7 +361,7 @@ Function playerLogLib_setVideoState(videoState = "")
         m.contentCount += 1 'increment the contentCount for every new title starts
         m.fireContentStartupPerformanceEvent(false, false)
         m.fireContentStartEvent(false, false)
-      end if  
+      end if
     end if
     m.isVideoPlayed = true
 
@@ -406,16 +414,16 @@ Function playerLogLib_setAdState(adState = "")
   end if
 
   if m.adState = "adsPending"
-    if m.adType = "preroll"  
+    if m.adType = "preroll"
       m.setPlayerStage("BEFORE_PREROLL")
     else
-      m.setPlayerStage("BEFORE_MIDROLL") 
+      m.setPlayerStage("BEFORE_MIDROLL")
     end if
   else if m.adState = "adsPlaying"
-    if m.adType = "preroll"  
+    if m.adType = "preroll"
       m.setPlayerStage("PREROLL")
     else
-      m.setPlayerStage("MIDROLL") 
+      m.setPlayerStage("MIDROLL")
     end if
     m.setAdPlayed(true)
   else if m.adState = "adsCompleted"
@@ -427,10 +435,10 @@ Function playerLogLib_setAdState(adState = "")
       m.playerPositionWhenAdsCompleted = playerPosition
     end if
 
-    if m.adType = "preroll"  
+    if m.adType = "preroll"
       m.setPlayerStage("AFTER_PREROLL")
     else
-      m.setPlayerStage("AFTER_MIDROLL") 
+      m.setPlayerStage("AFTER_MIDROLL")
       m.setFirstFrameForContentStartAfterMidroll()
     end if
   end if
@@ -465,7 +473,7 @@ Function playerLogLib_setFirstFrameForContentStartAfterMidroll()
 End Function
 
 
-'@videoControl: String, possible values are "play", "stop", "pause", "resume", "replay", "prebuffer", "skipcontent", "none" 
+'@videoControl: String, possible values are "play", "stop", "pause", "resume", "replay", "prebuffer", "skipcontent", "none"
 '
 Function playerLogLib_setVideoControl(videoControl = "")
   if isNonEmptyString(videoControl) = true
@@ -535,7 +543,7 @@ Function playerLogLib_setVideoContent(content = invalid)
     if isNonEmptyString(url) = true
       if url.InStr("fastly") > 0
         m.cdn = "fastly"
-      else if url.InStr("cloudfront") > 0
+      else if url.InStr("cloudfront") > 0 OR url.InStr("cf") > 0
         m.cdn = "cloudfront"
       else if url.InStr("akamai") > 0
         m.cdn = "akamai"
@@ -563,7 +571,7 @@ Function playerLogLib_setVideoPosition(playerPosition = -1)
   if isNumber(playerPosition) = true AND isNumber(m.playerPositionWhenAdsCompleted) = true
     m.videoPosition = playerPosition
 
-    'we calculate tvt only when after video starts playing 
+    'we calculate tvt only when after video starts playing
     if m.lastStartStep <> "START_LOAD" AND m.lastStartStep <> "UNKNOWN"
       m.totalViewTime += 1
     end if
@@ -608,7 +616,7 @@ Function playerLogLib_setPlayerLoadTime(playerLoadTime = -1)
 End Function
 
 
-' Player Setup Performance event will be triggered once player is configured, 
+' Player Setup Performance event will be triggered once player is configured,
 ' It will calculate the duration cost from the user pressing play/resume button to player setup
 '
 Function playerLogLib_firePlayerSetupPerformanceEvent()
@@ -643,15 +651,15 @@ Function playerLogLib_sendEvent(data = {} as Dynamic, subType = "" as String, ev
     eventInfo = m.tracking.populateMessage(subType, data, eventBase)
 
     if eventInfo <> invalid
-      eventValues =  eventInfo[subType]
+      eventValues = eventInfo[subType]
 
       if isAA(eventValues) = true
         trackData = m.tracking.getPlayerAnalyticsEvent(subType, eventValues)
-    
+
         if m.trackingLoggingTask = invalid then
           m.trackingLoggingTask = getGlobalAA().global.trackingLoggingTask
         end if
-    
+
         if m.trackingLoggingTask <> invalid then
           m.trackingLoggingTask.trackPlayerEvent = trackData
         end if
@@ -734,7 +742,7 @@ Function playerLogLib_setPlayerSetupEndTime()
 End Function
 
 
-'setErrorModal helps to identify whether any error modal is displayed while exiting the player 
+'setErrorModal helps to identify whether any error modal is displayed while exiting the player
 Function playerLogLib_setErrorModal(hasErrorModalShown = false)
   if isBoolean(hasErrorModalShown) = true
     m.hasErrorModalShown = hasErrorModalShown
@@ -831,7 +839,7 @@ Function playerLogLib_firePlayerPageExitEvent(playerExitInfo)
     playerExitInfo["content_counts"] = m.contentCount
     playerExitInfo["stage"] = m.playerStage
     playerExitInfo["is_buffering"] = m.isBuffering
-  
+
     if isNonEmptyString(m.playerFeedback) = true
       playerExitInfo["feedback"] = m.playerFeedback
     end if
@@ -879,7 +887,7 @@ Function playerLogLib_fireContentStartEvent(isFromPreroll, isAfterAd)
 
   if playerPosition > -1
     startPosition = playerPosition
-  else if isNode(m.content) = true and isNumber(m.content.nowPos) = true
+  else if isNode(m.content) = true AND isNumber(m.content.nowPos) = true
     startPosition = m.content.nowPos
   end if
 
@@ -913,7 +921,7 @@ End Function
 '
 'resourceInfo: assocarray, contains failedType(possible values are CODEC/DRM), currentResource(failed) & nextResource(fallback) which is needed for sending event
 Function playerLogLib_fireVideoResourceFallbackEvent(resourceInfo)
-  m.fallbackCount += 1  
+  m.fallbackCount += 1
 
   eventBase = {
     track_id: ""
@@ -941,7 +949,7 @@ End Function
 
 
 'The Ad Startup Performance event will be triggered when Ad starts.
-'It helps to monitor slow start of Ads 
+'It helps to monitor slow start of Ads
 '
 '@adCtx: assocArray: holds ad related information (eg. adCount, adIndex, adServer, duration etc.,)
 Function playerLogLib_fireAdStartupPerformanceEvent(adCtx = {})
@@ -1004,7 +1012,7 @@ Function playerLogLib_fireAdStartEvent(adCtx = {})
   if isAA(adCtx) = true
     adStartInfo = m.updateSingleAdInfo(adCtx)
     adStartInfo["video_id"] = m.videoId
-    m.sendEvent(adStartInfo, "ad_start", eventBase)   
+    m.sendEvent(adStartInfo, "ad_start", eventBase)
   end if
 End Function
 
@@ -1031,7 +1039,7 @@ Function playerLogLib_fireAdCompleteEvent(adCtx = {})
 
     adCompleteInfo = m.updateSingleAdInfo(adCtx)
     adCompleteInfo["video_id"] = m.videoId
-    m.sendEvent(adCompleteInfo, "ad_complete", eventBase)   
+    m.sendEvent(adCompleteInfo, "ad_complete", eventBase)
   end if
 End Function
 
@@ -1068,10 +1076,10 @@ Function playerLogLib_fireAdDiscontinueEvent(adCtx = {})
     adDiscontinueInfo["ad_position"] = adPosition
     adDiscontinueInfo["video_id"] = m.videoId
     adDiscontinueInfo["reason"] = "error"
-    m.sendEvent(adDiscontinueInfo, "ad_discontinue", eventBase)   
+    m.sendEvent(adDiscontinueInfo, "ad_discontinue", eventBase)
   end if
 
-  'this is used in quality of service event 
+  'this is used in quality of service event
   m.failedAdCount += 1
 End Function
 
@@ -1148,7 +1156,7 @@ Function playerLogLib_resetAdMetrics()
 End Function
 
 
-'setLastStartStep sets value to m.lastStartStep. 
+'setLastStartStep sets value to m.lastStartStep.
 'START_LOAD represents player start load but has not shown first frame;
 'IEWED_FIRST_FRAME represents viewed first frame;
 'PLAY_STARTED represents first frame viewed and player position progressed normally.
@@ -1165,7 +1173,7 @@ End Function
 
 'setIsAd sets value to m.isAd
 '
-'@isAd: boolean, used in events to identify whether the player is playing Ad or regular video 
+'@isAd: boolean, used in events to identify whether the player is playing Ad or regular video
 '
 Function playerLogLib_setIsAd(isAd = false)
   if isBoolean(isAd) = true
@@ -1174,10 +1182,17 @@ Function playerLogLib_setIsAd(isAd = false)
 End Function
 
 
-'incrementAdReBuffer increments the value of adRebuffer by 1
+'trackAdReBuffer tracks unique ads that experienced re-buffering
+'@adId: string, the unique identifier for the ad
 '
-Function playerLogLib_incrementAdReBuffer()
-  m.adReBuffer += 1
+Function playerLogLib_trackAdReBuffer(adId = "")
+  if isNonEmptyString(adId) = true
+    ' Only increment if this ad hasn't been tracked for re-buffering yet
+    if m.adReBufferTracker[adId] = invalid
+      m.adReBufferTracker[adId] = true
+      m.adReBuffer += 1
+    end if
+  end if
 End Function
 
 
@@ -1270,7 +1285,7 @@ End Function
 Function playerLogLib_setSeekStartTime()
   m.totalSeekDurationTimer = CreateObject("roTimespan")
   m.totalSeekDurationTimer.mark()
-End function
+End Function
 
 
 '@seekDuration: integer, this is the seekDuration
@@ -1390,22 +1405,22 @@ Function playerLogLib_fireQualityOfServiceEvent(adImp = {})
   qualityOfServiceInfo["is_ad"] = m.isAd
   qualityOfServiceInfo["ad_ac"] = m.adCount
 
-  'download_speed represents the download speed (in kbits/s) within a playback session. 
-  'It is calculated by dividing the total size of downloaded fragments (total video fragments size + total audio fragments size) 
+  'download_speed represents the download speed (in kbits/s) within a playback session.
+  'It is calculated by dividing the total size of downloaded fragments (total video fragments size + total audio fragments size)
   'by the total fragment download duration.
   if m.totalSegSize > 0 AND m.totalDownloadDuration > 0
     downloadSpeed = (m.totalSegSize * 8 / 1000) / (m.totalDownloadDuration / 1000)
   else
-    downloadSpeed = 0  
+    downloadSpeed = 0
   end if
   qualityOfServiceInfo["download_speed"] = downloadSpeed
 
-  'download_frag_bitrate represents the average playback bitrate (in kbits/s) within a playback session. 
-  'It is calculated by dividing the total size of downloaded fragments (total video fragments size + total audio fragments size) 
+  'download_frag_bitrate represents the average playback bitrate (in kbits/s) within a playback session.
+  'It is calculated by dividing the total size of downloaded fragments (total video fragments size + total audio fragments size)
   'by the total fragment duration(maximum of total video fragments duration and total audio fragments duration).
   downloadFragBitrate = 0
-  
-  if m.totalSegSize > 0 
+
+  if m.totalSegSize > 0
     if m.totalAudioSegDuration > 0 AND m.totalVideoSegDuration > 0
       downloadFragBitrate = (m.totalSegSize * 8 / 1000) / (maxValue(m.totalAudioSegDuration, m.totalVideoSegDuration) / 1000)
     else if m.totalAudioSegDuration > 0
@@ -1416,7 +1431,6 @@ Function playerLogLib_fireQualityOfServiceEvent(adImp = {})
   end if
 
   qualityOfServiceInfo["download_frag_bitrate"] = downloadFragBitrate
-
   qualityOfServiceInfo["cdn"] = m.cdn
   qualityOfServiceInfo["resource_type"] = m.videoResourceType
   qualityOfServiceInfo["hdcp"] = m.hdcpVersion
@@ -1443,7 +1457,7 @@ Function playerLogLib_resetQoSAttributes()
   m.firstErrorCode = 0
   m.breakOffCount = 0
   m.videoBufferingCount = 0
-  m.totalBufferingDuration = 0 
+  m.totalBufferingDuration = 0
   m.totalSeekDuration = 0
   m.seekCount = 0
   m.isSeekExceededLimit = false
@@ -1455,11 +1469,12 @@ Function playerLogLib_resetQoSAttributes()
   m.adReBuffer = 0
   m.isAd = false
   m.adCount = 0
-
+  m.adBufferingDuration = 0
+  m.adBestStatus = {}
+  m.adReBufferTracker = {}
   m.bwwOpenCount = 0
   m.bwwDidConvert = false
   m.didUserSeeBwwPeek = false
-  
   m.totalSegSize = 0
   m.totalAudioSegDuration = 0
   m.totalVideoSegDuration = 0
@@ -1574,7 +1589,7 @@ End Function
 
 'setIsSeeking sets value to m.isAd
 '
-'@isSeeking: boolean, used in events to detect whether the video is seeking 
+'@isSeeking: boolean, used in events to detect whether the video is seeking
 '
 Function playerLogLib_setIsSeeking(isSeeking = false)
   if isBoolean(isSeeking) = true
@@ -1625,7 +1640,7 @@ Function playerLogLib_updateCaptionIndex(subtitleTrack = "")
     end for
   else
     m.captionsIndex = 0
-  end if  
+  end if
 End Function
 
 
@@ -1644,18 +1659,28 @@ Function playerLogLib_setAdPodStartupResult(adCtx = {})
       m.latestAdPodStartupResult = {}
     else if adCtx.type = "Impression"
       m.latestAdPodStartupResult[adId] = "VIEWED_FIRST_FRAME"
+      m.adBestStatus[adId] = "VIEWED_FIRST_FRAME"
     else if adCtx.type = "Start"
       m.latestAdPodStartupResult[adId] = "PLAY_STARTED"
+      m.adBestStatus[adId] = "PLAY_STARTED"
     else if adCtx.type = "Close"
       m.latestAdPodStartupResult[adId] = "START_LOAD"
+      ' Only set best status to START_LOAD if it hasn't achieved a better status
+      if m.adBestStatus[adId] = invalid
+        m.adBestStatus[adId] = "START_LOAD"
+      end if
     else if adCtx.type = "Error"
-      m.latestAdPodStartupResult[adId] = "UNKNOWN"  
+      m.latestAdPodStartupResult[adId] = "UNKNOWN"
+      ' Only set best status to UNKNOWN if it hasn't achieved a better status
+      if m.adBestStatus[adId] = invalid
+        m.adBestStatus[adId] = "UNKNOWN"
+      end if
     end if
   end if
 End Function
 
 
-'The Ad Missed event will be triggered when any ad pod is missed to play due to 
+'The Ad Missed event will be triggered when any ad pod is missed to play due to
 'autoplay, exitBeforeResponse, exitBeforePlayback, exitDuringPlayback
 '
 '@adMissedInfo: assocarray, contains reason, response_time, ad_count, total_ads_duration, position, cue_point
@@ -1707,8 +1732,130 @@ Function playerLogLib_setIsBuffering(isBuffering)
   if isBoolean(isBuffering) = true
     m.isBuffering = isBuffering
   else
-    m.isBuffering = false      
+    m.isBuffering = false
   end if
+End Function
+
+
+' playerLogLib_sendRealtimeEvent helps to send the event to backend through trackingLoggingTask
+'
+'@data: assocarray, the payload that needs to be sent
+Function playerLogLib_sendRealtimeEvent(data = {} as Dynamic)
+  'Do not send player events for trailers
+  if m.isTrailer = false
+    trackData = m.tracking.generateQoSRealtimeMetrics(data, m.cdn)
+
+    if m.trackingLoggingTask = invalid then
+      m.trackingLoggingTask = getGlobalAA().global.trackingLoggingTask
+    end if
+
+    if m.trackingLoggingTask <> invalid then
+      m.trackingLoggingTask.trackRealtimeEvent = trackData
+    end if
+  end if
+End Function
+
+
+'The fireRealtimeQoSEvent event will be triggered when a playback session ends
+'
+Function playerLogLib_fireRealtimeQoSEvent()
+  realtimeQosInfo = {}
+  realtimeQosInfo["viewTime"] = m.totalViewTime
+  realtimeQosInfo["startupFailure"] = m.adStartupFailureCount
+
+  if m.errorCode <> 0
+    realtimeQosInfo["playFailure"] = 1
+  end if
+
+  if m.errorCode <> 0 OR m.fallbackCount > 0
+    realtimeQosInfo["playBreakOff"] = 1
+  end if
+
+  if m.videoBufferingCount > 0
+    realtimeQosInfo["bufferingCount"] = m.videoBufferingCount
+  end if
+
+  if m.totalBufferingDuration > 0
+    realtimeQosInfo["bufferingDuration"] = (m.totalBufferingDuration * 1000)
+  end if
+
+  if m.seekCount > 0
+    realtimeQosInfo["seekCount"] = m.seekCount
+  end if
+
+  if m.totalSeekDuration > 0
+    realtimeQosInfo["seekDuration"] = (m.totalSeekDuration * 1000)
+  end if
+
+  if m.contentFirstFrameDuration >= 0 'very first time
+    realtimeQosInfo["contentFirstFrameDuration"] = m.contentFirstFrameDuration
+  end if
+
+  if m.playerStage = "AFTER_MIDROLL" AND m.videoState = "buffering"
+    realtimeQosInfo["resumeFailureAfterMidroll"] = 1
+  end if
+
+  if m.resumeCount > 0
+    realtimeQosInfo["resumeCount"] = m.resumeCount
+  end if
+
+  if m.totalContentResumeFirstFrameDuration > 0
+    realtimeQosInfo["resumeFirstFrameDuration"] = m.totalContentResumeFirstFrameDuration
+  end if
+
+  if m.adCount > 0
+    realtimeQosInfo["adCount"] = m.adCount
+  end if
+
+  realtimeQosInfo["adViewTime"] = m.totalAdDurationPerTitle
+
+  adsExitedBeforeFirstFrame = m.getAdsExitedBeforeFirstFrame()
+  if adsExitedBeforeFirstFrame > 0
+    realtimeQosInfo["adNotStartupCount"] = adsExitedBeforeFirstFrame
+  end if
+
+  if m.totalAdFirstFrameDuration > 0
+    realtimeQosInfo["adFirstFrameDuration"] = m.totalAdFirstFrameDuration
+  end if
+
+  if m.adReBuffer > 0
+    realtimeQosInfo["bufferingAdCount"] = m.adReBuffer
+  end if
+
+  if m.adBufferingDuration > 0
+    realtimeQosInfo["adBufferingDuration"] = m.adBufferingDuration
+  end if
+
+  if m.failedAdCountPerTitle > 0
+    realtimeQosInfo["errorAdCount"] = m.failedAdCountPerTitle
+  end if
+
+  m.sendrealtimeEvent(realtimeQosInfo)
+End Function
+
+
+Function playerLogLib_setAdBufferingDurationStartTime()
+  m.adBufferingDurationTimer.mark()
+End Function
+
+
+Function playerLogLib_setAdBufferingDurationEndTime()
+  m.adBufferingDuration += m.adBufferingDurationTimer.totalMilliseconds()
+End Function
+
+
+Function playerLogLib_getAdsExitedBeforeFirstFrame()
+  adsExitedBeforeFirstFrame = 0
+
+  for each adId in m.adBestStatus
+    bestStatus = m.adBestStatus[adId]
+    ' Count ads that never reached VIEWED_FIRST_FRAME or PLAY_STARTED
+    if bestStatus = "START_LOAD" OR bestStatus = "UNKNOWN"
+      adsExitedBeforeFirstFrame += 1
+    end if
+  end for
+
+  return adsExitedBeforeFirstFrame
 End Function
 
 

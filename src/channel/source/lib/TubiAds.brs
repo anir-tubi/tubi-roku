@@ -1057,7 +1057,10 @@ Function tubiAds_adBufferingCallback(eventType, ctx)
   else if eventType = "ReBufferingStart" then
     ctx.eventType = "reBuffer"
     m.containerNode.visible = false
-  else if eventType = "BufferingEnd" OR eventType = "ReBufferingEnd" then
+  else if eventType = "ReBufferingEnd" then
+    ctx.eventType = "reBufferEnd"
+    m.containerNode.visible = true
+  else if eventType = "BufferingEnd" then
     m.containerNode.visible = true
   end if
 

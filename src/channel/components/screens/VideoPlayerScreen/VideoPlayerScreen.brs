@@ -972,6 +972,10 @@ Function onControlChange()
     updatePlayerLogLib(m.playerLogLib, "fireQualityOfServiceEvent", m.adImpressionMap)
     m.adImpressionMap = { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0 } 'reset adImpressionMap after sending QualityOfService event
 
+    if m.constants.settings.realtimeMetricsEnabled = true
+      updatePlayerLogLib(m.playerLogLib, "fireRealtimeQoSEvent")
+    end if
+
     updatePlayerLogLib(m.playerLogLib, "setVideoStateWhenExitingPlayer", m.video.state)
     updatePlayerLogLib(m.playerLogLib, "setPlayerStateWhenExitingPlayer", m.top.state)
 
@@ -3519,8 +3523,14 @@ End Function
 Function onAdBufferingObject(msg)
   adBufferingInfo = msg.getData()
   if isAA(adBufferingInfo) = true AND adBufferingInfo.eventType = "reBuffer"
-    updatePlayerLogLib(m.playerLogLib, "incrementAdReBuffer")
+    if isAA(adBufferingInfo) = true AND isAA(adBufferingInfo.ad) = true AND adBufferingInfo.ad.adId <> invalid
+      updatePlayerLogLib(m.playerLogLib, "trackAdReBuffer", adBufferingInfo.ad.adId)
+    end if
     updatePlayerLogLib(m.playerLogLib, "setIsBuffering", true)
+    updatePlayerLogLib(m.playerLogLib, "setAdBufferingDurationStartTime")
+  else if isAA(adBufferingInfo) = true AND adBufferingInfo.eventType = "reBufferEnd"
+    updatePlayerLogLib(m.playerLogLib, "setAdBufferingDurationEndTime")
+    updatePlayerLogLib(m.playerLogLib, "setIsBuffering", false)
   else
     updatePlayerLogLib(m.playerLogLib, "setIsBuffering", false)
   end if
