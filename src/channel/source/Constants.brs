@@ -1522,7 +1522,7 @@ Function getConstants()
   ' This will help us to avoid showing the expanded video tile.
   ' We will include ads containers in this list in future.
   constants.ui.nonVideoTileGridItemTypes = [constants.ui.gridItemTypes.historySignedOutUser]
-  constants.ui.videoTilesListTranslation = [0, 144]
+  constants.ui.videoTilesListTranslation = [24, 144]
 
   constants.ui.uris = {}
 

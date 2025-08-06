@@ -1416,10 +1416,10 @@ Function setInlineVideoMetadataOverlay(featuredRowContent, columnFocused, rowFoc
   ' Predicting the next row to be focused based on current scroll direction.
   ' We will reset the metadata if user changes the scroll direction inside onFeaturedListScrollDirectionChange.
   screen = getCurrentScreen()
-  nextRow = rowFocused
+  nextRow = 1
   if screen.featuredListScrollDirection = "down"
     nextRow = rowFocused + 1
-  else
+  else if rowFocused > 0
     nextRow = rowFocused - 1
   end if
 
@@ -1587,9 +1587,9 @@ Function onFeaturedRowListTranslationChange(msg)
     if isVerticalScroll = true AND screen.inTransitCurrentFocusedItemBoundingRect <> invalid AND screen.inTransitCurrentFocusedItemBoundingRect.y <> 0
       inTransitRectY = screen.inTransitCurrentFocusedItemBoundingRect.y
       ' As soon as the scrolling stops we will hide the in transit video metadata overlay.
-      if screen.featuredListScrollingStatus = true
-        m.inTransitInlineVideoMetadataOverlay.opacity = 1
+      if screen.featuredListScrollingStatus = true AND isNumber(inTransitRectY)
         m.inTransitInlineVideoMetadataOverlay.translation = [165, translation[1] + inTransitRectY + 5]
+        m.inTransitInlineVideoMetadataOverlay.opacity = 1
       else
         m.inTransitInlineVideoMetadataOverlay.opacity = 0
       end if

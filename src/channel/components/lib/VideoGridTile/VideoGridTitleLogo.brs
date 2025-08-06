@@ -86,17 +86,17 @@ End Function
 
 
 Function setTitle(title = "", titleImageUri = "")
+  ' Stopping any existing animations
+  if m.titleAnimation <> invalid
+    m.titleAnimation.control = "finish"
+    m.titleAnimation = invalid
+  end if
+
   m.title.text = title
   titleImageUri = titleImageUri
   m.titleImage.scale = [1.0, 1.0]
-  m.titleGroup.opacity = 0
   m.titleImage.opacity = 0
-
-  ' Stopping any existing animations
-  if m.titleAnimation <> invalid
-    m.titleAnimation.control = "stop"
-    m.titleAnimation = invalid
-  end if
+  m.titleGroup.opacity = 0
 
   if isNonEmptyString(titleImageUri) = true
     m.titleImage.uri = titleImageUri

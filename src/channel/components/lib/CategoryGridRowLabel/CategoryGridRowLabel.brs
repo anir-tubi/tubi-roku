@@ -47,7 +47,7 @@ Function onSponsorPosterLoadStatusChanged(msg)
     nBoundingWidth = m.SponsoredByPoster.boundingRect().width
 
     m.SponsoredByPoster.height = 32
-    nWidth = (nBoundingWidth * m.SponsoredByPoster.height)/nBoundingHeight
+    nWidth = (nBoundingWidth * m.SponsoredByPoster.height) / nBoundingHeight
     m.SponsoredByPoster.width = nWidth
     m.SponsoredByPoster.visible = true
   end if
@@ -70,7 +70,7 @@ Function onContentChange()
     if item.subtext <> invalid AND item.subtext <> ""
       ' Purposely passing in invalid constants for each row label to avoid having to pull in constants for each row label
       authInfo = TubiAuth(invalid).getAuthInfo()
-      if isLoggedInUser(authInfo) = false  'signedOut user or new user
+      if isLoggedInUser(authInfo) = false 'signedOut user or new user
         'recalculate the width of the rowlabel. This is required because Spanish titles might be different width than english.
         m.CategoryName.width = 0
         m.CategoryName.text = item.title
@@ -78,8 +78,8 @@ Function onContentChange()
         m.CategoryName.width = width
         m.subText.text = item.subtext
         m.subText.height = m.CategoryName.boundingRect().height
-        m.subText.vertAlign = "center"
-        m.subText.translation = [width, 5]
+        m.subText.vertAlign = "bottom"
+        m.subText.translation = [width, 0]
         m.subText.visible = true
       end if
     end if
@@ -108,7 +108,7 @@ Function onContentChange()
       m.SponsorPoster.width = 48
       m.SponsorPoster.opacity = 1
       m.SponsorPoster.visible = true
-      m.CategoryName.translation = [m.SponsorPoster.translation[0] + 57 , m.CategoryName.translation[1]]
+      m.CategoryName.translation = [m.SponsorPoster.translation[0] + 57, m.CategoryName.translation[1]]
     else
       '//reset the assets in case the label is reused for other container rows that do not have sponsorships
       m.SponsoredByPoster.unobserveField("loadStatus")

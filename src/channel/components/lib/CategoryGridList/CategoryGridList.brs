@@ -1042,9 +1042,10 @@ Function updateCurrentFocusedItemBoundingRect()
     currFocusRow = rowItemFocused[0]
     ' Since we are trying to update the bounding rect as the user scrolls we cannot use any of the row list fields to figure out the next row.
     ' Based on the scroll direction we are updating the next focus row.
+    nextFocusRow = 1
     if m.top.featuredListScrollDirection = "down"
       nextFocusRow = currFocusRow + 1
-    else
+    else if currFocusRow > 0
       nextFocusRow = currFocusRow - 1
     end if
 

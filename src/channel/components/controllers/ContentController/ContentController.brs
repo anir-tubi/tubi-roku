@@ -107,6 +107,7 @@ Function addControllerUi()
   videoTilesListTranslation = m.constants.ui.videoTilesListTranslation
   ' Using clipping rect to ensure that when scrolling up the video tile gets clipped along with the rest of the row list tiles
   m.videoTileOverlayGroup.clippingRect = [videoTilesListTranslation[0], videoTilesListTranslation[1], 1920, 1080]
+  m.videoTileOverlayGroup.translation = [videoTilesListTranslation[0], -6]
 
   experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_3", false)
   ' This is used to track if the user is in the video tiles experiment.
