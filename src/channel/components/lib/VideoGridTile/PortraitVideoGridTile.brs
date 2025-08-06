@@ -41,9 +41,13 @@ Function onItemContentChange(msg)
   itemContent = msg.getData()
 
   if itemContent <> invalid
+    m.progressBarGroup.visible = false
+    m.gradient.visible = false
+
     currentProgram = invalid
     if itemContent.type = "linear"
       currentProgram = getCurrentLiveProgram(itemContent)
+      drawLinearProgressBar(currentProgram)
     end if
     if currentProgram <> invalid
       if isNonEmptyString(currentProgram.hdGridPosterUrl) = true
@@ -69,8 +73,6 @@ Function onItemContentChange(msg)
       setSotBadge(badgeUri, badgeText)
     end if
 
-    m.progressBarGroup.visible = false
-    m.gradient.visible = false
     categoryContent = itemContent.getParent()
     if categoryContent <> invalid AND categoryContent.id = "continue_watching"
       drawHistoryProgressBar()
@@ -116,10 +118,22 @@ Function drawHistoryProgressBar()
 End Function
 
 
+Function drawLinearProgressBar(currentProgram)
+  progress = getLinearProgramProgress(currentProgram)
+  if progress > 0
+    m.progressBar.progress = progress
+    m.timeLeftLabel.text = calculateProgramTime(currentProgram)
+    m.progressBarGroup.visible = true
+    m.gradient.visible = true
+  end if
+End Function
+
+
 Function onHeightChange(msg)
   height = msg.getData()
   m.progressBarGroup.translation = [0, (height - 76)]
 End Function
+
 
 ' helper function which returns the time left in the format 'x hour and y mins left' if time left is more than an hour.
 Function getDurationHoursString(seconds as Integer) as String
@@ -138,4 +152,16 @@ Function getDurationHoursString(seconds as Integer) as String
   end if
 
   return formattedString
+End Function
+
+
+Function calculateProgramTime(program) as String
+  programTimeString = ""
+
+  if isInt(program.endTime) = true AND isInt(program.startTime) = true
+    duration = program.endTime - program.startTime
+    programTimeString = getDurationHoursString(duration)
+  end if
+
+  return programTimeString
 End Function

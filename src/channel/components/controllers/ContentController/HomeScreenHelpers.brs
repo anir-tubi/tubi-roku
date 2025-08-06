@@ -1308,6 +1308,7 @@ End Function
 Function onFeaturedRowCurrFocusColumnChange()
   m.inlineVideoMetadataOverlay.skipAnimation = false
   m.videoPreviewDebounce.control = "stop"
+  stopCountdownTimer()
   screen = getCurrentScreen()
   if screen <> invalid
     columnFocused = screen.featuredRowCurrFocusColumn

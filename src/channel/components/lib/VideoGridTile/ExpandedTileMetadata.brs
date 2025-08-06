@@ -78,7 +78,7 @@ Function onItemContentChange(msg)
     m.sotBadge.visible = true
     m.description.width = m.top.width
     if itemContent.type = m.constants.ui.contentTypes.linear
-      setThumbnailImage(itemContent.thumbnailUri,  itemContent.type)
+      setThumbnailImage(itemContent.thumbnailUri, itemContent.type)
       currentProgram = getCurrentLiveProgram(itemContent)
       if currentProgram <> invalid
         metadataOnLivePosterContent(currentProgram, itemContent)
@@ -95,19 +95,19 @@ Function onItemContentChange(msg)
           index = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.lineOneData)
           m.firstLineGroup.insertChild(m.progressBarGroup, index + 1)
         end if
-  
+
         if m.lineTwoData.getParent() = invalid
           index = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.progressBarGroup)
           m.firstLineGroup.insertChild(m.lineTwoData, index + 1)
         end if
-        
+
         if m.sotBadge.getParent() <> invalid
           m.firstLineGroup.removeChild(m.sotBadge)
         end if
       else
         metadataOnPosterContent(itemContent)
         m.description.text = itemContent.description
-        
+
         if m.lineTwoData.getParent() <> invalid
           m.firstLineGroup.removeChild(m.lineTwoData)
         end if
@@ -116,7 +116,7 @@ Function onItemContentChange(msg)
           m.firstLineGroup.removeChild(m.progressBarGroup)
         end if
       end if
-  
+
     else
       'Remove thumbnail image and badge we showed for live
       if m.channelLogo.getParent() <> invalid
@@ -130,9 +130,9 @@ Function onItemContentChange(msg)
       if m.progressBarGroup.getParent() <> invalid
         m.firstLineGroup.removeChild(m.progressBarGroup)
       end if
-      
+
       m.description.text = itemContent.description
-      
+
       categoryContent = itemContent.getParent()
       if categoryContent <> invalid AND categoryContent.id = "continue_watching" AND itemContent.type <> m.constants.ui.contentTypes.series
         metadataOnContinueWatchingContent(itemContent)
@@ -179,7 +179,7 @@ Function metadataOnPosterContent(itemContent)
     if seasons = 1
       text += getTranslation("metadata_seasons_singular")
     else
-      text += getTranslation("metadata_seasons_plural", {seasons: seasons.toStr()})
+      text += getTranslation("metadata_seasons_plural", { seasons: seasons.toStr() })
     end if
   else if length <> invalid AND length <> 0
     if text.len() > 0
@@ -218,6 +218,10 @@ Function metadataOnPosterContent(itemContent)
   sotBadge = itemContent.sotPosterLabels
   if itemContent.type <> "linear" AND isAA(sotBadge) = true AND sotBadge.count() > 0
     if isSotBadgePresent = false
+      ratingIndex = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.rating)
+      if ratingIndex <> -1
+        insertIndex = ratingIndex + 1
+      end if
       firstLineGroup.insertChild(m.sotBadge, insertIndex)
     end if
 
@@ -354,7 +358,7 @@ End Function
 
 'helper function which returns the time left in the format 'x hour and y mins left' if time left is more than an hour
 ' else it returns 'y mins left'
-Function getDurationHoursString(seconds As Integer) As String
+Function getDurationHoursString(seconds as Integer) as String
   retVal = ""
 
   if seconds <> invalid
@@ -362,9 +366,9 @@ Function getDurationHoursString(seconds As Integer) As String
     minValue = StrI((Int(seconds / 60) mod 60) + 1) 'increase the min by one so that we dont show 0 min
 
     if hourValue > 0
-      retVal =  getTranslation("h_m_left", {"hour": StrI(hourValue), "minutes": minValue})
+      retVal = getTranslation("h_m_left", { "hour": StrI(hourValue), "minutes": minValue })
     else
-      retVal = getTranslation("m_left", {"minutes": minValue})
+      retVal = getTranslation("m_left", { "minutes": minValue })
     end if
   end if
 
@@ -372,7 +376,7 @@ Function getDurationHoursString(seconds As Integer) As String
 End Function
 
 
-Function convertSecondsToHoursString(seconds As Integer) As String
+Function convertSecondsToHoursString(seconds as Integer) as String
   retVal = ""
 
   if seconds <> invalid
@@ -381,7 +385,7 @@ Function convertSecondsToHoursString(seconds As Integer) As String
     ' Not using translation for better performance since in all languages h and m are same.
     ' Please refer h_m_left for reference.
     if hourValue > 0 AND minValue > 0
-      retVal =  Substitute("{0}h {1}m", hourValue.toStr(), minValue.toStr())
+      retVal = Substitute("{0}h {1}m", hourValue.toStr(), minValue.toStr())
     else if hourValue > 0
       retVal = Substitute("{0}h", hourValue.toStr())
     else
