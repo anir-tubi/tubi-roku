@@ -21,9 +21,9 @@ Function init()
   topRef.observeField("backgroundInfo", "newBackgroundSet")
 
   m.topRightContentPosterGroup = topRef.findNode("topRightContentPosterGroup")
-  m.oldPoster = topRef.findNode("poster1")  'the poster that is hidden (or transitioning to be hidden)
-  m.newPoster = topRef.findNode("poster2")  'the poster that is visible (or transitioning to be visible)
-  m.oldBackgroundType = m.constants.ui.backgroundTypes.fullscreen  'set the default background type
+  m.oldPoster = topRef.findNode("poster1") 'the poster that is hidden (or transitioning to be hidden)
+  m.newPoster = topRef.findNode("poster2") 'the poster that is visible (or transitioning to be visible)
+  m.oldBackgroundType = m.constants.ui.backgroundTypes.fullscreen 'set the default background type
   m.newBackgroundType = topRef.backgroundInfo.type
   m.isRotation = false
 
@@ -37,7 +37,7 @@ Function init()
   m.maskLayer10BlendColor2 = topRef.findNode("maskLayer10BlendColor2")
   m.maskLayer11BlendColor2 = topRef.findNode("maskLayer11BlendColor2")
   m.maskLayer2 = topRef.findNode("maskLayer2")
-  
+
   m.fullScreenPosterGradient = topRef.findNode("fullScreenPosterGradient")
   m.fullScreenPosterLeftGradient = topRef.findNode("fullScreenPosterLeftGradient")
   m.fullScreenPosterBottomGradient = topRef.findNode("fullScreenPosterBottomGradient")
@@ -46,7 +46,7 @@ Function init()
   m.timer.duration = 3
 
   setMaskLayerUris()
-  ' Prevent artifacts when a parent node is faded in, which might cause the masked image to show through the gradient. 
+  ' Prevent artifacts when a parent node is faded in, which might cause the masked image to show through the gradient.
   m.top.inheritParentOpacity = false
 End Function
 
@@ -158,7 +158,7 @@ Function newBackgroundSet()
 
   m.aCurrentBackgroundInfo = m.top.backgroundInfo
   backgroundTypes = m.constants.ui.backgroundTypes
-  
+
   if m.lastBackgroundInfo <> invalid AND m.aCurrentBackgroundInfo <> invalid AND m.lastBackgroundInfo.type <> m.aCurrentBackgroundInfo.type
     backgroundType = m.aCurrentBackgroundInfo.type
 
@@ -170,7 +170,7 @@ Function newBackgroundSet()
       fade(m.fullScreenPosterGradient, "out", 0.5)
       fade(m.fullScreenPosterGradient2, "out", 0.5)
     else if backgroundType = backgroundTypes.fullScreen2
-      '// fullScreen2 displays the images in full screen with a vertical gradient overlay that is more opaque on the bottom. 
+      '// fullScreen2 displays the images in full screen with a vertical gradient overlay that is more opaque on the bottom.
       fade(m.circularMaskLayer, "out", 0.5)
       fade(m.posterGroupMask, "out", 0.5)
       fade(m.defaultBackground, "out", 0.5)
@@ -191,7 +191,7 @@ Function newBackgroundSet()
       fade(m.fullScreenPosterGradient2, "out", 0.5)
     end if
   end if
-  
+
 
   'can't rely on alwaysNotify for m.top.uriList, so run our own logic to determine if the field value has actually changed
   isSame = true
@@ -201,7 +201,7 @@ Function newBackgroundSet()
     isSame = false
   else
     'types are the same and uriList counts are the same, so check if all elements in uriList are the same
-    for i=0 to m.lastBackgroundInfo.uriList.count()-1
+    for i = 0 to m.lastBackgroundInfo.uriList.count() - 1
       if type(m.lastBackgroundInfo.uriList[i]) <> type(m.aCurrentBackgroundInfo.uriList[i]) OR m.lastBackgroundInfo.uriList[i] <> m.aCurrentBackgroundInfo.uriList[i]
         isSame = false
         exit for
@@ -269,7 +269,7 @@ Function setPosterValues(posterUri)
   if m.aCurrentBackgroundInfo.type = m.constants.ui.backgroundTypes.topRight
     m.oldPoster.width = 1197
     m.oldPoster.height = 675
-    m.oldPoster.posterTranslation = [804,0]
+    m.oldPoster.posterTranslation = [804, 0]
     if m.constants.deviceInfo.limitedUi = true OR m.constants.deviceInfo.lowVram = true
       m.oldPoster.loadDisplayMode = "scaleToZoom"
     end if
@@ -277,7 +277,7 @@ Function setPosterValues(posterUri)
     ' else block handles the case where we display full screen single gradient background.
     m.oldPoster.width = 1920
     m.oldPoster.height = 1080
-    m.oldPoster.posterTranslation = [0,0]
+    m.oldPoster.posterTranslation = [0, 0]
     if m.constants.deviceInfo.limitedUi = true
       m.oldPoster.loadWidth = "640"
       m.oldPoster.loadHeight = "360"
@@ -402,9 +402,13 @@ Function startTransitionIn()
   else if m.newBackgroundType = m.constants.ui.backgroundTypes.epg
     m.newPoster.epgTransitionInControl = "start"
     m.newPoster.lastAnimationName = "epgTransitionIn"
-  else if m.newBackgroundType = m.constants.ui.backgroundTypes.fullScreen OR m.newBackgroundType = m.constants.ui.backgroundTypes.fullScreen2 OR m.newBackgroundType = m.constants.ui.backgroundTypes.spotlight OR m.newBackgroundType = m.constants.ui.backgroundTypes.skinAd
+  else if m.newBackgroundType = m.constants.ui.backgroundTypes.fullScreen OR m.newBackgroundType = m.constants.ui.backgroundTypes.fullScreen2 OR m.newBackgroundType = m.constants.ui.backgroundTypes.spotlight
     m.newPoster.fullScreenTransitionInControl = "start"
     m.newPoster.lastAnimationName = "FullScreenTransitionIn"
+  else if m.newBackgroundType = m.constants.ui.backgroundTypes.skinAd
+    '//Simple fade in for skinAd
+    m.newPoster.fadeInControl = "start"
+    m.newPoster.lastAnimationName = "FadeIn"
   else if m.newBackgroundType = m.constants.ui.backgroundTypes.rightScreen
     m.newPoster.fullScreenTransitionInControl = "start"
     m.newPoster.lastAnimationName = "FullScreenTransitionIn"
