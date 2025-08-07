@@ -444,7 +444,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
       ' Below logic is for the control reorder containers experiment.
       ' For now we are using for swapping featured row and recommended row.
       experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_3", true)
-      if m.isUserInVideoTilesExperiment = true AND isNonEmptyString(experiment.container_id) AND experiment.container_id <> "none"
+      if (experiment <> invalid AND (experiment.design_type = "withDescriptionPortraitSmall" OR experiment.design_type = "controlReOrderContainers")) AND isNonEmptyString(experiment.container_id) AND experiment.container_id <> "none"
         containerToBeReOrdered = m.nodeHelpers.getChildById(rawResponse, experiment.container_id)
         rawResponse.removeChild(containerToBeReOrdered)
         rawResponse.insertChild(containerToBeReOrdered, 0)
