@@ -1,9 +1,9 @@
 ' This file is used to send playerlogs. Please refer to the document below for details on all events:
 ' Document - https://www.notion.so/tubi/RFC-Player-Analytics-Event-v1-0-b8bee0eb69d14cc891baf8e907635f2f
 ' Protos - https://github.com/adRise/protos/tree/master/tubi/analytics/v3/player_analytics_event
-' 
+'
 '@constants: assocArray, constants as set in Constants.brs
-'@tracking: assocArray, a request queue as returned by TubiRequestQueue().create(), default as invalid 
+'@tracking: assocArray, a request queue as returned by TubiRequestQueue().create(), default as invalid
 '
 Function LivePlayerLogLib(constants, tracking)
   deviceInfo = CreateObject("roDeviceInfo")
@@ -57,7 +57,7 @@ Function LivePlayerLogLib(constants, tracking)
     breakOffCount: 0 'used in QoS event
     videoBufferingCount: 0 'used in QoS event
     totalBufferingDuration: 0 'used in QoS event
-    singleBufferingThreshold: 3600000 'threshold of single buffering duration in milliseconds 
+    singleBufferingThreshold: 3600000 'threshold of single buffering duration in milliseconds
 
     'video
     setFirstFrameForContentStart: playerLogLib_setFirstFrameForLiveContentStart
@@ -91,7 +91,7 @@ Function LivePlayerLogLib(constants, tracking)
     resetAttributes: playerLogLib_resetAttributes
     sendEvent: playerLogLib_sendLiveEvent
   }
-End Function 
+End Function
 
 
 'setFirstFrameForLiveContentStart marks the roTimeSpan
@@ -165,7 +165,7 @@ Function playerLogLib_setLiveVideoContent(content = invalid)
 End Function
 
 
-'@videoControl: String, possible values are "play", "stop", "pause", "resume", "replay", "prebuffer", "skipcontent", "none" 
+'@videoControl: String, possible values are "play", "stop", "pause", "resume", "replay", "prebuffer", "skipcontent", "none"
 '
 Function playerLogLib_setLiveVideoControl(videoControl = "")
   if isNonEmptyString(videoControl) = true
@@ -202,7 +202,7 @@ Function playerLogLib_setLiveVideoState(videoState = "")
       m.isBuffering = true
       m.setVideoBufferingStartTime()
     else
-      m.isBuffering = false  
+      m.isBuffering = false
     end if
 
   else if m.videoState = "playing"
@@ -219,7 +219,7 @@ Function playerLogLib_setLiveVideoState(videoState = "")
       m.setLastStartStep("VIEWED_FIRST_FRAME")
       m.fireContentStartupPerformanceEvent()
       m.fireContentStartEvent()
-    end if  
+    end if
     m.isVideoPlayed = true
 
   else if m.videoState = "stopped" OR m.videoState = "finished"
@@ -256,6 +256,7 @@ Function playerLogLib_fireLiveContentStartupPerformanceEvent()
     ssai_version: ""
     current_video_resolution: ""
     network_type: ""
+    message_map: {}
   }
 
   data = {
@@ -297,6 +298,7 @@ Function playerLogLib_fireLiveContentStartEvent()
     player_type: ""
     ssai_version: ""
     network_type: ""
+    message_map: {}
   }
 
   data = {
@@ -338,6 +340,7 @@ Function playerLogLib_fireLiveAdStartEvent(adInfo)
     duration: ""
     ssai_version: ""
     player_type: ""
+    message_map: {}
   }
 
   if isAA(adInfo) = true
@@ -372,6 +375,7 @@ Function playerLogLib_fireLiveAdCompleteEvent(adInfo)
     duration: ""
     ssai_version: ""
     player_type: ""
+    message_map: {}
   }
 
   if isAA(adInfo) = true
@@ -403,6 +407,7 @@ Function playerLogLib_fireLiveAdPodCompleteEvent(adInfo)
     total_ads_duration: 0
     ssai_version: ""
     player_type: ""
+    message_map: {}
   }
 
   if isAA(adInfo) = true
@@ -484,6 +489,7 @@ Function playerLogLib_fireLiveQualityOfServiceEvent()
     content_id: ""
     download_frag_bitrate: ""
     ssai_version: ""
+    message_map: {}
   }
 
   qualityOfServiceInfo = {}
@@ -499,31 +505,31 @@ Function playerLogLib_fireLiveQualityOfServiceEvent()
   qualityOfServiceInfo["errc"] = Round(m.errorCode)
   qualityOfServiceInfo["first_errc"] = Round(m.firstErrorCode)
   qualityOfServiceInfo["boc"] = Round(m.breakOffCount)
-  
+
   qualityOfServiceInfo["bc"] = Round(m.videoBufferingCount)
   qualityOfServiceInfo["tbd"] = Round(m.totalBufferingDuration)
-  
+
   qualityOfServiceInfo["tvt"] = Round(m.totalViewTime) * 1000 'ms
   qualityOfServiceInfo["ad_ac"] = m.adCount
   qualityOfServiceInfo["ssai_version"] = m.ssaiVersion
   qualityOfServiceInfo["cdn"] = m.cdn
 
-  'download_speed represents the download speed (in kbits/s) within a playback session. 
-  'It is calculated by dividing the total size of downloaded fragments (total video fragments size + total audio fragments size) 
+  'download_speed represents the download speed (in kbits/s) within a playback session.
+  'It is calculated by dividing the total size of downloaded fragments (total video fragments size + total audio fragments size)
   'by the total fragment download duration.
   if m.totalSegSize > 0 AND m.totalDownloadDuration > 0
     downloadSpeed = (m.totalSegSize * 8 / 1000) / (m.totalDownloadDuration / 1000)
   else
-    downloadSpeed = 0  
+    downloadSpeed = 0
   end if
   qualityOfServiceInfo["download_speed"] = downloadSpeed
 
-  'download_frag_bitrate represents the average playback bitrate (in kbits/s) within a playback session. 
-  'It is calculated by dividing the total size of downloaded fragments (total video fragments size + total audio fragments size) 
+  'download_frag_bitrate represents the average playback bitrate (in kbits/s) within a playback session.
+  'It is calculated by dividing the total size of downloaded fragments (total video fragments size + total audio fragments size)
   'by the total fragment duration(maximum of total video fragments duration and total audio fragments duration).
   downloadFragBitrate = 0
 
-  if m.totalSegSize > 0 
+  if m.totalSegSize > 0
     if m.totalAudioSegDuration > 0 AND m.totalVideoSegDuration > 0
       downloadFragBitrate = (m.totalSegSize * 8 / 1000) / (maxValue(m.totalAudioSegDuration, m.totalVideoSegDuration) / 1000)
     else if m.totalAudioSegDuration > 0
@@ -559,6 +565,7 @@ Function playerLogLib_fireLivePlayerPageExitEvent()
     ssai_version: ""
     last_ss: ""
     cdn: ""
+    message_map: {}
   }
 
   playerExitInfo = {}
@@ -620,7 +627,7 @@ Function playerLogLib_setLiveManifestLoadedTime(manifestLoadedTime = 0)
 End Function
 
 
-'setLastStartStep sets value to m.lastStartStep. 
+'setLastStartStep sets value to m.lastStartStep.
 'START_LOAD represents player start load but has not shown first frame;
 'VIEWED_FIRST_FRAME represents viewed first frame;
 'PLAY_STARTED represents first frame viewed and player position progressed normally.
@@ -631,7 +638,7 @@ End Function
 Function playerLogLib_setLiveLastStartStep(lastStartStep = "UNKNOWN")
   if isNonEmptyString(lastStartStep) = true
     if lastStartStep = "START_LOAD"
-      m.setFirstFrameForContentStart() 'mark the time from player start load to first frame rendered 
+      m.setFirstFrameForContentStart() 'mark the time from player start load to first frame rendered
     end if
     m.lastStartStep = lastStartStep
   end if
@@ -667,7 +674,7 @@ Function playerLogLib_setLiveBreakOffError(errorCode)
 End Function
 
 
-'setErrorModal helps to identify whether any error modal is displayed while exiting the player 
+'setErrorModal helps to identify whether any error modal is displayed while exiting the player
 Function playerLogLib_setLiveErrorModal(hasErrorModalShown = false)
   if isBoolean(hasErrorModalShown) = true
     m.hasErrorModalShown = hasErrorModalShown
@@ -684,7 +691,7 @@ Function playerLogLib_resetAttributes()
   m.firstErrorCode = 0
   m.breakOffCount = 0
   m.videoBufferingCount = 0
-  m.totalBufferingDuration = 0 
+  m.totalBufferingDuration = 0
   m.totalViewTime = 0
   m.isAd = false
   m.adCount = 0
@@ -731,15 +738,15 @@ Function playerLogLib_sendLiveEvent(data = {} as Dynamic, subType = "" as String
   eventInfo = m.tracking.populateMessage(subType, data, eventBase)
 
   if eventInfo <> invalid
-    eventValues =  eventInfo[subType]
+    eventValues = eventInfo[subType]
 
     if isAA(eventValues) = true
       trackData = m.tracking.getPlayerAnalyticsEvent(subType, eventValues)
-  
+
       if m.trackingLoggingTask = invalid then
         m.trackingLoggingTask = getGlobalAA().global.trackingLoggingTask
       end if
-  
+
       if m.trackingLoggingTask <> invalid then
         m.trackingLoggingTask.trackPlayerEvent = trackData
       end if

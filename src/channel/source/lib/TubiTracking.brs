@@ -1477,6 +1477,11 @@ Function tubiTracking_getPlayerAnalyticsEvent(eventType, eventValues) as Object
   eventValues["log_version"] = m.constants.player.analyticsVersion
   eventValues["version"] = m.constants.deviceInfo.clientVersion
 
+  if eventValues["message_map"] = invalid
+    eventValues["message_map"] = {}
+  end if
+  eventValues["message_map"].model = m.constants.deviceInfo.model
+
   clientCommon = {
     event_id: m.getAnalyticsEventId()
     event_timestamp: m.getAnalyticsTimestamp()

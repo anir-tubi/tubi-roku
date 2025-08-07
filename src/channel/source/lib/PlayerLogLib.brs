@@ -625,6 +625,7 @@ Function playerLogLib_firePlayerSetupPerformanceEvent()
     video_id: ""
     page_loaded_time: ""
     player_setup_time: ""
+    message_map: {}
   }
 
   data = {
@@ -711,6 +712,7 @@ Function playerLogLib_fireContentStartupPerformanceEvent(isFromPreroll, isAfterA
     is_after_ad: ""
     is_from_preroll: ""
     first_frame_time: ""
+    message_map: {}
   }
 
   data = {
@@ -796,6 +798,7 @@ Function playerLogLib_fireCuepointFilledEvent(cuepointInfo)
     is_preroll: ""
     ad_count: ""
     message: ""
+    message_map: {}
   }
 
   if isAA(cuepointInfo) = true
@@ -900,6 +903,7 @@ Function playerLogLib_fireContentStartEvent(isFromPreroll, isAfterAd)
     is_after_ad: ""
     is_from_preroll: ""
     is_from_autoplay: ""
+    message_map: {}
   }
 
   data = {
@@ -938,6 +942,7 @@ Function playerLogLib_fireVideoResourceFallbackEvent(resourceInfo)
     fallback_max_video_resolution: ""
     fallback_url: ""
     message: ""
+    message_map: {}
   }
 
   if isAA(resourceInfo) = true
@@ -967,6 +972,7 @@ Function playerLogLib_fireAdStartupPerformanceEvent(adCtx = {})
     manifest_loaded_time: ""
     preloaded: ""
     message: ""
+    message_map: {}
   }
 
   if adCtx <> invalid AND adCtx.ad <> invalid
@@ -1007,6 +1013,7 @@ Function playerLogLib_fireAdStartEvent(adCtx = {})
     ad_count: ""
     duration: ""
     message: ""
+    message_map: {}
   }
 
   if isAA(adCtx) = true
@@ -1032,6 +1039,7 @@ Function playerLogLib_fireAdCompleteEvent(adCtx = {})
     duration: ""
     play_time_exclude_pause_time: ""
     message: ""
+    message_map: {}
   }
 
   if isAA(adCtx) = true
@@ -1063,6 +1071,7 @@ Function playerLogLib_fireAdDiscontinueEvent(adCtx = {})
     reason: ""
     ad_position: ""
     message: ""
+    message_map: {}
   }
 
   if isAA(adCtx) = true
@@ -1098,6 +1107,7 @@ Function playerLogLib_fireAdPodCompleteEvent(adCtx = {})
     play_time_exclude_pause_time: ""
     is_preroll: ""
     message: ""
+    message_map: {}
   }
 
   adCount = adCtx.adCount
@@ -1526,6 +1536,7 @@ Function playerLogLib_setUserFeedback(userfeedbackInfo = {})
     frame_rate: ""
     duration: ""
     message: ""
+    message_map: {}
   }
 
   userfeedbackInfo["device_id"] = m.constants.deviceInfo.deviceId
