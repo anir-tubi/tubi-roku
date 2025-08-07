@@ -143,11 +143,10 @@ Function getDurationHoursString(seconds as Integer) as String
     hourValue = Int(seconds / 3600)
     minValue = StrI((Int(seconds / 60) mod 60) + 1) 'increase the min by one so that we don't show 0 min
 
-    ' Since h and m are same in all languages skipping translation for better performance.
     if hourValue > 0
-      formattedString = Substitute("{0}h {1}m", StrI(hourValue), minValue)
+      formattedString = getTranslation("h_m_left", { "hour": StrI(hourValue), "minutes": minValue })
     else
-      formattedString = Substitute("{0}m", minValue)
+      formattedString = getTranslation("m_left", { "minutes": minValue })
     end if
   end if
 
@@ -157,9 +156,9 @@ End Function
 
 Function calculateProgramTime(program) as String
   programTimeString = ""
-
-  if isInt(program.endTime) = true AND isInt(program.startTime) = true
-    duration = program.endTime - program.startTime
+  now = getCurrentLocalTime()
+  if isInt(program.endTime) AND program.endTime > now
+    duration = program.endTime - now
     programTimeString = getDurationHoursString(duration)
   end if
 
