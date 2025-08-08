@@ -29,8 +29,13 @@
       <field id="highlightPointer" type="boolean" />
 
       <field id="scaledUI"      type="boolean" value="false" />
+
+      <!-- The margin of the progress bar. This is useful when we have to translate the progress bar when placed inside layout group with alignment non custom value. -->
+      <field id="margin" alias="ProgressBarForeground.translation, ProgressBarBackground.translation" />
+
       <!-- This is used to set the height of the pointer. This allows us to override the default height of the pointer. -->
       <field id="pointerHeight" type="integer" value="32" alias="pointer.height"/>
+
   </interface>
 
   <children>

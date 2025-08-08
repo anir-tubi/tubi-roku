@@ -62,8 +62,8 @@ Function TubiExperiments(experimentsInfo) as Object
           holdout_control: { "overlay_type": "none" }
           holdout_winning: { "overlay_type": "none" }
         },
-        ' We will run 4 ui control types including control. Possible values are none, variant1, variant2, variant3
-        roku_player_control_ui_refresh_v2: {
+        'Possible values are none, variant1
+        roku_player_control_ui_refresh_v3: {
           default: { "type": "none" }
           holdout_control: { "type": "none" }
           holdout_winning: { "type": "none" }

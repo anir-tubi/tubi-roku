@@ -85,7 +85,7 @@ Function init()
     m.video.asyncStopSemantics = true
   end if
 
-  m.playerControlExperimentType = getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v2", false).type
+  m.playerControlExperimentType = getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v3", false).type
   m.marginX = m.constants.ui.translations.player.marginX
 
   if m.playerControlExperimentType = "none"
@@ -177,10 +177,14 @@ Function init()
   m.VideoOverlay = m.top.findNode("VideoOverlay")
   m.VideoBrowseWhileWatchingOverlay = m.top.findNode("VideoBrowseWhileWatchingOverlay")
 
-  if m.playerControlExperimentType = "none" OR m.playerControlExperimentType = "variant1"
+  if m.playerControlExperimentType = "none"
     m.skipCuepointsButton = m.top.findNode("skipCuepointsSimpleButton")
+    m.SkipTrailerButton = m.top.findNode("SkipTrailerButton")
   else
     m.skipCuepointsButton = m.top.findNode("skipCuepointsTextIconButton")
+    m.skipCuepointsButton.alwaysShowLabel = true
+    m.SkipTrailerButton = m.top.findNode("SkipTrailerTextIconButton")
+    m.SkipTrailerButton.alwaysShowLabel = true
   end if
   m.skipCuepointsButton.visible = true
   m.skipCuepointsButton.observeFieldScoped("selected", "onSkipCuepointsButtonSelected")
@@ -263,6 +267,14 @@ Function init()
   m.controlIcon = m.top.findNode("controlIcon")
   m.Transport = m.top.findNode("Transport")
 
+  if m.playerControlExperimentType = "none"
+    m.Transport.itemSpacings = "[9, 18]"
+    m.TransportButtonsXTranslation = 0
+  else
+    m.Transport.itemSpacings = "[39, 3]"
+    m.TransportButtonsXTranslation = 1730
+  end if
+
   m.ProgressBar = createObject("roSGNode", "TubiProgressBar")
   m.timeGroup = createObject("roSGNode", "Group")
 
@@ -286,20 +298,20 @@ Function init()
   m.RemainingLabel.translation = "[1695, 0]"
   m.timeGroup.appendChild(m.RemainingLabel)
 
-  m.TransportButtons = createObject("roSGNode", "Group")
-  m.TransportButtons.id = "TransportButtons"
-
   if m.playerControlExperimentType = "none"
-    m.Transport.appendChild(m.timeGroup)
-    m.Transport.appendChild(m.ProgressBar)
-    m.Transport.appendChild(m.TransportButtons)
+    m.TransportButtons = createObject("roSGNode", "Group")
+    m.TransportButtons.id = "TransportButtons"
   else
-    m.Transport.appendChild(m.ProgressBar)
-    m.Transport.appendChild(m.timeGroup)
-    m.Transport.appendChild(m.TransportButtons)
+    m.TransportButtons = createObject("roSGNode", "LayoutGroup")
+    m.TransportButtons.id = "TransportButtons"
+    m.TransportButtons.layoutDirection = "horiz"
+    m.TransportButtons.vertAlignment = "top"
+    m.TransportButtons.horizAlignment = "right"
+    m.TransportButtons.translation = [m.TransportButtonsXTranslation, 0]
+    m.TransportButtons.itemSpacings = [12]
   end if
 
-  'seekUI for variant1, variant2 and variant3
+  'seekUI for variant1
   m.seekGroup = m.top.findNode("seekGroup")
   m.currentSeekLabel = m.top.findNode("currentSeekLabel")
   m.seekControlGroup = m.top.findNode("seekControlGroup")
@@ -311,7 +323,7 @@ Function init()
   m.typographyConstants = getTypographyConstants()
   createTransportButtons()
 
-  if m.playerControlExperimentType = "variant1" OR m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3"
+  if m.playerControlExperimentType = "variant1"
     m.focusedNode = m.progressBar
   else
     'm.focusedNode holds the node/component which helps setting/unsetting focus to component/m.top on video player screen
@@ -396,36 +408,50 @@ Function init()
   ' Now that we are using async stop we need to wait until we get stopped state on the Video node before starting the ad. This variable helps track if we have requested a stop and are waiting for it to complete.
   m.isShowAdBreakPendingStop = false
 
-  m.skipCuepointsButtonUpTranslation = 648
-  m.skipCuepointsButtonDownTranslation = 900
-  m.thumbnailMaxYOffset = 750
-  m.Transport.translation = [m.marginX, 762]
+  if m.playerControlExperimentType = "none"
+    m.skipCuepointsButtonUpTranslation = 648
+    m.Transport.translation = [0, 762]
+    m.thumbnailMaxYOffset = 750
+    m.hudYTranslation = -696
+  else
+    m.skipCuepointsButtonUpTranslation = 744
+    m.Transport.translation = [0, 783]
+    m.thumbnailMaxYOffset = 825
+    m.hudYTranslation = -759
+  end if
+  m.skipCuepointsButtonDownTranslation = 888
 
   setFocusToComponent(m.focusedNode)
 
   m.TitleGroup = m.TopOverlay.findNode("TitleGroup")
 
   m.title = CreateObject("roSGNode", "Label")
-  m.title.id = "VideoOverlayTitle"
-  m.title.width = "1311"
-  m.title.height = "57"
-  m.title.ellipsizeOnBoundary = "true"
-  m.title.vertAlign = "top"
+  m.title.update({
+    id: "VideoOverlayTitle"
+    width: 1311
+    height: 57
+    ellipsizeOnBoundary: true
+    vertAlign: "top"
+  })
 
   m.titleImage = CreateObject("roSGNode", "Poster")
-  m.titleImage.id = "VideoOverlayTitleImage"
-  m.titleImage.loadWidth = 366
-  m.titleImage.loadHeight = 57
-  m.titleImage.loadDisplayMode = "limitSize"
+  m.titleImage.update({
+    id: "VideoOverlayTitleImage"
+    loadWidth: 366
+    loadHeight: 57
+    loadDisplayMode: "limitSize"
+  })
   m.titleImage.observeFieldScoped("loadStatus", "onDisplayTitleArt")
 
   m.episodeTitle = CreateObject("roSGNode", "Label")
-  m.episodeTitle.id = "VideoOverlayEpisodeTitle"
-  m.episodeTitle.translation = [0, 66]
-  m.episodeTitle.width = "1311"
-  m.episodeTitle.height = "57"
-  m.episodeTitle.ellipsizeOnBoundary = "true"
-  m.episodeTitle.vertAlign = "top"
+  m.episodeTitle.update({
+    id: "VideoOverlayEpisodeTitle"
+    translation: [0, 66]
+    width: 1311
+    height: 57
+    ellipsizeOnBoundary: true
+    vertAlign: "top"
+  })
 
   SkipTrailerButtonLabel = m.TopOverlay.findNode("SkipTrailerButtonLabel")
 
@@ -464,8 +490,9 @@ Function init()
   m.descriptorDesc.translation = [m.marginX + 27, m.descriptorDesc.translation[1]]
   m.ElapsedLabel.translation = [m.marginX, m.ElapsedLabel.translation[1]]
   m.RemainingLabel.translation = [1920 - m.marginX - m.RemainingLabel.boundingRect().width - 10, m.RemainingLabel.translation[1]]
+
   m.RemainingMinimizedGroup.translation = [1779, 346]
-  m.ProgressBar.translation = [m.constants.ui.translations.marginX, m.ProgressBar.translation[1]]
+  m.ProgressBar.translation = [m.marginX, m.ProgressBar.translation[1]]
   m.ProgressBar.width = 1920 - (m.marginX * 2)
 
   m.closedCaptionAndAudioSelectionOverlay = m.top.findNode("closedCaptionAndAudioSelectionOverlay")
@@ -478,16 +505,9 @@ Function init()
 
   m.sendFeedbackSelectionOverlayGroup = m.top.findNode("sendFeedbackSelectionOverlayGroup")
   m.sendFeedbackSelectionOverlay = m.top.findNode("sendFeedbackSelectionOverlay")
-
-  if m.playerControlExperimentType = "none" OR m.playerControlExperimentType = "variant1"
-    m.sendFeedbackSelectionOverlay.translation = [1230, 60]
-    m.sendFeedbackSelectionOverlay.width = 630
-    m.sendFeedbackSelectionOverlay.height = 960
-  else
-    m.sendFeedbackSelectionOverlay.translation = [1170, 176]
-    m.sendFeedbackSelectionOverlay.width = 558
-    m.sendFeedbackSelectionOverlay.height = 768
-  end if
+  m.sendFeedbackSelectionOverlay.translation = [1230, 60]
+  m.sendFeedbackSelectionOverlay.width = 630
+  m.sendFeedbackSelectionOverlay.height = 960
 
   m.sendFeedbackSelectionOverlay.observeFieldScoped("backOrLeftKeyPress", "onWasBackORLeftButtonSelectedForSendFeedback")
   m.sendFeedbackSelectionOverlay.observeFieldScoped("itemSelected", "onSendFeedBackOverlayItemSelected")
@@ -624,16 +644,9 @@ Function showQRCodeScreen()
     uri: "pkg:/images/sendFeedback.webp"
   })
 
-  if m.playerControlExperimentType = "none" OR m.playerControlExperimentType = "variant1"
-    sendFeedbackQRCodeOverlay.translation = [0, 0]
-    sendFeedbackQRCodeOverlay.width = 630
-    sendFeedbackQRCodeOverlay.height = 960
-  else
-    sendFeedbackQRCodeOverlay.translation = [0, -96]
-    sendFeedbackQRCodeOverlay.width = 660
-    sendFeedbackQRCodeOverlay.height = 920
-  end if
-
+  sendFeedbackQRCodeOverlay.translation = [0, 0]
+  sendFeedbackQRCodeOverlay.width = 630
+  sendFeedbackQRCodeOverlay.height = 960
   m.sendFeedbackSelectionOverlay.appendChild(sendFeedbackQRCodeOverlay)
 
   sendFeedbackQRCodeOverlay.observeFieldScoped("closeQRCodeOverlay", "onCloseQRCodeOverlay")
@@ -704,22 +717,36 @@ End Function
 Function showSkipCuepointsButton()
   tubiLog("videoPlayerScreen.showSkipCuepointsButton")
 
-  xPosition = m.top.width - (m.skipCuepointsButton.boundingRect().width + m.marginX)
-
   if m.HUD.opacity = 1
+    xPosition = m.top.width - (m.skipCuepointsButton.boundingRect().width + m.marginX)
     m.skipCuepointsButton.translation = [xPosition, m.skipCuepointsButtonUpTranslation]
+    width = m.skipCuepointsButton.boundingRect().width + 12
+
+    if m.playerControlExperimentType = "variant1"
+      slideTransportButtons(true, width)
+    end if
   else if m.HUD.opacity > 0
     setFocusToComponent(m.skipCuepointsButton, true)
+    xPosition = m.top.width - (m.skipCuepointsButton.boundingRect().width + m.marginX)
     m.skipCuepointsButton.translation = [xPosition, m.skipCuepointsButtonUpTranslation]
+    width = m.skipCuepointsButton.boundingRect().width + 12
+
+    if m.playerControlExperimentType = "variant1"
+      slideTransportButtons(true, width)
+    end if
   else
     setFocusToComponent(m.skipCuepointsButton, true)
+    xPosition = m.top.width - (m.skipCuepointsButton.boundingRect().width + m.marginX)
     m.skipCuepointsButton.translation = [xPosition, m.skipCuepointsButtonDownTranslation]
+
+    if m.playerControlExperimentType = "variant1"
+      slideTransportButtons(false)
+    end if
   end if
 
   if m.focusedNode.isSameNode(m.BrowseWhileWatching) = false
     m.skipCuepointsButton.visible = true
   end if
-
 End Function
 
 
@@ -734,6 +761,31 @@ Function hideSkipCuepointsButton(componentToFocus = invalid)
     end if
     componentToFocus.setFocus(true)
   end if
+
+  if m.playerControlExperimentType = "variant1"
+    slideTransportButtons(false)
+  end if
+End Function
+
+
+' slideTransportButtons
+'
+' Wrapper function for sliding TransportButtons with consistent animation
+'
+' @param offsetLeft: Boolean - If true, slides left by button width; if false, slides to original position
+' @param width: Integer - Width of button for offset calculation (optional, default: 0)
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Function slideTransportButtons(offsetLeft as Boolean, width = 0 as Integer)
+  transportButtonsTranslation = m.TransportButtons.translation
+
+  if offsetLeft = true
+    targetX = m.TransportButtonsXTranslation - width
+  else
+    targetX = m.TransportButtonsXTranslation
+  end if
+
+  destination = [targetX, transportButtonsTranslation[1]]
+  return slideTo(m.TransportButtons, destination, 0.6)
 End Function
 
 
@@ -749,7 +801,12 @@ End Function
 Function clearSkipCuepointsButtonAndTimer()
   m.skipCuepointsButton.text = ""
   clearSkipCuepointsTimer()
-  hideSkipCuepointsButton(m.top)
+  if m.focusedNode.isSameNode(m.skipCuepointsButton) = true AND m.HUD.opacity > 0
+    componentToFocus = m.progressBar
+  else
+    componentToFocus = m.top
+  end if
+  hideSkipCuepointsButton(componentToFocus)
 End Function
 
 
@@ -2044,6 +2101,7 @@ Function resetVideoPlayerState(content = invalid)
   m.ratingOverlay.opacity = 0
   m.showRatings = true
   m.ratingInterval = 0
+  m.focusedButtonIndex = 0
 
   if content <> invalid
     m.top.adPosition = content.nowPos
@@ -2219,27 +2277,18 @@ Function updateVideoPlayerState(content) as Void
     m.ratingOverlayAnimatedPositionY = 150
   end if
 
-  if m.playerControlExperimentType = "variant3"
-    m.ratingOverlayAnimatedPositionY = 0
-  end if
-
   childrenCount = m.titleGroup.getChildCount()
   m.titleGroup.removeChildrenIndex(childrenCount, 0)
-
-  if m.playerControlExperimentType = "variant3"
-    if content.titleImageUrl <> ""
-      m.titleImage.uri = ""
-      m.titleImage.uri = content.titleImageUrl
-      m.titleGroup.appendChild(m.titleImage)
-    else
-      m.titleGroup.appendChild(m.title)
-    end if
-  else
-    m.titleGroup.appendChild(m.title)
-  end if
+  m.titleGroup.appendChild(m.title)
   m.titleGroup.appendChild(m.episodeTitle)
 
   updateTransportButtons(content)
+
+  if m.playerControlExperimentType = "none"
+    m.transport.appendChildren([m.timeGroup, m.ProgressBar, m.TransportButtons])
+  else
+    m.transport.appendChildren([m.TransportButtons, m.ProgressBar, m.timeGroup])
+  end if
 End Function
 
 
@@ -2265,93 +2314,70 @@ End Function
 
 
 Function updateTransportButtons(content)
-  if m.playerControlExperimentType <> "none"
-    m.ProgressBar.highlightPointer = true 'to show black srubber on progresBar
-  end if
+  m.SkipTrailerButton.enabled = false
 
-  if m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3"
-    childrenCount = m.TransportLayoutGroup.getChildCount()
-    m.TransportLayoutGroup.removeChildrenIndex(childrenCount, 0)
-    m.TransportButtons.removeChild(m.TransportLayoutGroup)
-    m.TransportButtons.removeChild(m.SkipTrailerButton)
-
-    if content.isTrailer = true
-      m.TransportLayoutGroup.appendChild(m.SkipTrailerButton)
-      m.SkipTrailerButton.visible = true
-    end if
-
-    m.TransportLayoutGroup.appendChild(m.PlayFromBeginning)
-
-    if content.parentType = "series"
-      m.TransportLayoutGroup.appendChild(m.NextEpisode)
-    end if
-
-    width = m.TransportLayoutGroup.boundingRect().width
-    spacer = CreateObject("roSGNode", "Rectangle")
-    spacer.addField("enabled", "boolean", false)
-    spacer.enabled = false
-    spacer.width = 1200 - width - 40
-    m.TransportLayoutGroup.appendChild(spacer)
-
-    m.TransportLayoutGroup.appendChild(m.closedCaptionAudioButton)
-    m.TransportButtons.appendChild(m.TransportLayoutGroup)
-
-  else if m.playerControlExperimentType = "variant1"
-    m.ProgressBar.highlightPointer = false
+  if m.playerControlExperimentType = "variant1"
+    m.ProgressBar.highlightPointer = true
 
     childrenCount = m.TransportButtons.getChildCount()
     m.TransportButtons.removeChildrenIndex(childrenCount, 0)
+    m.HUD.removeChild(m.SkipTrailerButton)
 
     if content.isTrailer = true
+      m.Transport.translation = [0, 783]
+      m.thumbnailMaxYOffset = 870
       m.SkipTrailerButton.enabled = true
-      m.SkipTrailerButton.visible = true
-      m.TransportButtons.appendChild(m.SkipTrailerButton)
-    else
 
-      spacer = CreateObject("roSGNode", "Rectangle")
-      spacer.addField("enabled", "boolean", false)
-      spacer.enabled = false
-      spacer.width = 800
-      m.TransportButtons.appendChild(spacer)
+      if content.type = "series"
+        m.SkipTrailerButton.text = getTranslation("videoPlayer_button_watchSeries")
+      else
+        m.SkipTrailerButton.text = getTranslation("videoPlayer_button_watchMovie")
+      end if
+
+      'Thumbnail should be placed as the last child of the HUD component so that transport buttons or components do not overlay it.
+      m.HUD.insertChild(m.SkipTrailerButton, m.HUD.getChildCount() - 1)
 
       m.StartButton.uri = "pkg:/images/icon-resume.webp"
-
-      extraPadding = 0
-      if m.top.appMode = "KIDS_MODE"
-        extraPadding = 100
-      end if
-
-      if content.parentType = "series"
-        m.StartButton.translation = [1170 + extraPadding, 0]
-      else
-        m.StartButton.translation = [1270 + extraPadding, 0]
-      end if
+      m.TransportButtons.appendChild(m.StartButton)
+    else
+      m.Transport.translation = [0, 744]
+      m.thumbnailMaxYOffset = 825
+      m.StartButton.uri = "pkg:/images/icon-resume.webp"
       m.TransportButtons.appendChild(m.StartButton)
 
       if content.parentType = "series"
-        m.EndButton.translation = [1270 + extraPadding, 0]
         m.TransportButtons.appendChild(m.EndButton)
       end if
 
-      m.closedCaptionAudioButton.translation = [1370 + extraPadding, 0]
-      m.sendFeedBackButton.translation = [1470 + extraPadding, 0]
-      m.TransportButtons.appendChild(m.closedCaptionAudioButton)
-      m.TransportButtons.appendChild(m.sendFeedBackButton)
+      if m.closedCaptionAudioButton.visible = true
+        m.TransportButtons.appendChild(m.closedCaptionAudioButton)
+      end if
+
+      if m.sendFeedBackButton.visible = true
+        m.TransportButtons.appendChild(m.sendFeedBackButton)
+      end if
+
+      if m.skipCuepointsButton.visible = true
+        m.top.appendChild(m.skipCuepointsButton)
+      end if
     end if
 
   else if m.playerControlExperimentType = "none"
     m.ProgressBar.highlightPointer = false
+    m.Transport.translation = [0, 762]
 
     childrenCount = m.TransportButtons.getChildCount()
     m.TransportButtons.removeChildrenIndex(childrenCount, 0)
 
     if content.isTrailer = true
       m.SkipTrailerButton.enabled = true
-      m.SkipTrailerButton.visible = true
-      m.TransportButtons.appendChild(m.SkipTrailerButton)
-    else
-      m.SkipTrailerButton.enabled = false
-      m.SkipTrailerButton.visible = false
+
+      if content.type = "series"
+        m.SkipTrailerButtonLabel.text = getTranslation("videoPlayer_button_watchSeries")
+      else
+        m.SkipTrailerButtonLabel.text = getTranslation("videoPlayer_button_watchMovie")
+      end if
+
       m.TransportButtons.appendChild(m.SkipTrailerButton)
     end if
 
@@ -2370,13 +2396,7 @@ Function updateTransportButtons(content)
 
   end if
 
-  if m.playerControlExperimentType = "variant3"
-    if content.parentType = "series"
-      m.TitleGroup.translation = [m.constants.ui.translations.player.marginX, 540]
-    else
-      m.TitleGroup.translation = [m.constants.ui.translations.player.marginX, 580]
-    end if
-  else if m.playerControlExperimentType = "variant1" OR m.playerControlExperimentType = "variant2"
+  if m.playerControlExperimentType = "variant1"
     m.TitleGroup.translation = [m.constants.ui.translations.player.marginX, 0]
   else
     m.TitleGroup.translation = [m.constants.ui.translations.marginX, 0]
@@ -2385,143 +2405,180 @@ End Function
 
 
 Function createTransportButtons()
-  m.SkipTrailerButton = CreateObject("roSGNode", "TransportButton")
-  m.SkipTrailerButton.id = "SkipTrailerButton"
-  m.SkipTrailerButton.width = 260
-  m.SkipTrailerButton.height = 80
-  m.SkipTrailerButton.translation = "[0,96]"
-  m.SkipTrailerButton.uri = ""
+  if m.playerControlExperimentType = "variant1"
 
-  m.SkipTrailerButtonLabel = CreateObject("roSGNode", "Label")
-  m.SkipTrailerButtonLabel.id = "SkipTrailerButtonLabel"
-  m.SkipTrailerButtonLabel.text = getTranslation("videoPlayer_button_watchMovie")
-  m.SkipTrailerButtonLabel.width = 260
-  m.SkipTrailerButtonLabel.height = 80
-  m.SkipTrailerButtonLabel.horizAlign = "center"
-  m.SkipTrailerButtonLabel.vertAlign = "center"
+    m.StartButton = CreateObject("roSGNode", "TextIconButton")
+    m.StartButton.update({
+      hasUnfocusedBackground: true
+      id: "StartButton"
+      uri: "pkg:/images/icon-resume.webp"
+      text: getTranslation("screenDetails_button_startOver")
+      iconWidth: 36
+      iconHeight: 36
+      alwaysShowLabel: false
+    })
 
-  setTypographyOfLabel(m.SkipTrailerButtonLabel, m.typographyConstants.ids.bodyLargeStrong)
-  m.SkipTrailerButton.appendChild(m.SkipTrailerButtonLabel)
+    m.EndButton = CreateObject("roSGNode", "TextIconButton")
+    m.EndButton.update({
+      hasUnfocusedBackground: true
+      id: "EndButton"
+      uri: "pkg:/images/transport/sgplayer/icon-to-end.webp"
+      text: getTranslation("videoPlayer_button_nextEpisode")
+      iconWidth: 36
+      iconHeight: 36
+      alwaysShowLabel: false
+    })
 
-  m.StartButton = CreateObject("roSGNode", "TransportButton")
-  m.StartButton.id = "StartButton"
-  m.StartButton.width = 60
-  m.StartButton.height = 60
-  m.StartButton.translation = "[540,110]"
-  m.StartButton.uri = "pkg:/images/transport/sgplayer/icon-to-start.webp"
+    m.closedCaptionAudioButton = CreateObject("roSGNode", "TextIconButton")
+    m.closedCaptionAudioButton.update({
+      hasUnfocusedBackground: true
+      id: "closedCaptionAudioButton"
+      uri: "pkg:/images/transport/sgplayer/icon-subtitles.webp"
+      text: getTranslation("videoPlayer_button_audio_subtitles")
+      iconWidth: 36
+      iconHeight: 36
+      alwaysShowLabel: false
+    })
+
+    m.sendFeedBackButton = CreateObject("roSGNode", "TextIconButton")
+    m.sendFeedBackButton.update({
+      hasUnfocusedBackground: true
+      id: "sendFeedBackButton"
+      uri: "pkg:/images/transport/sgplayer/icon-help.webp"
+      text: getTranslation("send_feedback_overlay_title")
+      iconWidth: 36
+      iconHeight: 36
+      alwaysShowLabel: false
+    })
+
+  else
+
+    m.SkipTrailerButtonLabel = CreateObject("roSGNode", "Label")
+    m.SkipTrailerButtonLabel.update({
+      id: "SkipTrailerButtonLabel"
+      width: 260
+      height: 80
+      horizAlign: "center"
+      vertAlign: "center"
+    })
+
+    setTypographyOfLabel(m.SkipTrailerButtonLabel, m.typographyConstants.ids.bodyLargeStrong)
+    m.SkipTrailerButton.appendChild(m.SkipTrailerButtonLabel)
+
+    m.StartButton = CreateObject("roSGNode", "TransportButton")
+    m.StartButton.update({
+      id: "StartButton"
+      width: 60
+      height: 60
+      translation: [540, 0]
+      uri: "pkg:/images/transport/sgplayer/icon-to-start.webp"
+    })
+
+    m.EndButton = CreateObject("roSGNode", "TransportButton")
+    m.EndButton.update({
+      id: "EndButton"
+      width: 60
+      height: 60
+      translation: [1320, 0]
+      uri: "pkg:/images/transport/sgplayer/icon-to-end.webp"
+    })
+
+    m.closedCaptionAudioButton = CreateObject("roSGNode", "TransportButton")
+    m.closedCaptionAudioButton.update({
+      id: "closedCaptionAudioButton"
+      width: 60
+      height: 60
+      translation: [1070, 0]
+      uri: "pkg:/images/transport/sgplayer/icon-subtitles.webp"
+    })
+
+    m.sendFeedBackButton = CreateObject("roSGNode", "TransportButton")
+    m.sendFeedBackButton.update({
+      id: "sendFeedBackButton"
+      enabled: false
+      width: 60
+      height: 60
+      translation: [1140, 0]
+      uri: "pkg:/images/transport/sgplayer/icon-help.webp"
+    })
+  end if
 
   m.RewindButton = CreateObject("roSGNode", "TransportButton")
-  m.RewindButton.id = "RewindButton"
-  m.RewindButton.width = 60
-  m.RewindButton.height = 60
-  m.RewindButton.translation = "[672,110]"
-  m.RewindButton.uri = "pkg:/images/transport/sgplayer/icon-rew.webp"
+  m.RewindButton.update({
+    id: "RewindButton"
+    width: 60
+    height: 60
+    uri: "pkg:/images/transport/sgplayer/icon-rew.webp"
+  })
+
+  if m.playerControlExperimentType = "none"
+    m.RewindButton.translation = [672, 0]
+  end if
 
   m.HopBackButton = CreateObject("roSGNode", "TransportButton")
-  m.HopBackButton.id = "HopBackButton"
-  m.HopBackButton.width = 60
-  m.HopBackButton.height = 60
-  m.HopBackButton.translation = "[800,110]"
-  m.HopBackButton.uri = "pkg:/images/transport/sgplayer/icon-rew-30s.webp"
+  m.HopBackButton.update({
+    id: "HopBackButton"
+    width: 60
+    height: 60
+    uri: "pkg:/images/transport/sgplayer/icon-rew-30s.webp"
+  })
+
+  if m.playerControlExperimentType = "none"
+    m.HopBackButton.translation = [800, 0]
+  end if
 
   m.PlayPauseButton = CreateObject("roSGNode", "TransportButton")
-  m.PlayPauseButton.id = "PlayPauseButton"
-  m.PlayPauseButton.width = 60
-  m.PlayPauseButton.height = 60
-  m.PlayPauseButton.translation = "[930,110]"
-  m.PlayPauseButton.uri = "pkg:/images/transport/sgplayer/icon-play.webp"
+  m.PlayPauseButton.update({
+    id: "PlayPauseButton"
+    width: 60
+    height: 60
+    uri: "pkg:/images/transport/sgplayer/icon-play.webp"
+  })
+
+  if m.playerControlExperimentType = "none"
+    m.PlayPauseButton.translation = [930, 0]
+  end if
 
   m.HopForwardButton = CreateObject("roSGNode", "TransportButton")
-  m.HopForwardButton.id = "HopForwardButton"
-  m.HopForwardButton.width = 60
-  m.HopForwardButton.height = 60
-  m.HopForwardButton.translation = "[1060,110]"
-  m.HopForwardButton.uri = "pkg:/images/transport/sgplayer/icon-fwd-30s.webp"
+  m.HopForwardButton.update({
+    id: "HopForwardButton"
+    width: 60
+    height: 60
+    uri: "pkg:/images/transport/sgplayer/icon-fwd-30s.webp"
+  })
+
+  if m.playerControlExperimentType = "none"
+    m.HopForwardButton.translation = [1060, 0]
+  end if
 
   m.FastForwardButton = CreateObject("roSGNode", "TransportButton")
-  m.FastForwardButton.id = "FastForwardButton"
-  m.FastForwardButton.width = 60
-  m.FastForwardButton.height = 60
-  m.FastForwardButton.translation = "[1190,110]"
-  m.FastForwardButton.uri = "pkg:/images/transport/sgplayer/icon-ffw.webp"
+  m.FastForwardButton.update({
+    id: "FastForwardButton"
+    width: 60
+    height: 60
+    uri: "pkg:/images/transport/sgplayer/icon-ffw.webp"
+  })
 
-  m.EndButton = CreateObject("roSGNode", "TransportButton")
-  m.EndButton.id = "EndButton"
-  m.EndButton.width = 60
-  m.EndButton.height = 60
-  m.EndButton.translation = "[1320,110]"
-  m.EndButton.uri = "pkg:/images/transport/sgplayer/icon-to-end.webp"
-
-  m.closedCaptionAudioButton = CreateObject("roSGNode", "TransportButton")
-  m.closedCaptionAudioButton.id = "closedCaptionAudioButton"
-  m.closedCaptionAudioButton.width = 60
-  m.closedCaptionAudioButton.height = 60
-  m.closedCaptionAudioButton.translation = "[1520,110]"
-  m.closedCaptionAudioButton.uri = "pkg:/images/transport/sgplayer/icon-subtitles.webp"
-
-  m.sendFeedBackButton = CreateObject("roSGNode", "TransportButton")
-  m.sendFeedBackButton.id = "sendFeedBackButton"
-  m.sendFeedBackButton.enabled = false
-  m.sendFeedBackButton.width = 60
-  m.sendFeedBackButton.height = 60
-  m.sendFeedBackButton.translation = "[1655,110]"
-  m.sendFeedBackButton.uri = "pkg:/images/transport/sgplayer/icon-help.webp"
-
-  m.PlayFromBeginning = CreateObject("roSGNode", "TextIconButton")
-  m.PlayFromBeginning.id = "PlayFromBeginning"
-  m.PlayFromBeginning.translation = [m.marginX, 0]
-  m.PlayFromBeginning.uri = "pkg:/images/icon-resume.webp"
-  m.PlayFromBeginning.text = getTranslation("screenDetails_button_startOver")
-
-  m.NextEpisode = CreateObject("roSGNode", "TextIconButton")
-  m.NextEpisode.id = "NextEpisode"
-  m.NextEpisode.uri = "pkg:/images/transport/sgplayer/icon-to-end.webp"
-  m.NextEpisode.text = getTranslation("videoPlayer_button_nextEpisode")
+  if m.playerControlExperimentType = "none"
+    m.FastForwardButton.translation = [1190, 0]
+  end if
 
   m.SkipTrailerButton.translation = [m.marginX, m.SkipTrailerButton.translation[1]]
 
-  if m.playerControlExperimentType = "none"
+  if m.playerControlExperimentType = "variant1"
+    m.focusedNode = m.progressBar
+  else if m.playerControlExperimentType = "none"
     m.focusedNode = m.PlayPauseButton
-
-  else if m.playerControlExperimentType = "variant1"
-    m.focusedNode = m.progressBar
-
-  else if m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3"
-
-    m.TransportLayoutGroup = CreateObject("roSGNode", "LayoutGroup")
-    m.TransportLayoutGroup.id = "TransportLayoutGroup"
-    m.TransportLayoutGroup.layoutDirection = "horiz"
-    m.TransportLayoutGroup.vertAlignment = "top"
-    m.TransportLayoutGroup.horizAlignment = "left"
-    m.TransportLayoutGroup.itemSpacings = "[12]"
-
-    m.SkipTrailerButton = CreateObject("roSGNode", "TextIconButton")
-    m.SkipTrailerButton.id = "SkipTrailerButton"
-    m.SkipTrailerButton.visible = false
-    m.SkipTrailerButton.uri = "pkg:/images/transport/sgplayer/icon-play.webp"
-    m.SkipTrailerButton.text = getTranslation("videoPlayer_button_watchMovie")
-
-    m.closedCaptionAudioButton = CreateObject("roSGNode", "TextIconButton")
-    m.closedCaptionAudioButton.id = "closedCaptionAudioButton"
-    m.closedCaptionAudioButton.uri = "pkg:/images/transport/sgplayer/icon-subtitles.webp"
-    m.closedCaptionAudioButton.text = getTranslation("videoPlayer_button_audio_subtitles")
-
-    m.sendFeedBackButton = m.top.findNode("sendFeedBackButtonTopRight")
-    m.sendFeedBackButton.text = getTranslation("send_feedback_overlay_title")
-    m.focusedNode = m.progressBar
   end if
 
   if m.top.appMode <> "KIDS_MODE"
     m.sendFeedBackButton.visible = true
-    m.closedCaptionAudioButton.translation = [1520, 110]
-
-    if m.playerControlExperimentType = "variant2" OR m.playerControlExperimentType = "variant3"
-      m.sendFeedBackButton.translation = [1458, 30]
-    else
-      m.sendFeedBackButton.translation = [1655, 110]
+    if m.playerControlExperimentType = "none"
+      m.closedCaptionAudioButton.translation = [1520, 0]
+      m.sendFeedBackButton.translation = [1655, 0]
     end if
-  else
-    m.closedCaptionAudioButton.translation = [1655, 110]
+  else if m.playerControlExperimentType = "none"
+    m.closedCaptionAudioButton.translation = [1655, 0]
   end if
 
 End Function

@@ -1801,6 +1801,7 @@ Function trailerHelper(screen)
         trailerContent.descriptorCode = content.descriptorCode
         trailerContent.descriptors = content.descriptors
         trailerContent.descriptorDescription = content.descriptorDescription
+        trailerContent.type = content.type
       end if
 
       playVideoContent(trailerContent)

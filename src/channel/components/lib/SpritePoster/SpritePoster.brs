@@ -11,6 +11,7 @@ Function init()
   m.top.observeField("spriteDirection", "showSprite")
   m.top.observeField("jumpToSprite", "showSprite")
   m.top.observeField("showBorder", "onShowBorder")
+  m.background = m.top.findNode("background")
   m.border = m.top.findNode("Border")
   m.preload = m.top.findNode("Preload")
   m.preload2 = m.top.findNode("Preload2")
@@ -35,7 +36,7 @@ Function onThemeChange(msg = invalid)
   if theme <> invalid
     m.border.blendColor = theme.focusedColor
   end if
-End function
+End Function
 
 
 Function onLoadStatus()
@@ -48,8 +49,9 @@ End Function
 
 
 Function onShowBorder(msg)
+  m.background.visible = true
   m.border.visible = true
-End function
+End Function
 
 
 ' Set the component offset and clipping rect
@@ -73,16 +75,19 @@ Function showSprite()
       nColumns = m.top.numSprites
     end if
     page = m.top.jumpToSprite \ m.top.numSprites
-    index = (m.top.jumpToSprite MOD m.top.numSprites)
+    index = (m.top.jumpToSprite mod m.top.numSprites)
   end if
 
   if nColumns > 0
-    nColumnIndex = index MOD nColumns
-    nRowIndex = Int(index/nColumns)
+    nColumnIndex = index mod nColumns
+    nRowIndex = Int(index / nColumns)
   end if
 
   m.poster.width = m.top.width * nColumns
   m.poster.height = m.top.height * nRows
+
+  m.background.width = m.poster.width
+  m.background.height = m.poster.height
 
   m.border.width = m.top.width + 5
   m.border.height = m.top.height + 5
@@ -93,7 +98,7 @@ Function showSprite()
 
   nSheetWidth = m.top.thumbnailWidth * nColumns
   nSheetHeight = m.top.thumbnailHeight * nRows
-  if (nSheetWidth > 0 AND nSheetHeight > 0) AND (nSheetWidth > m.constants.deviceInfo.displayWidth or nSheetHeight > m.constants.deviceInfo.displayHeight)
+  if (nSheetWidth > 0 AND nSheetHeight > 0) AND (nSheetWidth > m.constants.deviceInfo.displayWidth OR nSheetHeight > m.constants.deviceInfo.displayHeight)
     loadDisplayMode = "scaleToFit"
     ' Scale the poster down should bring the image dimensions down below the 4kx4k texture size limit
     ' which would otherwise cause the images to fail to load.
@@ -101,10 +106,10 @@ Function showSprite()
     scaleFactorWidth = 1
     scaleFactorHeight = 1
     if nSheetWidth > m.constants.deviceInfo.displayWidth
-      scaleFactorWidth = m.constants.deviceInfo.displayWidth/nSheetWidth
+      scaleFactorWidth = m.constants.deviceInfo.displayWidth / nSheetWidth
     end if
     if nSheetHeight > m.constants.deviceInfo.displayHeight
-      scaleFactorHeight = m.constants.deviceInfo.displayHeight/nSheetHeight
+      scaleFactorHeight = m.constants.deviceInfo.displayHeight / nSheetHeight
     end if
 
     scaleFactor = scaleFactorWidth
@@ -128,15 +133,16 @@ Function showSprite()
   m.preload2.loadHeight = loadHeight
   if m.top.spriteUrls[page] <> invalid
     m.poster.uri = m.top.spriteUrls[page]
-    if m.top.spriteUrls[page+1] <> invalid
-      m.preload.uri = m.top.spriteUrls[page+1]
+    if m.top.spriteUrls[page + 1] <> invalid
+      m.preload.uri = m.top.spriteUrls[page + 1]
     end if
-    if m.top.spriteUrls[page+2] <> invalid
-      m.preload2.uri = m.top.spriteUrls[page+2]
+    if m.top.spriteUrls[page + 2] <> invalid
+      m.preload2.uri = m.top.spriteUrls[page + 2]
     end if
 
     offsetX = m.top.width * nColumnIndex
     offsetY = m.top.height * nRowIndex
+    m.background.translation = [-offsetX, -offsetY]
     m.poster.translation = [-offsetX, -offsetY]
     m.top.clippingRect = [
       0

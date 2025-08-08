@@ -27,7 +27,7 @@ End Function
 '       Placement of dynamic strings within a static string translation is used when it may not be known where the dynamic string
 '       should be placed within the static string.  For example: "Welcome Jack" vs "Jack Bienvenidos"
 '@return String - The translated string associated with the string ID. If unsuccessful, it will return an empty string.
-Function getTranslation(sID as string, aDynamicStrings = {}) as String
+Function getTranslation(sID as String, aDynamicStrings = {}) as String
   '//What is the current language
   locale = getLocale()
   defaultLocale = getDefaultLocale()
@@ -220,11 +220,11 @@ End Function
 '
 ' take an integer length in seconds and give it an setlocale descriptions like "1 h 36 min"
 ' ::NOTE:: when calling this function, make sure the calling file is including TubiLanguageTranslate.brs as a dependency
-Function formatLengthSelectedLocale(length As Dynamic) As String
-  if type(length) = "roFloat" or type(length) = "Float" or type(length) = "Double" then
+Function formatLengthSelectedLocale(length as Dynamic) as String
+  if type(length) = "roFloat" OR type(length) = "Float" OR type(length) = "Double" then
     length = Int(length)
   end if
-  if type(length) = "Integer" or type(length) = "roInt"
+  if type(length) = "Integer" OR type(length) = "roInt"
     hours = length \ 3600
     minutes = (length mod 3600) \ 60
     seconds = length mod 60
@@ -298,7 +298,7 @@ Function getTranslation_en_US()
       "description": "Menu option on the app's top nav for pillshaped, (length of text should not be too long). Allows the user to display the home screen.",
       "message": "For You"
     },
-    "component_library_failed":{
+    "component_library_failed": {
       "description": "Latest Version of Tubi app failed to load due to some error",
       "message": "{errCode}\nThe Tubi channel failed to load fully. Some functionality may be missing."
     },
@@ -998,99 +998,99 @@ Function getTranslation_en_US()
       "description": "Indicate the number of minutes left. Use an abbreviation for minutes to save space and so we don't have to worry about plural and singular forms of the word minutes.",
       "message": "{minutes}m left"
     },
-    "hour_mins_left":{
+    "hour_mins_left": {
       "description": "Indicates time left in the format 'x hour y mins left'",
       "message": "{hour} hour {minutes} mins left"
     },
-    "mins_left":{
+    "mins_left": {
       "description": "Indicates time left in the format 'y mins left'",
       "message": "{minutes} mins left"
     },
-    "today":{
+    "today": {
       "description": "Today",
       "message": "TODAY"
     },
-    "tomorrow":{
+    "tomorrow": {
       "description": "Tomorrow",
       "message": "TOMORROW"
     },
-    "onNow":{
+    "onNow": {
       "description": "badge text to show program is not live but on now",
       "message": "ON NOW"
     },
-    "day_1":{
+    "day_1": {
       "description": "shortened version Monday, formatted with , and a space",
       "message": "Mon, "
     },
-    "day_2":{
+    "day_2": {
       "description": "shortened version Tuesday, formatted with , and a space",
       "message": "Tue, "
     },
-    "day_3":{
+    "day_3": {
       "description": "shortened version Wednessday, formatted with , and a space",
       "message": "Wed, "
     },
-    "day_4":{
+    "day_4": {
       "description": "shortened version Thursday, formatted with , and a space",
       "message": "Thur, "
     },
-    "day_5":{
+    "day_5": {
       "description": "shortened version Friday, formatted with , and a space",
       "message": "Fri, "
     },
-    "day_6":{
+    "day_6": {
       "description": "shortened version Saturday, formatted with , and a space",
       "message": "Sat, "
     },
-    "day_7":{
+    "day_7": {
       "description": "shortened version Sunday, formatted with , and a space",
       "message": "Sun, "
     },
-    "short_version_date_format_1":{
+    "short_version_date_format_1": {
       "description": "Shortened version of date format for the month of January",
       "message": "Jan {day}, {year}"
     },
-    "short_version_date_format_2":{
+    "short_version_date_format_2": {
       "description": "Shortened version of date format for the month of February",
       "message": "Feb {day}, {year}"
     },
-    "short_version_date_format_3":{
+    "short_version_date_format_3": {
       "description": "Shortened version of date format for the month of March",
       "message": "Mar {day}, {year}"
     },
-    "short_version_date_format_4":{
+    "short_version_date_format_4": {
       "description": "Shortened version of date format for the month of April",
       "message": "Apr {day}, {year}"
     },
-    "short_version_date_format_5":{
+    "short_version_date_format_5": {
       "description": "Shortened version of date format for the month of May",
       "message": "May {day}, {year}"
     },
-    "short_version_date_format_6":{
+    "short_version_date_format_6": {
       "description": "Shortened version of date format for the month of June",
       "message": "Jun {day}, {year}"
     },
-    "short_version_date_format_7":{
+    "short_version_date_format_7": {
       "description": "Shortened version of date format for the month of July",
       "message": "Jul {day}, {year}"
     },
-    "short_version_date_format_8":{
+    "short_version_date_format_8": {
       "description": "Shortened version of date format for the month of August",
       "message": "Aug {day}, {year}"
     },
-    "short_version_date_format_9":{
+    "short_version_date_format_9": {
       "description": "Shortened version of date format for the month of September",
       "message": "Sep {day}, {year}"
     },
-    "short_version_date_format_10":{
+    "short_version_date_format_10": {
       "description": "Shortened version of date format for the month of October",
       "message": "Oct {day}, {year}"
     },
-    "short_version_date_format_11":{
+    "short_version_date_format_11": {
       "description": "Shortened version of date format for the month of November",
       "message": "Nov {day}, {year}"
     },
-    "short_version_date_format_12":{
+    "short_version_date_format_12": {
       "description": "Shortened version of date format for the month of December",
       "message": "Dec {day}, {year}"
     },
@@ -1354,9 +1354,9 @@ Function getTranslation_en_US()
       "description": "When content is sponsored by an advertizer, then this text proceeds the image of the sponsor. The text and the image should make a complete sentence.",
       "message": "Brought to you by"
     },
-    "registration_signIn_recommended":{
+    "registration_signIn_recommended": {
       "description": "text appended to recommended row label to subtly remind users that they are signed out so that they understand that they need to sign-in to use Tubi at its fullest",
-      "message":"Sign In for a more personalized experience"
+      "message": "Sign In for a more personalized experience"
     },
     "screenEndCard_startingIn": {
       "description": "indicator for how many seconds until next video will start playing (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
@@ -1560,15 +1560,15 @@ Function getTranslation_en_US()
       "description": "Label shown on video player when tv rating/descriptor is shown",
       "message": "RATED"
     },
-    "skipIntro_Player":{
+    "skipIntro_Player": {
       "description": "Navigational instructions to users to skip the introduction section of the title. Usually the song or the beginning credits",
       "message": "Skip Intro"
     },
-    "skipRecap_Player":{
+    "skipRecap_Player": {
       "description": "Navigational instructions to users to skip the section where the previous part of the show is recapped",
       "message": "Skip Recap"
     },
-    "skipEarlyCredits_Player":{
+    "skipEarlyCredits_Player": {
       "description": "Navigational instructions to users to skip when the Credits are followed by a scene",
       "message": "Skip Early Credits"
     },
@@ -1672,7 +1672,7 @@ Function getTranslation_en_US()
       "description": "Hint message why we have locked the content. This is the default message",
       "message": "Sign in required. No credit card needed."
     },
-    "text_new":{
+    "text_new": {
       "description": "simple text to use anywhere to indicate item is new",
       "message": "NEW"
     },
@@ -1724,7 +1724,7 @@ Function getTranslation_en_US()
       "description": "title displayed on registration welcome modal",
       "message": "Tubi is better when you sign in"
     },
-    "reg_intro_sub_header":{
+    "reg_intro_sub_header": {
       "description": "sub header displayed on registraton welcome modal",
       "message": "No credit card. Free Forever."
     },
@@ -1732,11 +1732,11 @@ Function getTranslation_en_US()
       "description": "first sub item to be displayed under reg_first_line_item to explain user about benifit of registration",
       "message": "Save now to watch later"
     },
-    "reg_third_line_item":{
+    "reg_third_line_item": {
       "description": "third item to let know user about the benifit of registration",
       "message": "Unlock Picks Just for You"
     },
-    "reg_third_line_sub_item":{
+    "reg_third_line_sub_item": {
       "description": "third sub item to be displayed under reg_third_line_item to explain user about benifit of registration",
       "message": "Get better recommendations"
     },
@@ -2148,11 +2148,11 @@ Function getTranslation_en_US()
       "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
       "message": "Ad break starts in"
     },
-    "h_m_left":{
+    "h_m_left": {
       "description": "Indicates time left in the format 'x h y m left'",
       "message": "{hour}h {minutes}m left"
     },
-    "m_left":{
+    "m_left": {
       "description": "Indicates time left in the format 'y m left'",
       "message": "{minutes}m left"
     },
@@ -2167,6 +2167,18 @@ Function getTranslation_en_US()
     "videoPlayer_button_watchMovie": {
       "description": "Label of button to allow users to watch movie from trailer screen",
       "message": "Watch Movie"
+    },
+    "videoPlayer_button_watchSeries": {
+      "description": "Label of button to allow users to watch series/episode from trailer screen",
+      "message": "Watch Series"
+    },
+    "h_m_duration": {
+      "description": "Indicates time in the format 'x h y m'",
+      "message": "{hour}h {minutes}m"
+    },
+    "m_duration": {
+      "description": "Indicates time in the format 'x m'",
+      "message": "{minutes}m"
     }
   }
 End Function

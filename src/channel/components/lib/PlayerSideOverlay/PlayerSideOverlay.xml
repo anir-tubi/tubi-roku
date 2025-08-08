@@ -18,8 +18,8 @@
     <!-- INPUTS -->
 
     <field id="itemList" type="array" />
-    <field id="width" alias="overlayBackground.width"/>
-    <field id="height" alias="overlayBackground.height"/>
+    <field id="width" alias="overlayBackground.width" value="630"/>
+    <field id="height" alias="overlayBackground.height" value="960"/>
 
     <!-- OUTPUTS -->
 

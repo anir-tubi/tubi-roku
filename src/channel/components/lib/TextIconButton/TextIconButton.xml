@@ -17,7 +17,9 @@
       <field id="uri" type="String"/>
       <field id="text" type="String" />
 
-      <field id="hasUnfocusedBackground" type="boolean" value="false"/>
+      <field id="alwaysShowLabel" type="boolean"/>
+
+      <field id="hasUnfocusedBackground" type="boolean"/>
       <field id="iconWidth" alias="ButtonIcon.width" />
       <field id="iconHeight" alias="ButtonIcon.height" />
 
@@ -40,7 +42,7 @@
       vertAlignment="center"
       horizAlignment="left"
       itemSpacings="[12]"
-      translation="[36,36]">
+      translation="[18,36]">
       <Poster
         id="ButtonIcon"
         height="36"
@@ -49,6 +51,8 @@
       <Label
         id="ButtonText"
         height="72"
+        width="0"
+        scale="[0,0]"
         vertAlign="center">
         <Font
           role="font"/>

@@ -1,6 +1,6 @@
 ' Thin wrapper for CMS API, Autopilot API and Search API requests.  Collected here to facilitate easy
 ' integration tests
-Function CmsApi(constants, apiUtils, experiments=invalid)
+Function CmsApi(constants, apiUtils, experiments = invalid)
 
   defaultValues = {
     ' dependencies
@@ -104,7 +104,7 @@ Function cmsApi_createUpNextContentReqInfo(passedOptions, bDisplayLargestLandsca
 End Function
 
 
-Function cmsApi_createSingleContentReqInfo(contentId, includeChannels=false, bKidsMode = false)
+Function cmsApi_createSingleContentReqInfo(contentId, includeChannels = false, bKidsMode = false)
   options = m.getCommonOptions(true)
 
   options.params["content_id"] = contentId
@@ -115,12 +115,8 @@ Function cmsApi_createSingleContentReqInfo(contentId, includeChannels=false, bKi
   options.params = m.setTupianLandscapeParam(options.params)
   options.params = m.setTupianBackgroundParam(options.params)
 
-  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v2").type = "variant3"
-    options.params = m.setImageParams(["title"], options.params)
-  end if
-
-  capability = formatJson({"content_types" :["se"]})
-  options.headers.append({"x-capability": capability})
+  capability = formatJson({ "content_types": ["se"] })
+  options.headers.append({ "x-capability": capability })
   url = m.constants.urls.content.singleContent
 
   return {
@@ -188,7 +184,7 @@ End Function
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
 ' @passedOptions: assocArray, options that are used to create a request (ie, headers, params, method, etc.)
 '                 see request.brs for more info
-' @isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated. 
+' @isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
 Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {}, isLinearBlock = false)
 
   options = m.getCommonOptions(true)
@@ -203,7 +199,7 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {}, i
   params["include_sponsorships"] = true
   params["include_ui_customization"] = true
 
-  ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated. 
+  ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
   if isLinearBlock = true
     params["excluded_containers"] = ["live_news", "sports_on_tubi", "recommended_linear_channels", "news", "featured_channels"]
   end if
@@ -358,7 +354,7 @@ End Function
 ' @screenId: String, id of the screen to which is requesting to get large poster sizes from Tupian.
 ' @containerGridItemType: String, gridItemType of the container for which we are making the request.
 ' @cursor: Integer, cursor value for lazy loading
-' @isLinearBlock: Boolean  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated. 
+' @isLinearBlock: Boolean  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
 Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptions = {}, imageParamTypes = invalid, screenId = "", containerGridItemType = invalid, cursor = 0, isLinearBlock = false)
   options = m.getCommonOptions(true)
   params = options.params
@@ -585,7 +581,7 @@ End Function
 ' @uiMode: string, one of the allowed values from constants.ui.modes
 ' @isLinearBlock: Boolean, value if user is part of linear_no_show experiment
 ' returns batch requests
-Function cmsApi_createHomeScreenBatchReqInfo(homeScreen, index, bKidsMode = false, isSignedInUser = false, uiMode="standard", isLinearBlock = false)
+Function cmsApi_createHomeScreenBatchReqInfo(homeScreen, index, bKidsMode = false, isSignedInUser = false, uiMode = "standard", isLinearBlock = false)
   if index = 0
     m.categoryWindowSize = m.constants.performance.categoryGridList.categoryWindowSize
   else
@@ -593,14 +589,14 @@ Function cmsApi_createHomeScreenBatchReqInfo(homeScreen, index, bKidsMode = fals
   end if
 
   requests = []
-    'Determine the window start and window size for lazy loading
+  'Determine the window start and window size for lazy loading
   windowInfo = m.getWindowInfo(homeScreen, index)
   if windowInfo <> invalid
 
     if windowInfo.start = 0 AND homeScreen.featuredRowContent <> invalid
       featuredCategory = homeScreen.featuredRowContent.getChild(0)
       if featuredCategory <> invalid
-        ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated. 
+        ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
         categoryReqInfo = m.createGetContainerContentsReqInfo(featuredCategory, homeScreen, bKidsMode, isSignedInUser, uiMode, true, isLinearBlock)
 
         if categoryReqInfo <> invalid
@@ -612,10 +608,10 @@ Function cmsApi_createHomeScreenBatchReqInfo(homeScreen, index, bKidsMode = fals
     end if
 
     'Create requests for each category in the window
-    for i = windowInfo.start to (windowInfo.start + windowInfo.size)-1
+    for i = windowInfo.start to (windowInfo.start + windowInfo.size) - 1
       category = homeScreen.content.getChild(i)
       if category <> invalid
-        ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated. 
+        ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
         categoryReqInfo = m.createGetContainerContentsReqInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode, true, isLinearBlock)
 
         if categoryReqInfo <> invalid then
@@ -702,9 +698,9 @@ Function cmsApi_getWindowInfo(homescreen, index)
   currentCategory = homescreen.content.getChild(index)
   if currentCategory <> invalid
     windowSize = m.categoryWindowSize
-    if currentCategory.state = "partial" or currentCategory.state = "none"
+    if currentCategory.state = "partial" OR currentCategory.state = "none"
       windowStart = (index \ m.categoryWindowSize) * m.categoryWindowSize
-      if (index + 1) MOD m.categoryWindowSize = 0
+      if (index + 1) mod m.categoryWindowSize = 0
         ' if the user lands on an empty category that is also the last category in its window,
         ' add some more categories to the batch in order to fill the "next" category
         windowSize = m.categoryWindowSize + (m.categoryWindowSize \ 2)
@@ -752,9 +748,9 @@ End Function
 ' @bKidsMode : boolean
 ' @isSignedInUser: boolean, value based on user loggedIn or not
 ' @uiMode: string, one of the allowed values from constants.ui.modes
-' @isLinearBlock: String  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated. 
+' @isLinearBlock: String  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
 ' returns batch requests
-Function cmsApi_createHomeScreenBatchReqInfoForContainers(containerIds, contentMode = "", bKidsMode = false, isSignedInUser = false, uiMode="standard", screenId="", isLinearBlock = false)
+Function cmsApi_createHomeScreenBatchReqInfoForContainers(containerIds, contentMode = "", bKidsMode = false, isSignedInUser = false, uiMode = "standard", screenId = "", isLinearBlock = false)
 
   reqName = m.constants.reqNames.getCategory
   if screenId = ""
@@ -763,48 +759,48 @@ Function cmsApi_createHomeScreenBatchReqInfoForContainers(containerIds, contentM
 
   requests = []
 
-    for each containerId in containerIds
-      categoryReqInfo = invalid
-      if isNonEmptyString(containerId) = true
-        options = {
-          params: {
-            contents_limit: m.constants.performance.categoryGridList.lazyLoadItemsPerBatch
-          }
+  for each containerId in containerIds
+    categoryReqInfo = invalid
+    if isNonEmptyString(containerId) = true
+      options = {
+        params: {
+          contents_limit: m.constants.performance.categoryGridList.lazyLoadItemsPerBatch
         }
+      }
 
-        contentModeParam = {
-          "content_mode": contentMode
-        }
+      contentModeParam = {
+        "content_mode": contentMode
+      }
 
-        options.params.append(contentModeParam)
+      options.params.append(contentModeParam)
 
-        categoryReqInfo = m.createCategoryReqInfo(containerId, bKidsMode, options, invalid, screenId)
-        categoryReqInfo.requestType = reqName
-        categoryReqInfo.responseType = "node"
-        categoryReqInfo.isSignedInUser = isSignedInUser
-        categoryReqInfo.screenId = screenId
-        categoryReqInfo.uiMode = uiMode
-        ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated. 
-        if isLinearBlock <> invalid
-          categoryReqInfo.isLinearBlock = isLinearBlock
-        end if
+      categoryReqInfo = m.createCategoryReqInfo(containerId, bKidsMode, options, invalid, screenId)
+      categoryReqInfo.requestType = reqName
+      categoryReqInfo.responseType = "node"
+      categoryReqInfo.isSignedInUser = isSignedInUser
+      categoryReqInfo.screenId = screenId
+      categoryReqInfo.uiMode = uiMode
+      ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
+      if isLinearBlock <> invalid
+        categoryReqInfo.isLinearBlock = isLinearBlock
       end if
+    end if
 
-      if categoryReqInfo <> invalid then
-        requests.push(categoryReqInfo)
-      end if
-    end for
+    if categoryReqInfo <> invalid then
+      requests.push(categoryReqInfo)
+    end if
+  end for
 
   return requests
 
 End Function
 
-' @isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated. 
+' @isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
 Function cmsApi_createGetContainerContentsReqInfo(category, homeScreen, bKidsMode, isSignedInUser, uiMode, isVerticalLoad = false, isLinearBlock = false)
   categoryReqInfo = invalid
   paginationInfo = category.paginationInfo
   ' Adding a check to allow only on horizontal scroll or initial vertical scroll if we have not fetched the container.
-  if category.state = "partial" OR category.state = "none" OR (paginationInfo <> invalid AND paginationInfo.hasMoreContent = true AND (isVerticalLoad = false OR category.state <> "loaded") )
+  if category.state = "partial" OR category.state = "none" OR (paginationInfo <> invalid AND paginationInfo.hasMoreContent = true AND (isVerticalLoad = false OR category.state <> "loaded"))
     reqName = m.constants.reqNames.getCategory
 
     categoryId = m.getFullCategoryId(category)
@@ -833,14 +829,14 @@ Function cmsApi_createGetContainerContentsReqInfo(category, homeScreen, bKidsMod
       if paginationInfo <> invalid AND paginationInfo.cursor <> invalid
         cursor = paginationInfo.cursor
       end if
-      ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated. 
+      ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
       categoryReqInfo = m.createCategoryReqInfo(categoryId, bKidsMode, options, imageTypes, m.constants.ui.screenIds.homeScreen, category.gridItemType, cursor, isLinearBlock)
       categoryReqInfo.requestType = reqName
       categoryReqInfo.responseType = "node"
       categoryReqInfo.isSignedInUser = isSignedInUser
       categoryReqInfo.screenId = m.constants.ui.screenIds.homeScreen
-      categoryReqInfo.uiMode = uiMode     
-      categoryReqInfo.isLinearBlock = isLinearBlock ' @isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated. 
+      categoryReqInfo.uiMode = uiMode
+      categoryReqInfo.isLinearBlock = isLinearBlock ' @isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
     end if
 
   end if

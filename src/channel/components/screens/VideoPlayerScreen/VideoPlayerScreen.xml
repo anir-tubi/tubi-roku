@@ -454,21 +454,37 @@
 
       </LayoutGroup>
 
+      <LayoutGroup
+        id="Transport"
+        layoutDirection="vert"
+        vertAlignment="top"
+        horizAlignment="custom"
+        opacity="1.0"/>
+
+      <!-- Thumbnail should be placed as the last child of the HUD component so that transport buttons or components do not overlay it. -->
       <SpritePoster
         id="Thumbnail"
         width="342"
         height="192"
         spriteDirection="horiz"/>
 
-      <LayoutGroup
-        id="Transport"
-        layoutDirection="vert"
-        vertAlignment="top"
-        horizAlignment="left"
-        opacity="1.0"
-        itemSpacings="[9, 18]"/>
-
     </Group>  <!-- HUD -->
+
+    <TransportButton
+      id="SkipTrailerButton"
+      width="260"
+      height="80"
+      translation="[0, -10]"/>
+
+    <TextIconButton
+      id="SkipTrailerTextIconButton"
+      uri="pkg:/images/transport/sgplayer/icon-movie-series.webp"
+      hasUnfocusedBackground="true"
+      iconWidth="36"
+      iconHeight="36"
+      alwaysShowLabel="true"
+      translation="[192, 783]"
+      opacity="0.0"/>
 
     <SimpleButton
       id="skipCuepointsSimpleButton"
@@ -478,8 +494,9 @@
       id="skipCuepointsTextIconButton"
       uri="pkg:/images/transport/sgplayer/icon-skip-intro-nonfocus.webp"
       hasUnfocusedBackground="true"
-      iconWidth="27"
-      iconHeight="15"
+      iconWidth="36"
+      iconHeight="36"
+      alwaysShowLabel="false"
       visible="false"/>
 
     <Group

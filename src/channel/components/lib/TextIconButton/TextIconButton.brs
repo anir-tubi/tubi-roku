@@ -25,6 +25,7 @@ End Function
 Function drawButton()
   text = m.top.text
   uri = m.top.uri
+  m.ButtonText.width = 0
 
   if text <> ""
     m.ButtonText.text = text
@@ -34,9 +35,19 @@ Function drawButton()
     m.ButtonIcon.uri = uri
   end if
 
-  textWidth = m.ButtonText.boundingRect().width + 40
-  iconWidth = m.ButtonIcon.boundingRect().width + 40
-  m.ButtonBG.width = textWidth + iconWidth
+  if m.top.alwaysShowLabel = true
+    m.ButtonBG.width = calculateButtonWidth()
+  else
+    m.ButtonBG.width = 72
+  end if
+
+  if m.top.hasUnfocusedBackground = true
+    m.ButtonBG.blendcolor = m.neutralColor2
+    m.ButtonBG.visible = true
+  else
+    m.ButtonBG.visible = false
+  end if
+
 End Function
 
 
@@ -65,7 +76,6 @@ Function onThemeChange(msg = invalid)
       m.ButtonBG.blendcolor = m.neutralColor2
       m.ButtonBG.visible = true
     else
-      m.ButtonBG.blendcolor = m.neutralColor
       m.ButtonBG.visible = false
     end if
 
@@ -78,8 +88,13 @@ Function updateUI()
     m.ButtonText.color = m.backgroundColor
     m.ButtonIcon.blendcolor = m.backgroundColor
     m.ButtonBG.blendcolor = m.focusedColor
+
+    m.ButtonText.scale = [1, 1]
+    m.ButtonBG.width = calculateButtonWidth()
     m.ButtonBG.visible = true
+
   else
+    m.ButtonIcon.blendcolor = m.primaryTextColor
     if m.top.hasUnfocusedBackground = true
       m.ButtonBG.blendcolor = m.neutralColor2
       m.ButtonBG.visible = true
@@ -87,7 +102,18 @@ Function updateUI()
       m.ButtonBG.blendcolor = m.neutralColor
       m.ButtonBG.visible = false
     end if
-    m.ButtonIcon.blendcolor = m.primaryTextColor
+    if m.top.alwaysShowLabel = false
+      m.ButtonText.scale = [0, 0]
+      m.ButtonBG.width = 72
+    else
+      m.ButtonBG.width = calculateButtonWidth()
+      m.ButtonText.scale = [1, 1]
+    end if
     m.ButtonText.color = m.primaryTextColor
   end if
+End Function
+
+
+Function calculateButtonWidth()
+  return m.ButtonText.boundingRect().width + 90
 End Function

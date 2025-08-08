@@ -7,14 +7,7 @@ Function init()
   m.caret = topRef.findNode("caret")
   m.caretFocused = topRef.findNode("caretFocused")
   m.caretFocused.opacity = 0
-
-  playerControlExperimentType = getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v2", false).type
-
-  if playerControlExperimentType = "variant2" OR playerControlExperimentType = "variant3"
-    m.background.uri = "pkg:/images/tab_component_alt_$$RES$$.9.png"
-  else
-    m.background.uri = "pkg:/images/menu-focus-$$RES$$.9.png" 
-  end if
+  m.background.uri = "pkg:/images/menu-focus-$$RES$$.9.png"
 
   topRef.observeFieldScoped("itemContent", "onItemContentChange")
   topRef.observeFieldScoped("height", "onHeightChange")
@@ -99,7 +92,7 @@ End Function
 ' Returns the width that needs to be subtracted from the width.
 Function getWidthMinusText()
   ' The width include the checkbox, the space in between the checkbox and the label, and the space before the 1st and last elements of the checkbutton
-  return m.caret.width + m.container.itemSpacings[0] + m.container.translation[0]*2
+  return m.caret.width + m.container.itemSpacings[0] + m.container.translation[0] * 2
 End Function
 
 

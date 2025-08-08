@@ -1,6 +1,5 @@
 Function init()
   topRef = m.top
-  m.playerControlExperimentType = getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v2", false).type
 
   deviceInfo = CreateObject("roDeviceInfo")
   modelType = deviceInfo.GetModelType()
@@ -20,7 +19,7 @@ Function init()
   m.globalCaptionMode = "Off"
 
   'The isCCOrAudioSelectedFromFirmware variable is a boolean flag used to identify the source of updates to Closed Captions (CC) or audio tracks.
-  'Source can be from Roku firmware overlay or our application's CC overlay. If the update happened via roku firmware overlay, then we need to hide our CCOverlay. 
+  'Source can be from Roku firmware overlay or our application's CC overlay. If the update happened via roku firmware overlay, then we need to hide our CCOverlay.
   m.isCCOrAudioSelectedFromFirmware = true
 
   m.tubiTrackingInfo = TubiTrackingInfo(m.constants)
@@ -70,7 +69,7 @@ Function showClosedCaptionAndAudioSettings()
   subtitleModeArray = []
   captionModes = m.captionModes
 
-  for i = 0 to captionModes.Count()-1
+  for i = 0 to captionModes.Count() - 1
     captionMode = captionModes[i]
 
     if captionMode = m.globalCaptionMode
@@ -82,7 +81,7 @@ Function showClosedCaptionAndAudioSettings()
         hasSubmenu: true
       })
     end if
-    
+
   end for
 
   subtitleModeContentNode = CreateObject("roSGNode", "ContentNode")
@@ -119,7 +118,7 @@ Function showClosedCaptionAndAudioSettings()
   subtitleAA.numRows = numRows.subtitle
   audioTrackAA.numRows = numRows.audioTrack
 
-  if subtitleCount > 0 
+  if subtitleCount > 0
     m.closedCaptionAndAudioSettings.push(subtitleAA)
   end if
 
@@ -128,15 +127,6 @@ Function showClosedCaptionAndAudioSettings()
   end if
 
   m.playerSideOverlay = CreateObject("roSGNode", "PlayerSideOverlay")
-
-  if m.playerControlExperimentType = "none" OR m.playerControlExperimentType = "variant1"
-    m.playerSideOverlay.width = 630
-    m.playerSideOverlay.height = 960
-  else
-    m.playerSideOverlay.width = 558
-    m.playerSideOverlay.height = 744
-  end if
-
   m.playerSideOverlay.observeFieldScoped("itemUpdated", "onCCAndAudioOptionItemSelected")
   m.playerSideOverlay.observeFieldScoped("backOrLeftKeyPress", "onCCAndAudioOptionBackKeyPressed")
   m.top.appendChild(m.playerSideOverlay)
@@ -157,7 +147,7 @@ Function getLocalizedSubtitleMode(mode)
     translatedMode = "On Replay"
   else if mode = "When mute"
     translatedMode = "On Mute"
-  end if  
+  end if
 
   return translatedMode
 End Function
@@ -173,19 +163,19 @@ Function onCCAndAudioOptionItemSelected(msg)
 
   if screen <> invalid
     item = screen.content
-    
+
     if item <> invalid AND item.checked = true
-      
+
       if item.id = "subtitleMode"
         showSubtitleModeSubMenu()
       else if item.id = "subtitleTrack"
         m.isCCOrAudioSelectedFromFirmware = false
-  
+
         if item.title = "Off"
-  
+
           m.globalCaptionMode = "Off"
           m.top.globalCaptionChanged = m.globalCaptionMode
-  
+
           m.top.trackingEventInfo = {
             type: "subtitles_toggle"
             values: {
@@ -197,9 +187,9 @@ Function onCCAndAudioOptionItemSelected(msg)
           if m.globalCaptionMode = "Off"
             m.globalCaptionMode = "On"
           end if
-  
+
           languageCode = m.tubiTrackingInfo.getLanguageCode(item.language)
-  
+
           m.top.trackingEventInfo = {
             type: "subtitles_toggle"
             values: {
@@ -208,22 +198,22 @@ Function onCCAndAudioOptionItemSelected(msg)
               language_code: languageCode
             }
           }
-  
+
           m.top.subtitleTrack = item.trackName
           m.currentSubtitleTrack = item.trackName
           m.top.globalCaptionChanged = m.globalCaptionMode
-  
-        end if  
+
+        end if
       else if item.id = "audioTrack"
         m.isCCOrAudioSelectedFromFirmware = false
         m.top.audioTrack = item.track
         m.currentAudioTrack = item.track
-  
+
         hasAccessibilityDescription = false
         if item.name.instr(m.constants.player.audioTrack.audioDescriptionTrackNamePrefix) > -1
           hasAccessibilityDescription = true
         end if
-  
+
         m.top.trackingEventInfo = {
           type: "audio_selection"
           values: {
@@ -324,7 +314,7 @@ Function sortAudioTracks(availableAudioTracks)
       if isNonEmptyString(track.name) = true AND track.name.instr(m.constants.player.audioTrack.audioDescriptionTrackNamePrefix) > -1
         index = 1
       else
-        index = 0  
+        index = 0
       end if
     else if languageCode = "ES" 'ESPANOL
       if hasAccessibilityDescription = true
@@ -476,7 +466,7 @@ End Function
 'returns (string) localized audio track name or audio track name as returned from backend
 Function getLocalizedAudioTrackLanguage(track)
   localizedAudioTrackLanguage = track.name
-  languageCode =  m.tubiTrackingInfo.getLanguageCode(track.language)
+  languageCode = m.tubiTrackingInfo.getLanguageCode(track.language)
   audioDescriptionTrackNamePrefix = m.constants.player.audioTrack.audioDescriptionTrackNamePrefix
 
   if languageCode = "EN" AND isNonEmptyString(track.name) = true AND track.name.instr(audioDescriptionTrackNamePrefix) > -1 'English Audio Description
@@ -504,7 +494,7 @@ Function updateSubtitleModeAndSubtitleTrackUI()
 
       if m.globalCaptionMode = "Off"
 
-        for j = 0 to content.getChildCount()-1
+        for j = 0 to content.getChildCount() - 1
           if content.getChild(j).title = "Off"
             content.getChild(0).checked = true
           else
@@ -514,7 +504,7 @@ Function updateSubtitleModeAndSubtitleTrackUI()
 
       else
 
-        for j = 0 to content.getChildCount()-1
+        for j = 0 to content.getChildCount() - 1
           trackName = content.getChild(j).trackName
 
           if m.currentSubtitleTrack = trackName
@@ -540,7 +530,7 @@ Function updateAudioTrackUI()
     if closedCaptionAndAudioSettings[i].id = "audioTracks"
       content = closedCaptionAndAudioSettings[i].content
 
-      for j = 0 to content.getChildCount()-1
+      for j = 0 to content.getChildCount() - 1
         track = content.getChild(j).track
 
         if m.currentAudioTrack = track
@@ -581,13 +571,13 @@ Function showSubtitleModeSubMenu()
   subtitleModeSubMenuAA.hasSubmenu = false
   defaultCheckedItemIndex = 0
 
-  for i = 0 to captionModes.Count()-1
-    
+  for i = 0 to captionModes.Count() - 1
+
     if captionModes[i] = m.globalCaptionMode
       checked = true
       defaultCheckedItemIndex = i
     else
-      checked = false  
+      checked = false
     end if
 
     subtitleModeArray.push({
@@ -601,7 +591,7 @@ Function showSubtitleModeSubMenu()
   content = CreateObject("roSGNode", "ContentNode")
   content.id = "subtitleMode"
   content.update(subtitleModeArray, true)
-  
+
   subtitleModeSubMenuAA.content = content
   subtitleModeSubMenuAA.defaultCheckedItemIndex = defaultCheckedItemIndex
   subtitleModeSubMenuAA.numRows = content.getChildCount()
@@ -610,22 +600,13 @@ Function showSubtitleModeSubMenu()
   m.closedCaptionAndAudioSettings.push(subtitleModeSubMenuAA)
 
   m.playerSideOverlay = CreateObject("roSGNode", "PlayerSideOverlay")
-
-  if m.playerControlExperimentType = "none" OR m.playerControlExperimentType = "variant1"
-    m.playerSideOverlay.width = 630
-    m.playerSideOverlay.height = 960
-  else
-    m.playerSideOverlay.width = 558
-    m.playerSideOverlay.height = 744
-  end if
-
   m.playerSideOverlay.observeFieldScoped("itemUpdated", "onSubtitleModeSubMenuItemSelected")
   m.playerSideOverlay.observeFieldScoped("backOrLeftKeyPress", "onSubtitleModeBackKeyPressed")
   m.top.appendChild(m.playerSideOverlay)
 
   m.playerSideOverlay.itemList = m.closedCaptionAndAudioSettings
   m.playerSideOverlay.setFocus(true)
-  
+
 End Function
 
 

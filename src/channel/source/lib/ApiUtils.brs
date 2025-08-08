@@ -4,17 +4,23 @@
 ' @pubServerPersistentData: assocarray Holds the value for user/device level settings.
 Function ApiUtils(constants, pubServerPersistentData) as Object
 
- return {
-  ' dependencies
-  constants: constants
-  pubServerPersistentData: pubServerPersistentData
+  return {
+    ' dependencies
+    constants: constants
+    pubServerPersistentData: pubServerPersistentData
 
-  ' public
-  getCommonOptions: apiUtils_getCommonOptions
- }
+    ' public
+    getCommonOptions: apiUtils_getCommonOptions
+    getPlatform: apiUtils_getPlatform
+  }
 
 End Function
 
+' Gets the platform value from constants
+' @return: string The platform value (e.g., "roku", "telstra")
+Function apiUtils_getPlatform()
+  return m.constants.platform
+End Function
 
 ' @appendFailSafeHeaders: boolean Pass true if we want to append fail safe parameters.
 Function apiUtils_getCommonOptions(appendFailSafeHeaders = false)
@@ -28,7 +34,7 @@ Function apiUtils_getCommonOptions(appendFailSafeHeaders = false)
     if m.pubServerPersistentData <> invalid AND m.pubServerPersistentData.parentalRating <> invalid
       headers["X-TUBI-RATING"] = m.constants.serverValues.parentalControls[m.pubServerPersistentData.parentalRating]
     end if
-    
+
     headers.append(m.constants.headers.tubiPlatform)
   end if
 

@@ -29,6 +29,10 @@
       <field id="showBorder" type="boolean" value="false"/>
   </interface>
   <children>
+    <Rectangle 
+      id="background"
+      color="0x000000"
+      visible="false"/>
     <Poster
       id="Poster"/>
     <!-- Based on testing, this will preload the image even if visible=false. This

@@ -1,6 +1,5 @@
 Function init()
   m.overlayBackground = m.top.findNode("overlayBackground")
-  m.playerControlExperimentType = getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v2", false).type
 
   m.top.observeFieldScoped("focusedChild", "onComponentFocus")
   m.top.observeFieldScoped("itemList", "onItemListChanged")
@@ -29,28 +28,17 @@ Function onItemListChanged(msg)
     outerLayoutGroup = createObject("roSGNode", "LayoutGroup")
     outerLayoutGroup.layoutDirection = "vert"
     outerLayoutGroup.vertAlignment = "custom"
-
-    if m.playerControlExperimentType = "none" OR m.playerControlExperimentType = "variant1"
-      outerLayoutGroup.translation = [60, 60]
-      outerLayoutGroup.itemSpacings = [40]
-    else
-      outerLayoutGroup.translation = [24, 24]
-      outerLayoutGroup.itemSpacings = [24]
-    end if
+    outerLayoutGroup.translation = [60, 60]
+    outerLayoutGroup.itemSpacings = [40]
 
     for i = 0 to itemList.Count() - 1
       items = itemList[i]
 
       if items <> invalid
-
-        if m.playerControlExperimentType = "none" OR m.playerControlExperimentType = "variant1"
-          overlayItems = CreateObject("roSGNode", "OverlayItems")
-        else
-          overlayItems = CreateObject("roSGNode", "EnhancedOverlayItems")
-        end if
+        overlayItems = CreateObject("roSGNode", "OverlayItems")
         overlayItems.itemsInfo = items
 
-        child =  overlayItems.getChild(0)
+        child = overlayItems.getChild(0)
         focusedChild = invalid
         for j = 0 to child.getChildCount() - 1
           if child.getChild(j).subtype() = "CheckBoxList" OR child.getChild(j).subtype() = "CaretBoxList"
