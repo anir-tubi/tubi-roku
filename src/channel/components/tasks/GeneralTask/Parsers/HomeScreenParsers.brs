@@ -28,16 +28,16 @@ Function parseHomeScreenContentSuccess(fullResponse, reqInfo)
   end if
 
   isSignedInUser = false
-  isLinearBlock = false ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated. 
+  isLinearBlock = false ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
   if reqInfo <> invalid
     isSignedInUser = reqInfo.isSignedInUser
-    
+
     if reqInfo.isLinearBlock <> invalid
       isLinearBlock = reqInfo.isLinearBlock
     end if
   end if
 
-  convertedMetadata = m.metadataTranslate.translateHomescreen(parsedResponse, contentMode, isKidsMode, uiMode,"homeScreen", isSignedInUser, isLinearBlock)
+  convertedMetadata = m.metadataTranslate.translateHomescreen(parsedResponse, contentMode, isKidsMode, uiMode, "homeScreen", isSignedInUser, isLinearBlock)
 
   'AdSkin
   ads = parsedResponse.ads
@@ -71,6 +71,10 @@ Function parseCategoryContentSuccess(fullResponse, reqInfo)
 
   isKidsMode = false
   uiMode = "standard"
+  requestContext = {
+    totalDuplicates: 0
+    childrenContentIDs: {}
+  }
 
   if reqInfo <> invalid
     isSignedInUser = reqInfo.isSignedInUser
@@ -88,11 +92,14 @@ Function parseCategoryContentSuccess(fullResponse, reqInfo)
     if reqInfo.uiMode <> invalid
       uiMode = reqInfo.uiMode
     end if
-  
+
     if reqInfo.isLinearBlock <> invalid
       isLinearBlock = reqInfo.isLinearBlock
     end if
 
+    if reqInfo.requestContext <> invalid
+      requestContext = reqInfo.requestContext
+    end if
   end if
 
   ' Noticed a small bug in tensor response that sometimes cursor is not returned from backend using our request information.
@@ -102,8 +109,8 @@ Function parseCategoryContentSuccess(fullResponse, reqInfo)
     end if
   end if
 
-  convertedMetadata = m.metadataTranslate.translateContainer(parsedResponse, fullJson, orientation, bFullData, contentMode, screenId, isSignedInUser, isKidsMode, uiMode, isLinearBlock)
-  return convertedMetadata  'may return an empty container
+  convertedMetadata = m.metadataTranslate.translateContainer(parsedResponse, fullJson, orientation, bFullData, contentMode, screenId, isSignedInUser, isKidsMode, uiMode, isLinearBlock, requestContext)
+  return convertedMetadata 'may return an empty container
 End Function
 
 

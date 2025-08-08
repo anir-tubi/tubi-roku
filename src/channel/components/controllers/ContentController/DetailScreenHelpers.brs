@@ -2290,10 +2290,12 @@ Function getDetailScreenAnalyticsPageInfo(content, constants)
       end if
     end if
     ' Cannot use appendContentUserContextValues here because screen is not yet created in some cases.
-    additionalContextValues = {}
-    isAdultParentalLevel = checkIfUserIsAdultByParentalRatingAndBirthday()
-    appendContentUserContextValues(additionalContextValues, content, isAdultParentalLevel)
-    pageInfo.additionalContextValues = additionalContextValues
+    if pageInfo <> invalid
+      additionalContextValues = {}
+      isAdultParentalLevel = checkIfUserIsAdultByParentalRatingAndBirthday()
+      appendContentUserContextValues(additionalContextValues, content, isAdultParentalLevel)
+      pageInfo.additionalContextValues = additionalContextValues
+    end if
   end if
 
   return pageInfo

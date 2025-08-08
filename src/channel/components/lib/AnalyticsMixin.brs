@@ -3,6 +3,6 @@
 ' @content: assocArray, the content object
 ' @isAdultParentalLevel: boolean, true if the user is an adult parental level
 Function appendContentUserContextValues(eventValues, content, isAdultParentalLevel)
-  eventValues.isCdc = content <> invalid AND content.isCdc
+  eventValues.isCdc = content <> invalid AND content.isCdc = true
   eventValues.isAdultParentalLevel = isAdultParentalLevel
 End Function

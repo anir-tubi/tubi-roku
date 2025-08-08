@@ -696,7 +696,11 @@ Function makeContainerRequest(category, columnFocused, homeScreen, successCallba
   if isNode(category) = true AND category.paginationInfo <> invalid AND columnFocused >= firstBatchLimit
     cursor = category.paginationInfo.cursor
     hasMoreContent = category.paginationInfo.hasMoreContent
-    if hasMoreContent = true AND columnFocused >= (cursor - 10) AND category.state <> "containerPaginationRequestPending"
+    rightEdge = cursor - 10
+    if isInteger(category.totalDuplicates)
+      rightEdge = rightEdge - category.totalDuplicates
+    end if
+    if hasMoreContent = true AND columnFocused >= rightEdge AND category.state <> "containerPaginationRequestPending"
       isKidsMode = shouldKidsModeBeSentToServer()
       isSignedInUser = isLoggedInUser()
       isLinearBlock = isLinearBlocked()
@@ -715,6 +719,10 @@ Function makeContainerRequest(category, columnFocused, homeScreen, successCallba
           isLinearBlock: isLinearBlock
           uiMode: m.uiMode
           categoryId: category.id
+          requestContext: {
+            childrenContentIDs: category.childrenContentIDs
+            totalDuplicates: category.totalDuplicates
+          }
         })
       end if
     end if
@@ -767,6 +775,8 @@ Function appendContentToCategory(response, contentNode, rowFocused)
 
       category.paginationInfo = response.paginationInfo
       category.child_ui_customization = childUICustomization
+      category.childrenContentIDs = response.childrenContentIDs
+      category.totalDuplicates = response.totalDuplicates
       category.json = FormatJson(fullJson)
       category.state = response.state
       category.appendChildren(items)

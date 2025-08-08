@@ -41,20 +41,20 @@ Function listen()
   m.batchStore = {}
   ' batch store will look like below after receiving response for a batch
   ' m.batchStore - eg.
-       '{
-          '416eb945-81ba-45b8-9cd8-c11056666b43:  '{
-                                                    '09a35019-4120-45ef-bd3d-51effcc1340b: <Component: roAssociativeArray>
-                                                    '12c696be-b2b1-4617-8b68-20fe912cea9a: <Component: roAssociativeArray>
-                                                    '6e32aecc-b2af-41ce-ba23-d02678619fa8: <Component: roAssociativeArray>
-                                                    '6f5ed7be-c97c-4086-80e7-be5c3c870849: <Component: roAssociativeArray>
-                                                    '70ef677a-8b06-49fa-bf82-c15b63a5c6dc: <Component: roAssociativeArray>
-                                                    '79276deb-7de3-4f77-a708-979abe533800: <Component: roAssociativeArray>
-                                                    '7b2599df-7ac0-49ce-b3d6-e750b15289f2: <Component: roAssociativeArray>
-                                                    '8e922927-27bd-4b90-bf9d-ec23c3da3bae: <Component: roAssociativeArray>
-                                                    'c5b9facd-67de-4e7f-aa1e-d4325cb9ec7d: <Component: roAssociativeArray>
-                                                    'fa915219-1db3-446c-aa9d-1c5af09c7704: <Component: roAssociativeArray>
-                                                  '}
-      '}
+  '{
+  '416eb945-81ba-45b8-9cd8-c11056666b43:  '{
+  '09a35019-4120-45ef-bd3d-51effcc1340b: <Component: roAssociativeArray>
+  '12c696be-b2b1-4617-8b68-20fe912cea9a: <Component: roAssociativeArray>
+  '6e32aecc-b2af-41ce-ba23-d02678619fa8: <Component: roAssociativeArray>
+  '6f5ed7be-c97c-4086-80e7-be5c3c870849: <Component: roAssociativeArray>
+  '70ef677a-8b06-49fa-bf82-c15b63a5c6dc: <Component: roAssociativeArray>
+  '79276deb-7de3-4f77-a708-979abe533800: <Component: roAssociativeArray>
+  '7b2599df-7ac0-49ce-b3d6-e750b15289f2: <Component: roAssociativeArray>
+  '8e922927-27bd-4b90-bf9d-ec23c3da3bae: <Component: roAssociativeArray>
+  'c5b9facd-67de-4e7f-aa1e-d4325cb9ec7d: <Component: roAssociativeArray>
+  'fa915219-1db3-446c-aa9d-1c5af09c7704: <Component: roAssociativeArray>
+  '}
+  '}
 
   m.jobStore = {}
   m.backedOffJobs = {}
@@ -69,7 +69,7 @@ Function listen()
 
   m.requestModule = Request(m.constants.settings)
   m.auth = TubiAuth(m.constants)
-  nTimeout = 0  'We do not need to execute timeout processing logic every time while loop is executed (200ms). This counter is used to control the timeout logic execution to every third time.
+  nTimeout = 0 'We do not need to execute timeout processing logic every time while loop is executed (200ms). This counter is used to control the timeout logic execution to every third time.
 
   while (true)
     msg = wait(200, m.port)
@@ -209,7 +209,7 @@ Function processTimeoutError(job)
     end if
   end if
 
-End function
+End Function
 
 
 ' makeApiRequest
@@ -461,7 +461,7 @@ Function processSuccessResponse(result, callbackTypes, job)
                     "url": result.url
                     "responseCode": result.response.code
                   }
-      
+
                   ' If the output does not match the expected type then we should log an error
                   logInfo(message, "clientInfo", "parser-json-aa-conversion", 1)
 
@@ -503,15 +503,19 @@ Function processSuccessResponse(result, callbackTypes, job)
         job.reqInfo.callbackNode.response = ""
       end if
     catch e
-      message = {
-        "url": result.url
-        "responseCode": result.response.code
-      }
+      if m.constants.settings.mode <> "production"
+        throw e
+      else
+        message = {
+          "url": result.url
+          "responseCode": result.response.code
+        }
 
-      message.append(e)
+        message.append(e)
 
-      logInfo(message, "clientInfo", "caught-crash", 1)
-      processErrorResponse(result, callbackTypes, job)
+        logInfo(message, "clientInfo", "caught-crash", 1)
+        processErrorResponse(result, callbackTypes, job)
+      end if
     end try
   end if
 
@@ -529,7 +533,7 @@ End Function
 '
 ' Side effect sends the batch with responses back to the render thread if all responses have been returned
 Function accumulateBatchResponse(job, parsedResponse) as Void
-  if job = invalid or job.reqInfo = invalid or job.batchInfo = invalid
+  if job = invalid OR job.reqInfo = invalid OR job.batchInfo = invalid
     return
   end if
 
@@ -656,7 +660,7 @@ End Function
 '
 ' this method cancels the outstanding requests on the same screen
 ' @reqInfo: AA that was created by generalTask_makeRequest
-Function cancelRequests(reqInfo) As Void
+Function cancelRequests(reqInfo) as Void
   tubiLog("BaseGeneralTask.cancelRequests")
 
   requestId = reqInfo.id
