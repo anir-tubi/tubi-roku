@@ -1345,7 +1345,8 @@ End Function
 Function updateVideoTileOnFocusChange(rowFocused, columnFocused, screen)
   ' Only process if the screen is the home screen.
   ' Since all others screens are using topRight background variant vs home screen will use full screen background.
-  if isCurrentScreenHomeScreen() = true
+  ' TODO: If we graduate roku_home_screen_redesign_v_1_3 we should migrate the skin ad to be a itemComponent of FeaturedRowList so that we don't have to add these one off checks.
+  if isCurrentScreenHomeScreen() = true AND screen.lastFocusedList <> "skinAdRow"
     displayDefaultBackground()
   end if
 
