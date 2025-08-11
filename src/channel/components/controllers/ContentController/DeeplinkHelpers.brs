@@ -100,6 +100,10 @@ Function createDeeplinkContentFromStartupArgs(args)
     else if mediaType = "sports"
       content.type = "video"
       content.deeplinkType = "sports"
+      ' Temporary for Fox player testing
+    else if mediaType = "fox"
+      content.type = "linear"
+      content.deeplinkType = "fox"
     end if
   else if args.mediaType = invalid AND args.page <> invalid ' page request
     page = LCase(args.page)
@@ -178,7 +182,7 @@ Function handleDeeplink()
 End Function
 
 
-Function handleInputDeeplink(inputInfo) as void
+Function handleInputDeeplink(inputInfo) as Void
   tubilog("DeeplinkHelpers.handleInputDeeplink")
   resetSideNav(false)
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
@@ -241,7 +245,7 @@ Function handleDeeplinkContentByType()
   tubilog("deeplinkHelpers.handleDeeplinkContentByType")
   if m.deepLinkContent <> invalid
     if m.deepLinkContent.deeplinkType = "linear" OR m.deepLinkContent.deeplinkType = "liveTV"
-     'if fadeInContentController has not be set true, then linear content can not play.
+      'if fadeInContentController has not be set true, then linear content can not play.
       'in that case, we are setting a callback to call handleLinearDeeplinkContent after fadeInContentController is triggered
       if m.top.fadeInContentController = true
         handleLinearDeeplinkContent()
@@ -256,13 +260,13 @@ Function handleDeeplinkContentByType()
       handleMoviesPageDeeplinkContent()
     else if m.deepLinkContent.deeplinkType = "kids"
       handleKidsPageDeeplinkContent()
-    else if m.deepLinkContent.deeplinktype = "espanolPage"
+    else if m.deepLinkContent.deeplinkType = "espanolPage"
       handleEspanolPageDeeplinkContent()
-    else if m.deepLinkContent.deeplinktype = "homePage"
+    else if m.deepLinkContent.deeplinkType = "homePage"
       handleHomePageDeeplinkContent()
-    else if m.deepLinkContent.deeplinktype = "tvPage"
+    else if m.deepLinkContent.deeplinkType = "tvPage"
       handleTVPageDeeplinkContent()
-    else if m.deepLinkContent.deeplinktype = "series"
+    else if m.deepLinkContent.deeplinkType = "series"
       if Left(m.deepLinkContent.id, 1) = "0"
         playbackSource = getPlaybackSourceForDeeplinkType()
         showDetailScreen(m.deepLinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource)
@@ -270,10 +274,10 @@ Function handleDeeplinkContentByType()
         getSingleContentFromServer(m.deeplinkContent, onDeeplinkSeriesContentSuccess, handleSingleContentDeeplinkError)
       end if
 
-    else if m.deepLinkContent.deeplinktype = "episode"
+    else if m.deepLinkContent.deeplinkType = "episode"
       getSingleContentFromServer(m.deeplinkContent, onDeeplinkEpisodeContentSuccess, handleSingleContentDeeplinkError)
 
-    else if m.deepLinkContent.deeplinktype = "season"
+    else if m.deepLinkContent.deeplinkType = "season"
       if Left(m.deepLinkContent.id, 1) = "0"
         playbackSource = getPlaybackSourceForDeeplinkType()
         showDetailScreen(m.deepLinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource)
@@ -281,19 +285,27 @@ Function handleDeeplinkContentByType()
         getSingleContentFromServer(m.deeplinkContent, onDeeplinkSeasonContentSuccess, handleSingleContentDeeplinkError)
       end if
 
-    else if m.deepLinkContent.deeplinktype = "movie" OR m.deepLinkContent.deeplinktype = "tvspecial"
+    else if m.deepLinkContent.deeplinkType = "movie" OR m.deepLinkContent.deeplinkType = "tvspecial"
       playbackSource = getPlaybackSourceForDeeplinkType()
       showDetailScreen(m.deeplinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource)
 
-    else if m.deepLinkContent.deeplinktype = "sports"
+    else if m.deepLinkContent.deeplinkType = "sports"
       playbackSource = getPlaybackSourceForDeeplinkType()
       showDetailScreen(m.deeplinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource)
       sideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
       focusSideNavOption(sideNavID)
-    else if m.deepLinkContent.deeplinktype = "shortFormVideo"
+    else if m.deepLinkContent.deeplinkType = "shortFormVideo"
       ' shortFormVideo media refers to content that is under 15 minutes long. Examples include movie trailers, news snippets, comedy clips, food reviews, and similar videos.
       ' In our app, it primarily features movie trailers
       getSingleContentFromServer(m.deeplinkContent, onDeeplinkShortFormContentSuccess, handleSingleContentDeeplinkError)
+    else if m.deepLinkContent.deeplinkType = "fox" then
+      ' Temp code for now so QA can test
+      test = CreateObject("roSGNode", "ContentNode")
+      test.update({
+        "id": "-1" ' No id on our side currently
+        "listingId": m.deepLinkContent.id
+      }, true)
+      playLinearVideoWithFoxPlayer(test)
     else
       message = getTranslation("error_deeplink_page")
       showDeeplinkErrorModal(invalid, message)
@@ -316,7 +328,7 @@ Function onSingleChannelFetchForDeeplinkSuccess(successResponse, storeInCache = 
   linearContent = invalid
   if successResponse.getChildCount() > 0
     linearContent = successResponse.getChild(0)
-    linearContent.deeplinktype = "linear"
+    linearContent.deeplinkType = "linear"
   end if
 
   if linearContent <> invalid
@@ -351,7 +363,7 @@ Function onSingleChannelFetchForDeeplinkSuccess(successResponse, storeInCache = 
     end if
   else
     showDeeplinkErrorModal()
-   end if
+  end if
 
   'm.enteredFromDeepLink will be set to false when back button is pressed on video
   m.deeplinkContent = invalid
@@ -395,7 +407,7 @@ Function showDeeplinkErrorModal(response = invalid, message = "")
       type: "dialog"
       values: {
         dialog_type: dialogType
-        pageOneof: m.Tracking.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_UNKNOWN"})
+        pageOneof: m.Tracking.getAnalyticsPage("home_page", { content_mode: "CONTENT_MODE_UNKNOWN" })
         dialog_action: "SHOW"
         dialog_sub_type: "launch-deeplink"
       }
@@ -455,14 +467,14 @@ Function sendDeeplinkAnalytics(deepLinkContent, refreshedContent, entryPoint, tr
     else 'default
       pageInfo = {
         pageType: "home_page"
-        pageValues: {content_mode: "CONTENT_MODE_UNKNOWN"}
+        pageValues: { content_mode: "CONTENT_MODE_UNKNOWN" }
       }
     end if
 
     if entryPoint = m.constants.deeplinks.entryPoints.detail
       referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
     else if entryPoint = m.constants.deeplinks.entryPoints.home
-      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_UNKNOWN"})
+      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", { content_mode: "CONTENT_MODE_UNKNOWN" })
     else if entryPoint = m.constants.deeplinks.entryPoints.epg
       referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("linear_browse_page", {})
     else if entryPoint = m.constants.deeplinks.entryPoints.category
@@ -470,19 +482,19 @@ Function sendDeeplinkAnalytics(deepLinkContent, refreshedContent, entryPoint, tr
     else if entryPoint = m.constants.deeplinks.entryPoints.channel
       referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("channel_list_page", {})
     else if entryPoint = m.constants.deeplinks.entryPoints.espanol
-      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_LATINO"})
+      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", { content_mode: "CONTENT_MODE_LATINO" })
     else if entryPoint = m.constants.deeplinks.entryPoints.movies
-      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_MOVIE"})
+      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", { content_mode: "CONTENT_MODE_MOVIE" })
     else if entryPoint = m.constants.deeplinks.entryPoints.tv
-      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_TV"})
+      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", { content_mode: "CONTENT_MODE_TV" })
     else if entryPoint = m.constants.deeplinks.entryPoints.categoryDetail
-      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("category_page", {"category_slug": deepLinkContent.id})
+      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("category_page", { "category_slug": deepLinkContent.id })
     else if entryPoint = m.constants.deeplinks.entryPoints.news
-      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_LINEAR"})
+      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", { content_mode: "CONTENT_MODE_LINEAR" })
     else if entryPoint = m.constants.deeplinks.entryPoints.episodeList
       if deepLinkContent <> invalid
         seriesId = deepLinkContent.id.toInt()
-        referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("episode_video_list_page", {series_id: seriesId})
+        referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("episode_video_list_page", { series_id: seriesId })
       end if
     else if entryPoint = m.constants.deeplinks.entryPoints.video AND pageInfo <> invalid
       referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
@@ -655,10 +667,10 @@ Function handleMoviesPageDeeplinkContent()
     showMoviesScreen()
     focusSideNavOption(m.constants.ui.sideNavIds.movies)
   else if isParentalControlsAdultLevel() = false OR m.uiMode = m.constants.ui.modes.kidsAgeGate
-      ' Display error message indicating to turn off the parental controls
-      message = getTranslation("dialog_sideNavItemDisabled_Parental_description")
-      showDeeplinkErrorModal(invalid, message)
-      setUiMode(m.constants.ui.modes.kids)
+    ' Display error message indicating to turn off the parental controls
+    message = getTranslation("dialog_sideNavItemDisabled_Parental_description")
+    showDeeplinkErrorModal(invalid, message)
+    setUiMode(m.constants.ui.modes.kids)
   else
     if m.enteredFromDeepLink = true
       sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.movies, m.Tracking, m.trackingLoggingTask, m.constants)
@@ -773,7 +785,7 @@ End Function
 ' @refreshedContent: roSGNode, success video response content
 ' @successcb: successcallback which will handle success response after fetching video for provided contentId
 ' @errorcb: errorCallback which will handle error while fetching video for provided contentId
-Function handleDeeplinkVideoSuccessResponse(refreshedContent, successCb = invalid, errorCb = invalid) as void
+Function handleDeeplinkVideoSuccessResponse(refreshedContent, successCb = invalid, errorCb = invalid) as Void
   '  refreshedContent.id =       episode id
   '  refreshedContent.seriesId = series id
   '  refreshedContent.type =     video
@@ -793,7 +805,7 @@ End Function
 ' @refreshedContent: roSGNode, success video response content
 ' @successcb: success callback which will handle the success response after fetching the content metadata for the movie associated with the trailer that was deeplinked to.
 ' @errorcb: errorCallback which will handle error while fetching video for provided contentId
-Function handleDeeplinkShortFormSuccessResponse(refreshedContent, successCb = invalid, errorCb = invalid) as void
+Function handleDeeplinkShortFormSuccessResponse(refreshedContent, successCb = invalid, errorCb = invalid) as Void
   emptyMovieNode = CreateObject("roSGNode", "TubiContentNode")
   emptyMovieNode.type = m.constants.ui.contentTypes.movie
 
@@ -963,7 +975,7 @@ Function handleSingleContentDeeplinkError(error)
   if m.enteredFromDeepLink = false AND m.deepLinkContent <> invalid
     'only in case of the movie, we have already sneaked the showdetail screen, so we need to
     'bring the user to previous screen.
-    if m.deepLinkContent.deeplinktype = "movie" OR m.deepLinkContent.deeplinktype = "sports" OR m.deepLinkContent.deeplinktype = "tvspecial"
+    if m.deepLinkContent.deeplinkType = "movie" OR m.deepLinkContent.deeplinkType = "sports" OR m.deepLinkContent.deeplinkType = "tvspecial"
       detailScreen = getTopDetailScreenFromStack()
       if detailScreen <> invalid AND detailScreen.content.id = m.deepLinkContent.id
         'Simply popping the screen is resulting in issues, so calling onDetailBackPressed function.

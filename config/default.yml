@@ -9,6 +9,7 @@ settings:
   starterComponentsUrl: "https://mrcdn-production.tubitv.com/appFiles/starter-components/tubi_starter_components_{{versionMinorUnderscored}}.pkg"
   remoteComponentsUrl:  "https://mrcdn-production.tubitv.com/appFiles/components/tubi_remote_components_{{versionUnderscored}}.pkg"
   oneTrustComponentsUrl:  "https://mrcdn-production.tubitv.com/appFiles/one-trust-components/tubi_one_trust_components_{{oneTrustVersionUnderscored}}.pkg"
+  foxVideoPlayerComponentsUrl: "https://mrcdn-staging.tubitv.com/appFiles/fox-video-player-components/fox_video_player_{{foxVideoPlayerVersionUnderscored}}.pkg"
   remoteComponentsExtension: "pkg"
   remoteComponentLibProvided: "{{remoteComponentLibProvided}}"
   suitest: false
@@ -117,5 +118,12 @@ starter_library_manifest:
 one_trust_library_manifest:
   title: "One Trust Component Library"
   sg_component_libs_provided: "OneTrustLibrary"
+  hidden: 1
+  rsg_version: 1.2
+
+fox_video_player_library_manifest:
+  title: "Fox Video Player Component Library"
+  sg_component_libs_provided: "FoxVideoPlayer"
+  bs_libs_required: "roku_ads_lib,googleima3"
   hidden: 1
   rsg_version: 1.2

@@ -18,7 +18,7 @@ const clipboardy = require('clipboardy');
 const REMOVE_TUBI_LOGS_REGEX = /(?<!Function.*)(tubiLog|logDebug)\s*\(.*$/gim;
 
 //Importing old build functions
-const {load, getBuildTag, getOneTrustBuildTag} = require('./js/config');
+const {load, getBuildTag, getOneTrustBuildTag, getFoxVideoPlayerBuildTag} = require('./js/config');
 const {createManifest, createSettings} = require('./js/build');
 const {keypress, deeplink, uploadPkg, signPkg, installWithSquashfs} = require('./js/network');
 
@@ -32,7 +32,7 @@ const {replaceTypographyConstants, updateTypographyJSON} = require('./js/typogra
 const {NoStackError} = require('./js/utilities');
 
 // Importing functions with Git functionality
-const {makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges, buildQaBranch, bumpBuild, bumpBuildTen, bumpRevision, tagBuild, createCdnPullRequestForOneTrustSDK, sendSlackReminders, getCurrentBranch, isBranchTrackingPresent} = require('./js/git');
+const {makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges, buildQaBranch, bumpBuild, bumpBuildTen, bumpRevision, tagBuild, createCdnPullRequestForOneTrustSDK, createCdnPullRequestForFoxVideoPlayer, sendSlackReminders, getCurrentBranch, isBranchTrackingPresent} = require('./js/git');
 
 // Importing functions related to Github action runners
 const {setupAutomatedTestsGithubActionRunner, startAutomatedTestsGithubActionRunner, removeAutomatedTestsGithubActionRunner} = require('./js/action-runner');
@@ -209,6 +209,16 @@ function buildInstalled() {
 
   return build
     .then(() => {
+      // TODO remove after fox video player is removed.
+      // Only including with staging and production to speed up development deployments
+      if (options.config === 'production' || options.config === 'staging') {
+      const foxBuildTag = getFoxVideoPlayerBuildTag(options);
+        const foxVideoPlayerPkgName = `fox_video_player_${foxBuildTag}.pkg`;
+
+        fs.mkdirSync('build/local/fox-video-player-components/');
+        fs.copyFileSync(`fox-video-player-components/${foxVideoPlayerPkgName}`, `build/local/fox-video-player-components/${foxVideoPlayerPkgName}`);
+      }
+
       replaceColorConstants('build/local');
       replaceTypographyConstants('build/local');
       createSettings(options, 'build/local/source/Settings.brs');
@@ -761,10 +771,143 @@ function packageOneTrust(done) {
     });
 }
 
+// Storing outside of function to allow use across functions
+const foxVideoPlayerDestSDKPath = 'build/fox_video_player';
+const foxVideoPlayerZipFilePath = `build/fox_video_player_components_${getFoxVideoPlayerBuildTag(options)}.zip`;
+
+
+async function buildFoxVideoPlayer() {
+  const foxSrcSDKPath = '../fox-player-roku';
+
+  // Copy the fox video player components to the build folder
+  await new Promise((res, rej) => {
+    let sources = [
+      `${foxSrcSDKPath}/components/**/*.*`,
+      `${foxSrcSDKPath}/source/**/*.*`,
+      `${foxSrcSDKPath}/assets/**/*.*`
+    ];
+
+    const srcOptions = {
+      base: foxSrcSDKPath
+    };
+
+    let stream = collect(sources, srcOptions)
+      .pipe(dest(foxVideoPlayerDestSDKPath));
+
+    stream.on('end', () => {
+      res();
+    });
+  });
+
+  // Need to modify their files to replace pkg with libpkg to allow it to run properly in a component library
+  processDirectoryForPkgReplacement(foxVideoPlayerDestSDKPath);
+
+  // Copy our files as well
+  await new Promise((res, rej) => {
+    let sources = [
+      `fox-video-player/components/FoxVideoPlayerInitializer/**/*`,
+    ];
+
+    const srcOptions = {
+      base: 'fox-video-player/'
+    };
+
+    let stream = collect(sources, srcOptions)
+      .pipe(dest(foxVideoPlayerDestSDKPath));
+
+    stream.on('end', () => {
+      res();
+    });
+  });
+
+  createManifest(options, `${foxVideoPlayerDestSDKPath}/manifest`, 'fox_video_player_library_manifest');
+  return zipAsPromise(`${foxVideoPlayerDestSDKPath}/**/*`, foxVideoPlayerZipFilePath, './');
+}
+
+
+function packageFoxVideoPlayer(done) {
+  const buildTag = getFoxVideoPlayerBuildTag(options);
+  log('Starting packageFoxVideoPlayer');
+  const appName = `fox_video_player_${buildTag}`;
+
+  return installWithSquashfs(foxVideoPlayerZipFilePath, options.target, options.devPass)
+    .then(() => {
+      log(`Signing ${foxVideoPlayerZipFilePath}`);
+      return signPkg(options.target, options.devPass, options.pkgPass, appName, 'build');
+    })
+    .then(path => {
+      log(`Signed package at ${foxVideoPlayerZipFilePath}`);
+      return path;
+    })
+    .catch(err => {
+      console.log(err);
+      log('Could not package fox video player components');
+      log('HINT: Make sure you are using the correct Roku device IP.');
+      done(err);
+    });
+}
+
+
+// Remove after fox video player is removed
+// Used to replace pkg with libpkg in a specific brs file in the fox video player
+function replacePkgWithLibpkgInFile(filePath) {
+  fs.readFile(filePath, 'utf8', (err, data) => {
+    if (err) {
+      console.error(`Error reading file ${filePath}:`, err);
+      return;
+    }
+
+    const result = data.replace(/pkg:\//g, 'libpkg:/');
+
+    fs.writeFile(filePath, result, 'utf8', (err) => {
+      if (err) {
+        console.error(`Error writing file ${filePath}:`, err);
+      } else {
+        console.log(`Replaced in file ${filePath}`);
+      }
+    });
+  });
+}
+
+
+// Remove after fox video player is removed
+// Used to replace pkg with libpkg in all brs files in the fox video player
+function processDirectoryForPkgReplacement(directory) {
+  fs.readdir(directory, (err, files) => {
+    if (err) {
+      console.error(`Error reading directory ${directory}:`, err);
+      return;
+    }
+
+    files.forEach((file) => {
+      const filePath = path.join(directory, file);
+      fs.stat(filePath, (err, stats) => {
+        if (err) {
+          console.error(`Error running fs.state on file ${filePath}:`, err);
+          return;
+        }
+
+        if (stats.isDirectory()) {
+          processDirectoryForPkgReplacement(filePath);
+        } else if (stats.isFile() && path.extname(file) === '.brs') {
+          replacePkgWithLibpkgInFile(filePath);
+        }
+      });
+    });
+  });
+}
+
 
 function makeOneTrustReleasePrs(done) {
   const buildTag = getOneTrustBuildTag(options);
   return createCdnPullRequestForOneTrustSDK(done, buildTag);
+}
+
+
+async function makeFoxVideoPlayerPR(done) {
+  const buildTag = getFoxVideoPlayerBuildTag(options);
+  const pkgPath = await packageFoxVideoPlayer(done);
+  return createCdnPullRequestForFoxVideoPlayer(done, buildTag, pkgPath);
 }
 
 
@@ -982,6 +1125,20 @@ function pushOneTrustStaging(done) {
 }
 
 
+async function pushFoxVideoPlayerStaging(done) {
+  const pkgPath = await packageFoxVideoPlayer(done);
+
+  const remotePath = `s3://tubi-roku-multi-cdn-source-staging/appFiles/fox-video-player-components/${path.basename(pkgPath)}`;
+  const result = shell.exec(`aws s3 cp ${pkgPath} ${remotePath} --profile $AWS_PROFILE`);
+
+  if (!result.stderr) {
+    done();
+  } else {
+    done(new NoStackError(`AWS S3 error: Hint - check valet auth. And also make sure AWS_PROFILE env variable set to main-roku-dev`));
+  }
+}
+
+
 async function confirmRelease(done) {
   const msg = 'Are you sure you want to run the release process? This will push branches to Github and create multiple PRs in the appropriate places. (y/n)';
   const confirmation = await prompts({
@@ -1085,6 +1242,7 @@ function validateBuildEnvironment(done) {
 
 exports.codeClean = series(listUnusedImages, listUnusedTranslations);
 exports.build = series(clean, parallel(buildInstalled, buildStarter, buildRemote));
+exports.buildPlusFoxVideoPlayer = series(clean, parallel(buildInstalled, buildStarter, buildRemote, buildFoxVideoPlayer));
 exports.sideload = sideLoad;
 exports['build-downloads'] = series(buildStarter, buildRemote, packageStarter, packageRemote);
 exports.bump = bumpBuild;
@@ -1103,7 +1261,9 @@ exports.compareCheckedOut = findCommitsNotOnCurrentBranch;
 exports.addMissingImages = addMissingImagesToRemoteLibrary;
 exports.tasks = listTasks;
 exports.pushOneTrustStagingCDN = series(buildOneTrust, packageOneTrust, pushOneTrustStaging);
+exports.pushFoxVideoPlayerStaging = series(buildFoxVideoPlayer, pushFoxVideoPlayerStaging);
 exports.releaseOneTrust = series(buildOneTrust, packageOneTrust, makeOneTrustReleasePrs);
+exports.makeFoxVideoPlayerPR = series(buildFoxVideoPlayer, makeFoxVideoPlayerPR);
 exports.validateBuildEnvironment = validateBuildEnvironment;
 
 
@@ -1219,5 +1379,7 @@ exports.compareTranslations = compareTranslations;
 
 exports.updateJsonTypography = updateTypographyJSON;
 exports.updateJsonColor = updateColorJSON;
+
+exports.buildFoxVideoPlayer = buildFoxVideoPlayer;
 
 exports.updateErrorConfig = updateLocalClientErrorConfigFile;

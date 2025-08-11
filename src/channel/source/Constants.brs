@@ -718,18 +718,18 @@ Function getConstants()
   constants.urls.continueWatchingItemBackground_largePoster = "https://mcdn.tubitv.com/image/roku_support_images/continueWatchingItemBackground_largePoster.webp"
   constants.urls.continueWatchingItemBackground_largePoster_kidsMode = "https://mcdn.tubitv.com/image/roku_support_images/continueWatchingItemBackground_largePoster_kids.webp"
 
+  if constants.settings.stagingApis = true
+    constants.urls.foxApiBaseUrl = "https://qa.api.digitalvideoplatform.com/tubi"
+  else
+    constants.urls.foxApiBaseUrl = "https://qa.api.digitalvideoplatform.com/tubi"
+  end if
+
   ' url for pinging Nielsen
   constants.urls.nielsenPing = "https://audit.imrworldwide.com/cgi-bin/gn"
 
   constants.urls.rokuContinueWatchingEndpoint = "https://userdata.sr.roku.com/user-data/v1/content/continueWatching"
 
   constants.urls.clientErrorConfigEndpoint = "https://md0.tubitv.com/error-handler/v2/client-error-config.json"
-
-  if constants.settings.stagingApis = true
-    constants.urls.foxApiBaseUrl = "https://qa.api.haw.digitalvideoplatform.com"
-  else
-    constants.urls.foxApiBaseUrl = "https://prod.api.haw.digitalvideoplatform.com"
-  end if
 
   constants.urls.foxListingEndpoint = constants.urls.foxApiBaseUrl + "/v3.0/listings"
 
@@ -1318,6 +1318,7 @@ Function getConstants()
   constants.ui.screenIds.managePreferencesScreen = "managePreferencesScreen"
   constants.ui.screenIds.rokuContinueWatchingConsentScreen = "rokuContinueWatchingConsentScreen"
   constants.ui.screenIds.eventDetailScreen = "eventDetailScreen"
+  constants.ui.screenIds.foxVideoPlayerWrapperScreen = "FoxVideoPlayerWrapperScreen"
 
   ' notAllowedContainerIds are the containers which are not allowed to be displayed on category screen,
   ' because currently we support only portrait style in category detail screen

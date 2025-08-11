@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="FoxVideoPlayerWrapperScreen" extends="BaseScreen">
+  <script type="text/brightscript" uri="FoxVideoPlayerWrapperScreen.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+
+      <!-- The content we are trying to play as returned by Fox's listing api -->
+      <field id="contentId" type="string" />
+
+      <!-- Content node for the event we are trying to play -->
+      <field id="tubiContent" type="node" />
+
+      <!-- We have to load the fox player from the component library before we can try to play. This lets us know we are ready to continue -->
+      <field id="isFoxVideoPlayerAvailable" type="boolean" alwaysNotify="true" />
+
+      <!-- Set to true to start the process to close the player. You should observe isPlayerClosed to know when this completes -->
+      <field id="closePlayer" type="boolean" alwaysNotify="true" />
+
+
+    <!-- OUTPUTS -->
+      <field id="willPlayerClose" type="boolean" alwaysNotify="true" />
+  </interface>
+
+  <children>
+    <Spinner
+      id="spinner"
+      width="1920"
+      height="1080"/>
+  </children>
+</component>
