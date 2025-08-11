@@ -1,0 +1,10 @@
+<component name="DeeplinkHandlerTests" extends="ContentController">
+    <script type="text/brightscript" uri="DeeplinkHelpersTests.brs" />
+
+    <!-- bs:disable-next-line: 1004 -->
+    <script type="text/brightscript" uri="pkg:/source/rooibosFunctionMap.brs" />
+    <script type="text/brightscript" uri="pkg:/source/tests/rooibos/rooibosDist.brs" />
+    <interface>
+        <function name="Rooibos_RunNodeTests" />
+    </interface>
+</component>

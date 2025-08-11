@@ -95,6 +95,13 @@ Function createDeeplinkContentFromStartupArgs(args)
       content.type = "video"
       content.deeplinkType = "shortFormVideo"
     else if mediaType = "livefeed" OR mediaType = "livestream" OR mediaType = "sportsevent"
+      if mediaType = "sportsevent"
+        sportsEvent = parseSportsEventContentId(content.id)
+        ' channel is used short term, eventually we should use program id
+        if isNonEmptyString(sportsEvent.channel) then
+          content.id = sportsEvent.channel
+        end if
+      end if
       content.type = "linear"
       content.deeplinkType = "linear"
     else if mediaType = "sports"
@@ -994,6 +1001,24 @@ Function handleSingleContentDeeplinkError(error)
   end if
 
   showDeeplinkErrorModal(error, message)
+End Function
+
+' parses a uri encoded list of key:value pair
+' example: channel%3A1234%2Cprogram%3A5678 -> channel:1234,program:5678
+' returns AA of key:value pairs
+' expected to have channel and program
+Function parseSportsEventContentId(contentId) as Object
+  sportsEvent = {
+    channel: invalid
+    program: invalid
+  }
+  decoded = contentId.decodeUriComponent()
+  entries = decoded.split(",")
+  for each entry in entries
+    keyValue = entry.split(":")
+    sportsEvent[keyValue[0]] = keyValue[1]
+  end for
+  return sportsEvent
 End Function
 
 
