@@ -245,7 +245,8 @@ Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
     videoPreview.content = videoContent
     videoPreview.updateContent = true
 
-    if isKidsUIOn() = false AND m.isUserInVideoTilesExperiment = true
+    screen = getCurrentScreen()
+    if isKidsUIOn() = false AND m.isUserInVideoTilesExperiment = true AND screen <> invalid AND screen.id = m.constants.ui.screenIds.homeScreen
       m.videoPreviewPlayer.videoPlayerType = "VIDEO_IN_GRID"
     else
       m.videoPreviewPlayer.videoPlayerType = "BANNER"
@@ -420,12 +421,13 @@ End Function
 
 Function updatePlayerLayoutBasedOnFocusedContent(content)
   currentScreen = getCurrentScreen()
+  isHomeScreen = currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen
   ' If the experiment is enabled and focused content is from featured row than expand preview to full screen.
   if content.gridItemType = m.constants.ui.gridItemTypes.skinAd
     ' Reducing 1px from both width and height since the player is in background and keeping full width causes roku to display closed captioning overlay.
     ' To avoid any other Roku OS level default behavior from kicking in reducing 1px to give a impression that player is not in full screen.
     updatePreviewPlayerToFullScreen()
-  else if isKidsUIOn() = false AND (content.tileDesignType = "withDescriptionPortraitSmall" OR (m.isUserInVideoTilesExperiment = true AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen))
+  else if isKidsUIOn() = false AND isHomeScreen = true AND m.isUserInVideoTilesExperiment = true
     updatePreviewPlayerToInlineView()
   else
     updatePreviewPlayerToCondensedView()
