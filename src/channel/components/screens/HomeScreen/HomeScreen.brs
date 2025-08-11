@@ -146,7 +146,11 @@ Function moveContentAreaMask(nFocusRow = -1, nFocusingPercent = 1)
     end if
   end if
 
-  m.ContentArea.maskOffset = [0, nMaskYNew]
+  if m.top.lastFocusedList = "skinAdRow"
+    m.ContentArea.maskOffset = [0, 1080]
+  else
+    m.ContentArea.maskOffset = [0, nMaskYNew]
+  end if
 End Function
 
 
@@ -913,6 +917,7 @@ Function updateFeaturedRowListTranslation()
   translation = m.categoryGridList.featuredRowListTranslation
   translation[1] = translation[1] + m.ContentAreaParent.translation[1]
   m.top.featuredRowListTranslation = translation
+  moveContentAreaMaskBasedCurrentFocus()
 End Function
 
 
