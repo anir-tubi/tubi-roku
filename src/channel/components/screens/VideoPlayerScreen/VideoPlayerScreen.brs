@@ -2360,10 +2360,6 @@ Function updateTransportButtons(content)
       if m.sendFeedBackButton.visible = true
         m.TransportButtons.appendChild(m.sendFeedBackButton)
       end if
-
-      if m.skipCuepointsButton.visible = true
-        m.top.appendChild(m.skipCuepointsButton)
-      end if
     end if
 
   else if m.playerControlExperimentType = "none"
