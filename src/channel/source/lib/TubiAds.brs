@@ -888,7 +888,12 @@ End Function
 Function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
   ' ShowVariable(m.allAdUnitsList, "ALL AD UNITS LIST", 4)
   scene = containerNode.getScene()
-  m.youboraTask = scene.findNode("Youbora") 'created in ContentController.initVideoTracking
+
+  if m.constants.settings.youboraEnabledVod = true
+    m.youboraTask = scene.findNode("Youbora") 'created in ContentController.initVideoTracking
+  else
+    m.youboraTask = invalid
+  end if
 
   if m.hasAds(m.allAdUnitsList) = true
     currentAdPosition = 1

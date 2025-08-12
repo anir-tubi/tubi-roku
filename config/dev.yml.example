@@ -49,6 +49,16 @@ settings:
   youboraEnabled: false
   # Setting the below value to true will enable youbora request logging into the console.
   youboraDebugEnabled: false
+  
+  # Setting the below value to true will enable youbora tracking for vod.
+  youboraEnabledVod: false
+  # Setting the below value to true will enable youbora tracking for live.
+  youboraEnabledLinear: false
+  # Setting the below value to true will enable youbora tracking for preview.
+  youboraEnabledPreview: false
+  # Setting the below value to true will enable youbora tracking for trailer.
+  youboraEnabledTrailer: false
+
 
   # Setting the below value to false will disable sending logs to client logs.
   clientLogsEnabled: true

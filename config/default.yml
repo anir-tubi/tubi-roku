@@ -35,6 +35,14 @@ settings:
 
   # Setting the below value to true will enable youbora tracking.
   youboraEnabled: false
+
+  # youboraEnabled has been deprecated. Use the below values instead.
+  youboraEnabledVod: false
+  youboraEnabledLinear: false
+  youboraEnabledPreview: false
+  youboraEnabledTrailer: false
+
+  
   # Setting the below value to true will enable youbora request logging into the console.
   youboraDebugEnabled: false
 

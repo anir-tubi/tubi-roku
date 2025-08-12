@@ -2069,7 +2069,11 @@ Function prepareToStartVideo(content, videoResourceIndex = [0, 0])
   setDrmOnContent(content, resource, videoResourceIndex)
 
   m.top.content = content 'sends content to video node and makes current content available to contentController
-  m.top.sendVideoTrackingStart = true
+  if m.constants.settings.youboraEnabledVod = true
+    m.top.sendVideoTrackingStart = true
+  else
+    m.top.sendVideoTrackingStart = false
+  end if
 End Function
 
 

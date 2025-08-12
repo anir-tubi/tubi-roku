@@ -5,6 +5,10 @@ Function TubiExternalConfig(constants as Object) as Object
     'default values should just be a simple key/value associative array
     defaultValues: {
       youbora_enabled: 0
+      youbora_enabled_vod: 0
+      youbora_enabled_live: 0
+      youbora_enabled_preview: 0
+      youbora_enabled_trailer: 0
     }
 
     ' public methods
@@ -22,7 +26,7 @@ Function tubiExternalConfig_getConfigsRequestInfo()
     params: {
       "device_id": constants.deviceInfo.deviceId
     }
-    headers:{}
+    headers: {}
   }
   options.headers.append(constants.headers.commonUapi)
   options.headers.append(constants.headers.tubiPlatform)

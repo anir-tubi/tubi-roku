@@ -212,7 +212,7 @@ Function playContent()
       video_resolution: resolution
       is_fullscreen: isFullScreen
       input_device: m.constants.inputDevices.unknown 'InputDevice enum
-      pageOneof: m.tubiTrackingInfo.getAnalyticsPage("video_player_page", {video_id: videoId})
+      pageOneof: m.tubiTrackingInfo.getAnalyticsPage("video_player_page", { video_id: videoId })
     }
   })
 
@@ -233,7 +233,7 @@ Function updateColors()
 End Function
 
 
-Function onContentChange() as void
+Function onContentChange() as Void
   tubiLog("LinearVideoPlayerScreen.onContentChange")
   m.top.state = ""
 
@@ -381,7 +381,7 @@ Function onVideoStateChange(msg)
     logError(jsonErrorInfo, "videoPlayback", "video-playback", 0.1)
 
     m.top.sendYouboraError = true
-    
+
     updatePlayerLogLib(m.playerLogLib, "setBreakOffError", m.Video.errorCode)
 
     ' Set up the next DRM scheme. Playback of next DRM scheme is triggered when state = "finished",
@@ -436,11 +436,11 @@ Function onVideoStateChange(msg)
   end if
 
   ' Loading page visibility
-  if state = "playing" or state = "paused"
+  if state = "playing" OR state = "paused"
     m.Loading.visible = false
     m.top.state = state
 
-    if m.top.state = "playing" AND (sPreviousState = "stopped" or sPreviousState = "") AND m.top.fullscreen = true
+    if m.top.state = "playing" AND (sPreviousState = "stopped" OR sPreviousState = "") AND m.top.fullscreen = true
       if m.VideoOverlay.timeGridContentLoading = false AND m.VideoOverlay.timeGridContent <> invalid
         if m.top.allowTransportToAppear = true
           showOverlay(true)
@@ -499,7 +499,7 @@ Function onVideoPositionChange(msg)
     m.AdsSSAITask.videoPosition = position
   end if
 
-   '//After some time has elapsed and the channel guide isn't currently visible and loading, then hide the overlay
+  '//After some time has elapsed and the channel guide isn't currently visible and loading, then hide the overlay
   if m.VideoState = "play" AND m.VideoOverlay <> invalid AND m.VideoOverlay.isDisplaying = true
     if m.VideoOverlay.epgScrollingStatus = false AND m.playerPosition > m.lastButtonPressPos + m.overlayAutoHideTime
       hideOverlay()
@@ -637,7 +637,7 @@ Function createContentForClosedCaptioning()
     usedLanguage = {} '//make sure only a single language subtitle is displayed and used
     for each track in availableSubtitleTracks
       language = LCase(track.language)
-      if (language = "eng" or language = "spa") AND usedLanguage[language] = invalid'//::TODO:: allow for multiple languages. When backend provides more captioning support, then this should be changed
+      if (language = "eng" OR language = "spa") AND usedLanguage[language] = invalid'//::TODO:: allow for multiple languages. When backend provides more captioning support, then this should be changed
         bEnabled = false
         if bCaptionsOn = true
           if m.Video.subtitleTrack = track.trackname
@@ -689,7 +689,7 @@ Function onBufferingStatus(msg)
 End Function
 
 
-Function trackEvent(event as object)
+Function trackEvent(event as Object)
   m.top.trackingLoggingEvent = event
 End Function
 
@@ -713,7 +713,7 @@ End Function
 ' Helper function that aggregates any tasks that need to be done before playing a new video
 ' @contentNode: roSGNode, a TubiContentNode
 ' @videoResourceIndex: intarray, [0] -> codexIndex & [1] -> drmIndex
-Function prepareToStartVideo(content, videoResourceIndex = [0,0])
+Function prepareToStartVideo(content, videoResourceIndex = [0, 0])
   resetVideoPlayerState(content)
 
   videoResources = content.videoResources
@@ -732,7 +732,12 @@ Function prepareToStartVideo(content, videoResourceIndex = [0,0])
 
   m.VideoOverlay.currentLinearVideoContent = content
   m.top.content = content 'sends content to video node and makes current content available to contentController
-  m.top.sendVideoTrackingStart = true
+
+  if m.constants.settings.youboraEnabledLinear = true
+    m.top.sendVideoTrackingStart = true
+  else
+    m.top.sendVideoTrackingStart = false
+  end if
 End Function
 
 
@@ -789,7 +794,7 @@ End Function
 
 ' Set video player state based on passed in content
 ' @content: TubiContentNode
-Function updateVideoPlayerState(content) as void
+Function updateVideoPlayerState(content) as Void
   if type(content) <> "roSGNode" then return
 
   ' make the content available to the video node
@@ -812,7 +817,7 @@ Function advanceCodecOnContent(contentNode)
     videoResources = contentNode.videoResources
     currentVideoResourceIndex = contentNode.currentVideoResourceIndex
 
-    if videoResources <> invalid AND currentVideoResourceIndex <> invalid  AND currentVideoResourceIndex.Count() >= 2
+    if videoResources <> invalid AND currentVideoResourceIndex <> invalid AND currentVideoResourceIndex.Count() >= 2
       currentCodecIndex = currentVideoResourceIndex[0]
       currentDrmIndex = currentVideoResourceIndex[1]
 
@@ -827,7 +832,7 @@ Function advanceCodecOnContent(contentNode)
           nextResource = videoResources[nextCodecIndex][nextDrmIndex]
         end if
 
-        if nextResource <> invalid and setDrmOnContent(contentNode, nextResource, [nextCodecIndex, nextDrmIndex]) = true
+        if nextResource <> invalid AND setDrmOnContent(contentNode, nextResource, [nextCodecIndex, nextDrmIndex]) = true
 
           fallbackInfo = {
             failed_url: removeExcessUrl(currentResource.url)
@@ -885,7 +890,7 @@ Function advanceDrmOnContent(contentNode)
           end if
         end if
 
-        if nextResource <> invalid and setDrmOnContent(contentNode, nextResource, [nextCodecIndex, nextDrmIndex]) = true
+        if nextResource <> invalid AND setDrmOnContent(contentNode, nextResource, [nextCodecIndex, nextDrmIndex]) = true
 
           fallbackInfo = {
             failed_url: removeExcessUrl(currentResource.url)
@@ -1005,7 +1010,7 @@ End Function
 'Helper function that removes all characters after the ? in the url
 Function removeExcessUrl(url)
   cutUrl = ""
-  if type(url) = "roString" or type(url) = "String"
+  if type(url) = "roString" OR type(url) = "String"
     position = url.Instr(Chr(63)) 'checks for the position of the "?" in the url string
     if position > -1
       cutUrl = url.Left(position)
@@ -1038,7 +1043,7 @@ Function getPlayProgressEvent(isFullScreen = true)
         video_id: videoId
         view_time: viewTime
         video_player: videoPlayerType
-        pageOneof: m.tubiTrackingInfo.getAnalyticsPage("video_player_page", {video_id: videoId})
+        pageOneof: m.tubiTrackingInfo.getAnalyticsPage("video_player_page", { video_id: videoId })
       }
     }
 
@@ -1112,7 +1117,7 @@ Function onClosedCaptioningSelected()
 End Function
 
 
-Function onKeyEvent(key as string, press as boolean) as boolean
+Function onKeyEvent(key as String, press as Boolean) as Boolean
   if press AND m.top.fullscreen = true
     tubiLog("LinearVideoPlayerScreen.onKeyEvent key = " + key)
     m.lastButtonPressPos = m.playerPosition
@@ -1123,7 +1128,7 @@ Function onKeyEvent(key as string, press as boolean) as boolean
       else if m.top.state = "playing"
         '// Any button should wake the overlays as long as the video is playing
         showOverlay(false, key)
-      else if m.top.state = "stopped" and m.top.channelSelected <> invalid and m.top.channelSelected.needsLogin = true and m.Loading.visible = true
+      else if m.top.state = "stopped" AND m.top.channelSelected <> invalid AND m.top.channelSelected.needsLogin = true AND m.Loading.visible = true
         '// Any button should wake the overlay even when video is not playing and channel selected is locked
         showOverlay(false, key)
       end if
@@ -1145,7 +1150,7 @@ Function onOKPressed()
   if item <> invalid AND item.count() = 2 AND item[1] = 0
     hideOverlay()
   end if
-  if m.top.channelSelected <> invalid AND  m.top.channelSelected.needsLogin = true
+  if m.top.channelSelected <> invalid AND m.top.channelSelected.needsLogin = true
     m.top.ChannelSelectedUpdated = true
   end if
 End Function
@@ -1163,7 +1168,7 @@ End Function
 Function setVideoplayerLoadingScreenBackGround(set = true)
   tubilog("LinearVideoPlayerScreen.setVideoplayerLoadingScreenBackGround")
   if set = true
-    if m.VideoOverlay.linearChannelToPlay <> invalid and m.VideoOverlay.linearChannelToPlay.backgrounds <> invalid
+    if m.VideoOverlay.linearChannelToPlay <> invalid AND m.VideoOverlay.linearChannelToPlay.backgrounds <> invalid
       m.backgroundImage.uri = m.VideoOverlay.linearChannelToPlay.backgrounds[0]
       m.backgroundImage.visible = true
     end if
@@ -1183,7 +1188,7 @@ End Function
 
 Function onDownloadedSegment(msg)
   downloadedSegment = msg.getData()
-  
+
   if isAA(downloadedSegment) = true
     updatePlayerLogLib(m.playerLogLib, "setDownloadedSegmentData", downloadedSegment)
   end if
@@ -1208,7 +1213,7 @@ Function onTrackAdEventChange(msg)
         adInfo["total_ads_duration"] = Round(totalAdsDuration) 'Rounding float to int for proto compatibility
       end if
     end if
-    
+
     if adType = "adStart"
       updatePlayerLogLib(m.playerLogLib, "fireAdStartEvent", adInfo)
     else if adType = "adComplete"

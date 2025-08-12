@@ -219,10 +219,22 @@ Function updateConstantsValuesFromExternalConfig(config)
       m.constants.deviceInfo.countryCode = UCase(config.country)
     end if
 
-    'Let youbora be enabled by the remote config
-    youboraEnabled = config.youbora_enabled
-    if youboraEnabled = true
-      m.constants.settings.youboraEnabled = youboraEnabled
+    if config.youbora <> invalid
+      if config.youbora.vod = 1 OR config.youbora.vod = true
+        m.constants.settings.youboraEnabledVod = true
+      end if
+
+      if config.youbora.linear = 1 OR config.youbora.linear = true
+        m.constants.settings.youboraEnabledLinear = true
+      end if
+
+      if config.youbora.preview = 1 OR config.youbora.preview = true
+        m.constants.settings.youboraEnabledPreview = true
+      end if
+
+      if config.youbora.trailer = 1 OR config.youbora.trailer = true
+        m.constants.settings.youboraEnabledTrailer = true
+      end if
     end if
 
     'Client log disabled by the remote config

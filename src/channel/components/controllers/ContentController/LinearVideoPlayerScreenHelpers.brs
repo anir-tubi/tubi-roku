@@ -12,7 +12,7 @@
 '                                                    valid values are "deeplink" , "ap_auto", "ap_select", "container", "ymal", "search", "epg", "unknown"
 '
 '                                               playbackContainer - if srcForAds = container, then playbackContainer is set to the id of the container that was the source, otherwise not used.
-Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID = "", bAllowTransportToAppear = false, playbackSource = {"srcForAnalytic": "unknown", "srcForAds": "unknown"})
+Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID = "", bAllowTransportToAppear = false, playbackSource = { "srcForAnalytic": "unknown", "srcForAds": "unknown" })
   if content <> invalid
     tubiLog("LinearVideoPlayerScreenHelpers.playLinearVideoContent")
     stopVideoPreview()
@@ -21,9 +21,11 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
     ' a variety of unexpected and unwanted callbacks, as the passed in content potentially exists on a number
     ' of fields that are being observed (for instance: HomeScreen.contentFocused)
     clonedContent = content.clone(true)
+    youboraEnabledLinear = m.constants.settings.youboraEnabledLinear
+
     if clonedContent.needsLogin = true AND isLoggedInUser() = false 'Check for user signed In status because we do not refetch the content and so it will not pass through metadata translate process.
       if bMinimized = false
-        callbackAfterSignInParams = {"content": content, "bMinimized": false, "sAssociatedScreenID": clonedContent.associatedScreenID, "bAllowTransportToAppear": bAllowTransportToAppear, "playbackSource": playbackSource}
+        callbackAfterSignInParams = { "content": content, "bMinimized": false, "sAssociatedScreenID": clonedContent.associatedScreenID, "bAllowTransportToAppear": bAllowTransportToAppear, "playbackSource": playbackSource }
         startSignIn(afterSignInPlayLockedLinearContent, callbackAfterSignInParams)
       end if
     else 'Content is not locked so just play the content
@@ -49,12 +51,13 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
 
         observeUpdateAuth(videoPlayer.task)
 
-        initVideoTracking(videoPlayer) 'initializeYoubora. Regular and linear video players share tracking functions, which are found in VideoHelpers
+        initVideoTracking(videoPlayer, youboraEnabledLinear) 'initializeYoubora. Regular and linear video players share tracking functions, which are found in VideoHelpers
         setInScreenCache(videoPlayer)
 
       end if
 
-      passVideoReferenceToYouboraPlugin(videoPlayer)
+
+      passVideoReferenceToYouboraPlugin(videoPlayer, youboraEnabledLinear)
 
       screen = getFromScreenCache(sAssociatedScreenID)
       if screen <> invalid
@@ -235,7 +238,7 @@ Function maximizeLinearPlayer(content)
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
 
   if videoPlayer <> invalid AND videoPlayer.content <> invalid
-    if getCurrentScreen() = invalid or getCurrentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen
+    if getCurrentScreen() = invalid OR getCurrentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen
       pushScreen(videoPlayer, true, true)
     end if
     bAnimate = false
@@ -258,8 +261,8 @@ Function maximizeLinearPlayer(content)
 
       're-setting to default values for trackingComponentInfo
       videoPlayer.trackingComponentInfo = {
-        componentType : ""
-        componentValues : {}
+        componentType: ""
+        componentValues: {}
       }
 
       videoPlayer.trackingPageContext = videoPlayer.trackingPageInfo
@@ -279,7 +282,7 @@ Function getDataForVideoPlayerTimeGrid()
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   epgChannelList = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
   if videoPlayer <> invalid
-    if epgChannelList = invalid or (epgChannelList <> invalid AND shouldRefresh(epgChannelList.getChild(0)) = true) 'There is no cached contents
+    if epgChannelList = invalid OR (epgChannelList <> invalid AND shouldRefresh(epgChannelList.getChild(0)) = true) 'There is no cached contents
       if m.enteredFromDeepLink <> true
         videoPlayer.contentIdToFocusOnLoadComplete = videoPlayer.content.id
         fetchEPGScreenChannels(videoPlayer)
@@ -372,7 +375,7 @@ Function onLiveStreamManifestResponse(response)
       else if line.Instr("#EXT-X-APOLLO-ANALYTICS-URL") = 0
         ssaiUsed = "apollo"
         ' Extract the value of the analytics URL
-          pollUrl = right(line, len(line) - 28)
+        pollUrl = right(line, len(line) - 28)
 
         ' Strip surrounding quotes characters if present
         if (left(pollUrl, 1) = chr(34))
@@ -614,7 +617,7 @@ Function onLinearVideoPlayerStateWhileInMinState(msg)
   if videoPlayer <> invalid
     tubiLog("LinearVideoPlayerScreenHelpers.onLinearVideoPlayerStateWhileInMinState state = " + msg.GetData())
     state = msg.GetData()
-    if state = "error" or state = "finished"
+    if state = "error" OR state = "finished"
       reactToLinearVideoPlayerErrorStateInNonFullscreenState()
     else if state = "playing"
       '//Once the video player has loaded, then display video player
@@ -743,7 +746,9 @@ Function stopLinearVideoContent()
     showHideLinearVideoPlayerSpinner(false)
     videoPlayer.loading = false
     videoPlayer.unobserveFieldScoped("sendVideoTrackingStart")
-    videoTrackingStop() 'stops youbora tracking
+    if m.constants.settings.youboraEnabledLinear = true
+      videoTrackingStop() 'stops youbora tracking
+    end if
 
     ' asyncStopSemantics was broken prior to 14.0 so we are not running it on older firmware versions
     isFirmwareOk = createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
@@ -795,23 +800,23 @@ Function reactToLinearVideoPlayerErrorState(error_message = "", errorCode = inva
           errorCode = ""
         end if
         userErrorCode = getUserFacingErrorCode(m.constants.errors.context.linearPlayerScreen, m.constants.errors.subtypes.playerPlaybackError, errorCode.toStr())
-  
+
         videoId = 0
-  
+
         if videoPlayer <> invalid AND videoPlayer.content <> invalid AND videoPlayer.content.id <> invalid
           videoId = videoPlayer.content.id.toInt()
         end if
-  
+
         dialogEvent = {
           type: "dialog"
           values: {
             dialog_type: "PLAYER_ERROR"
-            pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: videoId})
+            pageOneof: m.Tracking.getAnalyticsPage("video_page", { video_id: videoId })
             dialog_action: "SHOW"
             dialog_sub_type: userErrorCode
           }
         }
-  
+
         modalInfo = {
           message: getErrorMessage(errorMessage, userErrorCode)
           openTrackEvent: dialogEvent
@@ -940,7 +945,7 @@ Function onTrackingLoggingEvent(event)
   trackEvent = event.getData()
 
   if event <> invalid
-    m.trackingLoggingTask.trackEvent =  trackEvent
+    m.trackingLoggingTask.trackEvent = trackEvent
   end if
 End Function
 
@@ -952,22 +957,22 @@ Function switchLinearToInlineGridMode(linearPlayer)
   isCloseTo16By9 = isCloseTo16By9AspectRatio(playerSize)
   if isCloseTo16By9 = false
     ' If the aspect ratio is not close to 16:9, adjust the height to 16:9
-    adjustedHeight = playerSize[0] * (9/16)
+    adjustedHeight = playerSize[0] * (9 / 16)
     playerTranslationY = (playerSize[1] - adjustedHeight) / 2
-  end if  
+  end if
 
   linearPlayer.width = playerSize[0]
   if isCloseTo16By9AspectRatio(playerSize) = true
     linearPlayer.height = playerSize[1]
   else
-    linearPlayer.height = playerSize[0] * (9/16)
+    linearPlayer.height = playerSize[0] * (9 / 16)
   end if
 
   linearPlayer.width = playerSize[0]
 
   if isCloseTo16By9 = false
     ' If the aspect ratio is not close to 16:9, adjust the height to 16:9
-    adjustedHeight = playerSize[0] * (9/16)
+    adjustedHeight = playerSize[0] * (9 / 16)
     linearPlayer.height = adjustedHeight
     linearPlayer.clippingRect = [0, Abs(playerTranslationY), playerSize[0], playerSize[1]]
   else

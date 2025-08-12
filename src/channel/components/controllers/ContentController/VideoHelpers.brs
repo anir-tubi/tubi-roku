@@ -96,6 +96,7 @@ Function setupVideoPlayer(content, playbackSource = { "srcForAnalytic": "unknown
   end if
 
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
+  youboraEnabledVod = m.constants.settings.youboraEnabledVod
 
   if videoPlayer = invalid
     videoPlayer = CreateObject("roSGNode", "VideoPlayerScreen")
@@ -111,11 +112,11 @@ Function setupVideoPlayer(content, playbackSource = { "srcForAnalytic": "unknown
     videoPlayer.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
     observeUpdateAuth(videoPlayer.task)
 
-    initVideoTracking(videoPlayer) 'initializeYoubora
+    initVideoTracking(videoPlayer, youboraEnabledVod) 'initializeYoubora
     setInScreenCache(videoPlayer)
   end if
 
-  passVideoReferenceToYouboraPlugin(videoPlayer)
+  passVideoReferenceToYouboraPlugin(videoPlayer, youboraEnabledVod)
 
   ' Passing current user selected subtitle track.
   if m.pub_serverPersistentData <> invalid
@@ -967,7 +968,9 @@ Function stopVideoContent(videoPlayer)
   if videoPlayer <> invalid
     content = videoPlayer.content
     sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.streamEnd, content)
-    videoTrackingStop() 'stops youbora tracking
+    if m.constants.settings.youboraEnabledVod = true
+      videoTrackingStop() 'stops youbora tracking
+    end if
 
     videoPlayer.unobserveFieldScoped("backButtonPressed")
     videoPlayer.unobserveFieldScoped("showSignUpModal")
@@ -1131,49 +1134,52 @@ Function onUpNextCuepointReached(msg)
 End Function
 
 
-Function initVideoTracking(videoPlayer)
-  if m.constants.settings.youboraEnabled = true
-    if videoPlayer <> invalid
-      'If we are switching from VOD to LIVE or LIVE to VOD, latest videoPlayerScreen's
-      'sendYouboraError should be observed.
-      videoPlayer.unobserveFieldScoped("sendYouboraError")
-      videoPlayer.observeFieldScoped("sendYouboraError", "onSendYouboraError")
-      if m.youboraTask = invalid
-        m.youboraTask = m.top.createChild("YBPluginRokuVideo")
-        m.youboraTask.id = "Youbora"
-        m.youboraTask.options = m.constants.thirdParty.youbora.config
-        m.global.addFields({ YouboraLogActive: m.constants.settings.youboraDebugEnabled })
-        m.youboraTask.control = "RUN"
-      else
-        'Setting m.youboraTask.taskState to "stop" triggers the youboraTask to
-        'unobserve the VideoPlayer that is currently being observed in the youboraTask,
-        'which enables it to accept the new videoPlayer node (that will be set below)
-        'and re-observe the video node attributes.
-        m.youboraTask.taskState = "stop"
-      end if
+Function initVideoTracking(videoPlayer, initYoubora = false)
+  if initYoubora = true AND videoPlayer <> invalid
+    if m.youboraTask = invalid
+      m.youboraTask = m.top.createChild("YBPluginRokuVideo")
+      m.youboraTask.id = "Youbora"
+      m.youboraTask.options = m.constants.thirdParty.youbora.config
+      m.global.addFields({ YouboraLogActive: m.constants.settings.youboraDebugEnabled })
+      m.youboraTask.control = "RUN"
     end if
   end if
 End Function
 
 
 'This is needed when switching from VOD -> Live OR Live -> VOD to fire the Youbora joinTime events.
-Function passVideoReferenceToYouboraPlugin(videoPlayer)
-  if videoPlayer <> invalid AND m.constants.settings.youboraEnabled = true
-    player = videoPlayer.findNode("VideoNode")
-    'Pass Video reference to Youbora plugin
-    if m.youboraTask <> invalid
+Function passVideoReferenceToYouboraPlugin(videoPlayer, initYoubora = false)
+
+  if videoPlayer <> invalid AND initYoubora = true AND m.youboraTask <> invalid
+
+    currentPlayer = m.youboraTask.videoPlayer
+    newPlayer = videoPlayer.findNode("VideoNode")
+
+    if currentPlayer = invalid OR currentPlayer.isSameNode(newPlayer) = false
+      'If we are switching from VOD to LIVE or LIVE to VOD, latest videoPlayerScreen's
+      'sendYouboraError should be observed.
+      videoPlayer.unobserveFieldScoped("sendYouboraError")
+      videoPlayer.observeFieldScoped("sendYouboraError", "onSendYouboraError")
+
+      player = videoPlayer.findNode("VideoNode")
+      'Pass Video reference to Youbora plugin
       m.youboraTask.updateplayer = { player: player, unobserveGlobalScope: false }
     end if
   end if
+
 End Function
 
 
 Function onVideoTrackingStart(msg)
   tubiLog("VideoHelpers.onVideoTrackingStart")
   videoPlayer = msg.getRoSGNode()
+  youboraEnabled = msg.getData()
+
   ' Youbora events
-  if m.constants.settings.youboraEnabled = true AND videoPlayer <> invalid AND videoPlayer.content <> invalid
+  if videoPlayer <> invalid AND videoPlayer.content <> invalid AND youboraEnabled = true AND m.youboraTask <> invalid
     content = videoPlayer.content
+
+
     youboraConfig = m.constants.thirdParty.youbora.config
 
     youboraConfig["extraparam.1"] = content.id
@@ -1225,7 +1231,7 @@ End Function
 
 
 Function videoTrackingStop()
-  if m.constants.settings.youboraEnabled = true
+  if m.youboraTask <> invalid
     m.youboraTask.event = { handler: "stop" }
   end if
 End Function
@@ -1237,7 +1243,7 @@ End Function
 ' the Youbora plugin with the error info.
 Function onSendYouboraError(msg)
   videoPlayer = msg.getRoSGNode()
-  if videoPlayer <> invalid
+  if videoPlayer <> invalid AND m.youboraTask <> invalid
     m.youboraTask.event = {
       handler: "error"
       params: {
