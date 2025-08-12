@@ -128,7 +128,7 @@ Function onCreateMenuItems()
     menuItems.push(m.constants.ui.sideNavIds.tv)
   end if
 
-  if getExternalConfigValueFromGlobal("livetv", false) = true AND m.top.isLinearBlock = false ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated. 
+  if getExternalConfigValueFromGlobal("livetv", false) = true
     menuItems.push(m.constants.ui.sideNavIds.linearEPG)
   end if
 
@@ -618,7 +618,7 @@ End Function
 
 ' @index: Integer, index of the selected item in the list.
 Function setSelectedItemBackgroundTranslation(index)
-  selectedItemBoundingRect = m.mainItems.subBoundingRect("item"+index.toStr())
+  selectedItemBoundingRect = m.mainItems.subBoundingRect("item" + index.toStr())
   m.background.translation = [m.background.translation[0], selectedItemBoundingRect.y]
 End Function
 

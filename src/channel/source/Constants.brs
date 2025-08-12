@@ -1848,7 +1848,6 @@ Function getConstants()
   constants.serverPersistentDataKeys.parentalRating = "parental_rating"
   constants.serverPersistentDataKeys.hasPassword = "has_password"
   constants.serverPersistentDataKeys.hasPreviouslyRegistered = "has_previously_registered"
-  constants.serverPersistentDataKeys.isLinearBlocked = "is_linear_blocked"
   constants.serverPersistentDataKeys.birthday = "birthday"
 
   constants.persistentDataKeyConsentKeyMapping = {

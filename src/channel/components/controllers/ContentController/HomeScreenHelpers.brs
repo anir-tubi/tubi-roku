@@ -355,8 +355,7 @@ Function fetchHomeScreen(homeScreen, useCache = false)
 
     options.params = params
     options.headers = headers
-    isLinearBlock = isLinearBlocked()
-    homeScreenReqInfo = m.CmsApi.createHomeScreenReqInfo(isKidsMode, options, isLinearBlock)
+    homeScreenReqInfo = m.CmsApi.createHomeScreenReqInfo(isKidsMode, options)
     m.makeRequest({
       url: homeScreenReqInfo.url
       requestType: reqName
@@ -365,7 +364,6 @@ Function fetchHomeScreen(homeScreen, useCache = false)
       errorCallback: errorHandler
       responseType: "node"
       isSignedInUser: isLoggedInUser()
-      isLinearBlock: isLinearBlock
       uiMode: m.uiMode
     })
 
@@ -703,8 +701,7 @@ Function makeContainerRequest(category, columnFocused, homeScreen, successCallba
     if hasMoreContent = true AND columnFocused >= rightEdge AND category.state <> "containerPaginationRequestPending"
       isKidsMode = shouldKidsModeBeSentToServer()
       isSignedInUser = isLoggedInUser()
-      isLinearBlock = isLinearBlocked()
-      categoryReqInfo = m.cmsApi.createGetContainerContentsReqInfo(category, homeScreen, isKidsMode, isSignedInUser, m.uiMode, false, isLinearBlock)
+      categoryReqInfo = m.cmsApi.createGetContainerContentsReqInfo(category, homeScreen, isKidsMode, isSignedInUser, m.uiMode, false)
       if categoryReqInfo <> invalid
         category.state = "containerPaginationRequestPending"
         m.makeRequest({
@@ -716,7 +713,6 @@ Function makeContainerRequest(category, columnFocused, homeScreen, successCallba
           silenceCallbackWarnings: true
           responseType: "node"
           isSignedInUser: isSignedInUser
-          isLinearBlock: isLinearBlock
           uiMode: m.uiMode
           categoryId: category.id
           requestContext: {
@@ -1161,7 +1157,6 @@ Function onLoadCategoryForIds(msg)
 
   isKidsMode = shouldKidsModeBeSentToServer()
   isSignedInUser = isLoggedInUser()
-  isLinearBlock = isLinearBlocked()
 
   if homeScreen.contentMode = m.constants.ui.contentMode.homescreen
     contentMode = ""
@@ -1169,7 +1164,7 @@ Function onLoadCategoryForIds(msg)
     contentMode = homeScreen.contentMode
   end if
 
-  batchRequests = m.cmsApi.createHomeScreenBatchReqInfoForContainers(categoryIDs, contentMode, isKidsMode, isSignedInUser, "standard", "", isLinearBlock)
+  batchRequests = m.cmsApi.createHomeScreenBatchReqInfoForContainers(categoryIDs, contentMode, isKidsMode, isSignedInUser)
 
   if batchRequests <> invalid
     m.makeBatchRequest({
@@ -1636,42 +1631,6 @@ Function onFeaturedListScrollDirectionChange(msg)
   if scrollDirection = "down" OR scrollDirection = "up"
     updateInTransitVideoMetadataOverlay()
   end if
-End Function
-
-
-' This function is part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
-Function isLinearBlocked()
-  'only apply to US new users and only to users under the experiment.
-  if UCase(m.constants.deviceInfo.countryCode) = "US" AND getExperimentResult("roku_linear_no_show", "roku_linear_no_show_v2") <> invalid
-    if isNewUser() = true
-      'all newUsers are under linear holdout experiment
-      if getExperimentResource("roku_linear_no_show", "roku_linear_no_show_v2", true).enabled = true ' if experiment is not running there wont be any exposure events.
-        saveServerPersistentData({
-          "isLinearBlocked": "linearblocked"
-        }, "device")
-        return true
-      else ' isLinearBlocked only if experiment is running in popper.
-        saveServerPersistentData({
-          "isLinearBlocked": "linearshow"
-        }, "device")
-        return false
-      end if
-    else
-      if m.pub_serverPersistentData.isLinearBlocked = "linearblocked"
-
-        getExperimentResource("roku_linear_no_show", "roku_linear_no_show_v2", true)
-        return true
-      else if m.pub_serverPersistentData.isLinearBlocked = "linearshow"
-        getExperimentResource("roku_linear_no_show", "roku_linear_no_show_v2", true)
-        return false
-      else ' returning user never was in experiment
-        return false
-      end if
-    end if
-  end if
-
-  return false 'default case for non us users, not experiment started etc
-
 End Function
 
 

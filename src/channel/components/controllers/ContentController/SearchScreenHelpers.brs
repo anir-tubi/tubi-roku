@@ -37,13 +37,13 @@ Function onSearchContentSelected(msg)
   if selectedContent <> invalid AND selectedContent.type = m.constants.ui.contentTypes.linear
     playbackSource = {
       "srcForAnalytic": m.constants.player.playbackSource.unknown
-      "srcForAds":m.constants.player.playbackOrigin.search
+      "srcForAds": m.constants.player.playbackOrigin.search
     }
     playLinearVideoContent(selectedContent, false, searchScreen.id, false, playbackSource)
   else
     playbackSource = {
       "srcForAnalytic": m.constants.player.playbackSource.unknown
-      "srcForAds":m.constants.player.playbackOrigin.search
+      "srcForAds": m.constants.player.playbackOrigin.search
     }
 
     showDetailScreen(searchScreen.contentSelected, true, invalid, invalid, playbackSource)
@@ -57,7 +57,7 @@ Function onSearchContentToPlay(msg)
 
   playbackSource = {
     "srcForAnalytic": m.constants.player.playbackSource.unknown
-    "srcForAds":m.constants.player.playbackOrigin.search
+    "srcForAds": m.constants.player.playbackOrigin.search
   }
 
   if content <> invalid AND content.type = m.constants.ui.contentTypes.linear
@@ -118,7 +118,7 @@ Function searchFromScreen(searchText, personalizationID = invalid, inputDevice =
   kidsMode = shouldKidsModeBeSentToServer()
 
   if bSearchNonDefaultResults = true
-    includeLinear = isUserInAdultsMode() = true AND isKidsUIOn() = false AND isLinearBlocked() = false
+    includeLinear = isUserInAdultsMode() = true AND isKidsUIOn() = false
     if isNonEmptyString(inputDevice) = false
       ' assume the input device is remote unless specified otherwise.
       inputDevice = m.constants.inputDevices.remote
@@ -273,7 +273,7 @@ Function updateSearchContentNode(searchScreen)
   tubiLog("SearchScreenHelpers.updateSearchContentNode")
   content = searchScreen.content
   if content <> invalid
-    for i = 0 to content.getChildCount()-1
+    for i = 0 to content.getChildCount() - 1
       content.getChild(i).needsLogin = false
     end for
     searchScreen.contentUpdated = true

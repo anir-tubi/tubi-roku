@@ -984,8 +984,7 @@ End Function
 ' @uiMode: string, one of the allowed values from constants.ui.modes
 ' @screenId: string, the id of the screen
 ' @isSignedInUser: boolean, value based on user logged In or not
-' @isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
-Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMode = "homescreen", isKidsMode = false, uiMode = "standard", screenId = "", isSignedInUser = false, isLinearBlock = false) as Object
+Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMode = "homescreen", isKidsMode = false, uiMode = "standard", screenId = "", isSignedInUser = false) as Object
   tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateHomescreen()")
 
   translated = CreateObject("roSGNode", "CategoryContentNode")
@@ -1033,15 +1032,13 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
         '//if continue watching container while user is signed out,
         ' then ensure row is empty except for 1 item that will entice users to sign in
         categoryAA = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode, contentMode)
-      else if container.type = "linear" AND isLinearBlock = true ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
-        categoryAA = invalid
       else
         shouldInsertChannelTile = true
         isContentModeHomeScreen = (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
         if isContentModeHomeScreen = true AND uiMode = "standard" AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_3").design_type = "withDescriptionPortraitSmall"
           shouldInsertChannelTile = false
         end if
-        categoryAA = m.buildCategoryAAWithInsert(container, contents, "", "", false, contentMode, screenId, isSignedInUser, uiMode, isLinearBlock, shouldInsertChannelTile, {}) ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
+        categoryAA = m.buildCategoryAAWithInsert(container, contents, "", "", false, contentMode, screenId, isSignedInUser, uiMode, shouldInsertChannelTile, {})
       end if
 
       if categoryAA <> invalid
@@ -1211,10 +1208,9 @@ End Function
 ' @isSignedInUser: boolean, value based on user logged In or not
 ' @isKidsMode: boolean, the value of the isKidsMode parameter as sent as part of the matrix/homescreen request
 ' @uiMode: string, one of the allowed values from constants.ui.modes
-' @isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
 ' @requestContext: assocArray, the request context as sent as part of the homescreen request
 
-Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, sOrientation = "", bFullData = false, contentMode = "homeScreen", screenId = "", isSignedInUser = false, isKidsMode = false, uiMode = "standard", isLinearBlock = false, requestContext = {}) as Object
+Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, sOrientation = "", bFullData = false, contentMode = "homeScreen", screenId = "", isSignedInUser = false, isKidsMode = false, uiMode = "standard", requestContext = {}) as Object
   tubiLog("TubiMetadataTranslate.translateContainer")
   translated = CreateObject("roSGNode", "CategoryContentNode")
   container = contentToTranslate.container
@@ -1228,7 +1224,7 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
     ' then ensure row is empty except for 1 item that will entice users to sign in
     categoryMetadata = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode, contentMode)
   else
-    categoryMetadata = m.buildCategoryAAWithInsert(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser, uiMode, isLinearBlock, false, requestContext) 'isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
+    categoryMetadata = m.buildCategoryAAWithInsert(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser, uiMode, false, requestContext)
   end if
 
   if contentToTranslate.personalization_id <> invalid
@@ -1338,13 +1334,12 @@ End Function
 ' @bFullData: boolean, Should the full data be parsed and passed to the video children?
 ' @contentMode: string, one of the contentModes found at m.constants.ui.contentMode
 ' @isSignedInUser: boolean, value based on user logged In or not
-' @isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
 ' @requestContext: assocArray, the request context as sent as part of the homescreen request
 ' returns an associative array that can be passed to ContentNode.update() to populate the ContentNode and it's children
-Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode = "homeScreen", screenId = "", isSignedInUser = false, uiMode = "standard", isLinearBlock = false, requestContext = {})
+Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode = "homeScreen", screenId = "", isSignedInUser = false, uiMode = "standard", requestContext = {})
   categoryParent = m.buildCategoryParentInfo(container, sOrientation, contentMode, uiMode)
   gridItemType = m.getGridItemType(container, sOrientation, m.constants, screenId, contentMode, uiMode)
-  categoryChildrenInfo = m.buildCategoryChildrenInfo(container, contents, contentsJson, gridItemType, bFullData, isSignedInUser, uiMode, isLinearBlock, requestContext) ' @isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
+  categoryChildrenInfo = m.buildCategoryChildrenInfo(container, contents, contentsJson, gridItemType, bFullData, isSignedInUser, uiMode, requestContext)
 
   categoryParent.children = categoryChildrenInfo.children
   categoryParent.json = categoryChildrenInfo.contentsJson
@@ -1390,11 +1385,10 @@ End Function
 ' @screenId: string, one of the screenIds found at constants.ui.screenIds
 ' @isSignedInUser: boolean, value based on user logged In or not
 ' @uiMode: string, one of the allowed values from constants.ui.modes
-' @isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
 ' @shouldInsertChannelTile: boolean, true if the channel tile should be inserted into the container, false otherwise
 ' @requestContext: assocArray, the request context as sent as part of the homescreen request
 ' returns an associative array that can be passed to ContentNode.update() to populate the ContentNode and it's children
-Function tubiMetadataTranslate_buildCategoryAAWithInsert(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode = "homeScreen", screenId = "", isSignedInUser = false, uiMode = "standard", isLinearBlock = false, shouldInsertChannelTile = false, requestContext = {})
+Function tubiMetadataTranslate_buildCategoryAAWithInsert(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode = "homeScreen", screenId = "", isSignedInUser = false, uiMode = "standard", shouldInsertChannelTile = false, requestContext = {})
   categoryAA = invalid
 
   if container <> invalid AND container.children <> invalid
@@ -1425,9 +1419,9 @@ Function tubiMetadataTranslate_buildCategoryAAWithInsert(container, contents, co
       contentsWithPrepend.append(contents)
       ' force contentsJson to be regenerated with the prepended content in buildCategoryAA()
       contentsJson = invalid
-      categoryAA = m.buildCategoryAA(container, contentsWithPrepend, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser, uiMode, isLinearBlock, requestContext) ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
+      categoryAA = m.buildCategoryAA(container, contentsWithPrepend, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser, uiMode, requestContext)
     else
-      categoryAA = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser, uiMode, isLinearBlock, requestContext) ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
+      categoryAA = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser, uiMode, requestContext)
     end if
 
   end if
@@ -1526,12 +1520,11 @@ End Function
 ' @bFullData: boolean, true if each child should contain full metadata, false if children should contain
 '                      a limited set of metadata
 ' @isSignedInUser: boolean, value based on user logged In or not
-' @isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
 ' @requestContext: assocArray, the request context as sent as part of the homescreen request
 ' @returns: assocArray, an AA with keys:
 '                       "children", as an array of AAs containing content metadata
 '                       "contentsJson", a JSON formatted string of contents belonging to the container/category
-Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, contentsJson, parentGridItemType, bFullData, isSignedInUser = false, uiMode = "standard", isLinearBlock = false, requestContext = {})
+Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, contentsJson, parentGridItemType, bFullData, isSignedInUser = false, uiMode = "standard", requestContext = {})
   childrenReturn = CreateObject("roArray", 0, false)
   childrenContentIDs = {}
   totalDuplicates = 0
@@ -1754,12 +1747,10 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             childAA.id = "0" + sFullChildID
           end if
 
-          if fullChild.type <> "l" OR isLinearBlock = false 'isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
-            if childIsPushable = true AND jsonAA <> invalid
-              jsonAA[childAA.id] = fullChild
-            end if
-            childrenReturn.push(childAA)
+          if childIsPushable = true AND jsonAA <> invalid
+            jsonAA[childAA.id] = fullChild
           end if
+          childrenReturn.push(childAA)
         else if childrenContentIDs[child] <> invalid
           totalDuplicates = totalDuplicates + 1
           if isAA(childAA) = true AND isNonEmptyString(childAA.title) = true

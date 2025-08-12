@@ -6,7 +6,6 @@ Function initSideNav()
   m.SideNav.observeFieldScoped("itemSelectedId", "onSideNavItemSelected")
   m.SideNav.observeFieldScoped("navigateWithinPageInfo", "onSideNavNavigateWithinPageInfoChanged")
 
-  m.SideNav.isLinearBlock = isLinearBlocked()
   m.SideNav.createMenuItems = true
 
   ' display Espanol, TV, Movies menu items only if the countryCode is US

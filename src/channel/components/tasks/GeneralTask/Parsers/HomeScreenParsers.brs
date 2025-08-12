@@ -28,16 +28,11 @@ Function parseHomeScreenContentSuccess(fullResponse, reqInfo)
   end if
 
   isSignedInUser = false
-  isLinearBlock = false ' isLinearBlock :  this part of roku_linear_no_show_v2 experiment. Remove it after experiment over.  Exp will be never graduated.
   if reqInfo <> invalid
     isSignedInUser = reqInfo.isSignedInUser
-
-    if reqInfo.isLinearBlock <> invalid
-      isLinearBlock = reqInfo.isLinearBlock
-    end if
   end if
 
-  convertedMetadata = m.metadataTranslate.translateHomescreen(parsedResponse, contentMode, isKidsMode, uiMode, "homeScreen", isSignedInUser, isLinearBlock)
+  convertedMetadata = m.metadataTranslate.translateHomescreen(parsedResponse, contentMode, isKidsMode, uiMode, "homeScreen", isSignedInUser)
 
   'AdSkin
   ads = parsedResponse.ads
@@ -67,7 +62,6 @@ Function parseCategoryContentSuccess(fullResponse, reqInfo)
   contentMode = m.constants.ui.contentMode.homescreen
   isSignedInUser = false
   screenId = m.constants.ui.screenIds.homeScreen
-  isLinearBlock = false
 
   isKidsMode = false
   uiMode = "standard"
@@ -93,10 +87,6 @@ Function parseCategoryContentSuccess(fullResponse, reqInfo)
       uiMode = reqInfo.uiMode
     end if
 
-    if reqInfo.isLinearBlock <> invalid
-      isLinearBlock = reqInfo.isLinearBlock
-    end if
-
     if reqInfo.requestContext <> invalid
       requestContext = reqInfo.requestContext
     end if
@@ -109,7 +99,7 @@ Function parseCategoryContentSuccess(fullResponse, reqInfo)
     end if
   end if
 
-  convertedMetadata = m.metadataTranslate.translateContainer(parsedResponse, fullJson, orientation, bFullData, contentMode, screenId, isSignedInUser, isKidsMode, uiMode, isLinearBlock, requestContext)
+  convertedMetadata = m.metadataTranslate.translateContainer(parsedResponse, fullJson, orientation, bFullData, contentMode, screenId, isSignedInUser, isKidsMode, uiMode, requestContext)
   return convertedMetadata 'may return an empty container
 End Function
 

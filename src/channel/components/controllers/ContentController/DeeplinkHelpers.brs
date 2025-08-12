@@ -518,9 +518,7 @@ End Function
 Function handleLinearDeeplinkContent()
   tubilog("DeeplinkHelpers.handleLinearDeeplinkContent")
 
-  if isLinearBlocked() = true
-    showDeeplinkErrorModal(invalid)
-  else if isParentalControlsAdultLevel() = false OR m.uiMode = m.constants.ui.modes.kidsAgeGate
+  if isParentalControlsAdultLevel() = false OR m.uiMode = m.constants.ui.modes.kidsAgeGate
     ' Display error message indicating to turn off the parental controls
     message = getTranslation("dialog_contentNotAvailable_Parental_description")
     showDeeplinkErrorModal(invalid, message)

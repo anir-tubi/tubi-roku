@@ -31,9 +31,6 @@
     <!-- hasPreviouslyRegistered holds the boolean value whether this device is already registered on Tubi -->
     <field id="hasPreviouslyRegistered" type="boolean" value="false" />
 
-    <!--isLinearBlocked holds the string value whether linear is blocked for the user-->
-    <field id="isLinearBlocked" type="string" value="none" />
-
     <!-- birthday holds the string value of the user's birthday -->
     <field id="birthday" type="string" value="" />
 
