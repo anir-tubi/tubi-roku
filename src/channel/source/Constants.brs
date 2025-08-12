@@ -676,9 +676,9 @@ Function getConstants()
   end if
 
   constants.urls.realtime = {}
-  constants.urls.realtime.urlBase = "https://realtime-logger.staging-public.tubi.io"
-  if mode = "production"
-    constants.urls.realtime.urlBase = "https://realtime-logger.production-public.tubi.io"
+  constants.urls.realtime.urlBase = "https://realtime-logger.production-public.tubi.io"
+  if mode <> "production" AND constants.settings.stagingApis = true
+    constants.urls.realtime.urlBase = "https://realtime-logger.staging-public.tubi.io"
   end if
 
   constants.urls.realtime.increment = constants.urls.realtime.urlBase + "/metric/increment"
