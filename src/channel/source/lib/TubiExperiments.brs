@@ -129,14 +129,6 @@ Function TubiExperiments(experimentsInfo) as Object
         }
       }
 
-      roku_search_larger_poster: {
-        roku_search_larger_poster_v1: {
-          default: { "enabled": true }
-          holdout_control: { "enabled": false }
-          holdout_winning: { "enabled": false }
-        }
-      }
-
       roku_category_large_poster: {
         roku_category_large_poster_v1: {
           default: { "enabled": false }

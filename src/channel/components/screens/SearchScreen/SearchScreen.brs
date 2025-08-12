@@ -7,9 +7,9 @@ Function init()
 
   m.ResultArea = m.top.findNode("ResultArea")
 
-  ' Since we have 2 different markup grid inside the result area. When the user scroll downs to trending searches grid 
-  ' from results grid, we move the the container that holds the 2 grid upwards. We are adding clipping rect so that anything 
-  ' that is above the specified x and y everything else is clipped or hidden. This causes the results grid to be hidden 
+  ' Since we have 2 different markup grid inside the result area. When the user scroll downs to trending searches grid
+  ' from results grid, we move the the container that holds the 2 grid upwards. We are adding clipping rect so that anything
+  ' that is above the specified x and y everything else is clipped or hidden. This causes the results grid to be hidden
   ' and gives a effects as if the grid scrolled below the container.
   m.ResultArea.clippingRect = {
     height: 1080
@@ -25,7 +25,7 @@ Function init()
   m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]
   m.spinner = m.top.findNode("spinner")
   m.KidsModeMessage = m.top.findNode("KidsModeMessage")
-  
+
   m.autocomplete = m.top.findNode("autocomplete")
   m.autocompleteHeading = m.top.findNode("autocompleteHeading")
   m.autocompleteMenu = m.top.findNode("autocompleteMenu")
@@ -85,19 +85,10 @@ Function init()
   m.trendingSearchResultGrid.observeFieldScoped("itemSelected", "onResultSelected")
   m.trendingSearchResultGrid.observeFieldScoped("itemFocused", "onItemFocused")
 
-  m.rokuSearchLargerPoster = (getExperimentResource("roku_search_larger_poster", "roku_search_larger_poster_v1", true).enabled = true)
-
-  if m.rokuSearchLargerPoster = true
-    m.ResultGrid.itemSize = m.constants.ui.imageSizes.largePoster
-    m.ResultGrid.numColumns = 4
-    m.trendingSearchResultGrid.itemSize = m.constants.ui.imageSizes.largePoster
-    m.trendingSearchResultGrid.numColumns = 4
-  else
-    m.ResultGrid.itemSize = [198,282]
-    m.ResultGrid.numColumns = 5
-    m.trendingSearchResultGrid.itemSize = [198,282]
-    m.trendingSearchResultGrid.numColumns = 5
-  end if
+  m.ResultGrid.itemSize = m.constants.ui.imageSizes.largePoster
+  m.ResultGrid.numColumns = 4
+  m.trendingSearchResultGrid.itemSize = m.constants.ui.imageSizes.largePoster
+  m.trendingSearchResultGrid.numColumns = 4
 
   m.trendingResultsHint.text = getTranslation("trending_search_results_hint")
 
@@ -224,7 +215,7 @@ Function onKeyboardTextEditBoxVoiceEnabledChange()
       setTextForVoiceHint()
     end if
     if m.searchMenuText.text = "" OR m.searchMenuText.text = m.searchTitleText
-m.microphone.visible = true
+      m.microphone.visible = true
     end if
   end if
 End Function
@@ -233,7 +224,7 @@ End Function
 Function setTextForVoiceHint()
   parentGroup = m.searchGroup '//Note: set it to m.voiceGroup if you ever wish to move this text to be underneath the other text that is above the keyboard. nVoiceHintWidth and nVoiceHintTranslationY would have to be adjusted.
   nVoiceHintWidth = 400
-  nVoiceHintTranslationY = -5 
+  nVoiceHintTranslationY = -5
   m.microphone = parentGroup.createChild("Poster")
   m.microphone.uri = "pkg:/images/microphone.png"
   m.microphone.width = "36"
@@ -307,7 +298,7 @@ Function onScreenFocusChange()
     end if
     handleKeyboardVoiceInput(m.bResultsInFocus)
   else if m.top.isInFocusChain() = false
-    m.Keyboard.keyGrid.jumpToKey = [0, 0, 0]  '//focus on the left most letter when focus shifts away from searchScreen (to the sideNav)
+    m.Keyboard.keyGrid.jumpToKey = [0, 0, 0] '//focus on the left most letter when focus shifts away from searchScreen (to the sideNav)
     m.keyboard.textEditBox.voiceEnabled = false
   end if
 
@@ -353,7 +344,7 @@ End Function
 Function displayNoResults()
   m.gridContainer.visible = false
   m.NoResultsMessage.visible = true
-  m.NoResultsMessage.text = getTranslation("screenSearch_noResults", {term: m.top.searchText})
+  m.NoResultsMessage.text = getTranslation("screenSearch_noResults", { term: m.top.searchText })
 End Function
 
 
@@ -419,7 +410,7 @@ Function onAutocompleteChange()
     end for
 
     m.autocompleteMenu.content = menuItems
-    
+
     '//because the menu is in reverse order, ensure the top suggestion (now at the menu's bottom most item) is the 1st item to gain focus when the menu gains focus
     jumpToLastAutocompleteSuggestion()
     displayAutocompleteAfterResponse()
@@ -470,20 +461,11 @@ Function onSearchContentChange()
         m.ResultGrid.visible = false
         m.trendingSearchResultsContainer.translation = [0, 0]
       else
-        if m.rokuSearchLargerPoster = true
-          if resultsContent.getChildCount() > 4
-            m.trendingSearchResultsContainer.translation = [0, 752]
-          else
-            ' If the result count is less than or equal to 5. We will show the trending searches.
-            m.trendingSearchResultsContainer.translation = [0, 430]
-          end if
+        if resultsContent.getChildCount() > 4
+          m.trendingSearchResultsContainer.translation = [0, 752]
         else
-          if resultsContent.getChildCount() > 5
-            m.trendingSearchResultsContainer.translation = [0, 672]
-          else
-            ' If the result count is less than or equal to 5. We will show the trending searches.
-            m.trendingSearchResultsContainer.translation = [0, 372]
-          end if
+          ' If the result count is less than or equal to 4. We will show the trending searches.
+          m.trendingSearchResultsContainer.translation = [0, 430]
         end if
       end if
     else
@@ -493,9 +475,9 @@ Function onSearchContentChange()
       if nMatches = 1
         matchingText = getTranslation("screenSearch_matchingTitles_singular")
       else
-        matchingText = getTranslation("screenSearch_matchingTitles_plural", {matches: nMatches.toStr()})
+        matchingText = getTranslation("screenSearch_matchingTitles_plural", { matches: nMatches.toStr() })
       end if
-      
+
       if getExperimentResource("roku_search_autocomplete", "roku_search_autocomplete_v3", false).enabled = true
         m.searchHintText.text = matchingText
       else
@@ -512,21 +494,12 @@ Function onSearchContentChange()
         m.trendingResultsHint.visible = false
         if m.top.isUserEligibleForTrendingSearchContents = true
           m.trendingSearchResultsContainer.visible = true
-          if m.rokuSearchLargerPoster = true
-            if results.getChildCount() > 4
-              m.trendingSearchResultsContainer.translation = [0, 752]
-            else
-              m.trendingResultsHint.visible = true
-              m.trendingSearchResultsContainer.translation = [0, 430]
-            end if
+
+          if results.getChildCount() > 4
+            m.trendingSearchResultsContainer.translation = [0, 752]
           else
-            if results.getChildCount() > 5
-              m.trendingSearchResultsContainer.translation = [0, 672]
-            else
-              m.trendingResultsHint.visible = true
-              ' If the result count is less than or equal to 5. We will show the trending searches.
-              m.trendingSearchResultsContainer.translation = [0, 372]
-            end if
+            m.trendingResultsHint.visible = true
+            m.trendingSearchResultsContainer.translation = [0, 430]
           end if
         else
           m.trendingSearchResultsContainer.visible = false
@@ -565,12 +538,12 @@ Function onSearchContentChange()
 
 
   '//if the autocompleteMenu is the component that had been last in focus in the middle column, then that means the search results were the result of selecting an autocomplete suggestion.
-  '// Move focus to the right most column 
+  '// Move focus to the right most column
   ' if m.autocompleteMenu.isInFocusChain() = true
   if doesAutocompleteSuggestionsHaveFocusInMiddleColumn() = true
     resultsComponent = invalid
-    m.middleColumnFocus = m.keyboard  '//reset the middle focus to the keyboard after a suggestion selection
-    
+    m.middleColumnFocus = m.keyboard '//reset the middle focus to the keyboard after a suggestion selection
+
     if m.ResultGrid.visible = true
       resultsComponent = m.ResultGrid
       m.gridHasFocus = true
@@ -623,7 +596,7 @@ Function onKeyboardTextChanged()
 
   if getExperimentResource("roku_search_autocomplete", "roku_search_autocomplete_v3", false).enabled = true
     '//Move some text to the right side
-    '//if the roku_search_autocomplete_v3 fails, then we need to change the XML so searchDirectionsGroup is on the leftside 
+    '//if the roku_search_autocomplete_v3 fails, then we need to change the XML so searchDirectionsGroup is on the leftside
     m.rightSideTextGroup.insertChild(m.searchDirectionsGroup, 0)
   end if
 
@@ -633,7 +606,7 @@ Function onKeyboardTextChanged()
     if getExperimentResource("roku_search_autocomplete", "roku_search_autocomplete_v3", false).enabled = true
       '// when searchMenuText is on the right side when the roku_search_autocomplete_v3 experiment is enabled,
       '// then do not display the search title as it looks out of place
-        m.searchMenuText.text = ""
+      m.searchMenuText.text = ""
     else
       m.searchMenuText.text = m.searchTitleText
     end if
@@ -830,25 +803,14 @@ Function onResultGridCurrFocusRowChange(msg)
     totalItems = 0
   end if
 
-  if m.rokuSearchLargerPoster = true
-    totalRows = totalItems \ 4
-    if totalItems MOD 4 <> 0
-      totalRows = totalRows + 1
-    end if
-  else
-    totalRows = totalItems \ 5
-    if totalItems MOD 5 <> 0
-      totalRows = totalRows + 1
-    end if
+  totalRows = totalItems \ 4
+  if totalItems mod 4 <> 0
+    totalRows = totalRows + 1
   end if
 
   fraction = totalRows - 1 - currFocusRow
   if fraction < 1 AND m.top.isUserEligibleForTrendingSearchContents = true
-    if m.rokuSearchLargerPoster = true
-      translationY = 752 - ((1 - fraction) * 318)
-    else
-      translationY = 672 - ((1 - fraction) * 298)
-    end if
+    translationY = 752 - ((1 - fraction) * 318)
     m.trendingSearchResultsContainer.translation = [0, translationY]
     m.trendingResultsHint.visible = true
   else
@@ -877,7 +839,7 @@ End Function
 
 Function getTrackingComponentInfo(itemIndex, numColumns, contentNode, trackingLib)
   if trackingLib <> invalid
-    column = 1 + (itemIndex MOD numColumns)
+    column = 1 + (itemIndex mod numColumns)
     row = 1 + (itemIndex \ numColumns)
 
     return {
@@ -895,7 +857,7 @@ End Function
 Function getTrackingAutocompleteComponentInfo(contentNode)
   returnValue = invalid
   if contentNode <> invalid AND contentNode.title <> invalid
-    returnValue =  {
+    returnValue = {
       componentType: "search_suggestions_component"
       componentValues: {
         search_suggestion: contentNode.title
@@ -934,14 +896,14 @@ End Function
 '''''''''''''''''''''''
 ' onKeyEvent
 '
-Function onKeyEvent(key As string, press As boolean) As boolean
+Function onKeyEvent(key as String, press as Boolean) as Boolean
   tubiLog("SearchScreen.onKeyEvent")
   if press then
     ' Only focus on content grid if animation is not in process, and if there is actually content there
     if key = "right" AND (m.Keyboard.isInFocusChain() = true OR m.autocompleteMenu.isInFocusChain() = true) AND m.isSearchRequestInProgress = false then
       if m.ResultGrid.content <> invalid AND m.ResultGrid.content.getChildCount() > 0 AND m.isTrendingResultsGridInFocus = false
         m.ResultGrid.setFocus(true)
-      ' Only setting focus to trending search result if the user is eligible.
+        ' Only setting focus to trending search result if the user is eligible.
       else if m.trendingSearchResultGrid.content <> invalid AND m.trendingSearchResultGrid.content.getChildCount() > 0 AND m.trendingSearchResultsContainer.visible = true
         m.trendingSearchResultGrid.setFocus(true)
       end if
@@ -985,13 +947,9 @@ Function onKeyEvent(key As string, press As boolean) As boolean
       translationY = m.ResultGrid.subBoundingRect("item" + lastItemIndex.toStr()).y
       m.trendingSearchResultGrid.setFocus(true)
       m.isTrendingResultsGridInFocus = true
-      if m.rokuSearchLargerPoster = true
-        translationY = 430 + translationY
-      else
-        translationY = 375 + translationY
-      end if
-      slideTo(m.gridContainer, [0, -(translationY)], 0.3)
-      
+      translationY = 430 + translationY
+      slideTo(m.gridContainer, [0, - (translationY)], 0.3)
+
     else if key = "up" AND m.trendingSearchResultGrid.isInFocusChain() = true AND (m.ResultGrid.content <> invalid AND m.ResultGrid.content.getChildCount() > 0)
       slideTo(m.gridContainer, [0, 0], 0.3)
       m.ResultGrid.setFocus(true)
@@ -1004,7 +962,7 @@ Function onKeyEvent(key As string, press As boolean) As boolean
       m.bResultsInFocus = false
       return true
     end if
-  else    
+  else
     if key = "up" AND m.Keyboard.isInFocusChain() = true AND m.isSearchRequestInProgress = false AND m.autocomplete.visible = true
       m.autocompleteMenu.setFocus(true)
       m.middleColumnFocus = m.autocompleteMenu
@@ -1047,7 +1005,7 @@ End Function
 Function handlePlayInput()
   selectedContent = invalid
   itemFocused = 0
-  
+
   if m.ResultGrid.isInFocusChain() = true AND m.ResultGrid.content <> invalid
     itemFocused = m.ResultGrid.itemFocused
     selectedContent = m.ResultGrid.content.getChild(itemFocused)
@@ -1090,13 +1048,13 @@ Function onAutocompleteFocused(msg)
 
   if autocompleteContent <> invalid AND itemFocused <> invalid AND autocompleteContent.getChild(itemFocused) <> invalid
     focusedContent = autocompleteContent.getChild(itemFocused)
-    
+
     autocompleteComponent = getTrackingAutocompleteComponentInfo(focusedContent)
     if m.oldAutocompleteComponent <> invalid AND autocompleteComponent <> invalid
       '//Dispatch that the focus has shifted from one autocomplete suggestion to a new suggestion
       sendNavigateWithinAnalytics(m.autocompleteMenu.id)
     else
-      '//Since the old oldAutocompleteComponent does not exist or it's identical as the current autocompleteComponent, then that 
+      '//Since the old oldAutocompleteComponent does not exist or it's identical as the current autocompleteComponent, then that
       '// means the autocompleteComponent menu has just gained focus and report a toggle_on to the automplete suggestion menu
       sendAutocompleteFocusAnalytics(autocompleteComponent)
     end if
@@ -1121,8 +1079,8 @@ End Function
 
 ' Send the navigateWithinPage event when navigating to/from autocompleteMenu and searchResults grid - OR send the event when navigating within suugestions of the autocompleteMenu
 '   TODO:: It currently cannot be called to track a navigateWithinPage event from search result to another search result; however, it should be chamnged so it can.
-' @prevComponentID: string - set to be the value either the id of autocompleteMenu or the id of the search results grid 
-' @destComponentID: string - set to be the value either the id of autocompleteMenu or the id of the search results grid 
+' @prevComponentID: string - set to be the value either the id of autocompleteMenu or the id of the search results grid
+' @destComponentID: string - set to be the value either the id of autocompleteMenu or the id of the search results grid
 Function sendNavigateWithinAnalytics(prevComponentID, destComponentID = "")
   '//initialize variables
   prevComponentOneof = invalid
@@ -1150,7 +1108,7 @@ Function sendNavigateWithinAnalytics(prevComponentID, destComponentID = "")
     col = -1
     if destComponentID = m.autocompleteMenu.id
       destComponentOneof = getTrackingAutocompleteComponentInfo(focusedAutocompleteContent)
-      '//since the UI visually reverses the order of the suggestions: bottomUp instead of topDown, 
+      '//since the UI visually reverses the order of the suggestions: bottomUp instead of topDown,
       '//then we must determine the original row placement of the suggestion that the backend had provided.
       nSuggestions = autocompleteContent.getChildCount()
       row = nSuggestions - m.autocompleteMenu.itemFocused
@@ -1174,7 +1132,7 @@ Function sendNavigateWithinAnalytics(prevComponentID, destComponentID = "")
         vertical_location: row
         horizontal_location: col
       }
-      
+
       '//Dispatch that the focus has shifted from an autocomplete suggestion to a result item, or visa versa
       m.top.navigateWithinPageInfo = navigateWithinPageInfo
     end if
@@ -1196,7 +1154,7 @@ Function sendAutocompleteFocusAnalytics(autocompleteComponent, bToggleOn = true)
     end if
 
     updateTrackingInfoWithSearchQuery()
-    pageInfo = m.top.trackingPageInfo 
+    pageInfo = m.top.trackingPageInfo
     m.top.componentInteractionInfo = {
       pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
       componentOneof: m.Tracking.getAnalyticsComponent(autocompleteComponent.componentType, autocompleteComponent.componentValues)
@@ -1217,18 +1175,18 @@ Function onAutocompleteSelected(msg)
     if m.top.content = invalid OR m.top.content.searchText <> itemTitle
       '//Ensure the current results is not associated with the selected suggestion
       prepareScreenForSearchChange()
-      
+
       '//Set the query value to the current user-typed query before the keyboard text is changed to the suggestion
       updateTrackingInfoWithSearchQuery()
-      
+
       m.searchMenuText.text = LCase(itemTitle)
 
       '//unobserve keyboard.text while dispatching that an autocomplete suggestion was selected.
       '// This is to ensure only one search is performed.
       m.keyboard.unobserveFieldScoped("text")
-      m.Keyboard.text = itemTitle 
+      m.Keyboard.text = itemTitle
       m.keyboard.observeFieldScoped("text", "onKeyboardTextChanged")
-      
+
       m.autocomplete.visible = false
       m.autocompleteMenu.content = invalid
 
@@ -1248,7 +1206,7 @@ Function setDefaultText()
     m.searchHintText.text = m.searchHintToSearch
     m.searchText.text = ""
     m.autocomplete.visible = false
-    
+
     if getExperimentResource("roku_search_autocomplete", "roku_search_autocomplete_v3", false).enabled = true AND m.microphone <> invalid
       m.microphone.visible = true
     end if
@@ -1261,7 +1219,7 @@ Function setVisibilityForDefaultText(b = true)
   m.searchMenuText.visible = b
   m.searchHintText.visible = b
   m.searchResultsMessageContainer.visible = b
-  
+
 End Function
 
 
@@ -1274,7 +1232,7 @@ Function handleInfoPanelVisibilityForLeftPress()
     setDefaultText()
   end if
   setVisibilityForDefaultText(true)
-  
+
   if getExperimentResource("roku_search_autocomplete", "roku_search_autocomplete_v3", false).enabled = false AND m.microphone <> invalid
     m.microphone.visible = true
   end if
