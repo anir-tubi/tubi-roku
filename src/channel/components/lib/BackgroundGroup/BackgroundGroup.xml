@@ -63,6 +63,20 @@
         height="1080"/>
     </Group>
 
+    <Group
+      id="adDisplayGradient"
+      opacity="0">
+      <Poster
+        id="adDisplayLeftGradient"
+        width="620"
+        height="1080"/>
+      <Poster
+        id="adDisplayBottomGradient"
+        translation="[0, 350]"
+        width="1920"
+        height="258"/>
+    </Group>
+
     <Poster
       id="fullScreenPosterGradient2"
       opacity="0"

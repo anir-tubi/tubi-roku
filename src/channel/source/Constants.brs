@@ -279,6 +279,7 @@ Function getConstants()
   constants.reqNames.getHomescreen = "getHomescreen"
   constants.reqNames.getMiniHomescreen = "getMiniHomescreen"
   constants.reqNames.getCategoriesListScreen = "getCategoriesListScreen"
+  constants.reqNames.getHomescreenAds = "getHomescreenAds"
   constants.reqNames.getCategoryDetailsScreen = "getCategoryDetailsScreen"
   constants.reqNames.getSearchDefault = "getSearchDefault"
   constants.reqNames.getCategory = "getCategory"
@@ -295,8 +296,11 @@ Function getConstants()
   constants.reqNames.deviceRegister = "deviceRegister" 'verify age
   constants.reqNames.checkBirthdayInfo = "checkBirthdayInfo" 'verify age
   constants.reqNames.patchUserSettings = "patchUserSettings"
+
+  '//::TODO::ads_ott_hdc_carousel_v1, remove the sponsorPixel & skinAdPixel once the new ad carousel is fully rolled out.
   constants.reqNames.sponsorPixel = "sponsorPixel"
   constants.reqNames.skinAdPixel = "skinAdPixel"
+
   constants.reqNames.getEPGChannelIds = "getEPGChannelIds"
   constants.reqNames.getEPGPrograms = "getEPGPrograms"
   constants.reqNames.postUserHistory = "postUserHistory"
@@ -343,6 +347,7 @@ Function getConstants()
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getHomescreen] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getMiniHomescreen] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getCategoriesListScreen] = true
+  constants.reqNames.acceptsTubiAuth[constants.reqNames.getHomescreenAds] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getCategoryDetailsScreen] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getSearchDefault] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getCategory] = true
@@ -565,6 +570,12 @@ Function getConstants()
     constants.urls.autocomplete = "https://search.staging-public.tubi.io/api/v1/autocomplete"
   end if
 
+  'ad showcase url
+  constants.urls.adShowcase = "https://ads.tubi.io/137528/inapp"
+  if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
+    constants.urls.adShowcase = "https://ads.staging-public.tubi.io/900000/inapp"
+  end if
+
   'tensor url
   constants.urls.tensor = {}
   ' tensor cdn url
@@ -746,6 +757,12 @@ Function getConstants()
   constants.userQueueType.watchLater = "watch_later"
   constants.userQueueType.remindMe = "remind_me"
 
+  'Ad Types
+  constants.adTypes = {}
+  constants.adTypes.adRowlistSpotlight = "adRowlistSpotlight"
+  constants.adTypes.adRowlistCarousel = "adRowlistCarousel"
+  constants.adTypes.skinAd = "skinAd"
+
   'common http request headers
   constants.headers = {}
   locale = constants.deviceInfo.locale.replace("_", "-")
@@ -775,6 +792,8 @@ Function getConstants()
 
   ' Time in seconds after which we force a refresh of the categoryscreen
   constants.timers.categoryContentRefreshTimeout = 12 * 60 * 60
+  '// Time in seconds when we fire pixels when an ad is in focus
+  constants.timers.adFocusPixelFire = 1
 
   ' Time in seconds after which stored hasAge info becomes expired for COPPA
   constants.timers.coppaFailTimeout = 24 * 60 * 60 ' 1 day
@@ -1039,7 +1058,10 @@ Function getConstants()
   constants.player.browseContent.numContainers = 10
   constants.player.browseContent.numContents = 50
 
-  constants.player.videoPreviewDebounce = 0.5
+  'The number of seconds to debounce/delay the video preview from playing
+  constants.player.videoPreviewDelayTimes = {}
+  constants.player.videoPreviewDelayTimes.videoTiles = 0.5
+  constants.player.videoPreviewDelayTimes.adCarousel = 3
 
   ' constants used for EPG
   constants.EPGChannelPlayMode = {}
@@ -1053,6 +1075,7 @@ Function getConstants()
   constants.cacheTimes.category = 4 * 60 * 60 ' Time in seconds after which a category's cache is not valid
   constants.cacheTimes.homescreen = 6 * 60 * 60 ' Time in seconds after which the category screen's cache is not valid
   constants.cacheTimes.epgscreen = 6 * 60 * 60 ' Time in seconds after which the epg screen's cache is not valid
+  constants.cacheTimes.homescreenAd = 60 ' Time in seconds after which the homescreen ad cache is not valid
 
   'This will store the error codes that are needed to be displayed to the user.
   'Review the following page to see the list of error codes that are used across platforms:
@@ -1175,6 +1198,8 @@ Function getConstants()
   constants.ui.categoryIds.certifiedFresh = "certified_fresh"
   ' Adding a constant entry so that it is easier to change for testing or future use if we need to pick other container outside of featured.
   constants.ui.categoryIds.skinAd = "skinAd"
+  constants.ui.categoryIds.adRowlistSpotlight = "hdc_spotlight"
+  constants.ui.categoryIds.adRowlistCarousel = "hdc_carousel"
 
   constants.ui.categoryTypes = {}
   'these map to tensor api container types
@@ -1234,6 +1259,8 @@ Function getConstants()
   constants.ui.contentTypes.epg = "epg"
   constants.ui.contentTypes.sportsEvent = "sports_event"
   constants.ui.contentTypes.skinAd = "skinAd"
+  constants.ui.contentTypes.adRowlistSpotlight = "adRowlistSpotlight"
+  constants.ui.contentTypes.adRowlistCarousel = "adRowlistCarousel"
 
   constants.ui.playerTypes = {}
   constants.ui.playerTypes.fox = "fox"
@@ -1253,6 +1280,8 @@ Function getConstants()
   constants.ui.backgroundTypes.spotlight = "spotlight"
   ' This acts the same as spotlight but makes changes to allow a seemless transition to a looping background video
   constants.ui.backgroundTypes.skinAd = "skinAd"
+  constants.ui.backgroundTypes.adRowlistSpotlight = "adRowlistSpotlight"
+  constants.ui.backgroundTypes.adRowlistCarousel = "adRowlistCarousel"
 
   constants.ui.modes = {}
   constants.ui.modes.standard = "standard"
@@ -1411,8 +1440,15 @@ Function getConstants()
   ' Will be removed when purple carpet code is cleaned up.
   constants.ui.imageSizes.banner = [1693, 162]
 
+  ' Sizes for the full width ad display container image. It will display within a row on the homescreen.
+  constants.ui.imageSizes.adRowlistThumbnail = [1592, 360]
+
+  constants.ui.imageSizes.adRowlistCarouselThumbnail = [118, 118]
   'Sizes of featured row  poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
   constants.ui.imageSizes.featuredPortraitSmall = [310, 442]
+
+  ' Size of guest user continue watching container.
+  constants.ui.imageSizes.guestContinueWatchingTile = [1613, 378]
 
   ' Size of guest user continue watching container.
   constants.ui.imageSizes.guestContinueWatchingTile = [1613, 378]
@@ -1513,6 +1549,8 @@ Function getConstants()
   constants.ui.gridItemTypes.landscapeNoTitle = "landscapeNoTitle"
   constants.ui.gridItemTypes.linear = "linear"
   constants.ui.gridItemTypes.historySignedOutUser = "continue_watching_signed_out_user"
+  constants.ui.gridItemTypes.adRowlistSpotlight = "adRowlistSpotlight"
+  constants.ui.gridItemTypes.adRowlistCarousel = "adRowlistCarousel"
   constants.ui.gridItemTypes.emptyContainer = "emptyContainer"
   constants.ui.gridItemTypes.portraitTopTen = "portraitTopTen"
   constants.ui.gridItemTypes.skinAd = "skinAd"

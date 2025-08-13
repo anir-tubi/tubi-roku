@@ -4,7 +4,7 @@ Function init()
 
   m.playerFullscreenCountdownTimer = topRef.findNode("PlayerFullscreenCountdownTimer")
   m.countdownGroup = topRef.findNode("CountdownGroup")
-  m.adIndicator = topRef.findNode("AdIndicator")
+  m.adIndicator = topRef.findNode("adIndicator")
   m.infoPanel = topRef.findNode("InfoPanel")
   m.infoPanelGroup = topRef.findNode("infoPanelGroup")
   m.rowList = topRef.findNode("rowList")
@@ -47,7 +47,7 @@ End Function
 Function setCountdownTranslation()
   tubiLog("SkinAdRow.setCountdownTranslation")
   nXCountDownTranslation = m.rowList.translation[0] + m.constants.ui.imageSizes.skinAdLandscape[0] - m.countdownGroup.width - 25 '//move the countdown to the right so it does not overlap with the ad indicator
-  m.countdownGroup.translation = [nXCountDownTranslation, m.countdownGroup.translation[1]]  '//move the countdown to the right so it does not overlap with the ad indicator
+  m.countdownGroup.translation = [nXCountDownTranslation, m.countdownGroup.translation[1]] '//move the countdown to the right so it does not overlap with the ad indicator
 End Function
 
 
@@ -157,7 +157,7 @@ End Function
 Function onRowItemSelected(msg)
   tubiLog("SkinAdRow.onRowItemSelected")
   selectVideoItem()
-End function
+End Function
 
 
 Function selectVideoItem()
@@ -187,6 +187,6 @@ End Function
 Function populateInfoPanel(contentNode)
   tubiLog("SkinAdRow.populateInfoPanel")
   if contentNode <> invalid
-    m.infoPanel.content = contentNode 
+    m.infoPanel.content = contentNode
   end if
 End Function

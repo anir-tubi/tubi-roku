@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="AdDisplayCarouselItem" extends="Group" >
+  <script type="text/brightscript" uri="AdDisplayCarouselItem.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+
+  <interface>
+    <!-- INPUT -->
+      <field id="width" alias="Poster.width"/>
+      <field id="height" alias="Poster.height"/>
+      <field id="itemContent" type="node" />
+  </interface>
+
+  <children>
+    <Poster
+      id="Poster"/>
+  </children>
+</component>

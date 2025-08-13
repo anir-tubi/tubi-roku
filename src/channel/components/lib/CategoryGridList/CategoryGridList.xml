@@ -72,6 +72,9 @@
            -->
       <field id="categoryResponseInBatch" type="node" />
 
+      <!-- incoming ad container data to replace/add to the existing content. -->
+      <field id="adResponseInBatch" type="array" />
+
       <!-- incoming metadata from MetadataFetchTask for single categories (non batched). These are currently not used. -->
       <field id="remainingInCategoryResponse" type="assocarray" />
 
@@ -150,6 +153,7 @@
       -->
       <field id="reloadedItemToBeFocused" type="node" />
 
+      <field id="animateToItem" alias="RowList.animateToItem" />
       <field id="currFocusRow" alias="RowList.currFocusRow" />
       <field id="currFocusColumn" alias="RowList.currFocusColumn" />
       <field id="scrollingStatus" alias="RowList.scrollingStatus" />

@@ -249,8 +249,8 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, t
 
     ' We do not have any other differentiating parameter outside of player type to figure out if it is a purple carpet content or not.
     ' Backend content type is sports_event.
-    if contentFromServer[typeVar] <> m.constants.ui.contentTypes.emptyContainer
-      sType = m.translateBackendTypeToClientSideType(contentFromServer[typeVar])
+    if sType <> m.constants.ui.contentTypes.emptyContainer
+      sType = m.translateBackendTypeToClientSideType(sType)
     end if
     translatedContent[typeVar] = sType
 
@@ -897,7 +897,7 @@ Function tubiMetadataTranslate_translateAds(ads = []) as Object
 
           media = creative.media
           if isAA(media) = true
-            skinAdContent.videoPreviewUrl = media.streamurl
+            skinAdContent.videoPreviewUrl = media.streamUrl
           end if
 
           skinAdContent.imageImptracking = creative.image_imptracking

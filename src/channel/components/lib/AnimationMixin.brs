@@ -6,7 +6,7 @@
 ' @startOrEndLocation - 'above' 'below' 'left' 'right'.  If animating IN, this is start location, otherwise end
 ' @inOrOut - 'in' or 'out'
 ' @translationDifference - how many pixels the target should slide
-Function slideFade(target As Object, startOrEndLocation As String, inOrOut As String, duration=2.0 As Float, delay=0.0 As Float, translationDifference = 100 as Integer)
+Function slideFade(target as Object, startOrEndLocation as String, inOrOut as String, duration = 2.0 as Float, delay = 0.0 as Float, translationDifference = 100 as Integer)
   animationOptions = {
     duration: duration
     delay: delay
@@ -60,7 +60,7 @@ End Function
 ' @delay: float, the amount of time to wait before starting the animation, in seconds
 ' @endingOpacity: float, the final opacity of the target after the animation completes. If not passed, the opacity will be set to 0.0 for "out" and 1.0 for "in"
 ' @skipSlideFadeOrigin: boolean, if true, the slideFadeOrigin will not be set
-Function slideFadeGeneral(target, endTranslation, inOrOut, duration=2.0, delay=0.0, endingOpacity = -1, skipSlideFadeOrigin = false, completeCallback = invalid)
+Function slideFadeGeneral(target, endTranslation, inOrOut, duration = 2.0, delay = 0.0, endingOpacity = -1, skipSlideFadeOrigin = false, completeCallback = invalid)
   animationOptions = {
     duration: duration
     delay: delay
@@ -112,7 +112,7 @@ End Function
 ' slideTo
 '
 ' simple helper to slide the component to the destination.
-Function slideTo(target As Object, destination As Object, duration As Float, delay=0.0 As Float, completeCallback = invalid)
+Function slideTo(target as Object, destination as Object, duration as Float, delay = 0.0 as Float, completeCallback = invalid)
   animationOptions = {
     duration: duration
     delay: delay
@@ -127,7 +127,7 @@ End Function
 ' bubbleIn
 '
 ' Effect to reveal by scaling from 0 to 1
-Function bubbleIn(target As Object, duration As Float, delay=0.0 As Float)
+Function bubbleIn(target as Object, duration as Float, delay = 0.0 as Float)
   target.scale = [0.0, 0.0]
   animationOptions = {
     duration: duration
@@ -143,7 +143,7 @@ End Function
 ' resize
 '
 ' animate the width and height of the target simultaneously
-Function resize(target As Object, width As Float, height As Float, duration As Float, delay=0.0 As Float)
+Function resize(target as Object, width as Float, height as Float, duration as Float, delay = 0.0 as Float)
   animationOptions = {
     duration: duration
     delay: delay
@@ -158,7 +158,7 @@ End Function
 ' resizeToLocation
 '
 ' animate the width and height of the target while simultaneously animating the translation
-Function resizeToLocation(target As Object, width As Float, height As Float, destination As Object, duration As Float, delay=0.0 As Float)
+Function resizeToLocation(target as Object, width as Float, height as Float, destination as Object, duration as Float, delay = 0.0 as Float)
   animationOptions = {
     duration: duration
     delay: delay
@@ -178,7 +178,7 @@ End Function
 ' @param clippingRect: array, the clippingRect property of the target that will be animated. Should be a 4-element array [x, y, width, height]
 ' @param duration: float, the duration of the animation
 ' @param delay: float, the delay (if any) of the animation
-Function animateClippingRect(target As Object, clippingRect As Object, duration As Float, delay = 0.0 As Float)
+Function animateClippingRect(target as Object, clippingRect as Object, duration as Float, delay = 0.0 as Float)
   animationOptions = {
     duration: duration
     delay: delay
@@ -192,7 +192,7 @@ End Function
 ' colorSlide
 '
 ' transitions the color of a node
-Function colorChange(target As Object, color As String, duration As Float, delay=0.0 As Float)
+Function colorChange(target as Object, color as String, duration as Float, delay = 0.0 as Float)
   animationOptions = {
     color: color
     duration: duration
@@ -202,7 +202,7 @@ Function colorChange(target As Object, color As String, duration As Float, delay
 End Function
 
 
-Function fade(target As Object, outOrIn As String, duration As Float, delay=0.0 As Float, endingOpacity = -1, completeCallback = invalid)
+Function fade(target as Object, outOrIn as String, duration as Float, delay = 0.0 as Float, endingOpacity = -1, completeCallback = invalid)
   animationOptions = {
     duration: duration
     delay: delay
@@ -261,7 +261,7 @@ End Function
 ' NOTE3!: Potential leak here if animations are applied to dynamically created targets.  While targets
 '         may be removed and go out of scope, their animations don't get garbage collected with them.
 ' TODO(Chris): check for abandoned animations here and remove them
-Function animate(target As Object, options as Object) As Object
+Function animate(target as Object, options as Object) as Object
   if type(target) = "roSGNode" AND target.id <> ""
     if options.origin = invalid then options.origin = target.translation
     if options.duration = invalid then options.duration = 2.0

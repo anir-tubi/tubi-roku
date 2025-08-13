@@ -12,27 +12,46 @@ Function round(value)
   else
     value = wholeNum
   end if
-  
+
   return Int(value)
-  
+
 End Function
+
 
 ' maxValue function is used to get the max value of two values
 ' @a : dynamic, the first value
 ' @b : dynamic, the second value
 ' returns value as dynamic; or invalid if one of the inputs is not valid numeric type
-Function maxValue(a as dynamic, b as dynamic) as dynamic
+Function maxValue(a as Dynamic, b as Dynamic) as Dynamic
   ' Return invalid to indicate that the inputs are not valid numeric types
   if isNumber(a) = false
     return invalid
   else if isNumber(b) = false
     return invalid
   end if
-  
+
   if a > b
-      return a
+    return a
   else
-      return b
+    return b
+  end if
+End Function
+
+
+' minValue function is used to get the min value of two values
+' @a : integer|float, the first value
+' @b : integer|float, the second value
+' returns value as integer|float; or invalid if one of the inputs is not valid numeric type
+Function minValue(a as Dynamic, b as Dynamic) as Dynamic
+  ' Return invalid to indicate that the inputs are not valid numeric types
+  if isNumber(a) = false OR isNumber(b) = false
+    return invalid
+  end if
+
+  if a < b
+    return a
+  else
+    return b
   end if
 End Function
 
@@ -47,13 +66,13 @@ Function roundUp(value)
   result = 0
   valueType = type(value)
 
-  if valueType = "roFloat" or valueType = "Float" or valueType= "roDouble" or valueType= "Double"
+  if valueType = "roFloat" OR valueType = "Float" OR valueType = "roDouble" OR valueType = "Double"
     if FIX(value) <> value
       result = Int(value) + 1
     else
       result = Int(value)
     end if
-  else if valueType = "roInteger" or valueType = "roInt" or valueType = "Integer"  
+  else if valueType = "roInteger" OR valueType = "roInt" OR valueType = "Integer"
     result = value
   end if
 
@@ -71,15 +90,15 @@ Function roundDown(value)
 
   result = 0
   valueType = type(value)
-  if valueType = "roFloat" or valueType = "Float" or valueType= "roDouble" or valueType= "Double"
-    if value <> 0 
+  if valueType = "roFloat" OR valueType = "Float" OR valueType = "roDouble" OR valueType = "Double"
+    if value <> 0
       result = Int(value)
     end if
-  else if valueType = "roInteger" or valueType = "roInt" or valueType = "Integer"  
+  else if valueType = "roInteger" OR valueType = "roInt" OR valueType = "Integer"
     result = value
   end if
   return result
-  
+
 End Function
 
 
@@ -87,10 +106,10 @@ End Function
 ' @a : float/double/integer, the first value
 ' @b : float/double/integer, the second value
 ' returns maximum value
-Function maxVal(a as dynamic, b as dynamic) as dynamic
+Function maxVal(a as Dynamic, b as Dynamic) as Dynamic
   if a > b
-      return a
+    return a
   else
-      return b
+    return b
   end if
 End Function

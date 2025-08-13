@@ -196,6 +196,12 @@ Function registerParsingCallbacks()
     parseError: parseGenericError
   }
 
+  ' homescreen ads
+  m.requestTypes[m.constants.reqNames.getHomescreenAds] = {
+    parseSuccess: parseHomeScreenAdsSuccess
+    parseError: parseHomeScreenAdsError
+  }
+
   ' category list screen
   m.requestTypes[m.constants.reqNames.getCategoriesListScreen] = {
     parseSuccess: parseCategoryListSuccess

@@ -21,8 +21,8 @@ Function init()
 
   m.browseWhileWatchingGroupShowAnimation = invalid
 
-  m.browseWhileWatchingXYPositionWhenHidden = [0,0]
-  m.browseWhileWatchingXYPositionWhenOpen = [0,-432]
+  m.browseWhileWatchingXYPositionWhenHidden = [0, 0]
+  m.browseWhileWatchingXYPositionWhenOpen = [0, -432]
 
   ' Used to determine if navigate_within_page events should be sent. Only send when the Related content row already
   ' has focus, not when it gains focus.
@@ -35,7 +35,7 @@ Function onComponentFocus()
   if m.top.hasFocus()
     m.signedIn = isLoggedInUser() 'everytime the component gets focus, check if user is signed in
     m.categoryGridList.setFocus(true)
-    m.categoryGridList.jumpToRowItem = [0,0]
+    m.categoryGridList.jumpToRowItem = [0, 0]
     if m.info.opacity = 0
       fade(m.info, "in", 0.4)
     end if
@@ -182,7 +182,7 @@ End Function
 ' onGridFocusChange
 '
 ' On grid focus change, update the info panel
-Function onGridFocusChange() as void
+Function onGridFocusChange() as Void
   content = m.categoryGridList.itemFocused
 
   if content <> invalid
@@ -199,16 +199,17 @@ Function onGridFocusChange() as void
     if m.isRelatedFocused = true AND oldAnalyticsRow > 0 AND oldAnalyticsCol > 0
       if oldAnalyticsRow <> newAnalyticsRow OR oldAnalyticsCol <> newAnalyticsCol
 
-        categoryComponentInfo = {}
-        categoryComponentInfo["category_slug"] = m.categoryGridList.oldCategoryId
-        categoryComponentInfo["category_row"] = oldAnalyticsRow
         'row is hardcoded to 1 in the line below because the row represents the row within the category_component, not within the grid
         'and the current design only has one row per category
         tile = m.tracking.getAnalyticsTile(oldFocusedContent, oldAnalyticsCol, 1)
-        categoryComponentInfo["content_tile"] = tile
+        categoryComponentInfo = {
+          "category_slug": m.categoryGridList.oldCategoryId
+          "category_row": oldAnalyticsRow
+          "content_tile": tile
+        }
 
         m.top.navigateWithinPageInfo = {
-          pageOneof: m.tracking.getAnalyticsPage(pageName, {video_id: content.id.toInt()})
+          pageOneof: m.tracking.getAnalyticsPage(pageName, { video_id: content.id.toInt() })
           componentOneof: m.tracking.getAnalyticsComponent("category_component", categoryComponentInfo)
           means_of_navigation: "BUTTON" 'MeansOfNavigation enum
           vertical_location: newAnalyticsRow
@@ -225,7 +226,7 @@ Function onGridFocusChange() as void
 End Function
 
 
-Function onGridItemSelected() as void
+Function onGridItemSelected() as Void
   if m.categoryGridList <> invalid
     selectedItem = m.categoryGridList.itemSelected
     handleItemSelected(selectedItem, m.top.selectedPosition)

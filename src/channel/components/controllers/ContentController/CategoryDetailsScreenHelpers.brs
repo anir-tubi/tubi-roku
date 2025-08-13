@@ -150,7 +150,7 @@ Function fetchCategoryDetails(content, index = 0, contentMode = "")
 
     if index <> 0
       params["cursor"] = index
-      params["contents_limit"] =  m.constants.performance.categoryGridList.lazyLoadBatchSize
+      params["contents_limit"] = m.constants.performance.categoryGridList.lazyLoadBatchSize
       params["expanded"] = true
     end if
 
@@ -189,7 +189,7 @@ Function onCategoryDetailResponse(categoryContent)
       if categoryContent.sponsorImages <> invalid AND categoryContent.sponsorImages.pixels <> invalid AND categoryContent.sponsorImages.pixels["container_details"] <> invalid
         '//When a sponsored container is made visible, then call the pixels
         sponsorPixels = categoryContent.sponsorImages.pixels["container_details"]
-        sendSponsorPixels(sponsorPixels)
+        sendAdPixels(sponsorPixels)
       end if
 
       if screen.content = invalid 'first time
@@ -202,15 +202,15 @@ Function onCategoryDetailResponse(categoryContent)
 
       'Total received content is less than batchsize that means we have reached the maximum available
       'Number of contents on the screen + next batchsize is more than maximum limit
-      if responseItemsCount <  m.constants.performance.categoryGridList.lazyLoadBatchSize OR (screen.content.getChildCount() +  m.constants.performance.categoryGridList.lazyLoadBatchSize > m.constants.performance.categoryGridList.finalLazyLoadSize)
+      if responseItemsCount < m.constants.performance.categoryGridList.lazyLoadBatchSize OR (screen.content.getChildCount() + m.constants.performance.categoryGridList.lazyLoadBatchSize > m.constants.performance.categoryGridList.finalLazyLoadSize)
         screen.isFullyLoaded = true
       else
-        screen.isFullyLoaded =  false
+        screen.isFullyLoaded = false
       end if
 
 
-    else if categoryContent <> invalid AND responseItemsCount = 0 AND screen.content <> invalid AND  screen.isLoading = false
-      screen.isFullyLoaded =  true
+    else if categoryContent <> invalid AND responseItemsCount = 0 AND screen.content <> invalid AND screen.isLoading = false
+      screen.isFullyLoaded = true
     else
       screen.isLoading = true
 
@@ -354,10 +354,10 @@ Function showCategoryDetailError(error, bContentEmptyError = false)
 
 
   'if categorydetailScreen is lazy loading then send the tracking event only for first batch
-    if categoryDetailsScreen <> invalid AND categoryDetailsScreen.categoryBatchIndex = 0 'first batch has failed, so send page load event
-      loadTime = Int((Uptime(0) - categoryDetailsScreen.trackingLoadStartTime) * 1000) 'in ms
-      screenTrackingLoad(categoryDetailsScreen.trackingPageInfo, loadTime, false)
-    end If
+  if categoryDetailsScreen <> invalid AND categoryDetailsScreen.categoryBatchIndex = 0 'first batch has failed, so send page load event
+    loadTime = Int((Uptime(0) - categoryDetailsScreen.trackingLoadStartTime) * 1000) 'in ms
+    screenTrackingLoad(categoryDetailsScreen.trackingPageInfo, loadTime, false)
+  end if
 
 End Function
 

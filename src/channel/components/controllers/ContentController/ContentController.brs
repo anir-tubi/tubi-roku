@@ -351,8 +351,8 @@ Function addControllerUi()
 
 
   m.videoPreviewDebounce = CreateObject("roSGNode", "Timer")
-  m.videoPreviewDebounce.duration = m.constants.player.videoPreviewDebounce
-  m.videoPreviewDebounce.observeFieldScoped("fire", "startFeaturedInlinePreview")
+  m.videoPreviewDebounce.duration = m.constants.player.videoPreviewDelayTimes.videoTiles
+  m.videoPreviewDebounce.observeFieldScoped("fire", "startDebouncedVideoPreview")
 End Function
 
 
@@ -1254,9 +1254,9 @@ Function resetVideoPlayerBrowseContent()
 End Function
 
 
-'@aPixelURLs: The array of pixel URLs that log when a skinAd container has been seen
-Function sendSkinAdPixels(aPixelURLs)
-  tubiLog("ContentController.sendSkinAdPixels")
+'@aPixelURLs: The array of pixel URLs that log when a non-video-player, screen ad has been seen
+Function sendAdPixels(aPixelURLs)
+  tubiLog("ContentController.sendAdPixels")
   if isNonEmptyArray(aPixelURLs) = true
     for each pixelURL in aPixelURLs
       '//the sStringToReplace is the agreed upon string that the backend will set to the param that is used for cachebusting.
@@ -1270,32 +1270,7 @@ Function sendSkinAdPixels(aPixelURLs)
 
         m.makeRequest({
           url: encodedUrl
-          requestType: m.constants.reqNames.skinAdPixel
-          responseType: "assocarray"
-          silenceCallbackWarnings: true
-        })
-      end if
-    end for
-  end if
-End Function
-
-
-'@aPixelURLs: The array of pixel URLs that log when a sponsored container has been seen
-Function sendSponsorPixels(aPixelURLs)
-  tubiLog("ContentController.sendSponsorPixels")
-  if aPixelURLs <> invalid AND aPixelURLs.Count() > 0
-    for each pixelURL in aPixelURLs
-      '//the sStringToReplace is the agreed upon string that the backend will set to the param that is used for cachebusting.
-      '//a cache busting string must be created within the Roku client and replace the sStringToReplace.
-      sStringToReplace = "(ADRISE:CB)"
-      sCacheBuster = createCacheBusterString()
-      newPixelURL = pixelURL.replace(sStringToReplace, sCacheBuster)
-
-      if isNonEmptyString(newPixelURL) = true
-        encodedUrl = newPixelURL.EncodeUri()
-        m.makeRequest({
-          url: encodedUrl
-          requestType: m.constants.reqNames.sponsorPixel
+          requestType: m.constants.reqNames.generic
           responseType: "assocarray"
           silenceCallbackWarnings: true
         })
@@ -1704,7 +1679,8 @@ Function setVideoContentScreenBackground(screen)
     end if
 
     isSkinAdRowContent = (isCurrentScreenHomeScreen() = true AND gridItemType = m.constants.ui.gridItemTypes.skinAd)
-    if (videoPreviewState = "playing" OR videoPreviewState = "paused" OR videoPreviewState = "buffering" OR isVideoPreviewPlayQueued = true) AND isSkinAdRowContent = false
+    isAdCarouselRowContent = gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
+    if (videoPreviewState = "playing" OR videoPreviewState = "paused" OR videoPreviewState = "buffering" OR isVideoPreviewPlayQueued = true) AND isSkinAdRowContent = false AND isAdCarouselRowContent = false
       m.backgroundGroup.backgroundInfo = {
         type: m.constants.ui.backgroundTypes.epg
         uriList: [] ' setting uriList as empty, because don't need to rotate the background poster when video preview is playing. We can't use shouldRotateBackgrounds because we still need the gradients from backgroundGroup
@@ -1715,10 +1691,17 @@ Function setVideoContentScreenBackground(screen)
         type: m.constants.ui.backgroundTypes.skinAd
         uriList: screen.backgroundUriList
       }
+    else if (videoPreviewState = "playing" OR videoPreviewState = "paused") AND isAdCarouselRowContent = true
 
+      m.backgroundGroup.backgroundInfo = {
+        type: m.constants.ui.backgroundTypes.adRowlistCarousel
+        uriList: screen.backgroundUriList
+      }
     else
       if isSkinAdRowContent = true
         backgroundType = m.constants.ui.backgroundTypes.skinAd
+      else if isAdCarouselRowContent = true
+        backgroundType = m.constants.ui.backgroundTypes.adRowlistCarousel
       else
         backgroundType = getBackgroundType(screen.backgroundUriList, contentType)
       end if
@@ -1843,6 +1826,8 @@ Function getBackgroundType(backgroundUriList, contentType = "")
   if isNonEmptyArray(backgroundUriList) = true
     if contentType = m.constants.ui.contentTypes.linear OR contentType = m.constants.ui.contentTypes.epg
       backgroundType = m.constants.ui.backgroundTypes.epg
+    else if contentType = m.constants.ui.contentTypes.adRowlistSpotlight OR contentType = m.constants.ui.contentTypes.adRowlistCarousel
+      backgroundType = m.constants.ui.backgroundTypes.adRowlistSpotlight
     else
       backgroundType = m.constants.ui.backgroundTypes.topRight
     end if
@@ -3137,6 +3122,7 @@ End Function
 Function sendImpressionEvent()
   if m.viewableImpressionEvents <> invalid AND isMajorEventDay() = false
     if m.viewableImpressionEvents.containers <> invalid AND m.viewableImpressionEvents.containers.count() > 0
+      tubiLog("ContentController.sendImpressionEvent")
       containers = []
       items = m.viewableImpressionEvents.containers.Items()
       for each item in items

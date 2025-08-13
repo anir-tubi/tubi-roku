@@ -140,6 +140,12 @@ Function onVideoPreviewStateChanged(msg)
         end if
         m.backgroundGroup.posterVisible = true
 
+      else if item <> invalid AND item.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
+        '// Simply stop the video preview for adRowlistCarousel content
+        m.backgroundGroup.posterVisible = true
+        if isCurrentScreenHomeScreen() = true
+          currentScreen.allowCarouselAutoRotate = true
+        end if
       else if m.maintask.isHdmiStatusOk = true AND isFullPlayerBlockedForUser = false
         ' Don't want to continue playback if the user has their tv turned off
         if currentScreen.subType() = "DetailScreen"
@@ -170,7 +176,7 @@ Function onVideoPreviewStateChanged(msg)
           showDetailScreen(contentFocused, false, skipDetailScreen, invalid, playbackSource)
         end if
       else if isFullPlayerBlockedForUser = true
-        'Updating backgroundUriList once video preview finished to show the background images instead of black backgroud.
+        'Updating backgroundUriList once video preview finished to show the background images instead of black background.
         currentScreen.backgroundUriList = currentScreen.backgroundUriList
       end if
     end if
@@ -203,16 +209,25 @@ End Function
 ' @componentInfo: assocarray, value can be { componentType: "category_page", componentValues: {}}
 Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
   tubiLog("VideoPreviewHelpers.startVideoPreview")
-
   if content <> invalid AND (isVideoPreviewOn() = true OR (content.gridItemType = m.constants.ui.gridItemTypes.skinAd AND m.constants.deviceInfo.IsAutoplayEnabled = true AND m.constants.deviceInfo.limitedUi = false))
     '//::NOTE:: if this is a skinAd content, the above conditional statement checks if the device auto play setting is on and that the device is not a limited UI device before playing the looping background video
     videoPreview = m.videoPreviewPlayer
     videoPreview.isBufferingComplete = false
 
     ' If the experiment is enabled and focused content is from featured row than expand preview to full screen.
-    if content.gridItemType = m.constants.ui.gridItemTypes.skinAd
+    if content.gridItemType = m.constants.ui.gridItemTypes.skinAd OR content.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
       videoPreview.unObserveFieldScoped("position")
       videoPreview.observeFieldScoped("position", "onVideoPreviewPositionChanged")
+      if content.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel AND isCurrentScreenHomeScreen() = true
+        currentScreen = getCurrentScreen()
+        currentScreen.allowCarouselAutoRotate = false
+      end if
+
+      videoContent = createObject("RoSGNode", "AdContentNode")
+      videoContent.adInfo = content.adInfo
+
+    else
+      videoContent = createObject("RoSGNode", "ContentNode")
     end if
 
     updatePlayerLayoutBasedOnFocusedContent(content)
@@ -225,7 +240,6 @@ Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
     ' Add componentInfo to the video preview player node for analytics
     videoPreview.componentInfoForAnalytics = componentInfo
 
-    videoContent = createObject("RoSGNode", "ContentNode")
     videoContent.id = content.id
     videoContent.url = content.videoPreviewUrl
     videoContent.streamformat = "mp4" ' backend will return always as mp4 for video previews
@@ -252,6 +266,7 @@ Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
       m.videoPreviewPlayer.videoPlayerType = "BANNER"
     end if
 
+    ' If there is no delay, we can start the video preview immediately.
     sendVideoPlayerCommand(videoPreview, "prebuffer")
   end if
 
@@ -323,6 +338,14 @@ Function updatePreviewPlayerToFullScreen()
   resizeToLocation(m.videoPreviewPlayer, 1919, 1079, [0, 0], 0)
 End Function
 
+
+Function updatePreviewPlayerToAdCarousel()
+  m.videoPreviewPlayer.reParent(m.backgroundVideoPreviewPlayerContainer, false)
+  m.videoPreviewPlayer.clippingRect = [0, 0, 1920, 595]
+  resizeToLocation(m.videoPreviewPlayer, 1919, 595, [0, 0], 0)
+End Function
+
+
 Function resumeVideoPreview()
   tubiLog("VideoPreviewHelpers.resumeVideoPreview")
   videoPreview = m.videoPreviewPlayer
@@ -351,8 +374,9 @@ End Function
 ' @componentInfo: assocarray, value can be { componentType: "category_page", componentValues: {}}
 Function setVideoPreviewAfterFocus(focusedContent, pageInfo = {}, componentInfo = {})
   tubiLog("VideoPreviewHelpers.setVideoPreviewAfterFocus")
+  m.videoPreviewDebounce.control = "stop"
   if focusedContent <> invalid AND focusedContent.type <> invalid AND m.SideNav.opened <> true
-    if isVideoPreviewOn() = true OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd
+    if isVideoPreviewOn() = true OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
       previewState = getVideoPreviewStateForThisContent(focusedContent)
       updatePlayerLayoutBasedOnFocusedContent(focusedContent)
       if previewState = "buffering" OR previewState = "playing"
@@ -396,14 +420,46 @@ Function onVideoPreviewPositionChanged(msg)
   position = msg.getData()
   duration = videoPreviewScreen.duration
   currentScreen = getCurrentScreen()
-
   contentFocused = currentScreen.contentFocused
-  if contentFocused <> invalid AND contentFocused.gridItemType = m.constants.ui.gridItemTypes.skinAd
+  if contentFocused <> invalid AND (contentFocused.gridItemType = m.constants.ui.gridItemTypes.skinAd OR contentFocused.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel)
+    reportAdQuartileIfNeeded(contentFocused, position, duration)
+
     if position >= (duration - 1)
       '//this is a loop video. Display the background poster while the video buffers to show again
       m.backgroundGroup.posterVisible = true
     end if
   end if
+End Function
+
+
+Function reportAdQuartileIfNeeded(adItem, position, duration)
+  adInfo = adItem.adInfoProcessed
+
+  if isAA(adInfo) = true AND isNonEmptyArray(adInfo.tracking) = true AND isNumber(position) = true AND isNumber(duration) = true AND position >= 0 AND duration > 0
+
+    trackingPixels = adInfo.tracking
+
+    for i = 0 to trackingPixels.Count() - 1
+      trackingPixel = trackingPixels[i]
+      eventType = trackingPixel.event
+      triggered = trackingPixel.triggered
+      timeToTrigger = trackingPixel.time
+      url = trackingPixel.url
+
+      if isNonEmptyString(eventType) = true AND isBoolean(triggered) = true AND triggered = false AND isNumber(timeToTrigger) = true AND isNonEmptyString(url) = true AND position >= timeToTrigger
+        tubiLog("VideoPreviewHelpers: reportAdQuartileIfNeeded(), Triggering tracking pixel for eventType: " + eventType + ", url: " + url)
+        sendAdPixels([url])
+
+        '// Mark the tracking pixel as triggered to avoid firing it again
+        trackingPixel.triggered = true
+      end if
+    end for
+
+
+    '//adInfoProcessed is not mutable so we need to assign the modified copy back to adItem.adInfoProcessed so that the changes are saved.
+    adItem.adInfoProcessed = adInfo
+  end if
+
 End Function
 
 
@@ -427,6 +483,8 @@ Function updatePlayerLayoutBasedOnFocusedContent(content)
     ' Reducing 1px from both width and height since the player is in background and keeping full width causes roku to display closed captioning overlay.
     ' To avoid any other Roku OS level default behavior from kicking in reducing 1px to give a impression that player is not in full screen.
     updatePreviewPlayerToFullScreen()
+  else if content.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
+    updatePreviewPlayerToAdCarousel()
   else if isKidsUIOn() = false AND isHomeScreen = true AND m.isUserInVideoTilesExperiment = true
     updatePreviewPlayerToInlineView()
   else

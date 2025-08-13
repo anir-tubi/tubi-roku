@@ -22,12 +22,17 @@
 
   <interface>
     <!-- INPUTS -->
+      <!-- When the Helper receives valid ad campaign data from the server, it sets the new value to this field. Currently the array will contain at most 1 child/ad campaign.  -->
+      <field id="adContent" type="array"/>
 
       <!-- When the Helper receives valid category data from the server, it sets the new value to this field. -->
       <field id="content" alias="CategoryGridList.content" />
 
       <!-- Skin Ad content node to display a skin ad wrapper campaign on homescreen . -->
       <field id="skinAdContent" alias="CategoryGridList.skinAdContent" />
+
+      <!-- Tells the ad carousel if it should stop or start automatically rotating -->
+      <field id="allowCarouselAutoRotate" type="boolean"/>
 
       <!-- The helper class will call this when the new content is ready to be displayed on the screen. -->
       <field id="contentUpdated" alwaysNotify="true" alias="CategoryGridList.contentUpdated" />
@@ -37,6 +42,9 @@
 
       <!-- The helper will set this when the new skin Ad content is ready to be displayed on the screen. -->
       <field id="skinAdContentUpdated" alias="CategoryGridList.skinAdContentUpdated" />
+
+      <!-- The helper will set this when the new ad carousel content is ready to be displayed on the screen. -->
+      <field id="adContentUpdated" type="boolean" value="false" />
 
       <!-- What kind of content is this homeScreen displaying: movies, tv, normal, espanol etc -->
       <field id="contentMode" alias="CategoryGridList.contentMode" />
@@ -92,6 +100,9 @@
        -->
       <field id="batchResponse" type="node" alias="CategoryGridList.categoryResponseInBatch" />
 
+      <!-- incoming response to show/update ads on the homescreen. Currently the array will contain at most 1 child/ad campaign.  -->
+      <field id="batchAdResponse" type="array"/>
+
       <!-- This field is used to force remove focus from the rowlist. -->
       <field id="removeFocusFromRowList" type="boolean" alias="CategoryGridList.removeFocusFromRowList" />
 
@@ -112,6 +123,9 @@
            fields have been set (e.g. signedIn) -->
       <field id="loadAllCategories" type="boolean" value="false" alwaysNotify="true"/>
 
+      <!-- Triggered when the ad has been in focus for awhile and needs to be reported. -->
+      <field id="adTimerImpressionFire" type="boolean" value="false" alwaysNotify="true"/>
+      
       <field id="featuredRowCurrFocusColumn" alias="CategoryGridList.featuredRowCurrFocusColumn" />
 
       <field id="featuredListCurrFocusRow" alias="CategoryGridList.featuredListCurrFocusRow" />
@@ -127,8 +141,8 @@
       -->
       <field id="contentToPlay" type="node"/>
 
-      <!-- set to the tubi content of the item which was focused on -->
-      <field id="contentFocused" type="node" />
+      <!-- set to the tubi content of the item which was focused on. alwaysNotify is required. Most video content is always unique for the same content (b/c of the nature of resolveAbbreviatedContent()) so this param is not needed in that case, but the ad content does not call resolveAbbreviatedContent() and so is not unique each time it is created so this para is needed. -->
+      <field id="contentFocused" type="node"  alwaysNotify="true"/>
 
       <!-- set to the tubi content of the new row container (row of contentFocused) which was focused on -->
       <field id="rowFocused" alias="CategoryGridList.rowFocused"/>
@@ -210,6 +224,8 @@
         </MaskGroup>
       </Group>
     </Group>
+    <Group
+      id="adContentGroup"/>
 
     <!-- For viewers that watch a REALLY long time, or just never close the app, force a refresh -->
     <Timer

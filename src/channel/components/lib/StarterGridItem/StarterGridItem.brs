@@ -65,6 +65,9 @@ Function setThemeColors(msg = invalid)
   end if
 
   if theme <> invalid
+    if m.adIndicator <> invalid
+      m.adIndicator.fontColor = theme.backgroundColor
+    end if
     m.focusedTextColor = theme.focusedTextColor
   end if
 End Function
@@ -127,6 +130,27 @@ Function onItemContentChange(msg)
       sPosterURL = itemContent.HDGRIDPOSTERURL
       m.poster.uri = sPosterURL
       m.poster.visible = true
+
+      if gridItemType = "adRowlistSpotlight" OR gridItemType = "adRowlistCarousel"
+        ' If the gridItemType is an ad Type, then add an "AD" image to the UI
+        m.adIndicator = createObject("roSgNode", "TextIcon")
+        m.adIndicator.padding = "[16, 9]"
+        m.adIndicator.translation = [12, 12]
+        m.adIndicator.uri = "pkg:/images/tag-rounded-rectangle-background-pull-$$RES$$.9.png"
+        typographyConstants = getTypographyConstants()
+
+        setTypographyOfLabel(m.adIndicator, typographyConstants.ids.bodyExtraSmallStrong)
+        m.adIndicator.text = getTranslation("ad")
+
+        setThemeColors()
+        m.top.appendChild(m.adIndicator)
+      else
+        if m.adIndicator <> invalid
+          m.top.removeChild(m.adIndicator)
+          m.delete("adIndicator")
+        end if
+      end if
+
     else
       m.poster.visible = false
       if m.childGridItem = invalid then
@@ -163,10 +187,10 @@ Function onItemContentChange(msg)
       m.top.removeChild(m.sotBadge)
       m.sotBadge = invalid
     end if
-    
+
     if itemContent.type <> "linear" AND isAA(sotPosterLabels) = true AND sotPosterLabels.count() > 0
       badgeUri = sotPosterLabels.sotIcon
-      badgeText =  sotPosterLabels.sotLabelText
+      badgeText = sotPosterLabels.sotLabelText
       setSotBadge(badgeUri, badgeText)
     end if
   end if
@@ -193,7 +217,7 @@ Function onItemContentChange(msg)
 
     if isInteger(numColumns) = true AND numColumns > 0 AND m.parentArrayGrid.subType() <> "RowList"
       rowIndex = Int(col / numColumns)
-      col = col MOD numColumns
+      col = col mod numColumns
     end if
 
     itemInfo = {
@@ -241,8 +265,8 @@ Function setSotBadge(badgeUri, badgeText)
   if isNonEmptyString(badgeText) = true
     if m.sotBadge = invalid
       m.sotBadge = createObject("roSGNode", "Badge")
-      m.sotBadge.id="sotBadge"
-      m.sotBadge.translation=[6, 6]
+      m.sotBadge.id = "sotBadge"
+      m.sotBadge.translation = [6, 6]
     end if
 
     m.sotBadge.textColor = m.focusedTextColor
@@ -251,7 +275,7 @@ Function setSotBadge(badgeUri, badgeText)
     m.sotBadge.text = badgeText
     m.sotBadge.visible = true
     m.top.appendChild(m.sotBadge)
-  
+
   end if
 End Function
 

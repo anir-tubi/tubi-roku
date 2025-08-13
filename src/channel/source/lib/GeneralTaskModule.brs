@@ -31,12 +31,12 @@ Function GeneralTaskModule(context, generalTask)
   ' required - this loop helps to check the GeneralTaskModule methods/properties with context methods/properties
   for each key in module
     if context.DoesExist(key)
-       print ""
-       print "**********************************************************"
-       print "IMPORTANT WARNING - YOU ARE OVERWRITING THE EXISTING PROPERTIES/METHODS OF CONTEXT WITH GENERALTASK HELPER"
-       print "CHANGE THE PROPERTY/METHOD NAME IN THE CONTEXT TO AVOID OVERWRITING"
-       print "**********************************************************"
-       print ""
+      print ""
+      print "**********************************************************"
+      print "IMPORTANT WARNING - YOU ARE OVERWRITING THE EXISTING PROPERTIES/METHODS OF CONTEXT WITH GENERALTASK HELPER"
+      print "CHANGE THE PROPERTY/METHOD NAME IN THE CONTEXT TO AVOID OVERWRITING"
+      print "**********************************************************"
+      print ""
     end if
   end for
 
@@ -55,7 +55,7 @@ Function generalTask_constructBatchCallbackNode(batchInfo = {})
   callbackNode.id = batchInfo.id
 
   successResponseType = batchInfo.responseType
-  if batchInfo.successCallback = invalid or m.isValidBatchResponseType(successResponseType) <> true
+  if batchInfo.successCallback = invalid OR m.isValidBatchResponseType(successResponseType) <> true
     successResponseType = "assocarray"
   end if
 
@@ -118,9 +118,9 @@ Function generalTask_addDefaultRequestValues(reqInfo = {})
     reqInfo.pause = 500
   end if
 
-  ' make sure timeoutInMilliSec is numeric and also grater than 1000 ms to avoid timeing out too quickly.
+  ' make sure timeoutInMilliSec is numeric and also greater than 1000 ms to avoid timing out too quickly.
   if isNumber(reqInfo.timeoutInMilliSec) = false OR reqInfo.timeoutInMilliSec < 1000 then
-    reqInfo.timeoutInMilliSec = 30000  'keeping Roku timeout is 30000 as baseline
+    reqInfo.timeoutInMilliSec = 30000 'keeping Roku timeout is 30000 as baseline
   end if
 
 
@@ -188,7 +188,7 @@ End Function
 '   silenceCallbackWarnings: boolean, if no callbacks are provided, prevents warning logs to the console
 '                            Use for 'fire and forget' requests like analytics, etc.
 '   retries: Integer, tells how many times the api should retry if is fails, overwrites the default number set in addDefaultRequestValues
-'   timeoutInMilliSec: Integer, tell how many milli seconds within which api should response.
+'   timeoutInMilliSec: Integer, tell how many milliseconds within which api should response.
 '   backoffFactor: Float, API Retry request will be made after a delay. this delay logic is decided based on backoffFactor & pause fields. backoffFactor is a multiplier value where total backoff time = backoffFactor * pause, overwrites the default number set in addDefaultRequestValues
 '   pause: Integer, api retry will happen after a sleep of below mentioned time in milliseconds, overwrites the default number set in addDefaultRequestValues
 
@@ -373,7 +373,7 @@ Function generalTask_isValidBatchResponseType(responseType)
     arrayTypes = getArrayInterfaceTypes()
 
     responseType = Lcase(responseType)
-    if arrayTypes[responseType] <> invalid or responseType = "node" or responseType = "assocarray"
+    if arrayTypes[responseType] <> invalid OR responseType = "node" OR responseType = "assocarray"
       return true
     end if
   end if

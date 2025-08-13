@@ -57,7 +57,6 @@
   <script type="text/brightscript" uri="../../../source/lib/MathUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiCache.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/TubiAds.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
@@ -78,6 +77,9 @@
   <script type="text/brightscript" uri="pkg:/source/lib/TubiClientErrorConfig.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
   <script type="text/brightscript" uri="pkg:/source/lib/PlayerLogLib.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiAds.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/AdsUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/RequestQueue.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnalyticsMixin.brs" />
 
   <interface>

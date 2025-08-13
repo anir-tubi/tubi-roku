@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Extend the ContentNode so we can add some custom fields -->
+<component name = "AdDisplayCarouselContentNode" extends="AdContentNode">
+  <interface>
+
+    <!-- An array of associative arrays that contain a "background" image URL and a "thumb" image URL.  -->
+    <field id="carousel" type="array"/>
+  </interface>
+</component>

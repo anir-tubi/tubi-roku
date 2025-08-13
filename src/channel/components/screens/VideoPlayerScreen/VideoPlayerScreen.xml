@@ -13,6 +13,7 @@
   <script type="text/brightscript" uri="pkg:/components/lib/DeviceMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/EventMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiAds.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/AdsUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
   <script type="text/brightscript" uri="pkg:/source/3rdparty/google/gam_utils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Sentry.brs" />

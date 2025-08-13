@@ -50,18 +50,19 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.observeFieldScoped("contentSelected", "onContentSelected")
     homeScreen.observeFieldScoped("contentToPlay", "onContentToPlay")
     homeScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
+    homeScreen.observeFieldScoped("loadCategoryForIds", "onLoadCategoryForIds")
     homeScreen.observeFieldScoped("stopLinearVideoPlayer", "onStopLinearVideoPlayer")
     homeScreen.observeFieldScoped("sponsoredRowFocused", "onHomeScreenSponsoredRowFocused")
     homeScreen.observeFieldScoped("columnFocused", "onColumnFocusChanged")
     homeScreen.observeFieldScoped("currFocusRow", "onHomeScreenRowFocusChanged")
     homeScreen.observeFieldScoped("pauseVideoPreview", "onPauseVideoPreview")
-    homeScreen.observeFieldScoped("loadCategoryForIds", "onLoadCategoryForIds")
     homeScreen.observeFieldScoped("eventCtaListItemSelected", "onEventCtaListItemSelected")
     homeScreen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
     homeScreen.observeFieldScoped("featuredRowCurrFocusColumn", "onFeaturedRowCurrFocusColumnChange")
     homeScreen.observeFieldScoped("featuredListCurrFocusRow", "onFeaturedRowCurrFocusRowChange")
     homeScreen.observeFieldScoped("featuredRowFocusedItem", "onFeaturedRowFocusedItemChange")
     homeScreen.observeFieldScoped("featuredListHasFocus", "onFeaturedListHasFocusChange")
+    homeScreen.observeFieldScoped("adTimerImpressionFire", "onAdTimerImpressionFired")
     homeScreen.observeFieldScoped("currCategoryId", "onCurrCategoryIdChange")
     homeScreen.observeFieldScoped("currentFocusedItemBoundingRect", "onFeaturedRowListTranslationChange")
     homeScreen.observeFieldScoped("featuredRowListTranslation", "onFeaturedRowListTranslationChange")
@@ -127,12 +128,24 @@ End Function
 
 
 Function processHomeScreenBatchResponse(response, screenId)
+  tubiLog("HomeScreenHelpers.processHomeScreenBatchResponse")
   homeScreen = getFromScreenCache(screenId)
   if homeScreen <> invalid
     if isKidsUIOn() = false AND m.isUserInVideoTilesExperiment = true AND isNode(response) = true AND response.getChildCount() > 0 AND homeScreen.contentMode = m.constants.ui.contentMode.homescreen
       updateCategoryGridWithFeaturedList(response, homeScreen)
     end if
+
     homeScreen.batchResponse = response
+  end if
+End Function
+
+
+'//This is called when the homescreen has already loaded but the ad display content has expired and needs to be refreshed.
+Function onHomesceenAdDisplayBatchResponse(response)
+  tubiLog("HomeScreenHelpers.onHomesceenAdDisplayBatchResponse")
+  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  if homeScreen <> invalid AND isNonEmptyArray(response) = true
+    homeScreen.batchAdResponse = response
   end if
 End Function
 
@@ -322,6 +335,9 @@ Function fetchHomeScreen(homeScreen, useCache = false)
     else if homeScreen.id = m.constants.ui.screenIds.espanolScreen
       successHandler = onEspanolScreenSuccessResponse
       errorHandler = onEspanolScreenErrorResponse
+    else if homeScreen.id = m.constants.ui.screenIds.homeScreen
+      '//Call ad endpoint to get ad content for the homescreen
+      createHomescreenAdRequest(homeScreen.id, onHomesceenAdDisplaySuccessResponse, onHomesceenAdDisplayErrorResponse)
     end if
 
     options = {}
@@ -375,6 +391,35 @@ Function fetchHomeScreen(homeScreen, useCache = false)
 End Function
 
 
+Function createHomescreenAdRequest(homescreenId, successCallback, errorCallback = invalid)
+  appMode = "DEFAULT_MODE"
+  if isKidsUIOn() = true
+    appMode = "KIDS_MODE"
+  else if m.uiMode = m.constants.ui.modes.latino
+    appMode = "LATINO_MODE"
+  end if
+  aAdTypes = [m.constants.adTypes.adRowlistCarousel, m.constants.adTypes.adRowlistSpotlight]
+
+  authInfo = m.tubiAuthUpdate.getAuthInfo()
+  userId = ""
+  if authInfo <> invalid AND authInfo.userId <> invalid
+    userId = authInfo.userId.toStr()
+  end if
+  adDisplayReqInfo = m.cmsApi.createAdHomescreenDisplayContainerReqInfo(aAdTypes, appMode, userId, isKidsUIOn())
+  m.makeRequest({
+    url: adDisplayReqInfo.url
+    requestType: m.constants.reqNames.getHomescreenAds
+    options: adDisplayReqInfo.options
+    successCallback: successCallback
+    errorCallback: errorCallback
+    responseType: "array"
+    screenId: homescreenId
+    adTypes: aAdTypes
+    timeoutInMilliSec: adDisplayReqInfo.timeoutInMilliSec
+  })
+End Function
+
+
 ''''''''''''''''''''''''''''''
 ' onEspanolscreenSuccessResponse
 '
@@ -407,10 +452,72 @@ Function onHomeScreenSuccessResponse(response)
 End Function
 
 
+Function onHomesceenAdDisplaySuccessResponse(response)
+  tubiLog("HomeScreenHelpers.onHomesceenAdDisplaySuccessResponse")
+  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  if homeScreen <> invalid AND isNonEmptyArray(response) = true
+
+    if getExperimentResource("ads_hdc_carousel", "ads_ott_hdc_carousel_v1", false).enabled = true
+
+      for i = 0 to response.count() - 1
+        adNode = response[i]
+        '//::NOTE::ads_hdc_carousel - just for the experiment, we are storing the rowPlacement in the ad campaigns so we can fire the experiment impression when .
+        if adNode.type = m.constants.adTypes.adRowlistCarousel
+          m.homescreenCarouselRowPlacement = adNode.rowPlacement
+        else if adNode.type = m.constants.adTypes.adRowlistSpotlight
+          m.homescreenSpotlightRowPlacement = adNode.rowPlacement
+        end if
+      end for
+      homeScreen.adContent = response
+    end if
+  end if
+
+  homeScreen.adContentUpdated = true
+  checkIfHomeScreenContentIsReady(homeScreen)
+End Function
+
+
+Function onHomesceenAdDisplayErrorResponse(response)
+  tubiLog("HomeScreenHelpers.onHomesceenAdDisplayErrorResponse")
+  '//If the ad response fails, then fail silently and continue with the homescreen content update
+  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  homeScreen.adContentUpdated = true
+  checkIfHomeScreenContentIsReady(homeScreen)
+End Function
+
+
+Function checkIfHomeScreenContentIsReady(homeScreen)
+  sID = homeScreen.id
+
+  '//Check if ad content has loaded, but only for the default homescreen type. The other homescreen types do not have ad content. (Note that adContentUpdated will be true even if backend responds that there is no ad content)
+  bAdContentLoaded = (sID = m.constants.ui.screenIds.homeScreen AND homeScreen.adContentUpdated = true) OR sID <> m.constants.ui.screenIds.homeScreen
+  if bAdContentLoaded = true AND (homeScreen.content <> invalid OR homeScreen.featuredRowContent <> invalid)
+    '//Once all the homescreen content is ready, then display the homescreen
+    if homeScreen.adContent <> invalid
+      adContent = homeScreen.adContent
+
+      if homeScreen.content <> invalid
+        homescreenContent = homeScreen.content
+      else
+        homescreenContent = homeScreen.featuredRowContent
+      end if
+      ' Insert each node into homeScreen.content at rowPlacement index
+      for each node in adContent
+        '//assume the parser had reverse ordered the nodes based on rowPlacement, so we place the ads in the proper row
+        homescreenContent.insertChild(node, node.rowPlacement)
+      end for
+    end if
+
+    onHomeScreenContentUpdateComplete(homeScreen.id)
+  end if
+End Function
+
+
 ''''''''''''''''''''''''''''''
 ' respondToHomeScreenSuccessResponse
 '
 Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
+  tubiLog("HomeScreenHelpers.respondToHomeScreenSuccessResponse, screenID: " + screenID)
   homeScreen = getFromScreenCache(screenID)
   if homeScreen <> invalid
     ' Content should be structured as:
@@ -463,7 +570,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
 
     homeScreen.content = rawResponse
 
-    onHomeScreenContentUpdateComplete(homeScreen.id)
+    checkIfHomeScreenContentIsReady(homeScreen)
 
     getExperimentResource("roku_no_change_experiment", "roku_no_change_experiment_v3", true)
 
@@ -782,7 +889,20 @@ Function appendContentToCategory(response, contentNode, rowFocused)
 End Function
 
 
-Function onHomeScreenRowFocusChanged()
+Function onHomeScreenRowFocusChanged(msg)
+  currFocusRow = msg.getData()
+  if currFocusRow <> invalid AND (m.homescreenCarouselRowPlacement <> invalid OR m.homescreenSpotlightRowPlacement <> invalid)
+    if currFocusRow = m.homescreenCarouselRowPlacement
+      '//Send exposure event for carousel experiment when the proper row gains focus (for control and variant)
+      getExperimentResource("ads_hdc_carousel", "ads_ott_hdc_carousel_v1", true)
+    end if
+    if currFocusRow = m.homescreenSpotlightRowPlacement
+      '//Send exposure event for spotlight experiment when the proper row gains focus (for control and variant)
+      '//::TODO::JHAND - adRowlist - Spotlight, the following code should reference the experiment specific to the spotlight row campaign
+      getExperimentResource("ads_hdc_carousel", "ads_ott_hdc_carousel_v1", true)
+    end if
+  end if
+
   if isLinearPlayerLoadingORPlaying() = true
     '//as the rowlist is scrolling, if the the linear video player is playing or loading, then make sure the linear video player has stopped
     stopAndHideLinearVideoPlayer()
@@ -840,7 +960,14 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
 
       if currentScreen.isSameNode(homeScreen) = true AND currentScreen.isInFocusChain() = true 'if there are any modals over home screen or focus has been lost to side nav
         componentTrackingInfo = getCategoryComponentTrackingInfo(currentScreen)
-        setVideoPreviewAfterFocus(focusedContent, currentScreen.trackingPageInfo, componentTrackingInfo)
+        if focusedContent <> invalid AND focusedContent.type = m.constants.ui.contentTypes.adRowlistCarousel AND focusedContent.videoPreviewUrl <> ""
+          ' If the content is adRowlistSpotlight, then set the video preview after a delay
+          m.videoPreviewDebounce.duration = m.constants.player.videoPreviewDelayTimes.adCarousel
+          m.videoPreviewDebounce.control = "start"
+        else
+          ' If the content is not linear or adRowlistSpotlight, then just set the video preview after focus
+          setVideoPreviewAfterFocus(focusedContent, currentScreen.trackingPageInfo, componentTrackingInfo)
+        end if
       end if
 
       if bStopCountdownTimer = true
@@ -863,7 +990,7 @@ Function setUIBasedOnFocusedContent(focusedContent)
           '//Hide the logo if the current row is a skinAd
           showHideLogo(m.constants.logoType.hide)
 
-          sendSkinAdPixels(focusedContent.imageImpTracking)
+          sendAdPixels(focusedContent.imageImpTracking)
 
         else
           showHideLogoBasedOnUiMode(skinAdContent.titleImageUrl, skinAdContent.titlePrefix)
@@ -875,7 +1002,22 @@ Function setUIBasedOnFocusedContent(focusedContent)
       end if
     end if
   end if
+End Function
 
+
+'//When the ad timer impression is fired from the homescreen, then send the pixels to the ad server
+Function onAdTimerImpressionFired(msg)
+  tubiLog("HomeScreenHelpers.onAdTimerImpression")
+  homeScreen = msg.getRoSGNode()
+  if homeScreen <> invalid
+    row = homeScreen.rowFocused
+    if row <> invalid AND row.imageImpTracking <> invalid
+      imageImpTracking = row.imageImpTracking
+      '//Once the pixel has been sent, then set the imageImpTracking to invalid so that it is not sent again
+      row.imageImpTracking = invalid
+      sendAdPixels(imageImpTracking)
+    end if
+  end if
 End Function
 
 
@@ -892,7 +1034,7 @@ Function manageHomeScreenSponsorPixels(rowFocused)
     '//Only send sponsor pixels once per page load
     if m.sentSponsorPixels[containerId] <> true
       m.sentSponsorPixels[containerId] = true '//set to true when the sponsor image has been seen at least once per page load. This AA will be reset when the homescreen is no longer visible
-      sendSponsorPixels(sponsorPixels)
+      sendAdPixels(sponsorPixels)
     end if
   end if
 End Function
@@ -961,6 +1103,7 @@ Function onContentSelected(msg)
   content = msg.getData()
   homeScreen = msg.getRoSGNode()
   m.autoplayContext = homeScreen.currCategoryId
+  m.videoPreviewDebounce.control = "stop"
 
   contentType = content.type
   if contentType = m.constants.uapiContentTypes.channel
@@ -977,6 +1120,8 @@ Function onContentSelected(msg)
     selectLinearContent(content)
   else if contentType = m.constants.ui.contentTypes.skinAd
     playAdContent(content)
+  else if contentType = m.constants.ui.contentTypes.adRowlistSpotlight OR contentType = m.constants.ui.contentTypes.adRowlistCarousel
+    '//Do nothing if the user selects an ad content on the homescreen.
   else
     playbackSource = {
       "srcForAnalytic": m.constants.player.playbackSource.unknown
@@ -1141,10 +1286,11 @@ Function onLoadCategoryForIds(msg)
   tubiLog("HomeScreenHelpers.onLoadCategoryForIds")
   homeScreen = msg.getRoSGNode()
   categoryIDs = msg.getData()
-
+  aAdTypes = []
   if homeScreen = invalid OR homeScreen.content = invalid OR categoryIDs.count() <= 0
     return false
   end if
+
 
   batchResponseHandler = homeBatchResponse
   if homeScreen.id = m.constants.ui.screenIds.movieScreen
@@ -1153,7 +1299,21 @@ Function onLoadCategoryForIds(msg)
     batchResponseHandler = tvBatchResponse
   else if homeScreen.id = m.constants.ui.screenIds.espanolScreen
     batchResponseHandler = espanolBatchResponse
+  else if homeScreen.id = m.constants.ui.screenIds.homescreen
+    '//check if there are any ad category IDs in the list of category IDs
+    for i = categoryIDs.count() - 1 to 0 step -1
+      categoryID = categoryIDs[i]
+      if categoryID = m.constants.ui.categoryIds.adRowlistCarousel
+        aAdTypes.push(m.constants.adTypes.adRowlistCarousel)
+        categoryIDs.delete(i)
+      else if categoryID = m.constants.ui.categoryIds.adRowlistSpotlight
+        aAdTypes.push(m.constants.adTypes.adRowlistSpotlight)
+        categoryIDs.delete(i)
+      end if
+    end for
   end if
+
+  createHomescreenAdRequest(homeScreen.id, onHomesceenAdDisplayBatchResponse)
 
   isKidsMode = shouldKidsModeBeSentToServer()
   isSignedInUser = isLoggedInUser()
@@ -1379,18 +1539,26 @@ End Function
 
 
 ' Starts the inline preview when the featured row list has focus.
-Function startFeaturedInlinePreview()
+Function startDebouncedVideoPreview()
   screen = getCurrentScreen()
-  if isCurrentScreenHomeScreen() = true AND screen.featuredListHasFocus = true
-    stopAndHideLinearVideoPlayer()
-    if screen.featuredRowContent <> invalid AND screen.featuredRowFocusedItem <> invalid
-      content = screen.featuredRowFocusedItem
+  if isCurrentScreenHomeScreen() = true
+    if screen.featuredListHasFocus = true
+      stopAndHideLinearVideoPlayer()
+      if screen.featuredRowContent <> invalid AND screen.featuredRowFocusedItem <> invalid
+        content = screen.featuredRowFocusedItem
 
-      if content.type = m.constants.ui.categoryTypes.linear AND m.constants.deviceInfo.isAutoPlayEnabled = true
-        playLinearInlineGridView(content, screen)
-      else
+        if content.type = m.constants.ui.categoryTypes.linear AND m.constants.deviceInfo.isAutoPlayEnabled = true
+          playLinearInlineGridView(content, screen)
+        else
+          componentTrackingInfo = getCategoryComponentTrackingInfo(screen)
+          setVideoPreviewAfterFocus(content, screen.trackingPageInfo, componentTrackingInfo)
+        end if
+      end if
+    else
+      focusedContent = screen.contentFocused
+      if focusedContent <> invalid AND focusedContent.type = m.constants.ui.contentTypes.adRowlistCarousel
         componentTrackingInfo = getCategoryComponentTrackingInfo(screen)
-        setVideoPreviewAfterFocus(content, screen.trackingPageInfo, componentTrackingInfo)
+        setVideoPreviewAfterFocus(focusedContent, screen.trackingPageInfo, componentTrackingInfo)
       end if
     end if
   end if

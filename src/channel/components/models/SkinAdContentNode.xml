@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!-- Extend the ContentNode so we can add some custom fields -->
-<component name = "SkinAdContentNode" extends="ContentNode">
+<component name = "SkinAdContentNode" extends="AdContentNode">
   <interface>
     <!-- url of the footer image to be displayed when the app is sponsored -->
     <field id="footerImageUrl" type="string"/>
@@ -16,21 +16,6 @@
 
     <!-- url of the QR code -->
     <field id="qrCodeUrl" type="string"/>
-
-    <!-- adInfo holds the required fields from response to play trailer ad -->
-    <field id="adInfo" type="assocarray"/>
-
-    <field id="imageImpTracking" type="array"/>
-
-    <field id="backgrounds" type="stringarray"/>
-
-    <field id="titleImageUrl" type="string"/>
-
-    <field id="videoPreviewUrl" type="string"/>
-
-    <field id="gridItemType" type="string"/>
-
-    <field id="type" type="string" />
 
   </interface>
 </component>

@@ -429,6 +429,7 @@ Function openSideNav(b = true)
   m.SideNav.opened = b
   if b = false
     topScreen = getCurrentScreen()
+    m.videoPreviewDebounce.control = "stop"
     sideNavId = m.constants.ui.screenIdToSideNavId[topScreen.id]
     itemSelectedId = m.SideNav.itemSelectedId
     if itemSelectedId = m.constants.ui.sideNavIds.kidsMode AND sideNavId <> invalid

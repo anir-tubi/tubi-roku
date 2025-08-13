@@ -14,6 +14,7 @@ Function CmsApi(constants, apiUtils, experiments = invalid)
     createSingleContentReqInfo: cmsApi_createSingleContentReqInfo
     createThumbnailsReqInfo: cmsApi_createThumbnailsReqInfo
     createCategoriesListReqInfo: cmsApi_createCategoriesListReqInfo
+    createAdHomescreenDisplayContainerReqInfo: cmsApi_createAdHomescreenDisplayContainerReqInfo
     createHomeScreenReqInfo: cmsApi_createHomeScreenReqInfo
     createMiniHomeScreenOnPlayerReqInfo: cmsApi_createMiniHomeScreenOnPlayerReqInfo
     createCategoryReqInfo: cmsApi_createCategoryReqInfo
@@ -173,6 +174,88 @@ Function cmsApi_createCategoriesListReqInfo(bKidsMode = false)
   return {
     url: m.constants.urls.tensor.cdn.browserList
     options: options
+  }
+End Function
+
+
+'''''''''''''''''''''
+' cmsApi_createAdHomescreenDisplayContainerReqInfo()
+' @adTypes: array, An array of ad types to be requested.  The ad types are defined in m.constants.adTypes.
+' @appMode: string, the app mode for which the ad request is being made: i.e. "KIDS_MODE" "DEFAULT_MODE", "LATINO_MODE"
+' @userId: string, the user id for which the ad request is being made.
+' @bKidsMode: boolean Are we in kids mode?
+'
+Function cmsApi_createAdHomescreenDisplayContainerReqInfo(adTypes = [], appMode = "DEFAULT_MODE", userId = "", bKidsMode = false)
+  headers = {}
+
+  headers.append(m.getCommonOptions().headers)
+  headers.append({
+    "user-agent": m.constants.deviceInfo.userAgent
+  })
+
+  aHomescreenBgroundCodes = []
+  for each adType in adTypes
+    if adType = m.constants.adTypes.adRowlistSpotlight
+      '//::TODO:: add spotlight rendering code(s).
+    else if adType = m.constants.adTypes.adRowlistCarousel
+      aHomescreenBgroundCodes.push(m.constants.ui.categoryIds.adRowlistCarousel)
+    else if adType = m.constants.adTypes.skinAd
+      '//::TODO:: add skinAd wrapper rendering code(s).
+    end if
+  end for
+
+  nResolution = m.constants.deviceInfo.videoMode.toInt()
+  videoResolutionID = m.constants.player.videoResolution[nResolution.toStr()]
+  if videoResolutionID = invalid OR videoResolutionID = m.constants.player.videoResolution.unknown OR videoResolutionID = m.constants.player.videoResolution["AUTO"]
+    '//set to default resolution if the video resolution is unknown or auto
+    nResolution = 720
+  end if
+  sResolution = nResolution.toStr() + "p"
+
+  ifaValue = ""
+  if bKidsMode = false
+    '//do to data protection rules, do not send IFA value while in kids mode
+    ifaValue = m.constants.deviceInfo.deviceAdId
+  end if
+
+  body = {
+    viewer: {
+      viewer_id: userId
+    }
+    app: {
+      app_install_id: m.constants.deviceInfo.deviceId
+      ifa: ifaValue
+      video_resoln: sResolution
+    }
+    device: {
+      platform: UCase(m.constants.platform)
+      os: m.constants.deviceInfo.operatingSystem
+      os_version: m.constants.deviceInfo.firmwareVersion
+      make: m.constants.deviceInfo.vendorName
+      width: m.constants.deviceInfo.displayWidth
+      height: m.constants.deviceInfo.displayHeight
+    }
+    ad_units: {
+      hdc_row: {
+        sizes: {
+          rendering_codes: aHomescreenBgroundCodes
+        }
+      }
+    }
+    custom_kvps: {
+      app_mode: appMode
+    }
+
+  }
+  bodyJson = FormatJSON(body)
+  return {
+    url: m.constants.urls.adShowcase
+    options: {
+      body: bodyJson
+      headers: headers
+      method: m.constants.reqTypes.post
+    }
+    timeoutInMilliSec: 5000
   }
 End Function
 

@@ -182,7 +182,7 @@ Function listen()
 End Function
 
 
-'processTimeoutError, mimmics when api timeouts
+'processTimeoutError, mimics when api timeouts
 ' @job : assocarray, it has reqInfo, tubiReq, batchInfo(invalid for single request, valid for batch request)
 '
 Function processTimeoutError(job)

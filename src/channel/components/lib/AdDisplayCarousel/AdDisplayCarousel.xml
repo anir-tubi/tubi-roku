@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="AdDisplayCarousel" extends="Group">
+  <script type="text/brightscript" uri="AdDisplayCarousel.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs"/>
+
+  <interface>
+    <!-- INPUTS -->
+      <field id="content" type="node"/>
+      <field id="updateContent" type="boolean" alwaysNotify="true"/>
+
+      <!-- When this is true, then the carousel will automatically go from one thumbnail to the next thumbnail. -->
+      <field id="allowCarouselAutoRotate" type="boolean" value="false"/>
+      
+    <!-- OUTPUTS -->
+    <field id="contentFocused" type="node" alwaysNotify="true"/>
+
+    <!-- When the user manually navigates to a new tile - as opposed to the carousel automatically cycling to the next tile  -->
+    <field id="tileManuallyNavigated" type="boolean" alwaysNotify="true"/>
+    <field id="itemFocused" type="integer" alias="carouselGrid.itemFocused"/>
+    <field id="itemUnfocused" type="integer" alias="carouselGrid.itemUnfocused"/>
+
+  </interface>
+
+  <children>
+    <LayoutGroup 
+      id="carouselLayout"
+      layoutDirection="horiz"
+      vertAlignment="bottom">
+      <LayoutGroup
+        id="titleLayout"
+        itemSpacings="[21, 12]"
+        layoutDirection="vert">
+        <TextIcon
+          id="adIndicator"
+          padding="[16, 9]"
+          uri="pkg:/images/tag-rounded-rectangle-background-pull-$$RES$$.9.png"/>
+        <LayoutGroup 
+          id="carouselLayout"
+          layoutDirection="horiz"
+          vertAlignment="bottom"
+          itemSpacings="[336]">
+          <Poster
+            id="sideImage"
+            loadDisplayMode="limitSize"/>
+          <Poster
+            width="1"
+            id="sideImageSpacer"/>
+        </LayoutGroup>
+        <Label
+          id="title"
+          width="618">
+          <Font
+            role="font"/>
+        </Label>
+      </LayoutGroup>
+    </LayoutGroup>
+
+    <MarkupGrid
+      id="carouselGrid"
+      numRows="1"
+      numColumns="5"
+      itemSpacing="[16,0]"
+      itemComponentName="AdDisplayCarouselItem"
+      focusFootprintBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+      focusFootprintBlendColor="#00000000"
+      drawFocusFeedbackOnTop="true"
+      focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
+
+      <!-- Timer used to shift focus to new thumbnail. -->
+      <Timer
+        id="focusTimer"/>
+  </children>
+</component>

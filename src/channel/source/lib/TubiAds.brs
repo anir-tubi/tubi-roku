@@ -63,7 +63,6 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
     googleAppSession: invalid ' Google's GAMUtils appsession or invalid
     googleContentSession: invalid ' Google's GAMUtils contentSession or invalid
     shouldSendGoogleBeacons: false ' Let's us know if during a given ad pod we should send beacons to Google or not
-    createRAFStructure: tubiAds_createRAFStructure
     adResponseTime: -1
     totalAdBreakAdsPerSession: 0
 
@@ -343,147 +342,6 @@ Function tubiAds_getRainmakerParamsForLinear(content)
 
   return params
 End Function
-
-
-' This function converts the associative array into RAF Structure
-' @adInfo: assocArray, Ad information retrieved from API response
-Function tubiAds_createRAFStructure(adInfo)
-  currentAdUnitsList = []
-  stream = []
-  trackingPixels = []
-
-  if isAA(adInfo) = true
-    adId = adInfo.ad_id
-    media = adInfo.media
-
-    streamUrl = ""
-    duration = 0
-    trackingEvents = {}
-
-    if isAA(media) = true
-      streamUrl = media.streamurl
-      duration = media.duration
-
-      if isAA(media.trackingevents) = true
-        trackingEvents = media.trackingevents
-      end if
-    end if
-
-    streamAA = {
-      id: adInfo.id
-      mimetype: "video/mp4"
-      provider: ""
-      url: streamUrl
-    }
-    stream.push(streamAA)
-
-    'Error tracking event
-    error = adInfo.error
-    if isNonEmptyString(error) = true
-      tracking = {}
-      tracking["event"] = "Error"
-      tracking["triggered"] = false
-      tracking["url"] = replaceCachebusterMacro(error)
-      trackingPixels.push(tracking)
-    end if
-
-    'Impression tracking event
-    impTracking = adInfo.imptracking
-
-    if isNonEmptyArray(impTracking) = true
-      for each pixelUrl in impTracking
-        tracking = {}
-        tracking["event"] = "Impression"
-        tracking["triggered"] = false
-        tracking["url"] = replaceCachebusterMacro(pixelUrl)
-        tracking["time"] = 0
-        trackingPixels.push(tracking)
-      end for
-    end if
-
-    trackingEventKeys = trackingEvents.Keys()
-    'Impression/FirstQuartile/Midpoint/ThirdQuartile/Complete tracking event
-
-    for each key in trackingEventKeys
-      pixelType = ""
-      pixelUrl = trackingEvents[key][0]
-      pixelValue = key.split("_")[1]
-
-      if pixelValue <> invalid
-        iPixelPercent = pixelValue.toInt()
-        time = 0
-
-        if iPixelPercent = 0
-          pixelType = "Impression"
-          time = 0
-        else if iPixelPercent = 25
-          pixelType = "FirstQuartile"
-          time = duration * 0.25
-        else if iPixelPercent = 50
-          pixelType = "Midpoint"
-          time = duration * 0.50
-        else if iPixelPercent = 75
-          pixelType = "ThirdQuartile"
-          time = duration * 0.75
-        else if iPixelPercent = 100
-          pixelType = "Complete"
-          time = duration
-        end if
-
-        tracking = {}
-        tracking["event"] = pixelType
-        tracking["triggered"] = false
-        tracking["url"] = replaceCachebusterMacro(pixelUrl)
-        tracking["time"] = time
-
-        if isNonEmptyString(pixelType) = true
-          trackingPixels.push(tracking)
-        end if
-      end if
-    end for
-
-    ads = []
-    adUnit = {
-      adid: adId
-      adserver: "Tubi"
-      creativeadid: adId
-      duration: duration
-      streamformat: "mp4"
-      streams: stream
-      tracking: trackingPixels
-    }
-    ads.push(adUnit)
-
-    currentAdUnitsList[0] = {
-      ads: ads
-      duration: duration
-      rendersequence: "preroll"
-      rendertime: 0
-      tracking: trackingPixels
-      viewed: false
-    }
-  end if
-
-  return currentAdUnitsList
-End Function
-
-
-'//the sStringToReplace is the agreed upon string that the backend will set to the param that is used for cachebusting.
-'//a cache busting string must be created within the Roku client and replace the sStringToReplace.
-'@pixelURL: String, pixel urls needs to be updated
-Function replaceCachebusterMacro(pixelURL as String)
-  sStringToReplace = "(ADRISE:CB)"
-  sCacheBuster = createCacheBusterString()
-  newPixelURL = pixelURL.replace(sStringToReplace, sCacheBuster)
-  encodedUrl = ""
-
-  if isNonEmptyString(newPixelURL) = true
-    encodedUrl = newPixelURL.EncodeUri()
-  end if
-
-  return encodedUrl
-End Function
-
 
 
 ' This function is used to retrieve ads for linear and VOD
@@ -797,7 +655,7 @@ Function tubiAds_getAdsListViaTubi(content)
   currentAdUnitsList = invalid
 
   if isAA(adInfo) = true
-    currentAdUnitsList = m.createRAFStructure(adInfo)
+    currentAdUnitsList = createRAFStructure(adInfo)
   end if
 
   'check to see if the ad server returns an ad that can be used by RAF or needs to use our ad SDK

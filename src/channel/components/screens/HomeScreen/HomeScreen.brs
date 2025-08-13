@@ -7,7 +7,10 @@ Function init()
   m.PageGroup = m.top.findNode("PageGroup")
   m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]
   m.ContentAreaParent = m.top.findNode("ContentAreaParent")
+  m.maskUri = "pkg:/images/poster-mask.png"
   m.ContentArea = m.top.findNode("ContentArea")
+  m.ContentArea.maskUri = m.maskUri
+  m.adContentGroup = m.top.findNode("adContentGroup")
   m.InfoPanel = m.top.findNode("InfoPanel")
   m.InfoPanelParent = m.top.findNode("InfoPanelParent")
 
@@ -22,11 +25,18 @@ Function init()
   topRef.observeField("transportVoiceRequest", "onTransportVoiceRequest")
   topRef.observeFieldScoped("personalizationId", "onPersonalizationIdChanged")
   topRef.observeFieldScoped("contentUpdated", "onContentUpdated")
+  topRef.observeFieldScoped("batchAdResponse", "onBatchAdResponseChanged")
+  topRef.observeFieldScoped("allowCarouselAutoRotate", "onAllowCarouselAutoRotateChange")
   topRef.observeFieldScoped("kidsMode", "onKidsModeChange")
   m.CategoryRefreshTimer = topRef.findNode("CategoryRefreshTimer")
   m.CategoryRefreshTimer.duration = m.constants.timers.categoryContentRefreshTimeout
   m.CategoryRefreshTimer.observeFieldScoped("fire", "onCategoryRefreshTimer")
   m.CategoryRefreshTimer.control = "start"
+
+  '//The timer that is used to countdown when to send pixels after an ad campaign gains focus.
+  m.adFocusTimer = CreateObject("roSGNode", "Timer")
+  m.adFocusTimer.duration = m.constants.timers.adFocusPixelFire
+  m.adFocusTimer.observeFieldScoped("fire", "onAdFocusTimer")
 
   'Content area
   m.CategoryGridList = topRef.findNode("CategoryGridList")
@@ -192,12 +202,55 @@ End Function
 
 
 Function onContentUpdated(msg)
-  '//the presense or absense of a 1st-Row will dictate the starting point of the peek row mask
+  if m.top.featuredRowContent <> invalid
+    content = m.top.featuredRowContent
+  else
+    content = m.top.content
+  end if
+
+  if m.adRowlistCarouselComponent = invalid
+    for i = 0 to content.getChildCount() - 1
+      item = content.getChild(i)
+      if item <> invalid AND item.type = m.constants.ui.contentTypes.adRowlistCarousel
+        '//If there is a carousel, then preload the component so it is ready to be displayed
+        createAdDisplayCarouselComponent(item)
+        exit for
+      end if
+    end for
+  end if
+
+  '//the presence or absence of a 1st-Row will dictate the starting point of the peek row mask
   if m.top.kidsMode = false AND (m.top.skinAdContent <> invalid AND m.top.skinAdContent.getChildCount() > 0) AND (m.top.lastFocusedList = "skinAdRow" OR m.top.lastFocusedList = "")
     moveContentAreaMask(-1)
     fadeOutInfoPanel()
   else
     moveContentAreaMask(0)
+  end if
+End Function
+
+
+Function onBatchAdResponseChanged(msg)
+  tubiLog("HomeScreen.onBatchAdResponseChanged")
+  aResponse = msg.getData()
+  if isNonEmptyArray(aResponse) = true
+    for each adContent in aResponse
+      if adContent <> invalid
+        sContentType = adContent.type
+        if sContentType = m.constants.ui.contentTypes.adRowlistCarousel
+          createAdDisplayCarouselComponent(adContent)
+        end if
+      end if
+    end for
+  end if
+  m.CategoryGridList.adResponseInBatch = aResponse
+End Function
+
+
+Function onAllowCarouselAutoRotateChange(msg)
+  tubiLog("HomeScreen.onAllowCarouselAutoRotateChange")
+  allowCarouselAutoRotate = msg.getData()
+  if m.adRowlistCarouselComponent <> invalid
+    m.adRowlistCarouselComponent.allowCarouselAutoRotate = allowCarouselAutoRotate
   end if
 End Function
 
@@ -213,8 +266,11 @@ Function onLoadingChange()
     populateInfoPanel(m.constants.ui.infoPanelModes.item, emptyContentNode) 'empties the info panel
     m.CategoryGridList.content = invalid ' should be all categories with initial amounts of content in them
     m.CategoryGridList.skinAdContent = invalid
+    deleteAdDisplayCarouselComponent()
+    m.top.adContent = invalid
     m.CategoryGridList.featuredRowContent = invalid
     m.CategoryGridList.skinAdContentUpdated = true
+    m.top.adContentUpdated = false
 
     ' Resetting the previous state variables.
     m.CategoryGridList.featuredListCurrFocusRow = -1
@@ -252,6 +308,8 @@ Function onScreenFocusChange()
     setFocusOnCategoryGrid()
 
     m.top.shouldFocusWhenPushed = true
+  else if m.top.isInFocusChain() = false
+    m.adFocusTimer.control = "stop"
   end if
 End Function
 
@@ -279,10 +337,19 @@ Function onRowFocused(msg)
   tubiLog("HomeScreen.onRowFocused")
   row = msg.getData()
 
+  isRowAdContainerContainer = false
   if row <> invalid
     if isSponsoredRow(row) = true
       m.top.sponsoredRowFocused = true
+    else if (isAdDisplayContainerRow(row) = true OR isAdDisplayCarouselRow(row) = true) AND isNonEmptyArray(row.imageImpTracking) = true
+      isRowAdContainerContainer = true
     end if
+  end if
+
+  if isRowAdContainerContainer = false
+    m.adFocusTimer.control = "stop"
+  else
+    m.adFocusTimer.control = "start"
   end if
 End Function
 
@@ -297,6 +364,18 @@ Function isSponsoredRow(row)
 End Function
 
 
+' @row: roSGNode, a CategoryContentNode
+Function isAdDisplayCarouselRow(row)
+  return (row <> invalid AND row.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel)
+End Function
+
+
+' @row: roSGNode, a CategoryContentNode
+Function isAdDisplayContainerRow(row)
+  return (row <> invalid AND row.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight)
+End Function
+
+
 ' When the column changes focus, then report to any observers.
 Function onCurrFocusColumnChange(msg)
   tubiLog("HomeScreen.onCurrFocusColumnChange")
@@ -308,6 +387,41 @@ Function onCurrFocusColumnChange(msg)
     m.currentColumn = newColumn
 
     m.top.columnFocused = m.currentColumn
+  end if
+End Function
+
+
+Function onAdDisplayCarouselContentFocusedChanged(msg)
+  contentFocused = msg.getData()
+  if contentFocused <> invalid
+    m.top.contentFocused = contentFocused
+    m.top.backgroundUriList = contentFocused.backgrounds
+  end if
+End Function
+
+
+'//When the user manually focuses a different tile in the carousel, then report the navigation within event
+Function onAdDisplayCarouselContentFocusedManually(msg)
+  carouselComponent = msg.getRoSGNode()
+  if carouselComponent <> invalid AND carouselComponent.itemFocused >= 0 AND carouselComponent.itemFocused <> carouselComponent.itemUnfocused AND carouselComponent.itemUnfocused >= 0
+    nOldFocusCol = carouselComponent.itemUnfocused + 1
+    nNewFocusCol = carouselComponent.itemFocused + 1
+    categoryComponentInfo = {}
+    categoryComponentInfo["category_slug"] = m.CategoryGridList.currCategoryId
+    categoryComponentInfo["category_row"] = m.CategoryGridList.cursorPosition[0]
+    categoryComponentInfo["category_col"] = nOldFocusCol
+    'row is hardcoded to 1 in the line below because the row represents the row within the category_component, not within the grid
+    'and the current design only has one row per category
+    tile = m.Tracking.getAnalyticsTile(m.CategoryGridList.itemFocused, nOldFocusCol, 1)
+    categoryComponentInfo["content_tile"] = tile
+
+    m.top.navigateWithinPageInfo = {
+      pageOneof: m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pageType, m.top.trackingPageInfo.pageValues)
+      componentOneof: m.Tracking.getAnalyticsComponent("category_component", categoryComponentInfo)
+      means_of_navigation: "BUTTON" 'MeansOfNavigation enum
+      vertical_location: m.CategoryGridList.cursorPosition[0]
+      horizontal_location: nNewFocusCol
+    }
   end if
 End Function
 
@@ -412,10 +526,15 @@ Function onCurrFocusRowChange()
       else if categoryEnteringFocus.sponsorImages.brandColor <> ""
         sSponsorBackgroundURL = categoryEnteringFocus.sponsorImages.brandColor
       end if
+    else if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
+      expandContentAreaForAdDisplayContainer(rowPercent)
+    else if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
+      expandContentAreaForAdDisplayCarousel(rowPercent)
     else if categoryEnteringFocus.id = m.constants.ui.categoryIds.certifiedFresh
       expandContentAreaForSponsorship(rowPercent)
+    else
+      contractContentAreaToOriginal(rowPercent)
     end if
-
     m.top.sponsorshipBackground = sSponsorBackgroundURL
 
   else if categoryLosingFocus <> invalid
@@ -440,7 +559,7 @@ Function contractContentAreaToOriginal(rowPercent)
 
   if m.ContentAreaParent.translation[1] <> m.currentContentAreaTranslation[1]
     'gradually reset back to original position
-    if rowPercent < .95
+    if rowPercent < 0.95
       '//while the rowPercent is less than .75, then gradually shift the visual elements back to default state
       nDiffContentAreaTranslation_y = m.currentContentAreaTranslation[1] - m.ContentAreaParent.translation[1]
 
@@ -466,7 +585,7 @@ Function expandContentAreaForSponsorship(rowPercent)
 
   if m.InfoPanel.opacity < 0
     '//gradually display the info panel as the sponsorship row comes into view
-    if rowPercent < .95
+    if rowPercent < 0.95
       m.InfoPanel.opacity = rowPercent
     else
       m.InfoPanel.opacity = 1
@@ -475,9 +594,51 @@ Function expandContentAreaForSponsorship(rowPercent)
 End Function
 
 
+' Adjust the RowList based on the difference of the normal and adRowlistSpotlight row title heights and relative to where the rowList already is.
+'   So if a gridType already adjusted the rowList's position, then adjust it more but relative to where it already had been adjusted.
+' @rowPercent: float, the percentage that the adRowlistSpotlight row is focused
+Function expandContentAreaForAdDisplayContainer(rowPercent)
+  nDiffHeight = m.originalContentAreaTranslation[1] - 102 '//bring this to the top of the screen
+  if m.currentContentAreaTranslation[1] = m.constants.ui.videoTilesListTranslation[1]
+    nDiffHeight = m.currentContentAreaTranslation[1] + 302 '//bring this to the top of the screen if the home redesign is enabled
+  end if
+  m.ContentAreaParent.translation = [m.ContentAreaParent.translation[0], m.currentContentAreaTranslation[1] - (nDiffHeight * rowPercent)]
+
+  '//gradually hide the info panel as the adRowlistSpotlight comes into view
+  stopAnimation(m.infoPanelFade)
+  if rowPercent < 0.95
+    m.InfoPanelParent.opacity = 1 - rowPercent
+  else
+    m.InfoPanelParent.opacity = 0
+  end if
+End Function
+
+
+' Adjust the RowList based on the difference of the normal and adRowlistCarousel row title heights and relative to where the rowList already is.
+'   So if a gridType already adjusted the rowList's position, then adjust it more but relative to where it already had been adjusted.
+' @rowPercent: float, the percentage that the adRowlistCarousel row is focused
+Function expandContentAreaForAdDisplayCarousel(rowPercent)
+  nDiffHeight = m.originalContentAreaTranslation[1] - 102 '//bring this to the top of the screen
+  if m.currentContentAreaTranslation[1] = m.constants.ui.videoTilesListTranslation[1]
+    nDiffHeight = m.currentContentAreaTranslation[1] + 302 '//bring this to the top of the screen if the home redesign is enabled
+  end if
+  m.ContentAreaParent.translation = [m.ContentAreaParent.translation[0], m.currentContentAreaTranslation[1] - (nDiffHeight * rowPercent)]
+
+  '//gradually hide the info panel as the adRowlistCarousel comes into view
+  stopAnimation(m.infoPanelFade)
+  if rowPercent < 0.95
+    m.InfoPanelParent.opacity = 1 - rowPercent
+  else
+    m.InfoPanelParent.opacity = 0
+  end if
+End Function
+
+
+
 Function populateInfoPanelByContent(focusedContent)
   if focusedContent <> invalid
     sType = focusedContent.type
+
     if sType = m.constants.ui.contentTypes.linear
       populateInfoPanel(m.constants.ui.infoPanelModes.linearProgramHomescreen, focusedContent)
     else if sType = m.constants.ui.contentTypes.historySignedOutUser
@@ -498,7 +659,7 @@ End Function
 
 
 Function onFeaturedListHasFocusChange(msg)
-  slideFadeGeneral(m.InfoPanelParent, [0, -50], "out", 0.2)
+  m.infoPanelFade = slideFadeGeneral(m.InfoPanelParent, [0, -50], "out", 0.2)
   setContentAreaState()
   'Make sure Content is in correct location
   moveContentAreaMaskBasedCurrentFocus()
@@ -537,13 +698,21 @@ Function onGridFocusChange() as Void
 
       m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(focusedContent, m.CategoryGridList.focusedPosition)
       m.top.contentFocused = focusedContent
-
-      if focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd
+      '//::TODO::JHAND - adRowlist - spotlight, Use MaskGroup to create rounded corners for the 1-Up video
+      '//::TODO::JHAND - adRowlist - spotlight, place video over 1-up image. Is there a way to mask the video so it has rounded corners?
+      if focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
         fadeOutInfoPanel()
         m.top.backgroundUriList = determineBackgroundImage(focusedContent)
       else
-        populateInfoPanelByContent(focusedContent)
-        fadeInContentArea()
+        sType = focusedContent.type
+        if sType <> m.constants.ui.contentTypes.adRowlistCarousel
+          populateInfoPanelByContent(focusedContent)
+          fadeInContentArea()
+        else
+          '//Display the adRowlistCarousel Component
+          fadeOutInfoPanel()
+          displayAdDisplayCarousel()
+        end if
       end if
 
     end if
@@ -555,6 +724,53 @@ Function onGridFocusChange() as Void
 
   fireNavigateWithinPageEvent()
 
+End Function
+
+
+Function deleteAdDisplayCarouselComponent()
+  tubiLog("HomeScreen.deleteAdDisplayCarouselComponent")
+  if m.adRowlistCarouselComponent <> invalid
+    m.adRowlistCarouselComponent.unobserveFieldScoped("contentFocused")
+    m.adRowlistCarouselComponent.unobserveFieldScoped("tileManuallyNavigated")
+    if m.adRowlistCarouselComponent.isInFocusChain() = true
+      m.CategoryGridList.setFocus(true)
+    end if
+    onCarouselFadeOutComplete()
+    m.adContentGroup.removeChild(m.adRowlistCarouselComponent)
+    '//NOTE:: do not set m.adRowlistCarouselComponent to invalid, as it may need to be reused later and the AnimationMixin may a reference to the original component
+  end if
+End Function
+
+
+Function createAdDisplayCarouselComponent(content)
+  tubiLog("HomeScreen.createAdDisplayCarouselComponent")
+  if content.type = m.constants.ui.contentTypes.adRowlistCarousel
+
+    if content.getChildCount() = 0 AND m.adRowlistCarouselComponent <> invalid
+      '//if the content is empty, then remove the adRowlistCarouselComponent
+      deleteAdDisplayCarouselComponent()
+    else if content.getChildCount() > 0
+      bCarouselHasFocus = (m.adRowlistCarouselComponent <> invalid AND m.adRowlistCarouselComponent.isInFocusChain() = true)
+      if m.adRowlistCarouselComponent = invalid
+        m.adRowlistCarouselComponent = CreateObject("roSGNode", "AdDisplayCarousel")
+      else
+        m.adRowlistCarouselComponent.unobserveFieldScoped("contentFocused")
+        m.adRowlistCarouselComponent.unobserveFieldScoped("tileManuallyNavigated")
+      end if
+
+      m.adRowlistCarouselComponent.observeFieldScoped("contentFocused", "onAdDisplayCarouselContentFocusedChanged")
+      m.adRowlistCarouselComponent.observeFieldScoped("tileManuallyNavigated", "onAdDisplayCarouselContentFocusedManually")
+      m.adRowlistCarouselComponent.id = "adRowlistCarousel"
+      m.adRowlistCarouselComponent.opacity = 0
+      m.adRowlistCarouselComponent.content = content
+      m.adRowlistCarouselComponent.updateContent = true
+      m.adContentGroup.appendChild(m.adRowlistCarouselComponent)
+
+      if bCarouselHasFocus = true
+        displayAdDisplayCarousel()
+      end if
+    end if
+  end if
 End Function
 
 
@@ -585,7 +801,6 @@ Function fireNavigateWithinPageEvent()
         tile = m.Tracking.getAnalyticsTile(oldFocusedContent, oldAnalyticsCol, 1)
         categoryComponentInfo["content_tile"] = tile
       end if
-
 
       m.top.navigateWithinPageInfo = {
         pageOneof: m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pageType, m.top.trackingPageInfo.pageValues)
@@ -670,12 +885,12 @@ Function onItemToBeFocusedChange()
   'Here we are updating the contentFocused, so it will play correct video preview when the content is updated.
   m.top.contentFocused = reloadedItemToBeFocused
 
-  if reloadedItemToBeFocused <> invalid AND reloadedItemToBeFocused.gridItemType <> m.constants.ui.gridItemTypes.skinAd
+  if reloadedItemToBeFocused <> invalid AND reloadedItemToBeFocused.gridItemType <> m.constants.ui.gridItemTypes.skinAd AND reloadedItemToBeFocused.gridItemType <> m.constants.ui.gridItemTypes.adRowlistSpotlight
     ' Covers use cases where info panel was hidden but due to home screen container changes purple carpet is removed and info panel was reset.
     fadeInContentArea()
     populateInfoPanelByContent(reloadedItemToBeFocused)
   else
-    ' Making sure the background is also updated if a purple carpet row is focused.
+    ' Making sure the background is also updated
     m.top.backgroundUriList = determineBackgroundImage(reloadedItemToBeFocused)
   end if
 End Function
@@ -686,37 +901,43 @@ End Function
 Function populateInfoPanel(mode, contentNode)
 
   if contentNode <> invalid
-    ' The below is to ensure that there is slight delay in showing the info panel so that there is no overlap with any row that is gaining focus.
-    if m.InfoPanel.visible = false
-      slideFadeGeneral(m.InfoPanelParent, [0, 0], "in", 0.2)
-    end if
-
-    if mode = m.constants.ui.infoPanelModes.item
-      populateInfoPanelWithHomescreenStyleItemMode(contentNode, m.InfoPanel, true)
-    else if mode = m.constants.ui.infoPanelModes.linearProgramHomescreen
-      populateInfoPanelWithLinearProgramHomescreenMode(contentNode, m.InfoPanel) 'V4 api
-    else if mode = m.constants.ui.infoPanelModes.continueWatching
-      m.InfoPanel.mode = mode
-      m.InfoPanel.title = contentNode.title
-      m.InfoPanel.description = contentNode.description
-
-      if contentNode.needsLogin = true AND m.top.signedIn <> true
-
-        m.InfoPanel.loginReason = contentNode.loginReason 'set login reason before needsLogin
-        m.InfoPanel.needsLogin = true
-      else
-        m.InfoPanel.needsLogin = false
+    sType = contentNode.type
+    if sType <> m.constants.ui.contentTypes.adRowlistCarousel AND sType <> m.constants.ui.contentTypes.adRowlistSpotlight
+      ' The below is to ensure that there is slight delay in showing the info panel so that there is no overlap with any row that is gaining focus.
+      if m.InfoPanel.visible = false
+        slideFadeGeneral(m.InfoPanelParent, [0, 0], "in", 0.2)
       end if
 
-      m.InfoPanel.reminderIsSet = false
+      if mode = m.constants.ui.infoPanelModes.item
+        populateInfoPanelWithHomescreenStyleItemMode(contentNode, m.InfoPanel, true)
+      else if mode = m.constants.ui.infoPanelModes.linearProgramHomescreen
+        populateInfoPanelWithLinearProgramHomescreenMode(contentNode, m.InfoPanel) 'V4 api
+      else if mode = m.constants.ui.infoPanelModes.continueWatching
+        m.InfoPanel.mode = mode
+        m.InfoPanel.title = contentNode.title
+        m.InfoPanel.description = contentNode.description
 
-    else if mode = m.constants.ui.infoPanelModes.sportsEvent
-      populateInfoPanelWithHomescreenStyleSportsMode(contentNode, m.InfoPanel)
+        if contentNode.needsLogin = true AND m.top.signedIn <> true
+
+          m.InfoPanel.loginReason = contentNode.loginReason 'set login reason before needsLogin
+          m.InfoPanel.needsLogin = true
+        else
+          m.InfoPanel.needsLogin = false
+        end if
+
+        m.InfoPanel.reminderIsSet = false
+
+      else if mode = m.constants.ui.infoPanelModes.sportsEvent
+        populateInfoPanelWithHomescreenStyleSportsMode(contentNode, m.InfoPanel)
+      end if
+
+      m.InfoPanel.calculateHeight = true
+    else
+      m.infoPanelFade = slideFadeGeneral(m.InfoPanelParent, [0, -50], "out", 0.2)
     end if
 
-    m.InfoPanel.calculateHeight = true
   else
-    slideFadeGeneral(m.InfoPanelParent, [0, -50], "out", 0.2)
+    m.infoPanelFade = slideFadeGeneral(m.InfoPanelParent, [0, -50], "out", 0.2)
     setContentAreaState()
   end if
 End Function
@@ -733,17 +954,65 @@ Function onCategoryRefreshTimer()
 End Function
 
 
+' Called when the adFocusTimer is fired
+Function onAdFocusTimer()
+  tubiLog("HomeScreen.onAdFocusTimer")
+  focusedContent = m.categoryGridList.rowFocused
+
+  if isAdDisplayContainerRow(focusedContent) = true OR isAdDisplayCarouselRow(focusedContent) = true
+    m.top.adTimerImpressionFire = true
+  end if
+End Function
+
+
 Function setFocusOnCategoryGrid()
   tubiLog("Homescreen.setFocusOnCategoryGrid" + m.top.id)
-  ' Only fade in content area if last focused was not purple carept.
   focusedContent = m.categoryGridList.itemFocused
-  if focusedContent <> invalid AND focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd
+  shouldPlaceFocusOnCategoryGridList = true
+  if focusedContent <> invalid AND (focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel)
     fadeOutInfoPanel()
-    m.top.backgroundUriList = determineBackgroundImage(focusedContent)
+
+    if focusedContent.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel AND m.adRowlistCarouselComponent <> invalid
+      shouldPlaceFocusOnCategoryGridList = false
+      displayAdDisplayCarousel()
+    else
+      m.top.backgroundUriList = determineBackgroundImage(focusedContent)
+    end if
   else
     fadeInContentArea()
   end if
-  m.CategoryGridList.setFocus(true)
+
+  if shouldPlaceFocusOnCategoryGridList = true
+    m.CategoryGridList.setFocus(true)
+  end if
+End Function
+
+
+Function hideAdDisplayCarousel()
+  tubiLog("HomeScreen.hideAdDisplayCarousel")
+  if m.adRowlistCarouselComponent <> invalid
+    '//There is a slight delay to the fade out, so the full-width carousel thumbnail does NOT get seen for a split second as another row gains focus.
+    fade(m.adRowlistCarouselComponent, "out", 0.1, 0.1, 0, onCarouselFadeOutComplete)
+  end if
+End Function
+
+
+Function displayAdDisplayCarousel()
+  tubiLog("HomeScreen.displayAdDisplayCarousel")
+  if m.adRowlistCarouselComponent <> invalid
+    m.adRowlistCarouselComponent.setFocus(true)
+    if m.adRowlistCarouselComponent.content <> invalid AND isNonEmptyArray(m.adRowlistCarouselComponent.content.imageImpTracking) = true
+      m.adFocusTimer.control = "start"
+    end if
+    m.ContentArea.maskUri = "pkg:/images/poster-mask-ads.png"
+    fade(m.adRowlistCarouselComponent, "in", 0.1)
+  end if
+End Function
+
+
+Function onCarouselFadeOutComplete()
+  tubiLog("HomeScreen.onCarouselFadeOutComplete")
+  m.ContentArea.maskUri = m.maskUri
 End Function
 
 
@@ -755,7 +1024,7 @@ Function fadeInContentArea()
 
   stopAnimation(m.infoPanelFade)
   if m.InfoPanelParent.opacity < 1
-    m.infoPanelFade = slideFadeGeneral(m.InfoPanelParent, [0, 0], "in", 0.2)
+    m.infoPanelFade = slideFadeGeneral(m.InfoPanelParent, [0, 0], "in", 0.2, 1)
   end if
 End Function
 
@@ -767,9 +1036,9 @@ End Function
 
 
 Function onKeyEvent(key, press) as Boolean
-  if press
+  if press = true
     if key = "left" OR key = "back"
-      ' This is required to stop videopreview
+      ' This is required to stop videoPreview
       itemFocused = m.CategoryGridList.itemFocused
       if m.top.isVideoPreviewOn = true OR (itemFocused <> invalid AND itemFocused.gridItemType = m.constants.ui.gridItemTypes.skinAd)
         m.top.pauseVideoPreview = true
@@ -777,6 +1046,22 @@ Function onKeyEvent(key, press) as Boolean
 
       ' navigating to the side nav
       m.top.stopLinearVideoPlayer = true
+    else if m.adRowlistCarouselComponent <> invalid AND m.adRowlistCarouselComponent.isInFocusChain() = true
+      if key = "down"
+        nCurrentFocusRow = m.CategoryGridList.currFocusRow
+        '//Must set the focus before animating to the next item because CategoryGridList may call jumpToItem when focus changes.
+        m.CategoryGridList.setFocus(true)
+        m.CategoryGridList.animateToItem = nCurrentFocusRow + 1
+        hideAdDisplayCarousel()
+        return true
+      else if key = "up"
+        nCurrentFocusRow = m.CategoryGridList.currFocusRow
+        '//Must set the focus before animating to the next item because CategoryGridList may call jumpToItem when focus changes.
+        m.CategoryGridList.setFocus(true)
+        m.CategoryGridList.animateToItem = nCurrentFocusRow - 1
+        hideAdDisplayCarousel()
+        return true
+      end if
     end if
   end if
 
@@ -906,9 +1191,9 @@ End Function
 Function onHideInfoPanelChange(msg)
   visible = msg.getData()
   if visible = true
-    slideFadeGeneral(m.InfoPanelParent, [0, 0], "in", 0.2)
+    m.infoPanelFade = slideFadeGeneral(m.InfoPanelParent, [0, 0], "in", 0.2, 1)
   else
-    slideFadeGeneral(m.InfoPanelParent, [0, -50], "out", 0.2)
+    m.infoPanelFade = slideFadeGeneral(m.InfoPanelParent, [0, -50], "out", 0.2)
   end if
 End Function
 

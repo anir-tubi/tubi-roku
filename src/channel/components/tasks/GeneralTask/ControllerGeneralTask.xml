@@ -25,6 +25,7 @@
     <script type="text/brightscript" uri="pkg:/source/lib/TubiBookmarks.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/CmsApi.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/ApiUtils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/AdsUtils.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/TimeOffsetUtils.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />

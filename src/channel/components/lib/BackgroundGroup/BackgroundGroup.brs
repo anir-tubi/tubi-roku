@@ -39,8 +39,11 @@ Function init()
   m.maskLayer2 = topRef.findNode("maskLayer2")
 
   m.fullScreenPosterGradient = topRef.findNode("fullScreenPosterGradient")
+  m.adDisplayGradient = topRef.findNode("adDisplayGradient")
   m.fullScreenPosterLeftGradient = topRef.findNode("fullScreenPosterLeftGradient")
   m.fullScreenPosterBottomGradient = topRef.findNode("fullScreenPosterBottomGradient")
+  m.adDisplayLeftGradient = topRef.findNode("adDisplayLeftGradient")
+  m.adDisplayBottomGradient = topRef.findNode("adDisplayBottomGradient")
 
   m.timer = CreateObject("roSGNode", "Timer")
   m.timer.duration = 3
@@ -72,12 +75,16 @@ Function setMaskLayerUris()
 
     m.fullScreenPosterLeftGradient.uri = "pkg:/images/background-masks/kids-left.png"
     m.fullScreenPosterBottomGradient.uri = "pkg:/images/background-masks/kids-bottom.png"
+    m.adDisplayLeftGradient.uri = "pkg:/images/background-masks/kids-left.png"
+    m.adDisplayBottomGradient.uri = "pkg:/images/background-masks/kids-bottom.png"
 
   else
     m.posterGroupMask.uri = "pkg:/images/background-masks/mask-layer-0.webp"
     m.defaultBackground.uri = "pkg:/images/background-masks/mask-layer-1-0.webp"
     m.fullScreenPosterLeftGradient.uri = "pkg:/images/background-masks/left.png"
     m.fullScreenPosterBottomGradient.uri = "pkg:/images/background-masks/bottom.png"
+    m.adDisplayLeftGradient.uri = "pkg:/images/background-masks/left.png"
+    m.adDisplayBottomGradient.uri = "pkg:/images/background-masks/bottom.png"
   end if
 
   setCircularMaskColor()
@@ -169,19 +176,22 @@ Function newBackgroundSet()
       fade(m.defaultBackground, "in", 0.5)
       fade(m.fullScreenPosterGradient, "out", 0.5)
       fade(m.fullScreenPosterGradient2, "out", 0.5)
-    else if backgroundType = backgroundTypes.fullScreen2
+      fade(m.adDisplayGradient, "out", 0.5)
+    else if backgroundType = backgroundTypes.fullScreen2 OR backgroundType = backgroundTypes.spotlight OR backgroundType = backgroundTypes.skinAd
       '// fullScreen2 displays the images in full screen with a vertical gradient overlay that is more opaque on the bottom.
       fade(m.circularMaskLayer, "out", 0.5)
       fade(m.posterGroupMask, "out", 0.5)
       fade(m.defaultBackground, "out", 0.5)
       fade(m.fullScreenPosterGradient, "out", 0.5)
       fade(m.fullScreenPosterGradient2, "in", 0.5)
-    else if backgroundType = backgroundTypes.spotlight OR backgroundType = backgroundTypes.skinAd
+      fade(m.adDisplayGradient, "out", 0.5)
+    else if backgroundType = backgroundTypes.adRowlistSpotlight OR backgroundType = backgroundTypes.adRowlistCarousel
       fade(m.circularMaskLayer, "out", 0.5)
       fade(m.posterGroupMask, "out", 0.5)
       fade(m.defaultBackground, "out", 0.5)
-      fade(m.fullScreenPosterGradient, "in", 0.5)
+      fade(m.fullScreenPosterGradient, "out", 0.5)
       fade(m.fullScreenPosterGradient2, "out", 0.5)
+      fade(m.adDisplayGradient, "in", 0.5)
     else
       fade(m.circularMaskLayer, "in", 0.5)
       ' Showing the poster group. Posters will automatically animate with width shrink effect due to update in the background info.
@@ -189,6 +199,7 @@ Function newBackgroundSet()
       fade(m.defaultBackground, "out", 0.5)
       fade(m.fullScreenPosterGradient, "out", 0.5)
       fade(m.fullScreenPosterGradient2, "out", 0.5)
+      fade(m.adDisplayGradient, "out", 0.5)
     end if
   end if
 
@@ -271,6 +282,21 @@ Function setPosterValues(posterUri)
     m.oldPoster.height = 675
     m.oldPoster.posterTranslation = [804, 0]
     if m.constants.deviceInfo.limitedUi = true OR m.constants.deviceInfo.lowVram = true
+      m.oldPoster.loadDisplayMode = "scaleToZoom"
+    end if
+  else if m.aCurrentBackgroundInfo.type = m.constants.ui.backgroundTypes.adRowlistSpotlight
+    m.oldPoster.width = 1920
+    m.oldPoster.height = 595
+    m.oldPoster.loadDisplayMode = "noScale"
+    m.oldPoster.posterTranslation = [20, 20]
+
+    if m.constants.deviceInfo.limitedUi = true
+      m.oldPoster.loadWidth = "640"
+      m.oldPoster.loadHeight = "198"
+      m.oldPoster.loadDisplayMode = "scaleToZoom"
+    else if m.constants.deviceInfo.lowVram = true
+      m.oldPoster.loadWidth = "1280"
+      m.oldPoster.loadHeight = "397"
       m.oldPoster.loadDisplayMode = "scaleToZoom"
     end if
   else
@@ -405,6 +431,9 @@ Function startTransitionIn()
   else if m.newBackgroundType = m.constants.ui.backgroundTypes.fullScreen OR m.newBackgroundType = m.constants.ui.backgroundTypes.fullScreen2 OR m.newBackgroundType = m.constants.ui.backgroundTypes.spotlight
     m.newPoster.fullScreenTransitionInControl = "start"
     m.newPoster.lastAnimationName = "FullScreenTransitionIn"
+  else if m.newBackgroundType = m.constants.ui.backgroundTypes.adRowlistSpotlight OR m.newBackgroundType = m.constants.ui.backgroundTypes.adRowlistCarousel
+    m.newPoster.adDisplayTransitionInControl = "start"
+    m.newPoster.lastAnimationName = "AdDisplayTransitionIn"
   else if m.newBackgroundType = m.constants.ui.backgroundTypes.skinAd
     '//Simple fade in for skinAd
     m.newPoster.fadeInControl = "start"

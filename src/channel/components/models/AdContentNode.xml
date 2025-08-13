@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Extend the ContentNode so we can add some custom fields -->
+<component name = "AdContentNode" extends="ContentNode">
+  <interface>
+
+    <!-- adInfo holds the required fields from response to play video ad -->
+    <field id="adInfo" type="assocarray"/>
+
+    <!-- The array that is returned when adInfo is processed by createRAFStructure()   -->
+    <field id="adInfoProcessed" type="assocarray"/>
+
+    <field id="backgrounds" type="stringarray" />
+    
+    <field id="json" type="string" />
+
+    <field id="imageImpTracking" type="array"/>
+
+    <field id="videoPreviewUrl" type="string"/>
+
+    <field id="titleImageUrl" type="string"/>
+
+    <field id="gridItemType" type="string"/>
+
+    <field id="type" type="string" />
+
+    <!-- What row should the ad be placed, 0-based. -->
+    <field id="rowPlacement" type="integer" value="-1"/>
+
+    <!-- currently focused item index to communicate to CategoryGridRowLabel -->
+    <field id="focusIndex" type="integer" value="-1"/>
+
+    <!-- if UpTime(0) > validUntil, then refetch metadata for this content -->
+    <field id="validUntil" type="integer"/>
+
+  </interface>
+</component>

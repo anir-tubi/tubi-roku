@@ -3,6 +3,7 @@ Function init()
   m.constants = getConstantsFromGlobal()
 
   m.top.observeFieldScoped("categoryResponseInBatch", "onCategoryResponseInBatch")
+  m.top.observeFieldScoped("adResponseInBatch", "onAdResponseInBatch")
   m.top.observeFieldScoped("focusedChild", "onComponentFocusChange")
   m.top.observeFieldScoped("jumpToRowItemByID", "onJumpToRowItemByIDChange")
   m.top.observeFieldScoped("contentUpdated", "onContentChange")
@@ -213,7 +214,7 @@ Function onComponentFocusChange(msg)
 
         rowItemFocused = m.RowList.rowItemFocused
 
-        if rowItemFocused.count() = 2 AND resolveAbbreviatedContent(content, rowItemFocused) <> invalid then
+        if rowItemFocused.count() = 2
           '// If count does not equal 2 then the rowList has not gained focus yet so use the default first item in the else block
           itemToJumpTo = rowItemFocused
         else
@@ -306,11 +307,11 @@ Function onContentChange()
           ' This allows to create a slide down animation.
           m.rowList.translation = [0, m.featuredRowPoster[1] + 92]
         else
-          m.rowList.translation = [0, 0]
+          m.RowList.translation = [0, 0]
         end if
       end if
     else
-      m.rowList.translation = [0, 0]
+      m.RowList.translation = [0, 0]
     end if
 
     m.skinAdRow.opacity = 0
@@ -513,6 +514,13 @@ Function setRowHeights()
       rowHeight = bannerSize[1]
       rowItemSpacings.push([10, 0])
       focusXOffsets.push(0)
+    else if gridItemType = gridItemTypes.adRowlistSpotlight OR gridItemType = gridItemTypes.adRowlistCarousel
+      adSize = m.constants.ui.imageSizes.adRowlistThumbnail
+      rowItemSize.push(adSize)
+      rowHeight = adSize[1]
+      rowItemSpacings.push([15, 0])
+      focusXOffsets.push(0)
+      numRows = 3
     else if gridItemType = gridItemTypes.portrait OR gridItemType = gridItemTypes.certifiedFresh
       posterWidth = posterSize[0]
       posterHeight = posterSize[1]
@@ -633,13 +641,18 @@ End Function
 ' @content rowlist content node.
 ' @rowItemIndex is 2D array of [rowindex, itemindex] from RowList.rowItemSelected or m.RowList.rowItemFocused
 Function resolveAbbreviatedContent(content, rowItemIndex)
+  itemContent = invalid
   if content <> invalid AND rowItemIndex[0] <> invalid AND rowItemIndex[1] <> invalid
     contentId = invalid
     category = content.getChild(rowItemIndex[0])
     if category <> invalid
-      content = category.getChild(rowItemIndex[1])
-      if content <> invalid
-        contentId = content.id
+      itemContent = category.getChild(rowItemIndex[1])
+      if itemContent <> invalid
+        if itemContent.type = m.constants.ui.contentTypes.adRowlistSpotlight OR itemContent.type = m.constants.ui.contentTypes.adRowlistCarousel
+          ' adRowlistSpotlight and adRowlistCarousel are not regular video content items so they were never abbreviated
+          return itemContent
+        end if
+        contentId = itemContent.id
       end if
     end if
 
@@ -697,6 +710,139 @@ Function onRowItemFocused(msg)
         m.top.itemFocused = itemFocused
       end if
     end if
+  end if
+End Function
+
+
+Function onAdResponseInBatch(msg) as Void
+  tubiLog("CategoryGridList.onAdResponseInBatch")
+
+  aResponse = msg.getData()
+  if isNonEmptyArray(aResponse) = true
+    content = m.top.content
+
+    '//Process the batch into categories for update
+    processResult = processAdBatchResponse(aResponse, content)
+    aAdsToAdd = processResult.aAdsToAdd
+    aAdsToReplace = processResult.aAdsToReplace
+    removableCategories = processResult.removableCategories
+
+    if content <> invalid
+      '//Capture last focus before mutations
+      lastFocusedRowID = ""
+      lastRowItemFocused = invalid
+      if isNonEmptyArray(m.RowList.rowItemFocused) AND m.RowList.rowItemFocused[0] > 0
+        lastFocusedRow = content.getChild(m.RowList.rowItemFocused[0])
+        lastFocusedRowID = lastFocusedRow.id
+      end if
+
+      '//Update content with ads (remove, replace, add)
+      shouldInformHomeScreen = updateContentWithAdBatches(content, aAdsToReplace, removableCategories, aAdsToAdd)
+
+      m.top.content = content ' Set m.top.content before handling UI side effects
+
+      '//Restore focus and set row heights if changes occurred
+      if shouldInformHomeScreen = true
+        restoreFocusAndRowHeightsAfterAdBatchUpdate(content, lastFocusedRowID, lastRowItemFocused)
+      end if
+    end if
+
+    '//Free references to the batch so that it can be garbage collected
+    m.top.adResponseInBatch = invalid
+  end if
+End Function
+
+
+' Helper to onAdResponseInBatch(): Processes the ad response batch into adds, replaces, and removals
+Function processAdBatchResponse(aResponse, content) as Object
+  removableCategories = {}
+  aAdsToAdd = []
+  aAdsToReplace = []
+
+  for i = 0 to aResponse.count() - 1
+    adContent = aResponse[i]
+    if adContent <> invalid
+      bValid = (adContent.getChildCount() > 0) ' If the container has children, then it is valid. If it does not, it is being passed to remove from the rowList
+      containerID = adContent.id
+
+      '//If this is valid content, then we need to add it to the rowlist content later.
+      if bValid = true
+        rowPlacement = adContent.rowPlacement
+        if content <> invalid AND content.getChild(rowPlacement).id = containerID
+          aAdsToReplace.push(adContent)
+        else
+          '//If the row placement has changed, then mark content for removal from the current rowList, so it can be re-added back in at the new rowPlacement.
+          removableCategories[containerID] = true
+          aAdsToAdd.push(adContent)
+        end if
+      else
+        '//Place all content in removableCategories associative array. We want to get rid of all the content before adding it back in.
+        removableCategories[containerID] = true
+      end if
+    end if
+  end for
+
+  return {
+    aAdsToAdd: aAdsToAdd
+    aAdsToReplace: aAdsToReplace
+    removableCategories: removableCategories
+  }
+End Function
+
+
+' Helper to onAdResponseInBatch(): Updates the content by replacing, removing, and adding ad batches; returns if significant changes occurred
+Function updateContentWithAdBatches(content, aAdsToReplace, removableCategories, aAdsToAdd) as Boolean
+  shouldInformHomeScreen = false
+
+  '//Replace existing ads
+  if aAdsToReplace.count() > 0
+    for i = 0 to aAdsToReplace.count() - 1
+      adContent = aAdsToReplace[i]
+      content.replaceChild(adContent, adContent.rowPlacement)
+    end for
+  end if
+
+  '//First remove all ad campaigns. They may no longer be valid or they may have been requested to be moved to a new row. Do this before we add the new, valid adContent
+  if removableCategories.count() > 0
+    shouldInformHomeScreen = true
+    for i = content.getChildCount() - 1 to 0 step -1
+      child = content.getChild(i)
+      if removableCategories[child.id] = true
+        content.removeChildIndex(i)
+      end if
+    end for
+  end if
+
+  '//Add new ads
+  if aAdsToAdd.count() > 0
+    shouldInformHomeScreen = true
+    for i = 0 to aAdsToAdd.count() - 1
+      adContent = aAdsToAdd[i]
+      content.insertChild(adContent, adContent.rowPlacement)
+    end for
+  end if
+
+  return shouldInformHomeScreen
+End Function
+
+
+' Helper to onAdResponseInBatch(): Restores focus to the last row item and sets row heights after ad batch updates
+Function restoreFocusAndRowHeightsAfterAdBatchUpdate(content, lastFocusedRowID, lastRowItemFocused)
+  '//If the content had been removed or inserted, then we need to jump back to the last focused rowItem we reset the rowlist.content which happens when we reset the row heights.
+  if lastFocusedRowID <> ""
+    for i = 0 to content.getChildCount() - 1
+      row = content.getChild(i)
+      if row.id = lastFocusedRowID
+        lastRowItemFocused = [i, m.RowList.rowItemFocused[1]]
+        exit for
+      end if
+    end for
+  end if
+
+  setRowHeights()
+  if lastRowItemFocused <> invalid
+    '//::NOTE:: if the rowlist does not have focus (i.e. an ad component has focus), then the rowItemFocused will not be set even after jumpToRowItem is set.
+    m.RowList.jumpToRowItem = lastRowItemFocused
   end if
 End Function
 

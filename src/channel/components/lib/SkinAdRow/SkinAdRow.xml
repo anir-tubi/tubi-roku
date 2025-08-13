@@ -66,7 +66,7 @@
       secondsTranslationId="metadata_fullscreen_countdown_no_seconds"
       translation="[1443, 15]"/>
     <TextIcon
-      id="AdIndicator"
+      id="adIndicator"
       padding="[16, 4]"
       uri="pkg:/images/tag-rounded-rectangle-background-pull-$$RES$$.9.png"
       translation="[1509, 243]"/>

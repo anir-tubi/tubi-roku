@@ -30,6 +30,14 @@ Function TubiExperiments(experimentsInfo) as Object
         }
       }
 
+      ads_hdc_carousel: {
+        ads_ott_hdc_carousel_v1: {
+          default: { "enabled": false }
+          holdout_control: { "enabled": false }
+          holdout_winning: { "enabled": false }
+        }
+      }
+
       'This experiment will be under holdout
       roku_video_autostart_ui_refresh: {
         roku_video_autostart_ui_refresh_v1: {
