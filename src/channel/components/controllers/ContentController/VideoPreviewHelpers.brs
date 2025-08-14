@@ -228,6 +228,7 @@ Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
 
     else
       videoContent = createObject("RoSGNode", "ContentNode")
+      videoContent.addField("type", "string", false)
     end if
 
     updatePlayerLayoutBasedOnFocusedContent(content)
@@ -242,6 +243,7 @@ Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
 
     videoContent.id = content.id
     videoContent.url = content.videoPreviewUrl
+    videoContent.type = content.type
     videoContent.streamformat = "mp4" ' backend will return always as mp4 for video previews
 
     videoContent.addField("previewId", "string", false)
@@ -265,6 +267,7 @@ Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
     else
       m.videoPreviewPlayer.videoPlayerType = "BANNER"
     end if
+    m.videoPreviewPlayer.isDetailScreen = false
 
     ' If there is no delay, we can start the video preview immediately.
     sendVideoPlayerCommand(videoPreview, "prebuffer")

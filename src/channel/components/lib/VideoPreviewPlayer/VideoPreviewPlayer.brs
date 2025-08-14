@@ -283,10 +283,24 @@ Function getPreviewProgressEvent(pageInfo, callSource)
         pageOneof: pgInfo
       }
     }
-
+    contentTile = invalid
     componentInfo = m.top.componentInfoForAnalytics
     if isAA(componentInfo) = true AND isAA(componentInfo.componentOneof) = true
       previewProgressEvent.values.componentOneof = componentInfo.componentOneof
+
+      categoryComponent = componentInfo.componentOneof.category_component
+      if categoryComponent <> invalid
+        contentTile = categoryComponent.content_tile
+      end if
+    else
+      contentTile = m.tubiTrackingInfo.getAnalyticsTile(videoContent, 1, 1)
+    end if
+
+    if contentTile <> invalid AND m.top.isDetailScreen = true
+      previewComponent = m.tubiTrackingInfo.getAnalyticsComponent("preview_component", {
+        content_tile: contentTile
+      })
+      previewProgressEvent.values.componentOneof = previewComponent
     end if
 
 

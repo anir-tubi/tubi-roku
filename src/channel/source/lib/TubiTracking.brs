@@ -1242,6 +1242,10 @@ Function tubiTracking_getOneOfs()
       series_id: -1
       video_id: -1
     }
+
+    preview_component: {
+      content_tile: {}
+    }
   }
 
   selectorOneOf = {

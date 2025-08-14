@@ -59,6 +59,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
       previewState = getVideoPreviewStateForThisContent(content)
       if m.videoPreviewPlayer <> invalid
         m.videoPreviewPlayer.videoPlayerType = "BANNER"
+        m.videoPreviewPlayer.isDetailScreen = true
       end if
       if previewState = "buffering" OR previewState = "playing"
         setPageInfoForVideoPreview(detailScreen.trackingPageInfo) ' this will help to trigger analytics
