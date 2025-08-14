@@ -1505,7 +1505,7 @@ Function updateVideoTileOnFocusChange(rowFocused, columnFocused, screen)
     displayDefaultBackground()
   end if
 
-  if screen <> invalid AND screen.featuredRowContent <> invalid
+  if screen <> invalid AND screen.featuredRowContent <> invalid AND screen.lastFocusedList <> "skinAdRow"
     pauseVideoPreviewAndShowPoster()
     m.videoPreviewDebounce.control = "start"
     setInlineVideoMetadataOverlay(screen.featuredRowContent, columnFocused, rowFocused)
