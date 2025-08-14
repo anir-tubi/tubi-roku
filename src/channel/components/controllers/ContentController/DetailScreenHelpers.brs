@@ -1715,6 +1715,7 @@ Function onDetailBackPressed()
   ' but we have to invoke the "empty stack" logic at this point.
   onKeyEvent("back", true)
   onKeyEvent("back", false)
+  m.videoPreviewPlayer.isDetailScreen = false
 End Function
 
 
