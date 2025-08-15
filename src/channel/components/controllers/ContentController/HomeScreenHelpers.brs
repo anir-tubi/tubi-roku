@@ -1700,6 +1700,7 @@ Function onFeaturedRowFocusedItemChange(msg)
   else
     m.inlineVideoPreviewPlayerContainer.visible = false
   end if
+  setUIBasedOnFocusedContent(focusedItem)
 End Function
 
 
