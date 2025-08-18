@@ -11,7 +11,7 @@ Function init()
   m.titleGroup = m.top.findNode("TitleGroup")
   m.title = m.top.findNode("Title")
   m.titleImage = m.top.findNode("TitleImage")
-  
+
   m.titleImage.loadHeight = m.constants.ui.logoSizes.skinAds.infoPanel.height
   m.titleImage.loadWidth = m.constants.ui.logoSizes.skinAds.infoPanel.width
   m.descriptionPanel = m.top.findNode("DescriptionPanel")
@@ -78,21 +78,21 @@ End Function
 Function onTitleImageLoadStatusChange(msg)
   if (msg.getData() = "failed")
     tubiLog("SkinAdInfoPanel onTitleImageLoadStatusChange(), title image failed to load")
-    setTitleImage("")   '//attempt to display text-only version, if available
+    setTitleImage("") '//attempt to display text-only version, if available
   end if
-End function
+End Function
 
 
 Function setTitleImage(titleImageUri)
-    if isNonEmptyString(titleImageUri) = true
-      m.titleGroup.appendChild(m.titleImage)
-      m.titleGroup.removeChild(m.title)
-      
-      m.titleImage.uri = replaceURLParameter(titleImageUri, "w", m.constants.ui.logoSizes.skinAds.infoPanel.width, true)
-    else
-      m.titleGroup.appendChild(m.title)
-      m.titleGroup.removeChild(m.titleImage)
-        
-      m.titleImage.uri = ""
-    end if
+  if isNonEmptyString(titleImageUri) = true
+    m.titleGroup.appendChild(m.titleImage)
+    m.titleGroup.removeChild(m.title)
+
+    m.titleImage.uri = titleImageUri
+  else
+    m.titleGroup.appendChild(m.title)
+    m.titleGroup.removeChild(m.titleImage)
+
+    m.titleImage.uri = ""
+  end if
 End Function
