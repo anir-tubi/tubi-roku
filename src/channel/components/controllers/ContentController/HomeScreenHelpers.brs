@@ -337,7 +337,26 @@ Function fetchHomeScreen(homeScreen, useCache = false)
       errorHandler = onEspanolScreenErrorResponse
     else if homeScreen.id = m.constants.ui.screenIds.homeScreen
       '//Call ad endpoint to get ad content for the homescreen
-      createHomescreenAdRequest(homeScreen.id, onHomesceenAdDisplaySuccessResponse, onHomesceenAdDisplayErrorResponse)
+
+      experimentAdType = getExperimentResource("ads_ott_hdc_adformats", "ads_ott_hdc_adformats_v1", false).name
+      if experimentAdType <> "control"
+
+        aAdTypes = []
+        if experimentAdType = "carousel"
+          aAdTypes = [m.constants.adTypes.adRowlistCarousel]
+        else if experimentAdType = "spotlight"
+          aAdTypes = [m.constants.adTypes.adRowlistSpotlight]
+        end if
+        '//If this is no longer in the experiment and the ads_ott_hdc_adformats_v1 experiment has been graduated, then request both ad types and let the backend decide which ad type(s) to return
+        ' aAdTypes = [m.constants.adTypes.adRowlistCarousel, m.constants.adTypes.adRowlistSpotlight]
+
+        createHomescreenAdRequest(homeScreen.id, onHomesceenAdDisplaySuccessResponse, aAdTypes, onHomesceenAdDisplayErrorResponse)
+      else
+        'If not in experiment, then indicate that the adContentUpdated flag is true so that ads are not waited on when loading homescreen content
+        homeScreen.adContentUpdated = true
+        '//::NOTE::ads_ott_hdc_adformats, this value is hardcoded for the experiment. It is the same value that is hardcoded in HomeScreenParsers.parseHomeScreenAdsSuccess()
+        m.homeScreenAdExperimentRowPlacement = 2
+      end if
     end if
 
     options = {}
@@ -391,14 +410,22 @@ Function fetchHomeScreen(homeScreen, useCache = false)
 End Function
 
 
-Function createHomescreenAdRequest(homescreenId, successCallback, errorCallback = invalid)
+' @homescreenId: string, the screen ID of the homescreen
+' @successCallback: function to call on success
+' @aAdTypes: array of strings, the ad types to request; possible values are found under m.constants.adTypes.
+' @errorCallback: function to call on error
+Function createHomescreenAdRequest(homescreenId, successCallback, aAdTypes = [], errorCallback = invalid) as Void
+  if isNonEmptyArray(aAdTypes) = true
+    '//If no ad types are specified, then there is no need to make the ad request
+    return
+  end if
+
   appMode = "DEFAULT_MODE"
   if isKidsUIOn() = true
     appMode = "KIDS_MODE"
   else if m.uiMode = m.constants.ui.modes.latino
     appMode = "LATINO_MODE"
   end if
-  aAdTypes = [m.constants.adTypes.adRowlistCarousel, m.constants.adTypes.adRowlistSpotlight]
 
   authInfo = m.tubiAuthUpdate.getAuthInfo()
   userId = ""
@@ -456,20 +483,16 @@ Function onHomesceenAdDisplaySuccessResponse(response)
   tubiLog("HomeScreenHelpers.onHomesceenAdDisplaySuccessResponse")
   homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
   if homeScreen <> invalid AND isNonEmptyArray(response) = true
-
-    if getExperimentResource("ads_hdc_carousel", "ads_ott_hdc_carousel_v1", false).enabled = true
-
-      for i = 0 to response.count() - 1
-        adNode = response[i]
-        '//::NOTE::ads_hdc_carousel - just for the experiment, we are storing the rowPlacement in the ad campaigns so we can fire the experiment impression when .
-        if adNode.type = m.constants.adTypes.adRowlistCarousel
-          m.homescreenCarouselRowPlacement = adNode.rowPlacement
-        else if adNode.type = m.constants.adTypes.adRowlistSpotlight
-          m.homescreenSpotlightRowPlacement = adNode.rowPlacement
-        end if
-      end for
-      homeScreen.adContent = response
-    end if
+    for each adNode in response
+      '//::NOTE::ads_ott_hdc_adformats - just for the experiment, we are storing the rowPlacement in the ad campaigns so we can fire the experiment impression.
+      if adNode.type = m.constants.adTypes.adRowlistCarousel
+        m.homeScreenAdExperimentRowPlacement = adNode.rowPlacement
+      else if adNode.type = m.constants.adTypes.adRowlistSpotlight
+        '//::NOTE:: either spotlight or carousel can be used for the experiment - not both.
+        m.homeScreenAdExperimentRowPlacement = adNode.rowPlacement
+      end if
+    end for
+    homeScreen.adContent = response
   end if
 
   homeScreen.adContentUpdated = true
@@ -891,15 +914,10 @@ End Function
 
 Function onHomeScreenRowFocusChanged(msg)
   currFocusRow = msg.getData()
-  if currFocusRow <> invalid AND (m.homescreenCarouselRowPlacement <> invalid OR m.homescreenSpotlightRowPlacement <> invalid)
-    if currFocusRow = m.homescreenCarouselRowPlacement
-      '//Send exposure event for carousel experiment when the proper row gains focus (for control and variant)
-      getExperimentResource("ads_hdc_carousel", "ads_ott_hdc_carousel_v1", true)
-    end if
-    if currFocusRow = m.homescreenSpotlightRowPlacement
-      '//Send exposure event for spotlight experiment when the proper row gains focus (for control and variant)
-      '//::TODO::JHAND - adRowlist - Spotlight, the following code should reference the experiment specific to the spotlight row campaign
-      getExperimentResource("ads_hdc_carousel", "ads_ott_hdc_carousel_v1", true)
+  if currFocusRow <> invalid AND m.homeScreenAdExperimentRowPlacement <> invalid
+    if currFocusRow = m.homeScreenAdExperimentRowPlacement
+      '//Send exposure event for ads_ott_hdc_adformats_v1 experiment when the proper row gains focus (for control and variants)
+      getExperimentResource("ads_ott_hdc_adformats", "ads_ott_hdc_adformats_v1", true)
     end if
   end if
 
@@ -1313,7 +1331,7 @@ Function onLoadCategoryForIds(msg)
     end for
   end if
 
-  createHomescreenAdRequest(homeScreen.id, onHomesceenAdDisplayBatchResponse)
+  createHomescreenAdRequest(homeScreen.id, onHomesceenAdDisplayBatchResponse, aAdTypes)
 
   isKidsMode = shouldKidsModeBeSentToServer()
   isSignedInUser = isLoggedInUser()

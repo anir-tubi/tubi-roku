@@ -30,11 +30,12 @@ Function TubiExperiments(experimentsInfo) as Object
         }
       }
 
-      ads_hdc_carousel: {
-        ads_ott_hdc_carousel_v1: {
-          default: { "enabled": false }
-          holdout_control: { "enabled": false }
-          holdout_winning: { "enabled": false }
+      '//This experiment will be for the new showcase cad campaigns. The possible "name" values are "control", "carousel", "spotlight"
+      ads_ott_hdc_adformats: {
+        ads_ott_hdc_adformats_v1: {
+          default: { "name": "control" }
+          holdout_control: { "name": "control" }
+          holdout_winning: { "name": "control" }
         }
       }
 
