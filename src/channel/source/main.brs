@@ -125,7 +125,7 @@ Function runChannel(constants, log, request)
     starterLibUrl = constants.settings.starterComponentsUrl
     print "attempting to load TubiStarterLibrary "; starterLibUrl
 
-    starterLibrary.uri =  starterLibUrl ' kicks off fetch of starter components
+    starterLibrary.uri = starterLibUrl ' kicks off fetch of starter components
     componentTimer = CreateObject("roTimespan")
   else
     'only expect this else block to happen when side loading/testing
@@ -178,7 +178,7 @@ Function runChannel(constants, log, request)
           response = "unhandled"
         end if
         if result.id <> invalid
-          input.EventResponse({id: result.id, status: response})
+          input.EventResponse({ id: result.id, status: response })
         end if
       else if field = "loadStatus"
         'starter components or remote components load status update
@@ -642,8 +642,8 @@ Function initSubmittedChannel(request, constants, tubiScene, port, startupArgs, 
   '     submittedAppVersion =  constants.deviceInfo.clientversion
   '   end if
 
-    ' Sometimes submitted version of the app might have bugs, legal issues or api changes which makes them not worthy of fallback.
-    ' constants.externalConfig.info.fallback_blocked_versions will contain a list of submitted app versions that we should not fallback on.
+  ' Sometimes submitted version of the app might have bugs, legal issues or api changes which makes them not worthy of fallback.
+  ' constants.externalConfig.info.fallback_blocked_versions will contain a list of submitted app versions that we should not fallback on.
   '   if constants.externalConfig <> invalid AND constants.externalConfig.info <> invalid AND constants.externalConfig.info.fallback_blocked_versions <> invalid
   '     for each version in constants.externalConfig.info.fallback_blocked_versions
   '       if version = submittedAppVersion

@@ -6,24 +6,18 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
   'set to 0 retries - 1 max request, even if there are no ads returned from our server
   roAdFramework.setAdPrefs(false, 1)
 
-  'turn on Nielsen DAR API for the Roku Advertising Framework
-  'this is mutually exclusive with Roku's own Global Audience Measurement API,
-  'meaning only one audience measurement API can run at a time.
-  roAdFramework.enableNielsenDAR(true)
-
-  'set the Nielsen application id for Tubi TV
-  roAdFramework.setNielsenAppId(constants.thirdParty.nielsen.rafToken)
-
-  'turn off debug output for RAF
-  roAdFramework.setDebugOutput(false)
-
-  roAdFramework.enableAdMeasurements(true)
+  'turn off debug output for RAF by default
+  setDebugOutput = false
 
   #if consoleLoggingEnabled
     if constants.settings.mode = "qa" OR constants.settings.mode = "staging"
-      roAdFramework.setDebugOutput(true)
+      setDebugOutput = true
     end if
   #end if
+  roAdFramework.setDebugOutput(setDebugOutput)
+
+  ' Make sure this comes after setDebugOutput to make Robin happy
+  roAdFramework.enableAdMeasurements(true)
 
   'a port used for sending logging requests
   adMessagePort = CreateObject("roMessagePort")
@@ -529,8 +523,15 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos)
       end for
     end if
 
+    ' Add generic fallback to add Entertainment if we don't have any to avoid RAF errors
+    if genres.count() = 0
+      genres.push("Entertainment")
+    end if
+
     isChildDirected = (episode.isCdc = true)
     m.roAdFramework.setContentGenre(genres.join(","), isChildDirected)
+
+    m.roAdFramework.setContentId("Tubi VOD Stream")
 
     ' We are not sending setContentId because our contract does not require it.
 

@@ -32,6 +32,12 @@ Function execAdsSSAITask()
   m.adLib = TubiAds(m.constants, m.request, requestQueueLib, auth, m.tracking, "mp4", m.top.tcfString, userConsentsOptOutStatus, gdpr)
   m.raf = m.adLib.roAdFramework
 
+  ' We don't know what genre it is so defaulting to Entertainment
+  kidsContent = false ' linear should never be kids content
+  m.raf.setContentGenre("Entertainment", kidsContent)
+
+  m.raf.setContentId("Tubi Live Stream")
+
   ' used to determine when to poll for ads
   m.timeSpan = CreateObject("roTimespan")
   m.pollFrequency = 3000 'in ms
@@ -169,6 +175,7 @@ End Function
 Function pollForAds(url)
   if isNonEmptyString(url) = true AND m.isPlayingAds <> true AND m.isPlayingAdFiller <> true then
     ' Retrieves ads and also sets m.notUsedAdPodPixels
+
     adPods = m.adLib.retrieveAds(url, m.ssaiUsed)
 
     if adPods <> invalid AND adPods.count() > 0
@@ -228,7 +235,7 @@ Function onTags(msg)
   else
     parseYoSpaceId3(tags)
   end if
-End function
+End Function
 
 
 Function parseYoSpaceId3(tags)
@@ -308,7 +315,7 @@ Function parseYoSpaceId3(tags)
       ' video concludes. This means we need to set isPlayingAdFiller false after each filler segment ends
       ' as we don't know if the next segment will be filler video. We will set isPlayingAdFiller back to true
       ' at the start of the next segment, if it is a filler video segment.
-        updateNowPlaying("content")
+      updateNowPlaying("content")
     end if
   else if id3s.getType() = "middle"
     ' At a middle point of a segment (there can be multiple middle points per segment).
@@ -459,7 +466,7 @@ Function handleStartAdTracking()
     m.adLib.notUsedAdPodPixels.delete(m.currentAdInPod.sequence.toStr())
 
     startAdValues = {
-      ad_started: m.tracking.getAnalyticsAd(analyticsCtx)  'Ad
+      ad_started: m.tracking.getAnalyticsAd(analyticsCtx) 'Ad
       video_id: m.top.content.id
       exit_type: "AUTO" 'Reason enum
       is_fullscreen: m.videoIsFullscreen
@@ -543,11 +550,11 @@ Function handleMidPixels(position)
 
     quartile = 0
     if ad.duration <> invalid
-      if position >= ad.duration * (1/4) AND position < ad.duration * (1/2)
+      if position >= ad.duration * (1 / 4) AND position < ad.duration * (1 / 2)
         quartile = 0.25
-      else if position >= ad.duration * (1/2) AND position < ad.duration * (3/4)
+      else if position >= ad.duration * (1 / 2) AND position < ad.duration * (3 / 4)
         quartile = 0.5
-      else if position >= ad.duration * (3/4) AND position < ad.duration
+      else if position >= ad.duration * (3 / 4) AND position < ad.duration
         quartile = 0.75
       end if
     end if
@@ -581,7 +588,7 @@ Function handleFinishAdTrackingOnComplete()
     if ad.streams <> invalid AND ad.streams[0] <> invalid
       adUrl = ad.streams[0].url
     else
-      adUrl = ""  
+      adUrl = ""
     end if
 
     if isNonEmptyString(m.ssaiUsed) = true
@@ -647,7 +654,7 @@ Function fireCurrentAndPreviousPixels(ad, pixelRecord, maxQuartile)
   ]
 
   if isNumber(maxQuartile) = true
-    if maxQuartile = 0 or maxQuartile = 0.25 or maxQuartile = 0.5 or maxQuartile = 0.75 or maxQuartile = 1.0
+    if maxQuartile = 0 OR maxQuartile = 0.25 OR maxQuartile = 0.5 OR maxQuartile = 0.75 OR maxQuartile = 1.0
       for each quartile in quartiles
         if checkPixelRecord(pixelRecord, quartile) = false
           firePixels(ad, pixelRecord, quartile)
@@ -713,7 +720,7 @@ Function sendFinishAdAnalytics(ad, exitType = "AUTO")
     ' send FinishAdEvent tracking
     analyticsCtx = getAnalyticsCtx(ad, m.adPod.ads.count())
     finishAdValues = {
-      ad_finished: m.tracking.getAnalyticsAd(analyticsCtx)  'Ad
+      ad_finished: m.tracking.getAnalyticsAd(analyticsCtx) 'Ad
       video_id: m.top.content.id
       exit_type: exitType 'Reason enum
     }
