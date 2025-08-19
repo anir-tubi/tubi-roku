@@ -421,7 +421,7 @@ End Function
 ' @aAdTypes: array of strings, the ad types to request; possible values are found under m.constants.adTypes.
 ' @errorCallback: function to call on error
 Function createHomescreenAdRequest(homescreenId, successCallback, aAdTypes = [], errorCallback = invalid) as Void
-  if isNonEmptyArray(aAdTypes) = true
+  if isNonEmptyArray(aAdTypes) = false
     '//If no ad types are specified, then there is no need to make the ad request
     return
   end if
