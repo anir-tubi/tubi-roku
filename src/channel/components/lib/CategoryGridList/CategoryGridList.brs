@@ -13,6 +13,7 @@ Function init()
   m.top.observeFieldScoped("parentScreenTrackingPageInfo", "onParentScreenTrackingPageInfoChange")
   m.top.observeFieldScoped("kidsMode", "onKidsModeChange")
   m.top.observeFieldScoped("containerAppendMoreTilesStatus", "onContainerAppendMoreTilesStatusChange")
+  m.top.observeFieldScoped("animateToItem", "onAnimateToItemChange")
 
   m.RowList = m.top.findNode("RowList")
   m.RowList.observeFieldScoped("rowItemFocused", "onRowItemFocused")
@@ -610,6 +611,10 @@ Function setFeaturedRowHeights()
         rowItemSize.push(guestCWPosterSize)
         ' 80 is the padding below the poster.
         heights.push(guestCWPosterSize[1] + 80)
+      else if gridItemType = gridItemTypes.adRowlistSpotlight OR gridItemType = gridItemTypes.adRowlistCarousel
+        adSize = m.constants.ui.imageSizes.adRowlistThumbnail
+        rowItemSize.push(adSize)
+        heights.push(adSize[1] + 186)
       else
         rowItemSize.push(m.gridItemSize)
         heights.push(featuredRowHeight)
@@ -731,8 +736,14 @@ Function onAdResponseInBatch(msg) as Void
       '//Capture last focus before mutations
       lastFocusedRowID = ""
       lastRowItemFocused = invalid
-      if isNonEmptyArray(m.RowList.rowItemFocused) AND m.RowList.rowItemFocused[0] > 0
-        lastFocusedRow = content.getChild(m.RowList.rowItemFocused[0])
+      if m.top.featuredRowContent <> invalid
+        rowItemFocused = m.FeaturedRowList.rowItemFocused
+      else
+        rowItemFocused = m.RowList.rowItemFocused
+      end if
+
+      if isNonEmptyArray(rowItemFocused) AND rowItemFocused[0] > 0
+        lastFocusedRow = content.getChild(rowItemFocused[0])
         lastFocusedRowID = lastFocusedRow.id
       end if
 
@@ -829,11 +840,17 @@ End Function
 ' Helper to onAdResponseInBatch(): Restores focus to the last row item and sets row heights after ad batch updates
 Function restoreFocusAndRowHeightsAfterAdBatchUpdate(content, lastFocusedRowID, lastRowItemFocused)
   '//If the content had been removed or inserted, then we need to jump back to the last focused rowItem we reset the rowlist.content which happens when we reset the row heights.
+  if m.top.featuredRowContent <> invalid
+    rowList = m.FeaturedRowList
+  else
+    rowList = m.RowList
+  end if
+
   if lastFocusedRowID <> ""
     for i = 0 to content.getChildCount() - 1
       row = content.getChild(i)
-      if row.id = lastFocusedRowID
-        lastRowItemFocused = [i, m.RowList.rowItemFocused[1]]
+      if row.id = lastFocusedRowID AND isNonEmptyArray(rowList.rowItemFocused) = true
+        lastRowItemFocused = [i, rowList.rowItemFocused[1]]
         exit for
       end if
     end for
@@ -842,7 +859,7 @@ Function restoreFocusAndRowHeightsAfterAdBatchUpdate(content, lastFocusedRowID, 
   setRowHeights()
   if lastRowItemFocused <> invalid
     '//::NOTE:: if the rowlist does not have focus (i.e. an ad component has focus), then the rowItemFocused will not be set even after jumpToRowItem is set.
-    m.RowList.jumpToRowItem = lastRowItemFocused
+    rowList.jumpToRowItem = lastRowItemFocused
   end if
 End Function
 
@@ -1141,7 +1158,7 @@ Function updateFocusXOffset(currFocusRow, isInTransit = false)
       category = featuredRowContent.getChild(i)
       gridItemType = category.gridItemType
 
-      if (i = currFocusRow OR (isInTransit = true AND i = currFocusRow + 1)) AND gridItemType <> gridItemTypes.historySignedOutUser
+      if (i = currFocusRow OR (isInTransit = true AND i = currFocusRow + 1)) AND gridItemType <> gridItemTypes.historySignedOutUser AND gridItemType <> gridItemTypes.adRowlistSpotlight AND gridItemType <> gridItemTypes.adRowlistCarousel
         focusXOffset.push(m.expandedTileFocusXOffset)
       else
         focusXOffset.push(0)
@@ -1279,6 +1296,18 @@ End Function
 Function onKidsModeChange(msg)
   kidsMode = msg.getData()
   m.isWithDescPortraitSmallExpEnabled = (m.homeScreenDesignType = "withDescriptionPortraitSmall" AND kidsMode = false)
+End Function
+
+
+Function onAnimateToItemChange(msg)
+  tubiLog("CategoryGridList.onAnimateToItemChange")
+  '//::TODO::roku_home_screen_redesign, change this observer to an alias once the roku_home_screen_redesign experiment is fully rolled out.
+  itemToAnimate = msg.getData()
+  if m.isWithDescPortraitSmallExpEnabled = true AND m.featuredRowList.content <> invalid
+    m.featuredRowList.animateToItem = itemToAnimate
+  else
+    m.RowList.animateToItem = itemToAnimate
+  end if
 End Function
 
 

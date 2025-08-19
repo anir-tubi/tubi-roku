@@ -95,7 +95,6 @@ Function mathUtils_min_value_test()
   result = minValue(5, 3)
   m.AssertEqual(result, 3)
   m.AssertTrue(isInt(result))
-
   ' minValue test with integers (reverse order)
   result = minValue(3, 5)
   m.AssertEqual(result, 3)

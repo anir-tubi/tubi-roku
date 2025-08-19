@@ -1282,7 +1282,6 @@ Function getConstants()
   constants.ui.backgroundTypes.skinAd = "skinAd"
   constants.ui.backgroundTypes.adRowlistSpotlight = "adRowlistSpotlight"
   constants.ui.backgroundTypes.adRowlistCarousel = "adRowlistCarousel"
-
   constants.ui.modes = {}
   constants.ui.modes.standard = "standard"
   constants.ui.modes.kids = "kids" 'the "normal" kids mode, when a user selects kids from the side nav
@@ -1453,6 +1452,9 @@ Function getConstants()
   ' Size of guest user continue watching container.
   constants.ui.imageSizes.guestContinueWatchingTile = [1613, 378]
 
+  ' Size of guest user continue watching container.
+  constants.ui.imageSizes.guestContinueWatchingTile = [1613, 378]
+
   ' Size for the background image.
   if limitedUi = true
     constants.ui.imageSizes.background = [399, 225]
@@ -1560,7 +1562,7 @@ Function getConstants()
   ' Holds the container ids which are not video tile containers.
   ' This will help us to avoid showing the expanded video tile.
   ' We will include ads containers in this list in future.
-  constants.ui.nonVideoTileGridItemTypes = [constants.ui.gridItemTypes.historySignedOutUser]
+  constants.ui.nonVideoTileGridItemTypes = [constants.ui.gridItemTypes.historySignedOutUser, constants.ui.gridItemTypes.adRowlistCarousel, constants.ui.gridItemTypes.adRowlistSpotlight]
   constants.ui.videoTilesListTranslation = [24, 144]
 
   constants.ui.uris = {}

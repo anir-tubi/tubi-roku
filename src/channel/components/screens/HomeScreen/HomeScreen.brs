@@ -4,10 +4,21 @@ Function init()
   m._ = rodash()
   m.constants = getConstantsFromGlobal()
   m.Tracking = TubiTrackingInfo(m.constants)
+  experimentInfo = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_3", false)
+  m.isUserInVideoTilesExperiment = isAA(experimentInfo) AND experimentInfo.design_type = "withDescriptionPortraitSmall"
+  m.shouldDimPeekRow = isAA(experimentInfo) AND experimentInfo.should_dim = true
+
   m.PageGroup = m.top.findNode("PageGroup")
   m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]
   m.ContentAreaParent = m.top.findNode("ContentAreaParent")
   m.maskUri = "pkg:/images/poster-mask.png"
+  if m.isUserInVideoTilesExperiment = true
+    if m.shouldDimPeekRow = true
+      m.maskUri = "pkg:/images/poster-mask-75.png"
+    else
+      m.maskUri = ""
+    end if
+  end if
   m.ContentArea = m.top.findNode("ContentArea")
   m.ContentArea.maskUri = m.maskUri
   m.adContentGroup = m.top.findNode("adContentGroup")
@@ -51,7 +62,7 @@ Function init()
   m.CategoryGridList.observeFieldScoped("rowlistTranslation", "onRowlistTranslationChange")
   m.CategoryGridList.observeFieldScoped("gridContentIsReady", "onGridContentIsReadyChange")
   m.CategoryGridList.observeFieldScoped("featuredListHasFocus", "onFeaturedListHasFocusChange")
-  m.CategoryGridList.observeFieldScoped("featuredRowFocusedItem", "fireNavigateWithinPageEvent")
+  m.CategoryGridList.observeFieldScoped("featuredRowFocusedItem", "onFeaturedRowFocusedItemChange")
   m.CategoryGridList.observeFieldScoped("hideInfoPanel", "onHideInfoPanelChange")
   m.CategoryGridList.observeFieldScoped("featuredRowListTranslation", "updateFeaturedRowListTranslation")
   m.ContentAreaParent.observeFieldScoped("translation", "updateFeaturedRowListTranslation")
@@ -83,14 +94,6 @@ Function init()
 
   m.scrollDirection = "none"
 
-
-  experimentInfo = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_3", false)
-  m.isUserInVideoTilesExperiment = isAA(experimentInfo) AND experimentInfo.design_type = "withDescriptionPortraitSmall"
-  m.shouldDimPeekRow = isAA(experimentInfo) AND experimentInfo.should_dim = true
-
-  if m.isUserInVideoTilesExperiment = true AND m.shouldDimPeekRow = true
-    m.ContentArea.maskUri = "pkg:/images/poster-mask-75.png"
-  end if
 End Function
 
 
@@ -129,16 +132,9 @@ Function moveContentAreaMask(nFocusRow = -1, nFocusingPercent = 1)
   featuredRowHeights = m.CategoryGridList.featuredRowHeights
   ' Since we have 2 full rows visible we are setting the mask offset to make sure the first row of the category grid is visible.
   if m.top.lastFocusedList = "featuredRowList" AND isNonEmptyArray(featuredRowHeights) = true
-    if m.shouldDimPeekRow = true
-      ' Where 150 represents the height of the container title component + padding.
-      rowTileComponentHeight = 150
-      nMaskYNew = featuredRowHeights[0] - rowTileComponentHeight
-    else
-      ' Setting mask offset to be outside of view bounds.
-      ' If we decide to graduate non dimmed peek row, then we can remove this.
-      ' TODO: Revisit once we have a decision on the roku_home_screen_redesign experiment.
-      nMaskYNew = 1080
-    end if
+    ' Where 150 represents the height of the container title component + padding.
+    rowTileComponentHeight = 150
+    nMaskYNew = featuredRowHeights[0] - rowTileComponentHeight
   end if
   if nFocusRow >= 0 AND isNonEmptyArray(rowHeights) = true AND (m.top.lastFocusedList = "rowList" OR m.top.lastFocusedList = "")
     nMaxRowHeights = rowHeights.count()
@@ -623,7 +619,6 @@ Function expandContentAreaForAdDisplayCarousel(rowPercent)
     nDiffHeight = m.currentContentAreaTranslation[1] + 302 '//bring this to the top of the screen if the home redesign is enabled
   end if
   m.ContentAreaParent.translation = [m.ContentAreaParent.translation[0], m.currentContentAreaTranslation[1] - (nDiffHeight * rowPercent)]
-
   '//gradually hide the info panel as the adRowlistCarousel comes into view
   stopAnimation(m.infoPanelFade)
   if rowPercent < 0.95
@@ -724,6 +719,41 @@ Function onGridFocusChange() as Void
 
   fireNavigateWithinPageEvent()
 
+End Function
+
+
+Function onFeaturedRowFocusedItemChange(msg) as Void
+  tubiLog("HomeScreen.onFeaturedRowFocusedItemChange")
+  focusedContent = msg.getData()
+
+  '//if the screen is loading or if the grid is not in focus then exit out of this function
+  if m.CategoryGridList.isInFocusChain() = false OR m.top.isLoading = true
+    return
+  end if
+
+  if m.CategoryGridList.isInFocusChain() = true
+    '//if the CategoryGridList is in focus, then alter the UI.
+    if focusedContent <> invalid
+      m.top.contentFocused = focusedContent
+      '//::TODO::JHAND - adRowlist - spotlight, Use MaskGroup to create rounded corners for the 1-Up video
+      '//::TODO::JHAND - adRowlist - spotlight, place video over 1-up image. Is there a way to mask the video so it has rounded corners?
+      if focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
+        m.top.backgroundUriList = determineBackgroundImage(focusedContent)
+      else
+        sType = focusedContent.type
+        if sType = m.constants.ui.contentTypes.adRowlistCarousel
+          '//Display the adRowlistCarousel Component
+          displayAdDisplayCarousel()
+        end if
+      end if
+
+    end if
+
+  end if
+
+
+
+  fireNavigateWithinPageEvent()
 End Function
 
 
@@ -968,6 +998,11 @@ End Function
 Function setFocusOnCategoryGrid()
   tubiLog("Homescreen.setFocusOnCategoryGrid" + m.top.id)
   focusedContent = m.categoryGridList.itemFocused
+  if m.CategoryGridList.lastFocusedList = "featuredRowList"
+    focusedContent = m.categoryGridList.featuredRowFocusedItem
+  else
+    focusedContent = m.categoryGridList.itemFocused
+  end if
   shouldPlaceFocusOnCategoryGridList = true
   if focusedContent <> invalid AND (focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel)
     fadeOutInfoPanel()
@@ -1004,7 +1039,13 @@ Function displayAdDisplayCarousel()
     if m.adRowlistCarouselComponent.content <> invalid AND isNonEmptyArray(m.adRowlistCarouselComponent.content.imageImpTracking) = true
       m.adFocusTimer.control = "start"
     end if
-    m.ContentArea.maskUri = "pkg:/images/poster-mask-ads.png"
+
+    if m.isUserInVideoTilesExperiment = true AND m.shouldDimPeekRow = false
+      m.ContentArea.maskUri = "pkg:/images/poster-mask-ads-no-dim.png"
+    else
+      m.ContentArea.maskUri = "pkg:/images/poster-mask-ads.png"
+    end if
+
     fade(m.adRowlistCarouselComponent, "in", 0.1)
   end if
 End Function
@@ -1048,14 +1089,22 @@ Function onKeyEvent(key, press) as Boolean
       m.top.stopLinearVideoPlayer = true
     else if m.adRowlistCarouselComponent <> invalid AND m.adRowlistCarouselComponent.isInFocusChain() = true
       if key = "down"
-        nCurrentFocusRow = m.CategoryGridList.currFocusRow
+        if m.CategoryGridList.lastFocusedList = "featuredRowList"
+          nCurrentFocusRow = m.CategoryGridList.featuredListCurrFocusRow
+        else
+          nCurrentFocusRow = m.CategoryGridList.currFocusRow
+        end if
         '//Must set the focus before animating to the next item because CategoryGridList may call jumpToItem when focus changes.
         m.CategoryGridList.setFocus(true)
         m.CategoryGridList.animateToItem = nCurrentFocusRow + 1
         hideAdDisplayCarousel()
         return true
       else if key = "up"
-        nCurrentFocusRow = m.CategoryGridList.currFocusRow
+        if m.CategoryGridList.lastFocusedList = "featuredRowList"
+          nCurrentFocusRow = m.CategoryGridList.featuredListCurrFocusRow
+        else
+          nCurrentFocusRow = m.CategoryGridList.currFocusRow
+        end if
         '//Must set the focus before animating to the next item because CategoryGridList may call jumpToItem when focus changes.
         m.CategoryGridList.setFocus(true)
         m.CategoryGridList.animateToItem = nCurrentFocusRow - 1

@@ -229,7 +229,6 @@ Function parseHomeScreenAdsSuccess(fullResponse, reqInfo)
           if adUnit.trackers <> invalid AND isNonEmptyString(adUnit.trackers.imp) = true
             carouselNode.imageImpTracking = adUnit.trackers.imp
           end if
-
           if adUnit.valid_duration <> invalid AND isInt(adUnit.valid_duration) = true
             validUntil = UpTime(0) + adUnit.valid_duration
           else

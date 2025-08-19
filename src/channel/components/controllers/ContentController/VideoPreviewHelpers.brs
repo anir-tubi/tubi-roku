@@ -439,7 +439,6 @@ Function reportAdQuartileIfNeeded(adItem, position, duration)
   adInfo = adItem.adInfoProcessed
 
   if isAA(adInfo) = true AND isNonEmptyArray(adInfo.tracking) = true AND isNumber(position) = true AND isNumber(duration) = true AND position >= 0 AND duration > 0
-
     trackingPixels = adInfo.tracking
 
     for i = 0 to trackingPixels.Count() - 1
@@ -458,11 +457,9 @@ Function reportAdQuartileIfNeeded(adItem, position, duration)
       end if
     end for
 
-
     '//adInfoProcessed is not mutable so we need to assign the modified copy back to adItem.adInfoProcessed so that the changes are saved.
     adItem.adInfoProcessed = adInfo
   end if
-
 End Function
 
 

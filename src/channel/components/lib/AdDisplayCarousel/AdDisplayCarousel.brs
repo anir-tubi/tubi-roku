@@ -22,7 +22,6 @@ Function init()
   setTypographyOfLabel(m.adIndicator, typographyConstants.ids.bodyExtraSmallStrong)
   setTypographyOfLabel(m.title, typographyConstants.ids.bodyMediumStrong)
   m.adIndicator.text = getTranslation("ad")
-
   m.carouselGrid.itemSize = m.constants.ui.imageSizes.adRowlistCarouselThumbnail
   m.carouselGrid.observeFieldScoped("itemFocused", "onItemFocused")
 

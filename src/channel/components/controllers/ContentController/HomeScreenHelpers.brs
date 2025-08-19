@@ -316,6 +316,7 @@ Function fetchHomeScreen(homeScreen, useCache = false)
   ' being set to true.  Then, once true categories reload any time fetchHomeScreen() is
   ' called, such as when signedIn field changes.
   if homeScreen.canLoadCategories = true
+    bSkipCallingAdContent = false
     reqName = m.constants.reqNames.getHomescreen
 
     homeScreen.trackingLoadStartTime = UpTime(0)
@@ -353,7 +354,7 @@ Function fetchHomeScreen(homeScreen, useCache = false)
         createHomescreenAdRequest(homeScreen.id, onHomesceenAdDisplaySuccessResponse, aAdTypes, onHomesceenAdDisplayErrorResponse)
       else
         'If not in experiment, then indicate that the adContentUpdated flag is true so that ads are not waited on when loading homescreen content
-        homeScreen.adContentUpdated = true
+        bSkipCallingAdContent = true
         '//::NOTE::ads_ott_hdc_adformats, this value is hardcoded for the experiment. It is the same value that is hardcoded in HomeScreenParsers.parseHomeScreenAdsSuccess()
         m.homeScreenAdExperimentRowPlacement = 2
       end if
@@ -405,6 +406,11 @@ Function fetchHomeScreen(homeScreen, useCache = false)
     if useCache = false
       homeScreen.resetContentAreaValues = true
       setHomeScreenLoading(homeScreen)
+
+      if bSkipCallingAdContent = true
+        '//::NOTE::ads_ott_hdc_adformats_v1 this is only needed for the experiment. Skip loading of the ad content if it was found in this function that we should skip waiting for ad content
+        homeScreen.adContentUpdated = true
+      end if
     end if
   end if
 End Function
@@ -494,7 +500,6 @@ Function onHomesceenAdDisplaySuccessResponse(response)
     end for
     homeScreen.adContent = response
   end if
-
   homeScreen.adContentUpdated = true
   checkIfHomeScreenContentIsReady(homeScreen)
 End Function
@@ -511,7 +516,6 @@ End Function
 
 Function checkIfHomeScreenContentIsReady(homeScreen)
   sID = homeScreen.id
-
   '//Check if ad content has loaded, but only for the default homescreen type. The other homescreen types do not have ad content. (Note that adContentUpdated will be true even if backend responds that there is no ad content)
   bAdContentLoaded = (sID = m.constants.ui.screenIds.homeScreen AND homeScreen.adContentUpdated = true) OR sID <> m.constants.ui.screenIds.homeScreen
   if bAdContentLoaded = true AND (homeScreen.content <> invalid OR homeScreen.featuredRowContent <> invalid)
@@ -1438,8 +1442,15 @@ End Function
 ' @param msg: roSGNode, the message object.
 Function onFeaturedRowCurrFocusRowChange(msg)
   screen = msg.getRoSGNode()
+  currFocusRow = msg.getData()
+  if currFocusRow <> invalid AND m.homeScreenAdExperimentRowPlacement <> invalid
+    if currFocusRow = m.homeScreenAdExperimentRowPlacement
+      '//Send exposure event for ads_ott_hdc_adformats_v1 experiment when the proper row gains focus (for control and variants)
+      getExperimentResource("ads_ott_hdc_adformats", "ads_ott_hdc_adformats_v1", true)
+    end if
+  end if
+
   if screen.lastFocusedList = "featuredRowList"
-    currFocusRow = msg.getData()
     m.inlineVideoMetadataOverlay.skipAnimation = true
     ' Avoid the focus indicator from being shown when the row is scrolling.
     ' Start fade in when the user is half way through the scroll.
@@ -1717,6 +1728,12 @@ Function onFeaturedRowFocusedItemChange(msg)
     end if
   else
     m.inlineVideoPreviewPlayerContainer.visible = false
+
+    if focusedItem <> invalid AND focusedItem.type = m.constants.ui.contentTypes.adRowlistCarousel AND focusedItem.videoPreviewUrl <> ""
+      ' If the content is adRowlistSpotlight, then set the video preview after a delay
+      m.videoPreviewDebounce.duration = m.constants.player.videoPreviewDelayTimes.adCarousel
+      m.videoPreviewDebounce.control = "start"
+    end if
   end if
   setUIBasedOnFocusedContent(focusedItem)
 End Function

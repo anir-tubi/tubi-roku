@@ -138,7 +138,6 @@ Function onItemContentChange(msg)
         m.adIndicator.translation = [12, 12]
         m.adIndicator.uri = "pkg:/images/tag-rounded-rectangle-background-pull-$$RES$$.9.png"
         typographyConstants = getTypographyConstants()
-
         setTypographyOfLabel(m.adIndicator, typographyConstants.ids.bodyExtraSmallStrong)
         m.adIndicator.text = getTranslation("ad")
 
