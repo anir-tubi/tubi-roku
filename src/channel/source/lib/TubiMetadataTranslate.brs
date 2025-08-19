@@ -781,8 +781,10 @@ Function canHideLeavingSoon(sotChild)
     end for
   end if
 
-  if posterLabels <> invalid AND posterLabels.type = "leaving_soon" AND canHideLeavingSoonLabel = false
-    canHideLeavingSoonLabel = true
+  if isNonEmptyArray(posterLabels) = true AND isAA(posterLabels[0]) = true
+    if posterLabels[0].type = "leaving_soon" AND canHideLeavingSoonLabel = false
+      canHideLeavingSoonLabel = true
+    end if
   end if
 
   return canHideLeavingSoonLabel
