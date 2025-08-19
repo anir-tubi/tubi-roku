@@ -364,6 +364,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, t
     sotCustomization = container.child_ui_customization
   end if
 
+  canHideLeavingSoon = false
   if isAA(sotCustomization) = true AND sotCustomization.count() > 0 AND isAA(m.soTStaticConfig) = true AND m.soTStaticConfig.count() > 0
     'If the current children match any of the children in child_ui_customization, we will retrieve the SOT labels to display.
 
@@ -376,6 +377,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, t
     sotChild = sotCustomization[contentId]
 
     if sotChild <> invalid
+      canHideLeavingSoon = canHideLeavingSoon(sotChild)
       sotInfo = m.getSignalTrustInfo(sotChild, contentFromServer)
     end if
 
@@ -671,7 +673,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, t
   end if
 
   if contentFromServer.is_recurring <> invalid then translatedContent.isRecurring = contentFromServer.is_recurring
-  if contentFromServer.availability_ends <> invalid then translatedContent.availabilityEnds = contentFromServer.availability_ends
+  if contentFromServer.availability_ends <> invalid AND canHideLeavingSoon = false then translatedContent.availabilityEnds = contentFromServer.availability_ends
   if contentFromServer.air_datetime <> invalid then translatedContent.airDateTime = contentFromServer.air_datetime
 
   hasVideoResources = false
@@ -761,6 +763,27 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, t
 
   ' return the total number of children converted
   return count
+End Function
+
+
+'TODO: This function will be removed depends on the leaving_soon graduating or not.
+Function canHideLeavingSoon(sotChild)
+  canHideLeavingSoonLabel = false
+  sotTopLabels = sotChild.metadata_labels
+  posterLabels = sotChild.poster_labels
+
+  for each sotTopLabel in sotTopLabels
+    if sotTopLabel.type = "leaving_soon"
+      canHideLeavingSoonLabel = true
+      exit for
+    end if
+  end for
+
+  if posterLabels.type = "leaving_soon" AND canHideLeavingSoonLabel = false
+    canHideLeavingSoonLabel = true
+  end if
+
+  return canHideLeavingSoonLabel
 End Function
 
 
