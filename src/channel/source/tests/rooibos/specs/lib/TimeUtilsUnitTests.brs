@@ -254,7 +254,6 @@ End Function
 
 
 '@Test convertSecondsToYears unit tests
-'@only
 Function timeUtils_convertSecondsToYears_test()
   dateTime = CreateObject("roDateTime")
   ' Adding 00:00:00Z to the birthday string to make it a valid ISO-8601 string.

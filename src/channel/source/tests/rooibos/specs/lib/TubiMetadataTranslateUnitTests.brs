@@ -5,7 +5,7 @@ Function TubiMetadataTranslateSetup()
   m.constants = getConstants()
   experiments = TubiExperiments({})
   m.translate = TubiMetadataTranslate(m.constants, experiments)
-End function
+End Function
 
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -33,7 +33,7 @@ Function tubiMetadataTranslate_translateRecursive_testTranslateTypes_test()
     dest = CreateObject("roSGNode", "TubiContentNode")
     source.type = contentType
     m.translate.translateRecursive(source, dest)
-    if contentType = "s" or contentType = "a"
+    if contentType = "s" OR contentType = "a"
       m.assertEqual("0" + source.id, dest.id)
     else
       m.assertEqual(source.id, dest.id)
@@ -71,7 +71,7 @@ Function tubiMetadataTranslate_translateRecursive_testParentTypes_test()
     parent.type = contentType
     child = parent.createChild("TubiContentNode")
     m.translate.translateRecursive(source, child)
-    if contentType = m.constants.ui.contentTypes.series or contentType = m.constants.ui.contentTypes.season
+    if contentType = m.constants.ui.contentTypes.series OR contentType = m.constants.ui.contentTypes.season
       m.assertEqual(child.parentId, parent.id)
     else
       m.assertEqual(child.parentId, "")
@@ -234,7 +234,7 @@ Function tubiMetadataTranslate_buildCategoryAAWithInsert_channel_test()
   contents = contentToTranslate.contents
   contentsJson = m.translate.getContentsJson(contentToTranslate, channelJson)
 
-  translated = m.translate.buildCategoryAAWithInsert(container, contents, contentsJson, "", false, "homeScreen", "", false, "standard", false, true)
+  translated = m.translate.buildCategoryAAWithInsert(container, contents, contentsJson, "", false, "homeScreen", "", false, "standard", true, {})
   m.assertNotInvalid(translated)
   m.assertEqual(translated.id, "cbs")
   m.assertTrue(translated.totalCount = 96)
@@ -414,7 +414,7 @@ Function tubiMetadataTranslate_translateEPGPrograms_test()
 
   datetimeObj.FromISO8601String(programInfo.end_time)
   datetimeObj.ToLocalTime()
-  program_endTime= datetimeObj.asSeconds()
+  program_endTime = datetimeObj.asSeconds()
   end_Time = GetAMPMTimeString(datetimeObj, false)
 
   hours_of_airing = start_Time + " - " + end_Time
@@ -447,12 +447,12 @@ Function tubiMetadataTranslate_setDescriptorCodeAndDescription_test()
 
   descriptors = [
     {
-        "code": "L",
-        "description": "Coarse or crude language"
+      "code": "L",
+      "description": "Coarse or crude language"
     },
     {
-        "code": "V",
-        "description": "Violence"
+      "code": "V",
+      "description": "Violence"
     }
   ]
   content = CreateObject("roSGNode", "TubiContentNode")

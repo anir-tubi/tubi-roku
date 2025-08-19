@@ -6,6 +6,7 @@
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
@@ -33,8 +34,9 @@
       id="progressBarGroup">
       <Label
         id="timeLeftLabel"
-        translation="[18, 27]"
-        vertAlign="bottom" >
+        height="33"
+        translation="[18, 18]"
+        vertAlign="center" >
         <Font
           role="font" />
       </Label>

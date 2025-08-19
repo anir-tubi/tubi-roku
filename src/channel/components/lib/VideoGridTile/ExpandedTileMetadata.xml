@@ -5,6 +5,7 @@
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
@@ -62,7 +63,7 @@
           <Poster
             id="RatingBackground"
             height="30"
-            uri="pkg:/images/rating_background_video_tile.png"
+            uri="pkg:/images/rating_background_video_tile_$$RES$$.9.png"
             loadDisplayMode="scaleToFit"
             loadSync="true"/>
           <Label

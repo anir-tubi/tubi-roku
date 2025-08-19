@@ -2,6 +2,8 @@
 
 '@Setup
 Function MathUtilsSetup()
+  ' Ensure translations are available for functions that rely on getTranslation
+  initTranslations()
 End Function
 
 
@@ -40,6 +42,38 @@ Function mathUtils_round_test()
 
 End Function
 
+
+'@Test convertSecondsToTimeLeftString unit tests
+Function mathUtils_convert_seconds_to_time_left_string_test()
+
+  ' under a minute → rounds up to 1 minute
+  result = convertSecondsToTimeLeftString(0)
+  m.AssertEqual(result, "1m left")
+
+  result = convertSecondsToTimeLeftString(59)
+  m.AssertEqual(result, "1m left")
+
+  ' exactly 1 minute → returns 2m left per current logic (+1 minute rule)
+  result = convertSecondsToTimeLeftString(60)
+  m.AssertEqual(result, "2m left")
+
+  ' 59m 59s → 60m left (no hours)
+  result = convertSecondsToTimeLeftString(3599)
+  m.AssertEqual(result, "60m left")
+
+  ' 1h 0m → "1h 1m left" (+1 minute rule)
+  result = convertSecondsToTimeLeftString(3600)
+  m.AssertEqual(result, "1h 1m left")
+
+  ' 1h 1m → "1h 2m left"
+  result = convertSecondsToTimeLeftString(3660)
+  m.AssertEqual(result, "1h 2m left")
+
+  ' 2h 2m → "2h 3m left"
+  result = convertSecondsToTimeLeftString(7320)
+  m.AssertEqual(result, "2h 3m left")
+
+End Function
 
 '@Test maxValue unit tests
 Function mathUtils_max_value_test()
@@ -203,5 +237,42 @@ Function mathUtils_round_down_test()
   ' roundDown value test with value [3.5]
   roundedPosition = roundDown([3.5])
   m.AssertEqual(roundedPosition, 0)
+
+End Function
+
+
+'@Test ensureDivisibleBy3 unit tests
+Function mathUtils_ensure_divisible_by_3_test()
+
+  ' zero stays zero
+  result = ensureDivisibleBy3(0)
+  m.AssertEqual(result, 0)
+
+  ' already divisible by 3
+  result = ensureDivisibleBy3(3)
+  m.AssertEqual(result, 3)
+
+  result = ensureDivisibleBy3(6)
+  m.AssertEqual(result, 6)
+
+  result = ensureDivisibleBy3(99)
+  m.AssertEqual(result, 99)
+
+  ' round up to next multiple
+  result = ensureDivisibleBy3(1)
+  m.AssertEqual(result, 3)
+
+  result = ensureDivisibleBy3(2)
+  m.AssertEqual(result, 3)
+
+  result = ensureDivisibleBy3(4)
+  m.AssertEqual(result, 6)
+
+  result = ensureDivisibleBy3(100)
+  m.AssertEqual(result, 102)
+
+  ' negative input returns 0 safeguard
+  result = ensureDivisibleBy3(-1)
+  m.AssertEqual(result, 0)
 
 End Function

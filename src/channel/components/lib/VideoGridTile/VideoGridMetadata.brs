@@ -54,7 +54,8 @@ Function onThemeChange(msg = invalid)
     m.lineOneData.color = theme.primaryTextColor
     m.RatingLabel.color = theme.primaryTextColor
     m.focused2Color = theme.focused2Color
-    m.blueBadgeColor = theme.bluebadgecolor
+    m.blueBadgeColor = theme.blueBadgeColor
+    m.ratingBackground.blendColor = theme.tertiaryTextColor
   end if
 End Function
 
@@ -108,39 +109,39 @@ Function onItemContentChange(msg)
   if itemContent <> invalid
     m.title.visible = false
     m.title.lineSpacing = 0
-  
+
     if itemContent.type = m.constants.ui.contentTypes.linear
-      setThumbnailImage(itemContent.thumbnailUri,  itemContent.type)
+      setThumbnailImage(itemContent.thumbnailUri, itemContent.type)
       currentProgram = getCurrentLiveProgram(itemContent)
-  
+
       if currentProgram <> invalid
-  
+
         if currentProgram.live = true
           setBadge(m.badgeTypes.live)
         else
           setBadge(m.badgeTypes.onNow)
         end if
-  
+
         metadataOnLivePosterContent(currentProgram, itemContent)
       else
         setBadge(m.badgeTypes.onNow)
         metadataOnPosterContent(itemContent)
       end if
-  
+
     else
       'Remove thumbnail image and badge we showed for live
       if m.logoBackground.getParent() <> invalid
         m.top.removeChild(m.logoBackground)
       end if
-  
+
       badgePresent = (m.badge <> invalid AND m.badge.getParent() <> invalid)
       if badgePresent = true
         m.top.removeChild(m.badge)
       end if
-  
+
       metadataOnPosterContent(itemContent)
     end if
-  
+
     adjustMetadataGroupTranslation()
   end if
 End Function
@@ -182,7 +183,7 @@ Function metadataOnPosterContent(itemContent)
     if seasons = 1
       text += getTranslation("metadata_seasons_singular")
     else
-      text += getTranslation("metadata_seasons_plural", {seasons: seasons.toStr()})
+      text += getTranslation("metadata_seasons_plural", { seasons: seasons.toStr() })
     end if
   else if length <> invalid AND length <> 0
     if text.len() > 0
@@ -200,7 +201,7 @@ Function metadataOnPosterContent(itemContent)
       arr = lengthString.split("min")
       firstSubString = arr[0].trim() + "m"
     end if
-    
+
     if isNonEmptyArray(secondSubString) = true
       finalString = firstSubString[0].trim() + "h" + " " + secondSubString[0].trim() + "m"
     else
@@ -292,7 +293,7 @@ Function metadataOnLivePosterContent(currentProgram, content)
     end if
     m.episode.text = currentProgram.epgProgramTitle
   else if episodePresent = true
-      m.offset.removeChild(m.episode)
+    m.offset.removeChild(m.episode)
   end if
 
   setTitle(content.titleImageUri)
@@ -336,7 +337,7 @@ End Function
 
 'helper function which returns the time left in the format 'x hour and y mins left' if timeleft is more than an hour
 ' else it retuns 'y mins left'
-Function getDurationHoursString(seconds As Integer) As String
+Function getDurationHoursString(seconds as Integer) as String
   retVal = ""
 
   if seconds <> invalid
@@ -344,9 +345,9 @@ Function getDurationHoursString(seconds As Integer) As String
     minValue = StrI((Int(seconds / 60) mod 60) + 1) 'increase the min by one so that we dont show 0 min
 
     if hourValue > 0
-      retVal =  getTranslation("h_m_left", {"hour": StrI(hourValue), "minutes": minValue})
+      retVal = getTranslation("h_m_left", { "hour": StrI(hourValue), "minutes": minValue })
     else
-      retVal = getTranslation("m_left", {"minutes": minValue})
+      retVal = getTranslation("m_left", { "minutes": minValue })
     end if
   end if
 

@@ -51,6 +51,7 @@ Function onThemeChange(msg = invalid)
     m.progressBar.focusColor = theme.focusedColor
     m.progressBar.trackColor = theme.neutralColor
     m.progressBar.unfocusColor = theme.focusedColor
+    m.ratingBackground.blendColor = theme.tertiaryTextColor
   end if
 End Function
 
@@ -204,8 +205,8 @@ Function metadataOnPosterContent(itemContent)
 
     m.ratingLabel.width = 0
     m.ratingLabel.text = UCase(itemContent.ratings[0].value)
-
     nRatingBoundingBoxIncrease = m.ratingLabel.boundingRect().width + 24
+    nRatingBoundingBoxIncrease = ensureDivisibleBy3(nRatingBoundingBoxIncrease)
     m.ratingBackground.width = nRatingBoundingBoxIncrease
     m.ratingLabel.width = nRatingBoundingBoxIncrease
   else
@@ -264,7 +265,7 @@ Function metadataOnContinueWatchingContent(itemContent)
 
     if m.progressBarGroup.getParent() = invalid
       index = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.lineOneData)
-      timeLeft = getDurationHoursString(duration - nowPos)
+      timeLeft = convertSecondsToTimeLeftString(duration - nowPos)
       if isNonEmptyString(timeLeft) = true
         m.lineTwoData.text = timeLeft
         m.firstLineGroup.insertChild(m.lineTwoData, index + 1)
@@ -337,7 +338,7 @@ Function calculateProgramTimeLeft(program) as String
 
   if isInt(program.endTime) = true AND program.endTime > now
     timeLeft = program.endTime - now
-    retVal = getDurationHoursString(timeLeft)
+    retVal = convertSecondsToTimeLeftString(timeLeft)
   end if
 
   return retVal
@@ -350,26 +351,6 @@ Function calculateProgramTime(program) as String
   if isInt(program.endTime) = true AND isInt(program.startTime) = true
     duration = program.endTime - program.startTime
     retVal = convertSecondsToHoursString(duration)
-  end if
-
-  return retVal
-End Function
-
-
-'helper function which returns the time left in the format 'x hour and y mins left' if time left is more than an hour
-' else it returns 'y mins left'
-Function getDurationHoursString(seconds as Integer) as String
-  retVal = ""
-
-  if seconds <> invalid
-    hourValue = Int(seconds / 3600)
-    minValue = StrI((Int(seconds / 60) mod 60) + 1) 'increase the min by one so that we dont show 0 min
-
-    if hourValue > 0
-      retVal = getTranslation("h_m_left", { "hour": StrI(hourValue), "minutes": minValue })
-    else
-      retVal = getTranslation("m_left", { "minutes": minValue })
-    end if
   end if
 
   return retVal

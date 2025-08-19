@@ -1553,7 +1553,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
   childrenReturn = CreateObject("roArray", 0, false)
   childrenContentIDs = {}
   totalDuplicates = 0
-  if requestContext.childrenContentIDs <> invalid AND requestContext.totalDuplicates <> invalid
+  if isAA(requestContext) AND requestContext.childrenContentIDs <> invalid AND requestContext.totalDuplicates <> invalid
     childrenContentIDs = requestContext.childrenContentIDs
     totalDuplicates = requestContext.totalDuplicates
   end if

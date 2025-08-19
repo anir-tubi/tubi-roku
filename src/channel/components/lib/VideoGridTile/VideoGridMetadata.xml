@@ -91,7 +91,7 @@
             <Poster
               id="RatingBackground"
               height="30"
-              uri="pkg:/images/rating_background_video_tile.png"
+              uri="pkg:/images/rating_background_video_tile_$$RES$$.9.png"
               loadDisplayMode="scaleToFit"
               loadSync="true"/>
             <Label

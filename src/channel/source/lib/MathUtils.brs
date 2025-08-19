@@ -113,3 +113,37 @@ Function maxVal(a as Dynamic, b as Dynamic) as Dynamic
     return b
   end if
 End Function
+
+
+' Returns the same width if already divisible by 3,
+' otherwise rounds up to the next multiple of 3.
+Function ensureDivisibleBy3(width as Integer) as Integer
+  if width < 0 then return 0
+  remainder = width mod 3
+  if remainder = 0 then
+    return width
+  else
+    return width + (3 - remainder)
+  end if
+End Function
+
+
+' Converts seconds to time left string.
+' @seconds: Integer, the seconds to convert
+' @returns: String, the time left string
+Function convertSecondsToTimeLeftString(seconds as Integer) as String
+  formattedString = ""
+
+  if seconds <> invalid
+    hourValue = Int(seconds / 3600)
+    minValue = ((Int(seconds / 60) mod 60) + 1).toStr()
+
+    if hourValue > 0
+      formattedString = getTranslation("h_m_left", { "hour": hourValue.toStr(), "minutes": minValue })
+    else
+      formattedString = getTranslation("m_left", { "minutes": minValue })
+    end if
+  end if
+
+  return formattedString
+End Function

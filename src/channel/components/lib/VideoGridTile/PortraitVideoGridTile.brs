@@ -8,7 +8,7 @@ Function init()
   topRef.observeFieldScoped("height", "onHeightChange")
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.timeLeftLabel, typographyConstants.ids.bodyExtraSmall)
+  setTypographyOfLabel(m.timeLeftLabel, typographyConstants.ids.bodySmall)
 
   m.top.observeFieldScoped("itemContent", "onItemContentChange")
   if m.global <> invalid
@@ -111,7 +111,7 @@ Function drawHistoryProgressBar()
   if nowPos > 0 AND isNumber(duration) = true AND duration > 0
     percentage = nowPos / duration
     m.progressBar.progress = (percentage * 100)
-    m.timeLeftLabel.text = getDurationHoursString(duration - nowPos)
+    m.timeLeftLabel.text = convertSecondsToTimeLeftString(duration - nowPos)
     m.progressBarGroup.visible = true
     m.gradient.visible = true
   end if
@@ -131,26 +131,7 @@ End Function
 
 Function onHeightChange(msg)
   height = msg.getData()
-  m.progressBarGroup.translation = [0, (height - 76)]
-End Function
-
-
-' helper function which returns the time left in the format 'x hour and y mins left' if time left is more than an hour.
-Function getDurationHoursString(seconds as Integer) as String
-  formattedString = ""
-
-  if seconds <> invalid
-    hourValue = Int(seconds / 3600)
-    minValue = StrI((Int(seconds / 60) mod 60) + 1) 'increase the min by one so that we don't show 0 min
-
-    if hourValue > 0
-      formattedString = getTranslation("h_m_left", { "hour": StrI(hourValue), "minutes": minValue })
-    else
-      formattedString = getTranslation("m_left", { "minutes": minValue })
-    end if
-  end if
-
-  return formattedString
+  m.progressBarGroup.translation = [0, (height - 78)]
 End Function
 
 
@@ -159,7 +140,7 @@ Function calculateProgramTime(program) as String
   now = getCurrentLocalTime()
   if isInt(program.endTime) AND program.endTime > now
     duration = program.endTime - now
-    programTimeString = getDurationHoursString(duration)
+    programTimeString = convertSecondsToTimeLeftString(duration)
   end if
 
   return programTimeString
