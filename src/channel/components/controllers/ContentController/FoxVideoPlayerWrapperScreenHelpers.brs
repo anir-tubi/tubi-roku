@@ -195,26 +195,16 @@ Function getFoxVideoPlayerConfig()
     },
     "ads": {
       "raf": {
-        "disableAdMeasurements": false
+        "disableAdMeasurements": true
       }
       "yospace": {
-        "devices": [
-          "3810X",
-          "*"
-        ],
-        "playheadManipulation": {
-          "disabled": true,
-          "dvrWindowSize": 3600,
-          "dvrSeekTime": 15,
-          "DVRControls": {
-            "disabled": true
-          }
-        },
-        "sdkDisabled": false
+        "sdkDisabled": true
       }
     },
     "api": {
       "content": {
+        "@note": "Currently pointed at QA Tomato APIs for development.",
+        "appConfig": "{foxApiRoot}/v2.0/appconfigs/foxsports-config",
         "categories": "{foxApiRoot}/v2.0/categories",
         "categoryDetail": "{foxApiRoot}/v2.0/categories/{customId}",
         "deeplinkPlayback": "{foxApiRoot}/v2.0/video?uID={contentId}",
