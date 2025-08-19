@@ -772,14 +772,16 @@ Function canHideLeavingSoon(sotChild)
   sotTopLabels = sotChild.metadata_labels
   posterLabels = sotChild.poster_labels
 
-  for each sotTopLabel in sotTopLabels
-    if sotTopLabel.type = "leaving_soon"
-      canHideLeavingSoonLabel = true
-      exit for
-    end if
-  end for
+  if isNonEmptyArray(sotTopLabels) = true
+    for each sotTopLabel in sotTopLabels
+      if sotTopLabel <> invalid AND sotTopLabel.type = "leaving_soon"
+        canHideLeavingSoonLabel = true
+        exit for
+      end if
+    end for
+  end if
 
-  if posterLabels.type = "leaving_soon" AND canHideLeavingSoonLabel = false
+  if posterLabels <> invalid AND posterLabels.type = "leaving_soon" AND canHideLeavingSoonLabel = false
     canHideLeavingSoonLabel = true
   end if
 
