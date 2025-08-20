@@ -368,9 +368,22 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
       end if
     end if
 
-    if content.availabilityEnds <> invalid AND content.availabilityEnds <> ""
+    'Removie this code once the leaving soon is graduated.
+    canShowLeavingSoon = true
+    if isNonEmptyArray(detailScreen.sotTopLabelSignals) = true
+      for each sotTopSignal in detailScreen.sotTopLabelSignals
+        if isAA(sotTopSignal) = true AND sotTopSignal.count() > 0
+          if isString(sotTopSignal.sotlabeltext) = true AND sotTopSignal.sotlabeltext.trim() <> "" AND sotTopSignal.sotlabeltext.trim().Right(4) = "left"
+            canShowLeavingSoon = false
+            exit for
+          end if
+        end if
+      end for
+    end if
+
+    if content.availabilityEnds <> invalid AND content.availabilityEnds <> "" AND canShowLeavingSoon = true
       lineOneData.availabilityEnds = content.availabilityEnds
-    else if episode <> invalid AND episode.availabilityEnds <> invalid
+    else if episode <> invalid AND episode.availabilityEnds <> invalid AND canShowLeavingSoon = true
       lineOneData.availabilityEnds = episode.availabilityEnds
     end if
 
