@@ -573,15 +573,6 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     homeScreen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
 
     if isKidsUIOn() = false AND screenID = m.constants.ui.screenIds.homeScreen
-      ' Below logic is for the control reorder containers experiment.
-      ' For now we are using for swapping featured row and recommended row.
-      experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_3", true)
-      if (experiment <> invalid AND (experiment.design_type = "withDescriptionPortraitSmall" OR experiment.design_type = "controlReOrderContainers")) AND isNonEmptyString(experiment.container_id) AND experiment.container_id <> "none"
-        containerToBeReOrdered = m.nodeHelpers.getChildById(rawResponse, experiment.container_id)
-        rawResponse.removeChild(containerToBeReOrdered)
-        rawResponse.insertChild(containerToBeReOrdered, 0)
-      end if
-
       if m.isUserInVideoTilesExperiment = true AND isNode(rawResponse) = true AND rawResponse.getChildCount() > 0
         ' Only show the video tile overlay group if the screen is the home screen and the skin ads are not available.
         ' This is needed because we refresh home screen behind the scenes during parent controls change.
@@ -1529,7 +1520,7 @@ End Function
 Function updateVideoTileOnFocusChange(rowFocused, columnFocused, screen)
   ' Only process if the screen is the home screen.
   ' Since all others screens are using topRight background variant vs home screen will use full screen background.
-  ' TODO: If we graduate roku_home_screen_redesign_v_1_3 we should migrate the skin ad to be a itemComponent of FeaturedRowList so that we don't have to add these one off checks.
+  ' TODO: If we graduate roku_home_screen_redesign_v_1_4 we should migrate the skin ad to be a itemComponent of FeaturedRowList so that we don't have to add these one off checks.
   if isCurrentScreenHomeScreen() = true AND screen.lastFocusedList <> "skinAdRow"
     displayDefaultBackground()
   end if

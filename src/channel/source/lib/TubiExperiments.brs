@@ -81,7 +81,7 @@ Function TubiExperiments(experimentsInfo) as Object
 
       'This experiment will not be under holdout and will clean up once we take the decision.
       roku_home_screen_redesign: {
-        roku_home_screen_redesign_v_1_3: {
+        roku_home_screen_redesign_v_1_4: {
           ' Possible values for design_type are "withDescriptionPortraitSmall", "controlReOrderContainers",  "none"
           ' Possible values for container_id are "featured" or any other tensor container id
           ' Possible values for gridItemSize are [310, 442] or [252, 360]
