@@ -573,6 +573,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     homeScreen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
 
     if isKidsUIOn() = false AND screenID = m.constants.ui.screenIds.homeScreen
+      getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_4", true)
       if m.isUserInVideoTilesExperiment = true AND isNode(rawResponse) = true AND rawResponse.getChildCount() > 0
         ' Only show the video tile overlay group if the screen is the home screen and the skin ads are not available.
         ' This is needed because we refresh home screen behind the scenes during parent controls change.
