@@ -266,11 +266,7 @@ Function tubiAds_getRainmakerParams(content, breakPos = 0)
     params["spon_exp"] = content.videoSponsorExposureId
   end if
 
-  isCdc = false
-  if content.isCdc <> invalid
-    isCdc = content.isCdc
-  end if
-  if m.constants.deviceInfo.deviceAdId <> invalid AND (isCdc = false OR m.isAdultParentalLevel = true)
+  if m.constants.deviceInfo.deviceAdId <> invalid
     params["adv_id"] = m.constants.deviceInfo.deviceAdId
   end if
 
