@@ -79,7 +79,7 @@ Function onItemContentChange(msg)
       if m.subtitle.getParent() <> invalid
         m.titleGroup.removeChild(m.subtitle)
       end if
-      setTitle(itemContent.title, itemContent.titleImageUri)
+      setTitle(itemContent.title, itemContent.titleImageUrl)
     end if
   end if
 End Function

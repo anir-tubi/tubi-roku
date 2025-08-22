@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="EnhancedButton" extends="Group">
+
+  <script type="text/brightscript" uri="EnhancedButton.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+    <field id="width" type="float" alias="buttonBackground.width,buttonBackgroundFocused.width" />
+    <field id="height" type="float" alias="buttonBackground.height,buttonBackgroundFocused.height" />
+    <field id="focusPercent" type="float" />
+    <field id="itemContent" type="node" />
+    <field id="itemHasFocus" type="boolean" />
+    <field id="gridHasFocus" type="boolean" />
+
+    <!-- OUTPUTS -->
+    <!-- Helps us with width calculation when we want to use with ArrayGrid -->
+    <field id="calculatedTextWidth" type="integer" />
+    <field id="wasSelected" type="boolean" alwaysNotify="true" />
+  </interface>
+
+  <children>
+    <Poster
+      id="buttonBackground"
+      uri="pkg:/images/pill_button_$$RES$$.9.png" />
+
+    <Poster
+      opacity="0"
+      id="buttonBackgroundFocused" />
+
+    <LayoutGroup
+      id="elementsGroup"
+      layoutDirection="horiz"
+      vertAlignment="center"
+      itemSpacings="[12]">
+
+      <Group
+        id="iconGroup">
+        <Poster
+          id="icon"
+          height="36"
+          width="36" />
+
+        <Poster
+          opacity="0"
+          id="iconFocused"
+          height="36"
+          width="36" />
+      </Group>
+
+      <Group
+        id="labelGroup">
+        <Label
+          id="label">
+          <Font
+            role="font" />
+        </Label>
+
+        <Label
+          opacity="0"
+          id="labelFocused">
+          <Font
+            role="font" />
+        </Label>
+      </Group>
+
+      <Group
+        id="badgeGroup">
+        <Group
+          id="badge"
+          opacity="0">
+          <Poster
+            id="badgeBackground"
+            uri="pkg:/images/badge_$$RES$$.9.png"
+            height="40" />
+          <Label
+            vertAlign="center"
+            height="40"
+            id="badgeText">
+            <Font
+              role="font" />
+          </Label>
+        </Group>
+
+        <Group
+          id="badgeFocused"
+          opacity="0">
+          <Poster
+            id="badgeBackgroundFocused"
+            uri="pkg:/images/badge_$$RES$$.9.png"
+            height="40" />
+          <Label
+            vertAlign="center"
+            height="40"
+            id="badgeTextFocused">
+            <Font
+              role="font" />
+          </Label>
+        </Group>
+      </Group>
+    </LayoutGroup>
+  </children>
+</component>

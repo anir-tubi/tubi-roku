@@ -25,6 +25,7 @@ Function init()
   m.featuredRowList.observeFieldScoped("currFocusColumn", "onFeaturedRowCurrFocusColumnChange")
   m.featuredRowList.observeFieldScoped("currFocusRow", "onFeaturedListCurrFocusRowChange")
   m.featuredRowList.observeFieldScoped("vertFocusDirection", "onVertFocusDirectionChange")
+  m.top.observeFieldScoped("featuredRowContent", "onFeaturedRowContentChange")
 
   experimentsInfo = getExperimentsInfoFromGlobal()
   experiments = TubiExperiments(experimentsInfo)
@@ -93,6 +94,19 @@ Function onThemeChange(msg = invalid)
     m.RowList.focusBitmapBlendColor = theme.focusedColor
     m.FeaturedRowList.focusBitmapBlendColor = theme.focusedColor
   end if
+End Function
+
+
+Function onFeaturedRowContentChange(msg)
+  m.featuredRowList.update({
+    parentScreenId: m.top.parentScreenId
+    parentScreenTrackingPageInfo: m.top.parentScreenTrackingPageInfo
+    personalizationId: m.top.personalizationId
+    shouldTrackViewableImpressionEvent: m.top.shouldTrackViewableImpressionEvent
+    rowIndexBoost: 0
+  }, true)
+
+  m.featuredRowList.content = msg.getData()
 End Function
 
 
@@ -356,14 +370,6 @@ Function onContentChange()
     rowIndexBoost: 0
   }, true)
 
-  m.FeaturedRowList.update({
-    parentScreenId: m.top.parentScreenId
-    parentScreenTrackingPageInfo: m.top.parentScreenTrackingPageInfo
-    personalizationId: m.top.personalizationId
-    shouldTrackViewableImpressionEvent: m.top.shouldTrackViewableImpressionEvent
-    rowIndexBoost: 0
-  }, true)
-
   ' Below is to add animation of slide down of the row list for the first time when screen is loaded.
   if m.top.featuredRowContent <> invalid AND isSkinAdsAvailable() = false AND m.isWithDescPortraitSmallExpEnabled = true AND m.top.lastFocusedList <> "rowList"
     slideTo(m.RowList, [m.rowListPosition[0], m.rowListPosition[1]], 0.3, 0.3)
@@ -494,6 +500,8 @@ Function setRowHeights()
   posterSize = imageSizes.largePoster
   landscapeSize = imageSizes.largeLandscape
   featuredRowPoster = imageSizes.featuredRowPoster
+  liveEventsContainerSize = imageSizes.liveEventsContainer
+  bannerSize = imageSizes.banner
   showRowLabel = []
 
   for i = 0 to m.top.content.getChildCount() - 1
@@ -503,7 +511,13 @@ Function setRowHeights()
     gridItemType = category.gridItemType
     gridItemTypes = m.constants.ui.gridItemTypes
 
-    if gridItemType = gridItemTypes.historySignedOutUser
+    if gridItemType = gridItemTypes.liveEventSpotlight
+      rowItemSize.push(liveEventsContainerSize)
+      rowHeight = liveEventsContainerSize[1]
+    else if gridItemType = gridItemTypes.liveEventBanner
+      rowItemSize.push(bannerSize)
+      rowHeight = bannerSize[1]
+    else if gridItemType = gridItemTypes.historySignedOutUser
       posterHeight = posterSize[1]
       rowItemSize.push([1693, posterHeight])
       rowHeight = posterHeight
@@ -554,14 +568,8 @@ Function setRowHeights()
       rowItemSpacings.push([15, 0])
       focusXOffsets.push(0)
     end if
-
-    if gridItemType = gridItemTypes.banner
-      showRowLabel.push(false)
-      ' Just adding the spacing and not the row header component height.
-      rowHeightAdjustment = 18
-    else
-      showRowLabel.push(true)
-    end if
+    shouldDisplayHeader = arrayIncludes(m.constants.ui.noHeaderGridTypes, category.gridItemType) = false
+    showRowLabel.push(shouldDisplayHeader)
 
     if category.sponsorImages <> invalid
       '//if this is a sponsored row, then adjust the spacing so row includes the header size of the sponsored row
@@ -588,7 +596,10 @@ End Function
 
 
 Function setFeaturedRowHeights()
-  guestCWPosterSize = m.constants.ui.imageSizes.guestContinueWatchingTile
+  imageSizes = m.constants.ui.imageSizes
+  guestCWPosterSize = imageSizes.guestContinueWatchingTile
+  liveEventsContainerSize = imageSizes.liveEventsContainer
+  bannerSize = imageSizes.banner
 
   gridItemTypes = m.constants.ui.gridItemTypes
   featuredRowContent = m.top.featuredRowContent
@@ -596,6 +607,7 @@ Function setFeaturedRowHeights()
   if isNode(featuredRowContent) = true
     heights = []
     rowItemSize = []
+    showRowLabel = []
     for i = 0 to featuredRowContent.getChildCount() - 1
       category = featuredRowContent.getChild(i)
       gridItemType = category.gridItemType
@@ -607,7 +619,16 @@ Function setFeaturedRowHeights()
         featuredRowHeight = featuredRowHeight + 32
       end if
 
-      if gridItemType = gridItemTypes.historySignedOutUser
+      shouldDisplayHeader = arrayIncludes(m.constants.ui.noHeaderGridTypes, category.gridItemType) = false
+      showRowLabel.push(shouldDisplayHeader)
+
+      if gridItemType = gridItemTypes.liveEventSpotlight
+        rowItemSize.push(liveEventsContainerSize)
+        heights.push(liveEventsContainerSize[1])
+      else if gridItemType = gridItemTypes.liveEventBanner
+        rowItemSize.push(bannerSize)
+        heights.push(bannerSize[1])
+      else if gridItemType = gridItemTypes.historySignedOutUser
         rowItemSize.push(guestCWPosterSize)
         ' 80 is the padding below the poster.
         heights.push(guestCWPosterSize[1] + 80)
@@ -622,15 +643,18 @@ Function setFeaturedRowHeights()
     end for
 
     m.FeaturedRowList.update({
-      "showRowLabel": [true]
+      "showRowLabel": showRowLabel
       "rowItemSize": rowItemSize
       "rowHeights": heights
       "focusXOffset": [0]
     })
 
-    m.FeaturedRowList.content = m.top.featuredRowContent
     if m.top.featuredRowFocusedItem = invalid AND m.skinAdRow.content = invalid
-      m.featuredRowList.focusXOffset = [m.expandedTileFocusXOffset, 0]
+      if arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, featuredRowContent.getChild(0).gridItemType) = true
+        m.featuredRowList.focusXOffset = [0, 0]
+      else
+        m.featuredRowList.focusXOffset = [m.expandedTileFocusXOffset, 0]
+      end if
       m.FeaturedRowList.rowItemFocused = [0, 0]
       if m.isWithDescPortraitSmallExpEnabled = true
         m.top.lastFocusedList = "featuredRowList"
@@ -663,6 +687,18 @@ Function resolveAbbreviatedContent(content, rowItemIndex)
 
     if isNonEmptyString(contentId) = true
       singleContent = m.metadataTranslate.getContentFromCategoryJson(category, contentId, m.top.signedIn) ' can return invalid
+      ' Adding additional temporary field to the content to handle the actionId for the live events.
+      if isNonEmptyString(itemContent.actionId) = true
+        singleContent.update({
+          actionId: itemContent.actionId
+        }, true)
+      end if
+      ' Since we are refreshing the tensor data from schedule endpoint we need to use node info rather than from category json
+      if isAA(itemContent.scheduleData)
+        singleContent.update({
+          scheduleData: itemContent.scheduleData
+        }, true)
+      end if
       return singleContent
     end if
   end if
@@ -1152,13 +1188,12 @@ Function updateFocusXOffset(currFocusRow, isInTransit = false)
   focusXOffsets = m.featuredRowList.focusXOffset
   if isNode(featuredRowContent) = true AND isNonEmptyArray(focusXOffsets) = true
     focusXOffset = []
-    gridItemTypes = m.constants.ui.gridItemTypes
+    nonVideoTileGridItemTypes = m.constants.ui.nonVideoTileGridItemTypes
 
     for i = 0 to featuredRowContent.getChildCount() - 1
       category = featuredRowContent.getChild(i)
       gridItemType = category.gridItemType
-
-      if (i = currFocusRow OR (isInTransit = true AND i = currFocusRow + 1)) AND gridItemType <> gridItemTypes.historySignedOutUser AND gridItemType <> gridItemTypes.adRowlistSpotlight AND gridItemType <> gridItemTypes.adRowlistCarousel
+      if (i = currFocusRow OR (isInTransit = true AND i = currFocusRow + 1)) AND arrayIncludes(nonVideoTileGridItemTypes, gridItemType) = false
         focusXOffset.push(m.expandedTileFocusXOffset)
       else
         focusXOffset.push(0)

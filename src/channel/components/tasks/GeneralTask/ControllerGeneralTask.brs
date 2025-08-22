@@ -220,12 +220,6 @@ Function registerParsingCallbacks()
     parseError: parseGenericError
   }
 
-  'queue bookmarks
-  m.requestTypes[m.constants.reqNames.postToQueue] = {
-    parseSuccess: parseAddToQueueSuccess
-    parseError: parseAddToQueueError
-  }
-
   ' gets the list of user/device level server persistent data.
   m.requestTypes[m.constants.reqNames.getServerPersistentData] = {
     parseSuccess: parseGetServerPersistentData
@@ -279,6 +273,11 @@ Function registerParsingCallbacks()
 
   m.requestTypes[m.constants.reqNames.getSoTStaticConfig] = {
     parseSuccess: parseSoTStaticConfigSuccess
+    parseError: parseGenericError
+  }
+
+  m.requestTypes[m.constants.reqNames.getEpgListing] = {
+    parseSuccess: parseEpgListingSuccess
     parseError: parseGenericError
   }
 End Function

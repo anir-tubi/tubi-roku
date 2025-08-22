@@ -1,0 +1,52 @@
+<component name="RelatedContentContainer" extends="Group">
+  <script type="text/brightscript" uri="RelatedContentContainer.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+    <field id="content" type="node" alias="grid.content" />
+    <field id="contentUpdated" type="boolean" alwaysNotify="true" />
+    <field id="shouldTrackViewableImpressionEvent" type="boolean" value="true" />
+    <field id="parentScreenId" type="string" />
+    <field id="parentScreenTrackingPageInfo" type="assocarray" />
+    <field id="personalizationId" type="string" />
+    <field id="trackingPageInfo" type="assocarray" />
+
+    <!-- OUTPUTS -->
+    <field id="navigateWithinPageInfo" type="assocarray" />
+    <field id="trackingComponentInfo" type="assocarray" />
+    <field id="selectedContent" type="node" alwaysNotify="true" />
+  </interface>
+
+  <children>
+    <CategoryGridRowLabel
+      id="header"
+      visible="false" />
+    <MarkupGrid
+      id="grid"
+      itemComponentName="StarterGridItem"
+      numRows="1"
+      itemSpacing="[16,16]"
+      fadeFocusFeedbackWhenAutoScrolling="true"
+      horizFocusAnimationStyle="fixedFocus"
+      focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+      focusFootprintBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+      focusFootprintBlendColor="#00000000"
+      translation="[0, 56]" />
+    <Label
+      id="title"
+      width="875"
+      wrap="false"
+      maxLines="1"
+      translation="[0, 438]">
+      <Font
+        role="font" />
+    </Label>
+  </children>
+</component>

@@ -666,12 +666,16 @@ Function onItemFocused(msg)
 
     setVisibilityForDefaultText(false)
     m.searchScreenInfoPanel.title = focusedContent.title
-    m.searchScreenInfoPanel.description = focusedContent.DESCRIPTION
+    m.searchScreenInfoPanel.description = focusedContent.description
 
     lineOneData = {}
     lineTwoData = {}
 
-    if focusedContent.type = "linear"
+    ' Live Events can be of type sportsEvent or video. So basing the info panel mode on presence of scheduleData.
+    ' If scheduleData is present, then it is a live event.
+    if focusedContent.scheduleData <> invalid
+      populateInfoPanelForLiveEvent(focusedContent, m.searchScreenInfoPanel)
+    else if focusedContent.type = "linear"
       m.searchScreenInfoPanel.mode = m.constants.ui.infoPanelModes.linearSearch
       lineOneData = {}
       lineTwoData = {
@@ -751,8 +755,11 @@ Function onItemFocused(msg)
       end if
     end if
 
-    m.searchScreenInfoPanel.lineOneData = lineOneData
-    m.searchScreenInfoPanel.lineTwoData = lineTwoData
+    if focusedContent.scheduleData = invalid
+      m.searchScreenInfoPanel.lineOneData = lineOneData
+      m.searchScreenInfoPanel.lineTwoData = lineTwoData
+    end if
+
     m.searchScreenInfoPanel.calculateHeight = true
 
     ' Set up the info that the ContentController uses to send navigate_within_page events.

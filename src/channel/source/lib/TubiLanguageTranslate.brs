@@ -2187,6 +2187,30 @@ Function getTranslation_en_US()
     "m_duration": {
       "description": "Indicates time in the format 'x m'",
       "message": "{minutes}m"
+    },
+    "h_duration": {
+      "description": "Indicates time in the format 'x h'",
+      "message": "{hours}h"
+    },
+    "d_duration": {
+      "description": "Indicates time in the format 'x d'",
+      "message": "{days}d"
+    },
+    "sign_in_watch": {
+      "description": "Sign in to watch live button label.",
+      "message": "Sign in to Watch"
+    },
+    "live_in_date": {
+      "description": "date label used in air date countdown timer",
+      "message": "LIVE IN {timeString}"
+    },
+    "starts_date": {
+      "description": "date label used in air date countdown timer",
+      "message": "STARTS {date}"
+    },
+    "screenDetails_button_details": {
+      "description": "Details button label used in linear detail screen",
+      "message": "More Details"
     }
   }
 End Function

@@ -79,6 +79,9 @@ settings:
   # A date which will be used as the current date within the app. Use this to simulate a date in the past or future. If a date is provided this gets converted to a time offset in seconds to allow testing of features only available at a particular time
   # testingTimeOffset: "2022-12-18T20:00:00Z"
 
+  # Setting the below value to true will turn on displaying the live events spotlight and banner on the home screen
+  enableLiveEventsSpotlightAndBanner: false
+
   bs_const:
     #By default nothing will be printed to debug console.(port : 8085)
     #To enable console debug logs, set consoleLoggingEnabled to true

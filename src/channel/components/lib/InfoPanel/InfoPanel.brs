@@ -80,7 +80,7 @@ Function init()
   m.top.observeFieldScoped("starring", "onStarringChange")
   m.top.observeFieldScoped("needsLogin", "onNeedsLoginChange")
   m.top.observeFieldScoped("reminderIsSet", "onReminderChange")
-  m.top.observeFieldScoped("episodeTitle","onEpisodeTitleChange")
+  m.top.observeFieldScoped("episodeTitle", "onEpisodeTitleChange")
   m.top.observeFieldScoped("fullscreenCountdown", "onPlayerCountDownChange")
   m.top.observeFieldScoped("calculateHeight", "onCalculateHeight")
   m.top.observeFieldScoped("focusedChild", "onComponentFocus")
@@ -164,7 +164,7 @@ Function onThemeChange(msg = invalid)
     theme = msg.getData()
   else
     theme = getThemeFromGlobal()
-    
+
   end if
 
   m.theme = theme
@@ -205,7 +205,7 @@ End Function
 Function onComponentFocus()
   tubiLog("InfoPanel.onComponentFocus")
   theme = m.theme
-  if m.top.isInFocusChain() AND  m.top.description <> invalid AND m.top.description <> ""
+  if m.top.isInFocusChain() AND m.top.description <> invalid AND m.top.description <> ""
     m.descriptionFocusButton.visible = true
     if theme <> invalid
       m.Description.color = theme.backgroundColor
@@ -277,8 +277,8 @@ Function onEpisodeTitleChange(msg)
     end if
     m.episode.text = episodeTitle
   else if episodeIsPresent = true
-      m.episode.text = ""
-      m.offset.removeChild(m.episode)
+    m.episode.text = ""
+    m.offset.removeChild(m.episode)
   end if
   shouldCalculateHeight()
 End Function
@@ -337,7 +337,7 @@ Function onSotMarkersChange(msg)
     formatBadge(sotMarker.sotLabelText, m.sotMarker, sotMarker.sotIcon)
     m.offset.appendChild(m.sotMarker)
   end if
-  
+
 End Function
 
 
@@ -379,8 +379,8 @@ End Function
 Function onSotTopLabelSignalsChange(msg)
   sotTopLabelSignals = msg.getData()
 
-   'Remove all the previous badges before adding the new one
-   m.nodeHelpers.removeAllChildren(m.sotTopLabelGroup)
+  'Remove all the previous badges before adding the new one
+  m.nodeHelpers.removeAllChildren(m.sotTopLabelGroup)
 
   ' handle availability badge
   if isNonEmptyArray(sotTopLabelSignals) = true
@@ -401,17 +401,17 @@ Function setSoTSignal(signals, signalType, badgeGroup, iconRequired = true)
     if isNonEmptyString(signal.sotLabelText) = true
       badge = createObject("roSGNode", "Badge")
       badge.backgroundColor = theme.neutralColor
-      badge.textColor =  theme.primaryTextColor
+      badge.textColor = theme.primaryTextColor
       if iconRequired = true AND isNonEmptyString(signal.sotIcon) = true
         badge.iconUri = signal.sotIcon
       end if
 
-        if signalType = m.BadgeTypes.sotMetaData
-          badge.showBackground = false
-          badge.badgeTextFont = m.typographyConstants.ids.bodySmallStrong
-        end if
+      if signalType = m.BadgeTypes.sotMetaData
+        badge.showBackground = false
+        badge.badgeTextFont = m.typographyConstants.ids.bodySmallStrong
+      end if
 
-        badge.text = signal.sotLabelText
+      badge.text = signal.sotLabelText
 
       badgeGroup.appendChild(badge)
     end if
@@ -425,9 +425,9 @@ Function onReminderChange(msg)
   isReminder = msg.getData()
 
   reminderIsPresent = (m.reminderGroup.getParent() <> invalid)
-  if isReminder = true and reminderIsPresent = false
+  if isReminder = true AND reminderIsPresent = false
     m.offset.appendChild(m.reminderGroup)
-  else if isReminder = false and reminderIsPresent = true
+  else if isReminder = false AND reminderIsPresent = true
     m.offset.removeChild(m.reminderGroup)
   end if
 End Function
@@ -464,6 +464,19 @@ Function onLineOneDataChange(msg)
     else
       if availabilityBadgeIsPresent = true
         firstLineGroup.removeChild(m.firstLineAvailabilityBadge)
+      end if
+    end if
+
+    uhdAvailableBadgeIsPresent = (m.uhdAvailableBadge.getParent() <> invalid)
+    if data.has4k = true
+      if uhdAvailableBadgeIsPresent = false
+        firstLineGroup.insertChild(m.uhdAvailableBadge, insertIndex)
+      end if
+
+      insertIndex++
+    else
+      if uhdAvailableBadgeIsPresent = true
+        firstLineGroup.removeChild(m.uhdAvailableBadge)
       end if
     end if
 
@@ -516,7 +529,7 @@ Function onLineOneDataChange(msg)
         if data.seasons = 1
           text += getTranslation("metadata_seasons_singular") + " "
         else
-          text += getTranslation("metadata_seasons_plural", {seasons: data.seasons.toStr()}) + " "
+          text += getTranslation("metadata_seasons_plural", { seasons: data.seasons.toStr() }) + " "
         end if
       else
         text += getTranslation("metadata_series") + " "
@@ -586,19 +599,6 @@ Function onLineOneDataChange(msg)
       end if
     end if
 
-    uhdAvailableBadgeIsPresent = (m.uhdAvailableBadge.getParent() <> invalid)
-    if data.has4k = true
-      if uhdAvailableBadgeIsPresent = false
-        firstLineGroup.insertChild(m.uhdAvailableBadge, insertIndex)
-      end if
-
-      insertIndex++
-    else
-      if uhdAvailableBadgeIsPresent = true
-        firstLineGroup.removeChild(m.uhdAvailableBadge)
-      end if
-    end if
-
     ' handle audio description
     audioDescriptionIsPresent = (m.audioDescriptionPoster.getParent() <> invalid)
     if data.hasAudioDescription = true
@@ -659,7 +659,7 @@ Function onLineOneDataChange(msg)
       ' BIZ REQ: only titles expiring in the next 2 weeks should display message
       if daysRemaining > 0 AND daysRemaining <= 14
         if daysRemaining > 1
-          m.expireWarning.text = getTranslation("metadata_expiresIn_plural", {days: daysRemaining.toStr()})
+          m.expireWarning.text = getTranslation("metadata_expiresIn_plural", { days: daysRemaining.toStr() })
         else
           m.expireWarning.text = getTranslation("metadata_expiresIn_singular")
         end if
@@ -786,7 +786,7 @@ Function onDescriptionChange(msg)
   description = msg.getData()
   if isNonEmptyString(description) = true
     m.description.visible = true
-    m.description.height = 0  ' reset for calculations below
+    m.description.height = 0 ' reset for calculations below
     m.description.text = description
   else
     m.description.visible = false
@@ -972,7 +972,7 @@ Function onCalculateHeight()
     'Adjusting the height to avoid the empty space after the description. Here if the height more than 1/2/3 lines and some extra pixels
     'for the next line, we are removing the extra space to avoid the extra gap between description and next items.
     for i = maxNumLines to 0 step -1
-      calculatedDescriptionHeight = i*(topMarginForDescription) + i*(lineHeight) + i*(bottomMarginForDescription) + (i-1)*lineSpacing
+      calculatedDescriptionHeight = i * (topMarginForDescription) + i * (lineHeight) + i * (bottomMarginForDescription) + (i - 1) * lineSpacing
       if calculatedDescriptionHeight <= maxAllowedDescriptionHeight
         m.description.height = calculatedDescriptionHeight
         exit for
@@ -1274,7 +1274,7 @@ Function getSecondLineText(data)
       text += " " + Chr(&hb7) + " "
     end if
 
-    text +=  data.channelName
+    text += data.channelName
   end if
 
   return text
@@ -1288,7 +1288,7 @@ Function formatBadge(text, badgeComponent, iconUri = "")
   theme = m.theme
   uText = UCase(text)
   if theme <> invalid
-    if  uText = UCase(getTranslation("screenSearch_liveText"))
+    if uText = UCase(getTranslation("screenSearch_liveText"))
       ' LIVE badge
       badgeComponent.backgroundColor = theme.focused2Color
       badgeComponent.textColor = theme.primaryTextColor
@@ -1318,8 +1318,8 @@ Function formatBadge(text, badgeComponent, iconUri = "")
       badgeComponent.textColor = theme.cautionColor
     else
       ' TODAY, TOMORROW, <<Date>> badge
-      badgeComponent.backgroundColor = theme.neutralColor
-      badgeComponent.textColor = theme.primaryTextColor
+      badgeComponent.backgroundColor = theme.primaryTextColor
+      badgeComponent.textColor = theme.backgroundColor
       badgeComponent.text = uText
     end if
   end if

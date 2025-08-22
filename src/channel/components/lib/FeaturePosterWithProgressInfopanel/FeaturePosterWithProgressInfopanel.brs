@@ -14,7 +14,7 @@ Function init()
     m.progressBar.unfocusColor = theme.focusedcolor
   end if
 
-  m.resumeMargin = 6  'inset of resume bar
+  m.resumeMargin = 6 'inset of resume bar
 End Function
 
 
@@ -53,7 +53,7 @@ Function setupProgressBar()
     history = getHistory(item.id)
 
     if history <> invalid AND history.nowPos <> invalid AND history.nowPos > 0 AND item.length <> invalid AND item.length > 0 then
-      percentage = ( history.nowPos / item.length ) * 100
+      percentage = (history.nowPos / item.length) * 100
       m.progressBar.progress = percentage
       m.progressBar.visible = true
     else
@@ -69,7 +69,7 @@ Function setLockIcon()
     m.lockIcon.opacity = 0.0
     m.lockIcon.width = 48
     m.lockIcon.height = 48
-    m.lockIcon.uri = "pkg:/images/icon-lock.webp"
+    m.lockIcon.uri = "pkg:/images/account-icon.webp"
     m.lockIcon.translation = [m.top.width - 56, 8]
     m.top.observeFieldscoped("focusPercent", "onHandleFocus")
     m.top.observeFieldScoped("rowHasFocus", "onHandleFocus")

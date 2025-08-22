@@ -359,7 +359,7 @@ Function onCategoryPanelContentSelected(msg)
       "srcForAds": m.constants.player.playbackOrigin.container
       "playbackContainer": categoryContent.id
     }
-    showDetailScreen(categoryItemSelected, true, invalid, invalid, playbackSource)
+    processUserContentSelection(categoryItemSelected, categoryPanelScreen, playbackSource)
   end if
 End Function
 

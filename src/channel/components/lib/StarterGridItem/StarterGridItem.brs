@@ -69,6 +69,9 @@ Function setThemeColors(msg = invalid)
       m.adIndicator.fontColor = theme.backgroundColor
     end if
     m.focusedTextColor = theme.focusedTextColor
+    m.focused2Color = theme.focused2Color
+    m.backgroundColor = theme.backgroundColor
+    m.primaryTextColor = theme.primaryTextColor
   end if
 End Function
 
@@ -81,6 +84,7 @@ Function onItemContentChange(msg)
 
     childGridItemComponent = invalid
     row = itemContent.getParent()
+
     if gridItemType = "emptyContainer" then
       childGridItemComponent = "CategoryGridPoster"
     else if gridItemType = "landscapeWithMetadata"
@@ -107,10 +111,14 @@ Function onItemContentChange(msg)
       if row <> invalid AND row.gridItemType = "landscapeNoTitle" OR row.gridItemType = "landscape" then
         childGridItemComponent = "CategoryGridLinearPoster"
       end if
-    else if itemContent.needsLogin = true AND isLoggedInUser() = false '//TBD : isLoggedInUser accesses m.global for every item. Try to remove this
-      childGridItemComponent = "CategoryGridPoster"
     else if gridItemType = "certifiedFresh"
       childGridItemComponent = "CertifiedFreshPoster"
+    else if gridItemType = "liveEventSpotlight"
+      childGridItemComponent = "LiveEventsContainer"
+    else if gridItemType = "liveEventBanner"
+      childGridItemComponent = "Banner"
+    else if itemContent.needsLogin = true
+      childGridItemComponent = "CategoryGridPoster"
     else
       if row <> invalid AND row.id = "continue_watching"
         childGridItemComponent = "CategoryGridPoster"
@@ -118,6 +126,11 @@ Function onItemContentChange(msg)
     end if
 
     requiresParenting = false
+
+    if m.availabilityBadge <> invalid
+      m.top.removeChild(m.availabilityBadge)
+      m.availabilityBadge = invalid
+    end if
 
     if childGridItemComponent = invalid then
       ' If we're only using the starter component then we want to unobserve all of the conditionally observed fields
@@ -150,6 +163,20 @@ Function onItemContentChange(msg)
         end if
       end if
 
+      if itemContent.scheduleData <> invalid
+        badgeInfo = getLinearContentBadgeInfo(itemContent.scheduleData)
+        if badgeInfo <> invalid
+          m.availabilityBadge = createObject("roSGNode", "Badge")
+          if badgeInfo.availability = "live"
+            setLinearAvailabilityBadge(m.availabilityBadge, badgeInfo.availability, m.primaryTextColor, m.focused2Color)
+          else
+            setLinearAvailabilityBadge(m.availabilityBadge, badgeInfo.availability, m.backgroundColor, m.primaryTextColor, badgeInfo.badgeText)
+          end if
+          m.availabilityBadge.translation = [6, 6]
+          m.top.appendChild(m.availabilityBadge)
+        end if
+      end if
+
     else
       m.poster.visible = false
       if m.childGridItem = invalid then
@@ -168,6 +195,9 @@ Function onItemContentChange(msg)
       end if
 
       if m.childGridItem <> invalid then
+        if m.childGridItem.hasField("parentArrayGrid") = true
+          m.childGridItem.parentArrayGrid = m.parentArrayGrid
+        end if
         ' Pass along the itemContent to the child
         m.childGridItem.itemContent = itemContent
 
@@ -187,7 +217,7 @@ Function onItemContentChange(msg)
       m.sotBadge = invalid
     end if
 
-    if itemContent.type <> "linear" AND isAA(sotPosterLabels) = true AND sotPosterLabels.count() > 0
+    if itemContent.type <> "linear" AND m.availabilityBadge = invalid AND isAA(sotPosterLabels) = true AND sotPosterLabels.count() > 0
       badgeUri = sotPosterLabels.sotIcon
       badgeText = sotPosterLabels.sotLabelText
       setSotBadge(badgeUri, badgeText)

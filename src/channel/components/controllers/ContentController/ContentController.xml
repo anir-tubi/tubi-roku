@@ -81,6 +81,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/AdsUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/RequestQueue.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnalyticsMixin.brs" />
+  <script type="text/brightscript" uri="LinearDetailScreenHelpers.brs" />
 
   <interface>
 

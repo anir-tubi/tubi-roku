@@ -225,9 +225,38 @@ Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel)
 End Function
 
 
+Function populateInfoPanelForLiveEvent(content, infoPanel)
+  infoPanel.mode = m.constants.ui.infoPanelModes.item
+  badgeText = getTranslation("screenSearch_liveText")
+  badgeInfo = getLinearContentBadgeInfo(content.scheduleData)
+  if badgeInfo <> invalid AND isNonEmptyString(badgeInfo.badgeText)
+    badgeText = badgeInfo.badgeText
+  end if
+  lineOneData = {
+    badgeText: badgeText
+    genres: content.genres
+    hasCC: (content.hasSubtitles = true OR m._.empty(content.subtitleTracks) = false)
+  }
+
+  if arrayIncludes(content.videoRenditions, m.constants.serverValues.tensorVideoRenditions.fourK)
+    lineOneData.has4k = true
+  end if
+
+  if content.needsLogin = true
+    infoPanel.loginReason = content.loginReason
+    infoPanel.needsLogin = true
+  else
+    infoPanel.needsLogin = false
+  end if
+
+  infoPanel.lineOneData = lineOneData
+  infoPanel.lineTwoData = {}
+End Function
+
+
 ' helper function which returns the time left in the format 'x hour and y mins left' if timeleft is more than an hour
 ' else it retuns 'y mins left'
-Function getDurationHoursString(seconds As Integer) As String
+Function getDurationHoursString(seconds as Integer) as String
   retVal = ""
 
   if seconds <> invalid
@@ -235,9 +264,9 @@ Function getDurationHoursString(seconds As Integer) As String
     minValue = StrI((Int(seconds / 60) mod 60) + 1) 'increase the min by one so that we dont show 0 min
 
     if hourValue > 0
-      retVal =  getTranslation("hour_mins_left", {"hour": StrI(hourValue), "minutes": minValue})
+      retVal = getTranslation("hour_mins_left", { "hour": StrI(hourValue), "minutes": minValue })
     else
-      retVal = getTranslation("mins_left", {"minutes": minValue})
+      retVal = getTranslation("mins_left", { "minutes": minValue })
     end if
   end if
 

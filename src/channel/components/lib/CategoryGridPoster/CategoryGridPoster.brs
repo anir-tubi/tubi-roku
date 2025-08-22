@@ -8,7 +8,7 @@ Function init()
   m.resumeProgressBar = m.top.findNode("ResumeProgressBar")
   m.DurationBar = m.top.findNode("DurationBar")
   m.top.observeField("itemContent", "onContentChange")
-  m.resumeMargin = 4  'inset of resume bar
+  m.resumeMargin = 4 'inset of resume bar
   m.title = m.top.findNode("Title")
   m.posterFadeTime = 0.5
 
@@ -95,7 +95,7 @@ Function onContentChange(msg)
   m.TimeRemaining.visible = false
   m.resumeMargin = 6
 
-  gradientPoster =  m.poster.findNode("gradientPoster")
+  gradientPoster = m.poster.findNode("gradientPoster")
   if gradientPoster <> invalid
     m.poster.removeChild(gradientPoster)
   end if
@@ -104,7 +104,7 @@ Function onContentChange(msg)
 
   ' next line shouldn't be necessary but is added in order to try and quell crashes as reported by roku crash logs
   if m.resumeProgressBar = invalid then m.resumeProgressBar = m.top.findNode("ResumeProgressBar")
-  if m.DurationBar  = invalid then m.DurationBar  = m.top.findNode("m.DurationBar")
+  if m.DurationBar = invalid then m.DurationBar = m.top.findNode("m.DurationBar")
 
   m.resumeProgressBar.visible = false
   m.DurationBar.visible = false
@@ -175,7 +175,7 @@ Function onContentChange(msg)
 
           setLiveBadge()
         else if itemContent.gridItemType = "" OR categoryContent.gridItemType <> m.gridItemTypes.linear
-           'itemContent.gridItemType is not an empty string on the home screen,
+          'itemContent.gridItemType is not an empty string on the home screen,
           'and we want this to set Live logo and text just on the search screen.
           setLiveBadge()
         end if
@@ -190,7 +190,7 @@ End Function
 ' Make sure the assets within the inner part of the poster like the resume Progress bar
 ' are located towards the bottom of the poster based on the current dimensions of the poster.
 Function moveInnerAssets()
-  m.InnerLayout.translation = [m.resumeMargin, m.top.height - m.resumeProgressBar.height - m.resumeMargin - m.InnerTitle.height - m.TimeRemaining.height - (m.InnerLayout.itemSpacings[0] * 2) ]
+  m.InnerLayout.translation = [m.resumeMargin, m.top.height - m.resumeProgressBar.height - m.resumeMargin - m.InnerTitle.height - m.TimeRemaining.height - (m.InnerLayout.itemSpacings[0] * 2)]
 End Function
 
 
@@ -226,7 +226,7 @@ Function drawProgressBar(nowPos, duration)
 
   if m.top.itemContent.gridItemType = m.gridItemTypes.landscapeInnerMetadata
     m.TimeRemaining.visible = true
-    m.TimeRemaining.text = getTranslation("epg_minutes_left", {minutes: toStr(convertSecondsToMins(duration - nowPos))})
+    m.TimeRemaining.text = getTranslation("epg_minutes_left", { minutes: toStr(convertSecondsToMins(duration - nowPos)) })
   end if
 
   moveInnerAssets()
@@ -235,14 +235,14 @@ End Function
 
 Function setUpSignedOutContinueWatching()
   m.continueWatchingLayout = m.top.createChild("ContinueWatchingCategoryGridPoster")
-  m.continueWatchingLayout.translation = [(m.top.width-m.continueWatchingLayout.width)/2, 57]
+  m.continueWatchingLayout.translation = [(m.top.width - m.continueWatchingLayout.width) / 2, 57]
   m.continueWatchingLayout.visible = true
 End Function
 
 
 Function setUpEmptyContainer()
   m.myStuffEmptyLayout = m.top.createChild("MyStuffEmptyCategoryGridPoster")
-  m.myStuffEmptyLayout.translation = [(m.top.width-m.myStuffEmptyLayout.width)/2, 40]
+  m.myStuffEmptyLayout.translation = [(m.top.width - m.myStuffEmptyLayout.width) / 2, 40]
   m.myStuffEmptyLayout.title = m.top.itemContent.title
   m.myStuffEmptyLayout.subtitle = m.top.itemContent.description
   m.myStuffEmptyLayout.iconUri = m.top.itemContent.iconUrl
@@ -268,7 +268,7 @@ Function setLiveBadge()
   tubiLog("CategoryGridPoster.setLiveBadge")
   badge = m.badgeGroup.createChild("Badge")
   theme = getThemeFromGlobal()
-  badge.translation = [12,12]
+  badge.translation = [12, 12]
   if theme <> invalid
     badge.backgroundColor = theme.focused2Color
     badge.textColor = theme.primaryTextColor
@@ -289,7 +289,7 @@ Function setReplayOrUpcomingBadge(badgeText)
   tubiLog("CategoryGridPoster.setReplayOrUpcomingBadge")
   theme = getThemeFromGlobal()
   badge = m.badgeGroup.createChild("Badge")
-  badge.translation = [12,12]
+  badge.translation = [12, 12]
   if theme <> invalid
     if badgeText = m.contentTimings.replay
       badge.backgroundColor = theme.backgroundColorLight
@@ -310,7 +310,7 @@ Function setLockIcon()
     m.lockIcon.opacity = 0.0
     m.lockIcon.width = 48
     m.lockIcon.height = 48
-    m.lockIcon.uri = "pkg:/images/icon-lock.webp"
+    m.lockIcon.uri = "pkg:/images/account-icon.webp"
     m.lockIcon.translation = [m.top.width - 56, 8]
 
     m.top.observeFieldScoped("focusPercent", "onHandleFocus")

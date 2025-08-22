@@ -47,12 +47,12 @@ Function onHandleFocus()
   focusPercent = m.top.focusPercent
   m.bgTopTenNumbers.opacity = focusPercent
 
-    if focusPercent > 0.1 AND m.top.rowHasFocus = true
-      if m.lockIcon <> invalid then m.lockIcon.opacity = focusPercent
-    else
-      if m.lockIcon <> invalid then m.lockIcon.opacity = 0.0
-      m.bgTopTenNumbers.opacity = 0.0
-    end if
+  if focusPercent > 0.1 AND m.top.rowHasFocus = true
+    if m.lockIcon <> invalid then m.lockIcon.opacity = focusPercent
+  else
+    if m.lockIcon <> invalid then m.lockIcon.opacity = 0.0
+    m.bgTopTenNumbers.opacity = 0.0
+  end if
 End Function
 
 
@@ -62,7 +62,7 @@ Function setLockIcon()
     m.lockIcon.opacity = 0.0
     m.lockIcon.width = 48
     m.lockIcon.height = 48
-    m.lockIcon.uri = "pkg:/images/icon-lock.webp"
+    m.lockIcon.uri = "pkg:/images/account-icon.webp"
     m.lockIcon.translation = [m.top.width - 56, 8]
     m.top.appendChild(m.lockIcon)
   end if

@@ -9,7 +9,7 @@ Function init()
     m.progressBar.color = theme.focusedColor
   end if
 
-  m.resumeMargin = 6  'inset of resume bar
+  m.resumeMargin = 6 'inset of resume bar
   drawProgressBar()
 End Function
 
@@ -57,7 +57,7 @@ Function setLockIcon()
     m.lockIcon.opacity = 0.0
     m.lockIcon.width = 48
     m.lockIcon.height = 48
-    m.lockIcon.uri = "pkg:/images/icon-lock.webp"
+    m.lockIcon.uri = "pkg:/images/account-icon.webp"
     m.lockIcon.translation = [m.top.width - 56, 8]
     m.top.observeFieldscoped("focusPercent", "onHandleFocus")
     m.top.observeField("rowHasFocus", "onHandleFocus")
@@ -78,13 +78,13 @@ End Function
 ' This function combines the focus percentage and rowHasFocus to determine if the lock icon should be visible
 ' to avoid a bug where lock icon is shown on first column.
 Function onHandleFocus()
-focusPercent = m.top.focusPercent
-if m.lockIcon <> invalid
-  if focusPercent > 0.1 AND m.top.rowHasFocus = true
-    m.lockIcon.opacity = focusPercent
-  else
-    m.lockIcon.opacity = 0.0
+  focusPercent = m.top.focusPercent
+  if m.lockIcon <> invalid
+    if focusPercent > 0.1 AND m.top.rowHasFocus = true
+      m.lockIcon.opacity = focusPercent
+    else
+      m.lockIcon.opacity = 0.0
+    end if
   end if
-end if
 
 End Function

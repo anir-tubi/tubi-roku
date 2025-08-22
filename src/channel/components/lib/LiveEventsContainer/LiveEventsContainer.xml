@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<component name="LiveEventsContainer" extends="Group">
+  <script type="text/brightscript" uri="LiveEventsContainer.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+
+  <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/ArrayUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeOffsetUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ContentMixin.brs" />
+
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+
+  <interface>
+    <!-- INPUT -->
+    <field id="itemContent" type="node" />
+    <field id="isContentDetailsView" type="boolean" value="false" />
+    <field id="parentArrayGrid" type="node" />
+    <field id="itemHasFocus" type="boolean" value="false" />
+    <field id="rowHasFocus" type="boolean" value="false" />
+    <field id="rowListHasFocus" type="boolean" value="false" />
+    <field id="trackingPageInfo" type="assocarray" />
+
+    <!-- OUTPUT -->
+    <field id="ctaButtonSelectedId" type="string" alwaysNotify="true" />
+    <field id="componentInteractionInfo" type="assocarray" alwaysNotify="true" />
+  </interface>
+
+  <children>
+    <LayoutGroup
+      opacity="0.0"
+      id="contentSection"
+      itemSpacings="[60]">
+      <LayoutGroup
+        id="metadataSection"
+        itemSpacings="[24]">
+        <Poster
+          id="networkLogo"
+          loadDisplayMode="limitSize" />
+        <Poster
+          id="titleImage"
+          loadDisplayMode="limitSize" />
+
+        <LayoutGroup
+          id="metadataRow"
+          layoutDirection="horizontal"
+          vertAlignment="center"
+          itemSpacings="[12]">
+          <Badge
+            id="availabilityBadge" />
+          <Badge
+            visible="false"
+            id="uhdAvailableBadge" />
+          <Label
+            id="genres"
+            vertAlign="bottom">
+            <Font
+              role="font" />
+          </Label>
+          <Poster
+            id="ClosedCaptionPoster"
+            visible="false"
+            uri="pkg:/images/icon-closed-caption.webp"
+            height="36"
+            width="36"
+            loadDisplayMode="scaleToFit"
+            loadSync="true" />
+        </LayoutGroup>
+
+        <Group
+          id="descriptionGroup">
+          <Poster
+            id="descriptionFocusButton"
+            uri="pkg:/images/menu-focus-$$RES$$.9.png"
+            visible="false" />
+          <Label
+            id="description"
+            width="960"
+            maxLines="3"
+            wrap="true">
+            <Font
+              id="descriptionFont"
+              role="font" />
+          </Label>
+        </Group>
+      </LayoutGroup>
+
+      <FocusControlLayoutGroup
+        id="buttonList"
+        translation="[0,39]"
+        itemSpacings="[12]">
+      </FocusControlLayoutGroup>
+    </LayoutGroup>
+
+    <Timer id="uiRefreshTimer" />
+  </children>
+</component>

@@ -109,7 +109,7 @@ Function setContentAreaState(state = invalid)
   end if
 
   if shouldAnimate = true
-    slideTo(m.ContentAreaParent, m.currentContentAreaTranslation, 0.2)
+    m.contentAreaAnimation = slideTo(m.ContentAreaParent, m.currentContentAreaTranslation, 0.2)
   else
     m.ContentAreaParent.translation = m.currentContentAreaTranslation
   end if
@@ -512,7 +512,14 @@ Function onCurrFocusRowChange()
   if categoryEnteringFocus <> invalid
     sSponsorBackgroundURL = ""
 
-    if categoryEnteringFocus.sponsorImages <> invalid
+    isLiveEventRowContent = arrayIncludes(m.constants.ui.liveEventsGridTypes, categoryEnteringFocus.gridItemType) = true
+    m.CategoryGridList.showFocusFeedback = (isLiveEventRowContent = false)
+    if isLiveEventRowContent = true
+      if m.contentAreaAnimation <> invalid
+        m.contentAreaAnimation.control = "stop"
+      end if
+      expandContentAreaForContainersWithoutInfoPanel(rowPercent)
+    else if categoryEnteringFocus.sponsorImages <> invalid
       '//if the entering row is sponsored, then take into account the extra room that the sponsor artwork takes up in the row header
       if m.top.featuredRowContent = invalid
         expandContentAreaForSponsorship(rowPercent)
@@ -523,7 +530,7 @@ Function onCurrFocusRowChange()
         sSponsorBackgroundURL = categoryEnteringFocus.sponsorImages.brandColor
       end if
     else if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
-      expandContentAreaForAdDisplayContainer(rowPercent)
+      expandContentAreaForContainersWithoutInfoPanel(rowPercent)
     else if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
       expandContentAreaForAdDisplayCarousel(rowPercent)
     else if categoryEnteringFocus.id = m.constants.ui.categoryIds.certifiedFresh
@@ -590,10 +597,9 @@ Function expandContentAreaForSponsorship(rowPercent)
 End Function
 
 
-' Adjust the RowList based on the difference of the normal and adRowlistSpotlight row title heights and relative to where the rowList already is.
-'   So if a gridType already adjusted the rowList's position, then adjust it more but relative to where it already had been adjusted.
-' @rowPercent: float, the percentage that the adRowlistSpotlight row is focused
-Function expandContentAreaForAdDisplayContainer(rowPercent)
+' Adjust the content area for containers that do not have an info panel.
+' @rowPercent: float, the percentage that the container is focused
+Function expandContentAreaForContainersWithoutInfoPanel(rowPercent)
   nDiffHeight = m.originalContentAreaTranslation[1] - 102 '//bring this to the top of the screen
   if m.currentContentAreaTranslation[1] = m.constants.ui.videoTilesListTranslation[1]
     nDiffHeight = m.currentContentAreaTranslation[1] + 302 '//bring this to the top of the screen if the home redesign is enabled
@@ -695,7 +701,8 @@ Function onGridFocusChange() as Void
       m.top.contentFocused = focusedContent
       '//::TODO::JHAND - adRowlist - spotlight, Use MaskGroup to create rounded corners for the 1-Up video
       '//::TODO::JHAND - adRowlist - spotlight, place video over 1-up image. Is there a way to mask the video so it has rounded corners?
-      if focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
+      gridItemType = focusedContent.gridItemType
+      if gridItemType = m.constants.ui.gridItemTypes.skinAd OR gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight OR arrayIncludes(m.constants.ui.liveEventsGridTypes, gridItemType) = true
         fadeOutInfoPanel()
         m.top.backgroundUriList = determineBackgroundImage(focusedContent)
       else

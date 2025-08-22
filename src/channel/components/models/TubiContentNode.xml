@@ -9,6 +9,7 @@
     <field id="parentTitle" type="string" />
     <field id="parentId" type="string" />
     <field id="parentHistoryId" type="string" />
+    <field id="playerType" type="string" />
     <field id="landscape" type="string" />
     <field id="portrait" type="string" />
     <field id="genres" type="stringarray" />
@@ -132,6 +133,7 @@
 
     <!-- ID of a preview. It is used to send for analytic events -->
     <field id="previewId" type="string" />
+    <field id="videoRenditions" type="stringarray" />
 
   </interface>
 </component>

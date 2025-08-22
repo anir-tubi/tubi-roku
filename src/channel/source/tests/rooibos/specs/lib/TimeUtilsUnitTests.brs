@@ -214,6 +214,21 @@ Function timeUtils_isGreaterThanCurrentTime_test()
 End Function
 
 
+'@Test isLessThanOrEqualToCurrentTime unit tests
+Function timeUtils_isLessThanOrEqualToCurrentTime_test()
+  dateTime = CreateObject("roDateTime")
+  currentTime = dateTime.ToISOString()
+  nowSeconds = dateTime.AsSeconds()
+  dateTime.fromSeconds(nowSeconds + (24 * 60 * 60))
+  nextDayString = dateTime.ToISOString()
+  m.assertTrue(isLessThanOrEqualToCurrentTime(currentTime))
+  m.assertFalse(isLessThanOrEqualToCurrentTime(nextDayString))
+  m.assertTrue(isLessThanOrEqualToCurrentTime("2009-01-01 01:01:01.001"))
+  m.assertFalse(isLessThanOrEqualToCurrentTime(1234567))
+  m.assertFalse(isLessThanOrEqualToCurrentTime(invalid))
+End Function
+
+
 '@Test compareDates unit tests
 Function timeUtils_compareDates_test()
   dateTime = CreateObject("roDateTime")

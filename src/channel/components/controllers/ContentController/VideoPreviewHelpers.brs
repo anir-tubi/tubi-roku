@@ -130,7 +130,7 @@ Function onVideoPreviewStateChanged(msg)
         isReplay = true
       end if
 
-      isFullPlayerBlockedForUser = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR (item <> invalid AND item.needsLogin = true AND isloggedInUser() = false)
+      isFullPlayerBlockedForUser = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR (item <> invalid AND item.needsLogin = true AND isLoggedInUser() = false AND arrayIncludes(m.constants.ui.fullScreenVideoPlayerGridItemTypes, item.gridItemType) = false)
 
       if isReplay = true
         '//Loop the video in this case
@@ -478,8 +478,7 @@ End Function
 Function updatePlayerLayoutBasedOnFocusedContent(content)
   currentScreen = getCurrentScreen()
   isHomeScreen = currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen
-  ' If the experiment is enabled and focused content is from featured row than expand preview to full screen.
-  if content.gridItemType = m.constants.ui.gridItemTypes.skinAd
+  if arrayIncludes(m.constants.ui.fullScreenVideoPlayerGridItemTypes, content.gridItemType)
     ' Reducing 1px from both width and height since the player is in background and keeping full width causes roku to display closed captioning overlay.
     ' To avoid any other Roku OS level default behavior from kicking in reducing 1px to give a impression that player is not in full screen.
     updatePreviewPlayerToFullScreen()

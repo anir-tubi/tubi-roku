@@ -50,6 +50,8 @@ Function TubiMetadataTranslate(constants, experiments = invalid, soTStaticConfig
     getTheIconAndTextFromConfig: tubiMetadataTranslate_getTheIconAndTextFromConfig
     getTextFromPath: tubiMetadataTranslate_getTextFromPath
     getSignalTrustInfo: tubiMetadataTranslate_getSignalTrustInfo
+    parseScheduleData: tubiMetadataTranslate_parseScheduleData
+    parseUICustomization: tubiMetadataTranslate_parseUICustomization
   }
 End Function
 
@@ -129,7 +131,7 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
     if canvasImages <> invalid AND type(canvasImages.skinAd_landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.skinAd__landscape_tb[0]) = true
       sThumbnailURL = canvasImages.skinAd_landscape_tb[0]
     end if
-  else if gridType = gridItemTypes.banner
+  else if gridType = gridItemTypes.banner OR gridType = gridItemTypes.liveEventsBanner
     bannerImages = contentFromServer.banner_images
     if bannerImages <> invalid AND isNonEmptyString(bannerImages.ott_banner_background) = true
       sThumbnailURL = bannerImages.ott_banner_background
@@ -346,6 +348,10 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, t
   if contentFromServer.needs_login = true AND isSignedInUser = false AND m.checkIfUserIsInRegistrationByPassMode() = false
     translatedContent.needsLogin = true
     translatedContent.loginReason = contentFromServer.login_reason
+  end if
+
+  if contentFromServer.player_type <> invalid
+    translatedContent.playerType = contentFromServer.player_type
   end if
 
   if isAA(contentFromServer.content_tags) = true AND isNonEmptyArray(contentFromServer.content_tags.rotten_tomatoes_certified_fresh) = true
@@ -761,6 +767,25 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, t
     end if
   end if
 
+  if isNonEmptyArray(contentFromServer.genres) = true
+    translatedContent.genres = contentFromServer.genres
+  end if
+
+  if isNonEmptyArray(contentFromServer.video_renditions) = true
+    translatedContent.videoRenditions = contentFromServer.video_renditions
+  end if
+
+  if contentFromServer.schedule_data <> invalid
+    schedule = m.parseScheduleData(contentFromServer.schedule_data)
+    if type(translatedContent) = "roAssociativeArray"
+      translatedContent.scheduleData = schedule
+    else if type(translatedContent) = "roSGNode"
+      translatedContent.update({
+        scheduleData: schedule
+      }, true)
+    end if
+  end if
+
   ' return the total number of children converted
   return count
 End Function
@@ -1073,6 +1098,12 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
           "cursor": m.constants.performance.categoryGridList.initialBlockSize
           "hasMoreContent": true
         }
+
+        if isAA(container.ui_customization) = true
+          parsedUicustomization = m.parseUICustomization(container.ui_customization)
+          categoryAA.uiCustomization = parsedUicustomization
+        end if
+
         homescreenAA.children.push(categoryAA)
       end if
 
@@ -1660,7 +1691,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
               year: fullChild.year
               duration: fullChild.length
               ratings: fullChild.ratings
-              titleImageUri: titleImage
+              titleImageUrl: titleImage
               thumbnailUri: thumbnailUri
               seasons: seasons
               type: sContentType
@@ -1683,6 +1714,10 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
               subtype: sType
               type: sContentType
             }
+
+            if isNonEmptyString(titleImage) = true
+              childAA.titleImageUrl = titleImage
+            end if
           end if
 
           if fullChild.showAllText <> invalid
@@ -1746,16 +1781,16 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           sHDGridPosterURL = m.getThumbnailImage(fullChild, gridType)
           childAA.hdgridposterurl = sHDGridPosterURL
 
-          if childAA.gridItemType = "banner"
-            if isAA(fullChild.banner_texts) = true
-              childAA.bannerTextGuest = fullChild.banner_texts.banner_text_guest
-              childAA.bannerTextRegistered = fullChild.banner_texts.banner_text_registered
-              childAA.bannerDisclaimerText = fullChild.banner_texts.banner_text_disclaimer_guest
-            end if
+          if isAA(fullChild.schedule_data)
+            childAA.scheduleData = m.parseScheduleData(fullChild.schedule_data)
+          end if
 
-            if isAA(fullChild.banner_images) = true AND isNonEmptyString(fullChild.banner_images.ott_banner_background_guest) = true
-              childAA.bannerBackgroundGuest = fullChild.banner_images.ott_banner_background_guest
-            end if
+          if isNonEmptyArray(fullChild.genres) = true
+            childAA.genres = fullChild.genres
+          end if
+
+          if isNonEmptyArray(fullChild.video_renditions) = true
+            childAA.videoRenditions = fullChild.video_renditions
           end if
 
           if parentGridItemType = gridItemTypes.linear AND fullChild.thumbnails <> invalid
@@ -2088,11 +2123,15 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
   end if
 
   isContentModeHomeScreen = (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
-  if screenId = m.constants.ui.screenIds.homeScreen AND isUserInVideoTilesExperiment = true AND isContentModeHomeScreen
+  if isAA(container.ui_customization) = true AND container.ui_customization.type = "live_event_spotlight"
+    gridItemType = gridItemTypes.liveEventSpotlight
+  else if isAA(container.ui_customization) = true AND container.ui_customization.type = "live_event_banner"
+    gridItemType = gridItemTypes.liveEventBanner
+  else if screenId = m.constants.ui.screenIds.homeScreen AND isUserInVideoTilesExperiment = true AND isContentModeHomeScreen = true
     gridItemType = gridItemTypes.featuredPortraitSmall
   else if (tileDesignType = "controlReOrderContainers" AND container.id = experimentContainerId) AND isContentModeHomeScreen AND uiMode = "standard" AND screenId = m.constants.ui.screenIds.homeScreen
     gridItemType = gridItemTypes.landscape
-  else if tileDesignType = "withDescriptionPortraitSmall" AND isUserInVideoTilesExperiment = true AND isContentModeHomeScreen
+  else if tileDesignType = "withDescriptionPortraitSmall" AND isUserInVideoTilesExperiment = true AND isContentModeHomeScreen = true
     gridItemType = gridItemTypes.portrait
   else if container.type = constants.ui.categoryTypes.linear
     gridItemType = gridItemTypes.linear
@@ -3136,4 +3175,39 @@ Function tubiMetadataTranslate_getSignalTrustInfo(sotChild, content)
 
   return sotInfo
 
+End Function
+
+
+' @schedule: roAssocArray, schedule data from the server.
+Function tubiMetadataTranslate_parseScheduleData(schedule) as Object
+  if isAA(schedule) = true
+    return {
+      startTime: schedule.start_time
+      endTime: schedule.end_time
+      id: schedule.id
+      channelId: schedule.channel_id
+      playerType: schedule.player_type
+      thirdPartyId: schedule.third_party_id
+      channelLogo: schedule.channel_logo
+    }
+  else
+    return invalid
+  end if
+End Function
+
+
+Function tubiMetadataTranslate_parseUICustomization(uiCustomization) as Object
+  parsedUicustomization = {}
+
+  if isAA(uiCustomization) = true AND uiCustomization.type = "live_event_banner" AND isAA(uiCustomization.style) = true
+    style = uiCustomization.style
+    parsedUicustomization.style = {
+      bannerTextGuest: style.banner_text_guest
+      bannerTextRegistered: style.banner_text_registered
+      bannerBackground: style.background_tv
+      bannerScreenBackground: style.background_tv_behind_banner
+    }
+  end if
+
+  return parsedUicustomization
 End Function

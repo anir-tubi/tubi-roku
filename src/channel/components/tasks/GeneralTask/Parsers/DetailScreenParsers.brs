@@ -14,7 +14,7 @@ End Function
 '                            .data value converted from JSON to AA already
 ' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
 Function parseDetailScreenSingleContentError(fullResponse, reqInfo)
-returnResponse = {}
+  returnResponse = {}
   if reqInfo <> invalid AND reqInfo.options <> invalid AND reqInfo.options.params <> invalid
     returnResponse.contentId = reqInfo.options.params.content_id
   end if
@@ -102,9 +102,9 @@ End Function
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
-Function parseRemoveFromQueueSuccess(fullResponse, _reqInfo)
-  return fullResponse.data
+' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseRemoveFromQueueSuccess(fullResponse, reqInfo)
+  return reqInfo.options.params
 End Function
 
 
@@ -115,4 +115,12 @@ Function parseRemoveFromQueueError(fullResponse, _reqInfo)
   return {
     code: fullResponse.code
   }
+End Function
+
+
+' @fullResponse: assocArray, as returned by Request.handleEvent, but with
+'                            .data value converted from JSON to AA already
+' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseEpgListingSuccess(fullResponse, _reqInfo)
+  return m.metadataTranslate.parseScheduleData(fullResponse.data)
 End Function

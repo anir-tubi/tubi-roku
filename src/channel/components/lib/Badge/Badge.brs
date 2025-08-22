@@ -17,10 +17,17 @@ Function onMaxWidthChanged()
 End Function
 
 
-Function onIconChanged()
-  m.badgeIcon.width = 24
-  m.badgeIcon.uri = m.top.iconUri
-  m.badgeInfoLayout.itemSpacings = [8]
+Function onIconChanged(msg)
+  iconUri = msg.getData()
+  if isNonEmptyString(iconUri)
+    m.badgeIcon.width = 24
+    m.badgeIcon.uri = iconUri
+    m.badgeInfoLayout.itemSpacings = [8]
+    m.badgeIcon.scale = [1, 1]
+  else
+    m.badgeIcon.scale = [0, 0]
+    m.badgeInfoLayout.itemSpacings = [0]
+  end if
   adjustBadgeSize()
 End Function
 
@@ -44,12 +51,12 @@ Function adjustBadgeSize()
     if m.badgeIcon.width > 0
       iconWidth = m.badgeIcon.width + 8 ' icon width + spacing
     end if
-    
+
     availableTextWidth = maxWidthValue - iconWidth - 24 ' subtract padding
     if availableTextWidth > 0
       m.badgeText.width = availableTextWidth
     end if
-    
+
     ' Recalculate width after constraining text
     badgeInfoLayoutWidth = m.badgeInfoLayout.boundingRect().width
   end if
@@ -57,17 +64,17 @@ Function adjustBadgeSize()
   xAxis = 0
   if m.top.showBackground = true
     targetWidth = badgeInfoLayoutWidth + 24
-    
+
     ' Apply maxWidth to background if set
     if maxWidthValue > 0 AND targetWidth > maxWidthValue
       targetWidth = maxWidthValue
     end if
-    
+
     if targetWidth >= m.badgeBackground.width
       m.badgeBackground.width = targetWidth
     end if
 
-    xAxis = (m.badgeBackground.width - badgeInfoLayoutWidth)/2
+    xAxis = (m.badgeBackground.width - badgeInfoLayoutWidth) / 2
   end if
 
   m.badgeInfoLayout.translation = [xAxis, 20]
@@ -75,7 +82,7 @@ End Function
 
 
 Function onSetTypography(msg)
-    fontSize = msg.getData()
+  fontSize = msg.getData()
 
   if isString(fontSize) = true AND m.typographyConstants.ids[fontSize] <> invalid
     fontSize = m.typographyConstants.ids[fontSize]

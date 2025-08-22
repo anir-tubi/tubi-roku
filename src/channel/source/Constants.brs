@@ -335,6 +335,7 @@ Function getConstants()
   constants.reqNames.postLogout = "postLogout"
   constants.reqNames.postViewableImpression = "postViewableImpression"
   constants.reqNames.getSoTStaticConfig = "getSoTStaticConfig"
+  constants.reqNames.getEpgListing = "getEpgListing"
 
   ' a list of reqnames that the general task will inject auth headers and should expect to handle 403 errors for
   constants.reqNames.acceptsTubiAuth = {}
@@ -385,6 +386,7 @@ Function getConstants()
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getLiveManifest] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getEPGPrograms] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getSoTStaticConfig] = true
+  constants.reqNames.acceptsTubiAuth[constants.reqNames.getEpgListing] = true
 
   constants.anonymous = {}
   constants.anonymous.algorithm = "TUBI-HMAC-SHA256"
@@ -547,6 +549,8 @@ Function getConstants()
   end if
   constants.urls.content.epgProgramContent = constants.urls.content.epgProgramContentUrlBase + "/content/epg/programming"
 
+  constants.urls.content.epgListingEndpoint = constants.urls.content.epgProgramContentUrlBase + "/api/v1/listing"
+
   'autopilot url
   constants.urls.autopilot = {}
   constants.urls.autopilot.urlBase = "https://autopilot-cdn.production-public.tubi.io/api"
@@ -584,8 +588,14 @@ Function getConstants()
   if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
     constants.urls.tensor.cdn.urlBase = "https://tensor-cdn.staging-public.tubi.io/api"
   end if
-  constants.urls.tensor.cdn.homescreen = constants.urls.tensor.cdn.urlBase + "/v6/homescreen"
-  constants.urls.tensor.cdn.container = constants.urls.tensor.cdn.urlBase + "/v6/containers"
+  ' Since V7 is not in production yet enabling it only when requested.
+  if constants.settings.enableLiveEventsSpotlightAndBanner = true
+    constants.urls.tensor.cdn.homescreen = constants.urls.tensor.cdn.urlBase + "/v7/homescreen"
+    constants.urls.tensor.cdn.container = constants.urls.tensor.cdn.urlBase + "/v7/containers"
+  else
+    constants.urls.tensor.cdn.homescreen = constants.urls.tensor.cdn.urlBase + "/v6/homescreen"
+    constants.urls.tensor.cdn.container = constants.urls.tensor.cdn.urlBase + "/v6/containers"
+  end if
   constants.urls.tensor.cdn.epgChannelIds = constants.urls.tensor.cdn.urlBase + "/v2/epg"
   constants.urls.tensor.cdn.browserList = constants.urls.tensor.cdn.urlBase + "/v1/browse_list"
   constants.urls.tensor.SoTStaticConfig = constants.urls.tensor.cdn.urlBase + "/v1/ui_customization/static_config"
@@ -1261,6 +1271,7 @@ Function getConstants()
   constants.ui.contentTypes.skinAd = "skinAd"
   constants.ui.contentTypes.adRowlistSpotlight = "adRowlistSpotlight"
   constants.ui.contentTypes.adRowlistCarousel = "adRowlistCarousel"
+  constants.ui.contentTypes.movie = "movie"
 
   constants.ui.playerTypes = {}
   constants.ui.playerTypes.fox = "fox"
@@ -1320,6 +1331,7 @@ Function getConstants()
   constants.ui.screenLevels.consentScreen = 120
   constants.ui.screenLevels.rokuContinueWatchingConsentScreen = 120
   constants.ui.screenLevels.managePreferencesScreen = 130
+  constants.ui.screenLevels.linearDetailScreen = 50
 
   constants.ui.screenIds = {}
   constants.ui.screenIds.homeScreen = "homeScreen"
@@ -1347,6 +1359,7 @@ Function getConstants()
   constants.ui.screenIds.rokuContinueWatchingConsentScreen = "rokuContinueWatchingConsentScreen"
   constants.ui.screenIds.eventDetailScreen = "eventDetailScreen"
   constants.ui.screenIds.foxVideoPlayerWrapperScreen = "FoxVideoPlayerWrapperScreen"
+  constants.ui.screenIds.linearDetailScreen = "linearDetailScreen"
 
   ' notAllowedContainerIds are the containers which are not allowed to be displayed on category screen,
   ' because currently we support only portrait style in category detail screen
@@ -1411,6 +1424,9 @@ Function getConstants()
   'Sizes of video title image (if available) that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images. The video title image is an image representation of the title metadata of the video. Not all videos may have this image.
   constants.ui.imageSizes.title = [600, 201]
 
+  'Size of the network logo.
+  constants.ui.imageSizes.networkLogo = [178, 90]
+
   'Sizes of large poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
   constants.ui.imageSizes.largePoster = [252, 360]
 
@@ -1449,8 +1465,11 @@ Function getConstants()
   ' Size of guest user continue watching container.
   constants.ui.imageSizes.guestContinueWatchingTile = [1613, 378]
 
-  ' Size of guest user continue watching container.
-  constants.ui.imageSizes.guestContinueWatchingTile = [1613, 378]
+  ' Size of the banner component.
+  constants.ui.imageSizes.banner = [1613, 120]
+
+  ' Size of the live events container.
+  constants.ui.imageSizes.liveEventsContainer = [960, 729]
 
   ' Size of guest user continue watching container.
   constants.ui.imageSizes.guestContinueWatchingTile = [1613, 378]
@@ -1558,11 +1577,16 @@ Function getConstants()
   constants.ui.gridItemTypes.skinAd = "skinAd"
   constants.ui.gridItemTypes.featuredPortraitSmall = "featuredPortraitSmall"
   constants.ui.gridItemTypes.certifiedFresh = "certifiedFresh"
+  constants.ui.gridItemTypes.liveEventSpotlight = "liveEventSpotlight"
+  constants.ui.gridItemTypes.liveEventBanner = "liveEventBanner"
 
   ' Holds the container ids which are not video tile containers.
   ' This will help us to avoid showing the expanded video tile.
   ' We will include ads containers in this list in future.
-  constants.ui.nonVideoTileGridItemTypes = [constants.ui.gridItemTypes.historySignedOutUser, constants.ui.gridItemTypes.adRowlistCarousel, constants.ui.gridItemTypes.adRowlistSpotlight]
+  constants.ui.noHeaderGridTypes = [constants.ui.gridItemTypes.liveEventSpotlight, constants.ui.gridItemTypes.liveEventBanner]
+  constants.ui.liveEventsGridTypes = [constants.ui.gridItemTypes.liveEventSpotlight, constants.ui.gridItemTypes.liveEventBanner]
+  constants.ui.nonVideoTileGridItemTypes = [constants.ui.gridItemTypes.historySignedOutUser, constants.ui.gridItemTypes.liveEventSpotlight, constants.ui.gridItemTypes.liveEventBanner, constants.ui.gridItemTypes.adRowlistCarousel, constants.ui.gridItemTypes.adRowlistSpotlight]
+  constants.ui.fullScreenVideoPlayerGridItemTypes = [constants.ui.gridItemTypes.skinAd, constants.ui.gridItemTypes.liveEventSpotlight, constants.ui.gridItemTypes.liveEventBanner]
   constants.ui.videoTilesListTranslation = [24, 144]
 
   constants.ui.uris = {}
@@ -1797,6 +1821,11 @@ Function getConstants()
   if UCase(constants.ui.themes.kidsMode.keyboardFocusedTextColor) = "0XFFFFFFFF"
     constants.ui.themes.kidsMode.keyboardFocusedTextColor = "0xFFFFFFFE"
   end if
+
+  constants.ui.badgeTypes = {}
+  constants.ui.badgeTypes.live = "live"
+  constants.ui.badgeTypes.upcoming = "upcoming"
+  constants.ui.badgeTypes.today = "today"
 
 
   'THEME/COLOR END///////////////////////

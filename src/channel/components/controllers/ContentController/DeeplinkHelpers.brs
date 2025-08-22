@@ -254,10 +254,11 @@ Function handleDeeplinkContentByType()
     if m.deepLinkContent.deeplinkType = "linear" OR m.deepLinkContent.deeplinkType = "liveTV"
       'if fadeInContentController has not be set true, then linear content can not play.
       'in that case, we are setting a callback to call handleLinearDeeplinkContent after fadeInContentController is triggered
+      callback = handleLiveEventDeeplinkContent
       if m.top.fadeInContentController = true
-        handleLinearDeeplinkContent()
+        callback()
       else
-        m.linearScreenAfterFn = handleLinearDeeplinkContent
+        m.linearScreenAfterFn = callback
       end if
     else if m.deepLinkContent.deeplinkType = "category"
       handleCategoryDeeplinkContent()
@@ -1014,7 +1015,9 @@ Function parseSportsEventContentId(contentId) as Object
   entries = decoded.split(",")
   for each entry in entries
     keyValue = entry.split(":")
-    sportsEvent[keyValue[0]] = keyValue[1]
+    if sportsEvent.doesExist(keyValue[0]) = true
+      sportsEvent[keyValue[0]] = keyValue[1]
+    end if
   end for
   return sportsEvent
 End Function
@@ -1061,4 +1064,30 @@ Function getPlaybackSourceForDeeplinkType()
     }
   end if
 
+End Function
+
+
+Function handleLiveEventDeeplinkContent()
+  getSingleContentFromServer(m.deepLinkContent, onDeeplinkLiveEventContentSuccess, handleSingleContentDeeplinkError)
+End Function
+
+
+Function onDeeplinkLiveEventContentSuccess(content)
+  if content <> invalid AND isAA(content.scheduleData) AND content.scheduleData.playerType = m.constants.ui.playerTypes.fox
+    playbackSource = getPlaybackSourceForDeeplinkType()
+    scheduleData = content.scheduleData
+    if isAA(scheduleData) AND isNonEmptyString(scheduleData.startTime) = true
+      startTime = content.scheduleData.startTime
+      isEventLive = isLessThanOrEqualToCurrentTime(startTime)
+      if isEventLive = true
+        playLinearVideoWithFoxPlayer(content)
+      else
+        showLinearDetailScreen(content, playbackSource)
+      end if
+    else
+      showLinearDetailScreen(content, playbackSource)
+    end if
+  else
+    handleLinearDeeplinkContent()
+  end if
 End Function

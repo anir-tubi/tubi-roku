@@ -110,7 +110,6 @@ Function getHistory(contentId)
 End Function
 
 
-
 ' Remove the local version copy of the resume position for a particular video.
 ' @contentId: String, ContentNode to be removed from local history
 Function removeHistoryLocally(contentId)
@@ -151,7 +150,6 @@ End Function
 ' @contentId: string, the id of any content
 ' returns bookmark of the given content
 Function getBookmark(contentId)
-
   bookmark = invalid
   if contentId <> invalid
     bookmarkIds = getFieldFromGlobal("bookmarkIds")
@@ -159,6 +157,26 @@ Function getBookmark(contentId)
       bookmark = bookmarkIds.findNode(contentId)
     end if
   end if
-  return bookmark
 
+  return bookmark
+End Function
+
+
+' Remove the local version copy of the resume position for a particular video.
+' @content: ContentNode, ContentNode to be added or removed from local bookmarks
+' @shouldAdd: Boolean, true if the content should be added, false if the content should be removed
+Function updateBookmarkLocally(content, shouldAdd = true)
+  if content <> invalid
+    bookmarkIds = getFieldFromGlobal("bookmarkIds")
+    if bookmarkIds <> invalid
+      if shouldAdd = true
+        bookmarkIds.appendChild(content)
+      else
+        bookmark = bookmarkIds.findNode(content.id)
+        if bookmark <> invalid
+          bookmarkIds.removeChild(bookmark)
+        end if
+      end if
+    end if
+  end if
 End Function

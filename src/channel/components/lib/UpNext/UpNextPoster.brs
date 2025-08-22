@@ -17,7 +17,7 @@ Function onContentChange()
   if item <> invalid then
     ' If series content, we show a 16:9 poster, otherwise a DVD-aspect poster
     sURI = ""
-    if item.seriesId <> invalid and item.seriesId <> ""
+    if item.seriesId <> invalid AND item.seriesId <> ""
       sURI = item.landscape
     else
       if getExperimentResource("roku_video_autostart_ui_refresh", "roku_video_autostart_ui_refresh_v1", false).enabled = true
@@ -46,7 +46,7 @@ Function setLockIcon()
     m.lockIcon.opacity = 0.0
     m.lockIcon.width = 21
     m.lockIcon.height = 24
-    m.lockIcon.uri = "pkg:/images/icon-lock.webp"
+    m.lockIcon.uri = "pkg:/images/account-icon.webp"
     m.top.observeFieldscoped("focusPercent", "onFocusPercent")
   end if
   setLockIconPosition()
@@ -71,7 +71,7 @@ End Function
 
 
 Function onFocusPercent(msg)
-  if  m.lockIcon <> invalid
+  if m.lockIcon <> invalid
     m.lockIcon.opacity = msg.getData()
   end if
 End Function

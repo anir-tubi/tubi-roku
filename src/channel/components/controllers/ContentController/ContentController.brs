@@ -1673,14 +1673,11 @@ Function setVideoContentScreenBackground(screen)
     gridItemType = contentFocused.gridItemType
     videoPreviewState = getVideoPreviewState()
 
-    isVideoPreviewPlayQueued = false
-    if m.videoPreviewPlayer <> invalid AND m.queuedVideoPlayerCommand <> invalid AND m.videoPreviewPlayer.isSameNode(m.queuedVideoPlayerCommand.videoPlayerNode) = TRUE AND m.queuedVideoPlayerCommand.command = "play" then
-      isVideoPreviewPlayQueued = true
-    end if
-
     isSkinAdRowContent = (isCurrentScreenHomeScreen() = true AND gridItemType = m.constants.ui.gridItemTypes.skinAd)
     isAdCarouselRowContent = gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
-    if (videoPreviewState = "playing" OR videoPreviewState = "paused" OR videoPreviewState = "buffering" OR isVideoPreviewPlayQueued = true) AND isSkinAdRowContent = false AND isAdCarouselRowContent = false
+    if arrayIncludes(m.constants.ui.liveEventsGridTypes, gridItemType) = true
+      displayBackgroundForLiveEvents(contentFocused)
+    else if (videoPreviewState = "playing" OR videoPreviewState = "paused" OR videoPreviewState = "buffering" OR isVideoPreviewPlayQueued() = true) AND isSkinAdRowContent = false AND isAdCarouselRowContent = false
       m.backgroundGroup.backgroundInfo = {
         type: m.constants.ui.backgroundTypes.epg
         uriList: [] ' setting uriList as empty, because don't need to rotate the background poster when video preview is playing. We can't use shouldRotateBackgrounds because we still need the gradients from backgroundGroup
@@ -1785,6 +1782,18 @@ Function displayDefaultBackground()
     type: m.constants.ui.backgroundTypes.fullScreen
     uriList: []
   }
+End Function
+
+
+Function displayBackgroundForLiveEvents(content)
+  if isNode(content) = true AND isNonEmptyArray(content.backgrounds) = true then
+    m.backgroundGroup.backgroundInfo = {
+      type: m.constants.ui.backgroundTypes.spotlight
+      uriList: content.backgrounds
+    }
+  else
+    displayDefaultBackground()
+  end if
 End Function
 
 
@@ -3316,4 +3325,92 @@ Function checkIfUserIsAdultByParentalRatingAndBirthday()
   end if
 
   return isAdult
+End Function
+
+
+' Checks if the video preview is queued.
+' @return: boolean, true if the video preview is queued, false otherwise
+Function isVideoPreviewPlayQueued()
+  isVideoPreviewPlayQueued = false
+  if m.videoPreviewPlayer <> invalid AND m.queuedVideoPlayerCommand <> invalid AND m.videoPreviewPlayer.isSameNode(m.queuedVideoPlayerCommand.videoPlayerNode) = TRUE AND m.queuedVideoPlayerCommand.command = "play" then
+    isVideoPreviewPlayQueued = true
+  end if
+  return isVideoPreviewPlayQueued
+End Function
+
+
+' Processes the user content selection.
+' @content, roSGNode, the content item that the user selected.
+' @screen, roSGNode, the screen that the user selected the content item from.
+' @playbackSource, assocarray, the playback source for the content.
+Function processUserContentSelection(content, screen, playbackSource = {}) as Void
+  if screen.isInFocusChain() = false
+    return
+  end if
+  contentType = content.type
+  playerType = content.playerType
+  if isAA(content.scheduleData)
+    playerType = content.scheduleData.playerType
+  end if
+
+  m.videoPreviewDebounce.control = "stop"
+  if isNonEmptyString(content.actionId) = true
+    if content.actionId = "signInWatch"
+      startSignIn(refreshScreenAndContentAfterSignIn)
+    else if content.actionId = "watchLive"
+      if playerType = m.constants.ui.playerTypes.fox
+        playLinearVideoWithFoxPlayer(content)
+      end if
+    else if content.actionId = "reminder"
+      addOrRemoveReminderForEventContent(content)
+    else
+      showLinearDetailScreen(content, playbackSource)
+    end if
+  else if contentType = m.constants.uapiContentTypes.channel
+    stopVideoPreview()
+    contentMode = ""
+    if screen.contentMode <> m.constants.ui.contentMode.homescreen
+      contentMode = screen.contentMode
+    end if
+    showCategoryDetailsScreen(content, true, contentMode)
+  else if contentType = m.constants.ui.contentTypes.historySignedOutUser
+    startSignIn(refreshScreenAndContentAfterSignIn)
+  else if contentType = m.constants.ui.contentTypes.linear
+    selectLinearContent(content)
+  else if contentType = m.constants.ui.contentTypes.skinAd
+    playAdContent(content)
+  else if playerType = m.constants.ui.playerTypes.fox
+    showLinearDetailScreen(content, playbackSource)
+  else
+    showDetailScreen(content, true, invalid, invalid, playbackSource)
+  end if
+End Function
+
+
+
+' Processes the user content selection.
+' @content, roSGNode, the content item that the user selected.
+' @screen, roSGNode, the screen that the user selected the content item from.
+' @playbackSource, assocarray, the playback source for the content.
+Function processUserPlayAction(content, screen, playbackSource = {}) as Void
+  if screen.isInFocusChain() = false
+    return
+  end if
+  contentType = content.type
+
+  ' Since category panel list screen re-uses the method allowing it to play the content.
+  if contentType = m.constants.uapiContentTypes.channel
+    contentMode = ""
+    if screen.contentMode <> m.constants.ui.contentMode.homescreen
+      contentMode = screen.contentMode
+    end if
+    showCategoryDetailsScreen(content, true, contentMode)
+  else if contentType = m.constants.ui.contentTypes.historySignedOutUser
+    '//if a signed out user selects the continue watching row, then navigate him/her to the sign in screen
+    startSignIn(refreshScreenAndContentAfterSignIn)
+  else if contentType = m.constants.ui.contentTypes.skinAd
+    playAdContent(content)
+  else
+    showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource)
+  end if
 End Function

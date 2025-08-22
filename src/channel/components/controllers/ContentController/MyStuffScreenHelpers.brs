@@ -156,7 +156,7 @@ Function onReloadUserCategoriesResponseInMyStuffScreen(response)
         if response.getChildCount() > 0
           newCategory = response
         end if
-        
+
         if content.getChildCount() > 0
           for i = 0 to content.getChildCount() - 1
             container = content.getChild(i)
@@ -171,7 +171,7 @@ Function onReloadUserCategoriesResponseInMyStuffScreen(response)
       end if
 
       if newCategory <> invalid AND oldCategory <> invalid
-        screen.isLoading = true   '//In order to properly refresh the screen content, we need to mark the screen has loading, which will reset the content
+        screen.isLoading = true '//In order to properly refresh the screen content, we need to mark the screen has loading, which will reset the content
 
         'replace the old category with the new category
         content.replaceChild(newCategory, nOldCategoryIndex)
@@ -221,10 +221,10 @@ Function onErrorReloadUserCategoriesInMyStuffScreen(response)
 
       showErrorModal(modalInfo, onUserMyStuffCategoriesFailed, invalid, setContentToRefresh, screenID, [getTranslation("dialog_button_continue")])
     else
-      '//As a last resort, if there was a problem getting a specific category when refreshing, 
+      '//As a last resort, if there was a problem getting a specific category when refreshing,
       '//and the screen is not in focus, then set the entire page to refresh. This way there is a chance
       '//that the user will see the correct content on this screen
-      setContentToRefresh(m.constants.ui.screenIds.myStuffScreen) 
+      setContentToRefresh(m.constants.ui.screenIds.myStuffScreen)
     end if
   end if
 End Function
@@ -238,7 +238,7 @@ Function onUserMyStuffCategoriesFailed()
 
   if screen <> invalid AND screen.isInFocusChain() = true
     '//refresh the myStuff screen content after the screen had experienced an error
-    setContentToRefresh(screenID) 
+    setContentToRefresh(screenID)
     showMyStuffScreen()
   end if
 
@@ -261,19 +261,19 @@ Function jumpToPreviousFocusedItem(screen)
 
     if rowItemFocused <> invalid
       '//try to focus on the previous focused item before the content was reloaded.
-      screen.jumpToRowItemByIdAndIndex  = {
+      screen.jumpToRowItemByIdAndIndex = {
         id: oldFocusedContentID,
         index: rowItemFocused
       }
     else
       '//focus on the left most item
-      screen.jumpToRowItemByIdAndIndex  = {
-        index: [0,0]
+      screen.jumpToRowItemByIdAndIndex = {
+        index: [0, 0]
       }
     end if
 
   end if
-End FUnction
+End Function
 
 
 ' Determine the valid until duration baed on the passed content's container children.
@@ -306,13 +306,13 @@ Function determineValidUntilDurationBasedOnChildren(content)
   end if
 
   return nValidReturn
-End function
+End Function
 
 
 Function onSignUpButtonSelectedOnMyStuffScreen()
   tubiLog("MyStuffScreenHelpers.onSignUpButtonSelectedOnMyStuffScreen")
   startSignIn(onRegistrationProcessCompletedOnMyStuffScreen)
-End function
+End Function
 
 
 Function onHomeButtonSelectedOnMyStuffScreen()
@@ -321,7 +321,7 @@ Function onHomeButtonSelectedOnMyStuffScreen()
   homeSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
   focusSideNavOption(homeSideNavID)
   showDefaultHomeScreen()
-End function
+End Function
 
 
 'myStuff screen has told us that the content is out of cache window, so refresh
@@ -342,7 +342,7 @@ Function refreshContentSignalForMyStuffScreen(screen)
   showHideSpinner(true)
   screen.content = invalid
   screen.contentUpdated = true
-  stopVideoPreview()  '//In case a video preview is playing, stop it until the new content has loaded.
+  stopVideoPreview() '//In case a video preview is playing, stop it until the new content has loaded.
   fetchMyStuffCategoryDetails()
 End Function
 
@@ -351,17 +351,18 @@ End Function
 Function onMyStuffContentSelected(msg)
   tubiLog("MyStuffScreenHelpers.onMyStuffContentSelected")
   content = msg.getData()
+  screen = msg.getRoSGNode()
   if content.type <> m.constants.ui.contentTypes.emptyContainer
     '//NOTE: If the content type is empty, then it is most likely the user has no items in a myList row  (i.e. continue watching, myList)
     ' and the user attempted to click on an empty row.
     ' Nothing should happen.
     playbackSource = {
       "srcForAnalytic": m.constants.player.playbackSource.unknown
-      "srcForAds":m.constants.player.playbackOrigin.container
-      "playbackContainer": content.parentId
+      "srcForAds": m.constants.player.playbackOrigin.container
+      "playbackContainer": getCurrentFocusedContainerId(screen, content)
     }
 
-    showDetailScreen(content, true, invalid, invalid, playbackSource)
+    processUserContentSelection(content, screen, playbackSource)
   end if
 End Function
 

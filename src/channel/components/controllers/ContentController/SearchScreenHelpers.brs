@@ -30,29 +30,20 @@ End Function
 Function onSearchContentSelected(msg)
   tubiLog("SearchScreenHelpers.onSearchContentSelected")
   m.autoplayContext = invalid
-  searchScreen = msg.getRoSGNode()
 
-  selectedContent = msg.getData()
-  'Launch the full player if it's linear content. Otherwise, launch details screen
-  if selectedContent <> invalid AND selectedContent.type = m.constants.ui.contentTypes.linear
-    playbackSource = {
-      "srcForAnalytic": m.constants.player.playbackSource.unknown
-      "srcForAds": m.constants.player.playbackOrigin.search
-    }
-    playLinearVideoContent(selectedContent, false, searchScreen.id, false, playbackSource)
-  else
-    playbackSource = {
-      "srcForAnalytic": m.constants.player.playbackSource.unknown
-      "srcForAds": m.constants.player.playbackOrigin.search
-    }
+  screen = msg.getRoSGNode()
+  content = msg.getData()
+  playbackSource = {
+    "srcForAnalytic": m.constants.player.playbackSource.unknown
+    "srcForAds": m.constants.player.playbackOrigin.search
+  }
 
-    showDetailScreen(searchScreen.contentSelected, true, invalid, invalid, playbackSource)
-  end if
+  processUserContentSelection(content, screen, playbackSource)
 End Function
 
 
 Function onSearchContentToPlay(msg)
-  searchScreen = msg.getRoSGNode()
+  screen = msg.getRoSGNode()
   content = msg.getData()
 
   playbackSource = {
@@ -60,11 +51,7 @@ Function onSearchContentToPlay(msg)
     "srcForAds": m.constants.player.playbackOrigin.search
   }
 
-  if content <> invalid AND content.type = m.constants.ui.contentTypes.linear
-    playLinearVideoContent(content, false, searchScreen.id, false, playbackSource)
-  else
-    showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource)
-  end if
+  processUserPlayAction(content, screen, playbackSource)
 End Function
 
 

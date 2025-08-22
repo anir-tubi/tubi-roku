@@ -237,8 +237,8 @@
               width="57"
               loadDisplayMode="scaleToFit"
               loadSync="true"/>
-              <Badge
-                id="uhdAvailableBadge" />
+            <Badge
+              id="uhdAvailableBadge" />
             <Group
               id="Rating">
               <Poster
@@ -335,7 +335,7 @@
             width="24"
             height="24"
             translation="[0,9]"
-            uri="pkg:/images/lock-closed.webp"
+            uri="pkg:/images/account-icon.webp"
             loadDisplayMode="scaleToFit" />
           <Label
             id="SignInText"

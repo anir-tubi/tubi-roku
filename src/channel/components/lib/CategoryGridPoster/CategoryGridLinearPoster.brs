@@ -172,7 +172,7 @@ Function setLockIcon()
     m.lockIcon.opacity = 0.0
     m.lockIcon.width = 48
     m.lockIcon.height = 48
-    m.lockIcon.uri = "pkg:/images/icon-lock.webp"
+    m.lockIcon.uri = "pkg:/images/account-icon.webp"
     m.lockIcon.translation = [m.top.width - 56, 8]
     m.top.observeFieldScoped("focusPercent", "onHandleFocus")
     m.top.observeFieldScoped("rowHasFocus", "onHandleFocus")

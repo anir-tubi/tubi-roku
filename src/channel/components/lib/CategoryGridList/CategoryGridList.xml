@@ -41,7 +41,7 @@
 
       <field id="skinAdContentUpdated" alias="skinAdRow.contentUpdated" />
 
-      <field id="featuredRowContent" type="node" alias="FeaturedRowList.content" />
+      <field id="featuredRowContent" type="node" />
 
       <!-- contentUpdated will be set when the new content is ready to be displayed on the screen. -->
       <field id="contentUpdated" type="boolean" alwaysNotify="true"/>
@@ -124,6 +124,8 @@
       <field id="lastFocusedList" type="string" />
 
       <field id="kidsMode" type="boolean" />
+
+      <field id="showFocusFeedback" alias="RowList.drawFocusFeedback" />
 
     <!-- OUTPUT -->
       <field id="itemSelected" type="node"/>

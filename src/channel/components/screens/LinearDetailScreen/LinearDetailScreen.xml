@@ -1,0 +1,43 @@
+<component name="LinearDetailScreen" extends="BaseScreen">
+  <script type="text/brightscript" uri="LinearDetailScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+    <field id="content" type="node" alias="liveEventsContainer.itemContent" />
+    <field id="trackingLoadStartTime" type="integer" />
+    <field id="playbackSource" type="assocarray" />
+    <field id="didUserSetReminderForEventContent" type="boolean" />
+    <field id="signedIn" type="boolean" />
+    <field id="relatedContent" type="node" alias="relatedContentContainer.content" />
+    <field id="relatedContentUpdated" alias="relatedContentContainer.contentUpdated" />
+    <field id="shouldTrackViewableImpressionEvent" type="boolean" value="true" />
+
+    <!-- OUTPUTS -->
+    <field id="backButtonPressed" type="boolean" alwaysNotify="true" />
+    <field id="selectedRelatedContent" alias="relatedContentContainer.selectedContent" />
+    <field id="ctaButtonSelectedId" alias="liveEventsContainer.ctaButtonSelectedId" />
+  </interface>
+
+  <children>
+    <Poster
+      id="leftChevron"
+      uri="pkg:/images/left-chevron.png"
+      width="15"
+      height="27"
+      translation="[75,528]" />
+
+    <Group
+      id="contentContainer">
+      <LiveEventsContainer
+        isContentDetailsView="true"
+        id="liveEventsContainer" />
+
+      <RelatedContentContainer
+        id="relatedContentContainer" />
+    </Group>
+  </children>
+</component>

@@ -7,9 +7,9 @@
 
 
 '@Test populateInfoPanelItem unit test
-'@Params [ "asdf", {channel: invalid, program: invalid, asdf: invalid} ]
-'@Params [ "a,b", {channel: invalid, program: invalid, a:invalid, b:invalid} ]
-'@Params [ "a:,b:,c:1234", {channel: invalid, program: invalid, a: "", b: "", c: "1234"} ]
+'@Params [ "asdf", {channel: invalid, program: invalid} ]
+'@Params [ "a,b", {channel: invalid, program: invalid} ]
+'@Params [ "a:,b:,c:1234", {channel: invalid, program: invalid} ]
 '@Params [ "channel:1235,program:a_program_id", {channel: 12345, channel: a_program_id} ]
 Function deeplinkHelper_parseSportsEventContentId_test(input, expected)
   result = parseSportsEventContentId(input.encodeUriComponent())

@@ -56,7 +56,7 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.observeFieldScoped("columnFocused", "onColumnFocusChanged")
     homeScreen.observeFieldScoped("currFocusRow", "onHomeScreenRowFocusChanged")
     homeScreen.observeFieldScoped("pauseVideoPreview", "onPauseVideoPreview")
-    homeScreen.observeFieldScoped("eventCtaListItemSelected", "onEventCtaListItemSelected")
+    homeScreen.observeFieldScoped("loadCategoryForIds", "onLoadCategoryForIds")
     homeScreen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
     homeScreen.observeFieldScoped("featuredRowCurrFocusColumn", "onFeaturedRowCurrFocusColumnChange")
     homeScreen.observeFieldScoped("featuredListCurrFocusRow", "onFeaturedRowCurrFocusRowChange")
@@ -573,6 +573,8 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     homeScreen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
 
     if isKidsUIOn() = false AND screenID = m.constants.ui.screenIds.homeScreen
+      refreshLiveEventsContainerWithEpgListingInfo(rawResponse)
+
       getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_4", true)
       if m.isUserInVideoTilesExperiment = true AND isNode(rawResponse) = true AND rawResponse.getChildCount() > 0
         ' Only show the video tile overlay group if the screen is the home screen and the skin ads are not available.
@@ -1111,53 +1113,41 @@ Function startCountdownTimer()
 End Function
 
 
-' Show the detail screen for the selected content
+Function getCurrentFocusedContainerId(screen, content)
+  containerId = invalid
+  if screen <> invalid AND screen.currCategoryId <> invalid
+    containerId = screen.currCategoryId
+  else if screen <> invalid AND screen.categoryId <> invalid
+    containerId = screen.categoryId
+  else if content <> invalid
+    containerId = content.parentId
+  end if
+
+  return containerId
+End Function
+
+
+' Called when the user selects a content item on the home screen.
+' @msg, roSGNode, the message containing the content item and the home screen node.
 Function onContentSelected(msg)
   tubiLog("HomeScreenHelpers.onContentSelected")
   content = msg.getData()
   homeScreen = msg.getRoSGNode()
-  m.autoplayContext = homeScreen.currCategoryId
-  m.videoPreviewDebounce.control = "stop"
-
-  contentType = content.type
-  if contentType = m.constants.uapiContentTypes.channel
-    stopVideoPreview()
-    contentMode = ""
-    if homeScreen.contentMode <> m.constants.ui.contentMode.homescreen
-      contentMode = homeScreen.contentMode
-    end if
-    showCategoryDetailsScreen(content, true, contentMode)
-  else if contentType = m.constants.ui.contentTypes.historySignedOutUser
-    '//if a signed out user selects the continue watching row, then navigate him/her to the sign in screen
-    startSignIn(refreshScreenAndContentAfterSignIn)
-  else if contentType = m.constants.ui.contentTypes.linear
-    selectLinearContent(content)
-  else if contentType = m.constants.ui.contentTypes.skinAd
-    playAdContent(content)
-  else if contentType = m.constants.ui.contentTypes.adRowlistSpotlight OR contentType = m.constants.ui.contentTypes.adRowlistCarousel
-    '//Do nothing if the user selects an ad content on the homescreen.
-  else
-    playbackSource = {
-      "srcForAnalytic": m.constants.player.playbackSource.unknown
-      "srcForAds": m.constants.player.playbackOrigin.container
-      "playbackContainer": homeScreen.currCategoryId
-    }
-    showDetailScreen(content, true, invalid, invalid, playbackSource)
-  end if
+  containerId = getCurrentFocusedContainerId(homeScreen, content)
+  m.autoplayContext = containerId
+  playbackSource = {
+    "srcForAnalytic": m.constants.player.playbackSource.unknown
+    "srcForAds": m.constants.player.playbackOrigin.container
+    "playbackContainer": containerId
+  }
+  processUserContentSelection(content, homeScreen, playbackSource)
 End Function
 
 
 Function onContentToPlay(msg)
   content = msg.getData()
   screen = msg.getRoSGNode()
-
-  if screen <> invalid AND screen.currCategoryId <> invalid
-    containerId = screen.currCategoryId
-  else if screen <> invalid AND screen.categoryId <> invalid 'category screen
-    containerId = screen.categoryId
-  else
-    containerId = content.parentId
-  end if
+  containerId = getCurrentFocusedContainerId(screen, content)
 
   playbackSource = {
     "srcForAnalytic": m.constants.player.playbackSource.unknown
@@ -1165,22 +1155,7 @@ Function onContentToPlay(msg)
     "playbackContainer": containerId
   }
 
-  contentType = content.type
-  ' Since category panel list screen re-uses the method allowing it to play the content.
-  if contentType = m.constants.uapiContentTypes.channel
-    contentMode = ""
-    if screen.contentMode <> m.constants.ui.contentMode.homescreen
-      contentMode = screen.contentMode
-    end if
-    showCategoryDetailsScreen(content, true, contentMode)
-  else if contentType = m.constants.ui.contentTypes.historySignedOutUser
-    '//if a signed out user selects the continue watching row, then navigate him/her to the sign in screen
-    startSignIn(refreshScreenAndContentAfterSignIn)
-  else if contentType = m.constants.ui.contentTypes.skinAd
-    playAdContent(content)
-  else
-    showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource)
-  end if
+  processUserPlayAction(content, screen, playbackSource)
 End Function
 
 
@@ -1551,7 +1526,11 @@ Function pauseVideoPreviewAndShowPoster()
     end if
   end if
   isLinearPlayerPlaying = isLinearPlayerLoadingOrPlaying()
-  updatePreviewPlayerToInlineView()
+  screen = getCurrentScreen()
+
+  if screen <> invalid AND screen.featuredRowFocusedItem <> invalid
+    updatePlayerLayoutBasedOnFocusedContent(screen.featuredRowFocusedItem)
+  end if
   if isLinearPlayerPlaying = true
     stopAndHideLinearVideoPlayer()
   end if
@@ -1657,7 +1636,12 @@ Function onFeaturedListHasFocusChange(msg)
   previewContent = m.videoPreviewPlayer.content
   m.videoPreviewPlayer.visible = (isCurrentScreenHomeScreen() = false OR (content <> invalid AND previewContent <> invalid AND content.id = previewContent.id))
   if hasFeaturedListFocus = true
-    displayDefaultBackground()
+    if isNode(content) = true AND arrayIncludes(m.constants.ui.liveEventsGridTypes, content.gridItemType)
+      displayBackgroundForLiveEvents(content)
+    else
+      displayDefaultBackground()
+    end if
+
     ' Resetting the content focused when the featured row list receives focus.
     if screen.hasField("contentFocused") = true
       screen.contentFocused = invalid
@@ -1704,6 +1688,7 @@ End Function
 
 Function onFeaturedRowFocusedItemChange(msg)
   focusedItem = msg.getData()
+  screen = msg.getRoSGNode()
   ' Only process if the focused item is a video tile.
   if focusedItem <> invalid AND arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, focusedItem.gridItemType) = false
     m.inlineVideoPreviewPlayerContainer.visible = true
@@ -1711,12 +1696,6 @@ Function onFeaturedRowFocusedItemChange(msg)
     ' For ex: One instance is Continue watching row getting updated with the new item or existing item been deleted.
     if isNode(m.inlineVideoMetadataOverlay.itemContent) = true AND focusedItem.title <> m.inlineVideoMetadataOverlay.itemContent.title
       updateInTransitVideoMetadataOverlay()
-    end if
-
-    ' If VideoPreview is on and we have not started the debounce, we will start it.
-    ' This is needed in case where for initial load and refresh cases where columnFocusChange is not triggered.
-    if isVideoPreviewOn() = true AND m.videoPreviewDebounce.control = "stop"
-      m.videoPreviewDebounce.control = "start"
     end if
   else
     m.inlineVideoPreviewPlayerContainer.visible = false
@@ -1726,6 +1705,18 @@ Function onFeaturedRowFocusedItemChange(msg)
       m.videoPreviewDebounce.duration = m.constants.player.videoPreviewDelayTimes.adCarousel
       m.videoPreviewDebounce.control = "start"
     end if
+  end if
+
+  ' If VideoPreview is on and we have not started the debounce, we will start it.
+  ' This is needed in case where for initial load and refresh cases where columnFocusChange is not triggered.
+  if focusedItem <> invalid AND screen.featuredListHasFocus = true AND isVideoPreviewOn() = true AND m.videoPreviewDebounce.control = "stop"
+    m.videoPreviewDebounce.control = "start"
+  end if
+
+  if isNode(focusedItem) = true AND arrayIncludes(m.constants.ui.liveEventsGridTypes, focusedItem.gridItemType)
+    displayBackgroundForLiveEvents(focusedItem)
+  else
+    displayDefaultBackground()
   end if
   setUIBasedOnFocusedContent(focusedItem)
 End Function
@@ -1849,4 +1840,35 @@ Function checkAndSetSponsorshipBackground(content, rowIndex)
     end if
     setSponsorshipBackground(background)
   end if
+End Function
+
+
+Function refreshLiveEventsContainerWithEpgListingInfo(response)
+  liveEventsContainer = getLiveEventsContainer(response)
+  if isNode(liveEventsContainer) AND liveEventsContainer.getChildCount() > 0
+    ' Currently limiting it to only one live event spotlight.
+    ' Might have to revisit this once we add support for multiple live event in container.
+    program = liveEventsContainer.getChild(0)
+    if isNode(program) AND isAA(program.scheduleData) AND program.scheduleData.id <> invalid
+      scheduleId = program.scheduleData.id.toStr()
+      updateLiveEventsContainerWithEpgListingInfo(scheduleId)
+    end if
+  end if
+End Function
+
+
+' Returns the live events container if available.
+' @param rawResponse: roSGNode, the raw response.
+' @return: roSGNode, the live events container if available, otherwise invalid.
+Function getLiveEventsContainer(rawResponse)
+  if isNode(rawResponse) = true AND rawResponse.getChildCount() > 0
+    for i = 0 to rawResponse.getChildCount() - 1
+      child = rawResponse.getChild(i)
+      if child.gridItemType = m.constants.ui.gridItemTypes.liveEventSpotlight
+        return child
+      end if
+    end for
+  end if
+
+  return invalid
 End Function

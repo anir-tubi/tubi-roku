@@ -281,6 +281,11 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
   params["include_sponsorships"] = true
   params["include_ui_customization"] = true
 
+  if m.constants.settings.mode = "dev" OR (m.constants.settings.mode = "qa" AND m.constants.settings.enableLiveEventsSpotlightAndBanner = true) then
+    params["include_live_event_spotlight"] = true
+    params["include_live_event_banner"] = true
+  end if
+
   params["is_kids_mode"] = bKidsMode
   ' content_mode is mandatory param and its value needs to be passed as empty for fetching homescreen content
   params["content_mode"] = "" ' default contentMode
@@ -392,6 +397,8 @@ Function cmsApi_createMiniHomeScreenOnPlayerReqInfo(bKidsMode = false, passedOpt
   end if
 
   params["include_ui_customization"] = true
+  params["include_live_event_spotlight"] = false
+  params["include_live_event_banner"] = false
 
   if passedOptions <> invalid
     if passedOptions.params <> invalid

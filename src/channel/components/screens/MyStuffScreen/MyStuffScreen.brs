@@ -47,7 +47,7 @@ Function init()
   'Content area
   m.RowList = m.top.findNode("RowList")
   m.GuestMenu = m.top.findNode("GuestMenu")
-  m.RowList.focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+  m.RowList.focusBitmapUri = "pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
   m.GuestMenu.focusBitmapUri = "pkg:/images/menu-focus-$$RES$$.9.png"
   m.GuestMenu.focusFootprintBitmapUri = "pkg:/images/menu-disabled-focus-$$RES$$.9.png"
   m.AllEmptyUIMenu.focusBitmapUri = "pkg:/images/menu-focus-$$RES$$.9.png"
@@ -183,7 +183,7 @@ Function onLoadingChange(msg)
 End Function
 
 
-Function onContentUpdateChange() As Void
+Function onContentUpdateChange() as Void
   tubiLog("MyStuffScreen.onContentUpdateChange")
   content = m.top.content
   if content <> invalid
@@ -197,7 +197,7 @@ Function onContentUpdateChange() As Void
       for i = 0 to nContainers - 1
         container = content.getChild(i)
         if container.gridItemType <> m.constants.ui.gridItemTypes.emptyContainer
-            m.isAllContentEmpty = false
+          m.isAllContentEmpty = false
         end if
       end for
 
@@ -365,8 +365,6 @@ Function populateInfoPanelByContent(focusedContent)
       mode = m.constants.ui.infoPanelModes.linearHomeScreen
     else if sType = m.constants.ui.categoryTypes.historySignedOutUser
       mode = m.constants.ui.infoPanelModes.continueWatching
-    else if sType = m.constants.ui.categoryTypes.preview
-      mode = m.constants.ui.infoPanelModes.vitg
     else if sType = m.constants.ui.contentTypes.sportsEvent
       mode = m.constants.ui.infoPanelModes.sportsEvent
     end if
@@ -380,29 +378,28 @@ End Function
 '@contentNode: content node
 Function populateInfoPanel(mode, contentNode)
   if contentNode <> invalid
-    if mode = m.constants.ui.infoPanelModes.vitg
-      m.InfoPanel.mode = mode
+
+    m.InfoPanel.title = contentNode.title
+    m.InfoPanel.description = contentNode.description
+
+    if contentNode.needsLogin
+      m.InfoPanel.loginReason = contentNode.loginReason
+      m.InfoPanel.needsLogin = true
+    else
+      m.InfoPanel.needsLogin = false
+    end if
+
+    if isAA(contentNode.scheduleData) = true
+      populateInfoPanelForLiveEvent(contentNode, m.InfoPanel)
     else if mode = m.constants.ui.infoPanelModes.item
       populateInfoPanelWithHomescreenStyleItemMode(contentNode, m.InfoPanel)
     else if mode = m.constants.ui.infoPanelModes.linearHomeScreen
       m.InfoPanel.mode = mode
       m.InfoPanel.liveBadgeHeaderText = UCase(getTranslation("screenSearch_liveText"))
-      m.InfoPanel.title = contentNode.title
-      m.InfoPanel.description = contentNode.description
-
-      if contentNode.needsLogin AND m.top.signedIn <> true
-        m.InfoPanel.loginReason = contentNode.loginReason
-        m.InfoPanel.needsLogin = true
-      else
-        m.InfoPanel.needsLogin = false
-      end if
-
       m.InfoPanel.reminderIsSet = false
       m.InfoPanel.width = 650
     else if mode = m.constants.ui.infoPanelModes.continueWatching
       m.InfoPanel.mode = mode
-      m.InfoPanel.title = contentNode.title
-      m.InfoPanel.description = contentNode.description
       m.InfoPanel.reminderIsSet = false
       m.InfoPanel.width = 960
     else if mode = m.constants.ui.infoPanelModes.sportsEvent
@@ -535,7 +532,7 @@ Function resolveAbbreviatedContent(rowItemIndex)
   category = m.top.content.getChild(rowItemIndex[0])
   if content <> invalid AND isNonEmptyString(content.id)
     contentId = content.id
-    contentFromJSON = m.metadataTranslate.getContentFromCategoryJson(category, contentId) ' can return invalid
+    contentFromJSON = m.metadataTranslate.getContentFromCategoryJson(category, contentId, m.top.signedIn) ' can return invalid
     return contentFromJSON
   end if
 
@@ -698,7 +695,7 @@ Function onResetChange(msg)
   end if
 End Function
 
-Function onKeyEvent(key As String, press As Boolean) as Boolean
+Function onKeyEvent(key as String, press as Boolean) as Boolean
   tubiLog("MyStuffScreen.onKeyEvent key = " + key)
   if press = true
     if key = "OK"

@@ -58,7 +58,11 @@ Function playLinearVideoWithFoxPlayer(content)
 
     ' TODO update when we figure out what we are doing for UI
     ' getFoxListingItemsAndRefreshPurpleCarpetContainerData(setFoxContentId)
-    foxVideoPlayerWrapperScreen.contentId = content.listingId
+    if isAA(content.scheduleData) = true AND content.scheduleData.thirdPartyId <> invalid then
+      foxVideoPlayerWrapperScreen.contentId = content.scheduleData.thirdPartyId
+    else
+      foxVideoPlayerWrapperScreen.contentId = content.listingId
+    end if
   end if
 End Function
 

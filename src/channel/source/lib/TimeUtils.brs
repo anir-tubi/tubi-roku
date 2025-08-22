@@ -270,6 +270,22 @@ Function isGreaterThanCurrentTime(dateString)
 End Function
 
 
+' @dateString: string, an ISO-8601 string representing the UTC time to check against the current UTC time
+Function isLessThanOrEqualToCurrentTime(dateString)
+  if isIso8601String(dateString) = true
+    dateTime = CreateObject("roDateTime")
+    nowSeconds = dateTime.AsSeconds()
+
+    dateTime.FromISO8601String(dateString)
+    dateSeconds = dateTime.AsSeconds()
+
+    return nowSeconds >= dateSeconds
+  end if
+
+  return false
+End Function
+
+
 ' Compares 2 dates. Returns true if dateString1 is later than dateString2
 ' IMPORTANT: The ISO-8601 strings of the params must match the formats documented at
 ' https://developer.roku.com/en-gb/docs/references/brightscript/interfaces/ifdatetime.md#fromiso8601stringdatestring-as-string-as-void
