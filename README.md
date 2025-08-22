@@ -244,15 +244,17 @@ Note: If you are adding a new unit test, then you can test only this new unit te
 
 3\. Prepare for submission release.
 
-- Create a new branch based off of master which will be used to make updates as needed for a submission release. Branch name is not important, but for clarity it can be something like: `updates_for_x_y_submission`, where x is the Major Release number and where y is the Minor Release number: i.e. `updates_for_2_14_submission`.
-
-- Create a new `new_images_since_x_y` file: i.e. `new_images_since_2_9` in the `new_images_since` directory.
+- Create a new branch based off of master which will be used to make updates as needed for a submission release. Branch name is not important, but for clarity it can be something like: `updates_for_x_y_submission`, where x is the Major Release number and where y is the incremented (as described in the next step) Minor Release number: i.e. `updates_for_2_14_submission`. Please: 
 
 - Update version numbers in `config/build.yml`
 
   - Increment `minor_version`
 
   - set `build_version` to `0`
+
+- Create a new `new_images_since_x_y` file: i.e. `new_images_since_2_9` in the `new_images_since` directory. Copy the commented header from the previous file into the new file.
+
+- Create a new `new_fonts_since_x_y` file: i.e. `new_fonts_since_2_9` in the `new_fonts_since` directory. Copy the commented header from the previous file into the new file.
 
 - Create a new image to serve as the staging channel launch icon.
   - Using GIMP or Photoshop or other image editor, modify the `channel-store/channel-store-poster-540x405.png` with some text to identify it as the x_y staging channel.
@@ -269,7 +271,7 @@ Note: If you are adding a new unit test, then you can test only this new unit te
 
    You may see a Connection Error modal on roku device, it is because the starter and remote components are not yet there in aws. We will upload it to aws in coming steps. So you may ignore the error modal now. Just make sure the 'tubi_x_y_z.pkg' got created in /build directory.
 
-- In a browser, navigate to [https://developer.roku.com/developer-channels/channels](https://developer.roku.com/developer-channels/channels), sign in, and follow the process to create a new private channel.
+- In a browser, navigate to [https://developer.roku.com/developer-channels/channels](https://developer.roku.com/developer-channels/channels), get the developer signin credentials from the company password manager (currently Cerby. Check myfox okta website), sign in, and follow the process to create a new private channel.
 
   - Upload the `tubi_x_y_z.pkg` file from the `/build` directory.
 
@@ -313,8 +315,9 @@ TBD
 
   - Go to the ShortCut tool
   - Create a QA ticket by navigating to the following menu items: Create Story in Team> Create Story> Product QA Team> Roku QA Template
-  - Run the command gulp buildQaChanges, which will build most of the copy for this ticket and place it in your clipboard
+  - Run the command `gulp buildQaChanges`, which will build most of the copy for this ticket and place it in your clipboard
   - Paste the copy in the newly created SC ticket from the previous step
+  - Change the branch name within the SC ticket to reflect the new created submission branch (`x_y_branch`). The `buildQaChanges` command does not yet handle submission builds so the command will assume that it should use the remote submission naming convention. 
   - Make sure that no work is missing in the list and that the included info looks correct
   - Provide QA with a link to the ticket within the roku_qa slack channel
 
