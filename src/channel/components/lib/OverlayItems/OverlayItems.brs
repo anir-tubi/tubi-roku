@@ -42,7 +42,7 @@ Function onItemInfoChanged(msg)
     subTitleLabel.text = items.subtitle
     subTitleLabel.height = 40
     m.overLayItemsLayoutGroup.appendChild(subTitleLabel)
-    setTypographyOfLabel(subTitleLabel, typographyConstants.ids.bodyMedium)
+    setTypographyOfLabel(subTitleLabel, typographyConstants.ids.bodySmall)
   end if
 
   if items.id <> "sendFeedbackOnPlayer"
@@ -62,9 +62,9 @@ Function onItemInfoChanged(msg)
     itemComponentName = "CheckButton"
   end if
 
-  checkBoxList.focusBitmapUri = "pkg:/images/menu-focus-$$RES$$.9.png" 
+  checkBoxList.focusBitmapUri = "pkg:/images/menu-focus-$$RES$$.9.png"
   checkBoxList.id = items.id.trim()
-  checkBoxList.itemSize = [510,69]
+  checkBoxList.itemSize = [510, 69]
   checkBoxList.numRows = items.numRows
   checkBoxList.itemComponentName = itemComponentName
   checkBoxList.rowSpacings = [8]
@@ -73,7 +73,7 @@ Function onItemInfoChanged(msg)
   if items.defaultCheckedItemIndex <> invalid
     checkBoxList.defaultCheckedItemIndex = items.defaultCheckedItemIndex
   end if
-  
+
   checkBoxList.focusBitmapBlendColor = m.focusedColor
   checkBoxList.observeFieldScoped("itemSelected", "onWasItemSelectedFromMenu")
 
