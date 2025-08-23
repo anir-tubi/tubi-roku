@@ -30,12 +30,12 @@ Function TubiExperiments(experimentsInfo) as Object
         }
       }
 
-      '//This experiment will be for the new showcase cad campaigns. The possible "name" values are "control", "carousel", "spotlight"
+      '//This experiment will be for the new showcase cad campaigns. The possible "enabled_arm" values are "control", "carousel", "spotlight"
       ads_ott_hdc_adformats: {
         ads_ott_hdc_adformats_v1: {
-          default: { "name": "control" }
-          holdout_control: { "name": "control" }
-          holdout_winning: { "name": "control" }
+          default: { "enabled_arm": "control" }
+          holdout_control: { "enabled_arm": "control" }
+          holdout_winning: { "enabled_arm": "control" }
         }
       }
 

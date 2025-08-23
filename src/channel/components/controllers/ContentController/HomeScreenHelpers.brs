@@ -338,9 +338,8 @@ Function fetchHomeScreen(homeScreen, useCache = false)
       errorHandler = onEspanolScreenErrorResponse
     else if homeScreen.id = m.constants.ui.screenIds.homeScreen
       '//Call ad endpoint to get ad content for the homescreen
-
-      experimentAdType = getExperimentResource("ads_ott_hdc_adformats", "ads_ott_hdc_adformats_v1", false).name
-      if experimentAdType <> "control"
+      experimentAdType = getExperimentResource("ads_ott_hdc_adformats", "ads_ott_hdc_adformats_v1", false).enabled_arm
+      if experimentAdType <> invalid AND experimentAdType <> "control"
 
         aAdTypes = []
         if experimentAdType = "carousel"
