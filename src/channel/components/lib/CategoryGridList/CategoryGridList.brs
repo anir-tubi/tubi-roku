@@ -58,7 +58,7 @@ Function init()
   m.lastCurrentFocusColumn = 0
   m.lastFocusColumnIndex = 0
 
-  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_4", false)
+  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_4_restart", false)
   if isNonEmptyArray(experiment.featuredRowPosterSize) = true
     m.featuredRowPoster = experiment.featuredRowPosterSize
   else
@@ -139,7 +139,7 @@ Function onContainerAppendMoreTilesStatusChange(msg)
   ' So in the below logic before we start appending we check if there is a difference between currFocusColumn and rowItemFocused[1], this indicates to us that user is fast scrolling because when user press and hold only currFocusColumn changes and rowItemFocused[1] is updated only when user releases the press.
   ' So we store the value of where the user position is when we start appending and then we jump to that position when we are done appending.
   ' This way user press and hold is seem less.
-  ' TODO: Revisit the logic below and remove either if or else based on whether we graduated roku_home_screen_redesign_v_1_4 experiment.
+  ' TODO: Revisit the logic below and remove either if or else based on whether we graduated roku_home_screen_redesign_v_1_4_restart experiment.
   ' TODO: Revisit logic inside onComponentFocusChange since that gets triggered a lot of times during navigation we might not need that logic. Not changing now to avoid scope creep for this PR.
   if m.isWithDescPortraitSmallExpEnabled = true
     if status = "start" AND isNonEmptyArray(m.featuredRowList.rowItemFocused) = true AND (m.featuredRowList.rowItemFocused[0] = m.featuredRowList.currFocusRow AND m.featuredRowList.rowItemFocused[1] <> m.top.featuredRowCurrFocusColumn)

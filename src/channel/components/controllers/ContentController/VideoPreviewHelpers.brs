@@ -44,7 +44,7 @@ Function stopVideoPreview(node = invalid)
     node = m.videoPreviewPlayer
   end if
 
-  ' TODO: Remove if we do not graduate roku_home_screen_redesign_v_1_4 experiment.
+  ' TODO: Remove if we do not graduate roku_home_screen_redesign_v_1_4_restart experiment.
   ' This is needed to provide smooth scrolling experience when the user is scrolling the list because calling video stop causes glitchy behavior.
   isListScrolling = false
   screen = getCurrentScreen()

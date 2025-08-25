@@ -109,7 +109,7 @@ Function addControllerUi()
   m.videoTileOverlayGroup.clippingRect = [videoTilesListTranslation[0], videoTilesListTranslation[1], 1920, 1080]
   m.videoTileOverlayGroup.translation = [videoTilesListTranslation[0], -6]
 
-  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_4", false)
+  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_4_restart", false)
   ' This is used to track if the user is in the video tiles experiment.
   m.isUserInVideoTilesExperiment = (experiment <> invalid AND experiment.design_type = "withDescriptionPortraitSmall")
 
@@ -2008,7 +2008,7 @@ Function onCustomSuspend(msg)
         linearVideoPlayer.control = "stop"
       end if
 
-      ' Remove this line if we do not graduated roku_home_screen_redesign_v_1_4.
+      ' Remove this line if we do not graduated roku_home_screen_redesign_v_1_4_restart.
       ' This is needed to avoid having to use alwaysnotify on featuredListHasFocus and when app is suspended it does not fire focus change event on home screen.
       homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
       if homeScreen <> invalid
@@ -3258,7 +3258,7 @@ End Function
 ' Returns the size of the featured preivew player.
 ' @return: array, the size of the player
 Function getFeaturedPlayerSize()
-  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_4", false)
+  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_4_restart", false)
   if isNonEmptyArray(experiment.featuredRowPosterSize) = true
     featuredRowPoster = experiment.featuredRowPosterSize
   else
