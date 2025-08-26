@@ -226,7 +226,7 @@ Function parseHomeScreenAdsSuccess(fullResponse, reqInfo)
           sRowThumbnailURL = m.metadataTranslate.getRoundedCornersURL(carousel[0].backgrounds[0], 18)
           translatedThumb.hdgridposterurl = sRowThumbnailURL
 
-          if adUnit.trackers <> invalid AND isNonEmptyString(adUnit.trackers.imp) = true
+          if adUnit.trackers <> invalid AND isNonEmptyArray(adUnit.trackers.imp) = true
             carouselNode.imageImpTracking = adUnit.trackers.imp
           end if
           if adUnit.valid_duration <> invalid AND isInt(adUnit.valid_duration) = true
