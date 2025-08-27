@@ -338,7 +338,7 @@ Function fetchHomeScreen(homeScreen, useCache = false)
       errorHandler = onEspanolScreenErrorResponse
     else if homeScreen.id = m.constants.ui.screenIds.homeScreen
       '//Call ad endpoint to get ad content for the homescreen
-      experimentAdType = getExperimentResource("ads_ott_hdc_adformats", "ads_ott_hdc_adformats_v1", false).enabled_arm
+      experimentAdType = getExperimentResource("ads_ott_hdc_adformats", "ads_ott_hdc_adformats_v1", true).enabled_arm
       if experimentAdType <> invalid AND experimentAdType <> "control"
 
         aAdTypes = []
@@ -354,8 +354,6 @@ Function fetchHomeScreen(homeScreen, useCache = false)
       else
         'If not in experiment, then indicate that the adContentUpdated flag is true so that ads are not waited on when loading homescreen content
         bSkipCallingAdContent = true
-        '//::NOTE::ads_ott_hdc_adformats, this value is hardcoded for the experiment. It is the same value that is hardcoded in HomeScreenParsers.parseHomeScreenAdsSuccess()
-        m.homeScreenAdExperimentRowPlacement = 2
       end if
     end if
 
@@ -488,15 +486,6 @@ Function onHomesceenAdDisplaySuccessResponse(response)
   tubiLog("HomeScreenHelpers.onHomesceenAdDisplaySuccessResponse")
   homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
   if homeScreen <> invalid AND isNonEmptyArray(response) = true
-    for each adNode in response
-      '//::NOTE::ads_ott_hdc_adformats - just for the experiment, we are storing the rowPlacement in the ad campaigns so we can fire the experiment impression.
-      if adNode.type = m.constants.adTypes.adRowlistCarousel
-        m.homeScreenAdExperimentRowPlacement = adNode.rowPlacement
-      else if adNode.type = m.constants.adTypes.adRowlistSpotlight
-        '//::NOTE:: either spotlight or carousel can be used for the experiment - not both.
-        m.homeScreenAdExperimentRowPlacement = adNode.rowPlacement
-      end if
-    end for
     homeScreen.adContent = response
   end if
   homeScreen.adContentUpdated = true
@@ -910,14 +899,6 @@ End Function
 
 
 Function onHomeScreenRowFocusChanged(msg)
-  currFocusRow = msg.getData()
-  if currFocusRow <> invalid AND m.homeScreenAdExperimentRowPlacement <> invalid
-    if currFocusRow = m.homeScreenAdExperimentRowPlacement
-      '//Send exposure event for ads_ott_hdc_adformats_v1 experiment when the proper row gains focus (for control and variants)
-      getExperimentResource("ads_ott_hdc_adformats", "ads_ott_hdc_adformats_v1", true)
-    end if
-  end if
-
   if isLinearPlayerLoadingORPlaying() = true
     '//as the rowlist is scrolling, if the the linear video player is playing or loading, then make sure the linear video player has stopped
     stopAndHideLinearVideoPlayer()
@@ -1409,12 +1390,6 @@ End Function
 Function onFeaturedRowCurrFocusRowChange(msg)
   screen = msg.getRoSGNode()
   currFocusRow = msg.getData()
-  if currFocusRow <> invalid AND m.homeScreenAdExperimentRowPlacement <> invalid
-    if currFocusRow = m.homeScreenAdExperimentRowPlacement
-      '//Send exposure event for ads_ott_hdc_adformats_v1 experiment when the proper row gains focus (for control and variants)
-      getExperimentResource("ads_ott_hdc_adformats", "ads_ott_hdc_adformats_v1", true)
-    end if
-  end if
 
   if screen.lastFocusedList = "featuredRowList"
     m.inlineVideoMetadataOverlay.skipAnimation = true
