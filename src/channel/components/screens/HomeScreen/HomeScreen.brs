@@ -404,7 +404,11 @@ Function onAdDisplayCarouselContentFocusedManually(msg)
     nNewFocusCol = carouselComponent.itemFocused + 1
     categoryComponentInfo = {}
     categoryComponentInfo["category_slug"] = m.CategoryGridList.currCategoryId
-    categoryComponentInfo["category_row"] = m.CategoryGridList.cursorPosition[0]
+
+    ' The rowIndexBoost is 1 based. And Roku row list index is 0 based.
+    rowIndexBoost = m.categoryGridList.rowIndexBoost + 1
+    '//user starting at the following row/column
+    categoryComponentInfo["category_row"] = m.CategoryGridList.cursorPosition[0] + rowIndexBoost 'all analytics are 1 based
     categoryComponentInfo["category_col"] = nOldFocusCol
     'row is hardcoded to 1 in the line below because the row represents the row within the category_component, not within the grid
     'and the current design only has one row per category
@@ -415,7 +419,7 @@ Function onAdDisplayCarouselContentFocusedManually(msg)
       pageOneof: m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pageType, m.top.trackingPageInfo.pageValues)
       componentOneof: m.Tracking.getAnalyticsComponent("category_component", categoryComponentInfo)
       means_of_navigation: "BUTTON" 'MeansOfNavigation enum
-      vertical_location: m.CategoryGridList.cursorPosition[0]
+      vertical_location: m.CategoryGridList.cursorPosition[0] + rowIndexBoost 'all analytics are 1 based
       horizontal_location: nNewFocusCol
     }
   end if
