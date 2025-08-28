@@ -205,7 +205,7 @@ Function onContentUpdated(msg)
       content = m.top.content
     end if
 
-    if isAdDisplayCarouselAvailable() = true
+    if isAdDisplayCarouselAvailable() = false
       for i = 0 to content.getChildCount() - 1
         item = content.getChild(i)
         if item <> invalid AND item.type = m.constants.ui.contentTypes.adRowlistCarousel
