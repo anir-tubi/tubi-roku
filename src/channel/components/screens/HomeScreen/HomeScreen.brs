@@ -274,7 +274,6 @@ Function onLoadingChange()
     m.top.content = invalid
 
     ' Resetting the previous state variables.
-    m.CategoryGridList.jumpToItem = [0, 0]
     m.CategoryGridList.featuredListCurrFocusRow = -1
     m.CategoryGridList.featuredRowCurrFocusColumn = -1
     m.CategoryGridList.featuredListScrollDirection = "none"
