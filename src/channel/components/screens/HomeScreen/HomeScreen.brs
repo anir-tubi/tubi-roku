@@ -198,29 +198,31 @@ End Function
 
 
 Function onContentUpdated(msg)
-  if m.top.featuredRowContent <> invalid
-    content = m.top.featuredRowContent
-  else
-    content = m.top.content
-  end if
+  if m.top.contentUpdated = true
+    if m.top.featuredRowContent <> invalid
+      content = m.top.featuredRowContent
+    else
+      content = m.top.content
+    end if
 
-  if m.adRowlistCarouselComponent = invalid
-    for i = 0 to content.getChildCount() - 1
-      item = content.getChild(i)
-      if item <> invalid AND item.type = m.constants.ui.contentTypes.adRowlistCarousel
-        '//If there is a carousel, then preload the component so it is ready to be displayed
-        createAdDisplayCarouselComponent(item)
-        exit for
-      end if
-    end for
-  end if
+    if isAdDisplayCarouselAvailable() = true
+      for i = 0 to content.getChildCount() - 1
+        item = content.getChild(i)
+        if item <> invalid AND item.type = m.constants.ui.contentTypes.adRowlistCarousel
+          '//If there is a carousel, then preload the component so it is ready to be displayed
+          createAdDisplayCarouselComponent(item)
+          exit for
+        end if
+      end for
+    end if
 
-  '//the presence or absence of a 1st-Row will dictate the starting point of the peek row mask
-  if m.top.kidsMode = false AND (m.top.skinAdContent <> invalid AND m.top.skinAdContent.getChildCount() > 0) AND (m.top.lastFocusedList = "skinAdRow" OR m.top.lastFocusedList = "")
-    moveContentAreaMask(-1)
-    fadeOutInfoPanel()
-  else
-    moveContentAreaMask(0)
+    '//the presence or absence of a 1st-Row will dictate the starting point of the peek row mask
+    if m.top.kidsMode = false AND (m.top.skinAdContent <> invalid AND m.top.skinAdContent.getChildCount() > 0) AND (m.top.lastFocusedList = "skinAdRow" OR m.top.lastFocusedList = "")
+      moveContentAreaMask(-1)
+      fadeOutInfoPanel()
+    else
+      moveContentAreaMask(0)
+    end if
   end if
 End Function
 
@@ -245,7 +247,7 @@ End Function
 Function onAllowCarouselAutoRotateChange(msg)
   tubiLog("HomeScreen.onAllowCarouselAutoRotateChange")
   allowCarouselAutoRotate = msg.getData()
-  if m.adRowlistCarouselComponent <> invalid
+  if isAdDisplayCarouselAvailable() = true
     m.adRowlistCarouselComponent.allowCarouselAutoRotate = allowCarouselAutoRotate
   end if
 End Function
@@ -256,6 +258,7 @@ Function onLoadingChange()
   bLoaded = (m.top.isLoading = false)
   m.CategoryGridList.visible = bLoaded
   if m.top.isLoading = true
+    m.adFocusTimer.control = "stop"
     m.top.contentFocused = invalid
     m.top.contentReady = false
     emptyContentNode = CreateObject("roSGNode", "TubiContentNode")
@@ -267,8 +270,11 @@ Function onLoadingChange()
     m.CategoryGridList.featuredRowContent = invalid
     m.CategoryGridList.skinAdContentUpdated = true
     m.top.adContentUpdated = false
+    m.top.featuredRowContent = invalid
+    m.top.content = invalid
 
     ' Resetting the previous state variables.
+    m.CategoryGridList.jumpToItem = [0, 0]
     m.CategoryGridList.featuredListCurrFocusRow = -1
     m.CategoryGridList.featuredRowCurrFocusColumn = -1
     m.CategoryGridList.featuredListScrollDirection = "none"
@@ -776,6 +782,7 @@ Function deleteAdDisplayCarouselComponent()
     if m.adRowlistCarouselComponent.isInFocusChain() = true
       m.CategoryGridList.setFocus(true)
     end if
+    m.adRowlistCarouselComponent.opacity = 0
     onCarouselFadeOutComplete()
     m.adContentGroup.removeChild(m.adRowlistCarouselComponent)
     '//NOTE:: do not set m.adRowlistCarouselComponent to invalid, as it may need to be reused later and the AnimationMixin may a reference to the original component
@@ -783,15 +790,21 @@ Function deleteAdDisplayCarouselComponent()
 End Function
 
 
+' Is the carousel component available and not marked for "deletion" (aka: removed from the scene graph)
+Function isAdDisplayCarouselAvailable()
+  return (m.adRowlistCarouselComponent <> invalid AND m.adRowlistCarouselComponent.getParent() <> invalid)
+End Function
+
+
 Function createAdDisplayCarouselComponent(content)
   tubiLog("HomeScreen.createAdDisplayCarouselComponent")
   if content.type = m.constants.ui.contentTypes.adRowlistCarousel
 
-    if content.getChildCount() = 0 AND m.adRowlistCarouselComponent <> invalid
+    if content.getChildCount() = 0 AND isAdDisplayCarouselAvailable() = true
       '//if the content is empty, then remove the adRowlistCarouselComponent
       deleteAdDisplayCarouselComponent()
     else if content.getChildCount() > 0
-      bCarouselHasFocus = (m.adRowlistCarouselComponent <> invalid AND m.adRowlistCarouselComponent.isInFocusChain() = true)
+      bCarouselHasFocus = (isAdDisplayCarouselAvailable() = true AND m.adRowlistCarouselComponent.isInFocusChain() = true)
       if m.adRowlistCarouselComponent = invalid
         m.adRowlistCarouselComponent = CreateObject("roSGNode", "AdDisplayCarousel")
       else
@@ -1018,7 +1031,7 @@ Function setFocusOnCategoryGrid()
   if focusedContent <> invalid AND (focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel)
     fadeOutInfoPanel()
 
-    if focusedContent.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel AND m.adRowlistCarouselComponent <> invalid
+    if focusedContent.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel AND isAdDisplayCarouselAvailable() = true
       shouldPlaceFocusOnCategoryGridList = false
       displayAdDisplayCarousel()
     else
@@ -1036,7 +1049,7 @@ End Function
 
 Function hideAdDisplayCarousel()
   tubiLog("HomeScreen.hideAdDisplayCarousel")
-  if m.adRowlistCarouselComponent <> invalid
+  if isAdDisplayCarouselAvailable() = true
     '//There is a slight delay to the fade out, so the full-width carousel thumbnail does NOT get seen for a split second as another row gains focus.
     fade(m.adRowlistCarouselComponent, "out", 0.1, 0.1, 0, onCarouselFadeOutComplete)
   end if
@@ -1045,7 +1058,7 @@ End Function
 
 Function displayAdDisplayCarousel()
   tubiLog("HomeScreen.displayAdDisplayCarousel")
-  if m.adRowlistCarouselComponent <> invalid
+  if isAdDisplayCarouselAvailable() = true
     m.adRowlistCarouselComponent.setFocus(true)
     if m.adRowlistCarouselComponent.content <> invalid AND isNonEmptyArray(m.adRowlistCarouselComponent.content.imageImpTracking) = true
       m.adFocusTimer.control = "start"
@@ -1098,7 +1111,7 @@ Function onKeyEvent(key, press) as Boolean
 
       ' navigating to the side nav
       m.top.stopLinearVideoPlayer = true
-    else if m.adRowlistCarouselComponent <> invalid AND m.adRowlistCarouselComponent.isInFocusChain() = true
+    else if isAdDisplayCarouselAvailable() = true AND m.adRowlistCarouselComponent.isInFocusChain() = true
       if key = "down"
         if m.CategoryGridList.lastFocusedList = "featuredRowList"
           nCurrentFocusRow = m.CategoryGridList.featuredListCurrFocusRow

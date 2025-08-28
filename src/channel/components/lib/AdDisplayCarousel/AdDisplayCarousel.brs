@@ -80,6 +80,7 @@ Function onContentChange(msg)
     nY = 78 + m.carouselLayout.boundingRect().height
     m.carouselLayout.translation = [m.constants.ui.translations.marginX, nY]
 
+    m.carouselGrid.content = invalid '//Reset the content first to ensure the grid updates properly
     m.carouselGrid.content = gridContent
     nVisibleCount = minValue(nCarouselCount, m.carouselGrid.numColumns)
     nGridWidth = nVisibleCount * m.constants.ui.imageSizes.adRowlistCarouselThumbnail[0] + (nVisibleCount - 1) * m.carouselGrid.itemSpacing[0]
