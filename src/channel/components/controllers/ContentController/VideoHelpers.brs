@@ -369,9 +369,10 @@ End Function
 ' @nowPos: integer, a playback position which will be passed to the history API
 ' @isFireAndForget: boolean, true to not handle the history response
 '                            false to handle the history response (only needed when exiting playback)
-Function updateHistory(content, nowPos, isFireAndForget = true)
+' @ignoreMinimumPosition: boolean, true to ignore the minimum position requirement for history updates
+Function updateHistory(content, nowPos, isFireAndForget = true, ignoreMinimumPosition = false)
   ' Don't send history updates to the server if the user hasn't watched at least a certain amount of video
-  if nowPos >= m.constants.player.historyFrequency1Min AND isLoggedInUser() = true AND (content["type"] = m.constants.ui.contentTypes.video OR content["type"] = m.constants.ui.contentTypes.sportsEvent) AND isMajorEventDay() = false
+  if (nowPos >= m.constants.player.historyFrequency1Min OR ignoreMinimumPosition) AND isLoggedInUser() = true AND (content["type"] = m.constants.ui.contentTypes.video OR content["type"] = m.constants.ui.contentTypes.sportsEvent) AND isMajorEventDay() = false
     postUserHistory = m.userDeviceApi.getAddHistoryRequestInfo(content, nowPos)
 
     if postUserHistory <> invalid
@@ -404,8 +405,9 @@ End Function
 '
 ' @content: roSGNode, TubiContentNode
 ' @nowPos: integer, a playback position which will be passed to the history API
-Function updateHistoryAndHandleResponse(content, nowPos)
-  updateHistory(content, nowPos, false)
+' @ignoreMinimumPosition: boolean, true to ignore the minimum position requirement for history updates
+Function updateHistoryAndHandleResponse(content, nowPos, ignoreMinimumPosition = false)
+  updateHistory(content, nowPos, false, ignoreMinimumPosition)
 End Function
 
 

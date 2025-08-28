@@ -327,11 +327,20 @@ Function addControllerUi()
   ' Stores a reference to the fox provided video player interface node
   m.foxRpfInstance = invalid
 
+  ' Store the current fox player ad break that is being played. To allow us to be able remove ad breaks as they are completed to make our logic easier
+  m.currentFoxPlayerAdBreak = invalid
+
   ' The position we last sent fox player progress from
   m.lastSentFoxPlayerProgressPosition = 0
 
-  ' The content id that is currently being played with the fox video player stored as an integer or invalid if no content is being played
-  m.foxPlayerCurrentContentId = invalid
+  m.foxPlayerPositionSidelinedStarted = -1
+
+  m.foxPlayerContinueWatchingNextSendPosition = rnd(getExternalConfigValueFromGlobal("special_event_continue_watching_init_jitter", 180))
+
+  m.foxPlayerEndSlateCloseDelay = rnd(getExternalConfigValueFromGlobal("special_event_redirect_homepage_jitter", 60))
+
+  ' The listing that is currently being played with the fox video player stored or invalid if no content is being played
+  m.foxPlayerCurrentListing = invalid
 
   ' We delay closing the fox video player when the end slate appears so we need to use store the timer for this on m to keep it alive
   m.foxPlayerEndSlateCloseDelayTimer = invalid

@@ -307,13 +307,7 @@ Function handleDeeplinkContentByType()
       ' In our app, it primarily features movie trailers
       getSingleContentFromServer(m.deeplinkContent, onDeeplinkShortFormContentSuccess, handleSingleContentDeeplinkError)
     else if m.deepLinkContent.deeplinkType = "fox" then
-      ' Temp code for now so QA can test
-      test = CreateObject("roSGNode", "ContentNode")
-      test.update({
-        "id": "-1" ' No id on our side currently
-        "listingId": m.deepLinkContent.id
-      }, true)
-      playLinearVideoWithFoxPlayer(test)
+      playLinearVideoWithFoxPlayer()
     else
       message = getTranslation("error_deeplink_page")
       showDeeplinkErrorModal(invalid, message)

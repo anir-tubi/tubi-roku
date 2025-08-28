@@ -8,8 +8,8 @@
       <!-- The content we are trying to play as returned by Fox's listing api -->
       <field id="contentId" type="string" />
 
-      <!-- Content node for the event we are trying to play -->
-      <field id="tubiContent" type="node" />
+      <!-- Id of the content we started playback with on Tubi's side -->
+      <field id="tubiId" type="string" />
 
       <!-- We have to load the fox player from the component library before we can try to play. This lets us know we are ready to continue -->
       <field id="isFoxVideoPlayerAvailable" type="boolean" alwaysNotify="true" />
@@ -20,6 +20,9 @@
 
     <!-- OUTPUTS -->
       <field id="willPlayerClose" type="boolean" alwaysNotify="true" />
+
+      <!-- How long the page took to load -->
+      <field id="loadTime" type="time" alwaysNotify="true" />
   </interface>
 
   <children>

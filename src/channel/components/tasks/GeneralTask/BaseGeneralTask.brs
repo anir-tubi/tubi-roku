@@ -477,6 +477,10 @@ Function processSuccessResponse(result, callbackTypes, job)
             if isNode(output) = false then
               outputTypeMatches = false
             end if
+          else if expectedType = "array" then
+            if isArray(output) = false then
+              outputTypeMatches = false
+            end if
           else
             tubiLog("BaseGeneralTask.processSuccessResponse: Unchecked type: " + expectedType)
           end if

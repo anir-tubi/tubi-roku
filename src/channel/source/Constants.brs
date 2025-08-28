@@ -742,7 +742,7 @@ Function getConstants()
   if constants.settings.stagingApis = true
     constants.urls.foxApiBaseUrl = "https://qa.api.digitalvideoplatform.com/tubi"
   else
-    constants.urls.foxApiBaseUrl = "https://qa.api.digitalvideoplatform.com/tubi"
+    constants.urls.foxApiBaseUrl = "https://prod.api.digitalvideoplatform.com/tubi"
   end if
 
   ' url for pinging Nielsen
@@ -752,7 +752,11 @@ Function getConstants()
 
   constants.urls.clientErrorConfigEndpoint = "https://md0.tubitv.com/error-handler/v2/client-error-config.json"
 
-  constants.urls.foxListingEndpoint = constants.urls.foxApiBaseUrl + "/v3.0/listings"
+  if constants.settings.stagingApis = true then
+    constants.urls.foxListingEndpoint = "https://epg-cdn.staging-public.tubi.io/api/v1/listing_proxy"
+  else
+    constants.urls.foxListingEndpoint = "https://epg-cdn.production-public.tubi.io/api/v1/listing_proxy"
+  end if
 
   'http request types
   constants.reqTypes = {}
