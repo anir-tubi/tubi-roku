@@ -216,7 +216,12 @@ function buildInstalled() {
         const foxVideoPlayerPkgName = `fox_video_player_${foxBuildTag}.pkg`;
 
         fs.mkdirSync('build/local/fox-video-player-components/');
-        fs.copyFileSync(`fox-video-player-components/${foxVideoPlayerPkgName}`, `build/local/fox-video-player-components/${foxVideoPlayerPkgName}`);
+        try {
+          fs.copyFileSync(`fox-video-player-components/${foxVideoPlayerPkgName}`, `build/local/fox-video-player-components/${foxVideoPlayerPkgName}`);
+        } catch (e) {
+          console.log(`Could not copy fox video player pkg file.  Make sure you have built the fox video player package and that the file fox-video-player-components/${foxVideoPlayerPkgName} exists.`);
+        }
+
       }
 
       replaceColorConstants('build/local');
