@@ -2,14 +2,27 @@ import { spawnSync } from "child_process"
 import { relative } from "path"
 import { exit } from "process"
 
+const excludedFiles = [
+    'src/channel/source/localClientErrorConfig.brs'
+];
+
 /*
  * Workflow script for enforcing formatting rules defined in `bsfmt.json`
- * on files changed in a Pull Request 
+ * on files changed in a Pull Request
  */
 
 
 function isBrightscriptFile(line: string) {
     return line.endsWith('.brs') || line.endsWith('.bs')
+}
+
+function isNotExcludedFile(line: string) {
+    for (const excludedFile of excludedFiles) {
+        if (line.includes(excludedFile)) {
+            return false;
+        }
+    }
+    return true;
 }
 
 function fetchBranch(branch: string) {
@@ -22,7 +35,7 @@ function fetchBranch(branch: string) {
 }
 
 /**
- * Uses the HEAD ref and the target branch to determine all changed files, then runs bsfmt on those files. 
+ * Uses the HEAD ref and the target branch to determine all changed files, then runs bsfmt on those files.
  * If the formatting check fails, we return an error
  */
 async function main() {
@@ -43,6 +56,7 @@ async function main() {
         .split('\n')
         .map(l => l.trim())
         .filter(isBrightscriptFile)
+        .filter(isNotExcludedFile);
     files = [...new Set(files)]
 
     if (files.length > 0) {

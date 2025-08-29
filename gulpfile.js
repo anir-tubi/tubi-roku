@@ -1270,6 +1270,7 @@ exports.pushFoxVideoPlayerStaging = series(buildFoxVideoPlayer, pushFoxVideoPlay
 exports.releaseOneTrust = series(buildOneTrust, packageOneTrust, makeOneTrustReleasePrs);
 exports.makeFoxVideoPlayerPR = series(buildFoxVideoPlayer, makeFoxVideoPlayerPR);
 exports.validateBuildEnvironment = validateBuildEnvironment;
+exports.verifyLocalClientErrorConfigIsCurrent = verifyLocalClientErrorConfigIsCurrent;
 
 
 // Automated test related
