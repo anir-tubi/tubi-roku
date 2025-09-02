@@ -2,8 +2,6 @@ import { expect } from 'chai';
 import { ecp, odc, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
 import { shared } from '../shared';
-import exp = require('constants');
-
 
 
 describe('Side Navigation', function () {

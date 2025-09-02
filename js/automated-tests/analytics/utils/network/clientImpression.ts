@@ -9,7 +9,6 @@ const log = require('fancy-log');
 import { expect } from 'chai';
 import { odc } from 'roku-test-automation';
 import { EventsValues } from '../../utils/constants';
-import exp = require('constants');
 
 export interface ClientImpressionRequest {
   url: string;
@@ -175,9 +174,7 @@ function isWithinTenMinutes(sentTimestamp: string, currentTime: string): boolean
   return diffInMinutes <= 10;
 }
 
-export function clearRequestCollection() {
-  requestCollection.length = 0;
-}
+
 
 export function getCurrentDateTimeUTC(): string {
   const now = new Date();
