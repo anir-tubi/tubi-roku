@@ -15,8 +15,8 @@ Function init()
 
   m.networkLogo = topRef.findNode("networkLogo")
   networkLogoSize = m.constants.ui.imageSizes.networkLogo
-  m.networkLogo.height = networkLogoSize[1]
-  m.networkLogo.width = networkLogoSize[0]
+  m.networkLogo.loadHeight = networkLogoSize[1]
+  m.networkLogo.loadWidth = networkLogoSize[0]
 
   m.closedCaptions = topRef.findNode("ClosedCaptionPoster")
   m.genres = topRef.findNode("genres")
