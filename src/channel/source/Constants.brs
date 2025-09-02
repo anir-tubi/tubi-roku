@@ -588,14 +588,8 @@ Function getConstants()
   if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
     constants.urls.tensor.cdn.urlBase = "https://tensor-cdn.staging-public.tubi.io/api"
   end if
-  ' Since V7 is not in production yet enabling it only when requested.
-  if constants.settings.enableLiveEventsSpotlightAndBanner = true
-    constants.urls.tensor.cdn.homescreen = constants.urls.tensor.cdn.urlBase + "/v7/homescreen"
-    constants.urls.tensor.cdn.container = constants.urls.tensor.cdn.urlBase + "/v7/containers"
-  else
-    constants.urls.tensor.cdn.homescreen = constants.urls.tensor.cdn.urlBase + "/v6/homescreen"
-    constants.urls.tensor.cdn.container = constants.urls.tensor.cdn.urlBase + "/v6/containers"
-  end if
+  constants.urls.tensor.cdn.homescreen = constants.urls.tensor.cdn.urlBase + "/v7/homescreen"
+  constants.urls.tensor.cdn.container = constants.urls.tensor.cdn.urlBase + "/v7/containers"
   constants.urls.tensor.cdn.epgChannelIds = constants.urls.tensor.cdn.urlBase + "/v2/epg"
   constants.urls.tensor.cdn.browserList = constants.urls.tensor.cdn.urlBase + "/v1/browse_list"
   constants.urls.tensor.SoTStaticConfig = constants.urls.tensor.cdn.urlBase + "/v1/ui_customization/static_config"
