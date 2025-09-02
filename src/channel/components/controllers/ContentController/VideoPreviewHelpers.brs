@@ -130,8 +130,7 @@ Function onVideoPreviewStateChanged(msg)
         isReplay = true
       end if
 
-      isFullPlayerBlockedForUser = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR (item <> invalid AND item.needsLogin = true AND isLoggedInUser() = false AND arrayIncludes(m.constants.ui.fullScreenVideoPlayerGridItemTypes, item.gridItemType) = false)
-
+      isFullPlayerBlockedForUser = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR (item <> invalid AND item.needsLogin = true AND isLoggedInUser() = false) OR arrayIncludes(m.constants.ui.fullScreenVideoPlayerGridItemTypes, item.gridItemType) = true
       if isReplay = true
         '//Loop the video in this case
         if m.maintask.isHdmiStatusOk = true
