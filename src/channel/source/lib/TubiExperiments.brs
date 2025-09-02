@@ -137,14 +137,6 @@ Function TubiExperiments(experimentsInfo) as Object
         }
       }
 
-      roku_swap_play_sign_up_button_order: {
-        roku_swap_play_sign_up_button_order_v1: {
-          default: { "enabled": true }
-          holdout_control: { "enabled": false }
-          holdout_winning: { "enabled": false }
-        }
-      }
-
     }
 
     'public methods
