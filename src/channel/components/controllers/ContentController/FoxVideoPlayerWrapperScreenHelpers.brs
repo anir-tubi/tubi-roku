@@ -11,6 +11,8 @@ Function playLinearVideoWithFoxPlayer(content = invalid)
 
   m.lastSentFoxPlayerProgressPosition = 0
 
+  stopVideoPreview()
+
   showHideLogo(m.constants.logoType.hide)
 
   ' We immediately show the player screen so we can show the loading spinner but have to wait until we are ready to actually try playing video
@@ -870,63 +872,4 @@ Function findFoxLiveProgram(listing)
   end if
 
   return invalid
-End Function
-
-
-Function setFoxContentId(purpleCarpetContainer, _screenId)
-  ' This happens during sign in process from purple carpet during which we are trying to start playback and also refreshing home screen.
-  ' This does not happen if we are not fast enough in sign in. Below logic provides additional safety to make sure preview is always stopped.
-  stopVideoPreview()
-  if purpleCarpetContainer <> invalid then
-    currentScreen = getCurrentScreen()
-    if currentScreen.id = m.constants.ui.screenIds.foxVideoPlayerWrapperScreen then
-      contentIdToPlay = ""
-
-      tubiContent = currentScreen.tubiContent
-
-      if tubiContent <> invalid
-        contentNode = m.nodeHelpers.getChildById(purpleCarpetContainer, tubiContent.id)
-
-        if contentNode <> invalid AND contentNode.foxContentId <> invalid then
-          ' We need to find the matching content from the Fox listing endpoint response so we can check its network
-          if isArray(m.foxListingEndpointResponse) = true then
-            for each item in m.foxListingEndpointResponse
-              if item.asset <> invalid AND item.asset.listing <> invalid AND item.asset.listing.id = contentNode.foxContentId then
-                ' Now that we have lined up the Tubi content and Fox content check if the network is foxdep to know whether to treat it differently. foxdep contains a spanish version of the stream that doesn't have different program ids within it.
-                if item.asset.listing.network = "foxdep" then
-                  ' In this case we just want to play the selected content
-                  contentIdToPlay = contentNode.foxContentId
-                end if
-                exit for
-              end if
-            end for
-          end if
-
-        end if
-
-
-        ' If we don't have a valid contentIdToPlay yet then we need to search through the Fox listing items to find what is currently playing
-        if isNonEmptyString(contentIdToPlay) = false then
-          for each item in m.foxListingEndpointResponse
-            if item.asset <> invalid AND item.asset.listing <> invalid then
-              listing = item.asset.listing
-
-              ' Check to see if this item is currently live
-              if listing.network <> "foxdep" AND isNowWithinTimePeriod(listing.startDate, listing.endDate) = true then
-                contentIdToPlay = listing.id
-                exit for
-              end if
-            end if
-          end for
-        end if
-      end if
-
-      if isNonEmptyString(contentIdToPlay) = true then
-        currentScreen.contentId = contentIdToPlay
-      else
-        tubiLog("setFoxContentId contentIdToPlay is invalid. Closing player.")
-        closeFoxVideoPlayer()
-      end if
-    end if
-  end if
 End Function
