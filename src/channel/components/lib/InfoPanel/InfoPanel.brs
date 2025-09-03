@@ -172,9 +172,9 @@ Function onThemeChange(msg = invalid)
   if theme <> invalid
     m.descriptionFocusButton.blendColor = theme.focusedColor
     m.expireWarning.color = theme.cautionColor
-    m.SignInLock.blendColor = theme.cautionColor
-    m.signInText.color = theme.cautionColor
-    m.SignInBg.blendColor = theme.cautionColor
+    m.SignInLock.blendColor = theme.highlightedTextColor
+    m.signInText.color = theme.highlightedTextColor
+    m.SignInBg.blendColor = theme.highlightedTextColor
     m.Title.color = theme.primaryTextColor
     m.RatingLabel.color = theme.primaryTextColor
     m.Description.color = theme.primaryTextColor

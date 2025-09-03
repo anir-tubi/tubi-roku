@@ -264,7 +264,11 @@ Function onScreenChange()
   updateInlineVideoMetadataOverlayVisibility()
 
   if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen
-    refreshLiveEventsContainerWithEpgListingInfo(currentScreen.featuredRowContent)
+    if isNode(currentScreen.featuredRowContent) = true
+      refreshLiveEventsContainerWithEpgListingInfo(currentScreen.featuredRowContent)
+    else
+      refreshLiveEventsContainerWithEpgListingInfo(currentScreen.content)
+    end if
   end if
 End Function
 

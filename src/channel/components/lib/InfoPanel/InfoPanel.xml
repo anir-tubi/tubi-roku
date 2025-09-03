@@ -335,7 +335,7 @@
             width="24"
             height="24"
             translation="[0,9]"
-            uri="pkg:/images/account-icon.webp"
+            uri="pkg:/images/icon-account.webp"
             loadDisplayMode="scaleToFit" />
           <Label
             id="SignInText"

@@ -3365,7 +3365,7 @@ Function processUserContentSelection(content, screen, playbackSource = {}) as Vo
   m.videoPreviewDebounce.control = "stop"
   if isNonEmptyString(content.actionId) = true
     if content.actionId = "signInWatch"
-      startSignIn(refreshScreenAndContentAfterSignIn)
+      startSignIn(processUserContentSelectionAfterSignIn)
     else if content.actionId = "watchLive"
       if playerType = m.constants.ui.playerTypes.fox
         playLinearVideoWithFoxPlayer(content)
@@ -3421,5 +3421,21 @@ Function processUserPlayAction(content, screen, playbackSource = {}) as Void
     playAdContent(content)
   else
     showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource)
+  end if
+End Function
+
+
+Function processUserContentSelectionAfterSignIn()
+  if isCurrentScreenHomeScreen() = true
+    refreshScreenAndContentAfterSignIn()
+  else
+    popScreenAfterSignInProcess()
+    showContentGroupAndHideSpinner()
+    screen = getCurrentScreen()
+    if screen <> invalid
+      screen.signedIn = isLoggedInUser()
+    end if
+    refreshUiAfterSignIn()
+    setContentToRefreshAllPersonalizedScreens(true)
   end if
 End Function

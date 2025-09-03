@@ -758,14 +758,14 @@ Function tubiTracking_getAnalyticsTile(contentNode, colPos = 1, rowPos = 1)
         contentId = Mid(contentNode.id, 2)
       end if
       tile.series_id = contentId.toInt()
-    else if contentNode.type = m.constants.ui.contentTypes.video OR contentNode.type = m.constants.ui.contentTypes.linear OR contentNode.type = m.constants.ui.contentTypes.skinAd
-      tile.video_id = contentId.toInt()
     else if contentNode.type = m.constants.ui.contentTypes.genre
       tile.id = contentId
     else if contentNode.type = m.constants.ui.contentTypes.adRowlistCarousel OR contentNode.type = m.constants.ui.contentTypes.adRowlistSpotlight
       if isNonEmptyString(contentNode.slug) = true
         tile.ad_id = contentNode.slug
       end if
+    else if isNonEmptyString(contentId) = true
+      tile.video_id = contentId.toInt()
     end if
 
     tile.col = colPos

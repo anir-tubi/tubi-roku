@@ -109,10 +109,19 @@ Function getEpgListingInfoFromListingComplete(schedule)
   if isAA(schedule) = true AND isNonEmptyString(schedule.startTime) = true
     screen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
     if isNode(screen) = true
-      container = getLiveEventsContainer(screen.featuredRowContent)
+      if isNode(screen.featuredRowContent) = true
+        content = screen.featuredRowContent
+      else
+        content = screen.content
+      end if
+      container = getLiveEventsContainer(content)
       if isNode(container) = true AND container.getChildCount() > 0
         child = container.getChild(0)
         child.scheduleData = schedule
+        if isGreaterThanCurrentTime(schedule.endTime) = false
+          content.removeChild(container)
+          screen.contentUpdated = true
+        end if
       end if
     end if
   end if

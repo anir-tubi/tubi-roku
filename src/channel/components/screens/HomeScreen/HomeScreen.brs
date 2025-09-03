@@ -223,6 +223,7 @@ Function onContentUpdated(msg)
     else
       moveContentAreaMask(0)
     end if
+    onCurrFocusRowChange()
   end if
 End Function
 
@@ -523,10 +524,10 @@ Function onCurrFocusRowChange()
 
     isEnteringLiveEventRow = arrayIncludes(m.constants.ui.liveEventsGridTypes, categoryEnteringFocus.gridItemType)
     isLeavingLiveEventRow = categoryLosingFocus <> invalid AND arrayIncludes(m.constants.ui.liveEventsGridTypes, categoryLosingFocus.gridItemType)
-    if isLeavingLiveEventRow = true AND currFocusRow = CInt(currFocusRow)
-      m.CategoryGridList.showFocusFeedback = true
-    else if isEnteringLiveEventRow = true
+    if isEnteringLiveEventRow = true
       m.CategoryGridList.showFocusFeedback = false
+    else if isLeavingLiveEventRow = true AND currFocusRow = CInt(currFocusRow)
+      m.CategoryGridList.showFocusFeedback = true
     end if
 
     isNoInfoPanelGridItemType = arrayIncludes(m.constants.ui.noInfoPanelGridItemTypes, categoryEnteringFocus.gridItemType) = true
