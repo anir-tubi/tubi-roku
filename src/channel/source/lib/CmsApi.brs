@@ -281,7 +281,7 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
   params["include_sponsorships"] = true
   params["include_ui_customization"] = true
 
-  if m.constants.settings.mode = "dev" OR (m.constants.settings.mode = "qa" AND m.constants.settings.enableLiveEventsSpotlightAndBanner = true) then
+  if m.constants.settings.enableLiveEventsSpotlightAndBanner = true
     params["include_live_event_spotlight"] = true
     params["include_live_event_banner"] = true
   end if
@@ -477,6 +477,7 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
       "poster"
       "landscape"
       "background"
+      "title"
     ]
   end if
 
@@ -530,6 +531,7 @@ Function cmsApi_createSearchReqInfo(searchText, bKidsMode = false, sAutoComplete
   imageParamTypes = [
     "poster"
     "background"
+    "title"
   ]
   if isNonEmptyString(sAutoCompleteSessionID) = true
     options.params["session_id"] = sAutoCompleteSessionID
@@ -746,6 +748,7 @@ Function cmsApi_createMyStuffScreenBatchReqInfo(content, bKidsMode = false, isSi
             "poster"
             "hero"
             "background"
+            "title"
           ]
 
           categoryReqInfo = m.createCategoryReqInfo(categoryId, bKidsMode, options, imageParamTypes)

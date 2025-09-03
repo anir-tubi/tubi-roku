@@ -249,6 +249,9 @@ Function populateInfoPanelForLiveEvent(content, infoPanel)
     infoPanel.needsLogin = false
   end if
 
+  infoPanel.title = content.title
+  infoPanel.description = content.description
+
   infoPanel.lineOneData = lineOneData
   infoPanel.lineTwoData = {}
 End Function

@@ -6,7 +6,7 @@ Function init()
 
   topRef.observeFieldScoped("itemContent", "onContentChange")
   topRef.observeFieldScoped("itemHasFocus", "onItemHasFocusChange")
-  topRef.observeFieldScoped("rowHasFocus", "onItemHasFocusChange")
+  topRef.observeFieldScoped("rowListHasFocus", "onItemHasFocusChange")
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.title, typographyConstants.ids.bodyMedium)
@@ -62,7 +62,7 @@ End Function
 
 
 Function onItemHasFocusChange(_msg)
-  itemHasFocus = (m.top.itemHasFocus = true AND m.top.rowHasFocus = true)
+  itemHasFocus = (m.top.itemHasFocus = true AND m.top.rowListHasFocus = true)
   if itemHasFocus = true
     m.border.blendColor = m.focusedColor
   else

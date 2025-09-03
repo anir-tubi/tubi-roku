@@ -523,7 +523,8 @@ Function onCurrFocusRowChange()
 
     isLiveEventRowContent = arrayIncludes(m.constants.ui.liveEventsGridTypes, categoryEnteringFocus.gridItemType) = true
     m.CategoryGridList.showFocusFeedback = (isLiveEventRowContent = false)
-    if isLiveEventRowContent = true
+    isNoInfoPanelGridItemType = arrayIncludes(m.constants.ui.noInfoPanelGridItemTypes, categoryEnteringFocus.gridItemType) = true
+    if isNoInfoPanelGridItemType = true
       if m.contentAreaAnimation <> invalid
         m.contentAreaAnimation.control = "stop"
       end if
@@ -538,8 +539,6 @@ Function onCurrFocusRowChange()
       else if categoryEnteringFocus.sponsorImages.brandColor <> ""
         sSponsorBackgroundURL = categoryEnteringFocus.sponsorImages.brandColor
       end if
-    else if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
-      expandContentAreaForContainersWithoutInfoPanel(rowPercent)
     else if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
       expandContentAreaForAdDisplayCarousel(rowPercent)
     else if categoryEnteringFocus.id = m.constants.ui.categoryIds.certifiedFresh
@@ -649,7 +648,9 @@ Function populateInfoPanelByContent(focusedContent)
   if focusedContent <> invalid
     sType = focusedContent.type
 
-    if sType = m.constants.ui.contentTypes.linear
+    if focusedContent.scheduleData <> invalid
+      populateInfoPanel(m.constants.ui.infoPanelModes.item, focusedContent)
+    else if sType = m.constants.ui.contentTypes.linear
       populateInfoPanel(m.constants.ui.infoPanelModes.linearProgramHomescreen, focusedContent)
     else if sType = m.constants.ui.contentTypes.historySignedOutUser
       populateInfoPanel(m.constants.ui.infoPanelModes.continueWatching, focusedContent)
@@ -711,7 +712,7 @@ Function onGridFocusChange() as Void
       '//::TODO::JHAND - adRowlist - spotlight, Use MaskGroup to create rounded corners for the 1-Up video
       '//::TODO::JHAND - adRowlist - spotlight, place video over 1-up image. Is there a way to mask the video so it has rounded corners?
       gridItemType = focusedContent.gridItemType
-      if gridItemType = m.constants.ui.gridItemTypes.skinAd OR gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight OR arrayIncludes(m.constants.ui.liveEventsGridTypes, gridItemType) = true
+      if arrayIncludes(m.constants.ui.noInfoPanelGridItemTypes, gridItemType) = true
         fadeOutInfoPanel()
         m.top.backgroundUriList = determineBackgroundImage(focusedContent)
       else
@@ -962,7 +963,11 @@ Function populateInfoPanel(mode, contentNode)
       end if
 
       if mode = m.constants.ui.infoPanelModes.item
-        populateInfoPanelWithHomescreenStyleItemMode(contentNode, m.InfoPanel, true)
+        if contentNode.scheduleData <> invalid
+          populateInfoPanelForLiveEvent(contentNode, m.InfoPanel)
+        else
+          populateInfoPanelWithHomescreenStyleItemMode(contentNode, m.InfoPanel, true)
+        end if
       else if mode = m.constants.ui.infoPanelModes.linearProgramHomescreen
         populateInfoPanelWithLinearProgramHomescreenMode(contentNode, m.InfoPanel) 'V4 api
       else if mode = m.constants.ui.infoPanelModes.continueWatching

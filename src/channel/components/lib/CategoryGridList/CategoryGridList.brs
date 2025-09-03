@@ -501,7 +501,7 @@ Function setRowHeights()
   landscapeSize = imageSizes.largeLandscape
   featuredRowPoster = imageSizes.featuredRowPoster
   liveEventsContainerSize = imageSizes.liveEventsContainer
-  bannerSize = imageSizes.banner
+  bannerSize = imageSizes.liveEventsBanner
   showRowLabel = []
 
   for i = 0 to m.top.content.getChildCount() - 1
@@ -517,17 +517,14 @@ Function setRowHeights()
     else if gridItemType = gridItemTypes.liveEventBanner
       rowItemSize.push(bannerSize)
       rowHeight = bannerSize[1]
+      rowHeightAdjustment = 0
+      ' Since we have to show a peek of the next container in the list, we need to show 3 rows.
+      numRows = 3
     else if gridItemType = gridItemTypes.historySignedOutUser
       posterHeight = posterSize[1]
       rowItemSize.push([1693, posterHeight])
       rowHeight = posterHeight
       rowItemSpacings.push([15, 0])
-      focusXOffsets.push(0)
-    else if gridItemType = gridItemTypes.banner
-      bannerSize = m.constants.ui.imageSizes.banner
-      rowItemSize.push(bannerSize)
-      rowHeight = bannerSize[1]
-      rowItemSpacings.push([10, 0])
       focusXOffsets.push(0)
     else if gridItemType = gridItemTypes.adRowlistSpotlight OR gridItemType = gridItemTypes.adRowlistCarousel
       adSize = m.constants.ui.imageSizes.adRowlistThumbnail

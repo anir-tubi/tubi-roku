@@ -105,7 +105,12 @@ Function onItemContentChange()
     else
       m.networkLogo.uri = ""
     end if
-    isFourK = arrayIncludes(itemContent.videoRenditions, m.constants.serverValues.tensorVideoRenditions.fourK)
+    isFourK = false
+    if itemContent.videoRenditions <> invalid
+      isFourK = arrayIncludes(itemContent.videoRenditions, m.constants.serverValues.tensorVideoRenditions.fourK)
+    else
+      isFourK = false
+    end if
     m.uhdAvailableBadge.visible = isFourK
     if isFourK = false
       m.metadataRow.removeChild(m.uhdAvailableBadge)
@@ -194,11 +199,12 @@ Function refreshButtonList()
         }
       end if
     end if
-
+    ' Avoiding unnecessary updates to the onItemContentChange been triggered.
+    m.top.unObserveFieldScoped("itemContent")
     itemContent.update({
       actionId: buttonContent.id
     }, true)
-
+    m.top.observeFieldScoped("itemContent", "onItemContentChange")
     if buttonContent <> invalid
       content = CreateObject("roSGNode", "ContentNode")
       content.update(buttonContent, true)
