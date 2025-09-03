@@ -521,8 +521,14 @@ Function onCurrFocusRowChange()
   if categoryEnteringFocus <> invalid
     sSponsorBackgroundURL = ""
 
-    isLiveEventRowContent = arrayIncludes(m.constants.ui.liveEventsGridTypes, categoryEnteringFocus.gridItemType) = true
-    m.CategoryGridList.showFocusFeedback = (isLiveEventRowContent = false)
+    isEnteringLiveEventRow = arrayIncludes(m.constants.ui.liveEventsGridTypes, categoryEnteringFocus.gridItemType)
+    isLeavingLiveEventRow = categoryLosingFocus <> invalid AND arrayIncludes(m.constants.ui.liveEventsGridTypes, categoryLosingFocus.gridItemType)
+    if isLeavingLiveEventRow = true AND currFocusRow = CInt(currFocusRow)
+      m.CategoryGridList.showFocusFeedback = true
+    else if isEnteringLiveEventRow = true
+      m.CategoryGridList.showFocusFeedback = false
+    end if
+
     isNoInfoPanelGridItemType = arrayIncludes(m.constants.ui.noInfoPanelGridItemTypes, categoryEnteringFocus.gridItemType) = true
     if isNoInfoPanelGridItemType = true
       if m.contentAreaAnimation <> invalid
@@ -1093,7 +1099,7 @@ Function fadeInContentArea()
 
   stopAnimation(m.infoPanelFade)
   if m.InfoPanelParent.opacity < 1
-    m.infoPanelFade = slideFadeGeneral(m.InfoPanelParent, [0, 0], "in", 0.2, 1)
+    m.infoPanelFade = slideFadeGeneral(m.InfoPanelParent, [0, 0], "in", 0.2)
   end if
 End Function
 
@@ -1276,10 +1282,12 @@ End Function
 
 
 Function updateFeaturedRowListTranslation()
-  translation = m.categoryGridList.featuredRowListTranslation
-  translation[1] = translation[1] + m.ContentAreaParent.translation[1]
-  m.top.featuredRowListTranslation = translation
-  moveContentAreaMaskBasedCurrentFocus()
+  if m.top.featuredRowContent <> invalid
+    translation = m.categoryGridList.featuredRowListTranslation
+    translation[1] = translation[1] + m.ContentAreaParent.translation[1]
+    m.top.featuredRowListTranslation = translation
+    moveContentAreaMaskBasedCurrentFocus()
+  end if
 End Function
 
 
