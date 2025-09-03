@@ -337,7 +337,7 @@ Function fetchHomeScreen(homeScreen, useCache = false)
       successHandler = onEspanolScreenSuccessResponse
       errorHandler = onEspanolScreenErrorResponse
     else if homeScreen.id = m.constants.ui.screenIds.homeScreen
-      if isKidsUIOn() = false
+      if isKidsUIOn() = false AND isParentalControlsAdultLevel() = true
         '//Call ad endpoint to get ad content for the homescreen\
         experimentAd = getExperimentResource("ads_ott_hdc_adformats", "ads_ott_hdc_adformats_v1", true)
         experimentAdType = "control"
