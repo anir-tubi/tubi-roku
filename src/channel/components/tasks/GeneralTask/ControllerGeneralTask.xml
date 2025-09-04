@@ -34,5 +34,6 @@
     <script type="text/brightscript" uri="pkg:/components/lib/DeviceMixin.brs" />
     <script type="text/brightscript" uri="Parsers/TubiExperimentParsers.brs" />
     <script type="text/brightscript" uri="Parsers/ExternalConfigParsers.brs" />
+    <script type="text/brightscript" uri="Parsers/StatsigSDKParsers.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/TubiExternalConfig.brs" />
 </component>

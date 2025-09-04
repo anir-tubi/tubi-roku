@@ -276,6 +276,16 @@ Function registerParsingCallbacks()
     parseError: parseGenericError
   }
 
+  m.requestTypes[m.constants.reqNames.statsigInitialize] = {
+    parseSuccess: parseStatsigSDKSuccess
+    parseError: parseStatsigSDKError
+  }
+
+  m.requestTypes[m.constants.reqNames.statsigGetConfig] = {
+    parseSuccess: parseStatsigSDKSuccess
+    parseError: parseStatsigSDKError
+  }
+
   m.requestTypes[m.constants.reqNames.getEpgListing] = {
     parseSuccess: parseEpgListingSuccess
     parseError: parseGenericError

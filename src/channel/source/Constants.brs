@@ -335,6 +335,9 @@ Function getConstants()
   constants.reqNames.postLogout = "postLogout"
   constants.reqNames.postViewableImpression = "postViewableImpression"
   constants.reqNames.getSoTStaticConfig = "getSoTStaticConfig"
+  constants.reqNames.statsigInitialize = "statsigInitialize"
+  constants.reqNames.statsigGetConfig = "statsigGetConfig"
+  constants.reqNames.statsigLogExposure = "statsigLogExposure"
   constants.reqNames.getEpgListing = "getEpgListing"
 
   ' a list of reqnames that the general task will inject auth headers and should expect to handle 403 errors for
@@ -459,6 +462,25 @@ Function getConstants()
   end if
   constants.thirdParty.oneTrust.location = "cdn.cookielaw.org"
   constants.thirdParty.oneTrust.version = "202405.1.0"
+
+  ' Statsig Configuration
+  constants.thirdParty.statsig = {}
+  constants.thirdParty.statsig.clientApiKey = "client-alkgSzOCrtvlHNJUx12irbXYuGLrZNcs97hroCMmZH4" 'same clientApiKey for all environment
+  constants.thirdParty.statsig.enabled = true
+
+  ' Environment tier mapping based on app mode
+  if constants.settings.mode = "production"
+    constants.thirdParty.statsig.environment = { tier: "production" }
+  else if constants.settings.mode = "staging"
+    constants.thirdParty.statsig.environment = { tier: "staging" }
+  else
+    constants.thirdParty.statsig.environment = { tier: "development" }
+  end if
+
+  ' Network configuration
+  constants.thirdParty.statsig.timeout = 10000 ' 10 seconds timeout for API calls
+  constants.thirdParty.statsig.retryCount = 3 ' Number of retries for failed requests
+  constants.thirdParty.statsig.enableLogging = (constants.settings.mode <> "production") ' Enable debug logging for non-prod
 
   'platform is used when communitcating with CMS API
   constants.platform = "roku"
@@ -664,6 +686,18 @@ Function getConstants()
     constants.urls.experiments.baseUrl = "https://popper-engine.production-public.tubi.io/popper/"
   end if
   constants.urls.experiments.evaluate = constants.urls.experiments.baseUrl + "evaluate-namespaces"
+
+  'StatSig API
+  constants.urls.statsig = {}
+  constants.urls.statsig.baseUrl = "https://abproxy.staging-public.tubi.io/v1/"
+
+  if constants.settings.mode = "production"
+    constants.urls.statsig.baseUrl = "https://abproxy.production-public.tubi.io/v1/"
+  end if
+
+  constants.urls.statsig.initialize = constants.urls.statsig.baseUrl + "initialize"
+  constants.urls.statsig.getConfig = constants.urls.statsig.baseUrl + "get_config"
+  constants.urls.statsig.logCustomExposure = constants.urls.statsig.baseUrl + "log_custom_exposure"
 
   ' Configuring the live news manifest proxy url.
   constants.urls.qaProxy = {}
