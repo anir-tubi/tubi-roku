@@ -1505,6 +1505,8 @@ Function getConstants()
   ' Size of guest user continue watching container.
   constants.ui.imageSizes.guestContinueWatchingTile = [1613, 378]
 
+  constants.ui.imageSizes.titleArt = [594, 249]
+
   ' Size for the background image.
   if limitedUi = true
     constants.ui.imageSizes.background = [399, 225]

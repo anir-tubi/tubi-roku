@@ -586,7 +586,7 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
   landscapeSize = imageSizes.landscape
   largestLandscapeSize = imageSizes.largestLandscape
   background = imageSizes.background
-  title = imageSizes.title
+  title = imageSizes.titleArt
   skinAdLandscape = imageSizes.skinAdLandscape
   fullScreenBackground = imageSizes.fullScreenBackground
   featuredRowPoster = imageSizes.featuredRowPoster
