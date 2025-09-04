@@ -1450,6 +1450,10 @@ Function getTranslation_en_US()
       "description": "Label to display time left in linear video player info panel",
       "message": "{time} left"
     },
+    "linearVideoPlayer_adCounter": {
+      "description": "Label to display ad counter in linear video player",
+      "message": "Ad {ad_index} of {ad_count}"
+    },
     "channel_name": {
       "description": "This is the name of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
       "message": "Tubi - Free Movies & TV"

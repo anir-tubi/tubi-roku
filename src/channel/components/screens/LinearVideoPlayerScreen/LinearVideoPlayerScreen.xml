@@ -203,6 +203,15 @@
         translation="[584,696]"/>
     </Group>
 
+    <LayoutGroup
+      id="adCounter"
+      visible="false"
+      translation="[102, 102]">
+      <Label
+        id="adCounterLabel"
+        text=""/>
+    </LayoutGroup>
+
     <LinearVideoPlayerScreenOverlay
       id="VideoOverlay"
       visible="false"/>

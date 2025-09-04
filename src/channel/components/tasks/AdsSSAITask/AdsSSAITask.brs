@@ -413,6 +413,14 @@ Function onPlaybackStopped()
       remainingAds = m.adPod.ads.count() - m.currentAdInPod.sequence
     end if
 
+    m.top.trackAdEvent = {
+      adType: "missedImpression"
+      adInfo: {
+        ad_index: m.currentAdInPod.sequence
+        ad_count: m.adPod.ads.count()
+      }
+    }
+
     if remainingAds > 0
       contentId = ""
       if m.top.content <> invalid

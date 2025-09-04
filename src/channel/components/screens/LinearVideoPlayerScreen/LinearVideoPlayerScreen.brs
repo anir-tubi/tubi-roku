@@ -24,7 +24,8 @@ Function init()
   m.top.task = m.AdsSSAITask
   m.AdsSSAITask.observeField("nowPlaying", "onAdChange")
   m.AdsSSAITask.observeField("trackAdEvent", "onTrackAdEventChange")
-
+  m.adCounter = m.top.findNode("adCounter")
+  m.adCounterLabel = m.top.findNode("adCounterLabel")
   m.Video = m.top.findNode("VideoNode") ' reference in case we change from extending Video to extending Group
   m.Video.observeFieldScoped("position", "onVideoPositionChange")
   m.Video.observeFieldScoped("state", "onVideoStateChange")
@@ -76,6 +77,7 @@ Function init()
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.LoadingMessage, typographyConstants.ids.subheaderMedium)
+  setTypographyOfLabel(m.adCounterLabel, typographyConstants.ids.bodyMediumStrong)
 
   updateColors()
 
@@ -1215,12 +1217,27 @@ Function onTrackAdEventChange(msg)
     end if
 
     if adType = "adStart"
+      updateAdCounter(adInfo, true)
       updatePlayerLogLib(m.playerLogLib, "fireAdStartEvent", adInfo)
     else if adType = "adComplete"
       updatePlayerLogLib(m.playerLogLib, "fireAdCompleteEvent", adInfo)
     else if adType = "adPodComplete"
+      updateAdCounter(adInfo, false)
       updatePlayerLogLib(m.playerLogLib, "fireAdPodCompleteEvent", adInfo)
+    else if adType = "missedImpression"
+      updateAdCounter(adInfo, false)
     end if
   end if
 
+End Function
+
+
+Function updateAdCounter(adInfo, showCounter = false)
+  if showCounter = true AND adInfo <> invalid
+    m.adCounter.visible = true
+    m.adCounterLabel.text = getTranslation("linearVideoPlayer_adCounter", { "ad_index": adInfo.ad_index.toStr(), "ad_count": adInfo.ad_count.toStr() })
+  else
+    m.adCounterLabel.text = ""
+    m.adCounter.visible = false
+  end if
 End Function
