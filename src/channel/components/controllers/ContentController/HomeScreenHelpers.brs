@@ -1236,6 +1236,11 @@ Function showRegistrationWelcomeModal()
     instantResumeAction: m.constants.instantResumeActions.closeDialog
   }
 
+  modalInfo.append({
+    imageUrls: ["https://mcdn.tubitv.com/image/roku_support_images/welcome-banner.webp"]
+    imageDimensions: [[617, 120]]
+  })
+
   buttonInfo = []
 
   buttonOne = {

@@ -7,7 +7,7 @@ Function init()
   m.multiStyleLayout = m.top.findNode("multiStyleLayout")
   m.imagesSection = m.top.findNode("imagesSection")
   m.mask = m.top.findNode("mask")
-  m.semiCircle = m.top.findNode("semiCircle")
+  m.contentArea = m.top.findNode("contentArea")
 
   m.top.observeFieldScoped("buttons", "formatDialog")
   m.top.observeFieldScoped("multiStyleMessage", "formatDialog")
@@ -19,6 +19,7 @@ Function init()
   '//::TODO::colors - Design will eventually add this black color to all themes but until then, hardcode this with the default shadeColor regardless of theme.
   '//   when Design adds the color to all themes, then set this color within the onThemeChange() observer using the new theme specific color
   m.shade.color = m.constants.ui.themes.default.shadeColor
+  m.dialogBox.color = m.constants.ui.colors.transparent
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.header, typographyConstants.ids.headerMedium)
@@ -92,9 +93,9 @@ Function formatDialog()
       m.dialogBox.width = buttonListWidth
     end if
 
-    dialogBoxTranslationX = 1920 - m.dialogBox.width
-    m.semiCircle.translation = [dialogBoxTranslationX - 160 , 0 ]
-    m.dialogBox.translation = [dialogBoxTranslationX, 0]
+    dialogBoxTranslationX = 1898 - m.dialogBox.width ' 1920 total width - 22 right margin
+    dialogBoxTranslationY = 36
+    m.dialogBox.translation = [dialogBoxTranslationX, dialogBoxTranslationY]
     m.mask.width = m.dialogBox.width
     m.subHeader.width = m.dialogBox.width - 180
     m.header.width = m.dialogBox.width - 180
@@ -102,92 +103,144 @@ Function formatDialog()
   end if
 
   if m.top.multiStyleMessage <> invalid AND m.top.multiStyleMessage.Count() > 0 AND m.multiStyleLayout.getChildCount() = 0
-    m.multiStyleLayout.visible = true
-
-    for each multiMsg in m.top.multiStyleMessage
-      multiStyleMsgGroup = CreateObject("roSGNode", "IconTitleSubtitleGroup")
-      multiStyleMsgGroup.header = multiMsg.header
-      multiStyleMsgGroup.subHeader = multiMsg.subHeader
-
-      if m.theme <> invalid
-        multiStyleMsgGroup.headerColor = m.theme.primaryTextColor
-        multiStyleMsgGroup.subHeaderColor = m.theme.secondaryTextColor
-      end if
-
-      multiStyleMsgGroup.sideIcon = multiMsg.iconUri
-
-      m.multiStyleLayout.appendChild(multiStyleMsgGroup)
-    end for
-  else if isNonEmptyArray(m.top.imageUrls) = true AND m.multiStyleLayout.getChildCount() = 0
-    imageUrls = m.top.imageUrls
-
-    ' Since we need to support multiple images.
-    ' Setting image dimensions based on number of images returned.
-    ' Idea behind having 2 variable is to provide flexiblity in future to have as many as image layouts as possible.
-    ' So that we do not have to create if else logic across the file. We will create the imageDimensions and imageTranslations
-    ' Which will control where in the modal the images will be placed and the dimensions of them.
-    ' We will use absolute positioning for simplicity.
-    imageDimensions = []
-    imageTranslations = []
-
-    if imageUrls.count() = 1
-
-      ' set imageDimensions if provided otherwise use the default Braze's dimensions
-      if isNonEmptyArray(m.top.imageDimensions) = true AND isNonEmptyArray(m.top.imageDimensions[0]) = true
-        imageWidth = m.top.imageDimensions[0][0]
-        imageDimensions = m.top.imageDimensions
-        ' Center aligning the image if dimensions are provided.
-        translationX = (m.dialogBox.width / 2) - (imageWidth / 2)
-        m.imagesSection.translation = [translationX, 0]
-
-        imageTranslations = [[0, 0]]
-      else
-        'braze modal
-        imageDimensions = [[282, 405]]
-        imageTranslations = [[97, 0]]
-        m.imagesSection.translation = [112, 0]
-      end if
-
-    else
-      ' For now since we only support 1 or 3 images layout.
-      ' Once we have other variations we will add conditions and settings based on a new layout.
-      ' For ex: imageUrls.count() > 3.
-
-      if isNonEmptyArray(m.top.imageDimensions) = true AND isNonEmptyArray(m.top.imageDimensions[0]) = true
-        imageDimensions = m.top.imageDimensions
-      else
-        imageDimensions = [[216, 309], [282, 405], [216, 309]]
-      end if
-
-      imageTranslations = [[0, 48], [87, 0], [243, 48]]
-      ' Adjusting image section translation to have left side gutter width.
-      m.imagesSection.translation = [112, 0]
-    end if
-
-    index = 0
-    imageList = []
-    for each imageUrl in imageUrls
-      ' Adding a check to  make sure we do not crash if in case we get more images than supported.
-      ' If we gracefully ignoring anything more than what is supported.For now it is 3.
-      if imageDimensions[index] <> invalid
-        imageWidth = imageDimensions[index][0]
-        imageHeight = imageDimensions[index][1]
-        imageList.push({
-          subtype: "Poster"
-          uri: imageUrl
-          height: imageHeight
-          width: imageWidth
-          translation: imageTranslations[index]
-          loadDisplayMode: "scaleToFit"
-        })
-      end if
-      index++
-    end for
-
-    ' Sorting the images by width so that largest is rendered at the end so that it is always on top.
-    imageList.sortBy("width")
-    m.imagesSection.update(imageList, true)
-    m.imagesSection.visible = true
+    isAdjustLayoutSpacing = (m.imagesSection.getChildCount() > 0)
+    adjustLayoutSpacing(isAdjustLayoutSpacing)
+    formatMessageSection()
+  else if isNonEmptyArray(m.top.imageUrls) = true
+    isAdjustLayoutSpacing = (m.multiStyleLayout.getChildCount() > 0)
+    adjustLayoutSpacing(isAdjustLayoutSpacing)
+    formatImageSection()
   end if
 
 End Function
+
+
+Function formatMessageSection()
+
+  m.multiStyleLayout.visible = true
+
+  for each multiMsg in m.top.multiStyleMessage
+    multiStyleMsgGroup = CreateObject("roSGNode", "IconTitleSubtitleGroup")
+    multiStyleMsgGroup.header = multiMsg.header
+    multiStyleMsgGroup.subHeader = multiMsg.subHeader
+
+    if m.theme <> invalid
+      multiStyleMsgGroup.headerColor = m.theme.primaryTextColor
+      multiStyleMsgGroup.subHeaderColor = m.theme.secondaryTextColor
+    end if
+
+    multiStyleMsgGroup.sideIcon = multiMsg.iconUri
+
+    m.multiStyleLayout.appendChild(multiStyleMsgGroup)
+  end for
+
+End Function
+
+
+Function formatImageSection()
+  imageUrls = m.top.imageUrls
+
+  ' Since we need to support multiple images.
+  ' Setting image dimensions based on number of images returned.
+  ' Idea behind having 2 variable is to provide flexiblity in future to have as many as image layouts as possible.
+  ' So that we do not have to create if else logic across the file. We will create the imageDimensions and imageTranslations
+  ' Which will control where in the modal the images will be placed and the dimensions of them.
+  ' We will use absolute positioning for simplicity.
+  imageDimensions = []
+  imageTranslations = []
+
+  if imageUrls.count() = 1
+
+    ' set imageDimensions if provided otherwise use the default Braze's dimensions
+    if isNonEmptyArray(m.top.imageDimensions) = true AND isNonEmptyArray(m.top.imageDimensions[0]) = true
+      imageWidth = m.top.imageDimensions[0][0]
+      imageDimensions = m.top.imageDimensions
+      ' Center aligning the image if dimensions are provided.
+      translationX = (m.dialogBox.width / 2) - (imageWidth / 2)
+      m.imagesSection.translation = [translationX, 0]
+
+      imageTranslations = [[0, 0]]
+    else
+      'braze modal
+      imageDimensions = [[282, 405]]
+      imageTranslations = [[97, 0]]
+      m.imagesSection.translation = [112, 0]
+    end if
+
+  else
+    ' For now since we only support 1 or 3 images layout.
+    ' Once we have other variations we will add conditions and settings based on a new layout.
+    ' For ex: imageUrls.count() > 3.
+
+    if isNonEmptyArray(m.top.imageDimensions) = true AND isNonEmptyArray(m.top.imageDimensions[0]) = true
+      imageDimensions = m.top.imageDimensions
+    else
+      imageDimensions = [[216, 309], [282, 405], [216, 309]]
+    end if
+
+    imageTranslations = [[0, 48], [87, 0], [243, 48]]
+    ' Adjusting image section translation to have left side gutter width.
+    m.imagesSection.translation = [112, 0]
+  end if
+
+  index = 0
+  imageList = []
+  for each imageUrl in imageUrls
+    ' Adding a check to  make sure we do not crash if in case we get more images than supported.
+    ' If we gracefully ignoring anything more than what is supported.For now it is 3.
+    if imageDimensions[index] <> invalid
+      imageWidth = imageDimensions[index][0]
+      imageHeight = imageDimensions[index][1]
+      imageList.push({
+        subtype: "Poster"
+        uri: imageUrl
+        height: imageHeight
+        width: imageWidth
+        translation: imageTranslations[index]
+        loadDisplayMode: "scaleToFit"
+      })
+    end if
+    index++
+  end for
+
+  ' Sorting the images by width so that largest is rendered at the end so that it is always on top.
+  imageList.sortBy("width")
+  m.imagesSection.update(imageList, true)
+
+  for each image in m.imagesSection.getChildren(-1, 0)
+    if image <> invalid
+      image.observeFieldScoped("loadStatus", "onImageLoaded")
+    end if
+  end for
+
+  m.imagesSection.visible = true
+End Function
+
+
+Function onImageLoaded(msg)
+  image = msg.getRoSGNode()
+  status = msg.getData()
+  image.unObserveFieldScoped("loadStatus")
+
+  if status = "failed"
+    m.imagesSection.removeChild(image)
+    if m.imagesSection.getChildCount() = 0
+      adjustLayoutSpacing(false)
+    end if
+  end if
+End Function
+
+
+'This function does not handle all possible scenarios. It will for now handle
+'messages upto 3 being present with images upto 3.
+Function adjustLayoutSpacing(isMsgsWithImages)
+
+  if isMsgsWithImages = true
+    m.multiStyleLayout.itemSpacings = [24]
+    m.contentArea.itemSpacings = [40, 40, 40]
+  else
+    m.multiStyleLayout.itemSpacings = [68]
+    m.contentArea.itemSpacings = [48, 0, 80]
+  end if
+End Function
+

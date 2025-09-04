@@ -1730,7 +1730,7 @@ Function getTranslation_en_US()
     },
     "reg_intro_title": {
       "description": "title displayed on registration welcome modal",
-      "message": "Tubi is better when you sign in"
+      "message": "Welcome to Tubi"
     },
     "reg_intro_sub_header": {
       "description": "sub header displayed on registraton welcome modal",

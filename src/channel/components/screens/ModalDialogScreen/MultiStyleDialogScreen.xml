@@ -55,23 +55,17 @@
       opacity="0.9"
       translation="[0,0]"/>
 
-    <Poster
-      id="semiCircle"
-      width="160"
-      height="1080"
-      uri="pkg:/images/sidepanel-0.webp"/>
-
     <Rectangle
       id="dialogBox"
-      width="762"
-      height="1080"
-      translation="[1191, 0]">
+      width="744"
+      height="1008"
+      translation="[1154, 36]">
 
       <Poster
         id="mask"
-        width="762"
-        height="1080"
-        uri="pkg:/images/gradient-reg-modal.webp"
+        width="744"
+        height="1008"
+        uri="pkg:/images/sidepanel.webp"
         translation="[0, 0]"/>
 
       <LayoutGroup
