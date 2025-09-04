@@ -152,9 +152,15 @@ Function refreshButtonList()
     end if
 
     if itemContent.needsLogin = true AND getExternalConfigValueFromGlobal("bypass_registration_gate", false) = false
+      translationId = "sign_in_watch"
+      buttonId = "signInWatch"
+      if isEventLive = true
+        translationId = "sign_in_watch_live"
+        buttonId = "signInWatchLive"
+      end if
       buttonContent = {
-        id: "signInWatch"
-        title: getTranslation("sign_in_watch")
+        id: buttonId
+        title: getTranslation(translationId)
         iconUrl: "pkg:/images/account-icon.webp"
         badgeText: getTranslation("registration_signup_button_free")
         isPrimaryButton: true

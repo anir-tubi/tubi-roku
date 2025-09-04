@@ -733,11 +733,7 @@ Function getConstants()
   constants.urls.continueWatchingItemBackground_largePoster = "https://mcdn.tubitv.com/image/roku_support_images/continueWatchingItemBackground_largePoster.webp"
   constants.urls.continueWatchingItemBackground_largePoster_kidsMode = "https://mcdn.tubitv.com/image/roku_support_images/continueWatchingItemBackground_largePoster_kids.webp"
 
-  if constants.settings.stagingApis = true
-    constants.urls.foxApiBaseUrl = "https://qa.api.digitalvideoplatform.com/tubi"
-  else
-    constants.urls.foxApiBaseUrl = "https://prod.api.digitalvideoplatform.com/tubi"
-  end if
+  constants.urls.foxApiBaseUrl = "https://prod.api.digitalvideoplatform.com/tubi"
 
   ' url for pinging Nielsen
   constants.urls.nielsenPing = "https://audit.imrworldwide.com/cgi-bin/gn"

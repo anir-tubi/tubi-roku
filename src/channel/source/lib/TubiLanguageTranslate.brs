@@ -2211,6 +2211,10 @@ Function getTranslation_en_US()
     "screenDetails_button_details": {
       "description": "Details button label used in linear detail screen",
       "message": "More Details"
+    },
+    "sign_in_watch_live": {
+      "description": "Sign in to watch live button label.",
+      "message": "Sign in to Watch Live"
     }
   }
 End Function
@@ -3978,10 +3982,6 @@ Function getTranslation_es_MX()
       "description": "A header for the message that let's the user know they've been signed in with the given email",
       "message": "¡Bienvenido!"
     },
-    "resolution_full_hd": {
-      "description": "Title of the 1080p resolution label in the infopanel",
-      "message": "HD COMPLETO"
-    },
     "available_at_toast_heading": {
       "description": "Toast message heading that is displayed when we click on a available at button",
       "message": "Contenido disponible a las {time}"
@@ -4085,6 +4085,18 @@ Function getTranslation_es_MX()
     "videoPlayer_button_watchMovie": {
       "description": "Label of button to allow users to watch movie from trailer screen",
       "message": "Ver Película"
+    },
+    "videoPlayer_button_watchSeries": {
+      "description": "Label of button to allow users to watch series/episode from trailer screen",
+      "message": "Ver series"
+    },
+    "h_m_duration": {
+      "description": "Indicates time in the format 'x h y m'",
+      "message": "{hour}h {minutes}m"
+    },
+    "m_duration": {
+      "description": "Indicates time in the format 'x m'",
+      "message": "{minutes}m"
     }
   }
 End Function
@@ -5850,10 +5862,6 @@ Function getTranslation_fr_CA()
       "description": "A header for the message that let's the user know they've been signed in with the given email",
       "message": "Bienvenue!"
     },
-    "resolution_full_hd": {
-      "description": "Title of the 1080p resolution label in the infopanel",
-      "message": "PLEINE HD"
-    },
     "available_at_toast_heading": {
       "description": "Toast message heading that is displayed when we click on a available at button",
       "message": "Contenu disponible sur {time}"
@@ -5957,6 +5965,18 @@ Function getTranslation_fr_CA()
     "videoPlayer_button_watchMovie": {
       "description": "Label of button to allow users to watch movie from trailer screen",
       "message": "Regarder film"
+    },
+    "videoPlayer_button_watchSeries": {
+      "description": "Label of button to allow users to watch series/episode from trailer screen",
+      "message": "Regarder la série"
+    },
+    "h_m_duration": {
+      "description": "Indicates time in the format 'x h y m'",
+      "message": "{hour}h {minutes}m"
+    },
+    "m_duration": {
+      "description": "Indicates time in the format 'x m'",
+      "message": "{minutes}m"
     }
   }
 End Function

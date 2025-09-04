@@ -19,7 +19,6 @@ Function showLinearDetailScreen(content, playbackSource)
     screen.playbackSource = playbackSource
     screen.content = content
     contentId = content.id
-    screen.signedIn = isLoggedInUser()
     screen.trackingPageInfo = {
       pageType: "linear_details_page"
       pageValues: {

@@ -1940,5 +1940,9 @@
   "screenDetails_button_details": {
     "description": "Details button label used in linear detail screen",
     "message": "More Details"
+  },
+  "sign_in_watch_live": {
+    "description": "Sign in to watch live button label.",
+    "message": "Sign in to Watch Live"
   }
 }

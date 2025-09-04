@@ -162,21 +162,6 @@ Function onItemContentChange(msg)
           m.delete("adIndicator")
         end if
       end if
-
-      if itemContent.scheduleData <> invalid
-        badgeInfo = getLinearContentBadgeInfo(itemContent.scheduleData)
-        if badgeInfo <> invalid
-          m.availabilityBadge = createObject("roSGNode", "Badge")
-          if badgeInfo.availability = "live"
-            setLinearAvailabilityBadge(m.availabilityBadge, badgeInfo.availability, m.primaryTextColor, m.focused2Color)
-          else
-            setLinearAvailabilityBadge(m.availabilityBadge, badgeInfo.availability, m.backgroundColor, m.primaryTextColor, badgeInfo.badgeText)
-          end if
-          m.availabilityBadge.translation = [6, 6]
-          m.top.appendChild(m.availabilityBadge)
-        end if
-      end if
-
     else
       m.poster.visible = false
       if m.childGridItem = invalid then
@@ -206,6 +191,20 @@ Function onItemContentChange(msg)
           m.top.appendChild(m.childGridItem)
         end if
 
+      end if
+    end if
+
+    if itemContent.scheduleData <> invalid AND gridItemType <> "liveEventSpotlight" AND gridItemType <> "liveEventBanner"
+      badgeInfo = getLinearContentBadgeInfo(itemContent.scheduleData)
+      if badgeInfo <> invalid
+        m.availabilityBadge = createObject("roSGNode", "Badge")
+        if badgeInfo.availability = "live"
+          setLinearAvailabilityBadge(m.availabilityBadge, badgeInfo.availability, m.primaryTextColor, m.focused2Color)
+        else
+          setLinearAvailabilityBadge(m.availabilityBadge, badgeInfo.availability, m.backgroundColor, m.primaryTextColor, badgeInfo.badgeText)
+        end if
+        m.availabilityBadge.translation = [6, 6]
+        m.top.appendChild(m.availabilityBadge)
       end if
     end if
 

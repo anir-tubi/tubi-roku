@@ -3364,7 +3364,7 @@ Function processUserContentSelection(content, screen, playbackSource = {}) as Vo
 
   m.videoPreviewDebounce.control = "stop"
   if isNonEmptyString(content.actionId) = true
-    if content.actionId = "signInWatch"
+    if content.actionId = "signInWatch" OR content.actionId = "signInWatchLive"
       startSignIn(processUserContentSelectionAfterSignIn)
     else if content.actionId = "watchLive"
       if playerType = m.constants.ui.playerTypes.fox
@@ -3426,16 +3426,24 @@ End Function
 
 
 Function processUserContentSelectionAfterSignIn()
-  if isCurrentScreenHomeScreen() = true
-    refreshScreenAndContentAfterSignIn()
-  else
-    popScreenAfterSignInProcess()
-    showContentGroupAndHideSpinner()
-    screen = getCurrentScreen()
-    if screen <> invalid
-      screen.signedIn = isLoggedInUser()
+  popScreenAfterSignInProcess()
+  screen = getCurrentScreen()
+  if screen <> invalid
+    if screen.content <> invalid
+      screen.content.needsLogin = (isLoggedInUser() = false)
     end if
-    refreshUiAfterSignIn()
-    setContentToRefreshAllPersonalizedScreens(true)
+    contentFocused = screen.contentFocused
+    if contentFocused <> invalid AND contentFocused.actionId = "signInWatchLive"
+      playerType = contentFocused.playerType
+      if isAA(contentFocused.scheduleData)
+        playerType = contentFocused.scheduleData.playerType
+      end if
+      if playerType = m.constants.ui.playerTypes.fox
+        playLinearVideoWithFoxPlayer(contentFocused)
+      end if
+    end if
   end if
+  showContentGroupAndHideSpinner()
+  refreshUiAfterSignIn()
+  setContentToRefreshAllPersonalizedScreens(true)
 End Function

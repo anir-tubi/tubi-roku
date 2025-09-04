@@ -115,7 +115,7 @@ Function onVideoPreviewStateChanged(msg)
   end if
 
   if videoPreviewState = "finished"
-    if currentScreen <> invalid
+    if currentScreen <> invalid AND currentScreen.contentFocused <> invalid
 
       'Don't want to continue to full player from video preview if the user is in kidsmode, teen level for UK and NZ region as per GDPR guidelines.
       'Also dont auto start locked contents.
