@@ -524,9 +524,13 @@ Function onCurrFocusRowChange()
 
     isEnteringLiveEventRow = arrayIncludes(m.constants.ui.liveEventsGridTypes, categoryEnteringFocus.gridItemType)
     isLeavingLiveEventRow = categoryLosingFocus <> invalid AND arrayIncludes(m.constants.ui.liveEventsGridTypes, categoryLosingFocus.gridItemType)
+
     if isEnteringLiveEventRow = true
       m.CategoryGridList.showFocusFeedback = false
     else if isLeavingLiveEventRow = true AND currFocusRow = CInt(currFocusRow)
+      m.CategoryGridList.showFocusFeedback = true
+    else if isEnteringLiveEventRow = false AND isLeavingLiveEventRow = false
+      ' This covers case where the container gets removed.
       m.CategoryGridList.showFocusFeedback = true
     end if
 
