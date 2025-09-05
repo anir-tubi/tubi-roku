@@ -82,7 +82,7 @@ const abbreviatedContentTypeConversion = {
   channel: ContentTypes.channel,
   l: ContentTypes.linear,
   se: ContentTypes.sports_event
-} as {[key: string]: ContentTypes};
+} as { [key: string]: ContentTypes };
 
 
 class TestUtils {
@@ -187,7 +187,7 @@ class TestUtils {
     await odc.onFieldChangeOnce({
       keyPath: '#ContentController.removeStartUpScreens',
       match: true
-    }, {timeout: 20000});
+    }, { timeout: 20000 });
   }
 
 
@@ -221,7 +221,7 @@ class TestUtils {
         base: 'scene',
         keyPath: '#ContentController.exitApp',
         value: true
-      }, {timeout: 1000});
+      }, { timeout: 1000 });
     } catch (e) {
       // We don't care if it does not return since this can be expected behavior since we're stopping the application
     }
@@ -249,8 +249,9 @@ class TestUtils {
   public async sendNetworkRequest(requestOptions: needle.NeedleOptions & {
     url: string;
     method: needle.NeedleHttpVerbs;
-    params?: {[key: string]: any};
-    body?: any}) {
+    params?: { [key: string]: any };
+    body?: any
+  }) {
     // requestOptions.proxy = '127.0.0.1:8888'; // useful for debugging
 
     requestOptions.headers = requestOptions.headers ?? {};
@@ -283,9 +284,9 @@ class TestUtils {
 
   // Starts the application at the specified page.
   // args: options to modify starting application state such as wether a user is logged in or not
-  public async startApplicationAtPage(page: DeeplinkPage | 'search' | 'settings' | 'myStuff', args: StartApplicationArgs = {}) {
+  public async startApplicationAtPage(page: DeeplinkPage | NonDeeplinkPage, args: StartApplicationArgs = {}) {
     let deeplink;
-    const isNonDeeplinkPage = ['search', 'settings', 'myStuff'].includes(page);
+    const isNonDeeplinkPage = nonDeeplinkPages.includes(page);
     if (!isNonDeeplinkPage) {
       deeplink = {
         page: page
@@ -382,7 +383,7 @@ class TestUtils {
   }
 
 
-  public async loginAsUser(credentials: {email: string, password: string}) {
+  public async loginAsUser(credentials: { email: string, password: string }) {
     const user = new RegisteredUser();
     await user.login(credentials);
     return user;
@@ -403,16 +404,18 @@ class TestUtils {
 
 
   // Helper for going to a different page in the application
-  public async goToPage(page: DeeplinkPage | 'search' | 'settings' | 'myStuff' | 'movies' | 'series') {
+  public async goToPage(page: DeeplinkPage | NonDeeplinkPage) {
 
-    var pageTileMapping = {
+    const pageTileMapping = {
       'movies': 'Movies',
-      'series': 'TV Shows',
       'home': 'Home',
       'search': 'Search',
+      'settings': 'Settings',
       'myStuff': 'My Stuff',
-      'settings': 'Settings'
-    }
+      'series': 'TV Shows',
+      'livefeed': 'Live TV'
+    };
+
     const selectedPage = pageTileMapping[page];
     if (selectedPage) {
       // We don't have a deeplink for these so we access it on the side nav menu instead
@@ -485,7 +488,7 @@ class TestUtils {
   public async getPlayerPosition(videoPlayerElementId?: VideoPlayerElementId) {
     if (videoPlayerElementId) {
       const element = this.getElementKeyPath(videoPlayerElementId);
-      const {value} = await odc.getValue({
+      const { value } = await odc.getValue({
         keyPath: `${element.keyPath}.#VideoNode.position`
       });
       // position is in seconds but we want to convert to milliseconds to match ECP units
@@ -504,7 +507,7 @@ class TestUtils {
    */
   public async getPlayerDuration(videoPlayerElementId: VideoPlayerElementId) {
     const element = this.getElementKeyPath(videoPlayerElementId);
-    const {value} = await odc.getValue({
+    const { value } = await odc.getValue({
       keyPath: `${element.keyPath}.#VideoNode.duration`
     });
     return value * 1000;
@@ -529,7 +532,7 @@ class TestUtils {
       availabilityEnds: string;
       codec: string;
       country: string;
-      creditCuePoints: {[key: string]: number};
+      creditCuePoints: { [key: string]: number };
       cuepoints: number[];
       drmType: string;
       genres: string[];
@@ -604,7 +607,7 @@ class TestUtils {
 
     return await this.retryWithTimeOut(async () => {
       // First count how many rows of content there are
-      const {found, value: rowCount} = await odc.getValue({
+      const { found, value: rowCount } = await odc.getValue({
         base: element.base,
         keyPath: `${baseKeyPath}.getChildCount()`
       });
@@ -621,7 +624,7 @@ class TestUtils {
         };
       }
 
-      const {results} = await odc.getValues({
+      const { results } = await odc.getValues({
         requests: requests
       });
 
@@ -659,7 +662,7 @@ class TestUtils {
     await odc.setValue(this.getElementKeyPath(elementOrElementId, {
       field: 'jumpToItem',
       value: rowIndex
-    }), {timeout: timeout});
+    }), { timeout: timeout });
   }
 
 
@@ -673,7 +676,7 @@ class TestUtils {
     await odc.setValue(this.getElementKeyPath(elementOrElementId, {
       field: 'jumpToRowItem',
       value: index
-    }), {timeout: timeout});
+    }), { timeout: timeout });
   }
 
 
@@ -689,12 +692,12 @@ class TestUtils {
     const baseKeyPath = `${element.keyPath}.content.${rowIndex}`;
 
     const node = await testUtils.retryWithTimeOut(async () => {
-      const {value, found} = await odc.getValue({
-          keyPath: baseKeyPath,
-          responseMaxChildDepth: 1
+      const { value, found } = await odc.getValue({
+        keyPath: baseKeyPath,
+        responseMaxChildDepth: 1
       });
 
-      if(!found) {
+      if (!found) {
         throw new Error(`Could not retrieve item content for rowIndex ${rowIndex}`);
       }
 
@@ -757,7 +760,7 @@ class TestUtils {
     }
 
     const rowCount = await this.retryWithTimeOut(async () => {
-      const {found, value: rowCount} = await odc.getValue({
+      const { found, value: rowCount } = await odc.getValue({
         keyPath: `${baseKeyPath}.getChildCount()`
       });
       if (!found) {
@@ -789,11 +792,11 @@ class TestUtils {
     }
 
     return this.retryWithTimeOut(async () => {
-      const {found, value} = await odc.getValue({
+      const { found, value } = await odc.getValue({
         base: element.base,
         keyPath: `${element.keyPath}.content`,
         responseMaxChildDepth: 1
-      }, {timeout: timeout});
+      }, { timeout: timeout });
 
       if (!found) {
         throw new Error(`Can't retrieve grid content`);
@@ -814,7 +817,7 @@ class TestUtils {
 
     // TODO update when we either get multiple observer callback support or more advanced types
     await this.untilTrue(async () => {
-      const {value} = await odc.getValue(element, {timeout: timeout});
+      const { value } = await odc.getValue(element, { timeout: timeout });
       return !!value;
     });
   }
@@ -850,9 +853,9 @@ class TestUtils {
             }
           }
         };
-        const {results} = await odc.getValues(requests);
+        const { results } = await odc.getValues(requests);
 
-        if(!results.itemContent.found) {
+        if (!results.itemContent.found) {
           throw new Error(`Could not retrieve item content for index ${arrayIndex.join(':')}`);
         }
 
@@ -868,11 +871,11 @@ class TestUtils {
       }
     } else {
       return await testUtils.retryWithTimeOut(async () => {
-        const {value, found} = await odc.getValue({
-            keyPath: baseKeyPath
+        const { value, found } = await odc.getValue({
+          keyPath: baseKeyPath
         });
 
-        if(!found) {
+        if (!found) {
           throw new Error(`Could not retrieve item content for index ${arrayIndex[0]}`);
         }
 
@@ -892,7 +895,7 @@ class TestUtils {
     return await this.retryWithTimeOut(async () => {
       const grid = await this.getNodeForElement(elementOrElementId, timeout);
       if (grid.rowItemFocused?.length === 2) {
-        return grid.rowItemFocused  as number[];
+        return grid.rowItemFocused as number[];
       } else if (grid.itemFocused !== -1) {
         return grid.itemFocused as number;
       } else {
@@ -950,12 +953,12 @@ class TestUtils {
   }
 
 
-/**
-   * Used to navigate to the grid item that matches the callback function provided
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
-   * @param callbackFn - The function that will be used to determine if the grid item matches the criteria we are looking for
-   * @param timeout - How long we will wait for this operation before considering it to have failed
-   */
+  /**
+     * Used to navigate to the grid item that matches the callback function provided
+     * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
+     * @param callbackFn - The function that will be used to determine if the grid item matches the criteria we are looking for
+     * @param timeout - How long we will wait for this operation before considering it to have failed
+     */
   public async navigateToGridItem(elementOrElementId: ElementOrElementId, callbackFn: (gridItemContent: any) => boolean, timeout = 10000) {
     const index = await this.getMatchingGridItemIndex(elementOrElementId, callbackFn, timeout);
     if (index.length === 1) {
@@ -996,8 +999,8 @@ class TestUtils {
         // We know we're good once the remove item shows up
         await this.findRowIndexWithTitle(element, 'Remove from My List', timeout);
         break;
-      case 'likeOrDislike' :
-        await this.selectMenuItem(element,'Like or Dislike', timeout );
+      case 'likeOrDislike':
+        await this.selectMenuItem(element, 'Like or Dislike', timeout);
         await this.waitForElementToFullyShowOnScreen('secondaryMenu');
         break;
       case 'removeFromMyList':
@@ -1012,7 +1015,7 @@ class TestUtils {
           try {
             await this.findRowIndexWithTitle(element, 'Remove from history', 0);
             return false;
-          } catch(e) {
+          } catch (e) {
             return true;
           }
         }, 'Could not verify that Remove from history was removed');
@@ -1035,12 +1038,12 @@ class TestUtils {
         await this.selectMenuItem(element, 'Sign Up to Save Progress', timeout);
 
         // Currently no way to verify the RFI prompt actually opens up since Roku doesn't expose that ability so the closest we can do is verify that the analytics call was made
-        const {value} = await observerPromise;
+        const { value } = await observerPromise;
         expect(value.type).to.equal('dialog');
         expect(value.values.dialog_type).to.equal('REGISTRATION');
         expect(value.values.dialog_action).to.equal('SHOW');
         break;
-      }
+    }
   }
 
 
@@ -1056,7 +1059,7 @@ class TestUtils {
     await odc.setValue(this.getElementKeyPath(elementOrElementId, {
       field: 'itemSelected',
       value: index
-    }), {timeout: timeout});
+    }), { timeout: timeout });
   }
 
 
@@ -1067,12 +1070,12 @@ class TestUtils {
    */
   public async verifyFocusedSideNavMenuItemEquals(expectedItem: SideNavMenuItems | keyof typeof SideNavMenuItems, timeout = 10000) {
     const mainMenuElement = this.getElementKeyPath('sideNavMenu');
-    const requestOptions = {timeout: timeout};
-    const {value: currFocusRow} = await odc.getValue({
+    const requestOptions = { timeout: timeout };
+    const { value: currFocusRow } = await odc.getValue({
       keyPath: `${mainMenuElement.keyPath}.currFocusRow`
     }, requestOptions);
 
-    const {value} = await odc.getValue({
+    const { value } = await odc.getValue({
       keyPath: `${mainMenuElement.keyPath}.content.${currFocusRow}.id`
     }, requestOptions);
 
@@ -1083,11 +1086,11 @@ class TestUtils {
   }
 
 
-    /**
-   * Wrapper around waitForFocusedMainMenuItemToEqual that will wait for the value to match or fail
-   * @param expectedItem - the item we are expecting it equal
-   * @param timeout - How long we will wait for this operation before considering it to have failed
-   */
+  /**
+ * Wrapper around waitForFocusedMainMenuItemToEqual that will wait for the value to match or fail
+ * @param expectedItem - the item we are expecting it equal
+ * @param timeout - How long we will wait for this operation before considering it to have failed
+ */
   public waitForFocusedSideNavMenuItemToEqual(expectedItem: SideNavMenuItems | keyof typeof SideNavMenuItems, timeout = 10000) {
     return this.retryWithTimeOut(async () => {
       await this.verifyFocusedSideNavMenuItemEquals(expectedItem);
@@ -1104,7 +1107,7 @@ class TestUtils {
    */
   public async elementIsInFocusChain(elementOrElementId: ElementOrElementId, failIfNot?: boolean, timeout = 10000) {
     const element = this.getElementKeyPath(elementOrElementId);
-    const result = await odc.isInFocusChain(element, {timeout: timeout});
+    const result = await odc.isInFocusChain(element, { timeout: timeout });
     if (failIfNot !== undefined) {
       if (failIfNot !== result) {
         throw new Error(`'${element.id}'isInFocusChain equaled ${result} when ${failIfNot} was expected`);
@@ -1123,7 +1126,7 @@ class TestUtils {
    */
   public async elementHasFocus(elementOrElementId: ElementOrElementId, failIfNot?: boolean, timeout = 10000) {
     const element = this.getElementKeyPath(elementOrElementId);
-    const result = await odc.hasFocus(element, {timeout: timeout});
+    const result = await odc.hasFocus(element, { timeout: timeout });
     if (failIfNot !== undefined) {
       if (failIfNot !== result) {
         throw new Error(`'${element.id}' hasFocus equaled ${result} when ${failIfNot} was expected`);
@@ -1146,7 +1149,7 @@ class TestUtils {
     await this.untilTrue(async () => {
       try {
         return await this.elementHasFocus(elementOrElementId);
-      } catch(e) {
+      } catch (e) {
         return false;
       }
     }, errorMessage, timeout);
@@ -1167,7 +1170,7 @@ class TestUtils {
       try {
         const result = await this.elementHasFocus(elementOrElementId);
         return !result;
-      } catch(e) {
+      } catch (e) {
         return false;
       }
     }, errorMessage, timeout);
@@ -1187,7 +1190,7 @@ class TestUtils {
     await this.untilTrue(async () => {
       try {
         return await this.elementIsInFocusChain(elementOrElementId);
-      } catch(e) {
+      } catch (e) {
         return false;
       }
     }, errorMessage, timeout);
@@ -1208,7 +1211,7 @@ class TestUtils {
       try {
         const result = await this.elementIsInFocusChain(elementOrElementId);
         return !result;
-      } catch(e) {
+      } catch (e) {
         return false;
       }
     }, errorMessage, timeout);
@@ -1223,8 +1226,8 @@ class TestUtils {
   public async isElementShowingOnScreen(elementOrElementId: ElementOrElementId, timeout = 10000) {
     const element = this.getElementKeyPath(elementOrElementId);
     try {
-      return await odc.isShowingOnScreen(element, {timeout: timeout});
-    } catch(e) {
+      return await odc.isShowingOnScreen(element, { timeout: timeout });
+    } catch (e) {
       return {
         isShowing: false,
         isFullyShowing: false
@@ -1282,9 +1285,9 @@ class TestUtils {
    */
   public async getElementSize(elementOrElementId: ElementOrElementId, timeout = 10000) {
     const element = this.getElementKeyPath(elementOrElementId);
-    const {found, value} = await odc.getValue({
+    const { found, value } = await odc.getValue({
       keyPath: element.keyPath + '.sceneBoundingRect()'
-    }, {timeout: timeout});
+    }, { timeout: timeout });
 
     if (!found) {
       throw new Error(`Could not retrieve size for element '${element.id}'`);
@@ -1299,37 +1302,37 @@ class TestUtils {
   }
 
 
-    /**
-   * Allows getting the dimensions of a grid item node
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file. This should be for the grid or RowList not the grid element itself
-   * @param index - array or number of which item we are getting the size of. For RowLists this should a 2 item array and for Grids a single item array or number
-   * @param timeout - How long we will wait for this operation before considering it to have failed
-   */
-    public async getGridElementSize(elementOrElementId: ElementOrElementId, index: number | number[], timeout = 10000) {
-      if (!Array.isArray(index)) {
-        index = [index];
-      }
-
-      const element = this.getElementKeyPath(elementOrElementId);
-      let item = `item${index[0]}`;
-      if (index.length > 1) {
-        item += `_${index[1]}`;
-      }
-      const {found, value} = await odc.getValue({
-        keyPath: element.keyPath + `.sceneSubBoundingRect(${item})`
-      }, {timeout: timeout});
-
-      if (!found) {
-        throw new Error(`Could not retrieve size for element '${element.id}'`);
-      }
-
-      return value as {
-        width: number;
-        height: number;
-        x: number;
-        y: number;
-      };
+  /**
+ * Allows getting the dimensions of a grid item node
+ * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file. This should be for the grid or RowList not the grid element itself
+ * @param index - array or number of which item we are getting the size of. For RowLists this should a 2 item array and for Grids a single item array or number
+ * @param timeout - How long we will wait for this operation before considering it to have failed
+ */
+  public async getGridElementSize(elementOrElementId: ElementOrElementId, index: number | number[], timeout = 10000) {
+    if (!Array.isArray(index)) {
+      index = [index];
     }
+
+    const element = this.getElementKeyPath(elementOrElementId);
+    let item = `item${index[0]}`;
+    if (index.length > 1) {
+      item += `_${index[1]}`;
+    }
+    const { found, value } = await odc.getValue({
+      keyPath: element.keyPath + `.sceneSubBoundingRect(${item})`
+    }, { timeout: timeout });
+
+    if (!found) {
+      throw new Error(`Could not retrieve size for element '${element.id}'`);
+    }
+
+    return value as {
+      width: number;
+      height: number;
+      x: number;
+      y: number;
+    };
+  }
 
 
   /**
@@ -1372,9 +1375,9 @@ class TestUtils {
    */
   public async getElementColorField(elementOrElementId: ElementOrElementId, colorFieldName = 'color', timeout = 10000) {
     const element = this.getElementKeyPath(elementOrElementId);
-    const {value, found} = await odc.getValue({
+    const { value, found } = await odc.getValue({
       keyPath: `${element.keyPath}.${colorFieldName}`
-    }, {timeout: timeout});
+    }, { timeout: timeout });
 
     if (!found || typeof value !== 'number') {
       throw new Error(`Could not retrieve valid color for element '${element.id}' with color field '${colorFieldName}'`);
@@ -1386,10 +1389,10 @@ class TestUtils {
 
     // Slice out each 8 bits for each rgba part value
     const rgb = {
-        red: parseInt(binary.slice(0, 8), 2),
-        green: parseInt(binary.slice(8, 16), 2),
-        blue: parseInt(binary.slice(16, 24), 2),
-        alpha: parseInt(binary.slice(24, 32), 2)
+      red: parseInt(binary.slice(0, 8), 2),
+      green: parseInt(binary.slice(8, 16), 2),
+      blue: parseInt(binary.slice(16, 24), 2),
+      alpha: parseInt(binary.slice(24, 32), 2)
     };
 
     return `#${this.convertByteToHex(rgb.red)}${this.convertByteToHex(rgb.green)}${this.convertByteToHex(rgb.blue)}${this.convertByteToHex(rgb.alpha)}`;
@@ -1426,7 +1429,7 @@ class TestUtils {
   public async untilTrue(func: () => boolean | Promise<boolean>, errorMessage?: string, timeout = 15000) {
     const start = Date.now();
     while (timeout > Date.now() - start) {
-      if(await func()) {
+      if (await func()) {
         return;
       }
     }
@@ -1484,7 +1487,7 @@ class Auth {
       return this.deviceId;
     }
 
-    const {values} = await odc.readRegistry({
+    const { values } = await odc.readRegistry({
       values: {
         deviceinfo: 'deviceId'
       }
@@ -1508,8 +1511,8 @@ class Auth {
 
   private generateDeviceIdPart(length: number) {
     let result = '';
-    for(let i = 0; i < length; i++) {
-        result += Math.floor(Math.random() * 16).toString(16);
+    for (let i = 0; i < length; i++) {
+      result += Math.floor(Math.random() * 16).toString(16);
     }
     return result;
   }
@@ -1575,15 +1578,15 @@ class Auth {
 
 
   public async userSignup(credentials: {
-      birthday: string;
-      email: string;
-      email_type: string;
-      first_name: string;
-      gender: string;
-      last_name: string;
-      password: string;
-      temporary_name: boolean;
-    }) {
+    birthday: string;
+    email: string;
+    email_type: string;
+    first_name: string;
+    gender: string;
+    last_name: string;
+    password: string;
+    temporary_name: boolean;
+  }) {
     const anonymousToken = await this.getAnonymousToken(true);
     const body = JSON.stringify({
       device_id: await this.getDeviceId(),
@@ -1609,7 +1612,7 @@ class Auth {
 
         user.signingKey = anonymousToken.signingKey;
         return user as UserInfoResponse;
-      } catch(e) {
+      } catch (e) {
         retriesLeft--;
         if (retriesLeft > 0 && e.message.includes('429')) {
           console.log('Failed to sign up user Due to 429 error. Retrying after 60 second delay');
@@ -1687,7 +1690,7 @@ class Auth {
     const hashedCanonicalRequest = createHash('sha256').update(canonicalRequest).digest('hex');
 
     const dateTime = new Date().toISOString().split('.').shift() + 'Z';
-    const dateTimeFormatted = dateTime.replace(/-/g,'').replace(/:/g,'');
+    const dateTimeFormatted = dateTime.replace(/-/g, '').replace(/:/g, '');
 
     const algorithm = 'TUBI-HMAC-SHA256';
 
@@ -1717,7 +1720,7 @@ class Auth {
     const hashedPayload = createHash('sha256').update(requestOptions.body).digest('hex');
 
     const headersArray = [];
-    const headers = {...requestOptions.headers};
+    const headers = { ...requestOptions.headers };
 
     for (const key in headers) {
       const headerValue = headers[key] as string;
@@ -1883,7 +1886,7 @@ class RegisteredUser extends User {
   }
 
 
-  public async login(credentials: {email: string, password: string}) {
+  public async login(credentials: { email: string, password: string }) {
     this.userInfo = await auth.userLogin(credentials);
     this.userInfo.password = credentials.password;
     this.accessToken = this.userInfo.access_token;
@@ -1910,7 +1913,7 @@ class RegisteredUser extends User {
 
 
   // contents: array of contents as returned by a call to getContents()
-  public async addContentToWatchList(contents: {type: keyof typeof ContentTypes; id: string}[] | {type: keyof typeof ContentTypes; id: string}) {
+  public async addContentToWatchList(contents: { type: keyof typeof ContentTypes; id: string }[] | { type: keyof typeof ContentTypes; id: string }) {
     if (!Array.isArray(contents)) {
       contents = [contents];
     }
@@ -1945,7 +1948,7 @@ class RegisteredUser extends User {
 
 
   public async getWatchListContent() {
-    const {queues} = await this.sendTubiAuthNetworkRequest({
+    const { queues } = await this.sendTubiAuthNetworkRequest({
       method: 'get',
       url: 'https://user-queue.production-public.tubi.io/api/v2/queues'
     });
@@ -1957,7 +1960,7 @@ class RegisteredUser extends User {
 
 
   // contents: array of contents as returned by a call to getContents()
-  public async removeContentFromWatchList(contents: {type: keyof typeof ContentTypes; id: string}[] | {type: keyof typeof ContentTypes; id: string}) {
+  public async removeContentFromWatchList(contents: { type: keyof typeof ContentTypes; id: string }[] | { type: keyof typeof ContentTypes; id: string }) {
     if (!Array.isArray(contents)) {
       contents = [contents];
     }
@@ -1982,7 +1985,7 @@ class RegisteredUser extends User {
 
   // contents: array of contents returned from a call to getContents
   // positions: number or array of where in the content to mark the user's play history. If less values are provided than in contents then the last positions value is used
-  public async addContentToViewHistory(contents: {type: keyof typeof ContentTypes; id: string}[] | {type: keyof typeof ContentTypes; id: string}, positions: number | number[]) {
+  public async addContentToViewHistory(contents: { type: keyof typeof ContentTypes; id: string }[] | { type: keyof typeof ContentTypes; id: string }, positions: number | number[]) {
     if (!Array.isArray(contents)) {
       contents = [contents];
     }
@@ -2050,7 +2053,7 @@ class RegisteredUser extends User {
 
 
   public async getViewHistoryContent() {
-    const {items} = await this.sendTubiAuthNetworkRequest({
+    const { items } = await this.sendTubiAuthNetworkRequest({
       method: 'get',
       url: 'https://lishi.production-public.tubi.io/api/v2/view_history'
     });
@@ -2070,7 +2073,7 @@ class RegisteredUser extends User {
 
 
   // contents: array of contents returned from a call to getContents
-  public async removeContentFromViewHistory(contents: {type: keyof typeof ContentTypes; id: string}[] | {type: keyof typeof ContentTypes; id: string}) {
+  public async removeContentFromViewHistory(contents: { type: keyof typeof ContentTypes; id: string }[] | { type: keyof typeof ContentTypes; id: string }) {
     if (!Array.isArray(contents)) {
       contents = [contents];
     }
@@ -2193,9 +2196,9 @@ class FilterContent {
 
   // limit: how many items we want to retrieve
   public async retrieve({
-      limit = 1,
-      force = false,
-      contentsLimit = 10
+    limit = 1,
+    force = false,
+    contentsLimit = 10
   } = {}) {
     if (!this.cachedContents || force) {
       const result = await this.user.sendTubiAuthNetworkRequest({
@@ -2211,26 +2214,26 @@ class FilterContent {
       this.cachedContents = result.contents;
     }
 
-    const contents = {...this.cachedContents};
+    const contents = { ...this.cachedContents };
 
     for (const filter of this.filters) {
       switch (filter.type) {
         case ContentFilterType.videoPreview:
-          for(const key in contents) {
+          for (const key in contents) {
             if (!!contents[key].video_preview_url !== filter.value) {
               delete contents[key];
             }
           }
           break;
         case ContentFilterType.rating:
-          for(const key in contents) {
+          for (const key in contents) {
             if (!filter.value.includes(contents[key].ratings[0].value)) {
               delete contents[key];
             }
           }
           break;
         case ContentFilterType.contentType:
-          for(const key in contents) {
+          for (const key in contents) {
             if (!filter.value.includes(contents[key].type)) {
               delete contents[key];
             }
@@ -2301,7 +2304,9 @@ type DeviceSettings = {
 };
 
 
-type DeeplinkPage = 'movies' | 'livefeed' | 'genre' | 'network' | 'tv' | 'espanol' | 'kids' | 'home';
+type DeeplinkPage = 'movies' | 'genre' | 'network' | 'tv' | 'espanol' | 'kids' | 'home';
+type NonDeeplinkPage = 'home' | 'search' | 'settings' | 'myStuff' | 'movies' | 'series' | 'livefeed';
+const nonDeeplinkPages = ['home', 'search', 'settings', 'myStuff', 'movies', 'series', 'livefeed'];
 
 
 /**
