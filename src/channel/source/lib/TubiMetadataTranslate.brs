@@ -799,7 +799,7 @@ Function canHideLeavingSoon(sotChild)
 
   if isNonEmptyArray(sotTopLabels) = true
     for each sotTopLabel in sotTopLabels
-      if sotTopLabel <> invalid AND sotTopLabel.type = "leaving_soon"
+      if sotTopLabel <> invalid AND (sotTopLabel.type = "leaving_soon" OR sotTopLabel.type = "leaving_soon_days_left")
         canHideLeavingSoonLabel = true
         exit for
       end if
@@ -807,7 +807,7 @@ Function canHideLeavingSoon(sotChild)
   end if
 
   if isNonEmptyArray(posterLabels) = true AND isAA(posterLabels[0]) = true
-    if posterLabels[0].type = "leaving_soon" AND canHideLeavingSoonLabel = false
+    if (posterLabels[0].type = "leaving_soon" OR posterLabels[0].type = "leaving_soon_days_left") AND canHideLeavingSoonLabel = false
       canHideLeavingSoonLabel = true
     end if
   end if
