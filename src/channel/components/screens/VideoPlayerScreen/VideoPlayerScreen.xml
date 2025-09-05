@@ -409,6 +409,19 @@
 
     </Group>
 
+     <LayoutGroup
+       id="brandingLogoGroup"
+       layoutDirection="horiz"
+       vertAlignment="top"
+       horizAlignment="right"
+       translation="[1728, 80]"
+       itemSpacings="[6]">
+      <Poster
+        id="brandingLogo"
+        uri="pkg:/images/logo-large.webp"
+        opacity="0.0"/>
+     </LayoutGroup>
+
     <Group
       id="HUD"
       visible="true"

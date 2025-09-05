@@ -142,6 +142,9 @@ Function init()
 
   m.logo = m.top.findNode("tubiLogo")
   m.logoKids = m.top.findNode("tubiKidsLogo")
+  m.brandingLogo = m.top.findNode("brandingLogo")
+
+  m.brandingLogoExperimentType = getExperimentResource("roku_player_branding", "roku_player_branding_v1").type
 
   '//Variable to keep track where the m.ratingOverlay UI element should animated when the down button is pressed.
   m.ratingOverlayAnimatedPositionY = 150
@@ -1260,7 +1263,7 @@ Function onVideoStateChange(msg)
 
   ' Loading page visibility
   if state = "playing" OR state = "paused"
-    if m.playerControlExperimentType <> "none"
+    if m.brandingLogoExperimentType = "variant1"
       m.LoadingSpinner.visible = false
     else
       m.Loading.visible = false
@@ -1275,7 +1278,7 @@ Function onVideoStateChange(msg)
         m.VideoBorder.visible = false
         m.UpNext.setFocus(true)
       end if
-    else if m.playerControlExperimentType <> "none"
+    else if m.brandingLogoExperimentType = "variant1"
       m.LoadingSpinner.visible = true
     else
       m.LoadingProgressBar.progress = 0
@@ -2106,6 +2109,7 @@ Function resetVideoPlayerState(content = invalid)
   m.showRatings = true
   m.ratingInterval = 0
   m.focusedButtonIndex = 0
+  m.brandingLogo.opacity = 0
 
   if content <> invalid
     m.top.adPosition = content.nowPos
@@ -3079,6 +3083,9 @@ Function showRatingOverlay(callback = invalid)
       m.ratingOverlay.translation = [0, 0]
     end if
     m.ratingOverlayTimer.control = "start"
+
+    ' Update branding logo visibility when rating overlay is shown
+    updateBrandingLogoVisibility(true, 0.5)
   end if
 
 End Function
@@ -3091,8 +3098,36 @@ Function hideRatingOverlay()
     ' resetting ratingInterval to zero, because we don't want to show the ratingOverlay immediately after hiding
     m.ratingInterval = 0
     fade(m.ratingOverlay, "out", 0.6)
+
+    ' Update branding logo visibility when rating overlay is hidden
+    if m.HUD.opacity = 0
+      updateBrandingLogoVisibility(false, 0.5)
+    end if
   end if
 
+End Function
+
+
+' updateBrandingLogoVisibility manages the visibility of the branding logo group
+' The branding logo should be visible when either transport controls or rating overlay is displayed
+' @shouldShowBrandingLogo: boolean, true to show the logo with animation, false to hide the logo with animation
+' @delay: integer, delay to start the animation
+Function updateBrandingLogoVisibility(shouldShowBrandingLogo = false, delay = 0)
+  'roku_player_branding_v1 exposure event should be fired when content loads
+  if shouldShowBrandingLogo = true AND getExperimentResource("roku_player_branding", "roku_player_branding_v1", true).type <> "none"
+    ' Update branding logo URI and width based on app mode, then show with animation
+    if m.top.appMode = "KIDS_MODE"
+      m.brandingLogo.uri = "pkg:/images/logo-kids-large.webp"
+      m.brandingLogo.width = 255
+    else
+      m.brandingLogo.uri = "pkg:/images/logo-large.webp"
+      m.brandingLogo.width = 135
+    end if
+    fade(m.brandingLogo, "in", 0.6, delay)
+  else
+    ' Hide branding logo with shrink-out animation
+    fade(m.brandingLogo, "out", 0.6, delay)
+  end if
 End Function
 
 

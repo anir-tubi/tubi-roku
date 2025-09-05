@@ -79,6 +79,18 @@ Function TubiExperiments(experimentsInfo) as Object
         }
       }
 
+      ' We will run 3 types. Possible values are none, variant1, variant2
+      ' none - (control) production version
+      ' variant1 - new loader (circular) + branding logo on top right corner of player
+      ' variant2 - old loader (bar) + branding logo on top right corner of player
+      roku_player_branding: {
+        roku_player_branding_v1: {
+          default: { "type": "none" }
+          holdout_control: { "enabled": false }
+          holdout_winning: { "enabled": false }
+        }
+      }
+
       'This experiment will not be under holdout and will clean up once we take the decision.
       roku_home_screen_redesign: {
         roku_home_screen_redesign_v_1_4_restart: {

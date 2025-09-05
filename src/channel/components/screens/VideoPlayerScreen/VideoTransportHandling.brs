@@ -1651,6 +1651,11 @@ End Function
 '@direction: string, value may be "out" or "in"
 Function animateTransport(direction)
   tubiLog("VideoTransportHandling.AnimateTransport, direction = " + direction)
+
+  ' Update branding logo visibility based on transport control state
+  shouldShowBrandingLogo = (direction = "in" OR m.ratingOverlay.opacity > 0)
+  updateBrandingLogoVisibility(shouldShowBrandingLogo)
+
   handleSkipCuepointsButtonOnAnimateTransport(direction)
 
   if m.top.isTrailer = true
@@ -2216,6 +2221,7 @@ Function animateTransportAndBrowseWhileWatching(direction)
     end if
     fade(m.VideoOverlay, "out", 0.4)
     fade(m.VideoBrowseWhileWatchingOverlay, "in", 0.4)
+    updateBrandingLogoVisibility(false)
     hideRatingOverlay()
     slideTo(m.HUD, [0, m.hudYTranslation], 0.6)
     m.BrowseWhileWatching.open = true
@@ -2245,6 +2251,7 @@ Function animateTransportAndBrowseWhileWatching(direction)
     fade(m.VideoBrowseWhileWatchingOverlay, "out", 0.4)
     fade(m.VideoOverlay, "in", 0.4)
     slideTo(m.HUD, [0, 0], 0.6)
+    updateBrandingLogoVisibility(true)
     m.BrowseWhileWatching.close = true
 
     if m.skipCuepointsButtonTimer = invalid
