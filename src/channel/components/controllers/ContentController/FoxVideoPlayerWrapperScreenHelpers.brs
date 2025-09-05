@@ -86,6 +86,11 @@ Function onFoxVideoPlayerComponentLibraryLoadStatus(msg)
       else
         m.foxRpfInstance = foxRpfInstance
 
+        foxVideoPlayerAdTraceId = regRead("foxVideoPlayerAdTraceId", m.constants.registrySectionIDs.settingsOverride)
+        if foxVideoPlayerAdTraceId <> invalid then
+          foxRpfInstance.adTraceId = foxVideoPlayerAdTraceId
+        end if
+
         assignProfileIdToFoxVideoPlayer(foxRpfInstance)
 
         ' Set the strings for the fox player that we are overriding

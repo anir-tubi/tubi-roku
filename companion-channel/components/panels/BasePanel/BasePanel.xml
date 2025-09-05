@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name="BasePanel" extends="Panel" >
   <script type="text/brightscript" uri="BasePanel.brs" />
+
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
 </component>

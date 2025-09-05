@@ -1,7 +1,7 @@
 Function init()
   m.top.list = m.top.findNode("labelList")
 
-  m.top.observeField("createNextPanelIndex","onCreateNextPanelIndexChanged")
+  m.top.observeField("createNextPanelIndex", "onCreateNextPanelIndexChanged")
 
   m.top.panelSize = "narrow"
   m.top.leftOnly = true
@@ -11,6 +11,6 @@ End Function
 
 
 Function onCreateNextPanelIndexChanged(msg)
-  Functiontype = m.top.list.content.getChild(msg.getData()).subtype
-  m.top.nextPanel = createObject("RoSGNode", Functiontype)
+  panelType = m.top.list.content.getChild(msg.getData()).subtype
+  m.top.nextPanel = createObject("RoSGNode", panelType)
 End Function

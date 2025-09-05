@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="AdTraceId" extends="BasePanel" >
+  <script type="text/brightscript" uri="AdTraceId.brs" />
+
+  <children>
+    <FocusControlLayoutGroup
+      id="focusControlLayoutGroup"
+      translation="[15,15]">
+      <Label id="currentAdTraceIdLabel" />
+      <AppButton id="setAdTraceIdButton" maxWidth="460" minWidth="460" text="Set Ad Trace ID" />
+      <AppButton id="clearAdTraceIdButton" maxWidth="460" minWidth="460" text="Clear Ad Trace ID" />
+    </FocusControlLayoutGroup>
+  </children>
+</component>

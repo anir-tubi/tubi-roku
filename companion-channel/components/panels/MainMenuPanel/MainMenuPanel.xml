@@ -6,6 +6,7 @@
       <ContentNode role="content">
         <MainMenuListItem title="Proxy Setup" subtype="ProxySetupPanel" />
         <MainMenuListItem title="View Registry" subtype="ViewRegistryPanel" />
+        <MainMenuListItem title="Fox Video Player Ad Trace ID" subtype="AdTraceId" />
       </ContentNode>
     </LabelList>
   </children>

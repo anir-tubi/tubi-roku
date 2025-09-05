@@ -19,7 +19,7 @@ Function getConstants()
   ' Creating a section to store user sign up information in case of registration failure.
   constants.registrySectionIDs.registrationByPass = "registrationByPass"
 
-  ' Used for storing proxy settings
+  ' Used for storing settings overrides
   constants.registrySectionIDs.settingsOverride = "settingsOverride"
 
   ' Used to store overrides like for the external config like for disabling magiclink for Roku. Stores a json inside that needs to be parsed.

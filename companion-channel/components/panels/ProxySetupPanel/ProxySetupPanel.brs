@@ -10,7 +10,7 @@ Function init()
   m.enabledButton = m.top.findNode("enabledButton")
   m.enabledButton.observeFieldScoped("buttonSelected", "onEnabledButtonSelected")
 
-	m.settingsOverride = regReadAll(m.global.constants.registrySectionIDs.settingsOverride)
+  m.settingsOverride = regReadAll(m.global.constants.registrySectionIDs.settingsOverride)
 
   updateUI()
 End Function
@@ -49,6 +49,7 @@ Function onIpAddressButtonSelected()
 
   if m.settingsOverride.charlesProxyIp <> invalid then
     dialog.textEditBox.text = m.settingsOverride.charlesProxyIp
+    dialog.textEditBox.cursorPosition = len(dialog.textEditBox.text)
   end if
 
   m.top.getScene().dialog = dialog
@@ -87,6 +88,7 @@ Function onPortButtonSelected()
   dialog.observeFieldScoped("buttonSelected", "onPortSaveButtonSelected")
   if m.settingsOverride.charlesProxyPort <> invalid then
     dialog.textEditBox.text = m.settingsOverride.charlesProxyPort
+    dialog.textEditBox.cursorPosition = len(dialog.textEditBox.text)
   end if
 
   m.top.getScene().dialog = dialog
@@ -112,17 +114,4 @@ Function onEnabledButtonSelected()
   end if
 
   updateUI()
-End Function
-
-
-Function updateField(fieldName, fieldValue)
-  if fieldValue = invalid then
-    RegDelete(fieldName, m.global.constants.registrySectionIDs.settingsOverride)
-    m.settingsOverride.delete(fieldName)
-  else
-    RegWrite(fieldName, fieldValue, m.global.constants.registrySectionIDs.settingsOverride)
-    m.settingsOverride[fieldName] = fieldValue
-  end if
-
-  RegWrite("applicationRestartRequired", "true", m.global.constants.registrySectionIDs.settingsOverride)
 End Function
