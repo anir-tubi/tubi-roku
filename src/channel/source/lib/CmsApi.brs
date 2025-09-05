@@ -113,8 +113,7 @@ Function cmsApi_createSingleContentReqInfo(contentId, includeChannels = false, b
   options.params["includeChannels"] = includeChannels
   options.params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
   options.params["limit_resolutions"] = m.constants.player.limitResolutions
-  options.params = m.setTupianLandscapeParam(options.params)
-  options.params = m.setTupianBackgroundParam(options.params)
+  options.params = m.setImageParams(["title", "landscape", "background"], options.params)
 
   capability = formatJson({ "content_types": ["se"] })
   options.headers.append({ "x-capability": capability })

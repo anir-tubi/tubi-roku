@@ -3406,6 +3406,10 @@ Function processUserPlayAction(content, screen, playbackSource = {}) as Void
     return
   end if
   contentType = content.type
+  playerType = content.playerType
+  if isAA(content.scheduleData)
+    playerType = content.scheduleData.playerType
+  end if
 
   ' Since category panel list screen re-uses the method allowing it to play the content.
   if contentType = m.constants.uapiContentTypes.channel
@@ -3419,6 +3423,16 @@ Function processUserPlayAction(content, screen, playbackSource = {}) as Void
     startSignIn(refreshScreenAndContentAfterSignIn)
   else if contentType = m.constants.ui.contentTypes.skinAd
     playAdContent(content)
+  else if isNonEmptyString(content.actionId) = true
+    if content.actionId = "signInWatchLive"
+      startSignIn(processUserContentSelectionAfterSignIn)
+    else if content.actionId = "watchLive"
+      if playerType = m.constants.ui.playerTypes.fox
+        playLinearVideoWithFoxPlayer(content)
+      end if
+    end if
+  else if playerType = m.constants.ui.playerTypes.fox
+    showLinearDetailScreen(content, playbackSource)
   else
     showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource)
   end if
