@@ -1070,9 +1070,10 @@ Function onDeeplinkLiveEventContentSuccess(content)
   if content <> invalid AND isAA(content.scheduleData) AND content.scheduleData.playerType = m.constants.ui.playerTypes.fox
     playbackSource = getPlaybackSourceForDeeplinkType()
     scheduleData = content.scheduleData
-    if isAA(scheduleData) AND isNonEmptyString(scheduleData.startTime) = true
+    if isAA(scheduleData) AND isNonEmptyString(scheduleData.startTime) = true AND (isLoggedInUser() = true OR content.needsLogin = false)
       startTime = content.scheduleData.startTime
-      isEventLive = isLessThanOrEqualToCurrentTime(startTime)
+      endTime = content.scheduleData.endTime
+      isEventLive = isLessThanOrEqualToCurrentTime(startTime) AND isGreaterThanCurrentTime(endTime)
       if isEventLive = true
         playLinearVideoWithFoxPlayer(content)
       else

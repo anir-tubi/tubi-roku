@@ -57,13 +57,14 @@ End Function
 Function getLinearContentBadgeInfo(schedule)
   currentDatetime = CreateObject("roDateTime")
   airDatetime = CreateObject("roDateTime")
-  if schedule.startTime <> invalid
+  if schedule.startTime <> invalid AND schedule.endTime <> invalid
     airDatetime.FromISO8601String(schedule.startTime)
 
     ' Calculating the seconds until the air time.
     secondsUntilAirTime = airDatetime.asSeconds() - currentDatetime.asSeconds()
+    hasEventEnded = isLessThanOrEqualToCurrentTime(schedule.endTime)
 
-    if airDatetime.asSeconds() <= currentDatetime.asSeconds()
+    if airDatetime.asSeconds() <= currentDatetime.asSeconds() AND hasEventEnded = false
       ' Not using constants to avoid having to access global.
       return { availability: "live" }
     else if secondsUntilAirTime > (7 * 24 * 60 * 60) AND FindMemberFunction(airDatetime, "asDateStringLoc") <> invalid
@@ -74,7 +75,7 @@ Function getLinearContentBadgeInfo(schedule)
         availability: "upcoming",
         badgeText: UCase(badgeText)
       }
-    else
+    else if hasEventEnded = false
       remainingDays = Fix(secondsUntilAirTime / 86400)
       remainingHours = Fix(secondsUntilAirTime / 3600)
       remainingSeconds = secondsUntilAirTime mod 3600

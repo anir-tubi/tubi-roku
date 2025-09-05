@@ -3372,7 +3372,7 @@ Function processUserContentSelection(content, screen, playbackSource = {}) as Vo
       end if
     else if content.actionId = "reminder"
       addOrRemoveReminderForEventContent(content)
-    else
+    else if content.actionId <> "contentUnavailable"
       showLinearDetailScreen(content, playbackSource)
     end if
   else if contentType = m.constants.uapiContentTypes.channel
@@ -3446,8 +3446,13 @@ Function processUserContentSelectionAfterSignIn()
     if screen.content <> invalid
       screen.content.needsLogin = (isLoggedInUser() = false)
     end if
-    contentFocused = screen.contentFocused
-    if contentFocused <> invalid AND contentFocused.actionId = "signInWatchLive"
+    if screen.subtype() = "LinearDetailScreen"
+      contentFocused = screen.content
+    else
+      contentFocused = screen.contentFocused
+    end if
+
+    if contentFocused <> invalid AND contentFocused.actionId <> "signInWatch"
       playerType = contentFocused.playerType
       if isAA(contentFocused.scheduleData)
         playerType = contentFocused.scheduleData.playerType

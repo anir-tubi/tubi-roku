@@ -2219,6 +2219,10 @@ Function getTranslation_en_US()
     "sign_in_watch_live": {
       "description": "Sign in to watch live button label.",
       "message": "Sign in to Watch Live"
+    },
+    "content_unavailable": {
+      "description": "Button label when the content is unavailable",
+      "message": "Content Unavailable"
     }
   }
 End Function

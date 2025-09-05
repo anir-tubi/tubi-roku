@@ -17,7 +17,8 @@ Function showLinearDetailScreen(content, playbackSource)
     screen.trackingLoadStartTime = Uptime(0)
     screen.shouldFocusWhenPushed = m.top.fadeInContentController
     screen.playbackSource = playbackSource
-    screen.content = content
+    ' we make changes to the content from this point forward. If we don't clone, changes will be propagated to the original content in home or search screen.
+    screen.content = content.clone(true)
     contentId = content.id
     screen.trackingPageInfo = {
       pageType: "linear_details_page"

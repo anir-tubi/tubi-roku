@@ -137,12 +137,13 @@ Function refreshButtonList()
   if itemContent <> invalid AND itemContent.scheduleData <> invalid AND isNonEmptyString(itemContent.scheduleData.startTime) = true
     buttonContent = invalid
     startTime = itemContent.scheduleData.startTime
+    endTime = itemContent.scheduleData.endTime
     currentDatetime = CreateObject("roDateTime")
     airDatetime = CreateObject("roDateTime")
     airDatetime.FromISO8601String(startTime)
 
     isEventLive = currentDatetime.asSeconds() >= airDatetime.asSeconds()
-
+    hasEventEnded = isLessThanOrEqualToCurrentTime(endTime)
     if m.uiRefreshTimer <> invalid
       secondsUntilAirTime = airDatetime.asSeconds() - currentDatetime.asSeconds()
       m.uiRefreshTimer.control = "stop"
@@ -164,6 +165,13 @@ Function refreshButtonList()
         iconUrl: "pkg:/images/account-icon.webp"
         badgeText: getTranslation("registration_signup_button_free")
         isPrimaryButton: true
+      }
+    else if hasEventEnded = true
+      buttonContent = {
+        id: "contentUnavailable"
+        title: getTranslation("content_unavailable")
+        isPrimaryButton: true
+        disabled: true
       }
     else if isEventLive = true
       ' For now using air datetime in future will use listing api information.
@@ -306,6 +314,8 @@ Function updateAvailabilityBadge()
       else
         setLinearAvailabilityBadge(m.availabilityBadge, badgeInfo.availability, m.backgroundColor, m.primaryTextColor, badgeInfo.badgeText)
       end if
+    else
+      m.metadataRow.removeChild(m.availabilityBadge)
     end if
   end if
 End Function

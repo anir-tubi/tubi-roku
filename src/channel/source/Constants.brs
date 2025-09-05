@@ -1360,6 +1360,7 @@ Function getConstants()
   constants.ui.screenLevels.rokuContinueWatchingConsentScreen = 120
   constants.ui.screenLevels.managePreferencesScreen = 130
   constants.ui.screenLevels.linearDetailScreen = 50
+  constants.ui.screenLevels.foxVideoPlayerWrapperScreen = 60
 
   constants.ui.screenIds = {}
   constants.ui.screenIds.homeScreen = "homeScreen"
