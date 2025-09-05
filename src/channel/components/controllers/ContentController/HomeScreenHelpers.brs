@@ -1236,8 +1236,14 @@ Function showRegistrationWelcomeModal()
     instantResumeAction: m.constants.instantResumeActions.closeDialog
   }
 
+  if m.constants.settings.welcomeBannerImageUrl = invalid
+    imageUrl = ["https://mrcdn-production.tubitv.com/appFiles/images/welcome-banner.webp"]
+  else
+    imageUrl = [m.constants.settings.welcomeBannerImageUrl]
+  end if
+
   modalInfo.append({
-    imageUrls: ["https://mcdn.tubitv.com/image/roku_support_images/welcome-banner.webp"]
+    imageUrls: imageUrl
     imageDimensions: [[617, 120]]
   })
 
