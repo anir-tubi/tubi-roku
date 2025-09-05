@@ -8,8 +8,8 @@ const shell = require('shelljs');
 const webFetch = require('node-fetch');
 shell.config.silent = true;
 
-const {getBuildTag, incrementBuildNumber, incrementRevisionNumber} = require('./config');
-const {NoStackError, execShellCommand} = require('./utilities');
+const { getBuildTag, incrementBuildNumber, incrementRevisionNumber } = require('./config');
+const { NoStackError, execShellCommand } = require('./utilities');
 
 const githubDeveloperInfo = require('./github-developer-info.json');
 
@@ -50,7 +50,7 @@ function verifyGit(done, directory = '') {
     done(new NoStackError('Git error: git not installed'));
     return false;
   } else if (shell.exec(`git ${gitDirectory} rev-parse --is-inside-work-tree`
-    ).stdout.trim() !== 'true') {
+  ).stdout.trim() !== 'true') {
     directory = directory ? directory : process.cwd();
     done(new NoStackError(`Git error: current directory (${directory}) is not part of a git repo.`));
     return false;
@@ -308,7 +308,7 @@ function pushTag(done) {
 }
 
 
-function pushBranch(done){
+function pushBranch(done) {
   log(`...Pushing QA branch to origin (Github)`);
   const currentBranch = getCurrentBranch(done);
   const gitPushCurrentBranch = `git push origin ${currentBranch}`;
@@ -321,7 +321,7 @@ function pushBranch(done){
 
 async function createGithubRelease(done) {
   // Prompt if the dev wants to make a release via the CLI (as opposed to Github UI)
-  const {releaseConfirmation} = await prompts({
+  const { releaseConfirmation } = await prompts({
     type: 'confirm',
     name: 'releaseConfirmation',
     message: 'Do you want to make a Github release now, in the CLI? (y/n)',
@@ -360,7 +360,7 @@ async function createGithubRelease(done) {
 
     let isTagOnGithub = false;
     for (const tag of topTags.data) {
-      if (tag.name === buildTag && tag.commit.sha === tagSha){
+      if (tag.name === buildTag && tag.commit.sha === tagSha) {
         isTagOnGithub = true;
         break;
       }
@@ -370,12 +370,12 @@ async function createGithubRelease(done) {
       const errorMsg = `The ${buildTag} tag is not on Github. Not creating a release here or else Github will make automatically make a tag from master - which will be inaccurate for our purposes.`;
       done(new NoStackError(errorMsg));
     }
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     done(new NoStackError(err));
   }
 
-  const {releaseType, isPreRelease, preReleaseDate} = await prompts([
+  const { releaseType, isPreRelease, preReleaseDate } = await prompts([
     // prompt the dev for the release type to be used as the Release title
     {
       type: 'toggle',
@@ -424,7 +424,7 @@ async function createGithubRelease(done) {
 
   // prompt the dev to confirm the generated release notes
   log(releaseNotesState); //this is part of the CLI UI - leave in
-  const {releaseNotesConfirmation} = await prompts([
+  const { releaseNotesConfirmation } = await prompts([
     {
       type: 'confirm',
       name: 'releaseNotesConfirmation',
@@ -447,7 +447,7 @@ async function createGithubRelease(done) {
       //mark as pre-release if there is a date associated with the pre release.
       prerelease: preReleaseDate ? true : false
     });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     done(new NoStackError(err));
   }
@@ -459,7 +459,7 @@ async function sendSlackReminders(done) {
   log(`...Sending slack reminders to the team`);
   const prodBranch = getProductionBranchName();
   const currentBranch = getCurrentBranch(done);
-  const webHookUrl = "https://hooks.slack.com/services/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";
+  const webHookUrl = 'https://hooks.slack.com/services/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';
 
   const pullRequestCommits = await findPullRequestCommitDifferences(done, currentBranch, prodBranch, true);
 
@@ -475,7 +475,7 @@ async function sendSlackReminders(done) {
 
     const prReleaseNotes = extractReleaseNotesFromPullRequestBody(response.data.body);
 
-    if (prReleaseNotes && prReleaseNotes.includes("Experiment:")) {
+    if (prReleaseNotes && prReleaseNotes.includes('Experiment:')) {
       log(`...Sending slack reminder for PR #${prId}`);
       const author = githubDeveloperInfo[response.data.user.login];
       const memberId = author.slackId;
@@ -494,7 +494,7 @@ async function sendSlackReminders(done) {
     }
 
   }
-  done()
+  done();
 }
 
 
@@ -503,7 +503,7 @@ async function sendSlackReminders(done) {
 async function pullOrFetchBranch(done, branch) {
   if (!isBranchTrackingPresent(done, branch)) {
     // Add a prompt asking if engineer wants to proceed with the build.
-    const {proceedWithGitPull} = await prompts({
+    const { proceedWithGitPull } = await prompts({
       type: 'confirm',
       name: 'proceedWithGitPull',
       message: `${branch} is missing remote tracking. Do you wish to proceed? (y/n)`,
@@ -587,12 +587,12 @@ async function buildQaChanges(done) {
       owner: ghInfo.owner,
       repo: ghInfo.rokuRepo,
     };
-    const {data: pullRequest} = await octokit().pulls.get({
+    const { data: pullRequest } = await octokit().pulls.get({
       ...octokitRequestSharedParams,
       pull_number: +prId
     });
 
-    const qaInfo = extractQaChangesFromPullRequestBody( pullRequest.body);
+    const qaInfo = extractQaChangesFromPullRequestBody(pullRequest.body);
     if (!qaInfo) {
       console.log(`Could not retrieve qa info for pull request #${prId}`);
       continue;
@@ -603,7 +603,7 @@ async function buildQaChanges(done) {
     }
 
     let ticketUrl = '';
-    const {data: prComments} = await octokit().issues.listComments({...octokitRequestSharedParams, issue_number: +prId});
+    const { data: prComments } = await octokit().issues.listComments({ ...octokitRequestSharedParams, issue_number: +prId });
     for (const prComment of prComments) {
       const commentShortcutLinkMatch = prComment.body.match(/\((https:\/\/app.shortcut.com\/tubi\/story\/[^)]+)\)/);
       if (commentShortcutLinkMatch) {
@@ -619,12 +619,12 @@ async function buildQaChanges(done) {
     }
 
     const qaChange = {
-        pullNumber: prId,
-        commit: commitHash,
-        whatChanged: qaInfo.whatChanged,
-        testingSteps: qaInfo.testingSteps,
-        pointDeveloper: githubDeveloperInfo[userLogin],
-        ticketUrl: ticketUrl
+      pullNumber: prId,
+      commit: commitHash,
+      whatChanged: qaInfo.whatChanged,
+      testingSteps: qaInfo.testingSteps,
+      pointDeveloper: githubDeveloperInfo[userLogin],
+      ticketUrl: ticketUrl
     };
     qaChangesData.push(qaChange);
 
@@ -727,17 +727,6 @@ function getPullRequestCommitsForBranch(done, branch, commitCount, oneLine = fal
 async function findPullRequestCommitDifferences(done, branchA, branchB, includeAuthorName = false, commitCount = 400) {
   // verify clean working directory
   verifyGit(done);
-
-  // Add a prompt asking if engineer wants to fetch latest from prod and master branches
-  const {prepareConfirmation} = await prompts({
-    type: 'confirm',
-    name: 'prepareConfirmation',
-    message: `Running this script will apply updates from origin ${branchA} and origin ${branchB} to your local ${branchA} and ${branchB} branches. Do you wish to proceed? (y/n)`,
-  });
-
-  if (!prepareConfirmation) {
-    return done(new NoStackError('Script aborted'));
-  }
 
   // process/store pull requests on branchA branch
   await pullOrFetchBranch(done, branchA);
@@ -888,13 +877,13 @@ async function addMissingImagesToRemoteLibrary(done) {
   let newImagesSinceFileContents = fs.readFileSync(newImagesSinceFilePath, 'utf8');
   const imagesToAdd = [];
 
-  if (changedImageFilePaths !== null){
+  if (changedImageFilePaths !== null) {
     for (const changedImageFilePath of changedImageFilePaths) {
       // First check the file exists as files that were deleted are also included in the diff
       if (!fs.existsSync(changedImageFilePath)) {
         continue;
       }
-  
+
       const relativeChangedImageFilePath = changedImageFilePath.replace(baseChannelPath, '');
       if (newImagesSinceFileContents.search(relativeChangedImageFilePath) === -1) {
         imagesToAdd.push(relativeChangedImageFilePath);
@@ -906,7 +895,7 @@ async function addMissingImagesToRemoteLibrary(done) {
     const formattedNewImageContents = imagesToAdd.join('\n');
     log(`The following images were found that are not included in ${newImagesSinceFilePath} already:\n${formattedNewImageContents}`);
     // Prompt if the dev wants to add these images to new images since file
-    const {addToFile} = await prompts({
+    const { addToFile } = await prompts({
       type: 'confirm',
       name: 'addToFile',
       message: `Do you want add these to ${newImagesSinceFilePath}?`,
@@ -929,7 +918,7 @@ function bumpBuild(done) {
     incrementBuildNumber();
     const buildTag = getBuildTag('revision');
     log(`Committing build bump to ${buildTag}`);
-    shell.exec(`git commit -m "incrementbuild: Bump build number to ${buildTag}" config/build.yml`, {silent: true});
+    shell.exec(`git commit -m "incrementbuild: Bump build number to ${buildTag}" config/build.yml`, { silent: true });
     done();
   } else {
     // errors should be handled in verifyGit()
@@ -943,7 +932,7 @@ function bumpBuildTen(done) {
     incrementBuildNumber(10);
     const buildTag = getBuildTag('revision');
     log(`Committing build bump to ${buildTag}`);
-    shell.exec(`git commit -m "incrementbuild: Bump build number to ${buildTag}" config/build.yml`, {silent: true});
+    shell.exec(`git commit -m "incrementbuild: Bump build number to ${buildTag}" config/build.yml`, { silent: true });
     done();
   } else {
     // errors should be handled in verifyGit()
@@ -957,7 +946,7 @@ function bumpRevision(done) {
     incrementRevisionNumber();
     const buildTag = getBuildTag('revision');
     log(`Committing build bump to ${buildTag}`);
-    shell.exec(`git commit -m "incrementbuild: Bump revision number to ${buildTag}" config/build.yml`, {silent: true});
+    shell.exec(`git commit -m "incrementbuild: Bump revision number to ${buildTag}" config/build.yml`, { silent: true });
     done();
   } else {
     // errors should be handled in verifyGit()
@@ -978,7 +967,7 @@ async function buildQaBranch(done) {
   // verify clean working directory
   verifyGit(done);
 
-  const {releaseType} = await prompts({
+  const { releaseType } = await prompts({
     type: 'select',
     name: 'releaseType',
     message: 'What type of release are you creating this QA branch for?',
@@ -1031,7 +1020,7 @@ async function buildQaBranch(done) {
     const version = buildParts.join('.');
     const qaBranchName = getQaBranchName(buildParts.join(connector));
 
-    const {confirm} = await prompts({
+    const { confirm } = await prompts({
       type: 'confirm',
       name: 'confirm',
       message: `Confirm that you would like to make a qa branch named ${qaBranchName} and increment the version to ${version}`,
