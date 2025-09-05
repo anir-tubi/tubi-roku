@@ -1293,7 +1293,7 @@ Function onRemoveFromQueue(detailScreen)
         options: removeFromQueueReq.options
         successCallback: removeFromQueueSuccessResponse
         errorCallback: removeFromQueueErrorResponse
-        responseType: "string"
+        responseType: "assocarray"
       })
 
       detailScreen.isWaitingForServerResponse = true
