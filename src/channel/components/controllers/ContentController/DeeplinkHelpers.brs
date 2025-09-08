@@ -498,6 +498,8 @@ Function sendDeeplinkAnalytics(deepLinkContent, refreshedContent, entryPoint, tr
         seriesId = deepLinkContent.id.toInt()
         referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("episode_video_list_page", { series_id: seriesId })
       end if
+    else if entryPoint = m.constants.deeplinks.entryPoints.linearDetail
+      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("linear_details_page", { video_id: deepLinkContent.id.toInt() })
     else if entryPoint = m.constants.deeplinks.entryPoints.video AND pageInfo <> invalid
       referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
     end if
@@ -1018,7 +1020,11 @@ End Function
 
 
 Function skipDetailScreenDeeplinkWrapper(refreshedContent)
-  if refreshedContent.type = m.constants.ui.contentTypes.linear
+  ' This is a hack to handle cases where wrong media type is passed in the deeplink for fox player.
+  if refreshedContent <> invalid AND refreshedContent.playerType = m.constants.ui.playerTypes.fox
+    popScreen()
+    onDeeplinkLiveEventContentSuccess(refreshedContent)
+  else if refreshedContent.type = m.constants.ui.contentTypes.linear
     handleSingleContentDeeplinkError(invalid) 'if the content type is linear, then do not show detailScreen instead show error dialog.
   else
     skipDetailScreen(refreshedContent)
@@ -1070,17 +1076,22 @@ Function onDeeplinkLiveEventContentSuccess(content)
   if content <> invalid AND isAA(content.scheduleData) AND content.scheduleData.playerType = m.constants.ui.playerTypes.fox
     playbackSource = getPlaybackSourceForDeeplinkType()
     scheduleData = content.scheduleData
+    entryPoint = m.constants.deeplinks.entryPoints.linearDetail
     if isAA(scheduleData) AND isNonEmptyString(scheduleData.startTime) = true AND (isLoggedInUser() = true OR content.needsLogin = false)
       startTime = content.scheduleData.startTime
       endTime = content.scheduleData.endTime
       isEventLive = isLessThanOrEqualToCurrentTime(startTime) AND isGreaterThanCurrentTime(endTime)
       if isEventLive = true
+        entryPoint = m.constants.deeplinks.entryPoints.video
         playLinearVideoWithFoxPlayer(content)
       else
         showLinearDetailScreen(content, playbackSource)
       end if
     else
       showLinearDetailScreen(content, playbackSource)
+    end if
+    if m.deeplinkContent <> invalid
+      sendDeeplinkAnalytics(m.deeplinkContent, content, entryPoint, m.tracking, m.trackingLoggingTask, m.constants)
     end if
   else
     handleLinearDeeplinkContent()
