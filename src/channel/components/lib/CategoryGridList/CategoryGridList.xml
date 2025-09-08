@@ -130,7 +130,8 @@
     <!-- OUTPUT -->
       <field id="itemSelected" type="node"/>
 
-      <field id="itemFocused" type="node" />
+      <!-- set alwaysNotify true to ensure field observers of this field are notified if the user starts scrolling to a new item but quickly scrolls back to the original item  -->
+      <field id="itemFocused" type="node"  alwaysNotify="true" />
 
       <field id="oldItemFocused" type="node" />
 
