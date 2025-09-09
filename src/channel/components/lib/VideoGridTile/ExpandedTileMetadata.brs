@@ -216,7 +216,13 @@ Function metadataOnPosterContent(itemContent)
   end if
 
   isSotBadgePresent = (m.sotBadge.getParent() <> invalid)
-  sotBadge = itemContent.sotPosterLabels
+
+  sotBadge = {}
+
+  if isAA(itemContent.sotInfo) = true AND isNonEmptyArray(itemContent.sotInfo.sotMetadata)
+    sotBadge = itemContent.sotInfo.sotMetadata[0]
+  end if
+
   if itemContent.type <> "linear" AND isAA(sotBadge) = true AND sotBadge.count() > 0
     if isSotBadgePresent = false
       ratingIndex = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.rating)

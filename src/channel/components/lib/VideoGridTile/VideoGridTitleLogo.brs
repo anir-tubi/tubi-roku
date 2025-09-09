@@ -8,6 +8,10 @@ Function init()
   m.titleGroup = topRef.findNode("titleGroup")
   m.titleImage = topRef.findNode("titleImage")
   m.posterGroup = topRef.findNode("posterGroup")
+
+  m.sotTopLabelGroup = m.top.findNode("sotTopLabelGroup")
+  m.sotMarkerGroup = m.top.findNode("sotMarkerGroup")
+  m.sotMarker = m.top.findNode("sotMarker")
   ' We are only limiting the height since title logo is displayed on it's own row we are good to let the width flow.
   m.titleImage.loadHeight = 68
   m.titleImage.loadWidth = 240
@@ -15,11 +19,13 @@ Function init()
   m.BadgeTypes = {
     live: "live"
     onNow: "onNow"
+    sot: "sot"
   }
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.title, typographyConstants.ids.bodyMediumStrong)
   setTypographyOfLabel(m.subtitle, typographyConstants.ids.bodySmallStrong)
+  m.badgeTextFont = typographyConstants.ids.bodyextrasmallstrong
 
   m.titleImage.observeFieldScoped("loadStatus", "onTitleImageLoadStatus")
   topRef.observeFieldScoped("showContentPoster", "onShowContentPosterChange")
@@ -40,6 +46,8 @@ Function onThemeChange()
     m.subtitle.color = theme.primaryTextColor
     m.focused2Color = theme.focused2Color
     m.blueBadgeColor = theme.blueBadgeColor
+    m.cautionColor = theme.cautionColor
+    m.focusedTextColor = theme.focusedTextColor
   end if
 End Function
 
@@ -48,13 +56,8 @@ Function onItemContentChange(msg)
   itemContent = msg.getData()
 
   if itemContent <> invalid
-    ' Remove the badge if it exists.
-    if m.badge <> invalid
-      m.posterGroup.removeChild(m.badge)
-      m.badge = invalid
-    end if
-
     currentProgram = invalid
+    isBadgeAdded = false
     if itemContent.type = "linear"
       currentProgram = getCurrentLiveProgram(itemContent)
       ' Only add the onNow badge if there is no live program or the live program is not live.
@@ -66,6 +69,7 @@ Function onItemContentChange(msg)
     end if
 
     if itemContent.type = "linear"
+      isBadgeAdded = true
       m.title.maxLines = 1
     else
       m.title.maxLines = 2
@@ -80,6 +84,10 @@ Function onItemContentChange(msg)
         m.titleGroup.removeChild(m.subtitle)
       end if
       setTitle(itemContent.title, itemContent.titleImageUrl)
+    end if
+
+    if isBadgeAdded = false AND isAA(itemContent.sotInfo) = true
+      setBadge(m.badgeTypes.sot, itemContent.sotInfo)
     end if
   end if
 End Function
@@ -102,7 +110,7 @@ Function setTitle(title = "", titleImageUri = "")
     m.titleImage.uri = titleImageUri
   else
     m.titleImage.uri = ""
-    m.titleGroup.translation = [16, m.top.height - 16 - m.titleGroup.boundingRect().height]
+    m.titleGroup.translation = [16, m.top.height - 63 - m.titleGroup.boundingRect().height]
     m.titleAnimation = fade(m.titleGroup, "in", 0.5)
   end if
 End Function
@@ -125,22 +133,57 @@ End Function
 
 
 '@badgeType - string, Indicating format of the badge
-'@badgeText - string, Indicating text on the badge
-Function setBadge(badgeType = "live", badgeText = "")
-
-  if m.badge = invalid
-    m.badge = m.posterGroup.createChild("Badge")
-    m.badge.textColor = m.primaryTextColor
-    m.badge.translation = [16, 16]
-  end if
+'@badgeInfo - assocArray, includes sotMarkers, sotMetaDataTopLabels, sotMetaData
+Function setBadge(badgeType = "live", badgeInfo = {})
+  topLabelCount = m.sotTopLabelGroup.getChildCount()
+  m.sotTopLabelGroup.removeChildrenIndex(topLabelCount, 0)
+  m.sotMarkerGroup.removeChild(m.sotMarker)
 
   if badgeType = m.badgeTypes.live
-    m.badge.backgroundColor = m.focused2Color
-    m.badge.iconUri = "pkg:/images/live-icon-filled.webp"
-    m.badge.text = UCase(getTranslation("screenSearch_liveText"))
+    badge = m.sotTopLabelGroup.createChild("Badge")
+    badge.textColor = m.primaryTextColor
+    badge.translation = [15, 15]
+    badge.backgroundColor = m.focused2Color
+    badge.iconUri = "pkg:/images/live-icon-filled.webp"
+    badge.text = UCase(getTranslation("screenSearch_liveText"))
   else if badgeType = m.badgeTypes.onNow
-    m.badge.backgroundColor = m.blueBadgeColor
-    m.badge.text = UCase(getTranslation("onNow"))
+    badge = m.sotTopLabelGroup.createChild("Badge")
+    badge.textColor = m.primaryTextColor
+    badge.translation = [15, 15]
+    badge.backgroundColor = m.blueBadgeColor
+    badge.text = UCase(getTranslation("onNow"))
+  else if badgeType = m.badgeTypes.sot
+    sotInfo = badgeInfo
+    if sotInfo <> invalid
+      sotTopLabelSignals = sotInfo.sotMetaDataTopLabels
+      sotMarkers = sotInfo.sotMarkers
+
+      if isNonEmptyArray(sotTopLabelSignals) = true
+        for each signal in sotTopLabelSignals
+          topLabel = createObject("roSGNode", "Badge")
+          topLabel.text = signal.sotLabelText
+          topLabel.iconUri = signal.sotIcon
+          topLabel.textColor = m.focusedTextColor
+          topLabel.maxWidth = m.top.width - 12
+          m.sotTopLabelGroup.appendChild(topLabel)
+        end for
+      end if
+
+      if isAA(sotMarkers) = true
+        m.sotMarker = createObject("roSGNode", "Badge")
+        m.sotMarker.id = "sotMarker"
+        m.sotMarker.showBackground = false
+        m.sotMarker.maxWidth = m.top.width
+        m.sotMarker.text = sotMarkers.sotLabelText
+        m.sotMarker.iconUri = sotMarkers.sotIcon
+        m.sotMarker.badgeTextFont = m.badgeTextFont
+        m.sotMarker.textColor = m.cautionColor
+        translationX = 15
+        translationY = m.top.height - m.sotMarker.boundingRect().height - 15
+        m.sotMarkerGroup.translation = [translationX, translationY]
+        m.sotMarkerGroup.appendChild(m.sotMarker)
+      end if
+    end if
   end if
 
 End Function
@@ -165,6 +208,6 @@ End Function
 
 
 Function adjustTitleImageTranslation()
-  translationY = m.top.height - 16 - m.titleImage.boundingRect().height
+  translationY = m.top.height - 63 - m.titleImage.boundingRect().height
   m.titleImage.translation = [16, translationY]
 End Function

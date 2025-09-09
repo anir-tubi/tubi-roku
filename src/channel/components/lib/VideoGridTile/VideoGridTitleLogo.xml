@@ -62,5 +62,18 @@
       </Group>
     </LayoutGroup>
 
+    <LayoutGroup
+      layoutDirection="horiz"
+      id="sotTopLabelGroup"
+      translation="[16,16]"
+      itemSpacings="[9]" />
+
+    <LayoutGroup
+      id="sotMarkerGroup"
+      itemSpacings="[9]">
+      <Badge
+        id="sotMarker"/>
+    </LayoutGroup>
+
   </children>
 </component>

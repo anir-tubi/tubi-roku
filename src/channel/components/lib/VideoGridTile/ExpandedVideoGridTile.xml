@@ -39,6 +39,12 @@
           translation="[0, 1]"
           loadDisplayMode="scaleToFill"
           uri="pkg:/images/video_in_grid_gradient_$$RES$$.9.png"/>
+        
+        <LayoutGroup
+          layoutDirection="horiz"
+          id="sotTopLabelGroup"
+          translation="[15, 15]"
+          itemSpacings="[9]" />
 
         <Poster
           id="titleImage"
@@ -65,6 +71,12 @@
               id="SubTitleFont"
               role="font"/>
           </Label>
+        </LayoutGroup>
+        <LayoutGroup
+          id="sotMarkerGroup"
+          itemSpacings="[9]">
+          <Badge
+            id="sotMarker"/>
         </LayoutGroup>
       </Group>
       <ExpandedTileMetadata id="videoGridMetadata" />

@@ -1658,6 +1658,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
 
           sotCustomization = container.child_ui_customization
           sotPosterLabels = {}
+          sotInfo = {}
 
           if isAA(sotCustomization) = true AND sotCustomization.count() > 0 AND isAA(m.soTStaticConfig) = true AND m.soTStaticConfig.count() > 0
 
@@ -1675,6 +1676,8 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
                 ' We are displaying a maximum of one poster label, so we're selecting the first index instead of considering the entire child count.
                 sotPosterLabels = m.getTheIconAndTextFromConfig(posterLables[0], fullChild)
               end if
+
+              sotInfo = m.getSignalTrustInfo(sotChild, fullChild)
             end if
 
           end if
@@ -1699,6 +1702,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
               tileDesignType: tileDesignType
               featuredLandscape: featuredLandscape
               sotPosterLabels: sotPosterLabels
+              sotInfo: sotInfo
               hasCC: (fullChild.hasSubtitles = true OR fullChild.has_subtitle = true OR (fullChild.subtitleTracks <> invalid AND fullChild.subtitleTracks.isEmpty() = false))
               gridItemType: parentGridItemType
             }
@@ -1711,6 +1715,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
               length: fullChild.duration
               userStarRating: rottenTomatoScore
               sotPosterLabels: sotPosterLabels
+              sotInfo: sotInfo
               subtype: sType
               type: sContentType
             }

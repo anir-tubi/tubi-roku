@@ -9,10 +9,14 @@ Function init()
   m.title = m.top.findNode("Title")
   m.titleImage = m.top.findNode("TitleImage")
   m.episode = m.top.findNode("episode")
+  m.sotTopLabelGroup = m.top.findNode("sotTopLabelGroup")
+  m.sotMarkerGroup = m.top.findNode("sotMarkerGroup")
+  m.sotMarker = m.top.findNode("sotMarker")
 
   m.BadgeTypes = {
     live: "live"
     onNow: "onNow"
+    sot: "sot"
   }
 
   ' We are only limiting the height since title logo is displayed on it's own row we are good to let the width flow.
@@ -33,6 +37,7 @@ Function init()
   setTypographyOfLabel(m.episode, typographyConstants.ids.bodyExtraSmallStrong)
   setTypographyOfLabel(m.lineOneData, typographyConstants.ids.bodyExtraSmallStrong)
   setTypographyOfLabel(m.ratingLabel, typographyConstants.ids.bodyExtraSmallStrong)
+  m.badgeTextFont = typographyConstants.ids.bodyExtraSmallStrong
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -56,6 +61,8 @@ Function onThemeChange(msg = invalid)
     m.focused2Color = theme.focused2Color
     m.blueBadgeColor = theme.blueBadgeColor
     m.ratingBackground.blendColor = theme.tertiaryTextColor
+    m.focusedTextColor = theme.focusedTextColor
+    m.cautionColor = theme.cautionColor
   end if
 End Function
 
@@ -134,11 +141,7 @@ Function onItemContentChange(msg)
         m.top.removeChild(m.logoBackground)
       end if
 
-      badgePresent = (m.badge <> invalid AND m.badge.getParent() <> invalid)
-      if badgePresent = true
-        m.top.removeChild(m.badge)
-      end if
-
+      setBadge(m.badgeTypes.sot, itemContent.sotInfo)
       metadataOnPosterContent(itemContent)
     end if
 
@@ -301,23 +304,61 @@ End Function
 
 
 '@badgeType - string, Indicating format of the badge
-'@badgeText - string, Indicating text on the badge
-Function setBadge(badgeType = "live", badgeText = "")
+'@badgeInfo - assocArray, includes sotMarkers, sotMetaDataTopLabels, sotMetaData
+Function setBadge(badgeType = "live", badgeInfo = {})
 
-  if m.badge = invalid
-    m.badge = m.top.createChild("Badge")
-    m.badge.textColor = m.primaryTextColor
-    m.badge.translation = [20, 20]
-  end if
+  topLabelCount = m.sotTopLabelGroup.getChildCount()
+  m.sotTopLabelGroup.removeChildrenIndex(topLabelCount, 0) 'remove all the previous top labels
+  m.sotMarkerGroup.removeChild(m.sotMarker)
 
   if badgeType = m.badgeTypes.live
+    m.badge = m.sotTopLabelGroup.createChild("Badge")
+    m.badge.textColor = m.primaryTextColor
+    m.badge.translation = [20, 20]
     m.badge.backgroundColor = m.focused2Color
     m.badge.iconUri = "pkg:/images/live-icon-filled.webp"
     m.badge.text = UCase(getTranslation("screenSearch_liveText"))
   else if badgeType = m.badgeTypes.onNow
+    m.badge = m.sotTopLabelGroup.createChild("Badge")
+    m.badge.textColor = m.primaryTextColor
+    m.badge.translation = [20, 20]
     m.badge.backgroundColor = m.blueBadgeColor
     m.badge.text = UCase(getTranslation("onNow"))
+  else if badgeType = m.badgeTypes.sot
+    sotInfo = badgeInfo
+    if sotInfo <> invalid
+      sotTopLabelSignals = sotInfo.sotMetaDataTopLabels
+      sotMarkers = sotInfo.sotMarkers
+
+      if isNonEmptyArray(sotTopLabelSignals) = true
+        for each signal in sotTopLabelSignals
+          topLabel = createObject("roSGNode", "Badge")
+          topLabel.text = signal.sotLabelText
+          topLabel.iconUri = signal.sotIcon
+          topLabel.textColor = m.focusedTextColor
+          topLabel.maxWidth = m.top.width - 12
+          m.sotTopLabelGroup.appendChild(topLabel)
+        end for
+      end if
+
+      if isAA(sotMarkers) = true
+        m.sotMarker = createObject("roSGNode", "Badge")
+        m.sotMarker.id = "sotMarker"
+        m.sotMarker.showBackground = false
+        m.sotMarker.maxWidth = m.top.width
+        m.sotMarker.text = sotMarkers.sotLabelText
+        m.sotMarker.iconUri = sotMarkers.sotIcon
+        m.sotMarker.badgeTextFont = m.badgeTextFont
+        m.sotMarker.textColor = m.cautionColor
+        translationX = 15
+        translationY = m.top.height - m.sotMarker.boundingRect().height - 15
+        m.sotMarkerGroup.translation = [translationX, translationY]
+        m.sotMarkerGroup.appendChild(m.sotMarker)
+      end if
+    end if
+
   end if
+
 
 End Function
 
