@@ -152,7 +152,7 @@ Function refreshButtonList()
       end if
     end if
 
-    if itemContent.needsLogin = true AND getExternalConfigValueFromGlobal("bypass_registration_gate", false) = false
+    if itemContent.needsLogin = true AND getExternalConfigValueFromGlobal("bypass_registration_gate", false) = false AND hasEventEnded = false
       translationId = "sign_in_watch"
       buttonId = "signInWatch"
       if isEventLive = true
@@ -188,7 +188,7 @@ Function refreshButtonList()
     bookmark = getBookmark(itemContent.id)
     didUserSetReminderForEventContent = (bookmark <> invalid)
 
-    if isEventLive = false AND itemContent.needsLogin <> true
+    if isEventLive = false AND itemContent.needsLogin <> true AND hasEventEnded = false
       if m.top.isContentDetailsView = true
         if didUserSetReminderForEventContent = false
           reminderTranslationId = "screenDetails_button_set_reminder"
