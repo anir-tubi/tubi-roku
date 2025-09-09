@@ -44,7 +44,7 @@ Function stopVideoPreview(node = invalid)
     node = m.videoPreviewPlayer
   end if
 
-  ' TODO: Remove if we do not graduate roku_home_screen_redesign_v_1_4_restart experiment.
+  ' TODO: Remove if we do not graduate roku_home_screen_redesign_v_1_5 experiment.
   ' This is needed to provide smooth scrolling experience when the user is scrolling the list because calling video stop causes glitchy behavior.
   isListScrolling = false
   screen = getCurrentScreen()
@@ -195,7 +195,7 @@ Function startVideoPreviewIfBufferingComplete()
   bufferingStatus = m.videoPreviewPlayer.bufferingStatus
   if bufferingStatus <> invalid
     videoPreview.isBufferingComplete = (bufferingStatus.percentage = 100)
-    if videoPreview.isBufferingComplete = true AND videoPreview.control = "prebuffer"
+    if videoPreview.isBufferingComplete = true AND videoPreview.control <> "play"
       sendVideoPlayerCommand(videoPreview, "play")
     end if
   end if
@@ -500,4 +500,14 @@ End Function
 ' returns true if the video preview is playing, false otherwise
 Function isVideoPreviewPlaying()
   return getVideoPreviewState() = "playing"
+End Function
+
+
+Function getVideoPreviewContentId()
+  videoPreview = m.videoPreviewPlayer
+  if videoPreview <> invalid AND videoPreview.content <> invalid
+    return videoPreview.content.id
+  end if
+
+  return invalid
 End Function

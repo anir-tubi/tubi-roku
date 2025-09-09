@@ -1087,7 +1087,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
       else
         shouldInsertChannelTile = true
         isContentModeHomeScreen = (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
-        if isContentModeHomeScreen = true AND uiMode = "standard" AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_4_restart").design_type = "withDescriptionPortraitSmall"
+        if isContentModeHomeScreen = true AND uiMode = "standard" AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_5").design_type = "withDescriptionPortraitSmall"
           shouldInsertChannelTile = false
         end if
         categoryAA = m.buildCategoryAAWithInsert(container, contents, "", "", false, contentMode, screenId, isSignedInUser, uiMode, shouldInsertChannelTile, {})
@@ -1516,7 +1516,7 @@ Function tubiMetadataTranslate_buildCategoryParentInfo(container, sOrientation =
     }
 
     if m.experiments <> invalid
-      experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_4_restart")
+      experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_5")
       tileDesignType = experiment.design_type
       isUserInVideoTilesExp = (tileDesignType = "withDescriptionPortraitSmall") AND uiMode = "standard"
 
@@ -1643,7 +1643,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           tileDesignType = "none"
           isUserInVideoTilesExp = false
           if m.experiments <> invalid
-            experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_4_restart")
+            experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_5")
             tileDesignType = experiment.design_type
             isUserInVideoTilesExp = (tileDesignType = "withDescriptionPortraitSmall") AND uiMode = "standard"
           end if
@@ -1949,7 +1949,7 @@ Function tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA(cont
     ' Since this field is temporary since we need to support both formats for now.
     useVideoTilesFormat = false
     if m.experiments <> invalid AND isContentModeHomeScreen = true AND bKidsMode <> true
-      experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_4_restart")
+      experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_5")
       useVideoTilesFormat = (isAA(experiment) = true AND experiment.design_type = "withDescriptionPortraitSmall")
     end if
 
@@ -2116,7 +2116,7 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
   isUserInVideoTilesExperiment = false
   experimentContainerId = "none"
   if m.experiments <> invalid
-    experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_4_restart")
+    experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_5")
     tileDesignType = experiment.design_type
     experimentContainerId = experiment.container_id
     isUserInVideoTilesExperiment = (tileDesignType = "withDescriptionPortraitSmall") AND uiMode = "standard"

@@ -572,7 +572,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     if isKidsUIOn() = false AND screenID = m.constants.ui.screenIds.homeScreen
       refreshLiveEventsContainerWithEpgListingInfo(rawResponse)
 
-      getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_4_restart", true)
+      getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_5", true)
       if m.isUserInVideoTilesExperiment = true AND isNode(rawResponse) = true AND rawResponse.getChildCount() > 0
         ' Only show the video tile overlay group if the screen is the home screen and the skin ads are not available.
         ' This is needed because we refresh home screen behind the scenes during parent controls change.
@@ -1492,7 +1492,7 @@ Function updateVideoTileOnFocusChange(rowFocused, columnFocused, screen)
   tubiLog("HomeScreenHelpers.updateVideoTileOnFocusChange")
   ' Only process if the screen is the home screen.
   ' Since all others screens are using topRight background variant vs home screen will use full screen background.
-  ' TODO: If we graduate roku_home_screen_redesign_v_1_4_restart we should migrate the skin ad to be a itemComponent of FeaturedRowList so that we don't have to add these one off checks.
+  ' TODO: If we graduate roku_home_screen_redesign_v_1_5 we should migrate the skin ad to be a itemComponent of FeaturedRowList so that we don't have to add these one off checks.
 
   gridItemType = ""
   category = screen.featuredRowContent.getChild(rowFocused)
@@ -1506,7 +1506,7 @@ Function updateVideoTileOnFocusChange(rowFocused, columnFocused, screen)
 
   if screen <> invalid AND screen.featuredRowContent <> invalid AND arrayIncludes(m.constants.ui.adGridItemTypes, gridItemType) = false
     pauseVideoPreviewAndShowPoster()
-    m.videoPreviewDebounce.control = "start"
+    startVideoTilePreview()
     setInlineVideoMetadataOverlay(screen.featuredRowContent, columnFocused, rowFocused)
   end if
 End Function
@@ -1551,11 +1551,13 @@ Function startDebouncedVideoPreview()
       if screen.featuredRowContent <> invalid AND screen.featuredRowFocusedItem <> invalid
         content = screen.featuredRowFocusedItem
 
-        if content.type = m.constants.ui.categoryTypes.linear AND m.constants.deviceInfo.isAutoPlayEnabled = true
-          playLinearInlineGridView(content, screen)
-        else
-          componentTrackingInfo = getCategoryComponentTrackingInfo(screen)
-          setVideoPreviewAfterFocus(content, screen.trackingPageInfo, componentTrackingInfo)
+        if getVideoPreviewContentId() <> content.id
+          if content.type = m.constants.ui.categoryTypes.linear AND m.constants.deviceInfo.isAutoPlayEnabled = true
+            playLinearInlineGridView(content, screen)
+          else
+            componentTrackingInfo = getCategoryComponentTrackingInfo(screen)
+            setVideoPreviewAfterFocus(content, screen.trackingPageInfo, componentTrackingInfo)
+          end if
         end if
       end if
     else
@@ -1647,10 +1649,6 @@ Function onFeaturedListHasFocusChange(msg)
       displayDefaultBackground()
     end if
 
-    ' Resetting the content focused when the featured row list receives focus.
-    if screen.hasField("contentFocused") = true
-      screen.contentFocused = invalid
-    end if
     previewState = getVideoPreviewStateForThisContent(content)
     m.inlinePreviewFocusIndicator.visible = true
     if previewState = "paused"
@@ -1715,7 +1713,7 @@ Function onFeaturedRowFocusedItemChange(msg)
   ' If VideoPreview is on and we have not started the debounce, we will start it.
   ' This is needed in case where for initial load and refresh cases where columnFocusChange is not triggered.
   if focusedItem <> invalid AND screen.featuredListHasFocus = true AND isVideoPreviewOn() = true AND m.videoPreviewDebounce.control = "stop"
-    m.videoPreviewDebounce.control = "start"
+    startVideoTilePreview()
   end if
 
   if isNode(focusedItem) = true AND (arrayIncludes(m.constants.ui.liveEventsGridTypes, focusedItem.gridItemType) OR arrayIncludes(m.constants.ui.adGridItemTypes, focusedItem.gridItemType))
@@ -1876,4 +1874,13 @@ Function getLiveEventsContainer(rawResponse)
   end if
 
   return invalid
+End Function
+
+
+Function startVideoTilePreview()
+  if m.shouldDebounceVideoTilePreview = true
+    m.videoPreviewDebounce.control = "start"
+  else
+    startDebouncedVideoPreview()
+  end if
 End Function

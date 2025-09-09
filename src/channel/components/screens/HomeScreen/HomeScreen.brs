@@ -4,20 +4,15 @@ Function init()
   m._ = rodash()
   m.constants = getConstantsFromGlobal()
   m.Tracking = TubiTrackingInfo(m.constants)
-  experimentInfo = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_4_restart", false)
+  experimentInfo = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_5", false)
   m.isUserInVideoTilesExperiment = isAA(experimentInfo) AND experimentInfo.design_type = "withDescriptionPortraitSmall"
-  m.shouldDimPeekRow = isAA(experimentInfo) AND experimentInfo.should_dim = true
 
   m.PageGroup = m.top.findNode("PageGroup")
   m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]
   m.ContentAreaParent = m.top.findNode("ContentAreaParent")
   m.maskUri = "pkg:/images/poster-mask.png"
   if m.isUserInVideoTilesExperiment = true
-    if m.shouldDimPeekRow = true
-      m.maskUri = "pkg:/images/poster-mask-75.png"
-    else
-      m.maskUri = ""
-    end if
+    m.maskUri = ""
   end if
   m.ContentArea = m.top.findNode("ContentArea")
   m.ContentArea.maskUri = m.maskUri
@@ -1079,7 +1074,7 @@ Function displayAdDisplayCarousel()
       m.adFocusTimer.control = "start"
     end if
 
-    if m.isUserInVideoTilesExperiment = true AND m.shouldDimPeekRow = false
+    if m.isUserInVideoTilesExperiment = true
       m.ContentArea.maskUri = "pkg:/images/poster-mask-ads-no-dim.png"
     else
       m.ContentArea.maskUri = "pkg:/images/poster-mask-ads.png"

@@ -180,17 +180,10 @@ Function onDetailBackgroundChange(msg)
   tubiLog("DetailScreenHelpers.onDetailBackgroundChange")
   detailScreen = msg.getRoSGNode()
   if detailScreen.isInFocusChain()
-    if isVideoPreviewOn() = true
-      m.backgroundGroup.backgroundInfo = {
-        type: m.constants.ui.backgroundTypes.topright
-        uriList: detailScreen.backgroundUriList
-      }
-    else
-      m.backgroundGroup.backgroundInfo = {
-        type: m.constants.ui.backgroundTypes.topright
-        uriList: detailScreen.backgroundUriList
-      }
-    end if
+    m.backgroundGroup.backgroundInfo = {
+      type: m.constants.ui.backgroundTypes.topright
+      uriList: detailScreen.backgroundUriList
+    }
   end if
 End Function
 
