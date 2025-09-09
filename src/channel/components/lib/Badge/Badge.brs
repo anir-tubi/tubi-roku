@@ -77,7 +77,7 @@ Function adjustBadgeSize()
     xAxis = (m.badgeBackground.width - badgeInfoLayoutWidth) / 2
   end if
 
-  m.badgeInfoLayout.translation = [xAxis, 20]
+  m.badgeInfoLayout.translation = [xAxis, (36 - height) / 2]
 End Function
 
 

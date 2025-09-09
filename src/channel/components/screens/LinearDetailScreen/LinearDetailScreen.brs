@@ -8,7 +8,7 @@ Function init()
   m.relatedContentContainer = topRef.findNode("relatedContentContainer")
   m.contentContainer = topRef.findNode("contentContainer")
 
-  m.liveEventsContainer.translation = [m.constants.ui.translations.marginX, 140]
+  m.liveEventsContainer.translation = [m.constants.ui.translations.marginX, 102]
   m.relatedContentContainer.translation = [m.constants.ui.translations.marginX, 900]
 
   m.leftChevron = topRef.findNode("leftChevron")

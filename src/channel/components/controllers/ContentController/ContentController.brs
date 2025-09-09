@@ -3452,7 +3452,7 @@ Function processUserContentSelectionAfterSignIn()
       contentFocused = screen.contentFocused
     end if
 
-    if contentFocused <> invalid AND contentFocused.actionId <> "signInWatch"
+    if contentFocused <> invalid AND contentFocused.actionId <> "signInWatch" AND contentFocused.actionId <> "reminder"
       playerType = contentFocused.playerType
       if isAA(contentFocused.scheduleData)
         playerType = contentFocused.scheduleData.playerType

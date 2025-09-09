@@ -862,7 +862,7 @@ Function fireNavigateWithinPageEvent()
       if oldFocusedContent <> invalid AND oldFocusedContent.type = m.constants.ui.contentTypes.channel
         tile = m.Tracking.getUtilityTile(oldFocusedContent, oldAnalyticsCol, 1)
         categoryComponentInfo["utility_tile"] = tile
-      else
+      else if oldFocusedContent <> invalid AND oldFocusedContent.type <> "continue_watching_signed_out_user"
         tile = m.Tracking.getAnalyticsTile(oldFocusedContent, oldAnalyticsCol, 1)
         categoryComponentInfo["content_tile"] = tile
       end if
@@ -922,7 +922,7 @@ Function getTrackingComponentInfoOfCategoryGridList(gridItem, itemPosition)
     if gridItem.type = m.constants.ui.contentTypes.channel
       tile = m.Tracking.getUtilityTile(gridItem, itemPosition[1] + 1)
       componentValues["utility_tile"] = tile
-    else
+    else if gridItem.type <> "continue_watching_signed_out_user"
       tile = m.Tracking.getAnalyticsTile(gridItem, itemPosition[1] + 1)
       componentValues["content_tile"] = tile
     end if

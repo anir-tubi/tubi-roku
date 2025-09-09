@@ -29,10 +29,7 @@
       uri="pkg:/images/menu-focus-$$RES$$.9.png"/>
     <LayoutGroup
       id="BadgeInfoLayout"
-      layoutDirection="horiz"
-      vertAlignment="center"
-      horizAlignment="left"
-      translation="[0,0]">
+      layoutDirection="horiz">
       <Poster
         id="BadgeIcon"
         height="21"
@@ -40,6 +37,8 @@
         loadDisplayMode="scaleToFit"/>
       <Label
         id="BadgeText"
+        height="24"
+        vertAlign="center"
         ellipsizeOnBoundary="true"
         maxLines="1">
         <Font

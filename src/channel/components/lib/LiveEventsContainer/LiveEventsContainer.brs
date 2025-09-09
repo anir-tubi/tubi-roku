@@ -323,8 +323,11 @@ End Function
 
 Function adjustMetadataSectionTranslation()
   contentSectionHeight = m.contentSection.boundingRect().height
-  if contentSectionHeight < 650
-    translationY = 650 - m.contentSection.boundingRect().height
+  isContentDetailsView = m.top.isContentDetailsView
+  containerHeight = 690
+  ' Since in content details view we have space on top we are moving it up vs home screen we are sticking it zero
+  if contentSectionHeight < containerHeight OR isContentDetailsView = true
+    translationY = containerHeight - contentSectionHeight
     m.contentSection.translation = [0, translationY]
   else
     m.contentSection.translation = [0, 0]
