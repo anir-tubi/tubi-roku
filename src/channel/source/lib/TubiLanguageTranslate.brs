@@ -3664,7 +3664,7 @@ Function getTranslation_es_MX()
     },
     "reg_intro_title": {
       "description": "title displayed on registration welcome modal",
-      "message": "Tubi es mejor cuando Inicias Sesión"
+      "message": "Bienvenido a Tubi"
     },
     "reg_intro_sub_header": {
       "description": "sub header displayed on registraton welcome modal",
@@ -4105,6 +4105,38 @@ Function getTranslation_es_MX()
     "m_duration": {
       "description": "Indicates time in the format 'x m'",
       "message": "{minutes}m"
+    },
+    "h_duration": {
+      "description": "Indicates time in the format 'x h'",
+      "message": "{hours}h"
+    },
+    "d_duration": {
+      "description": "Indicates time in the format 'x d'",
+      "message": "{days}d"
+    },
+    "sign_in_watch": {
+      "description": "Sign in to watch live button label.",
+      "message": "Inicia sesión para ver"
+    },
+    "live_in_date": {
+      "description": "date label used in air date countdown timer",
+      "message": "EN VIVO EN {timeString}"
+    },
+    "starts_date": {
+      "description": "date label used in air date countdown timer",
+      "message": "COMIENZA {date}"
+    },
+    "screenDetails_button_details": {
+      "description": "Details button label used in linear detail screen",
+      "message": "Más detalles"
+    },
+    "sign_in_watch_live": {
+      "description": "Sign in to watch live button label.",
+      "message": "Inicia sesión para ver en vivo"
+    },
+    "content_unavailable": {
+      "description": "Button label when the content is unavailable",
+      "message": "Contenido no disponible"
     }
   }
 End Function
@@ -5548,7 +5580,7 @@ Function getTranslation_fr_CA()
     },
     "reg_intro_title": {
       "description": "title displayed on registration welcome modal",
-      "message": "Tubi, c'est mieux quand vous vous connectez"
+      "message": "Bienvenue sur Tubi"
     },
     "reg_intro_sub_header": {
       "description": "sub header displayed on registraton welcome modal",
@@ -5985,6 +6017,38 @@ Function getTranslation_fr_CA()
     "m_duration": {
       "description": "Indicates time in the format 'x m'",
       "message": "{minutes}m"
+    },
+    "h_duration": {
+      "description": "Indicates time in the format 'x h'",
+      "message": "{hours}h"
+    },
+    "d_duration": {
+      "description": "Indicates time in the format 'x d'",
+      "message": "{days}j"
+    },
+    "sign_in_watch": {
+      "description": "Sign in to watch live button label.",
+      "message": "Se connecter pour voir"
+    },
+    "live_in_date": {
+      "description": "date label used in air date countdown timer",
+      "message": "EN DIRECT DANS {timeString}"
+    },
+    "starts_date": {
+      "description": "date label used in air date countdown timer",
+      "message": "DÉBUTE {date}"
+    },
+    "screenDetails_button_details": {
+      "description": "Details button label used in linear detail screen",
+      "message": "Plus de détails"
+    },
+    "sign_in_watch_live": {
+      "description": "Sign in to watch live button label.",
+      "message": "Connexion pour en direct"
+    },
+    "content_unavailable": {
+      "description": "Button label when the content is unavailable",
+      "message": "Contenu non disponible"
     }
   }
 End Function
