@@ -290,6 +290,7 @@ End Function
 
 
 Function updatePreviewPlayerToInlineView()
+  tubiLog("VideoPreviewHelpers.updatePreviewPlayerToInlineView")
   if isCurrentScreenHomeScreen() = true
     screen = getCurrentScreen()
 
@@ -334,6 +335,7 @@ End Function
 
 
 Function updatePreviewPlayerToFullScreen()
+  tubiLog("VideoPreviewHelpers.updatePreviewPlayerToFullScreen")
   m.videoPreviewPlayer.reParent(m.backgroundVideoPreviewPlayerContainer, false)
   m.videoPreviewPlayer.clippingRect = [0, 0, 1920, 1080]
   m.videoPreviewPlayer.videoPlayerType = "BANNER"
@@ -342,6 +344,7 @@ End Function
 
 
 Function updatePreviewPlayerToAdCarousel()
+  tubiLog("VideoPreviewHelpers.updatePreviewPlayerToAdCarousel")
   m.videoPreviewPlayer.reParent(m.backgroundVideoPreviewPlayerContainer, false)
   m.videoPreviewPlayer.clippingRect = [0, 0, 1920, 595]
   resizeToLocation(m.videoPreviewPlayer, 1919, 595, [0, 0], 0)
@@ -463,6 +466,7 @@ End Function
 
 
 Function onInlineVideoPreviewPositionChanged(msg)
+  tubiLog("VideoPreviewHelpers.onInlineVideoPreviewPositionChanged")
   screen = getCurrentScreen()
   content = screen.featuredRowFocusedItem
   if content <> invalid
@@ -475,6 +479,7 @@ End Function
 
 
 Function updatePlayerLayoutBasedOnFocusedContent(content)
+  tubiLog("VideoPreviewHelpers.updatePlayerLayoutBasedOnFocusedContent")
   currentScreen = getCurrentScreen()
   isHomeScreen = currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen
   if arrayIncludes(m.constants.ui.fullScreenVideoPlayerGridItemTypes, content.gridItemType)

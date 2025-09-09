@@ -967,6 +967,7 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
         componentTrackingInfo = getCategoryComponentTrackingInfo(currentScreen)
         if focusedContent <> invalid AND focusedContent.type = m.constants.ui.contentTypes.adRowlistCarousel AND focusedContent.videoPreviewUrl <> ""
           ' If the content is adRowlistSpotlight, then set the video preview after a delay
+
           m.videoPreviewDebounce.duration = m.constants.player.videoPreviewDelayTimes.adCarousel
           m.videoPreviewDebounce.control = "start"
         else
@@ -1488,14 +1489,22 @@ End Function
 ' @param columnFocused: int, the column index of the focused item.
 ' @param screen: roSGNode, the screen node.
 Function updateVideoTileOnFocusChange(rowFocused, columnFocused, screen)
+  tubiLog("HomeScreenHelpers.updateVideoTileOnFocusChange")
   ' Only process if the screen is the home screen.
   ' Since all others screens are using topRight background variant vs home screen will use full screen background.
   ' TODO: If we graduate roku_home_screen_redesign_v_1_4_restart we should migrate the skin ad to be a itemComponent of FeaturedRowList so that we don't have to add these one off checks.
-  if isCurrentScreenHomeScreen() = true AND screen.lastFocusedList <> "skinAdRow"
+
+  gridItemType = ""
+  category = screen.featuredRowContent.getChild(rowFocused)
+  if category <> invalid
+    gridItemType = category.gridItemType
+  end if
+
+  if isCurrentScreenHomeScreen() = true AND arrayIncludes(m.constants.ui.adGridItemTypes, gridItemType) = false
     displayDefaultBackground()
   end if
 
-  if screen <> invalid AND screen.featuredRowContent <> invalid AND screen.lastFocusedList <> "skinAdRow"
+  if screen <> invalid AND screen.featuredRowContent <> invalid AND arrayIncludes(m.constants.ui.adGridItemTypes, gridItemType) = false
     pauseVideoPreviewAndShowPoster()
     m.videoPreviewDebounce.control = "start"
     setInlineVideoMetadataOverlay(screen.featuredRowContent, columnFocused, rowFocused)
@@ -1504,6 +1513,7 @@ End Function
 
 
 Function pauseVideoPreviewAndShowPoster()
+  tubiLog("HomeScreenHelpers.pauseVideoPreviewAndShowPoster")
   ' If the video preview is playing, we will pause it and show the poster.
   ' This helps with smoother scrolling experience.
   if m.inlineVideoPreviewPlayerContainer.opacity = 1
@@ -1623,6 +1633,7 @@ End Function
 
 
 Function onFeaturedListHasFocusChange(msg)
+  tubiLog("HomeScreenHelpers.onFeaturedListHasFocusChange")
   hasFeaturedListFocus = msg.getData()
   screen = msg.getRoSGNode()
   m.videoTileOverlayGroup.visible = (isCurrentScreenHomeScreen() = true AND isKidsUIOn() = false AND screen.lastFocusedList = "featuredRowList")
@@ -1630,8 +1641,8 @@ Function onFeaturedListHasFocusChange(msg)
   previewContent = m.videoPreviewPlayer.content
   m.videoPreviewPlayer.visible = (isCurrentScreenHomeScreen() = false OR (content <> invalid AND previewContent <> invalid AND content.id = previewContent.id))
   if hasFeaturedListFocus = true
-    if isNode(content) = true AND arrayIncludes(m.constants.ui.liveEventsGridTypes, content.gridItemType)
-      displayBackgroundForLiveEvents(content)
+    if isNode(content) = true AND (arrayIncludes(m.constants.ui.liveEventsGridTypes, content.gridItemType) OR arrayIncludes(m.constants.ui.adGridItemTypes, content.gridItemType))
+      setVideoContentScreenBackground(screen)
     else
       displayDefaultBackground()
     end if
@@ -1707,8 +1718,8 @@ Function onFeaturedRowFocusedItemChange(msg)
     m.videoPreviewDebounce.control = "start"
   end if
 
-  if isNode(focusedItem) = true AND arrayIncludes(m.constants.ui.liveEventsGridTypes, focusedItem.gridItemType)
-    displayBackgroundForLiveEvents(focusedItem)
+  if isNode(focusedItem) = true AND (arrayIncludes(m.constants.ui.liveEventsGridTypes, focusedItem.gridItemType) OR arrayIncludes(m.constants.ui.adGridItemTypes, focusedItem.gridItemType))
+    setVideoContentScreenBackground(screen)
   else
     displayDefaultBackground()
   end if
