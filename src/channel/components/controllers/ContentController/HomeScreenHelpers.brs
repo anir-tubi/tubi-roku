@@ -1495,9 +1495,11 @@ Function updateVideoTileOnFocusChange(rowFocused, columnFocused, screen)
   ' TODO: If we graduate roku_home_screen_redesign_v_1_5 we should migrate the skin ad to be a itemComponent of FeaturedRowList so that we don't have to add these one off checks.
 
   gridItemType = ""
-  category = screen.featuredRowContent.getChild(rowFocused)
-  if category <> invalid
-    gridItemType = category.gridItemType
+  if screen.featuredRowContent <> invalid
+    category = screen.featuredRowContent.getChild(rowFocused)
+    if category <> invalid
+      gridItemType = category.gridItemType
+    end if
   end if
 
   if isCurrentScreenHomeScreen() = true AND arrayIncludes(m.constants.ui.adGridItemTypes, gridItemType) = false
