@@ -122,16 +122,15 @@ End Function
 '     how close the row is to its final state.
 Function moveContentAreaMask(nFocusRow = -1, nFocusingPercent = 1)
   '//nMaskYNew will most likely be set to 0 w/ the following line unless the content rowList has been moved to make way for a special top row.
-  nMaskYNew = m.CategoryGridList.rowlistTranslation[1]
-  rowHeights = m.CategoryGridList.rowHeights
-  featuredRowHeights = m.CategoryGridList.featuredRowHeights
-  ' Since we have 2 full rows visible we are setting the mask offset to make sure the first row of the category grid is visible.
-  if m.top.lastFocusedList = "featuredRowList" AND isNonEmptyArray(featuredRowHeights) = true
-    ' Where 150 represents the height of the container title component + padding.
-    rowTileComponentHeight = 150
-    nMaskYNew = featuredRowHeights[0] - rowTileComponentHeight
+  if m.isUserInVideoTilesExperiment = true
+    nMaskYNew = m.CategoryGridList.featuredRowListTranslation[1]
+    rowHeights = m.CategoryGridList.featuredRowHeights
+  else
+    nMaskYNew = m.CategoryGridList.rowlistTranslation[1]
+    rowHeights = m.CategoryGridList.rowHeights
   end if
-  if nFocusRow >= 0 AND isNonEmptyArray(rowHeights) = true AND (m.top.lastFocusedList = "rowList" OR m.top.lastFocusedList = "")
+
+  if nFocusRow >= 0 AND isNonEmptyArray(rowHeights) = true
     nMaxRowHeights = rowHeights.count()
     if nFocusRow > (nMaxRowHeights - 1)
       '//If the rowHeights array doesn't contain as many row heights as the passed nFocusRow, then assume the current height is associated with the last item in the rowHeights array

@@ -632,7 +632,7 @@ Function setFeaturedRowHeights()
       else if gridItemType = gridItemTypes.adRowlistSpotlight OR gridItemType = gridItemTypes.adRowlistCarousel
         adSize = m.constants.ui.imageSizes.adRowlistThumbnail
         rowItemSize.push(adSize)
-        heights.push(adSize[1] + 186)
+        heights.push(adSize[1] + 64)
       else
         rowItemSize.push(m.gridItemSize)
         heights.push(featuredRowHeight)
