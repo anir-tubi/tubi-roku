@@ -1,5 +1,5 @@
 'use strict';
-const {series, parallel, src, dest} = require('gulp');
+const { series, parallel, src, dest } = require('gulp');
 const fs = require('fs');
 const replace = require('gulp-replace');
 const filter = require('gulp-filter');
@@ -18,27 +18,27 @@ const clipboardy = require('clipboardy');
 const REMOVE_TUBI_LOGS_REGEX = /(?<!Function.*)(tubiLog|logDebug)\s*\(.*$/gim;
 
 //Importing old build functions
-const {load, getBuildTag, getOneTrustBuildTag, getFoxVideoPlayerBuildTag} = require('./js/config');
-const {createManifest, createSettings} = require('./js/build');
-const {keypress, deeplink, uploadPkg, signPkg, installWithSquashfs} = require('./js/network');
+const { load, getBuildTag, getOneTrustBuildTag, getFoxVideoPlayerBuildTag } = require('./js/config');
+const { createManifest, createSettings } = require('./js/build');
+const { keypress, deeplink, uploadPkg, signPkg, installWithSquashfs } = require('./js/network');
 
 //Functions to upload and download static string translations
-const {compareTranslations, downloadAndProcessTranslations, updateLocalTranslations, uploadTranslations} = require('./js/translate');
-const {listUnusedImages,listUnusedTranslations} = require('./js/codeclean.js');
-const {replaceColorConstants, updateColorJSON} = require('./js/colorreplace.js');
-const {replaceTypographyConstants, updateTypographyJSON} = require('./js/typography.js');
+const { compareTranslations, downloadAndProcessTranslations, updateLocalTranslations, uploadTranslations } = require('./js/translate');
+const { listUnusedImages, listUnusedTranslations } = require('./js/codeclean.js');
+const { replaceColorConstants, updateColorJSON } = require('./js/colorreplace.js');
+const { replaceTypographyConstants, updateTypographyJSON } = require('./js/typography.js');
 
 // Importing functions with Git functionality
-const {NoStackError} = require('./js/utilities');
+const { NoStackError } = require('./js/utilities');
 
 // Importing functions with Git functionality
-const {makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges, buildQaBranch, bumpBuild, bumpBuildTen, bumpRevision, tagBuild, createCdnPullRequestForOneTrustSDK, createCdnPullRequestForFoxVideoPlayer, sendSlackReminders, getCurrentBranch, isBranchTrackingPresent} = require('./js/git');
+const { makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges, buildQaBranch, bumpBuild, bumpBuildTen, bumpRevision, tagBuild, createCdnPullRequestForOneTrustSDK, createCdnPullRequestForFoxVideoPlayer, sendSlackReminders, getCurrentBranch, isBranchTrackingPresent } = require('./js/git');
 
 // Importing functions related to Github action runners
-const {setupAutomatedTestsGithubActionRunner, startAutomatedTestsGithubActionRunner, removeAutomatedTestsGithubActionRunner} = require('./js/action-runner');
+const { setupAutomatedTestsGithubActionRunner, startAutomatedTestsGithubActionRunner, removeAutomatedTestsGithubActionRunner } = require('./js/action-runner');
 
 // importing functions related to client error config
-const {updateLocalClientErrorConfigFile, verifyLocalClientErrorConfigIsCurrent} = require('./js/local-client-error-config');
+const { updateLocalClientErrorConfigFile, verifyLocalClientErrorConfigIsCurrent } = require('./js/local-client-error-config');
 
 /* Allow some environment variables to drive which config we're building.
    Environment variables are set on options, along with any parameters passed in
@@ -85,7 +85,7 @@ passedArgs.forEach(arg => {
       options.config = strippedArg;
     } else if (allowedTelnetConfigs[strippedArg]) {
       options.telnet = strippedArg;
-    } else if(strippedArg.split('.').length === 4) {
+    } else if (strippedArg.split('.').length === 4) {
       //check if the arg is an IP address
       let ipBlocks = strippedArg.split('.');
       let isIp = ipBlocks.reduce((acc, block) => {
@@ -111,7 +111,7 @@ function clean(done) {
     // It is quicker to just rename the folder synchronously and then let it delete the folder on its own time asynchronously
     const pendingDeleteBuildFolder = '__pendingDeleteBuild';
     fs.renameSync('build', pendingDeleteBuildFolder);
-    fs.rm(pendingDeleteBuildFolder, { recursive: true, force: true }, (e) => {});
+    fs.rm(pendingDeleteBuildFolder, { recursive: true, force: true }, (e) => { });
   }
   done();  //inform gulp that the task has completed.
 }
@@ -126,9 +126,9 @@ function collect(sources, srcOptions) {
   });
   const dedupe = require('gulp-dedupe');
   return src(sources, srcOptions)
-        .pipe(dedupe());
-        // uncomment the next line for more info on which files are being collected
-        // .pipe(debug())
+    .pipe(dedupe());
+  // uncomment the next line for more info on which files are being collected
+  // .pipe(debug())
 }
 
 
@@ -212,7 +212,7 @@ function buildInstalled() {
       // TODO remove after fox video player is removed.
       // Only including with staging and production to speed up development deployments
       if (options.config === 'production' || options.config === 'staging') {
-      const foxBuildTag = getFoxVideoPlayerBuildTag(options);
+        const foxBuildTag = getFoxVideoPlayerBuildTag(options);
         const foxVideoPlayerPkgName = `fox_video_player_${foxBuildTag}.pkg`;
 
         fs.mkdirSync('build/local/fox-video-player-components/');
@@ -286,7 +286,7 @@ function buildStarter() {
 
   if (settings.useFullStarterController) {
     genUtilSrc.push('src/channel/source/localClientErrorConfig.brs'),
-    genUtilSrc.push('src/channel/source/3rdparty/rta/typeUtils.brs');
+      genUtilSrc.push('src/channel/source/3rdparty/rta/typeUtils.brs');
   }
 
   let genUtilSrcOptions = {
@@ -392,12 +392,12 @@ function buildStarter() {
         await new Promise((resolve, reject) => {
           // Create a new stream to process files
           src('build/starter/**/*.brs') // Adjust the glob pattern to match your BrightScript files
-          .pipe(
-            replace(REMOVE_TUBI_LOGS_REGEX, `' $&`) // Case-insensitive match for tubiLog or logDebug followed by '('
-          )
-          .pipe(dest('build/starter'))
-          .on('end', resolve)
-          .on('error', reject);
+            .pipe(
+              replace(REMOVE_TUBI_LOGS_REGEX, `' $&`) // Case-insensitive match for tubiLog or logDebug followed by '('
+            )
+            .pipe(dest('build/starter'))
+            .on('end', resolve)
+            .on('error', reject);
         });
       }
 
@@ -451,7 +451,7 @@ function buildRemote() {
      * the remote component package instead of the installed package.
      */
     const newFontsFile = `new_fonts_since/new_fonts_since_${minorBuildTag}`;
-    const newFonts = fs.readFileSync(newFontsFile, 'utf8').split('\n').filter(function(e) {
+    const newFonts = fs.readFileSync(newFontsFile, 'utf8').split('\n').filter(function (e) {
       e = e.trim();
       return (!e.startsWith('#') && (e.endsWith('ttf')));
     });
@@ -474,7 +474,7 @@ function buildRemote() {
      * the remote component package instead of the installed package.
      */
     const newImagesFile = `new_images_since/new_images_since_${minorBuildTag}`;
-    let newImages = fs.readFileSync(newImagesFile, 'utf8').split('\n').filter(function(e) {
+    let newImages = fs.readFileSync(newImagesFile, 'utf8').split('\n').filter(function (e) {
       e = e.trim();
       return (!e.startsWith('#') && (e.endsWith('png') || e.endsWith('jpg') || e.endsWith('webp')));
     });
@@ -500,12 +500,12 @@ function buildRemote() {
     let stream = collect(sources, srcOptions)
 
       // do the actual uri string replacement for fonts
-      .pipe(replace(fontPathRegex, function(match) {
+      .pipe(replace(fontPathRegex, function (match) {
         let replacement = match;
-        newFonts.forEach(function(newFont) {
+        newFonts.forEach(function (newFont) {
           if (match.indexOf(newFont) !== -1) {
             log(`Redirecting ${newFont} to remote components`);
-            replacement = match.replace('pkg:','libpkg:');
+            replacement = match.replace('pkg:', 'libpkg:');
           }
         });
         return replacement;
@@ -513,12 +513,12 @@ function buildRemote() {
       .pipe(dest('build/remote'))
 
       // do the actual uri string replacement for images
-      .pipe(replace(imagePathRegex, function(match) {
+      .pipe(replace(imagePathRegex, function (match) {
         let replacement = match;
-        newImages.forEach(function(newImage) {
+        newImages.forEach(function (newImage) {
           if (match.indexOf(newImage) !== -1) {
             log(`Redirecting ${newImage} to remote components`);
-            replacement = match.replace('pkg:','libpkg:');
+            replacement = match.replace('pkg:', 'libpkg:');
           }
         });
         return replacement;
@@ -529,12 +529,12 @@ function buildRemote() {
       // are included in the remote components pkg
       .pipe(src('src/channel/fonts/**/*', srcOptions))
       .pipe(filter(file => {
-          if (newFontsMap[file.relative]) {
-            log(`Filtering ${file.relative}`);
-            return true;
-          } else {
-            return false;
-          }
+        if (newFontsMap[file.relative]) {
+          log(`Filtering ${file.relative}`);
+          return true;
+        } else {
+          return false;
+        }
       }))
       .pipe(dest('build/remote'))
 
@@ -542,12 +542,12 @@ function buildRemote() {
       // are included in the remote components pkg
       .pipe(src('src/channel/images/**/*', srcOptions))
       .pipe(filter(file => {
-          if (newImagesMap[file.relative]) {
-            log(`Filtering ${file.relative}`);
-            return true;
-          } else {
-            return false;
-          }
+        if (newImagesMap[file.relative]) {
+          log(`Filtering ${file.relative}`);
+          return true;
+        } else {
+          return false;
+        }
       }))
       .pipe(dest('build/remote'));
 
@@ -558,23 +558,23 @@ function buildRemote() {
 
   // zip up the remote components
   return build
-  .then(async() => {
-    replaceColorConstants('build/remote');
-    replaceTypographyConstants('build/remote');
-    createManifest(options, 'build/remote/manifest', 'component_library_manifest');
+    .then(async () => {
+      replaceColorConstants('build/remote');
+      replaceTypographyConstants('build/remote');
+      createManifest(options, 'build/remote/manifest', 'component_library_manifest');
 
-    if (options.config === 'production' || options.config === 'staging') {
-      // Create a new stream to process files
-      await new Promise((resolve, reject) => {
-        src('build/remote/**/*.brs')
-          .pipe(replace(REMOVE_TUBI_LOGS_REGEX, `' $&`))
-          .pipe(dest('build/remote'))
-          .on('end', resolve)
-          .on('error', reject);
-      });
-    }
-    return zipAsPromise('build/remote/**/*', `tubi_remote_components_${buildTag}.zip`, 'build/');
-  });
+      if (options.config === 'production' || options.config === 'staging') {
+        // Create a new stream to process files
+        await new Promise((resolve, reject) => {
+          src('build/remote/**/*.brs')
+            .pipe(replace(REMOVE_TUBI_LOGS_REGEX, `' $&`))
+            .pipe(dest('build/remote'))
+            .on('end', resolve)
+            .on('error', reject);
+        });
+      }
+      return zipAsPromise('build/remote/**/*', `tubi_remote_components_${buildTag}.zip`, 'build/');
+    });
 }
 
 
@@ -595,10 +595,10 @@ function buildOneTrust() {
   const buildTag = getOneTrustBuildTag(options);
 
   return build
-  .then(() => {
-    createManifest(options, 'build/onetrust/manifest', 'one_trust_library_manifest');
-    return zipAsPromise('build/onetrust/**/*', `tubi_one_trust_components_${buildTag}.zip`, 'build/');
-  });
+    .then(() => {
+      createManifest(options, 'build/onetrust/manifest', 'one_trust_library_manifest');
+      return zipAsPromise('build/onetrust/**/*', `tubi_one_trust_components_${buildTag}.zip`, 'build/');
+    });
 }
 
 
@@ -609,13 +609,13 @@ function upload(zipPath) {
   const address = options.target;
   const password = options.devPass;
   return keypress('home', address, password)
-  .then(() => {
-    log(`Uploading ${zipPath} to ${address} using dev password ${password}...`);
-    return uploadPkg(zipPath, address, password);
-  })
-  .then(data => {
-    log(`Uploaded ${zipPath} to ${address} successfully.`);
-  });
+    .then(() => {
+      log(`Uploading ${zipPath} to ${address} using dev password ${password}...`);
+      return uploadPkg(zipPath, address, password);
+    })
+    .then(data => {
+      log(`Uploaded ${zipPath} to ${address} successfully.`);
+    });
 }
 
 
@@ -638,52 +638,52 @@ function sideLoad(done) {
   console.log('buildTag', buildTag);
   const zipPath = `build/tubi_${buildTag}.zip`;
   return upload(zipPath)
-  .then(() => {
-    let { settings } = load(options);
+    .then(() => {
+      let { settings } = load(options);
 
-    if (!settings.useStarterComponents) {
-      done();
-    } else {
-      return server({
-        host: '0.0.0.0',
-        port: options.port,
-        root: 'build',
-        debug: true,
-        middleware: () => {
-          return [
-            serverMiddleware
-          ];
-        }
-      });
-    }
-  })
-  .catch((err) => {
-    if (typeof err === 'string' && err.trim() === 'Application Received: Identical to previous version -- not replacing.') {
-      log('Build already installed, launching dev channel via deeplink.');
-      return deeplink('dev', address);
-    } else {
-      if (err.errno === 'ENOTFOUND') {
-        log('Hint: Double check that ROKU_DEV_TARGET is set.');
-      } else if (err.errno === 'EHOSTUNREACH') {
-        log('Hint: Double check that you are sending to an available Roku device IP.');
-        log(`The IP ${options.target} does not seem to be accessible.`);
+      if (!settings.useStarterComponents) {
+        done();
+      } else {
+        return server({
+          host: '0.0.0.0',
+          port: options.port,
+          root: 'build',
+          debug: true,
+          middleware: () => {
+            return [
+              serverMiddleware
+            ];
+          }
+        });
       }
-      throw err;
-    }
-  })
-  .then(() => {
-    log(`${options.config.toUpperCase()} channel launched.`);
+    })
+    .catch((err) => {
+      if (typeof err === 'string' && err.trim() === 'Application Received: Identical to previous version -- not replacing.') {
+        log('Build already installed, launching dev channel via deeplink.');
+        return deeplink('dev', address);
+      } else {
+        if (err.errno === 'ENOTFOUND') {
+          log('Hint: Double check that ROKU_DEV_TARGET is set.');
+        } else if (err.errno === 'EHOSTUNREACH') {
+          log('Hint: Double check that you are sending to an available Roku device IP.');
+          log(`The IP ${options.target} does not seem to be accessible.`);
+        }
+        throw err;
+      }
+    })
+    .then(() => {
+      log(`${options.config.toUpperCase()} channel launched.`);
 
-    if (options.telnet === 'sametab') {
-      shell.config.silent = false;
-      shell.exec(`telnet ${options.target} 8085`,{async: true});
-    }
-  })
-  .catch(err => {
-    console.log(`sideLoad error: `, err);
-    serverClose();
-  })
-  .then(done());
+      if (options.telnet === 'sametab') {
+        shell.config.silent = false;
+        shell.exec(`telnet ${options.target} 8085`, { async: true });
+      }
+    })
+    .catch(err => {
+      console.log(`sideLoad error: `, err);
+      serverClose();
+    })
+    .then(done());
 }
 
 
@@ -937,14 +937,14 @@ function conditionalPackage(done) {
 function packageAll(done) {
   log('starting packageAll');
   return packageStarter(done)
-  .then(() => packageRemote(done))
-  .then(() => packageLocal(done));
+    .then(() => packageRemote(done))
+    .then(() => packageLocal(done));
 }
 
 
 // force production on options, so we ensure our build is using the production config
 function setProduction(done) {
-  if(options) {
+  if (options) {
     options.config = 'production';
     options.overrides = {
       settings: {
@@ -960,7 +960,7 @@ function setProduction(done) {
 
 // force staging on options, so we ensure our build is using the staging config
 function setStaging(done) {
-  if(options) {
+  if (options) {
     options.config = 'staging';
     done();
   } else {
@@ -971,7 +971,7 @@ function setStaging(done) {
 
 // force qa on options, so we ensure our build is using the qa config and set other automated test config settings
 function setAutomatedTestsConfig(done) {
-  if(options) {
+  if (options) {
     let useQaAnalyticsProxy = false;
     let noAdsConfig = true;
     if (process.env.analyticAutomatedTests === 'true') {
@@ -1009,7 +1009,7 @@ function setAutomatedTestsConfig(done) {
 
 // force qa on options, so we ensure our build is using the qa config and set other automated test config settings
 function setPerformanceTestsConfig(done) {
-  if(options) {
+  if (options) {
     options.config = 'qa';
     options.overrides = {
       settings: {
@@ -1027,7 +1027,7 @@ function setPerformanceTestsConfig(done) {
 }
 
 function runPerformanceTests(done) {
-    automatedTests().runAutomatedTests(done, '', [], 'js/automated-tests/performance-tests/*.ts');
+  automatedTests().runAutomatedTests(done, '', [], 'js/automated-tests/performance-tests/*.ts');
 }
 
 
@@ -1038,7 +1038,7 @@ function runToolingTests(done) {
 
 // force test on options, so we ensure our build is using the test config
 function setTest(done) {
-  if(options) {
+  if (options) {
     options.config = 'test';
     done();
   } else {
@@ -1075,7 +1075,7 @@ function pushStaging(done) {
   const rcdnS3RemoteComponentsPath = `s3://tubi-rokucdn-source-staging/appFiles/components/tubi_remote_components_${buildTag}.pkg`;
   const mrcdnS3RemoteComponentsPath = `s3://tubi-roku-multi-cdn-source-staging/appFiles/components/tubi_remote_components_${buildTag}.pkg`;
 
-  const localStarterComponentsPath  = `build/tubi_starter_components_${minorBuildTag}.pkg`;
+  const localStarterComponentsPath = `build/tubi_starter_components_${minorBuildTag}.pkg`;
   const rcdnS3starterComponentsPath = `s3://tubi-rokucdn-source-staging/appFiles/starter-components/tubi_starter_components_${minorBuildTag}.pkg`;
   const mrcdnS3starterComponentsPath = `s3://tubi-roku-multi-cdn-source-staging/appFiles/starter-components/tubi_starter_components_${minorBuildTag}.pkg`;
 
@@ -1095,7 +1095,7 @@ function pushStaging(done) {
     pushResult = shell.exec(`aws s3 cp ${localStarterComponentsPath} ${rcdnS3starterComponentsPath} --profile $AWS_PROFILE`);
   }
 
-   // invalidate the cloudfront so that new starter component can get replaced.
+  // invalidate the cloudfront so that new starter component can get replaced.
   if (!pushResult.stderr) {
     pushResult = shell.exec(`aws cloudfront create-invalidation --distribution-id ${stagingCdnDistributionID} --paths "/*" --profile $AWS_PROFILE`);
   }
@@ -1181,7 +1181,7 @@ async function buildQaChangesOutput(done) {
   console.log('-----------------------------------------------------------------------');
   for (const change of qaChanges.changes) {
     console.log(`${change.commit}: ${change.whatChanged}`);
-    if(change.ticketUrl) {
+    if (change.ticketUrl) {
       console.log(change.ticketUrl);
     }
     console.log('');
@@ -1214,7 +1214,7 @@ function validateBuildEnvironment(done) {
   // Adding check to make sure we have a valid aws sso token.
   // If we do not have a valid token then we will get error as follows - "Error when retrieving token from sso: Token has expired and refresh failed."
   let response = shell.exec('aws sts get-caller-identity');
-  if(response.stderr) {
+  if (response.stderr) {
     done(new NoStackError(`\x1b[31m AWS SSO error: ${response.stderr.replace(/[\r\n]+/g, '')}. \x1b[0m \x1b[33mHint: Make sure you have run valet aws command to get a new token.\x1b[0m`));
   }
 
@@ -1276,7 +1276,7 @@ exports.verifyLocalClientErrorConfigIsCurrent = verifyLocalClientErrorConfigIsCu
 // Automated test related
 // Because automated-tests has to call ts-node/register it takes over 300ms to load so we only want to load when necessary. We are adding wrappers for these functions here
 let _automatedTests;
-function automatedTests () {
+function automatedTests() {
   if (!_automatedTests) {
     _automatedTests = require('./js/automated-tests');
   }
@@ -1326,7 +1326,7 @@ async function installCompanionChannel(done) {
   const rokuDeploy = require('roku-deploy');
   const env = process.env;
 
-  const options = rokuDeploy.getOptions({project: 'companion-channel/bsconfig.json'});
+  const options = rokuDeploy.getOptions({ project: 'companion-channel/bsconfig.json' });
   await rokuDeploy.deploy({
     ...options,
     host: env.ROKU_DEV_TARGET,
@@ -1339,7 +1339,7 @@ async function packageCompanionChannel(done) {
   const rokuDeploy = require('roku-deploy');
   const env = process.env;
 
-  const options = rokuDeploy.getOptions({project: 'companion-channel/bsconfig.json'});
+  const options = rokuDeploy.getOptions({ project: 'companion-channel/bsconfig.json' });
   await rokuDeploy.deployAndSignPackage({
     ...options,
     host: env.ROKU_DEV_TARGET,
