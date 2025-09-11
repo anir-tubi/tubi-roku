@@ -251,6 +251,7 @@ Function populateInfoPanelForLiveEvent(content, infoPanel)
 
   infoPanel.title = content.title
   infoPanel.description = content.description
+  infoPanel.sotTopLabelSignals = content.sotTopLabelSignals
 
   infoPanel.lineOneData = lineOneData
   infoPanel.lineTwoData = {}
