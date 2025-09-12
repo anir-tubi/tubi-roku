@@ -336,8 +336,7 @@ Function getConstants()
   constants.reqNames.postViewableImpression = "postViewableImpression"
   constants.reqNames.getSoTStaticConfig = "getSoTStaticConfig"
   constants.reqNames.statsigInitialize = "statsigInitialize"
-  constants.reqNames.statsigGetConfig = "statsigGetConfig"
-  constants.reqNames.statsigLogExposure = "statsigLogExposure"
+  constants.reqNames.statsigExposure = "statsigExposure"
   constants.reqNames.getEpgListing = "getEpgListing"
 
   ' a list of reqnames that the general task will inject auth headers and should expect to handle 403 errors for
@@ -465,8 +464,7 @@ Function getConstants()
 
   ' Statsig Configuration
   constants.thirdParty.statsig = {}
-  constants.thirdParty.statsig.clientApiKey = "client-alkgSzOCrtvlHNJUx12irbXYuGLrZNcs97hroCMmZH4" 'same clientApiKey for all environment
-  constants.thirdParty.statsig.enabled = true
+  constants.thirdParty.statsig.clientApiKey = "client-alkgSzOCrtvlHNJUx12irbXYuGLrZNcs97hroCMmZH4" 'same clientApiKey for all environments
 
   ' Environment tier mapping based on app mode
   if constants.settings.mode = "production"
@@ -479,8 +477,7 @@ Function getConstants()
 
   ' Network configuration
   constants.thirdParty.statsig.timeout = 10000 ' 10 seconds timeout for API calls
-  constants.thirdParty.statsig.retryCount = 3 ' Number of retries for failed requests
-  constants.thirdParty.statsig.enableLogging = (constants.settings.mode <> "production") ' Enable debug logging for non-prod
+  constants.thirdParty.statsig.retryCount = 0 ' Number of retries for failed requests
 
   'platform is used when communitcating with CMS API
   constants.platform = "roku"
@@ -696,7 +693,6 @@ Function getConstants()
   end if
 
   constants.urls.statsig.initialize = constants.urls.statsig.baseUrl + "initialize"
-  constants.urls.statsig.getConfig = constants.urls.statsig.baseUrl + "get_config"
   constants.urls.statsig.logCustomExposure = constants.urls.statsig.baseUrl + "log_custom_exposure"
 
   ' Configuring the live news manifest proxy url.

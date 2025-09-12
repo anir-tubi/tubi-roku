@@ -1,83 +1,30 @@
 ' Statsig Lib using GeneralTaskModule for HTTP requests
-' @params: context : assocArray, m context
+' @constants: assocArray, constants as set in Constants.brs
 '
-Function StatsigLib(context = {}) as Object
-  if context.makeRequest = invalid OR context.constants = invalid
-    print "[StatsigLib] Make sure GeneralTaskModule has been initialized in the calling context for StatSig"
-    return invalid
-  end if
-
+Function StatsigLib(constants) as Object
   return {
-    constants: context.constants
-    generalTaskContext: context
-    user: invalid ' Store user internally
+    constants: constants
+    user: {}
 
-    ' Public API methods
-    createUser: statsigLib_createUser
+    ' Public methods
     initialize: statsigLib_initialize
-    getConfig: statsigLib_getConfig
     logExposure: statsigLib_logExposure
+    createUser: statsigLib_createUser
 
     ' Private methods
     makeStatsigRequest: statsigLib_makeStatsigRequest
     getCommonHeaders: statsigLib_getCommonHeaders
     getCurrentTime: statsigLib_getCurrentTime
-    log: statsigLib_log
+    isEmptyAssocArray: statsigLib_isEmptyAssocArray
   }
 End Function
 
 
-' Create and store a Statsig user object internally
-' Usage: m.statsigLib.createUser(userId, { userType: "premium" })
-Function statsigLib_createUser(userID = invalid, customAttributes = {})
-  user = {
-    userAgent: m.constants.deviceInfo.userAgent
-    country: m.constants.deviceInfo.countryCode
-    locale: m.constants.deviceInfo.locale
-    appVersion: m.constants.deviceInfo.clientVersion
-    statsigEnvironment: m.constants.thirdParty.statsig.environment
-    ip: "" 'setting as empty to prevent Statsig from inferring the user IP address clients
-    custom: {}
-  }
-
-  ' Add device-specific custom attributes
-  user.custom.deviceModel = m.constants.deviceInfo.model
-  user.custom.operatingSystem = m.constants.deviceInfo.operatingSystem
-  user.custom.firmwareVersion = m.constants.deviceInfo.firmwareVersion
-  user.custom.displayResolution = m.constants.deviceInfo.displayWidth.toStr() + "x" + m.constants.deviceInfo.displayHeight.toStr()
-  user.custom.platform = m.constants.platform
-  user.custom.isLowVram = m.constants.deviceInfo.lowVram
-  user.custom.isLimitedUi = m.constants.deviceInfo.limitedUi
-  user.custom.device_id = m.constants.deviceInfo.deviceId
-
-  ' Add user ID if provided
-  if userID <> invalid AND userID <> ""
-    user.userID = userID
-  else
-    user.userID = m.constants.deviceInfo.deviceId
-  end if
-
-  ' Add any custom attributes
-  if type(customAttributes) = "roAssociativeArray"
-    for each key in customAttributes
-      user.custom[key] = customAttributes[key]
-    end for
-  end if
-
-  ' Store user internally
-  m.user = user
-
-  return user
-End Function
-
-
-' Initialize Statsig for the stored user and get feature gates/configs
-' Usage: m.statsigLib.initialize(onStatsigInitSuccess, onStatsigInitError)
+' Initialize Statsig with user creation and get namespaces & experiments
 '
 Function statsigLib_initialize(successCallback = invalid, errorCallback = invalid)
-  if m.user = invalid
-    m.log("[StatsigLib] Cannot initialize - no user created. Call createUser() first.")
-    return invalid
+  if m.isEmptyAssocArray(m.user) then
+    m.createUser()
   end if
 
   requestBody = {
@@ -101,57 +48,18 @@ Function statsigLib_initialize(successCallback = invalid, errorCallback = invali
     retries: m.constants.thirdParty.statsig.retryCount
   }
 
-  return m.makeStatsigRequest(reqInfo)
+  m.makeStatsigRequest(reqInfo)
 End Function
 
 
-' Get a dynamic config for the stored user
-' Usage: m.statsigLib.getConfig("roku_test_config", onTestConfigReceived, onConfigError)
-'
-Function statsigLib_getConfig(configName, successCallback = invalid, errorCallback = invalid)
-  if m.user = invalid
-    m.log("[StatsigLib] Cannot get config - no user created. Call createUser() first.")
-    return invalid
+Function statsigLib_logExposure(exposureData = {})
+  if m.isEmptyAssocArray(m.user) then
+    m.createUser()
   end if
 
+  exposureData["user"] = m.user
   requestBody = {
-    user: m.user
-    "configName": configName
-  }
-
-  options = {
-    method: "POST"
-    headers: m.getCommonHeaders()
-    body: FormatJson(requestBody)
-  }
-
-  reqInfo = {
-    url: m.constants.urls.statsig.getConfig
-    requestType: m.constants.reqNames.statsigGetConfig
-    options: options
-    successCallback: successCallback
-    errorCallback: errorCallback
-    responseType: "assocarray"
-    timeoutInMilliSec: m.constants.thirdParty.statsig.timeout
-    retries: m.constants.thirdParty.statsig.retryCount
-  }
-
-  return m.makeStatsigRequest(reqInfo)
-End Function
-
-
-' Log exposure events for A/B testing
-' Usage:
-' exposure = {
-'   user: m.statsigLib.user ' or any user object
-'   experimentName: "button_swap_experiment"
-'   group: experimentGroup
-' }
-' m.statsigLib.logExposure([exposure])
-'
-Function statsigLib_logExposure(exposures, successCallback = invalid, errorCallback = invalid)
-  requestBody = {
-    exposures: exposures
+    exposures: [exposureData]
   }
 
   options = {
@@ -162,32 +70,25 @@ Function statsigLib_logExposure(exposures, successCallback = invalid, errorCallb
 
   reqInfo = {
     url: m.constants.urls.statsig.logCustomExposure
-    requestType: m.constants.reqNames.statsigLogExposure
+    requestType: m.constants.reqNames.statsigExposure
     options: options
-    successCallback: successCallback
-    errorCallback: errorCallback
-    responseType: "assocarray"
-    timeoutInMilliSec: m.constants.thirdParty.statsig.timeout
-    retries: 1
+    responseType: "string"
     silenceCallbackWarnings: true
+    timeoutInMilliSec: m.constants.thirdParty.statsig.timeout
+    retries: m.constants.thirdParty.statsig.retryCount
   }
 
-  return m.makeStatsigRequest(reqInfo)
+  m.makeStatsigRequest(reqInfo)
 End Function
 
 
-' Make HTTP request using GeneralTaskModule
+' Make HTTP request using GenstateralTaskModule
 Function statsigLib_makeStatsigRequest(reqInfo)
-  m.log("Making Statsig request: " + reqInfo.requestType + " to " + reqInfo.url)
-  result = m.generalTaskContext.makeRequest(reqInfo)
+  makeRequest = getGlobalAA().makeRequest
 
-  if result <> invalid
-    m.log("Statsig request initiated successfully: " + reqInfo.requestType)
-  else
-    m.log("Failed to initiate Statsig request: " + reqInfo.requestType)
+  if makeRequest <> invalid then
+    makeRequest(reqInfo)
   end if
-
-  return result
 End Function
 
 
@@ -213,9 +114,45 @@ Function statsigLib_getCurrentTime()
 End Function
 
 
-' Internal logging function
-Function statsigLib_log(message)
-  if m.constants.thirdParty.statsig.enableLogging = true
-    tubiLog("[StatsigLib] " + message, "info")
-  end if
+' Create and store a Statsig user object
+Function statsigLib_createUser()
+  deviceInfo = m.constants.deviceInfo
+
+  user = {
+    "userAgent": deviceInfo.userAgent
+    "country": deviceInfo.countryCode
+    "locale": deviceInfo.locale
+    "appVersion": deviceInfo.clientVersion
+    "statsigEnvironment": m.constants.thirdParty.statsig.environment
+    "ip": ""
+    "userID": ""
+    "custom": {}
+    "customIDs": {}
+  }
+
+  custom = {
+    "deviceModel": deviceInfo.model
+    "operatingSystem": deviceInfo.operatingSystem
+    "firmwareVersion": deviceInfo.firmwareVersion
+    "displayResolution": deviceInfo.displayWidth.toStr() + "x" + deviceInfo.displayHeight.toStr()
+    "platform": m.constants.platform
+    "isLowVram": deviceInfo.lowVram
+    "isLimitedUi": deviceInfo.limitedUi
+  }
+  user.custom = custom
+
+  customIDs = {
+    "device_id": deviceInfo.deviceId
+  }
+  user["customIDs"] = customIDs
+
+  m.user = user
+End Function
+
+
+' Helper function to check if an associative array is empty
+Function statsigLib_isEmptyAssocArray(assocArray)
+  if assocArray = invalid then return true
+  if type(assocArray) <> "roAssociativeArray" then return true
+  return assocArray.count() = 0
 End Function

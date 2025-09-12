@@ -42,6 +42,13 @@ Function getExperimentsInfoFromGlobal()
 End Function
 
 
+' make sure theme is set in the case that m.global is not immediately available
+' limits the number of attempts so the while loop doesn't block into perpetuity.
+Function getStatsigExperimentsInfoFromGlobal()
+  return getFieldFromGlobal("statsigExperimentsInfo")
+End Function
+
+
 Function getSoTStaticConfigFromGlobal()
   return getFieldFromGlobal("soTStaticConfig")
 End Function

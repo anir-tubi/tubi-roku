@@ -127,7 +127,29 @@ Function onExperimentsRequestSuccess(experimentsInfo)
   m.global.experimentsInfo = experimentsInfo
   m.isExperimentsConfigReady = true
   m.updateGeneralTaskExperimentsInfo(experimentsInfo)
+
+  ' Statsig experiments are now initialized in parallel with Tubi experiments
   runControllerStartSequence()
+End Function
+
+
+' Initialize Statsig experiments using encapsulated StatsigExperiments
+Function initializeStatsigExperiments()
+  tubiLog("initializeStatsigExperiments")
+  m.statsigExperiments = StatsigExperiments(m.constants)
+
+  if m.global.hasField("statsigExperimentsInfo") = false
+    m.global.addField("statsigExperimentsInfo", "assocarray", false)
+  end if
+
+  if m.statsigExperiments <> invalid
+    m.statsigExperiments.initialize(onStatsigInitializationSuccess, onStatsigInitializationError)
+  else
+    TubiLog("Failed to create StatsigExperiments instance")
+    'Mark isStatsigConfigReady as ready and continue startup sequence
+    m.isStatsigConfigReady = true
+    runControllerStartSequence()
+  end if
 End Function
 
 
@@ -136,6 +158,8 @@ Function onExperimentsRequestFailure(_responses)
   TubiLog("onExperimentsRequestFailure")
   ' Continue using the local defaults.
   m.isExperimentsConfigReady = true
+
+  ' Statsig experiments are now initialized in parallel with Tubi experiments
   runControllerStartSequence()
 End Function
 
@@ -165,6 +189,7 @@ Function onExternalConfigRequestSuccess(config)
   m.isExternalConfigReady = true
 
   sendRequestForExperiments()
+  initializeStatsigExperiments()
   retrieveSoTStaticConfig()
 End Function
 
@@ -197,6 +222,7 @@ Function onExternalConfigRequestFailure(_error)
   m.isExternalConfigReady = true
 
   sendRequestForExperiments()
+  initializeStatsigExperiments()
   retrieveSoTStaticConfig()
 End Function
 
@@ -343,3 +369,44 @@ Function setSoTStaticConfigComplete()
   m.soTStaticConfigComplete = true
   runControllerStartSequence()
 End Function
+
+
+' Statsig initialization success callback
+' @successResponse: assocarray, response object from Statsig initialization
+'
+Function onStatsigInitializationSuccess(successResponse)
+  ' Mark Statsig as ready
+  m.isStatsigConfigReady = true
+
+  ' Process the Statsig response through the StatsigExperiments instance
+  if m.statsigExperiments <> invalid
+    m.global.statsigExperimentsInfo = m.statsigExperiments.processStatsigResponse(successResponse)
+    tubiLog("StatsigExperiments processed and stored globally")
+  else
+    tubiLog("Warning: StatsigExperiments instance not available for response processing")
+  end if
+
+  runControllerStartSequence()
+End Function
+
+
+' Statsig initialization error callback
+' @errorResponse: assocarray, error object from Statsig initialization
+'
+Function onStatsigInitializationError(errorResponse)
+  ' Mark Statsig as ready (even though it failed) so app can continue
+  m.isStatsigConfigReady = true
+
+  ' Log detailed error information for debugging
+  if errorResponse <> invalid
+    if errorResponse.error <> invalid
+      tubiLog("Statsig error details: " + errorResponse.error)
+    end if
+    if errorResponse.statusCode <> invalid
+      tubiLog("Statsig HTTP status code: " + errorResponse.statusCode.toStr())
+    end if
+  end if
+
+  runControllerStartSequence()
+End Function
+

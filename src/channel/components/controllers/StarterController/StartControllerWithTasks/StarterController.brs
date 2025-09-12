@@ -18,7 +18,7 @@ Function setupFullStarterController()
 End Function
 
 
-Function sendExposureEvent(namespaceName as string, experimentName as string, experimentsLib)
+Function sendExposureEvent(namespaceName as String, experimentName as String, experimentsLib)
   exposureInfo = experimentsLib.getExperimentTracking(namespaceName, experimentName)
 
   if exposureInfo <> invalid
@@ -39,38 +39,38 @@ End Function
 ' Called in StarterController's runControllerStartSequence. Used to specify what remote components URL to use
 Function getRemoteComponentsUrl()
   ' if an experiment or remote config needs to update the remoteComponentsUrl, do it here.
-      ' (experiment tracking should not happen here. It should happen when the user encounters the experiment!)
-      '-------------------------------------------------------------------------------------'
-      ' EXPERIMENT EXAMPLE
-      ' experiments = TubiExperiments(experimentsInfo)
-      ' sideNavEnabled = m.experiments.getExperimentResource("RokuNamespace", "roku_side_nav").enabled
-      ' if sideNavEnabled = true
-      '   remoteComponentsUrl = "someUrl"
-      ' else
-      '   remoteComponentsUrl = "someOtherUrl"
-      ' end if
-      '
-      ' sendExposureEvent("RokuNamespace", "roku_side_nav", experiments)
-      '
-      ' REMOTE/EXTERNAL CONFIG EXAMPLE:
-      ' remoteComponentsUrl = m.global.externalConfig.sideNavRemoteComponentsUrl
-      '-------------------------------------------------------------------------------------'
-      remoteComponentsUrl = m.constants.settings.remoteComponentsUrl
+  ' (experiment tracking should not happen here. It should happen when the user encounters the experiment!)
+  '-------------------------------------------------------------------------------------'
+  ' EXPERIMENT EXAMPLE
+  ' experiments = TubiExperiments(experimentsInfo)
+  ' sideNavEnabled = m.experiments.getExperimentResource("RokuNamespace", "roku_side_nav").enabled
+  ' if sideNavEnabled = true
+  '   remoteComponentsUrl = "someUrl"
+  ' else
+  '   remoteComponentsUrl = "someOtherUrl"
+  ' end if
+  '
+  ' sendExposureEvent("RokuNamespace", "roku_side_nav", experiments)
+  '
+  ' REMOTE/EXTERNAL CONFIG EXAMPLE:
+  ' remoteComponentsUrl = m.global.externalConfig.sideNavRemoteComponentsUrl
+  '-------------------------------------------------------------------------------------'
+  remoteComponentsUrl = m.constants.settings.remoteComponentsUrl
 
-      if m.constants.settings.useFullStarterController <> true then
-        experimentsInfo = getExperimentsInfoFromGlobal()
-        experiments = TubiExperiments(experimentsInfo)
-        if experiments <> invalid then
-          if m.constants.settings.mode <> "dev"
-            if experiments.getExperimentResource("roku_new_cdn", "roku_new_cdn_v1").enabled = true
-              remoteComponentsUrl = m.constants.settings.rcdnRemoteComponentsUrl
-            end if
-          end if
+  if m.constants.settings.useFullStarterController <> true then
+    experimentsInfo = getExperimentsInfoFromGlobal()
+    experiments = TubiExperiments(experimentsInfo)
+    if experiments <> invalid then
+      if m.constants.settings.mode <> "dev"
+        if experiments.getExperimentResource("roku_new_cdn", "roku_new_cdn_v1").enabled = true
+          remoteComponentsUrl = m.constants.settings.rcdnRemoteComponentsUrl
         end if
       end if
-      '-------------------------------------------------------------------------------------'
-      '-------------------------------------------------------------------------------------'
-      return remoteComponentsUrl
+    end if
+  end if
+  '-------------------------------------------------------------------------------------'
+  '-------------------------------------------------------------------------------------'
+  return remoteComponentsUrl
 End Function
 
 

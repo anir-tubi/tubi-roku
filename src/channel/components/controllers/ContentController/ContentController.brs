@@ -32,6 +32,7 @@ Function init()
 
   m.isExternalConfigReady = false ' Used to know when external config has been loaded so we know if we can proceed
   m.isExperimentsConfigReady = false ' Used to know when experiments have been loaded so we know if we can proceed
+  m.isStatsigConfigReady = false ' Used to know when Statsig experiments have been loaded so we know if we can proceed
   m.soTStaticConfigComplete = false ' Used to know when the SoT static config has been loaded so we know if we can proceed
 
   ' Holds the callback method value which will be called once the initial get consent request is completed.
@@ -41,6 +42,9 @@ Function init()
   ' Since One trust sdk access m.global.OTsdk within it's codebase we need to update the m.global.OTsdk to have the sdk instance.
   ' The reason why we are also storing it's reference in m scope for better performance since we access the sdk instance a lot of items during the app session.
   m.oneTrust = invalid
+
+  m.global.addField("statsigExposureInfo", "assocarray", false)
+  m.global.observeFieldScoped("statsigExposureInfo", "onStatsigExposureInfoChange")
 
   retrieveClientErrorConfig(retrieveClientErrorConfigSuccessCallbackTriggerRetrieveInitialAuthInfo, retrieveClientErrorConfigErrorCallbackTriggerRetrieveInitialAuthInfo)
 
@@ -701,8 +705,9 @@ End Function
 Function runControllerStartSequence()
   tubiLog("ContentController.runControllerStartSequence")
   cleanRegistry()
-  if m.isExternalConfigReady <> true OR m.isExperimentsConfigReady <> true then
-    ' Wait for external and experiments config to be ready before proceeding
+  if m.isExternalConfigReady <> true OR m.isExperimentsConfigReady <> true OR m.isStatsigConfigReady <> true then
+    ' Wait for external config, experiments config, and Statsig config to be ready before proceeding
+    tubiLog("Waiting for configs - External: " + m.isExternalConfigReady.toStr() + ", Experiments: " + m.isExperimentsConfigReady.toStr() + ", Statsig: " + m.isStatsigConfigReady.toStr())
   else if m.uiGroup = invalid then
     ' checks if the controller's UI has been added as children
     addControllerUi()
@@ -3466,4 +3471,22 @@ Function processUserContentSelectionAfterSignIn()
   showContentGroupAndHideSpinner()
   refreshUiAfterSignIn()
   setContentToRefreshAllPersonalizedScreens(true)
+End Function
+
+
+Function onStatsigExposureInfoChange(msg)
+  data = msg.getData()
+  sendStatsigExposureEvent(data)
+End Function
+
+
+Function sendStatsigExposureEvent(exposureInfo)
+  if exposureInfo <> invalid
+
+    if m.statsigExperiments = invalid
+      m.statsigExperiments = StatsigExperiments(m.constants)
+    end if
+
+    m.statsigExperiments.logExposure(exposureInfo)
+  end if
 End Function
