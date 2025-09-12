@@ -332,7 +332,12 @@ Function onSideNavItemSelected()
     '//if currentScreen no longer = the screen that
     '//same item was selected, do nothing other than closing the menu
     hideNavMenu(false)
-    focusCurrentScreen()
+    ' Mostly happens during automation run but could happen for a regular user.
+    ' If user clicking on home side nav item and modal being shown concurrently us force setting focus to current screen causes the modal to lose focus.
+    ' So we are checking if the modal is not open before setting focus to current screen.
+    if getTopModal() = invalid
+      focusCurrentScreen()
+    end if
   end if
 
   '//Dispatch what side nav button was selected. Do this after the app has reacted to the side nav selection and the current screen has had a chance to change based on the side nav selection

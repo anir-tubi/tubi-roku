@@ -15,7 +15,7 @@ describe('Welcome Registration', function () {
     const welcomeRegModalSignInButton = await testUtils.getNodeForElement('welcomeRegModalSignInButtonFocused');
     const welcomeRegModalContinueAsGuestButton = await testUtils.getNodeForElement('welcomeRegModalContinueAsGuestButton');
 
-    expect(welcomeRegModalHeader.text).to.equal('Tubi is better when you sign in');
+    expect(welcomeRegModalHeader.text).to.equal('Welcome to Tubi');
     expect(welcomeRegModalSignInButton.text).to.equal('Continue to Sign In');
     expect(welcomeRegModalContinueAsGuestButton.text).to.equal('Continue as Guest');
   });
