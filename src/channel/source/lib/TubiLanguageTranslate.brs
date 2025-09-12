@@ -2223,6 +2223,18 @@ Function getTranslation_en_US()
     "content_unavailable": {
       "description": "Button label when the content is unavailable",
       "message": "Content Unavailable"
+    },
+    "reminder_set_toast_header": {
+      "description": "Toast message header that is displayed when we set a reminder for a content",
+      "message": "New Reminder Added"
+    },
+    "reminder_set_toast_subheader": {
+      "description": "Toast message sub header that is displayed when we set a reminder for a content",
+      "message": "We'll notify you as soon as this becomes available to watch."
+    },
+    "reminder_set_button_label": {
+      "description": "Label of the button to remove a reminder for a content",
+      "message": "Reminder Set"
     }
   }
 End Function

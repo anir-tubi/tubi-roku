@@ -2,7 +2,7 @@
 ' formatLengthAsTimestamp
 '
 ' take a float or integer length in seconds, transform to timestamp "HH:MM:SS".
-Function formatLengthAsTimestamp(length As Dynamic) As String
+Function formatLengthAsTimestamp(length as Dynamic) as String
   if type(length) = "Float" OR type(length) = "roFloat" OR type(length) = "Double" then length = Int(length)
   if (type(length) = "Integer" OR type(length) = "roInteger") AND length > 0 then
     hours = length \ 3600
@@ -20,7 +20,7 @@ End Function
 ' formatLengthAsTimestampWithoutHours
 '
 ' take a float or integer length in seconds, transform to timestamp "MM:SS".
-Function formatLengthAsTimestampWithoutHours(length As Dynamic) As String
+Function formatLengthAsTimestampWithoutHours(length as Dynamic) as String
   if type(length) = "roFloat" OR type(length) = "Double" then length = Int(length)
   if (type(length) = "Integer" OR type(length) = "roInteger") AND length > 0 then
     minutes = length \ 60
@@ -37,7 +37,7 @@ End Function
 '
 ' take a float or integer length in seconds, transform to timestamp "MM:SS".
 ' if the length is >= 3600, then it will return as "HH:MM:SS"
-Function formatLengthasMinsAndSecs(length As Dynamic) As String
+Function formatLengthasMinsAndSecs(length as Dynamic) as String
   if type(length) = "Float" OR type(length) = "roFloat" OR type(length) = "Double" then length = Int(length)
   if (type(length) = "Integer" OR type(length) = "roInteger") AND length >= 0 then
     minutes = (length mod 3600) \ 60
@@ -55,7 +55,7 @@ End Function
 '
 ' take a float or integer length in seconds, transform to 'x hours y min'
 
-Function formatLengthAsHourAndMins(length As Dynamic) As String
+Function formatLengthAsHourAndMins(length as Dynamic) as String
   if type(length) = "roFloat" OR type(length) = "Double" then length = Int(length)
 
   if (type(length) = "Integer" OR type(length) = "roInteger") AND length > 0 then
@@ -86,12 +86,12 @@ End Function
 '         @c: String, will be prepended based on width
 ' return: result with padstring with specified width
 ' Example: padString('12345', 8, '0') => '00012345'
-Function padString(s As String, width As Integer, c as String)
+Function padString(s as String, width as Integer, c as String)
   result = s.trim()
   result_length = result.Len()
   if result_length < width
     difference = width - result_length
-    prependText = right(String(difference, c), difference)
+    prependText = right(string(difference, c), difference)
     result = prependText + result
   end if
   return result
@@ -109,7 +109,7 @@ End Function
 ' padStringLeft("bbb", "0123", 8) = "01230123bbb"
 ' padString("bbb", 8, "0123") = "30123bbb"
 
-Function padStringLeft(originalString, padString, minLength) as string
+Function padStringLeft(originalString, padString, minLength) as String
   originalString = originalString.Trim()
   while originalString.Len() < minLength
     originalString = padString + originalString
@@ -122,7 +122,7 @@ End Function
 ' capitalize
 '
 ' Make the first letter uppercase, the reset lowercase
-Function capitalize(s As String)
+Function capitalize(s as String)
   if s.len() > 0 then
     return Ucase(Left(s, 1)) + LCase(Right(s, s.len() - 1))
   else
@@ -248,7 +248,7 @@ Function convertFunctionToString(func)
 
   functionStr = ""
   if type(func) = "roFunction" OR type(func) = "Function"
-    functionStr = func.ToStr().Replace("Function: ","")
+    functionStr = func.ToStr().Replace("Function: ", "")
   end if
   return functionStr
 
@@ -262,7 +262,7 @@ End Function
 'returns AM/PM appended time format
 '******************************************************
 
-Function GetAMPMTimeString(dateTime, bIncludeSpaceSeparator = true) as string
+Function GetAMPMTimeString(dateTime, bIncludeSpaceSeparator = true) as String
   if dateTime.GetHours() - 12 >= 0
     amPm = "PM"
   else

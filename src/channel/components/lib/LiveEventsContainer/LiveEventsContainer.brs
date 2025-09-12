@@ -194,7 +194,7 @@ Function refreshButtonList()
           reminderTranslationId = "screenDetails_button_set_reminder"
           iconUrl = "pkg:/images/set-reminder.webp"
         else
-          reminderTranslationId = "screenDetails_button_remove_reminder"
+          reminderTranslationId = "reminder_set_button_label"
           iconUrl = "pkg:/images/reminder-set.webp"
         end if
 

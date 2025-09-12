@@ -167,6 +167,13 @@ Function onSetReminderSuccess(response)
     content.id = response.content_id
     content.bookmarkId = response.id
     refreshReminderStatus(content, true)
+
+    showToast({
+      "selfDestructTimer": 5
+      "headerText": getTranslation("reminder_set_toast_header")
+      "message": getTranslation("reminder_set_toast_subheader")
+      "imageUri": "pkg:/images/reminder-set-filled.webp"
+    })
   end if
 End Function
 
