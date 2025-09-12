@@ -837,6 +837,8 @@ Function retrieveFoxListingResponseSuccess(response)
         }
       }
       m.trackingLoggingTask.trackEvent = event
+    else if listing = invalid AND foxVideoPlayerWrapperScreen <> invalid then
+      closeFoxVideoPlayer()
     end if
   end if
 End Function
