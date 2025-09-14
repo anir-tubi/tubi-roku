@@ -11,11 +11,11 @@
 
   <interface>
     <field id="itemContent" type="node" />
-    <field id="focusPercent" type="float" />
     <field id="width" alias="poster.width, border.width" />
     <field id="height" alias="poster.height, border.height, title.height" />
     <field id="rowListHasFocus" type="boolean" />
     <field id="itemHasFocus" type="boolean" />
+    <field id="rowHasFocus" type="boolean" />
   </interface>
 
   <children>

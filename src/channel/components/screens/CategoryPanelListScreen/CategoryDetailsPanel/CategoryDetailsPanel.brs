@@ -20,7 +20,7 @@ Function init()
   m.InfoPanel = m.top.findNode("ChannelsInfoPanel")
   m.PageTitleAndCounter = m.top.findNode("pageTitleAndCounter")
   m.ContentGrid = m.top.findNode("ChannelsContentGrid")
-  if getExperimentResource("roku_category_large_poster","roku_category_large_poster_v1", false).enabled = true
+  if getExperimentResource("roku_category_large_poster", "roku_category_large_poster_v1", false).enabled = true
     m.ContentGrid.itemSize = [291, 417]
   else
     m.ContentGrid.itemSize = m.constants.ui.imageSizes.largePoster
@@ -215,7 +215,7 @@ Function onItemFocused(msg)
         m.top.trackingPageInfo = trackingPageInfo
 
         ' trigger navigate_within_page events in ContentController
-        col = 1 + (item MOD numColumns)
+        col = 1 + (item mod numColumns)
         row = 1 + (item \ numColumns)
 
         m.top.navigateWithinPageInfo = {
@@ -290,7 +290,9 @@ End Function
 '@content: roSGNode, a content node
 Function populateInfoPanel(infoPanel, content)
   if content <> invalid
-    if content.type = m.constants.ui.contentTypes.sportsEvent
+    if isAA(content.scheduleData) = true
+      populateInfoPanelForLiveEvent(content, infoPanel)
+    else if content.type = m.constants.ui.contentTypes.sportsEvent
       populateInfoPanelWithHomescreenStyleSportsMode(content, infoPanel)
     else if content.type = m.constants.ui.contentTypes.channel
       infoPanel.mode = m.constants.ui.infoPanelModes.channel
@@ -331,7 +333,7 @@ End Function
 
 Function getTrackingComponentInfo(itemIndex, numColumns, category, trackingLib)
   if trackingLib <> invalid AND category <> invalid
-    column = 1 + (itemIndex MOD numColumns)
+    column = 1 + (itemIndex mod numColumns)
     row = 1 + (itemIndex \ numColumns)
     content = category.getChild(itemIndex)
 
@@ -341,7 +343,7 @@ Function getTrackingComponentInfo(itemIndex, numColumns, category, trackingLib)
       category_col: column
     }
 
-    if content.type  = m.constants.ui.contentTypes.channel
+    if content.type = m.constants.ui.contentTypes.channel
       componentInfo.utility_tile = m.Tracking.getUtilityTile(content, column, row)
     else
       componentInfo.content_tile = m.Tracking.getAnalyticsTile(content, column, row)
@@ -367,7 +369,7 @@ Function updateTrackingInfo(category, content, itemSelected)
     end if
 
     numColumns = m.ContentGrid.numColumns
-    col = 1 + (itemSelected MOD numColumns)
+    col = 1 + (itemSelected mod numColumns)
     row = 1 + (itemSelected \ numColumns)
 
     componentInfo = {
@@ -376,12 +378,12 @@ Function updateTrackingInfo(category, content, itemSelected)
       category_col: col
     }
 
-    if content.type  = m.constants.ui.contentTypes.channel
+    if content.type = m.constants.ui.contentTypes.channel
       componentInfo.utility_tile = m.Tracking.getUtilityTile(content, col, row)
     else
       componentInfo.content_tile = m.Tracking.getAnalyticsTile(content, col, row)
     end if
-    
+
     'Set the tracking component of the item that was selected so it can be accessed as part of the navigateToPage event
     m.top.trackingComponentInfo = {
       componentType: "category_component"
