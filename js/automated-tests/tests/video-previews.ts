@@ -13,7 +13,7 @@ describe('Video Preview', function () {
       type: 'movie'
     });
     await testUtils.startApplicationAtPage('home', { user: user });
-    
+
 
     // Now find where the My List Row is and jump to it
     const myListIndex = await testUtils.jumpToRowWithTitle('homeScreenRowList', 'My List');
@@ -27,7 +27,7 @@ describe('Video Preview', function () {
     const { value: row } = await odc.getValue(args);
     const json = JSON.parse(row.json);
     const videoPreviewUrl = json[row.children[0].id].video_preview_url;
-  
+
     await testUtils.retryWithTimeOut(async () => {
       const args = testUtils.getElementKeyPath('previewVideoPlayer');
       args.keyPath += `.content`;
@@ -37,13 +37,13 @@ describe('Video Preview', function () {
     });
 
     // Verify that video is playing
-    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer','playing', 10000);
+    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 10000);
 
     // Go to the detail screen
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify that video is still playing
-    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer','playing', 10000);
+    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 10000);
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/257900
@@ -52,7 +52,7 @@ describe('Video Preview', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Verify that video is playing
-    await checkForPreview(); 
+    await checkForPreview();
 
   });
 
@@ -72,10 +72,10 @@ describe('Video Preview', function () {
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 10000);
     const detailScreenPanel = await testUtils.getNodeForElement('detailScreenPanel');
     expect(detailScreenPanel.opacity).to.be.equal(1);
-    
+
 
     // Verify that video is still playing
-    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer','playing', 10000);
+    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 10000);
 
   });
 
@@ -91,14 +91,14 @@ describe('Video Preview', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify that video is still playing
-    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer','playing', 5000);
+    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 5000);
 
     // Back to home screen
     await ecp.sendKeypress(ecp.Key.Back);
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Verify that video is still playing
-    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer','playing', 5000);
+    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 5000);
 
   });
 
@@ -143,13 +143,13 @@ describe('Video Preview', function () {
     await utils.sleep(90000); // IMPROVEMENT with helper (See to End)
 
     // Verify that video is playing
-    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 10000);
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 10000);
 
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/264838
   it('C264838 - Access Kids Mode and ensure the behavior of the Video Preview mirrors that of the non-kids mode @videopreview', async () => {
-    
+
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
@@ -158,9 +158,9 @@ describe('Video Preview', function () {
 
     // Navigate right to home page focus
     await utils.sleep(2500);
-    await ecp.sendKeypress(ecp.Key.Right, {wait:1500});
-    await ecp.sendKeypress(ecp.Key.Down,  {count:3});
-  
+    await ecp.sendKeypress(ecp.Key.Right, { wait: 1500 });
+    await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
+
     // Verify that video is playing
     await checkForPreview();
 
@@ -168,7 +168,7 @@ describe('Video Preview', function () {
     await utils.sleep(90000);
 
     // Verify that video is playing
-    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 5000);
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 5000);
 
   });
 
@@ -216,15 +216,7 @@ describe('Video Preview', function () {
     await testUtils.startApplicationAtPage('home', { user: user });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Navigate to My Stuff
-    await ecp.sendKeypress(ecp.Key.Left);
-
-    // Check for left nav home button
-    await testUtils.waitForElementToFullyShowOnScreen('leftNavHomeButton');
-    await utils.sleep(1000);
-    await ecp.sendKeypress(ecp.Key.Down, {count:2});
-    await testUtils.waitForElementToFullyShowOnScreen('myStuffLeftNav');
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuff();
 
     // Let's check for My Stuff page, CW row here
     await testUtils.waitForElementToFullyShowOnScreen('myStuffContinueWatchingRow');
@@ -246,15 +238,12 @@ describe('Video Preview', function () {
     await ecp.sendKeypress(ecp.Key.Back);
 
     await testUtils.waitForElementToFullyShowOnScreen('emptyMyStuffButton');
-
-    // Check for presence of Video Player
-    const previewVideoPlayer = await testUtils.getNodeForElement('previewVideoPlayer');
-    expect(previewVideoPlayer.visible).to.be.false;
+    await testUtils.waitForElementToNotShowOnScreen('previewVideoPlayer');
   });
 
-   // https://tubi.testrail.io/index.php?/cases/view/257906
-   it('C257906 - Ensure when user hovers to the next video preview supported title the preview changes to that new title @videopreview', async () => {
-    
+  // https://tubi.testrail.io/index.php?/cases/view/257906
+  it('C257906 - Ensure when user hovers to the next video preview supported title the preview changes to that new title @videopreview', async () => {
+
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
@@ -267,26 +256,14 @@ describe('Video Preview', function () {
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/676756
-   it('C676756 - "Autoplay Previews" setting defaults to "on" when user signs out @videopreview', async () => {
+  it('C676756 - "Autoplay Previews" setting defaults to "on" when user signs out @videopreview', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Open Left Nav and Turn off Video Preview
-    await ecp.sendKeypress(ecp.Key.Left);
-    await testUtils.jumpToRowWithTitle('sideNavMenu', 'Settings');
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await testUtils.waitForCurrentScreenToEqual('settingsScreen');
-
-    await testUtils.jumpToRowWithTitle('settingsMenu', 'Autoplay Controls');
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await testUtils.waitForElementToFullyShowOnScreen('autoplayPreviewOn');
-    await ecp.sendKeypress(ecp.Key.Down);
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await testUtils.waitForElementToFullyShowOnScreen('previewOffCheckMark');
+    await shared.turnOffPreview();
 
     // Sign out
-    await ecp.sendKeypress(ecp.Key.Back, {count:2});
     await testUtils.waitForCurrentScreenToEqual('homeScreen');
     await ecp.sendKeypress(ecp.Key.Left);
     await testUtils.jumpToRowWithTitle('sideNavMenu', 'Hi ');
@@ -298,43 +275,44 @@ describe('Video Preview', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     await testUtils.waitForCurrentScreenToEqual('homeScreen');
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await utils.sleep(5000);
     // Verify that video is playing
     await checkForPreview();
 
     // Check Preview in Settings
-    await ecp.sendKeypress(ecp.Key.Left);
-    await testUtils.jumpToRowWithTitle('sideNavMenu', 'Settings');
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Back);
+    await shared.openSettings();
     await testUtils.waitForCurrentScreenToEqual('settingsScreen');
 
     await testUtils.jumpToRowWithTitle('settingsMenu', 'Autoplay Controls');
-    await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForElementToFullyShowOnScreen('autoplayPreviewOn');
+    await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForElementToFullyShowOnScreen('previewOnCheckMark');
   });
 });
 
 
 
-  async function openKidsMode() {
+async function openKidsMode() {
 
-    await ecp.sendKeypress(ecp.Key.Left);
-    await ecp.sendKeypress(ecp.Key.Up);
-    await utils.sleep(3000); // Adding sleeps temporary // Improvement - try to work around sleeps
-    await ecp.sendKeypress(ecp.Key.Up);
-    await ecp.sendKeypress(ecp.Key.Ok);
-    const exitKidsOption = await testUtils.getNodeForElement('exitKidsOption');
-    expect(exitKidsOption.visible).to.be.true;
+  await ecp.sendKeypress(ecp.Key.Left);
+  await ecp.sendKeypress(ecp.Key.Up);
+  await utils.sleep(3000); // Adding sleeps temporary // Improvement - try to work around sleeps
+  await ecp.sendKeypress(ecp.Key.Up);
+  await ecp.sendKeypress(ecp.Key.Ok);
+  const exitKidsOption = await testUtils.getNodeForElement('exitKidsOption');
+  expect(exitKidsOption.visible).to.be.true;
+}
+
+async function checkForPreview() {
+  const rowIndex = 0;
+  const content = await testUtils.getRowListRowItemsContent('homeScreenRowList', 0);
+  for (const [itemIndex, item] of content.entries()) {
+    if (item.video_preview_url !== '') {
+      await testUtils.jumpToRowItem('homeScreenRowList', [rowIndex, itemIndex]);
+      break;
+    }
   }
-
-  async function checkForPreview() {
-    const rowIndex = 0;
-    const content = await testUtils.getRowListRowItemsContent('homeScreenRowList', 0);
-    for (const [itemIndex, item] of content.entries()) {
-      if (item.video_preview_url !== '') {
-        await testUtils.jumpToRowItem('homeScreenRowList', [rowIndex, itemIndex]);
-        break;
-      }
-    }
-    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer','playing', 5000);
-    }
+  await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 5000);
+}

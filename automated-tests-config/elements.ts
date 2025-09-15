@@ -997,15 +997,10 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen',
   },
 
-  /** linear video preview screen */
-  linearVideoPlayerScreenPreview: {
-    keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#LinearPlayerGroup.#linearVideoPlayerScreen',
-  },
   /** linear video screen */
   linearVideoPlayerScreen: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#linearVideoPlayerScreen',
+      '#ContentController.#uiGroup.#ContentGroup.#linearVideoPlayerScreen',
   },
 
   /** Fox Player element ID */
@@ -2416,19 +2411,13 @@ const elements = typeCheckElements({
   /** Sign Up to Save Progress Series detail menu item button text */
   seriesSignUpToSaveProgressButtonText: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.0.#DetailsMenuTextParent.#DetailsMenuText',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuText',
   },
 
   /** Sign Up to Save Progress Series detail menu item button text when have history */
   seriesSignUpToSaveProgressButtonTextOnDetailsPageWithHistory: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuText',
-  },
-
-  /** Sign Up to Save Progress detail menu item badge text */
-  seriesSignUpBadgeLabelText: {
-    keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.0.#badgeLabel.#textLabel',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.2.#DetailsMenuTextParent.#DetailsMenuText',
   },
 
   /** Sign Up to Save Progress Series detail menu item button text */
@@ -2682,6 +2671,10 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#AutoplayPreviewMenu.0'
   },
 
+  autoplayPreviewMenu: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.#AutoplayPreviewMenu'
+  },
+
   // Preview Off Checked
   previewOffCheckMark: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.3.#Offset.#ContentGroup.#AutoplayPreviewMenu.1.#container.0.#checkIcon',
@@ -2693,7 +2686,12 @@ const elements = typeCheckElements({
 
   autoplayNextVideoMenu: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.#AutoPlayTimerMenu'
-  }
+  },
+
+  leftNav: {
+    keyPath:
+      '#ContentController.#uiGroup.#mainItems',
+  },
   
 });
 

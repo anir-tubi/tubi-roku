@@ -7,41 +7,29 @@ describe('Sign up Save Progress TV', function () {
     beforeEach(async () => {
         const user = await testUtils.createAnonymousUser();
         user.setIsNewUser(false);
-        await testUtils.startApplicationAtPage('tv', { user: user });
-        await testUtils.waitForAppLaunchBeaconToFire();
-        // Are we on the Series page?
-        const tvScreenRowList = await testUtils.waitForCurrentScreenToEqual('tvScreen');
+        await testUtils.startApplicationAtPage('home', { user: user });
+        await shared.openSeries();
+        await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
     });
 
 
-// https://tubi.testrail.io/index.php?/cases/view/260843
+    // https://tubi.testrail.io/index.php?/cases/view/260843
     it('C260843 - Guest - When (Tubi) user clicks the "Sign Up to Save Progress" button on the Details page, the user is redirected to the Registration/Sign In modal @signupsaveprogress,@smoke', async () => {
-
         // Select a title
         await ecp.sendKeypress(ecp.Key.Ok);
-
-        // Is Sign Up to Save Progress Button present, with Badge Label?
+        // Is Sign Up to Save Progress Button present?
         const seriesSignUpToSaveProgressButtonText = await testUtils.getNodeForElement('seriesSignUpToSaveProgressButtonText');
         expect(seriesSignUpToSaveProgressButtonText.text).to.equal('Sign Up to Save Progress');
-        const seriesSignUpBadgeLabelText = await testUtils.getNodeForElement('seriesSignUpBadgeLabelText');
-        expect(seriesSignUpBadgeLabelText.text).to.equal('FREE');
 
         // Click and verify user is taken to sign up/sign in flow
+        await ecp.sendKeypress(ecp.Key.Down);
         await ecp.sendKeypress(ecp.Key.Ok);
-
         // Wait for Let's create your account screen
         await utils.sleep(4000);
-
         // Click OK
-        await ecp.sendKeypress(ecp.Key.Ok, {wait:10000});
-
-
+        await ecp.sendKeypress(ecp.Key.Ok, { wait: 10000 });
         // Are we on the magic link page?
         await testUtils.waitForElementToFullyShowOnScreen('emailVerificationButton', 'Email Verification Button not found');
-       
-      
-
-
     });
     /* Magic link issue - need workaround - removed from run, moved to manual
     // https://tubi.testrail.io/index.php?/cases/view/260844

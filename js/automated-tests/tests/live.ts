@@ -19,26 +19,11 @@ describe('Live', function () {
 
         // Verify that video preview is playing
         await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'On Now');
-        await ecp.sendKeypress(ecp.Key.Right, {count:2});
-        await utils.sleep(5000);
-        await linearVideoPreviewPlayingTest();
-
+        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing');
         // Press left navigation to open the side navigation
-        await ecp.sendKeypress(ecp.Key.Left, {count:2});
-
-        // Is the left Nav open?
-        const leftNavHomeButton = 
-        await testUtils.getNodeForElement('leftNavHomeButton');
-        await testUtils.elementHasFocus('leftNavHomeButton');
-
-        // Verify that video preview is not playing (Brian L. to investigate)
-        // expect(linearVideoPlayerScreenPreview.state).is.equal('stopped'); // this fails and error says it's "playing"
-        const player = await ecp.getMediaPlayer();
-        expect(player.state).to.equal('close');
-        expect(player.state).to.not.equal('play');
-        expect(player.state).to.not.equal('pause');
-       
-
+        await ecp.sendKeypress(ecp.Key.Left);
+        await testUtils.waitForElementToHaveFocus('leftNav');
+        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'stopped');
     });
 
     // https://tubi.testrail.io/index.php?/cases/view/207737
@@ -129,13 +114,6 @@ describe('Live', function () {
         await utils.sleep(1000);
         await ecp.sendKeypress(ecp.Key.Ok);
         
-    }
-
-    async function linearVideoPreviewPlayingTest() {
-        await testUtils.retryWithTimeOut(async () => {
-            const linearVideoPlayerScreenPreview = await testUtils.getNodeForElement('linearVideoPlayerScreenPreview'); 
-            expect(linearVideoPlayerScreenPreview.state).is.equal('playing');
-		});
     }
 
 });

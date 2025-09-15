@@ -3445,6 +3445,8 @@ Function processUserPlayAction(content, screen, playbackSource = {}) as Void
     end if
   else if playerType = m.constants.ui.playerTypes.fox
     showLinearDetailScreen(content, playbackSource)
+  else if contentType = m.constants.ui.contentTypes.linear
+    selectLinearContent(content)
   else
     showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource)
   end if

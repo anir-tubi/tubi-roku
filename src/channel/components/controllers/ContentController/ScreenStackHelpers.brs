@@ -164,9 +164,9 @@ Function screenTrackingNavigate(oldTrackingPageInfo, newTrackingPageInfo, tracki
     dest_pageOneof: m.Tracking.getAnalyticsPage(destPageType, destPageValues) 'page navigating to - a valid page type (see NavigateToPageEvent in events.protos)
   }
 
-  if newTrackingPageInfo.additionalContextValues <> invalid
+  if newTrackingPageInfo <> invalid AND newTrackingPageInfo.additionalContextValues <> invalid
     eventValues.append(newTrackingPageInfo.additionalContextValues)
-  else if oldTrackingPageInfo.additionalContextValues <> invalid
+  else if oldTrackingPageInfo <> invalid AND oldTrackingPageInfo.additionalContextValues <> invalid
     ' Handles the case where user is navigating to other screen from the CDC details screen. For ex: registration flow.
     eventValues.append(oldTrackingPageInfo.additionalContextValues)
   end if
@@ -202,7 +202,7 @@ Function screenTrackingLoad(trackingPageInfo, loadTime = 0, success = true)
     status: status 'ActionStatus enum
   }
 
-  if trackingPageInfo.additionalContextValues <> invalid
+  if trackingPageInfo <> invalid AND trackingPageInfo.additionalContextValues <> invalid
     eventValues.append(trackingPageInfo.additionalContextValues)
   end if
 

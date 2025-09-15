@@ -226,12 +226,55 @@ class Shared {
     await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
   }
 
+
+  async turnOnPreview() {
+    //Open left nav
+    await ecp.sendKeypress(ecp.Key.Left);
+  
+    // Open settings
+    await this.openSettings();
+  
+    // Turn off video previews
+    await ecp.sendKeypress(ecp.Key.Down);
+    await ecp.sendKeypress(ecp.Key.Ok);
+
+    await testUtils.waitForElementToHaveFocus('autoplayPreviewMenu', 'Timed out waiting for Autoplay Preview Menu to have focus', 15000);
+
+    await testUtils.jumpToRowIndex('autoplayPreviewMenu', 0);
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await utils.sleep(2000);
+    await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
+  }
+
+  async turnOffPreview() {
+    //Open left nav
+    await ecp.sendKeypress(ecp.Key.Left);
+
+    // Open settings
+    await this.openSettings();
+
+    // Turn off video previews
+    await ecp.sendKeypress(ecp.Key.Down);
+    await ecp.sendKeypress(ecp.Key.Ok);
+
+    await testUtils.waitForElementToHaveFocus('autoplayPreviewMenu', 'Timed out waiting for Autoplay Preview Menu to have focus', 15000);
+    await testUtils.jumpToRowIndex('autoplayPreviewMenu', 1);
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await utils.sleep(2000);
+    await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
+  }
+
+
   public async openMovies() {
     await testUtils.goToPage('movies');
   }
 
   public async openSeries() {
     await testUtils.goToPage('series');
+  }
+
+  public async openMyStuff() {
+    await testUtils.goToPage('myStuff');
   }
 
   async openSeriesScreenAndWaitUntilListIsFocused(shouldCreateNewUser: boolean = true) {
