@@ -133,6 +133,7 @@ Function PlayerLogLib(constants, tracking)
     adBufferingDuration: 0 'used in realtime->Qos event
     adBestStatus: {} 'tracks the best status each ad ever achieved, used to calculate adNotStartupCount in Realtime->Qos event
     adReBufferTracker: {} 'tracks which ads have experienced re-buffering to count unique ads only once
+    startupFailureCount: 0 'used in realtime->Qos event
 
     '//timers
     playerSetupTimer: CreateObject("roTimespan") 'helps to calculate playerSetupTime for playerSetupPerformance event
@@ -187,6 +188,7 @@ Function PlayerLogLib(constants, tracking)
     setPlayerAction: playerLogLib_setPlayerAction
     setPlayerStateWhenExitingPlayer: playerLogLib_setPlayerStateWhenExitingPlayer
     setIsBuffering: playerLogLib_setIsBuffering
+    setStartupFailureCount: playerLogLib_setStartupFailureCount
 
     'ad
     setIsAd: playerLogLib_setIsAd
@@ -343,7 +345,6 @@ Function playerLogLib_setVideoState(videoState = "")
     if m.adState = "adsCompleted"
       if m.adType = "midroll" OR m.adType = "seek"
         isPreroll = false
-        m.resumeCount += 1
         m.totalContentResumeFirstFrameDuration += m.firstFrameTimerForContentStartAfterMidroll.totalMilliseconds()
       else
         isPreroll = true
@@ -439,6 +440,7 @@ Function playerLogLib_setAdState(adState = "")
       m.setPlayerStage("AFTER_PREROLL")
     else
       m.setPlayerStage("AFTER_MIDROLL")
+      m.resumeCount += 1 'increment resumeCount by 1 when midroll/seek ad pod complete
       m.setFirstFrameForContentStartAfterMidroll()
     end if
   end if
@@ -1217,9 +1219,13 @@ End Function
 
 
 'setAdStartupFailureCount sets the AdStartupFailureCount value by checking ad playback
-'
-Function playerLogLib_setAdStartupFailureCount()
-  m.adStartupFailureCount += 1
+'@count: integer, optional count to add (defaults to 1)
+Function playerLogLib_setAdStartupFailureCount(count = 1)
+  if isNumber(count) = true AND count > 0
+    m.adStartupFailureCount += count
+  else
+    m.adStartupFailureCount += 1
+  end if
 End Function
 
 
@@ -1663,6 +1669,10 @@ End Function
 '
 '@adCtx: assocarray, contains ad related information
 Function playerLogLib_setAdPodStartupResult(adCtx = {})
+  if isAA(adCtx) = true AND adCtx.type = "PodStart"
+    m.latestAdPodStartupResult = {}
+  end if
+
   if isAA(adCtx) = true AND isAA(adCtx.ad) = true AND adCtx.ad.adId <> invalid
     adId = adCtx.ad.adId
 
@@ -1675,16 +1685,35 @@ Function playerLogLib_setAdPodStartupResult(adCtx = {})
       m.latestAdPodStartupResult[adId] = "PLAY_STARTED"
       m.adBestStatus[adId] = "PLAY_STARTED"
     else if adCtx.type = "Close"
-      m.latestAdPodStartupResult[adId] = "START_LOAD"
+      ' Only set to START_LOAD if ad hasn't achieved any status yet (meaning it started loading but never progressed)
+      if m.latestAdPodStartupResult[adId] = invalid
+        m.latestAdPodStartupResult[adId] = "START_LOAD"
+      end if
       ' Only set best status to START_LOAD if it hasn't achieved a better status
       if m.adBestStatus[adId] = invalid
         m.adBestStatus[adId] = "START_LOAD"
       end if
+      'setAdStartupFailureCount when the user exits before the ad first frame is viewed, even if no error occurs
+      if m.latestAdPodStartupResult.count() = 0 OR m.latestAdPodStartupResult[adId] = "START_LOAD"
+        m.setAdStartupFailureCount()
+      end if
     else if adCtx.type = "Error"
+      ' Call setAdStartupFailureCount for Error event
+      m.setAdStartupFailureCount()
+
       m.latestAdPodStartupResult[adId] = "UNKNOWN"
       ' Only set best status to UNKNOWN if it hasn't achieved a better status
       if m.adBestStatus[adId] = invalid
         m.adBestStatus[adId] = "UNKNOWN"
+      end if
+    else
+      ' For any other ad event type, set START_LOAD as initial status if not already set
+      ' This ensures START_LOAD is set when ads start loading, before they progress to other states
+      if m.latestAdPodStartupResult[adId] = invalid
+        m.latestAdPodStartupResult[adId] = "START_LOAD"
+        if m.adBestStatus[adId] = invalid
+          m.adBestStatus[adId] = "START_LOAD"
+        end if
       end if
     end if
   end if
@@ -1772,7 +1801,7 @@ End Function
 Function playerLogLib_fireRealtimeQoSEvent()
   realtimeQosInfo = {}
   realtimeQosInfo["viewTime"] = m.totalViewTime
-  realtimeQosInfo["startupFailure"] = m.adStartupFailureCount
+  realtimeQosInfo["startupFailure"] = m.startupFailureCount
 
   if m.errorCode <> 0
     realtimeQosInfo["playFailure"] = 1
@@ -1928,4 +1957,28 @@ Function playerLogLib_fireContentErrorEvent(contentErrorInfo)
   contentErrorInfo["message_map"] = messageMap
 
   m.sendEvent(contentErrorInfo, "content_error", eventBase)
+End Function
+
+
+'setStartupFailureCount determines and sets the appropriate startup failure count when user exits
+'- If user exits during pre-roll video playing, sets value to 0
+'- If user exits after pre-roll ads finished and before content first frame shown, sets value to 1
+'- If user exits with content first frame viewed, sets value to 0
+'- If there isn't preroll and user exits before content first frame shown, sets value to 1
+Function playerLogLib_setStartupFailureCount()
+  ' Determine startup failure count based on exit timing
+  ' 0 = exit during pre-roll OR after content first frame viewed
+  ' 1 = exit after pre-roll finished but before content first frame shown
+  '     OR exit when there's no preroll and before content first frame shown
+  startupFailureCount = 0
+
+  ' Check if user exits after pre-roll ads finished and before content first frame shown
+  if m.adState = "adsCompleted" AND m.adType = "preroll" AND m.isVideoPlayed = false
+    startupFailureCount = 1
+    ' Check if there isn't preroll and user exits before content first frame shown
+  else if m.playerStage = "READY" AND m.isVideoPlayed = false
+    startupFailureCount = 1
+  end if
+
+  m.startupFailureCount = startupFailureCount
 End Function

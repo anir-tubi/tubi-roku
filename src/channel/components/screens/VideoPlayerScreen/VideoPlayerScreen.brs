@@ -3595,9 +3595,6 @@ Function onAdTrackingObject(msg)
   else if adStatus = "Error"
     'If the last ad in the ad pod returns an error, we need to reset is_buffering to false, as onAdBufferingObject won't be triggered afterward.
     updatePlayerLogLib(m.playerLogLib, "setIsBuffering", false)
-    if adInfo.rendertime = 0
-      updatePlayerLogLib(m.playerLogLib, "setAdStartupFailureCount")
-    end if
     updatePlayerLogLib(m.playerLogLib, "fireAdDiscontinueEvent", adInfo)
   else if adStatus = "PodComplete"
     updatePlayerLogLib(m.playerLogLib, "fireAdPodCompleteEvent", adInfo)
@@ -3605,6 +3602,7 @@ Function onAdTrackingObject(msg)
 
   'This helps to set the different startup results like START_LOAD, VIEWED_FIRST_FRAME, PLAY_STARTED, UNKNOWN
   updatePlayerLogLib(m.playerLogLib, "setAdPodStartupResult", adInfo)
+
 
   isAd = (adStatus <> "PodComplete")
   m.playerExitInfo["is_ad"] = isAd
@@ -3650,6 +3648,9 @@ Function onExitPlayer(msg)
   exitPlayer = msg.getData()
 
   if exitPlayer = true
+    ' Handle startup failure count logic in PlayerLogLib
+    updatePlayerLogLib(m.playerLogLib, "setStartupFailureCount")
+
     m.playerExitInfo.message_map = {}
     m.playerExitInfo.message_map.exitReason = m.top.exitReason
     updatePlayerLogLib(m.playerLogLib, "firePlayerPageExitEvent", m.playerExitInfo)
