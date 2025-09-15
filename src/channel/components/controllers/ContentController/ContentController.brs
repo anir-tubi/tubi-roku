@@ -117,6 +117,7 @@ Function addControllerUi()
   ' This is used to track if the user is in the video tiles experiment.
   m.isUserInVideoTilesExperiment = (experiment <> invalid AND experiment.design_type = "withDescriptionPortraitSmall")
   m.shouldDebounceVideoTilePreview = (experiment <> invalid AND experiment.should_debounce = true)
+  m.queuedVideoTilePreview = false
 
   if isNonEmptyArray(experiment.featuredRowPosterSize) = true
     featuredRowPoster = experiment.featuredRowPosterSize

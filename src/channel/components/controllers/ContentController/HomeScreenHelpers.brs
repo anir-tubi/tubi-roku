@@ -1446,7 +1446,9 @@ Function onFeaturedListScrollingStatusChange(msg)
       if state = "playing" OR state = "paused"
         stopVideoPreview()
       end if
-      startDebouncedVideoPreview()
+      if m.queuedVideoTilePreview = true
+        startDebouncedVideoPreview()
+      end if
     end if
   end if
 End Function
@@ -1516,7 +1518,6 @@ Function updateVideoTileOnFocusChange(rowFocused, columnFocused, screen)
 
   if screen <> invalid AND screen.featuredRowContent <> invalid AND arrayIncludes(m.constants.ui.adGridItemTypes, gridItemType) = false
     pauseVideoPreviewAndShowPoster()
-    startVideoTilePreview()
     setInlineVideoMetadataOverlay(screen.featuredRowContent, columnFocused, rowFocused)
   end if
 End Function
@@ -1531,7 +1532,7 @@ Function pauseVideoPreviewAndShowPoster()
     if videoPlayer <> invalid
       videoPlayer.visible = false
     end if
-    m.videoPreviewPlayer.visible = false
+    fade(m.videoPreviewPlayer, "out", 0.3)
     if getVideoPreviewState() = "playing"
       ' Gives better scrolling experience if we pause the video preview.
       ' We are calling stopVideoPreview once we are done with scrolling.
@@ -1554,6 +1555,7 @@ End Function
 
 ' Starts the inline preview when the featured row list has focus.
 Function startDebouncedVideoPreview()
+  m.queuedVideoTilePreview = false
   screen = getCurrentScreen()
   if isCurrentScreenHomeScreen() = true
     if screen.featuredListHasFocus = true
@@ -1723,7 +1725,13 @@ Function onFeaturedRowFocusedItemChange(msg)
   ' If VideoPreview is on and we have not started the debounce, we will start it.
   ' This is needed in case where for initial load and refresh cases where columnFocusChange is not triggered.
   if focusedItem <> invalid AND screen.featuredListHasFocus = true AND isVideoPreviewOn() = true AND m.videoPreviewDebounce.control = "stop"
-    startVideoTilePreview()
+    if m.shouldDebounceVideoTilePreview = true
+      m.videoPreviewDebounce.control = "start"
+    else if screen.featuredListScrollingStatus = false
+      startDebouncedVideoPreview()
+    else
+      m.queuedVideoTilePreview = true
+    end if
   end if
 
   if isNode(focusedItem) = true AND (arrayIncludes(m.constants.ui.liveEventsGridTypes, focusedItem.gridItemType) OR arrayIncludes(m.constants.ui.adGridItemTypes, focusedItem.gridItemType))
@@ -1884,16 +1892,4 @@ Function getLiveEventsContainer(rawResponse)
   end if
 
   return invalid
-End Function
-
-
-Function startVideoTilePreview()
-  if m.shouldDebounceVideoTilePreview = true
-    m.videoPreviewDebounce.control = "start"
-  else
-    screen = getCurrentScreen()
-    if screen <> invalid AND screen.featuredListScrollingStatus = false
-      startDebouncedVideoPreview()
-    end if
-  end if
 End Function

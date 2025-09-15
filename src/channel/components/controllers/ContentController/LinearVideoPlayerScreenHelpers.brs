@@ -985,7 +985,7 @@ Function switchLinearToInlineGridMode(linearPlayer)
   m.inlineVideoGridTitleLogo.reParent(m.inlineVideoPreviewPlayerContainer, false)
   m.inlinePreviewFocusIndicator.reParent(m.inlineVideoPreviewPlayerContainer, false)
 
-  linearPlayer.visible = false
+  linearPlayer.visible = (linearPlayer.state = "playing")
   linearPlayer.loading = true
   if linearPlayer.fullscreen <> false
     linearPlayer.fullscreen = false

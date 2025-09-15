@@ -83,26 +83,17 @@ Function onVideoPreviewStateChanged(msg)
   videoPreview = msg.getRoSGNode()
   videoPreviewState = msg.getData()
   currentScreen = getCurrentScreen()
-
   if (videoPreviewState = "playing" OR videoPreviewState = "paused") AND videoPreview <> invalid AND videoPreview.isBufferingComplete = true
-    ' Adding a safety check to make sure if a new debounce was started we do not show the player instead just pause it.
-    ' Only doing it for featured row list since that is the only row that has debounce for now.
-    ' TODO: Remove the and condition to check featuredListHasFocus once we have debounce for all rows.
-    if m.videoPreviewDebounce.control = "start" AND currentScreen.featuredListHasFocus = true
-      videoPreview.visible = false
+    if currentScreen.featuredListHasFocus = false AND m.isUserInVideoTilesExperiment = true
       m.inlineVideoMetadataOverlay.showContentPoster = true
-      pauseVideoPreview()
     else
-      if currentScreen.featuredListHasFocus = false AND m.isUserInVideoTilesExperiment = true
-        m.inlineVideoMetadataOverlay.showContentPoster = true
-      else
-        m.inlineVideoMetadataOverlay.showContentPoster = false
-      end if
-
-      showVideoPreviewPlayer = (currentScreen <> invalid AND currentScreen.isInFocusChain() = true) OR currentScreen.lastFocusedList <> "featuredRowList"
-      videoPreview.visible = (showVideoPreviewPlayer = true)
-      m.backgroundGroup.posterVisible = (showVideoPreviewPlayer = false)
+      m.inlineVideoMetadataOverlay.showContentPoster = false
     end if
+    m.videoPreviewPlayer.opacity = 1
+
+    showVideoPreviewPlayer = (currentScreen <> invalid AND currentScreen.isInFocusChain() = true) OR currentScreen.lastFocusedList <> "featuredRowList"
+    videoPreview.visible = (showVideoPreviewPlayer = true)
+    m.backgroundGroup.posterVisible = (showVideoPreviewPlayer = false)
   else if videoPreviewState = "error"
     ' unobserve the state if we have any error while playing mp4 video previews to avoid autostarting the focused content on autostart variant of experiment.
     videoPreview.unobserveFieldScoped("state")
