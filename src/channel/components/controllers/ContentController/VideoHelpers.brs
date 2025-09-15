@@ -1224,6 +1224,7 @@ Function onVideoTrackingStart(msg)
     youboraConfig["device.model"] = m.constants.deviceInfo.model
     youboraConfig["device.id"] = m.constants.deviceInfo.deviceId
     youboraConfig["app.releaseVersion"] = m.constants.deviceInfo.clientVersion
+    youboraConfig["app.name"] = "tubi"
     youboraConfig["content.encoding.videoCodec"] = content.codec
 
     m.youboraTask.options = youboraConfig
