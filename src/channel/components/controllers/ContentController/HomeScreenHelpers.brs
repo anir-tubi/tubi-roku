@@ -1437,8 +1437,16 @@ Function onFeaturedListScrollingStatusChange(msg)
   ' Below logic helps to avoid us from updating the in transit video metadata overlay when the user is scrolling up or down.
   if scrollingStatus = false
     updateInTransitVideoMetadataOverlay()
-    if isVideoPreviewPlaying() = true
-      stopVideoPreview()
+    if m.shouldDebounceVideoTilePreview = true
+      if isVideoPreviewPlaying() = true
+        stopVideoPreview()
+      end if
+    else
+      state = m.videoPreviewPlayer.playerState
+      if state = "playing" OR state = "paused"
+        stopVideoPreview()
+      end if
+      startDebouncedVideoPreview()
     end if
   end if
 End Function
@@ -1883,6 +1891,9 @@ Function startVideoTilePreview()
   if m.shouldDebounceVideoTilePreview = true
     m.videoPreviewDebounce.control = "start"
   else
-    startDebouncedVideoPreview()
+    screen = getCurrentScreen()
+    if screen <> invalid AND screen.featuredListScrollingStatus = false
+      startDebouncedVideoPreview()
+    end if
   end if
 End Function

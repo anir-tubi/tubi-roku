@@ -54,6 +54,7 @@
       <field id="duration" alias="VideoNode.duration"/>
       <field id="bufferingStatus" alias="VideoNode.bufferingStatus" />
       <field id="isBufferingComplete" type="boolean" />
+      <field id="playerState" alias="VideoNode.state"/>
   </interface>
 
   <children>
