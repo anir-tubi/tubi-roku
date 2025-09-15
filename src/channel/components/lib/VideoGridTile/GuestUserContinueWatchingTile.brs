@@ -14,6 +14,7 @@ Function init()
 
   topRef.observeFieldScoped("itemHasFocus", "onItemHasFocusChange")
   topRef.observeFieldScoped("rowHasFocus", "onItemHasFocusChange")
+  topRef.observeFieldScoped("rowListHasFocus", "onItemHasFocusChange")
   topRef.observeFieldScoped("width", "adjustContentAlignment")
   topRef.observeFieldScoped("height", "adjustContentAlignment")
 
@@ -28,7 +29,7 @@ End Function
 
 Function setThemeColors()
   theme = getThemeFromGlobal()
-  
+
   if theme <> invalid
     m.title.color = theme.primaryTextColor
     m.subTitle.color = theme.secondaryTextColor
@@ -48,8 +49,8 @@ Function adjustContentAlignment()
 End Function
 
 
-Function onItemHasFocusChange(msg)
-  itemHasFocus = (msg.getData() = true AND m.top.rowHasFocus = true)
+Function onItemHasFocusChange(_msg)
+  itemHasFocus = ((m.top.rowHasFocus = true OR m.top.itemHasFocus = true) AND m.top.rowListHasFocus = true)
   m.signUpButton.itemHasFocus = itemHasFocus
   if itemHasFocus = true
     m.border.blendColor = m.focusedColor

@@ -12,6 +12,7 @@
     <field id="height" alias="border.height" />
     <field id="itemHasFocus" type="boolean" />
     <field id="rowHasFocus" type="boolean" />
+    <field id="rowListHasFocus" type="boolean" />
   </interface>
 
   <children>
