@@ -196,7 +196,15 @@ Function startVideoPreviewIfBufferingComplete()
   if bufferingStatus <> invalid
     videoPreview.isBufferingComplete = (bufferingStatus.percentage = 100)
     if videoPreview.isBufferingComplete = true AND videoPreview.control <> "play"
-      sendVideoPlayerCommand(videoPreview, "play")
+      screen = getCurrentScreen()
+      ' Making sure current screen is in focus chain before playing the video preview.
+      ' This is to avoid playing the video preview when the user navigates quickly to side nav or some modal opens up.
+      if screen <> invalid AND screen.isInFocusChain() = true
+        sendVideoPlayerCommand(videoPreview, "play")
+      else
+        ' Resetting the state to none so that we reset the video preview to the default state and preview restarts properly from buggy state.
+        videoPreview.state = "none"
+      end if
     end if
   end if
 End Function
