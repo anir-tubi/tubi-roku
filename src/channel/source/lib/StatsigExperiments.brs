@@ -16,9 +16,11 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
     ' Same structure as TubiExperiments for consistency
     defaultResources: {
 
-      roku_test_player: {
-        roku_test_player_v1: {
-          default: { "type": "none" }
+      ' POC Statsig "no change" experiment on search screen
+      ' It is to validate Statsig integration, exposure logging, and experiment flow.
+      roku_no_change_statsig_experiment: {
+        roku_no_change_statsig_experiment_v1: {
+          default: { "enabled": false }
         }
       }
 

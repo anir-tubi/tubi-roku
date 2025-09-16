@@ -105,6 +105,10 @@ Function init()
   m.top.observeFieldScoped("isKidsModeAvailable", "onIsKidsModeAvailableChange")
   m.top.observeFieldScoped("shouldTrackViewableImpressionEvent", "onShouldTrackViewableImpressionEventChange")
 
+  'no change experiment is only to validate exposure logging in statsig console.
+  'NOTE: Remove this code once the experiment is complete.
+  getStatsigExperimentResource("roku_no_change_statsig_experiment", "roku_no_change_statsig_experiment_v1", true)
+
   'set initial tracking values
   m.top.trackingPageInfo = {
     pageType: "search_page"
