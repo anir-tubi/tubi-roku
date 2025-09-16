@@ -1416,13 +1416,23 @@ Function tubiTracking_getRepeated()
     contents: [] ' Repeated property of type content_title
   }
 
+  content_labels = {
+    metadata_labels: []
+    metadata: []
+    markers: []
+    poster_labels: []
+  }
+
   content_tile = {
     series_id: -1
     video_id: -1
     row: -1
     col: -1
     duration: 0
+    content_labels: content_labels
   }
+
+
 
   return {
     containers: container
@@ -1572,6 +1582,7 @@ Function tubiTracking_getViewableImpressionEvent(eventValues) as Object
     personalization_id: ""
     pageOneof: {} 'current screen
   }
+
   eventInfo = m.populateMessage("viewable_impression", eventValues, eventBase)
   user = m.getAnalyticsUser()
   impressionEvent = {

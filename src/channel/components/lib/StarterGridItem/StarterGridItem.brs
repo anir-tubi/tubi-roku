@@ -2,6 +2,7 @@ Function init()
   m.poster = m.top.findNode("poster")
 
   m.top.observeFieldScoped("itemContent", "onItemContentChange")
+  m.top.observeFieldScoped("itemHasFocus", "onItemFocusChange")
   ' List of fields that will only be observed if we have a child grid item component with that field
   m.conditionallyObservedFields = [
     "itemHasFocus"
@@ -73,6 +74,69 @@ Function setThemeColors(msg = invalid)
     m.backgroundColor = theme.backgroundColor
     m.primaryTextColor = theme.primaryTextColor
   end if
+End Function
+
+
+Function onItemFocusChange(msg)
+  itemHasFocus = msg.getData()
+  itemContent = m.top.itemContent
+
+  ' Track focus state and store focus-specific labels when focused
+  if m.clientTrackingInfo <> invalid AND m.clientTrackingInfo.itemInfo <> invalid AND itemHasFocus = true
+    itemInfo = m.clientTrackingInfo.itemInfo
+    contentLabels = itemInfo.content_labels
+
+    ' Initialize contentLabels if it doesn't exist
+    if contentLabels = invalid
+      contentLabels = {}
+    end if
+
+    ' Store focus-specific labels when item gets focus
+    if isAA(itemContent.sotInfo) = true
+      sotInfo = itemContent.sotInfo
+
+      ' Process metadata labels (sotMetaDataLabels) - only add if data exists
+      if isNonEmptyArray(sotInfo.sotMetaDataTopLabels) = true
+        metadataLabels = []
+        for each metaDataLabel in sotInfo.sotMetaDataTopLabels
+          if isNonEmptyString(metaDataLabel.sotLabelText)
+            metaDataLabelArray = { type: metaDataLabel.sotLabelText }
+            metadataLabels.push(metaDataLabelArray)
+          end if
+        end for
+        if isNonEmptyArray(metadataLabels) = true
+          contentLabels.metadata_labels = metadataLabels
+        end if
+      end if
+
+      ' Process metadata (sotMetaData) - only add if data exists
+      if isNonEmptyArray(sotInfo.sotMetaData) = true
+        metadata = []
+        for each mData in sotInfo.sotMetaData
+          if isNonEmptyString(mData.sotLabelText)
+            metaDataArray = { type: mData.sotLabelText }
+            metadata.push(metaDataArray)
+          end if
+        end for
+        if isNonEmptyArray(metadata) = true
+          contentLabels.metadata = metadata
+        end if
+      end if
+
+      ' Process markers (sotMarkers) - only add if data exists
+      if isAA(sotInfo.sotMarkers) = true AND isNonEmptyString(sotInfo.sotMarkers.sotLabelText)
+        markerLabel = { type: sotInfo.sotMarkers.sotLabelText }
+        contentLabels.markers = [markerLabel]
+      end if
+
+      ' Store focus-specific labels for later use during impression only if there are changes
+      if isAA(contentLabels) = true AND contentLabels.count() > 0
+        itemInfo.content_labels = contentLabels
+      end if
+
+    end if
+  end if
+
 End Function
 
 
@@ -253,6 +317,18 @@ Function onItemContentChange(msg)
       col: col + 1
     }
 
+    ' Build ContentLabels structure - only add arrays when data exists
+    contentLabels = {}
+
+    ' Process poster labels - only add if data exists
+    if isAA(itemContent.sotPosterLabels) = true AND isNonEmptyString(itemContent.sotPosterLabels.sotLabelText)
+      posterLabel = [{ type: itemContent.sotPosterLabels.sotLabelText }]
+      contentLabels.poster_labels = posterLabel
+    end if
+
+    ' Always set content_labels (even if empty) so it can be populated later on focus
+    itemInfo.content_labels = contentLabels
+
     if itemContent.type = "series"
       seriesId = itemContent.id
       if seriesId.startsWith("0") = true
@@ -356,3 +432,4 @@ Function onRenderTrackingChange(msg)
     end if
   end if
 End Function
+

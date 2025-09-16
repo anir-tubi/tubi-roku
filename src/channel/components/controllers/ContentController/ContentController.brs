@@ -307,6 +307,7 @@ Function addControllerUi()
   '     row: 1 - Vertical position within a container, 1-based index
   '     col: 1 - Horizontal position within a container, 1-based index
   '     duration: 2000 - Total duration the tile was visible in milliseconds
+  '     content_labels: {} - ContentLabels structure with metadata_labels, metadata, markers, poster_labels
   '   }
   '   screenId: "" - Contains id of the screen where the tile is displayed.
   '   screenTrackingInfo: Format: { pageType: "home_page", pageValues: {} }

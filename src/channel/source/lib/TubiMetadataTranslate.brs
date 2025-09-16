@@ -3174,9 +3174,17 @@ Function tubiMetadataTranslate_getSignalTrustInfo(sotChild, content)
     end for
   end if
 
-  sotInfo.sotMetaDataTopLabels = sotMetaDataTopLabels
-  sotInfo.sotMarkers = sotMarkers
-  sotInfo.sotMetaData = sotMetaData
+  if isNonEmptyArray(sotMetaDataTopLabels) = true
+    sotInfo.sotMetaDataTopLabels = sotMetaDataTopLabels
+  end if
+
+  if isAA(sotMarkers) = true AND sotMarkers.count() > 0
+    sotInfo.sotMarkers = sotMarkers
+  end if
+
+  if isNonEmptyArray(sotMetaData) = true
+    sotInfo.sotMetaData = sotMetaData
+  end if
 
   return sotInfo
 
