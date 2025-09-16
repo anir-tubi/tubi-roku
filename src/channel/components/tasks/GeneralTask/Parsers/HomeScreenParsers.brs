@@ -139,6 +139,7 @@ End Function
 
 
 Function parseHomeScreenAdsSuccess(fullResponse, reqInfo)
+  tubiLog("HomeScreenParsers.parseHomeScreenAdsSuccess")
   parsedResponse = fullResponse.data
   requestedAdTypes = []
   if reqInfo.adTypes <> invalid
@@ -150,10 +151,22 @@ Function parseHomeScreenAdsSuccess(fullResponse, reqInfo)
     adUnit = ad_units.hdc_row
 
     if adUnit <> invalid AND adUnit.ad <> invalid AND adUnit.ad.assets <> invalid
+
+      assets = adUnit.ad.assets
+      adID = adUnit.ad.id
+      aImageTracking = []
+      if adUnit.trackers <> invalid AND isNonEmptyArray(adUnit.trackers.imp) = true
+        aImageTracking = adUnit.trackers.imp
+      end if
+      if adUnit.valid_duration <> invalid AND isInt(adUnit.valid_duration) = true
+        validUntil = UpTime(0) + adUnit.valid_duration
+      else
+        validUntil = UpTime(0) + m.constants.cacheTimes.homescreenAd
+      end if
+
+
       for each adType in requestedAdTypes
         if adType = m.constants.adTypes.adRowlistCarousel AND adUnit.rendering_code = m.constants.ui.categoryIds.adRowlistCarousel
-          assets = adUnit.ad.assets
-
           ' If the rendering code matches the constants.ui.categoryIds.adRowlistCarousel, we can create a carousel ad node
           carouselNode = CreateObject("roSGNode", "AdDisplayCarouselContentNode")
           carouselNode.rowPlacement = 2 '//::NOTE:: this is hardcoded until the backend supports row_placement for ads
@@ -197,9 +210,9 @@ Function parseHomeScreenAdsSuccess(fullResponse, reqInfo)
           adInfo = invalid
           if videoData <> invalid
             adInfo = {
-              ad_id: adUnit.ad.id
+              ad_id: adID
               error: invalid
-              id: adUnit.ad.id
+              id: adID
               impTracking: ""
               media: {
                 duration: videoData.duration
@@ -223,16 +236,15 @@ Function parseHomeScreenAdsSuccess(fullResponse, reqInfo)
           translatedThumb.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
 
           '//Round the corners on thumbnail that is displayed in homescreen rowList
-          sRowThumbnailURL = m.metadataTranslate.getRoundedCornersURL(carousel[0].backgrounds[0], 18)
+          if assets.poster_image <> invalid AND isNonEmptyString(assets.poster_image.url) = true
+            sRowThumbnailURL = m.metadataTranslate.getRoundedCornersURL(assets.poster_image.url, 18)
+          else
+            sRowThumbnailURL = m.metadataTranslate.getRoundedCornersURL(carousel[0].backgrounds[0], 18)
+          end if
           translatedThumb.hdgridposterurl = sRowThumbnailURL
 
-          if adUnit.trackers <> invalid AND isNonEmptyArray(adUnit.trackers.imp) = true
-            carouselNode.imageImpTracking = adUnit.trackers.imp
-          end if
-          if adUnit.valid_duration <> invalid AND isInt(adUnit.valid_duration) = true
-            validUntil = UpTime(0) + adUnit.valid_duration
-          else
-            validUntil = UpTime(0) + m.constants.cacheTimes.homescreenAd
+          if isNonEmptyArray(aImageTracking) = true
+            carouselNode.imageImpTracking = aImageTracking
           end if
 
           carouselNode.validUntil = validUntil
@@ -242,8 +254,9 @@ Function parseHomeScreenAdsSuccess(fullResponse, reqInfo)
 
           carouselNode.adInfo = adInfo
           aReturnAds.push(carouselNode)
-        else if adType = m.constants.adTypes.adRowlistSpotlight
-          '//::TODO::JHAND - adRowlist - spotlight, this is where we would handle the adRowlistSpotlight type if it were to be implemented.
+        else if adType = m.constants.adTypes.adRowlistSpotlight AND adUnit.rendering_code = m.constants.ui.categoryIds.adRowlistSpotlight
+          '//process the spotlight ad response
+          aReturnAds.push(processSpotlightAdContent(adID, assets, validUntil, aImageTracking))
         end if
       end for
     end if
@@ -251,6 +264,88 @@ Function parseHomeScreenAdsSuccess(fullResponse, reqInfo)
   end if
 
   return buildAdContentMap(aReturnAds)
+End Function
+
+
+' Helper function of parseHomeScreenAdsSuccess() to process the spotlight ad content from the ad response.
+'
+' @sAdID: string, The ID of the spotlight ad.
+' @assets: assocArray, The assets associated with the ad.
+' @validUntil: Integer, The time that the ad is valid until.
+' @returnedImageTracking: Array, optional Image tracking data. Default is an empty array.
+'
+' @returns: object, An object containing processed spotlight ad content.
+Function processSpotlightAdContent(sAdID, assets, validUntil, returnedImageTracking = []) as Object
+
+  returnedAssetBgroundImage = assets.background_image
+  returnedAssetPosterImage = assets.poster_image
+  returnedAssetBrandText = assets.brand_text
+  returnedAssetVideo = assets.video
+
+  translatedThumb = CreateObject("roSGNode", "TubiContentNode")
+  rowContentNode = CreateObject("roSGNode", "AdContentNode")
+  rowContentNode.rowPlacement = 2
+  rowContentNode.id = m.constants.ui.gridItemTypes.adRowlistSpotlight
+  rowContentNode.type = m.constants.ui.contentTypes.adRowlistSpotlight
+  rowContentNode.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
+
+  translatedThumb.id = m.constants.ui.categoryIds.adRowlistSpotlight
+  translatedThumb.slug = sAdID
+  translatedThumb.type = m.constants.ui.contentTypes.adRowlistSpotlight
+  translatedThumb.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
+
+  if returnedAssetBgroundImage <> invalid AND isNonEmptyString(returnedAssetBgroundImage.url) = true
+    translatedThumb.backgrounds = [returnedAssetBgroundImage.url]
+  end if
+
+  '//Round the corners on thumbnail that is displayed in homescreen rowList
+  sRowThumbnailURL = ""
+  if returnedAssetPosterImage <> invalid AND isNonEmptyString(returnedAssetPosterImage.url) = true
+    sRowThumbnailURL = m.metadataTranslate.getRoundedCornersURL(returnedAssetPosterImage.url, 18)
+  else if isNonEmptyArray(translatedThumb.backgrounds) = true
+    sRowThumbnailURL = m.metadataTranslate.getRoundedCornersURL(translatedThumb.backgrounds[0], 18)
+  end if
+  translatedThumb.hdgridposterurl = sRowThumbnailURL
+
+  if returnedAssetBrandText <> invalid AND isNonEmptyString(returnedAssetBrandText.text) = true
+    rowContentNode.title = returnedAssetBrandText.text
+  end if
+
+  videoData = invalid
+  if isNonEmptyArray(returnedAssetVideo) = true
+    videoData = returnedAssetVideo[0]
+    if isNonEmptyString(videoData.url) = true
+      translatedThumb.videoPreviewUrl = videoData.url
+    end if
+  end if
+
+  adInfo = invalid
+  if videoData <> invalid
+    adInfo = {
+      ad_id: sAdID
+      error: invalid
+      id: sAdID
+      impTracking: ""
+      media: {
+        duration: videoData.duration
+        streamUrl: videoData.url
+        trackingEvents: {}
+      }
+      type: "video"
+    }
+  end if
+  rowContentNode.adInfo = adInfo
+
+  if isNonEmptyArray(returnedImageTracking) = true
+    rowContentNode.imageImpTracking = returnedImageTracking
+  end if
+
+  rowContentNode.validUntil = validUntil
+  translatedThumb.validUntil = validUntil
+
+  rowContentNode.appendChild(translatedThumb)
+
+  return rowContentNode
 End Function
 
 
@@ -320,6 +415,7 @@ End Function
 
 
 Function parseHomeScreenAdsError(fullResponse, reqInfo)
+  tubiLog("HomeScreenParsers.parseHomeScreenAdsError")
   screenId = ""
   if reqInfo.screenId <> invalid
     screenId = reqInfo.screenId

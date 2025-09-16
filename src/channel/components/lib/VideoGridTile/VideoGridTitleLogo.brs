@@ -1,5 +1,6 @@
 Function init()
   topRef = m.top
+  m.tileLayout = topRef.findNode("tileLayout")
   m.videoInGridGradient = topRef.findNode("videoInGridGradient")
   topRef.observeFieldScoped("itemContent", "onItemContentChange")
   topRef.observeFieldScoped("height", "onHeightChange")
@@ -56,6 +57,7 @@ Function onItemContentChange(msg)
   itemContent = msg.getData()
 
   if itemContent <> invalid
+    m.tileLayout.visible = true
     currentProgram = invalid
     isBadgeAdded = false
     if itemContent.type = "linear"
@@ -89,6 +91,8 @@ Function onItemContentChange(msg)
     if isBadgeAdded = false AND isAA(itemContent.sotInfo) = true
       setBadge(m.badgeTypes.sot, itemContent.sotInfo)
     end if
+  else
+    m.tileLayout.visible = false
   end if
 End Function
 

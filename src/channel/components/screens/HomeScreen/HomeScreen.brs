@@ -306,6 +306,7 @@ Function onScreenFocusChange()
     m.top.shouldFocusWhenPushed = true
   else if m.top.isInFocusChain() = false
     m.adFocusTimer.control = "stop"
+    m.top.focusLost = true
   end if
 End Function
 
@@ -564,7 +565,6 @@ Function onCurrFocusRowChange()
   m.lastFocusPosition = currFocusRow
   if rowPercent = 1
     m.lastFocusPosition = -1
-    m.top.currFocusRow = currFocusRow
   end if
 End Function
 
@@ -714,8 +714,6 @@ Function onGridFocusChange() as Void
 
       m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(focusedContent, m.CategoryGridList.focusedPosition)
       m.top.contentFocused = focusedContent
-      '//::TODO::JHAND - adRowlist - spotlight, Use MaskGroup to create rounded corners for the 1-Up video
-      '//::TODO::JHAND - adRowlist - spotlight, place video over 1-up image. Is there a way to mask the video so it has rounded corners?
       gridItemType = focusedContent.gridItemType
       if arrayIncludes(m.constants.ui.noInfoPanelGridItemTypes, gridItemType) = true
         fadeOutInfoPanel()
@@ -757,8 +755,6 @@ Function onFeaturedRowFocusedItemChange(msg) as Void
     '//if the CategoryGridList is in focus, then alter the UI.
     if focusedContent <> invalid
       m.top.contentFocused = focusedContent
-      '//::TODO::JHAND - adRowlist - spotlight, Use MaskGroup to create rounded corners for the 1-Up video
-      '//::TODO::JHAND - adRowlist - spotlight, place video over 1-up image. Is there a way to mask the video so it has rounded corners?
       if focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
         m.top.backgroundUriList = determineBackgroundImage(focusedContent)
       else

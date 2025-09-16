@@ -23,6 +23,7 @@
 
   <children>
     <LayoutGroup
+      id="tileLayout"
       itemSpacings="[24]">
 
       <Group 

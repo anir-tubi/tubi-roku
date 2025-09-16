@@ -1096,6 +1096,7 @@ Function getConstants()
   constants.player.videoPreviewDelayTimes = {}
   constants.player.videoPreviewDelayTimes.videoTiles = 0.5
   constants.player.videoPreviewDelayTimes.adCarousel = 3
+  constants.player.videoPreviewDelayTimes.adSpotlight = 1
 
   ' constants used for EPG
   constants.EPGChannelPlayMode = {}

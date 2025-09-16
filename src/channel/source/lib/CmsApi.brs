@@ -195,7 +195,7 @@ Function cmsApi_createAdHomescreenDisplayContainerReqInfo(adTypes = [], appMode 
   aHomescreenBgroundCodes = []
   for each adType in adTypes
     if adType = m.constants.adTypes.adRowlistSpotlight
-      '//::TODO:: add spotlight rendering code(s).
+      aHomescreenBgroundCodes.push(m.constants.ui.categoryIds.adRowlistSpotlight)
     else if adType = m.constants.adTypes.adRowlistCarousel
       aHomescreenBgroundCodes.push(m.constants.ui.categoryIds.adRowlistCarousel)
     else if adType = m.constants.adTypes.skinAd

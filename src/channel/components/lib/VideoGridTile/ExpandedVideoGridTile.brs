@@ -1,5 +1,6 @@
 Function init()
   topRef = m.top
+  m.tileLayout = topRef.findNode("tileLayout")
   m.poster = topRef.findNode("Poster")
   m.videoGridMetadata = topRef.findNode("videoGridMetadata")
   m.videoInGridGradient = topRef.findNode("videoInGridGradient")
@@ -77,6 +78,9 @@ Function onItemContentChange(msg)
   itemContent = msg.getData()
 
   if itemContent <> invalid
+    m.tileLayout.visible = true
+    ' Resetting the blend color to default.
+    m.poster.blendColor = "#FFFFFFFF"
     isBadgeAdded = false
 
     currentProgram = invalid
@@ -138,6 +142,9 @@ Function onItemContentChange(msg)
     if isBadgeAdded = false AND isAA(itemContent.sotInfo) = true
       setBadge(m.badgeTypes.sot, itemContent.sotInfo)
     end if
+
+  else
+    m.tileLayout.visible = false
   end if
 End Function
 

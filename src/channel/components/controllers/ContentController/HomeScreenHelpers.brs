@@ -47,6 +47,7 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     homeScreen.observeFieldScoped("loadAllCategories", "onLoadAllCategories")
     homeScreen.observeFieldScoped("contentFocused", "onHomeScreenContentFocused")
+    homeScreen.observeFieldScoped("focusLost", "onHomeScreenFocusLost")
     homeScreen.observeFieldScoped("contentSelected", "onContentSelected")
     homeScreen.observeFieldScoped("contentToPlay", "onContentToPlay")
     homeScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
@@ -770,6 +771,23 @@ Function onHomeScreenContentFocused(msg)
 End Function
 
 
+
+
+Function onHomeScreenFocusLost(msg)
+  tubiLog("HomeScreenHelpers.onHomeScreenFocusLost")
+  homeScreen = msg.getRoSGNode()
+  bLostFocus = msg.getData()
+  focusedContent = homeScreen.contentFocused
+  if bLostFocus = true
+    m.inlinePreviewFocusIndicator.visible = false
+    if focusedContent <> invalid AND focusedContent.type = m.constants.ui.contentTypes.adRowlistSpotlight
+      '//Hide the video preview when the focus is no longer on the homscreen but the ad rowlist spotlight is still displayed. This is to ensure we can't see the player does not have rounded corners.
+      stopVideoPreview()
+    end if
+  end if
+End Function
+
+
 '//when a new column of the row list begins to gain partial focus during a horizontal scroll, then do something
 Function onColumnFocusChanged(msg)
   tubiLog("HomeScreenHelpers.onColumnFocusChanged")
@@ -908,10 +926,24 @@ End Function
 
 
 Function onHomeScreenRowFocusChanged(msg)
-  if isLinearPlayerLoadingORPlaying() = true
-    '//as the rowlist is scrolling, if the the linear video player is playing or loading, then make sure the linear video player has stopped
-    stopAndHideLinearVideoPlayer()
+  currFocusRow = msg.getData()
+
+  if currFocusRow = CInt(currFocusRow)
+    if isLinearPlayerLoadingORPlaying() = true
+      '//as the rowlist is scrolling, if the the linear video player is playing or loading, then make sure the linear video player has stopped
+      stopAndHideLinearVideoPlayer()
+    end if
+  else if m.inlinePreviewFocusIndicator.opacity = 1
+    ' Avoid the focus indicator from being shown when the row is scrolling.
+    fade(m.inlinePreviewFocusIndicator, "out", 0.1)
+
+    focusedContent = getCurrentScreen().contentFocused
+    if focusedContent <> invalid AND focusedContent.type = m.constants.ui.contentTypes.adRowlistSpotlight
+      '//Hide the video preview when the row is scrolling.
+      stopVideoPreview()
+    end if
   end if
+
 End Function
 
 
@@ -965,13 +997,19 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
 
       if currentScreen.isSameNode(homeScreen) = true AND currentScreen.isInFocusChain() = true 'if there are any modals over home screen or focus has been lost to side nav
         componentTrackingInfo = getCategoryComponentTrackingInfo(currentScreen)
-        if focusedContent <> invalid AND focusedContent.type = m.constants.ui.contentTypes.adRowlistCarousel AND focusedContent.videoPreviewUrl <> ""
-          ' If the content is adRowlistSpotlight, then set the video preview after a delay
+        if focusedContent <> invalid AND (focusedContent.type = m.constants.ui.contentTypes.adRowlistCarousel OR focusedContent.type = m.constants.ui.contentTypes.adRowlistSpotlight) AND focusedContent.videoPreviewUrl <> ""
+          ' If the content is adRowlistCarousel or adRowlistSpotlight, then set the video preview after a delay
+          nAdVideoDelay = m.constants.player.videoPreviewDelayTimes.adCarousel
+          if focusedContent.type = m.constants.ui.contentTypes.adRowlistSpotlight
+            updatePreviewPlayerToAdSpotlight()
+            nAdVideoDelay = m.constants.player.videoPreviewDelayTimes.adSpotlight
+            stopVideoPreview()
+          end if
 
-          m.videoPreviewDebounce.duration = m.constants.player.videoPreviewDelayTimes.adCarousel
+          m.videoPreviewDebounce.duration = nAdVideoDelay
           m.videoPreviewDebounce.control = "start"
         else
-          ' If the content is not linear or adRowlistSpotlight, then just set the video preview after focus
+          ' If the content is not linear, adRowlistCarousel, or adRowlistSpotlight, then just set the video preview after focus
           setVideoPreviewAfterFocus(focusedContent, currentScreen.trackingPageInfo, componentTrackingInfo)
         end if
       end if
@@ -1542,7 +1580,6 @@ Function pauseVideoPreviewAndShowPoster()
   end if
   isLinearPlayerPlaying = isLinearPlayerLoadingOrPlaying()
   screen = getCurrentScreen()
-
   if screen <> invalid AND screen.featuredRowFocusedItem <> invalid
     updatePlayerLayoutBasedOnFocusedContent(screen.featuredRowFocusedItem)
   end if
@@ -1574,7 +1611,7 @@ Function startDebouncedVideoPreview()
       end if
     else
       focusedContent = screen.contentFocused
-      if focusedContent <> invalid AND focusedContent.type = m.constants.ui.contentTypes.adRowlistCarousel
+      if focusedContent <> invalid AND (focusedContent.type = m.constants.ui.contentTypes.adRowlistCarousel OR focusedContent.type = m.constants.ui.contentTypes.adRowlistSpotlight)
         componentTrackingInfo = getCategoryComponentTrackingInfo(screen)
         setVideoPreviewAfterFocus(focusedContent, screen.trackingPageInfo, componentTrackingInfo)
       end if
@@ -1603,7 +1640,9 @@ Function setInlineVideoMetadataOverlay(featuredRowContent, columnFocused, rowFoc
   if currCategory <> invalid
     itemContent = currCategory.getChild(columnFocused)
     m.inlineVideoMetadataOverlay.itemContent = itemContent
+    m.inlineVideoMetadataOverlay.visible = true
     m.inlineVideoGridTitleLogo.itemContent = itemContent
+    m.inlineVideoGridTitleLogo.visible = true
   end if
 
   ' Predicting the next row to be focused based on current scroll direction.
@@ -1663,6 +1702,7 @@ Function onFeaturedListHasFocusChange(msg)
 
     previewState = getVideoPreviewStateForThisContent(content)
     m.inlinePreviewFocusIndicator.visible = true
+    m.inlinePreviewFocusIndicator.opacity = 1
     if previewState = "paused"
       resumeVideoPreview()
     else if previewState = "playing"
@@ -1749,6 +1789,7 @@ End Function
 
 
 Function updateInlineVideoMetadataOverlayVisibility(duration = 0)
+  tubiLog("HomeScreenHelpers.updateInlineVideoMetadataOverlayVisibility")
   screen = getCurrentScreen()
   if screen <> invalid
     isHomeScreen = (screen <> invalid AND screen.id = m.constants.ui.screenIds.homeScreen)
@@ -1765,12 +1806,15 @@ Function updateInlineVideoMetadataOverlayVisibility(duration = 0)
       else
         ' Below logic handles displaying the large preview poster when skin ad is focused and during navigating back from ad player.
         if screen <> invalid AND screen.lastFocusedList <> "skinAdRow"
+
           fade(m.inlineVideoPreviewPlayerContainer, "out", duration, 0.1)
         else
+
           fade(m.inlineVideoPreviewPlayerContainer, "in", duration)
         end if
       end if
     else
+
       m.inlineVideoPreviewPlayerContainer.opacity = 0
     end if
   end if
@@ -1778,6 +1822,7 @@ End Function
 
 
 Function onFeaturedRowListTranslationChange(msg)
+  tubiLog("HomeScreenHelpers.onFeaturedRowListTranslationChange")
   screen = msg.getRoSGNode()
   translation = screen.featuredRowListTranslation
   if translation <> invalid

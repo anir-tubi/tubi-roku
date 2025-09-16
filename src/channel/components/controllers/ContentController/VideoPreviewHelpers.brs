@@ -79,15 +79,25 @@ End Function
 
 
 Function onVideoPreviewStateChanged(msg)
-  tubiLog("VideoPreviewHelpers.onVideoPreviewStateChanged")
   videoPreview = msg.getRoSGNode()
   videoPreviewState = msg.getData()
+  tubiLog("VideoPreviewHelpers.onVideoPreviewStateChanged, " + videoPreviewState)
   currentScreen = getCurrentScreen()
   if (videoPreviewState = "playing" OR videoPreviewState = "paused") AND videoPreview <> invalid AND videoPreview.isBufferingComplete = true
     if currentScreen.featuredListHasFocus = false AND m.isUserInVideoTilesExperiment = true
       m.inlineVideoMetadataOverlay.showContentPoster = true
     else
       m.inlineVideoMetadataOverlay.showContentPoster = false
+
+      showVideoPreviewPlayer = currentScreen.isInFocusChain() = true OR currentScreen.lastFocusedList <> "featuredRowList"
+      videoPreview.visible = (showVideoPreviewPlayer = true)
+
+      bDisplayBackgroundGroup = (showVideoPreviewPlayer = false)
+      if currentScreen.contentFocused <> invalid AND currentScreen.contentFocused.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
+        '//Keep the background group visible for adRowlistSpotlight content
+        bDisplayBackgroundGroup = true
+      end if
+      m.backgroundGroup.posterVisible = bDisplayBackgroundGroup
     end if
     m.videoPreviewPlayer.opacity = 1
 
@@ -130,10 +140,10 @@ Function onVideoPreviewStateChanged(msg)
         end if
         m.backgroundGroup.posterVisible = true
 
-      else if item <> invalid AND item.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
-        '// Simply stop the video preview for adRowlistCarousel content
+      else if item <> invalid AND item.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel OR item.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
+        '// Simply stop the video preview for adRowlistCarousel or adRowlistSpotlight content
         m.backgroundGroup.posterVisible = true
-        if isCurrentScreenHomeScreen() = true
+        if isCurrentScreenHomeScreen() = true AND item.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
           currentScreen.allowCarouselAutoRotate = true
         end if
       else if m.maintask.isHdmiStatusOk = true AND isFullPlayerBlockedForUser = false
@@ -213,7 +223,7 @@ Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
     videoPreview.isBufferingComplete = false
 
     ' If the experiment is enabled and focused content is from featured row than expand preview to full screen.
-    if content.gridItemType = m.constants.ui.gridItemTypes.skinAd OR content.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
+    if content.gridItemType = m.constants.ui.gridItemTypes.skinAd OR content.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel OR content.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
       videoPreview.unObserveFieldScoped("position")
       videoPreview.observeFieldScoped("position", "onVideoPreviewPositionChanged")
       if content.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel AND isCurrentScreenHomeScreen() = true
@@ -324,6 +334,8 @@ Function updatePreviewPlayerToInlineView()
       m.inlinePreviewFocusIndicator.reParent(m.inlineVideoPreviewPlayerContainer, false)
     end if
 
+    m.inlinePreviewFocusIndicator.height = playerSize[1]
+    m.inlinePreviewFocusIndicator.width = playerSize[0] + 12
 
     m.videoPreviewPlayer.unObserveFieldScoped("position")
     m.videoPreviewPlayer.observeFieldScoped("position", "onInlineVideoPreviewPositionChanged")
@@ -347,6 +359,34 @@ Function updatePreviewPlayerToAdCarousel()
   m.videoPreviewPlayer.reParent(m.backgroundVideoPreviewPlayerContainer, false)
   m.videoPreviewPlayer.clippingRect = [0, 0, 1920, 595]
   resizeToLocation(m.videoPreviewPlayer, 1919, 595, [0, 0], 0)
+End Function
+
+
+Function updatePreviewPlayerToAdSpotlight()
+  playerSize = m.constants.ui.imageSizes.adRowlistThumbnail
+  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_4_restart", false)
+  if experiment = invalid OR experiment.design_type <> "withDescriptionPortraitSmall"
+    m.inlineVideoPreviewPlayerContainer.translation = [138, 168]
+  else
+    m.inlineVideoPreviewPlayerContainer.translation = [160, 213]
+  end if
+
+  m.inlineVideoMetadataOverlay.visible = false
+  m.inlineVideoGridTitleLogo.visible = false
+  m.inlinePreviewFocusIndicator.width = playerSize[0] + 6
+  m.inlinePreviewFocusIndicator.height = playerSize[1] + 6
+  m.inlineVideoPreviewPlayerContainer.opacity = 1
+  m.inlineVideoPreviewPlayerContainer.visible = true
+  m.inlinePreviewFocusIndicator.visible = true
+  m.inlinePreviewFocusIndicator.opacity = 1
+  m.videoPreviewPlayer.reParent(m.inlineVideoPreviewPlayerContainer, false)
+  m.inlinePreviewFocusIndicator.reParent(m.inlineVideoPreviewPlayerContainer, false)
+
+  nVideoPlayerSizeAdjustment = 6
+  videoPlayerSize = [playerSize[0] - nVideoPlayerSizeAdjustment, playerSize[1] - nVideoPlayerSizeAdjustment]
+  m.videoPreviewPlayer.clippingRect = [0, 0, videoPlayerSize[0], videoPlayerSize[1]]
+  resizeToLocation(m.videoPreviewPlayer, videoPlayerSize[0], videoPlayerSize[1], [nVideoPlayerSizeAdjustment, nVideoPlayerSizeAdjustment], 0)
+  m.videoPreviewPlayer.videoPlayerType = "VIDEO_IN_GRID"
 End Function
 
 
@@ -380,7 +420,7 @@ Function setVideoPreviewAfterFocus(focusedContent, pageInfo = {}, componentInfo 
   tubiLog("VideoPreviewHelpers.setVideoPreviewAfterFocus")
   m.videoPreviewDebounce.control = "stop"
   if focusedContent <> invalid AND focusedContent.type <> invalid AND m.SideNav.opened <> true
-    if isVideoPreviewOn() = true OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
+    if isVideoPreviewOn() = true OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
       previewState = getVideoPreviewStateForThisContent(focusedContent)
       updatePlayerLayoutBasedOnFocusedContent(focusedContent)
       if previewState = "buffering" OR previewState = "playing"
@@ -391,7 +431,9 @@ Function setVideoPreviewAfterFocus(focusedContent, pageInfo = {}, componentInfo 
             startVideoPreviewIfBufferingComplete()
           end if
         end if
-        m.backgroundGroup.posterVisible = false
+        if focusedContent.gridItemType <> m.constants.ui.gridItemTypes.adRowlistSpotlight
+          m.backgroundGroup.posterVisible = false
+        end if
       else if previewState = "paused"
         resumeVideoPreview()
       else
@@ -425,7 +467,7 @@ Function onVideoPreviewPositionChanged(msg)
   duration = videoPreviewScreen.duration
   currentScreen = getCurrentScreen()
   contentFocused = currentScreen.contentFocused
-  if contentFocused <> invalid AND (contentFocused.gridItemType = m.constants.ui.gridItemTypes.skinAd OR contentFocused.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel)
+  if contentFocused <> invalid AND (contentFocused.gridItemType = m.constants.ui.gridItemTypes.skinAd OR contentFocused.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel OR contentFocused.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight)
     reportAdQuartileIfNeeded(contentFocused, position, duration)
 
     if position >= (duration - 1)
@@ -485,6 +527,8 @@ Function updatePlayerLayoutBasedOnFocusedContent(content)
     ' Reducing 1px from both width and height since the player is in background and keeping full width causes roku to display closed captioning overlay.
     ' To avoid any other Roku OS level default behavior from kicking in reducing 1px to give a impression that player is not in full screen.
     updatePreviewPlayerToFullScreen()
+  else if content.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
+    updatePreviewPlayerToAdSpotlight()
   else if content.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
     updatePreviewPlayerToAdCarousel()
   else if isKidsUIOn() = false AND isHomeScreen = true AND m.isUserInVideoTilesExperiment = true

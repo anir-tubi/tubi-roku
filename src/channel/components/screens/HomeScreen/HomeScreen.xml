@@ -123,6 +123,9 @@
            fields have been set (e.g. signedIn) -->
       <field id="loadAllCategories" type="boolean" value="false" alwaysNotify="true"/>
 
+      <!-- Triggered when the homescreen has lost focus -->
+      <field id="focusLost" type="boolean" alwaysNotify="true"/>
+
       <!-- Triggered when the ad has been in focus for awhile and needs to be reported. -->
       <field id="adTimerImpressionFire" type="boolean" value="false" alwaysNotify="true"/>
       
@@ -152,7 +155,7 @@
 
       <field id="scrollingstatus" alias="CategoryGridList.scrollingstatus" />
 
-      <field id="currFocusRow" type="integer" />
+      <field id="currFocusRow" alias="CategoryGridList.currFocusRow" />
 
       <!-- content on the homescreen is loaded and spinner can be turned off -->
       <field id="contentReady" type="boolean" value="false" alwaysNotify="true" />
@@ -196,6 +199,7 @@
       <field id="lastFocusedList" alias="CategoryGridList.lastFocusedList" />
 
       <field id="featuredRowListTranslation" type="array" alwaysNotify="true" />
+      <field id="contentAreaTranslation" type="array" alias="ContentAreaParent.translation"/>
 
     <!-- DATA STORE (Anything defined below are not meant to be used as output or input fields which will triggered change events. ) -->
       <field id="personalizationId" type="string" alias="CategoryGridList.personalizationId" />
