@@ -573,7 +573,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     if isKidsUIOn() = false AND screenID = m.constants.ui.screenIds.homeScreen
       refreshLiveEventsContainerWithEpgListingInfo(rawResponse)
 
-      getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_5", true)
+      getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_5_restart", true)
       if m.isUserInVideoTilesExperiment = true AND isNode(rawResponse) = true AND rawResponse.getChildCount() > 0
         ' Only show the video tile overlay group if the screen is the home screen and the skin ads are not available.
         ' This is needed because we refresh home screen behind the scenes during parent controls change.
@@ -1540,7 +1540,7 @@ Function updateVideoTileOnFocusChange(rowFocused, columnFocused, screen)
   tubiLog("HomeScreenHelpers.updateVideoTileOnFocusChange")
   ' Only process if the screen is the home screen.
   ' Since all others screens are using topRight background variant vs home screen will use full screen background.
-  ' TODO: If we graduate roku_home_screen_redesign_v_1_5 we should migrate the skin ad to be a itemComponent of FeaturedRowList so that we don't have to add these one off checks.
+  ' TODO: If we graduate roku_home_screen_redesign_v_1_5_restart we should migrate the skin ad to be a itemComponent of FeaturedRowList so that we don't have to add these one off checks.
 
   gridItemType = ""
   if screen.featuredRowContent <> invalid

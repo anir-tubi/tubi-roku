@@ -4,7 +4,7 @@ Function init()
   m._ = rodash()
   m.constants = getConstantsFromGlobal()
   m.Tracking = TubiTrackingInfo(m.constants)
-  experimentInfo = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_5", false)
+  experimentInfo = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_5_restart", false)
   m.isUserInVideoTilesExperiment = isAA(experimentInfo) AND experimentInfo.design_type = "withDescriptionPortraitSmall"
 
   m.PageGroup = m.top.findNode("PageGroup")

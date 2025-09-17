@@ -459,7 +459,7 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
 
   tileDesignType = "none"
   if m.experiments <> invalid AND bKidsMode = false
-    experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_5")
+    experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_5_restart")
     tileDesignType = experiment.design_type
   end if
 

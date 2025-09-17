@@ -44,7 +44,7 @@ Function stopVideoPreview(node = invalid)
     node = m.videoPreviewPlayer
   end if
 
-  ' TODO: Remove if we do not graduate roku_home_screen_redesign_v_1_5 experiment.
+  ' TODO: Remove if we do not graduate roku_home_screen_redesign_v_1_5_restart experiment.
   ' This is needed to provide smooth scrolling experience when the user is scrolling the list because calling video stop causes glitchy behavior.
   isListScrolling = false
   screen = getCurrentScreen()
@@ -295,6 +295,7 @@ Function updatePreviewPlayerToCondensedView()
   m.videoPreviewPlayer.clippingRect = [0, 0, 1920, 1080]
   resizeToLocation(m.videoPreviewPlayer, 1120, 630, [799, 0], 0)
   m.videoPreviewPlayer.unObserveFieldScoped("position")
+  m.videoPreviewPlayer.opacity = 1
 End Function
 
 
