@@ -23,6 +23,8 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 			await testUtils.getNodeForElement(NODES.TITLE_DESCRIPTION_HOME),
 		homeScreenPoster: async () =>
 			await testUtils.getNodeForElement('homeScreenPoster'),
+		homeScreenPosterVideoPreview: async () =>
+			await testUtils.getNodeForElement(NODES.HOME_SCREEN_POSTER_VIDEO_PREVIEW),
 		homeScreenKidsLogo: async () =>
 			await testUtils.getNodeForElement('kidsLogoHomeScreen'),
 		exitToUseFeatureMessage: async () =>
@@ -189,6 +191,10 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 	async function getMovieTitleIdAndCategory() {
 		const movieScreenRowList = await elements.movieScreenRowList();
 		expect(movieScreenRowList.visible).to.equal(true);
+		await testUtils.retryWithTimeOut(async () => {
+			const movieDescirption = await elements.movieDescription();
+			expect(movieDescirption.visible).to.equal(true);
+		});
 		const detailScreenTitle = await elements.movieDescription();
 		const [categorySlug, contentId] = detailScreenTitle.text.split(' ');
 		return { contentId: contentId, categorySlug: categorySlug };
@@ -224,6 +230,8 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 	}
 
 	async function selectFocusedTitleMovie() {
+		// need to contnent in focus to get the correct title
+		await utils.sleep(800);
 		const content = await testUtils.getCurrentlyFocusedGridItemContent(
 			NODES.MOVIE_SCREEN_ROW_LIST
 		);
@@ -440,6 +448,13 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 	}
 
 	async function playTitle(espanol = false, kids = false, tvShow = false) {
+		await pageDidLoad();
+		await testUtils.retryWithTimeOut(async () => {
+			const homeScreenPosterVideoPreview = await elements.homeScreenPosterVideoPreview();
+			expect(homeScreenPosterVideoPreview.visible).to.equal(true);
+		});
+		// need to sleep to get the correct title
+		await utils.sleep(1000);
 		await ecp.sendKeypress(ecp.Key.Play);
 		let content;
 		if (espanol) {
@@ -483,8 +498,8 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 		return await playTitle(false, false, true);
 	}
 
-	async function navigateDown(times) {
-		await ecp.sendKeypress(ecp.Key.Down, { count: times });
+	async function navigateDown(times,wait = 200) {
+		await ecp.sendKeypress(ecp.Key.Down, { count: times, wait: wait });
 	}
 
 	async function navigateRight(times) {

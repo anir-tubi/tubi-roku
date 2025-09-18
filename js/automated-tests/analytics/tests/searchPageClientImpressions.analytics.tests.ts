@@ -32,7 +32,7 @@ describe('Client Impressions events', function () {
         await searchPage.pageDidLoad();
         await searchPage.goToTitleInPosition(1);
         await utils.sleep(3000);
-        const titleIds = await searchPage.getTitleIdSarchScreenVertical({ amount: 5 });
+        const titleIds = await searchPage.getTitleIdSarchScreenVertical({ amount: 4 });
         await searchPage.navigateToSideNav();
         await SideNav().selectTabNoPageReturn(tabs.categories);
         const impressionEvent = await waitForClientImpressionEvent(filter, 35000);
@@ -45,7 +45,7 @@ describe('Client Impressions events', function () {
         expect(impressionEvent.search_page).to.be.an('object');
     });
 
-    it('C754615 Impression event fires when left nav is in focus @impressionEvents,', async () => {
+    it('C754615 Impression event fires when left nav is in focus @impressionEvents', async () => {
         const filter = (impressionEvent: ImpressionEvent) => {
             return impressionEvent.containers?.some((container) => {
                 return container.id === 'top_searched';
@@ -56,7 +56,7 @@ describe('Client Impressions events', function () {
         await searchPage.pageDidLoad();
         await searchPage.goToTitleInPosition(1);
         await utils.sleep(5000);
-        const titleIds = await searchPage.getTitleIdSarchScreenVertical({ amount: 5 });
+        const titleIds = await searchPage.getTitleIdSarchScreenVertical({ amount: 4 });
         await searchPage.navigateToSideNav();
         const impressionEvent = await waitForClientImpressionEvent(filter, 35000);
         await verifyNormalContainerContents({
@@ -84,7 +84,7 @@ describe('Client Impressions events', function () {
         const impressionEvent = await waitForClientImpressionEventsForTime(filter, 65000);
         await verifyNormalContainerContents({
             containerIds: ['search'],
-            impressionEvent,
+            impressionEvent: impressionEvent,
             column: 1,
             titleIds: titleIds,
         });

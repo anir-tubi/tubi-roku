@@ -5,6 +5,7 @@ export const NODES = {
 	ESPANOL_SCREEN_ROW_LIST: 'espanolScreenRowList',
 	HOME_SCREEN_ROW_LIST: 'homeRowList',
 	TITLE_DESCRIPTION_HOME: 'titleDescriptionHomesScreen',
+	HOME_SCREEN_POSTER_VIDEO_PREVIEW: 'homeScreenPosterVideoPreview',
 };
 
 export const ButtomValues = {

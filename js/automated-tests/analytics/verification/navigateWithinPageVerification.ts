@@ -332,7 +332,7 @@ export async function verifyC543668andC543669(titleId) {
 export async function verifyC543671(details) {
 	let eventNavigateToPage;
 	let i = 1;
-	while (eventNavigateToPage === undefined && i < 16) {
+	while (eventNavigateToPage === undefined && i < 36) {
 		const pulletEvents = await getMatchedEventsFromLastEvent(
 			Events.navigate_within_page,
 			8 + i

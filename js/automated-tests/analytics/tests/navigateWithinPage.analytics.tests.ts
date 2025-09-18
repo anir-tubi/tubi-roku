@@ -48,10 +48,11 @@ describe('Navigate Within Page', function () {
 	it('NavigateWithinPage - HomePage CategoryComponent horizontal navigation - every 3 seconds C543671 @analyticsASet2,@analyticsNavigateWithinPage', async () => {
 		const homePage = HomePage();
 		const details = await homePage.getMovieTitleIdAndCategory();
+		await utils.sleep(2000);
 		await homePage.navigateDown(1);
-		await utils.sleep(500); //need this as quick navigation messing with events
+		await utils.sleep(2000); //need this as quick navigation messing with events
 		await homePage.navigateRight(2);
-		await utils.sleep(500);
+		await utils.sleep(2000);
 		await homePage.navigateRight(1);
 		await verifyC543671(details);
 	});
@@ -124,6 +125,8 @@ describe('Navigate Within Page', function () {
 		const categories = Categories();
 		await categories.pageDidLoad();
 		const container = await categories.selectChannelByName('cj_enm');
+		await container.pageDidLoad();
+		await utils.sleep(2000);
 		const titleDetailsPage = await container.selectFocusedTitle();
 		const videoId = titleDetailsPage.getTitleId();
 		await titleDetailsPage.highlightAddToMyList();
@@ -174,6 +177,7 @@ describe('Navigate Within Page', function () {
 
 	it('C524595 User lands on the “You May Also Like” container on the player page. @analyticsASet2,@analyticsNavigateWithinPage', async () => {
 		const homePage = HomePage();
+		await homePage.pageDidLoad();
 		let movieDetailsPage = await homePage.selectFocusedTitleMovie();
 		const video = await movieDetailsPage.selectPlay();
 		await video.allowPlaybackToPlayForSeconds(10000);
@@ -196,7 +200,7 @@ describe('Navigate Within Page', function () {
 
 	it('C690746	User scrolls vertically and navigates within the categories listed on the category list page  @analyticsASet2,@analyticsNavigateWithinPage', async () => {
 		const homePage = HomePage();
-		const categories = await homePage.selectSideNavTab(tabs.categories, 7);
+		const categories = await homePage.highlightedSideNavTab(tabs.categories, 7);
 		await utils.sleep(2000);
 		await ecp.sendKeypress(ecp.Key.Up);
 		await utils.sleep(2000);

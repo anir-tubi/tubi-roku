@@ -13,6 +13,9 @@ export const settingsTabs = {
 	parentalControls: {
 		row: 1,
 	},
+	autplayControls: {
+		row: 2,
+	},
 	about: {
 		row: 3,
 	},
@@ -43,6 +46,15 @@ const Settings = () => {
 		await ecp.sendKeypress(ecp.Key.Ok);
 	}
 
+	async function turnOfPreview(){
+		await moveToRow(ui.row - settingsTabs.autplayControls.row);
+		// wait for the row to be highlighted
+		await utils.sleep(1000);
+		await ecp.sendKeypress(ecp.Key.Ok, { wait: 1000 });
+		await ecp.sendKeypress(ecp.Key.Down, { wait: 1000 });
+		await ecp.sendKeypress(ecp.Key.Ok, { wait: 3000 });
+	}
+
 	const ui = {
 		row: 1,
 	};
@@ -51,6 +63,7 @@ const Settings = () => {
 		pageDidLoad,
 		checkIfKidsLogoPresent,
 		signOut,
+		turnOfPreview,
 		...SideNav(),
 	};
 };

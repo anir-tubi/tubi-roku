@@ -2300,6 +2300,7 @@ type DeviceSettings = {
 };
 
 
+
 type DeeplinkPage = 'movies' | 'genre' | 'network' | 'tv' | 'espanol' | 'kids' | 'home';
 type NonDeeplinkPage = 'home' | 'search' | 'settings' | 'myStuff' | 'movies' | 'series' | 'livefeed';
 const nonDeeplinkPages = ['home', 'search', 'settings', 'myStuff', 'movies', 'series', 'livefeed'];

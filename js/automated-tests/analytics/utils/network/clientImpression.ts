@@ -57,7 +57,7 @@ export async function waitForClientImpressionEvent(filter: (impressionEvent: Imp
       reject(new Error('waitForRequest timeout'));
     }, timeout);
     proxy.addCallback({
-      shouldProcess: (args) => {
+      shouldProcess: (args) => { 
         if (args.url.includes('user-signals')) {
           console.log('Request intercepted', args.requestBody);
           checkMandatoryElements([args.requestBody]);

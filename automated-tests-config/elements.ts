@@ -570,7 +570,7 @@ const elements = typeCheckElements({
 
   homeScreenPoster: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#BackgroundGroup.#topRightContentPosterGroup.#poster2.#BackgroundPoster',
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentAreaParent.#ContentArea.#CategoryGridList.#RowList.0.items.0.#poster',
   },
 
   homeInfoPanel: {
@@ -1715,12 +1715,17 @@ const elements = typeCheckElements({
 
   titleDescriptionOnHomeScreen: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description',
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#movieScreen.#PageGroup.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description',
+  },
+
+  homeScreenPosterVideoPreview: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#BackgroundGroup.#posterGroupMask',
   },
 
   linearNavigationPanel: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#linearVideoPlayerScreen.#VideoOverlay.#overlayParent.#overlayContentArea.#EPGHorizontalSlide.#EPG',
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#epgScreen.#PageGroup.#programGuide.#ProgramGrid.8.items.0.#cellRect',
   },
 
   liveNewsSubtitlesPanel: {
