@@ -11,16 +11,7 @@ describe('Autoplay Movies', function () {
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/768091
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/105693
   it('C768091 - Autoplay Next Video On - Autoplay next title @autoplay', async () => {
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await shared.turnOnAutoplay();
-    await shared.openMovies();
-    // Are we on the Movies page?
-    await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
-    await ecp.sendKeypress(ecp.Key.Play);
-    await seekToTriggerCuePoint();
-
-    // Autoplay triggered?
-    await checkIfMovieAutoPlayUIisShowing();
+    await triggerMovieAutoplayUI();
 
     const { node } = await odc.getFocusedNode();
     expect(node.id).to.equal('GridMovie');
@@ -38,24 +29,15 @@ describe('Autoplay Movies', function () {
     // Testing to make sure the new video is playing.
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
-    const videoNode2 = await testUtils.getNodeForElement('videoPlayerActual');
-    const newVideoId = videoNode2.content.id;
+    const playerContent = await testUtils.getPlayerContent('videoPlayerScreen');
+    const newVideoId = playerContent.parentType == 'series' ? playerContent.parentId : playerContent.id;
     expect(newVideoId).to.be.equal(gridContents[0].id);
   });
 
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/76115
   it('C76115 - Autoplay - Movie - When content focused then year displayed @autoplay', async () => {
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
-    await shared.openMovies();
-    // Are we on the Movies page?
-    await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
-    await ecp.sendKeypress(ecp.Key.Play);
-    await seekToTriggerCuePoint();
-
-    // Autoplay triggered?
-    await checkIfMovieAutoPlayUIisShowing();
+    await triggerMovieAutoplayUI();
 
     const { node } = await odc.getFocusedNode();
     expect(node.id).to.equal('GridMovie');
@@ -71,16 +53,7 @@ describe('Autoplay Movies', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/768092
   it('C768092 - Autoplay Next Video On - Press back during Autoplay countdown @autoplay', async () => {
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
-    await shared.openMovies();
-    // Are we on the Movies page?
-    await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
-    await ecp.sendKeypress(ecp.Key.Play);
-    await seekToTriggerCuePoint();
-
-    // Autoplay triggered?
-    await checkIfMovieAutoPlayUIisShowing();
+    await triggerMovieAutoplayUI();
 
     await ecp.sendKeypress(ecp.Key.Back);
     const { node } = await odc.getFocusedNode();
@@ -89,16 +62,7 @@ describe('Autoplay Movies', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/70395
   it('C70395 - Autoplay - Movie - Timer resets as users navigates within the titles in autoplay UI @autoplay', async () => {
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
-    await shared.openMovies();
-    // Are we on the Movies page?
-    await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
-    await ecp.sendKeypress(ecp.Key.Play);
-    await seekToTriggerCuePoint();
-
-    // Autoplay triggered?
-    await checkIfMovieAutoPlayUIisShowing();
+    await triggerMovieAutoplayUI();
     // Waiting for 5 seconds to let the countdown timer count down.
     await utils.sleep(5000);
     await ecp.sendKeypress(ecp.Key.Right);
@@ -114,16 +78,7 @@ describe('Autoplay Movies', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/25123
   it('C25123 - Autoplay - Movie - When user chooses last title on the list then movie plays @autoplay', async () => {
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
-    await shared.openMovies();
-    // Are we on the Movies page?
-    await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
-    await ecp.sendKeypress(ecp.Key.Play);
-    await seekToTriggerCuePoint();
-
-    // Autoplay triggered?
-    await checkIfMovieAutoPlayUIisShowing();
+    await triggerMovieAutoplayUI();
 
     await testUtils.waitForElementToHaveFocus('autoplayGridMovie', 'Timed out waiting for Rowlist to have focus', 15000);
 
@@ -136,23 +91,14 @@ describe('Autoplay Movies', function () {
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'stopped');
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
-    const videoNode2 = await testUtils.getNodeForElement('videoPlayerActual');
-    const newVideoId = videoNode2.content.id;
+    const playerContent = await testUtils.getPlayerContent('videoPlayerScreen');
+    const newVideoId = playerContent.parentType == 'series' ? playerContent.parentId : playerContent.id;
     expect(newVideoId).to.be.equal(gridContents[totalItems - 1].id);
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/76105
   it('C76105 - Autoplay - Movie - When user chooses first title on the list then movie plays @autoplay', async () => {
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
-    await shared.openMovies();
-    // Are we on the Movies page?
-    await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
-    await ecp.sendKeypress(ecp.Key.Play);
-    await seekToTriggerCuePoint();
-
-    // Autoplay triggered?
-    await checkIfMovieAutoPlayUIisShowing();
+    await triggerMovieAutoplayUI();
 
     await testUtils.waitForElementToHaveFocus('autoplayGridMovie', 'Timed out waiting for Rowlist to have focus', 15000);
 
@@ -163,23 +109,14 @@ describe('Autoplay Movies', function () {
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'stopped');
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
-    const videoNode2 = await testUtils.getNodeForElement('videoPlayerActual');
-    const newVideoId = videoNode2.content.id;
+    const playerContent = await testUtils.getPlayerContent('videoPlayerScreen');
+    const newVideoId = playerContent.parentType == 'series' ? playerContent.parentId : playerContent.id;
     expect(newVideoId).to.be.equal(gridContents[0].id);
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/705819
   it('C705819 - BWW does not appear while autoplay modal is shown @autoplay', async () => {
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
-    await shared.openMovies();
-    // Are we on the Movies page?
-    await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
-    await ecp.sendKeypress(ecp.Key.Play);
-    await seekToTriggerCuePoint();
-
-    // Autoplay triggered?
-    await checkIfMovieAutoPlayUIisShowing();
+    await triggerMovieAutoplayUI();
 
     await testUtils.waitForElementToHaveFocus('autoplayGridMovie', 'Timed out waiting for Movie Grid to have focus', 15000);
 
@@ -196,16 +133,7 @@ describe('Autoplay Movies', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/710850
   it('C710850 - Ensure movie plays to the end after dismissing autoplay modal @autoplay', async () => {
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
-    await shared.openMovies();
-    // Are we on the Movies page?
-    await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
-    await ecp.sendKeypress(ecp.Key.Play);
-    await seekToTriggerCuePoint();
-
-    // Autoplay triggered?
-    await checkIfMovieAutoPlayUIisShowing();
+    await triggerMovieAutoplayUI();
 
     await ecp.sendKeypress(ecp.Key.Back);
     const { node } = await odc.getFocusedNode();
@@ -222,8 +150,8 @@ describe('Autoplay Movies', function () {
     // Testing to make sure the new video is playing.
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
-    const videoNode2 = await testUtils.getNodeForElement('videoPlayerActual');
-    const newVideoId = videoNode2.content.id;
+    const playerContent = await testUtils.getPlayerContent('videoPlayerScreen');
+    const newVideoId = playerContent.parentType == 'series' ? playerContent.parentId : playerContent.id;
     expect(newVideoId).to.be.equal(gridContents[0].id);
   });
 
@@ -276,6 +204,19 @@ describe('Autoplay Movies', function () {
   });
 
 });
+
+async function triggerMovieAutoplayUI() {
+  await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+  await shared.turnOnAutoplay();
+  await shared.openMovies();
+  // Are we on the Movies page?
+  await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
+  await ecp.sendKeypress(ecp.Key.Play);
+  await seekToTriggerCuePoint();
+
+  // Autoplay triggered?
+  await checkIfMovieAutoPlayUIisShowing();
+}
 
 async function seekToTriggerCuePoint() {
   await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');

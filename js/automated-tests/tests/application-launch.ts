@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { ecp, utils } from 'roku-test-automation';
+import { ecp, odc, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
 import { shared } from '../shared';
 
@@ -93,10 +93,10 @@ describe('Application Launch', function () {
 
     // Open and play a title, create history, then back to details page to check for "Resume" button
     await ecp.sendKeypress(ecp.Key.Right);
-    await ecp.sendKeypress(ecp.Key.Ok);
     await ecp.sendKeypress(ecp.Key.Play);
     await createHistory();
     await ecp.sendKeypress(ecp.Key.Back);
+
     await testUtils.waitForElementToFullyShowOnScreen('resumePlayingButton');
 
     // Exit app and restart
@@ -108,7 +108,6 @@ describe('Application Launch', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
     
     // Test for resume button (Roku retains resume button for 24 hours)
-    await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForElementToFullyShowOnScreen('resumePlayingButton', 'Resume Playing button not found', 8000);
   });
 
@@ -129,9 +128,11 @@ describe('Application Launch', function () {
 
     // Create CW row
     await createHistory();
+    await ecp.sendKeypress(ecp.Key.Back);
+    await testUtils.waitForElementToFullyShowOnScreen('resumePlayingButton');
 
     // Back out to Details page
-    await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Back);
 
     // Jump To Continue Watching Row
     await testUtils.jumpToRowWithTitle('movieScreenRowList', 'Continue Watching');
@@ -165,10 +166,6 @@ describe('Application Launch', function () {
 
 async function createHistory() {
   await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
-  await ecp.sendKeypress(ecp.Key.Forward);
-  await ecp.sendKeypress(ecp.Key.Forward);
-  await ecp.sendKeypress(ecp.Key.Forward);
-  await utils.sleep(3000);
-  await ecp.sendKeypress(ecp.Key.Play);
+  await testUtils.seekPlayerToAbsolutePosition('videoPlayerScreen', 900000);
   await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing');
 }

@@ -10,16 +10,7 @@ describe('Autoplay Series', function () {
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/768087
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535750
   it('C768087 - Autoplay Next Video On - Autoplay next title @autoplay', async () => {
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await shared.turnOnAutoplay();
-    await shared.openSeries();
-    // Are we on the series page?
-    await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
-    await ecp.sendKeypress(ecp.Key.Play);
-    await seekToTriggerCuePoint();
-
-    // Autoplay triggered?
-    await checkIfSeriesAutoPlayUIisShowing();
+    await triggerSeriesAutoplayUI();
 
     await testUtils.waitForElementToHaveFocus('autoplayUINextEpisodeButton', 'Timed out waiting for Next Episode button to have focus', 15000);
 
@@ -40,16 +31,7 @@ describe('Autoplay Series', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/768088
   it('C768088 - Autoplay Next Video On - Press back during Autoplay countdown @autoplay', async () => {
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
-    await shared.openSeries();
-    // Are we on the series page?
-    await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
-    await ecp.sendKeypress(ecp.Key.Play);
-    await seekToTriggerCuePoint();
-
-    // Autoplay triggered?
-    await checkIfSeriesAutoPlayUIisShowing();
+    await triggerSeriesAutoplayUI();
 
     await ecp.sendKeypress(ecp.Key.Back);
     const { node } = await odc.getFocusedNode();
@@ -142,6 +124,21 @@ describe('Autoplay Series', function () {
   });
 
 });
+
+
+async function triggerSeriesAutoplayUI() {
+  await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+  await shared.turnOnAutoplay();
+  await shared.openSeries();
+  // Are we on the Movies page?
+  await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
+  await ecp.sendKeypress(ecp.Key.Play);
+  await seekToTriggerCuePoint();
+
+  // Autoplay triggered?
+  await checkIfSeriesAutoPlayUIisShowing();
+}
+
 
 async function seekToTriggerCuePoint() {
   await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');

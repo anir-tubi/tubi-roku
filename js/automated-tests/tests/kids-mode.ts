@@ -157,23 +157,18 @@ describe('Kids Mode', function () {
   it('C535860 - Registered User - Toggle ON - When user switches to Kids Mode then Home Screen filters out non-kids title, @kidsmode_registered', async () => {
     
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
     await openKidsMode();
     await ecp.sendKeypress(ecp.Key.Right);
     await testUtils.waitForSideNavMenuToNotBeExpanded();
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Check Ratings label
-    const homeScreenRatingsLabel = await testUtils.getNodeForElement('homeScreenRatingsLabel');
     const rowItemsContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('homeScreenRowList');
-
 
     for (const itemContent of rowItemsContent) {
       const rating = itemContent.ratings[0].value;
-      expect(rating).to.not.equal('R');
-      expect(rating).to.not.equal('MA');
-      expect(rating).to.not.equal('PG-13');
-      expect(rating).to.not.equal('NR');
-      expect(rating).to.not.equal('TV-13');
-
+      const restrictedRatings = ['R', 'MA', 'PG-13', 'NR', 'TV-13'];
+      expect(rating).to.not.be.oneOf(restrictedRatings);
     }
 
   });
