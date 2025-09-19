@@ -118,8 +118,8 @@ Function onVideoPreviewStateChanged(msg)
   if videoPreviewState = "finished"
     if currentScreen <> invalid AND currentScreen.contentFocused <> invalid
 
-      'Don't want to continue to full player from video preview if the user is in kidsmode, teen level for UK and NZ region as per GDPR guidelines.
-      'Also dont auto start locked contents.
+      'Don't want to continue to full player from video preview if the user is in kidsMode, teen level for UK and NZ region as per GDPR guidelines.
+      'Also don't auto start locked contents.
       item = currentScreen.contentFocused
 
       if currentScreen.subType() = "DetailScreen"
@@ -365,8 +365,7 @@ End Function
 
 Function updatePreviewPlayerToAdSpotlight()
   playerSize = m.constants.ui.imageSizes.adRowlistThumbnail
-  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_4_restart", false)
-  if experiment = invalid OR experiment.design_type <> "withDescriptionPortraitSmall"
+  if m.isUserInVideoTilesExperiment = false
     m.inlineVideoPreviewPlayerContainer.translation = [138, 168]
   else
     m.inlineVideoPreviewPlayerContainer.translation = [160, 213]
