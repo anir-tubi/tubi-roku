@@ -1160,15 +1160,21 @@ End Function
 Function onContentSelected(msg)
   tubiLog("HomeScreenHelpers.onContentSelected")
   content = msg.getData()
-  homeScreen = msg.getRoSGNode()
-  containerId = getCurrentFocusedContainerId(homeScreen, content)
-  m.autoplayContext = containerId
-  playbackSource = {
-    "srcForAnalytic": m.constants.player.playbackSource.unknown
-    "srcForAds": m.constants.player.playbackOrigin.container
-    "playbackContainer": containerId
-  }
-  processUserContentSelection(content, homeScreen, playbackSource)
+  contentType = content.type
+
+  if contentType <> m.constants.ui.contentTypes.adRowlistCarousel AND contentType <> m.constants.ui.contentTypes.adRowlistSpotlight
+    '//process the user content selection if the content selected is not a carousel or spotlight ad campaign type
+
+    homeScreen = msg.getRoSGNode()
+    containerId = getCurrentFocusedContainerId(homeScreen, content)
+    m.autoplayContext = containerId
+    playbackSource = {
+      "srcForAnalytic": m.constants.player.playbackSource.unknown
+      "srcForAds": m.constants.player.playbackOrigin.container
+      "playbackContainer": containerId
+    }
+    processUserContentSelection(content, homeScreen, playbackSource)
+  end if
 End Function
 
 
