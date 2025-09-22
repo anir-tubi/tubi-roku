@@ -373,8 +373,8 @@ Function updatePreviewPlayerToAdSpotlight()
 
   m.inlineVideoMetadataOverlay.visible = false
   m.inlineVideoGridTitleLogo.visible = false
-  m.inlinePreviewFocusIndicator.width = playerSize[0] + 6
-  m.inlinePreviewFocusIndicator.height = playerSize[1] + 6
+  m.inlinePreviewFocusIndicator.width = playerSize[0] + 3
+  m.inlinePreviewFocusIndicator.height = playerSize[1] + 3
   m.inlineVideoPreviewPlayerContainer.opacity = 1
   m.inlineVideoPreviewPlayerContainer.visible = true
   m.inlinePreviewFocusIndicator.visible = true
@@ -382,10 +382,9 @@ Function updatePreviewPlayerToAdSpotlight()
   m.videoPreviewPlayer.reParent(m.inlineVideoPreviewPlayerContainer, false)
   m.inlinePreviewFocusIndicator.reParent(m.inlineVideoPreviewPlayerContainer, false)
 
-  nVideoPlayerSizeAdjustment = 6
-  videoPlayerSize = [playerSize[0] - nVideoPlayerSizeAdjustment, playerSize[1] - nVideoPlayerSizeAdjustment]
+  videoPlayerSize = [playerSize[0], playerSize[1]]
   m.videoPreviewPlayer.clippingRect = [0, 0, videoPlayerSize[0], videoPlayerSize[1]]
-  resizeToLocation(m.videoPreviewPlayer, videoPlayerSize[0], videoPlayerSize[1], [nVideoPlayerSizeAdjustment, nVideoPlayerSizeAdjustment], 0)
+  resizeToLocation(m.videoPreviewPlayer, videoPlayerSize[0], videoPlayerSize[1], [0, 0], 0)
   m.videoPreviewPlayer.videoPlayerType = "VIDEO_IN_GRID"
 End Function
 
