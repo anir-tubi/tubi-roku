@@ -698,30 +698,28 @@ Function tubiTracking_generateQoSRealtimeMetrics_test()
   tracking = m.tracking
 
   data = {
-    adViewTime: 0
-    contentFirstFrameDuration: 1445
-    startupFailure: 0
-    viewTime: 5
-    adFirstFrameDuration: 3
+    adViewTime: 0 'distribution
+    contentFirstFrameDuration: 1445 'distribution
+    viewTime: 5 'distribution
+    adFirstFrameDuration: 3 'distribution
+    startupFailure: 0 'increment
+    seekCount: 2 'increment
     dummyInfo: 8
-    seekCount: 2
   }
 
   cdn = "cloudfront"
   trackData = tracking.generateQoSRealtimeMetrics(data, cdn)
   m.assertNotInvalid(trackData)
   m.assertNotInvalid(trackData.distribution)
-  m.assertArrayCount(trackData.distribution, 2)
+  m.assertArrayCount(trackData.distribution, 4)
   m.assertEqual(trackData.distribution[0].tags.cdn, "cloudfront")
   m.assertNotInvalid(trackData.increment)
-  m.assertArrayCount(trackData.increment, 4)
+  m.assertArrayCount(trackData.increment, 2)
   m.assertEqual(trackData.increment[0].tags.cdn, "cloudfront")
 
   data = {
-    adViewTime: 0
-    contentFirstFrameDuration: 1445
-    viewTime: 5
-    adFirstFrameDuration: 3
+    startupFailure: 0 'increment
+    seekCount: 2 'increment
     dummyInfo: 8
   }
 
@@ -731,7 +729,7 @@ Function tubiTracking_generateQoSRealtimeMetrics_test()
   m.assertNotInvalid(trackData.distribution)
   m.assertArrayCount(trackData.distribution, 0)
   m.assertNotInvalid(trackData.increment)
-  m.assertArrayCount(trackData.increment, 4)
+  m.assertArrayCount(trackData.increment, 2)
   m.assertEqual(trackData.increment[0].tags.cdn, "akamai")
 
   data = {

@@ -1561,9 +1561,9 @@ Function tubiTracking_generateQoSRealtimeMetrics(keyValuePairs as Object, cdn as
     }
 
     if m.constants.urls.realtime.distributionMapping.DoesExist(key) = true
-      incrementMetrics.push(metric)
-    else if m.constants.urls.realtime.incrementMapping.DoesExist(key) = true
       distributionMetrics.push(metric)
+    else if m.constants.urls.realtime.incrementMapping.DoesExist(key) = true
+      incrementMetrics.push(metric)
     else
       tubiLog("realtime QoS key does not exists in increment or distribution metric map", "warn")
     end if
