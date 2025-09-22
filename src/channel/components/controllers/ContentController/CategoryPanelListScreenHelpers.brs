@@ -189,16 +189,21 @@ Function onCategoryDetailPanelResponse(categoryContent)
       else
         '//there is no content in the container/category response and there is no content already existing in the category UI (panel)
 
-        screen.isCategoryLoading = true
+        screen.isCategoryLoading = false
 
-        showCategoryDetailPanelError(invalid, true)
+        ' Instead of showing error modal, show "No content" text and keep focus on category list
+        ' Create an empty content node to indicate no content state
+        emptyContent = CreateObject("roSGNode", "CategoryContentNode")
+        emptyContent.id = focusedItem.id
+        emptyContent.title = focusedItem.title
+        emptyContent.slug = focusedItem.slug
 
-        ' After the modal is dismissed, the categoryPanelScreen is given focus.
-        ' If there is content that is not valid (i.e. responseItemsCount<=0 or categoryContent = invalid),
-        ' another request will be made to fetch the content
-        ' for the categoryPanelScreen. Since we've already established there is no content, we
-        ' can prevent another call from taking place by setting the screen's content to invalid.
-        screen.categoryContent = invalid
+        ' Add isEmpty field dynamically only when needed (avoids adding it to all CategoryContentNode instances)
+        emptyContent.addField("isEmpty", "boolean", false)
+        emptyContent.isEmpty = true
+
+        screen.categoryContent = emptyContent
+        screen.shouldLoadCategoryContent = true
       end if
 
       if categoryContent <> invalid AND categoryContent.personalizationId <> invalid

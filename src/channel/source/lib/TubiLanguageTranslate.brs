@@ -974,6 +974,14 @@ Function getTranslation_en_US()
       "description": "Description of message to let users know that they must be signed in to change the AutoplayPreview choice.",
       "message": "You must be signed in to change Autoplay Controls preferences."
     },
+    "screenCategories_allEmptyUITitle": {
+      "description": "The title of the Category Detail Panel for the empty state.",
+      "message": "Nothing here… yet!"
+    },
+    "screenCategories_allEmptyUISubtitle": {
+      "description": "The subtitle of the Category Detail Panel for the empty state.",
+      "message": "Keep exploring. We’ll stay ready."
+    },
     "screenCategories_error_retrieve_message": {
       "description": "Onscreen message to indicate categories content could not be gathered",
       "message": "Could not retrieve categories content."

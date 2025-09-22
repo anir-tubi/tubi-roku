@@ -20,6 +20,12 @@ Function init()
   m.InfoPanel = m.top.findNode("ChannelsInfoPanel")
   m.PageTitleAndCounter = m.top.findNode("pageTitleAndCounter")
   m.ContentGrid = m.top.findNode("ChannelsContentGrid")
+  m.EmptyStateGroup = m.top.findNode("EmptyStateGroup")
+  m.EmptyStateTitle = m.top.findNode("EmptyStateTitle")
+  m.EmptyStateSubtitle = m.top.findNode("EmptyStateSubtitle")
+
+  m.EmptyStateTitle.text = getTranslation("screenCategories_allEmptyUITitle")
+  m.EmptyStateSubtitle.text = getTranslation("screenCategories_allEmptyUISubtitle")
   if getExperimentResource("roku_category_large_poster", "roku_category_large_poster_v1", false).enabled = true
     m.ContentGrid.itemSize = [291, 417]
   else
@@ -35,6 +41,10 @@ Function init()
   m.top.observeFieldScoped("checkOnRefreshed", "onCheckOnRefreshTriggerred")
   m.ContentGrid.observeFieldScoped("itemFocused", "onItemFocused")
   m.ContentGrid.observeFieldScoped("itemSelected", "onItemSelected")
+
+  m.typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.EmptyStateTitle, m.typographyConstants.ids.subheaderMedium)
+  setTypographyOfLabel(m.EmptyStateSubtitle, m.typographyConstants.ids.bodyMedium)
 
   ' set initial tracking values
   m.top.trackingPageInfo = createTrackingPageInfo(invalid)
@@ -56,6 +66,8 @@ Function onThemeChange(msg = invalid)
 
   if theme <> invalid
     m.ContentGrid.focusBitmapBlendColor = theme.focusedColor
+    m.EmptyStateTitle.color = theme.secondaryTextColor
+    m.EmptyStateSubtitle.color = theme.tertiaryTextColor
   end if
 End Function
 
@@ -111,7 +123,10 @@ Function setUIBasedOnFocus(bAnimateOn = true)
       '//then have the focus return to the left panel
       m.top.backButtonPressed = true
     else if m.top.content <> invalid
-      if m.top.content.getChildCount() > 0
+      if (m.top.content.hasField("isEmpty") AND m.top.content.isEmpty = true) OR m.top.content.getChildCount() = 0
+        '//For empty content, return focus to the left panel and don't allow focus on content grid
+        m.top.backButtonPressed = true
+      else if m.top.content.getChildCount() > 0
         m.ContentGrid.setFocus(true)
         '//Animate panel so infoPanel is visible
         slideTo(m.PageAnimatedGroup, [0, -m.nSponsorshipYDelta], nAnimateTime)
@@ -136,7 +151,13 @@ Function onLoadContent()
   category = m.top.content
   if category <> invalid
     m.contentLoadedAndFocused = false
-    if category.getChildCount() > 0
+    if (category.hasField("isEmpty") AND category.isEmpty = true) OR category.getChildCount() = 0
+      m.PageTitleAndCounter.content = category
+      showEmptyState()
+      ' Set focus back to left panel
+      setUIBasedOnFocus(false)
+    else if category.getChildCount() > 0
+      showContentState()
       m.nSponsorshipYDelta = 0
       if category.sponsorImages <> invalid
         m.nSponsorshipYDelta = -45
@@ -178,6 +199,7 @@ Function onIsLoading(msg)
     m.InfoPanel.visible = false
     m.ContentGrid.visible = false
     m.PageTitleAndCounter.visible = false
+    m.EmptyStateGroup.visible = false
   else
     m.InfoPanel.visible = true
     m.ContentGrid.visible = true
@@ -435,4 +457,23 @@ Function handlePlayInput()
     m.contentLoadedAndFocused = false
     m.top.contentToPlay = selectedContent
   end if
+End Function
+
+
+Function showEmptyState()
+  tubiLog("CategoryDetailsPanel.showEmptyState")
+  m.ContentGrid.visible = false
+  m.InfoPanel.visible = false
+  m.PageTitleAndCounter.visible = true
+  m.EmptyStateGroup.visible = true
+  m.top.setFocus(false)
+End Function
+
+
+Function showContentState()
+  tubiLog("CategoryDetailsPanel.showContentState")
+  m.ContentGrid.visible = true
+  m.InfoPanel.visible = true
+  m.PageTitleAndCounter.visible = true
+  m.EmptyStateGroup.visible = false
 End Function

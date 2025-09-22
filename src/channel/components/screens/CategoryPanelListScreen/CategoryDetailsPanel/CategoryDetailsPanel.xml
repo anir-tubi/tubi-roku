@@ -148,6 +148,27 @@
           fadeFocusFeedbackWhenAutoScrolling="true"
           vertFocusAnimationStyle="fixedFocus"
           focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
+        <LayoutGroup
+          id="EmptyStateGroup"
+          translation="[0, 765]"
+          itemSpacings="[21, 12]"
+          visible="false">
+          <Poster
+            id="EmptyStateIcon"
+            uri="pkg:/images/video-placeholder.png"
+            width="192"
+            height="192" />
+
+          <Label
+            id="EmptyStateTitle"
+            horizAlign="left"
+            width="1100"/>
+
+          <Label
+            id="EmptyStateSubtitle"
+            horizAlign="left"
+            width="1100"/>
+        </LayoutGroup>
       </Group>
       <Spinner
         id="ChannelDetailSpinner"
