@@ -40,6 +40,9 @@ Function init()
   }
   m.bAutostartRefreshExperimentEnabled = getExperimentResource("roku_video_autostart_ui_refresh", "roku_video_autostart_ui_refresh_v1", false).enabled = true
 
+  m.alignAdRequestExperiment = getStatsigExperimentResource("roku_player_improvement", "roku_player_align_ad_request_cuepoint_v1", false).enabled
+  m.isAlignAdRequestExposureFired = false 'using this variable to avoid experiment calls during every video position change
+
   m.tubiTrackingInfo = TubiTrackingInfo(m.constants)
   m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
 
@@ -1584,11 +1587,45 @@ Function onVideoPositionChange(msg)
   if m.top.enableAds = true AND m.midrolls.count() > 0 then
     m.AdHeadsUp.visible = false ' default to AdHeadsUp being off; this will catch ff, replay, rew during the countdown
 
-    ' attempt to fetch midroll ads before actual cuepoint
-    potentialCuepoint = m.playerPosition + m.adPrefetchTime
-    isCuepointPrefetchTimeReached = m.midrolls[strI(potentialCuepoint)]
+    isCuepointPrefetchTimeReached = false
+    potentialCuepoint = -1
+    shouldFireExposure = false
+    'Do not trigger exposure when the gap between cue point and player position is exactly 15 seconds.
 
-    if isCuepointPrefetchTimeReached = true AND m.UpNext.opacity = 0
+    ' attempt to fetch midroll ads before actual cuepoint only if the adState is "init"
+    if adState = "init"
+      cuepoint = m.playerPosition + m.adPrefetchTime
+
+      if m.midrolls[strI(cuepoint)] = true
+        isCuepointPrefetchTimeReached = true
+        potentialCuepoint = cuepoint
+      else
+        'Check if the gap between cue point and player position falls within the 3–15 second window for any cue point.
+
+        for each cuepointStr in m.midrolls
+          cuepoint = val(cuepointStr)
+          timeToCuepoint = cuepoint - m.playerPosition
+
+          if timeToCuepoint >= 3 AND timeToCuepoint < 15
+            ' Only set ad request flags if experiment is enabled
+            if m.alignAdRequestExperiment = true
+              isCuepointPrefetchTimeReached = true
+              potentialCuepoint = cuepoint
+            end if
+            shouldFireExposure = true
+            exit for
+          end if
+        end for
+      end if
+
+      if m.isAlignAdRequestExposureFired = false AND shouldFireExposure = true
+        getStatsigExperimentResource("roku_player_improvement", "roku_player_align_ad_request_cuepoint_v1")
+        m.isAlignAdRequestExposureFired = true
+      end if
+    end if
+
+    'Fetch midroll Ads
+    if isCuepointPrefetchTimeReached = true AND m.UpNext.opacity = 0 AND potentialCuepoint > 0
       m.top.adPosition = potentialCuepoint
       m.top.adControl = "midroll"
       updatePlayerLogLib(m.playerLogLib, "setAdType", "midroll")

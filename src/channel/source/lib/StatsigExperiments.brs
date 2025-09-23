@@ -24,6 +24,13 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
+      ' Ad request cuepoint alignment - fetch Ad anywhere between 3~15 second before cuepoint if experiment is enabled
+      roku_player_improvement: {
+        roku_player_align_ad_request_cuepoint_v1: {
+          default: { "enabled": false }
+        }
+      }
+
     }
     statsigExperimentsInfo: statsigExperimentsInfo
     getExperimentResource: statsigExperiments_getExperimentResource
