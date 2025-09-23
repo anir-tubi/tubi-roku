@@ -12,6 +12,7 @@ Function init()
     "width"
     "height"
     "index"
+    "rowIndex"
   ]
 
   ' Below field will hold the object of roTimeSpan that will be used to calculate how long the item was fully visible for use with viewableImpressionEvents.
@@ -246,6 +247,9 @@ Function onItemContentChange(msg)
       if m.childGridItem <> invalid then
         if m.childGridItem.hasField("parentArrayGrid") = true
           m.childGridItem.parentArrayGrid = m.parentArrayGrid
+        end if
+        if m.childGridItem.hasField("videoTilesVariant") = true
+          m.childGridItem.videoTilesVariant = row.videoTilesVariant
         end if
         ' Pass along the itemContent to the child
         m.childGridItem.itemContent = itemContent

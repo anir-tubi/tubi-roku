@@ -17,6 +17,8 @@
     <field id="itemContent" type="node" />
     <field id="width" alias="poster.width, gradient.width" />
     <field id="height" alias="poster.height, gradient.height" />
+    <field id="rowIndex" type="integer" value="-1" />
+    <field id="videoTilesVariant" type="string" value="" />
   </interface>
 
   <children>

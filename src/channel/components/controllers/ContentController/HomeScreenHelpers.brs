@@ -571,15 +571,23 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     homeScreen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
 
     if isKidsUIOn() = false AND screenID = m.constants.ui.screenIds.homeScreen
+      liveEventsContainer = getLiveEventsContainer(rawResponse)
+      if isNode(liveEventsContainer) AND liveEventsContainer.getChildCount() > 0
+        m.billboardContainerIndex = 1
+        updateBillboardContainerIndex()
+      end if
       refreshLiveEventsContainerWithEpgListingInfo(rawResponse)
 
-      getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_5_restart", true)
+      getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", true)
       if m.isUserInVideoTilesExperiment = true AND isNode(rawResponse) = true AND rawResponse.getChildCount() > 0
         ' Only show the video tile overlay group if the screen is the home screen and the skin ads are not available.
         ' This is needed because we refresh home screen behind the scenes during parent controls change.
         screen = getCurrentScreen()
         isSkinAdsAvailable = (homeScreen.skinAdContent <> invalid)
         m.videoTileOverlayGroup.visible = (isSkinAdsAvailable = false AND screen <> invalid AND screen.id = m.constants.ui.screenIds.homeScreen)
+        m.inTransitInlineVideoMetadataOverlay.containerIndex = 1
+        m.inlineVideoMetadataOverlay.containerIndex = 0
+        m.inlineVideoGridTitleLogo.containerIndex = 0
         updateCategoryGridWithFeaturedList(rawResponse, homeScreen)
         rawResponse = invalid
       end if
@@ -1455,8 +1463,11 @@ End Function
 Function onFeaturedRowCurrFocusRowChange(msg)
   screen = msg.getRoSGNode()
   currFocusRow = msg.getData()
+  updateExpandedVideoTileCurrFocusRow(currFocusRow, screen.featuredListScrollDirection)
+  updateVideoTileSize(screen.featuredListScrollingStatus)
 
   if screen.lastFocusedList = "featuredRowList"
+    m.videoPreviewPlayer.opacity = 0
     m.inlineVideoMetadataOverlay.skipAnimation = true
     ' Avoid the focus indicator from being shown when the row is scrolling.
     ' Start fade in when the user is half way through the scroll.
@@ -1480,6 +1491,7 @@ Function onFeaturedListScrollingStatusChange(msg)
   scrollingStatus = msg.getData()
   ' Below logic helps to avoid us from updating the in transit video metadata overlay when the user is scrolling up or down.
   if scrollingStatus = false
+    updateVideoTileSize(scrollingStatus)
     updateInTransitVideoMetadataOverlay()
     if m.shouldDebounceVideoTilePreview = true
       if isVideoPreviewPlaying() = true
@@ -1546,7 +1558,7 @@ Function updateVideoTileOnFocusChange(rowFocused, columnFocused, screen)
   tubiLog("HomeScreenHelpers.updateVideoTileOnFocusChange")
   ' Only process if the screen is the home screen.
   ' Since all others screens are using topRight background variant vs home screen will use full screen background.
-  ' TODO: If we graduate roku_home_screen_redesign_v_1_5_restart we should migrate the skin ad to be a itemComponent of FeaturedRowList so that we don't have to add these one off checks.
+  ' TODO: If we graduate roku_home_screen_redesign_v_1_6 we should migrate the skin ad to be a itemComponent of FeaturedRowList so that we don't have to add these one off checks.
 
   gridItemType = ""
   if screen.featuredRowContent <> invalid
@@ -1805,22 +1817,16 @@ Function updateInlineVideoMetadataOverlayVisibility(duration = 0)
         content = screen.featuredRowFocusedItem
         if getVideoPreviewStateForThisContent(content) <> "playing"
           m.inlineVideoMetadataOverlay.showContentPoster = true
-          ' Gives better scrolling experience if we pause the video preview.
-          ' We are calling stopVideoPreview once we are done with scrolling.
-          pauseVideoPreview()
         end if
       else
         ' Below logic handles displaying the large preview poster when skin ad is focused and during navigating back from ad player.
         if screen <> invalid AND screen.lastFocusedList <> "skinAdRow"
-
           fade(m.inlineVideoPreviewPlayerContainer, "out", duration, 0.1)
         else
-
           fade(m.inlineVideoPreviewPlayerContainer, "in", duration)
         end if
       end if
     else
-
       m.inlineVideoPreviewPlayerContainer.opacity = 0
     end if
   end if
@@ -1886,8 +1892,11 @@ End Function
 ' Below when user is scrolling down we use next container poster vs previous container poster.
 ' @param msg: roSGNode, the message object.
 Function onFeaturedListScrollDirectionChange(msg)
+  screen = msg.getRoSGNode()
   scrollDirection = msg.getData()
   if scrollDirection = "down" OR scrollDirection = "up"
+    updateExpandedVideoTileCurrFocusRow(screen.featuredListCurrFocusRow, scrollDirection)
+    updateVideoTileSize(screen.featuredListScrollingStatus)
     updateInTransitVideoMetadataOverlay()
   end if
 End Function
@@ -1943,4 +1952,33 @@ Function getLiveEventsContainer(rawResponse)
   end if
 
   return invalid
+End Function
+
+
+Function getVideoTileFocusedRow()
+  screen = getCurrentScreen()
+  focusedRow = 0
+  if screen <> invalid
+    focusedRow = screen.featuredListCurrFocusRow
+  end if
+
+  return focusedRow
+End Function
+
+
+Function updateExpandedVideoTileCurrFocusRow(currFocusRow, scrollDirection)
+  m.inlineVideoMetadataOverlay.containerIndex = currFocusRow
+  if scrollDirection <> "up"
+    m.inTransitInlineVideoMetadataOverlay.containerIndex = currFocusRow + 1
+  else
+    m.inTransitInlineVideoMetadataOverlay.containerIndex = currFocusRow - 1
+  end if
+  m.inlineVideoGridTitleLogo.containerIndex = currFocusRow
+End Function
+
+
+Function updateBillboardContainerIndex()
+  m.inlineVideoMetadataOverlay.billboardContainerIndex = m.billboardContainerIndex
+  m.inTransitInlineVideoMetadataOverlay.billboardContainerIndex = m.billboardContainerIndex
+  m.inlineVideoGridTitleLogo.billboardContainerIndex = m.billboardContainerIndex
 End Function

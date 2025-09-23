@@ -952,6 +952,7 @@ End Function
 
 Function switchLinearToInlineGridMode(linearPlayer)
   playerTranslationY = 0
+
   playerSize = getFeaturedPlayerSize()
 
   isCloseTo16By9 = isCloseTo16By9AspectRatio(playerSize)

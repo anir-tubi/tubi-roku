@@ -130,7 +130,11 @@ End Function
 
 ' Wrapper for getting the current screen field from the screen stack.
 Function getCurrentScreen()
-  return m.screenStack.current
+  if m.screenStack <> invalid
+    return m.screenStack.current
+  end if
+
+  return invalid
 End Function
 
 

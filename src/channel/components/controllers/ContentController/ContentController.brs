@@ -108,39 +108,25 @@ Function addControllerUi()
   ' Holds the poster for the video tile that is in transit.That is in case of user scrolling down next container poster vs previous container poster when scrolling up.
   m.inTransitInlineVideoMetadataOverlay = m.top.findNode("inTransitInlineVideoMetadataOverlay")
   m.videoTileOverlayGroup = m.top.findNode("videoTileOverlayGroup")
-  videoTilesListTranslation = m.constants.ui.videoTilesListTranslation
+  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
+  if isAA(experiment) = true AND experiment.variant = "billboard"
+    videoTilesListTranslation = m.constants.ui.billboardVariantTranslation
+  else
+    videoTilesListTranslation = m.constants.ui.videoTilesListTranslation
+  end if
   ' Using clipping rect to ensure that when scrolling up the video tile gets clipped along with the rest of the row list tiles
   m.videoTileOverlayGroup.clippingRect = [videoTilesListTranslation[0], videoTilesListTranslation[1], 1920, 1080]
   m.videoTileOverlayGroup.translation = [videoTilesListTranslation[0], -6]
 
-  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_5_restart", false)
   ' This is used to track if the user is in the video tiles experiment.
   m.isUserInVideoTilesExperiment = (experiment <> invalid AND experiment.design_type = "withDescriptionPortraitSmall")
   m.shouldDebounceVideoTilePreview = (experiment <> invalid AND experiment.should_debounce = true)
+  m.isInBillboardExperiment = (experiment <> invalid AND experiment.variant = "billboard")
   m.queuedVideoTilePreview = false
 
-  if isNonEmptyArray(experiment.featuredRowPosterSize) = true
-    featuredRowPoster = experiment.featuredRowPosterSize
-  else
-    featuredRowPoster = m.constants.ui.imageSizes.featuredRowPoster
-  end if
-  ' 4 is the padding to account for the focus indicator.
-  paddingToAccountForFocusIndicator = 4
-  width = featuredRowPoster[0] + paddingToAccountForFocusIndicator
-  height = featuredRowPoster[1] + paddingToAccountForFocusIndicator
-  ' Adjusting the size of the metadata overlay with some additional padding to account for the focus indicator.
-  m.inlineVideoMetadataOverlay.width = width
-  m.inlineVideoMetadataOverlay.height = height
-  m.inTransitInlineVideoMetadataOverlay.width = width
-  m.inTransitInlineVideoMetadataOverlay.height = height
+  m.billboardContainerIndex = 0
 
-  m.inlineVideoGridTitleLogo = m.top.findNode("inlineVideoGridTitleLogo")
-  m.inlineVideoGridTitleLogo.width = width
-  m.inlineVideoGridTitleLogo.height = height
-
-  playerSize = getFeaturedPlayerSize()
-  m.inlinePreviewFocusIndicator.height = playerSize[1]
-  m.inlinePreviewFocusIndicator.width = playerSize[0] + 12
+  updateVideoTileSize()
 
   m.LinearPlayerGroup = m.top.findNode("LinearPlayerGroup")
   m.LinearPlayerGroupAboveScreenStack = m.top.findNode("LinearPlayerGroupAboveScreenStack")
@@ -2025,7 +2011,7 @@ Function onCustomSuspend(msg)
         linearVideoPlayer.control = "stop"
       end if
 
-      ' Remove this line if we do not graduated roku_home_screen_redesign_v_1_5_restart.
+      ' Remove this line if we do not graduated roku_home_screen_redesign_v_1_6.
       ' This is needed to avoid having to use alwaysnotify on featuredListHasFocus and when app is suspended it does not fire focus change event on home screen.
       homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
       if homeScreen <> invalid
@@ -3280,11 +3266,15 @@ End Function
 ' Returns the size of the featured preivew player.
 ' @return: array, the size of the player
 Function getFeaturedPlayerSize()
-  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_5_restart", false)
+  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
   if isNonEmptyArray(experiment.featuredRowPosterSize) = true
     featuredRowPoster = experiment.featuredRowPosterSize
   else
     featuredRowPoster = m.constants.ui.imageSizes.featuredRowPoster
+  end if
+
+  if getVideoTileFocusedRow() = m.billboardContainerIndex AND experiment <> invalid AND experiment.variant = "billboard"
+    featuredRowPoster = m.constants.ui.imageSizes.billboard
   end if
 
   ' Adding 4px to the width and 10px to the height to account for the border and rounded corners.
@@ -3498,4 +3488,56 @@ Function sendStatsigExposureEvent(exposureInfo)
 
     m.statsigExperiments.logExposure(exposureInfo)
   end if
+End Function
+
+
+Function updateVideoTileSize(scrollingStatus = false)
+  m.inlineVideoGridTitleLogo = m.top.findNode("inlineVideoGridTitleLogo")
+  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
+  if isNonEmptyArray(experiment.featuredRowPosterSize) = true
+    featuredRowPoster = experiment.featuredRowPosterSize
+  else
+    featuredRowPoster = m.constants.ui.imageSizes.featuredRowPoster
+  end if
+  paddingToAccountForFocusIndicator = 4
+  preBillboardWidth = featuredRowPoster[0] + paddingToAccountForFocusIndicator
+  preBillboardHeight = featuredRowPoster[1] + paddingToAccountForFocusIndicator
+
+  billboardSize = m.constants.ui.imageSizes.billboard
+  billboardWidth = billboardSize[0]
+  billboardHeight = billboardSize[1]
+
+  if getVideoTileFocusedRow() = m.billboardContainerIndex AND m.isInBillboardExperiment = true
+    featuredRowPoster = billboardSize
+  end if
+  ' 4 is the padding to account for the focus indicator.
+  width = featuredRowPoster[0] + paddingToAccountForFocusIndicator
+  height = featuredRowPoster[1] + paddingToAccountForFocusIndicator
+  ' Adjusting the size of the metadata overlay with some additional padding to account for the focus indicator.
+
+  ' Below logic is to handle the case when user is scrolling up to billboard row.
+  ' We should not be updating the size of current Expanded video tile to larger size to avoid a effect of it expanded prematurely.
+  if m.inTransitInlineVideoMetadataOverlay.containerIndex <= m.billboardContainerIndex AND scrollingStatus = true AND m.isInBillboardExperiment = true
+    m.inlineVideoMetadataOverlay.width = preBillboardWidth
+    m.inlineVideoMetadataOverlay.height = preBillboardHeight
+    m.inlineVideoGridTitleLogo.width = preBillboardWidth
+    m.inlineVideoGridTitleLogo.height = preBillboardHeight
+  else
+    m.inlineVideoMetadataOverlay.width = width
+    m.inlineVideoMetadataOverlay.height = height
+    m.inlineVideoGridTitleLogo.width = width
+    m.inlineVideoGridTitleLogo.height = height
+  end if
+
+  if m.inTransitInlineVideoMetadataOverlay.containerIndex <= m.billboardContainerIndex AND m.isInBillboardExperiment = true AND m.inlineVideoMetadataOverlay.containerIndex < m.billboardContainerIndex + 1
+    m.inTransitInlineVideoMetadataOverlay.width = billboardWidth
+    m.inTransitInlineVideoMetadataOverlay.height = billboardHeight
+  else
+    m.inTransitInlineVideoMetadataOverlay.width = width
+    m.inTransitInlineVideoMetadataOverlay.height = height
+  end if
+
+  m.inlinePreviewFocusIndicator.height = m.inlineVideoMetadataOverlay.height
+  m.inlinePreviewFocusIndicator.width = m.inlineVideoMetadataOverlay.width + 12
+
 End Function

@@ -97,15 +97,15 @@ Function updateLiveEventsContainerWithEpgListingInfo(scheduleId)
   m.makeRequest({
     url: m.constants.urls.content.epgListingEndpoint + "/" + scheduleId
     requestType: m.constants.reqNames.getEpgListing
-    successCallback: getEpgListingInfoFromListingComplete
-    errorCallback: getEpgListingInfoFromListingComplete
+    successCallback: updateHomeScreenContainersWithEpgListingInfo
+    errorCallback: updateHomeScreenContainersWithEpgListingInfo
     responseType: "assocarray"
     retries: 0
   })
 End Function
 
 
-Function getEpgListingInfoFromListingComplete(schedule)
+Function updateHomeScreenContainersWithEpgListingInfo(schedule)
   if isAA(schedule) = true AND isNonEmptyString(schedule.startTime) = true
     screen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
     if isNode(screen) = true
@@ -120,11 +120,15 @@ Function getEpgListingInfoFromListingComplete(schedule)
         child.scheduleData = schedule
         if isGreaterThanCurrentTime(schedule.endTime) = false
           content.removeChild(container)
+          m.billboardContainerIndex = 0
           screen.contentUpdated = true
+        else
+          m.billboardContainerIndex = 1
         end if
       end if
     end if
   end if
+  updateBillboardContainerIndex()
 End Function
 
 

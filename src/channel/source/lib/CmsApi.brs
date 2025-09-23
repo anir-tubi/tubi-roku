@@ -312,6 +312,7 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
     ' Appending it only for home tab.
     if isNonEmptyString(params["content_mode"]) = false
       imageParamTypes.push("featured")
+      imageParamTypes.push("billboard")
     end if
 
     params = m.setImageParams(imageParamTypes, options.params, m.constants.ui.screenIds.homeScreen)
@@ -458,9 +459,11 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
   end if
 
   tileDesignType = "none"
+  includeBillboard = false
   if m.experiments <> invalid AND bKidsMode = false
-    experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_5_restart")
+    experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6")
     tileDesignType = experiment.design_type
+    includeBillboard = experiment.variant = "billboard"
   end if
 
   if imageParamTypes = invalid AND tileDesignType = "withDescriptionPortraitSmall"
@@ -471,6 +474,9 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
       "featured"
       "title"
     ]
+    if includeBillboard = true
+      imageParamTypes.push("billboard")
+    end if
   else if imageParamTypes = invalid
     imageParamTypes = [
       "poster"
@@ -590,6 +596,7 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
   fullScreenBackground = imageSizes.fullScreenBackground
   featuredRowPoster = imageSizes.featuredRowPoster
   featuredPortraitSmall = imageSizes.featuredPortraitSmall
+  billboard = imageSizes.billboard
 
   '//For now, ensure the large posters do not show up on the search screen
   isNonLargePostersScreen = (isNonEmptyString(screenId) = true AND screenId = m.constants.ui.screenIds.searchScreen)
@@ -618,6 +625,8 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
     else if imageType = "featured"
       existingParams["images[hero_tb]"] = "w" + featuredRowPoster[0].ToStr() + "h" + featuredRowPoster[1].ToStr() + "_hero"
       existingParams["images[featured_portrait_tb]"] = "w" + featuredPortraitSmall[0].ToStr() + "h" + featuredPortraitSmall[1].ToStr() + "_poster"
+    else if imageType = "billboard"
+      existingParams["images[billboard_tb]"] = "w" + billboard[0].ToStr() + "h" + billboard[1].ToStr() + "_hero"
     else if imageType = "background"
       if containerGridItemType <> gridItemTypes.skinAd
         existingParams["images[background_tb]"] = "w" + background[0].ToStr() + "h" + background[1].ToStr() + "_background"

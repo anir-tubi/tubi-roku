@@ -5,9 +5,8 @@ Function init()
   m.constants = getConstantsFromGlobal()
   m.channelLogo = m.top.findNode("channelLogo")
   m.firstLineGroup = m.top.findNode("firstLineGroup")
+  m.thirdLineGroup = m.top.findNode("thirdLineGroup")
   m.description = m.top.findNode("description")
-  m.lineOneData = m.firstLineGroup.findNode("lineOneData")
-  m.lineTwoData = m.top.findNode("lineTwoData")
   m.progressBar = m.top.findNode("progressBar")
   m.progressBarGroup = m.top.findNode("progressBarGroup")
   m.rating = m.firstLineGroup.findNode("Rating")
@@ -15,17 +14,40 @@ Function init()
   m.ratingLabel = m.rating.findNode("RatingLabel")
   m.sotBadge = m.firstLineGroup.findNode("sotBadge")
   m.closedCaptions = m.firstLineGroup.findNode("ClosedCaptionPoster")
+  m.subHeadlinePrefixGroup = m.top.findNode("subHeadlinePrefixGroup")
+  m.subHeadlineSuffixGroup = m.top.findNode("subHeadlineSuffixGroup")
 
   m.top.observeFieldScoped("itemContent", "onItemContentChange")
+  m.top.observeFieldScoped("hideTitle", "onHideTitleChange")
+  m.top.observeFieldScoped("width", "onWidthChange")
+
+  experimentInfo = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
+  m.variant = experimentInfo.variant
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.description, typographyConstants.ids.bodySmall)
-  setTypographyOfLabel(m.lineOneData, typographyConstants.ids.bodySmall)
-  setTypographyOfLabel(m.lineTwoData, typographyConstants.ids.bodySmall)
+  m.bodyMediumFont = typographyConstants.ids.bodyMedium
+
+  m.bodySmallFont = typographyConstants.ids.bodySmall
+
+  m.title = invalid
+  if m.variant = "typography_improvements"
+    m.title = createObject("roSGNode", "Label")
+    m.title.id = "title"
+    setTypographyOfLabel(m.title, typographyConstants.ids.subheaderMedium)
+    m.metadataGroup.insertChild(m.title, 0)
+
+    m.metadataGroup.itemSpacings = [8, 4]
+    setTypographyOfLabel(m.description, m.bodyMediumFont)
+  else
+    setTypographyOfLabel(m.description, m.bodySmallFont)
+  end if
+
   setTypographyOfLabel(m.ratingLabel, typographyConstants.ids.bodyExtraSmallStrong)
   m.badgeTextFont = typographyConstants.ids.bodySmallStrong
 
   m.description.observeFieldScoped("isTextEllipsized", "onIsTextEllipsizedChange")
+
+  m.top.observeFieldScoped("isBillboardRow", "onIsBillboardRowChange")
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -43,8 +65,7 @@ Function onThemeChange(msg = invalid)
 
   if theme <> invalid
     m.primaryTextColor = theme.primaryTextColor
-    m.lineOneData.color = theme.secondaryTextColor
-    m.lineTwoData.color = theme.secondaryTextColor
+    m.secondaryTextColor = theme.secondaryTextColor
     m.RatingLabel.color = theme.secondaryTextColor
     m.description.color = m.primaryTextColor
 
@@ -52,6 +73,10 @@ Function onThemeChange(msg = invalid)
     m.progressBar.trackColor = theme.neutralColor
     m.progressBar.unfocusColor = theme.focusedColor
     m.ratingBackground.blendColor = theme.tertiaryTextColor
+
+    if m.title <> invalid
+      m.title.color = m.primaryTextColor
+    end if
   end if
 End Function
 
@@ -62,7 +87,6 @@ Function setThumbnailImage(thumbnailUri, contentType)
     if channelLogoIsPresent = false
       m.firstLineGroup.insertChild(m.channelLogo, 0)
     end if
-
     m.channelLogo.uri = thumbnailUri
   else if channelLogoIsPresent = true
     m.firstLineGroup.removeChild(m.channelLogo)
@@ -74,10 +98,18 @@ Function onItemContentChange(msg)
   itemContent = msg.getData()
 
   if itemContent <> invalid
+    m.nodeHelpers.removeAllChildren(m.subHeadlinePrefixGroup)
+    m.nodeHelpers.removeAllChildren(m.subHeadlineSuffixGroup)
+
     ' Resetting the visibility of the rating and sot badge.
     m.rating.visible = true
     m.sotBadge.visible = true
-    m.description.width = m.top.width
+    onWidthChange()
+
+    if m.title <> invalid
+      m.title.text = itemContent.title
+    end if
+
     if itemContent.type = m.constants.ui.contentTypes.linear
       setThumbnailImage(itemContent.thumbnailUri, itemContent.type)
       currentProgram = getCurrentLiveProgram(itemContent)
@@ -93,13 +125,13 @@ Function onItemContentChange(msg)
         m.progressBar.visible = true
 
         if m.progressBarGroup.getParent() = invalid
-          index = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.lineOneData)
+          index = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.subHeadlinePrefixGroup)
           m.firstLineGroup.insertChild(m.progressBarGroup, index + 1)
         end if
 
-        if m.lineTwoData.getParent() = invalid
+        if m.subHeadlineSuffixGroup.getParent() = invalid
           index = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.progressBarGroup)
-          m.firstLineGroup.insertChild(m.lineTwoData, index + 1)
+          m.firstLineGroup.insertChild(m.subHeadlineSuffixGroup, index + 1)
         end if
 
         if m.sotBadge.getParent() <> invalid
@@ -109,8 +141,8 @@ Function onItemContentChange(msg)
         metadataOnPosterContent(itemContent)
         m.description.text = itemContent.description
 
-        if m.lineTwoData.getParent() <> invalid
-          m.firstLineGroup.removeChild(m.lineTwoData)
+        if m.subHeadlineSuffixGroup.getParent() <> invalid
+          m.firstLineGroup.removeChild(m.subHeadlineSuffixGroup)
         end if
 
         if m.progressBarGroup.getParent() <> invalid
@@ -124,8 +156,8 @@ Function onItemContentChange(msg)
         m.firstLineGroup.removeChild(m.channelLogo)
       end if
 
-      if m.lineTwoData.getParent() <> invalid
-        m.firstLineGroup.removeChild(m.lineTwoData)
+      if m.subHeadlineSuffixGroup.getParent() <> invalid
+        m.firstLineGroup.removeChild(m.subHeadlineSuffixGroup)
       end if
 
       if m.progressBarGroup.getParent() <> invalid
@@ -146,61 +178,59 @@ End Function
 
 
 Function metadataOnPosterContent(itemContent)
-
-  firstLineGroup = m.firstLineGroup
   insertIndex = 0
 
-  text = ""
+  prefixTextParts = []
 
   tags = itemContent.tags
   if isNonEmptyArray(tags) = true
     text = tags[0]
     if tags[1] <> invalid
-      text += ", " + tags[1]
+      if m.top.isBillboardRow = false
+        text += ", " + tags[1]
+      else
+        text += " " + Chr(&hb7) + " " + tags[1]
+      end if
     end if
-    text += " "
+    prefixTextParts.push(text)
   end if
 
   if itemContent.year <> invalid
-    ' add 'dot' spacer only if we had a tag/genre
-    if text.len() > 0
-      text += Chr(&hb7) + " "
-    end if
-    text += itemContent.year.toStr() + " "
+    text = itemContent.year.toStr()
+    prefixTextParts.push(text)
   end if
 
   seasons = itemContent.seasons
   length = itemContent.length
   if seasons <> invalid AND seasons > 0
-
-    if text.len() > 0
-      text += Chr(&hb7) + " "
-    end if
-
     if seasons = 1
-      text += getTranslation("metadata_seasons_singular")
+      text = getTranslation("metadata_seasons_singular")
     else
-      text += getTranslation("metadata_seasons_plural", { seasons: seasons.toStr() })
+      text = getTranslation("metadata_seasons_plural", { seasons: seasons.toStr() })
     end if
+    prefixTextParts.push(text)
   else if length <> invalid AND length <> 0
-    if text.len() > 0
-      text += Chr(&hb7) + " "
-    end if
-
     lengthString = convertSecondsToHoursString(length)
-    text += lengthString
+    prefixTextParts.push(lengthString)
   end if
 
-  if isNonEmptyString(text) = true
-    m.lineOneData.text = text
+  if isNonEmptyArray(prefixTextParts) = true
+    renderSubHeadline(prefixTextParts, true)
     insertIndex++
+  end if
+
+
+  if m.thirdLineGroup <> invalid
+    ratingSotParent = m.thirdLineGroup
+  else
+    ratingSotParent = m.firstLineGroup
   end if
 
   ' handle rating
   ratingIsPresent = (m.rating.getParent() <> invalid)
   if isNonEmptyArray(itemContent.ratings) = true AND isAA(itemContent.ratings[0]) = true
     if ratingIsPresent = false
-      firstLineGroup.insertChild(m.rating, insertIndex)
+      ratingSotParent.insertChild(m.rating, insertIndex)
     end if
 
     m.ratingLabel.width = 0
@@ -211,7 +241,7 @@ Function metadataOnPosterContent(itemContent)
     m.ratingLabel.width = nRatingBoundingBoxIncrease
   else
     if ratingIsPresent = true
-      firstLineGroup.removeChild(m.rating)
+      ratingSotParent.removeChild(m.rating)
     end if
   end if
 
@@ -225,11 +255,11 @@ Function metadataOnPosterContent(itemContent)
 
   if itemContent.type <> "linear" AND isAA(sotBadge) = true AND sotBadge.count() > 0
     if isSotBadgePresent = false
-      ratingIndex = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.rating)
+      ratingIndex = m.nodeHelpers.getChildIndex(ratingSotParent, m.rating)
       if ratingIndex <> -1
         insertIndex = ratingIndex + 1
       end if
-      firstLineGroup.insertChild(m.sotBadge, insertIndex)
+      ratingSotParent.insertChild(m.sotBadge, insertIndex)
     end if
 
     m.sotBadge.textColor = m.primaryTextColor
@@ -239,7 +269,7 @@ Function metadataOnPosterContent(itemContent)
     m.sotBadge.iconUri = sotBadge.sotIcon
 
   else if isSotBadgePresent = true
-    firstLineGroup.removeChild(m.sotBadge)
+    ratingSotParent.removeChild(m.sotBadge)
   end if
 
   if itemContent.hascc = true
@@ -251,7 +281,6 @@ End Function
 
 
 Function metadataOnContinueWatchingContent(itemContent)
-  m.lineOneData.text = ""
   m.closedCaptions.visible = false
   m.rating.visible = false
   ' Sot badge is will not be present in the continue watching content portrait mode.
@@ -270,11 +299,11 @@ Function metadataOnContinueWatchingContent(itemContent)
     m.progressBar.visible = true
 
     if m.progressBarGroup.getParent() = invalid
-      index = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.lineOneData)
+      index = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.subHeadlinePrefixGroup)
       timeLeft = convertSecondsToTimeLeftString(duration - nowPos)
       if isNonEmptyString(timeLeft) = true
-        m.lineTwoData.text = timeLeft
-        m.firstLineGroup.insertChild(m.lineTwoData, index + 1)
+        renderSubHeadline([timeLeft], false)
+        m.firstLineGroup.insertChild(m.subHeadlineSuffixGroup, index + 1)
       end if
 
       m.firstLineGroup.insertChild(m.progressBarGroup, index + 1)
@@ -286,41 +315,35 @@ End Function
 Function metadataOnLivePosterContent(currentProgram, content)
   firstLineGroup = m.firstLineGroup
 
-  text = ""
+  prefixTextParts = []
 
   releaseDate = currentProgram.releaseDate
   if releaseDate <> invalid
     releaseDate = releaseDate.toStr()
     if isNonEmptyString(releaseDate) = true
-      text = text + releaseDate
+      prefixTextParts.push(releaseDate)
     end if
   end if
 
   duration = calculateProgramTime(currentProgram)
   if isNonEmptyString(duration) = true
-    if text.len() > 0
-      text += " " + Chr(&hb7) + " "
-    end if
-
-    text += duration
+    prefixTextParts.push(duration)
   end if
 
   timeLeft = calculateProgramTimeLeft(currentProgram)
-  twoLineText = ""
   if timeLeft <> invalid
-    twoLineText = timeLeft
-    m.lineTwoData.text = twoLineText
+    renderSubHeadline([timeLeft], false)
   end if
 
-  if isNonEmptyString(text) = true
-    m.lineOneData.text = text
+  if isNonEmptyArray(prefixTextParts) = true
+    renderSubHeadline(prefixTextParts, true)
   end if
 
   ' handle rating
   ratingIsPresent = (m.rating.getParent() <> invalid)
   if isNonEmptyString(currentProgram.rating) = true
     if ratingIsPresent = false
-      insertIndex = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.lineTwoData)
+      insertIndex = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.subHeadlinePrefixGroup)
       firstLineGroup.insertChild(m.rating, insertIndex + 1)
     end if
 
@@ -392,5 +415,58 @@ Function onIsTextEllipsizedChange(msg)
   isTextEllipsized = msg.getData()
   if isTextEllipsized = true
     m.description.width = 884
+  end if
+End Function
+
+
+Function onHideTitleChange(msg)
+  hideTitle = msg.getData()
+  if m.title <> invalid
+    if hideTitle = true
+      m.title.scale = [0, 0]
+    else
+      m.title.scale = [1, 1]
+    end if
+  end if
+End Function
+
+
+Function onIsBillboardRowChange(msg)
+  isBillboardRow = msg.getData()
+  if isBillboardRow = true
+    setTypographyOfLabel(m.description, m.bodyMediumFont)
+    m.subHeadlinePrefixGroup.itemSpacings = [20]
+    m.subHeadlineSuffixGroup.itemSpacings = [20]
+    m.firstLineGroup.itemSpacings = [20]
+  end if
+End Function
+
+
+Function renderSubHeadline(parts, isPrefix)
+  if isPrefix = true
+    group = m.subHeadlinePrefixGroup
+  else
+    group = m.subHeadlineSuffixGroup
+  end if
+
+  prefix = ""
+  for each part in parts
+    label = createObject("roSGNode", "Label")
+    label.color = m.secondaryTextColor
+    setTypographyOfLabel(label, m.bodySmallFont)
+    label.text = prefix + part
+    group.appendChild(label)
+    if m.top.isBillboardRow = false
+      prefix = " " + Chr(&hb7) + " "
+    end if
+  end for
+End Function
+
+
+Function onWidthChange()
+  if m.top.descriptionWidth <= 0
+    m.description.width = m.top.width
+  else
+    m.description.width = m.top.descriptionWidth
   end if
 End Function

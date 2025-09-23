@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="ExpandedTilePosterOverlay" extends="Group">
+
+  <script type="text/brightscript" uri="ExpandedTilePosterOverlay.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
+
+  <interface>
+    <field id="itemContent" type="node" />
+    <field id="width" type="float" />
+    <field id="height" type="float" />
+    <field id="itemHasFocus" type="boolean" />
+    <field id="showContentPoster" type="boolean" value="true" />
+    <field id="skipAnimation" type="boolean" />
+    <field id="containerIndex" type="float" />
+    <field id="billboardContainerIndex" type="integer" />
+  </interface>
+
+  <children>
+    <LayoutGroup
+      layoutDirection="horiz"
+      id="sotTopLabelGroup"
+      translation="[15, 15]"
+      itemSpacings="[9]" />
+
+    <LayoutGroup
+      itemSpacings="[12, 9]"
+      translation="[15, 0]"
+      id="bottomContentGroup">
+      <Poster
+        id="titleImage"
+        opacity="0"
+        loadDisplayMode="limitSize" />
+
+      <LayoutGroup
+        opacity="0"
+        id="titleGroup">
+        <Label
+          id="title"
+          width="650"
+          wrap="true"
+          vertAlign="bottom">
+          <Font
+            id="TitleFont"
+            role="font" />
+        </Label>
+        <Label
+          id="subtitle"
+          width="650"
+          vertAlign="bottom">
+          <Font
+            id="SubTitleFont"
+            role="font" />
+        </Label>
+      </LayoutGroup>
+    </LayoutGroup>
+  </children>
+</component>

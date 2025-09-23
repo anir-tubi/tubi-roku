@@ -44,7 +44,7 @@ Function stopVideoPreview(node = invalid)
     node = m.videoPreviewPlayer
   end if
 
-  ' TODO: Remove if we do not graduate roku_home_screen_redesign_v_1_5_restart experiment.
+  ' TODO: Remove if we do not graduate roku_home_screen_redesign_v_1_6 experiment.
   ' This is needed to provide smooth scrolling experience when the user is scrolling the list because calling video stop causes glitchy behavior.
   isListScrolling = false
   screen = getCurrentScreen()
@@ -53,7 +53,9 @@ Function stopVideoPreview(node = invalid)
   end if
 
   if node <> invalid AND node.subType() = "VideoPreviewPlayer" AND isListScrolling = false
-    sendVideoPlayerCommand(node, "stop")
+    if node.playerState <> "stopped"
+      sendVideoPlayerCommand(node, "stop")
+    end if
     node.visible = false
   end if
 End Function
@@ -308,7 +310,7 @@ Function updatePreviewPlayerToInlineView()
       setPageInfoForVideoPreview(screen.trackingPageInfo)
     end if
     playerTranslationY = 0
-    playerSize = getFeaturedPlayerSize()
+    playerSize = [m.inlineVideoMetadataOverlay.width, m.inlineVideoMetadataOverlay.height]
 
     isCloseTo16By9 = isCloseTo16By9AspectRatio(playerSize)
     if isCloseTo16By9 = false
@@ -318,17 +320,17 @@ Function updatePreviewPlayerToInlineView()
     end if
 
     index = m.nodeHelpers.getChildIndex(m.inlineVideoPreviewPlayerContainer, m.inlineVideoMetadataOverlay)
+    m.videoPreviewPlayer.width = playerSize[0]
+    if isCloseTo16By9 = false
+      ' If the aspect ratio is not close to 16:9, adjust the height to 16:9
+      adjustedHeight = playerSize[0] * (9 / 16)
+      m.videoPreviewPlayer.height = adjustedHeight
+      m.videoPreviewPlayer.clippingRect = [0, Abs(playerTranslationY), playerSize[0], playerSize[1]]
+    else
+      m.videoPreviewPlayer.height = playerSize[1]
+      m.videoPreviewPlayer.clippingRect = [0, 0, playerSize[0], playerSize[1]]
+    end if
     if m.videoPreviewPlayer.getParent().isSameNode(m.inlineVideoPreviewPlayerContainer) = false OR index <> 0
-      m.videoPreviewPlayer.width = playerSize[0]
-
-      if isCloseTo16By9 = false
-        ' If the aspect ratio is not close to 16:9, adjust the height to 16:9
-        adjustedHeight = playerSize[0] * (9 / 16)
-        m.videoPreviewPlayer.height = adjustedHeight
-        m.videoPreviewPlayer.clippingRect = [0, Abs(playerTranslationY), playerSize[0], playerSize[1]]
-      else
-        m.videoPreviewPlayer.height = playerSize[1]
-      end if
       m.inlineVideoMetadataOverlay.reParent(m.inlineVideoPreviewPlayerContainer, false)
       m.videoPreviewPlayer.reParent(m.inlineVideoPreviewPlayerContainer, false)
       m.inlineVideoGridTitleLogo.reParent(m.inlineVideoPreviewPlayerContainer, false)

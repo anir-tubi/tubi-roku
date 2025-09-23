@@ -66,6 +66,8 @@ Function onContentChange()
 
     m.CategoryName.width = 1000
     m.subText.visible = false
+    ' TODO: Revisit this logic based on the experiment roku_home_screen_redesign_v_1_6 results.
+    m.CategoryName.visible = item.videoTilesVariant <> "billboard" OR item.id <> "featured"
 
     if item.subtext <> invalid AND item.subtext <> ""
       ' Purposely passing in invalid constants for each row label to avoid having to pull in constants for each row label

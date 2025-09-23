@@ -1505,6 +1505,8 @@ Function getConstants()
 
   constants.ui.imageSizes.titleArt = [594, 249]
 
+  constants.ui.imageSizes.billboard = [1209, 681]
+
   ' Size for the background image.
   if limitedUi = true
     constants.ui.imageSizes.background = [399, 225]
@@ -1610,6 +1612,7 @@ Function getConstants()
   constants.ui.gridItemTypes.certifiedFresh = "certifiedFresh"
   constants.ui.gridItemTypes.liveEventSpotlight = "liveEventSpotlight"
   constants.ui.gridItemTypes.liveEventBanner = "liveEventBanner"
+  constants.ui.gridItemTypes.billboard = "billboard"
 
   ' Holds the container ids which are not video tile containers.
   ' This will help us to avoid showing the expanded video tile.
@@ -1621,6 +1624,7 @@ Function getConstants()
   constants.ui.noInfoPanelGridItemTypes = [constants.ui.gridItemTypes.liveEventSpotlight, constants.ui.gridItemTypes.skinAd, constants.ui.gridItemTypes.adRowlistSpotlight]
   constants.ui.adGridItemTypes = [constants.ui.gridItemTypes.adRowlistCarousel, constants.ui.gridItemTypes.skinAd, constants.ui.gridItemTypes.adRowlistSpotlight]
   constants.ui.videoTilesListTranslation = [24, 144]
+  constants.ui.billboardVariantTranslation = [0, 75]
 
   constants.ui.uris = {}
 

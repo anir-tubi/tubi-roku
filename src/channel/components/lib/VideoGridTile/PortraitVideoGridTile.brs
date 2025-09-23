@@ -6,6 +6,7 @@ Function init()
   m.timeLeftLabel = topRef.findNode("timeLeftLabel")
   m.gradient = topRef.findNode("gradient")
   topRef.observeFieldScoped("height", "onHeightChange")
+  topRef.observeFieldScoped("videoTilesVariant", "updateTileTranslation")
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.timeLeftLabel, typographyConstants.ids.bodySmall)
@@ -41,6 +42,7 @@ Function onItemContentChange(msg)
   itemContent = msg.getData()
 
   if itemContent <> invalid
+    updateTileTranslation()
     m.progressBarGroup.visible = false
     m.gradient.visible = false
 
@@ -144,4 +146,17 @@ Function calculateProgramTime(program) as String
   end if
 
   return programTimeString
+End Function
+
+
+Function updateTileTranslation()
+  content = m.top.itemContent
+  if content <> invalid
+    parent = content.getParent()
+    if m.top.videoTilesVariant = "billboard" AND parent <> invalid AND parent.id = "featured"
+      m.top.translation = [0, 120]
+    else
+      m.top.translation = [0, 0]
+    end if
+  end if
 End Function

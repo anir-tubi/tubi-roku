@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <component name="VideoGridTitleLogo" extends="Group">
 
   <script type="text/brightscript" uri="VideoGridTitleLogo.brs" />
@@ -9,72 +9,34 @@
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
 
   <interface>
-    <field id="itemContent" type="node" />
-    <field id="width" alias="videoInGridGradient.width" />
-    <field id="height" alias="videoInGridGradient.height" />
-    <field id="itemHasFocus" type="boolean" />
-    <field id="showContentPoster" type="boolean" value="true" />
+    <field id="itemContent" type="node" alias="posterOverlay.itemContent" />
+    <field id="width" alias="videoInGridGradient.width, posterOverlay.width" />
+    <field id="height" alias="videoInGridGradient.height, posterOverlay.height" />
+    <field id="itemHasFocus" type="boolean" alias="posterOverlay.itemHasFocus" />
+    <field id="showContentPoster" type="boolean" value="true" alias="posterOverlay.showContentPoster" />
+    <field id="containerIndex" type="integer" alias="posterOverlay.containerIndex" />
+    <field id="billboardContainerIndex" type="integer" alias="posterOverlay.billboardContainerIndex" />
   </interface>
 
   <children>
-    <LayoutGroup
-      id="tileLayout"
-      itemSpacings="[24]">
+    <Group
+      id="tileLayout">
+      <Poster
+        id="videoInGridGradient"
+        translation="[0, 1]"
+        loadDisplayMode="scaleToFill"
+        uri="pkg:/images/video_in_grid_gradient_$$RES$$.9.png" />
 
-      <Group 
-        id="posterGroup">
-        <Poster
-          id="videoInGridGradient"
-          translation="[0, 1]"
-          loadDisplayMode="scaleToFill"
-          uri="pkg:/images/video_in_grid_gradient_$$RES$$.9.png"/>
-
-        <Poster
-          id="titleImage"
-          opacity="0"
-          loadDisplayMode="limitSize"/>
-
-        <LayoutGroup
-          opacity="0"
-          id="titleGroup">
-          <Label
-            id="title"
-            wrap="true"
-            width="650"
-            vertAlign="bottom">
-            <Font
-              id="TitleFont"
-              role="font"/>
-          </Label>
-          <Label
-            id="subtitle"
-            width="650"
-            vertAlign="bottom">
-            <Font
-              id="SubTitleFont"
-              role="font"/>
-          </Label>
-        </LayoutGroup>
-      </Group>
-    </LayoutGroup>
-
-    <LayoutGroup
-      layoutDirection="horiz"
-      id="sotTopLabelGroup"
-      translation="[16,16]"
-      itemSpacings="[9]" />
-
-    <LayoutGroup
-      id="sotMarkerGroup"
-      itemSpacings="[9]">
-      <Badge
-        id="sotMarker"/>
-    </LayoutGroup>
+      <ExpandedTilePosterOverlay
+        id="posterOverlay" />
+    </Group>
 
   </children>
 </component>

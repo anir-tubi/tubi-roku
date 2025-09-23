@@ -4,8 +4,10 @@ Function init()
   m._ = rodash()
   m.constants = getConstantsFromGlobal()
   m.Tracking = TubiTrackingInfo(m.constants)
-  experimentInfo = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_5_restart", false)
+  experimentInfo = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
   m.isUserInVideoTilesExperiment = isAA(experimentInfo) AND experimentInfo.design_type = "withDescriptionPortraitSmall"
+  m.isUserInBillboardVariant = isAA(experimentInfo) AND experimentInfo.variant = "billboard"
+  m.shouldDim = isAA(experimentInfo) AND experimentInfo.should_dim = true
 
   m.PageGroup = m.top.findNode("PageGroup")
   m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]
@@ -89,6 +91,13 @@ Function init()
 
   m.scrollDirection = "none"
 
+  ' Logic related to roku_home_screen_redesign_v_1_6 experiment.
+  if isAA(experimentInfo) = true AND experimentInfo.variant = "billboard"
+    m.videoTilesListTranslation = [0, m.constants.ui.videoTilesListTranslation[1]]
+  else
+    m.videoTilesListTranslation = m.constants.ui.videoTilesListTranslation
+  end if
+
 End Function
 
 
@@ -100,7 +109,7 @@ Function setContentAreaState(state = invalid)
     m.currentContentAreaTranslation = m.originalContentAreaTranslation
     shouldAnimate = true
   else
-    m.currentContentAreaTranslation = m.constants.ui.videoTilesListTranslation
+    m.currentContentAreaTranslation = m.videoTilesListTranslation
   end if
 
   if shouldAnimate = true
@@ -614,7 +623,7 @@ End Function
 ' @rowPercent: float, the percentage that the container is focused
 Function expandContentAreaForContainersWithoutInfoPanel(rowPercent)
   nDiffHeight = m.originalContentAreaTranslation[1] - 102 '//bring this to the top of the screen
-  if m.currentContentAreaTranslation[1] = m.constants.ui.videoTilesListTranslation[1]
+  if m.currentContentAreaTranslation[1] = m.videoTilesListTranslation[1]
     nDiffHeight = m.currentContentAreaTranslation[1] + 302 '//bring this to the top of the screen if the home redesign is enabled
   end if
   m.ContentAreaParent.translation = [m.ContentAreaParent.translation[0], m.currentContentAreaTranslation[1] - (nDiffHeight * rowPercent)]
@@ -634,7 +643,7 @@ End Function
 ' @rowPercent: float, the percentage that the adRowlistCarousel row is focused
 Function expandContentAreaForAdDisplayCarousel(rowPercent)
   nDiffHeight = m.originalContentAreaTranslation[1] - 102 '//bring this to the top of the screen
-  if m.currentContentAreaTranslation[1] = m.constants.ui.videoTilesListTranslation[1]
+  if m.currentContentAreaTranslation[1] = m.videoTilesListTranslation[1]
     nDiffHeight = m.currentContentAreaTranslation[1] + 302 '//bring this to the top of the screen if the home redesign is enabled
   end if
   m.ContentAreaParent.translation = [m.ContentAreaParent.translation[0], m.currentContentAreaTranslation[1] - (nDiffHeight * rowPercent)]
@@ -752,6 +761,11 @@ Function onFeaturedRowFocusedItemChange(msg) as Void
   end if
 
   if m.CategoryGridList.isInFocusChain() = true
+    if m.shouldDim = true AND m.CategoryGridList.featuredListCurrFocusRow = 0
+      m.ContentArea.maskUri = "pkg:/images/poster-mask-60.png"
+    else if m.isUserInVideoTilesExperiment = true
+      m.ContentArea.maskUri = ""
+    end if
     '//if the CategoryGridList is in focus, then alter the UI.
     if focusedContent <> invalid
       m.top.contentFocused = focusedContent
@@ -768,8 +782,6 @@ Function onFeaturedRowFocusedItemChange(msg) as Void
     end if
 
   end if
-
-
 
   fireNavigateWithinPageEvent()
 End Function

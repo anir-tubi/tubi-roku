@@ -13,10 +13,15 @@
   <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
 
   <interface>
     <field id="itemContent" type="node" />
     <field id="width" type="float" />
+    <field id="hideTitle" type="boolean" />
+    <field id="isBillboardRow" type="boolean" />
+    <field id="descriptionWidth" type="float" value="0" />
   </interface>
 
   <children>
@@ -34,12 +39,9 @@
           id="channelLogo"
           width="40"
           height="40" />
-        <Label
-          id="lineOneData"
-          vertAlign="bottom" >
-          <Font
-            role="font" />
-        </Label>
+        <LayoutGroup
+          id="subHeadlinePrefixGroup"
+          layoutDirection="horiz" />
         <Rectangle
           id="progressBarGroup"
           width="40"
@@ -52,12 +54,9 @@
             pointerHeight="6"
             visible="false"/>
         </Rectangle>
-        <Label
-          id="lineTwoData"
-          vertAlign="bottom" >
-          <Font
-            role="font" />
-        </Label>
+        <LayoutGroup
+          id="subHeadlineSuffixGroup"
+          layoutDirection="horiz" />
         <Group
           id="Rating">
           <Poster

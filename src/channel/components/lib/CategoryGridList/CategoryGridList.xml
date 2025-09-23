@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 
 <component name="CategoryGridList" extends="Group">
   <script type="text/brightscript" uri="CategoryGridList.brs" />
@@ -24,7 +24,7 @@
 
   <interface>
     <!-- INPUT -->
-      <!-- The content that actually populates the RowList. Content should be structured as:
+    <!-- The content that actually populates the RowList. Content should be structured as:
       <CategoryContentNode>
         <CategoryContentNode title="category1" />
           <ContentNode title="item1" />
@@ -35,161 +35,177 @@
         <CategoryContentNode title="category3" />
         ...
       </CategoryContentNode> -->
-      <field id="content" type="node"/>
+    <field id="content" type="node" />
 
-      <field id="skinAdContent" type="node" alias="skinAdRow.content" />
+    <field id="skinAdContent" type="node" alias="skinAdRow.content" />
 
-      <field id="skinAdContentUpdated" alias="skinAdRow.contentUpdated" />
+    <field id="skinAdContentUpdated" alias="skinAdRow.contentUpdated" />
 
-      <field id="featuredRowContent" type="node" />
+    <field id="featuredRowContent" type="node" />
 
-      <!-- contentUpdated will be set when the new content is ready to be displayed on the screen. -->
-      <field id="contentUpdated" type="boolean" alwaysNotify="true"/>
+    <!-- contentUpdated will be set when the new content is ready to be displayed on the screen. -->
+    <field id="contentUpdated" type="boolean" alwaysNotify="true" />
 
-      <!-- set the RowList.rowHeights and RowList.rowItemSize arrays since the category order has changed. -->
-      <field id="repopulateContent" type="boolean" alwaysNotify="true"/>
+    <!-- set the RowList.rowHeights and RowList.rowItemSize arrays since the category order has
+    changed. -->
+    <field id="repopulateContent" type="boolean" alwaysNotify="true" />
 
-      <!-- expected to be category ids(continue_watching/queue) if new continue_watching/queue got added, helps to set focus to correct row -->
-      <field id="rowAdded" type="string"/>
+    <!-- expected to be category ids(continue_watching/queue) if new continue_watching/queue got
+    added, helps to set focus to correct row -->
+    <field id="rowAdded" type="string" />
 
-      <!-- expected to be category ids(continue_watching/queue) if new continue_watching/queue got removed, helps to set focus to correct row -->
-      <field id="rowRemoved" type="string"/>
+    <!-- expected to be category ids(continue_watching/queue) if new continue_watching/queue got
+    removed, helps to set focus to correct row -->
+    <field id="rowRemoved" type="string" />
 
-      <!-- What kind of filter if any does this list use? For example, "tv", "movies", "latino" -->
-      <field id="contentMode" value="" type="string"/>
+    <!-- What kind of filter if any does this list use? For example, "tv", "movies", "latino" -->
+    <field id="contentMode" value="" type="string" />
 
-      <!-- Indicates if that when the server is contacted, it should indcate that the app is in kidsMode. -->
-      <field id="shouldKidsModeBeSentToServer" type="boolean"/>
+    <!-- Indicates if that when the server is contacted, it should indcate that the app is in
+    kidsMode. -->
+    <field id="shouldKidsModeBeSentToServer" type="boolean" />
 
-      <field id="animateToCategory" alias="RowList.animateToItem"/>
+    <field id="animateToCategory" alias="RowList.animateToItem" />
 
-      <!-- An array that should include up to 2 elements, the 1st element is the ID of the content to jump to, the 2nd optional element is the ID of the container within which the content item should be found -->
-      <field id="jumpToRowItemByID" type="array" alwaysNotify="true"/>
-      <field id="jumpToRowItem" alias="RowList.jumpToRowItem"/>
+    <!-- An array that should include up to 2 elements, the 1st element is the ID of the content to
+    jump to, the 2nd optional element is the ID of the container within which the content item
+    should be found -->
+    <field id="jumpToRowItemByID" type="array" alwaysNotify="true" />
+    <field id="jumpToRowItem" alias="RowList.jumpToRowItem" />
 
-      <!-- incoming metadata from GeneralTask
-               type is node, so that it takes less time to send data from one file to another file when comparing to assocarray
+    <!-- incoming metadata from GeneralTask
+               type is node, so that it takes less time to send data from one file to another file when comparing
+    to assocarray
            -->
-      <field id="categoryResponseInBatch" type="node" />
+    <field id="categoryResponseInBatch" type="node" />
 
-      <!-- incoming ad container data to replace/add to the existing content. -->
-      <field id="adResponseInBatch" type="array" />
+    <!-- incoming ad container data to replace/add to the existing content. -->
+    <field id="adResponseInBatch" type="array" />
 
-      <!-- incoming metadata from MetadataFetchTask for single categories (non batched). These are currently not used. -->
-      <field id="remainingInCategoryResponse" type="assocarray" />
+    <!-- incoming metadata from MetadataFetchTask for single categories (non batched). These are
+    currently not used. -->
+    <field id="remainingInCategoryResponse" type="assocarray" />
 
-      <field id="wholeCategoryResponse" type="assocarray" />
+    <field id="wholeCategoryResponse" type="assocarray" />
 
-      <!-- if a fetch error occurred, error is set with the following information
+    <!-- if a fetch error occurred, error is set with the following information
        -      {
        -        code: response.code
        -        failReason: response.failReason
        -      }
       -->
-      <field id="error" type="assocarray" alwaysNotify="true" />
+    <field id="error" type="assocarray" alwaysNotify="true" />
 
-      <!-- inbound interface so the UI can be updated based on if the category grid lists occupy
+    <!-- inbound interface so the UI can be updated based on if the category grid lists occupy
        -   the full width of the category screen (ie. the category menu is not showing).
        -   Assumes there are only 2 possible widths for the CategoryGridList, full width and not full width.
        -->
-      <field id="isFullWidth" type="boolean" value="true" />
+    <field id="isFullWidth" type="boolean" value="true" />
 
-      <!-- set to true if the user is signed in and we want to change the experience based on that -->
-      <field id="signedIn" type="boolean" value="false" />
+    <!-- set to true if the user is signed in and we want to change the experience based on that -->
+    <field id="signedIn" type="boolean" value="false" />
 
-      <!-- This field is used to force remove focus from the rowlist. -->
-      <field id="removeFocusFromRowList" type="boolean" />
+    <!-- This field is used to force remove focus from the rowlist. -->
+    <field id="removeFocusFromRowList" type="boolean" />
 
-      <!-- parentScreenId will be set with screen id in which the rowlist is displayed. ex homescreen,tvscreen,moviesscreen etc. -->
-      <!-- This field should be set only if we want to enable viewable impression events to be tracked. -->
-      <field id="parentScreenId" type="string" />
+    <!-- parentScreenId will be set with screen id in which the rowlist is displayed. ex
+    homescreen,tvscreen,moviesscreen etc. -->
+    <!-- This field should be set only if we want to enable viewable impression events to be
+    tracked. -->
+    <field id="parentScreenId" type="string" />
 
-      <!--
+    <!--
         {
-          pageType: "video_page"  'corresponds to one of the page types in tubiTracking_getAnalyticsPage() which mirrors the protos repo
-          pageValues: {}          'an assoc array with key/values that match the pageType as found in tubiTracking_getAnalyticsPage()
+          pageType: "video_page"  'corresponds to one of the page types in tubiTracking_getAnalyticsPage()
+    which mirrors the protos repo
+          pageValues: {}          'an assoc array with key/values that match the pageType as found in
+    tubiTracking_getAnalyticsPage()
         }
        -->
-      <field id="parentScreenTrackingPageInfo" type="assocarray" />
+    <field id="parentScreenTrackingPageInfo" type="assocarray" />
 
-      <!-- Contains the value of personalization_id returned from backend home screen api call. -->
-      <field id="personalizationId" type="string" />
+    <!-- Contains the value of personalization_id returned from backend home screen api call. -->
+    <field id="personalizationId" type="string" />
 
-      <!-- We have to create a field due to renderTracking events being async each itemComponent should be aware of what the mode was when it rendered. -->
-      <field id="shouldTrackViewableImpressionEvent" type="boolean" />
+    <!-- We have to create a field due to renderTracking events being async each itemComponent
+    should be aware of what the mode was when it rendered. -->
+    <field id="shouldTrackViewableImpressionEvent" type="boolean" />
 
-      <!-- Will be set to true if we want to reset the grid position back to [0,0] -->
-      <field id="resetGridPosition" type="boolean" />
+    <!-- Will be set to true if we want to reset the grid position back to [0,0] -->
+    <field id="resetGridPosition" type="boolean" />
 
-      <field id="lastFocusedList" type="string" />
+    <field id="lastFocusedList" type="string" />
 
-      <field id="kidsMode" type="boolean" />
+    <field id="kidsMode" type="boolean" />
 
-      <field id="showFocusFeedback" alias="RowList.drawFocusFeedback" />
+    <field id="showFocusFeedback" alias="RowList.drawFocusFeedback" />
 
     <!-- OUTPUT -->
-      <field id="itemSelected" type="node"/>
+    <field id="itemSelected" type="node" />
 
-      <!-- set alwaysNotify true to ensure field observers of this field are notified if the user starts scrolling to a new item but quickly scrolls back to the original item  -->
-      <field id="itemFocused" type="node"  alwaysNotify="true" />
+    <!-- set alwaysNotify true to ensure field observers of this field are notified if the user
+    starts scrolling to a new item but quickly scrolls back to the original item  -->
+    <field id="itemFocused" type="node" alwaysNotify="true" />
 
-      <field id="oldItemFocused" type="node" />
+    <field id="oldItemFocused" type="node" />
 
-      <field id="featuredItemSelected" type="node"/>
+    <field id="featuredItemSelected" type="node" />
 
-      <!-- set to the tubi content of the new row container (row of contentFocused) which was focused on -->
-      <field id="rowFocused" type="node" alwaysNotify="true" />
+    <!-- set to the tubi content of the new row container (row of contentFocused) which was focused
+    on -->
+    <field id="rowFocused" type="node" alwaysNotify="true" />
 
-      <!-- array with the [x, y], where x is the category index and y is the content index -->
-      <field id="cursorPosition" type="vector2d" value="[-1,-1]"/>
+    <!-- array with the [x, y], where x is the category index and y is the content index -->
+    <field id="cursorPosition" type="vector2d" value="[-1,-1]" />
 
-      <field id="oldCursorPosition" type="vector2d" value="[-1,-1]"/>
+    <field id="oldCursorPosition" type="vector2d" value="[-1,-1]" />
 
-      <field id="selectedPosition" type="array" />
+    <field id="selectedPosition" type="array" />
 
-      <field id="focusedPosition" type="array" />
+    <field id="focusedPosition" type="array" />
 
-      <field id="vertFocusDirection" alias="RowList.vertFocusDirection" />
+    <field id="vertFocusDirection" alias="RowList.vertFocusDirection" />
 
-      <!-- in the case that focus is not being set on the RowList, inform that content is loaded
+    <!-- in the case that focus is not being set on the RowList, inform that content is loaded
            and infoPanel should be updated. Typically happens on kids mode toggle.
       -->
-      <field id="reloadedItemToBeFocused" type="node" />
+    <field id="reloadedItemToBeFocused" type="node" />
 
-      <!-- ::TODO::roku_home_screen_redesign, change this to an alias to the RowList.animateToItem or FeaturedRowList.animateToItem after the experiment is done. -->
-      <field id="animateToItem" type="integer" alwaysNotify="true"/>
-      <field id="currFocusRow" alias="RowList.currFocusRow" />
-      <field id="currFocusColumn" alias="RowList.currFocusColumn" />
-      <field id="scrollingStatus" alias="RowList.scrollingStatus" />
-      <field id="rowHeights" alias="RowList.rowHeights" />
+    <!-- ::TODO::roku_home_screen_redesign, change this to an alias to the RowList.animateToItem or
+    FeaturedRowList.animateToItem after the experiment is done. -->
+    <field id="animateToItem" type="integer" alwaysNotify="true" />
+    <field id="currFocusRow" alias="RowList.currFocusRow" />
+    <field id="currFocusColumn" alias="RowList.currFocusColumn" />
+    <field id="scrollingStatus" alias="RowList.scrollingStatus" />
+    <field id="rowHeights" alias="RowList.rowHeights" />
 
-      <field id="featuredRowCurrFocusColumn" type="integer" />
-      <field id="featuredListCurrFocusRow" alias="FeaturedRowList.currFocusRow" />
-      <field id="featuredListScrollingStatus" alias="FeaturedRowList.scrollingStatus" />
-      <field id="featuredListScrollDirection" type="string" value="none" />
-      <field id="featuredRowHeights" alias="FeaturedRowList.rowHeights" />
+    <field id="featuredRowCurrFocusColumn" type="integer" />
+    <field id="featuredListCurrFocusRow" alias="FeaturedRowList.currFocusRow" />
+    <field id="featuredListScrollingStatus" alias="FeaturedRowList.scrollingStatus" />
+    <field id="featuredListScrollDirection" type="string" value="none" />
+    <field id="featuredRowHeights" alias="FeaturedRowList.rowHeights" />
 
-      <field id="featuredRowFocusedItem" type="node" />
+    <field id="featuredRowFocusedItem" type="node" />
 
-      <field id="currCategoryId" type="string" />
+    <field id="currCategoryId" type="string" />
 
-      <field id="oldCategoryId" type="string" />
+    <field id="oldCategoryId" type="string" />
 
-      <field id="rowlistTranslation" alias="RowList.translation" />
+    <field id="rowlistTranslation" alias="RowList.translation" />
 
-      <!-- content on the home screen is loaded and spinner can be turned off -->
-      <field id="gridContentIsReady" type="boolean" value="false" alwaysNotify="true" />
+    <!-- content on the home screen is loaded and spinner can be turned off -->
+    <field id="gridContentIsReady" type="boolean" value="false" alwaysNotify="true" />
 
-      <field id="featuredListHasFocus" type="boolean" value="false" />
-      <field id="currentFocusedItemBoundingRect" type="assocArray" value="{}" />
-      <field id="inTransitCurrentFocusedItemBoundingRect" type="assocArray" value="{}" />
-      <field id="hideInfoPanel" type="boolean" alwaysNotify="true" />
+    <field id="featuredListHasFocus" type="boolean" value="false" />
+    <field id="currentFocusedItemBoundingRect" type="assocArray" value="{}" />
+    <field id="inTransitCurrentFocusedItemBoundingRect" type="assocArray" value="{}" />
+    <field id="hideInfoPanel" type="boolean" alwaysNotify="true" />
 
-      <field id="rowIndexBoost" type="integer" value="0" />
-      <field id="featuredRowListTranslation" alias="FeaturedRowList.translation" alwaysNotify="true" />
+    <field id="rowIndexBoost" type="integer" value="0" />
+    <field id="featuredRowListTranslation" alias="FeaturedRowList.translation" alwaysNotify="true" />
 
-      <!-- Possible values "none", "start", "complete". -->
-      <field id="containerAppendMoreTilesStatus" type="string" value="none" />
+    <!-- Possible values "none", "start", "complete". -->
+    <field id="containerAppendMoreTilesStatus" type="string" value="none" />
   </interface>
 
   <children>
@@ -197,20 +213,19 @@
       id="skinAdRow"
       opacity="0"
       translation="[0,-12]" />
-
     <RowList
       id="FeaturedRowList"
       itemComponentName="StarterGridItem"
       rowTitleComponentName="CategoryGridRowLabel"
       itemSize="[1752, 350]"
-      numRows="2"
+      numRows="3"
       rowItemSpacing="[[16,0]]"
       rowLabelOffset="[[0, 6]]"
       showRowCounter="[false]"
       itemSpacing="[0, 35]"
       drawFocusFeedback="false"
       rowFocusAnimationStyle="fixedFocus"
-      vertFocusAnimationStyle="fixedFocus"/>
+      vertFocusAnimationStyle="fixedFocus" />
 
     <RowList
       id="RowList"
@@ -225,10 +240,11 @@
       focusFootprintBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
       focusFootprintBlendColor="#00000000"
       rowFocusAnimationStyle="fixedFocus"
-      vertFocusAnimationStyle="fixedFocus"/>
+      vertFocusAnimationStyle="fixedFocus" />
+
     <Timer
       id="LinearProgramRefreshTimer"
       repeat="true"
-      duration="180"/>
+      duration="180" />
   </children>
 </component>

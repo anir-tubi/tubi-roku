@@ -61,6 +61,7 @@
             <ExpandedVideoGridTile
               id="inTransitInlineVideoMetadataOverlay" 
               opacity="0"
+              containerIndex="1"
               skipAnimation="true"/>
             <Group
               id="inlineVideoPreviewPlayerContainer"
