@@ -345,8 +345,12 @@ class TestUtils {
       constantsUpdates['settings.noAds'] = args.noAds;
     }
 
-    if (args.isAutoplayEnabled === true || args.isAutoplayEnabled === false) {
-      constantsUpdates['deviceInfo.isAutoplayEnabled'] = args.isAutoplayEnabled;
+    if (args.enablePurpleCarpetContainerAndBanner !== undefined) {
+      constantsUpdates['settings.enablePurpleCarpetContainerAndBanner'] = args.enablePurpleCarpetContainerAndBanner;
+    }
+
+    if (args.triggerFailSafe === 'gameDayExperience') {
+      constantsUpdates['settings.enableFailSafe'] = true;
     }
 
     if (constantsUpdates && Object.keys(constantsUpdates).length > 0) {
@@ -2353,8 +2357,10 @@ type StartApplicationArgs = {
   /** No ads are shown unless set to false */
   noAds?: boolean;
 
-  /** If set will override the Roku system level autoplay setting to the specified value. NOTE that if set to true the user level autoplay setting could still not allow playback if set to false */
-  isAutoplayEnabled?: boolean
+  /* When set to true will enable the purple carpet container and banner. */
+  enablePurpleCarpetContainerAndBanner?: boolean;
+
+  triggerFailSafe?: 'gameDayExperience'
 }
 
 

@@ -28,7 +28,6 @@ describe('Client Impressions events', function () {
     const filter = (impressionEvent: ImpressionEvent) => {
       return impressionEvent.home_page?.content_mode === 'CONTENT_MODE_UNKNOWN';
     };
-
     const home = HomePage();
     await home.pageDidLoad();
     const titleIds = await home.getTitleIdHomeScreenHorizontal({ row: 0, amount: 3 });

@@ -13,6 +13,7 @@ describe('Client Impressions events', function () {
         this.timeout(300000);
         await testUtils.startApplicationAtPage('search', {
             shouldCreateNewUser: false,
+            isAutoplayEnabled : false,
         });
         await proxy.start();
     });

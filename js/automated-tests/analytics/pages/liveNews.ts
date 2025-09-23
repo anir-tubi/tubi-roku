@@ -126,7 +126,7 @@ const LiveNews = () => {
 		waitWhenGoFullScreen,
 		selectNewChannelFromMenu,
 		navigateToChannelMenu,
-		exitLiveNewsPlayer
+		exitLiveNewsPlayer,
 	};
 };
 
