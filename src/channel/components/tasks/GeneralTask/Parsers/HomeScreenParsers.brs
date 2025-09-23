@@ -222,10 +222,7 @@ Function parseHomeScreenAdsSuccess(fullResponse, reqInfo)
               type: "video"
             }
           end if
-          slugID = ""
-          if adInfo <> invalid AND adInfo.ad_id <> invalid
-            slugID = adInfo.ad_id.toStr()
-          end if
+          slugID = adUnit.rendering_code
 
           carouselNode.carousel = carousel
 
@@ -290,7 +287,8 @@ Function processSpotlightAdContent(sAdID, assets, validUntil, returnedImageTrack
   rowContentNode.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
 
   translatedThumb.id = m.constants.ui.categoryIds.adRowlistSpotlight
-  translatedThumb.slug = sAdID
+
+  translatedThumb.slug = m.constants.ui.categoryIds.adRowlistSpotlight
   translatedThumb.type = m.constants.ui.contentTypes.adRowlistSpotlight
   translatedThumb.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
 
