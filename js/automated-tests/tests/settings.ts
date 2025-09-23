@@ -6,7 +6,7 @@ import { shared } from '../shared';
 describe('Settings', function () {
   beforeEach(async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeRowList','Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('homeRowList', 'Timed out waiting for Rowlist to have focus');
 
   });
 
@@ -59,7 +59,7 @@ describe('Settings', function () {
 
   // https://tubi.testrail.io/index.php?/cases/view/32370
   it('C32370 - About Page - When user chooses the About Page and presses OK then Full Device ID is displayed, @settings', async () => {
-   
+
 
     // Go to Settings Page
     await goToSettingsPageSelectAbout();
@@ -73,7 +73,7 @@ describe('Settings', function () {
 
   // https://tubi.testrail.io/index.php?/cases/view/32371
   it('C32371 - About Page - When user chooses the About Page and checks Need Help label then Need Help should be present, @settings', async () => {
-    
+
 
     // Go to Settings Page and higlight About
     await goToSettingsPageSelectAbout();
@@ -100,16 +100,57 @@ describe('Settings', function () {
     expect(await privacyPolicyHeader.text).to.equal('Privacy Center');
 
   });
+
+  // https://tubi.testrail.io/index.php?/cases/view/770140
+  it('C770140- Privacy Policy Page - If Rokus autoplay setting = OFF, Autoplay Next Video should be accesible, @settings', async () => {
+
+    // Start app with Roku's autoplay setting disabled
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true, isAutoplayEnabled: false }); // This sets Roku system level autoplay to OFF
+
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Navigate to Settings
+    await ecp.sendKeypress(ecp.Key.Left);
+    await shared.openSettings();
+
+    // Verify we're on Settings screen
+    await testUtils.waitForElementToFullyShowOnScreen('settingsScreen');
+
+    await ecp.sendKeypress(ecp.Key.Down);
+    await testUtils.waitForElementToFullyShowOnScreen('AutoPlayControlsMenuItemFocused');
+
+    // Get the autoplay instructions element using getNodeForElement
+    const instructions = await testUtils.getNodeForElement('autoplayInstructions');
+    expect(instructions.visible).to.equal(true);
+
+    // Get the instructions text to verify it shows disabled message
+    const instructionsText = instructions.text;
+    expect(instructionsText).to.equals('Autoplay is currently controlled in Roku Settings. To change this setting, go to Roku Settings -> Accessibility -> Auto-play video.'); // Verify the feature disabled message is shown
+
+    //As Autoplay video is disabled, focus should go to AutoPlay Next Video Menu when we press right.
+    await ecp.sendKeypress(ecp.Key.Right);
+
+    //Verify autoplayNextVideoMenu is visible
+    const autoplayNextVideoMenu = await testUtils.getNodeForElement('autoplayNextVideoMenu');
+    expect(autoplayNextVideoMenu.visible).to.equal(true);
+
+    //Verify AutoPlay Next Video has focus and can browse throgh items
+    await testUtils.waitForElementToFullyShowOnScreen('autoplayNextVideoMenu');
+    await ecp.sendKeypress(ecp.Key.Up);
+    await ecp.sendKeypress(ecp.Key.Down);
+
+  });
+
 });
 
-async function goToSettingsPageSelectAbout(){
+async function goToSettingsPageSelectAbout() {
   // Go to Settings Page
   await testUtils.goToPage('settings');
   await testUtils.waitForElementToFullyShowOnScreen('settingsScreen');
 
   // Select About
   await ecp.sendKeypress(ecp.Key.Down, { count: 2 });
-  
+
   // Is the About Page Open?
   const settingsScreenHeader = await testUtils.getNodeForElement('settingsScreenHeader');
   await testUtils.waitForElementToFullyShowOnScreen('settingsScreenHeader');

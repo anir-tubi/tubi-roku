@@ -54,6 +54,7 @@ on:
           - '@videopreview'
           - '@welcome_modal'
           - '@welcome_modaltest'
+          - '@send_feedback'
       customString:
         description: 'Use to provide a custom string of which test to run. You can use the the pipe symbol "|" to provide more than one one string. For example "C4151|C4153" would run both the C4151 test and C4153 test. This input is ignored unless "Custom String" is set above.'
         type: string

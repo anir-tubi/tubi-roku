@@ -66,6 +66,7 @@ export const PLAYER_NODES = {
 	FAST_FORWARD_BUTTON: 'fastForwardButton',
 	VIDEO_PLAYER_ACTUAL: 'videoPlayerActual',
 	PLAY_PAUSE_BUTTON: 'playPauseButton',
+	SEND_FEEDBACK_BUTTON: 'playPauseButton',
 	PLAYER_REMAINING: 'remainingLabel',
 	CURRENT_TIME_PLAYED: 'currentTimePlayed',
 	SUBTITLES: 'closedCaptionAudioButton',

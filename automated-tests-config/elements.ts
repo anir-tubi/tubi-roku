@@ -43,6 +43,10 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.3.#Offset.#ContentGroup.#AutoplayPreviewMenu.1.#container',
   },
 
+  autoplayInstructions: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.3.#Offset.#ContentGroup.#Instructions',
+  },
+
   episodesList: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#episodeScreen.#PageGroup.#RowList.0.title.#CategoryName',
   },
@@ -1774,6 +1778,12 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.2.#SettingsMenuGroup.#SettingsMenu.0.#DetailsMenuTextParent.#DetailsMenuTextFocused',
   },
 
+  /** Autoplay controls Controls Menu item focused */
+  AutoPlayControlsMenuItemFocused: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.2.#SettingsMenuGroup.#SettingsMenu.1.#DetailsMenuTextParent.#DetailsMenuTextFocused',
+  },
+
   /** Continue Watching button in Categories */
   continueWatchingButton: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuTextFocused',
@@ -1801,6 +1811,40 @@ const elements = typeCheckElements({
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#closedCaptionAudioButton',
   },
+
+  /** Send Feedback button shown on the player transport HUD */
+  sendFeedBackButton: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#sendFeedBackButton',
+  },
+
+  /** Send Feedback overlay group (for visibility) */
+  sendFeedbackSelectionOverlayGroup: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#sendFeedbackSelectionOverlayGroup',
+  },
+
+  /** Send Feedback overlay container (child list/focus) */
+  sendFeedbackSelectionOverlay: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#sendFeedbackSelectionOverlay',
+  },
+
+  SendFeedbackQRCodeOverlayOnPlayer: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#sendFeedbackSelectionOverlay.0',
+  },
+
+  sendFeedbackQRCodeHeaderLabel: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#sendFeedbackSelectionOverlayGroup.#sendFeedbackSelectionOverlay.2',
+  },
+
+  closeButton: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#sendFeedbackSelectionOverlayGroup.#sendFeedbackSelectionOverlay.2.#overlayBackground.#sendFeedbackSection.#sendFeedbackHeaderLabel',
+  },
+
 
   /** Audio tracks section */
   audioTracksSection: {
@@ -2697,7 +2741,7 @@ const elements = typeCheckElements({
     keyPath:
       '#ContentController.#uiGroup.#mainItems',
   },
-  
+
 });
 
 export {
