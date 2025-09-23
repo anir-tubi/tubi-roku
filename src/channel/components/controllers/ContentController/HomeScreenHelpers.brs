@@ -1494,7 +1494,8 @@ Function onFeaturedListScrollingStatusChange(msg)
     updateVideoTileSize(scrollingStatus)
     updateInTransitVideoMetadataOverlay()
     if m.shouldDebounceVideoTilePreview = true
-      if isVideoPreviewPlaying() = true
+      state = m.videoPreviewPlayer.playerState
+      if state = "playing" OR state = "paused"
         stopVideoPreview()
       end if
     else
