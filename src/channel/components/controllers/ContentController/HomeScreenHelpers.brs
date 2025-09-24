@@ -571,6 +571,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     homeScreen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
 
     if isKidsUIOn() = false AND screenID = m.constants.ui.screenIds.homeScreen
+      sanitizeHomeScreenResponse(rawResponse)
       liveEventsContainer = getLiveEventsContainer(rawResponse)
       if isNode(liveEventsContainer) AND liveEventsContainer.getChildCount() > 0
         m.billboardContainerIndex = 1
@@ -1986,4 +1987,18 @@ Function updateBillboardContainerIndex()
   m.inlineVideoMetadataOverlay.billboardContainerIndex = m.billboardContainerIndex
   m.inTransitInlineVideoMetadataOverlay.billboardContainerIndex = m.billboardContainerIndex
   m.inlineVideoGridTitleLogo.billboardContainerIndex = m.billboardContainerIndex
+End Function
+
+
+Function sanitizeHomeScreenResponse(rawResponse)
+  if isNode(rawResponse) = true AND rawResponse.getChildCount() > 0
+    liveEventsContainer = getLiveEventsContainer(rawResponse)
+
+    if isNode(liveEventsContainer) = true AND liveEventsContainer.getChildCount() > 0
+      program = liveEventsContainer.getChild(0)
+      if isNode(program) = true AND isAA(program.scheduleData) AND isGreaterThanCurrentTime(program.scheduleData.endTime) = false
+        rawResponse.removeChild(liveEventsContainer)
+      end if
+    end if
+  end if
 End Function
