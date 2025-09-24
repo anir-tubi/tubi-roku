@@ -773,7 +773,7 @@ Function onHomeScreenContentFocused(msg)
   focusedContent = msg.getData()
   homeScreen = msg.getRoSGNode()
   ' Content Focused needs to be updated even when home screen is not in focus so that background image gets displayed even when side nav is in focus.
-  if homeScreen.isInFocusChain() = true
+  if homeScreen.isInFocusChain() = true AND homeScreen.lastFocusedList <> "featuredRowList"
     setHomeScreenAfterFocus(focusedContent, homeScreen)
   end if
 End Function
@@ -1605,7 +1605,11 @@ Function pauseVideoPreviewAndShowPoster()
   if isLinearPlayerPlaying = true
     stopAndHideLinearVideoPlayer()
   end if
-  m.inlineVideoPreviewPlayerContainer.opacity = 1
+  if screen.featuredListScrollDirection = "up" OR screen.featuredListScrollDirection = "down"
+    m.inlineVideoPreviewPlayerContainer.opacity = 0
+  else
+    m.inlineVideoPreviewPlayerContainer.opacity = 1
+  end if
 End Function
 
 

@@ -80,12 +80,12 @@ Function onItemContentChange(msg)
   if itemContent <> invalid
     adjustPosterBottomContentTranslation()
     isBillboardRow = m.variant = "billboard" AND m.top.containerIndex = m.top.billboardContainerIndex
-    titleImageLoadHeight = 160
-    titleImageLoadWidth = 478
+    titleImageLoadWidth = 360
+    titleImageLoadHeight = 84
     if isBillboardRow = false
       m.bottomContentGroup.translation = [15, m.top.height - 24]
-      titleImageLoadHeight = 68
       titleImageLoadWidth = 240
+      titleImageLoadHeight = 68
       setTypographyOfLabel(m.title, m.bodyMediumStrongFont)
     else
       setTypographyOfLabel(m.title, m.headerSmallFont)

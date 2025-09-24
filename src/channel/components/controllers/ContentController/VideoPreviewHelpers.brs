@@ -337,7 +337,7 @@ Function updatePreviewPlayerToInlineView()
       m.inlinePreviewFocusIndicator.reParent(m.inlineVideoPreviewPlayerContainer, false)
     end if
 
-    m.inlinePreviewFocusIndicator.height = playerSize[1]
+    m.inlinePreviewFocusIndicator.height = playerSize[1] + 9
     m.inlinePreviewFocusIndicator.width = playerSize[0] + 12
 
     m.videoPreviewPlayer.unObserveFieldScoped("position")

@@ -19,6 +19,7 @@
     <field id="height" alias="poster.height, gradient.height" />
     <field id="rowIndex" type="integer" value="-1" />
     <field id="videoTilesVariant" type="string" value="" />
+    <field id="rowHasFocus" type="boolean" />
   </interface>
 
   <children>

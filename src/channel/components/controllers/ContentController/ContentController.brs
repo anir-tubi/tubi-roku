@@ -3501,18 +3501,18 @@ Function updateVideoTileSize(scrollingStatus = false)
   end if
   paddingToAccountForFocusIndicator = 4
   preBillboardWidth = featuredRowPoster[0] + paddingToAccountForFocusIndicator
-  preBillboardHeight = featuredRowPoster[1] + paddingToAccountForFocusIndicator
+  preBillboardHeight = featuredRowPoster[1]
 
   billboardSize = m.constants.ui.imageSizes.billboard
   billboardWidth = billboardSize[0]
   billboardHeight = billboardSize[1]
 
-  if getVideoTileFocusedRow() = m.billboardContainerIndex AND m.isInBillboardExperiment = true
+  if getVideoTileFocusedRow() <= m.billboardContainerIndex AND m.isInBillboardExperiment = true
     featuredRowPoster = billboardSize
   end if
   ' 4 is the padding to account for the focus indicator.
   width = featuredRowPoster[0] + paddingToAccountForFocusIndicator
-  height = featuredRowPoster[1] + paddingToAccountForFocusIndicator
+  height = featuredRowPoster[1]
   ' Adjusting the size of the metadata overlay with some additional padding to account for the focus indicator.
 
   ' Below logic is to handle the case when user is scrolling up to billboard row.
@@ -3537,7 +3537,6 @@ Function updateVideoTileSize(scrollingStatus = false)
     m.inTransitInlineVideoMetadataOverlay.height = height
   end if
 
-  m.inlinePreviewFocusIndicator.height = m.inlineVideoMetadataOverlay.height
+  m.inlinePreviewFocusIndicator.height = m.inlineVideoMetadataOverlay.height + 9
   m.inlinePreviewFocusIndicator.width = m.inlineVideoMetadataOverlay.width + 12
-
 End Function

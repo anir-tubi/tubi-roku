@@ -35,6 +35,13 @@ Function onItemContentChange(msg)
 
   if itemContent <> invalid
     isBillboardRow = m.variant = "billboard" AND m.top.containerIndex = m.top.billboardContainerIndex
+
+    if isBillboardRow = false
+      m.videoInGridGradient.uri = "pkg:/images/video_in_grid_gradient_$$RES$$.9.png"
+    else
+      m.videoInGridGradient.uri = "pkg:/images/billboard-gradient-$$RES$$.png"
+    end if
+
     m.videoGridMetadataGroup.visible = true
     ' Resetting the blend color to default.
     m.poster.blendColor = "#FFFFFFFF"
@@ -67,9 +74,6 @@ Function onItemContentChange(msg)
     if isBillboardRow = false
       fade(m.videoGridMetadata, "in", m.animationDuration, m.metadataFadeDelay)
       m.videoGridMetadata.itemContent = itemContent
-      m.videoInGridGradient.uri = "pkg:/images/video_in_grid_gradient_$$RES$$.9.png"
-    else
-      m.videoInGridGradient.uri = "pkg:/images/billboard-gradient-$$RES$$.png"
     end if
     m.metadataFadeDelay = 0
   else

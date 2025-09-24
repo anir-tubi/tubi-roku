@@ -299,7 +299,7 @@ Function onContentChange()
   ' When any other list is focused, we will not show the skin ads.
   if isSkinAdsAvailable() = true AND (m.top.lastFocusedList = "skinAdRow" OR m.top.lastFocusedList = "")
     if m.top.featuredRowContent <> invalid
-      m.FeaturedRowList.translation = [0, 384]
+      m.FeaturedRowList.translation = [0, 345]
     else
       m.rowList.translation = [0, 384]
     end if
@@ -1191,6 +1191,8 @@ Function onVertFocusDirectionChange(msg)
 End Function
 
 
+' TODO: Revisit the isInTransit parameter since it is not used anywhere.
+' Before we graduate the roku_home_screen_redesign_v_1_6 experiment. If we do not find any other use cases for it remove the field.
 Function updateFocusXOffset(currFocusRow, isInTransit = false)
   featuredRowContent = m.top.featuredRowContent
   focusXOffsets = m.featuredRowList.focusXOffset
@@ -1218,6 +1220,15 @@ Function updateFocusXOffset(currFocusRow, isInTransit = false)
       m.featuredRowList.focusXOffset = focusXOffset
       m.ignoreCurrColumnChange = false
     end if
+
+    if m.variant = "billboard"
+      container = featuredRowContent.getChild(currFocusRow)
+      translation = [0, 0]
+      if container <> invalid AND container.id = "featured"
+        translation = [0, -69]
+      end if
+      m.featuredRowList.translation = translation
+    end if
   end if
 End Function
 
@@ -1237,15 +1248,7 @@ Function onFeaturedListCurrFocusRowChange(msg)
     else if currFocusRow > 0
       nextFocusRow = currFocusRow - 1
     end if
-    if m.variant = "billboard"
-      container = featuredRowContent.getChild(nextFocusRow)
-      translation = [0, 0]
-      if container <> invalid AND container.id = "featured"
-        translation = [0, -69]
-      end if
-      m.featuredRowList.translation = translation
-    end if
-    updateFocusXOffset(nextFocusRow, m.top.featuredListScrollDirection = "up")
+    updateFocusXOffset(nextFocusRow)
 
     updateCurrentFocusedItemBoundingRect()
   end if

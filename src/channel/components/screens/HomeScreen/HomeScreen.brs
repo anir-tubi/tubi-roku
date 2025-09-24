@@ -14,7 +14,11 @@ Function init()
   m.ContentAreaParent = m.top.findNode("ContentAreaParent")
   m.maskUri = "pkg:/images/poster-mask.png"
   if m.isUserInVideoTilesExperiment = true
-    m.maskUri = ""
+    if m.shouldDim = false
+      m.maskUri = ""
+    else
+      m.maskUri = "pkg:/images/poster-mask-60.png"
+    end if
   end if
   m.ContentArea = m.top.findNode("ContentArea")
   m.ContentArea.maskUri = m.maskUri
@@ -155,11 +159,7 @@ Function moveContentAreaMask(nFocusRow = -1, nFocusingPercent = 1)
     end if
   end if
 
-  if m.top.lastFocusedList = "skinAdRow"
-    m.ContentArea.maskOffset = [0, 1080]
-  else
-    m.ContentArea.maskOffset = [0, nMaskYNew]
-  end if
+  m.ContentArea.maskOffset = [0, nMaskYNew]
 End Function
 
 
@@ -761,13 +761,14 @@ Function onFeaturedRowFocusedItemChange(msg) as Void
   end if
 
   if m.CategoryGridList.isInFocusChain() = true
-    if m.shouldDim = true AND m.CategoryGridList.featuredListCurrFocusRow = 0
-      m.ContentArea.maskUri = "pkg:/images/poster-mask-60.png"
-    else if m.isUserInVideoTilesExperiment = true
-      m.ContentArea.maskUri = ""
-    end if
     '//if the CategoryGridList is in focus, then alter the UI.
     if focusedContent <> invalid
+      if m.shouldDim = true AND (m.CategoryGridList.currCategoryId = "featured" OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.liveEventSpotlight)
+        m.ContentArea.maskUri = "pkg:/images/poster-mask-60.png"
+      else if m.isUserInVideoTilesExperiment = true
+        m.ContentArea.maskUri = ""
+      end if
+
       m.top.contentFocused = focusedContent
       if focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
         m.top.backgroundUriList = determineBackgroundImage(focusedContent)
