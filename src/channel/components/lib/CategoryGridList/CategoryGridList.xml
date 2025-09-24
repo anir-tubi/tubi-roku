@@ -21,6 +21,9 @@
   <script type="text/brightscript" uri="pkg:/components/lib/DeviceMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StatsigExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StatsigLib.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/StatsigExperimentMixin.brs" />
 
   <interface>
     <!-- INPUT -->

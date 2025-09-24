@@ -36,4 +36,6 @@
     <script type="text/brightscript" uri="Parsers/ExternalConfigParsers.brs" />
     <script type="text/brightscript" uri="Parsers/StatsigLibParsers.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/TubiExternalConfig.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/StatsigExperiments.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/StatsigLib.brs" />
 </component>

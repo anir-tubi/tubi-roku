@@ -4,7 +4,7 @@ Function init()
   m._ = rodash()
   m.constants = getConstantsFromGlobal()
   m.Tracking = TubiTrackingInfo(m.constants)
-  experimentInfo = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
+  experimentInfo = getStatsigExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
   m.isUserInVideoTilesExperiment = isAA(experimentInfo) AND experimentInfo.design_type = "withDescriptionPortraitSmall"
   m.isUserInBillboardVariant = isAA(experimentInfo) AND experimentInfo.variant = "billboard"
   m.shouldDim = isAA(experimentInfo) AND experimentInfo.should_dim = true

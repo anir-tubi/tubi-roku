@@ -9,6 +9,7 @@ Function init()
   m.top.observeField("newConstants", m.port)
   m.top.observeField("newExperimentsInfo", m.port)
   m.top.observeField("newSoTStaticConfig", m.port)
+  m.top.observeField("newStatSigExperiments", m.port)
   m.constants = getConstantsFromGlobal()
 
   ' Used to know how we should handle error cases on network requests
@@ -16,6 +17,9 @@ Function init()
 
   ' In order to be able to update the experiments without having pass it down manually we need an existing AA that we can just update the keys on
   m.experimentsInfo = {}
+
+  ' In order to be able to update the statSigExperiments without having pass it down manually we need an existing AA that we can just update the keys on
+  m.statSigExperimentsInfo = {}
 
   ' In order to be able to update the soTStaticConfig without having pass it down manually we need an existing AA that we can just update the keys on
   m.soTStaticConfig = {}
@@ -124,6 +128,17 @@ Function listen()
         end for
 
         m.soTStaticConfig.append(soTStaticConfig)
+      else if field = "newStatSigExperiments" then
+        statSigExperiments = msg.getData()
+
+        ' Instead of trying to track down all the spots experimentsInfo might be used we are keeping the AA reference and just replacing the keys to update all to use the same data
+        for each key in m.statSigExperimentsInfo
+          if statSigExperiments[key] = invalid
+            m.statSigExperimentsInfo.delete(key)
+          end if
+        end for
+
+        m.statSigExperimentsInfo.append(statSigExperiments)
       else
         conditionallyProcessAuthUpdatedMessage(msg)
       end if

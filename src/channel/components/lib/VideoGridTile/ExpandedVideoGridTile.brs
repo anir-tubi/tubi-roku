@@ -23,7 +23,7 @@ Function init()
   m.metadataFadeDelay = 0.5
   m.animationDuration = 0
 
-  experimentInfo = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
+  experimentInfo = getStatsigExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
   if isAA(experimentInfo) = true
     m.variant = experimentInfo.variant
   end if

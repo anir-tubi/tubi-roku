@@ -85,7 +85,9 @@ Function addControllerUi()
   m.Tracking = TubiTracking(m.constants, m.tubiAuthUpdate)
   experimentsInfo = getExperimentsInfoFromGlobal()
   experiments = TubiExperiments(experimentsInfo)
-  m.cmsApi = CmsApi(m.constants, apiUtilsLib, experiments)
+  statSigExperimentsInfo = getStatsigExperimentsInfoFromGlobal()
+  statSigExperiments = StatsigExperimentsInterface(statSigExperimentsInfo)
+  m.cmsApi = CmsApi(m.constants, apiUtilsLib, experiments, statSigExperiments)
   m.userDeviceApi = UserDeviceApi(m.constants, apiUtilsLib)
   m.tensorapi = TensorApi(m.constants, m.pub_serverPersistentData)
   m.rainmakerApi = RainmakerApi(m.constants)
@@ -108,7 +110,7 @@ Function addControllerUi()
   ' Holds the poster for the video tile that is in transit.That is in case of user scrolling down next container poster vs previous container poster when scrolling up.
   m.inTransitInlineVideoMetadataOverlay = m.top.findNode("inTransitInlineVideoMetadataOverlay")
   m.videoTileOverlayGroup = m.top.findNode("videoTileOverlayGroup")
-  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
+  experiment = getStatsigExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
   if isAA(experiment) = true AND experiment.variant = "billboard"
     videoTilesListTranslation = m.constants.ui.billboardVariantTranslation
   else
@@ -2255,6 +2257,7 @@ Function restartApp()
   ' Forces the external config to be retrieved again on startup
   m.global.externalConfigInfo = invalid
   m.global.experimentsInfo = invalid
+  m.global.statsigExperimentsInfo = invalid
 
   m.top.disableInstantResume = true
   m.mainTask.control = "done"
@@ -3266,7 +3269,7 @@ End Function
 ' Returns the size of the featured preivew player.
 ' @return: array, the size of the player
 Function getFeaturedPlayerSize()
-  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
+  experiment = getStatsigExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
   if isNonEmptyArray(experiment.featuredRowPosterSize) = true
     featuredRowPoster = experiment.featuredRowPosterSize
   else
@@ -3493,7 +3496,7 @@ End Function
 
 Function updateVideoTileSize(scrollingStatus = false)
   m.inlineVideoGridTitleLogo = m.top.findNode("inlineVideoGridTitleLogo")
-  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
+  experiment = getStatsigExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
   if isNonEmptyArray(experiment.featuredRowPosterSize) = true
     featuredRowPoster = experiment.featuredRowPosterSize
   else

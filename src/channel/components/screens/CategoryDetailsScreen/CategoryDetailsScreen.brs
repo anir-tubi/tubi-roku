@@ -9,7 +9,9 @@ Function init()
   experimentsInfo = getExperimentsInfoFromGlobal()
   m.experiments = TubiExperiments(experimentsInfo)
   soTStaticConfig = getSoTStaticConfigFromGlobal()
-  m.metadataTranslate = TubiMetadataTranslate(m.constants, m.experiments, soTStaticConfig)
+  statSigExperimentsInfo = getStatsigExperimentsInfoFromGlobal()
+  statSigExperiments = StatsigExperimentsInterface(statSigExperimentsInfo)
+  m.metadataTranslate = TubiMetadataTranslate(m.constants, m.experiments, soTStaticConfig, statSigExperiments)
 
   m.itemsInRowCount = 8
 
@@ -174,7 +176,7 @@ Function onItemFocused(_msg)
         m.top.trackingPageInfo = trackingPageInfo
 
         ' trigger navigate_within_page events in ContentController
-        col = 1 + (item MOD numColumns)
+        col = 1 + (item mod numColumns)
         row = 1 + (item \ numColumns)
 
         m.top.navigateWithinPageInfo = {
@@ -248,7 +250,7 @@ Function updateTrackingInfo(category, content, itemSelected)
     end if
 
     numColumns = m.VideoGrid.numColumns
-    col = 1 + (itemSelected MOD numColumns)
+    col = 1 + (itemSelected mod numColumns)
     row = 1 + (itemSelected \ numColumns)
     'Set the tracking component of the item that was selected so it can be accessed as part of the navigateToPage event
     m.top.trackingComponentInfo = {
@@ -305,7 +307,7 @@ End Function
 
 Function getTrackingComponentInfo(itemIndex, numColumns, category, trackingLib)
   if trackingLib <> invalid AND category <> invalid
-    column = 1 + (itemIndex MOD numColumns)
+    column = 1 + (itemIndex mod numColumns)
     row = 1 + (itemIndex \ numColumns)
     content = category.getChild(itemIndex)
 

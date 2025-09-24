@@ -1,11 +1,12 @@
 ' Thin wrapper for CMS API, Autopilot API and Search API requests.  Collected here to facilitate easy
 ' integration tests
-Function CmsApi(constants, apiUtils, experiments = invalid)
+Function CmsApi(constants, apiUtils, experiments = invalid, statSigExperiments = invalid)
 
   defaultValues = {
     ' dependencies
     constants: constants
     experiments: experiments
+    statSigExperiments: statSigExperiments
 
     ' public
     setUtmCampaignConfig: cmsApi_setUtmCampaignConfig
@@ -460,8 +461,8 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
 
   tileDesignType = "none"
   includeBillboard = false
-  if m.experiments <> invalid AND bKidsMode = false
-    experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6")
+  if m.statSigExperiments <> invalid AND bKidsMode = false
+    experiment = m.statSigExperiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6")
     tileDesignType = experiment.design_type
     includeBillboard = experiment.variant = "billboard"
   end if

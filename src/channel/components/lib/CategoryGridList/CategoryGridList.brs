@@ -30,7 +30,9 @@ Function init()
   experimentsInfo = getExperimentsInfoFromGlobal()
   experiments = TubiExperiments(experimentsInfo)
   soTStaticConfig = getSoTStaticConfigFromGlobal()
-  m.metadataTranslate = TubiMetadataTranslate(m.constants, experiments, soTStaticConfig)
+  statSigExperimentsInfo = getStatsigExperimentsInfoFromGlobal()
+  statSigExperiments = StatsigExperimentsInterface(statSigExperimentsInfo)
+  m.metadataTranslate = TubiMetadataTranslate(m.constants, experiments, soTStaticConfig, statSigExperiments)
 
   m.RowList.drawFocusFeedbackOnTop = true
 
@@ -58,7 +60,7 @@ Function init()
   m.lastCurrentFocusColumn = 0
   m.lastFocusColumnIndex = 0
 
-  experiment = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
+  experiment = getStatsigExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
   if isNonEmptyArray(experiment.featuredRowPosterSize) = true
     m.featuredRowPoster = experiment.featuredRowPosterSize
   else

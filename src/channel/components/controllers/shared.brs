@@ -380,7 +380,9 @@ Function onStatsigInitializationSuccess(successResponse)
 
   ' Process the Statsig response through the StatsigExperiments instance
   if m.statsigExperiments <> invalid
-    m.global.statsigExperimentsInfo = m.statsigExperiments.processStatsigResponse(successResponse)
+    statsigExperimentsInfo = m.statsigExperiments.processStatsigResponse(successResponse)
+    m.global.statsigExperimentsInfo = statsigExperimentsInfo
+    m.updateGeneralTaskStatSigExperiments(statsigExperimentsInfo)
     tubiLog("StatsigExperiments processed and stored globally")
   else
     tubiLog("Warning: StatsigExperiments instance not available for response processing")

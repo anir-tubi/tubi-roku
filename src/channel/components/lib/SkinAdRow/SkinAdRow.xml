@@ -20,6 +20,9 @@
   <script type="text/brightscript" uri="pkg:/components/lib/InfoPanelMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/ContentMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StatsigExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StatsigLib.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/StatsigExperimentMixin.brs" />
 
   <interface>
     <!-- INPUT -->

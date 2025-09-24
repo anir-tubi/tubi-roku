@@ -27,5 +27,8 @@
 
     <!-- We use the GeneralTask to make our soTStaticConfig network requests. This means the soTStaticConfig is not available at that time and we need to update it once loaded. This is only used for updating m.soTStaticConfig and should not be accessed outside of the observer -->
     <field id="newSoTStaticConfig" type="assocarray" />
+
+    <!-- We use the GeneralTask to make our statsigExperiments network requests. This means the statsigExperiments is not available at that time and we need to update it once loaded. This is only used for updating m.statSigExperiments and should not be accessed outside of the observer -->
+    <field id="newStatSigExperiments" type="assocarray" />
   </interface>
 </component>

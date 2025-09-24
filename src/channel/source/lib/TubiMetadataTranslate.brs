@@ -1,4 +1,4 @@
-Function TubiMetadataTranslate(constants, experiments = invalid, soTStaticConfig = invalid)
+Function TubiMetadataTranslate(constants, experiments = invalid, soTStaticConfig = invalid, statSigExperiments = invalid)
   return {
     ' public
     translateBackendTypeToClientSideType: tubiMetadataTranslate_translateBackendTypeToClientSideType
@@ -27,6 +27,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid, soTStaticConfig
     allowAfterHours: constants.settings.allowAfterHours
     experiments: experiments
     soTStaticConfig: soTStaticConfig
+    statSigExperiments: statSigExperiments
 
     dedupeBackgrounds: tubiMetadataTranslate_dedupeBackgrounds
     setTotalCount: tubiMetadataTranslate_setTotalCount
@@ -1089,7 +1090,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
       else
         shouldInsertChannelTile = true
         isContentModeHomeScreen = (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
-        if isContentModeHomeScreen = true AND uiMode = "standard" AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6").design_type = "withDescriptionPortraitSmall"
+        if isContentModeHomeScreen = true AND uiMode = "standard" AND m.statSigExperiments <> invalid AND m.statSigExperiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6").design_type = "withDescriptionPortraitSmall"
           shouldInsertChannelTile = false
         end if
         categoryAA = m.buildCategoryAAWithInsert(container, contents, "", "", false, contentMode, screenId, isSignedInUser, uiMode, shouldInsertChannelTile, {})
@@ -1517,8 +1518,8 @@ Function tubiMetadataTranslate_buildCategoryParentInfo(container, sOrientation =
       child_ui_customization: container.child_ui_customization 'child_ui_customization is the not camel case because we are trying to store the container filed as is in field name
     }
 
-    if m.experiments <> invalid
-      experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6")
+    if m.statSigExperiments <> invalid
+      experiment = m.statSigExperiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6")
       tileDesignType = experiment.design_type
       isUserInVideoTilesExp = (tileDesignType = "withDescriptionPortraitSmall") AND uiMode = "standard"
 
@@ -1646,8 +1647,8 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           tileDesignType = "none"
           isUserInVideoTilesExp = false
           isUserInBillboardVariant = false
-          if m.experiments <> invalid
-            experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6")
+          if m.statSigExperiments <> invalid
+            experiment = m.statSigExperiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6")
             tileDesignType = experiment.design_type
             isUserInVideoTilesExp = (tileDesignType = "withDescriptionPortraitSmall") AND uiMode = "standard"
             isUserInBillboardVariant = experiment.variant = "billboard"
@@ -1963,8 +1964,8 @@ Function tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA(cont
     ' Remove useVideoTilesFormat field irrespective of whether we graduate or not graduate the experiment.
     ' Since this field is temporary since we need to support both formats for now.
     useVideoTilesFormat = false
-    if m.experiments <> invalid AND isContentModeHomeScreen = true AND bKidsMode <> true
-      experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6")
+    if m.statSigExperiments <> invalid AND isContentModeHomeScreen = true AND bKidsMode <> true
+      experiment = m.statSigExperiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6")
       useVideoTilesFormat = (isAA(experiment) = true AND experiment.design_type = "withDescriptionPortraitSmall")
     end if
 
@@ -2130,8 +2131,8 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
   tileDesignType = "none"
   isUserInVideoTilesExperiment = false
   experimentContainerId = "none"
-  if m.experiments <> invalid
-    experiment = m.experiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6")
+  if m.statSigExperiments <> invalid
+    experiment = m.statSigExperiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6")
     tileDesignType = experiment.design_type
     experimentContainerId = experiment.container_id
     isUserInVideoTilesExperiment = (tileDesignType = "withDescriptionPortraitSmall") AND uiMode = "standard"

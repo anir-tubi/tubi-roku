@@ -5,7 +5,7 @@ Function init()
   topRef.observeFieldScoped("itemContent", "onItemContentChange")
   topRef.observeFieldScoped("height", "onHeightChange")
 
-  experimentInfo = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
+  experimentInfo = getStatsigExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
   if isAA(experimentInfo) = true
     m.variant = experimentInfo.variant
   end if

@@ -21,7 +21,7 @@ Function init()
   m.top.observeFieldScoped("hideTitle", "onHideTitleChange")
   m.top.observeFieldScoped("width", "onWidthChange")
 
-  experimentInfo = getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
+  experimentInfo = getStatsigExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
   m.variant = experimentInfo.variant
 
   typographyConstants = getTypographyConstants()
