@@ -353,6 +353,10 @@ class TestUtils {
       constantsUpdates['settings.enableFailSafe'] = true;
     }
 
+    if (args.isAutoplayEnabled !== undefined) {
+      constantsUpdates['deviceInfo.isAutoplayEnabled'] = args.isAutoplayEnabled;
+    }
+
     if (constantsUpdates && Object.keys(constantsUpdates).length > 0) {
       deeplink['constantsUpdates'] = JSON.stringify(constantsUpdates);
     }
@@ -2353,6 +2357,9 @@ type StartApplicationArgs = {
 
   /** No startup modals are shown unless false */
   hideStartupModals?: boolean;
+
+  /** Sets the Roku system level autoplay setting */
+  isAutoplayEnabled?: boolean;
 
   /** No ads are shown unless set to false */
   noAds?: boolean;

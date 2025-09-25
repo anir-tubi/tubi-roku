@@ -290,6 +290,23 @@ describe('Video Preview', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForElementToFullyShowOnScreen('previewOnCheckMark');
   });
+
+  // https://tubi.testrail.io/index.php?/cases/view/705821
+  it('C705821- Roku Autoplay OFF - Video previews are disabled, @autoplay @videopreview', async () => {
+
+    // Start app with Roku's autoplay setting disabled
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true, isAutoplayEnabled: false });
+
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Verify that video is playing
+    await focusOnVideoTileWithPreviewUrl();
+
+    const previewVideoPlayer = await testUtils.getNodeForElement('previewVideoPlayer');
+    expect(previewVideoPlayer.state).to.not.be.oneOf(['playing', 'buffering'])
+
+  });
+
 });
 
 
@@ -306,6 +323,12 @@ async function openKidsMode() {
 }
 
 async function checkForPreview() {
+  await focusOnVideoTileWithPreviewUrl()
+
+  await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 5000);
+}
+
+async function focusOnVideoTileWithPreviewUrl() {
   const rowIndex = 0;
   const content = await testUtils.getRowListRowItemsContent('homeScreenRowList', 0);
   for (const [itemIndex, item] of content.entries()) {
@@ -314,5 +337,4 @@ async function checkForPreview() {
       break;
     }
   }
-  await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 5000);
 }

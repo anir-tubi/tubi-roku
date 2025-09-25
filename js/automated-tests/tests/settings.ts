@@ -74,7 +74,6 @@ describe('Settings', function () {
   // https://tubi.testrail.io/index.php?/cases/view/32371
   it('C32371 - About Page - When user chooses the About Page and checks Need Help label then Need Help should be present, @settings', async () => {
 
-
     // Go to Settings Page and higlight About
     await goToSettingsPageSelectAbout();
 
