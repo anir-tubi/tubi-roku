@@ -1634,8 +1634,8 @@ Function startDebouncedVideoPreview()
       stopAndHideLinearVideoPlayer()
       if screen.featuredRowContent <> invalid AND screen.featuredRowFocusedItem <> invalid
         content = screen.featuredRowFocusedItem
-
-        if getVideoPreviewContentId() <> content.id
+        state = getVideoPreviewState()
+        if getVideoPreviewContentId() <> content.id OR state = "stopped"
           if content.type = m.constants.ui.categoryTypes.linear AND m.constants.deviceInfo.isAutoPlayEnabled = true
             playLinearInlineGridView(content, screen)
           else
@@ -1743,6 +1743,8 @@ Function onFeaturedListHasFocusChange(msg)
     else if previewState = "playing"
       displayDefaultBackground()
       updatePreviewPlayerToInlineView()
+    else if m.queuedVideoTilePreview = true
+      startDebouncedVideoPreview()
     end if
     setUIBasedOnFocusedContent(content)
   else if isCurrentScreenHomeScreen() = true
@@ -1799,10 +1801,10 @@ Function onFeaturedRowFocusedItemChange(msg)
 
   ' If VideoPreview is on and we have not started the debounce, we will start it.
   ' This is needed in case where for initial load and refresh cases where columnFocusChange is not triggered.
-  if focusedItem <> invalid AND screen.featuredListHasFocus = true AND isVideoPreviewOn() = true AND m.videoPreviewDebounce.control = "stop"
-    if m.shouldDebounceVideoTilePreview = true
+  if focusedItem <> invalid AND isVideoPreviewOn() = true AND m.videoPreviewDebounce.control = "stop"
+    if m.shouldDebounceVideoTilePreview = true AND screen.featuredListHasFocus = true
       m.videoPreviewDebounce.control = "start"
-    else if screen.featuredListScrollingStatus = false
+    else if screen.featuredListScrollingStatus = false AND screen.featuredListHasFocus = true
       startDebouncedVideoPreview()
     else
       m.queuedVideoTilePreview = true
@@ -1975,7 +1977,7 @@ End Function
 Function getVideoTileFocusedRow()
   screen = getCurrentScreen()
   focusedRow = 0
-  if screen <> invalid
+  if screen <> invalid AND screen.featuredListCurrFocusRow <> invalid
     focusedRow = screen.featuredListCurrFocusRow
   end if
 

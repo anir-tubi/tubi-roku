@@ -150,7 +150,7 @@ End Function
 
 Function updateCategoryNameVisibility()
   item = m.top.content
-  if item <> invalid AND m.parentArrayGrid <> invalid
+  if item <> invalid AND m.parentArrayGrid <> invalid AND m.parentArrayGrid.parentScreenId = "homeScreen"
     categoryId = m.parentArrayGrid.currCategoryId
     m.CategoryName.visible = item.videoTilesVariant <> "billboard" OR item.id <> "featured" OR categoryId = "skinAd" OR categoryId = "fox_live_events"
   end if
