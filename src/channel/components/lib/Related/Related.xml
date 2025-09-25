@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<component name="BrowseContentOnPlayer" extends="Group">
-  <script type="text/brightscript" uri="BrowseContentOnPlayer.brs" />
+<!-- Also referred to as YMAL UI -->
+<component name="Related" extends="Group">
+  <script type="text/brightscript" uri="Related.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
@@ -8,8 +9,6 @@
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/UserMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
 
   <interface>
@@ -18,71 +17,60 @@
       <field id="updateContent" type="boolean" alwaysNotify="true"/>
       <!-- show or hide the Info panel component -->
       <field id="showInfoPanel" type="boolean" alwaysNotify="true"/>
-      <!-- shows the Browse While Watching patially -->
+      <!-- shows the YMAL partially -->
       <field id="show" type="boolean" alwaysNotify="true"/>
-      <!-- hides the Browse While Watching -->
+      <!-- hides the YMAL -->
       <field id="hide" type="boolean" alwaysNotify="true"/>
-      <!-- opens the Browse While Watching in full screen -->
+      <!-- opens the YMAL in full screen -->
       <field id="open" type="boolean" alwaysNotify="true"/>
-      <!-- closes the Browse While Watching so it is only shown as a peek -->
+      <!-- closes the YMAL so it is only shown as a peek -->
       <field id="close" type="boolean" alwaysNotify="true"/>
-      <!-- show the Browse While Watching in full screen -->
+      <!-- show the YMAL in full screen -->
       <field id="showInFullScreen" type="boolean" alwaysNotify="true"/>
       <!-- The analytics page type value associated with the parent page of this Related component.   -->
-      <field id="associatedPageName" type="string" value="video_page"/>
-       <!-- hides or shows the loading Spinner -->
-      <field id="isLoading" type="boolean" alias="Spinner.visible" />
+      <field id="associatedPageName" type="string"/>
 
-      <field id="jumpToRowItem" alias="CategoryGridList.jumpToRowItem" />
+      <field id="focusedContent" type="node" alwaysNotify="true" alias="relatedContentContainer.focusedContent"/>
+
+      <field id="jumpToItem" alias="relatedContentContainer.jumpToItem" />
 
     <!-- OUTPUTS -->
       <!-- selectedRelatedContentItemUpdated should be observed instead of this field -->
-      <field id="selectedRelatedContentItem" type="node" alias="CategoryGridList.itemSelected"/>
+      <field id="selectedRelatedContentItem" type="node" alias="relatedContentContainer.selectedContent"/>
 
-      <field id="currCategoryId" alias="CategoryGridList.currCategoryId" />
+      <field id="keyPress" type="string" alwaysNotify="true"/>
 
-      <field id="focusedContent" alias="CategoryGridList.itemFocused"/>
       <!-- Holds the information needed to populate a navigate_within_page event. This will
            be observed by the contentController via videoHelpers
            which will be responsible for sending navigate_within_page events.
       -->
-      <field id="navigateWithinPageInfo" type="assocarray"/>
-      <field id="selectedPosition" alias="CategoryGridList.selectedPosition" />
-      <field id="trackingComponentInfo" type="assocarray"/>
-      <field id="currFocusRow" alias="CategoryGridList.currFocusRow" />
+      <field id="navigateWithinPageInfo" type="assocarray" alias="relatedContentContainer.navigateWithinPageInfo"/>
+      <field id="trackingComponentInfo" type="assocarray" alias="relatedContentContainer.trackingComponentInfo"/>
   </interface>
 
   <children>
 
     <Group
-      id="BrowseWhileWatchingGroup"
+      id="YmalGroup"
       opacity="0.0"
       translation="[0,0]">
 
       <InfoPanel
         id="Info"
-        translation="[0,81]"
         mode="item"
-        width="993"
+        width="992"
         maxHeight="312"
-        maxTitleLines="2"
+        maxTitleLines="3"
         opacity="0.0"/>
 
       <Group
-        id="BrowseWhileWatchingRow"
-        opacity="0.2"
-        translation="[0,400]">
+        id="YmalRow"
+        opacity="0.2">
 
-        <CategoryGridList
-          id="CategoryGridList"/>
+        <RelatedContentContainer
+          id="relatedContentContainer"
+          translation="[0,384]"/>
 
-        <Spinner
-          id="Spinner"
-          visible="false"
-          showShade="true"
-          width="1920"
-          height="200"
-          translation="[-180,0]"/>
       </Group>
 
     </Group>

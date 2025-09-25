@@ -131,11 +131,20 @@
       <!-- Holds the tcf string value. -->
       <field id="tcfString" type="string" />
 
+      <!-- YMAL content to be displayed on YMAL Row inside player -->
+      <field id="relatedContent" type="node" />
+
+      <!-- boolean field which tells the YMAL content is updated -->
+      <field id="updateRelatedContent" type="boolean" alwaysNotify="true"/>
+
       <!-- browseContent content to be displayed on Browse While Watching Row -->
       <field id="browseContent" type="node" />
 
       <!-- boolean field which tells the browseContent is updated -->
       <field id="updateBrowseContent" type="boolean" alwaysNotify="true"/>
+
+      <!-- boolean field which can be set to true for showing the YMAL in full screen and set focus to YMAL -->
+      <field id="showYMALInFullScreen" type="boolean" alwaysNotify="true"/>
 
       <!-- Used to allow seeking the video player while still maintaining proper state tracking. Sets video player seek field to appropriate value and updates necessary state. `seek` field is time/double based and value specified should be in seconds -->
       <field id="seekTo" type="time" />
@@ -205,6 +214,14 @@
 
       <!-- Autoplay this content when this field is set -->
       <field id="upNextContentToAutoplay" type="node" />
+
+      <!-- set to the contentNode of the Related item which was focused when
+           the ok button is pressed
+      -->
+      <field id="relatedContentToPlay" type="node" />
+
+      <!-- set to true when the relatedContentToPlay field is updated -->
+      <field id="relatedContentToPlayUpdated" type="boolean" alwaysNotify="true"/>
 
       <!-- set to the contentNode of the homescreen item which was focused when
            the ok button is pressed

@@ -194,6 +194,12 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
           else if m.playerControlExperimentType = "none" AND m.top.isTrailer = false
             relatedContent = m.top.browseContent
 
+            if getStatsigExperimentResource("roku_player_bww_ymal", "roku_player_bww_ymal_v1", false).enabled = true
+              relatedContent = m.top.relatedContent
+            else
+              relatedContent = m.top.browseContent
+            end if
+
             if relatedContent <> invalid AND relatedContent.getChildCount() > 0
               setFocusToComponent(m.BrowseWhileWatching)
               animateTransportAndBrowseWhileWatching("in")
@@ -2281,10 +2287,17 @@ End Function
 ' show BrowseWhileWatching row on bottom of the screen and fire exposure event
 Function showBrowseWhileWatching()
   if m.top.appMode <> "KIDS_MODE" AND m.top.isTrailer = false
-    content = m.top.browseContent
 
-    'fire exposure event when BrowseWhileWatching row is displayed at bottom area of the screen
-    if content <> invalid AND content.getChildCount() > 0
+    if getStatsigExperimentResource("roku_player_bww_ymal", "roku_player_bww_ymal_v1", false).enabled = true
+      content = m.top.relatedContent
+    else
+      content = m.top.browseContent
+    end if
+
+    'fire exposure event when YMAL row is displayed at bottom area of the screen
+    if content <> invalid AND content.getChildCount() > 0 AND getStatsigExperimentResource("roku_player_bww_ymal", "roku_player_bww_ymal_v1").enabled = true
+      m.BrowseWhileWatching.jumpToItem = 0
+    else if content <> invalid AND content.getChildCount() > 0
       m.BrowseWhileWatching.jumpToRowItem = [0, 0]
       m.BrowseWhileWatching.isLoading = false
     end if
@@ -2373,4 +2386,13 @@ Function setComponentInteractionInfo(buttonValue)
       user_interaction: "CONFIRM"
     }
   end if
+End Function
+
+
+Function onShowYMALInFullScreen()
+  fade(m.VideoBrowseWhileWatchingOverlay, "in", 0.4)
+  m.HUD.translation = [0, m.hudYTranslation]
+  fade(m.HUD, "in", 0.6)
+  m.BrowseWhileWatching.showInFullScreen = true
+  m.BrowseWhileWatching.setFocus(true)
 End Function

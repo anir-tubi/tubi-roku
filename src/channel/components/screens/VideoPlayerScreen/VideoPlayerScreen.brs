@@ -96,16 +96,23 @@ Function init()
   end if
 
   BrowseWhileWatchingRow = m.top.findNode("BrowseWhileWatchingRow")
-  m.BrowseWhileWatching = BrowseWhileWatchingRow.createChild("BrowseContentOnPlayer")
-  m.BrowseWhileWatching.observeFieldScoped("selectedRelatedContentItemUpdated", "onBrowseContentSelected")
+
+  if getStatsigExperimentResource("roku_player_bww_ymal", "roku_player_bww_ymal_v1", false).enabled = true then
+    m.BrowseWhileWatching = BrowseWhileWatchingRow.createChild("Related")
+    m.BrowseWhileWatching.observeFieldScoped("selectedRelatedContentItem", "onRelatedItemSelected")
+  else
+    m.BrowseWhileWatching = BrowseWhileWatchingRow.createChild("BrowseContentOnPlayer")
+    m.BrowseWhileWatching.observeFieldScoped("selectedRelatedContentItem", "onBrowseContentSelected")
+  end if
 
   m.BrowseWhileWatching.translation = [m.marginX, 550]
   m.BrowseWhileWatching.associatedPageName = "video_player_page"
   m.BrowseWhileWatching.observeFieldScoped("trackingComponentInfo", "onTrackingComponentInfo")
-  m.BrowseWhileWatching.observeFieldScoped("isRelatedContentFocused", "onRelatedItemFocused")
+  m.BrowseWhileWatching.observeFieldScoped("focusedContent", "onRelatedItemFocused")
   m.BrowseWhileWatching.observeFieldScoped("keyPress", "onKeyPressWhenBrowseWhileWatchingHasFocus")
   m.BrowseWhileWatching.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
 
+  m.top.observeFieldScoped("updateRelatedContent", "onRelatedContentUpdated")
   m.top.observeFieldScoped("updateBrowseContent", "onBrowseContentUpdated")
   m.top.observeField("updateContent", "onContentChange")
   m.top.observeField("sprites", "onSpritesReceived")
@@ -119,6 +126,7 @@ Function init()
   m.top.observeFieldScoped("adTrackingObject", "onAdTrackingObject")
   m.top.observeFieldScoped("adBufferingObject", "onAdBufferingObject")
   m.top.observeFieldScoped("filledAdData", "onHandleFilledAdData")
+  m.top.observeFieldScoped("showYMALInFullScreen", "onShowYMALInFullScreen")
 
   'isPauseAdReqInProgress is the state of pauseAd requests in flight.
   'If pause ad request is in flight, we do not send another pause ad request
@@ -3474,6 +3482,23 @@ Function onBrowseContentSelected(msg)
 
     updatePlayerLogLib(m.playerLogLib, "setBrowseWhileWatchingDidConvert", true)
   end if
+End Function
+
+
+Function onRelatedItemSelected(msg)
+  screen = msg.getRoSGNode()
+
+  if screen <> invalid then
+    selectedContent = screen.selectedRelatedContentItem
+    animateTransport("out")
+    hideBrowseWhileWatching()
+    setFocusToPlaybackControl()
+    m.top.relatedContentToPlay = selectedContent
+    resetTransportButtons()
+
+    updatePlayerLogLib(m.playerLogLib, "setBrowseWhileWatchingDidConvert", true)
+  end if
+
 End Function
 
 

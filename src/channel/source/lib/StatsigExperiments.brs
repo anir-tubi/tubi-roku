@@ -24,6 +24,12 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
+      roku_player_bww_ymal: {
+        roku_player_bww_ymal_v1: {
+          default: { "enabled": false }
+        }
+      }
+
       ' Ad request cuepoint alignment - fetch Ad anywhere between 3~15 second before cuepoint if experiment is enabled
       roku_player_improvement: {
         roku_player_align_ad_request_cuepoint_v1: {

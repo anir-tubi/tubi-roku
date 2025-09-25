@@ -25,12 +25,18 @@ Function init()
   setTypographyOfLabel(m.title, typographyConstants.ids.bodyMedium)
 
   m.previousFocusedContent = invalid
+
+  ' Used to determine if navigate_within_page events should be sent. Only send when the Related content row already
+  ' has focus, not when it gains focus.
+  m.isRelatedFocused = false
 End Function
 
 
 Function onFocusedChildChange()
   if m.top.hasFocus() = true
     m.grid.setFocus(true)
+  else if m.top.isInFocusChain() <> true
+    m.isRelatedFocused = false
   end if
 End Function
 
@@ -108,19 +114,23 @@ Function onItemFocused()
 
     col = itemFocused + 1
     row = 1
-
     pageInfo = m.top.trackingPageInfo
 
-    m.top.navigateWithinPageInfo = {
-      pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
-      componentOneof: m.Tracking.getAnalyticsComponent("related_component", m.previousFocusedContent)
-      means_of_navigation: "BUTTON"
-      vertical_location: row
-      horizontal_location: col
-    }
+    if m.isRelatedFocused = true
+      m.top.navigateWithinPageInfo = {
+        pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+        componentOneof: m.Tracking.getAnalyticsComponent("related_component", m.previousFocusedContent)
+        means_of_navigation: "BUTTON"
+        vertical_location: row
+        horizontal_location: col
+      }
 
-    m.previousFocusedContent = {
-      content_tile: m.Tracking.getAnalyticsTile(focusedContent, col, row)
-    }
+      m.previousFocusedContent = {
+        content_tile: m.Tracking.getAnalyticsTile(focusedContent, col, row)
+      }
+    end if
+
+    m.isRelatedFocused = true
+    m.top.focusedContent = focusedContent
   end if
 End Function

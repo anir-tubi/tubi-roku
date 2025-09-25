@@ -49,12 +49,17 @@ Function cmsApi_setUtmCampaignConfig(utmCampaignConfig)
 End Function
 
 
-Function cmsApi_createRelatedContentReqInfo(contentId, bKidsMode = false)
+Function cmsApi_createRelatedContentReqInfo(contentId, bKidsMode = false, limit = 0)
   options = m.getCommonOptions(true)
   options.params["isKidsMode"] = bKidsMode
   options.params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
   options.params = m.setTupianPosterParam(options.params)
   options.params["content_id"] = contentId
+
+  if limit > 0
+    options.params["limit"] = limit
+  end if
+
   url = m.constants.urls.autopilot.relatedContent
 
   return {

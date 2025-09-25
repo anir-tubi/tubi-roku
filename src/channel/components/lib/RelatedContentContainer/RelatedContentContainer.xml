@@ -17,11 +17,13 @@
     <field id="parentScreenTrackingPageInfo" type="assocarray" />
     <field id="personalizationId" type="string" />
     <field id="trackingPageInfo" type="assocarray" />
+    <field id="jumpToItem" alias="grid.jumpToItem" />
 
     <!-- OUTPUTS -->
     <field id="navigateWithinPageInfo" type="assocarray" />
     <field id="trackingComponentInfo" type="assocarray" />
     <field id="selectedContent" type="node" alwaysNotify="true" />
+    <field id="focusedContent" type="node" alwaysNotify="true" />
   </interface>
 
   <children>

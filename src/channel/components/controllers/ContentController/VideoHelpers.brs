@@ -109,6 +109,7 @@ Function setupVideoPlayer(content, playbackSource = { "srcForAnalytic": "unknown
     videoPlayer.observeFieldScoped("subtitleTrackSettings", "onSubtitleTrackSettingsChange")
     videoPlayer.observeFieldScoped("audioTrackSettings", "onAudioTrackSettingsChange")
     videoPlayer.observeFieldScoped("homescreenContentToPlayUpdated", "onPlayerHomeScreenContentToPlay")
+    videoPlayer.observeFieldScoped("relatedContentToPlay", "onPlayerRelatedContentToPlay")
     videoPlayer.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
     observeUpdateAuth(videoPlayer.task)
 
@@ -220,11 +221,17 @@ Function setupVideoPlayer(content, playbackSource = { "srcForAnalytic": "unknown
 
       'Do not Fetch/Show BrowseWhileWatching row for kids mode & limited UI models
       if isKidsUIOn() = false AND m.constants.deviceInfo.limitedUi = false
-        browseContent = videoPlayer.browseContent
 
-        if browseContent = invalid
-          fetchBrowseContentForPlayer(videoPlayer.appMode)
+        if getStatsigExperimentResource("roku_player_bww_ymal", "roku_player_bww_ymal_v1", false).enabled = true
+          getRelatedContent(content, handleRelatedResponseInVideoPlayer, 20)
+        else
+          browseContent = videoPlayer.browseContent
+
+          if browseContent = invalid
+            fetchMiniHomeScreen(videoPlayer.appMode)
+          end if
         end if
+
       else
         videoPlayer.browseContent = invalid
         videoPlayer.updateBrowseContent = true
@@ -286,7 +293,7 @@ End Function
 '
 ' @appMode: String, current app mode. Possible values are "DEFAULT_MODE", "KIDS_MODE", "LATINO_MODE"
 '
-Function fetchBrowseContentForPlayer(appMode = "DEFAULT_MODE")
+Function fetchMiniHomeScreen(appMode = "DEFAULT_MODE")
   reqName = m.constants.reqNames.getMiniHomescreen
   options = {}
   headers = {}
@@ -318,28 +325,36 @@ Function fetchBrowseContentForPlayer(appMode = "DEFAULT_MODE")
     responseType: "node"
     isSignedInUser: isLoggedInUser()
   })
-
 End Function
 
 
 Function onMiniHomeScreenContentSuccessResponse(response)
-  screenID = m.constants.ui.screenIds.videoPlayerScreen
-  videoPlayerScreen = getFromScreenCache(screenID)
+  currentScreen = getCurrentScreen()
 
-  if videoPlayerScreen <> invalid
-    videoPlayerScreen.browseContent = response
-    videoPlayerScreen.updateBrowseContent = true
+  if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
+    currentScreen.browseContent = response
+    currentScreen.updateBrowseContent = true
   end if
 End Function
 
 
 Function onMiniHomeScreenContentErrorResponse(response)
-  screenID = m.constants.ui.screenIds.videoPlayerScreen
-  videoPlayerScreen = getFromScreenCache(screenID)
+  currentScreen = getCurrentScreen()
 
-  if videoPlayerScreen <> invalid
-    videoPlayerScreen.browseContent = invalid
-    videoPlayerScreen.updateBrowseContent = true
+  if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
+    currentScreen.browseContent = invalid
+    currentScreen.updateBrowseContent = true
+  end if
+End Function
+
+
+' @relatedContent: roSGNode, TubiContentNode
+Function handleRelatedResponseInVideoPlayer(relatedContent)
+  currentScreen = getCurrentScreen()
+
+  if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
+    currentScreen.relatedContent = relatedContent
+    currentScreen.updateRelatedContent = true
   end if
 End Function
 
@@ -1586,12 +1601,11 @@ Function handleBrowseWhileWatchingContentErrorResponse(error)
   end if
 
   ' set up the error modal dialog
-  errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, m.constants.errors.subtypes.fetchError, error.code)
+  errorCode = getUserFacingErrorCode(m.constants.errors.context.playerScreen, m.constants.errors.subtypes.fetchError, error.code)
   dialogEvent = getDetailScreenDialogAnalyticEvent(content, "NETWORK_ERROR", errorCode, m.constants)
 
-  message = ""
   modalInfo = {
-    message: getErrorMessage(message, errorCode)
+    message: getErrorMessage("", errorCode)
     openTrackEvent: dialogEvent
     trackingTask: m.trackingLoggingTask
   }
@@ -1629,3 +1643,75 @@ Function stopAllVideoPlayersAndRestartPlayback(callback)
 
   callback()
 End Function
+
+
+Function onPlayerRelatedContentToPlay(msg)
+  content = msg.getData()
+  if content <> invalid then
+
+    ' The episode information is not available for the selected series, so refetch required for series content type
+    if content.type = m.constants.ui.contentTypes.series
+      emptySeriesNode = CreateObject("roSGNode", "ContentNode")
+      emptySeriesNode.type = m.constants.ui.contentTypes.series
+      emptySeriesNode.id = content.id
+      getSingleContentFromServer(emptySeriesNode, handleYMALContentSuccessResponse, handleYMALContentErrorResponse)
+    else
+      playbackSource = {
+        "srcForAnalytic": m.constants.player.playbackSource.unknown
+        "srcForAds": m.constants.player.playbackOrigin.ymal
+      }
+      playUpNextContent(content, playbackSource)
+    end if
+  end if
+End Function
+
+
+Function handleYMALContentSuccessResponse(content)
+  playbackSource = {
+    "srcForAnalytic": m.constants.player.playbackSource.unknown
+    "srcForAds": m.constants.player.playbackOrigin.ymal
+  }
+  playUpNextContent(content, playbackSource)
+End Function
+
+
+Function handleYMALContentErrorResponse(error)
+  content = invalid
+  currentScreen = getCurrentScreen()
+
+  if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
+    content = currentScreen.relatedContentToPlay
+  end if
+
+  if content <> invalid
+    ' set up the error modal dialog
+    errorCode = getUserFacingErrorCode(m.constants.errors.context.playerScreen, m.constants.errors.subtypes.fetchError, error.code)
+    dialogEvent = {
+      type: "dialog"
+      values: {
+        dialog_type: "NETWORK_ERROR"
+        pageOneof: m.Tracking.getAnalyticsPage("video_page", { video_id: content.id.toInt() })
+        dialog_action: "SHOW"
+        dialog_sub_type: errorCode
+      }
+    }
+
+    modalInfo = {
+      message: getErrorMessage("", errorCode)
+      openTrackEvent: dialogEvent
+      trackingTask: m.trackingLoggingTask
+    }
+    showErrorModal(modalInfo, invalid, invalid, onCloseYMALContentFetchErrorModal)
+  end if
+
+End Function
+
+
+Function onCloseYMALContentFetchErrorModal()
+  currentScreen = getCurrentScreen()
+
+  if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
+    currentScreen.showYMALInFullScreen = true
+  end if
+End Function
+

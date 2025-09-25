@@ -219,8 +219,6 @@ Function onGridFocusChange() as Void
     end if
 
     m.isRelatedFocused = true
-    ' this field helps to update last key press time & pauseAd timer
-    m.top.isRelatedContentFocused = true
   end if
 
 End Function
@@ -229,19 +227,7 @@ End Function
 Function onGridItemSelected() as Void
   if m.categoryGridList <> invalid
     selectedItem = m.categoryGridList.itemSelected
-    handleItemSelected(selectedItem, m.top.selectedPosition)
-  end if
-End Function
-
-
-' @item: roSGNode, TubiContentNode with metadata for an item in the grid
-' @position: array, 2d array with [x,y] grid coordinate information
-Function handleItemSelected(item, position)
-  m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(item, position)
-
-  if item <> invalid then
-    m.top.selectedRelatedContentItem = item
-    m.top.selectedRelatedContentItemUpdated = true
+    m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(selectedItem, m.top.selectedPosition)
   end if
 End Function
 

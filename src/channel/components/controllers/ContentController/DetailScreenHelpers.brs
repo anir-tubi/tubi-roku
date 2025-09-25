@@ -717,13 +717,13 @@ Function handleSingleContentError(error, onRetrySuccessCallback, onRetryErrorCal
 End Function
 
 
-Function getRelatedContent(content, callback = handleRelatedResponse)
+Function getRelatedContent(content, callback = handleRelatedResponse, limit = 0)
   ' get related (You May Also Like) content along with metadata for the content
   ' (but not if in any of the kids modes, since it won't be displayed)
 
   if content <> invalid AND isKidsUIOn() = false
 
-    relatedRequestInfo = m.cmsApi.createRelatedContentReqInfo(content.id, shouldKidsModeBeSentToServer())
+    relatedRequestInfo = m.cmsApi.createRelatedContentReqInfo(content.id, shouldKidsModeBeSentToServer(), limit)
     requestType = m.constants.reqNames.getRelatedContent
 
     m.makeRequest({
@@ -2438,6 +2438,7 @@ Function onRelatedContentToPlay(msg)
   screen = msg.getRoSGNode()
   if screen <> invalid then
     content = screen.relatedContentToPlay
+
     playbackSource = {
       "srcForAnalytic": m.constants.player.playbackSource.unknown
       "srcForAds": m.constants.player.playbackOrigin.ymal
