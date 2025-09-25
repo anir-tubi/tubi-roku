@@ -225,6 +225,7 @@ Function onComponentFocusChange(msg)
       m.skinAdRow.setFocus(true)
     else if m.isWithDescPortraitSmallExpEnabled = true AND m.FeaturedRowList.content <> invalid AND (m.top.lastFocusedList = "featuredRowList" OR m.top.lastFocusedList = "")
       m.top.lastFocusedList = "featuredRowList"
+      m.top.featuredListHasFocus = true
       m.FeaturedRowList.setFocus(true)
     else
       ' Don't want to do any of this logic if we are already have an item we are going to jump to

@@ -1235,6 +1235,7 @@ Function getConstants()
   constants.ui.categoryIds.skinAd = "skinAd"
   constants.ui.categoryIds.adRowlistSpotlight = "hdc_spotlight"
   constants.ui.categoryIds.adRowlistCarousel = "hdc_carousel"
+  constants.ui.categoryIds.liveEventSpotlight = "live_event_spotlight"
 
   constants.ui.categoryTypes = {}
   'these map to tensor api container types

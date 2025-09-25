@@ -8,16 +8,16 @@ Function init()
   m.isUserInVideoTilesExperiment = isAA(experimentInfo) AND experimentInfo.design_type = "withDescriptionPortraitSmall"
   m.isUserInBillboardVariant = isAA(experimentInfo) AND experimentInfo.variant = "billboard"
   m.shouldDim = isAA(experimentInfo) AND experimentInfo.should_dim = true
+  m.dimMask = m.top.findNode("dimMask")
 
   m.PageGroup = m.top.findNode("PageGroup")
   m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]
   m.ContentAreaParent = m.top.findNode("ContentAreaParent")
   m.maskUri = "pkg:/images/poster-mask.png"
   if m.isUserInVideoTilesExperiment = true
-    if m.shouldDim = false
-      m.maskUri = ""
-    else
-      m.maskUri = "pkg:/images/poster-mask-60.png"
+    m.maskUri = ""
+    if m.shouldDim = true
+      m.dimMask.visible = true
     end if
   end if
   m.ContentArea = m.top.findNode("ContentArea")
@@ -67,6 +67,7 @@ Function init()
   m.CategoryGridList.observeFieldScoped("hideInfoPanel", "onHideInfoPanelChange")
   m.CategoryGridList.observeFieldScoped("featuredRowListTranslation", "updateFeaturedRowListTranslation")
   m.ContentAreaParent.observeFieldScoped("translation", "updateFeaturedRowListTranslation")
+  m.top.observeFieldScoped("featuredListCurrFocusRow", "onFeaturedListCurrFocusRowChange")
 
   'used to know when to send tracking info. Do not send focus tracking info when the grid is 1st loaded
   m.gridHasGainedInitialFocus = false
@@ -763,12 +764,6 @@ Function onFeaturedRowFocusedItemChange(msg) as Void
   if m.CategoryGridList.isInFocusChain() = true
     '//if the CategoryGridList is in focus, then alter the UI.
     if focusedContent <> invalid
-      if m.shouldDim = true AND (m.CategoryGridList.currCategoryId = "featured" OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.liveEventSpotlight)
-        m.ContentArea.maskUri = "pkg:/images/poster-mask-60.png"
-      else if m.isUserInVideoTilesExperiment = true
-        m.ContentArea.maskUri = ""
-      end if
-
       m.top.contentFocused = focusedContent
       if focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
         m.top.backgroundUriList = determineBackgroundImage(focusedContent)
@@ -1305,3 +1300,17 @@ Function onKidsModeChange(msg)
     m.ContentAreaParent.translation = m.originalContentAreaTranslation
   end if
 End Function
+
+
+Function onFeaturedListCurrFocusRowChange(msg)
+  tubiLog("HomeScreen.onFeaturedListCurrFocusRowChange")
+  row = msg.getData()
+  featuredRowContent = m.top.featuredRowContent
+  if m.shouldDim = true AND featuredRowContent <> invalid
+    container = featuredRowContent.getChild(CInt(row))
+    m.dimMask.visible = container <> invalid AND arrayIncludes([m.constants.ui.categoryIds.featured, m.constants.ui.categoryIds.liveEventSpotlight], container.id)
+  else
+    m.dimMask.visible = false
+  end if
+End Function
+

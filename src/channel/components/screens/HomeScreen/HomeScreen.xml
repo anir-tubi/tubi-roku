@@ -227,6 +227,13 @@
             id="CategoryGridList"/>
         </MaskGroup>
       </Group>
+      <Poster
+        id="dimMask"
+        uri="pkg:/images/dim-mask.png"
+        width="1920"
+        height="250"
+        translation="[0, 830]"
+        visible="false"/>
     </Group>
     <Group
       id="adContentGroup"/>

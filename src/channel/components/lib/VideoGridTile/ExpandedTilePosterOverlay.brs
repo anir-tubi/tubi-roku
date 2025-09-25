@@ -1,4 +1,5 @@
 Function init()
+  m.constants = getConstantsFromGlobal()
   topRef = m.top
   topRef.observeFieldScoped("itemContent", "onItemContentChange")
   topRef.observeFieldScoped("height", "onHeightChange")
@@ -9,6 +10,10 @@ Function init()
   m.sotTopLabelGroup = topRef.findNode("sotTopLabelGroup")
   m.bottomContentGroup = topRef.findNode("bottomContentGroup")
   m.sotMarker = topRef.findNode("sotMarker")
+  m.channelLogo = topRef.findNode("channelLogo")
+  m.overlayTitleRow = topRef.findNode("overlayTitleRow")
+  m.channelLogoGroup = topRef.findNode("channelLogoGroup")
+  m.channelLogoBackground = topRef.findNode("channelLogoBackground")
   m.billboardTileMetadata = invalid
 
 
@@ -24,6 +29,7 @@ Function init()
   m.badgeTextFont = typographyConstants.ids.bodyExtraSmallStrong
   m.headerSmallFont = typographyConstants.ids.headerSmall
   m.bodyMediumStrongFont = typographyConstants.ids.bodyMediumStrong
+  m.subheaderMediumFont = typographyConstants.ids.subheaderMedium
 
   m.titleImage.observeFieldScoped("loadStatus", "onTitleImageLoadStatus")
   topRef.observeFieldScoped("showContentPoster", "onShowContentPosterChange")
@@ -70,6 +76,7 @@ Function onThemeChange()
     m.focusedTextColor = theme.focusedTextColor
     m.backgroundColor = theme.neutralSolidColor
     m.cautionColor = theme.cautionColor
+    m.channelLogoBackground.blendColor = theme.tertiaryTextColor
   end if
 End Function
 
@@ -78,6 +85,10 @@ Function onItemContentChange(msg)
   itemContent = msg.getData()
 
   if itemContent <> invalid
+    if m.subtitle.getParent() <> invalid
+      m.titleGroup.removeChild(m.subtitle)
+    end if
+    m.overlayTitleRow.removeChild(m.channelLogoGroup)
     adjustPosterBottomContentTranslation()
     isBillboardRow = m.variant = "billboard" AND m.top.containerIndex = m.top.billboardContainerIndex
     titleImageLoadWidth = 360
@@ -87,9 +98,16 @@ Function onItemContentChange(msg)
       titleImageLoadWidth = 240
       titleImageLoadHeight = 68
       setTypographyOfLabel(m.title, m.bodyMediumStrongFont)
+    else if itemContent.type = "linear"
+      setTypographyOfLabel(m.title, m.subheaderMediumFont)
     else
       setTypographyOfLabel(m.title, m.headerSmallFont)
     end if
+
+    m.title.height = 0
+    m.title.vertAlign = "bottom"
+    m.title.maxLines = 2
+
     ' We are only limiting the height since title logo is displayed on it's own row we are good to let the width flow.
     m.titleImage.loadHeight = titleImageLoadHeight
     m.titleImage.loadWidth = titleImageLoadWidth
@@ -103,6 +121,10 @@ Function onItemContentChange(msg)
     end if
 
     if itemContent.type = "linear"
+      if isBillboardRow = true
+        setThumbnailImage(itemContent.thumbnailUri, itemContent.type)
+        m.overlayTitleRow.insertChild(m.channelLogoGroup, 0)
+      end if
       currentProgram = getCurrentLiveProgram(itemContent)
       isBadgeAdded = true
       ' Only add the onNow badge if there is no live program or the live program is not live.
@@ -133,20 +155,29 @@ Function onItemContentChange(msg)
     end if
 
     if itemContent.type = "linear"
-      m.title.maxLines = 1
-    else
-      m.title.maxLines = 2
+      if isBillboardRow = true
+        m.title.height = 81
+        m.title.vertAlign = "center"
+        m.title.maxLines = 2
+        ' Need to adjust line spacing to allow for 2 lines of text.
+        m.title.lineSpacing = -9
+      else
+        m.title.maxLines = 1
+      end if
     end if
 
     if m.variant <> "typography_improvements"
       ' For Linear content, we are using the title from the current program.
       if currentProgram <> invalid
-        setSubtitle(itemContent.title)
-        setTitle(currentProgram.epgProgramTitle)
-      else
-        if m.subtitle.getParent() <> invalid
-          m.titleGroup.removeChild(m.subtitle)
+        if isBillboardRow = false
+          setSubtitle(itemContent.title)
         end if
+        if isNonEmptyString(currentProgram.epgProgramTitle) = true
+          setTitle(currentProgram.epgProgramTitle)
+        else
+          setTitle(currentProgram.title)
+        end if
+      else
         setTitle(itemContent.title, itemContent.titleImageUrl)
       end if
     end if
@@ -177,7 +208,7 @@ Function setTitle(title = "", titleImageUri = "")
     m.titleImage.uri = ""
     m.bottomContentGroup.removeChild(m.titleImage)
     if m.titleGroup.getParent() = invalid
-      m.bottomContentGroup.insertChild(m.titleGroup, 0)
+      m.overlayTitleRow.appendChild(m.titleGroup)
     end if
     m.titleAnimation = fade(m.titleGroup, "in", m.animationDuration)
   end if
@@ -203,7 +234,7 @@ End Function
 
 Function onTitleImageLoadStatus(msg)
   if msg.getData() = "ready"
-    m.bottomContentGroup.removeChild(m.titleGroup)
+    m.overlayTitleRow.removeChild(m.titleGroup)
     m.titleAnimation = fade(m.titleImage, "in", m.animationDuration)
     adjustPosterBottomContentTranslation()
   end if
@@ -306,7 +337,8 @@ End Function
 
 Function adjustPosterBottomContentTranslation()
   height = m.bottomContentGroup.boundingRect().height
-  isBillboardRow = m.variant = "billboard" AND m.top.containerIndex = m.top.billboardContainerIndex
+  ' Handling a case where top row above featured is not video tile like event spotlight or skin ads.
+  isBillboardRow = m.variant = "billboard" AND m.top.containerIndex <= m.top.billboardContainerIndex
   containerHeight = m.top.height
   translationX = 15
   if isBillboardRow = true
@@ -322,5 +354,16 @@ Function onContainerIndexChange(msg)
   if containerIndex > m.top.billboardContainerIndex AND m.billboardTileMetadata <> invalid
     m.bottomContentGroup.removeChild(m.billboardTileMetadata)
     adjustPosterBottomContentTranslation()
+  end if
+End Function
+
+
+Function setThumbnailImage(thumbnailUri, contentType)
+  channelLogoIsPresent = (m.channelLogoGroup.getParent() <> invalid)
+  if isNonEmptyString(thumbnailUri) = true AND (contentType = m.constants.ui.contentTypes.sportsEvent OR contentType = m.constants.ui.contentTypes.linear)
+    if channelLogoIsPresent = false
+      m.overlayTitleRow.insertChild(m.channelLogoGroup, 0)
+    end if
+    m.channelLogo.uri = thumbnailUri
   end if
 End Function

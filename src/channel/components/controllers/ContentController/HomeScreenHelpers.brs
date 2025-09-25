@@ -1467,6 +1467,18 @@ Function onFeaturedRowCurrFocusRowChange(msg)
   updateExpandedVideoTileCurrFocusRow(currFocusRow, screen.featuredListScrollDirection)
   updateVideoTileSize(screen.featuredListScrollingStatus)
 
+  if m.isInBillboardExperiment = true
+    billboardVariantTranslation = m.constants.ui.billboardVariantTranslation
+    if CInt(currFocusRow) = m.billboardContainerIndex
+      videoTilesListTranslation = billboardVariantTranslation
+    else
+      videoTilesListTranslation = [billboardVariantTranslation[0], m.constants.ui.videoTilesListTranslation[1]]
+    end if
+    ' Using clipping rect to ensure that when scrolling up the video tile gets clipped along with the rest of the row list tiles
+    m.videoTileOverlayGroup.clippingRect = [videoTilesListTranslation[0], videoTilesListTranslation[1], 1920, 1080]
+    m.videoTileOverlayGroup.translation = [videoTilesListTranslation[0], -6]
+  end if
+
   if screen.lastFocusedList = "featuredRowList"
     m.videoPreviewPlayer.opacity = 0
     m.inlineVideoMetadataOverlay.skipAnimation = true

@@ -100,6 +100,9 @@ Function onItemContentChange(msg)
   if itemContent <> invalid
     m.nodeHelpers.removeAllChildren(m.subHeadlinePrefixGroup)
     m.nodeHelpers.removeAllChildren(m.subHeadlineSuffixGroup)
+    if m.top.isBillboardRow = true
+      m.firstLineGroup.removeChild(m.rating)
+    end if
 
     ' Resetting the visibility of the rating and sot badge.
     m.rating.visible = true
@@ -111,7 +114,11 @@ Function onItemContentChange(msg)
     end if
 
     if itemContent.type = m.constants.ui.contentTypes.linear
-      setThumbnailImage(itemContent.thumbnailUri, itemContent.type)
+      if m.top.isBillboardRow = false
+        setThumbnailImage(itemContent.thumbnailUri, itemContent.type)
+      else
+        m.firstLineGroup.removeChild(m.channelLogo)
+      end if
       currentProgram = getCurrentLiveProgram(itemContent)
       if currentProgram <> invalid
         metadataOnLivePosterContent(currentProgram, itemContent)
@@ -133,7 +140,7 @@ Function onItemContentChange(msg)
           index = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.progressBarGroup)
           m.firstLineGroup.insertChild(m.subHeadlineSuffixGroup, index + 1)
         end if
-
+        displayLiveRating(currentProgram)
         if m.sotBadge.getParent() <> invalid
           m.firstLineGroup.removeChild(m.sotBadge)
         end if
@@ -313,8 +320,6 @@ End Function
 
 
 Function metadataOnLivePosterContent(currentProgram, content)
-  firstLineGroup = m.firstLineGroup
-
   prefixTextParts = []
 
   releaseDate = currentProgram.releaseDate
@@ -338,13 +343,21 @@ Function metadataOnLivePosterContent(currentProgram, content)
   if isNonEmptyArray(prefixTextParts) = true
     renderSubHeadline(prefixTextParts, true)
   end if
+End Function
 
+
+Function displayLiveRating(currentProgram)
+  firstLineGroup = m.firstLineGroup
   ' handle rating
   ratingIsPresent = (m.rating.getParent() <> invalid)
   if isNonEmptyString(currentProgram.rating) = true
     if ratingIsPresent = false
-      insertIndex = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.subHeadlinePrefixGroup)
-      firstLineGroup.insertChild(m.rating, insertIndex + 1)
+      if m.top.isBillboardRow = false
+        insertIndex = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.subHeadlinePrefixGroup) + 1
+      else
+        insertIndex = 0
+      end if
+      firstLineGroup.insertChild(m.rating, insertIndex)
     end if
 
     m.ratingLabel.width = 0

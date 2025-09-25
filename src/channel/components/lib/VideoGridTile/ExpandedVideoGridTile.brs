@@ -39,7 +39,7 @@ Function onItemContentChange(msg)
     if isBillboardRow = false
       m.videoInGridGradient.uri = "pkg:/images/video_in_grid_gradient_$$RES$$.9.png"
     else
-      m.videoInGridGradient.uri = "pkg:/images/billboard-gradient-$$RES$$.png"
+      m.videoInGridGradient.uri = "pkg:/images/billboard-gradient-$$RES$$.webp"
     end if
 
     m.videoGridMetadataGroup.visible = true
@@ -95,14 +95,6 @@ Function onHeightChange(msg)
   height = msg.getData()
   if height > 0
     m.videoInGridGradient.height = height
-  end if
-End Function
-
-
-Function onWidthChange(msg)
-  width = msg.getData()
-  if width > 0
-    m.videoGridMetadata.width = width
   end if
 End Function
 

@@ -46,25 +46,45 @@
         loadDisplayMode="limitSize" />
 
       <LayoutGroup
-        opacity="0"
-        id="titleGroup">
-        <Label
-          id="title"
-          width="650"
-          wrap="true"
-          vertAlign="bottom">
-          <Font
-            id="TitleFont"
-            role="font" />
-        </Label>
-        <Label
-          id="subtitle"
-          width="650"
-          vertAlign="bottom">
-          <Font
-            id="SubTitleFont"
-            role="font" />
-        </Label>
+        layoutDirection="horiz"
+        itemSpacings="[21]"
+        id="overlayTitleRow">
+        <Group
+          id="channelLogoGroup">
+          <Poster
+            id="channelLogoBackground"
+            height="81"
+            width="81"
+            uri="pkg:/images/rating_background_video_tile_$$RES$$.9.png"
+            loadDisplayMode="scaleToFit"
+            loadSync="true" />
+          <Poster
+            id="channelLogo"
+            translation="[9, 9]"
+            width="63"
+            height="63" />
+        </Group>
+        <LayoutGroup
+          opacity="0"
+          id="titleGroup">
+          <Label
+            id="title"
+            width="650"
+            wrap="true"
+            vertAlign="bottom">
+            <Font
+              id="TitleFont"
+              role="font" />
+          </Label>
+          <Label
+            id="subtitle"
+            width="650"
+            vertAlign="bottom">
+            <Font
+              id="SubTitleFont"
+              role="font" />
+          </Label>
+        </LayoutGroup>
       </LayoutGroup>
     </LayoutGroup>
   </children>
