@@ -100,6 +100,38 @@ describe('Settings', function () {
 
   });
 
+  // https://tubi.testrail.io/index.php?/cases/view/705829
+  it('C705829 - Roku Autoplay OFF - Tubi autoplay settings cannot be toggled on/off in settings screen, @autoplay @settings', async () => {
+
+    // Start app with Roku's autoplay setting disabled
+    await testUtils.startApplicationAtPage('home', {
+      shouldCreateNewUser: true,
+      isAutoplayEnabled: false  // This sets Roku system level autoplay to OFF
+    });
+
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Navigate to Settings
+    await ecp.sendKeypress(ecp.Key.Left);
+    await shared.openSettings();
+
+    // Verify we're on Settings screen
+    await testUtils.waitForElementToFullyShowOnScreen('settingsScreen');
+
+    // Select AutoPlay Controls
+    await ecp.sendKeypress(ecp.Key.Down);
+    await testUtils.waitForElementToFullyShowOnScreen('AutoPlayControlsMenuItemFocused');
+
+    // Get the autoplay instructions element using getNodeForElement
+    const instructions = await testUtils.getNodeForElement('autoplayInstructions');
+    expect(instructions.visible).to.equal(true);
+
+    // Get the instructions text to verify it shows disabled message
+    const instructionsText = instructions.text;
+    expect(instructionsText).to.equals('Autoplay is currently controlled in Roku Settings. To change this setting, go to Roku Settings -> Accessibility -> Auto-play video.'); // Verify the feature disabled message is shown
+
+  });
+
   // https://tubi.testrail.io/index.php?/cases/view/770140
   it('C770140- Privacy Policy Page - If Rokus autoplay setting = OFF, Autoplay Next Video should be accesible, @settings', async () => {
 
