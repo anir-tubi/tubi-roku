@@ -222,13 +222,12 @@ Function parseHomeScreenAdsSuccess(fullResponse, reqInfo)
               type: "video"
             }
           end if
-          slugID = adUnit.rendering_code
 
           carouselNode.carousel = carousel
 
           translatedThumb = CreateObject("roSGNode", "TubiContentNode")
           translatedThumb.id = m.constants.ui.categoryIds.adRowlistCarousel
-          translatedThumb.slug = slugID
+          translatedThumb.slug = adID
           translatedThumb.type = m.constants.ui.contentTypes.adRowlistCarousel
           translatedThumb.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
 
@@ -287,8 +286,7 @@ Function processSpotlightAdContent(sAdID, assets, validUntil, returnedImageTrack
   rowContentNode.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
 
   translatedThumb.id = m.constants.ui.categoryIds.adRowlistSpotlight
-
-  translatedThumb.slug = m.constants.ui.categoryIds.adRowlistSpotlight
+  translatedThumb.slug = sAdID
   translatedThumb.type = m.constants.ui.contentTypes.adRowlistSpotlight
   translatedThumb.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
 
