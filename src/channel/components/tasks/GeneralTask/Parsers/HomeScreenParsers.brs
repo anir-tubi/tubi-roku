@@ -281,7 +281,7 @@ Function processSpotlightAdContent(sAdID, assets, validUntil, returnedImageTrack
   translatedThumb = CreateObject("roSGNode", "TubiContentNode")
   rowContentNode = CreateObject("roSGNode", "AdContentNode")
   rowContentNode.rowPlacement = 2
-  rowContentNode.id = m.constants.ui.gridItemTypes.adRowlistSpotlight
+  rowContentNode.id = m.constants.ui.categoryIds.adRowlistSpotlight
   rowContentNode.type = m.constants.ui.contentTypes.adRowlistSpotlight
   rowContentNode.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
 
