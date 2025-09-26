@@ -205,7 +205,7 @@ End Function
 '
 Function onComponentFocusChange(msg)
   tubiLog("CategoryGridList.onComponentFocusChange " + focusState(m.top))
-  if m.top.lastFocusedList = "featuredRowlist"
+  if m.isWithDescPortraitSmallExpEnabled = true
     content = m.top.featuredRowContent
   else
     content = m.top.content
@@ -268,6 +268,13 @@ Function onComponentFocusChange(msg)
 
   if m.isWithDescPortraitSmallExpEnabled = true
     m.top.featuredListHasFocus = m.top.isInFocusChain() = true AND m.top.lastFocusedList = "featuredRowList" AND m.top.featuredRowContent <> invalid
+    if m.top.featuredListHasFocus = true AND (m.top.resetGridPosition = true OR itemToJumpTo <> invalid)
+      if m.top.resetGridPosition = true
+        itemToJumpTo = [0, 0]
+        m.top.resetGridPosition = false
+      end if
+      m.FeaturedRowList.jumpToRowItem = itemToJumpTo
+    end if
   end if
 End Function
 
@@ -406,7 +413,12 @@ Function onRepopulateContent()
     setRowHeights()
   end if
 
-  rowItemFocused = m.RowList.rowItemFocused
+  if m.isWithDescPortraitSmallExpEnabled = true
+    rowItemFocused = [m.FeaturedRowList.currFocusRow, 0]
+  else
+    rowItemFocused = m.RowList.rowItemFocused
+  end if
+
   if m.itemToJumpTo <> invalid
     rowItemFocused = m.itemToJumpTo
   end if
@@ -422,7 +434,7 @@ Function onRepopulateContent()
   m.top.rowAdded = ""
   m.top.rowRemoved = ""
 
-  if m.top.lastFocusedList = "featuredRowlist"
+  if m.isWithDescPortraitSmallExpEnabled = true
     content = m.top.featuredRowContent
   else
     content = m.top.content
@@ -466,7 +478,7 @@ Function onRepopulateContent()
   ' 2) new queue row got inserted, so increment the focus index by 1
   ' 3) continue_watching row got removed, so decrement the focus index by 1
   ' 4) queue row got removed, so decrement the focus index by 1
-  if m.Rowlist <> invalid AND m.Rowlist.content <> invalid AND rowItemFocused[0] <> invalid
+  if content <> invalid AND rowItemFocused[0] <> invalid
     if rowAdded = m.constants.ui.categoryIds.history
       if rowItemFocused[0] >= m.RowList.content.continueWatchingIndex
         m.itemToJumpTo = [m.itemToJumpTo[0] + 1, m.itemToJumpTo[1]]
@@ -1254,6 +1266,13 @@ Function onFeaturedListCurrFocusRowChange(msg)
     updateFocusXOffset(nextFocusRow)
 
     updateCurrentFocusedItemBoundingRect()
+
+    category = featuredRowContent.getChild(nextFocusRow)
+    if category <> invalid AND category.focusIndex > 0
+      m.lastFocusColumnIndex = category.focusIndex
+    else
+      m.lastFocusColumnIndex = 0
+    end if
   end if
 End Function
 
@@ -1277,6 +1296,9 @@ Function updateCurrentFocusedItemBoundingRect()
     category = featuredRowContent.getChild(nextFocusRow)
     if category <> invalid AND category.focusIndex <> invalid
       columnFocused = category.focusIndex
+      if columnFocused < 0
+        columnFocused = 0
+      end if
       nextBoundingRect = m.FeaturedRowList.subBoundingRect("item" + nextFocusRow.toStr() + "_" + columnFocused.toStr())
       m.top.inTransitCurrentFocusedItemBoundingRect = nextBoundingRect
     end if

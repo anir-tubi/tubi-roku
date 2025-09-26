@@ -1531,8 +1531,12 @@ Function updateInTransitVideoMetadataOverlay()
     currFocusRow = screen.featuredListCurrFocusRow
     category = screen.featuredRowContent.getChild(currFocusRow)
     columnFocused = 0
-    if category <> invalid AND isNumber(category.focusIndex) = true AND category.focusIndex > 0
-      columnFocused = category.focusIndex
+    if screen.featuredListScrollDirection = "left" OR screen.featuredListScrollDirection = "right"
+      columnFocused = Cint(screen.featuredRowCurrFocusColumn)
+    else
+      if category <> invalid AND isNumber(category.focusIndex) = true AND category.focusIndex > 0
+        columnFocused = category.focusIndex
+      end if
     end if
     updateVideoTileOnFocusChange(currFocusRow, columnFocused, screen)
   end if
@@ -1550,6 +1554,7 @@ Function onFeaturedRowCurrFocusColumnChange()
     if isNumber(columnFocused) = false OR columnFocused < 0
       columnFocused = 0
     end if
+
 
     rowFocused = screen.featuredListCurrFocusRow
     updateVideoTileOnFocusChange(rowFocused, columnFocused, screen)
@@ -1601,7 +1606,7 @@ Function pauseVideoPreviewAndShowPoster()
     if videoPlayer <> invalid
       videoPlayer.visible = false
     end if
-    fade(m.videoPreviewPlayer, "out", 0.3)
+    m.inlinePreviewPlayerFadeAnimation = fade(m.videoPreviewPlayer, "out", 0.3)
     if getVideoPreviewState() = "playing"
       ' Gives better scrolling experience if we pause the video preview.
       ' We are calling stopVideoPreview once we are done with scrolling.
@@ -1680,27 +1685,30 @@ Function setInlineVideoMetadataOverlay(featuredRowContent, columnFocused, rowFoc
     m.inlineVideoGridTitleLogo.visible = true
   end if
 
-  ' Predicting the next row to be focused based on current scroll direction.
-  ' We will reset the metadata if user changes the scroll direction inside onFeaturedListScrollDirectionChange.
   screen = getCurrentScreen()
-  nextRow = 1
-  if screen.featuredListScrollDirection = "down"
-    nextRow = rowFocused + 1
-  else if rowFocused > 0
-    nextRow = rowFocused - 1
-  end if
-
-  nextCategory = featuredRowContent.getChild(nextRow)
-  if nextCategory <> invalid
-    ' Accessing column index from the category node since we preserve user previous focus index.
-    columnFocused = nextCategory.focusIndex
-    if isNumber(columnFocused) = false OR columnFocused < 0
-      columnFocused = 0
+  if screen.featuredListScrollDirection <> "left" AND screen.featuredListScrollDirection <> "right"
+    ' Predicting the next row to be focused based on current scroll direction.
+    ' We will reset the metadata if user changes the scroll direction inside onFeaturedListScrollDirectionChange.
+    screen = getCurrentScreen()
+    nextRow = 1
+    if screen.featuredListScrollDirection = "down"
+      nextRow = rowFocused + 1
+    else if rowFocused > 0 AND screen.featuredListScrollDirection = "up"
+      nextRow = rowFocused - 1
     end if
-    isNonVideoTile = arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, nextCategory.gridItemType)
-    m.inTransitInlineVideoMetadataOverlay.visible = (isNonVideoTile = false)
-    inTransitItemContent = nextCategory.getChild(columnFocused)
-    m.inTransitInlineVideoMetadataOverlay.itemContent = inTransitItemContent
+
+    nextCategory = featuredRowContent.getChild(nextRow)
+    if nextCategory <> invalid
+      ' Accessing column index from the category node since we preserve user previous focus index.
+      columnFocused = nextCategory.focusIndex
+      if isNumber(columnFocused) = false OR columnFocused < 0
+        columnFocused = 0
+      end if
+      isNonVideoTile = arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, nextCategory.gridItemType)
+      m.inTransitInlineVideoMetadataOverlay.visible = (isNonVideoTile = false)
+      inTransitItemContent = nextCategory.getChild(columnFocused)
+      m.inTransitInlineVideoMetadataOverlay.itemContent = inTransitItemContent
+    end if
   end if
 End Function
 
@@ -1742,7 +1750,7 @@ Function onFeaturedListHasFocusChange(msg)
       resumeVideoPreview()
     else if previewState = "playing"
       displayDefaultBackground()
-      updatePreviewPlayerToInlineView()
+      updatePlayerLayoutBasedOnFocusedContent(content)
     else if m.queuedVideoTilePreview = true
       startDebouncedVideoPreview()
     end if
@@ -1754,7 +1762,12 @@ Function onFeaturedListHasFocusChange(msg)
       pauseVideoPreview()
     end if
   else
-    updatePreviewPlayerToCondensedView()
+    screen = getCurrentScreen()
+    if screen <> invalid AND screen.id = m.constants.ui.screenIds.linearDetailScreen
+      updatePreviewPlayerToFullScreen()
+    else
+      updatePreviewPlayerToCondensedView()
+    end if
   end if
 End Function
 
@@ -1987,12 +2000,18 @@ End Function
 
 Function updateExpandedVideoTileCurrFocusRow(currFocusRow, scrollDirection)
   m.inlineVideoMetadataOverlay.containerIndex = currFocusRow
+  nextFocusRow = 1
   if scrollDirection <> "up"
-    m.inTransitInlineVideoMetadataOverlay.containerIndex = currFocusRow + 1
+    nextFocusRow = currFocusRow + 1
   else
-    m.inTransitInlineVideoMetadataOverlay.containerIndex = currFocusRow - 1
+    nextFocusRow = currFocusRow - 1
   end if
   m.inlineVideoGridTitleLogo.containerIndex = currFocusRow
+
+  if nextFocusRow < 0 AND m.billboardContainerIndex > 0
+    nextFocusRow = m.billboardContainerIndex
+  end if
+  m.inTransitInlineVideoMetadataOverlay.containerIndex = nextFocusRow
 End Function
 
 

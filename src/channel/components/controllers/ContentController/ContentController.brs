@@ -128,6 +128,8 @@ Function addControllerUi()
 
   m.billboardContainerIndex = 0
 
+  m.inlinePreviewPlayerFadeAnimation = invalid
+
   updateVideoTileSize()
 
   m.LinearPlayerGroup = m.top.findNode("LinearPlayerGroup")

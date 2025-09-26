@@ -101,6 +101,9 @@ Function onVideoPreviewStateChanged(msg)
       end if
       m.backgroundGroup.posterVisible = bDisplayBackgroundGroup
     end if
+    if m.inlinePreviewPlayerFadeAnimation <> invalid
+      m.inlinePreviewPlayerFadeAnimation.control = "stop"
+    end if
     m.videoPreviewPlayer.opacity = 1
 
     showVideoPreviewPlayer = (currentScreen <> invalid AND currentScreen.isInFocusChain() = true) OR currentScreen.lastFocusedList <> "featuredRowList"
