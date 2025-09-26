@@ -454,7 +454,7 @@ Function onRepopulateContent()
       rowIndex = rowItemFocused[0]
     end if
 
-    lastContentIndex = m.top.content.getChild(rowIndex).getChildCount() - 1
+    lastContentIndex = content.getChild(rowIndex).getChildCount() - 1
     m.itemToJumpTo = [rowIndex, lastContentIndex]
   else
     ' if there is no content at the most recently focused coordinates, and
@@ -480,19 +480,19 @@ Function onRepopulateContent()
   ' 4) queue row got removed, so decrement the focus index by 1
   if content <> invalid AND rowItemFocused[0] <> invalid
     if rowAdded = m.constants.ui.categoryIds.history
-      if rowItemFocused[0] >= m.RowList.content.continueWatchingIndex
+      if rowItemFocused[0] >= content.continueWatchingIndex
         m.itemToJumpTo = [m.itemToJumpTo[0] + 1, m.itemToJumpTo[1]]
       end if
     else if rowAdded = m.constants.ui.categoryIds.queue
-      if rowItemFocused[0] >= m.RowList.content.queueIndex
+      if rowItemFocused[0] >= content.queueIndex
         m.itemToJumpTo = [m.itemToJumpTo[0] + 1, m.itemToJumpTo[1]]
       end if
     else if rowRemoved = m.constants.ui.categoryIds.history
-      if rowItemFocused[0] >= m.RowList.content.continueWatchingIndex
+      if rowItemFocused[0] >= content.continueWatchingIndex
         m.itemToJumpTo = [m.itemToJumpTo[0] - 1, m.itemToJumpTo[1]]
       end if
     else if rowRemoved = m.constants.ui.categoryIds.queue
-      if rowItemFocused[0] >= m.RowList.content.queueIndex
+      if rowItemFocused[0] >= content.queueIndex
         m.itemToJumpTo = [m.itemToJumpTo[0] - 1, m.itemToJumpTo[1]]
       end if
     end if
