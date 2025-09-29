@@ -1,10 +1,8 @@
-'The Main function serves to run any remote config and experiment API calls and then choose the appropriate UI
+'The Main function serves to initiate the application
 Function Main(startupArgs)
   m.appStartTime = UpTime(0)
   m.startupArgs = startupArgs
 
-  ' The name of the component library lib provided by our remote component library. Will be updated by Starter Component Library
-  m.remoteComponentLibProvided = "TubiRemoteLibrary"
   handleRegistryOperations(startupArgs)
 
   ' this version of constants will be the constants that are part of the submitted build (or the side loaded build)
@@ -26,8 +24,8 @@ Function Main(startupArgs)
   ' is closed. The presence of the permaScreen prevents the app from closing if screen.close()
   ' is called within runChannel(), due to the undocumented and apparent requirement that there
   ' is always at least one screen that on which .show() has been called and has not been closed.
-  permaScreen = CreateObject("roSGScreen")
-  permaScreen.CreateScene("BackgroundScene")
+  permaScreen = createObject("roSGScreen")
+  permaScreen.createScene("BackgroundScene")
   permaScreen.show()
 
   while runChannel(constants, log, request) = true
@@ -49,37 +47,25 @@ Function runChannel(constants, log, request)
 
   ' Load scene graph
   port = CreateObject("roMessagePort")
-  input = CreateObject("roInput")
-  input.SetMessagePort(port)
   screen = CreateObject("roSGScreen")
   screen.SetMessagePort(port)
-  controller = invalid
-
-  input.enableTransportEvents()
 
   ' start the scene graph UI
   tubiScene = screen.CreateScene("TubiScene")
-  tubiScene.allowBackgroundTask = true
-  sgGlobal = screen.getGlobalNode()
-  sgGlobal.addField("constants", "assocarray", false)
-  sgGlobal.addField("theme", "assocarray", false)
-  sgGlobal.addField("externalConfigInfo", "assocarray", false)
-  sgGlobal.addField("experimentsInfo", "assocarray", false)
-
-  'setting constants here is just to get the scene up and running.
-  'Global constants will be overwritten with constants pulled from starterController that are the most recent version of constants
-  sgGlobal.setField("constants", constants)
-  'set a default theme
-  sgGlobal.setField("theme", constants.ui.themes.default)
 
   screen.show()
+
+  tubiScene.observeField("exitApp", port)
+  tubiScene.observeField("disableInstantResume", port)
+  tubiScene.observeField("rokuContinueWatchingRequestInfo", port)
+  tubiScene.observeField("sendLogToServer", port)
 
   if constants.settings.injectRtaOnDeviceComponent = true then
     m.odc = createObject("roSGNode", "RTA_OnDeviceComponent") 'bs:disable-line 1128
   end if
 
   'add RALE for dev builds - children can not be added to tubiScene until after screen.show has run
-  if constants <> invalid AND constants.settings <> invalid AND constants.settings.mode = "dev" AND constants.settings.raleEnabled = true
+  if constants.settings.mode = "dev" AND constants.settings.raleEnabled = true
     tubiScene.createChild("TrackerTask")
   end if
   ' Used to add required node creation needed for RALE component during vscode build
@@ -89,8 +75,7 @@ Function runChannel(constants, log, request)
   ' vscode_rdb_on_device_component_entry
 
   'run SceneGraph tests if in test mode
-  if constants.settings.mode = "test"
-    sgGlobal.setField("theme", constants.ui.themes.default) 'set theme for testing purposes
+  if constants.settings.mode = "test" then
     if (type(Rooibos__Init) = "Function") then Rooibos__Init() 'bs:disable-line 1001 1140 LINT1001
 
     localHostUri = constants.settings.localHostUri
@@ -101,61 +86,19 @@ Function runChannel(constants, log, request)
     return false
   end if
 
-  ' execute suitest library only if the mode is qa & suitest attribute enabled in qa config yml
-  if constants.thirdParty.suiteTest.enabled = true AND constants.settings.mode = "qa"
-    SuitestLibrary = createObject("roSGNode", "SuitestLibrary") 'bs:disable-line 1128
-    SuitestLibrary.app_id = constants.thirdParty.suiteTest.app_id
-    tubiScene.InsertChild(SuitestLibrary, 0)
-  end if
+  tubiScene.setFields({
+    "startupArgs": startupArgs
+    "appStartTime": m.appStartTime
+  })
 
-  retries = 0
-  maxRetries = 5
-  backoffFactor = 1.5
-  initialBackoff = 1000 'ms
-  pause = initialBackoff
-  libraryBeingFetched = invalid
-
-  'this is the packaged constants - the submitted constants
-  if constants.settings.useStarterComponents <> false
-    starterLibrary = tubiScene.findNode("TubiStarterLibrary")
-    starterLibrary.observeField("loadStatus", port)
-    libraryBeingFetched = starterLibrary
-    componentsLoaded = false
-
-    starterLibUrl = constants.settings.starterComponentsUrl
-    print "attempting to load TubiStarterLibrary "; starterLibUrl
-
-    starterLibrary.uri = starterLibUrl ' kicks off fetch of starter components
-    componentTimer = CreateObject("roTimespan")
-  else
-    'only expect this else block to happen when side loading/testing
-    controller = loadPackagedComponents(tubiScene, port, startupArgs)
-    controller.fadeInContentController = true
-    componentsLoaded = true
-    componentTimer = invalid
-  end if
+  ' Setting constants separate to make sure it gets triggered last
+  tubiScene.baseChannelConstants = constants
 
   while true
-    msg = wait(200, port)
+    msg = wait(0, port)
     msgType = type(msg)
 
-    if msgType = "roInputEvent"
-      inputInfo = msg.GetInfo()
-      if controller <> invalid AND inputInfo <> invalid
-        if inputInfo.rale = invalid
-          ' We don't want to handle rale events in our deeplinking code
-          if inputInfo.type = invalid
-            'deeplink info doesn't have a "type" field, so we add one in order to easily differentiate input behavior later
-            inputInfo.type = "deeplink"
-          end if
-          controller.roInputInfo = inputInfo
-        end if
-      end if
-    else if msgType = "roSGScreenEvent"
-      ' documentation indicates a roSGSCreenEvent occurs when screen.close() is called, but trial
-      ' and error testing suggests that the roSGScreenEvent never gets fired.
-      ' do nothing for now - closing the screen does not necessarily mean we want to close the app.
-    else if msgType = "roSGNodeEvent"
+    if msgType = "roSGNodeEvent"
       field = msg.getField()
       tubiLog("main() got roSGNodeEvent for " + field)
       if field = "exitApp"
@@ -171,200 +114,11 @@ Function runChannel(constants, log, request)
           screen.close() ' destroys the current scene as we need to relaunch the app from beginning
           return true
         end if
-      else if field = "transportVoiceResponse"
-        result = msg.getData()
-        response = result.response
-        if response = invalid
-          response = "unhandled"
-        end if
-        if result.id <> invalid
-          input.EventResponse({ id: result.id, status: response })
-        end if
-      else if field = "loadStatus"
-        'starter components or remote components load status update
-        print "loadStatus = "; msg.getData()
-        if msg.getData() = "ready"
-          if msg.GetRoSGNode().id = "suitest"
-            suitestIL = CreateObject("roSGNode", "SuitestInstrumentationLib:main")
-            suitestIL.SetField("app_id", constants.thirdParty.suiteTest.app_id)
-          else if msg.GetRoSGNode().id = "TubiStarterLibrary"
-            starterController = tubiScene.createChild("TubiStarterLibrary:StarterController")
-            if starterController <> invalid
-              starterController.id = "StarterController"
-              starterController.observeField("useRemoteComponents", port)
-              starterController.observeField("remoteComponentsUrl", port, ["remoteComponentLibProvided"])
-              starterController.observeField("remoteComponentLibProvided", port)
-              starterController.observeField("fadeOutCustomSplash", port)
-              starterController.observeField("fadeInRemoteComponent", port)
-              starterController.setField("getUrl", true)
-              pause = initialBackoff
-            else
-              return showComponentsFailedToLoadError(msg, log, screen, constants)
-            end if
-          else if msg.GetRoSGNode().id = "TubiRemoteLibrary"
-            componentsLoaded = true
-            controller = tubiScene.createChild(m.remoteComponentLibProvided + ":ContentController")
-            if controller <> invalid
-              controller.id = "ContentController"
-              controller.observeField("exitApp", port)
-              controller.observeField("transportVoiceResponse", port)
-              controller.observeField("removeStartUpScreens", port)
-              controller.observeField("disableInstantResume", port)
-              controller.observeField("rokuContinueWatchingRequestInfo", port)
-              controller.appStartTime = m.appStartTime
-              controller.startupArgs = startupArgs
-
-              starterController = tubiScene.findNode("StarterController")
-              if starterController <> invalid AND starterController.fadeInRemoteComponent = true AND controller.fadeInContentController <> true
-                starterController.unobserveField("fadeInRemoteComponent")
-                tubiScene.fadeOutSpinner = true
-                controller.fadeInContentController = true
-              end if
-            else
-              return showComponentsFailedToLoadError(msg, log, screen, constants)
-            end if
-          end if
-        else if msg.getData() = "loading"
-          print msg.GetRoSGNode().id + " status is loading"
-        else if msg.getData() = "failed"
-          if msg.GetRoSGNode().id = "suitest"
-            print "Suitest component library failed to download"
-          else if retries < maxRetries
-            retries += 1
-            componentLibrary = msg.GetRoSGNode()
-            print componentLibrary.id; " failed to load due to API error, attempting retry #"; retries
-            pause = pause * backoffFactor
-            sleep(pause)
-            resetComponentLibrary(componentLibrary, tubiScene, port)
-          else if retries = maxRetries
-
-            if initSubmittedChannel(request, constants, tubiScene, port, startupArgs, screen) = true
-
-              message = libraryBeingFetched.id + " failed to load due to API error. Loading packed components"
-
-              messageInfo = {
-                message: message
-                model: constants.deviceInfo.model
-                name: libraryBeingFetched.id
-                type: constants.errors.type.loadFailed
-              }
-
-              'send error info to sentry
-              log.exception(messageInfo, "warn", m.queue, 0.1)
-
-              'send error info to client logs
-              log.error(FormatJSON(messageInfo), "apiError", "RO-1-300", m.queue, 1.0)
-
-              componentsLoaded = true
-              componentTimer = invalid
-            else
-              return showComponentsFailedToLoadError(msg, log, screen, constants)
-            end if
-          else
-            return showComponentsFailedToLoadError(msg, log, screen, constants)
-          end if
-        end if
-      else if field = "useRemoteComponents"
-        'starter components may indicate not to use remote components
-        if msg.getData() = false
-          tubiLog("using packaged components")
-          starterController = msg.GetRoSGNode()
-          starterController.unobserveField("remoteComponentsUrl")
-          starterController.unobserveField("useRemoteComponents")
-
-          componentsLoaded = true
-          controller = loadPackagedComponents(tubiScene, port, startupArgs)
-
-          if starterController.fadeInRemoteComponent = true AND tubiScene <> invalid AND controller <> invalid
-            tubiScene.fadeOutSpinner = true
-            controller.fadeInContentController = true
-          end if
-        end if
-      else if field = "remoteComponentsUrl"
-        ' Will get used later once the component library has finished loading
-        remoteComponentLibProvided = msg.getInfo().remoteComponentLibProvided
-        if remoteComponentLibProvided <> invalid then
-          m.remoteComponentLibProvided = remoteComponentLibProvided
-        end if
-
-        print "m.remoteComponentLibProvided"; m.remoteComponentLibProvided
-
-        'starter components have indicated the url to use for remote components
-        starterController = msg.GetRoSGNode()
-        starterController.unobserveField("remoteComponentsUrl")
-        starterController.unobserveField("useRemoteComponents")
-
-        remoteLibrary = tubiScene.findNode("TubiRemoteLibrary")
-        libraryBeingFetched = remoteLibrary
-
-        if componentTimer <> invalid
-          componentTimer.mark()
-        end if
-
-        retries = 0
-
-        if remoteLibrary <> invalid
-          remoteLibrary.observeField("loadStatus", port)
-          remoteLibrary.uri = msg.getData()
-        end if
-
-      else if field = "fadeOutCustomSplash"
-        starterController = msg.GetRoSGNode()
-        starterController.unobserveField("fadeOutCustomSplash")
-        tubiScene.fadeOutCustomSplash = true
-      else if field = "fadeInRemoteComponent"
-        starterController = msg.GetRoSGNode()
-        contentController = tubiScene.findNode("ContentController")
-        if contentController <> invalid AND contentController.fadeInContentController <> true
-          starterController.unobserveField("fadeInRemoteComponent")
-          tubiScene.fadeOutSpinner = true
-          contentController.fadeInContentController = true
-        end if
-      else if field = "removeStartUpScreens"
-        contentController = msg.GetRoSGNode()
-        contentController.unobserveField("removeStartUpScreens")
-        starterController = tubiScene.findNode("StarterController")
-        tubiScene.fadeOutCustomSplash = true
-        if starterController <> invalid
-          starterController.removeStartUpScreens = true
-        end if
       else if field = "rokuContinueWatchingRequestInfo"
         info = msg.getData()
         updateRokuContinueWatchingInfo(request, info)
-      end if
-    end if
-
-    ' handle starterComponents and remoteComponents timeouts
-    if libraryBeingFetched <> invalid AND componentsLoaded = false AND componentTimer <> invalid AND componentTimer.totalMilliseconds() > 30000
-      if retries < maxRetries
-        retries += 1
-        componentTimer.mark()
-        print libraryBeingFetched.id; " failed to load due to timeout, attempting retry #"; retries
-        pause = pause * backoffFactor
-        sleep(pause)
-        resetComponentLibrary(libraryBeingFetched, tubiScene, port)
-      else if retries = maxRetries
-        if initSubmittedChannel(request, constants, tubiScene, port, startupArgs, screen) = true
-          message = libraryBeingFetched.id + " failed to load due to timeout. Loading Packed Components"
-          messageInfo = {
-            message: message
-            model: constants.deviceInfo.model
-            name: libraryBeingFetched.id
-            type: constants.errors.type.loadFailed
-          }
-          'Send error info to sentry
-          log.exception(messageInfo, "warn", m.queue, 0.1)
-
-          'Send error info to clientLog
-          log.warn(FormatJSON(messageInfo), "apiTimeout", "RO-1-300", m.queue, 1)
-
-          componentsLoaded = true 'bs:disable-line 1001 LINT1005
-          componentTimer = invalid 'bs:disable-line 1001 LINT1005
-        else
-          return showComponentsTimedOutError(libraryBeingFetched, log, screen, constants)
-        end if
-      else
-        return showComponentsTimedOutError(libraryBeingFetched, log, screen, constants)
+      else if field = "sendLogToServer" then
+        sendLogToServer(msg.getData(), log)
       end if
     end if
   end while
@@ -372,108 +126,23 @@ Function runChannel(constants, log, request)
 End Function
 
 
-Function loadPackagedComponents(scene, port, startupArgs)
-  controller = scene.createChild("ContentController")
-  controller.id = "ContentController"
-  controller.observeField("exitApp", port)
-  controller.observeField("rokuContinueWatchingRequestInfo", port)
-  controller.observeField("transportVoiceResponse", port)
-  controller.observeField("removeStartUpScreens", port)
-  controller.observeField("disableInstantResume", port)
-  controller.appStartTime = m.appStartTime
-  controller.startupArgs = startupArgs
-  return controller
-End Function
-
-
-'removes the componentLibrary from the scene, and creates a new componentLibrary with the same id and same url
-'as the removed componentLibrary. This will kick off a new request to the url for the remote library.
-Function resetComponentLibrary(componentLibrary, scene, port)
-  componentId = componentLibrary.id
-  componentUri = componentLibrary.uri
-
-  nodeHelpers = TubiNodeHelpers()
-  componentLibraryTubiScene = nodeHelpers.getChildById(scene, componentId)
-  componentLibraryTubiScene.unobserveField("loadStatus")
-  scene.removeChild(componentLibraryTubiScene)
-
-  newComponentLibrary = scene.createChild("ComponentLibrary")
-  newComponentLibrary.observeField("loadStatus", port)
-  newComponentLibrary.id = componentId
-  newComponentLibrary.uri = componentUri
-End Function
-
-
-' @library: roSGNode: a ComponentLibrary node, either the TubiStarterLibrary or TubiRemoteLibrary
-Function showComponentsTimedOutError(library, log, screen, constants)
-  libraryId = ""
-  if library <> invalid
-    libraryId = library.id
-  end if
-
-  message = "Fetching " + libraryId + " timed out"
-  print message
-  error = {
-    type: constants.errors.type.timedOut
-    name: libraryId
-    message: message
-    loadStatus: "timeout"
-    url: library.uri
-  }
-  log.exception(error, "error", m.queue, 0.1)
-  return showStartupErrorDialog(screen, constants)
-End Function
-
-
-Function showComponentsFailedToLoadError(msg, log, screen, constants)
-  message = msg.GetRoSGNode().id + " failed to load"
-  print message
-  error = {
-    type: constants.errors.type.loadFailed
-    name: msg.GetRoSGNode().id
-    message: message
-    loadStatus: msg.getData()
-    url: msg.GetRoSGNode().uri
-  }
-  log.exception(error, "error", m.queue, 0.1)
-  return showStartupErrorDialog(screen, constants)
-End Function
-
-
-Function showStartupErrorDialog(screen, constants)
-  port = CreateObject("roMessagePort")
-
-  sgGlobal = screen.getGlobalNode()
-  sgGlobal.setField("theme", constants.ui.themes.default)
-
-  scene = screen.GetScene()
-
-  ' the following while loop is necessary because roku crash logs indicate that
-  ' scene.CreateChild("ErrorController") can inexplicably return invalid at times.
-  controllerCreated = false
-  attempts = 0
-  while controllerCreated = false AND attempts < 100
-    controller = scene.CreateChild("ErrorController")
-
-    if controller <> invalid
-      controller.observeField("buttonSelected", port)
-      controller.connectionError = true
-      controllerCreated = true
+Function sendLogToServer(contents, log)
+  ' Check if contents is a valid associative array and has the required fields. message will be checked in the log module
+  if contents <> invalid AND isString(contents.type) = true then
+    ' Default samplePercent to 1
+    samplePercent = 1
+    if isNumber(contents.samplePercent) = true
+      samplePercent = contents.samplePercent
     end if
 
-    attempts += 1
-  end while
-
-  if controllerCreated = true
-    while(true)
-      msg = wait(0, port)
-      msgType = type(msg)
-      if msgType <> invalid then exit while
-    end while
+    if contents.type = "exception" AND isString(contents.level) = true then
+      log.exception(contents.message, contents.level, m.queue, samplePercent)
+    else if log[contents.type] <> invalid AND isString(contents.serverTypeName) = true AND isString(contents.subtype) = true then
+      log[contents.type](contents.message, contents.serverTypeName, contents.subtype, m.queue, samplePercent)
+    else
+      print "Log type '" + contents.type + "' not found in log module or did not have correct params"
+    end if
   end if
-
-  screen.close()
-  return false
 End Function
 
 
@@ -612,76 +281,6 @@ Function addConstantsFromStartupArgs(startupArgs, constants)
 
   return constants
 End Function
-
-
-
-' @request: assocArray, an instance of the request module as returned by TubiRequest()
-' @constants: assocArray, constants as returned by getConstants(), this version of constants
-'                         will be the constants that are part of the submitted build.
-' @tubiScene: node, home scene node
-' @port: port, used to create content controller
-' startupArgs: assocArray, start up app arguments, used to create content controller
-' screen: node, screen instance.
-'
-' returns: boolean, true if the app successfully loaded submitted version of the app,
-'                   false if app can not fallback on submitted version
-Function initSubmittedChannel(request, constants, tubiScene, port, startupArgs, screen)
-  print "loading the packed components"
-
-  ' Reverting the constants back to base channel version.
-  sgGlobal = screen.getGlobalNode()
-  sgGlobal.setField("constants", constants)
-
-  canFallback = true
-
-  ' TODO now that we do not have external config in main, we need to update this logic to be run after get external config
-  ' if constants <> invalid
-  '   submittedAppVersion = "0.0.0"
-
-  '   if constants.deviceInfo <> invalid
-  '     submittedAppVersion =  constants.deviceInfo.clientversion
-  '   end if
-
-  ' Sometimes submitted version of the app might have bugs, legal issues or api changes which makes them not worthy of fallback.
-  ' constants.externalConfig.info.fallback_blocked_versions will contain a list of submitted app versions that we should not fallback on.
-  '   if constants.externalConfig <> invalid AND constants.externalConfig.info <> invalid AND constants.externalConfig.info.fallback_blocked_versions <> invalid
-  '     for each version in constants.externalConfig.info.fallback_blocked_versions
-  '       if version = submittedAppVersion
-  '         canFallback = false
-  '         exit for
-  '       end if
-  '     end for
-  '   else if constants.externalConfig = invalid OR constants.externalConfig.info = invalid OR constants.externalConfig.info.fallback_blocked_versions = invalid  'externalConfig is missing. In this case, do not take risk of loading submitted version. Just show error modal.
-  '     canFallback = false
-  '   end if
-  ' end if
-
-  if canFallback = true
-    nodeHelpers = TubiNodeHelpers()
-    starterLibrary = nodeHelpers.getChildById(tubiScene, "starterLibrary")
-
-    if starterLibrary <> invalid
-      starterLibrary.unobserveField("loadStatus")
-      tubiScene.removeChild(starterLibrary)
-    end if
-
-    remoteLibrary = nodeHelpers.getChildById(tubiScene, "TubiRemoteLibrary")
-
-    if remoteLibrary <> invalid
-      remoteLibrary.unobserveField("loadStatus")
-      tubiScene.removeChild(remoteLibrary)
-    end if
-
-    controller = loadPackagedComponents(tubiScene, port, startupArgs)
-    controller.fadeInContentController = true
-    controller.isComponentLibFailedToLoad = true
-    return true 'successfully fallback
-  else
-    return false 'can not fallback on the current version as explicitly specified by external config.
-  end if
-End Function
-
-
 ' Makes a request to update or delete roku continue watching info.
 '
 ' @tubiRequest: assocArray, an instance of the request module as returned by TubiRequest()

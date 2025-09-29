@@ -20,13 +20,35 @@
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
 
   <interface>
+    <!-- Includes the constants included in the base channel and kicks off the bootstrap process -->
+    <field id="baseChannelConstants" type="assocarray" />
 
-    <!-- fadeOutCustomSplash is used to fadeOut the CustomSplashPoster -->
-    <field id="fadeOutCustomSplash" type="boolean"/>
+    <!-- the arguments that are passed into the app at startup, as an associative array -->
+    <field id="startupArgs" type="assocarray"/>
+    <field id="appStartTime" type="integer"/>
 
-    <!-- fadeOutSpinner is used to fadeOut the TubiSceneSpinner -->
-    <field id="fadeOutSpinner" type="boolean"/>
+    <!-- Main thread listens for this and will make a call to roku continue watching endpoint. Below field will contain information related to the update or delete request.
+          Below field is necessary due to a roku limitation that we need to make the api request from main thread due to a fact that they cannot retrieve channel token properly if it is made in component library.
+          Sample value:
+          {
+          url: m.constants.urls.rokuContinueWatchingEndpoint
+          options: {
+            method: m.constants.reqTypes.post
+            body: {} // Sample body - {"items":[{"contentId":"abc123","episodeId":"def123","lastInteractionTime":123456,"position":854,"duration":1678,"waitForNextEpisodeAvailability":true}]}
+            headers: {}
+          }
+          requestType: "" string representing a unique value for the request. ex: postRokuContinueWatching
+        }
+    -->
+    <field id="rokuContinueWatchingRequestInfo" type="assocarray" value="{}" alwaysNotify="true" />
 
+    <!-- Main thread listens for this and will exit the app if set to true-->
+    <field id="exitApp" type="boolean" value="false"/>
+
+    <!-- disableInstantResume will be set to true when guest user tries to relaunch the app after 24hours after app got suspended by pressing home or by opening channel on remote -->
+    <field id="disableInstantResume" type="boolean" value="false" alwaysNotify="true" />
+
+    <field id="sendLogToServer" type="assocarray" alwaysNotify="true" />
   </interface>
 
   <!-- suspendhandler will be set when app got suspended by pressing Home key or other Channel on remote -->
@@ -37,17 +59,17 @@
 
   <children>
 
-    <ComponentLibrary
-      id="TubiStarterLibrary"/>
+    <RetryableComponentLibrary
+      id="TubiStarterLibrary"
+      timeoutDuration="30"
+      retryDelayDuration="3"
+      retryCount="3" />
 
-    <ComponentLibrary
-      id="TubiRemoteLibrary"/>
-
-   <Spinner
-      id="TubiSceneSpinner"
-      width="1920"
-      opacity="0"
-      height="1080"/>
+    <RetryableComponentLibrary
+      id="TubiRemoteLibrary"
+      timeoutDuration="30"
+      retryDelayDuration="3"
+      retryCount="3"  />
 
     <Poster
       id="customSplashPoster"
@@ -56,6 +78,25 @@
       uri="pkg:/images/splash-$$RES$$.webp"
       visible="true" />
 
+      <!-- startupScreens group has video node, which is shown before HomeScreen/Deeplinks -->
+    <Group id="startupScreens" opacity="0.0">
+
+      <!-- animationLogo is the startup video played right after customSplashPoster is shown -->
+      <Video
+        id="animationLogo"
+        width="1920"
+        height="1080"
+        translation="[0,0]"
+        enableUI="false"
+        enableTrickPlay="false"
+        visible="true" />
+
+      <!-- customSplashTimer is used to show/hide the customSplashPoster -->
+      <Timer
+        id="customSplashTimer"
+        duration="0.5"
+        repeat="true" />
+    </Group>
   </children>
 
 </component>

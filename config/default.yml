@@ -3,7 +3,7 @@ settings:
   # Any constants that need to be templatized via handlebars should be added via settings
   mode: "production"
   version: "{{versionUnderscored}}"
-  contentType: "hls"
+  contentType: "hls" # don't think this is used anymore, but leaving for now
   shortAppName: "tubitv"
   platformName: "roku"
   starterComponentsUrl: "https://mrcdn-production.tubitv.com/appFiles/starter-components/tubi_starter_components_{{versionMinorUnderscored}}.pkg"
@@ -29,9 +29,10 @@ settings:
   # useStarterComponents MUST ALWAYS BE TRUE FOR PRODUCTION
   useStarterComponents: true
   useRemoteComponents: false
+  processAnimationLogo: true
 
-  # Set to true only if running an experiment from within the StarterController. This is used to determine if we use the full version of the StarterController that includes the dependencies need to run experiments at the Starter component library level. By not including these dependencies when not needed, we can reduce the size of the Starter component library and the time it takes to compile.
-  useFullStarterController: false
+  # Moved from constants to keep all config needed for StarterConfig component in one place
+  animationLogoUrl: https://mcdn.tubitv.com/video/roku/animation_logo_3.mp4
 
   # Setting the below value to true will enable youbora tracking.
   youboraEnabled: false

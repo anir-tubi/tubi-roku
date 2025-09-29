@@ -1,7 +1,12 @@
 Function init()
   m.port = createObject("roMessagePort")
 
-  m.top.observeFieldScoped("request", m.port)
+  m.input = createObject("roInput")
+  m.input.setMessagePort(m.port)
+  m.input.enableTransportEvents()
+
+  ' Add each field to be handled here
+  m.top.observeFieldScoped("transportVoiceResponse", m.port)
 
   ' Enabling low memory event. Adding it to m scope since roku does not fire the event if it is not in m scope.
   m.deviceInfo = CreateObject("roAppMemoryMonitor")
@@ -53,15 +58,35 @@ Function taskThread()
       m.top.isHdmiStatusOk = (m.hdmiStatus.isConnected() = true AND m.lastCecStatusIsActiveSource = true)
       tubiLog("MainTask received " + messageType + " hdmiStatus.isConnected(): " + m.hdmiStatus.isConnected().toStr() + " lastCecStatusIsActiveSource: " + m.lastCecStatusIsActiveSource.toStr())
     else if messageType = "roSGNodeEvent" then
-        if msg.getField() = "request" then
-          handleRequest(msg.getData())
+      field = msg.getField()
+      if field = "transportVoiceResponse" then
+        handleTransportVoiceResponse(msg.getData())
+      end if
+    else if messageType = "roInputEvent"
+      inputInfo = msg.getInfo()
+      if inputInfo <> invalid then
+        if inputInfo.rale = invalid then
+          ' We don't want to handle rale events in our deeplinking code
+          if inputInfo.type = invalid then
+            'deeplink info doesn't have a "type" field, so we add one in order to easily differentiate input behavior later
+            inputInfo.type = "deeplink"
+          end if
+
+          m.top.roInputInfo = inputInfo
         end if
+      end if
     end if
   end while
 End Function
 
 
-Function handleRequest(request)
-  ' Not using for now
-  ' requestType = request.type
+Function handleTransportVoiceResponse(result)
+  response = result.response
+  if response = invalid
+    response = "unhandled"
+  end if
+
+  if result.id <> invalid
+    m.input.EventResponse({ id: result.id, status: response })
+  end if
 End Function

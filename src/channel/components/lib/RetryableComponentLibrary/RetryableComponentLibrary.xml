@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+- RetryableComponentLibrary
+-
+- Serves as a common spot to store code for retrying a component library that either failed or timed out
+-->
+<component name="RetryableComponentLibrary" extends="Node">
+  <script type="text/brightscript" uri="RetryableComponentLibrary.brs" />
+
+  <interface>
+    <!-- Inputs -->
+    <field id="timeoutDuration" alias="timeoutDurationTimer.duration" value="30" />
+    <field id="retryDelayDuration" alias="retryDelayDurationTimer.duration" value="30" />
+    <field id="retryCount" type="integer" value="3" />
+    <field id="uri" type="uri" />
+
+    <!-- Outputs -->
+    <field id="loadStatus" type="string" value="none" />
+  </interface>
+  <children>
+    <ComponentLibrary id="internalComponentLibrary" />
+    <Timer id="timeoutDurationTimer" />
+    <Timer id="retryDelayDurationTimer" />
+  </children>
+</component>

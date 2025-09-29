@@ -3,7 +3,9 @@ Function init()
   tubiLog("Init Scenegraph----------------")
   m._ = rodash()
 
-  m.constants = getConstantsFromGlobal()
+  m.constants = getConstants()
+  m.global.constants = m.constants
+  m.global.theme = m.constants.ui.themes.default
 
   ' We need to create the general task in order to load our base dependencies (like experiments, remote config, etc.) but we will need to update the general task after the base dependencies are loaded.
   generalTask = createObject("roSGNode", "ControllerGeneralTask") ' initiate GeneralTask
@@ -21,9 +23,6 @@ Function init()
 
   ' Used to know if we are already getting auth and want to avoid running multiple requests at the same time
   m.getAuthOperationInProgress = false
-
-  ' Used to know when startupArgs have been received so we know if we can proceed
-  m.startupArgsReceived = false
 
   ' Used to know when the startupArgs have been handled so we know if we can proceed
   m.startupArgsHandled = false
@@ -56,6 +55,9 @@ End Function
 
 ' This will load the rest of our modules and UI after the base dependencies are loaded
 Function addControllerUi()
+  '//When ContentController initializes, set translations
+  initTranslations()
+
   m.uiGroup = m.top.findNode("uiGroup")
   ' We need to add all of the UI that was in ContentController before but is now housed in ContentControllerUI. See ContentControllerUI.xml for more details.
   ' We're pulling out all of the children of ContentControllerUI and appending them to the uiGroup to avoid having a different node structure than before.
@@ -67,10 +69,6 @@ Function addControllerUi()
 
   ' Timer to find last time the app suspended
   m.appSuspendTimer = CreateObject("roTimespan")
-
-  '//When ContentController initializes, clear all translations and reset translations in case the
-  ' remote component translations are different from the local translations.
-  initTranslations()
 
   m.mainTask = createObject("roSGNode", "MainTask") ' initiate MainTask
   m.mainTask.observeFieldScoped("isHdmiStatusOk", "onIsHdmiStatusOkChange")
@@ -195,7 +193,7 @@ Function addControllerUi()
   'in case fadeInContentController is still playing when we tried to play linear content which will result in playback error.
   m.linearScreenAfterFn = invalid
 
-  m.top.observeFieldScoped("roInputInfo", "onInputInfoReceived")
+  m.mainTask.observeFieldScoped("roInputInfo", "onInputInfoReceived")
 
   if m.top.fadeInContentController = true then
     onFadeInContentController()
@@ -550,7 +548,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
           popScreen(true, false)
           ' reset appStartTime so that the home screen load event will have the correct loadTime value
           ' which will be set in fireAppLoadBeacon()
-          m.top.appStartTime = Int(Uptime(0))
+          m.top.getScene().appStartTime = Int(Uptime(0))
           m.deeplinkContent = invalid
         end if
       else if m.SideNav.opened = true
@@ -585,7 +583,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
             popScreen(true, false)
             ' reset appStartTime so that the home screen load event will have the correct loadTime value
             ' which will be set in fireAppLoadBeacon() if the beacon hasn't fired yet
-            m.top.appStartTime = Int(Uptime(0))
+            m.top.getScene().appStartTime = Int(Uptime(0))
             m.deeplinkContent = invalid
           else
             displayExitModal(topScreen.trackingPageInfo)
@@ -703,7 +701,6 @@ Function runControllerStartSequence()
   else if m.uiGroup = invalid then
     ' checks if the controller's UI has been added as children
     addControllerUi()
-  else if m.startupArgsReceived <> true
     ' checks if the startupArgs have been received from main thread
   else if m.startUpArgsHandled <> true
     ' checks if the logic has been run on the startupArgs.
@@ -840,17 +837,8 @@ Function sendDeviceEnvironmentSettingsLog()
 End Function
 
 
-' is triggered when the args that are passed to main, are passed into the SG thread to the contentController.
-' this is one of the pre-requisites to starting the SG user experience.
-Function onStartupArgs()
-  m.deeplinkContent = invalid
-  m.startupArgsReceived = true
-  runControllerStartSequence()
-End Function
-
-
 Function handleStartUpArgs()
-  startupArgs = m.top.startupArgs
+  startupArgs = m.top.getScene().startupArgs
   if startupArgs <> invalid then
     m.deeplinkContent = createDeeplinkContentFromStartupArgs(startupArgs)
     utmCampaignConfig = generateUtmCampaignConfig(startupArgs)
@@ -884,8 +872,9 @@ Function handleStartUpArgs()
 End Function
 
 
-Function onInputInfoReceived()
-  inputInfo = m.top.roInputInfo
+Function onInputInfoReceived(msg)
+  inputInfo = msg.getData()
+
   if inputInfo <> invalid
     if inputInfo.type = "deeplink"
       handleInputDeeplink(inputInfo)
@@ -910,7 +899,7 @@ End Function
 
 Function onTransportVoiceResponse(msg)
   transportVoiceResponse = msg.getData()
-  m.top.transportVoiceResponse = transportVoiceResponse
+  m.mainTask.transportVoiceResponse = transportVoiceResponse
 End Function
 
 
@@ -1906,7 +1895,7 @@ End Function
 ' (this would happen in the case of deep links)
 Function fireAppLoadBeacon()
   currentTime = Int(Uptime(0))
-  loadTime = currentTime - m.top.appStartTime
+  loadTime = currentTime - m.top.getScene().appStartTime
 
   if m.appLoadedBeaconFired = false
     m.appLoadedBeaconFired = true
@@ -2715,7 +2704,7 @@ End Function
 ' Delete all items from roku continue watching row.
 Function clearRokuContinueWatching()
   requestInfo = m.rokuContinueWatchingApi.createClearContinueWatchingReqInfo()
-  m.top.rokuContinueWatchingRequestInfo = requestInfo
+  m.top.getScene().rokuContinueWatchingRequestInfo = requestInfo
 End Function
 
 

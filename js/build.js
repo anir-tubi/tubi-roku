@@ -3,6 +3,7 @@
 const { load } = require('./config');
 const fs = require('fs');
 const log = require('fancy-log');
+const path = require('path');
 
 /**
  * generate manifest file based on the manifest section
@@ -47,7 +48,7 @@ function createManifest(options, filename, manifestName) {
  * @param options: object with at least the keys 'env' (as "production", "qa", etc.), and "port"
  * @param filename: output filename
  */
-function createSettings(options, filename) {
+function createSettings(options, filename, settingOverrides = {}) {
   const data = load(options);
 
   // If a testingTimeOffset is specified then we need to calculate what the time offset is from the current time
@@ -59,8 +60,12 @@ function createSettings(options, filename) {
     data.settings.testingTimeOffset = Math.trunc(requestedAppStartTimeStamp - Date.now() / 1000);
   }
 
-  const functions = Object.keys(data).map(key => genConfigFunction(key, data[key]));
-  fs.writeFileSync(filename, functions.join('\n'));
+  const settings = { ...data.settings, ...settingOverrides };
+  const settingsFileOutput = genConfigFunction('settings', settings);
+
+  // Need to make the folder in case it doesn't exist yet like in the case of creating starter component library from buildInstalled
+  fs.mkdirSync(path.dirname(filename), { recursive: true });
+  fs.writeFileSync(filename, settingsFileOutput);
   log(`Generated the file: ${filename}.`);
 }
 

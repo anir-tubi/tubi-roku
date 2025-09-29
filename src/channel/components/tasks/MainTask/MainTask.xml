@@ -12,11 +12,14 @@
 
   <interface>
     <!-- INPUTS -->
-    <!-- At minimum should have {type: <<REQUEST_TYPE>>} additional keys can be included if more information is needed for the request -->
-    <field id="request" type="assocarray" />
+    <field id="transportVoiceResponse" type="assocarray"/>
 
     <!-- OUTPUT -->
     <!-- Combination of roHdmiStatus and roCECStatus hdmi checks to know if we're ok to playback video -->
     <field id="isHdmiStatusOk" type="boolean" />
+
+    <!-- any info that is passed into the channel via roInput/ECP while the channel is running
+    can be deeplinks, transport controls, voice commands, etc. -->
+    <field id="roInputInfo" type="assocarray" />
   </interface>
 </component>

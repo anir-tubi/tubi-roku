@@ -10,4 +10,7 @@
   <script type="text/brightscript" uri="TestsScene.brs" />
   <script type="text/brightscript" uri="../../../../source/tests/rooibos/rooibosDist.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/Constants.brs" />
+  <script type="text/brightscript" uri="pkg:/source/Settings.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
 </component>

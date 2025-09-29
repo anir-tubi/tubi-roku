@@ -251,14 +251,6 @@
     "description": "Message of a Dialog Window that is shown when a deeplink content can not played because of user's parental control setting",
     "message": "Please turn off parental controls to watch this content."
   },
-  "error_connection_title": {
-    "description": "title of error window when there is a connection error",
-    "message": "Connection Error"
-  },
-  "error_connection_description": {
-    "description": "description of error window when there is a connection error",
-    "message": "There may be an issue with your network connection, or with Tubi's server. Please check your network connection and try again. \n"
-  },
   "dialog_updateVersion_title": {
     "description": "title of a dialog window that is shown when the user has an older version of the app",
     "message": "Please update the Tubi channel"

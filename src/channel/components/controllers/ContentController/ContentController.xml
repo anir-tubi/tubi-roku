@@ -77,6 +77,8 @@
   <script type="text/brightscript" uri="pkg:/source/lib/TubiClientErrorConfig.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
   <script type="text/brightscript" uri="pkg:/source/lib/PlayerLogLib.brs" />
+  <script type="text/brightscript" uri="pkg:/source/Constants.brs" />
+  <script type="text/brightscript" uri="pkg:/source/Settings.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiAds.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/AdsUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/RequestQueue.brs" />
@@ -89,14 +91,6 @@
   <interface>
 
     <!-- INPUTS -->
-      <!-- the arguments that are passed into the app at startup, as an associative array -->
-      <field id="startupArgs" type="assocarray"/>
-      <field id="appStartTime" type="integer"/>
-
-      <!-- any info that is passed into the channel via roInput/ECP while the channel is running
-           can be deeplinks, transport controls, voice commands, etc. -->
-      <field id="roInputInfo" type="assocarray"/>
-
       <!-- customSuspend will be set by scene's suspendhandler callback  -->
       <field id="customSuspend" type="assocarray" alwaysNotify="true"/>
 
@@ -117,32 +111,10 @@
 
       <field id="isComponentLibFailedToLoad" type="boolean" value="false"/>
 
-    <!-- OUTPUT -->
-      <!-- Main thread listens for this and will exit the app if set to true-->
-      <field id="exitApp" type="boolean" value="false"/>
-
-      <field id="transportVoiceResponse" type="assocarray"/>
-
       <!-- removeStartUpScreens is used to remove the StartUpScreens(animationLogo) -->
       <field id="removeStartUpScreens" type="boolean" />
 
-      <!-- disableInstantResume will be set to true when guest user tries to relaunch the app after 24hours after app got suspended by pressing home or by opening channel on remote -->
-      <field id="disableInstantResume" type="boolean" value="false" alwaysNotify="true"/>
-
-      <!-- Main thread listens for this and will make a call to roku continue watching endpoint. Below field will contain information related to the update or delete request.
-           Below field is necessary due to a roku limitation that we need to make the api request from main thread due to a fact that they cannot retrieve channel token properly if it is made in component library.
-           Sample value:
-           {
-            url: m.constants.urls.rokuContinueWatchingEndpoint
-            options: {
-              method: m.constants.reqTypes.post
-              body: {} // Sample body - {"items":[{"contentId":"abc123","episodeId":"def123","lastInteractionTime":123456,"position":854,"duration":1678,"waitForNextEpisodeAvailability":true}]}
-              headers: {}
-            }
-            requestType: "" string representing a unique value for the request. ex: postRokuContinueWatching
-          }
-      -->
-      <field id="rokuContinueWatchingRequestInfo" type="assocarray" value="{}" alwaysNotify="true" />
+    <!-- OUTPUT -->
 
   </interface>
 

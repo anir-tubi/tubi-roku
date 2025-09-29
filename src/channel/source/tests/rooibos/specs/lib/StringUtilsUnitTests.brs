@@ -13,7 +13,7 @@ End Function
 '@Test padString unit tests
 Function stringUtils_padString_test()
   ' since we use this for transport time, test with time values
-  for i=0 to 60
+  for i = 0 to 60
     padded = padString(stri(i), 2, "0")
     m.AssertEqual(padded.len(), 2)
   end for
@@ -78,7 +78,7 @@ End Function
 Function stringUtils_formatLengthAsTimestamp_test()
   m.AssertEqual(formatLengthAsTimestamp(invalid), "")
   m.AssertEqual(formatLengthAsTimestamp(0), "")
-  for i=1 to 7250
+  for i = 1 to 7250
     formatted = formatLengthAsTimestamp(i)
     m.AssertNotEqual(formatted, "")
     m.AssertTrue(formatted.len() > 6)
@@ -179,7 +179,7 @@ End Function
 Function stringUtils_createCacheBusterString_test()
   aRandomStrings = {}
   '//get a number of unique strings from the function and test their uniqueness
-  for i=0 to 20
+  for i = 0 to 20
     sUnique = createCacheBusterString()
 
     '//Test that the string is a valid string
@@ -197,11 +197,11 @@ End Function
 '@Test convertFunctionToString unit tests
 Function stringUtils_convertFunctionToString_test()
 
-  functionStr = convertFunctionToString(loadPackagedComponents)
+  functionStr = convertFunctionToString(runChannel)
   m.assertNotInvalid(functionStr)
-  m.assertEqual(LCASE(functionStr), LCASE("loadPackagedComponents"))
+  m.assertEqual(LCASE(functionStr), LCASE("runChannel"))
 
-  functionStr = convertFunctionToString("loadPackagedComponents")
+  functionStr = convertFunctionToString("runChannel")
   m.assertNotInvalid(functionStr)
   m.assertEqual(functionStr, "")
 
@@ -212,8 +212,8 @@ End Function
 Function stringUtils_GetAMPMTimeString_test()
   dt = CreateObject("roDateTime")
   dt.FromSeconds(1635811870)
-  m.AssertEqual(GetAMPMTimeString(dt),"12:11 AM")
-  m.AssertEqual(GetAMPMTimeString(dt, false),"12:11AM")
+  m.AssertEqual(GetAMPMTimeString(dt), "12:11 AM")
+  m.AssertEqual(GetAMPMTimeString(dt, false), "12:11AM")
 
   dt.fromSeconds(1636171870)
   m.AssertEqual(GetAMPMTimeString(dt), "4:11 AM")

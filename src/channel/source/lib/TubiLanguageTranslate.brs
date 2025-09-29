@@ -12,9 +12,7 @@ End Function
 ' Tell the code to clear the translations. It is necessary to call this when the remote components is called and there
 ' are new strings that are contained in the remote components.
 Function clearTranslations()
-  if m.global.translationAA <> invalid
-    m.global.translationAA = invalid
-  end if
+  m.global.translationAA = invalid
 End Function
 
 
@@ -521,14 +519,6 @@ Function getTranslation_en_US()
     "dialog_contentNotAvailable_Parental_description": {
       "description": "Message of a Dialog Window that is shown when a deeplink content can not played because of user's parental control setting",
       "message": "Please turn off parental controls to watch this content."
-    },
-    "error_connection_title": {
-      "description": "title of error window when there is a connection error",
-      "message": "Connection Error"
-    },
-    "error_connection_description": {
-      "description": "description of error window when there is a connection error",
-      "message": "There may be an issue with your network connection, or with Tubi's server. Please check your network connection and try again. \n"
     },
     "dialog_updateVersion_title": {
       "description": "title of a dialog window that is shown when the user has an older version of the app",
@@ -2504,14 +2494,6 @@ Function getTranslation_es_MX()
       "description": "Message of a Dialog Window that is shown when a deeplink content can not played because of user's parental control setting",
       "message": "Por favor, desactiva el control parental para utilizar esta función."
     },
-    "error_connection_title": {
-      "description": "title of error window when there is a connection error",
-      "message": "Error de conexión"
-    },
-    "error_connection_description": {
-      "description": "description of error window when there is a connection error",
-      "message": "Puede haber un problema con tu conexión de red, o con el servidor de Tubi. Por favor, comprueba tu conexión de red e inténtalo de nuevo."
-    },
     "dialog_updateVersion_title": {
       "description": "title of a dialog window that is shown when the user has an older version of the app",
       "message": "Por favor, actualiza el canal de Tubi"
@@ -4419,14 +4401,6 @@ Function getTranslation_fr_CA()
     "dialog_contentNotAvailable_Parental_description": {
       "description": "Message of a Dialog Window that is shown when a deeplink content can not played because of user's parental control setting",
       "message": "Veuillez désactiver le contrôle parental pour regarder ce contenu."
-    },
-    "error_connection_title": {
-      "description": "title of error window when there is a connection error",
-      "message": "Erreur de connexion"
-    },
-    "error_connection_description": {
-      "description": "description of error window when there is a connection error",
-      "message": "Il peut y avoir un problème avec votre connexion réseau ou avec le serveur de Tubi. Veuillez vérifier votre connexion réseau et réessayer. "
     },
     "dialog_updateVersion_title": {
       "description": "title of a dialog window that is shown when the user has an older version of the app",

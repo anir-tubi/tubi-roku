@@ -110,6 +110,12 @@ function clean(done) {
   if (fs.existsSync(buildFolder)) {
     // It is quicker to just rename the folder synchronously and then let it delete the folder on its own time asynchronously
     const pendingDeleteBuildFolder = '__pendingDeleteBuild';
+
+    // if the pending delete folder exists, remove it to avoid the next command failing
+    if (fs.existsSync(pendingDeleteBuildFolder)) {
+      fs.rmSync(pendingDeleteBuildFolder, { recursive: true, force: true });
+    }
+
     fs.renameSync('build', pendingDeleteBuildFolder);
     fs.rm(pendingDeleteBuildFolder, { recursive: true, force: true }, (e) => { });
   }
@@ -145,223 +151,131 @@ function zipAsPromise(srcPath, zipPath, destPath) {
 }
 
 
-function buildInstalled() {
+async function buildInstalled() {
   const buildTag = getBuildTag('revision');
-  let build = new Promise((res, rej) => {
-    /* Installed bundle */
-    mkdirp.sync(`${process.env.PWD}/build/local/source`);
-    let { settings } = load(options);
 
-    let sources = [
-      'src/channel/**/*',
-      //make sure not to include the following files
-      '!src/channel/**/.keep',
-      '!src/channel/**/.DS_Store',
-      '!src/channel/**/*.md',
-      '!src/channel/components/controllers/StarterController/**',
-      '!src/channel/components/tasks/GeneralTask/StarterGeneralTask.xml',
-      '!src/channel/components/tasks/GeneralTask/StarterGeneralTask.brs',
-    ];
+  /* Installed bundle */
+  mkdirp.sync(`${process.env.PWD}/build/local/source`);
+  let { settings } = load(options);
 
-    let testSources = [
-      '!src/channel/components/tests/**',
-      '!src/channel/source/tests/**',
-      '!src/channel/source/rooibosFunctionMap.brs'
-    ];
+  let sources = [
+    'src/channel/**/*',
+    //make sure not to include the following files
+    '!src/channel/**/.keep',
+    '!src/channel/**/.DS_Store',
+    '!src/channel/**/*.md',
+    '!src/channel/components/controllers/StarterController/**',
+    '!src/channel/components/tasks/GeneralTask/StarterGeneralTask.xml',
+    '!src/channel/components/tasks/GeneralTask/StarterGeneralTask.brs',
+  ];
 
-    // don't include test files if the config is not 'test'
-    if (options.config !== 'test') {
-      sources = [...sources, ...testSources];
-    }
+  let testSources = [
+    '!src/channel/components/tests/**',
+    '!src/channel/source/tests/**',
+    '!src/channel/source/rooibosFunctionMap.brs'
+  ];
 
-    // don't include RALE files if config is not 'dev' or it's disabled
-    if (options.config !== 'dev' || settings.raleEnabled !== true) {
-      sources.push('!src/channel/components/controllers/TubiScene/TrackerTask.xml');
-    }
+  // don't include test files if the config is not 'test'
+  if (options.config !== 'test') {
+    sources = [...sources, ...testSources];
+  }
 
-    // don't include Suitest files if config is not 'qa' and suitest is not enabled
-    if (options.config !== 'qa' || settings.suitest === false) {
-      sources.push('!src/channel/components/controllers/Suitest/**');
-    }
-    // don't include TestAid files if config is production
-    if (options.config === 'production') {
-      sources.push('!src/channel/components/screens/SettingsScreen/TestAid/**');
-    }
+  // don't include RALE files if config is not 'dev' or it's disabled
+  if (options.config !== 'dev' || settings.raleEnabled !== true) {
+    sources.push('!src/channel/components/controllers/TubiScene/TrackerTask.xml');
+  }
 
-    let srcOptions = {
-      base: 'src/channel'
-    };
+  // don't include Suitest files if config is not 'qa' and suitest is not enabled
+  if (options.config !== 'qa' || settings.suitest === false) {
+    sources.push('!src/channel/components/controllers/Suitest/**');
+  }
+  // don't include TestAid files if config is production
+  if (options.config === 'production') {
+    sources.push('!src/channel/components/screens/SettingsScreen/TestAid/**');
+  }
 
-    let stream = collect(sources, srcOptions);
+  let srcOptions = {
+    base: 'src/channel'
+  };
 
-    if (options.config === 'production' || options.config === 'staging') {
-      stream = stream.pipe(
-        replace(REMOVE_TUBI_LOGS_REGEX, `' $&`) // Case-insensitive match for tubiLog or logDebug followed by '('
-      );
-    }
+  let stream = collect(sources, srcOptions);
 
-    stream = stream.pipe(dest('build/local'));
+  if (options.config === 'production' || options.config === 'staging') {
+    stream = stream.pipe(
+      replace(REMOVE_TUBI_LOGS_REGEX, `' $&`) // Case-insensitive match for tubiLog or logDebug followed by '('
+    );
+  }
 
+  const outputFolder = 'build/local';
+  stream = stream.pipe(dest(outputFolder));
+  await new Promise((res, rej) => {
     stream.on('end', () => {
       res();
     });
   });
 
-  return build
-    .then(() => {
-      // TODO remove after fox video player is removed.
-      // Only including with staging and production to speed up development deployments
-      if (options.config === 'production' || options.config === 'staging') {
-        const foxBuildTag = getFoxVideoPlayerBuildTag(options);
-        const foxVideoPlayerPkgName = `fox_video_player_${foxBuildTag}.pkg`;
+  let settingsOverrides = {};
 
-        fs.mkdirSync('build/local/fox-video-player-components/');
-        try {
-          fs.copyFileSync(`fox-video-player-components/${foxVideoPlayerPkgName}`, `build/local/fox-video-player-components/${foxVideoPlayerPkgName}`);
-        } catch (e) {
-          console.log(`Could not copy fox video player pkg file.  Make sure you have built the fox video player package and that the file fox-video-player-components/${foxVideoPlayerPkgName} exists.`);
-        }
+  // If useStarterComponents is false, we still need to include it in the base channel so we compile starter and include it
+  if (settings.useStarterComponents === false) {
+    await buildStarter();
 
-      }
-
-      replaceColorConstants('build/local');
-      replaceTypographyConstants('build/local');
-      createSettings(options, 'build/local/source/Settings.brs');
-      createManifest(options, 'build/local/manifest', 'manifest');
-      return zipAsPromise('build/local/**/*', `tubi_${buildTag}.zip`, 'build/');
+    const minorBuildTag = getBuildTag('minor');
+    let stream = collect([`build/tubi_starter_components_${minorBuildTag}.zip`], {
+      base: 'build'
     });
+
+    stream = stream.pipe(dest(outputFolder));
+    await new Promise((res, rej) => {
+      stream.on('end', () => {
+        res();
+      });
+    });
+
+    // Update the settings and options with the updated starterComponentsUrl
+    settingsOverrides = {
+      starterComponentsUrl: `pkg:/tubi_starter_components_${minorBuildTag}.zip`
+    };
+  }
+
+  // TODO remove after fox video player is removed.
+  // Only including with staging and production to speed up development deployments
+  if (options.config === 'production' || options.config === 'staging') {
+    const foxBuildTag = getFoxVideoPlayerBuildTag(options);
+    const foxVideoPlayerPkgName = `fox_video_player_${foxBuildTag}.pkg`;
+
+    fs.mkdirSync('build/local/fox-video-player-components/');
+    try {
+      fs.copyFileSync(`fox-video-player-components/${foxVideoPlayerPkgName}`, `build/local/fox-video-player-components/${foxVideoPlayerPkgName}`);
+    } catch (e) {
+      console.log(`Could not copy fox video player pkg file.  Make sure you have built the fox video player package and that the file fox-video-player-components/${foxVideoPlayerPkgName} exists.`);
+    }
+  }
+
+  replaceColorConstants('build/local');
+  replaceTypographyConstants('build/local');
+  createSettings(options, 'build/local/source/Settings.brs', settingsOverrides);
+  createManifest(options, 'build/local/manifest', 'manifest');
+  return zipAsPromise('build/local/**/*', `tubi_${buildTag}.zip`, 'build/');
 }
 
 
 function buildStarter() {
   const minorBuildTag = getBuildTag('minor');
-  const { settings } = load(options);
-
-
-  // include StarterController in starter components
-  let starterControllerSrc = [
-    'src/channel/components/controllers/StarterController/**/*',
-    'src/channel/components/controllers/shared.brs',
-  ];
-  let starterControllerSrcOptions = {
-    base: 'src/channel/components'
-  };
-
-  // We only want to include the xml file for the version of the starter controller that we are using as it will not compile otherwise
-  if (settings.useFullStarterController) {
-    starterControllerSrc.push('!src/channel/components/controllers/StarterController/StarterController.xml');
-  } else {
-    starterControllerSrc.push('!src/channel/components/controllers/StarterController/StartControllerWithTasks/StarterController.xml');
-    starterControllerSrc.push('!src/channel/components/controllers/StarterController/StartControllerWithTasks/StarterController.brs');
-  }
-
-  // include GeneralTask in starterComponents
-  let generalTaskSrc = [
-    'src/channel/components/tasks/BaseTaskNeedingAuth/BaseTaskNeedingAuth.xml',
-    'src/channel/components/tasks/BaseTaskNeedingAuth/BaseTaskNeedingAuth.brs',
-    'src/channel/components/tasks/GeneralTask/BaseGeneralTask.xml',
-    'src/channel/components/tasks/GeneralTask/BaseGeneralTask.brs',
-    'src/channel/components/tasks/GeneralTask/StarterGeneralTask.xml',
-    'src/channel/components/tasks/GeneralTask/StarterGeneralTask.brs',
-    'src/channel/components/tasks/GeneralTask/Parsers/TubiExperimentParsers.brs',
-    'src/channel/components/tasks/GeneralTask/Parsers/ExternalConfigParsers.brs',
-    'src/channel/components/tasks/GeneralTask/Parsers/UncategorizedParsers.brs'
-  ];
-  let generalTaskSrcOptions = {
-    base: 'src/channel/components'
-  };
-
-  // include Constants in starter components
-  let constantsSrc = [
-    'src/channel/source/Constants.brs'
-  ];
-  let constantsSrcOptions = {
-    base: 'src/channel'
-  };
-
-  // include generalUtils in starterComponents
-  let genUtilSrc = [
-    'src/channel/source/3rdparty/roku/generalUtils.brs',
-  ];
-
-  if (settings.useFullStarterController) {
-    genUtilSrc.push('src/channel/source/localClientErrorConfig.brs'),
-      genUtilSrc.push('src/channel/source/3rdparty/rta/typeUtils.brs');
-  }
-
-  let genUtilSrcOptions = {
-    base: 'src/channel/source'
-  };
-
-  // include TubiExperiments, TubiExternalConfig, and Request modules in starterComponents
-  let sourceLibsSrc = [
-    'src/channel/source/lib/Log.brs',
-
-  ];
-
-  if (settings.useFullStarterController) {
-    genUtilSrc.push('src/channel/source/lib/GeneralTaskModule.brs');
-    genUtilSrc.push('src/channel/source/lib/Auth.brs');
-    genUtilSrc.push('src/channel/source/lib/Request.brs');
-    genUtilSrc.push('src/channel/source/lib/TubiExperiments.brs');
-    genUtilSrc.push('src/channel/source/lib/TubiExternalConfig.brs');
-    genUtilSrc.push('src/channel/source/lib/TubiTracking.brs');
-    genUtilSrc.push('src/channel/source/lib/TimeUtils.brs');
-    genUtilSrc.push('src/channel/source/lib/TimeOffsetUtils.brs');
-    genUtilSrc.push('src/channel/source/lib/StringUtils.brs');
-    genUtilSrc.push('src/channel/source/lib/TubiLanguageTranslate.brs');
-  }
-
-
-  let sourceLibsSrcOptions = {
-    base: 'src/channel/source'
-  };
-
-  // include Mixin in starterComponents
-  let componentLibSrc = [
-    'src/channel/components/lib/AnimationMixin.brs',
-    'src/channel/components/lib/GlobalMixin.brs'
-  ];
-  let componentLibSrcOptions = {
-    base: 'src/channel/components'
-  };
 
   // Creating a list that holds all the sub tasks.
   const subTaskPaths = [
     {
-      src: starterControllerSrc,
-      options: starterControllerSrcOptions,
+      src: [
+        'src/channel/components/StarterConfig/StarterConfig.xml',
+        'src/channel/components/StarterConfig/StarterConfig.brs'
+      ],
+      options: {
+        base: 'src/channel/components'
+      },
       dest: 'build/starter/components'
-    },
-    {
-      src: constantsSrc,
-      options: constantsSrcOptions,
-      dest: 'build/starter/'
-    },
-    {
-      src: genUtilSrc,
-      options: genUtilSrcOptions,
-      dest: 'build/starter/source'
-    },
-    {
-      src: sourceLibsSrc,
-      options: sourceLibsSrcOptions,
-      dest: 'build/starter/source'
-    },
-    {
-      src: componentLibSrc,
-      options: componentLibSrcOptions,
-      dest: 'build/starter/components'
-    },
+    }
   ];
-
-  if (settings.useFullStarterController) {
-    subTaskPaths.push({
-      src: generalTaskSrc,
-      options: generalTaskSrcOptions,
-      dest: 'build/starter/components'
-    });
-  }
 
   // Loops through each item in the sub task and creates individual promises.
   const promises = [];
@@ -383,23 +297,8 @@ function buildStarter() {
   // Adding a promise all which will make sure that success callback will be triggered only after all file moving is completed.
   return Promise.all(promises)
     .then(async () => {
-      replaceColorConstants('build/starter');
-      replaceTypographyConstants('build/starter');
       createSettings(options, 'build/starter/source/Settings.brs');
       createManifest(options, 'build/starter/manifest', 'starter_library_manifest');
-
-      if (options.config === 'production' || options.config === 'staging') {
-        await new Promise((resolve, reject) => {
-          // Create a new stream to process files
-          src('build/starter/**/*.brs') // Adjust the glob pattern to match your BrightScript files
-            .pipe(
-              replace(REMOVE_TUBI_LOGS_REGEX, `' $&`) // Case-insensitive match for tubiLog or logDebug followed by '('
-            )
-            .pipe(dest('build/starter'))
-            .on('end', resolve)
-            .on('error', reject);
-        });
-      }
 
       return zipAsPromise('build/starter/**/*', `tubi_starter_components_${minorBuildTag}.zip`, 'build/');
     });
@@ -417,6 +316,7 @@ function buildRemote() {
 
     let sources = [
       // "src/channel/images/**/*",
+      'src/channel/source/Constants.brs',
       'src/channel/source/lib/**/*',
       'src/channel/source/localClientErrorConfig.brs',
       'src/channel/source/3rdparty/**/*',
@@ -562,6 +462,7 @@ function buildRemote() {
       replaceColorConstants('build/remote');
       replaceTypographyConstants('build/remote');
       createManifest(options, 'build/remote/manifest', 'component_library_manifest');
+      createSettings(options, 'build/remote/source/Settings.brs');
 
       if (options.config === 'production' || options.config === 'staging') {
         // Create a new stream to process files
