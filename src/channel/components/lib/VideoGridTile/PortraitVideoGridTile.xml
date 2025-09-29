@@ -20,6 +20,7 @@
     <field id="rowIndex" type="integer" value="-1" />
     <field id="videoTilesVariant" type="string" value="" />
     <field id="rowHasFocus" type="boolean" />
+    <field id="rowListHasFocus" type="boolean" />
   </interface>
 
   <children>

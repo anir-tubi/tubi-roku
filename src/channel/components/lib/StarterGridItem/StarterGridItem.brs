@@ -284,7 +284,7 @@ Function onItemContentChange(msg)
       m.sotBadge = invalid
     end if
 
-    if itemContent.type <> "linear" AND m.availabilityBadge = invalid AND isAA(sotPosterLabels) = true AND sotPosterLabels.count() > 0
+    if itemContent.type <> "linear" AND m.availabilityBadge = invalid AND isAA(sotPosterLabels) = true AND sotPosterLabels.count() > 0 AND childGridItemComponent <> "PortraitVideoGridTile"
       badgeUri = sotPosterLabels.sotIcon
       badgeText = sotPosterLabels.sotLabelText
       setSotBadge(badgeUri, badgeText)

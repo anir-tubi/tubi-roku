@@ -1826,7 +1826,7 @@ Function onFeaturedRowFocusedItemChange(msg)
 
   if isNode(focusedItem) = true AND (arrayIncludes(m.constants.ui.liveEventsGridTypes, focusedItem.gridItemType) OR arrayIncludes(m.constants.ui.adGridItemTypes, focusedItem.gridItemType))
     setVideoContentScreenBackground(screen)
-  else
+  else if isCurrentScreenHomeScreen() = true
     displayDefaultBackground()
   end if
   setUIBasedOnFocusedContent(focusedItem)

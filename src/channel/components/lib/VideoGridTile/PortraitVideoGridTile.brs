@@ -8,6 +8,7 @@ Function init()
   topRef.observeFieldScoped("height", "onHeightChange")
   topRef.observeFieldScoped("videoTilesVariant", "updateTileTranslation")
   topRef.observeFieldScoped("rowHasFocus", "updateTileTranslation")
+  topRef.observeFieldScoped("rowListHasFocus", "updateTileTranslation")
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.timeLeftLabel, typographyConstants.ids.bodySmall)
@@ -18,6 +19,13 @@ Function init()
   end if
 
   setThemeColors()
+
+  m.linearBadge = invalid
+  m.badgeTypes = {
+    live: "live"
+    onNow: "onNow"
+    sot: "sot"
+  }
 End Function
 
 
@@ -35,6 +43,10 @@ Function setThemeColors(msg = invalid)
     m.progressBar.unfocusColor = theme.focusedColor
     m.timeLeftLabel.color = theme.primaryTextColor
     m.backgroundColor = theme.neutralSolidColor
+
+    m.primaryTextColor = theme.primaryTextColor
+    m.focused2Color = theme.focused2Color
+    m.blueBadgeColor = theme.blueBadgeColor
   end if
 End Function
 
@@ -70,10 +82,32 @@ Function onItemContentChange(msg)
       m.sotBadge = invalid
     end if
 
+    if m.linearBadge <> invalid
+      m.top.removeChild(m.linearBadge)
+      m.linearBadge = invalid
+    end if
+
     if isAA(itemContent.sotPosterLabels) = true AND itemContent.sotPosterLabels.count() > 0
       badgeUri = itemContent.sotPosterLabels.sotIcon
       badgeText = itemContent.sotPosterLabels.sotLabelText
       setSotBadge(badgeUri, badgeText)
+    end if
+
+    if itemContent.type = "linear"
+      currentProgram = getCurrentLiveProgram(itemContent)
+      ' Only add the onNow badge if there is no live program or the live program is not live.
+      if currentProgram = invalid OR currentProgram.live = false
+        setLinearBadge(m.badgeTypes.onNow)
+      else
+        setLinearBadge(m.badgeTypes.live)
+      end if
+    else if m.sotBadge = invalid
+      if isNonEmptyString(itemContent.availabilityEnds)
+        badgeInfo = getExpiresBadgeInfo(itemContent.availabilityEnds)
+        if badgeInfo <> invalid
+          setSotBadge("", badgeInfo.text)
+        end if
+      end if
     end if
 
     categoryContent = itemContent.getParent()
@@ -99,6 +133,31 @@ Function setSotBadge(badgeUri, badgeText)
     m.sotBadge.visible = true
     m.top.appendChild(m.sotBadge)
 
+  end if
+End Function
+
+
+Function setLinearBadge(badgeType = "live", badgeInfo = {})
+  badge = invalid
+  if badgeType = m.badgeTypes.live
+    badge = createObject("roSGNode", "Badge")
+    badge.badgeTextWidth = 0.0
+    badge.textColor = m.primaryTextColor
+    badge.translation = [6, 6]
+    badge.backgroundColor = m.focused2Color
+    badge.iconUri = "pkg:/images/live-icon-filled.webp"
+    badge.text = UCase(getTranslation("screenSearch_liveText"))
+  else if badgeType = m.badgeTypes.onNow
+    badge = createObject("roSGNode", "Badge")
+    badge.badgeTextWidth = 0.0
+    badge.textColor = m.primaryTextColor
+    badge.translation = [6, 6]
+    badge.backgroundColor = m.blueBadgeColor
+    badge.text = UCase(getTranslation("onNow"))
+  end if
+  if badge <> invalid
+    m.linearBadge = badge
+    m.top.appendChild(m.linearBadge)
   end if
 End Function
 
@@ -154,7 +213,7 @@ Function updateTileTranslation()
   content = m.top.itemContent
   if content <> invalid
     parent = content.getParent()
-    if m.top.videoTilesVariant = "billboard" AND parent <> invalid AND parent.id = "featured" AND m.top.rowHasFocus = true
+    if m.top.videoTilesVariant = "billboard" AND parent <> invalid AND parent.id = "featured" AND (m.top.rowListHasFocus = false OR m.top.rowHasFocus = true)
       m.top.translation = [0, 120]
     else
       m.top.translation = [0, 0]

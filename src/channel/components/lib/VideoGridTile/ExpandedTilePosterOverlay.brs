@@ -2,7 +2,7 @@ Function init()
   m.constants = getConstantsFromGlobal()
   topRef = m.top
   topRef.observeFieldScoped("itemContent", "onItemContentChange")
-  topRef.observeFieldScoped("height", "onHeightChange")
+  topRef.observeFieldScoped("height", "adjustPosterBottomContentTranslation")
   m.title = topRef.findNode("title")
   m.subtitle = topRef.findNode("subtitle")
   m.titleGroup = topRef.findNode("titleGroup")
@@ -21,6 +21,7 @@ Function init()
     live: "live"
     onNow: "onNow"
     sot: "sot"
+    expires: "expires"
   }
 
   typographyConstants = getTypographyConstants()
@@ -133,6 +134,13 @@ Function onItemContentChange(msg)
       else
         setBadge(m.badgeTypes.live)
       end if
+    else
+      if isNonEmptyString(itemContent.availabilityEnds)
+        badgeInfo = getExpiresBadgeInfo(itemContent.availabilityEnds)
+        if badgeInfo <> invalid
+          setBadge(m.badgeTypes.expires, badgeInfo)
+        end if
+      end if
     end if
 
     if m.billboardTileMetadata <> invalid
@@ -150,7 +158,8 @@ Function onItemContentChange(msg)
       m.bottomContentGroup.removeChild(m.billboardTileMetadata)
     end if
 
-    if isBadgeAdded = false AND isAA(itemContent.sotInfo) = true
+    if isBadgeAdded = false AND isNonEmptyAA(itemContent.sotInfo) = true
+      removeAllSotBadges()
       setBadge(m.badgeTypes.sot, itemContent.sotInfo)
     end if
 
@@ -259,6 +268,17 @@ Function setBadge(badgeType = "live", badgeInfo = {})
     badge.translation = [15, 15]
     badge.backgroundColor = m.blueBadgeColor
     badge.text = UCase(getTranslation("onNow"))
+  else if badgeType = m.badgeTypes.expires
+    badge = m.sotTopLabelGroup.createChild("Badge")
+    badge.badgeTextWidth = 0.0
+    badge.textColor = m.focusedTextColor
+    isBillboardRow = m.variant = "billboard" AND m.top.containerIndex = m.top.billboardContainerIndex
+    if isBillboardRow = true
+      m.sotTopLabelGroup.translation = [32, 32]
+    else
+      m.sotTopLabelGroup.translation = [15, 15]
+    end if
+    badge.text = badgeInfo.text
   else if badgeType = m.badgeTypes.sot
 
     sotInfo = badgeInfo
@@ -284,7 +304,7 @@ Function setBadge(badgeType = "live", badgeInfo = {})
         m.sotMarker.maxWidth = m.top.width
         m.sotMarker.text = sotMarkers.sotLabelText
         m.sotMarker.iconUri = sotMarkers.sotIcon
-        m.sotMarker.badgeTextFont = m.badgeTextFont
+        m.sotMarker.badgeTextFont = m.bodyMediumStrongFont
         m.sotMarker.textColor = m.cautionColor
         m.bottomContentGroup.appendChild(m.sotMarker)
       end if

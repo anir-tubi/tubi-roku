@@ -1278,6 +1278,14 @@ Function getTranslation_en_US()
       "description": "label to indicate the user has exactly 1 day to watch a video",
       "message": "Expires in 1 day"
     },
+    "metadata_expiring_plural": {
+      "description": "label to indicate how long the user have to watch a video",
+      "message": "Expiring in {days} days"
+    },
+    "metadata_expiring_singular": {
+      "description": "label to indicate the user has exactly 1 day to watch a video",
+      "message": "Expiring in 1 day"
+    },
     "metadata_myStuff_empty_myList_title": {
       "description": "For an empty MyList container, this is the title that is displayed in the empty container",
       "message": "Your My List Is Empty"

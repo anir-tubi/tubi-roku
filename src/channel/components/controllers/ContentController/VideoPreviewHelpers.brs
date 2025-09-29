@@ -53,6 +53,7 @@ Function stopVideoPreview(node = invalid)
   end if
 
   if node <> invalid AND node.subType() = "VideoPreviewPlayer" AND isListScrolling = false
+    node.unObserveFieldScoped("bufferingStatus")
     if node.playerState <> "stopped"
       sendVideoPlayerCommand(node, "stop")
     end if

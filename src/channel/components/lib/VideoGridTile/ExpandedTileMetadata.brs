@@ -352,11 +352,7 @@ Function displayLiveRating(currentProgram)
   ratingIsPresent = (m.rating.getParent() <> invalid)
   if isNonEmptyString(currentProgram.rating) = true
     if ratingIsPresent = false
-      if m.top.isBillboardRow = false
-        insertIndex = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.subHeadlinePrefixGroup) + 1
-      else
-        insertIndex = 0
-      end if
+      insertIndex = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.subHeadlineSuffixGroup) + 1
       firstLineGroup.insertChild(m.rating, insertIndex)
     end if
 
@@ -466,7 +462,11 @@ Function renderSubHeadline(parts, isPrefix)
   for each part in parts
     label = createObject("roSGNode", "Label")
     label.color = m.secondaryTextColor
-    setTypographyOfLabel(label, m.bodySmallFont)
+    if m.top.isBillboardRow = true
+      setTypographyOfLabel(label, m.bodyMediumFont)
+    else
+      setTypographyOfLabel(label, m.bodySmallFont)
+    end if
     label.text = prefix + part
     group.appendChild(label)
     if m.top.isBillboardRow = false
