@@ -134,10 +134,22 @@ Function onVideoStateChange(msg)
     m.videoState = "stop"
   else if state = "error"
     content = m.video.content
-    errorInfo = getPlaybackErrorInfo(m.video.position, m.video.streamInfo, m.video.errorCode, m.video.errorMsg, content)
-    jsonErrorInfo = FormatJSON(errorInfo)
-    logError(jsonErrorInfo, "videoPlayback", "video-preview-playback", 0.1)
+    allNodes = m.top.getAll()
+    playerStates = {}
+    if checkIfMultipleVideoNodeError(m.video.errorMsg) = true
+      for each node in allNodes
+        parent = node.getParent()
+        if node.isSubtype("Video") AND parent <> invalid AND parent.id <> invalid
+          id = parent.id
+          playerStates[id] = node.state
+        end if
+      end for
+    end if
 
+    errorInfo = getPlaybackErrorInfo(m.video.position, m.video.streamInfo, m.video.errorCode, m.video.errorMsg, content)
+    errorInfo.playerStates = playerStates
+    jsonErrorInfo = FormatJSON(errorInfo)
+    logError(jsonErrorInfo, "videoPlayback", "video-preview-playback", 1)
     m.videoState = "stop"
   end if
 
@@ -462,4 +474,9 @@ End Function
 Function onSeekToChange(msg)
   position = msg.getData()
   jumpToPosition(position)
+End Function
+
+
+Function checkIfMultipleVideoNodeError(errorMsg)
+  return isNonEmptyString(errorMsg) = true AND LCase(errorMsg) = "player: only one playing instance supported."
 End Function
