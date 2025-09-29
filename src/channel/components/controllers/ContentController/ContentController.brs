@@ -332,7 +332,7 @@ Function addControllerUi()
 
   m.foxPlayerContinueWatchingNextSendPosition = rnd(getExternalConfigValueFromGlobal("special_event_continue_watching_init_jitter", 180))
 
-  m.foxPlayerEndSlateCloseDelay = rnd(getExternalConfigValueFromGlobal("special_event_redirect_homepage_jitter", 60))
+  m.foxPlayerEndSlateCloseDelay = rnd(getExternalConfigValueFromGlobal("special_event_redirect_homepage_jitter", 300)) ' 5 minute default
 
   ' The listing that is currently being played with the fox video player stored or invalid if no content is being played
   m.foxPlayerCurrentListing = invalid

@@ -636,12 +636,29 @@ Function onFoxVideoPlayerAdStateChange(msg)
   else if adState = "adStarted" then
     sendFoxVideoPlayerLiveAdAnalyticEvent("start_ad", m.currentFoxPlayerAdBreak, playerPosition)
   else if adState = "adCompleted" then
-    sendFoxVideoPlayerLiveAdAnalyticEvent("ad_finished", m.currentFoxPlayerAdBreak, playerPosition)
-  else if adState = "adBreakEnded" then
-    sendFoxVideoPlayerLiveAdAnalyticEvent("ad_finished", m.currentFoxPlayerAdBreak, playerPosition)
+    sendFoxVideoPlayerLiveAdAnalyticEvent("finish_ad", m.currentFoxPlayerAdBreak, playerPosition)
+  else if adState = "adBreakCompleted" then
+    sendFoxVideoPlayerLiveAdAnalyticEvent("finish_ad", m.currentFoxPlayerAdBreak, playerPosition)
 
     m.currentFoxPlayerAdBreak = invalid
   end if
+End Function
+
+
+Function findCurrentAdInBreak(currentFoxPlayerAdBreak, playerPosition)
+  if currentFoxPlayerAdBreak = invalid OR isNonEmptyArray(currentFoxPlayerAdBreak.ads) = false then
+    return invalid
+  end if
+
+  for each ad in currentFoxPlayerAdBreak.ads
+    if isAA(ad) = true AND fix(ad.renderTime) <= playerPosition AND ad.renderTime + ad.duration >= playerPosition then
+      return ad
+    end if
+  end for
+
+  logWarn("onFoxVideoPlayerAdStateChange could not find current ad in break")
+
+  return invalid
 End Function
 
 
@@ -651,10 +668,11 @@ Function sendFoxVideoPlayerLiveAdAnalyticEvent(eventType, currentFoxPlayerAdBrea
     return invalid
   end if
 
-  currentAd = currentFoxPlayerAdBreak.ads[0]
+  currentAd = findCurrentAdInBreak(currentFoxPlayerAdBreak, playerPosition)
+
   ' First ad should always be the active one but we verify
-  if isAA(currentAd) = false OR fix(currentAd.renderTime) < playerPosition then
-    logWarn("onFoxVideoPlayerAdStateChange adStarted but currentAd is invalid or renderTime is less than playerPosition")
+  if currentAd = invalid then
+    logWarn("onFoxVideoPlayerAdStateChange adStarted but currentAd is invalid")
     return invalid
   else if m.foxPlayerCurrentListing = invalid then
     tubiLog("sendFoxVideoPlayerLiveAdAnalyticEvent m.foxPlayerCurrentListing is invalid")
@@ -687,12 +705,12 @@ Function sendFoxVideoPlayerLiveAdAnalyticEvent(eventType, currentFoxPlayerAdBrea
   if eventType = "start_ad" then
     values["ad_started"] = adValue
     values["start_position"] = 0
-  else if eventType = "ad_finished" then
+  else if eventType = "finish_ad" then
     if values.exit_type = invalid then
       values["exit_type"] = "AUTO"
     end if
 
-    values["finish_ad"] = adValue
+    values["ad_finished"] = adValue
   end if
 
   event = {
@@ -756,6 +774,12 @@ Function closeFoxVideoPlayer()
   foxVideoPlayerWrapperScreen = getScreenFromStackById(m.constants.ui.screenIds.foxVideoPlayerWrapperScreen)
   if foxVideoPlayerWrapperScreen <> invalid then
     foxVideoPlayerWrapperScreen.closePlayer = true
+  end if
+
+  if m.foxPlayerEndSlateCloseDelayTimer <> invalid then
+    ' Avoids case that that timer starts and you exit and then go back in and then get kicked out when timer fires
+    m.foxPlayerEndSlateCloseDelayTimer.unobserveFieldScoped("fire")
+    m.foxPlayerEndSlateCloseDelayTimer = invalid
   end if
 End Function
 
