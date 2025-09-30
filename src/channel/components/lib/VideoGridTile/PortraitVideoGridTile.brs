@@ -213,7 +213,14 @@ Function updateTileTranslation()
   content = m.top.itemContent
   if content <> invalid
     parent = content.getParent()
-    if m.top.videoTilesVariant = "billboard" AND parent <> invalid AND parent.id = "featured" AND (m.top.rowListHasFocus = false OR m.top.rowHasFocus = true)
+    parentArrayGrid = m.top.parentArrayGrid
+    if parentArrayGrid <> invalid AND m.top.rowListHasFocus = false
+      parentArrayGrid = parentArrayGrid.getParent()
+    end if
+    ' TODO: Revisit this logic once we move the skins to the featuredRowList.
+    ' Check if the last focused list is featuredRowList and the rowListHasFocus is false or the row has focus
+    ' First condition covers the case where the featuredRowList was focused and then user moved to side nav.
+    if m.top.videoTilesVariant = "billboard" AND parent <> invalid AND parent.id = "featured" AND ((m.top.rowListHasFocus = false AND parentArrayGrid <> invalid AND parentArrayGrid.currCategoryId = "featured") OR m.top.rowHasFocus = true)
       m.top.translation = [0, 120]
     else
       m.top.translation = [0, 0]

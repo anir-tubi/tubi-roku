@@ -21,6 +21,7 @@
     <field id="videoTilesVariant" type="string" value="" />
     <field id="rowHasFocus" type="boolean" />
     <field id="rowListHasFocus" type="boolean" />
+    <field id="parentArrayGrid" type="node" />
   </interface>
 
   <children>
