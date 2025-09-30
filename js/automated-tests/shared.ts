@@ -135,8 +135,8 @@ class Shared {
         position = index;
         break;
       }
-      }
-    
+    }
+
     return position > -1 ? this.positionToRowCol(position) : [];
   }
 
@@ -144,7 +144,7 @@ class Shared {
     await this.navigateRightToGrid();
     const position = await this.findContentPositionInGridByTitle({ title: title, gridId: 'searchResultGrid' });
     if (position.length > 0) {
-      await moveToGrid({grid: {row: 0, col: 0}, destRow: position[0], destCol: position[1]});
+      await moveToGrid({ grid: { row: 0, col: 0 }, destRow: position[0], destCol: position[1] });
     }
   }
 
@@ -169,7 +169,7 @@ class Shared {
         break;
       }
     }
-    
+
     return position > -1 ? this.positionToRowCol(position, columnsPerRow) : [];
   }
 
@@ -177,10 +177,10 @@ class Shared {
   async turnOnAutoplay() {
     //Open left nav
     await ecp.sendKeypress(ecp.Key.Left);
-  
+
     // Open settings
     await this.openSettings();
-  
+
     // Turn off video previews
     await ecp.sendKeypress(ecp.Key.Down);
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -230,10 +230,10 @@ class Shared {
   async turnOnPreview() {
     //Open left nav
     await ecp.sendKeypress(ecp.Key.Left);
-  
+
     // Open settings
     await this.openSettings();
-  
+
     // Turn off video previews
     await ecp.sendKeypress(ecp.Key.Down);
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -280,7 +280,7 @@ class Shared {
   async openSeriesScreenAndWaitUntilListIsFocused(shouldCreateNewUser: boolean = true) {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: shouldCreateNewUser });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
-  
+
     await shared.openSeries();
     await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
   }
@@ -288,9 +288,29 @@ class Shared {
   async openMoviesScreenAndWaitUntilListIsFocused(shouldCreateNewUser: boolean = true) {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: shouldCreateNewUser });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
-  
+
     await shared.openMovies();
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
+  }
+
+  public async completeGuestUserRegistrationFlow() {
+    // wait for Let's Create Your Account Modal and Continue
+    await utils.sleep(7000); // Roku modal
+    await ecp.sendKeypress(ecp.Key.Down, { wait: 1000 });
+    await ecp.sendKeypress(ecp.Key.Ok, { wait: 1000 });
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await testUtils.waitForElementToFullyShowOnScreen('emailAddressBox');
+
+    // Now we need to make our user with not registered with Tubi
+    const email = `build_roku_${Math.floor(Date.now() / 1000)}@tubi.tv`;
+
+    // Send email address
+    await ecp.sendText(email);
+    await ecp.sendKeypress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4, wait: 1000 });
+    await ecp.sendKeypress(ecp.Key.Ok);
+
+    // return email;
   }
 
 }

@@ -28,21 +28,7 @@ describe('Age Gate', function () {
     // Sign in
     await selectSignInFromHomeScreen();
 
-    // wait for Let's Create Your Account Modal and Continue
-    await utils.sleep(7000); // Roku modal
-    await ecp.sendKeypress(ecp.Key.Down, {wait:1000});
-    await ecp.sendKeypress(ecp.Key.Ok, {wait:1000});
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await testUtils.waitForElementToFullyShowOnScreen('emailAddressBox');
-
-    // Now we need to make our user with not registered with Tubi
-    const email = `build_roku_${Math.floor(Date.now() / 1000)}@tubi.tv`;
-
-    // Send email address
-    await ecp.sendText(email);
-    await ecp.sendKeypress(ecp.Key.Right);
-    await ecp.sendKeypress(ecp.Key.Down, { count: 4, wait: 1000});
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.completeGuestUserRegistrationFlow()
 
     // Verify Age Gate Screen
     await testUtils.waitForElementToFullyShowOnScreen('ageVerificationPad', 'age verification keypad not found', 10000);
@@ -52,7 +38,6 @@ describe('Age Gate', function () {
 
     // Verify error message
     await testUtils.waitForElementToFullyShowOnScreen('ageGateInvalidAge');
-    
 
   });
 
@@ -65,21 +50,7 @@ describe('Age Gate', function () {
     await selectSignInFromHomeScreen();
 
     // wait for Let's Create Your Account Modal and Continue
-    await utils.sleep(7000); // Roku modal
-    await ecp.sendKeypress(ecp.Key.Down, {wait:1000});
-    await ecp.sendKeypress(ecp.Key.Ok, {wait:1000});
-
-    // Create Account
-    const emailAddressBox = testUtils.waitForElementToFullyShowOnScreen('emailAddressBox');
-
-    // Now we need to make our user with not registered with Tubi
-    const email = `build_roku_${Math.floor(Date.now() / 1000)}@tubi.tv`;
-
-    // Send email address
-    await ecp.sendText(email);
-    await ecp.sendKeypress(ecp.Key.Right);
-    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.completeGuestUserRegistrationFlow()
 
     // Verify Age Gate Screen
     await testUtils.waitForElementToFullyShowOnScreen('ageVerificationPad', 'age verification keypad not found', 10000);
@@ -241,29 +212,29 @@ describe('Age Gate', function () {
   });
 });
 
-  async function openKidsMode() {
-    await ecp.sendKeypress(ecp.Key.Left);
-    await testUtils.waitForSideNavMenuToBeExpanded();
-    await testUtils.selectMenuItem('sideNavMenu', 'Kids');
-  }
+async function openKidsMode() {
+  await ecp.sendKeypress(ecp.Key.Left);
+  await testUtils.waitForSideNavMenuToBeExpanded();
+  await testUtils.selectMenuItem('sideNavMenu', 'Kids');
+}
 
-  async function exitKidsMode() {
-    await testUtils.waitForSideNavMenuToBeExpanded();
-    await testUtils.selectMenuItem('sideNavMenu', 'Exit Kids');
-  }
+async function exitKidsMode() {
+  await testUtils.waitForSideNavMenuToBeExpanded();
+  await testUtils.selectMenuItem('sideNavMenu', 'Exit Kids');
+}
 
-  async function selectSignInFromHomeScreen() {
-    // Sign in
-    await ecp.sendKeypress(ecp.Key.Left);
-    await ecp.sendKeypress(ecp.Key.Up, { count: 3 });
-    await ecp.sendKeypress(ecp.Key.Ok);
-  }
+async function selectSignInFromHomeScreen() {
+  // Sign in
+  await ecp.sendKeypress(ecp.Key.Left);
+  await ecp.sendKeypress(ecp.Key.Up, { count: 3 });
+  await ecp.sendKeypress(ecp.Key.Ok);
+}
 
-  async function verifyAgeGateScreen() {
-    await testUtils.waitForElementToShowOnScreen('ageVerificationNumberPad');
-  }
+async function verifyAgeGateScreen() {
+  await testUtils.waitForElementToShowOnScreen('ageVerificationNumberPad');
+}
 
-  async function yearsVerificationEntry() {
-    await testUtils.waitForElementToShowOnScreen('yearsVerificationEntry', 'Verification not present', 10000);
-    expect(yearsVerificationEntry).to.exist;
-  }
+async function yearsVerificationEntry() {
+  await testUtils.waitForElementToShowOnScreen('yearsVerificationEntry', 'Verification not present', 10000);
+  expect(yearsVerificationEntry).to.exist;
+}

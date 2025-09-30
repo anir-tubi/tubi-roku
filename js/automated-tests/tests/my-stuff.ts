@@ -46,6 +46,53 @@ describe('MyStuff', function () {
 
   });
 
+  // https://tubi.testrail.io/index.php?/cases/view/148846
+  it('C148846 Guest User - Selects register from Continue Watching row and creates account, @mystuff @registration', async () => {
+
+    // Start app as guest user
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Navigate to Continue Watching row as guest user - should show "Sign Up to Save Your Progress"
+    await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Continue Watching');
+
+    // Verify the Continue Watching row shows registration prompt content
+    await testUtils.waitForElementToFullyShowOnScreen('signUpToSaveProgressDescription');
+
+    // Check CW row shows the registration prompt
+    const continueWatchingRowContent = await testUtils.getCurrentlyFocusedGridItemContent('homeScreenRowList');
+    expect(continueWatchingRowContent.title).to.equal('Sign Up to Save Your Progress');
+
+    // Select the Continue Watching item - this should trigger registration flow
+    await ecp.sendKeypress(ecp.Key.Ok);
+
+    // Select register/unlock button to start registration flow
+    await shared.completeGuestUserRegistrationFlow()
+
+    // Verify Age Gate Screen
+    await testUtils.waitForElementToFullyShowOnScreen('ageVerificationPad', 'age verification keypad not found', 10000);
+
+
+    // For automation emails (@tubi.tv), the backend automatically processes the magic link
+    // Wait for the automatic verification and transition to age gate
+    await utils.sleep(5000); // Allow time for backend magic link processing
+
+    // Age gate should appear after automatic magic link verification
+    await testUtils.waitForElementToFullyShowOnScreen('ageVerificationPageHeader');
+
+    // Enter valid age (over 13)
+    await ecp.sendText('20');
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
+    await ecp.sendKeypress(ecp.Key.Ok);
+
+    // Click "Start Watching" button on age gate completion
+    await testUtils.waitForElementToFullyShowOnScreen('continueWatchingConsentPageAcceptButton');
+    await ecp.sendKeypress(ecp.Key.Ok); // Click "Start Watching"
+
+    // Should return to home screen as registered user
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for home screen after registration');
+  });
+
   // https://tubi.testrail.io/index.php?/cases/view/421098 - https://tubi.testrail.io/index.php?/cases/view/423511
   it.skip('C421098 Guest User - Selecting the my stuff menu item and registering will display the empty my stuff page, @mystuff', async () => {
 
