@@ -672,6 +672,75 @@ For example:
 
 By updating the default resource in Popper Config, it is possible to update all devices to a specific experiment experience without changing any client code.
 
+## Setting up the Statsig experiment in Statsig Console
+
+- Review the Guide
+
+Start with [Statsig Experiment User Guide](https://www.notion.so/tubi/Statsig-Experiment-User-Guide-23c72557e92080c8baccc2b782cc04d1) to understand the overall process and best practices.
+
+- Create Layer(namespace) and Experiment
+
+In the [Statsig Console](https://console.statsig.com/43UGszvUzuvL3Z3ispUMFe/home), create a Layer (namespace) to organize your parameters. Within the Layer, set up a new Experiment with a clear name, hypothesis, primary metrics and secondary metrics. Set Targeting rules, duration and experiment parameters.
+
+- Enable Environments
+
+Turn on the experiment in the required environments (e.g., development, staging, production).
+
+- Whitelist for testing (Optional)
+
+If testing is needed, whitelist device IDs to control variant assignment for roku dev/qa devices.
+
+- Launch and Verify
+
+Save, start the experiment, and validate that it’s running as expected using test devices.
+
+## Setting up the Statsig experiment within the Roku Code:
+
+- Within StatsigExperiments.brs, set up a default experiment resource. Although the Statsig experiment system can set a default value, we should still set a default resource client-side in case the app cannot communicate to the backend. Additionally, when the experiment ends, Statsig will cease to provide a resource for the experiment, so the default resource will be used as a fallback. As previously stated, the resource values provide the code a way to externalize the properties of a given experiment. Locate the defaultResources associative array within the StatsigExperiments.brs file and add the default resource associative array within the appropriate namespace.
+For example:
+
+  ```vbnet
+  defaultResources: {
+    roku_trailers: {
+      roku_trailers_v1: {
+        background: "FF0000FF",
+        delay: 5000
+        on: false
+      }
+        }
+  }
+  ```
+
+  - After you have set everything up, then you can have your code check which experiment is turned on and display to the user that experiment. To do this, you simply have to add somewhere in your code (where it makes sense) a call to the getStatsigExperimentResource() method to check if an experiment has been turned on.
+For example:
+
+  ```vbnet
+  if getStatsigExperimentResource("roku_trailers", "roku_trailers_v1", true).enabled = true then
+      ' Enable the experiment logic throughout the app
+  end if
+
+  ' Explanation:
+  ' - "roku_trailers"   -> Layer (namespace)
+  ' - "roku_trailers_v1" -> Experiment name
+  ' - 3rd parameter (true/false):
+  '     true  = exposure event will be sent
+  '     false = exposure event will not be sent
+  ```
+
+- Alternately, you can call the getStatsigExperimentResource() method to get the associative array associated with the experiment and do the appropriate things that are particular to your experiment.
+For example:
+
+  ```vbnet
+  '//Set the background color based on the experiment
+  properties = getStatsigExperimentResource("roku_trailers", "roku_trailers_v1")
+  if properties.background <> invalid
+    m.background.color = properties.background
+  end if
+  ```
+
+By updating the default resource in [Statsig Console](https://console.statsig.com/43UGszvUzuvL3Z3ispUMFe/home), it is possible to update all devices to a specific experiment experience without changing any client code.
+
+
 # Updating Code from External Sources
 
 ## Updating the Colors & Font Themes
