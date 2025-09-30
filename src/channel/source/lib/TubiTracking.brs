@@ -1429,6 +1429,7 @@ Function tubiTracking_getRepeated()
     row: -1
     col: -1
     duration: 0
+    dwell_time: 0
     content_labels: content_labels
   }
 

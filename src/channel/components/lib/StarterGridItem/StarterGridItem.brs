@@ -3,6 +3,10 @@ Function init()
 
   m.top.observeFieldScoped("itemContent", "onItemContentChange")
   m.top.observeFieldScoped("itemHasFocus", "onItemFocusChange")
+
+  ' Used for dwell time tracking
+  m.itemFocusTimespan = invalid
+
   ' List of fields that will only be observed if we have a child grid item component with that field
   m.conditionallyObservedFields = [
     "itemHasFocus"
@@ -81,60 +85,79 @@ End Function
 Function onItemFocusChange(msg)
   itemHasFocus = msg.getData()
   itemContent = m.top.itemContent
+  MIN_VISIBLE_THRESHOLD = 1000
 
   ' Track focus state and store focus-specific labels when focused
-  if m.clientTrackingInfo <> invalid AND m.clientTrackingInfo.itemInfo <> invalid AND itemHasFocus = true
+  if m.clientTrackingInfo <> invalid AND m.clientTrackingInfo.itemInfo <> invalid
     itemInfo = m.clientTrackingInfo.itemInfo
-    contentLabels = itemInfo.content_labels
+    if itemHasFocus = true
+      ' Start dwell time tracking when rowItem gains focus
+      m.itemFocusTimespan = CreateObject("roTimespan")
 
-    ' Initialize contentLabels if it doesn't exist
-    if contentLabels = invalid
-      contentLabels = {}
-    end if
+      contentLabels = itemInfo.content_labels
 
-    ' Store focus-specific labels when item gets focus
-    if isAA(itemContent.sotInfo) = true
-      sotInfo = itemContent.sotInfo
+      ' Initialize contentLabels if it doesn't exist
+      if contentLabels = invalid
+        contentLabels = {}
+      end if
 
-      ' Process metadata labels (sotMetaDataLabels) - only add if data exists
-      if isNonEmptyArray(sotInfo.sotMetaDataTopLabels) = true
-        metadataLabels = []
-        for each metaDataLabel in sotInfo.sotMetaDataTopLabels
-          if isNonEmptyString(metaDataLabel.sotLabelText)
-            metaDataLabelArray = { type: metaDataLabel.sotLabelText }
-            metadataLabels.push(metaDataLabelArray)
+      ' Store focus-specific labels when item gets focus
+      if isAA(itemContent.sotInfo) = true
+        sotInfo = itemContent.sotInfo
+
+        ' Process metadata labels (sotMetaDataLabels) - only add if data exists
+        if isNonEmptyArray(sotInfo.sotMetaDataTopLabels) = true
+          metadataLabels = []
+          for each metaDataLabel in sotInfo.sotMetaDataTopLabels
+            if isNonEmptyString(metaDataLabel.sotLabelText)
+              metaDataLabelArray = { type: metaDataLabel.sotLabelText }
+              metadataLabels.push(metaDataLabelArray)
+            end if
+          end for
+          if isNonEmptyArray(metadataLabels) = true
+            contentLabels.metadata_labels = metadataLabels
           end if
-        end for
-        if isNonEmptyArray(metadataLabels) = true
-          contentLabels.metadata_labels = metadataLabels
         end if
-      end if
 
-      ' Process metadata (sotMetaData) - only add if data exists
-      if isNonEmptyArray(sotInfo.sotMetaData) = true
-        metadata = []
-        for each mData in sotInfo.sotMetaData
-          if isNonEmptyString(mData.sotLabelText)
-            metaDataArray = { type: mData.sotLabelText }
-            metadata.push(metaDataArray)
+        ' Process metadata (sotMetaData) - only add if data exists
+        if isNonEmptyArray(sotInfo.sotMetaData) = true
+          metadata = []
+          for each mData in sotInfo.sotMetaData
+            if isNonEmptyString(mData.sotLabelText)
+              metaDataArray = { type: mData.sotLabelText }
+              metadata.push(metaDataArray)
+            end if
+          end for
+          if isNonEmptyArray(metadata) = true
+            contentLabels.metadata = metadata
           end if
-        end for
-        if isNonEmptyArray(metadata) = true
-          contentLabels.metadata = metadata
         end if
+
+        ' Process markers (sotMarkers) - only add if data exists
+        if isAA(sotInfo.sotMarkers) = true AND isNonEmptyString(sotInfo.sotMarkers.sotLabelText)
+          markerLabel = { type: sotInfo.sotMarkers.sotLabelText }
+          contentLabels.markers = [markerLabel]
+        end if
+
+        ' Store focus-specific labels for later use during impression only if there are changes
+        if isAA(contentLabels) = true AND contentLabels.count() > 0
+          itemInfo.content_labels = contentLabels
+        end if
+
+      end if
+    else if m.itemFocusTimespan <> invalid
+      ' Calculate dwell time when rowItem lost focus(Includes selected, screen change and focus move to another item in a row)
+      currentFocusTime = m.itemFocusTimespan.totalMilliSeconds()
+
+      itemInfo.totalSessionDwellTime = itemInfo.totalSessionDwellTime + currentFocusTime
+
+      ' Only set dwell_time if total accumulated time meets the minimum threshold
+      if itemInfo.totalSessionDwellTime >= MIN_VISIBLE_THRESHOLD
+        itemInfo.dwell_time = itemInfo.totalSessionDwellTime
       end if
 
-      ' Process markers (sotMarkers) - only add if data exists
-      if isAA(sotInfo.sotMarkers) = true AND isNonEmptyString(sotInfo.sotMarkers.sotLabelText)
-        markerLabel = { type: sotInfo.sotMarkers.sotLabelText }
-        contentLabels.markers = [markerLabel]
-      end if
-
-      ' Store focus-specific labels for later use during impression only if there are changes
-      if isAA(contentLabels) = true AND contentLabels.count() > 0
-        itemInfo.content_labels = contentLabels
-      end if
-
+      ' Clear the timer
+      m.itemFocusTimespan = invalid
     end if
   end if
 
@@ -143,6 +166,9 @@ End Function
 
 Function onItemContentChange(msg)
   itemContent = msg.getData()
+
+  ' Clear any active focus timer since this is new content
+  m.itemFocusTimespan = invalid
 
   if itemContent <> invalid
     gridItemType = itemContent.gridItemType
@@ -316,9 +342,13 @@ Function onItemContentChange(msg)
       col = col mod numColumns
     end if
 
+    ' dwell_time: tracks focus time for the current focus session
+    ' totalSessionDwellTime: accumulates focus time across multiple focus events within the same session
     itemInfo = {
       row: rowIndex + 1 + rowIndexBoost
       col: col + 1
+      dwell_time: 0
+      totalSessionDwellTime: 0
     }
 
     ' Build ContentLabels structure - only add arrays when data exists
@@ -412,11 +442,12 @@ Function onRenderTrackingChange(msg)
   topRef = m.top
   content = topRef.itemContent
 
+  MIN_VISIBLE_THRESHOLD = 1000
+
   ' Checking the item is of type video or series or linear only then we proceed.
   contentType = content.type
   if m.shouldTrackViewableImpressionEvent = true AND (contentType = "series" OR contentType = "video" OR contentType = "linear")
     ' Minimum visible time in milli seconds.
-    MIN_VISIBLE_THRESHOLD = 1000
 
     if state = "full"
       ' Not doing it init of the method to avoid having to create this for items that are not visible yet.
@@ -425,10 +456,12 @@ Function onRenderTrackingChange(msg)
     else if state <> "full" AND m.itemVisibleTimespan <> invalid
       duration = m.itemVisibleTimespan.totalMilliSeconds()
       row = content.getParent()
+
       if duration >= MIN_VISIBLE_THRESHOLD AND row <> invalid AND m.parentScreenId <> invalid
         if m.clientTrackingInfo <> invalid AND m.clientTrackingInfo.itemInfo <> invalid
           m.clientTrackingInfo.itemInfo.duration = duration
         end if
+
         m.global.viewableImpressionEventInfo = m.clientTrackingInfo
       end if
 
