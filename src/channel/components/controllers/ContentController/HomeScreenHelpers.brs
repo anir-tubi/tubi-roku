@@ -928,6 +928,9 @@ Function appendContentToCategory(response, contentNode, rowFocused)
       category.state = response.state
       category.appendChildren(items)
       screen.containerAppendMoreTilesStatus = "complete"
+      if m.shouldDebounceVideoTilePreview = true AND m.videoPreviewDebounce.control = "stop"
+        m.videoPreviewDebounce.control = "start"
+      end if
     end if
   end if
 End Function
@@ -1679,9 +1682,13 @@ Function setInlineVideoMetadataOverlay(featuredRowContent, columnFocused, rowFoc
   currCategory = featuredRowContent.getChild(rowFocused)
   if currCategory <> invalid
     itemContent = currCategory.getChild(columnFocused)
-    m.inlineVideoMetadataOverlay.itemContent = itemContent
+    if itemContent <> invalid
+      m.inlineVideoMetadataOverlay.itemContent = itemContent
+    end if
     m.inlineVideoMetadataOverlay.visible = true
-    m.inlineVideoGridTitleLogo.itemContent = itemContent
+    if itemContent <> invalid
+      m.inlineVideoGridTitleLogo.itemContent = itemContent
+    end if
     m.inlineVideoGridTitleLogo.visible = true
   end if
 

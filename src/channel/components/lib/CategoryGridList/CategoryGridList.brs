@@ -414,7 +414,7 @@ Function onRepopulateContent()
   end if
 
   if m.isWithDescPortraitSmallExpEnabled = true
-    rowItemFocused = [m.FeaturedRowList.currFocusRow, 0]
+    rowItemFocused = m.FeaturedRowList.rowItemFocused
   else
     rowItemFocused = m.RowList.rowItemFocused
   end if
