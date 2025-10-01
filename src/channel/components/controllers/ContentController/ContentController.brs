@@ -1,4 +1,6 @@
 Function init()
+  m.top.id = "ContentController"
+
   tubiLog("")
   tubiLog("Init Scenegraph----------------")
   m._ = rodash()
@@ -671,7 +673,7 @@ End Function
 
 
 Function setExitApp()
-  m.top.exitApp = true
+  m.top.getScene().exitApp = true
 End Function
 
 
@@ -2250,7 +2252,7 @@ Function restartApp()
   m.global.experimentsInfo = invalid
   m.global.statsigExperimentsInfo = invalid
 
-  m.top.disableInstantResume = true
+  m.top.getScene().disableInstantResume = true
   m.mainTask.control = "done"
   m.trackingLoggingTask.control = "done"
   m.generalTask.control = "done"

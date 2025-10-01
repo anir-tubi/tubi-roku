@@ -219,7 +219,8 @@ class TestUtils {
     try {
       await odc.setValue({
         base: 'scene',
-        keyPath: '#ContentController.exitApp',
+        keyPath: '',
+        field: 'exitApp',
         value: true
       }, { timeout: 1000 });
     } catch (e) {
