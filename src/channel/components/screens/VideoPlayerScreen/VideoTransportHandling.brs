@@ -194,7 +194,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
           else if m.playerControlExperimentType = "none" AND m.top.isTrailer = false
             relatedContent = m.top.browseContent
 
-            if getStatsigExperimentResource("roku_player_bww_ymal", "roku_player_bww_ymal_v1", false).enabled = true
+            if getStatsigExperimentResource("roku_player_improvement", "roku_player_bww_ymal_v1", false).enabled = true
               relatedContent = m.top.relatedContent
             else
               relatedContent = m.top.browseContent
@@ -2288,14 +2288,14 @@ End Function
 Function showBrowseWhileWatching()
   if m.top.appMode <> "KIDS_MODE" AND m.top.isTrailer = false
 
-    if getStatsigExperimentResource("roku_player_bww_ymal", "roku_player_bww_ymal_v1", false).enabled = true
+    if getStatsigExperimentResource("roku_player_improvement", "roku_player_bww_ymal_v1", false).enabled = true
       content = m.top.relatedContent
     else
       content = m.top.browseContent
     end if
 
     'fire exposure event when YMAL row is displayed at bottom area of the screen
-    if content <> invalid AND content.getChildCount() > 0 AND getStatsigExperimentResource("roku_player_bww_ymal", "roku_player_bww_ymal_v1").enabled = true
+    if content <> invalid AND content.getChildCount() > 0 AND getStatsigExperimentResource("roku_player_improvement", "roku_player_bww_ymal_v1").enabled = true
       m.BrowseWhileWatching.jumpToItem = 0
     else if content <> invalid AND content.getChildCount() > 0
       m.BrowseWhileWatching.jumpToRowItem = [0, 0]

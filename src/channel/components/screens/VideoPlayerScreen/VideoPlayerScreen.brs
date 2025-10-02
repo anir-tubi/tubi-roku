@@ -97,7 +97,7 @@ Function init()
 
   BrowseWhileWatchingRow = m.top.findNode("BrowseWhileWatchingRow")
 
-  if getStatsigExperimentResource("roku_player_bww_ymal", "roku_player_bww_ymal_v1", false).enabled = true then
+  if getStatsigExperimentResource("roku_player_improvement", "roku_player_bww_ymal_v1", false).enabled = true then
     m.BrowseWhileWatching = BrowseWhileWatchingRow.createChild("Related")
     m.BrowseWhileWatching.observeFieldScoped("selectedRelatedContentItem", "onRelatedItemSelected")
   else

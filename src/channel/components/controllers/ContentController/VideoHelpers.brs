@@ -222,7 +222,7 @@ Function setupVideoPlayer(content, playbackSource = { "srcForAnalytic": "unknown
       'Do not Fetch/Show BrowseWhileWatching row for kids mode & limited UI models
       if isKidsUIOn() = false AND m.constants.deviceInfo.limitedUi = false
 
-        if getStatsigExperimentResource("roku_player_bww_ymal", "roku_player_bww_ymal_v1", false).enabled = true
+        if getStatsigExperimentResource("roku_player_improvement", "roku_player_bww_ymal_v1", false).enabled = true
           getRelatedContent(content, handleRelatedResponseInVideoPlayer, 20)
         else
           browseContent = videoPlayer.browseContent
