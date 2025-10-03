@@ -130,6 +130,7 @@
       <field id="adTimerImpressionFire" type="boolean" value="false" alwaysNotify="true"/>
       
       <field id="featuredRowCurrFocusColumn" alias="CategoryGridList.featuredRowCurrFocusColumn" />
+      <field id="currFocusColumn" alias="CategoryGridList.currFocusColumn" />
 
       <field id="featuredListCurrFocusRow" alias="CategoryGridList.featuredListCurrFocusRow" />
 

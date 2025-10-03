@@ -9,6 +9,9 @@ Function init()
   m.global.constants = m.constants
   m.global.theme = m.constants.ui.themes.default
 
+  m.performanceMetricsTracker = PerformanceMetricsTracker()
+  m.performanceMetricsTracker.startAppLaunchMetricTiming("time_to_first_tile_focus")
+
   ' We need to create the general task in order to load our base dependencies (like experiments, remote config, etc.) but we will need to update the general task after the base dependencies are loaded.
   generalTask = createObject("roSGNode", "ControllerGeneralTask") ' initiate GeneralTask
   observeUpdateAuth(generalTask)
@@ -701,6 +704,7 @@ Function runControllerStartSequence()
     ' Wait for external config, experiments config, and Statsig config to be ready before proceeding
     tubiLog("Waiting for configs - External: " + m.isExternalConfigReady.toStr() + ", Experiments: " + m.isExperimentsConfigReady.toStr() + ", Statsig: " + m.isStatsigConfigReady.toStr())
   else if m.uiGroup = invalid then
+    m.performanceMetricsTracker.startAppLaunchMetricTiming("start_app_ui_load_after_configs")
     ' checks if the controller's UI has been added as children
     addControllerUi()
     ' checks if the startupArgs have been received from main thread
@@ -775,6 +779,7 @@ Function runControllerStartSequence()
     ' If for some reason request is delayed and completes after all the other conditions are true then we will load the home / side nav.
     ' After which it will again try to load side nav and try to attach observers twice.
   else
+    m.performanceMetricsTracker.endAppLaunchMetricTiming("start_app_ui_load_after_configs")
     ' All of the above checked values are true, so we are ready to start the channel UI
 
     ' initSideNav must run after m.global.trackingLoggingTask is set in case there are any experiments

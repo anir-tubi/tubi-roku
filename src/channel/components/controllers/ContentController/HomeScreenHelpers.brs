@@ -39,6 +39,7 @@ Function showHomeScreen(constants, screenID = "")
     '//when cached homescreen is displayed, then check UI needs to be updated
     setHomeScreenAfterFocus(homeScreen.contentFocused, homeScreen)
   else
+    m.performanceMetricsTracker.startAppLaunchMetricTiming("home_screen_tensor_request")
     showHideSpinner(true)
     homeScreen = CreateObject("roSGNode", "HomeScreen")
     homeScreen.shouldFocusWhenPushed = m.top.fadeInContentController
@@ -56,6 +57,7 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.observeFieldScoped("sponsoredRowFocused", "onHomeScreenSponsoredRowFocused")
     homeScreen.observeFieldScoped("columnFocused", "onColumnFocusChanged")
     homeScreen.observeFieldScoped("currFocusRow", "onHomeScreenRowFocusChanged")
+    homeScreen.observeFieldScoped("currFocusColumn", "onHomeScreenColumnFocusChanged")
     homeScreen.observeFieldScoped("pauseVideoPreview", "onPauseVideoPreview")
     homeScreen.observeFieldScoped("loadCategoryForIds", "onLoadCategoryForIds")
     homeScreen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
@@ -544,6 +546,8 @@ End Function
 '
 Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
   tubiLog("HomeScreenHelpers.respondToHomeScreenSuccessResponse, screenID: " + screenID)
+  m.performanceMetricsTracker.endAppLaunchMetricTiming("home_screen_tensor_request")
+  m.performanceMetricsTracker.startAppLaunchMetricTiming("home_screen_populate_content")
   homeScreen = getFromScreenCache(screenID)
   if homeScreen <> invalid
     ' Content should be structured as:
@@ -641,6 +645,7 @@ Function onHomeScreenErrorResponse(response)
     ' Updating the valid_duration.
     screen.content.validUntil = Uptime(0) + screen.content.validDuration
   end if
+  m.performanceMetricsTracker.endAppLaunchMetricTiming("home_screen_tensor_request")
 End Function
 
 
@@ -939,7 +944,8 @@ End Function
 
 Function onHomeScreenRowFocusChanged(msg)
   currFocusRow = msg.getData()
-
+  m.performanceMetricsTracker.startMetricTiming("vertical_scroll_performance")
+  screen = msg.getRoSGNode()
   if currFocusRow = CInt(currFocusRow)
     if isLinearPlayerLoadingORPlaying() = true
       '//as the rowlist is scrolling, if the the linear video player is playing or loading, then make sure the linear video player has stopped
@@ -949,14 +955,30 @@ Function onHomeScreenRowFocusChanged(msg)
     ' Avoid the focus indicator from being shown when the row is scrolling.
     fade(m.inlinePreviewFocusIndicator, "out", 0.1)
 
-    focusedContent = getCurrentScreen().contentFocused
+    focusedContent = screen.contentFocused
     if focusedContent <> invalid AND focusedContent.type = m.constants.ui.contentTypes.adRowlistSpotlight
       '//Hide the video preview when the row is scrolling.
       stopVideoPreview()
     end if
   end if
 
+  if currFocusRow = Fix(currFocusRow)
+    m.performanceMetricsTracker.endMetricTiming("vertical_scroll_performance", { row: currFocusRow, screen: screen.id })
+  end if
+
 End Function
+
+
+Function onHomeScreenColumnFocusChanged(msg)
+  currFocusColumn = msg.getData()
+  screen = msg.getRoSGNode()
+  m.performanceMetricsTracker.startMetricTiming("horizontal_scroll_performance")
+  rowFocused = screen.currFocusRow
+  if currFocusColumn = Fix(currFocusColumn)
+    m.performanceMetricsTracker.endMetricTiming("horizontal_scroll_performance", { column: currFocusColumn, row: rowFocused, screen: screen.id })
+  end if
+End Function
+
 
 
 ' setHomeScreenAfterFocus()
@@ -1457,6 +1479,8 @@ Function onHomeScreenContentUpdateComplete(screenId)
     homeScreen.setFocus(true)
   end if
 
+  m.performanceMetricsTracker.endAppLaunchMetricTiming("home_screen_populate_content")
+
   startClientImpressionTimer()
 End Function
 
@@ -1467,6 +1491,8 @@ End Function
 Function onFeaturedRowCurrFocusRowChange(msg)
   screen = msg.getRoSGNode()
   currFocusRow = msg.getData()
+  ' It will only start the timer for the first time.
+  m.performanceMetricsTracker.startMetricTiming("vertical_scroll_performance")
   updateExpandedVideoTileCurrFocusRow(currFocusRow, screen.featuredListScrollDirection)
   updateVideoTileSize(screen.featuredListScrollingStatus)
 
@@ -1497,6 +1523,10 @@ Function onFeaturedRowCurrFocusRowChange(msg)
     if currFocusRow = Fix(currFocusRow)
       checkAndSetSponsorshipBackground(screen.featuredRowContent, currFocusRow)
     end if
+  end if
+
+  if currFocusRow = Fix(currFocusRow)
+    m.performanceMetricsTracker.endMetricTiming("vertical_scroll_performance", { row: currFocusRow, screen: screen.id })
   end if
 End Function
 
@@ -1554,6 +1584,7 @@ Function onFeaturedRowCurrFocusColumnChange()
   stopCountdownTimer()
   screen = getCurrentScreen()
   if screen <> invalid
+    m.performanceMetricsTracker.startMetricTiming("horizontal_scroll_performance")
     columnFocused = screen.featuredRowCurrFocusColumn
     if isNumber(columnFocused) = false OR columnFocused < 0
       columnFocused = 0
@@ -1567,6 +1598,10 @@ Function onFeaturedRowCurrFocusColumnChange()
     if isNumber(columnFocused) = true AND isNumber(rowFocused) = true AND screen.featuredRowContent <> invalid
       category = screen.featuredRowContent.getChild(rowFocused)
       makeContainerRequest(category, columnFocused, screen, onVideoTilesListMoreItemsSuccess)
+    end if
+
+    if columnFocused = Fix(columnFocused)
+      m.performanceMetricsTracker.endMetricTiming("horizontal_scroll_performance", { column: columnFocused, row: rowFocused, screen: screen.id })
     end if
   end if
 End Function
@@ -1844,6 +1879,11 @@ End Function
 
 
 Function onCurrCategoryIdChange()
+  if m.wasAppLaunchMetricFired <> true
+    m.wasAppLaunchMetricFired = true
+    m.performanceMetricsTracker.endAppLaunchMetricTiming("time_to_first_tile_focus")
+    m.performanceMetricsTracker.logAppLaunchMetrics()
+  end if
   updateInlineVideoMetadataOverlayVisibility(0.3)
 End Function
 

@@ -35,6 +35,7 @@ Function TubiLogger(constants, request, auth, sentry = invalid)
           clientInfo: "CLIENT:INFO"
           videoInfo: "VIDEO:INFO"
           adInfo: "AD:INFO"
+          performanceMetrics: "PERFORMANCE_METRICS"
         }
       }
       warn: {
@@ -123,7 +124,7 @@ End Function
 '@level: string, (optional), possible log levels are "debug", "info", "warn", or "error"
 '@queue: roAssociativeArray, object as created by RequestQueue()
 '@samplePercent: float (optional), possible values are between 0 and 1. default is 1.0
-Function tubiLog_exception(message = "" as Dynamic, level = "exception" as String, queue = invalid as Object, samplePercent = 1.0 as Float) as void
+Function tubiLog_exception(message = "" as Dynamic, level = "exception" as String, queue = invalid as Object, samplePercent = 1.0 as Float) as Void
   m.printLogInfo(level, "", message)
 
   if m.isSampled(samplePercent) = true AND m.sentry <> invalid
@@ -242,7 +243,7 @@ Function tubiLog_sendLogging_(logInfo as Object, queue as Object)
 
       if logInfo["type"] <> invalid AND logInfo.level <> "" AND logInfo.subtype <> "" AND queue <> invalid
         'don't send debug or info statements unless the user id is in m.constants.idsToLog
-        if m.constants.idsToLog.DoesExist(m.constants.deviceInfo.deviceId) or logInfo.level = m.logConsts.warn.name or logInfo.level = m.logConsts.error.name or logInfo.level = m.logConsts.info.name
+        if m.constants.idsToLog.DoesExist(m.constants.deviceInfo.deviceId) OR logInfo.level = m.logConsts.warn.name OR logInfo.level = m.logConsts.error.name OR logInfo.level = m.logConsts.info.name
           loggingRequest = m.getLoggingRequest(logInfo)
           return queue.pushRequest(loggingRequest)
         end if
@@ -434,7 +435,7 @@ Function tubiLog_getLogPrintout_(level = "" as String, subtype = "" as String, m
   end if
 
   #if consoleLoggingIncludeTimestamp
-    lpad = Function (value, padLength = 2, padCharacter = "0")
+    lpad = Function(value, padLength = 2, padCharacter = "0")
       value = value.toStr()
       while value.len() < padLength
         value = padCharacter + value
@@ -475,7 +476,7 @@ End Function
 ' 1 means send log always, 0 means don't send log
 Function tubiLog_helper(logType, message = "" as Dynamic, level = "debug" as String, serverTypeName = "" as String, subtype = "" as String, samplePercent = 1.0 as Float) as Void
 
-  if level <> "error" and level <> "info" and level <> "warn"
+  if level <> "error" AND level <> "info" AND level <> "warn"
     level = "debug"
   end if
 

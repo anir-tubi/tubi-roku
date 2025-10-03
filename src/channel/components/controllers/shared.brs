@@ -1,5 +1,6 @@
 ' Provides a spot to put code shared between StarterController and ContentController to avoid them getting out of sync
 Function retrieveClientErrorConfig(successCallback = retrieveClientErrorConfigSuccessCallback, errorCallback = retrieveClientErrorConfigErrorCallback)
+  m.performanceMetricsTracker.startAppLaunchMetricTiming("client_error_config_request")
   ' If the global field is not set then we need to add it.
   if getClientErrorConfigFromGlobal(invalid) = invalid
     m.global.update({
@@ -42,6 +43,7 @@ Function updateAndConvertClientErrorConfig(clientErrorConfig)
   clientErrorConfig = convertClientErrorConfig(clientErrorConfig)
   m.updateGeneralTaskClientErrorConfig(clientErrorConfig)
   m.global.clientErrorConfig = clientErrorConfig
+  m.performanceMetricsTracker.endAppLaunchMetricTiming("client_error_config_request")
 End Function
 
 
@@ -73,6 +75,7 @@ End Function
 ' Performs network request to get experiments and external config.
 Function sendRequestForExperiments()
   TubiLog("sendRequestForExperiments")
+  m.performanceMetricsTracker.startAppLaunchMetricTiming("experiments_request")
   constants = m.constants
 
   if m.constants.settings.mode = "qa" AND m.constants.settings.disableExperiments = true then
@@ -83,6 +86,7 @@ Function sendRequestForExperiments()
   if getExperimentsInfoFromGlobal() <> invalid OR isMajorEventDay() = true then
     m.isExperimentsConfigReady = true
     runControllerStartSequence()
+    m.performanceMetricsTracker.endAppLaunchMetricTiming("experiments_request")
   else
     experiments = TubiExperiments({})
     experimentsRequestInfo = experiments.getNamespaceRequestInfo(constants)
@@ -101,6 +105,7 @@ End Function
 
 Function sendRequestForExternalConfig()
   TubiLog("sendRequestForExternalConfig")
+  m.performanceMetricsTracker.startAppLaunchMetricTiming("external_config_request")
 
   constants = m.constants
   externalConfig = TubiExternalConfig(constants)
@@ -111,6 +116,7 @@ Function sendRequestForExternalConfig()
     updateConstantsValuesFromExternalConfig(config)
     m.isExternalConfigReady = true
     runControllerStartSequence()
+    m.performanceMetricsTracker.endAppLaunchMetricTiming("external_config_request")
   else
     externalConfigRequestInfo = externalConfig.getConfigsRequestInfo()
     externalConfigRequestInfo.successCallback = onExternalConfigRequestSuccess
@@ -130,12 +136,14 @@ Function onExperimentsRequestSuccess(experimentsInfo)
 
   ' Statsig experiments are now initialized in parallel with Tubi experiments
   runControllerStartSequence()
+  m.performanceMetricsTracker.endAppLaunchMetricTiming("experiments_request")
 End Function
 
 
 ' Initialize Statsig experiments using encapsulated StatsigExperiments
 Function initializeStatsigExperiments()
   tubiLog("initializeStatsigExperiments")
+  m.performanceMetricsTracker.startAppLaunchMetricTiming("statsig_initialization_request")
   m.statsigExperiments = StatsigExperiments(m.constants)
 
   if m.global.hasField("statsigExperimentsInfo") = false
@@ -145,6 +153,7 @@ Function initializeStatsigExperiments()
   if m.statsigExperiments <> invalid
     m.statsigExperiments.initialize(onStatsigInitializationSuccess, onStatsigInitializationError)
   else
+    m.performanceMetricsTracker.endAppLaunchMetricTiming("statsig_initialization_request")
     TubiLog("Failed to create StatsigExperiments instance")
     'Mark isStatsigConfigReady as ready and continue startup sequence
     m.isStatsigConfigReady = true
@@ -161,6 +170,7 @@ Function onExperimentsRequestFailure(_responses)
 
   ' Statsig experiments are now initialized in parallel with Tubi experiments
   runControllerStartSequence()
+  m.performanceMetricsTracker.endAppLaunchMetricTiming("experiments_request")
 End Function
 
 
@@ -187,7 +197,7 @@ Function onExternalConfigRequestSuccess(config)
   end if
 
   m.isExternalConfigReady = true
-
+  m.performanceMetricsTracker.endAppLaunchMetricTiming("external_config_request")
   sendRequestForExperiments()
   initializeStatsigExperiments()
   retrieveSoTStaticConfig()
@@ -220,7 +230,7 @@ Function onExternalConfigRequestFailure(_error)
   updateConstantsValuesFromExternalConfig(config)
 
   m.isExternalConfigReady = true
-
+  m.performanceMetricsTracker.endAppLaunchMetricTiming("external_config_request")
   sendRequestForExperiments()
   initializeStatsigExperiments()
   retrieveSoTStaticConfig()
@@ -337,7 +347,7 @@ End Function
 
 ' This function is used to retrieve the soTStaticConfig from the tensor api.
 Function retrieveSoTStaticConfig()
-
+  m.performanceMetricsTracker.startAppLaunchMetricTiming("sot_static_config_request")
   m.makeRequest({
     url: m.constants.urls.tensor.SoTStaticConfig
     requestType: m.constants.reqNames.getSoTStaticConfig
@@ -367,6 +377,7 @@ End Function
 ' increases the time to load the app. Since SoT is nice to have and not a blocker for the app to load, we can remove this function in the future.
 Function setSoTStaticConfigComplete()
   m.soTStaticConfigComplete = true
+  m.performanceMetricsTracker.endAppLaunchMetricTiming("sot_static_config_request")
   runControllerStartSequence()
 End Function
 
@@ -388,6 +399,7 @@ Function onStatsigInitializationSuccess(successResponse)
     tubiLog("Warning: StatsigExperiments instance not available for response processing")
   end if
 
+  m.performanceMetricsTracker.endAppLaunchMetricTiming("statsig_initialization_request")
   runControllerStartSequence()
 End Function
 
@@ -409,6 +421,7 @@ Function onStatsigInitializationError(errorResponse)
     end if
   end if
 
+  m.performanceMetricsTracker.endAppLaunchMetricTiming("statsig_initialization_request")
   runControllerStartSequence()
 End Function
 

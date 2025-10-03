@@ -87,6 +87,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/StatsigExperiments.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/StatsigExperimentMixin.brs" />
   <script type="text/brightscript" uri="LinearDetailScreenHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/PerformanceMetricsTracker.brs" />
 
   <interface>
 
