@@ -192,7 +192,6 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
           if m.playerControlExperimentType = "variant1"
             setFocusToComponent(m.progressBar)
           else if m.playerControlExperimentType = "none" AND m.top.isTrailer = false
-            relatedContent = m.top.browseContent
 
             if getStatsigExperimentResource("roku_player_improvement", "roku_player_bww_ymal_v1", false).enabled = true
               relatedContent = m.top.relatedContent

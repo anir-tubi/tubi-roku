@@ -235,6 +235,8 @@ Function setupVideoPlayer(content, playbackSource = { "srcForAnalytic": "unknown
       else
         videoPlayer.browseContent = invalid
         videoPlayer.updateBrowseContent = true
+        videoPlayer.relatedContent = invalid
+        videoPlayer.updateRelatedContent = true
       end if
 
     end if
