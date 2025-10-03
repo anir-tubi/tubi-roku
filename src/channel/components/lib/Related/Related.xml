@@ -69,6 +69,7 @@
 
         <RelatedContentContainer
           id="relatedContentContainer"
+          hideTitle="false"
           translation="[0,384]"/>
 
       </Group>

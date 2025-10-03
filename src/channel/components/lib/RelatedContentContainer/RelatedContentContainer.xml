@@ -18,6 +18,7 @@
     <field id="personalizationId" type="string" />
     <field id="trackingPageInfo" type="assocarray" />
     <field id="jumpToItem" alias="grid.jumpToItem" />
+    <field id="hideTitle" alias="title.visible" />
 
     <!-- OUTPUTS -->
     <field id="navigateWithinPageInfo" type="assocarray" />
