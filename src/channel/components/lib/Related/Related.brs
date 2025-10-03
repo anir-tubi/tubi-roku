@@ -22,7 +22,6 @@ Function init()
 
   m.ymalXYPositionWhenHidden = [0, 0]
   m.ymalXYPositionWhenOpen = [0, -365]
-
 End Function
 
 
@@ -99,8 +98,6 @@ Function updateInfoPanel(infoNode, content)
   infoNode.lineOneData = lineOneData
   infoNode.lineTwoData = lineTwoData
   infoNode.description = content.description
-  infoNode.directors = content.directors
-  infoNode.starring = content.actors
   infoNode.needsLogin = (content.needsLogin = true)
 
   ' always have to do this
