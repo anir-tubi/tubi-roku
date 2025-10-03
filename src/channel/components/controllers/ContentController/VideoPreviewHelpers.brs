@@ -343,7 +343,7 @@ Function updatePreviewPlayerToInlineView()
 
     m.inlinePreviewFocusIndicator.height = playerSize[1] + 9
     m.inlinePreviewFocusIndicator.width = playerSize[0] + 12
-    m.inlinePreviewFocusIndicator.translation = [0, 0]
+    m.inlinePreviewFocusIndicator.visible = true
 
     m.videoPreviewPlayer.unObserveFieldScoped("position")
     m.videoPreviewPlayer.observeFieldScoped("position", "onInlineVideoPreviewPositionChanged")
@@ -373,28 +373,25 @@ End Function
 Function updatePreviewPlayerToAdSpotlight()
   playerSize = m.constants.ui.imageSizes.adRowlistThumbnail
   if m.isUserInVideoTilesExperiment = false
-    m.inlineVideoPreviewPlayerContainer.translation = [138, 168]
-  else
-    m.inlineVideoPreviewPlayerContainer.translation = [160, 213]
+    m.inlineVideoPreviewPlayerContainer.translation = [135, 164]
   end if
 
   m.inlineVideoMetadataOverlay.visible = false
   m.inlineVideoGridTitleLogo.visible = false
-  nSizeDiff = 6
-  m.inlinePreviewFocusIndicator.width = playerSize[0] + nSizeDiff
-  m.inlinePreviewFocusIndicator.height = playerSize[1] + nSizeDiff
-  m.inlinePreviewFocusIndicator.translation = [0, -nSizeDiff / 2]
   m.inlineVideoPreviewPlayerContainer.opacity = 1
   m.inlineVideoPreviewPlayerContainer.visible = true
-  m.inlinePreviewFocusIndicator.visible = true
-  m.inlinePreviewFocusIndicator.opacity = 1
   m.videoPreviewPlayer.reParent(m.inlineVideoPreviewPlayerContainer, false)
   m.inlinePreviewFocusIndicator.reParent(m.inlineVideoPreviewPlayerContainer, false)
 
-  videoPlayerSize = [playerSize[0], playerSize[1]]
-  m.videoPreviewPlayer.clippingRect = [0, 0, videoPlayerSize[0] - nSizeDiff, videoPlayerSize[1]]
-  resizeToLocation(m.videoPreviewPlayer, videoPlayerSize[0] - nSizeDiff, videoPlayerSize[1], [nSizeDiff, 0], 0)
+  m.videoPreviewPlayer.width = playerSize[0]
+  m.videoPreviewPlayer.height = playerSize[1]
+  m.videoPreviewPlayer.clippingRect = [0, 0, playerSize[0], playerSize[1]]
+  m.videoPreviewPlayer.translation = [5, 6]
+  m.inlinePreviewFocusIndicator.width = m.videoPreviewPlayer.width + 12
+  m.inlinePreviewFocusIndicator.height = m.videoPreviewPlayer.height + 9
   m.videoPreviewPlayer.videoPlayerType = "VIDEO_IN_GRID"
+  m.inlinePreviewFocusIndicator.visible = true
+  m.inlinePreviewFocusIndicator.opacity = 1
 End Function
 
 

@@ -1483,7 +1483,7 @@ Function getConstants()
   constants.ui.imageSizes.banner = [1693, 162]
 
   ' Sizes for the full width ad display container image. It will display within a row on the homescreen.
-  constants.ui.imageSizes.adRowlistThumbnail = [1592, 360]
+  constants.ui.imageSizes.adRowlistThumbnail = [1593, 360]
 
   constants.ui.imageSizes.adRowlistCarouselThumbnail = [118, 118]
   'Sizes of featured row  poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images

@@ -456,6 +456,7 @@ Function createHomescreenAdRequest(homescreenId, successCallback, aAdTypes = [],
     screenId: homescreenId
     adTypes: aAdTypes
     timeoutInMilliSec: adDisplayReqInfo.timeoutInMilliSec
+    isUserInVideoTilesExperiment: m.isUserInVideoTilesExperiment
   })
 End Function
 
@@ -1012,7 +1013,7 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
           ' If the content is adRowlistCarousel or adRowlistSpotlight, then set the video preview after a delay
           nAdVideoDelay = m.constants.player.videoPreviewDelayTimes.adCarousel
           if focusedContent.type = m.constants.ui.contentTypes.adRowlistSpotlight
-            updatePreviewPlayerToAdSpotlight()
+            updatePlayerLayoutBasedOnFocusedContent(focusedContent)
             nAdVideoDelay = m.constants.player.videoPreviewDelayTimes.adSpotlight
             stopVideoPreview()
           end if
@@ -1593,8 +1594,10 @@ Function updateVideoTileOnFocusChange(rowFocused, columnFocused, screen)
     displayDefaultBackground()
   end if
 
-  if screen <> invalid AND screen.featuredRowContent <> invalid AND arrayIncludes(m.constants.ui.adGridItemTypes, gridItemType) = false
-    pauseVideoPreviewAndShowPoster()
+  if screen <> invalid AND screen.featuredRowContent <> invalid
+    if arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, gridItemType) = false
+      pauseVideoPreviewAndShowPoster()
+    end if
     setInlineVideoMetadataOverlay(screen.featuredRowContent, columnFocused, rowFocused)
   end if
 End Function

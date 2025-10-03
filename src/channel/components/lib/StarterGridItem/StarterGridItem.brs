@@ -208,6 +208,8 @@ Function onItemContentChange(msg)
       childGridItemComponent = "LiveEventsContainer"
     else if gridItemType = "liveEventBanner"
       childGridItemComponent = "Banner"
+    else if gridItemType = "adRowlistSpotlight" OR gridItemType = "adRowlistCarousel"
+      childGridItemComponent = "AdContainer"
     else if itemContent.needsLogin = true
       childGridItemComponent = "CategoryGridPoster"
     else
@@ -234,25 +236,6 @@ Function onItemContentChange(msg)
       sPosterURL = itemContent.HDGRIDPOSTERURL
       m.poster.uri = sPosterURL
       m.poster.visible = true
-
-      if gridItemType = "adRowlistSpotlight" OR gridItemType = "adRowlistCarousel"
-        ' If the gridItemType is an ad Type, then add an "AD" image to the UI
-        m.adIndicator = createObject("roSgNode", "TextIcon")
-        m.adIndicator.padding = "[16, 9]"
-        m.adIndicator.translation = [12, 12]
-        m.adIndicator.uri = "pkg:/images/tag-rounded-rectangle-background-pull-$$RES$$.9.png"
-        typographyConstants = getTypographyConstants()
-        setTypographyOfLabel(m.adIndicator, typographyConstants.ids.bodyExtraSmallStrong)
-        m.adIndicator.text = getTranslation("ad")
-
-        setThemeColors()
-        m.top.appendChild(m.adIndicator)
-      else
-        if m.adIndicator <> invalid
-          m.top.removeChild(m.adIndicator)
-          m.delete("adIndicator")
-        end if
-      end if
     else
       m.poster.visible = false
       if m.childGridItem = invalid then

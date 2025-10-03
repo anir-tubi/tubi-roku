@@ -145,6 +145,7 @@ Function parseHomeScreenAdsSuccess(fullResponse, reqInfo)
   if reqInfo.adTypes <> invalid
     requestedAdTypes = reqInfo.adTypes
   end if
+  isUserInVideoTilesExperiment = reqInfo.isUserInVideoTilesExperiment
   aReturnAds = []
   if isNonEmptyArray(requestedAdTypes) AND parsedResponse <> invalid AND isAA(parsedResponse.ads) AND isAA(parsedResponse.ads.ad_units)
     ad_units = parsedResponse.ads.ad_units
@@ -193,7 +194,7 @@ Function parseHomeScreenAdsSuccess(fullResponse, reqInfo)
               background = assets[key]
               index = key.split("background_")[1]
               tile = assets["tile_" + index.toStr()]
-              carouselTile = parseCarouselTile(background, tile)
+              carouselTile = parseCarouselTile(background, tile, isUserInVideoTilesExperiment)
               if carouselTile <> invalid
                 carousel.push(carouselTile)
               end if
@@ -252,7 +253,7 @@ Function parseHomeScreenAdsSuccess(fullResponse, reqInfo)
           aReturnAds.push(carouselNode)
         else if adType = m.constants.adTypes.adRowlistSpotlight AND adUnit.rendering_code = m.constants.ui.categoryIds.adRowlistSpotlight
           '//process the spotlight ad response
-          aReturnAds.push(processSpotlightAdContent(adID, assets, validUntil, aImageTracking))
+          aReturnAds.push(processSpotlightAdContent(adID, assets, validUntil, aImageTracking, isUserInVideoTilesExperiment))
         end if
       end for
     end if
@@ -269,9 +270,10 @@ End Function
 ' @assets: assocArray, The assets associated with the ad.
 ' @validUntil: Integer, The time that the ad is valid until.
 ' @returnedImageTracking: Array, optional Image tracking data. Default is an empty array.
+' @isInVideoTilesFormat: boolean, optional Whether the ad is in video tiles format. Default is false.
 '
 ' @returns: object, An object containing processed spotlight ad content.
-Function processSpotlightAdContent(sAdID, assets, validUntil, returnedImageTracking = []) as Object
+Function processSpotlightAdContent(sAdID, assets, validUntil, returnedImageTracking = [], isUserInVideoTilesExperiment = false) as Object
 
   returnedAssetBgroundImage = assets.background_image
   returnedAssetPosterImage = assets.poster_image
@@ -339,6 +341,10 @@ Function processSpotlightAdContent(sAdID, assets, validUntil, returnedImageTrack
   rowContentNode.validUntil = validUntil
   translatedThumb.validUntil = validUntil
 
+  rowContentNode.update({
+    useVideoTilesFormat: isUserInVideoTilesExperiment
+  }, true)
+
   rowContentNode.appendChild(translatedThumb)
 
   return rowContentNode
@@ -346,7 +352,7 @@ End Function
 
 
 ' Helper function of parseHomeScreenAdsSuccess() to parse a carousel tile from the ad response.
-Function parseCarouselTile(background, tile)
+Function parseCarouselTile(background, tile, isUserInVideoTilesExperiment = false)
   ' Check if both background and tile are valid associative arrays with non-empty URLs
   if isAA(background) AND isNonEmptyString(background.url) AND isAA(tile) AND isNonEmptyString(tile.url)
     tileURL = m.metadataTranslate.getRoundedCornersURL(tile.url, 8)
@@ -359,6 +365,10 @@ Function parseCarouselTile(background, tile)
     node.backgrounds = [background.url]
     imageURL = tileURL
     node.hdgridposterurl = imageURL
+
+    node.update({
+      useVideoTilesFormat: isUserInVideoTilesExperiment
+    }, true)
 
     return node
   else
