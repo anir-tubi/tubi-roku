@@ -542,7 +542,7 @@ function sideLoad(done) {
     .then(() => {
       let { settings } = load(options);
 
-      if (!settings.useStarterComponents) {
+      if (!settings.useStarterComponents && !settings.useRemoteComponents) {
         done();
       } else {
         return server({
