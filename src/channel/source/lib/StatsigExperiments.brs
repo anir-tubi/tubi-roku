@@ -38,9 +38,9 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
       roku_home_screen_redesign: {
         roku_home_screen_redesign_v_1_6: {
           ' default: { "design_type": "withDescriptionPortraitSmall", should_debounce: false, gridItemSize: [310, 442], featuredRowPosterSize: [788, 442], variant: "billboard", should_dim: true }
-          default: { "design_type": "none", should_debounce: false, gridItemSize: [], featuredRowPosterSize: [], variant: "", should_dim: false }
-          holdout_control: { "design_type": "none", should_debounce: false, gridItemSize: [], featuredRowPosterSize: [], should_dim: false }
-          holdout_winning: { "design_type": "none", should_debounce: false, gridItemSize: [], featuredRowPosterSize: [], should_dim: false }
+          default: { "design_type": "none", should_debounce: false, gridItemSize: [], featuredRowPosterSize: [], variant: "", should_dim: false, debounce_time: 0 }
+          holdout_control: { "design_type": "none", should_debounce: false, gridItemSize: [], featuredRowPosterSize: [], should_dim: false, debounce_time: 0 }
+          holdout_winning: { "design_type": "none", should_debounce: false, gridItemSize: [], featuredRowPosterSize: [], should_dim: false, debounce_time: 0 }
         }
       }
 

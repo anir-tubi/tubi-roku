@@ -133,6 +133,15 @@ Function addControllerUi()
 
   m.inlinePreviewPlayerFadeAnimation = invalid
 
+  debounceTime = m.constants.player.videoPreviewDelayTimes.videoTiles
+  if m.isUserInVideoTilesExperiment AND isNumber(experiment.debounce_time)
+    debounceTime = experiment.debounce_time
+  end if
+  m.videoPreviewDebounce = CreateObject("roSGNode", "Timer")
+  m.videoPreviewDebounce.duration = debounceTime
+  m.videoPreviewDebounce.observeFieldScoped("fire", "startDebouncedVideoPreview")
+
+
   updateVideoTileSize()
 
   m.LinearPlayerGroup = m.top.findNode("LinearPlayerGroup")
@@ -357,11 +366,6 @@ Function addControllerUi()
 
   ' This needs to go last as this will immediately call runControllerStartSequence if not logged in and we want all the initial state to be setup before this happens
   getUserInfo(onStartupAuthInfoReceived)
-
-
-  m.videoPreviewDebounce = CreateObject("roSGNode", "Timer")
-  m.videoPreviewDebounce.duration = m.constants.player.videoPreviewDelayTimes.videoTiles
-  m.videoPreviewDebounce.observeFieldScoped("fire", "startDebouncedVideoPreview")
 End Function
 
 

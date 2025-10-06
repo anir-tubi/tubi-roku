@@ -1095,7 +1095,7 @@ Function getConstants()
 
   'The number of seconds to debounce/delay the video preview from playing
   constants.player.videoPreviewDelayTimes = {}
-  constants.player.videoPreviewDelayTimes.videoTiles = 0.5
+  constants.player.videoPreviewDelayTimes.videoTiles = 1
   constants.player.videoPreviewDelayTimes.adCarousel = 3
   constants.player.videoPreviewDelayTimes.adSpotlight = 1
 
