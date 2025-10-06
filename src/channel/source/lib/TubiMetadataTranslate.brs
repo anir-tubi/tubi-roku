@@ -1713,7 +1713,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
               featuredLandscape: featuredLandscape
               sotPosterLabels: sotPosterLabels
               sotInfo: sotInfo
-              hasCC: (fullChild.hasSubtitles = true OR fullChild.has_subtitle = true OR (fullChild.subtitleTracks <> invalid AND fullChild.subtitleTracks.isEmpty() = false))
+              hasSubtitles: (fullChild.hasSubtitles = true OR fullChild.has_subtitle = true OR (fullChild.subtitleTracks <> invalid AND fullChild.subtitleTracks.isEmpty() = false))
               gridItemType: parentGridItemType
               billboardImageUrl: billboardImageUrl
               availabilityEnds: fullChild.availability_ends

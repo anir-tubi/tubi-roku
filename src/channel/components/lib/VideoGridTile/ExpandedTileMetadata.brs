@@ -279,7 +279,7 @@ Function metadataOnPosterContent(itemContent)
     ratingSotParent.removeChild(m.sotBadge)
   end if
 
-  if itemContent.hascc = true
+  if itemContent.hasSubtitles = true
     m.closedCaptions.visible = true
   else
     m.closedCaptions.visible = false

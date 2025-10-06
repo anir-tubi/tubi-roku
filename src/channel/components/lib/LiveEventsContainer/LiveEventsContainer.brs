@@ -121,7 +121,7 @@ Function onItemContentChange()
       m.genres.text = genres[0]
     end if
 
-    m.closedCaptions.visible = (itemContent.hasCC = true)
+    m.closedCaptions.visible = (itemContent.hasSubtitles = true)
 
     m.contentSection.opacity = 1.0
 
