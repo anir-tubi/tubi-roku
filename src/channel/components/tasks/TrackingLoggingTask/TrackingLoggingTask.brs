@@ -90,7 +90,7 @@ End Function
 '           type: string, corresponds to one of the eventTypes found in m.tracking.getAnalyticsEvent()
 '           values: assocArray, fields that correspond to the fields specified for the eventType in m.tracking.getAnalyticsEvent()
 Function trackSceneGraphRealtimeEvent(evtData)
-  if evtData <> invalid AND isAA(evtData) = true
+  if evtData <> invalid AND isAA(evtData) = true AND m.constants.settings.realtimeMetricsEnabled = true then
     m.tracking.trackRealtimeEvent(evtData, m.queue) 'creates a request and adds it to the requestQueue
   end if
 End Function

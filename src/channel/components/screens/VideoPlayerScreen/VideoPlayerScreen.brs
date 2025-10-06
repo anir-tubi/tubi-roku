@@ -1047,9 +1047,7 @@ Function onControlChange()
     updatePlayerLogLib(m.playerLogLib, "fireQualityOfServiceEvent", m.adImpressionMap)
     m.adImpressionMap = { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0 } 'reset adImpressionMap after sending QualityOfService event
 
-    if m.constants.settings.realtimeMetricsEnabled = true
-      updatePlayerLogLib(m.playerLogLib, "fireRealtimeQoSEvent")
-    end if
+    updatePlayerLogLib(m.playerLogLib, "fireRealtimeQoSEvent")
 
     updatePlayerLogLib(m.playerLogLib, "setVideoStateWhenExitingPlayer", m.video.state)
     updatePlayerLogLib(m.playerLogLib, "setPlayerStateWhenExitingPlayer", m.top.state)

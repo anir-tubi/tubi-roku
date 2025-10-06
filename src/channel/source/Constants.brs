@@ -728,6 +728,7 @@ Function getConstants()
 
   constants.urls.realtime.increment = constants.urls.realtime.urlBase + "/metric/increment"
   constants.urls.realtime.distribution = constants.urls.realtime.urlBase + "/metric/distribution"
+  constants.urls.realtime.log = constants.urls.realtime.urlBase + "/log"
 
   constants.urls.impressionEvents = {}
   constants.urls.impressionEvents.urlBase = "https://user-signals.staging-public.tubi.io/user-signals"

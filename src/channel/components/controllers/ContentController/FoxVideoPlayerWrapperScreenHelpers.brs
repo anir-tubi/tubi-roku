@@ -130,6 +130,7 @@ Function onFoxVideoPlayerComponentLibraryLoadStatus(msg)
   else if status = "failed" then
     m.isFoxPlayerLoadRequired = true
     tubiLog("Fox video player component library failed to load")
+    sendFoxPlayerErrorBeforePlayEvent("Fox video player component library failed to load")
     closeFoxVideoPlayer()
   end if
 End Function
@@ -869,6 +870,7 @@ End Function
 
 
 Function retrieveFoxListingResponseError(response)
+  sendFoxPlayerErrorBeforePlayEvent("Listing load error:" + formatJson(response))
   closeFoxVideoPlayer()
 End Function
 
@@ -888,4 +890,22 @@ Function findFoxLiveProgram(listing)
   end if
 
   return invalid
+End Function
+
+
+Function sendFoxPlayerErrorBeforePlayEvent(message)
+  event = {
+    "increment": [{
+      "metric": "web_ott.performance.metrics.seaTiger.errorBeforePlay",
+      "value": 1
+    }]
+
+    "log": [{
+      "message": "seatiger_playback: " + message
+      "level": "error"
+    }]
+
+  }
+
+  m.trackingLoggingTask.trackRealtimeEvent = event
 End Function

@@ -1518,29 +1518,35 @@ End Function
 
 '@trackData: assocArray, object returned from m.generateQoSRealtimeMetrics()
 '@requestQueue: assocArray, a request queue as returned by TubiRequestQueue().create()
-Function tubiTracking_trackRealtimeEvent(trackData, requestQueue)
-  incrementData = trackData.increment
-  incrementRequestUrl = m.constants.urls.realtime.increment
-  incrementRealtimeRequest = invalid
-
-  if isNonEmptyArray(incrementData) = true
-    incrementRealtimeRequest = m.getRealtimeTrackingRequest(incrementData, incrementRequestUrl)
+Function tubiTracking_trackRealtimeEvent(trackData, requestQueue) as Void
+  if requestQueue = invalid then
+    print "Request queue is invalid. Cannot send realtime event"
+    return
   end if
 
-  if incrementRealtimeRequest <> invalid AND requestQueue <> invalid
-    requestQueue.pushRequest(incrementRealtimeRequest)
+  incrementData = trackData.increment
+  if isNonEmptyArray(incrementData) = true then
+    incrementRealtimeRequest = m.getRealtimeTrackingRequest(incrementData, m.constants.urls.realtime.increment)
+
+    if incrementRealtimeRequest <> invalid then
+      requestQueue.pushRequest(incrementRealtimeRequest)
+    end if
   end if
 
   distributionData = trackData.distribution
-  distributionRequestUrl = m.constants.urls.realtime.distribution
-  distributionRealtimeRequest = invalid
-
-  if isNonEmptyArray(distributionData) = true
-    distributionRealtimeRequest = m.getRealtimeTrackingRequest(distributionData, distributionRequestUrl)
+  if isNonEmptyArray(distributionData) = true then
+    distributionRealtimeRequest = m.getRealtimeTrackingRequest(distributionData, m.constants.urls.realtime.distribution)
+    if distributionRealtimeRequest <> invalid then
+      requestQueue.pushRequest(distributionRealtimeRequest)
+    end if
   end if
 
-  if distributionRealtimeRequest <> invalid AND requestQueue <> invalid
-    requestQueue.pushRequest(distributionRealtimeRequest)
+  logData = trackData.log
+  if isNonEmptyArray(logData) = true then
+    logRealtimeRequest = m.getRealtimeTrackingRequest(logData, m.constants.urls.realtime.log)
+    if logRealtimeRequest <> invalid then
+      requestQueue.pushRequest(logRealtimeRequest)
+    end if
   end if
 End Function
 
