@@ -2,8 +2,6 @@
 <!-- Extend the ContentNode so we can add some custom fields -->
 <component name = "SkinAdContentNode" extends="AdContentNode">
   <interface>
-    <!-- url of the footer image to be displayed when the app is sponsored -->
-    <field id="footerImageUrl" type="string"/>
 
     <!-- The background color to be displayed on the homescreen when the app is sponsored  -->
     <field id="bgColor" type="string"/>

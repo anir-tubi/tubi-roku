@@ -34,6 +34,7 @@ Function CmsApi(constants, apiUtils, experiments = invalid, statSigExperiments =
     setTupianBackgroundParam: cmsApi_setTupianBackgroundParam
     getWindowInfo: cmsApi_getWindowInfo
     getFullCategoryId: cmsApi_getFullCategoryId
+    generateAdUnitFromAdType: cmsApi_generateAdUnitFromAdType
   }
 
   cmsApi = {}
@@ -198,17 +199,6 @@ Function cmsApi_createAdHomescreenDisplayContainerReqInfo(adTypes = [], appMode 
     "user-agent": m.constants.deviceInfo.userAgent
   })
 
-  aHomescreenBgroundCodes = []
-  for each adType in adTypes
-    if adType = m.constants.adTypes.adRowlistSpotlight
-      aHomescreenBgroundCodes.push(m.constants.ui.categoryIds.adRowlistSpotlight)
-    else if adType = m.constants.adTypes.adRowlistCarousel
-      aHomescreenBgroundCodes.push(m.constants.ui.categoryIds.adRowlistCarousel)
-    else if adType = m.constants.adTypes.skinAd
-      '//::TODO:: add skinAd wrapper rendering code(s).
-    end if
-  end for
-
   nResolution = m.constants.deviceInfo.videoMode.toInt()
   videoResolutionID = m.constants.player.videoResolution[nResolution.toStr()]
   if videoResolutionID = invalid OR videoResolutionID = m.constants.player.videoResolution.unknown OR videoResolutionID = m.constants.player.videoResolution["AUTO"]
@@ -240,18 +230,19 @@ Function cmsApi_createAdHomescreenDisplayContainerReqInfo(adTypes = [], appMode 
       width: m.constants.deviceInfo.displayWidth
       height: m.constants.deviceInfo.displayHeight
     }
-    ad_units: {
-      hdc_row: {
-        sizes: {
-          rendering_codes: aHomescreenBgroundCodes
-        }
-      }
-    }
     custom_kvps: {
       app_mode: appMode
     }
 
   }
+
+  '//Add the ad units to the request body
+  adUnits = {}
+  for each adType in adTypes
+    adUnits = m.generateAdUnitFromAdType(adType, adUnits)
+  end for
+  body.ad_units = adUnits
+
   bodyJson = FormatJSON(body)
   return {
     url: m.constants.urls.adShowcase
@@ -262,6 +253,45 @@ Function cmsApi_createAdHomescreenDisplayContainerReqInfo(adTypes = [], appMode 
     }
     timeoutInMilliSec: 5000
   }
+End Function
+
+
+' Generates an ad unit based on the specified ad type. Helper function for cmsApi_createAdHomescreenDisplayContainerReqInfo()
+'
+' @param sAdType, string: The type of ad to generate the ad unit for.
+' @param aaAdUnits, assocArray: The list of available ad units.
+' @return assocArray: returns the passed aaAdUnits but with the ad unit for the specified sAdType added to it.
+Function cmsApi_generateAdUnitFromAdType(sAdType, aaAdUnits)
+  if sAdType = m.constants.adTypes.skinAd
+    aaAdUnits.tubi_app_homepage = {
+      sizes: {
+        rendering_codes: ["wrapper"]
+      }
+    }
+    aaAdUnits.homepage_video = {
+      sizes: {
+        rendering_codes: ["wrapper_video"]
+      }
+    }
+  else if sAdType = m.constants.adTypes.adRowlistSpotlight OR sAdType = m.constants.adTypes.adRowlistCarousel
+    if sAdType = m.constants.adTypes.adRowlistCarousel
+      renderingCode = m.constants.ui.categoryIds.adRowlistCarousel
+    else
+      renderingCode = m.constants.ui.categoryIds.adRowlistSpotlight
+    end if
+
+    if aaAdUnits <> invalid AND aaAdUnits.hdc_row <> invalid AND aaAdUnits.hdc_row.sizes <> invalid AND aaAdUnits.hdc_row.sizes.rendering_codes <> invalid
+      aaAdUnits.hdc_row.sizes.rendering_codes.push(renderingCode)
+    else
+      aaAdUnits.hdc_row = {
+        sizes: {
+          rendering_codes: [renderingCode]
+        }
+      }
+    end if
+  end if
+
+  return aaAdUnits
 End Function
 
 

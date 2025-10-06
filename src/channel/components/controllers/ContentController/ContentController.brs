@@ -1736,12 +1736,6 @@ Function setSponsorshipBackground(url)
 End Function
 
 
-' @url: string, The URL of the Sponsorship Background
-Function setSponsorshipFooter(url)
-  m.SponsorFooter.uri = url
-End Function
-
-
 ' Setting a new background color. Usually this is not called unless there is a special case: i.e. sponsorship requiring different background color
 ' @sColor: string, The color that the background should be.
 Function setBackgroundColor(sColor)

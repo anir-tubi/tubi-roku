@@ -358,6 +358,8 @@ Function fetchHomeScreen(homeScreen, useCache = false)
           '//If this is no longer in the experiment and the ads_ott_hdc_adformats_v1 experiment has been graduated, then request both ad types and let the backend decide which ad type(s) to return
           ' aAdTypes = [m.constants.adTypes.adRowlistCarousel, m.constants.adTypes.adRowlistSpotlight]
 
+          aAdTypes.push(m.constants.adTypes.skinAd) '//Also request the skin ad unit
+
           createHomescreenAdRequest(homeScreen.id, onHomesceenAdDisplaySuccessResponse, aAdTypes, onHomesceenAdDisplayErrorResponse)
         else
           'If not in experiment, then indicate that the adContentUpdated flag is true so that ads are not waited on when loading homescreen content
@@ -502,6 +504,28 @@ Function onHomesceenAdDisplaySuccessResponse(response)
     homeScreen.adContent = response
   end if
   homeScreen.adContentUpdated = true
+
+  skinAdsWrapper = invalid
+  for each adResponse in response
+    if adResponse <> invalid AND adResponse.type = m.constants.ui.contentTypes.skinAd
+      skinAdsWrapper = adResponse
+    end if
+  end for
+  isSkinAdsAvailable = (isKidsUIOn() = false AND skinAdsWrapper <> invalid)
+  if isSkinAdsAvailable = true AND getExperimentResource("ads_tubi_skins", "ads_tubi_skins_v1", true).enabled = true
+    '//If this is a valid skinAds wrapper, then check if it is part of the experiment.
+    '//As long as a valid skin wrapper is returned, fire the experiment's exposure event here, regardless.
+    homeScreen.skinAdContent = skinAdsWrapper
+
+    ' Do not display video tile overlay group if the skin ads is available.
+    ' This is needed because we refresh home screen behind the scenes during parent controls change.
+    m.videoTileOverlayGroup.visible = false
+  else
+    homeScreen.skinAdContent = invalid
+  end if
+  homeScreen.skinAdContentUpdated = true
+
+
   checkIfHomeScreenContentIsReady(homeScreen)
 End Function
 
@@ -517,27 +541,39 @@ End Function
 
 Function checkIfHomeScreenContentIsReady(homeScreen)
   sID = homeScreen.id
+  bIsHomeScreen = (sID = m.constants.ui.screenIds.homeScreen)
   '//Check if ad content has loaded, but only for the default homescreen type. The other homescreen types do not have ad content. (Note that adContentUpdated will be true even if backend responds that there is no ad content)
-  bAdContentLoaded = (sID = m.constants.ui.screenIds.homeScreen AND homeScreen.adContentUpdated = true) OR sID <> m.constants.ui.screenIds.homeScreen
-  if bAdContentLoaded = true AND (homeScreen.content <> invalid OR homeScreen.featuredRowContent <> invalid)
-    '//Once all the homescreen content is ready, then display the homescreen
-    if homeScreen.adContent <> invalid
-      adContent = homeScreen.adContent
+  bAdContentLoaded = (bIsHomeScreen = true AND homeScreen.adContentUpdated = true)
+  bContentLoaded = (homeScreen.content <> invalid) OR (homeScreen.featuredRowContent <> invalid)
 
+  bHomeScreenContentReady = false
+  if bContentLoaded = true
+    if bIsHomeScreen = false
+      ' For non-default homeScreens, we do not have ad content to wait for, so just indicate that the homescreen content is ready
+      bHomeScreenContentReady = true
+    else if bAdContentLoaded = true
+      bHomeScreenContentReady = true
+
+      adContent = homeScreen.adContent
       if homeScreen.content <> invalid
         homescreenContent = homeScreen.content
       else
         homescreenContent = homeScreen.featuredRowContent
       end if
+
       ' Insert each node into homeScreen.content at rowPlacement index
       for each node in adContent
-        '//assume the parser had reverse ordered the nodes based on rowPlacement, so we place the ads in the proper row
-        homescreenContent.insertChild(node, node.rowPlacement)
+        if node <> invalid AND node.type <> m.constants.ui.contentTypes.skinAd
+          homescreenContent.insertChild(node, node.rowPlacement)
+        end if
       end for
     end if
 
-    onHomeScreenContentUpdateComplete(homeScreen.id)
+    if bHomeScreenContentReady = true
+      onHomeScreenContentUpdateComplete(sID)
+    end if
   end if
+
 End Function
 
 
@@ -563,14 +599,6 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     '      ...
     '   </CategoryContentNode>
     ' </CategoryContentNode>
-
-    ads = rawResponse.ads
-    isSkinAdsAvailable = isKidsUIOn() = false AND ads <> invalid
-    if isSkinAdsAvailable = true
-      updateSkinAdRowContent(homeScreen, ads)
-    else
-      updateSkinAdRowContent(homeScreen, invalid)
-    end if
 
     homeScreen.personalizationId = rawResponse.personalizationId
     homeScreen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
@@ -1074,8 +1102,6 @@ Function setUIBasedOnFocusedContent(focusedContent)
           showHideLogoBasedOnUiMode(skinAdContent.titleImageUrl, skinAdContent.titlePrefix)
         end if
 
-        '//set the footer image while the homescreen is visible
-        setSponsorshipFooter(skinAdContent.footerImageUrl)
         setBackgroundColor(skinAdContent.bgColor)
       end if
     end if
@@ -1423,46 +1449,6 @@ Function hasRegModalBeenShown()
   end if
 
   return true
-End Function
-
-
-' @param homeScreen, roSGNode - The HomeScreen component that contains the focused content.
-' @param content, roSGNode - The ContentNode for the skin item.
-Function updateSkinAdRowContent(homeScreen, content)
-  tubiLog("HomeScreenHelpers.updateSkinAdRowContent")
-
-  if content <> invalid AND (isNonEmptyString(content.title) = true OR isNonEmptyString(content.titleImageUrl) = true) AND isNonEmptyString(content.id) = true AND (isNonEmptyString(content.videoPreviewUrl) = true OR (isNonEmptyArray(content.backgrounds) = true AND isNonEmptyString(content.backgrounds[0]) = true)) AND isNonEmptyString(content.HDGRIDPOSTERURL) = true
-    '//If this is a valid skinAds wrapper, then check if it is part of the experiment.
-    '// Fire the experiment's exposure event here, regardless.
-    if m.constants.settings.disableSkinAds = false AND getExperimentResource("ads_tubi_skins", "ads_tubi_skins_v1", true).enabled = true
-      '//proceed if the content is valid and has the mandatory fields
-      rowContentNode = CreateObject("roSGNode", "SkinAdContentNode")
-      rowContentNode.id = content.id
-      rowContentNode.type = m.constants.ui.contentTypes.skinAd
-      rowContentNode.footerImageUrl = content.footerImageUrl
-      rowContentNode.bgColor = content.bgColor
-      rowContentNode.title = content.title
-      rowContentNode.titleImageUrl = content.titleImageUrl
-      rowContentNode.titlePrefix = content.titlePrefix
-      rowContentNode.gridItemType = m.constants.ui.gridItemTypes.skinAd
-      rowContentNode.description = content.description
-      rowContentNode.subDescription = content.subDescription
-      rowContentNode.qrCodeUrl = content.qrCodeUrl
-      rowContentNode.adInfo = content.adInfo
-      rowContentNode.imageImpTracking = content.imageImpTracking
-
-      categoryContentNode = CreateObject("roSGNode", "CategoryContentNode")
-      categoryContentNode.id = m.constants.ui.categoryIds.skinAd
-      categoryContentNode.appendChild(content)
-      rowContentNode.appendChild(categoryContentNode)
-      homeScreen.skinAdContent = rowContentNode
-      homeScreen.skinAdContentUpdated = true
-    end if
-  else
-    homeScreen.skinAdContent = invalid
-    homeScreen.skinAdContentUpdated = true
-  end if
-
 End Function
 
 

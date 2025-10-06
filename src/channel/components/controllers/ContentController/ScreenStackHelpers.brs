@@ -53,7 +53,6 @@ End Function
 Function resetScreenStack()
   m.sentSponsorPixels = {} '//refresh this associative array that keeps track of the viewing of the sponsor images. Only send out the sponsor pixels once per page load so refresh upon an unloading of a screen.
   setSponsorshipBackground("") '//reset the sponsorship background whenever a screen needs to be reset
-  setSponsorshipFooter("") '//reset the sponsorship footer whenever a screen stack needs to be reset
   setBackgroundColor("") '//reset the background color whenever a screen stack needs to be reset
 End Function
 

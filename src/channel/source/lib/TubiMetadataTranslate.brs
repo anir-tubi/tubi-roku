@@ -9,7 +9,6 @@ Function TubiMetadataTranslate(constants, experiments = invalid, soTStaticConfig
     translateContainer: tubiMetadataTranslate_translateContainer
     translateCategoryDetails: tubiMetadataTranslate_translateCategoryDetails
     translateHomescreen: tubiMetadataTranslate_translateHomescreen
-    translateAds: tubiMetadataTranslate_translateAds
     translateMiniHomescreen: tubiMetadataTranslate_translateMiniHomescreen
     translateCategoriesListScreen: tubiMetadataTranslate_translateCategoriesListScreen
     translateEPGChannelIds: tubiMetadataTranslate_translateEPGChannelIds
@@ -905,82 +904,6 @@ Function tubiMetadataTranslate_translateRelatedContent(contentFromServer, isSign
   end if
 
   return translated
-End Function
-
-
-'@ads: array, ads received from homescreen response
-Function tubiMetadataTranslate_translateAds(ads = []) as Object
-  tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateAds")
-  skinAdContent = invalid
-  isNativeCustomVideoPresent = false
-  isVideoAdPresent = false
-
-  for each ad in ads
-    creatives = ad.creatives
-
-    if isNonEmptyArray(creatives) = true
-
-      for each creative in creatives
-
-        if isAA(creative) = true AND creative.type = "native_custom_video"
-          isNativeCustomVideoPresent = true
-
-          if skinAdContent = invalid
-            skinAdContent = CreateObject("roSGNode", "SkinAdContentNode")
-          end if
-
-          skinAdContent.bgColor = creative.color
-          skinAdContent.backgrounds = [creative.image]
-
-          custom = creative.custom
-          if isAA(custom) = true
-            width = m.constants.ui.imageSizes.skinAdLandscape[0].toStr()
-            posterUrl = replaceURLParameter(custom.tile_img, "w", width, true)
-            skinAdContent.HDGRIDPOSTERURL = m.getRoundedCornersURL(posterUrl, 8)
-            skinAdContent.footerImageUrl = custom.footer_img
-          end if
-
-          offer = creative.offer
-          if isAA(offer) = true
-            skinAdContent.titleImageUrl = offer.logo
-            skinAdContent.title = offer.logo_text
-            skinAdContent.titlePrefix = offer.title
-            skinAdContent.description = offer.body
-            skinAdContent.subDescription = offer.cta
-            skinAdContent.qrCodeUrl = offer.landing_page
-          end if
-
-          media = creative.media
-          if isAA(media) = true
-            skinAdContent.videoPreviewUrl = media.streamUrl
-          end if
-
-          skinAdContent.imageImptracking = creative.image_imptracking
-          skinAdContent.gridItemType = m.constants.ui.gridItemTypes.skinAd
-          skinAdContent.type = m.constants.ui.contentTypes.skinAd
-
-        else if isAA(creative) = true AND creative.type = "video"
-          isVideoAdPresent = true
-
-          if skinAdContent = invalid
-            skinAdContent = CreateObject("roSGNode", "SkinAdContentNode")
-          end if
-
-          skinAdContent.id = creative.ad_id
-          skinAdContent.adInfo = creative
-        end if
-
-        if isNativeCustomVideoPresent = true AND isVideoAdPresent = true
-          exit for
-        end if
-
-      end for
-      exit for 'for now we are limiting by 1 as we expect only one Ad trailer
-
-    end if
-  end for
-
-  return skinAdContent
 End Function
 
 
