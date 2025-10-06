@@ -1805,6 +1805,7 @@ Function onAdStateChange(msg)
       unObserveClosedCaptionAndAudioTrack()
       observeClosedCaptionAndAudioTrack()
       m.Video.control = "play"
+      setInitialCCAndAudioTracks()
 
       ' sometimes position callback not getting triggered for longtime after playing Ads.
       ' so unobserving and observing it, it may trigger the position callback properly.
