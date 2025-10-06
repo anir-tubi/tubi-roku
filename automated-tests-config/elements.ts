@@ -1463,10 +1463,22 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#Line1',
   },
 
+  /** movies details page expires warning label */
+  detailExpiresWarningLabel: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#ExpireWarning',
+  },
+
   /** movies label */
   moviesLabel: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#Line1',
+  },
+
+  /** movies Expires Warning Label */
+  moviesExpiresWarningLabel: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#ExpireWarning',
   },
 
   /** resume playing button */
