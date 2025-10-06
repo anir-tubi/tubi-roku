@@ -44,6 +44,13 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
+      roku_player_ad_preroll_timeout: {
+        ' Shorten the preroll ad timeout from 10s to 5s
+        roku_player_ad_preroll_timeout_v1: {
+          default: { "enabled": false }
+        }
+      }
+
     }
     statsigExperimentsInfo: statsigExperimentsInfo
     getExperimentResource: statsigExperiments_getExperimentResource

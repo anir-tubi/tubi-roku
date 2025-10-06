@@ -186,6 +186,9 @@ Function tubiSGAdShim_preroll(episode, cuepoint)
   m.videoPlayerNode.adState = "fetching"
   m.ads.reset()
 
+  ' Set ad type for timeout logic
+  m.ads.setAdType("preroll")
+
   'if the user is starting from beginning or resuming on a cue point, show ads
   'attempt to get list of ads and play them for preroll
   m.ads.getAdsListViaRoku(episode, cuepoint)
@@ -243,6 +246,10 @@ End Function
 '@cuepoint: float, cuepoint sent from video player
 Function tubiSGAdShim_midroll(episode, cuepoint)
   m.videoPlayerNode.adState = "fetching"
+
+  ' Set ad type for timeout logic
+  m.ads.setAdType("midroll")
+
   m.ads.cacheAdsList(episode, cuepoint)
   if m.ads.getCachedAdsList(episode, cuepoint) <> invalid then
     filledAdData = {
@@ -265,6 +272,10 @@ End Function
 '@cuepoint: float, cuepoint sent from video player
 Function tubiSGAdShim_resume(episode, cuepoint)
   m.videoPlayerNode.adState = "fetching"
+
+  ' Set ad type for timeout logic
+  m.ads.setAdType("seek")
+
   'NOTE: TubiAds sets resumePlayAdsList on 'm' here
   if m.ads.getResumingPlayAds(episode, cuepoint) = true then
     tubiLog("Setting adState to adsPending")

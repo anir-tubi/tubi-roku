@@ -1,4 +1,4 @@
-Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType, tcfString = invalid, userConsentsOptOutStatus = invalid, isGDPR = false)
+Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType, tcfString = invalid, userConsentsOptOutStatus = invalid, isGDPR = false, prerollTimeoutExperiment = invalid)
   'Add Support for Roku Advertising Framework
   roAdFramework = Roku_Ads()
 
@@ -59,6 +59,8 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
     shouldSendGoogleBeacons: false ' Let's us know if during a given ad pod we should send beacons to Google or not
     adResponseTime: -1
     totalAdBreakAdsPerSession: 0
+    prerollTimeoutExperiment: prerollTimeoutExperiment ' Statsig experiment for preroll timeout
+    currentAdType: "preroll" ' Current ad type: "preroll", "midroll", or "seek"
 
     'pixelsFiredStatus is used in PlayerLog QualityOfService event
     pixelsFiredStatus: {} 'example: {"Impression": true, "FirstQuartile": true, "Midpoint": true, "ThirdQuartile": true, "Complete": true}
@@ -85,6 +87,7 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
     retrieveAds: tubiAds_retrieveAds
     replaceMacro: tubiAds_replaceMacro
     setLimitAdTracking: tubiAds_setLimitAdTracking
+    setAdType: tubiAds_setAdType
 
     appMode: "DEFAULT_MODE"
     notUsedAdPodPixels: {} ' List of pixels for the current ad pod that should be sent if playback is stopped before we get an impression for that ad
@@ -400,6 +403,12 @@ Function tubiAds_retrieveAds(adsUrl, adInsertionMethod)
   port = createObject("roMessagePort")
   if tubiReq.start(port) = true then
     timeout = 10000 ' in milliseconds
+
+    ' Use 5 second timeout for preroll ads when experiment is enabled
+    if m.currentAdType = "preroll" AND m.prerollTimeoutExperiment <> invalid AND m.prerollTimeoutExperiment.enabled = true
+      timeout = 5000 ' in milliseconds
+    end if
+
     msg = wait(timeout, port)
     if type(msg) = "roUrlEvent" then
       responseCode = msg.getResponseCode()
@@ -1281,4 +1290,11 @@ Function tubiAds_setLimitAdTracking(enabled)
   if isFunction(m.roAdFramework.setLimitAdTracking) = true then
     m.roAdFramework.setLimitAdTracking(enabled)
   end if
+End Function
+
+
+' Sets the current ad type for timeout logic
+' @adType: string, the type of ad being fetched ("preroll", "midroll", "seek")
+Function tubiAds_setAdType(adType)
+  m.currentAdType = adType
 End Function
