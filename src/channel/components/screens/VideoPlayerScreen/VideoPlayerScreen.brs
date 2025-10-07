@@ -1597,44 +1597,47 @@ Function onVideoPositionChange(msg)
   if m.top.enableAds = true AND m.midrolls.count() > 0 then
     m.AdHeadsUp.visible = false ' default to AdHeadsUp being off; this will catch ff, replay, rew during the countdown
 
+    ' Initialize variables
     isCuepointPrefetchTimeReached = false
     potentialCuepoint = -1
     shouldFireExposure = false
-    'Do not trigger exposure when the gap between cue point and player position is exactly 15 seconds.
 
-    ' attempt to fetch midroll ads before actual cuepoint only if the adState is "init"
-    if adState = "init"
-      cuepoint = m.playerPosition + m.adPrefetchTime
+    ' Skip exposure when cue point is exactly 15 seconds ahead of playback.
+    ' Fetch midroll ads early only if ads are neither pending nor currently fetching.
+    if (adState <> "adsPending" AND adState <> "fetching")
+      currentPosition = m.playerPosition
+      prefetchCuepoint = currentPosition + m.adPrefetchTime
 
-      if m.midrolls[strI(cuepoint)] = true
+      ' Check if we're at the exact prefetch time for a cuepoint
+      if m.midrolls[strI(prefetchCuepoint)] = true
         isCuepointPrefetchTimeReached = true
-        potentialCuepoint = cuepoint
+        potentialCuepoint = prefetchCuepoint
       else
-        'Check if the gap between cue point and player position falls within the 3–15 second window for any cue point.
-
+        ' Check if any cuepoint falls within the 5-15 second window
         for each cuepointStr in m.midrolls
           cuepoint = val(cuepointStr)
-          timeToCuepoint = cuepoint - m.playerPosition
+          timeToCuepoint = cuepoint - currentPosition
 
-          if timeToCuepoint >= 3 AND timeToCuepoint < 15
+          if timeToCuepoint >= 5 AND timeToCuepoint < 15
+            shouldFireExposure = true
             ' Only set ad request flags if experiment is enabled
             if m.alignAdRequestExperiment = true
               isCuepointPrefetchTimeReached = true
               potentialCuepoint = cuepoint
             end if
-            shouldFireExposure = true
             exit for
           end if
         end for
       end if
 
-      if m.isAlignAdRequestExposureFired = false AND shouldFireExposure = true
+      ' Fire exposure event if needed and not already fired
+      if shouldFireExposure = true AND m.isAlignAdRequestExposureFired = false
         getStatsigExperimentResource("roku_player_improvement", "roku_player_align_ad_request_cuepoint_v1")
         m.isAlignAdRequestExposureFired = true
       end if
     end if
 
-    'Fetch midroll Ads
+    ' Fetch midroll ads if conditions are met
     if isCuepointPrefetchTimeReached = true AND m.UpNext.opacity = 0 AND potentialCuepoint > 0
       m.top.adPosition = potentialCuepoint
       m.top.adControl = "midroll"
