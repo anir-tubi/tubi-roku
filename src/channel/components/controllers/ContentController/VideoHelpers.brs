@@ -76,6 +76,10 @@ Function playVideoContentWhileSkippingDetailScreen(content, nowPos, currentTrack
     videoPlayer.loadTime = loadTime.totalMilliseconds()
     sendVideoPlayerCommand(videoPlayer, "play")
     updateRokuContinueWatchingInfo(content, nowPos)
+
+    if m.isUserInVideoTilesExperiment = true AND playbackSource.srcForAnalytic = "previews"
+      removeTopMostScreenWithIDFromStack(m.constants.ui.screenIds.detailScreen)
+    end if
   end if
 End Function
 
