@@ -208,8 +208,6 @@ Function onItemContentChange(msg)
       childGridItemComponent = "LiveEventsContainer"
     else if gridItemType = "liveEventBanner"
       childGridItemComponent = "Banner"
-    else if gridItemType = "adRowlistSpotlight" OR gridItemType = "adRowlistCarousel"
-      childGridItemComponent = "AdContainer"
     else if itemContent.needsLogin = true
       childGridItemComponent = "CategoryGridPoster"
     else
@@ -446,6 +444,13 @@ Function onRenderTrackingChange(msg)
         end if
 
         m.global.viewableImpressionEventInfo = m.clientTrackingInfo
+
+        ' Reset dwell_time tracking after firing viewable impression event
+        ' This ensures clean state for future events
+        if m.clientTrackingInfo <> invalid AND m.clientTrackingInfo.itemInfo <> invalid
+          m.clientTrackingInfo.itemInfo.dwell_time = 0
+          m.clientTrackingInfo.itemInfo.totalSessionDwellTime = 0
+        end if
       end if
 
       m.itemVisibleTimespan = invalid
