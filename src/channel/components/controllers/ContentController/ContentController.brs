@@ -55,6 +55,45 @@ Function init()
 
   ' Holds true or false based on if app suspend is in progress
   m.isApplicationSuspendInProgress = false
+
+  m.top.getScene().observeFieldScoped("focusedChild", "onSceneFocusedChildChanged")
+End Function
+
+
+Function onSceneFocusedChildChanged()
+  if m.top.getScene().isInFocusChain() = false then
+    ' Have to use a timer as trying to set right away fails to set properly
+    m.sceneLooseFocusTimer = createObject("roSGNode", "Timer")
+    m.sceneLooseFocusTimer.duration = 0.01
+    m.sceneLooseFocusTimer.observeFieldScoped("fire", "onSceneLooseFocusTimerFired")
+    m.sceneLooseFocusTimer.control = "start"
+    tubiLog("ContentController.onSceneFocusedChildChanged - Scene lost focus, starting timer")
+
+    ' Go ahead and log so we can keep track of how often this happens
+    currentScreenSubtype = invalid
+    currentScreenId = invalid
+
+    currentScreen = getCurrentScreen()
+    if currentScreen <> invalid then
+      currentScreenSubtype = currentScreen.subtype()
+      currentScreenId = currentScreen.id
+    end if
+
+    logInfo({
+      "message": "Roku scene lost focus. Attempting to restore focus."
+      "currentScreenSubtype": currentScreenSubtype
+      "currentScreenId": currentScreenId
+    }, "clientInfo", "scene-lost-focus")
+  end if
+End Function
+
+
+Function onSceneLooseFocusTimerFired()
+  m.sceneLooseFocusTimer = invalid
+  screen = getCurrentScreen()
+  if screen <> invalid then
+    screen.setFocus(true)
+  end if
 End Function
 
 
