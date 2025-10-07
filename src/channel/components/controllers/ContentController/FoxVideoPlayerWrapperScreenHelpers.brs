@@ -607,10 +607,12 @@ Function conditionallyUpdateHistoryForSidelined(position)
       m.foxPlayerPositionSidelinedStarted = position
     end if
 
-    sideLinedContentPosition = position - m.foxPlayerPositionSidelinedStarted
 
-    if sideLinedContentPosition >= m.foxPlayerContinueWatchingNextSendPosition
+
+    if position >= m.foxPlayerContinueWatchingNextSendPosition
       m.foxPlayerContinueWatchingNextSendPosition = position + getExternalConfigValueFromGlobal("special_event_continue_watching_post_interval", 180)
+
+      sideLinedContentPosition = position - m.foxPlayerPositionSidelinedStarted
 
       content = createObject("roSGNode", "ContentNode")
       content.update({
