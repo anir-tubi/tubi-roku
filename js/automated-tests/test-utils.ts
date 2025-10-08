@@ -995,6 +995,10 @@ class TestUtils {
         await this.selectMenuItem(element, 'Play from Beginning', timeout);
         await this.waitForElementToNotBeInFocusChain('detailScreen');
         break;
+      case 'watchTrailer':
+        await this.selectMenuItem(element, 'Watch Trailer', timeout);
+        await this.waitForElementToNotBeInFocusChain('detailScreen');
+        break;
       case 'resume':
         await this.selectMenuItem(element, 'Resume Playing', timeout);
         await this.waitForElementToNotBeInFocusChain('detailScreen');
@@ -2267,7 +2271,7 @@ type KeyPathElement = {
 };
 
 
-type DetailPageMenuItemType = 'play' | 'playFromBeginning' | 'likeOrDislike' | 'resume' | 'addToMyList' | 'removeFromMyList' | 'removeFromHistory' | 'episodesList' | 'signUp';
+type DetailPageMenuItemType = 'play' | 'playFromBeginning' | 'watchTrailer' | 'likeOrDislike' | 'resume' | 'addToMyList' | 'removeFromMyList' | 'removeFromHistory' | 'episodesList' | 'signUp';
 
 
 type UserInfoResponse = {

@@ -8,7 +8,7 @@ describe('Kids Mode', function () {
   it.skip('C537398 - Guest User - Toggle ON - Home Screen - When User Switches Parental Control to Older Kids Then Exit Kids is still present, @kidsmode_guest', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await openKidsMode();
- 
+
     // Open Settings
     await shared.openSettings();
 
@@ -21,10 +21,10 @@ describe('Kids Mode', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Navigate to Left Nav
-    await ecp.sendKeypress(ecp.Key.Back, { count: 2, wait:1000});
+    await ecp.sendKeypress(ecp.Key.Back, { count: 2, wait: 1000 });
 
-     // Is the Exit Kids button grayed out?
-     await checkForKidsModeGrayed();
+    // Is the Exit Kids button grayed out?
+    await checkForKidsModeGrayed();
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/537396
@@ -49,8 +49,8 @@ describe('Kids Mode', function () {
     // Navigate to Left Nav
     await ecp.sendKeypress(ecp.Key.Left, { count: 2 });
 
-     // Is the Exit Kids button grayed out?
-     await checkForKidsModeGrayed();
+    // Is the Exit Kids button grayed out?
+    await checkForKidsModeGrayed();
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/537398
@@ -118,8 +118,8 @@ describe('Kids Mode', function () {
     // Navigate to Left Nav
     await ecp.sendKeypress(ecp.Key.Left, { count: 2 });
 
-     // Is the Exit Kids button grayed out?
-     await checkForKidsModeGrayed();
+    // Is the Exit Kids button grayed out?
+    await checkForKidsModeGrayed();
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/537401
@@ -145,7 +145,7 @@ describe('Kids Mode', function () {
 
     // Is the Exit Kids button grayed out?
     await checkForKidsModeGrayed();
- 
+
     // Is the Tubi Kid's logo present?
     const tubiKidsLogo = await testUtils.getNodeForElement('tubiKidsLogo');
     expect(tubiKidsLogo.uri).to.equal('pkg:/images/logo-kids-large.webp');
@@ -155,7 +155,7 @@ describe('Kids Mode', function () {
 
   // https://tubi.testrail.io/index.php?/cases/view/535860
   it('C535860 - Registered User - Toggle ON - When user switches to Kids Mode then Home Screen filters out non-kids title, @kidsmode_registered', async () => {
-    
+
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
     await openKidsMode();
@@ -229,7 +229,7 @@ describe('Kids Mode', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Navigate to Left Nav
-    await ecp.sendKeypress(ecp.Key.Left, { count: 2});
+    await ecp.sendKeypress(ecp.Key.Left, { count: 2 });
 
     // Is the Exit Kids button grayed out?
     await checkForKidsModeGrayed();
@@ -301,7 +301,7 @@ describe('Kids Mode', function () {
 
     // Exit app
     await ecp.sendKeypress(ecp.Key.Up, { count: 3 });
-    await ecp.sendKeypress(ecp.Key.Ok, { count:2 });
+    await ecp.sendKeypress(ecp.Key.Ok, { count: 2 });
     await testUtils.waitForElementToShowOnScreen('kidsExitPrompt');
     await ecp.sendKeypress(ecp.Key.Ok);
 
@@ -316,6 +316,52 @@ describe('Kids Mode', function () {
     await testUtils.waitForSideNavMenuToBeExpanded();
     const kidsLeftNavOption = await testUtils.getNodeForElement('kidsLeftNavOption');
     expect(kidsLeftNavOption.text).to.be.equal('Kids');
+
+  });
+
+  // https://tubi.testrail.io/index.php?/cases/view/548495
+  it('C548495 - Kids Mode - Launch Tubi, enter Kids Mode, select movie with trailer, watch trailer, then watch movie @kids_trailer', async () => {
+    // Launch Tubi
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for home screen');
+
+    // From left nav enter Kids Mode
+    await openKidsMode();
+
+    // Navigate back to home screen content
+    await ecp.sendKeypress(ecp.Key.Right);
+    await utils.sleep(2000); // Wait for nav to close
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist focus');
+
+    // Select a Movie with trailer
+    await focusOnVideoTileTrailer();
+    await ecp.sendKeypress(ecp.Key.Ok);
+
+    // Verify we're on detail screen
+    await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle', 'Detail screen not displayed');
+    const titleElement = await testUtils.getNodeForElement('detailScreenTitle');
+
+    // Select Watch Trailer button
+    // await selectWatchTrailerButton();
+    await testUtils.selectAndVerifyDetailPageMenuItem('watchTrailer');
+
+    // Verify trailer starts playing
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
+
+    await utils.sleep(800);
+
+    await ecp.sendKeypress(ecp.Key.Down);
+
+    await ecp.sendKeypress(ecp.Key.Left, { count: 4 });
+
+    //Select Watch Movie
+    await ecp.sendKeypress(ecp.Key.Ok);
+
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
+
+    const videoPlayerScreen = await testUtils.getNodeForElement('videoPlayerScreen');
+    expect(videoPlayerScreen.position).to.not.be.greaterThan(10);
+    console.log(videoPlayerScreen.position);
 
   });
 
@@ -347,7 +393,7 @@ describe('Kids Mode', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
     await ecp.sendKeypress(ecp.Key.Left);
     await testUtils.waitForElementToFullyShowOnScreen('leftNavHomeButton');
-    
+
 
     // Check for Live News row
     await ecp.sendKeypress(ecp.Key.Right);
@@ -403,7 +449,7 @@ async function signInUserFromParentalControls() {
   await ecp.sendKeypress(ecp.Key.Ok);
   await testUtils.waitForElementToFullyShowOnScreen('emailTexEditBox');
   await ecp.sendText(user['userInfo'].email);
-  await ecp.sendKeypress(ecp.Key.Down, { count: 4, wait:1500});
+  await ecp.sendKeypress(ecp.Key.Down, { count: 4, wait: 1500 });
   await ecp.sendKeypress(ecp.Key.Ok);
 
 
@@ -429,7 +475,7 @@ async function signInUserFromParentalControls() {
 }
 async function kidsOpenSettings() {
   await ecp.sendKeypress(ecp.Key.Left);
-  await testUtils.waitForElementToFullyShowOnScreen('leftNavHomeButton',  'Left Nav home button not found', 10000);
+  await testUtils.waitForElementToFullyShowOnScreen('leftNavHomeButton', 'Left Nav home button not found', 10000);
   await ecp.sendKeypress(ecp.Key.Down, { count: 7 });
   await ecp.sendKeypress(ecp.Key.Ok);
 
@@ -466,13 +512,24 @@ async function checkForKidsModeGrayed() {
   expect(exitKidsGrayedOut.opacity).to.be.lessThan(1);
 }
 
-async function checkForKidsModeNotGrayed(){
+async function checkForKidsModeNotGrayed() {
   const exitKidsOption = await testUtils.getNodeForElement('exitKidsOption');
   expect(exitKidsOption.text).to.equal('Exit Kids');
   expect(exitKidsOption.opacity).to.be.equal(1);
 }
 
-async function checkForKidsModeAdult(){
+async function checkForKidsModeAdult() {
   await testUtils.waitForElementToFullyShowOnScreen('exitKidsOption');
-  
+
+}
+
+async function focusOnVideoTileTrailer() {
+  const rowIndex = 0;
+  const content = await testUtils.getRowListRowItemsContent('homeScreenRowList', 0);
+  for (const [itemIndex, item] of content.entries()) {
+    if (item.hasTrailer == true) {
+      await testUtils.jumpToRowItem('homeScreenRowList', [rowIndex, itemIndex]);
+      break;
+    }
+  }
 }
