@@ -10,13 +10,11 @@ Function init()
 
   m.top.observeField("focusedChild", "onComponentFocus")
 
-  if getExperimentResource("roku_category_large_poster","roku_category_large_poster_v1", false).enabled = true
-    m.Menu.columnWidths = [384]
-    m.Menu.itemSize = [384,72]
-  else
-    m.Menu.columnWidths = [432]
-    m.Menu.itemSize = [432,72]
-  end if
+  constants = getConstantsFromGlobal()
+
+  categoryMenuPanelList = constants.ui.categoryMenuPanelList
+  m.Menu.columnWidths = categoryMenuPanelList.columnWidths
+  m.Menu.itemSize = categoryMenuPanelList.itemSize
 
 
   if m.global <> invalid

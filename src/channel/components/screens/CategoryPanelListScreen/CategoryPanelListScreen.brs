@@ -10,19 +10,11 @@ Function init()
   m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
   m.top.handlesTransportVoiceRequests = true
 
-  if getExperimentResource("roku_category_large_poster","roku_category_large_poster_v1", true).enabled = true
-    m.leftPanelWidth = 384
-    '//Hardcode the right panel width so the right panel's loading spinner is centered to the panel
-    m.rightPanelWidth = 1212
-    '//The offset sets the right panel to be placed at a different position than the menu list
-    m.rightPanelOffset = [-18, -58]
-  else
-    m.leftPanelWidth = 495
-    '//Hardcode the right panel width so the right panel's loading spinner is centered to the panel
-    m.rightPanelWidth = 1062
-    '//The offset sets the right panel to be placed at a different position than the menu list
-    m.rightPanelOffset = [0, -36]
-  end if
+  m.leftPanelWidth = 384
+  '//Hardcode the right panel width so the right panel's loading spinner is centered to the panel
+  m.rightPanelWidth = 1212
+  '//The offset sets the right panel to be placed at a different position than the menu list
+  m.rightPanelOffset = [-18, -58]
 
   m.Tracking = TubiTrackingInfo(m.constants)
 
@@ -59,7 +51,7 @@ Function createCategoryMenuPanel()
   menuPanel.leftPosition = 0
   menuPanel.focusable = true
   menuPanel.leftOnly = true
-  '//::NOTE:: - The following line is used to hide the gradient. 
+  '//::NOTE:: - The following line is used to hide the gradient.
   '//     For some reason this is not necessary for the panelset on the Settings Screen. There is no visible gradient on that screen.
   menuPanel.maskUri = ""
   menuPanel.createNextPanelOnItemFocus = true
@@ -177,11 +169,11 @@ End Function
 Function onCategoryPanelFocusChanged(msg)
   TubiLog("CategoryPanelListScreen.onCategoryPanelFocusChanged")
   panel = msg.getRoSGNode()
-  
+
   sOldRightPanelInFocusID = m.rightPanelInFocusID
   m.rightPanelInFocusID = panel.categoryID
 
-  if sOldRightPanelInFocusID = invalid AND isNonEmptyString(m.rightPanelInFocusID) = true 
+  if sOldRightPanelInFocusID = invalid AND isNonEmptyString(m.rightPanelInFocusID) = true
     '//The right-side category details panel gained focus by the user pressing the OK or RIGHT keys from the left-side Category List Menu
 
     setCategoryPanelComponentInteractionEvents()
@@ -232,7 +224,7 @@ End Function
 
 Function onCategoryPanelBackgroundChange(msg)
   TubiLog("CategoryPanelListScreen.onCategoryPanelBackgroundChange")
-  m.top.backgroundUriList = msg.getData() 
+  m.top.backgroundUriList = msg.getData()
 End Function
 
 
@@ -279,7 +271,7 @@ End Function
 Function onScreenFocusChange()
   tubiLog("CategoryPanelListScreen.onScreenFocusChange")
   if m.top.hasFocus() = true
-    
+
     bRightPanelHasFocus = false
     if m.top.content <> invalid AND m.top.content.getChildCount() > 0
       if shouldRefresh(m.top.content) = true 'cacheValidationMixin
@@ -288,14 +280,14 @@ Function onScreenFocusChange()
         bRightPanelHasFocus = true
       end if
     end if
-    
+
     if bRightPanelHasFocus = true
       setFocusOnRightPanel()
     else
       m.CategoryMenuPanel.setFocus(true)
       if m.CategoryMenuPanel.nextPanel <> invalid
         '//If the left panel needs to be refreshed, then there is no need to check if the right panel needs to be refreshed
-        '//If the right panel has focus, then there is no need to check if it needs to be refreshed as the check is done 
+        '//If the right panel has focus, then there is no need to check if it needs to be refreshed as the check is done
         '// upon the right panel gaining focus - just as it is done for the left panel in this function.
         m.CategoryMenuPanel.nextPanel.checkOnRefreshed = true
       end if
@@ -391,7 +383,7 @@ Function createNextPanelAtIndex(nIndex)
     nextPanel = invalid
 
     buttonContent = m.top.content.getChild(nIndex)
-    
+
     if m.CategoryMenuPanel.nextPanel = invalid OR (buttonContent.id <> m.CategoryMenuPanel.nextPanel.categoryId)
       nextPanel = createNextPanel(buttonContent)
       if nextPanel <> invalid
@@ -402,7 +394,7 @@ Function createNextPanelAtIndex(nIndex)
         m.top.categoryListItemFocused = buttonContent
       end if
     end if
-    
+
   end if
 End Function
 
@@ -423,7 +415,7 @@ Function onItemFocused(msg)
       m.top.navigateWithinPageInfo = {
         pageOneof: m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pageType, m.top.trackingPageInfo.pageValues)
         componentOneof: m.Tracking.getAnalyticsComponent("browse_menu_component", m.oldCategoryComponent)
-        means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+        means_of_navigation: "SCROLL" 'MeansOfNavigation enum
         vertical_location: CategoryMenuPanel.list.currFocusRow + 1 ' Since focused index starts from zero.
         horizontal_location: 1
       }
@@ -475,7 +467,7 @@ Function onJumpToItem()
   tubilog("CategoryPanelListScreen.onJumpToItem")
   sCategoryID = m.top.jumpToItemByID
   content = m.top.content
-  
+
   if m.top.isLoading = false AND content <> invalid AND sCategoryID <> ""
     nodeHelpers = TubiNodeHelpers()
     index = nodeHelpers.getChildIndexById(content, sCategoryID)
@@ -486,7 +478,7 @@ Function onJumpToItem()
       m.CategoryMenuPanel.jumpToItem = index
       m.top.jumpToItemByID = ""
 
-      '//see if the right panel should be in focus. This may because the left panel needed to be reloaded and this function is called to go the previous focused item. 
+      '//see if the right panel should be in focus. This may because the left panel needed to be reloaded and this function is called to go the previous focused item.
       '// in this case, the right panel may have been in focus before the left panel was refreshed.
       if m.CategoryMenuPanel.nextPanel <> invalid AND tempRightPanelInFocusID = m.CategoryMenuPanel.nextPanel.categoryId
         setFocusOnRightPanel()
@@ -509,7 +501,7 @@ Function onJumpToCategoryItem()
     sTitleID = m.top.jumpToCategoryItemByID.contentId
     nextPanel = m.CategoryMenuPanel.nextPanel
     content = m.top.categoryContent
-    
+
     if isNonEmptyString(sCategoryID) = true AND isNonEmptyString(sTitleID) = true AND nextPanel <> invalid
 
       if nextPanel.categoryId = sCategoryID

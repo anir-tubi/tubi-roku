@@ -1509,6 +1509,8 @@ Function getConstants()
 
   constants.ui.imageSizes.billboard = [1209, 681]
 
+  constants.ui.imageSizes.categoryLargePoster = [291, 417]
+
   ' Size for the background image.
   if limitedUi = true
     constants.ui.imageSizes.background = [399, 225]
@@ -1528,6 +1530,10 @@ Function getConstants()
   else
     constants.ui.imageSizes.fullScreenBackground = [1920, 1080]
   end if
+
+  constants.ui.categoryMenuPanelList = {}
+  constants.ui.categoryMenuPanelList.columnWidths = [384]
+  constants.ui.categoryMenuPanelList.itemSize = [384, 72]
 
   constants.ui.featuredRow = {}
   constants.ui.featuredRow.playerSize = [constants.ui.imageSizes.featuredRowPoster[0] + 4, constants.ui.imageSizes.featuredRowPoster[1] + 10]
