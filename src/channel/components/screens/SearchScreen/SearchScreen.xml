@@ -100,7 +100,7 @@
         <DynamicCustomKeyboard
           id="Keyboard"
           translation="[0,-20]"/>
-     </Group>
+      </Group>
 
 
       <Group

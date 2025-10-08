@@ -49,7 +49,6 @@ Function init()
   m.searchHintText = m.top.findNode("searchHintText")
 
   m.keyboard = m.top.findNode("Keyboard")
-
   m.keyboard.id = "SearchKeyboard"
   m.keyboard.textEditBox.maxTextLength = 100
   m.keyboard.setFocus(true)
@@ -67,10 +66,9 @@ Function init()
   m.searchDebounce = m.top.findNode("searchDebounce")
   m.searchDebounce.observeField("fire", "onSearchDebounce")
 
-  setSearchStrings()
-
   m.ResultGrid = m.top.findNode("ResultGrid")
   m.keyboard.observeFieldScoped("text", "onKeyboardTextChanged")
+  m.keyboard.observeFieldScoped("focusedChild", "onKeyboardFocusChanged")
   m.keyboard.textEditBox.observeField("focusedChild", "onTextEditBoxFocused")
 
   m.ResultGrid.observeField("itemSelected", "onResultSelected")
@@ -96,6 +94,9 @@ Function init()
 
   m.keyboard.palette = handleKeyboardColors()
   m.NoResultsMessage = m.top.findNode("NoResultsMessage")
+
+
+  setSearchStrings()
 
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
@@ -472,6 +473,7 @@ Function onSearchContentChange()
           m.trendingSearchResultsContainer.translation = [0, 430]
         end if
       end if
+      m.trendingSearchHeading.visible = true
     else
       m.ResultGrid.content = results
       m.ResultGrid.personalizationId = results.personalizationId
@@ -480,6 +482,13 @@ Function onSearchContentChange()
         matchingText = getTranslation("screenSearch_matchingTitles_singular")
       else
         matchingText = getTranslation("screenSearch_matchingTitles_plural", { matches: nMatches.toStr() })
+      end if
+
+
+      if getStatsigExperimentResource("roku_search_screen_animate_grid", "roku_search_screen_animate_grid_v1", false).enabled = true
+        m.searchHintText.width = 0
+        m.searchHintText.numLines = 0
+        m.searchHintText.wrap = false
       end if
 
       if getExperimentResource("roku_search_autocomplete", "roku_search_autocomplete_v3", false).enabled = true
@@ -498,6 +507,7 @@ Function onSearchContentChange()
         m.trendingResultsHint.visible = false
         if m.top.isUserEligibleForTrendingSearchContents = true
           m.trendingSearchResultsContainer.visible = true
+          m.trendingSearchHeading.visible = true
 
           if results.getChildCount() > 4
             m.trendingSearchResultsContainer.translation = [0, 752]
@@ -506,9 +516,11 @@ Function onSearchContentChange()
             m.trendingSearchResultsContainer.translation = [0, 430]
           end if
         else
+          m.trendingSearchHeading.visible = false
           m.trendingSearchResultsContainer.visible = false
         end if
       else
+        m.trendingSearchHeading.visible = false
         m.trendingSearchResultsContainer.visible = false
       end if
 
@@ -615,7 +627,7 @@ Function onKeyboardTextChanged()
       m.searchMenuText.text = m.searchTitleText
     end if
   end if
-
+  moveSearchGridIntoPosition()
   ' making backend request only after 0.5s
   m.searchDebounce.control = "start"
 
@@ -659,6 +671,8 @@ Function onItemFocused(msg)
   itemFocused = msg.getData()
   gridContent = gridNode.content
   if gridContent <> invalid AND itemFocused <> invalid AND gridContent.getChild(itemFocused) <> invalid
+    moveSearchGridIntoPosition()
+
     focusedContent = gridContent.getChild(itemFocused)
     m.top.backgroundUriList = determineBackgroundImage(focusedContent)
     m.searchScreenInfoPanel.visible = true
@@ -1051,6 +1065,13 @@ Function onTextEditBoxFocused()
 End Function
 
 
+Function onKeyboardFocusChanged(msg)
+  if m.Keyboard.hasFocus() = true
+    moveSearchGridIntoPosition()
+  end if
+End Function
+
+
 '// Handling when the user focused on an autocomplete suggestion
 Function onAutocompleteFocused(msg)
   itemFocused = msg.getData()
@@ -1084,6 +1105,8 @@ Function onAutocompleteFocusChanged(msg)
     autocompleteComponent = m.oldAutocompleteComponent
     m.oldAutocompleteComponent = invalid 'reset oldAutocompleteComponent when focus is lost
     sendAutocompleteFocusAnalytics(autocompleteComponent, false)
+  else
+    moveSearchGridIntoPosition()
   end if
 End Function
 
@@ -1212,8 +1235,21 @@ Function setDefaultText()
   if m.Keyboard.text = ""
     m.leftSide.insertChild(m.searchDirectionsGroup, 0)
 
+    trendingSearchContent = m.trendingSearchResultGrid.content
+    if trendingSearchContent <> invalid AND trendingSearchContent.getChildCount() > 0
+      m.trendingSearchHeading.visible = true
+    else
+      m.trendingSearchHeading.visible = false
+    end if
+
     m.searchMenuText.text = m.searchTitleText
     m.KidsModeMessage.text = m.sDefaultKidsWarning
+
+    if getStatsigExperimentResource("roku_search_screen_animate_grid", "roku_search_screen_animate_grid_v1", false).enabled = true
+      m.searchHintText.width = 531
+      m.searchHintText.numLines = 2
+      m.searchHintText.wrap = true
+    end if
     m.searchHintText.text = m.searchHintToSearch
     m.searchText.text = ""
     m.autocomplete.visible = false
@@ -1251,6 +1287,31 @@ Function handleInfoPanelVisibilityForLeftPress()
   autocompleteContent = m.autocompleteMenu.content
   if autocompleteContent <> invalid
     m.autocomplete.visible = true
+  end if
+End Function
+
+
+Function moveSearchGridIntoPosition()
+  if getStatsigExperimentResource("roku_search_screen_animate_grid", "roku_search_screen_animate_grid_v1", true).enabled = true
+    m.ResultGrid.numRows = 3
+    m.trendingSearchResultGrid.numRows = 3
+    if m.ResultArea.isInFocusChain() = true
+      '//If the search results area is in focus, then slide the area down right next to the keyboard allowing the info panel and background image to be unobstructed.
+      translation = [0, 474]
+    else if isNonEmptyString(m.Keyboard.text) = true
+      '//if there are search results, then slide the area right below the search results text
+      translation = [0, 312]
+    else
+      '//if there are no search results, then slide the area up to the highest point of the empty screen
+      translation = [0, 132]
+    end if
+
+    bAnimate = (m.gridContainer.visible = true)
+    if bAnimate = true
+      slideTo(m.ResultArea, translation, 0.3)
+    else
+      m.ResultArea.translation = translation
+    end if
   end if
 End Function
 

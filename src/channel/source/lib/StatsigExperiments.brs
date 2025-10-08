@@ -35,6 +35,12 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
+      roku_search_screen_animate_grid: {
+        roku_search_screen_animate_grid_v1: {
+          default: { "enabled": false }
+        }
+      }
+
       roku_home_screen_redesign: {
         roku_home_screen_redesign_v_1_6: {
           ' default: { "design_type": "withDescriptionPortraitSmall", should_debounce: false, gridItemSize: [310, 442], featuredRowPosterSize: [788, 442], variant: "billboard", should_dim: true }
