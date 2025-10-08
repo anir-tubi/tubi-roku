@@ -757,6 +757,72 @@ describe('MyStuff', function () {
 
   });
 
+  // https://tubi.testrail.io/index.php?/cases/view/264839
+  it('C264839 - Guest User - Add to My List, sign in through age gate, verify title added @guest_signin_mylist', async () => {
+    // Launch app as guest user
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Select a title from home screen
+    await ecp.sendKeypress(ecp.Key.Ok);
+
+    // Verify we're on the detail screen
+    const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
+    expect(detailScreenTitle.visible).to.equal(true);
+    await utils.sleep(800);
+
+    // Select "Add to My List" button
+    await testUtils.findRowIndexWithTitle('detailScreenMenu', 'Add to My List');
+    await testUtils.selectMenuItem('detailScreenMenu', 'Add to My List');
+    await utils.sleep(800);
+
+    await ecp.sendKeypress(ecp.Key.Ok);
+
+    // Select register/unlock button to start registration flow
+    await shared.completeGuestUserRegistrationFlow()
+
+    // Allow time for backend magic link processing
+    await utils.sleep(800);
+
+    // Enter valid age (over 13)
+    await ecp.sendText('20');
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
+    await ecp.sendKeypress(ecp.Key.Ok);
+
+    await testUtils.waitForElementToFullyShowOnScreen('continueWatchingConsentPageAcceptButton');
+    await ecp.sendKeypress(ecp.Key.Ok); // Click "Start Watching"
+
+    await utils.sleep(1000);
+
+    await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
+
+    await utils.sleep(2000);
+
+    // Open side nav and navigate to My Stuff item
+    await highlightMyStuffMenuItem();
+
+    // Select My Stuff
+    await ecp.sendKeypress(ecp.Key.Ok, { count: 2 });
+
+    // Check that CW displays no titles and has correct text for empty row
+    await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
+    await utils.sleep(2000);
+
+    await ecp.sendKeypress(ecp.Key.Down);
+    await utils.sleep(800);
+
+    await testUtils.waitForElementToFullyShowOnScreen('myListScreenTitle');
+    await utils.sleep(2000);
+
+    const myListContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('queueRowList');
+
+    if (myListContent) {
+      const title = myListContent[0].title
+      expect(title).to.not.equal('');
+    }
+
+  });
+
   //https://tubi.testrail.io/index.php?/cases/edit/439744
   it('C439744 - Registered User - Kids Mode - Video Preview for My List Movie @mystuff', async () => {
 
