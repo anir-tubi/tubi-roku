@@ -374,6 +374,12 @@ Function addConditionalFieldObservers(childGridItem)
 
         ' Set the initial value for each field
         childGridItem[field] = m.top[field]
+
+        ' For focus tracking, we also need to observe the child's focus changes
+        ' to ensure dwell_time calculation works for child components like CategoryGridPoster
+        if field = "itemHasFocus" then
+          childGridItem.observeFieldScoped("itemHasFocus", "onItemFocusChange")
+        end if
       end if
     end for
   end if
@@ -404,6 +410,11 @@ Function removeConditionalFieldObservers()
   for each field in m.conditionallyObservedFields
     m.top.unobserveFieldScoped(field)
   end for
+
+  ' Also unobserve child focus changes if we have a child grid item
+  if m.childGridItem <> invalid AND m.childGridItem.hasField("itemHasFocus") then
+    m.childGridItem.unobserveFieldScoped("itemHasFocus")
+  end if
 End Function
 
 
