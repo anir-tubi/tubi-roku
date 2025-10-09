@@ -282,6 +282,10 @@ End Function
 Function onContentChange()
   tubiLog("CategoryGridList.onContentChange")
 
+  if m.top.parentScreenId <> invalid AND m.top.parentScreenId <> m.constants.ui.screenIds.homeScreen
+    m.isWithDescPortraitSmallExpEnabled = false
+  end if
+
   ' Resetting the state of the UI. Below condition safe guards against any rowList background refresh.
   ' Like item getting added to CW row or queue row.
 
@@ -915,7 +919,9 @@ Function restoreFocusAndRowHeightsAfterAdBatchUpdate(content, lastFocusedRowID, 
     end for
   end if
 
-  setRowHeights()
+  if rowList <> invalid AND rowList.content <> invalid
+    setRowHeights()
+  end if
   if lastRowItemFocused <> invalid
     '//::NOTE:: if the rowlist does not have focus (i.e. an ad component has focus), then the rowItemFocused will not be set even after jumpToRowItem is set.
     rowList.jumpToRowItem = lastRowItemFocused
