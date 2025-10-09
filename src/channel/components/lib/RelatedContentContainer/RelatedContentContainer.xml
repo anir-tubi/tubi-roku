@@ -12,7 +12,7 @@
     <!-- INPUTS -->
     <field id="content" type="node" alias="grid.content" />
     <field id="contentUpdated" type="boolean" alwaysNotify="true" />
-    <field id="shouldTrackViewableImpressionEvent" type="boolean" value="true" />
+    <field id="shouldTrackViewableImpressionEvent" type="boolean" value="false" />
     <field id="parentScreenId" type="string" />
     <field id="parentScreenTrackingPageInfo" type="assocarray" />
     <field id="personalizationId" type="string" />

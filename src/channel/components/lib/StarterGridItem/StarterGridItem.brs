@@ -354,13 +354,15 @@ Function onItemContentChange(msg)
       itemInfo.video_id = itemContent.id
     end if
 
-    m.clientTrackingInfo = {
-      containerId: row.id
-      itemInfo: itemInfo
-      screenId: m.parentScreenId
-      screenTrackingInfo: parentScreenTrackingPageInfo
-      personalizationId: personalizationId
-    }
+    if row <> invalid
+      m.clientTrackingInfo = {
+        containerId: row.id
+        itemInfo: itemInfo
+        screenId: m.parentScreenId
+        screenTrackingInfo: parentScreenTrackingPageInfo
+        personalizationId: personalizationId
+      }
+    end if
   end if
 End Function
 
