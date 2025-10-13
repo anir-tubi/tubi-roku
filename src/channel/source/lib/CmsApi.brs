@@ -35,6 +35,7 @@ Function CmsApi(constants, apiUtils, experiments = invalid, statSigExperiments =
     getWindowInfo: cmsApi_getWindowInfo
     getFullCategoryId: cmsApi_getFullCategoryId
     generateAdUnitFromAdType: cmsApi_generateAdUnitFromAdType
+    convertImageSizeFor720p: cmsApi_convertImageSizeFor720p
   }
 
   cmsApi = {}
@@ -642,6 +643,20 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
     landscapeSize = imageSizes.largeLandscape
   end if
 
+  is720p = (m.constants.deviceInfo.displayHeight = 720 OR m.constants.deviceInfo.lowVram = true)
+  if is720p = true
+    posterSize = m.convertImageSizeFor720p(posterSize)
+    landscapeSize = m.convertImageSizeFor720p(landscapeSize)
+    largestLandscapeSize = m.convertImageSizeFor720p(largestLandscapeSize)
+    background = m.convertImageSizeFor720p(background)
+    title = m.convertImageSizeFor720p(title)
+    billboard = m.convertImageSizeFor720p(billboard)
+    featuredRowPoster = m.convertImageSizeFor720p(featuredRowPoster)
+    featuredPortraitSmall = m.convertImageSizeFor720p(featuredPortraitSmall)
+    fullScreenBackground = m.convertImageSizeFor720p(fullScreenBackground)
+    skinAdLandscape = m.convertImageSizeFor720p(skinAdLandscape)
+  end if
+
   gridItemTypes = m.constants.ui.gridItemTypes
 
   for each imageType in imageTypes
@@ -670,7 +685,7 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
         existingParams["images[background_tb]"] = "w" + fullScreenBackground[0].ToStr() + "h" + fullScreenBackground[1].ToStr() + "_background"
       end if
     else if imageType = "title"
-      existingParams["images[title_art]"] = "w" + title[0].ToStr() + "h" + title[1].ToStr() + "_title"
+      existingParams["images[title_art]"] = "w0h" + title[1].ToStr() + "_title"
     else if imageType = "skinAdLandscape"
       existingParams["images[skinAd_landscape_tb]"] = "w" + skinAdLandscape[0].ToStr() + "h" + skinAdLandscape[1].ToStr() + "_landscape"
     end if
@@ -698,6 +713,22 @@ End Function
 ' @existingParams: assocArray, any parameters that have already been defined that need to be added to
 Function cmsApi_setTupianBackgroundParam(existingParams = {})
   return m.setImageParams(["background"], existingParams)
+End Function
+
+
+' Converts image sizes from 1920x1080 resolution to 1280x720 resolution
+' @originalSize: array - [width, height] array for 1920x1080 resolution
+' @return: array - [width, height] array scaled for 1280x720 resolution
+Function cmsApi_convertImageSizeFor720p(originalSize as Object) as Object
+  ' Calculate scaling factors: 1280/1920 = 0.6667, 720/1080 = 0.6667
+  ' Both dimensions scale by the same factor since we're maintaining aspect ratio
+  scaleFactor = 0.6667
+
+  ' Convert to integers after scaling
+  newWidth = Int(originalSize[0] * scaleFactor)
+  newHeight = Int(originalSize[1] * scaleFactor)
+
+  return [newWidth, newHeight]
 End Function
 
 

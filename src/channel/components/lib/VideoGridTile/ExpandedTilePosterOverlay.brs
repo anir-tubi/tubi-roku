@@ -214,13 +214,18 @@ Function setTitle(title = "", titleImageUri = "")
     end if
     m.titleImage.uri = titleImageUri
   else
-    m.titleImage.uri = ""
-    m.bottomContentGroup.removeChild(m.titleImage)
-    if m.titleGroup.getParent() = invalid
-      m.overlayTitleRow.appendChild(m.titleGroup)
-    end if
-    m.titleAnimation = fade(m.titleGroup, "in", m.animationDuration)
+    displayVideoTitle()
   end if
+End Function
+
+
+Function displayVideoTitle()
+  m.titleImage.uri = ""
+  m.bottomContentGroup.removeChild(m.titleImage)
+  if m.titleGroup.getParent() = invalid
+    m.overlayTitleRow.appendChild(m.titleGroup)
+  end if
+  m.titleAnimation = fade(m.titleGroup, "in", m.animationDuration)
 End Function
 
 
@@ -242,10 +247,13 @@ End Function
 
 
 Function onTitleImageLoadStatus(msg)
-  if msg.getData() = "ready"
+  status = msg.getData()
+  if status = "ready"
     m.overlayTitleRow.removeChild(m.titleGroup)
     m.titleAnimation = fade(m.titleImage, "in", m.animationDuration)
     adjustPosterBottomContentTranslation()
+  else if status = "failed"
+    displayVideoTitle()
   end if
 End Function
 
