@@ -241,6 +241,7 @@ Function getConstants()
   constants.deviceInfo.vendorName = di.GetModelDetails().VendorName
   constants.deviceInfo.displayWidth = di.GetDisplaySize().w
   constants.deviceInfo.displayHeight = di.GetDisplaySize().h
+  constants.deviceInfo.displayProperties = di.GetDisplayProperties()
   constants.deviceInfo.rokuCountryCode = di.GetUserCountryCode()
   'This will return true for any remote that has voice input
   constants.deviceInfo.hasVoiceRemoteFeature = (di.HasFeature("voice_remote") OR di.HasFeature("handsfree_voice"))
