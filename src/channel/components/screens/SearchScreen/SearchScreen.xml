@@ -227,15 +227,6 @@
                 focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
             </LayoutGroup>
           </Group>
-
-          <Spinner
-            id="spinner"
-            visible="false"
-            showShade="false"
-            modal="true"
-            displayText="true"
-            width="1094"
-            height="475"/>
           <Label
             id="NoResultsMessage"
             vertAlign="center"
@@ -251,8 +242,18 @@
               role="font"/>
           </Label>
         </Group>
-      </Group>
 
+        <Spinner
+          id="spinner"
+          visible="false"
+          translation="[0, 474]"
+          showShade="false"
+          modal="true"
+          displayText="true"
+          width="1094"
+          height="475"/>
+      </Group>
+        
       <Timer
         id="searchDebounce"
         duration="0.5"/>
