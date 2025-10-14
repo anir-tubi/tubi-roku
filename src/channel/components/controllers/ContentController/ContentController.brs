@@ -68,22 +68,9 @@ Function onSceneFocusedChildChanged()
     m.sceneLooseFocusTimer.observeFieldScoped("fire", "onSceneLooseFocusTimerFired")
     m.sceneLooseFocusTimer.control = "start"
     tubiLog("ContentController.onSceneFocusedChildChanged - Scene lost focus, starting timer")
-
-    ' Go ahead and log so we can keep track of how often this happens
-    currentScreenSubtype = invalid
-    currentScreenId = invalid
-
-    currentScreen = getCurrentScreen()
-    if currentScreen <> invalid then
-      currentScreenSubtype = currentScreen.subtype()
-      currentScreenId = currentScreen.id
-    end if
-
-    logInfo({
-      "message": "Roku scene lost focus. Attempting to restore focus."
-      "currentScreenSubtype": currentScreenSubtype
-      "currentScreenId": currentScreenId
-    }, "clientInfo", "scene-lost-focus")
+  else if m.sceneLooseFocusTimer <> invalid then
+    m.sceneLooseFocusTimer.control = "stop"
+    m.sceneLooseFocusTimer = invalid
   end if
 End Function
 
@@ -91,7 +78,17 @@ End Function
 Function onSceneLooseFocusTimerFired()
   m.sceneLooseFocusTimer = invalid
   screen = getCurrentScreen()
-  if screen <> invalid then
+  if screen <> invalid AND m.top.getScene().isInFocusChain() = false then
+    ' Go ahead and log so we can keep track of how often this happens
+    currentScreenSubtype = screen.subtype()
+    currentScreenId = screen.id
+
+    logInfo({
+      "message": "Roku scene lost focus. Attempting to restore focus."
+      "currentScreenSubtype": currentScreenSubtype
+      "currentScreenId": currentScreenId
+    }, "clientInfo", "scene-lost-focus")
+
     screen.setFocus(true)
   end if
 End Function
