@@ -328,7 +328,7 @@ Function onPasswordConfirm(msg = invalid)
       url: parentalRatingReq.url
       requestType: m.constants.reqNames.updateParentalRating
       options: parentalRatingReq.options
-      successCallback: updateParentalSettingsSuccessResponse
+      successCallback: refreshAuthTokenAfterParentalControlsChange
       errorCallback: updateParentalSettingsErrorResponse
       responseType: "assocarray"
       password: sPassword
@@ -392,64 +392,90 @@ Function refreshScreenAfterParentalChanges()
 End Function
 
 
-Function updateParentalSettingsSuccessResponse(response)
-  tubiLog("SettingsScreenHelper.updateParentalSettingsSuccessResponse")
-  m.confirmPasswordScreen.isLoading = false
+Function refreshUIAfterParentalControlsChange()
+  tubiLog("SettingsScreenHelper.refreshUIAfterParentalControlsChange")
+  if m.confirmPasswordScreen <> invalid then
+    m.confirmPasswordScreen.isLoading = false
+  end if
 
+  showHideSpinner(false)
+  if isConfirmPasswordScreen() = true
+    popScreen(true, true)
+  end if
+
+
+  '//Update menu so it appears updated. This is only needed if the password has been saved locally and was not entered immediately from the password screen
+  m.settingsScreen.parentalSettingUpdated = true
+
+  if m.settingsScreen.parentalSettingSelected < 2
+    setUiMode(m.constants.ui.modes.kidsParental)
+  else
+    '//turn off kids mode (if it is on) when switching to teens and greater
+    '// Also, disable the manual version of kids mode if the user had previously enabled kids mode manually
+    if isKidsUIOn() = true
+      setUiMode(m.constants.ui.modes.standard)
+    end if
+  end if
+
+  ' If the parental controls was changed to adults.
+  if isUserInAdultsMode() = true AND isKidsUIOn() = false
+    getConsent(onConsentRefreshAfterParentalControlsChange)
+  else
+    refreshScreenAfterParentalChanges()
+  end if
+
+  dialogEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "SIGNIN_REQUIRED"
+      pageOneof: m.Tracking.getAnalyticsPage(m.settingsScreen.trackingPageInfo.pageType, m.settingsScreen.trackingPageInfo.pageValues)
+      dialog_action: "SHOW"
+      dialog_sub_type: "parental-updated-" + m.settingsScreen.parentalSettingSelected.toStr()
+    }
+  }
+
+  parentalSetting = m.settingsScreen.parentalSettingSelected
+  sMessageID = ""
+  if type(parentalSetting) = "roInt"
+    sMessageID = "screenSettings_error_parentalChanges_description_group" + parentalSetting.toStr()
+  end if
+  if sMessageID = ""
+    sMessageID = "screenSettings_error_parentalChanges_description_default"
+  end if
+
+  title = getTranslation("screenSettings_error_parentalChanges")
+  message = getTranslation(sMessageID)
+  showSimpleInstantResumableModal(title, message, [], dialogEvent, m.trackingLoggingTask)
+End Function
+
+
+Function refreshAuthTokenAfterParentalControlsChange(response)
   if response <> invalid
     saveLocalServerPersistentData([{ parentalRating: m.settingsScreen.parentalSettingSelected }])
     if isConfirmPasswordScreen() = true
-      '//If ConfirmPasswordScreen visible, then pop the Screen and save the password
-      popScreen(true, true) ' remove the ConfirmPasswordScreen
       m.passwordCache = {
         password: response.requestInput.password
         currentTime: getNowSeconds()
       }
     else
-      '//Update menu so it appears updated. This is only needed if the password has been saved locally and was not entered immediately from the password screen
-      m.settingsScreen.parentalSettingUpdated = true
+      showHideSpinner(true)
     end if
 
-    if m.settingsScreen.parentalSettingSelected < 2
-      setUiMode(m.constants.ui.modes.kidsParental)
-    else
-      '//turn off kids mode (if it is on) when switching to teens and greater
-      '// Also, disable the manual version of kids mode if the user had previously enabled kids mode manually
-      if isKidsUIOn() = true
-        setUiMode(m.constants.ui.modes.standard)
-      end if
-    end if
-
-    ' If the parental controls was changed to adults.
-    if isUserInAdultsMode() = true AND isKidsUIOn() = false
-      getConsent(onConsentRefreshAfterParentalControlsChange)
-    else
-      refreshScreenAfterParentalChanges()
-    end if
-
-    dialogEvent = {
-      type: "dialog"
-      values: {
-        dialog_type: "SIGNIN_REQUIRED"
-        pageOneof: m.Tracking.getAnalyticsPage(m.settingsScreen.trackingPageInfo.pageType, m.settingsScreen.trackingPageInfo.pageValues)
-        dialog_action: "SHOW"
-        dialog_sub_type: "parental-updated-" + m.settingsScreen.parentalSettingSelected.toStr()
-      }
-    }
-
-    parentalSetting = m.settingsScreen.parentalSettingSelected
-    sMessageID = ""
-    if type(parentalSetting) = "roInt"
-      sMessageID = "screenSettings_error_parentalChanges_description_group" + parentalSetting.toStr()
-    end if
-    if sMessageID = ""
-      sMessageID = "screenSettings_error_parentalChanges_description_default"
-    end if
-
-    title = getTranslation("screenSettings_error_parentalChanges")
-    message = getTranslation(sMessageID)
-    showSimpleInstantResumableModal(title, message, [], dialogEvent, m.trackingLoggingTask)
+    ' Although not a perfect solution but based on the test 1 second seems to be good enough delay.
+    ' Even in worst case scenario if backend takes more time we will still refresh the auth token but might see some calls that fail due to expired token.
+    ' But below logic should cover majority of the cases.
+    m.parentalChangeAuthRefreshTokenTimer = CreateObject("roSGNode", "Timer")
+    m.parentalChangeAuthRefreshTokenTimer.duration = 1
+    m.parentalChangeAuthRefreshTokenTimer.control = "start"
+    m.parentalChangeAuthRefreshTokenTimer.observeFieldScoped("fire", "onParentalChangeAuthRefreshTokenTimerFired")
   end if
+End Function
+
+
+Function onParentalChangeAuthRefreshTokenTimerFired()
+  m.parentalChangeAuthRefreshTokenTimer.control = "stop"
+  m.parentalChangeAuthRefreshTokenTimer = invalid
+  m.tubiAuthUpdate.initOrUpdateAuthInfo(refreshUIAfterParentalControlsChange, true)
 End Function
 
 
