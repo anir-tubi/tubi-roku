@@ -303,10 +303,15 @@ Function onScreenFocusChange()
   tubiLog("HomeScreen.onScreenFocusChange " + focusState(m.top))
 
   if m.top.hasFocus() = true
-    if m.CategoryGridList.content <> invalid
-      if shouldRefresh(m.CategoryGridList.content) = true
+    'TODO: Revisit this if we ever use both.
+    if m.CategoryGridList.featuredRowContent <> invalid
+      content = m.CategoryGridList.featuredRowContent
+    else
+      content = m.CategoryGridList.content
+    end if
+    if content <> invalid
+      if shouldRefresh(content) = true
         m.top.loadAllCategories = true
-
       else 'check if any containers has expired
         refreshHomeScreenContainers()
       end if
