@@ -1224,12 +1224,14 @@ Function refreshHomeScreenContainers()
     end if
   end if
 
-  for i = 0 to m.CategoryGridList.content.getChildCount() - 1
-    container = m.CategoryGridList.content.getChild(i)
-    if shouldRefresh(container) = true
-      loadCategoryForIds.push(container.id)
-    end if
-  end for
+  if m.CategoryGridList.content <> invalid
+    for i = 0 to m.CategoryGridList.content.getChildCount() - 1
+      container = m.CategoryGridList.content.getChild(i)
+      if shouldRefresh(container) = true
+        loadCategoryForIds.push(container.id)
+      end if
+    end for
+  end if
   if loadCategoryForIds.count() > 0
     m.top.loadCategoryForIds = loadCategoryForIds
   end if
