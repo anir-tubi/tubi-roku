@@ -619,6 +619,7 @@ Function conditionallyUpdateHistoryForSidelined(position)
         "type": m.constants.ui.contentTypes.video
         "id": m.foxPlayerCurrentListing.tubi_id
         "nowPos": sideLinedContentPosition ' Will crash later if not present
+        "parentId": m.foxPlayerCurrentListing.parent_id
       }, true)
       updateHistoryAndHandleResponse(content, sideLinedContentPosition, true)
     end if
