@@ -341,30 +341,25 @@ Function fetchHomeScreen(homeScreen, useCache = false)
       errorHandler = onEspanolScreenErrorResponse
     else if homeScreen.id = m.constants.ui.screenIds.homeScreen
       if isKidsUIOn() = false AND isParentalControlsAdultLevel() = true
-        '//Call ad endpoint to get ad content for the homescreen\
+        '//Call ad endpoint to get ad content for the homescreen
         experimentAd = getExperimentResource("ads_ott_hdc_adformats", "ads_ott_hdc_adformats_v1", true)
         experimentAdType = "control"
         if experimentAd <> invalid
           experimentAdType = experimentAd.enabled_arm
         end if
-        if experimentAdType <> invalid AND experimentAdType <> "control"
 
-          aAdTypes = []
-          if experimentAdType = "carousel"
-            aAdTypes = [m.constants.adTypes.adRowlistCarousel]
-          else if experimentAdType = "spotlight"
-            aAdTypes = [m.constants.adTypes.adRowlistSpotlight]
-          end if
-          '//If this is no longer in the experiment and the ads_ott_hdc_adformats_v1 experiment has been graduated, then request both ad types and let the backend decide which ad type(s) to return
-          ' aAdTypes = [m.constants.adTypes.adRowlistCarousel, m.constants.adTypes.adRowlistSpotlight]
-
-          aAdTypes.push(m.constants.adTypes.skinAd) '//Also request the skin ad unit
-
-          createHomescreenAdRequest(homeScreen.id, onHomesceenAdDisplaySuccessResponse, aAdTypes, onHomesceenAdDisplayErrorResponse)
-        else
-          'If not in experiment, then indicate that the adContentUpdated flag is true so that ads are not waited on when loading homescreen content
-          bSkipCallingAdContent = true
+        aAdTypes = []
+        if experimentAdType = "carousel"
+          aAdTypes = [m.constants.adTypes.adRowlistCarousel]
+        else if experimentAdType = "spotlight"
+          aAdTypes = [m.constants.adTypes.adRowlistSpotlight]
         end if
+        '//If this is no longer in the experiment and the ads_ott_hdc_adformats_v1 experiment has been graduated, then request both ad types and let the backend decide which ad type(s) to return
+        ' aAdTypes = [m.constants.adTypes.adRowlistCarousel, m.constants.adTypes.adRowlistSpotlight]
+
+        aAdTypes.push(m.constants.adTypes.skinAd) '//Also request the skin ad unit
+
+        createHomescreenAdRequest(homeScreen.id, onHomesceenAdDisplaySuccessResponse, aAdTypes, onHomesceenAdDisplayErrorResponse)
       else
         'If in kids mode, then user is not in experiment and we should indicate that the adContentUpdated flag is true so that ads are not waited on when loading homescreen content
         bSkipCallingAdContent = true
