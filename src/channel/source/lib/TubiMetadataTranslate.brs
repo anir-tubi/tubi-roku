@@ -52,6 +52,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid, soTStaticConfig
     getSignalTrustInfo: tubiMetadataTranslate_getSignalTrustInfo
     parseScheduleData: tubiMetadataTranslate_parseScheduleData
     parseUICustomization: tubiMetadataTranslate_parseUICustomization
+    processSotStaticConfig: tubiMetadataTranslate_processSotStaticConfig
   }
 End Function
 
@@ -232,6 +233,77 @@ End Function
 
 
 '''''''''''''''''''''
+' processSotStaticConfig
+'
+' Processes SOT static configuration for New Episode and Tubi Presents labels
+'
+' @contentFromServer: assocArray, AA representation of content metadata JSON as returned from server
+' @sotInfo: assocArray, reference to SOT info object that will be updated
+' @return: assocArray, updated SOT info object
+Function tubiMetadataTranslate_processSotStaticConfig(contentFromServer as Object, sotInfo as Object) as Object
+  if isAA(m.soTStaticConfig) = true AND m.soTStaticConfig.count() > 0 AND isAA(m.soTStaticConfig.customizations) = true
+    contentId = contentFromServer.id
+    newEpisodesMatch = false
+    tubiPresentsMatch = false
+
+    if m.soTStaticConfig.newEpisode <> invalid AND m.soTStaticConfig.newEpisode[contentId] = true
+      newEpisodesMatch = true
+    end if
+
+    if m.soTStaticConfig.tubiPresents <> invalid AND m.soTStaticConfig.tubiPresents[contentId] = true
+      tubiPresentsMatch = true
+    end if
+
+    customizations = m.soTStaticConfig.customizations
+
+    if newEpisodesMatch = true AND isAA(customizations.new_episode) = true AND isNonEmptyString(customizations.new_episode.template) = true
+      newEpisodeTemplate = customizations.new_episode.template
+      if isAA(sotInfo) = false
+        sotInfo = {}
+      end if
+
+      'prioritizing New Episode
+      sotInfo.sotPosterLabels = {
+        sotIcon: ""
+        sotLabelText: newEpisodeTemplate
+      }
+
+      sotmetadatatoplabels = []
+      topLabel = {}
+      topLabel.sotIcon = ""
+      topLabel.sotLabelText = newEpisodeTemplate
+      sotmetadatatoplabels.push(topLabel)
+      sotInfo.sotmetadatatoplabels = sotmetadatatoplabels
+    end if
+
+    if tubiPresentsMatch = true AND isAA(customizations.tubi_presents) = true AND isNonEmptyString(customizations.tubi_presents.template) = true
+      tubiPresentsTemplate = customizations.tubi_presents.template
+      if isAA(sotInfo) = false
+        sotInfo = {}
+      end if
+
+      sotmetadata = sotInfo.sotmetadata
+
+      if sotmetadata = invalid
+        sotmetadata = []
+      end if
+
+      metadata = {}
+      metadata.sotIcon = "pkg:/images/tubi_presents_logo.webp"
+      metadata.sotLabelText = tubiPresentsTemplate
+      metadata.hideText = true
+      metadata.badgeIconWidth = 195
+      sotmetadata.push(metadata)
+      sotInfo.sotmetadata = sotmetadata
+    end if
+
+  end if
+
+  return sotInfo
+End Function
+
+
+'''''''''''''''''''''
 ' translateRecursive
 '
 ' This is a recursive function that does the heavy lifting for translateContentFromServer
@@ -366,6 +438,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, t
   end if
 
   sotInfo = {}
+  sotPosterLabels = {}
 
   sotCustomization = {}
   if isAA(container) = true OR isNode(container) = true
@@ -387,10 +460,27 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, t
     if sotChild <> invalid
       canHideLeavingSoon = canHideLeavingSoon(sotChild)
       sotInfo = m.getSignalTrustInfo(sotChild, contentFromServer)
+
+      posterLables = sotChild.poster_labels
+      if isNonEmptyArray(posterLables) = true
+        ' We are displaying a maximum of one poster label, so we're selecting the first index instead of considering the entire child count.
+        sotPosterLabels = m.getTheIconAndTextFromConfig(posterLables[0], contentFromServer)
+      end if
+
     end if
 
   end if
 
+  ' New Episode and Tubi Presents content IDs are sourced directly from the SotStatic response.
+  ' When comparing with other ui_customization children from the homescreen response, New Episode takes priority.
+  sotInfo = m.processSotStaticConfig(contentFromServer, sotInfo)
+
+  ' Use the updated sotPosterLabels from sotInfo if available, otherwise use the original sotPosterLabels
+  if isAA(sotInfo) = true AND isAA(sotInfo.sotPosterLabels) = true
+    translatedContent.sotPosterLabels = sotInfo.sotPosterLabels
+  else
+    translatedContent.sotPosterLabels = sotPosterLabels
+  end if
   translatedContent.sotInfo = sotInfo
 
   ' in case isCdc was already set from the parent above, don't overwrite
@@ -1607,6 +1697,35 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
               end if
 
               sotInfo = m.getSignalTrustInfo(sotChild, fullChild)
+            end if
+
+          end if
+
+          ' New Episode and Tubi Presents content IDs are sourced directly from the SotStatic response.
+          ' When comparing with other ui_customization children from the homescreen response, New Episode takes priority.
+          if isAA(m.soTStaticConfig) = true AND m.soTStaticConfig.count() > 0 AND isAA(m.soTStaticConfig.customizations) = true
+            contentId = fullChild.id
+            newEpisodesMatch = false
+
+            if m.soTStaticConfig.newEpisode <> invalid AND m.soTStaticConfig.newEpisode[contentId] = true
+              newEpisodesMatch = true
+            end if
+
+            customizations = m.soTStaticConfig.customizations
+
+            if newEpisodesMatch = true AND isAA(customizations.new_episode) = true AND isNonEmptyString(customizations.new_episode.template) = true
+              newEpisodeTemplate = customizations.new_episode.template
+              if isAA(sotInfo) = false
+                sotInfo = {}
+              end if
+
+              'prioritizing New Episode
+              sotPosterLabels = {
+                sotIcon: ""
+                sotLabelText: newEpisodeTemplate
+              }
+              sotInfo.sotPosterLabels = sotPosterLabels
+
             end if
 
           end if
@@ -3101,6 +3220,7 @@ Function tubiMetadataTranslate_getSignalTrustInfo(sotChild, content)
 
   metaData = sotChild.metadata
   sotMetaData = []
+
   if isNonEmptyArray(metaData) = true
     ' We are displaying the maximum number of metadata labels, so we're considering the entire child count.
     for i = 0 to metaData.count() - 1

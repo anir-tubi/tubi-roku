@@ -15,6 +15,7 @@
     <field id="text" type="string"/>
     <field id="width" type="float" alias="BadgeBackground.width"/>
     <field id="badgeTextWidth" type="float" alias="BadgeText.width"/>
+    <field id="badgeIconWidth" type="float" alias="BadgeIcon.width"/>
     <field id="showBackground" alias="BadgeBackground.visible" value="true" />
     <!-- This field is used to set the font style/size of the badge text when showBackground is false. Values can be any typographyConstants ids. -->
     <field id="badgeTextFont" type="string" />

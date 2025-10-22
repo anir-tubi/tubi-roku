@@ -95,6 +95,17 @@ Function updateInfoPanel(infoNode, content)
     genres: content.genres
   }
 
+  sotInfo = content.sotInfo
+  if isAA(sotInfo) = true
+    infoNode.sotTopLabelSignals = sotInfo.sotMetaDataTopLabels
+    lineTwoData.sotMetaData = sotInfo.sotMetaData
+    infoNode.sotMarkers = sotInfo.sotMarkers
+  else
+    infoNode.sotTopLabelSignals = []
+    lineTwoData.sotMetaData = []
+    infoNode.sotMarkers = {}
+  end if
+
   infoNode.lineOneData = lineOneData
   infoNode.lineTwoData = lineTwoData
   infoNode.description = content.description

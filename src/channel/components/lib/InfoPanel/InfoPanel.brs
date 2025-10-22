@@ -398,7 +398,11 @@ Function setSoTSignal(signals, signalType, badgeGroup, iconRequired = true)
   theme = m.theme
 
   for each signal in signals
-    if isNonEmptyString(signal.sotLabelText) = true
+    badgeIconWidth = signal.badgeIconWidth
+    sotLabelText = signal.sotLabelText
+    hideText = signal.hideText
+
+    if isNonEmptyString(sotLabelText) = true
       badge = createObject("roSGNode", "Badge")
       badge.backgroundColor = theme.neutralColor
       badge.textColor = theme.primaryTextColor
@@ -407,11 +411,20 @@ Function setSoTSignal(signals, signalType, badgeGroup, iconRequired = true)
       end if
 
       if signalType = m.BadgeTypes.sotMetaData
+
+        if isNumber(badgeIconWidth) = true
+          badge.badgeIconWidth = badgeIconWidth
+        end if
+
         badge.showBackground = false
         badge.badgeTextFont = m.typographyConstants.ids.bodySmallStrong
       end if
 
-      badge.text = signal.sotLabelText
+      if hideText = true
+        badge.text = ""
+      else
+        badge.text = sotLabelText
+      end if
 
       badgeGroup.appendChild(badge)
     end if

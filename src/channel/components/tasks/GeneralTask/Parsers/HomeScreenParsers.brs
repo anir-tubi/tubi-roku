@@ -528,5 +528,27 @@ End Function
 ' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
 Function parseSoTStaticConfigSuccess(fullResponse, reqInfo)
   response = fullResponse.data
+  parsedResponse = {}
+  newEpisode = {}
+  tubiPresents = {}
+
+  if response <> invalid
+    parsedResponse.customizations = response.customizations
+
+    neContentIds = response.new_episode
+    for each id in neContentIds
+      newEpisode[id] = true
+    end for
+
+    tpContentIds = response.tubi_presents
+    for each id in tpContentIds
+      tubiPresents[id] = true
+    end for
+
+    parsedResponse.newEpisode = newEpisode
+    parsedResponse.tubiPresents = tubiPresents
+    return parsedResponse
+  end if
+
   return response
 End Function

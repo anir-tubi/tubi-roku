@@ -54,6 +54,8 @@
     -->
     <field id="sotInfo" type="assocarray" value="{}" />
 
+    <field id="sotPosterLabels" type="assocarray" value="{}" />
+
     <!-- tracking info to be used specifically by youbora. The names of the keys of this AA will be under: constants.thirdParty.youbora.trackingKeys -->
     <field id="youboraTracking" type="assocarray" value="{}"/>
 
