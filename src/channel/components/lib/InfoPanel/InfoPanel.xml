@@ -275,6 +275,11 @@
               height="36"
               loadHeight="36"
               loadDisplayMode="scaleToFit"/>
+            <Poster
+              id="tubiPresentsLogo"
+              height="27"
+              translation="[0,5]"
+              loadDisplayMode="scaleToFit"/>  
           </LayoutGroup>
           <LayoutGroup
             id="SecondLineGroup"

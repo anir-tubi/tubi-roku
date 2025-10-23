@@ -98,10 +98,12 @@ Function updateInfoPanel(infoNode, content)
   sotInfo = content.sotInfo
   if isAA(sotInfo) = true
     infoNode.sotTopLabelSignals = sotInfo.sotMetaDataTopLabels
+    lineOneData.sotMetaData = sotInfo.sotMetaData
     lineTwoData.sotMetaData = sotInfo.sotMetaData
     infoNode.sotMarkers = sotInfo.sotMarkers
   else
     infoNode.sotTopLabelSignals = []
+    lineOneData.sotMetaData = []
     lineTwoData.sotMetaData = []
     infoNode.sotMarkers = {}
   end if

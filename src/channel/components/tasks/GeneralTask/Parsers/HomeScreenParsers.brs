@@ -537,11 +537,17 @@ Function parseSoTStaticConfigSuccess(fullResponse, reqInfo)
 
     neContentIds = response.new_episode
     for each id in neContentIds
+      if isString(id) = false
+        id = id.toStr()
+      end if
       newEpisode[id] = true
     end for
 
     tpContentIds = response.tubi_presents
     for each id in tpContentIds
+      if isString(id) = false
+        id = id.toStr()
+      end if
       tubiPresents[id] = true
     end for
 

@@ -22,7 +22,7 @@ Function init()
   m.defaultContentBackgroundUri = m.constants.ui.uris.defaultContentBackgroundUri
 
   '//hide menu left of the screen
-  m.MenuStartingXPos = -m.PageGroup.translation[1]-m.Menu.itemSize[0]
+  m.MenuStartingXPos = -m.PageGroup.translation[1] - m.Menu.itemSize[0]
   m.Menu.translation = [m.MenuStartingXPos, m.Menu.translation[1]]
 
   theme = getThemeFromGlobal()
@@ -125,10 +125,26 @@ Function onEpisodeFocused()
       lineOneData.rating = episode.rating
       lineOneData.partnerLogoUri = episode.inlineLogoUri
 
-      m.Info.lineOneData = lineOneData
-      m.Info.lineTwoData = {
-        genres: episode.genres
+      lineTwoData = {
+        genres: content.genres
       }
+
+      sotInfo = episode.sotInfo
+
+      if isAA(sotInfo) = true
+        m.Info.sotTopLabelSignals = sotInfo.sotMetaDataTopLabels
+        lineOneData.sotMetaData = sotInfo.sotMetaData
+        lineTwoData.sotMetaData = sotInfo.sotMetaData
+        m.Info.sotMarkers = sotInfo.sotMarkers
+      else
+        m.Info.sotTopLabelSignals = []
+        lineOneData.sotMetaData = []
+        lineTwoData.sotMetaData = []
+        m.Info.sotMarkers = {}
+      end if
+
+      m.Info.lineOneData = lineOneData
+      m.Info.lineTwoData = lineTwoData
 
       if episode.needsLogin = true AND m.top.signedIn = false
         m.Info.loginReason = episode.loginReason 'set login reason before needslogin
@@ -208,7 +224,7 @@ End Function
 ''''''''''''''''''''''
 ' getEpisodeContent
 '
-Function getEpisodeContent(selection As Object) As Object
+Function getEpisodeContent(selection as Object) as Object
   if m.top.content <> invalid then
     season = m.top.content.getChild(selection[0])
     if season <> invalid then
@@ -221,7 +237,7 @@ End Function
 
 
 'When menu updates season, we need to sync the season rows grid
-Function onMenuScrollFocused() As Void
+Function onMenuScrollFocused() as Void
   if m.RowList.preItemFocused <> m.Menu.rowScrollFocused
     tubiLog("EpisodeScreen.onMenuScrollFocused")
     m.RowList.animateToItem = m.Menu.rowScrollFocused
@@ -229,7 +245,7 @@ Function onMenuScrollFocused() As Void
 End Function
 
 
-Function setSeasonInfo(season As Integer)
+Function setSeasonInfo(season as Integer)
   ' Display the series description when the season is being selected
   seasonContent = m.top.content.getChild(season) ' season
   m.Info.title = seasonContent.title
@@ -263,7 +279,7 @@ End Function
 ''''''''''''''''''''
 ' onKeyEvent
 '
-Function onKeyEvent(key As String, press As Boolean) As Boolean
+Function onKeyEvent(key as String, press as Boolean) as Boolean
   tubiLog("EpisodesScreen.onKeyEvent" + key)
   if press then
     if key = "play" AND m.RowList.isInFocusChain() = true

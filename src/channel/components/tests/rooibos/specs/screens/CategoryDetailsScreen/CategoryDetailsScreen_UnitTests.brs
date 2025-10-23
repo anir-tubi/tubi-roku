@@ -59,6 +59,7 @@ Function categoryDetailsScreen_populateInfoPanelItem_test()
     rating: content.rating
     releaseDate: content.releaseDate
     availabilityEnds: content.availabilityEnds
+    sotMetaData: invalid
   }
   controlInfoPanel.lineTwoData = {
     genres: content.genres

@@ -386,6 +386,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     sotMarkers = detailScreen.sotMarkers
 
     detailScreen.sotTopLabelSignals = sotTopLabelSignals
+    lineOneData.sotMetaData = sotMetaData
     lineTwoData.sotMetaData = sotMetaData
 
     detailScreen.title = content.title

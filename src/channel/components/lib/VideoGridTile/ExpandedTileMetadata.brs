@@ -16,6 +16,7 @@ Function init()
   m.closedCaptions = m.firstLineGroup.findNode("ClosedCaptionPoster")
   m.subHeadlinePrefixGroup = m.top.findNode("subHeadlinePrefixGroup")
   m.subHeadlineSuffixGroup = m.top.findNode("subHeadlineSuffixGroup")
+  m.tubiPresentsLogo = m.firstLineGroup.findNode("tubiPresentsLogo")
 
   m.top.observeFieldScoped("itemContent", "onItemContentChange")
   m.top.observeFieldScoped("hideTitle", "onHideTitleChange")
@@ -277,6 +278,41 @@ Function metadataOnPosterContent(itemContent)
 
   else if isSotBadgePresent = true
     ratingSotParent.removeChild(m.sotBadge)
+  end if
+
+  sotInfo = itemContent.sotInfo
+  ' handle sotMetaData - append tubiPresentsLogo Poster to firstLineGroup if type is "tubiPresentsLogo"
+  tubiPresentsLogoIsPresent = (m.tubiPresentsLogo.getParent() <> invalid)
+  ' Remove the poster if no sotMetaData or no matching type
+  if tubiPresentsLogoIsPresent = true
+    m.firstLineGroup.removeChild(m.tubiPresentsLogo)
+    m.tubiPresentsLogo.visible = false
+  end if
+
+  if isAA(sotInfo) = true AND isNonEmptyArray(sotInfo.sotMetaData) = true
+    for each sotMetadata in sotInfo.sotMetaData
+      if sotMetadata.sotType = "tubiPresentsLogo"
+
+        ' Set Poster properties - use sotIcon as the uri
+        if isNonEmptyString(sotMetadata.sotIcon) = true
+          m.tubiPresentsLogo.uri = sotMetadata.sotIcon
+        end if
+
+        ' Set dimensions if provided
+        if isNumber(sotMetadata.width) = true
+          m.tubiPresentsLogo.width = sotMetadata.width
+        end if
+
+        if isNumber(sotMetadata.height) = true
+          m.tubiPresentsLogo.height = sotMetadata.height
+        end if
+
+        ' Append the tubiPresentsLogo Poster to firstLineGroup
+        m.firstLineGroup.appendChild(m.tubiPresentsLogo)
+        m.tubiPresentsLogo.visible = true
+        exit for ' Only process the first matching item
+      end if
+    end for
   end if
 
   if itemContent.hasSubtitles = true

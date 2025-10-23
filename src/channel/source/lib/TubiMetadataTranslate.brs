@@ -268,12 +268,12 @@ Function tubiMetadataTranslate_processSotStaticConfig(contentFromServer as Objec
         sotLabelText: newEpisodeTemplate
       }
 
-      sotmetadatatoplabels = []
+      sotMetaDatatoplabels = []
       topLabel = {}
       topLabel.sotIcon = ""
       topLabel.sotLabelText = newEpisodeTemplate
-      sotmetadatatoplabels.push(topLabel)
-      sotInfo.sotmetadatatoplabels = sotmetadatatoplabels
+      sotMetaDatatoplabels.push(topLabel)
+      sotInfo.sotMetaDatatoplabels = sotMetaDatatoplabels
     end if
 
     if tubiPresentsMatch = true AND isAA(customizations.tubi_presents) = true AND isNonEmptyString(customizations.tubi_presents.template) = true
@@ -282,19 +282,20 @@ Function tubiMetadataTranslate_processSotStaticConfig(contentFromServer as Objec
         sotInfo = {}
       end if
 
-      sotmetadata = sotInfo.sotmetadata
+      sotMetaData = sotInfo.sotMetaData
 
-      if sotmetadata = invalid
-        sotmetadata = []
+      if sotMetaData = invalid
+        sotMetaData = []
       end if
 
       metadata = {}
       metadata.sotIcon = "pkg:/images/tubi_presents_logo.webp"
       metadata.sotLabelText = tubiPresentsTemplate
-      metadata.hideText = true
-      metadata.badgeIconWidth = 195
-      sotmetadata.push(metadata)
-      sotInfo.sotmetadata = sotmetadata
+      metadata.sotType = "tubiPresentsLogo"
+      metadata.width = 194
+      metadata.height = 27
+      sotMetaData.push(metadata)
+      sotInfo.sotMetaData = sotMetaData
     end if
 
   end if
@@ -481,6 +482,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, t
   else
     translatedContent.sotPosterLabels = sotPosterLabels
   end if
+
   translatedContent.sotInfo = sotInfo
 
   ' in case isCdc was already set from the parent above, don't overwrite
@@ -1703,31 +1705,11 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
 
           ' New Episode and Tubi Presents content IDs are sourced directly from the SotStatic response.
           ' When comparing with other ui_customization children from the homescreen response, New Episode takes priority.
-          if isAA(m.soTStaticConfig) = true AND m.soTStaticConfig.count() > 0 AND isAA(m.soTStaticConfig.customizations) = true
-            contentId = fullChild.id
-            newEpisodesMatch = false
+          sotInfo = m.processSotStaticConfig(fullChild, sotInfo)
 
-            if m.soTStaticConfig.newEpisode <> invalid AND m.soTStaticConfig.newEpisode[contentId] = true
-              newEpisodesMatch = true
-            end if
-
-            customizations = m.soTStaticConfig.customizations
-
-            if newEpisodesMatch = true AND isAA(customizations.new_episode) = true AND isNonEmptyString(customizations.new_episode.template) = true
-              newEpisodeTemplate = customizations.new_episode.template
-              if isAA(sotInfo) = false
-                sotInfo = {}
-              end if
-
-              'prioritizing New Episode
-              sotPosterLabels = {
-                sotIcon: ""
-                sotLabelText: newEpisodeTemplate
-              }
-              sotInfo.sotPosterLabels = sotPosterLabels
-
-            end if
-
+          ' Use the updated sotPosterLabels from sotInfo if available, otherwise use the original sotPosterLabels
+          if isAA(sotInfo) = true AND isAA(sotInfo.sotPosterLabels) = true
+            sotPosterLabels = sotInfo.sotPosterLabels
           end if
 
           if isUserInVideoTilesExp = true

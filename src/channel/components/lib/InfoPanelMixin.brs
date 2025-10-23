@@ -29,10 +29,12 @@ Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel, isHome
   sotInfo = content.sotInfo
   if isAA(sotInfo) = true
     infoPanel.sotTopLabelSignals = sotInfo.sotMetaDataTopLabels
+    lineOneData.sotMetaData = sotInfo.sotMetaData
     lineTwoData.sotMetaData = sotInfo.sotMetaData
     infoPanel.sotMarkers = sotInfo.sotMarkers
   else
     infoPanel.sotTopLabelSignals = []
+    lineOneData.sotMetaData = []
     lineTwoData.sotMetaData = []
     infoPanel.sotMarkers = {}
   end if

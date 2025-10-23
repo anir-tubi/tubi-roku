@@ -33,6 +33,7 @@ Function init()
   m.descriptorCode = m.firstLineGroup.findNode("DescriptorCode")
   m.expireWarning = m.firstLineGroup.findNode("ExpireWarning")
   m.partnerLogo = m.firstLineGroup.findNode("PartnerLogo")
+  m.tubiPresentsLogo = m.firstLineGroup.findNode("tubiPresentsLogo")
 
   m.secondLineGroup = m.top.findNode("SecondLineGroup")
   m.secondLineAvailabilityBadge = m.secondLineGroup.findNode("SecondLineAvailabilityBadge")
@@ -398,9 +399,7 @@ Function setSoTSignal(signals, signalType, badgeGroup, iconRequired = true)
   theme = m.theme
 
   for each signal in signals
-    badgeIconWidth = signal.badgeIconWidth
     sotLabelText = signal.sotLabelText
-    hideText = signal.hideText
 
     if isNonEmptyString(sotLabelText) = true
       badge = createObject("roSGNode", "Badge")
@@ -411,21 +410,11 @@ Function setSoTSignal(signals, signalType, badgeGroup, iconRequired = true)
       end if
 
       if signalType = m.BadgeTypes.sotMetaData
-
-        if isNumber(badgeIconWidth) = true
-          badge.badgeIconWidth = badgeIconWidth
-        end if
-
         badge.showBackground = false
         badge.badgeTextFont = m.typographyConstants.ids.bodySmallStrong
       end if
 
-      if hideText = true
-        badge.text = ""
-      else
-        badge.text = sotLabelText
-      end if
-
+      badge.text = sotLabelText
       badgeGroup.appendChild(badge)
     end if
   end for
@@ -713,6 +702,40 @@ Function onLineOneDataChange(msg)
       end if
     end if
 
+    ' handle sotMetaData - append tubiPresentsLogo Poster to firstLineGroup if type is "tubiPresentsLogo"
+    tubiPresentsLogoIsPresent = (m.tubiPresentsLogo.getParent() <> invalid)
+    ' Remove the poster if no sotMetaData or no matching type
+    if tubiPresentsLogoIsPresent = true
+      firstLineGroup.removeChild(m.tubiPresentsLogo)
+      m.tubiPresentsLogo.visible = false
+    end if
+
+    if isNonEmptyArray(data.sotMetaData) = true
+      for each sotMetadata in data.sotMetaData
+        if sotMetadata.sotType = "tubiPresentsLogo"
+
+          ' Set Poster properties - use sotIcon as the uri
+          if isNonEmptyString(sotMetadata.sotIcon) = true
+            m.tubiPresentsLogo.uri = sotMetadata.sotIcon
+          end if
+
+          ' Set dimensions if provided
+          if isNumber(sotMetadata.width) = true
+            m.tubiPresentsLogo.width = sotMetadata.width
+          end if
+
+          if isNumber(sotMetadata.height) = true
+            m.tubiPresentsLogo.height = sotMetadata.height
+          end if
+
+          ' Append the tubiPresentsLogo Poster to firstLineGroup
+          firstLineGroup.appendChild(m.tubiPresentsLogo)
+          m.tubiPresentsLogo.visible = true
+          exit for ' Only process the first matching item
+        end if
+      end for
+    end if
+
   end if
 
   shouldCalculateHeight()
@@ -785,7 +808,17 @@ Function onLineTwoDataChange(msg)
     end if
 
     if isNonEmptyArray(data.sotMetaData) = true
-      setSoTSignal(data.sotMetaData, m.BadgeTypes.sotMetaData, secondLineGroup, true)
+      ' Filter out sotMetaData with type "tubiPresentsLogo" as it should go to firstLineGroup
+      filteredSotMetaData = []
+      for each sotMetadata in data.sotMetaData
+        if sotMetadata.sotType <> "tubiPresentsLogo"
+          filteredSotMetaData.push(sotMetadata)
+        end if
+      end for
+
+      if filteredSotMetaData.count() > 0
+        setSoTSignal(filteredSotMetaData, m.BadgeTypes.sotMetaData, secondLineGroup, true)
+      end if
     end if
 
   end if
