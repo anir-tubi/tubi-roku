@@ -37,7 +37,7 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
 
       roku_search_screen_animate_grid: {
         roku_search_screen_animate_grid_v1: {
-          default: { "enabled": false }
+          default: { "enabled": true }
         }
       }
 
