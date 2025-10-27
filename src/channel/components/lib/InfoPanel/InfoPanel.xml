@@ -203,7 +203,7 @@
           layoutDirection="vert"
           itemSpacings="[2]"
           vertAlignment="bottom"
-          visible="true" >
+          visible="false" >
           <LayoutGroup
             id="FirstLineGroup"
             layoutDirection="horiz"
@@ -325,6 +325,7 @@
 
         <LayoutGroup
           id="SignInGroup"
+          visible="false"
           layoutDirection="horiz"
           vertAlignment="custom"
           itemSpacings="[-180,10]"
@@ -355,6 +356,7 @@
 
         <LayoutGroup
           id="ReminderGroup"
+          visible="false"
           layoutDirection="horiz"
           vertAlignment="center"
           itemSpacings="[10]"

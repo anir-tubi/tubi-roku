@@ -27,11 +27,12 @@
 '                 callbackParams: <array>       - An array which will be passed to the callback as a single paramater
 '               }
 '
-Function showModal(modalInfo, buttonInfo)
+Function showModal(modalInfo, buttonInfo, isLinearSignUpUI = false)
   ' Don't create the modal if a modal already exists, or there is not enough info to create it
   if m.tempModal = invalid AND modalInfo <> invalid AND buttonInfo <> invalid
     removeFocusFromRowlist()
     modal = getSimpleModal(modalInfo)
+    modal.isModalUIChanged = isLinearSignUpUI
 
     m.tempModal = {
       buttonInfo: buttonInfo
@@ -163,6 +164,7 @@ Function getSimpleModal(modalInfo)
   modal.id = getUniqueModalId(title, message)
   modal.title = title
   modal.message = message
+  modal.subMessage = modalInfo.subMessage
   modal.scrollable = modalInfo.scrollable
   modal.instantResumeAction = modalInfo.instantResumeAction
   return modal
@@ -218,7 +220,7 @@ Function closeModal(modal, buttonSelected = invalid)
     trackEvent.values.dialog_action = "DISMISS_AUTO"
     if buttonSelected = invalid
       trackEvent.values.dialog_action = "ACCEPT_AUTO"
-    else if type(buttonSelected) = "String" or type(buttonSelected) = "roString"
+    else if type(buttonSelected) = "String" OR type(buttonSelected) = "roString"
       if buttonSelected = "back"
         'the user has pressed the back buttons on the remote
         trackEvent.values.dialog_action = "DISMISS_DELIBERATE"
@@ -312,7 +314,7 @@ End Function
 ' @cancelCallback: (optional)  Function to call when the cancel button is clicked
 ' @cancelParams: (optional)  The parameters to pass to the cancelCallback() function when it is called
 ' @buttons: (optional) An array of strings for the names of the buttons. Should only be 1 or 2 button names. Default buttons will be used if this is not passed
-Function showErrorModal(modalInfo = {}, tryAgainCallback = invalid, tryAgainParams = invalid, cancelCallback = invalid, cancelParams = invalid, buttons = []) As Void
+Function showErrorModal(modalInfo = {}, tryAgainCallback = invalid, tryAgainParams = invalid, cancelCallback = invalid, cancelParams = invalid, buttons = []) as Void
   tubiLog("ModalDialog.showErrorModal")
 
   if tryAgainCallback <> invalid
@@ -350,12 +352,12 @@ Function showErrorModal(modalInfo = {}, tryAgainCallback = invalid, tryAgainPara
   end if
 
   ' set a default error modal title
-  if modalInfo.title = invalid or modalInfo.title = ""
+  if modalInfo.title = invalid OR modalInfo.title = ""
     modalInfo.title = getTranslation("dialog_defaultError_title")
   end if
 
   ' set a default error modal message (this should never happen in theory)
-  if modalInfo.message = invalid or modalInfo.message = ""
+  if modalInfo.message = invalid OR modalInfo.message = ""
     modalInfo.message = getTranslation("dialog_defaultError_description")
   end if
 
@@ -388,7 +390,7 @@ End Function
 ' Returns a user facing error code as specified by:
 ' https://tubitv.atlassian.net/wiki/spaces/EC/pages/798359880/User+Facing+Error+Codes
 Function getUserFacingErrorCode(contextCode, subtypeCode, externalCode = "")
-  sPrefix = "RO"  '//RO = "Roku"
+  sPrefix = "RO" '//RO = "Roku"
 
   '//The external code is optional, so if there is no external code, then do not include it in the returned code
   sExternalCode = ""
@@ -404,9 +406,9 @@ Function getUserFacingErrorCode(contextCode, subtypeCode, externalCode = "")
   end if
 
   if isNonEmptyString(contextCode) = true
-    contextCode = "-" + contextCode 
+    contextCode = "-" + contextCode
   end if
-  
+
   if isNonEmptyString(subtypeCode) = true
     subtypeCode = "-" + subtypeCode
   end if
@@ -419,10 +421,10 @@ End Function
 ' ::TODO:: this is copied from generalUtils.brs. If/when we make generalUtils available to the general code, then we should link to generalUtils
 'Determine if the given object supports the ifString interface
 '******************************************************
-Function modal_isstr(obj as dynamic) As Boolean
-    if obj = invalid return false
-    if GetInterface(obj, "ifString") = invalid return false
-    return true
+Function modal_isstr(obj as Dynamic) as Boolean
+  if obj = invalid return false
+  if GetInterface(obj, "ifString") = invalid return false
+  return true
 End Function
 
 '******************************************************
@@ -430,10 +432,10 @@ End Function
 ' ::TODO:: this is copied from generalUtils.brs. If/when we make generalUtils available to the general code, then we should link to generalUtils
 'Determine if the given object supports the ifInt interface
 '******************************************************
-Function modal_isint(obj as dynamic) As Boolean
-    if obj = invalid return false
-    if GetInterface(obj, "ifInt") = invalid return false
-    return true
+Function modal_isint(obj as Dynamic) as Boolean
+  if obj = invalid return false
+  if GetInterface(obj, "ifInt") = invalid return false
+  return true
 End Function
 
 
@@ -496,9 +498,9 @@ End Function
 ' @callback: (optional) roFunction, a function that will be triggered when the first button is selected
 ' @cancelCallback: (optional) Function will be triggered when the second button is clicked (function will not have any params)
 ' @instantResumeAction: string, provides the information on what action should take for error and action modals.
-Function showSimpleModal(title, message, buttons, dialogEvent, trackingTask, callback = invalid, cancelCallback = invalid, instantResumeAction = "")
-  info = getSimpleModalInfo(title, message, buttons, dialogEvent, trackingTask, callback, cancelCallback, instantResumeAction)
-  showModal(info.modalInfo, info.buttonInfo)
+Function showSimpleModal(title, message, buttons, dialogEvent, trackingTask, callback = invalid, cancelCallback = invalid, instantResumeAction = "", isLinearSignUpUI = false, subMessage = "")
+  info = getSimpleModalInfo(title, message, buttons, dialogEvent, trackingTask, callback, cancelCallback, instantResumeAction, subMessage)
+  showModal(info.modalInfo, info.buttonInfo, isLinearSignUpUI)
 End Function
 
 
@@ -514,8 +516,9 @@ End Function
 ' @trackingTask: roSGNode, an instance of the trackingLoggingTask - used to send close dialog events when the dialog is closed.
 ' @callback: (optional) roFunction, a function that will be triggered when the first button is selected
 ' @cancelCallback: (optional) Function will be triggered when the second button is clicked (function will not have any params)
-Function showSimpleInstantResumableModal(title, message, buttons, dialogEvent, trackingTask, callback = invalid, cancelCallback = invalid)
-  showSimpleModal(title, message, buttons, dialogEvent, trackingTask, callback, cancelCallback, m.constants.instantResumeActions.closeDialog)
+' @subMessage: (Optional) will be only used for linear registration age-gate modals for now to show the hint.
+Function showSimpleInstantResumableModal(title, message, buttons, dialogEvent, trackingTask, callback = invalid, cancelCallback = invalid, isLinearSignUpUI = false, subMessage = "")
+  showSimpleModal(title, message, buttons, dialogEvent, trackingTask, callback, cancelCallback, m.constants.instantResumeActions.closeDialog, isLinearSignUpUI, subMessage)
 End Function
 
 
@@ -531,7 +534,8 @@ End Function
 ' @trackingLib: associativeArray, an instance of TubiTracking()
 ' @trackingTask: roSGNode, an instance of the trackingLoggingTask - used to send close dialog events when the dialog is closed.
 ' @callback: (optional) roFunction, a function that will be triggered when the first button is selected
-Function showSignInRequiredModal(dialogTitle, dialogMessage, buttons, screen, dialogSubType, trackingLib, trackingTask, callBackFunction = invalid)
+' @subMessage: (Optional) will be only used for linear registration age - gate modals for now to show the hint.
+Function showSignInRequiredModal(dialogTitle, dialogMessage, buttons, screen, dialogSubType, trackingLib, trackingTask, callBackFunction = invalid, isLinearSignUpUI = false, subMessage = "")
   pageInfo = screen.trackingPageInfo
   dialogEvent = {
     type: "dialog"
@@ -546,7 +550,7 @@ Function showSignInRequiredModal(dialogTitle, dialogMessage, buttons, screen, di
   title = dialogTitle
   message = dialogMessage
   buttons = buttons
-  showSimpleInstantResumableModal(title, message, buttons, dialogEvent, trackingTask, callBackFunction)
+  showSimpleInstantResumableModal(title, message, buttons, dialogEvent, trackingTask, callBackFunction, invalid, isLinearSignUpUI, subMessage)
 End Function
 
 
@@ -555,21 +559,22 @@ End Function
 ' prior to calling showModal. For example showDescriptionModal() needs to add the scrollable key.
 '
 ' Returns an assocArray with the keys modalInfo and buttonInfo.
-Function getSimpleModalInfo(title, message, buttons, dialogEvent, trackingTask, callback = invalid, cancelCallback = invalid, instantResumeAction = "")
+Function getSimpleModalInfo(title, message, buttons, dialogEvent, trackingTask, callback = invalid, cancelCallback = invalid, instantResumeAction = "", subMessage = "")
   modalInfo = {
     title: title
     message: message
+    subMessage: subMessage
     openTrackEvent: dialogEvent
     trackingTask: trackingTask
-    backButtonCallback : cancelCallback
-    instantResumeAction : instantResumeAction
+    backButtonCallback: cancelCallback
+    instantResumeAction: instantResumeAction
   }
 
   buttonInfo = []
 
   'always create at least one button
   firstButtonText = getTranslation("dialog_button_ok")
-  if type(buttons) = "roArray" AND (type(buttons[0]) = "roString" or type(buttons[0]) = "String")
+  if type(buttons) = "roArray" AND (type(buttons[0]) = "roString" OR type(buttons[0]) = "String")
     firstButtonText = buttons[0]
   end if
   buttonOne = {
@@ -581,7 +586,7 @@ Function getSimpleModalInfo(title, message, buttons, dialogEvent, trackingTask, 
   buttonInfo.push(buttonOne)
 
   'second button is optional
-  if type(buttons) = "roArray" AND (type(buttons[1]) = "roString" or type(buttons[1]) = "String")
+  if type(buttons) = "roArray" AND (type(buttons[1]) = "roString" OR type(buttons[1]) = "String")
     buttonTwo = {
       text: buttons[1]
       type: "dismiss"
@@ -601,7 +606,7 @@ End Function
 ' Helper function to return the top most modal being displayed with respect to the current m.top
 Function getTopModal()
 
-  for i = m.top.getChildCount()-1 to 0 Step -1
+  for i = m.top.getChildCount() - 1 to 0 step -1
     child = m.top.getChild(i)
     if child.isSubtype("BaseDialogScreen") = true
       return child

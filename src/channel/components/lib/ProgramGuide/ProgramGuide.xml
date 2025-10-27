@@ -65,6 +65,10 @@
     <!-- present the ready node to play -->
     <field id="linearChannelToPlay" type="node" />
 
+    <!-- this field will update the background images when content has needsLogIn = true and user is in roku_linear_age_gate_v1 experiment -->
+    <field id="isBackgroundImagesChanges" type="boolean" alwaysNotify="true"/>
+
+
     <!--Since LinearChannelToPlay will get updated everytime minsLeftTimer is run, to protect unwanted trigging of observer, this field is used-->
     <field id="linearChannelToPlayUpdated" type="boolean" alwaysNotify="true"/>
 

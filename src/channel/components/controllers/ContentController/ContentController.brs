@@ -3423,13 +3423,86 @@ Function processUserContentSelection(content, screen, playbackSource = {}) as Vo
   else if contentType = m.constants.ui.contentTypes.historySignedOutUser
     startSignIn(refreshScreenAndContentAfterSignIn)
   else if contentType = m.constants.ui.contentTypes.linear
-    selectLinearContent(content)
+    if content.needsLogin = true AND getStatsigExperimentResource("roku_linear_age_gate", "roku_linear_age_gate_v1").enabled = true
+      showLinearPlayerSignInModal(content)
+    else
+      selectLinearContent(content)
+    end if
   else if contentType = m.constants.ui.contentTypes.skinAd
     playAdContent(content)
   else if playerType = m.constants.ui.playerTypes.fox
     showLinearDetailScreen(content, playbackSource)
   else
     showDetailScreen(content, true, invalid, invalid, playbackSource)
+  end if
+End Function
+
+
+Function showLinearPlayerSignInModal(content)
+  tubiLog("ContentController.showLinearPlayerSignInModal")
+
+  if content <> invalid
+    ' Get program name for the modal
+    programName = content.title
+
+    ' Create two-line title format:
+    ' Line 1: "Register or Sign In to stream"
+    ' Line 2: "{ProgramName}"
+    titleLine1 = getTranslation("linear_player_signin_title") ' "Register or Sign In to stream"
+    modalTitle = titleLine1 + Chr(10) + programName
+
+    ' Modal message details
+    message = getTranslation("linear_player_signin_subtitle") ' "No credit card required • FREE Forever"
+    subMessage = getTranslation("linear_player_signin_description") ' "Please register or sign in to watch."
+
+    buttons = [getTranslation("dialog_button_continue"), getTranslation("dialog_button_exit")]
+    ' Get current screen for analytics
+    currentScreen = getCurrentScreen()
+
+
+    ' Store content reference for callbacks
+    m.linearSignInModalContent = content
+
+    ' Show the modal with two-line title
+    showSignInRequiredModal(modalTitle, message, buttons, currentScreen, "linear-signin", m.Tracking, m.trackingLoggingTask, onLinearSignInModalContinue, true, subMessage)
+  end if
+End Function
+
+
+'Callback when user selects "Continue" from linear sign-in modal
+Function onLinearSignInModalContinue()
+  tubiLog("ContentController.onLinearSignInModalContinue")
+
+  if m.linearSignInModalContent <> invalid
+    content = m.linearSignInModalContent
+
+    ' Clear stored content
+    m.linearSignInModalContent = invalid
+
+    ' Start sign-in process, then redirect to linear content selection
+    m.contentAfterSignIn = content
+    startSignIn(onLinearSignInComplete)
+  end if
+End Function
+
+
+' Callback after sign-in is complete for linear content
+Function onLinearSignInComplete()
+  tubiLog("ContentController.onLinearSignInComplete")
+
+  if m.contentAfterSignIn <> invalid
+    content = m.contentAfterSignIn
+    m.contentAfterSignIn = invalid
+    currentScreen = getCurrentScreen()
+
+    playbackSource = {
+      "srcForAnalytic": m.constants.player.playbackSource.unknown
+      "srcForAds": m.constants.player.playbackOrigin.container
+    }
+
+    ' Now that user is signed in, select the linear content normally
+    stopLinearVideoContent()
+    playLinearVideoContent(content, false, currentScreen.id, true, playbackSource)
   end if
 End Function
 

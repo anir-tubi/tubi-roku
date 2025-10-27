@@ -18,11 +18,15 @@
       <!-- The text of buttons.  The button list will grow to the size of this array -->
       <field id="buttons" type="stringarray" value="[]" alwaysNotify="true"/>
 
-      <!-- Bold header text, single line -->
+      <!-- Bold header text, can be multiple lines for linear content -->
       <field id="title" alias="Title.text"/>
 
       <!-- Secondary message, multiple lines -->
       <field id="message" type="string" value=""/>
+
+      <field id="subMessage" type="string" value=""/>
+
+      <field id="isModalUIChanged" type="boolean" value="false" alwaysNotify="true"/>
 
       <field id="scrollable" type="boolean" value="false"/>
 
@@ -46,6 +50,14 @@
         horizAlignment="custom"
         translation="[20,65]"
         itemSpacings="[50,36]">
+        <Poster
+          id="signUpLogo"
+          visible="false"
+          uri="pkg:/images/profile_icon.png"
+          height="84"
+          loadHeight="84"
+           translation="[44,0]"
+          loadDisplayMode="scaleToFit"/>
         <Label
           id="Title"
           width="763"
@@ -64,6 +76,15 @@
             wrap="true"
             maxLines="8"
             translation="[0,0]">
+            <Font
+              role="font"/>
+          </Label>
+          <Label
+            id="subMessage"
+            width="822"
+            wrap="true"
+            maxLines="8"
+            translation="[0,45]">
             <Font
               role="font"/>
           </Label>

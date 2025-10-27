@@ -16,7 +16,7 @@ Function showEPGScreen(constants, screenID = "")
     epgScreen.signedIn = isLoggedInUser()
 
   else
-    displayDefaultBackground()  ' clear background from previous screens until epgscreen loads
+    displayDefaultBackground() ' clear background from previous screens until epgscreen loads
     showHideSpinner(true)
 
     epgScreen = CreateObject("roSGNode", "EPGHomeScreen")
@@ -64,10 +64,10 @@ Function refreshEPGScreen(epgScreen)
   tubiLog("EPGScreenHelpers.refreshEPGscreen")
   mode = m.constants.ui.contentMode.epgScreen
   epgScreen.signedIn = isLoggedInUser()
-  epgChannelList  = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
+  epgChannelList = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
 
 
-  if epgChannelList = invalid or (epgChannelList <> invalid AND shouldRefresh(epgChannelList.getChild(0)) = true)'There is no cached contents
+  if epgChannelList = invalid OR (epgChannelList <> invalid AND shouldRefresh(epgChannelList.getChild(0)) = true)'There is no cached contents
     setEPGScreenLoading(epgScreen)
     fetchEPGScreenChannels(epgScreen, mode)
   else if epgChannelList <> invalid
@@ -77,7 +77,7 @@ Function refreshEPGScreen(epgScreen)
 End Function
 
 
-Function fetchEPGScreenChannels(screen, mode="")
+Function fetchEPGScreenChannels(screen, mode = "")
   tubiLog("EPGScreenHelpers.fetchEPGScreenChannels")
 
   screen.trackingLoadStartTime = UpTime(0)
@@ -98,13 +98,13 @@ Function fetchEPGChannels(screen, mode = "tubitv_us_linear")
   isSignedIn = isLoggedInUser()
 
   channelRequest = m.makeRequest({
-    url : epgContainerInfo.url
-    requestType : m.constants.reqNames.getEPGChannelIds
-    options : epgContainerInfo.options
-    successCallback : onEpgChannelListResponse
-    errorCallback : onEpgError 'if there is no program list then there wont be any programs to pull.
-    responseType : "node"
-    requestorID : screen.ID
+    url: epgContainerInfo.url
+    requestType: m.constants.reqNames.getEPGChannelIds
+    options: epgContainerInfo.options
+    successCallback: onEpgChannelListResponse
+    errorCallback: onEpgError 'if there is no program list then there wont be any programs to pull.
+    responseType: "node"
+    requestorID: screen.ID
     isSignedInUser: isSignedIn
   })
 
@@ -156,21 +156,21 @@ Function fetchEPGChannel(screenId, channelID, successCallback, errorCallback)
     instantResponse.appendChild(clonedCachedChannel)
     successCallback(instantResponse, false)
   else
-      '//call the API to get new channel data
-      channelListIDs = [channelID]
-      isSignedIn = isLoggedInUser()
-      epgProgramInfo = m.tensorapi.getEPGProgramReqInfo(channelListIDs)
-      m.makeRequest({
-        url : epgProgramInfo.url
-        requestType : m.constants.reqNames.getEPGPrograms
-        options : epgProgramInfo.options
-        successCallback : successCallback
-        errorCallback : errorCallback
-        responseType : "node"
-        storeInCacheUponSuccess: true
-        requestorID : screenId
-        isSignedInUser: isSignedIn
-      })
+    '//call the API to get new channel data
+    channelListIDs = [channelID]
+    isSignedIn = isLoggedInUser()
+    epgProgramInfo = m.tensorapi.getEPGProgramReqInfo(channelListIDs)
+    m.makeRequest({
+      url: epgProgramInfo.url
+      requestType: m.constants.reqNames.getEPGPrograms
+      options: epgProgramInfo.options
+      successCallback: successCallback
+      errorCallback: errorCallback
+      responseType: "node"
+      storeInCacheUponSuccess: true
+      requestorID: screenId
+      isSignedInUser: isSignedIn
+    })
   end if
 
 End Function
@@ -225,15 +225,15 @@ Function onEpgChannelListResponse(response)
             for j = 1 to upIndex
               if index - j >= 0
                 epgChannel = response.getChild(index - j)
-                if channelListAA[epgChannel.id] <>  true
-                  channelListAA[epgChannel.id] =  true
-                  m.uniqueChannelIdsList.push(epgChannel.id)  ' store it Array to preserve the order of the original list from the server.
+                if channelListAA[epgChannel.id] <> true
+                  channelListAA[epgChannel.id] = true
+                  m.uniqueChannelIdsList.push(epgChannel.id) ' store it Array to preserve the order of the original list from the server.
                 end if
               end if
 
               if index + j < upIndex
                 epgChannel = response.getChild(index + j)
-                if channelListAA[epgChannel.id] <>  true
+                if channelListAA[epgChannel.id] <> true
                   channelListAA[epgChannel.id] = true
                   m.uniqueChannelIdsList.push(epgChannel.id) ' store it Array to preserve the order of the original list from the server.
                 end if
@@ -246,7 +246,7 @@ Function onEpgChannelListResponse(response)
       else
         for i = 0 to response.getChildCount() - 1 'If no jump_to channel has been specified, then just load from first to last channel(epg screen)
           epgChannel = response.getChild(i)
-          if channelListAA[epgChannel.id] <>  true
+          if channelListAA[epgChannel.id] <> true
             channelListAA[epgChannel.id] = true
             m.uniqueChannelIdsList.push(epgChannel.id) ' store it Array to preserve the order of the original list from the server.
           end if
@@ -284,13 +284,13 @@ Function makeEPGProgramCalls(requestorID, nFetchInBatch = 10)
     isSignedIn = isLoggedInUser()
 
     m.makeRequest({
-      url : epgProgramInfo.url
-      requestType : m.constants.reqNames.getEPGPrograms
-      options : epgProgramInfo.options
-      successCallback : onEPGProgramSuccess
-      errorCallback : onEpgProgramError
-      responseType : "node"
-      requestorID : requestorID
+      url: epgProgramInfo.url
+      requestType: m.constants.reqNames.getEPGPrograms
+      options: epgProgramInfo.options
+      successCallback: onEPGProgramSuccess
+      errorCallback: onEpgProgramError
+      responseType: "node"
+      requestorID: requestorID
       fetchId: m.epgFetchUniqueId
       isSignedInUser: isSignedIn
     })
@@ -379,19 +379,19 @@ Function onEpgError(response)
       code = response.code
       errorCode = getUserFacingErrorCode(m.constants.errors.context.epgScreen, m.constants.errors.subtypes.fetchError, code)
       dialogEvent = {
-        type : "dialog"
-        values : {
-          dialog_type : "NETWORK_ERROR"
-          pageOneof : m.Tracking.getAnalyticsPage("linear_browse_page", {})
-          dialog_action : "SHOW"
-          dialog_sub_type : errorCode
+        type: "dialog"
+        values: {
+          dialog_type: "NETWORK_ERROR"
+          pageOneof: m.Tracking.getAnalyticsPage("linear_browse_page", {})
+          dialog_action: "SHOW"
+          dialog_sub_type: errorCode
         }
       }
 
       modalInfo = {
-        message : getErrorMessage(errorMessage, errorCode)
-        openTrackEvent : dialogEvent
-        trackingTask : m.trackingLoggingTask
+        message: getErrorMessage(errorMessage, errorCode)
+        openTrackEvent: dialogEvent
+        trackingTask: m.trackingLoggingTask
       }
 
       showErrorModal(modalInfo)
@@ -443,29 +443,33 @@ Function onEPGScreenOKPressed()
   if currentScreen <> invalid AND isAnEpgScreen(currentScreen)
     contentToPlay = currentScreen.LinearChannelToPlay
     if contentToPlay <> invalid
-      startPlayVideo = true
-      linearVideoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
-      if linearVideoPlayer <> invalid AND linearVideoPlayer.content <> invalid
-        if linearVideoPlayer.content.id = contentToPlay.id AND linearVideoPlayer.state = "playing"
-          'do not Re-play same content
-          startPlayVideo = false
-        end if
-      end if
-
-      if startPlayVideo = true
-        'If player is currently not playing the current content,
-        'tell player to load and play the video associated with the selected item
-        stopCountdownTimer() 'stop previous counter
-        stopLinearVideoContent()
-        playbackSource = {
-          "srcForAnalytic": m.constants.player.playbackSource.unknown
-          "srcForAds": m.constants.player.playbackOrigin.epg
-          "playbackContainer": contentToPlay.parentId
-          }
-        playLinearVideoContent(contentToPlay, false, currentScreen.id, false, playbackSource)
+      if contentToPlay.needsLogin = true AND getStatsigExperimentResource("roku_linear_age_gate", "roku_linear_age_gate_v1").enabled = true
+        showLinearPlayerSignInModal(contentToPlay)
       else
-        stopCountdownTimer()
-        maximizeLinearPlayer(contentToPlay)
+        startPlayVideo = true
+        linearVideoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
+        if linearVideoPlayer <> invalid AND linearVideoPlayer.content <> invalid
+          if linearVideoPlayer.content.id = contentToPlay.id AND linearVideoPlayer.state = "playing"
+            'do not Re-play same content
+            startPlayVideo = false
+          end if
+        end if
+
+        if startPlayVideo = true
+          'If player is currently not playing the current content,
+          'tell player to load and play the video associated with the selected item
+          stopCountdownTimer() 'stop previous counter
+          stopLinearVideoContent()
+          playbackSource = {
+            "srcForAnalytic": m.constants.player.playbackSource.unknown
+            "srcForAds": m.constants.player.playbackOrigin.epg
+            "playbackContainer": contentToPlay.parentId
+          }
+          playLinearVideoContent(contentToPlay, false, currentScreen.id, false, playbackSource)
+        else
+          stopCountdownTimer()
+          maximizeLinearPlayer(contentToPlay)
+        end if
       end if
     end if
   end if
@@ -579,7 +583,7 @@ Function setEPGScreenLoading(epgScreen)
   tubiLog("EPGScreenHelpers: setEPGScreenLoading")
   if isAnEpgScreen(epgScreen) = true
     screen = getCurrentScreen()
-    if screen = invalid or screen.id = epgScreen.id
+    if screen = invalid OR screen.id = epgScreen.id
       showHideSpinner(true)
       displayDefaultBackground()
     end if
@@ -625,8 +629,8 @@ End Function
 Function changeEPGScreenBackground(EPGScreen)
   if EPGScreen <> invalid AND EPGScreen.backgroundUriList <> invalid
     m.backgroundGroup.backgroundInfo = {
-      type : getBackgroundType(EPGScreen.backgroundUriList, m.constants.ui.contentTypes.epg)
-      uriList : EPGScreen.backgroundUriList
+      type: getBackgroundType(EPGScreen.backgroundUriList, m.constants.ui.contentTypes.epg)
+      uriList: EPGScreen.backgroundUriList
     }
   end if
 End Function

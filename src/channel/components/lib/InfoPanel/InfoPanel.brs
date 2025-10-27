@@ -291,6 +291,8 @@ Function onNeedsLoginChange(msg)
   mode = m.top.mode
   signInGroupIsPresent = (m.signInGroup.getParent() <> invalid)
 
+  m.SignInGroup.visible = needsLogin
+
   modesWithTimerAtBottom = {}
   modesWithTimerAtBottom[m.constants.ui.infoPanelModes.linearHomeScreen] = true
 
@@ -425,6 +427,7 @@ End Function
 Function onReminderChange(msg)
   tubiLog("InfoPanel.onReminderChange")
   isReminder = msg.getData()
+  m.ReminderGroup.visible = isReminder
 
   reminderIsPresent = (m.reminderGroup.getParent() <> invalid)
   if isReminder = true AND reminderIsPresent = false
@@ -445,6 +448,7 @@ Function onLineOneDataChange(msg)
   firstLineGroup = m.firstLineGroup
   firstLineGroupIsPresent = (firstLineGroup.getParent() <> invalid)
 
+  m.twoLineInfo.visible = true
   if isAA(data) AND data.count() > 0 AND firstLineGroupIsPresent = false
     m.twoLineInfo.insertChild(firstLineGroup, 0)
   else if (isAA(data) = false OR data.count() = 0) AND firstLineGroupIsPresent = true

@@ -17,8 +17,9 @@ Function init()
   m.epgTimeGrid = m.top.findNode("programGuide")
   m.epgTimeGrid.observeField("linearChannelFocusedUpdated", "onLinearChannelFocused")
   m.epgTimeGrid.observeField("linearChannelToPlayUpdated", "onLinearChannelToPlay")
-  m.epgTimeGrid.observeField("okPressed","onEPGTimegridOKPressed")
+  m.epgTimeGrid.observeField("okPressed", "onEPGTimegridOKPressed")
   m.epgTimeGrid.observeField("currFocusRow", "onCurrFocusRowChange")
+  m.epgTimeGrid.observeField("isBackgroundImagesChanges", "isOnBackgroundImagesChange")
   ' In this mode epg will expose the channel to Play only when uses presses/say "OK" or "PLAY"
   m.epgTimeGrid.EPGChannelPlayMode = m.constants.EPGChannelPlayMode.playItemOnSelect
 
@@ -37,8 +38,8 @@ Function init()
   m.top.backgroundUriList = []
   m.top.handlesTransportVoiceRequests = true
   m.top.trackingPageInfo = {
-    pageType : "linear_browse_page"
-    pageValues : {}
+    pageType: "linear_browse_page"
+    pageValues: {}
   }
   m.epgTimeGrid.trackingPageInfo = m.top.trackingPageInfo
   'ChannelRefreshTimer
@@ -75,6 +76,18 @@ Function onScreenFocusChange()
     fadeInContentArea()
   end if
 
+End Function
+
+
+Function isOnBackgroundImagesChange(msg)
+  backGroundImages = msg.getData()
+
+  'When user is in roku_linear_age_gate_v1 experiement, user will not play the content if needsLogIn = true, so we are just updating the backgroundImages.
+  if backGroundImages = true AND getStatsigExperimentResource("roku_linear_age_gate", "roku_linear_age_gate_v1", false).enabled = true
+    rowItemFocused = m.epgTimeGrid.rowItemFocused
+    content = m.epgTimeGrid.content.getChild(rowItemFocused[0])
+    m.top.backgroundUriList = determineBackgroundImage(content)
+  end if
 End Function
 
 
@@ -168,14 +181,14 @@ Function onLinearChannelToPlay(msg)
 
     if linearChannelToPlay <> invalid
       m.top.trackingComponentInfo = {
-        componentType : "epg_component"
-        componentValues : {
-          content_tile : m.Tracking.getAnalyticsTile(linearChannelToPlay, col, row)
+        componentType: "epg_component"
+        componentValues: {
+          content_tile: m.Tracking.getAnalyticsTile(linearChannelToPlay, col, row)
           category_slug: linearChannelToPlay.parentId
         }
       }
 
-      if m.top.linearChannelToPlay = invalid or (m.top.linearChannelToPlay <> invalid AND linearChannelToPlay <> invalid AND m.top.linearChannelToPlay.id <> linearChannelToPlay.id )
+      if m.top.linearChannelToPlay = invalid OR (m.top.linearChannelToPlay <> invalid AND linearChannelToPlay <> invalid AND m.top.linearChannelToPlay.id <> linearChannelToPlay.id)
         m.top.linearChannelToPlay = linearChannelToPlay
         m.top.backgroundUriList = determineBackgroundImage(linearChannelToPlay)
       end if
@@ -230,7 +243,7 @@ End Function
 
 
 
-Function onKeyEvent(key As string, press As boolean) As boolean
+Function onKeyEvent(key as String, press as Boolean) as Boolean
   tubiLog("EPGHomeScreen.onKeyEvent")
   if press
     if key = "play" AND m.epgTimeGrid.isInFocusChain() = true
@@ -264,7 +277,7 @@ Function onIDChange()
   '//::NOTE:: id should only be set after the instantiation of the HomeScreen, but before the screen is added to the stack
   newTrackingPageInfo = m.top.trackingPageInfo
   analyticsContentMode = m.Tracking.getAnalyticsHomePageContentMode(m.top.id)
-  newTrackingPageInfo.pageValues = {content_mode: analyticsContentMode}
+  newTrackingPageInfo.pageValues = { content_mode: analyticsContentMode }
 
   m.top.trackingPageInfo = newTrackingPageInfo
 End Function
@@ -281,8 +294,8 @@ Function getTrackingComponentInfoOfEPGGridList(timegridItem, itemPosition)
 
     ' Set the tracking component of the timegridItem that was passed so it can be accessed as part of the navigateToPage event
     trackingComponentInfo = {
-      componentType : "EPGComponent"
-      componentValues : componentValues
+      componentType: "EPGComponent"
+      componentValues: componentValues
     }
   end if
 

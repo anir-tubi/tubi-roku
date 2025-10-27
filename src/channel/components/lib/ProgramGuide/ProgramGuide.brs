@@ -79,13 +79,17 @@ Function programGridContentFocused(channelItem, itemPosition)
   if itemPosition <> invalid AND itemPosition.count() = 2
     channel = channelItem.content.getChild(itemPosition[0])
 
+    if channel.needsLogin = true AND isNonEmptyArray(channel.backgrounds) = true
+      m.top.isBackgroundImagesChanges = true
+    end if
+
     if m.playOnFocusMode = true OR m.top.linearChannelToPlay = invalid 'anytime linearChannelToPlay is invalid, assign focused channel to play?
 
       if channel <> invalid AND channel.videoResources <> invalid
         epgTrackingComponentInfo = getEPGTrackingComponentInfo(itemPosition)
         m.top.epgTrackingComponentInfo = {
-          componentType : "epg_component"
-          componentValues : epgTrackingComponentInfo
+          componentType: "epg_component"
+          componentValues: epgTrackingComponentInfo
         }
         m.top.linearChannelToPlay = channel
         m.top.linearChannelToPlayUpdated = true
@@ -266,7 +270,7 @@ Function onUpdateMinsLeftTimer()
             if program.endTime - now <= 0
               channel.removeChildIndex(j)
             else if isProgramLive(program) = true
-              program.ShortDescriptionLine1 = getTranslation("epg_minutes_left", {minutes: toStr(convertSecondsToMins(program.endTime - now))})
+              program.ShortDescriptionLine1 = getTranslation("epg_minutes_left", { minutes: toStr(convertSecondsToMins(program.endTime - now)) })
               exit for 'found the current program
             end if
           end if
@@ -354,8 +358,8 @@ Function doesSendEvent(lastItemFocused, rowItemFocused)
     'to avoid duplicates, when onProgramGridContentFocused() gets invoked twice.
     if rowItemFocused[1] = lastItemFocused[1] AND rowItemFocused[0] = lastItemFocused[0]
       isEqual = false
-    'this will avoid the duplicate events when up/down navigation, as the item
-    'jumped to [currentRowFocused, 0] and then jump to the correct item.
+      'this will avoid the duplicate events when up/down navigation, as the item
+      'jumped to [currentRowFocused, 0] and then jump to the correct item.
     else if rowItemFocused[1] = 0 AND rowItemFocused[0] = lastItemFocused[0] AND (m.programGrid.kepPressed = "up" OR m.programGrid.kepPressed = "down")
       isEqual = false
     end if

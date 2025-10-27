@@ -35,6 +35,12 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
+      roku_linear_age_gate: {
+        roku_linear_age_gate_v1: {
+          default: { "enabled": false }
+        }
+      }
+
       roku_search_screen_animate_grid: {
         roku_search_screen_animate_grid_v1: {
           default: { "enabled": true }

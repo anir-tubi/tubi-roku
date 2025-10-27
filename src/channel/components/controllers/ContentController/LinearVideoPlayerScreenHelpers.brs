@@ -23,10 +23,9 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
     clonedContent = content.clone(true)
     youboraEnabledLinear = m.constants.settings.youboraEnabledLinear
 
-    if clonedContent.needsLogin = true AND isLoggedInUser() = false 'Check for user signed In status because we do not refetch the content and so it will not pass through metadata translate process.
+    if clonedContent.needsLogin = true AND getStatsigExperimentResource("roku_linear_age_gate", "roku_linear_age_gate_v1").enabled = true 'Check for user signed In status because we do not refetch the content and so it will not pass through metadata translate process.
       if bMinimized = false
-        callbackAfterSignInParams = { "content": content, "bMinimized": false, "sAssociatedScreenID": clonedContent.associatedScreenID, "bAllowTransportToAppear": bAllowTransportToAppear, "playbackSource": playbackSource }
-        startSignIn(afterSignInPlayLockedLinearContent, callbackAfterSignInParams)
+        showLinearPlayerSignInModal(content)
       end if
     else 'Content is not locked so just play the content
       ' Limit to devices with 512Mb RAM as those are the most likely to crash from exceeding the memory limit during playback.

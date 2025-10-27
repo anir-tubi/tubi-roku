@@ -1034,12 +1034,14 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
           m.backgroundGroup.posterVisible = true '//reset the background so it can be seen
           stopLinearVideoContent()
 
-          playbackSource = {
-            "srcForAnalytic": m.constants.player.playbackSource.unknown
-            "srcForAds": m.constants.player.playbackOrigin.container
-            "playbackContainer": currentScreen.currCategoryId
-          }
-          playLinearVideoContent(focusedContent, true, homeScreen.id, true, playbackSource)
+          if focusedContent.needsLogin = false AND getStatsigExperimentResource("roku_linear_age_gate", "roku_linear_age_gate_v1").enabled = false
+            playbackSource = {
+              "srcForAnalytic": m.constants.player.playbackSource.unknown
+              "srcForAds": m.constants.player.playbackOrigin.container
+              "playbackContainer": currentScreen.currCategoryId
+            }
+            playLinearVideoContent(focusedContent, true, homeScreen.id, true, playbackSource)
+          end if
         else
           bStopCountdownTimer = false
           startCountdownTimer()
@@ -1149,18 +1151,22 @@ Function selectLinearContent(content)
   stopCountdownTimer()
   if content <> invalid AND content.type = m.constants.ui.contentTypes.linear
     linearContent = getCurrentLinearContent()
-    if linearContent <> invalid AND linearContent.id <> invalid AND content.id = linearContent.id
-      '//If the user selects the linear content that is already playing, then just maximize it.
-      maximizeLinearPlayer(content)
+    if content.needsLogin = true AND getStatsigExperimentResource("roku_linear_age_gate", "roku_linear_age_gate_v1").enabled = true
+      showLinearPlayerSignInModal(content)
     else
-      '//If the user selects the linear content that is not yet playing, then stop the previous content (if any) and start playing the content.
-      stopLinearVideoContent()
-      playbackSource = {
-        "srcForAnalytic": m.constants.player.playbackSource.unknown
-        "srcForAds": m.constants.player.playbackOrigin.container
-        "playbackContainer": homeScreen.currCategoryId
-      }
-      playLinearVideoContent(content, false, homeScreen.id, true, playbackSource)
+      if linearContent <> invalid AND linearContent.id <> invalid AND content.id = linearContent.id
+        '//If the user selects the linear content that is already playing, then just maximize it.
+        maximizeLinearPlayer(content)
+      else
+        '//If the user selects the linear content that is not yet playing, then stop the previous content (if any) and start playing the content.
+        stopLinearVideoContent()
+        playbackSource = {
+          "srcForAnalytic": m.constants.player.playbackSource.unknown
+          "srcForAds": m.constants.player.playbackOrigin.container
+          "playbackContainer": homeScreen.currCategoryId
+        }
+        playLinearVideoContent(content, false, homeScreen.id, true, playbackSource)
+      end if
     end if
   end if
 End Function

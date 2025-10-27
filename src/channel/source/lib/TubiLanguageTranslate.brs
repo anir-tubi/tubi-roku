@@ -544,6 +544,18 @@ Function getTranslation_en_US()
       "description": "title of a dialog window when it asks the user to sign in",
       "message": "Please Sign In"
     },
+    "linear_player_signin_title": {
+      "description": "title for linear player sign-in modal",
+      "message": "Register or Sign In to stream"
+    },
+    "linear_player_signin_subtitle": {
+      "description": "subtitle for linear player sign-in modal",
+      "message": "No credit card required • FREE Forever"
+    },
+    "linear_player_signin_description": {
+      "description": "description for linear player sign-in modal",
+      "message": "Please register or sign in to watch."
+    },
     "dialog_confirmCorrectAge_title": {
       "description": "title of a dialog window when the user is attempting to set their age but are less than 13 years old so we want to confirm they set the correct year",
       "message": "Were you born in {birthYear}?"

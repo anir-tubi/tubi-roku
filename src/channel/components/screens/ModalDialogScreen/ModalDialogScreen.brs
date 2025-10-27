@@ -8,11 +8,15 @@ Function init()
   m.ContentArea = m.top.findNode("ContentArea")
   m.DialogBox = m.top.findNode("DialogBox")
   m.Message = m.top.findNode("Message")
+  m.subMessage = m.top.findNode("subMessage")
   m.MessageGroup = m.top.findNode("MessageGroup")
   m.scrollableMessage = m.top.findNode("ScrollableMessage")
   m.ScrollableBackground = m.top.findNode("ScrollableBackground")
   m.Shade = m.top.findNode("Shade")
   m.Title = m.top.findNode("Title")
+  m.signUpLogo = m.top.findNode("signUpLogo")
+
+  m.top.observeFieldScoped("isModalUIChanged", "onIsModalUIChangedChanged")
 
 
   m.constants = getConstantsFromGlobal()
@@ -20,6 +24,7 @@ Function init()
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.Title, typographyConstants.ids.headerSmall)
   setTypographyOfLabel(m.Message, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.subMessage, typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.ScrollableMessage, typographyConstants.ids.bodyMedium)
 
   '//::TODO::colors - Design will eventually add this black color to all themes but until then, hardcode this with the default shadeColor regardless of theme.
@@ -41,6 +46,7 @@ Function onThemeChange(msg = invalid)
   if theme <> invalid
     m.ScrollableBackground.color = theme.shadeColor
     m.Message.color = theme.primaryTextColor
+    m.subMessage.color = theme.secondaryTextColor
     m.Title.color = theme.primaryTextColor
     m.DialogBox.color = theme.neutralSolidColor
   end if
@@ -67,7 +73,7 @@ Function formatDialog()
       '//   in order to determine how wide m.ButtonList should be.
       '//   Different languages may make the text wider than usual so we need to ensure the button displays the full text
       listItem = CreateObject("roSGNode", "ModalListItem")
-      listContent =  CreateObject("roSGNode", "ContentNode")
+      listContent = CreateObject("roSGNode", "ContentNode")
       listContent.title = b
       listItem.itemContent = listContent
 
@@ -86,7 +92,7 @@ Function formatDialog()
   'text area
   if m.top.scrollable then
     m.MessageGroup.removeChild(m.Message)
-    m.MessageGroup.appendChild(m.ScrollableBackground)  ' for making this idempotent
+    m.MessageGroup.appendChild(m.ScrollableBackground) ' for making this idempotent
     m.ScrollableBackground.visible = true
     m.ScrollableBackground.height = 320
     m.ScrollableMessage.visible = true
@@ -96,11 +102,56 @@ Function formatDialog()
     m.MessageGroup.removeChild(m.ScrollableBackground)
     m.Message.visible = true
     m.Message.text = m.top.message
+    m.subMessage.text = m.top.subMessage
   end if
 
   ' Position the dialog vertically and horizontally centered on the screen
   contentRect = m.ContentArea.boundingRect()
-  m.DialogBox.height = contentRect.height + 65 + 24  ' 65 is from top to title, 24 is from button to bottom of dialog
+  m.DialogBox.height = contentRect.height + 65 + 24 ' 65 is from top to title, 24 is from button to bottom of dialog
   newY = (1080 - m.DialogBox.height) / 2.0
   m.DialogBox.translation = [m.DialogBox.translation[0], newY]
+End Function
+
+
+Function onIsModalUIChangedChanged(msg)
+  isModalUIChanged = msg.getData()
+  isSignUpLogoPresent = (m.signUpLogo.getParent() <> invalid)
+  isSubMessagePresent = (m.subMessage.getParent() <> invalid)
+
+  if isModalUIChanged = true
+    if isSignUpLogoPresent = false
+      m.ContentArea.insertChild(m.signUpLogo, 0)
+    end if
+
+    if isSubMessagePresent = false
+      m.MessageGroup.insertChild(m.subMessage, 1)
+    end if
+
+    m.ScrollableBackground.translation = [40, 40]
+    m.signUpLogo.visible = true
+    m.subMessage.visible = true
+    m.Title.maxLines = 3
+    m.ButtonList.bgURL = "pkg:/images/pill_top_nav_$$RES$$.9.png"
+    m.ButtonList.numRows = "1"
+    m.ButtonList.numColumns = "3"
+    m.ContentArea.itemSpacings = [24, 12, 72]
+    m.ButtonList.itemSize = [120, 80]
+  else
+    if isSignUpLogoPresent = true
+      m.ContentArea.removeChild(m.signUpLogo)
+    end if
+
+    if isSubMessagePresent = true
+      m.MessageGroup.removeChild(m.subMessage)
+    end if
+
+    m.signUpLogo.visible = false
+    m.subMessage.visible = false
+    m.Title.maxLines = 1
+    m.ButtonList.bgURL = ""
+    m.ButtonList.numRows = "3"
+    m.ButtonList.numColumns = "1"
+    m.ContentArea.itemSpacings = [50, 36]
+    m.ButtonList.itemSize = [475, 80]
+  end if
 End Function
