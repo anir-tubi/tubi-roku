@@ -2530,6 +2530,18 @@ Function getTranslation_es_MX()
       "description": "title of a dialog window when it asks the user to sign in",
       "message": "Por favor, Iniciar Sesión"
     },
+    "linear_player_signin_title": {
+      "description": "title for linear player sign-in modal",
+      "message": "Regístrate o inicia sesión para ver"
+    },
+    "linear_player_signin_subtitle": {
+      "description": "subtitle for linear player sign-in modal",
+      "message": "No se requiere tarjeta de crédito • Gratis Siempre"
+    },
+    "linear_player_signin_description": {
+      "description": "description for linear player sign-in modal",
+      "message": "Regístrate o inicia sesión para ver."
+    },
     "dialog_confirmCorrectAge_title": {
       "description": "title of a dialog window when the user is attempting to set their age but are less than 13 years old so we want to confirm they set the correct year",
       "message": "¿Naciste en {birthYear}?"
@@ -2950,6 +2962,14 @@ Function getTranslation_es_MX()
       "description": "Description of message to let users know that they must be signed in to change the AutoplayPreview choice.",
       "message": "Debes iniciar sesión para cambiar las preferencias de reproducción automática."
     },
+    "screenCategories_allEmptyUITitle": {
+      "description": "The title of the Category Detail Panel for the empty state.",
+      "message": "¡Nada aquí… por ahora!"
+    },
+    "screenCategories_allEmptyUISubtitle": {
+      "description": "The subtitle of the Category Detail Panel for the empty state.",
+      "message": "Sigue explorando. Estamos listos."
+    },
     "screenCategories_error_retrieve_message": {
       "description": "Onscreen message to indicate categories content could not be gathered",
       "message": "No se pudo recuperar el contenido de las categorías."
@@ -3246,6 +3266,14 @@ Function getTranslation_es_MX()
       "description": "label to indicate the user has exactly 1 day to watch a video",
       "message": "Expira en 1 día"
     },
+    "metadata_expiring_plural": {
+      "description": "label to indicate how long the user have to watch a video",
+      "message": "Expira en {days} días"
+    },
+    "metadata_expiring_singular": {
+      "description": "label to indicate the user has exactly 1 day to watch a video",
+      "message": "Expira en 1 día"
+    },
     "metadata_myStuff_empty_myList_title": {
       "description": "For an empty MyList container, this is the title that is displayed in the empty container",
       "message": "Tu lista está vacía"
@@ -3405,6 +3433,10 @@ Function getTranslation_es_MX()
     "linearVideoPlayer_timeLeft": {
       "description": "Label to display time left in linear video player info panel",
       "message": "{time} quedan"
+    },
+    "linearVideoPlayer_adCounter": {
+      "description": "Label to display ad counter in linear video player",
+      "message": "Ad {ad_index} de {ad_count}"
     },
     "channel_name": {
       "description": "This is the name of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
@@ -4159,6 +4191,18 @@ Function getTranslation_es_MX()
     "content_unavailable": {
       "description": "Button label when the content is unavailable",
       "message": "Contenido no disponible"
+    },
+    "reminder_set_toast_header": {
+      "description": "Toast message header that is displayed when we set a reminder for a content",
+      "message": "Recordatorio agregado"
+    },
+    "reminder_set_toast_subheader": {
+      "description": "Toast message sub header that is displayed when we set a reminder for a content",
+      "message": "Te avisaremos en cuanto esté disponible para ver."
+    },
+    "reminder_set_button_label": {
+      "description": "Label of the button to remove a reminder for a content",
+      "message": "Recordatorio activado"
     }
   }
 End Function
@@ -4437,6 +4481,18 @@ Function getTranslation_fr_CA()
     "dialog_signIn_title": {
       "description": "title of a dialog window when it asks the user to sign in",
       "message": "Veuillez vous connecter"
+    },
+    "linear_player_signin_title": {
+      "description": "title for linear player sign-in modal",
+      "message": "S’inscrire ou se connecter pour regarder"
+    },
+    "linear_player_signin_subtitle": {
+      "description": "subtitle for linear player sign-in modal",
+      "message": "Pas de carte de crédit requise • Gratuit our toujours"
+    },
+    "linear_player_signin_description": {
+      "description": "description for linear player sign-in modal",
+      "message": "S’inscrire ou se connecter pour regarder."
     },
     "dialog_confirmCorrectAge_title": {
       "description": "title of a dialog window when the user is attempting to set their age but are less than 13 years old so we want to confirm they set the correct year",
@@ -4858,6 +4914,14 @@ Function getTranslation_fr_CA()
       "description": "Description of message to let users know that they must be signed in to change the AutoplayPreview choice.",
       "message": "Vous devez être connecté pour modifier les préférences de lecture automatique."
     },
+    "screenCategories_allEmptyUITitle": {
+      "description": "The title of the Category Detail Panel for the empty state.",
+      "message": "Rien ici… pour l’instant!"
+    },
+    "screenCategories_allEmptyUISubtitle": {
+      "description": "The subtitle of the Category Detail Panel for the empty state.",
+      "message": "Continuez d’explorer. On reste prêts."
+    },
     "screenCategories_error_retrieve_message": {
       "description": "Onscreen message to indicate categories content could not be gathered",
       "message": "Impossible de récupérer le contenu des catégories."
@@ -5154,6 +5218,14 @@ Function getTranslation_fr_CA()
       "description": "label to indicate the user has exactly 1 day to watch a video",
       "message": "Expire dans 1 jour"
     },
+    "metadata_expiring_plural": {
+      "description": "label to indicate how long the user have to watch a video",
+      "message": "Expire dans {days} jours"
+    },
+    "metadata_expiring_singular": {
+      "description": "label to indicate the user has exactly 1 day to watch a video",
+      "message": "Expire dans 1 jour"
+    },
     "metadata_myStuff_empty_myList_title": {
       "description": "For an empty MyList container, this is the title that is displayed in the empty container",
       "message": "Votre liste est vide"
@@ -5313,6 +5385,10 @@ Function getTranslation_fr_CA()
     "linearVideoPlayer_timeLeft": {
       "description": "Label to display time left in linear video player info panel",
       "message": "{time} restantes"
+    },
+    "linearVideoPlayer_adCounter": {
+      "description": "Label to display ad counter in linear video player",
+      "message": "Ad {ad_index} du {ad_count}"
     },
     "channel_name": {
       "description": "This is the name of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
@@ -5884,6 +5960,10 @@ Function getTranslation_fr_CA()
       "description": "date label used in air date countdown timer",
       "message": "AUJOURD'HUI À {time}"
     },
+    "live_on_day": {
+      "description": "day label used in air date countdown timer",
+      "message": "{day} J"
+    },
     "cc_audio_overlay_subtitles_mode": {
       "description": "Available modes displayed on closed caption overlay",
       "message": "Mode Sous-Titres"
@@ -6063,6 +6143,18 @@ Function getTranslation_fr_CA()
     "content_unavailable": {
       "description": "Button label when the content is unavailable",
       "message": "Contenu non disponible"
+    },
+    "reminder_set_toast_header": {
+      "description": "Toast message header that is displayed when we set a reminder for a content",
+      "message": "Rappel ajouté"
+    },
+    "reminder_set_toast_subheader": {
+      "description": "Toast message sub header that is displayed when we set a reminder for a content",
+      "message": "Nous vous aviserons dès que ce sera disponible pour regarder."
+    },
+    "reminder_set_button_label": {
+      "description": "Label of the button to remove a reminder for a content",
+      "message": "Rappel activé"
     }
   }
 End Function
@@ -6070,6 +6162,18 @@ End Function
 
 Function getTranslation_en_GB()
   return {
+    "linear_player_signin_title": {
+      "description": "title for linear player sign-in modal",
+      "message": "Register or Sign In to stream"
+    },
+    "linear_player_signin_subtitle": {
+      "description": "subtitle for linear player sign-in modal",
+      "message": "No credit card required • FREE Forever"
+    },
+    "linear_player_signin_description": {
+      "description": "description for linear player sign-in modal",
+      "message": "Please register or sign in to watch."
+    },
     "screenSettings_about_description": {
       "description": "The description on the about screen",
       "message": "Tubi is the leading free, premium, video streaming app. We have a large and diverse library of content with many thousands of titles and 3x fewer adverts than other TV services."
@@ -6094,6 +6198,14 @@ Function getTranslation_en_GB()
       "description": "Description of message to let users know that they must be signed in to change the AutoplayPreview choice.",
       "message": "You must be signed in to change Auto-play Preview preferences."
     },
+    "screenCategories_allEmptyUITitle": {
+      "description": "The title of the Category Detail Panel for the empty state.",
+      "message": "Nothing here… yet!"
+    },
+    "screenCategories_allEmptyUISubtitle": {
+      "description": "The subtitle of the Category Detail Panel for the empty state.",
+      "message": "Keep exploring. We’ll stay ready."
+    },
     "short_version_date_format_6": {
       "description": "Shortened version of date format for the month of June",
       "message": "June {day}, {year}"
@@ -6114,6 +6226,14 @@ Function getTranslation_en_GB()
       "description": "An error message shown to users when they submit their birthdate, but there is an unexpected server or network error",
       "message": "Could not successfully send your date of birth to our servers."
     },
+    "metadata_expiring_plural": {
+      "description": "label to indicate how long the user have to watch a video",
+      "message": "Expiring in {days} days"
+    },
+    "metadata_expiring_singular": {
+      "description": "label to indicate the user has exactly 1 day to watch a video",
+      "message": "Expiring in 1 day"
+    },
     "metadata_myStuff_empty_myList_description": {
       "description": "For an empty MyList container, this is the description/subtitle that is display in the empty container",
       "message": "Use the bookmark button to save favourite series and movies. They’ll show up here."
@@ -6129,6 +6249,10 @@ Function getTranslation_en_GB()
     "videoPlayer_adHeadsUp": {
       "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
       "message": "Adverts start in {seconds} s"
+    },
+    "linearVideoPlayer_adCounter": {
+      "description": "Label to display ad counter in linear video player",
+      "message": "Advert {ad_index} of {ad_count}"
     },
     "channel_webDescription": {
       "description": "This is the description of the app. This is not located in the app. It is displayed to the user in the Roku Web Channel Store",
@@ -6190,6 +6314,18 @@ Function getTranslation_en_GB()
     "videoPlayer_adBreakStartsIn": {
       "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
       "message": "Adverts start in"
+    },
+    "reminder_set_toast_header": {
+      "description": "Toast message header that is displayed when we set a reminder for a content",
+      "message": "New Reminder Added"
+    },
+    "reminder_set_toast_subheader": {
+      "description": "Toast message sub header that is displayed when we set a reminder for a content",
+      "message": "We'll notify you as soon as this becomes available to watch."
+    },
+    "reminder_set_button_label": {
+      "description": "Label of the button to remove a reminder for a content",
+      "message": "Reminder Set"
     }
   }
 End Function
