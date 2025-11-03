@@ -365,6 +365,38 @@ describe('Kids Mode', function () {
 
   });
 
+  //https://tubi.testrail.io/index.php?/cases/view/765060
+  it('C765060 - Kids Categories - Focus on title with video preview should start video preview @kids @categories @video_preview', async () => {
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+    await openKidsMode();
+
+    await selectCategories();
+
+    await ecp.sendKeypress(ecp.Key.Ok);
+
+    await utils.sleep(2000);
+
+    await testUtils.waitForElementToHaveFocus('channelCategoryGrid', 'Timed out waiting for channelGrid to have focus');
+
+
+    await utils.sleep(800);
+
+    const categoryContent = await testUtils.getAllGridItemsContent('channelCategoryGrid');
+
+    await testUtils.jumpToRowIndex('channelCategoryGrid', 0);
+
+    const previewFound = await focusOnVideoTileWithPreviewUrlInCategoryGrid(categoryContent);
+
+    if (previewFound) {
+      await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 5000);
+    } else {
+      console.log(' No video preview found, focused on default content');
+    }
+
+  });
+
   // https://tubi.testrail.io/index.php?/cases/view/145905
   it('C145905 - Kids Mode - When user signs out while in Kids mode, non-Kids UI integrity is maintained, @kidsmode_registered', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
@@ -532,4 +564,31 @@ async function focusOnVideoTileTrailer() {
       break;
     }
   }
+}
+
+async function selectCategories() {
+  await testUtils.jumpToRowWithTitle('sideNavMenu', 'Categories');
+  await utils.sleep(1000);
+  await testUtils.waitForElementToFullyShowOnScreen('categoriesLeftNavButtonSelected');
+  await ecp.sendKeypress(ecp.Key.Ok, { wait: 2000 });
+}
+
+
+async function focusOnVideoTileWithPreviewUrlInCategoryGrid(categoryContent: any[]) {
+  let previewFound = false;
+
+  for (const [itemIndex, item] of categoryContent.entries()) {
+    if (item.videoPreviewUrl !== '' && item.videoPreviewUrl !== null && item.videoPreviewUrl !== undefined) {
+      await testUtils.jumpToRowIndex('channelCategoryGrid', itemIndex);
+      previewFound = true;
+      break;
+    }
+  }
+
+  if (!previewFound) {
+    // Focus on first item if no preview found
+    await testUtils.jumpToRowIndex('channelCategoryGrid', 0);
+  }
+
+  return previewFound;
 }
