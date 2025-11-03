@@ -226,5 +226,61 @@ describe('Search', function () {
 
 	});
 
+	//https://tubi.testrail.io/index.php?/cases/view/585698
+	it('C585698 - Should display trending searches under search results for no results scenario @search', async () => {
+		// Launch Tubi and observe homescreen
+		await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+		await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+		// Navigate to Search page using testUtils.goToPage
+		await testUtils.goToPage('search');
+
+		// Verify we're on the search screen by checking trending results grid with no search text
+		await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for search screen', 10000);
+
+		// Enter search terms that will return no results
+		const noResultsQuery = 'dddd';
+		await ecp.sendText(noResultsQuery);
+		await utils.sleep(3000);
+
+
+		// Verify the no matching results message content
+		const noResultsMessage = await testUtils.getNodeForElement('noMatchingResultsMessage');
+
+		//If no matching results are found, trending searches will show on the results area.
+		if (noResultsMessage.visible == true) {
+			await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for search screen', 10000);
+		}
+
+		// Search that give less results to see the search results and tending search results
+		// Clear existing text with backspace
+		await ecp.sendKeypress(ecp.Key.Backspace, { count: 10 });
+		await ecp.sendText('2340');
+
+		const searchResultsGrid = await testUtils.getAllGridItemsContent('searchResultGrid');
+		expect(searchResultsGrid.length).to.be.greaterThan(0, 'We found search results');
+
+		if (searchResultsGrid.length > 0 && searchResultsGrid.length < 4) {
+			await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for search screen', 10000);
+		}
+
+		// Clear existing text with backspace
+		await ecp.sendKeypress(ecp.Key.Backspace, { count: 10 });
+		await ecp.sendText('Fox');
+
+		const searchResultsGridUpdated = await testUtils.getAllGridItemsContent('searchResultGrid');
+
+		//When we have more search results for search terrm, you will not see the trensing searches but it will be on the bottom of the screen
+		if (searchResultsGridUpdated.length > 8) {
+			await testUtils.waitForElementToNotShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for search screen', 10000);
+
+			const trendingSearches = await testUtils.getNodeForElement('trendingSearchResultsGrid');
+			const trendingSearchResults = await testUtils.getAllGridItemsContent('trendingSearchResultsGrid');
+			expect(trendingSearches.visible).to.equal(true);
+			expect(trendingSearchResults.length).to.be.greaterThan(0);
+		}
+
+	});
+
 });
 

@@ -910,6 +910,11 @@ const elements = typeCheckElements({
       '/TubiScene/ContentController/Group/Group/ScreenStack/SearchScreen/InfoPanel/LayoutGroup/LayoutGroup/Label',
   },
 
+  noMatchingResultsMessage: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#PageGroup.#rightSide.#rightSideTextGroup.#searchResultsMessageContainer.#noMatchingResultsMessage',
+  },
+
   kidsSearchResultsText: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#PageGroup.#leftSide.0.#searchMenuText',
