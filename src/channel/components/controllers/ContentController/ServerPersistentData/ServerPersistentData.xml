@@ -34,5 +34,8 @@
     <!-- birthday holds the string value of the user's birthday -->
     <field id="birthday" type="string" value="" />
 
+    <!-- Currently only used for passing user privacy settings to Fox player -->
+    <field id="usPrivacyString" type="string" value="" />
+
   </interface>
 </component>

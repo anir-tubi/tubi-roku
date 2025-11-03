@@ -153,6 +153,11 @@ End Function
 
 
 Function getFoxVideoPlayerConfig()
+  usPrivacyString = "{dnsParams}"
+  if isNonEmptyString(m.pub_serverPersistentData.usPrivacyString) = true then
+    usPrivacyString = m.pub_serverPersistentData.usPrivacyString
+  end if
+
   muxEnvironmentKey = "aa7at5lkvspdg2ju2r42gf559"
   if m.constants.settings.mode = "production" then
     muxEnvironmentKey = "18lus0524edvcif1pa0hruc0e"
@@ -174,6 +179,14 @@ Function getFoxVideoPlayerConfig()
       "env": clientRemoteConfigEnv
     },
     "ads": {
+      "adsParam": "{doNotSellInfo}&extra=%257Cis_lat%257C{limitedAdTracking}%26ad.sssb%3D1",
+      "debugParam": "%26ad._debug%3D{userDebugValue}",
+      "doNotSellParam": "_fw_us_privacy=" + usPrivacyString,
+      "doNotSellParamOptions": {
+        "default": "---",
+        "disabled": "YNN",
+        "enabled": "YYN"
+      }
       "raf": {
         "disableAdMeasurements": false
       }
