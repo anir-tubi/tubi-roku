@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { ecp, utils } from 'roku-test-automation';
+import { ecp, utils, odc } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
 import { shared } from '../shared';
 
@@ -130,6 +130,26 @@ describe('Settings', function () {
     const instructionsText = instructions.text;
     expect(instructionsText).to.equals('Autoplay is currently controlled in Roku Settings. To change this setting, go to Roku Settings -> Accessibility -> Auto-play video.'); // Verify the feature disabled message is shown
 
+  });
+
+  //https://tubi.testrail.io/index.php?/cases/view/705820
+  it('C705820 - Roku Autoplay OFF - animationLogo video is NOT playing during startup', async () => {
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true, isAutoplayEnabled: false });
+
+    //Verify autoPlayDisabled in Roku settings
+    const deviceInfo = await odc.getValue({ base: 'global', keyPath: 'constants.deviceInfo' });
+    expect(deviceInfo.value.isautoplayenabled).to.equal(false);
+
+    // Animation shouldn't be playing if it exists
+    const animationLogo = await testUtils.getNodeForElement('animationLogo');
+    expect(animationLogo.state).to.not.be.oneOf(['playing', 'buffering']);
+
+    // App should load quickly to home screen
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Verify home screen loaded
+    const homeScreenRowList = await testUtils.getNodeForElement('homeScreenRowList');
+    expect(homeScreenRowList.visible).to.equal(true);
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/770140

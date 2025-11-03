@@ -350,6 +350,10 @@ class TestUtils {
       constantsUpdates['settings.enablePurpleCarpetContainerAndBanner'] = args.enablePurpleCarpetContainerAndBanner;
     }
 
+    if (args.isAutoplayEnabled !== undefined) {
+      constantsUpdates['deviceInfo.isautoplayenabled'] = args.isAutoplayEnabled;
+    }
+
     if (args.triggerFailSafe === 'gameDayExperience') {
       constantsUpdates['settings.enableFailSafe'] = true;
     }
@@ -2368,6 +2372,9 @@ type StartApplicationArgs = {
 
   /** No ads are shown unless set to false */
   noAds?: boolean;
+
+  /** Sets the Roku system level autoplay setting */
+  isAutoplayEnabled?: boolean;
 
   /* When set to true will enable the purple carpet container and banner. */
   enablePurpleCarpetContainerAndBanner?: boolean;

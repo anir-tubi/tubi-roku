@@ -43,6 +43,12 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.3.#Offset.#ContentGroup.#AutoplayPreviewMenu.1.#container',
   },
 
+  /** Animated splash screen video that plays during app startup */
+  animationLogo: {
+    keyPath: '#startupScreens.#animationLogo',
+    xpath: '/TubiScene/Group[startupScreens]/Video[animationLogo]',
+  },
+
   autoplayInstructions: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.3.#Offset.#ContentGroup.#Instructions',
   },
