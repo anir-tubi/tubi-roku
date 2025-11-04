@@ -342,19 +342,25 @@ Function fetchHomeScreen(homeScreen, useCache = false)
     else if homeScreen.id = m.constants.ui.screenIds.homeScreen
       if isKidsUIOn() = false AND isParentalControlsAdultLevel() = true
         '//Call ad endpoint to get ad content for the homescreen
-        experimentAd = getExperimentResource("ads_ott_hdc_adformats", "ads_ott_hdc_adformats_v1", true)
-        experimentAdType = "control"
-        if experimentAd <> invalid
-          experimentAdType = experimentAd.enabled_arm
-        end if
 
         aAdTypes = []
-        if experimentAdType = "carousel"
-          aAdTypes = [m.constants.adTypes.adRowlistCarousel]
-        else if experimentAdType = "spotlight"
-          aAdTypes = [m.constants.adTypes.adRowlistSpotlight]
+        experimentAd = getStatsigExperimentResource("ads_webott_hdc_homepage_layer", "ads_hdc_gm_carousel_a", true)
+        if experimentAd <> invalid
+          experimentAdType = experimentAd.enabled_arm
+          if experimentAdType = "carousel"
+            aAdTypes.push(m.constants.adTypes.adRowlistCarousel)
+          end if
         end if
-        '//If this is no longer in the experiment and the ads_ott_hdc_adformats_v1 experiment has been graduated, then request both ad types and let the backend decide which ad type(s) to return
+
+        experimentAd = getStatsigExperimentResource("ads_webott_hdc_homepage_layer", "ads_hdc_mcdonalds_spotlight", true)
+        if experimentAd <> invalid
+          experimentAdType = experimentAd.enabled_arm
+          if experimentAdType = "spotlight"
+            aAdTypes.push(m.constants.adTypes.adRowlistSpotlight)
+          end if
+        end if
+
+        '//If this is no longer in the experiment and the ads_webott_hdc_homepage_layer experiment has been graduated, then request both ad types and let the backend decide which ad type(s) to return
         ' aAdTypes = [m.constants.adTypes.adRowlistCarousel, m.constants.adTypes.adRowlistSpotlight]
 
         aAdTypes.push(m.constants.adTypes.skinAd) '//Also request the skin ad unit

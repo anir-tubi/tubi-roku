@@ -41,6 +41,16 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
+      '//This experiment will be for the new showcase ad campaigns. The possible "enabled_arm" values are "control", "carousel", "spotlight"
+      ads_webott_hdc_homepage_layer: {
+        ads_hdc_gm_carousel_a: {
+          default: { "enabled_arm": "carousel" }
+        }
+        ads_hdc_mcdonalds_spotlight: {
+          default: { "enabled_arm": "spotlight" }
+        }
+      }
+
       roku_search_screen_animate_grid: {
         roku_search_screen_animate_grid_v1: {
           default: { "enabled": true }
