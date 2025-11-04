@@ -1092,9 +1092,6 @@ Function setUIBasedOnFocusedContent(focusedContent)
         if focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd
           '//Hide the logo if the current row is a skinAd
           showHideLogo(m.constants.logoType.hide)
-
-          sendAdPixels(focusedContent.imageImpTracking)
-
         else
           showHideLogoBasedOnUiMode(skinAdContent.titleImageUrl, skinAdContent.titlePrefix)
         end if
@@ -1110,6 +1107,14 @@ End Function
 Function onAdTimerImpressionFired(msg)
   tubiLog("HomeScreenHelpers.onAdTimerImpression")
   homeScreen = msg.getRoSGNode()
+  checkHomeScreenFocusRowToSendAdPixels(homeScreen)
+End Function
+
+
+'//Check the focused row if it has any ad pixels to be sent
+' @homeScreen: roSGNode, the HomeScreen component
+Function checkHomeScreenFocusRowToSendAdPixels(homeScreen)
+  tubiLog("HomeScreenHelpers.checkHomeScreenFocusRowToSendAdPixels")
   if homeScreen <> invalid
     row = homeScreen.rowFocused
     if row <> invalid AND row.imageImpTracking <> invalid
@@ -1235,6 +1240,11 @@ Function onContentSelected(msg)
       "playbackContainer": containerId
     }
     processUserContentSelection(content, homeScreen, playbackSource)
+
+    if contentType = m.constants.ui.contentTypes.skinAd
+      ' If the content selected is a skinAd, then check if there are any ad pixels to be sent.
+      checkHomeScreenFocusRowToSendAdPixels(homeScreen)
+    end if
   end if
 End Function
 

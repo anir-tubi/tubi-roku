@@ -1104,6 +1104,12 @@ Function setRowListFocus()
         m.top.reloadedItemToBeFocused = resolveAbbreviatedContent(m.top.content, reloadedItemIndex)
       end if
     else if m.FeaturedRowList.isInFocusChain() = true
+      if m.top.featuredRowContent <> invalid
+        rowItemFocused = m.featuredRowList.rowItemFocused
+        if isNonEmptyArray(rowItemFocused) = true
+          m.top.rowFocused = m.top.featuredRowContent.getChild(rowItemFocused[0])
+        end if
+      end if
       m.FeaturedRowList.setFocus(true)
     end if
   end if
@@ -1192,6 +1198,7 @@ Function updateFeaturedRowItemFocused()
       topRef.oldCursorPosition = topRef.cursorPosition
       topRef.cursorPosition = rowItemFocused
       topRef.oldItemFocused = itemFocused
+      topRef.rowFocused = category
       topRef.featuredRowFocusedItem = itemFocused
       updateCurrentFocusedItemBoundingRect()
       updateFocusXOffset(rowItemFocused[0])

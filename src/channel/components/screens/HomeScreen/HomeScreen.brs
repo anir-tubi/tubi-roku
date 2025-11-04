@@ -353,7 +353,7 @@ Function onRowFocused(msg)
   if row <> invalid
     if isSponsoredRow(row) = true
       m.top.sponsoredRowFocused = true
-    else if (isAdDisplayContainerRow(row) = true OR isAdDisplayCarouselRow(row) = true) AND isNonEmptyArray(row.imageImpTracking) = true
+    else if (isAdDisplayContainerRow(row) = true OR isAdDisplayCarouselRow(row) = true OR isAdSkinRow(row) = true) AND isNonEmptyArray(row.imageImpTracking) = true
       isRowAdContainerContainer = true
     end if
   end if
@@ -373,6 +373,12 @@ Function isSponsoredRow(row)
   end if
 
   return false
+End Function
+
+
+' @row: roSGNode, a CategoryContentNode
+Function isAdSkinRow(row)
+  return (row <> invalid AND row.gridItemType = m.constants.ui.gridItemTypes.skinAd)
 End Function
 
 
@@ -1031,7 +1037,7 @@ Function onAdFocusTimer()
   tubiLog("HomeScreen.onAdFocusTimer")
   focusedContent = m.categoryGridList.rowFocused
 
-  if isAdDisplayContainerRow(focusedContent) = true OR isAdDisplayCarouselRow(focusedContent) = true
+  if isAdDisplayContainerRow(focusedContent) = true OR isAdDisplayCarouselRow(focusedContent) = true OR isAdSkinRow(focusedContent) = true
     m.top.adTimerImpressionFire = true
   end if
 End Function

@@ -414,6 +414,7 @@ Function processSkinAdRowContent(rowAdUnit, videoAdUnit) as Object
     end if
   end if
 
+  categoryContentNode = CreateObject("roSGNode", "AdContentNode")
   rowContentNode = CreateObject("roSGNode", "SkinAdContentNode")
   rowContentNode.type = m.constants.ui.contentTypes.skinAd
   rowContentNode.gridItemType = m.constants.ui.gridItemTypes.skinAd
@@ -453,8 +454,7 @@ Function processSkinAdRowContent(rowAdUnit, videoAdUnit) as Object
     skinAdContent.qrCodeUrl = assets.landing_page.url
   end if
   if rowAdUnit.trackers <> invalid AND isNonEmptyArray(rowAdUnit.trackers.imp) = true
-    rowContentNode.imageImpTracking = rowAdUnit.trackers.imp
-    skinAdContent.imageImpTracking = rowAdUnit.trackers.imp
+    categoryContentNode.imageImpTracking = rowAdUnit.trackers.imp
   end if
   if assets.main_image <> invalid AND isNonEmptyString(assets.main_image.url) = true
     skinAdContent.backgrounds = [assets.main_image.url]
@@ -468,8 +468,8 @@ Function processSkinAdRowContent(rowAdUnit, videoAdUnit) as Object
     skinAdContent.HDGRIDPOSTERURL = m.metadataTranslate.getRoundedCornersURL(sPosterURL, 8)
   end if
 
-  categoryContentNode = CreateObject("roSGNode", "CategoryContentNode")
   categoryContentNode.id = m.constants.ui.categoryIds.skinAd
+  categoryContentNode.gridItemType = m.constants.ui.gridItemTypes.skinAd
   categoryContentNode.appendChild(skinAdContent)
   rowContentNode.appendChild(categoryContentNode)
 
