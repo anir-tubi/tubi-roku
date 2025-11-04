@@ -381,6 +381,12 @@ Function processSkinAdRowContent(rowAdUnit, videoAdUnit) as Object
   end if
 
   assets = rowAdUnit.ad.assets
+
+  iValidUntil = UpTime(0) + m.constants.cacheTimes.homescreenAd
+  if rowAdUnit.valid_duration <> invalid AND isInt(rowAdUnit.valid_duration) = true
+    iValidUntil = UpTime(0) + rowAdUnit.valid_duration
+  end if
+
   sID = ""
   sPosterURL = ""
   adInfo = invalid
@@ -416,6 +422,8 @@ Function processSkinAdRowContent(rowAdUnit, videoAdUnit) as Object
 
   categoryContentNode = CreateObject("roSGNode", "AdContentNode")
   rowContentNode = CreateObject("roSGNode", "SkinAdContentNode")
+  rowContentNode.validUntil = iValidUntil
+  categoryContentNode.validUntil = iValidUntil
   rowContentNode.type = m.constants.ui.contentTypes.skinAd
   rowContentNode.gridItemType = m.constants.ui.gridItemTypes.skinAd
   rowContentNode.id = sID

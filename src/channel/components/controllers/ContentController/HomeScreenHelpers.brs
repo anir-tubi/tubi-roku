@@ -59,7 +59,6 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.observeFieldScoped("currFocusRow", "onHomeScreenRowFocusChanged")
     homeScreen.observeFieldScoped("currFocusColumn", "onHomeScreenColumnFocusChanged")
     homeScreen.observeFieldScoped("pauseVideoPreview", "onPauseVideoPreview")
-    homeScreen.observeFieldScoped("loadCategoryForIds", "onLoadCategoryForIds")
     homeScreen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
     homeScreen.observeFieldScoped("featuredRowCurrFocusColumn", "onFeaturedRowCurrFocusColumnChange")
     homeScreen.observeFieldScoped("featuredListCurrFocusRow", "onFeaturedRowCurrFocusRowChange")
@@ -148,6 +147,7 @@ Function onHomesceenAdDisplayBatchResponse(response)
   tubiLog("HomeScreenHelpers.onHomesceenAdDisplayBatchResponse")
   homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
   if homeScreen <> invalid AND isNonEmptyArray(response) = true
+    '//Don't Refresh the skin
     homeScreen.batchAdResponse = response
   end if
 End Function
@@ -1413,6 +1413,9 @@ Function onLoadCategoryForIds(msg)
         categoryIDs.delete(i)
       else if categoryID = m.constants.ui.categoryIds.adRowlistSpotlight
         aAdTypes.push(m.constants.adTypes.adRowlistSpotlight)
+        categoryIDs.delete(i)
+      else if categoryID = m.constants.ui.categoryIds.skinAd
+        aAdTypes.push(m.constants.adTypes.skinAd)
         categoryIDs.delete(i)
       end if
     end for

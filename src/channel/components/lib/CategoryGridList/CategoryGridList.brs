@@ -774,6 +774,7 @@ Function onRowItemFocused(msg)
         m.top.oldCursorPosition = m.top.cursorPosition
         m.top.cursorPosition = m.top.focusedPosition
         m.top.oldItemFocused = m.top.itemFocused
+        m.top.oldRowFocused = m.top.rowFocused
         m.top.rowFocused = m.top.content.getChild(rowItemFocused[0])
         m.top.itemFocused = itemFocused
       end if
@@ -1100,6 +1101,7 @@ Function setRowListFocus()
         reloadedItemIndex = [0, 0]
       end if
       if m.RowList.content <> invalid
+        m.top.oldRowFocused = m.top.rowFocused
         m.top.rowFocused = m.RowList.content.getChild(reloadedItemIndex[0])
         m.top.reloadedItemToBeFocused = resolveAbbreviatedContent(m.top.content, reloadedItemIndex)
       end if
@@ -1107,6 +1109,7 @@ Function setRowListFocus()
       if m.top.featuredRowContent <> invalid
         rowItemFocused = m.featuredRowList.rowItemFocused
         if isNonEmptyArray(rowItemFocused) = true
+          m.top.oldRowFocused = m.top.rowFocused
           m.top.rowFocused = m.top.featuredRowContent.getChild(rowItemFocused[0])
         end if
       end if
@@ -1157,6 +1160,7 @@ Function onSkinAdRowItemFocused(msg)
         m.top.oldCursorPosition = m.top.cursorPosition
         m.top.cursorPosition = rowItemFocused
         m.top.oldItemFocused = m.top.itemFocused
+        m.top.oldRowFocused = m.top.rowFocused
         m.top.rowFocused = category
         m.top.itemFocused = content.clone(true)
         m.top.focusedPosition = rowItemFocused
@@ -1198,6 +1202,7 @@ Function updateFeaturedRowItemFocused()
       topRef.oldCursorPosition = topRef.cursorPosition
       topRef.cursorPosition = rowItemFocused
       topRef.oldItemFocused = itemFocused
+      topRef.oldRowFocused = topRef.rowFocused
       topRef.rowFocused = category
       topRef.featuredRowFocusedItem = itemFocused
       updateCurrentFocusedItemBoundingRect()

@@ -236,11 +236,21 @@ Function onBatchAdResponseChanged(msg)
   tubiLog("HomeScreen.onBatchAdResponseChanged")
   aResponse = msg.getData()
   if isNonEmptyArray(aResponse) = true
-    for each adContent in aResponse
+    for i = aResponse.Count() - 1 to 0 step -1
+      adContent = aResponse[i]
       if adContent <> invalid
         sContentType = adContent.type
         if sContentType = m.constants.ui.contentTypes.adRowlistCarousel
           createAdDisplayCarouselComponent(adContent)
+        else if sContentType = m.constants.ui.contentTypes.skinAd
+          if m.CategoryGridList.skinAdContent <> invalid AND m.CategoryGridList.skinAdContent.id = adContent.id AND adContent.getChild(0) <> invalid AND m.CategoryGridList.skinAdContent.getChild(0) <> invalid
+            '// If the updated skinAd wrapper is the same as the existing one, then just update the impression tracking info.
+            '// We are not expecting a new skinAd content during the app's lifecycle.
+            m.CategoryGridList.skinAdContent.getChild(0).imageImpTracking = adContent.getChild(0).imageImpTracking
+
+            '//Once the skin ad is processed, remove it from the array so that it is not processed with the other ads when adResponseInBatch is set below.
+            aResponse.delete(i)
+          end if
         end if
       end if
     end for
@@ -301,7 +311,6 @@ End Function
 ' being shown.
 Function onScreenFocusChange()
   tubiLog("HomeScreen.onScreenFocusChange " + focusState(m.top))
-
   if m.top.hasFocus() = true
     'TODO: Revisit this if we ever use both.
     if m.CategoryGridList.featuredRowContent <> invalid
@@ -348,13 +357,15 @@ End Function
 Function onRowFocused(msg)
   tubiLog("HomeScreen.onRowFocused")
   row = msg.getData()
-
+  oldRow = m.categoryGridList.oldRowFocused
   isRowAdContainerContainer = false
   if row <> invalid
     if isSponsoredRow(row) = true
       m.top.sponsoredRowFocused = true
-    else if (isAdDisplayContainerRow(row) = true OR isAdDisplayCarouselRow(row) = true OR isAdSkinRow(row) = true) AND isNonEmptyArray(row.imageImpTracking) = true
-      isRowAdContainerContainer = true
+    else if oldRow = invalid OR row.id <> oldRow.id '//If the oldRow is the same as the new row, then do not check if the adFocusTimer should be started. This is to prevent sending too many pixel impressions.
+      if (isAdDisplayContainerRow(row) = true OR isAdDisplayCarouselRow(row) = true OR isAdSkinRow(row) = true) AND isNonEmptyArray(row.imageImpTracking) = true
+        isRowAdContainerContainer = true
+      end if
     end if
   end if
 
@@ -1230,6 +1241,14 @@ Function refreshHomeScreenContainers()
     end if
   end if
 
+  if m.CategoryGridList.skinAdContent <> invalid
+    skinAdContainer = m.CategoryGridList.skinAdContent.getChild(0)
+    if shouldRefresh(skinAdContainer) = true AND isNonEmptyArray(skinAdContainer.imageImpTracking) = false
+      '//if the content has expired AND the impression pixels have been fired, then get a new set of impression pixels
+      loadCategoryForIds.push(skinAdContainer.id)
+    end if
+  end if
+
   if m.CategoryGridList.content <> invalid
     for i = 0 to m.CategoryGridList.content.getChildCount() - 1
       container = m.CategoryGridList.content.getChild(i)
@@ -1238,6 +1257,7 @@ Function refreshHomeScreenContainers()
       end if
     end for
   end if
+
   if loadCategoryForIds.count() > 0
     m.top.loadCategoryForIds = loadCategoryForIds
   end if
