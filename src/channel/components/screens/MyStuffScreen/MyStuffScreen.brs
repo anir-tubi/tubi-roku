@@ -384,7 +384,10 @@ Function populateInfoPanel(mode, contentNode)
     m.InfoPanel.title = contentNode.title
     m.InfoPanel.description = contentNode.description
 
-    if contentNode.needsLogin
+    ' Always set needsLogin = false for linear content in infoPanel, regular content follows normal logic
+    if contentNode.type = m.constants.ui.contentTypes.linear
+      m.InfoPanel.needsLogin = false
+    else if contentNode.needsLogin
       m.InfoPanel.loginReason = contentNode.loginReason
       m.InfoPanel.needsLogin = true
     else

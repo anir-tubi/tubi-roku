@@ -3423,7 +3423,7 @@ Function processUserContentSelection(content, screen, playbackSource = {}) as Vo
   else if contentType = m.constants.ui.contentTypes.historySignedOutUser
     startSignIn(refreshScreenAndContentAfterSignIn)
   else if contentType = m.constants.ui.contentTypes.linear
-    if content.needsLogin = true AND getStatsigExperimentResource("roku_linear_age_gate", "roku_linear_age_gate_v1").enabled = true
+    if content.needsLogin = true AND getStatsigExperimentResource("roku_linear_reg_gate", "roku_linear_reg_gate_v1").enabled = true
       showLinearPlayerSignInModal(content)
     else
       selectLinearContent(content)

@@ -84,7 +84,7 @@
             width="822"
             wrap="true"
             maxLines="8"
-            translation="[0,45]">
+            translation="[0,54]">
             <Font
               role="font"/>
           </Label>
@@ -104,17 +104,16 @@
             </ScrollableText>
           </Rectangle>
         </Group>
-
-        <FilledButtonMarkupGrid
-          id="ButtonList"
-          translation="[0,0]"
-          itemSize="[475,80]"
-          itemComponentName="ModalListItem"
-          itemSpacing="[0,6]"
-          numRows="3"
-          numColumns="1"
-          vertFocusAnimationStyle="floatingFocus"/>
       </LayoutGroup>
+      <FilledButtonMarkupGrid
+        id="ButtonList"
+        translation="[0,0]"
+        itemSize="[475,80]"
+        itemComponentName="ModalListItem"
+        itemSpacing="[0,6]"
+        numRows="3"
+        numColumns="1"
+        vertFocusAnimationStyle="floatingFocus"/>
     </Rectangle>
 
   </children>

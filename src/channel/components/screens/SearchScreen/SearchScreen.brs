@@ -700,12 +700,8 @@ Function onItemFocused(msg)
         badgeText: getTranslation("screenSearch_liveText")
         genres: focusedContent.genres
       }
-      if focusedContent.needsLogin = true AND m.top.signedIn <> true
-        m.searchScreenInfoPanel.loginReason = focusedContent.loginReason 'set loginreason before needslogin
-        m.searchScreenInfoPanel.needsLogin = true
-      else
-        m.searchScreenInfoPanel.needsLogin = false
-      end if
+      ' Always set needsLogin = false for linear content in infoPanel
+      m.searchScreenInfoPanel.needsLogin = false
 
     else if focusedContent.type = m.constants.ui.contentTypes.sportsEvent
       m.searchScreenInfoPanel.mode = m.constants.ui.infoPanelModes.sportsEvent

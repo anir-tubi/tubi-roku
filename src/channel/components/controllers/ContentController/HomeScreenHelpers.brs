@@ -1040,7 +1040,7 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
           m.backgroundGroup.posterVisible = true '//reset the background so it can be seen
           stopLinearVideoContent()
 
-          if focusedContent.needsLogin = false AND getStatsigExperimentResource("roku_linear_age_gate", "roku_linear_age_gate_v1").enabled = false
+          if focusedContent.needsLogin = false OR getStatsigExperimentResource("roku_linear_reg_gate", "roku_linear_reg_gate_v1").enabled = false
             playbackSource = {
               "srcForAnalytic": m.constants.player.playbackSource.unknown
               "srcForAds": m.constants.player.playbackOrigin.container
@@ -1162,7 +1162,7 @@ Function selectLinearContent(content)
   stopCountdownTimer()
   if content <> invalid AND content.type = m.constants.ui.contentTypes.linear
     linearContent = getCurrentLinearContent()
-    if content.needsLogin = true AND getStatsigExperimentResource("roku_linear_age_gate", "roku_linear_age_gate_v1").enabled = true
+    if content.needsLogin = true AND getStatsigExperimentResource("roku_linear_reg_gate", "roku_linear_reg_gate_v1").enabled = true
       showLinearPlayerSignInModal(content)
     else
       if linearContent <> invalid AND linearContent.id <> invalid AND content.id = linearContent.id

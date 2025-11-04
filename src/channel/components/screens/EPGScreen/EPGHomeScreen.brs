@@ -82,8 +82,8 @@ End Function
 Function isOnBackgroundImagesChange(msg)
   backGroundImages = msg.getData()
 
-  'When user is in roku_linear_age_gate_v1 experiement, user will not play the content if needsLogIn = true, so we are just updating the backgroundImages.
-  if backGroundImages = true AND getStatsigExperimentResource("roku_linear_age_gate", "roku_linear_age_gate_v1", false).enabled = true
+  'When user is in roku_linear_reg_gate_v1 experiement, user will not play the content if needsLogIn = true, so we are just updating the backgroundImages.
+  if backGroundImages = true AND getStatsigExperimentResource("roku_linear_reg_gate", "roku_linear_reg_gate_v1", false).enabled = true
     rowItemFocused = m.epgTimeGrid.rowItemFocused
     content = m.epgTimeGrid.content.getChild(rowItemFocused[0])
     m.top.backgroundUriList = determineBackgroundImage(content)
@@ -141,12 +141,8 @@ Function populateInfoPanel(contentNode)
     m.InfoPanel.lineOneData = lineOneData
     m.InfoPanel.description = contentNode.description
 
-    if contentNode.needsLogin = true AND m.top.signedIn <> true
-      m.InfoPanel.loginReason = contentNode.loginReason 'set login reason before setting needsLogin
-      m.InfoPanel.needsLogin = true
-    else
-      m.InfoPanel.needsLogin = false
-    end if
+    ' Always set needsLogin = false for linear content in infoPanel
+    m.InfoPanel.needsLogin = false
 
   end if
 

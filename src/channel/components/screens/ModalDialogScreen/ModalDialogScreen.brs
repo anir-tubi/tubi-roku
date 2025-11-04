@@ -107,7 +107,8 @@ Function formatDialog()
 
   ' Position the dialog vertically and horizontally centered on the screen
   contentRect = m.ContentArea.boundingRect()
-  m.DialogBox.height = contentRect.height + 65 + 24 ' 65 is from top to title, 24 is from button to bottom of dialog
+  buttonRect = m.ButtonList.boundingRect()
+  m.DialogBox.height = contentRect.height + buttonRect.height + 65 + 24 ' 65 is from top to title, 24 is from button to bottom of dialog
   newY = (1080 - m.DialogBox.height) / 2.0
   m.DialogBox.translation = [m.DialogBox.translation[0], newY]
 End Function
@@ -117,6 +118,7 @@ Function onIsModalUIChangedChanged(msg)
   isModalUIChanged = msg.getData()
   isSignUpLogoPresent = (m.signUpLogo.getParent() <> invalid)
   isSubMessagePresent = (m.subMessage.getParent() <> invalid)
+  buttonListXPosition = 20
 
   if isModalUIChanged = true
     if isSignUpLogoPresent = false
@@ -136,6 +138,7 @@ Function onIsModalUIChangedChanged(msg)
     m.ButtonList.numColumns = "3"
     m.ContentArea.itemSpacings = [24, 12, 72]
     m.ButtonList.itemSize = [120, 80]
+    buttonListXPosition = 60
   else
     if isSignUpLogoPresent = true
       m.ContentArea.removeChild(m.signUpLogo)
@@ -154,4 +157,6 @@ Function onIsModalUIChangedChanged(msg)
     m.ContentArea.itemSpacings = [50, 36]
     m.ButtonList.itemSize = [475, 80]
   end if
+
+  m.ButtonList.translation = [buttonListXPosition, m.ContentArea.boundingRect().height + 108]
 End Function

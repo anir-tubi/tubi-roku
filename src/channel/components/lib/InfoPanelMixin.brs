@@ -61,7 +61,11 @@ Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel, isHome
 
   infoPanel.lineOneData = lineOneData
   infoPanel.lineTwoData = lineTwoData
-  if content.needsLogin = true
+
+  ' Always set needsLogin = false for linear content in infoPanel, regular content follows normal logic
+  if content.type = m.constants.ui.contentTypes.linear
+    infoPanel.needsLogin = false
+  else if content.needsLogin = true
     infoPanel.loginReason = content.loginReason
     infoPanel.needsLogin = true
   else
@@ -113,7 +117,10 @@ Function populateInfoPanelWithHomescreenStyleSportsMode(content, infoPanel)
   infoPanel.lineTwoData = lineTwoData
 
   infoPanel.reminderIsSet = (availabilityType = m.constants.ui.contentTimings.upcoming AND getBookmark(content.id) <> invalid)
-  if content.needsLogin = true AND m.top.signedIn <> true
+  ' Always set needsLogin = false for linear content in infoPanel, regular content follows normal logic
+  if content.type = m.constants.ui.contentTypes.linear
+    infoPanel.needsLogin = false
+  else if content.needsLogin = true AND m.top.signedIn <> true
     infoPanel.loginReason = content.loginReason 'set loginReason before needs Login
     infoPanel.needsLogin = true
   else
@@ -216,7 +223,10 @@ Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel)
   infoPanel.lineOneData = lineOneData
   infoPanel.lineTwoData = lineTwoData
 
-  if content.needsLogin = true AND m.top.signedIn <> true
+  ' Always set needsLogin = false for linear content in infoPanel, regular content follows normal logic
+  if content.type = m.constants.ui.contentTypes.linear
+    infoPanel.needsLogin = false
+  else if content.needsLogin = true AND m.top.signedIn <> true
     infoPanel.loginReason = content.loginReason
     infoPanel.needsLogin = true
   else

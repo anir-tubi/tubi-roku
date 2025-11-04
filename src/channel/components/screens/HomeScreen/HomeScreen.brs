@@ -1006,8 +1006,10 @@ Function populateInfoPanel(mode, contentNode)
         m.InfoPanel.title = contentNode.title
         m.InfoPanel.description = contentNode.description
 
-        if contentNode.needsLogin = true AND m.top.signedIn <> true
-
+        ' Always set needsLogin = false for linear content in infoPanel, regular content follows normal logic
+        if contentNode.type = m.constants.ui.contentTypes.linear
+          m.InfoPanel.needsLogin = false
+        else if contentNode.needsLogin = true AND m.top.signedIn <> true
           m.InfoPanel.loginReason = contentNode.loginReason 'set login reason before needsLogin
           m.InfoPanel.needsLogin = true
         else

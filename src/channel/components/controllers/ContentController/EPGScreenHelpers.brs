@@ -443,7 +443,7 @@ Function onEPGScreenOKPressed()
   if currentScreen <> invalid AND isAnEpgScreen(currentScreen)
     contentToPlay = currentScreen.LinearChannelToPlay
     if contentToPlay <> invalid
-      if contentToPlay.needsLogin = true AND getStatsigExperimentResource("roku_linear_age_gate", "roku_linear_age_gate_v1").enabled = true
+      if contentToPlay.needsLogin = true AND getStatsigExperimentResource("roku_linear_reg_gate", "roku_linear_reg_gate_v1").enabled = true
         showLinearPlayerSignInModal(contentToPlay)
       else
         startPlayVideo = true
