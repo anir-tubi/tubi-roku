@@ -33,6 +33,10 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         roku_player_align_ad_request_cuepoint_v1: {
           default: { "enabled": false }
         }
+        ' Testing preroll ad timeout values: 12s, 8s and 5s variants
+        roku_player_ad_preroll_timeout_v2: {
+          default: { "timeout": 10000 }
+        }
       }
 
       roku_linear_age_gate: {
@@ -63,13 +67,6 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
           default: { "design_type": "none", should_debounce: false, gridItemSize: [], featuredRowPosterSize: [], variant: "", should_dim: false, debounce_time: 0 }
           holdout_control: { "design_type": "none", should_debounce: false, gridItemSize: [], featuredRowPosterSize: [], should_dim: false, debounce_time: 0 }
           holdout_winning: { "design_type": "none", should_debounce: false, gridItemSize: [], featuredRowPosterSize: [], should_dim: false, debounce_time: 0 }
-        }
-      }
-
-      roku_player_ad_preroll_timeout: {
-        ' Shorten the preroll ad timeout from 10s to 5s
-        roku_player_ad_preroll_timeout_v1: {
-          default: { "enabled": false }
         }
       }
 

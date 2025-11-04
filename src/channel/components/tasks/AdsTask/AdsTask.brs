@@ -16,7 +16,7 @@ Function execAdsTask()
   gdpr = isGDPR(constants)
 
   ' Get Statsig experiment for preroll timeout
-  prerollTimeoutExperiment = getStatsigExperimentResource("roku_player_ad_preroll_timeout", "roku_player_ad_preroll_timeout_v1", false)
+  prerollTimeoutExperiment = getStatsigExperimentResource("roku_player_improvement", "roku_player_ad_preroll_timeout_v2", false)
 
   m.tubiAds = TubiAds(constants, request, requestQueue, auth, tracking, m.top.adContentType, videoPlayerNode.tcfString, videoPlayerNode.userConsentsOptOutStatus, gdpr, prerollTimeoutExperiment)
   adShim = TubiSGAdShim(constants, m.tubiAds)

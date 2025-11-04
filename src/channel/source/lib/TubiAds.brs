@@ -404,9 +404,9 @@ Function tubiAds_retrieveAds(adsUrl, adInsertionMethod)
   if tubiReq.start(port) = true then
     timeout = 10000 ' in milliseconds
 
-    ' Use 5 second timeout for preroll ads when experiment is enabled
-    if m.currentAdType = "preroll" AND m.prerollTimeoutExperiment <> invalid AND m.prerollTimeoutExperiment.enabled = true
-      timeout = 5000 ' in milliseconds
+    ' Use a 12-, 8-, 5-second timeout for preroll ads when the experiment is enabled, depending on the timeout value specified in the experiment.
+    if m.currentAdType = "preroll" AND m.prerollTimeoutExperiment <> invalid AND isInteger(m.prerollTimeoutExperiment.timeout) = true
+      timeout = m.prerollTimeoutExperiment.timeout ' in milliseconds
     end if
 
     msg = wait(timeout, port)

@@ -890,8 +890,8 @@ Function playContent()
       if fetchPreroll = true
         updatePlayerLogLib(m.playerLogLib, "setAdType", "preroll")
 
-        'Fire roku_player_ad_preroll_timeout_v1 exposure event when fetching preroll ads
-        getStatsigExperimentResource("roku_player_ad_preroll_timeout", "roku_player_ad_preroll_timeout_v1")
+        'Fire roku_player_ad_preroll_timeout_v2 exposure event when fetching preroll ads
+        getStatsigExperimentResource("roku_player_improvement", "roku_player_ad_preroll_timeout_v2")
 
         ' Start pre-roll fetch
         m.top.adControl = "preroll"
