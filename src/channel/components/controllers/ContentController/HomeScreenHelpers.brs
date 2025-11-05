@@ -1162,7 +1162,7 @@ Function selectLinearContent(content)
   stopCountdownTimer()
   if content <> invalid AND content.type = m.constants.ui.contentTypes.linear
     linearContent = getCurrentLinearContent()
-    if content.needsLogin = true AND getStatsigExperimentResource("roku_linear_reg_gate", "roku_linear_reg_gate_v1").enabled = true
+    if content.needsLogin = true AND isLoggedInUser() = false AND getStatsigExperimentResource("roku_linear_reg_gate", "roku_linear_reg_gate_v1").enabled = true
       showLinearPlayerSignInModal(content)
     else
       if linearContent <> invalid AND linearContent.id <> invalid AND content.id = linearContent.id

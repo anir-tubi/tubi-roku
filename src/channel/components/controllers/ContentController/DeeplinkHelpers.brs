@@ -358,6 +358,8 @@ Function onSingleChannelFetchForDeeplinkSuccess(successResponse, storeInCache = 
       if linearContent.needsLogin = false OR (linearContent.needsLogin = true AND isLoggedInUser() = true)
         playbackSource = getPlaybackSourceForDeeplinkType()
         playLinearVideoContent(linearContent, false, m.constants.ui.screenIds.epgScreen, false, playbackSource)
+      else
+        showLinearPlayerSignInModal(linearContent)
       end if
 
       sEPGSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.epgScreen]

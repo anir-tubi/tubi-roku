@@ -3443,7 +3443,7 @@ Function processUserContentSelection(content, screen, playbackSource = {}) as Vo
   else if contentType = m.constants.ui.contentTypes.historySignedOutUser
     startSignIn(refreshScreenAndContentAfterSignIn)
   else if contentType = m.constants.ui.contentTypes.linear
-    if content.needsLogin = true AND getStatsigExperimentResource("roku_linear_reg_gate", "roku_linear_reg_gate_v1").enabled = true
+    if content.needsLogin = true AND isLoggedInUser() = false AND getStatsigExperimentResource("roku_linear_reg_gate", "roku_linear_reg_gate_v1").enabled = true
       showLinearPlayerSignInModal(content)
     else
       selectLinearContent(content)
@@ -3463,7 +3463,14 @@ Function showLinearPlayerSignInModal(content)
 
   if content <> invalid
     ' Get program name for the modal
-    programName = content.title
+
+    currentProgram = getCurrentLiveProgram(content)
+
+    if currentProgram <> invalid
+      programName = currentProgram.title
+    else
+      programName = content.title
+    end if
 
     ' Create two-line title format:
     ' Line 1: "Register or Sign In to stream"
