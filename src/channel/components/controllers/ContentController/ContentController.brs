@@ -3421,6 +3421,8 @@ Function processUserContentSelection(content, screen, playbackSource = {}) as Vo
     else if content.actionId = "watchLive"
       if playerType = m.constants.ui.playerTypes.fox
         playLinearVideoWithFoxPlayer(content)
+      else
+        playerLinearChannel(content)
       end if
     else if content.actionId = "reminder"
       addOrRemoveReminderForEventContent(content)
@@ -3444,7 +3446,7 @@ Function processUserContentSelection(content, screen, playbackSource = {}) as Vo
     end if
   else if contentType = m.constants.ui.contentTypes.skinAd
     playAdContent(content)
-  else if playerType = m.constants.ui.playerTypes.fox
+  else if content.scheduleData <> invalid
     showLinearDetailScreen(content, playbackSource)
   else
     showDetailScreen(content, true, invalid, invalid, playbackSource)
@@ -3558,9 +3560,11 @@ Function processUserPlayAction(content, screen, playbackSource = {}) as Void
     else if content.actionId = "watchLive"
       if playerType = m.constants.ui.playerTypes.fox
         playLinearVideoWithFoxPlayer(content)
+      else
+        playerLinearChannel(content)
       end if
     end if
-  else if playerType = m.constants.ui.playerTypes.fox
+  else if content.scheduleData <> invalid
     showLinearDetailScreen(content, playbackSource)
   else if contentType = m.constants.ui.contentTypes.linear
     selectLinearContent(content)
@@ -3590,6 +3594,8 @@ Function processUserContentSelectionAfterSignIn()
       end if
       if playerType = m.constants.ui.playerTypes.fox
         playLinearVideoWithFoxPlayer(contentFocused)
+      else
+        playerLinearChannel(contentFocused)
       end if
     end if
   end if
@@ -3665,4 +3671,30 @@ Function updateVideoTileSize(scrollingStatus = false)
 
   m.inlinePreviewFocusIndicator.height = m.inlineVideoMetadataOverlay.height + 12
   m.inlinePreviewFocusIndicator.width = m.inlineVideoMetadataOverlay.width + 12
+End Function
+
+
+Function playerLinearChannel(content)
+  screenId = getCurrentScreen().id
+  showHideSpinner(true)
+  fetchEPGChannel(screenId, content.scheduleData.channelId, onLinearChannelFetchSuccess, onLinearChannelFetchError)
+End Function
+
+
+Function onLinearChannelFetchSuccess(response)
+  if isNode(response)
+    content = response.getChild(0)
+    if content <> invalid
+      screenId = getCurrentScreen().id
+      showHideSpinner(false)
+      playLinearVideoContent(content, false, screenId, false, {})
+    end if
+  end if
+End Function
+
+
+Function onLinearChannelFetchError(response)
+  ' For now just hiding the spinner and not showing the error modal.
+  Tubilog("ContentController.onLinearChannelFetchError")
+  showHideSpinner(false)
 End Function

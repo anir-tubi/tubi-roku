@@ -1083,7 +1083,15 @@ Function onDeeplinkLiveEventContentSuccess(content)
       isEventLive = isLessThanOrEqualToCurrentTime(startTime) AND isGreaterThanCurrentTime(endTime)
       if isEventLive = true
         entryPoint = m.constants.deeplinks.entryPoints.video
-        playLinearVideoWithFoxPlayer(content)
+        playerType = content.playerType
+        if isAA(content.scheduleData)
+          playerType = content.scheduleData.playerType
+        end if
+        if playerType = m.constants.ui.playerTypes.fox
+          playLinearVideoWithFoxPlayer(content)
+        else
+          playerLinearChannel(content)
+        end if
       else
         showLinearDetailScreen(content, playbackSource)
       end if
