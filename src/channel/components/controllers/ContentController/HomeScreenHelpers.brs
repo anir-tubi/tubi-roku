@@ -1040,7 +1040,7 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
           m.backgroundGroup.posterVisible = true '//reset the background so it can be seen
           stopLinearVideoContent()
 
-          if focusedContent.needsLogin = false OR getStatsigExperimentResource("roku_linear_reg_gate", "roku_linear_reg_gate_v1").enabled = false
+          if focusedContent.needsLogin = false OR getStatsigExperimentResource("roku_linear_reg_gate", "roku_linear_reg_gate_v1", false).enabled = false
             playbackSource = {
               "srcForAnalytic": m.constants.player.playbackSource.unknown
               "srcForAds": m.constants.player.playbackOrigin.container

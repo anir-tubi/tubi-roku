@@ -32,7 +32,7 @@ Function onThemeChange(msg = invalid)
     m.cellRect.blendColor = theme.neutralColor2
     m.timeString.color = theme.secondaryTextColor
     m.programString.color = theme.primaryTextColor
-    onFocusPercentChange()    '//This function also sets the color - but depending on the focus state
+    onFocusPercentChange() '//This function also sets the color - but depending on the focus state
   end if
 End Function
 
@@ -47,7 +47,7 @@ Function onContentChange()
     m.programString.width = item.FHDItemWidth - 24
     m.timeString.width = item.FHDItemWidth - 24
     if item.selected = true
-      if itemAttributes <> invalid and itemAttributes.title <> invalid
+      if itemAttributes <> invalid AND itemAttributes.title <> invalid
         m.timeString.text = itemAttributes.title + item.ShortDescriptionLine1
         if m.theme <> invalid
           m.timeString.color = m.theme.cautionColor
@@ -63,29 +63,32 @@ Function onContentChange()
       m.programString.text = item.epgProgramTitle
     end if
 
-    if item.needsLogin = true
-      if m.lockIcon = invalid
-        m.lockIcon = createObject("roSGNode","Poster")
-        m.lockIcon.id = "lockIcon"
-        m.lockIcon.width = 21
-        m.lockIcon.height = 24
-        m.lockIcon.opacity = 1
-        m.lockIcon.uri="pkg:/images/lock-closed.webp"
-        m.titleLockGroup.insertChild(m.lockIcon, 0)
-        m.programString.width = item.FHDItemWidth - m.lockIcon.width - 12
-      end if
-    else
-      if m.lockIcon <> invalid
-        m.lockIcon.opacity = 0
-        m.titleLockGroup.removeChild(m.lockIcon)
-        m.lockIcon = invalid
-      end if
-    end if
+    ' Uncomment this code if we doesn't have plans to graduate roku_linear_reg_gate experiment.
+    ' if item.needsLogin = true
+    '   if m.lockIcon = invalid
+    '     m.lockIcon = createObject("roSGNode", "Poster")
+    '     m.lockIcon.id = "lockIcon"
+    '     m.lockIcon.width = 21
+    '     m.lockIcon.height = 24
+    '     m.lockIcon.opacity = 1
+    '     m.lockIcon.uri = "pkg:/images/lock-closed.webp"
+    '     m.titleLockGroup.insertChild(m.lockIcon, 0)
+    '     m.programString.width = item.FHDItemWidth - m.lockIcon.width - 12
+    '   end if
+    ' else
+    '   if m.lockIcon <> invalid
+    '     m.lockIcon.opacity = 0
+    '     m.titleLockGroup.removeChild(m.lockIcon)
+    '     m.lockIcon = invalid
+    '   end if
+    ' end if
+
   end if
-  if m.timeString.text = "" or m.timeString.text = invalid
-    m.titleLockGroup.translation = [24,36]
+
+  if m.timeString.text = "" OR m.timeString.text = invalid
+    m.titleLockGroup.translation = [24, 36]
   else
-    m.titleLockGroup.translation = [24,54]
+    m.titleLockGroup.translation = [24, 54]
   end if
 
 

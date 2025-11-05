@@ -849,10 +849,12 @@ Function reactToLinearVideoPlayerErrorStateInNonFullscreenState()
   ' to start playback. If an error occurs heres, not showing an error modal allows users to continue navigating.
   stopAndHideLinearVideoPlayer()
   homescreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-  if homescreen.lastFocusedList = "featuredRowList"
-    displayDefaultBackground()
-  else
-    setVideoContentScreenBackground(homescreen)
+  if homescreen <> invalid
+    if homescreen.lastFocusedList = "featuredRowList"
+      displayDefaultBackground()
+    else
+      setVideoContentScreenBackground(homescreen)
+    end if
   end if
 End Function
 

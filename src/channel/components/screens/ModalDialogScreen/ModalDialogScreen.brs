@@ -107,8 +107,8 @@ Function formatDialog()
 
   ' Position the dialog vertically and horizontally centered on the screen
   contentRect = m.ContentArea.boundingRect()
-  buttonRect = m.ButtonList.boundingRect()
-  m.DialogBox.height = contentRect.height + buttonRect.height + 65 + 24 ' 65 is from top to title, 24 is from button to bottom of dialog
+  buttonRect = m.ButtonList.boundingRect().height + 36
+  m.DialogBox.height = contentRect.height + buttonRect + 65 + 24 ' 65 is from top to title, 24 is from button to bottom of dialog
   newY = (1080 - m.DialogBox.height) / 2.0
   m.DialogBox.translation = [m.DialogBox.translation[0], newY]
 End Function
