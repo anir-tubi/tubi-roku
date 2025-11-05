@@ -22,33 +22,25 @@ Function init()
   m.top.observeFieldScoped("hideTitle", "onHideTitleChange")
   m.top.observeFieldScoped("width", "onWidthChange")
 
-  experimentInfo = getStatsigExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
+  experimentInfo = getStatsigExperimentResource("roku_video_tiles", "roku_video_tiles_1_7", false)
   m.variant = experimentInfo.variant
 
   typographyConstants = getTypographyConstants()
   m.bodyMediumFont = typographyConstants.ids.bodyMedium
-
   m.bodySmallFont = typographyConstants.ids.bodySmall
+  m.headerSmallFont = typographyConstants.ids.headerSmall
 
   m.title = invalid
   if m.variant = "typography_improvements"
-    m.title = createObject("roSGNode", "Label")
-    m.title.id = "title"
-    setTypographyOfLabel(m.title, typographyConstants.ids.subheaderMedium)
-    m.metadataGroup.insertChild(m.title, 0)
-
-    m.metadataGroup.itemSpacings = [8, 4]
-    setTypographyOfLabel(m.description, m.bodyMediumFont)
+    appendTitleToMetadataGroup()
   else
-    setTypographyOfLabel(m.description, m.bodySmallFont)
+    setTypographyOfLabel(m.description, m.bodyMediumFont)
   end if
 
   setTypographyOfLabel(m.ratingLabel, typographyConstants.ids.bodyExtraSmallStrong)
   m.badgeTextFont = typographyConstants.ids.bodySmallStrong
 
   m.description.observeFieldScoped("isTextEllipsized", "onIsTextEllipsizedChange")
-
-  m.top.observeFieldScoped("isBillboardRow", "onIsBillboardRowChange")
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -69,6 +61,7 @@ Function onThemeChange(msg = invalid)
     m.secondaryTextColor = theme.secondaryTextColor
     m.RatingLabel.color = theme.secondaryTextColor
     m.description.color = m.primaryTextColor
+    m.focusedTextColor = theme.focusedTextColor
 
     m.progressBar.focusColor = theme.focusedColor
     m.progressBar.trackColor = theme.neutralColor
@@ -101,8 +94,13 @@ Function onItemContentChange(msg)
   if itemContent <> invalid
     m.nodeHelpers.removeAllChildren(m.subHeadlinePrefixGroup)
     m.nodeHelpers.removeAllChildren(m.subHeadlineSuffixGroup)
-    if m.top.isBillboardRow = true
-      m.firstLineGroup.removeChild(m.rating)
+
+    isVideoTilesControlMetadata = m.top.id = "videoTilesControlMetadata"
+    if isVideoTilesControlMetadata = false
+      m.metadataGroup.itemSpacings = [9]
+    end if
+    if isVideoTilesControlMetadata = true AND m.title = invalid
+      appendTitleToMetadataGroup()
     end if
 
     ' Resetting the visibility of the rating and sot badge.
@@ -181,6 +179,10 @@ Function onItemContentChange(msg)
         metadataOnPosterContent(itemContent)
       end if
     end if
+
+    if isVideoTilesControlMetadata = true AND itemContent.type <> m.constants.ui.contentTypes.linear AND isNonEmptyString(itemContent.availabilityEnds) AND m.sotBadge.getParent() = invalid
+      setupExpiresBadge(itemContent)
+    end if
   end if
 End Function
 
@@ -200,7 +202,11 @@ Function metadataOnPosterContent(itemContent)
         text += " " + Chr(&hb7) + " " + tags[1]
       end if
     end if
-    prefixTextParts.push(text)
+    if m.variant <> "trueControlTop2Rows" OR m.top.id <> "videoTilesControlMetadata"
+      prefixTextParts.push(text)
+    else
+      renderTags(text)
+    end if
   end if
 
   if itemContent.year <> invalid
@@ -498,12 +504,15 @@ Function renderSubHeadline(parts, isPrefix)
   for each part in parts
     label = createObject("roSGNode", "Label")
     label.color = m.secondaryTextColor
-    if m.top.isBillboardRow = true
+    isVideoTilesControlMetadata = m.top.id = "videoTilesControlMetadata"
+    if isVideoTilesControlMetadata = true
       setTypographyOfLabel(label, m.bodyMediumFont)
     else
       setTypographyOfLabel(label, m.bodySmallFont)
     end if
     label.text = prefix + part
+    label.height = 40
+    label.vertAlign = "center"
     group.appendChild(label)
     if m.top.isBillboardRow = false
       prefix = " " + Chr(&hb7) + " "
@@ -518,4 +527,51 @@ Function onWidthChange()
   else
     m.description.width = m.top.descriptionWidth
   end if
+End Function
+
+
+Function appendTitleToMetadataGroup()
+  m.title = createObject("roSGNode", "Label")
+  m.title.id = "title"
+  setTypographyOfLabel(m.title, m.headerSmallFont)
+  m.metadataGroup.insertChild(m.title, 0)
+  if m.variant = "trueControlTop2Rows" AND m.top.id = "videoTilesControlMetadata"
+    m.metadataGroup.itemSpacings = [18, 3, 15]
+  else if m.variant = "refinedControlTop2Rows" AND m.top.id = "videoTilesControlMetadata"
+    m.metadataGroup.itemSpacings = [15, 18]
+  else if m.variant = "cinematicTop2Rows" AND m.top.id = "videoTilesControlMetadata"
+    m.metadataGroup.itemSpacings = [9, 9]
+  else
+    m.metadataGroup.itemSpacings = [9, 3]
+  end if
+  setTypographyOfLabel(m.description, m.bodyMediumFont)
+End Function
+
+
+Function setupExpiresBadge(itemContent)
+  badgeInfo = getExpiresBadgeInfo(itemContent.availabilityEnds)
+  if badgeInfo <> invalid
+    m.sotBadge.textColor = m.focusedTextColor
+    m.sotBadge.text = badgeInfo.text
+    m.sotBadge.visible = true
+    m.firstLineGroup.appendChild(m.sotBadge)
+  end if
+End Function
+
+
+Function renderTags(tags)
+  if m.tagsLabel <> invalid
+    m.metadataGroup.removeChild(m.tagsLabel)
+  end if
+
+  label = createObject("roSGNode", "Label")
+  label.id = "tags"
+  label.color = m.secondaryTextColor
+  setTypographyOfLabel(label, m.bodyMediumFont)
+  label.text = tags
+  label.height = 40
+  label.vertAlign = "center"
+  m.metadataGroup.insertChild(label, 2)
+
+  m.tagsLabel = label
 End Function

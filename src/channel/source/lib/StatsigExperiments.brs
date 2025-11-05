@@ -61,12 +61,13 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
-      roku_home_screen_redesign: {
-        roku_home_screen_redesign_v_1_6: {
-          ' default: { "design_type": "withDescriptionPortraitSmall", should_debounce: false, gridItemSize: [310, 442], featuredRowPosterSize: [788, 442], variant: "billboard", should_dim: true }
-          default: { "design_type": "none", should_debounce: false, gridItemSize: [], featuredRowPosterSize: [], variant: "", should_dim: false, debounce_time: 0 }
-          holdout_control: { "design_type": "none", should_debounce: false, gridItemSize: [], featuredRowPosterSize: [], should_dim: false, debounce_time: 0 }
-          holdout_winning: { "design_type": "none", should_debounce: false, gridItemSize: [], featuredRowPosterSize: [], should_dim: false, debounce_time: 0 }
+      roku_video_tiles: {
+        roku_video_tiles_1_7: {
+          ' Possible variants: cinematicTop2Rows, trueControlTop2Rows, refinedControlTop2Rows
+          'default: { "design_type": "videoTiles", should_debounce: true, gridItemSize: [310, 442], featuredRowPosterSize: [788, 442], featuredLandscapePosterSize: [360, 201], variant: "refinedControlTop2Rows", should_dim: true, controlCategoryIds: ["featured", "recommended_for_you"], useTitleArt: false }
+          default: { "design_type": "none", should_debounce: false, gridItemSize: [], featuredRowPosterSize: [], featuredLandscapePosterSize: [], variant: "", should_dim: false, debounce_time: 0, controlCategoryIds: [], useTitleArt: false }
+          holdout_control: { "design_type": "none", should_debounce: false, gridItemSize: [], featuredRowPosterSize: [], featuredLandscapePosterSize: [], should_dim: false, debounce_time: 0, controlCategoryIds: [], useTitleArt: false }
+          holdout_winning: { "design_type": "none", should_debounce: false, gridItemSize: [], featuredRowPosterSize: [], featuredLandscapePosterSize: [], should_dim: false, debounce_time: 0, controlCategoryIds: [], useTitleArt: false }
         }
       }
 

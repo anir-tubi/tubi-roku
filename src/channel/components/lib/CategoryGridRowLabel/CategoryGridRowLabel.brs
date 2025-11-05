@@ -86,7 +86,7 @@ Function onContentChange()
 
     m.CategoryName.width = 1000
     m.subText.visible = false
-    ' TODO: Revisit this logic based on the experiment roku_home_screen_redesign_v_1_6 results.
+    ' TODO: Revisit this logic based on the experiment roku_video_tiles_1_7 results.
     updateCategoryNameVisibility()
 
     if item.subtext <> invalid AND item.subtext <> ""

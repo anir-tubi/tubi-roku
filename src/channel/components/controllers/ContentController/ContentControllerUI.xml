@@ -1,10 +1,12 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
  - ContentControllerUI
  -
  - This serves as the spot for all ui components of the ContentController.
- - We don't want to make these components until after auth, remote config and experiments are all ready to go.
- - This is to avoid the issue where a component copies the default values before the actual values have been updated by ContentController
+ - We don't want to make these components until after auth, remote config and experiments are all
+ready to go.
+ - This is to avoid the issue where a component copies the default values before the actual values
+have been updated by ContentController
  -
  -->
 <component name="ContentControllerUI" extends="Group">
@@ -12,173 +14,186 @@
     <!-- All interface and actual controller code should be added in ContentController instead -->
   </interface>
 
-    <children>
-      <!--
+  <children>
+    <!--
         - This hides the loading screen that was in place by the Scene
         - before remote components have loaded
         -->
-      <Rectangle
-        id="ContentBackground"
-        width="1920"
-        height="1080"
-        translation="[0,0]"/>
+    <Rectangle
+      id="ContentBackground"
+      width="1920"
+      height="1080"
+      translation="[0,0]" />
 
-      <!-- All the children of this group exist only in a single instance -->
+    <!-- All the children of this group exist only in a single instance -->
+    <Group
+      id="ContentGroup"
+      visible="false">
+
       <Group
-        id="ContentGroup"
-        visible="false">
-
-        <Group
-          id="backgroundVideoPreviewPlayerContainer">
-          <VideoPreviewPlayer
-            id="videoPreviewPlayer" />
-        </Group>
-
-        <!--  Group that contains the linear video player when it is not in its fullscreen state -->
-        <Group
-          id="LinearPlayerGroup"/>
-        <!--Handles the background images -->
-        <BackgroundGroup
-          id="BackgroundGroup"/>
-        <!--Handles the background sponsorship images when the current focused item is sponsored-->
-        <SponsorshipBackgroundGroup
-          id="SponsorshipBackgroundGroup"
-          translation="[0,522]"/>
-
-        <!--Displays a footer image when the app is sponsored. -->
-        <SponsorshipFooterGroup
-          id="SponsorshipFooterGroup"/>
-
-        <Group
-          id="screenStackGroup">
-          
-          <ScreenStack
-            id="ScreenStack"/>
-            
-          <Group
-            id="videoTileOverlayGroup"
-            visible="false">
-            <ExpandedVideoGridTile
-              id="inTransitInlineVideoMetadataOverlay" 
-              opacity="0"
-              containerIndex="1"
-              skipAnimation="true"/>
-            <Group
-              id="inlineVideoPreviewPlayerContainer"
-              opacity="0"
-              translation="[160, 204.5]" >
-              <ExpandedVideoGridTile
-                id="inlineVideoMetadataOverlay"
-                translation="[5,4]" />
-              <VideoGridTitleLogo
-                id="inlineVideoGridTitleLogo" 
-                translation="[5,4]" />
-              <Poster
-                id="inlinePreviewFocusIndicator"
-                width="801"
-                height="340"
-                visible="false"
-                uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
-            </Group>
-          </Group>
-
-        </Group>
-
-        <!--  Group that contains the linear video player when it is not in its fullscreen state, and when the player needs to be above the screen stack layer. -->
-        <Group
-          id="LinearPlayerGroupAboveScreenStack"/>
-
-        <SideNav
-          id="SideNav"
-          translation="[0,0]"
-          width="338"/>
-        <Clock
-          id="clock"
-          width="93"
-          height="36"
-          visible="false"
-          translation="[1729,72]"/>
-
-        <Group
-          id="logoGroup">
-          <Poster
-            id="tubiLogo"
-            height="48"
-            width="135"
-            uri="pkg:/images/logo-large.webp"
-            translation="[1698,54]"/>
-          <Poster
-            id="tubiKidsLogo"
-            height="48"
-            width="256"
-            uri="pkg:/images/logo-kids-large.webp"
-            translation="[1575,54]"
-            visible="false"/>
-          <Poster
-            id="tubiEspanolLogo"
-            height="93"
-            width="135"
-            uri="pkg:/images/logo-espanol-large.webp"
-            translation="[1698,54]"
-            visible="false"/>
-          <LayoutGroup
-            id="presentedByGroup"
-            layoutDirection="vert"
-            horizAlignment="center"
-            itemSpacings="[8]"
-            translation="[1764,54]">
-              <Label
-                id="presentedByLabel"
-                maxLines="1">
-                <Font role="font"/>
-              </Label>
-              <Poster
-                id="presentedByImage"
-                width="174"
-                height="48"
-                loadDisplayMode="scaleToFit"/>
-          </LayoutGroup>
-        </Group>
-        <TubiToast
-          id="tubiToast"
-          translation="[1191, 60]"/>
+        id="backgroundVideoPreviewPlayerContainer">
+        <VideoPreviewPlayer
+          id="videoPreviewPlayer" />
       </Group>
 
-      <!-- Services -->
+      <!--  Group that contains the linear video player when it is not in its fullscreen state -->
+      <Group
+        id="LinearPlayerGroup" />
+      <!--Handles
+      the background images -->
+      <BackgroundGroup
+        id="BackgroundGroup" />
+      <!--Handles
+      the background sponsorship images when the current focused item is sponsored-->
+      <SponsorshipBackgroundGroup
+        id="SponsorshipBackgroundGroup"
+        translation="[0,522]" />
 
-      <TrackingLoggingTask
-        id="TrackingLoggingTask"/>
+      <!--Displays
+      a footer image when the app is sponsored. -->
+      <SponsorshipFooterGroup
+        id="SponsorshipFooterGroup" />
 
-      <!-- The timer that is used to countdown when the minimized player goes fullscreen -->
-      <Timer
-        id="PlayerFullscreenCountdownTimer"
-        duration="1"
-        repeat="true"/>
+      <Group
+        id="screenStackGroup">
 
-      <!-- The timer that is used to check if guests are allowed to see the history of content. -->
-      <Timer
-        id="ResumeAllowedTimer"
-        duration="300"
-        repeat="true"/>
+        <ScreenStack
+          id="ScreenStack" />
 
-      <!-- Spinner primarily for sign-in/sign-out transitions -->
-      <Spinner
-        id="ContentControllerSpinner"
-        visible="true"
-        modal="true"
-        width="1920"
-        height="1080"/>
+        <Group
+          id="videoTileOverlayGroup"
+          visible="false">
+          <ExpandedTileMetadata
+            opacity="0"
+            width="1056"
+            hideTitle="false"
+            id="videoTilesControlMetadata" />
+          <ExpandedVideoGridTile
+            id="inTransitInlineVideoMetadataOverlay"
+            opacity="0"
+            containerIndex="1"
+            skipAnimation="true" />
+          <Group
+            id="inlineVideoPreviewPlayerContainer"
+            opacity="0"
+            translation="[160, 204.5]">
+            <ExpandedVideoGridTile
+              id="inlineVideoMetadataOverlay"
+              translation="[5,4]" />
+            <VideoGridTitleLogo
+              id="inlineVideoGridTitleLogo"
+              translation="[5,4]" />
+            <Poster
+              id="inlinePreviewFocusIndicator"
+              width="801"
+              height="340"
+              visible="false"
+              uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png" />
+          </Group>
+        </Group>
 
-      <!-- Spinner to indicate loading of a linear video when it is not fullscreen -->
-      <Spinner
-        id="LinearVideoPlayerSpinner"
-        translation="[1576,660]"
-        showShade="false"
-        displayText="false"
-        width="266"
-        height="66"
-        horizAlign="right"
-        vertAlign="bottom"
-        visible="false"/>
+      </Group>
+
+      <!--  Group that contains the linear video player when it is not in its fullscreen state, and
+      when the player needs to be above the screen stack layer. -->
+      <Group
+        id="LinearPlayerGroupAboveScreenStack" />
+
+      <SideNav
+        id="SideNav"
+        translation="[0,0]"
+        width="338" />
+      <Clock
+        id="clock"
+        width="93"
+        height="36"
+        visible="false"
+        translation="[1729,72]" />
+
+      <Group
+        id="logoGroup">
+        <Poster
+          id="tubiLogo"
+          height="48"
+          width="135"
+          uri="pkg:/images/logo-large.webp"
+          translation="[1731, 54]" />
+        <Poster
+          id="tubiKidsLogo"
+          height="48"
+          width="256"
+          uri="pkg:/images/logo-kids-large.webp"
+          translation="[1575,54]"
+          visible="false" />
+        <Poster
+          id="tubiEspanolLogo"
+          height="93"
+          width="135"
+          uri="pkg:/images/logo-espanol-large.webp"
+          translation="[1731,54]"
+          visible="false" />
+        <LayoutGroup
+          id="presentedByGroup"
+          layoutDirection="vert"
+          horizAlignment="center"
+          itemSpacings="[8]"
+          translation="[1764,54]">
+          <Label
+            id="presentedByLabel"
+            maxLines="1">
+            <Font role="font" />
+          </Label>
+          <Poster
+            id="presentedByImage"
+            width="174"
+            height="48"
+            loadDisplayMode="scaleToFit" />
+        </LayoutGroup>
+      </Group>
+      <TubiToast
+        id="tubiToast"
+        translation="[1191, 60]" />
+    </Group>
+
+    <!-- Services -->
+
+    <TrackingLoggingTask
+      id="TrackingLoggingTask" />
+
+    <CircularCounter
+      opacity="0.0"
+      id="autoStartPreviewToPlaybackTimer" />
+
+    <!-- The timer that is used to countdown when the minimized player goes fullscreen -->
+    <Timer
+      id="PlayerFullscreenCountdownTimer"
+      duration="1"
+      repeat="true" />
+
+    <!-- The timer that is used to check if guests are allowed to see the history of content. -->
+    <Timer
+      id="ResumeAllowedTimer"
+      duration="300"
+      repeat="true" />
+
+    <!-- Spinner primarily for sign-in/sign-out transitions -->
+    <Spinner
+      id="ContentControllerSpinner"
+      visible="true"
+      modal="true"
+      width="1920"
+      height="1080" />
+
+    <!-- Spinner to indicate loading of a linear video when it is not fullscreen -->
+    <Spinner
+      id="LinearVideoPlayerSpinner"
+      translation="[1576,660]"
+      showShade="false"
+      displayText="false"
+      width="266"
+      height="66"
+      horizAlign="right"
+      vertAlign="bottom"
+      visible="false" />
   </children>
 </component>

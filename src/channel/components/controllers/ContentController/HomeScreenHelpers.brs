@@ -609,7 +609,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
       end if
       refreshLiveEventsContainerWithEpgListingInfo(rawResponse)
 
-      getStatsigExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", true)
+      getStatsigExperimentResource("roku_video_tiles", "roku_video_tiles_1_7", true)
       if m.isUserInVideoTilesExperiment = true AND isNode(rawResponse) = true AND rawResponse.getChildCount() > 0
         ' Only show the video tile overlay group if the screen is the home screen and the skin ads are not available.
         ' This is needed because we refresh home screen behind the scenes during parent controls change.
@@ -1497,6 +1497,7 @@ End Function
 Function onFeaturedRowCurrFocusRowChange(msg)
   screen = msg.getRoSGNode()
   currFocusRow = msg.getData()
+  fade(m.autoStartPreviewToPlaybackTimer, "out", 0.1)
   ' It will only start the timer for the first time.
   m.performanceMetricsTracker.startMetricTiming("vertical_scroll_performance")
   updateExpandedVideoTileCurrFocusRow(currFocusRow, screen.featuredListScrollDirection)
@@ -1535,6 +1536,19 @@ Function onFeaturedRowCurrFocusRowChange(msg)
     m.performanceMetricsTracker.endMetricTiming("vertical_scroll_performance", { row: currFocusRow, screen: screen.id })
     if screen.containerPaginationStatus <> "finished"
       makeAdditionalContainersRequestConditionally(currFocusRow, screen)
+    end if
+  end if
+
+  content = screen.featuredRowContent
+  if content <> invalid
+    category = content.getChild(m.inTransitInlineVideoMetadataOverlay.containerIndex)
+    if category <> invalid AND arrayIncludes(m.videoTilesControlCategoryIds, category.id) = false
+      m.videoTilesControlMetadata.visible = false
+    end if
+
+    category = content.getChild(currFocusRow)
+    if category <> invalid AND arrayIncludes(m.videoTilesControlCategoryIds, category.id) = false
+      m.videoTilesControlMetadata.visible = false
     end if
   end if
 End Function
@@ -1590,6 +1604,7 @@ End Function
 Function onFeaturedRowCurrFocusColumnChange()
   m.inlineVideoMetadataOverlay.skipAnimation = false
   m.videoPreviewDebounce.control = "stop"
+  fade(m.autoStartPreviewToPlaybackTimer, "out", 0.3)
   stopCountdownTimer()
   screen = getCurrentScreen()
   if screen <> invalid
@@ -1624,23 +1639,28 @@ Function updateVideoTileOnFocusChange(rowFocused, columnFocused, screen)
   tubiLog("HomeScreenHelpers.updateVideoTileOnFocusChange")
   ' Only process if the screen is the home screen.
   ' Since all others screens are using topRight background variant vs home screen will use full screen background.
-  ' TODO: If we graduate roku_home_screen_redesign_v_1_6 we should migrate the skin ad to be a itemComponent of FeaturedRowList so that we don't have to add these one off checks.
+  ' TODO: If we graduate roku_video_tiles_1_7 we should migrate the skin ad to be a itemComponent of FeaturedRowList so that we don't have to add these one off checks.
 
   gridItemType = ""
+  contentFocused = invalid
   if screen.featuredRowContent <> invalid
     category = screen.featuredRowContent.getChild(rowFocused)
     if category <> invalid
       gridItemType = category.gridItemType
+      contentFocused = category.getChild(columnFocused)
     end if
   end if
 
-  if isCurrentScreenHomeScreen() = true AND arrayIncludes(m.constants.ui.adGridItemTypes, gridItemType) = false
-    displayDefaultBackground()
+  if isCurrentScreenHomeScreen() = true
+    updateVideoTileScreenBackground(contentFocused, screen)
   end if
 
   if screen <> invalid AND screen.featuredRowContent <> invalid
-    if arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, gridItemType) = false
+    isVideoTileEnabled = contentFocused <> invalid AND isVideoTileEnabledContainer(gridItemType, contentFocused.parentId)
+    if isVideoTileEnabled = true
       pauseVideoPreviewAndShowPoster()
+    else
+      pauseVideoPreview()
     end if
     setInlineVideoMetadataOverlay(screen.featuredRowContent, columnFocused, rowFocused)
   end if
@@ -1731,11 +1751,10 @@ Function setInlineVideoMetadataOverlay(featuredRowContent, columnFocused, rowFoc
     itemContent = currCategory.getChild(columnFocused)
     if itemContent <> invalid
       m.inlineVideoMetadataOverlay.itemContent = itemContent
+      m.inlineVideoGridTitleLogo.itemContent = itemContent
+      m.videoTilesControlMetadata.itemContent = itemContent
     end if
     m.inlineVideoMetadataOverlay.visible = true
-    if itemContent <> invalid
-      m.inlineVideoGridTitleLogo.itemContent = itemContent
-    end if
     m.inlineVideoGridTitleLogo.visible = true
   end if
 
@@ -1758,8 +1777,8 @@ Function setInlineVideoMetadataOverlay(featuredRowContent, columnFocused, rowFoc
       if isNumber(columnFocused) = false OR columnFocused < 0
         columnFocused = 0
       end if
-      isNonVideoTile = arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, nextCategory.gridItemType)
-      m.inTransitInlineVideoMetadataOverlay.visible = (isNonVideoTile = false)
+      isVideoTileEnabled = isVideoTileEnabledContainer(nextCategory.gridItemType, nextCategory.id)
+      m.inTransitInlineVideoMetadataOverlay.visible = (isVideoTileEnabled = true)
       inTransitItemContent = nextCategory.getChild(columnFocused)
       m.inTransitInlineVideoMetadataOverlay.itemContent = inTransitItemContent
     end if
@@ -1791,11 +1810,7 @@ Function onFeaturedListHasFocusChange(msg)
   previewContent = m.videoPreviewPlayer.content
   m.videoPreviewPlayer.visible = (isCurrentScreenHomeScreen() = false OR (content <> invalid AND previewContent <> invalid AND content.id = previewContent.id))
   if hasFeaturedListFocus = true
-    if isNode(content) = true AND (arrayIncludes(m.constants.ui.liveEventsGridTypes, content.gridItemType) OR arrayIncludes(m.constants.ui.adGridItemTypes, content.gridItemType))
-      setVideoContentScreenBackground(screen)
-    else
-      displayDefaultBackground()
-    end if
+    updateVideoTileScreenBackground(content, screen)
 
     previewState = getVideoPreviewStateForThisContent(content)
     m.inlinePreviewFocusIndicator.visible = true
@@ -1803,7 +1818,6 @@ Function onFeaturedListHasFocusChange(msg)
     if previewState = "paused"
       resumeVideoPreview()
     else if previewState = "playing"
-      displayDefaultBackground()
       updatePlayerLayoutBasedOnFocusedContent(content)
     else if m.queuedVideoTilePreview = true
       startDebouncedVideoPreview()
@@ -1848,8 +1862,17 @@ End Function
 Function onFeaturedRowFocusedItemChange(msg)
   focusedItem = msg.getData()
   screen = msg.getRoSGNode()
+
+  if focusedItem <> invalid AND arrayIncludes(m.videoTilesControlCategoryIds, focusedItem.parentId) = true
+    ' Using a combination of visible and fade to avoid the issue where user scrolls past the row in between of fade in.
+    m.videoTilesControlMetadata.visible = true
+    fade(m.videoTilesControlMetadata, "in", 0.1)
+  else
+    m.videoTilesControlMetadata.opacity = 0
+  end if
+
   ' Only process if the focused item is a video tile.
-  if focusedItem <> invalid AND arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, focusedItem.gridItemType) = false
+  if focusedItem <> invalid AND isVideoTileEnabledContainer(focusedItem.gridItemType, focusedItem.parentId) = true
     m.inlineVideoPreviewPlayerContainer.visible = true
     ' In certain cases where the focused item is not the same as the itemContent, we need to update the itemContent.
     ' For ex: One instance is Continue watching row getting updated with the new item or existing item been deleted.
@@ -1878,11 +1901,7 @@ Function onFeaturedRowFocusedItemChange(msg)
     end if
   end if
 
-  if isNode(focusedItem) = true AND (arrayIncludes(m.constants.ui.liveEventsGridTypes, focusedItem.gridItemType) OR arrayIncludes(m.constants.ui.adGridItemTypes, focusedItem.gridItemType))
-    setVideoContentScreenBackground(screen)
-  else if isCurrentScreenHomeScreen() = true
-    displayDefaultBackground()
-  end if
+  updateVideoTileScreenBackground(focusedItem, screen)
   setUIBasedOnFocusedContent(focusedItem)
 End Function
 
@@ -1920,6 +1939,10 @@ Function updateInlineVideoMetadataOverlayVisibility(duration = 0)
     else
       m.inlineVideoPreviewPlayerContainer.opacity = 0
     end if
+
+    if isHomeScreen = false
+      fade(m.autoStartPreviewToPlaybackTimer, "out", 0.3)
+    end if
   end if
 End Function
 
@@ -1949,9 +1972,11 @@ Function onFeaturedRowListTranslationChange(msg)
     ' For Performance optimization reasons not processing it unless user is scrolling vertically.
     if isVerticalScroll = true AND screen.inTransitCurrentFocusedItemBoundingRect <> invalid AND screen.inTransitCurrentFocusedItemBoundingRect.y <> 0
       inTransitRectY = screen.inTransitCurrentFocusedItemBoundingRect.y
+      currentInTransitTranslationY = m.inTransitInlineVideoMetadataOverlay.translation[1]
+      newInTransitTranslationY = translation[1] + inTransitRectY + 5
       ' As soon as the scrolling stops we will hide the in transit video metadata overlay.
-      if screen.featuredListScrollingStatus = true AND isNumber(inTransitRectY)
-        m.inTransitInlineVideoMetadataOverlay.translation = [165, translation[1] + inTransitRectY + 5]
+      if screen.featuredListScrollingStatus = true AND isNumber(inTransitRectY) AND currentInTransitTranslationY <> newInTransitTranslationY
+        m.inTransitInlineVideoMetadataOverlay.translation = [165, newInTransitTranslationY]
         m.inTransitInlineVideoMetadataOverlay.opacity = 1
       else
         m.inTransitInlineVideoMetadataOverlay.opacity = 0
@@ -2096,6 +2121,20 @@ Function sanitizeHomeScreenResponseAndReturnLiveEventsContainer(rawResponse)
   end if
 
   return liveEventsContainer
+End Function
+
+
+Function isVideoTileEnabledContainer(gridItemType, categoryId)
+  return arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, gridItemType) = false AND arrayIncludes(m.videoTilesControlCategoryIds, categoryId) = false
+End Function
+
+
+Function updateVideoTileScreenBackground(content, screen)
+  if isNode(content) = true AND (shouldDisplayFullScreenVideoBackground(content) OR arrayIncludes(m.constants.ui.adGridItemTypes, content.gridItemType))
+    setVideoContentScreenBackground(screen)
+  else if screen.id = m.constants.ui.screenIds.homeScreen
+    displayDefaultBackground()
+  end if
 End Function
 
 

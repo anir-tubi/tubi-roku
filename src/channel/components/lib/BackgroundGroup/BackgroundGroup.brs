@@ -44,9 +44,17 @@ Function init()
   m.fullScreenPosterBottomGradient = topRef.findNode("fullScreenPosterBottomGradient")
   m.adDisplayLeftGradient = topRef.findNode("adDisplayLeftGradient")
   m.adDisplayBottomGradient = topRef.findNode("adDisplayBottomGradient")
-
+  m.videoTilesBackgroundGradient = topRef.findNode("videoTilesBackgroundGradient")
   m.timer = CreateObject("roSGNode", "Timer")
   m.timer.duration = 3
+
+
+  experiment = getStatsigExperimentResource("roku_video_tiles", "roku_video_tiles_1_7", false)
+  if isAA(experiment) = true
+    if experiment.variant = "refinedControlTop2Rows"
+      m.videoTilesBackgroundGradient.uri = "pkg:/images/background-masks/full_screen_variant_c_gradient-$$RES$$.webp"
+    end if
+  end if
 
   setMaskLayerUris()
   ' Prevent artifacts when a parent node is faded in, which might cause the masked image to show through the gradient.
@@ -177,7 +185,7 @@ Function newBackgroundSet()
       fade(m.fullScreenPosterGradient, "out", 0.5)
       fade(m.fullScreenPosterGradient2, "out", 0.5)
       fade(m.adDisplayGradient, "out", 0.5)
-    else if backgroundType = backgroundTypes.fullScreen2 OR backgroundType = backgroundTypes.spotlight OR backgroundType = backgroundTypes.skinAd
+    else if arrayIncludes([backgroundTypes.fullScreen2, backgroundTypes.spotlight, backgroundTypes.skinAd, backgroundTypes.cinematic], backgroundType)
       '// fullScreen2 displays the images in full screen with a vertical gradient overlay that is more opaque on the bottom.
       fade(m.circularMaskLayer, "out", 0.5)
       fade(m.posterGroupMask, "out", 0.5)
@@ -185,6 +193,9 @@ Function newBackgroundSet()
       fade(m.fullScreenPosterGradient, "out", 0.5)
       fade(m.fullScreenPosterGradient2, "in", 0.5)
       fade(m.adDisplayGradient, "out", 0.5)
+      if backgroundType = backgroundTypes.cinematic
+        fade(m.videoTilesBackgroundGradient, "in", 0.5)
+      end if
     else if backgroundType = backgroundTypes.adRowlistSpotlight OR backgroundType = backgroundTypes.adRowlistCarousel
       fade(m.circularMaskLayer, "out", 0.5)
       fade(m.posterGroupMask, "out", 0.5)
@@ -428,7 +439,7 @@ Function startTransitionIn()
   else if m.newBackgroundType = m.constants.ui.backgroundTypes.epg
     m.newPoster.epgTransitionInControl = "start"
     m.newPoster.lastAnimationName = "epgTransitionIn"
-  else if m.newBackgroundType = m.constants.ui.backgroundTypes.fullScreen OR m.newBackgroundType = m.constants.ui.backgroundTypes.fullScreen2 OR m.newBackgroundType = m.constants.ui.backgroundTypes.spotlight
+  else if arrayIncludes([m.constants.ui.backgroundTypes.fullScreen, m.constants.ui.backgroundTypes.fullScreen2, m.constants.ui.backgroundTypes.spotlight, m.constants.ui.backgroundTypes.cinematic], m.newBackgroundType)
     m.newPoster.fullScreenTransitionInControl = "start"
     m.newPoster.lastAnimationName = "FullScreenTransitionIn"
   else if m.newBackgroundType = m.constants.ui.backgroundTypes.adRowlistSpotlight OR m.newBackgroundType = m.constants.ui.backgroundTypes.adRowlistCarousel

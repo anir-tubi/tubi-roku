@@ -79,6 +79,7 @@ Function playVideoContentWhileSkippingDetailScreen(content, nowPos, currentTrack
 
     if m.isUserInVideoTilesExperiment = true AND playbackSource.srcForAnalytic = "previews"
       removeTopMostScreenWithIDFromStack(m.constants.ui.screenIds.detailScreen)
+      displayDefaultBackground()
     end if
   end if
 End Function

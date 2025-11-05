@@ -44,7 +44,7 @@ Function stopVideoPreview(node = invalid)
     node = m.videoPreviewPlayer
   end if
 
-  ' TODO: Remove if we do not graduate roku_home_screen_redesign_v_1_6 experiment.
+  ' TODO: Remove if we do not graduate roku_video_tiles_1_7 experiment.
   ' This is needed to provide smooth scrolling experience when the user is scrolling the list because calling video stop causes glitchy behavior.
   isListScrolling = false
   screen = getCurrentScreen()
@@ -111,6 +111,7 @@ Function onVideoPreviewStateChanged(msg)
     videoPreview.visible = (showVideoPreviewPlayer = true)
     m.backgroundGroup.posterVisible = (showVideoPreviewPlayer = false)
   else if videoPreviewState = "error"
+    m.autoStartPreviewToPlaybackTimer.opacity = 0
     ' unobserve the state if we have any error while playing mp4 video previews to avoid autostarting the focused content on autostart variant of experiment.
     videoPreview.unobserveFieldScoped("state")
     videoPreview.unobserveFieldScoped("position")
@@ -121,17 +122,17 @@ Function onVideoPreviewStateChanged(msg)
     m.backgroundGroup.posterVisible = true
   end if
 
-  if videoPreviewState = "finished"
-    if currentScreen <> invalid AND currentScreen.contentFocused <> invalid
-
-      'Don't want to continue to full player from video preview if the user is in kidsMode, teen level for UK and NZ region as per GDPR guidelines.
-      'Also don't auto start locked contents.
+  if videoPreviewState = "finished" AND currentScreen <> invalid
+    m.autoStartPreviewToPlaybackTimer.opacity = 0
+    'Don't want to continue to full player from video preview if the user is in kidsMode, teen level for UK and NZ region as per GDPR guidelines.
+    'Also don't auto start locked contents.
+    if currentScreen.subType() = "DetailScreen"
+      item = currentScreen.content
+    else
       item = currentScreen.contentFocused
+    end if
 
-      if currentScreen.subType() = "DetailScreen"
-        item = currentScreen.content
-      end if
-
+    if item <> invalid
       isReplay = false
       if item <> invalid AND item.gridItemType = m.constants.ui.gridItemTypes.skinAd
         isReplay = true
@@ -228,10 +229,11 @@ Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
     videoPreview = m.videoPreviewPlayer
     videoPreview.isBufferingComplete = false
 
+    videoPreview.unObserveFieldScoped("position")
+    videoPreview.observeFieldScoped("position", "onVideoPreviewPositionChanged")
+
     ' If the experiment is enabled and focused content is from featured row than expand preview to full screen.
     if content.gridItemType = m.constants.ui.gridItemTypes.skinAd OR content.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel OR content.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
-      videoPreview.unObserveFieldScoped("position")
-      videoPreview.observeFieldScoped("position", "onVideoPreviewPositionChanged")
       if content.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel AND isCurrentScreenHomeScreen() = true
         currentScreen = getCurrentScreen()
         currentScreen.allowCarouselAutoRotate = false
@@ -284,7 +286,8 @@ Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
     m.videoPreviewPlayer.isDetailScreen = false
 
     ' If there is no delay, we can start the video preview immediately.
-    sendVideoPlayerCommand(videoPreview, "prebuffer")
+    sendVideoPlayerCommand(videoPreview, "play")
+    m.autoStartPreviewToPlaybackTimer.opacity = 0
   end if
 
 End Function
@@ -299,8 +302,15 @@ Function updatePreviewPlayerToCondensedView()
 
   m.videoPreviewPlayer.reParent(m.backgroundVideoPreviewPlayerContainer, false)
   m.videoPreviewPlayer.clippingRect = [0, 0, 1920, 1080]
-  resizeToLocation(m.videoPreviewPlayer, 1120, 630, [799, 0], 0)
+  if m.videoTilesVariant = "refinedControlTop2Rows"
+    resizeToLocation(m.videoPreviewPlayer, 1308, 735, [612, 0], 0)
+  else
+    resizeToLocation(m.videoPreviewPlayer, 1120, 630, [799, 0], 0)
+  end if
   m.videoPreviewPlayer.unObserveFieldScoped("position")
+  if isCurrentScreenHomeScreen() = true
+    m.videoPreviewPlayer.observeFieldScoped("position", "onVideoPreviewPositionChanged")
+  end if
   m.videoPreviewPlayer.opacity = 1
 End Function
 
@@ -344,7 +354,6 @@ Function updatePreviewPlayerToInlineView()
     m.inlinePreviewFocusIndicator.height = playerSize[1] + 9
     m.inlinePreviewFocusIndicator.width = playerSize[0] + 12
     m.inlinePreviewFocusIndicator.visible = true
-
     m.videoPreviewPlayer.unObserveFieldScoped("position")
     m.videoPreviewPlayer.observeFieldScoped("position", "onInlineVideoPreviewPositionChanged")
     m.videoPreviewPlayer.translation = [6, playerTranslationY]
@@ -480,6 +489,10 @@ Function onVideoPreviewPositionChanged(msg)
       m.backgroundGroup.posterVisible = true
     end if
   end if
+
+  if m.isUserInVideoTilesExperiment = true AND contentFocused <> invalid AND m.videoTilesVariant <> "trueControlTop2Rows"
+    renderAutoStartPlaybackFromPreviewCounter(contentFocused, position, duration)
+  end if
 End Function
 
 
@@ -514,6 +527,9 @@ End Function
 Function onInlineVideoPreviewPositionChanged(msg)
   tubiLog("VideoPreviewHelpers.onInlineVideoPreviewPositionChanged")
   screen = getCurrentScreen()
+  videoPreviewScreen = msg.getRoSGNode()
+  position = msg.getData()
+  duration = videoPreviewScreen.duration
   content = screen.featuredRowFocusedItem
   if content <> invalid
     previewState = getVideoPreviewStateForThisContent(content)
@@ -521,6 +537,7 @@ Function onInlineVideoPreviewPositionChanged(msg)
       m.inlineVideoMetadataOverlay.showContentPoster = false
     end if
   end if
+  renderAutoStartPlaybackFromPreviewCounter(content, position, duration)
 End Function
 
 
@@ -537,7 +554,18 @@ Function updatePlayerLayoutBasedOnFocusedContent(content)
   else if content.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
     updatePreviewPlayerToAdCarousel()
   else if isKidsUIOn() = false AND isHomeScreen = true AND m.isUserInVideoTilesExperiment = true
-    updatePreviewPlayerToInlineView()
+    isContainerInControl = arrayIncludes(m.videoTilesControlCategoryIds, content.parentId)
+    if isContainerInControl = false
+      ' Adding a pause to cover case where we are switching between inline and full screen video preview.
+      if m.videoPreviewPlayer.isDetailScreen = false
+        pauseVideoPreview()
+      end if
+      updatePreviewPlayerToInlineView()
+    else if arrayIncludes(["trueControlTop2Rows", "refinedControlTop2Rows"], m.videoTilesVariant) = true
+      updatePreviewPlayerToCondensedView()
+    else
+      updatePreviewPlayerToFullScreen()
+    end if
   else
     updatePreviewPlayerToCondensedView()
   end if
@@ -558,4 +586,25 @@ Function getVideoPreviewContentId()
   end if
 
   return invalid
+End Function
+
+
+Function renderAutoStartPlaybackFromPreviewCounter(contentFocused, position, duration)
+  diff = duration - position
+  if duration > 0 AND diff = 10
+    currentScreen = getCurrentScreen()
+    if currentScreen <> invalid AND contentFocused <> invalid AND arrayIncludes(m.videoTilesControlCategoryIds, contentFocused.parentId) = true
+      m.autoStartPreviewToPlaybackTimer.reParent(m.top, false)
+      width = m.autoStartPreviewToPlaybackTimer.boundingRect().width
+      m.autoStartPreviewToPlaybackTimer.translation = [1920 - width - 66, currentScreen.featuredRowListTranslation[1] - 40]
+    else
+      m.autoStartPreviewToPlaybackTimer.reParent(m.inlineVideoPreviewPlayerContainer, false)
+      m.autoStartPreviewToPlaybackTimer.translation = [581, 16]
+    end if
+
+    fade(m.autoStartPreviewToPlaybackTimer, "in", 0.3)
+    m.autoStartPreviewToPlaybackTimer.countdownText = diff.ToStr()
+  else if diff >= 0 AND diff < 10
+    m.autoStartPreviewToPlaybackTimer.countdownText = diff.ToStr()
+  end if
 End Function

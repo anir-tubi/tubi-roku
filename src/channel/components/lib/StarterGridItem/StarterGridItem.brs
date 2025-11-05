@@ -178,13 +178,7 @@ Function onItemContentChange(msg)
 
     if gridItemType = "emptyContainer" then
       childGridItemComponent = "CategoryGridPoster"
-    else if gridItemType = "landscapeWithMetadata"
-      if itemContent.tileDesignType = "withDescription"
-        childGridItemComponent = "VideoGridTileWithDescription"
-      else
-        childGridItemComponent = "VideoGridTile"
-      end if
-    else if gridItemType = "featuredPortraitSmall"
+    else if gridItemType = "videoTile"
       childGridItemComponent = "PortraitVideoGridTile"
     else if gridItemType = "landscapeInnerMetadata" then
       childGridItemComponent = "CategoryGridPoster"

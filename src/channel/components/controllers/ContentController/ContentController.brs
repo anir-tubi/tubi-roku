@@ -162,23 +162,39 @@ Function addControllerUi()
   m.videoPreviewPlayer = m.top.findNode("videoPreviewPlayer")
   m.inlinePreviewFocusIndicator = m.top.findNode("inlinePreviewFocusIndicator")
   m.inlineVideoMetadataOverlay = m.top.findNode("inlineVideoMetadataOverlay")
+  m.videoTilesControlMetadata = m.top.findNode("videoTilesControlMetadata")
+  m.autoStartPreviewToPlaybackTimer = m.top.findNode("autoStartPreviewToPlaybackTimer")
 
   ' Video tiles experiment related node.
   ' Holds the poster for the video tile that is in transit.That is in case of user scrolling down next container poster vs previous container poster when scrolling up.
   m.inTransitInlineVideoMetadataOverlay = m.top.findNode("inTransitInlineVideoMetadataOverlay")
   m.videoTileOverlayGroup = m.top.findNode("videoTileOverlayGroup")
-  experiment = getStatsigExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
-  if isAA(experiment) = true AND experiment.variant = "billboard"
-    videoTilesListTranslation = m.constants.ui.billboardVariantTranslation
-  else
-    videoTilesListTranslation = m.constants.ui.videoTilesListTranslation
+  experiment = getStatsigExperimentResource("roku_video_tiles", "roku_video_tiles_1_7", false)
+  videoTilesListTranslation = m.constants.ui.videoTilesListTranslation
+  m.videoTilesVariant = ""
+  if isAA(experiment) = true
+    m.videoTilesVariant = experiment.variant
   end if
+
+  if m.videoTilesVariant = "refinedControlTop2Rows"
+    m.videoTilesControlMetadata.translation = [168, 192]
+    m.videoTilesControlMetadata.width = 741
+  else if m.videoTilesVariant = "trueControlTop2Rows"
+    m.videoTilesControlMetadata.translation = [168, 138]
+    m.videoTilesControlMetadata.width = 960
+  else
+    m.videoTilesControlMetadata.translation = [168, 431]
+    m.videoTilesControlMetadata.width = 1056
+  end if
+
+
+
   ' Using clipping rect to ensure that when scrolling up the video tile gets clipped along with the rest of the row list tiles
   m.videoTileOverlayGroup.clippingRect = [videoTilesListTranslation[0], videoTilesListTranslation[1], 1920, 1080]
   m.videoTileOverlayGroup.translation = [videoTilesListTranslation[0], -6]
 
   ' This is used to track if the user is in the video tiles experiment.
-  m.isUserInVideoTilesExperiment = (experiment <> invalid AND experiment.design_type = "withDescriptionPortraitSmall")
+  m.isUserInVideoTilesExperiment = (experiment <> invalid AND experiment.design_type = "videoTiles")
   m.shouldDebounceVideoTilePreview = (experiment <> invalid AND experiment.should_debounce = true)
   m.isInBillboardExperiment = (experiment <> invalid AND experiment.variant = "billboard")
   m.queuedVideoTilePreview = false
@@ -194,6 +210,11 @@ Function addControllerUi()
   m.videoPreviewDebounce = CreateObject("roSGNode", "Timer")
   m.videoPreviewDebounce.duration = debounceTime
   m.videoPreviewDebounce.observeFieldScoped("fire", "startDebouncedVideoPreview")
+
+  m.videoTilesControlCategoryIds = []
+  if isAA(experiment) = true AND isNonEmptyArray(experiment.controlCategoryIds) = true
+    m.videoTilesControlCategoryIds = experiment.controlCategoryIds
+  end if
 
 
   updateVideoTileSize()
@@ -1736,8 +1757,13 @@ Function setVideoContentScreenBackground(screen)
 
     isSkinAdRowContent = (isCurrentScreenHomeScreen() = true AND gridItemType = m.constants.ui.gridItemTypes.skinAd)
     isAdCarouselRowContent = gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
-    if arrayIncludes(m.constants.ui.liveEventsGridTypes, gridItemType) = true
-      displayBackgroundForLiveEvents(contentFocused)
+    if arrayIncludes(m.constants.ui.liveEventsGridTypes, contentFocused.gridItemType) = true
+      displayFullScreenVideoBackground(contentFocused)
+    else if contentFocused <> invalid AND shouldDisplayFullScreenVideoBackground(contentFocused) = true AND m.videoTilesVariant <> "trueControlTop2Rows" AND currentScreen.id = m.constants.ui.screenIds.homeScreen
+      m.backgroundGroup.backgroundInfo = {
+        type: m.constants.ui.backgroundTypes.cinematic
+        uriList: contentFocused.backgrounds
+      }
     else if (videoPreviewState = "playing" OR videoPreviewState = "paused" OR videoPreviewState = "buffering" OR isVideoPreviewPlayQueued() = true) AND isSkinAdRowContent = false AND isAdCarouselRowContent = false
       m.backgroundGroup.backgroundInfo = {
         type: m.constants.ui.backgroundTypes.epg
@@ -1756,16 +1782,20 @@ Function setVideoContentScreenBackground(screen)
         uriList: screen.backgroundUriList
       }
     else
+      backgroundUriList = screen.backgroundUriList
+      if isNonEmptyArray(backgroundUriList) = false AND contentFocused <> invalid AND isNonEmptyArray(contentFocused.backgrounds) = true
+        backgroundUriList = contentFocused.backgrounds
+      end if
       if isSkinAdRowContent = true
         backgroundType = m.constants.ui.backgroundTypes.skinAd
       else if isAdCarouselRowContent = true
         backgroundType = m.constants.ui.backgroundTypes.adRowlistCarousel
       else
-        backgroundType = getBackgroundType(screen.backgroundUriList, contentType)
+        backgroundType = getBackgroundType(backgroundUriList, contentType)
       end if
       m.backgroundGroup.backgroundInfo = {
         type: backgroundType
-        uriList: screen.backgroundUriList
+        uriList: backgroundUriList
       }
     end if
   else if screen <> invalid AND screen.backgroundUriList <> invalid AND screen.id = m.constants.ui.screenIds.myStuffScreen
@@ -1840,7 +1870,7 @@ Function displayDefaultBackground()
 End Function
 
 
-Function displayBackgroundForLiveEvents(content)
+Function displayFullScreenVideoBackground(content)
   if isNode(content) = true AND isNonEmptyArray(content.backgrounds) = true then
     m.backgroundGroup.backgroundInfo = {
       type: m.constants.ui.backgroundTypes.spotlight
@@ -2063,7 +2093,7 @@ Function onCustomSuspend(msg)
         linearVideoPlayer.control = "stop"
       end if
 
-      ' Remove this line if we do not graduated roku_home_screen_redesign_v_1_6.
+      ' Remove this line if we do not graduated roku_video_tiles_1_7.
       ' This is needed to avoid having to use alwaysnotify on featuredListHasFocus and when app is suspended it does not fire focus change event on home screen.
       homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
       if homeScreen <> invalid
@@ -2491,13 +2521,13 @@ Function showHideLogo(logoType, presentedByURL = "", presentedByText = "")
 
     presentedWidth = m.presentedByGroup.boundingRect().width
     logoWidth = m.logo.boundingRect().width
-    x = 1809 - (logoWidth + presentedWidth) ' 1920 - total - (135 - logo width + 24 space + 87 -margin + presentedWidth)
+    x = 1776 - (logoWidth + presentedWidth) ' 1920 - total - (135 - logo width + 24 space + 87 -margin + presentedWidth)
     x1 = x + logoWidth + 24 + (presentedWidth / 2) ' 159 =  135 + 24
     m.presentedByGroup.translation = [x1, 33]
     m.logo.translation = [x, 54]
   else
     m.presentedByGroup.visible = false
-    m.logo.translation = [1698, 54]
+    m.logo.translation = [1731, 54]
   end if
 
 End Function
@@ -3319,7 +3349,7 @@ End Function
 ' Returns the size of the featured preivew player.
 ' @return: array, the size of the player
 Function getFeaturedPlayerSize()
-  experiment = getStatsigExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
+  experiment = getStatsigExperimentResource("roku_video_tiles", "roku_video_tiles_1_7", false)
   if isNonEmptyArray(experiment.featuredRowPosterSize) = true
     featuredRowPoster = experiment.featuredRowPosterSize
   else
@@ -3636,7 +3666,7 @@ End Function
 
 Function updateVideoTileSize(scrollingStatus = false)
   m.inlineVideoGridTitleLogo = m.top.findNode("inlineVideoGridTitleLogo")
-  experiment = getStatsigExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
+  experiment = getStatsigExperimentResource("roku_video_tiles", "roku_video_tiles_1_7", false)
   if isNonEmptyArray(experiment.featuredRowPosterSize) = true
     featuredRowPoster = experiment.featuredRowPosterSize
   else
@@ -3682,6 +3712,11 @@ Function updateVideoTileSize(scrollingStatus = false)
 
   m.inlinePreviewFocusIndicator.height = m.inlineVideoMetadataOverlay.height + 12
   m.inlinePreviewFocusIndicator.width = m.inlineVideoMetadataOverlay.width + 12
+End Function
+
+
+Function shouldDisplayFullScreenVideoBackground(content)
+  return arrayIncludes(m.videoTilesControlCategoryIds, content.parentId) = true OR arrayIncludes(m.constants.ui.liveEventsGridTypes, content.gridItemType)
 End Function
 
 

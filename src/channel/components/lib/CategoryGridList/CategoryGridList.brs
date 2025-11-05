@@ -26,7 +26,7 @@ Function init()
   m.featuredRowList.observeFieldScoped("currFocusColumn", "onFeaturedRowCurrFocusColumnChange")
   m.featuredRowList.observeFieldScoped("currFocusRow", "onFeaturedListCurrFocusRowChange")
   m.featuredRowList.observeFieldScoped("vertFocusDirection", "onVertFocusDirectionChange")
-  m.top.observeFieldScoped("featuredRowContent", "onFeaturedRowContentChange")
+  m.top.observeFieldScoped("contentUpdated", "onFeaturedRowContentChange")
 
   experimentsInfo = getExperimentsInfoFromGlobal()
   experiments = TubiExperiments(experimentsInfo)
@@ -60,19 +60,26 @@ Function init()
 
   m.lastCurrentFocusColumn = 0
   m.lastFocusColumnIndex = 0
+  m.lastFocusRow = 0
 
-  experiment = getStatsigExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
+  experiment = getStatsigExperimentResource("roku_video_tiles", "roku_video_tiles_1_7", false)
   if isNonEmptyArray(experiment.featuredRowPosterSize) = true
     m.featuredRowPoster = experiment.featuredRowPosterSize
   else
     m.featuredRowPoster = m.constants.ui.imageSizes.featuredRowPoster
+  end if
+
+  m.featuredLandscapePoster = experiment.featuredLandscapePosterSize
+  m.controlCategoryIds = experiment.controlCategoryIds
+  if isNonEmptyArray(experiment.controlCategoryIds) = true
+    m.featuredRowList.rowLabelOffset = [[0, -3], [0, -3], [0, 6]]
   end if
   m.variant = experiment.variant
 
   if isNonEmptyArray(experiment.gridItemSize) = true
     m.gridItemSize = experiment.gridItemSize
   else
-    m.gridItemSize = m.constants.ui.imageSizes.featuredPortraitSmall
+    m.gridItemSize = m.constants.ui.imageSizes.videoTilesPortrait
   end if
 
   m.expandedTileFocusXOffset = m.featuredRowPoster[0] - m.gridItemSize[0] + 4
@@ -80,8 +87,13 @@ Function init()
   ' 263 is the height of the metadata section displayed beneath the featured focused tile.
   ' 263 also includes the space between the last line of the description and container below it.
   m.rowListPosition = [0, 263 + m.featuredRowPoster[1]]
-  m.homeScreenDesignType = experiment.design_type
-  m.isWithDescPortraitSmallExpEnabled = (m.homeScreenDesignType = "withDescriptionPortraitSmall")
+  m.isUserInVideoTiles = (experiment.design_type = "videoTiles")
+  m.videoTilesVariant = experiment.variant
+
+  m.videoTilesControlCategoryIds = []
+  if isAA(experiment) = true AND isNonEmptyArray(experiment.controlCategoryIds) = true
+    m.videoTilesControlCategoryIds = experiment.controlCategoryIds
+  end if
 
   m.ignoreCurrColumnChange = false
 End Function
@@ -102,15 +114,18 @@ End Function
 
 
 Function onFeaturedRowContentChange(msg)
-  m.featuredRowList.update({
-    parentScreenId: m.top.parentScreenId
-    parentScreenTrackingPageInfo: m.top.parentScreenTrackingPageInfo
-    personalizationId: m.top.personalizationId
-    shouldTrackViewableImpressionEvent: m.top.shouldTrackViewableImpressionEvent
-    rowIndexBoost: 0
-  }, true)
+  featuredRowContent = m.top.featuredRowContent
+  if featuredRowContent <> invalid then
+    m.featuredRowList.update({
+      parentScreenId: m.top.parentScreenId
+      parentScreenTrackingPageInfo: m.top.parentScreenTrackingPageInfo
+      personalizationId: m.top.personalizationId
+      shouldTrackViewableImpressionEvent: m.top.shouldTrackViewableImpressionEvent
+      rowIndexBoost: 0
+    }, true)
 
-  m.featuredRowList.content = msg.getData()
+    m.featuredRowList.content = featuredRowContent
+  end if
 End Function
 
 
@@ -143,9 +158,9 @@ Function onContainerAppendMoreTilesStatusChange(msg)
   ' So in the below logic before we start appending we check if there is a difference between currFocusColumn and rowItemFocused[1], this indicates to us that user is fast scrolling because when user press and hold only currFocusColumn changes and rowItemFocused[1] is updated only when user releases the press.
   ' So we store the value of where the user position is when we start appending and then we jump to that position when we are done appending.
   ' This way user press and hold is seem less.
-  ' TODO: Revisit the logic below and remove either if or else based on whether we graduated roku_home_screen_redesign_v_1_6 experiment.
+  ' TODO: Revisit the logic below and remove either if or else based on whether we graduated roku_video_tiles_1_7 experiment.
   ' TODO: Revisit logic inside onComponentFocusChange since that gets triggered a lot of times during navigation we might not need that logic. Not changing now to avoid scope creep for this PR.
-  if m.isWithDescPortraitSmallExpEnabled = true
+  if m.isUserInVideoTiles = true
     if status = "start" AND isNonEmptyArray(m.featuredRowList.rowItemFocused) = true AND (m.featuredRowList.rowItemFocused[0] = m.featuredRowList.currFocusRow AND m.featuredRowList.rowItemFocused[1] <> m.top.featuredRowCurrFocusColumn)
       m.resetListPositionOnRepopulateToIndex = [m.featuredRowList.currFocusRow, m.top.featuredRowCurrFocusColumn]
     else if isNonEmptyArray(m.resetListPositionOnRepopulateToIndex) = true
@@ -172,7 +187,7 @@ Function onJumpToRowItemByIDChange()
     sDesiredContainerID = m.top.jumpToRowItemByID[1]
   end if
 
-  if m.isWithDescPortraitSmallExpEnabled = true AND m.featuredRowList.content <> invalid
+  if m.isUserInVideoTiles = true AND m.featuredRowList.content <> invalid
     content = m.featuredRowList.content
   else
     content = m.RowList.content
@@ -187,7 +202,7 @@ Function onJumpToRowItemByIDChange()
         item = container.getChild(j)
         if item.id = sContentID
           'focus on the item
-          if m.isWithDescPortraitSmallExpEnabled = true
+          if m.isUserInVideoTiles = true
             m.featuredRowList.jumpToRowItem = [i, j]
           else
             m.RowList.jumpToRowItem = [i, j]
@@ -206,7 +221,7 @@ End Function
 '
 Function onComponentFocusChange(msg)
   tubiLog("CategoryGridList.onComponentFocusChange " + focusState(m.top))
-  if m.isWithDescPortraitSmallExpEnabled = true
+  if m.isUserInVideoTiles = true
     content = m.top.featuredRowContent
   else
     content = m.top.content
@@ -224,7 +239,7 @@ Function onComponentFocusChange(msg)
       m.top.lastFocusedList = "skinAdRow"
       m.skinAdRow.opacity = 1
       m.skinAdRow.setFocus(true)
-    else if m.isWithDescPortraitSmallExpEnabled = true AND m.FeaturedRowList.content <> invalid AND (m.top.lastFocusedList = "featuredRowList" OR m.top.lastFocusedList = "")
+    else if m.isUserInVideoTiles = true AND m.FeaturedRowList.content <> invalid AND (m.top.lastFocusedList = "featuredRowList" OR m.top.lastFocusedList = "")
       m.top.lastFocusedList = "featuredRowList"
       m.top.featuredListHasFocus = true
       m.FeaturedRowList.setFocus(true)
@@ -267,7 +282,7 @@ Function onComponentFocusChange(msg)
     m.RowList.jumpToRowItem = itemToJumpTo
   end if
 
-  if m.isWithDescPortraitSmallExpEnabled = true
+  if m.isUserInVideoTiles = true
     m.top.featuredListHasFocus = m.top.isInFocusChain() = true AND m.top.lastFocusedList = "featuredRowList" AND m.top.featuredRowContent <> invalid
     if m.top.featuredListHasFocus = true AND (m.top.resetGridPosition = true OR itemToJumpTo <> invalid)
       if m.top.resetGridPosition = true
@@ -284,7 +299,7 @@ Function onContentChange()
   tubiLog("CategoryGridList.onContentChange")
 
   if m.top.parentScreenId <> invalid AND m.top.parentScreenId <> m.constants.ui.screenIds.homeScreen
-    m.isWithDescPortraitSmallExpEnabled = false
+    m.isUserInVideoTiles = false
   end if
 
   ' Resetting the state of the UI. Below condition safe guards against any rowList background refresh.
@@ -333,13 +348,6 @@ Function onContentChange()
       ' This is required for initial slide down animation.
       if m.top.lastFocusedList = ""
         m.FeaturedRowList.translation = [0, 0]
-        if m.isWithDescPortraitSmallExpEnabled = true
-          ' 92 is the amount of px we need to animate down to create a required initial animation.
-          ' This allows to create a slide down animation.
-          m.rowList.translation = [0, m.featuredRowPoster[1] + 92]
-        else
-          m.RowList.translation = [0, 0]
-        end if
       end if
     else
       m.RowList.translation = [0, 0]
@@ -387,7 +395,7 @@ Function onContentChange()
   }, true)
 
   ' Below is to add animation of slide down of the row list for the first time when screen is loaded.
-  if m.top.featuredRowContent <> invalid AND isSkinAdsAvailable() = false AND m.isWithDescPortraitSmallExpEnabled = true AND m.top.lastFocusedList <> "rowList"
+  if m.top.featuredRowContent <> invalid AND isSkinAdsAvailable() = false AND m.isUserInVideoTiles = true AND m.top.lastFocusedList <> "rowList"
     slideTo(m.RowList, [m.rowListPosition[0], m.rowListPosition[1]], 0.3, 0.3)
   end if
 
@@ -418,7 +426,7 @@ Function onRepopulateContent()
     setRowHeights()
   end if
 
-  if m.isWithDescPortraitSmallExpEnabled = true
+  if m.isUserInVideoTiles = true
     rowItemFocused = m.FeaturedRowList.rowItemFocused
   else
     rowItemFocused = m.RowList.rowItemFocused
@@ -439,7 +447,7 @@ Function onRepopulateContent()
   m.top.rowAdded = ""
   m.top.rowRemoved = ""
 
-  if m.isWithDescPortraitSmallExpEnabled = true
+  if m.isUserInVideoTiles = true
     content = m.top.featuredRowContent
   else
     content = m.top.content
@@ -504,7 +512,7 @@ Function onRepopulateContent()
   end if
 
   ' We need to make sure the focused item is updated to account for cases where container content is updated.
-  if m.isWithDescPortraitSmallExpEnabled = true
+  if m.isUserInVideoTiles = true
     updateFeaturedRowItemFocused()
   end if
 End Function
@@ -622,8 +630,11 @@ Function setFeaturedRowHeights()
   gridItemTypes = m.constants.ui.gridItemTypes
   featuredRowContent = m.top.featuredRowContent
 
+  controlPortraitSize = imageSizes.largePoster
+  controlLandscapeSize = imageSizes.largeLandscape
+
   ' 246 is the height of the metadata section displayed beneath the featured focused tile.
-  metadataSectionHeight = 246
+  metadataSectionHeight = 240
   if m.variant = "typography_improvements"
     metadataSectionHeight = 286
   end if
@@ -650,6 +661,8 @@ Function setFeaturedRowHeights()
       shouldDisplayHeader = arrayIncludes(m.constants.ui.noHeaderGridTypes, category.gridItemType) = false
       showRowLabel.push(shouldDisplayHeader)
 
+      isControlCategory = arrayIncludes(m.controlCategoryIds, category.id)
+
       if gridItemType = gridItemTypes.liveEventSpotlight
         rowItemSize.push(liveEventsContainerSize)
         heights.push(liveEventsContainerSize[1])
@@ -664,6 +677,39 @@ Function setFeaturedRowHeights()
         adSize = m.constants.ui.imageSizes.adRowlistThumbnail
         rowItemSize.push(adSize)
         heights.push(adSize[1] + 64)
+      else if m.videoTilesVariant = "trueControlTop2Rows" AND isControlCategory = true
+        if category.id = m.constants.ui.categoryIds.featured
+          rowItemSize.push(controlLandscapeSize)
+          controlVideoTileContainerHeight = controlLandscapeSize[1]
+        else
+          rowItemSize.push(controlPortraitSize)
+          controlVideoTileContainerHeight = controlPortraitSize[1]
+        end if
+        controlVideoTileContainerHeight = controlVideoTileContainerHeight + 54
+        if category.sponsorImages <> invalid
+          controlVideoTileContainerHeight = controlVideoTileContainerHeight + 32
+        end if
+        heights.push(controlVideoTileContainerHeight)
+      else if m.videoTilesVariant = "refinedControlTop2Rows" AND isControlCategory = true
+        if category.id = m.constants.ui.categoryIds.featured
+          rowItemSize.push(m.featuredLandscapePoster)
+          controlVideoTileContainerHeight = m.featuredLandscapePoster[1]
+        else
+          rowItemSize.push(controlPortraitSize)
+          controlVideoTileContainerHeight = controlPortraitSize[1]
+        end if
+        controlVideoTileContainerHeight = controlVideoTileContainerHeight + 54
+        if category.sponsorImages <> invalid
+          controlVideoTileContainerHeight = controlVideoTileContainerHeight + 32
+        end if
+        heights.push(controlVideoTileContainerHeight)
+      else if isControlCategory = true
+        rowItemSize.push(m.featuredLandscapePoster)
+        controlVideoTileContainerHeight = m.featuredLandscapePoster[1] + 54
+        if category.sponsorImages <> invalid
+          controlVideoTileContainerHeight = controlVideoTileContainerHeight + 32
+        end if
+        heights.push(controlVideoTileContainerHeight)
       else
         rowItemSize.push(m.gridItemSize)
         heights.push(featuredRowHeight)
@@ -678,13 +724,14 @@ Function setFeaturedRowHeights()
     })
 
     if m.top.featuredRowFocusedItem = invalid AND m.skinAdRow.content = invalid
-      if arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, featuredRowContent.getChild(0).gridItemType) = true
+      container = featuredRowContent.getChild(0)
+      if container <> invalid AND isVideoTileEnabledContainer(container.gridItemType, container.id) = false
         m.featuredRowList.focusXOffset = [0, 0]
       else
         m.featuredRowList.focusXOffset = [m.expandedTileFocusXOffset, 0]
       end if
       m.FeaturedRowList.rowItemFocused = [0, 0]
-      if m.isWithDescPortraitSmallExpEnabled = true
+      if m.isUserInVideoTiles = true
         m.top.lastFocusedList = "featuredRowList"
       end if
     end if
@@ -1086,7 +1133,7 @@ Function setRowListFocus()
     ' Below logic handles the use case where home screen is refreshed but the focus after refresh is on the screen but modal or side nav.
     ' Since featured row does not have info panel we need to check for presence of featured row content.
     ' Featured row landscape poster logic is handled in homescreen helpers.
-    if m.RowList.isInFocusChain() = true OR m.isWithDescPortraitSmallExpEnabled = false
+    if m.RowList.isInFocusChain() = true OR m.isUserInVideoTiles = false
       if m.RowList.currFocusRow <> invalid AND m.RowList.currFocusRow >= 0 AND m.RowList.currFocusColumn <> invalid AND m.RowList.currFocusColumn >= 0
         '//If rowList is not in focus and new content is set, then one would think that rowItemFocused should be [0,0] but it isn't,
         '//so that is why we use currFocusRow and currFocusColumn - to ensure the proper item is announced
@@ -1226,19 +1273,17 @@ End Function
 
 
 ' TODO: Revisit the isInTransit parameter since it is not used anywhere.
-' Before we graduate the roku_home_screen_redesign_v_1_6 experiment. If we do not find any other use cases for it remove the field.
+' Before we graduate the roku_video_tiles_1_7 experiment. If we do not find any other use cases for it remove the field.
 Function updateFocusXOffset(currFocusRow, isInTransit = false)
   featuredRowContent = m.top.featuredRowContent
   focusXOffsets = m.featuredRowList.focusXOffset
   billboardWidth = m.constants.ui.imageSizes.billboard[0]
   if isNode(featuredRowContent) = true AND isNonEmptyArray(focusXOffsets) = true
     focusXOffset = []
-    nonVideoTileGridItemTypes = m.constants.ui.nonVideoTileGridItemTypes
-
     for i = 0 to featuredRowContent.getChildCount() - 1
       category = featuredRowContent.getChild(i)
       gridItemType = category.gridItemType
-      if (i = currFocusRow OR (isInTransit = true AND i = currFocusRow + 1)) AND arrayIncludes(nonVideoTileGridItemTypes, gridItemType) = false
+      if (i = currFocusRow OR (isInTransit = true AND i = currFocusRow + 1)) AND isVideoTileEnabledContainer(gridItemType, category.id) = true
         if category.id = "featured" AND m.variant = "billboard"
           focusXOffset.push(m.expandedTileFocusXOffset + (billboardWidth - 788))
         else
@@ -1255,14 +1300,35 @@ Function updateFocusXOffset(currFocusRow, isInTransit = false)
       m.ignoreCurrColumnChange = false
     end if
 
+    container = featuredRowContent.getChild(currFocusRow)
+    isVideoTileControl = container <> invalid AND arrayIncludes(m.videoTilesControlCategoryIds, container.id) = true
     if m.variant = "billboard"
-      container = featuredRowContent.getChild(currFocusRow)
       translation = [0, 0]
       if container <> invalid AND container.id = "featured"
         translation = [0, -69]
       end if
       m.featuredRowList.translation = translation
+    else if isVideoTileControl = true AND m.videoTilesVariant = "trueControlTop2Rows"
+      if container <> invalid AND container.id = "featured"
+        translation = [3, 456]
+      else
+        translation = [3, 393]
+      end if
+      m.featuredRowList.translation = translation
+    else if isVideoTileControl = true AND m.videoTilesVariant = "refinedControlTop2Rows"
+      if container <> invalid AND container.id = "featured"
+        translation = [3, 489]
+      else
+        translation = [3, 393]
+      end if
+      m.featuredRowList.translation = translation
+    else if isVideoTileControl = true AND m.videoTilesVariant <> "trueControlTop2Rows"
+      m.featuredRowList.translation = [3, 504]
+    else
+      m.featuredRowList.translation = [0, 0]
     end if
+
+    m.featuredRowList.drawFocusFeedback = isVideoTileControl
   end if
 End Function
 
@@ -1298,10 +1364,13 @@ End Function
 
 Function updateCurrentFocusedItemBoundingRect()
   rowItemFocused = m.featuredRowList.rowItemFocused
-
   featuredRowContent = m.top.featuredRowContent
   if isNonEmptyArray(rowItemFocused) = true AND isNode(featuredRowContent) = true
     currFocusRow = rowItemFocused[0]
+
+    ' Will be used to avoid updating the in transit bounding rect when the user scroll is about to end and the rowItemFocused gets updated.
+    ' This avoids the slight flicker of the next in transit from appearing for a split second.
+    diff = Abs(currFocusRow - m.lastFocusRow)
     ' Since we are trying to update the bounding rect as the user scrolls we cannot use any of the row list fields to figure out the next row.
     ' Based on the scroll direction we are updating the next focus row.
     nextFocusRow = 1
@@ -1313,7 +1382,7 @@ Function updateCurrentFocusedItemBoundingRect()
 
     ' Updating the bounding rect for the next focus row.
     category = featuredRowContent.getChild(nextFocusRow)
-    if category <> invalid AND category.focusIndex <> invalid
+    if category <> invalid AND category.focusIndex <> invalid AND diff <= 0
       columnFocused = category.focusIndex
       if columnFocused < 0
         columnFocused = 0
@@ -1326,6 +1395,8 @@ Function updateCurrentFocusedItemBoundingRect()
     columnFocused = rowItemFocused[1]
     boundingRect = m.FeaturedRowList.subBoundingRect("item" + currFocusRow.toStr() + "_" + columnFocused.toStr())
     m.top.currentFocusedItemBoundingRect = boundingRect
+
+    m.lastFocusRow = currFocusRow
   end if
 End Function
 
@@ -1385,7 +1456,7 @@ Function translateFeaturedListAndSetFocus(delayFeaturedFocus = false)
   end if
 
   slideFadeGeneral(m.FeaturedRowList, [0, 0], "in", 0.3, 0, 1, true, callback)
-  if m.isWithDescPortraitSmallExpEnabled = true
+  if m.isUserInVideoTiles = true
     slideTo(m.RowList, [m.rowListPosition[0], m.rowListPosition[1]], 0.3)
   end if
 
@@ -1397,19 +1468,24 @@ End Function
 ' Kids mode is a special case where we want to disable the small portrait description experiment.
 Function onKidsModeChange(msg)
   kidsMode = msg.getData()
-  m.isWithDescPortraitSmallExpEnabled = (m.homeScreenDesignType = "withDescriptionPortraitSmall" AND kidsMode = false)
+  m.isUserInVideoTiles = (m.isUserInVideoTiles AND kidsMode = false)
 End Function
 
 
 Function onAnimateToItemChange(msg)
   tubiLog("CategoryGridList.onAnimateToItemChange")
-  '//::TODO::roku_home_screen_redesign, change this observer to an alias once the roku_home_screen_redesign experiment is fully rolled out.
+  '//::TODO::roku_video_tiles, change this observer to an alias once the roku_video_tiles experiment is fully rolled out.
   itemToAnimate = msg.getData()
-  if m.isWithDescPortraitSmallExpEnabled = true AND m.featuredRowList.content <> invalid
+  if m.isUserInVideoTiles = true AND m.featuredRowList.content <> invalid
     m.featuredRowList.animateToItem = itemToAnimate
   else
     m.RowList.animateToItem = itemToAnimate
   end if
+End Function
+
+
+Function isVideoTileEnabledContainer(gridItemType, categoryId)
+  return arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, gridItemType) = false AND arrayIncludes(m.videoTilesControlCategoryIds, categoryId) = false
 End Function
 
 
@@ -1461,7 +1537,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
     else if key = "down" AND m.FeaturedRowList.isInFocusChain() = true AND isNode(m.rowList.content) = true
       m.top.lastFocusedList = "rowList"
       slideFadeGeneral(m.featuredRowList, [0, -760], "out", 0.3, 0, -1, true)
-      if m.isWithDescPortraitSmallExpEnabled = true
+      if m.isUserInVideoTiles = true
         slideTo(m.RowList, [0, 420], 0.3, 0.1)
       end if
       m.RowList.setFocus(true)

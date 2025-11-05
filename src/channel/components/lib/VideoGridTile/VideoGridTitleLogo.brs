@@ -5,7 +5,7 @@ Function init()
   topRef.observeFieldScoped("itemContent", "onItemContentChange")
   topRef.observeFieldScoped("height", "onHeightChange")
 
-  experimentInfo = getStatsigExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
+  experimentInfo = getStatsigExperimentResource("roku_video_tiles", "roku_video_tiles_1_7", false)
   if isAA(experimentInfo) = true
     m.variant = experimentInfo.variant
   end if
@@ -15,13 +15,6 @@ End Function
 Function onItemContentChange(msg)
   itemContent = msg.getData()
   m.tileLayout.visible = itemContent <> invalid
-
-  isBillboardRow = m.variant = "billboard" AND m.top.containerIndex = m.top.billboardContainerIndex
-  if isBillboardRow = false
-    m.videoInGridGradient.uri = "pkg:/images/video_in_grid_gradient_$$RES$$.9.png"
-  else
-    m.videoInGridGradient.uri = "pkg:/images/billboard-gradient-$$RES$$.webp"
-  end if
 End Function
 
 

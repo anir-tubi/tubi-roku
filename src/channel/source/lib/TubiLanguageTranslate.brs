@@ -316,6 +316,10 @@ Function getTranslation_en_US()
       "description": "Program time Title for live program.",
       "message": "Started at"
     },
+    "circular_counter_starts_in": {
+      "description": "Text displayed in circular counter component to indicate countdown starting.",
+      "message": "Fullscreen In"
+    },
     "detail_screen_like_disLike_toast_header": {
       "description": "header text to be displayed on Toast-message when user like/dislike a title",
       "message": "Thanks for your feedback!"

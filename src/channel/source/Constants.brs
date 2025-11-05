@@ -595,7 +595,7 @@ Function getConstants()
   end if
 
   'ad showcase url
-  constants.urls.adShowcase = "https://ads.tubi.io/137528/inapp"
+  constants.urls.adShowcase = "https://ads.production-public.tubi.io/137528/inapp"
   if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
     constants.urls.adShowcase = "https://ads.staging-public.tubi.io/900000/inapp"
   end if
@@ -1321,6 +1321,7 @@ Function getConstants()
   constants.ui.backgroundTypes.skinAd = "skinAd"
   constants.ui.backgroundTypes.adRowlistSpotlight = "adRowlistSpotlight"
   constants.ui.backgroundTypes.adRowlistCarousel = "adRowlistCarousel"
+  constants.ui.backgroundTypes.cinematic = "cinematic"
   constants.ui.modes = {}
   constants.ui.modes.standard = "standard"
   constants.ui.modes.kids = "kids" 'the "normal" kids mode, when a user selects kids from the side nav
@@ -1489,7 +1490,7 @@ Function getConstants()
 
   constants.ui.imageSizes.adRowlistCarouselThumbnail = [118, 118]
   'Sizes of featured row  poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
-  constants.ui.imageSizes.featuredPortraitSmall = [310, 442]
+  constants.ui.imageSizes.videoTilesPortrait = [310, 442]
 
   ' Size of guest user continue watching container.
   constants.ui.imageSizes.guestContinueWatchingTile = [1613, 378]
@@ -1617,7 +1618,7 @@ Function getConstants()
   constants.ui.gridItemTypes.emptyContainer = "emptyContainer"
   constants.ui.gridItemTypes.portraitTopTen = "portraitTopTen"
   constants.ui.gridItemTypes.skinAd = "skinAd"
-  constants.ui.gridItemTypes.featuredPortraitSmall = "featuredPortraitSmall"
+  constants.ui.gridItemTypes.videoTile = "videoTile"
   constants.ui.gridItemTypes.certifiedFresh = "certifiedFresh"
   constants.ui.gridItemTypes.liveEventSpotlight = "liveEventSpotlight"
   constants.ui.gridItemTypes.liveEventBanner = "liveEventBanner"

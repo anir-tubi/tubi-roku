@@ -28,7 +28,7 @@ Function init()
   setTypographyOfLabel(m.title, typographyConstants.ids.bodyMediumStrong)
   setTypographyOfLabel(m.subtitle, typographyConstants.ids.bodySmallStrong)
   m.badgeTextFont = typographyConstants.ids.bodyExtraSmallStrong
-  m.headerSmallFont = typographyConstants.ids.headerSmall
+  m.headerMediumFont = typographyConstants.ids.headerMedium
   m.bodyMediumStrongFont = typographyConstants.ids.bodyMediumStrong
   m.subheaderMediumFont = typographyConstants.ids.subheaderMedium
 
@@ -47,9 +47,10 @@ Function init()
   m.titleAnimation = invalid
 
   m.billboardSize = 0
-  experimentInfo = getStatsigExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
+  experimentInfo = getStatsigExperimentResource("roku_video_tiles", "roku_video_tiles_1_7", false)
   if isAA(experimentInfo) = true
     m.variant = experimentInfo.variant
+    m.useTitleArt = experimentInfo.useTitleArt
 
     if m.variant = "billboard"
       m.billboardTileMetadata = createObject("roSGNode", "ExpandedTileMetadata")
@@ -98,11 +99,9 @@ Function onItemContentChange(msg)
       m.bottomContentGroup.translation = [15, m.top.height - 24]
       titleImageLoadWidth = 240
       titleImageLoadHeight = 68
-      setTypographyOfLabel(m.title, m.bodyMediumStrongFont)
-    else if itemContent.type = "linear"
       setTypographyOfLabel(m.title, m.subheaderMediumFont)
     else
-      setTypographyOfLabel(m.title, m.headerSmallFont)
+      setTypographyOfLabel(m.title, m.headerMediumFont)
     end if
 
     m.title.height = 0
@@ -208,7 +207,7 @@ Function setTitle(title = "", titleImageUri = "")
     m.titleAnimation.control = "stop"
     m.titleAnimation = invalid
   end if
-  if isNonEmptyString(titleImageUri) = true
+  if isNonEmptyString(titleImageUri) = true AND m.useTitleArt = true
     if m.titleImage.getParent() = invalid
       m.bottomContentGroup.insertChild(m.titleImage, 0)
     end if

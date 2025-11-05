@@ -10,3 +10,4 @@ out/
 rta-config.json
 .idea
 src/experiments/*
+.cursor/mcp.json

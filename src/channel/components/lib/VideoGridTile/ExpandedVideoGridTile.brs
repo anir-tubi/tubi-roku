@@ -23,7 +23,7 @@ Function init()
   m.metadataFadeDelay = 0.5
   m.animationDuration = 0
 
-  experimentInfo = getStatsigExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
+  experimentInfo = getStatsigExperimentResource("roku_video_tiles", "roku_video_tiles_1_7", false)
   if isAA(experimentInfo) = true
     m.variant = experimentInfo.variant
   end if
@@ -35,12 +35,6 @@ Function onItemContentChange(msg)
 
   if itemContent <> invalid
     isBillboardRow = m.variant = "billboard" AND m.top.containerIndex = m.top.billboardContainerIndex
-
-    if isBillboardRow = false
-      m.videoInGridGradient.uri = "pkg:/images/video_in_grid_gradient_$$RES$$.9.png"
-    else
-      m.videoInGridGradient.uri = "pkg:/images/billboard-gradient-$$RES$$.webp"
-    end if
 
     m.videoGridMetadataGroup.visible = true
     ' Resetting the blend color to default.

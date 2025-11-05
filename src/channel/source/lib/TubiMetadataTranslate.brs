@@ -104,8 +104,8 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
     else if isNonEmptyArray(contentFromServer.thumbnails) = true
       sThumbnailURL = contentFromServer.thumbnails[0]
     end if
-  else if gridType = gridItemTypes.featuredPortraitSmall AND canvasImages <> invalid AND isNonEmptyArray(canvasImages.featured_portrait_tb) = true
-    sThumbnailURL = canvasImages.featured_portrait_tb[0]
+  else if gridType = gridItemTypes.videoTile AND canvasImages <> invalid AND isNonEmptyArray(canvasImages.video_tiles_portrait_tb) = true
+    sThumbnailURL = canvasImages.video_tiles_portrait_tb[0]
   else if gridType = gridItemTypes.landscape OR gridType = gridItemTypes.landscapeNoTitle OR gridType = gridItemTypes.landscapeInnerMetadata OR gridType = gridItemTypes.linear
     if canvasImages <> invalid AND type(canvasImages.landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.landscape_tb[0])
       '//A custom landscape size was requested, use this image instead of the default image
@@ -1105,7 +1105,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
       else
         shouldInsertChannelTile = true
         isContentModeHomeScreen = (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
-        if isContentModeHomeScreen = true AND uiMode = "standard" AND m.statSigExperiments <> invalid AND m.statSigExperiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6").design_type = "withDescriptionPortraitSmall"
+        if isContentModeHomeScreen = true AND uiMode = "standard" AND m.statSigExperiments <> invalid AND m.statSigExperiments.getExperimentResource("roku_video_tiles", "roku_video_tiles_1_7").design_type = "videoTiles"
           shouldInsertChannelTile = false
         end if
         categoryAA = m.buildCategoryAAWithInsert(container, contents, "", "", false, contentMode, screenId, isSignedInUser, uiMode, shouldInsertChannelTile, {})
@@ -1534,9 +1534,9 @@ Function tubiMetadataTranslate_buildCategoryParentInfo(container, sOrientation =
     }
 
     if m.statSigExperiments <> invalid
-      experiment = m.statSigExperiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6")
+      experiment = m.statSigExperiments.getExperimentResource("roku_video_tiles", "roku_video_tiles_1_7")
       tileDesignType = experiment.design_type
-      isUserInVideoTilesExp = (tileDesignType = "withDescriptionPortraitSmall") AND uiMode = "standard"
+      isUserInVideoTilesExp = (tileDesignType = "videoTiles") AND uiMode = "standard"
 
       if isUserInVideoTilesExp = true
         updateMetadata.gridItemSize = experiment.gridItemSize
@@ -1661,12 +1661,10 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
 
           tileDesignType = "none"
           isUserInVideoTilesExp = false
-          isUserInBillboardVariant = false
           if m.statSigExperiments <> invalid
-            experiment = m.statSigExperiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6")
+            experiment = m.statSigExperiments.getExperimentResource("roku_video_tiles", "roku_video_tiles_1_7")
             tileDesignType = experiment.design_type
-            isUserInVideoTilesExp = (tileDesignType = "withDescriptionPortraitSmall") AND uiMode = "standard"
-            isUserInBillboardVariant = experiment.variant = "billboard"
+            isUserInVideoTilesExp = (tileDesignType = "videoTiles") AND uiMode = "standard"
           end if
 
           rottenTomatoScore = 0
@@ -1714,10 +1712,6 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
 
           if isUserInVideoTilesExp = true
             featuredLandscape = m.getRoundedCornersURL(m.getThumbnailImage(fullChild, m.constants.ui.gridItemTypes.landscapeWithMetadata))
-            billboardImageUrl = ""
-            if isUserInBillboardVariant = true
-              billboardImageUrl = m.getRoundedCornersURL(m.getThumbnailImage(fullChild, m.constants.ui.gridItemTypes.billboard))
-            end if
             childAA = {
               id: fullChild.id
               title: fullChild.title
@@ -1739,8 +1733,8 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
               sotInfo: sotInfo
               hasSubtitles: (fullChild.hasSubtitles = true OR fullChild.has_subtitle = true OR (fullChild.subtitleTracks <> invalid AND fullChild.subtitleTracks.isEmpty() = false))
               gridItemType: parentGridItemType
-              billboardImageUrl: billboardImageUrl
               availabilityEnds: fullChild.availability_ends
+              parentId: container.id
             }
           else
 
@@ -1990,8 +1984,8 @@ Function tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA(cont
     ' Since this field is temporary since we need to support both formats for now.
     useVideoTilesFormat = false
     if m.statSigExperiments <> invalid AND isContentModeHomeScreen = true AND bKidsMode <> true
-      experiment = m.statSigExperiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6")
-      useVideoTilesFormat = (isAA(experiment) = true AND experiment.design_type = "withDescriptionPortraitSmall")
+      experiment = m.statSigExperiments.getExperimentResource("roku_video_tiles", "roku_video_tiles_1_7")
+      useVideoTilesFormat = (isAA(experiment) = true AND experiment.design_type = "videoTiles")
     end if
 
     updateMetadata = {
@@ -2155,12 +2149,14 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
 
   tileDesignType = "none"
   isUserInVideoTilesExperiment = false
-  experimentContainerId = "none"
+  controlCategoryIds = []
+  videoTilesVariant = "none"
   if m.statSigExperiments <> invalid
-    experiment = m.statSigExperiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6")
+    experiment = m.statSigExperiments.getExperimentResource("roku_video_tiles", "roku_video_tiles_1_7")
     tileDesignType = experiment.design_type
-    experimentContainerId = experiment.container_id
-    isUserInVideoTilesExperiment = (tileDesignType = "withDescriptionPortraitSmall") AND uiMode = "standard"
+    controlCategoryIds = experiment.controlCategoryIds
+    isUserInVideoTilesExperiment = (tileDesignType = "videoTiles") AND uiMode = "standard"
+    videoTilesVariant = experiment.variant
   end if
 
   isContentModeHomeScreen = (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
@@ -2169,11 +2165,15 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
   else if isAA(container.ui_customization) = true AND container.ui_customization.type = "live_event_banner"
     gridItemType = gridItemTypes.liveEventBanner
   else if screenId = m.constants.ui.screenIds.homeScreen AND isUserInVideoTilesExperiment = true AND isContentModeHomeScreen = true
-    gridItemType = gridItemTypes.featuredPortraitSmall
-  else if (tileDesignType = "controlReOrderContainers" AND container.id = experimentContainerId) AND isContentModeHomeScreen AND uiMode = "standard" AND screenId = m.constants.ui.screenIds.homeScreen
-    gridItemType = gridItemTypes.landscape
-  else if tileDesignType = "withDescriptionPortraitSmall" AND isUserInVideoTilesExperiment = true AND isContentModeHomeScreen = true
-    gridItemType = gridItemTypes.portrait
+    if arrayIncludes(controlCategoryIds, container.id) = true
+      if (videoTilesVariant = "trueControlTop2Rows" OR videoTilesVariant = "refinedControlTop2Rows") AND container.id = m.constants.ui.categoryIds.recommendedForYou
+        gridItemType = gridItemTypes.portrait
+      else
+        gridItemType = gridItemTypes.landscape
+      end if
+    else
+      gridItemType = gridItemTypes.videoTile
+    end if
   else if container.type = constants.ui.categoryTypes.linear
     gridItemType = gridItemTypes.linear
   else if container.id = constants.ui.categoryIds.certifiedFresh
@@ -2731,12 +2731,12 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
       gridItemType = translatedProgram.gridItemType
     end if
 
-    if gridItemType = m.constants.ui.gridItemTypes.featuredPortraitSmall
+    if gridItemType = m.constants.ui.gridItemTypes.videoTile
       useSeriesImage = (programFromServer.series_id <> invalid AND programFromServer.series_images <> invalid)
-      landscapePosterUrl = m.getRoundedCornersURL(m.getThumbnailImage(programFromServer, m.constants.ui.gridItemTypes.linear, useSeriesImage))
+      landscapePosterUrl = m.getRoundedCornersURL(m.getThumbnailImage(programFromServer, m.constants.ui.gridItemTypes.landscapeWithMetadata, useSeriesImage))
 
       if isNonEmptyString(landscapePosterUrl) = false
-        landscapePosterUrl = m.getRoundedCornersURL(m.getThumbnailImage(channelFromServer, m.constants.ui.gridItemTypes.linear))
+        landscapePosterUrl = m.getRoundedCornersURL(m.getThumbnailImage(channelFromServer, m.constants.ui.gridItemTypes.landscapeWithMetadata))
       end if
 
       translatedProgram.landscapePosterUrl = landscapePosterUrl

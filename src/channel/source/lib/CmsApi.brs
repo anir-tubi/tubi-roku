@@ -349,7 +349,6 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
     ' Appending it only for home tab.
     if isNonEmptyString(params["content_mode"]) = false
       imageParamTypes.push("featured")
-      imageParamTypes.push("billboard")
     end if
 
     params = m.setImageParams(imageParamTypes, options.params, m.constants.ui.screenIds.homeScreen)
@@ -496,14 +495,12 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
   end if
 
   tileDesignType = "none"
-  includeBillboard = false
   if m.statSigExperiments <> invalid AND bKidsMode = false
-    experiment = m.statSigExperiments.getExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6")
+    experiment = m.statSigExperiments.getExperimentResource("roku_video_tiles", "roku_video_tiles_1_7")
     tileDesignType = experiment.design_type
-    includeBillboard = experiment.variant = "billboard"
   end if
 
-  if imageParamTypes = invalid AND tileDesignType = "withDescriptionPortraitSmall"
+  if imageParamTypes = invalid AND tileDesignType = "videoTiles"
     imageParamTypes = [
       "poster"
       "landscape"
@@ -511,9 +508,6 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
       "featured"
       "title"
     ]
-    if includeBillboard = true
-      imageParamTypes.push("billboard")
-    end if
   else if imageParamTypes = invalid
     imageParamTypes = [
       "poster"
@@ -632,7 +626,7 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
   skinAdLandscape = imageSizes.skinAdLandscape
   fullScreenBackground = imageSizes.fullScreenBackground
   featuredRowPoster = imageSizes.featuredRowPoster
-  featuredPortraitSmall = imageSizes.featuredPortraitSmall
+  videoTilesPortrait = imageSizes.videoTilesPortrait
   billboard = imageSizes.billboard
 
   '//For now, ensure the large posters do not show up on the search screen
@@ -652,7 +646,7 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
     title = m.convertImageSizeFor720p(title)
     billboard = m.convertImageSizeFor720p(billboard)
     featuredRowPoster = m.convertImageSizeFor720p(featuredRowPoster)
-    featuredPortraitSmall = m.convertImageSizeFor720p(featuredPortraitSmall)
+    videoTilesPortrait = m.convertImageSizeFor720p(videoTilesPortrait)
     fullScreenBackground = m.convertImageSizeFor720p(fullScreenBackground)
     skinAdLandscape = m.convertImageSizeFor720p(skinAdLandscape)
   end if
@@ -664,20 +658,14 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
       '//Tell backend to provide a specific sized image
       existingParams["images[poster_tb]"] = "w" + posterSize[0].ToStr() + "h" + posterSize[1].ToStr() + "_poster"
     else if imageType = "landscape"
-      if containerGridItemType = gridItemTypes.featuredPortraitSmall
-        existingParams["images[landscape_tb]"] = "w" + featuredRowPoster[0].ToStr() + "h" + featuredRowPoster[1].ToStr() + "_landscape"
-      else
-        existingParams["images[landscape_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_landscape"
-      end if
+      existingParams["images[landscape_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_landscape"
     else if imageType = "largestLandscape"
       existingParams["images[landscape_tb]"] = "w" + largestLandscapeSize[0].ToStr() + "h" + largestLandscapeSize[1].ToStr() + "_landscape"
     else if imageType = "hero"
       existingParams["images[hero_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_hero"
     else if imageType = "featured"
       existingParams["images[hero_tb]"] = "w" + featuredRowPoster[0].ToStr() + "h" + featuredRowPoster[1].ToStr() + "_hero"
-      existingParams["images[featured_portrait_tb]"] = "w" + featuredPortraitSmall[0].ToStr() + "h" + featuredPortraitSmall[1].ToStr() + "_poster"
-    else if imageType = "billboard"
-      existingParams["images[billboard_tb]"] = "w" + billboard[0].ToStr() + "h" + billboard[1].ToStr() + "_hero"
+      existingParams["images[video_tiles_portrait_tb]"] = "w" + videoTilesPortrait[0].ToStr() + "h" + videoTilesPortrait[1].ToStr() + "_poster"
     else if imageType = "background"
       if containerGridItemType <> gridItemTypes.skinAd
         existingParams["images[background_tb]"] = "w" + background[0].ToStr() + "h" + background[1].ToStr() + "_background"

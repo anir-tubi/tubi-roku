@@ -177,7 +177,7 @@
       -->
     <field id="reloadedItemToBeFocused" type="node" />
 
-    <!-- ::TODO::roku_home_screen_redesign, change this to an alias to the RowList.animateToItem or
+    <!-- ::TODO::roku_video_tiles, change this to an alias to the RowList.animateToItem or
     FeaturedRowList.animateToItem after the experiment is done. -->
     <field id="animateToItem" type="integer" alwaysNotify="true" />
     <field id="currFocusRow" alias="RowList.currFocusRow" />
@@ -233,6 +233,9 @@
       showRowCounter="[false]"
       itemSpacing="[0, 35]"
       drawFocusFeedback="false"
+      focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+      focusFootprintBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+      focusFootprintBlendColor="#00000000"
       rowFocusAnimationStyle="fixedFocus"
       vertFocusAnimationStyle="fixedFocus" />
 

@@ -4,8 +4,8 @@ Function init()
   m._ = rodash()
   m.constants = getConstantsFromGlobal()
   m.Tracking = TubiTrackingInfo(m.constants)
-  experimentInfo = getStatsigExperimentResource("roku_home_screen_redesign", "roku_home_screen_redesign_v_1_6", false)
-  m.isUserInVideoTilesExperiment = isAA(experimentInfo) AND experimentInfo.design_type = "withDescriptionPortraitSmall"
+  experimentInfo = getStatsigExperimentResource("roku_video_tiles", "roku_video_tiles_1_7", false)
+  m.isUserInVideoTilesExperiment = isAA(experimentInfo) AND experimentInfo.design_type = "videoTiles"
   m.isUserInBillboardVariant = isAA(experimentInfo) AND experimentInfo.variant = "billboard"
   m.shouldDim = isAA(experimentInfo) AND experimentInfo.should_dim = true
   m.dimMask = m.top.findNode("dimMask")
@@ -96,7 +96,7 @@ Function init()
 
   m.scrollDirection = "none"
 
-  ' Logic related to roku_home_screen_redesign_v_1_6 experiment.
+  ' Logic related to roku_video_tiles_1_7 experiment.
   if isAA(experimentInfo) = true AND experimentInfo.variant = "billboard"
     m.videoTilesListTranslation = [0, m.constants.ui.videoTilesListTranslation[1]]
   else

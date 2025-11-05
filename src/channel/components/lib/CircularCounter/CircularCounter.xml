@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="CircularCounter" extends="Group">
+  <interface>
+    <field id="startValue" type="integer" value="10" />
+    <field id="labelText" type="string" alias="startsInLabel.text" />
+    <field id="countdownText" type="string" alias="countdownLabel.text" />
+    <field id="backgroundColor" type="string" alias="background.blendColor" />
+    <field id="textColor" type="string" alias="startsInLabel.color" />
+    <field id="counterColor" type="string" alias="countdownLabel.color" />
+    <field id="height" alias="background.height, startsInLabel.height" value="39" />
+    <field id="iconHeight" alias="circleBackground.height, countdownLabel.height" value="39" />
+    <field id="iconWidth"
+      alias="circleBackground.width, countdownLabel.width" value="39" />
+
+    <field id="start" type="boolean" value="false" alwaysNotify="true" />
+    <field id="stop" type="boolean" value="false" alwaysNotify="true" />
+  </interface>
+
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="CircularCounter.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <children>
+    <!-- Background 9-patch image -->
+    <Poster
+      id="background"
+      uri="pkg:/images/ad_counter_$$RES$$.9.png"
+    />
+
+    <!-- "Starts in" text -->
+    <Label
+      id="startsInLabel"
+      translation="[15, 0]"
+      text="Starts in"
+      vertAlign="center">
+      <Font
+        role="font"
+        id="startsInFont" />
+    </Label>
+
+    <!-- Circular progress background -->
+    <Poster
+      id="circleBackground"
+      uri="pkg:/images/counter-circle-$$RES$$.9.png"
+    />
+
+
+    <!-- Countdown number -->
+    <Label
+      id="countdownLabel"
+      text="0"
+      horizAlign="center"
+      vertAlign="center">
+      <Font
+        role="font"
+        id="countdownFont" />
+    </Label>
+  </children>
+</component>
