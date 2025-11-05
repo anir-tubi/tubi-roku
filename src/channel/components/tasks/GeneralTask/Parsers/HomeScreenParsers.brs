@@ -40,6 +40,12 @@ Function parseHomeScreenContentSuccess(fullResponse, reqInfo)
     }, true)
   end if
 
+  if reqInfo <> invalid AND reqInfo.screenId <> invalid
+    convertedMetadata.update({
+      screenId: reqInfo.screenId
+    }, true)
+  end if
+
   return convertedMetadata
 End Function
 

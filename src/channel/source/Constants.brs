@@ -1880,6 +1880,8 @@ Function getConstants()
   constants.performance.categoryGridList = {}
   constants.performance.categoryGridList.initialBlockSize = 9
 
+  constants.performance.categoryGridList.numContainers = 10
+
   if limitedUi
     ' Notes:
     ' - lowMemory devices may have 512MB but will have 256MB minimum.

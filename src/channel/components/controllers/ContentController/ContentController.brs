@@ -57,6 +57,9 @@ Function init()
   m.isApplicationSuspendInProgress = false
 
   m.top.getScene().observeFieldScoped("focusedChild", "onSceneFocusedChildChanged")
+
+  ' Holds the paginated content in queue to be appended to the screen.
+  m.paginatedContentQueue = invalid
 End Function
 
 

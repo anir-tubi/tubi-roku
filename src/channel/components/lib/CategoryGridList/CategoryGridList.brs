@@ -14,6 +14,7 @@ Function init()
   m.top.observeFieldScoped("kidsMode", "onKidsModeChange")
   m.top.observeFieldScoped("containerAppendMoreTilesStatus", "onContainerAppendMoreTilesStatusChange")
   m.top.observeFieldScoped("animateToItem", "onAnimateToItemChange")
+  m.top.observeFieldScoped("hasNewContainers", "onHasNewContainersChange")
 
   m.RowList = m.top.findNode("RowList")
   m.RowList.observeFieldScoped("rowItemFocused", "onRowItemFocused")
@@ -1408,6 +1409,36 @@ Function onAnimateToItemChange(msg)
     m.featuredRowList.animateToItem = itemToAnimate
   else
     m.RowList.animateToItem = itemToAnimate
+  end if
+End Function
+
+
+' Handles when new content containers are added to the grid
+' Preserves user focus position by jumping to previously focused row item
+' Updates row heights for featured or regular content layouts
+' @param msg - Message containing hasNewContainers boolean value
+Function onHasNewContainersChange(msg)
+  hasNewContainers = msg.getData()
+  if hasNewContainers = true
+    if m.top.featuredRowContent <> invalid
+      currFocusRow = m.featuredRowList.currFocusRow
+      rowItemFocused = [currFocusRow, 0]
+      category = m.top.featuredRowContent.getChild(currFocusRow)
+      if category <> invalid AND category.focusIndex <> -1
+        rowItemFocused[1] = category.focusIndex
+      end if
+      setFeaturedRowHeights()
+      m.featuredRowList.jumpToRowItem = rowItemFocused
+    else if m.top.content <> invalid
+      currFocusRow = m.RowList.currFocusRow
+      rowItemFocused = [currFocusRow, 0]
+      category = m.top.content.getChild(currFocusRow)
+      if category <> invalid AND category.focusIndex <> -1
+        rowItemFocused[1] = category.focusIndex
+      end if
+      setRowHeights()
+      m.RowList.jumpToRowItem = rowItemFocused
+    end if
   end if
 End Function
 

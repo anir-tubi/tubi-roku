@@ -212,6 +212,9 @@
 
     <!-- Possible values "none", "start", "complete". -->
     <field id="containerAppendMoreTilesStatus" type="string" value="none" />
+
+    <!-- Informs CategoryGridList that more containers were added to screen. -->
+    <field id="hasNewContainers" type="boolean" value="false" alwaysNotify="true" />
   </interface>
 
   <children>

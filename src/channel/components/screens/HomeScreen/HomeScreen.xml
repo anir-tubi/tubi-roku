@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <component name="HomeScreen" extends="BaseScreen">
   <script type="text/brightscript" uri="HomeScreen.brs" />
   <script type="text/brightscript" uri="../../lib/CacheValidationMixin.brs" />
@@ -17,193 +17,235 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/DeviceMixin.brs" />
 
   <interface>
     <!-- INPUTS -->
-      <!-- When the Helper receives valid ad campaign data from the server, it sets the new value to this field. Currently the array will contain at most 1 child/ad campaign.  -->
-      <field id="adContent" type="array"/>
+    <!-- When the Helper receives valid ad campaign data from the server, it sets the new value to
+    this field. Currently the array will contain at most 1 child/ad campaign.  -->
+    <field id="adContent" type="array" />
 
-      <!-- When the Helper receives valid category data from the server, it sets the new value to this field. -->
-      <field id="content" alias="CategoryGridList.content" />
+    <!-- When the Helper receives valid category data from the server, it sets the new value to this
+    field. -->
+    <field id="content" alias="CategoryGridList.content" />
 
-      <!-- Skin Ad content node to display a skin ad wrapper campaign on homescreen . -->
-      <field id="skinAdContent" alias="CategoryGridList.skinAdContent" />
+    <!-- Skin Ad content node to display a skin ad wrapper campaign on homescreen . -->
+    <field id="skinAdContent" alias="CategoryGridList.skinAdContent" />
 
-      <!-- Tells the ad carousel if it should stop or start automatically rotating -->
-      <field id="allowCarouselAutoRotate" type="boolean"/>
+    <!-- Tells the ad carousel if it should stop or start automatically rotating -->
+    <field id="allowCarouselAutoRotate" type="boolean" />
 
-      <!-- The helper class will call this when the new content is ready to be displayed on the screen. -->
-      <field id="contentUpdated" alwaysNotify="true" alias="CategoryGridList.contentUpdated" />
+    <!-- The helper class will call this when the new content is ready to be displayed on the
+    screen. -->
+    <field id="contentUpdated" alwaysNotify="true" alias="CategoryGridList.contentUpdated" />
 
-       <!-- Featured row content node -->
-      <field id="featuredRowContent" alias="CategoryGridList.featuredRowContent" />
+    <!-- Featured row content node -->
+    <field id="featuredRowContent" alias="CategoryGridList.featuredRowContent" />
 
-      <!-- The helper will set this when the new skin Ad content is ready to be displayed on the screen. -->
-      <field id="skinAdContentUpdated" alias="CategoryGridList.skinAdContentUpdated" />
+    <!-- The helper will set this when the new skin Ad content is ready to be displayed on the
+    screen. -->
+    <field id="skinAdContentUpdated" alias="CategoryGridList.skinAdContentUpdated" />
 
-      <!-- The helper will set this when the new ad carousel content is ready to be displayed on the screen. -->
-      <field id="adContentUpdated" type="boolean" value="false" />
+    <!-- The helper will set this when the new ad carousel content is ready to be displayed on the
+    screen. -->
+    <field id="adContentUpdated" type="boolean" value="false" />
 
-      <!-- What kind of content is this homeScreen displaying: movies, tv, normal, espanol etc -->
-      <field id="contentMode" alias="CategoryGridList.contentMode" />
+    <!-- What kind of content is this homeScreen displaying: movies, tv, normal, espanol etc -->
+    <field id="contentMode" alias="CategoryGridList.contentMode" />
 
-      <!-- removes any existing content on the CategoryGridList! -->
-      <field id="isLoading" type="boolean" />
+    <!-- removes any existing content on the CategoryGridList! -->
+    <field id="isLoading" type="boolean" />
 
-      <!-- tells the rowList to re-populate the content because rows have been added/removed and that may affect the look of some rows that have different heights compared to other rows  -->
-      <field id="repopulateContent" type="boolean" alias="CategoryGridList.repopulateContent" />
+    <!-- tells the rowList to re-populate the content because rows have been added/removed and that
+    may affect the look of some rows that have different heights compared to other rows  -->
+    <field id="repopulateContent" type="boolean" alias="CategoryGridList.repopulateContent" />
 
-      <!-- expected to be category ids(continue_watching/queue) if new continue_watching/queue got added, helps to set focus to correct row -->
-      <field id="rowAdded" type="string" alias="CategoryGridList.rowAdded" />
+    <!-- expected to be category ids(continue_watching/queue) if new continue_watching/queue got
+    added, helps to set focus to correct row -->
+    <field id="rowAdded" type="string" alias="CategoryGridList.rowAdded" />
 
-      <!-- expected to be category ids(continue_watching/queue) if new continue_watching/queue got removed, helps to set focus to correct row -->
-      <field id="rowRemoved" type="string" alias="CategoryGridList.rowRemoved" />
+    <!-- expected to be category ids(continue_watching/queue) if new continue_watching/queue got
+    removed, helps to set focus to correct row -->
+    <field id="rowRemoved" type="string" alias="CategoryGridList.rowRemoved" />
 
-      <!-- set to true if the user is signed in and we want to change the experience based on that -->
-      <field id="signedIn" alias="CategoryGridList.signedIn" />
+    <!-- set to true if the user is signed in and we want to change the experience based on that -->
+    <field id="signedIn" alias="CategoryGridList.signedIn" />
 
-      <!-- Indicated whether to play/pause/stop video preview -->
-      <field id="isVideoPreviewOn" type="boolean" value="true" />
+    <!-- Indicated whether to play/pause/stop video preview -->
+    <field id="isVideoPreviewOn" type="boolean" value="true" />
 
-      <!-- show/hide the category menu -->
-      <field id="categoryMenuVisible" type="boolean"/>
+    <!-- show/hide the category menu -->
+    <field id="categoryMenuVisible" type="boolean" />
 
-      <!-- Indicates if that when the server is contacted, it should indicate that the app is in kidsMode. -->
-      <field id="shouldKidsModeBeSentToServer" type="boolean" alias="CategoryGridList.shouldKidsModeBeSentToServer"/>
+    <!-- Indicates if that when the server is contacted, it should indicate that the app is in
+    kidsMode. -->
+    <field id="shouldKidsModeBeSentToServer" type="boolean"
+      alias="CategoryGridList.shouldKidsModeBeSentToServer" />
 
-      <field id="animateToCategory" alias="CategoryGridList.animateToCategory" />
-      <field id="jumpToRowItemByID" alias="CategoryGridList.jumpToRowItemByID" />
-      <field id="jumpToRowItem" alias="CategoryGridList.jumpToRowItem" />
+    <field id="animateToCategory" alias="CategoryGridList.animateToCategory" />
+    <field id="jumpToRowItemByID" alias="CategoryGridList.jumpToRowItemByID" />
+    <field id="jumpToRowItem" alias="CategoryGridList.jumpToRowItem" />
 
-      <!-- If the screen is not enabled, then user should not be able to select anything -->
-      <field id="enabled" type="boolean"  alwaysNotify="true"/>
+    <!-- If the screen is not enabled, then user should not be able to select anything -->
+    <field id="enabled" type="boolean" alwaysNotify="true" />
 
-      <!-- Acts a circuit breaker in case categories are attempted to be fetched before categories are initially loaded -->
-      <field id="canLoadCategories" type="boolean" />
+    <!-- Acts a circuit breaker in case categories are attempted to be fetched before categories are
+    initially loaded -->
+    <field id="canLoadCategories" type="boolean" />
 
-      <!-- Triggers a reset of the ContentArea translation values in the case they were adjusted by VITG -->
-      <field id="resetContentAreaValues" type="boolean" alwaysNotify="true" />
+    <!-- Triggers a reset of the ContentArea translation values in the case they were adjusted by
+    VITG -->
+    <field id="resetContentAreaValues" type="boolean" alwaysNotify="true" />
 
-      <!-- The number that is used as how many more seconds until the linear video player will be going fullscreen -->
-      <field id="fullscreenCountdown" type="integer" />
+    <!-- The number that is used as how many more seconds until the linear video player will be
+    going fullscreen -->
+    <field id="fullscreenCountdown" type="integer" />
 
-      <!-- kidsModeFeatureOn will be set based device countryCode -->
-      <field id="kidsModeFeatureOn" type="boolean" />
+    <!-- kidsModeFeatureOn will be set based device countryCode -->
+    <field id="kidsModeFeatureOn" type="boolean" />
 
-      <!--Is KidsMode On-->
-      <field id="kidsMode" alias="CategoryGridList.kidsMode" />
+    <!--Is
+    KidsMode On-->
+    <field id="kidsMode" alias="CategoryGridList.kidsMode" />
 
-      <!-- incoming metadata from GeneralTask
-           type is node, so that it takes less time to send data from one file to another file when comparing to assocarray
+    <!-- incoming metadata from GeneralTask
+           type is node, so that it takes less time to send data from one file to another file when comparing
+    to assocarray
        -->
-      <field id="batchResponse" type="node" alias="CategoryGridList.categoryResponseInBatch" />
+    <field id="batchResponse" type="node" alias="CategoryGridList.categoryResponseInBatch" />
 
-      <!-- incoming response to show/update ads on the homescreen. Currently the array will contain at most 1 child/ad campaign.  -->
-      <field id="batchAdResponse" type="array"/>
+    <!-- incoming response to show/update ads on the homescreen. Currently the array will contain at
+    most 1 child/ad campaign.  -->
+    <field id="batchAdResponse" type="array" />
 
-      <!-- This field is used to force remove focus from the rowlist. -->
-      <field id="removeFocusFromRowList" type="boolean" alias="CategoryGridList.removeFocusFromRowList" />
+    <!-- This field is used to force remove focus from the rowlist. -->
+    <field id="removeFocusFromRowList" type="boolean"
+      alias="CategoryGridList.removeFocusFromRowList" />
 
-      <!-- We have to create a field due to renderTracking events being async each itemComponent should be aware of what the mode was when it rendered. -->
-      <field id="shouldTrackViewableImpressionEvent" type="boolean" value="true" alias="CategoryGridList.shouldTrackViewableImpressionEvent" />
+    <!-- We have to create a field due to renderTracking events being async each itemComponent
+    should be aware of what the mode was when it rendered. -->
+    <field id="shouldTrackViewableImpressionEvent" type="boolean" value="true"
+      alias="CategoryGridList.shouldTrackViewableImpressionEvent" />
 
-      <!-- Will be set to true if we want to reset the grid position back to [0,0] -->
-      <field id="resetGridPosition" alias="CategoryGridList.resetGridPosition" />
+    <!-- Will be set to true if we want to reset the grid position back to [0,0] -->
+    <field id="resetGridPosition" alias="CategoryGridList.resetGridPosition" />
 
-      <field id="featuredRowFocusedItem" alias="CategoryGridList.featuredRowFocusedItem" alwaysNotify="true" />
+    <field id="featuredRowFocusedItem" alias="CategoryGridList.featuredRowFocusedItem"
+      alwaysNotify="true" />
 
-      <!-- Informs CategoryGridList add more content was appended to the category container during lazy loading. -->
-      <field id="containerAppendMoreTilesStatus" alias="CategoryGridList.containerAppendMoreTilesStatus" />
+    <!-- Informs CategoryGridList add more content was appended to the category container during
+    lazy loading. -->
+    <field id="containerAppendMoreTilesStatus"
+      alias="CategoryGridList.containerAppendMoreTilesStatus" />
+
+    <!-- Informs CategoryGridList that more containers were added to screen. -->
+    <field id="hasNewContainers" alias="CategoryGridList.hasNewContainers" />
+
+    <!-- Possible values "none", "pending", "complete", "error", "finished". -->
+    <!-- difference between complete and finished is that finished indicates current pagination
+    request is completed where finished indicates completed loading all pages. -->
+    <field id="containerPaginationStatus" type="string" value="none" />
 
     <!-- OUTPUTS -->
-      <!-- Trigger the content to be loaded.  This field is used to delay
+    <!-- Trigger the content to be loaded.  This field is used to delay
            the initial category content loading until after the stateful
            fields have been set (e.g. signedIn) -->
-      <field id="loadAllCategories" type="boolean" value="false" alwaysNotify="true"/>
+    <field id="loadAllCategories" type="boolean" value="false" alwaysNotify="true" />
 
-      <!-- Triggered when the homescreen has lost focus -->
-      <field id="focusLost" type="boolean" alwaysNotify="true"/>
+    <!-- Triggered when the homescreen has lost focus -->
+    <field id="focusLost" type="boolean" alwaysNotify="true" />
 
-      <!-- Triggered when the ad has been in focus for awhile and needs to be reported. -->
-      <field id="adTimerImpressionFire" type="boolean" value="false" alwaysNotify="true"/>
-      
-      <field id="featuredRowCurrFocusColumn" alias="CategoryGridList.featuredRowCurrFocusColumn" />
-      <field id="currFocusColumn" alias="CategoryGridList.currFocusColumn" />
+    <!-- Triggered when the ad has been in focus for awhile and needs to be reported. -->
+    <field id="adTimerImpressionFire" type="boolean" value="false" alwaysNotify="true" />
 
-      <field id="featuredListCurrFocusRow" alias="CategoryGridList.featuredListCurrFocusRow" />
+    <field id="featuredRowCurrFocusColumn" alias="CategoryGridList.featuredRowCurrFocusColumn" />
+    <field id="currFocusColumn" alias="CategoryGridList.currFocusColumn" />
 
-      <field id="featuredListScrollingStatus" alias="CategoryGridList.featuredListScrollingStatus" />
-      <field id="featuredListScrollDirection" alias="CategoryGridList.featuredListScrollDirection" />
+    <field id="featuredListCurrFocusRow" alias="CategoryGridList.featuredListCurrFocusRow" />
 
-      <!-- set to the contentNode of the CategoryGridList item which was clicked on -->
-      <field id="contentSelected" type="node"/>
+    <field id="featuredListScrollingStatus" alias="CategoryGridList.featuredListScrollingStatus" />
+    <field id="featuredListScrollDirection" alias="CategoryGridList.featuredListScrollDirection" />
 
-      <!-- set to the contentNode of the CategoryGridList item which was focused when
+    <!-- set to the contentNode of the CategoryGridList item which was clicked on -->
+    <field id="contentSelected" type="node" />
+
+    <!-- set to the contentNode of the CategoryGridList item which was focused when
            the "play" input transport deeplink was triggered
       -->
-      <field id="contentToPlay" type="node"/>
+    <field id="contentToPlay" type="node" />
 
-      <!-- set to the tubi content of the item which was focused on. alwaysNotify is required. Most video content is always unique for the same content (b/c of the nature of resolveAbbreviatedContent()) so this param is not needed in that case, but the ad content does not call resolveAbbreviatedContent() and so is not unique each time it is created so this para is needed. -->
-      <field id="contentFocused" type="node"  alwaysNotify="true"/>
+    <!-- set to the tubi content of the item which was focused on. alwaysNotify is required. Most
+    video content is always unique for the same content (b/c of the nature of
+    resolveAbbreviatedContent()) so this param is not needed in that case, but the ad content does
+    not call resolveAbbreviatedContent() and so is not unique each time it is created so this para
+    is needed. -->
+    <field id="contentFocused" type="node" alwaysNotify="true" />
 
-      <!-- set to the tubi content of the new row container (row of contentFocused) which was focused on -->
-      <field id="rowFocused" alias="CategoryGridList.rowFocused"/>
+    <!-- set to the tubi content of the new row container (row of contentFocused) which was focused
+    on -->
+    <field id="rowFocused" alias="CategoryGridList.rowFocused" />
 
-      <!-- As the rowlist column changes, even during scrolling, this will get dispatched. During scrolling, each new focused column between the start and end scrolled columns will be dispatched as they begin to gain partial focus.  -->
-      <field id="columnFocused" type="integer" value="-1"/>
+    <!-- As the rowlist column changes, even during scrolling, this will get dispatched. During
+    scrolling, each new focused column between the start and end scrolled columns will be dispatched
+    as they begin to gain partial focus.  -->
+    <field id="columnFocused" type="integer" value="-1" />
 
-      <field id="scrollingstatus" alias="CategoryGridList.scrollingstatus" />
+    <field id="scrollingStatus" alias="CategoryGridList.scrollingStatus" />
 
-      <field id="currFocusRow" alias="CategoryGridList.currFocusRow" />
+    <field id="currFocusRow" alias="CategoryGridList.currFocusRow" />
 
-      <!-- content on the homescreen is loaded and spinner can be turned off -->
-      <field id="contentReady" type="boolean" value="false" alwaysNotify="true" />
+    <!-- content on the homescreen is loaded and spinner can be turned off -->
+    <field id="contentReady" type="boolean" value="false" alwaysNotify="true" />
 
-      <field id="cursorPosition" alias="CategoryGridList.cursorPosition" />
+    <field id="cursorPosition" alias="CategoryGridList.cursorPosition" />
 
-      <field id="currCategoryId" alias="CategoryGridList.currCategoryId" />
+    <field id="currCategoryId" alias="CategoryGridList.currCategoryId" />
 
-      <field id="selectedPosition" alias="CategoryGridList.selectedPosition" />
+    <field id="selectedPosition" alias="CategoryGridList.selectedPosition" />
 
-      <!-- Communicates that the homescreen has focused on a sponsored container/category/row.
+    <!-- Communicates that the homescreen has focused on a sponsored container/category/row.
       This may happen when the homescreen/categoryGridList is regaining focus, or it may
       happen when a user navigates through the grid until they focus on a sponsored row.
       Use a boolean instead of the actual node so that any changes to the node don't trigger
       additional callbacks unexpectedly. -->
-      <field id="sponsoredRowFocused" type="boolean" alwaysNotify="true" />
+    <field id="sponsoredRowFocused" type="boolean" alwaysNotify="true" />
 
-      <!-- will be used to change the sponsored background images on the content controller -->
-      <field id="sponsorshipBackground" type="string" alwaysNotify="true" />
+    <!-- will be used to change the sponsored background images on the content controller -->
+    <field id="sponsorshipBackground" type="string" alwaysNotify="true" />
 
-      <!-- Holds a load time start value [returned from UpTime()] that can be used to determine how long the page took to load.
+    <!-- Holds a load time start value [returned from UpTime()] that can be used to determine how
+    long the page took to load.
       -->
-      <field id="trackingLoadStartTime" type="integer" />
+    <field id="trackingLoadStartTime" type="integer" />
 
-      <!-- Communicates to the parent that the linear video player should be stopped -->
-      <field id="stopLinearVideoPlayer" type="boolean" alwaysNotify="true" />
+    <!-- Communicates to the parent that the linear video player should be stopped -->
+    <field id="stopLinearVideoPlayer" type="boolean" alwaysNotify="true" />
 
-      <!-- Communicates to the parent that the video preview should be paused -->
-      <field id="pauseVideoPreview" type="boolean" alwaysNotify="true"/>
+    <!-- Communicates to the parent that the video preview should be paused -->
+    <field id="pauseVideoPreview" type="boolean" alwaysNotify="true" />
 
-       <!--Communicates to the parent that some of the containers has expired and to be loaded-->
-      <field id="loadCategoryForIds" type="array" alwaysNotify="true"/>
+    <!--Communicates
+    to the parent that some of the containers has expired and to be loaded-->
+    <field id="loadCategoryForIds" type="array" alwaysNotify="true" />
 
-      <!-- Communicates to the parent if the featured list has focus. -->
-      <field id="featuredListHasFocus" alias="CategoryGridList.featuredListHasFocus" />
-      
-      <field id="currentFocusedItemBoundingRect" alias="CategoryGridList.currentFocusedItemBoundingRect" />
-      <field id="inTransitCurrentFocusedItemBoundingRect" alias="CategoryGridList.inTransitCurrentFocusedItemBoundingRect" />
-      
-      <!-- Communicates to parent what was the last focused list was. -->
-      <field id="lastFocusedList" alias="CategoryGridList.lastFocusedList" />
+    <!-- Communicates to the parent if the featured list has focus. -->
+    <field id="featuredListHasFocus" alias="CategoryGridList.featuredListHasFocus" />
 
-      <field id="featuredRowListTranslation" type="array" alwaysNotify="true" />
-      <field id="contentAreaTranslation" type="array" alias="ContentAreaParent.translation"/>
+    <field id="currentFocusedItemBoundingRect"
+      alias="CategoryGridList.currentFocusedItemBoundingRect" />
+    <field id="inTransitCurrentFocusedItemBoundingRect"
+      alias="CategoryGridList.inTransitCurrentFocusedItemBoundingRect" />
 
-    <!-- DATA STORE (Anything defined below are not meant to be used as output or input fields which will triggered change events. ) -->
-      <field id="personalizationId" type="string" alias="CategoryGridList.personalizationId" />
+    <!-- Communicates to parent what was the last focused list was. -->
+    <field id="lastFocusedList" alias="CategoryGridList.lastFocusedList" />
+
+    <field id="featuredRowListTranslation" type="array" alwaysNotify="true" />
+    <field id="contentAreaTranslation" type="array" alias="ContentAreaParent.translation" />
+
+    <!-- DATA STORE (Anything defined below are not meant to be used as output or input fields which
+    will triggered change events. ) -->
+    <field id="personalizationId" type="string" alias="CategoryGridList.personalizationId" />
   </interface>
 
   <children>
@@ -215,7 +257,7 @@
           maxHeight="387"
           width="960"
           translation="[0,105]"
-          maxTitleLines="2"/>
+          maxTitleLines="2" />
       </Group>
 
       <Group
@@ -225,7 +267,7 @@
           maskUri="pkg:/images/poster-mask.png"
           maskSize="[0,0]">
           <CategoryGridList
-            id="CategoryGridList"/>
+            id="CategoryGridList" />
         </MaskGroup>
       </Group>
       <Poster
@@ -234,15 +276,15 @@
         width="1920"
         height="250"
         translation="[0, 830]"
-        visible="false"/>
+        visible="false" />
     </Group>
     <Group
-      id="adContentGroup"/>
+      id="adContentGroup" />
 
     <!-- For viewers that watch a REALLY long time, or just never close the app, force a refresh -->
     <Timer
       id="CategoryRefreshTimer"
-      repeat="true"/>
+      repeat="true" />
 
   </children>
 </component>

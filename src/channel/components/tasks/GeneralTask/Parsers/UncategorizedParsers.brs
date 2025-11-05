@@ -9,14 +9,21 @@ End Function
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
 ' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
-Function parseGenericError(fullResponse, _reqInfo)
+Function parseGenericError(fullResponse, reqInfo)
   httpStatusCode = -1
   if fullResponse <> invalid AND fullResponse.code <> invalid
     httpStatusCode = fullResponse.code
   end if
+
+  screenId = ""
+  if reqInfo <> invalid AND reqInfo.screenId <> invalid
+    screenId = reqInfo.screenId
+  end if
+
   return {
     code: getErrorCodeFromResponse(fullResponse)
     httpStatusCode: httpStatusCode
+    screenId: screenId
   }
 End Function
 

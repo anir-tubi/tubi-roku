@@ -70,6 +70,8 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.observeFieldScoped("featuredRowListTranslation", "onFeaturedRowListTranslationChange")
     homeScreen.observeFieldScoped("featuredListScrollDirection", "onFeaturedListScrollDirectionChange")
     homeScreen.observeFieldScoped("featuredListScrollingStatus", "onFeaturedListScrollingStatusChange")
+    homeScreen.observeFieldScoped("scrollingStatus", "onScrollingStatusChange")
+    homeScreen.observeFieldScoped("featuredListScrollingStatus", "onScrollingStatusChange")
 
     m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop listening to timer before listing to it in case a previous screen started the timer
     m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
@@ -320,7 +322,6 @@ Function fetchHomeScreen(homeScreen, useCache = false)
   ' called, such as when signedIn field changes.
   if homeScreen.canLoadCategories = true
     bSkipCallingAdContent = false
-    reqName = m.constants.reqNames.getHomescreen
 
     homeScreen.trackingLoadStartTime = UpTime(0)
     authInfo = m.tubiAuthUpdate.getAuthInfo()
@@ -372,30 +373,24 @@ Function fetchHomeScreen(homeScreen, useCache = false)
       end if
     end if
 
+    ' For tensor API, we need to pass as empty string for homescreen
+    if homeScreen.contentMode = m.constants.ui.contentMode.homescreen
+      contentMode = ""
+    else
+      contentMode = homeScreen.contentMode
+    end if
+
     options = {}
 
     headers = {}
-    params = {}
-
-    limitParamName = "contents_limit"
-    contentModeParamName = "content_mode"
-
-    ' For tensor API, we need to pass as empty string for homescreen
-    if homeScreen.contentMode = m.constants.ui.contentMode.homescreen
-      contentModeParamValue = ""
-    else
-      contentModeParamValue = homeScreen.contentMode
-    end if
-
-    params[contentModeParamName] = contentModeParamValue
+    params = {
+      group_start: 0
+      group_size: m.constants.performance.categoryGridList.numContainers
+      contents_limit: m.constants.performance.categoryGridList.initialBlockSize
+      content_mode: contentMode
+    }
 
     isKidsMode = shouldKidsModeBeSentToServer()
-
-    if m.constants.settings.mode = "dev" AND m.constants.settings.numContainers <> invalid
-      params["group_size"] = m.constants.settings.numContainers
-    end if
-
-    params[limitParamName] = m.constants.performance.categoryGridList.initialBlockSize
 
     if homeScreen <> invalid AND homeScreen.content <> invalid AND useCache = true AND homeScreen.content.lastModified <> invalid
       headers["If-Modified-Since"] = homeScreen.content.lastModified
@@ -406,7 +401,7 @@ Function fetchHomeScreen(homeScreen, useCache = false)
     homeScreenReqInfo = m.CmsApi.createHomeScreenReqInfo(isKidsMode, options)
     m.makeRequest({
       url: homeScreenReqInfo.url
-      requestType: reqName
+      requestType: m.constants.reqNames.getHomescreen
       options: homeScreenReqInfo.options
       successCallback: successHandler
       errorCallback: errorHandler
@@ -424,6 +419,8 @@ Function fetchHomeScreen(homeScreen, useCache = false)
         homeScreen.adContentUpdated = true
       end if
     end if
+
+    homeScreen.containerPaginationStatus = "none"
   end if
 End Function
 
@@ -993,6 +990,9 @@ Function onHomeScreenRowFocusChanged(msg)
 
   if currFocusRow = Fix(currFocusRow)
     m.performanceMetricsTracker.endMetricTiming("vertical_scroll_performance", { row: currFocusRow, screen: screen.id })
+    if screen.containerPaginationStatus <> "finished"
+      makeAdditionalContainersRequestConditionally(currFocusRow, screen)
+    end if
   end if
 
 End Function
@@ -1533,6 +1533,9 @@ Function onFeaturedRowCurrFocusRowChange(msg)
 
   if currFocusRow = Fix(currFocusRow)
     m.performanceMetricsTracker.endMetricTiming("vertical_scroll_performance", { row: currFocusRow, screen: screen.id })
+    if screen.containerPaginationStatus <> "finished"
+      makeAdditionalContainersRequestConditionally(currFocusRow, screen)
+    end if
   end if
 End Function
 
@@ -2093,4 +2096,132 @@ Function sanitizeHomeScreenResponseAndReturnLiveEventsContainer(rawResponse)
   end if
 
   return liveEventsContainer
+End Function
+
+
+' Requests additional content containers when user scrolls near the bottom
+' Implements pagination by loading more containers as needed
+' @param currFocusRow - The current row index where user focus is
+' @param screen - The screen node requesting additional containers
+Function makeAdditionalContainersRequestConditionally(currFocusRow, screen) as Void
+  if screen <> invalid AND screen.containerPaginationStatus <> "pending"
+    if screen.featuredRowContent <> invalid
+      content = screen.featuredRowContent
+    else
+      content = screen.content
+    end if
+
+    if isNode(content) = false
+      return
+    end if
+
+    containerCount = content.getChildCount()
+    if containerCount - currFocusRow > 5
+      return
+    end if
+
+    screen.containerPaginationStatus = "pending"
+
+    ' For tensor API, we need to pass as empty string for homescreen
+    if screen.contentMode = m.constants.ui.contentMode.homescreen
+      contentMode = ""
+    else
+      contentMode = screen.contentMode
+    end if
+
+    params = {
+      group_start: containerCount
+      group_size: m.constants.performance.categoryGridList.numContainers
+      contents_limit: m.constants.performance.categoryGridList.initialBlockSize
+      content_mode: contentMode
+    }
+
+    isKidsMode = shouldKidsModeBeSentToServer()
+
+    options = {
+      params: params
+      headers: {}
+    }
+    homeScreenReqInfo = m.CmsApi.createHomeScreenReqInfo(isKidsMode, options)
+    m.makeRequest({
+      url: homeScreenReqInfo.url
+      requestType: m.constants.reqNames.getHomescreen
+      options: homeScreenReqInfo.options
+      successCallback: onAdditionalContainersSuccessResponse
+      errorCallback: onAdditionalContainersErrorResponse
+      silenceCallbackWarnings: true
+      responseType: "node"
+      isSignedInUser: isLoggedInUser()
+      uiMode: m.uiMode
+      screenId: screen.id
+    })
+  end if
+End Function
+
+
+' Handles successful response from additional containers request
+' Appends new containers immediately if not scrolling, otherwise queues them
+' @param response - Response node containing additional content containers
+Function onAdditionalContainersSuccessResponse(response)
+  screen = getScreenFromStackById(response.screenId)
+  if screen <> invalid
+    if screen.featuredRowContent <> invalid
+      scrollingStatus = screen.featuredListScrollingStatus
+    else
+      scrollingStatus = screen.scrollingStatus
+    end if
+
+    if scrollingStatus = false
+      appendPaginatedContainersToScreen(screen, response)
+    else
+      m.paginatedContentQueue = response
+    end if
+  end if
+End Function
+
+
+Function onAdditionalContainersErrorResponse(response)
+  screen = getScreenFromStackById(response.screenId)
+  if screen <> invalid
+    ' Resetting the state so that we can retry on the next scroll down.
+    screen.containerPaginationStatus = "complete"
+  end if
+End Function
+
+
+' Handles scrolling status changes on the screen
+' Appends queued paginated content when scrolling stops
+' @param msg - Message containing scrolling status boolean value
+Function onScrollingStatusChange(msg)
+  scrollingStatus = msg.getData()
+  screen = msg.getRoSGNode()
+  if scrollingStatus = false AND m.paginatedContentQueue <> invalid
+    appendPaginatedContainersToScreen(screen, m.paginatedContentQueue)
+    m.paginatedContentQueue = invalid
+  end if
+End Function
+
+
+' Appends paginated content containers to the screen
+' Updates pagination status and triggers video preview debounce if needed
+' @param screen - The screen node to append containers to
+' @param response - Response node containing content containers to append
+Function appendPaginatedContainersToScreen(screen, response)
+  if screen.featuredRowContent <> invalid
+    content = screen.featuredRowContent
+  else
+    content = screen.content
+  end if
+
+  if content <> invalid AND isNode(response) = true AND response.getChildCount() > 0
+    items = response.getChildren(-1, 0)
+    content.appendChildren(items)
+    screen.hasNewContainers = true
+    if m.shouldDebounceVideoTilePreview = true AND m.videoPreviewDebounce.control = "stop"
+      m.videoPreviewDebounce.control = "start"
+    end if
+    screen.containerPaginationStatus = "complete"
+  else
+    screen.containerPaginationStatus = "finished"
+  end if
 End Function
