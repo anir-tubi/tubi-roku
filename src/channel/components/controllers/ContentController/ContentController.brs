@@ -64,13 +64,19 @@ Function onSceneFocusedChildChanged()
   if m.top.getScene().isInFocusChain() = false then
     ' Have to use a timer as trying to set right away fails to set properly
     m.sceneLooseFocusTimer = createObject("roSGNode", "Timer")
-    m.sceneLooseFocusTimer.duration = 0.01
+    m.sceneLooseFocusTimespan = createObject("roTimespan")
+    m.sceneLooseFocusTimer.duration = 5
     m.sceneLooseFocusTimer.observeFieldScoped("fire", "onSceneLooseFocusTimerFired")
     m.sceneLooseFocusTimer.control = "start"
     tubiLog("ContentController.onSceneFocusedChildChanged - Scene lost focus, starting timer")
   else if m.sceneLooseFocusTimer <> invalid then
+    if m.sceneLooseFocusTimespan.totalMilliseconds() > 10 then
+      onSceneLooseFocusTimerFired()
+    end if
+
     m.sceneLooseFocusTimer.control = "stop"
     m.sceneLooseFocusTimer = invalid
+    m.sceneLooseFocusTimespan = invalid
   end if
 End Function
 
@@ -83,11 +89,19 @@ Function onSceneLooseFocusTimerFired()
     currentScreenSubtype = screen.subtype()
     currentScreenId = screen.id
 
-    logInfo({
+    message = {
       "message": "Roku scene lost focus. Attempting to restore focus."
       "currentScreenSubtype": currentScreenSubtype
       "currentScreenId": currentScreenId
-    }, "clientInfo", "scene-lost-focus")
+      "timeFocusWasLost": m.sceneLooseFocusTimespan.totalMilliseconds()
+    }
+
+    if currentScreenId = "videoPlayerScreen" then
+      message["adState"] = screen.adState
+      message["state"] = screen.state
+    end if
+
+    logInfo(message, "clientInfo", "scene-lost-focus", 0.1)
 
     screen.setFocus(true)
   end if
