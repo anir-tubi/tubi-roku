@@ -142,10 +142,8 @@ Function statsigLib_createUser()
 
   displayProperties = deviceInfo.displayProperties
   if displayProperties <> invalid AND displayProperties.width <> invalid AND displayProperties.height <> invalid
-    custom.screenSize = {
-      "width": displayProperties.width.toStr()
-      "height": displayProperties.height.toStr()
-    }
+    custom.screenSizeWidth = displayProperties.width.toStr()
+    custom.screenSizeHeight = displayProperties.height.toStr()
   end if
 
   user.custom = custom
