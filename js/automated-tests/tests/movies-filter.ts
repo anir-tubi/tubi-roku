@@ -21,7 +21,7 @@ describe('Homescreen Navigation - Movies Filter', function () {
 
   // https://tubi.testrail.io/index.php?/cases/view/535770
   it('C535770 - Movies Filter - When movie filter is triggered then only Movie Titles are present, @homescreen, @movies', async () => {
-    await testUtils.waitForAppLaunchBeaconToFire();
+    await testUtils.waitForApplicationStartup();
 
     // Check if Featured row contains all Movie titles ("v") titles
     const rowItemsContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('movieScreenRowList');
@@ -34,7 +34,7 @@ describe('Homescreen Navigation - Movies Filter', function () {
   // https://tubi.testrail.io/index.php?/cases/view/76723
   it('C76723 - Movies Filter - When title is selected then corresponding details page displayed, @homescreen, @movies', async () => {
 
-    await testUtils.waitForAppLaunchBeaconToFire();
+    await testUtils.waitForApplicationStartup();
 
 
     // Check if Featured row contains all Movie titles ("v") titles

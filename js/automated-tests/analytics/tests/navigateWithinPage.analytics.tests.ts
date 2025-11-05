@@ -120,7 +120,7 @@ describe('Navigate Within Page', function () {
 		await testUtils.startApplicationAtPage('home', {
 			shouldCreateNewUser: false,
 		});
-		await testUtils.waitForAppLaunchBeaconToFire();
+		await testUtils.waitForApplicationStartup();
 		await testUtils.goToPage('network');
 		const categories = Categories();
 		await categories.pageDidLoad();

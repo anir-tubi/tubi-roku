@@ -24,7 +24,7 @@ describe('Settings', function () {
   it('C21252 - Terms of Service, @settings', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForAppLaunchBeaconToFire();
+    await testUtils.waitForApplicationStartup();
 
     // Go to Settings Page
     await ecp.sendKeypress(ecp.Key.Back, { count: 2 });

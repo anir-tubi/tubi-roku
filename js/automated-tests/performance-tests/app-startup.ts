@@ -3,19 +3,19 @@ import { performanceTestUtils } from '../performance-test-utils';
 import { testUtils } from '../test-utils';
 
 describe('app-startup', function () {
-  before(async function(){
+  before(async function () {
     // Waiting for the application to fully load and try and make/cache its initial network calls to hopefully remove some of the variability in subsequent run
     await performanceTestUtils.waitForNodeCountStability();
   });
 
 
-  afterEach(async function() {
+  afterEach(async function () {
     await odc.deleteNodeReferences();
     await odc.stopResponsivenessTesting();
   });
 
 
-  it('app_launch', async function() {
+  it('app_launch', async function () {
     // Next want to exit the application since deploying auto launches the application and we want to give a more stable boot than the initial deploy does
     await testUtils.exitApplication();
 
@@ -25,17 +25,17 @@ describe('app-startup', function () {
     await ecp.sendLaunchChannel();
     await odc.startResponsivenessTesting();
 
-    await testUtils.waitForAppLaunchBeaconToFire();
+    await testUtils.waitForApplicationStartup();
 
     // Start capturing our output data
     const outputData = {} as any;
     outputData.launchDuration = Date.now() - startTime;
 
-    const {testingTotals} = await odc.getResponsivenessTestingData();
+    const { testingTotals } = await odc.getResponsivenessTestingData();
     outputData.responsivenessTesting = testingTotals;
 
     // Waiting for all initial nodes to load to get a better idea of true node count and memory usage
-    const {totalNodes, nodeCountByType} = await performanceTestUtils.waitForNodeCountStability();
+    const { totalNodes, nodeCountByType } = await performanceTestUtils.waitForNodeCountStability();
 
     const chanperf = await ecp.getChanperf();
     outputData.memory = chanperf.plugin.memory;
@@ -47,7 +47,7 @@ describe('app-startup', function () {
   });
 
 
-  it('app_resume', async function() {
+  it('app_resume', async function () {
     const observeActiveEventPromise = odc.onFieldChangeOnce({
       base: 'global',
       keyPath: 'trackingLoggingTask.trackEvent',
@@ -74,7 +74,7 @@ describe('app-startup', function () {
     // Start capturing our output data
     const resumeDuration = Date.now() - startTime;
 
-    const {totalNodes, nodeCountByType} = await performanceTestUtils.waitForNodeCountStability();
+    const { totalNodes, nodeCountByType } = await performanceTestUtils.waitForNodeCountStability();
 
     const chanperf = await ecp.getChanperf();
     const outputData = {
@@ -88,9 +88,9 @@ describe('app-startup', function () {
   });
 
 
-  it('app_restart', async function() {
+  it('app_restart', async function () {
     // See how many nodes we started with
-    const {totalNodes: previousTotalNodes} = await odc.storeNodeReferences({includeNodeCountInfo: true});
+    const { totalNodes: previousTotalNodes } = await odc.storeNodeReferences({ includeNodeCountInfo: true });
     await odc.deleteNodeReferences();
 
     await ecp.sendKeypress(ecp.Key.Home);
@@ -107,7 +107,7 @@ describe('app-startup', function () {
       }
     });
 
-    await testUtils.waitForAppLaunchBeaconToFire();
+    await testUtils.waitForApplicationStartup();
 
     // Start capturing our output data
     const restartDuration = Date.now() - startTime;
@@ -119,7 +119,7 @@ describe('app-startup', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Waiting for all initial nodes to load to get a better idea of true node count and memory usage
-    const {totalNodes, nodeCountByType} = await performanceTestUtils.waitForNodeCountStability();
+    const { totalNodes, nodeCountByType } = await performanceTestUtils.waitForNodeCountStability();
 
     const chanperf = await ecp.getChanperf();
     const outputData = {

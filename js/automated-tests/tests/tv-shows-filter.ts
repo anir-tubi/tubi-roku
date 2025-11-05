@@ -23,7 +23,7 @@ describe('Homescreen Navigation - TV Shows Filter', function () {
   it('C63513 - TV Shows Filter - When tv show filter is triggered then only Series Titles are present, @homescreen, @tvshows', async () => {
 
 
-    await testUtils.waitForAppLaunchBeaconToFire();
+    await testUtils.waitForApplicationStartup();
 
     // Check if Featured row contains all Series titles
     const rowItemsContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('tvScreenRowList');
@@ -36,7 +36,7 @@ describe('Homescreen Navigation - TV Shows Filter', function () {
   // https://tubi.testrail.io/index.php?/cases/view/76733
   it('C76733 - TV Shows Filter - When history category displayed then all titles are series, @homescreen, @tvshows', async () => {
 
-    await testUtils.waitForAppLaunchBeaconToFire();
+    await testUtils.waitForApplicationStartup();
 
     // Scroll down to Continue Watching
     await testUtils.jumpToRowWithTitle('tvScreenRowList', 'Continue Watching');
@@ -56,7 +56,7 @@ describe('Homescreen Navigation - TV Shows Filter', function () {
   it('C538328 - Series Filter - When My List category displayed then all titles are series, @homescreen, @tvshows', async () => {
 
 
-    // await testUtils.waitForAppLaunchBeaconToFire();
+    // await testUtils.waitForApplicationStartup();
 
     // Scroll down to My List
     await testUtils.jumpToRowWithTitle('tvScreenRowList', 'My List');
@@ -75,7 +75,7 @@ describe('Homescreen Navigation - TV Shows Filter', function () {
   // https://tubi.testrail.io/index.php?/cases/view/538329
   it('C538329 - TV Shows Filter - When title is selected then corresponding details page displayed, @homescreen, @tvshows', async () => {
 
-    await testUtils.waitForAppLaunchBeaconToFire();
+    await testUtils.waitForApplicationStartup();
 
     // Check if Featured row contains all Series titles
     const tvShowsSeriesLabel = await testUtils.getNodeForElement('tvShowsSeriesLabel');

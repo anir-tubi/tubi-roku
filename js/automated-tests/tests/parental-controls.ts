@@ -7,7 +7,7 @@ import { shared } from '../shared';
 describe('Parental Controls', function () {
   before(async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForAppLaunchBeaconToFire();
+    await testUtils.waitForApplicationStartup();
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
 
@@ -46,7 +46,7 @@ describe('Parental Controls', function () {
   it('C537375 - Parental Settings - Teens - Deeplink Playback, @parental_controls', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForAppLaunchBeaconToFire();
+    await testUtils.waitForApplicationStartup();
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     await testUtils.goToPage('settings');
@@ -86,7 +86,7 @@ describe('Parental Controls', function () {
   it('C537405 - Parental Settings - Older Kids - Deeplink Playback, @parental_controls', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForAppLaunchBeaconToFire();
+    await testUtils.waitForApplicationStartup();
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     await testUtils.goToPage('settings');
@@ -119,7 +119,7 @@ describe('Parental Controls', function () {
   // https://tubi.testrail.io/index.php?/cases/view/535834
   it('C535834 - Categories Page - When setting is changed from Adult to Little Kids then the categories only for Little Kids are listed, @parental_controls', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForAppLaunchBeaconToFire();
+    await testUtils.waitForApplicationStartup();
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     await testUtils.goToPage('settings');
@@ -163,7 +163,7 @@ describe('Parental Controls', function () {
   it('C535835- Categories Page - When settings is changed from Adult to Older Kids then categories for Older kids are listed, @parental_controls', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForAppLaunchBeaconToFire();
+    await testUtils.waitForApplicationStartup();
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     await testUtils.goToPage('settings');
@@ -223,7 +223,7 @@ describe('Parental Controls', function () {
   it('C535836 - Categories Page - When settings is changed from Adult to Teens then categories for Teens are listed, @parental_controls', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForAppLaunchBeaconToFire();
+    await testUtils.waitForApplicationStartup();
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     await testUtils.goToPage('settings');
@@ -267,7 +267,7 @@ describe('Parental Controls', function () {
   it('C535864 - Parental Controls - Little Kids - When user switches Parental Control to Little Kids then a modal is presented/Exit Kids is grayed out, @parental_controls', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForAppLaunchBeaconToFire();
+    await testUtils.waitForApplicationStartup();
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     await testUtils.goToPage('settings');
@@ -300,7 +300,7 @@ describe('Parental Controls', function () {
   it('C6596 - Parental Controls - Little Kids - When user switches Parental Control to Older Kids then a modal is presented/Exit Kids is grayed out, @parental_controls', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForAppLaunchBeaconToFire();
+    await testUtils.waitForApplicationStartup();
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     await testUtils.goToPage('settings');
@@ -333,7 +333,7 @@ describe('Parental Controls', function () {
   it('C535866 - Parental Controls - Teens -  When user switches Parental Control to Teens then a modal is presented/Exit Kids is not present, @parental_controls', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForAppLaunchBeaconToFire();
+    await testUtils.waitForApplicationStartup();
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     await testUtils.goToPage('settings');
@@ -387,7 +387,7 @@ describe('Parental Controls', function () {
   it('C535868 - Parental Control - Change Before 5 minutes, @parental_controls', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForAppLaunchBeaconToFire();
+    await testUtils.waitForApplicationStartup();
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     await testUtils.goToPage('settings');
@@ -419,7 +419,7 @@ describe('Parental Controls', function () {
   it('C537901 - Search - Adult to Older Kids - When titles above Older Kids is searched then no results should be displayed, @parental_controls', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForAppLaunchBeaconToFire();
+    await testUtils.waitForApplicationStartup();
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     await testUtils.goToPage('settings');

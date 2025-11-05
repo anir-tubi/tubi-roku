@@ -7,7 +7,7 @@ import { count, timeEnd } from 'console';
 describe('Live', function () {
     beforeEach(async () => {
         await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-        await testUtils.waitForAppLaunchBeaconToFire();
+        await testUtils.waitForApplicationStartup();
         await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
     });
     // Let's investigate the preview player when the left nav is open here
@@ -36,15 +36,15 @@ describe('Live', function () {
         await startLiveFeed();
 
         // Verify that full linear video is playing
-        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen','playing',20000);
+        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 20000);
 
         // Go back to preview
         await utils.sleep(6000); // Waiting for full screen - improve
-        await ecp.sendKeypress(ecp.Key.Back, {count: 1});
+        await ecp.sendKeypress(ecp.Key.Back, { count: 1 });
 
         // Verify that linear preview video is playing
-        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen','playing',20000);
-        
+        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 20000);
+
     });
 
     // https://tubi.testrail.io/index.php?/cases/view/114053
@@ -57,20 +57,20 @@ describe('Live', function () {
         await startLiveFeed();
 
         // Verify that full linear video is playing
-        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen','playing',10000);
+        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 10000);
 
         // Navigate right after displaying the guide
         await ecp.sendKeypress(ecp.Key.Up);
         await utils.sleep(1000);
         await ecp.sendKeypress(ecp.Key.Right);
 
-         // Verify that linear video is still playing
-        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen','playing',10000);
+        // Verify that linear video is still playing
+        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 10000);
     });
 
     // https://tubi.testrail.io/index.php?/cases/view/114058
     it('C114058 - Live News - When a user changes channels during playback, playback for the updated channel should be near instantaneous @live', async () => {
- 
+
         // Navigate to the Live News Row
         await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
         await utils.sleep(2000);
@@ -94,26 +94,26 @@ describe('Live', function () {
 
     });
 
-    
-     // https://tubi.testrail.io/index.php?/cases/view/115290
-     it('C115290 -  Home Screen Automatic Small video transition to full screen view @live', async () => {
- 
+
+    // https://tubi.testrail.io/index.php?/cases/view/115290
+    it('C115290 -  Home Screen Automatic Small video transition to full screen view @live', async () => {
+
         // Navigate to the Live News Row
         await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
         await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
 
         // Verify that full video plays after preview video is playing
-        
-        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen','playing', 20000);
-     
+
+        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 20000);
+
         // Verify that full linear video is playing
-        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen','playing',20000);
-     });
+        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 20000);
+    });
 
     async function startLiveFeed() {
         await utils.sleep(1000);
         await ecp.sendKeypress(ecp.Key.Ok);
-        
+
     }
 
 });
