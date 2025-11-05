@@ -73,11 +73,12 @@ Function onSceneFocusedChildChanged()
     m.sceneLooseFocusTimer.control = "start"
     tubiLog("ContentController.onSceneFocusedChildChanged - Scene lost focus, starting timer")
   else if m.sceneLooseFocusTimer <> invalid then
+    m.sceneLooseFocusTimer.control = "stop"
+
     if m.sceneLooseFocusTimespan.totalMilliseconds() > 10 then
       onSceneLooseFocusTimerFired()
     end if
 
-    m.sceneLooseFocusTimer.control = "stop"
     m.sceneLooseFocusTimer = invalid
     m.sceneLooseFocusTimespan = invalid
   end if
