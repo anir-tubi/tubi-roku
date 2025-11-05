@@ -3507,6 +3507,9 @@ Function onLinearSignInComplete()
   if m.contentAfterSignIn <> invalid
     content = m.contentAfterSignIn
     m.contentAfterSignIn = invalid
+    popScreenAfterSignInProcess()
+    setContentToRefreshAllPersonalizedScreens(false)
+
     currentScreen = getCurrentScreen()
 
     playbackSource = {
@@ -3517,6 +3520,7 @@ Function onLinearSignInComplete()
     ' Now that user is signed in, select the linear content normally
     stopLinearVideoContent()
     playLinearVideoContent(content, false, currentScreen.id, true, playbackSource)
+    showHideSpinner(false)
   end if
 End Function
 
