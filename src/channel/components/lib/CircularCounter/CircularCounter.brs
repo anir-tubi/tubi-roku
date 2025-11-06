@@ -16,9 +16,6 @@ Function init()
   m.countdownTimer.repeat = true
   m.countdownTimer.observeField("fire", "onTimerFire")
 
-  ' Set translated "Starts in" text
-  m.startsInLabel.text = getTranslation("circular_counter_starts_in")
-
   ' Set typography/fonts
   typographyIds = getTypographyConstants().ids
   setTypographyOfLabel(m.startsInLabel, typographyIds.bodyExtraSmallStrong)
@@ -100,6 +97,8 @@ End Function
 
 Function onCountdownTextChanged()
   ' When countdownText is updated from outside, parse it and update internal state
+  ' Set translated "Starts in" text
+  m.startsInLabel.text = getTranslation("circular_counter_starts_in")
   countdownTextValue = m.top.countdownText
   if countdownTextValue <> ""
     m.currentCountdown = Val(countdownTextValue)
