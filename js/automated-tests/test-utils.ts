@@ -422,7 +422,8 @@ class TestUtils {
       'settings': 'Settings',
       'myStuff': 'My Stuff',
       'series': 'TV Shows',
-      'livefeed': 'Live TV'
+      'livefeed': 'Live TV',
+      'espanol': 'Español'
     };
 
     const selectedPage = pageTileMapping[page];

@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node:*)",
+      "Bash(npx mocha:*)",
+      "Bash(npx gulp:*)",
+      "Bash(RERUN_AUTOMATED_TESTS=true npx gulp runAutomatedTests:*)",
+      "Bash(pkill:*)",
+      "Bash(curl:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
