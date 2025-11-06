@@ -163,7 +163,10 @@ Function addControllerUi()
   m.inlinePreviewFocusIndicator = m.top.findNode("inlinePreviewFocusIndicator")
   m.inlineVideoMetadataOverlay = m.top.findNode("inlineVideoMetadataOverlay")
   m.videoTilesControlMetadata = m.top.findNode("videoTilesControlMetadata")
-  m.autoStartPreviewToPlaybackTimer = m.top.findNode("autoStartPreviewToPlaybackTimer")
+  m.autoStartPreviewToPlaybackTimer = createObject("roSGNode", "CircularCounter")
+  m.autoStartPreviewToPlaybackTimer.id = "autoStartPreviewToPlaybackTimer"
+  m.autoStartPreviewToPlaybackTimer.opacity = 0.0
+  m.contentGroup.appendChild(m.autoStartPreviewToPlaybackTimer)
 
   ' Video tiles experiment related node.
   ' Holds the poster for the video tile that is in transit.That is in case of user scrolling down next container poster vs previous container poster when scrolling up.

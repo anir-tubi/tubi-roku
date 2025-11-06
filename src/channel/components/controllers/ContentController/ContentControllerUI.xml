@@ -160,10 +160,6 @@ have been updated by ContentController
     <TrackingLoggingTask
       id="TrackingLoggingTask" />
 
-    <CircularCounter
-      opacity="0.0"
-      id="autoStartPreviewToPlaybackTimer" />
-
     <!-- The timer that is used to countdown when the minimized player goes fullscreen -->
     <Timer
       id="PlayerFullscreenCountdownTimer"
