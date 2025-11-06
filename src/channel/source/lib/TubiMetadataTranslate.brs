@@ -123,6 +123,8 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
   else if gridType = gridItemTypes.landscapeWithMetadata
     if canvasImages <> invalid AND type(canvasImages.hero_tb) = "roArray" AND isNonEmptyString(canvasImages.hero_tb[0])
       sThumbnailURL = canvasImages.hero_tb[0]
+    else if contentFromServer <> invalid AND isNonEmptyArray(contentFromServer.hero_images) = true
+      sThumbnailURL = contentFromServer.hero_images[0]
     end if
   else if gridType = gridItemTypes.spotlight
     if canvasImages <> invalid AND type(canvasImages.spotlight_landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.spotlight_landscape_tb[0])
@@ -139,6 +141,9 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
     end if
   else if gridType = gridItemTypes.billboard AND canvasImages <> invalid AND isNonEmptyArray(canvasImages.billboard_tb)
     sThumbnailURL = canvasImages.billboard_tb[0]
+    ' To cover a use case where tensor falls back to fail safe.
+  else if gridType = gridItemTypes.videoTile AND contentFromServer <> invalid AND isNonEmptyArray(contentFromServer.posterArts) = true
+    sThumbnailURL = contentFromServer.posterArts[0]
   end if
 
   '//Ensure thumbnails have rounded corners - will only work with Tupian URLs

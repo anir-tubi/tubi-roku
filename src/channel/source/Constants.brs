@@ -807,7 +807,7 @@ Function getConstants()
   constants.headers.platform = { "x-client-platform": constants.platform }
   constants.headers.clientVersion = { "x-client-version": constants.deviceInfo.clientVersion }
   constants.headers.tubiPlatform = { "X-TUBI-PLATFORM": constants.analyticsPlatform }
-  constants.headers.triggerFailSafe = { "X-TRIGGER-FAILSAFE": "GAME_DAY_EXPERIENCE" }
+  constants.headers.triggerFailSafe = { "X-TRIGGER-FAILSAFE": "true" }
 
   constants.headers.commonUapi = {}
   constants.headers.commonUapi.append(constants.headers.platform)

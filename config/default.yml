@@ -68,6 +68,10 @@ settings:
   # Setting the below value to true will turn on displaying the live events spotlight and banner on the home screen
   enableLiveEventsSpotlightAndBanner: false
 
+  # When set to true will pass a header to enable fail safe testing.
+  # This field is only used in controller scope.
+  enableFailSafe: false
+
   # Any configs added to the bs_const setting will be included in the various manifest
   # configurations via the handlebars templates
   bs_const:

@@ -90,6 +90,9 @@ Function init()
   m.isUserInVideoTiles = (experiment.design_type = "videoTiles")
   m.videoTilesVariant = experiment.variant
 
+  ' Creating a backup variable to check if user is in video tiles experiment, since we override value.
+  m.isUserInVideoTilesExperiment = m.isUserInVideoTiles
+
   m.videoTilesControlCategoryIds = []
   if isAA(experiment) = true AND isNonEmptyArray(experiment.controlCategoryIds) = true
     m.videoTilesControlCategoryIds = experiment.controlCategoryIds
@@ -1468,7 +1471,7 @@ End Function
 ' Kids mode is a special case where we want to disable the small portrait description experiment.
 Function onKidsModeChange(msg)
   kidsMode = msg.getData()
-  m.isUserInVideoTiles = (m.isUserInVideoTiles AND kidsMode = false)
+  m.isUserInVideoTiles = (m.isUserInVideoTilesExperiment AND kidsMode = false)
 End Function
 
 

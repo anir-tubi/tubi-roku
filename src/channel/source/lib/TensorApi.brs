@@ -28,6 +28,10 @@ Function tensorApi_commonOptions()
   end if
   headers.append(m.constants.headers.tubiPlatform)
 
+  if m.constants.settings.enableFailSafe = true
+    headers.append(m.constants.headers.triggerFailSafe)
+  end if
+
   options = {
     params: {
       "app_id": m.constants.settings.shortAppName
@@ -68,8 +72,8 @@ Function tensorApi_getEPGProgramReqInfo(contentIds)
   url = m.constants.urls.content.epgProgramContent
   options = m.commonOptions()
 
-  capability = formatJson({"program_title_differ_with_episode_title" :true})
-  options.headers.append({"x-capability": capability})
+  capability = formatJson({ "program_title_differ_with_episode_title": true })
+  options.headers.append({ "x-capability": capability })
 
   options.params["content_id"] = contentIdsString
   options.params["lookahead"] = 1
