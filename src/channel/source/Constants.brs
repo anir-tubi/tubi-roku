@@ -1533,6 +1533,8 @@ Function getConstants()
     constants.ui.imageSizes.fullScreenBackground = [1920, 1080]
   end if
 
+  constants.ui.imageSizes.controlLandscape = [360, 201]
+
   constants.ui.categoryMenuPanelList = {}
   constants.ui.categoryMenuPanelList.columnWidths = [384]
   constants.ui.categoryMenuPanelList.itemSize = [384, 72]
@@ -1623,6 +1625,7 @@ Function getConstants()
   constants.ui.gridItemTypes.liveEventSpotlight = "liveEventSpotlight"
   constants.ui.gridItemTypes.liveEventBanner = "liveEventBanner"
   constants.ui.gridItemTypes.billboard = "billboard"
+  constants.ui.gridItemTypes.controlLandscape = "controlLandscape"
 
   ' Holds the container ids which are not video tile containers.
   ' This will help us to avoid showing the expanded video tile.

@@ -106,6 +106,8 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
     end if
   else if gridType = gridItemTypes.videoTile AND canvasImages <> invalid AND isNonEmptyArray(canvasImages.video_tiles_portrait_tb) = true
     sThumbnailURL = canvasImages.video_tiles_portrait_tb[0]
+  else if gridType = gridItemTypes.controlLandscape AND canvasImages <> invalid AND isNonEmptyArray(canvasImages.control_landscape_tb) = true
+    sThumbnailURL = canvasImages.control_landscape_tb[0]
   else if gridType = gridItemTypes.landscape OR gridType = gridItemTypes.landscapeNoTitle OR gridType = gridItemTypes.landscapeInnerMetadata OR gridType = gridItemTypes.linear
     if canvasImages <> invalid AND type(canvasImages.landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.landscape_tb[0])
       '//A custom landscape size was requested, use this image instead of the default image
@@ -1429,6 +1431,15 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
   categoryParent.totalDuplicates = categoryChildrenInfo.totalDuplicates
   categoryChildrenCount = categoryParent.children.count()
 
+  if m.statSigExperiments <> invalid
+    experiment = m.statSigExperiments.getExperimentResource("roku_video_tiles", "roku_video_tiles_1_7")
+    tileDesignType = experiment.design_type
+    isUserInVideoTilesExp = (tileDesignType = "videoTiles") AND uiMode = "standard"
+    if isUserInVideoTilesExp = true AND container.id = m.constants.ui.categoryIds.recommendedForYou AND experiment.variant = "cinematicTop2Rows"
+      categoryParent.isControlLandscape = true
+    end if
+  end if
+
   ' container.cursor = invalid indicates we are dealing with response JSON
   ' from matrix/containers/:id or tensor/containers/:id endpoints.
   ' note: container.cursor = 0 for limitedUI model responses from
@@ -1717,6 +1728,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
 
           if isUserInVideoTilesExp = true
             featuredLandscape = m.getRoundedCornersURL(m.getThumbnailImage(fullChild, m.constants.ui.gridItemTypes.landscapeWithMetadata))
+            controlLandscape = m.getRoundedCornersURL(m.getThumbnailImage(fullChild, m.constants.ui.gridItemTypes.controlLandscape))
             childAA = {
               id: fullChild.id
               title: fullChild.title
@@ -1734,6 +1746,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
               userStarRating: rottenTomatoScore
               tileDesignType: tileDesignType
               featuredLandscape: featuredLandscape
+              controlLandscape: controlLandscape
               sotPosterLabels: sotPosterLabels
               sotInfo: sotInfo
               hasSubtitles: (fullChild.hasSubtitles = true OR fullChild.has_subtitle = true OR (fullChild.subtitleTracks <> invalid AND fullChild.subtitleTracks.isEmpty() = false))

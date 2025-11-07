@@ -628,6 +628,7 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
   featuredRowPoster = imageSizes.featuredRowPoster
   videoTilesPortrait = imageSizes.videoTilesPortrait
   billboard = imageSizes.billboard
+  controlLandscape = imageSizes.controlLandscape
 
   '//For now, ensure the large posters do not show up on the search screen
   isNonLargePostersScreen = (isNonEmptyString(screenId) = true AND screenId = m.constants.ui.screenIds.searchScreen)
@@ -649,6 +650,7 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
     videoTilesPortrait = m.convertImageSizeFor720p(videoTilesPortrait)
     fullScreenBackground = m.convertImageSizeFor720p(fullScreenBackground)
     skinAdLandscape = m.convertImageSizeFor720p(skinAdLandscape)
+    controlLandscape = m.convertImageSizeFor720p(controlLandscape)
   end if
 
   gridItemTypes = m.constants.ui.gridItemTypes
@@ -666,6 +668,7 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
     else if imageType = "featured"
       existingParams["images[hero_tb]"] = "w" + featuredRowPoster[0].ToStr() + "h" + featuredRowPoster[1].ToStr() + "_hero"
       existingParams["images[video_tiles_portrait_tb]"] = "w" + videoTilesPortrait[0].ToStr() + "h" + videoTilesPortrait[1].ToStr() + "_poster"
+      existingParams["images[control_landscape_tb]"] = "w" + controlLandscape[0].ToStr() + "h" + controlLandscape[1].ToStr() + "_hero"
     else if imageType = "background"
       if containerGridItemType <> gridItemTypes.skinAd
         existingParams["images[background_tb]"] = "w" + background[0].ToStr() + "h" + background[1].ToStr() + "_background"

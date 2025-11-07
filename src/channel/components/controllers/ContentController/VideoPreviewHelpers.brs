@@ -599,7 +599,7 @@ Function renderAutoStartPlaybackFromPreviewCounter(contentFocused, position, dur
       m.autoStartPreviewToPlaybackTimer.translation = [1920 - width - 66, currentScreen.featuredRowListTranslation[1] - 40]
     else
       m.autoStartPreviewToPlaybackTimer.reParent(m.inlineVideoPreviewPlayerContainer, false)
-      m.autoStartPreviewToPlaybackTimer.translation = [581, 16]
+      m.autoStartPreviewToPlaybackTimer.translation = [612, 24]
     end if
 
     fade(m.autoStartPreviewToPlaybackTimer, "in", 0.3)

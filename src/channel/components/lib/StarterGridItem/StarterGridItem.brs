@@ -210,11 +210,17 @@ Function onItemContentChange(msg)
       end if
     end if
 
+
     requiresParenting = false
 
     if m.availabilityBadge <> invalid
       m.top.removeChild(m.availabilityBadge)
       m.availabilityBadge = invalid
+    end if
+
+    if m.titleLabelGroup <> invalid
+      m.top.removeChild(m.titleLabelGroup)
+      m.titleLabelGroup = invalid
     end if
 
     if childGridItemComponent = invalid then
@@ -225,9 +231,17 @@ Function onItemContentChange(msg)
         m.delete("childGridItem")
       end if
 
-      sPosterURL = itemContent.HDGRIDPOSTERURL
+      if row <> invalid AND row.isControlLandscape = true
+        sPosterURL = itemContent.controlLandscape
+      else
+        sPosterURL = itemContent.HDGRIDPOSTERURL
+      end if
       m.poster.uri = sPosterURL
       m.poster.visible = true
+
+      if row <> invalid AND row.isControlLandscape = true
+        createTitleLabel()
+      end if
     else
       m.poster.visible = false
       if m.childGridItem = invalid then
@@ -463,5 +477,48 @@ Function onRenderTrackingChange(msg)
       m.itemVisibleTimespan = invalid
     end if
   end if
+End Function
+
+
+Function createTitleLabel()
+  titleLabelGroup = createObject("roSGNode", "Group")
+  titleLabelGroup.id = "titleLabelGroup"
+
+  gradient = createObject("roSGNode", "Poster")
+  gradient.update({
+    id: "titleLabelGradient"
+    uri: "pkg:/images/video_in_grid_gradient_$$RES$$.9.png"
+    translation: [0, m.poster.height - 120]
+    width: m.poster.width
+    height: 120
+    loadDisplayMode: "scaleToFill"
+    loadSync: true
+  })
+  titleLabelGroup.appendChild(gradient)
+
+  if m.subheaderSmallFont = invalid
+    typographyConstants = getTypographyConstants()
+    m.subheaderSmallFont = typographyConstants.ids.subheaderSmall
+  end if
+
+  titleLabel = createObject("roSGNode", "Label")
+  setTypographyOfLabel(titleLabel, m.subheaderSmallFont)
+  titleLabel.update({
+    id: "titleLabel"
+    color: m.primaryTextColor
+    maxLines: 2
+    numLines: 2
+    height: 80
+    lineSpacing: 6
+    width: m.poster.width - 35
+    wrap: true
+    vertAlign: "bottom"
+    text: m.top.itemContent.title
+    translation: [15, m.poster.height - 86]
+  })
+
+  titleLabelGroup.appendChild(titleLabel)
+  m.top.appendChild(titleLabelGroup)
+  m.titleLabelGroup = titleLabelGroup
 End Function
 

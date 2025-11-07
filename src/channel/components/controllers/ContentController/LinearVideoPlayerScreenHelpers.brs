@@ -996,6 +996,9 @@ Function switchLinearToInlineGridMode(linearPlayer)
 
   linearPlayer.unObserveFieldScoped("state")
   linearPlayer.observeFieldScoped("state", "onLinearInlineVideoPlayerStateWhileInMinState")
+
+  m.autoStartPreviewToPlaybackTimer.reParent(m.inlineVideoPreviewPlayerContainer, false)
+  m.autoStartPreviewToPlaybackTimer.translation = [624, 24]
 End Function
 
 

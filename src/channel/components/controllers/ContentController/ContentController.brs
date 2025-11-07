@@ -185,12 +185,11 @@ Function addControllerUi()
   else if m.videoTilesVariant = "trueControlTop2Rows"
     m.videoTilesControlMetadata.translation = [168, 138]
     m.videoTilesControlMetadata.width = 960
+    m.autoStartPreviewToPlaybackTimer.visible = false
   else
     m.videoTilesControlMetadata.translation = [168, 431]
     m.videoTilesControlMetadata.width = 1056
   end if
-
-
 
   ' Using clipping rect to ensure that when scrolling up the video tile gets clipped along with the rest of the row list tiles
   m.videoTileOverlayGroup.clippingRect = [videoTilesListTranslation[0], videoTilesListTranslation[1], 1920, 1080]
@@ -2420,7 +2419,13 @@ Function onFullscreenCountdown()
         nNewCount = nCurrentCount - 1
         screen.fullscreenCountdown = nNewCount
         if nNewCount <= 0
+          fade(m.autoStartPreviewToPlaybackTimer, "out", 0.1)
           selectLinearContent(contentToPlay)
+        end if
+
+        if m.isUserInVideoTilesExperiment = true AND screen.id = m.constants.ui.screenIds.homeScreen
+          fade(m.autoStartPreviewToPlaybackTimer, "in", 0.1)
+          m.autoStartPreviewToPlaybackTimer.countdownText = nNewCount.ToStr()
         end if
       end if
     end if

@@ -364,15 +364,8 @@ End Function
 
 Function adjustPosterBottomContentTranslation()
   height = m.bottomContentGroup.boundingRect().height
-  ' Handling a case where top row above featured is not video tile like event spotlight or skin ads.
-  isBillboardRow = m.variant = "billboard" AND m.top.containerIndex <= m.top.billboardContainerIndex
   containerHeight = m.top.height
-  translationX = 15
-  if isBillboardRow = true
-    containerHeight = m.billboardSize[1]
-    translationX = 33
-  end if
-  m.bottomContentGroup.translation = [translationX, containerHeight - height - 24]
+  m.bottomContentGroup.translation = [15, containerHeight - height - 12]
 End Function
 
 
