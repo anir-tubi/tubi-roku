@@ -60,6 +60,14 @@
         <LayoutGroup
           id="subHeadlineSuffixGroup"
           layoutDirection="horiz" />
+        <Poster
+          id="ClosedCaptionPoster"
+          visible="false"
+          uri="pkg:/images/icon-closed-caption.webp"
+          height="36"
+          width="36"
+          loadDisplayMode="scaleToFit"
+          loadSync="true" />
         <Group
           id="Rating">
           <Poster
@@ -82,14 +90,6 @@
         </Group>
         <Badge
           id="sotBadge" />
-        <Poster
-          id="ClosedCaptionPoster"
-          visible="false"
-          uri="pkg:/images/icon-closed-caption.webp"
-          height="36"
-          width="36"
-          loadDisplayMode="scaleToFit"
-          loadSync="true" />
         <Poster
           id="tubiPresentsLogo"
           height="27"

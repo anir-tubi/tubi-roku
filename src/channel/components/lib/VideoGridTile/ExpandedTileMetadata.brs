@@ -322,9 +322,18 @@ Function metadataOnPosterContent(itemContent)
   end if
 
   if itemContent.hasSubtitles = true
+    if m.closedCaptions.getParent() = invalid
+      index = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.rating)
+      ' Which means rating is not present in the first line group.
+      ' As a fallback displaying in a fixed position.
+      if index = -1
+        index = 2
+      end if
+      m.firstLineGroup.insertChild(m.closedCaptions, index)
+    end if
     m.closedCaptions.visible = true
   else
-    m.closedCaptions.visible = false
+    m.firstLineGroup.removeChild(m.closedCaptions)
   end if
 End Function
 
