@@ -23,7 +23,13 @@ function execShellCommand(done, command, defaultErrorMsg) {
 
   if (commandRes.code) {
     const errorMsg = commandRes.stderr ? commandRes.stderr : defaultErrorMsg;
-    done(new NoStackError(errorMsg));
+    // Only call done if it's provided (for async contexts without done callback)
+    if (done) {
+      done(new NoStackError(errorMsg));
+    } else {
+      log(errorMsg);
+      return ''; // Return empty string so .trim() won't fail in calling code
+    }
   } else {
     return commandRes.stdout;
   }
@@ -37,7 +43,7 @@ function execShellCommand(done, command, defaultErrorMsg) {
 function spawnShellCommand(done, command, allowNonzeroExitCode = false) {
   log(`Performing: ${command}`);
   return new Promise((resolve) => {
-    const process = spawn(command, {stdio: 'inherit', shell: true});
+    const process = spawn(command, { stdio: 'inherit', shell: true });
     process.on('close', (code) => {
       if (code === 0 || allowNonzeroExitCode) {
         resolve(code);
@@ -56,14 +62,14 @@ function spawnShellCommand(done, command, allowNonzeroExitCode = false) {
 */
 function writeJSONToFile(data, filePath) {
   try {
-      // Stringify the JSON. Format it using tab to make it readable. Tab is used by the original Design JSON - which this function is used for.
-      const jsonData = JSON.stringify(data, null, '\t');
+    // Stringify the JSON. Format it using tab to make it readable. Tab is used by the original Design JSON - which this function is used for.
+    const jsonData = JSON.stringify(data, null, '\t');
 
-      fs.writeFileSync(filePath, jsonData);
-      log(`JSON data successfully written to ${filePath}`);
+    fs.writeFileSync(filePath, jsonData);
+    log(`JSON data successfully written to ${filePath}`);
   } catch (error) {
-      log(`Error: An error occurred while writing the JSON data from the filepath:', ${filePath}`);
-      throw(error);
+    log(`Error: An error occurred while writing the JSON data from the filepath:', ${filePath}`);
+    throw (error);
   }
 }
 

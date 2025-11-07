@@ -23,7 +23,7 @@ const { createManifest, createSettings } = require('./js/build');
 const { keypress, deeplink, uploadPkg, signPkg, installWithSquashfs } = require('./js/network');
 
 //Functions to upload and download static string translations
-const { compareTranslations, downloadAndProcessTranslations, updateLocalTranslations, uploadTranslations } = require('./js/translate');
+const { uploadLatestTranslationsAndCreateTicketForMissingTranslations, downloadAndProcessTranslations, updateLocalTranslations, uploadTranslations } = require('./js/translate');
 const { listUnusedImages, listUnusedTranslations } = require('./js/codeclean.js');
 const { replaceColorConstants, updateColorJSON } = require('./js/colorreplace.js');
 const { replaceTypographyConstants, updateTypographyJSON } = require('./js/typography.js');
@@ -32,7 +32,7 @@ const { replaceTypographyConstants, updateTypographyJSON } = require('./js/typog
 const { NoStackError } = require('./js/utilities');
 
 // Importing functions with Git functionality
-const { makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges, buildQaBranch, bumpBuild, bumpBuildTen, bumpRevision, tagBuild, createCdnPullRequestForOneTrustSDK, createCdnPullRequestForFoxVideoPlayer, sendSlackReminders, getCurrentBranch, isBranchTrackingPresent } = require('./js/git');
+const { makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges, buildQaBranch, bumpBuild, bumpBuildTen, bumpRevision, tagBuild, createCdnPullRequestForOneTrustSDK, createCdnPullRequestForFoxVideoPlayer, sendSlackReminders, getCurrentBranch, isBranchTrackingPresent, createTranslationsPullRequestIfChanges } = require('./js/git');
 
 // Importing functions related to Github action runners
 const { setupAutomatedTestsGithubActionRunner, startAutomatedTestsGithubActionRunner, removeAutomatedTestsGithubActionRunner } = require('./js/action-runner');
@@ -1159,9 +1159,9 @@ exports.bumpQa = exports.bumpQA; //Create bumpQA command alias
 exports.install = series(exports.build, conditionalPackage, sideLoad);
 exports.test = series(setTest, clean, preprocessTests, buildInstalled, sideLoad);
 exports.buildQaBranch = buildQaBranch;
-exports.stage = series(validateBuildEnvironment, verifyLocalClientErrorConfigIsCurrent, compareTranslations, setStaging, bumpRevision, exports.build, packageAll, pushStaging, pushBranch);
+exports.stage = series(validateBuildEnvironment, verifyLocalClientErrorConfigIsCurrent, uploadLatestTranslationsAndCreateTicketForMissingTranslations, setStaging, bumpRevision, exports.build, packageAll, pushStaging, pushBranch);
 exports.releaseOnGithub = series(tagBuild, pushTag, createGithubRelease);
-exports.release = series(validateBuildEnvironment, confirmRelease, verifyLocalClientErrorConfigIsCurrent, compareTranslations, setProduction, bumpBuild, exports.build, packageAll, makeReleasePrs, exports.releaseOnGithub, sendSlackReminders);
+exports.release = series(validateBuildEnvironment, confirmRelease, verifyLocalClientErrorConfigIsCurrent, setProduction, bumpBuild, exports.build, packageAll, makeReleasePrs, exports.releaseOnGithub, sendSlackReminders);
 exports.compareProd = findCommitsNotOnProductionBranch;
 exports.compareCheckedOut = findCommitsNotOnCurrentBranch;
 exports.addMissingImages = addMissingImagesToRemoteLibrary;
@@ -1282,7 +1282,9 @@ exports.removeAutomatedTestsRunner = removeAutomatedTestsGithubActionRunner;
 exports.updateLocalTranslations = updateLocalTranslations;
 exports.uploadTranslations = series(updateLocalTranslations, uploadTranslations);
 exports.downloadTranslations = downloadAndProcessTranslations;
-exports.compareTranslations = compareTranslations;
+exports.uploadLatestTranslationsAndCreateTicketForMissingTranslations = uploadLatestTranslationsAndCreateTicketForMissingTranslations;
+// Downloads translations from Crowdin and creates a pull request only if there are changes (typically triggered by GitHub Actions)
+exports.updateTranslations = series(downloadAndProcessTranslations, createTranslationsPullRequestIfChanges);
 
 exports.updateJsonTypography = updateTypographyJSON;
 exports.updateJsonColor = updateColorJSON;

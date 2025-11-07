@@ -38,6 +38,36 @@ function octokit() {
   return _octokit;
 }
 
+/**
+ * Send a message to Slack webhook
+ * @param {string} message - The message to send to Slack
+ * @param {string} webhookUrl - Optional custom webhook URL. Uses ROKU_RELEASE_WEBHOOK env var if not provided
+ * @returns {Promise} - Resolves when message is sent
+ */
+async function sendSlackMessage(message, webhookUrl = null) {
+  const webHookUrl = webhookUrl || process.env.ROKU_RELEASE_WEBHOOK;
+
+  if (!webHookUrl) {
+    log('No Slack webhook URL provided. Skipping Slack notification.');
+    return;
+  }
+
+  try {
+    await webFetch(webHookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        text: message,
+      }),
+    });
+    log('Slack notification sent successfully.');
+  } catch (error) {
+    log(`Failed to send Slack notification: ${error.message}`);
+  }
+}
+
 
 // ensure git exists on the system and that the working directory is clean
 function verifyGit(done, directory = '') {
@@ -497,15 +527,7 @@ async function sendSlackReminders(done) {
       const message = `<@${memberId}> , Please create the experiment if needed for : \n\`\`\`  ${prReleaseNotes}\`\`\``;
 
       //post and forget
-      webFetch(webHookUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          text: message,
-        }),
-      });
+      sendSlackMessage(message, webHookUrl);
     }
 
   }
@@ -1056,12 +1078,289 @@ async function buildQaBranch(done) {
   done();
 }
 
+
+/**
+ * Processes Jira labels from environment variable for use in GitHub PR
+ * 
+ * This function parses labels from the JIRA_LABELS environment variable (which can be in JSON array
+ * format or comma-separated string format) and filters out unwanted labels. Specifically, it removes
+ * the "Localization" label since that's Jira-specific and not relevant for GitHub PRs.
+ * 
+ * The function is resilient to different input formats:
+ * - JSON array: ["Localization", "preview_improvements", "urgent"]
+ * - Comma-separated string: "Localization, preview_improvements, urgent"
+ * 
+ * @returns {Array<string>} Array of filtered label names to apply to the GitHub PR, with "Localization" 
+ *                          and empty strings removed. Returns empty array if no valid labels found.
+ * @example
+ * // Input: JIRA_LABELS = "Localization, preview_improvements, urgent"
+ * // Returns: ["preview_improvements", "urgent"]
+ */
+function processJiraLabelsForPR() {
+  const jiraLabelsEnv = process.env.JIRA_LABELS;
+
+  if (!jiraLabelsEnv) {
+    return [];
+  }
+
+  try {
+    // Parse labels (can be comma-separated string or JSON array)
+    let jiraLabels = [];
+    try {
+      // Try parsing as JSON first
+      jiraLabels = JSON.parse(jiraLabelsEnv);
+    } catch {
+      // Fall back to comma-separated string
+      jiraLabels = jiraLabelsEnv.split(',').map(label => label.trim());
+    }
+
+    // Filter out "Localization" label and empty strings
+    const prLabels = jiraLabels
+      .filter(label => label && label.toLowerCase() !== 'localization');
+
+    if (prLabels.length > 0) {
+      log(`Labels to add to PR: ${prLabels.join(', ')}`);
+    }
+
+    return prLabels;
+  } catch (error) {
+    log(`Warning: Could not parse Jira labels: ${error.message}`);
+    return [];
+  }
+}
+
+
+/**
+ * Checks if there are changes to the translation file and only creates PR if changes exist
+ * This is a wrapper that performs an early check before going through the entire PR creation process
+ * @param {Function} done - Gulp callback function
+ */
+async function createTranslationsPullRequestIfChanges(done) {
+  // Check if the translation file has changes first
+  log('Checking for translation file changes...');
+  const statusResult = shell.exec('git status --porcelain src/channel/source/lib/TubiLanguageTranslate.brs');
+  if (!statusResult.stdout.trim()) {
+    log('No changes detected in TubiLanguageTranslate.brs. Skipping PR creation.');
+    done();
+    return;
+  }
+
+  log('Changes detected in TubiLanguageTranslate.brs. Proceeding with PR creation...');
+  await createTranslationsPullRequest(done);
+}
+
+
+/**
+ * Create a pull request for automatic translation updates
+ * This function creates a new branch from master, commits the translation file, and opens a PR
+ * @param {Function} done - Gulp callback function
+ */
+async function createTranslationsPullRequest(done) {
+  try {
+    log('Starting PR creation process...');
+
+    // Get current date for branch name
+    const date = new Date();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const branchName = `translations_update_${month}_${day}`;
+
+    log(`Creating translations update branch: ${branchName}`);
+
+    // Ensure we have the latest master branch from remote
+    // Configure git user for CI environments (GitHub Actions, etc.) if not already set
+    const gitEmail = shell.exec('git config user.email', { silent: true });
+    const gitName = shell.exec('git config user.name', { silent: true });
+
+    if (!gitEmail.stdout.trim()) {
+      shell.exec('git config user.email "roku-crowdin-auto-bot@users.noreply.github.com"', { silent: true });
+    }
+
+    if (!gitName.stdout.trim()) {
+      shell.exec('git config user.name "roku-crowdin-auto-bot"', { silent: true });
+    }
+
+    log('Fetching latest changes from remote...');
+    const fetchResult = shell.exec('git fetch origin master');
+    if (fetchResult.code !== 0) {
+      log.error(`Git fetch failed with exit code: ${fetchResult.code}`);
+      log.error(`stderr: ${fetchResult.stderr}`);
+      log.error(`stdout: ${fetchResult.stdout}`);
+      done(new NoStackError(`Failed to fetch from origin. Exit code: ${fetchResult.code}. Error: ${fetchResult.stderr || fetchResult.stdout}`));
+      return;
+    }
+
+    // Checkout master branch (or create it from origin/master if it doesn't exist locally)
+    log('Checking out master branch...');
+    let checkoutResult = shell.exec('git checkout master');
+    if (checkoutResult.code !== 0) {
+      // Check if master branch exists locally
+      const branchExists = shell.exec('git rev-parse --verify master', { silent: true });
+
+      if (branchExists.code !== 0) {
+        // Branch doesn't exist, create it from origin/master
+        log('Local master branch does not exist, creating from origin/master...');
+        checkoutResult = shell.exec('git checkout -b master origin/master');
+      } else {
+        // Branch exists but checkout failed, try force checkout
+        log('Master branch exists but checkout failed, attempting force checkout...');
+        checkoutResult = shell.exec('git checkout -f master');
+      }
+
+      if (checkoutResult.code !== 0) {
+        log.error(`Git checkout failed with exit code: ${checkoutResult.code}`);
+        log.error(`stderr: ${checkoutResult.stderr}`);
+        log.error(`stdout: ${checkoutResult.stdout}`);
+        done(new NoStackError(`Failed to checkout master branch. Exit code: ${checkoutResult.code}. Error: ${checkoutResult.stderr || checkoutResult.stdout}`));
+        return;
+      }
+    }
+
+    // Pull latest from master
+    log('Pulling latest changes from master...');
+    const pullResult = shell.exec('git pull origin master');
+    if (pullResult.code !== 0) {
+      log.error(`Git pull failed with exit code: ${pullResult.code}`);
+      log.error(`stderr: ${pullResult.stderr}`);
+      log.error(`stdout: ${pullResult.stdout}`);
+      done(new NoStackError(`Failed to pull latest changes from master. Exit code: ${pullResult.code}. Error: ${pullResult.stderr || pullResult.stdout}`));
+      return;
+    }
+
+    // Delete branch locally if it exists (fails silently if it doesn't)
+    log(`Ensuring branch ${branchName} doesn't exist locally...`);
+    shell.exec(`git branch -D ${branchName}`, { silent: true });
+
+    // Delete branch remotely if it exists (fails silently if it doesn't)
+    log(`Ensuring branch ${branchName} doesn't exist remotely...`);
+    shell.exec(`git push origin --delete ${branchName}`, { silent: true });
+
+    // Create new branch from master
+    const createBranchResult = shell.exec(`git checkout -b ${branchName}`);
+    if (createBranchResult.code !== 0) {
+      log.error(`Git checkout -b failed with exit code: ${createBranchResult.code}`);
+      log.error(`stderr: ${createBranchResult.stderr}`);
+      log.error(`stdout: ${createBranchResult.stdout}`);
+      done(new NoStackError(`Failed to create branch ${branchName}. Exit code: ${createBranchResult.code}. Error: ${createBranchResult.stderr || createBranchResult.stdout}`));
+      return;
+    }
+
+    log(`Successfully created branch ${branchName}`);
+
+    // Commit the translation file changes
+    const commitMessage = 'updated translations';
+    log(`Committing translation changes with message: "${commitMessage}"`);
+
+    const commitResult = shell.exec(`git commit -m "${commitMessage}" src/channel/source/lib/TubiLanguageTranslate.brs`);
+    if (commitResult.code !== 0) {
+      log.error(`Git commit failed with exit code: ${commitResult.code}`);
+      log.error(`stderr: ${commitResult.stderr}`);
+      log.error(`stdout: ${commitResult.stdout}`);
+      done(new NoStackError(`Failed to commit translation changes. Exit code: ${commitResult.code}. Error: ${commitResult.stderr || commitResult.stdout}`));
+      return;
+    }
+
+    // Push the branch to remote
+    log(`Pushing branch ${branchName} to remote...`);
+    const pushResult = shell.exec(`git push -u origin ${branchName}`);
+    if (pushResult.code !== 0) {
+      log.error(`Git push failed with exit code: ${pushResult.code}`);
+      log.error(`stderr: ${pushResult.stderr}`);
+      log.error(`stdout: ${pushResult.stdout}`);
+      done(new NoStackError(`Failed to push branch ${branchName} to remote. Exit code: ${pushResult.code}. Error: ${pushResult.stderr || pushResult.stdout}`));
+      return;
+    }
+    log(`Successfully pushed branch ${branchName} to remote`);
+
+    // Create pull request using GitHub API
+    log('Creating pull request...');
+
+    // Get Jira ticket number from environment variable if available
+    const jiraTicketNumber = process.env.JIRA_TICKET_NUMBER;
+
+    // Build PR title with optional Jira ticket reference
+    let prTitle = commitMessage;
+    if (jiraTicketNumber) {
+      prTitle = `${commitMessage} - ${jiraTicketNumber}`;
+      log(`Including Jira ticket reference: ${jiraTicketNumber}`);
+    }
+
+    // Build PR body with optional Jira ticket link
+    const prBodyParts = [];
+
+    if (jiraTicketNumber) {
+      prBodyParts.push(`**Related Jira Ticket:** [${jiraTicketNumber}](https://tubitv.atlassian.net/browse/${jiraTicketNumber})`);
+      prBodyParts.push('');
+    }
+
+    prBodyParts.push(
+      '## Release Notes',
+      '',
+      '---',
+      '',
+      '## QA What Changed',
+      '',
+      '---',
+      '',
+      '## QA Testing Steps',
+      '',
+      '---',
+      ''
+    );
+
+    const prBody = prBodyParts.join('\n');
+
+    // Process labels from Jira
+    const prLabels = processJiraLabelsForPR();
+
+    // Create PR with labels included
+    const prCreateOptions = {
+      owner: ghInfo.owner,
+      repo: ghInfo.rokuRepo,
+      title: prTitle,
+      body: prBody,
+      head: branchName,
+      base: 'master'
+    };
+
+    // Add labels if we have any
+    if (prLabels.length > 0) {
+      prCreateOptions.labels = prLabels;
+    }
+
+    const prResponse = await octokit().pulls.create(prCreateOptions);
+
+    const prUrl = prResponse.data.html_url;
+    log(`✅ Successfully created pull request: ${prUrl}`);
+
+    // Copy PR URL to clipboard
+    try {
+      clipboardy.writeSync(prUrl);
+      log('PR URL copied to clipboard!');
+    } catch (e) {
+      // Clipboard copy is not critical, continue
+      log('Could not copy to clipboard');
+    }
+
+    // Switch back to master
+    log('Switching back to master branch...');
+    shell.exec('git checkout master');
+
+    done();
+  } catch (error) {
+    log(`Error creating translations pull request: ${error.message}`);
+    done(new NoStackError(error.message));
+  }
+}
+
+
 module.exports = {
   verifyGit,
   makeReleasePrs,
   pushTag,
   createGithubRelease,
   sendSlackReminders,
+  sendSlackMessage,
   findCommitsNotOnProductionBranch,
   findCommitsNotOnCurrentBranch,
   addMissingImagesToRemoteLibrary,
@@ -1078,5 +1377,7 @@ module.exports = {
   createCdnPullRequestForOneTrustSDK,
   getCurrentBranch,
   isBranchTrackingPresent,
-  createCdnPullRequestForFoxVideoPlayer
+  createCdnPullRequestForFoxVideoPlayer,
+  createTranslationsPullRequest,
+  createTranslationsPullRequestIfChanges
 };

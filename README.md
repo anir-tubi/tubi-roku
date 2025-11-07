@@ -73,7 +73,9 @@ When asked to set up a dev password, use "1234" so it's easier for any developer
   - Only select the "repo" scope and "repo" sub scopes.
   - Copy the token, as you will not be able to see it again once you leave the page.
 
-10\. Set the build environment. Add the following environment variables to the appropriate shell configuration file:
+10\. Create Jira Token by visiting https://id.atlassian.com/manage-profile/security/api-tokens.
+
+11\. Set the build environment. Add the following environment variables to the appropriate shell configuration file:
 
 - .zprofile for ZSH (ZSH is the default shell for new Macs.)
 - .bash_profile for BASH on Macs
@@ -88,9 +90,11 @@ export RCDN_GIT_DIRECTORY="<path to the rcdn repo directory ex: ~/dev/rcdn>"
 export GITHUB_PAT="<github personal access token>"
 export ROKU_DEV_TELNET="sametab" (optional)
 export AWS_PROFILE=main-roku-dev
+export JIRA_TOKEN="<jira personal api token>"
+export JIRA_EMAIL="<personal jira account email>"
 ```
 
-11\. Create a `dev.yml` file in your `config` directory. Use the existing `dev.yml.example` file as a template.
+12\. Create a `dev.yml` file in your `config` directory. Use the existing `dev.yml.example` file as a template.
 
 -----
 
@@ -797,6 +801,30 @@ During the `gulp stage` and `gulp release` commands, there will be a few compari
   gulp compareTranslations --crowdinToken "TOKEN"
   ```
 
+## Automated Translation Workflow
+
+The `updateTranslations` command automates the entire translation update process, from downloading translations to creating a pull request.
+
+### Quick Start
+
+```shell
+gulp updateTranslations
+```
+
+### What It Does
+
+This automated workflow performs the following steps:
+
+1. **Downloads translations** from Crowdin (waits for build completion if needed)
+2. **Processes translation files** and updates `TubiLanguageTranslate.brs`
+3. **Creates a new branch** named `translations_update_{MM}_{DD}` from `master`
+4. **Commits changes** with message "updated translations"
+5. **Pushes to remote** and creates a pull request automatically
+6. **PR includes**:
+   - Summary of what changed
+   - QA testing steps template
+   - Release notes template
+   
 NOTE: Instead of passing the crowdin token, you can set the crowdin token as a system environment variable labeled as "ROKU_CROWDIN_TOKEN". This is actually the preferred way. Check your system on how to create an environment variable. Also note, that the Crowdin personal access token is created under your [Crowdin profile](https://crowdin.com/settings#api-key).
 
 After some time of features being added/removed, some translations may no longer be needed. The following command line script should be used to check for any unnecessary translations. A PR should then be created to remove these no longer-needed translations. Please note that the script also displays other potentially unnecessary things in the codebase: i.e. images.

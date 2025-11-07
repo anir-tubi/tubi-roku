@@ -1,0 +1,33 @@
+# .github/workflows/download-translations.yml
+name: Download Translations
+
+on:
+  repository_dispatch:
+    types: [jira-translation-done]
+  workflow_dispatch:  # Manual trigger option
+
+jobs:
+  download-translations:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.ROKU_AUTO_PAT }}
+          fetch-depth: 0  # Fetch all history for all branches
+      
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install dependencies
+        run: npm install
+      
+      - name: Update translations and create PR
+        env:
+          ROKU_CROWDIN_TOKEN: ${{ secrets.ROKU_CROWDIN_TOKEN }}
+          GITHUB_PAT: ${{ secrets.ROKU_AUTO_PAT }}
+          JIRA_TICKET_NUMBER: ${{ github.event.client_payload.ticket_number }}
+          JIRA_LABELS: ${{ github.event.client_payload.labels }}
+        run: npx gulp updateTranslations

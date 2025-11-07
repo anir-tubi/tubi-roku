@@ -2,9 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 const log = require('fancy-log');
-const {NoStackError} = require('./utilities');
-const {fetchJSON} = require('./network');
+const { NoStackError } = require('./utilities');
+const { fetchJSON } = require('./network');
+const { getCurrentBranch } = require('./git');
 const prompts = require('prompts');
+const axios = require('axios').default;
 
 /* Allow the crowdinK token to be driven from an environment variable or thru command line param.
    Environment variables are set on options, along with any parameters passed in
@@ -45,7 +47,7 @@ const arg = (argList => {
     }
   }
 
-  if(arg["crowdinToken"] !== undefined){
+  if (arg["crowdinToken"] !== undefined) {
     crowdinConfig["crowdinToken"] = arg["crowdinToken"]
   }
 })(process.argv);
@@ -113,13 +115,13 @@ async function processTranslationFiles(directory) {
 
           //remove any translation that are empty strings
           const jsonString = removeEmptyTranslations(localeData)
-          
+
           // write the contents of the translation json to the appropriate function
           // in the TubiLanguageTranslate.brs file
           writeLocaleDataToBRS_sync(sLocale, jsonString);
 
           sLocale = sLocale.toLowerCase();
-          if (sLocale !== 'en-us' && sLocale !== 'en_us'){
+          if (sLocale !== 'en-us' && sLocale !== 'en_us') {
             //Let's delete the translation JSON file that was just downloaded, but let's not
             //delete the default US English translation if for some reason the US English is downloaded.
             //The US English file should not download from crowdin, but just in case, we should not delete it as we should keep the US English file in the project as the source file
@@ -158,9 +160,9 @@ function escapeRegExp(stringToGoIntoTheRegex) {
 //process the Crowdin JSON data so it returns a string that is ready to be displayed in the app.
 //  @localeData: String, the stringified version of the JSON translation data
 //  @return: The string that is returned will be have every string removed or replaced from it that the app cannot display: i.e. '\"'
-function processRemoteJSONData(localeData){
+function processRemoteJSONData(localeData) {
   let sJsonReturn;
-  if(localeData !== undefined && localeData !== "") {
+  if (localeData !== undefined && localeData !== "") {
     // add appropriate indentation to localeData and remove any empty lines
     const localeDataLines = localeData.split('\n');
     const localDataLinesIndented = localeDataLines.reduce((acc, line, index) => {
@@ -195,7 +197,7 @@ function processRemoteJSONData(localeData){
 //be compared to a more recently downloaded version of the Crowdin JSON. If this is not done, then these special characters 
 //that were added during processing will make it impossible to convert the raw strings into JSON objects.  
 //@see this and the processRemoteJSONData()functions to see what is is being processed/unprocessed.
-function  unprocessJSONString(sJSONData){
+function unprocessJSONString(sJSONData) {
   //Replace Chr(34) with \"
   let sJsonReturn = sJSONData.replace(/"\s\+\sChr\(34\)\s\+\s"/g, '\\"');
   sJsonReturn = sJsonReturn.replace(_sBRSReturn, "");
@@ -236,7 +238,7 @@ function getJSONFromBRS(sLocale) {
 //  The function will be used by the app to process an ID and return a translation string.
 //  @sLocale: String, the ID of the locale: i.e. en_us
 //  @return The string to represent the start of the function described the above description. 
-function getLocaleFunctionStartString(sLocale){
+function getLocaleFunctionStartString(sLocale) {
   sLocale = sLocale.replace("-", "_");
   const sFunctionName = `getTranslation_${sLocale}`;
   const sStartFunctionString = `Function ${sFunctionName}()`;
@@ -245,14 +247,14 @@ function getLocaleFunctionStartString(sLocale){
 }
 
 
-function getFunctionEndString(){
+function getFunctionEndString() {
   return "End Function";
 }
 
 
 //Write the translation contents of a locale into the translations BRS file if they don't exist yet or replace them if they do.
 function writeLocaleDataToBRS_sync(sLocale, localeData) {
-  if(localeData !== undefined && localeData !== "") {
+  if (localeData !== undefined && localeData !== "") {
     localeData = processRemoteJSONData(localeData);
 
     var data = fs.readFileSync(_sLocalTranslationCodeFilenameAndPath, 'utf-8');
@@ -285,7 +287,7 @@ async function updateFilesRequest(filePath) {
   const requestParam = {
     storageId: storageResponse.data.id,
   };
-  return await sourceFilesApi.updateOrRestoreFile(crowdinConfig.projectId, crowdinConfig.fileId, requestParam); 
+  return await sourceFilesApi.updateOrRestoreFile(crowdinConfig.projectId, crowdinConfig.fileId, requestParam);
 }
 
 
@@ -294,9 +296,13 @@ function makeGetRequest(options) {
   return new Promise((resolve, reject) => {
     const req = https.request(options, (resp) => {
       if (resp.statusCode >= 300) {
-        const url = `${resp.socket.servername}${resp.req.path}`
-        const method = resp.socket["_httpMessage"].method
-        const errorMessage = `Received ${resp.statusCode} while attempting a ${method} request to ${url}`
+        // Build URL from request options instead of socket properties
+        const protocol = options.protocol || 'https:';
+        const host = options.hostname || options.host || 'unknown';
+        const path = options.path || '/';
+        const url = `${protocol}//${host}${path}`;
+        const method = options.method || 'GET';
+        const errorMessage = `Received ${resp.statusCode} while attempting a ${method} request to ${url}`;
         const err = new Error(errorMessage);
         reject(err);
       } else {
@@ -319,61 +325,241 @@ function makeGetRequest(options) {
 }
 
 
-//Download and return the translations
-//@nMaxRetries: Integer, How many times should Crowdin be called to check the build status before displaying an error?
-//@bSkipUntranslatedStrings: Boolean, Should the Untranslated Strings in Crowdin be skipped?
-//@return if the process is successful, then this returns an associative array of the files returned from Crowdin. if the process fails, then this returns nothing.
-async function downloadTranslations(nMaxRetries = 5, bSkipUntranslatedStrings = true) {
-  let translationFiles;
+const BUILD_CONFIG = {
+  MAX_BUILD_RETRIES: 10,
+  BUILD_RETRY_DELAY: 30000,      // 30 seconds
+  MAX_STATUS_CHECKS: 150,
+  STATUS_CHECK_INTERVAL: 5000    // 5 seconds
+};
 
-  if(crowdinConfig.crowdinToken!== undefined && crowdinConfig.crowdinToken !== ""){
-    try{
-      const nRetryTiming = 2000; //The number of milliseconds to try to check the build status
-      let nRetryCount = 0
-      const result = await translationsApi.buildProject(crowdinConfig.projectId, {skipUntranslatedStrings: bSkipUntranslatedStrings});
-      const buildId = result.data.id;
+/**
+ * Checks if a Crowdin API error is due to another build being in progress
+ * 
+ * Crowdin allows only one build to run at a time per project. When attempting to start a new build
+ * while another is running, the API returns an error containing "build is currently in progress".
+ * This function inspects the error object to detect this specific condition, allowing the code to
+ * implement retry logic rather than failing immediately.
+ * 
+ * The function checks multiple locations in the error object because the error message structure
+ * can vary (error.message, error.error.message, or nested in the JSON structure).
+ * 
+ * Used by: startBuild() to determine if it should retry or throw the error
+ * 
+ * @param {Error|Object} error - The error object from Crowdin API
+ * @returns {boolean} True if error indicates a build is in progress, false otherwise
+ */
+function isBuildInProgressError(error) {
+  const errorMessage = error.message || error.error?.message || '';
+  const errorString = JSON.stringify(error).toLowerCase();
 
-      while (nRetryCount < nMaxRetries){
-        const resultCheckBuildStatus = await translationsApi.checkBuildStatus(crowdinConfig.projectId, buildId)
+  return errorMessage.toLowerCase().includes('build is currently in progress') ||
+    errorString.includes('build is currently in progress');
+}
 
-        let sStatus = resultCheckBuildStatus.data.status.toLowerCase();
-        if (sStatus === 'finished'){
-          log('Starting to download the translations.');
-          const translationInfo = await translationsApi.downloadTranslations(crowdinConfig.projectId, result.data.id);
+/**
+ * Pauses execution for a specified number of milliseconds
+ * 
+ * This utility function creates a Promise-based delay, allowing async functions to wait
+ * without blocking the event loop. It's essential for implementing polling and retry logic
+ * where we need to wait between API calls.
+ * 
+ * Why it's needed:
+ * - Crowdin API rate limiting: Prevents hitting API too frequently
+ * - Build completion polling: Waits between status checks (every 5 seconds)
+ * - Build slot availability: Waits for existing builds to complete (every 30 seconds)
+ * 
+ * Used by:
+ * - startBuild(): Waits 30 seconds between retries when another build is in progress
+ * - pollBuildStatus(): Waits 5 seconds between build status checks
+ * 
+ * @param {number} ms - Number of milliseconds to sleep/wait
+ * @returns {Promise<void>} Promise that resolves after the specified delay
+ * @example
+ * await sleep(5000); // Wait for 5 seconds
+ */
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-          const translationsFileBuffer = await getTranslationsZipFile(translationInfo.data.url);
-          const unzipper = require('unzipper');
-          translationFiles = await unzipper.Open.buffer(translationsFileBuffer);
-          
-          log('DONE DOWNLOADING TRANSLATIONS.');       
-          return translationFiles;
-        } else if(sStatus === 'canceled' || sStatus === 'failed') {
-          log(`FAILED TO BUILD TRANSLATIONS. STATUS = ${sStatus}`);
-          return;
-        } else {
-          nRetryCount++;
-          if (nRetryCount < nMaxRetries) {
-            log(`Crowdin is currently building the project. Status = ${resultCheckBuildStatus.data.status}`);
-            log(`Will attempt to get the translations again in ${nRetryTiming} ms. ${nRetryCount} out of ${nMaxRetries} times.`);
-            await new Promise(resolve => setTimeout(resolve, nRetryTiming));
-          }
-        }
+/**
+ * Initiates a Crowdin translation build with automatic retry logic for concurrent build conflicts
+ * 
+ * A Crowdin build is the process where Crowdin compiles all translations into downloadable files.
+ * Since only one build can run at a time per project, this function implements retry logic to wait
+ * for any existing builds to complete before starting a new one.
+ * 
+ * Build process:
+ * 1. Attempts to start a new build via Crowdin API
+ * 2. If successful, returns the build ID immediately
+ * 3. If "build in progress" error occurs, waits 30 seconds and retries (up to 10 times = 5 minutes)
+ * 4. If a different error occurs, throws immediately (no retry)
+ * 5. After max retries, throws error indicating timeout
+ * 
+ * The skipUntranslatedStrings parameter determines if incomplete translations should be included:
+ * - true (default): Only download fully translated strings, leaving gaps for incomplete translations
+ * - false: Download all strings, including partially translated ones
+ * 
+ * @param {boolean} [bSkipUntranslatedStrings=true] - Whether to exclude untranslated strings from the build
+ * @returns {Promise<number>} The Crowdin build ID that can be used to check status and download files
+ * @throws {Error} If build fails for non-retry reasons or max retries exceeded
+ */
+async function startBuild(bSkipUntranslatedStrings = true) {
+  for (let i = 0; i < BUILD_CONFIG.MAX_BUILD_RETRIES; i++) {
+    try {
+      log('Attempting to start Crowdin build...');
+      const result = await translationsApi.buildProject(crowdinConfig.projectId, {
+        skipUntranslatedStrings: bSkipUntranslatedStrings
+      });
+      log(`Build started successfully with ID: ${result.data.id}`);
+      return result.data.id;
+    } catch (error) {
+      if (!isBuildInProgressError(error) || i === BUILD_CONFIG.MAX_BUILD_RETRIES - 1) {
+        log(`Build error: ${error.message}`);
+        log(`Full error object: ${JSON.stringify(error, null, 2)}`);
+        throw error;
       }
-
-      log('FAILED TO BUILD TRANSLATIONS. Crowdin is busy creating a build. Please try again later.');
-      return;
-    } catch(error) {
-      log(`FAILED TO BUILD TRANSLATIONS: "${error}"`);
-      return;
+      log(`Another build is in progress. Waiting ${BUILD_CONFIG.BUILD_RETRY_DELAY / 1000} seconds before retry ${i + 1}/${BUILD_CONFIG.MAX_BUILD_RETRIES}...`);
+      await sleep(BUILD_CONFIG.BUILD_RETRY_DELAY);
     }
-  } else {
-    log('COULD NOT DOWNLOAD TRANSLATIONS. MISSING CROWDIN TOKEN EITHER IN ENVIRONMENT VARIABLE (ROKU_CROWDIN_KEY) OR COMMAND LINE PARAMETER');
+  }
+  throw new Error('Failed to start build after maximum retries');
+}
+
+/**
+ * Continuously polls Crowdin build status until completion, failure, or timeout
+ * 
+ * After a build is started, it takes time for Crowdin to compile all translations. This function
+ * repeatedly checks the build status every 5 seconds until the build reaches a terminal state.
+ * With 150 max checks at 5-second intervals, it will wait up to 12.5 minutes for build completion.
+ * 
+ * Build status progression:
+ * - "in_progress" / "queued" → Keep polling
+ * - "finished" → Success! Return build data
+ * - "canceled" → Throw error (build was manually canceled)
+ * - "failed" → Throw error (build encountered an error)
+ * - Timeout after 150 checks → Throw error (likely a stuck build)
+ * 
+ * The function logs progress with each check, showing elapsed time and check count to help
+ * monitor long-running builds in CI/CD environments.
+ * 
+ * @param {number} buildId - The Crowdin build ID returned from startBuild()
+ * @returns {Promise<Object>} The completed build data object from Crowdin API
+ * @throws {Error} If build is canceled, failed, or times out after 12.5 minutes
+ */
+async function pollBuildStatus(buildId) {
+  for (let i = 0; i < BUILD_CONFIG.MAX_STATUS_CHECKS; i++) {
+    const result = await translationsApi.checkBuildStatus(crowdinConfig.projectId, buildId);
+    const status = result.data.status.toLowerCase();
+
+    if (status === 'finished') {
+      log('Build completed successfully.');
+      return result.data;
+    } else if (status === 'canceled' || status === 'failed') {
+      throw new Error(`Build ${status}`);
+    }
+
+    log(`Crowdin is currently building the project. Status: ${result.data.status}`);
+    log(`Will check status again in ${BUILD_CONFIG.STATUS_CHECK_INTERVAL / 1000} seconds. Check ${i + 1} out of ${BUILD_CONFIG.MAX_STATUS_CHECKS}.`);
+    await sleep(BUILD_CONFIG.STATUS_CHECK_INTERVAL);
+  }
+
+  throw new Error('Build timeout: Crowdin is busy creating a build. Please try again later.');
+}
+
+/**
+ * Downloads the compiled translation files from a completed Crowdin build
+ * 
+ * After a build finishes, Crowdin provides a download URL for a zip file containing all
+ * translation files. This function:
+ * 1. Requests the download URL from Crowdin API using the build ID
+ * 2. Downloads the zip file buffer from the provided URL
+ * 3. Opens/parses the zip file in memory using the unzipper library
+ * 4. Returns the parsed zip directory structure for further processing
+ * 
+ * The returned object contains a files array where each file has properties like:
+ * - path: File path within the zip (e.g., "es-MX/roku/translations/es-MX.json")
+ * - buffer(): Method to get file contents as a buffer
+ * 
+ * These files are later processed by processTranslationFiles() which writes them to
+ * TubiLanguageTranslate.brs.
+ * 
+ * @param {number} buildId - The Crowdin build ID of a completed build
+ * @returns {Promise<Object>} Unzipped directory object containing all translation files
+ * @throws {Error} If download fails or zip file cannot be parsed
+ */
+async function downloadBuildFiles(buildId) {
+  log('Starting to download the translations.');
+  const translationInfo = await translationsApi.downloadTranslations(crowdinConfig.projectId, buildId);
+  const translationsFileBuffer = await getTranslationsZipFile(translationInfo.data.url);
+  const unzipper = require('unzipper');
+  const translationFiles = await unzipper.Open.buffer(translationsFileBuffer);
+  log('DONE DOWNLOADING TRANSLATIONS.');
+  return translationFiles;
+}
+
+/**
+ * Orchestrates the complete Crowdin translation download workflow
+ * 
+ * This is the main function that coordinates the entire process of getting translations from Crowdin.
+ * It combines three sub-operations in sequence:
+ * 1. startBuild() - Initiates a new Crowdin build (with retry logic for concurrent builds)
+ * 2. pollBuildStatus() - Waits for the build to complete (polling every 5 seconds)
+ * 3. downloadBuildFiles() - Downloads and parses the compiled translation zip file
+ * 
+ * The function is designed to be resilient:
+ * - Validates Crowdin token before starting
+ * - Catches all errors and logs them gracefully
+ * - Returns undefined on failure (instead of throwing) to allow calling code to continue
+ * 
+ * Total possible wait time:
+ * - Build slot retry: up to 5 minutes (10 retries × 30 seconds)
+ * - Build completion: up to 12.5 minutes (150 checks × 5 seconds)
+ * - Maximum total: ~17.5 minutes in worst case scenario
+ * 
+ * Environment variable required: ROKU_CROWDIN_TOKEN
+ * 
+ * @param {boolean} [bSkipUntranslatedStrings=true] - If true, excludes incomplete translations from the build
+ * @returns {Promise<Object|undefined>} Unzipped directory object containing translation files, or undefined on failure
+ */
+async function downloadTranslations(bSkipUntranslatedStrings = true) {
+  if (!crowdinConfig.crowdinToken) {
+    log('COULD NOT DOWNLOAD TRANSLATIONS. MISSING CROWDIN TOKEN EITHER IN ENVIRONMENT VARIABLE (ROKU_CROWDIN_TOKEN) OR COMMAND LINE PARAMETER');
+    return;
+  }
+
+  try {
+    const buildId = await startBuild(bSkipUntranslatedStrings);
+    await pollBuildStatus(buildId);
+    const translationFiles = await downloadBuildFiles(buildId);
+    return translationFiles;
+  } catch (error) {
+    log(`FAILED TO BUILD TRANSLATIONS: "${error.message}"`);
     return;
   }
 }
 
 
-//update the English strings within the translation BRS file with the latest version of the US English locale file
+/**
+ * Updates the en-US translation function in TubiLanguageTranslate.brs with the latest English strings
+ * 
+ * This function serves as the bridge between the source translation file (translations/en-US.json)
+ * and the BrightScript code (TubiLanguageTranslate.brs) that the Roku app actually uses at runtime.
+ * 
+ * Process:
+ * 1. Reads translations/en-US.json (the source of truth for English translations)
+ * 2. Calls writeLocaleDataToBRS_sync() to update the getTranslation_en_US() function
+ * 3. The BRS file is modified in place, replacing old translations with new ones
+ * 
+ * When to use:
+ * - After editing translations/en-US.json to add/update English strings
+ * - Before uploading to Crowdin (to ensure Crowdin has latest English source)
+ * - As part of the translation workflow to keep BRS and JSON in sync
+ * 
+ * This is typically run as a gulp task: `gulp updateLocalTranslations`
+ * 
+ * @param {Function} done - Gulp callback function to signal task completion
+ * @returns {void}
+ */
 function updateLocalTranslations(done) {
   //update the BRS file with the American English file before uploading to Crowdin
   log(`Updating the BRS file with the latest version found in: ${_sLocalTranslationFilePath}`)
@@ -387,242 +573,59 @@ function updateLocalTranslations(done) {
 }
 
 
-//Get a list of strings that have the same value between the two passed objects: i.e.  
-//objectLanguage1.key1.message === objectLanguage2.key1.message
-//@objectLanguage1: Object, A JSON object literal containing all the language strings are ordered by the index of an id/key 
-//@objectLanguage2: Object, It has the same format as the previous param. If the previous param was of locally stored translation, then this param would be the remotely stored, and visa versa.
-function getListOfStringsThatMatch(objectLanguage1, objectLanguage2) {
-  let aMatchedStrings = [];
-  for(var key in objectLanguage1){
-    if(objectLanguage1[key] !== undefined && objectLanguage2[key] !== undefined){
-      if(objectLanguage1[key].message !== undefined && objectLanguage2[key].message !== undefined && objectLanguage1[key].message === objectLanguage2[key].message){
-        aMatchedStrings.push(key);
-      }
-    }
-  }
-  return aMatchedStrings;
-}
-
-
-//Get an array of strings that do NOT have the same value between the two passed JSON objects: i.e.  
-//jsonLanguage1.key1.message !== jsonLanguage1.key1.message
-// Note: We do not need to be concerned with key/message pairs that might exist in one of the jsonLanguage objects, but not the other.
-//  When the English strings are in sync (a previous check), then Crowdin will automatically ensure all translations have the same keys.
-//@return An array as described above: [key1, key5, key22, etc]
-function getListOfStringsThatDoNotMatch(jsonLanguage1, jsonLanguage2) {
-  let aUnMatchedStrings = [];
-  for(var key in jsonLanguage1){
-    if(jsonLanguage1[key] !== undefined && jsonLanguage2[key] !== undefined){
-      if(jsonLanguage1[key].message !== undefined && jsonLanguage2[key].message !== undefined && jsonLanguage1[key].message !== jsonLanguage2[key].message ){
-        aUnMatchedStrings.push(key);
-      }
-    }
-  }
-  return aUnMatchedStrings;
-}
-
-
-// Check that the local English strings in en-US.json match with the remote Crowdin version.
-// If the two JSON files do not match, then report the string keys associated with the strings that do not match.
-// Ask if the developer would like to cancel to upload the strings to Crowdin and get the strings translated
-// @remoteUSEnglishTranslations: The JSON object literal representing the crowdin, remote English translations
-// @return Boolean, True if translations passed comparison test or user chose to ignore the failed comparison test.
-async function compareEnglishTranslations(remoteUSEnglishTranslations) {
-  log('COMPARE STEP #1: Checking if English strings needs to be uploaded to Crowdin...');
-  const localeData = fs.readFileSync(_sLocalTranslationFilePath, 'utf-8');
-  const localUSEnglishTranslations = JSON.parse(localeData);
-  let aMissingData = [];
-
-  for (const key in localUSEnglishTranslations) {
-    let remoteTranslation = remoteUSEnglishTranslations[key];
-    let localTranslation = localUSEnglishTranslations[key];
-    if (remoteTranslation !== undefined){
-        if (remoteTranslation.message !== localTranslation.message){
-          //If the remote string does not match with the local string, then the local strings may still need to be uploaded to Crowdin
-          aMissingData.push(key);
-        }
-    } else {
-      //If the remote string does not exist, then the local strings may still need to be uploaded to Crowdin
-      aMissingData.push(key);
-    }
-  }
-  if(aMissingData.length > 0){
-    log(`The US English strings associated with the following ID(s) are MISSING from Crowdin, or they are DIFFERENT from those found on Crowdin: ${aMissingData.join(", ")}.`);
-    
-    //Add a prompt asking if the engineer wants to cancel, so he/she can fix the English local and remote string mismatch.
-    const {bEnglishMismatchCancel} = await prompts({
-      type: 'confirm',
-      name: 'bEnglishMismatchCancel',
-      message: `You may need to run "gulp uploadTranslations" to upload the English strings to Crowdin.\n Do you wish to cancel the current process? (y/n)`,
-    });
-
-    if (bEnglishMismatchCancel) {
-      return false;
-    }
-
-  } else {
-    log('COMPARE STEP #1 Complete: Crowdin Source file matches with local US English JSON!');
-    log(' ');
-  }
-
-  return true;
-}
-
-
-//  Check if there are any untranslated words in crowdin. The way to know if there are
-//  untranslated words is if the string is the same as the US English version. This is because when we 
-//  called downloadTranslations(), we passed false for the bSkipUntranslatedStrings param. If we had passed 
-//  true, then the untranslated words would have a blank string in the JSON file.
-//
-//  Report if there are untranslated strings.
-//  Ask if the developer would like to continue or stop so the developer can get the words translated and then to download the strings from Crowdin into the master branch and cherry pick that change into this branch
-// @aaTranslations, an associative array of the locale and their corresponding remote JSON
-// @jsonUSEnglishRemoteData, The US English JSON object that is located remotely on Crowdin. sourceFilesApi.downloadFile() must be called to get this object
-// @return Boolean, Were there no errors or did the user choose to ignore the errors? 
-async function checkForRemoteUntranslatedTranslations(aaTranslations, jsonUSEnglishRemoteData) {
-  log('COMPARE STEP #2: Now checking to see if there are any untranslated strings in Crowdin...');
-  let bUntranslatedStringsFound = false;
-  for(let locale in aaTranslations){
-    //strings from other languages should not match with English strings. If they do, then both strings are assumed to be in English. The foreign language is assumed to be untranslated.
-    let aMatches = getListOfStringsThatMatch(aaTranslations[locale], jsonUSEnglishRemoteData);
-    if(aMatches.length > 0){
-      bUntranslatedStringsFound = true;
-      log(`Untranslated strings have been found in the locale "${locale.toLocaleUpperCase()}" with the ids: ${aMatches.join(", ")}.`);
-      log(' ');
-    }
-  }
-
-  if(bUntranslatedStringsFound){
-    //Add a prompt asking if the engineer wants to cancel, so he/she can fix the untranslated strings
-    const {bUntranslatedCancel} = await prompts({
-      type: 'confirm',
-      name: 'bUntranslatedCancel',
-      message: `Once all of the strings in Crowdin have been translated, you may need to run "gulp downloadTranslations" on a branch cut from master, make a PR to master, and cherry pick the translations into this branch.\n Do you wish to cancel this process so you may do that? (y/n)`,
-    });
-    
-    if (bUntranslatedCancel) {
-      return false;
-    }
-  } else {
-    log('COMPARE STEP #2 Complete: There are no untranslated strings in Crowdin');
-    log(' ');
-  }
-  return true;
-}
-
-
-//  Check if the local non-US English languages match with Crowdin.
-//  If they do not match, then the translations may not have been downloaded from Crowdin.
-//  Report the string keys that do not match.
-//  Ask if the developer wishes to continue or stop to download the strings from Crowdin into the master branch and cherry pick that change into this branch
-// @aaTranslations, an associative array of the locale and their corresponding remote JSON
-// @return Boolean, Were there no errors or did the user choose to ignore the errors? 
-async function compareForeignTranslations(aaTranslations) {
-    log('COMPARE STEP #3: Now checking to see if all translations have been downloaded from Crowdin...');
-    let bNonDownloadedStringsFound = false;
-
-    for(let locale in aaTranslations){
-      let localeRemoteData = aaTranslations[locale];
-
-      // Process remote JSON data similarly to local data, then "unprocess" it for comparison.
-      // This is necessary because the processing is destructive and we need to compare processed remote 
-      // data with processed local data. Also, it is difficult to compare the 2 versions of the translation files before making them into JSON objects,
-      // as the processing introduces special characters making it impossible to convert the strings into JSON objects and thus making it 
-      // difficult to compare the 2 versions of the translation files.
-      // Previously, local data was generated from Crowdin and processed.
-      let sLocaleRemoteData = JSON.stringify(localeRemoteData);
-      const jsonString = removeEmptyTranslations(sLocaleRemoteData);
-      localeRemoteData = processRemoteJSONData(jsonString);
-      localeRemoteData = unprocessJSONString(jsonString); 
-
-      let localeLocalData = getJSONFromBRS(locale);
-
-      let aNonMatches = getListOfStringsThatDoNotMatch(localeRemoteData, localeLocalData);
-      if(aNonMatches.length > 0){
-        bNonDownloadedStringsFound = true;
-        log(`Strings have been found NOT to be downloaded from Crowdin in the locale "${locale.toLocaleUpperCase()}" with the ids: ${aNonMatches.join(", ")}.`);
-        log(' ');
-      }
-    }
-
-    if(bNonDownloadedStringsFound){
-      //Add a prompt asking if the engineer wants to cancel, so he/she can download the latest strings
-      const {bUnDownloadedCancel} = await prompts({
-        type: 'confirm',
-        name: 'bUnDownloadedCancel',
-        message: `You may need to run "gulp downloadTranslations" in a branch cut from master, make a PR to master, and cherry pick the translations into this branch.\n Do you wish to cancel so you may do that? (y/n)`,
-      });
-
-      if (bUnDownloadedCancel) {
-        return false;
-      } 
-    } else {
-      log('COMPARE STEP #3 Complete: All translations have been downloaded from Crowdin.');
-      log(' ');
-    }
-
-    return true;
-}
-
-
-//upload the latest version of the US English locale file to crowdin
-async function uploadTranslations(done) {
-  if(crowdinConfig.crowdinToken !== undefined && crowdinConfig.crowdinToken !== ""){
+/**
+ * Uploads the latest en-US.json source file to Crowdin for translation
+ * 
+ * This function sends the local translations/en-US.json file to Crowdin, updating the source
+ * strings that translators will work from. This is a critical step in the translation workflow
+ * because Crowdin needs the latest English text before translators can update other languages.
+ * 
+ * Upload process:
+ * 1. Reads translations/en-US.json from local filesystem
+ * 2. Uploads file to Crowdin storage (temporary storage)
+ * 3. Updates the project's source file (file ID: 46) with the new content
+ * 
+ * When to use:
+ * - After adding new translation keys to en-US.json
+ * - After modifying existing English text that needs re-translation
+ * - Before creating a Jira ticket for missing translations (ensures Crowdin is up-to-date)
+ * 
+ * Typically called by:
+ * - uploadLatestTranslationsAndCreateTicketForMissingTranslations() workflow
+ * - Manually via gulp task when updating source strings
+ * 
+ * Environment variable required: ROKU_CROWDIN_TOKEN
+ * 
+ * @returns {Promise<void>}
+ * @throws {Error} If upload fails or Crowdin token is missing
+ */
+async function uploadTranslations() {
+  if (crowdinConfig.crowdinToken !== undefined && crowdinConfig.crowdinToken !== "") {
     try {
-      const updateFileResponse = await updateFilesRequest(_sLocalTranslationFilePath);
-      log('SUCCESS! FINISHED UPLOADING THE TRANSLATION FILE TO CROWDIN');
-      done();
-    } catch(error) {
-      done(new NoStackError(`ERROR UPLOADING THE TRANSLATION FILE TO CROWDIN: "${error}"`));
+      await updateFilesRequest(_sLocalTranslationFilePath);
+    } catch (error) {
+      new NoStackError(`ERROR UPLOADING THE TRANSLATION FILE TO CROWDIN: "${error}"`);
+      throw error;
     }
   } else {
     log('MISSING CROWDIN TOKEN EITHER IN ENVIRONMENT VARIABLE (ROKU_CROWDIN_TOKEN) OR COMMAND LINE PARAMETER');
-    done();
   }
 }
 
 
-// Get the translations of all the locales and place it in in an associative array 
-// @return Associative Array, an associative array of the locale and their corresponding remote JSON
-async function getRemoteTranslations() {
-  //an associative array of the locale and their corresponding remote JSON
-  let aaTranslations = {};
-
-  //  Download the latest from Crowdin to the next step. Wait up to minute for the download to occur. 
-  //  When it does, then instead of saving the download into a file, save it in a variable.
-  const translationFiles = await downloadTranslations(30, false);
-  if (translationFiles && translationFiles.files) {
-
-    // iterate over each file in the zipped directory
-    for (const file of translationFiles.files) {
-      let unZippedFilePath = file.path;
-
-      // if the file path contains 'roku' and '.json', we want to process it
-      // expect the file path looks like 'es-MX/roku/translations/es-MX.json'
-      if (unZippedFilePath.indexOf(crowdinConfig.crowdinBaseDirectory) >= 0 && unZippedFilePath.indexOf('.json') >= 0) {
-        //Remove '.json' from the file path to get the locale ID
-        let sLocale = path.parse(unZippedFilePath).name;
-        sLocale = sLocale.toLowerCase();
-
-        let fileBuffer = await file.buffer();
-        if (fileBuffer !== undefined) {
-          let fileString = fileBuffer.toString();
-          let fileJSON = JSON.parse(fileString);
-          if (fileJSON !== undefined) {
-            aaTranslations[sLocale] = fileJSON;
-          }
-        }
-        
-      }
-    }
-  }
-  return aaTranslations;
-}
-
-
+/**
+ * Downloads translations from Crowdin and processes them into the local codebase
+ * 
+ * This is the main entry point for the translation download workflow. It downloads the latest
+ * translations from Crowdin (triggering a build if needed), then processes each translation file
+ * by writing the content to the appropriate locale function in TubiLanguageTranslate.brs.
+ * 
+ * @param {Function} done - Gulp callback function to signal task completion
+ * @returns {Promise<void>}
+ */
 async function downloadAndProcessTranslations(done) {
   const translationFiles = await downloadTranslations();
-  if (translationFiles !== undefined){
+  if (translationFiles !== undefined) {
     await processTranslationFiles(translationFiles);
     log('DONE PROCESSING TRANSLATIONS.');
   }
@@ -632,54 +635,29 @@ async function downloadAndProcessTranslations(done) {
 }
 
 
-//compare the local version of our source and translated strings with the remote versions to ensure 
-//the translations are currently up to date. This function will do 3 comparisons. The developer can bypass
-//any failed comparison test.
-async function compareTranslations(done) {
-  if(crowdinConfig.crowdinToken!== undefined && crowdinConfig.crowdinToken !== ""){
-    //The US English JSON that is located remotely on Crowdin
-    let jsonUSEnglishRemoteData;
+/**
+ * Identifies missing and outdated translations, uploads source to Crowdin, and creates/updates a Jira ticket
+ * 
+ * This function orchestrates the translation quality check workflow by:
+ * 1. Finding translation keys that exist in en-US but are missing in es_MX and fr_CA
+ * 2. Identifying keys where the English source has changed and needs re-translation
+ * 3. If any issues are found, uploads the latest en-US source to Crowdin
+ * 4. Creates a new Jira ticket or updates an existing one with the missing/outdated keys
+ * 
+ * @param {Function} done - Gulp callback function to signal task completion
+ * @returns {Promise<void>}
+ */
+async function uploadLatestTranslationsAndCreateTicketForMissingTranslations(done) {
+  if (crowdinConfig.crowdinToken !== undefined && crowdinConfig.crowdinToken !== "") {
+    const untranslatedTranslations = await findMissingTranslationKeys();
+    const reTranslationRequiredKeys = await getTranslationKeysWhichNeedsReTranslation();
 
-    log('Preparing to compare Crowdin Source file with local US English JSON...');
-    try {
-      const sourceResponse = await sourceFilesApi.downloadFile(crowdinConfig.projectId, crowdinConfig.fileId);
-      const sSourceURL = sourceResponse.data.url;
-      
-      jsonUSEnglishRemoteData = await fetchJSON(sSourceURL, {});
-      
-    }  catch(error) {
-      done(new NoStackError(`ERROR DOWNLOADING THE ENGLISH SOURCE FILE FROM CROWDIN: "${error}"`));
-      return;
+
+    if (Object.keys(untranslatedTranslations).length > 0 || reTranslationRequiredKeys.length > 0) {
+      await uploadTranslations();
+      await createTicketForMissingTranslations(untranslatedTranslations, reTranslationRequiredKeys);
     }
 
-
-    //  COMPARE STEP #1: 
-    const bEnglishTranslationComparisonContinue = await compareEnglishTranslations(jsonUSEnglishRemoteData);
-    if (!bEnglishTranslationComparisonContinue) {
-      //if compareEnglishTranslations() indicates that the script was aborted, then stop function
-      return done(new NoStackError('Script aborted'));
-    }
-
-
-    //an associative array of the locale and their corresponding remote JSON
-    let aaTranslations = await getRemoteTranslations();
-
-    //  COMPARE STEP #2: 
-    const bRemoteUntranslatedTranslationsCheck =  await checkForRemoteUntranslatedTranslations(aaTranslations, jsonUSEnglishRemoteData);
-    if (!bRemoteUntranslatedTranslationsCheck) {
-      //if checkForRemoteUntranslatedTranslations() indicates that the script was aborted, then stop function
-      return done(new NoStackError('Script aborted'));
-    }
-
-    //  COMPARE STEP #3:
-    const bForeignTranslationComparisonContinue =  await compareForeignTranslations(aaTranslations);
-    if (!bForeignTranslationComparisonContinue) {
-      //if compareForeignTranslations() indicates that the script was aborted, then stop function
-      return done(new NoStackError('Script aborted'));
-    }
-
-
-    log('Translation checks have been completed.');
     done();
     return;
   } else {
@@ -690,9 +668,533 @@ async function compareTranslations(done) {
 }
 
 
+/**
+ * Finds translation keys that exist in en-US but are missing in other locales
+ * 
+ * This function compares the en-US translation keys with es_MX and fr_CA locale keys
+ * stored in TubiLanguageTranslate.brs. Any keys present in English but absent in a
+ * target locale are identified as needing translation.
+ * 
+ * @returns {Object} Object with locale codes as keys (e.g., 'es_MX', 'fr_CA') and arrays 
+ *                   of missing translation keys as values. Empty if all keys are translated.
+ * @example
+ * // Returns: { "es_MX": ["new_feature_title", "error_message"], "fr_CA": ["new_feature_title"] }
+ */
+function findMissingTranslationKeys() {
+  const locales = ["es_MX", "fr_CA"];
+  const englishTranslations = getJSONFromBRS('en-US');
+
+  // Get all keys from both
+  const englishTranslationKeys = Object.keys(englishTranslations);
+  const untranslatedKeys = {};
+  for (const locale of locales) {
+    // Extract JSON from target locale function
+    const localeData = getJSONFromBRS(locale);
+    const localeKeys = Object.keys(localeData);
+    const missingKeys = englishTranslationKeys.filter(key => !localeKeys.includes(key));
+    if (missingKeys.length > 0) {
+      untranslatedKeys[locale] = missingKeys;
+    }
+  }
+
+  return untranslatedKeys;
+}
+
+
+/**
+ * Compares local English translations with remote Crowdin source file to identify keys that need re-translation
+ * 
+ * This function downloads the source file from Crowdin (remote en-US.json) and compares it with the local
+ * en-US translations stored in TubiLanguageTranslate.brs. Any keys where the message content differs
+ * between local and remote indicate that the English text has been updated locally but not yet translated
+ * in other languages on Crowdin. Re-translation is needed because when the English source changes, all
+ * existing translations in other languages become outdated and must be updated to match the new English text.
+ * 
+ * @returns {Promise<Array<string>>} Array of translation keys where the local English message differs from 
+ *                                   the remote Crowdin source, indicating re-translation is needed
+ * @throws {Error} If unable to download or parse the remote source file
+ */
+async function getTranslationKeysWhichNeedsReTranslation() {
+  const reTranslationRequiredKeys = [];
+  try {
+    const sourceResponse = await sourceFilesApi.downloadFile(crowdinConfig.projectId, crowdinConfig.fileId);
+    const remoteEnglishTranslations = await fetchJSON(sourceResponse.data.url, {})
+    const englishTranslations = getJSONFromBRS('en-US');
+
+    // Compare messages between remote and local English translations
+    for (const key in englishTranslations) {
+      const localMessage = englishTranslations[key]?.message || '';
+      const remoteMessage = remoteEnglishTranslations[key]?.message || '';
+
+      // If key exists in both but messages don't match
+      if (remoteEnglishTranslations.hasOwnProperty(key) && localMessage !== remoteMessage) {
+        reTranslationRequiredKeys.push(key);
+      }
+    }
+
+  } catch (error) {
+    log(`Failed to get translation keys which needs re-translation: ${error.message}`);
+    throw error;
+  }
+  return reTranslationRequiredKeys;
+}
+
+
+/**
+ * Searches for existing open ROKU translation tickets in Jira
+ * 
+ * Uses JQL (Jira Query Language) to find tickets matching:
+ * - Project: TINTL
+ * - Summary contains: "ROKU Translations"
+ * - Status: Not Done
+ * - Labels: Localization AND current branch name
+ * 
+ * This prevents creating duplicate tickets when translation work is already tracked
+ * for the same branch.
+ * 
+ * @param {string} auth - Base64 encoded authentication string (email:token)
+ * @param {string} JIRA_BASE_URL - Jira instance base URL (e.g., 'tubitv.atlassian.net')
+ * @returns {Promise<Object|null>} The most recently created open ticket, or null if none exist
+ */
+async function findExistingOpenTranslationTicket(auth, JIRA_BASE_URL) {
+  try {
+    const currentBranch = getCurrentBranch();
+
+    // JQL query to find open ROKU translation tickets for the current branch
+    // Using summary match instead of custom field to avoid field ID issues
+    const jql = `project = TINTL AND summary ~ "ROKU Translations" AND status != Done AND labels = Localization AND labels = "${currentBranch}" ORDER BY created DESC`;
+
+    const response = await axios.get(
+      `https://${JIRA_BASE_URL}/rest/api/3/search/jql`,
+      {
+        params: {
+          jql: jql,
+          maxResults: 1,
+          fields: 'key,summary,status'
+        },
+        headers: {
+          'Authorization': `Basic ${auth}`,
+          'Accept': 'application/json'
+        }
+      }
+    );
+
+    if (response.data.issues && response.data.issues.length > 0) {
+      const issue = response.data.issues[0];
+      log(`Found existing open ticket for branch "${currentBranch}": ${issue.key} - ${issue.fields.summary}`);
+      return issue;
+    }
+
+    log(`No existing open translation tickets found for branch "${currentBranch}".`);
+    return null;
+  } catch (error) {
+    log(`Error searching for existing tickets: ${error.message}`);
+    return null;
+  }
+}
+
+/**
+ * Adds a comment to an existing Jira ticket
+ * 
+ * Uses Jira REST API v3 to add a timestamped comment to track when the ticket
+ * was updated with additional translation keys.
+ * 
+ * @param {string} issueKey - The Jira ticket key (e.g., 'TINTL-123')
+ * @param {Array<Object>} commentContent - ADF (Atlassian Document Format) content array for the comment
+ * @param {string} auth - Base64 encoded authentication string (email:token)
+ * @param {string} JIRA_BASE_URL - Jira instance base URL (e.g., 'tubitv.atlassian.net')
+ * @returns {Promise<Object>} The created comment object from Jira API
+ * @throws {Error} If unable to add comment to the ticket
+ */
+async function addCommentToTicket(issueKey, commentContent, auth, JIRA_BASE_URL) {
+  try {
+    const response = await axios.post(
+      `https://${JIRA_BASE_URL}/rest/api/3/issue/${issueKey}/comment`,
+      {
+        body: {
+          type: 'doc',
+          version: 1,
+          content: commentContent
+        }
+      },
+      {
+        headers: {
+          'Authorization': `Basic ${auth}`,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    log(`✅ Comment added to ticket: ${issueKey}`);
+    return response.data;
+  } catch (error) {
+    log(`Failed to add comment to ticket: ${error.message}`);
+    if (error.response) {
+      log(`Status: ${error.response.status}`);
+      log(`Response: ${JSON.stringify(error.response.data)}`);
+    }
+    throw error;
+  }
+}
+
+/**
+ * Updates the description of an existing Jira ticket
+ * 
+ * Replaces the entire ticket description with new ADF content containing updated
+ * translation keys. This is called when new missing keys are discovered or when
+ * re-translation requirements change.
+ * 
+ * @param {string} issueKey - The Jira ticket key (e.g., 'TINTL-123')
+ * @param {Array<Object>} descriptionContent - ADF (Atlassian Document Format) content array for the description
+ * @param {string} auth - Base64 encoded authentication string (email:token)
+ * @param {string} JIRA_BASE_URL - Jira instance base URL (e.g., 'tubitv.atlassian.net')
+ * @returns {Promise<Object>} The updated ticket object from Jira API
+ * @throws {Error} If unable to update the ticket description
+ */
+async function updateTicketDescription(issueKey, descriptionContent, auth, JIRA_BASE_URL) {
+  try {
+    const response = await axios.put(
+      `https://${JIRA_BASE_URL}/rest/api/3/issue/${issueKey}`,
+      {
+        fields: {
+          description: {
+            type: 'doc',
+            version: 1,
+            content: descriptionContent
+          }
+        }
+      },
+      {
+        headers: {
+          'Authorization': `Basic ${auth}`,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    log(`✅ Description updated for ticket: ${issueKey}`);
+    return response.data;
+  } catch (error) {
+    log(`Failed to update ticket description: ${error.message}`);
+    if (error.response) {
+      log(`Status: ${error.response.status}`);
+      log(`Response: ${JSON.stringify(error.response.data)}`);
+    }
+    throw error;
+  }
+}
+
+/**
+ * Builds an ADF (Atlassian Document Format) paragraph node
+ * 
+ * Creates a simple paragraph with plain text content for use in Jira ticket
+ * descriptions and comments.
+ * 
+ * @param {string} text - The text content for the paragraph
+ * @returns {Object} ADF paragraph node with the specified text
+ */
+function buildAdfParagraph(text) {
+  return {
+    type: 'paragraph',
+    content: [{ type: 'text', text }]
+  };
+}
+
+/**
+ * Builds an ADF (Atlassian Document Format) bullet list from an array of translation keys
+ * 
+ * Converts an array of strings into a formatted bullet list for Jira ticket descriptions.
+ * Each key becomes a separate list item.
+ * 
+ * @param {Array<string>} keys - Array of translation keys to display as bullet points
+ * @returns {Object} ADF bulletList node containing all the keys as list items
+ */
+function buildAdfBulletList(keys) {
+  return {
+    type: 'bulletList',
+    content: keys.map(key => ({
+      type: 'listItem',
+      content: [{
+        type: 'paragraph',
+        content: [{ type: 'text', text: key }]
+      }]
+    }))
+  };
+}
+
+/**
+ * Builds ADF heading
+ */
+function buildAdfHeading(text, level = 3) {
+  const content = [{ type: 'text', text }];
+  if (level === 3) {
+    content[0].marks = [{ type: 'strong' }];
+  }
+  return {
+    type: 'heading',
+    attrs: { level },
+    content
+  };
+}
+
+/**
+ * Builds the complete Jira ticket description in ADF format
+ * 
+ * Constructs a structured ticket description containing:
+ * 1. Introduction paragraph
+ * 2. Re-translation required keys section (if any exist)
+ * 3. Missing translation keys grouped by locale (es_MX, fr_CA)
+ * 4. Note about identical translations
+ * 
+ * @param {Object} untranslatedTranslations - Object with locale codes as keys and arrays of missing keys as values
+ * @param {Array<string>} reTranslationRequiredKeys - Array of keys where English source has changed
+ * @returns {Array<Object>} ADF content array ready for Jira ticket description
+ */
+function buildTicketDescription(untranslatedTranslations, reTranslationRequiredKeys) {
+  const descriptionContent = [
+    buildAdfParagraph('Could you please help us with the translations for below keys:')
+  ];
+
+  // Add re-translation required keys section
+  if (reTranslationRequiredKeys.length > 0) {
+    descriptionContent.push(
+      buildAdfParagraph('Below keys need re-translation to all languages:'),
+      buildAdfBulletList(reTranslationRequiredKeys)
+    );
+  }
+
+  // Add missing keys by locale
+  for (const locale in untranslatedTranslations) {
+    descriptionContent.push(
+      buildAdfHeading(locale, 3),
+      buildAdfBulletList(untranslatedTranslations[locale])
+    );
+  }
+
+  // Add note
+  descriptionContent.push(
+    buildAdfHeading('Note: If any translation is identical to the American English, then it can be left blank, saved, and approved. The outcome should read: [empty translation]', 4)
+  );
+
+  return descriptionContent;
+}
+
+/**
+ * Checks if a Jira ticket's description has changed by comparing with new content
+ * 
+ * Fetches the current ticket description from Jira and performs a JSON string comparison
+ * with the new description content. This prevents unnecessary API calls and notification
+ * spam when the description hasn't actually changed.
+ * 
+ * @param {string} issueKey - The Jira ticket key (e.g., 'TINTL-123')
+ * @param {Array<Object>} newDescriptionContent - ADF content array for the new description
+ * @param {string} auth - Base64 encoded authentication string (email:token)
+ * @param {string} JIRA_BASE_URL - Jira instance base URL (e.g., 'tubitv.atlassian.net')
+ * @returns {Promise<boolean>} True if description has changed, false if identical
+ */
+async function hasDescriptionChanged(issueKey, newDescriptionContent, auth, JIRA_BASE_URL) {
+  try {
+    const response = await axios.get(
+      `https://${JIRA_BASE_URL}/rest/api/3/issue/${issueKey}`,
+      {
+        params: { fields: 'description' },
+        headers: {
+          'Authorization': `Basic ${auth}`,
+          'Accept': 'application/json'
+        }
+      }
+    );
+
+    const currentDescription = response.data.fields.description;
+    const newDescriptionStr = JSON.stringify(newDescriptionContent);
+    const currentDescriptionStr = JSON.stringify(currentDescription?.content || []);
+
+    return newDescriptionStr !== currentDescriptionStr;
+  } catch (error) {
+    log(`Warning: Could not fetch current ticket description: ${error.message}`);
+    return true; // Assume changed if we can't fetch
+  }
+}
+
+/**
+ * Updates an existing open ROKU translation ticket with new or additional translation keys
+ * 
+ * This function first checks if the ticket's description has actually changed by comparing the new
+ * description content with the current ticket description. If changes are detected, it updates the
+ * ticket description and adds a timestamped comment to track the update. If no changes are detected,
+ * it skips the update to avoid unnecessary API calls and notification spam.
+ * 
+ * @param {Object} existingTicket - The existing Jira ticket object (must contain at least the 'key' property)
+ * @param {Array<Object>} descriptionContent - ADF (Atlassian Document Format) content array for the ticket description
+ * @param {string} auth - Base64 encoded authentication string (email:token)
+ * @param {string} JIRA_BASE_URL - Jira instance base URL (e.g., 'tubitv.atlassian.net')
+ * @returns {Promise<Object>} The existing ticket object
+ * @throws {Error} If unable to fetch current description, update ticket, or add comment
+ */
+async function updateExistingTicket(existingTicket, descriptionContent, auth, JIRA_BASE_URL) {
+  log(`Updating existing ticket: ${existingTicket.key}`);
+
+  const hasChanged = await hasDescriptionChanged(existingTicket.key, descriptionContent, auth, JIRA_BASE_URL);
+
+  if (!hasChanged) {
+    log('Description unchanged. No update needed.');
+    log(`   View at: https://${JIRA_BASE_URL}/browse/${existingTicket.key}`);
+    return existingTicket;
+  }
+
+  log('Description has changed. Updating ticket...');
+  await updateTicketDescription(existingTicket.key, descriptionContent, auth, JIRA_BASE_URL);
+
+  // Add update comment
+  const date = new Date();
+  const commentContent = [
+    {
+      type: 'paragraph',
+      content: [{
+        type: 'text',
+        text: `Updated on ${date.toLocaleDateString('en-US')} at ${date.toLocaleTimeString('en-US')}`,
+        marks: [{ type: 'strong' }]
+      }]
+    },
+    buildAdfParagraph('Updated the ticket to include additional translation keys.')
+  ];
+
+  await addCommentToTicket(existingTicket.key, commentContent, auth, JIRA_BASE_URL);
+  log(`   View at: https://${JIRA_BASE_URL}/browse/${existingTicket.key}`);
+
+  return existingTicket;
+}
+
+/**
+ * Creates a new Jira translation ticket in the TINTL project
+ * 
+ * Creates a new Story ticket with:
+ * - Dynamic date-based summary (e.g., "ROKU Translations 10/16/2025")
+ * - ADF formatted description with missing/outdated translation keys
+ * - Custom fields: Story type = Chore, Request Type = Engineering, Platform = Roku
+ * - Assigned to localization team member
+ * - Linked to parent epic (TINTL-21)
+ * - Tagged with Localization label
+ * 
+ * @param {Array<Object>} descriptionContent - ADF content array for the ticket description
+ * @param {string} auth - Base64 encoded authentication string (email:token)
+ * @param {string} JIRA_BASE_URL - Jira instance base URL (e.g., 'tubitv.atlassian.net')
+ * @param {string} JIRA_PROJECT_ID - Jira project ID for TINTL
+ * @param {string} JIRA_ASSIGNEE_ACCOUNT_ID - Account ID of the assignee
+ * @returns {Promise<Object>} The created ticket object from Jira API
+ * @throws {Error} If unable to create the ticket
+ */
+async function createNewTicket(descriptionContent, auth, JIRA_BASE_URL, JIRA_PROJECT_ID, JIRA_ASSIGNEE_ACCOUNT_ID) {
+  log('Creating new translation ticket...');
+
+  const date = new Date();
+  const dateString = `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}/${date.getFullYear()}`;
+  const currentBranch = getCurrentBranch();
+
+  const issueData = {
+    fields: {
+      project: { id: JIRA_PROJECT_ID.toString() },
+      summary: `ROKU Translations ${dateString}`,
+      description: {
+        type: 'doc',
+        version: 1,
+        content: descriptionContent
+      },
+      issuetype: { name: 'Story' },
+      assignee: { accountId: JIRA_ASSIGNEE_ACCOUNT_ID },
+      customfield_10375: { value: 'Chore' },
+      customfield_10276: { value: 'Engineering' },
+      customfield_10247: [{ value: 'Roku' }],
+      parent: { key: 'TINTL-21' },
+      labels: ['Localization', currentBranch]
+    }
+  };
+
+  try {
+    const response = await axios.post(
+      `https://${JIRA_BASE_URL}/rest/api/3/issue`,
+      issueData,
+      {
+        headers: {
+          'Authorization': `Basic ${auth}`,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    log(`✅ New Jira ticket created: ${response.data.key}`);
+    log(`   View at: https://${JIRA_BASE_URL}/browse/${response.data.key}`);
+    return response.data;
+  } catch (error) {
+    log(`Failed to create Jira ticket: ${error.message}`);
+    if (error.response) {
+      log(`Status: ${error.response.status}`);
+      log(`Response: ${JSON.stringify(error.response.data)}`);
+    }
+    throw error;
+  }
+}
+
+/**
+ * Creates or updates a Jira ticket for missing and outdated translations
+ * 
+ * This is the main orchestrator for Jira ticket management. It:
+ * 1. Builds the ticket description from missing/outdated translation keys
+ * 2. Searches for an existing open ROKU translation ticket
+ * 3. If found, updates the existing ticket (if description changed) and adds a comment
+ * 4. If not found, creates a new ticket with all the required fields
+ * 
+ * Environment variables required:
+ * - JIRA_TOKEN: Jira API token for authentication
+ * - JIRA_EMAIL: Email associated with the Jira account
+ * 
+ * @param {Object} untranslatedTranslations - Object with locale codes as keys and arrays of missing keys as values
+ * @param {Array<string>} reTranslationRequiredKeys - Array of keys where English source has changed
+ * @returns {Promise<Object|void>} The created or updated ticket object, or void if env vars missing
+ */
+async function createTicketForMissingTranslations(untranslatedTranslations, reTranslationRequiredKeys) {
+  const JIRA_TOKEN = process.env.JIRA_TOKEN;
+  const JIRA_BASE_URL = 'tubitv.atlassian.net';
+  const JIRA_EMAIL = process.env.JIRA_EMAIL;
+  const JIRA_PROJECT_ID = '10222';
+  const JIRA_ASSIGNEE_ACCOUNT_ID = '5ec76b76ae79a10c16ba92b4'; // Michael Jordan Morales
+
+  if (!JIRA_TOKEN || !JIRA_EMAIL) {
+    log('JIRA_TOKEN and JIRA_EMAIL environment variables are required');
+    return;
+  }
+
+  const auth = Buffer.from(`${JIRA_EMAIL}:${JIRA_TOKEN}`).toString('base64');
+  const descriptionContent = buildTicketDescription(untranslatedTranslations, reTranslationRequiredKeys);
+
+  // Check for existing open ticket and either update or create
+  const existingTicket = await findExistingOpenTranslationTicket(auth, JIRA_BASE_URL);
+
+  if (existingTicket) {
+    // Update the existing ticket
+    const updatedTicket = await updateExistingTicket(existingTicket, descriptionContent, auth, JIRA_BASE_URL);
+
+    // Show warning prompt after update
+    await prompts({
+      type: 'text',
+      name: 'acknowledged',
+      message: `⚠️  Please follow up on the existing translation ticket: https://${JIRA_BASE_URL}/browse/${existingTicket.key}\n   Press Enter to continue...`,
+      initial: ''
+    });
+
+    return updatedTicket;
+  } else {
+    return await createNewTicket(descriptionContent, auth, JIRA_BASE_URL, JIRA_PROJECT_ID, JIRA_ASSIGNEE_ACCOUNT_ID);
+  }
+}
+
+
 module.exports = {
   updateLocalTranslations,
   uploadTranslations,
   downloadAndProcessTranslations,
-  compareTranslations
+  uploadLatestTranslationsAndCreateTicketForMissingTranslations
 }
