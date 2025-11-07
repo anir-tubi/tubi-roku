@@ -1,0 +1,37 @@
+name: Cherry-pick Translations to QA Branch
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - master
+
+jobs:
+  cherry-pick-translations:
+    # Only run if PR was merged (not just closed) and branch starts with translations_update_
+    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'translations_update_')
+    
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.ROKU_AUTO_PAT }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install dependencies
+        run: npm install
+      
+      - name: Run cherry-pick task
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          COMMIT_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+          GITHUB_PAT: ${{ secrets.ROKU_AUTO_PAT }}
+        run: npx gulp cherryPickTranslations
+

@@ -1313,7 +1313,7 @@ async function createTranslationsPullRequest(done) {
     // Process labels from Jira
     const prLabels = processJiraLabelsForPR();
 
-    // Create PR with labels included
+    // Create PR
     const prCreateOptions = {
       owner: ghInfo.owner,
       repo: ghInfo.rokuRepo,
@@ -1323,12 +1323,18 @@ async function createTranslationsPullRequest(done) {
       base: 'master'
     };
 
-    // Add labels if we have any
-    if (prLabels.length > 0) {
-      prCreateOptions.labels = prLabels;
-    }
-
     const prResponse = await octokit().pulls.create(prCreateOptions);
+
+    // Add labels after PR creation (labels can't be added during PR creation)
+    if (prLabels.length > 0) {
+      await octokit().issues.addLabels({
+        owner: ghInfo.owner,
+        repo: ghInfo.rokuRepo,
+        issue_number: prResponse.data.number,
+        labels: prLabels
+      });
+      log(`✅ Added labels to PR: ${prLabels.join(', ')}`);
+    }
 
     const prUrl = prResponse.data.html_url;
     log(`✅ Successfully created pull request: ${prUrl}`);
@@ -1350,6 +1356,201 @@ async function createTranslationsPullRequest(done) {
   } catch (error) {
     log(`Error creating translations pull request: ${error.message}`);
     done(new NoStackError(error.message));
+  }
+}
+
+
+/**
+ * Automatically cherry-picks translation commits from merged PRs to QA branches.
+ * Triggered by GitHub Actions after a translation PR is merged to master.
+ * Reads PR labels to determine target QA branch (pattern: qa_X_Y_Z).
+ * 
+ * Environment variables required:
+ * - PR_NUMBER: The pull request number
+ * - COMMIT_SHA: The commit SHA to cherry-pick
+ * - GITHUB_PAT: GitHub personal access token for API calls
+ * 
+ * @param {Function} done - Gulp callback function
+ */
+async function cherryPickTranslationsToQaBranch(done) {
+  try {
+    log('Starting cherry-pick translations to QA branch...');
+
+    configureGitUser();
+
+    const { prNumber, commitSha, commitShaShort } = getEnvVarsForCherryPick(done);
+    if (!prNumber) return; // Early exit if validation failed
+
+    log(`PR #${prNumber}, Commit: ${commitShaShort}`);
+
+    const targetBranch = await findQaBranchFromPrLabels(prNumber, done);
+    if (!targetBranch) return; // No QA branch label found
+
+    log(`Target branch: ${targetBranch}`);
+
+    if (!verifyBranchExists(targetBranch, done)) return;
+
+    if (!checkoutAndUpdateBranch(targetBranch, done)) return;
+
+    cherryPickAndPush(commitSha, targetBranch, done);
+
+  } catch (error) {
+    log.error(`Error during cherry-pick: ${error.message}`);
+    done(new NoStackError(error.message));
+  }
+}
+
+
+/**
+ * Configures git user for CI environments if not already set.
+ * Sets github-actions[bot] as the default user for commits.
+ */
+function configureGitUser() {
+  const gitEmail = shell.exec('git config user.email', { silent: true });
+  const gitName = shell.exec('git config user.name', { silent: true });
+
+  if (!gitEmail.stdout.trim()) {
+    shell.exec('git config user.email "github-actions[bot]@users.noreply.github.com"', { silent: true });
+  }
+
+  if (!gitName.stdout.trim()) {
+    shell.exec('git config user.name "github-actions[bot]"', { silent: true });
+  }
+}
+
+
+/**
+ * Retrieves and validates required environment variables for cherry-pick operation.
+ * Extracts short SHA (9 characters) for display, keeps full SHA for git operations.
+ * 
+ * @param {Function} done - Gulp callback function
+ * @returns {Object} Object containing prNumber, commitSha (full), and commitShaShort
+ */
+function getEnvVarsForCherryPick(done) {
+  const prNumber = process.env.PR_NUMBER;
+  const commitSha = process.env.COMMIT_SHA;
+
+  if (!prNumber || !commitSha) {
+    log.error('PR_NUMBER and COMMIT_SHA environment variables are required');
+    done(new NoStackError('PR_NUMBER and COMMIT_SHA environment variables are required'));
+    return {};
+  }
+
+  // Convert full SHA to short format (9 chars) for display purposes
+  const shortShaResult = shell.exec(`git rev-parse --short=9 ${commitSha}`, { silent: true });
+  const commitShaShort = shortShaResult.code === 0 ? shortShaResult.stdout.trim() : commitSha.substring(0, 9);
+
+  return { prNumber, commitSha, commitShaShort };
+}
+
+
+/**
+ * Finds the QA branch name from PR labels using the pattern qa_X_Y_Z.
+ * Makes a GitHub API call to retrieve PR labels.
+ * 
+ * @param {string|number} prNumber - Pull request number
+ * @param {Function} done - Gulp callback function
+ * @returns {Promise<string|undefined>} QA branch name if found, undefined otherwise
+ */
+async function findQaBranchFromPrLabels(prNumber, done) {
+  const pr = await octokit().rest.pulls.get({
+    owner: ghInfo.owner,
+    repo: ghInfo.rokuRepo,
+    pull_number: prNumber,
+  });
+
+  const labels = pr.data.labels.map(l => l.name);
+  log(`PR Labels: ${labels.join(', ')}`);
+
+  const qaLabelPattern = /^qa_\d+_\d+_\d+$/;
+  const targetBranch = labels.find(label => qaLabelPattern.test(label));
+
+  if (!targetBranch) {
+    log.error('No QA branch label found (pattern: qa_X_Y_Z). Skipping cherry-pick.');
+    done(new NoStackError('No QA branch label found (pattern: qa_X_Y_Z)'));
+    return;
+  }
+
+  return targetBranch;
+}
+
+
+/**
+ * Verifies that the target branch exists on the remote repository.
+ * Fetches latest branches from origin before checking.
+ * 
+ * @param {string} targetBranch - Name of the branch to verify
+ * @param {Function} done - Gulp callback function
+ * @returns {boolean} True if branch exists, false otherwise
+ */
+function verifyBranchExists(targetBranch, done) {
+  shell.exec('git fetch origin');
+
+  const branchExists = shell.exec(`git ls-remote --heads origin ${targetBranch}`, { silent: true });
+  if (branchExists.code !== 0 || !branchExists.stdout.includes(targetBranch)) {
+    log.error(`Branch ${targetBranch} does not exist`);
+    done(new NoStackError(`Branch ${targetBranch} does not exist`));
+    return false;
+  }
+
+  return true;
+}
+
+
+/**
+ * Checks out the target branch and pulls latest changes from origin.
+ * 
+ * @param {string} targetBranch - Name of the branch to checkout
+ * @param {Function} done - Gulp callback function
+ * @returns {boolean} True if successful, false otherwise
+ */
+function checkoutAndUpdateBranch(targetBranch, done) {
+  log(`Checking out ${targetBranch}...`);
+  const checkoutResult = shell.exec(`git checkout ${targetBranch}`);
+  if (checkoutResult.code !== 0) {
+    log.error(`Failed to checkout ${targetBranch}`);
+    done(new NoStackError(`Failed to checkout ${targetBranch}`));
+    return false;
+  }
+
+  shell.exec(`git pull origin ${targetBranch}`);
+  return true;
+}
+
+
+/**
+ * Cherry-picks the specified commit to the current branch and pushes to origin.
+ * Aborts cherry-pick on failure to avoid leaving the repository in a bad state.
+ * 
+ * @param {string} commitSha - SHA of the commit to cherry-pick
+ * @param {string} targetBranch - Name of the branch to push to
+ * @param {Function} done - Gulp callback function
+ */
+function cherryPickAndPush(commitSha, targetBranch, done) {
+  log(`Cherry-picking commit ${commitSha.substring(0, 7)}...`);
+
+  const cherryPickResult = shell.exec(`git cherry-pick ${commitSha}`);
+
+  if (cherryPickResult.code !== 0) {
+    log.error('Cherry-pick failed - conflicts detected');
+    shell.exec('git cherry-pick --abort');
+    done(new NoStackError('Cherry-pick failed due to conflicts'));
+    return;
+  }
+
+  log('✅ Cherry-pick successful!');
+
+  log(`Pushing to origin/${targetBranch}...`);
+  const pushResult = shell.exec(`git push origin ${targetBranch}`);
+  if (pushResult.code === 0) {
+    log(`✅ Changes pushed to ${targetBranch}`);
+    done();
+  } else {
+    log.error(`Failed to push changes. Exit code: ${pushResult.code}`);
+    log.error(`Error output: ${pushResult.stderr}`);
+    log.error(`Standard output: ${pushResult.stdout}`);
+    shell.exec('git cherry-pick --abort');
+    done(new NoStackError(`Failed to push changes: ${pushResult.stderr || pushResult.stdout}`));
   }
 }
 
@@ -1379,5 +1580,6 @@ module.exports = {
   isBranchTrackingPresent,
   createCdnPullRequestForFoxVideoPlayer,
   createTranslationsPullRequest,
-  createTranslationsPullRequestIfChanges
+  createTranslationsPullRequestIfChanges,
+  cherryPickTranslationsToQaBranch
 };

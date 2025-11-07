@@ -32,7 +32,7 @@ const { replaceTypographyConstants, updateTypographyJSON } = require('./js/typog
 const { NoStackError } = require('./js/utilities');
 
 // Importing functions with Git functionality
-const { makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges, buildQaBranch, bumpBuild, bumpBuildTen, bumpRevision, tagBuild, createCdnPullRequestForOneTrustSDK, createCdnPullRequestForFoxVideoPlayer, sendSlackReminders, getCurrentBranch, isBranchTrackingPresent, createTranslationsPullRequestIfChanges } = require('./js/git');
+const { makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges, buildQaBranch, bumpBuild, bumpBuildTen, bumpRevision, tagBuild, createCdnPullRequestForOneTrustSDK, createCdnPullRequestForFoxVideoPlayer, sendSlackReminders, getCurrentBranch, isBranchTrackingPresent, createTranslationsPullRequestIfChanges, cherryPickTranslationsToQaBranch } = require('./js/git');
 
 // Importing functions related to Github action runners
 const { setupAutomatedTestsGithubActionRunner, startAutomatedTestsGithubActionRunner, removeAutomatedTestsGithubActionRunner } = require('./js/action-runner');
@@ -1285,6 +1285,8 @@ exports.downloadTranslations = downloadAndProcessTranslations;
 exports.uploadLatestTranslationsAndCreateTicketForMissingTranslations = uploadLatestTranslationsAndCreateTicketForMissingTranslations;
 // Downloads translations from Crowdin and creates a pull request only if there are changes (typically triggered by GitHub Actions)
 exports.updateTranslations = series(downloadAndProcessTranslations, createTranslationsPullRequestIfChanges);
+// Cherry-picks merged translation PRs to QA branches based on PR labels
+exports.cherryPickTranslations = cherryPickTranslationsToQaBranch;
 
 exports.updateJsonTypography = updateTypographyJSON;
 exports.updateJsonColor = updateColorJSON;

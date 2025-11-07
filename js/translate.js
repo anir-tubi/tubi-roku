@@ -25,6 +25,9 @@ const _sLocalTranslationFilePath = `${process.cwd()}/${_sLocalTranslationFilenam
 const _sLocalTranslationCodeFilenameAndPath = 'src/channel/source/lib/TubiLanguageTranslate.brs';
 const _sBRSReturn = "  return "
 
+// Whitelisted locales that are allowed to have translation functions in TubiLanguageTranslate.brs
+const WHITELISTED_LOCALES = ['en-US', 'en_US', 'es-MX', 'es_MX', 'fr-CA', 'fr_CA'];
+
 // fetch command line arguments and replace params in crowdinConfig. Right now it just replaces the "crowdinToken"
 // @Source: https://www.sitepoint.com/pass-parameters-gulp-tasks/
 const arg = (argList => {
@@ -270,6 +273,11 @@ function writeLocaleDataToBRS_sync(sLocale, localeData) {
       var re = new RegExp(escapeRegExp(sStartFunctionString) + "[\\s\\S]*?" + sEndFunctionString, "i");
       newValue = data.replace(re, sNewString);
     } else {
+      // Only create new translation functions for whitelisted locales
+      if (!WHITELISTED_LOCALES.includes(sLocale)) {
+        log(`Skipping ${sLocale} - not a whitelisted locale. Only ${WHITELISTED_LOCALES.join(', ')} are allowed.`);
+        return;
+      }
       //If the locale function does not exist, then create a new function with the new translations
       log(`Could not find ${sLocale} locale function. Appending it to the end of the BRS file: '${_sLocalTranslationCodeFilenameAndPath}'`);
       newValue = `${data}\n\n\n${sNewString}`;
@@ -762,7 +770,7 @@ async function findExistingOpenTranslationTicket(auth, JIRA_BASE_URL) {
 
     // JQL query to find open ROKU translation tickets for the current branch
     // Using summary match instead of custom field to avoid field ID issues
-    const jql = `project = TINTL AND summary ~ "ROKU Translations" AND status != Done AND labels = Localization AND labels = "${currentBranch}" ORDER BY created DESC`;
+    const jql = `project = TINTL AND summary ~ "ROKU Translations" AND status NOT IN (Done, Released) AND labels = Localization AND labels = "${currentBranch}" ORDER BY created DESC`;
 
     const response = await axios.get(
       `https://${JIRA_BASE_URL}/rest/api/3/search/jql`,
