@@ -2314,6 +2314,10 @@ Function getTranslation_es_MX()
       "description": "Program time Title for live program.",
       "message": "Comenzó a las"
     },
+    "circular_counter_starts_in": {
+      "description": "Text displayed in circular counter component to indicate countdown starting.",
+      "message": "Pantalla completa en"
+    },
     "detail_screen_like_disLike_toast_header": {
       "description": "header text to be displayed on Toast-message when user like/dislike a title",
       "message": "Gracias por tus comentarios!"
@@ -2509,6 +2513,14 @@ Function getTranslation_es_MX()
     "dialog_contentNotAvailable_Parental_description": {
       "description": "Message of a Dialog Window that is shown when a deeplink content can not played because of user's parental control setting",
       "message": "Por favor, desactiva el control parental para utilizar esta función."
+    },
+    "error_connection_title": {
+      "description": "title of error window when there is a connection error",
+      "message": "Error de conexión"
+    },
+    "error_connection_description": {
+      "description": "description of error window when there is a connection error",
+      "message": "Puede haber un problema con tu conexión de red o con el servidor de Tubi. Verifica tu conexión e inténtalo de nuevo\n"
     },
     "dialog_updateVersion_title": {
       "description": "title of a dialog window that is shown when the user has an older version of the app",
@@ -3438,10 +3450,6 @@ Function getTranslation_es_MX()
       "description": "Label to display time left in linear video player info panel",
       "message": "{time} quedan"
     },
-    "linearVideoPlayer_adCounter": {
-      "description": "Label to display ad counter in linear video player",
-      "message": "Ad {ad_index} de {ad_count}"
-    },
     "channel_name": {
       "description": "This is the name of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
       "message": "Tubi - Películas y Series Gratis"
@@ -4262,6 +4270,10 @@ Function getTranslation_fr_CA()
       "description": "Program time Title for live program.",
       "message": "Commencé à"
     },
+    "circular_counter_starts_in": {
+      "description": "Text displayed in circular counter component to indicate countdown starting.",
+      "message": "Plein écran dans"
+    },
     "detail_screen_like_disLike_toast_header": {
       "description": "header text to be displayed on Toast-message when user like/dislike a title",
       "message": "Merci pour vos commentaires!"
@@ -4461,6 +4473,14 @@ Function getTranslation_fr_CA()
     "dialog_contentNotAvailable_Parental_description": {
       "description": "Message of a Dialog Window that is shown when a deeplink content can not played because of user's parental control setting",
       "message": "Veuillez désactiver le contrôle parental pour regarder ce contenu."
+    },
+    "error_connection_title": {
+      "description": "title of error window when there is a connection error",
+      "message": "Erreur de connexion"
+    },
+    "error_connection_description": {
+      "description": "description of error window when there is a connection error",
+      "message": "Il peut y avoir un problème avec votre connexion réseau ou le serveur de Tubi. Vérifiez votre connexion et réessayez.\n"
     },
     "dialog_updateVersion_title": {
       "description": "title of a dialog window that is shown when the user has an older version of the app",
@@ -5390,10 +5410,6 @@ Function getTranslation_fr_CA()
       "description": "Label to display time left in linear video player info panel",
       "message": "{time} restantes"
     },
-    "linearVideoPlayer_adCounter": {
-      "description": "Label to display ad counter in linear video player",
-      "message": "Ad {ad_index} du {ad_count}"
-    },
     "channel_name": {
       "description": "This is the name of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
       "message": "Tubi - Films et TV gratuits"
@@ -6253,10 +6269,6 @@ Function getTranslation_en_GB()
     "videoPlayer_adHeadsUp": {
       "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
       "message": "Adverts start in {seconds} s"
-    },
-    "linearVideoPlayer_adCounter": {
-      "description": "Label to display ad counter in linear video player",
-      "message": "Advert {ad_index} of {ad_count}"
     },
     "channel_webDescription": {
       "description": "This is the description of the app. This is not located in the app. It is displayed to the user in the Roku Web Channel Store",
