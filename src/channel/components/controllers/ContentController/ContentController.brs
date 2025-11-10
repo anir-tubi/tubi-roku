@@ -1761,7 +1761,7 @@ Function setVideoContentScreenBackground(screen)
     isAdCarouselRowContent = gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
     if arrayIncludes(m.constants.ui.liveEventsGridTypes, contentFocused.gridItemType) = true
       displayFullScreenVideoBackground(contentFocused)
-    else if contentFocused <> invalid AND shouldDisplayFullScreenVideoBackground(contentFocused) = true AND m.videoTilesVariant <> "trueControlTop2Rows" AND currentScreen.id = m.constants.ui.screenIds.homeScreen
+    else if contentFocused <> invalid AND shouldDisplayFullScreenVideoBackground(contentFocused) = true AND m.videoTilesVariant <> "trueControlTop2Rows" AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND isKidsUIOn() = false
       m.backgroundGroup.backgroundInfo = {
         type: m.constants.ui.backgroundTypes.cinematic
         uriList: contentFocused.backgrounds
@@ -2419,13 +2419,14 @@ Function onFullscreenCountdown()
         nNewCount = nCurrentCount - 1
         screen.fullscreenCountdown = nNewCount
         if nNewCount <= 0
-          fade(m.autoStartPreviewToPlaybackTimer, "out", 0.1)
           selectLinearContent(contentToPlay)
         end if
 
-        if m.isUserInVideoTilesExperiment = true AND screen.id = m.constants.ui.screenIds.homeScreen
+        if m.isUserInVideoTilesExperiment = true AND screen.id = m.constants.ui.screenIds.homeScreen AND nNewCount > 0
           fade(m.autoStartPreviewToPlaybackTimer, "in", 0.1)
           m.autoStartPreviewToPlaybackTimer.countdownText = nNewCount.ToStr()
+        else
+          fade(m.autoStartPreviewToPlaybackTimer, "out", 0.1)
         end if
       end if
     end if

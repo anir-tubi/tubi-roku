@@ -1431,10 +1431,11 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
   categoryParent.totalDuplicates = categoryChildrenInfo.totalDuplicates
   categoryChildrenCount = categoryParent.children.count()
 
-  if m.statSigExperiments <> invalid
+  ' Applying this logic only for home screen and standard mode.
+  if m.statSigExperiments <> invalid AND contentMode = "" AND uiMode = "standard"
     experiment = m.statSigExperiments.getExperimentResource("roku_video_tiles", "roku_video_tiles_1_7")
     tileDesignType = experiment.design_type
-    isUserInVideoTilesExp = (tileDesignType = "videoTiles") AND uiMode = "standard"
+    isUserInVideoTilesExp = (tileDesignType = "videoTiles")
     if isUserInVideoTilesExp = true AND container.id = m.constants.ui.categoryIds.recommendedForYou AND experiment.variant = "cinematicTop2Rows"
       categoryParent.isControlLandscape = true
     end if

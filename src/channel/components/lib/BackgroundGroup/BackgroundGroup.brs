@@ -176,6 +176,10 @@ Function newBackgroundSet()
 
   if m.lastBackgroundInfo <> invalid AND m.aCurrentBackgroundInfo <> invalid AND m.lastBackgroundInfo.type <> m.aCurrentBackgroundInfo.type
     backgroundType = m.aCurrentBackgroundInfo.type
+    ' Hiding the video tiles background gradient when the background type is not cinematic.
+    if m.videoTilesBackgroundGradient.opacity > 0 AND backgroundType <> backgroundTypes.cinematic
+      fade(m.videoTilesBackgroundGradient, "out", 0.1)
+    end if
 
     if backgroundType = backgroundTypes.fullScreen
       '// fullScreen2 displays the images in full screen with two gradient overlays, 1) a vertical gradient overlay that is more opaque on the bottom and 2) a horizontal gradient overlay that is more opaque on the left

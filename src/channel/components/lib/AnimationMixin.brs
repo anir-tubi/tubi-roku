@@ -359,6 +359,10 @@ Function animate(target as Object, options as Object) as Object
       heightInterpolator.fieldToInterp = target.id + ".height"
     else if heightInterpolator <> invalid AND (options.height = invalid OR options.height = target.height)
       animation.removeChild(heightInterpolator)
+    else if heightInterpolator <> invalid AND options.height <> invalid
+      ' This logic provides a grace degradation if animation gets stopped in between in.
+      target.height = options.height
+      animation.removeChild(heightInterpolator)
     end if
 
     widthInterpolator = animation.findNode("WidthInterpolator-" + target.id)
@@ -367,6 +371,10 @@ Function animate(target as Object, options as Object) as Object
       widthInterpolator.id = "WidthInterpolator-" + target.id
       widthInterpolator.fieldToInterp = target.id + ".width"
     else if widthInterpolator <> invalid AND (options.width = invalid OR options.width = target.width)
+      animation.removeChild(widthInterpolator)
+    else if widthInterpolator <> invalid AND options.width <> invalid
+      ' This logic provides a grace degradation if animation gets stopped in between in.
+      target.width = options.width
       animation.removeChild(widthInterpolator)
     end if
 

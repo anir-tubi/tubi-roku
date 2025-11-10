@@ -491,7 +491,29 @@ Function onVideoPreviewPositionChanged(msg)
   end if
 
   if m.isUserInVideoTilesExperiment = true AND contentFocused <> invalid AND m.videoTilesVariant <> "trueControlTop2Rows"
-    renderAutoStartPlaybackFromPreviewCounter(contentFocused, position, duration)
+    ' Determines if the full video player should be blocked for the current user
+    ' The full player is blocked if ANY of these conditions are true:
+    '
+    ' 1. GDPR + Kids/Parental Controls:
+    '    - User is in a GDPR region (Europe)
+    '    - AND either:
+    '      * Kids mode is enabled, OR
+    '      * Parental controls are NOT at adult level
+    '
+    ' 2. Login Required:
+    '    - Content requires user to be logged in
+    '
+    ' 3. Grid Item Type Restriction:
+    '    - Content's gridItemType is in the restricted list
+    '    - (e.g., promotional content, ads, special content types)
+    '
+    ' 4. Fox Content:
+    '    - Content's playerType is Fox (requires special handling)
+    isFullPlayerBlockedForUser = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR contentFocused.needsLogin = true OR arrayIncludes(m.constants.ui.fullScreenVideoPlayerGridItemTypes, contentFocused.gridItemType) = true OR contentFocused.playerType = m.constants.ui.playerTypes.fox
+
+    if isFullPlayerBlockedForUser = false
+      renderAutoStartPlaybackFromPreviewCounter(contentFocused, position, duration)
+    end if
   end if
 End Function
 

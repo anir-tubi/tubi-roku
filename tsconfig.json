@@ -5,12 +5,12 @@
     "checkJs": true,
     "resolveJsonModule": true,
     "noImplicitAny": false,
-    "target": "ES2017",
+    "target": "ES2018",
     "module": "commonjs",
     "sourceMap": true,
     "declaration": true
   },
   "ts-node": {
-      "transpileOnly": true
+    "transpileOnly": true
   }
 }

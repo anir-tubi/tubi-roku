@@ -16,6 +16,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
   if content <> invalid
     tubiLog("LinearVideoPlayerScreenHelpers.playLinearVideoContent")
     stopVideoPreview()
+    m.autoStartPreviewToPlaybackTimer.opacity = 0
 
     ' we make changes to the content from this point forward. If we don't clone, those changes will initialize
     ' a variety of unexpected and unwanted callbacks, as the passed in content potentially exists on a number

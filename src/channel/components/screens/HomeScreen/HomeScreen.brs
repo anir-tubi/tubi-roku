@@ -110,7 +110,7 @@ Function setContentAreaState(state = invalid)
   tubiLog("HomeScreen.setToRedesignContentArea")
 
   shouldAnimate = false
-  if m.isUserInVideoTilesExperiment = false OR (m.top.featuredListHasFocus = false AND m.CategoryGridList.lastFocusedList = "skinAdRow") OR m.top.featuredRowContent = invalid
+  if m.isUserInVideoTilesExperiment = false OR (m.top.featuredListHasFocus = false AND m.CategoryGridList <> invalid AND m.CategoryGridList.lastFocusedList = "skinAdRow") OR m.top.featuredRowContent = invalid
     m.currentContentAreaTranslation = m.originalContentAreaTranslation
     shouldAnimate = true
   else
@@ -287,6 +287,7 @@ Function onLoadingChange()
     m.top.adContentUpdated = false
     m.top.featuredRowContent = invalid
     m.top.content = invalid
+    m.CategoryGridList.resetFeaturedRowList = true
 
     ' Resetting the previous state variables.
     m.CategoryGridList.featuredListCurrFocusRow = -1

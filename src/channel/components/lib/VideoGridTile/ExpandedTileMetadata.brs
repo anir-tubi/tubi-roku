@@ -267,7 +267,7 @@ Function metadataOnPosterContent(itemContent)
     sotBadge = itemContent.sotInfo.sotMetadata[0]
   end if
 
-  if itemContent.type <> "linear" AND isAA(sotBadge) = true AND sotBadge.count() > 0
+  if itemContent.type <> "linear" AND isAA(sotBadge) = true AND sotBadge.count() > 0 AND sotBadge.sotType <> "tubiPresentsLogo"
     if isSotBadgePresent = false
       ratingIndex = m.nodeHelpers.getChildIndex(ratingSotParent, m.rating)
       if ratingIndex <> -1
@@ -299,6 +299,9 @@ Function metadataOnPosterContent(itemContent)
     for each sotMetadata in sotInfo.sotMetaData
       if sotMetadata.sotType = "tubiPresentsLogo"
 
+        ' Append the tubiPresentsLogo Poster to firstLineGroup
+        m.firstLineGroup.appendChild(m.tubiPresentsLogo)
+
         ' Set Poster properties - use sotIcon as the uri
         if isNonEmptyString(sotMetadata.sotIcon) = true
           m.tubiPresentsLogo.uri = sotMetadata.sotIcon
@@ -313,8 +316,6 @@ Function metadataOnPosterContent(itemContent)
           m.tubiPresentsLogo.height = sotMetadata.height
         end if
 
-        ' Append the tubiPresentsLogo Poster to firstLineGroup
-        m.firstLineGroup.appendChild(m.tubiPresentsLogo)
         m.tubiPresentsLogo.visible = true
         exit for ' Only process the first matching item
       end if

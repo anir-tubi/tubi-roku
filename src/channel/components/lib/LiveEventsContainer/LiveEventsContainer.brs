@@ -215,11 +215,11 @@ Function refreshButtonList()
     end if
     ' Avoiding unnecessary updates to the onItemContentChange been triggered.
     m.top.unObserveFieldScoped("itemContent")
-    itemContent.update({
-      actionId: buttonContent.id
-    }, true)
     m.top.observeFieldScoped("itemContent", "onItemContentChange")
     if buttonContent <> invalid
+      itemContent.update({
+        actionId: buttonContent.id
+      }, true)
       content = CreateObject("roSGNode", "ContentNode")
       content.update(buttonContent, true)
 

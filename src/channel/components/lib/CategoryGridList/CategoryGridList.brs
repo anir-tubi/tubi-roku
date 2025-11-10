@@ -27,6 +27,7 @@ Function init()
   m.featuredRowList.observeFieldScoped("currFocusRow", "onFeaturedListCurrFocusRowChange")
   m.featuredRowList.observeFieldScoped("vertFocusDirection", "onVertFocusDirectionChange")
   m.top.observeFieldScoped("contentUpdated", "onFeaturedRowContentChange")
+  m.top.observeFieldScoped("resetFeaturedRowList", "onResetFeaturedRowListChange")
 
   experimentsInfo = getExperimentsInfoFromGlobal()
   experiments = TubiExperiments(experimentsInfo)
@@ -131,6 +132,10 @@ Function onFeaturedRowContentChange(msg)
   end if
 End Function
 
+
+Function onResetFeaturedRowListChange(msg)
+  m.featuredRowList.content = invalid
+End Function
 
 Function onFeaturedRowItemSelected(msg)
   tubiLog("CategoryGridList.onFeaturedRowItemSelected")
@@ -641,6 +646,7 @@ Function setFeaturedRowHeights()
   if m.variant = "typography_improvements"
     metadataSectionHeight = 286
   end if
+  numRows = 3
 
   if isNode(featuredRowContent) = true
     heights = []
@@ -672,6 +678,7 @@ Function setFeaturedRowHeights()
       else if gridItemType = gridItemTypes.liveEventBanner
         rowItemSize.push(bannerSize)
         heights.push(bannerSize[1])
+        numRows = 4
       else if gridItemType = gridItemTypes.historySignedOutUser
         rowItemSize.push(guestCWPosterSize)
         ' 80 is the padding below the poster.
@@ -724,6 +731,7 @@ Function setFeaturedRowHeights()
       "rowItemSize": rowItemSize
       "rowHeights": heights
       "focusXOffset": [0]
+      "numRows": numRows
     })
 
     if m.top.featuredRowFocusedItem = invalid AND m.skinAdRow.content = invalid
