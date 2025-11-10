@@ -1432,7 +1432,7 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
   categoryChildrenCount = categoryParent.children.count()
 
   ' Applying this logic only for home screen and standard mode.
-  if m.statSigExperiments <> invalid AND contentMode = "" AND uiMode = "standard"
+  if m.statSigExperiments <> invalid AND contentMode = "" AND uiMode = "standard" AND screenId = m.constants.ui.screenIds.homeScreen
     experiment = m.statSigExperiments.getExperimentResource("roku_video_tiles", "roku_video_tiles_1_7")
     tileDesignType = experiment.design_type
     isUserInVideoTilesExp = (tileDesignType = "videoTiles")

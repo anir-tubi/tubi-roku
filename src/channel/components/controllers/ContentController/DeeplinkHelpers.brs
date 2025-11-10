@@ -45,7 +45,13 @@ Function createDeeplinkContentFromStartupArgs(args)
 
   ' default deep link source is no-source
   sourceArg = args.source
-  if sourceArg = invalid OR m.constants.deeplinks[sourceArg] = invalid
+  mediaType = args.mediaType
+  if isNonEmptyString(mediaType) = true
+    mediaType = LCase(mediaType)
+  end if
+  if args <> invalid AND arrayIncludes(["sportsevent", "livestream", "livefeed"], mediaType)
+    content.source = m.constants.deeplinks["sports-hub"]
+  else if sourceArg = invalid OR m.constants.deeplinks[sourceArg] = invalid
     content.source = "no-source"
   else
     content.source = m.constants.deeplinks[sourceArg]

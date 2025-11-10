@@ -1939,6 +1939,7 @@ Function getConstants()
   constants.deeplinks["auto-run-dev"] = "sideload"
   constants.deeplinks["hs-d"] = "feature-free-page"
   constants.deeplinks["dial"] = "dial"
+  constants.deeplinks["sports-hub"] = "platform_sports_hub"
 
   constants.deeplinks.entrypoints = {}
   constants.deeplinks.entrypoints.detail = "detail"
