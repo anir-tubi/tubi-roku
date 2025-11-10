@@ -3644,7 +3644,7 @@ Function onAdTrackingObject(msg)
   if adStatus = "PodStart"
     ' Firing the exposure event when ad is loaded.
     getExperimentResource("roku_player_ui_refresh", "roku_ads_overlay_v1", true)
-    updatePlayerLogLib(m.playerLogLib, "setAdPodStart", adInfo)
+    updatePlayerLogLib(m.playerLogLib, "setTotalAdDurationInCurrentPod", adInfo)
   else if adStatus = "Impression" AND m.isAdsOverlayExperimentEnabled = true
     ' Since Roku clears out the node when the ad is complete, we need to re-append the adCountdownOverlay to the RAFAdContainer.
     overlay = m.RAFAdContainer.findNode("adCountdownOverlay")
@@ -3656,9 +3656,11 @@ Function onAdTrackingObject(msg)
     end if
   else if adStatus = "Start"
     m.playerExitInfo["ad_counts"] += 1
+    updatePlayerLogLib(m.playerLogLib, "setAdCount", 1)
     updatePlayerLogLib(m.playerLogLib, "fireAdStartupPerformanceEvent", adInfo)
     updatePlayerLogLib(m.playerLogLib, "fireAdStartEvent", adInfo)
   else if adStatus = "Complete"
+    updatePlayerLogLib(m.playerLogLib, "setAdViewTime", adInfo)
     updatePlayerLogLib(m.playerLogLib, "fireAdCompleteEvent", adInfo)
   else if adStatus = "Error"
     'If the last ad in the ad pod returns an error, we need to reset is_buffering to false, as onAdBufferingObject won't be triggered afterward.
@@ -3666,6 +3668,9 @@ Function onAdTrackingObject(msg)
     updatePlayerLogLib(m.playerLogLib, "fireAdDiscontinueEvent", adInfo)
   else if adStatus = "PodComplete"
     updatePlayerLogLib(m.playerLogLib, "fireAdPodCompleteEvent", adInfo)
+  else if adStatus = "Close"
+    updatePlayerLogLib(m.playerLogLib, "setAdViewTime", adInfo)
+    updatePlayerLogLib(m.playerLogLib, "resetAdPodInfo")
   end if
 
   'This helps to set the different startup results like START_LOAD, VIEWED_FIRST_FRAME, PLAY_STARTED, UNKNOWN

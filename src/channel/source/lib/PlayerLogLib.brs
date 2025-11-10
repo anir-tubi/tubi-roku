@@ -119,9 +119,11 @@ Function PlayerLogLib(constants, tracking)
 
     adType: "preroll" 'Possible values are preroll, midroll, seek. It helps to set playerStage etc
     isAd: false 'used in qualityOfService event
-    totalAdDurationPerTitle: 0 'used in adPodComplete event
-    failedAdCountPerTitle: 0 'used in adPodComplete event
+    totalAdViewTimePerTitle: 0 'used in RealtimeQos event
+    failedAdCountPerTitle: 0 'used in RealtimeQos event
     adStartupFailureCount: 0 'used in qualityOfService event
+    totalAdDurationPerAdPod: 0 'used in adPodComplete event
+    failedAdCountPerAdPod: 0 'used in adPodComplete event
     adReBuffer: 0 'used in qualityOfService event
     totalAdFirstFrameDuration: 0 'used in qualityOfService event
     failedAdCount: 0 'used in qualityOfService event
@@ -195,7 +197,6 @@ Function PlayerLogLib(constants, tracking)
     setAdState: playerLogLib_setAdState
     setAdType: playerLogLib_setAdType
     setAdBufferStartTime: playerLogLib_setAdBufferStartTime
-    resetAdMetrics: playerLogLib_resetAdMetrics
     trackAdReBuffer: playerLogLib_trackAdReBuffer
     setAdCount: playerLogLib_setAdCount
     setAdStartupFailureCount: playerLogLib_setAdStartupFailureCount
@@ -204,6 +205,9 @@ Function PlayerLogLib(constants, tracking)
     setAdBufferingDurationStartTime: playerLogLib_setAdBufferingDurationStartTime
     setAdBufferingDurationEndTime: playerLogLib_setAdBufferingDurationEndTime
     getAdsExitedBeforeFirstFrame: playerLogLib_getAdsExitedBeforeFirstFrame
+    resetAdPodInfo: playerLogLib_resetAdPodInfo
+    setTotalAdDurationInCurrentPod: playerLogLib_setTotalAdDurationInCurrentPod
+    setAdViewTime: playerLogLib_setAdViewTime
 
     'public functions which fire events
     fireCuepointFilledEvent: playerLogLib_fireCuepointFilledEvent
@@ -217,7 +221,6 @@ Function PlayerLogLib(constants, tracking)
     fireAdMissedEvent: playerLogLib_fireAdMissedEvent
     fireRealtimeQoSEvent: playerLogLib_fireRealtimeQoSEvent
     fireContentErrorEvent: playerLogLib_fireContentErrorEvent
-    setAdPodStart: playerLogLib_setAdPodStart
 
     ' public functions to track browse while watching
     updateBrowseWhileWatchingOpenCount: playerLogLib_updateBrowseWhileWatchingOpenCount
@@ -244,6 +247,7 @@ Function PlayerLogLib(constants, tracking)
     resetQoSAttributes: playerLogLib_resetQoSAttributes
     resetTrackId: playerLogLib_resetTrackId
     resetAdType: playerLogLib_resetAdType
+    resetAdMetrics: playerLogLib_resetAdMetrics
 
     sendEvent: playerLogLib_sendEvent
     sendRealtimeEvent: playerLogLib_sendRealtimeEvent
@@ -481,6 +485,7 @@ Function playerLogLib_setVideoControl(videoControl = "")
   if isNonEmptyString(videoControl) = true
     if videoControl = "play"
       m.resetQoSAttributes()
+      m.resetAdMetrics()
       m.resetAdState()
       m.resetAdType()
       m.setAdPlayed(false)
@@ -987,20 +992,6 @@ Function playerLogLib_fireAdStartupPerformanceEvent(adCtx = {})
 End Function
 
 
-'The Ad Pod Start event will be triggered when Ad Pod Starts.
-'
-'@adCtx: assocarray, contains ad information
-Function playerLogLib_setAdPodStart(adCtx = {})
-  m.resetAdMetrics()
-
-  if isAA(adCtx) = true AND isNumber(adCtx.adCount) = true
-    m.setAdCount(adCtx.adCount)
-  else
-    m.setAdCount(0)
-  end if
-End Function
-
-
 'The Ad Start event will be triggered when Ad starts.
 '
 '@adCtx: assocarray, contains ad information
@@ -1045,8 +1036,6 @@ Function playerLogLib_fireAdCompleteEvent(adCtx = {})
   }
 
   if isAA(adCtx) = true
-    m.totalAdDurationPerTitle += adCtx.duration
-
     adCompleteInfo = m.updateSingleAdInfo(adCtx)
     adCompleteInfo["video_id"] = m.videoId
     m.sendEvent(adCompleteInfo, "ad_complete", eventBase)
@@ -1059,7 +1048,7 @@ End Function
 '@adCtx: assocarray, contains ad information
 Function playerLogLib_fireAdDiscontinueEvent(adCtx = {})
   m.failedAdCountPerTitle += 1
-  m.totalAdDurationPerTitle += adCtx.duration
+  m.failedAdCountPerAdPod += 1
 
   eventBase = {
     track_id: ""
@@ -1116,12 +1105,15 @@ Function playerLogLib_fireAdPodCompleteEvent(adCtx = {})
   adPodCompleteInfo = {}
   adPodCompleteInfo["track_id"] = m.playerLogTrackId
   adPodCompleteInfo["ad_count"] = adCount
-  adPodCompleteInfo["successful_count"] = adCount - m.failedAdCountPerTitle
-  adPodCompleteInfo["failed_count"] = m.failedAdCountPerTitle
+  adPodCompleteInfo["successful_count"] = adCount - m.failedAdCountPerAdPod
+  adPodCompleteInfo["failed_count"] = m.failedAdCountPerAdPod
   adPodCompleteInfo["is_preroll"] = (adCtx.rendersequence = "preroll")
   adPodCompleteInfo["video_id"] = m.videoId
-  adPodCompleteInfo["total_ads_duration"] = Round(m.totalAdDurationPerTitle)
+  adPodCompleteInfo["total_ads_duration"] = Round(m.totalAdDurationPerAdPod)
   m.sendEvent(adPodCompleteInfo, "ad_pod_complete", eventBase)
+
+  m.totalAdDurationPerAdPod = 0
+  m.failedAdCountPerAdPod = 0
 End Function
 
 
@@ -1161,10 +1153,19 @@ Function playerLogLib_updateSingleAdInfo(adCtx = {})
 End Function
 
 
+'resets the AdMetrics related to AdPod
+Function playerLogLib_resetAdPodInfo()
+  m.totalAdDurationPerAdPod = 0
+  m.failedAdCountPerAdPod = 0
+End Function
+
+
 'resets the AdMetrics
 Function playerLogLib_resetAdMetrics()
   m.failedAdCountPerTitle = 0
-  m.totalAdDurationPerTitle = 0
+  m.totalAdViewTimePerTitle = 0
+  m.totalAdDurationPerAdPod = 0
+  m.failedAdCountPerAdPod = 0
 End Function
 
 
@@ -1226,13 +1227,6 @@ Function playerLogLib_setAdStartupFailureCount(count = 1)
   else
     m.adStartupFailureCount += 1
   end if
-End Function
-
-
-'setTotalAdDurationPerTitle sets the totalAdDurationPerTitle value by checking ad playback
-'
-Function playerLogLib_setTotalAdDurationPerTitle()
-  m.totalAdDurationPerTitle += 1
 End Function
 
 
@@ -1816,7 +1810,7 @@ Function playerLogLib_fireRealtimeQoSEvent()
   end if
 
   if m.totalBufferingDuration > 0
-    realtimeQosInfo["bufferingDuration"] = (m.totalBufferingDuration * 1000)
+    realtimeQosInfo["bufferingDuration"] = Round(m.totalBufferingDuration)
   end if
 
   if m.seekCount > 0
@@ -1824,7 +1818,7 @@ Function playerLogLib_fireRealtimeQoSEvent()
   end if
 
   if m.totalSeekDuration > 0
-    realtimeQosInfo["seekDuration"] = (m.totalSeekDuration * 1000)
+    realtimeQosInfo["seekDuration"] = Round(m.totalSeekDuration)
   end if
 
   if m.contentFirstFrameDuration >= 0 'very first time
@@ -1847,7 +1841,7 @@ Function playerLogLib_fireRealtimeQoSEvent()
     realtimeQosInfo["adCount"] = m.adCount
   end if
 
-  realtimeQosInfo["adViewTime"] = m.totalAdDurationPerTitle
+  realtimeQosInfo["adViewTime"] = m.totalAdViewTimePerTitle
 
   adsExitedBeforeFirstFrame = m.getAdsExitedBeforeFirstFrame()
   if adsExitedBeforeFirstFrame > 0
@@ -1981,4 +1975,26 @@ Function playerLogLib_setStartupFailureCount()
   end if
 
   m.startupFailureCount = startupFailureCount
+End Function
+
+
+'setTotalAdDurationInCurrentPod sets the total ads duration in current pod
+'
+'@adCtx: assocarray, contains ad information
+'
+Function playerLogLib_setTotalAdDurationInCurrentPod(adCtx)
+  if isAA(adCtx) = true AND isInteger(adCtx.totaladdurationincurrentpod) = true
+    m.totalAdDurationPerAdPod = adCtx.totaladdurationincurrentpod
+  end if
+End Function
+
+
+'setAdViewTime appends the ads view time
+'
+'@adCtx: assocarray, contains ad information
+'
+Function playerLogLib_setAdViewTime(adCtx)
+  if isAA(adCtx) = true AND isInteger(adCtx.time) = true
+    m.totalAdViewTimePerTitle += adCtx.time
+  end if
 End Function

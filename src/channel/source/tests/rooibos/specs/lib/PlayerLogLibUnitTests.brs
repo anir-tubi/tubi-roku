@@ -8,12 +8,12 @@ Function PlayerLogLibSetup()
   tracking = TubiTracking(constants, auth, {}, request)
   m.playerLogLib = PlayerLogLib(constants, tracking)
   m.playerLogLib.sendEvent = sendEvent
-End function
+End Function
 
 
 Function sendEvent(data = {} as Dynamic, subType = "" as String, eventBase = {})
   eventInfo = m.tracking.populateMessage(subType, data, eventBase)
-  eventValues =  eventInfo[subType]
+  eventValues = eventInfo[subType]
   trackData = m.tracking.getPlayerAnalyticsEvent(subType, eventValues)
   m.trackingLoggingTask = CreateObject("roSGNode", "TrackingLoggingTask")
   m.trackingLoggingTask.trackPlayerEvent = trackData
@@ -361,7 +361,7 @@ End Function
 Function playerLogLib_resetAdMetrics_test()
   m.playerLogLib.resetAdMetrics()
   m.assertEqual(m.playerLogLib.failedAdCountPerTitle, 0)
-  m.assertEqual(m.playerLogLib.totalAdDurationPerTitle, 0)
+  m.assertEqual(m.playerLogLib.totalAdViewTimePerTitle, 0)
 End Function
 
 

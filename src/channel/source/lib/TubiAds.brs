@@ -992,6 +992,9 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
       if ctx.rendertime <> invalid
         adTrackingObject.rendertime = ctx.rendertime
       end if
+      if ctx.time <> invalid
+        adTrackingObject.time = ctx.time
+      end if
 
       ' Overriding the ads context to reset the sequence since ROKU does not have a way to figure out render sequence properly for VAST ad format.
       ' And it always falls back to preroll. We are basing the value based on the current position when the break occurred.
