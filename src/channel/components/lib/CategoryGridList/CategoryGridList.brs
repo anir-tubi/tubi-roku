@@ -229,7 +229,7 @@ End Function
 '
 Function onComponentFocusChange(msg)
   tubiLog("CategoryGridList.onComponentFocusChange " + focusState(m.top))
-  if m.isUserInVideoTiles = true
+  if m.isUserInVideoTiles = true AND m.top.featuredRowContent <> invalid
     content = m.top.featuredRowContent
   else
     content = m.top.content

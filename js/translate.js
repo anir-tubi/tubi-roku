@@ -74,13 +74,30 @@ async function getTranslationsZipFile(url) {
  * @param {string} localeData - A JSON string containing translations with the "message" property
  * @returns {string} - A JSON string with the filtered translations
  */
-function removeEmptyTranslations(localeData) {
+function removeEmptyTranslations(localeData, sLocale) {
   const jsonTranslationFile = JSON.parse(localeData);
-
+  const emptyTranslationKeys = [];
   for (const key in jsonTranslationFile) {
     if (jsonTranslationFile[key].message === "") {
+      if ((sLocale === "es-MX") && !emptyTranslationKeys.includes(key)) {
+        emptyTranslationKeys.push(key);
+      }
       delete jsonTranslationFile[key];
     }
+  }
+
+  if (sLocale === "es-MX" && emptyTranslationKeys.length > 0) {
+    // Update en-US.json with noTranslationRequired flag for empty keys
+    const englishTranslations = JSON.parse(fs.readFileSync(_sLocalTranslationFilePath, 'utf8'));
+
+    for (const key of emptyTranslationKeys) {
+      if (englishTranslations[key]) {
+        englishTranslations[key].noTranslationRequired = true;
+      }
+    }
+
+    // Write updated translations back to en-US.json
+    fs.writeFileSync(_sLocalTranslationFilePath, JSON.stringify(englishTranslations, null, 2) + '\n', 'utf8');
   }
 
   const jsonString = JSON.stringify(jsonTranslationFile, null, 2);
@@ -117,7 +134,7 @@ async function processTranslationFiles(directory) {
           var localeData = fs.readFileSync(destinationPath, 'utf-8');
 
           //remove any translation that are empty strings
-          const jsonString = removeEmptyTranslations(localeData)
+          const jsonString = removeEmptyTranslations(localeData, sLocale)
 
           // write the contents of the translation json to the appropriate function
           // in the TubiLanguageTranslate.brs file
@@ -690,7 +707,7 @@ async function uploadLatestTranslationsAndCreateTicketForMissingTranslations(don
  */
 function findMissingTranslationKeys() {
   const locales = ["es_MX", "fr_CA"];
-  const englishTranslations = getJSONFromBRS('en-US');
+  const englishTranslations = JSON.parse(fs.readFileSync(_sLocalTranslationFilePath, 'utf8'))
 
   // Get all keys from both
   const englishTranslationKeys = Object.keys(englishTranslations);
@@ -699,7 +716,9 @@ function findMissingTranslationKeys() {
     // Extract JSON from target locale function
     const localeData = getJSONFromBRS(locale);
     const localeKeys = Object.keys(localeData);
-    const missingKeys = englishTranslationKeys.filter(key => !localeKeys.includes(key));
+    const missingKeys = englishTranslationKeys.filter(key =>
+      !localeKeys.includes(key) && !englishTranslations[key].noTranslationRequired
+    );
     if (missingKeys.length > 0) {
       untranslatedKeys[locale] = missingKeys;
     }

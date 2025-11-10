@@ -125,7 +125,8 @@
   },
   "dialog_errorPrefix": {
     "description": "When the user is displayed an error, this is the prefix of the error ID that is presented to them: i.e. Error 101",
-    "message": "Error: "
+    "message": "Error: ",
+    "noTranslationRequired": true
   },
   "dialog_defaultError_title": {
     "description": "The default title of a popup error dialog",
@@ -189,7 +190,8 @@
   },
   "dialog_button_ok": {
     "description": "Label of the dialog button to confirm the action the dialog is asking",
-    "message": "OK"
+    "message": "OK",
+    "noTranslationRequired": true
   },
   "dialog_button_off": {
     "description": "Label of the dialog button to turn something off: i.e. turn off closed captions",
@@ -1085,19 +1087,23 @@
   },
   "metadata_hoursAndMinutes": {
     "description": "a duration listed in hours and minutes (abbreviated for brevity and so singular and plural forms are irrelevant)",
-    "message": "{hours} h {minutes} min"
+    "message": "{hours} h {minutes} min",
+    "noTranslationRequired": true
   },
   "metadata_hours": {
     "description": "a duration listed in hours (abbreviated for brevity and so singular and plural forms are irrelevant)",
-    "message": "{hours} h"
+    "message": "{hours} h",
+    "noTranslationRequired": true
   },
   "metadata_minutes": {
     "description": "a duration listed in minutes (abbreviated for brevity and so singular and plural forms are irrelevant)",
-    "message": "{minutes} min"
+    "message": "{minutes} min",
+    "noTranslationRequired": true
   },
   "metadata_seconds": {
     "description": "a duration listed in seconds (abbreviated for brevity and so singular and plural forms are irrelevant)",
-    "message": "{seconds} sec"
+    "message": "{seconds} sec",
+    "noTranslationRequired": true
   },
   "metadata_seasons_plural": {
     "description": "Label of how many seasons of the current TV title",
@@ -1109,7 +1115,8 @@
   },
   "metadata_series": {
     "description": "Label to indicate a title is a TV series",
-    "message": "Series"
+    "message": "Series",
+    "noTranslationRequired": true
   },
   "sponsor_brought_by": {
     "description": "When content is sponsored by an advertizer, then this text proceeds the image of the sponsor. The text and the image should make a complete sentence.",
@@ -1515,7 +1522,8 @@
   },
   "ad": {
     "description": "This label used for badge overlaid on top of a thumbnail to indicate it is associated with an AD. The text needs to be very few characters.",
-    "message": "AD"
+    "message": "AD",
+    "noTranslationRequired": true
   },
   "replay": {
     "description": "This label used for badge to indicate the content availability",
@@ -1539,7 +1547,8 @@
   },
   "cc_audio_overlay_audio": {
     "description": "Available audio tracks section header label.",
-    "message": "Audio"
+    "message": "Audio",
+    "noTranslationRequired": true
   },
   "thank_you_title": {
     "description": "title on the qr code overlay after submitting the video playback feedback.",
@@ -1791,11 +1800,8 @@
   },
   "live_on_day": {
     "description": "day label used in air date countdown timer",
-    "message": "{day} D"
-  },
-  "dialog_gdpr_manage_privacy_settings_error_description": {
-    "description": "Error dialog description shown due to one trust component library failure when clicking manage privacy settings.",
-    "message": "Please try restarting Tubi to update the privacy settings. Please email support@tubi.tv if this keeps happening."
+    "message": "{day} D",
+    "noTranslationRequired": true
   },
   "cc_audio_overlay_subtitles_mode": {
     "description": "Available modes displayed on closed caption overlay",
