@@ -1444,12 +1444,9 @@ End Function
 
 
 Function onSignUpSignInErrorScreenContinueAsGuestUserButtonSelected(msg)
-
-  isMajorEventDay = isMajorEventDay()
-
   screen = msg.getRoSGNode()
 
-  if isGDPR() = false AND (isMajorEventDay = true OR screen.wasRegistrationQueued = true)
+  if isGDPR() = false AND (isAllowedByPassRegistration() = true OR screen.wasRegistrationQueued = true)
     currentTimeSeconds = CreateObject("roDateTime").AsSeconds()
     ' 12 hours.
     expiryTimeInSeconds = currentTimeSeconds + (12 * 3600)
@@ -1476,11 +1473,18 @@ Function onSignUpSignInErrorScreenContinueAsGuestUserButtonSelected(msg)
 End Function
 
 
+Function isAllowedByPassRegistration()
+  eventStart = getExternalConfigValueFromGlobal("special_event_onboarding_start_time", m.constants.configHubFallbacks.majorEventStart)
+  eventEnd = getExternalConfigValueFromGlobal("special_event_onboarding_end_time", m.constants.configHubFallbacks.majorEventEnd)
+  return isNowWithinTimePeriod(eventStart, eventEnd)
+End Function
+
+
 Function shouldShowSignInSignUpErrorPage(errorResponse)
   ' Checking for less than greater than 500, 429 and less than 200 to handle cases where error code is like -1236 which is returned when we have network error.
   if errorResponse <> invalid AND errorResponse.code <> invalid AND (errorResponse.code >= 500 OR errorResponse.code = 429 OR errorResponse.code < 200)
     wasRegistrationQueued = isAA(errorResponse.info) = true AND errorResponse.info.code = "ACCOUNT_PENDING_PROCESSING"
-    if isMajorEventDay() = true OR wasRegistrationQueued = true
+    if isAllowedByPassRegistration() = true OR wasRegistrationQueued = true
       return true
     end if
   end if
