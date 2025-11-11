@@ -38,6 +38,7 @@ Function init()
   m.isExperimentsConfigReady = false ' Used to know when experiments have been loaded so we know if we can proceed
   m.isStatsigConfigReady = false ' Used to know when Statsig experiments have been loaded so we know if we can proceed
   m.soTStaticConfigComplete = false ' Used to know when the SoT static config has been loaded so we know if we can proceed
+  m.startupDelayComplete = false
 
   ' Holds the callback method value which will be called once the initial get consent request is completed.
   m.onGetConsentCompletionCallback = invalid
@@ -859,6 +860,19 @@ Function runControllerStartSequence()
     ' This is required because we call runControllerStartSequence() from the success or failure callback of the SoT static config request.
     ' If for some reason request is delayed and completes after all the other conditions are true then we will load the home / side nav.
     ' After which it will again try to load side nav and try to attach observers twice.
+  else if m.startupDelayComplete = false then
+    m.startupDelayComplete = true
+
+    delaySeconds = getStatsigExperimentResource("roku_start_up_performance_test", "roku_start_up_performance_test_v1", true).delaySeconds
+
+    if delaySeconds > 0 then
+      timer = m.top.createChild("Timer")
+      timer.observeFieldScoped("fire", "onStartupDelayTimerFired")
+      timer.duration = delaySeconds
+      timer.control = "start"
+    else
+      runControllerStartSequence()
+    end if
   else
     m.performanceMetricsTracker.endAppLaunchMetricTiming("start_app_ui_load_after_configs")
     ' All of the above checked values are true, so we are ready to start the channel UI
@@ -881,6 +895,14 @@ Function runControllerStartSequence()
 
     setUiModeAndLoadContent()
   end if
+End Function
+
+
+Function onStartupDelayTimerFired(msg)
+  timer = msg.getRoSGNode()
+  timer.getParent().removeChild(timer)
+
+  runControllerStartSequence()
 End Function
 
 

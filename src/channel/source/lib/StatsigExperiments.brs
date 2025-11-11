@@ -71,6 +71,12 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
+      roku_start_up_performance_test: {
+        ' We are adding an additional delay in the treatment group to measure its impact on user metrics
+        roku_start_up_performance_test_v1: {
+          default: { "delaySeconds": 0 }
+        }
+      }
     }
     statsigExperimentsInfo: statsigExperimentsInfo
     getExperimentResource: statsigExperiments_getExperimentResource
