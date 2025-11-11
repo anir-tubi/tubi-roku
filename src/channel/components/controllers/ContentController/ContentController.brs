@@ -2423,8 +2423,10 @@ Function onFullscreenCountdown()
         end if
 
         if m.isUserInVideoTilesExperiment = true AND screen.id = m.constants.ui.screenIds.homeScreen AND nNewCount > 0
-          fade(m.autoStartPreviewToPlaybackTimer, "in", 0.1)
-          m.autoStartPreviewToPlaybackTimer.countdownText = nNewCount.ToStr()
+          if nNewCount + 1 = m.constants.settings.linearFullscreenTimeout
+            fade(m.autoStartPreviewToPlaybackTimer, "in", 0.1)
+          end if
+          renderAutoStartPlaybackFromPreviewCounter(contentToPlay, nNewCount + 1)
         else
           fade(m.autoStartPreviewToPlaybackTimer, "out", 0.1)
         end if

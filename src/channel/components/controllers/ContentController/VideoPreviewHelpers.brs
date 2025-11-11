@@ -512,7 +512,8 @@ Function onVideoPreviewPositionChanged(msg)
     isFullPlayerBlockedForUser = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR contentFocused.needsLogin = true OR arrayIncludes(m.constants.ui.fullScreenVideoPlayerGridItemTypes, contentFocused.gridItemType) = true OR contentFocused.playerType = m.constants.ui.playerTypes.fox
 
     if isFullPlayerBlockedForUser = false
-      renderAutoStartPlaybackFromPreviewCounter(contentFocused, position, duration)
+      diff = duration - position
+      renderAutoStartPlaybackFromPreviewCounter(contentFocused, diff)
     end if
   end if
 End Function
@@ -559,7 +560,8 @@ Function onInlineVideoPreviewPositionChanged(msg)
       m.inlineVideoMetadataOverlay.showContentPoster = false
     end if
   end if
-  renderAutoStartPlaybackFromPreviewCounter(content, position, duration)
+  diff = duration - position
+  renderAutoStartPlaybackFromPreviewCounter(content, diff)
 End Function
 
 
@@ -611,9 +613,8 @@ Function getVideoPreviewContentId()
 End Function
 
 
-Function renderAutoStartPlaybackFromPreviewCounter(contentFocused, position, duration)
-  diff = duration - position
-  if duration > 0 AND diff = 10
+Function renderAutoStartPlaybackFromPreviewCounter(contentFocused, diff)
+  if diff = 10
     currentScreen = getCurrentScreen()
     if currentScreen <> invalid AND contentFocused <> invalid AND arrayIncludes(m.videoTilesControlCategoryIds, contentFocused.parentId) = true
       m.autoStartPreviewToPlaybackTimer.reParent(m.top, false)

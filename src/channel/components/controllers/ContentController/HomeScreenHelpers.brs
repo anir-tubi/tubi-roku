@@ -1706,7 +1706,10 @@ Function startDebouncedVideoPreview()
   screen = getCurrentScreen()
   if isCurrentScreenHomeScreen() = true
     if screen.featuredListHasFocus = true
-      stopAndHideLinearVideoPlayer()
+      stopCountdownTimer()
+      if isLinearPlayerLoadingOrPlaying() = true
+        stopAndHideLinearVideoPlayer()
+      end if
       if screen.featuredRowContent <> invalid AND screen.featuredRowFocusedItem <> invalid
         content = screen.featuredRowFocusedItem
         state = getVideoPreviewState()

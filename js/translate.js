@@ -72,42 +72,32 @@ async function getTranslationsZipFile(url) {
  * This function removes translations with empty message strings from a JSON object.
  *
  * @param {string} localeData - A JSON string containing translations with the "message" property
- * @returns {string} - A JSON string with the filtered translations
+ * @returns {Object} - An object containing jsonString and emptyTranslationKeys array
  */
-function removeEmptyTranslations(localeData, sLocale) {
+function removeEmptyTranslations(localeData) {
   const jsonTranslationFile = JSON.parse(localeData);
   const emptyTranslationKeys = [];
   for (const key in jsonTranslationFile) {
+    // Always remove markedEmptyTranslationForLocale field
+    delete jsonTranslationFile[key].markedEmptyTranslationForLocale;
+
     if (jsonTranslationFile[key].message === "") {
-      if ((sLocale === "es-MX") && !emptyTranslationKeys.includes(key)) {
-        emptyTranslationKeys.push(key);
-      }
+      emptyTranslationKeys.push(key);
       delete jsonTranslationFile[key];
     }
   }
 
-  if (sLocale === "es-MX" && emptyTranslationKeys.length > 0) {
-    // Update en-US.json with noTranslationRequired flag for empty keys
-    const englishTranslations = JSON.parse(fs.readFileSync(_sLocalTranslationFilePath, 'utf8'));
-
-    for (const key of emptyTranslationKeys) {
-      if (englishTranslations[key]) {
-        englishTranslations[key].noTranslationRequired = true;
-      }
-    }
-
-    // Write updated translations back to en-US.json
-    fs.writeFileSync(_sLocalTranslationFilePath, JSON.stringify(englishTranslations, null, 2) + '\n', 'utf8');
-  }
-
   const jsonString = JSON.stringify(jsonTranslationFile, null, 2);
-  return jsonString;
+  return {
+    jsonString: jsonString,
+    emptyTranslationKeys: emptyTranslationKeys,
+  };
 }
 
 
 async function processTranslationFiles(directory) {
   if (directory && directory.files) {
-
+    const markedEmptyTranslationKeys = {};
     // iterate over each file in the zipped directory
     for (const file of directory.files) {
       let unZippedFilePath = file.path;
@@ -134,8 +124,10 @@ async function processTranslationFiles(directory) {
           var localeData = fs.readFileSync(destinationPath, 'utf-8');
 
           //remove any translation that are empty strings
-          const jsonString = removeEmptyTranslations(localeData, sLocale)
-
+          const { jsonString, emptyTranslationKeys } = removeEmptyTranslations(localeData)
+          if (sLocale != "en-AU" && sLocale != "en-GB") {
+            markedEmptyTranslationKeys[sLocale] = emptyTranslationKeys;
+          }
           // write the contents of the translation json to the appropriate function
           // in the TubiLanguageTranslate.brs file
           writeLocaleDataToBRS_sync(sLocale, jsonString);
@@ -149,6 +141,30 @@ async function processTranslationFiles(directory) {
           }
         }
       }
+    }
+
+    if (Object.keys(markedEmptyTranslationKeys).length > 0) {
+      // Update en-US.json with markedEmptyTranslationForLocale for empty keys
+      const englishTranslations = JSON.parse(fs.readFileSync(_sLocalTranslationFilePath, 'utf8'));
+
+      for (const locale in markedEmptyTranslationKeys) {
+        // Convert locale format from 'fr-CA' to 'fr_CA'
+        const normalizedLocale = locale.replace(/-/g, '_');
+
+        for (const key of markedEmptyTranslationKeys[locale]) {
+          if (englishTranslations[key]) {
+            if (!englishTranslations[key].markedEmptyTranslationForLocale) {
+              englishTranslations[key].markedEmptyTranslationForLocale = [];
+            }
+            if (!englishTranslations[key].markedEmptyTranslationForLocale.includes(normalizedLocale)) {
+              englishTranslations[key].markedEmptyTranslationForLocale.push(normalizedLocale);
+            }
+          }
+        }
+      }
+
+      // Write updated translations back to en-US.json
+      fs.writeFileSync(_sLocalTranslationFilePath, JSON.stringify(englishTranslations, null, 2) + '\n', 'utf8');
     }
   }
 }
@@ -677,7 +693,6 @@ async function uploadLatestTranslationsAndCreateTicketForMissingTranslations(don
     const untranslatedTranslations = await findMissingTranslationKeys();
     const reTranslationRequiredKeys = await getTranslationKeysWhichNeedsReTranslation();
 
-
     if (Object.keys(untranslatedTranslations).length > 0 || reTranslationRequiredKeys.length > 0) {
       await uploadTranslations();
       await createTicketForMissingTranslations(untranslatedTranslations, reTranslationRequiredKeys);
@@ -716,9 +731,14 @@ function findMissingTranslationKeys() {
     // Extract JSON from target locale function
     const localeData = getJSONFromBRS(locale);
     const localeKeys = Object.keys(localeData);
-    const missingKeys = englishTranslationKeys.filter(key =>
-      !localeKeys.includes(key) && !englishTranslations[key].noTranslationRequired
-    );
+    const missingKeys = englishTranslationKeys.filter(key => {
+      if (localeKeys.includes(key)) return false;
+
+      // Skip if this key is marked as empty translation for this locale
+      const markedForLocales = englishTranslations[key].markedEmptyTranslationForLocale || [];
+      return !markedForLocales.includes(locale);
+    });
+
     if (missingKeys.length > 0) {
       untranslatedKeys[locale] = missingKeys;
     }

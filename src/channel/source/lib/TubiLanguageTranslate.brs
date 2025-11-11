@@ -1038,7 +1038,7 @@ Function getTranslation_en_US()
     },
     "onNow": {
       "description": "badge text to show program is not live but on now",
-      "message": "ON NOW"
+      "message": "On Now"
     },
     "day_1": {
       "description": "shortened version Monday, formatted with , and a space",
@@ -3036,7 +3036,7 @@ Function getTranslation_es_MX()
     },
     "onNow": {
       "description": "badge text to show program is not live but on now",
-      "message": "AHORA"
+      "message": "Ahora"
     },
     "day_1": {
       "description": "shortened version Monday, formatted with , and a space",
@@ -4996,7 +4996,7 @@ Function getTranslation_fr_CA()
     },
     "onNow": {
       "description": "badge text to show program is not live but on now",
-      "message": "MAINTENANT"
+      "message": "Maintenant"
     },
     "day_1": {
       "description": "shortened version Monday, formatted with , and a space",

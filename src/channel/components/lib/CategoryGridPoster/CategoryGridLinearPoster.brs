@@ -20,8 +20,8 @@ Function init()
   }
 
   m.languages = {
-    spanish: "ESPAÑOL"
-    french: "FRANÇAIS"
+    spanish: "Español"
+    french: "Français"
   }
 
   setThemeColors()
@@ -134,12 +134,12 @@ Function setBadge(badgeType = "live", badgeText = "")
     badge.backgroundColor = m.focused2Color
     badge.textColor = m.primaryTextColor
     badge.iconUri = "pkg:/images/live-icon-filled.webp"
-    badge.text = UCase(getTranslation("screenSearch_liveText"))
+    badge.text = getTranslation("screenSearch_liveText")
   else if badgeType = m.badgeTypes.onNow
     badge = m.badgeGroup.createChild("Badge")
     badge.backgroundColor = m.blueBadgeColor
     badge.textColor = m.primaryTextColor
-    badge.text = UCase(getTranslation("onNow"))
+    badge.text = getTranslation("onNow")
   else if badgeType = m.badgeTypes.language
     if badgeText <> ""
       lang = Ucase(badgeText)
@@ -152,10 +152,7 @@ Function setBadge(badgeType = "live", badgeText = "")
     end if
   end if
 
-  translationX = m.top.width - m.badgeGroup.boundingRect().width - 16
-  translationY = m.top.height - 76
-  m.badgeGroup.translation = [translationX, translationY]
-
+  m.badgeGroup.translation = [4, 4]
 End Function
 
 

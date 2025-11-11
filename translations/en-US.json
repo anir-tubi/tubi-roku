@@ -126,7 +126,9 @@
   "dialog_errorPrefix": {
     "description": "When the user is displayed an error, this is the prefix of the error ID that is presented to them: i.e. Error 101",
     "message": "Error: ",
-    "noTranslationRequired": true
+    "markedEmptyTranslationForLocale": [
+      "es_MX"
+    ]
   },
   "dialog_defaultError_title": {
     "description": "The default title of a popup error dialog",
@@ -191,7 +193,10 @@
   "dialog_button_ok": {
     "description": "Label of the dialog button to confirm the action the dialog is asking",
     "message": "OK",
-    "noTranslationRequired": true
+    "markedEmptyTranslationForLocale": [
+      "fr_CA",
+      "es_MX"
+    ]
   },
   "dialog_button_off": {
     "description": "Label of the dialog button to turn something off: i.e. turn off closed captions",
@@ -1088,22 +1093,34 @@
   "metadata_hoursAndMinutes": {
     "description": "a duration listed in hours and minutes (abbreviated for brevity and so singular and plural forms are irrelevant)",
     "message": "{hours} h {minutes} min",
-    "noTranslationRequired": true
+    "markedEmptyTranslationForLocale": [
+      "fr_CA",
+      "es_MX"
+    ]
   },
   "metadata_hours": {
     "description": "a duration listed in hours (abbreviated for brevity and so singular and plural forms are irrelevant)",
     "message": "{hours} h",
-    "noTranslationRequired": true
+    "markedEmptyTranslationForLocale": [
+      "fr_CA",
+      "es_MX"
+    ]
   },
   "metadata_minutes": {
     "description": "a duration listed in minutes (abbreviated for brevity and so singular and plural forms are irrelevant)",
     "message": "{minutes} min",
-    "noTranslationRequired": true
+    "markedEmptyTranslationForLocale": [
+      "fr_CA",
+      "es_MX"
+    ]
   },
   "metadata_seconds": {
     "description": "a duration listed in seconds (abbreviated for brevity and so singular and plural forms are irrelevant)",
     "message": "{seconds} sec",
-    "noTranslationRequired": true
+    "markedEmptyTranslationForLocale": [
+      "fr_CA",
+      "es_MX"
+    ]
   },
   "metadata_seasons_plural": {
     "description": "Label of how many seasons of the current TV title",
@@ -1116,7 +1133,9 @@
   "metadata_series": {
     "description": "Label to indicate a title is a TV series",
     "message": "Series",
-    "noTranslationRequired": true
+    "markedEmptyTranslationForLocale": [
+      "es_MX"
+    ]
   },
   "sponsor_brought_by": {
     "description": "When content is sponsored by an advertizer, then this text proceeds the image of the sponsor. The text and the image should make a complete sentence.",
@@ -1184,7 +1203,10 @@
   },
   "linearVideoPlayer_buttonGuide": {
     "description": "Label of a Button to view the channel guide",
-    "message": "Guide"
+    "message": "Guide",
+    "markedEmptyTranslationForLocale": [
+      "fr_CA"
+    ]
   },
   "linearVideoPlayer_buttonGuide2": {
     "description": "Label of a Button to view the channel guide",
@@ -1523,7 +1545,10 @@
   "ad": {
     "description": "This label used for badge overlaid on top of a thumbnail to indicate it is associated with an AD. The text needs to be very few characters.",
     "message": "AD",
-    "noTranslationRequired": true
+    "markedEmptyTranslationForLocale": [
+      "fr_CA",
+      "es_MX"
+    ]
   },
   "replay": {
     "description": "This label used for badge to indicate the content availability",
@@ -1548,7 +1573,10 @@
   "cc_audio_overlay_audio": {
     "description": "Available audio tracks section header label.",
     "message": "Audio",
-    "noTranslationRequired": true
+    "markedEmptyTranslationForLocale": [
+      "fr_CA",
+      "es_MX"
+    ]
   },
   "thank_you_title": {
     "description": "title on the qr code overlay after submitting the video playback feedback.",
@@ -1760,7 +1788,10 @@
   },
   "updated_terms_toast_header": {
     "description": "Header on the toast message informing the user of update ToS",
-    "message": "Important"
+    "message": "Important",
+    "markedEmptyTranslationForLocale": [
+      "fr_CA"
+    ]
   },
   "privacy_center_restart_channel": {
     "description": "Settings screen privacy center restart channel button label.",
@@ -1801,7 +1832,9 @@
   "live_on_day": {
     "description": "day label used in air date countdown timer",
     "message": "{day} D",
-    "noTranslationRequired": true
+    "markedEmptyTranslationForLocale": [
+      "es_MX"
+    ]
   },
   "cc_audio_overlay_subtitles_mode": {
     "description": "Available modes displayed on closed caption overlay",

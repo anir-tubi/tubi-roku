@@ -99,7 +99,12 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
         currentScreen = getCurrentScreen()
         ' If the current screen is the home screen and the featured list has focus, then switch to inline grid mode.
         if isKidsUIOn() = false AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND currentScreen.featuredListHasFocus = true
-          switchLinearToInlineGridMode(videoPlayer)
+          isContainerInControl = arrayIncludes(m.videoTilesControlCategoryIds, content.parentId)
+          if arrayIncludes(["trueControlTop2Rows", "refinedControlTop2Rows", "cinematicTop2Rows"], m.videoTilesVariant) = true AND isContainerInControl = true
+            animateLinearVideoPlayerToMinState(0, false)
+          else
+            switchLinearToInlineGridMode(videoPlayer)
+          end if
         else
           '//play at minimized state
           showHideLinearVideoPlayerSpinner(true)
@@ -569,10 +574,11 @@ Function animateLinearVideoPlayerToMinState(nDuration = .25, bVisible = true)
 
   tubiLog("LinearVideoPlayerScreenHelpers.animateLinearVideoPlayerToMinState")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
-  if videoPlayer <> invalid
-
+  if videoPlayer <> invalid AND videoPlayer.content <> invalid
+    isContainerInControl = arrayIncludes(m.videoTilesControlCategoryIds, videoPlayer.content.parentId)
     currentScreen = getCurrentScreen()
-    if isKidsUIOn() = false AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND currentScreen.featuredListHasFocus = true
+    enableInlineGridMode = isKidsUIOn() = false AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND currentScreen.featuredListHasFocus = true
+    if enableInlineGridMode = true AND (arrayIncludes(["trueControlTop2Rows", "refinedControlTop2Rows", "cinematicTop2Rows"], m.videoTilesVariant) = false OR isContainerInControl = false)
       switchLinearToInlineGridMode(videoPlayer)
     else
       screen = getFromScreenCache(videoPlayer.associatedScreenID)
@@ -589,9 +595,20 @@ Function animateLinearVideoPlayerToMinState(nDuration = .25, bVisible = true)
 
       linearPlayerParentGroup = m.LinearPlayerGroup
 
-      nWidth = m.constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension[0]
-      nHeight = m.constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension[1]
-      nPosition = m.constants.ui.imageTranslations.epgLinearVideoPlayerOnEPGScreen_minimizedTranslation
+      if isContainerInControl = true AND m.videoTilesVariant = "cinematicTop2Rows"
+        nWidth = 1919
+        nHeight = 1079
+        nPosition = [0, 0]
+      else if isContainerInControl = true AND m.videoTilesVariant = "refinedControlTop2Rows"
+        nWidth = 1308
+        nHeight = 735
+        nPosition = [612, 0]
+      else
+        nWidth = m.constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension[0]
+        nHeight = m.constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension[1]
+        nPosition = m.constants.ui.imageTranslations.epgLinearVideoPlayerOnEPGScreen_minimizedTranslation
+      end if
+
       m.LinearVideoPlayerSpinner.translation = [1260, 320]
       videoPlayer.clippingRect = [0, 0, 1920, 1080]
       linearPlayerParentGroup.appendChild(videoPlayer)
