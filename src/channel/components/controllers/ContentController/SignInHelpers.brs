@@ -291,7 +291,7 @@ Function onEmailExistsResponse(response)
         end if
         m.email = email
 
-        if getExternalConfigValueFromGlobal("auth_magic_link_enabled", true) = true
+        if getExternalConfigValueFromGlobal("auth_magic_link_enabled", true) = true AND getStatsigExperimentResource("roku_disable_magic_link", "roku_disable_magic_link_v1", true).disable <> true then
           showEmailVerificationScreen(email)
           createMagicLinkRequest(email)
         else
