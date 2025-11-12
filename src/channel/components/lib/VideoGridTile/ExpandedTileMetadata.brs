@@ -17,6 +17,7 @@ Function init()
   m.subHeadlinePrefixGroup = m.top.findNode("subHeadlinePrefixGroup")
   m.subHeadlineSuffixGroup = m.top.findNode("subHeadlineSuffixGroup")
   m.tubiPresentsLogo = m.firstLineGroup.findNode("tubiPresentsLogo")
+  m.sotTopLabelGroup = m.top.findNode("sotTopLabelGroup")
 
   m.top.observeFieldScoped("itemContent", "onItemContentChange")
   m.top.observeFieldScoped("hideTitle", "onHideTitleChange")
@@ -29,6 +30,7 @@ Function init()
   m.bodyMediumFont = typographyConstants.ids.bodyMedium
   m.bodySmallFont = typographyConstants.ids.bodySmall
   m.headerSmallFont = typographyConstants.ids.headerSmall
+  m.bodyMediumStrongFont = typographyConstants.ids.bodyMediumStrong
 
   m.title = invalid
   if m.variant = "typography_improvements"
@@ -62,6 +64,7 @@ Function onThemeChange(msg = invalid)
     m.RatingLabel.color = theme.secondaryTextColor
     m.description.color = m.primaryTextColor
     m.focusedTextColor = theme.focusedTextColor
+    m.cautionColor = theme.cautionColor
 
     m.progressBar.focusColor = theme.focusedColor
     m.progressBar.trackColor = theme.neutralColor
@@ -92,8 +95,14 @@ Function onItemContentChange(msg)
   itemContent = msg.getData()
 
   if itemContent <> invalid
+    m.nodeHelpers.removeAllChildren(m.sotTopLabelGroup)
+    m.metadataGroup.removeChild(m.sotTopLabelGroup)
     m.nodeHelpers.removeAllChildren(m.subHeadlinePrefixGroup)
     m.nodeHelpers.removeAllChildren(m.subHeadlineSuffixGroup)
+
+    if m.sotMarker <> invalid
+      m.metadataGroup.removeChild(m.sotMarker)
+    end if
 
     isVideoTilesControlMetadata = m.top.id = "videoTilesControlMetadata"
     if isVideoTilesControlMetadata = false
@@ -182,6 +191,40 @@ Function onItemContentChange(msg)
 
     if isVideoTilesControlMetadata = true AND itemContent.type <> m.constants.ui.contentTypes.linear AND isNonEmptyString(itemContent.availabilityEnds) AND m.sotBadge.getParent() = invalid
       setupExpiresBadge(itemContent)
+    end if
+
+    ' Adjust the translation based on height of the description text.
+    if isVideoTilesControlMetadata
+      ' Create SOT badges using helper function
+      sotBadges = createSOTBadges(itemContent.sotInfo, {
+        focusedTextColor: m.focusedTextColor
+        maxWidth: m.top.width - 12
+        bodyMediumStrongFont: m.bodyMediumStrongFont
+        cautionColor: m.cautionColor
+      })
+
+      if isNonEmptyArray(sotBadges.topLabels) = true
+        m.metadataGroup.insertChild(m.sotTopLabelGroup, 0)
+      end if
+
+      ' Append top label badges
+      for each topLabel in sotBadges.topLabels
+        m.sotTopLabelGroup.appendChild(topLabel)
+      end for
+
+      ' Append marker badge if exists
+      if sotBadges.marker <> invalid
+        ' Update maxWidth for marker to full width
+        sotBadges.marker.maxWidth = m.top.width
+        m.sotMarker = sotBadges.marker
+        m.metadataGroup.appendChild(m.sotMarker)
+      end if
+      ' With 3 lines of description text, the height is 230px and with 2 lines of description text, the height is 192px.
+      ' And parent level translation is set based on 2 lines of description text. So we are adjusting the bottom padding by negative margining the metadataGroup.
+      ' This is required only for control variant.
+      height = m.metadataGroup.boundingRect().height
+      translation = m.metadataGroup.translation
+      m.metadataGroup.translation = [translation[0], 192 - height]
     end if
   end if
 End Function
@@ -324,13 +367,13 @@ Function metadataOnPosterContent(itemContent)
 
   if itemContent.hasSubtitles = true
     if m.closedCaptions.getParent() = invalid
-      index = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.rating)
+      index = m.nodeHelpers.getChildIndex(ratingSotParent, m.rating)
       ' Which means rating is not present in the first line group.
       ' As a fallback displaying in a fixed position.
       if index = -1
-        index = 2
+        index = 1
       end if
-      m.firstLineGroup.insertChild(m.closedCaptions, index)
+      m.firstLineGroup.insertChild(m.closedCaptions, index + 1)
     end if
     m.closedCaptions.visible = true
   else

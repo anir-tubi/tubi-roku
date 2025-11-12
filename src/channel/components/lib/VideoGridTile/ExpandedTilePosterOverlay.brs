@@ -267,14 +267,14 @@ Function setBadge(badgeType = "live", badgeInfo = {})
     badge.translation = [15, 15]
     badge.backgroundColor = m.focused2Color
     badge.iconUri = "pkg:/images/live-icon-filled.webp"
-    badge.text = UCase(getTranslation("screenSearch_liveText"))
+    badge.text = getTranslation("screenSearch_liveText")
   else if badgeType = m.badgeTypes.onNow
     badge = m.sotTopLabelGroup.createChild("Badge")
     badge.badgeTextWidth = 0.0
     badge.textColor = m.primaryTextColor
     badge.translation = [15, 15]
     badge.backgroundColor = m.blueBadgeColor
-    badge.text = UCase(getTranslation("onNow"))
+    badge.text = getTranslation("onNow")
   else if badgeType = m.badgeTypes.expires
     badge = m.sotTopLabelGroup.createChild("Badge")
     badge.badgeTextWidth = 0.0
@@ -288,33 +288,25 @@ Function setBadge(badgeType = "live", badgeInfo = {})
     badge.text = badgeInfo.text
   else if badgeType = m.badgeTypes.sot
 
-    sotInfo = badgeInfo
-    if sotInfo <> invalid
-      sotTopLabelSignals = sotInfo.sotMetaDataTopLabels
-      sotMarkers = sotInfo.sotMarkers
+    ' Create SOT badges using helper function
+    sotBadges = createSOTBadges(badgeInfo, {
+      focusedTextColor: m.focusedTextColor
+      maxWidth: m.top.width - 12
+      bodyMediumStrongFont: m.bodyMediumStrongFont
+      cautionColor: m.cautionColor
+    })
 
-      if isNonEmptyArray(sotTopLabelSignals) = true
-        for each signal in sotTopLabelSignals
-          topLabel = createObject("roSGNode", "Badge")
-          topLabel.text = signal.sotLabelText
-          topLabel.iconUri = signal.sotIcon
-          topLabel.textColor = m.focusedTextColor
-          topLabel.maxWidth = m.top.width - 12
-          m.sotTopLabelGroup.appendChild(topLabel)
-        end for
-      end if
+    ' Append top label badges
+    for each topLabel in sotBadges.topLabels
+      m.sotTopLabelGroup.appendChild(topLabel)
+    end for
 
-      if isAA(sotMarkers) = true
-        m.sotMarker = createObject("roSGNode", "Badge")
-        m.sotMarker.id = "sotMarker"
-        m.sotMarker.showBackground = false
-        m.sotMarker.maxWidth = m.top.width
-        m.sotMarker.text = sotMarkers.sotLabelText
-        m.sotMarker.iconUri = sotMarkers.sotIcon
-        m.sotMarker.badgeTextFont = m.bodyMediumStrongFont
-        m.sotMarker.textColor = m.cautionColor
-        m.bottomContentGroup.appendChild(m.sotMarker)
-      end if
+    ' Append marker badge if exists
+    if sotBadges.marker <> invalid
+      ' Update maxWidth for marker to full width
+      sotBadges.marker.maxWidth = m.top.width
+      m.sotMarker = sotBadges.marker
+      m.bottomContentGroup.appendChild(m.sotMarker)
     end if
 
   end if

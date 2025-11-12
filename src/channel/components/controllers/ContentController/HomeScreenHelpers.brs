@@ -770,7 +770,7 @@ Function onHomeScreenSponsoredRowFocused(msg)
   isSponsoredRowFocused = msg.getData()
   homeScreen = msg.getRoSGNode()
   currentScreen = getCurrentScreen()
-  if isSponsoredRowFocused = true AND homeScreen <> invalid AND currentScreen <> invalid AND currentScreen.isSameNode(homeScreen)
+  if isSponsoredRowFocused = true AND homeScreen <> invalid AND currentScreen <> invalid AND currentScreen.isSameNode(homeScreen) AND m.isUserInVideoTilesExperiment = false
     row = homeScreen.rowFocused
     if row <> invalid
       manageHomeScreenSponsorPixels(row)
@@ -1972,9 +1972,10 @@ Function onFeaturedRowListTranslationChange(msg)
       m.inlineVideoPreviewPlayerContainer.opacity = 1
     end if
 
+    inTransitCurrentFocusedItemBoundingRect = screen.inTransitCurrentFocusedItemBoundingRect
     ' For Performance optimization reasons not processing it unless user is scrolling vertically.
-    if isVerticalScroll = true AND screen.inTransitCurrentFocusedItemBoundingRect <> invalid AND screen.inTransitCurrentFocusedItemBoundingRect.y <> 0
-      inTransitRectY = screen.inTransitCurrentFocusedItemBoundingRect.y
+    if isVerticalScroll = true AND inTransitCurrentFocusedItemBoundingRect <> invalid AND inTransitCurrentFocusedItemBoundingRect.y <> 0
+      inTransitRectY = inTransitCurrentFocusedItemBoundingRect.y
       currentInTransitTranslationY = m.inTransitInlineVideoMetadataOverlay.translation[1]
       newInTransitTranslationY = translation[1] + inTransitRectY + 5
       ' As soon as the scrolling stops we will hide the in transit video metadata overlay.
@@ -1984,6 +1985,8 @@ Function onFeaturedRowListTranslationChange(msg)
       else
         m.inTransitInlineVideoMetadataOverlay.opacity = 0
       end if
+    else if isVerticalScroll = true AND screen.featuredListScrollingStatus = false AND inTransitCurrentFocusedItemBoundingRect <> invalid AND inTransitCurrentFocusedItemBoundingRect.y = 0
+      m.inTransitInlineVideoMetadataOverlay.opacity = 0
     end if
   end if
 End Function

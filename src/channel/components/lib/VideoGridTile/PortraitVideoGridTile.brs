@@ -146,14 +146,14 @@ Function setLinearBadge(badgeType = "live", badgeInfo = {})
     badge.translation = [6, 6]
     badge.backgroundColor = m.focused2Color
     badge.iconUri = "pkg:/images/live-icon-filled.webp"
-    badge.text = UCase(getTranslation("screenSearch_liveText"))
+    badge.text = getTranslation("screenSearch_liveText")
   else if badgeType = m.badgeTypes.onNow
     badge = createObject("roSGNode", "Badge")
     badge.badgeTextWidth = 0.0
     badge.textColor = m.primaryTextColor
     badge.translation = [6, 6]
     badge.backgroundColor = m.blueBadgeColor
-    badge.text = UCase(getTranslation("onNow"))
+    badge.text = getTranslation("onNow")
   end if
   if badge <> invalid
     m.linearBadge = badge

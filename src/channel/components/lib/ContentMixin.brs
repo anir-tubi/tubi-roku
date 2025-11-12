@@ -63,3 +63,57 @@ Function getAvailabilityTypeBadgeAndMatchTimeValues(airDateTime = "", hasVideoRe
   return badgeAndInfoPanelValues
 
 End Function
+
+
+' Creates SOT (Signals of Trust) badge nodes from sotInfo data
+' @param sotInfo - AssocArray containing sotMetaDataTopLabels and sotMarkers
+' @param config - AssocArray with optional styling configuration:
+'   - focusedTextColor: color for top label badges (required)
+'   - maxWidth: maximum width for badges (required)
+'   - bodyMediumStrongFont: font for marker badge (optional)
+'   - cautionColor: color for marker badge (optional)
+' @return AssocArray with topLabels (array of Badge nodes) and marker (Badge node or invalid)
+Function createSOTBadges(sotInfo, config)
+  result = {
+    topLabels: []
+    marker: invalid
+  }
+
+  if sotInfo = invalid OR config = invalid then return result
+
+  ' Create top label badges from sotMetaDataTopLabels
+  sotTopLabelSignals = sotInfo.sotMetaDataTopLabels
+  if isNonEmptyArray(sotTopLabelSignals) = true
+    for each signal in sotTopLabelSignals
+      topLabel = createObject("roSGNode", "Badge")
+      topLabel.text = signal.sotLabelText
+      topLabel.iconUri = signal.sotIcon
+      topLabel.textColor = config.focusedTextColor
+      topLabel.maxWidth = config.maxWidth
+      result.topLabels.push(topLabel)
+    end for
+  end if
+
+  ' Create marker badge from sotMarkers
+  sotMarkers = sotInfo.sotMarkers
+  if isAA(sotMarkers) = true
+    marker = createObject("roSGNode", "Badge")
+    marker.id = "sotMarker"
+    marker.showBackground = false
+    marker.maxWidth = config.maxWidth
+    marker.text = sotMarkers.sotLabelText
+    marker.iconUri = sotMarkers.sotIcon
+
+    if config.bodyMediumStrongFont <> invalid
+      marker.badgeTextFont = config.bodyMediumStrongFont
+    end if
+
+    if config.cautionColor <> invalid
+      marker.textColor = config.cautionColor
+    end if
+
+    result.marker = marker
+  end if
+
+  return result
+End Function

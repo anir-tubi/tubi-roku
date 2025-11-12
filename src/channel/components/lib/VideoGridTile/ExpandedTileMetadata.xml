@@ -3,6 +3,7 @@
 
   <script type="text/brightscript" uri="ExpandedTileMetadata.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ContentMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
@@ -32,6 +33,10 @@
       id="metadataGroup"
       itemSpacings="[12]"
       horizAlignment="left">
+      <LayoutGroup
+        layoutDirection="horiz"
+        id="sotTopLabelGroup"
+        itemSpacings="[9]" />
 
       <LayoutGroup
         id="firstLineGroup"
@@ -60,14 +65,6 @@
         <LayoutGroup
           id="subHeadlineSuffixGroup"
           layoutDirection="horiz" />
-        <Poster
-          id="ClosedCaptionPoster"
-          visible="false"
-          uri="pkg:/images/icon-closed-caption.webp"
-          height="36"
-          width="36"
-          loadDisplayMode="scaleToFit"
-          loadSync="true" />
         <Group
           id="Rating">
           <Poster
@@ -88,6 +85,14 @@
               role="font" />
           </Label>
         </Group>
+        <Poster
+          id="ClosedCaptionPoster"
+          visible="false"
+          uri="pkg:/images/icon-closed-caption.webp"
+          height="36"
+          width="36"
+          loadDisplayMode="scaleToFit"
+          loadSync="true" />
         <Badge
           id="sotBadge" />
         <Poster
