@@ -1,6 +1,9 @@
 Function init()
   addGlobalFields()
 
+  m.animationLogo = m.top.findNode("animationLogo")
+  m.global.appVideoNode = m.animationLogo
+
   ' TODO should eventually experiment if it is beneficial to only keep this on as needed
   m.top.allowBackgroundTask = true
 
@@ -23,13 +26,14 @@ Function init()
 End Function
 
 
-' addGlobalFields adds global fields to the scene. Values will get set in ContentController init
+' addGlobalFields adds global fields to the scene. Values except for appVideoNode will get set in ContentController init
 Function addGlobalFields()
   m.global.addField("constants", "assocarray", false)
   m.global.addField("theme", "assocarray", false)
   m.global.addField("externalConfigInfo", "assocarray", false)
   m.global.addField("experimentsInfo", "assocarray", false)
   m.global.addField("translationAA", "assocarray", false)
+  m.global.addField("appVideoNode", "node", false)
 End Function
 
 
@@ -199,7 +203,6 @@ Function processAnimationLogo(url)
   videoContent.title = "AnimationLogo"
   videoContent.streamformat = "mp4"
 
-  m.animationLogo = m.top.findNode("animationLogo")
   m.animationLogo.content = videoContent
   m.animationLogo.observeField("bufferingStatus", "onBufferingStatus")
   m.animationLogo.observeField("position", "onPositionChange")
