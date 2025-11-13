@@ -143,7 +143,7 @@ screens), fullscreen (detail, search screens)
 
     <Poster
       id="videoTilesBackgroundGradient"
-      uri="pkg:/images/background-masks/fullscreen-video-tiles-background-fhd.webp"
+      uri="pkg:/images/background-masks/full_screen_variant_d_gradient-$$RES$$.webp"
       opacity="0"
       width="1920"
       height="1080" />

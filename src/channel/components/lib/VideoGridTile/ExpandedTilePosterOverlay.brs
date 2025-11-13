@@ -274,6 +274,7 @@ Function setBadge(badgeType = "live", badgeInfo = {})
     badge.textColor = m.primaryTextColor
     badge.translation = [15, 15]
     badge.backgroundColor = m.blueBadgeColor
+    badge.borderUri = "pkg:/images/badge-border-dark-$$RES$$.9.png"
     badge.text = getTranslation("onNow")
   else if badgeType = m.badgeTypes.expires
     badge = m.sotTopLabelGroup.createChild("Badge")

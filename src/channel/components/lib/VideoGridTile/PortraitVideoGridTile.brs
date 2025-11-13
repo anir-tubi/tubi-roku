@@ -154,6 +154,7 @@ Function setLinearBadge(badgeType = "live", badgeInfo = {})
     badge.translation = [6, 6]
     badge.backgroundColor = m.blueBadgeColor
     badge.text = getTranslation("onNow")
+    badge.borderUri = "pkg:/images/badge-border-dark-$$RES$$.9.png"
   end if
   if badge <> invalid
     m.linearBadge = badge

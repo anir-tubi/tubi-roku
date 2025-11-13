@@ -10,6 +10,7 @@
   <interface>
     <field id="backgroundUri" type="string" alias="BadgeBackground.uri" />
     <field id="backgroundColor" type="string" alias="BadgeBackground.blendColor" />
+    <field id="borderUri" alias="badgeBorder.uri" />
     <field id="textColor" type="string" alias="BadgeText.color" />
     <field id="iconUri" type="string" />
     <field id="text" type="string" />
@@ -32,7 +33,7 @@
       id="badgeBorder"
       height="36"
       width="0"
-      uri="pkg:/images/badge-border-$$RES$$.9.png" />
+      uri="pkg:/images/badge-border-light-$$RES$$.9.png" />
     <LayoutGroup
       id="BadgeInfoLayout"
       layoutDirection="horiz">

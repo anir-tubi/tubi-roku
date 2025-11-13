@@ -140,6 +140,7 @@ Function setBadge(badgeType = "live", badgeText = "")
     badge.backgroundColor = m.blueBadgeColor
     badge.textColor = m.primaryTextColor
     badge.text = getTranslation("onNow")
+    badge.borderUri = "pkg:/images/badge-border-dark-$$RES$$.9.png"
   else if badgeType = m.badgeTypes.language
     if badgeText <> ""
       lang = Ucase(badgeText)
