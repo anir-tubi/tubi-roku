@@ -195,10 +195,12 @@ Function newBackgroundSet()
       fade(m.posterGroupMask, "out", 0.5)
       fade(m.defaultBackground, "out", 0.5)
       fade(m.fullScreenPosterGradient, "out", 0.5)
-      fade(m.fullScreenPosterGradient2, "in", 0.5)
       fade(m.adDisplayGradient, "out", 0.5)
       if backgroundType = backgroundTypes.cinematic
+        fade(m.fullScreenPosterGradient2, "out", 0)
         fade(m.videoTilesBackgroundGradient, "in", 0.5)
+      else
+        fade(m.fullScreenPosterGradient2, "in", 0.5)
       end if
     else if backgroundType = backgroundTypes.adRowlistSpotlight OR backgroundType = backgroundTypes.adRowlistCarousel
       fade(m.circularMaskLayer, "out", 0.5)

@@ -1811,6 +1811,7 @@ Function onFeaturedListHasFocusChange(msg)
   hasFeaturedListFocus = msg.getData()
   screen = msg.getRoSGNode()
   m.videoTileOverlayGroup.visible = (isCurrentScreenHomeScreen() = true AND isKidsUIOn() = false AND screen.lastFocusedList = "featuredRowList")
+  m.videoTilesControlMetadata.visible = m.videoTileOverlayGroup.visible
   content = screen.featuredRowFocusedItem
   previewContent = m.videoPreviewPlayer.content
   m.videoPreviewPlayer.visible = (isCurrentScreenHomeScreen() = false OR (content <> invalid AND previewContent <> invalid AND content.id = previewContent.id))
