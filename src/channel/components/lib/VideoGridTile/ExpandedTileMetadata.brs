@@ -222,9 +222,11 @@ Function onItemContentChange(msg)
       ' With 3 lines of description text, the height is 230px and with 2 lines of description text, the height is 192px.
       ' And parent level translation is set based on 2 lines of description text. So we are adjusting the bottom padding by negative margining the metadataGroup.
       ' This is required only for control variant.
-      height = m.metadataGroup.boundingRect().height
-      translation = m.metadataGroup.translation
-      m.metadataGroup.translation = [translation[0], 192 - height]
+      if m.variant <> "trueControlTop2Rows"
+        height = m.metadataGroup.boundingRect().height
+        translation = m.metadataGroup.translation
+        m.metadataGroup.translation = [translation[0], 192 - height]
+      end if
     end if
   end if
 End Function
