@@ -59,6 +59,7 @@ Function runChannel(constants, log, request)
   tubiScene.observeField("disableInstantResume", port)
   tubiScene.observeField("rokuContinueWatchingRequestInfo", port)
   tubiScene.observeField("sendLogToServer", port)
+  tubiScene.observeField("enableSystemLogTypes", port)
 
   if constants.settings.injectRtaOnDeviceComponent = true then
     m.odc = createObject("roSGNode", "RTA_OnDeviceComponent") 'bs:disable-line 1128
@@ -94,6 +95,8 @@ Function runChannel(constants, log, request)
   ' Setting constants separate to make sure it gets triggered last
   tubiScene.baseChannelConstants = constants
 
+  sysLog = invalid
+
   while true
     msg = wait(0, port)
     msgType = type(msg)
@@ -119,7 +122,24 @@ Function runChannel(constants, log, request)
         updateRokuContinueWatchingInfo(request, info)
       else if field = "sendLogToServer" then
         sendLogToServer(msg.getData(), log)
+      else if field = "enableSystemLogTypes" then
+        if sysLog = invalid then
+          sysLog = CreateObject("roSystemLog")
+          sysLog.setMessagePort(port)
+        end if
+
+        logTypes = msg.getData()
+        for each logType in logTypes
+          sysLog.enableType(logType)
+        end for
       end if
+    else if msgType = "roSystemLogEvent" then
+      systemLogEvent = msg.getInfo()
+
+      ' We need to convert over the roDateTime as that can't cross the thread barrier
+      systemLogEvent.Datetime = systemLogEvent.Datetime.toISOString("milliseconds")
+
+      tubiScene.systemLogEvent = systemLogEvent
     end if
   end while
   return false

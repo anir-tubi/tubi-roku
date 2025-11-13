@@ -20,12 +20,18 @@
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
 
   <interface>
+  <!-- Inputs from main -->
     <!-- Includes the constants included in the base channel and kicks off the bootstrap process -->
     <field id="baseChannelConstants" type="assocarray" />
 
     <!-- the arguments that are passed into the app at startup, as an associative array -->
     <field id="startupArgs" type="assocarray"/>
     <field id="appStartTime" type="integer"/>
+
+    <!-- If we have enabled log types with enableSystemLogTypes then they will come through here as they happen  -->
+    <field id="systemLogEvent" type="assocarray" alwaysNotify="true"/>
+
+  <!-- Outputs to main -->
 
     <!-- Main thread listens for this and will make a call to roku continue watching endpoint. Below field will contain information related to the update or delete request.
           Below field is necessary due to a roku limitation that we need to make the api request from main thread due to a fact that they cannot retrieve channel token properly if it is made in component library.
@@ -48,7 +54,11 @@
     <!-- disableInstantResume will be set to true when guest user tries to relaunch the app after 24hours after app got suspended by pressing home or by opening channel on remote -->
     <field id="disableInstantResume" type="boolean" value="false" alwaysNotify="true" />
 
+    <!-- sendLogToServer will be set when there is a need to send logs to server from main thread (Only before ContentController is setup) -->
     <field id="sendLogToServer" type="assocarray" alwaysNotify="true" />
+
+    <!-- We use enableSystemLogTypes to pass the log types we want to turn on -->
+    <field id="enableSystemLogTypes" type="stringarray"/>
   </interface>
 
   <!-- suspendhandler will be set when app got suspended by pressing Home key or other Channel on remote -->
