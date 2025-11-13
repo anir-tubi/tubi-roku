@@ -559,12 +559,14 @@ Function checkIfHomeScreenContentIsReady(homeScreen)
         homescreenContent = homeScreen.featuredRowContent
       end if
 
-      ' Insert each node into homeScreen.content at rowPlacement index
-      for each node in adContent
-        if node <> invalid AND node.type <> m.constants.ui.contentTypes.skinAd
-          homescreenContent.insertChild(node, node.rowPlacement)
-        end if
-      end for
+      if adContent <> invalid then
+        ' Insert each node into homeScreen.content at rowPlacement index
+        for each node in adContent
+          if node <> invalid AND node.type <> m.constants.ui.contentTypes.skinAd
+            homescreenContent.insertChild(node, node.rowPlacement)
+          end if
+        end for
+      end if
     end if
 
     if bHomeScreenContentReady = true
