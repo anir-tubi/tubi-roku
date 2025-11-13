@@ -528,8 +528,12 @@ Function processSuccessResponse(result, callbackTypes, job)
         message = {
           "url": result.url
           "responseCode": result.response.code
+          "responseHeaders": formatJson(result.response.headers)
+          "responseFullJson": formatJson(result.response.fullJson)
         }
 
+        ' Have to convert backtrace to string
+        e.backtrace = formatJson(e.backtrace)
         message.append(e)
 
         logInfo(message, "clientInfo", "caught-crash", 1)

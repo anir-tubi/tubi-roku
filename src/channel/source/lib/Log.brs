@@ -341,6 +341,10 @@ Function tubiLog_getClientLogEvent(eventValues) as Object
     end if
   end for
 
+  if propertiesToDelete.count() > 0 AND m.constants.settings.mode = "dev" then
+    throw "TubiLogger.getClientLogEvent: Removed invalid properties from message_map: " + FormatJson(propertiesToDelete)
+  end if
+
   for each key in propertiesToDelete
     message_map.delete(key)
   end for
