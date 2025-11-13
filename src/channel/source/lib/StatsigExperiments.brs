@@ -25,6 +25,10 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
       }
 
       roku_player_improvement: {
+        'Showing branding logo on top right corner of player
+        roku_player_branding_v2: {
+          default: { "enabled": false }
+        }
         ' ymal container in BWW section inside player if experiment is enabled
         roku_player_bww_ymal_v1: {
           default: { "enabled": false }

@@ -155,7 +155,7 @@ Function init()
   m.logoKids = m.top.findNode("tubiKidsLogo")
   m.brandingLogo = m.top.findNode("brandingLogo")
 
-  m.brandingLogoExperimentType = getExperimentResource("roku_player_branding", "roku_player_branding_v1").type
+  m.isBrandingLogoExperimentEnabled = getStatsigExperimentResource("roku_player_improvement", "roku_player_branding_v2", false).enabled
 
   '//Variable to keep track where the m.ratingOverlay UI element should animated when the down button is pressed.
   m.ratingOverlayAnimatedPositionY = 150
@@ -1276,11 +1276,7 @@ Function onVideoStateChange(msg)
 
   ' Loading page visibility
   if state = "playing" OR state = "paused"
-    if m.brandingLogoExperimentType = "variant1"
-      m.LoadingSpinner.visible = false
-    else
-      m.Loading.visible = false
-    end if
+    m.Loading.visible = false
     m.top.state = state
   else
     if m.bAutostartRefreshExperimentEnabled = true AND m.UpNext.opacity > 0 AND m.Video.width <> 1920
@@ -1291,8 +1287,6 @@ Function onVideoStateChange(msg)
         m.VideoBorder.visible = false
         m.UpNext.setFocus(true)
       end if
-    else if m.brandingLogoExperimentType = "variant1"
-      m.LoadingSpinner.visible = true
     else
       m.LoadingProgressBar.progress = 0
       m.Loading.visible = true
@@ -3164,8 +3158,8 @@ End Function
 ' @shouldShowBrandingLogo: boolean, true to show the logo with animation, false to hide the logo with animation
 ' @delay: integer, delay to start the animation
 Function updateBrandingLogoVisibility(shouldShowBrandingLogo = false, delay = 0)
-  'roku_player_branding_v1 exposure event should be fired when content loads
-  if shouldShowBrandingLogo = true AND getExperimentResource("roku_player_branding", "roku_player_branding_v1", true).type <> "none"
+  'roku_player_branding_v2 exposure event should be fired when content loads
+  if shouldShowBrandingLogo = true AND getStatsigExperimentResource("roku_player_improvement", "roku_player_branding_v2", true).enabled = true
     ' Update branding logo URI and width based on app mode, then show with animation
     if m.top.appMode = "KIDS_MODE"
       m.brandingLogo.uri = "pkg:/images/logo-kids-large.webp"
