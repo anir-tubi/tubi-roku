@@ -304,6 +304,18 @@ Function observeUpdateAuth(taskNode)
 End Function
 
 
+' Observes logoutAndRestartApp field on the passed in node
+' @taskNode: The Task node that we will observe the logoutAndRestartApp field on.
+Function observeLogoutAndRestartApp(taskNode)
+  if taskNode = invalid OR taskNode.isSubType("Task") = false then
+    tubiLog("Task node not passed in to observeLogoutAndRestartApp")
+  else
+    TubiLog("observeLogoutAndRestartApp")
+    taskNode.observeFieldScoped("logoutAndRestartApp", "logoutAndRestartApp")
+  end if
+End Function
+
+
 Function onUpdateAuthChange()
   if m.getAuthOperationInProgress = false then
     m.getAuthOperationInProgress = true
@@ -424,4 +436,3 @@ Function onStatsigInitializationError(errorResponse)
   m.performanceMetricsTracker.endAppLaunchMetricTiming("statsig_initialization_request")
   runControllerStartSequence()
 End Function
-

@@ -26,6 +26,13 @@ Function getUpdatedAuth(port = invalid)
 End Function
 
 
+' If we are told to log a user out by client error config then we need to communicate this to the controller.
+Function logoutAndRestartApp()
+  tubiLog("BaseTaskNeedingAuth.logoutAndRestartApp")
+  m.top.logoutAndRestartApp = true
+End Function
+
+
 ' Since tasks run in a loop, this function is needed to check if we have received updated auth info and if so trigger the appropriate callback either onAuthUpdatedFailure or onAuthUpdatedSuccess. Will return true if the message passed in was an authUpdated message else false.
 Function conditionallyProcessAuthUpdatedMessage(msg)
   if type(msg) = "roSGNodeEvent" then

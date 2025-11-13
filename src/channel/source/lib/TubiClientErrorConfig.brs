@@ -121,16 +121,26 @@ Function clientErrorConfigCheckIfShouldRetryAfter(clientErrorConfig, url, method
     ' Make sure we have a retry_strategy
     if isString(matchedConfig.retry_strategy) = true then
       if matchedConfig.retry_strategy = "new_token" then
+
+        ' ContentController uses convertClientErrorConfig but does not use this method so need to ignore getUpdatedAuth not existing
         ' bs:disable-next-line 1001 LINT1001
         if isFunction(getUpdatedAuth) = true then
           getUpdatedAuth() 'bs:disable-line 1140 LINT1001
         else
           print "getUpdatedAuth is not in scope"
         end if
+      else if matchedConfig.retry_strategy = "sign_off" then
+        ' ContentController uses convertClientErrorConfig but does not use this method so need to ignore logoutAndRestartApp not existing
+        ' bs:disable-next-line 1001 LINT1001
+        if isFunction(logoutAndRestartApp) = true then
+          logoutAndRestartApp() 'bs:disable-line 1140 LINT1001
+        else
+          print "logoutAndRestartApp is not in scope"
+        end if
       end if
 
       retryStrategy = clientErrorConfig.retry_strategies[matchedConfig.retry_strategy]
-      if isAA(retryStrategy) = true then
+      if isAA(retryStrategy) = true AND retryStrategy.max_retries <> invalid then
         if retriesAttempted >= retryStrategy.max_retries then
           ' If we have already retried the max number of times then we don't retry
           return -1
@@ -173,8 +183,8 @@ Function clientErrorConfigCheckIfShouldRetryAfter(clientErrorConfig, url, method
     end if
   end if
 
-  ' If we got here we default to retrying. This should never get hit since default.error.default should always match as long as it is there
-  return 0
+  ' If we got here we default to not retrying. This should never get hit since default.error.default should always match as long as it is there unless we get an invalid response from backend
+  return -1
 End Function
 
 

@@ -20,5 +20,8 @@
       <!-- OUTPUT -->
         <!-- updateAuth is set by calling getUpdatedAuth() which is observed in the active controller to trigger us getting updated auth info. m.waitingForUpdatedAuthInfo is set to true to let the task know we are waiting for updated auth info. -->
         <field id="updateAuth" type="boolean" alwaysNotify="true" />
+
+        <!-- If we are told to log a user out by client error config then we need to communicate this to the controller. -->
+        <field id="logoutAndRestartApp" type="boolean" alwaysNotify="true" />
     </interface>
 </component>

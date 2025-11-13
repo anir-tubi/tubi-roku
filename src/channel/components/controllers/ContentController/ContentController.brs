@@ -15,6 +15,7 @@ Function init()
   ' We need to create the general task in order to load our base dependencies (like experiments, remote config, etc.) but we will need to update the general task after the base dependencies are loaded.
   generalTask = createObject("roSGNode", "ControllerGeneralTask") ' initiate GeneralTask
   observeUpdateAuth(generalTask)
+  observeLogoutAndRestartApp(generalTask)
 
   ' Initiate GeneralTaskModule by passing caller context.
   ' Calling GeneralTaskModule() will append methods to the local m.
@@ -265,6 +266,8 @@ Function addControllerUi()
 
   m.trackingLoggingTask = CreateObject("roSGNode", "TrackingLoggingTask")
   observeUpdateAuth(m.trackingLoggingTask)
+  observeLogoutAndRestartApp(m.trackingLoggingTask)
+
   m.global.addField("trackingLoggingTask", "node", false)
   m.global.trackingLoggingTask = m.trackingLoggingTask
 

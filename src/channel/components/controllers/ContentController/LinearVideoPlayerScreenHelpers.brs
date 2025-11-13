@@ -51,6 +51,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
         videoPlayer.observeFieldScoped("trackingLoggingEvent", "onTrackingLoggingEvent")
 
         observeUpdateAuth(videoPlayer.task)
+        observeLogoutAndRestartApp(videoPlayer.task)
 
         initVideoTracking(videoPlayer, youboraEnabledLinear) 'initializeYoubora. Regular and linear video players share tracking functions, which are found in VideoHelpers
         setInScreenCache(videoPlayer)
