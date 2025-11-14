@@ -220,7 +220,6 @@ Function addControllerUi()
     m.videoTilesControlCategoryIds = experiment.controlCategoryIds
   end if
 
-
   updateVideoTileSize()
 
   m.LinearPlayerGroup = m.top.findNode("LinearPlayerGroup")

@@ -1240,9 +1240,9 @@ Function updateScrubTime()
 
   '//Ensure scrub can't go past the timer for the UpNext Overlay
   if m.Video.content.seriesId <> invalid AND m.Video.content.seriesId <> ""
-    nMaxScrub = m.Video.duration - m.constants.player.upNextCountdownForSeries - 5
+    nMaxScrub = m.Video.duration - m.seriesPostplayCountdown - 5
   else
-    nMaxScrub = m.Video.duration - m.constants.player.upNextCountdown - 5
+    nMaxScrub = m.Video.duration - m.moviePostplayCountdown - 5
   end if
   if nMaxScrub < 0
     nMaxScrub = m.Video.duration
