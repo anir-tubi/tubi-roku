@@ -1492,6 +1492,9 @@ Function getConstants()
   'Sizes of featured row  poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
   constants.ui.imageSizes.videoTilesPortrait = [310, 442]
 
+  ' Readding the renamed constant from the previous experiment. Due to it causing a crash when user fallbacks to submission release.
+  constants.ui.imageSizes.featuredPortraitSmall = [310, 442]
+
   ' Size of guest user continue watching container.
   constants.ui.imageSizes.guestContinueWatchingTile = [1613, 378]
 

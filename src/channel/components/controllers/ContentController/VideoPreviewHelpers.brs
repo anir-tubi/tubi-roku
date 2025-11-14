@@ -616,7 +616,7 @@ End Function
 Function renderAutoStartPlaybackFromPreviewCounter(contentFocused, diff)
   if diff = 10
     currentScreen = getCurrentScreen()
-    if currentScreen <> invalid AND contentFocused <> invalid AND arrayIncludes(m.videoTilesControlCategoryIds, contentFocused.parentId) = true
+    if currentScreen <> invalid AND contentFocused <> invalid AND arrayIncludes(m.videoTilesControlCategoryIds, contentFocused.parentId) = true AND isNonEmptyArray(currentScreen.featuredRowListTranslation) = true
       m.autoStartPreviewToPlaybackTimer.reParent(m.top, false)
       width = m.autoStartPreviewToPlaybackTimer.boundingRect().width
       m.autoStartPreviewToPlaybackTimer.translation = [1920 - width - 66, currentScreen.featuredRowListTranslation[1] - 40]

@@ -138,10 +138,12 @@ Function onVideoStateChange(msg)
     playerStates = {}
     if checkIfMultipleVideoNodeError(m.video.errorMsg) = true
       for each node in allNodes
-        parent = node.getParent()
-        if node.isSubtype("Video") AND parent <> invalid AND parent.id <> invalid
-          id = parent.id
-          playerStates[id] = node.state
+        if node.isSubtype("Video")
+          parent = node.getParent()
+          if parent <> invalid AND parent.id <> invalid
+            id = parent.id
+            playerStates[id] = node.state
+          end if
         end if
       end for
     end if
