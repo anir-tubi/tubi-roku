@@ -2,8 +2,8 @@ settings:
   # Settings are added to constants.settings via getSettings
   # Any constants that need to be templatized should be added via settings
   mode: "qa"
-  noAds: false  #setting to true will prevent ads from being requested from rainmaker
-  stagingApis: false  #setting to true will use UAPI staging APIs (matrix, cms, user_device)
+  noAds: false #setting to true will prevent ads from being requested from rainmaker
+  stagingApis: false #setting to true will use UAPI staging APIs (matrix, cms, user_device)
   remoteComponentsExtension: "zip" #prevents packages being built for qa builds, as they are not used - makes for faster builds
   skipAgeGate: false #setting to true will prevent the COPPA age gate screen from appearing
 
@@ -60,9 +60,11 @@ settings:
   # Setting the below value to true will enable youbora tracking for trailer.
   youboraEnabledTrailer: false
 
-
   # Setting the below value to true will turn off displaying the skin ads feature (if there is a skin ads campaign) to avoid issues with automated tests on Roku devices not hooked up to display the feature
   disableSkinAds: false
+
+  # Setting the below value to a number greater than 0 will override the default category content refresh timeout value in seconds
+  screenOverrideContentRefreshTimeoutSeconds: -1
 
   # Setting the below value to false will disable sending logs to client logs.
   clientLogsEnabled: true

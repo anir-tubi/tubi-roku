@@ -7,8 +7,8 @@ settings:
   shortAppName: "tubitv"
   platformName: "roku"
   starterComponentsUrl: "https://mrcdn-production.tubitv.com/appFiles/starter-components/tubi_starter_components_{{versionMinorUnderscored}}.pkg"
-  remoteComponentsUrl:  "https://mrcdn-production.tubitv.com/appFiles/components/tubi_remote_components_{{versionUnderscored}}.pkg"
-  oneTrustComponentsUrl:  "https://mrcdn-production.tubitv.com/appFiles/one-trust-components/tubi_one_trust_components_{{oneTrustVersionUnderscored}}.pkg"
+  remoteComponentsUrl: "https://mrcdn-production.tubitv.com/appFiles/components/tubi_remote_components_{{versionUnderscored}}.pkg"
+  oneTrustComponentsUrl: "https://mrcdn-production.tubitv.com/appFiles/one-trust-components/tubi_one_trust_components_{{oneTrustVersionUnderscored}}.pkg"
   foxVideoPlayerComponentsUrl: "https://mrcdn-staging.tubitv.com/appFiles/fox-video-player-components/fox_video_player_{{foxVideoPlayerVersionUnderscored}}.pkg"
   remoteComponentsExtension: "pkg"
   remoteComponentLibProvided: "{{remoteComponentLibProvided}}"
@@ -43,7 +43,6 @@ settings:
   youboraEnabledPreview: false
   youboraEnabledTrailer: false
 
-  
   # Setting the below value to true will enable youbora request logging into the console.
   youboraDebugEnabled: false
 
@@ -61,6 +60,9 @@ settings:
 
   # Setting the below value to true will turn off displaying the skin ads feature (if there is a skin ads campaign) to avoid issues with automated tests on Roku devices not hooked up to display the feature
   disableSkinAds: false
+
+  # Setting the below value to a number greater than 0 will override the default category content refresh timeout value in seconds
+  screenOverrideContentRefreshTimeoutSeconds: -1
 
   # Setting the below value to true will turn off running any experiments which is useful while running automated tests
   disableExperiments: false

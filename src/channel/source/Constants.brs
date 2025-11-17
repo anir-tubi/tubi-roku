@@ -826,8 +826,13 @@ Function getConstants()
   constants.timers = {}
   constants.timers.skinAdTimeout = 6
 
-  ' Time in seconds after which we force a refresh of the categoryscreen
-  constants.timers.categoryContentRefreshTimeout = 12 * 60 * 60
+  ' Time in seconds after which we force a refresh of the homeScreen and EPGHomeScreen
+  if constants.settings.mode <> "production" AND constants.settings.screenOverrideContentRefreshTimeoutSeconds <> invalid AND constants.settings.screenOverrideContentRefreshTimeoutSeconds > 0
+    constants.timers.categoryContentRefreshTimeout = constants.settings.screenOverrideContentRefreshTimeoutSeconds
+  else
+    constants.timers.categoryContentRefreshTimeout = 12 * 60 * 60
+  end if
+
   '// Time in seconds when we fire pixels when an ad is in focus
   constants.timers.adFocusPixelFire = 1
 

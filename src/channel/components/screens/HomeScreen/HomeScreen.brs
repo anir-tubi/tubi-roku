@@ -209,6 +209,8 @@ Function onContentUpdated(msg)
       content = m.top.content
     end if
 
+    deleteAdDisplayCarouselComponent() '//remove any existing ad carousel component before creating a new one
+
     if isAdDisplayCarouselAvailable() = false
       for i = 0 to content.getChildCount() - 1
         item = content.getChild(i)
@@ -227,6 +229,7 @@ Function onContentUpdated(msg)
     else
       moveContentAreaMask(0)
     end if
+
     onCurrFocusRowChange()
   end if
 End Function
@@ -284,7 +287,7 @@ Function onLoadingChange()
     m.top.adContent = invalid
     m.CategoryGridList.featuredRowContent = invalid
     m.CategoryGridList.skinAdContentUpdated = true
-    m.top.adContentUpdated = false
+    m.top.adContentFetchCompleted = false
     m.top.featuredRowContent = invalid
     m.top.content = invalid
     m.CategoryGridList.resetFeaturedRowList = true
@@ -817,7 +820,7 @@ Function deleteAdDisplayCarouselComponent()
     m.adRowlistCarouselComponent.opacity = 0
     onCarouselFadeOutComplete()
     m.adContentGroup.removeChild(m.adRowlistCarouselComponent)
-    '//NOTE:: do not set m.adRowlistCarouselComponent to invalid, as it may need to be reused later and the AnimationMixin may a reference to the original component
+    '//NOTE:: do not set m.adRowlistCarouselComponent to invalid, as it may need to be reused later and the AnimationMixin may have a reference to the original component
   end if
 End Function
 
@@ -1042,7 +1045,7 @@ End Function
 
 Function onCategoryRefreshTimer()
   tubiLog("HomeScreen.onCategoryRefreshTimer")
-  m.top.loadAllCategories = true
+  m.top.loadAllCategoriesViaRefreshTimer = true
 End Function
 
 

@@ -36,8 +36,7 @@
     <!-- Tells the ad carousel if it should stop or start automatically rotating -->
     <field id="allowCarouselAutoRotate" type="boolean" />
 
-    <!-- The helper class will call this when the new content is ready to be displayed on the
-    screen. -->
+    <!-- The helper class will call this when the new content is ready to be displayed on the screen. -->
     <field id="contentUpdated" alwaysNotify="true" alias="CategoryGridList.contentUpdated" />
 
     <!-- Featured row content node -->
@@ -47,9 +46,11 @@
     screen. -->
     <field id="skinAdContentUpdated" alias="CategoryGridList.skinAdContentUpdated" />
 
-    <!-- The helper will set this when the new ad carousel content is ready to be displayed on the
-    screen. -->
-    <field id="adContentUpdated" type="boolean" value="false" />
+    <!-- The helper will set this when the ad content is ready to be displayed on the screen. Both contentFetchCompleted and skinAdContentUpdated have to be true before the screen can proceed to load which is communicated via setting of contentUpdated. -->
+    <field id="adContentFetchCompleted" type="boolean" value="false" />
+
+    <!-- The helper will set this when the content is ready to be displayed on the screen. Both contentFetchCompleted and skinAdContentUpdated have to be true before the screen can proceed to load which is communicated via setting of contentUpdated. -->
+    <field id="contentFetchCompleted" type="boolean" value="false" />
 
     <!-- What kind of content is this homeScreen displaying: movies, tv, normal, espanol etc -->
     <field id="contentMode" alias="CategoryGridList.contentMode" />
@@ -152,6 +153,8 @@
            the initial category content loading until after the stateful
            fields have been set (e.g. signedIn) -->
     <field id="loadAllCategories" type="boolean" value="false" alwaysNotify="true" />
+    <!-- Same as loadAllCategories but indicates this was triggered via the refresh timer -->
+    <field id="loadAllCategoriesViaRefreshTimer" type="boolean" value="false" alwaysNotify="true" />
 
     <!-- Triggered when the homescreen has lost focus -->
     <field id="focusLost" type="boolean" alwaysNotify="true" />

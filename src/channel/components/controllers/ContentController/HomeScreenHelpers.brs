@@ -47,6 +47,7 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.observeFieldScoped("sponsorshipBackground", "onSponsorshipBackgroundChanged")
     homeScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     homeScreen.observeFieldScoped("loadAllCategories", "onLoadAllCategories")
+    homeScreen.observeFieldScoped("loadAllCategoriesViaRefreshTimer", "onLoadAllCategoriesAfterRefreshTimer")
     homeScreen.observeFieldScoped("contentFocused", "onHomeScreenContentFocused")
     homeScreen.observeFieldScoped("focusLost", "onHomeScreenFocusLost")
     homeScreen.observeFieldScoped("contentSelected", "onContentSelected")
@@ -306,12 +307,27 @@ Function setHomeScreenLoading(homeScreen)
 End Function
 
 
-' load all category content, including . Series do not have season or episode information though.
+' load all category content. Series do not have season or episode information though.
 Function onLoadAllCategories(msg)
   tubiLog("HomeScreenHelpers.onLoadAllCategories")
   homeScreen = msg.getRoSGNode()
 
   fetchHomescreen(homeScreen, true)
+End Function
+
+
+' load all category content. Series do not have season or episode information though.
+Function onLoadAllCategoriesAfterRefreshTimer(msg)
+  tubiLog("HomeScreenHelpers.onLoadAllCategoriesAfterRefreshTimer")
+  homeScreen = msg.getRoSGNode()
+
+  useCache = true
+  if m.constants.settings.mode <> "production" AND m.constants.settings.screenOverrideContentRefreshTimeoutSeconds <> invalid AND m.constants.settings.screenOverrideContentRefreshTimeoutSeconds > 0
+    '//If we are overriding the content refresh timeout using a forced refresh timer (for testing purposes), then always fetch fresh content
+    useCache = false
+  end if
+
+  fetchHomescreen(homeScreen, useCache)
 End Function
 
 
@@ -322,6 +338,10 @@ Function fetchHomeScreen(homeScreen, useCache = false)
   ' called, such as when signedIn field changes.
   if homeScreen.canLoadCategories = true
     bSkipCallingAdContent = false
+
+    '//reset contentFetchCompleted flags
+    homeScreen.contentFetchCompleted = false
+    homeScreen.adContentFetchCompleted = false
 
     homeScreen.trackingLoadStartTime = UpTime(0)
     authInfo = m.tubiAuthUpdate.getAuthInfo()
@@ -368,7 +388,7 @@ Function fetchHomeScreen(homeScreen, useCache = false)
 
         createHomescreenAdRequest(homeScreen.id, onHomesceenAdDisplaySuccessResponse, aAdTypes, onHomesceenAdDisplayErrorResponse)
       else
-        'If in kids mode, then user is not in experiment and we should indicate that the adContentUpdated flag is true so that ads are not waited on when loading homescreen content
+        'If in kids mode, then user is not in experiment and we should indicate that the adContentFetchCompleted flag is true so that ads are not waited on when loading homescreen content
         bSkipCallingAdContent = true
       end if
     end if
@@ -410,14 +430,15 @@ Function fetchHomeScreen(homeScreen, useCache = false)
       uiMode: m.uiMode
     })
 
+
+    if bSkipCallingAdContent = true
+      '//::NOTE::ads_ott_hdc_adformats_v1 this is only needed for the experiment. Skip loading of the ad content if it was found in this function that we should skip waiting for ad content
+      homeScreen.adContentFetchCompleted = true
+    end if
+
     if useCache = false
       homeScreen.resetContentAreaValues = true
       setHomeScreenLoading(homeScreen)
-
-      if bSkipCallingAdContent = true
-        '//::NOTE::ads_ott_hdc_adformats_v1 this is only needed for the experiment. Skip loading of the ad content if it was found in this function that we should skip waiting for ad content
-        homeScreen.adContentUpdated = true
-      end if
     end if
 
     homeScreen.containerPaginationStatus = "none"
@@ -491,6 +512,8 @@ End Function
 ' onHomeScreenSuccessResponse
 '
 Function onHomeScreenSuccessResponse(response)
+  '//::TODO::JHAND - remove component before setting content
+  ' deleteAdDisplayCarouselComponent() '//Remove any existing carousel component before checking for a new one
   respondToHomeScreenSuccessResponse(m.constants.ui.screenIds.homeScreen, response)
 End Function
 
@@ -501,7 +524,7 @@ Function onHomesceenAdDisplaySuccessResponse(response)
   if homeScreen <> invalid AND isNonEmptyArray(response) = true
     homeScreen.adContent = response
   end if
-  homeScreen.adContentUpdated = true
+  homeScreen.adContentFetchCompleted = true
 
   skinAdsWrapper = invalid
   for each adResponse in response
@@ -532,17 +555,18 @@ Function onHomesceenAdDisplayErrorResponse(response)
   tubiLog("HomeScreenHelpers.onHomesceenAdDisplayErrorResponse")
   '//If the ad response fails, then fail silently and continue with the homescreen content update
   homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-  homeScreen.adContentUpdated = true
+  homeScreen.adContentFetchCompleted = true
   checkIfHomeScreenContentIsReady(homeScreen)
 End Function
 
 
 Function checkIfHomeScreenContentIsReady(homeScreen)
+  tubiLog("HomeScreenHelpers.checkIfHomeScreenContentIsReady")
   sID = homeScreen.id
   bIsHomeScreen = (sID = m.constants.ui.screenIds.homeScreen)
-  '//Check if ad content has loaded, but only for the default homescreen type. The other homescreen types do not have ad content. (Note that adContentUpdated will be true even if backend responds that there is no ad content)
-  bAdContentLoaded = (bIsHomeScreen = true AND homeScreen.adContentUpdated = true)
-  bContentLoaded = (homeScreen.content <> invalid) OR (homeScreen.featuredRowContent <> invalid)
+  '//Check if ad content has loaded, but only for the default homescreen type. The other homescreen types do not have ad content. (Note that adContentFetchCompleted will be true even if backend responds that there is no ad content)
+  bAdContentLoaded = (bIsHomeScreen = true AND homeScreen.adContentFetchCompleted = true)
+  bContentLoaded = (homeScreen.contentFetchCompleted = true)
 
   bHomeScreenContentReady = false
   if bContentLoaded = true
@@ -629,6 +653,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     end if
 
     homeScreen.content = rawResponse
+    homeScreen.contentFetchCompleted = true
 
     checkIfHomeScreenContentIsReady(homeScreen)
 
@@ -666,6 +691,7 @@ End Function
 ' onHomeScreenErrorResponse
 '
 Function onHomeScreenErrorResponse(response)
+  tubiLog("HomeScreenHelpers.onHomeScreenErrorResponse")
   screen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
   if response.httpStatusCode <> 304 OR screen.content = invalid
     handleHomeScreenErrorResponse(m.constants.ui.screenIds.homeScreen, response)
@@ -1476,6 +1502,7 @@ End Function
 
 ' @screenId: string, id of the screen from where the call was made. constants.ui.screenIds.homeScreen or constants.ui.screenIds.eventDetailScreen
 Function onHomeScreenContentUpdateComplete(screenId)
+  tubiLog("HomeScreenHelpers.onHomeScreenContentUpdateComplete")
   homeScreen = getFromScreenCache(screenId)
 
   homeScreen.contentUpdated = true
