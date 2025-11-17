@@ -331,7 +331,7 @@ Function onContentChange()
   m.skinAdRow.translation = m.originalTranslationSkinAdRow
 
 
-  ' set the translation position of the page based on presense or absence of any 1st rows.
+  ' set the translation position of the page based on presence or absence of any 1st rows.
   ' DO this BEFORE setting the content of the rowList (later in this function) or else the translation will not be properly set.
   ' This is need mainly for the initial load and if skinAdRow is focused.
   ' When any other list is focused, we will not show the skin ads.
@@ -344,6 +344,9 @@ Function onContentChange()
 
     m.skinAdRow.opacity = 1
     m.top.lastFocusedList = "skinAdRow"
+    if m.top.isInFocusChain() = true
+      m.skinAdRow.setFocus(true)
+    end if
     category = m.top.skinAdContent.getChild(0)
     if category <> invalid
       content = category.getChild(0)
