@@ -33,6 +33,25 @@ Function init()
   m.Video.observeField("timedMetaData", "onId3")
   'downloadedSegment is needed for live player log - Quality Of Service event
   m.Video.observeFieldScoped("downloadedSegment", "onDownloadedSegment")
+  m.Video.observeFieldScoped("streamInfo", "onStreamInfoChanged")
+  m.Video.observeFieldScoped("streamingSegment", "onStreamingSegmentChange")
+
+  m.showPlayerStats = false
+  ' Player Stats Overlay initialization for nonproduction mode
+  if m.constants.settings.mode <> "production"
+    m.playerStatsOverlay = m.top.findNode("playerStatsOverlay")
+
+    if m.global <> invalid
+      m.global.observeFieldScoped("showPlayerStats", "onShowPlayerStatsChange")
+
+      if m.global.showPlayerStats <> invalid AND m.global.showPlayerStats = true
+        m.showPlayerStats = true
+      else
+        m.showPlayerStats = false
+      end if
+
+    end if
+  end if
 
   ' asyncStopSemantics was broken prior to 14.0 so we are not running it on older firmware versions
   isFirmwareOk = createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
@@ -534,6 +553,10 @@ End Function
 Function onFullScreenChange()
   updatePlayerLogLib(m.playerLogLib, "setPlayerType", m.top.fullScreen)
 
+  if m.top.fullScreen = false
+    hidePlayerStats()
+  end if
+
   ' When the linear video player changes sizes, we want to send a play progress event for the previous size.
   if m.isPlayingAdsCurrentState = "content"
     isFullScreenForPlayProgressEvent = (m.top.fullScreen <> true)
@@ -728,6 +751,9 @@ Function prepareToStartVideo(content, videoResourceIndex = [0, 0])
   end if
 
   setDrmOnContent(content, resource, videoResourceIndex)
+
+  ' Update player stats overlay when new content is loaded
+  updatePlayerStatsOverlay()
 
   m.AdsSSAITask.content = content
   m.AdsSSAITask.updateContent = true
@@ -1194,6 +1220,8 @@ Function onDownloadedSegment(msg)
   if isAA(downloadedSegment) = true
     updatePlayerLogLib(m.playerLogLib, "setDownloadedSegmentData", downloadedSegment)
   end if
+
+  updatePlayerStatsOverlay()
 End Function
 
 
@@ -1239,5 +1267,32 @@ Function updateAdCounter(adInfo, showCounter = false)
   else
     m.adCounterLabel.text = ""
     m.adCounter.visible = false
+  end if
+End Function
+
+
+Function onStreamInfoChanged(msg)
+  updatePlayerStatsOverlay()
+End Function
+
+
+Function onStreamingSegmentChange(msg)
+  updatePlayerStatsOverlay()
+End Function
+
+
+Function onShowPlayerStatsChange(msg)
+  m.showPlayerStats = msg.getData()
+End Function
+
+
+Function updatePlayerStatsOverlay()
+  updatePlayerStatsOverlayMixin(m.constants, m.Video, m.showPlayerStats, m.playerStatsOverlay)
+End Function
+
+
+Function hidePlayerStats()
+  if m.playerStatsOverlay <> invalid
+    m.playerStatsOverlay.opacity = 0.0
   end if
 End Function

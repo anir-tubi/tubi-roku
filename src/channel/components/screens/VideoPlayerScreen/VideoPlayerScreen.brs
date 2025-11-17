@@ -85,6 +85,23 @@ Function init()
   m.video.observeFieldScoped("downloadedSegment", "onDownloadedSegment")
   m.videoBorder = m.top.findNode("VideoBorder")
 
+  m.showPlayerStats = false
+  ' Player Stats Overlay initialization for nonproduction mode
+  if m.constants.settings.mode <> "production"
+    m.playerStatsOverlay = m.top.findNode("playerStatsOverlay")
+
+    if m.global <> invalid
+      m.global.observeFieldScoped("showPlayerStats", "onShowPlayerStatsChange")
+
+      if m.global.showPlayerStats <> invalid AND m.global.showPlayerStats = true
+        m.showPlayerStats = true
+      else
+        m.showPlayerStats = false
+      end if
+
+    end if
+  end if
+
   ' asyncStopSemantics was broken prior to 14.0 so we are not running it on older firmware versions
   isFirmwareOk = createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
   if isFirmwareOk = true AND getExperimentResource("roku_async_stop", "roku_async_stop_v6", false).enabled = true then
@@ -619,6 +636,7 @@ End Function
 Function onStreamInfoChanged(msg)
   streamInfo = msg.GetData()
   updatePlayerLogLib(m.playerLogLib, "setStreamInfo", streamInfo)
+  updatePlayerStatsOverlay()
 End Function
 
 
@@ -2119,6 +2137,9 @@ Function prepareToStartVideo(content, videoResourceIndex = [0, 0])
 
   setDrmOnContent(content, resource, videoResourceIndex)
 
+  ' Update player stats overlay when new content is loaded
+  updatePlayerStatsOverlay()
+
   m.top.content = content 'sends content to video node and makes current content available to contentController
   if m.constants.settings.youboraEnabledVod = true
     m.top.sendVideoTrackingStart = true
@@ -3091,6 +3112,9 @@ Function onStreamingSegmentChange(msg)
   if streamingSegment <> invalid AND streamingSegment.segBitrateBps <> invalid AND (streamingSegment.segType = invalid OR streamingSegment.segType = 2 OR streamingSegment.segType = 0) then
     m.top.segInfo = streamingSegment
   end if
+
+  ' Update player stats overlay when streaming segment changes
+  updatePlayerStatsOverlay()
 End Function
 
 
@@ -3099,6 +3123,7 @@ Function onDownloadedSegment(msg)
 
   if isAA(downloadedSegment) = true
     updatePlayerLogLib(m.playerLogLib, "setDownloadedSegmentData", downloadedSegment)
+    updatePlayerStatsOverlay()
   end if
 End Function
 
@@ -3793,4 +3818,14 @@ Function fireBrowseWhileWatchingPlaybackSessionEndEvent()
 
     logInfo(FormatJson(data), "videoInfo", "browseWhileWatchingPlaybackSessionEnd")
   end if
+End Function
+
+
+Function onShowPlayerStatsChange(msg)
+  m.showPlayerStats = msg.getData()
+End Function
+
+
+Function updatePlayerStatsOverlay()
+  updatePlayerStatsOverlayMixin(m.constants, m.Video, m.showPlayerStats, m.playerStatsOverlay)
 End Function

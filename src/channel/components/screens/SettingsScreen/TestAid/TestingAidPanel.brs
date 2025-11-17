@@ -66,11 +66,12 @@ Function onItemFocused(msg)
     if m.constants.settings.charlesProxyEnabled = true
       m.infoArea.text = proxyInfo + chr(10) + "Current Proxy: " + m.constants.settings.charlesProxyUrl
     else
-      m.infoArea.text =  proxyInfo + chr(10) + "Current Proxy: None"
+      m.infoArea.text = proxyInfo + chr(10) + "Current Proxy: None"
     end if
   else if item.id = "changeCountry"
     m.infoArea.text = "Select the country. It will work for White listed IPs only. Contact CSS for whitelisting" + chr(10) + "Current Country: " + m.constants.deviceInfo.countryCode
-
+  else if item.id = "playerStats"
+    m.infoArea.text = "This toggles the display of player stats within the video player, helping QA and developers understand the current playback."
   end if
   showCountryList(item.id = "changeCountry")
   displayProxyKB(item.id = "addProxy")
@@ -130,7 +131,7 @@ Function addProxy(msg)
 End Function
 
 
-Function onKeyEvent(key as String, press as Boolean) as boolean
+Function onKeyEvent(key as String, press as Boolean) as Boolean
   handled = false
   if press = true
     if key = "left"
@@ -173,7 +174,7 @@ Function onTestingAidPanelItemSelected(msg)
   itemSelected = msg.GetData()
 
   item = m.Menu.Content.getChild(itemSelected)
-  if item.id="viewRegistry"
+  if item.id = "viewRegistry"
     showRegistryValues()
   else if item.id = "clearRegistry"
     clearRegistry()
@@ -207,9 +208,27 @@ Function onTestingAidPanelItemSelected(msg)
     else
       displayProxyKB(true)
     end if
+  else if item.id = "playerStats"
+    showPlayerStats = getPlayerStats()
 
+    if showPlayerStats = false
+      item.title = "Hide Player Stats"
+      m.global.showPlayerStats = true
+    else
+      item.title = "Show Player Stats"
+      m.global.showPlayerStats = false
+    end if
   end if
 
+End Function
+
+
+Function getPlayerStats()
+  playerStats = false
+  if m.global <> invalid AND m.global.showPlayerStats <> invalid
+    playerStats = m.global.showPlayerStats
+  end if
+  return playerStats
 End Function
 
 
@@ -224,14 +243,14 @@ Function showRegistryValues()
     section = CreateObject("roRegistrySection", sectionName)
     print "-------------------" + sectionName + "-----------------------"
     keys = section.GetKeyList()
-    regStr = regStr + chr(10) + chr(10) + "<header>"+ sectionName + "</header>" + chr(10)
+    regStr = regStr + chr(10) + chr(10) + "<header>" + sectionName + "</header>" + chr(10)
     for each k in keys
       value = section.Read(k)
       if value <> invalid
-        regStr = regStr + "          " +  k + ": " + "<subTitle>" + value.toStr() + "</subTitle>" + chr(10)
+        regStr = regStr + "          " + k + ": " + "<subTitle>" + value.toStr() + "</subTitle>" + chr(10)
         print "            " + k + ": " + value.toStr()
       else
-        regStr = regStr + "          " +  k +  ": " + chr(10)
+        regStr = regStr + "          " + k + ": " + chr(10)
         print "            " + k + ": "
       end if
     end for
@@ -358,7 +377,7 @@ Function showSafeZoneImage(safeZone)
     if m.constants.deviceInfo.scaledUi = true
       res = "HD"
     else
-      res="FHD"
+      res = "FHD"
     end if
 
     safeZone.uri = "https://mcdn.tubitv.com/image/roku_support_images/Outline-Roku-Safe-Zones-" + res + ".png"
@@ -394,72 +413,72 @@ Function showCountryList(show = false)
   if show = true
     if m.countryListMenu = invalid
       m.countryListMenu = createObject("roSGNode", "markupList")
-      m.countryListMenu.numRows ="5"
-      m.countryListMenu.itemSize ="[585,72]"
-      m.countryListMenu.itemSpacing ="[0,8]"
+      m.countryListMenu.numRows = "5"
+      m.countryListMenu.itemSize = "[585,72]"
+      m.countryListMenu.itemSpacing = "[0,8]"
       m.countryListMenu.focusBitmapBlendColor = m.focusedColor
-      m.countryListMenu.itemComponentName ="CheckButton"
+      m.countryListMenu.itemComponentName = "CheckButton"
       m.countryListMenu.vertFocusAnimationStyle = "floatingFocus"
       m.countryListMenu.translation = "[700,200]"
       m.countryListMenu.id = "countryListMenu"
       countryList = createObject("roSGNode", "ContentNode")
       countryList.id = "countryList"
-      item = createObject("roSGNode","ContentNode")
+      item = createObject("roSGNode", "ContentNode")
       item.id = "US"
       item.title = "United States"
       countryList.appendChild(item)
 
-      item = createObject("roSGNode","ContentNode")
+      item = createObject("roSGNode", "ContentNode")
       item.id = "GB"
       item.title = "United Kingdom"
       countryList.appendChild(item)
 
-      item = createObject("roSGNode","ContentNode")
+      item = createObject("roSGNode", "ContentNode")
       item.id = "AU"
       item.title = "Australia"
       countryList.appendChild(item)
 
-      item = createObject("roSGNode","ContentNode")
+      item = createObject("roSGNode", "ContentNode")
       item.id = "CA"
       item.title = "Canada"
       countryList.appendChild(item)
 
-      item = createObject("roSGNode","ContentNode")
+      item = createObject("roSGNode", "ContentNode")
       item.id = "NZ"
       item.title = "New Zealand"
       countryList.appendChild(item)
 
-      item = createObject("roSGNode","ContentNode")
+      item = createObject("roSGNode", "ContentNode")
       item.id = "MX"
       item.title = "Mexico"
       countryList.appendChild(item)
 
-      item = createObject("roSGNode","ContentNode")
+      item = createObject("roSGNode", "ContentNode")
       item.id = "CR"
       item.title = "Costa Rica"
       countryList.appendChild(item)
 
-      item = createObject("roSGNode","ContentNode")
+      item = createObject("roSGNode", "ContentNode")
       item.id = "GT"
       item.title = "Guatemala"
       countryList.appendChild(item)
 
-      item = createObject("roSGNode","ContentNode")
+      item = createObject("roSGNode", "ContentNode")
       item.id = "EC"
       item.title = "Ecuador"
       countryList.appendChild(item)
 
-      item = createObject("roSGNode","ContentNode")
+      item = createObject("roSGNode", "ContentNode")
       item.id = "PA"
       item.title = "Panama"
       countryList.appendChild(item)
 
-      item = createObject("roSGNode","ContentNode")
+      item = createObject("roSGNode", "ContentNode")
       item.id = "SV"
       item.title = "El Salvador"
       countryList.appendChild(item)
 
-      item = createObject("roSGNode","ContentNode")
+      item = createObject("roSGNode", "ContentNode")
       item.id = "OTHER"
       item.title = "Other"
       countryList.appendChild(item)
@@ -470,11 +489,11 @@ Function showCountryList(show = false)
       m.countryListMenu.observeFieldScoped("itemSelected", "onCountryListMenuChanged")
     end if
     m.countryListMenu.visible = true
-else
-  if m.countryListMenu <> invalid
-    m.countryListMenu.visible = false
+  else
+    if m.countryListMenu <> invalid
+      m.countryListMenu.visible = false
+    end if
   end if
-end if
 End Function
 
 

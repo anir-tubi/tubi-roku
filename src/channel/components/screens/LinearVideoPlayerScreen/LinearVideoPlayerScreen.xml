@@ -15,6 +15,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/LivePlayerLogLib.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/EventMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/PlayerStatsMixin.brs" />
 
   <interface>
 
@@ -218,6 +219,11 @@
 
     <AdsSSAITask
       id="PlayerAdsSSAITask" />
+
+    <PlayerStatsOverlay
+      id="playerStatsOverlay"
+      translation="[700, 30]"
+      opacity="0.0" />
 
   </children>
 </component>

@@ -54,6 +54,8 @@ Function init()
 
   retrieveClientErrorConfig(retrieveClientErrorConfigSuccessCallbackTriggerRetrieveInitialAuthInfo, retrieveClientErrorConfigErrorCallbackTriggerRetrieveInitialAuthInfo)
 
+  'playerStats is used in TestingAidPanel which shows/hides the player stats overlay in VideoplayerScreen
+  m.global.addField("showPlayerStats", "boolean", false)
 
   ' Holds true or false based on if app suspend is in progress
   m.isApplicationSuspendInProgress = false

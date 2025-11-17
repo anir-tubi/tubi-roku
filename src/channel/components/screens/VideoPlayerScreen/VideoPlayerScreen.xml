@@ -19,6 +19,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/Sentry.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/PlayerLogLib.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnalyticsMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/PlayerStatsMixin.brs" />
 
   <interface>
 
@@ -653,6 +654,11 @@
 
     <AdsTask
       id="AdsTask" />
+
+    <PlayerStatsOverlay
+      id="playerStatsOverlay"
+      translation="[700, 30]"
+      opacity="0.0" />
 
     <Timer
       id="ScrubTimer"

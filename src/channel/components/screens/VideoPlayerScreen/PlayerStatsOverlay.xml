@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- The PlayerStatsOverlay component displays playback statistics and debugging information 
+     as an overlay on the Video Player Screen. -->
+<component name="PlayerStatsOverlay" extends="Group">
+  <script type="text/brightscript" uri="PlayerStatsOverlay.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+
+  <interface>
+    <!-- INPUT -->
+    <field id="playerStats" type="assocArray" />
+  </interface>
+
+  <children>
+    <Rectangle
+      id="background"
+      width="1200"
+      height="1000"
+      color="0x000000DD">
+      
+      <LayoutGroup
+        id="contentGroup"
+        translation="[15, 15]"
+        layoutDirection="vert"
+        itemSpacings="[8]">
+        
+        <Label id="titleLabel" text="Player Information" height="30"><Font role="font"/></Label>
+
+        <Rectangle width="900" height="1" color="0x444444FF"/>
+
+        <Label id="sectionStreamInfo" text="Stream Info" height="30"><Font role="font"/></Label>
+
+        <LayoutGroup layoutDirection="horiz" itemSpacings="[5]">
+          <Label id="measuredBitrateKey" text="Measured Bitrate:" height="20"><Font role="font"/></Label>
+          <Label id="measuredBitrateValue" text="--" height="20"><Font role="font"/></Label>
+        </LayoutGroup>
+
+        <LayoutGroup layoutDirection="horiz" itemSpacings="[5]">
+          <Label id="streamBitrateKey" text="Target Bitrate:" height="20"><Font role="font"/></Label>
+          <Label id="streamBitrateValue" text="--" height="20"><Font role="font"/></Label>
+        </LayoutGroup>
+
+        <LayoutGroup layoutDirection="horiz" itemSpacings="[2]">
+          <Label id="streamUrlKey" text="Stream URL:" height="20"><Font role="font"/></Label>
+          <Label id="streamUrlValue" text="--" width="1000" wrap="true"><Font role="font"/></Label>
+        </LayoutGroup>
+
+        <LayoutGroup layoutDirection="horiz" itemSpacings="[5]">
+          <Label id="resolutionKey" text="Resolution:" height="20"><Font role="font"/></Label>
+          <Label id="resolutionValue" text="--" height="20"><Font role="font"/></Label>
+        </LayoutGroup>
+
+        <LayoutGroup layoutDirection="horiz" itemSpacings="[5]">
+          <Label id="drmTypeKey" text="Drm Type:" height="20"><Font role="font"/></Label>
+          <Label id="drmTypeValue" text="--" height="20"><Font role="font"/></Label>
+        </LayoutGroup>
+
+        <LayoutGroup layoutDirection="horiz" itemSpacings="[5]">
+          <Label id="codecKey" text="Codec:" height="20"><Font role="font"/></Label>
+          <Label id="codecValue" text="--" height="20"><Font role="font"/></Label>
+        </LayoutGroup>
+
+        <LayoutGroup layoutDirection="horiz" itemSpacings="[5]">
+          <Label id="fallbackCountKey" text="Fallback Count:" height="20"><Font role="font"/></Label>
+          <Label id="fallbackCountValue" text="--" height="20"><Font role="font"/></Label>
+        </LayoutGroup>
+
+        <LayoutGroup layoutDirection="horiz" itemSpacings="[5]">
+          <Label id="fallbackUrlKey" text="Fallback URL:" height="20"><Font role="font"/></Label>
+          <Label id="fallbackUrlValue" text="--" width="1000" wrap="true"><Font role="font"/></Label>
+        </LayoutGroup>
+
+        <Rectangle width="900" height="1" color="0x444444FF"/>
+
+        <Label id="sectionStreamingSeg" text="Current Streaming Segment" height="30"><Font role="font"/></Label>
+
+        <LayoutGroup layoutDirection="horiz" itemSpacings="[5]">
+          <Label id="streamSegSequenceKey" text="Segment #:" height="20"><Font role="font"/></Label>
+          <Label id="streamSegSequenceValue" text="--" height="20"><Font role="font"/></Label>
+        </LayoutGroup>
+
+        <LayoutGroup layoutDirection="horiz" itemSpacings="[5]">
+          <Label id="streamSegStartTimeKey" text="Start Time (s):" height="20"><Font role="font"/></Label>
+          <Label id="streamSegStartTimeValue" text="--" height="20"><Font role="font"/></Label>
+        </LayoutGroup>
+
+        <LayoutGroup layoutDirection="horiz" itemSpacings="[5]">
+          <Label id="streamSegTypeKey" text="Type:" height="20"><Font role="font"/></Label>
+          <Label id="streamSegTypeValue" text="--" height="20"><Font role="font"/></Label>
+        </LayoutGroup>
+
+        <LayoutGroup layoutDirection="horiz" itemSpacings="[5]">
+          <Label id="streamSegBitrateKey" text="Bitrate (bps):" height="20"><Font role="font"/></Label>
+          <Label id="streamSegBitrateValue" text="--" height="20"><Font role="font"/></Label>
+        </LayoutGroup>
+
+        <LayoutGroup layoutDirection="horiz" itemSpacings="[5]">
+          <Label id="streamSegResolutionKey" text="Resolution:" height="20"><Font role="font"/></Label>
+          <Label id="streamSegResolutionValue" text="--" height="20"><Font role="font"/></Label>
+        </LayoutGroup>
+
+        <LayoutGroup layoutDirection="horiz" itemSpacings="[5]">
+          <Label id="streamSegHdrModeKey" text="HDR Mode:" height="20"><Font role="font"/></Label>
+          <Label id="streamSegHdrModeValue" text="--" height="20"><Font role="font"/></Label>
+        </LayoutGroup>
+
+        <LayoutGroup layoutDirection="horiz" itemSpacings="[5]">
+          <Label id="streamSegUrlKey" text="Segment URL:" height="20"><Font role="font"/></Label>
+          <Label id="streamSegUrlValue" text="--" width="1000" wrap="true"><Font role="font"/></Label>
+        </LayoutGroup>
+
+        <Rectangle width="900" height="1" color="0x444444FF"/>
+
+        <Label id="sectionDownloadedSeg" text="Last Downloaded Segment" height="30"><Font role="font"/></Label>
+
+        <LayoutGroup layoutDirection="horiz" itemSpacings="[5]">
+          <Label id="dlSegSequenceKey" text="Segment #:" height="20"><Font role="font"/></Label>
+          <Label id="dlSegSequenceValue" text="--" height="20"><Font role="font"/></Label>
+        </LayoutGroup>
+
+        <LayoutGroup layoutDirection="horiz" itemSpacings="[5]">
+          <Label id="dlSegStartTimeKey" text="Start Time (s):" height="20"><Font role="font"/></Label>
+          <Label id="dlSegStartTimeValue" text="--" height="20"><Font role="font"/></Label>
+        </LayoutGroup>
+
+        <LayoutGroup layoutDirection="horiz" itemSpacings="[5]">
+          <Label id="dlSegTypeKey" text="Type:" height="20"><Font role="font"/></Label>
+          <Label id="dlSegTypeValue" text="--" height="20"><Font role="font"/></Label>
+        </LayoutGroup>
+
+        <LayoutGroup layoutDirection="horiz" itemSpacings="[5]">
+          <Label id="dlSegDurationKey" text="Duration (ms):" height="20"><Font role="font"/></Label>
+          <Label id="dlSegDurationValue" text="--" height="20"><Font role="font"/></Label>
+        </LayoutGroup>
+
+        <LayoutGroup layoutDirection="horiz" itemSpacings="[5]">
+          <Label id="dlSegSizeKey" text="Size (bytes):" height="20"><Font role="font"/></Label>
+          <Label id="dlSegSizeValue" text="--" height="20"><Font role="font"/></Label>
+        </LayoutGroup>
+
+        <LayoutGroup layoutDirection="horiz" itemSpacings="[5]">
+          <Label id="dlSegBitrateKey" text="Bitrate (bps):" height="20"><Font role="font"/></Label>
+          <Label id="dlSegBitrateValue" text="--" height="20"><Font role="font"/></Label>
+        </LayoutGroup>
+
+        <LayoutGroup layoutDirection="horiz" itemSpacings="[5]">
+          <Label id="dlSegDownloadTimeKey" text="Download (ms):" height="20"><Font role="font"/></Label>
+          <Label id="dlSegDownloadTimeValue" text="--" height="20"><Font role="font"/></Label>
+        </LayoutGroup>
+
+        <LayoutGroup layoutDirection="horiz" itemSpacings="[5]">
+          <Label id="dlSegBufferLevelKey" text="Buffer Level:" height="20"><Font role="font"/></Label>
+          <Label id="dlSegBufferLevelValue" text="--" height="20"><Font role="font"/></Label>
+        </LayoutGroup>
+
+        <LayoutGroup layoutDirection="horiz" itemSpacings="[5]">
+          <Label id="dlSegBufferSizeKey" text="Buffer Size:" height="20"><Font role="font"/></Label>
+          <Label id="dlSegBufferSizeValue" text="--" height="20"><Font role="font"/></Label>
+        </LayoutGroup>
+
+        <LayoutGroup layoutDirection="horiz" itemSpacings="[5]">
+          <Label id="dlSegUrlKey" text="Segment URL:" height="20"><Font role="font"/></Label>
+          <Label id="dlSegUrlValue" text="--" width="1000" wrap="true"><Font role="font"/></Label>
+        </LayoutGroup>
+
+      </LayoutGroup>
+    </Rectangle>
+  </children>
+</component>
