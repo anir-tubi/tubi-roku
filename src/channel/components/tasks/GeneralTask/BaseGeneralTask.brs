@@ -179,11 +179,11 @@ Function listen()
           end if
 
           if retries > 0 AND reqInfo.retriesAttempted < retries then
-            result = clientErrorConfigCheckIfShouldRetryAfter(m.clientErrorConfig, reqInfo.url, job.tubiReq.method, "-1236", {}, invalid, reqInfo.retriesAttempted)
+            errorConfigCheckResult = clientErrorConfigCheckIfShouldRetryAfter(m.clientErrorConfig, reqInfo.url, job.tubiReq.method, "-1236", {}, invalid, reqInfo.retriesAttempted)
 
-            if result.shouldLogoutAndRestartApp = true then
+            if errorConfigCheckResult.shouldLogoutAndRestartApp = true then
               logoutAndRestartApp()
-            else if result.retryAfter = -1 then
+            else if errorConfigCheckResult.retryAfter = -1 then
               processTimeoutError(job)
             else
               reqInfo.retriesAttempted = reqInfo.retriesAttempted + 1
@@ -370,15 +370,15 @@ Function processResponse(msg)
             processErrorResponse(result, callbackTypes, job)
           else
             ' Next check against client error config to see if we should retry
-            result = clientErrorConfigCheckIfShouldRetryAfter(m.clientErrorConfig, reqInfo.url, result.method, code.toStr(), result.response.headers, result.response.data, reqInfo.retriesAttempted)
+            errorConfigCheckResult = clientErrorConfigCheckIfShouldRetryAfter(m.clientErrorConfig, reqInfo.url, result.method, code.toStr(), result.response.headers, result.response.data, reqInfo.retriesAttempted)
 
-            if result.shouldLogoutAndRestartApp = true then
+            if errorConfigCheckResult.shouldLogoutAndRestartApp = true then
               logoutAndRestartApp()
-            else if result.retryAfter = -1 then
+            else if errorConfigCheckResult.retryAfter = -1 then
               ' If we are told not to then process the error
               processErrorResponse(result, callbackTypes, job)
             else
-              handleBackoff(result, job, result.retryAfter)
+              handleBackoff(result, job, errorConfigCheckResult.retryAfter)
             end if
           end if
         end if
