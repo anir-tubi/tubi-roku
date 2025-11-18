@@ -1118,7 +1118,11 @@ End Function
 
 Function onCarouselFadeOutComplete()
   tubiLog("HomeScreen.onCarouselFadeOutComplete")
-  m.ContentArea.maskUri = m.maskUri
+
+  if m.adRowlistCarouselComponent.isInFocusChain() = false
+    '//because onCarouselFadeOutComplete is sometimes called on a delay, we need to check if the component is still out of focus before resetting the mask
+    m.ContentArea.maskUri = m.maskUri
+  end if
 End Function
 
 
