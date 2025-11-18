@@ -193,7 +193,9 @@
     <field id="featuredListScrollDirection" type="string" value="none" />
     <field id="featuredRowHeights" alias="FeaturedRowList.rowHeights" />
 
-    <field id="featuredRowFocusedItem" type="node" />
+    <!-- set alwaysNotify true to ensure field observers of this field are notified if the user
+    starts scrolling to a new item but quickly scrolls back to the original item  -->
+    <field id="featuredRowFocusedItem" type="node" alwaysNotify="true" />
 
     <field id="currCategoryId" type="string" />
 
