@@ -85,6 +85,31 @@ Function init()
   m.video.observeFieldScoped("downloadedSegment", "onDownloadedSegment")
   m.videoBorder = m.top.findNode("VideoBorder")
 
+  ' Enable decoder stats with a 20% probability.
+  ' Generates a random number between 0 and 1 using Rnd(0).
+  ' If the number is less than or equal to 0.2 (20%), decoder stats are enabled; otherwise, they are disabled.
+  fRandom = Rnd(0)
+
+  if fRandom <= 0.2
+    m.isDecoderStatsEnabled = true
+  else
+    m.isDecoderStatsEnabled = false
+  end if
+
+  if m.isDecoderStatsEnabled = true
+    m.Video.enableDecoderStats = true
+    m.cumulativeDecoderStats = {
+      renderCount: 0,
+      repeatCount: 0,
+      frameDropCount: 0,
+      streamErrorCount: 0
+    }
+
+    ' Store last observed renderCount to handle resets
+    m.lastRenderCount = 0
+    m.Video.observeFieldScoped("decoderStats", "onDecoderStatsChange")
+  end if
+
   m.showPlayerStats = false
   ' Player Stats Overlay initialization for nonproduction mode
   if m.constants.settings.mode <> "production"
@@ -1065,8 +1090,25 @@ Function onControlChange()
     end if
 
     fireBrowseWhileWatchingPlaybackSessionEndEvent()
+
+    ' Only send cumulativeDecoderStats if enabled
+    if m.isDecoderStatsEnabled = true
+      updatePlayerLogLib(m.playerLogLib, "setCumulativeDecoderStats", m.cumulativeDecoderStats)
+    end if
+
     updatePlayerLogLib(m.playerLogLib, "fireQualityOfServiceEvent", m.adImpressionMap)
     m.adImpressionMap = { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0 } 'reset adImpressionMap after sending QualityOfService event
+
+    ' Reset isDecoderStatsEnabled
+    if m.isDecoderStatsEnabled = true
+      m.cumulativeDecoderStats = {
+        renderCount: 0,
+        repeatCount: 0,
+        frameDropCount: 0,
+        streamErrorCount: 0
+      }
+      m.lastRenderCount = 0
+    end if
 
     updatePlayerLogLib(m.playerLogLib, "fireRealtimeQoSEvent")
 
@@ -3124,6 +3166,25 @@ Function onDownloadedSegment(msg)
   if isAA(downloadedSegment) = true
     updatePlayerLogLib(m.playerLogLib, "setDownloadedSegmentData", downloadedSegment)
     updatePlayerStatsOverlay()
+  end if
+End Function
+
+
+Function onDecoderStatsChange(msg)
+  stats = msg.getData()
+
+  if isAA(stats) = true
+    'Added this logic to handle the reset of renderCount after seeking or resuming content.
+    deltaRender = stats.renderCount - m.lastRenderCount
+    if deltaRender < 0 then
+      deltaRender = stats.renderCount
+    end if
+    m.lastRenderCount = stats.renderCount
+
+    m.cumulativeDecoderStats.renderCount = m.cumulativeDecoderStats.renderCount + deltaRender
+    m.cumulativeDecoderStats.repeatCount = stats.repeatCount
+    m.cumulativeDecoderStats.frameDropCount = stats.frameDropCount
+    m.cumulativeDecoderStats.streamErrorCount = stats.streamErrorCount
   end if
 End Function
 

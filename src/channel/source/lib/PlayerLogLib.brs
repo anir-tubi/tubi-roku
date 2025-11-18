@@ -149,6 +149,9 @@ Function PlayerLogLib(constants, tracking)
     totalSeekDurationTimer: invalid 'helps to calculate total seeking duration for QoS event
     adBufferingDurationTimer: CreateObject("roTimespan") 'helps to calculate adBufferingDuration for Realtime->QoS event
 
+    'Player Decoder Stats
+    cumulativeDecoderStats: { renderCount: 0, repeatCount: 0, frameDropCount: 0, streamErrorCount: 0 } 'used in quality of service -> message_map event
+
     '//browse while watching fields
     bwwOpenCount: 0 ' tracks total number of times user opens browse while watching tray.
     bwwDidConvert: false ' tracks if user converted to a new title after opening browse while watching tray.
@@ -191,6 +194,7 @@ Function PlayerLogLib(constants, tracking)
     setPlayerStateWhenExitingPlayer: playerLogLib_setPlayerStateWhenExitingPlayer
     setIsBuffering: playerLogLib_setIsBuffering
     setStartupFailureCount: playerLogLib_setStartupFailureCount
+    setCumulativeDecoderStats: playerLogLib_setCumulativeDecoderStats
 
     'ad
     setIsAd: playerLogLib_setIsAd
@@ -1450,7 +1454,8 @@ Function playerLogLib_fireQualityOfServiceEvent(adImp = {})
 
   qualityOfServiceInfo.message_map = {
     "bww_oc": m.bwwOpenCount.toStr(),
-    "bww_dc": m.bwwDidConvert.toStr()
+    "bww_dc": m.bwwDidConvert.toStr(),
+    "cumulative_decoder_stats": FormatJson(m.cumulativeDecoderStats)
   }
 
   m.sendEvent(qualityOfServiceInfo, "quality_of_services", eventBase)
@@ -1489,6 +1494,7 @@ Function playerLogLib_resetQoSAttributes()
   m.totalAudioSegDuration = 0
   m.totalVideoSegDuration = 0
   m.totalDownloadDuration = 0
+  m.cumulativeDecoderStats = { renderCount: 0, repeatCount: 0, frameDropCount: 0, streamErrorCount: 0 }
 End Function
 
 
@@ -1996,5 +2002,20 @@ End Function
 Function playerLogLib_setAdViewTime(adCtx)
   if isAA(adCtx) = true AND isInteger(adCtx.time) = true
     m.totalAdViewTimePerTitle += adCtx.time
+  end if
+End Function
+
+
+'@cumulativeDecoderStats: assocarray, contains playback stats information
+'  m.cumulativeDecoderStats = {
+'   renderCount: 0,
+'   repeatCount: 0,
+'   frameDropCount: 0,
+'   streamErrorCount: 0
+'}
+'
+Function playerLogLib_setCumulativeDecoderStats(cumulativeDecoderStats)
+  if isAA(cumulativeDecoderStats) = true
+    m.cumulativeDecoderStats = cumulativeDecoderStats
   end if
 End Function
