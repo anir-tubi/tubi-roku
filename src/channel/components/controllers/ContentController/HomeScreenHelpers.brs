@@ -610,55 +610,70 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
   m.performanceMetricsTracker.startAppLaunchMetricTiming("home_screen_populate_content")
   homeScreen = getFromScreenCache(screenID)
   if homeScreen <> invalid
-    ' Content should be structured as:
-    ' <CategoryContentNode json={...all contents info...}>
-    '   <CategoryContentNode id="featured">
-    '     <ContentNode id="37108" />
-    '     <ContentNode id="337825" />
-    '      ...
-    '   </CategoryContentNode>
-    '   <CategoryContentNode id="most_popular" />
-    '     <ContentNode id="346629" />
-    '     <ContentNode id="407698" />
-    '      ...
-    '   </CategoryContentNode>
-    ' </CategoryContentNode>
-
-    homeScreen.personalizationId = rawResponse.personalizationId
-    homeScreen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
-
-    if isKidsUIOn() = false AND screenID = m.constants.ui.screenIds.homeScreen
-      liveEventsContainer = sanitizeHomeScreenResponseAndReturnLiveEventsContainer(rawResponse)
-      if isNode(liveEventsContainer) AND liveEventsContainer.getChildCount() > 0
-        m.billboardContainerIndex = 1
-        updateBillboardContainerIndex()
+    ' Check if response is empty (no children)
+    isResponseEmpty = false
+    if isNode(rawResponse) = true
+      ' Check if node has no children
+      if rawResponse.getChildCount() = 0
+        isResponseEmpty = true
       end if
-      refreshLiveEventsContainerWithEpgListingInfo(rawResponse)
-
-      getStatsigExperimentResource("roku_video_tiles", "roku_video_tiles_1_7", true)
-      if m.isUserInVideoTilesExperiment = true AND isNode(rawResponse) = true AND rawResponse.getChildCount() > 0
-        ' Only show the video tile overlay group if the screen is the home screen and the skin ads are not available.
-        ' This is needed because we refresh home screen behind the scenes during parent controls change.
-        screen = getCurrentScreen()
-        isSkinAdsAvailable = (homeScreen.skinAdContent <> invalid)
-        m.videoTileOverlayGroup.visible = (isSkinAdsAvailable = false AND screen <> invalid AND screen.id = m.constants.ui.screenIds.homeScreen)
-        m.inTransitInlineVideoMetadataOverlay.containerIndex = 1
-        m.inlineVideoMetadataOverlay.containerIndex = 0
-        m.inlineVideoGridTitleLogo.containerIndex = 0
-        updateCategoryGridWithFeaturedList(rawResponse, homeScreen)
-        rawResponse = invalid
-      end if
-    else
-      m.videoTileOverlayGroup.visible = false
     end if
 
-    homeScreen.content = rawResponse
-    homeScreen.contentFetchCompleted = true
+    ' If response is empty, show error modal
+    if isResponseEmpty = true
+      ' Only show error modal if screen is in focus
+      handleHomeScreenErrorResponse(screenID, rawResponse)
+    else
+      ' Content should be structured as:
+      ' <CategoryContentNode json={...all contents info...}>
+      '   <CategoryContentNode id="featured">
+      '     <ContentNode id="37108" />
+      '     <ContentNode id="337825" />
+      '      ...
+      '   </CategoryContentNode>
+      '   <CategoryContentNode id="most_popular" />
+      '     <ContentNode id="346629" />
+      '     <ContentNode id="407698" />
+      '      ...
+      '   </CategoryContentNode>
+      ' </CategoryContentNode>
+      homeScreen.content = rawResponse
+      homeScreen.contentFetchCompleted = true
 
-    checkIfHomeScreenContentIsReady(homeScreen)
+      homeScreen.personalizationId = rawResponse.personalizationId
+      homeScreen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
 
-    getExperimentResource("roku_no_change_experiment", "roku_no_change_experiment_v3", true)
+      if isKidsUIOn() = false AND screenID = m.constants.ui.screenIds.homeScreen
+        liveEventsContainer = sanitizeHomeScreenResponseAndReturnLiveEventsContainer(rawResponse)
+        if isNode(liveEventsContainer) AND liveEventsContainer.getChildCount() > 0
+          m.billboardContainerIndex = 1
+          updateBillboardContainerIndex()
+        end if
+        refreshLiveEventsContainerWithEpgListingInfo(rawResponse)
 
+        getStatsigExperimentResource("roku_video_tiles", "roku_video_tiles_1_7", true)
+        if m.isUserInVideoTilesExperiment = true AND isNode(rawResponse) = true AND rawResponse.getChildCount() > 0
+          ' Only show the video tile overlay group if the screen is the home screen and the skin ads are not available.
+          ' This is needed because we refresh home screen behind the scenes during parent controls change.
+          screen = getCurrentScreen()
+          isSkinAdsAvailable = (homeScreen.skinAdContent <> invalid)
+          m.videoTileOverlayGroup.visible = (isSkinAdsAvailable = false AND screen <> invalid AND screen.id = m.constants.ui.screenIds.homeScreen)
+          m.inTransitInlineVideoMetadataOverlay.containerIndex = 1
+          m.inlineVideoMetadataOverlay.containerIndex = 0
+          m.inlineVideoGridTitleLogo.containerIndex = 0
+          updateCategoryGridWithFeaturedList(rawResponse, homeScreen)
+          rawResponse = invalid
+        end if
+      else
+        m.videoTileOverlayGroup.visible = false
+      end if
+
+      homeScreen.content = rawResponse
+
+      checkIfHomeScreenContentIsReady(homeScreen)
+
+      getExperimentResource("roku_no_change_experiment", "roku_no_change_experiment_v3", true)
+    end if
   end if
 End Function
 
