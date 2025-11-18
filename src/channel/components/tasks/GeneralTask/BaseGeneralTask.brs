@@ -179,8 +179,11 @@ Function listen()
           end if
 
           if retries > 0 AND reqInfo.retriesAttempted < retries then
-            retryAfter = clientErrorConfigCheckIfShouldRetryAfter(m.clientErrorConfig, reqInfo.url, job.tubiReq.method, "-1236", {}, invalid, reqInfo.retriesAttempted)
-            if retryAfter = -1 then
+            result = clientErrorConfigCheckIfShouldRetryAfter(m.clientErrorConfig, reqInfo.url, job.tubiReq.method, "-1236", {}, invalid, reqInfo.retriesAttempted)
+
+            if result.shouldLogoutAndRestartApp = true then
+              logoutAndRestartApp()
+            else if result.retryAfter = -1 then
               processTimeoutError(job)
             else
               reqInfo.retriesAttempted = reqInfo.retriesAttempted + 1
@@ -367,13 +370,15 @@ Function processResponse(msg)
             processErrorResponse(result, callbackTypes, job)
           else
             ' Next check against client error config to see if we should retry
-            retryAfter = clientErrorConfigCheckIfShouldRetryAfter(m.clientErrorConfig, reqInfo.url, result.method, code.toStr(), result.response.headers, result.response.data, reqInfo.retriesAttempted)
+            result = clientErrorConfigCheckIfShouldRetryAfter(m.clientErrorConfig, reqInfo.url, result.method, code.toStr(), result.response.headers, result.response.data, reqInfo.retriesAttempted)
 
-            ' If we are told not to then process the error
-            if retryAfter = -1 then
+            if result.shouldLogoutAndRestartApp = true then
+              logoutAndRestartApp()
+            else if result.retryAfter = -1 then
+              ' If we are told not to then process the error
               processErrorResponse(result, callbackTypes, job)
             else
-              handleBackoff(result, job, retryAfter)
+              handleBackoff(result, job, result.retryAfter)
             end if
           end if
         end if

@@ -61,11 +61,19 @@ End Function
 ' @param responseHeaders, AssocArray: The headers of the request that failed
 ' @param responseBody, string: The body of the failed request
 ' @param retriesAttempted, integer: The number of times this request has been retried so far
-' @return integer: -1 if the request should not be retried, 0 if the request should be retried immediately, or a positive integer representing the number of seconds to wait before retrying.
+' @return {
+'  retryAfter: integer: -1 if the request should not be retried, 0 if the request should be retried immediately, or a positive integer representing the number of seconds to wait before retrying.
+'  shouldLogoutAndRestartApp: boolean: true if the app should logout and restart, false otherwise.
+' }
 Function clientErrorConfigCheckIfShouldRetryAfter(clientErrorConfig, url, method, statusCode, responseHeaders, responseBody, retriesAttempted)
+  result = {
+    retryAfter: -1,
+    shouldLogoutAndRestartApp: false
+  }
+
   ' If the client error config is invalid, we can't do anything so default to never retrying
   if isAA(clientErrorConfig) = false then
-    return -1
+    return result
   end if
 
   method = UCase(method)
@@ -130,20 +138,15 @@ Function clientErrorConfigCheckIfShouldRetryAfter(clientErrorConfig, url, method
           print "getUpdatedAuth is not in scope"
         end if
       else if matchedConfig.retry_strategy = "sign_off" then
-        ' ContentController uses convertClientErrorConfig but does not use this method so need to ignore logoutAndRestartApp not existing
-        ' bs:disable-next-line 1001 LINT1001
-        if isFunction(logoutAndRestartApp) = true then
-          logoutAndRestartApp() 'bs:disable-line 1140 LINT1001
-        else
-          print "logoutAndRestartApp is not in scope"
-        end if
+        result.shouldLogoutAndRestartApp = true
+        return result
       end if
 
       retryStrategy = clientErrorConfig.retry_strategies[matchedConfig.retry_strategy]
       if isAA(retryStrategy) = true AND retryStrategy.max_retries <> invalid then
         if retriesAttempted >= retryStrategy.max_retries then
           ' If we have already retried the max number of times then we don't retry
-          return -1
+          return result
         else
           ' Built based off the logic here https://www.notion.so/tubi/Client-Error-Handling-Spec-V2-11472557e920809da609ed59476d52f3
           delay = 0
@@ -177,14 +180,15 @@ Function clientErrorConfigCheckIfShouldRetryAfter(clientErrorConfig, url, method
             end if
           end if
 
-          return delay
+          result.retryAfter = delay
+          return result
         end if
       end if
     end if
   end if
 
   ' If we got here we default to not retrying. This should never get hit since default.error.default should always match as long as it is there unless we get an invalid response from backend
-  return -1
+  return result
 End Function
 
 

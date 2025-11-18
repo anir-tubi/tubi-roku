@@ -75,5 +75,5 @@ Function clientErrorConfigCheckIfShouldRetryAfter_test(url, method, statusCode, 
 
   actualResult = clientErrorConfigCheckIfShouldRetryAfter(clientErrorConfig, url, method, statusCode, responseHeaders, responseBody, retriesAttempted)
 
-  m.assertEqual(actualResult, expectedResult)
+  m.assertEqual(actualResult.retryAfter, expectedResult)
 End Function
