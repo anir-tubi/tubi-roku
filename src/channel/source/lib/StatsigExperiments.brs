@@ -66,6 +66,9 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         ads_hdc_gm_carousel_a: {
           default: { "enabled_arm": "carousel" }
         }
+        ads_hdc_gm_carousel_b: {
+          default: { "enabled_arm": "carousel" }
+        }
         ads_hdc_mcdonalds_spotlight: {
           default: { "enabled_arm": "spotlight" }
         }

@@ -365,25 +365,26 @@ Function fetchHomeScreen(homeScreen, useCache = false)
         '//Call ad endpoint to get ad content for the homescreen
 
         aAdTypes = []
-        experimentAd = getStatsigExperimentResource("ads_webott_hdc_homepage_layer", "ads_hdc_gm_carousel_a", true)
-        if experimentAd <> invalid
-          experimentAdType = experimentAd.enabled_arm
-          if experimentAdType = "carousel"
-            aAdTypes.push(m.constants.adTypes.adRowlistCarousel)
+        adTypeSet = {} ' Simple associative array used as a Set (BrightScript has no real Set)
+        adExperiments = [
+          { name: "ads_hdc_gm_carousel_a", arm: "carousel", adType: m.constants.adTypes.adRowlistCarousel },
+          { name: "ads_hdc_gm_carousel_b", arm: "carousel", adType: m.constants.adTypes.adRowlistCarousel },
+          { name: "ads_hdc_mcdonalds_spotlight", arm: "spotlight", adType: m.constants.adTypes.adRowlistSpotlight }
+        ]
+        adLayer = "ads_webott_hdc_homepage_layer"
+        for each adExperiment in adExperiments
+          experimentAd = getStatsigExperimentResource(adLayer, adExperiment.name, true)
+          if experimentAd <> invalid AND experimentAd.enabled_arm = adExperiment.arm
+            adTypeKey = adExperiment.adType
+            if adTypeSet[adTypeKey] = invalid
+              aAdTypes.push(adTypeKey)
+              adTypeSet[adTypeKey] = true
+            end if
           end if
-        end if
-
-        experimentAd = getStatsigExperimentResource("ads_webott_hdc_homepage_layer", "ads_hdc_mcdonalds_spotlight", true)
-        if experimentAd <> invalid
-          experimentAdType = experimentAd.enabled_arm
-          if experimentAdType = "spotlight"
-            aAdTypes.push(m.constants.adTypes.adRowlistSpotlight)
-          end if
-        end if
+        end for
 
         '//If this is no longer in the experiment and the ads_webott_hdc_homepage_layer experiment has been graduated, then request both ad types and let the backend decide which ad type(s) to return
         ' aAdTypes = [m.constants.adTypes.adRowlistCarousel, m.constants.adTypes.adRowlistSpotlight]
-
         aAdTypes.push(m.constants.adTypes.skinAd) '//Also request the skin ad unit
 
         createHomescreenAdRequest(homeScreen.id, onHomesceenAdDisplaySuccessResponse, aAdTypes, onHomesceenAdDisplayErrorResponse)
