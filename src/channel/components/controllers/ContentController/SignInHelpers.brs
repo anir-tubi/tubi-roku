@@ -291,13 +291,7 @@ Function onEmailExistsResponse(response)
         end if
         m.email = email
 
-        if getExternalConfigValueFromGlobal("auth_magic_link_enabled", true) = true AND getStatsigExperimentResource("roku_disable_magic_link", "roku_disable_magic_link_v1", true).disable <> true then
-          showEmailVerificationScreen(email)
-          createMagicLinkRequest(email)
-        else
-          showSignInScreen(rawInput)
-        end if
-
+        showSignInScreen(rawInput)
       else
         if parsedResponse.code = "AVAILABLE"
           '//user's email address does not exist in Tubi servers, so sign user up with a new Tubi account

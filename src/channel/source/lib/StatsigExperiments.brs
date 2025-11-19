@@ -90,12 +90,6 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
-      roku_disable_magic_link: {
-        roku_disable_magic_link_v1: {
-          default: { "disable": false }
-        }
-      }
-
       roku_start_up_performance_test: {
         ' We are adding an additional delay in the treatment group to measure its impact on user metrics
         roku_start_up_performance_test_v1: {
