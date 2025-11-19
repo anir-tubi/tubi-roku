@@ -287,7 +287,6 @@ Function onLoadingChange()
     m.top.adContent = invalid
     m.CategoryGridList.featuredRowContent = invalid
     m.CategoryGridList.skinAdContentUpdated = true
-    m.top.adContentFetchCompleted = false
     m.top.featuredRowContent = invalid
     m.top.content = invalid
     m.CategoryGridList.resetFeaturedRowList = true

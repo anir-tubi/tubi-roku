@@ -434,6 +434,7 @@ Function fetchHomeScreen(homeScreen, useCache = false)
 
     if bSkipCallingAdContent = true
       '//::NOTE::ads_ott_hdc_adformats_v1 this is only needed for the experiment. Skip loading of the ad content if it was found in this function that we should skip waiting for ad content
+      homeScreen.adContent = []
       homeScreen.adContentFetchCompleted = true
     end if
 
@@ -513,8 +514,6 @@ End Function
 ' onHomeScreenSuccessResponse
 '
 Function onHomeScreenSuccessResponse(response)
-  '//::TODO::JHAND - remove component before setting content
-  ' deleteAdDisplayCarouselComponent() '//Remove any existing carousel component before checking for a new one
   respondToHomeScreenSuccessResponse(m.constants.ui.screenIds.homeScreen, response)
 End Function
 
