@@ -46,8 +46,8 @@ Function init()
   m.tubiTrackingInfo = TubiTrackingInfo(m.constants)
   m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
 
-  m.moviePostplayCountdown = getStatsigExperimentResource("roku_postplay_countdown_timer", "roku_postplay_countdown_timer_movie_v1", false).countdown
-  m.seriesPostplayCountdown = getStatsigExperimentResource("roku_postplay_countdown_timer", "roku_postplay_countdown_timer_series_v1", false).countdown
+  m.moviePostplayCountdown = getStatsigExperimentResource("roku_postplay_countdown_timer", "roku_postplay_countdown_timer_movie_v0", false).countdown
+  m.seriesPostplayCountdown = getStatsigExperimentResource("roku_postplay_countdown_timer", "roku_postplay_countdown_timer_series_v0", false).countdown
 
   m.top.handlesTransportVoiceRequests = true
   m._ = rodash()
@@ -200,7 +200,7 @@ Function init()
   m.logoKids = m.top.findNode("tubiKidsLogo")
   m.brandingLogo = m.top.findNode("brandingLogo")
 
-  m.isBrandingLogoExperimentEnabled = getStatsigExperimentResource("roku_player_improvement", "roku_player_branding_v2", false).enabled
+  m.isBrandingLogoExperimentEnabled = getStatsigExperimentResource("roku_player_improvement", "roku_player_branding_v0", false).enabled
 
   '//Variable to keep track where the m.ratingOverlay UI element should animated when the down button is pressed.
   m.ratingOverlayAnimatedPositionY = 150
@@ -936,8 +936,8 @@ Function playContent()
       if fetchPreroll = true
         updatePlayerLogLib(m.playerLogLib, "setAdType", "preroll")
 
-        'Fire roku_player_ad_preroll_timeout_v2 exposure event when fetching preroll ads
-        getStatsigExperimentResource("roku_player_improvement", "roku_player_ad_preroll_timeout_v2")
+        'Fire roku_player_ad_preroll_timeout_v0 exposure event when fetching preroll ads
+        getStatsigExperimentResource("roku_player_improvement", "roku_player_ad_preroll_timeout_v0")
 
         ' Start pre-roll fetch
         m.top.adControl = "preroll"
@@ -3247,8 +3247,8 @@ End Function
 ' @shouldShowBrandingLogo: boolean, true to show the logo with animation, false to hide the logo with animation
 ' @delay: integer, delay to start the animation
 Function updateBrandingLogoVisibility(shouldShowBrandingLogo = false, delay = 0)
-  'roku_player_branding_v2 exposure event should be fired when content loads
-  if shouldShowBrandingLogo = true AND getStatsigExperimentResource("roku_player_improvement", "roku_player_branding_v2", true).enabled = true
+  'roku_player_branding_v0 exposure event should be fired when content loads
+  if shouldShowBrandingLogo = true AND getStatsigExperimentResource("roku_player_improvement", "roku_player_branding_v0", true).enabled = true
     ' Update branding logo URI and width based on app mode, then show with animation
     if m.top.appMode = "KIDS_MODE"
       m.brandingLogo.uri = "pkg:/images/logo-kids-large.webp"

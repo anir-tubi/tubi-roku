@@ -26,7 +26,7 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
 
       roku_player_improvement: {
         'Showing branding logo on top right corner of player
-        roku_player_branding_v2: {
+        roku_player_branding_v0: {
           default: { "enabled": false }
         }
         ' ymal container in BWW section inside player if experiment is enabled
@@ -38,19 +38,19 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
           default: { "enabled": false }
         }
         ' Testing preroll ad timeout values: 12s, 8s and 5s variants
-        roku_player_ad_preroll_timeout_v2: {
+        roku_player_ad_preroll_timeout_v0: {
           default: { "timeout": 10000 }
         }
       }
 
       roku_postplay_countdown_timer: {
         ' Possible values for movie timer: 10s, 20s, 40s, 60s (default: 30s)
-        roku_postplay_countdown_timer_movie_v1: {
+        roku_postplay_countdown_timer_movie_v0: {
           default: { countdown: 30 }
         }
 
         ' Possible values for series timer: 3s, 5s, 10s (default: 15s)
-        roku_postplay_countdown_timer_series_v1: {
+        roku_postplay_countdown_timer_series_v0: {
           default: { countdown: 15 }
         }
       }
