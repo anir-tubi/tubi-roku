@@ -1,16 +1,16 @@
 manifest:
   major_version: 3
-  minor_version: 7
+  minor_version: 8
   build_version: 0
   revision_version: 0
 component_library_manifest:
   major_version: 3
-  minor_version: 7
+  minor_version: 8
   build_version: 0
   revision_version: 0
 starter_library_manifest:
   major_version: 3
-  minor_version: 7
+  minor_version: 8
   build_version: 0
   revision_version: 0
 one_trust_library_manifest:
