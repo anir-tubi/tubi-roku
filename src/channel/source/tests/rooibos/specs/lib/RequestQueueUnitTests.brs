@@ -8,7 +8,7 @@ End Function
 
 
 '@BeforeEach
-Function tubiRequestQueue_BeforeEach() as void
+Function tubiRequestQueue_BeforeEach() as Void
   m.request = TubiRequest().createAsync(m.sLocalHostURL)
   m.port = CreateObject("roMessagePort")
 End Function

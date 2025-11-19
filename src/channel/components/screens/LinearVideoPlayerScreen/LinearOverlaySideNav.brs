@@ -34,7 +34,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.btnBack_label.color = theme.primaryTextColor
     m.btnCC_label.color = theme.primaryTextColor
@@ -95,7 +95,7 @@ Function focusSideNavButton(sButtonID)
       poster.blendColor = theme.focusedColor
       label.color = theme.highlightedTextColor
     end if
-    
+
     poster.opacity = 1
     label.opacity = 1
   end if

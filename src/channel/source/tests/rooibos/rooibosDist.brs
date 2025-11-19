@@ -4,10 +4,10 @@
 ' * @link https://github.com/georgejecook/rooibos#readme
 ' * @license MIT
 ' */
- function RBS_BTS_BaseTestSuite_AddTest(name, func, funcName, setup = invalid, teardown = invalid)
+Function RBS_BTS_BaseTestSuite_AddTest(name, func, funcName, setup = invalid, teardown = invalid)
   m.testCases.Push(m.createTest(name, func, setup, teardown))
-end function
- function RBS_BTS_BaseTestSuite_CreateTest(name, func, funcName, setup = invalid, teardown = invalid) as object
+End Function
+Function RBS_BTS_BaseTestSuite_CreateTest(name, func, funcName, setup = invalid, teardown = invalid) as Object
   if (func = invalid)
     ? " ASKED TO CREATE TEST WITH INVALID FUNCITON POINTER FOR FUNCTION " ; funcName
   end if
@@ -18,13 +18,13 @@ end function
     SetUp: setup
     TearDown: teardown
   }
-end function
- function RBS_BTS_BaseTestSuite_Fail(msg = "Error") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_Fail(msg = "Error") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   m.currentResult.AddResult(msg)
   return m.GetLegacyCompatibleReturnValue(false)
-end function
- function RBS_BTS_BaseTestSuite_GetLegacyCompatibleReturnValue(value) as object
+End Function
+Function RBS_BTS_BaseTestSuite_GetLegacyCompatibleReturnValue(value) as Object
   if (value = true)
     if (m.isLegacy = true)
       return ""
@@ -38,30 +38,30 @@ end function
       return false
     end if
   end if
-end function
- function RBS_BTS_BaseTestSuite_AssertFalse(expr, msg = "Expression evaluates to true") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertFalse(expr, msg = "Expression evaluates to true") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
-  if not  rbs_cmn_IsBoolean(expr) or expr
+  if not rbs_cmn_IsBoolean(expr) OR expr
     return m.fail(msg)
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertTrue(expr, msg = "Expression evaluates to false")
+End Function
+Function RBS_BTS_BaseTestSuite_AssertTrue(expr, msg = "Expression evaluates to false")
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
-  if not  rbs_cmn_IsBoolean(expr) or not expr
+  if not rbs_cmn_IsBoolean(expr) OR not expr
     m.currentResult.AddResult(msg)
     return m.GetLegacyCompatibleReturnValue(false)
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertEqual(first, second, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertEqual(first, second, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if not m.eqValues(first, second)
     if msg = ""
-      first_as_string =  rbs_cmn_AsString(first)
-      second_as_string =  rbs_cmn_AsString(second)
+      first_as_string = rbs_cmn_AsString(first)
+      second_as_string = rbs_cmn_AsString(second)
       msg = first_as_string + " != " + second_as_string
     end if
     m.currentResult.AddResult(msg)
@@ -69,13 +69,13 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertLike(first, second, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertLike(first, second, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if first <> second
     if msg = ""
-      first_as_string =  rbs_cmn_AsString(first)
-      second_as_string =  rbs_cmn_AsString(second)
+      first_as_string = rbs_cmn_AsString(first)
+      second_as_string = rbs_cmn_AsString(second)
       msg = first_as_string + " != " + second_as_string
     end if
     m.currentResult.AddResult(msg)
@@ -83,13 +83,13 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertNotEqual(first, second, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertNotEqual(first, second, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if m.eqValues(first, second)
     if msg = ""
-      first_as_string =  rbs_cmn_AsString(first)
-      second_as_string =  rbs_cmn_AsString(second)
+      first_as_string = rbs_cmn_AsString(first)
+      second_as_string = rbs_cmn_AsString(second)
       msg = first_as_string + " == " + second_as_string
     end if
     m.currentResult.AddResult(msg)
@@ -97,12 +97,12 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertInvalid(value, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertInvalid(value, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if value <> invalid
     if msg = ""
-      expr_as_string =  rbs_cmn_AsString(value)
+      expr_as_string = rbs_cmn_AsString(value)
       msg = expr_as_string + " <> Invalid"
     end if
     m.currentResult.AddResult(msg)
@@ -110,12 +110,12 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertNotInvalid(value, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertNotInvalid(value, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if value = invalid
     if msg = ""
-      expr_as_string =  rbs_cmn_AsString(value)
+      expr_as_string = rbs_cmn_AsString(value)
       msg = expr_as_string + " = Invalid"
     end if
     m.currentResult.AddResult(msg)
@@ -123,10 +123,10 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertAAHasKey(array, key, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertAAHasKey(array, key, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
-  if  rbs_cmn_IsAssociativeArray(array)
+  if rbs_cmn_IsAssociativeArray(array)
     if not array.DoesExist(key)
       if msg = ""
         msg = "Array doesn't have the '" + key + "' key."
@@ -141,10 +141,10 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertAANotHasKey(array, key, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertAANotHasKey(array, key, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
-  if  rbs_cmn_IsAssociativeArray(array)
+  if rbs_cmn_IsAssociativeArray(array)
     if array.DoesExist(key)
       if msg = ""
         msg = "Array has the '" + key + "' key."
@@ -159,10 +159,10 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertAAHasKeys(array, keys, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertAAHasKeys(array, keys, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
-  if  rbs_cmn_IsAssociativeArray(array) and  rbs_cmn_IsArray(keys)
+  if rbs_cmn_IsAssociativeArray(array) AND rbs_cmn_IsArray(keys)
     for each key in keys
       if not array.DoesExist(key)
         if msg = ""
@@ -179,10 +179,10 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertAANotHasKeys(array, keys, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertAANotHasKeys(array, keys, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
-  if  rbs_cmn_IsAssociativeArray(array) and  rbs_cmn_IsArray(keys)
+  if rbs_cmn_IsAssociativeArray(array) AND rbs_cmn_IsArray(keys)
     for each key in keys
       if array.DoesExist(key)
         if msg = ""
@@ -199,12 +199,12 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertArrayContains(array, value, key = invalid, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertArrayContains(array, value, key = invalid, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
-  if  rbs_cmn_IsAssociativeArray(array) or  rbs_cmn_IsArray(array)
-    if not  rbs_cmn_ArrayContains(array, value, key)
-      msg = "Array doesn't have the '" +  rbs_cmn_AsString(value) + "' value."
+  if rbs_cmn_IsAssociativeArray(array) OR rbs_cmn_IsArray(array)
+    if not rbs_cmn_ArrayContains(array, value, key)
+      msg = "Array doesn't have the '" + rbs_cmn_AsString(value) + "' value."
       m.currentResult.AddResult(msg)
       return m.GetLegacyCompatibleReturnValue(false)
     end if
@@ -215,19 +215,19 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertArrayContainsAAs(array, values, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertArrayContainsAAs(array, values, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
-  if not  rbs_cmn_IsArray(values)
+  if not rbs_cmn_IsArray(values)
     msg = "values to search for are not an Array."
     m.currentResult.AddResult(msg)
     return m.GetLegacyCompatibleReturnValue(false)
   end if
-  if  rbs_cmn_IsArray(array)
+  if rbs_cmn_IsArray(array)
     for each value in values
       isMatched = false
-      if not  rbs_cmn_IsAssociativeArray(value)
-        msg = "Value to search for was not associativeArray " +  rbs_cmn_AsString(value)
+      if not rbs_cmn_IsAssociativeArray(value)
+        msg = "Value to search for was not associativeArray " + rbs_cmn_AsString(value)
         m.currentResult.AddResult(msg)
         return m.GetLegacyCompatibleReturnValue(false)
       end if
@@ -249,7 +249,7 @@ end function
         end if
       end for ' items in array
       if not isMatched
-        msg = "array missing value: " +  rbs_cmn_AsString(value)
+        msg = "array missing value: " + rbs_cmn_AsString(value)
         m.currentResult.AddResult(msg)
         return m.GetLegacyCompatibleReturnValue(false)
       end if
@@ -261,12 +261,12 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertArrayNotContains(array, value, key = invalid, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertArrayNotContains(array, value, key = invalid, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
-  if  rbs_cmn_IsAssociativeArray(array) or  rbs_cmn_IsArray(array)
-    if  rbs_cmn_ArrayContains(array, value, key)
-      msg = "Array has the '" +  rbs_cmn_AsString(value) + "' value."
+  if rbs_cmn_IsAssociativeArray(array) OR rbs_cmn_IsArray(array)
+    if rbs_cmn_ArrayContains(array, value, key)
+      msg = "Array has the '" + rbs_cmn_AsString(value) + "' value."
       m.currentResult.AddResult(msg)
       return m.GetLegacyCompatibleReturnValue(false)
     end if
@@ -277,11 +277,11 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertArrayContainsSubset(array, subset, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertArrayContainsSubset(array, subset, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
-  if (rbs_cmn_IsAssociativeArray(array) and  rbs_cmn_IsAssociativeArray(subset)) or (rbs_cmn_IsArray(array) and  rbs_cmn_IsArray(subset))
-    isAA =  rbs_cmn_IsAssociativeArray(subset)
+  if (rbs_cmn_IsAssociativeArray(array) AND rbs_cmn_IsAssociativeArray(subset)) OR (rbs_cmn_IsArray(array) AND rbs_cmn_IsArray(subset))
+    isAA = rbs_cmn_IsAssociativeArray(subset)
     for each item in subset
       key = invalid
       value = item
@@ -289,8 +289,8 @@ end function
         key = item
         value = subset[key]
       end if
-      if not  rbs_cmn_ArrayContains(array, value, key)
-        msg = "Array doesn't have the '" +  rbs_cmn_AsString(value) + "' value."
+      if not rbs_cmn_ArrayContains(array, value, key)
+        msg = "Array doesn't have the '" + rbs_cmn_AsString(value) + "' value."
         m.currentResult.AddResult(msg)
         return m.GetLegacyCompatibleReturnValue(false)
       end if
@@ -302,11 +302,11 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertArrayNotContainsSubset(array, subset, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertArrayNotContainsSubset(array, subset, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
-  if (rbs_cmn_IsAssociativeArray(array) and  rbs_cmn_IsAssociativeArray(subset)) or (rbs_cmn_IsArray(array) and  rbs_cmn_IsArray(subset))
-    isAA =  rbs_cmn_IsAssociativeArray(subset)
+  if (rbs_cmn_IsAssociativeArray(array) AND rbs_cmn_IsAssociativeArray(subset)) OR (rbs_cmn_IsArray(array) AND rbs_cmn_IsArray(subset))
+    isAA = rbs_cmn_IsAssociativeArray(subset)
     for each item in subset
       key = invalid
       value = item
@@ -314,8 +314,8 @@ end function
         key = item
         value = item[key]
       end if
-      if  rbs_cmn_ArrayContains(array, value, key)
-        msg = "Array has the '" +  rbs_cmn_AsString(value) + "' value."
+      if rbs_cmn_ArrayContains(array, value, key)
+        msg = "Array has the '" + rbs_cmn_AsString(value) + "' value."
         m.currentResult.AddResult(msg)
         return m.GetLegacyCompatibleReturnValue(false)
       end if
@@ -327,12 +327,12 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertArrayCount(array, count, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertArrayCount(array, count, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
-  if  rbs_cmn_IsAssociativeArray(array) or  rbs_cmn_IsArray(array)
+  if rbs_cmn_IsAssociativeArray(array) OR rbs_cmn_IsArray(array)
     if array.Count() <> count
-      msg = "Array items count " +  rbs_cmn_AsString(array.Count()) + " <> " +  rbs_cmn_AsString(count) + "."
+      msg = "Array items count " + rbs_cmn_AsString(array.Count()) + " <> " + rbs_cmn_AsString(count) + "."
       m.currentResult.AddResult(msg)
       return m.GetLegacyCompatibleReturnValue(false)
     end if
@@ -343,12 +343,12 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertArrayNotCount(array, count, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertArrayNotCount(array, count, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
-  if  rbs_cmn_IsAssociativeArray(array) or  rbs_cmn_IsArray(array)
+  if rbs_cmn_IsAssociativeArray(array) OR rbs_cmn_IsArray(array)
     if array.Count() = count
-      msg = "Array items count = " +  rbs_cmn_AsString(count) + "."
+      msg = "Array items count = " + rbs_cmn_AsString(count) + "."
       m.currentResult.AddResult(msg)
       return m.GetLegacyCompatibleReturnValue(false)
     end if
@@ -359,10 +359,10 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertEmpty(item, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertEmpty(item, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
-  if  rbs_cmn_IsAssociativeArray(item) or  rbs_cmn_IsArray(item)
+  if rbs_cmn_IsAssociativeArray(item) OR rbs_cmn_IsArray(item)
     if item.Count() > 0
       msg = "Array is not empty."
       m.currentResult.AddResult(msg)
@@ -381,16 +381,16 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertNotEmpty(item, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertNotEmpty(item, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
-  if  rbs_cmn_IsAssociativeArray(item) or  rbs_cmn_IsArray(item)
+  if rbs_cmn_IsAssociativeArray(item) OR rbs_cmn_IsArray(item)
     if item.Count() = 0
       msg = "Array is empty."
       m.currentResult.AddResult(msg)
       return m.GetLegacyCompatibleReturnValue(false)
     end if
-  else if  rbs_cmn_IsString(item)
+  else if rbs_cmn_IsString(item)
     if (item = "")
       msg = "Input value is empty."
       m.currentResult.AddResult(msg)
@@ -403,21 +403,21 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertArrayContainsOnlyValuesOfType(array, typeStr, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertArrayContainsOnlyValuesOfType(array, typeStr, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
-  if typeStr <> "String" and typeStr <> "Integer" and typeStr <> "Boolean" and typeStr <> "Array" and typeStr <> "AssociativeArray"
+  if typeStr <> "String" AND typeStr <> "Integer" AND typeStr <> "Boolean" AND typeStr <> "Array" AND typeStr <> "AssociativeArray"
     msg = "Type must be Boolean, String, Array, Integer, or AssociativeArray"
     m.currentResult.AddResult(msg)
     return m.GetLegacyCompatibleReturnValue(false)
   end if
-  if  rbs_cmn_IsAssociativeArray(array) or  rbs_cmn_IsArray(array)
+  if rbs_cmn_IsAssociativeArray(array) OR rbs_cmn_IsArray(array)
     methodName = "RBS_CMN_Is" + typeStr
     typeCheckFunction = m.GetIsTypeFunction(methodName)
     if (typeCheckFunction <> invalid)
       for each item in array
         if not typeCheckFunction(item)
-          msg =  rbs_cmn_AsString(item) + "is not a '" + typeStr + "' type."
+          msg = rbs_cmn_AsString(item) + "is not a '" + typeStr + "' type."
           m.currentResult.AddResult(msg)
           return m.GetLegacyCompatibleReturnValue(false)
         end if
@@ -434,47 +434,47 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_GetIsTypeFunction(name)
+End Function
+Function RBS_BTS_BaseTestSuite_GetIsTypeFunction(name)
   if name = "RBS_CMN_IsFunction"
-    return  rbs_cmn_IsFunction
+    return rbs_cmn_IsFunction
   else if name = "RBS_CMN_IsXmlElement"
-    return  rbs_cmn_IsXmlElement
+    return rbs_cmn_IsXmlElement
   else if name = "RBS_CMN_IsInteger"
-    return  rbs_cmn_IsInteger
+    return rbs_cmn_IsInteger
   else if name = "RBS_CMN_IsBoolean"
-    return  rbs_cmn_IsBoolean
+    return rbs_cmn_IsBoolean
   else if name = "RBS_CMN_IsFloat"
-    return  rbs_cmn_IsFloat
+    return rbs_cmn_IsFloat
   else if name = "RBS_CMN_IsDouble"
-    return  rbs_cmn_IsDouble
+    return rbs_cmn_IsDouble
   else if name = "RBS_CMN_IsLongInteger"
-    return  rbs_cmn_IsLongInteger
+    return rbs_cmn_IsLongInteger
   else if name = "RBS_CMN_IsNumber"
-    return  rbs_cmn_IsNumber
+    return rbs_cmn_IsNumber
   else if name = "RBS_CMN_IsList"
-    return  rbs_cmn_IsList
+    return rbs_cmn_IsList
   else if name = "RBS_CMN_IsArray"
-    return  rbs_cmn_IsArray
+    return rbs_cmn_IsArray
   else if name = "RBS_CMN_IsAssociativeArray"
-    return  rbs_cmn_IsAssociativeArray
+    return rbs_cmn_IsAssociativeArray
   else if name = "RBS_CMN_IsSGNode"
-    return  rbs_cmn_IsSGNode
+    return rbs_cmn_IsSGNode
   else if name = "RBS_CMN_IsString"
-    return  rbs_cmn_IsString
+    return rbs_cmn_IsString
   else if name = "RBS_CMN_IsDateTime"
-    return  rbs_cmn_IsDateTime
+    return rbs_cmn_IsDateTime
   else if name = "RBS_CMN_IsUndefined"
-    return  rbs_cmn_IsUndefined
+    return rbs_cmn_IsUndefined
   else
     return invalid
   end if
-end function
- function RBS_BTS_BaseTestSuite_AssertType(value, typeStr, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertType(value, typeStr, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if type(value) <> typeStr
     if msg = ""
-      expr_as_string =  rbs_cmn_AsString(value)
+      expr_as_string = rbs_cmn_AsString(value)
       msg = expr_as_string + " was not expected type " + typeStr
     end if
     m.currentResult.AddResult(msg)
@@ -482,19 +482,19 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertSubType(value, typeStr, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertSubType(value, typeStr, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if type(value) <> "roSGNode"
     if msg = ""
-      expr_as_string =  rbs_cmn_AsString(value)
+      expr_as_string = rbs_cmn_AsString(value)
       msg = expr_as_string + " was not a node, so could not match subtype " + typeStr
     end if
     m.currentResult.AddResult(msg)
     return m.GetLegacyCompatibleReturnValue(false)
   else if (value.subType() <> typeStr)
     if msg = ""
-      expr_as_string =  rbs_cmn_AsString(value)
+      expr_as_string = rbs_cmn_AsString(value)
       msg = expr_as_string + "( type : " + value.subType() + ") was not of subType " + typeStr
     end if
     m.currentResult.AddResult(msg)
@@ -502,29 +502,29 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_EqValues(Value1, Value2) as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_EqValues(Value1, Value2) as Dynamic
   val1Type = type(Value1)
   val2Type = type(Value2)
-  if val1Type = "<uninitialized>" or val2Type = "<uninitialized>" or val1Type = "" or val2Type = ""
+  if val1Type = "<uninitialized>" OR val2Type = "<uninitialized>" OR val1Type = "" OR val2Type = ""
     ? "ERROR!!!! - undefined value passed"
     return false
   end if
-  if val1Type = "roString" or val1Type = "String"
-    Value1 =  rbs_cmn_AsString(Value1)
+  if val1Type = "roString" OR val1Type = "String"
+    Value1 = rbs_cmn_AsString(Value1)
   else
     Value1 = box(Value1)
   end if
-  if val2Type = "roString" or val2Type = "String"
-    Value2 =  rbs_cmn_AsString(Value2)
+  if val2Type = "roString" OR val2Type = "String"
+    Value2 = rbs_cmn_AsString(Value2)
   else
     Value2 = box(Value2)
   end if
   val1Type = type(Value1)
   val2Type = type(Value2)
-  if val1Type = "roFloat" and val2Type = "roInt"
+  if val1Type = "roFloat" AND val2Type = "roInt"
     Value2 = box(Cdbl(Value2))
-  else if val2Type = "roFloat" and val1Type = "roInt"
+  else if val2Type = "roFloat" AND val1Type = "roInt"
     Value1 = box(Cdbl(Value1))
   end if
   if val1Type <> val2Type
@@ -532,11 +532,11 @@ end function
   else
     valtype = val1Type
     if valtype = "roList"
-      return  rbs_bts_basetestsuite_EqArray(Value1, Value2)
+      return rbs_bts_basetestsuite_EqArray(Value1, Value2)
     else if valtype = "roAssociativeArray"
-      return  rbs_bts_basetestsuite_EqAssocArray(Value1, Value2)
+      return rbs_bts_basetestsuite_EqAssocArray(Value1, Value2)
     else if valtype = "roArray"
-      return  rbs_bts_basetestsuite_EqArray(Value1, Value2)
+      return rbs_bts_basetestsuite_EqArray(Value1, Value2)
     else if (valtype = "roSGNode")
       if (val2Type <> "roSGNode")
         return false
@@ -547,21 +547,21 @@ end function
       return Value1 = Value2
     end if
   end if
-end function
- function RBS_BTS_BaseTestSuite_EqAssocArray(Value1, Value2) as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_EqAssocArray(Value1, Value2) as Dynamic
   l1 = Value1.Count()
   l2 = Value2.Count()
   if not l1 = l2
     return false
   else
     for each k in Value1
-      if k <> "__mocks" and k <> "__stubs" 'fix infinite loop/box crash when doing equals on an aa with a mock
+      if k <> "__mocks" AND k <> "__stubs" 'fix infinite loop/box crash when doing equals on an aa with a mock
         if not Value2.DoesExist(k)
           return false
         else
           v1 = Value1[k]
           v2 = Value2[k]
-          if not  rbs_bts_basetestsuite_EqValues(v1, v2)
+          if not rbs_bts_basetestsuite_EqValues(v1, v2)
             return false
           end if
         end if
@@ -569,9 +569,9 @@ end function
     end for
     return true
   end if
-end function
- function RBS_BTS_BaseTestSuite_EqArray(Value1, Value2) as dynamic
-  if not (rbs_cmn_IsArray(Value1)) or not  rbs_cmn_IsArray(Value2) then return false
+End Function
+Function RBS_BTS_BaseTestSuite_EqArray(Value1, Value2) as Dynamic
+  if not (rbs_cmn_IsArray(Value1)) OR not rbs_cmn_IsArray(Value2) then return false
   l1 = Value1.Count()
   l2 = Value2.Count()
   if not l1 = l2
@@ -580,18 +580,18 @@ end function
     for i = 0 to l1 - 1
       v1 = Value1[i]
       v2 = Value2[i]
-      if not  rbs_bts_basetestsuite_EqValues(v1, v2) then
+      if not rbs_bts_basetestsuite_EqValues(v1, v2) then
         return false
       end if
     end for
     return true
   end if
-end function
- function RBS_BTS_BaseTestSuite_AssertNodeCount(node, count, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertNodeCount(node, count, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if type(node) = "roSGNode"
     if node.getChildCount() <> count
-      msg = "node items count <> " +  rbs_cmn_AsString(count) + ". Received " +  rbs_cmn_AsString(node.getChildCount())
+      msg = "node items count <> " + rbs_cmn_AsString(count) + ". Received " + rbs_cmn_AsString(node.getChildCount())
       m.currentResult.AddResult(msg)
       return m.GetLegacyCompatibleReturnValue(false)
     end if
@@ -602,12 +602,12 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertNodeNotCount(node, count, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertNodeNotCount(node, count, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if type(node) = "roSGNode"
     if node.getChildCount() = count
-      msg = "node items count = " +  rbs_cmn_AsString(count) + "."
+      msg = "node items count = " + rbs_cmn_AsString(count) + "."
       m.currentResult.AddResult(msg)
       return m.GetLegacyCompatibleReturnValue(false)
     end if
@@ -618,8 +618,8 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertNodeEmpty(node, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertNodeEmpty(node, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if type(node) = "roSGNode"
     if node.getChildCount() > 0
@@ -630,8 +630,8 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertNodeNotEmpty(node, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertNodeNotEmpty(node, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if type(node) = "roSGNode"
     if node.Count() = 0
@@ -642,12 +642,12 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertNodeContains(node, value, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertNodeContains(node, value, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if type(node) = "roSGNode"
-    if not  rbs_cmn_NodeContains(node, value)
-      msg = "Node doesn't have the '" +  rbs_cmn_AsString(value) + "' value."
+    if not rbs_cmn_NodeContains(node, value)
+      msg = "Node doesn't have the '" + rbs_cmn_AsString(value) + "' value."
       m.currentResult.AddResult(msg)
       return m.GetLegacyCompatibleReturnValue(false)
     end if
@@ -658,12 +658,12 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertNodeContainsOnly(node, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertNodeContainsOnly(node, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if type(node) = "roSGNode"
-    if not  rbs_cmn_NodeContains(node, value)
-      msg = "Node doesn't have the '" +  rbs_cmn_AsString(value) + "' value."
+    if not rbs_cmn_NodeContains(node, value)
+      msg = "Node doesn't have the '" + rbs_cmn_AsString(value) + "' value."
       m.currentResult.AddResult(msg)
       return m.GetLegacyCompatibleReturnValue(false)
     else if node.getChildCount() <> 1
@@ -678,12 +678,12 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertNodeNotContains(node, value, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertNodeNotContains(node, value, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if type(node) = "roSGNode"
-    if  rbs_cmn_NodeContains(node, value)
-      msg = "Node has the '" +  rbs_cmn_AsString(value) + "' value."
+    if rbs_cmn_NodeContains(node, value)
+      msg = "Node has the '" + rbs_cmn_AsString(value) + "' value."
       m.currentResult.AddResult(msg)
       return m.GetLegacyCompatibleReturnValue(false)
     end if
@@ -694,19 +694,19 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertNodeContainsFields(node, subset, ignoredFields = invalid, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertNodeContainsFields(node, subset, ignoredFields = invalid, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
-  if (type(node) = "roSGNode" and  rbs_cmn_IsAssociativeArray(subset)) or (type(node) = "roSGNode" and  rbs_cmn_IsArray(subset))
-    isAA =  rbs_cmn_IsAssociativeArray(subset)
-    isIgnoredFields =  rbs_cmn_IsArray(ignoredFields)
+  if (type(node) = "roSGNode" AND rbs_cmn_IsAssociativeArray(subset)) OR (type(node) = "roSGNode" AND rbs_cmn_IsArray(subset))
+    isAA = rbs_cmn_IsAssociativeArray(subset)
+    isIgnoredFields = rbs_cmn_IsArray(ignoredFields)
     for each key in subset
       if (key <> "")
-        if (not isIgnoredFields or not  rbs_cmn_ArrayContains(ignoredFields, key))
- subsetValue = subset[key]
+        if (not isIgnoredFields OR not rbs_cmn_ArrayContains(ignoredFields, key))
+          subsetValue = subset[key]
           nodeValue = node[key]
           if not m.eqValues(nodeValue, subsetValue)
-            msg = key + ": Expected '" +  rbs_cmn_AsString(subsetValue) + "', got '" +  rbs_cmn_AsString(nodeValue) + "'"
+            msg = key + ": Expected '" + rbs_cmn_AsString(subsetValue) + "', got '" + rbs_cmn_AsString(nodeValue) + "'"
             m.currentResult.AddResult(msg)
             return m.GetLegacyCompatibleReturnValue(false)
           end if
@@ -722,11 +722,11 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertNodeNotContainsFields(node, subset, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertNodeNotContainsFields(node, subset, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
-  if (type(node) = "roSGNode" and  rbs_cmn_IsAssociativeArray(subset)) or (type(node) = "roSGNode" and  rbs_cmn_IsArray(subset))
-    isAA =  rbs_cmn_IsAssociativeArray(subset)
+  if (type(node) = "roSGNode" AND rbs_cmn_IsAssociativeArray(subset)) OR (type(node) = "roSGNode" AND rbs_cmn_IsArray(subset))
+    isAA = rbs_cmn_IsAssociativeArray(subset)
     for each item in subset
       key = invalid
       value = item
@@ -734,8 +734,8 @@ end function
         key = item
         value = item[key]
       end if
-      if  rbs_cmn_NodeContains(node, value, key)
-        msg = "Node has the '" +  rbs_cmn_AsString(value) + "' value."
+      if rbs_cmn_NodeContains(node, value, key)
+        msg = "Node has the '" + rbs_cmn_AsString(value) + "' value."
         m.currentResult.AddResult(msg)
         return m.GetLegacyCompatibleReturnValue(false)
       end if
@@ -747,19 +747,19 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_AssertAAContainsSubset(array, subset, ignoredFields = invalid, msg = "") as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_AssertAAContainsSubset(array, subset, ignoredFields = invalid, msg = "") as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
-  if (rbs_cmn_IsAssociativeArray(array) and  rbs_cmn_IsAssociativeArray(subset))
-    isAA =  rbs_cmn_IsAssociativeArray(subset)
-    isIgnoredFields =  rbs_cmn_IsArray(ignoredFields)
+  if (rbs_cmn_IsAssociativeArray(array) AND rbs_cmn_IsAssociativeArray(subset))
+    isAA = rbs_cmn_IsAssociativeArray(subset)
+    isIgnoredFields = rbs_cmn_IsArray(ignoredFields)
     for each key in subset
       if (key <> "")
-        if (not isIgnoredFields or not  rbs_cmn_ArrayContains(ignoredFields, key))
- subsetValue = subset[key]
+        if (not isIgnoredFields OR not rbs_cmn_ArrayContains(ignoredFields, key))
+          subsetValue = subset[key]
           arrayValue = array[key]
           if not m.eqValues(arrayValue, subsetValue)
-            msg = key + ": Expected '" +  rbs_cmn_AsString(subsetValue) + "', got '" +  rbs_cmn_AsString(arrayValue) + "'"
+            msg = key + ": Expected '" + rbs_cmn_AsString(subsetValue) + "', got '" + rbs_cmn_AsString(arrayValue) + "'"
             m.currentResult.AddResult(msg)
             return m.GetLegacyCompatibleReturnValue(false)
           end if
@@ -774,8 +774,8 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
- function RBS_BTS_BaseTestSuite_Stub(target, methodName, returnValue = invalid, allowNonExistingMethods = false) as object
+End Function
+Function RBS_BTS_BaseTestSuite_Stub(target, methodName, returnValue = invalid, allowNonExistingMethods = false) as Object
   if (type(target) <> "roAssociativeArray")
     m.Fail("could not create Stub provided target was null")
     return {}
@@ -792,9 +792,9 @@ end function
   id = stri(m.__stubId).trim()
   fake = m.CreateFake(id, target, methodName, 1, invalid, returnValue)
   m.stubs[id] = fake
-  allowNonExisting = m.allowNonExistingMethodsOnMocks = true or allowNonExistingMethods
-  isMethodPresent = type(target[methodName]) = "Function" or type(target[methodName]) = "roFunction"
-  if (isMethodPresent or allowNonExisting)
+  allowNonExisting = m.allowNonExistingMethodsOnMocks = true OR allowNonExistingMethods
+  isMethodPresent = type(target[methodName]) = "Function" OR type(target[methodName]) = "roFunction"
+  if (isMethodPresent OR allowNonExisting)
     target[methodName] = m["StubCallback" + id]
     target.__stubs = m.stubs
     if (not isMethodPresent)
@@ -804,53 +804,53 @@ end function
     ? "ERROR - could not create Stub : method not found  "; target ; "." ; methodName
   end if
   return fake
-end function
- function RBS_BTS_BaseTestSuite_ExpectOnce(target, methodName, expectedArgs = invalid, returnValue = invalid, allowNonExistingMethods = false) as object
+End Function
+Function RBS_BTS_BaseTestSuite_ExpectOnce(target, methodName, expectedArgs = invalid, returnValue = invalid, allowNonExistingMethods = false) as Object
   return m.Mock(target, methodName, 1, expectedArgs, returnValue, allowNonExistingMethods)
-end function
- function RBS_BTS_BaseTestSuite_ExpectOnceWLN(lineNumber, target, methodName, expectedArgs = invalid, returnValue = invalid, allowNonExistingMethods = false) as object
+End Function
+Function RBS_BTS_BaseTestSuite_ExpectOnceWLN(lineNumber, target, methodName, expectedArgs = invalid, returnValue = invalid, allowNonExistingMethods = false) as Object
   return m.Mock(target, methodName, 1, expectedArgs, returnValue, allowNonExistingMethods, lineNumber)
-end function
- function RBS_BTS_BaseTestSuite_ExpectOnceOrNone(target, methodName, isExpected, expectedArgs = invalid, returnValue = invalid, allowNonExistingMethods = false) as object
+End Function
+Function RBS_BTS_BaseTestSuite_ExpectOnceOrNone(target, methodName, isExpected, expectedArgs = invalid, returnValue = invalid, allowNonExistingMethods = false) as Object
   if isExpected
     return m.ExpectOnce(target, methodName, expectedArgs, returnValue, allowNonExistingMethods)
   else
     return m.ExpectNone(target, methodName, allowNonExistingMethods)
   end if
-end function
- function RBS_BTS_BaseTestSuite_ExpectOnceOrNoneWLN(lineNumber, target, methodName, isExpected, expectedArgs = invalid, returnValue = invalid, allowNonExistingMethods = false) as object
+End Function
+Function RBS_BTS_BaseTestSuite_ExpectOnceOrNoneWLN(lineNumber, target, methodName, isExpected, expectedArgs = invalid, returnValue = invalid, allowNonExistingMethods = false) as Object
   if isExpected
     return m.ExpectOnceWLN(lineNumber, target, methodName, expectedArgs, returnValue, allowNonExistingMethods)
   else
     return m.ExpectNoneWLN(lineNumber, target, methodName, allowNonExistingMethods)
   end if
-end function
- function RBS_BTS_BaseTestSuite_ExpectNone(target, methodName, allowNonExistingMethods = false) as object
+End Function
+Function RBS_BTS_BaseTestSuite_ExpectNone(target, methodName, allowNonExistingMethods = false) as Object
   return m.Mock(target, methodName, 0, invalid, invalid, allowNonExistingMethods)
-end function
- function RBS_BTS_BaseTestSuite_ExpectNoneWLN(lineNumber, target, methodName, allowNonExistingMethods = false) as object
+End Function
+Function RBS_BTS_BaseTestSuite_ExpectNoneWLN(lineNumber, target, methodName, allowNonExistingMethods = false) as Object
   return m.Mock(target, methodName, 0, invalid, invalid, allowNonExistingMethods, lineNumber)
-end function
- function RBS_BTS_BaseTestSuite_Expect(target, methodName, expectedInvocations = 1, expectedArgs = invalid, returnValue = invalid, allowNonExistingMethods = false) as object
+End Function
+Function RBS_BTS_BaseTestSuite_Expect(target, methodName, expectedInvocations = 1, expectedArgs = invalid, returnValue = invalid, allowNonExistingMethods = false) as Object
   return m.Mock(target, methodName, expectedInvocations, expectedArgs, returnValue, allowNonExistingMethods)
-end function
- function RBS_BTS_BaseTestSuite_ExpectWLN(lineNumber, target, methodName, expectedInvocations = 1, expectedArgs = invalid, returnValue = invalid, allowNonExistingMethods = false) as object
+End Function
+Function RBS_BTS_BaseTestSuite_ExpectWLN(lineNumber, target, methodName, expectedInvocations = 1, expectedArgs = invalid, returnValue = invalid, allowNonExistingMethods = false) as Object
   return m.Mock(target, methodName, expectedInvocations, expectedArgs, returnValue, allowNonExistingMethods, lineNumber)
-end function
- function RBS_BTS_BaseTestSuite_Mock(target, methodName, expectedInvocations = 1, expectedArgs = invalid, returnValue = invalid, allowNonExistingMethods = false, lineNumber = -1) as object
-  if not  rbs_cmn_IsAssociativeArray(target)
+End Function
+Function RBS_BTS_BaseTestSuite_Mock(target, methodName, expectedInvocations = 1, expectedArgs = invalid, returnValue = invalid, allowNonExistingMethods = false, lineNumber = -1) as Object
+  if not rbs_cmn_IsAssociativeArray(target)
     methodName = ""
     m.MockFail(lineNumber, "", "mock args: target was not an AA")
-  else if not  rbs_cmn_IsString(methodName)
+  else if not rbs_cmn_IsString(methodName)
     methodName = ""
     m.MockFail(lineNumber, "", "mock args: methodName was not a string")
-  else if not  rbs_cmn_IsNumber(expectedInvocations)
+  else if not rbs_cmn_IsNumber(expectedInvocations)
     m.MockFail(lineNumber, methodName, "mock args: expectedInvocations was not an int")
-  else if not  rbs_cmn_IsArray(expectedArgs) and  rbs_cmn_IsValid(expectedArgs)
+  else if not rbs_cmn_IsArray(expectedArgs) AND rbs_cmn_IsValid(expectedArgs)
     m.MockFail(lineNumber, methodName, "mock args: expectedArgs was not invalid or an array of args")
-  else if  rbs_cmn_IsUndefined(expectedArgs)
+  else if rbs_cmn_IsUndefined(expectedArgs)
     m.MockFail(lineNumber, methodName, "mock args: expectedArgs undefined")
-  else if  rbs_cmn_IsUndefined(returnValue)
+  else if rbs_cmn_IsUndefined(returnValue)
     m.MockFail(lineNumber, methodName, "mock args: returnValue undefined")
   end if
   if m.currentResult.isFail
@@ -870,7 +870,7 @@ end function
   for i = 0 to m.__mockId
     id = stri(i).trim()
     mock = m.mocks[id]
-    if mock <> invalid and mock.methodName = methodName and mock.target.__rooibosTargetId = target.__rooibosTargetId
+    if mock <> invalid AND mock.methodName = methodName AND mock.target.__rooibosTargetId = target.__rooibosTargetId
       fake = mock
       fake.lineNumbers.push(lineNumber)
       exit for
@@ -886,9 +886,9 @@ end function
     end if
     fake = m.CreateFake(id, target, methodName, expectedInvocations, expectedArgs, returnValue, lineNumber)
     m.mocks[id] = fake 'this will bind it to m
-    allowNonExisting = m.allowNonExistingMethodsOnMocks = true or allowNonExistingMethods
-    isMethodPresent = type(target[methodName]) = "Function" or type(target[methodName]) = "roFunction"
-    if (isMethodPresent or allowNonExisting)
+    allowNonExisting = m.allowNonExistingMethodsOnMocks = true OR allowNonExistingMethods
+    isMethodPresent = type(target[methodName]) = "Function" OR type(target[methodName]) = "roFunction"
+    if (isMethodPresent OR allowNonExisting)
       target[methodName] = m["MockCallback" + id]
       target.__mocks = m.mocks
       if (not isMethodPresent)
@@ -901,10 +901,10 @@ end function
     m.CombineFakes(fake, m.CreateFake(id, target, methodName, expectedInvocations, expectedArgs, returnValue, lineNumber))
   end if
   return fake
-end function
- function RBS_BTS_BaseTestSuite_CreateFake(id, target, methodName, expectedInvocations = 1, expectedArgs = invalid, returnValue = invalid, lineNumber = -1) as object
+End Function
+Function RBS_BTS_BaseTestSuite_CreateFake(id, target, methodName, expectedInvocations = 1, expectedArgs = invalid, returnValue = invalid, lineNumber = -1) as Object
   expectedArgsValues = []
-  hasArgs =  rbs_cmn_IsArray(expectedArgs)
+  hasArgs = rbs_cmn_IsArray(expectedArgs)
   if (hasArgs)
     defaultValue = m.invalidValue
   else
@@ -913,11 +913,11 @@ end function
   end if
   lineNumbers = [lineNumber]
   for i = 0 to 9
-    if (hasArgs and expectedArgs.count() > i)
+    if (hasArgs AND expectedArgs.count() > i)
       value = expectedArgs[i]
-      if not  rbs_cmn_IsUndefined(value)
-        if  rbs_cmn_IsAssociativeArray(value) and  rbs_cmn_isValid(value.matcher)
-          if not  rbs_cmn_isFunction(value.matcher)
+      if not rbs_cmn_IsUndefined(value)
+        if rbs_cmn_IsAssociativeArray(value) AND rbs_cmn_isValid(value.matcher)
+          if not rbs_cmn_isFunction(value.matcher)
             ? "[ERROR] you have specified a matching function; but it is not in scope!"
             expectedArgsValues.push("#ERR-OUT_OF_SCOPE_MATCHER!")
           else
@@ -934,7 +934,7 @@ end function
     end if
   end for
   fake = {
-    id : id,
+    id: id,
     target: target,
     methodName: methodName,
     returnValue: returnValue,
@@ -944,7 +944,7 @@ end function
     invokedArgs: [invalid, invalid, invalid, invalid, invalid, invalid, invalid, invalid, invalid],
     expectedArgs: expectedArgsValues,
     expectedInvocations: expectedInvocations,
-    callback: function(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+    callback: Function(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
       if (m.allInvokedArgs = invalid)
         m.allInvokedArgs = []
       end if
@@ -952,10 +952,10 @@ end function
       m.allInvokedArgs.push ([arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9])
       m.isCalled = true
       m.invocations++
-      if (type(m.returnValue) = "roAssociativeArray" and m.returnValue.doesExist("multiResult"))
+      if (type(m.returnValue) = "roAssociativeArray" AND m.returnValue.doesExist("multiResult"))
         returnValues = m.returnValue["multiResult"]
         returnIndex = m.invocations - 1
-        if (type(returnValues) = "roArray" and returnValues.count() > 0)
+        if (type(returnValues) = "roArray" AND returnValues.count() > 0)
           if returnValues.count() <= m.invocations
             returnIndex = returnValues.count() - 1
             print "Multi return values all used up - repeating last value"
@@ -968,19 +968,19 @@ end function
       else
         return m.returnValue
       end if
-    end function
+    End Function
   }
   return fake
-end function
- function RBS_BTS_BaseTestSuite_CombineFakes(fake, otherFake)
-  if type(fake.expectedArgs) <> "roAssociativeArray" or not fake.expectedArgs.doesExist("multiInvoke")
+End Function
+Function RBS_BTS_BaseTestSuite_CombineFakes(fake, otherFake)
+  if type(fake.expectedArgs) <> "roAssociativeArray" OR not fake.expectedArgs.doesExist("multiInvoke")
     currentExpectedArgsArgs = fake.expectedArgs
     fake.expectedArgs = {
       "multiInvoke": [currentExpectedArgsArgs]
     }
   end if
   fake.expectedArgs.multiInvoke.push(otherFake.expectedArgs)
-  if type(fake.returnValue) <> "roAssociativeArray" or not fake.returnValue.doesExist("multiResult")
+  if type(fake.returnValue) <> "roAssociativeArray" OR not fake.returnValue.doesExist("multiResult")
     currentReturnValue = fake.returnValue
     fake.returnValue = {
       "multiResult": [currentReturnValue]
@@ -989,9 +989,9 @@ end function
   fake.returnValue.multiResult.push(otherFake.returnValue)
   fake.lineNumbers.push(lineNumber)
   fake.expectedInvocations++
-end function
- function RBS_BTS_BaseTestSuite_AssertMocks() as void
-  if (m.__mockId = invalid or not  rbs_cmn_IsAssociativeArray(m.mocks))
+End Function
+Function RBS_BTS_BaseTestSuite_AssertMocks() as Void
+  if (m.__mockId = invalid OR not rbs_cmn_IsAssociativeArray(m.mocks))
     return
   end if
   lastId = int(m.__mockId)
@@ -1002,8 +1002,8 @@ end function
       m.MockFail(mock.lineNumbers[0], methodName, "Wrong number of calls. (" + stri(mock.invocations).trim() + " / " + stri(mock.expectedInvocations).trim() + ")")
       m.CleanMocks()
       return
-    else if mock.expectedInvocations > 0 and (rbs_cmn_IsArray(mock.expectedArgs) or (type(mock.expectedArgs) = "roAssociativeArray" and  rbs_cmn_IsArray(mock.expectedArgs.multiInvoke)))
-      isMultiArgsSupported = type(mock.expectedArgs) = "roAssociativeArray" and  rbs_cmn_IsArray(mock.expectedArgs.multiInvoke)
+    else if mock.expectedInvocations > 0 AND (rbs_cmn_IsArray(mock.expectedArgs) OR (type(mock.expectedArgs) = "roAssociativeArray" AND rbs_cmn_IsArray(mock.expectedArgs.multiInvoke)))
+      isMultiArgsSupported = type(mock.expectedArgs) = "roAssociativeArray" AND rbs_cmn_IsArray(mock.expectedArgs.multiInvoke)
       for invocationIndex = 0 to mock.invocations - 1
         invokedArgs = mock.allInvokedArgs[invocationIndex]
         if isMultiArgsSupported
@@ -1014,22 +1014,22 @@ end function
         for i = 0 to expectedArgs.count() - 1
           value = invokedArgs[i]
           expected = expectedArgs[i]
-          didNotExpectArg =  rbs_cmn_IsString(expected) and expected = m.invalidValue
+          didNotExpectArg = rbs_cmn_IsString(expected) AND expected = m.invalidValue
           if (didNotExpectArg)
             expected = invalid
           end if
-          isUsingMatcher =  rbs_cmn_IsAssociativeArray(expected) and  rbs_cmn_isFunction(expected.matcher)
+          isUsingMatcher = rbs_cmn_IsAssociativeArray(expected) AND rbs_cmn_isFunction(expected.matcher)
           if isUsingMatcher
             if not expected.matcher(value)
-              m.MockFail(mock.lineNumbers[invocationIndex], methodName, "on Invocation #" + stri(invocationIndex).trim() + ", expected arg #" + stri(i).trim() + "  to match matching function '" +  rbs_cmn_AsString(expected.matcher) + "' got '" +  rbs_cmn_AsString(value) + "')")
+              m.MockFail(mock.lineNumbers[invocationIndex], methodName, "on Invocation #" + stri(invocationIndex).trim() + ", expected arg #" + stri(i).trim() + "  to match matching function '" + rbs_cmn_AsString(expected.matcher) + "' got '" + rbs_cmn_AsString(value) + "')")
               m.CleanMocks()
             end if
           else
-            if (not (rbs_cmn_IsString(expected) and expected = m.ignoreValue) and not m.eqValues(value, expected))
+            if (not (rbs_cmn_IsString(expected) AND expected = m.ignoreValue) AND not m.eqValues(value, expected))
               if (expected = invalid)
                 expected = "[INVALID]"
               end if
-              m.MockFail(mock.lineNumbers[invocationIndex], methodName, "on Invocation #" + stri(invocationIndex).trim() + ", expected arg #" + stri(i).trim() + "  to be '" +  rbs_cmn_AsString(expected) + "' got '" +  rbs_cmn_AsString(value) + "')")
+              m.MockFail(mock.lineNumbers[invocationIndex], methodName, "on Invocation #" + stri(invocationIndex).trim() + ", expected arg #" + stri(i).trim() + "  to be '" + rbs_cmn_AsString(expected) + "' got '" + rbs_cmn_AsString(value) + "')")
               m.CleanMocks()
               return
             end if
@@ -1039,166 +1039,166 @@ end function
     end if
   end for
   m.CleanMocks()
-end function
- function RBS_BTS_BaseTestSuite_CleanMocks() as void
+End Function
+Function RBS_BTS_BaseTestSuite_CleanMocks() as Void
   if m.mocks = invalid then return
   for each id in m.mocks
     mock = m.mocks[id]
     mock.target.__mocks = invalid
   end for
   m.mocks = invalid
-end function
- function RBS_BTS_BaseTestSuite_CleanStubs() as void
+End Function
+Function RBS_BTS_BaseTestSuite_CleanStubs() as Void
   if m.stubs = invalid then return
   for each id in m.stubs
     stub = m.stubs[id]
     stub.target.__stubs = invalid
   end for
   m.stubs = invalid
-end function
- function RBS_BTS_BaseTestSuite_MockFail(lineNumber, methodName, message) as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockFail(lineNumber, methodName, message) as Dynamic
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   m.currentResult.AddMockResult(lineNumber, "mock failure on '" + methodName + "' : " + message)
   return m.GetLegacyCompatibleReturnValue(false)
-end function
- function RBS_BTS_BaseTestSuite_StubCallback0(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_StubCallback0(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__Stubs["0"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_StubCallback1(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_StubCallback1(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__Stubs["1"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_StubCallback2(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_StubCallback2(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__Stubs["2"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_StubCallback3(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_StubCallback3(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__Stubs["3"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_StubCallback4(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_StubCallback4(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__Stubs["4"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_StubCallback5(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_StubCallback5(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__Stubs["5"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_MockCallback0(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockCallback0(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__mocks["0"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_MockCallback1(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockCallback1(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__mocks["1"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_MockCallback2(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockCallback2(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__mocks["2"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_MockCallback3(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockCallback3(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__mocks["3"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_MockCallback4(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockCallback4(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__mocks["4"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_MockCallback5(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockCallback5(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__mocks["5"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_MockCallback6(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockCallback6(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__mocks["6"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_MockCallback7(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockCallback7(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__mocks["7"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_MockCallback8(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockCallback8(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__mocks["8"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_MockCallback9(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockCallback9(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__mocks["9"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_MockCallback10(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockCallback10(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__mocks["10"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_MockCallback11(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockCallback11(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__mocks["11"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_MockCallback12(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockCallback12(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__mocks["12"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_MockCallback13(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockCallback13(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__mocks["13"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_MockCallback14(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockCallback14(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__mocks["14"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_MockCallback15(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockCallback15(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__mocks["15"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_MockCallback16(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockCallback16(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__mocks["16"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_MockCallback17(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockCallback17(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__mocks["17"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_MockCallback18(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockCallback18(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__mocks["18"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_MockCallback19(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockCallback19(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__mocks["19"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_MockCallback20(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockCallback20(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__mocks["20"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_MockCallback21(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockCallback21(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__mocks["21"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_MockCallback22(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockCallback22(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__mocks["22"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_MockCallback23(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockCallback23(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__mocks["23"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_MockCallback24(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid)as dynamic
+End Function
+Function RBS_BTS_BaseTestSuite_MockCallback24(arg1 = invalid, arg2 = invalid, arg3 = invalid, arg4 = invalid, arg5 = invalid, arg6 = invalid, arg7 = invalid, arg8 = invalid, arg9 = invalid) as Dynamic
   fake = m.__mocks["24"]
   return fake.callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-end function
- function RBS_BTS_BaseTestSuite_pathAsArray_(path)
+End Function
+Function RBS_BTS_BaseTestSuite_pathAsArray_(path)
   pathRE = CreateObject("roRegex", "\[([0-9]+)\]", "i")
   segments = []
-  if type(path) = "String" or type(path) = "roString"
+  if type(path) = "String" OR type(path) = "roString"
     dottedPath = pathRE.replaceAll(path, ".\1")
     stringSegments = dottedPath.tokenize(".")
     for each s in stringSegments
-      if (Asc(s) >= 48) and (Asc(s) <= 57)
+      if (Asc(s) >= 48) AND (Asc(s) <= 57)
         segments.push(s.toInt())
       else
         segments.push(s)
       end if
     end for
-  else if type(path) = "roList" or type(path) = "roArray"
+  else if type(path) = "roList" OR type(path) = "roArray"
     stringPath = ""
     for each s in path
       stringPath = stringPath + "." + Box(s).toStr()
@@ -1208,11 +1208,11 @@ end function
     segments = invalid
   end if
   return segments
-end function
- function RBS_BTS_BaseTestSuite_g(aa, path, default = invalid)
-  if type(aa) <> "roAssociativeArray" and type(aa) <> "roArray" and type(aa) <> "roSGNode" then return default
+End Function
+Function RBS_BTS_BaseTestSuite_g(aa, path, default = invalid)
+  if type(aa) <> "roAssociativeArray" AND type(aa) <> "roArray" AND type(aa) <> "roSGNode" then return default
   segments = m.pathAsArray_(path)
-  if (Type(path) = "roInt" or Type(path) = "roInteger" or Type(path) = "Integer")
+  if (Type(path) = "roInt" OR Type(path) = "roInteger" OR Type(path) = "Integer")
     path = stri(path).trim()
   end if
   if segments = invalid then return default
@@ -1220,11 +1220,11 @@ end function
   while segments.count() > 0
     key = segments.shift()
     if (type(key) = "roInteger") 'it's a valid index
-      if (aa <> invalid and GetInterface(aa, "ifArray") <> invalid)
+      if (aa <> invalid AND GetInterface(aa, "ifArray") <> invalid)
         value = aa[key]
-      else if (aa <> invalid and GetInterface(aa, "ifSGNodeChildren") <> invalid)
+      else if (aa <> invalid AND GetInterface(aa, "ifSGNodeChildren") <> invalid)
         value = aa.getChild(key)
-      else if (aa <> invalid and GetInterface(aa, "ifAssociativeArray") <> invalid)
+      else if (aa <> invalid AND GetInterface(aa, "ifAssociativeArray") <> invalid)
         key = tostr(key)
         if not aa.doesExist(key)
           exit while
@@ -1243,15 +1243,15 @@ end function
       result = value
       exit while
     end if
-    if type(value) <> "roAssociativeArray" and type(value) <> "roArray" and type(value) <> "roSGNode"
+    if type(value) <> "roAssociativeArray" AND type(value) <> "roArray" AND type(value) <> "roSGNode"
       exit while
     end if
     aa = value
   end while
   if result = invalid then return default
   return result
-end function
-function RBS_BTS_BaseTestSuite_waitForField(target, fieldName, delay = 500, maxAttempts = 10)
+End Function
+Function RBS_BTS_BaseTestSuite_waitForField(target, fieldName, delay = 500, maxAttempts = 10)
   attempts = 0
   if target = invalid
     return false
@@ -1267,8 +1267,8 @@ function RBS_BTS_BaseTestSuite_waitForField(target, fieldName, delay = 500, maxA
     ? "waiting for signal field '" ; fieldName "' - " ; attempts
   end while
   return true
-end function
- function RBS_BTS_BaseTestSuite_AssertAsyncField(target, fieldName, delay = 500, maxAttempts = 10)
+End Function
+Function RBS_BTS_BaseTestSuite_AssertAsyncField(target, fieldName, delay = 500, maxAttempts = 10)
   if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if target = invalid
     m.fail("Target was invalid")
@@ -1279,136 +1279,136 @@ end function
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
-end function
-      function __BaseTestSuite_builder()
-      instance = {}
-      BaseTestSuite_instance = {
-        __className: "BaseTestSuite"
-        AddTest: RBS_BTS_BaseTestSuite_AddTest
-        CreateTest: RBS_BTS_BaseTestSuite_CreateTest
-        Fail: RBS_BTS_BaseTestSuite_Fail
-        GetLegacyCompatibleReturnValue: RBS_BTS_BaseTestSuite_GetLegacyCompatibleReturnValue
-        AssertFalse: RBS_BTS_BaseTestSuite_AssertFalse
-        AssertTrue: RBS_BTS_BaseTestSuite_AssertTrue
-        AssertEqual: RBS_BTS_BaseTestSuite_AssertEqual
-        AssertLike: RBS_BTS_BaseTestSuite_AssertLike
-        AssertNotEqual: RBS_BTS_BaseTestSuite_AssertNotEqual
-        AssertInvalid: RBS_BTS_BaseTestSuite_AssertInvalid
-        AssertNotInvalid: RBS_BTS_BaseTestSuite_AssertNotInvalid
-        AssertAAHasKey: RBS_BTS_BaseTestSuite_AssertAAHasKey
-        AssertAANotHasKey: RBS_BTS_BaseTestSuite_AssertAANotHasKey
-        AssertAAHasKeys: RBS_BTS_BaseTestSuite_AssertAAHasKeys
-        AssertAANotHasKeys: RBS_BTS_BaseTestSuite_AssertAANotHasKeys
-        AssertArrayContains: RBS_BTS_BaseTestSuite_AssertArrayContains
-        AssertArrayContainsAAs: RBS_BTS_BaseTestSuite_AssertArrayContainsAAs
-        AssertArrayNotContains: RBS_BTS_BaseTestSuite_AssertArrayNotContains
-        AssertArrayContainsSubset: RBS_BTS_BaseTestSuite_AssertArrayContainsSubset
-        AssertArrayNotContainsSubset: RBS_BTS_BaseTestSuite_AssertArrayNotContainsSubset
-        AssertArrayCount: RBS_BTS_BaseTestSuite_AssertArrayCount
-        AssertArrayNotCount: RBS_BTS_BaseTestSuite_AssertArrayNotCount
-        AssertEmpty: RBS_BTS_BaseTestSuite_AssertEmpty
-        AssertNotEmpty: RBS_BTS_BaseTestSuite_AssertNotEmpty
-        AssertArrayContainsOnlyValuesOfType: RBS_BTS_BaseTestSuite_AssertArrayContainsOnlyValuesOfType
-        GetIsTypeFunction: RBS_BTS_BaseTestSuite_GetIsTypeFunction
-        AssertType: RBS_BTS_BaseTestSuite_AssertType
-        AssertSubType: RBS_BTS_BaseTestSuite_AssertSubType
-        EqValues: RBS_BTS_BaseTestSuite_EqValues
-        EqAssocArray: RBS_BTS_BaseTestSuite_EqAssocArray
-        EqArray: RBS_BTS_BaseTestSuite_EqArray
-        AssertNodeCount: RBS_BTS_BaseTestSuite_AssertNodeCount
-        AssertNodeNotCount: RBS_BTS_BaseTestSuite_AssertNodeNotCount
-        AssertNodeEmpty: RBS_BTS_BaseTestSuite_AssertNodeEmpty
-        AssertNodeNotEmpty: RBS_BTS_BaseTestSuite_AssertNodeNotEmpty
-        AssertNodeContains: RBS_BTS_BaseTestSuite_AssertNodeContains
-        AssertNodeContainsOnly: RBS_BTS_BaseTestSuite_AssertNodeContainsOnly
-        AssertNodeNotContains: RBS_BTS_BaseTestSuite_AssertNodeNotContains
-        AssertNodeContainsFields: RBS_BTS_BaseTestSuite_AssertNodeContainsFields
-        AssertNodeNotContainsFields: RBS_BTS_BaseTestSuite_AssertNodeNotContainsFields
-        AssertAAContainsSubset: RBS_BTS_BaseTestSuite_AssertAAContainsSubset
-        Stub: RBS_BTS_BaseTestSuite_Stub
-        ExpectOnce: RBS_BTS_BaseTestSuite_ExpectOnce
-        ExpectOnceWLN: RBS_BTS_BaseTestSuite_ExpectOnceWLN
-        ExpectOnceOrNone: RBS_BTS_BaseTestSuite_ExpectOnceOrNone
-        ExpectOnceOrNoneWLN: RBS_BTS_BaseTestSuite_ExpectOnceOrNoneWLN
-        ExpectNone: RBS_BTS_BaseTestSuite_ExpectNone
-        ExpectNoneWLN: RBS_BTS_BaseTestSuite_ExpectNoneWLN
-        Expect: RBS_BTS_BaseTestSuite_Expect
-        ExpectWLN: RBS_BTS_BaseTestSuite_ExpectWLN
-        Mock: RBS_BTS_BaseTestSuite_Mock
-        CreateFake: RBS_BTS_BaseTestSuite_CreateFake
-        CombineFakes: RBS_BTS_BaseTestSuite_CombineFakes
-        AssertMocks: RBS_BTS_BaseTestSuite_AssertMocks
-        CleanMocks: RBS_BTS_BaseTestSuite_CleanMocks
-        CleanStubs: RBS_BTS_BaseTestSuite_CleanStubs
-        MockFail: RBS_BTS_BaseTestSuite_MockFail
-        StubCallback0: RBS_BTS_BaseTestSuite_StubCallback0
-        StubCallback1: RBS_BTS_BaseTestSuite_StubCallback1
-        StubCallback2: RBS_BTS_BaseTestSuite_StubCallback2
-        StubCallback3: RBS_BTS_BaseTestSuite_StubCallback3
-        StubCallback4: RBS_BTS_BaseTestSuite_StubCallback4
-        StubCallback5: RBS_BTS_BaseTestSuite_StubCallback5
-        MockCallback0: RBS_BTS_BaseTestSuite_MockCallback0
-        MockCallback1: RBS_BTS_BaseTestSuite_MockCallback1
-        MockCallback2: RBS_BTS_BaseTestSuite_MockCallback2
-        MockCallback3: RBS_BTS_BaseTestSuite_MockCallback3
-        MockCallback4: RBS_BTS_BaseTestSuite_MockCallback4
-        MockCallback5: RBS_BTS_BaseTestSuite_MockCallback5
-        MockCallback6: RBS_BTS_BaseTestSuite_MockCallback6
-        MockCallback7: RBS_BTS_BaseTestSuite_MockCallback7
-        MockCallback8: RBS_BTS_BaseTestSuite_MockCallback8
-        MockCallback9: RBS_BTS_BaseTestSuite_MockCallback9
-        MockCallback10: RBS_BTS_BaseTestSuite_MockCallback10
-        MockCallback11: RBS_BTS_BaseTestSuite_MockCallback11
-        MockCallback12: RBS_BTS_BaseTestSuite_MockCallback12
-        MockCallback13: RBS_BTS_BaseTestSuite_MockCallback13
-        MockCallback14: RBS_BTS_BaseTestSuite_MockCallback14
-        MockCallback15: RBS_BTS_BaseTestSuite_MockCallback15
-        MockCallback16: RBS_BTS_BaseTestSuite_MockCallback16
-        MockCallback17: RBS_BTS_BaseTestSuite_MockCallback17
-        MockCallback18: RBS_BTS_BaseTestSuite_MockCallback18
-        MockCallback19: RBS_BTS_BaseTestSuite_MockCallback19
-        MockCallback20: RBS_BTS_BaseTestSuite_MockCallback20
-        MockCallback21: RBS_BTS_BaseTestSuite_MockCallback21
-        MockCallback22: RBS_BTS_BaseTestSuite_MockCallback22
-        MockCallback23: RBS_BTS_BaseTestSuite_MockCallback23
-        MockCallback24: RBS_BTS_BaseTestSuite_MockCallback24
-        pathAsArray_: RBS_BTS_BaseTestSuite_pathAsArray_
-        g: RBS_BTS_BaseTestSuite_g
-        waitForField: RBS_BTS_BaseTestSuite_waitForField
-        AssertAsyncField: RBS_BTS_BaseTestSuite_AssertAsyncField
-        Name: "BaseTestSuite"
-        invalidValue: "#ROIBOS#INVALID_VALUE" ' special value used in mock arguments
-        ignoreValue: "#ROIBOS#IGNORE_VALUE" ' special value used in mock arguments
-        anyStringMatcher: { "matcher":  rbs_match_anyStringMatcher }
-        anyBoolMatcher: { "matcher":  rbs_match_anyBoolMatcher }
-        anyNumberMatcher: { "matcher":  rbs_match_anyNumberMatcher }
-        anyAAMatcher: { "matcher":  rbs_match_anyAAMatcher }
-        anyArrayMatcher: { "matcher":  rbs_match_anyArrayMatcher }
-        anyNodeMatcher: { "matcher":  rbs_match_anyNodeMatcher }
-        allowNonExistingMethodsOnMocks: true
-        isAutoAssertingMocks: true
-        TestCases: []
-         __BaseTestSuite: RBS_BTS_BaseTestSuite_new_
-      }
-      instance.append(BaseTestSuite_instance)
-      return instance
-      end function
-      function BaseTestSuite()
-        instance = __BaseTestSuite_builder()
-        instance.__BaseTestSuite()
-        return instance
-      end function
-      function RBS_BTS_BaseTestSuite_new_()
-      end function
-function RBS_CMN_IsXmlElement(value) as boolean
-  return  rbs_cmn_IsValid(value) and GetInterface(value, "ifXMLElement") <> invalid
-end function
-function RBS_CMN_IsFunction(value) as boolean
-  return  rbs_cmn_IsValid(value) and GetInterface(value, "ifFunction") <> invalid
-end function
-function RBS_CMN_GetFunction(filename, functionName) as object
-  if (not  rbs_cmn_IsNotEmptyString(functionName)) then return invalid
-  if (not  rbs_cmn_IsNotEmptyString(filename)) then return invalid
+End Function
+Function __BaseTestSuite_builder()
+  instance = {}
+  BaseTestSuite_instance = {
+    __className: "BaseTestSuite"
+    AddTest: RBS_BTS_BaseTestSuite_AddTest
+    CreateTest: RBS_BTS_BaseTestSuite_CreateTest
+    Fail: RBS_BTS_BaseTestSuite_Fail
+    GetLegacyCompatibleReturnValue: RBS_BTS_BaseTestSuite_GetLegacyCompatibleReturnValue
+    AssertFalse: RBS_BTS_BaseTestSuite_AssertFalse
+    AssertTrue: RBS_BTS_BaseTestSuite_AssertTrue
+    AssertEqual: RBS_BTS_BaseTestSuite_AssertEqual
+    AssertLike: RBS_BTS_BaseTestSuite_AssertLike
+    AssertNotEqual: RBS_BTS_BaseTestSuite_AssertNotEqual
+    AssertInvalid: RBS_BTS_BaseTestSuite_AssertInvalid
+    AssertNotInvalid: RBS_BTS_BaseTestSuite_AssertNotInvalid
+    AssertAAHasKey: RBS_BTS_BaseTestSuite_AssertAAHasKey
+    AssertAANotHasKey: RBS_BTS_BaseTestSuite_AssertAANotHasKey
+    AssertAAHasKeys: RBS_BTS_BaseTestSuite_AssertAAHasKeys
+    AssertAANotHasKeys: RBS_BTS_BaseTestSuite_AssertAANotHasKeys
+    AssertArrayContains: RBS_BTS_BaseTestSuite_AssertArrayContains
+    AssertArrayContainsAAs: RBS_BTS_BaseTestSuite_AssertArrayContainsAAs
+    AssertArrayNotContains: RBS_BTS_BaseTestSuite_AssertArrayNotContains
+    AssertArrayContainsSubset: RBS_BTS_BaseTestSuite_AssertArrayContainsSubset
+    AssertArrayNotContainsSubset: RBS_BTS_BaseTestSuite_AssertArrayNotContainsSubset
+    AssertArrayCount: RBS_BTS_BaseTestSuite_AssertArrayCount
+    AssertArrayNotCount: RBS_BTS_BaseTestSuite_AssertArrayNotCount
+    AssertEmpty: RBS_BTS_BaseTestSuite_AssertEmpty
+    AssertNotEmpty: RBS_BTS_BaseTestSuite_AssertNotEmpty
+    AssertArrayContainsOnlyValuesOfType: RBS_BTS_BaseTestSuite_AssertArrayContainsOnlyValuesOfType
+    GetIsTypeFunction: RBS_BTS_BaseTestSuite_GetIsTypeFunction
+    AssertType: RBS_BTS_BaseTestSuite_AssertType
+    AssertSubType: RBS_BTS_BaseTestSuite_AssertSubType
+    EqValues: RBS_BTS_BaseTestSuite_EqValues
+    EqAssocArray: RBS_BTS_BaseTestSuite_EqAssocArray
+    EqArray: RBS_BTS_BaseTestSuite_EqArray
+    AssertNodeCount: RBS_BTS_BaseTestSuite_AssertNodeCount
+    AssertNodeNotCount: RBS_BTS_BaseTestSuite_AssertNodeNotCount
+    AssertNodeEmpty: RBS_BTS_BaseTestSuite_AssertNodeEmpty
+    AssertNodeNotEmpty: RBS_BTS_BaseTestSuite_AssertNodeNotEmpty
+    AssertNodeContains: RBS_BTS_BaseTestSuite_AssertNodeContains
+    AssertNodeContainsOnly: RBS_BTS_BaseTestSuite_AssertNodeContainsOnly
+    AssertNodeNotContains: RBS_BTS_BaseTestSuite_AssertNodeNotContains
+    AssertNodeContainsFields: RBS_BTS_BaseTestSuite_AssertNodeContainsFields
+    AssertNodeNotContainsFields: RBS_BTS_BaseTestSuite_AssertNodeNotContainsFields
+    AssertAAContainsSubset: RBS_BTS_BaseTestSuite_AssertAAContainsSubset
+    Stub: RBS_BTS_BaseTestSuite_Stub
+    ExpectOnce: RBS_BTS_BaseTestSuite_ExpectOnce
+    ExpectOnceWLN: RBS_BTS_BaseTestSuite_ExpectOnceWLN
+    ExpectOnceOrNone: RBS_BTS_BaseTestSuite_ExpectOnceOrNone
+    ExpectOnceOrNoneWLN: RBS_BTS_BaseTestSuite_ExpectOnceOrNoneWLN
+    ExpectNone: RBS_BTS_BaseTestSuite_ExpectNone
+    ExpectNoneWLN: RBS_BTS_BaseTestSuite_ExpectNoneWLN
+    Expect: RBS_BTS_BaseTestSuite_Expect
+    ExpectWLN: RBS_BTS_BaseTestSuite_ExpectWLN
+    Mock: RBS_BTS_BaseTestSuite_Mock
+    CreateFake: RBS_BTS_BaseTestSuite_CreateFake
+    CombineFakes: RBS_BTS_BaseTestSuite_CombineFakes
+    AssertMocks: RBS_BTS_BaseTestSuite_AssertMocks
+    CleanMocks: RBS_BTS_BaseTestSuite_CleanMocks
+    CleanStubs: RBS_BTS_BaseTestSuite_CleanStubs
+    MockFail: RBS_BTS_BaseTestSuite_MockFail
+    StubCallback0: RBS_BTS_BaseTestSuite_StubCallback0
+    StubCallback1: RBS_BTS_BaseTestSuite_StubCallback1
+    StubCallback2: RBS_BTS_BaseTestSuite_StubCallback2
+    StubCallback3: RBS_BTS_BaseTestSuite_StubCallback3
+    StubCallback4: RBS_BTS_BaseTestSuite_StubCallback4
+    StubCallback5: RBS_BTS_BaseTestSuite_StubCallback5
+    MockCallback0: RBS_BTS_BaseTestSuite_MockCallback0
+    MockCallback1: RBS_BTS_BaseTestSuite_MockCallback1
+    MockCallback2: RBS_BTS_BaseTestSuite_MockCallback2
+    MockCallback3: RBS_BTS_BaseTestSuite_MockCallback3
+    MockCallback4: RBS_BTS_BaseTestSuite_MockCallback4
+    MockCallback5: RBS_BTS_BaseTestSuite_MockCallback5
+    MockCallback6: RBS_BTS_BaseTestSuite_MockCallback6
+    MockCallback7: RBS_BTS_BaseTestSuite_MockCallback7
+    MockCallback8: RBS_BTS_BaseTestSuite_MockCallback8
+    MockCallback9: RBS_BTS_BaseTestSuite_MockCallback9
+    MockCallback10: RBS_BTS_BaseTestSuite_MockCallback10
+    MockCallback11: RBS_BTS_BaseTestSuite_MockCallback11
+    MockCallback12: RBS_BTS_BaseTestSuite_MockCallback12
+    MockCallback13: RBS_BTS_BaseTestSuite_MockCallback13
+    MockCallback14: RBS_BTS_BaseTestSuite_MockCallback14
+    MockCallback15: RBS_BTS_BaseTestSuite_MockCallback15
+    MockCallback16: RBS_BTS_BaseTestSuite_MockCallback16
+    MockCallback17: RBS_BTS_BaseTestSuite_MockCallback17
+    MockCallback18: RBS_BTS_BaseTestSuite_MockCallback18
+    MockCallback19: RBS_BTS_BaseTestSuite_MockCallback19
+    MockCallback20: RBS_BTS_BaseTestSuite_MockCallback20
+    MockCallback21: RBS_BTS_BaseTestSuite_MockCallback21
+    MockCallback22: RBS_BTS_BaseTestSuite_MockCallback22
+    MockCallback23: RBS_BTS_BaseTestSuite_MockCallback23
+    MockCallback24: RBS_BTS_BaseTestSuite_MockCallback24
+    pathAsArray_: RBS_BTS_BaseTestSuite_pathAsArray_
+    g: RBS_BTS_BaseTestSuite_g
+    waitForField: RBS_BTS_BaseTestSuite_waitForField
+    AssertAsyncField: RBS_BTS_BaseTestSuite_AssertAsyncField
+    Name: "BaseTestSuite"
+    invalidValue: "#ROIBOS#INVALID_VALUE" ' special value used in mock arguments
+    ignoreValue: "#ROIBOS#IGNORE_VALUE" ' special value used in mock arguments
+    anyStringMatcher: { "matcher": rbs_match_anyStringMatcher }
+    anyBoolMatcher: { "matcher": rbs_match_anyBoolMatcher }
+    anyNumberMatcher: { "matcher": rbs_match_anyNumberMatcher }
+    anyAAMatcher: { "matcher": rbs_match_anyAAMatcher }
+    anyArrayMatcher: { "matcher": rbs_match_anyArrayMatcher }
+    anyNodeMatcher: { "matcher": rbs_match_anyNodeMatcher }
+    allowNonExistingMethodsOnMocks: true
+    isAutoAssertingMocks: true
+    TestCases: []
+    __BaseTestSuite: RBS_BTS_BaseTestSuite_new_
+  }
+  instance.append(BaseTestSuite_instance)
+  return instance
+End Function
+Function BaseTestSuite()
+  instance = __BaseTestSuite_builder()
+  instance.__BaseTestSuite()
+  return instance
+End Function
+Function RBS_BTS_BaseTestSuite_new_()
+End Function
+Function RBS_CMN_IsXmlElement(value) as Boolean
+  return rbs_cmn_IsValid(value) AND GetInterface(value, "ifXMLElement") <> invalid
+End Function
+Function RBS_CMN_IsFunction(value) as Boolean
+  return rbs_cmn_IsValid(value) AND GetInterface(value, "ifFunction") <> invalid
+End Function
+Function RBS_CMN_GetFunction(filename, functionName) as Object
+  if (not rbs_cmn_IsNotEmptyString(functionName)) then return invalid
+  if (not rbs_cmn_IsNotEmptyString(filename)) then return invalid
   mapFunction = RBSFM_getFunctionsForFile(filename)
   if mapFunction <> invalid
     map = mapFunction()
@@ -1420,9 +1420,9 @@ function RBS_CMN_GetFunction(filename, functionName) as object
     end if
   end if
   return invalid
-end function
-function RBS_CMN_GetFunctionBruteForce(functionName) as object
-  if (not  rbs_cmn_IsNotEmptyString(functionName)) then return invalid
+End Function
+Function RBS_CMN_GetFunctionBruteForce(functionName) as Object
+  if (not rbs_cmn_IsNotEmptyString(functionName)) then return invalid
   filenames = RBSFM_getFilenames()
   for i = 0 to filenames.count() - 1
     filename = filenames[i]
@@ -1438,67 +1438,67 @@ function RBS_CMN_GetFunctionBruteForce(functionName) as object
     end if
   end for
   return invalid
-end function
-function RBS_CMN_IsBoolean(value) as boolean
-  return  rbs_cmn_IsValid(value) and GetInterface(value, "ifBoolean") <> invalid
-end function
-function RBS_CMN_IsInteger(value) as boolean
-  return  rbs_cmn_IsValid(value) and GetInterface(value, "ifInt") <> invalid and (Type(value) = "roInt" or Type(value) = "roInteger" or Type(value) = "Integer")
-end function
-function RBS_CMN_IsFloat(value) as boolean
-  return  rbs_cmn_IsValid(value) and GetInterface(value, "ifFloat") <> invalid
-end function
-function RBS_CMN_IsDouble(value) as boolean
-  return  rbs_cmn_IsValid(value) and GetInterface(value, "ifDouble") <> invalid
-end function
-function RBS_CMN_IsLongInteger(value) as boolean
-  return  rbs_cmn_IsValid(value) and GetInterface(value, "ifLongInt") <> invalid
-end function
-function RBS_CMN_IsNumber(value) as boolean
-  return  rbs_cmn_IsLongInteger(value) or  rbs_cmn_IsDouble(value) or  rbs_cmn_IsInteger(value) or  rbs_cmn_IsFloat(value)
-end function
-function RBS_CMN_IsList(value) as boolean
-  return  rbs_cmn_IsValid(value) and GetInterface(value, "ifList") <> invalid
-end function
-function RBS_CMN_IsArray(value) as boolean
-  return  rbs_cmn_IsValid(value) and GetInterface(value, "ifArray") <> invalid
-end function
-function RBS_CMN_IsAssociativeArray(value) as boolean
-  return  rbs_cmn_IsValid(value) and GetInterface(value, "ifAssociativeArray") <> invalid
-end function
-function RBS_CMN_IsSGNode(value) as boolean
-  return  rbs_cmn_IsValid(value) and GetInterface(value, "ifSGNodeChildren") <> invalid
-end function
-function RBS_CMN_IsString(value) as boolean
-  return  rbs_cmn_IsValid(value) and GetInterface(value, "ifString") <> invalid
-end function
-function RBS_CMN_IsNotEmptyString(value) as boolean
-  return  rbs_cmn_IsString(value) and len(value) > 0
-end function
-function RBS_CMN_IsDateTime(value) as boolean
-  return  rbs_cmn_IsValid(value) and (GetInterface(value, "ifDateTime") <> invalid or Type(value) = "roDateTime")
-end function
-function RBS_CMN_IsValid(value) as boolean
-  return not  rbs_cmn_IsUndefined(value) and value <> invalid
-end function
-function RBS_CMN_IsUndefined(value) as boolean
-  return type(value) = "" or Type(value) = "<uninitialized>"
-end function
-function RBS_CMN_ValidStr(obj) as string
-  if obj <> invalid and GetInterface(obj, "ifString") <> invalid
+End Function
+Function RBS_CMN_IsBoolean(value) as Boolean
+  return rbs_cmn_IsValid(value) AND GetInterface(value, "ifBoolean") <> invalid
+End Function
+Function RBS_CMN_IsInteger(value) as Boolean
+  return rbs_cmn_IsValid(value) AND GetInterface(value, "ifInt") <> invalid AND (Type(value) = "roInt" OR Type(value) = "roInteger" OR Type(value) = "Integer")
+End Function
+Function RBS_CMN_IsFloat(value) as Boolean
+  return rbs_cmn_IsValid(value) AND GetInterface(value, "ifFloat") <> invalid
+End Function
+Function RBS_CMN_IsDouble(value) as Boolean
+  return rbs_cmn_IsValid(value) AND GetInterface(value, "ifDouble") <> invalid
+End Function
+Function RBS_CMN_IsLongInteger(value) as Boolean
+  return rbs_cmn_IsValid(value) AND GetInterface(value, "ifLongInt") <> invalid
+End Function
+Function RBS_CMN_IsNumber(value) as Boolean
+  return rbs_cmn_IsLongInteger(value) OR rbs_cmn_IsDouble(value) OR rbs_cmn_IsInteger(value) OR rbs_cmn_IsFloat(value)
+End Function
+Function RBS_CMN_IsList(value) as Boolean
+  return rbs_cmn_IsValid(value) AND GetInterface(value, "ifList") <> invalid
+End Function
+Function RBS_CMN_IsArray(value) as Boolean
+  return rbs_cmn_IsValid(value) AND GetInterface(value, "ifArray") <> invalid
+End Function
+Function RBS_CMN_IsAssociativeArray(value) as Boolean
+  return rbs_cmn_IsValid(value) AND GetInterface(value, "ifAssociativeArray") <> invalid
+End Function
+Function RBS_CMN_IsSGNode(value) as Boolean
+  return rbs_cmn_IsValid(value) AND GetInterface(value, "ifSGNodeChildren") <> invalid
+End Function
+Function RBS_CMN_IsString(value) as Boolean
+  return rbs_cmn_IsValid(value) AND GetInterface(value, "ifString") <> invalid
+End Function
+Function RBS_CMN_IsNotEmptyString(value) as Boolean
+  return rbs_cmn_IsString(value) AND len(value) > 0
+End Function
+Function RBS_CMN_IsDateTime(value) as Boolean
+  return rbs_cmn_IsValid(value) AND (GetInterface(value, "ifDateTime") <> invalid OR Type(value) = "roDateTime")
+End Function
+Function RBS_CMN_IsValid(value) as Boolean
+  return not rbs_cmn_IsUndefined(value) AND value <> invalid
+End Function
+Function RBS_CMN_IsUndefined(value) as Boolean
+  return type(value) = "" OR Type(value) = "<uninitialized>"
+End Function
+Function RBS_CMN_ValidStr(obj) as String
+  if obj <> invalid AND GetInterface(obj, "ifString") <> invalid
     return obj
   else
     return ""
   end if
-end function
-function RBS_CMN_AsString(input) as string
-  if  rbs_cmn_IsValid(input) = false
+End Function
+Function RBS_CMN_AsString(input) as String
+  if rbs_cmn_IsValid(input) = false
     return "Invalid"
-  else if  rbs_cmn_IsString(input)
+  else if rbs_cmn_IsString(input)
     return input
-  else if  rbs_cmn_IsInteger(input) or  rbs_cmn_IsLongInteger(input) or  rbs_cmn_IsBoolean(input)
+  else if rbs_cmn_IsInteger(input) OR rbs_cmn_IsLongInteger(input) OR rbs_cmn_IsBoolean(input)
     return input.ToStr()
-  else if  rbs_cmn_IsFloat(input) or  rbs_cmn_IsDouble(input)
+  else if rbs_cmn_IsFloat(input) OR rbs_cmn_IsDouble(input)
     return Str(input).Trim()
   else if type(input) = "roSGNode"
     return "Node(" + input.subType() + ")"
@@ -1510,8 +1510,8 @@ function RBS_CMN_AsString(input) as string
       isFirst = false
     end if
     for each key in input
-      if key <> "__mocks" and key <> "__stubs"
-        text += key + ":" +  rbs_cmn_AsString(input[key])
+      if key <> "__mocks" AND key <> "__stubs"
+        text += key + ":" + rbs_cmn_AsString(input[key])
       end if
     end for
     text += "}"
@@ -1521,118 +1521,118 @@ function RBS_CMN_AsString(input) as string
   else
     return ""
   end if
-end function
-function RBS_CMN_AsInteger(input) as integer
-  if  rbs_cmn_IsValid(input) = false
+End Function
+Function RBS_CMN_AsInteger(input) as Integer
+  if rbs_cmn_IsValid(input) = false
     return 0
-  else if  rbs_cmn_IsString(input)
+  else if rbs_cmn_IsString(input)
     return input.ToInt()
-  else if  rbs_cmn_IsInteger(input)
+  else if rbs_cmn_IsInteger(input)
     return input
-  else if  rbs_cmn_IsFloat(input) or  rbs_cmn_IsDouble(input) or  rbs_cmn_IsLongInteger(input)
+  else if rbs_cmn_IsFloat(input) OR rbs_cmn_IsDouble(input) OR rbs_cmn_IsLongInteger(input)
     return Int(input)
   else
     return 0
   end if
-end function
-function RBS_CMN_AsLongInteger(input) as longinteger
-  if  rbs_cmn_IsValid(input) = false
+End Function
+Function RBS_CMN_AsLongInteger(input) as Longinteger
+  if rbs_cmn_IsValid(input) = false
     return 0
-  else if  rbs_cmn_IsString(input)
-    return  rbs_cmn_AsInteger(input)
-  else if  rbs_cmn_IsLongInteger(input) or  rbs_cmn_IsFloat(input) or  rbs_cmn_IsDouble(input) or  rbs_cmn_IsInteger(input)
+  else if rbs_cmn_IsString(input)
+    return rbs_cmn_AsInteger(input)
+  else if rbs_cmn_IsLongInteger(input) OR rbs_cmn_IsFloat(input) OR rbs_cmn_IsDouble(input) OR rbs_cmn_IsInteger(input)
     return input
   else
     return 0
   end if
-end function
-function RBS_CMN_AsFloat(input) as float
-  if  rbs_cmn_IsValid(input) = false
+End Function
+Function RBS_CMN_AsFloat(input) as Float
+  if rbs_cmn_IsValid(input) = false
     return 0.0
-  else if  rbs_cmn_IsString(input)
+  else if rbs_cmn_IsString(input)
     return input.ToFloat()
-  else if  rbs_cmn_IsInteger(input)
+  else if rbs_cmn_IsInteger(input)
     return (input / 1)
-  else if  rbs_cmn_IsFloat(input) or  rbs_cmn_IsDouble(input) or  rbs_cmn_IsLongInteger(input)
+  else if rbs_cmn_IsFloat(input) OR rbs_cmn_IsDouble(input) OR rbs_cmn_IsLongInteger(input)
     return input
   else
     return 0.0
   end if
-end function
-function RBS_CMN_AsDouble(input) as double
-  if  rbs_cmn_IsValid(input) = false
+End Function
+Function RBS_CMN_AsDouble(input) as Double
+  if rbs_cmn_IsValid(input) = false
     return 0.0
-  else if  rbs_cmn_IsString(input)
-    return  rbs_cmn_AsFloat(input)
-  else if  rbs_cmn_IsInteger(input) or  rbs_cmn_IsLongInteger(input) or  rbs_cmn_IsFloat(input) or  rbs_cmn_IsDouble(input)
+  else if rbs_cmn_IsString(input)
+    return rbs_cmn_AsFloat(input)
+  else if rbs_cmn_IsInteger(input) OR rbs_cmn_IsLongInteger(input) OR rbs_cmn_IsFloat(input) OR rbs_cmn_IsDouble(input)
     return input
   else
     return 0.0
   end if
-end function
-function RBS_CMN_AsBoolean(input) as boolean
-  if  rbs_cmn_IsValid(input) = false
+End Function
+Function RBS_CMN_AsBoolean(input) as Boolean
+  if rbs_cmn_IsValid(input) = false
     return false
-  else if  rbs_cmn_IsString(input)
+  else if rbs_cmn_IsString(input)
     return LCase(input) = "true"
-  else if  rbs_cmn_IsInteger(input) or  rbs_cmn_IsFloat(input)
+  else if rbs_cmn_IsInteger(input) OR rbs_cmn_IsFloat(input)
     return input <> 0
-  else if  rbs_cmn_IsBoolean(input)
+  else if rbs_cmn_IsBoolean(input)
     return input
   else
     return false
   end if
-end function
-function RBS_CMN_AsArray(value) as object
-  if  rbs_cmn_IsValid(value)
-    if not  rbs_cmn_IsArray(value)
+End Function
+Function RBS_CMN_AsArray(value) as Object
+  if rbs_cmn_IsValid(value)
+    if not rbs_cmn_IsArray(value)
       return [value]
     else
       return value
     end if
   end if
   return []
-end function
-function RBS_CMN_IsNullOrEmpty(value) as boolean
-  if  rbs_cmn_IsString(value)
+End Function
+Function RBS_CMN_IsNullOrEmpty(value) as Boolean
+  if rbs_cmn_IsString(value)
     return Len(value) = 0
   else
-    return not  rbs_cmn_IsValid(value)
+    return not rbs_cmn_IsValid(value)
   end if
-end function
-function RBS_CMN_FindElementIndexInArray(array , value , compareAttribute = invalid , caseSensitive = false) as integer
-  if  rbs_cmn_IsArray(array)
-    for i = 0 to  rbs_cmn_AsArray(array).Count() - 1
+End Function
+Function RBS_CMN_FindElementIndexInArray(array, value, compareAttribute = invalid, caseSensitive = false) as Integer
+  if rbs_cmn_IsArray(array)
+    for i = 0 to rbs_cmn_AsArray(array).Count() - 1
       compareValue = array[i]
-      if compareAttribute <> invalid and  rbs_cmn_IsAssociativeArray(compareValue)
+      if compareAttribute <> invalid AND rbs_cmn_IsAssociativeArray(compareValue)
         compareValue = compareValue.LookupCI(compareAttribute)
       end if
-      if  rbs_bts_basetestsuite_EqValues(compareValue, value)
+      if rbs_bts_basetestsuite_EqValues(compareValue, value)
         return i
       end if
       item = array[i]
     next
   end if
   return -1
-end function
-function RBS_CMN_ArrayContains(array , value , compareAttribute = invalid) as boolean
+End Function
+Function RBS_CMN_ArrayContains(array, value, compareAttribute = invalid) as Boolean
   return (rbs_cmn_FindElementIndexInArray(array, value, compareAttribute) > -1)
-end function
-function RBS_CMN_FindElementIndexInNode(node , value) as integer
+End Function
+Function RBS_CMN_FindElementIndexInNode(node, value) as Integer
   if type(node) = "roSGNode"
     for i = 0 to node.getChildCount() - 1
       compareValue = node.getChild(i)
-      if type(compareValue) = "roSGNode" and compareValue.isSameNode(value)
+      if type(compareValue) = "roSGNode" AND compareValue.isSameNode(value)
         return i
       end if
     next
   end if
   return -1
-end function
-function RBS_CMN_NodeContains(node , value) as boolean
+End Function
+Function RBS_CMN_NodeContains(node, value) as Boolean
   return (rbs_cmn_FindElementIndexInNode(node, value) > -1)
-end function
-function RBS_Coverage_createLCovOutput()
+End Function
+Function RBS_Coverage_createLCovOutput()
   ? "Generating lcov.info file..."
   cc = m.global._rbs_ccn
   expectedMap = cc.expectedMap
@@ -1650,7 +1650,7 @@ function RBS_Coverage_createLCovOutput()
     for each expected in expectedMap[moduleNumber]
       lineNumber = expected[0]
       SHIFT = 1
-      if (resolvedMap[moduleNumber] <> invalid) and resolvedMap[moduleNumber].doesExist(str(lineNumber)) then
+      if (resolvedMap[moduleNumber] <> invalid) AND resolvedMap[moduleNumber].doesExist(str(lineNumber)) then
         buffer += "DA:" + str(lineNumber + SHIFT) + ",1" + chr(10)
       else
         buffer += "DA:" + str(lineNumber + SHIFT) + ",0" + chr(10)
@@ -1659,26 +1659,26 @@ function RBS_Coverage_createLCovOutput()
     buffer += "end_of_record" + chr(10)
   end for
   return buffer
-end function
-function RBS_Coverage_printLCovInfo()
+End Function
+Function RBS_Coverage_printLCovInfo()
   ?
   ? "+++++++++++++++++++++++++++++++++++++++++++"
   ? "LCOV.INFO FILE"
   ? "+++++++++++++++++++++++++++++++++++++++++++"
   ?
   ? "+-=-coverage:start"
-  ?  rbs_coverage_createLCovOutput()
+  ? rbs_coverage_createLCovOutput()
   ? "+-=-coverage:end"
-end function
-function RBS_ItG_GetTestCases(group) as object
+End Function
+Function RBS_ItG_GetTestCases(group) as Object
   if (group.hasSoloTests = true)
     return group.soloTestCases
   else
     return group.testCases
   end if
-end function
-function RBS_ItG_GetRunnableTestSuite(group) as object
-  testCases =  rbs_itg_GetTestCases(group)
+End Function
+Function RBS_ItG_GetRunnableTestSuite(group) as Object
+  testCases = rbs_itg_GetTestCases(group)
   runnableSuite = BaseTestSuite()
   runnableSuite.name = group.name
   runnableSuite.isLegacy = group.isLegacy = true
@@ -1690,31 +1690,31 @@ function RBS_ItG_GetRunnableTestSuite(group) as object
     if (testCase.isSolo = true)
       name += " [SOLO] "
     end if
-    testFunction =  rbs_cmn_GetFunction(group.filename, testCase.funcName)
+    testFunction = rbs_cmn_GetFunction(group.filename, testCase.funcName)
     runnableSuite.addTest(name, testFunction, testCase.funcName)
     group.testCaseLookup[name] = testCase
   end for
-  runnableSuite.SetUp =  rbs_cmn_GetFunction(group.filename, group.setupFunctionName)
-  runnableSuite.TearDown =  rbs_cmn_GetFunction(group.filename, group.teardownFunctionName)
-  runnableSuite.BeforeEach =  rbs_cmn_GetFunction(group.filename, group.beforeEachFunctionName)
-  runnableSuite.AfterEach =  rbs_cmn_GetFunction(group.filename, group.afterEachFunctionName)
+  runnableSuite.SetUp = rbs_cmn_GetFunction(group.filename, group.setupFunctionName)
+  runnableSuite.TearDown = rbs_cmn_GetFunction(group.filename, group.teardownFunctionName)
+  runnableSuite.BeforeEach = rbs_cmn_GetFunction(group.filename, group.beforeEachFunctionName)
+  runnableSuite.AfterEach = rbs_cmn_GetFunction(group.filename, group.afterEachFunctionName)
   return runnableSuite
-end function
- function RBS_IG_ItemGenerator_new()
-  m.isValid =  rbs_cmn_IsValid(scheme)
-end function
- function RBS_IG_ItemGenerator_GetItem(scheme as object) as object
+End Function
+Function RBS_IG_ItemGenerator_new()
+  m.isValid = rbs_cmn_IsValid(scheme)
+End Function
+Function RBS_IG_ItemGenerator_GetItem(scheme as Object) as Object
   item = invalid
-  if  rbs_cmn_IsAssociativeArray(scheme)
+  if rbs_cmn_IsAssociativeArray(scheme)
     item = m.getAssocArray(scheme)
-  else if  rbs_cmn_IsArray(scheme)
+  else if rbs_cmn_IsArray(scheme)
     item = m.getArray(scheme)
-  else if  rbs_cmn_IsString(scheme)
+  else if rbs_cmn_IsString(scheme)
     item = m.getSimpleType(lCase(scheme))
   end if
   return item
-end function
- function RBS_IG_ItemGenerator_GetAssocArray(scheme as object) as object
+End Function
+Function RBS_IG_ItemGenerator_GetAssocArray(scheme as Object) as Object
   item = {}
   for each key in scheme
     if not item.DoesExist(key)
@@ -1722,111 +1722,111 @@ end function
     end if
   end for
   return item
-end function
- function RBS_IG_ItemGenerator_GetArray(scheme as object) as object
+End Function
+Function RBS_IG_ItemGenerator_GetArray(scheme as Object) as Object
   item = []
   for each key in scheme
     item.Push(m.getItem(key))
   end for
   return item
-end function
- function RBS_IG_ItemGenerator_GetSimpleType(typeStr as string) as object
+End Function
+Function RBS_IG_ItemGenerator_GetSimpleType(typeStr as String) as Object
   item = invalid
-  if typeStr = "integer" or typeStr = "int" or typeStr = "roint"
+  if typeStr = "integer" OR typeStr = "int" OR typeStr = "roint"
     item = m.getInteger()
-  else if typeStr = "float" or typeStr = "rofloat"
+  else if typeStr = "float" OR typeStr = "rofloat"
     item = m.getFloat()
-  else if typeStr = "string" or typeStr = "rostring"
+  else if typeStr = "string" OR typeStr = "rostring"
     item = m.getString(10)
-  else if typeStr = "boolean" or typeStr = "roboolean"
+  else if typeStr = "boolean" OR typeStr = "roboolean"
     item = m.getBoolean()
   end if
   return item
-end function
- function RBS_IG_ItemGenerator_GetBoolean() as boolean
-  return  rbs_cmn_AsBoolean(Rnd(2) \ Rnd(2))
-end function
- function RBS_IG_ItemGenerator_GetInteger(seed = 100 as integer) as integer
+End Function
+Function RBS_IG_ItemGenerator_GetBoolean() as Boolean
+  return rbs_cmn_AsBoolean(Rnd(2) \ Rnd(2))
+End Function
+Function RBS_IG_ItemGenerator_GetInteger(seed = 100 as Integer) as Integer
   return Rnd(seed)
-end function
- function RBS_IG_ItemGenerator_GetFloat() as float
+End Function
+Function RBS_IG_ItemGenerator_GetFloat() as Float
   return Rnd(0)
-end function
- function RBS_IG_ItemGenerator_GetString(seed as integer) as string
+End Function
+Function RBS_IG_ItemGenerator_GetString(seed as Integer) as String
   item = ""
   if seed > 0
     stringLength = Rnd(seed)
     for i = 0 to stringLength
       chType = Rnd(3)
-      if chType = 1     'Chr(48-57) - numbers
+      if chType = 1 'Chr(48-57) - numbers
         chNumber = 47 + Rnd(10)
-      else if chType = 2  'Chr(65-90) - Uppercase Letters
+      else if chType = 2 'Chr(65-90) - Uppercase Letters
         chNumber = 64 + Rnd(26)
-      else        'Chr(97-122) - Lowercase Letters
+      else 'Chr(97-122) - Lowercase Letters
         chNumber = 96 + Rnd(26)
       end if
       item = item + Chr(chNumber)
     end for
   end if
   return item
-end function
-      function __ItemGenerator_builder()
-      instance = {}
-      ItemGenerator_instance = {
-        __className: "ItemGenerator"
-        GetItem: RBS_IG_ItemGenerator_GetItem
-        GetAssocArray: RBS_IG_ItemGenerator_GetAssocArray
-        GetArray: RBS_IG_ItemGenerator_GetArray
-        GetSimpleType: RBS_IG_ItemGenerator_GetSimpleType
-        GetBoolean: RBS_IG_ItemGenerator_GetBoolean
-        GetInteger: RBS_IG_ItemGenerator_GetInteger
-        GetFloat: RBS_IG_ItemGenerator_GetFloat
-        GetString: RBS_IG_ItemGenerator_GetString
-         __ItemGenerator: RBS_IG_ItemGenerator_new
-      }
-      instance.append(ItemGenerator_instance)
-      return instance
-      end function
-      function ItemGenerator()
-        instance = __ItemGenerator_builder()
-        instance.__ItemGenerator()
-        return instance
-      end function
-function RBS_MATCH_anyStringMatcher(value)
-  return  rbs_cmn_isString(value)
-end function
-function RBS_MATCH_anyBoolMatcher(value)
-  return  rbs_cmn_isBoolean(value)
-end function
-function RBS_MATCH_anyNumberMatcher(value)
-  return  rbs_cmn_isNumber(value)
-end function
-function RBS_MATCH_anyAAMatcher(value)
-  return  rbs_cmn_isAssociativeArray(value)
-end function
-function RBS_MATCH_anyArrayMatcher(value)
-  return  rbs_cmn_isArray(value)
-end function
-function RBS_MATCH_anyNodeMatcher(value)
-  return  rbs_cmn_isSGNode(value)
-end function
-function Rooibos_RunNodeTests(args) as object
+End Function
+Function __ItemGenerator_builder()
+  instance = {}
+  ItemGenerator_instance = {
+    __className: "ItemGenerator"
+    GetItem: RBS_IG_ItemGenerator_GetItem
+    GetAssocArray: RBS_IG_ItemGenerator_GetAssocArray
+    GetArray: RBS_IG_ItemGenerator_GetArray
+    GetSimpleType: RBS_IG_ItemGenerator_GetSimpleType
+    GetBoolean: RBS_IG_ItemGenerator_GetBoolean
+    GetInteger: RBS_IG_ItemGenerator_GetInteger
+    GetFloat: RBS_IG_ItemGenerator_GetFloat
+    GetString: RBS_IG_ItemGenerator_GetString
+    __ItemGenerator: RBS_IG_ItemGenerator_new
+  }
+  instance.append(ItemGenerator_instance)
+  return instance
+End Function
+Function ItemGenerator()
+  instance = __ItemGenerator_builder()
+  instance.__ItemGenerator()
+  return instance
+End Function
+Function RBS_MATCH_anyStringMatcher(value)
+  return rbs_cmn_isString(value)
+End Function
+Function RBS_MATCH_anyBoolMatcher(value)
+  return rbs_cmn_isBoolean(value)
+End Function
+Function RBS_MATCH_anyNumberMatcher(value)
+  return rbs_cmn_isNumber(value)
+End Function
+Function RBS_MATCH_anyAAMatcher(value)
+  return rbs_cmn_isAssociativeArray(value)
+End Function
+Function RBS_MATCH_anyArrayMatcher(value)
+  return rbs_cmn_isArray(value)
+End Function
+Function RBS_MATCH_anyNodeMatcher(value)
+  return rbs_cmn_isSGNode(value)
+End Function
+Function Rooibos_RunNodeTests(args) as Object
   ? " RUNNING NODE TESTS"
-  totalStatObj =  rbs_stats_CreateTotalStatistic()
+  totalStatObj = rbs_stats_CreateTotalStatistic()
   rooibos_testrunner_RunItGroups(args.metaTestSuite, totalStatObj, args.testUtilsDecoratorMethodName, args.config, args.runtimeConfig, m)
   return totalStatObj
-end function
-function Rooibos_CreateTestNode(nodeType) as object
+End Function
+Function Rooibos_CreateTestNode(nodeType) as Object
   node = createObject("roSGNode", nodeType)
-  if (type(node) = "roSGNode" and node.subType() = nodeType)
+  if (type(node) = "roSGNode" AND node.subType() = nodeType)
     m.top.AppendChild(node)
     return node
   else
     ? " Error creating test node of type " ; nodeType
     return invalid
   end if
-end function
-function Rooibos__Init(preTestSetup = invalid, testUtilsDecoratorMethodName = invalid, testSceneName = invalid, nodeContext = invalid) as void
+End Function
+Function Rooibos__Init(preTestSetup = invalid, testUtilsDecoratorMethodName = invalid, testSceneName = invalid, nodeContext = invalid) as Void
   args = {}
   if createObject("roAPPInfo").IsDev() <> true then
     ? " not running in dev mode! - rooibos tests only support sideloaded builds - aborting"
@@ -1859,10 +1859,10 @@ function Rooibos__Init(preTestSetup = invalid, testUtilsDecoratorMethodName = in
   args.global = m.global
   rooibosVersion = "3.6.1"
   requiredRooibosPreprocessorVersion = "1.0.0"
-  if not  rbs_cmn_isFunction(RBSFM_getPreprocessorVersion)
+  if not rbs_cmn_isFunction(RBSFM_getPreprocessorVersion)
     versionError = "You are using a rooibos-preprocessor (i.e. rooibos-cli) version older than 1.0.0 - please update to " + requiredRooibosPreprocessorVersion
   else
-    if  rooibos__versionCompare(RBSFM_getPreprocessorVersion(), requiredRooibosPreprocessorVersion) >= 0
+    if rooibos__versionCompare(RBSFM_getPreprocessorVersion(), requiredRooibosPreprocessorVersion) >= 0
       versionError = ""
     else
       versionError = "Your rooibos-preprocessor (i.e. rooibos-cli) version '" + RBSFM_getPreprocessorVersion() + "' is not compatible with rooibos version " + rooibosVersion + ". Please upgrade your rooibos-cli to version " + requiredRooibosPreprocessorVersion
@@ -1875,27 +1875,27 @@ function Rooibos__Init(preTestSetup = invalid, testUtilsDecoratorMethodName = in
     ? "# tests parsed with rooibosC version: " ; RBSFM_getPreprocessorVersion()
     ? "######################################################"
     ? ""
-    if scene.hasField("isReadyToStartTests") and scene.isReadyToStartTests = false
+    if scene.hasField("isReadyToStartTests") AND scene.isReadyToStartTests = false
       ? "The scene is not ready yet - waiting for it to set isReadyToStartTests to true"
       scene.observeField("isReadyToStartTests", m.port)
-    while(true)
-      msg = wait(0, m.port)
-      msgType = type(msg)
-      if msgType = "roSGScreenEvent"
-        if msg.isScreenClosed()
-          return
+      while(true)
+        msg = wait(0, m.port)
+        msgType = type(msg)
+        if msgType = "roSGScreenEvent"
+          if msg.isScreenClosed()
+            return
+          end if
+        else if msgType = "roSGNodeEvent"
+          if msg.getField() = "isReadyToStartTests" AND msg.getData() = true
+            ? "scene is ready; running tests now"
+            runner = TestRunner(args)
+            runner.Run()
+          end if
         end if
-      else if msgType = "roSGNodeEvent"
-        if msg.getField() = "isReadyToStartTests" and msg.getData() = true
-          ? "scene is ready; running tests now"
-          runner =     TestRunner(args)
-          runner.Run()
-        end if
-      end if
-    end while
-  else
+      end while
+    else
       ? "scene is ready; running tests now"
-      runner =     TestRunner(args)
+      runner = TestRunner(args)
       runner.Run()
     end if
   else
@@ -1905,8 +1905,8 @@ function Rooibos__Init(preTestSetup = invalid, testUtilsDecoratorMethodName = in
     ? versionError
     ? "#########################################################"
   end if
-end function
-function Rooibos__versionCompare(v1, v2)
+End Function
+Function Rooibos__versionCompare(v1, v2)
   v1parts = v1.split(".")
   v2parts = v2.split(".")
   while v1parts.count() < v2parts.count()
@@ -1931,11 +1931,11 @@ function Rooibos__versionCompare(v1, v2)
     return -1
   end if
   return 0
-end function
- function RBS_UTRC_UnitTestRuntimeConfig_new()
+End Function
+Function RBS_UTRC_UnitTestRuntimeConfig_new()
   m.suites = m.CreateSuites()
-end function
- function RBS_UTRC_UnitTestRuntimeConfig_CreateSuites()
+End Function
+Function RBS_UTRC_UnitTestRuntimeConfig_CreateSuites()
   suites = RBSFM_getTestSuitesForProject()
   includedSuites = []
   for i = 0 to suites.count() - 1
@@ -1956,39 +1956,39 @@ end function
     end if
   end for
   return includedSuites
-end function
-      function __UnitTestRuntimeConfig_builder()
-      instance = {}
-      UnitTestRuntimeConfig_instance = {
-        __className: "UnitTestRuntimeConfig"
-        CreateSuites: RBS_UTRC_UnitTestRuntimeConfig_CreateSuites
-        hasSoloSuites: false
-        hasSoloGroups: false
-        hasSoloTests: false
-         __UnitTestRuntimeConfig: RBS_UTRC_UnitTestRuntimeConfig_new
-      }
-      instance.append(UnitTestRuntimeConfig_instance)
-      return instance
-      end function
-      function UnitTestRuntimeConfig()
-        instance = __UnitTestRuntimeConfig_builder()
-        instance.__UnitTestRuntimeConfig()
-        return instance
-      end function
-function RBS_STATS_CreateTotalStatistic() as object
+End Function
+Function __UnitTestRuntimeConfig_builder()
+  instance = {}
+  UnitTestRuntimeConfig_instance = {
+    __className: "UnitTestRuntimeConfig"
+    CreateSuites: RBS_UTRC_UnitTestRuntimeConfig_CreateSuites
+    hasSoloSuites: false
+    hasSoloGroups: false
+    hasSoloTests: false
+    __UnitTestRuntimeConfig: RBS_UTRC_UnitTestRuntimeConfig_new
+  }
+  instance.append(UnitTestRuntimeConfig_instance)
+  return instance
+End Function
+Function UnitTestRuntimeConfig()
+  instance = __UnitTestRuntimeConfig_builder()
+  instance.__UnitTestRuntimeConfig()
+  return instance
+End Function
+Function RBS_STATS_CreateTotalStatistic() as Object
   statTotalItem = {
-    Suites    : []
-    Time    : 0
-    Total     : 0
-    Correct   : 0
-    Fail    : 0
-    Ignored   : 0
-    Crash     : 0
+    Suites: []
+    Time: 0
+    Total: 0
+    Correct: 0
+    Fail: 0
+    Ignored: 0
+    Crash: 0
     IgnoredTestNames: []
   }
   return statTotalItem
-end function
-function RBS_STATS_MergeTotalStatistic(stat1, stat2) as void
+End Function
+Function RBS_STATS_MergeTotalStatistic(stat1, stat2) as Void
   for each suite in stat2.Suites
     stat1.Suites.push(suite)
   end for
@@ -1999,37 +1999,37 @@ function RBS_STATS_MergeTotalStatistic(stat1, stat2) as void
   stat1.Crash += stat2.Crash
   stat1.Ignored += stat2.Ignored
   stat1.IgnoredTestNames.append(stat2.IgnoredTestNames)
-end function
-function RBS_STATS_CreateSuiteStatistic(name as string) as object
+End Function
+Function RBS_STATS_CreateSuiteStatistic(name as String) as Object
   statSuiteItem = {
-    Name  : name
-    Tests   : []
-    Time  : 0
-    Total   : 0
-    Correct : 0
-    Fail  : 0
-    Crash   : 0
-    Ignored   : 0
-    IgnoredTestNames:[]
+    Name: name
+    Tests: []
+    Time: 0
+    Total: 0
+    Correct: 0
+    Fail: 0
+    Crash: 0
+    Ignored: 0
+    IgnoredTestNames: []
   }
   return statSuiteItem
-end function
-function RBS_STATS_CreateTestStatistic(name as string, result = "Success" as string, time = 0 as integer, errorCode = 0 as integer, errorMessage = "" as string) as object
+End Function
+Function RBS_STATS_CreateTestStatistic(name as String, result = "Success" as String, time = 0 as Integer, errorCode = 0 as Integer, errorMessage = "" as String) as Object
   statTestItem = {
-    Name  : name
-    Result  : result
-    Time  : time
-    Error   : {
-      Code  : errorCode
-      Message : errorMessage
+    Name: name
+    Result: result
+    Time: time
+    Error: {
+      Code: errorCode
+      Message: errorMessage
     }
   }
   return statTestItem
-end function
-sub RBS_STATS_AppendTestStatistic(statSuiteObj as object, statTestObj as object)
-  if  rbs_cmn_IsAssociativeArray(statSuiteObj) and  rbs_cmn_IsAssociativeArray(statTestObj)
+End Function
+sub RBS_STATS_AppendTestStatistic(statSuiteObj as Object, statTestObj as Object)
+  if rbs_cmn_IsAssociativeArray(statSuiteObj) AND rbs_cmn_IsAssociativeArray(statTestObj)
     statSuiteObj.Tests.Push(statTestObj)
-    if  rbs_cmn_IsInteger(statTestObj.time)
+    if rbs_cmn_IsInteger(statTestObj.time)
       statSuiteObj.Time = statSuiteObj.Time + statTestObj.Time
     end if
     statSuiteObj.Total = statSuiteObj.Total + 1
@@ -2042,25 +2042,25 @@ sub RBS_STATS_AppendTestStatistic(statSuiteObj as object, statTestObj as object)
     end if
   end if
 end sub
-sub RBS_STATS_AppendSuiteStatistic(statTotalObj as object, statSuiteObj as object)
-  if  rbs_cmn_IsAssociativeArray(statTotalObj) and  rbs_cmn_IsAssociativeArray(statSuiteObj)
+sub RBS_STATS_AppendSuiteStatistic(statTotalObj as Object, statSuiteObj as Object)
+  if rbs_cmn_IsAssociativeArray(statTotalObj) AND rbs_cmn_IsAssociativeArray(statSuiteObj)
     statTotalObj.Suites.Push(statSuiteObj)
     statTotalObj.Time = statTotalObj.Time + statSuiteObj.Time
-    if  rbs_cmn_IsInteger(statSuiteObj.Total)
+    if rbs_cmn_IsInteger(statSuiteObj.Total)
       statTotalObj.Total = statTotalObj.Total + statSuiteObj.Total
     end if
-    if  rbs_cmn_IsInteger(statSuiteObj.Correct)
+    if rbs_cmn_IsInteger(statSuiteObj.Correct)
       statTotalObj.Correct = statTotalObj.Correct + statSuiteObj.Correct
     end if
-    if  rbs_cmn_IsInteger(statSuiteObj.Fail)
+    if rbs_cmn_IsInteger(statSuiteObj.Fail)
       statTotalObj.Fail = statTotalObj.Fail + statSuiteObj.Fail
     end if
-    if  rbs_cmn_IsInteger(statSuiteObj.Crash)
+    if rbs_cmn_IsInteger(statSuiteObj.Crash)
       statTotalObj.Crash = statTotalObj.Crash + statSuiteObj.Crash
     end if
   end if
 end sub
- function RBS_TC_UnitTestCase_new(name as string, func as dynamic, funcName as string, isSolo as boolean, isIgnored as boolean, lineNumber as integer, params = invalid, paramTestIndex = 0, paramLineNumber = 0)
+Function RBS_TC_UnitTestCase_new(name as String, func as Dynamic, funcName as String, isSolo as Boolean, isIgnored as Boolean, lineNumber as Integer, params = invalid, paramTestIndex = 0, paramLineNumber = 0)
   m.isSolo = isSolo
   m.func = func
   m.funcName = funcName
@@ -2074,58 +2074,58 @@ end sub
     m.name += stri(m.paramTestIndex)
   end if
   return this
-end function
- function RBS_TC_UnitTestCase_GetAssertLine(testCase, index)
+End Function
+Function RBS_TC_UnitTestCase_GetAssertLine(testCase, index)
   if (testCase.assertLineNumberMap.doesExist(stri(index).trim()))
     return testCase.assertLineNumberMap[stri(index).trim()]
   else if (testCase.assertLineNumberMap.doesExist(stri(index + 1000).trim()))
     return testCase.assertLineNumberMap[stri(index + 1000).trim()]
     return testCase.lineNumber
   end if
-end function
-      function __UnitTestCase_builder()
-      instance = {}
-      UnitTestCase_instance = {
-        __className: "UnitTestCase"
-        GetAssertLine: RBS_TC_UnitTestCase_GetAssertLine
-        isSolo: invalid
-        func: invalid
-        funcName: invalid
-        isIgnored: invalid
-        name: invalid
-        lineNumber: invalid
-        paramLineNumber: invalid
-        assertIndex: 0
-        assertLineNumberMap: {}
-        getTestLineIndex: 0
-        rawParams: invalid
-        paramTestIndex: invalid
-        isParamTest: false
-        time: 0
-         __UnitTestCase: RBS_TC_UnitTestCase_new
-      }
-      instance.append(UnitTestCase_instance)
-      return instance
-      end function
-      function UnitTestCase(name as string, func as dynamic, funcName as string, isSolo as boolean, isIgnored as boolean, lineNumber as integer, params = invalid, paramTestIndex = 0, paramLineNumber = 0)
-        instance = __UnitTestCase_builder()
-        instance.__UnitTestCase(name, func, funcName, isSolo, isIgnored, lineNumber, params, paramTestIndex, paramLineNumber)
-        return instance
-      end function
- function RBS_LOGGER_Logger_new(config)
+End Function
+Function __UnitTestCase_builder()
+  instance = {}
+  UnitTestCase_instance = {
+    __className: "UnitTestCase"
+    GetAssertLine: RBS_TC_UnitTestCase_GetAssertLine
+    isSolo: invalid
+    func: invalid
+    funcName: invalid
+    isIgnored: invalid
+    name: invalid
+    lineNumber: invalid
+    paramLineNumber: invalid
+    assertIndex: 0
+    assertLineNumberMap: {}
+    getTestLineIndex: 0
+    rawParams: invalid
+    paramTestIndex: invalid
+    isParamTest: false
+    time: 0
+    __UnitTestCase: RBS_TC_UnitTestCase_new
+  }
+  instance.append(UnitTestCase_instance)
+  return instance
+End Function
+Function UnitTestCase(name as String, func as Dynamic, funcName as String, isSolo as Boolean, isIgnored as Boolean, lineNumber as Integer, params = invalid, paramTestIndex = 0, paramLineNumber = 0)
+  instance = __UnitTestCase_builder()
+  instance.__UnitTestCase(name, func, funcName, isSolo, isIgnored, lineNumber, params, paramTestIndex, paramLineNumber)
+  return instance
+End Function
+Function RBS_LOGGER_Logger_new(config)
   m.config = config
   m.verbosityLevel = {
-    basic : 0
-    normal : 1
-    verbose : 2
+    basic: 0
+    normal: 1
+    verbose: 2
   }
   m.verbosity = m.config.logLevel
-end function
- sub RBS_LOGGER_Logger_PrintStatistic(statObj as object)
+End Function
+sub RBS_LOGGER_Logger_PrintStatistic(statObj as Object)
   m.PrintStart()
   previousfile = invalid
   for each testSuite in statObj.Suites
-    if (not statObj.testRunHasFailures or ((not m.config.showOnlyFailures) or testSuite.fail > 0 or testSuite.crash > 0))
+    if (not statObj.testRunHasFailures OR ((not m.config.showOnlyFailures) OR testSuite.fail > 0 OR testSuite.crash > 0))
       if (testSuite.metaTestSuite.filePath <> previousfile)
         m.PrintMetaSuiteStart(testSuite.metaTestSuite)
         previousfile = testSuite.metaTestSuite.filePath
@@ -2136,7 +2136,7 @@ end function
   ? ""
   m.PrintEnd()
   ignoredInfo = RBSFM_getIgnoredTestInfo()
-  ? "Total  = ";  rbs_cmn_AsString(statObj.Total); " ; Passed  = "; statObj.Correct; " ; Failed   = "; statObj.Fail; " ; Ignored   = "; ignoredInfo.count
+  ? "Total  = "; rbs_cmn_AsString(statObj.Total); " ; Passed  = "; statObj.Correct; " ; Failed   = "; statObj.Fail; " ; Ignored   = "; ignoredInfo.count
   ? " Time spent: "; statObj.Time; "ms"
   ? ""
   ? ""
@@ -2159,16 +2159,16 @@ end function
   end if
   ? "RESULT: "; overrallResult
 end sub
- sub RBS_LOGGER_Logger_PrintSuiteStatistic(statSuiteObj as object, hasFailures)
+sub RBS_LOGGER_Logger_PrintSuiteStatistic(statSuiteObj as Object, hasFailures)
   m.PrintSuiteStart(statSuiteObj.Name)
   for each testCase in statSuiteObj.Tests
-    if (not hasFailures or ((not m.config.showOnlyFailures) or testCase.Result <> "Success"))
+    if (not hasFailures OR ((not m.config.showOnlyFailures) OR testCase.Result <> "Success"))
       m.PrintTestStatistic(testCase)
     end if
   end for
   ? " |"
 end sub
- sub RBS_LOGGER_Logger_PrintTestStatistic(testCase as object)
+sub RBS_LOGGER_Logger_PrintTestStatistic(testCase as Object)
   metaTestCase = testCase.metaTestCase
   if (LCase(testCase.Result) <> "success")
     testChar = "-"
@@ -2195,7 +2195,7 @@ end sub
     ? messageLine ; testCase.Result ; timeText
   else if (metaTestcase.paramTestIndex = 0)
     name = metaTestCase.Name
-    if (len(name) > 1 and right(name, 1) = "0")
+    if (len(name) > 1 AND right(name, 1) = "0")
       name = left(name, len(name) - 1)
     end if
     ? " " + testChar + " |--" + name + " : "
@@ -2205,7 +2205,7 @@ end sub
     if type(metaTestCase.rawParams) = "roAssociativeArray"
       rawParams = {}
       for each key in metaTestCase.rawParams
-        if type(metaTestCase.rawParams[key]) <> "Function" and type(metaTestCase.rawParams[key]) <> "roFunction"
+        if type(metaTestCase.rawParams[key]) <> "Function" AND type(metaTestCase.rawParams[key]) <> "roFunction"
           rawParams[key] = metaTestCase.rawParams[key]
         end if
       end for
@@ -2223,7 +2223,7 @@ end sub
     ? " | "; insettext ;"  |--Error Message: "; testCase.Error.Message
   end if
 end sub
- function RBS_LOGGER_Logger_FillText(text as string, fillChar = " ", numChars = 40) as string
+Function RBS_LOGGER_Logger_FillText(text as String, fillChar = " ", numChars = 40) as String
   if (len(text) >= numChars)
     text = left(text, numChars - 5) + "..." + fillChar + fillChar
   else
@@ -2233,82 +2233,82 @@ end sub
     end for
   end if
   return text
-end function
- sub RBS_LOGGER_Logger_PrintStart()
+End Function
+sub RBS_LOGGER_Logger_PrintStart()
   ? ""
   ? "[START TEST REPORT]"
   ? ""
 end sub
- sub RBS_LOGGER_Logger_PrintEnd()
+sub RBS_LOGGER_Logger_PrintEnd()
   ? ""
   ? "[END TEST REPORT]"
   ? ""
 end sub
- sub RBS_LOGGER_Logger_PrintSuiteSetUp(sName as string)
+sub RBS_LOGGER_Logger_PrintSuiteSetUp(sName as String)
   if m.verbosity = m.verbosityLevel.verbose
     ? "================================================================="
     ? "===   SetUp "; sName; " suite."
     ? "================================================================="
   end if
 end sub
- sub RBS_LOGGER_Logger_PrintMetaSuiteStart(metaTestSuite)
+sub RBS_LOGGER_Logger_PrintMetaSuiteStart(metaTestSuite)
   ? metaTestSuite.name; " " ; "pkg:/" ; metaTestSuite.filePath + "(1)"
 end sub
- sub RBS_LOGGER_Logger_PrintSuiteStart(sName as string)
+sub RBS_LOGGER_Logger_PrintSuiteStart(sName as String)
   ? " |-" ; sName
 end sub
- sub RBS_LOGGER_Logger_PrintSuiteTearDown(sName as string)
+sub RBS_LOGGER_Logger_PrintSuiteTearDown(sName as String)
   if m.verbosity = m.verbosityLevel.verbose
     ? "================================================================="
     ? "===   TearDown "; sName; " suite."
     ? "================================================================="
   end if
 end sub
- sub RBS_LOGGER_Logger_PrintTestSetUp(tName as string)
+sub RBS_LOGGER_Logger_PrintTestSetUp(tName as String)
   if m.verbosity = m.verbosityLevel.verbose
     ? "----------------------------------------------------------------"
     ? "---   SetUp "; tName; " test."
     ? "----------------------------------------------------------------"
   end if
 end sub
- sub RBS_LOGGER_Logger_PrintTestTearDown(tName as string)
+sub RBS_LOGGER_Logger_PrintTestTearDown(tName as String)
   if m.verbosity = m.verbosityLevel.verbose
     ? "----------------------------------------------------------------"
     ? "---   TearDown "; tName; " test."
     ? "----------------------------------------------------------------"
   end if
 end sub
-      function __Logger_builder()
-      instance = {}
-      Logger_instance = {
-        __className: "Logger"
-        PrintStatistic: RBS_LOGGER_Logger_PrintStatistic
-        PrintSuiteStatistic: RBS_LOGGER_Logger_PrintSuiteStatistic
-        PrintTestStatistic: RBS_LOGGER_Logger_PrintTestStatistic
-        FillText: RBS_LOGGER_Logger_FillText
-        PrintStart: RBS_LOGGER_Logger_PrintStart
-        PrintEnd: RBS_LOGGER_Logger_PrintEnd
-        PrintSuiteSetUp: RBS_LOGGER_Logger_PrintSuiteSetUp
-        PrintMetaSuiteStart: RBS_LOGGER_Logger_PrintMetaSuiteStart
-        PrintSuiteStart: RBS_LOGGER_Logger_PrintSuiteStart
-        PrintSuiteTearDown: RBS_LOGGER_Logger_PrintSuiteTearDown
-        PrintTestSetUp: RBS_LOGGER_Logger_PrintTestSetUp
-        PrintTestTearDown: RBS_LOGGER_Logger_PrintTestTearDown
-         __Logger: RBS_LOGGER_Logger_new
-      }
-      instance.append(Logger_instance)
-      return instance
-      end function
-      function Logger(config)
-        instance = __Logger_builder()
-        instance.__Logger(config)
-        return instance
-      end function
- function Rooibos_TestRunner_new(args = {})
+Function __Logger_builder()
+  instance = {}
+  Logger_instance = {
+    __className: "Logger"
+    PrintStatistic: RBS_LOGGER_Logger_PrintStatistic
+    PrintSuiteStatistic: RBS_LOGGER_Logger_PrintSuiteStatistic
+    PrintTestStatistic: RBS_LOGGER_Logger_PrintTestStatistic
+    FillText: RBS_LOGGER_Logger_FillText
+    PrintStart: RBS_LOGGER_Logger_PrintStart
+    PrintEnd: RBS_LOGGER_Logger_PrintEnd
+    PrintSuiteSetUp: RBS_LOGGER_Logger_PrintSuiteSetUp
+    PrintMetaSuiteStart: RBS_LOGGER_Logger_PrintMetaSuiteStart
+    PrintSuiteStart: RBS_LOGGER_Logger_PrintSuiteStart
+    PrintSuiteTearDown: RBS_LOGGER_Logger_PrintSuiteTearDown
+    PrintTestSetUp: RBS_LOGGER_Logger_PrintTestSetUp
+    PrintTestTearDown: RBS_LOGGER_Logger_PrintTestTearDown
+    __Logger: RBS_LOGGER_Logger_new
+  }
+  instance.append(Logger_instance)
+  return instance
+End Function
+Function Logger(config)
+  instance = __Logger_builder()
+  instance.__Logger(config)
+  return instance
+End Function
+Function Rooibos_TestRunner_new(args = {})
   m.testScene = args.testScene
   m.nodeContext = args.nodeContext
   config = RBSFM_getRuntimeConfig()
-  if (config = invalid or not  rbs_cmn_IsAssociativeArray(config))
+  if (config = invalid OR not rbs_cmn_IsAssociativeArray(config))
     ? "WARNING : specified config is invalid - using default"
     config = {
       showOnlyFailures: false
@@ -2326,13 +2326,13 @@ end sub
   m.config.testsDirectory = config.testsDirectory
   m.logger = Logger(m.config)
   m.global = args.global
-end function
- sub Rooibos_TestRunner_run()
+End Function
+sub Rooibos_TestRunner_run()
   if type(RBSFM_getTestSuitesForProject) <> "Function"
     ? " ERROR! RBSFM_getTestSuitesForProject is not found! That looks like you didn't run the preprocessor as part of your test process. Please refer to the docs."
     return
   end if
-  totalStatObj =  rbs_stats_CreateTotalStatistic()
+  totalStatObj = rbs_stats_CreateTotalStatistic()
   m.runtimeConfig = UnitTestRuntimeConfig()
   m.runtimeConfig.global = m.global
   totalStatObj.testRunHasFailures = false
@@ -2356,18 +2356,18 @@ end function
       if (m.config.logLevel = 2)
         ? "Ignoring TestSuite " ; metaTestSuite.name ; " Due to Ignore flag"
       end if
-      totalstatobj.ignored ++
+      totalstatobj.ignored++
       totalStatObj.IgnoredTestNames.push("|-" + metaTestSuite.name + " [WHOLE SUITE]")
       goto skipSuite
     end if
     ? ""
-    ?  rbs_logger_logger_FillText("> SUITE: " + metaTestSuite.name, ">", 80)
-    if (metaTestSuite.isNodeTest = true and metaTestSuite.nodeTestFileName <> "")
+    ? rbs_logger_logger_FillText("> SUITE: " + metaTestSuite.name, ">", 80)
+    if (metaTestSuite.isNodeTest = true AND metaTestSuite.nodeTestFileName <> "")
       ? " +++++RUNNING NODE TEST"
       nodeType = metaTestSuite.nodeTestFileName
       ? " node type is " ; nodeType
       node = m.testScene.CallFunc("Rooibos_CreateTestNode", nodeType)
-      if (type(node) = "roSGNode" and node.subType() = nodeType)
+      if (type(node) = "roSGNode" AND node.subType() = nodeType)
         args = {
           "metaTestSuite": metaTestSuite
           "testUtilsDecoratorMethodName": m.testUtilsDecoratorMethodName
@@ -2376,7 +2376,7 @@ end function
         }
         nodeStatResults = node.callFunc("Rooibos_RunNodeTests", args)
         if nodeStatResults <> invalid
-  rbs_stats_MergeTotalStatistic(totalStatObj, nodeStatResults)
+          rbs_stats_MergeTotalStatistic(totalStatObj, nodeStatResults)
         else
           ? " ERROR! The node "; nodeType; " did not return stats from the Rooibos_RunNodeTests method. This usually means you are not importing rooibosDist.brs, or rooibosFunctionMap.brs. Please refer to : https://github.com/georgejecook/rooibos/blob/master/docs/index.md#testing-scenegraph-nodes"
         end if
@@ -2394,7 +2394,7 @@ end function
     skipSuite:
   end for
   m.logger.PrintStatistic(totalStatObj)
-  if  rbs_cmn_IsFunction(RBS_ReportCodeCoverage)
+  if rbs_cmn_IsFunction(RBS_ReportCodeCoverage)
     RBS_ReportCodeCoverage()
     if m.config.printLcov = true
       RBS_Coverage_printLCovInfo()
@@ -2402,15 +2402,15 @@ end function
   end if
   m.SendHomeKeypress()
 end sub
- sub Rooibos_TestRunner_RunItGroups(metaTestSuite, totalStatObj, testUtilsDecoratorMethodName, config, runtimeConfig, nodeContext = invalid)
+sub Rooibos_TestRunner_RunItGroups(metaTestSuite, totalStatObj, testUtilsDecoratorMethodName, config, runtimeConfig, nodeContext = invalid)
   if (testUtilsDecoratorMethodName <> invalid)
-    testUtilsDecorator =  rbs_cmn_GetFunctionBruteForce(testUtilsDecoratorMethodName)
-    if (not  rbs_cmn_IsFunction(testUtilsDecorator))
+    testUtilsDecorator = rbs_cmn_GetFunctionBruteForce(testUtilsDecoratorMethodName)
+    if (not rbs_cmn_IsFunction(testUtilsDecorator))
       ? "[ERROR] Test utils decorator method `" ; testUtilsDecoratorMethodName ;"` was not in scope! for testSuite: " + metaTestSuite.name
     end if
   end if
   for each itGroup in metaTestSuite.itGroups
-    testSuite =  rbs_itg_GetRunnableTestSuite(itGroup)
+    testSuite = rbs_itg_GetRunnableTestSuite(itGroup)
     if (nodeContext <> invalid)
       testSuite.node = nodeContext
       testSuite.global = nodeContext.global
@@ -2436,7 +2436,7 @@ end sub
             totalStatObj.IgnoredTestNames.push("  | |--" + testCase.name)
           else if (testcase.paramTestIndex = 0)
             testCaseName = testCase.Name
-            if (len(testCaseName) > 1 and right(testCaseName, 1) = "0")
+            if (len(testCaseName) > 1 AND right(testCaseName, 1) = "0")
               testCaseName = left(testCaseName, len(testCaseName) - 1)
             end if
             totalStatObj.IgnoredTestNames.push("  | |--" + testCaseName)
@@ -2463,37 +2463,37 @@ end sub
       goto skipItGroup
     end if
     ? ""
-    ?  rbs_logger_logger_FillText("> GROUP: " + itGroup.name, ">", 80)
-    if  rbs_cmn_IsFunction(testSuite.SetUp)
+    ? rbs_logger_logger_FillText("> GROUP: " + itGroup.name, ">", 80)
+    if rbs_cmn_IsFunction(testSuite.SetUp)
       testSuite.SetUp()
     end if
-  rooibos_testrunner_RunTestCases(metaTestSuite, itGroup, testSuite, totalStatObj, config, runtimeConfig)
-    if  rbs_cmn_IsFunction(testSuite.TearDown)
+    rooibos_testrunner_RunTestCases(metaTestSuite, itGroup, testSuite, totalStatObj, config, runtimeConfig)
+    if rbs_cmn_IsFunction(testSuite.TearDown)
       testSuite.TearDown()
     end if
-    if (totalStatObj.testRunHasFailures = true and config.failFast = true)
+    if (totalStatObj.testRunHasFailures = true AND config.failFast = true)
       exit for
     end if
     skipItGroup:
   end for
 end sub
- sub Rooibos_TestRunner_RunTestCases(metaTestSuite, itGroup, testSuite, totalStatObj, config, runtimeConfig)
-  suiteStatObj =  rbs_stats_CreateSuiteStatistic(itGroup.Name)
+sub Rooibos_TestRunner_RunTestCases(metaTestSuite, itGroup, testSuite, totalStatObj, config, runtimeConfig)
+  suiteStatObj = rbs_stats_CreateSuiteStatistic(itGroup.Name)
   testSuite.global = runtimeConfig.global
   for each testCase in testSuite.testCases
     metaTestCase = itGroup.testCaseLookup[testCase.Name]
     metaTestCase.time = 0
-    if (runtimeConfig.hasSoloTests and not metaTestCase.isSolo)
+    if (runtimeConfig.hasSoloTests AND not metaTestCase.isSolo)
       goto skipTestCase
     end if
     ? ""
-    ?  rbs_logger_logger_FillText("> TEST: " + testCase.Name + " ", ">", 80)
-    if  rbs_cmn_IsFunction(testSuite.beforeEach)
+    ? rbs_logger_logger_FillText("> TEST: " + testCase.Name + " ", ">", 80)
+    if rbs_cmn_IsFunction(testSuite.beforeEach)
       testSuite.beforeEach()
     end if
     testTimer = CreateObject("roTimespan")
     testCaseTimer = CreateObject("roTimespan")
-    testStatObj =  rbs_stats_CreateTestStatistic(testCase.Name)
+    testStatObj = rbs_stats_CreateTestStatistic(testCase.Name)
     testSuite.testCase = testCase.Func
     testStatObj.filePath = metaTestSuite.filePath
     testStatObj.metaTestCase = metaTestCase
@@ -2504,7 +2504,7 @@ end sub
         testCaseParams = []
         for paramIndex = 0 to metaTestCase.rawParams.count()
           paramValue = metaTestCase.rawParams[paramIndex]
-          if type(paramValue) = "roString" and len(paramValue) >= 8 and left(paramValue, 8) = "#RBSNode"
+          if type(paramValue) = "roString" AND len(paramValue) >= 8 AND left(paramValue, 8) = "#RBSNode"
             nodeType = "ContentNode"
             paramDirectiveArgs = paramValue.split("|")
             if paramDirectiveArgs.count() > 1
@@ -2565,14 +2565,14 @@ end sub
       testStatObj.Result = "Success"
     end if
     testStatObj.Time = testTimer.TotalMilliseconds()
-  rbs_stats_AppendTestStatistic(suiteStatObj, testStatObj)
-    if  rbs_cmn_IsFunction(testSuite.afterEach)
+    rbs_stats_AppendTestStatistic(suiteStatObj, testStatObj)
+    if rbs_cmn_IsFunction(testSuite.afterEach)
       testSuite.afterEach()
     end if
     if testStatObj.Result <> "Success"
       totalStatObj.testRunHasFailures = true
     end if
-    if testStatObj.Result = "Fail" and config.failFast = true
+    if testStatObj.Result = "Fail" AND config.failFast = true
       exit for
     end if
     skipTestCase:
@@ -2580,35 +2580,35 @@ end sub
   suiteStatObj.metaTestSuite = metaTestSuite
   rbs_stats_AppendSuiteStatistic(totalStatObj, suiteStatObj)
 end sub
- sub Rooibos_TestRunner_SendHomeKeypress()
+sub Rooibos_TestRunner_SendHomeKeypress()
   ut = CreateObject("roUrlTransfer")
   ut.SetUrl("http://localhost:8060/keypress/Home")
   ut.PostFromString("")
 end sub
-      function __TestRunner_builder()
-      instance = {}
-      TestRunner_instance = {
-        __className: "TestRunner"
-        run: Rooibos_TestRunner_run
-        RunItGroups: Rooibos_TestRunner_RunItGroups
-        RunTestCases: Rooibos_TestRunner_RunTestCases
-        SendHomeKeypress: Rooibos_TestRunner_SendHomeKeypress
-         __TestRunner: Rooibos_TestRunner_new
-      }
-      instance.append(TestRunner_instance)
-      return instance
-      end function
-      function TestRunner(args = {})
-        instance = __TestRunner_builder()
-        instance.__TestRunner(args)
-        return instance
-      end function
- function RBS_UTR_UnitTestResult_Reset() as void
+Function __TestRunner_builder()
+  instance = {}
+  TestRunner_instance = {
+    __className: "TestRunner"
+    run: Rooibos_TestRunner_run
+    RunItGroups: Rooibos_TestRunner_RunItGroups
+    RunTestCases: Rooibos_TestRunner_RunTestCases
+    SendHomeKeypress: Rooibos_TestRunner_SendHomeKeypress
+    __TestRunner: Rooibos_TestRunner_new
+  }
+  instance.append(TestRunner_instance)
+  return instance
+End Function
+Function TestRunner(args = {})
+  instance = __TestRunner_builder()
+  instance.__TestRunner(args)
+  return instance
+End Function
+Function RBS_UTR_UnitTestResult_Reset() as Void
   m.isFail = false
   m.failedMockLineNumber = -1
   m.messages = []
-end function
- function RBS_UTR_UnitTestResult_AddResult(message as string) as string
+End Function
+Function RBS_UTR_UnitTestResult_AddResult(message as String) as String
   if (message <> "")
     m.messages.push(message)
     if (not m.isFail)
@@ -2618,8 +2618,8 @@ end function
   end if
   m.currentAssertIndex++
   return message
-end function
- function RBS_UTR_UnitTestResult_AddMockResult(lineNumber, message as string) as string
+End Function
+Function RBS_UTR_UnitTestResult_AddMockResult(lineNumber, message as String) as String
   if (message <> "")
     m.messages.push(message)
     if (not m.isFail)
@@ -2628,8 +2628,8 @@ end function
     m.isFail = true
   end if
   return message
-end function
- function RBS_UTR_UnitTestResult_GetResult() as string
+End Function
+Function RBS_UTR_UnitTestResult_GetResult() as String
   if (m.isFail)
     msg = m.messages.peek()
     if (msg <> invalid)
@@ -2640,29 +2640,29 @@ end function
   else
     return ""
   end if
-end function
-      function __UnitTestResult_builder()
-      instance = {}
-      UnitTestResult_instance = {
-        __className: "UnitTestResult"
-        Reset: RBS_UTR_UnitTestResult_Reset
-        AddResult: RBS_UTR_UnitTestResult_AddResult
-        AddMockResult: RBS_UTR_UnitTestResult_AddMockResult
-        GetResult: RBS_UTR_UnitTestResult_GetResult
-        messages: []
-        isFail: false
-        currentAssertIndex: 0
-        failedAssertIndex: 0
-        failedMockLineNumber: -1
-         __UnitTestResult: RBS_UTR_UnitTestResult_new_
-      }
-      instance.append(UnitTestResult_instance)
-      return instance
-      end function
-      function UnitTestResult()
-        instance = __UnitTestResult_builder()
-        instance.__UnitTestResult()
-        return instance
-      end function
-      function RBS_UTR_UnitTestResult_new_()
-      end function
+End Function
+Function __UnitTestResult_builder()
+  instance = {}
+  UnitTestResult_instance = {
+    __className: "UnitTestResult"
+    Reset: RBS_UTR_UnitTestResult_Reset
+    AddResult: RBS_UTR_UnitTestResult_AddResult
+    AddMockResult: RBS_UTR_UnitTestResult_AddMockResult
+    GetResult: RBS_UTR_UnitTestResult_GetResult
+    messages: []
+    isFail: false
+    currentAssertIndex: 0
+    failedAssertIndex: 0
+    failedMockLineNumber: -1
+    __UnitTestResult: RBS_UTR_UnitTestResult_new_
+  }
+  instance.append(UnitTestResult_instance)
+  return instance
+End Function
+Function UnitTestResult()
+  instance = __UnitTestResult_builder()
+  instance.__UnitTestResult()
+  return instance
+End Function
+Function RBS_UTR_UnitTestResult_new_()
+End Function

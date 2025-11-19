@@ -5,7 +5,7 @@ Function TensorApiSetup()
   constants = getConstants()
   pub_serverPersistentData = createObject("roSGNode", "ServerPersistentData")
   m.tensorApi = TensorApi(constants, pub_serverPersistentData)
-End function
+End Function
 
 
 
@@ -48,7 +48,7 @@ Function tensorApi_commonOptions_Test()
   m.assertEqual(commonOptions.headers["Content-Type"], "application/json")
   m.assertEqual(commonOptions.headers["x-client-platform"], platform)
   m.assertEqual(commonOptions.headers["x-client-version"], clientVersion)
-End function
+End Function
 
 
 '@Test unit tests epgChannelIds
@@ -159,5 +159,5 @@ Function tensorApi_getEPGProgramReqInfo_test()
   m.assertEqual(epgProgramReq.options.params.lookahead, lookahead)
   m.assertEqual(epgProgramReq.options.params.content_id, content_id)
   m.assertEqual(epgProgramReq.options.headers["Content-Type"], "application/json")
-  m.assertEqual(epgProgramReq.options.headers["x-capability"], formatJson({"program_title_differ_with_episode_title":true}))
+  m.assertEqual(epgProgramReq.options.headers["x-capability"], formatJson({ "program_title_differ_with_episode_title": true }))
 End Function

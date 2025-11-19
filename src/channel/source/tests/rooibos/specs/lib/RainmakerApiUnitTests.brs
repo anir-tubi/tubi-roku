@@ -4,7 +4,7 @@
 Function RainmakerApiSetup()
   m.constants = getConstants()
   m.rainmakerApi = RainmakerApi(m.constants)
-End function
+End Function
 
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

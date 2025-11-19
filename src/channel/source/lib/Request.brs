@@ -1,11 +1,11 @@
 ' TubiRequest is used for tubi specific http requests
 ' the functions inside this module will be more specific to tubi
 ' TubiRequest is deprecated and any new logic should use Request with the goal of eventually removing TubiRequest.
-Function TubiRequest(settings = {mode: "production",CharlesProxyEnabled: false, printReqAndResInfo: false })
+Function TubiRequest(settings = { mode: "production", CharlesProxyEnabled: false, printReqAndResInfo: false })
   return {
     configMode: settings.mode
     charlesProxyEnabled: settings.charlesProxyEnabled
-    charlesProxyUrl:settings.charlesProxyUrl
+    charlesProxyUrl: settings.charlesProxyUrl
     printReqAndResInfo: settings.printReqAndResInfo
     createAsync: createAsyncHTTPRequest
     start: tubihttp_start
@@ -25,7 +25,7 @@ End Function
 
 ' Request is used for general http requests
 ' the functions inside this module is more generic and can be used other endpoints
-Function Request(settings = {mode: "production",CharlesProxyEnabled: false})
+Function Request(settings = { mode: "production", CharlesProxyEnabled: false })
   request = TubiRequest(settings)
   request.handleEvent = tubi_handleHttpEventV2
   return request
@@ -44,7 +44,7 @@ End Function
 '               body - PUT or POST body as string
 '               headers - assoc array of headers and their values
 '
-Function createAsyncHTTPRequest(url as String, name = "" as String, options={} as Object) as Object
+Function createAsyncHTTPRequest(url as String, name = "" as String, options = {} as Object) as Object
   deviceInfo = CreateObject("roDeviceInfo")
 
   ' sanitize
@@ -75,16 +75,16 @@ Function createAsyncHTTPRequest(url as String, name = "" as String, options={} a
     if o = "headers"
       if mergedOptions[o].DoesExist("Content-Type") = false
         if options.method <> invalid
-          if UCase(options.method) = "POST" or UCase(options.method) = "PUT" or UCase(options.method) = "PATCH" OR (UCase(options.method) = "DELETE" AND options.body <> "")
-            mergedOptions[o].Append({"Content-Type": "application/json"})
+          if UCase(options.method) = "POST" OR UCase(options.method) = "PUT" OR UCase(options.method) = "PATCH" OR (UCase(options.method) = "DELETE" AND options.body <> "")
+            mergedOptions[o].Append({ "Content-Type": "application/json" })
           end if
         end if
       end if
       if mergedOptions[o].DoesExist("Accept-Language") = false
-        mergedOptions[o].Append({"Accept-Language": m.getLocale()})
+        mergedOptions[o].Append({ "Accept-Language": m.getLocale() })
       end if
       if m.sudoCountry <> invalid
-        mergedOptions[o].Append({"x-sudo-country": m.sudoCountry})
+        mergedOptions[o].Append({ "x-sudo-country": m.sudoCountry })
       end if
     end if
 
@@ -99,16 +99,16 @@ Function createAsyncHTTPRequest(url as String, name = "" as String, options={} a
     hasData: m.hasData
     runSynchronous: m.runSynchronous
     cancel: m.cancel
-    name: name  ' human-friendly name for the request
+    name: name ' human-friendly name for the request
     response: invalid
-    uuid: deviceInfo.GetRandomUUID()  ' since this object is not 1-to-1 with roUrlTransfer
-                                      ' instance, we create our own unique id, helpful for
-                                      ' cancellations
+    uuid: deviceInfo.GetRandomUUID() ' since this object is not 1-to-1 with roUrlTransfer
+    ' instance, we create our own unique id, helpful for
+    ' cancellations
 
     ' private
     addParamsToUrl_: m.addParamsToUrl
     urltransfer: invalid
-    klass: "TubiAsyncHTTPRequest"   ' Just a sentinel for verification by Request Queue
+    klass: "TubiAsyncHTTPRequest" ' Just a sentinel for verification by Request Queue
     configMode: m.configMode
     printReqAndResInfo: m.printReqAndResInfo
     charlesProxyEnabled: m.charlesProxyEnabled
@@ -131,7 +131,7 @@ End Function
 '     If roMessagePort is passed, a roUrlTransfer object is allocated and
 '     events will be sent to the roMessagePort provided.
 '
-Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
+Function tubihttp_start(urltransfer_or_messageport as Object) as Boolean
   if type(urltransfer_or_messageport) = "roUrlTransfer" then
     ' use default assigned port
     m.urltransfer = urltransfer_or_messageport
@@ -186,7 +186,7 @@ Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
   end if
 
   ' Start the request
-  if  m.body <> invalid AND m.body <> "" AND (m.method = "POST" or m.method = "PUT" or m.method = "PATCH" OR m.method = "DELETE")
+  if m.body <> invalid AND m.body <> "" AND (m.method = "POST" OR m.method = "PUT" OR m.method = "PATCH" OR m.method = "DELETE")
     if m.urltransfer.AsyncPostFromString(m.body) = false
       tubiLog(m.method + " request failed. " + m.url)
       return false
@@ -208,7 +208,7 @@ End Function
 '
 ' returns just the data of the response, not the code or fail reason
 '
-Function tubihttp_runSynchronous(timeout = 5 as Integer) As Object
+Function tubihttp_runSynchronous(timeout = 5 as Integer) as Object
   timer = CreateObject("roTimespan")
   res = invalid
   msgPort = CreateObject("roMessagePort")
@@ -228,7 +228,7 @@ Function tubihttp_runSynchronous(timeout = 5 as Integer) As Object
         if request.response <> invalid AND request.response.data <> invalid AND request.response.data.len() > 0
           res = request.response.data
           exit while
-        else if request.response.code < 200 or request.response.code >= 400
+        else if request.response.code < 200 OR request.response.code >= 400
           exit while
         end if
       end if
@@ -251,7 +251,7 @@ End Function
 '
 ' message - the roUrlEvent received on the caller's roMessagePort
 '
-Function tubi_handleHttpEvent(message As Object) As Object
+Function tubi_handleHttpEvent(message as Object) as Object
   ' perhaps .start() was not called yet
   if m.urltransfer = invalid
     return invalid
@@ -324,7 +324,7 @@ End Function
 ' isHttps
 '
 'Check if url is "https" prefixed
-Function tubihttp_isHttps_(url As String)
+Function tubihttp_isHttps_(url as String)
   if Left(UCase(url), 5) = "HTTPS" then
     return true
   else
@@ -351,8 +351,8 @@ End Function
 ' addParamsToUrl - helper function to construct the full url
 '
 ' NOTE: Don't use 'm' references in here so that we can use it as a module function
-Function tubihttp_addParamsToUrl_(url As String, params As Object) As String
-  if params = invalid or params.Count() = 0 then return url
+Function tubihttp_addParamsToUrl_(url as String, params as Object) as String
+  if params = invalid OR params.Count() = 0 then return url
 
   ' allow a dangling '?' or '&' in the base url, e.g. "http://something.net/?"
   '         Example                  Case
@@ -364,7 +364,7 @@ Function tubihttp_addParamsToUrl_(url As String, params As Object) As String
   '             ...net/?x=&           1
   '             ...net/?x=1           3
   '             ...net/?x=1&          1
-  if url.Right(1) = "&" or url.Right(1) = "?" then
+  if url.Right(1) = "&" OR url.Right(1) = "?" then
     separator = ""
   else if url.Instr("?") = -1
     separator = "?"
@@ -385,7 +385,7 @@ Function tubihttp_addParamsToUrl_(url As String, params As Object) As String
 
     for each value in values
       if value = invalid then
-        value = ""  ' don't send any string literal "invalid"
+        value = "" ' don't send any string literal "invalid"
       end if
       value = value.toStr().trim()
       url = url + separator + key.EncodeUriComponent() + "=" + value.EncodeUriComponent()
@@ -396,7 +396,7 @@ Function tubihttp_addParamsToUrl_(url As String, params As Object) As String
   return url
 End Function
 
-Function tubihttp_passThroughCharlesProxy(url as String) as string
+Function tubihttp_passThroughCharlesProxy(url as String) as String
   proxiedUrl = url
 
   if m.charlesProxyEnabled
@@ -443,7 +443,7 @@ End Function
 '
 ' message - the roUrlEvent received on the caller's roMessagePort
 '
-Function tubi_handleHttpEventV2(message As Object) As Object
+Function tubi_handleHttpEventV2(message as Object) as Object
   ' perhaps .start() was not called yet
   if m.urltransfer = invalid
     return invalid

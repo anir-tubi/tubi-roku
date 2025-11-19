@@ -37,7 +37,7 @@ Function TubiAuthUpdateSetup()
     "url"
     "options"
   ]
-End function
+End Function
 
 
 '@AfterEach
@@ -45,7 +45,7 @@ Function TubiAuthUpdateAfterEach()
   authSection = createObject("roRegistry")
   authSection.delete(m.auth.authRegSection)
   authSection.flush()
-End function
+End Function
 
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -282,10 +282,10 @@ Function tubiAuth_createSignature_test()
   dateTime = "2021-12-13T22:27:04Z"
 
   sampleBody = {
-    "device_id":"5d9bb3b3-dfab-50af-a65e-28d25ca4d32b",
-    "id":"419f8a8e-b1aa-4763-ac4e-e451ee7358e7",
-    "platform":"roku",
-    "verifier":"846d141f-e75e-4414-9116-b83cda6f9e5f"
+    "device_id": "5d9bb3b3-dfab-50af-a65e-28d25ca4d32b",
+    "id": "419f8a8e-b1aa-4763-ac4e-e451ee7358e7",
+    "platform": "roku",
+    "verifier": "846d141f-e75e-4414-9116-b83cda6f9e5f"
   }
   bodyJson = FormatJson(sampleBody)
 
@@ -318,10 +318,10 @@ End Function
 Function tubiAuth_constructCanonicalRequest_test()
   auth = m.auth
   sampleBody = {
-    "device_id":"5d9bb3b3-dfab-50af-a65e-28d25ca4d32b",
-    "id":"daa3a5ee-d410-414a-8512-20cfe550468b",
-    "platform":"roku",
-    "verifier":"846d141f-e75e-4414-9116-b83cda6f9e5f"
+    "device_id": "5d9bb3b3-dfab-50af-a65e-28d25ca4d32b",
+    "id": "daa3a5ee-d410-414a-8512-20cfe550468b",
+    "platform": "roku",
+    "verifier": "846d141f-e75e-4414-9116-b83cda6f9e5f"
   }
   bodyJson = formatJson(sampleBody)
 
@@ -404,10 +404,10 @@ End Function
 Function tubiAuth_constructHashedPayload_test()
   auth = m.auth
   body = {
-    "device_id":"5d9bb3b3-dfab-50af-a65e-28d25ca4d32b",
-    "id":"419f8a8e-b1aa-4763-ac4e-e451ee7358e7",
-    "platform":"roku",
-    "verifier":"846d141f-e75e-4414-9116-b83cda6f9e5f"
+    "device_id": "5d9bb3b3-dfab-50af-a65e-28d25ca4d32b",
+    "id": "419f8a8e-b1aa-4763-ac4e-e451ee7358e7",
+    "platform": "roku",
+    "verifier": "846d141f-e75e-4414-9116-b83cda6f9e5f"
   }
   body = formatJSON(body)
   expected_HashedPayload = "7b3e447fd60d2543df79f5af98b2fddd698c1a3f01b5a04287594f7cbab8c5be"
@@ -420,10 +420,10 @@ End Function
 Function tubiAuth_getHash_test()
   auth = m.auth
   text = {
-    "device_id":"5d9bb3b3-dfab-50af-a65e-28d25ca4d32b",
-    "id":"419f8a8e-b1aa-4763-ac4e-e451ee7358e7",
-    "platform":"roku",
-    "verifier":"846d141f-e75e-4414-9116-b83cda6f9e5f"
+    "device_id": "5d9bb3b3-dfab-50af-a65e-28d25ca4d32b",
+    "id": "419f8a8e-b1aa-4763-ac4e-e451ee7358e7",
+    "platform": "roku",
+    "verifier": "846d141f-e75e-4414-9116-b83cda6f9e5f"
   }
   body = formatJSON(text)
   expected_hashedValue = "7b3e447fd60d2543df79f5af98b2fddd698c1a3f01b5a04287594f7cbab8c5be"
@@ -575,7 +575,7 @@ Function tubiAuth_getSignedHeaders_test()
   ' test headers that aren't strings
   headers = {
     "TestHeader": 12
-    "TestHeader2": {"not": "valid"}
+    "TestHeader2": { "not": "valid" }
     "TestHeader3": "Ok"
   }
 
@@ -624,14 +624,14 @@ End Function
 Function tubiAuth_setAuthInfo_test()
   auth = m.auth
 
-  keyValue3 = {"userId" : "somebody"}
+  keyValue3 = { "userId": "somebody" }
   auth.setAuthInfo(keyValue3.keys()[0], keyValue3.userId)
   savedAuthInfo = RegReadAll(auth.authRegSection)
   m.assertNotInvalid(savedAuthInfo)
   m.assertEqual(savedAuthInfo.userId, keyValue3.userId)
 
 
-  keyValue4 = {userId : true}
+  keyValue4 = { userId: true }
   auth.setAuthInfo(keyValue4.keys()[0], keyValue4.userId)
   savedAuthInfo = RegReadAll(auth.authRegSection)
   m.assertNotInvalid(savedAuthInfo)

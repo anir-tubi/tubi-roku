@@ -33,7 +33,7 @@ End Function
 Function onLoadStatusChanged()
   loadStatus = m.nextPoster.loadStatus
 
-  if loadStatus = "ready" or loadStatus = "failed"
+  if loadStatus = "ready" OR loadStatus = "failed"
     m.nextPoster.unobserveFieldScoped("loadStatus")
     m.nextPoster.visible = true
     if m.nextPoster.uri = ""

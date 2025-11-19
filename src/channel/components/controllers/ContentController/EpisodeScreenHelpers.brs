@@ -1,9 +1,9 @@
 Function showEpisodeScreenWithNavigationTracking(content, playbackSource)
-  showEpisodeScreen(content, true, playbackSource )
+  showEpisodeScreen(content, true, playbackSource)
 End Function
 
 
-Function showEpisodeScreenWithoutNavigationTracking(content, playbackSource )
+Function showEpisodeScreenWithoutNavigationTracking(content, playbackSource)
   showEpisodeScreen(content, false, playbackSource)
 End Function
 
@@ -32,7 +32,7 @@ Function showEpisodeScreen(content, shouldSendNavigationAnalytics, playbackSourc
   episodesScreen.playbackSource = playbackSource
 
   if episodesScreen.content <> invalid AND episodesScreen.content.id <> invalid
-    contentId = Mid(episodesScreen.content.id, 2)  ' trim leading "0" off series id
+    contentId = Mid(episodesScreen.content.id, 2) ' trim leading "0" off series id
 
     'update tracking info - have to set the whole AA, can't update only a portion on the AA field
     episodesScreen.trackingPageInfo = {

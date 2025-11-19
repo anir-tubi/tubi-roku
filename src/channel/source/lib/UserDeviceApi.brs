@@ -386,7 +386,7 @@ Function userDeviceApi_getAddHistoryRequestInfo(content as Object, nowPos as Int
   'set the parentId to an integer or invalid as needed (expect to receive it as a string which is not compatible with API)
   if isString(parentId) = true then
     if parentId.len() = 0
-      body.parent_id = invalid  'is ok if parentId is invalid (ie. for movies)
+      body.parent_id = invalid 'is ok if parentId is invalid (ie. for movies)
       if content.type = m.constants.uapiContentTypes.sportsEvent
         contentType = m.constants.uapiContentTypes.sportsEvent
       end if

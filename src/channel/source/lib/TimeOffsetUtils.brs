@@ -3,7 +3,7 @@
 'returns time offset for testing purposes if it has been specified
 '******************************************************
 
-Function getTestingTimeOffset(constants) as integer
+Function getTestingTimeOffset(constants) as Integer
   if constants <> invalid AND constants.settings.mode <> "production" AND isNumber(constants.settings.testingTimeOffset) = true then
     return constants.settings.testingTimeOffset
   end if

@@ -32,7 +32,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.posterRect.blendColor = theme.neutralColor2
     m.Title.color = theme.primaryTextColor
@@ -78,11 +78,11 @@ Function onContentChange(data)
 
     categoryContent = m.top.itemContent.getParent()
     if categoryContent <> invalid then
-        if m.top.itemContent.logouri <> invalid AND m.top.itemContent.logouri <> ""
-          m.logo.uri = m.constants.urls.channelLogoBrandedPrefix + m.top.itemContent.id + m.constants.urls.channelLogoBrandedSuffix
-        else
-          displayTitle()
-        end if
+      if m.top.itemContent.logouri <> invalid AND m.top.itemContent.logouri <> ""
+        m.logo.uri = m.constants.urls.channelLogoBrandedPrefix + m.top.itemContent.id + m.constants.urls.channelLogoBrandedSuffix
+      else
+        displayTitle()
+      end if
     end if
     setTranslations()
   end if
@@ -90,13 +90,13 @@ End Function
 
 
 Function setTranslations()
-  nXLogo = (m.top.width - m.logo.width)/2
-  nYLogo = (m.top.height - m.logo.height)/2
+  nXLogo = (m.top.width - m.logo.width) / 2
+  nYLogo = (m.top.height - m.logo.height) / 2
   m.logo.translation = [nXLogo, nYLogo]
 
   nTitleWidth = m.top.width * .9
-  nXTitle = (m.top.width - nTitleWidth)/2
-  nYTitle = (m.top.height - m.title.boundingRect().height)/2
+  nXTitle = (m.top.width - nTitleWidth) / 2
+  nYTitle = (m.top.height - m.title.boundingRect().height) / 2
   m.title.width = nTitleWidth
   m.title.translation = [nXTitle, nYTitle]
 End Function
@@ -113,11 +113,11 @@ Function onSponsorPosterLoadStatusChanged(msg)
     nMaxWidth = 150
     nMaxHeight = 30
     nHeight = nMaxHeight
-    nWidth = (nBoundingWidth * nHeight)/nBoundingHeight
+    nWidth = (nBoundingWidth * nHeight) / nBoundingHeight
     if nWidth > nMaxWidth
       '//ensure the image isn't too wide
       nWidth = nMaxWidth
-      nHeight = (nBoundingHeight * nWidth)/nBoundingWidth
+      nHeight = (nBoundingHeight * nWidth) / nBoundingWidth
       m.SponsoredByPoster.height = nHeight
     end if
 
@@ -127,7 +127,7 @@ Function onSponsorPosterLoadStatusChanged(msg)
 
     '//center sponsor text and icon
     nSponsorWidth = m.SponsoredByText.boundingRect().width + m.SponsoredBy.itemSpacings[0] + m.SponsoredByPoster.width
-    nXSponsor = (m.top.width - nSponsorWidth)/2
+    nXSponsor = (m.top.width - nSponsorWidth) / 2
     nYSponsor = m.top.height * .79
     m.SponsoredBy.translation = [nXSponsor, nYSponsor]
   end if

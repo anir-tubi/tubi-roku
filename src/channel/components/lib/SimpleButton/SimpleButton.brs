@@ -6,7 +6,7 @@ Function init()
   'The skipIntro button is an example of how this is used.
   m.notFilledBackground = m.top.findNode("notFilledBackground")
 
-  m.originalColor = ""  '//the default color based on the theme if no color is passed into the component via the m.top.color field
+  m.originalColor = "" '//the default color based on the theme if no color is passed into the component via the m.top.color field
   m.focus9Patch.opacity = m.top.unfocusedBackgroundOpacity
 
   m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
@@ -110,7 +110,7 @@ Function onOpacityChanged()
   end if
 End Function
 
-' Allows us to override the background color when the 
+' Allows us to override the background color when the
 Function onItemHasFocusChange(msg)
   itemHasFocus = msg.getData()
   updateFocusState(itemHasFocus)
@@ -147,7 +147,7 @@ Function updateFocusState(isFocused = false)
 End Function
 
 
-Function onKeyEvent(key As String, press As Boolean) as Boolean
+Function onKeyEvent(key as String, press as Boolean) as Boolean
 
   if press then
     tubiLog("SimpleButton.onKeyEvent key = " + key)

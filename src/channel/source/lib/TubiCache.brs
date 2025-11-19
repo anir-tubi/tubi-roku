@@ -69,7 +69,7 @@ End Function
 '
 ' returns: roSGNode/invalid, the screen node or invalid if no screens were found with the passed in id
 Function tubiCache_getFromScreenCache(screenId)
-  if type(screenId) = "String" or type(screenId) = "roString"
+  if type(screenId) = "String" OR type(screenId) = "roString"
     return m.screenCache[screenId]
   end if
   return invalid
@@ -82,7 +82,7 @@ End Function
 '
 ' returns: boolean, true if the screen was successfully deleted, otherwise returns false
 Function tubiCache_deleteFromScreenCache(screenId)
-  if type(screenId) = "String" or type(screenId) = "roString"
+  if type(screenId) = "String" OR type(screenId) = "roString"
     m.deleteScreenContentCache(screenId)
     screen = m.getFromScreenCache(screenId)
 
@@ -186,7 +186,7 @@ End Function
 '               is no longer valid, the content is removed from the cache. Content without a validUntil
 '               field is not removed from the cache.
 Function tubiCache_getFromContentCache(contentId)
-  if type(contentId) = "String" or type(contentId) = "roString"
+  if type(contentId) = "String" OR type(contentId) = "roString"
     cachedContent = m.contentCache[contentId]
 
     if cachedContent <> invalid
@@ -226,7 +226,7 @@ End Function
 Function tubiCache_markContentNotValidOnCachedScreens(contentId)
   isContentFound = false
 
-  if type(contentId) = "String" or type(contentId) = "roString"
+  if type(contentId) = "String" OR type(contentId) = "roString"
     for each screenId in m.screenCache
       screen = m.screenCache[screenId]
 
@@ -247,7 +247,7 @@ End Function
 '
 ' returns: boolean, true if the content was successfully deleted, otherwise returns false
 Function tubiCache_deleteContentFromCache(contentId)
-  if type(contentId) = "String" or type(contentId) = "roString"
+  if type(contentId) = "String" OR type(contentId) = "roString"
     return m.contentCache.delete(contentId)
   end if
 
@@ -263,7 +263,7 @@ End Function
 ' returns: boolean, true if the cacheOrderInfo was successfully deleted from the contentCacheOrder
 '                   or false if not successfully deleted
 Function tubiCache_deleteFromContentCacheOrder(contentId)
-  if type(contentId) = "String" or type(contentId) = "roString"
+  if type(contentId) = "String" OR type(contentId) = "roString"
     for i = 0 to m.contentCacheOrder.count() - 1
       cacheOrderInfo = m.contentCacheOrder[i]
 

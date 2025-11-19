@@ -1,4 +1,4 @@
-'@TestSuite [YoSpaceId3s] YoSpaceId3s.brs 
+'@TestSuite [YoSpaceId3s] YoSpaceId3s.brs
 
 '@Setup
 Function YoSpaceId3sSetup()
@@ -28,7 +28,7 @@ Function YoSpaceId3sSetup()
       m.id3s.setTag(tag, tags[tag])
     end for
   End Function
-End function
+End Function
 
 
 '@BeforeEach

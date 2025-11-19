@@ -39,7 +39,7 @@ End Function
 
 
 Function onTimeRemainingChange(msg)
-  timeRemaining = msg.getData()  
+  timeRemaining = msg.getData()
   m.timeRemainingText.text = Int(timeRemaining).toStr() + "s"
 
   if m.top.reCalculateWidth = true

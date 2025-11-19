@@ -5,7 +5,7 @@ Function init()
   topRef.screenLevel = m.constants.ui.screenLevels.signInSignUpErrorScreen
   topRef.observeFieldScoped("focusedChild", "onScreenFocusChange")
   topRef.observeFieldScoped("action", "onActionChange")
-  
+
   m.heading = topRef.findNode("heading")
   m.subheading = topRef.findNode("subheading")
   m.footerText = topRef.findNode("footerText")
@@ -84,8 +84,8 @@ Function onActionChange(msg)
 
   majorEventNameFallback = getTranslation(m.constants.configHubFallbacks.majorEventNameTranslationKey)
   majorEventName = getExternalConfigValueFromGlobal("major_event_name", majorEventNameFallback)
-  m.heading.text = getTranslation(headingKey, {"major_event_name": majorEventName})
-  m.subheading.text = getTranslation(subheadingKey, {"major_event_name": majorEventName})
+  m.heading.text = getTranslation(headingKey, { "major_event_name": majorEventName })
+  m.subheading.text = getTranslation(subheadingKey, { "major_event_name": majorEventName })
 
   m.top.trackingPageInfo = {
     pageType: "static_page"

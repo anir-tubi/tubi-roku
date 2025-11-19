@@ -29,26 +29,26 @@ Function init()
 
   '//Keep a record of keys that are on the lower line of the left side of the keyboard
   m.aLeftLowerKeys = {}
-  m.aLeftLowerKeys["left"] =  true
-  m.aLeftLowerKeys["right"] =  true
+  m.aLeftLowerKeys["left"] = true
+  m.aLeftLowerKeys["right"] = true
 
   '//Keep a record of keys that are on the lower line of the right side of the keyboard
   m.aRightLowerKeys = {}
-  m.aRightLowerKeys["@"] =  true
-  m.aRightLowerKeys["."] =  true
-  m.aRightLowerKeys["0"] =  true
-  m.aRightLowerKeys["accents"] =  true
-  m.aRightLowerKeys["÷"] =  true
-  m.aRightLowerKeys["±"] =  true
-  m.aRightLowerKeys["–"] =  true
-  m.aRightLowerKeys["—"] =  true
-  m.aRightLowerKeys["‚"] =  true
-  m.aRightLowerKeys["‰"] =  true
-  m.aRightLowerKeys["ß"] =  true
-  m.aRightLowerKeys["þ"] =  true
-  m.aRightLowerKeys["Ž"] =  true
-  m.aRightLowerKeys["Ð"] =  true
-  m.aRightLowerKeys["Þ"] =  true
+  m.aRightLowerKeys["@"] = true
+  m.aRightLowerKeys["."] = true
+  m.aRightLowerKeys["0"] = true
+  m.aRightLowerKeys["accents"] = true
+  m.aRightLowerKeys["÷"] = true
+  m.aRightLowerKeys["±"] = true
+  m.aRightLowerKeys["–"] = true
+  m.aRightLowerKeys["—"] = true
+  m.aRightLowerKeys["‚"] = true
+  m.aRightLowerKeys["‰"] = true
+  m.aRightLowerKeys["ß"] = true
+  m.aRightLowerKeys["þ"] = true
+  m.aRightLowerKeys["Ž"] = true
+  m.aRightLowerKeys["Ð"] = true
+  m.aRightLowerKeys["Þ"] = true
 
   m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
   m.top.observeFieldScoped("voiceEnabled", "onVoiceEnabledChange")
@@ -65,15 +65,15 @@ End Function
 Function onButtonSelected(evt)
   buttonSelected = evt.getRoSGNode()
   if buttonSelected.id = "showHidePassword"
-      if m.passwordMode = true
-          m.showHidePassword.text = getTranslation("screenSettings_parentalPassword_button_hide")
-          m.passwordMode = false
-        else
-          m.showHidePassword.text = getTranslation("screenSettings_parentalPassword_button_show")
-          m.passwordMode = true
-        end if
+    if m.passwordMode = true
+      m.showHidePassword.text = getTranslation("screenSettings_parentalPassword_button_hide")
+      m.passwordMode = false
+    else
+      m.showHidePassword.text = getTranslation("screenSettings_parentalPassword_button_show")
+      m.passwordMode = true
+    end if
 
-        m.top.audioGuideText = m.showHidePassword.text
+    m.top.audioGuideText = m.showHidePassword.text
   end if
 
   m.top.buttonSelected = buttonSelected.id
@@ -109,7 +109,7 @@ Function onVoiceEnabledChange(msg)
 End Function
 
 
-'//When the timer is called, it means the user pressed the DOWN button. There should be slight delay in determining which 
+'//When the timer is called, it means the user pressed the DOWN button. There should be slight delay in determining which
 '// button to go to next since there the keyboard has a slight delay in determining the key focus.
 Function onFocusDelayTimerFired()
   if m.keyboard.isInFocusChain() = true
@@ -127,14 +127,14 @@ Function onFocusDelayTimerFired()
 End Function
 
 
-Function onKeyEvent(key As String, press As Boolean) as Boolean
+Function onKeyEvent(key as String, press as Boolean) as Boolean
   handled = true
   if press
-    m.focusDelayTimer.control = "stop"  '//whenever the key is pressed, then cancel the timer
+    m.focusDelayTimer.control = "stop" '//whenever the key is pressed, then cancel the timer
 
     if key = "down"
       if m.keyboard.isInFocusChain() = true
-        m.focusDelayTimer.control = "start"  '//cause a slight delay to determine where to go next since there is a slight delay for the keyboard to know which keyboard button is in focus
+        m.focusDelayTimer.control = "start" '//cause a slight delay to determine where to go next since there is a slight delay for the keyboard to know which keyboard button is in focus
       end if
 
     else if key = "up"
@@ -164,7 +164,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         setFocusToComponent(m.continue)
       end if
     else if key = "back"
-        handled = false
+      handled = false
     end if
 
     return handled
@@ -185,7 +185,7 @@ Function setFocusToComponent(focusTarget)
       m.keyboard.muteAudioGuide = true
       m.top.audioGuideText = focusTarget.text
     end if
-    
+
     focusTarget.setFocus(true)
   end if
 End Function
@@ -202,7 +202,7 @@ Function onKeyGridChange(msg)
     if keyGrid.keyFocused = "a"
       audioGuideText = keyGrid.keyFocused + " " + "alpha"
     else
-      audioGuideText = keyGrid.keyFocused +  " " + m.constants.audioGuideHints.buttonHint
+      audioGuideText = keyGrid.keyFocused + " " + m.constants.audioGuideHints.buttonHint
     end if
 
     m.top.audioGuideText = audioGuideText

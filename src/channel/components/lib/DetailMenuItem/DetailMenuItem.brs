@@ -130,7 +130,7 @@ Function onItemContentChange()
       bVisibleImage = false
     end if
 
-    nDetailsMenuTextBoundingWidth = m.DetailsMenuText.boundingRect().width 
+    nDetailsMenuTextBoundingWidth = m.DetailsMenuText.boundingRect().width
     m.top.calculatedTextWidth = nDetailsMenuTextBoundingWidth + iconWidth
     m.DetailsMenuText.text = item.title
     m.DetailsMenuTextFocused.text = item.title
@@ -166,7 +166,7 @@ Function onItemContentChange()
       m.DetailsMenuText.opacity = 0
       m.DetailsMenuTextFocused.opacity = 1
     end if
-    
+
     if bVisibleImage = false AND bVisibleBadgeText = false
       'Adjusting the DetailsMenuText text to center when there is no iconUrl and badge label text.
       if item.align = "center"
@@ -181,7 +181,7 @@ Function onItemContentChange()
 End Function
 
 
-Function showProgressBar(percentage As Double)
+Function showProgressBar(percentage as Double)
   tubiLog("DetailMenuItem.showProgressBar")
   if percentage > 1.0 then percentage = 1.0
   if percentage < 0.0 then percentage = 0.0
@@ -203,7 +203,7 @@ Function onItemHasFocus()
     end if
   end if
 
-  '//Call setFocusUI() on the chance that a Menu Item's focusPercent does not get changed. For example, a list's jumpToItem is called which may bypass setting of focusPercent 
+  '//Call setFocusUI() on the chance that a Menu Item's focusPercent does not get changed. For example, a list's jumpToItem is called which may bypass setting of focusPercent
   setFocusUI()
 End Function
 

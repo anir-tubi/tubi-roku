@@ -9,7 +9,7 @@ Function onDrawDots()
     totalDots = m.top.totalDots
     carouselIndex = m.top.carouselIndex
 
-    for i = 0 to totalDots-1
+    for i = 0 to totalDots - 1
       dot = m.dotGroup.createChild("Poster")
       dot.id = "dot_" + i.ToStr()
       dot.uri = "pkg:/images/dot-carousel.webp"

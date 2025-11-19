@@ -8,12 +8,12 @@ Function LivePlayerLogLibSetup()
   tracking = TubiTracking(constants, auth, {}, request)
   m.playerLogLib = LivePlayerLogLib(constants, tracking)
   m.playerLogLib.sendEvent = sendLiveEvent
-End function
+End Function
 
 
 Function sendLiveEvent(data = {} as Dynamic, subType = "" as String, eventBase = {})
   eventInfo = m.tracking.populateMessage(subType, data, eventBase)
-  eventValues =  eventInfo[subType]
+  eventValues = eventInfo[subType]
   trackData = m.tracking.getPlayerAnalyticsEvent(subType, eventValues)
   m.trackingLoggingTask = CreateObject("roSGNode", "TrackingLoggingTask")
   m.trackingLoggingTask.trackPlayerEvent = trackData
@@ -133,7 +133,7 @@ End Function
 '@Test resetAdMetrics unit tests
 Function playerLogLib_resetAttributes_test()
   m.playerLogLib.resetAttributes()
-  m.assertEqual(m.playerLogLib.contentFirstFrameDuration,-1)
+  m.assertEqual(m.playerLogLib.contentFirstFrameDuration, -1)
   m.assertEqual(m.playerLogLib.lastStartStep, "UNKNOWN")
   m.assertEqual(m.playerLogLib.errorCode, 0)
   m.assertEqual(m.playerLogLib.firstErrorCode, 0)

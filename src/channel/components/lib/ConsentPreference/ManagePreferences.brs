@@ -59,7 +59,7 @@ Function onConsentList(msg)
 
   ' Using the index so that we can calculate the height of the visible row items to place the bottom gradient.
   index = 0
-  visibleItemsHeight = 0  
+  visibleItemsHeight = 0
   for each height in rowHeights
     if index < 4
       visibleItemsHeight = visibleItemsHeight + height
@@ -75,7 +75,7 @@ Function onConsentList(msg)
   m.bottomGradient.translation = [-5, visibleItemsHeight - 72]
 
   m.topGradient.opacity = 0
-  
+
   ' Display gradient only if we have more than 4 items.
   if consentList.count() > 4
     m.bottomGradient.opacity = 1
@@ -201,7 +201,7 @@ Function onPreferenceMenuItemCurrFocusRow(msg)
 
         ' When we reach top of the grid hiding the top gradient. So that we do not display gradient on top of focused item.
         if m.focusedIndexWhenFocusStyleChanges = itemFocused
-          if m.topGradient.opacity  <> 0
+          if m.topGradient.opacity <> 0
             fadeOutTopGradient(fraction, vertFocusDirection)
           end if
         else if m.focusedIndexWhenFocusStyleChanges < itemFocused AND m.focusedIndexWhenFocusStyleChanges > 1

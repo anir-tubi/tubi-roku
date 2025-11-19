@@ -8,14 +8,14 @@ Function insertItemIntoArray(array, item, index)
   newArray = []
 
   'if the index is greater than the count, then push the item at the end of the array.
-  if index > array.Count()-1
+  if index > array.Count() - 1
     newArray.append(array)
     newArray.push(item)
   else if index = 0
     newArray.push(item)
     newArray.append(array)
   else
-    for i = 0 to array.Count()-1
+    for i = 0 to array.Count() - 1
 
       if i = index
         newArray.push(item)

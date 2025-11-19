@@ -198,7 +198,7 @@ Function onIsEmailValidChange(msg)
 End Function
 
 
-Function onKeyEvent(key As String, press As Boolean) as Boolean
+Function onKeyEvent(key as String, press as Boolean) as Boolean
 
   if key = "OK"
     m.emailTextEditBox.text = m.keyboard.text

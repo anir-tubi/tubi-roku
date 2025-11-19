@@ -4,7 +4,7 @@
 Function SentrySetup()
   m.constants = getConstants()
   m.auth = TubiAuth(m.constants)
-End function
+End Function
 
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

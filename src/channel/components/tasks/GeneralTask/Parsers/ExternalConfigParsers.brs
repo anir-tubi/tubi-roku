@@ -21,7 +21,7 @@ Function parseGetExternalConfigSuccess(fullResponse, _reqInfo)
     end if
 
     config.blocked_analytics_events = eventsAA
-    
+
   end if
 
   return config

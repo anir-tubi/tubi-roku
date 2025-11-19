@@ -9,7 +9,7 @@ Function init()
   drawingStyles = {
     "default": {}
     "subTitle": {}
-    "header":{}
+    "header": {}
   }
 
   typographyConstants = getTypographyConstants()
@@ -23,8 +23,8 @@ Function init()
   if theme <> invalid
     palette.colors = {
       "DialogFocusColor": theme.highlightedTextColor
-      "DialogFocusItemColor" : theme.primaryTextColor
-      "DialogBackgroundColor" : theme.neutralSolidColor
+      "DialogFocusItemColor": theme.primaryTextColor
+      "DialogBackgroundColor": theme.neutralSolidColor
     }
     drawingStyles.default.color = theme.primaryTextColor
     drawingStyles.header.color = theme.primaryTextColor

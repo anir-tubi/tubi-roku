@@ -192,9 +192,9 @@ Function centerClosedCaptioning()
   nSpacing = m.closedCaptioningButtonList.rowItemSpacing[0][0]
   nItemWidth = m.closedCaptioningButtonList.rowItemSize[0][0]
   nItems = m.closedCaptioningButtonList.content.getChild(0).getChildCount()
-  nListWidth = (nItems * nItemWidth) + ((nItems-1) * nSpacing)
+  nListWidth = (nItems * nItemWidth) + ((nItems - 1) * nSpacing)
 
-  nCenterPointX = (1920-nListWidth)/2
+  nCenterPointX = (1920 - nListWidth) / 2
   m.closedCaptioningButtonList.translation = [nCenterPointX, m.closedCaptioningButtonList.translation[1]]
 End Function
 
@@ -309,7 +309,7 @@ Function jumpEPGToCurrentPlayingVideo(shouldSendComponentInteractionEvent = fals
 
     m.EPG.trackingPageInfo = {
       pageType: "video_player_page"
-      pageValues: {video_id: m.top.currentLinearVideoContent.id.toInt()}
+      pageValues: { video_id: m.top.currentLinearVideoContent.id.toInt() }
     }
     if shouldSendComponentInteractionEvent = true
       m.EPG.shouldSendComponentInteractionEventOnJumpToLinearChannelId = true
@@ -346,7 +346,7 @@ End Function
 Function displayClosedCaptioningMenu()
   m.closedCaptioningButtonList.setFocus(true)
   m.closedCaptioningButtonList.setFocus(false) ' workaround for roku focus indicator bug
-  m.closedCaptioningButtonList.setFocus(true)  ' workaround for roku focus indicator bug
+  m.closedCaptioningButtonList.setFocus(true) ' workaround for roku focus indicator bug
   m.sideNav.setOpenState = "openedAndNotInFocus"
 
   if m.bEPGVisible = true
@@ -356,7 +356,7 @@ Function displayClosedCaptioningMenu()
     nJumpTo = 0
     if m.closedCaptioningButtonList.content <> invalid AND m.closedCaptioningButtonList.content.getChildCount() > 0
       captions = m.closedCaptioningButtonList.content.getChild(0)
-      for i = 0 to captions.getChildCount()-1
+      for i = 0 to captions.getChildCount() - 1
         caption = captions.getChild(i)
         if caption.enabled = true
           nJumpTo = i
@@ -389,7 +389,7 @@ Function goBackToEPGFromSideNav()
 End Function
 
 
-Function onKeyEvent(key As String, press As Boolean) as Boolean
+Function onKeyEvent(key as String, press as Boolean) as Boolean
   bKeyReacted = false
 
   if m.top.isDisplaying = true AND press = true then
@@ -450,14 +450,14 @@ Function setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, 
   componentValues = {}
   if sideNavItemId <> invalid
     componentValues = {
-        left_nav_section: m.Tracking.linearSideNavPageMap[sideNavItemId]
-      }
+      left_nav_section: m.Tracking.linearSideNavPageMap[sideNavItemId]
+    }
   end if
-  pageValues =  {video_id: m.top.currentLinearVideoContent.id.toInt()}
+  pageValues = { video_id: m.top.currentLinearVideoContent.id.toInt() }
 
   componentInteractionInfo = {
     pageOneof: m.Tracking.getAnalyticsPage("video_player_page", pageValues)
-    componentOneof: m.Tracking.getAnalyticsComponent("left_side_nav_component",  componentValues)
+    componentOneof: m.Tracking.getAnalyticsComponent("left_side_nav_component", componentValues)
     user_interaction: userInteraction
   }
 

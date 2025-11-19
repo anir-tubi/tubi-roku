@@ -1,4 +1,4 @@
-function BrazeConstants() as object
+Function BrazeConstants() as Object
   SDK_DATA = {
     SDK_VERSION: "2.2.0"
   }
@@ -224,43 +224,43 @@ function BrazeConstants() as object
     FF_IMPRESSION_EVENT_FIELDS: FF_IMPRESSION_EVENT_FIELDS
     USER_ALIAS_EVENT_FIELDS: USER_ALIAS_EVENT_FIELDS
   }
-end function
+End Function
 
-function BrazeInit(config as object, messagePort as object)
+Function BrazeInit(config as Object, messagePort as Object)
   StorageManager = {
-    brazeSaveData: function(key as string, section as string, value as dynamic, flush = true as boolean) as void
+    brazeSaveData: Function(key as String, section as String, value as Dynamic, flush = true as Boolean) as Void
       sec = CreateObject("roRegistrySection", section)
       sec.Write(key, value.ToStr())
       if flush then
         sec.Flush()
       end if
-    end function,
+    End Function,
 
-    brazeDeleteData: function(key as string, section as string, flush = true as boolean) as void
+    brazeDeleteData: Function(key as String, section as String, flush = true as Boolean) as Void
       sec = CreateObject("roRegistrySection", section)
       sec.Delete(key)
       if flush then
         sec.Flush()
       end if
-    end function,
+    End Function,
 
-    brazeReadData: function(key as string, section as string, default = invalid as dynamic) as dynamic
+    brazeReadData: Function(key as String, section as String, default = invalid as Dynamic) as Dynamic
       sec = CreateObject("roRegistrySection", section)
       if sec.Exists(key) then
         return sec.Read(key)
       end if
       return default
-    end function,
+    End Function,
 
-    brazeReadDataInt: function(key as string, section as string, default = 0 as integer) as integer
+    brazeReadDataInt: Function(key as String, section as String, default = 0 as Integer) as Integer
       result = m.brazeReadData(key, section, default)
       if Type(result) <> "Integer"
         result = result.ToInt()
       end if
       return result
-    end function,
+    End Function,
 
-    brazeReadDataBoolean: function(key as string, section as string, default = false as boolean) as boolean
+    brazeReadDataBoolean: Function(key as String, section as String, default = false as Boolean) as Boolean
       result = m.brazeReadData(key, section, default)
       if Type(result) <> "Boolean"
         if result = true.ToStr()
@@ -270,23 +270,23 @@ function BrazeInit(config as object, messagePort as object)
         end if
       end if
       return result
-    end function
+    End Function
   }
 
   DataProvider = {
-    DeviceDataProvider: function() as object
+    DeviceDataProvider: Function() as Object
       if m.cachedDeviceInfo = invalid then
         di = CreateObject("roDeviceInfo")
         version = di.GetOsVersion()
         version = version.major + "." + version.minor + "." + version.revision + "." + version.build
         m.cachedDeviceInfo = {
-          model : di.GetModelDetails().ModelNumber,
-          ad_tracking_enabled : not di.IsRIDADisabled(),
-          roku_ad_id : di.GetRIDA(),
+          model: di.GetModelDetails().ModelNumber,
+          ad_tracking_enabled: not di.IsRIDADisabled(),
+          roku_ad_id: di.GetRIDA(),
           ' roku_channel_client_id : di.GetChannelClientId(),
-          time_zone : di.GetTimeZone(),
-          locale : di.GetCurrentLocale(),
-          os_version : version
+          time_zone: di.GetTimeZone(),
+          locale: di.GetCurrentLocale(),
+          os_version: version
         }
 
         ' Add the resolution
@@ -297,9 +297,9 @@ function BrazeInit(config as object, messagePort as object)
         end if
       end if
       return m.cachedDeviceInfo
-    end function,
+    End Function,
 
-    AppDataProvider: function() as object
+    AppDataProvider: Function() as Object
       if m.cachedAppInfo = invalid then
         ai = CreateObject("roAppInfo")
         app_version = ai.GetVersion()
@@ -311,9 +311,9 @@ function BrazeInit(config as object, messagePort as object)
         }
       end if
       return m.cachedAppInfo
-    end function,
+    End Function,
 
-    DeviceIdProvider: function() as object
+    DeviceIdProvider: Function() as Object
       if m.cachedDeviceId = invalid then
         storage = Braze()._privateApi.storage
         stored_device_id = storage.brazeReadData(BrazeConstants().BRAZE_STORAGE.DEVICE_ID_KEY, BrazeConstants().BRAZE_STORAGE.DEVICE_ID_SECTION)
@@ -330,9 +330,9 @@ function BrazeInit(config as object, messagePort as object)
         m.cachedDeviceId = stored_device_id
       end if
       return m.cachedDeviceId
-    end function,
+    End Function,
 
-    UserIdProvider: function() as object
+    UserIdProvider: Function() as Object
       if m.cachedUserId = invalid then
         storage = Braze()._privateApi.storage
         stored_user_id = storage.brazeReadData(BrazeConstants().BRAZE_STORAGE.USER_ID_KEY, BrazeConstants().BRAZE_STORAGE.USER_ID_SECTION)
@@ -342,18 +342,18 @@ function BrazeInit(config as object, messagePort as object)
         m.cachedUserId = stored_user_id
       end if
       return m.cachedUserId
-    end function,
+    End Function,
 
-    SessionIdProvider: function() as object
+    SessionIdProvider: Function() as Object
       if m.cachedSessionId = invalid then
         di = CreateObject("roDeviceInfo")
         session_id = di.GetRandomUUID()
         m.cachedSessionId = session_id
       end if
       return m.cachedSessionId
-    end function,
+    End Function,
 
-    ConfigProvider: function() as object
+    ConfigProvider: Function() as Object
       if m.cachedConfig = invalid then
         eventHandler = Braze()._privateApi.eventHandler
         storage = Braze()._privateApi.storage
@@ -368,7 +368,7 @@ function BrazeInit(config as object, messagePort as object)
         end if
         m.cachedconfig.feature_flags_last_update = 0
         m.cachedconfig.feature_flags_sent_ffi = {}
-        if config_response = invalid or config_response.config = invalid or config_response.config.time = invalid
+        if config_response = invalid OR config_response.config = invalid OR config_response.config.time = invalid
           m.cachedConfig.config_time = stored_config_time
           stored_attributes_blocklist = storage.brazeReadData(BrazeConstants().BRAZE_STORAGE.CONFIG_ATTRIBUTES_BLOCKLIST_KEY, BrazeConstants().BRAZE_STORAGE.CONFIG_SECTION)
           stored_attributes_blocklist = utils.setToEmptyJSONArrayIfInvalid(stored_attributes_blocklist)
@@ -391,7 +391,7 @@ function BrazeInit(config as object, messagePort as object)
                 if brazetask <> invalid
                   getBrazeTask().BrazeFeatureFlags = ff_data.feature_flags
                 end if
-              else 
+              else
                 brazelogger.debug("stored feature flag data was invalid", ff_json)
               end if
             end if
@@ -431,16 +431,16 @@ function BrazeInit(config as object, messagePort as object)
           if m.cachedconfig.feature_flags_enabled = false
             storage.brazeDeleteData(BrazeConstants().BRAZE_STORAGE.FEATURE_FLAG_DATA_KEY, BrazeConstants().BRAZE_STORAGE.CONFIG_SECTION)
             getBrazeTask().BrazeFeatureFlags = []
-          end if   
+          end if
         end if
-        if config_response <> invalid and config_response.triggers <> invalid
+        if config_response <> invalid AND config_response.triggers <> invalid
           m.cachedConfig.triggers = config_response.triggers
         end if
       end if
       return m.cachedConfig
-    end function
-    
-    syncForNewUser: function()
+    End Function
+
+    syncForNewUser: Function()
       config = m.ConfigProvider()
       if config <> invalid then
         eventHandler = Braze()._privateApi.eventHandler
@@ -453,7 +453,7 @@ function BrazeInit(config as object, messagePort as object)
         if raw_response <> invalid
           config_response = ParseJson(raw_response)
         end if
-        if config_response <> invalid and config_response.config <> invalid and config_response.config.time <> invalid
+        if config_response <> invalid AND config_response.config <> invalid AND config_response.config.time <> invalid
           config_time = config_response.config.time
           storage.brazeSaveData(BrazeConstants().BRAZE_STORAGE.CONFIG_TIME_KEY, BrazeConstants().BRAZE_STORAGE.CONFIG_SECTION, config_time)
           config_attributes_blocklist = utils.ifInvalidSetToDefault(config_response.config.attributes_blocklist, [])
@@ -482,36 +482,36 @@ function BrazeInit(config as object, messagePort as object)
             feature_flags_rate_limit = 0
           end if
         end if
-        if config_response <> invalid and config_response.triggers <> invalid
+        if config_response <> invalid AND config_response.triggers <> invalid
           m.cachedConfig.triggers = config_response.triggers
         end if
       end if
       return m.cachedConfig
-    end function
+    End Function
   }
 
   TimeUtils = {
-    getCurrentTimeSeconds: function() as object
+    getCurrentTimeSeconds: Function() as Object
       date = CreateObject("roDateTime")
       return date.AsSeconds()
-    end function
+    End Function
   }
 
   BrazeUtils = {
-    inArray: function(needle as dynamic, haystack as object) as boolean
+    inArray: Function(needle as Dynamic, haystack as Object) as Boolean
       for each thing in haystack
         if thing = needle
           return true
         end if
       end for
       return false
-    end function,
+    End Function,
 
-    isString: function(input as object) as boolean
-      return input <> invalid and GetInterface(input, "ifString") <> invalid
-    end function,
+    isString: Function(input as Object) as Boolean
+      return input <> invalid AND GetInterface(input, "ifString") <> invalid
+    End Function,
 
-    truncateBrazeField: function(input as dynamic) as dynamic
+    truncateBrazeField: Function(input as Dynamic) as Dynamic
       if not m.isString(input) then
         return invalid
       end if
@@ -519,18 +519,18 @@ function BrazeInit(config as object, messagePort as object)
         return Left(input, 255)
       end if
       return input
-    end function,
+    End Function,
 
-    isBool: function(input as object) as boolean
-      return input <> invalid and GetInterface(input, "ifBoolean") <> invalid
-    end function,
+    isBool: Function(input as Object) as Boolean
+      return input <> invalid AND GetInterface(input, "ifBoolean") <> invalid
+    End Function,
 
-    isFloat: function(input as object) as boolean
-      return input <> invalid and (GetInterface(input, "ifFloat") <> invalid or (Type(input) = "roFloat" or Type(input) = "Float"))
-    end function,
+    isFloat: Function(input as Object) as Boolean
+      return input <> invalid AND (GetInterface(input, "ifFloat") <> invalid OR (Type(input) = "roFloat" OR Type(input) = "Float"))
+    End Function,
 
-    isArrayOfStrings: function(input as object) as boolean
-      isArray = input <> invalid and (GetInterface(input, "ifArray") <> invalid or Type(input) = "roArray")
+    isArrayOfStrings: Function(input as Object) as Boolean
+      isArray = input <> invalid AND (GetInterface(input, "ifArray") <> invalid OR Type(input) = "roArray")
       if not isArray then
         return false
       end if
@@ -540,22 +540,22 @@ function BrazeInit(config as object, messagePort as object)
         end if
       end for
       return true
-    end function,
+    End Function,
 
-    isInt: function(input as object) as boolean
-      return input <> invalid and (GetInterface(input, "ifInt") <> invalid or Type(input) = "roInt")
-    end function,
+    isInt: Function(input as Object) as Boolean
+      return input <> invalid AND (GetInterface(input, "ifInt") <> invalid OR Type(input) = "roInt")
+    End Function,
 
-    isLongInt: function(input as object) as boolean
-      return input <> invalid and (GetInterface(input, "ifLongInt") <> invalid or Type(input) = "roLongInteger")
-    end function,
+    isLongInt: Function(input as Object) as Boolean
+      return input <> invalid AND (GetInterface(input, "ifLongInt") <> invalid OR Type(input) = "roLongInteger")
+    End Function,
 
-    isNumeric: function(input as object) as boolean
-      return m.isFloat(input) or m.isInt(input) or m.isLongInt(input)
-    end function,
+    isNumeric: Function(input as Object) as Boolean
+      return m.isFloat(input) OR m.isInt(input) OR m.isLongInt(input)
+    End Function,
 
-    isBlankOrEmpty: function(input as object) as boolean
-      if input = invalid or input = ""
+    isBlankOrEmpty: Function(input as Object) as Boolean
+      if input = invalid OR input = ""
         return true
       end if
       len = Len(input)
@@ -567,25 +567,25 @@ function BrazeInit(config as object, messagePort as object)
         end if
       end for
       return true
-    end function,
+    End Function,
 
-    setToEmptyJSONArrayIfInvalid: function(input as dynamic) as string
+    setToEmptyJSONArrayIfInvalid: Function(input as Dynamic) as String
       if input = invalid
         return "[]"
       else
         return input
       end if
-    end function,
+    End Function,
 
-    ifInvalidSetToDefault: function(input as dynamic, defaultVal as dynamic) as dynamic
+    ifInvalidSetToDefault: Function(input as Dynamic, defaultVal as Dynamic) as Dynamic
       if input = invalid
         return defaultVal
       else
         return input
       end if
-    end function,
+    End Function,
 
-    processTriggers: function(action_type as string, triggers as dynamic, trigger_task as dynamic, data as dynamic) as void
+    processTriggers: Function(action_type as String, triggers as Dynamic, trigger_task as Dynamic, data as Dynamic) as Void
       active_trigger = m.checkAgainstTriggers(action_type, triggers, { event_name: data.event_name, product_id: data.product_id, event_properties: data.event_properties })
       if active_trigger <> invalid
         if active_trigger.is_control = true
@@ -607,9 +607,9 @@ function BrazeInit(config as object, messagePort as object)
           ' Something else is already there, so we can't display
         end if
       end if
-    end function,
+    End Function,
 
-    checkAgainstTriggers: function(trigger_type as string, triggers as dynamic, data = invalid as dynamic) as dynamic
+    checkAgainstTriggers: Function(trigger_type as String, triggers as Dynamic, data = invalid as Dynamic) as Dynamic
       raw_result = []
       result = invalid
       if triggers <> invalid
@@ -618,7 +618,7 @@ function BrazeInit(config as object, messagePort as object)
         triggers = m.filterTriggersByReEligibility(triggers)
         for each trigger in triggers
           for each condition in trigger[BrazeConstants().TRIGGER_FIELDS.TRIGGER_CONDITION]
-            if condition[BrazeConstants().TRIGGER_CONDITION_FIELDS.TYPE] = trigger_type or condition[BrazeConstants().TRIGGER_CONDITION_FIELDS.TYPE] = trigger_type + "_property"
+            if condition[BrazeConstants().TRIGGER_CONDITION_FIELDS.TYPE] = trigger_type OR condition[BrazeConstants().TRIGGER_CONDITION_FIELDS.TYPE] = trigger_type + "_property"
               if trigger_type = BrazeConstants().TRIGGER_TYPES.OPEN
                 raw_result.Push(trigger)
                 exit for
@@ -645,9 +645,9 @@ function BrazeInit(config as object, messagePort as object)
                 if condition_data <> invalid
                   condition_product_id = condition_data[BrazeConstants().TRIGGER_CONDITION_DATA_FIELDS.PRODUCT_ID]
                 end if
-                if condition_product_id <> invalid and condition_product_id = data.product_id
+                if condition_product_id <> invalid AND condition_product_id = data.product_id
                   condition_property_filters = condition_data[BrazeConstants().TRIGGER_CONDITION_DATA_FIELDS.PROPERTY_FILTERS]
-                  if data.event_properties <> invalid and condition_property_filters <> invalid
+                  if data.event_properties <> invalid AND condition_property_filters <> invalid
                     if m.propertyFiltersMetByEvent(condition_property_filters, data.event_properties)
                       raw_result.Push(trigger)
                       exit for
@@ -675,10 +675,10 @@ function BrazeInit(config as object, messagePort as object)
         raw_result[0].roku_sdk_last_sent = CreateObject("roTimeSpan")
       end if
       return result
-    end function,
+    End Function,
 
     ' Convert the trigger to an In-App Message object that the users will use to create the In-App Message UI
-    transformTrigger: function(trigger as object) as object
+    transformTrigger: Function(trigger as Object) as Object
       transformed_trigger = {}
       transformed_trigger.message = trigger[BrazeConstants().TRIGGER_FIELDS.DATA][BrazeConstants().TRIGGER_DATA_FIELDS.MESSAGE]
       transformed_trigger.extras = trigger[BrazeConstants().TRIGGER_FIELDS.DATA][BrazeConstants().TRIGGER_DATA_FIELDS.EXTRAS]
@@ -733,46 +733,46 @@ function BrazeInit(config as object, messagePort as object)
         transformed_trigger.is_control = false
       end if
       return transformed_trigger
-    end function,
+    End Function,
 
-    filterTriggersByAllowedTypes: function(triggers as object) as object
+    filterTriggersByAllowedTypes: Function(triggers as Object) as Object
       filtered_triggers = []
       for each trigger in triggers
         if trigger.type = BrazeConstants().TRIGGER_TYPES.TEMPLATED_IAM
           filtered_triggers.Push(trigger)
         else if trigger.type = BrazeConstants().TRIGGER_TYPES.INAPP
-          if (trigger.data.is_control <> invalid and trigger.data.is_control) or Braze()._privateapi.brazeutils.inArray(trigger.data.type, BrazeConstants().TRIGGER_FILTER_ALLOWED_TYPES)
+          if (trigger.data.is_control <> invalid AND trigger.data.is_control) OR Braze()._privateapi.brazeutils.inArray(trigger.data.type, BrazeConstants().TRIGGER_FILTER_ALLOWED_TYPES)
             filtered_triggers.Push(trigger)
           end if
         end if
       end for
       return filtered_triggers
-    end function,
+    End Function,
 
-    filterTriggersByExpiry: function(triggers as object) as object
+    filterTriggersByExpiry: Function(triggers as Object) as Object
       filtered_triggers = []
       current_timestamp = CreateObject("roDateTime").AsSeconds()
       for each trigger in triggers
-        if trigger.start_time < current_timestamp and (trigger.end_time = invalid or trigger.end_time > current_timestamp)
+        if trigger.start_time < current_timestamp AND (trigger.end_time = invalid OR trigger.end_time > current_timestamp)
           filtered_triggers.Push(trigger)
         end if
       end for
       return filtered_triggers
-    end function,
+    End Function,
 
-    filterTriggersByReEligibility: function(triggers as object) as object
+    filterTriggersByReEligibility: Function(triggers as Object) as Object
       filtered_triggers = []
       for each trigger in triggers
-        if trigger[BrazeConstants().TRIGGER_DATA_FIELDS.RE_ELIGIBILITY] = 0 or trigger.roku_sdk_last_sent = invalid
+        if trigger[BrazeConstants().TRIGGER_DATA_FIELDS.RE_ELIGIBILITY] = 0 OR trigger.roku_sdk_last_sent = invalid
           filtered_triggers.Push(trigger)
-        else if trigger[BrazeConstants().TRIGGER_DATA_FIELDS.RE_ELIGIBILITY] > 0 and trigger.roku_sdk_last_sent.TotalSeconds() > trigger[BrazeConstants().TRIGGER_DATA_FIELDS.RE_ELIGIBILITY]
+        else if trigger[BrazeConstants().TRIGGER_DATA_FIELDS.RE_ELIGIBILITY] > 0 AND trigger.roku_sdk_last_sent.TotalSeconds() > trigger[BrazeConstants().TRIGGER_DATA_FIELDS.RE_ELIGIBILITY]
           filtered_triggers.Push(trigger)
         end if
       end for
       return filtered_triggers
-    end function,
+    End Function,
 
-    propertyFiltersMetByEvent: function(filters as object, properties as object) as boolean
+    propertyFiltersMetByEvent: Function(filters as Object, properties as Object) as Boolean
       for each filter in filters
         met = false
         for each or_filter in filter
@@ -795,9 +795,9 @@ function BrazeInit(config as object, messagePort as object)
         end if
       end for
       return true
-    end function,
+    End Function,
 
-    updateTriggerWithTemplate: function(trigger as object, event_type as string, data = invalid as dynamic)
+    updateTriggerWithTemplate: Function(trigger as Object, event_type as String, data = invalid as Dynamic)
       if trigger.template_only
         template_response_raw = Braze()._privateapi.eventhandler.requestTemplate(trigger.trigger_id, event_type, data)
         remove_trigger = true
@@ -816,9 +816,9 @@ function BrazeInit(config as object, messagePort as object)
         end if
       end if
       return trigger
-    end function,
+    End Function,
 
-    refreshFeatureFlags: function() as void
+    refreshFeatureFlags: Function() as Void
       cached_config = Braze()._privateapi.dataprovider.cachedconfig
       ff_enabled = cached_config.feature_flags_enabled
       brazelogger = Braze()._privateApi.brazeLogger
@@ -829,7 +829,7 @@ function BrazeInit(config as object, messagePort as object)
         return
       end if
 
-      last_update = cached_config.feature_flags_last_update 
+      last_update = cached_config.feature_flags_last_update
       rate_limit = cached_config.feature_flags_rate_limit
       now = Braze()._privateApi.timeUtils.getCurrentTimeSeconds()
 
@@ -850,52 +850,52 @@ function BrazeInit(config as object, messagePort as object)
           else
             brazelogger.debug("feature flag response could not be parsed", raw_response)
           end if
-        else 
+        else
           brazelogger.debug("feature flag response was invalid", "")
         end if
       else
         brazelogger.debug("refreshFeatureFlag called too soon. Seconds to wait", last_update + rate_limit - now)
       end if
       getBrazeTask().BrazeFeatureFlagsUpdated = true
-    end function,
+    End Function,
 
-    compareNumbers: function(value, comparator, comparison_value) as boolean
+    compareNumbers: Function(value, comparator, comparison_value) as Boolean
       if comparator = BrazeConstants().TRIGGER_COMPARATORS.EQUALS
-        return m.isnumeric(value) and value = comparison_value
+        return m.isnumeric(value) AND value = comparison_value
       else if comparator = BrazeConstants().TRIGGER_COMPARATORS.NOT_EQUAL
-        return m.isnumeric(value) and value <> comparison_value
+        return m.isnumeric(value) AND value <> comparison_value
       else if comparator = BrazeConstants().TRIGGER_COMPARATORS.GREATER_THAN
-        return m.isnumeric(value) and value > comparison_value
+        return m.isnumeric(value) AND value > comparison_value
       else if comparator = BrazeConstants().TRIGGER_COMPARATORS.GREATER_THAN_EQUAL
-        return m.isnumeric(value) and value >= comparison_value
+        return m.isnumeric(value) AND value >= comparison_value
       else if comparator = BrazeConstants().TRIGGER_COMPARATORS.LESS_THAN
-        return m.isnumeric(value) and value < comparison_value
+        return m.isnumeric(value) AND value < comparison_value
       else if comparator = BrazeConstants().TRIGGER_COMPARATORS.LESS_THAN_EQUAL
-        return m.isnumeric(value) and value <= comparison_value
+        return m.isnumeric(value) AND value <= comparison_value
       else if comparator = BrazeConstants().TRIGGER_COMPARATORS.EXISTS
-        return value <> invalid and m.isnumeric(value)
+        return value <> invalid AND m.isnumeric(value)
       else if comparator = BrazeConstants().TRIGGER_COMPARATORS.DOES_NOT_EXIST
         return value = invalid
       end if
       return false
-    end function,
+    End Function,
 
-    compareBooleans: function(value, comparator, comparison_value) as boolean
+    compareBooleans: Function(value, comparator, comparison_value) as Boolean
       if comparator = BrazeConstants().TRIGGER_COMPARATORS.EQUALS
-        return m.isBool(value) and value = comparison_value
+        return m.isBool(value) AND value = comparison_value
       else if comparator = BrazeConstants().TRIGGER_COMPARATORS.EXISTS
-        return value <> invalid and m.isBool(value)
+        return value <> invalid AND m.isBool(value)
       else if comparator = BrazeConstants().TRIGGER_COMPARATORS.DOES_NOT_EXIST
         return value = invalid
       end if
       return false
-    end function,
+    End Function,
 
-    compareStrings: function(value, comparator, comparison_value) as boolean
+    compareStrings: Function(value, comparator, comparison_value) as Boolean
       if comparator = BrazeConstants().TRIGGER_COMPARATORS.EQUALS
-        return m.isString(value) and value = comparison_value
+        return m.isString(value) AND value = comparison_value
       else if comparator = BrazeConstants().TRIGGER_COMPARATORS.NOT_EQUAL
-        return m.isString(value) and value <> comparison_value
+        return m.isString(value) AND value <> comparison_value
       else if comparator = BrazeConstants().TRIGGER_COMPARATORS.MATCHES
         if m.isString(value)
           r = CreateObject("roRegex", comparison_value, "i")
@@ -904,7 +904,7 @@ function BrazeInit(config as object, messagePort as object)
           return false
         end if
       else if comparator = BrazeConstants().TRIGGER_COMPARATORS.EXISTS
-        return value <> invalid and m.isString(value)
+        return value <> invalid AND m.isString(value)
       else if comparator = BrazeConstants().TRIGGER_COMPARATORS.DOES_NOT_EXIST
         return value = invalid
       else if comparator = BrazeConstants().TRIGGER_COMPARATORS.NOT_MATCHES
@@ -916,35 +916,35 @@ function BrazeInit(config as object, messagePort as object)
         end if
       end if
       return false
-    end function,
+    End Function,
 
-    toColor: function(s as object) as dynamic
-      if s = invalid 
+    toColor: Function(s as Object) as Dynamic
+      if s = invalid
         return invalid
       end if
       hex = stri(s, 16)
       ' 0 pad if needed
-      if hex.Len() < 8 then hex = String(8-hex.Len(), "0") + hex
+      if hex.Len() < 8 then hex = string(8 - hex.Len(), "0") + hex
       ' Swap the alpha to the end
       return "0x" + Right(hex, 6) + Left(hex, 2)
-    end function,
+    End Function,
   }
 
   BrazeLogger = {
-    debug: function(tag as string, message as dynamic) as void
+    debug: Function(tag as String, message as Dynamic) as Void
       m.logMessage(tag, message.ToStr())
-    end function,
+    End Function,
 
-    logMessage: function(tag as string, message as string) as void
+    logMessage: Function(tag as String, message as String) as Void
       ' *** Please do not remove the if condition for controlling logging when we make braze updates. ***
       #if brazeLoggingEnabled
-      print "Braze Roku SDK v" + BrazeConstants().SDK_DATA.SDK_VERSION + " - " + tag + " - " + message
+        print "Braze Roku SDK v" + BrazeConstants().SDK_DATA.SDK_VERSION + " - " + tag + " - " + message
       #end if
-    end function
+    End Function
   }
 
   EventHandler = {
-    createEventObject: function(name as string, data = {} as object)
+    createEventObject: Function(name as String, data = {} as Object)
       event_payload = {
         "name": name,
         "data": data,
@@ -956,9 +956,9 @@ function BrazeInit(config as object, messagePort as object)
         event_payload["user_id"] = user_id
       end if
       return event_payload
-    end function,
+    End Function,
 
-    createCustomEventEvent: function(name as string, properties as object) as object
+    createCustomEventEvent: Function(name as String, properties as Object) as Object
       event_data = {}
       event_data[BrazeConstants().BRAZE_EVENT_API_FIELDS.CUSTOM_EVENT_NAME] = name
       if properties <> invalid then
@@ -966,9 +966,9 @@ function BrazeInit(config as object, messagePort as object)
       end if
       event_object = m.createEventObject(BrazeConstants().EVENT_TYPES.CUSTOM_EVENT, event_data)
       return event_object
-    end function,
+    End Function,
 
-    createPurchaseEvent: function(product_id as string, currency_code as string, price as double, quantity as integer, properties as object) as object
+    createPurchaseEvent: Function(product_id as String, currency_code as String, price as Double, quantity as Integer, properties as Object) as Object
       event_data = {}
       event_data[BrazeConstants().BRAZE_EVENT_API_FIELDS.PRODUCT_ID] = product_id
       event_data[BrazeConstants().BRAZE_EVENT_API_FIELDS.CURRENCY_CODE] = currency_code
@@ -979,54 +979,54 @@ function BrazeInit(config as object, messagePort as object)
       end if
       event_object = m.createEventObject(BrazeConstants().EVENT_TYPES.PURCHASE, event_data)
       return event_object
-    end function,
+    End Function,
 
-    createIAMImpressionEvent: function(trigger_id as string) as object
+    createIAMImpressionEvent: Function(trigger_id as String) as Object
       event_data = {}
       event_data[BrazeConstants().IAM_IMPRESSION_EVENT_FIELDS.TRIGGER_IDS] = [trigger_id]
       event_object = m.createEventObject(BrazeConstants().EVENT_TYPES.IAM_IMPRESSION, event_data)
       return event_object
-    end function,
+    End Function,
 
-    createIAMControlImpressionEvent: function(trigger_id as string) as object
+    createIAMControlImpressionEvent: Function(trigger_id as String) as Object
       event_data = {}
       event_data[BrazeConstants().IAM_CONTROL_IMPRESSION_EVENT_FIELDS.TRIGGER_IDS] = [trigger_id]
       event_object = m.createEventObject(BrazeConstants().EVENT_TYPES.IAM_CONTROL_IMPRESSION, event_data)
       return event_object
-    end function,
+    End Function,
 
-    createIAMClickEvent: function(trigger_id as string) as object
+    createIAMClickEvent: Function(trigger_id as String) as Object
       event_data = {}
       event_data[BrazeConstants().IAM_CLICK_EVENT_FIELDS.TRIGGER_IDS] = [trigger_id]
       event_object = m.createEventObject(BrazeConstants().EVENT_TYPES.IAM_CLICK, event_data)
       return event_object
-    end function,
+    End Function,
 
-    createIAMButtonClickEvent: function(trigger_id as string, button_id as integer) as object
+    createIAMButtonClickEvent: Function(trigger_id as String, button_id as Integer) as Object
       event_data = {}
       event_data[BrazeConstants().IAM_BUTTON_CLICK_EVENT_FIELDS.TRIGGER_IDS] = [trigger_id]
       event_data[BrazeConstants().IAM_BUTTON_CLICK_EVENT_FIELDS.BUTTON_ID] = button_id
       event_object = m.createEventObject(BrazeConstants().EVENT_TYPES.IAM_BUTTON_CLICK, event_data)
       return event_object
-    end function,
+    End Function,
 
-    createFeatureFlagImpressionEvent: function(ffId as string, fts as string) as object
+    createFeatureFlagImpressionEvent: Function(ffId as String, fts as String) as Object
       event_data = {}
       event_data[BrazeConstants().FF_IMPRESSION_EVENT_FIELDS.FID] = ffId
       event_data[BrazeConstants().FF_IMPRESSION_EVENT_FIELDS.FTS] = fts
       event_object = m.createEventObject(BrazeConstants().EVENT_TYPES.FF_IMPRESSION, event_data)
       return event_object
-    end function,
+    End Function,
 
-    createUserAliasEvent: function(alias as string, label as string) as object
+    createUserAliasEvent: Function(alias as String, label as String) as Object
       event_data = {}
       event_data[BrazeConstants().USER_ALIAS_EVENT_FIELDS.ALIAS_ID] = alias
       event_data[BrazeConstants().USER_ALIAS_EVENT_FIELDS.LABEL_ID] = label
       event_object = m.createEventObject(BrazeConstants().EVENT_TYPES.USER_ALIAS, event_data)
       return event_object
-    end function,
+    End Function,
 
-    createAttributeObject: function(name as string, properties) as object
+    createAttributeObject: Function(name as String, properties) as Object
       attribute_object = {}
       attribute_object[name] = properties
       user_id = Braze()._privateApi.dataProvider.UserIdProvider()
@@ -1034,9 +1034,9 @@ function BrazeInit(config as object, messagePort as object)
         attribute_object["user_id"] = user_id
       end if
       return attribute_object
-    end function,
+    End Function,
 
-    createConfigObject: function(config_time as integer, request_triggers as boolean) as object
+    createConfigObject: Function(config_time as Integer, request_triggers as Boolean) as Object
       config_object = {}
       user_id = Braze()._privateApi.dataProvider.UserIdProvider()
       if user_id <> "" then
@@ -1045,38 +1045,38 @@ function BrazeInit(config as object, messagePort as object)
       config_object["config"] = { config_time: config_time }
       config_object["triggers"] = request_triggers
       return config_object
-    end function,
+    End Function,
 
-    createIncrementCustomAttributeEvent: function(key as string, value as integer) as object
+    createIncrementCustomAttributeEvent: Function(key as String, value as Integer) as Object
       event_data = {}
       event_data.key = key
       event_data.value = value
       event_object = m.createEventObject(BrazeConstants().EVENT_TYPES.INCREMENT_CUSTOM_ATTRIBUTE, event_data)
       return event_object
-    end function,
+    End Function,
 
-    createSetLocationCustomAttributeEvent: function(key as string, lat as double, lon as double) as object
+    createSetLocationCustomAttributeEvent: Function(key as String, lat as Double, lon as Double) as Object
       event_object = m.createEventObject(BrazeConstants().EVENT_TYPES.LOCATION_CUSTOM_ATTRIBUTE_ADD, { key: key, latitude: lat, longitude: lon })
       return event_object
-    end function,
+    End Function,
 
-    createAddToCustomAttributeArrayEvent: function(key as string, value as string) as object
+    createAddToCustomAttributeArrayEvent: Function(key as String, value as String) as Object
       event_data = {}
       event_data.key = key
       event_data.value = value
       event_object = m.createEventObject(BrazeConstants().EVENT_TYPES.ADD_CUSTOM_ATTRIBUTE_ARRAY, event_data)
       return event_object
-    end function,
+    End Function,
 
-    createRemoveFromCustomAttributeArrayEvent: function(key as string, value as string) as object
+    createRemoveFromCustomAttributeArrayEvent: Function(key as String, value as String) as Object
       event_data = {}
       event_data.key = key
       event_data.value = value
       event_object = m.createEventObject(BrazeConstants().EVENT_TYPES.REMOVE_CUSTOM_ATTRIBUTE_ARRAY, event_data)
       return event_object
-    end function,
+    End Function,
 
-    logEvent: function(event_object as object) as void
+    logEvent: Function(event_object as Object) as Void
       json = {
         "events": [event_object]
       }
@@ -1084,9 +1084,9 @@ function BrazeInit(config as object, messagePort as object)
       json.Append(required_fields)
       endpoint = Braze()._privateApi.config[BrazeConstants().BRAZE_CONFIG_FIELDS.ENDPOINT] + "api/v3/data"
       server_response = Braze()._privateApi.networkUtil.postToUrl(endpoint, json)
-    end function,
+    End Function,
 
-    logAttribute: function(attribute_object as object) as void
+    logAttribute: Function(attribute_object as Object) as Void
       json = {
         "attributes": [attribute_object]
       }
@@ -1094,9 +1094,9 @@ function BrazeInit(config as object, messagePort as object)
       json.Append(required_fields)
       endpoint = Braze()._privateApi.config[BrazeConstants().BRAZE_CONFIG_FIELDS.ENDPOINT] + "api/v3/data"
       server_response = Braze()._privateApi.networkUtil.postToUrl(endpoint, json)
-    end function,
+    End Function,
 
-    requestConfigAndTriggers: function(config_object as object)
+    requestConfigAndTriggers: Function(config_object as Object)
       json = {
         "respond_with": config_object
       }
@@ -1110,9 +1110,9 @@ function BrazeInit(config as object, messagePort as object)
 
       server_response = Braze()._privateApi.networkUtil.postToUrl(endpoint, json, headers)
       return server_response
-    end function,
+    End Function,
 
-    requestTemplate: function(trigger_id as string, trigger_event_type as string, data = invalid as dynamic)
+    requestTemplate: Function(trigger_id as String, trigger_event_type as String, data = invalid as Dynamic)
       if data = invalid
         data = {}
       end if
@@ -1132,9 +1132,9 @@ function BrazeInit(config as object, messagePort as object)
       headers = []
       server_response = Braze()._privateApi.networkUtil.postToUrl(endpoint, json, headers)
       return server_response
-    end function,
+    End Function,
 
-    requestFeatureFlags: function()
+    requestFeatureFlags: Function()
       required_fields = Braze()._privateApi.networkUtil.generateRequiredRequestFields()
       endpoint = Braze()._privateApi.config[BrazeConstants().BRAZE_CONFIG_FIELDS.ENDPOINT] + "api/v3/feature_flags/sync"
       headers = [
@@ -1143,11 +1143,11 @@ function BrazeInit(config as object, messagePort as object)
       ]
       server_response = Braze()._privateApi.networkUtil.postToUrl(endpoint, required_fields, headers)
       return server_response
-    end function,
+    End Function,
   }
 
   NetworkUtil = {
-    postToUrl: function(url as string, postJson as object, headers = [] as object) as object
+    postToUrl: Function(url as String, postJson as Object, headers = [] as Object) as Object
       request = CreateObject("roUrlTransfer")
       port = CreateObject("roMessagePort")
       request.SetMessagePort(port)
@@ -1175,10 +1175,10 @@ function BrazeInit(config as object, messagePort as object)
         end while
       end if
       return invalid
-    end function,
+    End Function,
 
 
-    generateRequiredRequestFields: function(include_device = false as boolean) as object
+    generateRequiredRequestFields: Function(include_device = false as Boolean) as Object
       request_fields = {}
       app_object = Braze()._privateApi.dataProvider.AppDataProvider()
       current_time = Braze()._privateApi.timeUtils.getCurrentTimeSeconds()
@@ -1204,11 +1204,11 @@ function BrazeInit(config as object, messagePort as object)
       end if
 
       return request_fields
-    end function
+    End Function
   }
 
   brazePublicApi = {
-    logEvent: function(args as object) as void
+    logEvent: Function(args as Object) as Void
       m._privateApi.brazeLogger.debug("logging args", FormatJson(args))
       event_name = m._privateApi.brazeUtils.truncateBrazeField(args[BrazeConstants().BRAZE_EVENT_API_FIELDS.CUSTOM_EVENT_NAME])
       events_blocklist = m._privateApi.dataProvider.ConfigProvider().events_blocklist
@@ -1220,9 +1220,9 @@ function BrazeInit(config as object, messagePort as object)
       event_object = m._privateApi.eventHandler.createCustomEventEvent(event_name, event_properties)
       m._privateApi.brazeUtils.processTriggers(BrazeConstants().TRIGGER_TYPES.CUSTOM_EVENT, m._privateapi.dataprovider.ConfigProvider().triggers, getBrazeTask(), { event_name: event_name, event_properties: event_properties, event_object: event_object })
       m._privateApi.eventHandler.logEvent(event_object)
-    end function,
+    End Function,
 
-    logPurchase: function(args as object) as void
+    logPurchase: Function(args as Object) as Void
       m._privateApi.brazeLogger.debug("logging args for purchase", FormatJson(args))
       product_id = Braze()._privateApi.brazeUtils.truncateBrazeField(args[BrazeConstants().BRAZE_EVENT_API_FIELDS.PRODUCT_ID])
       purchases_blocklist = m._privateApi.dataProvider.ConfigProvider().purchases_blocklist
@@ -1237,9 +1237,9 @@ function BrazeInit(config as object, messagePort as object)
       event_object = m._privateApi.eventHandler.createPurchaseEvent(product_id, currency_code, price, quantity, event_properties)
       m._privateApi.brazeUtils.processTriggers(BrazeConstants().TRIGGER_TYPES.PURCHASE, m._privateapi.dataprovider.ConfigProvider().triggers, getBrazeTask(), { product_id: product_id, event_properties: event_properties, event_object: event_object })
       m._privateApi.eventHandler.logEvent(event_object)
-    end function,
+    End Function,
 
-    setLocationCustomAttribute: function(args as object) as void
+    setLocationCustomAttribute: Function(args as Object) as Void
       m._privateApi.brazeLogger.debug("logging args for location custom attribute", FormatJson(args))
       key = Braze()._privateApi.brazeUtils.truncateBrazeField(args.key)
       if m._privateApi.brazeUtils.inArray(key, m._privateApi.dataProvider.ConfigProvider().attributes_blocklist)
@@ -1248,15 +1248,15 @@ function BrazeInit(config as object, messagePort as object)
       end if
       lat = args.lat
       lon = args.lon
-      if key <> invalid and lat <> invalid and lon <> invalid and lat >= -90 and lat <= 90 and lon >= -180 and lon <= 180
+      if key <> invalid AND lat <> invalid AND lon <> invalid AND lat >= -90 AND lat <= 90 AND lon >= -180 AND lon <= 180
         event_object = m._privateApi.eventHandler.createSetLocationCustomAttributeEvent(key, lat, lon)
         m._privateApi.eventHandler.logEvent(event_object)
       else
         m._privateApi.brazeLogger.debug("invalid args for location custom attribute", FormatJson(args))
       end if
-    end function,
+    End Function,
 
-    incrementCustomUserAttribute: function(args as object) as void
+    incrementCustomUserAttribute: Function(args as Object) as Void
       m._privateApi.brazeLogger.debug("logging args for incrementing custom user attribute", FormatJson(args))
       key = Braze()._privateApi.brazeUtils.truncateBrazeField(args.key)
       if m._privateApi.brazeUtils.inArray(key, m._privateApi.dataProvider.ConfigProvider().attributes_blocklist)
@@ -1264,15 +1264,15 @@ function BrazeInit(config as object, messagePort as object)
         return
       end if
       value = args.value
-      if key <> invalid and value <> invalid
+      if key <> invalid AND value <> invalid
         event_object = m._privateApi.eventHandler.createIncrementCustomAttributeEvent(key, value)
         m._privateApi.eventHandler.logEvent(event_object)
       else
         m._privateApi.brazeLogger.debug("invalid args for incrementing custom user attribute", FormatJson(args))
       end if
-    end function,
+    End Function,
 
-    addToCustomAttributeArray: function(args as object) as void
+    addToCustomAttributeArray: Function(args as Object) as Void
       m._privateApi.brazeLogger.debug("logging args for adding to custom attribute array", FormatJson(args))
       key = Braze()._privateApi.brazeUtils.truncateBrazeField(args.key)
       if m._privateApi.brazeUtils.inArray(key, m._privateApi.dataProvider.ConfigProvider().attributes_blocklist)
@@ -1280,15 +1280,15 @@ function BrazeInit(config as object, messagePort as object)
         return
       end if
       value = Braze()._privateApi.brazeUtils.truncateBrazeField(args.value)
-      if key <> invalid and value <> invalid
+      if key <> invalid AND value <> invalid
         event_object = m._privateApi.eventHandler.createAddToCustomAttributeArrayEvent(key, value)
         m._privateApi.eventHandler.logEvent(event_object)
       else
         m._privateApi.brazeLogger.debug("invalid args for adding to custom attribute array", FormatJson(args))
       end if
-    end function,
+    End Function,
 
-    removeFromCustomAttributeArray: function(args as object) as void
+    removeFromCustomAttributeArray: Function(args as Object) as Void
       m._privateApi.brazeLogger.debug("logging args for remove from custom attribute array", FormatJson(args))
       key = Braze()._privateApi.brazeUtils.truncateBrazeField(args.key)
       if m._privateApi.brazeUtils.inArray(key, m._privateApi.dataProvider.ConfigProvider().attributes_blocklist)
@@ -1296,15 +1296,15 @@ function BrazeInit(config as object, messagePort as object)
         return
       end if
       value = Braze()._privateApi.brazeUtils.truncateBrazeField(args.value)
-      if key <> invalid and value <> invalid
+      if key <> invalid AND value <> invalid
         event_object = m._privateApi.eventHandler.createRemoveFromCustomAttributeArrayEvent(key, value)
         m._privateApi.eventHandler.logEvent(event_object)
       else
         m._privateApi.brazeLogger.debug("invalid args for remove from custom attribute array", FormatJson(args))
       end if
-    end function,
+    End Function,
 
-    setCustomAttribute: function(args as object) as void
+    setCustomAttribute: Function(args as Object) as Void
       m._privateApi.brazeLogger.debug("logging args for setting custom attribute", FormatJson(args))
       key = Braze()._privateApi.brazeUtils.truncateBrazeField(args.key)
       if m._privateApi.brazeUtils.inArray(key, m._privateApi.dataProvider.ConfigProvider().attributes_blocklist)
@@ -1312,7 +1312,7 @@ function BrazeInit(config as object, messagePort as object)
         return
       end if
       value = args.value
-      if key <> invalid and (value = invalid or Braze()._privateApi.brazeUtils.isString(value) or Braze()._privateApi.brazeUtils.isInt(value) or Braze()._privateApi.brazeUtils.isFloat(value) or Braze()._privateApi.brazeUtils.isBool(value) or Braze()._privateApi.brazeUtils.isArrayOfStrings(value))
+      if key <> invalid AND (value = invalid OR Braze()._privateApi.brazeUtils.isString(value) OR Braze()._privateApi.brazeUtils.isInt(value) OR Braze()._privateApi.brazeUtils.isFloat(value) OR Braze()._privateApi.brazeUtils.isBool(value) OR Braze()._privateApi.brazeUtils.isArrayOfStrings(value))
         properties = {}
         if Braze()._privateApi.brazeUtils.isString(value) then
           value = Braze()._privateApi.brazeUtils.truncateBrazeField(args.value)
@@ -1330,9 +1330,9 @@ function BrazeInit(config as object, messagePort as object)
       else
         m._privateApi.brazeLogger.debug("invalid args for setting custom attribute", FormatJson(args))
       end if
-    end function,
+    End Function,
 
-    setStringAttribute: function(args as object) as void
+    setStringAttribute: Function(args as Object) as Void
       m._privateApi.brazeLogger.debug("logging args for string attribute", FormatJson(args))
       key = args.key
       value = Braze()._privateApi.brazeUtils.truncateBrazeField(args.value)
@@ -1342,9 +1342,9 @@ function BrazeInit(config as object, messagePort as object)
       else
         m._privateApi.brazeLogger.debug("invalid args for string attribute", FormatJson(args))
       end if
-    end function,
+    End Function,
 
-    logIAMImpression: function(args as object) as void
+    logIAMImpression: Function(args as Object) as Void
       m._privateApi.brazeLogger.debug("logging args for IAM impression", FormatJson(args))
       value = Braze()._privateApi.brazeUtils.truncateBrazeField(args.value)
       if value <> invalid
@@ -1353,9 +1353,9 @@ function BrazeInit(config as object, messagePort as object)
       else
         m._privateApi.brazeLogger.debug("invalid args for IAM impression", FormatJson(args))
       end if
-    end function,
+    End Function,
 
-    logIAMControlImpression: function(args as object) as void
+    logIAMControlImpression: Function(args as Object) as Void
       m._privateApi.brazeLogger.debug("logging args for IAM control impression", FormatJson(args))
       value = Braze()._privateApi.brazeUtils.truncateBrazeField(args.value)
       if value <> invalid
@@ -1364,9 +1364,9 @@ function BrazeInit(config as object, messagePort as object)
       else
         m._privateApi.brazeLogger.debug("invalid args for IAM control impression", FormatJson(args))
       end if
-    end function,
+    End Function,
 
-    logIAMClick: function(args as object) as void
+    logIAMClick: Function(args as Object) as Void
       m._privateApi.brazeLogger.debug("logging args for IAM click", FormatJson(args))
       value = Braze()._privateApi.brazeUtils.truncateBrazeField(args.value)
       if value <> invalid
@@ -1375,9 +1375,9 @@ function BrazeInit(config as object, messagePort as object)
       else
         m._privateApi.brazeLogger.debug("invalid args for IAM click", FormatJson(args))
       end if
-    end function,
+    End Function,
 
-    logIAMButtonClick: function(args as object) as void
+    logIAMButtonClick: Function(args as Object) as Void
       m._privateApi.brazeLogger.debug("logging args for IAM Button click", FormatJson(args))
       value = Braze()._privateApi.brazeUtils.truncateBrazeField(args.value)
       value2 = args.value2
@@ -1387,13 +1387,13 @@ function BrazeInit(config as object, messagePort as object)
       else
         m._privateApi.brazeLogger.debug("invalid args for IAM Button click", FormatJson(args))
       end if
-    end function,
+    End Function,
 
-    refreshFeatureFlags: function(args as object) ' public API
+    refreshFeatureFlags: Function(args as Object) ' public API
       m._privateapi.brazeutils.refreshFeatureFlags()
-    end function,
+    End Function,
 
-    logFeatureFlagImpression: function(args as object) as void
+    logFeatureFlagImpression: Function(args as Object) as Void
       brazelogger = m._privateApi.brazeLogger
       feature_flags_raw = getBrazeTask().BrazeFeatureFlags
       ffId = args.ffId
@@ -1412,28 +1412,28 @@ function BrazeInit(config as object, messagePort as object)
           m._privateapi.dataprovider.cachedconfig.feature_flags_sent_ffi[fts] = 1
           event_object = m._privateApi.eventHandler.createFeatureFlagImpressionEvent(ffId, fts)
           brazeLogger.debug("Logging a feature flag impression. ", FormatJson(args))
-          m._privateApi.eventHandler.logEvent(event_object)  
+          m._privateApi.eventHandler.logEvent(event_object)
         end if
-      else 
+      else
         brazeLogger.debug("Not logging a feature flag impression. The feature flag was not part of any matching campaign", FormatJson(args))
       end if
-    end function,
+    End Function,
 
-    addUserAlias: function(args as object) as void
+    addUserAlias: Function(args as Object) as Void
       m._privateApi.brazeLogger.debug("adding user alias", FormatJson(args))
       utils = Braze()._privateApi.brazeUtils
       alias = utils.truncateBrazeField(args.alias)
       label = utils.truncateBrazeField(args.label)
 
-      if utils.isBlankOrEmpty(alias) or utils.isBlankOrEmpty(label)
+      if utils.isBlankOrEmpty(alias) OR utils.isBlankOrEmpty(label)
         m._privateApi.brazeLogger.debug("invalid args for addUserAlias", FormatJson(args))
       else
         event_object = m._privateApi.eventHandler.createUserAliasEvent(alias, label)
         m._privateApi.eventHandler.logEvent(event_object)
       end if
-    end function,
+    End Function,
 
-    sessionStart: function(args as object) as void
+    sessionStart: Function(args as Object) as Void
       session_uuid = m._privateapi.dataprovider.SessionIdProvider()
       m._privateApi.brazeLogger.debug("session starting", session_uuid)
       storage = Braze()._privateApi.storage
@@ -1459,15 +1459,15 @@ function BrazeInit(config as object, messagePort as object)
         getBrazeTask().BrazeInAppMessage = active_trigger
       end if
       m._privateapi.brazeutils.refreshFeatureFlags()
-    end function,
+    End Function,
 
-    sessionHeartBeat: function(args as object) as void
+    sessionHeartBeat: Function(args as Object) as Void
       m._privateApi.brazeLogger.debug("session heart beat", FormatJson(args))
       storage = Braze()._privateApi.storage
       storage.brazeSaveData(BrazeConstants().BRAZE_STORAGE.SESSION_END_KEY, BrazeConstants().BRAZE_STORAGE.SESSION_SECTION, m._privateapi.timeutils.getCurrentTimeSeconds())
-    end function,
+    End Function,
 
-    sessionEnd: function(args as object) as void
+    sessionEnd: Function(args as Object) as Void
       storage = m._privateApi.storage
       previous_session = storage.brazeReadData(BrazeConstants().BRAZE_STORAGE.SESSION_UUID_KEY, BrazeConstants().BRAZE_STORAGE.SESSION_SECTION)
       if previous_session <> invalid
@@ -1475,7 +1475,7 @@ function BrazeInit(config as object, messagePort as object)
         start_time = storage.brazeReadDataInt(BrazeConstants().BRAZE_STORAGE.SESSION_START_KEY, BrazeConstants().BRAZE_STORAGE.SESSION_SECTION)
         end_time = storage.brazeReadDataInt(BrazeConstants().BRAZE_STORAGE.SESSION_END_KEY, BrazeConstants().BRAZE_STORAGE.SESSION_SECTION)
         duration = 0
-        if start_time <> invalid and end_time <> invalid
+        if start_time <> invalid AND end_time <> invalid
           duration = end_time - start_time
         end if
         data = {}
@@ -1490,9 +1490,9 @@ function BrazeInit(config as object, messagePort as object)
       else
         m._privateApi.brazeLogger.debug("no previous session to end", FormatJson(args))
       end if
-    end function,
+    End Function,
 
-    setUserId: function(args as object) as void
+    setUserId: Function(args as Object) as Void
       m._privateApi.brazeLogger.debug("setting user id", FormatJson(args))
       user_id = args["user_id"]
       if user_id <> m._privateapi.dataprovider.cachedUserId then
@@ -1508,8 +1508,8 @@ function BrazeInit(config as object, messagePort as object)
         m.sessionStart({})
       else
         m._privateApi.brazeLogger.debug("userid not changed", "")
-      end if  
-    end function
+      end if
+    End Function
   }
 
   brazePrivateApi = {
@@ -1525,27 +1525,27 @@ function BrazeInit(config as object, messagePort as object)
 
   brazePublicApi.append({ _privateApi: brazePrivateApi })
   GetGlobalAA().brazeInstance = brazePublicApi
-end function
+End Function
 
 ' Construct a braze SDK object
-function Braze() as object
+Function Braze() as Object
   if GetGlobalAA().brazeInstance = invalid then
     print "BrazeInit not called beforehand"
   end if
   return GetGlobalAA().brazeInstance
-end function
+End Function
 
-function getBrazeTask() as object
+Function getBrazeTask() as Object
   return GetGlobalAA().brazeTask
-end function
+End Function
 
 ' An internal method to allow us to return Feature Flags with the convenience methods
-function _createFeatureFlag(ff as object) as object
+Function _createFeatureFlag(ff as Object) as Object
   return {
     id: ff.id,
     enabled: ff.enabled,
     properties: ff.properties,
-    getStringProperty: function(key as string) as object
+    getStringProperty: Function(key as String) as Object
       for each prop in m.properties
         if prop = key
           if m.properties[prop].type = "string"
@@ -1556,8 +1556,8 @@ function _createFeatureFlag(ff as object) as object
         end if
       end for
       return invalid
-    end function,
-    getBooleanProperty: function(key as string) as object
+    End Function,
+    getBooleanProperty: Function(key as String) as Object
       for each prop in m.properties
         if prop = key
           if m.properties[prop].type = "boolean"
@@ -1568,8 +1568,8 @@ function _createFeatureFlag(ff as object) as object
         end if
       end for
       return invalid
-    end function,
-    getNumberProperty: function(key as string) as object
+    End Function,
+    getNumberProperty: Function(key as String) as Object
       for each prop in m.properties
         if prop = key
           if m.properties[prop].type = "number"
@@ -1580,8 +1580,8 @@ function _createFeatureFlag(ff as object) as object
         end if
       end for
       return invalid
-    end function,
-    getTimestampProperty: function(key as string) as object
+    End Function,
+    getTimestampProperty: Function(key as String) as Object
       for each prop in m.properties
         if prop = key
           if m.properties[prop].type = "datetime"
@@ -1592,8 +1592,8 @@ function _createFeatureFlag(ff as object) as object
         end if
       end for
       return invalid
-    end function,
-    getJSONProperty: function(key as string) as object
+    End Function,
+    getJSONProperty: Function(key as String) as Object
       for each prop in m.properties
         if prop = key
           if m.properties[prop].type = "jsonobject"
@@ -1604,8 +1604,8 @@ function _createFeatureFlag(ff as object) as object
         end if
       end for
       return invalid
-    end function,
-    getImageProperty: function(key as string) as object
+    End Function,
+    getImageProperty: Function(key as String) as Object
       for each prop in m.properties
         if prop = key
           if m.properties[prop].type = "image"
@@ -1616,22 +1616,22 @@ function _createFeatureFlag(ff as object) as object
         end if
       end for
       return invalid
-    end function,
+    End Function,
   }
-end function
+End Function
 
-function getBrazeInstance(task as object) as object
+Function getBrazeInstance(task as Object) as Object
   brazeInstance = {
     brazeTask: task,
 
-    logEvent: function(event_name as string, event_properties = invalid as object) as void
+    logEvent: Function(event_name as String, event_properties = invalid as Object) as Void
       args = {}
       args[BrazeConstants().BRAZE_EVENT_API_FIELDS.CUSTOM_EVENT_NAME] = event_name
       args[BrazeConstants().BRAZE_EVENT_API_FIELDS.CUSTOM_EVENT_PROPERTIES] = event_properties
       m.callInstanceMethod("logEvent", args)
-    end function,
+    End Function,
 
-    logPurchase: function(product_id as string, currency_code as string, price as double, quantity as integer, event_properties = invalid as object) as void
+    logPurchase: Function(product_id as String, currency_code as String, price as Double, quantity as Integer, event_properties = invalid as Object) as Void
       args = {}
       args[BrazeConstants().BRAZE_EVENT_API_FIELDS.PRODUCT_ID] = product_id
       args[BrazeConstants().BRAZE_EVENT_API_FIELDS.CURRENCY_CODE] = currency_code
@@ -1639,170 +1639,170 @@ function getBrazeInstance(task as object) as object
       args[BrazeConstants().BRAZE_EVENT_API_FIELDS.QUANTITY] = quantity
       args[BrazeConstants().BRAZE_EVENT_API_FIELDS.PURCHASE_EVENT_PROPERTIES] = event_properties
       m.callInstanceMethod("logPurchase", args)
-    end function,
+    End Function,
 
-    setCustomAttribute: function(key as string, value as object) as void
-      if value <> invalid and (GetInterface(value, "ifDateTime") <> invalid or Type(value) = "roDateTime") then
+    setCustomAttribute: Function(key as String, value as Object) as Void
+      if value <> invalid AND (GetInterface(value, "ifDateTime") <> invalid OR Type(value) = "roDateTime") then
         m.callInstanceMethod("setCustomAttribute", { key: key, value: value.ToISOString() })
       else
         m.callInstanceMethod("setCustomAttribute", { key: key, value: value })
       end if
-    end function,
+    End Function,
 
-    unsetCustomAttribute: function(key as string) as void
+    unsetCustomAttribute: Function(key as String) as Void
       m.callInstanceMethod("setCustomAttribute", { key: key, value: invalid })
-    end function,
+    End Function,
 
-    setLocationCustomAttribute: function(key as string, lat as double, lon as double) as void
+    setLocationCustomAttribute: Function(key as String, lat as Double, lon as Double) as Void
       m.callInstanceMethod("setLocationCustomAttribute", { key: key, lat: lat, lon: lon })
-    end function,
+    End Function,
 
-    incrementCustomUserAttribute: function(key as string, value as integer) as void
+    incrementCustomUserAttribute: Function(key as String, value as Integer) as Void
       m.callInstanceMethod("incrementCustomUserAttribute", { key: key, value: value })
-    end function,
+    End Function,
 
-    addToCustomAttributeArray: function(key as string, value as string) as void
+    addToCustomAttributeArray: Function(key as String, value as String) as Void
       m.callInstanceMethod("addToCustomAttributeArray", { key: key, value: value })
-    end function,
+    End Function,
 
-    removeFromCustomAttributeArray: function(key as string, value as string) as void
+    removeFromCustomAttributeArray: Function(key as String, value as String) as Void
       m.callInstanceMethod("removeFromCustomAttributeArray", { key: key, value: value })
-    end function,
+    End Function,
 
-    setUserId: function(userId as string) as void
+    setUserId: Function(userId as String) as Void
       m.callInstanceMethod("setUserId", { user_id: userId })
-    end function,
+    End Function,
 
-    setFirstName: function(name as string) as void
+    setFirstName: Function(name as String) as Void
       m.callInstanceMethod("setStringAttribute", { key: "first_name", value: name })
-    end function,
+    End Function,
 
-    setLastName: function(name as string) as void
+    setLastName: Function(name as String) as Void
       m.callInstanceMethod("setStringAttribute", { key: "last_name", value: name })
-    end function,
+    End Function,
 
-    setEmail: function(email as string) as void
+    setEmail: Function(email as String) as Void
       m.callInstanceMethod("setStringAttribute", { key: "email", value: email })
-    end function,
+    End Function,
 
-    setDateOfBirth: function(dob as object) as void
-      if dob <> invalid and (GetInterface(dob, "ifDateTime") <> invalid or Type(dob) = "roDateTime") then
+    setDateOfBirth: Function(dob as Object) as Void
+      if dob <> invalid AND (GetInterface(dob, "ifDateTime") <> invalid OR Type(dob) = "roDateTime") then
         m.callInstanceMethod("setStringAttribute", { key: "dob", value: dob.ToISOString() })
       end if
-    end function,
+    End Function,
 
-    setCountry: function(country as string) as void
+    setCountry: Function(country as String) as Void
       m.callInstanceMethod("setStringAttribute", { key: "country", value: country })
-    end function,
+    End Function,
 
-    setLanguage: function(language as string) as void
+    setLanguage: Function(language as String) as Void
       m.callInstanceMethod("setStringAttribute", { key: "language", value: language })
-    end function,
+    End Function,
 
-    setHomeCity: function(homeCity as string) as void
+    setHomeCity: Function(homeCity as String) as Void
       m.callInstanceMethod("setStringAttribute", { key: "home_city", value: homeCity })
-    end function,
+    End Function,
 
-    setGender: function(gender as string) as void
+    setGender: Function(gender as String) as Void
       m.callInstanceMethod("setStringAttribute", { key: "gender", value: gender })
-    end function,
+    End Function,
 
-    setPhoneNumber: function(number as string) as void
+    setPhoneNumber: Function(number as String) as Void
       m.callInstanceMethod("setStringAttribute", { key: "phone", value: number })
-    end function,
+    End Function,
 
-    setEmailSubscriptionState: function(subscriptionState = BrazeConstants().SUBSCRIPTION_STATES.UNSUBSCRIBED) as void
+    setEmailSubscriptionState: Function(subscriptionState = BrazeConstants().SUBSCRIPTION_STATES.UNSUBSCRIBED) as Void
       m.callInstanceMethod("setStringAttribute", { key: "email_subscribe", value: subscriptionState })
-    end function,
+    End Function,
 
-    setPushNotificationSubscriptionState: function(subscriptionState = BrazeConstants().SUBSCRIPTION_STATES.UNSUBSCRIBED) as void
+    setPushNotificationSubscriptionState: Function(subscriptionState = BrazeConstants().SUBSCRIPTION_STATES.UNSUBSCRIBED) as Void
       m.callInstanceMethod("setStringAttribute", { key: "push_subscribe", value: subscriptionState })
-    end function,
+    End Function,
 
-    setAvatarImageUrl: function(avatarImageUrl as string) as void
+    setAvatarImageUrl: Function(avatarImageUrl as String) as Void
       m.callInstanceMethod("setStringAttribute", { key: "image_url", value: avatarImageUrl })
-    end function,
+    End Function,
 
-    logIAMImpression: function(trigger_id as string) as void
+    logIAMImpression: Function(trigger_id as String) as Void
       m.callInstanceMethod("logIAMImpression", { key: "trigger_id", value: trigger_id })
-    end function,
+    End Function,
 
-    logIAMClick: function(trigger_id as string) as void
+    logIAMClick: Function(trigger_id as String) as Void
       m.callInstanceMethod("logIAMClick", { key: "trigger_id", value: trigger_id })
-    end function,
+    End Function,
 
-    logIAMButtonClick: function(trigger_id as string, button_id as integer) as void
+    logIAMButtonClick: Function(trigger_id as String, button_id as Integer) as Void
       m.callInstanceMethod("logIAMButtonClick", { key: "trigger_id", value: trigger_id, value2: button_id })
-    end function,
+    End Function,
 
-    refreshFeatureFlags: function() as void
-      m.callInstanceMethod("refreshFeatureFlags", { })
-    end function,
+    refreshFeatureFlags: Function() as Void
+      m.callInstanceMethod("refreshFeatureFlags", {})
+    End Function,
 
-    getAllFeatureFlags: function() as object
+    getAllFeatureFlags: Function() as Object
       feature_flags = []
       feature_flags_raw = getBrazeTask().BrazeFeatureFlags
       for each ff in feature_flags_raw
         feature_flags.push(_createFeatureFlag(ff))
       end for
       return feature_flags
-    end function,
+    End Function,
 
-    getFeatureFlag: function(id as string) as object
+    getFeatureFlag: Function(id as String) as Object
       feature_flags = getBrazeTask().BrazeFeatureFlags
-      for each ff in feature_flags 
+      for each ff in feature_flags
         if ff.id = id
           return _createFeatureFlag(ff)
         end if
       end for
       return invalid
-    end function,
-    
-    logFeatureFlagImpression: function(featureFlagId as string) as void
+    End Function,
+
+    logFeatureFlagImpression: Function(featureFlagId as String) as Void
       m.callInstanceMethod("logFeatureFlagImpression", { ffId: featureFlagId })
-    end function,
+    End Function,
 
-    addUserAlias: function(alias as string, label as string) as void
+    addUserAlias: Function(alias as String, label as String) as Void
       m.callInstanceMethod("addUserAlias", { alias: alias, label: label })
-    end function,
+    End Function,
 
-    callInstanceMethod: function(methodName as string, args as object) as void
+    callInstanceMethod: Function(methodName as String, args as Object) as Void
       payload = {}
       payload.methodName = methodName
       payload.arguments = args
       m.brazeTask[BrazeConstants().SCENE_GRAPH_EVENTS.BRAZE_API_INVOCATION] = payload
-    end function,
+    End Function,
   }
 
   brazeInstance.callInstanceMethod("sessionEnd", {})
   brazeInstance.callInstanceMethod("sessionStart", {})
   return brazeInstance
-end function
+End Function
 
-function LogInAppMessageImpression(id as string, brazetask) as void
+Function LogInAppMessageImpression(id as String, brazetask) as Void
   payload = {}
   payload.methodName = "logIAMImpression"
   payload.arguments = { key: "trigger_id", value: id }
   brazetask["BrazeApiInvocation"] = payload
-end function
+End Function
 
-function LogInAppMessageControlImpression(id as string, brazetask) as void
+Function LogInAppMessageControlImpression(id as String, brazetask) as Void
   payload = {}
   payload.methodName = "logIAMControlImpression"
   payload.arguments = { key: "trigger_id", value: id }
   brazetask["BrazeApiInvocation"] = payload
-end function
+End Function
 
-function LogInAppMessageButtonClick(triggerid as string, buttonid as integer, brazetask) as void
+Function LogInAppMessageButtonClick(triggerid as String, buttonid as Integer, brazetask) as Void
   payload = {}
   payload.methodName = "logIAMButtonClick"
   payload.arguments = { key: "trigger_id", value: triggerid, value2: buttonid }
   brazetask["BrazeApiInvocation"] = payload
-end function
+End Function
 
-function LogInAppMessageClick(triggerid as string, brazetask) as void
+Function LogInAppMessageClick(triggerid as String, brazetask) as Void
   payload = {}
   payload.methodName = "logIAMClick"
   payload.arguments = { key: "trigger_id", value: triggerid }
   brazetask["BrazeApiInvocation"] = payload
-end function
+End Function

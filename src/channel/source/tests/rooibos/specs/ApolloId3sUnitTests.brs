@@ -8,34 +8,34 @@ Function ApolloId3sSetup()
     TSEQ: "2:3"
     TSTS: "0.066733:30.096733"
     TVER: "1"
-}
+  }
   m.startId3s = {
     _decodeInfo_pts: 3185.221
     TDUR: "0.000000"
     TMID: "525123456"
     TPOS: "0"
     TVER: "1"
-}
+  }
   m.midId3s = {
     _decodeInfo_pts: 3200.202
     TDUR: "2.969633"
     TMID: "525123456"
     TPOS: "50"
     TVER: "1"
-}
+  }
   m.endId3s = {
     _decodeInfo_pts: 3215.251
     TDUR: "2.002000"
     TMID: "525123456"
     TPOS: "100"
     TVER: "1"
-}
+  }
   m.setAllTags = Function(tags)
     for each tag in tags
       m.id3s.setTag(tag, tags[tag])
     end for
   End Function
-End function
+End Function
 
 
 '@BeforeEach

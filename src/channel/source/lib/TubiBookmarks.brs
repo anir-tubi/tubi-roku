@@ -85,10 +85,10 @@ Function tubiBookmarks_updateLikesLocally(contentId as String, sRatingAction as 
     end if
 
     if sState = ""
-        '//remove the like
-        if likeNode <> invalid
-          global.likeIds.removeChild(likeNode)
-        end if
+      '//remove the like
+      if likeNode <> invalid
+        global.likeIds.removeChild(likeNode)
+      end if
     else
       '//update or add the like
       if likeNode = invalid

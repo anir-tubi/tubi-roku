@@ -6,7 +6,7 @@ Function RokuContinueWatchingApiSetup()
 
   m.constants = getConstants()
   m.rokuContinueWatchingApi = RokuContinueWatchingApi(m.constants)
-End function
+End Function
 
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -17,13 +17,13 @@ End function
 '@Test createUpdateContinueWatchingReqInfo unit tests
 Function rokuContinueWatchingApi_createUpdateContinueWatchingReqInfo_test()
   body = {
-    "items":[{
-        "contentId" :"testContentId",
-        "episodeId":"testEpisodeId",
-        "lastInteractionTime":123456,
-        "position":854,
-        "duration":1678
-      }]
+    "items": [{
+      "contentId": "testContentId",
+      "episodeId": "testEpisodeId",
+      "lastInteractionTime": 123456,
+      "position": 854,
+      "duration": 1678
+    }]
   }
   req = m.rokuContinueWatchingApi.createUpdateContinueWatchingReqInfo(body)
 
@@ -38,7 +38,7 @@ Function rokuContinueWatchingApi_createUpdateContinueWatchingReqInfo_test()
   headers = options.headers
   m.assertAAHasKeys(headers, ["x-roku-reserved-jwt", "x-roku-reserved-channel-id", "x-roku-reserved-channel-store-code", "x-roku-reserved-virtual-user-id", "x-roku-reserved-device-id", "x-roku-reserved-serial-number"])
   m.assertEqual(m.constants.productionApplicationId, headers["x-roku-reserved-channel-id"])
-  
+
   requestBody = ParseJson(options.body)
   m.assertNotInvalid(requestBody.items)
   m.assertEqual("testContentId", requestBody.items[0].contentId)
@@ -52,10 +52,10 @@ End Function
 '@Test createDeleteContinueWatchingReqInfo unit tests
 Function rokuContinueWatchingApi_createDeleteContinueWatchingReqInfo_test()
   body = {
-    "items":[{
-        "contentId" :"testContentId",
-        "episodeId":"testEpisodeId"
-      }]
+    "items": [{
+      "contentId": "testContentId",
+      "episodeId": "testEpisodeId"
+    }]
   }
   req = m.rokuContinueWatchingApi.createDeleteContinueWatchingReqInfo(body)
 
@@ -67,7 +67,7 @@ Function rokuContinueWatchingApi_createDeleteContinueWatchingReqInfo_test()
   headers = options.headers
   m.assertAAHasKeys(headers, ["x-roku-reserved-jwt", "x-roku-reserved-channel-id", "x-roku-reserved-channel-store-code", "x-roku-reserved-virtual-user-id", "x-roku-reserved-device-id", "x-roku-reserved-serial-number"])
   m.assertEqual(m.constants.productionApplicationId, headers["x-roku-reserved-channel-id"])
-  
+
   requestBody = ParseJson(options.body)
   m.assertNotInvalid(requestBody.items)
   m.assertEqual("testContentId", requestBody.items[0].contentId)

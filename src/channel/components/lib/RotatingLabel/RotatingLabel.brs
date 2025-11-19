@@ -65,7 +65,7 @@ Function onCrossfadeStateChange()
   if m.CrossfadeAnimation.state = "stopped"
     m.CrossfadeAnimation.unobserveField("state")
     m.DisplayTimer.observeField("fire", "onDisplayTimerFire")
-    m.DisplayTimer.control = "start"        
+    m.DisplayTimer.control = "start"
   end if
 End Function
 

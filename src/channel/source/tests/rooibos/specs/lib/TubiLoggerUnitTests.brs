@@ -7,7 +7,7 @@ Function TubiLoggerSetup()
   request = TubiRequest()
   auth = TubiAuth(m.constants)
   m.log = TubiLogger(m.constants, request, auth)
-End function
+End Function
 
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -114,19 +114,19 @@ Function tubiLogger_sendLogging_test()
 
   'custom pushRequest method so we don't fire the request and remove the request from the queue
   'once it is added in log.sendLogging()
-  requestQueue.pushRequest = function(request)
-    if request = invalid or request["klass"] <> "TubiAsyncHTTPRequest"
+  requestQueue.pushRequest = Function(request)
+    if request = invalid OR request["klass"] <> "TubiAsyncHTTPRequest"
       tubiLog("Invalid object attempted to push to request queue")
       return invalid
     else
       ' push to queue only if there is room
-      if m.maxSize = 0 or m.queue.Count() < m.maxSize then
+      if m.maxSize = 0 OR m.queue.Count() < m.maxSize then
         m.queue.Push(m.WrapRequest_(request))
         return request
       end if
     end if
     return invalid
-  end function
+  End Function
 
   message = "super important message to log"
   subtype = "403_code"
@@ -138,14 +138,14 @@ Function tubiLogger_sendLogging_test()
   logResult1 = log.sendLogging(logInfo1, requestQueue)
   m.assertNotInvalid(logResult1)
   m.assertTrue(requestQueue.queue.count() > 0)
-  requestQueue.queue = []  'reset for next tests
+  requestQueue.queue = [] 'reset for next tests
 
   'test a log with no message
   logInfo2 = log.buildLogInfo("", errorServerType, subtype, errorLevel)
   logResult2 = log.sendLogging(logInfo2, requestQueue)
   m.assertInvalid(logResult2)
   m.assertTrue(requestQueue.queue.count() = 0)
-  requestQueue.queue = []  'reset for next tests
+  requestQueue.queue = [] 'reset for next tests
 
   'test a log with an invalid serverType
   badServerType = invalid
@@ -153,7 +153,7 @@ Function tubiLogger_sendLogging_test()
   logResult3 = log.sendLogging(logInfo3, requestQueue)
   m.assertInvalid(logResult3)
   m.assertTrue(requestQueue.queue.count() = 0)
-  requestQueue.queue = []  'reset for next tests
+  requestQueue.queue = [] 'reset for next tests
 
   'test with invalid queue
   logInfo4 = log.buildLogInfo(message, errorServerType, subtype, errorLevel)
@@ -167,7 +167,7 @@ Function tubiLogger_sendLogging_test()
   logResult5 = log.sendLogging(logInfo5, requestQueue)
   m.assertInvalid(logResult5)
   m.assertTrue(requestQueue.queue.count() = 0)
-  requestQueue.queue = []  'reset for next tests
+  requestQueue.queue = [] 'reset for next tests
 
   'test if log requests are sent for debug when the device id is in constants.idsToSend
   constants.idsToLog.AddReplace(constants.deviceInfo.deviceId, true)
@@ -175,8 +175,8 @@ Function tubiLogger_sendLogging_test()
   logResult6 = log.sendLogging(logInfo6, requestQueue)
   m.assertNotInvalid(logResult6)
   m.assertTrue(requestQueue.queue.count() > 0)
-  requestQueue.queue = []  'reset for next tests
-  constants.idsToLog = {}  'reset for next tests
+  requestQueue.queue = [] 'reset for next tests
+  constants.idsToLog = {} 'reset for next tests
 
   'test if log requests are sent for info
   infoLevel = "info"
@@ -185,8 +185,8 @@ Function tubiLogger_sendLogging_test()
   logResult7 = log.sendLogging(logInfo7, requestQueue)
   m.assertNotInvalid(logResult7)
   m.assertTrue(requestQueue.queue.count() > 0)
-  requestQueue.queue = []  'reset for next tests
-  constants.idsToLog = {}  'reset for next tests
+  requestQueue.queue = [] 'reset for next tests
+  constants.idsToLog = {} 'reset for next tests
 
   'test a valid warn log
   warnLevel = "warn"
@@ -195,7 +195,7 @@ Function tubiLogger_sendLogging_test()
   logResult8 = log.sendLogging(logInfo8, requestQueue)
   m.assertNotInvalid(logResult8)
   m.assertTrue(requestQueue.queue.count() > 0)
-  requestQueue.queue = []  'reset for next tests
+  requestQueue.queue = [] 'reset for next tests
 End Function
 
 

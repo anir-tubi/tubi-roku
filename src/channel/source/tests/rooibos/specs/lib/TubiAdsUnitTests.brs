@@ -20,7 +20,7 @@ End Function
 
 
 '@BeforeEach
-Function TubiAds_testBeforeEach() as void
+Function TubiAds_testBeforeEach() as Void
   m.stubContent = {
     id: "12345"
     pubid: "publisher_id"
@@ -131,7 +131,7 @@ Function tubiAds_getRainmakerParams_test()
 
   ' stub logged out user to start with
   m.ads.auth.getAuthInfo = Function()
-    return {userId: "3333"}
+    return { userId: "3333" }
   End Function
 
   m.ads.appMode = "KIDS_MODE"

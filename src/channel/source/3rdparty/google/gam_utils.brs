@@ -21,7 +21,7 @@
 
 
 ' Creates a new AppSession for the entire duration of the channel.
-Function newAppSession() As Object
+Function newAppSession() as Object
   deviceInfo = createObject("roDeviceInfo")
   instance = {
     _appInfo: createObject("roAppInfo"),
@@ -34,28 +34,28 @@ Function newAppSession() As Object
   }
 
   instance._booleanAsString = Function(booleanValue, trueValue, falseValue)
-    If booleanValue = Invalid Then Return Invalid
-    If booleanValue = True Then Return trueValue
-    Return falseValue
+    if booleanValue = invalid then return invalid
+    if booleanValue = True then return trueValue
+    return falseValue
   End Function
 
-  instance._buildUrlQueryString = Function(map As Object) As String
+  instance._buildUrlQueryString = Function(map as Object) as String
     keyValues = []
     for each keyValuePair in map.items()
-      If keyValuePair.value <> Invalid And keyValuePair.value <> ""
+      if keyValuePair.value <> invalid AND keyValuePair.value <> ""
         keyValues.push(keyValuePair.key + "=" + keyValuePair.value)
-      End If
-    End For
-    Return keyValues.join("&")
+      end if
+    end for
+    return keyValues.join("&")
   End Function
 
-  instance._webSafeBase64Encode = Function(uncodedString As String) As String
+  instance._webSafeBase64Encode = Function(uncodedString as String) as String
     byteArray = createObject("roByteArray")
     byteArray.fromAsciiString(uncodedString)
-    Return byteArray.toBase64String().replace("/", "_").replace("+", "-").replace("=", ".")
+    return byteArray.toBase64String().replace("/", "_").replace("+", "-").replace("=", ".")
   End Function
 
-  instance._getUserAgent = Function() As String
+  instance._getUserAgent = Function() as String
     product = m._appInfo.getTitle() + "/" + m._appInfo.getVersion()
     platformComponents = [
       "Roku " + m._osVersion.major + "." + m._osVersion.minor + "." + m._osVersion.revision,
@@ -63,10 +63,10 @@ Function newAppSession() As Object
       m._deviceInfo.getModelDisplayName(),
       "Build/" + m._osVersion.build,
     ]
-    Return m._urlTransfer.escape(product + " (" + platformComponents.join("; ") + ")")
+    return m._urlTransfer.escape(product + " (" + platformComponents.join("; ") + ")")
   End Function
 
-  instance._buildGIVN = Function(args As Object) As String
+  instance._buildGIVN = Function(args as Object) as String
     signals = {
       "url": m._urlTransfer.escape(m._appInfo.getTitle() + ".adsenseformobileapps.com/"),
       "vpa": m._booleanAsString(args.adWillAutoPlay, "auto", "click"),
@@ -86,36 +86,36 @@ Function newAppSession() As Object
       "imav": "r.3.2.2",
       "ua": m._getUserAgent()
     }
-    If args.descriptionUrl <> Invalid And args.descriptionUrl <> "" Then signals["url"] = args.descriptionUrl
-    If args.descriptionUrl <> Invalid And args.descriptionUrl <> "" Then signals["video_url_to_fetch"] = args.descriptionUrl
-    If args.videoHeight <> Invalid Then signals["vp_h"] = args.videoHeight.toStr()
-    If args.videoWidth <> Invalid Then signals["vp_w"] = args.videoWidth.toStr()
-    If args.videoHeight <> Invalid And args.videoWidth <> Invalid Then signals["u_so"] = m._booleanAsString(args.videoHeight > args.videoWidth, "p", "l")
-    If args.storageAllowed = True And args.directedForChildOrUnknownAge = False
+    if args.descriptionUrl <> invalid AND args.descriptionUrl <> "" then signals["url"] = args.descriptionUrl
+    if args.descriptionUrl <> invalid AND args.descriptionUrl <> "" then signals["video_url_to_fetch"] = args.descriptionUrl
+    if args.videoHeight <> invalid then signals["vp_h"] = args.videoHeight.toStr()
+    if args.videoWidth <> invalid then signals["vp_w"] = args.videoWidth.toStr()
+    if args.videoHeight <> invalid AND args.videoWidth <> invalid then signals["u_so"] = m._booleanAsString(args.videoHeight > args.videoWidth, "p", "l")
+    if args.storageAllowed = True AND args.directedForChildOrUnknownAge = False
       signals["id_type"] = "rida"
       signals["rdid"] = m._deviceInfo.getRida()
-    End If
+    end if
     signalString = m._buildUrlQueryString(signals)
-    Return m._webSafeBase64Encode(signalString)
+    return m._webSafeBase64Encode(signalString)
   End Function
 
   ' Creates a new content session, for a single given content or program.
-  instance.newContentSession = Function(rawSessionArgs As Object) As Object
+  instance.newContentSession = Function(rawSessionArgs as Object) as Object
     sessionArgs = {
-      adWillAutoPlay: Invalid,
-      adWillPlayMuted: Invalid,
-      continuousPlayback: Invalid,
-      descriptionUrl: Invalid,
+      adWillAutoPlay: invalid,
+      adWillPlayMuted: invalid,
+      continuousPlayback: invalid,
+      descriptionUrl: invalid,
       directedForChildOrUnknownAge: False,
       iconsSupported: False,
-      publisherProvidedId: Invalid,
-      raf: Invalid,
+      publisherProvidedId: invalid,
+      raf: invalid,
       storageAllowed: False,
       supportedApiFrameworks: [],
       sessionId: m._sessionId,
       skippablesSupported: False,
-      videoHeight: Invalid,
-      videoWidth: Invalid
+      videoHeight: invalid,
+      videoWidth: invalid
     }
     sessionArgs.append(rawSessionArgs)
     asscsCorrelator = m._deviceInfo.getRandomUUID()
@@ -130,50 +130,50 @@ Function newAppSession() As Object
     }
 
     ' Returns the `givn=` value for making ads requests.
-    proto.getGIVN = Function() As String
-      Return m._givn
+    proto.getGIVN = Function() as String
+      return m._givn
     End Function
 
     ' Sends a beacon to indicate that a clickthrough on an ad has occurred.
-    proto.sendAdClickBeacon = Sub()
-      m._sendBeacon("3", "Clicked", False, Invalid)
-    End Sub
+    proto.sendAdClickBeacon = sub()
+      m._sendBeacon("3", "Clicked", False, invalid)
+    end sub
 
     ' Sends a beacon to indicate that a user touch or click on the ad other than
     ' a clickthrough (for example, skip, mute, tap, etc.) from `onKeyEvent`.
-    proto.sendAdTouchBeacon = Sub(key As String)
+    proto.sendAdTouchBeacon = sub(key as String)
       m._sendBeacon("4", "Interaction", False, key)
-    End Sub
+    end sub
 
     ' Sends a beacon to indicate that the content activity has started. For
     ' video, this should be called on "video player start". This may be in
     ' response to a user-initiated action (click-to-play) or a channel initiated
     ' action (autoplay).
-    proto.sendStartedBeacon = Sub()
+    proto.sendStartedBeacon = sub()
       m._isActive = True
       m._activityTimer.mark()
-      m._sendBeacon("5", "ProgressStarted", True, Invalid)
-    End Sub
+      m._sendBeacon("5", "ProgressStarted", True, invalid)
+    end sub
 
     ' Triggers beacons that fire during content activity as time progresses.
-    proto.poll = Sub()
-      If m._isActive = False Then Return
-      If m._activityTimer.totalSeconds() < 5 Then Return
+    proto.poll = sub()
+      if m._isActive = False then return
+      if m._activityTimer.totalSeconds() < 5 then return
       m._activityTimer.mark()
-      m._sendBeacon("6", "Progress", False, Invalid)
-    End Sub
+      m._sendBeacon("6", "Progress", False, invalid)
+    end sub
 
     ' Sends a beacon to indicate that the content activity has ended. For video
     ' this should be called when playback ends (for example, when the player
     ' reaches end of stream, or when the user exits playback mid-way, or when
     ' the user quits the channel, or when advancing to the next content item in
     ' a playlist setting).
-    proto.sendEndedBeacon = Sub()
+    proto.sendEndedBeacon = sub()
       m._isActive = False
-      m._sendBeacon("7", "ProgressEnded", False, Invalid)
-    End Sub
+      m._sendBeacon("7", "ProgressEnded", False, invalid)
+    end sub
 
-    proto._sendBeacon = Sub(eventType As String, rafEventType As String, includeAllSignals As Boolean, key)
+    proto._sendBeacon = sub(eventType as String, rafEventType as String, includeAllSignals as Boolean, key)
       signals = {
         "asscs_correlator": m._asscsCorrelator,
         "ctv": "1",
@@ -186,7 +186,7 @@ Function newAppSession() As Object
         "lkp": (m._instance._deviceInfo.timeSinceLastKeyPress() * 1000).toStr(),
         "sut": (upTime(0) * 1000).toStr()
       }
-      If includeAllSignals
+      if includeAllSignals
         signals.append({
           "aid": m._instance._appInfo.getId(),
           "av": m._instance._appInfo.getVersion(),
@@ -197,15 +197,15 @@ Function newAppSession() As Object
           "mdl": m._instance._deviceInfo.getModel(),
           "isd": m._instance._booleanAsString(m._instance._appInfo.isDev(), "1", "0")
         })
-      End If
+      end if
       signalString = m._instance._buildUrlQueryString(signals)
       m._raf.fireTrackingEvents({
         "tracking": [{
           "event": rafEventType, "triggered": False,
           "url": "https://pagead2.googlesyndication.com/pagead/gen_204?" + signalString
-      }], "adServer": Invalid }, { "type": rafEventType })
-    End Sub
-    Return proto
+      }], "adServer": invalid }, { "type": rafEventType })
+    end sub
+    return proto
   End Function
-  Return instance
+  return instance
 End Function

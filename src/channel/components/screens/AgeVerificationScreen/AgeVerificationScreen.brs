@@ -125,7 +125,7 @@ Function onNumberPadTextChanged(msg)
     m.Prompt.visible = false
     if dateLength = 4
       m.NumberPad.moveFocusToDelete = true
-      m.top.birthdate = date + "-12-31"  ' since backend expects birthday in date format(YYYY-MM-DD), we are appending dummy month & day
+      m.top.birthdate = date + "-12-31" ' since backend expects birthday in date format(YYYY-MM-DD), we are appending dummy month & day
 
       currentYear = createObject("roDateTime").getYear()
       if isUserToddler(date, currentYear) = true AND m.warningDisplayedCount = 0
@@ -133,7 +133,7 @@ Function onNumberPadTextChanged(msg)
         readAudioGuideText(m.Prompt.text)
         m.Prompt.visible = true
         m.warningDisplayedCount += 1
-      else if isUserNewBorn(date, currentYear) = true or isUserTooOld(date, currentYear) = true
+      else if isUserNewBorn(date, currentYear) = true OR isUserTooOld(date, currentYear) = true
         m.Prompt.text = getTranslation("screenAgeVerification_error_prompt")
         readAudioGuideText(m.Prompt.text)
         m.Prompt.visible = true
@@ -151,7 +151,7 @@ End Function
 
 Function onAgeSubmittedChanged()
   ' Want to reset the numberpad text on submit as the only time they will be coming back is if they were confirming their age and likely need to change it
-    m.NumberPad.text = ""
+  m.NumberPad.text = ""
 End Function
 
 
@@ -201,7 +201,7 @@ Function refreshDateOnScreen(date)
   year = date
 
   ' update the year values
-  if year = invalid or year.len() = 0
+  if year = invalid OR year.len() = 0
     m.YearEntryFront.text = m.yearLetter + m.yearLetter + m.yearLetter + m.yearLetter
     m.YearEntryBack.text = m.yearLetter + m.yearLetter + m.yearLetter + m.yearLetter
   else if year.len() = 1
@@ -273,7 +273,7 @@ Function checkValidCentury(submittedMillennium, submittedCentury)
   dateTime = createObject("roDateTime")
   currentYear = dateTime.getYear()
 
-  currentCentury = (currentYear MOD 1000) \ 100 * 100
+  currentCentury = (currentYear mod 1000) \ 100 * 100
   ' (2021 MOD 1000) \ 100 * 100 = 0
   ' (2221 MOD 1000) \ 100 * 100 = 200
 
@@ -299,11 +299,11 @@ Function checkValidDecade(submittedCentury, submittedDecade)
   dateTime = createObject("roDateTime")
   currentYear = dateTime.getYear()
 
-  currentDecade = (currentYear MOD 100) \ 10 * 10
+  currentDecade = (currentYear mod 100) \ 10 * 10
   ' (2021 MOD 100) \ 10 * 10 = 20
   ' (2019 MOD 100) \ 10 * 10 = 10
 
-  currentCentury = (currentYear MOD 1000) \ 100 * 100
+  currentCentury = (currentYear mod 1000) \ 100 * 100
 
   if submittedCentury * 100 = currentCentury AND (submittedDecade * 10) > currentDecade
     ' only check if the submitted decade is greater than current decade if the submitted century

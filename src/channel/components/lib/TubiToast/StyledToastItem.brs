@@ -35,13 +35,13 @@ Function onThemeChange()
   if defaultStyleColor <> ""
     defaultStyle = getTypographyOfMultiStyleLabel(typographyConstants.ids.bodySmall, defaultStyleColor)
   else
-    defaultStyle = getTypographyOfMultiStyleLabel(typographyConstants.ids.bodySmall)      
+    defaultStyle = getTypographyOfMultiStyleLabel(typographyConstants.ids.bodySmall)
   end if
 
   if urlStyleColor <> ""
     urlStyle = getTypographyOfMultiStyleLabel(typographyConstants.ids.bodySmall, urlStyleColor)
   else
-    urlStyle = getTypographyOfMultiStyleLabel(typographyConstants.ids.bodySmall)      
+    urlStyle = getTypographyOfMultiStyleLabel(typographyConstants.ids.bodySmall)
   end if
 
   drawingStyles["defaultStyle"] = defaultStyle
@@ -113,7 +113,7 @@ Function onShow(_msg)
 
   if (msgWidth + imageWidth >= 546) OR (headerWidth + imageWidth >= 546)
     m.infoPaneBg.width = 642
-  else if (msgWidth + imageWidth < 345) AND (headerWidth +  imageWidth < 345)
+  else if (msgWidth + imageWidth < 345) AND (headerWidth + imageWidth < 345)
     m.infoPaneBg.width = 441
   else if (msgWidth + imageWidth >= 345) OR (headerWidth + imageWidth >= 345)
     m.infoPaneBg.width = msgWidth + imageWidth + 96
@@ -125,7 +125,7 @@ Function onShow(_msg)
   finalHorizTranslation = 654 - m.infoPaneBg.width
   m.top.finalHorizTranslation = finalHorizTranslation
 
-  totalHeight =  m.infoPaneText.boundingRect().height  + 72 'top + bottom margins
+  totalHeight = m.infoPaneText.boundingRect().height + 72 'top + bottom margins
   if m.header <> invalid
     totalHeight = totalHeight + m.header.boundingRect().height + 12 'header height + spacing
   end if
@@ -181,7 +181,7 @@ Function createHeaderText(inputArgs)
     m.header.numLines = "1"
     m.header.width = "0"
     m.header.text = inputArgs.headerText
-    m.header.wrap="false"
+    m.header.wrap = "false"
     font = CreateObject("roSGNode", "Font")
     m.header.font = font
     m.infoPaneMsgArea.insertChild(m.header, 0)

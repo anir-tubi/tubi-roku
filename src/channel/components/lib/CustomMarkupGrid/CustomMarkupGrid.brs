@@ -1,4 +1,4 @@
-Function onKeyEvent(key, press) as boolean
+Function onKeyEvent(key, press) as Boolean
   if press = true
     if key = "fastforward" OR key = "rewind"
       m.top.keyPress = key

@@ -3,7 +3,7 @@ Function init()
   m.constants = getConstantsFromGlobal()
   m.tubiTrackingInfo = TubiTrackingInfo(m.constants)
   topRef.observeFieldScoped("focusedChild", "onScreenFocusChange")
-  
+
   m.heading = topRef.findNode("heading")
   m.subheading = topRef.findNode("subheading")
   m.exitBtn = topRef.findNode("exitBtn")
@@ -62,7 +62,7 @@ Function onExitButtonSelected()
   pageOneof = m.tubiTrackingInfo.getAnalyticsPage(trackingPageInfo.pagetype, trackingPageInfo.pageValues)
   componentOneof = m.tubiTrackingInfo.getAnalyticsComponent("button_component", componentValues)
 
-  m.top.componentInteractionInfo =  {
+  m.top.componentInteractionInfo = {
     pageOneof: pageOneof
     componentOneof: componentOneof
     user_interaction: "CONFIRM"

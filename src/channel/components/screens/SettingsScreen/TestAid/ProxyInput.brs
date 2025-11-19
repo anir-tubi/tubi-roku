@@ -33,19 +33,19 @@ Function onFocusChange()
 End Function
 
 
-Function onKeyEvent(key as String, press as Boolean) as boolean
+Function onKeyEvent(key as String, press as Boolean) as Boolean
   handled = false
   if press = true
     if key = "down" AND m.proxyKB.isInFocusChain() = true
       m.addProxyBt.setFocus(true)
-      handled =true
+      handled = true
     else if key = "up" AND m.addProxyBt.hasFocus() = true
       m.proxyKB.setFocus(true)
       handled = true
-    else if key="right" AND m.addProxyBt.hasFocus() = true
+    else if key = "right" AND m.addProxyBt.hasFocus() = true
       m.removeProxyBt.setFocus(true)
       handled = true
-    else if key="left" AND m.removeProxyBt.hasFocus() = true
+    else if key = "left" AND m.removeProxyBt.hasFocus() = true
       m.addProxyBt.setFocus(true)
       handled = true
     end if

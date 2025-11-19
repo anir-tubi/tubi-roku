@@ -8,7 +8,7 @@ Function init()
   ' each time getTranslation() is called.
   m.constants = getConstantsFromGlobal()
   m.continueWatchingLayout = m.top.findNode("continueWatchingLayout")
-  m.continueWatchingButton= m.top.findNode("ButtonGroup")
+  m.continueWatchingButton = m.top.findNode("ButtonGroup")
   m.title = m.top.findNode("Title")
 
   sTitle = getTranslation("metadata_continueWatching_notSignedIn_container_description")
@@ -41,7 +41,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.buttonBG.blendColor = theme.focusedColor
     m.Title.color = theme.primaryTextColor

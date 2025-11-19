@@ -16,7 +16,7 @@ Function onFocusedChildChange()
 End Function
 
 
-Function onKeyEvent(key As string, press As boolean) As boolean
+Function onKeyEvent(key as String, press as Boolean) as Boolean
   if press = true
     ' Only gets executed if we have scrollable field at top and it is true.
     ' Mainly for default modals.
@@ -24,7 +24,7 @@ Function onKeyEvent(key As string, press As boolean) As boolean
       if key = "up" AND m.buttonList.hasFocus() = true then
         m.scrollableMessage.scrollbarThumbBitmapUri = "pkg:/images/menu-focus-$$RES$$.9.png"
         m.scrollableMessage.setFocus(true)
-      else if (key = "down" or key = "left" or key = "right" or key = "OK") AND m.scrollableMessage.hasFocus() = true then
+      else if (key = "down" OR key = "left" OR key = "right" OR key = "OK") AND m.scrollableMessage.hasFocus() = true then
         m.scrollableMessage.scrollbarThumbBitmapUri = "pkg:/images/menu-disabled-focus-$$RES$$.9.png"
         m.buttonList.setFocus(true)
       end if

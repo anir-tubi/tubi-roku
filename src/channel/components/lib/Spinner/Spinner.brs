@@ -34,7 +34,7 @@ Function init()
     spinner.visible = false
   end if
   onDimensionsChange() '//update the placement of spinners
-  
+
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(loadingMessage, typographyConstants.ids.bodyMedium)
 
@@ -51,7 +51,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.Shade.color = theme.shadeColor
     m.spinnerBox.color = theme.neutralSolidColor
@@ -61,7 +61,7 @@ End Function
 
 Function onVisibleChange(msg)
   visibility = msg.getData()
-  if visibility = true and m.Animation.state <> "running" then
+  if visibility = true AND m.Animation.state <> "running" then
     m.Animation.control = "start"
   else if visibility = false then
     m.Animation.control = "stop"
@@ -110,7 +110,7 @@ Function onDimensionsChange()
     rect = calculateRect(66, 66)
     spinner.width = rect.width
     spinner.height = rect.height
-    spinner.scaleRotateCenter=[rect.width / 2, rect.height / 2]
+    spinner.scaleRotateCenter = [rect.width / 2, rect.height / 2]
     if m.top.displayText = true
       '//vertically center both spinner and message
       nMessageSpacing = 37
@@ -131,17 +131,17 @@ Function onDimensionsChange()
     end if
     message.translation = [nMessageX, nMessageY]
   end if
-  End Function
+End Function
 
 
-  ' Get a bounding rect of a square with boundary of max size 'max'. Alignment should be dictated by the vertAlign and horizAlign values.
-  ' If the max is greater than the total size of this Spinner component, the component size is used
-  Function calculateRect(maxWidth, maxHeight)
+' Get a bounding rect of a square with boundary of max size 'max'. Alignment should be dictated by the vertAlign and horizAlign values.
+' If the max is greater than the total size of this Spinner component, the component size is used
+Function calculateRect(maxWidth, maxHeight)
   if m.top.width < maxWidth
     x = 0
     width = m.top.width
   else
-    x = (m.top.width - maxWidth) / 2  '//center is the default value
+    x = (m.top.width - maxWidth) / 2 '//center is the default value
     if m.top.horizAlign = "right"
       x = m.top.width - maxWidth
     else if m.top.horizAlign = "left"
@@ -153,7 +153,7 @@ Function onDimensionsChange()
     y = 0
     height = m.top.height
   else
-    y = (m.top.height - maxHeight) / 2  '//center is the default value
+    y = (m.top.height - maxHeight) / 2 '//center is the default value
     if m.top.vertAlign = "bottom"
       y = m.top.height - maxHeight
     else if m.top.vertAlign = "top"

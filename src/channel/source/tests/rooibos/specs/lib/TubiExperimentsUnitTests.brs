@@ -15,7 +15,7 @@ Function TubiExperimentsSetup()
       }
     }
   }
-End function
+End Function
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 '@It tests functions in TubiExperiments.brs

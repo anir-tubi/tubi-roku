@@ -10,7 +10,7 @@ Function init()
   m.qrCodePoster = topRef.findNode("qrCodePoster")
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.heading, typographyConstants.ids.subheaderMedium) 
+  setTypographyOfLabel(m.heading, typographyConstants.ids.subheaderMedium)
   setTypographyOfLabel(m.subheading, typographyConstants.ids.bodyMedium)
 
   if m.global <> invalid
@@ -59,7 +59,7 @@ Function onQRCodeSizeChange(msg)
 End Function
 
 
-Function onKeyEvent(key as string, press as boolean) as boolean
+Function onKeyEvent(key as String, press as Boolean) as Boolean
   if press = false
     return false
   end if

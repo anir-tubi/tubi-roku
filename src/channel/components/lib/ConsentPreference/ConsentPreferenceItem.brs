@@ -113,7 +113,7 @@ Function onFocusPercentChange(msg)
     m.subtitle.opacity = 1 - focusPercent
     m.subtitleFocused.opacity = focusPercent
     m.toggleText.opacity = 1 - focusPercent
-    m.toggleTextFocused.opacity = focusPercent  
+    m.toggleTextFocused.opacity = focusPercent
   end if
 End Function
 

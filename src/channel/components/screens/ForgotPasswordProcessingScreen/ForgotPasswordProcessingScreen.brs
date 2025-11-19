@@ -99,7 +99,7 @@ Function onResendInstantLinkSelected()
     type: "dialog"
     values: {
       dialog_type: "LOGIN_REQUEST"
-      pageOneof:  m.Tracking.getAnalyticsPage("login_page", {"choice": "LINK"})
+      pageOneof: m.Tracking.getAnalyticsPage("login_page", { "choice": "LINK" })
       dialog_action: "SHOW"
       dialog_sub_type: "resend_link"
     }
@@ -121,14 +121,14 @@ Function onResendVerificationLinkSelected()
       type: "dialog"
       values: {
         dialog_type: "LOGIN_REQUEST"
-        pageOneof:  m.Tracking.getAnalyticsPage("login_page", {"choice": "LINK"})
+        pageOneof: m.Tracking.getAnalyticsPage("login_page", { "choice": "LINK" })
         dialog_action: "SHOW"
         dialog_sub_type: "many_attempts"
       }
     }
 
     title = getTranslation("dialog_button_attempts_title")
-    message = getTranslation("dialog_button_multiple_emails_sent") + Chr(10) + m.email.text +  Chr(10) + getTranslation("dialog_email_verification_check_spam")
+    message = getTranslation("dialog_button_multiple_emails_sent") + Chr(10) + m.email.text + Chr(10) + getTranslation("dialog_email_verification_check_spam")
     buttons = [getTranslation("dialog_button_close")]
     showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onTooManyAttemptsCallback, onTooManyAttemptsCallback)
   else
@@ -150,7 +150,7 @@ Function onTooManyAttemptsCallback()
 End Function
 
 
-Function onKeyEvent(key As String, press As Boolean) as Boolean
+Function onKeyEvent(key as String, press as Boolean) as Boolean
   handled = false
   if press
     if key = "back"

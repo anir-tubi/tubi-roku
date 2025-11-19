@@ -55,8 +55,8 @@ Function setBackgroundWidth()
   setSeconds(getIntegerToSetWidth())
   m.CountdownSeconds.width = m.CountdownSeconds.boundingRect().width '//set the width of the seconds textfield so the seconds can be right aligned.
 
-  '// Workaround for potential Roku rendering issue: Add 1 pixel to the width to ensure the seconds label remains 
-  '// right-aligned when displaying fewer characters than the maximum (e.g., "5" vs. "55"). Without this, the text may appear 
+  '// Workaround for potential Roku rendering issue: Add 1 pixel to the width to ensure the seconds label remains
+  '// right-aligned when displaying fewer characters than the maximum (e.g., "5" vs. "55"). Without this, the text may appear
   '// misaligned if the width matches the maximum character count exactly.'
   m.CountdownSeconds.width = m.CountdownSeconds.width + 1
 
@@ -67,9 +67,9 @@ Function setBackgroundWidth()
     nFullScreenIconWidth = m.FullscreenIcon.width + nItemSpacing
   end if
 
-  m.PlayerCountdownBground.width = (m.TextAndIconParentGroup.translation[0] * 2) + nFullScreenIconWidth +  m.CountdownText.boundingRect().width + m.CountdownSeconds.boundingRect().width
+  m.PlayerCountdownBground.width = (m.TextAndIconParentGroup.translation[0] * 2) + nFullScreenIconWidth + m.CountdownText.boundingRect().width + m.CountdownSeconds.boundingRect().width
   m.top.width = m.PlayerCountdownBground.width
-  
+
   '//reset the seconds back to what they were before this function
   setSeconds(m.top.seconds)
 End Function
@@ -129,14 +129,14 @@ End Function
 Function onTypographyLabelIdChange(msg)
   setTypographyOfCountdownLabel(msg.getData())
 End Function
-  
-  
+
+
 Function setTypographyOfCountdownLabel(sTypographyId = "")
   typographyConstants = getTypographyConstants()
   if isNonEmptyString(sTypographyId) = false
     sTypographyId = typographyConstants.ids.bodyMedium
   end if
-  
+
   '//vertically center the label and icon
   m.CountdownText.height = 0
   m.CountdownSeconds.height = 0
@@ -148,7 +148,7 @@ Function setTypographyOfCountdownLabel(sTypographyId = "")
   m.PlayerCountdownBground.height = nLabelHeight + (m.TextAndIconParentGroup.translation[1] * 2)
   nMaxHeight = maxValue(nLabelHeight, m.FullscreenIcon.height)
   if nMaxHeight <> invalid
-    m.TextAndIconLayoutGroup.translation = [m.TextAndIconLayoutGroup.translation[0], nMaxHeight/2]
+    m.TextAndIconLayoutGroup.translation = [m.TextAndIconLayoutGroup.translation[0], nMaxHeight / 2]
   end if
   m.CountdownText.height = m.CountdownText.boundingRect().height
   m.CountdownSeconds.height = m.CountdownText.boundingRect().height
@@ -173,7 +173,7 @@ Function setSeconds(nSeconds)
 
   m.CountdownText.text = getTranslation(sTranslationId)
 
-  m.CountdownSeconds.horizAlign="right"
+  m.CountdownSeconds.horizAlign = "right"
   if nSeconds >= 0
     if m.top.maxSeconds < 0
       '//Set the maxSeconds if had never been set and the number of seconds is greater than or equal to 0.

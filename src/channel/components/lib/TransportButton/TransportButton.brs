@@ -69,8 +69,8 @@ Function onFocusUpdate()
   end if
 
   if m.top.enabled then
-    m.top.opacity=1.0
+    m.top.opacity = 1.0
   else
-    m.top.opacity=0.3
+    m.top.opacity = 0.3
   end if
 End Function

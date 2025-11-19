@@ -4,7 +4,7 @@ Function init()
   m.leftPanelWidth = 437
   m.rightPanelWidth = 1146
   '//The offset sets the right panel to be placed at a different position than the settings menu list
-  m.rightPanelOffset = [36,-147]
+  m.rightPanelOffset = [36, -147]
 
   m.PageGroup = m.top.findNode("PageGroup")
   m.PageGroup.translation = [69, 0]
@@ -386,7 +386,7 @@ Function createPrivacyCenterPanel(title)
     privacyCenterSettings = consentSettings.privacyCenterSettings
     privacyCenterPanel.consentSettings = consentSettings
     if privacyCenterSettings <> invalid AND privacyCenterSettings.showConsentPreferences = true AND consentSettings.consents.Count() > 0
-      for i = 0 to consentSettings.consents.Count()-1
+      for i = 0 to consentSettings.consents.Count() - 1
         if consentSettings.consents[i].value <> "required"
           focusable = true
           exit for
@@ -399,7 +399,7 @@ Function createPrivacyCenterPanel(title)
     end if
 
     privacyCenterPanel.focusable = focusable
-    privacyCenterPanel.offset = [m.rightPanelOffset[0],-141]
+    privacyCenterPanel.offset = [m.rightPanelOffset[0], -141]
     privacyCenterPanel.observeFieldScoped("newConsentPreferences", "onNewConsentPreferences")
     privacyCenterPanel.observeFieldScoped("didUserSelectSaveAndRestart", "onDidUserSelectSaveAndRestart")
   end if
@@ -453,7 +453,7 @@ End Function
 
 Function onLegalState(msg)
   tubiLog("onLegalState state = " + msg.GetData())
-  if msg.GetData() = "stop" or msg.GetData() = "done"
+  if msg.GetData() = "stop" OR msg.GetData() = "done"
     task = msg.getRoSGNode()
     if task <> invalid
       panel = task.getParent()
@@ -485,9 +485,9 @@ Function createSignOutPanel()
     sName = m.top.signInInfo.name
   end if
   if sName <> ""
-    panel.description  = getTranslation("screenSettings_signOut_description", {name: sName})
+    panel.description = getTranslation("screenSettings_signOut_description", { name: sName })
   else
-    panel.description  = ""
+    panel.description = ""
   end if
 
   sEmail = ""
@@ -495,9 +495,9 @@ Function createSignOutPanel()
     sEmail = m.top.signInInfo.email
   end if
   if sEmail <> ""
-    panel.description2  = getTranslation("screenSettings_signOut_description2", {email: sEmail})
+    panel.description2 = getTranslation("screenSettings_signOut_description2", { email: sEmail })
   else
-    panel.description2  = ""
+    panel.description2 = ""
   end if
 
   panel.width = m.rightPanelWidth

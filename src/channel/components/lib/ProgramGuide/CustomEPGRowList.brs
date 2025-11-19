@@ -1,12 +1,12 @@
-Sub init()
+sub init()
   m.currentItemFocused = -1
   m.lastFocused = 0
   m.top.observeField("itemUnfocused", "onItemUnfocused")
   m.top.observeField("currFocusRow", "onCurrFocusRowChange")
-End Sub
+end sub
 
 
-Function onKeyEvent(key, press) as boolean
+Function onKeyEvent(key, press) as Boolean
   if press
     m.top.kepPressed = key
     if key = "down"

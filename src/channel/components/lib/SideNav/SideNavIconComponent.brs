@@ -69,8 +69,8 @@ Function onContentChange(data)
       m.subTxt.text = item.shortDescriptionLine1
       if m.subTxt.text <> ""
         'subTxt needs to be centered on the sideNav. Center position of the subtext calculated using the X Position of the icon + center point of the profile icon.
-        subTxtCenterPt = (m.Icon.translation[0] + (m.Icon.boundingRect().width / 2)) - ( m.subTxt.boundingRect().width / 2 )
-        m.subTxt.translation = [subTxtCenterPt, 57 ]
+        subTxtCenterPt = (m.Icon.translation[0] + (m.Icon.boundingRect().width / 2)) - (m.subTxt.boundingRect().width / 2)
+        m.subTxt.translation = [subTxtCenterPt, 57]
       end if
 
       'add free icon next to Label when sideNav is open
@@ -213,7 +213,7 @@ End Function
 
 Function onHeightChange()
   nHeight = m.top.height
-  nIconY = (nHeight - m.Icon.height)/2
+  nIconY = (nHeight - m.Icon.height) / 2
   m.Icon.translation = [m.Icon.translation[0], nIconY]
   m.focusedIcon.translation = [m.Icon.translation[0], nIconY]
   m.Label.height = nHeight

@@ -98,7 +98,7 @@ Function onTimerFired()
   if adInfo <> invalid AND isNumber(adInfo.totalAdDurationInCurrentPod) = true
     m.adViewedDuration = m.adViewedDuration + 1
     updateTimeRemaining()
-    
+
     m.timer.control = "STOP"
     if adInfo.type = "Start" OR adInfo.type = "Resume"
       m.timer.control = "START"
@@ -111,14 +111,14 @@ Function updateTimeRemaining()
   adInfo = m.top.adInfo
 
   if shouldUseTotalPodDuration() = false
-    totalDuration = adInfo.duration    
+    totalDuration = adInfo.duration
   else
     totalDuration = adInfo.totalAdDurationInCurrentPod
   end if
 
   if adInfo <> invalid AND isNumber(totalDuration) = true
     timeRemaining = totalDuration - m.adViewedDuration
-    
+
     m.timeRemainingText.text = formatTime(timeRemaining)
 
     m.timeRemainingBackground.visible = true
@@ -135,16 +135,16 @@ Function updateOverlayWidth()
     m.timeRemainingText.width = timeRemainingTextWidth + padding
   end if
 
-  m.background.width = m.elementsGroup.boundingRect().width + 16  
+  m.background.width = m.elementsGroup.boundingRect().width + 16
 End Function
 
 
 Function formatTime(seconds)
-  minutes = seconds \ 60 ' Integer division to get minutes 
-  remainingSeconds = seconds MOD 60 ' Get remaining seconds 
+  minutes = seconds \ 60 ' Integer division to get minutes
+  remainingSeconds = seconds mod 60 ' Get remaining seconds
   ' Format as MM:SS with zero padding
-  formattedTime = "-" + StrI(minutes) + ":" + Right("0" + remainingSeconds.toStr(), 2) 
-  return formattedTime 
+  formattedTime = "-" + StrI(minutes) + ":" + Right("0" + remainingSeconds.toStr(), 2)
+  return formattedTime
 End Function
 
 

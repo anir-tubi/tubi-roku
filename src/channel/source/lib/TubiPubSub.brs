@@ -1,5 +1,5 @@
 ' An instance of TubiPubSub is used to allow UI components (typically screens) to have fields updated
-' when a value on the parent's (typically the contentController's) m. is updated. This could be used 
+' when a value on the parent's (typically the contentController's) m. is updated. This could be used
 ' to pass uiMode to screens, or isLoggedIn to screens automatically when these values change.
 '
 ' For items on the context's m. that act as publishers, please use the naming convention of prepending
@@ -22,9 +22,9 @@ Function TubiPubSub(context)
 
       ' private
       ' publications will be an AA with each key containing an AA of component ids that are
-      ' subscribed to a publication. An example data structure would look like the following 
+      ' subscribed to a publication. An example data structure would look like the following
       ' with uiMode and deviceSettings being keys on the context's m.
-      ' 
+      '
       ' publications: {
       '   uiMode: {
       '     uiMode: {
@@ -54,12 +54,12 @@ End Function
 ' Updates the value on the context's m. and updates the field on any components that are subscribed.
 ' For example if we pass ("uiMode", "latino"), then the context to which this module belongs will have
 ' m.uiMode = "latino" set upon it, and any components (like screens or side nav) which are subscribed to
-' updates on m.uiMode will have the value "latino" set on the component's field that was specified 
+' updates on m.uiMode will have the value "latino" set on the component's field that was specified
 ' at the time of setting up the subscription (the fieldName parameter in m.subsribe()).
-' 
+'
 ' If we want to publish a change to m.deviceSetting.fontPreferences.size, publish the full deviceSettings
 ' and any component that is subscribed to any child of deviceSettings will be updated.
-' 
+'
 ' @contextKey: string, a key/property on m. (ex. "uiMode" if we want to update m.uiMode = "latino").
 ' @value: any, (ex. "latino" if we want to update m.uiMode = "latino")
 Function tubiPubSub_publish(contextKey, value)
@@ -73,7 +73,7 @@ Function tubiPubSub_publish(contextKey, value)
     if publication <> invalid
       for each path in publication ' path might be "uiMode" or "deviceSettings.fonts.colors"
         publishValue = invalid
-        
+
         ' check if path exists on context's m.
         pathParts = path.split(".")
         pathTester = m.context
@@ -116,11 +116,11 @@ End Function
 ' @publication: string, the property name on the contexts m. This can either be a string like "uiMode"
 '                       if we want to subscribe to m.uiMode. Or it can be a string like
 '                       "deviceSettings.fontPreferences.size". This example would be considered to
-'                       have a depth of 3. The max depth allowed is 4.      
+'                       have a depth of 3. The max depth allowed is 4.
 ' @component: roSGNode, the component that will be updated when the property on m. is updated.
 '                       the component must have an id that is unique throughout the app
 ' @fieldName: string, the field on the passed in component that will be updated when property on m. is published
-' 
+'
 ' Note: if the passed in component does not have a field with the name that is passed as fieldName,
 ' the component will not be subscribed to the publication.
 Function tubiPubSub_subscribe(publication, component, fieldName)
@@ -231,7 +231,7 @@ Function tubiPubSub_unsubscribeFromAllViaId(componentId)
                     ' (ie. remove "deviceSettings" from publications)
                     m.publications.delete(pubPathHeadValue)
                   end if
-                end if          
+                end if
               end if
             end for
           end if
@@ -264,7 +264,7 @@ Function tubiPubSub_printPublication(publication)
           print "  "; subscriber; "."; subscribers[subscriber]
         end for
       else
-        print "!!!  No Subscibers on m."; publication; " !!!" 
+        print "!!!  No Subscibers on m."; publication; " !!!"
       end if
     end if
   end if
@@ -272,7 +272,7 @@ End Function
 
 
 Function tubiPubSub_printAllPublications()
-  if m.publications <> invalid and m.publications.count() > 0
+  if m.publications <> invalid AND m.publications.count() > 0
     for each publicationHeadValue in m.publications
       publicationPaths = m.publications[publicationHeadValue]
       for each publication in publicationPaths
@@ -281,6 +281,6 @@ Function tubiPubSub_printAllPublications()
 
     end for
   else
-    print "!!! There are no publications on m. !!!"     
+    print "!!! There are no publications on m. !!!"
   end if
 End Function

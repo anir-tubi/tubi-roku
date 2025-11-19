@@ -111,7 +111,7 @@ Function setAutoplayTimerChoices()
   else
     m.AutoPlayTimerTitle.translation = [0, 306]
     m.AutoPlayTimerInstructions.translation = [0, 450]
-    m.AutoPlayTimerMenu.translation = [0, 583] 
+    m.AutoPlayTimerMenu.translation = [0, 583]
   end if
 
   typographyConstants = getTypographyConstants()
@@ -169,7 +169,7 @@ End Function
 Function checkItemHelper(newIndex, menuItem)
   newContent = menuItem.content.clone(true)
 
-  for i=0 to newContent.getChildCount()-1
+  for i = 0 to newContent.getChildCount() - 1
     child = newContent.getChild(i)
     if i = newIndex
       child.checked = true

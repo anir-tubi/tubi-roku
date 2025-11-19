@@ -1,11 +1,11 @@
-'@TestSuite [ApiUtils] ApiUtils.brs 
+'@TestSuite [ApiUtils] ApiUtils.brs
 
 '@Setup
 Function ApiUtilsSetup()
   constants = getConstants()
   pub_serverPersistentData = createObject("roSGNode", "ServerPersistentData")
   m.apiUtils = ApiUtils(constants, pub_serverPersistentData)
-End function
+End Function
 
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

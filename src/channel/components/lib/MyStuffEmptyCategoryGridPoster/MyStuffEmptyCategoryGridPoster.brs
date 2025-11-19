@@ -1,7 +1,7 @@
 Function init()
   m.Title = m.top.findNode("Title")
   m.SubTitle = m.top.findNode("SubTitle")
-  
+
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.Title, typographyConstants.ids.subheaderMedium)
   setTypographyOfLabel(m.SubTitle, typographyConstants.ids.bodyMedium)

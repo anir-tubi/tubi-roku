@@ -53,7 +53,7 @@ Function setParentalControlStrings()
 
   nWidestWidth = 0
   newContent = m.Menu.content.clone(true)
-  for i=0 to newContent.getChildCount()-1
+  for i = 0 to newContent.getChildCount() - 1
     child = newContent.getChild(i)
     sText = getTranslation("screenSettings_parentalControls_group_" + child.id)
     child.title = sText
@@ -62,7 +62,7 @@ Function setParentalControlStrings()
     '//   in order to determine how wide m.Menu should be.
     '//   Different languages may make the text wider than usual so we need to ensure the button displays the full text
     checkBtn = CreateObject("roSGNode", "CheckButton")
-    btnContent =  CreateObject("roSGNode", "CheckButtonContentNode")
+    btnContent = CreateObject("roSGNode", "CheckButtonContentNode")
     btnContent.title = sText
     checkBtn.itemContent = btnContent
     if checkBtn.calculatedWidth > nWidestWidth
@@ -110,10 +110,10 @@ Function checkItemHelper(newIndex)
 
   'default focus to Adult
   if newIndex >= newContent.getChildCount()
-    newIndex = newContent.getChildCount()-1
+    newIndex = newContent.getChildCount() - 1
   end if
 
-  for i=0 to newContent.getChildCount()-1
+  for i = 0 to newContent.getChildCount() - 1
     child = newContent.getChild(i)
     if i = newIndex
       child.checked = true

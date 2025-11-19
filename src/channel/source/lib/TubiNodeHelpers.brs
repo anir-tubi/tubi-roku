@@ -24,7 +24,7 @@ End Function
 ' returns the index or -1 if the passed in child does not belong to the parent
 Function tubiNodeHelpers_getChildIndex(parent, child)
   if parent <> invalid
-    for i=0 to parent.getChildCount()-1
+    for i = 0 to parent.getChildCount() - 1
       if parent.getChild(i).isSameNode(child)
         return i
       end if
@@ -39,7 +39,7 @@ End Function
 ' returns the index or -1 if the passed in child does not belong to the parent
 Function tubiNodeHelpers_getChildIndexById(parent, childId)
   if parent <> invalid AND parent.getChildCount() > 0
-    for i=0 to parent.getChildCount()-1
+    for i = 0 to parent.getChildCount() - 1
       if parent.getChild(i).id <> invalid AND parent.getChild(i).id = childId
         return i
       end if
@@ -57,7 +57,7 @@ End Function
 Function tubiNodeHelpers_getChildIndicesById(parent, childId)
   indices = []
   if parent <> invalid AND parent.getChildCount() > 0
-    for i=0 to parent.getChildCount()-1
+    for i = 0 to parent.getChildCount() - 1
       if parent.getChild(i).id <> invalid AND parent.getChild(i).id = childId
         indices.push(i)
       end if
@@ -83,7 +83,7 @@ End Function
 
 ' Returns the first child matching the input childId value within the parent or invalid if there is no children with that id found.
 Function tubiNodeHelpers_getChildById(parent, childId)
-  for i=0 to parent.getChildCount()-1
+  for i = 0 to parent.getChildCount() - 1
     child = parent.getChild(i)
     if child.id = childId
       return child
@@ -138,7 +138,7 @@ End Function
 ' Returns an updated copy of the original parent node with a copy of the child inserted into it,
 ' or the unchanged parent node if the insert didn't work.
 ' Inserting the original child node instead of a clone of the child would remove the child from the original parent.
-Function tubiNodeHelpers_immutableInsertChild(parent as object, child as object, index as Integer)
+Function tubiNodeHelpers_immutableInsertChild(parent as Object, child as Object, index as Integer)
   clonedParent = parent.clone(true)
   clonedChild = child.clone(true)
 
@@ -156,7 +156,7 @@ End Function
 
 ' Clones the parent node and removes the child node at the given index.
 ' Returns an updated copy of the original parent node or the unchanged parent node if the removal didn't work
-Function tubiNodeHelpers_immutableRemoveChildIndex(parent as object, index as Integer)
+Function tubiNodeHelpers_immutableRemoveChildIndex(parent as Object, index as Integer)
   clonedParent = parent.clone(true)
   removed = clonedParent.removeChildIndex(index)
   if removed <> true then return parent
@@ -166,7 +166,7 @@ End Function
 
 ' Clones the parent node and removes the child node
 ' Returns an updated copy of the original parent node or the unchanged parent node if the removal didn't work
-Function tubiNodeHelpers_immutableRemoveChild(parent as object, child as object)
+Function tubiNodeHelpers_immutableRemoveChild(parent as Object, child as Object)
   childIndex = m.getChildIndex(parent, child)
   clonedParent = m.immutableRemoveChildIndex(parent, childIndex)
   return clonedParent
@@ -177,10 +177,10 @@ End Function
 ' @children: array, array of children nodes
 ' Returns an updated copy of the original parent node or the unchanged parent node if none
 ' of the child nodes were successfully removed
-Function tubiNodeHelpers_immutableRemoveChildren(parent as object, children as object)
+Function tubiNodeHelpers_immutableRemoveChildren(parent as Object, children as Object)
   clonedParent = parent.clone(true)
   allFailed = true
-  for i=children.count()-1 to 0 Step -1
+  for i = children.count() - 1 to 0 step -1
     child = children[i]
     childIndex = m.getChildIndex(parent, child)
     removed = clonedParent.removeChildIndex(childIndex)
@@ -204,13 +204,13 @@ End Function
 Function tubiNodeHelpers_countNodes(node, depth = 0)
   nodeCount = 0
 
-  if (type(depth) <> "Integer" AND type(depth) <> "roInt") or depth <= 0 or depth > 30
+  if (type(depth) <> "Integer" AND type(depth) <> "roInt") OR depth <= 0 OR depth > 30
     depth = 30
   end if
 
   if type(node) = "roSGNode"
     nodeCount = 1
-    depth --
+    depth--
 
     if depth > 0
       for i = 0 to node.getChildCount() - 1

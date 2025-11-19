@@ -20,7 +20,7 @@ Function apolloId3s()
     currentSegment: apolloId3s_currentSegment
     totalSegments: apolloId3s_totalSegments
     clearTags: apolloId3s_clearTags
-    getTotalAdDuration : apolloId3s_getTotalAdDuration
+    getTotalAdDuration: apolloId3s_getTotalAdDuration
     getSegStartTs: apolloId3s_getSegStartTs
     getAdType: apolloId3s_getAdType
 
@@ -56,15 +56,15 @@ Function apolloId3s_setTag(tag, value)
     m.id = value
   else if tag = "TVER" OR tag = "tver"
     m.timedMetaVersion = value
-  else if (tag="TSTS" OR tag = "tsts") AND isString(value) = true
+  else if (tag = "TSTS" OR tag = "tsts") AND isString(value) = true
     ts = value.split(":")
 
     if ts.count() > 1
       m.segStartTs = ts[0].toInt()
       m.adTotalDur = ts[1].toInt()
     end if
-  else if tag="TTYP" OR tag = "ttyp"
-      m.adType = value
+  else if tag = "TTYP" OR tag = "ttyp"
+    m.adType = value
   end if
 End Function
 

@@ -38,8 +38,8 @@ Function onItemContentChange()
     nBoundingTextWidth = m.buttonText.boundingRect().width
     m.buttonText.width = nBoundingTextWidth
     m.buttonTextFocused.width = nBoundingTextWidth
-     ' Adjust the width of the menu if the text is too long for the default width
-     ' Adding the left and right margin along with text width
+    ' Adjust the width of the menu if the text is too long for the default width
+    ' Adding the left and right margin along with text width
     m.top.calculatedWidth = nBoundingTextWidth + (2 * m.buttonTextParent.translation[0])
   end if
 End Function

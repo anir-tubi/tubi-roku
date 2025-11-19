@@ -26,7 +26,7 @@ End Function
 ' Attach to the scene graph VideoPlayer node and listen for events
 ' This is a blocking call
 '@adPlayerNode: node, AdPlayerScreen node
-Function tubiSGPreloadedAdShim_run(adPlayerNode) As boolean
+Function tubiSGPreloadedAdShim_run(adPlayerNode) as Boolean
   tubiLog("TubiSGPreloadedAdShim.Run")
   m.adPlayerNode = adPlayerNode
 
@@ -54,13 +54,13 @@ Function tubiSGPreloadedAdShim_run(adPlayerNode) As boolean
       else if msg.GetField() = "adControl"
         value = msg.GetData()
         if m.adPlayerNode.content <> invalid
-          content = m.adPlayerNode.content.getFields()  ' clone the content node into a local AA to avoid messing with it
+          content = m.adPlayerNode.content.getFields() ' clone the content node into a local AA to avoid messing with it
 
           tubiLog("TubiSGPreloadedAdShim: adControl = " + value + " ad state " + m.adPlayerNode.adState)
           m.ads.appMode = m.adPlayerNode.appMode
           m.handleControlMessage(m.adPlayerNode.adState, value, content)
         else
-          m.adPlayerNode.adState = "noAds"  ' if Ad player content was changed before we got here, return no ads
+          m.adPlayerNode.adState = "noAds" ' if Ad player content was changed before we got here, return no ads
         end if
       end if
     else if msgType = "roUrlEvent" then
@@ -96,7 +96,8 @@ Function tubiSGPreloadedAdShim_handleControlMessage(state, control, content)
       play: "playAds"
       stop: "reset"
     }
-    "adsCompleted": {'
+    "adsCompleted": {
+      '
       play: "playAds"
       stop: "reset"
     }
@@ -123,7 +124,7 @@ Function tubiSGPreloadedAdShim_playAds(content)
     if status = m.constants_.player.playerResults.closed
       m.adPlayerNode.adState = "adsClosed"
     else if status = m.constants_.player.playerResults.completed
-      m.adPlayerNode.adState = "adsCompleted" 
+      m.adPlayerNode.adState = "adsCompleted"
     else
       m.adPlayerNode.adState = "noAds"
     end if

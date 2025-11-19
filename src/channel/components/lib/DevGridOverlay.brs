@@ -3,7 +3,7 @@
 '
 ' createGridOverlay may break certain screens that require dynamic adding of components to
 ' the passed in screen node
-Function createGridOverlay(screen, spacingX=10, spacingY=10)
+Function createGridOverlay(screen, spacingX = 10, spacingY = 10)
   if m.global.constants.settings.mode = "dev" OR m.global.constants.settings.mode = "qa"
 
     boldColor = "0xC3C43FFF"
@@ -29,17 +29,17 @@ Function createGridOverlay(screen, spacingX=10, spacingY=10)
     horizLines = allLines.createChild("Group")
 
     'create vertical lines
-    for x=0+spacingX to width step spacingX
+    for x = 0 + spacingX to width step spacingX
       if width > x
         line = vertLines.createChild("Rectangle")
         line.translation = [x, 0]
         line.height = height
 
-        if x MOD 100 = 0
+        if x mod 100 = 0
           line.width = boldLineSize
           line.color = boldColor
           label = vertLines.createChild("Label")
-          label.translation = [x-fontsize, 100-fontsize]
+          label.translation = [x - fontsize, 100 - fontsize]
           label.text = x.ToStr()
           label.color = boldColor
           label.font.size = fontsize
@@ -51,17 +51,17 @@ Function createGridOverlay(screen, spacingX=10, spacingY=10)
     end for
 
     'create horizontal lines
-    for y=0+spacingY to height step spacingY
+    for y = 0 + spacingY to height step spacingY
       if height > y
         line = horizLines.createChild("Rectangle")
         line.translation = [0, y]
         line.width = width
 
-        if y MOD 100 = 0
+        if y mod 100 = 0
           line.height = boldLineSize
           line.color = boldColor
           label = horizLines.createChild("Label")
-          label.translation = [100-fontsize, y-fontsize]
+          label.translation = [100 - fontsize, y - fontsize]
           label.text = y.ToStr()
           label.color = boldColor
           label.font.size = fontsize

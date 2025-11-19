@@ -3,8 +3,8 @@ Function init()
   m.toggleRail = topRef.findNode("toggleRail")
   m.selector = topRef.findNode("selector")
 
-  m.selectorOnTranslation = [89,0]
-  m.selectorOffTranslation = [57,0]
+  m.selectorOnTranslation = [89, 0]
+  m.selectorOffTranslation = [57, 0]
   m.top.observeFieldScoped("isToggleOn", "onToggleUpdated")
 
   if m.global <> invalid

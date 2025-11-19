@@ -3,11 +3,11 @@ Function init()
   m.rectBG = m.top.findNode("rectBG")
   m.Text = m.top.findNode("Text")
   m.Text.text = m.top.hint
-  
-  
+
+
   m.top.observeField("boxWidth", "onBoxWidth")
   m.top.observeField("boxHeight", "onBoxHeight")
-  
+
   m.top.observeField("hint", "formatTextBox")
   m.top.observeField("text", "formatTextBox")
 
@@ -31,7 +31,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.theme = theme
     m.border.blendColor = m.theme.focusedColor
@@ -59,13 +59,13 @@ Function setTextColor()
   if isNonEmptyString(m.top.color) = false
     if m.theme <> invalid
 
-      bThemeSet= true
+      bThemeSet = true
       m.Text.opacity = 1.0
       if isNonEmptyString(m.top.text) = false
         m.Text.color = m.theme.tertiaryTextColor
       else
         m.Text.color = m.theme.primaryText
-      end if 
+      end if
 
     end if
   else
@@ -79,7 +79,7 @@ Function setTextColor()
       m.Text.opacity = 0.7
     else
       m.Text.opacity = 1.0
-    end if  
+    end if
   end if
 End Function
 
@@ -87,18 +87,18 @@ End Function
 
 Function onScreenFocusChange()
   tubiLog("TextEntryBox.onScreenFocusChange")
-  
+
   if m.top.hasFocus() then
     m.border.visible = true
-    if m.top.text <> invalid and m.top.text <> "" then
+    if m.top.text <> invalid AND m.top.text <> "" then
       onPasswordModeChange()
-    end if  
-    m.top.highlight = true 
-  else  
+    end if
+    m.top.highlight = true
+  else
     m.border.visible = false
-    m.top.highlight = false 
+    m.top.highlight = false
   end if
-  
+
 End Function
 
 
@@ -120,7 +120,7 @@ Function formatTextBox()
   setTextColor()
 
   textRect = m.Text.localBoundingRect()
-  safetyWidth = 400   'Arbitrarily chosen, smaller than 428 max width
+  safetyWidth = 400 'Arbitrarily chosen, smaller than 428 max width
   if textRect.width > safetyWidth then
     while true
       m.Text.text = Right(m.Text.text, m.Text.text.len() - 1)
@@ -136,7 +136,7 @@ End Function
 Function onPasswordModeChange()
   if m.top.passwordMode = true then
     passwordText = ""
-    for i=0 to m.top.text.len()-1
+    for i = 0 to m.top.text.len() - 1
       passwordText = passwordText + m.passwordPlaceholder
     end for
     if passwordText = ""
@@ -154,7 +154,7 @@ Function onPasswordModeChange()
 End Function
 
 
-Function onKeyEvent(key As String, press As Boolean) as Boolean
+Function onKeyEvent(key as String, press as Boolean) as Boolean
   tubiLog("TextEntryBox.onKeyEvent key = " + key)
   if press then
     if key = "OK"

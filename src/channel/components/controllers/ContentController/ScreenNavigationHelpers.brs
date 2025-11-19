@@ -11,8 +11,8 @@ Function navigateToNetworkDetailsScreen(networkId)
   showCategoryDetailsScreen(contentNode, false)
 
   channelPanelListScreen = getFromScreenCache(m.constants.ui.screenIds.categoryPanelListScreen)
-  if channelPanelListScreen <> invalid 
-    channelPanelListScreen.jumpToCategoryItemByID = {id: m.constants.ui.categoryIds.networks, subId: networkId}
+  if channelPanelListScreen <> invalid
+    channelPanelListScreen.jumpToCategoryItemByID = { id: m.constants.ui.categoryIds.networks, subId: networkId }
   end if
 
 End Function

@@ -92,7 +92,7 @@ End Function
 ' Returns the width that needs to be subtracted from the width.
 Function getWidthMinusText()
   ' The width include the checkbox, the space in between the checkbox and the label, and the space before the 1st and last elements of the checkbutton
-  return m.checkIcon.width + m.container.itemSpacings[0] + m.container.translation[0]*2
+  return m.checkIcon.width + m.container.itemSpacings[0] + m.container.translation[0] * 2
 End Function
 
 

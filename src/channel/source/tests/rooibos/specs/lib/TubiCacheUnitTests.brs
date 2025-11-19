@@ -13,7 +13,7 @@ End Function
 
 
 '@BeforeEach
-Function TubiCache_BeforeEach() as void
+Function TubiCache_BeforeEach() as Void
   m.cache.emptyScreenCache()
   m.cache.emptyContentCache()
   m.cache.permanentContentIds = m.constants.ui.permanentlyCachedContentIds
@@ -269,8 +269,8 @@ Function tubiCache_deleteFromContentCacheOrder_test()
   isDeleted3 = m.cache.deleteFromContentCacheOrder("test_content3")
   m.assertTrue(isDeleted3)
   m.assertTrue(m.cache.contentCacheOrder.count() = 2)
-  m.assertTrue(m.cache.contentCacheOrder[0].id <> "test_content3" )
-  m.assertTrue(m.cache.contentCacheOrder[1].id <> "test_content3" )
+  m.assertTrue(m.cache.contentCacheOrder[0].id <> "test_content3")
+  m.assertTrue(m.cache.contentCacheOrder[1].id <> "test_content3")
 
   ' check deleting the bottom of the order
   m.cache.emptyContentCache()
@@ -291,8 +291,8 @@ Function tubiCache_deleteFromContentCacheOrder_test()
   isDeleted1 = m.cache.deleteFromContentCacheOrder("test_content1")
   m.assertTrue(isDeleted1)
   m.assertTrue(m.cache.contentCacheOrder.count() = 2)
-  m.assertTrue(m.cache.contentCacheOrder[0].id <> "test_content1" )
-  m.assertTrue(m.cache.contentCacheOrder[1].id <> "test_content1" )
+  m.assertTrue(m.cache.contentCacheOrder[0].id <> "test_content1")
+  m.assertTrue(m.cache.contentCacheOrder[1].id <> "test_content1")
 
   ' check deleting the middle of the order
   m.cache.emptyContentCache()
@@ -313,8 +313,8 @@ Function tubiCache_deleteFromContentCacheOrder_test()
   isDeleted2 = m.cache.deleteFromContentCacheOrder("test_content2")
   m.assertTrue(isDeleted2)
   m.assertTrue(m.cache.contentCacheOrder.count() = 2)
-  m.assertTrue(m.cache.contentCacheOrder[0].id <> "test_content2" )
-  m.assertTrue(m.cache.contentCacheOrder[1].id <> "test_content2" )
+  m.assertTrue(m.cache.contentCacheOrder[0].id <> "test_content2")
+  m.assertTrue(m.cache.contentCacheOrder[1].id <> "test_content2")
 End Function
 
 

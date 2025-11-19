@@ -2,12 +2,12 @@
 
 'YBConstants.brs
 
-function YouboraConstants()
-	if m.ybconstants = invalid then
-		m.ybconstants = {
-			QUEUE_LIMIT_SIZE: 100
-		}
-	end if
+Function YouboraConstants()
+  if m.ybconstants = invalid then
+    m.ybconstants = {
+      QUEUE_LIMIT_SIZE: 100
+    }
+  end if
 
-	return m.ybconstants
-end function
+  return m.ybconstants
+End Function

@@ -5,7 +5,7 @@ Function init()
   m.constants = getConstantsFromGlobal()
   m.top.screenLevel = m.constants.ui.screenLevels.adPlayerScreen
   m.top.id = m.constants.ui.screenIds.adPlayerScreen
-  
+
   m.top.trackingPageInfo = {
     pageType: "video_player_page"
     pageValues: {}
@@ -67,7 +67,7 @@ Function onContentChange()
   if content <> invalid
     m.top.adState = "init"
     m.adDescriptionPanel.content = content
-    
+
     'set page tracking values for analytics
     m.top.trackingPageInfo = {
       pageType: m.top.trackingPageInfo.pageType
@@ -79,7 +79,7 @@ Function onContentChange()
     fade(m.adDescriptionPanel, "in", 0.4, 1)
   end if
 
- End Function
+End Function
 
 
 Function onDisplayAdLoadingMessage()
@@ -137,7 +137,7 @@ Function onControlChange()
 
     'in the case where an ad break has started, but RAF does not yet have control, we want to break out of ads on back button pressed
     m.top.adControl = "stop"
-  end if  
+  end if
 End Function
 
 
@@ -162,8 +162,8 @@ Function onAdStateChange(msg)
       ' which results in a ad/video loading screen that never loads. Reset the ad control once the ad state is in init if this is the case
       ' to fix the issue.
       m.top.adControl = m.top.adControl
-    end if  
-  end if 
+    end if
+  end if
 
 End Function
 

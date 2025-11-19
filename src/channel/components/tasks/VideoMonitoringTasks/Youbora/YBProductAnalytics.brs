@@ -1,4 +1,4 @@
-function YBProductAnalytics(plugin as object) As Object
+Function YBProductAnalytics(plugin as Object) as Object
 
   ProductAnalyticsLog("Created YBProductAnalytics")
   this = CreateObject("roAssociativeArray")
@@ -34,9 +34,9 @@ function YBProductAnalytics(plugin as object) As Object
 
   this._contentHighlighted = invalid
   this._contentHighlightTimeout = CreateObject("roSGNode", "Timer")
-  this._contentHighlightTimeout.setFields({"id": "timerHighlight", "duration": this._productAnalyticsSettings.highlightContentAfter, "repeat": false})
+  this._contentHighlightTimeout.setFields({ "id": "timerHighlight", "duration": this._productAnalyticsSettings.highlightContentAfter, "repeat": false })
   this._contentHighlightTimeout.observeField("fire", this._plugin.port)
-  
+
   this._pendingVideoEvents = []
 
   ' User state
@@ -47,7 +47,7 @@ function YBProductAnalytics(plugin as object) As Object
   }
 
   this._userStateTimeout = CreateObject("roSGNode", "Timer")
-  this._userStateTimeout.setFields({"id": "timerUserState", "repeat": false})
+  this._userStateTimeout.setFields({ "id": "timerUserState", "repeat": false })
   this._userStateDimension = ""
   this._userState = this._userStates.passive
 
@@ -70,7 +70,7 @@ function YBProductAnalytics(plugin as object) As Object
 
     ' Set screen name
 
-    if ( Type(page) = "roString" )
+    if (Type(page) = "roString")
       m._page = page
     else
       ProductAnalyticsLog("Page unset while initializing.")
@@ -81,43 +81,43 @@ function YBProductAnalytics(plugin as object) As Object
     m._productAnalyticsSettings = {}
     m._productAnalyticsSettings.Append(m._productAnalyticsSettingsDefault)
 
-    if ( Type(productAnalyticsSettings) = "roAssociativeArray")
+    if (Type(productAnalyticsSettings) = "roAssociativeArray")
       m._productAnalyticsSettings.Append(productAnalyticsSettings)
     end if
 
     ' Validate settings
 
-    if ( getInterface(m._productAnalyticsSettings.highlightContentAfter, "ifInt") = invalid )
+    if (getInterface(m._productAnalyticsSettings.highlightContentAfter, "ifInt") = invalid)
       m._productAnalyticsSettings.highlightContentAfter = m._productAnalyticsSettingsDefault["highlightContentAfter"]
     else if (m._productAnalyticsSettings.highlightContentAfter < 1)
       ProductAnalyticsLog("Invalid higlightContentAfter value. Using default value instead.")
       m._productAnalyticsSettings.highlightContentAfter = m._productAnalyticsSettingsDefault["highlightContentAfter"]
     end if
 
-    if ( getInterface(m._productAnalyticsSettings.enableStateTracking, "ifBoolean") = invalid )
+    if (getInterface(m._productAnalyticsSettings.enableStateTracking, "ifBoolean") = invalid)
       m._productAnalyticsSettings.enableStateTracking = m._productAnalyticsSettingsDefault["enableStateTracking"]
     end if
 
-    if ( getInterface(m._productAnalyticsSettings.activeStateTimeout, "ifInt") = invalid )
+    if (getInterface(m._productAnalyticsSettings.activeStateTimeout, "ifInt") = invalid)
       m._productAnalyticsSettings.activeStateTimeout = m._productAnalyticsSettingsDefault["activeStateTimeout"]
     else if (m._productAnalyticsSettings.activeStateTimeout < 1)
       ProductAnalyticsLog("Invalid activeStateTimeout value. Using default value instead.")
       m._productAnalyticsSettings.activeStateTimeout = m._productAnalyticsSettingsDefault["activeStateTimeout"]
     end if
 
-    if ( getInterface(m._productAnalyticsSettings.activeStateDimension, "ifInt") = invalid OR m._productAnalyticsSettings.activeStateDimension < 1 OR m._productAnalyticsSettings.activeStateDimension > 9)
+    if (getInterface(m._productAnalyticsSettings.activeStateDimension, "ifInt") = invalid OR m._productAnalyticsSettings.activeStateDimension < 1 OR m._productAnalyticsSettings.activeStateDimension > 9)
       m._productAnalyticsSettings.activeStateDimension = m._productAnalyticsSettingsDefault["activeStateDimension"]
     end if
 
     ' Update highlight timer period
-    
+
     m._contentHighlightTimeout.setField("duration", m._productAnalyticsSettings.highlightContentAfter)
 
     ' Update user state fields
 
     m._userStateTimeout.setField("duration", m._productAnalyticsSettings.activeStateTimeout)
     m._userStateTimeout.observeField("fire", m._plugin.port)
-  
+
     m._userStateDimension = "content.customDimension." + StrI(m._productAnalyticsSettings.activeStateDimension, 10)
 
     ' Set as initialized
@@ -145,9 +145,9 @@ function YBProductAnalytics(plugin as object) As Object
 
   this.adapterAfterSet = sub()
 
-  ' Start tracking user state
+    ' Start tracking user state
 
-  m._userStateStart()
+    m._userStateStart()
 
   end sub
 
@@ -160,7 +160,7 @@ function YBProductAnalytics(plugin as object) As Object
     m._userStateStop()
 
     ' Discard pending video events
-    
+
     m._pendingVideoEvents = []
 
   end sub
@@ -179,7 +179,7 @@ function YBProductAnalytics(plugin as object) As Object
       ProductAnalyticsLog("Cannot start a new session since plugin is unavailable.")
     else
       m.endSession()
-      m._plugin.eventHandler("sessionStart", {"page": m._page})
+      m._plugin.eventHandler("sessionStart", { "page": m._page })
     end if
 
   end sub
@@ -246,7 +246,7 @@ function YBProductAnalytics(plugin as object) As Object
     else
       m._page = page
 
-      m._plugin.eventHandler("sessionStart", {"page": m._page})
+      m._plugin.eventHandler("sessionStart", { "page": m._page })
 
       ' Track the event
 
@@ -304,7 +304,7 @@ function YBProductAnalytics(plugin as object) As Object
         m._fireEvent("ATTRIBUTION", params, dimensions, metrics)
 
       end if
-        
+
     end if
 
   end sub
@@ -413,7 +413,7 @@ function YBProductAnalytics(plugin as object) As Object
 
   this.trackContentHighlight = sub()
 
-    if ( m._contentHighlighted = invalid )
+    if (m._contentHighlighted = invalid)
 
       ProductAnalyticsLog("Cannot highlight content since no content is selected")
 
@@ -431,7 +431,7 @@ function YBProductAnalytics(plugin as object) As Object
       }, m._contentHighlighted["dimensions"], m._contentHighlighted["metrics"])
 
       m._contentHighlighted = invalid
-      
+
     end if
 
   end sub
@@ -450,15 +450,15 @@ function YBProductAnalytics(plugin as object) As Object
 
     if m._initialized = false
       ProductAnalyticsLog("Cannot track content click since Product Analytics is uninitialized.")
-    else if (Type(section) <> "roString" or section = "")
+    else if (Type(section) <> "roString" OR section = "")
       ProductAnalyticsLog("Cannot track content click since no section has been supplied.")
-    else if (Type(sectionOrder) <> "roInt" or sectionOrder < 1)
+    else if (Type(sectionOrder) <> "roInt" OR sectionOrder < 1)
       ProductAnalyticsLog("Cannot track content click since sectionOrder is invalid.")
-    else if (Type(column) <> "roInt" or column < 1)
+    else if (Type(column) <> "roInt" OR column < 1)
       ProductAnalyticsLog("Cannot track content click since column is invalid.")
-    else if (Type(row) <> "roInt" or row < 1)
+    else if (Type(row) <> "roInt" OR row < 1)
       ProductAnalyticsLog("Cannot track content click since row is invalid.")
-    else if (Type(contentID) <> "roString" or contentID = "")
+    else if (Type(contentID) <> "roString" OR contentID = "")
       ProductAnalyticsLog("Cannot track content click since no contentID has been supplied.")
     else
       ProductAnalyticsLog("CONTENT CLICK")
@@ -520,7 +520,7 @@ function YBProductAnalytics(plugin as object) As Object
       ProductAnalyticsLog("Cannot track player interaction since Product Analytics is uninitialized.")
     else if (Type(eventName) <> "roString" OR eventName = "")
       ProductAnalyticsLog("Cannot track player interaction since no interaction name has been supplied.")
-    else if ( m._plugin.isStarted = false )
+    else if (m._plugin.isStarted = false)
       m._pendingVideoEvents.push({ "eventName": eventName, "contentID": contentID, "dimensions": dimensions, "metrics": metrics, "startEvent": startEvent })
     else
       m._trackPlayerEventsPending()
@@ -548,7 +548,7 @@ function YBProductAnalytics(plugin as object) As Object
   ' @param {*} metrics
   ' @param {*} startEvent
 
-  this._trackPlayerEvent = sub(eventName as string, contentID, dimensions, metrics, startEvent as boolean)
+  this._trackPlayerEvent = sub(eventName as String, contentID, dimensions, metrics, startEvent as Boolean)
     ' Log message
 
     ProductAnalyticsLog("[PLAYER] " + eventName)
@@ -569,7 +569,7 @@ function YBProductAnalytics(plugin as object) As Object
 
     ' Transition state to active
 
-    if ( startEvent = false )
+    if (startEvent = false)
       m._setActive(eventName)
     end if
 
@@ -793,7 +793,7 @@ function YBProductAnalytics(plugin as object) As Object
     if m._initialized AND m._productAnalyticsSettings.enableStateTracking
       m._storeUserState(m._userStates.passive)
     end if
-    
+
   end sub
 
   ' Stop tracking user state
@@ -811,7 +811,7 @@ function YBProductAnalytics(plugin as object) As Object
   ' @param {string} eventName
   ' @param {boolean} playerStarted
 
-  this._setActive = sub(eventName as string)
+  this._setActive = sub(eventName as String)
 
     if m._initialized AND m._productAnalyticsSettings.enableStateTracking
 
@@ -847,7 +847,7 @@ function YBProductAnalytics(plugin as object) As Object
   ' Fire switch state event
   ' @private
 
-  this._fireEventState = sub(state as string, eventName as string)
+  this._fireEventState = sub(state as String, eventName as String)
 
     ProductAnalyticsLog("User changing from state " + m._userState + " to " + state)
 
@@ -860,9 +860,9 @@ function YBProductAnalytics(plugin as object) As Object
 
     ' Fire the event
 
-    if ( state = m._userStates.active )
+    if (state = m._userStates.active)
       m._fireEventVideo("[PLAYBACK STATE] Switch to Active", dimensions, invalid, invalid)
-    else if ( state = m._userStates.passive )
+    else if (state = m._userStates.passive)
       m._fireEventVideo("[PLAYBACK STATE] Switch to Passive", dimensions, invalid, invalid)
     end if
 
@@ -872,7 +872,7 @@ function YBProductAnalytics(plugin as object) As Object
   ' @param {string} state
   ' @private
 
-  this._storeUserState = sub(state as string)
+  this._storeUserState = sub(state as String)
 
     if m._plugin = invalid OR m._plugin.infoManager = invalid OR m._plugin.infoManager.options = invalid
       ProductAnalyticsLog("Cannot track user state since plugin options are unavailable.")
@@ -885,17 +885,17 @@ function YBProductAnalytics(plugin as object) As Object
 
   ' Get options
 
-  this.getOptions = function() as object
+  this.getOptions = Function() as Object
 
     options = {}
 
-    if ( m._initialized AND m._productAnalyticsSettings.enableStateTracking )
+    if (m._initialized AND m._productAnalyticsSettings.enableStateTracking)
       options[m._userStateDimension] = m._userState
     end if
 
     return options
 
-  end function
+  End Function
 
   ' ------------------------------------------------------------------------------------------------------------------------------
   ' INTERNAL
@@ -908,7 +908,7 @@ function YBProductAnalytics(plugin as object) As Object
   ' @param {Object} metrics Metrics to track
   ' @private
 
-  this._fireEvent = sub(eventName as string, dimensionsInternal, dimensionsUser, metrics)
+  this._fireEvent = sub(eventName as String, dimensionsInternal, dimensionsUser, metrics)
 
     ' Extract top level dimensions from custom dimensions
 
@@ -921,10 +921,10 @@ function YBProductAnalytics(plugin as object) As Object
     else
 
       params = {
-          "name": eventName,
-          "dimensions": dimensions["custom"],
-          "values": metrics
-        }
+        "name": eventName,
+        "dimensions": dimensions["custom"],
+        "values": metrics
+      }
 
       params.Append(dimensions["top"])
 
@@ -941,21 +941,21 @@ function YBProductAnalytics(plugin as object) As Object
   ' @param {Object} metrics Metrics to track
   ' @private
 
-  this._fireEventVideo = sub(eventName as string, dimensionsInternal as object, dimensionsUser as object, metrics as object)
+  this._fireEventVideo = sub(eventName as String, dimensionsInternal as Object, dimensionsUser as Object, metrics as Object)
 
     dimensions = m._buildDimensions(dimensionsInternal, dimensionsUser)
 
-    if ( m._plugin = invalid )
+    if (m._plugin = invalid)
 
       ProductAnalyticsLog("Cannot fire " + eventName + " video event since plugin is unavailable.")
 
     else
 
-      params = { 
-          "name": eventName,
-          "dimensions": dimensions.custom, 
-          "values": metrics
-        }
+      params = {
+        "name": eventName,
+        "dimensions": dimensions.custom,
+        "values": metrics
+      }
       params.Append(dimensions.top)
 
       m._plugin.eventHandler("event", params)
@@ -969,21 +969,21 @@ function YBProductAnalytics(plugin as object) As Object
   ' @param {Object} dimensionsUser Object containing list of custom dimensions
   ' @private
 
-  this._buildDimensions = function(dimensionsInternal as object, dimensionsUser as object)
+  this._buildDimensions = Function(dimensionsInternal as Object, dimensionsUser as Object)
 
     ' Build custom event dimensions
 
-    dimensionsCustom = {"page": m._page}
+    dimensionsCustom = { "page": m._page }
 
-    if ( dimensionsInternal <> invalid )
+    if (dimensionsInternal <> invalid)
       dimensionsCustom.Append(dimensionsInternal)
     end if
 
-    if ( dimensionsUser <> invalid )
+    if (dimensionsUser <> invalid)
       dimensionsCustom.Append(dimensionsUser)
     end if
 
-    dimensionsCustom.Append({"eventSource": "Product Analytics"})
+    dimensionsCustom.Append({ "eventSource": "Product Analytics" })
 
     ' List of Top Level Dimension keys
 
@@ -1006,29 +1006,29 @@ function YBProductAnalytics(plugin as object) As Object
       dimensionsCustom.Delete(key)
     next
 
-    return {"custom": dimensionsCustom, "top": dimensionsTopLevel}
+    return { "custom": dimensionsCustom, "top": dimensionsTopLevel }
 
-  end function
+  End Function
 
   ' String is contained in array
 
-  this._contained = function(arr as Object, str as String) as Boolean
+  this._contained = Function(arr as Object, str as String) as Boolean
 
     For Each item In arr
-        If item = str Then 
-            Return True
-        End If
-    End For
-    Return False
+      if item = str then
+        return True
+      end if
+    end for
+    return False
 
-  end function
- 
+  End Function
+
   return this
 
-end function
+End Function
 
-function ProductAnalyticsLog(message)
+Function ProductAnalyticsLog(message)
 
   YouboraLog(message, "Product Analytics")
 
-end function
+End Function

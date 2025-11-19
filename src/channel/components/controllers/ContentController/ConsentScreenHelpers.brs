@@ -81,7 +81,7 @@ Function onConsentActionButtonSelected(buttonSelected)
     pageOneof = m.Tracking.getAnalyticsPage(trackingPageInfo.pagetype, trackingPageInfo.pageValues)
     componentOneof = m.Tracking.getAnalyticsComponent("button_component", componentValues)
 
-    componentInteractionEvent =  {
+    componentInteractionEvent = {
       pageOneof: pageOneof
       componentOneof: componentOneof
       user_interaction: "CONFIRM"
@@ -130,14 +130,14 @@ Function getConsent(onGetConsentCompletionCallback)
 End Function
 
 
-function onOneTrustCompLibLoadStatusChanged(msg) as void
+Function onOneTrustCompLibLoadStatusChanged(msg) as Void
   loadStatus = msg.getData()
   if loadStatus = "ready"
-     initialiazeOneTrustSDK()
+    initialiazeOneTrustSDK()
   else if loadStatus = "failed"
     onOneTrustSDKInitializeFailure(msg)
   end if
-end function
+End Function
 
 
 Function initialiazeOneTrustSDK()
@@ -164,12 +164,12 @@ Function initialiazeOneTrustSDK()
 
   sdkParams.identifier = identifier
   sdkParams.identifierType = "DeviceID"
-  m.oneTrust.callFunc("setDataSubjectIdentifier",{"subjectIdentifier": identifier})
+  m.oneTrust.callFunc("setDataSubjectIdentifier", { "subjectIdentifier": identifier })
 
   m.oneTrust.callFunc("initOTSDKData", sdkParams)
   oneTrustViewsGroup = m.top.findNode("OneTrustViews")
   if oneTrustViewsGroup <> invalid
-    m.oneTrust.callFunc("setupUI", { "view":  oneTrustViewsGroup})
+    m.oneTrust.callFunc("setupUI", { "view": oneTrustViewsGroup })
   end if
   tcfString = getTCFString()
 
@@ -298,7 +298,7 @@ Function onSelectedPreferenceInfoChange(msg)
       pageOneof = m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pageType, pageValues)
       componentOneof = m.Tracking.getAnalyticsComponent("button_component", componentValues)
 
-      componentInteractionEvent =  {
+      componentInteractionEvent = {
         pageOneof: pageOneof
         componentOneof: componentOneof
         user_interaction: userInteractionValue

@@ -5,7 +5,7 @@ Function GeneralTaskModuleSetup()
   generalTask = CreateObject("roSGNode", "BaseGeneralTask")
   GeneralTaskModule(m, generalTask)
 
-End function
+End Function
 
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

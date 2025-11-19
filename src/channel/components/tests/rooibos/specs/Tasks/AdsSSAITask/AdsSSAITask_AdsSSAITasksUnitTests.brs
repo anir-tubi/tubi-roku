@@ -15,7 +15,7 @@ Function AdsSSAITaskTest_BeforeEach()
   ' ad pod with 3 ads
   m.mockedAdBreak = buildMockedAdBreak()
   m.adPod = m.mockedAdBreak[0]
-End function
+End Function
 
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

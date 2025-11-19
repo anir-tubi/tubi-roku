@@ -51,7 +51,7 @@ End Function
 Function rokuContinueWatchingApi_createClearContinueWatchingReqInfo()
   options = {
     method: m.constants.reqTypes.put
-    body: FormatJson({"items": []})
+    body: FormatJson({ "items": [] })
     headers: m.rokuReservedHeaders
   }
   return {

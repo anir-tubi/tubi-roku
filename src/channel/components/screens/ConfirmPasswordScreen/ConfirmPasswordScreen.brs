@@ -41,9 +41,9 @@ End Function
 
 Function onThemeChange(msg = invalid)
   if msg <> invalid
-    m.theme  = msg.getData()
+    m.theme = msg.getData()
   else
-    m.theme  = getThemeFromGlobal()
+    m.theme = getThemeFromGlobal()
   end if
 
   setPasswordColor()
@@ -74,7 +74,7 @@ Function onScreenFocusChange()
 
     m.keyboard.setFocus(true)
     m.keyboard.voiceEnabled = true
-    if m.constants.settings.mode <> "production" and m.constants.settings.password <> invalid
+    if m.constants.settings.mode <> "production" AND m.constants.settings.password <> invalid
       m.keyboard.text = m.constants.settings.password
       m.password.text = m.constants.settings.password
     end if
@@ -106,7 +106,7 @@ Function onButtonSelected(evt)
 End Function
 
 
-Function onKeyEvent(key As String, press As Boolean) As Boolean
+Function onKeyEvent(key as String, press as Boolean) as Boolean
   tubiLog("ConfirmPasswordScreen.onKeyEvent")
   if key = "OK"
     m.password.text = m.keyboard.text

@@ -53,8 +53,8 @@ Function init()
   end if
   onThemeChange()
 End Function
-  
-  
+
+
 Function onThemeChange(msg = invalid)
   if msg <> invalid
     theme = msg.getData()
@@ -86,7 +86,7 @@ Function onScreenFocusChange()
       m.resendBtn.visible = false
       m.resendBtn.scale = [0, 0]
 
-      m.pageSubHeading2.text = m.pageSubHeading2.text + Chr(10) + getTranslation("havent_received_email") 
+      m.pageSubHeading2.text = m.pageSubHeading2.text + Chr(10) + getTranslation("havent_received_email")
     else
       m.resendBtn.visible = true
       m.continueBtn.visible = false
@@ -110,7 +110,7 @@ Function onResendInstantLinkSelected()
     type: "dialog"
     values: {
       dialog_type: "LOGIN_REQUEST"
-      pageOneof:  m.Tracking.getAnalyticsPage("login_page", {"choice": "LINK"})
+      pageOneof: m.Tracking.getAnalyticsPage("login_page", { "choice": "LINK" })
       dialog_action: "SHOW"
       dialog_sub_type: "resend_link"
     }
@@ -131,14 +131,14 @@ Function onResendVerificationLinkSelected()
       type: "dialog"
       values: {
         dialog_type: "LOGIN_REQUEST"
-        pageOneof:  m.Tracking.getAnalyticsPage("login_page", {"choice": "LINK"})
+        pageOneof: m.Tracking.getAnalyticsPage("login_page", { "choice": "LINK" })
         dialog_action: "SHOW"
         dialog_sub_type: "many_attempts"
       }
     }
 
     title = getTranslation("dialog_button_attempts_title")
-    message = getTranslation("dialog_button_multiple_emails_sent") + Chr(10) + m.email.text +  Chr(10) + getTranslation("dialog_email_verification_check_spam")
+    message = getTranslation("dialog_button_multiple_emails_sent") + Chr(10) + m.email.text + Chr(10) + getTranslation("dialog_email_verification_check_spam")
     buttons = [getTranslation("dialog_button_close")]
     showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onTooManyAttemptsCallback)
   else
@@ -160,7 +160,7 @@ Function onTooManyAttemptsCallback()
 End Function
 
 
-Function onKeyEvent(key As String, press As Boolean) as Boolean
+Function onKeyEvent(key as String, press as Boolean) as Boolean
   if press AND key = "back"
     m.top.backButtonSelected = true
     return true

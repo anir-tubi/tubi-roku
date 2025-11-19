@@ -50,7 +50,7 @@ Function parseSearchAPISuccess(fullResponse, reqInfo)
   end if
 
   convertedMetadata = m.metadataTranslate.translateSearchResults(parsedResponse, isSignedInUser)
-  
+
   parsedData = CreateObject("roSGNode", "SearchContentNode")
   parsedData.searchText = reqInfo.searchText
   parsedData.inputDevice = reqInfo.inputDevice
@@ -76,7 +76,7 @@ Function parseAutocompleteAPISuccess(fullResponse, reqInfo)
       end if
     end for
   end if
-  
+
   convertedMetadata = {
     id: parsedResponse.personalization_id
     suggestions: aSuggestions

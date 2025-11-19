@@ -26,7 +26,7 @@ End Function
 'side effects... overwrites the old authInfo in the registry with the new authInfo
 Function parseSignUpSuccess(fullResponse, _reqInfo)
   parsedResponse = fullResponse.data
-  parsedResponse.authType = "EMAIL"  'used for subsequent analytics requests
+  parsedResponse.authType = "EMAIL" 'used for subsequent analytics requests
   return parsedResponse
 End Function
 
@@ -49,7 +49,7 @@ End Function
 'side effects... overwrites the old authInfo in the registry with the new authInfo
 Function parseSignInSuccess(fullResponse, reqInfo)
   parsedResponse = fullResponse.data
-  parsedResponse.authType = "EMAIL"  'used for subsequent analytics requests
+  parsedResponse.authType = "EMAIL" 'used for subsequent analytics requests
   parsedResponse.requestInput = reqInfo
   return parsedResponse
 End Function
@@ -94,9 +94,9 @@ Function parsequeryStatusOfMagicLinkSuccess(fullResponse, _reqInfo)
 
   if isAA(fullResponse) = true
     parsedResponse = fullResponse.data
-    
+
     if isAA(parsedResponse) = true
-      parsedResponse.authType = "EMAIL"  'used for subsequent analytics requests
+      parsedResponse.authType = "EMAIL" 'used for subsequent analytics requests
     end if
   end if
 

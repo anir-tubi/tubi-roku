@@ -4,7 +4,7 @@
 Function RequestSetup()
   m.request = TubiRequest().createAsync("http://localhost/")
   m.port = CreateObject("roMessagePort")
-End function
+End Function
 
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -57,7 +57,7 @@ End Function
 Function request_addParamsToUrlAsModuleFunction_test()
   ' Verify that we don't need to use the createAsync factory method in order to use this function
   module = TubiRequest()
-  m.assertEqual( module.addParamsToUrl("http://adrise.tv/", { uid: 0}), "http://adrise.tv/?uid=0")
+  m.assertEqual(module.addParamsToUrl("http://adrise.tv/", { uid: 0 }), "http://adrise.tv/?uid=0")
 End Function
 
 
@@ -83,7 +83,7 @@ End Function
 '@Params [ "http://adrise.tv/?x=1&",  { h: 1 },     "http://adrise.tv/?x=1&h=1" ]
 Function request_addParamsToUrl_test(url, params, expectedResult)
   request = TubiRequest().createAsync("http://localhost/")
-  m.assertEqual( request.addParamsToUrl_(url, params), expectedResult)
+  m.assertEqual(request.addParamsToUrl_(url, params), expectedResult)
 End Function
 
 '@Test passThroughCharlesProxyAsModuleFunction_test unit tests
@@ -99,7 +99,7 @@ End Function
 '@Params [ "http://adrise.tv",          {mode: "dev", CharlesProxyEnabled: false, charlesProxyUrl:"http://192.168.68.57:8888"},          "http://adrise.tv" ]
 '@Params [ "http://adrise.tv",          {mode: "dev", CharlesProxyEnabled: true, charlesProxyUrl:""},                                    "http://adrise.tv" ]
 '@Params [ "http://adrise.tv",          {mode: "dev", CharlesProxyEnabled: false, charlesProxyUrl:""},                                   "http://adrise.tv" ]
-Function request_passThroughCharlesProxy_test(url, settings, expectedResult )
+Function request_passThroughCharlesProxy_test(url, settings, expectedResult)
   module = TubiRequest(settings)
   m.assertEqual(module.passThroughCharlesProxy(url), expectedResult)
 End Function
@@ -118,7 +118,7 @@ End Function
 '@Params [ "http://adrise.tv",                                      {mode: "dev", CharlesProxyEnabled: true, charlesProxyUrl:""},                                    "http://adrise.tv" ]
 '@Params [ "http://adrise.tv",                                      {mode: "dev", CharlesProxyEnabled: false, charlesProxyUrl:""},                                   "http://adrise.tv" ]
 '@Params [ "http://192.168.68.57:8888/build/local/source/Settings.brs", {mode: "dev", CharlesProxyEnabled: true, charlesProxyUrl:"http://192.168.68.57:8888"},       "http://192.168.68.57:8888/build/local/source/Settings.brs" ]
-Function request_removeCharlesProxy_test(url, settings , expectedResult)
+Function request_removeCharlesProxy_test(url, settings, expectedResult)
   module = TubiRequest(settings)
   m.assertEqual(module.removeCharlesProxy(url), expectedResult)
 End Function
@@ -134,7 +134,7 @@ End Function
 
 '@Test methods unit tests
 Function request_methods_test()
-  validMethods = [ "GET", "PUT", "POST", "PATCH", "DELETE" ]
+  validMethods = ["GET", "PUT", "POST", "PATCH", "DELETE"]
 
   ' Go through each method, verifying from the server side that the method in the request is correct
   port = CreateObject("roMessagePort")
@@ -158,7 +158,7 @@ Function request_methods_test()
 End Function
 
 
-Function request_createTestServer_testHelper(tcpPort As Integer)
+Function request_createTestServer_testHelper(tcpPort as Integer)
   server = CreateObject("roStreamSocket")
   address = CreateObject("roSocketAddress")
   address.setPort(tcpPort)

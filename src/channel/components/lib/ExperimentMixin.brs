@@ -3,7 +3,7 @@
 ' Get more info about the experiment
 ' Note: the component calling getExperimentResource using the ExperimentMixin, must also
 ' have pkg:/source/lib/Request.brs, pkg:/source/lib/GlobalMixin.brs, and pkg:/source/lib/TubiExperiments.brs added as scripts
-Function getExperimentResource(namespaceName as string, experimentName as string, sendEvent=true as Boolean)
+Function getExperimentResource(namespaceName as String, experimentName as String, sendEvent = true as Boolean)
   if m.experimentsInfo = invalid then
     m.experimentsInfo = getExperimentsInfoFromGlobal()
   end if
@@ -19,7 +19,7 @@ Function getExperimentResource(namespaceName as string, experimentName as string
 End Function
 
 
-Function sendOutExperimentTracking(namespaceName as string, experimentName as string, experiments)
+Function sendOutExperimentTracking(namespaceName as String, experimentName as String, experiments)
   ' set up a list of experiment parameters that we've already sent exposure events for
   ' this will prevent multiple exposure events per session for the same experiment
   if m.global <> invalid AND m.global.exposedExperimentParameters = invalid
@@ -52,7 +52,7 @@ End Function
 '       "treatment": "in_pod_stitching",
 '       "segment": "WHITELISTED"
 ' this result can be used in youbora requests
-Function getExperimentResult(namespaceName as string, experimentName as string) as Object
+Function getExperimentResult(namespaceName as String, experimentName as String) as Object
   if m.experimentsInfo = invalid then
     m.experimentsInfo = getExperimentsInfoFromGlobal()
   end if

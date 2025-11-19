@@ -123,7 +123,7 @@ Function tubiAuth_getAuthInfoNoUpdate()
     authInfo.delete("ln")
   end if
 
-  if authInfo.expireTime <> invalid   'used as test to determine if we have any auth info in the auth registry
+  if authInfo.expireTime <> invalid 'used as test to determine if we have any auth info in the auth registry
     authInfo.expireTime = authInfo.expireTime.toInt()
 
     if isString(authInfo.hasAge) = true
@@ -136,7 +136,7 @@ Function tubiAuth_getAuthInfoNoUpdate()
     return authInfo
   end if
 
-  return authInfo  'can return an empty assocArray
+  return authInfo 'can return an empty assocArray
 End Function
 
 
@@ -228,7 +228,7 @@ Function tubiAuth_getAnonymousRefreshTokenRequestInfo(authInfo)
 
   algorithm = m.constants.anonymous.algorithm
   dateTime = createObject("roDateTime").ToISOString()
-  dateTimeFormatted = dateTime.replace("-","").replace(":","")
+  dateTimeFormatted = dateTime.replace("-", "").replace(":", "")
 
   headers = m.getAuthHeaders(authInfo.refreshToken)
 
@@ -254,7 +254,7 @@ Function tubiAuth_getAnonymousRefreshTokenRequestInfo(authInfo)
     "X-Tubi-SignedHeaders": signedHeaders
     "X-Tubi-Date": dateTimeFormatted
     "X-Tubi-Expires": "60"
-    "X-Tubi-Signature" : signature
+    "X-Tubi-Signature": signature
   }
 
 
@@ -288,7 +288,7 @@ Function tubiAuth_getAnonymousTokenRequestInfo(verifier, signingKeyResponse)
   algorithm = m.constants.anonymous.algorithm
 
   dateTime = createObject("roDateTime").ToISOString()
-  dateTimeFormatted = dateTime.replace("-","").replace(":","")
+  dateTimeFormatted = dateTime.replace("-", "").replace(":", "")
 
   body = {
     id: id
@@ -807,14 +807,14 @@ End Function
 
 ' copied from /source/3rdparty/roku/generalUtils.brs so that it won't need to be added as a dependency for any logic that wants to call
 ' auth.getAuthInfo
-Function tubiAuth_regReadAll(section="")
+Function tubiAuth_regReadAll(section = "")
   if section = "" then section = "Default"
   sec = CreateObject("roRegistrySection", section)
   keys = sec.GetKeyList()
   allInfo = {}
   for each key in keys
-      value = m.regRead(key, section)
-      allInfo[key] = value
+    value = m.regRead(key, section)
+    allInfo[key] = value
   end for
   return allInfo
 End Function
@@ -822,7 +822,7 @@ End Function
 
 ' copied from /source/3rdparty/roku/generalUtils.brs so that it won't need to be added as a dependency for any logic that wants to call
 ' auth.getAuthInfo
-Function tubiAuth_regRead(key, section=invalid)
+Function tubiAuth_regRead(key, section = invalid)
   if section = invalid then section = "Default"
   sec = CreateObject("roRegistrySection", section)
   if sec.Exists(key) then return sec.Read(key)
@@ -1000,7 +1000,7 @@ End Function
 '
 Function tubiAuth_createStringtoSignSignature(hashedCanonicalRequest, dateTime, algorithm)
 
-  dateTimeFormatted = dateTime.replace("-","").replace(":","")
+  dateTimeFormatted = dateTime.replace("-", "").replace(":", "")
   stringToSign = algorithm + chr(10) + dateTimeFormatted + chr(10) + hashedCanonicalRequest
   return stringToSign
 
@@ -1022,7 +1022,7 @@ Function tubiAuth_calculateSignature(stringToSign, secretKey, dateTime)
 
   signature = invalid
 
-  date = dateTime.replace("-","").split("T")[0]
+  date = dateTime.replace("-", "").split("T")[0]
 
   ba = CreateObject("roByteArray")
   ba.FromBase64String(secretKey)

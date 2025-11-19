@@ -3,7 +3,7 @@ Function init()
   m.top.observeFieldScoped("uri", "onURIChange")
   m.FadingGroup = m.top.findNode("FadingGroup")
 
-  m.FadeInURL = ""  '//When a new background needs to replace an existing one, the existing background is faded and this variable is used to remember the URL of the background that needs to be faded in
+  m.FadeInURL = "" '//When a new background needs to replace an existing one, the existing background is faded and this variable is used to remember the URL of the background that needs to be faded in
 End Function
 
 

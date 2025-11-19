@@ -148,7 +148,7 @@ Function onFocusedIndexChange()
     ' adjusting the position of the panel content section as per below logic.
     ' We are get the parent y position and adding the focused child within the layout groups y position.
     ' And moving up the translation of the content section.
-    slideTo(m.panelContentSection, [0, -(m.qrCodeSections.translation[1] + translation[1])], 0.5)
+    slideTo(m.panelContentSection, [0, - (m.qrCodeSections.translation[1] + translation[1])], 0.5)
   end if
 End Function
 

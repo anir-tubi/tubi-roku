@@ -22,7 +22,7 @@ End Function
 ' maxSize - the maximum depth of queue, or 0 if no limit
 ' timeout - seconds before expiring the request, default 30
 '
-Function createHTTPRequestQueue(port As Object, maxSize=0 As integer, timeout=30 As Integer) As Object
+Function createHTTPRequestQueue(port as Object, maxSize = 0 as Integer, timeout = 30 as Integer) as Object
   return {
     'public
     pushRequest: m.pushRequest
@@ -48,16 +48,16 @@ End Function
 '
 ' request - a request created by createAsyncHTTPRequest
 '
-Function tubiq_pushRequest(request As Object) As Object
+Function tubiq_pushRequest(request as Object) as Object
   ' make room first
   m.advanceQueue_()
 
-  if request = invalid or request["klass"] <> "TubiAsyncHTTPRequest"
+  if request = invalid OR request["klass"] <> "TubiAsyncHTTPRequest"
     tubiLog("Invalid object attempted to push to request queue")
     return invalid
   else
     ' push to queue only if there is room
-    if m.maxSize = 0 or m.queue.Count() < m.maxSize then
+    if m.maxSize = 0 OR m.queue.Count() < m.maxSize then
       m.queue.Push(m.WrapRequest_(request))
       m.AdvanceQueue_()
       return request
@@ -73,7 +73,7 @@ End Function
 ' event - an event received on the message port assigned to this queue; events besides roUrlEvent will
 '         be ignored
 '
-Function tubiq_handleEvent(event As Object) As Object
+Function tubiq_handleEvent(event as Object) as Object
   if type(event) <> "roUrlEvent" then return invalid
   id = event.GetSourceIdentity()
   index = m.findRequestById_(id)
@@ -97,7 +97,7 @@ End Function
 ' Cancel a request and remove it from the queue.  We have to add this here because
 ' a Request object that is cancelled does not emit an event on which handleEvent could
 ' clean up the queue.
-Function tubiq_cancelRequest(request As Object)
+Function tubiq_cancelRequest(request as Object)
   if request <> invalid AND request.uuid <> invalid then
     i = m.findRequestByUuid_(request.uuid)
     if i <> -1 then
@@ -130,7 +130,7 @@ End Function
 
 
 ' Make our own object out of the initial request
-Function tubiq_wrapRequest_(request As Object) As Object
+Function tubiq_wrapRequest_(request as Object) as Object
   datetime = CreateObject("roDateTime")
   now = datetime.AsSeconds()
   return {
@@ -163,7 +163,7 @@ Function tubiq_advanceQueue_()
 
   ' Start requests
   ' TODO(chris): incorporate an 'max active' to control a pool of roUrltransfer objects
-  for i=0 to m.queue.Count()-1
+  for i = 0 to m.queue.Count() - 1
     entry = m.queue[i]
     if entry.urltransfer = invalid
       entry.urltransfer = CreateObject("roUrlTransfer")
@@ -176,16 +176,16 @@ End Function
 ' Find a request in the queue by its urltransfer id. This is a helper for handleRequest().
 '
 ' returns the index in the queue
-Function tubiq_findRequestById_(id As Integer) As Integer
-  for i=0 to m.queue.Count() - 1
+Function tubiq_findRequestById_(id as Integer) as Integer
+  for i = 0 to m.queue.Count() - 1
     entry = m.queue[i]
     if entry.urltransfer <> invalid AND entry.urltransfer.GetIdentity() = id then return i
   end for
   return -1
 End Function
 
-Function tubiq_findRequestByUuid_(uuid As String) As Integer
-  for i=0 to m.queue.Count() - 1
+Function tubiq_findRequestByUuid_(uuid as String) as Integer
+  for i = 0 to m.queue.Count() - 1
     entry = m.queue[i]
     if entry.request.uuid <> invalid AND entry.request.uuid = uuid then return i
   end for

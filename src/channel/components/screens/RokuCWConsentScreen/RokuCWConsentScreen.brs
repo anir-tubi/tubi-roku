@@ -94,7 +94,7 @@ Function onItemSelectedChange(msg)
   pageOneof = m.tubiTrackingInfo.getAnalyticsPage(trackingPageInfo.pagetype, trackingPageInfo.pageValues)
   componentOneof = m.tubiTrackingInfo.getAnalyticsComponent("button_component", componentValues)
 
-  m.top.componentInteractionInfo =  {
+  m.top.componentInteractionInfo = {
     pageOneof: pageOneof
     componentOneof: componentOneof
     user_interaction: "CONFIRM"
@@ -111,7 +111,7 @@ Function onItemFocusedChange(msg)
 End Function
 
 
-Function onKeyEvent(key As String, press As Boolean) as Boolean
+Function onKeyEvent(key as String, press as Boolean) as Boolean
   if press AND key = "back"
     m.top.backButtonSelected = true
     return true

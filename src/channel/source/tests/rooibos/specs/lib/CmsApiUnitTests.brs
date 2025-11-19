@@ -6,7 +6,7 @@ Function CmsApiSetup()
   pub_serverPersistentData = createObject("roSGNode", "ServerPersistentData")
   utils = ApiUtils(constants, pub_serverPersistentData)
   m.cmsApi = CmsApi(constants, utils)
-End function
+End Function
 
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -710,7 +710,7 @@ Function cmsApi_createCategoryReqInfo_test()
       "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largePoster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largePoster[1].ToStr() + "_poster"
       "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largeLandscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largeLandscape[1].ToStr() + "_landscape"
       "contentMode": ""
-      "expanded":	true
+      "expanded": true
     }
     headers: {
       "x-client-platform": m.cmsApi.constants.headers.commonUapi["x-client-platform"]
@@ -721,8 +721,8 @@ Function cmsApi_createCategoryReqInfo_test()
   passedOptions = {
     params: {
       "cursor": 10
-      "contents_limit":  m.cmsApi.constants.performance.categoryGridList.lazyLoadBatchSize
-      "expanded":	true
+      "contents_limit": m.cmsApi.constants.performance.categoryGridList.lazyLoadBatchSize
+      "expanded": true
     }
   }
 
@@ -777,7 +777,7 @@ Function cmsApi_createAutocompleteReqInfo_test()
   m.assertEqual(autocompleteInfo.url, autocompleteUrl)
   m.assertAAHasKeys(autocompleteInfo.options.params, params)
   m.assertEqual(autocompleteInfo.options.params["app_id"], autocompleteOptions.params["app_id"])
-  m.assertEqual(autocompleteInfo.options.params["platform"],  autocompleteOptions.params["platform"])
+  m.assertEqual(autocompleteInfo.options.params["platform"], autocompleteOptions.params["platform"])
   m.assertEqual(autocompleteInfo.options.params["device_id"], autocompleteOptions.params["device_id"])
   m.assertEqual(autocompleteInfo.options.params["search"], autocompleteOptions.params["search"])
 

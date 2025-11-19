@@ -55,7 +55,7 @@ Function VideoErrorsSetup()
   mockedInfo.bufferMs = 2957
 
   m.mockedInfo = mockedInfo
-End function
+End Function
 
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

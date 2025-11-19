@@ -14,17 +14,17 @@ Function parseCategoryMyStuffContentSuccess(fullResponse, reqInfo)
       '//if this is the continue watching container, then ensure the orientation is landscape
       orientation = m.constants.ui.gridItemTypes.landscapeInnerMetadata
     end if
-    
+
     bFullData = false
     contentMode = m.constants.ui.contentMode.homescreen
-  
+
     if reqInfo <> invalid
       options = reqInfo.options
       if options <> invalid AND options.params <> invalid
         contentMode = options.params.contentMode
       end if
     end if
-  
+
     isSignedInUser = false
     if reqInfo <> invalid
       isSignedInUser = reqInfo.isSignedInUser
@@ -35,8 +35,8 @@ Function parseCategoryMyStuffContentSuccess(fullResponse, reqInfo)
     convertedMetadata = m.metadataTranslate.translateEmptyMyStuffContainer(parsedResponse)
   end if
 
-  
-  return convertedMetadata  'may return an empty container
+
+  return convertedMetadata 'may return an empty container
 End Function
 
 
@@ -51,7 +51,7 @@ Function parseMultipleContentSuccess(fullResponse, reqInfo)
     parentContainer.id = reqInfo.categoryId
   end if
   parentContainer.json = fullResponse.fulljson
-  
+
   nValidReturn = 0
   shortestValidDuration = invalid
 

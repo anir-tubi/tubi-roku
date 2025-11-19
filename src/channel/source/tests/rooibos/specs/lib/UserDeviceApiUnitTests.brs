@@ -26,7 +26,7 @@ Function UserDeviceApiSetup()
   m.episodeContent = CreateObject("roSGNode", "TubiContentNode")
   m.episodeContent.type = "episode"
 
-End function
+End Function
 
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -279,7 +279,7 @@ Function userDeviceApi_setContentRating_test()
 
   m.assertNotInvalid(params)
   m.assertNotInvalid(params.action)
-  m.assertEqual(params.action,  m.constants.ui.likeDislikeActions.like)
+  m.assertEqual(params.action, m.constants.ui.likeDislikeActions.like)
 
   m.assertNotInvalid(params.data)
   m.assertEqual(type(params.data), "roArray")
@@ -725,7 +725,7 @@ End Function
 
 '@Test createPatchConsentReqInfo unit tests
 Function userDeviceApi_createPatchConsentReqInfo_test()
-  body = {"behavioral_advertising": "opted_in", "essential_functionality": "required"}
+  body = { "behavioral_advertising": "opted_in", "essential_functionality": "required" }
   req = m.userDeviceApi.createPatchConsentReqInfo(body)
 
   m.assertNotInvalid(req)

@@ -105,7 +105,7 @@ Function onNumberPadTextChanged(msg)
     text = text.left(text.len() - 1)
   end if
 
-' Have to also set the numberpad to prevent getting out of sync
+  ' Have to also set the numberpad to prevent getting out of sync
   m.NumberPad.text = text
   m.AgeEntry.text = text
   readAudioGuideText(text)
@@ -113,7 +113,7 @@ End Function
 
 ' @year: String - year we are saying the user was born in
 Function updateBirthdate(year)
-  m.top.birthdate = year + "-12-31"  ' since backend expects birthday in date format(YYYY-MM-DD), we are appending dummy month & day
+  m.top.birthdate = year + "-12-31" ' since backend expects birthday in date format(YYYY-MM-DD), we are appending dummy month & day
 End Function
 
 

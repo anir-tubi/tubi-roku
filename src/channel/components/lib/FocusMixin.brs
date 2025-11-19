@@ -1,4 +1,4 @@
-Function focusState(node As Object) As String
+Function focusState(node as Object) as String
   if type(node) = "roSGNode" then
     return "id: " + node.id + " chain: " + node.isInFocusChain().toStr() + " self: " + node.hasFocus().toStr()
   else

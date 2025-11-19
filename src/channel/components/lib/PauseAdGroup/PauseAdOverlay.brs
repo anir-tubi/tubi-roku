@@ -10,7 +10,7 @@ Function init()
 End Function
 
 
-Function onKeyEvent(key As String, press As Boolean) as Boolean
+Function onKeyEvent(key as String, press as Boolean) as Boolean
   tubiLog("PauseAdGroup.onKeyEvent key = " + key + " press: " + press.toStr())
   handled = false
 

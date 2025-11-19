@@ -1,5 +1,5 @@
 Function isVideoPreviewEnabled()
-  if m.constants = Invalid then
+  if m.constants = invalid then
     m.constants = getConstantsFromGlobal()
   end if
 

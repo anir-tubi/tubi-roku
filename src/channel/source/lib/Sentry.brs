@@ -44,14 +44,14 @@ Function Sentry(constants, auth)
       "app_version": constants.deviceInfo.clientVersion
     }
   }
-  if auth.getAuthInfo() <> invalid and auth.getAuthInfo().userId <> invalid
+  if auth.getAuthInfo() <> invalid AND auth.getAuthInfo().userId <> invalid
     sentryContext["user"] = {}
     sentryContext["user"]["id"] = auth.getAuthInfo().userId.toStr()
   end if
 
   return initSentry(dsn, sentryAttributes, sentryContext)
 
-End function
+End Function
 
 
 ' @dsn: string, sentry url
@@ -66,10 +66,10 @@ Function initSentry(dsn, attributes = invalid, context = invalid)
     ' required attributes
     "event_id": ""
     "timestamp": ""
-    "platform": "other"   ' must be one of Sentry's enum values
+    "platform": "other" ' must be one of Sentry's enum values
     "sdk": {
       "name": "roku"
-      "version": "1.0"  ' arbitrary, but required.  match it to the sentry_client value in auth header
+      "version": "1.0" ' arbitrary, but required.  match it to the sentry_client value in auth header
     }
     "contexts": {
       "device": {
@@ -100,12 +100,12 @@ Function initSentry(dsn, attributes = invalid, context = invalid)
     sentry_deepAppend(defaultEvent.contexts, context)
   end if
 
-  if type(dsn) = "String" or type(dsn) = "roString"
+  if type(dsn) = "String" OR type(dsn) = "roString"
     dsn = sentry_parseDsn(dsn)
   else
     dsn = sentry_parseDsn("")
   end if
- ' print "Sentry client initialized with DSN: "; dsn
+  ' print "Sentry client initialized with DSN: "; dsn
 
   return {
     ' public
@@ -138,12 +138,12 @@ Function sentry_parseDsn(dsnString)
     print "ERROR: Failed to parse Sentry DSN"
   end if
   return {
-    "protocol":  result[1]
+    "protocol": result[1]
     "publicKey": result[2]
     "secretKey": result[3]
-    "host":      result[4]
-    "port":      result[5]
-    "project":   result[6]
+    "host": result[4]
+    "port": result[5]
+    "project": result[6]
   }
 End Function
 
@@ -153,7 +153,7 @@ End Function
 '
 Function sentry_getUrl()
   url = m._dsn.protocol + "://" + m._dsn.host
-  if m._dsn.port <> invalid and m._dsn.port <> ""
+  if m._dsn.port <> invalid AND m._dsn.port <> ""
     url += ":" + m._dsn.port
   end if
   url += "/api/" + m._dsn.project + "/store/"
@@ -166,12 +166,12 @@ End Function
 '
 Function sentry_severities()
   return {
-    "fatal":    "fatal"
-    "error":    "error"
-    "warning":  "warning"
-    "log":      "log"
-    "info":     "info"
-    "debug":    "debug"
+    "fatal": "fatal"
+    "error": "error"
+    "warning": "warning"
+    "log": "log"
+    "info": "info"
+    "debug": "debug"
     "critical": "critical"
   }
 End Function
@@ -196,12 +196,12 @@ End Function
 '
 ' @level - string (optional), possible log levels are "debug", "info", "warn", or "error"
 Function sentry_getReqInfo(message = "" as Dynamic, level = "info" as String) as Object
-  if type(message) <> "roString" and type(message) <> "String" and type(message) <> "roAssociativeArray"
+  if type(message) <> "roString" AND type(message) <> "String" AND type(message) <> "roAssociativeArray"
     return invalid
   end if
 
   ' Default to Info
-  if type(level) <> "roString" and type(level) <> "String"
+  if type(level) <> "roString" AND type(level) <> "String"
     level = m._SEVERITIES.info
   else if m._SEVERITIES.DoesExist(LCase(level)) = false
     level = m._SEVERITIES.info
@@ -247,7 +247,7 @@ Function sentry_getReqInfo(message = "" as Dynamic, level = "info" as String) as
   values["type"] = errorType
   values["value"] = name
   event["exception"] = {
-    "values" : [values]
+    "values": [values]
   }
 
   reqOptions = {
@@ -289,9 +289,9 @@ Function sentry_getHeader()
   authString = "Sentry " + authValues.join(", ")
 
   header = {
-      "Content-type": "application/json"
-      "X-Sentry-Auth": authString
-    }
+    "Content-type": "application/json"
+    "X-Sentry-Auth": authString
+  }
 
   return header
 End Function
@@ -303,7 +303,7 @@ End Function
 ' Genearate a Sentry-compliant id: UUID with hyphens removed
 Function sentry_generateEventId()
   uuid = Box(CreateObject("roDeviceInfo").GetRandomUUID())
-  shortuuid = uuid.Replace("-","")
+  shortuuid = uuid.Replace("-", "")
   return shortuuid
 End Function
 
@@ -318,12 +318,12 @@ End Function
 ' Invoked as a static method, no references to 'm' here.
 ' DESTRUCTIVE: this modifies a
 Function sentry_deepAppend(a, b)
-  if type(a) <> "roAssociativeArray" or type(b) <> "roAssociativeArray"
+  if type(a) <> "roAssociativeArray" OR type(b) <> "roAssociativeArray"
     return a
   end if
 
   for each key in b
-    if a.DoesExist(key) and type(a[key]) = "roAssociativeArray" and type(b[key]) = "roAssociativeArray"
+    if a.DoesExist(key) AND type(a[key]) = "roAssociativeArray" AND type(b[key]) = "roAssociativeArray"
       sentry_deepAppend(a[key], b[key])
     else
       ' if not an assocarray, we overwrite a's entry with b's value

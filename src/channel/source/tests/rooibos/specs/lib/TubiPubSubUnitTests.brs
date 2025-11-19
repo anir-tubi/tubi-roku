@@ -5,9 +5,9 @@ Function tubiPubsub_tests_beforeEach()
   ' since the context is not a node, mock an m.top.findNode()
   m.top = {
     component: invalid
-    findNode: function(id = "")
+    findNode: Function(id = "")
       return m.component
-    end function
+    End Function
   }
 
   m.pubsub = TubiPubSub(m)
@@ -180,13 +180,13 @@ Function tubiPubSub_publish_test()
   subscriber2 = CreateObject("roSGnode", "ContentNode")
   subscriber2.id = "the_subscriber2"
   ' update the find node mock function to enforce that we can't find subscriber1 but can find subscriber2
-  m.top.findNode = function(id = "")
-    if id = "the_subscriber2" 
+  m.top.findNode = Function(id = "")
+    if id = "the_subscriber2"
       return m.component
     else
       return invalid
     end if
-  end function
+  End Function
 
   m.pubsub.subscribe("someString", subscriber1, "title")
   m.pubsub.subscribe("someAA.is.nested", subscriber1, "description")

@@ -52,7 +52,7 @@
 
 ' Occurs after a user signs in, but the user does not have a valid age associated with their account yet.
 ' @signInInfo: assocarray(email,firstName) default set to invalid. eg - (test@tubi.tv, test)
-Function showAgeVerificationScreenAtSignIn(signInInfo = invalid as object)
+Function showAgeVerificationScreenAtSignIn(signInInfo = invalid as Object)
   tubiLog("AgeVerificationScreenHelpers.showAgeVerificationScreenAtSignIn")
   showAgeVerificationScreen(onAgeSubmittedAtSignIn, signInInfo)
 End Function
@@ -60,7 +60,7 @@ End Function
 
 ' Occurs for signedIn user when launching app and user does not have a valid age associated with their account yet.
 ' @signInInfo: assocarray(email,firstName) default set to invalid. eg - (test@tubi.tv, test)
-Function showAgeVerificationScreenAtStartup(signInInfo = invalid as object)
+Function showAgeVerificationScreenAtStartup(signInInfo = invalid as Object)
   tubiLog("AgeVerificationScreenHelpers.showAgeVerificationScreenAtStartup")
   showAgeVerificationScreen(onAgeSubmittedAtStartUp, signInInfo)
 
@@ -72,7 +72,7 @@ End Function
 
 ' Occurs during user signs up
 ' @signInInfo: assocarray(email,firstName,emailType) default set to invalid. eg - (test@tubi.tv, test, 'manual/pre_fill')
-Function showAgeVerificationScreenAtSignUp(signInInfo = invalid as object)
+Function showAgeVerificationScreenAtSignUp(signInInfo = invalid as Object)
   tubiLog("AgeVerificationScreenHelpers.showAgeVerificationScreenAtSignUp")
   showSignUpAgeVerificationScreen(signInInfo)
 End Function
@@ -165,17 +165,17 @@ Function conditionallyConfirmBirthYear(ageVerificationScreen, verifyAgeCallback,
     dialogEvent = {
       type: "dialog"
       values: {
-        dialog_type: "BIRTHDAY"   'DialogType enum
+        dialog_type: "BIRTHDAY" 'DialogType enum
         pageOneof: m.Tracking.getAnalyticsPage("age_gate_page", {})
         dialog_action: "SHOW"
         dialog_sub_type: "age_confirmation"
       }
     }
 
-    title = getTranslation("dialog_confirmCorrectAge_title", {"birthYear": birthYear})
+    title = getTranslation("dialog_confirmCorrectAge_title", { "birthYear": birthYear })
     if getNodeSubtype(ageVerificationScreen) = "SignUpAgeVerificationScreen" then
       age = currentYear - birthYear.toInt() - 1
-      title = getTranslation("dialog_confirmCorrectAge_title_age", {"age": age.toStr()})
+      title = getTranslation("dialog_confirmCorrectAge_title_age", { "age": age.toStr() })
     end if
 
     message = getTranslation("dialog_confirmCorrectAge_description")
@@ -622,7 +622,7 @@ Function handleInvalidEmailError()
     }
   }
 
-  title =  getTranslation("dialog_defaultError_title")
+  title = getTranslation("dialog_defaultError_title")
   message = getTranslation("could_not_verify_email") + ". " + getTranslation("dialog_defaultError_description")
   buttons = [getTranslation("dialog_button_ok")]
   showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, invalid)
@@ -711,7 +711,7 @@ Function verifyAge(birthdate, successCallback, errorCallback)
       successCallback: successCallback
       errorCallback: errorCallback
       responseType: "integer"
-      birthdate: birthdate  ' custom field to pass through to the callback
+      birthdate: birthdate ' custom field to pass through to the callback
     })
 
   else

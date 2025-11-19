@@ -10,5 +10,5 @@ Function parseCategoryDetailsSuccess(fullResponse, reqInfo)
   end if
 
   convertedMetadata = m.metadataTranslate.translateCategoryDetails(parsedResponse, isSignedInUser)
-  return convertedMetadata  'may return an empty container
+  return convertedMetadata 'may return an empty container
 End Function

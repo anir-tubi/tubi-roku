@@ -106,7 +106,7 @@ Function onDescriptionChange(msg)
 End Function
 
 
-Function onKeyEvent(key As String, press As Boolean) as Boolean
+Function onKeyEvent(key as String, press as Boolean) as Boolean
   if press = false
     return false
   end if

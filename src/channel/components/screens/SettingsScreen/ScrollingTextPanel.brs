@@ -9,8 +9,8 @@ Function init()
   theme = getThemeFromGlobal()
 
   m.Text.scrollbarTrackBitmapUri = "pkg:/does-not-exist.png" ' Setting this to an empty string or invalid will cause
-                                                             ' the default track image to show.  We hide it by
-                                                             ' setting a garbage value here
+  ' the default track image to show.  We hide it by
+  ' setting a garbage value here
   constants = getConstantsFromGlobal()
   if constants.deviceInfo.scaledUi = true
     if theme <> invalid
@@ -23,12 +23,12 @@ Function init()
     end if
     m.focusFootprintUri = "pkg:/images/transport/sgplayer/fhd/unfocused-progress-foreground.9.png"
   end if
-   m.Text.scrollbarThumbBitmapUri = m.focusFootprintUri
+  m.Text.scrollbarThumbBitmapUri = m.focusFootprintUri
 
-   if theme <> invalid
-      m.Title.color = theme.primaryTextColor
-      m.Text.color = theme.secondaryTextColor
-   end if
+  if theme <> invalid
+    m.Title.color = theme.primaryTextColor
+    m.Text.color = theme.secondaryTextColor
+  end if
 
 
   typographyConstants = getTypographyConstants()
@@ -37,15 +37,15 @@ Function init()
 End Function
 
 Function onComponentFocus()
- tubiLog("ScrollingTextPanel.onComponentFocus")
- if m.top.isInFocusChain() = true
-   if m.top.hasFocus()
-     m.Text.setFocus(true)
-   end if
-   m.Text.scrollbarThumbBitmapUri = m.focusBitmapUri
- else
-   m.Text.scrollbarThumbBitmapUri = m.focusFootprintUri
- end if
+  tubiLog("ScrollingTextPanel.onComponentFocus")
+  if m.top.isInFocusChain() = true
+    if m.top.hasFocus()
+      m.Text.setFocus(true)
+    end if
+    m.Text.scrollbarThumbBitmapUri = m.focusBitmapUri
+  else
+    m.Text.scrollbarThumbBitmapUri = m.focusFootprintUri
+  end if
 End Function
 
 Function onIsLoading()

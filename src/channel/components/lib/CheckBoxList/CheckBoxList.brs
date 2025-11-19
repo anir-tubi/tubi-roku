@@ -27,7 +27,7 @@ Function onItemSelectedChange(msg)
       contentCount = content.getChildCount()
 
       'Removes tick/check mark from all items on list
-      for i = 0 to contentCount-1
+      for i = 0 to contentCount - 1
         unCheckedContentItem = content.getChild(i)
         unCheckedContentItem.checked = false
       end for
@@ -46,7 +46,7 @@ Function onItemSelectedChange(msg)
 End Function
 
 
-Function onKeyEvent(key As String, press As Boolean) As Boolean
+Function onKeyEvent(key as String, press as Boolean) as Boolean
   if press then
     if key = "OK"
       m.top.itemSelected = m.top.itemFocused

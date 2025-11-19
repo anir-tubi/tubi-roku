@@ -19,7 +19,7 @@ Function moveUIElements()
   ' If we don't reset back to 0 before our boundRect our y position won't be correct
   m.textLabel.translation = [0, 0]
   textBoundingRect = m.textLabel.boundingRect()
-  textWidth= textBoundingRect.width
+  textWidth = textBoundingRect.width
   textHeight = textBoundingRect.height
 
   bIconVisible = false
@@ -53,7 +53,7 @@ Function moveUIElements()
     m.textLabel.horizOrigin = "center"
   end if
 
-  ' The y translation assumes that m.textLabel.vertOrigin = "center" and that an extra pixel is needed to take into account 
+  ' The y translation assumes that m.textLabel.vertOrigin = "center" and that an extra pixel is needed to take into account
   '    that the roku firmware not doing a good job with text. The 1 pixel adjustment is found by trial and error.
   m.textLabel.translation = [nTextLabelX, (m.textBackground.height / 2) + 1]
 

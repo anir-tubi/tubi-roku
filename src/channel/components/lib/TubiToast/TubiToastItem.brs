@@ -96,7 +96,7 @@ Function onShow(_msg)
     m.infoPaneBg.width = componentWidth + 36
   else if msgWidth + imageWidth >= 546
     m.infoPaneBg.width = 642
-  else if (msgWidth + imageWidth < 345) AND (headerWidth +  imageWidth < 345)
+  else if (msgWidth + imageWidth < 345) AND (headerWidth + imageWidth < 345)
     m.infoPaneBg.width = 441
   else if (msgWidth + imageWidth >= 345) OR (headerWidth + imageWidth >= 345)
     m.infoPaneBg.width = msgWidth + imageWidth + 96
@@ -108,12 +108,12 @@ Function onShow(_msg)
   finalHorizTranslation = 642 - m.infoPaneBg.width
   m.top.finalHorizTranslation = finalHorizTranslation
 
-  totalHeight =  m.infoPaneText.boundingRect().height  + 72 'top + bottom margins
+  totalHeight = m.infoPaneText.boundingRect().height + 72 'top + bottom margins
   if m.header <> invalid
     totalHeight = totalHeight + m.header.boundingRect().height + 12 'header height + spacing
   end if
 
-  if  totalHeight > 177 OR imageHeight > 177
+  if totalHeight > 177 OR imageHeight > 177
     m.infoPaneBg.height = 177
   else if totalHeight < 112 AND imageHeight < 112
     m.infoPaneBg.height = 112

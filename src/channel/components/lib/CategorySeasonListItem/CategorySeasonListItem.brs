@@ -29,7 +29,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     'TODO: Colors will be updated once the re-brand color updates done.
     m.categoryCountText.color = theme.primaryTextColor
@@ -57,7 +57,7 @@ Function onItemContentChange()
       m.categoryCountGroup.visible = false
     end if
   else
-    m.categoryCountGroup.visible = false  ' hidden until some useful value
+    m.categoryCountGroup.visible = false ' hidden until some useful value
     m.categoryText.text = ""
   end if
 End Function
@@ -71,8 +71,8 @@ Function onFocusPercentChange(msg)
   tubiLog("CategoryListItem.onFocusPercentChange")
   percent = msg.getData()
 
-  if m.top.listHasFocus = true or m.top.gridHasFocus = true or m.top.rowListHasFocus = true
-    m.categoryCountGroup.opacity = percent^3
+  if m.top.listHasFocus = true OR m.top.gridHasFocus = true OR m.top.rowListHasFocus = true
+    m.categoryCountGroup.opacity = percent ^ 3
   end if
 
   m.focusedCategoryText.opacity = percent

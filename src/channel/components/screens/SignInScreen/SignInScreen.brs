@@ -275,7 +275,7 @@ End Function
 
 
 Function showKeyboard()
-  slideTo(m.keyboard, [0,550], 1.0)
+  slideTo(m.keyboard, [0, 550], 1.0)
 
 End Function
 
@@ -287,7 +287,7 @@ End Function
 
 
 Function hideKeyboard()
-  slideTo(m.keyboard, [0,1080], 1.0)
+  slideTo(m.keyboard, [0, 1080], 1.0)
   m.continueBtn.visible = true
 
 End Function
@@ -312,7 +312,7 @@ Function onButtonSelected(evt)
   else if buttonSelected = "continue"
     m.keyboard.unobserveFieldScoped("buttonSelected")
     proceedPasswordValidation()
-  else if buttonSelected = "back" or buttonSelected = "up"
+  else if buttonSelected = "back" OR buttonSelected = "up"
     updatePasswordValidation()
     hideKeyboard()
     showButtons()
@@ -325,15 +325,15 @@ End Function
 
 Function proceedPasswordValidation()
 
-    updatePasswordValidation()
-    if isPasswordValid() = true
-      m.top.signInSelected = {
-        password: m.password.text
-        email: m.email.text
-        rfiSignInInfo: m.top.signInInfo
-      }
-      m.continueBtn.unobserveFieldScoped("selected")
-    end if
+  updatePasswordValidation()
+  if isPasswordValid() = true
+    m.top.signInSelected = {
+      password: m.password.text
+      email: m.email.text
+      rfiSignInInfo: m.top.signInInfo
+    }
+    m.continueBtn.unobserveFieldScoped("selected")
+  end if
 End Function
 
 
@@ -346,76 +346,76 @@ Function onKeyboardTextChanged()
     m.keyboard.voiceEnabled = false
     m.top.emailSelected = true
   end if
- End Function
+End Function
 
 
- Function onAudioGuideTextChanged(msg)
+Function onAudioGuideTextChanged(msg)
   audioGuideText = msg.getData()
   if isNonEmptyString(audioGuideText) = true
     readAudioGuideText(audioGuideText)
   end if
- End Function
+End Function
 
 
- Function onKeyEvent(key As String, press As Boolean) as Boolean
- if key = "OK"
-   m.password.text = m.keyboard.text
- end if
+Function onKeyEvent(key as String, press as Boolean) as Boolean
+  if key = "OK"
+    m.password.text = m.keyboard.text
+  end if
 
- handled = true
- if press
-   if key = "back"
+  handled = true
+  if press
+    if key = "back"
 
-     if m.keyboard.isInFocusChain() = true
-       updatePasswordValidation()
-       hideKeyboard()
-       showButtons()
-       setFocusToComponent(m.password)
-       m.emailHasFocus = false
-     else
-       m.trackingLoggingTask.trackEvent = {
-         type: "account"
-         values: {
-           manip: "SIGNIN"
-           current: "EMAIL"
-           status: "FAIL"
-           message: "user-cancel"
-         }
-       }
-       handled = false
-     end if
+      if m.keyboard.isInFocusChain() = true
+        updatePasswordValidation()
+        hideKeyboard()
+        showButtons()
+        setFocusToComponent(m.password)
+        m.emailHasFocus = false
+      else
+        m.trackingLoggingTask.trackEvent = {
+          type: "account"
+          values: {
+            manip: "SIGNIN"
+            current: "EMAIL"
+            status: "FAIL"
+            message: "user-cancel"
+          }
+        }
+        handled = false
+      end if
 
-   else if key = "down"
+    else if key = "down"
 
-     if m.email.hasFocus() = true
-       setFocusToComponent(m.password)
-       m.emailHasFocus = false
-     else if m.password.hasFocus() = true
-       setFocusToComponent(m.continueBtn)
-     else if m.continueBtn.hasFocus() = true
-       setFocusToComponent(m.forgotPasswordBtn)
-     end if
+      if m.email.hasFocus() = true
+        setFocusToComponent(m.password)
+        m.emailHasFocus = false
+      else if m.password.hasFocus() = true
+        setFocusToComponent(m.continueBtn)
+      else if m.continueBtn.hasFocus() = true
+        setFocusToComponent(m.forgotPasswordBtn)
+      end if
 
-   else if key = "up"
+    else if key = "up"
 
-     if m.password.hasFocus() = true
-       setFocusToComponent(m.email)
-       m.emailHasFocus = true
-     else if m.continueBtn.hasFocus() = true
-       setFocusToComponent(m.password)
-       m.emailHasFocus = false
-     else if m.forgotPasswordBtn.hasFocus() = true
-       setFocusToComponent(m.continueBtn)
-     else if m.keyboard.isInFocusChain() = true
-       updatePasswordValidation()
-       hideKeyboard()
-       showButtons()
-       setFocusToComponent(m.password)
-       m.emailHasFocus = false
-     end if
-   end if
+      if m.password.hasFocus() = true
+        setFocusToComponent(m.email)
+        m.emailHasFocus = true
+      else if m.continueBtn.hasFocus() = true
+        setFocusToComponent(m.password)
+        m.emailHasFocus = false
+      else if m.forgotPasswordBtn.hasFocus() = true
+        setFocusToComponent(m.continueBtn)
+      else if m.keyboard.isInFocusChain() = true
+        updatePasswordValidation()
+        hideKeyboard()
+        showButtons()
+        setFocusToComponent(m.password)
+        m.emailHasFocus = false
+      end if
+    end if
 
-   return handled
- end if
- return false
+    return handled
+  end if
+  return false
 End Function

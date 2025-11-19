@@ -31,7 +31,7 @@ End Function
 '@textToRead: String, The string to be spoken.
 '@isFlush: boolean, set to true to make the screen reader immediately stop speaking any other speech before speaking, otherwise set to false
 '@isRepeat: boolean, set to true will ignore reading the same text, otherwise set to false.
-Function readAudioGuideText(textToRead as string, isFlush = true as boolean, isRepeat = true as boolean)
+Function readAudioGuideText(textToRead as String, isFlush = true as Boolean, isRepeat = true as Boolean)
   if isRokuAudioGuideEnabled() = true AND m.audioGuide <> invalid
     m.audioGuide.say(textToRead, isFlush, isRepeat)
   end if
