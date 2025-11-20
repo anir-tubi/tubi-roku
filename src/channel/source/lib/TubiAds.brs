@@ -434,11 +434,23 @@ Function tubiAds_retrieveAds(adsUrl, adInsertionMethod)
             if notUsedAdPodPixels.count() > 0 then
               m.notUsedAdPodPixels = notUsedAdPodPixels
             end if
+            try
+              m.roAdFramework.setAdUrl(localRafVastUrl)
+              'get the array of ad units back from the Roku Advertising Framework(RAF)
+              'adUnits are called adPods in RAF documentation
+              currentAdUnitsList = m.roAdFramework.getAds()
+            catch e
+              message = {
+                "adsUrl": adsUrl
+                "rainmakerResponse": rainmakerResponse
+              }
 
-            m.roAdFramework.setAdUrl(localRafVastUrl)
-            'get the array of ad units back from the Roku Advertising Framework(RAF)
-            'adUnits are called adPods in RAF documentation
-            currentAdUnitsList = m.roAdFramework.getAds()
+              ' Have to convert backtrace to string
+              e.backtrace = formatJson(e.backtrace)
+              message.append(e)
+
+              logInfo(message, "clientInfo", "caught-crash", 1)
+            end try
           else
             tubiLog("Failed to write local vast response to " + localRafVastUrl)
           end if
@@ -808,8 +820,21 @@ Function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
             ads.adTrackingCallback(eventType, ctx)
           End Function, ctx)
 
+          isCompleted = true
           adPod = adUnitsListContainer.adUnitsList[0]
-          isCompleted = m.roAdFramework.showAds(adPod, screenCount, containerNode)
+          try
+            isCompleted = m.roAdFramework.showAds(adPod, screenCount, containerNode)
+          catch e
+            message = {
+              "adPod": formatJson(adPod)
+            }
+
+            ' Have to convert backtrace to string
+            e.backtrace = formatJson(e.backtrace)
+            message.append(e)
+
+            logInfo(message, "clientInfo", "caught-crash", 1)
+          end try
 
           ' This will hide the buffering messaging and reset the progress bar
           ' before the video loading takes over status
