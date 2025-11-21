@@ -848,12 +848,14 @@ Function onHomeScreenContentFocused(msg)
   focusedContent = msg.getData()
   homeScreen = msg.getRoSGNode()
   ' Content Focused needs to be updated even when home screen is not in focus so that background image gets displayed even when side nav is in focus.
-  if homeScreen.isInFocusChain() = true AND homeScreen.lastFocusedList <> "featuredRowList"
-    setHomeScreenAfterFocus(focusedContent, homeScreen)
+  if homeScreen.isInFocusChain() = true
+    if homeScreen.lastFocusedList <> "featuredRowList"
+      setHomeScreenAfterFocus(focusedContent, homeScreen)
+    else
+      setHomeScreenAfterFocusForFeaturedRowList(focusedContent, homeScreen)
+    end if
   end if
 End Function
-
-
 
 
 Function onHomeScreenFocusLost(msg)
@@ -1048,6 +1050,39 @@ Function onHomeScreenColumnFocusChanged(msg)
   rowFocused = screen.currFocusRow
   if currFocusColumn = Fix(currFocusColumn)
     m.performanceMetricsTracker.endMetricTiming("horizontal_scroll_performance", { column: currFocusColumn, row: rowFocused, screen: screen.id })
+  end if
+End Function
+
+
+
+' setHomeScreenAfterFocusForFeaturedRowList()
+' This function should be called when a new rowlist item on the homescreen gains focus.
+' Anything that needs to be set after a focus should be done in this function
+' @param focusedContent, roSGNode - The TubiContentNode of the focused content
+' @param homeScreen, roSGNode - The HomeScreen component that contains the focused content
+Function setHomeScreenAfterFocusForFeaturedRowList(focusedContent, homeScreen)
+  tubiLog("HomeScreenHelpers.setHomeScreenAfterFocusForFeaturedRowList")
+
+  '//update the UI anytime the homescreen changes focus.
+  setUIBasedOnFocusedContent(focusedContent)
+  if focusedContent <> invalid
+    currentScreen = getCurrentScreen()
+    if currentScreen.isSameNode(homeScreen) = true AND currentScreen.isInFocusChain() = true 'if there are any modals over home screen or focus has been lost to side nav
+
+      if focusedContent <> invalid AND (focusedContent.type = m.constants.ui.contentTypes.adRowlistCarousel OR focusedContent.type = m.constants.ui.contentTypes.adRowlistSpotlight) AND focusedContent.videoPreviewUrl <> ""
+        ' If the content is adRowlistCarousel or adRowlistSpotlight, then set the video preview after a delay
+        nAdVideoDelay = m.constants.player.videoPreviewDelayTimes.adCarousel
+        if focusedContent.type = m.constants.ui.contentTypes.adRowlistSpotlight
+          updatePlayerLayoutBasedOnFocusedContent(focusedContent)
+          nAdVideoDelay = m.constants.player.videoPreviewDelayTimes.adSpotlight
+          stopVideoPreview()
+        end if
+
+        m.videoPreviewDebounce.duration = nAdVideoDelay
+        m.videoPreviewDebounce.control = "start"
+      end if
+
+    end if
   end if
 End Function
 
@@ -1300,16 +1335,20 @@ End Function
 
 Function onContentToPlay(msg)
   content = msg.getData()
+  contentType = content.type
   screen = msg.getRoSGNode()
   containerId = getCurrentFocusedContainerId(screen, content)
 
-  playbackSource = {
-    "srcForAnalytic": m.constants.player.playbackSource.unknown
-    "srcForAds": m.constants.player.playbackOrigin.container
-    "playbackContainer": containerId
-  }
 
-  processUserPlayAction(content, screen, playbackSource)
+  if contentType <> m.constants.ui.contentTypes.adRowlistCarousel AND contentType <> m.constants.ui.contentTypes.adRowlistSpotlight
+    playbackSource = {
+      "srcForAnalytic": m.constants.player.playbackSource.unknown
+      "srcForAds": m.constants.player.playbackOrigin.container
+      "playbackContainer": containerId
+    }
+
+    processUserPlayAction(content, screen, playbackSource)
+  end if
 End Function
 
 
@@ -1646,6 +1685,7 @@ End Function
 
 ' Triggers a callback when the user is scrolling through the columns of the row.
 Function onFeaturedRowCurrFocusColumnChange()
+  tubiLog("HomeScreenHelpers.onFeaturedRowCurrFocusColumnChange")
   m.inlineVideoMetadataOverlay.skipAnimation = false
   m.videoPreviewDebounce.control = "stop"
   fade(m.autoStartPreviewToPlaybackTimer, "out", 0.3)
