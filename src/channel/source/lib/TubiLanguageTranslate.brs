@@ -2514,14 +2514,6 @@ Function getTranslation_es_MX()
       "description": "Message of a Dialog Window that is shown when a deeplink content can not played because of user's parental control setting",
       "message": "Por favor, desactiva el control parental para utilizar esta función."
     },
-    "error_connection_title": {
-      "description": "title of error window when there is a connection error",
-      "message": "Error de conexión"
-    },
-    "error_connection_description": {
-      "description": "description of error window when there is a connection error",
-      "message": "Puede haber un problema con tu conexión de red o con el servidor de Tubi. Verifica tu conexión e inténtalo de nuevo\n"
-    },
     "dialog_updateVersion_title": {
       "description": "title of a dialog window that is shown when the user has an older version of the app",
       "message": "Por favor, actualiza el canal de Tubi"
@@ -3449,6 +3441,10 @@ Function getTranslation_es_MX()
     "linearVideoPlayer_timeLeft": {
       "description": "Label to display time left in linear video player info panel",
       "message": "{time} quedan"
+    },
+    "linearVideoPlayer_adCounter": {
+      "description": "Label to display ad counter in linear video player",
+      "message": "Ad {ad_index} de {ad_count}"
     },
     "channel_name": {
       "description": "This is the name of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
@@ -4474,14 +4470,6 @@ Function getTranslation_fr_CA()
       "description": "Message of a Dialog Window that is shown when a deeplink content can not played because of user's parental control setting",
       "message": "Veuillez désactiver le contrôle parental pour regarder ce contenu."
     },
-    "error_connection_title": {
-      "description": "title of error window when there is a connection error",
-      "message": "Erreur de connexion"
-    },
-    "error_connection_description": {
-      "description": "description of error window when there is a connection error",
-      "message": "Il peut y avoir un problème avec votre connexion réseau ou le serveur de Tubi. Vérifiez votre connexion et réessayez.\n"
-    },
     "dialog_updateVersion_title": {
       "description": "title of a dialog window that is shown when the user has an older version of the app",
       "message": "Veuillez mettre à jour le chaîne Tubi"
@@ -5409,6 +5397,10 @@ Function getTranslation_fr_CA()
     "linearVideoPlayer_timeLeft": {
       "description": "Label to display time left in linear video player info panel",
       "message": "{time} restantes"
+    },
+    "linearVideoPlayer_adCounter": {
+      "description": "Label to display ad counter in linear video player",
+      "message": "Ad {ad_index} du {ad_count}"
     },
     "channel_name": {
       "description": "This is the name of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
