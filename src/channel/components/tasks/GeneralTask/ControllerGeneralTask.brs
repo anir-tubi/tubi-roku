@@ -285,6 +285,11 @@ Function registerParsingCallbacks()
     parseSuccess: parseEpgListingSuccess
     parseError: parseGenericError
   }
+
+  m.requestTypes[m.constants.reqNames.fetchStatsigExperiments] = {
+    parseSuccess: parseGenericSuccess
+    parseError: parseGenericError
+  }
 End Function
 
 

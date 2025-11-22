@@ -41,6 +41,17 @@ Function RegDelete(key, section = invalid)
 End Function
 
 
+Function RegDeleteSection(section = invalid)
+  if section = invalid then section = "Default"
+  sec = CreateObject("roRegistrySection", section)
+  keys = sec.GetKeyList()
+  for each key in keys
+    sec.Delete(key)
+  end for
+  sec.Flush()
+End Function
+
+
 '******************************************************
 'Insertion Sort
 'Will sort an array directly, or use a key function

@@ -29,10 +29,12 @@ Function init()
 
   m.Spinner = m.top.findNode("Spinner")
 
+  m.top.observeFieldScoped("statsigExperiments", "onStatsigExperimentsChanged")
+
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(title, typographyConstants.ids.headerSmall)
-  setTypographyOfLabel(m.infoArea, typographyConstants.ids.bodyMediumStrong)
+  setTypographyOfLabel(m.infoArea, typographyConstants.ids.bodyMedium)
 
 
 End Function
@@ -49,13 +51,15 @@ Function onItemFocused(msg)
 
   item = m.Menu.Content.getChild(itemSelected)
 
+  ' Hide features panel when navigating away from it
+  if item.id <> "features" AND m.featuresPanel <> invalid AND m.featuresPanel.visible = true
+    m.featuresPanel.visible = false
+  end if
+
   if item.id = "viewRegistry"
     m.infoArea.text = "Current Registry values are printed by each section. Press OK to see full registry."
   else if item.id = "clearRegistry"
     m.infoArea.text = "It will delete all the registry values and restart the app."
-  else if item.id = "showEnabledExp"
-    currExperiments = getCurrentExperiments()
-    m.infoArea.text = "Experiments enabled:" + chr(10) + chr(10) + currExperiments
   else if item.id = "safeZone"
     m.infoArea.text = "It will overlay all the screens with safe zone guidelines."
   else if item.id = "overlay"
@@ -72,6 +76,16 @@ Function onItemFocused(msg)
     m.infoArea.text = "Select the country. It will work for White listed IPs only. Contact CSS for whitelisting" + chr(10) + "Current Country: " + m.constants.deviceInfo.countryCode
   else if item.id = "playerStats"
     m.infoArea.text = "This toggles the display of player stats within the video player, helping QA and developers understand the current playback."
+  else if item.id = "features"
+    m.infoArea.text = "Override experiment variants for testing purposes. Select an experiment to view available variants. Changes require an app restart to take effect."
+    ' Show features panel on focus (similar to proxy and country list)
+    if m.featuresPanel = invalid
+      showFeaturesPanel()
+    else if m.featuresPanel.visible = false
+      ' Only auto-show if panel was never created or explicitly hidden by navigating away
+      ' Don't auto-show if user just closed it with left key
+      m.featuresPanel.visible = true
+    end if
   end if
   showCountryList(item.id = "changeCountry")
   displayProxyKB(item.id = "addProxy")
@@ -107,7 +121,6 @@ Function removeProxy(msg)
       if sectionName = m.constants.registrySectionIDs.settingsOverride
         registry.Delete(sectionName)
         registry.Flush()
-        print sectionName + " is Deleted "
         exit for
       end if
     end for
@@ -141,14 +154,35 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       else if m.countryListMenu <> invalid AND m.countryListMenu.isInFocusChain() = true
         m.Menu.setFocus(true)
         handled = true
+      else if m.featuresPanel <> invalid AND m.featuresPanel.isInFocusChain() = true
+        m.Menu.setFocus(true)
+        handled = true
       end if
     else if key = "right"
-      if m.Menu.hasFocus() = true AND m.proxyinputDialog <> invalid AND m.proxyinputDialog.visible = true
-        m.proxyinputDialog.setFocus(true)
-        handled = true
-      else if m.Menu.hasFocus() = true AND m.countryListMenu <> invalid AND m.countryListMenu.visible = true
-        m.countryListMenu.setFocus(true)
-        handled = true
+      if m.Menu.hasFocus() = true
+        if m.proxyinputDialog <> invalid AND m.proxyinputDialog.visible = true
+          m.proxyinputDialog.setFocus(true)
+          handled = true
+        else if m.countryListMenu <> invalid AND m.countryListMenu.visible = true
+          m.countryListMenu.setFocus(true)
+          handled = true
+        else if m.featuresPanel <> invalid
+          isFeaturesVisible = m.featuresPanel.visible
+          isFeaturesItemFocused = isFeaturesMenuItemFocused()
+          if isFeaturesVisible = true OR isFeaturesItemFocused = true
+            ' Show features panel if it's hidden, then move focus to it
+            if m.featuresPanel.visible = false
+              m.featuresPanel.visible = true
+            end if
+            m.featuresPanel.setFocus(true)
+            ' Also directly set focus to the experiments grid
+            experimentsGrid = m.featuresPanel.findNode("ExperimentsGrid")
+            if experimentsGrid <> invalid
+              experimentsGrid.setFocus(true)
+            end if
+            handled = true
+          end if
+        end if
       end if
     end if
   end if
@@ -158,7 +192,6 @@ End Function
 
 
 Function onIsLoading()
-  tubiLog("TestingAidPanel.onIsLoading")
   if m.top.isLoading = true
     m.Spinner.visible = true
     m.ContentGroup.visible = false
@@ -170,7 +203,6 @@ End Function
 
 
 Function onTestingAidPanelItemSelected(msg)
-  tubiLog("TestingAidPanel.onTestingAidPanelItemSelected")
   itemSelected = msg.GetData()
 
   item = m.Menu.Content.getChild(itemSelected)
@@ -178,8 +210,6 @@ Function onTestingAidPanelItemSelected(msg)
     showRegistryValues()
   else if item.id = "clearRegistry"
     clearRegistry()
-  else if item.id = "showEnabledExp"
-    showCurrentExperiments()
   else if item.id = "safeZone"
 
     safeZone = getSafeZone()
@@ -218,6 +248,8 @@ Function onTestingAidPanelItemSelected(msg)
       item.title = "Show Player Stats"
       m.global.showPlayerStats = false
     end if
+  else if item.id = "features"
+    showFeaturesPanel()
   end if
 
 End Function
@@ -237,79 +269,23 @@ Function showRegistryValues()
   registry = CreateObject("roRegistry")
   regStr = ""
   sections = registry.GetSectionList()
-  print "*******************Registry Values******************************"
 
   for each sectionName in sections
     section = CreateObject("roRegistrySection", sectionName)
-    print "-------------------" + sectionName + "-----------------------"
     keys = section.GetKeyList()
     regStr = regStr + chr(10) + chr(10) + "<header>" + sectionName + "</header>" + chr(10)
     for each k in keys
       value = section.Read(k)
       if value <> invalid
         regStr = regStr + "          " + k + ": " + "<subTitle>" + value.toStr() + "</subTitle>" + chr(10)
-        print "            " + k + ": " + value.toStr()
       else
         regStr = regStr + "          " + k + ": " + chr(10)
-        print "            " + k + ": "
       end if
     end for
-    print "-----------------------------------------------------------"
   end for
 
   showData(regStr)
 End Function
-
-
-Function getCurrentExperiments()
-
-  enabledExperiments = "Enabled Experiments" + chr(10) + "--------------------------------------------------" + chr(10)
-  graduatedExperiments = chr(10) + chr(10) + "Graduated Experiments" + chr(10) + "--------------------------------------------------" + chr(10)
-  inHoldOutExperiments = chr(10) + chr(10) + "In Holdout Experiments" + chr(10) + "--------------------------------------------------" + chr(10)
-
-  for each expNamespace in m.experiments.defaultResources.keys() 'namespace
-
-    if m.experiments.experimentsinfo <> invalid AND m.experiments.experimentsinfo[expNamespace] <> invalid
-
-      expResult = m.experiments.experimentsinfo[expNamespace].experiment_result
-      if expResult <> invalid
-        exp = expResult.experiment_name
-        holdoutInfo = expResult.holdout_info
-
-        if holdoutInfo <> invalid AND holdoutInfo.in_holdout = true
-          inHoldOutExperiments = inHoldOutExperiments + exp + "->" + expResult.treatment + chr(10)
-        else
-          enabledExperiments = enabledExperiments + exp + "->" + expResult.treatment + chr(10)
-        end if
-      end if
-    end if
-
-    for each exp in m.experiments.defaultResources[expNamespace].keys() ' There might be rare case of 1+ experiments graduated.
-      if m.experiments.defaultResources[expNamespace][exp].default.enabled = true
-        graduatedExperiments = graduatedExperiments + exp + chr(10)
-      end if
-    end for
-
-  end for
-
-  if m.experiments.experimentsinfo = invalid
-    enabledExperiments = enabledExperiments + "No Experiments enabled or popper api failed" + chr(10)
-    inHoldOutExperiments = inHoldOutExperiments + "No Experiments in holdouts or popper api failed" + chr(10)
-  end if
-
-  return enabledExperiments + inHoldOutExperiments + graduatedExperiments
-
-End Function
-
-
-Function showCurrentExperiments()
-  print "*******************Enabled Experiments******************************"
-  currentExperiments = getCurrentExperiments()
-  print currentExperiments
-  print "-----------------------------------------------------------"
-  showData(currentExperiments, "Current  Experiments")
-End Function
-
 
 
 Function showData(data = "", title = "")
@@ -327,7 +303,6 @@ Function clearRegistry()
   sections = registry.GetSectionList()
   for each sectionName in sections
     registry.Delete(sectionName)
-    print sectionName + " is Deleted "
   end for
   registry.Flush()
   'after registry been deleted restart the app.
@@ -512,4 +487,97 @@ Function onCountryListMenuChanged(msg)
   'after registry been updated restart the app.
   m.top.appRestartRequested = true
 
+End Function
+
+
+' Show or create the features panel for experiment overrides
+'
+' Creates the FeaturesPanel on first call and sets up observers for close and selection events.
+' Fetches experiments data from Statsig if not already available.
+' Makes panel visible but does not auto-focus (user must press right key to focus it).
+Function showFeaturesPanel() as Void
+  ' Request to fetch experiments only if not already available
+  if m.top.statsigExperiments = invalid
+    m.top.fetchStatsigExperiments = true
+  end if
+
+  ' Create and show FeaturesPanel
+  if m.featuresPanel = invalid
+    m.featuresPanel = createObject("roSGNode", "FeaturesPanel")
+    m.featuresPanel.translation = [350, 81]
+    m.featuresPanel.observeFieldScoped("closePanel", "onFeaturesPanelClose")
+    m.featuresPanel.observeFieldScoped("experimentGroupSelected", "onExperimentGroupSelected")
+    m.top.appendChild(m.featuresPanel)
+  end if
+
+  ' Pass experiments data if available
+  if m.top.statsigExperiments <> invalid
+    m.featuresPanel.experimentsData = m.top.statsigExperiments
+  end if
+
+  m.featuresPanel.visible = true
+  ' Don't auto-focus - let user explicitly move focus with right key
+End Function
+
+
+' Handle experiment group selection from features panel
+'
+' Bubbles up the selection event to SettingsScreen for processing and storage.
+' Selection data contains experiment ID and selected group/variant information.
+'
+' @param msg Message object containing the selection data (experimentId and group info)
+Function onExperimentGroupSelected(msg) as Void
+  selectionData = msg.getData()
+  ' Bubble up the selection to SettingsScreen
+  m.top.experimentGroupSelected = selectionData
+End Function
+
+
+' Handle Statsig experiments data changes
+'
+' Updates the FeaturesPanel with new experiments data when it becomes available.
+' Called when experiments are fetched from Statsig API.
+'
+' @param msg Message object containing the experiments data
+Function onStatsigExperimentsChanged(msg) as Void
+  experimentsData = msg.getData()
+
+  ' Pass data to FeaturesPanel if it exists
+  if m.featuresPanel <> invalid
+    m.featuresPanel.experimentsData = experimentsData
+  end if
+End Function
+
+
+' Handle features panel close event
+'
+' Hides the features panel and returns focus to the Testing Aid menu.
+' Called when user presses back/left from experiments grid.
+Function onFeaturesPanelClose() as Void
+  if m.featuresPanel <> invalid
+    m.featuresPanel.visible = false
+    m.Menu.setFocus(true)
+  end if
+End Function
+
+
+' Check if the features menu item is currently focused
+'
+' Traverses the menu structure to determine if the "features" item has focus.
+' Used to handle right key press to show/focus the features panel.
+'
+' @return Boolean True if features menu item is focused, false otherwise
+Function isFeaturesMenuItemFocused() as Boolean
+  if m.Menu <> invalid AND m.Menu.content <> invalid
+    focusedIndex = m.Menu.itemFocused
+    if focusedIndex >= 0
+      focusedItem = m.Menu.content.getChild(focusedIndex)
+      if focusedItem <> invalid
+        if focusedItem.id = "features"
+          return true
+        end if
+      end if
+    end if
+  end if
+  return false
 End Function

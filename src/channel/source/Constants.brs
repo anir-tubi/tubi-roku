@@ -338,6 +338,7 @@ Function getConstants()
   constants.reqNames.getSoTStaticConfig = "getSoTStaticConfig"
   constants.reqNames.statsigInitialize = "statsigInitialize"
   constants.reqNames.statsigExposure = "statsigExposure"
+  constants.reqNames.fetchStatsigExperiments = "fetchStatsigExperiments"
   constants.reqNames.getEpgListing = "getEpgListing"
 
   ' a list of reqnames that the general task will inject auth headers and should expect to handle 403 errors for
@@ -479,6 +480,10 @@ Function getConstants()
   ' Network configuration
   constants.thirdParty.statsig.timeout = 10000 ' 10 seconds timeout for API calls
   constants.thirdParty.statsig.retryCount = 0 ' Number of retries for failed requests
+
+  ' Console API configuration (for Testing Aid experiment overrides)
+  constants.thirdParty.statsig.consoleApiKey = "console-KjaFNIqjmTXkXuQuhB46pBdU5XLSPwygCAwRAGiMwMx"
+  constants.thirdParty.statsig.targetAppId = "1hJgYxprDXenCHV6umvpO4"
 
   'platform is used when communitcating with CMS API
   constants.platform = "roku"
@@ -695,6 +700,10 @@ Function getConstants()
 
   constants.urls.statsig.initialize = constants.urls.statsig.baseUrl + "initialize"
   constants.urls.statsig.logCustomExposure = constants.urls.statsig.baseUrl + "log_custom_exposure"
+
+  ' Console API for experiments management
+  constants.urls.statsig.consoleBaseUrl = "https://abproxy.production-public.tubi.io/console/v1/"
+  constants.urls.statsig.consoleExperiments = constants.urls.statsig.consoleBaseUrl + "experiments"
 
   ' Configuring the live news manifest proxy url.
   constants.urls.qaProxy = {}

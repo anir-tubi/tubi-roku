@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<component name="TestingAidPanel" extends="Panel" >
+<?xml version="1.0" encoding="utf-8"?>
+<component name="TestingAidPanel" extends="Panel">
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="TestingAidPanel.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
@@ -9,18 +9,21 @@
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/DevGridOverlay.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
 
   <interface>
     <!-- INPUTS -->
-      <field id="offset" alias="Offset.translation"/>
-      <field id="isLoading" type="boolean"/>
+    <field id="offset" alias="Offset.translation" />
+    <field id="isLoading" type="boolean" />
+    <field id="statsigExperiments" type="assocarray" alwaysNotify="true" />
 
 
     <!-- OUTPUTS -->
-      <field id="appRestartRequested" type="boolean" alwaysNotify="true" />
+    <field id="appRestartRequested" type="boolean" alwaysNotify="true" />
+    <field id="fetchStatsigExperiments" type="boolean" alwaysNotify="true" />
+    <field id="experimentGroupSelected" type="assocarray" alwaysNotify="true" />
   </interface>
 
   <children>
@@ -35,13 +38,13 @@
           height="73"
           vertAlign="bottom">
           <Font
-            role="font"/>
+            role="font" />
         </Label>
 
         <MarkupList
           id="testingAidMenu"
           numRows="12"
-          itemSize="[560,80]"
+          itemSize="[420,80]"
           itemSpacing="[0,8]"
           itemComponentName="CheckButton"
           vertFocusAnimationStyle="floatingFocus"
@@ -50,42 +53,41 @@
             id="SettingsMenuContent"
             role="content">
             <CheckButtonContentNode
+              id="features"
+              title="Experiments" />
+            <CheckButtonContentNode
               id="viewRegistry"
-              title="View Registry"/>
+              title="View Registry" />
             <CheckButtonContentNode
               id="clearRegistry"
-              title="Clear Registry"/>
-            <CheckButtonContentNode
-              id="showEnabledExp"
-              title="Show Current Experiments"/>
+              title="Clear Registry" />
             <CheckButtonContentNode
               id="safeZone"
-              title="Show/Hide Safe Zone Image"/>
+              title="Show/Hide Safe Zone Image" />
             <CheckButtonContentNode
               id="overlay"
-              title="Show/Hide Grid Overlay"/>
+              title="Show/Hide Grid Overlay" />
             <CheckButtonContentNode
               id="addProxy"
-              title="Add/Remove Proxy"/>
+              title="Add/Remove Proxy" />
             <CheckButtonContentNode
               id="changeCountry"
-              title="Change Country"/>
+              title="Change Country" />
             <CheckButtonContentNode
               id="playerStats"
-              title="Show/Hide Player Stats"/>
+              title="Show/Hide Player Stats" />
           </ContentNode>
         </MarkupList>
 
         <Label
           id="infoArea"
-          translation="[700,130]"
+          translation="[480,130]"
           numLines="10"
-          width="450"
+          width="950"
           truncateOnDelimiter="."
-          wrap="true"
-          height="1000">
+          wrap="true">
           <Font
-            role="font"/>
+            role="font" />
         </Label>
       </Group>
 
@@ -94,7 +96,7 @@
         visible="false"
         height="717"
         width="1034"
-        translation="[0,0]"/>
+        translation="[0,0]" />
     </Group>
   </children>
 </component>

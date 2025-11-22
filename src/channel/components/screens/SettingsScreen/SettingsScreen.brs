@@ -515,15 +515,49 @@ Function createTestingAidPanel()
   TestingPanel = CreateObject("roSGNode", "TestingAidPanel")
   if TestingPanel <> invalid
     TestingPanel.observeFieldScoped("appRestartRequested", "onAppRestartRequested")
+    TestingPanel.observeFieldScoped("fetchStatsigExperiments", "onTestingAidFetchStatsigExperiments")
+    TestingPanel.observeFieldScoped("experimentGroupSelected", "onExperimentGroupSelected")
     TestingPanel.width = m.rightPanelWidth
     TestingPanel.focusable = true
     TestingPanel.hasNextPanel = false
     TestingPanel.leftOnly = false
     TestingPanel.selectButtonMovesPanelForward = false
-    TestingPanel.offset = m.rightPanelOffset
+    TestingPanel.offset = [-100, -150]
+
+    ' Pass down the statsig experiments if already fetched
+    if m.top.statsigExperiments <> invalid
+      TestingPanel.statsigExperiments = m.top.statsigExperiments
+    end if
+
+    ' Observe changes to statsigExperiments on SettingsScreen
+    m.top.unobserveFieldScoped("statsigExperiments")
+    m.top.observeFieldScoped("statsigExperiments", "onStatsigExperimentsChanged")
   end if
 
   return TestingPanel
+End Function
+
+
+Function onExperimentGroupSelected(msg)
+  selectionData = msg.getData()
+  ' Pass to SettingsScreenHelpers or handle experiment group selection
+  m.top.experimentGroupSelected = selectionData
+End Function
+
+
+Function onTestingAidFetchStatsigExperiments()
+  tubiLog("SettingsScreen.onTestingAidFetchStatsigExperiments")
+  m.top.fetchStatsigExperiments = true
+End Function
+
+
+Function onStatsigExperimentsChanged(msg)
+  tubiLog("SettingsScreen.onStatsigExperimentsChanged")
+  experimentsData = msg.getData()
+  testingAidPanel = getPanelBySubtype("TestingAidPanel")
+  if testingAidPanel <> invalid
+    testingAidPanel.statsigExperiments = experimentsData
+  end if
 End Function
 
 

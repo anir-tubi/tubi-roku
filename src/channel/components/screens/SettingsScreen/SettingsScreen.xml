@@ -1,76 +1,91 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<component name="SettingsScreen" extends="BaseScreen" >
+<?xml version="1.0" encoding="utf-8"?>
+<component name="SettingsScreen" extends="BaseScreen">
   <script type="text/brightscript" uri="SettingsScreen.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/UserMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/DeviceMixin.brs" />
 
   <interface>
     <!-- INPUTS -->
 
-      <field id="parentalSettingUpdated" type="boolean" alwaysNotify="true"/>
+    <field id="parentalSettingUpdated" type="boolean" alwaysNotify="true" />
 
-      <field id="autoPreviewItemUpdated" type="integer" alwaysNotify="true"/>
+    <field id="autoPreviewItemUpdated" type="integer" alwaysNotify="true" />
 
-      <!-- The outside can request an item to be selected. The ID of the button. -->
-      <field id="itemRequested" type="string" alwaysNotify="true"/>
+    <!-- The outside can request an item to be selected. The ID of the button. -->
+    <field id="itemRequested" type="string" alwaysNotify="true" />
 
-      <!-- associative array that will indicate if the user is signed in and if so, the aa will contain their info.  -->
-      <field id="signInInfo" type="assocarray" alwaysNotify="true" />
+    <!-- associative array that will indicate if the user is signed in and if so, the aa will
+    contain their info.  -->
+    <field id="signInInfo" type="assocarray" alwaysNotify="true" />
 
-      <field id="isUserSignedInFromSettingScreen" type="boolean" value="false"/>
+    <field id="isUserSignedInFromSettingScreen" type="boolean" value="false" />
 
-      <!-- actionAfterActivation value will be set when user tried any action before signIn/activation
+    <!-- actionAfterActivation value will be set when user tried any action before signIn/activation
           this helps to do callback once the activation is completed
       -->
-      <field id="actionAfterActivation" type="string"/>
+    <field id="actionAfterActivation" type="string" />
 
-      <!-- Allowed values are those in constants.ui.modes -->
-      <field id="uiMode" type="string"/>
+    <!-- Allowed values are those in constants.ui.modes -->
+    <field id="uiMode" type="string" />
 
-      <!-- Holds the isVideoPreviewOn value obtained from ServerPersistentData.isVideoPreviewOn. either user or device level value obtained from backend settings endpoint.  -->
-      <field id="isVideoPreviewOn" type="boolean" value="true" />
+    <!-- Holds the isVideoPreviewOn value obtained from ServerPersistentData.isVideoPreviewOn.
+    either user or device level value obtained from backend settings endpoint.  -->
+    <field id="isVideoPreviewOn" type="boolean" value="true" />
 
-      <field id="isAutoPlayTimerOn" type="boolean" value="true" />
+    <field id="isAutoPlayTimerOn" type="boolean" value="true" />
 
-      <!-- Holds the consent preferences value obtained from backend. either user or device level.  -->
-      <field id="consentSettings" type="assocarray" />
+    <!-- Holds the consent preferences value obtained from backend. either user or device level.  -->
+    <field id="consentSettings" type="assocarray" />
 
-      <!-- response received from call to urls.account.userSettings  -->
-      <field id="userSettings" type="assocarray" />
+    <!-- response received from call to urls.account.userSettings  -->
+    <field id="userSettings" type="assocarray" />
 
-      <!-- Holds the true/false based on if the user is in adults mode and not in kids mode, and not in teens parental controls.  -->
-      <field id="isAllowedToManageConsent" type="boolean" value="false" />
+    <!-- Holds the true/false based on if the user is in adults mode and not in kids mode, and not
+    in teens parental controls.  -->
+    <field id="isAllowedToManageConsent" type="boolean" value="false" />
+
+    <!-- Holds the Statsig experiments data fetched from API  -->
+    <field id="statsigExperiments" type="assocarray" alwaysNotify="true" />
 
     <!-- OUTPUTS -->
-      <!-- triggers for upstream controller -->
-      <field id="showDeviceModal" type="boolean" alwaysNotify="true" />
+    <!-- triggers for upstream controller -->
+    <field id="showDeviceModal" type="boolean" alwaysNotify="true" />
 
-      <!-- Holds the true/false based on if the user selects Exit from the setting screen -->
-      <field id="showExitModal" type="boolean" alwaysNotify="true" />
+    <!-- Holds the true/false based on if the user selects Exit from the setting screen -->
+    <field id="showExitModal" type="boolean" alwaysNotify="true" />
 
-      <field id="backButtonPressed" type="boolean" alwaysNotify="true"/>
-      <field id="signOutSelected" type="boolean" alwaysNotify="true"/>
-      <field id="signInSelected" type="boolean" alwaysNotify="true"/>
-      <!-- Used to tell ContentController to update the userSettings field. Should only be triggered if logged in -->
-      <field id="fetchUserSettings" type="boolean" alwaysNotify="true"/>
-      <field id="parentalSettingSelected" type="integer" alwaysNotify="true"/>
-      <field id="autoPreviewSettingSelected" type="integer" alwaysNotify="true" />
-      <field id="autoPlayTimerSettingSelected" type="integer" alwaysNotify="true" />
-      <!-- Holds all the draft or unsaved changes to consents. ex: {"essential_functionality": "opt_in"}.  -->
-      <field id="newConsentPreferences" type="assocarray" value="{}" />
-      <field id="selectedQrCodeSectionInfo" type="assocarray" alwaysNotify="true" />
+    <field id="backButtonPressed" type="boolean" alwaysNotify="true" />
+    <field id="signOutSelected" type="boolean" alwaysNotify="true" />
+    <field id="signInSelected" type="boolean" alwaysNotify="true" />
+    <!-- Used to tell ContentController to update the userSettings field. Should only be triggered
+    if logged in -->
+    <field id="fetchUserSettings" type="boolean" alwaysNotify="true" />
+    <field id="parentalSettingSelected" type="integer" alwaysNotify="true" />
+    <field id="autoPreviewSettingSelected" type="integer" alwaysNotify="true" />
+    <field id="autoPlayTimerSettingSelected" type="integer" alwaysNotify="true" />
+    <!-- Holds all the draft or unsaved changes to consents. ex: {"essential_functionality":
+    "opt_in"}.  -->
+    <field id="newConsentPreferences" type="assocarray" value="{}" />
+    <field id="selectedQrCodeSectionInfo" type="assocarray" alwaysNotify="true" />
 
-      <!-- Holds the consent item that was selected. ex: {"essential_functionality": "required"}. This is used for showing required toast or for firing interaction event.  -->
-      <field id="selectedConsent" type="assocarray" alwaysNotify="true"/>
-      <field id="didUserSelectSaveAndRestart" type="boolean" value="false" alwaysNotify="true" />
+    <!-- Holds the consent item that was selected. ex: {"essential_functionality": "required"}. This
+    is used for showing required toast or for firing interaction event.  -->
+    <field id="selectedConsent" type="assocarray" alwaysNotify="true" />
+    <field id="didUserSelectSaveAndRestart" type="boolean" value="false" alwaysNotify="true" />
 
-      <!-- Holds the true/false based on if the user selected manage privacy settings button.  -->
-      <field id="didUserSelectManagePrivacySettingsButton" type="boolean" alwaysNotify="true" />
+    <!-- Holds the true/false based on if the user selected manage privacy settings button.  -->
+    <field id="didUserSelectManagePrivacySettingsButton" type="boolean" alwaysNotify="true" />
+
+    <!-- Trigger to fetch Statsig experiments  -->
+    <field id="fetchStatsigExperiments" type="boolean" alwaysNotify="true" />
+
+    <!-- Holds the selected experiment and group data  -->
+    <field id="experimentGroupSelected" type="assocarray" alwaysNotify="true" />
   </interface>
 
   <children>
@@ -81,14 +96,14 @@
         height="73"
         translation="[0,132]">
         <Font
-        role="font"/>
+          role="font" />
       </Label>
 
       <PanelSet
-      id="PanelSet"
-      width="1920"
-      height="550"
-      translation="[-36,264]"/>
+        id="PanelSet"
+        width="1920"
+        height="550"
+        translation="[-36,264]" />
     </Group>
 
   </children>

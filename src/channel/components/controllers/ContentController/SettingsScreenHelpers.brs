@@ -32,6 +32,8 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0)
   m.settingsScreen.observeFieldScoped("didUserSelectManagePrivacySettingsButton", "onDidUserSelectManagePrivacySettingsButton")
   m.settingsScreen.observeFieldScoped("selectedConsent", "onSelectedConsentChange")
   m.settingsScreen.observeFieldScoped("selectedQrCodeSectionInfo", "onSelectedQrCodeSectionInfoChanged")
+  m.settingsScreen.observeFieldScoped("fetchStatsigExperiments", "onFetchStatsigExperimentsRequested")
+  m.settingsScreen.observeFieldScoped("experimentGroupSelected", "onExperimentGroupSelected")
   if m.constants.settings.mode = "qa" OR m.constants.settings.mode = "dev" OR m.constants.settings.mode = "staging" 'this is for extra protection not to restart the app
     m.settingsScreen.observeFieldScoped("appRestartRequested", "onAppRestartRequested")
   end if
@@ -672,6 +674,11 @@ Function onFetchUserSettingsChanged()
 End Function
 
 
+Function onFetchStatsigExperimentsRequested()
+  fetchStatsigExperiments()
+End Function
+
+
 Function onSettingsScreenGetUserSettingsSuccess(userSettings)
   m.settingsScreen.userSettings = userSettings
 End Function
@@ -755,6 +762,134 @@ Function showRestartChannelAfterConsentUpdatedDialog()
     backButtonCallback: restartApp
     openTrackEvent: dialogEvent
     trackingTask: m.trackingLoggingTask
+  }
+
+  showModal(modalInfo, buttonInfo)
+End Function
+
+
+' Fetch active and setup experiments from Statsig Console API
+'
+' Makes an API request to retrieve all experiments for the Tubi Roku app.
+' Includes proper authentication headers and query parameters.
+' Used by Testing Aid feature to display available experiments for override.
+Function fetchStatsigExperiments() as Void
+  requestInfo = {
+    url: m.constants.urls.statsig.consoleExperiments
+    requestType: m.constants.reqNames.fetchStatsigExperiments
+    options: {
+      params: {
+        "targetAppID": m.constants.thirdParty.statsig.targetAppId
+        "status": "active,setup"
+      }
+      headers: {
+        "STATSIG-API-KEY": m.constants.thirdParty.statsig.consoleApiKey
+      }
+    }
+    successCallback: onFetchStatsigExperimentsSuccess
+    errorCallback: onFetchStatsigExperimentsError
+    responseType: "assocarray"
+  }
+
+  m.makeRequest(requestInfo)
+End Function
+
+
+' Handle successful experiments fetch from Statsig API
+'
+' Updates the SettingsScreen with the fetched experiments data,
+' which is then passed to the FeaturesPanel for display.
+'
+' @param response Associative array containing experiments data from Statsig API
+Function onFetchStatsigExperimentsSuccess(response) as Void
+  if m.settingsScreen = invalid OR response = invalid then return
+
+  m.settingsScreen.statsigExperiments = response
+End Function
+
+
+' Handle experiments fetch error
+'
+' Sets an error state on the SettingsScreen to display an error message
+' in the FeaturesPanel when experiments cannot be loaded.
+'
+' @param error Error object from the failed API request
+Function onFetchStatsigExperimentsError(error) as Void
+  if m.settingsScreen = invalid then return
+
+  m.settingsScreen.statsigExperiments = { error: true, message: "Failed to fetch experiments" }
+End Function
+
+
+' Handle experiment group/variant selection from FeaturesPanel
+'
+' Stores the complete selection data (experiment ID and group info) in the
+' "experimentOverrides" registry section as JSON. This allows QA and developers
+' to override experiment variants for testing purposes. Shows a restart dialog
+' since experiment overrides require an app restart to take effect.
+'
+' @param msg Message object containing selection data with experimentId and group info
+Function onExperimentGroupSelected(msg) as Void
+  selectionData = msg.getData()
+
+  ' Early return for invalid data
+  if selectionData = invalid OR selectionData.experimentId = invalid OR selectionData.group = invalid then return
+
+  ' Extract experiment details
+  experimentId = selectionData.experimentId
+  groupName = selectionData.group.name
+
+  ' Store override in registry
+  storeExperimentOverride(experimentId, selectionData)
+
+  ' Show restart dialog to apply the experiment override
+  showRestartAfterExperimentOverrideDialog(experimentId, groupName)
+End Function
+
+
+' Store experiment override in registry
+'
+' Saves the experiment selection data to the "experimentOverrides" registry section
+' as a JSON string for persistence across app restarts.
+'
+' @param experimentId String The experiment ID to use as the registry key
+' @param selectionData Object The complete selection data to store
+Function storeExperimentOverride(experimentId as String, selectionData as Object) as Void
+  ' Create/access the experimentOverrides registry section
+  registrySection = CreateObject("roRegistrySection", "experimentOverrides")
+
+  ' Serialize the entire selectionData object as JSON
+  selectionDataJson = FormatJson(selectionData)
+  registrySection.write(experimentId, selectionDataJson)
+  registrySection.flush()
+End Function
+
+
+' Show restart dialog after experiment override is applied
+'
+' Displays a modal dialog informing the user that an experiment override
+' has been applied and requires an app restart. Only "Restart Now" option
+' is provided - no way to cancel or postpone the restart.
+'
+' @param experimentId String The ID of the experiment that was overridden
+' @param groupName String The name of the selected group/variant
+Function showRestartAfterExperimentOverrideDialog(experimentId as String, groupName as String) as Void
+  if isNonEmptyString(experimentId) = false OR isNonEmptyString(groupName) = false then return
+
+  buttonInfo = [
+    {
+      text: "Restart Now"
+      callback: restartApp
+      shouldFocusParentBeforeCallback: false
+    }
+  ]
+
+  message = Substitute("Experiment override applied: {0} -> {1}{2}{2}Restart the app to apply changes.", experimentId, groupName, chr(10))
+
+  modalInfo = {
+    title: "Restart Required"
+    message: message
+    backButtonCallback: restartApp
   }
 
   showModal(modalInfo, buttonInfo)

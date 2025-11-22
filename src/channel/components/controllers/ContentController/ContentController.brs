@@ -958,6 +958,10 @@ Function handleStartUpArgs()
     utmCampaignConfig = generateUtmCampaignConfig(startupArgs)
     m.cmsApi.setUtmCampaignConfig(utmCampaignConfig)
 
+    if m.constants.settings.mode <> "production" AND startupArgs.lastExitOrTerminationReason = "EXIT_BRIGHTSCRIPT_CRASH" then
+      RegDeleteSection("experimentOverrides")
+    end if
+
     if startupArgs.lastExitInfo <> invalid then
       sendLastExitInfoExperimentsClientLog(startupArgs.lastExitInfo)
     end if
@@ -3686,6 +3690,16 @@ End Function
 Function onStatsigExposureInfoChange(msg)
   data = msg.getData()
   sendStatsigExposureEvent(data)
+
+  if m.constants.settings.mode <> "production"
+    if data.experimentName <> invalid AND data.group <> invalid AND LCase(data.group) <> "control"
+      showToast({
+        "selfDestructTimer": 5
+        "headerText": "Currently View Experiment: " + data.experimentName
+        "message": "variant: " + data.group
+      })
+    end if
+  end if
 End Function
 
 

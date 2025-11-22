@@ -404,6 +404,11 @@ Function onStatsigInitializationSuccess(successResponse)
   ' Process the Statsig response through the StatsigExperiments instance
   if m.statsigExperiments <> invalid
     statsigExperimentsInfo = m.statsigExperiments.processStatsigResponse(successResponse)
+
+    if m.constants.settings.mode <> "production"
+      applyExperimentOverrides(statsigExperimentsInfo)
+    end if
+
     m.global.statsigExperimentsInfo = statsigExperimentsInfo
     m.updateGeneralTaskStatSigExperiments(statsigExperimentsInfo)
     tubiLog("StatsigExperiments processed and stored globally")
@@ -435,4 +440,63 @@ Function onStatsigInitializationError(errorResponse)
 
   m.performanceMetricsTracker.endAppLaunchMetricTiming("statsig_initialization_request")
   runControllerStartSequence()
+End Function
+
+
+' Apply experiment overrides from registry to Statsig experiments
+' This allows QA/developers to manually override experiment variants via TestingAid panel
+' Only applies in non-production modes for testing purposes
+'
+' @param statSigExperimentsInfo: assocarray, the Statsig experiments info object to modify
+Function applyExperimentOverrides(statSigExperimentsInfo as Object) as Void
+  ' Skip overrides in production mode for safety
+  if m.constants.settings.mode = "production"
+    return
+  end if
+
+  ' Read experiment overrides from registry (stored by TestingAid panel)
+  experimentOverrides = RegReadAll("experimentOverrides")
+  if not isAA(experimentOverrides)
+    return
+  end if
+
+  ' Create Statsig interface to access hash and experiment methods
+  experimentInterface = StatsigExperimentsInterface(statSigExperimentsInfo)
+
+  ' Loop through each overridden experiment
+  for each experimentId in experimentOverrides
+    ' Parse the stored JSON override data
+    experimentOverride = ParseJson(experimentOverrides[experimentId])
+    if experimentOverride = invalid
+      continue for ' Skip invalid JSON entries
+    end if
+
+    ' Hash the experiment ID to match Statsig's internal format
+    hashedExperimentId = experimentInterface.getHashValue(experimentId)
+    experiment = statSigExperimentsInfo[hashedExperimentId]
+
+    ' If there is no entry add a new one
+    if experiment = invalid then
+      experiment = {}
+      statSigExperimentsInfo[hashedExperimentId] = experiment
+    end if
+
+    if experiment <> invalid
+      ' Extract group information from the override
+      groupName = experimentOverride.group.name
+      parameterValues = experimentOverride.group.parameterValues
+      ruleId = experimentOverride.group.id + ":device_id:id_override"
+
+      ' Override the experiment configuration with the selected group
+      experiment.append({
+        "groupName": groupName
+        "config": {
+          "group_name": groupName
+          "value": parameterValues ' Parameter values for this variant
+          "rule_id": ruleId ' Custom rule ID to identify overrides
+          "group": experimentOverride.group.id ' Group ID for tracking
+        }
+      })
+    end if
+  end for
 End Function

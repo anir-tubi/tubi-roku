@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="GroupDetailItem" extends="Group">
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="GroupDetailItem.brs" />
+
+  <interface>
+    <field id="itemContent" type="node" />
+    <field id="itemHasFocus" type="boolean" />
+    <field id="focusPercent" type="float" />
+    <field id="width" type="float" />
+    <field id="height" type="float" alias="background.height, label.height, labelFocused.height" />
+    <field id="gridHasFocus" type="boolean" />
+  </interface>
+
+  <children>
+    <Rectangle
+      id="background"
+      opacity="0">
+    </Rectangle>
+
+    <Poster
+      id="checkIcon"
+      uri="pkg:/images/icon-checkmark.png"
+      width="36"
+      height="36"
+      translation="[8, 10]"
+      visible="false" />
+
+    <Poster
+      id="checkIconFocused"
+      uri="pkg:/images/icon-checkmark.png"
+      width="36"
+      height="36"
+      translation="[8, 10]"
+      opacity="0"
+      visible="false" />
+
+    <Label
+      id="label"
+      text=""
+      translation="[52, 0]"
+      horizAlign="left"
+      vertAlign="center">
+    </Label>
+    <ScrollingLabel
+      id="labelFocused"
+      text=""
+      translation="[52, 0]"
+      horizAlign="left"
+      vertAlign="center"
+      repeatCount="0"
+      opacity="0">
+    </ScrollingLabel>
+  </children>
+</component>
