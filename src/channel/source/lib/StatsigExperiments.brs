@@ -41,6 +41,10 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         roku_player_ad_preroll_timeout_v0: {
           default: { "timeout": 10000 }
         }
+        ' Testing autoplay of content immediately after the trailer finishes
+        roku_autoplay_after_trailer_v1: {
+          default: { "enabled": false }
+        }
       }
 
       roku_postplay_countdown_timer: {

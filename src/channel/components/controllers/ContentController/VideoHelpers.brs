@@ -663,8 +663,16 @@ Function onVideoPlayerState(msg)
     else if state = "finished"
       isAutoPlayOff = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR videoPlayer.isAutoPlayTimerOn = false
       finishedContent = videoPlayer.content
-      if finishedContent.isTrailer
-        returnToDetailScreenFromVideo(true, true, "trailer")
+
+      if finishedContent.isTrailer = true
+
+        if getStatsigExperimentResource("roku_player_improvement", "roku_autoplay_after_trailer_v1", true).enabled = true
+          stopVideoContent(videoPlayer)
+          playActualContentFromDetailScreen()
+        else
+          returnToDetailScreenFromVideo(true, true, "trailer")
+        end if
+
       else if videoPlayer.upNextContentToAutoplay <> invalid
         ' the video ended while the autoplay UI was still present, now autoplay the chosen video
         ' or autoplay the video that was focused when the timer expired
@@ -1028,27 +1036,40 @@ End Function
 Function onSkipTrailer(msg)
   tubiLog("VideoHelpers.onSkipTrailer")
   skipTrailer = msg.getData()
-  if skipTrailer
+
+  if skipTrailer = true
     videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
+
     if videoPlayer <> invalid
       stopVideoContent(videoPlayer)
+      playActualContentFromDetailScreen()
+    end if
 
-      if getHiddenScreen() <> invalid AND getHiddenScreen().id = m.constants.ui.screenIds.detailScreen
-        detailScreen = getHiddenScreen()
-        detailScreenContent = getDetailScreenContent(detailScreen)
-        if detailScreenContent <> invalid AND detailScreenContent.type = "series"
-          episode = getEpisodeContent(detailScreen.content)
-          if episode <> invalid then
-            nowPos = processResume(episode)
-            if nowPos >= 0
-              playVideoContent(episode, detailScreen.playbackSource, nowPos)
-            end if
-          end if
-        else
-          nowPos = processResume(detailScreenContent)
-          playVideoContent(detailScreenContent, detailScreen.playbackSource, nowPos)
+  end if
+End Function
+
+
+' playActualContentFromDetailScreen
+'
+' Handles both series episodes and regular content
+Function playActualContentFromDetailScreen()
+  if getHiddenScreen() <> invalid AND getHiddenScreen().id = m.constants.ui.screenIds.detailScreen
+    detailScreen = getHiddenScreen()
+    detailScreenContent = getDetailScreenContent(detailScreen)
+
+    if detailScreenContent <> invalid AND detailScreenContent.type = "series"
+      episode = getEpisodeContent(detailScreen.content)
+
+      if episode <> invalid then
+        nowPos = processResume(episode)
+
+        if nowPos >= 0
+          playVideoContent(episode, detailScreen.playbackSource, nowPos)
         end if
       end if
+    else if detailScreenContent <> invalid
+      nowPos = processResume(detailScreenContent)
+      playVideoContent(detailScreenContent, detailScreen.playbackSource, nowPos)
     end if
   end if
 End Function
