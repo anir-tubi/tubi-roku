@@ -1789,7 +1789,7 @@ Function setVideoContentScreenBackground(screen)
 
     isSkinAdRowContent = (isCurrentScreenHomeScreen() = true AND gridItemType = m.constants.ui.gridItemTypes.skinAd)
     isAdCarouselRowContent = gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
-    if arrayIncludes(m.constants.ui.liveEventsGridTypes, contentFocused.gridItemType) = true
+    if contentFocused.gridItemType = m.constants.ui.gridItemTypes.liveEventSpotlight
       displayFullScreenVideoBackground(contentFocused)
     else if contentFocused <> invalid AND shouldDisplayFullScreenVideoBackground(contentFocused) = true AND m.videoTilesVariant <> "trueControlTop2Rows" AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND isKidsUIOn() = false
       m.backgroundGroup.backgroundInfo = {
@@ -3767,7 +3767,7 @@ End Function
 
 
 Function shouldDisplayFullScreenVideoBackground(content)
-  return arrayIncludes(m.videoTilesControlCategoryIds, content.parentId) = true OR arrayIncludes(m.constants.ui.liveEventsGridTypes, content.gridItemType)
+  return arrayIncludes(m.videoTilesControlCategoryIds, content.parentId) = true OR content.gridItemType = m.constants.ui.gridItemTypes.liveEventSpotlight
 End Function
 
 

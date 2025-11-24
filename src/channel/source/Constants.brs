@@ -1650,7 +1650,7 @@ Function getConstants()
   constants.ui.noHeaderGridTypes = [constants.ui.gridItemTypes.liveEventSpotlight, constants.ui.gridItemTypes.liveEventBanner]
   constants.ui.liveEventsGridTypes = [constants.ui.gridItemTypes.liveEventSpotlight, constants.ui.gridItemTypes.liveEventBanner]
   constants.ui.nonVideoTileGridItemTypes = [constants.ui.gridItemTypes.historySignedOutUser, constants.ui.gridItemTypes.liveEventSpotlight, constants.ui.gridItemTypes.liveEventBanner, constants.ui.gridItemTypes.adRowlistCarousel, constants.ui.gridItemTypes.adRowlistSpotlight]
-  constants.ui.fullScreenVideoPlayerGridItemTypes = [constants.ui.gridItemTypes.skinAd, constants.ui.gridItemTypes.liveEventSpotlight, constants.ui.gridItemTypes.liveEventBanner]
+  constants.ui.fullScreenVideoPlayerGridItemTypes = [constants.ui.gridItemTypes.skinAd, constants.ui.gridItemTypes.liveEventSpotlight]
   constants.ui.noInfoPanelGridItemTypes = [constants.ui.gridItemTypes.liveEventSpotlight, constants.ui.gridItemTypes.skinAd, constants.ui.gridItemTypes.adRowlistSpotlight]
   constants.ui.adGridItemTypes = [constants.ui.gridItemTypes.adRowlistCarousel, constants.ui.gridItemTypes.skinAd, constants.ui.gridItemTypes.adRowlistSpotlight]
   constants.ui.videoTilesListTranslation = [24, 144]
