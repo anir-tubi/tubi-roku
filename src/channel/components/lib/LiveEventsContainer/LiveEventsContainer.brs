@@ -133,7 +133,6 @@ End Function
 Function refreshButtonList()
   itemContent = m.top.itemContent
   buttons = []
-  m.nodeHelpers.removeAllChildren(m.buttonList)
   if itemContent <> invalid AND itemContent.scheduleData <> invalid AND isNonEmptyString(itemContent.scheduleData.startTime) = true
     buttonContent = invalid
     startTime = itemContent.scheduleData.startTime
@@ -232,6 +231,7 @@ Function refreshButtonList()
     end if
   end if
 
+  m.nodeHelpers.removeAllChildren(m.buttonList)
   m.buttonList.appendChildren(buttons)
   m.buttonList.visible = isNonEmptyArray(buttons)
 
