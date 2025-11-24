@@ -76,13 +76,13 @@ Function getLinearContentBadgeInfo(schedule)
         badgeText: UCase(badgeText)
       }
     else if hasEventEnded = false
-      remainingDays = Fix(secondsUntilAirTime / 86400)
-      remainingHours = Fix(secondsUntilAirTime / 3600)
+      remainingDays = Cint(secondsUntilAirTime / 86400)
+      remainingHours = Cint(secondsUntilAirTime / 3600)
       remainingSeconds = secondsUntilAirTime mod 3600
 
       ' If the remainingSeconds is less than 60 seconds than using fix will cause the minutes to zero for like 50 seconds etc.
       if remainingSeconds > 60
-        minutes = Fix(remainingSeconds / 60)
+        minutes = Cint(remainingSeconds / 60)
       else
         ' Making sure until the seconds becomes zero we will still display 1 min since we do not have seconds component.
         minutes = 1
