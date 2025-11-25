@@ -1462,7 +1462,7 @@ async function findQaBranchFromPrLabels(prNumber, done) {
   const labels = pr.data.labels.map(l => l.name);
   log(`PR Labels: ${labels.join(', ')}`);
 
-  const qaLabelPattern = /^qa_\d+_\d+_\d+$/;
+  const qaLabelPattern = /^(qa_\d+_\d+_\d+|\d+_\d+_branch)$/;
   const targetBranch = labels.find(label => qaLabelPattern.test(label));
 
   if (!targetBranch) {
