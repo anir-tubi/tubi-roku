@@ -853,6 +853,10 @@ When any PR is raised against master, the Github Actions runner triggers all of 
 If the Github Actions runner is not working, the linux machine may need to be restarted. The below document explains how to do that.
 https://tubitv.atlassian.net/wiki/spaces/IT/pages/2465464321/Accessing+Roku+Github+Action+Server
 
+## Setting Up New Action Runners
+
+To set up a new self-hosted GitHub Actions runner with automated Roku device configuration, use the [roku-runner-setup](https://github.com/adRise/roku-runner-setup) repository. This provides scripts and documentation for configuring a runner machine to execute automated tests against a connected Roku device.
+
 # Charles Proxy
 
 Roku app integration with Charles proxy.

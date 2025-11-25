@@ -409,7 +409,12 @@ Function onStatsigInitializationSuccess(successResponse)
       applyExperimentOverrides(statsigExperimentsInfo)
     end if
 
+    if m.constants.settings.mode = "qa" AND m.constants.settings.disableExperiments = true then
+      statsigExperimentsInfo = {}
+    end if
+
     m.global.statsigExperimentsInfo = statsigExperimentsInfo
+
     m.updateGeneralTaskStatSigExperiments(statsigExperimentsInfo)
     tubiLog("StatsigExperiments processed and stored globally")
   else

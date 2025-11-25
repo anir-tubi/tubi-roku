@@ -305,6 +305,10 @@ const elements = typeCheckElements({
       '#ContentController.#DialogBox.#ContentArea.#MessageGroup.#Message',
   },
 
+  rPayShareDialog: {
+    keyPath: '#RPayShareDialog',
+  },
+
 
   /** Content title on the detail screen */
   detailScreenTitle: {
@@ -1459,7 +1463,7 @@ const elements = typeCheckElements({
   /** Button Close text */
   buttonTextClose: {
     keyPath:
-      '#ContentController.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText',
+      '#ContentController.#DialogBox.#ButtonList.0.#buttonTextParent.#buttonText',
   },
 
   /** age gate error prompt */
@@ -2507,6 +2511,12 @@ const elements = typeCheckElements({
   emailInputScreenHeader: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#emailInputScreen.#emailLayout.#pageHeading',
+  },
+
+  /** Email input Screen Keyboard */
+  emailInputScreenKeyboard: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#emailInputScreen.2.#Keyboard',
   },
 
   /** Email test edit box */

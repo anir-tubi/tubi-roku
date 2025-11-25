@@ -10,7 +10,7 @@ on:
 
 # We want to cancel the previously running job if a new commit gets pushed
 concurrency:
-  group: ${{ github.head_ref }}
+  group: ${{ github.head_ref }}-smoke-tests
   cancel-in-progress: true
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -20,7 +20,7 @@ jobs:
     # name helps to check the status of github action
     name: Run Automated UI Tests @smoke
     # The type of runner that the job will run
-    runs-on: [self-hosted, automated-tests-runner, enabled, office]
+    runs-on: [self-hosted, enabled, roku, automation-smoke]
     # timeouts after 15 minutes, if the execution/automated tests got stuck/crash
     timeout-minutes: 15
 
@@ -36,26 +36,28 @@ jobs:
         env:
           retries: 1
         run: |
-          cp ~/rta-config.json ./rta-config.json
+          cp ./rta-config.example.json ./rta-config.json
+          sed -i -e "s/<DEVICE-IP>/$ROKU_DEV_TARGET/g" ./rta-config.json
+          sed -i -e "s/<DEVICE-PASSWORD>/$DEV_PASSWORD/g" ./rta-config.json
           npx gulp runAutomatedTestsSmoke
 
       - name: Upload JSON Report
         if: success() || failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: JSON Report
           path: out/ui-tests-output/report.json
 
       - name: Upload HTML Report
         if: success() || failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: HTML Report
           path: out/ui-tests-output/html
 
       - name: Upload Failed Test Screenshots
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Failed Test Screenshots
           path: out/ui-tests-output/screenshots

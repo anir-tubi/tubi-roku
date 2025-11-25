@@ -56,17 +56,39 @@ Function tubiTracking_getAnalyticsTimestamp_test()
 End Function
 
 
-'@Test getAnalyticsUser unit tests
-Function tubiTracking_getAnalyticsUser_test()
+'@Test getAnalyticsUser as guest unit tests
+Function tubiTracking_getGuestAnalyticsUser_test()
+
   Tracking = m.Tracking
+  m.expectOnce(Tracking.auth, "regReadAll", [Tracking.auth.authRegSection], {
+  })
   user = Tracking.getAnalyticsUser()
 
-  m.assertNotInvalid(user.user_id)
-  m.assertNotInvalid(user.auth_type)
-  m.assertTrue(user.auth_type = "UNKNOWN" OR user.auth_type = "NOT_AUTHED" OR user.auth_type = "EMAIL")
-  m.assertTrue(type(user.user_id) = "roInteger")
-  m.assertTrue((user.auth_type = "UNKNOWN" AND user.user_id > 0) OR (user.auth_type = "NOT_AUTHED" AND user.user_id = 0) OR (user.auth_type = "EMAIL" AND user.user_id > 0))
+  m.assertNotInvalid(user.user_id, "user id invalid")
+  m.assertNotInvalid(user.auth_type, "auth invalid")
+  m.assertEqual(user.auth_type, "NOT_AUTHED", "auth type not valid")
+  m.assertEqual(type(user.user_id), "roInteger", "id not integer")
+  m.assertEqual(user.user_id, 0)
+  m.tracking.auth.regReadAll = tubiAuth_regReadAll
+End Function
 
+
+'@Test getAnalyticsUser unit tests
+Function tubiTracking_getAnalyticsUser_test()
+
+  Tracking = m.Tracking
+  m.expectOnce(Tracking.auth, "regReadAll", [Tracking.auth.authRegSection], {
+    userId: "1234"
+    authType: "EMAIL"
+  })
+  user = Tracking.getAnalyticsUser()
+
+  m.assertNotInvalid(user.user_id, "user id invalid")
+  m.assertNotInvalid(user.auth_type, "auth invalid")
+  m.assertEqual(user.auth_type, "EMAIL", "auth type not valid")
+  m.assertEqual(type(user.user_id), "roInteger", "id not integer")
+  m.assertEqual(user.user_id, 1234, "user_id is not correct")
+  m.tracking.auth.regReadAll = tubiAuth_regReadAll
 End Function
 
 

@@ -112,23 +112,21 @@ describe('Age Gate', function () {
     await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
-    // Verify on home screen
-
-    const homeScreenRowList = await testUtils.getNodeForElement('homeScreenRowList');
+    // Verify cannot exit Kids Mode modal appears
     const cannotExitKidsModeTitle = await testUtils.getNodeForElement('cannotExitKidsModeTitle');
-    const exitKidsOption = await testUtils.getNodeForElement('exitKidsOption');
-    const leftNavHomeButtonLabel = await testUtils.getNodeForElement('leftNavHomeButtonLabel');
     const buttonTextClose = await testUtils.getNodeForElement('buttonTextClose');
 
-
-    // Verify cannot exit Kids Mode modal appears and can be closed
+    // Verify the modal title and button
     expect(cannotExitKidsModeTitle.text).to.equal('Cannot Exit Kids Mode');
     expect(buttonTextClose.text).to.equal('Close');
 
+    // Close the modal by pressing OK
     await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
+    // Verify we're still in Kids Mode
     await ecp.sendKeypress(ecp.Key.Left);
+    const leftNavHomeButtonLabel = await testUtils.getNodeForElement('leftNavHomeButtonLabel');
     expect(leftNavHomeButtonLabel.text).to.equal('Home');
   });
 

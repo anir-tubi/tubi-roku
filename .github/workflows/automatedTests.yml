@@ -3,16 +3,20 @@
 name: Automated UI Tests
 
 env:
-  runName: ${{ format('{0}; {1}', github.ref_name, inputs.tag) }}${{ inputs.tag == 'Custom String' && format('{0} "{1}"', ':', inputs.customString) || ''}}
+  runName: ${{ format('{0}; {1}', github.ref_name, inputs.tag || 'Run All Tests') }}${{ inputs.tag == 'Custom String' && format('{0} "{1}"', ':', inputs.customString) || ''}}
 
 # We are giving a name for the run to make it easier to see what was run. Not the prettiest for conditional strings but do not see another solution. Colon with a space after is a problem as well that we have to work around.
 # As an example if the branch name is qa_2_21_20 and we're running the @leftnav tag then the run name would: qa_2_21_20; @leftnav.
 # For a custom string of "C4153" it would be: qa_2_21_20; Custom String: "C4153"
-run-name: ${{ format('{0}; {1}', github.ref_name, inputs.tag) }}${{ inputs.tag == 'Custom String' && format('{0} "{1}"', ':', inputs.customString) || ''}}
+run-name: ${{ format('{0}; {1}', github.ref_name, inputs.tag || 'Run All Tests') }}${{ inputs.tag == 'Custom String' && format('{0} "{1}"', ':', inputs.customString) || ''}}
 
 # Controls when the action will run.
 on:
-  # We only run manually currently
+  # Run automatically at 2 AM Eastern time (6 AM UTC for EDT, 7 AM UTC for EST)
+  schedule:
+    - cron: '0 6 * * *'
+    
+  # Also allow manual trigger
   workflow_dispatch:
     inputs:
       tag:
@@ -62,12 +66,6 @@ on:
         description: 'Stop running on first test failure'
         default: false
         type: boolean
-      runOn:
-        description: 'Whose runner would you like to run on?'
-        type: choice
-        options:
-          - 'Office Runner'
-          - 'Local Testing Runner'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -76,9 +74,9 @@ jobs:
     # name helps to check the status of github action
     name: Run Automated UI Tests
     # The type of runner that the job will run
-    runs-on: [self-hosted, automated-tests-runner, enabled, '${{inputs.runOn}}']
-    # timeouts after 60 minutes, if the execution/automated tests got stuck/crash
-    timeout-minutes: 120
+    runs-on: [self-hosted, enabled, roku, automation-regression]
+    # timeouts after 4 hours
+    timeout-minutes: 240
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -89,23 +87,11 @@ jobs:
           echo tag: "${{ inputs.tag }}"
           echo customString: "${{ inputs.customString }}"
           echo bail: "${{ inputs.bail }}"
-          echo runOn: "${{ inputs.runOn }}"
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      - name: Install pip
-        run: |
-          curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-          sudo python3 get-pip.py
-
-      - name: Install dependencies
-        run: |
-          python3 -m pip install --upgrade pip
-          pip install -r requirements.txt
-
       # npm command install all required packages
-
       - name: npm install
         run: |
           npm install
@@ -114,41 +100,38 @@ jobs:
         env:
           runId: ${{ github.run_id }}
           branch: ${{ github.ref_name }}
-          tag: ${{ inputs.tag }}
-          customString: ${{ inputs.customString }}
-          bail: ${{ inputs.bail }}
+          tag: ${{ inputs.tag || 'Run All Tests' }}
+          customString: ${{ inputs.customString || '' }}
+          bail: ${{ inputs.bail || false }}
           retries: 1
         run: |
-          cp ~/rta-config.json ./rta-config.json
+          cp ./rta-config.example.json ./rta-config.json
+          sed -i -e "s/<DEVICE-IP>/$ROKU_DEV_TARGET/g" ./rta-config.json
+          sed -i -e "s/<DEVICE-PASSWORD>/$DEV_PASSWORD/g" ./rta-config.json
           npx gulp runAutomatedTests
 
       - name: Upload JSON Report
         if: success() || failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: JSON Report
           path: out/ui-tests-output/report.json
 
-      - name: Sync to TestRail
-        if: success() || failure()
-        run: python3 testRail/sync_to_testrail.py
-        continue-on-error: true
-
       - name: Upload HTML Report
         if: success() || failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: HTML Report
           path: out/ui-tests-output/html
 
       - name: Upload Failed Test Screenshots
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Failed Test Screenshots
           path: out/ui-tests-output/screenshots
 
-      - name: Send Slack Notification
-        if: success() || failure()
-        run: |
-          npx ts-node ./js/workflows/sendSlackAutomatedTestsResultNotification.ts
+      # - name: Send Slack Notification
+      #   if: success() || failure()
+      #   run: |
+      #     npx ts-node ./js/workflows/sendSlackAutomatedTestsResultNotification.ts
