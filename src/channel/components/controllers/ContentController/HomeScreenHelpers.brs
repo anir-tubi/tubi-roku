@@ -71,6 +71,7 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.observeFieldScoped("featuredRowListTranslation", "onFeaturedRowListTranslationChange")
     homeScreen.observeFieldScoped("featuredListScrollDirection", "onFeaturedListScrollDirectionChange")
     homeScreen.observeFieldScoped("featuredListScrollingStatus", "onFeaturedListScrollingStatusChange")
+    homeScreen.observeFieldScoped("scrollingStatus", "onFeaturedListScrollingStatusChange")
     homeScreen.observeFieldScoped("scrollingStatus", "onScrollingStatusChange")
     homeScreen.observeFieldScoped("featuredListScrollingStatus", "onScrollingStatusChange")
 
@@ -1643,8 +1644,11 @@ Function onFeaturedListScrollingStatusChange(msg)
   scrollingStatus = msg.getData()
   ' Below logic helps to avoid us from updating the in transit video metadata overlay when the user is scrolling up or down.
   if scrollingStatus = false
-    updateVideoTileSize(scrollingStatus)
-    updateInTransitVideoMetadataOverlay()
+    screen = msg.getRoSgNode()
+    if screen.featuredRowContent <> invalid
+      updateVideoTileSize(scrollingStatus)
+      updateInTransitVideoMetadataOverlay()
+    end if
     if m.shouldDebounceVideoTilePreview = true
       state = m.videoPreviewPlayer.playerState
       if state = "playing" OR state = "paused"

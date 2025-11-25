@@ -48,8 +48,12 @@ Function stopVideoPreview(node = invalid)
   ' This is needed to provide smooth scrolling experience when the user is scrolling the list because calling video stop causes glitchy behavior.
   isListScrolling = false
   screen = getCurrentScreen()
-  if screen <> invalid AND screen.hasField("featuredListScrollingStatus") = true
-    isListScrolling = screen.featuredListScrollingStatus
+  if screen <> invalid
+    if screen.hasField("featuredListScrollingStatus") = true AND screen.featuredListScrollingStatus = true
+      isListScrolling = screen.featuredListScrollingStatus
+    else if screen.hasField("scrollingStatus") = true AND screen.scrollingStatus = true
+      isListScrolling = screen.scrollingStatus
+    end if
   end if
 
   if node <> invalid AND node.subType() = "VideoPreviewPlayer" AND isListScrolling = false
