@@ -78,22 +78,19 @@ Function getLinearContentBadgeInfo(schedule)
     else if hasEventEnded = false
       remainingDays = Cint(secondsUntilAirTime / 86400)
       remainingHours = Cint(secondsUntilAirTime / 3600)
-      remainingSeconds = secondsUntilAirTime mod 3600
+      remainingMinutes = Cint(secondsUntilAirTime / 60)
 
-      ' If the remainingSeconds is less than 60 seconds than using fix will cause the minutes to zero for like 50 seconds etc.
-      if remainingSeconds > 60
-        minutes = Cint(remainingSeconds / 60)
-      else
-        ' Making sure until the seconds becomes zero we will still display 1 min since we do not have seconds component.
-        minutes = 1
+      ' If the total time remaining is less than 60 seconds, display 1 minute since we don't have seconds component
+      if secondsUntilAirTime < 60
+        remainingMinutes = 1
       end if
 
-      if remainingDays > 0
-        timeString = getTranslation("d_duration", { "days": remainingDays.toStr() })
-      else if remainingHours > 0
+      if remainingMinutes < 60
+        timeString = getTranslation("m_duration", { "minutes": remainingMinutes.toStr() })
+      else if remainingHours < 24
         timeString = getTranslation("h_duration", { "hours": remainingHours.toStr() })
       else
-        timeString = getTranslation("m_duration", { "minutes": minutes.toStr() })
+        timeString = getTranslation("d_duration", { "days": remainingDays.toStr() })
       end if
 
       badgeText = getTranslation("live_in_date", { "timeString": timeString })
