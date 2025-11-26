@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ecp, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
-import { shared } from '../shared';
+import { shared } from '../test-helpers';
 
 describe('Sign up Save Progress Movies', function () {
     beforeEach(async () => {

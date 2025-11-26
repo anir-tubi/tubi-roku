@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { odc, ecp, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
-import { shared } from '../shared';
+import { shared } from '../test-helpers';
 import { log } from 'console';
 import { Utils } from 'handlebars';
 import { ALL } from 'dns';

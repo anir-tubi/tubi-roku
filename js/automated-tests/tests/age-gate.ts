@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ecp, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
-import { shared } from '../shared';
+import { shared } from '../test-helpers';
 
 describe('Age Gate', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/242480

@@ -1,8 +1,7 @@
 import { expect } from 'chai';
 import { odc, ecp, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
-import { shared } from '../shared';
-import { count, timeEnd } from 'console';
+import { shared } from '../test-helpers';
 
 describe('Details Page', function () {
   describe('Movie Details Page', function () {
@@ -706,22 +705,13 @@ async function findIndexForFirstItemWithoutVideoPreview(rowListKeyPath) {
     }
   }
 }
-/* Create History function
-// An example of this called from a test after landing on a details page and pressing Play
-// After selecting a title from the details page, press the Play button
-    await ecp.sendKeypress(ecp.Key.Ok); // selecting the title
-    await testUtils.selectAndVerifyDetailPageMenuItem('play');  // verify the play button and press it
-    await createHistory(); // create history function is called
-*/
 
-// Create history function
 async function createHistory() {
   await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 15000);
   await testUtils.seekPlayerToRelativePosition('videoPlayerScreen', 120 * 1000, 'current');
   await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 15000);
 }
 
-// Play from Beginning check function
 async function verifyPlayFromBeginning() {
 
   // Press Play and check playback
@@ -732,31 +722,26 @@ async function verifyPlayFromBeginning() {
   // Verify Movie title playback starts from beginning
   const position = await testUtils.getPlayerPosition('videoPlayerScreen');
   expect(position).to.be.greaterThanOrEqual(0);
-  expect(position).to.be.lessThan(1000); //changed this value from original of 5000
+  expect(position).to.be.lessThan(1000);
 }
 
 async function verifyResumeWithinRange() {
   await utils.sleep(2000);
-  await ecp.sendKeypress(ecp.Key.Play);// PLay to create history
+  await ecp.sendKeypress(ecp.Key.Play);
   await utils.sleep(2000);
-  await createHistory(); // Create history function
+  await createHistory();
   const currentposition = await testUtils.getPlayerPosition('videoPlayerScreen');
-  //console.log(currentposition);
   await utils.sleep(2000);
   await ecp.sendKeypress(ecp.Key.Back);
 
-  // Verify we are on the details page
- await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
+  await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
 
-  // Select Resume and check for playback
   await testUtils.selectAndVerifyDetailPageMenuItem('resume');
   await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
 
-  // Find resume position
   const resumeposition = await testUtils.getPlayerPosition();
   const difference = (resumeposition - currentposition);
 
-  // Find out if current postion and resume postion are within range
   const min = -5000;
   const max = 5000;
   expect(difference).greaterThanOrEqual(min);

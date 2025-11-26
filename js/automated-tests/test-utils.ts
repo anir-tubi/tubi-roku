@@ -1,4 +1,4 @@
-import { createHash, createHmac } from 'crypto';
+import { createHash, createHmac, BinaryLike } from 'crypto';
 import { expect } from 'chai';
 import type { MediaPlayerResponse, NodeRepresentation, ComparableValueTypes } from 'roku-test-automation';
 import { ecp, odc, utils } from 'roku-test-automation';
@@ -422,7 +422,8 @@ class TestUtils {
       'settings': 'Settings',
       'myStuff': 'My Stuff',
       'series': 'TV Shows',
-      'livefeed': 'Live TV'
+      'livefeed': 'Live TV',
+      'espanol': 'Español'
     };
 
     const selectedPage = pageTileMapping[page];
@@ -461,15 +462,13 @@ class TestUtils {
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
   public async waitForPlayerStateToEqual(videoPlayerElementId: VideoPlayerElementId, expectedState: VideoPlayerStates | VideoPlayerStates[], timeout = 15000) {
-    // check if expectedState is a string
-    if (typeof expectedState === 'string') {
-      expectedState = [expectedState];
-    }
+    // check if expectedState is a string and convert to array
+    const expectedStates: VideoPlayerStates[] = typeof expectedState === 'string' ? [expectedState] : expectedState;
 
     const element = this.getElementKeyPath(videoPlayerElementId);
     return await testUtils.retryWithTimeOut(async () => {
       const state = await this.getElementField(videoPlayerElementId, 'state', timeout);
-      expect(state).to.be.oneOf(expectedState);
+      expect(state).to.be.oneOf(expectedStates);
     }, timeout);
   }
 
@@ -1688,9 +1687,9 @@ class Auth {
   private calculateSignature(stringToSign, secretKey, dateTime) {
     const date = dateTime.split('T')[0];
 
-    const secret1 = Buffer.concat([Buffer.from('TUBI', 'utf-8'), Buffer.from(secretKey, 'base64')]);
-    const secret2 = this.hmac(date, secret1);
-    const secret3 = this.hmac('tubi_request', secret2);
+    const secret1 = Buffer.concat([Buffer.from('TUBI', 'utf-8') as any, Buffer.from(secretKey, 'base64') as any]) as BinaryLike;
+    const secret2 = this.hmac(date, secret1) as BinaryLike;
+    const secret3 = this.hmac('tubi_request', secret2) as BinaryLike;
     const signature = this.hmac(stringToSign, secret3);
     return signature;
   }
@@ -1755,7 +1754,7 @@ class Auth {
   }
 
 
-  private hmac(contents, secret) {
+  private hmac(contents: BinaryLike, secret: BinaryLike): Buffer {
     const result = createHmac('SHA256', secret).update(contents).digest();
     return result;
   }
@@ -2372,9 +2371,6 @@ type StartApplicationArgs = {
 
   /** No ads are shown unless set to false */
   noAds?: boolean;
-
-  /** Sets the Roku system level autoplay setting */
-  isAutoplayEnabled?: boolean;
 
   /* When set to true will enable the purple carpet container and banner. */
   enablePurpleCarpetContainerAndBanner?: boolean;

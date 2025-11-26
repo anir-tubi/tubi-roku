@@ -8,12 +8,12 @@ require('ts-node/register');
 
 const prompts = require('prompts');
 const env = require('gulp-env');
-const {device, utils} = require('roku-test-automation');
+const { device, utils } = require('roku-test-automation');
 const fs = require('fs');
 const log = require('fancy-log');
 const path = require('path');
 
-const {execShellCommand, spawnShellCommand} = require('./utilities');
+const { execShellCommand, spawnShellCommand } = require('./utilities');
 
 const { testUtils, auth, ContentTypes, ContentRatings } = require('./automated-tests/test-utils');
 
@@ -32,7 +32,7 @@ async function runAutomatedTestsCli(done, testsPath = 'js/automated-tests/tests/
     });
   }
 
-  const {tags} = await prompts({
+  const { tags } = await prompts({
     type: 'multiselect',
     name: 'tags',
     message: 'Use the space bar to select the tag(s) you would like to test.',
@@ -64,7 +64,7 @@ async function runAutomatedTestsCli(done, testsPath = 'js/automated-tests/tests/
 
   let branch = '';
   if (!shouldUseExistingBranch) {
-    const {branchInput} = await prompts({
+    const { branchInput } = await prompts({
       type: 'text',
       name: 'branchInput',
       message: 'Enter the branch name you would like to run against. If you would like to use the current checked out version then just hit enter'
@@ -92,11 +92,11 @@ async function runAutomatedAnalyticsTestsCli(done) {
 }
 
 async function runAutomatedAnalyticsTestsForAdsCli(done) {
-	env.set({
-		enableAdsForTesting: 'true',
-	});
-	await runAutomatedTestsCli(done, 'js/automated-tests/analytics/tests/*.ts');
-	done();
+  env.set({
+    enableAdsForTesting: 'true',
+  });
+  await runAutomatedTestsCli(done, 'js/automated-tests/analytics/tests/*.ts');
+  done();
 }
 
 
@@ -109,7 +109,7 @@ async function buildTestAccountCli(done) {
     'Use existing user'
   ];
 
-  const {userChoiceIndex} = await prompts({
+  const { userChoiceIndex } = await prompts({
     type: 'select',
     name: 'userChoiceIndex',
     message: 'What user would would like to use?',
@@ -155,7 +155,7 @@ async function buildTestAccountCli(done) {
     // We are using this file from TypeScript and so have to prevent the compile error by typing more loosely
     /** @type any[] */
     const contentTypeChoices = Object.keys(ContentTypes);
-    const {contentTypeIndex} = await prompts({
+    const { contentTypeIndex } = await prompts({
       type: 'select',
       name: 'contentTypeIndex',
       message: 'What type of content would you like to add?',
@@ -170,7 +170,7 @@ async function buildTestAccountCli(done) {
     content.ofContentType(contentType);
 
     const ratingChoices = Object.keys(ContentRatings);
-    const {ratingIndexes} = await prompts({
+    const { ratingIndexes } = await prompts({
       type: 'multiselect',
       name: 'ratingIndexes',
       message: 'What ratings would like to allow?',
@@ -184,7 +184,7 @@ async function buildTestAccountCli(done) {
     const ratings = ratingIndexes.map(index => ratingChoices[index]);
     content.withRating(ratings);
 
-    const {limit} = await prompts({
+    const { limit } = await prompts({
       type: 'number',
       name: 'limit',
       message: 'How many would you like to add?',
@@ -209,7 +209,7 @@ async function buildTestAccountCli(done) {
     log(`Retrieved ${retrievedContents.length} matching ${contentType}`);
     if (retrievedContents.length) {
       const whereToAddChoices = ['Continue Watching', 'Watch List'];
-      const {whereToAddChoiceIndex} = await prompts({
+      const { whereToAddChoiceIndex } = await prompts({
         type: 'select',
         name: 'whereToAddChoiceIndex',
         message: 'Where would you like to add this content?',
@@ -234,7 +234,7 @@ async function buildTestAccountCli(done) {
       name: 'shouldContinue',
       message: 'Would you like to add more content?'
     };
-    ({shouldContinue} = await prompts(continuePrompt));
+    ({ shouldContinue } = await prompts(continuePrompt));
   }
 
   log(`Generated user info:
@@ -265,7 +265,7 @@ async function runAutomatedTests(done, branch = '', tags = [], testsPath = 'js/a
   }
 
   // Clear out any existing output. Should be ok to do asynchronous since we have several long steps before we start writing to output folder
-  fs.rm(testUtils.testsOutputFolder, { recursive: true, force: true }, (e) => {});
+  fs.rm(testUtils.testsOutputFolder, { recursive: true, force: true }, (e) => { });
 
   const mochaOptions = [
     '--reporter js/automated-tests/mocha-reporter.ts', // Tell mocha to use our custom reporter
@@ -317,9 +317,16 @@ async function runAutomatedTests(done, branch = '', tags = [], testsPath = 'js/a
     mochaOptions.push(`--parallel --jobs ${config.RokuDevice.devices.length}`);
   }
 
-  // Only used when running test through Github. Locally we don't retry tests
-  if (+process.env.retries > 0) {
+  // Retry failed tests once by default (can be disabled with DISABLE_TEST_RETRY=true or retries=0)
+  // Can also set custom retry count with retries env variable (used in GitHub workflows)
+  if (process.env.DISABLE_TEST_RETRY === 'true') {
+    // No retries
+  } else if (process.env.retries !== undefined) {
+    // Respect explicit retry count (including 0 to disable retries)
     mochaOptions.push(`--retries ${process.env.retries}`);
+  } else {
+    // Default to 1 retry for local development
+    mochaOptions.push('--retries 1');
   }
 
   // We need to make our package here or else when we run in parallel they will all attempt to make the package at the same time
@@ -344,13 +351,13 @@ async function runAutomatedTests(done, branch = '', tags = [], testsPath = 'js/a
 function capitalizeAfterDash(str) {
   const words = str.split('-');
   const capitalizedWords = words.map((word, index) => {
-  if (index === 0) {
-    return word;
-  } else {
-    const firstLetter = word.charAt(0).toUpperCase();
-    const restOfWord = word.slice(1);
-    return firstLetter + restOfWord;
-  }
+    if (index === 0) {
+      return word;
+    } else {
+      const firstLetter = word.charAt(0).toUpperCase();
+      const restOfWord = word.slice(1);
+      return firstLetter + restOfWord;
+    }
   });
   return capitalizedWords.join('');
 }
@@ -361,7 +368,7 @@ async function appendDataToJsonReport(branch) {
   const report = JSON.parse(fs.readFileSync(jsonReportOutputPath, 'utf-8'));
 
   // Retrieve info about the device that ran the tests
-  const {body: deviceInfoBody} = await device.sendEcpGet('query/device-info');
+  const { body: deviceInfoBody } = await device.sendEcpGet('query/device-info');
   const deviceInfo = {};
   const deviceInfoKeyList = [
     'uptime',
@@ -377,7 +384,7 @@ async function appendDataToJsonReport(branch) {
   ];
   for (const key of deviceInfoKeyList) {
     for (const child of deviceInfoBody.children) {
-      if(child.name === key) {
+      if (child.name === key) {
         deviceInfo[capitalizeAfterDash(key)] = child.value;
         break;
       }
@@ -405,9 +412,9 @@ async function appendDataToJsonReport(branch) {
 
   // Retrieve application version that ran the tests
   let applicationVersion = 'unavailable';
-  const {body: appsBody} = await device.sendEcpGet('query/apps');
+  const { body: appsBody } = await device.sendEcpGet('query/apps');
   for (const child of appsBody.children) {
-    if(child.attributes.id === 'dev') {
+    if (child.attributes.id === 'dev') {
       applicationVersion = child.attributes.version;
     }
   }

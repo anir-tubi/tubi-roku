@@ -3,7 +3,7 @@ import { odc, ecp, utils } from 'roku-test-automation';
 import type { RegisteredUser } from '../test-utils';
 import { testUtils } from '../test-utils';
 import { ok } from 'assert';
-import { shared } from '../shared';
+import { shared } from '../test-helpers';
 import { moveToGrid } from '../analytics/utils/helpers';
 
 

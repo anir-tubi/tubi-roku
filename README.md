@@ -593,6 +593,10 @@ There are some overrides that are helpful while writing tests these are:
 
 `RERUN_AUTOMATED_TESTS` - Will reuse existing deployment of application instead of redeploying to speed up rerunning tests. Care should be taken as this could cause an older version of the application to run but is useful while writing new tests to speed up deployment
 
+`DISABLE_TEST_RETRY` - By default, failed tests are automatically retried once using Mocha's `--retries 1` flag. Set this to `true` to disable automatic retry and see original failures only.
+
+`retries` - Override the default retry count (1). Used in CI/CD workflows to set custom retry behavior.
+
 In order to use these environment variables, they must be added to the env file located at `.vscode/.env`.
 
 # Experiments

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ecp, utils } from 'roku-test-automation';
 import { ContentRatings, testUtils } from '../test-utils';
-import { shared } from '../shared';
+import { shared } from '../test-helpers';
 
 describe('Kids Mode', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/537398

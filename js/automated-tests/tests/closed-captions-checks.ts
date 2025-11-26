@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { odc, ecp, utils } from 'roku-test-automation';
 import type { RegisteredUser } from '../test-utils';
 import { testUtils } from '../test-utils';
-import { shared } from '../shared';
+import { shared } from '../test-helpers';
 import { count, timeEnd } from 'console';
 
 

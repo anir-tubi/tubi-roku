@@ -753,7 +753,7 @@ const elements = typeCheckElements({
 
   /** BWW Row list Poster */
   browseWhileWatchingRowListPoster: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#YmalRow.0.#YmalGroup.#YmalRow.#CategoryGridList.#RowList.0.items.0.#poster',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#BrowseWhileWatchingRow.#YmalGroup.#YmalRow.#CategoryGridList.#RowList.0.items.0.#poster',
   },
 
   /** YMAL detail title */
@@ -768,8 +768,9 @@ const elements = typeCheckElements({
   },
 
   /** BWW Featured header */
+  /** browseWhileWatchingHeader (auto-updated) */
   browseWhileWatchingHeader: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#BrowseWhileWatchingRow.0.#BrowseWhileWatchingGroup.#BrowseWhileWatchingRow.#CategoryGridList.#RowList.0.title.#CategoryName',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#BrowseWhileWatchingRow.#YmalGroup.#YmalRow.#relatedContentContainer.#header',
   },
 
   /** rewind button icon */
@@ -889,13 +890,14 @@ const elements = typeCheckElements({
       '/TubiScene/ContentController/Group/Group/ScreenStack/SettingsScreen/PanelSet/ParentalControlsPanel/Group/Group/MarkupList/CheckButton[2]/LayoutGroup/Poster',
   },
 
-
+  /** browseWhileWatchingHeader (auto-updated) */
   browseWhileWatchingRowList: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#BrowseWhileWatchingRow.0.#BrowseWhileWatchingGroup.#BrowseWhileWatchingRow.#CategoryGridList.#RowList',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#BrowseWhileWatchingRow.#YmalGroup.#YmalRow.#grid',
   },
 
+  /** browseWhileWatchingHeader (auto-updated) */
   browseWhileWatchingInfoPanel: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#BrowseWhileWatchingRow.#BrowseWhileWatchingGroup.#Info',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#BrowseWhileWatchingRow.#YmalGroup.#Info',
   },
 
   searchResultChannelNameABC: {
@@ -1788,10 +1790,6 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.7.#DetailsMenuTextParent.#DetailsMenuText',
   },
 
-  bWWTitle: {
-    keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#BrowseWhileWatchingRow.0.#BrowseWhileWatchingGroup.#Info.#infoPanelGroup.#Offset.#Title',
-  },
 
   /** Kids left nav option */
   kidsLeftNavOption: {
@@ -2773,6 +2771,31 @@ const elements = typeCheckElements({
   leftNav: {
     keyPath:
       '#ContentController.#uiGroup.#mainItems',
+  },
+
+  /** playerScreenProgressBar */
+  playerScreenProgressBar: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#videoPlayerScreen.#HUD.#Transport.#TubiProgressBar',
+  },
+
+  /** browseWhileWatchingMetadata */
+  browseWhileWatchingMetadata: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#BrowseWhileWatchingRow.#YmalGroup.#Info.#infoPanelGroup.#Offset.#Title',
+  },
+
+  /** browseWhileWatchingMetadataDescription */
+  browseWhileWatchingMetadataDescription: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#BrowseWhileWatchingRow.#YmalGroup.#Info.#infoPanelGroup.#Offset.#Description',
+  },
+
+  /** browseWhileWatchingMetadataSubtitleLine1 */
+  browseWhileWatchingMetadataSubtitleLine1: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#BrowseWhileWatchingRow.#YmalGroup.#Info.#infoPanelGroup.#Offset.#Line1',
+  },
+
+  /** browseWhileWatchingMetadataSubtitleLine2 */
+  browseWhileWatchingMetadataSubtitleLine2: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#BrowseWhileWatchingRow.#YmalGroup.#Info.#infoPanelGroup.#Offset.#Line2',
   },
 
 });
