@@ -762,76 +762,52 @@ gulp updateJsonTypography
 
 ## Updating the static text (translations) in app
 
-The app stores all of its static text for various languages centrally. If you need to make a change, you should follow the below procedures.
+**📖 For complete documentation, see the [Translation Workflow Guide](docs/translation-workflow.md)**
 
-If you need to make a change or addition to the American English text
+The app supports translations for English (en-US), Spanish (es-MX), and French (fr-CA). All static text is centrally managed through Crowdin.
 
-- Create a new branch and modify the file /translations/en-US.json
+### Quick Reference
 
-- Then run the following command line within the project's root folder:
-
-  ```shell
-  gulp updateLocalTranslations
-  ```
-
-  This will modify the TubiLanguageTranslate.brs to include the new English text
-
-- Once your branch has been merged into master, then run the following command line within the project's root folder to upload your approved changes to the Crowdin server. "TOKEN" is the personal access token that you need to create within your Crowdin account.
-
-  ```shell
-  gulp uploadTranslations --crowdinToken "TOKEN"
-  ```
-
-  This upload command will do two things:
-  - Modify the TubiLanguageTranslate.brs to include the new English text (just in case you skipped the previous step).
-
-  - Upload the new change to the Crowdin server so the change can be recorded and our translators can work on obtaining translations for the new change.
-
-If you need to make a change to text that is not the default English, then log into [Crowdin](https://crowdin.com/project/tubiapps) and adjust the translation. Then you will need to follow the directions on how to update the app with the latest translations. Better yet, create a ticket for the translation team to update the translation. More details can be found at https://www.notion.so/tubi/Localization-d5007e6666d1436bac4391acef5c73bf
-
-If you need to get the latest translations from the Crowdin servers, then create a new GIT branch and run the below command line within the project's root folder, where "TOKEN" is the personal access token you need to create within your Crowdin account. This will modify the TubiLanguageTranslate.brs to contain all the translations available within Crowdin. You later need to create a PR to start the process of getting the new translations merged to the master branch.
-
-  ```shell
-  gulp downloadTranslations --crowdinToken "TOKEN"
-  ```
-
-During the `gulp stage` and `gulp release` commands, there will be a few comparison checks to ensure all English strings have been uploaded to Crowdin and all translations have been downloaded from Crowdin. These checks can be done directly using the following command:
-
-  ```shell
-  gulp compareTranslations --crowdinToken "TOKEN"
-  ```
-
-## Automated Translation Workflow
-
-The `updateTranslations` command automates the entire translation update process, from downloading translations to creating a pull request.
-
-### Quick Start
+**Common Commands:**
 
 ```shell
+# Update local translations after modifying en-US.json
+gulp updateLocalTranslations
+
+# Upload new English strings to Crowdin (manual - only if needed)
+# Note: gulp stage automatically uploads translations
+gulp uploadTranslations
+
+# Download latest translations from Crowdin
+gulp downloadTranslations
+
+# Automated workflow (download, commit, create PR)
 gulp updateTranslations
+
+# Validate translations before release
+gulp compareTranslations
+
+# Find unused translations
+gulp codeClean
 ```
 
-### What It Does
+**Environment Variables (Recommended):**
+```shell
+export ROKU_CROWDIN_TOKEN="<your-crowdin-token>"
+export JIRA_TOKEN="<your-jira-token>"
+export JIRA_EMAIL="<your-email@tubi.tv>"
+```
+- Crowdin token: [Crowdin profile](https://crowdin.com/settings#api-key)
+- Jira token: [Jira API tokens](https://id.atlassian.com/manage-profile/security/api-tokens)
+- Jira variables required for automatic ticket creation during `gulp stage`
 
-This automated workflow performs the following steps:
+**Important Rules:**
+- ✅ Always use `getTranslation()` for user-facing text
+- ❌ Never hardcode text strings in BrightScript
+- ✅ Modify only `en-US.json` - translators handle other languages
+- ✅ `gulp stage` automatically uploads translations to Crowdin
 
-1. **Downloads translations** from Crowdin (waits for build completion if needed)
-2. **Processes translation files** and updates `TubiLanguageTranslate.brs`
-3. **Creates a new branch** named `translations_update_{MM}_{DD}` from `master`
-4. **Commits changes** with message "updated translations"
-5. **Pushes to remote** and creates a pull request automatically
-6. **PR includes**:
-   - Summary of what changed
-   - QA testing steps template
-   - Release notes template
-   
-NOTE: Instead of passing the crowdin token, you can set the crowdin token as a system environment variable labeled as "ROKU_CROWDIN_TOKEN". This is actually the preferred way. Check your system on how to create an environment variable. Also note, that the Crowdin personal access token is created under your [Crowdin profile](https://crowdin.com/settings#api-key).
-
-After some time of features being added/removed, some translations may no longer be needed. The following command line script should be used to check for any unnecessary translations. A PR should then be created to remove these no longer-needed translations. Please note that the script also displays other potentially unnecessary things in the codebase: i.e. images.
-
-  ```shell
-  gulp codeClean
-  ```
+For detailed workflows, troubleshooting, and best practices, see the [Translation Workflow Guide](docs/translation-workflow.md).
 
 
 ## Updating the client error config
