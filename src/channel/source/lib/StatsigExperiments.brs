@@ -72,14 +72,11 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
 
       '//This experiment will be for the new showcase ad campaigns. The possible "enabled_arm" values are "control", "carousel", "spotlight"
       ads_webott_hdc_homepage_layer: {
-        ads_hdc_gm_carousel_a: {
+        ads_hdc_sephora_carousel: {
           default: { "enabled_arm": "carousel" }
         }
-        ads_hdc_gm_carousel_b: {
+        ads_hdc_haleon_carousel: {
           default: { "enabled_arm": "carousel" }
-        }
-        ads_hdc_mcdonalds_spotlight: {
-          default: { "enabled_arm": "spotlight" }
         }
       }
 

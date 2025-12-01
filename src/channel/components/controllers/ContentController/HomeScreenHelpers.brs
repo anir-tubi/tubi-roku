@@ -368,9 +368,8 @@ Function fetchHomeScreen(homeScreen, useCache = false)
         aAdTypes = []
         adTypeSet = {} ' Simple associative array used as a Set (BrightScript has no real Set)
         adExperiments = [
-          { name: "ads_hdc_gm_carousel_a", arm: "carousel", adType: m.constants.adTypes.adRowlistCarousel },
-          { name: "ads_hdc_gm_carousel_b", arm: "carousel", adType: m.constants.adTypes.adRowlistCarousel },
-          { name: "ads_hdc_mcdonalds_spotlight", arm: "spotlight", adType: m.constants.adTypes.adRowlistSpotlight }
+          { name: "ads_hdc_sephora_carousel", arm: "carousel", adType: m.constants.adTypes.adRowlistCarousel },
+          { name: "ads_hdc_haleon_carousel", arm: "carousel", adType: m.constants.adTypes.adRowlistCarousel }
         ]
         adLayer = "ads_webott_hdc_homepage_layer"
         for each adExperiment in adExperiments
