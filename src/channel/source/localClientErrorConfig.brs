@@ -43,7 +43,7 @@ Function getLocalClientErrorConfig()
   "default": {
     "errors": {
       "default": {
-        "retry_strategy": "exp_backoff"
+        "retry_strategy": "no_retry"
       }
     },
     "status_codes": {
@@ -75,7 +75,7 @@ Function getLocalClientErrorConfig()
         "retry_strategy": "no_retry"
       },
       "500": {
-        "retry_strategy": "exp_backoff"
+        "retry_strategy": "no_retry"
       },
       "501": {
         "retry_strategy": "no_retry"
