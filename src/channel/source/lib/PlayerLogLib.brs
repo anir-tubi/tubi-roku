@@ -130,12 +130,13 @@ Function PlayerLogLib(constants, tracking)
     adCount: 0 'used in qualityOfService event
     latestAdPodStartupResult: {} 'used in userFeedback event
     playbackSource: {} 'used on playerExit message_map
-    fallbackCount: 0 'used on playerExit message_map
+    fallbackCount: 0 'used on playerExit message_map, Qos->message_map event
     adPlayed: false 'used on playerExit message_map
     adBufferingDuration: 0 'used in realtime->Qos event
     adBestStatus: {} 'tracks the best status each ad ever achieved, used to calculate adNotStartupCount in Realtime->Qos event
     adReBufferTracker: {} 'tracks which ads have experienced re-buffering to count unique ads only once
     startupFailureCount: 0 'used in realtime->Qos event
+    retryCount: 0 'used in Qos->message_map event
 
     '//timers
     playerSetupTimer: CreateObject("roTimespan") 'helps to calculate playerSetupTime for playerSetupPerformance event
@@ -195,6 +196,7 @@ Function PlayerLogLib(constants, tracking)
     setIsBuffering: playerLogLib_setIsBuffering
     setStartupFailureCount: playerLogLib_setStartupFailureCount
     setCumulativeDecoderStats: playerLogLib_setCumulativeDecoderStats
+    setRetryCount: playerLogLib_setRetryCount
 
     'ad
     setIsAd: playerLogLib_setIsAd
@@ -225,6 +227,7 @@ Function PlayerLogLib(constants, tracking)
     fireAdMissedEvent: playerLogLib_fireAdMissedEvent
     fireRealtimeQoSEvent: playerLogLib_fireRealtimeQoSEvent
     fireContentErrorEvent: playerLogLib_fireContentErrorEvent
+    fireVideoResourceFallbackEvent: playerLogLib_fireVideoResourceFallbackEvent
 
     ' public functions to track browse while watching
     updateBrowseWhileWatchingOpenCount: playerLogLib_updateBrowseWhileWatchingOpenCount
@@ -244,7 +247,6 @@ Function PlayerLogLib(constants, tracking)
     firePlayerSetupPerformanceEvent: playerLogLib_firePlayerSetupPerformanceEvent
     fireContentStartupPerformanceEvent: playerLogLib_fireContentStartupPerformanceEvent
     fireContentStartEvent: playerLogLib_fireContentStartEvent
-    fireVideoResourceFallbackEvent: playerLogLib_fireVideoResourceFallbackEvent
 
     'reset
     resetAdState: playerLogLib_resetAdState
@@ -500,6 +502,7 @@ Function playerLogLib_setVideoControl(videoControl = "")
       m.isVideoPlayed = false
       m.mostRecentBufferDuration = 0
       m.fallbackCount = 0
+      m.retryCount = 0
     end if
   end if
 End Function
@@ -1244,7 +1247,7 @@ Function playerLogLib_setErrorCode(errorCode)
     if m.errorCodeList.count() > 4
       m.errorCodeList.shift()
     end if
-    m.errorCodeList.push(errorCode)
+    m.errorCodeList.push(errorCode.toStr())
 
   else
     m.errorCode = 0
@@ -1327,7 +1330,7 @@ Function playerLogLib_setBreakOffError(errorCode)
     if m.errorCodeList.count() > 4
       m.errorCodeList.shift()
     end if
-    m.errorCodeList.push(errorCode)
+    m.errorCodeList.push(errorCode.toStr())
 
     'firstErrorCode needs to be set only once
     if m.firstErrorCode = 0
@@ -1456,6 +1459,8 @@ Function playerLogLib_fireQualityOfServiceEvent(adImp = {})
     "bww_oc": m.bwwOpenCount.toStr(),
     "bww_dc": m.bwwDidConvert.toStr(),
     "cumulative_decoder_stats": FormatJson(m.cumulativeDecoderStats)
+    "fallbackCount": m.fallbackCount.toStr()
+    "retryCount": m.retryCount.toStr()
   }
 
   m.sendEvent(qualityOfServiceInfo, "quality_of_services", eventBase)
@@ -2017,5 +2022,15 @@ End Function
 Function playerLogLib_setCumulativeDecoderStats(cumulativeDecoderStats)
   if isAA(cumulativeDecoderStats) = true
     m.cumulativeDecoderStats = cumulativeDecoderStats
+  end if
+End Function
+
+
+'It updates the retry count of playback failures
+'
+'@retryCount: integer, number of retries
+Function playerLogLib_setRetryCount(retryCount)
+  if isNumber(retryCount) = true
+    m.retryCount += retryCount
   end if
 End Function

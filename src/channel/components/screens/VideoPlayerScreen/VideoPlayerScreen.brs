@@ -202,6 +202,37 @@ Function init()
 
   m.isBrandingLogoExperimentEnabled = getStatsigExperimentResource("roku_player_improvement", "roku_player_branding_v0", false).enabled
 
+  ' Initialize retry configuration for network errors
+  m.isRetryExperimentEnabled = getStatsigExperimentResource("roku_player_improvement", "roku_player_retry_network_errors_v1", false).enabled
+  m.retryConfig = {
+    network: {
+      maxRetries: 3
+      delays: [0.5, 1, 2] ' Seconds: 0.5s, 1s, 2s exponential backoff
+      errorCodes: {
+        "-1": true ' Network error
+        "-2": true ' Connection timeout
+        "-3": true ' Unknown/generic error
+      }
+    }
+    isRetrying: false
+    currentRetryCount: 0
+    lastErrorCode: 0
+  }
+  m.shouldRetryPlayback = false ' Flag to indicate retry (same resource) vs fallback (different resource)
+
+  ' Map error codes to retry strategies for O(1) lookup
+  m.errorRetryStrategyMap = {
+    "-1": "retry_network" ' Network error
+    "-2": "retry_network" ' Connection timeout
+    "-3": "retry_network" ' Unknown/generic error
+    "-5": "fallback_codec" ' Media error; format unknown or unsupported
+    "-6": "fallback_drm" ' DRM error
+  }
+
+  ' Create retry and fallback timers once for reuse
+  m.retryTimer = createObject("roSGNode", "Timer")
+  m.fallbackTimer = createObject("roSGNode", "Timer")
+
   '//Variable to keep track where the m.ratingOverlay UI element should animated when the down button is pressed.
   m.ratingOverlayAnimatedPositionY = 150
 
@@ -1133,12 +1164,27 @@ Function onControlChange()
 End Function
 
 
-'Occurs when the fallback timer fires.
-'This is used to advance the codec on the content in the case where the codec is not supported.
-Function onFallbackTimerFired()
-  m.fallbackTimer.unObserveFieldScoped("fire")
-  m.fallbackTimer = invalid
+' Occurs when the retry timer fires (network error retry with same resource)
+Function onRetryTimerFired()
+  cleanupRetryTimer()
+  m.retryConfig.isRetrying = false
 
+  ' QA DEBUG LOG
+  tubiLog("RETRY_TEST: Attempting retry " + m.retryConfig.currentRetryCount.toStr() + " of " + m.retryConfig.network.maxRetries.toStr())
+
+  updatePlayerLogLib(m.playerLogLib, "setRetryCount", 1)
+  ' RETRY: Play the same content again without advancing codec/DRM
+  playContent()
+End Function
+
+
+' Occurs when the fallback timer fires (codec/DRM fallback with different resource)
+' This is used to advance the codec on the content in the case where the codec is not supported.
+Function onFallbackTimerFired()
+  cleanupFallbackTimer()
+  m.retryConfig.isRetrying = false
+
+  ' FALLBACK: Advance to next codec/DRM resource
   if isNode(m.Video) AND m.Video.errorCode = -5 ' Media error; the media format is unknown or unsupported
     advanceCodecOnContent(m.Video.content)
   else
@@ -1152,6 +1198,7 @@ End Function
 Function onVideoStateChange(msg)
   tubiLog("VideoPlayer.onVideoStateChange " + msg.GetData())
   state = msg.GetData()
+
   updatePlayerLogLib(m.playerLogLib, "setVideoState", state)
 
   if m.shouldFireStartVideoEvent = true AND (state = "playing" OR state = "error")
@@ -1173,23 +1220,56 @@ Function onVideoStateChange(msg)
     m.bufferingTimer.control = "stop"
   end if
 
-  if state = "finished" AND m.VideoState = "play"
-    if m.didAdvanceDrm = true
-      ' video player always changes state to "finished" after reaching a state of "error"
-      ' so we wait until the "finished" state is reached to play the next available stream for the video
-      ' in order to prevent race conditions due to video player state changing.
-      m.didAdvanceDrm = false
-      ' ensure that when the new DRM resource plays, it starts where the previous resource had been playing - if it had been playing
+  if state = "finished" AND m.VideoState = "play" AND m.retryConfig.isRetrying = false
+    if m.shouldRetryPlayback = true
+      m.retryConfig.isRetrying = true
+
+      ' Video player always changes state to "finished" after reaching a state of "error"
+      ' Wait until the "finished" state to retry in order to prevent race conditions
+      m.shouldRetryPlayback = false
+
+      ' Preserve playback position for retry
       if m.Video.content <> invalid AND m.playerPosition >= 0
         m.Video.content.nowPos = m.playerPosition
       end if
-      ' Adding a small timer so that we move the execution to the next frame rather than immediately executing the fallback logic
-      ' This is that video player state gets out of the error state.
-      m.fallbackTimer = createObject("roSGNode", "Timer")
-      ' We just need a minute delay to ensure that the video player state gets out of the error state.
-      m.fallbackTimer.duration = 0.01
-      m.fallbackTimer.observeFieldScoped("fire", "onFallbackTimerFired")
-      m.fallbackTimer.control = "start"
+
+      timerDelay = 0.5
+      errorCode = m.retryConfig.lastErrorCode
+
+      if isNetworkRetryableError(errorCode, m.retryConfig)
+        retryConfigType = m.retryConfig.network
+
+        if retryConfigType <> invalid
+          retryDelayCount = retryConfigType.delays.Count()
+          delayIndex = m.retryConfig.currentRetryCount - 1
+
+          if delayIndex >= 0 AND delayIndex < retryDelayCount
+            timerDelay = retryConfigType.delays[delayIndex]
+          else if retryConfigType.delays.Count() > 0
+            timerDelay = retryConfigType.delays[retryDelayCount - 1]
+          end if
+        end if
+      end if
+
+      ' Start retry timer with exponential backoff delay
+      startRetryTimer(timerDelay)
+
+      ' Handle FALLBACK: Different resource (codec/DRM change) with immediate execution
+    else if m.didAdvanceDrm = true
+      m.retryConfig.isRetrying = true
+
+      ' Video player always changes state to "finished" after reaching a state of "error"
+      ' Wait until the "finished" state to play the next available stream
+      m.didAdvanceDrm = false
+
+      ' Preserve playback position for fallback
+      if m.Video.content <> invalid AND m.playerPosition >= 0
+        m.Video.content.nowPos = m.playerPosition
+      end if
+
+      ' Start fallback timer with minimal delay (just to move to next frame)
+      startFallbackTimer(0.01)
+
     else
       ' the video reached the end
       if m.Video.content <> invalid
@@ -1219,7 +1299,7 @@ Function onVideoStateChange(msg)
       end if
 
     end if
-  else if state = "error"
+  else if state = "error" AND m.retryConfig.isRetrying = false
     content = m.Video.content
     errorInfo = getPlaybackErrorInfo(m.Video.position, m.Video.downloadedSegment, m.Video.streamingSegment, m.Video.streamingInfo, m.Video.errorCode, m.Video.errorStr, content)
 
@@ -1278,20 +1358,23 @@ Function onVideoStateChange(msg)
       m.didAdvanceDrm = false
     else
       updatePlayerLogLib(m.playerLogLib, "setBreakOffError", m.Video.errorCode)
-      ' Set up the next DRM scheme. Playback of next DRM scheme is triggered when state = "finished",
-      ' right after error state occurs.
-      if m.Video.errorCode = -5 ' Media error; the media format is unknown or unsupported
-        m.didAdvanceDrm = checkIfCodecFallbackIsAvailable(content)
-      else
-        m.didAdvanceDrm = checkIfDRMFallbackIsAvailable(content)
+
+      ' Fire exposure event for retry experiment (tracks both control and variant) if the error code is -1 or -2 or -3
+      ' This should be called on every playback error to properly track experiment exposure
+      if errorCode = -1 OR errorCode = -2 OR errorCode = -3
+        getStatsigExperimentResource("roku_player_improvement", "roku_player_retry_network_errors_v1", true)
       end if
+
+      ' Retry logic with exponential backoff for network errors (experiment gated)
+      handlePlaybackError(content, errorCode)
     end if
 
     contentErrorInfo = {}
     contentErrorInfo["error_code"] = m.Video.errorCode
     contentErrorInfo["error_details"] = m.Video.errorMsg
 
-    if m.didAdvanceDrm <> true
+    ' Error is fatal if neither retry nor fallback is available
+    if m.shouldRetryPlayback = false AND m.didAdvanceDrm = false
       isFatal = true
     else
       isFatal = false
@@ -1300,12 +1383,14 @@ Function onVideoStateChange(msg)
     contentErrorInfo["fatal"] = isFatal
     updatePlayerLogLib(m.playerLogLib, "fireContentErrorEvent", contentErrorInfo)
 
-    if m.didAdvanceDrm <> true
+    ' Show error modal only if it's a fatal error
+    if m.shouldRetryPlayback = false AND m.didAdvanceDrm = false
       updatePlayerLogLib(m.playerLogLib, "setErrorCode", m.Video.errorCode)
       updatePlayerLogLib(m.playerLogLib, "setErrorModal", true)
       m.top.errorMsg = getTranslation("videoPlayer_error_playback_description") 'is used in error modal
       m.top.state = state 'triggers error modal in ContentController
     end if
+
   else if state = "stopped" then
 
     if m.isShowAdBreakPendingStop = true then
@@ -1357,6 +1442,11 @@ Function onVideoStateChange(msg)
   end if
 
   if state = "playing"
+    ' Reset retry counter on successful playback recovery
+    if m.isRetryExperimentEnabled = true AND m.retryConfig.currentRetryCount > 0
+      resetRetryConfig()
+    end if
+
     if m.showRatings = true AND m.ratingOverlay.opacity = 0.0 AND m.AdHeadsUp.visible = false
       m.showRatings = false
       if isAA(m.top.playbackSource) = true AND m.top.playbackSource.srcForAds = m.constants.player.playbackOrigin.deeplink AND getExperimentResource("roku_bww_deeplinked_content", "roku_bww_deeplinked_content_v1", true).enabled = true AND m.isBWWShownForDeeplinkUser = false
@@ -1378,6 +1468,8 @@ Function onVideoStateChange(msg)
     ' Update external state as stopping as long as we aren't currently playing an ad since we already handle that internally
     m.top.state = state
   end if
+
+  'return true
 End Function
 
 
@@ -2097,6 +2189,11 @@ Function showAdBreak()
   'un-observing globalCaptionMode, subtitle and audioTrack to avoid callbacks of those video node fields when Ad starts/ends
   unObserveClosedCaptionAndAudioTrack()
 
+  ' Clean up retry and fallback timers to prevent them from firing during ad breaks
+  cleanupFallbackTimer()
+  cleanupRetryTimer()
+  resetRetryConfig()
+
   ' leave m.VideoState = "play" because from the component's perspective video is still playing
 
   ' If Video node is already in stopped state then calling control = "stop" on it will not trigger onVideoStateChange (async will but will leave it stuck in state=stopping).
@@ -2169,6 +2266,7 @@ Function prepareToStartVideo(content, videoResourceIndex = [0, 0])
   resetPauseAdTimers()
 
   videoResources = content.videoResources
+
   codecIndex = videoResourceIndex[0]
   drmIndex = videoResourceIndex[1]
 
@@ -2221,6 +2319,13 @@ Function resetVideoPlayerState(content = invalid)
   m.ratingInterval = 0
   m.focusedButtonIndex = 0
   m.brandingLogo.opacity = 0
+
+  cleanupFallbackTimer()
+  cleanupRetryTimer()
+  resetRetryConfig()
+
+  m.shouldRetryPlayback = false
+  m.didAdvanceDrm = false
 
   if content <> invalid
     m.top.adPosition = content.nowPos
@@ -2288,6 +2393,11 @@ Function stopVideo()
 
   'unObserveClosedCaptionAndAudioTrack is required to prevent callbacks for the globalCaptionMode, subtitle, and audio track fields when user exits player or changes the video content
   unObserveClosedCaptionAndAudioTrack()
+
+  ' Clean up retry and fallback timers to prevent them from firing after video is stopped
+  cleanupFallbackTimer()
+  cleanupRetryTimer()
+  resetRetryConfig()
 
   videoState = m.videoState
 
@@ -3890,3 +4000,114 @@ End Function
 Function updatePlayerStatsOverlay()
   updatePlayerStatsOverlayMixin(m.constants, m.Video, m.showPlayerStats, m.playerStatsOverlay)
 End Function
+
+
+' Helper function to check if an error code is a network retryable error
+' @errorCode: integer, the video player error code
+' @retryConfig: object, the retry configuration containing errorCodes map
+' @returns: boolean, true if error code is in the network retryable error codes map
+Function isNetworkRetryableError(errorCode as Integer, retryConfig as Object) as Boolean
+  if retryConfig <> invalid AND retryConfig.network <> invalid AND retryConfig.network.errorCodes <> invalid
+    errorCodeKey = errorCode.toStr()
+    return retryConfig.network.errorCodes.DoesExist(errorCodeKey)
+  end if
+  return false
+End Function
+
+
+' Helper function to determine retry strategy based on error code
+' @errorCode: integer, the video player error code
+' @returns: string, the strategy to use: "retry_network", "fallback_codec", "fallback_drm", or "fatal"
+Function getErrorRetryStrategy(errorCode as Integer) as String
+  errorCodeKey = errorCode.toStr()
+  if m.errorRetryStrategyMap.DoesExist(errorCodeKey)
+    return m.errorRetryStrategyMap[errorCodeKey]
+  else
+    return "fatal"
+  end if
+End Function
+
+
+' Helper sub to stop and cleanup the retry timer
+sub cleanupRetryTimer()
+  if m.retryTimer <> invalid
+    m.retryTimer.control = "stop"
+    m.retryTimer.unObserveFieldScoped("fire")
+  end if
+end sub
+
+
+' Helper sub to configure and start the retry timer with a given delay
+' @timerDelay: float, the delay in seconds before the timer fires
+sub startRetryTimer(timerDelay as Float)
+  cleanupRetryTimer()
+  m.retryTimer.duration = timerDelay
+  m.retryTimer.observeFieldScoped("fire", "onRetryTimerFired")
+  m.retryTimer.control = "start"
+end sub
+
+
+' Helper sub to stop and cleanup the fallback timer
+sub cleanupFallbackTimer()
+  if m.fallbackTimer <> invalid
+    m.fallbackTimer.control = "stop"
+    m.fallbackTimer.unObserveFieldScoped("fire")
+  end if
+end sub
+
+
+' Helper sub to configure and start the fallback timer with a given delay
+' @timerDelay: float, the delay in seconds before the timer fires
+sub startFallbackTimer(timerDelay as Float)
+  cleanupFallbackTimer()
+  m.fallbackTimer.duration = timerDelay
+  m.fallbackTimer.observeFieldScoped("fire", "onFallbackTimerFired")
+  m.fallbackTimer.control = "start"
+end sub
+
+
+Function handlePlaybackError(content as Object, errorCode as Integer) as Void
+  if m.isRetryExperimentEnabled = true
+    strategy = getErrorRetryStrategy(errorCode)
+
+    ' Try network retry if within max attempts
+    if strategy = "retry_network" AND m.retryConfig.currentRetryCount < m.retryConfig.network.maxRetries
+      m.retryConfig.currentRetryCount += 1
+      m.retryConfig.lastErrorCode = errorCode
+      m.shouldRetryPlayback = true
+      return
+    end if
+
+    ' Retry exhausted or not retryable - try fallback
+    resetRetryConfig()
+    m.shouldRetryPlayback = false
+
+    ' Apply fallback strategy based on error type
+    if strategy = "retry_network" OR strategy = "fallback_drm"
+      m.didAdvanceDrm = checkIfDRMFallbackIsAvailable(content)
+    else if strategy = "fallback_codec"
+      m.didAdvanceDrm = checkIfCodecFallbackIsAvailable(content)
+    else
+      m.didAdvanceDrm = false ' Fatal/unsupported case
+    end if
+
+  else
+    ' Experiment disabled - use original fallback logic
+    if errorCode = -5 ' Media error; the media format is unknown or unsupported
+      m.didAdvanceDrm = checkIfCodecFallbackIsAvailable(content)
+    else
+      m.didAdvanceDrm = checkIfDRMFallbackIsAvailable(content)
+    end if
+  end if
+
+End Function
+
+
+' Helper sub to reset retry configuration state
+sub resetRetryConfig()
+  m.retryConfig.append({
+    isRetrying: false
+    currentRetryCount: 0
+    lastErrorCode: 0
+  })
+end sub
