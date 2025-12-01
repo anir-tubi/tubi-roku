@@ -652,7 +652,10 @@ Function processErrorResponse(result, callbackTypes, job)
   tubiLog("BaseGeneralTask.processErrorResponse")
   ' end result of parsedResponse type may vary depending on API response format
   responseFromServer = result.response
-  responseHeaders = responseFromServer.headers
+  responseHeaders = invalid
+  if responseFromServer <> invalid then
+    responseHeaders = responseFromServer.headers
+  end if
 
   if responseHeaders <> invalid AND responseHeaders["Content-Type"] = "application/json" AND isString(result.response.data) = true then
     responseFromServer.data = parseJson(result.response.data)
@@ -739,9 +742,13 @@ End Function
 
 
 ' @result: assocarray, this is the result field as AA returned by handleEvent()
-Function sendApiErrorLog(result)
+Function sendApiErrorLog(result) as Void
 
   responseFromServer = result.response
+
+  if responseFromServer = invalid then
+    return
+  end if
 
   errorInfo = {
     name: responseFromServer.name
@@ -759,7 +766,7 @@ End Function
 
 
 Function appendDnsInfo(responseFromServer, errorInfo)
-  if responseFromServer.dnsInfo <> invalid then
+  if responseFromServer <> invalid AND responseFromServer.dnsInfo <> invalid then
     errorInfo.append(responseFromServer.dnsInfo)
   end if
 

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="EnhancedButtonList" extends="FocusControlLayoutGroup">
+
+  <script type="text/brightscript" uri="EnhancedButtonList.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StatsigExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StatsigLib.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/StatsigExperimentMixin.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+    <field id="buttons" type="array" />
+    <field id="buttonSpacing" type="array" />
+    <field id="buttonBackgroundUri" type="string" value="pkg:/images/pill_button_$$RES$$.9.png" />
+    <field id="buttonBackgroundBlendColor" type="string" />
+    <field id="buttonHeight" type="integer" value="105" />
+    <field id="showInactiveFocusState" type="boolean" value="false" />
+    <field id="padding" type="integer" value="48" />
+
+    <!-- OUTPUTS -->
+    <field id="buttonSelected" type="assocarray" alwaysNotify="true" />
+    <field id="buttonFocused" type="assocarray" alwaysNotify="true" />
+    <field id="buttonUnFocused" type="assocarray" alwaysNotify="true" />
+    <field id="trackingContext" type="assocarray" alwaysNotify="true" />
+  </interface>
+
+  <children>
+
+  </children>
+
+</component>

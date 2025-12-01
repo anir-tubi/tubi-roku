@@ -14,7 +14,13 @@
 
 '                                               playbackContainer - if srcForAds = container, then playbackContainer is set to the id of the container that was the source, otherwise not used.
 ''//::TODO:: Remove pageOrigin once we fixed sending invalid component interaction events- added this for debugging purpose
-Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = invalid, errorCb = invalid, playbackSource = { "srcForAnalytic": "unknown", "srcForAds": "unknown" })
+Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = invalid, errorCb = invalid, playbackSource = { "srcForAnalytic": "unknown", "srcForAds": "unknown" }) as Void
+  experiment = getStatsigExperimentResource("roku_content_details", "roku_content_details_v1", true)
+  if experiment.enabled = true
+    ' Show new content details screen
+    showVodDetailScreen(content, playbackSource, successCb, errorCb)
+    return
+  end if
   tubiLog("DetailScreenHelpers.showDetailScreen")
   '//Update the logo based on the current detail screen UI. For example, the previous (home) screen may been showing a modified skinAd logo
   showHideLogoBasedOnUiMode()
@@ -38,7 +44,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     detailScreen.observeFieldScoped("addToQueueSelected", "onAddToQueueSelected")
     detailScreen.observeFieldScoped("removeFromQueueSelected", "onRemoveFromQueueSelected")
     detailScreen.observeFieldScoped("removeFromHistorySelected", "onRemoveFromHistorySelected")
-    detailScreen.observeFieldScoped("backButtonPressed", "onDetailBackPressed")
+    detailScreen.observeFieldScoped("backButtonPressed", "onDetailBackButtonPressedChange")
     detailScreen.observeFieldScoped("relatedContentSelected", "onRelatedContentSelected")
     detailScreen.observeFieldScoped("backgroundUriList", "onDetailBackgroundChange")
     detailScreen.observeFieldScoped("channelSelected", "onDetailScreenChannelSelected")
@@ -1414,7 +1420,7 @@ Function updateLikeDislike(detailScreen, sRatingChange)
       sAnalyticsEventType = "UNDO_DISLIKE"
     end if
 
-    sendLikeSelectAnalytics(detailScreen, sAnalyticsEventType)
+    sendLikeSelectAnalytics(detailScreen.content, detailScreen.trackingPageInfo, sAnalyticsEventType)
 
     m.makeRequest({
       url: updateLikeDislikeRequestInfo.url
@@ -1713,13 +1719,15 @@ End Function
 
 Function onCloseErrorModal()
   '//exit the detail screen entirely since the content could not be gathered.
-  onDetailBackPressed()
+  onDetailBackButtonPressedChange()
 End Function
 
 
-Function onDetailBackPressed()
+Function onDetailBackButtonPressedChange()
+  showHideSpinner(false)
   ' TODO(Chris): This is in terrible need of refactor. We shouldn't be calling this directly
   ' but we have to invoke the "empty stack" logic at this point.
+  ' TODO: Prajwal we need to revisit this delaying it since it has ties to deep-link flow.
   onKeyEvent("back", true)
   onKeyEvent("back", false)
   m.videoPreviewPlayer.isDetailScreen = false
@@ -2068,8 +2076,15 @@ End Function
 ' A callback to be used after fetching the single content to immediately begin playback.
 ' Used when a user presses the "play" button on the homescreen, for instance.
 ' @refreshedContent: roSGNode, full metadata as received from the cms/content route
-Function skipDetailScreen(refreshedContent)
+Function skipDetailScreen(refreshedContent) as Void
   tubilog("detailScreenHelpers.skipDetailScreen")
+
+  experiment = getStatsigExperimentResource("roku_content_details", "roku_content_details_v1", false)
+  if experiment.enabled = true
+    ' Show new content details screen
+    playVodContentFromDetailScreen(refreshedContent)
+    return
+  end if
 
   subScreen = getHiddenScreen(1)
 
@@ -2101,6 +2116,8 @@ Function skipDetailScreen(refreshedContent)
         end if
       end if
 
+      ' TODO: Re-visit this if we do not graduate roku_content_details_v1 experiment.
+      ' It is very confusing that method and variable names just that this logic is for series only but it does execute for both movie and series.
       episode = getEpisodeContent(refreshedContent)
 
       if episode <> invalid
@@ -2174,7 +2191,7 @@ End Function
 '
 ' @screen: the detail screen
 ' @sLikeEventEnum: string, one of the valid event strings as defined in events.protos -> enum ExplicitInteraction
-Function sendLikeSelectAnalytics(screen, sLikeEventEnum)
+Function sendLikeSelectAnalytics(content, pageInfo, sLikeEventEnum)
   tubiLog("DetailScreenHelper.sendLikeSelectAnalytics")
 
   explicitFeedbackEvent = {
@@ -2182,12 +2199,10 @@ Function sendLikeSelectAnalytics(screen, sLikeEventEnum)
     pageOneof: {}
   }
 
-  pageInfo = screen.trackingPageInfo
   pageOneof = m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
 
   componentValues = {}
 
-  content = screen.content
   if content.type = m.constants.ui.contentTypes.series
     seriesId = content.id
     '//if series, remove the "0" that was added in TubiMetadataTranslate
@@ -2207,7 +2222,7 @@ Function sendLikeSelectAnalytics(screen, sLikeEventEnum)
   explicitFeedbackEvent.pageOneof = pageOneof
 
   isAdultParentalLevel = checkIfUserIsAdultByParentalRatingAndBirthday()
-  appendContentUserContextValues(explicitFeedbackEvent, screen.content, isAdultParentalLevel)
+  appendContentUserContextValues(explicitFeedbackEvent, content, isAdultParentalLevel)
 
   m.trackingLoggingTask.trackEvent = {
     type: "explicit_feedback"

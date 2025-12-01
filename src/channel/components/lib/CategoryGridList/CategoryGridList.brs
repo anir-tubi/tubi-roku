@@ -646,9 +646,6 @@ Function setFeaturedRowHeights()
 
   ' 246 is the height of the metadata section displayed beneath the featured focused tile.
   metadataSectionHeight = 240
-  if m.variant = "typography_improvements"
-    metadataSectionHeight = 286
-  end if
   numRows = 3
 
   if isNode(featuredRowContent) = true

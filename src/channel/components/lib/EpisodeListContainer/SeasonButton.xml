@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="SeasonButton" extends="Group">
+
+  <script type="text/brightscript" uri="SeasonButton.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+    <field id="width" type="float"
+      alias="buttonBackground.width,buttonBackgroundFocused.width,label.width,labelFocused.width" />
+    <field id="height" type="float"
+      alias="buttonBackground.height,buttonBackgroundFocused.height,label.height,labelFocused.height" />
+    <field id="focusPercent" type="float" />
+    <field id="itemContent" type="node" />
+    <field id="itemHasFocus" type="boolean" />
+    <field id="rowHasFocus" type="boolean" />
+    <field id="index" type="integer" />
+  </interface>
+
+  <children>
+    <Poster
+      uri="pkg:/images/transparent.png"
+      loadSync="true"
+      id="buttonBackground" />
+
+    <Poster
+      opacity="0"
+      loadSync="true"
+      uri="pkg:/images/tabs-bg-$$RES$$.9.png"
+      id="buttonBackgroundFocused" />
+
+    <Group
+      id="labelGroup">
+      <Label
+        horizAlign="center"
+        vertAlign="center"
+        id="label">
+        <Font
+          role="font" />
+      </Label>
+
+      <Label
+        opacity="0"
+        horizAlign="center"
+        vertAlign="center"
+        id="labelFocused">
+        <Font
+          role="font" />
+      </Label>
+    </Group>
+  </children>
+
+</component>

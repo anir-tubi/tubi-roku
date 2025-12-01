@@ -603,6 +603,10 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       currentScreen = getCurrentScreen()
       if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.consentScreen
         displayExitModal(currentScreen.trackingPageInfo)
+      else if m.SideNav.opened = true AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.vodDetailScreen
+        hideNavMenu(true)
+        focusCurrentScreen()
+        return true
       else if m.SideNav.opened = false
         if m.SideNav.visible = true
           openSideNavFromButton() '//"BUTTON_BACK"

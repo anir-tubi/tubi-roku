@@ -49,6 +49,15 @@ Function removeTopMostScreenWithIDFromStack(id)
 End Function
 
 
+' Remove a specific screen node from the stack
+' @param screen: node, the screen node to be removed from the stack
+Function removeScreenFromStack(screen)
+  if screen <> invalid
+    m.screenStack.screenToRemove = screen
+  end if
+End Function
+
+
 ' Called when a screen is pushed or popped from the screen stack.
 Function resetScreenStack()
   m.sentSponsorPixels = {} '//refresh this associative array that keeps track of the viewing of the sponsor images. Only send out the sponsor pixels once per page load so refresh upon an unloading of a screen.
@@ -260,6 +269,7 @@ Function onScreenChange()
 
   if currentScreen <> invalid AND currentScreen.id <> invalid
     m.sideNav.visible = (m.constants.ui.sideNavOpenIds[currentScreen.id] = true)
+    m.backgroundGroup.screenId = currentScreen.id
   end if
   ' Processing any queued braze messaging if they are queued due to being in non whitelisted screens.
   processQueuedInAppMessage()
@@ -299,4 +309,32 @@ Function getScreensInStack()
   end if
 
   return []
+End Function
+
+
+' Finds a detail screen in the screen stack by screen ID and optional content ID
+' Traverses the screen stack from top to bottom looking for a matching screen
+' Supports lookup by screen ID alone (when contentId is invalid) or by both screen ID and content ID
+' @param id - String, the screen ID to search for (e.g., m.constants.ui.screenIds.vodDetailScreen)
+' @param contentId - Optional String or invalid, the content ID to match (default: invalid)
+' @return Screen node if found, or invalid if no matching screen exists in the stack
+Function getDetailScreenFromStackWithId(id, contentId = invalid)
+  detailScreen = invalid
+  screenStackDepth = 0
+  while detailScreen = invalid
+    hiddenScreen = getHiddenScreen(screenStackDepth)
+
+    if hiddenScreen = invalid
+      ' we are outside of the screen stack depth so there are no more hidden screens
+      exit while
+    else if hiddenScreen.id = id AND (contentId = invalid OR (hiddenScreen.content <> invalid AND hiddenScreen.content.id = contentId))
+      ' Match found: screen ID matches and either contentId is invalid (match by ID alone) or content ID matches
+      detailScreen = hiddenScreen
+    else
+      screenStackDepth += 1
+    end if
+
+  end while
+
+  return detailScreen
 End Function

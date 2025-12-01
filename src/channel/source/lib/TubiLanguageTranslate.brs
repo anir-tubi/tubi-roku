@@ -702,7 +702,7 @@ Function getTranslation_en_US()
     },
     "screenDetails_button_noQueue": {
       "description": "label of the button that will remove the video title from the user's list",
-      "message": "Remove from My List"
+      "message": "Remove From My List"
     },
     "screenDetails_button_noHistory": {
       "description": "label of the button that will remove the video title from the user's viewing history",
@@ -1164,6 +1164,10 @@ Function getTranslation_en_US()
       "description": "Label of button to allow users to start over and play the current video title",
       "message": "Play from Beginning"
     },
+    "screenDetails_button_startFromBeginning": {
+      "description": "Label of button to start playing from the beginning",
+      "message": "Start From Beginning"
+    },
     "screenDetails_button_like_instructions": {
       "description": "text to be place AFTER the text that indicates that the user 'liked' or 'disliked' the current video title. This appears once the button gains focus",
       "message": " - Remove Rating"
@@ -1352,6 +1356,14 @@ Function getTranslation_en_US()
       "description": "metadata label to indicate the actors of the current video title",
       "message": "Starring"
     },
+    "metadata_languages": {
+      "description": "metadata label to indicate the available languages",
+      "message": "Languages"
+    },
+    "metadata_audio_description": {
+      "description": "metadata label to indicate audio description is available",
+      "message": "Audio Description available"
+    },
     "metadata_hoursAndMinutes": {
       "description": "a duration listed in hours and minutes (abbreviated for brevity and so singular and plural forms are irrelevant)",
       "message": "{hours} h {minutes} min"
@@ -1375,6 +1387,10 @@ Function getTranslation_en_US()
     "metadata_seasons_singular": {
       "description": "Label for when the current TV title has exactly one season",
       "message": "1 Season"
+    },
+    "screenDetails_season_label": {
+      "description": "Label for season button in episode list",
+      "message": "Season {seasonNumber}"
     },
     "metadata_series": {
       "description": "Label to indicate a title is a TV series",
@@ -2257,6 +2273,70 @@ Function getTranslation_en_US()
     "reminder_set_button_label": {
       "description": "Label of the button to remove a reminder for a content",
       "message": "Reminder Set"
+    },
+    "screenDetails_button_resume": {
+      "description": "Label of button to allow users to resume the current video title",
+      "message": "Resume"
+    },
+    "rating_tv_y_description": {
+      "description": "Description for TV-Y rating (All Children)",
+      "message": "This program is designed to be appropriate for all children."
+    },
+    "rating_tv_y7_description": {
+      "description": "Description for TV-Y7 rating (Directed to Older Children)",
+      "message": "This program is designed for children age 7 and above."
+    },
+    "rating_tv_y7_fv_description": {
+      "description": "Description for TV-Y7-FV rating (Directed to Older Children - Fantasy Violence)",
+      "message": "This program is designed for children age 7 and above and may contain fantasy violence."
+    },
+    "rating_tv_g_description": {
+      "description": "Description for TV-G rating (General Audience)",
+      "message": "Most parents will find this program suitable for all ages."
+    },
+    "rating_tv_pg_description": {
+      "description": "Description for TV-PG rating (Parental Guidance Suggested)",
+      "message": "This program contains material that parents may find unsuitable for younger children."
+    },
+    "rating_tv_14_description": {
+      "description": "Description for TV-14 rating (Parents Strongly Cautioned)",
+      "message": "This program contains material that many parents would find unsuitable for children under 14 years of age."
+    },
+    "rating_tv_ma_description": {
+      "description": "Description for TV-MA rating (Mature Audience Only)",
+      "message": "This program is specifically designed to be viewed by adults and therefore may be unsuitable for children under 17."
+    },
+    "rating_g_description": {
+      "description": "Description for G rating (General Audiences)",
+      "message": "All ages admitted. Nothing that would offend parents for viewing by children."
+    },
+    "rating_pg_description": {
+      "description": "Description for PG rating (Parental Guidance Suggested)",
+      "message": "Some material may not be suitable for children. Parents urged to give 'parental guidance'. May contain some material parents might not like for their young children."
+    },
+    "rating_pg_13_description": {
+      "description": "Description for PG-13 rating (Parents Strongly Cautioned)",
+      "message": "Some material may be inappropriate for children under 13. Parents are urged to be cautious. Some material may be inappropriate for pre-teenagers."
+    },
+    "rating_r_description": {
+      "description": "Description for R rating (Restricted)",
+      "message": "Under 17 requires accompanying parent or adult guardian. Contains some adult material. Parents are urged to learn more about the film before taking their young children with them."
+    },
+    "rating_nc_17_description": {
+      "description": "Description for NC-17 rating (Adults Only)",
+      "message": "No one 17 and under admitted. Clearly adult. Children are not admitted."
+    },
+    "button_episodes": {
+      "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
+      "message": "Episodes"
+    },
+    "season_episode_label": {
+      "description": "Label for season and episode number",
+      "message": "S{0} E{1}"
+    },
+    "save_progress_button": {
+      "description": "Label for save progress button",
+      "message": "Save Progress"
     }
   }
 End Function

@@ -16,6 +16,7 @@ Function TubiNodeHelpers()
     removeChildAtIndex: tubiNodeHelpers_removeChildAtIndex
     removeChildAnimationNodes: tubiNodeHelpers_removeChildAnimationNodes
     removeAllChildren: tubiNodeHelpers_removeAllChildren
+    findParentWithField: tubiNodeHelpers_findParentWithField
   }
 End Function
 
@@ -261,4 +262,28 @@ Function tubiNodeHelpers_removeAllChildren(node)
     childCount = node.getChildCount()
     node.removeChildrenIndex(childCount, 0)
   end if
+End Function
+
+
+' Finds a parent node in the hierarchy that has a specific field
+' Traverses up the parent chain until it finds a node with the specified field or reaches max depth
+' @param node - roSGNode, the starting node to search from
+' @param fieldName - String, the name of the field to look for
+' @param maxDepth - Integer (optional), maximum number of parent levels to traverse (default: 10)
+' @return roSGNode or invalid - The first parent node with the field, or invalid if not found
+Function tubiNodeHelpers_findParentWithField(node, fieldName, maxDepth = 10)
+  if node = invalid OR fieldName = invalid then return invalid
+
+  parent = node.getParent()
+  depth = 0
+
+  while parent <> invalid AND depth < maxDepth
+    if parent.hasField(fieldName) = true then
+      return parent
+    end if
+    parent = parent.getParent()
+    depth++
+  end while
+
+  return invalid
 End Function

@@ -1902,7 +1902,10 @@ Function onFeaturedListHasFocusChange(msg)
   previewContent = m.videoPreviewPlayer.content
   m.videoPreviewPlayer.visible = (isCurrentScreenHomeScreen() = false OR (content <> invalid AND previewContent <> invalid AND content.id = previewContent.id))
   if hasFeaturedListFocus = true
-    updateVideoTileScreenBackground(content, screen)
+
+    if isCurrentScreenHomeScreen() = true
+      updateVideoTileScreenBackground(content, screen)
+    end if
 
     previewState = getVideoPreviewStateForThisContent(content)
     m.inlinePreviewFocusIndicator.visible = true
@@ -1993,7 +1996,9 @@ Function onFeaturedRowFocusedItemChange(msg)
     end if
   end if
 
-  updateVideoTileScreenBackground(focusedItem, screen)
+  if isCurrentScreenHomeScreen() = true
+    updateVideoTileScreenBackground(focusedItem, screen)
+  end if
   setUIBasedOnFocusedContent(focusedItem)
 End Function
 

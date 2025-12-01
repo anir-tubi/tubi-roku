@@ -1,11 +1,12 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!-- Extend the ContentNode so we can add some custom fields -->
-<component name = "HistoryContentNode" extends="ContentNode">
+<component name="HistoryContentNode" extends="ContentNode">
   <interface>
     <field id="type" type="string" />
     <field id="nowPos" type="int" />
     <field id="historyId" type="string" />
     <field id="currentEpisodeId" type="string" />
     <field id="lastSaved" type="int" />
+    <field id="contentLength" type="int" />
   </interface>
 </component>

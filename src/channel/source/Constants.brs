@@ -290,6 +290,8 @@ Function getConstants()
   constants.reqNames.getUpNextContent = "getUpNextContent"
   constants.reqNames.getRelatedContent = "getRelatedContent"
   constants.reqNames.getThumbnails = "getThumbnails"
+  constants.reqNames.getSeasonListBySeriesId = "getSeasonListBySeriesId"
+  constants.reqNames.getSeriesEpisodesBySeason = "getSeriesEpisodesBySeason"
   constants.reqNames.getLiveManifest = "getLiveManifest"
   constants.reqNames.emailExists = "emailExists"
   constants.reqNames.signUp = "signUp"
@@ -361,6 +363,8 @@ Function getConstants()
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getUpNextContent] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getRelatedContent] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getThumbnails] = true
+  constants.reqNames.acceptsTubiAuth[constants.reqNames.getSeasonListBySeriesId] = true
+  constants.reqNames.acceptsTubiAuth[constants.reqNames.getSeriesEpisodesBySeason] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getLiveManifest] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.emailExists] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.magicLink] = true
@@ -566,6 +570,7 @@ Function getConstants()
     constants.urls.content.urlBase = "https://content-cdn.staging-public.tubi.io/api"
   end if
   constants.urls.content.singleContent = constants.urls.content.urlBase + "/v2/content"
+  constants.urls.content.seriesEpisodes = constants.urls.content.urlBase + "/v2/series" ' + series_id + "/episodes"
 
   'epgProgram url
   constants.urls.content.epgProgramContentUrlBase = "https://epg-cdn.production-public.tubi.io"
@@ -1375,6 +1380,7 @@ Function getConstants()
   constants.ui.screenLevels.rokuContinueWatchingConsentScreen = 120
   constants.ui.screenLevels.managePreferencesScreen = 130
   constants.ui.screenLevels.linearDetailScreen = 50
+  constants.ui.screenLevels.vodDetailScreen = 50
   constants.ui.screenLevels.foxVideoPlayerWrapperScreen = 60
 
   constants.ui.screenIds = {}
@@ -1404,6 +1410,7 @@ Function getConstants()
   constants.ui.screenIds.eventDetailScreen = "eventDetailScreen"
   constants.ui.screenIds.foxVideoPlayerWrapperScreen = "FoxVideoPlayerWrapperScreen"
   constants.ui.screenIds.linearDetailScreen = "linearDetailScreen"
+  constants.ui.screenIds.vodDetailScreen = "vodDetailScreen"
 
   ' notAllowedContainerIds are the containers which are not allowed to be displayed on category screen,
   ' because currently we support only portrait style in category detail screen
@@ -1446,6 +1453,8 @@ Function getConstants()
   'X/Y placement of app-wide elements. Typically x/y placement should be done in XML, but when there is an element that spans many components/screens, then pixel placement can be set here.
   constants.ui.translations = {}
   constants.ui.translations.marginX = 165
+  constants.ui.translations.screenXWhenSideNavClosed = 193
+  constants.ui.translations.screenXWhenSideNavOpen = 588
 
   constants.ui.translations.player = {}
   constants.ui.translations.player.marginX = 192
@@ -1524,7 +1533,7 @@ Function getConstants()
   ' Size of guest user continue watching container.
   constants.ui.imageSizes.guestContinueWatchingTile = [1613, 378]
 
-  constants.ui.imageSizes.titleArt = [594, 249]
+  constants.ui.imageSizes.titleArt = [594, 80]
 
   constants.ui.imageSizes.billboard = [1209, 681]
 
@@ -1555,6 +1564,10 @@ Function getConstants()
   constants.ui.categoryMenuPanelList = {}
   constants.ui.categoryMenuPanelList.columnWidths = [384]
   constants.ui.categoryMenuPanelList.itemSize = [384, 72]
+
+  constants.ui.episodeGrid = {}
+  constants.ui.episodeGrid.itemSize = [522, 663]
+
 
   constants.ui.featuredRow = {}
   constants.ui.featuredRow.playerSize = [constants.ui.imageSizes.featuredRowPoster[0] + 4, constants.ui.imageSizes.featuredRowPoster[1] + 10]
@@ -1750,6 +1763,7 @@ Function getConstants()
   defaultDarkPrimaryAccent = "THEME_defaultDarkPrimaryAccent_THEME"
   defaultDarkPrimaryBackground = "THEME_defaultDarkPrimaryBackground_THEME"
   defaultDarkPrimaryForeground = "THEME_defaultDarkPrimaryForeground_THEME"
+  defaultDarkTransparentBackground20 = "THEME_defaultDarkTransparentBackground20_THEME"
   defaultDarkTransparentBackground50 = "THEME_defaultDarkTransparentBackground50_THEME"
   defaultDarkTransparentBackground75 = "THEME_defaultDarkTransparentBackground75_THEME"
   defaultDarkTransparentForeground5 = "THEME_defaultDarkTransparentForeground5_THEME"
@@ -1778,6 +1792,7 @@ Function getConstants()
   kidsDarkPrimaryAccent = "THEME_kidsDarkPrimaryAccent_THEME"
   kidsDarkPrimaryBackground = "THEME_kidsDarkPrimaryBackground_THEME"
   kidsDarkPrimaryForeground = "THEME_kidsDarkPrimaryForeground_THEME"
+  kidsDarkTransparentBackground20 = "THEME_kidsDarkTransparentBackground20_THEME"
   kidsDarkTransparentBackground50 = "THEME_kidsDarkTransparentBackground50_THEME"
   kidsDarkTransparentBackground75 = "THEME_kidsDarkTransparentBackground75_THEME"
   ' kidsDarkTransparentForeground0 = "THEME_kidsDarktransparentforeground0_THEME"   '//::NOTE:: not currently being used
@@ -1830,6 +1845,7 @@ Function getConstants()
     shadeColor: defaultDarkTransparentBackground75
     shadeColor2: defaultDarkTransparentBackground50
     shadeColor3: defaultDarkTransparentScrim
+    shadeColor4: defaultDarkTransparentBackground20
     focused2Color: defaultDarkStatusAlert
     unfocusedColor: defaultDarkPrimaryForeground
     selectedListItemColor: defaultDarkTransparentForeground5
@@ -1866,6 +1882,7 @@ Function getConstants()
     shadeColor: kidsDarkTransparentBackground75
     shadeColor2: kidsDarkTransparentBackground50
     shadeColor3: kidsDarkTransparentScrim
+    shadeColor4: kidsDarkTransparentBackground20
     focused2Color: kidsDarkStatusAlert
     unfocusedColor: kidsDarkPrimaryForeground
     selectedListItemColor: kidsDarkTransparentForeground5

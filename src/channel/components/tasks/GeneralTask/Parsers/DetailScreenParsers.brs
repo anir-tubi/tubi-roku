@@ -124,3 +124,98 @@ End Function
 Function parseEpgListingSuccess(fullResponse, _reqInfo)
   return m.metadataTranslate.parseScheduleData(fullResponse.data)
 End Function
+
+
+' Parses season list response from series episodes API
+' Transforms episodes_by_season array format into a more usable associative array
+' @fullResponse: assocArray, as returned by Request.handleEvent, but with
+'                            .data value converted from JSON to AA already
+' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseSeasonListSuccess(fullResponse, reqInfo)
+  parsedResponse = fullResponse.data
+
+  returnObj = {
+    seriesId: reqInfo.options.seriesId
+    isRecurring: parsedResponse.is_recurring
+    seasons: {}
+    episodeSeasonMap: {}
+    ' Contains the content node for season selector.
+    seasonSelectorContent: invalid
+  }
+
+  seasonLabel = reqInfo.seasonLabel
+
+  ' Transform episodes_by_season from array format to episodeId: episodeNum format
+  if parsedResponse <> invalid AND parsedResponse.episodes_by_season <> invalid
+    seasonSelectorContent = CreateObject("roSGNode", "ContentNode")
+    episodesBySeason = parsedResponse.episodes_by_season
+    seasonNumbers = []
+    for each item in episodesBySeason
+      seasonNum = item.season.toStr()
+      episodesBySeasonArray = item.episodes
+      episodes = []
+
+      if isNonEmptyArray(episodesBySeasonArray)
+        for each episode in episodesBySeasonArray
+          if episode.id <> invalid AND episode.num <> invalid
+            ' Create map with episodeId as key and episode number as value
+            episodes.push({
+              id: episode.id
+              num: episode.num
+            })
+            returnObj.episodeSeasonMap[episode.id.toStr()] = {
+              seasonNum: seasonNum
+              episodeNum: episode.num
+            }
+          end if
+        end for
+      end if
+      seasonNumbers.push({
+        id: "season_" + seasonNum
+        title: seasonLabel.replace("{seasonNumber}", seasonNum)
+        seasonNumber: seasonNum
+      })
+
+      returnObj.seasons[seasonNum] = episodes
+    end for
+    seasonSelectorContent.update({
+      children: [{
+        type: "ContentNode"
+        children: seasonNumbers
+      }]
+    }, true)
+    returnObj.seasonSelectorContent = seasonSelectorContent
+  end if
+
+  return returnObj
+End Function
+
+
+' Parses series episodes by season response
+' @fullResponse: assocArray, as returned by Request.handleEvent, but with
+'                            .data value converted from JSON to AA already
+' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseSeriesEpisodesBySeasonSuccess(fullResponse, reqInfo)
+  parsedResponse = fullResponse.data
+  seasonNode = CreateObject("roSGNode", "ContentNode")
+  if reqInfo.options <> invalid AND reqInfo.options.params <> invalid AND reqInfo.options.params.content_id <> invalid
+    params = reqInfo.options.params
+    seasonNode.id = params.content_id
+    seasonNode.titleSeason = params["pagination[season]"].toStr()
+  end if
+
+  episodesNode = CreateObject("roSGNode", "TubiContentNode")
+  m.metadataTranslate.translateRecursive(parsedResponse, episodesNode, reqInfo.isSignedInUser)
+  children = episodesNode.getChild(0).getChildren(-1, 0)
+  seasonNode.appendChildren(children)
+
+  content = episodesNode.getFields()
+  if content <> invalid
+    content.delete("change")
+    content.delete("focusedChild")
+  end if
+  return {
+    "seasonNode": seasonNode
+    "content": content
+  }
+End Function

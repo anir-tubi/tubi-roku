@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
  - ContentController
  -
@@ -66,8 +66,8 @@
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/VideoPreviewMixin.brs" />
   <script type="text/brightscript" uri="ServerPersistentData/ServerPersistentDataHelpers.brs" />
-  <script type="text/brightscript" uri="pkg:/components/tasks/BrazeTask/BrazeSDK.brs"/>
-  <script type="text/brightscript" uri="BrazeHelpers.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/tasks/BrazeTask/BrazeSDK.brs" />
+  <script type="text/brightscript" uri="BrazeHelpers.brs" />
   <script type="text/brightscript" uri="ScreenNavigationHelpers.brs" />
   <script type="text/brightscript" uri="ConsentScreenHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/ArrayUtils.brs" />
@@ -76,7 +76,7 @@
   <script type="text/brightscript" uri="pkg:/source/3rdparty/google/gam_utils.brs" />
   <script type="text/brightscript" uri="pkg:/source/localClientErrorConfig.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiClientErrorConfig.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/PlayerLogLib.brs" />
   <script type="text/brightscript" uri="pkg:/source/Constants.brs" />
   <script type="text/brightscript" uri="pkg:/source/Settings.brs" />
@@ -88,42 +88,47 @@
   <script type="text/brightscript" uri="pkg:/source/lib/StatsigExperiments.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/StatsigExperimentMixin.brs" />
   <script type="text/brightscript" uri="LinearDetailScreenHelpers.brs" />
+  <script type="text/brightscript" uri="VodDetailScreenHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/PerformanceMetricsTracker.brs" />
 
   <interface>
 
     <!-- INPUTS -->
-      <!-- customSuspend will be set by scene's suspendhandler callback  -->
-      <field id="customSuspend" type="assocarray" alwaysNotify="true"/>
+    <!-- customSuspend will be set by scene's suspendhandler callback  -->
+    <field id="customSuspend" type="assocarray" alwaysNotify="true" />
 
-      <!-- customResume will be set by scene's resumehandler callback  -->
-      <field id="customResume" type="assocarray" alwaysNotify="true"/>
+    <!-- customResume will be set by scene's resumehandler callback  -->
+    <field id="customResume" type="assocarray" alwaysNotify="true" />
 
-      <field id="transportVoiceRequest" type="assocarray"/>
+    <field id="transportVoiceRequest" type="assocarray" />
 
-      <!-- fadeInContentController will be set true once animation logo is finished during app launch -->
-      <field id="fadeInContentController" type="boolean"/>
+    <!-- fadeInContentController will be set true once animation logo is finished during app launch -->
+    <field id="fadeInContentController" type="boolean" />
 
-      <!-- Holds the information needed to populate a navigate_within_page event. This info is usually set elsewhere by screens and
-           observed by their helpers, but in rare cases, ContentController can set this associative array, which
+    <!-- Holds the information needed to populate a navigate_within_page event. This info is usually
+    set elsewhere by screens and
+           observed by their helpers, but in rare cases, ContentController can set this associative array,
+    which
            will be responsible for sending navigate_within_page events.
            See tubiTracking_getAnalyticsEvent for the format of the navigate_within_page AA
       -->
-      <field id="navigateWithinPageInfo" type="assocarray"/>
+    <field id="navigateWithinPageInfo" type="assocarray" />
 
-      <field id="isComponentLibFailedToLoad" type="boolean" value="false"/>
+    <field id="isComponentLibFailedToLoad" type="boolean" value="false" />
 
-      <!-- removeStartUpScreens is used to remove the StartUpScreens(animationLogo) -->
-      <field id="removeStartUpScreens" type="boolean" />
+    <!-- removeStartUpScreens is used to remove the StartUpScreens(animationLogo) -->
+    <field id="removeStartUpScreens" type="boolean" />
 
     <!-- OUTPUT -->
 
   </interface>
 
-    <children>
-      <!-- uiGroup should be the only child of ContentController. All other components should be added in ContentControllerUI to allow us to load base dependencies before starting to make UI components -->
-      <Group
-        id="uiGroup"
-        opacity="0.0" />
+  <children>
+    <!-- uiGroup should be the only child of ContentController. All other components should be added
+    in ContentControllerUI to allow us to load base dependencies before starting to make UI
+    components -->
+    <Group
+      id="uiGroup"
+      opacity="0.0" />
   </children>
 </component>

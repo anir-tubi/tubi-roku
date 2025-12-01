@@ -174,21 +174,20 @@ Function onItemContentChange(msg)
       end if
     end if
 
-    if m.variant <> "typography_improvements"
-      ' For Linear content, we are using the title from the current program.
-      if currentProgram <> invalid
-        if isBillboardRow = false
-          setSubtitle(itemContent.title)
-        end if
-        if isNonEmptyString(currentProgram.epgProgramTitle) = true
-          setTitle(currentProgram.epgProgramTitle)
-        else
-          setTitle(currentProgram.title)
-        end if
-      else
-        setTitle(itemContent.title, itemContent.titleImageUrl)
+    ' For Linear content, we are using the title from the current program.
+    if currentProgram <> invalid
+      if isBillboardRow = false
+        setSubtitle(itemContent.title)
       end if
+      if isNonEmptyString(currentProgram.epgProgramTitle) = true
+        setTitle(currentProgram.epgProgramTitle)
+      else
+        setTitle(currentProgram.title)
+      end if
+    else
+      setTitle(itemContent.title, itemContent.titleImageUrl)
     end if
+
     m.metadataFadeDelay = 0
     adjustPosterBottomContentTranslation()
   end if

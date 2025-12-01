@@ -443,6 +443,12 @@ Function onStatsigInitializationError(errorResponse)
     end if
   end if
 
+  if m.constants.settings.mode <> "production"
+    statsigExperimentsInfo = {}
+    applyExperimentOverrides(statsigExperimentsInfo)
+    m.global.statsigExperimentsInfo = statsigExperimentsInfo
+  end if
+
   m.performanceMetricsTracker.endAppLaunchMetricTiming("statsig_initialization_request")
   runControllerStartSequence()
 End Function

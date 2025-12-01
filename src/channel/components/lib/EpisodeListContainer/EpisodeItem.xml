@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="EpisodeItem" extends="Group">
+
+  <script type="text/brightscript" uri="EpisodeItem.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+    <field id="itemContent" type="node" />
+  </interface>
+
+  <children>
+    <LayoutGroup
+      id="mainLayout"
+      itemSpacings="[32]">
+
+      <Group>
+        <Poster
+          id="thumbnail"
+          width="520"
+          height="292"
+          loadDisplayMode="scaleToFill" />
+        <Rectangle
+          id="progressBarGroup"
+          width="488"
+          height="6"
+          translation="[15, 274]"
+          color="#00000000">
+
+          <TubiProgressBar
+            id="progressBar"
+            width="488"
+            height="6"
+            pointerHeight="6"
+            visible="false" />
+        </Rectangle>
+      </Group>
+      <LayoutGroup
+        id="metadataLayout"
+        layoutDirection="vert"
+        itemSpacings="[16]">
+
+        <LayoutGroup
+          id="titleLayout"
+          layoutDirection="vert"
+          itemSpacings="[8]">
+
+          <Label
+            id="episodeTitle"
+            width="520"
+            wrap="true"
+            maxLines="2" />
+
+          <Label
+            id="description"
+            width="520"
+            wrap="true"
+            maxLines="3">
+            <Font
+              id="RedesignDescriptionFont"
+              role="font" />
+          </Label>
+        </LayoutGroup>
+
+        <LayoutGroup
+          id="metadataRow"
+          vertAlignment="center"
+          layoutDirection="horiz"
+          itemSpacings="[12]">
+
+          <Label
+            id="duration" />
+
+          <Group
+            id="rating">
+            <Poster
+              id="ratingBackground"
+              height="30"
+              uri="pkg:/images/rating_background_video_tile_$$RES$$.9.png"
+              loadDisplayMode="scaleToFit"
+              loadSync="true" />
+            <Label
+              id="ratingLabel"
+              height="30"
+              width="0"
+              numLines="1"
+              wrap="false"
+              horizAlign="center"
+              vertAlign="center">
+              <Font
+                role="font" />
+            </Label>
+          </Group>
+
+          <Poster
+            id="subtitlesIcon"
+            uri="pkg:/images/icon-closed-caption.webp"
+            width="36"
+            height="36"
+            visible="false" />
+        </LayoutGroup>
+      </LayoutGroup>
+    </LayoutGroup>
+  </children>
+
+</component>

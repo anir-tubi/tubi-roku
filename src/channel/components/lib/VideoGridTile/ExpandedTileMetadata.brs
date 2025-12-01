@@ -1,3 +1,6 @@
+' Initializes the component and caches node references
+' Sets up observers for content changes, theme changes, and width changes
+' Initializes typography constants and experiment variants
 Function init()
   m.nodeHelpers = TubiNodeHelpers()
 
@@ -30,17 +33,16 @@ Function init()
   m.bodyMediumFont = typographyConstants.ids.bodyMedium
   m.bodySmallFont = typographyConstants.ids.bodySmall
   m.headerSmallFont = typographyConstants.ids.headerSmall
+  m.headerMediumFont = typographyConstants.ids.headerMedium
+  m.bodyExtraSmallStrongFont = typographyConstants.ids.bodyExtraSmallStrong
+  m.badgeTextFont = typographyConstants.ids.bodySmallStrong
   m.bodyMediumStrongFont = typographyConstants.ids.bodyMediumStrong
+  m.subheaderSmallFont = typographyConstants.ids.subheaderSmall
 
   m.title = invalid
-  if m.variant = "typography_improvements"
-    appendTitleToMetadataGroup()
-  else
-    setTypographyOfLabel(m.description, m.bodyMediumFont)
-  end if
-
-  setTypographyOfLabel(m.ratingLabel, typographyConstants.ids.bodyExtraSmallStrong)
-  m.badgeTextFont = typographyConstants.ids.bodySmallStrong
+  m.titleImage = invalid
+  setTypographyOfLabel(m.description, m.bodyMediumFont)
+  setTypographyOfLabel(m.ratingLabel, m.bodyExtraSmallStrongFont)
 
   m.description.observeFieldScoped("isTextEllipsized", "onIsTextEllipsizedChange")
 
@@ -51,6 +53,8 @@ Function init()
 End Function
 
 
+' Handles theme changes and applies color values to UI elements
+' @param msg - Optional message containing theme data
 Function onThemeChange(msg = invalid)
   if msg <> invalid
     theme = msg.getData()
@@ -61,7 +65,7 @@ Function onThemeChange(msg = invalid)
   if theme <> invalid
     m.primaryTextColor = theme.primaryTextColor
     m.secondaryTextColor = theme.secondaryTextColor
-    m.RatingLabel.color = theme.secondaryTextColor
+    m.ratingLabel.color = theme.secondaryTextColor
     m.description.color = m.primaryTextColor
     m.focusedTextColor = theme.focusedTextColor
     m.cautionColor = theme.cautionColor
@@ -78,6 +82,10 @@ Function onThemeChange(msg = invalid)
 End Function
 
 
+' Sets the thumbnail image for sports events and linear content
+' Shows channel logo if applicable, removes it otherwise
+' @param thumbnailUri - String, URI of the thumbnail image
+' @param contentType - String, type of content
 Function setThumbnailImage(thumbnailUri, contentType)
   channelLogoIsPresent = (m.channelLogo.getParent() <> invalid)
   if isNonEmptyString(thumbnailUri) = true AND (contentType = m.constants.ui.contentTypes.sportsEvent OR contentType = m.constants.ui.contentTypes.linear)
@@ -91,85 +99,136 @@ Function setThumbnailImage(thumbnailUri, contentType)
 End Function
 
 
-Function onItemContentChange(msg)
+' Handles item content changes and populates metadata based on content type
+' Clears existing SOT badges and rebuilds metadata display
+' Routes to appropriate metadata rendering function based on content category
+' @param msg - Message containing the content node data
+Function onItemContentChange(msg) as Void
   itemContent = msg.getData()
+  if itemContent = invalid then return
 
-  if itemContent <> invalid
-    m.nodeHelpers.removeAllChildren(m.sotTopLabelGroup)
-    m.metadataGroup.removeChild(m.sotTopLabelGroup)
-    m.nodeHelpers.removeAllChildren(m.subHeadlinePrefixGroup)
-    m.nodeHelpers.removeAllChildren(m.subHeadlineSuffixGroup)
+  cleanupMetadata()
+  setupTitleAndConfig(itemContent)
+  routeContentDisplay(itemContent)
+  handleSOTBadgesAndLayout(itemContent)
 
-    if m.sotMarker <> invalid
-      m.metadataGroup.removeChild(m.sotMarker)
+  if isNonEmptyString(itemContent.availabilityEnds) AND m.top.variant = "detailScreenInfoPanel"
+    badgeInfo = getExpiresBadgeInfo(itemContent.availabilityEnds)
+    if badgeInfo <> invalid
+      badge = createBadge(badgeInfo.text, {
+        textColor: m.focusedTextColor,
+        borderUri: ""
+      })
+      m.firstLineGroup.insertChild(badge, 0)
+      m.expiresBadge = badge
     end if
+  end if
+End Function
 
-    isVideoTilesControlMetadata = m.top.id = "videoTilesControlMetadata"
-    if isVideoTilesControlMetadata = false
-      m.metadataGroup.itemSpacings = [9]
-    end if
-    if isVideoTilesControlMetadata = true AND m.title = invalid
-      appendTitleToMetadataGroup()
-    end if
 
-    ' Resetting the visibility of the rating and sot badge.
-    m.rating.visible = true
-    m.sotBadge.visible = true
-    onWidthChange()
+' Cleans up existing metadata elements before displaying new content
+Function cleanupMetadata() as Void
+  m.nodeHelpers.removeAllChildren(m.sotTopLabelGroup)
+  m.metadataGroup.removeChild(m.sotTopLabelGroup)
+  m.nodeHelpers.removeAllChildren(m.subHeadlinePrefixGroup)
+  m.nodeHelpers.removeAllChildren(m.subHeadlineSuffixGroup)
 
-    if m.title <> invalid
-      m.title.text = itemContent.title
-    end if
+  if m.audioDescriptionPoster <> invalid
+    m.firstLineGroup.removeChild(m.audioDescriptionPoster)
+    m.audioDescriptionPoster = invalid
+  end if
 
-    if itemContent.type = m.constants.ui.contentTypes.linear
-      if m.top.isBillboardRow = false
-        setThumbnailImage(itemContent.thumbnailUri, itemContent.type)
-      else
-        m.firstLineGroup.removeChild(m.channelLogo)
-      end if
-      currentProgram = getCurrentLiveProgram(itemContent)
-      if currentProgram <> invalid
-        metadataOnLivePosterContent(currentProgram, itemContent)
+  if m.sotMarker <> invalid
+    m.metadataGroup.removeChild(m.sotMarker)
+  end if
 
-        if isNonEmptyString(currentProgram.description) = true
-          m.description.text = currentProgram.description
-        end if
+  if m.ratingDescriptorBadges <> invalid
+    for each badge in m.ratingDescriptorBadges
+      m.firstLineGroup.removeChild(badge)
+    end for
+    m.ratingDescriptorBadges = invalid
+  end if
 
-        progress = getLinearProgramProgress(currentProgram)
-        m.progressBar.progress = progress
-        m.progressBar.visible = true
+  if m.titleImage <> invalid
+    m.metadataGroup.removeChild(m.titleImage)
+    m.titleImage = invalid
+  end if
 
-        if m.progressBarGroup.getParent() = invalid
-          index = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.subHeadlinePrefixGroup)
-          m.firstLineGroup.insertChild(m.progressBarGroup, index + 1)
-        end if
+  if m.expiresBadge <> invalid
+    m.firstLineGroup.removeChild(m.expiresBadge)
+    m.expiresBadge = invalid
+  end if
+End Function
 
-        if m.subHeadlineSuffixGroup.getParent() = invalid
-          index = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.progressBarGroup)
-          m.firstLineGroup.insertChild(m.subHeadlineSuffixGroup, index + 1)
-        end if
-        displayLiveRating(currentProgram)
-        if m.sotBadge.getParent() <> invalid
-          m.firstLineGroup.removeChild(m.sotBadge)
-        end if
-      else
-        metadataOnPosterContent(itemContent)
-        m.description.text = itemContent.description
 
-        if m.subHeadlineSuffixGroup.getParent() <> invalid
-          m.firstLineGroup.removeChild(m.subHeadlineSuffixGroup)
-        end if
+' Sets up title and initial configuration based on component variant
+' @param itemContent - Content node with title and metadata
+Function setupTitleAndConfig(itemContent) as Void
+  isVideoTilesControlMetadata = m.top.id = "videoTilesControlMetadata"
+  ' TODO: Revisit this logic after roku_video_tiles_1_7 experiment results. This is getting hard to manage.
+  if m.top.variant = "detailScreenInfoPanel"
+    m.metadataGroup.itemSpacings = [15]
+  else if isVideoTilesControlMetadata = false
+    m.metadataGroup.itemSpacings = [9]
+  end if
 
-        if m.progressBarGroup.getParent() <> invalid
-          m.firstLineGroup.removeChild(m.progressBarGroup)
-        end if
-      end if
+  if isVideoTilesControlMetadata = true AND m.title = invalid
+    appendTitleToMetadataGroup(itemContent)
+  end if
 
+  variant = m.top.variant
+  if (variant = "portraitWithMetadata" OR variant = "detailScreenInfoPanel") AND m.title = invalid
+    appendTitleToMetadataGroup(itemContent)
+  end if
+
+  ' Resetting the visibility of the rating and sot badge.
+  m.rating.visible = true
+  m.sotBadge.visible = true
+  onWidthChange()
+
+  if m.title <> invalid
+    m.title.text = itemContent.title
+  end if
+End Function
+
+
+' Routes content display to appropriate metadata function based on content type
+' @param itemContent - Content node to display
+Function routeContentDisplay(itemContent) as Void
+  if itemContent.type = m.constants.ui.contentTypes.linear
+    if m.top.isBillboardRow = false
+      setThumbnailImage(itemContent.thumbnailUri, itemContent.type)
     else
-      'Remove thumbnail image and badge we showed for live
-      if m.channelLogo.getParent() <> invalid
-        m.firstLineGroup.removeChild(m.channelLogo)
+      m.firstLineGroup.removeChild(m.channelLogo)
+    end if
+    currentProgram = getCurrentLiveProgram(itemContent)
+    if currentProgram <> invalid
+      metadataOnLivePosterContent(currentProgram)
+
+      if isNonEmptyString(currentProgram.description) = true
+        m.description.text = currentProgram.description
       end if
+
+      progress = getLinearProgramProgress(currentProgram)
+      m.progressBar.progress = progress
+      m.progressBar.visible = true
+
+      if m.progressBarGroup.getParent() = invalid
+        index = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.subHeadlinePrefixGroup)
+        m.firstLineGroup.insertChild(m.progressBarGroup, index + 1)
+      end if
+
+      if m.subHeadlineSuffixGroup.getParent() = invalid
+        index = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.progressBarGroup)
+        m.firstLineGroup.insertChild(m.subHeadlineSuffixGroup, index + 1)
+      end if
+      displayLiveRating(currentProgram)
+      if m.sotBadge.getParent() <> invalid
+        m.firstLineGroup.removeChild(m.sotBadge)
+      end if
+    else
+      metadataOnPosterContent(itemContent)
+      m.description.text = itemContent.description
 
       if m.subHeadlineSuffixGroup.getParent() <> invalid
         m.firstLineGroup.removeChild(m.subHeadlineSuffixGroup)
@@ -178,66 +237,96 @@ Function onItemContentChange(msg)
       if m.progressBarGroup.getParent() <> invalid
         m.firstLineGroup.removeChild(m.progressBarGroup)
       end if
-
-      m.description.text = itemContent.description
-
-      categoryContent = itemContent.getParent()
-      if categoryContent <> invalid AND categoryContent.id = "continue_watching" AND itemContent.type <> m.constants.ui.contentTypes.series
-        metadataOnContinueWatchingContent(itemContent)
-      else
-        metadataOnPosterContent(itemContent)
-      end if
     end if
 
-    if isVideoTilesControlMetadata = true AND itemContent.type <> m.constants.ui.contentTypes.linear AND isNonEmptyString(itemContent.availabilityEnds) AND m.sotBadge.getParent() = invalid
-      setupExpiresBadge(itemContent)
+  else
+    'Remove thumbnail image and badge we showed for live
+    if m.channelLogo.getParent() <> invalid
+      m.firstLineGroup.removeChild(m.channelLogo)
     end if
 
-    ' Adjust the translation based on height of the description text.
-    if isVideoTilesControlMetadata
-      ' Create SOT badges using helper function
-      sotBadges = createSOTBadges(itemContent.sotInfo, {
-        focusedTextColor: m.focusedTextColor
-        maxWidth: m.top.width - 12
-        bodyMediumStrongFont: m.bodyMediumStrongFont
-        cautionColor: m.cautionColor
-      })
+    if m.subHeadlineSuffixGroup.getParent() <> invalid
+      m.firstLineGroup.removeChild(m.subHeadlineSuffixGroup)
+    end if
 
-      if isNonEmptyArray(sotBadges.topLabels) = true
-        m.metadataGroup.insertChild(m.sotTopLabelGroup, 0)
-      end if
+    if m.progressBarGroup.getParent() <> invalid
+      m.firstLineGroup.removeChild(m.progressBarGroup)
+    end if
 
-      ' Append top label badges
-      for each topLabel in sotBadges.topLabels
-        m.sotTopLabelGroup.appendChild(topLabel)
-      end for
+    m.description.text = itemContent.description
 
-      ' Append marker badge if exists
-      if sotBadges.marker <> invalid
-        ' Update maxWidth for marker to full width
-        sotBadges.marker.maxWidth = m.top.width
-        m.sotMarker = sotBadges.marker
-        m.metadataGroup.appendChild(m.sotMarker)
-      end if
-      ' With 3 lines of description text, the height is 230px and with 2 lines of description text, the height is 192px.
-      ' And parent level translation is set based on 2 lines of description text. So we are adjusting the bottom padding by negative margining the metadataGroup.
-      ' This is required only for control variant.
-      if m.variant <> "trueControlTop2Rows"
-        height = m.metadataGroup.boundingRect().height
-        translation = m.metadataGroup.translation
-        m.metadataGroup.translation = [translation[0], 192 - height]
-      end if
+    categoryContent = itemContent.getParent()
+    if categoryContent <> invalid AND categoryContent.id = "continue_watching" AND itemContent.type <> m.constants.ui.contentTypes.series
+      metadataOnContinueWatchingContent(itemContent)
+    else
+      metadataOnPosterContent(itemContent)
     end if
   end if
 End Function
 
 
+' Handles SOT badges and metadata height adjustments for control variant
+' @param itemContent - Content node with SOT information
+Function handleSOTBadgesAndLayout(itemContent) as Void
+  isVideoTilesControlMetadata = m.top.id = "videoTilesControlMetadata"
+
+  if isVideoTilesControlMetadata = true AND itemContent.type <> m.constants.ui.contentTypes.linear AND isNonEmptyString(itemContent.availabilityEnds) AND m.sotBadge.getParent() = invalid
+    setupExpiresBadge(itemContent)
+  end if
+
+  ' Adjust the translation based on height of the description text.
+  if isVideoTilesControlMetadata OR m.top.variant = "detailScreenInfoPanel"
+    ' Create SOT badges using helper function
+    sotBadges = createSOTBadges(itemContent.sotInfo, {
+      focusedTextColor: m.focusedTextColor
+      maxWidth: m.top.width - 12
+      bodyMediumStrongFont: m.bodyMediumStrongFont
+      cautionColor: m.cautionColor
+    })
+
+    if isNonEmptyArray(sotBadges.topLabels) = true
+      m.metadataGroup.insertChild(m.sotTopLabelGroup, 0)
+    end if
+
+    ' Append top label badges
+    for each topLabel in sotBadges.topLabels
+      m.sotTopLabelGroup.appendChild(topLabel)
+    end for
+
+    ' Append marker badge if exists
+    if sotBadges.marker <> invalid
+      ' Update maxWidth for marker to full width
+      sotBadges.marker.maxWidth = m.top.width
+      m.sotMarker = sotBadges.marker
+      m.metadataGroup.appendChild(m.sotMarker)
+    end if
+    ' With 3 lines of description text, the height is 230px and with 2 lines of description text, the height is 192px.
+    ' And parent level translation is set based on 2 lines of description text. So we are adjusting the bottom padding by negative margining the metadataGroup.
+    ' This is required only for control variant.
+    if m.variant <> "trueControlTop2Rows" AND m.top.variant <> "detailScreenInfoPanel"
+      height = m.metadataGroup.boundingRect().height
+      translation = m.metadataGroup.translation
+      m.metadataGroup.translation = [translation[0], 192 - height]
+    end if
+  end if
+End Function
+
+
+' Displays metadata for poster/thumbnail content (movies, series, etc.)
+' Shows genres, release date, seasons/length, rating, descriptors, and badges
+' @param itemContent - Content node with metadata to display
 Function metadataOnPosterContent(itemContent)
   insertIndex = 0
+  isDetailScreenInfoPanel = m.top.variant = "detailScreenInfoPanel"
+
+  ' Remove channel info group if it exists
+  if m.channelInfoGroup <> invalid
+    m.metadataGroup.removeChild(m.channelInfoGroup)
+    m.channelInfoGroup = invalid
+  end if
 
   prefixTextParts = []
-
-  tags = itemContent.tags
+  tags = itemContent.genres
   if isNonEmptyArray(tags) = true
     text = tags[0]
     if tags[1] <> invalid
@@ -254,8 +343,8 @@ Function metadataOnPosterContent(itemContent)
     end if
   end if
 
-  if itemContent.year <> invalid
-    text = itemContent.year.toStr()
+  if itemContent.releaseDate <> invalid
+    text = itemContent.releaseDate.toStr()
     prefixTextParts.push(text)
   end if
 
@@ -287,13 +376,12 @@ Function metadataOnPosterContent(itemContent)
 
   ' handle rating
   ratingIsPresent = (m.rating.getParent() <> invalid)
-  if isNonEmptyArray(itemContent.ratings) = true AND isAA(itemContent.ratings[0]) = true
+  if isNonEmptyString(itemContent.rating) = true
     if ratingIsPresent = false
       ratingSotParent.insertChild(m.rating, insertIndex)
     end if
-
     m.ratingLabel.width = 0
-    m.ratingLabel.text = UCase(itemContent.ratings[0].value)
+    m.ratingLabel.text = UCase(itemContent.rating)
     nRatingBoundingBoxIncrease = m.ratingLabel.boundingRect().width + 24
     nRatingBoundingBoxIncrease = ensureDivisibleBy3(nRatingBoundingBoxIncrease)
     m.ratingBackground.width = nRatingBoundingBoxIncrease
@@ -301,6 +389,20 @@ Function metadataOnPosterContent(itemContent)
   else
     if ratingIsPresent = true
       ratingSotParent.removeChild(m.rating)
+    end if
+  end if
+
+  if isDetailScreenInfoPanel = true
+    displayRatingDescriptor(itemContent)
+
+    ' Display channel logo and name if available
+    if isNonEmptyString(itemContent.channelLogoShort) AND isNonEmptyString(itemContent.channelName)
+      if m.titleImage <> invalid
+        titleIndex = m.nodeHelpers.getChildIndex(m.metadataGroup, m.titleImage)
+      else
+        titleIndex = m.nodeHelpers.getChildIndex(m.metadataGroup, m.title)
+      end if
+      displayChannelInfo(itemContent.channelLogoShort, itemContent.channelName, titleIndex)
     end if
   end if
 
@@ -334,6 +436,7 @@ Function metadataOnPosterContent(itemContent)
   sotInfo = itemContent.sotInfo
   ' handle sotMetaData - append tubiPresentsLogo Poster to firstLineGroup if type is "tubiPresentsLogo"
   tubiPresentsLogoIsPresent = (m.tubiPresentsLogo.getParent() <> invalid)
+
   ' Remove the poster if no sotMetaData or no matching type
   if tubiPresentsLogoIsPresent = true
     m.firstLineGroup.removeChild(m.tubiPresentsLogo)
@@ -381,9 +484,18 @@ Function metadataOnPosterContent(itemContent)
   else
     m.firstLineGroup.removeChild(m.closedCaptions)
   end if
+
+  ' if the variant is detailScreenInfoPanel then we need to display rating descriptor codes (D, L, S, V, FV) also audio description badge if present
+  if isDetailScreenInfoPanel = true AND itemContent.hasAudioDescription = true
+    displayAudioDescriptionBadge()
+  end if
 End Function
 
 
+' Displays metadata for continue watching content
+' Shows progress bar and time remaining based on viewing history
+' Hides rating, closed captions, and SOT badge
+' @param itemContent - Content node with viewing history
 Function metadataOnContinueWatchingContent(itemContent)
   m.closedCaptions.visible = false
   m.rating.visible = false
@@ -416,7 +528,10 @@ Function metadataOnContinueWatchingContent(itemContent)
 End Function
 
 
-Function metadataOnLivePosterContent(currentProgram, content)
+' Displays metadata for live/linear content
+' Shows release date, program duration, and time remaining
+' @param currentProgram - Current program node with scheduling information
+Function metadataOnLivePosterContent(currentProgram)
   prefixTextParts = []
 
   releaseDate = currentProgram.releaseDate
@@ -443,6 +558,9 @@ Function metadataOnLivePosterContent(currentProgram, content)
 End Function
 
 
+' Displays rating information for live content
+' Shows or hides rating based on currentProgram rating field
+' @param currentProgram - Current program node with rating information
 Function displayLiveRating(currentProgram)
   firstLineGroup = m.firstLineGroup
   ' handle rating
@@ -467,55 +585,6 @@ Function displayLiveRating(currentProgram)
 End Function
 
 
-Function calculateProgramTimeLeft(program) as String
-  retVal = ""
-  now = getCurrentLocalTime()
-
-  if isInt(program.endTime) = true AND program.endTime > now
-    timeLeft = program.endTime - now
-    retVal = convertSecondsToTimeLeftString(timeLeft)
-  end if
-
-  return retVal
-End Function
-
-
-Function calculateProgramTime(program) as String
-  retVal = ""
-
-  if isInt(program.endTime) = true AND isInt(program.startTime) = true
-    duration = program.endTime - program.startTime
-    retVal = convertSecondsToHoursString(duration)
-  end if
-
-  return retVal
-End Function
-
-
-Function convertSecondsToHoursString(seconds as Integer) as String
-  retVal = ""
-
-  if seconds <> invalid
-    hourValue = Int(seconds / 3600)
-    minValue = Int(seconds / 60) mod 60
-    ' Not using translation for better performance since in all languages h and m are same.
-    ' Please refer h_m_left for reference.
-    if hourValue > 0 AND minValue > 0
-      retVal = Substitute("{0}h {1}m", hourValue.toStr(), minValue.toStr())
-    else if hourValue > 0
-      retVal = Substitute("{0}h", hourValue.toStr())
-    else
-      if minValue < 1
-        minValue = 1
-      end if
-      retVal = Substitute("{0}m", minValue.toStr())
-    end if
-  end if
-
-  return retVal
-End Function
-
-
 ' Triggers when the description text is ellipsized.
 Function onIsTextEllipsizedChange(msg)
   isTextEllipsized = msg.getData()
@@ -525,6 +594,8 @@ Function onIsTextEllipsizedChange(msg)
 End Function
 
 
+' Handles hideTitle field changes and shows/hides the title element
+' @param msg - Message containing hideTitle boolean value
 Function onHideTitleChange(msg)
   hideTitle = msg.getData()
   if m.title <> invalid
@@ -537,6 +608,8 @@ Function onHideTitleChange(msg)
 End Function
 
 
+' Handles isBillboardRow field changes and adjusts typography and spacing
+' @param msg - Message containing isBillboardRow boolean value
 Function onIsBillboardRowChange(msg)
   isBillboardRow = msg.getData()
   if isBillboardRow = true
@@ -548,6 +621,9 @@ Function onIsBillboardRowChange(msg)
 End Function
 
 
+' Renders subtitle/subheadline text parts with bullet separators
+' @param parts - Array of text strings to display
+' @param isPrefix - Boolean, true for prefix group, false for suffix group
 Function renderSubHeadline(parts, isPrefix)
   if isPrefix = true
     group = m.subHeadlinePrefixGroup
@@ -555,27 +631,37 @@ Function renderSubHeadline(parts, isPrefix)
     group = m.subHeadlineSuffixGroup
   end if
 
+  ' Determine typography font once before loop
+  typographyFont = m.bodySmallFont
+  if m.top.id = "videoTilesControlMetadata"
+    typographyFont = m.bodyMediumFont
+  end if
+
+  ' Collect labels in array for batch insertion
+  labels = []
   prefix = ""
   for each part in parts
-    label = createObject("roSGNode", "Label")
-    label.color = m.secondaryTextColor
-    isVideoTilesControlMetadata = m.top.id = "videoTilesControlMetadata"
-    if isVideoTilesControlMetadata = true
-      setTypographyOfLabel(label, m.bodyMediumFont)
-    else
-      setTypographyOfLabel(label, m.bodySmallFont)
-    end if
-    label.text = prefix + part
-    label.height = 40
-    label.vertAlign = "center"
-    group.appendChild(label)
+    label = createLabel(prefix + part, {
+      height: 40
+      color: m.secondaryTextColor
+      typographyFont: typographyFont
+      vertAlign: "center"
+    })
+    labels.push(label)
+
     if m.top.isBillboardRow = false
       prefix = " " + Chr(&hb7) + " "
     end if
   end for
+
+  ' Batch append all labels at once
+  if isNonEmptyArray(labels)
+    group.appendChildren(labels)
+  end if
 End Function
 
 
+' Handles width changes and adjusts description width accordingly
 Function onWidthChange()
   if m.top.descriptionWidth <= 0
     m.description.width = m.top.width
@@ -585,48 +671,214 @@ Function onWidthChange()
 End Function
 
 
-Function appendTitleToMetadataGroup()
-  m.title = createObject("roSGNode", "Label")
-  m.title.id = "title"
-  setTypographyOfLabel(m.title, m.headerSmallFont)
-  m.metadataGroup.insertChild(m.title, 0)
-  if m.variant = "trueControlTop2Rows" AND m.top.id = "videoTilesControlMetadata"
-    m.metadataGroup.itemSpacings = [18, 3, 15]
-  else if m.variant = "refinedControlTop2Rows" AND m.top.id = "videoTilesControlMetadata"
-    m.metadataGroup.itemSpacings = [15, 18]
-  else if m.variant = "cinematicTop2Rows" AND m.top.id = "videoTilesControlMetadata"
-    m.metadataGroup.itemSpacings = [9, 9]
+' Appends title label or title image to metadata group and configures spacing based on variant
+' For detailScreenInfoPanel with title art, displays poster image; otherwise displays text label
+' @param itemContent - Content node with title and titleImageUrl
+Function appendTitleToMetadataGroup(itemContent = invalid)
+  isDetailScreenInfoPanel = m.top.variant = "detailScreenInfoPanel"
+
+  ' Check if we should use title art (only for detailScreenInfoPanel variant)
+  useTitleArt = false
+  titleImageUrl = ""
+  if isDetailScreenInfoPanel AND itemContent <> invalid AND isNonEmptyString(itemContent.titleImageUrl)
+    useTitleArt = true
+    titleImageUrl = itemContent.titleImageUrl
+  end if
+
+  titleArtSectionHeight = 60
+  ' Create title image poster for detailScreenInfoPanel with title art
+  if useTitleArt
+    ' Since title image are different height and width. Creating a Transparent Rectangle to hold the title image with  height.
+    m.titleImage = CreateObject("roSGNode", "Rectangle")
+    m.titleImage.update({
+      id: "titleImage"
+      width: 360
+      height: titleArtSectionHeight
+      color: "0x00000000"
+    })
+    image = createPoster(titleImageUrl, {
+      id: "titleArt"
+      loadDisplayMode: "limitSize"
+      loadHeight: titleArtSectionHeight
+      loadWidth: 360
+    })
+    image.observeFieldScoped("loadStatus", "onTitleImageLoadStatus")
+    image.translation = [0, (titleArtSectionHeight - image.boundingRect().height)]
+    m.titleImage.appendChild(image)
+    m.metadataGroup.insertChild(m.titleImage, 0)
   else
+    ' Create text label for title
+    m.title = createObject("roSGNode", "Label")
+    m.title.id = "title"
+    if isDetailScreenInfoPanel
+      m.title.update({
+        width: 960
+        height: titleArtSectionHeight
+        vertAlign: "bottom"
+      })
+    end if
+    if isDetailScreenInfoPanel
+      setTypographyOfLabel(m.title, m.headerMediumFont)
+    else
+      setTypographyOfLabel(m.title, m.headerSmallFont)
+    end if
+    m.metadataGroup.insertChild(m.title, 0)
+  end if
+
+  isVideoTilesControlMetadata = m.top.id = "videoTilesControlMetadata"
+  if m.variant = "trueControlTop2Rows" AND isVideoTilesControlMetadata
+    m.metadataGroup.itemSpacings = [18, 3, 15]
+  else if m.variant = "refinedControlTop2Rows" AND isVideoTilesControlMetadata
+    m.metadataGroup.itemSpacings = [15, 18]
+  else if m.variant = "cinematicTop2Rows" AND isVideoTilesControlMetadata
+    m.metadataGroup.itemSpacings = [9, 9]
+  else if isDetailScreenInfoPanel = false
     m.metadataGroup.itemSpacings = [9, 3]
   end if
   setTypographyOfLabel(m.description, m.bodyMediumFont)
 End Function
 
 
-Function setupExpiresBadge(itemContent)
-  badgeInfo = getExpiresBadgeInfo(itemContent.availabilityEnds)
-  if badgeInfo <> invalid
-    m.sotBadge.textColor = m.focusedTextColor
-    m.sotBadge.text = badgeInfo.text
-    m.sotBadge.visible = true
-    m.firstLineGroup.appendChild(m.sotBadge)
+' Handles title image load status and falls back to text label on failure
+' @param msg - roSGNodeEvent containing loadStatus data
+Function onTitleImageLoadStatus(msg) as Void
+  status = msg.getData()
+  image = msg.getRoSGNode()
+  if status = "failed"
+    ' Remove failed title image
+    if m.titleImage <> invalid
+      m.metadataGroup.removeChild(m.titleImage)
+      m.titleImage = invalid
+    end if
+
+    ' Fallback to text label
+    m.title = createObject("roSGNode", "Label")
+    m.title.id = "title"
+    setTypographyOfLabel(m.title, m.headerSmallFont)
+    m.metadataGroup.insertChild(m.title, 0)
+
+    ' Set title text from itemContent if available
+    if m.top.itemContent <> invalid
+      m.title.text = m.top.itemContent.title
+    end if
+  else if status = "ready"
+    image.translation = [0, (m.titleImage.height - image.boundingRect().height)]
   end if
 End Function
 
 
+' Displays rating descriptor codes (D, L, S, V, FV) with descriptions
+' @param itemContent - Content node containing descriptorCode and descriptorDescription
+Function displayRatingDescriptor(itemContent) as Void
+  if itemContent.descriptorCode = invalid OR itemContent.descriptorCode = "" then return
+
+  descriptorCode = itemContent.descriptorCode.trim().split(" ")
+
+  ' Create all rating descriptor badges in an array
+  m.ratingDescriptorBadges = []
+  ratingSize = 27
+
+  for i = 0 to descriptorCode.count() - 1
+    code = descriptorCode[i]
+
+    ' Create rating code badge using mixin helper
+    codeBadge = createRatingDescriptorBadge(code, {
+      ratingSize: ratingSize
+      labelFont: m.bodyExtraSmallStrongFont
+      labelColor: m.secondaryTextColor
+    })
+
+    m.ratingDescriptorBadges.push(codeBadge)
+  end for
+
+  ' Insert badges into firstLineGroup after rating using appendChildren
+  ratingIndex = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.rating)
+  if ratingIndex <> -1
+    m.firstLineGroup.insertChildren(m.ratingDescriptorBadges, ratingIndex + 1)
+  end if
+End Function
+
+
+' Sets up and displays the "Expires Soon" badge if content is expiring
+' @param itemContent - Content node with availabilityEnds field
+Function setupExpiresBadge(itemContent) as Void
+  badgeInfo = getExpiresBadgeInfo(itemContent.availabilityEnds)
+  if badgeInfo = invalid then return
+
+  m.sotBadge.textColor = m.focusedTextColor
+  m.sotBadge.text = badgeInfo.text
+  m.sotBadge.visible = true
+  m.firstLineGroup.appendChild(m.sotBadge)
+End Function
+
+
+' Displays the audio description badge in the first line group
+Function displayAudioDescriptionBadge()
+  audioDescriptionIndex = m.nodeHelpers.getChildIndex(m.firstLineGroup, m.rating)
+
+  audioDescriptionPoster = createPoster("pkg:/images/icon-audio-description.webp", {
+    id: "audioDescriptionPoster"
+    width: 63
+    height: 27
+    loadDisplayMode: "scaleToFit"
+  })
+
+  m.firstLineGroup.insertChild(audioDescriptionPoster, audioDescriptionIndex)
+  m.audioDescriptionPoster = audioDescriptionPoster
+End Function
+
+
+' Renders genre tags in the metadata group
+' @param tags - String containing genre tags to display
 Function renderTags(tags)
   if m.tagsLabel <> invalid
     m.metadataGroup.removeChild(m.tagsLabel)
   end if
 
-  label = createObject("roSGNode", "Label")
-  label.id = "tags"
-  label.color = m.secondaryTextColor
-  setTypographyOfLabel(label, m.bodyMediumFont)
-  label.text = tags
-  label.height = 40
-  label.vertAlign = "center"
-  m.metadataGroup.insertChild(label, 2)
+  label = createLabel(tags, {
+    id: "tags"
+    height: 40
+    color: m.secondaryTextColor
+    typographyFont: m.bodyMediumFont
+    vertAlign: "center"
+  })
 
+  m.metadataGroup.insertChild(label, 2)
   m.tagsLabel = label
+End Function
+
+
+' Creates and displays channel/network information with logo and name
+' Creates a horizontal layout group containing the logo and channel name label
+' @param channelLogoUri - String, the URI for the channel logo
+' @param channelName - String, the name of the channel/network to display
+' @param titleIndex - Integer, index position to insert the channel info group
+Function displayChannelInfo(channelLogoUri as String, channelName as String, titleIndex as Integer) as Void
+  ' Create logo poster
+  networkLogo = createPoster(channelLogoUri, {
+    id: "networkLogo"
+    height: 40
+    width: 40
+    loadDisplayMode: "scaleToFit"
+  })
+
+  ' Create channel name label
+  channelNameLabel = createLabel(channelName, {
+    id: "channelNameLabel"
+    color: m.primaryTextColor
+    typographyFont: m.subheaderSmallFont
+    vertAlign: "center"
+    height: 40
+  })
+
+  ' Create horizontal layout group with logo and name
+  channelInfoGroup = createLayoutGroup("horiz", {
+    id: "channelInfoGroup"
+    itemSpacings: [9]
+    children: [networkLogo, channelNameLabel]
+  })
+
+  ' Insert into metadata group and cache references
+  m.metadataGroup.insertChild(channelInfoGroup, titleIndex + 1)
+  m.channelInfoGroup = channelInfoGroup
 End Function

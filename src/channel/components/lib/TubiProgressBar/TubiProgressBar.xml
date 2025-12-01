@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
  - TubiProgressBar
  -
@@ -8,33 +8,37 @@
  - Progress bar that manages 9-patch artifacts
  -
  -->
-<component name="TubiProgressBar" extends="Group" >
+<component name="TubiProgressBar" extends="Group">
   <script type="text/brightscript" uri="TubiProgressBar.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
 
   <interface>
     <!-- INPUT -->
 
-      <!-- The width of the progress bar -->
-      <field id="width"         type="float" />
-      <field id="height"        type="integer" value="16"/>
+    <!-- The width of the progress bar -->
+    <field id="width" type="float" />
+    <field id="height" type="integer" value="16" />
 
-      <!-- The percentage to fill the loading bar -->
-      <field id="progress"      type="float" value="0.0" />
-      <field id="trackColor"    alias="ProgressBarBackground.blendColor" />
-      <field id="focusColor"    type="color"/>
-      <field id="unfocusColor"  type="color"/>
+    <!-- The percentage to fill the loading bar -->
+    <field id="progress" type="float" value="0.0" />
+    <field id="trackColor" alias="ProgressBarBackground.blendColor" />
+    <field id="focusColor" type="color" />
+    <field id="unfocusColor" type="color" />
 
-      <!-- enable this field to show black scrubber on progress bar -->
-      <field id="highlightPointer" type="boolean" />
+    <!-- enable this field to show black scrubber on progress bar -->
+    <field id="highlightPointer" type="boolean" />
 
-      <field id="scaledUI"      type="boolean" value="false" />
+    <field id="scaledUI" type="boolean" value="false" />
 
-      <!-- The margin of the progress bar. This is useful when we have to translate the progress bar when placed inside layout group with alignment non custom value. -->
-      <field id="margin" alias="ProgressBarForeground.translation, ProgressBarBackground.translation" />
+    <!-- The margin of the progress bar. This is useful when we have to translate the progress bar
+    when placed inside layout group with alignment non custom value. -->
+    <field id="margin" alias="ProgressBarForeground.translation, ProgressBarBackground.translation" />
 
-      <!-- This is used to set the height of the pointer. This allows us to override the default height of the pointer. -->
-      <field id="pointerHeight" type="integer" value="32" alias="pointer.height"/>
+    <!-- This is used to set the height of the pointer. This allows us to override the default
+    height of the pointer. -->
+    <field id="pointerHeight" type="integer" value="32" alias="pointer.height" />
+
+    <field id="isInFocusChain" type="boolean" value="false" alwaysNotify="true" />
 
   </interface>
 
@@ -42,20 +46,20 @@
     <Poster
       id="ProgressBarBackground"
       uri="pkg:/images/transport/sgplayer/fhd/white-progress-foreground.9.png"
-      loadSync="true"/>
+      loadSync="true" />
 
     <!-- ProgressBarForeground width will be set based on current position -->
     <Poster
       id="ProgressBarForeground"
       uri="pkg:/images/transport/sgplayer/fhd/white-progress-foreground.9.png"
       loadSync="true"
-      visible="false"/>
+      visible="false" />
 
     <Poster
       id="pointer"
       width="32"
       height="32"
       uri="pkg:/images/transport/sgplayer/icon-pointer.webp"
-      visible="false"/>  
+      visible="false" />
   </children>
 </component>

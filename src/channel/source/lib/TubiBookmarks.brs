@@ -45,6 +45,7 @@ Function tubiBookmarks_addHistoryLocally(content as Object, position as Integer,
         childNode.lastSaved = nLastSaved
         childNode.nowPos = position
         childNode.type = content.type
+        childNode.contentLength = content.length
 
         if isNonEmptyString(content.historyId) = true
           childNode.historyId = content.historyId
@@ -62,6 +63,7 @@ Function tubiBookmarks_addHistoryLocally(content as Object, position as Integer,
       historyNode.lastSaved = nLastSaved
       historyNode.nowPos = position
       historyNode.type = content.type
+      historyNode.contentLength = content.length
 
       if isNonEmptyString(content.historyId) = true
         historyNode.historyId = content.historyId
@@ -151,6 +153,7 @@ Function tubiBookmarks_translateHistoryIds(initialHistory)
           child.historyId = history.id
           child.nowPos = history.position
           child.type = m.constants.ui.contentTypes.video
+          child.contentLength = history.content_length
         else if history.content_type = m.constants.uapiContentTypes.series
           child.id = "0" + childId
           child.historyId = history.id
@@ -170,6 +173,7 @@ Function tubiBookmarks_translateHistoryIds(initialHistory)
               grandchild.historyId = episode.id
               grandchild.nowPos = episode.position
               grandchild.type = m.constants.ui.contentTypes.video
+              grandchild.contentLength = episode.content_length
             end if
           end for
         end if

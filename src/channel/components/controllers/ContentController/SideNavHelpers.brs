@@ -492,6 +492,25 @@ Function getSideNavInteractionEvent(screen, trackingLib, userInteraction)
 End Function
 
 
+' Toggles screen enabled state and tracks side nav interaction event
+' @param enabled - Boolean to set screen.enabled property
+' @param userInteraction - String: "on" or "off" for tracking event type
+' @param shouldTrackComponentInteraction - Boolean to optionally track the event
+Function toggleScreenEnabledAndTrackSideNavEvent(enabled as Boolean, userInteraction as String, shouldTrackComponentInteraction = true as Boolean) as Void
+  topScreen = getCurrentScreen()
+  if topScreen <> invalid
+    if topScreen.hasField("enabled")
+      topScreen.enabled = enabled
+    end if
+
+    if shouldTrackComponentInteraction = true
+      interactionEvent = getSideNavInteractionEvent(topScreen, m.Tracking, userInteraction)
+      m.trackingLoggingTask.trackEvent = interactionEvent
+    end if
+  end if
+End Function
+
+
 
 Function displayNavMenu(shouldTrackComponentInteraction = true)
   bSideNavOpened = m.SideNav.opened
@@ -504,15 +523,7 @@ Function displayNavMenu(shouldTrackComponentInteraction = true)
 
     slideTo(m.screenStackGroup, [m.nOriginalScreenStackX + m.SideNav.width, m.screenStackGroup.translation[1]], .2)
 
-    topScreen = getCurrentScreen()
-    if topScreen <> invalid
-      topScreen.enabled = false
-
-      if shouldTrackComponentInteraction = true
-        interactionEvent = getSideNavInteractionEvent(topScreen, m.Tracking, "on")
-        m.trackingLoggingTask.trackEvent = interactionEvent
-      end if
-    end if
+    toggleScreenEnabledAndTrackSideNavEvent(false, "on", shouldTrackComponentInteraction)
   end if
 End Function
 
@@ -523,18 +534,7 @@ Function hideNavMenu(shouldTrackComponentInteraction = true)
 
     slideTo(m.screenStackGroup, [m.nOriginalScreenStackX, m.screenStackGroup.translation[1]], .3)
 
-    topScreen = getCurrentScreen()
-    if topScreen <> invalid
-      if topScreen.hasField("enabled")
-        topScreen.enabled = true
-      end if
-
-      if shouldTrackComponentInteraction = true
-        interactionEvent = getSideNavInteractionEvent(topScreen, m.Tracking, "off")
-        m.trackingLoggingTask.trackEvent = interactionEvent
-      end if
-
-    end if
+    toggleScreenEnabledAndTrackSideNavEvent(true, "off", shouldTrackComponentInteraction)
 
     ' Below logic is to handle the case where certain side nav items are disabled and user tries to navigate to them.
     ' We show a toast message to user that the feature is disabled. We need to reset the selected item indicator in the side nav to the current screen.

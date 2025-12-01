@@ -1,0 +1,137 @@
+<component name="VodDetailScreen" extends="BaseScreen">
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="VodDetailScreenAnalytics.brs" />
+  <script type="text/brightscript" uri="VodDetailScreen.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+    <field id="content" type="node" alias="VideoMetadataPanel.itemContent" />
+    <!-- contentUpdated field is used to trigger updates when content is modified.
+         This is necessary because the player screen modifies the content node directly without cloning,
+         which can trigger unwanted observer updates. Using alwaysNotify ensures controlled updates. -->
+    <field id="contentUpdated" type="boolean" value="false" alwaysNotify="true" />
+    <field id="trackingLoadStartTime" type="integer" />
+    <field id="playbackSource" type="assocarray" />
+    <field id="relatedContent" type="node" alias="relatedContentContainer.content" />
+    <field id="relatedContentUpdated" alias="relatedContentContainer.contentUpdated" />
+    <field id="shouldTrackViewableImpressionEvent" type="boolean" value="true" />
+    <field id="userSignedIn" type="boolean" value="false" />
+    <field id="seasonList" type="node" alias="episodesContainer.seasonList" />
+    <field id="episodes" type="node" alias="episodesContainer.episodes" />
+    <field id="defaultSelectedSeason" alias="episodesContainer.defaultSelectedSeason" />
+    <field id="isInKidsMode" type="boolean" value="false" />
+    <field id="selectedSideNavId" type="string" />
+    <!-- If the screen is not enabled, then user should not be able to select anything. Exiting
+    field set from stack helper. -->
+    <field id="wasContentFetchCompleted" type="boolean" alwaysNotify="true" />
+    <!-- Performance optimization: Two separate refresh fields to minimize unnecessary re-renders
+         - shouldRefreshButtonList: Refreshes only the button list (lightweight operation)
+         - shouldRefreshScreen: Refreshes buttons AND metadatapanel (heavier operation, used for series
+    autoplay
+    into next episode, etc.)
+         Separating these fields prevents unnecessary metapanel refreshes when only buttons need updating -->
+    <field id="shouldRefreshButtonList" type="boolean" value="false" alwaysNotify="true" />
+    <field id="shouldRefreshScreen" type="boolean" value="false" alwaysNotify="true" />
+
+    <!-- OUTPUTS -->
+    <field id="backButtonPressed" type="boolean" alwaysNotify="true" />
+    <field id="openSideNav" type="boolean" alwaysNotify="true" />
+    <field id="selectedRelatedContent" alias="relatedContentContainer.selectedContent" />
+    <field id="focusedSeason" alias="episodesContainer.focusedSeason" />
+    <field id="selectedEpisode" alias="episodesContainer.selectedEpisode" />
+    <field id="selectedSection" type="string" alwaysNotify="true" />
+    <field id="ctaSelectedButtonId" type="string" alwaysNotify="true" />
+    <field id="shouldPauseVideoPreview" type="boolean" alwaysNotify="true" />
+  </interface>
+
+  <children>
+    <Poster
+      id="gradient"
+      uri="pkg:/images/details_above_fold_gradient_$$RES$$.webp"
+      width="1920"
+      height="1080" />
+
+    <Poster
+      id="belowFoldGradient"
+      uri="pkg:/images/details_below_fold_gradient.png"
+      width="1920"
+      height="1080" />
+
+    <Poster
+      id="leftChevron"
+      uri="pkg:/images/left-chevron.png"
+      width="15"
+      height="27"
+      translation="[75,528]"
+      visible="false" />
+
+    <Group
+      id="contentGroup">
+      <FocusControlLayoutGroup
+        itemSpacings="[60, 63, 24]"
+        horizAlignment="custom"
+        id="contentContainer">
+
+        <VideoMetadataPanel
+          id="videoMetadataPanel"
+          width="960"
+          minHeight="312"
+          descriptionWidth="960" />
+
+        <EnhancedButtonList
+          id="actionButtonList"
+          layoutDirection="horiz"
+          buttonSpacing="[15]" />
+
+        <EnhancedButtonList
+          id="sectionTabs"
+          buttonHeight="72"
+          padding="33"
+          showInactiveFocusState="true"
+          buttonBackgroundUri="pkg:/images/tabs-bg-$$RES$$.9.png"
+          layoutDirection="horiz"
+          buttonSpacing="[15]" />
+
+        <FocusControlGroup
+          id="additionalContentContainer"
+          opacity="0.5">
+          <RelatedContentContainer
+            id="relatedContentContainer"
+            visible="false"
+            variant="portraitWithMetadata" />
+          <VideoDetailsPanel
+            visible="false"
+            id="videoDetailsPanel" />
+          <EpisodeListContainer
+            visible="false"
+            id="episodesContainer" />
+        </FocusControlGroup>
+      </FocusControlLayoutGroup>
+    </Group>
+    <Group
+      id="contentTitle"
+      opacity="0"
+      translation="[225, 72]">
+      <Rectangle
+        id="transparentSpacer"
+        width="1"
+        height="54"
+        color="0x00000000" />
+      <Label
+        id="contentTitleLabel"
+        height="54"
+        width="1440"
+        vertAlign="center" />
+      <Poster
+        id="contentTitleImage"
+        loadDisplayMode="limitSize"
+        loadWidth="179"
+        loadHeight="54" />
+    </Group>
+  </children>
+</component>

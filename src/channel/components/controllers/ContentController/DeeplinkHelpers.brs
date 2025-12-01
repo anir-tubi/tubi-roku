@@ -988,8 +988,8 @@ Function handleSingleContentDeeplinkError(error)
     if m.deepLinkContent.deeplinkType = "movie" OR m.deepLinkContent.deeplinkType = "sports" OR m.deepLinkContent.deeplinkType = "tvspecial"
       detailScreen = getTopDetailScreenFromStack()
       if detailScreen <> invalid AND detailScreen.content.id = m.deepLinkContent.id
-        'Simply popping the screen is resulting in issues, so calling onDetailBackPressed function.
-        onDetailBackPressed()
+        'Simply popping the screen is resulting in issues, so calling onDetailBackButtonPressedChange function.
+        onDetailBackButtonPressedChange()
       end if
     end if
 

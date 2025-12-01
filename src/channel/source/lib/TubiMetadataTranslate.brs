@@ -406,6 +406,12 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, t
     else
       translatedContent.parentId = invalid
     end if
+
+    if contentFromServer.num_seasons <> invalid AND contentFromServer.num_seasons > 0
+      translatedContent.update({
+        seasons: contentFromServer.num_seasons
+      }, true)
+    end if
   end if
 
   'translate all the stuff from the server
@@ -418,6 +424,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, t
     translatedContent.categories = contentFromServer.tags 'array of genres
   end if
 
+  if contentFromServer.num_seasons <> invalid AND contentFromServer.num_seasons > 0 then translatedContent.seasons = contentFromServer.num_seasons
   if contentFromServer.slug <> invalid then translatedContent.slug = contentFromServer.slug
   if contentFromServer.lang <> invalid then translatedContent.language = contentFromServer.lang
   if contentFromServer.publisher_id <> invalid then translatedContent.pubId = contentFromServer.publisher_id
@@ -768,6 +775,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, t
   if contentFromServer.channel_id <> invalid then translatedContent.channelId = contentFromServer.channel_id
   if contentFromServer.channel_logo <> invalid then translatedContent.inlineLogoUri = contentFromServer.channel_logo
   if contentFromServer.channel_name <> invalid then translatedContent.channelName = contentFromServer.channel_name
+  if contentFromServer.channel_logo_short <> invalid then translatedContent.channelLogoShort = contentFromServer.channel_logo_short
 
   '//::TODO::roku_spotlight_carousel_v1 - The backend needs to create a better way to determine if this is a TubiOriginal.
   '//   After the experiment, ensure there is a better way.
@@ -1729,6 +1737,11 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
 
           if isUserInVideoTilesExp = true
             featuredLandscape = m.getRoundedCornersURL(m.getThumbnailImage(fullChild, m.constants.ui.gridItemTypes.landscapeWithMetadata))
+            rating = ""
+            if isNonEmptyArray(fullChild.ratings) = true AND isAA(fullChild.ratings[0]) = true
+              rating = fullChild.ratings[0].value
+            end if
+
             controlLandscape = m.getRoundedCornersURL(m.getThumbnailImage(fullChild, m.constants.ui.gridItemTypes.controlLandscape))
             childAA = {
               id: fullChild.id
@@ -1736,10 +1749,10 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
               description: fullChild.description
               length: fullChild.duration
               subtype: sType
-              tags: fullChild.tags
-              year: fullChild.year
+              genres: fullChild.tags
+              releaseDate: tostr(fullChild.year)
               duration: fullChild.length
-              ratings: fullChild.ratings
+              rating: rating
               titleImageUrl: titleImage
               thumbnailUri: thumbnailUri
               seasons: seasons
@@ -2359,6 +2372,19 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
             videoResourcesIndex = codecToVideoResourcesIndexMap[codec]
           end if
 
+          if isNonEmptyArray(video.audio_tracks)
+            audioTracks = video.audio_tracks
+            audioLanguages = []
+            if isNonEmptyArray(audioTracks)
+              for each track in audioTracks
+                if track.type <> "AUDIO_DESCRIPTOR"
+                  audioLanguages.push(track.lang)
+                end if
+              end for
+            end if
+            resource.audioLanguages = audioLanguages
+          end if
+
           videoResources[videoResourcesIndex].push(resource)
 
         end if
@@ -2944,7 +2970,7 @@ End Function
 '     ]
 Function tubiMetadataTranslate_setDescriptorCodeAndDescription(content, descriptors)
 
-  if content <> invalid AND descriptors <> invalid AND descriptors.Count() > 1
+  if content <> invalid AND descriptors <> invalid AND descriptors.Count() > 0
 
     descriptor_code = ""
     descriptor_desc = ""

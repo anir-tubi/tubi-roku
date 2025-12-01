@@ -199,6 +199,8 @@ Function newBackgroundSet()
       if backgroundType = backgroundTypes.cinematic
         fade(m.fullScreenPosterGradient2, "out", 0)
         fade(m.videoTilesBackgroundGradient, "in", 0.5)
+      else if m.top.screenId = m.constants.ui.screenIds.vodDetailScreen
+        fade(m.fullScreenPosterGradient2, "out", 0)
       else
         fade(m.fullScreenPosterGradient2, "in", 0.5)
       end if

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="EpisodeListContainer" extends="FocusControlGroup">
+
+  <script type="text/brightscript" uri="EpisodeListContainer.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/WidgetMixin.brs" />
+
+
+  <interface>
+    <!-- INPUTS -->
+    <field id="episodes" type="node" />
+    <field id="seasonList" type="assocarray" />
+    <field id="defaultSelectedSeason" type="integer" value="-1" />
+    <field id="showSeasonSelector" type="boolean" value="false" alwaysNotify="true" />
+    <field id="seriesId" type="string" />
+
+    <!-- OUTPUTS -->
+    <field id="focusedSeason" type="integer" />
+    <field id="selectedEpisode" type="node" alwaysNotify="true" />
+    <field id="navigateWithinPageInfo" type="assocarray" />
+    <field id="trackingContext" type="assocarray" />
+  </interface>
+
+  <children>
+    <RowList
+      id="seasonButtonsList"
+      itemComponentName="SeasonButton"
+      numRows="1"
+      visible="false"
+      rowItemSpacing="[[15,0]]"
+      itemSize="[1800, 72]"
+      rowHeights="[72]"
+      rowItemSize="[[192, 72]]"
+      showRowCounter="[false]"
+      showRowLabel="[false]"
+      drawFocusFeedback="false"
+      rowFocusAnimationStyle="floatingFocus" />
+
+    <MarkupGrid
+      id="episodeGrid"
+      itemComponentName="EpisodeItem"
+      numRows="1"
+      numColumns="3"
+      itemSpacing="[15, 15]"
+      fadeFocusFeedbackWhenAutoScrolling="true"
+      horizFocusAnimationStyle="fixedFocus"
+      focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+      focusFootprintBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+      focusFootprintBlendColor="#00000000" />
+  </children>
+
+</component>

@@ -4,12 +4,14 @@
   <script type="text/brightscript" uri="ExpandedTileMetadata.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/ContentMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/WidgetMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/VideoMetadataMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
@@ -25,6 +27,7 @@
     <field id="width" type="float" />
     <field id="hideTitle" type="boolean" value="true" />
     <field id="descriptionWidth" type="float" value="0" />
+    <field id="variant" type="string" />
     <field id="isBillboardRow" type="boolean" />
   </interface>
 

@@ -39,6 +39,8 @@ screens), fullscreen (detail, search screens)
     <field id="posterVisible" type="boolean" value="true" />
 
     <field id="circularMaskColor" type="string" />
+
+    <field id="screenId" type="string" />
   </interface>
 
   <children>

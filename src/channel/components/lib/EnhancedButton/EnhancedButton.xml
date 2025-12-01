@@ -16,20 +16,27 @@
     <field id="itemContent" type="node" />
     <field id="itemHasFocus" type="boolean" />
     <field id="gridHasFocus" type="boolean" />
+    <field id="hideFocusFootprint" type="boolean" value="false" alwaysNotify="true" />
+    <field id="backgroundUri" type="string" value="pkg:/images/pill_button_$$RES$$.9.png" />
+    <field id="backgroundBlendColor" type="string" />
+    <field id="padding" type="integer" value="48" />
 
     <!-- OUTPUTS -->
     <!-- Helps us with width calculation when we want to use with ArrayGrid -->
     <field id="calculatedTextWidth" type="integer" />
     <field id="wasSelected" type="boolean" alwaysNotify="true" />
+    <field id="wasFocused" type="boolean" alwaysNotify="true" />
   </interface>
 
   <children>
     <Poster
-      id="buttonBackground"
-      uri="pkg:/images/pill_button_$$RES$$.9.png" />
+      uri="pkg:/images/pill_button_$$RES$$.9.png"
+      loadSync="true"
+      id="buttonBackground" />
 
     <Poster
       opacity="0"
+      loadSync="true"
       id="buttonBackgroundFocused" />
 
     <LayoutGroup
@@ -41,32 +48,50 @@
       <Group
         id="iconGroup">
         <Poster
+          loadSync="true"
           id="icon"
           height="36"
           width="36" />
 
         <Poster
           opacity="0"
+          loadSync="true"
           id="iconFocused"
           height="36"
           width="36" />
       </Group>
 
-      <Group
-        id="labelGroup">
+      <LayoutGroup
+        id="titleGroup"
+        itemSpacings="[3]">
+        <Group
+          id="labelGroup">
+          <Label
+            id="label">
+            <Font
+              role="font" />
+          </Label>
+
+          <Label
+            opacity="0"
+            id="labelFocused">
+            <Font
+              role="font" />
+          </Label>
+        </Group>
+
         <Label
-          id="label">
+          id="subtitle">
           <Font
             role="font" />
         </Label>
 
-        <Label
-          opacity="0"
-          id="labelFocused">
-          <Font
-            role="font" />
-        </Label>
-      </Group>
+        <TubiProgressBar
+          id="progressBar"
+          width="195"
+          height="6"
+          pointerHeight="6" />
+      </LayoutGroup>
 
       <Group
         id="badgeGroup">

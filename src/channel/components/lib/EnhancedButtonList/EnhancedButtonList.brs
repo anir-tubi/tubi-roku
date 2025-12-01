@@ -1,0 +1,184 @@
+' Initializes the EnhancedButtonList component
+' Sets up node helpers, constants, observers, and theme
+Function init() as Void
+  m.nodeHelpers = TubiNodeHelpers()
+  m.constants = getConstantsFromGlobal()
+  m.buttons = []
+
+  topRef = m.top
+  topRef.observeFieldScoped("buttons", "onButtonsChange")
+  topRef.observeFieldScoped("buttonSpacing", "onButtonSpacingChange")
+  topRef.observeFieldScoped("buttonBackgroundBlendColor", "onButtonBackgroundBlendColorChange")
+  topRef.observeFieldScoped("focusedChild", "onButtonListFocusChange")
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+' Handles theme changes and caches color values
+' @param msg - Optional message object containing theme data
+Function onThemeChange(msg = invalid) as Void
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+
+  if theme <> invalid
+    m.primaryTextColor = theme.primaryTextColor
+    m.secondaryTextColor = theme.secondaryTextColor
+    m.focusedColor = theme.focusedColor
+    m.unfocusedColor = theme.unfocusedColor
+  end if
+End Function
+
+
+' Handles focus changes for the button list
+' Updates inactive focus state when list loses focus and showInactiveFocusState is enabled
+' @param msg - Message object containing focus change data
+Function onButtonListFocusChange(msg as Object) as Void
+  if m.top.showInactiveFocusState = true
+    updateInactiveFocusState()
+  end if
+End Function
+
+
+' Handles buttons array changes
+' Clears existing buttons and creates new ones from the provided button data
+' @param msg - Message object containing buttons array
+Function onButtonsChange(msg as Object) as Void
+  buttons = msg.getData()
+
+  m.nodeHelpers.removeAllChildren(m.top)
+
+  buttonList = []
+
+  if isNonEmptyArray(buttons) = true
+    for each info in buttons
+      button = createButton(info)
+      buttonList.push(button)
+    end for
+  end if
+
+  if isNonEmptyArray(buttonList) = true
+    m.top.appendChildren(buttonList)
+    ' Cache reference to button nodes for later use
+    m.buttons = buttonList
+  else
+    m.buttons = []
+  end if
+
+  if m.top.showInactiveFocusState = true
+    updateInactiveFocusState()
+  end if
+End Function
+
+
+' Creates an EnhancedButton node from button data
+' Configures button properties, content, and sets up event observers
+' @param buttonData - AssocArray containing button configuration (id, title, height, etc.)
+' @return roSGNode - Configured EnhancedButton node
+Function createButton(buttonData as Object) as Object
+  button = CreateObject("roSGNode", "EnhancedButton")
+  button.id = buttonData.id
+  button.backgroundUri = m.top.buttonBackgroundUri
+  if isNonEmptyString(m.top.buttonBackgroundBlendColor)
+    button.backgroundBlendColor = m.top.buttonBackgroundBlendColor
+  end if
+  button.padding = m.top.padding
+
+  if buttonData.height <> invalid
+    button.height = buttonData.height
+  else
+    button.height = m.top.buttonHeight
+  end if
+
+  itemContent = CreateObject("roSGNode", "ContentNode")
+  itemContent.update(buttonData, true)
+  button.itemContent = itemContent
+
+  ' Set up selection and focus handlers
+  button.observeFieldScoped("wasSelected", "onButtonSelected")
+  button.observeFieldScoped("wasFocused", "onButtonFocused")
+
+  return button
+End Function
+
+
+' Handles button selection events
+' Propagates button selection data (id, title, button node) to parent
+' @param msg - Message object from button selection event
+Function onButtonSelected(msg as Object) as Void
+  button = msg.getRoSGNode()
+  buttonData = button.itemContent
+
+  if buttonData = invalid then return
+
+  m.top.buttonSelected = {
+    id: buttonData.id
+    title: buttonData.title
+    button: button
+  }
+End Function
+
+
+' Handles button focus events
+' Tracks focused and unfocused button states for navigation analytics
+' @param msg - Message object from button focus event
+Function onButtonFocused(msg as Object) as Void
+  button = msg.getRoSGNode()
+  wasFocused = msg.getData()
+  buttonData = button.itemContent
+
+  if buttonData = invalid OR wasFocused = false then return
+
+  m.top.buttonUnFocused = m.top.buttonFocused
+  m.top.buttonFocused = {
+    id: buttonData.id
+    title: buttonData.title
+    button: button
+  }
+
+  m.top.trackingContext = buttonData.trackingContext
+End Function
+
+
+' Handles button spacing changes
+' Updates the layout group's itemSpacings based on buttonSpacing field
+' @param msg - Message object containing spacing array
+Function onButtonSpacingChange(msg as Object) as Void
+  m.top.itemSpacings = msg.getData()
+End Function
+
+
+' Handles buttonBackgroundBlendColor changes
+' Updates all existing buttons' backgroundBlendColor when the field changes
+' @param msg - Message object containing blend color string
+Function onButtonBackgroundBlendColorChange(msg as Object) as Void
+  blendColor = msg.getData()
+  if isNonEmptyArray(m.buttons)
+    for each button in m.buttons
+      button.backgroundBlendColor = blendColor
+    end for
+  end if
+End Function
+
+
+' Updates inactive focus state for buttons
+' Shows focus footprint only on the currently focused button when list is not in focus chain
+Function updateInactiveFocusState() as Void
+  if not isNonEmptyArray(m.buttons) then return
+
+  focusedIndex = m.top.focusedIndex
+  if focusedIndex = -1
+    focusedIndex = 0
+  end if
+
+  for i = 0 to m.buttons.count() - 1
+    button = m.buttons[i]
+    button.hideFocusFootprint = (i <> focusedIndex)
+  end for
+End Function

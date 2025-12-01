@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="VideoDetailsPanel" extends="Group">
+
+  <script type="text/brightscript" uri="VideoDetailsPanel.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/VideoMetadataMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/WidgetMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
+
+  <interface>
+    <field id="itemContent" type="node" />
+  </interface>
+
+  <children>
+    <LayoutGroup
+      id="mainContainer"
+      translation="[33, -6]"
+      vertAlignment="custom"
+      layoutDirection="horiz"
+      itemSpacings="[120]">
+
+      <LayoutGroup
+        id="leftColumn"
+        layoutDirection="vert"
+        itemSpacings="[48]">
+      </LayoutGroup>
+
+      <LayoutGroup
+        id="rightColumn"
+        layoutDirection="vert"
+        itemSpacings="[42]">
+      </LayoutGroup>
+
+    </LayoutGroup>
+  </children>
+
+</component>

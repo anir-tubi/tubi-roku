@@ -819,8 +819,16 @@ End Function
 '   - Deep link: exit video player movie after autoplay       : 2 - redraw detail screen with autoplayed content from video player; fetch new related items
 '   - Deep link: Exit video player series                     : 3 - redraw detail screen with existing detail content to updated resume positions; preserve related items
 '   - Deep link: Exit video player series after autoplay      : 4 - redraw detail screen with autoplayed episode metadata, but maintain series content; preserve related items
-Function returnToDetailScreenFromVideo(sendAnalyticsEvent, shouldUpdateEpisodeScreenContent, reason)
+Function returnToDetailScreenFromVideo(sendAnalyticsEvent, shouldUpdateEpisodeScreenContent, reason) as Void
   tubiLog("VideoHelpers.returnToDetailScreenFromVideo")
+
+  experiment = getStatsigExperimentResource("roku_content_details", "roku_content_details_v1", false)
+  if experiment.enabled = true
+    ' Show new content details screen
+    refreshVodDetailScreenAfterPlayback(sendAnalyticsEvent, reason)
+    return
+  end if
+
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
 
   'local variable helps to remove the episode list screen in between player and detail screen
@@ -1033,9 +1041,21 @@ End Function
 
 ' can fire from videoPlayer.skipTrailer or videoPlayer.goToNext fields
 ' if a trailer is playing.
-Function onSkipTrailer(msg)
+Function onSkipTrailer(msg) as Void
   tubiLog("VideoHelpers.onSkipTrailer")
   skipTrailer = msg.getData()
+  experiment = getStatsigExperimentResource("roku_content_details", "roku_content_details_v1", false)
+  if experiment.enabled = true AND skipTrailer = true
+    videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
+    if videoPlayer <> invalid AND videoPlayer.content <> invalid
+      screen = getHiddenScreen()
+      if screen <> invalid AND screen.id = m.constants.ui.screenIds.vodDetailScreen AND screen.content <> invalid
+        stopVideoContent(videoPlayer)
+        playSelectedVodContent(screen.content, screen.playbackSource, screen.episodes)
+      end if
+    end if
+    return
+  end if
 
   if skipTrailer = true
     videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)

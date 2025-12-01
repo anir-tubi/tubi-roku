@@ -4,6 +4,7 @@ Function init()
   m.top.observeField("push", "onPush")
   m.top.observeField("shrinkStack", "onShrinkStack")
   m.top.observeField("idToRemoveScreenFromStack", "onIdToRemoveScreenFromStack")
+  m.top.observeField("screenToRemove", "onScreenToRemove")
   m.top.observeField("clearStack", "onClearStack")
   m.top.observeField("focusCurrent", "onSetCurrentFocusCommand")
 End Function
@@ -132,6 +133,17 @@ Function onIdToRemoveScreenFromStack(msg)
       i = i - 1
     end while
 
+  end if
+End Function
+
+
+' Removes a specific screen node from the stack
+' @param msg - Message containing the screen node to remove
+Function onScreenToRemove(msg)
+  screenToRemove = msg.getData()
+  if screenToRemove <> invalid
+    m.nodeHelpers.unobserveAllScoped(screenToRemove)
+    m.top.removeChild(screenToRemove)
   end if
 End Function
 

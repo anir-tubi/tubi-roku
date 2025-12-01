@@ -13,6 +13,7 @@ Function CmsApi(constants, apiUtils, experiments = invalid, statSigExperiments =
     createRelatedContentReqInfo: cmsApi_createRelatedContentReqInfo
     createUpNextContentReqInfo: cmsApi_createUpNextContentReqInfo
     createSingleContentReqInfo: cmsApi_createSingleContentReqInfo
+    createSeriesEpisodesBySeasonReqInfo: cmsApi_createSeriesEpisodesBySeasonReqInfo
     createThumbnailsReqInfo: cmsApi_createThumbnailsReqInfo
     createCategoriesListReqInfo: cmsApi_createCategoriesListReqInfo
     createAdHomescreenDisplayContainerReqInfo: cmsApi_createAdHomescreenDisplayContainerReqInfo
@@ -25,6 +26,7 @@ Function CmsApi(constants, apiUtils, experiments = invalid, statSigExperiments =
     createMyStuffScreenBatchReqInfo: cmsApi_createMyStuffScreenBatchReqInfo
     createHomeScreenBatchReqInfoForContainers: cmsApi_createHomeScreenBatchReqInfoForContainers
     createGetContainerContentsReqInfo: cmsApi_createGetContainerContentsReqInfo
+    createGetSeasonListBySeriesIdReqInfo: cmsApi_createGetSeasonListBySeriesIdReqInfo
 
 
     ' private
@@ -117,6 +119,38 @@ Function cmsApi_createSingleContentReqInfo(contentId, includeChannels = false, b
   options = m.getCommonOptions(true)
 
   options.params["content_id"] = contentId
+  options.params["isKidsMode"] = bKidsMode
+  options.params["includeChannels"] = includeChannels
+  options.params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
+  options.params["limit_resolutions"] = m.constants.player.limitResolutions
+  options.params = m.setImageParams(["title", "landscape", "background"], options.params)
+
+  capability = formatJson({ "content_types": ["se"] })
+  options.headers.append({ "x-capability": capability })
+  url = m.constants.urls.content.singleContent
+
+  return {
+    url: url
+    options: options
+  }
+End Function
+
+
+' Creates request info for fetching series episodes by season with pagination
+' Similar to createSingleContentReqInfo but with pagination parameters for episodes
+' @seriesId: string, the ID of the series to get episodes for
+' @season: integer, the season number to fetch episodes from (default: 1)
+' @pageInSeason: integer, the page number within the season (default: 1)
+' @pageSizeInSeason: integer, the number of episodes per page (default: 10)
+' @includeChannels: boolean, include channel information (default: false)
+' @bKidsMode: boolean, Are we in kids mode (default: false)
+Function cmsApi_createSeriesEpisodesBySeasonReqInfo(seriesId, season = 1, pageInSeason = 1, pageSizeInSeason = 10, includeChannels = false, bKidsMode = false)
+  options = m.getCommonOptions(true)
+
+  options.params["content_id"] = seriesId
+  options.params["pagination[season]"] = season
+  options.params["pagination[page_in_season]"] = pageInSeason
+  options.params["pagination[page_size_in_season]"] = pageSizeInSeason
   options.params["isKidsMode"] = bKidsMode
   options.params["includeChannels"] = includeChannels
   options.params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
@@ -985,4 +1019,41 @@ Function cmsApi_createGetContainerContentsReqInfo(category, homeScreen, bKidsMod
   end if
 
   return categoryReqInfo
+End Function
+
+
+' Creates request info for fetching series episodes
+' @seriesId: string, the ID of the series to get episodes for
+' @bKidsMode: boolean, Are we in kids mode
+' @passedOptions: assocArray, additional options (params, headers, etc.)
+Function cmsApi_createGetSeasonListBySeriesIdReqInfo(seriesId, bKidsMode = false, passedOptions = {})
+  url = m.constants.urls.content.seriesEpisodes + "/" + seriesId + "/episodes"
+
+  options = m.getCommonOptions(true)
+  params = options.params
+  headers = options.headers
+
+  params["is_kids_mode"] = bKidsMode
+  params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
+  params["limit_resolutions"] = m.constants.player.limitResolutions
+
+  if passedOptions <> invalid
+    if passedOptions.params <> invalid
+      params.append(passedOptions.params)
+    end if
+
+    if passedOptions.headers <> invalid
+      headers.append(passedOptions.headers)
+    end if
+
+    options.append(passedOptions)
+  end if
+
+  options.params = params
+  options.headers = headers
+
+  return {
+    url: url
+    options: options
+  }
 End Function

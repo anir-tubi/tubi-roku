@@ -110,6 +110,18 @@ Function registerParsingCallbacks()
     parseSuccess: parseDetailScreenRelatedContentSuccess
   }
 
+  ' season list by series ID
+  m.requestTypes[m.constants.reqNames.getSeasonListBySeriesId] = {
+    parseSuccess: parseSeasonListSuccess
+    parseError: parseGenericError
+  }
+
+  ' series episodes by season
+  m.requestTypes[m.constants.reqNames.getSeriesEpisodesBySeason] = {
+    parseSuccess: parseSeriesEpisodesBySeasonSuccess
+    parseError: parseGenericError
+  }
+
   'epgChannelIds
   m.requestTypes[m.constants.reqNames.getEPGChannelIds] = {
     parseSuccess: parseEPGChannelIdsSuccess

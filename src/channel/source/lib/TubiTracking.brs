@@ -1164,6 +1164,14 @@ Function tubiTracking_getOneOfs()
     dest_middle_nav_component: section_middleNav
 
     dest_search_suggestions_component: search_suggestions_component
+
+    dest_related_component: {
+      content_tile: {} ' ContentTile message
+    }
+
+    dest_episode_video_list_component: {
+      content_tile: {} ' ContentTile message
+    }
   }
 
   ' At some point we may need to split the component "Oneof" like we did with the page and dest_page "Oneof"

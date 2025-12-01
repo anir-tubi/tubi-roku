@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="VideoMetadataPanel" extends="Group">
+
+  <script type="text/brightscript" uri="VideoMetadataPanel.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/VideoMetadataMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StatsigExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StatsigLib.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/StatsigExperimentMixin.brs" />
+
+  <interface>
+    <field id="itemContent" type="node" alias="infoPanel.itemContent" />
+    <field id="currentEpisode" type="node" />
+    <field id="width" type="float" />
+    <field id="descriptionWidth" type="float" value="0" />
+    <field id="minHeight" alias="minHeightTransparentRectangle.height" />
+  </interface>
+
+  <children>
+    <Rectangle
+      id="minHeightTransparentRectangle"
+      width="1"
+      color="0x00000000" />
+    <LayoutGroup
+      id="metadataGroup"
+      itemSpacings="[15]">
+      <ExpandedTileMetadata
+        id="infoPanel"
+        width="960"
+        variant="detailScreenInfoPanel" />
+
+      <LayoutGroup
+        id="additionalInfoItemsContainer"
+        layoutDirection="vert"
+        itemSpacings="[3]">
+      </LayoutGroup>
+    </LayoutGroup>
+
+
+  </children>
+</component>

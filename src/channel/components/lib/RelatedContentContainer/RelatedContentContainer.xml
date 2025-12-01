@@ -19,12 +19,16 @@
     <field id="trackingPageInfo" type="assocarray" />
     <field id="jumpToItem" alias="grid.jumpToItem" />
     <field id="hideTitle" alias="title.visible" />
+    <!-- variant of the related content container. Possible values: portraitWithTitle,
+    portraitWithMetadata, landscapeEpisodeMetadata -->
+    <field id="variant" type="string" value="portraitWithTitle" />
 
     <!-- OUTPUTS -->
     <field id="navigateWithinPageInfo" type="assocarray" />
-    <field id="trackingComponentInfo" type="assocarray" />
+    <field id="trackingContext" type="assocarray" />
     <field id="selectedContent" type="node" alwaysNotify="true" />
     <field id="focusedContent" type="node" alwaysNotify="true" />
+    <field id="focusedIndex" alias="grid.itemFocused" />
   </interface>
 
   <children>

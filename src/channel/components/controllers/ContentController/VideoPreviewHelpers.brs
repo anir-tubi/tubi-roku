@@ -95,25 +95,18 @@ Function onVideoPreviewStateChanged(msg)
       m.inlineVideoMetadataOverlay.showContentPoster = true
     else
       m.inlineVideoMetadataOverlay.showContentPoster = false
-
-      showVideoPreviewPlayer = currentScreen.isInFocusChain() = true OR currentScreen.lastFocusedList <> "featuredRowList"
-      videoPreview.visible = (showVideoPreviewPlayer = true)
-
-      bDisplayBackgroundGroup = (showVideoPreviewPlayer = false)
-      if currentScreen.contentFocused <> invalid AND currentScreen.contentFocused.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
-        '//Keep the background group visible for adRowlistSpotlight content
-        bDisplayBackgroundGroup = true
-      end if
-      m.backgroundGroup.posterVisible = bDisplayBackgroundGroup
     end if
     if m.inlinePreviewPlayerFadeAnimation <> invalid
       m.inlinePreviewPlayerFadeAnimation.control = "stop"
     end if
     m.videoPreviewPlayer.opacity = 1
 
-    showVideoPreviewPlayer = (currentScreen <> invalid AND currentScreen.isInFocusChain() = true) OR currentScreen.lastFocusedList <> "featuredRowList"
-    videoPreview.visible = (showVideoPreviewPlayer = true)
-    m.backgroundGroup.posterVisible = (showVideoPreviewPlayer = false)
+    isVodDetailPaused = (currentScreen.id = m.constants.ui.screenIds.vodDetailScreen AND currentScreen.shouldPauseVideoPreview = true)
+    showVideoPreviewPlayer = (currentScreen.isInFocusChain() = true OR currentScreen.lastFocusedList <> "featuredRowList") AND not isVodDetailPaused
+    videoPreview.visible = showVideoPreviewPlayer
+
+    isAdRowlistSpotlight = (currentScreen.contentFocused <> invalid AND currentScreen.contentFocused.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight)
+    m.backgroundGroup.posterVisible = not showVideoPreviewPlayer OR isAdRowlistSpotlight
   else if videoPreviewState = "error"
     m.autoStartPreviewToPlaybackTimer.opacity = 0
     ' unobserve the state if we have any error while playing mp4 video previews to avoid autostarting the focused content on autostart variant of experiment.
@@ -130,7 +123,7 @@ Function onVideoPreviewStateChanged(msg)
     m.autoStartPreviewToPlaybackTimer.opacity = 0
     'Don't want to continue to full player from video preview if the user is in kidsMode, teen level for UK and NZ region as per GDPR guidelines.
     'Also don't auto start locked contents.
-    if currentScreen.subType() = "DetailScreen"
+    if currentScreen.subType() = "DetailScreen" OR currentScreen.subType() = "VodDetailScreen"
       item = currentScreen.content
     else
       item = currentScreen.contentFocused
@@ -171,6 +164,8 @@ Function onVideoPreviewStateChanged(msg)
           else
             playVideoDetailScreen(currentScreen, playbackSource)
           end if
+        else if currentScreen.subType() = "VodDetailScreen"
+          playSelectedVodContent(currentScreen.content, currentScreen.playbackSource, currentScreen.episodes)
         else
           '//by default open the detail screen
           playbackSource = {

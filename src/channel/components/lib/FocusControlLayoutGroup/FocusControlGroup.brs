@@ -1,4 +1,6 @@
 Function init()
+  initFocusControlAnalytics()
+
   m.top.observeFieldScoped("focusedChild", "onFocusedChildChange")
   m.top.observeFieldScoped("jumpToIndex", "onJumpToIndexChange")
 
@@ -55,6 +57,9 @@ Function updateFocus(index)
 
     m.top.focusedIndex = index
     setFocus(componentGainingFocus)
+
+    ' Emit navigation tracking event if analytics is configured
+    onFocusControlFocusChange(componentLosingFocus, componentGainingFocus, index)
   end if
 End Function
 

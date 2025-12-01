@@ -1,5 +1,12 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <component name="FocusControlLayoutGroup" extends="LayoutGroup">
+
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="FocusControlAnalyticsHelper.brs" />
   <script type="text/brightscript" uri="FocusControlLayoutGroup.brs" />
 
   <interface>
@@ -7,6 +14,9 @@
 
     <!-- Used to specify the child index you would like to be focused -->
     <field id="jumpToIndex" type="integer" value="-1" alwaysNotify="true" />
+
+    <!-- Tracking page info for analytics -->
+    <field id="trackingPageInfo" type="assocarray" />
 
 
     <!-- OUTPUTS -->
@@ -19,5 +29,8 @@
 
     <!-- Node that is loosing focus. NOTE DO NOT OBSERVE THIS FIELD! Observe focusedIndex instead -->
     <field id="componentLosingFocus" type="node" />
+
+    <!-- Navigate within page event tracking info -->
+    <field id="navigateWithinPageEventInfo" type="assocarray" alwaysNotify="true" />
   </interface>
 </component>

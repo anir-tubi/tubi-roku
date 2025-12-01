@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
  - ContentController
  -
@@ -7,7 +7,8 @@
  -
  - Scene Startup Sequence:
  -  1) This component is created and init() is run
- -  2) During ContentController.init(), the MetadataFetchTask is set to "RUN", creating its long-lived thread
+ -  2) During ContentController.init(), the MetadataFetchTask is set to "RUN", creating its
+long-lived thread
  -     that will answer requests for metdata from the primary scene graph thread.
  -  3) The MetadataFetchTask sets a 'ready' field to "true" indicating that it is available
  -  4) This component dynamically creates the CategoryScreen which begins making metadata requests
@@ -24,36 +25,41 @@
 
   <interface>
     <!-- INPUTS -->
-      <!-- add a screen to the top of the stack -->
-      <field id="push" type="node" />
+    <!-- add a screen to the top of the stack -->
+    <field id="push" type="node" />
 
-      <!-- remove the top-most screen from the stack -->
-      <field id="pop" type="boolean" alwaysNotify="true" />
+    <!-- remove the top-most screen from the stack -->
+    <field id="pop" type="boolean" alwaysNotify="true" />
 
-      <!-- keep the top x screens in the stack, removing all other screens from underneath them -->
-      <field id="shrinkStack" type="integer" alwaysNotify="true" />
+    <!-- keep the top x screens in the stack, removing all other screens from underneath them -->
+    <field id="shrinkStack" type="integer" alwaysNotify="true" />
 
-      <!-- remove the top most screen that has the the ID set to this field; Only do this if there are more than 1 screens in the stack. -->
-      <field id="idToRemoveScreenFromStack" type="string" alwaysNotify="true" />
+    <!-- remove the top most screen that has the the ID set to this field; Only do this if there are
+    more than 1 screens in the stack. -->
+    <field id="idToRemoveScreenFromStack" type="string" alwaysNotify="true" />
 
-      <!-- remove all screens from the stack -->
-      <field id="clearStack" type="boolean" alwaysNotify="true" />
+    <!-- remove a specific screen node from the stack -->
+    <field id="screenToRemove" type="node" alwaysNotify="true" />
 
-      <!-- give focus to the top most screen in the stack -->
-      <field id="focusCurrent" type="boolean" alwaysNotify="true" />
+    <!-- remove all screens from the stack -->
+    <field id="clearStack" type="boolean" alwaysNotify="true" />
+
+    <!-- give focus to the top most screen in the stack -->
+    <field id="focusCurrent" type="boolean" alwaysNotify="true" />
 
     <!-- OUTPUT -->
-      <!-- true when there are no screens in the stack -->
-      <field id="isEmpty" type="boolean" alwaysNotify="true" />
+    <!-- true when there are no screens in the stack -->
+    <field id="isEmpty" type="boolean" alwaysNotify="true" />
 
-      <!-- the top most screen in the stack -->
-      <field id="current" type="node" />
+    <!-- the top most screen in the stack -->
+    <field id="current" type="node" />
 
-      <!--set when top most screen has changed-->
-      <field id="currentUpdated" type="boolean" alwaysNotify="true" />
+    <!--set
+    when top most screen has changed-->
+    <field id="currentUpdated" type="boolean" alwaysNotify="true" />
 
   </interface>
 
-    <children />
+  <children />
 
 </component>

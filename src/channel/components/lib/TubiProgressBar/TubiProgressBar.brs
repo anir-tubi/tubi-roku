@@ -17,6 +17,7 @@ Function init()
   m.top.observeField("scaledUI", "drawProgressBar")
   m.top.observeField("focusColor", "drawProgressBar")
   m.top.observeField("unfocusColor", "drawProgressBar")
+  m.top.observeField("isInFocusChain", "onIsInFocusChainChange")
   drawProgressBar()
 End Function
 
@@ -91,5 +92,15 @@ Function drawProgressBar()
   else
     m.foreground.blendColor = m.top.unfocusColor
     m.pointer.visible = false
+  end if
+End Function
+
+
+Function onIsInFocusChainChange(msg)
+  isInFocusChain = msg.getData()
+  if isInFocusChain = true
+    m.foreground.blendColor = m.top.focusColor
+  else
+    m.foreground.blendColor = m.top.unfocusColor
   end if
 End Function
