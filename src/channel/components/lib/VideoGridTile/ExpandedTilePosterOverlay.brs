@@ -133,13 +133,6 @@ Function onItemContentChange(msg)
       else
         setBadge(m.badgeTypes.live)
       end if
-    else
-      if isNonEmptyString(itemContent.availabilityEnds)
-        badgeInfo = getExpiresBadgeInfo(itemContent.availabilityEnds)
-        if badgeInfo <> invalid
-          setBadge(m.badgeTypes.expires, badgeInfo)
-        end if
-      end if
     end if
 
     if m.billboardTileMetadata <> invalid
@@ -157,9 +150,10 @@ Function onItemContentChange(msg)
       m.bottomContentGroup.removeChild(m.billboardTileMetadata)
     end if
 
-    if isBadgeAdded = false AND isNonEmptyAA(itemContent.sotInfo) = true
-      removeAllSotBadges()
-      setBadge(m.badgeTypes.sot, itemContent.sotInfo)
+    sotInfo = itemContent.sotInfo
+    if isBadgeAdded = false AND isNonEmptyAA(sotInfo) = true
+      removeAllSotBadges(sotInfo)
+      setBadge(m.badgeTypes.sot, sotInfo)
     end if
 
     if itemContent.type = "linear"
@@ -347,10 +341,27 @@ Function onSkipAnimationChange(msg)
 End Function
 
 
-Function removeAllSotBadges()
-  topLabelCount = m.sotTopLabelGroup.getChildCount()
-  m.sotTopLabelGroup.removeChildrenIndex(topLabelCount, 0)
-  m.bottomContentGroup.removeChild(m.sotMarker)
+Function removeAllSotBadges(sotInfo = invalid)
+  if sotInfo <> invalid AND isNonEmptyArray(sotInfo.sotMetaDataTopLabels) = true
+    ' Remove all badges (top labels + marker) when top labels exist
+    topLabelCount = m.sotTopLabelGroup.getChildCount()
+    m.sotTopLabelGroup.removeChildrenIndex(topLabelCount, 0)
+    if m.sotMarker <> invalid AND m.sotMarker.getParent() <> invalid
+      m.bottomContentGroup.removeChild(m.sotMarker)
+    end if
+  else if sotInfo <> invalid
+    ' Only remove marker when no top labels exist
+    if m.sotMarker <> invalid AND m.sotMarker.getParent() <> invalid
+      m.bottomContentGroup.removeChild(m.sotMarker)
+    end if
+  else
+    ' Remove all badges when called without parameters (default behavior)
+    topLabelCount = m.sotTopLabelGroup.getChildCount()
+    m.sotTopLabelGroup.removeChildrenIndex(topLabelCount, 0)
+    if m.sotMarker <> invalid AND m.sotMarker.getParent() <> invalid
+      m.bottomContentGroup.removeChild(m.sotMarker)
+    end if
+  end if
 End Function
 
 

@@ -101,13 +101,6 @@ Function onItemContentChange(msg)
       else
         setLinearBadge(m.badgeTypes.live)
       end if
-    else if m.sotBadge = invalid
-      if isNonEmptyString(itemContent.availabilityEnds)
-        badgeInfo = getExpiresBadgeInfo(itemContent.availabilityEnds)
-        if badgeInfo <> invalid
-          setSotBadge("", badgeInfo.text)
-        end if
-      end if
     end if
 
     categoryContent = itemContent.getParent()

@@ -121,24 +121,3 @@ Function setLinearAvailabilityBadge(badge, availability, textColor, backgroundCo
   badge.backgroundColor = backgroundColor
   badge.textColor = textColor
 End Function
-
-
-Function getExpiresBadgeInfo(availabilityEnds)
-  datetime = CreateObject("roDateTime")
-  datetime.FromISO8601String(availabilityEnds)
-  endSeconds = datetime.AsSeconds()
-  nowSeconds = CreateObject("roDateTime").AsSeconds()
-  daysRemaining = ((endSeconds - nowSeconds) \ 86400) + 1
-  ' BIZ REQ: only titles expiring in the next 2 weeks should display message
-  if daysRemaining > 0 AND daysRemaining <= 14
-    if daysRemaining > 1
-      badgeText = getTranslation("metadata_expiring_plural", { days: daysRemaining.toStr() })
-    else
-      badgeText = getTranslation("metadata_expiring_singular")
-    end if
-
-    return { "text": badgeText }
-  end if
-
-  return invalid
-End Function

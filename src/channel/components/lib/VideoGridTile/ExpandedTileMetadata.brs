@@ -111,17 +111,6 @@ Function onItemContentChange(msg) as Void
   routeContentDisplay(itemContent)
   handleSOTBadgesAndLayout(itemContent)
 
-  if isNonEmptyString(itemContent.availabilityEnds) AND m.top.variant = "detailScreenInfoPanel"
-    badgeInfo = getExpiresBadgeInfo(itemContent.availabilityEnds)
-    if badgeInfo <> invalid
-      badge = createBadge(badgeInfo.text, {
-        textColor: m.focusedTextColor,
-        borderUri: ""
-      })
-      m.firstLineGroup.insertChild(badge, 0)
-      m.expiresBadge = badge
-    end if
-  end if
 End Function
 
 
@@ -148,10 +137,6 @@ Function cleanupMetadata() as Void
     m.ratingDescriptorBadges = invalid
   end if
 
-  if m.expiresBadge <> invalid
-    m.firstLineGroup.removeChild(m.expiresBadge)
-    m.expiresBadge = invalid
-  end if
 End Function
 
 
@@ -263,10 +248,6 @@ End Function
 ' @param itemContent - Content node with SOT information
 Function handleSOTBadgesAndLayout(itemContent) as Void
   isVideoTilesControlMetadata = m.top.id = "videoTilesControlMetadata"
-
-  if isVideoTilesControlMetadata = true AND itemContent.type <> m.constants.ui.contentTypes.linear AND isNonEmptyString(itemContent.availabilityEnds) AND m.sotBadge.getParent() = invalid
-    setupExpiresBadge(itemContent)
-  end if
 
   ' Adjust the translation based on height of the description text.
   if isVideoTilesControlMetadata OR m.top.variant = "detailScreenInfoPanel"
@@ -734,19 +715,6 @@ Function displayRatingDescriptor(itemContent) as Void
   if ratingIndex <> -1
     m.firstLineGroup.insertChildren(m.ratingDescriptorBadges, ratingIndex + 1)
   end if
-End Function
-
-
-' Sets up and displays the "Expires Soon" badge if content is expiring
-' @param itemContent - Content node with availabilityEnds field
-Function setupExpiresBadge(itemContent) as Void
-  badgeInfo = getExpiresBadgeInfo(itemContent.availabilityEnds)
-  if badgeInfo = invalid then return
-
-  m.sotBadge.textColor = m.focusedTextColor
-  m.sotBadge.text = badgeInfo.text
-  m.sotBadge.visible = true
-  m.firstLineGroup.appendChild(m.sotBadge)
 End Function
 
 
