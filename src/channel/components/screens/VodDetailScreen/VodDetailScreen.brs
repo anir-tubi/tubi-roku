@@ -22,8 +22,6 @@ Function init()
   m.episodesContainer = topRef.findNode("episodesContainer")
   m.contentTitle = topRef.findNode("contentTitle")
   m.contentTitleLabel = m.contentTitle.findNode("contentTitleLabel")
-  m.contentTitleImage = m.contentTitle.findNode("contentTitleImage")
-  m.contentTitleImage.observeFieldScoped("loadStatus", "onContentTitleImageLoadStatus")
   m.gradient = topRef.findNode("gradient")
   m.belowFoldGradient = topRef.findNode("belowFoldGradient")
   m.leftChevron = topRef.findNode("leftChevron")
@@ -89,30 +87,7 @@ End Function
 ' @param content - Content node with title and titleImageUrl
 Function updateContentTitle(content) as Void
   if content = invalid then return
-
-  ' Check if titleImageUrl exists and is valid
-  if isNonEmptyString(content.titleImageUrl)
-    m.contentTitle.removeChild(m.contentTitleLabel)
-    m.contentTitleImage.uri = content.titleImageUrl
-  else
-    m.contentTitle.removeChild(m.contentTitleImage)
-    m.contentTitleLabel.text = content.title
-  end if
-End Function
-
-
-' Handles content title image load status and falls back to text label on failure
-' @param msg - Message object containing loadStatus data
-Function onContentTitleImageLoadStatus(msg) as Void
-  status = msg.getData()
-  if status = "ready"
-    m.contentTitle.removeChild(m.contentTitleLabel)
-  else if status = "failed"
-    m.contentTitle.removeChild(m.contentTitleImage)
-    if m.top.content <> invalid
-      m.contentTitleLabel.text = m.top.content.title
-    end if
-  end if
+  m.contentTitleLabel.text = content.title
 End Function
 
 
@@ -375,9 +350,7 @@ End Function
 Function onContentContainerFocusIndexChange(msg)
   focusedIndex = msg.getData()
   if focusedIndex <> invalid
-    if focusedIndex > 1
-      m.top.shouldPauseVideoPreview = true
-    end if
+    m.top.shouldPauseVideoPreview = focusedIndex > 1
     componentGainingFocus = m.contentContainer.componentGainingFocus
     m.leftChevron.visible = (m.isLeftBackExitEnabled = true AND focusedIndex = 1)
 
@@ -392,6 +365,10 @@ Function onContentContainerFocusIndexChange(msg)
         fade(m.contentTitle, "out", 0.3)
         fade(m.belowFoldGradient, "out", 0.3)
         m.additionalContentContainer.opacity = 0.5
+      end if
+
+      if componentGainingFocus.id = "actionButtonList" AND m.sectionTabs <> invalid AND m.sectionTabs.buttonFocused <> invalid AND m.sectionTabs.buttonFocused.id = "details"
+        m.additionalContentContainer.opacity = 0
       end if
 
       ' Check content validity before accessing type property
@@ -433,9 +410,8 @@ End Function
 ' @param msg - Message object containing focused button data
 Function onActionButtonFocused(msg) as Void
   focusedButton = msg.getData()
-  if focusedButton <> invalid
-    ' Set to false (resume) for play/resume buttons, true (pause) for all others
-    m.top.shouldPauseVideoPreview = (focusedButton.id <> "play" AND focusedButton.id <> "resume")
+  if focusedButton <> invalid AND m.top.shouldPauseVideoPreview = true
+    m.top.shouldPauseVideoPreview = false
   end if
 End Function
 

@@ -3,10 +3,12 @@
 ' @playbackSource, associative array, the playback source for the content.
 ' @successCb, roFunction, callback to be run on success
 ' @errorCb, roFunction, callback to be run on error
-Function showVodDetailScreen(content, playbackSource, successCb = invalid, errorCb = invalid)
+Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, errorCb = invalid)
   showHideLogoBasedOnUiMode()
 
-  if content <> invalid
+  if inputContent <> invalid
+    ' we make changes to the content from this point forward. If we don't clone, changes will be propagated to the original content in home or search screen.
+    content = inputContent.clone(true)
     ' TODO: Remove this once we have a way to check if the content has video resources.
     if content.isSubType("TubiContentNode") = false OR (successCb = skipDetailScreen AND content.hasVideoResources <> true)
       showHideSpinner(true)

@@ -40,7 +40,6 @@ Function init()
   m.subheaderSmallFont = typographyConstants.ids.subheaderSmall
 
   m.title = invalid
-  m.titleImage = invalid
   setTypographyOfLabel(m.description, m.bodyMediumFont)
   setTypographyOfLabel(m.ratingLabel, m.bodyExtraSmallStrongFont)
 
@@ -147,11 +146,6 @@ Function cleanupMetadata() as Void
       m.firstLineGroup.removeChild(badge)
     end for
     m.ratingDescriptorBadges = invalid
-  end if
-
-  if m.titleImage <> invalid
-    m.metadataGroup.removeChild(m.titleImage)
-    m.titleImage = invalid
   end if
 
   if m.expiresBadge <> invalid
@@ -328,14 +322,21 @@ Function metadataOnPosterContent(itemContent)
   prefixTextParts = []
   tags = itemContent.genres
   if isNonEmptyArray(tags) = true
-    text = tags[0]
-    if tags[1] <> invalid
-      if m.top.isBillboardRow = false
-        text += ", " + tags[1]
-      else
-        text += " " + Chr(&hb7) + " " + tags[1]
-      end if
+    maxTags = 2
+    if isDetailScreenInfoPanel
+      maxTags = 3
     end if
+
+    text = ""
+    for i = 0 to maxTags - 1
+      if tags[i] <> invalid
+        if text <> ""
+          text += ", "
+        end if
+        text += tags[i]
+      end if
+    end for
+
     if m.variant <> "trueControlTop2Rows" OR m.top.id <> "videoTilesControlMetadata"
       prefixTextParts.push(text)
     else
@@ -397,11 +398,7 @@ Function metadataOnPosterContent(itemContent)
 
     ' Display channel logo and name if available
     if isNonEmptyString(itemContent.channelLogoShort) AND isNonEmptyString(itemContent.channelName)
-      if m.titleImage <> invalid
-        titleIndex = m.nodeHelpers.getChildIndex(m.metadataGroup, m.titleImage)
-      else
-        titleIndex = m.nodeHelpers.getChildIndex(m.metadataGroup, m.title)
-      end if
+      titleIndex = m.nodeHelpers.getChildIndex(m.metadataGroup, m.title)
       displayChannelInfo(itemContent.channelLogoShort, itemContent.channelName, titleIndex)
     end if
   end if
@@ -673,57 +670,26 @@ End Function
 
 ' Appends title label or title image to metadata group and configures spacing based on variant
 ' For detailScreenInfoPanel with title art, displays poster image; otherwise displays text label
-' @param itemContent - Content node with title and titleImageUrl
+' @param itemContent - Content node with title
 Function appendTitleToMetadataGroup(itemContent = invalid)
   isDetailScreenInfoPanel = m.top.variant = "detailScreenInfoPanel"
 
-  ' Check if we should use title art (only for detailScreenInfoPanel variant)
-  useTitleArt = false
-  titleImageUrl = ""
-  if isDetailScreenInfoPanel AND itemContent <> invalid AND isNonEmptyString(itemContent.titleImageUrl)
-    useTitleArt = true
-    titleImageUrl = itemContent.titleImageUrl
+  ' Create text label for title
+  m.title = createObject("roSGNode", "Label")
+  m.title.id = "title"
+  if isDetailScreenInfoPanel
+    m.title.update({
+      width: 960
+      height: 60
+      vertAlign: "bottom"
+    })
   end if
-
-  titleArtSectionHeight = 60
-  ' Create title image poster for detailScreenInfoPanel with title art
-  if useTitleArt
-    ' Since title image are different height and width. Creating a Transparent Rectangle to hold the title image with  height.
-    m.titleImage = CreateObject("roSGNode", "Rectangle")
-    m.titleImage.update({
-      id: "titleImage"
-      width: 360
-      height: titleArtSectionHeight
-      color: "0x00000000"
-    })
-    image = createPoster(titleImageUrl, {
-      id: "titleArt"
-      loadDisplayMode: "limitSize"
-      loadHeight: titleArtSectionHeight
-      loadWidth: 360
-    })
-    image.observeFieldScoped("loadStatus", "onTitleImageLoadStatus")
-    image.translation = [0, (titleArtSectionHeight - image.boundingRect().height)]
-    m.titleImage.appendChild(image)
-    m.metadataGroup.insertChild(m.titleImage, 0)
+  if isDetailScreenInfoPanel
+    setTypographyOfLabel(m.title, m.headerMediumFont)
   else
-    ' Create text label for title
-    m.title = createObject("roSGNode", "Label")
-    m.title.id = "title"
-    if isDetailScreenInfoPanel
-      m.title.update({
-        width: 960
-        height: titleArtSectionHeight
-        vertAlign: "bottom"
-      })
-    end if
-    if isDetailScreenInfoPanel
-      setTypographyOfLabel(m.title, m.headerMediumFont)
-    else
-      setTypographyOfLabel(m.title, m.headerSmallFont)
-    end if
-    m.metadataGroup.insertChild(m.title, 0)
+    setTypographyOfLabel(m.title, m.headerSmallFont)
   end if
+  m.metadataGroup.insertChild(m.title, 0)
 
   isVideoTilesControlMetadata = m.top.id = "videoTilesControlMetadata"
   if m.variant = "trueControlTop2Rows" AND isVideoTilesControlMetadata
@@ -736,34 +702,6 @@ Function appendTitleToMetadataGroup(itemContent = invalid)
     m.metadataGroup.itemSpacings = [9, 3]
   end if
   setTypographyOfLabel(m.description, m.bodyMediumFont)
-End Function
-
-
-' Handles title image load status and falls back to text label on failure
-' @param msg - roSGNodeEvent containing loadStatus data
-Function onTitleImageLoadStatus(msg) as Void
-  status = msg.getData()
-  image = msg.getRoSGNode()
-  if status = "failed"
-    ' Remove failed title image
-    if m.titleImage <> invalid
-      m.metadataGroup.removeChild(m.titleImage)
-      m.titleImage = invalid
-    end if
-
-    ' Fallback to text label
-    m.title = createObject("roSGNode", "Label")
-    m.title.id = "title"
-    setTypographyOfLabel(m.title, m.headerSmallFont)
-    m.metadataGroup.insertChild(m.title, 0)
-
-    ' Set title text from itemContent if available
-    if m.top.itemContent <> invalid
-      m.title.text = m.top.itemContent.title
-    end if
-  else if status = "ready"
-    image.translation = [0, (m.titleImage.height - image.boundingRect().height)]
-  end if
 End Function
 
 
@@ -860,6 +798,8 @@ Function displayChannelInfo(channelLogoUri as String, channelName as String, tit
     height: 40
     width: 40
     loadDisplayMode: "scaleToFit"
+    loadingBitmapUri: "pkg:/images/placeholder-featured.webp"
+    failedBitmapUri: "pkg:/images/placeholder-featured.webp"
   })
 
   ' Create channel name label
