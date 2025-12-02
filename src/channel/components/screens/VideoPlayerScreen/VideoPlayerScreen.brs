@@ -140,15 +140,10 @@ Function init()
     m.marginX = m.constants.ui.translations.marginX
   end if
 
-  BrowseWhileWatchingRow = m.top.findNode("BrowseWhileWatchingRow")
+  browseWhileWatchingRow = m.top.findNode("BrowseWhileWatchingRow")
 
-  if getStatsigExperimentResource("roku_player_improvement", "roku_player_bww_ymal_v1", false).enabled = true then
-    m.BrowseWhileWatching = BrowseWhileWatchingRow.createChild("Related")
-    m.BrowseWhileWatching.observeFieldScoped("selectedRelatedContentItem", "onRelatedItemSelected")
-  else
-    m.BrowseWhileWatching = BrowseWhileWatchingRow.createChild("BrowseContentOnPlayer")
-    m.BrowseWhileWatching.observeFieldScoped("selectedRelatedContentItem", "onBrowseContentSelected")
-  end if
+  m.BrowseWhileWatching = browseWhileWatchingRow.createChild("Related")
+  m.BrowseWhileWatching.observeFieldScoped("selectedRelatedContentItem", "onRelatedItemSelected")
 
   m.BrowseWhileWatching.translation = [m.marginX, 550]
   m.BrowseWhileWatching.associatedPageName = "video_player_page"
@@ -158,7 +153,6 @@ Function init()
   m.BrowseWhileWatching.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
 
   m.top.observeFieldScoped("updateRelatedContent", "onRelatedContentUpdated")
-  m.top.observeFieldScoped("updateBrowseContent", "onBrowseContentUpdated")
   m.top.observeField("updateContent", "onContentChange")
   m.top.observeField("sprites", "onSpritesReceived")
   m.top.observeField("control", "onControlChange")
@@ -167,7 +161,6 @@ Function init()
   m.top.observeField("adProgress", "onAdProgressChange")
   m.top.observeField("displayAdLoadingMessage", "onDisplayAdLoadingMessage")
   m.top.observeField("seekTo", "onSeekToChange")
-  m.top.observeFieldScoped("showBrowseWhileWatchingInFullScreen", "onShowBrowseWhileWatchingInFullScreen")
   m.top.observeFieldScoped("adTrackingObject", "onAdTrackingObject")
   m.top.observeFieldScoped("adBufferingObject", "onAdBufferingObject")
   m.top.observeFieldScoped("filledAdData", "onHandleFilledAdData")
@@ -3667,23 +3660,6 @@ Function onRelatedItemFocused()
 End Function
 
 
-Function onBrowseContentSelected(msg)
-  screen = msg.getRoSGNode()
-
-  if screen <> invalid then
-    selectedContent = screen.selectedRelatedContentItem
-    animateTransport("out")
-    hideBrowseWhileWatching()
-    setFocusToPlaybackControl()
-    m.top.homescreenContentToPlay = selectedContent
-    m.top.homescreenContentToPlayUpdated = true
-    resetTransportButtons()
-
-    updatePlayerLogLib(m.playerLogLib, "setBrowseWhileWatchingDidConvert", true)
-  end if
-End Function
-
-
 Function onRelatedItemSelected(msg)
   screen = msg.getRoSGNode()
 
@@ -3723,13 +3699,6 @@ End Function
 
 Function onRelatedContentUpdated(msg)
   m.BrowseWhileWatching.content = m.top.relatedContent
-  m.BrowseWhileWatching.updateContent = true
-End Function
-
-
-Function onBrowseContentUpdated(msg)
-  m.BrowseWhileWatching.content = m.top.browseContent
-  m.BrowseWhileWatching.isLoading = false
   m.BrowseWhileWatching.updateContent = true
 End Function
 

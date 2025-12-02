@@ -175,7 +175,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
           if m.playerControlExperimentType = "none"
             setFocusToComponent(m.PlayPauseButton, true)
           else if m.playerControlExperimentType = "variant1" AND m.top.isTrailer = false
-            relatedContent = m.top.browseContent
+            relatedContent = m.top.relatedContent
 
             if relatedContent <> invalid AND relatedContent.getChildCount() > 0
               setFocusToComponent(m.BrowseWhileWatching)
@@ -192,12 +192,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
           if m.playerControlExperimentType = "variant1"
             setFocusToComponent(m.progressBar)
           else if m.playerControlExperimentType = "none" AND m.top.isTrailer = false
-
-            if getStatsigExperimentResource("roku_player_improvement", "roku_player_bww_ymal_v1", false).enabled = true
-              relatedContent = m.top.relatedContent
-            else
-              relatedContent = m.top.browseContent
-            end if
+            relatedContent = m.top.relatedContent
 
             if relatedContent <> invalid AND relatedContent.getChildCount() > 0
               setFocusToComponent(m.BrowseWhileWatching)
@@ -2287,20 +2282,10 @@ End Function
 Function showBrowseWhileWatching()
   if m.top.appMode <> "KIDS_MODE" AND m.top.isTrailer = false
 
-    'Fire roku_player_bww_ymal_v1 exposure event
-    if getStatsigExperimentResource("roku_player_improvement", "roku_player_bww_ymal_v1", true).enabled = true
-      content = m.top.relatedContent
-    else
-      content = m.top.browseContent
-    end if
+    content = m.top.relatedContent
 
     if content <> invalid AND content.getChildCount() > 0
-      if getStatsigExperimentResource("roku_player_improvement", "roku_player_bww_ymal_v1", false).enabled = true
-        m.BrowseWhileWatching.jumpToItem = 0
-      else
-        m.BrowseWhileWatching.jumpToRowItem = [0, 0]
-        m.BrowseWhileWatching.isLoading = false
-      end if
+      m.BrowseWhileWatching.jumpToItem = 0
     end if
 
     m.BrowseWhileWatching.show = true

@@ -362,17 +362,10 @@ Function refreshScreenAfterParentalChanges()
 
   refreshHomeScreenSideNav()
 
-  videoPlayerScreen = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
-  'setting videoplayerscreen's browseContent as invalid, so that when nexttime videoplayer launched new homescreen content will be fetched based on parental settings
-  if videoPlayerScreen <> invalid
-    videoPlayerScreen.browseContent = invalid
-    videoPlayerScreen.updateBrowseContent = true
-  end if
-
   screen = getCurrentScreen()
   if screen <> invalid
     if screen.id = m.constants.ui.screenIds.searchScreen
-      screen.kidsModeEnabled = isKidsUIOn()
+      screen.isKidsModeAvailable = isKidsUIOn()
       screen.signedIn = true
     else if screen.id = m.constants.ui.screenIds.categoryPanelListScreen
       ' Deleting the screen content cache to avoid showing the old content.

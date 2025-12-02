@@ -113,7 +113,6 @@ Function setupVideoPlayer(content, playbackSource = { "srcForAnalytic": "unknown
     videoPlayer.observeFieldScoped("sendPauseAdPixel", "onSendPauseAdPixel")
     videoPlayer.observeFieldScoped("subtitleTrackSettings", "onSubtitleTrackSettingsChange")
     videoPlayer.observeFieldScoped("audioTrackSettings", "onAudioTrackSettingsChange")
-    videoPlayer.observeFieldScoped("homescreenContentToPlayUpdated", "onPlayerHomeScreenContentToPlay")
     videoPlayer.observeFieldScoped("relatedContentToPlay", "onPlayerRelatedContentToPlay")
     videoPlayer.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
     observeUpdateAuth(videoPlayer.task)
@@ -226,20 +225,8 @@ Function setupVideoPlayer(content, playbackSource = { "srcForAnalytic": "unknown
 
       'Do not Fetch/Show BrowseWhileWatching row for kids mode & limited UI models
       if isKidsUIOn() = false AND m.constants.deviceInfo.limitedUi = false
-
-        if getStatsigExperimentResource("roku_player_improvement", "roku_player_bww_ymal_v1", false).enabled = true
-          getRelatedContent(content, handleRelatedResponseInVideoPlayer, 20)
-        else
-          browseContent = videoPlayer.browseContent
-
-          if browseContent = invalid
-            fetchMiniHomeScreen(videoPlayer.appMode)
-          end if
-        end if
-
+        getRelatedContent(content, handleRelatedResponseInVideoPlayer, 20)
       else
-        videoPlayer.browseContent = invalid
-        videoPlayer.updateBrowseContent = true
         videoPlayer.relatedContent = invalid
         videoPlayer.updateRelatedContent = true
       end if
@@ -296,65 +283,7 @@ Function setupVideoPlayer(content, playbackSource = { "srcForAnalytic": "unknown
 End Function
 
 
-'Fetch BrowseContent(similar to homescreen/espanol) for player screen BrowseWhileWatching section
 '
-' @appMode: String, current app mode. Possible values are "DEFAULT_MODE", "KIDS_MODE", "LATINO_MODE"
-'
-Function fetchMiniHomeScreen(appMode = "DEFAULT_MODE")
-  reqName = m.constants.reqNames.getMiniHomescreen
-  options = {}
-  headers = {}
-  params = {}
-
-  if appMode = "LATINO_MODE"
-    contentModeParamValue = m.constants.ui.contentMode.latino
-  else ' For tensor API, we need to pass as empty string for homescreen
-    contentModeParamValue = ""
-  end if
-
-  params["content_mode"] = contentModeParamValue
-  isKidsMode = shouldKidsModeBeSentToServer()
-
-  'Requesting 5 more containers on api request, as we remove linear rows from it.
-  params["group_size"] = m.constants.player.browseContent.numContainers + 5
-  params["contents_limit"] = m.constants.player.browseContent.numContents
-
-  options.params = params
-  options.headers = headers
-
-  homeScreenReqInfo = m.CmsApi.createMiniHomeScreenOnPlayerReqInfo(isKidsMode, options)
-  m.makeRequest({
-    url: homeScreenReqInfo.url
-    requestType: reqName
-    options: homeScreenReqInfo.options
-    successCallback: onMiniHomeScreenContentSuccessResponse
-    errorCallback: onMiniHomeScreenContentErrorResponse
-    responseType: "node"
-    isSignedInUser: isLoggedInUser()
-  })
-End Function
-
-
-Function onMiniHomeScreenContentSuccessResponse(response)
-  currentScreen = getCurrentScreen()
-
-  if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
-    currentScreen.browseContent = response
-    currentScreen.updateBrowseContent = true
-  end if
-End Function
-
-
-Function onMiniHomeScreenContentErrorResponse(response)
-  currentScreen = getCurrentScreen()
-
-  if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
-    currentScreen.browseContent = invalid
-    currentScreen.updateBrowseContent = true
-  end if
-End Function
-
-
 ' @relatedContent: roSGNode, TubiContentNode
 Function handleRelatedResponseInVideoPlayer(relatedContent)
   currentScreen = getCurrentScreen()
@@ -1608,68 +1537,6 @@ Function deleteFromRokuContinueWatching(content)
   requestInfo = m.rokuContinueWatchingApi.createDeleteContinueWatchingReqInfo(body)
   requestInfo.requestType = m.constants.reqNames.deleteRokuContinueWatching
   m.top.getScene().rokuContinueWatchingRequestInfo = requestInfo
-End Function
-
-
-Function onPlayerHomeScreenContentToPlay(msg)
-  screen = msg.getRoSGNode()
-
-  if screen <> invalid then
-    content = screen.homescreenContentToPlay
-
-    if content.type = m.constants.ui.contentTypes.series
-      emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
-      emptySeriesNode.type = m.constants.ui.contentTypes.series
-      emptySeriesNode.id = content.id
-      getSingleContentFromServer(emptySeriesNode, handleBrowseWhileWatchingContentSuccessResponse, handleBrowseWhileWatchingContentErrorResponse)
-    else
-      emptyMovieNode = CreateObject("roSGNode", "TubiContentNode")
-      emptyMovieNode.type = m.constants.ui.contentTypes.video
-      emptyMovieNode.id = content.id
-      getSingleContentFromServer(emptyMovieNode, handleBrowseWhileWatchingContentSuccessResponse, handleBrowseWhileWatchingContentErrorResponse)
-    end if
-  end if
-End Function
-
-
-Function handleBrowseWhileWatchingContentSuccessResponse(content)
-  playbackSource = {
-    "srcForAnalytic": m.constants.player.playbackSource.unknown
-    "srcForAds": m.constants.player.playbackOrigin.ymal
-  }
-  playUpNextContent(content, playbackSource, true)
-End Function
-
-
-Function handleBrowseWhileWatchingContentErrorResponse(error)
-  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
-  content = invalid
-
-  if videoPlayer <> invalid
-    content = videoPlayer.relatedContentToPlay
-  end if
-
-  ' set up the error modal dialog
-  errorCode = getUserFacingErrorCode(m.constants.errors.context.playerScreen, m.constants.errors.subtypes.fetchError, error.code)
-  dialogEvent = getDetailScreenDialogAnalyticEvent(content, "NETWORK_ERROR", errorCode, m.constants)
-
-  modalInfo = {
-    message: getErrorMessage("", errorCode)
-    openTrackEvent: dialogEvent
-    trackingTask: m.trackingLoggingTask
-  }
-
-  showErrorModal(modalInfo, invalid, invalid, onCloseBrowseWhileWatchingContentFetchErrorModal)
-End Function
-
-
-Function onCloseBrowseWhileWatchingContentFetchErrorModal()
-
-  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
-  if videoPlayer <> invalid
-    videoPlayer.showBrowseWhileWatchingInFullScreen = true
-  end if
-
 End Function
 
 

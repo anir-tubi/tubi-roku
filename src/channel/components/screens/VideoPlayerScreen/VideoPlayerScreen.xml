@@ -138,20 +138,11 @@
       <!-- boolean field which tells the YMAL content is updated -->
       <field id="updateRelatedContent" type="boolean" alwaysNotify="true"/>
 
-      <!-- browseContent content to be displayed on Browse While Watching Row -->
-      <field id="browseContent" type="node" />
-
-      <!-- boolean field which tells the browseContent is updated -->
-      <field id="updateBrowseContent" type="boolean" alwaysNotify="true"/>
-
       <!-- boolean field which can be set to true for showing the YMAL in full screen and set focus to YMAL -->
       <field id="showYMALInFullScreen" type="boolean" alwaysNotify="true"/>
 
       <!-- Used to allow seeking the video player while still maintaining proper state tracking. Sets video player seek field to appropriate value and updates necessary state. `seek` field is time/double based and value specified should be in seconds -->
       <field id="seekTo" type="time" />
-
-      <!-- boolean field which can be set to true for showing the BrowseWhileWatching in full screen and set focus to BrowseWhileWatching -->
-      <field id="showBrowseWhileWatchingInFullScreen" type="boolean" alwaysNotify="true"/>
 
       <!-- time taken to load player screen in milliseconds -->
       <field id="loadTime" type="integer"/>
@@ -223,14 +214,6 @@
 
       <!-- set to true when the relatedContentToPlay field is updated -->
       <field id="relatedContentToPlayUpdated" type="boolean" alwaysNotify="true"/>
-
-      <!-- set to the contentNode of the homescreen item which was focused when
-           the ok button is pressed
-      -->
-      <field id="homescreenContentToPlay" type="node"/>
-
-      <!-- set to true when the homescreenContentToPlay field is updated -->
-      <field id="homescreenContentToPlayUpdated" type="boolean" alwaysNotify="true"/>
 
       <!-- streamingSegment will be set when streamingSegment of videoNode value changes -->
       <field id="segInfo" type="assocarray"/>

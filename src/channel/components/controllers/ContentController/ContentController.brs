@@ -1354,21 +1354,7 @@ Function setUiMode(mode)
     showHideLogo(m.constants.logoType.tubiEspanol)
   end if
 
-  'Need to reset video player's browseContent as the uiMode is changed
-  resetVideoPlayerBrowseContent()
-
   tellScreensIfKidsModeBeSentToServer()
-End Function
-
-
-Function resetVideoPlayerBrowseContent()
-  videoPlayerScreen = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
-  'setting videoplayerscreen's browseContent as invalid, so that when nexttime videoplayer launched new homescreen content will be fetched
-
-  if videoPlayerScreen <> invalid
-    videoPlayerScreen.browseContent = invalid
-    videoPlayerScreen.updateBrowseContent = true
-  end if
 End Function
 
 
@@ -1706,14 +1692,6 @@ Function setContentToRefreshAllPersonalizedScreens(shouldRefetchHomescreen = tru
   if searchScreen <> invalid
     ' calling updateSearchContentNode to removes the Lock icon from search result posters once user sign-in.
     updateSearchContentNode(searchScreen)
-  end if
-
-  videoPlayerScreen = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
-
-  'setting videoplayerscreen's browseContent as invalid, so that when nexttime videoplayer launched new homescreen content will be fetched
-  if videoPlayerScreen <> invalid
-    videoPlayerScreen.browseContent = invalid
-    videoPlayerScreen.updateBrowseContent = true
   end if
 
   timeGridContent = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
