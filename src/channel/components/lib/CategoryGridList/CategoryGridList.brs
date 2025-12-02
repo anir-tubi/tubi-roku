@@ -867,7 +867,9 @@ Function onAdResponseInBatch(msg) as Void
 
       if isNonEmptyArray(rowItemFocused) AND rowItemFocused[0] > 0
         lastFocusedRow = content.getChild(rowItemFocused[0])
-        lastFocusedRowID = lastFocusedRow.id
+        if lastFocusedRow <> invalid
+          lastFocusedRowID = lastFocusedRow.id
+        end if
       end if
 
       '//Update content with ads (remove, replace, add)
