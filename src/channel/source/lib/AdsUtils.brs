@@ -92,8 +92,12 @@ Function createTrackingPixel(eventType as String, url as String, time = 0 as Flo
 End Function
 
 ' Helper: Maps tracking event key to quartile details
+' @key: String, tracking event key (e.g., "q25", "q50", etc.)
+' @duration: Integer, total duration of the ad in seconds
+' @pixelUrl: String, URL of the tracking pixel
+'@returns: Object, tracking pixel object or invalid if key is unrecognized
 Function getQuartileTrackingDetails(key as String, duration as Integer, pixelUrl as String) as Object
-  pixelValue = key.split("_")[1]
+  pixelValue = key.split("q")[1]
   if pixelValue <> invalid
     iPixelPercent = pixelValue.toInt()
     pixelTypeMapping = {
