@@ -3,7 +3,7 @@ import { odc, ecp, utils } from 'roku-test-automation';
 import type { RegisteredUser } from '../test-utils';
 import { testUtils } from '../test-utils';
 import { ok } from 'assert';
-import { shared } from '../test-helpers';
+import { shared, testHelpers } from '../test-helpers';
 import { moveToGrid } from '../analytics/utils/helpers';
 
 
@@ -23,8 +23,7 @@ describe('Categories', function () {
     );
 
     // Navigate to find Continue Watching category
-    await openLeftNav();
-    await selectCategories();
+    await testHelpers.navigateToCategories();
     await ecp.sendKeypress(ecp.Key.Down, { wait: 2000 });
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingButton');
     const continueWatchingButtonText = testUtils.getNodeForElement('continueWatchingButton');
@@ -46,8 +45,7 @@ describe('Categories', function () {
     );
 
     // Go to All Categories page
-    await openLeftNav();
-    await selectCategories();
+    await testHelpers.navigateToCategories();
 
     // Navigate to Continue Watching category
     await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton', 'button not found');
@@ -115,8 +113,7 @@ describe('Categories', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
-    await openLeftNav();
-    await selectCategories();
+    await testHelpers.navigateToCategories();
     await ecp.sendKeypress(ecp.Key.Down);
     await testUtils.waitForElementToShowOnScreen('channelsVideoGrid');
     await ecp.sendKeypress(ecp.Key.Right);
@@ -134,8 +131,7 @@ describe('Categories', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
-    await openLeftNav();
-    await selectCategories();
+    await testHelpers.navigateToCategories();
 
     // Navigate to the video grid in a channel
     await ecp.sendKeypress(ecp.Key.Right);
@@ -156,8 +152,7 @@ describe('Categories', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
-    await openLeftNav();
-    await selectCategories();
+    await testHelpers.navigateToCategories();
 
     //Verify Recommended button at the top
     await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
@@ -175,8 +170,7 @@ describe('Categories', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to All Categories page
-    await openLeftNav();
-    await selectCategories();
+    await testHelpers.navigateToCategories();
     await testUtils.waitForElementToNotShowOnScreen('continueWatchingButton');
   });
 
@@ -192,8 +186,7 @@ describe('Categories', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to All Categories page
-    await openLeftNav();
-    await selectCategories();
+    await testHelpers.navigateToCategories();
     await testUtils.waitForElementToShowOnScreen('categoryMyListMenuItem');
     const categoryMyListMenuItemText = await testUtils.getNodeForElement('categoryMyListMenuItem');
     expect(categoryMyListMenuItemText.text).to.equal('My List');
@@ -212,8 +205,7 @@ describe('Categories', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to All Categories page
-    await openLeftNav();
-    await selectCategories();
+    await testHelpers.navigateToCategories();
     await testUtils.waitForElementToFullyShowOnScreen('categoryMyListMenuItem');
     const buttonText = await testUtils.getNodeForElement('categoryMyListMenuItem');
     expect(buttonText.title).to.not.equal('My List');
@@ -227,8 +219,7 @@ describe('Categories', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
-    await openLeftNav();
-    await selectCategories();
+    await testHelpers.navigateToCategories();
 
     //Verify that the Networks button is near the top
     await ecp.sendKeypress(ecp.Key.Down);
@@ -243,8 +234,7 @@ describe('Categories', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
-    await openLeftNav();
-    await selectCategories();
+    await testHelpers.navigateToCategories();
 
     //Verify Recommended button at the top
     await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
@@ -275,8 +265,7 @@ describe('Categories', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
-    await openLeftNav();
-    await selectCategories();
+    await testHelpers.navigateToCategories();
 
     //Verify Recommended button at the top
     await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
@@ -299,8 +288,7 @@ describe('Categories', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
-    await openLeftNav();
-    await selectCategories();
+    await testHelpers.navigateToCategories();
 
     //Verify Recommended button at the top
     await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
@@ -320,8 +308,7 @@ describe('Categories', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
-    await openLeftNav();
-    await selectCategories();
+    await testHelpers.navigateToCategories();
 
     //Verify Recommended button at the top
     await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
@@ -346,7 +333,8 @@ describe('Categories', function () {
     // Launch to home page
     await testUtils.startApplicationAtPage('home', { user: user });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
-    await openLeftNav();
+    await ecp.sendKeypress(ecp.Key.Left);
+    await testUtils.waitForElementToFullyShowOnScreen('sideNavMenu');
 
     // Open settings
     await ecp.sendKeypress(ecp.Key.Left);
@@ -369,9 +357,8 @@ describe('Categories', function () {
     // Expect Home Side Nav item to be highlighted and on Home page
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
-    await openLeftNav();
     // Go to Categories Details page
-    await selectCategories();
+    await testHelpers.navigateToCategories();
 
     //Verify Recommended button at the top
     await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
@@ -393,10 +380,9 @@ describe('Categories', function () {
     // Launch to home page
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
-    await openLeftNav();
 
     // Go to Categories Details page
-    await selectCategories();
+    await testHelpers.navigateToCategories();
 
     //Verify Recommended button at the top
     await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
@@ -430,10 +416,9 @@ describe('Categories', function () {
     // Launch to home page
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
-    await openLeftNav();
 
     // Go to Categories Details page
-    await selectCategories();
+    await testHelpers.navigateToCategories();
 
     //Verify Recommended button at the top
     await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
@@ -458,8 +443,7 @@ describe('Categories', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
-    await openLeftNav();
-    await selectCategories();
+    await testHelpers.navigateToCategories();
 
     //Verify Recommended button at the top
     await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
@@ -492,8 +476,7 @@ describe('Categories', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
-    await openLeftNav();
-    await selectCategories();
+    await testHelpers.navigateToCategories();
 
     // Verify Recommended button at the top
     await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
@@ -519,8 +502,7 @@ describe('Categories', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
-    await openLeftNav();
-    await selectCategories();
+    await testHelpers.navigateToCategories();
 
     //Verify Networks category button at the top
     await testUtils.waitForElementToFullyShowOnScreen('categoryHeader');
@@ -535,8 +517,7 @@ describe('Categories', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
-    await openLeftNav();
-    await selectCategories();
+    await testHelpers.navigateToCategories();
 
     //Verify Recommended button at the top
     await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
@@ -558,26 +539,6 @@ describe('Categories', function () {
 
 });
 
-
-
-async function openLeftNav() {
-
-  // Press left
-  await ecp.sendKeypress(ecp.Key.Left);
-
-  // Is the left Nav open?
-  await testUtils.waitForElementToFullyShowOnScreen('sideNavMenu');
-}
-
-async function selectCategories() {
-  await testUtils.jumpToRowWithTitle('sideNavMenu', 'Categories');
-  await utils.sleep(1000);
-  await testUtils.waitForElementToFullyShowOnScreen('categoriesLeftNavButtonSelected');
-  await ecp.sendKeypress(ecp.Key.Ok, { wait: 2000 });
-
-  // Are we on Categories page?
-  await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton', 'Category page not shown', 15000);
-}
 
 async function verifyFourColumns() {
 

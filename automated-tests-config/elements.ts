@@ -83,9 +83,10 @@ const elements = typeCheckElements({
   },
 
   /** Component on the Movie Screen that we can pull content for the Grid from */
+  /** movieScreenRowList (auto-updated) */
+  /** movieScreenRowList (auto-updated) */
   movieScreenRowList: {
-    keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#PageGroup.#ContentArea.#CategoryGridList.#RowList',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#RowList',
   },
 
   /** Movie screen first row category name */
@@ -2796,6 +2797,109 @@ const elements = typeCheckElements({
   /** browseWhileWatchingMetadataSubtitleLine2 */
   browseWhileWatchingMetadataSubtitleLine2: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#videoPlayerScreen.#BrowseWhileWatchingRow.#YmalGroup.#Info.#infoPanelGroup.#Offset.#Line2',
+  },
+  // VOD Detail Screen Elements (copied from detailScreen elements)
+  vodDetailScreen: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#vodDetailScreen',
+  },
+
+  /** Action button list on VOD Detail Screen (Resume, Play from Beginning, Add to Queue, Like, Dislike, Go to Channel) */
+  vodDetailScreenMenu: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#vodDetailScreen.#actionButtonList',
+  },
+
+  /** Section tabs on VOD Detail Screen (Episodes, More Like This, Trailers) */
+  vodDetailScreenSectionTabs: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#vodDetailScreen.#sectionTabs',
+  },
+
+  /** Season list (buttons) on VOD Detail Screen (for series) */
+  vodDetailScreenSeasonList: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#vodDetailScreen.#episodesContainer.#seasonButtonsList',
+  },
+
+  /** Episodes list (grid) on VOD Detail Screen (for series) */
+  vodDetailScreenEpisodesList: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#vodDetailScreen.#contentGroup.#contentContainer.#additionalContentContainer.#episodesContainer.#episodeGrid',
+  },
+
+  /** YMAL (You Might Also Like) grid on VOD Detail Screen */
+  vodDetailScreenYmalGrid: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#vodDetailScreen.#contentGroup.#contentContainer.#additionalContentContainer.#relatedContentContainer.#grid',
+  },
+
+  /** YMAL tile metadata title */
+  vodDetailScreenYmalTileTitle: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#vodDetailScreen.#contentGroup.#contentContainer.#additionalContentContainer.#relatedContentContainer.#ymalTileMetadata.#metadataGroup.#title',
+  },
+
+  /** YMAL tile metadata description */
+  vodDetailScreenYmalTileDescription: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#vodDetailScreen.#contentGroup.#contentContainer.#additionalContentContainer.#relatedContentContainer.#ymalTileMetadata.#metadataGroup.#description',
+  },
+
+  /** detailScreenTitle */
+  vodDetailScreenTitle: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#vodDetailScreen.#contentGroup.#contentContainer.#videoMetadataPanel.#metadataGroup.#infoPanel.#metadataGroup.#titleImage.#titleArt',
+  },
+
+  /** detailScreenTitleLabel - Title text shown at same level as titleImage when no title art */
+  vodDetailScreenTitleLabel: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#vodDetailScreen.#contentGroup.#contentContainer.#videoMetadataPanel.#metadataGroup.#infoPanel.#metadataGroup.#titleLabel',
+  },
+
+  /** contentTitleImage - Title image shown when scrolled down */
+  contentTitleImage: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#vodDetailScreen.#contentTitle.#contentTitleImage',
+  },
+
+  /** contentTitleLabel - Typed text title shown when scrolled down (when no titleImageUrl) */
+  contentTitleLabel: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#vodDetailScreen.#contentTitle.#contentTitleLabel',
+  },
+
+  /** vodDetailScreenDescription - Description text in video metadata panel */
+  vodDetailScreenDescription: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#vodDetailScreen.#contentGroup.#contentContainer.#videoMetadataPanel.#metadataGroup.#infoPanel.#metadataGroup.#description',
+  },
+
+  /** vodDetailScreenActionButtons */
+  vodDetailScreenActionButtons: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#vodDetailScreen.#actionButtonList',
+  },
+
+  /** playButtonLabel */
+  playButtonLabel: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#vodDetailScreen.#contentContainer.#actionButtonList.#play',
+  },
+
+  /** Add to My List button label (unfocused state) */
+  addToMyListButtonLabelUnfocused: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#vodDetailScreen.#actionButtonList.#addToQueue.#elementsGroup.#titleGroup.#labelGroup.#label',
+    xpath: '//EnhancedButtonList[@name="actionButtonList"]//EnhancedButton[@name="addToQueue"]//RenderableNode[@name="labelGroup"]/Label[@name="label"]'
+  },
+
+  /** Add to My List button label (focused state) */
+  addToMyListButtonLabelFocused: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#vodDetailScreen.#actionButtonList.#addToQueue.#elementsGroup.#titleGroup.#labelGroup.#labelFocused',
+    xpath: '//EnhancedButtonList[@name="actionButtonList"]//EnhancedButton[@name="addToQueue"]//RenderableNode[@name="labelGroup"]/Label[@name="labelFocused"]'
+  },
+
+  /** likeButtonLabelGroup */
+  likeButtonLabelGroup: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#vodDetailScreen.#actionButtonList.#like.#elementsGroup.#titleGroup.#labelGroup',
+  },
+
+  dislikeButtonLabelGroup: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#vodDetailScreen.#actionButtonList.#dislike.#elementsGroup.#titleGroup.#labelGroup',
   },
 
 });

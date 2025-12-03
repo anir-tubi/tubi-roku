@@ -2,22 +2,55 @@
  * ═══════════════════════════════════════════════════════════════════
  * TEST HELPER FUNCTIONS
  * ═══════════════════════════════════════════════════════════════════
- * 
+ *
  * PURPOSE: Centralized, documented helper functions for Roku automated tests
- * 
+ *
  * USAGE: Import testHelpers in your test file:
  *   import { testHelpers } from '../test-helpers';
  *   await testHelpers.createHistory();
- * 
+ *
  * FOR AI: When generating tests, use these helpers instead of inventing new ones
- * 
+ *
  * CATEGORIES:
  *   - Detail Screen Helpers
  *   - History & Playback Helpers
  *   - Navigation Helpers
  *   - Parental Controls Helpers
  *   - User Management Helpers
- * 
+ *
+ * ⚠️ CRITICAL LIMITATION: Accessing Nested Node Properties
+ * ═══════════════════════════════════════════════════════════════════
+ * CANNOT access nested nodes using findNode() OR property chaining!
+ * Both are only available in Roku app runtime, NOT in test automation.
+ *
+ * ❌ WRONG - Using findNode():
+ *   const button = await testUtils.getNodeForElement('vodDetailScreenMenu');
+ *   const labelGroup = button.findNode('labelGroup'); // ERROR: Not available!
+ *
+ * ❌ WRONG - Using property chaining:
+ *   const menu = await testUtils.getNodeForElement('vodDetailScreenMenu');
+ *   const firstButton = menu.buttons[0];
+ *   const labelGroup = firstButton.elementsGroup?.titleGroup?.labelGroup; // ERROR: Returns undefined!
+ *
+ * ❌ WRONG - Looping through buttons with nested access:
+ *   const buttons = menu.buttons;
+ *   for (let i = 0; i < buttons.length; i++) {
+ *     const labelGroup = buttons[i].elementsGroup?.titleGroup?.labelGroup; // ERROR: Nested traversal not supported!
+ *   }
+ *
+ * ✅ CORRECT - Define EACH nested element in elements.ts:
+ *   1. In automated-tests-config/elements.ts, add entry for each nested node:
+ *      likeButtonLabelGroup: {
+ *        keyPath: '#ContentController...#actionButtonList.#like.#elementsGroup.#titleGroup.#labelGroup',
+ *        xpath: '//EnhancedButton[@name="like"]//RenderableNode[@name="labelGroup"]'
+ *      }
+ *   2. Access in test using getNodeForElement:
+ *      const labelGroup = await testUtils.getNodeForElement('likeButtonLabelGroup');
+ *      const isVisible = labelGroup.visible && labelGroup.opacity > 0;
+ *
+ * WHY: Returned node objects don't have child nodes populated - only direct properties.
+ *      You must define the full xpath to each nested element you need to access.
+ *
  * ═══════════════════════════════════════════════════════════════════
  */
 
@@ -325,6 +358,73 @@ class TestHelpers {
       });
       return id === 'ResultGrid';
     }, 'ResultGrid never obtained focus');
+  }
+
+  /**
+   * HELPER: Opens Categories page from side navigation
+   * 
+   * USE WHEN:
+   *   - Testing Categories page functionality
+   *   - Need to navigate to Categories from any screen
+   *   - Testing category-related features (My List, Continue Watching, Networks, etc.)
+   * 
+   * HOW IT WORKS:
+   *   1. Jumps to "Categories" item in side nav menu
+   *   2. Waits for selected state visual confirmation
+   *   3. Presses OK to open Categories page
+   *   4. Waits for Categories page to load (channelRecommendedButton shown)
+   * 
+   * COMMON USE CASES:
+   *   - Access category filters and browsing
+   *   - Test Continue Watching, My List, Networks sections
+   *   - Verify category page layout and functionality
+   * 
+   * PRE-CONDITION: Side nav menu should be open (call openLeftNav() first if needed)
+   * 
+   * @param timeout - Optional timeout for page load (default: 15000ms)
+   * 
+   * @example
+   * // From home screen
+   * await testHelpers.openLeftNav();
+   * await testHelpers.selectCategoriesFromSideNav();
+   * // Now on Categories page
+   * 
+   * @example
+   * // With custom timeout
+   * await testHelpers.openLeftNav();
+   * await testHelpers.selectCategoriesFromSideNav(20000);
+   */
+  public async selectCategoriesFromSideNav(timeout: number = 15000): Promise<void> {
+    await testUtils.jumpToRowWithTitle('sideNavMenu', 'Categories');
+    await utils.sleep(1000);
+    await testUtils.waitForElementToFullyShowOnScreen('categoriesLeftNavButtonSelected');
+    await ecp.sendKeypress(ecp.Key.Ok, { wait: 2000 });
+
+    // Verify we're on Categories page
+    await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton', 'Category page not shown', timeout);
+  }
+
+  /**
+   * HELPER: Opens left nav and navigates to Categories page
+   * 
+   * USE WHEN:
+   *   - Need to go directly to Categories from any screen with one call
+   *   - Starting a test that requires Categories page
+   * 
+   * BENEFITS: Combines openLeftNav() and selectCategoriesFromSideNav() into one convenient method
+   * 
+   * @param timeout - Optional timeout for page load (default: 15000ms)
+   * 
+   * @example
+   * // Quick navigation to Categories
+   * await testHelpers.openLeftNav();
+   * await testHelpers.selectCategoriesFromSideNav();
+   * // Now on Categories page ready for testing
+   */
+  public async navigateToCategories(timeout: number = 15000): Promise<void> {
+    await ecp.sendKeypress(ecp.Key.Left);
+    await testUtils.waitForElementToFullyShowOnScreen('sideNavMenu');
+    await this.selectCategoriesFromSideNav(timeout);
   }
 
   /**
@@ -1046,6 +1146,191 @@ class TestHelpers {
     if (expectedScreen) {
       await testUtils.waitForCurrentScreenToEqual(expectedScreen);
     }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+   * BUTTON LIST HELPERS
+   * ═══════════════════════════════════════════════════════════════════
+   */
+
+  /**
+   * HELPER: Navigates to a button by ID in a button list using jumpToIndex
+   * 
+   * USE WHEN:
+   *   - Need to focus a specific button in EnhancedButtonList or FocusControlLayoutGroup
+   *   - Want to navigate directly to a button without pressing arrow keys repeatedly
+   *   - Testing button selection in menus or action bars
+   * 
+   * HOW IT WORKS:
+   *   1. Gets all child nodes of the button list element
+   *   2. Finds the button with matching ID
+   *   3. Sets jumpToIndex field to navigate to that button
+   * 
+   * @param buttonListElementId - Element ID of the button list (EnhancedButtonList or FocusControlLayoutGroup)
+   * @param buttonId - ID of the button to navigate to
+   * @param waitForFocus - Whether to wait for button to have focus after jump (default: true)
+   * @returns The index of the button that was jumped to
+   * 
+   * @example
+   * // Navigate to "Resume Playing" button in VOD detail screen menu
+   * await testHelpers.jumpToButtonById('vodDetailScreenMenu', 'resume');
+   * 
+   * @example
+   * // Navigate to "Like" button without waiting for focus
+   * const index = await testHelpers.jumpToButtonById('actionButtons', 'like', false);
+   * expect(index).to.equal(2);
+   * 
+   * @throws Error if button with specified ID is not found
+   */
+  public async jumpToButtonById(buttonListElementId: any, buttonId: string, waitForFocus: boolean = true): Promise<number> {
+    // Get the button list node
+    const buttonList = await testUtils.getNodeForElement(buttonListElementId);
+    // Find the button index by ID
+    let buttonIndex = -1;
+
+    for (let i = 0; i < buttonList.buttons.length; i++) {
+      if (buttonList.buttons[i].id === buttonId) {
+        buttonIndex = i;
+        break;
+      }
+    }
+
+    if (buttonIndex === -1) {
+      throw new Error(`Button with ID "${buttonId}" not found in button list "${buttonListElementId}".`);
+    }
+
+    await odc.setValue(testUtils.getElementKeyPath(buttonListElementId, {
+      field: 'jumpToIndex',
+      value: buttonIndex
+    }), { timeout: 10000 });
+
+
+    // Optionally wait for the button to have focus
+    if (waitForFocus) {
+      await utils.sleep(500); // Give time for focus to update
+      const { node } = await odc.getFocusedNode();
+      if (node.id !== buttonId) {
+        throw new Error(`Expected button "${buttonId}" to have focus, but "${node.id}" has focus instead`);
+      }
+    }
+
+    return buttonIndex;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+   * ROW LIST HELPERS
+   * ═══════════════════════════════════════════════════════════════════
+   */
+
+  /**
+   * HELPER: Navigates to a specific row and column position in a RowList using jumpToRowItemIndex
+   * 
+   * USE WHEN:
+   *   - Need to focus a specific content item in a RowList (like HomeScreen, CategoryDetails, etc.)
+   *   - Testing content navigation and selection
+   *   - Need to jump directly to a position without manual arrow key navigation
+   *   - Finding content with specific properties (e.g., content without video preview)
+   * 
+   * HOW IT WORKS:
+   *   - Uses the RowList's `jumpToRowItemIndex` field with [row, column] array
+   *   - This is the direct and efficient way to navigate in RowLists
+   * 
+   * COMMON USE CASES:
+   *   - Navigate to content without video preview for testing
+   *   - Jump to specific row/column for playback tests
+   *   - Position focus for detail screen opening
+   *   - Test navigation behavior at specific grid positions
+   * 
+   * @param rowListElementId - Element ID of the RowList (e.g., 'movieScreenRowList', 'homeScreenRowList')
+   * @param targetRow - Target row index (0-based)
+   * @param targetCol - Target column index (0-based)
+   * 
+   * @example
+   * // Navigate to row 2, column 3 in home screen
+   * await testHelpers.jumpToRowListPosition('homeScreenRowList', 2, 3);
+   * 
+   * @example
+   * // Find content without video preview and navigate to it
+   * const position = await testHelpers.findContentWithoutVideoPreview('movieScreenRowList');
+   * if (position.length > 0) {
+   *   const [row, col] = position;
+   *   await testHelpers.jumpToRowListPosition('movieScreenRowList', row, col);
+   * }
+   */
+  public async jumpToRowListPosition(rowListElementId: any, targetRow: number, targetCol: number): Promise<void> {
+    await odc.setValue(testUtils.getElementKeyPath(rowListElementId, {
+      field: 'jumpToRowItem',
+      value: [targetRow, targetCol]
+    }), { timeout: 10000 });
+  }
+
+  /**
+   * HELPER: Finds content with or without video preview in a RowList
+   * 
+   * USE WHEN:
+   *   - Testing static image display when video preview is not available
+   *   - Finding content that has video previews for testing preview functionality
+   *   - Testing behavior differences between content with/without previews
+   * 
+   * HOW IT WORKS:
+   *   1. Gets all content items from the RowList (flattened from all rows)
+   *   2. Iterates through each item checking for videoPreviewUrl
+   *   3. Returns the [row, column] position of the first matching item
+   *   4. Handles row-based structure by tracking cumulative item count
+   * 
+   * COMMON USE CASES:
+   *   - Find content without video preview to test static image display
+   *   - Find content with video preview to test preview playback
+   *   - Navigate to specific content types for testing
+   * 
+   * @param rowListElementId - Element ID of the RowList (e.g., 'movieScreenRowList', 'homeScreenRowList')
+   * @param hasVideoPreview - true to find WITH preview, false to find WITHOUT (default: true)
+   * @param maxRowsToSearch - Maximum number of rows to search (default: 5)
+   * @returns [row, column] array or empty array if not found
+   * 
+   * @example
+   * // Find content WITHOUT video preview in movies screen
+   * const position = await testHelpers.findContentPositionInRowListThatContainsVideoPreview('movieScreenRowList', false, 5);
+   * if (position.length > 0) {
+   *   const [row, col] = position;
+   *   await testHelpers.jumpToRowListPosition('movieScreenRowList', row, col);
+   * }
+   * 
+   * @example
+   * // Find content WITH video preview
+   * const position = await testHelpers.findContentPositionInRowListThatContainsVideoPreview('homeScreenRowList', true);
+   * if (position.length === 0) {
+   *   throw new Error('Could not find content with video preview');
+   * }
+   */
+  public async findContentPositionInRowListThatContainsVideoPreview(
+    rowListElementId: any,
+    hasVideoPreview: boolean = true,
+    maxRowsToSearch: number = 5
+  ): Promise<[number, number] | []> {
+    // Get all content grouped by row
+    const rowsContent = await testUtils.getAllRowListItemsContentGroupedByRow(rowListElementId);
+
+    // Search through rows up to maxRowsToSearch
+    for (let rowIndex = 0; rowIndex < Math.min(rowsContent.length, maxRowsToSearch); rowIndex++) {
+      const rowContent = rowsContent[rowIndex];
+
+      // Search through items in this row
+      for (let colIndex = 0; colIndex < rowContent.length; colIndex++) {
+        const item = rowContent[colIndex];
+        const videoPreviewUrl = item.video_preview_url?.trim();
+
+        // Check if item matches the video preview criteria
+        if (hasVideoPreview && videoPreviewUrl.length > 0) {
+          return [rowIndex, colIndex];
+        } else if (!hasVideoPreview && videoPreviewUrl.length === 0) {
+          return [rowIndex, colIndex];
+        }
+      }
+    }
+
+    // Return empty array if not found
+    return [];
   }
 
   /* ═══════════════════════════════════════════════════════════════════

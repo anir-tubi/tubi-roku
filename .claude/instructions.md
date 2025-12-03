@@ -13,7 +13,22 @@
 
 ### When Generating Tests
 
-1. **CRITICAL: Use ONLY existing helper functions from the codebase**
+1. **🚨 MANDATORY FIRST STEP: Analyze method signatures before using ANY function**
+   - **Before writing ANY code, read the actual method definitions:**
+     - Read `js/automated-tests/test-utils.ts` to see ALL available methods and their signatures
+     - Read `js/automated-tests/test-helpers.ts` to see ALL available helper methods and their signatures
+   - **Search for the exact method definition using:**
+     - Pattern: `grep "methodName.*{" js/automated-tests/test-utils.ts`
+     - Example: `grep "waitForCurrentScreenToEqual.*{" js/automated-tests/test-utils.ts`
+   - **Read the parameter list from the actual TypeScript method definition**
+   - **NEVER guess parameters - always verify the actual signature first**
+   - **Common mistakes to avoid:**
+     - ❌ `retryWithTimeOut(callback, timeout, message)` - WRONG! No message parameter
+     - ✅ `retryWithTimeOut(callback, timeout)` - CORRECT! Only 2 parameters
+     - ❌ `waitForCurrentScreenToEqual(screenId, message, timeout)` - WRONG! No message parameter
+     - ✅ `waitForCurrentScreenToEqual(screenId, timeout)` - CORRECT! Only 2 parameters
+
+2. **CRITICAL: Use ONLY existing helper functions from the codebase**
    - ✅ FIRST check `js/automated-tests/test-helpers.ts` for documented helper functions
    - ✅ Then check `js/automated-tests/test-utils.ts` for utility functions
    - ✅ Look at similar tests in the same file to see what functions they use
@@ -370,6 +385,90 @@ const isVisible = await testUtils.getElementField('detailScreenTitle', 'visible'
 const isFocused = await testUtils.getElementField('movieScreenRowList', 'hasFocus');
 ```
 
+**Getting Focused Items:**
+```typescript
+// ⚠️ CRITICAL: getCurrentlyFocusedGridItemContent is ONLY for grids/lists
+// DO NOT use it for button lists, menus, or non-grid elements
+
+// ❌ WRONG: Using getCurrentlyFocusedGridItemContent on a button list
+const focusedButton = await testUtils.getCurrentlyFocusedGridItemContent('vodDetailScreenMenu');
+expect(focusedButton.id).to.equal('resume');
+
+// ✅ CORRECT: Use odc.getFocusedNode() for button lists and non-grid elements
+const { node } = await odc.getFocusedNode();
+expect(node.id).to.equal('resume');
+
+// ✅ CORRECT: getCurrentlyFocusedGridItemContent for actual grids/lists
+const focusedItem = await testUtils.getCurrentlyFocusedGridItemContent('movieScreenRowList');
+expect(focusedItem.title).to.contain('Expected Title');
+
+// Rule of thumb:
+// - For RowList, Grid, CategoryGridList → use getCurrentlyFocusedGridItemContent
+// - For ButtonList, EnhancedButtonList, Menu → use odc.getFocusedNode()
+// - When in doubt → use odc.getFocusedNode()
+```
+
+**Accessing Nested Node Properties:**
+```typescript
+// ⚠️ CRITICAL: Cannot access nested node properties directly in automated tests
+// Both findNode() and property chaining are NOT available in test automation
+
+// ❌ WRONG: Using findNode() to access child nodes
+const button = await testUtils.getNodeForElement('vodDetailScreenMenu');
+const labelGroup = button.findNode('labelGroup'); // ERROR: findNode is not available!
+const isLabelVisible = labelGroup.visible === true;
+
+// ❌ WRONG: Using property chaining to access nested elements
+const menu = await testUtils.getNodeForElement('vodDetailScreenMenu');
+const firstButton = menu.buttons[0];
+const labelGroup = firstButton.elementsGroup?.titleGroup?.labelGroup; // ERROR: Cannot traverse nested objects!
+const isLabelVisible = labelGroup?.visible === true;
+
+// ❌ WRONG: Trying to access nested properties from button arrays
+const buttons = menu.buttons;
+for (let i = 0; i < buttons.length; i++) {
+  const button = buttons[i];
+  const labelGroup = button.elementsGroup?.titleGroup?.labelGroup; // ERROR: Nested traversal not supported!
+}
+
+// ✅ CORRECT: Define EACH nested element in elements.ts with xpath
+// In automated-tests-config/elements.ts, add separate entries for each button's nested elements:
+//
+// likeButtonLabelGroup: {
+//   keyPath: '#ContentController...#actionButtonList.#like.#elementsGroup.#titleGroup.#labelGroup',
+//   xpath: '//EnhancedButton[@name="like"]//RenderableNode[@name="labelGroup"]'
+// }
+//
+// dislikeButtonLabelGroup: {
+//   keyPath: '#ContentController...#actionButtonList.#dislike.#elementsGroup.#titleGroup.#labelGroup',
+//   xpath: '//EnhancedButton[@name="dislike"]//RenderableNode[@name="labelGroup"]'
+// }
+
+// Then in your test:
+const likeButtonLabel = await testUtils.getNodeForElement('likeButtonLabelGroup');
+const isLikeLabelVisible = likeButtonLabel.visible === true && likeButtonLabel.opacity > 0;
+
+const dislikeButtonLabel = await testUtils.getNodeForElement('dislikeButtonLabelGroup');
+const isDislikeLabelVisible = dislikeButtonLabel.visible === true && dislikeButtonLabel.opacity > 0;
+
+// ✅ ALTERNATIVE: Use app-ui query during test development
+// For exploring nested structure, query app-ui:
+// curl -s "http://192.168.1.231:8060/query/app-ui" | grep -A 10 "like"
+```
+
+**Rule:** For accessing any nested child node properties (like button.elementsGroup.labelGroup, button.icon, etc.):
+1. Define EACH nested element separately in `automated-tests-config/elements.ts` with keyPath AND xpath
+2. Use `testUtils.getNodeForElement()` to access each element independently
+3. NEVER use `findNode()` or property chaining (`.elementsGroup?.titleGroup`) - neither work in test automation
+4. Create one element definition per nested node you need to access
+5. Use app-ui queries for exploration/debugging during test development
+
+**Why this limitation exists:**
+- Test automation can only access nodes that are directly defined in elements.ts
+- The returned node objects don't have child nodes populated - they only have direct properties
+- Property chaining like `button.elementsGroup.titleGroup.labelGroup` returns undefined because child nodes aren't included
+- You must define the full xpath to each nested element you want to access
+
 ## Learning System
 
 This project uses a learning feedback loop:
@@ -445,6 +544,249 @@ await testUtils.waitForElementToShowOnScreen('browseWhileWatchingHeader', 'BWW n
 - **`waitForElementToHaveFocus`** - For waiting for focus changes
 - **`utils.sleep(500-1000)`** - ONLY for short animation delays
 - **`retryWithTimeOut` + assertions** - Only for complex checks involving multiple conditions or field values
+
+## Test Generation Process (5-STEP MANDATORY)
+
+When generating a new test, follow these steps IN ORDER:
+
+### **STEP 1: Understand Requirements**
+
+a) **Read the Test Name** - this contains the EXPECTED BEHAVIOR
+   * Examples:
+     - "Year displayed and runtime not displayed" → Verify year IS visible AND runtime IS NOT visible
+     - "Button is visible" → Verify button IS visible
+     - "Movie has history" → YOU must create history in the test
+   * Pay attention to: "not", "displayed", "hidden", "visible", "autoplay", "preview"
+
+b) **Read the Pre-conditions** - this tells you what SETUP is needed
+   * "be a signed in user" → Use shouldCreateNewUser or create registered user
+   * "movie has history" → YOU must create history in the test
+   * Identify correct user type (Guest vs Registered)
+
+c) **Read the Test Steps** - this tells you the ACTIONS to perform
+   * Understand complete test flow from start to finish
+   * Identify all required user actions
+   * Note expected outcomes at each step
+
+d) **Derive Test Requirements** from Analysis:
+   * Test Name = WHAT to verify (expected behavior)
+   * Steps = HOW to get there (navigation and actions)
+   * Pre-conditions = SETUP required before test
+   * User authentication needs (Guest vs Registered user)
+   * Screen navigation path
+   * Required helper functions (createHistory, navigateToPage, etc.)
+   * Assertions needed to verify behavior
+
+### **STEP 2: READ test-helpers.ts (MANDATORY)**
+
+🚨 YOU MUST READ THIS FILE BEFORE WRITING ANY CODE: `js/automated-tests/test-helpers.ts`
+
+Look for helpers that match your requirements:
+- Navigation helpers (navigateToPage, startAtHomeScreen, etc.)
+- Playback helpers (startPlaybackAndWait, seekToEnd, etc.)
+- Content helpers (createHistory, jumpToContinueWatchingRow, etc.)
+- Verification helpers (verifyElementVisible, verifyElementText, etc.)
+
+Read the JSDoc comments for each helper to understand:
+- What it does
+- What parameters it takes
+- When to use it
+
+If you find a helper that does what you need, USE IT. Do NOT write custom logic.
+
+### **STEP 3: READ test-utils.ts (MANDATORY)**
+
+🚨 YOU MUST READ THIS FILE: `js/automated-tests/test-utils.ts`
+
+Look for utility functions:
+- Wait functions (waitForElementToShowOnScreen, waitForPlayerStateToEqual, etc.)
+- Element functions (getElementField, getNodeForElement, etc.)
+- Navigation functions (startApplicationAtPage, waitForCurrentScreenToEqual, etc.)
+
+Read the method signatures to understand parameters.
+NEVER guess parameters - read the actual signature!
+
+### **STEP 4: Look at Similar Tests in the Target File**
+
+- Search for tests in the same section/screen
+- Look for tests with similar requirements
+- Copy the patterns they use
+- See what imports they have at the top
+
+### **STEP 5: Write Code Using Discovered Helpers**
+
+- Use the helpers/utils you found in steps 2-4
+- DO NOT write custom logic if a helper exists
+- DO NOT manually iterate content if a helper can do it (use helper instead)
+- DO NOT manually check conditions if a wait function exists
+
+🚨 **CRITICAL EXAMPLES:**
+
+❌ **WRONG** (writing custom iteration to find content with preview):
+```typescript
+const content = await testUtils.getRowListRowItemsContent('homeScreenRowList', 0);
+for (const [itemIndex, item] of content.entries()) {
+  if (item.video_preview_url !== '') {
+    await testUtils.jumpToRowItem('homeScreenRowList', [0, itemIndex]);
+    break;
+  }
+}
+```
+
+✅ **CORRECT** (using helper from test-helpers.ts):
+```typescript
+// Read test-helpers.ts and you'll find: findContentPositionInGridThatContainsVideoPreview
+const position = await testHelpers.findContentPositionInGridThatContainsVideoPreview('homeScreenRowList', true);
+if (position.length > 0) {
+  await testUtils.jumpToRowItem('homeScreenRowList', position);
+}
+```
+
+❌ **WRONG** (manually checking element visibility with retryWithTimeOut):
+```typescript
+await testUtils.retryWithTimeOut(async () => {
+  const element = await testUtils.getNodeForElement('elementName');
+  expect(element.visible).to.equal(true);
+}, 10000);
+```
+
+✅ **CORRECT** (using dedicated wait function from test-utils.ts):
+```typescript
+await testUtils.waitForElementToShowOnScreen('elementName', 'Element not visible', 10000);
+```
+
+⚠️ **REMEMBER:**
+- If test mentions "movie has history" → YOU must create history in test
+- For "Remove from History" tests → Create history first, then remove
+- DO NOT invent functions - only use what you find in steps 2-4
+- Use raw ecp.sendKeypress(), odc, utils.sleep() only if no helper exists
+
+## Understanding Element Behavior Patterns
+
+### Combined-Info Elements
+
+**FIRST: Analyze the element name to understand what it contains:**
+- Element names like "titleAndGenre", "yearAndDuration", "nameAndRole" indicate COMBINED INFO in one element
+- These elements show different pieces of info in their .text property based on app state
+- The test verifies WHAT INFO IS SHOWN, not just if element is visible
+
+**PATTERN 1: Testing content within a combined-info element**
+
+When test says "X displayed and Y not displayed" AND element name is like "xAndY":
+
+```typescript
+// The element exists and is visible, but shows only some info
+const element = await testUtils.getNodeForElement('combinedInfoElement');
+
+// Check for presence of X (use appropriate pattern for what X is)
+expect(element.text).to.match(/pattern-for-X/);
+
+// Check for absence of Y (use appropriate pattern for what Y is)
+expect(element.text).to.not.match(/pattern-for-Y/);
+```
+
+**Examples of regex patterns:**
+- Year (4-digit number): `/\d{4}/`
+- Duration/Runtime (time format): `/\d+\s*(h|hr|hour|min|m)/i`
+- Genre (words): `/comedy|drama|action/i`
+- Rating (like PG-13, R): `/\b(G|PG|PG-13|R|NC-17)\b/i`
+
+**PATTERN 2: Testing visibility of separate elements**
+
+When test says "X visible and Y not visible" AND elements are separate:
+
+```typescript
+const xElement = await testUtils.getNodeForElement('xElement');
+expect(xElement.visible).to.equal(true);
+
+const yElement = await testUtils.getNodeForElement('yElement');
+expect(yElement.visible).to.equal(false);
+```
+
+**HOW TO DECIDE which pattern to use:**
+1. Look at element names in the test steps or error messages
+2. If element name combines multiple concepts (e.g., "titleAndYear") → Use PATTERN 1 (text matching)
+3. If there are separate elements → Use PATTERN 2 (visibility checks)
+4. Check existing tests in the same file for similar scenarios
+
+### Getting Focused Items
+
+⚠️ **getCurrentlyFocusedGridItemContent is ONLY for grids/lists**
+
+DO NOT use it for button lists, menus, or non-grid elements!
+
+❌ **WRONG:** Using getCurrentlyFocusedGridItemContent on a button list
+```typescript
+const focusedButton = await testUtils.getCurrentlyFocusedGridItemContent('vodDetailScreenMenu');
+expect(focusedButton.id).to.equal('buttonId');
+```
+
+✅ **CORRECT:** Use odc.getFocusedNode() for button lists and non-grid elements
+```typescript
+const { node } = await odc.getFocusedNode();
+expect(node.id).to.equal('expectedButtonId');
+```
+
+✅ **CORRECT:** getCurrentlyFocusedGridItemContent for actual grids/lists
+```typescript
+const focusedItem = await testUtils.getCurrentlyFocusedGridItemContent('movieScreenRowList');
+expect(focusedItem.title).to.contain('some value');
+```
+
+**Rule of thumb:**
+- For RowList, Grid, CategoryGridList → use getCurrentlyFocusedGridItemContent
+- For ButtonList, EnhancedButtonList, Menu → use odc.getFocusedNode()
+- When in doubt → use odc.getFocusedNode()
+
+## Understanding Autoplay Behavior
+
+### What "Autoplay" means in Tubi app:
+
+When test cases mention "autoplay", this refers to the following sequence:
+
+**1. Preview Phase:**
+- User focuses on a title (on detail screen, home screen, or any screen with content)
+- A preview video (trailer/clip) starts playing automatically in the background
+- Element: `previewVideoPlayer`
+- State: `'playing'`
+
+**2. Autoplay Transition:**
+- After the preview ends OR user waits on the focused title
+- The preview TRANSFORMS into the actual video player
+- The FULL content starts playing automatically
+- Element transitions: `previewVideoPlayer` → `videoPlayerScreen`
+- State: `'playing'`
+- This can happen from ANY screen (detail screen, home screen, browse, etc.)
+
+**3. Key Distinction:**
+- **Preview** = Short trailer/clip that plays in background while browsing
+- **Autoplay** = Full content playback that starts automatically after preview ends
+- Autoplay is NOT the same as "pressing Play button"
+- Autoplay happens automatically without user action
+- Autoplay can trigger from any screen where preview is playing
+
+### Testing Autoplay:
+
+Example code:
+```typescript
+// Wait for preview to start (can be on any screen)
+await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 10000);
+
+// Wait for preview to finish and autoplay to start (preview transforms to full player)
+await testUtils.waitForCurrentScreenToEqual('videoPlayerScreen', 10000);
+await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 10000);
+
+// Verify we're in actual playback, not preview
+const content = await testUtils.getElementField('videoPlayerScreen', 'content');
+expect(content.title).to.exist; // Should have actual content metadata
+```
+
+### Common Autoplay Test Scenarios:
+- "Verify autoplay starts after preview" → Wait for videoPlayerScreen + playing state
+- "Verify autoplay countdown appears" → Check for autoplay UI elements at end of content
+- "Disable autoplay in settings" → Verify videoPlayerScreen does NOT appear after preview
+- "Autoplay next episode" → After current content ends, next episode starts automatically
+- Autoplay can trigger from home screen, detail screen, browse screens, etc.
 
 ---
 

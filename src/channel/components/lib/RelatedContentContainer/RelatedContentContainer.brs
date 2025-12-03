@@ -102,6 +102,7 @@ Function setupPortraitWithMetadata() as Void
   m.grid.translation = [0, 0]
   m.tileMetadata = createObject("roSGNode", "ExpandedTileMetadata")
   m.tileMetadata.update({
+    id: "ymalTileMetadata",
     variant: "portraitWithMetadata"
     descriptionWidth: 1056
     translation: [0, 414]

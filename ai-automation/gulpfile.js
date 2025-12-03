@@ -25,19 +25,34 @@ const CLAUDE_TIMEOUT = 600000; // 10 minutes (increased from 2 to handle large c
 // ============================================================================
 
 async function promptUser() {
-  console.log('🎯 Test Generation Wizard');
-  console.log('========================\n');
+  // Check for command-line arguments
+  const caseIdArg = process.argv.find(arg => arg.startsWith('--caseId='));
+  const caseIdFromCli = caseIdArg ? caseIdArg.split('=')[1] : null;
 
-  const questions = [
-    {
-      type: 'input',
-      name: 'testCaseId',
-      message: 'TestRail Case ID (e.g., "C535841" or "535841"):',
-      validate: (input) => input.length > 0 || 'Test case ID is required'
-    }
-  ];
+  let answers = {};
 
-  const answers = await inquirer.prompt(questions);
+  if (caseIdFromCli) {
+    // Non-interactive mode
+    console.log('🎯 Test Generation (Non-Interactive Mode)');
+    console.log('==========================================\n');
+    console.log(`📋 Using Test Case ID: ${caseIdFromCli}\n`);
+    answers.testCaseId = caseIdFromCli;
+  } else {
+    // Interactive mode
+    console.log('🎯 Test Generation Wizard');
+    console.log('========================\n');
+
+    const questions = [
+      {
+        type: 'input',
+        name: 'testCaseId',
+        message: 'TestRail Case ID (e.g., "C535841" or "535841"):',
+        validate: (input) => input.length > 0 || 'Test case ID is required'
+      }
+    ];
+
+    answers = await inquirer.prompt(questions);
+  }
 
   // Set default values
   answers.runLinter = true;
@@ -216,6 +231,32 @@ function addOnlyToSpecificTest(code, testCaseId = null) {
   return code;
 }
 
+/**
+ * Removes .only from all test cases in a file
+ * @param {string} filePath - Path to the test file
+ */
+function removeTestOnlyFromFile(filePath) {
+  try {
+    let content = fs.readFileSync(filePath, 'utf8');
+    const originalContent = content;
+
+    // Replace all it.only( with it(
+    content = content.replace(/(\s+it)\.only\(/g, '$1(');
+
+    if (content !== originalContent) {
+      fs.writeFileSync(filePath, content, 'utf8');
+      console.log('✅ Removed .only from test file');
+      return true;
+    } else {
+      console.log('ℹ️  No .only found in test file');
+      return false;
+    }
+  } catch (error) {
+    console.error(`❌ Error removing .only: ${error.message}`);
+    return false;
+  }
+}
+
 function cleanGeneratedCode(stdout) {
   let cleanedOutput = stdout.trim();
 
@@ -274,27 +315,111 @@ function cleanGeneratedCode(stdout) {
   return cleanedOutput;
 }
 
-async function generateTestWithAI(testDetails) {
-  console.log('🤖 Calling Claude Code SDK with project context...');
+/**
+ * Scan all test files and extract existing test case IDs
+ * @returns {Array<string>} List of existing test case IDs
+ */
+function getAllExistingTestCaseIds() {
+  const testsDir = path.join(projectRoot, 'js/automated-tests/tests');
+  const existingIds = new Set();
 
-  if (!checkClaudeAvailable()) {
-    throw new Error('Claude Code SDK not found. Please install: npm install -g @anthropic-ai/claude-code');
+  try {
+    const testFiles = fs.readdirSync(testsDir).filter(f => f.endsWith('.ts'));
+
+    for (const file of testFiles) {
+      const filePath = path.join(testsDir, file);
+      const content = fs.readFileSync(filePath, 'utf8');
+
+      // Find all test case IDs in it() or it.only() blocks
+      const matches = content.matchAll(/it(?:\.only)?\s*\(['"]C(\d+)[^'"]*['"]/g);
+      for (const match of matches) {
+        existingIds.add('C' + match[1]);
+      }
+    }
+
+    return Array.from(existingIds).sort();
+  } catch (error) {
+    console.warn('⚠️  Could not scan existing test IDs:', error.message);
+    return [];
   }
+}
 
-  console.log('✅ Claude Code SDK found');
+/**
+ * Generate test with automatic retry if wrong test case ID is used
+ * @param {Object} testDetails
+ * @param {number} maxAttempts
+ * @returns {Promise<string>} Generated test code
+ */
+async function generateTestWithRetry(testDetails, maxAttempts = 3) {
+  const existingTestIds = getAllExistingTestCaseIds();
+  let lastWrongId = null;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    console.log(`\n${'='.repeat(60)}`);
+    console.log(`📍 Generation Attempt ${attempt}/${maxAttempts}`);
+    console.log(`${'='.repeat(60)}\n`);
+
+    const result = await generateTestWithAI(testDetails, existingTestIds, lastWrongId, attempt);
+
+    if (result.isValid) {
+      console.log(`\n✅ Test generated successfully with correct ID: ${testDetails.testCaseId}`);
+      return result.code;
+    }
+
+    // Wrong ID detected
+    console.error('\n' + '━'.repeat(60));
+    console.error('❌ WRONG TEST CASE ID DETECTED');
+    console.error('━'.repeat(60));
+    console.error(`\n🎯 Expected: ${result.expectedId}`);
+    console.error(`❌ Got: ${result.wrongId || 'unknown'}`);
+
+    if (result.wrongId && existingTestIds.includes(result.wrongId)) {
+      console.error(`⚠️  ${result.wrongId} ALREADY EXISTS in codebase - AI copied an existing test!`);
+    }
+
+    lastWrongId = result.wrongId;
+
+    if (attempt < maxAttempts) {
+      console.error(`\n🔄 Retrying with explicit feedback about the mistake...\n`);
+    } else {
+      console.error('\n❌ Failed to generate test with correct ID after all attempts');
+      throw new Error(`AI failed to use correct test case ID after ${maxAttempts} attempts. Expected: ${result.expectedId}, Got: ${result.wrongId}`);
+    }
+  }
+}
+
+async function generateTestWithAI(testDetails, existingTestIds, wrongIdFromPreviousAttempt = null, attempt = 1) {
+  if (attempt === 1) {
+    console.log('🤖 Calling Claude Code SDK with project context...');
+
+    if (!checkClaudeAvailable()) {
+      throw new Error('Claude Code SDK not found. Please install: npm install -g @anthropic-ai/claude-code');
+    }
+
+    console.log('✅ Claude Code SDK found');
+
+    // Get all existing test case IDs to prevent copying (only on first attempt)
+    if (!existingTestIds) {
+      console.log('🔍 Scanning for existing test case IDs...');
+      existingTestIds = getAllExistingTestCaseIds();
+      console.log(`📋 Found ${existingTestIds.length} existing test cases`);
+    }
+  } else {
+    console.log(`🔄 Regenerating with correction feedback (attempt ${attempt})...`);
+  }
 
   return new Promise((resolve, reject) => {
     console.log('📁 Claude will read project files directly...');
     console.log('🤖 Claude will analyze the project and generate test...');
     console.log('⏳ This may take 30-60 seconds...\n');
 
-    const promptContent = buildPrompt(testDetails);
+    const promptContent = buildPrompt(testDetails, existingTestIds, wrongIdFromPreviousAttempt);
 
     // Write prompt to a temporary file to avoid shell escaping issues
     const tmpFile = path.join(projectRoot, '.claude-prompt-tmp');
     fs.writeFileSync(tmpFile, promptContent);
 
-    // Use specific files + all test files for learning from existing test patterns
+    // Add test files for pattern learning, but AI must NOT copy test case IDs
     const claudeCommand = `cat ${tmpFile} | claude --print --add-dir js/automated-tests --add-dir automated-tests-config --add-dir .claude`;
 
     // Progress indicators
@@ -506,7 +631,59 @@ async function generateTestWithAI(testDetails) {
       } else {
         console.log('✅ Output validation passed - code structure looks good');
       }
-      resolve(cleanedOutput);
+
+      // CRITICAL: Verify the generated test uses the CORRECT test case ID
+      // This prevents AI from copying existing tests with different IDs
+      const expectedTestCaseId = testDetails.testCaseId.startsWith('C')
+        ? testDetails.testCaseId
+        : 'C' + testDetails.testCaseId;
+
+      // Find ALL test case IDs in the generated code
+      const allTestCaseIds = [];
+      const itBlockMatches = cleanedOutput.matchAll(/it(?:\.only)?\s*\(['"]([^'"]+)['"]/g);
+      for (const match of itBlockMatches) {
+        const testDescription = match[1];
+        const idMatch = testDescription.match(/C\d+/);
+        if (idMatch) {
+          allTestCaseIds.push(idMatch[0]);
+        }
+      }
+
+      // Check if there are ANY test case IDs other than the expected one
+      const wrongIds = allTestCaseIds.filter(id => id !== expectedTestCaseId);
+      if (wrongIds.length > 0) {
+        console.error(`\n⚠️  Generated code contains MULTIPLE test case IDs!`);
+        console.error(`   Expected only: ${expectedTestCaseId}`);
+        console.error(`   But found: ${allTestCaseIds.join(', ')}`);
+        console.error(`   Wrong IDs: ${wrongIds.join(', ')}`);
+
+        // Return validation error with details for retry
+        resolve({
+          isValid: false,
+          expectedId: expectedTestCaseId,
+          wrongId: wrongIds[0], // Report first wrong ID
+          code: cleanedOutput
+        });
+        return;
+      }
+
+      // Check if the expected test case ID appears in the generated code
+      if (!allTestCaseIds.includes(expectedTestCaseId)) {
+        console.error(`\n⚠️  Expected test case ID ${expectedTestCaseId} not found!`);
+        console.error(`   Found IDs: ${allTestCaseIds.join(', ') || 'none'}`);
+
+        // Return validation error with details for retry
+        resolve({
+          isValid: false,
+          expectedId: expectedTestCaseId,
+          wrongId: allTestCaseIds[0] || null,
+          code: cleanedOutput
+        });
+        return;
+      }
+
+      console.log(`✅ Test case ID verified: ${expectedTestCaseId} (only ID in output)`);
+      resolve({ isValid: true, code: cleanedOutput });
     });
   });
 }
@@ -907,21 +1084,36 @@ async function runLinter(filePath) {
           // TypeScript errors usually go to stdout
           const tscOutput = (tscStdout + '\n' + tscStderr).trim();
 
-          // Filter to only show errors related to the generated test file
+          // First, check if the generated file is mentioned in the output
           const lines = tscOutput.split('\n');
-          const fileSpecificErrors = lines.filter(line =>
-            line.includes(filePath) ||
-            (line.trim().startsWith('error TS') && !line.includes('node_modules'))
-          );
+          const fileErrorLines = [];
+
+          // Find all lines that reference the generated file
+          for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            if (line.includes(filePath)) {
+              // Found an error in our file - capture this line and the next few lines for context
+              fileErrorLines.push(line);
+              // Capture up to 3 following lines that might be part of the error message
+              for (let j = 1; j <= 3 && i + j < lines.length; j++) {
+                const nextLine = lines[i + j];
+                // Stop if we hit another file path or empty line
+                if (nextLine.trim().match(/^[a-zA-Z\/\.].*\(\d+,\d+\):/) || nextLine.trim() === '') {
+                  break;
+                }
+                fileErrorLines.push(nextLine);
+              }
+            }
+          }
 
           // If there are file-specific errors, report them
-          if (fileSpecificErrors.length > 0) {
+          if (fileErrorLines.length > 0) {
             console.log('\n⚠️  TypeScript found issues in generated test:\n');
             console.log('━'.repeat(60));
-            console.log(fileSpecificErrors.join('\n'));
+            console.log(fileErrorLines.join('\n'));
             console.log('━'.repeat(60));
             console.log('');
-            resolve({ hasErrors: true, errors: fileSpecificErrors.join('\n'), type: 'typescript' });
+            resolve({ hasErrors: true, errors: fileErrorLines.join('\n'), type: 'typescript' });
             return;
           }
 
@@ -958,7 +1150,7 @@ async function fixLintErrors(filePath, lintResult) {
     const tmpFile = path.join(projectRoot, '.claude-lint-fix-tmp');
     fs.writeFileSync(tmpFile, promptContent);
 
-    // Use specific files + all test files for learning from existing test patterns
+    // Add test files for pattern learning, but AI must NOT copy test case IDs
     const claudeCommand = `cat ${tmpFile} | claude --print --add-dir js/automated-tests --add-dir automated-tests-config --add-dir .claude`;
 
     console.log('⏳ Calling Claude to fix errors...');
@@ -1361,7 +1553,7 @@ await testUtils.waitForElementToShowOnScreen('elementName', 'Element not visible
 
 More examples:
 - await testUtils.waitForElementToShowOnScreen('browseWhileWatchingHeader', 'BWW not shown', 10000);
-- await testUtils.waitForElementToFullyShowOnScreen('transportButtons', 'Transport not shown', 10000);
+- await testUtils.waitForElementToShowOnScreen('transportButtons', 'Transport not shown', 10000);
 - Ensure screen is fully loaded before checking visibility
 `;
       break;
@@ -1463,7 +1655,7 @@ YOUR FIRST LINE MUST BE: import
     const tmpFile = path.join(projectRoot, '.claude-error-fix-tmp');
     fs.writeFileSync(tmpFile, promptContent);
 
-    // Use specific files + all test files for learning from existing test patterns
+    // Add test files for pattern learning, but AI must NOT copy test case IDs
     const claudeCommand = `cat ${tmpFile} | claude --print --add-dir js/automated-tests --add-dir automated-tests-config --add-dir .claude`;
 
     console.log('⏳ Claude is analyzing the error and generating fix...');
@@ -2209,8 +2401,8 @@ gulp.task('generate-test', async (done) => {
     console.log(`  Steps: ${testDetails.testSteps.substring(0, 80)}${testDetails.testSteps.length > 80 ? '...' : ''}`);
     console.log(`  Tags: ${testDetails.tags}\n`);
 
-    // Generate test with Claude
-    const generatedTest = await generateTestWithAI(testDetails);
+    // Generate test with Claude (with automatic retry if wrong ID is used)
+    const generatedTest = await generateTestWithRetry(testDetails);
 
     // Save test file
     const filePath = saveTest(generatedTest, testDetails);
@@ -2254,6 +2446,9 @@ gulp.task('generate-test', async (done) => {
         console.log('\n🎉 Test generated and verified successfully!');
         console.log(`✅ Test passed after ${testResult.attempts} attempt(s)`);
 
+        // Remove .only from test file after successful execution
+        removeTestOnlyFromFile(filePath);
+
         // Auto-record fix if errors were resolved
         if (testResult.attempts > 1 && testResult.fixedErrorType && testResult.errorCategory && testResult.errorOutput) {
           console.log('\n📚 Auto-recording successful fix to learned-fixes.md...');
@@ -2286,6 +2481,7 @@ gulp.task('generate-test', async (done) => {
     done(error);
   }
 });
+
 
 gulp.task('default', gulp.series('generate-test'));
 

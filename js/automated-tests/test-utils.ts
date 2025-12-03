@@ -59,6 +59,7 @@ enum ScreenIds {
   'myStuffScreen' = 'myStuffScreen',
   'tvScreen' = 'tvScreen',
   'detailScreen' = 'detailScreen',
+  'vodDetailScreen' = 'vodDetailScreen',
   'episodeScreen' = 'episodeScreen',
   'emailInputScreen' = 'emailInputScreen',
   'signInScreen' = 'signInScreen',

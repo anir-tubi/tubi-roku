@@ -70,7 +70,8 @@ function makeTestRailRequest(endpoint) {
  */
 async function fetchTestCaseWithContext(caseId) {
   try {
-    // Remove C prefix if present (TestRail API expects numeric ID)
+    // Convert to string and remove C prefix if present (TestRail API expects numeric ID)
+    caseId = String(caseId);
     if (caseId.startsWith('C')) {
       caseId = caseId.substring(1);
     }
