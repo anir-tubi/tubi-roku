@@ -283,12 +283,13 @@ Function setBadge(badgeType = "live", badgeInfo = {})
   else if badgeType = m.badgeTypes.sot
 
     ' Create SOT badges using helper function
+    sotPosterLabels = m.top.itemContent.sotPosterLabels
     sotBadges = createSOTBadges(badgeInfo, {
       focusedTextColor: m.focusedTextColor
       maxWidth: m.top.width - 12
       bodyMediumStrongFont: m.bodyMediumStrongFont
       cautionColor: m.cautionColor
-    })
+    }, sotPosterLabels)
 
     ' Append top label badges
     for each topLabel in sotBadges.topLabels

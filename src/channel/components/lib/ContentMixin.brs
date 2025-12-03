@@ -72,8 +72,9 @@ End Function
 '   - maxWidth: maximum width for badges (required)
 '   - bodyMediumStrongFont: font for marker badge (optional)
 '   - cautionColor: color for marker badge (optional)
+' @param sotPosterLabels - Optional AssocArray containing poster label data (sotLabelText, sotIcon)
 ' @return AssocArray with topLabels (array of Badge nodes) and marker (Badge node or invalid)
-Function createSOTBadges(sotInfo, config)
+Function createSOTBadges(sotInfo, config, sotPosterLabels = invalid)
   result = {
     topLabels: []
     marker: invalid
@@ -92,6 +93,16 @@ Function createSOTBadges(sotInfo, config)
       topLabel.maxWidth = config.maxWidth
       result.topLabels.push(topLabel)
     end for
+  else
+    ' Fallback to sotPosterLabels if provided and no top labels exist
+    if isNonEmptyArray(sotTopLabelSignals) = false AND isNonEmptyAA(sotPosterLabels) = true
+      posterLabel = createObject("roSGNode", "Badge")
+      posterLabel.text = sotPosterLabels.sotLabelText
+      posterLabel.iconUri = sotPosterLabels.sotIcon
+      posterLabel.textColor = config.focusedTextColor
+      posterLabel.maxWidth = config.maxWidth
+      result.topLabels.push(posterLabel)
+    end if
   end if
 
   ' Create marker badge from sotMarkers

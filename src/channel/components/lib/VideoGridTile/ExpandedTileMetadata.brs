@@ -257,7 +257,7 @@ Function handleSOTBadgesAndLayout(itemContent) as Void
       maxWidth: m.top.width - 12
       bodyMediumStrongFont: m.bodyMediumStrongFont
       cautionColor: m.cautionColor
-    })
+    }, itemContent.sotPosterLabels)
 
     if isNonEmptyArray(sotBadges.topLabels) = true
       m.metadataGroup.insertChild(m.sotTopLabelGroup, 0)
