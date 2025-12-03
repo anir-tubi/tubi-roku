@@ -2,7 +2,7 @@
 // This file provides some functions for downloading and updating the client error config
 
 const fs = require('fs');
-const {fetchJSON} = require('./network');
+const { fetchJSON } = require('./network');
 const { NoStackError } = require('./utilities');
 
 const localClientErrorConfigUrl = 'https://d0.tubitv.com/error-handler/v2/client-error-config.json';
@@ -37,7 +37,7 @@ async function verifyLocalClientErrorConfigIsCurrent(done) {
   const existingLocalClientErrorConfig = fs.readFileSync(localClientErrorConfigFilePath, 'utf8');
 
   if (generatedLocalClientErrorConfig !== existingLocalClientErrorConfig) {
-    done(new NoStackError(`The client error config file is out of date. Run the gulp task updateErrorConfig to update it.`));
+    done(new NoStackError(`The client error config file is out of date. Run the gulp tasks updateErrorConfig to update it.`));
   } else {
     done();
   }
