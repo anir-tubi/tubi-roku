@@ -26,7 +26,7 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
 
       roku_player_improvement: {
         'Showing branding logo on top right corner of player
-        roku_player_branding_v0: {
+        roku_player_branding_v2: {
           default: { "enabled": false }
         }
         ' Ad request cuepoint alignment - fetch Ad anywhere between 3~15 second before cuepoint if experiment is enabled

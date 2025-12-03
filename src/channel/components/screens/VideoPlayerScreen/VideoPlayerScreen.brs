@@ -193,7 +193,7 @@ Function init()
   m.logoKids = m.top.findNode("tubiKidsLogo")
   m.brandingLogo = m.top.findNode("brandingLogo")
 
-  m.isBrandingLogoExperimentEnabled = getStatsigExperimentResource("roku_player_improvement", "roku_player_branding_v0", false).enabled
+  m.isBrandingLogoExperimentEnabled = getStatsigExperimentResource("roku_player_improvement", "roku_player_branding_v2", false).enabled
 
   ' Initialize retry configuration for network errors
   m.isRetryExperimentEnabled = getStatsigExperimentResource("roku_player_improvement", "roku_player_retry_network_errors_v1", false).enabled
@@ -3350,8 +3350,8 @@ End Function
 ' @shouldShowBrandingLogo: boolean, true to show the logo with animation, false to hide the logo with animation
 ' @delay: integer, delay to start the animation
 Function updateBrandingLogoVisibility(shouldShowBrandingLogo = false, delay = 0)
-  'roku_player_branding_v0 exposure event should be fired when content loads
-  if shouldShowBrandingLogo = true AND getStatsigExperimentResource("roku_player_improvement", "roku_player_branding_v0", true).enabled = true
+  'roku_player_branding_v2 exposure event should be fired when content loads
+  if shouldShowBrandingLogo = true AND getStatsigExperimentResource("roku_player_improvement", "roku_player_branding_v2", true).enabled = true
     ' Update branding logo URI and width based on app mode, then show with animation
     if m.top.appMode = "KIDS_MODE"
       m.brandingLogo.uri = "pkg:/images/logo-kids-large.webp"
