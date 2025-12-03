@@ -50,12 +50,12 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
 
       roku_postplay_countdown_timer: {
         ' Possible values for movie timer: 10s, 20s, 40s, 60s (default: 30s)
-        roku_postplay_countdown_timer_movie_v0: {
+        roku_postplay_countdown_timer_movie_v1: {
           default: { countdown: 30 }
         }
 
         ' Possible values for series timer: 3s, 5s, 10s (default: 15s)
-        roku_postplay_countdown_timer_series_v0: {
+        roku_postplay_countdown_timer_series_v1: {
           default: { countdown: 15 }
         }
       }

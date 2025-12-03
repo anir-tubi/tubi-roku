@@ -46,8 +46,8 @@ Function init()
   m.tubiTrackingInfo = TubiTrackingInfo(m.constants)
   m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
 
-  m.moviePostplayCountdown = getStatsigExperimentResource("roku_postplay_countdown_timer", "roku_postplay_countdown_timer_movie_v0", false).countdown
-  m.seriesPostplayCountdown = getStatsigExperimentResource("roku_postplay_countdown_timer", "roku_postplay_countdown_timer_series_v0", false).countdown
+  m.moviePostplayCountdown = getStatsigExperimentResource("roku_postplay_countdown_timer", "roku_postplay_countdown_timer_movie_v1", false).countdown
+  m.seriesPostplayCountdown = getStatsigExperimentResource("roku_postplay_countdown_timer", "roku_postplay_countdown_timer_series_v1", false).countdown
 
   m.top.handlesTransportVoiceRequests = true
   m._ = rodash()

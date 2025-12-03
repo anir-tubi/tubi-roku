@@ -11,8 +11,8 @@ Function init()
   m.top.observeField("resetContent", "onResetContent")
   m.top.observeField("command", "onCommand")
 
-  m.moviePostplayCountdown = getStatsigExperimentResource("roku_postplay_countdown_timer", "roku_postplay_countdown_timer_movie_v0", false).countdown
-  m.seriesPostplayCountdown = getStatsigExperimentResource("roku_postplay_countdown_timer", "roku_postplay_countdown_timer_series_v0", false).countdown
+  m.moviePostplayCountdown = getStatsigExperimentResource("roku_postplay_countdown_timer", "roku_postplay_countdown_timer_movie_v1", false).countdown
+  m.seriesPostplayCountdown = getStatsigExperimentResource("roku_postplay_countdown_timer", "roku_postplay_countdown_timer_series_v1", false).countdown
 
   '//::NOTE:: the translation of m.UpNextUI is modified by AnimationMixin,
   '// so the translation of the UpNextUI element should not be changed directly.
@@ -567,12 +567,12 @@ Function onShow()
   ' reset the countdown timer prior to fading in the up next content so that
   ' the timer doesn't flash an old time from the previous time the up next UI was visible.
   if m.MovieGroup.visible = true
-    '//fire the roku_postplay_countdown_timer_movie_v0 exposure event
-    getStatsigExperimentResource("roku_postplay_countdown_timer", "roku_postplay_countdown_timer_movie_v0", true)
+    '//fire the roku_postplay_countdown_timer_movie_v1 exposure event
+    getStatsigExperimentResource("roku_postplay_countdown_timer", "roku_postplay_countdown_timer_movie_v1", true)
     drawCountdown(m.CountdownMovie, m.timeRemaining)
   else
-    '//fire the roku_postplay_countdown_timer_series_v0 exposure event
-    getStatsigExperimentResource("roku_postplay_countdown_timer", "roku_postplay_countdown_timer_series_v0", true)
+    '//fire the roku_postplay_countdown_timer_series_v1 exposure event
+    getStatsigExperimentResource("roku_postplay_countdown_timer", "roku_postplay_countdown_timer_series_v1", true)
     drawCountdown(m.CountdownSeries, m.timeRemaining)
   end if
 
