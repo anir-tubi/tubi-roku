@@ -160,6 +160,23 @@ Function init()
 End Function
 
 
+Function appendChildrenToParent(children, parent)
+  if isNonEmptyArray(children) = true
+    ' Filter out children that already have a parent and invalid children
+    childrenToAppend = []
+    for each child in children
+      if child <> invalid AND child.getParent() = invalid
+        childrenToAppend.push(child)
+      end if
+    end for
+
+    if childrenToAppend.count() > 0
+      parent.appendChildren(childrenToAppend)
+    end if
+  end if
+End Function
+
+
 Function onThemeChange(msg = invalid)
   if msg <> invalid
     theme = msg.getData()
@@ -1103,20 +1120,29 @@ Function onModeChange()
   if m.top.mode = m.constants.ui.infoPanelModes.item
     ' used for movies and series on the homescreen and similar screens
     m.infoPanelGroup.appendChild(m.offset)
-    m.offset.appendChild(m.sotTopLabelGroup)
-    m.offset.appendChild(m.title)
-    m.offset.appendChild(m.twoLineInfo)
-    m.offset.appendChild(m.descriptionGroup)
 
+    offsetChildrenArray = [
+      m.sotTopLabelGroup,
+      m.title,
+      m.twoLineInfo,
+      m.descriptionGroup
+    ]
+
+    appendChildrenToParent(offsetChildrenArray, m.offset)
     m.twoLineInfo.appendChild(m.firstLineGroup)
-    m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
-    m.firstLineGroup.appendChild(m.line1)
-    m.firstLineGroup.appendChild(m.closedCaptionPoster)
-    m.firstLineGroup.appendChild(m.audioDescriptionPoster)
-    m.firstLineGroup.appendChild(m.rating)
-    m.firstLineGroup.appendChild(m.descriptorCode)
-    m.firstLineGroup.appendChild(m.expireWarning)
-    m.firstLineGroup.appendChild(m.partnerLogo)
+
+    firstLineGroupChildren = [
+      m.firstLineAvailabilityBadge,
+      m.line1,
+      m.closedCaptionPoster,
+      m.audioDescriptionPoster,
+      m.rating,
+      m.descriptorCode,
+      m.expireWarning,
+      m.partnerLogo
+    ]
+
+    appendChildrenToParent(firstLineGroupChildren, m.firstLineGroup)
     m.twoLineInfo.appendChild(m.secondLineGroup)
     m.secondLineGroup.appendChild(m.line2)
 
@@ -1124,78 +1150,123 @@ Function onModeChange()
   else if m.top.mode = m.constants.ui.infoPanelModes.movie
     ' used for movies on the details screen
     m.infoPanelGroup.appendChild(m.offset)
-    m.offset.appendChild(m.sotTopLabelGroup)
-    m.offset.appendChild(m.title)
-    m.offset.appendChild(m.twoLineInfo)
-    m.offset.appendChild(m.descriptionGroup)
+    offsetChildrenArray = [
+      m.sotTopLabelGroup,
+      m.title,
+      m.twoLineInfo,
+      m.descriptionGroup
+    ]
 
+    appendChildrenToParent(offsetChildrenArray, m.offset)
     m.twoLineInfo.appendChild(m.firstLineGroup)
-    m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
-    m.firstLineGroup.appendChild(m.line1)
-    m.firstLineGroup.appendChild(m.closedCaptionPoster)
-    m.firstLineGroup.appendChild(m.audioDescriptionPoster)
-    m.firstLineGroup.appendChild(m.rating)
-    m.firstLineGroup.appendChild(m.descriptorCode)
-    m.firstLineGroup.appendChild(m.expireWarning)
-    m.firstLineGroup.appendChild(m.partnerLogo)
+    firstLineGroupChildren = [
+      m.firstLineAvailabilityBadge,
+      m.line1,
+      m.closedCaptionPoster,
+      m.audioDescriptionPoster,
+      m.rating,
+      m.descriptorCode,
+      m.expireWarning,
+      m.partnerLogo
+    ]
 
+    appendChildrenToParent(firstLineGroupChildren, m.firstLineGroup)
     m.twoLineInfo.appendChild(m.secondLineGroup)
-    m.secondLineGroup.appendChild(m.line2)
-    m.secondLineGroup.appendChild(m.rottenTomatoBadge)
+
+    secondLineGroupArray = [
+      m.line2,
+      m.rottenTomatoBadge
+    ]
+
+    appendChildrenToParent(secondLineGroupArray, m.secondLineGroup)
 
     m.offset.itemSpacings = [13]
   else if m.top.mode = m.constants.ui.infoPanelModes.series
     ' used for episodes/series on the details screen
     m.infoPanelGroup.appendChild(m.offset)
-    m.offset.appendChild(m.sotTopLabelGroup)
-    m.offset.appendChild(m.title)
-    m.offset.appendChild(m.episode)
-    m.offset.appendChild(m.twoLineInfo)
-    m.offset.appendChild(m.descriptionGroup)
+    offsetChildrenArray = [
+      m.sotTopLabelGroup,
+      m.title,
+      m.episode,
+      m.twoLineInfo,
+      m.descriptionGroup
+    ]
+
+    appendChildrenToParent(offsetChildrenArray, m.offset)
     m.twoLineInfo.appendChild(m.firstLineGroup)
-    m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
-    m.firstLineGroup.appendChild(m.line1)
-    m.firstLineGroup.appendChild(m.closedCaptionPoster)
-    m.firstLineGroup.appendChild(m.audioDescriptionPoster)
-    m.firstLineGroup.appendChild(m.rating)
-    m.firstLineGroup.appendChild(m.descriptorCode)
-    m.firstLineGroup.appendChild(m.expireWarning)
-    m.firstLineGroup.appendChild(m.partnerLogo)
+
+    firstLineGroupChildren = [
+      m.firstLineAvailabilityBadge,
+      m.line1,
+      m.closedCaptionPoster,
+      m.audioDescriptionPoster,
+      m.rating,
+      m.descriptorCode,
+      m.expireWarning,
+      m.partnerLogo
+    ]
+
+    appendChildrenToParent(firstLineGroupChildren, m.firstLineGroup)
+
 
     m.twoLineInfo.appendChild(m.secondLineGroup)
 
-    m.secondLineGroup.appendChild(m.line2)
-    m.secondLineGroup.appendChild(m.rottenTomatoBadge)
+    secondLineGroupArray = [
+      m.line2,
+      m.rottenTomatoBadge
+    ]
+
+    appendChildrenToParent(secondLineGroupArray, m.secondLineGroup)
+
     m.offset.itemSpacings = [13, 16, 13]
   else if m.top.mode = m.constants.ui.infoPanelModes.episode
     ' used for episodes on the episode list screen
     m.infoPanelGroup.appendChild(m.offset)
-    m.offset.appendChild(m.title)
-    m.offset.appendChild(m.episode)
-    m.offset.appendChild(m.twoLineInfo)
-    m.offset.appendChild(m.descriptionGroup)
+    offsetChildrenArray = [
+      m.title,
+      m.episode,
+      m.twoLineInfo,
+      m.descriptionGroup
+    ]
 
+    appendChildrenToParent(offsetChildrenArray, m.offset)
     m.twoLineInfo.appendChild(m.firstLineGroup)
-    m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
-    m.firstLineGroup.appendChild(m.line1)
-    m.firstLineGroup.appendChild(m.closedCaptionPoster)
-    m.firstLineGroup.appendChild(m.audioDescriptionPoster)
-    m.firstLineGroup.appendChild(m.rating)
-    m.firstLineGroup.appendChild(m.descriptorCode)
-    m.firstLineGroup.appendChild(m.expireWarning)
-    m.firstLineGroup.appendChild(m.partnerLogo)
 
+    firstLineGroupChildren = [
+      m.firstLineAvailabilityBadge,
+      m.line1,
+      m.closedCaptionPoster,
+      m.audioDescriptionPoster,
+      m.rating,
+      m.descriptorCode,
+      m.expireWarning,
+      m.partnerLogo
+    ]
+
+    appendChildrenToParent(firstLineGroupChildren, m.firstLineGroup)
     m.twoLineInfo.appendChild(m.secondLineGroup)
-    m.secondLineGroup.appendChild(m.line2)
-    m.secondLineGroup.appendChild(m.rottenTomatoBadge)
+
+
+    secondLineGroupArray = [
+      m.line2,
+      m.rottenTomatoBadge
+    ]
+
+    appendChildrenToParent(secondLineGroupArray, m.secondLineGroup)
 
     m.offset.itemSpacings = [13, 16, 13]
   else if m.top.mode = m.constants.ui.infoPanelModes.season
     ' used when the side nav season item is focused on the episode list screen
     m.infoPanelGroup.appendChild(m.offset)
-    m.offset.appendChild(m.title)
-    m.offset.appendChild(m.twoLineInfo)
-    m.offset.appendChild(m.descriptionGroup)
+
+    offsetChildrenArray = [
+      m.title,
+      m.twoLineInfo,
+      m.descriptionGroup
+    ]
+
+    appendChildrenToParent(offsetChildrenArray, m.offset)
+
 
     m.twoLineInfo.appendChild(m.secondLineGroup)
     m.secondLineGroup.appendChild(m.line2)
@@ -1205,32 +1276,52 @@ Function onModeChange()
   else if m.top.mode = m.constants.ui.infoPanelModes.continueWatching OR m.top.mode = m.constants.ui.infoPanelModes.channel
     ' used for guest user continue watching row on the home screen or for channel metadata
     m.infoPanelGroup.appendChild(m.offset)
-    m.offset.appendChild(m.title)
-    m.offset.appendChild(m.descriptionGroup)
+
+    offsetChildrenArray = [
+      m.title,
+      m.descriptionGroup
+    ]
+
+    appendChildrenToParent(offsetChildrenArray, m.offset)
+
     m.offset.itemSpacings = [15]
   else if m.top.mode = m.constants.ui.infoPanelModes.linearHomeScreen
     '//For when the linear player is on the home screen
     m.infoPanelGroup.appendChild(m.offset)
-    m.offset.appendChild(m.topHeaderGroup)
-    m.offset.appendChild(m.title)
-    m.offset.appendChild(m.descriptionGroup)
-    m.offset.appendChild(m.playerCountdownGroup)
+    offsetChildrenArray = [
+      m.topHeaderGroup,
+      m.title,
+      m.descriptionGroup,
+      m.playerCountdownGroup
+    ]
+
+    appendChildrenToParent(offsetChildrenArray, m.offset)
+
     'The fourth item spacing is to add the space between playerCountdownGroup and needsLogin(signup text with lock icon)
     m.offset.itemSpacings = [12]
   else if m.top.mode = m.constants.ui.infoPanelModes.epg
     '//For when the linear player is on its own EPG screen
     m.infoPanelGroup.appendChild(m.leftHeaderImage)
     m.infoPanelGroup.appendChild(m.offset)
-    m.offset.appendChild(m.title)
-    m.offset.appendChild(m.twoLineInfo)
-    m.offset.appendChild(m.descriptionGroup)
 
+    offsetChildrenArray = [
+      m.title,
+      m.twoLineInfo,
+      m.descriptionGroup,
+    ]
+
+    appendChildrenToParent(offsetChildrenArray, m.offset)
     m.twoLineInfo.appendChild(m.firstLineGroup)
-    m.firstLineGroup.appendChild(m.line1)
-    m.firstLineGroup.appendChild(m.closedCaptionPoster)
-    m.firstLineGroup.appendChild(m.audioDescriptionPoster)
-    m.firstLineGroup.appendChild(m.rating)
-    m.firstLineGroup.appendChild(m.descriptorCode)
+
+    firstLineGroupChildren = [
+      m.line1,
+      m.closedCaptionPoster,
+      m.audioDescriptionPoster,
+      m.rating,
+      m.descriptorCode
+    ]
+
+    appendChildrenToParent(firstLineGroupChildren, m.firstLineGroup)
 
     m.top.appendChild(m.playerCountdownGroup)
     m.playerCountdownGroup.translation = [1215, -111]
@@ -1240,26 +1331,43 @@ Function onModeChange()
   else if m.top.mode = m.constants.ui.infoPanelModes.linearSearch
     ' when linear content is focused on the search screen
     m.infoPanelGroup.appendChild(m.offset)
-    m.offset.appendChild(m.title)
-    m.offset.appendChild(m.twoLineInfo)
-    m.offset.appendChild(m.descriptionGroup)
+    offsetChildrenArray = [
+      m.title,
+      m.twoLineInfo,
+      m.descriptionGroup,
+    ]
 
+    appendChildrenToParent(offsetChildrenArray, m.offset)
     m.twoLineInfo.appendChild(m.secondLineGroup)
-    m.secondLineGroup.appendChild(m.secondLineAvailabilityBadge)
-    m.secondLineGroup.appendChild(m.line2)
+
+    secondLineGroupArray = [
+      m.secondLineAvailabilityBadge,
+      m.line2
+    ]
+
+    appendChildrenToParent(secondLineGroupArray, m.secondLineGroup)
 
     'The third item spacing is to add the space between description and needsLogin(signup text with lock icon)
     m.offset.itemSpacings = [13, 16, 13]
   else if m.top.mode = m.constants.ui.infoPanelModes.sportsEvent
     m.infoPanelGroup.appendChild(m.offset)
-    m.offset.appendChild(m.title)
-    m.offset.appendChild(m.twoLineInfo)
 
+    offsetChildrenArray = [
+      m.title,
+      m.twoLineInfo
+    ]
+
+    appendChildrenToParent(offsetChildrenArray, m.offset)
     m.twoLineInfo.appendChild(m.firstLineGroup)
-    m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
-    m.firstLineGroup.appendChild(m.line1Bold)
-    m.firstLineGroup.appendChild(m.closedCaptionPoster)
-    m.firstLineGroup.appendChild(m.audioDescriptionPoster)
+
+    firstLineGroupChildren = [
+      m.firstLineAvailabilityBadge,
+      m.line1Bold,
+      m.closedCaptionPoster,
+      m.audioDescriptionPoster
+    ]
+
+    appendChildrenToParent(firstLineGroupChildren, m.firstLineGroup)
 
     m.twoLineInfo.appendChild(m.secondLineGroup)
     m.secondLineGroup.appendChild(m.line2)
@@ -1267,20 +1375,23 @@ Function onModeChange()
   else if m.top.mode = m.constants.ui.infoPanelModes.linearProgramHomescreen
     ' This infopanel mode is for linear programs in response with V4 api
     m.infoPanelGroup.appendChild(m.offset)
-    m.offset.appendChild(m.title)
+
+    offsetChildrenArray = [
+      m.title
+    ]
 
     if isNonEmptyString(m.episode.text)
-      m.offset.appendChild(m.episode)
+      offsetChildrenArray.push(m.episode)
     end if
+    offsetChildrenArray.push(m.twoLineInfo)
+    offsetChildrenArray.push(m.descriptionGroup)
 
-    m.offset.appendChild(m.twoLineInfo)
+    appendChildrenToParent(offsetChildrenArray, m.offset)
 
     m.twoLineInfo.appendChild(m.firstLineGroup)
     m.firstLineGroup.appendChild(m.line1)
     m.twoLineInfo.appendChild(m.secondLineGroup)
     m.secondLineGroup.appendChild(m.line2)
-
-    m.offset.appendChild(m.descriptionGroup)
 
     m.offset.itemSpacings = [13, 16, 13]
   end if
