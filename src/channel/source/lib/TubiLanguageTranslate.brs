@@ -5064,7 +5064,7 @@ Function getTranslation_fr_CA()
     },
     "onNow": {
       "description": "badge text to show program is not live but on now",
-      "message": "Maintenant"
+      "message": "En ondes"
     },
     "day_1": {
       "description": "shortened version Monday, formatted with , and a space",
@@ -6341,6 +6341,10 @@ Function getTranslation_en_GB()
     "videoPlayer_adHeadsUp": {
       "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
       "message": "Adverts start in {seconds} s"
+    },
+    "linearVideoPlayer_adCounter": {
+      "description": "Label to display ad counter in linear video player",
+      "message": "Advert {ad_index} of {ad_count}"
     },
     "channel_webDescription": {
       "description": "This is the description of the app. This is not located in the app. It is displayed to the user in the Roku Web Channel Store",
