@@ -34,7 +34,7 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
           default: { "enabled": false }
         }
         ' Testing preroll ad timeout values: 12s, 8s and 5s variants
-        roku_player_ad_preroll_timeout_v0: {
+        roku_player_ad_preroll_timeout_v2: {
           default: { "timeout": 10000 }
         }
         ' Testing autoplay of content immediately after the trailer finishes
