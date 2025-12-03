@@ -317,8 +317,8 @@ TBD
 
 8\. Create a SC ticket with any changes that have been made and give the ticket to the QA team for manual testing.
 
-  - Go to the ShortCut tool
-  - Create a QA ticket by navigating to the following menu items: Create Story in Team> Create Story> Product QA Team> Roku QA Template
+  - Go to [JIRA](https://tubitv.atlassian.net/)
+  - Create a QA ticket
   - Run the command `gulp buildQaChanges`, which will build most of the copy for this ticket and place it in your clipboard
   - Paste the copy in the newly created SC ticket from the previous step
   - Change the branch name within the SC ticket to reflect the new created submission branch (`x_y_branch`). The `buildQaChanges` command does not yet handle submission builds so the command will assume that it should use the remote submission naming convention. 
@@ -352,7 +352,7 @@ TBD
   - push the `release_x_y_z` branch to Github.
   - make a PR to the `x_y_branch` on Github from the `release_x_y_z` branch.
   - prompt you to make a Github release (including adding build notes) in the CLI based on the tag that was just created. __If you choose not to make a release in the CLI, you must do step 14.__
-    - Automatic release note generation has now been added. If you choose not to use the automatically generated release notes, please make sure that the release notes adhere to the following. Each build note should be correspond to a change that was submitted as part of the QA Shortcut ticket that you made earlier. Remember, do not use commit messages, but rather write simple phrases or sentences that are easy to digest and accurately describe what the change was. Assume non technical readers will be consuming this information.
+    - Automatic release note generation has now been added. If you choose not to use the automatically generated release notes, please make sure that the release notes adhere to the following. Each build note should be correspond to a change that was submitted as part of the QA JIRA ticket that you made earlier. Remember, do not use commit messages, but rather write simple phrases or sentences that are easy to digest and accurately describe what the change was. Assume non technical readers will be consuming this information.
   - copy the Github urls for the two PRs made above to the clipboard.
 
     __Note:__ As an edge case, if you need to manually perform the release steps for the new build, follow the [Manual Submission Release Steps](https://github.com/adRise/project-total-recall/docs/manual_release.md#submission-release)
@@ -409,7 +409,7 @@ TBD
 
 - In the description area, add the date on which the release was actually deployed (ideally this is the same day as the Github release is being created, but sometimes it might not be.
 
-- Also within the description area, add the changes that were included in the release to the "Describe this release" description text box if you did not use the automatic release note generation. As it was mentioned earlier, use the the changes that were submitted to the QA Shortcut ticket that you made earlier. Each change should be on its own line and end with a period. Remember do not use commit messages, but rather write simple phrases or sentences that are easy to digest and accurately describe what the change was. Assume non technical readers will be consuming this information.
+- Also within the description area, add the changes that were included in the release to the "Describe this release" description text box if you did not use the automatic release note generation. As it was mentioned earlier, use the the changes that were submitted to the QA JIRA ticket that you made earlier. Each change should be on its own line and end with a period. Remember do not use commit messages, but rather write simple phrases or sentences that are easy to digest and accurately describe what the change was. Assume non technical readers will be consuming this information.
 
 - Select "Publish Release"
 
@@ -455,9 +455,9 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 7\. Check with your fellow Roku developers to see if there are any experiments from this build that should be added to Popper Staging. If there are, then [deploy the experiments to popper staging.](#deploying-an-experiment-on-popper-staging)
 
 
-8\. Create a SC ticket with any changes that have been made and give the ticket to the QA team for manual testing.
-  - Go to the [ShortCut tool](https://app.shortcut.com/tubi/team/61525f46-2903-4bfc-afa4-83f9d7fefbfb?stories_sort_by=priority&stories_group_by=workflow_state_id)
-  - Create a QA ticket by navigating to the following menu items: Create Story in Team> Create Story> Product QA Team> Roku QA Template
+8\. Create a JIRA ticket with any changes that have been made and give the ticket to the QA team for manual testing.
+  - Go to [JIRA](https://tubitv.atlassian.net/)
+  - Create a QA ticket.
   - Run the command `gulp buildQaChanges`, which will build most of the copy for this ticket and place it in your clipboard
   - Paste the copy in the newly created SC ticket from the previous step
   - Make sure that no work is missing in the list and that the included info looks correct
@@ -487,7 +487,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
   - create a tag based on the last commit named `x_y_z`
   - push the tag to Github
   - prompt you to make a Github release (including adding build notes) in the CLI based on the tag that was just created. __If you choose not to make a release in the CLI, you must do step 14.__
-    - Automatic release note generation has now been added. If you choose not to use the automatically generated release notes, please make sure that the release notes adhere to the following. Each build note should be correspond to a change that was submitted as part of the QA Shortcut ticket that you made earlier. Remember, do not use commit messages, but rather write simple phrases or sentences that are easy to digest and accurately describe what the change was. Assume non technical readers will be consuming this information.
+    - Automatic release note generation has now been added. If you choose not to use the automatically generated release notes, please make sure that the release notes adhere to the following. Each build note should be correspond to a change that was submitted as part of the QA JIRA ticket that you made earlier. Remember, do not use commit messages, but rather write simple phrases or sentences that are easy to digest and accurately describe what the change was. Assume non technical readers will be consuming this information.
 
   __Note:__ As an edge case, if you need to manually perform the release steps for the new build, follow the [Manual Remote Release Steps](https://github.com/adRise/project-total-recall/docs/manual_release.md#remote-release)
 
@@ -542,7 +542,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
 - In the description area, add the date on which the release was actually deployed (ideally this is the same day as the Github release is being created, but sometimes it might not be).
 
-- Also within the description area, add the changes that were included in the release to the "Describe this release" description text box if you did not use the automatic release note generation. As it was mentioned earlier, use the the changes that were submitted to the QA Shortcut ticket that you made earlier. Each change should be on its own line and end with a period. Remember do not use commit messages, but rather write simple phrases or sentences that are easy to digest and accurately describe what the change was. Assume non technical readers will be consuming this information.
+- Also within the description area, add the changes that were included in the release to the "Describe this release" description text box if you did not use the automatic release note generation. As it was mentioned earlier, use the the changes that were submitted to the QA JIRA ticket that you made earlier. Each change should be on its own line and end with a period. Remember do not use commit messages, but rather write simple phrases or sentences that are easy to digest and accurately describe what the change was. Assume non technical readers will be consuming this information.
 
 - Select "Publish Release"
 
@@ -570,7 +570,7 @@ The build will have the following features:
 - Content APIs are set to production. Analytics ingestion API, and Logging API set to staging.
 - No starter components or remote components are used.
 
-Send the .zip that is created to the appropriate QA team member along with a Shortcut ticket requesting testing.
+Send the .zip that is created to the appropriate QA team member along with a JIRA ticket requesting testing.
 
 # Suitest
 
