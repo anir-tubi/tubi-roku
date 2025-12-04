@@ -60,6 +60,14 @@ End Function
 Function clientErrorConfigCheckIfShouldRetryAfter_test(url, method, statusCode, responseCode, retriesAttempted, expectedResult)
   clientErrorConfig = convertClientErrorConfig(getLocalClientErrorConfig())
 
+  if statusCode = "800" then
+    if clientErrorConfig.default.status_codes["800"] = invalid then
+      clientErrorConfig.default.status_codes["800"] = {
+        retry_strategy: "exp_backoff"
+      }
+    end if
+  end if
+
   ' Removing jitter to make it easier to test
   clientErrorConfig.retry_strategies.exp_backoff.retry_jitter_ratio = 0
 
