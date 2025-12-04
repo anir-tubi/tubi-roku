@@ -1079,6 +1079,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
     validUntil: 0
     children: [] 'categories
     personalizationId: ""
+    groupCursor: invalid
   }
 
   if isAA(contentToTranslate) = true OR isNode(contentToTranslate) = true
@@ -1093,6 +1094,11 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
     end if
 
     homescreenAA.personalizationId = contentToTranslate.personalization_id
+
+    ' Extract groupCursor from API response for pagination
+    if contentToTranslate.group_cursor <> invalid
+      homescreenAA.groupCursor = contentToTranslate.group_cursor
+    end if
 
     containers = contentToTranslate.containers
     contents = contentToTranslate.contents

@@ -21,7 +21,7 @@
 
   <interface>
     <field id="itemContent" type="node" alias="infoPanel.itemContent" />
-    <field id="currentEpisode" type="node" />
+    <field id="currentEpisode" type="node" alias="infoPanel.currentEpisode" />
     <field id="width" type="float" />
     <field id="descriptionWidth" type="float" value="0" />
     <field id="minHeight" alias="minHeightTransparentRectangle.height" />

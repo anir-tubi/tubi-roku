@@ -23,6 +23,7 @@ Function init()
   m.sotTopLabelGroup = m.top.findNode("sotTopLabelGroup")
 
   m.top.observeFieldScoped("itemContent", "onItemContentChange")
+  m.top.observeFieldScoped("currentEpisode", "onCurrentEpisodeChange")
   m.top.observeFieldScoped("hideTitle", "onHideTitleChange")
   m.top.observeFieldScoped("width", "onWidthChange")
 
@@ -40,6 +41,7 @@ Function init()
   m.subheaderSmallFont = typographyConstants.ids.subheaderSmall
 
   m.title = invalid
+  m.currentEpisodeTitleLabel = invalid
   setTypographyOfLabel(m.description, m.bodyMediumFont)
   setTypographyOfLabel(m.ratingLabel, m.bodyExtraSmallStrongFont)
 
@@ -76,6 +78,9 @@ Function onThemeChange(msg = invalid)
 
     if m.title <> invalid
       m.title.color = m.primaryTextColor
+    end if
+    if m.currentEpisodeTitleLabel <> invalid
+      m.currentEpisodeTitleLabel.color = m.primaryTextColor
     end if
   end if
 End Function
@@ -136,6 +141,8 @@ Function cleanupMetadata() as Void
     end for
     m.ratingDescriptorBadges = invalid
   end if
+
+  removeCurrentEpisodeTitleLabel()
 
 End Function
 
@@ -789,4 +796,37 @@ Function displayChannelInfo(channelLogoUri as String, channelName as String, tit
   ' Insert into metadata group and cache references
   m.metadataGroup.insertChild(channelInfoGroup, titleIndex + 1)
   m.channelInfoGroup = channelInfoGroup
+End Function
+
+
+' Removes the current episode title label from metadata group
+Function removeCurrentEpisodeTitleLabel() as Void
+  if m.currentEpisodeTitleLabel <> invalid
+    m.metadataGroup.removeChild(m.currentEpisodeTitleLabel)
+    m.currentEpisodeTitleLabel = invalid
+  end if
+End Function
+
+
+' Handles changes to currentEpisode field
+' Creates and updates the episode title label when currentEpisode is set
+' @param msg - Optional message containing currentEpisode data
+Function onCurrentEpisodeChange(msg = invalid) as Void
+  currentEpisode = m.top.currentEpisode
+  removeCurrentEpisodeTitleLabel()
+
+  if currentEpisode <> invalid AND isNonEmptyString(currentEpisode.title)
+    m.currentEpisodeTitleLabel = createLabel(currentEpisode.title, {
+      id: "currentEpisodeTitleLabel"
+      height: 33
+      width: 960
+      vertAlign: "center"
+      color: m.primaryTextColor
+      typographyFont: m.subheaderSmallFont
+    })
+
+    ' Insert after title label
+    titleIndex = m.nodeHelpers.getChildIndex(m.metadataGroup, m.title)
+    m.metadataGroup.insertChild(m.currentEpisodeTitleLabel, titleIndex + 1)
+  end if
 End Function

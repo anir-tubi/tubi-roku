@@ -9,10 +9,6 @@ Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, 
   if inputContent <> invalid
     ' we make changes to the content from this point forward. If we don't clone, changes will be propagated to the original content in home or search screen.
     content = inputContent.clone(true)
-    ' TODO: Remove this once we have a way to check if the content has video resources.
-    if content.isSubType("TubiContentNode") = false OR (successCb = skipDetailScreen AND content.hasVideoResources <> true)
-      showHideSpinner(true)
-    end if
     screen = CreateObject("roSGNode", "VodDetailScreen")
     screen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
     screen.observeFieldScoped("backButtonPressed", "onDetailBackButtonPressedChange")
@@ -40,6 +36,7 @@ Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, 
     screen.trackingPageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
     screen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
     if content.type = m.constants.ui.contentTypes.series
+      screen.wasContentFetchCompleted = false
       getSeasonList(content.id, onGetSeasonListSuccess, onGetSeasonListError)
     else
       ' During deep-link use case we already have the complete content node, so we can skip the fetch.
@@ -48,6 +45,10 @@ Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, 
         getSingleContentFromServer(content, onGetVodContentSuccess, onGetVodContentError)
       end if
       getYouMayAlsoLikeContent(content)
+    end if
+
+    if screen.wasContentFetchCompleted = false
+      showHideSpinner(true)
     end if
     pushScreen(screen, true, true)
 
@@ -412,6 +413,10 @@ End Function
 ' @error: object, error information
 Function onGetSeasonListError(error)
   tubiLog("VodDetailScreenHelpers.onGetSeasonListError: " + formatJson(error))
+  screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen)
+  if screen <> invalid
+    screen.wasContentFetchCompleted = true
+  end if
   showHideSpinner(false)
 End Function
 
@@ -474,6 +479,10 @@ End Function
 ' @error: object, error information
 Function onGetSeriesEpisodesError(error)
   tubiLog("VodDetailScreenHelpers.onGetSeriesEpisodesError: " + formatJson(error))
+  screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen)
+  if screen <> invalid
+    screen.wasContentFetchCompleted = true
+  end if
   showHideSpinner(false)
 End Function
 

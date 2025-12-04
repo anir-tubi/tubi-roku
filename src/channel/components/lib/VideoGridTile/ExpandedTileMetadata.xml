@@ -24,6 +24,7 @@
 
   <interface>
     <field id="itemContent" type="node" />
+    <field id="currentEpisode" type="node" />
     <field id="width" type="float" />
     <field id="hideTitle" type="boolean" value="true" />
     <field id="descriptionWidth" type="float" value="0" />

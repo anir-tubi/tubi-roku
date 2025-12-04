@@ -2267,8 +2267,14 @@ Function makeAdditionalContainersRequestConditionally(currFocusRow, screen) as V
       contentMode = screen.contentMode
     end if
 
+    ' Use groupCursor from content if available, otherwise fall back to containerCount
+    groupStart = containerCount
+    if content.groupCursor <> invalid
+      groupStart = content.groupCursor
+    end if
+
     params = {
-      group_start: containerCount
+      group_start: groupStart
       group_size: m.constants.performance.categoryGridList.numContainers
       contents_limit: m.constants.performance.categoryGridList.initialBlockSize
       content_mode: contentMode
@@ -2354,6 +2360,12 @@ Function appendPaginatedContainersToScreen(screen, response)
   if content <> invalid AND isNode(response) = true AND response.getChildCount() > 0
     items = response.getChildren(-1, 0)
     content.appendChildren(items)
+
+    ' Update groupCursor from paginated response for next pagination request
+    if response.groupCursor <> invalid
+      content.groupCursor = response.groupCursor
+    end if
+
     screen.hasNewContainers = true
     if m.shouldDebounceVideoTilePreview = true AND m.videoPreviewDebounce.control = "stop"
       m.videoPreviewDebounce.control = "start"

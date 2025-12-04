@@ -49,6 +49,7 @@ Function init()
   m.actionButtonList.observeFieldScoped("buttonFocused", "onActionButtonFocused")
   topRef.observeFieldScoped("episodes", "onEpisodesChange")
   topRef.observeFieldScoped("shouldRefreshScreen", "refreshScreen")
+  topRef.observeFieldScoped("wasContentFetchCompleted", "onWasContentFetchCompletedChange")
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.contentTitleLabel, typographyConstants.ids.headerSmall)
@@ -114,6 +115,11 @@ Function onContentChange()
   content = m.top.content
 
   if content <> invalid
+    if m.top.wasContentFetchCompleted <> invalid
+      m.contentGroup.visible = m.top.wasContentFetchCompleted
+    else
+      m.contentGroup.visible = false
+    end if
     refreshButtonList()
     if m.sectionTabs = invalid OR isNonEmptyArray(m.sectionTabs.buttons) = false
       renderSectionTabs()
@@ -597,7 +603,7 @@ Function addTrailerButton(buttons, content) as Void
     buttons.push({
       id: "watchTrailer"
       title: getTranslation("screenDetails_button_trailer")
-      iconUrl: "pkg:/images/icon-trailer.webp"
+      iconUrl: "pkg:/images/watch-trailer-film-strip.webp"
       trackingContext: createButtonAnalytics("watchTrailer")
     })
   end if
@@ -699,6 +705,16 @@ Function refreshScreen() as Void
     onEpisodesChange()
   end if
   refreshButtonList()
+End Function
+
+
+' Handles wasContentFetchCompleted changes
+' @param msg - Message object containing wasContentFetchCompleted data
+Function onWasContentFetchCompletedChange(msg) as Void
+  wasContentFetchCompleted = msg.getData()
+  if wasContentFetchCompleted = true
+    m.contentGroup.visible = true
+  end if
 End Function
 
 
