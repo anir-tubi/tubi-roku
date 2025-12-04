@@ -28,11 +28,14 @@ Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel, isHome
 
   sotInfo = content.sotInfo
   if isAA(sotInfo) = true
+    'TODO: Remove this after video_tiles graduated
+    infoPanel.sotMetaData = sotInfo.sotMetaData
     infoPanel.sotTopLabelSignals = sotInfo.sotMetaDataTopLabels
     lineOneData.sotMetaData = sotInfo.sotMetaData
     lineTwoData.sotMetaData = sotInfo.sotMetaData
     infoPanel.sotMarkers = sotInfo.sotMarkers
   else
+    infoPanel.sotMetaData = []
     infoPanel.sotTopLabelSignals = []
     lineOneData.sotMetaData = []
     lineTwoData.sotMetaData = []

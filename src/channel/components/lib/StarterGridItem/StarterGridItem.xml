@@ -12,6 +12,7 @@
   <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/SOTBadgeMixin.brs" />
 
   <interface>
     <field id="itemContent" type="node" />

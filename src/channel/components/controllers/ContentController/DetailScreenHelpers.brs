@@ -313,8 +313,8 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
       end if
 
       lineOneData.type = m.constants.ui.contentTypes.series
-      lineOneData.seasons = content.totalCount
       lineTwoData.genres = content.genres
+      lineOneData.seasons = content.totalCount
       detailScreen.isSeries = true
     else if content.type = m.constants.ui.contentTypes.sportsEvent
       detailScreen.mode = m.constants.ui.infoPanelModes.sportsEvent

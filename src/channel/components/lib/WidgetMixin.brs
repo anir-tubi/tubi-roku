@@ -168,35 +168,3 @@ Function createRatingDescriptorBadge(code as String, config as Object) as Object
 
   return codeBadge
 End Function
-
-
-' Creates a badge with configurable properties
-' @param text - String, badge text content
-' @param config - AssocArray with optional properties:
-'   - id: String, node ID (default: not set)
-'   - width: Integer, badge width (default: not set)
-'   - height: Integer, badge height (default: not set)
-'   - translation: Array, [x, y] position (default: not set)
-'   - badgeTextWidth: Float, badge text width (default: 0.0)
-'   - textColor: String, text color (default: not set)
-'   - borderUri: String, border image URI (default: not set)
-'   - backgroundUri: String, background image URI (default: not set)
-' @return roSGNode - Configured Badge node
-Function createBadge(text as String, config = invalid as Object) as Object
-  badge = CreateObject("roSGNode", "Badge")
-  badge.text = text
-  badge.badgeTextWidth = 0.0
-
-  ' Apply common config properties
-  applyCommonConfig(badge, config)
-
-  ' Apply badge-specific configuration if provided
-  if config <> invalid
-    if config.badgeTextWidth <> invalid then badge.badgeTextWidth = config.badgeTextWidth
-    if config.textColor <> invalid then badge.textColor = config.textColor
-    if config.borderUri <> invalid then badge.borderUri = config.borderUri
-    if config.backgroundUri <> invalid then badge.backgroundUri = config.backgroundUri
-  end if
-
-  return badge
-End Function

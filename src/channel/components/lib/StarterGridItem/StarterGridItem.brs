@@ -78,6 +78,7 @@ Function setThemeColors(msg = invalid)
     m.focused2Color = theme.focused2Color
     m.backgroundColor = theme.backgroundColor
     m.primaryTextColor = theme.primaryTextColor
+    m.shadeColor = theme.shadeColor
   end if
 End Function
 
@@ -300,9 +301,12 @@ Function onItemContentChange(msg)
     end if
 
     if itemContent.type <> "linear" AND m.availabilityBadge = invalid AND isAA(sotPosterLabels) = true AND sotPosterLabels.count() > 0 AND childGridItemComponent <> "PortraitVideoGridTile"
-      badgeUri = sotPosterLabels.sotIcon
-      badgeText = sotPosterLabels.sotLabelText
-      setSotBadge(badgeUri, badgeText)
+      config = {
+        primaryTextColor: m.primaryTextColor
+        maxWidth: m.poster.width - 12
+        backgroundColor: m.shadeColor
+      }
+      m.sotBadge = createSotPosterLabels(sotPosterLabels, config, m.top)
     end if
   end if
 
@@ -394,26 +398,6 @@ Function addConditionalFieldObservers(childGridItem)
     end for
   end if
 End Function
-
-
-Function setSotBadge(badgeUri, badgeText)
-  if isNonEmptyString(badgeText) = true
-    if m.sotBadge = invalid
-      m.sotBadge = createObject("roSGNode", "Badge")
-      m.sotBadge.id = "sotBadge"
-      m.sotBadge.translation = [6, 6]
-    end if
-
-    m.sotBadge.textColor = m.focusedTextColor
-    m.sotBadge.iconUri = badgeUri
-    m.sotBadge.maxWidth = m.poster.width - 12
-    m.sotBadge.text = badgeText
-    m.sotBadge.visible = true
-    m.top.appendChild(m.sotBadge)
-
-  end if
-End Function
-
 
 
 Function removeConditionalFieldObservers()

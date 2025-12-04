@@ -8,6 +8,7 @@ Function init()
   m.constants = getConstantsFromGlobal()
   m.channelLogo = m.top.findNode("channelLogo")
   m.firstLineGroup = m.top.findNode("firstLineGroup")
+  m.secondLineGroup = m.top.findNode("secondLineGroup")
   m.thirdLineGroup = m.top.findNode("thirdLineGroup")
   m.description = m.top.findNode("description")
   m.progressBar = m.top.findNode("progressBar")
@@ -69,6 +70,8 @@ Function onThemeChange(msg = invalid)
     m.ratingLabel.color = theme.secondaryTextColor
     m.description.color = m.primaryTextColor
     m.focusedTextColor = theme.focusedTextColor
+    m.shadeColor = theme.shadeColor
+    m.backgroundColor = theme.shadeColor
     m.cautionColor = theme.cautionColor
 
     m.progressBar.focusColor = theme.focusedColor
@@ -125,6 +128,10 @@ Function cleanupMetadata() as Void
   m.metadataGroup.removeChild(m.sotTopLabelGroup)
   m.nodeHelpers.removeAllChildren(m.subHeadlinePrefixGroup)
   m.nodeHelpers.removeAllChildren(m.subHeadlineSuffixGroup)
+
+  if m.secondLineGroup <> invalid
+    clearSOTBadges(m.secondLineGroup)
+  end if
 
   if m.audioDescriptionPoster <> invalid
     m.firstLineGroup.removeChild(m.audioDescriptionPoster)
@@ -258,30 +265,69 @@ Function handleSOTBadgesAndLayout(itemContent) as Void
 
   ' Adjust the translation based on height of the description text.
   if isVideoTilesControlMetadata OR m.top.variant = "detailScreenInfoPanel"
-    ' Create SOT badges using helper function
-    sotBadges = createSOTBadges(itemContent.sotInfo, {
+    config = {
       focusedTextColor: m.focusedTextColor
+      primaryTextolor: m.primaryTextColor
+      backgroundColor: m.shadeColor
       maxWidth: m.top.width - 12
       bodyMediumStrongFont: m.bodyMediumStrongFont
+      textColor: m.primaryTextColor
       cautionColor: m.cautionColor
-    }, itemContent.sotPosterLabels)
+    }
 
-    if isNonEmptyArray(sotBadges.topLabels) = true
-      m.metadataGroup.insertChild(m.sotTopLabelGroup, 0)
+    sotBadges = createSOTBadges(itemContent.sotInfo, config)
+
+    marker = sotBadges.marker
+    ' Insert sotMarker below the title if title exists
+    if m.title <> invalid AND marker <> invalid
+      titleIndex = m.nodeHelpers.getChildIndex(m.metadataGroup, m.title)
+      if titleIndex <> -1
+        showMarkerLabels(m.metadataGroup, marker, titleIndex + 1)
+      else
+        showMarkerLabels(m.metadataGroup, marker, 0)
+      end if
+    else if marker <> invalid
+      showMarkerLabels(m.metadataGroup, marker, 0)
     end if
 
-    ' Append top label badges
-    for each topLabel in sotBadges.topLabels
-      m.sotTopLabelGroup.appendChild(topLabel)
-    end for
 
-    ' Append marker badge if exists
-    if sotBadges.marker <> invalid
-      ' Update maxWidth for marker to full width
-      sotBadges.marker.maxWidth = m.top.width
-      m.sotMarker = sotBadges.marker
-      m.metadataGroup.appendChild(m.sotMarker)
+    'Clear existing SOT badges from secondLineGroup before adding new ones
+    if m.secondLineGroup <> invalid
+      clearSOTBadges(m.secondLineGroup)
     end if
+
+    ' Remove secondLineGroup from parent before adding childs
+    if m.secondLineGroup <> invalid AND m.secondLineGroup.getParent() <> invalid
+      m.metadataGroup.removeChild(m.secondLineGroup)
+    end if
+
+    topLabels = sotBadges.topLabels
+    metaDataLabels = sotBadges.metaDataLabels
+
+    ' Only add secondLineGroup back if we have labels to display
+    if m.secondLineGroup <> invalid AND (isNonEmptyArray(topLabels) = true OR isNonEmptyArray(metaDataLabels) = true)
+      ' Find description index to insert secondLineGroup before it
+      descriptionIndex = m.nodeHelpers.getChildIndex(m.metadataGroup, m.description)
+      if descriptionIndex <> -1
+        m.metadataGroup.insertChild(m.secondLineGroup, descriptionIndex)
+      else
+        m.metadataGroup.appendChild(m.secondLineGroup)
+      end if
+
+      if isNonEmptyArray(topLabels) = true
+        showTopLabels(m.secondLineGroup, topLabels)
+      end if
+
+      if isNonEmptyArray(metaDataLabels) = true
+        isSotBadgePresent = m.sotBadge.getParent() <> invalid
+        if isSotBadgePresent = true
+          m.firstLineGroup.removeChild(m.sotBadge)
+        end if
+
+        showMetaDataLabels(m.secondLineGroup, metaDataLabels)
+      end if
+    end if
+
     ' With 3 lines of description text, the height is 230px and with 2 lines of description text, the height is 192px.
     ' And parent level translation is set based on 2 lines of description text. So we are adjusting the bottom padding by negative margining the metadataGroup.
     ' This is required only for control variant.
@@ -409,7 +455,9 @@ Function metadataOnPosterContent(itemContent)
     end if
 
     m.sotBadge.textColor = m.primaryTextColor
-    m.sotBadge.showBackground = false
+    m.sotBadge.borderUri = "pkg:/images/rounded-badge-border-dark-$$RES$$.9.png"
+    m.sotBadge.backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
+    m.sotBadge.backgroundColor = m.shadeColor
     m.sotBadge.badgeTextFont = m.badgeTextFont
     m.sotBadge.text = sotBadge.sotLabelText
     m.sotBadge.iconUri = sotBadge.sotIcon

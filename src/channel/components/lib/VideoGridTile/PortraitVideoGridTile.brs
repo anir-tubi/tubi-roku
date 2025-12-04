@@ -43,6 +43,7 @@ Function setThemeColors(msg = invalid)
     m.progressBar.unfocusColor = theme.focusedColor
     m.timeLeftLabel.color = theme.primaryTextColor
     m.backgroundColor = theme.neutralSolidColor
+    m.shadeColor = theme.shadeColor
 
     m.primaryTextColor = theme.primaryTextColor
     m.focused2Color = theme.focused2Color
@@ -87,10 +88,14 @@ Function onItemContentChange(msg)
       m.linearBadge = invalid
     end if
 
-    if isAA(itemContent.sotPosterLabels) = true AND itemContent.sotPosterLabels.count() > 0
-      badgeUri = itemContent.sotPosterLabels.sotIcon
-      badgeText = itemContent.sotPosterLabels.sotLabelText
-      setSotBadge(badgeUri, badgeText)
+    sotPosterLabels = itemContent.sotPosterLabels
+    if isAA(sotPosterLabels) = true AND sotPosterLabels.count() > 0
+      config = {
+        primaryTextColor: m.primaryTextColor
+        maxWidth: m.poster.width - 12
+        backgroundColor: m.shadeColor
+      }
+      m.sotBadge = createSotPosterLabels(sotPosterLabels, config, m.top)
     end if
 
     if itemContent.type = "linear"
@@ -107,25 +112,6 @@ Function onItemContentChange(msg)
     if categoryContent <> invalid AND categoryContent.id = "continue_watching"
       drawHistoryProgressBar()
     end if
-  end if
-End Function
-
-
-Function setSotBadge(badgeUri, badgeText)
-  if isNonEmptyString(badgeText) = true
-    if m.sotBadge = invalid
-      m.sotBadge = createObject("roSGNode", "Badge")
-      m.sotBadge.id = "sotBadge"
-      m.sotBadge.translation = [6, 6]
-    end if
-
-    m.sotBadge.textColor = m.focusedTextColor
-    m.sotBadge.iconUri = badgeUri
-    m.sotBadge.maxWidth = m.poster.width - 12
-    m.sotBadge.text = badgeText
-    m.sotBadge.visible = true
-    m.top.appendChild(m.sotBadge)
-
   end if
 End Function
 
@@ -147,7 +133,8 @@ Function setLinearBadge(badgeType = "live", badgeInfo = {})
     badge.translation = [6, 6]
     badge.backgroundColor = m.blueBadgeColor
     badge.text = getTranslation("onNow")
-    badge.borderUri = "pkg:/images/badge-border-dark-$$RES$$.9.png"
+    badge.borderUri = "pkg:/images/rounded-badge-border-dark-$$RES$$.9.png"
+    badge.backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
   end if
   if badge <> invalid
     m.linearBadge = badge

@@ -38,6 +38,10 @@
   <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/SOTBadgeMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StatsigLib.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StatsigExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/StatsigExperimentMixin.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -144,9 +148,9 @@
         translation="[0,0]">
 
         <LayoutGroup
-          layoutDirection="horiz"
-          id="sotTopLabelGroup"
-          itemSpacings="[9]" />
+        layoutDirection="horiz"
+        id="sotTopLabelGroup"
+        itemSpacings="[9]" />
 
         <LayoutGroup
           id="topHeaderGroup"
@@ -379,7 +383,6 @@
               role="font"/>
           </Label>
         </LayoutGroup>
-
 
         <Badge
           id="SotMarker"/>

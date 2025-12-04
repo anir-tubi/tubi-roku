@@ -125,6 +125,9 @@ Function init()
   setTypographyOfLabel(m.Starring, m.typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.channelNameHeader, m.typographyConstants.ids.subheaderSmall)
 
+  m.bodySmall = m.typographyConstants.ids.bodySmall
+  m.bodyMediumStrongFont = m.typographyConstants.ids.bodyMediumStrong
+
 
   m.BadgeTypes = {
     sotTopLabel: "sotTopLabel"
@@ -354,7 +357,16 @@ Function onSotMarkersChange(msg)
 
   shouldAddMarker = (isAA(sotMarker) = true AND sotMarker.count() > 0)
   if shouldAddMarker = true
-    formatBadge(sotMarker.sotLabelText, m.sotMarker, sotMarker.sotIcon)
+
+    config = {
+      backgroundColor: m.theme.shadeColor
+      bodyMediumStrongFont: m.bodyMediumStrongFont
+      maxWidth: m.top.width - 12
+      textColor: m.theme.cautionColor
+    }
+
+    createSotMarker(sotMarker, config, m.sotMarker)
+
     m.offset.appendChild(m.sotMarker)
   end if
 
@@ -395,48 +407,39 @@ Function onIsTubiOriginalChange(msg)
   m.tubiOriginal.visible = (isTubiOriginal = true)
 End Function
 
-
 Function onSotTopLabelSignalsChange(msg)
   sotTopLabelSignals = msg.getData()
+  sotMetaData = m.top.sotmetadata
 
   'Remove all the previous badges before adding the new one
   m.nodeHelpers.removeAllChildren(m.sotTopLabelGroup)
 
   ' handle availability badge
   if isNonEmptyArray(sotTopLabelSignals) = true
-    setSoTSignal(sotTopLabelSignals, m.BadgeTypes.sotTopLabel, m.sotTopLabelGroup, false)
-  end if
 
-End Function
-
-
-' @signals: roArray, one of SOT, it will have text and icon
-' @signalType: String, one of the value from m.BadgeTypes
-' @badgeGroup; layOutGroup, used to add the badges
-' @iconRequired: boolean, used to show/hide the icon
-Function setSoTSignal(signals, signalType, badgeGroup, iconRequired = true)
-  theme = m.theme
-
-  for each signal in signals
-    sotLabelText = signal.sotLabelText
-
-    if isNonEmptyString(sotLabelText) = true
-      badge = createObject("roSGNode", "Badge")
-      badge.backgroundColor = theme.neutralColor
-      badge.textColor = theme.primaryTextColor
-      if iconRequired = true AND isNonEmptyString(signal.sotIcon) = true
-        badge.iconUri = signal.sotIcon
+    if sotTopLabelSignals.count() < 2
+      if isNonEmptyArray(sotMetaData) = true
+        for each sotMetaDataItem in sotMetaData
+          sotTopLabelSignals.push(sotMetaDataItem)
+          if sotTopLabelSignals.count() = 2
+            exit for
+          end if
+        end for
       end if
-
-      if signalType = m.BadgeTypes.sotMetaData
-        badge.showBackground = false
-        badge.badgeTextFont = m.typographyConstants.ids.bodySmallStrong
-      end if
-
-      badge.text = sotLabelText
-      badgeGroup.appendChild(badge)
     end if
-  end for
+
+    config = {
+      focusedTextColor: m.theme.primaryTextColor
+      backgroundColor: m.theme.shadeColor
+      bodyMediumStrongFont: m.bodyMediumStrongFont
+      badgeFont: m.bodySmall
+      maxWidth: m.top.width - 12
+      textColor: m.theme.primaryTextColor
+    }
+
+    sotTopLabels = createTopLabels(sotTopLabelSignals, config)
+    showTopLabels(m.sotTopLabelGroup, sotTopLabels)
+  end if
 
 End Function
 
@@ -829,17 +832,15 @@ Function onLineTwoDataChange(msg)
     end if
 
     if isNonEmptyArray(data.sotMetaData) = true
-      ' Filter out sotMetaData with type "tubiPresentsLogo" as it should go to firstLineGroup
-      filteredSotMetaData = []
-      for each sotMetadata in data.sotMetaData
-        if sotMetadata.sotType <> "tubiPresentsLogo"
-          filteredSotMetaData.push(sotMetadata)
-        end if
-      end for
-
-      if filteredSotMetaData.count() > 0
-        setSoTSignal(filteredSotMetaData, m.BadgeTypes.sotMetaData, secondLineGroup, true)
-      end if
+      config = {
+        focusedTextColor: m.theme.primaryTextColor
+        maxWidth: m.top.width - 12
+        backgroundColor: m.theme.shadeColor
+        bodyMediumStrongFont: m.bodyMediumStrongFont
+        textColor: m.theme.primaryTextColor
+      }
+      sotMetadataLabels = createMetadataLabels(data.sotMetaData, config)
+      showMetaDataLabels(secondLineGroup, sotMetadataLabels)
     end if
 
   end if
@@ -1120,7 +1121,6 @@ Function onModeChange()
   if m.top.mode = m.constants.ui.infoPanelModes.item
     ' used for movies and series on the homescreen and similar screens
     m.infoPanelGroup.appendChild(m.offset)
-
     offsetChildrenArray = [
       m.sotTopLabelGroup,
       m.title,
@@ -1416,7 +1416,6 @@ End Function
 
 ' @data: assocArray, that matches form of m.top.lineTwoData
 Function getSecondLineText(data)
-  ' handle genres
   text = getGenreText(data.genres)
 
   ' handle sports event round/group info
@@ -1470,13 +1469,6 @@ Function formatBadge(text, badgeComponent, iconUri = "")
       badgeComponent.textColor = theme.primaryTextColor
       badgeComponent.badgeTextFont = m.typographyConstants.ids.bodySmallStrong
       badgeComponent.text = text
-    else if badgeComponent.id = m.sotMarker.id
-      badgeComponent.showBackground = false 'make sure to set this before maxWidth to ensure proper calculations in badge
-      badgeComponent.maxWidth = m.top.width
-      badgeComponent.iconUri = iconUri
-      badgeComponent.badgeTextFont = m.typographyConstants.ids.bodyMediumStrong
-      badgeComponent.text = text
-      badgeComponent.textColor = theme.cautionColor
     else
       ' TODAY, TOMORROW, <<Date>> badge
       badgeComponent.backgroundColor = theme.primaryTextColor

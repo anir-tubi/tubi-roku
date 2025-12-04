@@ -18,6 +18,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/StatsigExperiments.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StatsigLib.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/StatsigExperimentMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/SOTBadgeMixin.brs" />
 
   <interface>
     <field id="itemContent" type="node" />

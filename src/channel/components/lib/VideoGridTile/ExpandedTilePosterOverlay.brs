@@ -21,7 +21,6 @@ Function init()
     live: "live"
     onNow: "onNow"
     sot: "sot"
-    expires: "expires"
   }
 
   typographyConstants = getTypographyConstants()
@@ -77,6 +76,7 @@ Function onThemeChange()
     m.blueBadgeColor = theme.blueBadgeColor
     m.focusedTextColor = theme.focusedTextColor
     m.backgroundColor = theme.neutralSolidColor
+    m.shadeColor = theme.shadeColor
     m.cautionColor = theme.cautionColor
     m.channelLogoBackground.blendColor = theme.tertiaryTextColor
   end if
@@ -267,43 +267,18 @@ Function setBadge(badgeType = "live", badgeInfo = {})
     badge.textColor = m.primaryTextColor
     badge.translation = [15, 15]
     badge.backgroundColor = m.blueBadgeColor
-    badge.borderUri = "pkg:/images/badge-border-dark-$$RES$$.9.png"
+    badge.borderUri = "pkg:/images/rounded-badge-border-dark-$$RES$$.9.png"
+    badge.backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
     badge.text = getTranslation("onNow")
-  else if badgeType = m.badgeTypes.expires
-    badge = m.sotTopLabelGroup.createChild("Badge")
-    badge.badgeTextWidth = 0.0
-    badge.textColor = m.focusedTextColor
-    isBillboardRow = m.variant = "billboard" AND m.top.containerIndex = m.top.billboardContainerIndex
-    if isBillboardRow = true
-      m.sotTopLabelGroup.translation = [32, 32]
-    else
-      m.sotTopLabelGroup.translation = [15, 15]
-    end if
-    badge.text = badgeInfo.text
   else if badgeType = m.badgeTypes.sot
-
-    ' Create SOT badges using helper function
-    sotPosterLabels = m.top.itemContent.sotPosterLabels
-    sotBadges = createSOTBadges(badgeInfo, {
-      focusedTextColor: m.focusedTextColor
+    config = {
+      focusedTextColor: m.primaryTextColor
       maxWidth: m.top.width - 12
+      backgroundColor: m.shadeColor
       bodyMediumStrongFont: m.bodyMediumStrongFont
-      cautionColor: m.cautionColor
-    }, sotPosterLabels)
-
-    ' Append top label badges
-    for each topLabel in sotBadges.topLabels
-      m.sotTopLabelGroup.appendChild(topLabel)
-    end for
-
-    ' Append marker badge if exists
-    if sotBadges.marker <> invalid
-      ' Update maxWidth for marker to full width
-      sotBadges.marker.maxWidth = m.top.width
-      m.sotMarker = sotBadges.marker
-      m.bottomContentGroup.appendChild(m.sotMarker)
-    end if
-
+      textColor: m.primaryTextColor
+    }
+    showSotBadges(badgeInfo, config, m.sotTopLabelGroup, m.bottomContentGroup)
   end if
 End Function
 
