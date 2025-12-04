@@ -111,6 +111,12 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
           default: { "delaySeconds": 0 }
         }
       }
+
+      roku_disable_hdmi_cec: {
+        roku_disable_hdmi_cec_v1: {
+          default: { "disable": false }
+        }
+      }
     }
     statsigExperimentsInfo: statsigExperimentsInfo
     getExperimentResource: statsigExperiments_getExperimentResource

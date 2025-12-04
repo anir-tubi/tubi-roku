@@ -10,6 +10,11 @@
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
 
+  <!-- Remove after roku_disable_hdmi_cec_v1 is done -->
+  <script type="text/brightscript" uri="pkg:/components/lib/StatsigExperimentMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StatsigExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StatsigLib.brs" />
+
   <interface>
     <!-- INPUTS -->
     <field id="transportVoiceResponse" type="assocarray"/>

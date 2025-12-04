@@ -51,12 +51,15 @@ Function taskThread()
       m.top.isHdmiStatusOk = (m.hdmiStatus.isConnected() = true AND m.lastCecStatusIsActiveSource = true)
       tubiLog("MainTask received " + messageType + " hdmiStatus.isConnected(): " + m.hdmiStatus.isConnected().toStr() + " lastCecStatusIsActiveSource: " + m.lastCecStatusIsActiveSource.toStr())
     else if messageType = "roCECStatusEvent" then
-      ' Only update lastCecStatusIsActiveSource if m.hdmiStatus.isConnected is true since theoretically the only time we should get a roCECStatusEvent where it is false is when the HDMI cable was unplugged and we won't receive a CEC isActiveSource when the cable is plugged back in.
-      if m.hdmiStatus.isConnected() = true then
-        m.lastCecStatusIsActiveSource = msg.getInfo().active
+      if getStatsigExperimentResource("roku_disable_hdmi_cec", "roku_disable_hdmi_cec_v1", true).disable = false then
+
+        ' Only update lastCecStatusIsActiveSource if m.hdmiStatus.isConnected is true since theoretically the only time we should get a roCECStatusEvent where it is false is when the HDMI cable was unplugged and we won't receive a CEC isActiveSource when the cable is plugged back in.
+        if m.hdmiStatus.isConnected() = true then
+          m.lastCecStatusIsActiveSource = msg.getInfo().active
+        end if
+        m.top.isHdmiStatusOk = (m.hdmiStatus.isConnected() = true AND m.lastCecStatusIsActiveSource = true)
+        tubiLog("MainTask received " + messageType + " hdmiStatus.isConnected(): " + m.hdmiStatus.isConnected().toStr() + " lastCecStatusIsActiveSource: " + m.lastCecStatusIsActiveSource.toStr())
       end if
-      m.top.isHdmiStatusOk = (m.hdmiStatus.isConnected() = true AND m.lastCecStatusIsActiveSource = true)
-      tubiLog("MainTask received " + messageType + " hdmiStatus.isConnected(): " + m.hdmiStatus.isConnected().toStr() + " lastCecStatusIsActiveSource: " + m.lastCecStatusIsActiveSource.toStr())
     else if messageType = "roSGNodeEvent" then
       field = msg.getField()
       if field = "transportVoiceResponse" then
