@@ -102,23 +102,41 @@ Function createSOTBadges(sotInfo, config)
 End Function
 
 
+' Creates a Badge node with SOT label configuration
+' @param labelData - AssocArray containing sotLabelText and sotIcon
+' @param config - AssocArray with styling configuration (backgroundColor, textColor, maxWidth, badgeFont)
+' @return Badge node or invalid
+Function createBadge(labelData, config)
+  if isAA(labelData) = false OR isAA(config) = false then return invalid
+
+  badge = createObject("roSGNode", "Badge")
+  badge.text = labelData.sotLabelText
+  badge.backgroundColor = config.backgroundColor
+  badge.borderUri = "pkg:/images/rounded-badge-border-dark-$$RES$$.9.png"
+  badge.backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
+  badge.iconUri = labelData.sotIcon
+  badge.textColor = config.textColor
+  if config.badgeFont <> invalid
+    badge.badgeTextFont = config.badgeFont
+  end if
+  badge.maxWidth = config.maxWidth
+
+  return badge
+End Function
+
+
 Function createTopLabels(sotMetaDataTopLabels, config)
   ' Create top label badges from sotMetaDataTopLabels
   sotTopLabels = []
   if isNonEmptyArray(sotMetaDataTopLabels) = true
     for each signal in sotMetaDataTopLabels
-      topLabel = createObject("roSGNode", "Badge")
-      topLabel.text = signal.sotLabelText.Replace("days left", "Days Left")
-      topLabel.backgroundColor = config.backgroundColor
-      topLabel.borderUri = "pkg:/images/rounded-badge-border-dark-$$RES$$.9.png"
-      topLabel.backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
-      topLabel.iconUri = signal.sotIcon
-      topLabel.textColor = config.textColor
-      if config.badgeFont <> invalid
-        topLabel.badgeTextFont = config.badgeFont
+      ' Ignore TubiPresents (sotType = "tubiPresentsLogo") as it's handled separately
+      if isAA(signal) = true AND (signal.sotType <> "tubi_presents" AND signal.sotType <> "tubiPresentsLogo")
+        topLabel = createBadge(signal, config)
+        if topLabel <> invalid
+          sotTopLabels.push(topLabel)
+        end if
       end if
-      topLabel.maxWidth = config.maxWidth
-      sotTopLabels.push(topLabel)
     end for
   end if
 
@@ -130,18 +148,13 @@ Function createMetadataLabels(sotMetaDataLabels, config)
   sotMetaDataLabel = []
   if isNonEmptyArray(sotMetaDataLabels) = true
     for each metaDataLabel in sotMetaDataLabels
-      metaDataLabelBadge = createObject("roSGNode", "Badge")
-      metaDataLabelBadge.text = metaDataLabel.sotLabelText
-      metaDataLabelBadge.backgroundColor = config.backgroundColor
-      metaDataLabelBadge.borderUri = "pkg:/images/rounded-badge-border-dark-$$RES$$.9.png"
-      metaDataLabelBadge.backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
-      metaDataLabelBadge.iconUri = metaDataLabel.sotIcon
-      metaDataLabelBadge.textColor = config.textColor
-      if config.badgeFont <> invalid
-        metaDataLabelBadge.badgeTextFont = config.badgeFont
+      ' Ignore TubiPresents (sotType = "tubiPresentsLogo") as it's handled separately
+      if isAA(metaDataLabel) = true AND (metaDataLabel.sotType <> "tubi_presents" AND metaDataLabel.sotType <> "tubiPresentsLogo")
+        metaDataLabelBadge = createBadge(metaDataLabel, config)
+        if metaDataLabelBadge <> invalid
+          sotMetaDataLabel.push(metaDataLabelBadge)
+        end if
       end if
-      metaDataLabelBadge.maxWidth = config.maxWidth
-      sotMetaDataLabel.push(metaDataLabelBadge)
     end for
   end if
 

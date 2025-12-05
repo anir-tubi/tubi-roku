@@ -3128,10 +3128,12 @@ Function tubiMetadataTranslate_getTheIconAndTextFromConfig(sotSignal, content)
   soTStaticConfig = m.soTStaticConfig
   sotIcon = ""
   sotLabelText = ""
+  signalType = ""
 
   if isAA(sotSignal) = true AND isAA(soTStaticConfig) = true AND isAA(soTStaticConfig.customizations) = true
     customizations = soTStaticConfig.customizations
-    signalMap = customizations[sotSignal.type]
+    signalType = sotSignal.type
+    signalMap = customizations[signalType]
 
     if isAA(signalMap) = true
       templateFromConfig = signalMap.template
@@ -3172,6 +3174,7 @@ Function tubiMetadataTranslate_getTheIconAndTextFromConfig(sotSignal, content)
   return {
     sotLabelText: sotLabelText
     sotIcon: sotIcon
+    sotType: signalType
   }
 End Function
 
