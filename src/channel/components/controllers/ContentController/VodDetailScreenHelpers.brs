@@ -184,6 +184,7 @@ Function onVodDetailRelatedContentSelectedChange(msg)
   if selectedContent <> invalid
     ' The content node gets modified down the line so avoiding the changes to the original content node.
     content = selectedContent.clone(true)
+    stopVideoPreview()
     showVodDetailScreen(content, { "srcForAnalytic": "related_content", "srcForAds": "related_content" })
   end if
 End Function
@@ -889,6 +890,7 @@ Function onSelectedEpisodeChange(msg)
     if history <> invalid AND isNumber(history.nowPos) = true
       nowPos = history.nowPos
     end if
+    stopVideoPreview()
     playVideoContent(selectedEpisode, screen.playbackSource, nowPos)
   end if
 End Function
