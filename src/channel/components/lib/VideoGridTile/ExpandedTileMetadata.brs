@@ -889,6 +889,8 @@ Function onCurrentEpisodeChange(msg = invalid) as Void
       ' TODO: Revisit this logic we need a better solution for this.
       m.subHeadlinePrefixGroup.insertChild(label, m.subHeadlinePrefixGroup.getChildCount() - 1)
     end if
+
+    m.metadataGroup.itemSpacings = [9, 15]
   end if
 End Function
 
