@@ -3,7 +3,7 @@
 
 
 ' Converts seconds to a formatted hour/minute string
-' Examples: "2h 30m", "1h", "45m"
+' Examples: "2h 30m", "1 h", "45 min"
 ' Note: Not using translation for better performance since h and m are same in all languages
 ' @param seconds - Integer, duration in seconds
 ' @return String - Formatted duration string (e.g., "2h 30m", "1h", "45m")
@@ -17,12 +17,12 @@ Function convertSecondsToHoursString(seconds as Integer) as String
     if hourValue > 0 AND minValue > 0
       retVal = Substitute("{0}h {1}m", hourValue.toStr(), minValue.toStr())
     else if hourValue > 0
-      retVal = Substitute("{0}h", hourValue.toStr())
+      retVal = Substitute("{0} h", hourValue.toStr())
     else
       if minValue < 1
         minValue = 1
       end if
-      retVal = Substitute("{0}m", minValue.toStr())
+      retVal = Substitute("{0} min", minValue.toStr())
     end if
   end if
 

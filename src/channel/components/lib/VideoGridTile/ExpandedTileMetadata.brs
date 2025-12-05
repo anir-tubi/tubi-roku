@@ -432,8 +432,7 @@ Function metadataOnPosterContent(itemContent)
 
     ' Display channel logo and name if available
     if isNonEmptyString(itemContent.channelLogoShort) AND isNonEmptyString(itemContent.channelName)
-      titleIndex = m.nodeHelpers.getChildIndex(m.metadataGroup, m.title)
-      displayChannelInfo(itemContent.channelLogoShort, itemContent.channelName, titleIndex)
+      displayChannelInfo(itemContent.channelLogoShort, itemContent.channelName)
     end if
   end if
 
@@ -813,8 +812,7 @@ End Function
 ' Creates a horizontal layout group containing the logo and channel name label
 ' @param channelLogoUri - String, the URI for the channel logo
 ' @param channelName - String, the name of the channel/network to display
-' @param titleIndex - Integer, index position to insert the channel info group
-Function displayChannelInfo(channelLogoUri as String, channelName as String, titleIndex as Integer) as Void
+Function displayChannelInfo(channelLogoUri as String, channelName as String) as Void
   ' Create logo poster
   networkLogo = createPoster(channelLogoUri, {
     id: "networkLogo"
@@ -842,7 +840,7 @@ Function displayChannelInfo(channelLogoUri as String, channelName as String, tit
   })
 
   ' Insert into metadata group and cache references
-  m.metadataGroup.insertChild(channelInfoGroup, titleIndex + 1)
+  m.metadataGroup.insertChild(channelInfoGroup, 0)
   m.channelInfoGroup = channelInfoGroup
 End Function
 
@@ -864,7 +862,7 @@ Function onCurrentEpisodeChange(msg = invalid) as Void
   removeCurrentEpisodeTitleLabel()
 
   if currentEpisode <> invalid AND isNonEmptyString(currentEpisode.title)
-    m.currentEpisodeTitleLabel = createLabel(currentEpisode.title, {
+    m.currentEpisodeTitleLabel = createLabel(formatEpisodeTitle(currentEpisode.title), {
       id: "currentEpisodeTitleLabel"
       height: 33
       width: 960
@@ -876,5 +874,48 @@ Function onCurrentEpisodeChange(msg = invalid) as Void
     ' Insert after title label
     titleIndex = m.nodeHelpers.getChildIndex(m.metadataGroup, m.title)
     m.metadataGroup.insertChild(m.currentEpisodeTitleLabel, titleIndex + 1)
+
+    if isNonEmptyString(currentEpisode.description) = true
+      m.description.text = currentEpisode.description
+
+      lengthString = convertSecondsToHoursString(currentEpisode.length)
+
+      label = createLabel(" " + Chr(&hb7) + " " + lengthString, {
+        height: 40
+        color: m.secondaryTextColor
+        typographyFont: m.bodySmallFont
+        vertAlign: "center"
+      })
+      ' TODO: Revisit this logic we need a better solution for this.
+      m.subHeadlinePrefixGroup.insertChild(label, m.subHeadlinePrefixGroup.getChildCount() - 1)
+    end if
   end if
+End Function
+
+
+' TODO: This is a temporary solution to format the episode title. Backend will be formatting the title in the future.
+
+' Formats episode title from "S01:E01 - Pilot" to "S1 E1 - Pilot"
+' @param title - String, the original episode title
+' @return String - Formatted episode title
+Function formatEpisodeTitle(title as String) as String
+  if not isNonEmptyString(title) then return title
+
+  ' Match pattern: S followed by digits, colon, E followed by digits
+  regex = CreateObject("roRegex", "S([0-9]+):E([0-9]+)", "i")
+  matches = regex.Match(title)
+
+  if matches.Count() >= 3
+    ' Extract season and episode numbers
+    seasonNum = matches[1].toInt()
+    episodeNum = matches[2].toInt()
+
+    ' Replace "S01:E01" with "S1 E1"
+    replacement = "S" + seasonNum.toStr() + " E" + episodeNum.toStr()
+    formattedTitle = regex.Replace(title, replacement)
+    return formattedTitle
+  end if
+
+  ' If pattern doesn't match, return original title
+  return title
 End Function
