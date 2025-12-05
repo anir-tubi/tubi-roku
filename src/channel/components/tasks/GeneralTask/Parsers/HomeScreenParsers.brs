@@ -177,7 +177,7 @@ End Function
 ' Processes hdc_row ad unit for carousel or spotlight ads
 Function processHdcRowAd(adUnit, aRequestedAdTypes, aParsedAds, isUserInVideoTilesExperiment = false) as Void
   assets = adUnit.ad.assets
-  sAdID = getAdID(adUnit.ad.id)
+  adID = adUnit.ad.id
   aImageTracking = []
   if adUnit.trackers <> invalid AND isNonEmptyArray(adUnit.trackers.imp) = true
     aImageTracking = adUnit.trackers.imp
@@ -189,37 +189,25 @@ Function processHdcRowAd(adUnit, aRequestedAdTypes, aParsedAds, isUserInVideoTil
 
   for each adType in aRequestedAdTypes
     if adType = m.constants.adTypes.adRowlistCarousel AND adUnit.rendering_code = m.constants.ui.categoryIds.adRowlistCarousel
-      carouselRowContent = processCarouselAdContent(sAdID, assets, iValidUntil, aImageTracking, isUserInVideoTilesExperiment)
+      carouselRowContent = processCarouselAdContent(adID, assets, iValidUntil, aImageTracking, isUserInVideoTilesExperiment)
       if carouselRowContent <> invalid
         aParsedAds.push(carouselRowContent)
       end if
     else if adType = m.constants.adTypes.adRowlistSpotlight AND adUnit.rendering_code = m.constants.ui.categoryIds.adRowlistSpotlight
-      aParsedAds.push(processSpotlightAdContent(sAdID, assets, iValidUntil, aImageTracking, isUserInVideoTilesExperiment))
+      aParsedAds.push(processSpotlightAdContent(adID, assets, iValidUntil, aImageTracking, isUserInVideoTilesExperiment))
     end if
   end for
 End Function
 
 
-' Converts ad ID to string
-Function getAdID(id) as String
-  if isNonEmptyString(id) = true
-    return id
-  else if isNumber(id) = true
-    return id.toStr()
-  end if
-  return ""
-End Function
-
-
-
 ' Processes carousel ad content from response.
-' @param sAdID: String, The ad ID.
+' @param adID: String, The ad ID.
 ' @param assets: assocArray, Ad assets.
 ' @param iValidUntil: Integer, Ad validity timestamp.
 ' @param aImageTracking: Array, Image tracking data (default: []).
 ' @isInVideoTilesFormat: boolean, optional Whether the ad is in video tiles format. Default is false.
 ' @returns: roSGNode, Processed carousel ad node or invalid.
-Function processCarouselAdContent(sAdID, assets, iValidUntil, aImageTracking = [], isUserInVideoTilesExperiment = false) as Object
+Function processCarouselAdContent(adID, assets, iValidUntil, aImageTracking = [], isUserInVideoTilesExperiment = false) as Object
   tubiLog("HomeScreenParsers.processCarouselAdContent")
   carouselNode = CreateObject("roSGNode", "AdDisplayCarouselContentNode")
   carouselNode.rowPlacement = 2 ' Hardcoded until backend supports row_placement
@@ -263,9 +251,9 @@ Function processCarouselAdContent(sAdID, assets, iValidUntil, aImageTracking = [
   adInfo = invalid
   if videoData <> invalid
     adInfo = {
-      ad_id: sAdID
+      ad_id: adID
       error: invalid
-      id: sAdID
+      id: adID
       impTracking: ""
       media: {
         duration: videoData.duration
@@ -278,7 +266,7 @@ Function processCarouselAdContent(sAdID, assets, iValidUntil, aImageTracking = [
 
   translatedThumb = CreateObject("roSGNode", "TubiContentNode")
   translatedThumb.id = m.constants.ui.categoryIds.adRowlistCarousel
-  translatedThumb.slug = sAdID
+  translatedThumb.slug = adID
   translatedThumb.type = m.constants.ui.contentTypes.adRowlistCarousel
   translatedThumb.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
   translatedThumb.validUntil = iValidUntil
@@ -300,14 +288,14 @@ End Function
 
 
 ' Processes spotlight ad content from response.
-' @param sAdID: String, The ad ID.
+' @param adID: String, The ad ID.
 ' @param assets: assocArray, Ad assets.
 ' @param iValidUntil: Integer, Ad validity timestamp.
 ' @param aImageTracking: Array, Image tracking data (default: []).
 ' @isInVideoTilesFormat: boolean, optional Whether the ad is in video tiles format. Default is false.
 '
 ' @returns: roSGNode, Processed spotlight ad node or invalid.
-Function processSpotlightAdContent(sAdID, assets, iValidUntil, aImageTracking = [], isUserInVideoTilesExperiment = false) as Object
+Function processSpotlightAdContent(adID, assets, iValidUntil, aImageTracking = [], isUserInVideoTilesExperiment = false) as Object
   tubiLog("HomeScreenParsers.processSpotlightAdContent")
   rowContentNode = CreateObject("roSGNode", "AdContentNode")
   rowContentNode.rowPlacement = 2
@@ -323,7 +311,7 @@ Function processSpotlightAdContent(sAdID, assets, iValidUntil, aImageTracking = 
 
   translatedThumb = CreateObject("roSGNode", "TubiContentNode")
   translatedThumb.id = m.constants.ui.categoryIds.adRowlistSpotlight
-  translatedThumb.slug = sAdID
+  translatedThumb.slug = adID
   translatedThumb.type = m.constants.ui.contentTypes.adRowlistSpotlight
   translatedThumb.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
   translatedThumb.validUntil = iValidUntil
@@ -337,9 +325,9 @@ Function processSpotlightAdContent(sAdID, assets, iValidUntil, aImageTracking = 
   adInfo = invalid
   if videoData <> invalid
     adInfo = {
-      ad_id: sAdID
+      ad_id: adID
       error: invalid
-      id: sAdID
+      id: adID
       impTracking: ""
       media: {
         duration: videoData.duration
@@ -397,7 +385,7 @@ Function processSkinAdRowContent(rowAdUnit, videoAdUnit) as Object
   sPosterURL = ""
   adInfo = invalid
   if isValidAssetAdUnit(videoAdUnit) = true
-    sID = getAdID(videoAdUnit.ad.id)
+    sID = videoAdUnit.ad.id
     videoAssets = videoAdUnit.ad.assets
     videoTrackers = videoAdUnit.trackers
     if videoAssets.poster_image <> invalid AND isNonEmptyString(videoAssets.poster_image.url) = true

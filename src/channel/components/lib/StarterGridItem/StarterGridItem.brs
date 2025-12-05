@@ -362,6 +362,12 @@ Function onItemContentChange(msg)
         seriesId = mid(seriesId, 2)
       end if
       itemInfo.series_id = seriesId
+    else if itemContent.type = "adRowlistSpotlight" OR itemContent.type = "adRowlistCarousel"
+      if isNonEmptyString(itemContent.slug) = true
+        itemInfo.ad_id = itemContent.slug.toInt()
+      else if isNumber(itemContent.slug) = true
+        itemInfo.ad_id = itemContent.slug
+      end if
     else
       itemInfo.video_id = itemContent.id
     end if
@@ -430,9 +436,10 @@ Function onRenderTrackingChange(msg)
 
   MIN_VISIBLE_THRESHOLD = 1000
 
-  ' Checking the item is of type video or series or linear only then we proceed.
-  contentType = content.type
-  if m.shouldTrackViewableImpressionEvent = true AND (contentType = "series" OR contentType = "video" OR contentType = "linear")
+  ' Checking the item is of a certain type that we want to track viewable impression event for.
+  aAllowedTypes = ["series", "video", "linear", "adRowlistSpotlight", "adRowlistCarousel"]
+
+  if m.shouldTrackViewableImpressionEvent = true AND arrayIncludes(aAllowedTypes, content.type) = true then
     ' Minimum visible time in milli seconds.
 
     if state = "full"

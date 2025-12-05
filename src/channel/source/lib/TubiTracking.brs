@@ -762,6 +762,8 @@ Function tubiTracking_getAnalyticsTile(contentNode, colPos = 1, rowPos = 1)
       tile.id = contentId
     else if contentNode.type = m.constants.ui.contentTypes.adRowlistCarousel OR contentNode.type = m.constants.ui.contentTypes.adRowlistSpotlight
       if isNonEmptyString(contentNode.slug) = true
+        tile.ad_id = contentNode.slug.toInt()
+      else if isNumber(contentNode.slug) = true
         tile.ad_id = contentNode.slug
       end if
     else if isNonEmptyString(contentId) = true
@@ -1079,12 +1081,14 @@ Function tubiTracking_getOneOfs()
   contentOneof = {
     series_id: -1
     video_id: -1
+    ad_id: -1
   }
 
   targetOneof = {
     content: {
       series_id: -1
       video_id: -1
+      ad_id: -1
       user_interaction: ""
     }
   }
@@ -1244,11 +1248,13 @@ Function tubiTracking_getOneOfs()
     reminder_component: {
       video_id: -1
       series_id: -1
+      ad_id: -1
     }
 
     content: {
       series_id: -1
       video_id: -1
+      ad_id: -1
     }
 
     preview_component: {
@@ -1434,6 +1440,7 @@ Function tubiTracking_getRepeated()
   content_tile = {
     series_id: -1
     video_id: -1
+    ad_id: -1
     row: -1
     col: -1
     duration: 0
