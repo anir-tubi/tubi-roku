@@ -66,13 +66,12 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
-      '//This experiment will be for the new showcase ad campaigns. The possible "enabled_arm" values are "control", "carousel", "spotlight"
-      ads_webott_hdc_homepage_layer: {
-        ads_hdc_sephora_carousel: {
-          default: { "enabled_arm": "carousel" }
-        }
-        ads_hdc_haleon_carousel: {
-          default: { "enabled_arm": "carousel" }
+      '//This experiment will be for the new showcase ad campaigns.
+      '//The default "enabled" values should be where the ads are shown. If Statsig is down, we want to show the ads.
+      ads_homegrid_layer: {
+        ads_hdc_all_holdback: {
+          '// Possible variants: enabled = true (show all ads), or enabled = false (no ads shown)
+          default: { "enabled": true }
         }
       }
 

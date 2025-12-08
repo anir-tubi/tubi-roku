@@ -338,8 +338,6 @@ Function fetchHomeScreen(homeScreen, useCache = false)
   ' being set to true.  Then, once true categories reload any time fetchHomeScreen() is
   ' called, such as when signedIn field changes.
   if homeScreen.canLoadCategories = true
-    bSkipCallingAdContent = false
-
     '//reset contentFetchCompleted flags
     homeScreen.contentFetchCompleted = false
     homeScreen.adContentFetchCompleted = false
@@ -363,34 +361,14 @@ Function fetchHomeScreen(homeScreen, useCache = false)
       errorHandler = onEspanolScreenErrorResponse
     else if homeScreen.id = m.constants.ui.screenIds.homeScreen
       if isKidsUIOn() = false AND isParentalControlsAdultLevel() = true
-        '//Call ad endpoint to get ad content for the homescreen
-
-        aAdTypes = []
-        adTypeSet = {} ' Simple associative array used as a Set (BrightScript has no real Set)
-        adExperiments = [
-          { name: "ads_hdc_sephora_carousel", arm: "carousel", adType: m.constants.adTypes.adRowlistCarousel },
-          { name: "ads_hdc_haleon_carousel", arm: "carousel", adType: m.constants.adTypes.adRowlistCarousel }
-        ]
-        adLayer = "ads_webott_hdc_homepage_layer"
-        for each adExperiment in adExperiments
-          experimentAd = getStatsigExperimentResource(adLayer, adExperiment.name, true)
-          if experimentAd <> invalid AND experimentAd.enabled_arm = adExperiment.arm
-            adTypeKey = adExperiment.adType
-            if adTypeSet[adTypeKey] = invalid
-              aAdTypes.push(adTypeKey)
-              adTypeSet[adTypeKey] = true
-            end if
-          end if
-        end for
-
-        '//If this is no longer in the experiment and the ads_webott_hdc_homepage_layer experiment has been graduated, then request both ad types and let the backend decide which ad type(s) to return
-        ' aAdTypes = [m.constants.adTypes.adRowlistCarousel, m.constants.adTypes.adRowlistSpotlight]
-        aAdTypes.push(m.constants.adTypes.skinAd) '//Also request the skin ad unit
+        '//Call an ad endpoint to get ad content for the homescreen. The ad endpoint will return if any ads are active
+        aAdTypes = [m.constants.adTypes.adRowlistCarousel, m.constants.adTypes.adRowlistSpotlight, m.constants.adTypes.skinAd]
 
         createHomescreenAdRequest(homeScreen.id, onHomesceenAdDisplaySuccessResponse, aAdTypes, onHomesceenAdDisplayErrorResponse)
       else
         'If in kids mode, then user is not in experiment and we should indicate that the adContentFetchCompleted flag is true so that ads are not waited on when loading homescreen content
-        bSkipCallingAdContent = true
+        homeScreen.adContent = []
+        homeScreen.adContentFetchCompleted = true
       end if
     end if
 
@@ -430,13 +408,6 @@ Function fetchHomeScreen(homeScreen, useCache = false)
       isSignedInUser: isLoggedInUser()
       uiMode: m.uiMode
     })
-
-
-    if bSkipCallingAdContent = true
-      '//::NOTE::ads_ott_hdc_adformats_v1 this is only needed for the experiment. Skip loading of the ad content if it was found in this function that we should skip waiting for ad content
-      homeScreen.adContent = []
-      homeScreen.adContentFetchCompleted = true
-    end if
 
     if useCache = false
       homeScreen.resetContentAreaValues = true
@@ -520,34 +491,41 @@ End Function
 
 Function onHomesceenAdDisplaySuccessResponse(response)
   tubiLog("HomeScreenHelpers.onHomesceenAdDisplaySuccessResponse")
+
   homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-  if homeScreen <> invalid AND isNonEmptyArray(response) = true
-    homeScreen.adContent = response
-  end if
-  homeScreen.adContentFetchCompleted = true
+  if homeScreen <> invalid
+    aParsedResponseAfterExperimentCheck = []
+    skinAdsWrapper = invalid
 
-  skinAdsWrapper = invalid
-  for each adResponse in response
-    if adResponse <> invalid AND adResponse.type = m.constants.ui.contentTypes.skinAd
-      skinAdsWrapper = adResponse
+    if isNonEmptyArray(response) = true AND isKidsUIOn() = false AND isParentalControlsAdultLevel() = true
+      for each adResponse in response
+        '// Iterate through the ad responses and determine whether each ad should be displayed
+        '// based on the associated experiment's values.
+        if adResponse <> invalid
+          if adResponse.type = m.constants.ui.contentTypes.skinAd
+            if getStatsigExperimentResource("ads_homegrid_layer", "ads_hdc_all_holdback", true).enabled = true
+              skinAdsWrapper = adResponse
+
+              ' Do not display video tile overlay group if the skin ads is available.
+              ' This is needed because we refresh home screen behind the scenes during parent controls change.
+              m.videoTileOverlayGroup.visible = false
+            end if
+          else if adResponse.type = m.constants.ui.contentTypes.adRowlistCarousel OR adResponse.type = m.constants.ui.contentTypes.adRowlistSpotlight
+            if getStatsigExperimentResource("ads_homegrid_layer", "ads_hdc_all_holdback", true).enabled = true
+              aParsedResponseAfterExperimentCheck.push(adResponse)
+            end if
+          end if
+        end if
+      end for
     end if
-  end for
-  isSkinAdsAvailable = (isKidsUIOn() = false AND skinAdsWrapper <> invalid)
-  if isSkinAdsAvailable = true AND getExperimentResource("ads_tubi_skins", "ads_tubi_skins_v1", true).enabled = true
-    '//If this is a valid skinAds wrapper, then check if it is part of the experiment.
-    '//As long as a valid skin wrapper is returned, fire the experiment's exposure event here, regardless.
+
     homeScreen.skinAdContent = skinAdsWrapper
+    homeScreen.skinAdContentUpdated = true
+    homeScreen.adContent = aParsedResponseAfterExperimentCheck
+    homeScreen.adContentFetchCompleted = true
 
-    ' Do not display video tile overlay group if the skin ads is available.
-    ' This is needed because we refresh home screen behind the scenes during parent controls change.
-    m.videoTileOverlayGroup.visible = false
-  else
-    homeScreen.skinAdContent = invalid
+    checkIfHomeScreenContentIsReady(homeScreen)
   end if
-  homeScreen.skinAdContentUpdated = true
-
-
-  checkIfHomeScreenContentIsReady(homeScreen)
 End Function
 
 
