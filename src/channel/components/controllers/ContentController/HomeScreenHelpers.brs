@@ -1440,10 +1440,15 @@ Function showRegistrationWelcomeModal()
     instantResumeAction: m.constants.instantResumeActions.closeDialog
   }
 
-  if m.constants.settings.welcomeBannerImageUrl = invalid
+  ' Check if we're within the special event onboarding time period
+  eventStart = getExternalConfigValueFromGlobal("special_event_onboarding_start_time", invalid)
+  eventEnd = getExternalConfigValueFromGlobal("special_event_onboarding_end_time", invalid)
+  isWithinEventPeriod = isNowWithinTimePeriod(eventStart, eventEnd)
+
+  if isWithinEventPeriod = true
     imageUrl = ["https://mrcdn-production.tubitv.com/appFiles/images/welcome-banner.webp"]
   else
-    imageUrl = [m.constants.settings.welcomeBannerImageUrl]
+    imageUrl = ["pkg:/images/transparent.png"]
   end if
 
   modalInfo.append({

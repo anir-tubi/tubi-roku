@@ -84,9 +84,6 @@ settings:
   # Setting the below value to true will turn on displaying the live events spotlight and banner on the home screen
   enableLiveEventsSpotlightAndBanner: false
 
-  # Setting the below value will show this image instead of the default image. Comment this out to use the default image.
-  welcomeBannerImageUrl: "https://mrcdn-production.tubitv.com/appFiles/images/continueWatchingItemBackground_largePoster.webp"
-
   bs_const:
     #By default nothing will be printed to debug console.(port : 8085)
     #To enable console debug logs, set consoleLoggingEnabled to true
