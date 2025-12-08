@@ -4346,7 +4346,7 @@ Function getTranslation_es_MX()
     },
     "rating_pg_description": {
       "description": "Description for PG rating (Parental Guidance Suggested)",
-      "message": "Puede no ser adecuado para niños. Se recomienda orientación de los padres. Puede contener material no apropiado para menores."
+      "message": "Puede no ser adecuado para niños. Se recomienda 'orientación de los padres'. Puede contener material no apropiado para menores."
     },
     "rating_pg_13_description": {
       "description": "Description for PG-13 rating (Parents Strongly Cautioned)",
@@ -6382,7 +6382,7 @@ Function getTranslation_fr_CA()
     },
     "rating_pg_description": {
       "description": "Description for PG rating (Parental Guidance Suggested)",
-      "message": "Peut ne pas convenir aux enfants. Orientation parentale recommandée. Peut contenir du contenu que les parents n’apprécieraient pas pour leurs jeunes enfants."
+      "message": "Peut ne pas convenir aux enfants. 'Orientation parentale' recommandée. Peut contenir du contenu que les parents n’apprécieraient pas pour leurs jeunes enfants."
     },
     "rating_pg_13_description": {
       "description": "Description for PG-13 rating (Parents Strongly Cautioned)",
