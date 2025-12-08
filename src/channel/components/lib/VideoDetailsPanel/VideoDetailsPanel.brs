@@ -18,6 +18,7 @@ Function init()
   m.subheaderMediumFont = typographyConstants.ids.subheaderMedium
   m.bodyMediumFont = typographyConstants.ids.bodyMedium
   m.bodyExtraSmallStrongFont = typographyConstants.ids.bodyExtraSmallStrong
+  m.bodySmallStrongFont = typographyConstants.ids.bodySmallStrong
 
   ' Set up theme observer
   if m.global <> invalid
@@ -191,7 +192,7 @@ Function createRatingItem(ratingText as String, descriptionText as String) as Ob
   ' Rating badge with 9-patch background
   ratingBadge = CreateObject("roSGNode", "Group")
 
-  badgeBackground = createPoster("pkg:/images/rating_background_video_tile_$$RES$$.9.png", {
+  badgeBackground = createPoster("pkg:/images/vod-details-rating-background-$$RES$$.9.png", {
     height: ratingHeight
     loadDisplayMode: "scaleToFit"
   })
@@ -200,9 +201,10 @@ Function createRatingItem(ratingText as String, descriptionText as String) as Ob
     width: 0
     height: ratingHeight
     color: m.secondaryTextColor
-    typographyFont: m.bodyExtraSmallStrongFont
+    typographyFont: m.bodySmallStrongFont
     horizAlign: "center"
     vertAlign: "center"
+    lineSpacing: 2
   })
 
   ' Calculate dynamic width based on text length
@@ -223,6 +225,7 @@ Function createRatingItem(ratingText as String, descriptionText as String) as Ob
       wrap: true
       color: m.primaryTextColor
       typographyFont: m.bodyMediumFont
+      lineSpacing: 2
     })
     children.push(description)
   end if

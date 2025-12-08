@@ -54,6 +54,8 @@ Function createLabel(text, config = invalid) as Object
     if config.typographyFont <> invalid
       setTypographyOfLabel(label, config.typographyFont)
     end if
+
+    if config.lineSpacing <> invalid then label.lineSpacing = config.lineSpacing
   end if
 
   return label

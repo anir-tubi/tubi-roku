@@ -162,6 +162,9 @@ Function onSideNavItemSelected()
         bNewScreenCalledSuccess = true
       end if
     else if itemSelectedId = m.constants.ui.sideNavIds.kidsMode
+      if currentScreenNow <> invalid AND currentScreenNow.id = m.constants.ui.screenIds.vodDetailScreen
+        hideNavMenu(false)
+      end if
       if itemSelected.turnedOn = true
         '//If the parental control settings are not set to kids, then this action is not limited
         '// aka this mode is not locked down and can be easily exited without a parent's intervention

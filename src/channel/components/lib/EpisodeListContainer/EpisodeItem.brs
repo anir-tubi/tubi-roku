@@ -17,7 +17,7 @@ Function init() as Void
   ' Set typography
   setTypographyOfLabel(m.episodeTitle, m.typographyConstants.ids.subheaderSmall)
   setTypographyOfLabel(m.description, m.typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.duration, m.typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.duration, m.typographyConstants.ids.bodySmall)
   setTypographyOfLabel(m.ratingLabel, m.typographyConstants.ids.bodyExtraSmallStrong)
 
   if m.global <> invalid
