@@ -324,9 +324,13 @@ Function tubiLog_getClientLogEvent(eventValues) as Object
 
   ' Remove any properties that are invalid as that will cause the request to be rejected on the backend. Also try to convert any non-string values to strings if possible
   propertiesToDelete = []
+
+  ' Count of properties that were invalid. Want to keep track of this to not throw in the case only these values are being removed
+  invalidPropertiesCount = 0
   for each key in message_map
     value = message_map[key]
     if value = invalid
+      invalidPropertiesCount++
       propertiesToDelete.push(key)
     end if
 
@@ -341,7 +345,8 @@ Function tubiLog_getClientLogEvent(eventValues) as Object
     end if
   end for
 
-  if propertiesToDelete.count() > 0 AND m.constants.settings.mode = "dev" then
+  propertiesToDeleteCount = propertiesToDelete.count()
+  if propertiesToDeleteCount > 0 AND m.constants.settings.mode = "dev" AND propertiesToDeleteCount <> invalidPropertiesCount then
     throw "TubiLogger.getClientLogEvent: Removed invalid properties from message_map: " + FormatJson(propertiesToDelete)
   end if
 
