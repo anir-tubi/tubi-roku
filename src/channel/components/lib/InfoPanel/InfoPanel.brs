@@ -109,13 +109,13 @@ Function init()
   m.typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.title, m.typographyConstants.ids.headerSmall)
   setTypographyOfLabel(m.episode, m.typographyConstants.ids.subheaderSmall)
-  setTypographyOfLabel(m.Line1, m.typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.Line1, m.typographyConstants.ids.bodySmall)
   setTypographyOfLabel(m.Line1Bold, m.typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.rottenTomatoBadge, m.typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.DescriptorCode, m.typographyConstants.ids.bodyExtraSmallStrong)
   setTypographyOfLabel(m.RatingLabel, m.typographyConstants.ids.bodyExtraSmallStrong)
   setTypographyOfLabel(m.ExpireWarning, m.typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.Line2, m.typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.Line2, m.typographyConstants.ids.bodySmall)
   setTypographyOfLabel(m.Description, m.typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.SignInText, m.typographyConstants.ids.bodySmall)
   setTypographyOfLabel(m.ReminderTitle, m.typographyConstants.ids.bodyMedium)
@@ -126,7 +126,7 @@ Function init()
   setTypographyOfLabel(m.channelNameHeader, m.typographyConstants.ids.subheaderSmall)
 
   m.bodySmall = m.typographyConstants.ids.bodySmall
-  m.bodyMediumStrongFont = m.typographyConstants.ids.bodyMediumStrong
+  m.bodyMediumStrongFont = m.typographyConstants.ids.bodySmallStrong
 
 
   m.BadgeTypes = {
@@ -297,9 +297,29 @@ Function onEpisodeTitleChange(msg)
       m.offset.insertChild(m.episode, programEpisodeIndex)
     end if
     m.episode.text = episodeTitle
+
+    ' Reposition sotMarker to be below episode title if marker exists
+    if m.sotMarker <> invalid AND m.sotMarker.getParent() <> invalid
+      m.offset.removeChild(m.sotMarker)
+      episodeIndex = m.nodeHelpers.getChildIndex(m.offset, m.episode)
+      if episodeIndex <> -1
+        m.offset.insertChild(m.sotMarker, episodeIndex + 1)
+      end if
+    end if
   else if episodeIsPresent = true
     m.episode.text = ""
     m.offset.removeChild(m.episode)
+
+    ' Reposition sotMarker to be below title if marker exists
+    if m.sotMarker <> invalid AND m.sotMarker.getParent() <> invalid
+      m.offset.removeChild(m.sotMarker)
+      if m.title <> invalid
+        titleIndex = m.nodeHelpers.getChildIndex(m.offset, m.title)
+        if titleIndex <> -1
+          m.offset.insertChild(m.sotMarker, titleIndex + 1)
+        end if
+      end if
+    end if
   end if
   shouldCalculateHeight()
 End Function
@@ -326,7 +346,7 @@ Function onNeedsLoginChange(msg)
     else if m.top.reminderIsSet = true
       m.offset.appendChild(m.reminderGroup)
     else if isAA(m.top.sotMarkers) = true AND m.top.sotMarkers.count() > 0
-      m.offset.appendChild(m.sotMarker)
+      insertSotMarkerAtCorrectPosition()
     end if
   else if needsLogin = true AND signInGroupIsPresent = false
     ' login info overwrites countdown timer or reminder text if the user is not logged in
@@ -362,14 +382,46 @@ Function onSotMarkersChange(msg)
       backgroundColor: m.theme.shadeColor
       bodyMediumStrongFont: m.bodyMediumStrongFont
       maxWidth: m.top.width - 12
-      textColor: m.theme.cautionColor
+      primaryTextColor: m.theme.primaryTextColor
     }
 
     createSotMarker(sotMarker, config, m.sotMarker)
-
-    m.offset.appendChild(m.sotMarker)
+    insertSotMarkerAtCorrectPosition()
   end if
 
+End Function
+
+
+' Inserts sotMarker at the correct position: below episode title if exists, otherwise below title
+' Assumes marker has already been removed from parent if needed
+Function insertSotMarkerAtCorrectPosition() as Void
+  if m.sotMarker = invalid then return
+
+  if m.title <> invalid
+    titleIndex = m.nodeHelpers.getChildIndex(m.offset, m.title)
+    if titleIndex <> -1
+      ' Check if episode title exists and is positioned after title
+      if m.episode <> invalid AND m.episode.getParent() <> invalid
+        episodeIndex = m.nodeHelpers.getChildIndex(m.offset, m.episode)
+        if episodeIndex = titleIndex + 1
+          ' Episode is right after title, insert marker after episode
+          m.offset.insertChild(m.sotMarker, episodeIndex + 1)
+        else
+          ' Episode exists but not right after title, insert after title
+          m.offset.insertChild(m.sotMarker, titleIndex + 1)
+        end if
+      else
+        ' No episode title, insert marker right after title
+        m.offset.insertChild(m.sotMarker, titleIndex + 1)
+      end if
+    else
+      ' Title not found, insert at beginning
+      m.offset.insertChild(m.sotMarker, 0)
+    end if
+  else
+    ' No title, insert at beginning
+    m.offset.insertChild(m.sotMarker, 0)
+  end if
 End Function
 
 

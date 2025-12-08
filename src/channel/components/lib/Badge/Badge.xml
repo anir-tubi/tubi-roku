@@ -15,6 +15,7 @@
     <field id="iconUri" type="string" />
     <field id="text" type="string" />
     <field id="width" type="float" alias="BadgeBackground.width, badgeBorder.width" />
+    <field id="height" type="float" alias="BadgeBackground.height, badgeBorder.height" />
     <field id="badgeTextWidth" type="float" alias="BadgeText.width" />
     <field id="showBackground" alias="BadgeBackground.visible, badgeBorder.visible" value="true" />
     <!-- This field is used to set the font style/size of the badge text when showBackground is

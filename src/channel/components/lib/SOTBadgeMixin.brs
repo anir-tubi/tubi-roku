@@ -112,6 +112,7 @@ Function createBadge(labelData, config)
   badge = createObject("roSGNode", "Badge")
   badge.text = labelData.sotLabelText
   badge.backgroundColor = config.backgroundColor
+  badge.height = 40
   badge.borderUri = "pkg:/images/rounded-badge-border-dark-$$RES$$.9.png"
   badge.backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
   badge.iconUri = labelData.sotIcon
@@ -178,8 +179,8 @@ Function createSotMarker(sotMarkers, config, marker = invalid)
       marker.badgeTextFont = config.bodyMediumStrongFont
     end if
 
-    if config.textColor <> invalid
-      marker.textColor = config.textColor
+    if config.primaryTextColor <> invalid
+      marker.textColor = config.primaryTextColor
     end if
 
     return marker

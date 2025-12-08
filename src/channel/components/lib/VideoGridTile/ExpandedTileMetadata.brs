@@ -270,6 +270,7 @@ Function handleSOTBadgesAndLayout(itemContent) as Void
       primaryTextolor: m.primaryTextColor
       backgroundColor: m.shadeColor
       maxWidth: m.top.width - 12
+      badgeFont: m.bodySmallFont
       bodyMediumStrongFont: m.bodyMediumStrongFont
       textColor: m.primaryTextColor
       cautionColor: m.cautionColor
@@ -291,25 +292,30 @@ Function handleSOTBadgesAndLayout(itemContent) as Void
     end if
 
 
-    'Clear existing SOT badges from secondLineGroup before adding new ones
+    ' Clear and prepare secondLineGroup
     if m.secondLineGroup <> invalid
       clearSOTBadges(m.secondLineGroup)
-    end if
-
-    ' Remove secondLineGroup from parent before adding childs
-    if m.secondLineGroup <> invalid AND m.secondLineGroup.getParent() <> invalid
-      m.metadataGroup.removeChild(m.secondLineGroup)
+      if m.secondLineGroup.getParent() <> invalid
+        m.metadataGroup.removeChild(m.secondLineGroup)
+      end if
     end if
 
     topLabels = sotBadges.topLabels
     metaDataLabels = sotBadges.metaDataLabels
 
-    ' Only add secondLineGroup back if we have labels to display
+    ' Add secondLineGroup if we have labels to display
     if m.secondLineGroup <> invalid AND (isNonEmptyArray(topLabels) = true OR isNonEmptyArray(metaDataLabels) = true)
-      ' Find description index to insert secondLineGroup before it
-      descriptionIndex = m.nodeHelpers.getChildIndex(m.metadataGroup, m.description)
-      if descriptionIndex <> -1
-        m.metadataGroup.insertChild(m.secondLineGroup, descriptionIndex)
+      ' Calculate insert position: after firstLineGroup for series, before description otherwise
+      insertIndex = -1
+      if itemContent.type = m.constants.ui.contentTypes.series AND m.firstLineGroup <> invalid AND m.firstLineGroup.getParent() <> invalid
+        firstLineGroupIndex = m.nodeHelpers.getChildIndex(m.metadataGroup, m.firstLineGroup)
+        if firstLineGroupIndex <> -1 then insertIndex = firstLineGroupIndex + 1
+      end if
+
+      if insertIndex <> -1
+        currentChildCount = m.metadataGroup.getChildCount()
+        if insertIndex > currentChildCount then insertIndex = currentChildCount
+        m.metadataGroup.insertChild(m.secondLineGroup, insertIndex)
       else
         m.metadataGroup.appendChild(m.secondLineGroup)
       end if
@@ -319,11 +325,9 @@ Function handleSOTBadgesAndLayout(itemContent) as Void
       end if
 
       if isNonEmptyArray(metaDataLabels) = true
-        isSotBadgePresent = m.sotBadge.getParent() <> invalid
-        if isSotBadgePresent = true
+        if m.sotBadge <> invalid AND m.sotBadge.getParent() <> invalid
           m.firstLineGroup.removeChild(m.sotBadge)
         end if
-
         showMetaDataLabels(m.secondLineGroup, metaDataLabels)
       end if
     end if
