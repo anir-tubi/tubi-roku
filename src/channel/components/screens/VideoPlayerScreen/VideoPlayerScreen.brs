@@ -40,7 +40,13 @@ Function init()
   }
   m.bAutostartRefreshExperimentEnabled = getExperimentResource("roku_video_autostart_ui_refresh", "roku_video_autostart_ui_refresh_v1", false).enabled = true
 
-  m.alignAdRequestExperiment = getStatsigExperimentResource("roku_player_improvement", "roku_player_align_ad_request_cuepoint_v1", false).enabled
+  ' Ad request cuepoint alignment experiment (roku_player_align_ad_request_cuepoint_v2):
+  ' Control: prefetchTime=15, requestWithinWindow=false (request before 15s, not within 15s)
+  ' Variant1: prefetchTime=11, requestWithinWindow=false (request before 11s, not within 11s)
+  ' Variant2: prefetchTime=11, requestWithinWindow=true (request before 11s, also within 11s)
+  alignAdRequestExperimentConfig = getStatsigExperimentResource("roku_player_improvement", "roku_player_align_ad_request_cuepoint_v2", false)
+  m.adPrefetchTime = alignAdRequestExperimentConfig.prefetchTime ' adPrefetchTime is used to help to prefetch the ad before the actual cuepoint
+  m.alignAdRequestWithinWindow = alignAdRequestExperimentConfig.requestWithinWindow
   m.isAlignAdRequestExposureFired = false 'using this variable to avoid experiment calls during every video position change
 
   m.tubiTrackingInfo = TubiTrackingInfo(m.constants)
@@ -418,9 +424,18 @@ Function init()
 
   m.lastPingTime = 0
   m.lastSavedPosition = 0
-  m.adPrefetchTime = 15 ' adPrefetchTime is used to help to prefetch the ad before the actual cuepoint
   m.adHeadsUpTime = 10 ' adHeadsUpTime helps to decide how long we need to show the AdHeadsup
   m.midrolls = {} ' midrolls holds all cuepoints from API response
+
+  ' Prevent re-fetching ads when playback resumes after an ad break.
+  ' Roku may resume a few seconds earlier due to frame alignment, which can
+  ' accidentally trigger another ad request. This cooldown flag avoids that.
+  m.adFetchCooldown = false ' cooldown flag to prevent re-fetching ads on resume after ad break
+  m.adFetchCooldownTimer = createObject("roSGNode", "Timer") ' timer for ad fetch cooldown
+  m.adFetchCooldownTimer.duration = 10 ' 10 second cooldown
+  m.adFetchCooldownTimer.repeat = false
+  m.adFetchCooldownTimer.observeFieldScoped("fire", "onAdFetchCooldownTimerFired")
+
   m.mostRecentCompletedCuepoint = -1 'used to prevent multiple resume_after_break events from firing
   m.notificationInterval = 0.999 ' The interval that we are targeting for player position updates. We specify a value lower than a second in order to get a float value
   m.Video.notificationInterval = m.notificationInterval
@@ -911,6 +926,7 @@ Function playContent()
 
     ' Always reset ad state when we first start playback.  Preroll fetch will populate midrolls list
     m.midrolls = {}
+    cleanupAdFetchCooldownTimer() ' Reset cooldown timer for new playback
 
     ' reset the seekReferenceQueue
     m.seekReferenceQueue = []
@@ -1744,26 +1760,27 @@ Function onVideoPositionChange(msg)
     potentialCuepoint = -1
     shouldFireExposure = false
 
-    ' Skip exposure when cue point is exactly 15 seconds ahead of playback.
     ' Fetch midroll ads early only if ads are neither pending nor currently fetching.
     if (adState <> "adsPending" AND adState <> "fetching")
       currentPosition = m.playerPosition
       prefetchCuepoint = currentPosition + m.adPrefetchTime
 
-      ' Check if we're at the exact prefetch time for a cuepoint
+      ' Check if we're at the exact prefetch time boundary for a cuepoint
       if m.midrolls[strI(prefetchCuepoint)] = true
         isCuepointPrefetchTimeReached = true
         potentialCuepoint = prefetchCuepoint
       else
-        ' Check if any cuepoint falls within the 5-15 second window
+        ' Check if any cuepoint falls within the window (0 to prefetchTime)
         for each cuepointStr in m.midrolls
           cuepoint = val(cuepointStr)
           timeToCuepoint = cuepoint - currentPosition
 
-          if timeToCuepoint >= 5 AND timeToCuepoint < 15
+          ' Fire exposure when entering the prefetch window
+          if timeToCuepoint > 0 AND timeToCuepoint < m.adPrefetchTime
             shouldFireExposure = true
-            ' Only set ad request flags if experiment is enabled
-            if m.alignAdRequestExperiment = true
+            ' Request ads within window only if requestWithinWindow = true (Variant 2)
+            ' Skip if cooldown is active (prevents re-fetch on resume after ad break)
+            if m.alignAdRequestWithinWindow = true AND m.adFetchCooldown = false
               isCuepointPrefetchTimeReached = true
               potentialCuepoint = cuepoint
             end if
@@ -1774,7 +1791,7 @@ Function onVideoPositionChange(msg)
 
       ' Fire exposure event if needed and not already fired
       if shouldFireExposure = true AND m.isAlignAdRequestExposureFired = false
-        getStatsigExperimentResource("roku_player_improvement", "roku_player_align_ad_request_cuepoint_v1")
+        getStatsigExperimentResource("roku_player_improvement", "roku_player_align_ad_request_cuepoint_v2")
         m.isAlignAdRequestExposureFired = true
       end if
     end if
@@ -1933,6 +1950,13 @@ Function onAdStateChange(msg)
     ' no ads were returned from preroll or resumeroll, or we just came back from an ad break.  Make sure we start playing
     ' TODO(Chris): model the ad break more explicitly in m.VideoState so we're not trying to glean state from m.VideoState, m.Video.State, video control and ad control
     if m.Video.content.url <> invalid AND m.Video.content.url <> ""
+      ' Start cooldown timer only for requestWithinWindow (Variant 2) to prevent re-fetch on resume
+      ' Timer starts BEFORE video resumes so the cooldown is active when position callback fires
+      if m.alignAdRequestWithinWindow = true
+        cleanupAdFetchCooldownTimer()
+        startAdFetchCooldownTimer()
+      end if
+
       m.top.setFocus(true)
       m.seekReferenceQueue.push(m.playerPosition)
       seekToPosition(m.playerPosition)
@@ -4080,3 +4104,26 @@ sub resetRetryConfig()
     lastErrorCode: 0
   })
 end sub
+
+
+' Helper sub to start the ad fetch cooldown timer
+' This prevents re-fetching ads on resume after ad break (due to Roku frame alignment)
+sub startAdFetchCooldownTimer()
+  m.adFetchCooldown = true
+  m.adFetchCooldownTimer.observeFieldScoped("fire", "onAdFetchCooldownTimerFired")
+  m.adFetchCooldownTimer.control = "start"
+end sub
+
+
+' Helper sub to cleanup the ad fetch cooldown timer
+sub cleanupAdFetchCooldownTimer()
+  m.adFetchCooldown = false
+  m.adFetchCooldownTimer.control = "stop"
+  m.adFetchCooldownTimer.unObserveFieldScoped("fire")
+end sub
+
+
+' Callback when ad fetch cooldown timer expires
+Function onAdFetchCooldownTimerFired()
+  cleanupAdFetchCooldownTimer()
+End Function

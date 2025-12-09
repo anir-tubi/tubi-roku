@@ -29,9 +29,12 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         roku_player_branding_v2: {
           default: { "enabled": false }
         }
-        ' Ad request cuepoint alignment - fetch Ad anywhere between 3~15 second before cuepoint if experiment is enabled
-        roku_player_align_ad_request_cuepoint_v1: {
-          default: { "enabled": false }
+        ' Ad request cuepoint alignment experiment with 3 variants:
+        ' Control: prefetchTime=15, requestWithinWindow=false (request before 15s, not within 15s)
+        ' Variant1: prefetchTime=11, requestWithinWindow=false (request before 11s, not within 11s)
+        ' Variant2: prefetchTime=11, requestWithinWindow=true (request before 11s, also within 11s)
+        roku_player_align_ad_request_cuepoint_v2: {
+          default: { "prefetchTime": 15, "requestWithinWindow": false }
         }
         ' Testing preroll ad timeout values: 12s, 8s and 5s variants
         roku_player_ad_preroll_timeout_v2: {
