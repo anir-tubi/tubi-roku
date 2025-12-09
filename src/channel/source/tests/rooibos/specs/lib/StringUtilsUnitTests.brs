@@ -172,6 +172,36 @@ Function stringUtils_replaceURLParameter_test()
   m.assertEqual(badUrl1, convertedURL_bad1)
   m.assertEqual(badUrl2, convertedURL_bad2)
   m.assertEqual(badUrl3, convertedURL_bad3)
+
+  '// Fragment handling - value should end at #
+  urlWithFragment1 = "http://www.tubi.tv?cb=1234#section"
+  convertedFragment1 = replaceURLParameter(urlWithFragment1, "cb", "XYZ")
+  m.assertEqual(convertedFragment1, "http://www.tubi.tv?cb=XYZ#section")
+
+  '// Param in middle with fragment after
+  urlWithFragment2 = "http://www.tubi.tv?param1=abc&cb=1234#section"
+  convertedFragment2 = replaceURLParameter(urlWithFragment2, "cb", "XYZ")
+  m.assertEqual(convertedFragment2, "http://www.tubi.tv?param1=abc&cb=XYZ#section")
+
+  '// Empty param value
+  urlEmptyValue = "http://www.tubi.tv?cb=&other=123"
+  convertedEmptyValue = replaceURLParameter(urlEmptyValue, "cb", "XYZ")
+  m.assertEqual(convertedEmptyValue, "http://www.tubi.tv?cb=XYZ&other=123")
+
+  '// Case insensitivity - uppercase param should be found and replaced, preserving original case
+  urlUpperCase = "http://www.tubi.tv?CB=1234"
+  convertedUpperCase = replaceURLParameter(urlUpperCase, "cb", "XYZ")
+  m.assertTrue(convertedUpperCase.Instr("=XYZ") >= 0)
+
+  '// Param at very end (no trailing & or #)
+  urlParamAtEnd = "http://www.tubi.tv?other=abc&cb=1234"
+  convertedParamAtEnd = replaceURLParameter(urlParamAtEnd, "cb", "XYZ")
+  m.assertEqual(convertedParamAtEnd, "http://www.tubi.tv?other=abc&cb=XYZ")
+
+  '// URL-encoded values should be replaced entirely
+  urlEncoded = "http://www.tubi.tv?cb=hello%20world"
+  convertedEncoded = replaceURLParameter(urlEncoded, "cb", "XYZ")
+  m.assertEqual(convertedEncoded, "http://www.tubi.tv?cb=XYZ")
 End Function
 
 

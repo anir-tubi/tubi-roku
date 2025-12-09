@@ -203,22 +203,43 @@ End Function
 Function replaceURLParameter(url, paramToReplace, replacementValue, addIfDoesNotExist = false)
   sReplacementURL = url
   if isString(url) = true AND url <> "" AND isString(paramToReplace) = true AND isString(replacementValue) = true
-    re = CreateObject("roRegex", "[\\?&]" + paramToReplace + "=([^&#]*)", "i")
-    aMatches = re.Match(url)
-    if aMatches.Count() > 0
-      '//place replacement string into the URL
-      match = aMatches[0]
-      sDelimiter = match.mid(0, 1)
-      sNewParamValuePair = sDelimiter + paramToReplace + "=" + replacementValue
-      sReplacementURL = url.replace(match, sNewParamValuePair)
+
+    ' Try to find ?param= or &param=
+    searchPatterns = ["?" + paramToReplace + "=", "&" + paramToReplace + "="]
+    foundPos = 0
+    delimiter = ""
+
+    for each pattern in searchPatterns
+      patternPos = Instr(1, LCase(url), LCase(pattern))
+      if patternPos > 0
+        foundPos = patternPos
+        delimiter = Left(pattern, 1)
+        exit for
+      end if
+    end for
+
+    if foundPos > 0
+      ' Found the parameter - find where the value ends
+      valueStart = foundPos + Len(paramToReplace) + 2 ' +2 for delimiter and =
+      valueEnd = Len(url) + 1
+
+      ' Look for & or # to find end of value
+      ampPos = Instr(valueStart, url, "&")
+      hashPos = Instr(valueStart, url, "#")
+
+      if ampPos > 0 then valueEnd = ampPos
+      if hashPos > 0 AND (hashPos < valueEnd) then valueEnd = hashPos
+
+      ' Build replacement URL
+      beforeParam = Left(url, foundPos - 1)
+      afterValue = Mid(url, valueEnd)
+      sReplacementURL = beforeParam + delimiter + paramToReplace + "=" + replacementValue + afterValue
+
     else if addIfDoesNotExist = true
-      '// The paramToReplace is not in the URL, check the value of addIfDoesNotExist to see if we should still add it to the query list
       sConnector = "&"
       if Instr(1, url, "?") <= 0
-        '//if the URL does not contain a "?", then use the "?" instead of the "&" to add the param/value pair to the URL
         sConnector = "?"
       end if
-
       sReplacementURL = url + sConnector + paramToReplace + "=" + replacementValue
     end if
   end if
