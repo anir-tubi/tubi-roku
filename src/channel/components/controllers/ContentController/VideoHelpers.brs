@@ -1457,7 +1457,7 @@ End Function
 ' @position: integer, Playback position.
 Function updateRokuContinueWatchingInfo(content, position)
   ' Only perform the operation if user is logged in and not opted out of the continueWatching consent.
-  if content.isTrailer = false AND isLoggedInUser() = true AND getConsentOptOutStatusByKey(m.constants.consentKeys.continueWatching) = false then
+  if content <> invalid AND content.isTrailer = false AND isLoggedInUser() = true AND getConsentOptOutStatusByKey(m.constants.consentKeys.continueWatching) = false then
     didReachEndOfVideo = false
     if content.creditCuePoints <> invalid AND position >= content.creditCuePoints.postlude
       didReachEndOfVideo = true

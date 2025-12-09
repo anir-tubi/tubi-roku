@@ -194,13 +194,17 @@ Function createSotPosterLabels(sotInfo, config, targetParent)
   if isNonEmptyString(sotInfo.sotLabelText) = true
     sotBadge = createObject("roSGNode", "Badge")
     sotBadge.id = "sotBadge"
-    sotBadge.translation = [6, 6]
+    sotBadge.translation = [12, 12]
     sotBadge.textColor = config.primaryTextColor
     sotBadge.borderUri = "pkg:/images/rounded-badge-border-dark-$$RES$$.9.png"
     sotBadge.backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
     sotBadge.backgroundColor = config.backgroundColor
     sotBadge.iconUri = sotInfo.sotIcon
     sotBadge.maxWidth = config.maxWidth
+    if config.badgeFont <> invalid
+      sotBadge.badgeTextFont = config.badgeFont
+    end if
+
     sotBadge.text = sotInfo.sotLabelText.Replace("days left", "Days Left")
     sotBadge.visible = true
     targetParent.appendChild(sotBadge)

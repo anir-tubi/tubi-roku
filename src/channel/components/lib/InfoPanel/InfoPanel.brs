@@ -394,9 +394,11 @@ End Function
 
 ' Inserts sotMarker at the correct position: below episode title if exists, otherwise below title
 ' Assumes marker has already been removed from parent if needed
+' Updates itemSpacings to include 9px spacing for the marker and reduces spacing before it by 8px
 Function insertSotMarkerAtCorrectPosition() as Void
   if m.sotMarker = invalid then return
 
+  insertIndex = -1
   if m.title <> invalid
     titleIndex = m.nodeHelpers.getChildIndex(m.offset, m.title)
     if titleIndex <> -1
@@ -405,23 +407,79 @@ Function insertSotMarkerAtCorrectPosition() as Void
         episodeIndex = m.nodeHelpers.getChildIndex(m.offset, m.episode)
         if episodeIndex = titleIndex + 1
           ' Episode is right after title, insert marker after episode
-          m.offset.insertChild(m.sotMarker, episodeIndex + 1)
+          insertIndex = episodeIndex + 1
         else
           ' Episode exists but not right after title, insert after title
-          m.offset.insertChild(m.sotMarker, titleIndex + 1)
+          insertIndex = titleIndex + 1
         end if
       else
         ' No episode title, insert marker right after title
-        m.offset.insertChild(m.sotMarker, titleIndex + 1)
+        insertIndex = titleIndex + 1
       end if
     else
       ' Title not found, insert at beginning
-      m.offset.insertChild(m.sotMarker, 0)
+      insertIndex = 0
     end if
   else
     ' No title, insert at beginning
-    m.offset.insertChild(m.sotMarker, 0)
+    insertIndex = 0
   end if
+
+  if insertIndex >= 0
+    m.offset.insertChild(m.sotMarker, insertIndex)
+    updateItemSpacingsForMarker(insertIndex)
+  end if
+End Function
+
+
+' Updates itemSpacings array to include 9px spacing for the dynamically inserted sotMarker
+' Also reduces spacing before marker by 8px to move it up
+Function updateItemSpacingsForMarker(markerIndex) as Void
+  if m.offset = invalid OR markerIndex < 0 then return
+
+  existingSpacings = m.offset.itemSpacings
+  childCount = m.offset.getChildCount()
+  requiredLength = childCount - 1
+
+  if requiredLength <= 0 then return
+
+  ' Create new array accounting for the inserted marker
+  ' When marker is inserted at markerIndex, existing spacings from markerIndex onward shift right by 1
+  newSpacings = []
+  for i = 0 to requiredLength - 1
+    if i < markerIndex
+      ' Before marker: copy existing spacing
+      if i < existingSpacings.count()
+        newSpacings.push(existingSpacings[i])
+      else
+        newSpacings.push(13)
+      end if
+    else if i = markerIndex
+      ' At marker position: insert 9px spacing after marker
+      newSpacings.push(9)
+    else
+      ' After marker: copy existing spacing from previous position (shifted by 1)
+      ' existingSpacings[i-1] because we inserted one element
+      existingIndex = i - 1
+      if existingIndex < existingSpacings.count()
+        newSpacings.push(existingSpacings[existingIndex])
+      else
+        newSpacings.push(13)
+      end if
+    end if
+  end for
+
+  ' Reduce spacing before marker by 8px (at markerIndex - 1)
+  if markerIndex > 0 AND markerIndex - 1 < newSpacings.count()
+    currentSpacing = newSpacings[markerIndex - 1]
+    if currentSpacing >= 8
+      newSpacings[markerIndex - 1] = currentSpacing - 8
+    else
+      newSpacings[markerIndex - 1] = 0
+    end if
+  end if
+
+  m.offset.itemSpacings = newSpacings
 End Function
 
 
@@ -466,31 +524,44 @@ Function onSotTopLabelSignalsChange(msg)
   'Remove all the previous badges before adding the new one
   m.nodeHelpers.removeAllChildren(m.sotTopLabelGroup)
 
-  ' handle availability badge
+  config = {
+    focusedTextColor: m.theme.primaryTextColor
+    backgroundColor: m.theme.shadeColor
+    bodyMediumStrongFont: m.bodyMediumStrongFont
+    badgeFont: m.bodySmall
+    maxWidth: m.top.width - 12
+    textColor: m.theme.primaryTextColor
+  }
+
+  ' If we have sotTopLabelSignals, use them
   if isNonEmptyArray(sotTopLabelSignals) = true
-
-    if sotTopLabelSignals.count() < 2
-      if isNonEmptyArray(sotMetaData) = true
-        for each sotMetaDataItem in sotMetaData
-          sotTopLabelSignals.push(sotMetaDataItem)
-          if sotTopLabelSignals.count() = 2
-            exit for
-          end if
-        end for
-      end if
+    ' Fill up to 2 labels from sotMetaData if needed
+    if sotTopLabelSignals.count() < 2 AND isNonEmptyArray(sotMetaData) = true
+      for each sotMetaDataItem in sotMetaData
+        sotTopLabelSignals.push(sotMetaDataItem)
+        if sotTopLabelSignals.count() = 2
+          exit for
+        end if
+      end for
     end if
-
-    config = {
-      focusedTextColor: m.theme.primaryTextColor
-      backgroundColor: m.theme.shadeColor
-      bodyMediumStrongFont: m.bodyMediumStrongFont
-      badgeFont: m.bodySmall
-      maxWidth: m.top.width - 12
-      textColor: m.theme.primaryTextColor
-    }
 
     sotTopLabels = createTopLabels(sotTopLabelSignals, config)
     showTopLabels(m.sotTopLabelGroup, sotTopLabels)
+    ' If no sotTopLabelSignals but we have sotMetaData, use metadata labels instead (max 2)
+  else if isNonEmptyArray(sotMetaData) = true
+    ' Limit to maximum of 2 labels
+    limitedSotMetaData = []
+    count = 0
+    for each sotMetaDataItem in sotMetaData
+      limitedSotMetaData.push(sotMetaDataItem)
+      count++
+      if count >= 2
+        exit for
+      end if
+    end for
+
+    sotMetadataLabels = createMetadataLabels(limitedSotMetaData, config)
+    showMetaDataLabels(m.sotTopLabelGroup, sotMetadataLabels)
   end if
 
 End Function
@@ -882,19 +953,6 @@ Function onLineTwoDataChange(msg)
         secondLineGroup.removeChild(m.rottenTomatoBadge)
       end if
     end if
-
-    if isNonEmptyArray(data.sotMetaData) = true
-      config = {
-        focusedTextColor: m.theme.primaryTextColor
-        maxWidth: m.top.width - 12
-        backgroundColor: m.theme.shadeColor
-        bodyMediumStrongFont: m.bodyMediumStrongFont
-        textColor: m.theme.primaryTextColor
-      }
-      sotMetadataLabels = createMetadataLabels(data.sotMetaData, config)
-      showMetaDataLabels(secondLineGroup, sotMetadataLabels)
-    end if
-
   end if
 
   shouldCalculateHeight()

@@ -68,7 +68,7 @@
     <field id="calculateHeight" type="boolean" alwaysNotify="true" />
     <field id="sotMarkers" type="assocarray" />
     <field id="sotMetaData" type="array" />
-    <field id="sotTopLabelSignals" type="array" />
+    <field id="sotTopLabelSignals" type="array" alwaysNotify="true"/>
 
     <!-- handles changes to FirstLineGroup, has a structure like
       {

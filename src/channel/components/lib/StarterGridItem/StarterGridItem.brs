@@ -305,6 +305,7 @@ Function onItemContentChange(msg)
         primaryTextColor: m.primaryTextColor
         maxWidth: m.poster.width - 12
         backgroundColor: m.shadeColor
+        badgeFont: m.bodySmall
       }
       m.sotBadge = createSotPosterLabels(sotPosterLabels, config, m.top)
     end if
@@ -490,6 +491,7 @@ Function createTitleLabel()
   if m.subheaderSmallFont = invalid
     typographyConstants = getTypographyConstants()
     m.subheaderSmallFont = typographyConstants.ids.subheaderSmall
+    m.bodySmall = typographyConstants.ids.bodySmall
   end if
 
   titleLabel = createObject("roSGNode", "Label")

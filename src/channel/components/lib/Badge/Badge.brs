@@ -3,6 +3,7 @@ Function init()
   m.badgeIcon = m.top.findNode("BadgeIcon")
   m.badgeText = m.top.findNode("BadgeText")
   m.badgeBackground = m.top.findNode("BadgeBackground")
+  m.badgeBorder = m.top.findNode("badgeBorder")
   m.top.observeFieldScoped("iconUri", "onIconChanged")
   m.top.observeFieldScoped("text", "onTextChanged")
   m.top.observeFieldScoped("badgeTextFont", "onSetTypography")
@@ -73,6 +74,16 @@ Function adjustBadgeSize()
     if targetWidth >= m.badgeBackground.width
       m.badgeBackground.width = targetWidth
     end if
+
+    ' Set border width and height to be larger than background for proper edge display
+    borderWidth = m.badgeBackground.width + 2
+    borderHeight = m.badgeBackground.height + 2
+    m.badgeBorder.width = borderWidth
+    m.badgeBorder.height = borderHeight
+
+    ' Center the border over the background
+    ' Border is 4px larger, so offset by 2px to center it (2px on each side)
+    m.badgeBorder.translation = [-1, -1]
 
     xAxis = (m.badgeBackground.width - badgeInfoLayoutWidth) / 2
   end if
