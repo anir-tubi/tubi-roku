@@ -1018,7 +1018,7 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
         adTrackingObject.rendertime = ctx.rendertime
       end if
       if ctx.time <> invalid
-        adTrackingObject.time = ctx.time
+        adTrackingObject.time = Round(ctx.time)
       end if
 
       ' Overriding the ads context to reset the sequence since ROKU does not have a way to figure out render sequence properly for VAST ad format.

@@ -1077,7 +1077,7 @@ Function playerLogLib_fireAdDiscontinueEvent(adCtx = {})
 
     adPosition = 0
     if adCtx.time <> invalid
-      adPosition = adCtx.time
+      adPosition = Int(adCtx.time) 'extra safety to convert to integer
     end if
 
     adDiscontinueInfo["ad_position"] = adPosition
