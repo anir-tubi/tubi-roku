@@ -290,7 +290,7 @@
         <InfoPanel
           id="DetailInfoPanel"
           mode="item"
-          translation="[0,130]"
+          translation="[0,102]"
           maxHeight="462"
           maxTitleLines="2"
           visible="false" />
