@@ -185,7 +185,7 @@ Function onVodDetailRelatedContentSelectedChange(msg)
     ' The content node gets modified down the line so avoiding the changes to the original content node.
     content = selectedContent.clone(true)
     stopVideoPreview()
-    showVodDetailScreen(content, { "srcForAnalytic": "related_content", "srcForAds": "related_content" })
+    showVodDetailScreen(content, { "srcForAnalytic": "ymal", "srcForAds": "ymal" })
   end if
 End Function
 

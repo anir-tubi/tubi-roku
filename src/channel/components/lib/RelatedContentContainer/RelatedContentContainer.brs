@@ -111,13 +111,22 @@ Function setupPortraitWithMetadata() as Void
 End Function
 
 
+' Sets the selected content based on the provided item index
+' @param itemIndex - The index of the item to select
+Function setSelectedContentByIndex(itemIndex as Integer) as Void
+  if m.grid.content <> invalid AND itemIndex >= 0
+    selectedItem = m.grid.content.getChild(itemIndex)
+    if selectedItem <> invalid
+      m.top.selectedContent = selectedItem
+    end if
+  end if
+End Function
+
+
 ' Handles item selection in the grid
 ' Updates tracking information and sets selected content
 Function onItemSelected()
-  if m.grid.content <> invalid
-    itemSelected = m.grid.itemSelected
-    m.top.selectedContent = m.grid.content.getChild(itemSelected)
-  end if
+  setSelectedContentByIndex(m.grid.itemSelected)
 End Function
 
 
@@ -161,4 +170,18 @@ Function onItemFocused() as Void
       m.tileMetadata.itemContent = focusedContent
     end if
   end if
+End Function
+
+
+' Handles key events, specifically play button press
+' Sets selectedContent using the currently focused item
+' @param key - The key that was pressed
+' @param press - Whether the key was pressed (true) or released (false)
+' @return true if key was handled, false otherwise
+Function onKeyEvent(key as String, press as Boolean) as Boolean
+  if press = true AND key = "play"
+    setSelectedContentByIndex(m.grid.itemFocused)
+    return true
+  end if
+  return false
 End Function

@@ -100,7 +100,15 @@ Function setFocus(node, focus = true)
 End Function
 
 
-Function onKeyEvent(key as String, press as Boolean) as Boolean
+' Handles navigation key events and updates focus accordingly
+' Processes directional keys (up, down, left, right) based on childDirection
+' For horizontal layout: handles left/right keys
+' For vertical layout: handles up/down keys
+' Only processes key press events, ignores key release events
+' @param key - The key that was pressed (up, down, left, or right)
+' @param press - Whether the key was pressed (true) or released (false)
+' @return true if key was handled and focus was updated, false otherwise
+Function parentOnKeyEvent(key as String, press as Boolean) as Boolean
   if press = false then
     return false
   end if
@@ -127,4 +135,15 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
   end if
 
   return false
+End Function
+
+
+' Handles key events for the focus control group
+' Processes navigation keys (up, down, left, right) and updates focus accordingly
+' Only processes key press events, ignores key release events
+' @param key - The key that was pressed
+' @param press - Whether the key was pressed (true) or released (false)
+' @return true if key was handled, false otherwise
+Function onKeyEvent(key as String, press as Boolean) as Boolean
+  return parentOnKeyEvent(key, press)
 End Function

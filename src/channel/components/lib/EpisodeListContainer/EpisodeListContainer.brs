@@ -212,17 +212,22 @@ Function onSeasonButtonFocusedChange(msg)
 End Function
 
 
-' Handles episode item selection from grid
-' @param msg - Message containing selected item index
-Function onEpisodeSelectedChange(msg)
-  selectedIndex = msg.getData()
-
-  if m.episodeGrid.content <> invalid AND selectedIndex >= 0
-    selectedItem = m.episodeGrid.content.getChild(selectedIndex)
+' Sets the selected episode based on the provided item index
+' @param itemIndex - The index of the episode to select
+Function setSelectedEpisodeByIndex(itemIndex as Integer) as Void
+  if m.episodeGrid.content <> invalid AND itemIndex >= 0
+    selectedItem = m.episodeGrid.content.getChild(itemIndex)
     if selectedItem <> invalid
       m.top.selectedEpisode = selectedItem
     end if
   end if
+End Function
+
+
+' Handles episode item selection from grid
+' @param msg - Message containing selected item index
+Function onEpisodeSelectedChange(msg)
+  setSelectedEpisodeByIndex(msg.getData())
 End Function
 
 
@@ -256,4 +261,18 @@ Function onEpisodeFocusedChange(msg)
       }
     end if
   end if
+End Function
+
+
+' Handles key events, specifically play button press
+' Sets selectedEpisode using the currently focused item
+' @param key - The key that was pressed
+' @param press - Whether the key was pressed (true) or released (false)
+' @return true if key was handled, false otherwise
+Function onKeyEvent(key as String, press as Boolean) as Boolean
+  if press = true AND key = "play"
+    setSelectedEpisodeByIndex(m.episodeGrid.itemFocused)
+    return true
+  end if
+  return parentOnKeyEvent(key, press)
 End Function
