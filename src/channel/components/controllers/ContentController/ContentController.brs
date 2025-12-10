@@ -1760,11 +1760,15 @@ Function isCurrentScreenEPGScreen()
 End Function
 
 
-Function setVideoContentScreenBackground(screen)
+Function setVideoContentScreenBackground(screen, content = invalid)
   tubiLog("ContentController.setVideoContentScreenBackground")
   currentScreen = getCurrentScreen()
-  if screen <> invalid AND currentScreen <> invalid AND screen.id = currentScreen.id AND screen.contentFocused <> invalid
-    contentFocused = screen.contentFocused
+  if screen <> invalid AND currentScreen <> invalid AND screen.id = currentScreen.id AND (screen.contentFocused <> invalid OR content <> invalid)
+    if content <> invalid
+      contentFocused = content
+    else
+      contentFocused = screen.contentFocused
+    end if
     contentType = contentFocused.type
     gridItemType = contentFocused.gridItemType
     videoPreviewState = getVideoPreviewState()

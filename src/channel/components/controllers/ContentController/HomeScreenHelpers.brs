@@ -2213,7 +2213,7 @@ End Function
 
 Function updateVideoTileScreenBackground(content, screen)
   if isNode(content) = true AND (shouldDisplayFullScreenVideoBackground(content) OR arrayIncludes(m.constants.ui.adGridItemTypes, content.gridItemType))
-    setVideoContentScreenBackground(screen)
+    setVideoContentScreenBackground(screen, content)
   else if screen.id = m.constants.ui.screenIds.homeScreen
     displayDefaultBackground()
   end if
