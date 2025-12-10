@@ -104,21 +104,21 @@ End Function
 
 ' Creates a Badge node with SOT label configuration
 ' @param labelData - AssocArray containing sotLabelText and sotIcon
-' @param config - AssocArray with styling configuration (backgroundColor, textColor, maxWidth, badgeFont)
+' @param config - AssocArray with styling configuration ( textColor, maxWidth, badgeTextFont)
 ' @return Badge node or invalid
 Function createBadge(labelData, config)
   if isAA(labelData) = false OR isAA(config) = false then return invalid
 
   badge = createObject("roSGNode", "Badge")
+  badge.isSotBadge = true
   badge.text = labelData.sotLabelText
-  badge.backgroundColor = config.backgroundColor
   badge.height = 40
-  badge.borderUri = "pkg:/images/rounded-badge-border-dark-$$RES$$.9.png"
+  badge.borderUri = ""
   badge.backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
   badge.iconUri = labelData.sotIcon
   badge.textColor = config.textColor
-  if config.badgeFont <> invalid
-    badge.badgeTextFont = config.badgeFont
+  if config.badgeTextFont <> invalid
+    badge.badgeTextFont = config.badgeTextFont
   end if
   badge.maxWidth = config.maxWidth
 
@@ -170,7 +170,6 @@ Function createSotMarker(sotMarkers, config, marker = invalid)
       marker.id = "sotMarker"
     end if
     marker.showBackground = false
-    marker.backgroundColor = config.backgroundColor
     marker.maxWidth = config.maxWidth
     marker.text = sotMarkers.sotLabelText
     marker.iconUri = sotMarkers.sotIcon
@@ -196,16 +195,17 @@ Function createSotPosterLabels(sotInfo, config, targetParent)
     sotBadge.id = "sotBadge"
     sotBadge.translation = [12, 12]
     sotBadge.textColor = config.primaryTextColor
-    sotBadge.borderUri = "pkg:/images/rounded-badge-border-dark-$$RES$$.9.png"
+    sotBadge.borderUri = ""
+    sotBadge.isSotBadge = true
     sotBadge.backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
-    sotBadge.backgroundColor = config.backgroundColor
     sotBadge.iconUri = sotInfo.sotIcon
     sotBadge.maxWidth = config.maxWidth
-    if config.badgeFont <> invalid
-      sotBadge.badgeTextFont = config.badgeFont
+    if config.badgeTextFont <> invalid
+      sotBadge.badgeTextFont = config.badgeTextFont
     end if
 
-    sotBadge.text = sotInfo.sotLabelText.Replace("days left", "Days Left")
+    sotBadge.text = sotInfo.sotLabelText
+    sotBadge.height = 40
     sotBadge.visible = true
     targetParent.appendChild(sotBadge)
     return sotBadge

@@ -268,9 +268,8 @@ Function handleSOTBadgesAndLayout(itemContent) as Void
     config = {
       focusedTextColor: m.focusedTextColor
       primaryTextolor: m.primaryTextColor
-      backgroundColor: m.shadeColor
       maxWidth: m.top.width - 12
-      badgeFont: m.bodySmallFont
+      badgeTextFont: m.bodySmallFont
       bodyMediumStrongFont: m.bodyMediumStrongFont
       textColor: m.primaryTextColor
       cautionColor: m.cautionColor
@@ -310,6 +309,11 @@ Function handleSOTBadgesAndLayout(itemContent) as Void
       if itemContent.type = m.constants.ui.contentTypes.series AND m.firstLineGroup <> invalid AND m.firstLineGroup.getParent() <> invalid
         firstLineGroupIndex = m.nodeHelpers.getChildIndex(m.metadataGroup, m.firstLineGroup)
         if firstLineGroupIndex <> -1 then insertIndex = firstLineGroupIndex + 1
+      end if
+
+      if insertIndex = -1 AND m.description <> invalid
+        descriptionIndex = m.nodeHelpers.getChildIndex(m.metadataGroup, m.description)
+        if descriptionIndex <> -1 then insertIndex = descriptionIndex
       end if
 
       if insertIndex <> -1
@@ -458,9 +462,8 @@ Function metadataOnPosterContent(itemContent)
     end if
 
     m.sotBadge.textColor = m.primaryTextColor
-    m.sotBadge.borderUri = "pkg:/images/rounded-badge-border-dark-$$RES$$.9.png"
+    m.sotBadge.borderUri = ""
     m.sotBadge.backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
-    m.sotBadge.backgroundColor = m.shadeColor
     m.sotBadge.badgeTextFont = m.badgeTextFont
     m.sotBadge.text = sotBadge.sotLabelText
     m.sotBadge.iconUri = sotBadge.sotIcon

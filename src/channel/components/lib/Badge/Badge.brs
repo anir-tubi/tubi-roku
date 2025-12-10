@@ -3,7 +3,6 @@ Function init()
   m.badgeIcon = m.top.findNode("BadgeIcon")
   m.badgeText = m.top.findNode("BadgeText")
   m.badgeBackground = m.top.findNode("BadgeBackground")
-  m.badgeBorder = m.top.findNode("badgeBorder")
   m.top.observeFieldScoped("iconUri", "onIconChanged")
   m.top.observeFieldScoped("text", "onTextChanged")
   m.top.observeFieldScoped("badgeTextFont", "onSetTypography")
@@ -45,6 +44,12 @@ Function adjustBadgeSize()
   height = m.badgeText.boundingRect().height
   m.badgeIcon.height = height
 
+  backgroundHeight = 36
+  if m.top.isSotBadge = true
+    backgroundHeight = 39
+  end if
+
+
   ' Apply maxWidth constraint if set
   if maxWidthValue > 0 AND badgeInfoLayoutWidth > maxWidthValue
     ' Adjust badge text width to fit within maxWidth
@@ -75,20 +80,10 @@ Function adjustBadgeSize()
       m.badgeBackground.width = targetWidth
     end if
 
-    ' Set border width and height to be larger than background for proper edge display
-    borderWidth = m.badgeBackground.width + 2
-    borderHeight = m.badgeBackground.height + 2
-    m.badgeBorder.width = borderWidth
-    m.badgeBorder.height = borderHeight
-
-    ' Center the border over the background
-    ' Border is 4px larger, so offset by 2px to center it (2px on each side)
-    m.badgeBorder.translation = [-1, -1]
-
     xAxis = (m.badgeBackground.width - badgeInfoLayoutWidth) / 2
   end if
 
-  m.badgeInfoLayout.translation = [xAxis, (36 - height) / 2]
+  m.badgeInfoLayout.translation = [xAxis, (backgroundHeight - height) / 2]
 End Function
 
 

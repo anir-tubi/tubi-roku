@@ -10,8 +10,8 @@ Function init()
   topRef.observeFieldScoped("rowHasFocus", "updateTileTranslation")
   topRef.observeFieldScoped("rowListHasFocus", "updateTileTranslation")
 
-  typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.timeLeftLabel, typographyConstants.ids.bodySmall)
+  m.typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.timeLeftLabel, m.typographyConstants.ids.bodySmall)
 
   m.top.observeFieldScoped("itemContent", "onItemContentChange")
   if m.global <> invalid
@@ -93,7 +93,6 @@ Function onItemContentChange(msg)
       config = {
         primaryTextColor: m.primaryTextColor
         maxWidth: m.poster.width - 12
-        backgroundColor: m.shadeColor
       }
       m.sotBadge = createSotPosterLabels(sotPosterLabels, config, m.top)
     end if
@@ -122,19 +121,21 @@ Function setLinearBadge(badgeType = "live", badgeInfo = {})
     badge = createObject("roSGNode", "Badge")
     badge.badgeTextWidth = 0.0
     badge.textColor = m.primaryTextColor
-    badge.translation = [6, 6]
-    badge.backgroundColor = m.focused2Color
+    badge.badgeTextFont = m.typographyConstants.ids.bodySmall
+    badge.translation = [15, 15]
+    badge.borderUri = ""
+    badge.backgroundUri = "pkg:/images/rounded-rect-live-$$RES$$.9.png"
     badge.iconUri = "pkg:/images/live-icon-filled.webp"
     badge.text = getTranslation("screenSearch_liveText")
   else if badgeType = m.badgeTypes.onNow
     badge = createObject("roSGNode", "Badge")
     badge.badgeTextWidth = 0.0
+    badge.badgeTextFont = m.typographyConstants.ids.bodySmall
     badge.textColor = m.primaryTextColor
-    badge.translation = [6, 6]
-    badge.backgroundColor = m.blueBadgeColor
+    badge.translation = [15, 15]
+    badge.borderUri = ""
     badge.text = getTranslation("onNow")
-    badge.borderUri = "pkg:/images/rounded-badge-border-dark-$$RES$$.9.png"
-    badge.backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
+    badge.backgroundUri = "pkg:/images/rounded-rect-on-now-$$RES$$.9.png"
   end if
   if badge <> invalid
     m.linearBadge = badge

@@ -30,6 +30,7 @@ Function init()
   m.headerMediumFont = typographyConstants.ids.headerMedium
   m.bodyMediumStrongFont = typographyConstants.ids.bodyMediumStrong
   m.subheaderMediumFont = typographyConstants.ids.subheaderMedium
+  m.badgeSmallFont = typographyConstants.ids.bodySmall
 
   m.titleImage.observeFieldScoped("loadStatus", "onTitleImageLoadStatus")
   topRef.observeFieldScoped("showContentPoster", "onShowContentPosterChange")
@@ -256,25 +257,28 @@ Function setBadge(badgeType = "live", badgeInfo = {})
   if badgeType = m.badgeTypes.live
     badge = m.sotTopLabelGroup.createChild("Badge")
     badge.badgeTextWidth = 0.0
+    badge.maxWidth = m.top.width - 12
     badge.textColor = m.primaryTextColor
     badge.translation = [15, 15]
-    badge.backgroundColor = m.focused2Color
+    badge.badgeTextFont = m.badgeSmallFont
+    badge.borderUri = ""
+    badge.backgroundUri = "pkg:/images/rounded-rect-live-$$RES$$.9.png"
     badge.iconUri = "pkg:/images/live-icon-filled.webp"
     badge.text = getTranslation("screenSearch_liveText")
   else if badgeType = m.badgeTypes.onNow
     badge = m.sotTopLabelGroup.createChild("Badge")
     badge.badgeTextWidth = 0.0
+    badge.maxWidth = m.top.width - 12
     badge.textColor = m.primaryTextColor
     badge.translation = [15, 15]
-    badge.backgroundColor = m.blueBadgeColor
-    badge.borderUri = "pkg:/images/rounded-badge-border-dark-$$RES$$.9.png"
-    badge.backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
+    badge.badgeTextFont = m.badgeSmallFont
+    badge.borderUri = ""
+    badge.backgroundUri = "pkg:/images/rounded-rect-on-now-$$RES$$.9.png"
     badge.text = getTranslation("onNow")
   else if badgeType = m.badgeTypes.sot
     config = {
       focusedTextColor: m.primaryTextColor
       maxWidth: m.top.width - 12
-      backgroundColor: m.shadeColor
       bodyMediumStrongFont: m.bodyMediumStrongFont
       textColor: m.primaryTextColor
     }

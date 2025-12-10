@@ -110,14 +110,18 @@ End Function
 '@textColor - string, Indicating text color of the badge.
 '@backgroundColor - string, Indicating background color of the badge.
 '@badgeText - string, Indicating text on the badge. Should be passed when we want to use "today" badge type.
-Function setLinearAvailabilityBadge(badge, availability, textColor, backgroundColor, badgeText = "")
+Function setLinearAvailabilityBadge(badge, availability, textColor, backgroundColor = invalid, badgeText = "")
   if availability = "live"
     badge.text = UCase(getTranslation("screenSearch_liveText"))
     badge.iconUri = "pkg:/images/live-icon-filled.webp"
+    badge.backgroundUri = "pkg:/images/rounded-rect-live-$$RES$$.9.png"
   else
     badge.text = badgeText
     badge.iconUri = ""
+    badge.backgroundUri = "pkg:/images/rounded-rect-on-now-$$RES$$.9.png"
   end if
-  badge.backgroundColor = backgroundColor
+
+  badge.borderUri = ""
+
   badge.textColor = textColor
 End Function

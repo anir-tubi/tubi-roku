@@ -55,6 +55,10 @@ Function init()
     parent = parent.getParent()
   end for
 
+  typographyConstants = getTypographyConstants()
+  m.subheaderSmallFont = typographyConstants.ids.subheaderSmall
+  m.bodySmall = typographyConstants.ids.bodySmall
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "setThemeColors")
   end if
@@ -304,8 +308,7 @@ Function onItemContentChange(msg)
       config = {
         primaryTextColor: m.primaryTextColor
         maxWidth: m.poster.width - 12
-        backgroundColor: m.shadeColor
-        badgeFont: m.bodySmall
+        badgeTextFont: m.bodySmall
       }
       m.sotBadge = createSotPosterLabels(sotPosterLabels, config, m.top)
     end if
@@ -487,12 +490,6 @@ Function createTitleLabel()
     loadSync: true
   })
   titleLabelGroup.appendChild(gradient)
-
-  if m.subheaderSmallFont = invalid
-    typographyConstants = getTypographyConstants()
-    m.subheaderSmallFont = typographyConstants.ids.subheaderSmall
-    m.bodySmall = typographyConstants.ids.bodySmall
-  end if
 
   titleLabel = createObject("roSGNode", "Label")
   setTypographyOfLabel(titleLabel, m.subheaderSmallFont)

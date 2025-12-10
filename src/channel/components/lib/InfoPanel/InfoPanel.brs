@@ -379,7 +379,6 @@ Function onSotMarkersChange(msg)
   if shouldAddMarker = true
 
     config = {
-      backgroundColor: m.theme.shadeColor
       bodyMediumStrongFont: m.bodyMediumStrongFont
       maxWidth: m.top.width - 12
       primaryTextColor: m.theme.primaryTextColor
@@ -526,9 +525,8 @@ Function onSotTopLabelSignalsChange(msg)
 
   config = {
     focusedTextColor: m.theme.primaryTextColor
-    backgroundColor: m.theme.shadeColor
     bodyMediumStrongFont: m.bodyMediumStrongFont
-    badgeFont: m.bodySmall
+    badgeTextFont: m.bodySmall
     maxWidth: m.top.width - 12
     textColor: m.theme.primaryTextColor
   }
@@ -1560,7 +1558,9 @@ Function formatBadge(text, badgeComponent, iconUri = "")
   if theme <> invalid
     if uText = UCase(getTranslation("screenSearch_liveText"))
       ' LIVE badge
-      badgeComponent.backgroundColor = theme.focused2Color
+      badgeComponent.borderUri = ""
+      badgeComponent.badgeTextFont = m.typographyConstants.ids.bodySmall
+      badgeComponent.backgroundUri = "pkg:/images/rounded-rect-live-$$RES$$.9.png"
       badgeComponent.textColor = theme.primaryTextColor
       badgeComponent.iconUri = "pkg:/images/live-icon-filled.webp"
       badgeComponent.text = uText
@@ -1570,14 +1570,16 @@ Function formatBadge(text, badgeComponent, iconUri = "")
       badgeComponent.textColor = theme.textDarkColor
       badgeComponent.text = uText
     else if uText = UCase(getTranslation("onNow"))
-      badgeComponent.backgroundColor = theme.blueBadgeColor
+      badgeComponent.badgeTextFont = m.typographyConstants.ids.bodySmall
+      badgeComponent.borderUri = ""
+      badgeComponent.backgroundUri = "pkg:/images/rounded-rect-on-now-$$RES$$.9.png"
       badgeComponent.textColor = m.primaryTextColor
       badgeComponent.text = uText
     else if badgeComponent.id = m.rottenTomatoBadge.id
       badgeComponent.showBackground = false
       badgeComponent.iconUri = "pkg:/images/certified-fresh.png"
       badgeComponent.textColor = theme.primaryTextColor
-      badgeComponent.badgeTextFont = m.typographyConstants.ids.bodySmallStrong
+      badgeComponent.badgeTextFont = m.typographyConstants.ids.bodySmall
       badgeComponent.text = text
     else
       ' TODAY, TOMORROW, <<Date>> badge

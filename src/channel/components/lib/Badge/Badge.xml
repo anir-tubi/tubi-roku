@@ -14,9 +14,10 @@
     <field id="textColor" type="string" alias="BadgeText.color" />
     <field id="iconUri" type="string" />
     <field id="text" type="string" />
-    <field id="width" type="float" alias="BadgeBackground.width" />
-    <field id="height" type="float" alias="BadgeBackground.height" />
+    <field id="width" type="float" alias="BadgeBackground.width, badgeBorder.width" />
+    <field id="height" type="float" alias="BadgeBackground.height, badgeBorder.height" />
     <field id="badgeTextWidth" type="float" alias="BadgeText.width" />
+    <field id="isSotBadge" type="boolean"  value="false" />
     <field id="showBackground" alias="BadgeBackground.visible, badgeBorder.visible" value="true" />
     <!-- This field is used to set the font style/size of the badge text when showBackground is
     false. Values can be any typographyConstants ids. -->

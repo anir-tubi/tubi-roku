@@ -10,6 +10,8 @@ Function init()
     m.global.observeFieldScoped("refreshLinearChannels", "onRefreshLinearChannels")
   end if
 
+  m.typographyConstants = getTypographyConstants()
+
   m.BadgeTypes = {
     live: "live"
     onNow: "onNow"
@@ -131,16 +133,21 @@ Function setBadge(badgeType = "live", badgeText = "")
 
   if badgeType = m.badgeTypes.live
     badge = m.badgeGroup.createChild("Badge")
-    badge.backgroundColor = m.focused2Color
     badge.textColor = m.primaryTextColor
     badge.iconUri = "pkg:/images/live-icon-filled.webp"
+    badge.maxWidth = m.top.width - 12
+    badge.badgeTextFont = m.typographyConstants.ids.bodySmall
+    badge.borderUri = ""
+    badge.backgroundUri = "pkg:/images/rounded-rect-live-$$RES$$.9.png"
     badge.text = getTranslation("screenSearch_liveText")
   else if badgeType = m.badgeTypes.onNow
     badge = m.badgeGroup.createChild("Badge")
-    badge.backgroundColor = m.blueBadgeColor
     badge.textColor = m.primaryTextColor
+    badge.badgeTextFont = m.typographyConstants.ids.bodySmall
     badge.text = getTranslation("onNow")
-    badge.borderUri = "pkg:/images/badge-border-dark-$$RES$$.9.png"
+    badge.maxWidth = m.top.width - 12
+    badge.borderUri = ""
+    badge.backgroundUri = "pkg:/images/rounded-rect-on-now-$$RES$$.9.png"
   else if badgeType = m.badgeTypes.language
     if badgeText <> ""
       lang = Ucase(badgeText)
@@ -153,7 +160,7 @@ Function setBadge(badgeType = "live", badgeText = "")
     end if
   end if
 
-  m.badgeGroup.translation = [4, 4]
+  m.badgeGroup.translation = [12, 12]
 End Function
 
 
