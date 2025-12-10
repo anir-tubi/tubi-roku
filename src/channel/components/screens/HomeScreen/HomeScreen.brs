@@ -924,7 +924,17 @@ Function handleItemSelected(item, position)
 
     ' Content controller observes contentSelected to populate/push the detail screen
     if item <> invalid then
-      m.top.contentSelected = item
+      ' Determine which scrolling status to check based on the focused list
+      if m.CategoryGridList.lastFocusedList = "featuredRowList"
+        isScrolling = m.CategoryGridList.featuredListScrollingStatus
+      else
+        isScrolling = m.CategoryGridList.scrollingStatus
+      end if
+
+      if isScrolling = false
+        ' If the row is still scrolling, do not select the item.
+        m.top.contentSelected = item
+      end if
     end if
   end if
 End Function
