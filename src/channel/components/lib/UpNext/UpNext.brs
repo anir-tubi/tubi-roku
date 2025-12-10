@@ -30,7 +30,7 @@ Function init()
   m.backgroundGroup = m.top.findNode("BackgroundGroup")
   m.countdownGroup = m.top.findNode("CountdownGroup")
   m.countdownGroup.secondsTranslationId = "screenEndCard_upNextIn"
-  m.countdownGroup.maxSeconds = m.seriesPostplayCountdown
+  m.countdownGroup.maxSeconds = m.moviePostplayCountdown
 
   m.UpNextSeriesMenu = m.top.findNode("UpNextSeriesMenu")
   m.UpNextSeriesMenu.observeFieldScoped("itemSelected", "onSeriesItemSelected")
