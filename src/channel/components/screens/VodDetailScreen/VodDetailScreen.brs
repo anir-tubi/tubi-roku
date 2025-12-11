@@ -488,11 +488,19 @@ End Function
 ' @param buttonId - String, the button ID (e.g., "play", "moreLikeThis")
 ' @return Object - Analytics object with type and values
 Function createButtonAnalytics(buttonId as String) as Object
-  analyticsValue = m.buttonIdToAnalyticsSection[buttonId]
+  if m.buttonIdToAnalyticsSection = invalid then initAnalytics()
+
+  analyticsValue = ""
+
+  if m.buttonIdToAnalyticsSection <> invalid
+    analyticsValue = m.buttonIdToAnalyticsSection[buttonId]
+  end if
 
   return {
     type: "middle_nav_component"
-    values: { middle_nav_section: analyticsValue }
+    values: {
+      middle_nav_section: analyticsValue
+    }
   }
 End Function
 

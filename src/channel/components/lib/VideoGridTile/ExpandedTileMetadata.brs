@@ -887,14 +887,18 @@ Function onCurrentEpisodeChange(msg = invalid) as Void
 
       lengthString = convertSecondsToHoursString(currentEpisode.length)
 
-      label = createLabel(" " + Chr(&hb7) + " " + lengthString, {
+      if m.currentEpisodeLengthLabel <> invalid
+        m.subHeadlinePrefixGroup.removeChild(m.currentEpisodeLengthLabel)
+      end if
+
+      m.currentEpisodeLengthLabel = createLabel(" " + Chr(&hb7) + " " + lengthString, {
         height: 40
         color: m.secondaryTextColor
         typographyFont: m.bodySmallFont
         vertAlign: "center"
       })
       ' TODO: Revisit this logic we need a better solution for this.
-      m.subHeadlinePrefixGroup.insertChild(label, m.subHeadlinePrefixGroup.getChildCount() - 1)
+      m.subHeadlinePrefixGroup.insertChild(m.currentEpisodeLengthLabel, m.subHeadlinePrefixGroup.getChildCount() - 1)
     end if
 
     m.metadataGroup.itemSpacings = [9, 15]

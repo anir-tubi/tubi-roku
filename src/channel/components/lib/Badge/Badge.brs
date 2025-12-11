@@ -44,10 +44,7 @@ Function adjustBadgeSize()
   height = m.badgeText.boundingRect().height
   m.badgeIcon.height = height
 
-  backgroundHeight = 36
-  if m.top.isSotBadge = true
-    backgroundHeight = 39
-  end if
+  backgroundHeight = m.top.height
 
 
   ' Apply maxWidth constraint if set

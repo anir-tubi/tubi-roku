@@ -112,7 +112,6 @@ Function createBadge(labelData, config)
   badge = createObject("roSGNode", "Badge")
   badge.isSotBadge = true
   badge.text = labelData.sotLabelText
-  badge.height = 40
   badge.borderUri = ""
   badge.backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
   badge.iconUri = labelData.sotIcon
@@ -205,7 +204,6 @@ Function createSotPosterLabels(sotInfo, config, targetParent)
     end if
 
     sotBadge.text = sotInfo.sotLabelText
-    sotBadge.height = 40
     sotBadge.visible = true
     targetParent.appendChild(sotBadge)
     return sotBadge

@@ -279,7 +279,7 @@ Function setBadge(badgeType = "live", badgeInfo = {})
     config = {
       focusedTextColor: m.primaryTextColor
       maxWidth: m.top.width - 12
-      bodyMediumStrongFont: m.bodyMediumStrongFont
+      bodyMediumStrongFont: m.badgeSmallFont
       textColor: m.primaryTextColor
     }
     showSotBadges(badgeInfo, config, m.sotTopLabelGroup, m.bottomContentGroup)

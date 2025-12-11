@@ -265,7 +265,7 @@ Function onVodDetailCtaSelectedButtonIdChange(msg) as Void
       end if
       playVideoContent(content, screen.playbackSource, nowPos)
     else if id = "watchTrailer"
-      trailer = createTrailerContent(content)
+      trailer = createTrailerContent(screenContent)
       if trailer <> invalid
         playVideoContent(trailer, screen.playbackSource)
       else
