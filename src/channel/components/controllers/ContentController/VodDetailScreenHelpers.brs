@@ -463,7 +463,9 @@ Function onGetSeriesEpisodesSuccess(response)
     seasonNode = response.seasonNode
     content = response.content
     screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen, seasonNode.id)
-    if screen <> invalid
+    if screen <> invalid AND screen.content <> invalid AND content <> invalid
+      ' Since SOT info is present only at home screen, we are copying it to the detail screen content.
+      content.sotInfo = screen.content.sotInfo
       screen.content.update(content, true)
       screen.episodes = seasonNode
       screen.contentUpdated = true
