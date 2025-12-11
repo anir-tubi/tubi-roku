@@ -82,8 +82,8 @@ End Function
 Function isOnBackgroundImagesChange(msg)
   backGroundImages = msg.getData()
 
-  'When user is in roku_linear_reg_gate_v1 experiement, user will not play the content if needsLogIn = true, so we are just updating the backgroundImages.
-  if backGroundImages = true AND getStatsigExperimentResource("roku_linear_reg_gate", "roku_linear_reg_gate_v1", false).enabled = true
+  'When user is in roku_linear_reg_gate_v1_1 experiement, user will not play the content if needsLogIn = true, so we are just updating the backgroundImages.
+  if backGroundImages = true AND getStatsigExperimentResource("roku_linear_reg_gate", "roku_linear_reg_gate_v1_1", false).enabled = true
     rowItemFocused = m.epgTimeGrid.rowItemFocused
     content = m.epgTimeGrid.content.getChild(rowItemFocused[0])
     m.top.backgroundUriList = determineBackgroundImage(content)

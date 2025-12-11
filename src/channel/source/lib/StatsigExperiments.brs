@@ -64,7 +64,7 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
       }
 
       roku_linear_reg_gate: {
-        roku_linear_reg_gate_v1: {
+        roku_linear_reg_gate_v1_1: {
           default: { "enabled": false }
         }
       }

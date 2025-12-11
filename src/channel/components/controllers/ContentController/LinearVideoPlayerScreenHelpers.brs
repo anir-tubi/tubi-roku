@@ -25,7 +25,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
     youboraEnabledLinear = m.constants.settings.youboraEnabledLinear
 
     ' Once we have more channels with needsLogin, we need to remove the isLoggedInUser() = false check
-    if clonedContent.needsLogin = true AND isLoggedInUser() = false AND getStatsigExperimentResource("roku_linear_reg_gate", "roku_linear_reg_gate_v1", false).enabled = true 'Check for user signed In status because we do not refetch the content and so it will not pass through metadata translate process.
+    if clonedContent.needsLogin = true AND isLoggedInUser() = false AND getStatsigExperimentResource("roku_linear_reg_gate", "roku_linear_reg_gate_v1_1", false).enabled = true 'Check for user signed In status because we do not refetch the content and so it will not pass through metadata translate process.
       if bMinimized = false
         showLinearPlayerSignInModal(content)
       end if

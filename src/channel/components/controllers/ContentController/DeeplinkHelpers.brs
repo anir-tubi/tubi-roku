@@ -364,7 +364,7 @@ Function onSingleChannelFetchForDeeplinkSuccess(successResponse, storeInCache = 
       if linearContent.needsLogin = false OR (linearContent.needsLogin = true AND isLoggedInUser() = true)
         playbackSource = getPlaybackSourceForDeeplinkType()
         playLinearVideoContent(linearContent, false, m.constants.ui.screenIds.epgScreen, false, playbackSource)
-      else if linearContent.needsLogin = true AND isLoggedInUser() = false AND getStatsigExperimentResource("roku_linear_reg_gate", "roku_linear_reg_gate_v1").enabled = true
+      else if linearContent.needsLogin = true AND isLoggedInUser() = false AND getStatsigExperimentResource("roku_linear_reg_gate", "roku_linear_reg_gate_v1_1").enabled = true
         showLinearPlayerSignInModal(linearContent)
       end if
 

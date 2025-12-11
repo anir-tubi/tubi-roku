@@ -65,7 +65,7 @@
     <!-- present the ready node to play -->
     <field id="linearChannelToPlay" type="node" />
 
-    <!-- this field will update the background images when content has needsLogIn = true and user is in roku_linear_reg_gate_v1 experiment -->
+    <!-- this field will update the background images when content has needsLogIn = true and user is in roku_linear_reg_gate_v1_1 experiment -->
     <field id="isBackgroundImagesChanges" type="boolean" alwaysNotify="true"/>
 
 
