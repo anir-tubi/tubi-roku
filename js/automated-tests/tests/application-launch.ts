@@ -6,8 +6,9 @@ import { shared } from '../test-helpers';
 
 describe('Application Launch', function () {
   before(async () => {
-    await testUtils.startApplicationAtPage('home', {shouldCreateNewUser: true});
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.jumpToRowWithTitle('videoTitlesRowList', 'Featured');
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/535807
@@ -20,7 +21,7 @@ describe('Application Launch', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/edit/535837
   it('C535837 - Application Launch - When user opens the application after registering as a new user then the home screen is displayed @application_launch', async () => {
-    await testUtils.findRowIndexWithTitle('homeScreenRowList', 'Featured');
+    await testUtils.findRowIndexWithTitle('videoTitlesRowList', 'Featured');
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535748
@@ -33,8 +34,8 @@ describe('Application Launch', function () {
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/70718
   it('C70718 - Sign out after setting Parental Controls @application_launch', async () => {
     // Go to Settings page and select Older Kids
-    await testUtils.startApplicationAtPage('home', {shouldCreateNewUser: true});
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
     await testUtils.goToPage('settings');
     await ecp.sendKeypress(ecp.Key.Right);
     await testUtils.waitForElementToShowOnScreen('adultControlSelected');
@@ -49,7 +50,7 @@ describe('Application Launch', function () {
     await ecp.sendText('111111');
     await ecp.sendKeypress(ecp.Key.Down);
     await utils.sleep(500); // moving too fast here, sometimes when pressing down lands on Back, others Continue
-    await ecp.sendKeypress(ecp.Key.Down, { count: 3});
+    await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
     await utils.sleep(500);
     await ecp.sendKeypress(ecp.Key.Ok);
 
@@ -79,7 +80,7 @@ describe('Application Launch', function () {
     const signOutVerificationModalMessage = await testUtils.getNodeForElement('signOutVerificationModalMessage');
     expect(signOutVerificationModalMessage.text).to.equal('You are about to sign out of your Tubi account.');
     await ecp.sendKeypress(ecp.Key.Ok);
-    await testUtils.findRowIndexWithTitle('homeScreenRowList', 'Featured');
+    await testUtils.findRowIndexWithTitle('videoTitlesRowList', 'Featured');
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/116528
@@ -94,7 +95,7 @@ describe('Application Launch', function () {
     // Open and play a title, create history, then back to details page to check for "Resume" button
     await ecp.sendKeypress(ecp.Key.Right);
     await ecp.sendKeypress(ecp.Key.Play);
-    await createHistory();
+    await shared.createHistory(900000, true);
     await ecp.sendKeypress(ecp.Key.Back);
 
     await testUtils.waitForElementToFullyShowOnScreen('resumePlayingButton');
@@ -106,7 +107,7 @@ describe('Application Launch', function () {
     await testUtils.findRowIndexWithTitle('movieScreenRowList', 'Featured');
     await ecp.sendKeypress(ecp.Key.Right);
     await ecp.sendKeypress(ecp.Key.Ok);
-    
+
     // Test for resume button (Roku retains resume button for 24 hours)
     await testUtils.waitForElementToFullyShowOnScreen('resumePlayingButton', 'Resume Playing button not found', 8000);
   });
@@ -127,7 +128,7 @@ describe('Application Launch', function () {
     await ecp.sendKeypress(ecp.Key.Play);
 
     // Create CW row
-    await createHistory();
+    await shared.createHistory(900000, true);
     await ecp.sendKeypress(ecp.Key.Back);
     await testUtils.waitForElementToFullyShowOnScreen('resumePlayingButton');
 
@@ -135,7 +136,7 @@ describe('Application Launch', function () {
     await ecp.sendKeypress(ecp.Key.Back);
 
     // Jump To Continue Watching Row
-    await testUtils.jumpToRowWithTitle('movieScreenRowList', 'Continue Watching');
+    await shared.scrollDownToFindRow({ slug: 'continue_watching', rowListElementId: 'movieScreenRowList' });
     await testUtils.waitForElementToFullyShowOnScreen('infoPanelTitleMovies');
     const infoPanelTitleMovies = await testUtils.getNodeForElement('infoPanelTitleMovies');
     expect(infoPanelTitleMovies.text).to.not.equal('Sign Up to Save Your Progress');
@@ -147,25 +148,49 @@ describe('Application Launch', function () {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
 
     // Check for presence of Movies Grid
-    await testUtils.findRowIndexWithTitle('homeScreenRowList', 'Featured');
+    await testUtils.findRowIndexWithTitle('videoTitlesRowList', 'Featured');
 
-    // Jump To Continue Watching Row
-    await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Continue Watching');
-    await testUtils.waitForElementToFullyShowOnScreen('signUpToSaveProgressDescription');
+    // Jump To Continue Watching Row (validates row exists and is focused)
+    await shared.scrollDownToFindRow({ slug: 'continue_watching', rowListElementId: 'videoTitlesRowList' });
+    await utils.sleep(1000);
 
-    // Check CW row title
-    const continueWatchingRowContent = await testUtils.getCurrentlyFocusedGridItemContent('homeScreenRowList');
-    expect(continueWatchingRowContent.title).to.equal('Sign Up to Save Your Progress');
+    const rowIndex = await testUtils.findRowIndexWithSlug('videoTitlesRowList', 'continue_watching');
 
+    // Construct dynamic element objects with runtime row index
+    const titleElement = {
+      keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.${rowIndex}.items.0.#contentSection.#title`
+    };
+    const descriptionElement = {
+      keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.${rowIndex}.items.0.#contentSection.#description`
+    };
+    const buttonElement = {
+      keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.${rowIndex}.items.0.#contentSection.#signUpButton`
+    };
+    const buttonLabelElement = {
+      keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.${rowIndex}.items.0.#contentSection.#signUpButton.#label`
+    };
 
+    // Validate registration CTA title
+    const titleNode = await testUtils.getNodeWithDynamicPath(titleElement, 10000);
+    expect(titleNode.visible).to.equal(true, 'Guest user CW tile title should be visible');
+    expect(titleNode.text).to.equal('Sign Up to Save Your Progress', 'CW tile should display "Sign Up to Save Your Progress" title');
+
+    // Validate registration CTA description
+    const descriptionNode = await testUtils.getNodeWithDynamicPath(descriptionElement, 10000);
+    expect(descriptionNode.visible).to.equal(true, 'Guest user CW tile description should be visible');
+    expect(descriptionNode.text).to.equal('Pick up right where you left off next time you play a TV Series or a Movie. Available upon sign up.',
+      'CW tile should display correct description');
+
+    // Validate sign up button is present and visible
+    const buttonNode = await testUtils.getNodeWithDynamicPath(buttonElement, 10000);
+    expect(buttonNode.visible).to.equal(true, 'Sign up button should be visible');
+
+    // Validate button label text
+    const buttonLabelNode = await testUtils.getNodeWithDynamicPath(buttonLabelElement, 10000);
+    expect(buttonLabelNode.text).to.include('Sign Up to Save Progress', 'Button label should contain "Sign Up to Save Progress"');
   });
 
 
 });
 
 
-async function createHistory() {
-  await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
-  await testUtils.seekPlayerToAbsolutePosition('videoPlayerScreen', 900000);
-  await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing');
-}

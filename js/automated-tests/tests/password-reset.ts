@@ -8,7 +8,7 @@ describe('Sign In: On-Device Password Reset', function () {
   it.skip('C476627 - Registered User - Sign In with valid credentials, @password_reset', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Navigate to Left Nav
     await ecp.sendKeypress(ecp.Key.Left);
@@ -41,7 +41,7 @@ describe('Sign In: On-Device Password Reset', function () {
   it.skip('C476628 - Registered User - Sign In with invalid password, @password_reset1', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Navigate to Left Nav
     await ecp.sendKeypress(ecp.Key.Left);
@@ -74,7 +74,7 @@ describe('Sign In: On-Device Password Reset', function () {
   it.skip('C476629 - Registered User - Instant Sign-In Link - Prefilled email, @password_reset1', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Navigate to Left Nav
     await ecp.sendKeypress(ecp.Key.Left);
@@ -112,7 +112,7 @@ describe('Sign In: On-Device Password Reset', function () {
 it('C476634 - Register New User - Default Mode, @password_reset', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Navigate to Left Nav
     await ecp.sendKeypress(ecp.Key.Left);
@@ -166,7 +166,7 @@ it('C476634 - Register New User - Default Mode, @password_reset', async () => {
 it('C476635 - Register New User - Kids Mode, @password_reset', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Navigate to Left Nav
     await ecp.sendKeypress(ecp.Key.Left);
@@ -211,7 +211,7 @@ it('C476635 - Register New User - Kids Mode, @password_reset', async () => {
     // Press Ok to dismiss the dialog, verify user on the Kids mode Home screen
     await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForElementToFullyShowOnScreen('tubiKidsLogo');
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
   });
 });
 

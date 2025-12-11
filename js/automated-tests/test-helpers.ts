@@ -55,9 +55,10 @@
  */
 
 import { expect } from 'chai';
-import { ecp, odc, utils } from 'roku-test-automation';
-import { testUtils } from './test-utils';
+import { ecp, odc, utils, proxy } from 'roku-test-automation';
+import { testUtils, auth } from './test-utils';
 import { moveToGrid } from './analytics/utils/helpers';
+import type { ElementOrElementId } from '../../automated-tests-config/elements';
 
 
 class TestHelpers {
@@ -76,7 +77,7 @@ class TestHelpers {
    * @example
    * const [row, col] = testHelpers.positionToRowCol(12, 5); // Returns [2, 2] (3rd row, 3rd column)
    */
-  public positionToRowCol(position: number, columns: number = 5): [number, number] {
+  public positionToRowCol(position: number, columns = 5): [number, number] {
     const row = Math.floor(position / columns);
     const col = position % columns;
     return [row, col];
@@ -111,7 +112,7 @@ class TestHelpers {
    * @param columnsPerRow - Number of columns (default: 5)
    * @returns [row, column] array or empty array if not found
    */
-  public async findContentPositionInGridThatContainsVideoPreview(gridId: any, hasVideoPreview: boolean = true, columnsPerRow: number = 5) {
+  public async findContentPositionInGridThatContainsVideoPreview(gridId: any, hasVideoPreview = true, columnsPerRow = 5) {
     let position = -1;
     const content = await testUtils.getAllGridItemsContent(gridId);
 
@@ -171,6 +172,7 @@ class TestHelpers {
    * 5. Now "Resume Playing" and "Remove from History" buttons will be available
    * 
    * @param seekTimeMs - Optional: Time to seek to in milliseconds (default: 120000 = 2 minutes)
+   * @param useAbsolutePosition - Optional: If true, seeks to absolute position instead of relative (default: false)
    * 
    * @example
    * // Standard history creation pattern for detail screen tests
@@ -191,10 +193,15 @@ class TestHelpers {
    * 
    * @see Tests using this pattern: C535809, C535810, C535812, C535813, C535870
    */
-  public async createHistory(seekTimeMs: number = 120000) {
+  public async createHistory(seekTimeMs = 120000, useAbsolutePosition = false) {
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 15000);
-    await testUtils.seekPlayerToRelativePosition('videoPlayerScreen', seekTimeMs, 'current');
+    if (useAbsolutePosition) {
+      await testUtils.seekPlayerToAbsolutePosition('videoPlayerScreen', seekTimeMs);
+    } else {
+      await testUtils.seekPlayerToRelativePosition('videoPlayerScreen', seekTimeMs, 'current');
+    }
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 15000);
+    await utils.sleep(500);
   }
 
   /**
@@ -235,7 +242,7 @@ class TestHelpers {
    * await testHelpers.verifyPlayFromBeginning();
    * // Test will fail if position > 1 second
    */
-  public async verifyPlayFromBeginning(maxPositionMs: number = 1000) {
+  public async verifyPlayFromBeginning(maxPositionMs = 1000) {
     await testUtils.selectAndVerifyDetailPageMenuItem('play');
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 15000);
 
@@ -263,7 +270,7 @@ class TestHelpers {
    * await testHelpers.verifyResumeWithinRange();
    * // Test passes if resume position is 115-125 seconds (120±5)
    */
-  public async verifyResumeWithinRange(expectedPositionMs: number = 120000, toleranceMs: number = 5000) {
+  public async verifyResumeWithinRange(expectedPositionMs = 120000, toleranceMs = 5000) {
     await utils.sleep(2000);
     await ecp.sendKeypress(ecp.Key.Play);
     await utils.sleep(2000);
@@ -294,7 +301,7 @@ class TestHelpers {
    * @param expectedDelta - Expected change in position (30000 for 30s forward, -30000 for rewind)
    * @param tolerance - Allowed variance in ms (default: 5000)
    */
-  public async verifySeekWithinRange(startPosition: number, expectedDelta: number = 30000, tolerance: number = 5000) {
+  public async verifySeekWithinRange(startPosition: number, expectedDelta = 30000, tolerance = 5000) {
     await ecp.sendKeypress(ecp.Key.Ok);
     await utils.sleep(2000);
 
@@ -394,7 +401,7 @@ class TestHelpers {
    * await testHelpers.openLeftNav();
    * await testHelpers.selectCategoriesFromSideNav(20000);
    */
-  public async selectCategoriesFromSideNav(timeout: number = 15000): Promise<void> {
+  public async selectCategoriesFromSideNav(timeout = 15000): Promise<void> {
     await testUtils.jumpToRowWithTitle('sideNavMenu', 'Categories');
     await utils.sleep(1000);
     await testUtils.waitForElementToFullyShowOnScreen('categoriesLeftNavButtonSelected');
@@ -421,7 +428,7 @@ class TestHelpers {
    * await testHelpers.selectCategoriesFromSideNav();
    * // Now on Categories page ready for testing
    */
-  public async navigateToCategories(timeout: number = 15000): Promise<void> {
+  public async navigateToCategories(timeout = 15000): Promise<void> {
     await ecp.sendKeypress(ecp.Key.Left);
     await testUtils.waitForElementToFullyShowOnScreen('sideNavMenu');
     await this.selectCategoriesFromSideNav(timeout);
@@ -442,10 +449,10 @@ class TestHelpers {
    * const user = await testUtils.createRegisteredUser();
    * await testHelpers.startAtHomeScreen(true, user); // Specific user
    */
-  public async startAtHomeScreen(shouldCreateNewUser: boolean = true, user?: any) {
+  public async startAtHomeScreen(shouldCreateNewUser = true, user?: any) {
     const options = user ? { user } : { shouldCreateNewUser };
     await testUtils.startApplicationAtPage('home', options);
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
   }
 
   /**
@@ -473,7 +480,7 @@ class TestHelpers {
    * @param element - Element to wait for
    * @param timeout - Optional timeout in ms (default: 15000)
    */
-  public async openPageAndWaitForElement(page: any, element: any, timeout: number = 15000) {
+  public async openPageAndWaitForElement(page: any, element: any, timeout = 15000) {
     await testUtils.goToPage(page);
     await testUtils.waitForElementToFullyShowOnScreen(element, `${element} not shown on ${page}`, timeout);
   }
@@ -503,9 +510,9 @@ class TestHelpers {
    * 
    * @param shouldCreateNewUser - Whether to create new user (default: true)
    */
-  public async openSeriesScreenAndWaitUntilListIsFocused(shouldCreateNewUser: boolean = true) {
+  public async openSeriesScreenAndWaitUntilListIsFocused(shouldCreateNewUser = true) {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
     await this.openSeries();
     await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
   }
@@ -515,9 +522,9 @@ class TestHelpers {
    * 
    * @param shouldCreateNewUser - Whether to create new user (default: true)
    */
-  public async openMoviesScreenAndWaitUntilListIsFocused(shouldCreateNewUser: boolean = true) {
+  public async openMoviesScreenAndWaitUntilListIsFocused(shouldCreateNewUser = true) {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
     await this.openMovies();
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
   }
@@ -531,16 +538,17 @@ class TestHelpers {
    *   - Need to find a movie (not a series) on home screen
    * 
    * PREREQUISITES:
-   *   - Must already be on home screen with homeScreenRowList focused
+   *   - Must already be on home screen with rowListElementId focused
    * 
+   * @param rowListElementId - Element ID of the RowList to search in (default: 'videoTitlesRowList')
    * @example
    * // Navigate to movie on home screen
-   * await testHelpers.navigateToMovieInHome();
+   * await testHelpers.navigateToMovieInContainer('tvScreenRowList');
    * // Now you're focused on a movie
    * await ecp.sendKeypress(ecp.Key.Ok); // Open detail screen
    */
-  public async navigateToMovieInContainer() {
-    const content = await testUtils.getCurrentlyFocusedRowListRowItemsContent('homeScreenRowList');
+  public async navigateToMovieInContainer(rowListElementId: ElementOrElementId = 'videoTitlesRowList') {
+    const content = await testUtils.getCurrentlyFocusedRowListRowItemsContent(rowListElementId);
     let colIndex = -1;
     for (const [index, item] of content.entries()) {
       if (item.type === 'v') {
@@ -549,7 +557,7 @@ class TestHelpers {
       }
     }
     if (colIndex === -1) {
-      throw new Error('No movie found in current row of homeScreenRowList');
+      throw new Error(`No movie found in current row of ${rowListElementId}`);
     }
     await ecp.sendKeypress(ecp.Key.Right, { count: colIndex });
   }
@@ -563,16 +571,17 @@ class TestHelpers {
    *   - Need to find a series (not a movie) on home screen
    * 
    * PREREQUISITES:
-   *   - Must already be on home screen with homeScreenRowList focused
+   *   - Must already be on home screen with rowListElementId focused
    * 
+   * @param rowListElementId - Element ID of the RowList to search in (default: 'videoTitlesRowList')
    * @example
    * // Navigate to series on home screen
-   * await testHelpers.navigateToSeriesInHome();
+   * await testHelpers.navigateToSeriesInContainer('tvScreenRowList');
    * // Now you're focused on a series
    * await ecp.sendKeypress(ecp.Key.Ok); // Open detail screen
    */
-  public async navigateToSeriesInContainer() {
-    const content = await testUtils.getCurrentlyFocusedRowListRowItemsContent('homeScreenRowList');
+  public async navigateToSeriesInContainer(rowListElementId: ElementOrElementId = 'videoTitlesRowList') {
+    const content = await testUtils.getCurrentlyFocusedRowListRowItemsContent(rowListElementId);
     let colIndex = -1;
     for (const [index, item] of content.entries()) {
       if (item.type === 's') {
@@ -581,7 +590,7 @@ class TestHelpers {
       }
     }
     if (colIndex === -1) {
-      throw new Error('No series found in current row of homeScreenRowList');
+      throw new Error(`No series found in current row of ${rowListElementId}`);
     }
     await ecp.sendKeypress(ecp.Key.Right, { count: colIndex });
   }
@@ -666,14 +675,14 @@ class TestHelpers {
    * 
    * PATTERN: Used 12+ times across multiple files
    * 
-   * @param listElement - List element ID (default: 'homeScreenRowList')
+   * @param listElement - List element ID (default: 'videoTitlesRowList')
    * 
    * @example
    * await testHelpers.jumpToContinueWatchingRow();
    * await testHelpers.jumpToContinueWatchingRow('customListElement');
    */
-  public async jumpToContinueWatchingRow(listElement: any = 'homeScreenRowList') {
-    await testUtils.jumpToRowWithTitle(listElement, 'Continue Watching');
+  public async jumpToContinueWatchingRow(listElement: any = 'videoTitlesRowList') {
+    await this.scrollDownToFindRow({ slug: 'continue_watching', rowListElementId: listElement });
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRowHome');
   }
 
@@ -725,7 +734,7 @@ class TestHelpers {
    * await testHelpers.setParentalControls('littleKids');
    * await testHelpers.setParentalControls('teens', '123456', false);
    */
-  public async setParentalControls(level: 'littleKids' | 'olderKids' | 'teens' | 'adults', password: string = '111111', shouldDismiss: boolean = true) {
+  public async setParentalControls(level: 'littleKids' | 'olderKids' | 'teens' | 'adults', password = '111111', shouldDismiss = true) {
     await this.selectParentalControlLevel(level);
     await this.enterPassword(password);
 
@@ -757,7 +766,7 @@ class TestHelpers {
    * @param password - Password to enter (default: '111111')
    * @param handleKeyboard - Whether to handle keyboard navigation (default: true)
    */
-  public async enterPassword(password: string = '111111', handleKeyboard: boolean = true) {
+  public async enterPassword(password = '111111', handleKeyboard = true) {
     await ecp.sendKeypress(ecp.Key.Ok);
     await ecp.sendText(password);
 
@@ -802,7 +811,6 @@ class TestHelpers {
    * @param user - User API instance from shared.ts
    * 
    * @example
-   * const user = await shared.createUser();
    * await testHelpers.createUserHistory(user);
    * // Now user has mixed viewing history
    */
@@ -852,7 +860,7 @@ class TestHelpers {
    * @param contentId - Content ID (default: 342067 - reliable evergreen movie)
    * @param watchTimeSeconds - Watch time in seconds (default: 500)
    */
-  public async createHistoryForEvergreenMovie(user: any, contentId: number = 342067, watchTimeSeconds: number = 500) {
+  public async createHistoryForEvergreenMovie(user: any, contentId = 342067, watchTimeSeconds = 500) {
     const content = await user.getContentById(contentId);
     await user.addContentToViewHistory(content, watchTimeSeconds);
   }
@@ -864,7 +872,7 @@ class TestHelpers {
    * @param contentId - Series ID (default: 300005163 - reliable evergreen series)
    * @param watchTimeSeconds - Watch time in seconds (default: 500)
    */
-  public async createHistoryForEvergreenSeries(user: any, contentId: number = 300005163, watchTimeSeconds: number = 500) {
+  public async createHistoryForEvergreenSeries(user: any, contentId = 300005163, watchTimeSeconds = 500) {
     const content = await user.getContentById(contentId);
     await user.addContentToViewHistory(content, watchTimeSeconds);
   }
@@ -908,26 +916,19 @@ class TestHelpers {
   }
 
   /**
-   * HELPER: Turns ON/OFF autoplay (uses generic toggleSetting)
+   * HELPER: Navigates to settings and enables/disables autoplay (uses generic toggleSetting)
    */
-  public async setAutoplay(enabled: boolean) {
+  public async enableAutoplayInSettings(enabled: boolean) {
     await this.toggleSetting('autoplayNextVideoMenu', enabled ? 0 : 1, 'AutoplayPreviewMenu');
   }
 
   /**
-   * HELPER: Turns ON/OFF video preview (uses generic toggleSetting)
+   * HELPER: Navigates to settings and enables/disables video preview (uses generic toggleSetting)
    */
-  public async setPreview(enabled: boolean) {
+  public async enablePreviewInSettings(enabled: boolean) {
     await this.toggleSetting('autoplayPreviewMenu', enabled ? 0 : 1);
   }
 
-  /**
-   * BACKWARD COMPATIBILITY: Keep old method names
-   */
-  public async turnOnAutoplay() { await this.setAutoplay(true); }
-  public async turnOffAutoplay() { await this.setAutoplay(false); }
-  public async turnOnPreview() { await this.setPreview(true); }
-  public async turnOffPreview() { await this.setPreview(false); }
 
   /* ═══════════════════════════════════════════════════════════════════
    * KIDS MODE HELPERS
@@ -977,7 +978,7 @@ class TestHelpers {
    * @param waitForElement - Optional element to wait for after navigation
    * @param waitTime - Wait time between presses in ms (default: 200)
    */
-  public async navigate(direction: 'Up' | 'Down' | 'Left' | 'Right', count: number = 1, waitForElement?: any, waitTime: number = 200) {
+  public async navigate(direction: 'Up' | 'Down' | 'Left' | 'Right', count = 1, waitForElement?: any, waitTime = 200) {
     await ecp.sendKeypress(ecp.Key[direction], { count, wait: waitTime });
 
     if (waitForElement) {
@@ -993,7 +994,7 @@ class TestHelpers {
    * @param waitForElement - Optional element to wait for
    * @param waitForScreen - Optional screen to wait for
    */
-  public async pressKeyAndWait(key: string, count: number = 1, waitForElement?: any, waitForScreen?: any) {
+  public async pressKeyAndWait(key: string, count = 1, waitForElement?: any, waitForScreen?: any) {
     await ecp.sendKeypress(ecp.Key[key], { count });
 
     if (waitForElement) {
@@ -1013,7 +1014,7 @@ class TestHelpers {
    * @param shouldSelect - Whether to press OK after jumping (default: false)
    * @param confirmElement - Optional element to wait for after selection
    */
-  public async jumpToRowAndSelect(listElement: any, rowTitle: string, shouldSelect: boolean = false, confirmElement?: any) {
+  public async jumpToRowAndSelect(listElement: any, rowTitle: string, shouldSelect = false, confirmElement?: any) {
     await testUtils.jumpToRowWithTitle(listElement, rowTitle);
     await utils.sleep(1000);
 
@@ -1032,7 +1033,7 @@ class TestHelpers {
    * @param elementId - Element to check
    * @param timeout - Timeout in ms (default: 15000)
    */
-  public async waitForElementVisibleAndFocused(elementId: any, timeout: number = 15000) {
+  public async waitForElementVisibleAndFocused(elementId: any, timeout = 15000) {
     await testUtils.waitForElementToFullyShowOnScreen(elementId, `${elementId} not visible`, timeout);
     await testUtils.waitForElementToHaveFocus(elementId, `${elementId} not focused`, timeout);
   }
@@ -1046,7 +1047,7 @@ class TestHelpers {
    * @param startRow - Starting row (default: 0)
    * @param startCol - Starting column (default: 0)
    */
-  public async navigateToGridPosition(gridElement: string, targetRow: number, targetCol: number, startRow: number = 0, startCol: number = 0) {
+  public async navigateToGridPosition(gridElement: string, targetRow: number, targetCol: number, startRow = 0, startCol = 0) {
     await moveToGrid({
       grid: { row: startRow, col: startCol },
       destRow: targetRow,
@@ -1066,7 +1067,7 @@ class TestHelpers {
    * @param domain - Email domain (default: 'tubi.tv')
    * @returns Unique email address
    */
-  public generateTestEmail(prefix: string = 'build_roku', domain: string = 'tubi.tv'): string {
+  public generateTestEmail(prefix = 'build_roku', domain = 'tubi.tv'): string {
     return `${prefix}_${Math.floor(Date.now() / 1000)}@${domain}`;
   }
 
@@ -1111,16 +1112,86 @@ class TestHelpers {
    */
 
   /**
+   * HELPER: Ensures focus is on playable content before pressing Play/OK
+   *
+   * USE WHEN:
+   *   - About to press Play or OK to start playback from home screen
+   *   - After video tiles redesign, focus can land on non-playable content
+   *   - Need to ensure focused item is movie ('v'), series ('s'), or linear ('l')
+   *
+   * WHAT IT DOES:
+   *   1. Checks currently focused content type
+   *   2. If not playable (channel logo, promo tile), searches current row for playable content
+   *   3. If current row has no playable content, scrolls down to next row
+   *   4. Repeats until finding a row with playable content (up to 10 rows)
+   *   5. Navigates to first playable content found
+   *
+   * IMPORTANT:
+   *   - Only works on videoTitlesRowList (home screen) by default
+   *   - Must be called AFTER waitForElementToHaveFocus('videoTitlesRowList')
+   *   - Must be called BEFORE ecp.sendKeypress(ecp.Key.Play) or ecp.Key.Ok
+   *   - Scrolls down automatically if current row has no playable content
+   *
+   * @param listElement - List element ID (default: 'videoTitlesRowList')
+   * @param maxRowsToSearch - Maximum number of rows to search (default: 10)
+   * @throws Error if no playable content found after searching maxRowsToSearch rows
+   *
+   * @example
+   * await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+   * await testUtils.waitForElementToHaveFocus('videoTitlesRowList');
+   * await testHelpers.ensurePlayableContentFocused(); // ADD THIS
+   * await ecp.sendKeypress(ecp.Key.Play); // Now safe to play
+   */
+  public async ensurePlayableContentFocused(listElement: any = 'videoTitlesRowList', maxRowsToSearch = 10) {
+    let rowsSearched = 0;
+
+    while (rowsSearched < maxRowsToSearch) {
+      const currentFocusedIndex = await testUtils.getCurrentlyFocusedGridItemIndex(listElement);
+      const focusedContent = await testUtils.getCurrentlyFocusedGridItemContent(listElement);
+
+      // If already on playable content, we're done
+      if (focusedContent.type === 'v' || focusedContent.type === 's' || focusedContent.type === 'l') {
+        return;
+      }
+
+      // Not on playable content - search current row
+      const rowContent = await testUtils.getRowListRowItemsContent(listElement, currentFocusedIndex[0]);
+      let playableCol = -1;
+      for (let i = 0; i < rowContent.length; i++) {
+        if (rowContent[i].type === 'v' || rowContent[i].type === 's' || rowContent[i].type === 'l') {
+          playableCol = i;
+          break;
+        }
+      }
+
+      // Found playable content in current row - navigate to it
+      if (playableCol !== -1) {
+        await testUtils.jumpToRowItem(listElement, [currentFocusedIndex[0], playableCol]);
+        await utils.sleep(500);
+        return;
+      }
+
+      // No playable content in current row - move down to next row
+      await ecp.sendKeypress(ecp.Key.Down);
+      await utils.sleep(500);
+      rowsSearched++;
+    }
+
+    // If we get here, we've searched maxRowsToSearch rows without finding playable content
+    throw new Error(`No playable content found after searching ${maxRowsToSearch} rows`);
+  }
+
+  /**
    * HELPER: Starts playback and waits for playing state
-   * 
+   *
    * @param playerElement - Player element ID (default: 'videoPlayerScreen')
    * @param timeout - Timeout in ms (default: 15000)
-   * 
+   *
    * @example
    * await testHelpers.startPlaybackAndWait();
    * await testHelpers.startPlaybackAndWait('previewVideoPlayer', 10000);
    */
-  public async startPlaybackAndWait(playerElement: any = 'videoPlayerScreen', timeout: number = 15000) {
+  public async startPlaybackAndWait(playerElement: any = 'videoPlayerScreen', timeout = 15000) {
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual(playerElement, 'playing', timeout);
   }
@@ -1141,7 +1212,7 @@ class TestHelpers {
    * @param expectedScreen - Screen to wait for (default: 'detailScreen')
    * @param backCount - Number of times to press Back (default: 1)
    */
-  public async exitPlayback(expectedScreen: any = 'detailScreen', backCount: number = 1) {
+  public async exitPlayback(expectedScreen: any = 'detailScreen', backCount = 1) {
     await ecp.sendKeypress(ecp.Key.Back, { count: backCount });
     if (expectedScreen) {
       await testUtils.waitForCurrentScreenToEqual(expectedScreen);
@@ -1182,7 +1253,7 @@ class TestHelpers {
    * 
    * @throws Error if button with specified ID is not found
    */
-  public async jumpToButtonById(buttonListElementId: any, buttonId: string, waitForFocus: boolean = true): Promise<number> {
+  public async jumpToButtonById(buttonListElementId: any, buttonId: string, waitForFocus = true): Promise<number> {
     // Get the button list node
     const buttonList = await testUtils.getNodeForElement(buttonListElementId);
     // Find the button index by ID
@@ -1241,13 +1312,13 @@ class TestHelpers {
    *   - Position focus for detail screen opening
    *   - Test navigation behavior at specific grid positions
    * 
-   * @param rowListElementId - Element ID of the RowList (e.g., 'movieScreenRowList', 'homeScreenRowList')
+   * @param rowListElementId - Element ID of the RowList (e.g., 'movieScreenRowList', 'videoTitlesRowList')
    * @param targetRow - Target row index (0-based)
    * @param targetCol - Target column index (0-based)
    * 
    * @example
    * // Navigate to row 2, column 3 in home screen
-   * await testHelpers.jumpToRowListPosition('homeScreenRowList', 2, 3);
+   * await testHelpers.jumpToRowListPosition('videoTitlesRowList', 2, 3);
    * 
    * @example
    * // Find content without video preview and navigate to it
@@ -1283,7 +1354,7 @@ class TestHelpers {
    *   - Find content with video preview to test preview playback
    *   - Navigate to specific content types for testing
    * 
-   * @param rowListElementId - Element ID of the RowList (e.g., 'movieScreenRowList', 'homeScreenRowList')
+   * @param rowListElementId - Element ID of the RowList (e.g., 'movieScreenRowList', 'videoTitlesRowList')
    * @param hasVideoPreview - true to find WITH preview, false to find WITHOUT (default: true)
    * @param maxRowsToSearch - Maximum number of rows to search (default: 5)
    * @returns [row, column] array or empty array if not found
@@ -1298,15 +1369,15 @@ class TestHelpers {
    * 
    * @example
    * // Find content WITH video preview
-   * const position = await testHelpers.findContentPositionInRowListThatContainsVideoPreview('homeScreenRowList', true);
+   * const position = await testHelpers.findContentPositionInRowListThatContainsVideoPreview('videoTitlesRowList', true);
    * if (position.length === 0) {
    *   throw new Error('Could not find content with video preview');
    * }
    */
   public async findContentPositionInRowListThatContainsVideoPreview(
     rowListElementId: any,
-    hasVideoPreview: boolean = true,
-    maxRowsToSearch: number = 5
+    hasVideoPreview = true,
+    maxRowsToSearch = 5
   ): Promise<[number, number] | []> {
     // Get all content grouped by row
     const rowsContent = await testUtils.getAllRowListItemsContentGroupedByRow(rowListElementId);
@@ -1410,7 +1481,7 @@ class TestHelpers {
    * await testHelpers.verifyElementVisible('ageGateScreen');
    * await testHelpers.verifyElementVisible('myButton', false); // Verify hidden
    */
-  public async verifyElementVisible(elementId: any, expectedValue: boolean = true) {
+  public async verifyElementVisible(elementId: any, expectedValue = true) {
     await testUtils.retryWithTimeOut(async () => {
       const element = await testUtils.getNodeForElement(elementId);
       expect(element.visible).to.equal(expectedValue);
@@ -1424,7 +1495,7 @@ class TestHelpers {
    * @param expectedText - Expected text (exact match)
    * @param shouldContain - If true, uses 'contain' instead of 'equal' (default: false)
    */
-  public async verifyElementText(elementId: any, expectedText: string, shouldContain: boolean = false) {
+  public async verifyElementText(elementId: any, expectedText: string, shouldContain = false) {
     await testUtils.retryWithTimeOut(async () => {
       const element = await testUtils.getNodeForElement(elementId);
       if (shouldContain) {
@@ -1522,7 +1593,7 @@ class TestHelpers {
    * @param secondsElement - Seconds element ID (default: 'countDownSecondsAutoPlay')
    * @param verifyPlayerSize - Whether to verify player dimensions (default: false)
    */
-  public async verifyAutoplayUIShowing(countdownElement: any = 'countDownAutoPlay', secondsElement: any = 'countDownSecondsAutoPlay', verifyPlayerSize: boolean = false) {
+  public async verifyAutoplayUIShowing(countdownElement: any = 'countDownAutoPlay', secondsElement: any = 'countDownSecondsAutoPlay', verifyPlayerSize = false) {
     await testUtils.waitForElementToFullyShowOnScreen(countdownElement);
     const countDown = await testUtils.getNodeForElement(countdownElement);
     expect(countDown.text).to.contain('Up Next in');
@@ -1557,7 +1628,7 @@ class TestHelpers {
    * @param countdownElement - Countdown element to check (default: 'autoplayCountdownTimerSection')
    * @param verifyPlayerSize - Whether to verify player dimensions (default: false)
    */
-  public async verifyAutoplayUINotShowing(countdownElement: any = 'autoplayCountdownTimerSection', verifyPlayerSize: boolean = false) {
+  public async verifyAutoplayUINotShowing(countdownElement: any = 'autoplayCountdownTimerSection', verifyPlayerSize = false) {
     await testUtils.waitForElementToNotShowOnScreen(countdownElement, 'Countdown timer section is still showing', 10000);
 
     if (verifyPlayerSize) {
@@ -1578,9 +1649,9 @@ class TestHelpers {
    * await testHelpers.triggerMovieAutoplay();
    * // Now autoplay UI is showing with countdown
    */
-  public async triggerMovieAutoplay(shouldCreateNewUser: boolean = true, verifyPlayerSize: boolean = false) {
+  public async triggerMovieAutoplay(shouldCreateNewUser = true, verifyPlayerSize = false) {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser });
-    await this.setAutoplay(true);
+    await this.enableAutoplayInSettings(true);
     await this.navigateToPage('movies', 'movieScreenRowList');
     await ecp.sendKeypress(ecp.Key.Play);
     await this.seekToEnd();
@@ -1592,7 +1663,7 @@ class TestHelpers {
    * 
    * @param verifyPlayerSize - Whether to verify player dimensions (default: false)
    */
-  public async validateAutoplayNotTriggered(verifyPlayerSize: boolean = false) {
+  public async validateAutoplayNotTriggered(verifyPlayerSize = false) {
     await testUtils.goToPage('movies');
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
     await ecp.sendKeypress(ecp.Key.Play);
@@ -1612,7 +1683,7 @@ class TestHelpers {
    * @param age - Age to enter (default: '20')
    * @param acceptButton - Accept button element (default: 'continueWatchingConsentPageAcceptButton')
    */
-  public async completeAgeGate(age: string = '20', acceptButton: any = 'continueWatchingConsentPageAcceptButton') {
+  public async completeAgeGate(age = '20', acceptButton: any = 'continueWatchingConsentPageAcceptButton') {
     await testUtils.waitForElementToFullyShowOnScreen('ageVerificationPageHeader');
     await ecp.sendText(age);
     await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
@@ -1632,6 +1703,10 @@ class TestHelpers {
   /**
    * HELPER: Creates user content history with flexible configuration
    * 
+   * USE WHEN:
+   *   - Need to create user view history with specific ratings and content types
+   *   - Testing parental controls, categories, or content filtering
+   * 
    * @param user - User API instance
    * @param contentConfig - Array of {rating, contentType, limit, watchTime}
    * 
@@ -1649,6 +1724,50 @@ class TestHelpers {
         .retrieve({ limit: config.limit });
       await user.addContentToViewHistory(content, config.watchTime);
     }
+  }
+
+  /**
+   * HELPER: Creates user content history with comprehensive mix of ratings
+   * 
+   * USE WHEN:
+   *   - Testing parental controls with various rating levels
+   *   - Need history with mix of G, PG, PG-13, R, TV-G, TV-MA, TV-14, NR ratings
+   *   - Testing content filtering based on ratings
+   * 
+   * CREATES HISTORY FOR:
+   *   - G movies (25 items, 600s watch time)
+   *   - TV-G series (3 items, 600s watch time)
+   *   - TV-MA series (3 items, 600s watch time)
+   *   - R movies (2 items, 500s watch time)
+   *   - PG movies (2 items, 500s watch time)
+   *   - PG-13 movies (2 items, 500s watch time)
+   *   - TV-14 series (2 items, 500s watch time)
+   *   - NR movies (2 items, 500s watch time)
+   * 
+   * @param user - User API instance
+   * 
+   * @example
+   * const user = await testUtils.createRegisteredUser();
+   * await testHelpers.createUserHistoryWithRatings(user);
+   */
+  public async createUserHistoryWithRatings(user: any) {
+    // Create a user with mix of little kids and non-little kid rated titles with history
+    const ContentG = await user.getContent().withRating('G').ofContentType('movie').retrieve({ limit: 25 });
+    await user.addContentToViewHistory(ContentG, 600);
+    const ContentTVY7 = await user.getContent().withRating('TV-G').ofContentType('series').retrieve({ limit: 3 });
+    await user.addContentToViewHistory(ContentTVY7, 600);
+    const movieContentTVMA = await user.getContent().withRating('TV-MA').ofContentType('series').retrieve({ limit: 3 });
+    await user.addContentToViewHistory(movieContentTVMA, 600);
+    const movieContentR = await user.getContent().withRating('R').ofContentType('movie').retrieve({ limit: 2 });
+    await user.addContentToViewHistory(movieContentR, 500);
+    const movieContentPG = await user.getContent().withRating('PG').ofContentType('movie').retrieve({ limit: 2 });
+    await user.addContentToViewHistory(movieContentPG, 500);
+    const movieContentPG13 = await user.getContent().withRating('PG-13').ofContentType('movie').retrieve({ limit: 2 });
+    await user.addContentToViewHistory(movieContentPG13, 500);
+    const movieContentTV14 = await user.getContent().withRating('TV-14').ofContentType('series').retrieve({ limit: 2 });
+    await user.addContentToViewHistory(movieContentTV14, 500);
+    const movieContentNR = await user.getContent().withRating('NR').ofContentType('movie').retrieve({ limit: 2 });
+    await user.addContentToViewHistory(movieContentNR, 500);
   }
 
   /**
@@ -1704,18 +1823,18 @@ class TestHelpers {
 
   /**
    * HELPER: Creates history for a single title (movie or series)
-   * 
+   *
    * @param user - User API instance
    * @param contentType - 'movie' or 'series'
    * @param rating - Content rating (default: 'PG')
    * @param watchTime - Watch time in seconds (default: 500)
    * @param hasVideoPreview - For series, whether to filter by video preview (default: false)
-   * 
+   *
    * @example
    * await testHelpers.createHistoryForSingleTitle(user, 'movie', 'PG', 500);
    * await testHelpers.createHistoryForSingleTitle(user, 'series', 'TV-Y', 600, true);
    */
-  public async createHistoryForSingleTitle(user: any, contentType: string, rating: string = 'PG', watchTime: number = 500, hasVideoPreview: boolean = false) {
+  public async createHistoryForSingleTitle(user: any, contentType: string, rating = 'PG', watchTime = 500, hasVideoPreview = false) {
     let query = user.getContent().ofContentType(contentType).withRating(rating);
 
     if (contentType === 'series' && hasVideoPreview) {
@@ -1724,6 +1843,489 @@ class TestHelpers {
 
     const content = await query.retrieve({ limit: 1 });
     await user.addContentToViewHistory(content, watchTime);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+   * NETWORK PROXY MOCKING HELPERS
+   * ═══════════════════════════════════════════════════════════════════
+   */
+
+  /**
+   * HELPER: Finds Featured container by id with fallback to first container
+   *
+   * @param containers - Array of containers from homescreen response
+   * @returns Featured container or first container as fallback
+   *
+   * @private
+   */
+  private findFeaturedContainer(containers: any[]): any {
+    let featuredContainer = containers.find((c: any) => c.id === 'featured');
+
+    if (!featuredContainer) {
+      featuredContainer = containers[0];
+    }
+
+    return featuredContainer;
+  }
+
+  /**
+   * HELPER: Fetches linear content from Tubi API
+   *
+   * @param user - User instance for authenticated API calls
+   * @param count - Number of linear items to fetch (default: 2)
+   * @returns Array of linear content items
+   *
+   * @private
+   */
+  private async fetchLinearContent(user: any, count = 2): Promise<any[]> {
+    const linearChannelsUrl = 'https://tensor-cdn.production-public.tubi.io/api/v7/containers/recommended_linear_channels?' +
+      'images%5Bbackground_tb%5D=w1197h675_background&' +
+      'images%5Blandscape_tb%5D=w520h292_landscape&' +
+      'contents_limit=30&' +
+      'content_mode=&' +
+      'video_resources%5B%5D=dash_widevine_psshv0&' +
+      'video_resources%5B%5D=hlsv6&' +
+      'include_ui_customization=true&' +
+      'is_kids_mode=false&' +
+      'device_id=032760ab-cd00-5b65-958c-d0bdd972c7e2&' +
+      'images%5Bcontrol_landscape_tb%5D=w360h201_hero&' +
+      'images%5Bvideo_tiles_portrait_tb%5D=w310h442_poster&' +
+      'images%5Btitle_art%5D=w0h80_title&' +
+      'cursor=9&' +
+      'app_id=tubitv&' +
+      'images%5Bhero_tb%5D=w789h442_hero&' +
+      'include_sponsorships=true&' +
+      'platform=roku&' +
+      'images%5Bposter_tb%5D=w252h360_poster&' +
+      'limit_resolutions%5B%5D=H264_1080p&' +
+      'limit_resolutions%5B%5D=H265_1080p';
+
+    const linearChannelsResponse = await user.sendTubiAuthNetworkRequest({
+      method: 'get',
+      url: linearChannelsUrl
+    });
+
+    const childrenIds = linearChannelsResponse.container.children;
+    const contentsMap = linearChannelsResponse.contents;
+
+    if (!childrenIds || childrenIds.length < count) {
+      throw new Error(`Not enough linear channel IDs. Found ${childrenIds?.length || 0}, need at least ${count}`);
+    }
+
+    return childrenIds.slice(0, count).map((id: string) => contentsMap[id]);
+  }
+
+  /**
+   * HELPER: Sets up network proxy to inject linear content into homescreen Featured container
+   *
+   * USE WHEN:
+   *   - Testing linear content autoplay in Featured row
+   *   - Need to guarantee linear content appears in Featured container
+   *
+   * HOW IT WORKS:
+   *   1. Fetches linear channels from Tubi API
+   *   2. Extracts 2 linear content items
+   *   3. Sets up proxy.observeRequest to intercept homescreen API call
+   *   4. Modifies homescreen response to inject linear items at beginning of Featured container
+   *
+   * @param user - Registered user instance (for authentication)
+   *
+   * @example
+   * const user = await testUtils.createRegisteredUser();
+   * await testHelpers.mockHomescreenWithLinearContentInFeatured(user);
+   * await testUtils.startApplicationAtPage('home', { user });
+   * // Now Featured row will have 2 linear content items at the beginning
+   */
+  public async mockHomescreenWithLinearContentInFeatured(user: any) {
+    // Fetch linear content from API
+    const twoLinearItems = await this.fetchLinearContent(user, 2);
+
+    return new Promise((resolve) => {
+      proxy.addCallback({
+        shouldProcess: (args) => {
+          return args.url.includes('/api/v7/homescreen');
+        },
+        processResponse: (args) => {
+          const responseJson = JSON.parse(args.responseBuffer.toString());
+
+          // Find Featured container using helper
+          if (responseJson.containers && responseJson.containers.length > 0) {
+            const featuredContainer = this.findFeaturedContainer(responseJson.containers);
+
+            // Add linear item IDs to the beginning of Featured container's children array
+            if (featuredContainer.children) {
+              const linearIds = twoLinearItems.map((item: any) => item.id);
+              featuredContainer.children.unshift(...linearIds);
+            }
+
+            // Add linear items to top-level contents map so they're available by ID
+            if (!responseJson.contents) {
+              responseJson.contents = {};
+            }
+            twoLinearItems.forEach((item: any) => {
+              responseJson.contents[item.id] = item;
+            });
+          }
+
+          resolve(null);
+          args.removeCallback();
+          return JSON.stringify(responseJson);
+        }
+      });
+    });
+  }
+
+  /**
+   * HELPER: Sets up network proxy to inject/modify content with long titles in homescreen
+   *
+   * USE WHEN:
+   *   - Testing long title display (2-line for non-linear, 1-line for linear)
+   *   - Need to guarantee content with long titles appears in Featured container
+   *
+   * HOW IT WORKS FOR MOVIE/SERIES:
+   *   1. Intercepts homescreen API response
+   *   2. Searches ALL containers for first matching content type
+   *   3. Overrides its title with a very long title (>60 characters)
+   *   4. Moves it to the front of Featured container
+   *
+   * HOW IT WORKS FOR LINEAR:
+   *   1. Fetches linear content from Tubi API
+   *   2. Overrides the title with a very long title
+   *   3. Intercepts homescreen response and injects linear content into Featured container
+   *
+   * @param contentType - Type of content to modify ('movie', 'series', or 'linear')
+   * @param user - Optional user instance (required for linear content to make API calls)
+   *
+   * @example
+   * // For non-linear content (C842109)
+   * await testHelpers.mockHomescreenWithLongTitleContent('movie');
+   * await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false, clearRegistry: false });
+   *
+   * // For linear content (C842110)
+   * const user = await testUtils.createRegisteredUser();
+   * await testHelpers.mockHomescreenWithLongTitleContent('linear', user);
+   * await testUtils.startApplicationAtPage('home', { user, clearRegistry: false });
+   */
+  public async mockHomescreenWithLongTitleContent(contentType: 'movie' | 'series' | 'linear', user?: any) {
+    // Create long title based on content type
+    const longTitle = contentType === 'linear'
+      ? 'This Is An Extremely Long Linear Channel Name That Will Definitely Exceed The Character Limit For Testing'
+      : 'This Is An Extremely Long Movie Title That Will Definitely Exceed The Character Limit For Testing Purposes And Will Wrap To Multiple Lines';
+
+    // Map content type to type code
+    const typeCode = contentType === 'movie' ? 'v' : (contentType === 'series' ? 's' : 'l');
+
+    // For linear content, fetch from API first
+    let linearItemsWithLongTitle = null;
+    if (contentType === 'linear') {
+      if (!user) {
+        throw new Error('User instance required for fetching linear content from API');
+      }
+
+      // Fetch linear content using helper method
+      const linearItems = await this.fetchLinearContent(user, 2);
+
+      // Override titles with long title
+      linearItemsWithLongTitle = linearItems.map((item: any) => {
+        item.title = longTitle;
+        return item;
+      });
+    }
+
+    return new Promise((resolve) => {
+      proxy.addCallback({
+        shouldProcess: (args) => {
+          return args.url.includes('/api/v7/homescreen');
+        },
+        processResponse: (args) => {
+          const responseJson = JSON.parse(args.responseBuffer.toString());
+
+          if (responseJson.containers && responseJson.containers.length > 0 && responseJson.contents) {
+            // Find Featured container using helper
+            const featuredContainer = this.findFeaturedContainer(responseJson.containers);
+
+            // Handle linear content injection
+            if (contentType === 'linear' && linearItemsWithLongTitle) {
+              // Add linear item IDs to the beginning of Featured container's children array
+              if (featuredContainer.children) {
+                const linearIds = linearItemsWithLongTitle.map((item: any) => item.id);
+                featuredContainer.children.unshift(...linearIds);
+              }
+
+              // Add linear items to top-level contents map
+              if (!responseJson.contents) {
+                responseJson.contents = {};
+              }
+              linearItemsWithLongTitle.forEach((item: any) => {
+                responseJson.contents[item.id] = item;
+              });
+            } else {
+              // Handle movie/series by finding and modifying existing content
+              let matchingContentId = null;
+
+              // Search through ALL containers to find matching content type
+              for (const container of responseJson.containers) {
+                if (container.children && container.children.length > 0) {
+                  for (const childId of container.children) {
+                    const content = responseJson.contents[childId];
+                    if (content && content.type === typeCode) {
+                      // Override the title of this existing content
+                      responseJson.contents[childId].title = longTitle;
+                      matchingContentId = childId;
+                      break;
+                    }
+                  }
+                  if (matchingContentId) break;
+                }
+              }
+
+              // Move the matching content to the front of Featured container
+              if (matchingContentId) {
+                // Remove from wherever it currently is
+                featuredContainer.children = featuredContainer.children.filter(id => id !== matchingContentId);
+
+                // Add to front of Featured
+                featuredContainer.children.unshift(matchingContentId);
+              }
+            }
+          }
+
+          resolve(null);
+          args.removeCallback();
+          return JSON.stringify(responseJson);
+        }
+      });
+    });
+  }
+
+  /**
+   * HELPER: Mock homescreen response with content that has a very long description
+   *
+   * USE WHEN:
+   *   - Testing description overflow behavior (C842129)
+   *   - Testing UI layout with long descriptions
+   *
+   * HOW IT WORKS:
+   *   1. Intercepts homescreen API response
+   *   2. Searches ALL containers for first movie content
+   *   3. Overrides its description with a very long description (>500 characters)
+   *   4. Moves it to the front of Featured container
+   *
+   * @example
+   * await testHelpers.mockHomescreenWithLongDescriptionContent();
+   * await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false, clearRegistry: false });
+   */
+  public async mockHomescreenWithLongDescriptionContent() {
+    // Create a very long description (>500 characters)
+    const longDescription = 'This is an extremely long description that will definitely exceed the normal character limits for testing purposes. ' +
+      'It contains multiple sentences and paragraphs to simulate real-world content that might have extensive plot summaries or detailed information. ' +
+      'This description is intentionally verbose to test how the UI handles overflow scenarios and ensures that the text wrapping and truncation mechanisms work correctly. ' +
+      'Additional filler text is added here to make absolutely certain that we exceed the 500 character threshold needed for proper width validation. ' +
+      'More text continues here to ensure we have a truly long description that will cause the UI to properly display overflow handling behavior.';
+
+    return new Promise((resolve) => {
+      proxy.addCallback({
+        shouldProcess: (args) => {
+          return args.url.includes('/api/v7/homescreen');
+        },
+        processResponse: (args) => {
+          const responseJson = JSON.parse(args.responseBuffer.toString());
+
+          if (responseJson.containers && responseJson.containers.length > 0 && responseJson.contents) {
+            // Find Featured container using helper
+            const featuredContainer = this.findFeaturedContainer(responseJson.containers);
+
+            // Find first movie content and override its description
+            let matchingContentId = null;
+
+            // Search through ALL containers to find movie content (type 'v')
+            for (const container of responseJson.containers) {
+              if (container.children && container.children.length > 0) {
+                for (const childId of container.children) {
+                  const content = responseJson.contents[childId];
+                  if (content && content.type === 'v') {
+                    // Override the description of this existing content
+                    responseJson.contents[childId].description = longDescription;
+                    matchingContentId = childId;
+                    break;
+                  }
+                }
+                if (matchingContentId) break;
+              }
+            }
+
+            // Move the matching content to the front of Featured container
+            if (matchingContentId) {
+              // Remove from wherever it currently is
+              featuredContainer.children = featuredContainer.children.filter(id => id !== matchingContentId);
+
+              // Add to front of Featured
+              featuredContainer.children.unshift(matchingContentId);
+            }
+          }
+
+          resolve(null);
+          args.removeCallback();
+          return JSON.stringify(responseJson);
+        }
+      });
+    });
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+   * CONTINUE WATCHING ROW HELPERS
+   * ═══════════════════════════════════════════════════════════════════
+   */
+
+  /**
+   * HELPER: Validates guest user Continue Watching row registration CTA
+   *
+   * USE WHEN:
+   *   - Testing guest user Continue Watching row display
+   *   - Verifying registration prompt appears for guest users in CW row
+   *   - Test mentions "guest user", "sign up", "Continue Watching" together
+   *
+   * VALIDATES:
+   *   - Title: "Sign Up to Save Your Progress"
+   *   - Description: "Pick up right where you left off next time you play a TV Series or a Movie. Available upon sign up."
+   *   - Sign up button visibility
+   *   - Button label text: "Sign Up to Save Progress"
+   *
+   * PREREQUISITES:
+   *   - Must be on home screen
+   *   - Must already have navigated to Continue Watching row
+   *   - User must be guest user (not registered)
+   *
+   * HOW IT WORKS:
+   *   - Gets Continue Watching row index dynamically at runtime
+   *   - Constructs element keypaths with row index
+   *   - Uses getNodeWithDynamicPath() to access elements
+   *   - Validates all 4 elements of the registration CTA
+   *
+   * COMMON USE CASES:
+   *   - Test C842105: Validating guest CW row on home screen
+   *   - Test C148846: Guest user registration flow from CW row
+   *
+   * @example
+   * // Navigate to CW row first (scrollDownToFindRow handles scrolling and focusing)
+   * await testHelpers.scrollDownToFindRow({ slug: 'continue_watching' });
+   * // Then validate
+   * await testHelpers.validateGuestContinueWatchingRow();
+   */
+  public async validateGuestContinueWatchingRow() {
+    // Get row index dynamically
+    const rowIndex = await testUtils.findRowIndexWithSlug('videoTitlesRowList', 'continue_watching');
+
+    // Construct dynamic element objects with runtime row index
+    const titleElement = {
+      keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.${rowIndex}.items.0.#contentSection.#title`
+    };
+    const descriptionElement = {
+      keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.${rowIndex}.items.0.#contentSection.#description`
+    };
+    const buttonElement = {
+      keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.${rowIndex}.items.0.#contentSection.#signUpButton`
+    };
+    const buttonLabelElement = {
+      keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.${rowIndex}.items.0.#contentSection.#signUpButton.#label`
+    };
+
+    // Validate registration CTA title
+    const titleNode = await testUtils.getNodeWithDynamicPath(titleElement, 10000);
+    expect(titleNode.visible).to.equal(true, 'Guest user CW tile title should be visible');
+    expect(titleNode.text).to.equal('Sign Up to Save Your Progress', 'CW tile should display "Sign Up to Save Your Progress" title');
+
+    // Validate registration CTA description
+    const descriptionNode = await testUtils.getNodeWithDynamicPath(descriptionElement, 10000);
+    expect(descriptionNode.visible).to.equal(true, 'Guest user CW tile description should be visible');
+    expect(descriptionNode.text).to.equal('Pick up right where you left off next time you play a TV Series or a Movie. Available upon sign up.',
+      'CW tile should display correct description');
+
+    // Validate sign up button is present and visible
+    const buttonNode = await testUtils.getNodeWithDynamicPath(buttonElement, 10000);
+    expect(buttonNode.visible).to.equal(true, 'Sign up button should be visible');
+
+    // Validate button label text
+    const buttonLabelNode = await testUtils.getNodeWithDynamicPath(buttonLabelElement, 10000);
+    expect(buttonLabelNode.text).to.include('Sign Up to Save Progress', 'Button label should contain "Sign Up to Save Progress"');
+  }
+
+  /**
+   * Scroll down until the focused row's title or slug matches the target value
+   * @param options - Configuration object
+   * @param options.title - Title of the row to find (e.g., 'On Now', 'Continue Watching', 'My List')
+   * @param options.slug - Slug of the row to find (e.g., 'on-now', 'continue-watching', 'my-list')
+   * @param options.rowListElementId - Element ID of the RowList to search in (default: 'videoTitlesRowList')
+   * @param options.maxScrolls - Maximum number of times to scroll down (default: 20)
+   * @remarks Either `title` or `slug` must be provided. If `slug` is provided, only checks SLUG field. If `title` is provided, only checks TITLE field.
+   */
+  async scrollDownToFindRow(options: { title?: string; slug?: string; rowListElementId?: ElementOrElementId; maxScrolls?: number }): Promise<void> {
+    const { title, slug, rowListElementId = 'videoTitlesRowList', maxScrolls = 20 } = options;
+
+    if (!title && !slug) {
+      throw new Error('Either "title" or "slug" must be provided');
+    }
+
+    const searchValue = slug || title!;
+    const isSlugSearch = !!slug;
+
+    const element = testUtils.getElementKeyPath(rowListElementId);
+    let baseKeyPath = `content`;
+    if (element.keyPath) {
+      baseKeyPath = element.keyPath + '.' + baseKeyPath;
+    }
+
+    let found = false;
+    let scrollCount = 0;
+
+    while (!found && scrollCount < maxScrolls) {
+      try {
+        // Get the currently focused row index
+        const focusedIndex = await testUtils.getCurrentlyFocusedGridItemIndex(rowListElementId);
+        const rowIndex = focusedIndex[0];
+
+        if (isSlugSearch) {
+          // Only check slug field when slug parameter is provided
+          const { found: slugFound, value: currentRowSlug } = await odc.getValue({
+            base: element.base,
+            keyPath: `${baseKeyPath}.${rowIndex}.slug`
+          });
+
+          if (slugFound && currentRowSlug === searchValue) {
+            found = true;
+          } else {
+            // Row slug doesn't match, scroll down and try again
+            await ecp.sendKeypress(ecp.Key.Down);
+            await utils.sleep(500); // Wait for content to load
+            scrollCount++;
+          }
+        } else {
+          // Only check title field when title parameter is provided
+          const { found: titleFound, value: currentRowTitle } = await odc.getValue({
+            base: element.base,
+            keyPath: `${baseKeyPath}.${rowIndex}.TITLE`
+          });
+
+          if (titleFound && currentRowTitle === searchValue) {
+            found = true;
+          } else {
+            // Row title doesn't match, scroll down and try again
+            await ecp.sendKeypress(ecp.Key.Down);
+            await utils.sleep(500); // Wait for content to load
+            scrollCount++;
+          }
+        }
+      } catch (e) {
+        // Error getting focused row or title/slug, scroll down and try again
+        await ecp.sendKeypress(ecp.Key.Down);
+        scrollCount++;
+      }
+    }
+
+    if (!found) {
+      const fieldType = isSlugSearch ? 'slug' : 'title or slug';
+      throw new Error(`Could not find row with ${fieldType} "${searchValue}" after scrolling down ${maxScrolls} times`);
+    }
   }
 }
 

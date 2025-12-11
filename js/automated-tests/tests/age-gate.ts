@@ -7,7 +7,7 @@ describe('Age Gate', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/242480
   it('C242480 - COPPA V3 - Guest User access Kids mode and selects exit kids option. User is presented with Age Gate, @age_gate', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open Kids Mode
     await openKidsMode();
@@ -23,7 +23,7 @@ describe('Age Gate', function () {
   // https://tubi.testrail.io/index.php?/cases/view/408197
   it('C408197 - Guest User - Error shown immediately when entering age above 125, @age_gate', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Sign in
     await selectSignInFromHomeScreen();
@@ -44,7 +44,7 @@ describe('Age Gate', function () {
   // https://tubi.testrail.io/index.php?/cases/view/408196
   it('C408196 - Guest User - Error shown immediately when entering age with leading 0, @age_gate', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Sign in
     await selectSignInFromHomeScreen();
@@ -65,7 +65,7 @@ describe('Age Gate', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/242820
   it('C242820 - COPPA V3 - Guest User enters in age greater than 12 they are directed to the Tubi Homepage (non-kids), @age_gate, @smoke', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
 
     // Open Kids Mode
@@ -84,7 +84,7 @@ describe('Age Gate', function () {
 
     // Check if we are in the non-kids mode since user passed age gate
     // Verify on home screen
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open left nav and check for Kids left nav icon
     await ecp.sendKeypress(ecp.Key.Left);
@@ -95,11 +95,11 @@ describe('Age Gate', function () {
   // https://tubi.testrail.io/index.php?/cases/view/242819
   it('C242819 - COPPA V3 - Guest User enters in age lower than 13 they are locked into kids mode, @age_gate, @smoke', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open Kids Mode
     await openKidsMode();
-
+    await utils.sleep(1000);
     // Exit Kids Mode
     await exitKidsMode();
 
@@ -122,8 +122,10 @@ describe('Age Gate', function () {
 
     // Close the modal by pressing OK
     await ecp.sendKeypress(ecp.Key.Ok);
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await utils.sleep(1000);
 
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await utils.sleep(1000);
     // Verify we're still in Kids Mode
     await ecp.sendKeypress(ecp.Key.Left);
     const leftNavHomeButtonLabel = await testUtils.getNodeForElement('leftNavHomeButtonLabel');
@@ -136,7 +138,7 @@ describe('Age Gate', function () {
   */
   it('C242818 - COPPA V3 - Guest User exits kids mode and enters age of user between 0-4 again after user is presented with make sure information is correct prompt, @age_gate', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open Kids Mode
     await openKidsMode();

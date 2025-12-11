@@ -6,6 +6,8 @@ Function init()
   m._ = rodash()
 
   m.constants = getConstants()
+  startupArgs = m.top.getScene().startupArgs
+  m.constants = addConstantsFromStartupArgs(startupArgs, m.constants)
   m.global.constants = m.constants
   m.global.theme = m.constants.ui.themes.default
 
@@ -3780,4 +3782,36 @@ Function onLinearChannelFetchError(response)
   ' For now just hiding the spinner and not showing the error modal.
   Tubilog("ContentController.onLinearChannelFetchError")
   showHideSpinner(false)
+End Function
+
+
+Function addConstantsFromStartupArgs(startupArgs, constants)
+  isDev = createObject("roAppInfo").IsDev()
+  if isDev = false OR startupArgs.constantsUpdates = invalid then
+    return constants
+  end if
+
+  constantsUpdates = ParseJson(startupArgs.constantsUpdates)
+  if constantsUpdates = invalid then
+    constantsUpdates = {}
+  end if
+
+  for each keyPath in constantsUpdates
+    currentLevel = constants
+    keyPathParts = keyPath.tokenize(".")
+    finalKeyPathPart = keyPathParts.pop()
+    value = constantsUpdates[keyPath]
+    for each keyPathPart in keyPathParts
+      nextLevel = currentLevel[keyPathPart]
+      ' If the next level does not exist then we need to add it
+      if nextLevel = invalid then
+        nextLevel = {}
+        currentLevel[keyPathPart] = nextLevel
+      end if
+      currentLevel = nextLevel
+    end for
+    currentLevel[finalKeyPathPart] = value
+  end for
+
+  return constants
 End Function

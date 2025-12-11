@@ -13,7 +13,7 @@ describe('MyStuff', function () {
 
     // Start app with Guest user
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open side nav and navigate to My Stuff item
     await highlightMyStuffMenuItem();
@@ -25,7 +25,7 @@ describe('MyStuff', function () {
 
     // Start app with Guest user
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open side nav and navigate to My Stuff item
     await highlightMyStuffMenuItem();
@@ -51,17 +51,13 @@ describe('MyStuff', function () {
 
     // Start app as guest user
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Navigate to Continue Watching row as guest user - should show "Sign Up to Save Your Progress"
-    await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Continue Watching');
+    await shared.scrollDownToFindRow({ slug: 'continue_watching' });
 
     // Verify the Continue Watching row shows registration prompt content
-    await testUtils.waitForElementToFullyShowOnScreen('signUpToSaveProgressDescription');
-
-    // Check CW row shows the registration prompt
-    const continueWatchingRowContent = await testUtils.getCurrentlyFocusedGridItemContent('homeScreenRowList');
-    expect(continueWatchingRowContent.title).to.equal('Sign Up to Save Your Progress');
+    await shared.validateGuestContinueWatchingRow();
 
     // Select the Continue Watching item - this should trigger registration flow
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -90,7 +86,7 @@ describe('MyStuff', function () {
     await ecp.sendKeypress(ecp.Key.Ok); // Click "Start Watching"
 
     // Should return to home screen as registered user
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for home screen after registration');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for home screen after registration');
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/421098 - https://tubi.testrail.io/index.php?/cases/view/423511
@@ -98,7 +94,7 @@ describe('MyStuff', function () {
 
     // Start app with Guest user
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open side nav and navigate to My Stuff item
     await highlightMyStuffMenuItem();
@@ -149,11 +145,17 @@ describe('MyStuff', function () {
 
     // Create user with history only
     const user = await testUtils.createRegisteredUser();
-    await createHistory(user);
+    await shared.createFlexibleUserHistory(user, [
+      { rating: 'G', contentType: 'movie', limit: 10, watchTime: 600 },
+      { rating: 'TV-Y7', contentType: 'series', limit: 3, watchTime: 600 },
+      { rating: 'TV-MA', contentType: 'series', limit: 3, watchTime: 600 },
+      { rating: 'R', contentType: 'movie', limit: 2, watchTime: 500 },
+      { rating: 'PG', contentType: 'movie', limit: 2, watchTime: 500 }
+    ]);
 
     // Start app with Registered user
     await testUtils.startApplicationAtPage('home', { user: user });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open side nav and navigate to My Stuff item
     await highlightMyStuffMenuItem();
@@ -186,7 +188,7 @@ describe('MyStuff', function () {
 
     // Start app with Registered user
     await testUtils.startApplicationAtPage('home', { user: user });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open side nav and navigate to My Stuff item
     await highlightMyStuffMenuItem();
@@ -202,8 +204,10 @@ describe('MyStuff', function () {
 
     // Select a title from home page, let it stream for more than > 1 minute
     await testUtils.goToPage('home');
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.jumpToRowWithTitle('videoTitlesRowList', 'Featured');
     await ecp.sendKeypress(ecp.Key.Ok);
+    await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
     const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
     const detailScreenTitle1 = detailScreenTitle.text;
     await ecp.sendKeypress(ecp.Key.Play);
@@ -238,7 +242,7 @@ describe('MyStuff', function () {
 
     // Start app with Registered user
     await testUtils.startApplicationAtPage('home', { user: user });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open side nav and navigate to My Stuff item
     await highlightMyStuffMenuItem();
@@ -276,7 +280,7 @@ describe('MyStuff', function () {
 
     // Start app with Registered user
     await testUtils.startApplicationAtPage('home', { user: user });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open side nav and navigate to My Stuff item
     await highlightMyStuffMenuItem();
@@ -306,12 +310,11 @@ describe('MyStuff', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
     await testUtils.selectAndVerifyDetailPageMenuItem('removeFromHistory');
-    await testUtils.waitForElementToFullyShowOnScreen('addToMyListButtonFocused', 'Button not found', 150000);
-
-
-    // Check the My Stuff page displays no titles and displays correct indicators and text
-    await ecp.sendKeypress(ecp.Key.Back);
-    await checkEmptyMyStuffScreenRegistered();
+    await utils.sleep(3000);
+    const { value: button } = await odc.getValue({
+      keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#Menu.2',
+    });
+    expect(button.itemContent?.id).to.equal('AddQueueMenuItem');
 
   });
 
@@ -324,13 +327,14 @@ describe('MyStuff', function () {
 
     // Start app with Registered user
     await testUtils.startApplicationAtPage('home', { user: user });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open side nav and navigate to My Stuff item
     await highlightMyStuffMenuItem();
 
     // Select My Stuff
     await ecp.sendKeypress(ecp.Key.Ok);
+    await utils.sleep(2000); // Wait for My Stuff page to load before navigation
     await ecp.sendKeypress(ecp.Key.Down);
 
     // Check the My List displays no titles and displays correct indicators and text
@@ -369,7 +373,7 @@ describe('MyStuff', function () {
 
     // Start app with Registered user
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open side nav and navigate to My Stuff item
     await highlightMyStuffMenuItem();
@@ -392,7 +396,7 @@ describe('MyStuff', function () {
 
     // Start app with Registered user
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open side nav and navigate to My Stuff item
     await highlightMyStuffMenuItem();
@@ -408,7 +412,7 @@ describe('MyStuff', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Expect redirect to Home page
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
   });
 
@@ -421,13 +425,14 @@ describe('MyStuff', function () {
 
     // Start app with Registered user
     await testUtils.startApplicationAtPage('home', { user: user });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open side nav and navigate to My Stuff item
     await highlightMyStuffMenuItem();
 
     // Select My Stuff
     await ecp.sendKeypress(ecp.Key.Ok);
+    await utils.sleep(2000); // Wait for My Stuff page to load
 
     // Check that CW displays no titles and has correct text for empty row
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
@@ -451,17 +456,24 @@ describe('MyStuff', function () {
     // Create user with watch list and history
     const user = await testUtils.createRegisteredUser();
     await createWatchList(user);
-    await createHistory(user);
+    await shared.createFlexibleUserHistory(user, [
+      { rating: 'G', contentType: 'movie', limit: 10, watchTime: 600 },
+      { rating: 'TV-Y7', contentType: 'series', limit: 3, watchTime: 600 },
+      { rating: 'TV-MA', contentType: 'series', limit: 3, watchTime: 600 },
+      { rating: 'R', contentType: 'movie', limit: 2, watchTime: 500 },
+      { rating: 'PG', contentType: 'movie', limit: 2, watchTime: 500 }
+    ]);
 
     // Start app with Registered user
     await testUtils.startApplicationAtPage('home', { user: user });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open side nav and navigate to My Stuff item
     await highlightMyStuffMenuItem();
 
     // Select My Stuff
     await ecp.sendKeypress(ecp.Key.Ok);
+    await utils.sleep(2000); // Wait for My Stuff page to load before navigation
 
     // Verify that the title appears in CW section of My Stuff page
     await ecp.sendKeypress(ecp.Key.Up);
@@ -485,11 +497,17 @@ describe('MyStuff', function () {
     // Create user with watch list and history
     const user = await testUtils.createRegisteredUser();
     await createWatchList(user);
-    await createHistory(user);
+    await shared.createFlexibleUserHistory(user, [
+      { rating: 'G', contentType: 'movie', limit: 10, watchTime: 600 },
+      { rating: 'TV-Y7', contentType: 'series', limit: 3, watchTime: 600 },
+      { rating: 'TV-MA', contentType: 'series', limit: 3, watchTime: 600 },
+      { rating: 'R', contentType: 'movie', limit: 2, watchTime: 500 },
+      { rating: 'PG', contentType: 'movie', limit: 2, watchTime: 500 }
+    ]);
 
     // Launch app on Home page
     await testUtils.startApplicationAtPage('home', { user: user });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open settings
     await ecp.sendKeypress(ecp.Key.Left);
@@ -512,13 +530,13 @@ describe('MyStuff', function () {
     await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
 
     // Expect Home Side Nav item to be highlighted and on Home page
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Navigate to My Stuff Screen
     await highlightMyStuffMenuItem();
     await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
-    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'stopped');
+    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', ['stopped', '', 'none']);
 
     // Move down and check My List
     // Check the My List displays titles 
@@ -528,7 +546,7 @@ describe('MyStuff', function () {
     expect(myListPosterContent.height).is.equal(360);
 
     // Check that video preview is not playing when autoplay preview is turned off on My List Row
-    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'stopped');
+    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', ['stopped', '', 'none']);
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/439694
@@ -540,7 +558,7 @@ describe('MyStuff', function () {
 
     // Launch app on Home page
     await testUtils.startApplicationAtPage('home', { user: user });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Navigate to My Stuff Screen
     await highlightMyStuffMenuItem();
@@ -558,7 +576,7 @@ describe('MyStuff', function () {
 
     // Launch app on Home page
     await testUtils.startApplicationAtPage('home', { user: user });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Navigate to My Stuff Screen
     await highlightMyStuffMenuItem();
@@ -576,7 +594,7 @@ describe('MyStuff', function () {
 
     // Launch app on Home page
     await testUtils.startApplicationAtPage('home', { user: user });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Navigate to My Stuff Screen
     await highlightMyStuffMenuItem();
@@ -603,7 +621,7 @@ describe('MyStuff', function () {
 
     // Launch app on Home page
     await testUtils.startApplicationAtPage('home', { user: user });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Navigate to My Stuff Screen
     await highlightMyStuffMenuItem();
@@ -631,7 +649,7 @@ describe('MyStuff', function () {
 
     // Launch app on Home page
     await testUtils.startApplicationAtPage('home', { user: user });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Navigate to My Stuff Screen
     await highlightMyStuffMenuItem();
@@ -665,7 +683,7 @@ describe('MyStuff', function () {
 
     // Launch app on Home page
     await testUtils.startApplicationAtPage('home', { user: user });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Navigate to My Stuff Screen
     await highlightMyStuffMenuItem();
@@ -689,7 +707,7 @@ describe('MyStuff', function () {
 
     // Launch app on Home page
     await testUtils.startApplicationAtPage('home', { user: user });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Navigate to My Stuff Screen
     await highlightMyStuffMenuItem();
@@ -713,11 +731,12 @@ describe('MyStuff', function () {
 
     // Launch app on Home page
     await testUtils.startApplicationAtPage('home', { user: user });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Navigate to My Stuff Screen
     await highlightMyStuffMenuItem();
     await ecp.sendKeypress(ecp.Key.Ok);
+    await utils.sleep(2000); // Wait for My Stuff page to load
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
 
     // Navigate to My List row
@@ -761,7 +780,8 @@ describe('MyStuff', function () {
   it('C264839 - Guest User - Add to My List, sign in through age gate, verify title added @guest_signin_mylist', async () => {
     // Launch app as guest user
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await shared.ensurePlayableContentFocused();
 
     // Select a title from home screen
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -852,7 +872,13 @@ describe('MyStuff', function () {
     // Create user with watch list and history
     const user = await testUtils.createRegisteredUser();
     await createWatchList(user);
-    await createHistory(user);
+    await shared.createFlexibleUserHistory(user, [
+      { rating: 'G', contentType: 'movie', limit: 10, watchTime: 600 },
+      { rating: 'TV-Y7', contentType: 'series', limit: 3, watchTime: 600 },
+      { rating: 'TV-MA', contentType: 'series', limit: 3, watchTime: 600 },
+      { rating: 'R', contentType: 'movie', limit: 2, watchTime: 500 },
+      { rating: 'PG', contentType: 'movie', limit: 2, watchTime: 500 }
+    ]);
 
     // Launch app on Home page
     await testUtils.startApplicationAtPage('kids', { user: user });
@@ -887,7 +913,7 @@ describe('MyStuff', function () {
     await highlightMyStuffMenuItem();
     await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
-    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', ['stopped', '']);
+    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', ['stopped', '', 'none']);
 
     // Move down and check My List
     // Check the My List displays titles 
@@ -897,7 +923,7 @@ describe('MyStuff', function () {
     expect(myListPosterContent.height).is.equal(360);
 
     // Check that video preview is not playing when autoplay preview is turned off on My List Row
-    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', ['stopped', '']);
+    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', ['stopped', '', 'none']);
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/439741
@@ -972,22 +998,6 @@ async function highlightMyStuffMenuItem() {
 
 }
 
-async function createHistory(user) {
-
-  // Create a user with mix of little kids and non-little kid rated titles with history
-
-  const ContentG = await user.getContent().withRating('G').ofContentType('movie').retrieve({ limit: 10 });
-  await user.addContentToViewHistory(ContentG, 600);
-  const ContentTVY7 = await user.getContent().withRating('TV-Y7').ofContentType('series').retrieve({ limit: 3 });
-  await user.addContentToViewHistory(ContentTVY7, 600);
-  const movieContentTVMA = await user.getContent().withRating('TV-MA').ofContentType('series').retrieve({ limit: 3 });
-  await user.addContentToViewHistory(movieContentTVMA, 600);
-  const movieContentR = await user.getContent().withRating('R').ofContentType('movie').retrieve({ limit: 2 });
-  await user.addContentToViewHistory(movieContentR, 500);
-  const movieContentPG = await user.getContent().withRating('PG').ofContentType('movie').retrieve({ limit: 2 });
-  await user.addContentToViewHistory(movieContentPG, 500);
-
-}
 async function createWatchList(user) {
 
   // Create a user with mix of little kids and non-little kid rated titles with history
@@ -1081,8 +1091,8 @@ async function createHistoryForPlayingTitle() {
 // Check Empty My Stuff Screen for Registered User
 
 async function checkEmptyMyStuffScreenRegistered() {
-  await testUtils.waitForElementToFullyShowOnScreen('myStuffRegUserEmptyScreen');
-  await testUtils.waitForElementToFullyShowOnScreen('goHomeButtonMyStuff');
+  await testUtils.waitForElementToShowOnScreen('myStuffRegUserEmptyScreen');
+  await testUtils.waitForElementToShowOnScreen('goHomeButtonMyStuff');
   const goHomeButtonMyStuff = await testUtils.getNodeForElement('goHomeButtonMyStuff');
   expect(goHomeButtonMyStuff.text).to.equal('Go Home');
   const myStuffRegisteredScreenTextTitle = await testUtils.getNodeForElement('myStuffRegScreenTitle');

@@ -65,7 +65,7 @@ describe('Autoplay Series', function () {
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535854
   it('C535854 - Autoplay - Series - Next episode plays after multiple consecutive auto plays @autoplay', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus', 15000);
     await shared.openSeries();
     // Are we on the Series page?
     await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
@@ -102,18 +102,18 @@ describe('Autoplay Series', function () {
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/768089
   it('C768089 - Autoplay Next Video Off - Do not Autoplay next episode @autoplay', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus', 15000);
 
-    await shared.turnOffAutoplay();
+    await shared.enableAutoplayInSettings(false);
     await validateAutoplayNextVideoUINotShowing();
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/768094
   it('C768094 - Autoplay Next Video Off - Press Back button @autoplay', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus', 15000);
 
-    await shared.turnOffAutoplay();
+    await shared.enableAutoplayInSettings(false);
     await validateAutoplayNextVideoUINotShowing();
 
     await ecp.sendKeypress(ecp.Key.Back);
@@ -128,10 +128,12 @@ describe('Autoplay Series', function () {
 
 async function triggerSeriesAutoplayUI() {
   await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-  await shared.turnOnAutoplay();
+  await shared.enableAutoplayInSettings(true);
   await shared.openSeries();
   // Are we on the Movies page?
   await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
+  await ecp.sendKeypress(ecp.Key.Down);
+  await utils.sleep(1000);
   await ecp.sendKeypress(ecp.Key.Play);
   await seekToTriggerCuePoint();
 

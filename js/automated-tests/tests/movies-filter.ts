@@ -14,7 +14,7 @@ describe('Homescreen Navigation - Movies Filter', function () {
     await user.addContentToWatchList(movieContent);
 
     await testUtils.startApplicationAtPage('home', { user: user });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus', 15000);
     await shared.openMovies();
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
   });
@@ -59,7 +59,7 @@ describe('Homescreen Navigation - Movies Filter', function () {
   it('C76730 - Movies Filter - When continue watching displayed then all titles are movies, @homescreen, @movies', async () => {
 
     // Scroll down to Continue Watching
-    await testUtils.jumpToRowWithTitle('movieScreenRowList', 'Continue Watching');
+    await shared.scrollDownToFindRow({ slug: 'continue_watching', rowListElementId: 'movieScreenRowList' });
 
 
     // Check if CW row contains all Series titles
@@ -75,8 +75,8 @@ describe('Homescreen Navigation - Movies Filter', function () {
   // https://tubi.testrail.io/index.php?/cases/view/76731
   it('C76731 - Movies Filter - When My List category displayed then all titles are movies, @homescreen, @movies', async () => {
 
-    // Scroll down to Continue Watching
-    await testUtils.jumpToRowWithTitle('movieScreenRowList', 'My List');
+    // Scroll down to My List
+    await shared.scrollDownToFindRow({ slug: 'queue', rowListElementId: 'movieScreenRowList' });
 
 
     // Check if CW row contains all Series titles
@@ -92,7 +92,7 @@ describe('Homescreen Navigation - Movies Filter', function () {
   // https://tubi.testrail.io/index.php?/cases/view/103112
   it('C103112 - Movies Filter - Continue Watching titles with expiration should show expiration info in Details @movies @expiration', async () => {
     // Scroll to Continue Watching row
-    await testUtils.jumpToRowWithTitle('movieScreenRowList', 'Continue Watching');
+    await shared.scrollDownToFindRow({ slug: 'continue_watching', rowListElementId: 'movieScreenRowList' });
 
     const focusResult = await focusOnVideoTileWithExpireSoon();
 
@@ -122,7 +122,7 @@ describe('Homescreen Navigation - Movies Filter', function () {
 });
 
 async function focusOnVideoTileWithExpireSoon() {
-  const rowIndex = await testUtils.findRowIndexWithTitle('movieScreenRowList', 'Continue Watching');
+  const rowIndex = await testUtils.findRowIndexWithSlug('movieScreenRowList', 'continue_watching');
   const content = await testUtils.getCurrentlyFocusedRowListRowItemsContent('movieScreenRowList');
 
   const currentDate = new Date();

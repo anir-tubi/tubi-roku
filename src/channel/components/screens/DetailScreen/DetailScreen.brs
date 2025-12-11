@@ -615,7 +615,7 @@ End Function
 
 Function onDisableBookmarksChange()
   if m.top.disableBookmarks = true
-    ' remove any Add to My List or Remove from My List items that might be showing
+    ' remove any Add to My List or Remove From My List items that might be showing
     menuItems = m.Menu.content
     addQueueIndex = m.NodeHelpers.getChildIndexById(menuItems, m.AddQueueMenuItem.id)
     removeQueueIndex = m.NodeHelpers.getChildIndexById(menuItems, m.RemoveQueueMenuItem.id)

@@ -13,12 +13,15 @@ describe('Categories', function () {
 
     // Create user with history only
     const user = await testUtils.createRegisteredUser();
-    await createHistory(user);
+    await shared.createFlexibleUserHistory(user, [
+      { rating: 'G', contentType: 'movie', limit: 1, watchTime: 600 },
+      { rating: 'PG', contentType: 'movie', limit: 2, watchTime: 500 }
+    ]);
 
     // Start app with Registered user
     await testUtils.startApplicationAtPage('home', { user: user });
     await testUtils.waitForElementToHaveFocus(
-      'homeScreenRowList',
+      'videoTitlesRowList',
       'Timed out waiting for Rowlist to have focus'
     );
 
@@ -35,12 +38,15 @@ describe('Categories', function () {
   it('C48646 - Continue Watching - Category removed after choosing Remove From history in the details page, @categories', async () => {
     // Create user with history only
     const user = await testUtils.createRegisteredUser();
-    await createHistory(user);
+    await shared.createFlexibleUserHistory(user, [
+      { rating: 'G', contentType: 'movie', limit: 1, watchTime: 600 },
+      { rating: 'PG', contentType: 'movie', limit: 2, watchTime: 500 }
+    ]);
 
     // Start app with Registered user
     await testUtils.startApplicationAtPage('home', { user: user });
     await testUtils.waitForElementToHaveFocus(
-      'homeScreenRowList',
+      'videoTitlesRowList',
       'Timed out waiting for Rowlist to have focus'
     );
 
@@ -77,21 +83,20 @@ describe('Categories', function () {
 
     // Create user with history only
     const user = await testUtils.createRegisteredUser();
-    await createHistory(user);
+    await shared.createFlexibleUserHistory(user, [
+      { rating: 'G', contentType: 'movie', limit: 1, watchTime: 600 },
+      { rating: 'PG', contentType: 'movie', limit: 2, watchTime: 500 }
+    ]);
 
     // Start app with Registered user
     await testUtils.startApplicationAtPage('home', { user: user });
     await testUtils.waitForElementToHaveFocus(
-      'homeScreenRowList',
+      'videoTitlesRowList',
       'Timed out waiting for Rowlist to have focus'
     );
 
     // Jump to CW row
-    await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Continue Watching');
-
-    await testUtils.waitForElementToFullyShowOnScreen(
-      'continueWatchingRowHome'
-    );
+    await shared.scrollDownToFindRow({ slug: 'continue_watching' });
 
     // Press Ok to reach Details page for title in CW Row
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -128,7 +133,7 @@ describe('Categories', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/539354
   it('C539354 - User sees 6 titles per row on full screen channels page, @categories', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
     await testHelpers.navigateToCategories();
@@ -149,7 +154,7 @@ describe('Categories', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/637124 and https://tubi.testrail.io/index.php?/cases/view/690609
   it('C637124 - Guest User - Recommended is shown at the top of list, @categories', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
     await testHelpers.navigateToCategories();
@@ -163,11 +168,14 @@ describe('Categories', function () {
   it('C637123 - Registered User - Continue Watching is NOT displayed near top of list, if user does not have titles to resume, @categories', async () => {
     // Create user with history only
     const user = await testUtils.createRegisteredUser();
-    await createHistory(user);
+    await shared.createFlexibleUserHistory(user, [
+      { rating: 'G', contentType: 'movie', limit: 1, watchTime: 600 },
+      { rating: 'PG', contentType: 'movie', limit: 2, watchTime: 500 }
+    ]);
 
     // Start app with Registered user
     await testUtils.startApplicationAtPage('home', { user: user });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to All Categories page
     await testHelpers.navigateToCategories();
@@ -183,7 +191,7 @@ describe('Categories', function () {
 
     // Start app with Registered user
     await testUtils.startApplicationAtPage('home', { user: user });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to All Categories page
     await testHelpers.navigateToCategories();
@@ -202,7 +210,7 @@ describe('Categories', function () {
 
     // Start app with Registered user
     await testUtils.startApplicationAtPage('home', { user: user });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to All Categories page
     await testHelpers.navigateToCategories();
@@ -216,7 +224,7 @@ describe('Categories', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/638443
   it('C638443 - "Networks" is shown near the top of the list, @categories', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
     await testHelpers.navigateToCategories();
@@ -231,7 +239,7 @@ describe('Categories', function () {
   // https://tubi.testrail.io/index.php?/cases/view/765064
   it('C638445 - Selecting a network poster will display the category page view of all the titles in the network, @categories', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
     await testHelpers.navigateToCategories();
@@ -262,7 +270,7 @@ describe('Categories', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/765056
   it('C765056 - Static image is shown when title does not have a video preview, @categories', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
     await testHelpers.navigateToCategories();
@@ -285,7 +293,7 @@ describe('Categories', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/C638444
   it('C638444 - Selecting "Networks" will display the networks as separate posters, @categories', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
     await testHelpers.navigateToCategories();
@@ -305,7 +313,7 @@ describe('Categories', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/C638446 and https://tubi.testrail.io/index.php?/cases/view/638447
   it('C638446 - Selecting any category will move focus to first title in the container, @categories', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
     await testHelpers.navigateToCategories();
@@ -332,7 +340,7 @@ describe('Categories', function () {
     const user = await testUtils.createRegisteredUser();
     // Launch to home page
     await testUtils.startApplicationAtPage('home', { user: user });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
     await ecp.sendKeypress(ecp.Key.Left);
     await testUtils.waitForElementToFullyShowOnScreen('sideNavMenu');
 
@@ -355,7 +363,7 @@ describe('Categories', function () {
     await ecp.sendKeypress(ecp.Key.Back, { count: 2, wait: 200 });
 
     // Expect Home Side Nav item to be highlighted and on Home page
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
     await testHelpers.navigateToCategories();
@@ -379,7 +387,7 @@ describe('Categories', function () {
   it('C765055 - When a title is in focus, video preview plays when Autoplay Previews is On, @categories', async () => {
     // Launch to home page
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
     await testHelpers.navigateToCategories();
@@ -415,7 +423,7 @@ describe('Categories', function () {
   it('C765059 - Once video preview ends, title auto starts, @categories', async () => {
     // Launch to home page
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
     await testHelpers.navigateToCategories();
@@ -440,7 +448,7 @@ describe('Categories', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/C690718 and https://tubi.testrail.io/index.php?/cases/view/638449
   it('C690718 - When title is NOT in focus, the metadata/static image is removed from the top of the screen, @categories', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
     await testHelpers.navigateToCategories();
@@ -473,7 +481,7 @@ describe('Categories', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/637124 and https://tubi.testrail.io/index.php?/cases/view/690609
   it('C638448 - Selecting a title opens the details page, @categories', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
     await testHelpers.navigateToCategories();
@@ -514,7 +522,7 @@ describe('Categories', function () {
   // https://tubi.testrail.io/index.php?/cases/view/690606
   it('690606 - Pressing "back" from details page takes user back to category tile screen, @categories', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
     await testHelpers.navigateToCategories();
@@ -566,11 +574,3 @@ async function createWatchList(user) {
 
 }
 
-async function createHistory(user) {
-
-  // Create a user with mix of little kids and non-little kid rated titles with history
-  const ContentG = await user.getContent().withRating('G').ofContentType('movie').retrieve({ limit: 1 });
-  await user.addContentToViewHistory(ContentG, 600);
-  const movieContentPG = await user.getContent().withRating('PG').ofContentType('movie').retrieve({ limit: 2 });
-  await user.addContentToViewHistory(movieContentPG, 500);
-}

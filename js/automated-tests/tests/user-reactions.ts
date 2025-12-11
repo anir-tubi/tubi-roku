@@ -6,7 +6,7 @@ import { shared } from '../test-helpers';
 describe('User Reactions', function () {
   beforeEach(async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/307689
@@ -97,7 +97,10 @@ describe('User Reactions', function () {
 
     // Go to Kids mode
     await testUtils.goToPage('kids');
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToFullyShowOnScreen('tubiKidsLogo', 'Timed out waiting for Kids logo to show', 10000);
+    await utils.sleep(2000); // Wait for the screen to fully load
+    // In Kids mode, use homeScreenRowList instead of videoTitlesRowList
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
 
     //Open left nav
     await openLeftNav();
@@ -148,7 +151,10 @@ describe('User Reactions', function () {
 
     // Select a Title after landing on Home page
     await testUtils.goToPage('home');
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 10000);
+    await utils.sleep(2000); // Wait for the screen to fully load with parental controls
+    // With parental controls, still use homeScreenRowList
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Once on detail screen, Verify that the Reaction buttons are not showing on screen
@@ -163,7 +169,10 @@ describe('User Reactions', function () {
 
     // Select a Title after landing on Home page
     await testUtils.goToPage('home');
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 10000);
+    await utils.sleep(2000); // Wait for the screen to fully load with parental controls
+    // With parental controls, still use homeScreenRowList
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Once on detail screen, Verify that the Reaction buttons are not showing on screen

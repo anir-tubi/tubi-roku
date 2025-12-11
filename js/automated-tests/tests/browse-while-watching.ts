@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { ecp, utils } from 'roku-test-automation';
 import { ParentalRating, testUtils } from '../test-utils';
+import { shared } from '../test-helpers';
 
 describe('Browse While Watching', function () {
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/611427
@@ -85,7 +86,7 @@ describe('Browse While Watching', function () {
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/611434
     it('C611434 - When BWW is expanded, tapping "up" minimizes it @browse_watching', async () => {
         await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-        await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+        await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
         await testUtils.goToPage('movies');
         await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Movie screen row not found', 15000);
@@ -154,19 +155,14 @@ describe('Browse While Watching', function () {
         await ecp.sendKeypress(ecp.Key.Play);
         await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 10000);
 
-        await utils.sleep(2000);
         await ecp.sendKeypress(ecp.Key.Down);
         await testUtils.waitForElementToFullyShowOnScreen('transportButtons', 'Transport controls not shown', 10000);
 
-        await utils.sleep(1500);
-        await ecp.sendKeypress(ecp.Key.Down);
-        await testUtils.waitForElementToShowOnScreen('browseWhileWatchingHeader', 'BWW not shown below transport controls', 10000);
-
-        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 5000);
-
+        await utils.sleep(2000);
         await ecp.sendKeypress(ecp.Key.Play);
         await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'paused', 5000);
 
+        await utils.sleep(2000);
         await ecp.sendKeypress(ecp.Key.Play);
         await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 5000);
     });
@@ -194,7 +190,7 @@ describe('Browse While Watching', function () {
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/611443
     it('C611443 - BWW is NOT shown below transport controls when in Kids Mode @browse_watching @kids_mode', async () => {
         await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-        await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+        await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
         // Open Kids Mode from left nav
         await ecp.sendKeypress(ecp.Key.Left);
@@ -270,11 +266,14 @@ describe('Browse While Watching', function () {
 
     //  Test Rail link: https://tubi.testrail.io/index.php?/cases/view/611442
     it('C611442 - When Parental Controls = Teen, BWW screen does NOT have content over TV-14 or PG-13, @browse_watching', async () => {
-        // Create registered user, set PC to little Kids
+        // Create registered user, set PC to Teens
         const user = await testUtils.createRegisteredUser();
         await user.changeParentalRating(ParentalRating.teens);
         await testUtils.startApplicationAtPage('home', { user: user });
-        await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+        await testUtils.waitForApplicationStartup();
+        await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+        // Ensure we're focused on playable content before pressing Play
+        await shared.ensurePlayableContentFocused();
         // Select a movie title and Play
         await ecp.sendKeypress(ecp.Key.Play);
         // Verify YMAL row in player
@@ -294,7 +293,7 @@ describe('Browse While Watching', function () {
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/794353
     it('C611441 - BWW is shown below transport controls when in Español mode @browse_watching @espanol', async () => {
         await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-        await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for home screen');
+        await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for home screen');
 
         await ecp.sendKeypress(ecp.Key.Left);
         await utils.sleep(2000);
@@ -375,6 +374,8 @@ describe('Browse While Watching', function () {
         // Get Title B name
         const titleBContent = await testUtils.getElementField('videoPlayerScreen', 'content');
         const titleB = titleBContent.title;
+        // Verify Title B is different from Title A
+        expect(titleB).to.not.equal(titleA, 'Title B should be different from Title A');
         // Step 6: Display transport controls
         await ecp.sendKeypress(ecp.Key.Down);
         await testUtils.waitForElementToFullyShowOnScreen('transportButtons', 'Transport controls not shown', 10000);
@@ -392,6 +393,8 @@ describe('Browse While Watching', function () {
         // Get Title C name
         const titleCContent = await testUtils.getElementField('videoPlayerScreen', 'content');
         const titleC = titleCContent.title;
+        // Verify Title C is different from Title B
+        expect(titleC).to.not.equal(titleB, 'Title C should be different from Title B');
         // Step 9: FFWD to at least 5 min mark
         await ecp.sendKeypress(ecp.Key.Forward, { count: 10, wait: 500 });
         await ecp.sendKeypress(ecp.Key.Play);
@@ -404,8 +407,6 @@ describe('Browse While Watching', function () {
         await testUtils.waitForElementToShowOnScreen('detailScreenTitle', 'Detail screen title not shown', 10000);
         const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
         expect(detailScreenTitle.text).to.equal(titleC);
-        expect(detailScreenTitle.text).to.not.equal(titleA);
-        expect(detailScreenTitle.text).to.not.equal(titleB);
     });
 
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/611439

@@ -28,7 +28,7 @@ exports.mochaHooks = {
         await ecp.sendLaunchChannel();
       }
     } else {
-      if (device.deployed){
+      if (device.deployed) {
         isFirstRunForDevice = false;
         // If we have already deployed do nothing
       } else if (fs.existsSync(device.getOutputZipFilePath({}))) {
@@ -70,7 +70,7 @@ exports.mochaHooks = {
       try {
         const screenshot = await device.getTestScreenshot(this, baseScreenshotPath, '_' + Date.now().toString());
         test.err['screenshotPath'] = screenshot.path;
-      } catch(e) {}
+      } catch (e) { }
       test.err['telnetLog'] = await device.getTelnetLog();
     }
   },

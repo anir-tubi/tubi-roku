@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { ecp, odc, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
 import { shared } from '../test-helpers';
+import type { ElementOrElementId } from '../../../automated-tests-config/elements';
 
 
 describe('Video Preview', function () {
@@ -13,13 +14,16 @@ describe('Video Preview', function () {
       type: 'movie'
     });
     await testUtils.startApplicationAtPage('home', { user: user });
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
+    // Scroll down to find My List row (it might not be initially visible)
+    await shared.scrollDownToFindRow({ slug: 'queue' });
 
-    // Now find where the My List Row is and jump to it
-    const myListIndex = await testUtils.jumpToRowWithTitle('homeScreenRowList', 'My List');
+    // Now get the index of the My List row
+    const myListIndex = await testUtils.findRowIndexWithSlug('videoTitlesRowList', 'queue');
 
     // Get the video preview url for this content
-    const args = testUtils.getElementKeyPath('homeScreenRowList', {
+    const args = testUtils.getElementKeyPath('videoTitlesRowList', {
       responseMaxChildDepth: 1
     });
 
@@ -49,7 +53,8 @@ describe('Video Preview', function () {
   // https://tubi.testrail.io/index.php?/cases/view/257900
   it('C257900 - Ensure background image of the title transition automatically into a Video Preview clip immediately upon hovering over a Preview @videopreview', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await shared.ensurePlayableContentFocused();
 
     // Verify that video is playing
     await checkForPreview();
@@ -59,7 +64,8 @@ describe('Video Preview', function () {
   // https://tubi.testrail.io/index.php?/cases/view/257901
   it('C257901 - Verify that if the user access details page during Video Preview we continue to show this clip. @videopreview', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await shared.ensurePlayableContentFocused();
 
     // Verify that video is playing
     await checkForPreview();
@@ -82,7 +88,8 @@ describe('Video Preview', function () {
   // https://tubi.testrail.io/index.php?/cases/view/257902
   it('C257902 - Verify when user transitions from Video Preview > Details > HomeGrid the preview continue to play if clip did not end. @videopreview', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await shared.ensurePlayableContentFocused();
 
     // Verify that video is playing
     await checkForPreview();
@@ -95,7 +102,7 @@ describe('Video Preview', function () {
 
     // Back to home screen
     await ecp.sendKeypress(ecp.Key.Back);
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Verify that video is still playing
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 5000);
@@ -105,7 +112,8 @@ describe('Video Preview', function () {
   // https://tubi.testrail.io/index.php?/cases/view/264595
   it('C264595 - Ensure Registered users have access to turn off Video preview feature from settings @videopreview', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await shared.ensurePlayableContentFocused();
 
     //Open left nav
     await ecp.sendKeypress(ecp.Key.Left);
@@ -123,10 +131,7 @@ describe('Video Preview', function () {
     await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
 
     // Verify that video preview is not playing
-    const player = await ecp.getMediaPlayer();
-    expect(player.state).to.not.equal('play');
-    expect(player.state).to.not.equal('pause');
-    expect(player.state).to.not.equal('buffer');
+    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', ['stopped', '', 'none']);
 
 
   });
@@ -134,7 +139,8 @@ describe('Video Preview', function () {
   // https://tubi.testrail.io/index.php?/cases/view/345985
   it('C345985 - When the video preview ends the user should autoplay directly into the movie with prompt. @videopreview', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await shared.ensurePlayableContentFocused();
 
     // Verify that video is playing
     await checkForPreview();
@@ -151,7 +157,8 @@ describe('Video Preview', function () {
   it('C264838 - Access Kids Mode and ensure the behavior of the Video Preview mirrors that of the non-kids mode @videopreview', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await shared.ensurePlayableContentFocused();
 
     // Open Kids Mode
     await openKidsMode();
@@ -162,7 +169,7 @@ describe('Video Preview', function () {
     await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
 
     // Verify that video is playing
-    await checkForPreview();
+    await checkForPreview('homeScreenRowList');
 
     // Let the preview end
     await utils.sleep(90000);
@@ -175,7 +182,7 @@ describe('Video Preview', function () {
   // https://tubi.testrail.io/index.php?/cases/view/275042
   it('C275042 - Roku: Guest Users should be prompted to sign in if they choose to turn off autoplay preview in Settings @videopreview', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open settings
     await ecp.sendKeypress(ecp.Key.Left);
@@ -188,22 +195,18 @@ describe('Video Preview', function () {
     // Turn off video previews
     await ecp.sendKeypress(ecp.Key.Down);
     await ecp.sendKeypress(ecp.Key.Ok);
-    await utils.sleep(2000); // Improvement
+    await utils.sleep(2000);
     await ecp.sendKeypress(ecp.Key.Down);
-    await utils.sleep(2000); // Improvement
+    await utils.sleep(2000);
     await ecp.sendKeypress(ecp.Key.Ok);
-    await utils.sleep(2000); // Improvement
-    // const autoplayPreviewOff = await testUtils.getNodeForElement('autoplayPreviewOff');
-    // expect(autoplayPreviewOff.visible).to.be.true;
-
     // Expect Sign In dialog box
+    await testUtils.waitForElementToFullyShowOnScreen('autoPlaySignInDialogMessage');
     const autoPlaySignInDialogMessage = await testUtils.getNodeForElement('autoPlaySignInDialogMessage');
     expect(autoPlaySignInDialogMessage.visible).to.be.true;
-    const signInButton = await testUtils.getNodeForElement('signInButton');
+
+    await testUtils.waitForElementToShowOnScreen('dialogBoxSignInButton');
+    const signInButton = await testUtils.getNodeForElement('dialogBoxSignInButton');
     expect(signInButton.visible).to.be.true;
-
-
-
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/494418
@@ -214,7 +217,7 @@ describe('Video Preview', function () {
     const movieContent = await user.getContent().ofContentType('movie').retrieve({ limit: 2 });
     await user.addContentToViewHistory(movieContent, 500);
     await testUtils.startApplicationAtPage('home', { user: user });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await shared.openMyStuff();
 
@@ -245,7 +248,8 @@ describe('Video Preview', function () {
   it('C257906 - Ensure when user hovers to the next video preview supported title the preview changes to that new title @videopreview', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await shared.ensurePlayableContentFocused();
 
     // Navigate right to home page focus
     await ecp.sendKeypress(ecp.Key.Right);
@@ -259,9 +263,9 @@ describe('Video Preview', function () {
   it('C676756 - "Autoplay Previews" setting defaults to "on" when user signs out @videopreview', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    await shared.turnOffPreview();
+    await shared.enablePreviewInSettings(false);
 
     // Sign out
     await testUtils.waitForCurrentScreenToEqual('homeScreen');
@@ -275,8 +279,9 @@ describe('Video Preview', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     await testUtils.waitForCurrentScreenToEqual('homeScreen');
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
     await utils.sleep(5000);
+    await shared.ensurePlayableContentFocused();
     // Verify that video is playing
     await checkForPreview();
 
@@ -297,10 +302,14 @@ describe('Video Preview', function () {
     // Start app with Roku's autoplay setting disabled
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true, isAutoplayEnabled: false });
 
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Verify that video is playing
-    await focusOnVideoTileWithPreviewUrl();
+    // Verify that video preview is not playing (autoplay is disabled)
+    const position = await shared.findContentPositionInRowListThatContainsVideoPreview('videoTitlesRowList', true, 5);
+    if (position.length > 0) {
+      await shared.jumpToRowListPosition('videoTitlesRowList', position[0], position[1]);
+      await utils.sleep(1000);
+    }
 
     const previewVideoPlayer = await testUtils.getNodeForElement('previewVideoPlayer');
     expect(previewVideoPlayer.state).to.not.be.oneOf(['playing', 'buffering'])
@@ -322,19 +331,12 @@ async function openKidsMode() {
   expect(exitKidsOption.visible).to.be.true;
 }
 
-async function checkForPreview() {
-  await focusOnVideoTileWithPreviewUrl()
-
-  await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 5000);
-}
-
-async function focusOnVideoTileWithPreviewUrl() {
-  const rowIndex = 0;
-  const content = await testUtils.getRowListRowItemsContent('homeScreenRowList', 0);
-  for (const [itemIndex, item] of content.entries()) {
-    if (item.video_preview_url !== '') {
-      await testUtils.jumpToRowItem('homeScreenRowList', [rowIndex, itemIndex]);
-      break;
-    }
+async function checkForPreview(listElement: ElementOrElementId = 'videoTitlesRowList') {
+  const position = await shared.findContentPositionInRowListThatContainsVideoPreview(listElement, true, 5);
+  if (position.length === 0) {
+    throw new Error(`Could not find content with video preview in ${listElement}`);
   }
+  await shared.jumpToRowListPosition(listElement, position[0], position[1]);
+  await utils.sleep(1000);
+  await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 5000);
 }

@@ -82,6 +82,12 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#RowList',
   },
 
+  /** Component on the redesigned Home Screen (FeaturedRowList) */
+  videoTitlesRowList: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentAreaParent.#ContentArea.#CategoryGridList.#FeaturedRowList',
+  },
+
   /** Component on the Movie Screen that we can pull content for the Grid from */
   /** movieScreenRowList (auto-updated) */
   /** movieScreenRowList (auto-updated) */
@@ -1260,7 +1266,7 @@ const elements = typeCheckElements({
   /** dialog box sign in button */
   dialogBoxSignInButton: {
     keyPath:
-      '#ContentController.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText',
+      '#ContentController.#DialogBox.#ButtonList.0.#buttonTextParent.#buttonText',
   },
 
   /** Sign in screen password box */
@@ -1328,6 +1334,11 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.3.#Offset.#ContentGroup',
   },
 
+  /** Parental Controls Menu MarkupList */
+  parentalControlsMenu: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#ParentalControlsMenu',
+  },
+
   /** PC Dialog Settings Change box */
   parentalControlsChangeDialog: {
     keyPath: '#ContentController.#DialogBox.#ContentArea',
@@ -1365,9 +1376,10 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#LinearVideoPlayerSpinner.#PosterOrMessage.#SpinnerPoster',
   },
 
+  // Live/On Now badge on video tile (linear content)
   liveBadgeText: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#RowList.6.items.0.1.#badgeGroup.0.#BadgeInfoLayout',
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#videoTileOverlayGroup.#inlineVideoMetadataOverlay.#posterOverlay.#sotTopLabelGroup.0',
   },
 
   /** Preview off button */
@@ -1385,7 +1397,7 @@ const elements = typeCheckElements({
   /** Sign in Button */
   signInButton: {
     keyPath:
-      '#ContentController.#DialogBox.#ContentArea.#ButtonList.0',
+      '#ContentController.#DialogBox.#ButtonList.0',
   },
 
   /** TV Shows Series text */
@@ -2261,6 +2273,12 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#searchScreen.#PageGroup.#rightSide.#rightSideTextGroup.#searchDirectionsGroup.#searchMenuText',
   },
 
+  /** Search hint text showing number of titles found (e.g., "193 titles found") */
+  searchHintText: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#searchHintText',
+  },
+
   /** side nav element component */
   sideNavComponent: {
     keyPath:
@@ -2436,13 +2454,13 @@ const elements = typeCheckElements({
   /** button in Espanol Disabled dialog box */
   espanolDisabledButton: {
     keyPath:
-      '#ContentController.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText',
+      '#ContentController.#DialogBox.#ButtonList.0.#buttonTextParent.#buttonText',
   },
 
   /** button in Espanol Disabled dialog box for Teens */
   espanolDisabledButtonTeens: {
     keyPath:
-      '#ContentController.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText',
+      '#ContentController.#DialogBox.#ButtonList.0.#buttonTextParent.#buttonText',
   },
 
   /** tubi espanol logo */
@@ -2472,7 +2490,7 @@ const elements = typeCheckElements({
   /** Exit Button Text */
   exitDialogButtonText: {
     keyPath:
-      '#ContentController.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText',
+      '#ContentController.#DialogBox.#ButtonList.0.#buttonTextParent.#buttonText',
   },
 
   /** CC Menu */
@@ -2669,7 +2687,7 @@ const elements = typeCheckElements({
 
   // Sign up button on the exit prompt of Sign up to Save Progress
   signUpExitDialogSignUpButton: {
-    keyPath: '#ContentController.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText'
+    keyPath: '#ContentController.#DialogBox.#ButtonList.0.#buttonTextParent.#buttonText'
   },
 
   // Accept Now button
@@ -2679,7 +2697,7 @@ const elements = typeCheckElements({
 
   // Sign up later button on the exit prompt of Sign up to Save Progress
   signUpExitDialogLaterButton: {
-    keyPath: '#ContentController.#DialogBox.#ContentArea.#ButtonList.1.#buttonTextParent.#buttonText'
+    keyPath: '#ContentController.#DialogBox.#ButtonList.1.#buttonTextParent.#buttonText'
   },
 
   // Oops wrong password dialog
@@ -2699,12 +2717,12 @@ const elements = typeCheckElements({
 
   // Oops wrong password dialog Forgot Password button
   wrongPasswordForgotButton: {
-    keyPath: '#ContentController.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText'
+    keyPath: '#ContentController.#DialogBox.#ButtonList.0.#buttonTextParent.#buttonText'
   },
 
   // Oops wrong password dialog Retry button
   wrongPasswordRetryButton: {
-    keyPath: '#ContentController.#DialogBox.#ContentArea.#ButtonList.1.#buttonTextParent.#buttonText'
+    keyPath: '#ContentController.#DialogBox.#ButtonList.1.#buttonTextParent.#buttonText'
   },
 
   // title of Help is on the way! screen after user select Forgot Password
@@ -2729,7 +2747,7 @@ const elements = typeCheckElements({
 
   // OK Button on the Welcome To Tubi Kids Dialog
   welcomeToTubiKidsOKButton: {
-    keyPath: '#ContentController.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonTextFocused'
+    keyPath: '#ContentController.#DialogBox.#ButtonList.0.#buttonTextParent.#buttonTextFocused'
   },
 
   // Loading Progress Bar
@@ -2900,6 +2918,109 @@ const elements = typeCheckElements({
 
   dislikeButtonLabelGroup: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#vodDetailScreen.#actionButtonList.#dislike.#elementsGroup.#titleGroup.#labelGroup',
+  },
+
+  /** Video Grid Metadata Elements (NEW DESIGN - shown below focused tile in inlineVideoPreviewPlayerContainer) */
+
+  /** videoGridChannelLogo - Channel logo shown in video grid metadata */
+  videoGridChannelLogo: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#videoTileOverlayGroup.#inlineVideoPreviewPlayerContainer.#inlineVideoMetadataOverlay.#videoGridMetadataGroup.#videoGridMetadata.#metadataGroup.#firstLineGroup.#channelLogo',
+  },
+
+  /** videoGridRatingLabel - Rating label shown in video grid metadata */
+  videoGridRatingLabel: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#videoTileOverlayGroup.#inlineVideoPreviewPlayerContainer.#inlineVideoMetadataOverlay.#videoGridMetadataGroup.#videoGridMetadata.#metadataGroup.#firstLineGroup.#Rating.#RatingLabel',
+  },
+
+  /** videoGridProgressBar - Progress bar shown in video grid metadata for CW content */
+  videoGridProgressBar: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#videoTileOverlayGroup.#inlineVideoPreviewPlayerContainer.#inlineVideoMetadataOverlay.#videoGridMetadataGroup.#videoGridMetadata.#metadataGroup.#firstLineGroup.#progressBarGroup.#progressBar',
+  },
+
+  /** videoGridDescription - Description text shown in video grid metadata */
+  videoGridDescription: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#videoTileOverlayGroup.#inlineVideoPreviewPlayerContainer.#inlineVideoMetadataOverlay.#videoGridMetadataGroup.#videoGridMetadata.#metadataGroup.#description',
+  },
+
+  /** videoGridMetadataGroup - Parent group containing all video grid metadata */
+  videoGridMetadataGroup: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#videoTileOverlayGroup.#inlineVideoPreviewPlayerContainer.#inlineVideoMetadataOverlay.#videoGridMetadataGroup',
+  },
+
+  /** videoGridSubHeadlinePrefixGroup - Contains year and duration labels in metadata */
+  videoGridSubHeadlinePrefixGroup: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#videoTileOverlayGroup.#inlineVideoPreviewPlayerContainer.#inlineVideoMetadataOverlay.#videoGridMetadataGroup.#videoGridMetadata.#metadataGroup.#firstLineGroup.#subHeadlinePrefixGroup',
+  },
+
+  /** videoGridSubHeadlineSuffixGroup - Contains time left label in metadata */
+  videoGridSubHeadlineSuffixGroup: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#videoTileOverlayGroup.#inlineVideoPreviewPlayerContainer.#inlineVideoMetadataOverlay.#videoGridMetadataGroup.#videoGridMetadata.#metadataGroup.#firstLineGroup.#subHeadlineSuffixGroup',
+  },
+
+  /** posterOverlayTitle - Title label displayed on top of the video tile poster */
+  posterOverlayTitle: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#videoTileOverlayGroup.#inlineVideoPreviewPlayerContainer.#inlineVideoMetadataOverlay.#posterOverlay.#bottomContentGroup.#overlayTitleRow.#titleGroup.#title',
+  },
+
+  /** featuredPoster - Poster element inside inlineVideoPreviewPlayerContainer (shown in Featured row when video preview is disabled) */
+  featuredPoster: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#videoTileOverlayGroup.#inlineVideoPreviewPlayerContainer.#inlineVideoMetadataOverlay.#videoGridMetadataGroup.#posterGroup.#poster',
+  },
+
+  /** videoTileOverlayGroup - Parent group containing the inline video preview player container */
+  videoTileOverlayGroup: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#videoTileOverlayGroup',
+  },
+
+  /** inlineVideoPreviewPlayerContainer - Container for the inline video preview player (should have opacity 0 in kids mode) */
+  inlineVideoPreviewPlayerContainer: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#videoTileOverlayGroup.#inlineVideoPreviewPlayerContainer',
+  },
+
+  /** inlineVideoTilesPreviewPlayer - Video preview player inside inlineVideoPreviewPlayerContainer for home grid video tiles */
+  inlineVideoTilesPreviewPlayer: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#videoTileOverlayGroup.#inlineVideoPreviewPlayerContainer.#videoPreviewPlayer',
+    xpath: '//RenderableNode[@name="inlineVideoPreviewPlayerContainer"]//VideoPreviewPlayer[@name="videoPreviewPlayer"]',
+  },
+
+  /** guestUserCWTileTitle - Title label in guest user Continue Watching tile: "Sign Up to Save Your Progress"
+   * Note: Row index is dynamic. Use testUtils.getNodeWithDynamicPath() with runtime-determined row index.
+   * Template: #ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.{rowIndex}.items.0.#contentSection.#title
+   * @example
+   * const rowIndex = await testUtils.findRowIndexWithTitle('videoTitlesRowList', 'Continue Watching');
+   * const element = { keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.${rowIndex}.items.0.#contentSection.#title`, xpath: '//GuestUserContinueWatchingTile//Label[@name="title"]' };
+   * const titleNode = await testUtils.getNodeWithDynamicPath(element);
+   */
+  guestUserCWTileTitle: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList',
+    xpath: '//GuestUserContinueWatchingTile//Label[@name="title"]',
+  },
+
+  /** guestUserCWTileDescription - Description label in guest user Continue Watching tile
+   * Note: Row index is dynamic. Use testUtils.getNodeWithDynamicPath() with runtime-determined row index.
+   * Template: #ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.{rowIndex}.items.0.#contentSection.#description
+   */
+  guestUserCWTileDescription: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList',
+    xpath: '//GuestUserContinueWatchingTile//Label[@name="description"]',
+  },
+
+  /** guestUserCWTileButton - Sign up button in guest user Continue Watching tile
+   * Note: Row index is dynamic. Use testUtils.getNodeWithDynamicPath() with runtime-determined row index.
+   * Template: #ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.{rowIndex}.items.0.#contentSection.#signUpButton
+   */
+  guestUserCWTileButton: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList',
+    xpath: '//GuestUserContinueWatchingTile//SimpleButton[@name="signUpButton"]',
+  },
+
+  /** guestUserCWTileButtonLabel - Sign up button label text
+   * Note: Row index is dynamic. Use testUtils.getNodeWithDynamicPath() with runtime-determined row index.
+   * Template: #ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.{rowIndex}.items.0.#contentSection.#signUpButton.#label
+   */
+  guestUserCWTileButtonLabel: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList',
+    xpath: '//GuestUserContinueWatchingTile//SimpleButton[@name="signUpButton"]//Label[@name="label"]',
   },
 
 });

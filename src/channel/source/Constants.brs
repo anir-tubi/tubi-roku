@@ -354,7 +354,6 @@ Function getConstants()
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getHomescreen] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getMiniHomescreen] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getCategoriesListScreen] = true
-  constants.reqNames.acceptsTubiAuth[constants.reqNames.getHomescreenAds] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getCategoryDetailsScreen] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getSearchDefault] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getCategory] = true

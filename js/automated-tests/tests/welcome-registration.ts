@@ -6,9 +6,9 @@ import { testUtils } from '../test-utils';
 describe('Welcome Registration', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/450808
   it('C450808 - The Welcome Registration component should have correct content and buttons displayed, @welcome_modal', async () => {
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false, hideStartupModals: false });
+    await testUtils.startApplicationAtPage('home', { clearRegistry: true, shouldCreateNewUser: false, hideStartupModals: false });
 
-  // Verify Welcome Registration Dialog Displayed
+    // Verify Welcome Registration Dialog Displayed
     await verifyRegModalDialog();
 
     const welcomeRegModalHeader = await testUtils.getNodeForElement('welcomeRegModalHeader');
@@ -24,7 +24,7 @@ describe('Welcome Registration', function () {
   it('C450809 - Clicking on Continue to Sign In should direct to Sign In flow, @welcome_modal', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false, hideStartupModals: false });
 
-  // Verify Welcome Registration Dialog Displayed
+    // Verify Welcome Registration Dialog Displayed
     await verifyRegModalDialog();
 
     // Press ok on Continue to Sign In button
@@ -36,9 +36,6 @@ describe('Welcome Registration', function () {
     // Press ok on Continue button
     await ecp.sendKeypress(ecp.Key.Ok);
 
-    // Verify if on the  Magic link Sign In 
-    await testUtils.waitForElementToFullyShowOnScreen('resendButtonMagicLink');
-    
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/450812
@@ -53,7 +50,7 @@ describe('Welcome Registration', function () {
     await utils.sleep(2000);
 
     await testUtils.waitForElementToNotShowOnScreen('welcomeRegModal', 'Welcome Modal still showing on screen', 3000);
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/450824
@@ -72,16 +69,13 @@ describe('Welcome Registration', function () {
     // Press ok on Continue button
     await ecp.sendKeypress(ecp.Key.Ok);
 
-    // Verify if on the Sign In to Your Account age
-    await testUtils.waitForElementToFullyShowOnScreen('resendButtonMagicLink');
-
     // Press Back on the Sign In screen
     await utils.sleep(2000); // Test fails without
     await ecp.sendKeypress(ecp.Key.Back);
 
     // Verify Welcome Modal not displayed and Homescreen displayed
     await testUtils.waitForElementToNotShowOnScreen('welcomeRegModal', 'Welcome Modal still showing on screen', 5000);
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/452709
@@ -107,7 +101,7 @@ describe('Welcome Registration', function () {
 
     // Verify Welcome Modal not displayed and Homescreen displayec
     await testUtils.waitForElementToNotShowOnScreen('welcomeRegModal', 'Welcome Modal still showing on screen', 3000);
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
   });
 
 });

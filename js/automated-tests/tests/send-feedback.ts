@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { ecp, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
+import { shared } from '../test-helpers';
 
 describe(' Send Feedback Captions Checks', function () {
 
@@ -8,7 +9,7 @@ describe(' Send Feedback Captions Checks', function () {
   it('574103 Guest user shows the feedback icon on movie player, @send_feedback', async () => {
     // Start app with Guest user
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Select a movie title and Play
     await selectMovieTitle();
@@ -38,7 +39,7 @@ describe(' Send Feedback Captions Checks', function () {
   it('574104 Guest user shows the feedback icon on series player, @send_feedback', async () => {
     // Start app with Guest user
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Select a series title and Play
     await selectSeriesTitle();
@@ -68,7 +69,7 @@ describe(' Send Feedback Captions Checks', function () {
   it('574105 Registered user shows the feedback icon on movie player, @send_feedback', async () => {
     // Start app with Registered user
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Select a movie title and Play
     await selectMovieTitle();
@@ -98,7 +99,7 @@ describe(' Send Feedback Captions Checks', function () {
   it('574106 Registered user shows the feedback icon on series player, @send_feedback', async () => {
     // Start app with Registered user
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Select a series title and Play
     await selectSeriesTitle();
@@ -128,7 +129,10 @@ describe(' Send Feedback Captions Checks', function () {
   it('574107 User clicks on the send feedback icon and menu show up, @send_feedback', async () => {
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Ensure we're focused on playable content before pressing Play
+    await shared.ensurePlayableContentFocused();
 
     // Press play to start video, then check if it is playing
     await ecp.sendKeypress(ecp.Key.Play);
@@ -153,7 +157,10 @@ describe(' Send Feedback Captions Checks', function () {
   it('574108 User could scroll down/up on the side menu to browse options of user feedback, @send_feedback', async () => {
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Ensure we're focused on playable content before pressing Play
+    await shared.ensurePlayableContentFocused();
 
     // Press play to start video, then check if it is playing
     await ecp.sendKeypress(ecp.Key.Play);
@@ -181,7 +188,10 @@ describe(' Send Feedback Captions Checks', function () {
   it('574109 User could choose one item and see the confirm page, @send_feedback', async () => {
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Ensure we're focused on playable content before pressing Play
+    await shared.ensurePlayableContentFocused();
 
     // Press play to start video, then check if it is playing
     await ecp.sendKeypress(ecp.Key.Play);
@@ -219,7 +229,10 @@ describe(' Send Feedback Captions Checks', function () {
   it('574110 User could close the send feedback side menu be pressing back button, @send_feedback', async () => {
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Ensure we're focused on playable content before pressing Play
+    await shared.ensurePlayableContentFocused();
 
     // Press play to start video, then check if it is playing
     await ecp.sendKeypress(ecp.Key.Play);
@@ -252,7 +265,10 @@ describe(' Send Feedback Captions Checks', function () {
   it('574111 User could back to send feedback side menu from confirm page by pressing back button, @send_feedback', async () => {
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Ensure we're focused on playable content before pressing Play
+    await shared.ensurePlayableContentFocused();
 
     // Press play to start video, then check if it is playing
     await ecp.sendKeypress(ecp.Key.Play);
@@ -300,7 +316,10 @@ describe(' Send Feedback Captions Checks', function () {
   it('574113 User could submit the issue automatically aftering clicking one item from the panel, @send_feedback', async () => {
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Ensure we're focused on playable content before pressing Play
+    await shared.ensurePlayableContentFocused();
 
     // Press play to start video, then check if it is playing
     await ecp.sendKeypress(ecp.Key.Play);
@@ -360,7 +379,10 @@ describe(' Send Feedback Captions Checks', function () {
 
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Ensure we're focused on playable content before pressing Play
+    await shared.ensurePlayableContentFocused();
 
     // Press play to start video, then check if it is playing
     await ecp.sendKeypress(ecp.Key.Play);
@@ -406,7 +428,10 @@ describe(' Send Feedback Captions Checks', function () {
 
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Ensure we're focused on playable content before pressing Play
+    await shared.ensurePlayableContentFocused();
 
     // Press play to start video, then check if it is playing
     await ecp.sendKeypress(ecp.Key.Play);
@@ -435,7 +460,10 @@ describe(' Send Feedback Captions Checks', function () {
   it('574116 User could NOT submit feedback during pre-roll ads playback, @send_feedback', async () => {
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Ensure we're focused on playable content before pressing Play
+    await shared.ensurePlayableContentFocused();
 
     // Press play to start video, then check if it is playing
     await ecp.sendKeypress(ecp.Key.Play);
@@ -465,7 +493,10 @@ describe(' Send Feedback Captions Checks', function () {
   it('574117 User could NOT submit feedback during mid-roll ads playback, @send_feedback', async () => {
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Ensure we're focused on playable content before pressing Play
+    await shared.ensurePlayableContentFocused();
 
     // Press play to start video, then check if it is playing
     await ecp.sendKeypress(ecp.Key.Play);
@@ -510,7 +541,7 @@ describe(' Send Feedback Captions Checks', function () {
   it('574118 The feedback icon should be hidden in kids mode, @send_feedback', async () => {
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
     await utils.sleep(800);
 
     await openKidsMode();
@@ -559,7 +590,7 @@ describe(' Send Feedback Captions Checks', function () {
 
     // Back to home
     await testUtils.goToPage('home');
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Navigate right to home page focus
     await ecp.sendKeypress(ecp.Key.Right, { wait: 1500 });
@@ -584,7 +615,10 @@ describe(' Send Feedback Captions Checks', function () {
   it('749378 When "Close" button is in focus, press a navigational button, @send_feedback', async () => {
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Ensure we're focused on playable content before pressing Play
+    await shared.ensurePlayableContentFocused();
 
     // Press play to start video, then check if it is playing
     await ecp.sendKeypress(ecp.Key.Play);
@@ -647,7 +681,10 @@ describe(' Send Feedback Captions Checks', function () {
   it('749379 When user selects an issue, the Thank You/QR Code page is shown, @send_feedback', async () => {
     // Start app
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Ensure we're focused on playable content before pressing Play
+    await shared.ensurePlayableContentFocused();
 
     // Press play to start video, then check if it is playing
     await ecp.sendKeypress(ecp.Key.Play);

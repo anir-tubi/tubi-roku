@@ -9,7 +9,6 @@ Function Main(startupArgs)
   ' and only exist in the main brightscript thread.
   ' constants will be reset in remote components for scene graph
   constants = getConstants()
-  constants = addConstantsFromStartupArgs(startupArgs, constants)
 
   port = CreateObject("roMessagePort")
   m.queue = TubiRequestQueue().create(port)
@@ -271,36 +270,6 @@ Function handleRegistryOperations(startupArgs)
 End Function
 
 
-Function addConstantsFromStartupArgs(startupArgs, constants)
-  isDev = createObject("roAppInfo").IsDev()
-  if isDev = false OR startupArgs.constantsUpdates = invalid then
-    return constants
-  end if
-
-  constantsUpdates = ParseJson(startupArgs.constantsUpdates)
-  if constantsUpdates = invalid then
-    constantsUpdates = {}
-  end if
-
-  for each keyPath in constantsUpdates
-    currentLevel = constants
-    keyPathParts = keyPath.tokenize(".")
-    finalKeyPathPart = keyPathParts.pop()
-    value = constantsUpdates[keyPath]
-    for each keyPathPart in keyPathParts
-      nextLevel = currentLevel[keyPathPart]
-      ' If the next level does not exist then we need to add it
-      if nextLevel = invalid then
-        nextLevel = {}
-        currentLevel[keyPathPart] = nextLevel
-      end if
-      currentLevel = nextLevel
-    end for
-    currentLevel[finalKeyPathPart] = value
-  end for
-
-  return constants
-End Function
 ' Makes a request to update or delete roku continue watching info.
 '
 ' @tubiRequest: assocArray, an instance of the request module as returned by TubiRequest()

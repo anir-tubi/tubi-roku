@@ -40,8 +40,8 @@ describe.skip('Example Tests', function () {
       clearRegistry: false
     });
     await utils.promiseTimeout(proxyPromise, 5000);
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
-    const content = await testUtils.getAllRowListItemsContentGroupedByRow('homeScreenRowList');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    const content = await testUtils.getAllRowListItemsContentGroupedByRow('videoTitlesRowList');
     expect(content).to.have.lengthOf(2);
   });
 

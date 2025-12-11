@@ -35,7 +35,7 @@ describe('Details Page', function () {
       await utils.sleep(1000);
       await ecp.sendKeypress(ecp.Key.Down);
       await utils.sleep(1000);
-      await shared.navigateToSeriesInContainer();
+      await shared.navigateToSeriesInContainer('tvScreenRowList');
       await utils.sleep(1000);
       await ecp.sendKeypress(ecp.Key.Ok);
       await testUtils.waitForCurrentScreenToEqual('detailScreen');

@@ -11,7 +11,8 @@ describe('Playback', function () {
 
   it('C537377 537380 - Pause Playback @playback_1,@registered_user', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await shared.ensurePlayableContentFocused();
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
     await ecp.sendKeypress(ecp.Key.Play);
@@ -25,11 +26,12 @@ describe('Playback', function () {
     await testUtils.startApplicationAtPage('home');
 
     // Are we on the home page?
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await shared.ensurePlayableContentFocused();
 
     // Press play to start video, then check if it is playing
     await ecp.sendKeypress(ecp.Key.Play);
-    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing' );
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
     // Press OK twice to activate player controls
     await utils.sleep(5000);
@@ -53,11 +55,12 @@ describe('Playback', function () {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
 
     // Are we on the home page?
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await shared.ensurePlayableContentFocused();
 
     // Press play to start video, then check if it is playing
     await ecp.sendKeypress(ecp.Key.Play);
-    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing');
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
     // Press OK  to activate player controls
     await ecp.sendKeypress(ecp.Key.Play);
@@ -87,7 +90,8 @@ describe('Playback', function () {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
 
     // Are we on the home page?
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await shared.ensurePlayableContentFocused();
 
     //Play title, pause to open player, move right to FF button and press, verify state
     await ecp.sendKeypress(ecp.Key.Play);
@@ -114,8 +118,9 @@ describe('Playback', function () {
   it('C535815 - Fast Forward 2x @playback_1,@registered_user', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
 
-   // Are we on the home page?
-   await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    // Are we on the home page?
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await shared.ensurePlayableContentFocused();
 
     //Play title, pause to open player, move right to FF button and press, verify state
     await ecp.sendKeypress(ecp.Key.Play);
@@ -142,7 +147,8 @@ describe('Playback', function () {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
 
     // Are we on the home page?
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await shared.ensurePlayableContentFocused();
 
     //Play title, pause to open player, move right to FF button and press, verify state
     await ecp.sendKeypress(ecp.Key.Play);
@@ -170,7 +176,8 @@ describe('Playback', function () {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
 
     // Are we on the home page?
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await shared.ensurePlayableContentFocused();
 
     //Play title, pause to open player, move right to FF button and press, verify state
     await ecp.sendKeypress(ecp.Key.Play);
@@ -197,13 +204,14 @@ describe('Playback', function () {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
 
     // Are we on the home page?
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await shared.ensurePlayableContentFocused();
 
     //Play title, pause to open player, move right to FF button and press, verify state
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
     await ecp.sendKeypress(ecp.Key.Play);
-    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','paused');
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'paused');
     await ecp.sendKeypress(ecp.Key.Right, { count: 2 });
 
     // FF button highlighted
@@ -219,7 +227,7 @@ describe('Playback', function () {
     // Back out of the video player to land on Details page after FF
     await utils.sleep(3000);
     await ecp.sendKeypress(ecp.Key.Back);
-    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing');
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
     const videoPlayerScreenTopOverlay = await testUtils.getNodeForElement('videoPlayerScreenTopOverlay');
     if (videoPlayerScreenTopOverlay.opacity == 1) {
       await ecp.sendKeypress(ecp.Key.Back);
@@ -262,8 +270,6 @@ describe('Playback', function () {
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'paused');
 
-
-
     // verify resume when user goes back to series screen and selects/plays title again
     await verifyResumeWithinRangeWhenBackToScreenEpisodes();
 
@@ -277,13 +283,14 @@ describe('Playback', function () {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
 
     // Are we on the home page?
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await shared.ensurePlayableContentFocused();
 
     //Play title, pause to open player, move right to FF button and press, verify state
     await ecp.sendKeypress(ecp.Key.Play);
-    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing');
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
     await ecp.sendKeypress(ecp.Key.Play);
-    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','paused');
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'paused');
     await ecp.sendKeypress(ecp.Key.Left, { count: 2 });
 
     // Rewind button highlighted
@@ -303,7 +310,8 @@ describe('Playback', function () {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
 
     // Are we on the home page?
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await shared.ensurePlayableContentFocused();
 
     //Play title, pause to open player, move leff to Rewind button and press, verify state
     await ecp.sendKeypress(ecp.Key.Play);
@@ -328,7 +336,8 @@ describe('Playback', function () {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
 
     // Are we on the home page?
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await shared.ensurePlayableContentFocused();
 
     //Play title, pause to open player, move right to FF button and press, verify state
     await ecp.sendKeypress(ecp.Key.Play);
@@ -354,7 +363,8 @@ describe('Playback', function () {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
 
     // Are we on the home page?
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await shared.ensurePlayableContentFocused();
 
     //Play title, pause to open player, move left to rewind button and press, verify state
     await ecp.sendKeypress(ecp.Key.Play);
@@ -382,7 +392,7 @@ describe('Playback', function () {
     await ecp.sendText('zapped');
 
     // Call function to navigate right to search results grid
-    await shared.navigateRightToGrid();
+    await shared.navigateRightToSearchGrid();
 
     // Initiate playback
     await ecp.sendKeypress(ecp.Key.Play);
@@ -413,8 +423,8 @@ async function seekWithinRange(startposition) {
 
 async function verifyResumeWithinRangeWhenBackToScreen() {
   await ecp.sendKeypress(ecp.Key.Play);// PLay to create history
-  await createHistory(); // Create history function
-  await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
+  await shared.createHistoryWithForward(); // Create history function
+  await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 15000);
   const currentPosition = await testUtils.getPlayerPosition();
   await utils.sleep(2000);
   const videoPlayerScreenTopOverlay = await testUtils.getNodeForElement('videoPlayerScreenTopOverlay');
@@ -434,7 +444,7 @@ async function verifyResumeWithinRangeWhenBackToScreen() {
 
   // Select Resume and check for playback
   await testUtils.selectAndVerifyDetailPageMenuItem('resume', 5000);
-  await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
+  await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 15000);
 
   // Find resume position
   const resumePosition = await testUtils.getPlayerPosition();
@@ -451,7 +461,7 @@ async function verifyResumeWithinRangeWhenBackToScreen() {
 async function verifyResumeWithinRangeWhenBackToScreenEpisodes() {
   await ecp.sendKeypress(ecp.Key.Play);// PLay to create history
   await shared.createHistory(); // Create history function
-  await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
+  await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 15000);
   const currentposition = await testUtils.getPlayerPosition();
   console.log('current', currentposition);
   await ecp.sendKeypress(ecp.Key.Back);
@@ -473,7 +483,7 @@ async function verifyResumeWithinRangeWhenBackToScreenEpisodes() {
 
   // Select Resume and check for playback
   await testUtils.selectAndVerifyDetailPageMenuItem('resume');
-  await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
+  await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 15000);
 
   // Find resume position
   const resumeposition = await testUtils.getPlayerPosition();
@@ -489,10 +499,3 @@ async function verifyResumeWithinRangeWhenBackToScreenEpisodes() {
 
 }
 
-   // Create history function
-   async function createHistory() {
-      await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 15000);
-      await ecp.sendKeypress(ecp.Key.Forward, { count: 3 });
-      await utils.sleep(3000);
-      await ecp.sendKeypress(ecp.Key.Play);
-}

@@ -14,15 +14,13 @@ describe('Homescreen Navigation - TV Shows Filter', function () {
     await user.addContentToViewHistory(movieContent, 500);
     await user.addContentToWatchList(movieContent);
     await testUtils.startApplicationAtPage('home', { user: user });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus', 15000);
     await shared.openSeries();
     await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
   });
 
-  //https://tubi.testrail.io/index.php?/cases/view/63513
+  // https://tubi.testrail.io/index.php?/cases/view/63513
   it('C63513 - TV Shows Filter - When tv show filter is triggered then only Series Titles are present, @homescreen, @tvshows', async () => {
-
-
     await testUtils.waitForApplicationStartup();
 
     // Check if Featured row contains all Series titles
@@ -35,17 +33,13 @@ describe('Homescreen Navigation - TV Shows Filter', function () {
 
   // https://tubi.testrail.io/index.php?/cases/view/76733
   it('C76733 - TV Shows Filter - When history category displayed then all titles are series, @homescreen, @tvshows', async () => {
-
     await testUtils.waitForApplicationStartup();
 
     // Scroll down to Continue Watching
-    await testUtils.jumpToRowWithTitle('tvScreenRowList', 'Continue Watching');
-
+    await shared.scrollDownToFindRow({ slug: 'continue_watching', rowListElementId: 'tvScreenRowList' });
 
     // Check if CW row contains all Series titles
-
     const rowItemsContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('tvScreenRowList');
-
 
     for (const itemContent of rowItemsContent) {
       expect(itemContent.type).to.equal('s');
@@ -54,24 +48,17 @@ describe('Homescreen Navigation - TV Shows Filter', function () {
 
   // https://tubi.testrail.io/index.php?/cases/view/538328
   it('C538328 - Series Filter - When My List category displayed then all titles are series, @homescreen, @tvshows', async () => {
-
-
-    // await testUtils.waitForApplicationStartup();
-
     // Scroll down to My List
-    await testUtils.jumpToRowWithTitle('tvScreenRowList', 'My List');
+    await shared.scrollDownToFindRow({ slug: 'queue', rowListElementId: 'tvScreenRowList' });
 
-
-    // Check if CW row contains all Series titles
-
+    // Check if My List row contains all Series titles
     const rowItemsContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('tvScreenRowList');
-
 
     for (const itemContent of rowItemsContent) {
       expect(itemContent.type).to.equal('s');
     }
-
   });
+
   // https://tubi.testrail.io/index.php?/cases/view/538329
   it('C538329 - TV Shows Filter - When title is selected then corresponding details page displayed, @homescreen, @tvshows', async () => {
 

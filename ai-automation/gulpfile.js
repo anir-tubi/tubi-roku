@@ -2442,6 +2442,10 @@ gulp.task('generate-test', async (done) => {
     if (testDetails.runTest) {
       const testResult = await runTestWithRetry(filePath, 3);
 
+      // ALWAYS remove .only after test execution, regardless of success or failure
+      // This prevents .only from being left in the file when tests fail
+      removeTestOnlyFromFile(filePath);
+
       if (testResult.success) {
         console.log('\n🎉 Test generated and verified successfully!');
         console.log(`✅ Test passed after ${testResult.attempts} attempt(s)`);

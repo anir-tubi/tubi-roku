@@ -31,7 +31,7 @@ describe('Kids Mode', function () {
   it.skip('C537396 - Guest User - Toggle ON - Home Screen - When User Switches Parental Control to Older Kids Then Exit Kids is still present, @kidsmode_guest', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await openKidsMode();
 
@@ -57,7 +57,7 @@ describe('Kids Mode', function () {
   it.skip('C537398b - Guest User - Toggle ON - Home Screen - When User Switches Parental Control to Little Kids Then Kids Mode icon is now grayed out, @kidsmode_guest', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await openKidsMode();
 
@@ -84,7 +84,7 @@ describe('Kids Mode', function () {
   it.skip('C537403- Guest User - Toggle ON - Categories Screen - When User Switches Parental Control to Older Kids Then the App Stays in Kids Mode, @kidsmode_guest', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await openKidsMode();
 
@@ -125,7 +125,7 @@ describe('Kids Mode', function () {
   // https://tubi.testrail.io/index.php?/cases/view/537401
   it.skip('C537401 - Guest User - Toggle ON - Categories Screen - When User Switches Parental Control to Little Kids Then the App Stays in Kids Mode, @kidsmode_guest', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await openKidsMode();
 
@@ -157,7 +157,7 @@ describe('Kids Mode', function () {
   it('C535860 - Registered User - Toggle ON - When user switches to Kids Mode then Home Screen filters out non-kids title, @kidsmode_registered', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
     await openKidsMode();
     await ecp.sendKeypress(ecp.Key.Right);
     await testUtils.waitForSideNavMenuToNotBeExpanded();
@@ -178,7 +178,7 @@ describe('Kids Mode', function () {
   it('C537689 -  Registered User - Toggle ON - Home Screen - When User Switches Parental Control to Older Kids Then the App Stays in Kids Mode, @kidsmode_registered', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await openKidsMode();
 
@@ -197,7 +197,7 @@ describe('Kids Mode', function () {
   // https://tubi.testrail.io/index.php?/cases/view/219725
   it('C537690 - Registered User - Toggle ON - Home Screen - When User Switches Parental Control to Little Kids Then the App Stays in Kids Mode, @kidsmode_registered', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open Kids Mode
     await openKidsMode();
@@ -240,7 +240,7 @@ describe('Kids Mode', function () {
   it('C537393 Kids Mode - Registered User - Toggle ON - Parental Control ON - Older Kids- modal dialog, @kidsmode_registered', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await openKidsMode();
     await ecp.sendKeypress(ecp.Key.Left);
@@ -268,7 +268,7 @@ describe('Kids Mode', function () {
   // https://tubi.testrail.io/index.php?/cases/view/535858
   it('C535858 - Registered User - Toggle OFF - Parental Control OFF - When user opens the app then Kids Icon should be displayed, @kidsmode_registered', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open Settings
     await ecp.sendKeypress(ecp.Key.Left);
@@ -292,7 +292,7 @@ describe('Kids Mode', function () {
 
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await openKidsMode();
 
@@ -309,7 +309,7 @@ describe('Kids Mode', function () {
     // Relaunch app
     await testUtils.restartApplication();
     await testUtils.waitForApplicationStartup();
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Check that we are no longer in Kids mode
     await ecp.sendKeypress(ecp.Key.Left);
@@ -323,14 +323,15 @@ describe('Kids Mode', function () {
   it('C548495 - Kids Mode - Launch Tubi, enter Kids Mode, select movie with trailer, watch trailer, then watch movie @kids_trailer', async () => {
     // Launch Tubi
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for home screen');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for home screen');
 
     // From left nav enter Kids Mode
     await openKidsMode();
 
     // Navigate back to home screen content
     await ecp.sendKeypress(ecp.Key.Right);
-    await utils.sleep(2000); // Wait for nav to close
+    await testUtils.waitForSideNavMenuToNotBeExpanded();
+    // In Kids mode, the home screen uses homeScreenRowList instead of videoTitlesRowList
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist focus');
 
     // Select a Movie with trailer
@@ -368,7 +369,7 @@ describe('Kids Mode', function () {
   //https://tubi.testrail.io/index.php?/cases/view/765060
   it('C765060 - Kids Categories - Focus on title with video preview should start video preview @kids @categories @video_preview', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await openKidsMode();
 
@@ -400,7 +401,7 @@ describe('Kids Mode', function () {
   // https://tubi.testrail.io/index.php?/cases/view/145905
   it('C145905 - Kids Mode - When user signs out while in Kids mode, non-Kids UI integrity is maintained, @kidsmode_registered', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await openKidsMode();
 
@@ -422,15 +423,17 @@ describe('Kids Mode', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Check that we are no longer in Kids mode
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
     await ecp.sendKeypress(ecp.Key.Left);
     await testUtils.waitForElementToFullyShowOnScreen('leftNavHomeButton');
 
 
     // Check for Live News row
     await ecp.sendKeypress(ecp.Key.Right);
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 10000);
-    await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus', 10000);
+
+    // Scroll down to find "On Now" row (due to pagination)
+    await shared.scrollDownToFindRow({ slug: 'recommended_linear_channels' });
 
   });
 
@@ -592,3 +595,4 @@ async function focusOnVideoTileWithPreviewUrlInCategoryGrid(categoryContent: any
 
   return previewFound;
 }
+

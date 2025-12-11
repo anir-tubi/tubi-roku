@@ -7,7 +7,7 @@ import { shared } from '../test-helpers';
 describe('Side Navigation', function () {
   before(async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/535773
@@ -26,7 +26,7 @@ describe('Side Navigation', function () {
   it('C535774 - Side Navigation - Home - Left Nav Button - First Position, @sidenav', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await openLeftNav();
 
@@ -54,7 +54,7 @@ describe('Side Navigation', function () {
   it('C535778 - Side Navigation - Search query preserved - Accessing Left Nav, @sidenav', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     //Open left nav
     await openLeftNav();
@@ -88,7 +88,7 @@ describe('Side Navigation', function () {
   it('C535779 - Side Navigation - Settings - Back Button, @sidenav', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     //Open left nav and browse down to Settings, select
     await openLeftNav();
@@ -117,7 +117,7 @@ describe('Side Navigation', function () {
 
     // Need to relaunch
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     //Open left nav and browse down to Settings, select
     await openLeftNav();
@@ -141,7 +141,7 @@ describe('Side Navigation', function () {
   it('C535780 - Side Navigation - Expanded to Collapsed State - Right Button, @sidenav', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open left nav
     await openLeftNav();
@@ -160,7 +160,7 @@ describe('Side Navigation', function () {
   it('C535781 - Side Navigation - Search Page - Select, @sidenav', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await openLeftNav();
 
@@ -183,7 +183,7 @@ describe('Side Navigation', function () {
   it('C537391 - Side Navigation - Home Page - Select, @sidenav', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await openLeftNav();
 
@@ -193,7 +193,7 @@ describe('Side Navigation', function () {
 
     //Verify that user is on the Home page
     await utils.sleep(2000);
-    await testUtils.elementHasFocus('homeScreenRowList', true);
+    await testUtils.elementHasFocus('videoTitlesRowList', true);
 
   });
 
@@ -214,7 +214,7 @@ describe('Side Navigation', function () {
     await ecp.sendKeypress(ecp.Key.Right, { count: 1 });
 
     // Make sure we are NOT on Categories page, but still on Home page
-    await testUtils.elementHasFocus('homeScreenRowList', true);
+    await testUtils.elementHasFocus('videoTitlesRowList', true);
 
 
   });
@@ -246,7 +246,7 @@ describe('Side Navigation', function () {
   it('C535787 - Side Navigation - Settings Page - Highlight, @sidenav', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await openLeftNav();
 
@@ -260,7 +260,7 @@ describe('Side Navigation', function () {
     await ecp.sendKeypress(ecp.Key.Right);
 
     // Make sure we are NOT on Settings page, but still on home page
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
 
   });
@@ -270,7 +270,7 @@ describe('Side Navigation', function () {
   it('C535788 - Side Navigation - Settings Page - Select, @sidenav', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await openLeftNav();
     await testUtils.jumpToRowWithTitle('sideNavMenu', 'Settings');
@@ -296,7 +296,7 @@ describe('Side Navigation', function () {
 
     // Relaunch
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open left Nav
     await openLeftNav();
@@ -329,7 +329,7 @@ describe('Side Navigation', function () {
   it('C535791 - Side Navigation - Details Page - Press Back Button, @sidenav', async () => {
     // Relaunch - Improvement
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open left nav
     await openLeftNav();
@@ -371,7 +371,7 @@ describe('Side Navigation', function () {
   it('C538338 - From Titles Detail Page > Categories Detail Page > Categories > Exit App @sidenav', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open the Side nav and select Categories
     await openLeftNav();
@@ -405,6 +405,8 @@ describe('Side Navigation', function () {
     // Relaunch - Improvement
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForApplicationStartup();
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await shared.ensurePlayableContentFocused();
 
     // Choose a title in the home screen and go into the details page
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -476,7 +478,7 @@ describe('Side Navigation', function () {
   // https://tubi.testrail.io/index.php?/cases/view/538343
   it('C538343 - From Titles Detail Page > Channel Detail Page > Channel > Side Nav > Exit App, @sidenav', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open the Side nav and select Categories
     await ecp.sendKeypress(ecp.Key.Left);
@@ -531,7 +533,7 @@ describe('Side Navigation', function () {
   it('C591019 - The left side nav includes TV Shows option and takes user to TVShows Screen, @sidenav', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await openLeftNav();
 
@@ -546,7 +548,7 @@ describe('Side Navigation', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify redirect to Home page
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
 
   });
@@ -554,7 +556,7 @@ describe('Side Navigation', function () {
   // https://tubi.testrail.io/index.php?/cases/view/591020 and https://tubi.testrail.io/index.php?/cases/view/C591988
   it('C591020 - The left side nav includes Live TV option, @sidenav', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await openLeftNav();
 
@@ -577,7 +579,7 @@ describe('Side Navigation', function () {
   // https://tubi.testrail.io/index.php?/cases/view/591023 - includes https://tubi.testrail.io/index.php?/cases/view/591065
   it('C591023 - Left side nav: Networks moved to the Categories page, @sidenav', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await openLeftNav();
     await selectCategoriesItem();
@@ -597,7 +599,7 @@ describe('Side Navigation', function () {
   // https://tubi.testrail.io/index.php?/cases/view/591024
   it('C591024 - Left Side Nav: Exit has moved to Settings, @sidenav', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await testUtils.goToPage('settings');
 
@@ -622,7 +624,7 @@ describe('Side Navigation', function () {
   it('C536528 - Side Navigation - Exit - Exit App, @sidenav', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Press back once
     await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
@@ -642,7 +644,7 @@ describe('Side Navigation', function () {
   // https://tubi.testrail.io/index.php?/cases/view/591989 
   it('C591989 - Selecting Home while on the Live TV screen results in the redirection to Home screen, @sidenav', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await openLeftNav();
 
@@ -668,14 +670,14 @@ describe('Side Navigation', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify redirect to Home page
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/591992 and https://tubi.testrail.io/index.php?/cases/view/591993
   it('C591992 - Selecting Movies from left nav takes the user to Movies screen, @sidenav', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await openLeftNav();
 
@@ -691,7 +693,7 @@ describe('Side Navigation', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify redirect to Home page
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
   });
 
@@ -699,7 +701,7 @@ describe('Side Navigation', function () {
   it('C575863 - Side Navigation - Return to Home when pressing back from multiple side nav selections - Search, @sidenav_test', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 60000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus', 60000);
 
     // Open left nav
     await openLeftNav();
@@ -729,7 +731,7 @@ describe('Side Navigation', function () {
   it('C610650 - Side Navigation - Return to Home when pressing back from multiple side nav selections - Categories, @sidenav_test', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 60000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus', 60000);
 
     // Open left nav
     await openLeftNav();
@@ -759,7 +761,7 @@ describe('Side Navigation', function () {
   it('C610651 - Side Navigation - Return to Home when pressing back from multiple side nav selections - Channels, @sidenav_test', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 60000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus', 60000);
 
     // Open left nav
     await openLeftNav();
@@ -789,7 +791,7 @@ describe('Side Navigation', function () {
   it('C610652 - Side Navigation - Return to Home when pressing back from multiple side nav selections - Espanol, @sidenav_test', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 60000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus', 60000);
 
     // Open left nav
     await openLeftNav();

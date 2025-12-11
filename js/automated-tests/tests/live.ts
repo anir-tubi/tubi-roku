@@ -8,17 +8,17 @@ describe('Live', function () {
     beforeEach(async () => {
         await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
         await testUtils.waitForApplicationStartup();
-        await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+        await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
     });
     // Let's investigate the preview player when the left nav is open here
     // https://tubi.testrail.io/index.php?/cases/view/114677
     it('C114677 - Live News - Open Side Navigation while on Live New Row @live', async () => {
 
-        // Navigate to the Live News Row
-        await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
+        // Navigate to the Live News Row (with pagination support)
+        await shared.scrollDownToFindRow({ slug: 'recommended_linear_channels' });
 
         // Verify that video preview is playing
-        await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'On Now');
+        await testUtils.waitForElementToHaveFocus('videoTitlesRowList');
         await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing');
         // Press left navigation to open the side navigation
         await ecp.sendKeypress(ecp.Key.Left);
@@ -29,8 +29,8 @@ describe('Live', function () {
     // https://tubi.testrail.io/index.php?/cases/view/207737
     it('C207737 - Live Screen: When in full view, pressing back will return the user to preview mode @live', async () => {
 
-        // Navigate to the Live News Row
-        await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
+        // Navigate to the Live News Row (with pagination support)
+        await shared.scrollDownToFindRow({ slug: 'recommended_linear_channels' });
 
         // Start a live feed
         await startLiveFeed();
@@ -50,8 +50,8 @@ describe('Live', function () {
     // https://tubi.testrail.io/index.php?/cases/view/114053
     it('C114053 - Live News - Live TV channel guide @live', async () => {
 
-        // Navigate to the Live News Row
-        await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
+        // Navigate to the Live News Row (with pagination support)
+        await shared.scrollDownToFindRow({ slug: 'recommended_linear_channels' });
 
         // Start a live feed
         await startLiveFeed();
@@ -71,10 +71,11 @@ describe('Live', function () {
     // https://tubi.testrail.io/index.php?/cases/view/114058
     it('C114058 - Live News - When a user changes channels during playback, playback for the updated channel should be near instantaneous @live', async () => {
 
-        // Navigate to the Live News Row
-        await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+        // Navigate to the Live News Row (with pagination support)
+        await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
         await utils.sleep(2000);
-        await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
+        await shared.scrollDownToFindRow({ title: 'On Now' });
+        await testUtils.jumpToRowWithTitle('videoTitlesRowList', 'On Now');
 
         // Verify that linear preview video is playing
         await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 20000);
@@ -98,9 +99,10 @@ describe('Live', function () {
     // https://tubi.testrail.io/index.php?/cases/view/115290
     it('C115290 -  Home Screen Automatic Small video transition to full screen view @live', async () => {
 
-        // Navigate to the Live News Row
-        await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
-        await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
+        // Navigate to the Live News Row (with pagination support)
+        await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+        await shared.scrollDownToFindRow({ title: 'On Now' });
+        await testUtils.jumpToRowWithTitle('videoTitlesRowList', 'On Now');
 
         // Verify that full video plays after preview video is playing
 

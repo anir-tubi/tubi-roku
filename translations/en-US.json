@@ -2082,7 +2082,7 @@
   },
   "rating_pg_description": {
     "description": "Description for PG rating (Parental Guidance Suggested)",
-    "message": "Some material may not be suitable for children. Parents urged to give \"parental guidance\". May contain some material parents might not like for their young children."
+    "message": "Some material may not be suitable for children. Parents urged to give 'parental guidance'. May contain some material parents might not like for their young children."
   },
   "rating_pg_13_description": {
     "description": "Description for PG-13 rating (Parents Strongly Cautioned)",

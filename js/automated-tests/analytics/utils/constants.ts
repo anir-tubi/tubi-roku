@@ -115,7 +115,7 @@ export const TV_SHOW_DETAILS_PAGE_BUTONS = {
 	Go_TO: 'Go to',
 	WATCH_TRAILER: 'Watch Trailer',
 	REMOVE_FROM_HISTORY: 'Remove from history',
-	REMOVE_FROM_MY_LIST: 'Remove from My List',
+	REMOVE_FROM_MY_LIST: 'Remove From My List',
 };
 
 export const Events = {

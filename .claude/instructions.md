@@ -1,5 +1,36 @@
 # Claude Code Instructions for Roku Test Automation
 
+## Finding UI Elements: ALWAYS Use App-UI API
+
+🚨 **CRITICAL WORKFLOW: When asked to find an element path/keyPath/xpath:**
+
+**✅ CORRECT Process:**
+1. Read `rta-config.json` to get the device IP address (in `RokuDevice.devices[0].host`)
+2. Query the app-ui API endpoint: `http://{device-ip}:8060/query/app-ui`
+3. Search the returned XML for the element name
+4. Extract the keyPath from the XML structure
+5. Add the element definition to `automated-tests-config/elements.ts`
+
+**Example:**
+```bash
+# Get device IP from rta-config.json (e.g., 192.168.1.4)
+curl -s "http://192.168.1.4:8060/query/app-ui" | grep -A 10 "elementName"
+```
+
+**❌ NEVER:**
+- Use `grep` to search the codebase for element definitions
+- Use `npx app-ui find elementName` (this command doesn't exist)
+- Guess or assume element paths without verifying via app-ui API
+- Search files like `elements.ts` or Roku source files for element structure
+
+**Why:** The app-ui API returns the ACTUAL current UI tree structure from the running Roku app. Searching the codebase only shows previously defined elements, not the actual UI structure.
+
+**When to use:** Any time you need to:
+- Find a new element that's not in elements.ts
+- Verify the structure of an existing element
+- Debug element path issues
+- Understand UI hierarchy for nested elements
+
 ## Automatic Behaviors
 
 ### When a Test Fails

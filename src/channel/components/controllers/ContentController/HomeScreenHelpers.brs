@@ -1522,7 +1522,7 @@ End Function
 ' do not show if the user is already logged in during deeplink
 Function hasRegModalBeenShown()
   currentScreen = getCurrentScreen()
-  if m.constants.settings.mode = "qa" AND m.constants.settings.hideStartupModals = true
+  if m.constants.settings.mode <> "production" AND m.constants.settings.hideStartupModals = true
     return true
   end if
 

@@ -134,6 +134,33 @@ class TestUtils {
 
 
   /**
+   * Get a node using a dynamically constructed element object with custom keyPath
+   * Useful for elements with dynamic row indices or other runtime-determined paths
+   * @param element - The element object with keyPath, xpath, and optional base/id
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   * @returns The node representation
+   *
+   * @example
+   * // For guest user CW tile at dynamically found row index 5:
+   * const rowIndex = await testUtils.findRowIndexWithTitle('videoTitlesRowList', 'Continue Watching');
+   * const element = {
+   *   keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.${rowIndex}.items.0.#contentSection.#title`,
+   *   xpath: '//GuestUserContinueWatchingTile//Label[@name="title"]'
+   * };
+   * const titleNode = await testUtils.getNodeWithDynamicPath(element);
+   */
+  public async getNodeWithDynamicPath(element: Element, timeout = 15000) {
+    let result;
+    await testUtils.untilTrue(async () => {
+      result = await odc.getValue(element);
+      return result.found;
+    }, `Could not get node for dynamic element with keyPath '${element.keyPath}'`, timeout);
+
+    return result.value as NodeRepresentation;
+  }
+
+
+  /**
    * This gives an easy way to get a node field for the given element. This is more efficient than getNodeForElement if all we care about is one field. It can also be used to use the element key path as a base that you can add on to as well.
    * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
    * @param timeout - How long we will wait for this operation before considering it to have failed
@@ -209,14 +236,30 @@ class TestUtils {
   // Helper to fully shutdown the application
   public async exitApplication() {
     // Check if the application is already not running
-    const applicationIsRunning = await this.isApplicationRunning();
+    let applicationIsRunning = false;
+    try {
+      applicationIsRunning = await this.isApplicationRunning();
+    } catch (e) {
+      // If we can't communicate with the device, assume app is not running or device is unresponsive
+      // In this case, we can't exit the app, so just return
+      console.warn('Could not check if application is running (device may be unresponsive):', e.message);
+      return;
+    }
+
     if (!applicationIsRunning) {
       // If so then we can just exit here
       return;
     }
 
     // wait for content controller to get added. This is needed in the case that the application is still launching and then the next test tries to close the application again. Without this the setValue would fail because ContentController does not exist yet.
-    await this.getNodeForElement('contentControllerId');
+    try {
+      await this.getNodeForElement('contentControllerId');
+    } catch (e) {
+      // If we can't get the content controller, the app may already be shutting down or device is unresponsive
+      console.warn('Could not get content controller (app may already be shutting down):', e.message);
+      return;
+    }
+
     try {
       await odc.setValue({
         base: 'scene',
@@ -229,15 +272,26 @@ class TestUtils {
     }
 
     // Wait until application no longer shows as running
-    await this.waitForApplicationShutdown();
+    try {
+      await this.waitForApplicationShutdown();
+    } catch (e) {
+      // If we can't verify shutdown, device may be unresponsive - log but don't fail
+      console.warn('Could not verify application shutdown (device may be unresponsive):', e.message);
+    }
   }
 
 
   // Waits for application to shutdown but does not take any steps to make it do so
   public async waitForApplicationShutdown() {
     await this.untilTrue(async () => {
-      const isApplicationRunning = await this.isApplicationRunning();
-      return !isApplicationRunning;
+      try {
+        const isApplicationRunning = await this.isApplicationRunning();
+        return !isApplicationRunning;
+      } catch (e) {
+        // If device is unresponsive, assume app is not running
+        console.warn('Could not check application status during shutdown (device may be unresponsive):', e.message);
+        return true;
+      }
     }, 'Active app never switched from dev');
   }
 
@@ -345,14 +399,6 @@ class TestUtils {
 
     if (args.noAds !== undefined) {
       constantsUpdates['settings.noAds'] = args.noAds;
-    }
-
-    if (args.enablePurpleCarpetContainerAndBanner !== undefined) {
-      constantsUpdates['settings.enablePurpleCarpetContainerAndBanner'] = args.enablePurpleCarpetContainerAndBanner;
-    }
-
-    if (args.isAutoplayEnabled !== undefined) {
-      constantsUpdates['deviceInfo.isautoplayenabled'] = args.isAutoplayEnabled;
     }
 
     if (args.triggerFailSafe === 'gameDayExperience') {
@@ -647,6 +693,52 @@ class TestUtils {
     }, timeout);
   }
 
+  /**
+   * Because we store the json object at the row level, trying to access RowList content the normal way with RTA can result in huge responses (21 MB). This helps work around that
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
+   * @param slug - The slug we are searching for
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public async findRowIndexWithSlug(elementOrElementId: ElementOrElementId, slug: string, timeout = 10000): Promise<number> {
+    const element = this.getElementKeyPath(elementOrElementId);
+    let baseKeyPath = `content`;
+    if (element.keyPath) {
+      baseKeyPath = element.keyPath + '.' + baseKeyPath;
+    }
+
+    return await this.retryWithTimeOut(async () => {
+      // First count how many rows of content there are
+      const { found, value: rowCount } = await odc.getValue({
+        base: element.base,
+        keyPath: `${baseKeyPath}.getChildCount()`
+      });
+      if (!found) {
+        throw new Error(`Can't find row count`);
+      }
+
+      // Now request each row's slug
+      const requests = {};
+      for (let i = 0; i < rowCount; i++) {
+        requests[i] = {
+          base: element.base,
+          keyPath: `${baseKeyPath}.${i}.slug`
+        };
+      }
+
+      const { results } = await odc.getValues({
+        requests: requests
+      });
+
+      // Once we find the row that matches the slug return the index for it
+      for (const key in results) {
+        if (results[key].value === slug) {
+          return +key;
+        }
+      }
+      throw new Error(`Could not find row with slug ${slug}`);
+    }, timeout);
+  }
+
 
   /**
    * Used to jump to a row with the title provided
@@ -658,6 +750,51 @@ class TestUtils {
     const rowIndex = await this.findRowIndexWithTitle(elementOrElementId, title, timeout);
     await this.jumpToRowIndex(elementOrElementId, rowIndex, timeout);
     return rowIndex;
+  }
+
+
+  /**
+   * Used to find the index of a grid/list item by its title
+   * Works for both MarkupGrid and MarkupList components
+   * @param elementOrElementId - The grid/list element or element id from elements.ts
+   * @param title - The title we are searching for
+   * @param timeout - How long we will wait before considering it failed
+   */
+  public async findGridItemIndexWithTitle(elementOrElementId: ElementOrElementId, title: string, timeout = 10000): Promise<number> {
+    return await this.retryWithTimeOut(async () => {
+      // Grid and list items can be retrieved using the same method
+      const items = await this.getAllGridItemsContent(elementOrElementId, timeout);
+
+      // Find the index where title matches
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].title === title) {
+          return i;
+        }
+      }
+      throw new Error(`Could not find grid/list item with title "${title}"`);
+    }, timeout);
+  }
+
+
+  /**
+   * Used to jump to a grid/list item with the title provided
+   * Works for both MarkupGrid and MarkupList components
+   * @param elementOrElementId - The grid/list element or element id from elements.ts
+   * @param title - The title we are searching for
+   * @param timeout - How long we will wait before considering it failed
+   */
+  public async jumpToGridItemWithTitle(elementOrElementId: ElementOrElementId, title: string, timeout = 10000) {
+    const itemIndex = await this.findGridItemIndexWithTitle(elementOrElementId, title, timeout);
+    const element = this.getElementKeyPath(elementOrElementId);
+
+    // Use jumpToItem to navigate to the found index
+    await odc.setValue({
+      base: element.base,
+      keyPath: element.keyPath ? `${element.keyPath}.jumpToItem` : 'jumpToItem',
+      value: itemIndex
+    }, { timeout: timeout });
+
+    return itemIndex;
   }
 
 
@@ -1010,14 +1147,14 @@ class TestUtils {
       case 'addToMyList':
         await this.selectMenuItem(element, 'Add to My List', timeout);
         // We know we're good once the remove item shows up
-        await this.findRowIndexWithTitle(element, 'Remove from My List', timeout);
+        await this.findRowIndexWithTitle(element, 'Remove From My List', timeout);
         break;
       case 'likeOrDislike':
         await this.selectMenuItem(element, 'Like or Dislike', timeout);
         await this.waitForElementToFullyShowOnScreen('secondaryMenu');
         break;
       case 'removeFromMyList':
-        await this.selectMenuItem(element, 'Remove from My List', timeout);
+        await this.selectMenuItem(element, 'Remove From My List', timeout);
         // We know we're good once the add item shows up
         await this.findRowIndexWithTitle(element, 'Add to My List', timeout);
         break;
@@ -2326,7 +2463,7 @@ const nonDeeplinkPages = ['home', 'search', 'settings', 'myStuff', 'movies', 'se
 /**
  * List of element ids that can be used with our video player helpers
  */
-type VideoPlayerElementId = 'videoPlayerScreen' | 'previewVideoPlayer' | 'previewVideoPlayerScreen' | 'linearVideoPlayerScreen' | 'foxPLayerElementID';
+type VideoPlayerElementId = 'videoPlayerScreen' | 'previewVideoPlayer' | 'previewVideoPlayerScreen' | 'linearVideoPlayerScreen' | 'foxPLayerElementID' | 'inlineVideoTilesPreviewPlayer';
 
 
 enum ContentRatings {
@@ -2372,9 +2509,6 @@ type StartApplicationArgs = {
 
   /** No ads are shown unless set to false */
   noAds?: boolean;
-
-  /* When set to true will enable the purple carpet container and banner. */
-  enablePurpleCarpetContainerAndBanner?: boolean;
 
   triggerFailSafe?: 'gameDayExperience'
 }

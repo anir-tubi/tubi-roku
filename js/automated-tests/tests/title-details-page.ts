@@ -106,7 +106,7 @@ describe.skip('Title Details Page', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     await utils.sleep(1000);
-    // Verify that "Add to My List" button changed to "Remove from My List" by navigating to it
+    // Verify that "Add to My List" button changed to "Remove From My List" by navigating to it
     await testHelpers.jumpToButtonById('vodDetailScreenActionButtons', 'removeFromQueue');
     const { node } = await odc.getFocusedNode();
     expect(node.id).to.equal('removeFromQueue');
@@ -230,14 +230,14 @@ describe.skip('Title Details Page', function () {
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845239
   it('C845239 - Video Preview resumes from homepage to detail page @videopreview', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    const position = await testHelpers.findContentPositionInRowListThatContainsVideoPreview('homeScreenRowList', true, 5);
+    const position = await testHelpers.findContentPositionInRowListThatContainsVideoPreview('videoTitlesRowList', true, 5);
     if (position.length === 0) {
       throw new Error('Could not find content with video preview');
     }
     const [row, col] = position;
-    await testHelpers.jumpToRowListPosition('homeScreenRowList', row, col);
+    await testHelpers.jumpToRowListPosition('videoTitlesRowList', row, col);
 
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 10000);
 
@@ -293,7 +293,7 @@ describe.skip('Title Details Page', function () {
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845206
   it('C845206 - Order for horizontal menu bar in details page of title that is from a network @guest,@details_page', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await testHelpers.navigateToCategories();
     //Verify Recommended button at the top
@@ -922,9 +922,9 @@ describe.skip('Title Details Page', function () {
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845252
   it('C845252 - Autoplay should comply with settings @autoplay', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    await testHelpers.setAutoplay(false);
+    await testHelpers.enableAutoplayInSettings(false);
     await testUtils.goToPage('movies');
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
 
@@ -936,7 +936,7 @@ describe.skip('Title Details Page', function () {
     await testUtils.waitForElementToHaveFocus('autoplayGridMovie', 'Timed out waiting for Rowlist to have focus', 15000);
     await testHelpers.verifyAutoplayUINotShowing('autoplayCountdownTimerSection', true);
 
-    await testHelpers.setAutoplay(true);
+    await testHelpers.enableAutoplayInSettings(true);
     await testUtils.goToPage('movies');
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
 

@@ -74,6 +74,8 @@ ${forbiddenIdsPreview}${totalExistingTests > 20 ? `... and ${totalExistingTests 
 5. ✅ Read test-helpers.ts and test-utils.ts to find existing helpers (DO NOT write custom logic if helper exists)
 6. ❌ NEVER use findNode() or property chaining (node.child?.grandchild) - add nested elements to elements.ts instead
 7. ✅ Follow the 5-STEP PROCESS documented in instructions.md
+8. ✅ Refer to node_modules/roku-test-automation/README.md for roku-test-automation framework patterns (ArrayGrid/RowList element access, odc.getValue() syntax, grid navigation)
+9. ✅ Use startApplicationAtPage('home') for general tests - ONLY use 'movies', 'series', etc. if test specifically requires that mode
 
 🚨 **BEFORE RETURNING CODE - FINAL VERIFICATION:**
 1. Does the it() block contain "${normalizedTestCaseId}"? If NO → FIX IT
@@ -88,8 +90,9 @@ OUTPUT FORMAT:
 - Generate ONLY ONE it() block for ${normalizedTestCaseId}
 - Start with import statements (first character must be 'i')
 - Use correct imports: import { ecp, odc, utils } from 'roku-test-automation';
+- CRITICAL: You MUST include the TestRail link comment AFTER imports and BEFORE the it() block
 
-Example:
+REQUIRED STRUCTURE (follow this EXACT format):
 import { expect } from 'chai';
 import { ecp, odc, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
@@ -98,6 +101,9 @@ import { testUtils } from '../test-utils';
 it('${normalizedTestCaseId} - ${testDetails.testName} @tags', async () => {
   // Your test code here
 });
+
+🚨 The TestRail link comment is MANDATORY and must appear AFTER imports, BEFORE the it() block
+🚨 The format is: // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/${normalizedTestCaseId.replace('C', '')}
 
 Generate ONLY the TypeScript test code now - no explanations, no markdown, no summaries.`;
 }

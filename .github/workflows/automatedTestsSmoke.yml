@@ -23,6 +23,11 @@ jobs:
     runs-on: [self-hosted, enabled, roku, automation-smoke]
     # timeouts after 15 minutes, if the execution/automated tests got stuck/crash
     timeout-minutes: 15
+    # Permissions for posting PR comments
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -61,3 +66,10 @@ jobs:
         with:
           name: Failed Test Screenshots
           path: out/ui-tests-output/screenshots
+
+      - name: Post PR Test Results Comment
+        if: success() || failure()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          npx ts-node ./js/workflows/postPRTestResults.ts
