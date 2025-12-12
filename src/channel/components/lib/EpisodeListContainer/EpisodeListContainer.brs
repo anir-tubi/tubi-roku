@@ -200,7 +200,11 @@ Function onSeasonButtonFocusedChange(msg)
       focusedItem = seasonRow.getChild(focusedIndex)
       if focusedItem <> invalid AND focusedItem.seasonNumber <> invalid
         seasonNum = focusedItem.seasonNumber.toStr()
-
+        ' Resetting the position when user focuses on a different season.
+        if m.currentFocusedSeason <> seasonNum
+          m.episodeGrid.itemFocused = 0
+          m.currentFocusedSeason = seasonNum
+        end if
         if m.episodesBySeason[seasonNum] <> invalid
           handleEpisodesChange(m.episodesBySeason[seasonNum])
         else

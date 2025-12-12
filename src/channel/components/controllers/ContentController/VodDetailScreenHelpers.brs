@@ -427,8 +427,12 @@ End Function
 Function onFocusedSeasonChange(msg)
   focusedSeason = msg.getData()
   screen = msg.getRoSGNode()
-  if screen <> invalid AND screen.content <> invalid AND focusedSeason <> invalid AND focusedSeason <> screen.defaultSelectedSeason
-    getSeriesEpisodes(screen.content.id, focusedSeason)
+  if screen <> invalid AND screen.content <> invalid AND focusedSeason <> invalid AND focusedSeason <> screen.defaultSelectedSeason AND screen.seasonList <> invalid
+    seasons = screen.seasonList.seasons
+    if seasons <> invalid AND seasons[focusedSeason.toStr()] <> invalid
+      totalEpisodes = seasons[focusedSeason.toStr()].count()
+      getSeriesEpisodes(screen.content.id, focusedSeason, 1, totalEpisodes)
+    end if
   end if
 End Function
 
