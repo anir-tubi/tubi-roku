@@ -118,7 +118,11 @@ Function setLinearAvailabilityBadge(badge, availability, textColor, backgroundCo
   else
     badge.text = badgeText
     badge.iconUri = ""
-    badge.backgroundUri = "pkg:/images/rounded-rect-on-now-$$RES$$.9.png"
+    if availability = "onNow"
+      badge.backgroundUri = "pkg:/images/rounded-rect-on-now-$$RES$$.9.png"
+    else
+      badge.backgroundColor = backgroundColor
+    end if
   end if
 
   badge.borderUri = ""

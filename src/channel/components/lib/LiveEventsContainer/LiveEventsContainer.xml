@@ -57,9 +57,11 @@
           vertAlignment="center"
           itemSpacings="[12]">
           <Badge
+            height="36"
             id="availabilityBadge" />
           <Badge
             visible="false"
+            height="36"
             id="uhdAvailableBadge" />
           <Label
             id="genres"
