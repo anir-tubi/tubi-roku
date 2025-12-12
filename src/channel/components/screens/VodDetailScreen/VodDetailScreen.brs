@@ -56,7 +56,7 @@ Function init()
 
   m.animationDuration = 0.4
 
-  experiment = getStatsigExperimentResource("roku_content_details", "roku_content_details_v1", false)
+  experiment = getStatsigExperimentResource("roku_content_details", "roku_content_details_v2", false)
   m.isLeftBackExitEnabled = experiment <> invalid AND experiment.enable_left_button_exit = true
 
   m.leftChevron.visible = m.isLeftBackExitEnabled

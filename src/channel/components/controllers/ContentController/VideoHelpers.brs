@@ -751,7 +751,7 @@ End Function
 Function returnToDetailScreenFromVideo(sendAnalyticsEvent, shouldUpdateEpisodeScreenContent, reason) as Void
   tubiLog("VideoHelpers.returnToDetailScreenFromVideo")
 
-  experiment = getStatsigExperimentResource("roku_content_details", "roku_content_details_v1", false)
+  experiment = getStatsigExperimentResource("roku_content_details", "roku_content_details_v2", false)
   if experiment.enabled = true
     ' Show new content details screen
     refreshVodDetailScreenAfterPlayback(sendAnalyticsEvent, reason)
@@ -973,7 +973,7 @@ End Function
 Function onSkipTrailer(msg) as Void
   tubiLog("VideoHelpers.onSkipTrailer")
   skipTrailer = msg.getData()
-  experiment = getStatsigExperimentResource("roku_content_details", "roku_content_details_v1", false)
+  experiment = getStatsigExperimentResource("roku_content_details", "roku_content_details_v2", false)
   if experiment.enabled = true AND skipTrailer = true
     videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
     if videoPlayer <> invalid AND videoPlayer.content <> invalid
