@@ -53,6 +53,11 @@ Function LivePlayerLogLib(constants, tracking)
     totalVideoSegDuration: 0
     totalDownloadDuration: 0
 
+    ' Array to collect segType=0 segDuration data for outlier filtering
+    videoSegDurationBuffer: []
+    segmentsToAverage: 10
+    segmentsCollected: 0
+
     contentFirstFrameDuration: -1 'used in Qos event
     breakOffCount: 0 'used in QoS event
     videoBufferingCount: 0 'used in QoS event
@@ -426,26 +431,80 @@ End Function
 
 'setDownloadedSegmentData updated calculates the download_speed & download_frag_bitrate
 '
+' For segType=0: Collects 10 segments and appends only the averaged values to totals
+' For segType=1,2: Appends raw values directly to totals
+'
 '@downloadedSegment: assocarray, which contains segSize, downloadDuration, segDuration
 Function playerLogLib_setLiveDownloadedSegmentData(downloadedSegment)
-  if isAA(downloadedSegment) = true AND isNonEmptyString(m.cdn) = false
+  if isAA(downloadedSegment) = true
     segType = downloadedSegment.segType
     segUrl = downloadedSegment.segUrl
 
-    if segType = 0 OR segType = 1 OR segType = 2
-      m.totalSegSize += downloadedSegment.segSize 'in bytes
-      m.totalDownloadDuration += downloadedSegment.downloadDuration 'in milliseconds
+    if segType = 0 'mux (video & audio)
+      ' Add segSize and downloadDuration directly
+      m.totalSegSize += downloadedSegment.segSize
+      m.totalDownloadDuration += downloadedSegment.downloadDuration
 
-      if segType = 1 'audio for hlsv6
-        m.totalAudioSegDuration += downloadedSegment.segDuration 'in milliseconds
-      else if segType = 2 'video for hlsv6
-        m.totalVideoSegDuration += downloadedSegment.segDuration 'in milliseconds
-      else if segType = 0 'mux (video & audio) for hlsv3
-        m.totalVideoSegDuration += downloadedSegment.segDuration 'in milliseconds
+      ' Buffer segDuration for outlier filtering
+      m.videoSegDurationBuffer.push(downloadedSegment.segDuration)
+      m.segmentsCollected += 1
+
+      ' When 10 segments collected, process segDuration with outlier filtering
+      if m.segmentsCollected >= m.segmentsToAverage
+        adjustedVideoSegDurations = replaceOutliersWithAverage(m.videoSegDurationBuffer)
+        for each segDuration in adjustedVideoSegDurations
+          m.totalVideoSegDuration += segDuration
+        end for
+
+        ' Reset buffer for next batch
+        m.videoSegDurationBuffer = []
+        m.segmentsCollected = 0
       end if
+
+      m.setCDN(segUrl)
+
+    else if segType = 1 'audio for hlsv6 - append raw values
+      m.totalSegSize += downloadedSegment.segSize
+      m.totalDownloadDuration += downloadedSegment.downloadDuration
+      m.totalAudioSegDuration += downloadedSegment.segDuration
+      m.setCDN(segUrl)
+
+    else if segType = 2 'video for hlsv6 - append raw values
+      m.totalSegSize += downloadedSegment.segSize
+      m.totalDownloadDuration += downloadedSegment.downloadDuration
+      m.totalVideoSegDuration += downloadedSegment.segDuration
       m.setCDN(segUrl)
     end if
   end if
+End Function
+
+
+' Workaround for Roku issue: For linear content, the video node sometimes returns
+' incorrect segDuration values (mostly for the first downloaded segment).
+' This function replaces outlier values (< 1000ms) with the calculated average
+' of the passed values(segments) until Roku fixes this issue.
+' @values: array of segment duration values in milliseconds
+' @returns: modified array with outliers replaced by average
+Function replaceOutliersWithAverage(values as Object) as Object
+  if values = invalid OR values.count() = 0
+    return []
+  end if
+
+  'calculate the initial average
+  total = 0
+  for each value in values
+    total += value
+  end for
+  average = total / values.count()
+
+  'replace values < 1000 with the average
+  for i = 0 to values.count() - 1
+    if values[i] < 1000
+      values[i] = average
+    end if
+  end for
+
+  return values
 End Function
 
 
@@ -465,8 +524,21 @@ End Function
 
 
 'The QualityOfService event will be triggered when user changes the channel or exits the player
+' Before firing, it calculates averages from any remaining buffered segments (less than 10)
 '
 Function playerLogLib_fireLiveQualityOfServiceEvent()
+  ' If there are remaining segments in buffer (less than 10), process with outlier filtering
+  if m.segmentsCollected > 0
+    adjustedVideoSegDurations = replaceOutliersWithAverage(m.videoSegDurationBuffer)
+    for each segDuration in adjustedVideoSegDurations
+      m.totalVideoSegDuration += segDuration
+    end for
+
+    ' Clear buffer
+    m.videoSegDurationBuffer = []
+    m.segmentsCollected = 0
+  end if
+
   eventBase = {
     device_id: ""
     platform: ""
@@ -702,6 +774,10 @@ Function playerLogLib_resetAttributes()
   m.totalAudioSegDuration = 0
   m.totalVideoSegDuration = 0
   m.totalDownloadDuration = 0
+
+  ' Reset segment duration buffer
+  m.videoSegDurationBuffer = []
+  m.segmentsCollected = 0
 End Function
 
 
