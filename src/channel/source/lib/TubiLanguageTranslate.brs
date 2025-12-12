@@ -1346,7 +1346,7 @@ Function getTranslation_en_US()
     },
     "metadata_continueWatching_notSignedIn_container_button": {
       "description": "button text for when a non registered user focuses on the continue watching container",
-      "message": "Sign Up to Save Progress - FREE"
+      "message": "Sign Up to Save Progress"
     },
     "metadata_directed": {
       "description": "metadata label to indicate the directors of the current video title",

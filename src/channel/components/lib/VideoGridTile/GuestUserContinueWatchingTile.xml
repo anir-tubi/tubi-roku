@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<component name="GuestUserContinueWatchingTile" extends="Group" >
+<?xml version="1.0" encoding="utf-8"?>
+<component name="GuestUserContinueWatchingTile" extends="Group">
   <script type="text/brightscript" uri="GuestUserContinueWatchingTile.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
 
   <interface>
     <field id="itemContent" type="node" />
@@ -21,7 +21,7 @@
       uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
     />
     <LayoutGroup
-      itemSpacings="[164]"
+      itemSpacings="[114]"
       id="contentSection"
       layoutDirection="horiz">
       <LayoutGroup
@@ -31,7 +31,7 @@
           height="56"
           vertAlign="center">
           <Font
-            role="font"/>
+            role="font" />
         </Label>
         <Label
           id="description"
@@ -39,7 +39,7 @@
           wrap="true"
           vertAlign="center">
           <Font
-            role="font"/>
+            role="font" />
         </Label>
       </LayoutGroup>
       <LayoutGroup
@@ -50,11 +50,13 @@
           height="56"
           vertAlign="center">
           <Font
-            role="font"/>
+            role="font" />
         </Label>
-        <SimpleButton
-          isFilled="true"
-          id="signUpButton"/>
+        <EnhancedButton
+          id="signUpButton"
+          height="72"
+          backgroundUri="pkg:/images/rectangle-rounded-corner-button-bg-$$RES$$.9.png"
+          padding="36" />
       </LayoutGroup>
     </LayoutGroup>
   </children>

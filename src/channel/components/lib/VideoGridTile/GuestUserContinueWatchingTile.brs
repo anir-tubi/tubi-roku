@@ -8,9 +8,16 @@ Function init()
   m.contentSection = topRef.findNode("contentSection")
 
   m.title.text = getTranslation("metadata_continueWatching_notSignedIn_title")
-  m.signUpButton.text = getTranslation("metadata_continueWatching_notSignedIn_container_button")
   m.subTitle.text = getTranslation("metadata_continueWatching_notSignedIn_container_description")
   m.description.text = getTranslation("metadata_continueWatching_notSignedIn_description")
+
+  buttonContent = CreateObject("roSGNode", "ContentNode")
+  buttonContent.update({
+    title: getTranslation("metadata_continueWatching_notSignedIn_container_button")
+    badgeText: getTranslation("registration_signup_button_free")
+    isPrimaryButton: true
+  }, true)
+  m.signUpButton.itemContent = buttonContent
 
   topRef.observeFieldScoped("itemHasFocus", "onItemHasFocusChange")
   topRef.observeFieldScoped("rowHasFocus", "onItemHasFocusChange")
