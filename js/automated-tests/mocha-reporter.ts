@@ -8,8 +8,16 @@ class MochaReporter {
 
   constructor(runner: mocha.Runner, options: mocha.MochaOptions) {
     this.mochawesomeReporter = new Mochawesome(runner, options);
-    runner.once(mocha.Runner.constants.EVENT_RUN_END, this.mochawesomeReporter.done);
     this.jsonReporter = new mocha.reporters.JSON(runner, options);
+  }
+
+  done(failures: number, fn?: (failures: number) => void): void {
+    // Call mochawesome done first to generate HTML
+    if (this.mochawesomeReporter.done) {
+      this.mochawesomeReporter.done(failures, fn);
+    } else if (fn) {
+      fn(failures);
+    }
   }
 }
 

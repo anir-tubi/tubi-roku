@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ecp, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
-import { shared } from '../test-helpers';
+import { shared, testHelpers } from '../test-helpers';
 
 describe('Espanol', function () {
   before(async () => {
@@ -182,10 +182,10 @@ describe('Espanol', function () {
     await testUtils.waitForElementToFullyShowOnScreen('espanolLogo', 'Timed out waiting for espanol page');
 
     // Scroll to CW and verify translation
-    await testUtils.jumpToRowWithTitle('categoryGridRowList', 'Seguir Viendo', 10000);
+    await testHelpers.scrollDownToFindRow({ slug: 'continue_watching', rowListElementId: 'categoryGridRowList' });
 
     // Scroll to My List and verify tranlation
-    await testUtils.jumpToRowWithTitle('categoryGridRowList', 'Mi Lista', 10000);
+    await testHelpers.scrollDownToFindRow({ slug: 'queue', rowListElementId: 'categoryGridRowList' });
 
   });
 

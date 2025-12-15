@@ -4,7 +4,7 @@ import { testUtils } from '../test-utils';
 import { shared } from '../test-helpers';
 
 describe('Homescreen Navigation - Movies Filter', function () {
-  before(async () => {
+  beforeEach(async () => {
     const user = await testUtils.createRegisteredUser();
     const seriesContent = await user.getContent().ofContentType('series').retrieve({ limit: 5 });
     await user.addContentToViewHistory(seriesContent, 500);
@@ -21,8 +21,6 @@ describe('Homescreen Navigation - Movies Filter', function () {
 
   // https://tubi.testrail.io/index.php?/cases/view/535770
   it('C535770 - Movies Filter - When movie filter is triggered then only Movie Titles are present, @homescreen, @movies', async () => {
-    await testUtils.waitForApplicationStartup();
-
     // Check if Featured row contains all Movie titles ("v") titles
     const rowItemsContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('movieScreenRowList');
 
@@ -34,25 +32,19 @@ describe('Homescreen Navigation - Movies Filter', function () {
   // https://tubi.testrail.io/index.php?/cases/view/76723
   it('C76723 - Movies Filter - When title is selected then corresponding details page displayed, @homescreen, @movies', async () => {
 
-    await testUtils.waitForApplicationStartup();
-
-
     // Check if Featured row contains all Movie titles ("v") titles
     const rowItemsContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('movieScreenRowList');
+    const item = rowItemsContent[0];
+    expect(item.type).to.equal('v');
+    let selectedTitle = item.title;
 
-    for (const itemContent of rowItemsContent) {
-      expect(itemContent.type).to.equal('v');
-
-    }
-
-    // Now select a title to redirect us on the detail page
-    await ecp.sendKeypress(ecp.Key.Down);
+    utils.sleep(1000);
     await ecp.sendKeypress(ecp.Key.Ok);
 
-    // Verify the Details page is a Movies Details page
-    await testUtils.retryWithTimeOut(async () => {
-      await testUtils.findRowIndexWithTitle('detailScreenMenu', 'Watch Trailer');
-    });
+    await testUtils.waitForCurrentScreenToEqual('detailScreen');
+
+    const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
+    expect(detailScreenTitle.text).to.equal(selectedTitle);
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/76730

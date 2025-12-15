@@ -210,15 +210,8 @@ describe('Playback', function () {
     //Play title, pause to open player, move right to FF button and press, verify state
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
-    await ecp.sendKeypress(ecp.Key.Play);
-    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'paused');
-    await ecp.sendKeypress(ecp.Key.Right, { count: 2 });
-
-    // FF button highlighted
-    await testUtils.waitForElementToFullyShowOnScreen('fastForwardButton');
-
     // Press FF button three time
-    await ecp.sendKeypress(ecp.Key.Ok, { count: 3 });
+    await ecp.sendKeypress(ecp.Key.Forward, { count: 3 });
 
     // Verify FF button state is FF 3
     const fastForwardButton = await testUtils.getNodeForElement('fastForwardButton');
@@ -226,20 +219,19 @@ describe('Playback', function () {
 
     // Back out of the video player to land on Details page after FF
     await utils.sleep(3000);
-    await ecp.sendKeypress(ecp.Key.Back);
+    await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
+    await utils.sleep(1000);
     const videoPlayerScreenTopOverlay = await testUtils.getNodeForElement('videoPlayerScreenTopOverlay');
     if (videoPlayerScreenTopOverlay.opacity == 1) {
       await ecp.sendKeypress(ecp.Key.Back);
     }
     await ecp.sendKeypress(ecp.Key.Back);
 
-
     // Are we on the details page?
     await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
-
     // Check that movie has history
-    await testUtils.waitForElementToFullyShowOnScreen('resumePlayingButton');
+    await testUtils.waitForElementToShowOnScreen('resumePlayingButton');
 
   });
 

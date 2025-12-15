@@ -76,6 +76,11 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.id',
   },
 
+  /** Loading spinner shown at the app level (ContentController) */
+  contentControllerSpinner: {
+    keyPath: '#ContentController.#uiGroup.#ContentControllerSpinner',
+  },
+
   /** Component on the Home Screen that we can pull content for the Grid from */
   homeScreenRowList: {
     keyPath:
@@ -967,6 +972,10 @@ const elements = typeCheckElements({
 
   trendingSearchResultsGrid: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#PageGroup.#rightSide.#ResultArea.#gridContainer.#trendingSearchResultsContainer.#trendingSearchResultGrid',
+  },
+
+  trendingSearchResultsContainer: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#PageGroup.#rightSide.#ResultArea.#gridContainer.#trendingSearchResultsContainer',
   },
 
   kidsSearchSelected: {
@@ -2981,6 +2990,11 @@ const elements = typeCheckElements({
   inlineVideoTilesPreviewPlayer: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#videoTileOverlayGroup.#inlineVideoPreviewPlayerContainer.#videoPreviewPlayer',
     xpath: '//RenderableNode[@name="inlineVideoPreviewPlayerContainer"]//VideoPreviewPlayer[@name="videoPreviewPlayer"]',
+  },
+
+  /** inTransitInlineVideoMetadataOverlayPoster - Poster shown in the in-transit state when navigating between video tiles */
+  inlineVideoPreviewPlayerContainerContentPoster: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#videoTileOverlayGroup.#inlineVideoPreviewPlayerContainer.#posterGroup.#poster',
   },
 
   /** guestUserCWTileTitle - Title label in guest user Continue Watching tile: "Sign Up to Save Your Progress"

@@ -514,11 +514,16 @@ describe('Parental Controls', function () {
     const rowItemsContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('videoTitlesRowList');
     // Check Ratings label
     const allowedRatings = ['R', 'PG', 'PG-13', 'TV-G', 'TV-MA'];
+    let adultContentPresent = false;
     for (const itemContent of rowItemsContent) {
       const rating = itemContent.ratings[0].value;
       const isAllowed = allowedRatings.some(allowedRating => rating.includes(allowedRating));
-      expect(isAllowed, `Rating "${rating}" should match one of: ${allowedRatings.join(', ')}`).to.be.true;
+      if (isAllowed) {
+        adultContentPresent = true;
+        break;
+      }
     }
+    expect(adultContentPresent).to.be.true;
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/535762

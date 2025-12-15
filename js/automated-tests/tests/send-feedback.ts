@@ -590,7 +590,7 @@ describe(' Send Feedback Captions Checks', function () {
 
     // Back to home
     await testUtils.goToPage('home');
-    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Navigate right to home page focus
     await ecp.sendKeypress(ecp.Key.Right, { wait: 1500 });

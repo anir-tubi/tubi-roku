@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { ecp, odc, utils } from 'roku-test-automation';
+import { ecp, odc, proxy, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
 import { moveToGrid } from '../analytics/utils/helpers';
 import { shared } from '../test-helpers';
@@ -196,15 +196,22 @@ describe('Search', function () {
 			// Navigate to Search page using testUtils.goToPage
 			await testUtils.goToPage('search');
 
-			// Verify we're on the search screen by checking trending results grid
-			await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for search screen', 10000);
+			// Wait for search screen to be ready
+			await testUtils.waitForCurrentScreenToEqual('searchScreen');
+			await testUtils.untilTrue(async () => {
+				const contents = await testUtils.getAllGridItemsContent('trendingSearchResultsGrid');
+				return contents.length > 5;
+			}, 'trendingSearchResultsGrid content count not greater than 5', 30000);
 
 			// Input some characters that displays results
 			await ecp.sendText('action');
-			await utils.sleep(3000); // Wait for search results to load
+			await testUtils.retryWithTimeOut(async () => {
+				const searchHintText = await testUtils.getNodeForElement('searchHintText');
+				expect(searchHintText.text).to.match(/\d+ titles found/);
+			}, 30000);
 
 			// Navigate to the search results grid
-			await shared.navigateRightToGrid();
+			await shared.navigateRightToSearchGrid();
 
 			// Verify search results text is visible
 			await testUtils.retryWithTimeOut(async () => {
@@ -213,10 +220,11 @@ describe('Search', function () {
 			});
 
 			// Select a movie title from results
+			await utils.sleep(2000);
 			await ecp.sendKeypress(ecp.Key.Ok);
 
 			// Verify we're on the detail screen
-			await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle', 'Detail screen not displayed');
+			await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle', 'Detail screen not displayed', 10000);
 
 			// Verify title is not empty
 			const detailTitle = await testUtils.getNodeForElement('detailScreenTitle');
@@ -236,7 +244,10 @@ describe('Search', function () {
 		await testUtils.goToPage('search');
 
 		// Verify we're on the search screen by checking trending results grid with no search text
-		await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for search screen', 10000);
+		await testUtils.untilTrue(async () => {
+			const contents = await testUtils.getAllGridItemsContent('trendingSearchResultsGrid');
+			return contents.length > 5;
+		}, 'trendingSearchResultsGrid content count not greater than 5', 30000);
 
 		// Enter search terms that will return no results
 		const noResultsQuery = 'dddd';
@@ -247,30 +258,70 @@ describe('Search', function () {
 		// Verify the no matching results message content
 		const noResultsMessage = await testUtils.getNodeForElement('noMatchingResultsMessage');
 
+		const translation = await testUtils.getElementField('trendingSearchResultsContainer', 'translation');
+		expect(translation[1]).to.be.lessThanOrEqual(100, 'Trending searches container is not at the top of the screen');
 		//If no matching results are found, trending searches will show on the results area.
 		if (noResultsMessage.visible == true) {
 			await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for search screen', 10000);
 		}
 
-		// Search that give less results to see the search results and tending search results
-		await ecp.sendText('2340');
+		await proxy.start();
+		await ecp.sendKeypress(ecp.Key.Backspace, { count: 4, wait: 100 });
+		await ecp.sendText('test');
 
+		// Set up proxy to limit search results to just 4 entries
+		const proxyPromise = new Promise((resolve) => {
+			proxy.addCallback({
+				shouldProcess: (args) => {
+					return args.url.includes('/api/v2/search');
+				},
+				processResponse(args) {
+					const responseJson = JSON.parse(args.responseBuffer.toString());
+					console.log('Search response intercepted', args.url);
+
+					// Limit the contents to just 4 entries
+					if (responseJson.contents) {
+						const contentIds = Object.keys(responseJson.contents);
+						const limitedContentIds = contentIds.slice(0, 4);
+
+						// Create new contents object with only 4 entries
+						const limitedContents = {};
+						limitedContentIds.forEach(id => {
+							limitedContents[id] = responseJson.contents[id];
+						});
+
+						responseJson.contents = limitedContents;
+						console.log(`Limited search results from ${contentIds.length} to ${limitedContentIds.length}`);
+					}
+
+					resolve(null);
+					args.removeCallback();
+					return JSON.stringify(responseJson);
+				},
+			});
+		});
+
+		await utils.promiseTimeout(proxyPromise, 5000);
+
+		// Verify we have limited results and trending searches are visible
 		const searchResultsGrid = await testUtils.getAllGridItemsContent('searchResultGrid');
-		expect(searchResultsGrid.length).to.be.greaterThan(0, 'We found search results');
+		expect(searchResultsGrid.length).to.equal(4, 'Search results should be limited to 4');
 
-		if (searchResultsGrid.length > 0 && searchResultsGrid.length < 4) {
-			await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for search screen', 10000);
-		}
+		const newTranslation = await testUtils.getElementField('trendingSearchResultsContainer', 'translation');
+		expect(newTranslation[1]).to.be.lessThanOrEqual(500, 'Trending searches container is not at the top of the screen');
 
+		// Now test with more results (no proxy limit)
+		await proxy.stop();
+		await ecp.sendKeypress(ecp.Key.Backspace, { count: 4, wait: 100 });
 		await ecp.sendText('Fox');
 
 		const searchResultsGridUpdated = await testUtils.getAllGridItemsContent('searchResultGrid');
 
 		//When we have more search results for search terrm, you will not see the trensing searches but it will be on the bottom of the screen
 		if (searchResultsGridUpdated.length > 8) {
-			await testUtils.waitForElementToNotShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for search screen', 10000);
-
 			const trendingSearches = await testUtils.getNodeForElement('trendingSearchResultsGrid');
+			const translation = await testUtils.getElementField('trendingSearchResultsContainer', 'translation');
+			expect(translation[1]).to.be.greaterThan(700, 'Trending searches container is not at the bottom of the screen');
 			const trendingSearchResults = await testUtils.getAllGridItemsContent('trendingSearchResultsGrid');
 			expect(trendingSearches.visible).to.equal(true);
 			expect(trendingSearchResults.length).to.be.greaterThan(0);

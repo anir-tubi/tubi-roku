@@ -1,6 +1,6 @@
 # Query Roku Device UI
 
-Query the Roku device UI tree and search for specific elements.
+Query the Roku device UI tree, find elements, and add them to elements.ts.
 
 **Usage:** `/query-ui lego`
 
@@ -8,43 +8,36 @@ Query the Roku device UI tree and search for specific elements.
 1. Extracts the Roku device IP from rta-config.json
 2. Fetches the current UI tree from http://IP:8060/query/app-ui
 3. Searches for elements matching your search term
-4. Displays matching nodes with their attributes and keypaths
-5. Shows instructions on how to add the element to elements.ts
+4. Displays matching nodes with their attributes
+5. **Automatically adds the found element to elements.ts** (if you confirm)
 
 **Arguments:**
-- `{{arg1}}` - Search term to find in the UI tree (e.g., "lego", "playButton", "searchMenuText")
+- `{{arg1}}` - Search term to find in the UI tree (e.g., "lego", "playButton", "searchMenuText", "193 titles found")
 
 **Example:**
 ```
-/query-ui lego
+/query-ui 193 titles found
 ```
 
-This will search the Roku UI for any elements containing "lego" and show you their keypaths and attributes.
+This will search the Roku UI for any elements containing "193 titles found", show you the results, and then add it to elements.ts.
 
-Run these commands:
+First, extract the Roku IP:
 ```bash
-ROKU_IP=$(grep -o '"host": "[^"]*"' rta-config.json | head -1 | cut -d'"' -f4); curl -s "http://${ROKU_IP}:8060/query/app-ui" | grep -i "{{arg1}}" | head -20
+grep -o '"host": "[^"]*"' rta-config.json | head -1 | cut -d'"' -f4
 ```
 
-**How to add the found element to elements.ts:**
-
-After finding the element, add it to `automated-tests-config/elements.ts`:
-
-1. Identify the element name attribute from the XML (e.g., `name="searchHintText"`)
-2. Build the keyPath from the XML hierarchy (e.g., `#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#searchHintText`)
-3. Add to the elements object with a descriptive comment:
-
-```typescript
-/** Description of what this element represents */
-elementName: {
-  keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#screenName.#elementName',
-},
+Then search for the element (replace ROKU_IP with the IP from above):
+```bash
+curl -s "http://ROKU_IP:8060/query/app-ui" | grep -F '{{arg1}}' | head -20
 ```
 
-**Example:**
-```typescript
-/** Search hint text showing number of titles found (e.g., "193 titles found") */
-searchHintText: {
-  keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#searchHintText',
-},
-```
+After showing the results, I will:
+1. Analyze the XML structure to identify the element name and attributes
+2. Ask you what name you want to use for the element in elements.ts
+3. Ask for a description of what the element represents
+4. Build the correct keyPath from the XML hierarchy
+5. Add the element to `automated-tests-config/elements.ts` with proper formatting
+
+**Note:**
+- Uses `-F` for fixed string matching to handle special characters in URLs
+- Replace `ROKU_IP` with the actual IP address from the first command (usually 192.168.1.220)

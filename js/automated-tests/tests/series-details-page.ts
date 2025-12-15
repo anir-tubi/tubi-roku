@@ -22,8 +22,8 @@ describe('Details Page', function () {
 
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/781325
     it('C781325 - Verify user sees Play button first in Kids Mode (Swap Always) @guest,@sdp_1', async () => {
-      await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: false });
-      await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for TV screen rowlist to have focus');
+      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+      await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
       await ecp.sendKeypress(ecp.Key.Left);
       await ecp.sendKeypress(ecp.Key.Rewind);
@@ -31,12 +31,13 @@ describe('Details Page', function () {
       await utils.sleep(500);
       await ecp.sendKeypress(ecp.Key.Ok);
       await testUtils.waitForElementToFullyShowOnScreen('exitKidsOption', 'Kids mode toggle not shown', 10000);
+      await testUtils.waitForElementToShowOnScreen('homeScreenRowList', 'video titles row list not shown', 10000);
       await ecp.sendKeypress(ecp.Key.Right);
-      await utils.sleep(1000);
-      await ecp.sendKeypress(ecp.Key.Down);
-      await utils.sleep(1000);
-      await shared.navigateToSeriesInContainer('tvScreenRowList');
-      await utils.sleep(1000);
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+      // Find and navigate to a series in the row list
+      await shared.findAndNavigateToContentType('s', 'homeScreenRowList');
+
       await ecp.sendKeypress(ecp.Key.Ok);
       await testUtils.waitForCurrentScreenToEqual('detailScreen');
 

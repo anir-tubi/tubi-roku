@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ecp, utils } from 'roku-test-automation';
 import { ContentRatings, testUtils } from '../test-utils';
-import { shared } from '../test-helpers';
+import { shared, testHelpers } from '../test-helpers';
 
 describe('Kids Mode', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/537398
@@ -167,8 +167,8 @@ describe('Kids Mode', function () {
 
     for (const itemContent of rowItemsContent) {
       const rating = itemContent.ratings[0].value;
-      const restrictedRatings = ['R', 'MA', 'PG-13', 'NR', 'TV-13'];
-      expect(rating).to.not.be.oneOf(restrictedRatings);
+      const isAllowed = testHelpers.isKidsAppropriateRating(rating);
+      expect(isAllowed).to.be.true;
     }
 
   });

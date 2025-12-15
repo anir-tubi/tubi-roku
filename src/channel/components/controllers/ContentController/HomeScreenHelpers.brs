@@ -203,18 +203,18 @@ End Function
 
 ' @response: roSGNode, a ContentNode representing a container/category, may have no children
 ' @screenId: string, the id of the specific home page as found in m.constants.ui.screenIds
-Function onReloadUserCategoriesInHomeScreen(response, screenID = "")
+Function onReloadUserCategoriesInHomeScreen(response, screenId = "")
   tubiLog("HomeScreenHelpers.onReloadUserCategoriesInHomeScreen")
 
-  if screenID = ""
-    screenID = m.constants.ui.screenIds.homeScreen
+  if screenId = ""
+    screenId = m.constants.ui.screenIds.homeScreen
   end if
-  homeScreen = getFromScreenCache(screenID)
+  homeScreen = getFromScreenCache(screenId)
 
   if homeScreen <> invalid
     ' For video tiles experiment, we need to update the featured row content.
     ' Since all the rows will be using new video tiles format.
-    if m.isUserInVideoTilesExperiment = true
+    if m.isUserInVideoTilesExperiment = true AND screenId = m.constants.ui.screenIds.homeScreen
       content = homeScreen.featuredRowContent
     else
       content = homeScreen.content

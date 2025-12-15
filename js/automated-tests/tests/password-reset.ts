@@ -4,7 +4,7 @@ import { testUtils } from '../test-utils';
 
 describe('Sign In: On-Device Password Reset', function () {
 
-// Test Rail link: https://tubi.testrail.io/index.php?/cases/view/476627
+  // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/476627
   it.skip('C476627 - Registered User - Sign In with valid credentials, @password_reset', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
@@ -29,15 +29,15 @@ describe('Sign In: On-Device Password Reset', function () {
     await ecp.sendText('111111');
     await utils.sleep(3000);
     await ecp.sendKeypress(ecp.Key.Right);
-    await ecp.sendKeypress(ecp.Key.Down, {count:4});
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
     await ecp.sleep(3000);
-    await ecp.sendKeypress(ecp.Key.Ok);   
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify on home page
     await testUtils.waitForCurrentScreenToEqual('homeScreen');
   });
 
-// Test Rail link: https://tubi.testrail.io/index.php?/cases/view/476628
+  // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/476628
   it.skip('C476628 - Registered User - Sign In with invalid password, @password_reset1', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
@@ -62,15 +62,15 @@ describe('Sign In: On-Device Password Reset', function () {
     await ecp.sendText('22222');
     await utils.sleep(3000);
     await ecp.sendKeypress(ecp.Key.Right);
-    await ecp.sendKeypress(ecp.Key.Down, {count:4});
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
     await ecp.sleep(3000);
-    await ecp.sendKeypress(ecp.Key.Ok, {wait:2000});   
+    await ecp.sendKeypress(ecp.Key.Ok, { wait: 2000 });
 
     // Oops! wrong password! screen is displayed
     await verifyWrongPasswordDialogDisplayed();
   });
 
-// Test Rail link: https://tubi.testrail.io/index.php?/cases/view/476629
+  // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/476629
   it.skip('C476629 - Registered User - Instant Sign-In Link - Prefilled email, @password_reset1', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
@@ -94,9 +94,9 @@ describe('Sign In: On-Device Password Reset', function () {
     await ecp.sendText('222222');
     await utils.sleep(3000);
     await ecp.sendKeypress(ecp.Key.Right);
-    await ecp.sendKeypress(ecp.Key.Down, {count:4});
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
     await ecp.sleep(3000);
-    await ecp.sendKeypress(ecp.Key.Ok, {wait:2000});   
+    await ecp.sendKeypress(ecp.Key.Ok, { wait: 2000 });
 
     // Oops! wrong password! screen is displayed
     await verifyWrongPasswordDialogDisplayed();
@@ -109,7 +109,7 @@ describe('Sign In: On-Device Password Reset', function () {
     expect(helpOnTheWayTitle.text).to.equal('Help is on the way!');
   });
 
-it('C476634 - Register New User - Default Mode, @password_reset', async () => {
+  it('C476634 - Register New User - Default Mode, @password_reset', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
@@ -118,7 +118,7 @@ it('C476634 - Register New User - Default Mode, @password_reset', async () => {
     await ecp.sendKeypress(ecp.Key.Left);
     await testUtils.jumpToRowWithTitle('sideNavMenu', 'Sign In');
     await ecp.sendKeypress(ecp.Key.Ok);
-    
+
     // Wait for Roku sign in prompt
     await ecp.sleep(8000);
     // Cancel to land on Enter Email Address page
@@ -133,7 +133,7 @@ it('C476634 - Register New User - Default Mode, @password_reset', async () => {
     await ecp.sleep(2000);
     await ecp.sendText(email);
     await ecp.sleep(3000);
-    await ecp.sendKeypress(ecp.Key.Down,{count: 4});
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify on Confirm your age page
@@ -144,7 +144,7 @@ it('C476634 - Register New User - Default Mode, @password_reset', async () => {
     await ecp.sleep(2000);
     await ecp.sendText('14');
     await ecp.sleep(3000);
-    await ecp.sendKeypress(ecp.Key.Down,{count: 4});
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
     await ecp.sleep(2000);
     await ecp.sendKeypress(ecp.Key.Ok);
 
@@ -162,8 +162,8 @@ it('C476634 - Register New User - Default Mode, @password_reset', async () => {
     expect(sideNavSignedInLabel.text).to.contain('Hi');
   });
 
-// Test Rail link: https://tubi.testrail.io/index.php?/cases/view/476635
-it('C476635 - Register New User - Kids Mode, @password_reset', async () => {
+  // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/476635
+  it('C476635 - Register New User - Kids Mode, @password_reset', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
@@ -187,7 +187,7 @@ it('C476635 - Register New User - Kids Mode, @password_reset', async () => {
     await ecp.sleep(2000);
     await ecp.sendText(email);
     await ecp.sleep(3000);
-    await ecp.sendKeypress(ecp.Key.Down,{count: 4});
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify on Confirm your age page
@@ -198,7 +198,7 @@ it('C476635 - Register New User - Kids Mode, @password_reset', async () => {
     await ecp.sleep(2000);
     await ecp.sendText('12');
     await ecp.sleep(3000);
-    await ecp.sendKeypress(ecp.Key.Down,{count: 4});
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify on home screen with welcome to tubi kids dialog displayed
@@ -211,19 +211,19 @@ it('C476635 - Register New User - Kids Mode, @password_reset', async () => {
     // Press Ok to dismiss the dialog, verify user on the Kids mode Home screen
     await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForElementToFullyShowOnScreen('tubiKidsLogo');
-    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
   });
 });
 
 
-  async function verifyWrongPasswordDialogDisplayed() {
-    await testUtils.waitForElementToFullyShowOnScreen('wrongPasswordDialog');
-    const wrongPasswordDialogTitle = await testUtils.getNodeForElement('wrongPasswordTitle');
-    expect(wrongPasswordDialogTitle.text).to.equal('Oops, wrong Password');
-    const wrongPasswordDialogMessage = await testUtils.getNodeForElement('wrongPasswordMessage');
-    expect(wrongPasswordDialogMessage.text).to.contain('try again or enter a different password for this account:');
-    const wrongPasswordDialogForgotButton = await testUtils.getNodeForElement('wrongPasswordForgotButton');
-    expect(wrongPasswordDialogForgotButton.text).to.equal('Forgot Password');
-    const wrongPasswordDialogRetryButton = await testUtils.getNodeForElement('wrongPasswordRetryButton');
-    expect(wrongPasswordDialogRetryButton.text).to.equal('Retry');
-  }
+async function verifyWrongPasswordDialogDisplayed() {
+  await testUtils.waitForElementToFullyShowOnScreen('wrongPasswordDialog');
+  const wrongPasswordDialogTitle = await testUtils.getNodeForElement('wrongPasswordTitle');
+  expect(wrongPasswordDialogTitle.text).to.equal('Oops, wrong Password');
+  const wrongPasswordDialogMessage = await testUtils.getNodeForElement('wrongPasswordMessage');
+  expect(wrongPasswordDialogMessage.text).to.contain('try again or enter a different password for this account:');
+  const wrongPasswordDialogForgotButton = await testUtils.getNodeForElement('wrongPasswordForgotButton');
+  expect(wrongPasswordDialogForgotButton.text).to.equal('Forgot Password');
+  const wrongPasswordDialogRetryButton = await testUtils.getNodeForElement('wrongPasswordRetryButton');
+  expect(wrongPasswordDialogRetryButton.text).to.equal('Retry');
+}

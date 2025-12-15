@@ -137,6 +137,8 @@ async function triggerSeriesAutoplayUI() {
   await ecp.sendKeypress(ecp.Key.Play);
   await seekToTriggerCuePoint();
 
+  await utils.sleep(1000);
+
   // Autoplay triggered?
   await checkIfSeriesAutoPlayUIisShowing();
 }
@@ -152,6 +154,8 @@ async function checkIfSeriesAutoPlayUIisShowing() {
   const countDownAutoPlay = await testUtils.getNodeForElement('countDownAutoPlay');
   // Testing to make sure countdown is showing.
   expect(countDownAutoPlay.text).to.contain('Up Next in');
+
+  await testUtils.waitForElementToHaveFocus('autoplayUINextEpisodeButton', 'Timed out waiting for Next Episode button to have focus', 15000);
 
   // Testing to make sure countdown is counting down.
   await testUtils.waitForElementToFullyShowOnScreen('countDownSecondsAutoPlay');

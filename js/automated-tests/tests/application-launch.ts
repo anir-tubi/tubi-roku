@@ -120,20 +120,20 @@ describe('Application Launch', function () {
     // Launch app
     await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
 
-    // Check for presence of Movies Grid
-    await testUtils.findRowIndexWithTitle('movieScreenRowList', 'Featured');
-
-    // Play title
-    await ecp.sendKeypress(ecp.Key.Down);
+    await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
     await ecp.sendKeypress(ecp.Key.Play);
 
     // Create CW row
     await shared.createHistory(900000, true);
     await ecp.sendKeypress(ecp.Key.Back);
+
+    await testUtils.waitForCurrentScreenToEqual('detailScreen');
     await testUtils.waitForElementToFullyShowOnScreen('resumePlayingButton');
 
     // Back out to Details page
     await ecp.sendKeypress(ecp.Key.Back);
+    await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
 
     // Jump To Continue Watching Row
     await shared.scrollDownToFindRow({ slug: 'continue_watching', rowListElementId: 'movieScreenRowList' });

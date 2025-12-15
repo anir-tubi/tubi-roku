@@ -1348,6 +1348,10 @@ Function getTranslation_en_US()
       "description": "button text for when a non registered user focuses on the continue watching container",
       "message": "Sign Up to Save Progress"
     },
+    "save_progress_later_dialog_button": {
+      "description": "Button text for the 'save progress later' dialog button",
+      "message": "Sign Up to Save Progress - FREE"
+    },
     "metadata_directed": {
       "description": "metadata label to indicate the directors of the current video title",
       "message": "Directed by"

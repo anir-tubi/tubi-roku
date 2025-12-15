@@ -131,7 +131,7 @@ jobs:
           name: Failed Test Screenshots
           path: out/ui-tests-output/screenshots
 
-      # - name: Send Slack Notification
-      #   if: success() || failure()
-      #   run: |
-      #     npx ts-node ./js/workflows/sendSlackAutomatedTestsResultNotification.ts
+      - name: Send Slack Notification
+        if: success() || failure()
+        run: |
+          npx ts-node ./js/workflows/sendSlackAutomatedTestsResultNotification.ts

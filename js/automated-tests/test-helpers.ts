@@ -563,36 +563,74 @@ class TestHelpers {
   }
 
   /**
-   * Navigates to a series/TV show on home screen
+   * HELPER: Finds and navigates to content of a specific type
    * 
    * USE WHEN:
-   *   - Need to navigate to series detail page
-   *   - Testing series-specific features
-   *   - Need to find a series (not a movie) on home screen
+   *   - Need to find and focus on a specific content type
+   *   - Testing content-type-specific features
+   *   - Want flexible navigation that searches current or multiple rows
    * 
-   * PREREQUISITES:
-   *   - Must already be on home screen with rowListElementId focused
+   * @param contentType - Content type to find ('v' = movie, 's' = series, 'l' = live, etc.)
+   * @param rowListElementId - Element ID of the row list (defaults to 'videoTitlesRowList')
+   * @param maxRowsToCheck - Maximum number of rows to check (defaults to 20, set to 1 for current row only)
    * 
-   * @param rowListElementId - Element ID of the RowList to search in (default: 'videoTitlesRowList')
+   * @throws Error if no content of specified type found
+   * 
    * @example
-   * // Navigate to series on home screen
-   * await testHelpers.navigateToSeriesInContainer('tvScreenRowList');
-   * // Now you're focused on a series
-   * await ecp.sendKeypress(ecp.Key.Ok); // Open detail screen
+   * // Find a series across multiple rows (default behavior)
+   * await testHelpers.findAndNavigateToContentType('s', 'homeScreenRowList');
+   * 
+   * @example
+   * // Find a movie in current row only
+   * await testHelpers.findAndNavigateToContentType('v', 'movieScreenRowList', 1);
+   * 
+   * @example
+   * // Find live content with custom max rows
+   * await testHelpers.findAndNavigateToContentType('l', 'videoTitlesRowList', 10);
    */
-  public async navigateToSeriesInContainer(rowListElementId: ElementOrElementId = 'videoTitlesRowList') {
-    const content = await testUtils.getCurrentlyFocusedRowListRowItemsContent(rowListElementId);
-    let colIndex = -1;
-    for (const [index, item] of content.entries()) {
-      if (item.type === 's') {
-        colIndex = index;
-        break;
+  public async findAndNavigateToContentType(contentType: string, rowListElementId: ElementOrElementId = 'videoTitlesRowList', maxRowsToCheck: number = 20): Promise<void> {
+    let foundContent = false;
+
+    for (let rowAttempt = 0; rowAttempt < maxRowsToCheck; rowAttempt++) {
+      await utils.sleep(300);
+
+      try {
+        // Get content from current row
+        const content = await testUtils.getCurrentlyFocusedRowListRowItemsContent(rowListElementId);
+        let colIndex = -1;
+
+        // Find content of specified type
+        for (const [index, item] of content.entries()) {
+          if (item.type === contentType) {
+            colIndex = index;
+            break;
+          }
+        }
+
+        if (colIndex !== -1) {
+          // Found content, navigate to it
+          await ecp.sendKeypress(ecp.Key.Right, { count: colIndex });
+          foundContent = true;
+          break;
+        }
+
+        // No content of this type in current row, move to next row if we have more rows to check
+        if (rowAttempt < maxRowsToCheck - 1) {
+          await ecp.sendKeypress(ecp.Key.Down);
+        }
+      } catch (e) {
+        // Error getting content, move to next row if we have more rows to check
+        if (rowAttempt < maxRowsToCheck - 1) {
+          await ecp.sendKeypress(ecp.Key.Down);
+        }
       }
     }
-    if (colIndex === -1) {
-      throw new Error(`No series found in current row of ${rowListElementId}`);
+
+    if (!foundContent) {
+      const contentTypeName = contentType === 'v' ? 'movie' : contentType === 's' ? 'series' : contentType === 'l' ? 'live content' : `content type '${contentType}'`;
+      const rowText = maxRowsToCheck === 1 ? 'current row' : `${maxRowsToCheck} rows`;
+      throw new Error(`Could not find ${contentTypeName} in ${rowListElementId} after checking ${rowText}`);
     }
-    await ecp.sendKeypress(ecp.Key.Right, { count: colIndex });
   }
 
   /**
@@ -1381,20 +1419,21 @@ class TestHelpers {
   ): Promise<[number, number] | []> {
     // Get all content grouped by row
     const rowsContent = await testUtils.getAllRowListItemsContentGroupedByRow(rowListElementId);
-
     // Search through rows up to maxRowsToSearch
     for (let rowIndex = 0; rowIndex < Math.min(rowsContent.length, maxRowsToSearch); rowIndex++) {
       const rowContent = rowsContent[rowIndex];
-
       // Search through items in this row
       for (let colIndex = 0; colIndex < rowContent.length; colIndex++) {
         const item = rowContent[colIndex];
+        if (item.type.includes('ad')) {
+          continue;
+        }
         const videoPreviewUrl = item.video_preview_url?.trim();
 
         // Check if item matches the video preview criteria
         if (hasVideoPreview && videoPreviewUrl.length > 0) {
           return [rowIndex, colIndex];
-        } else if (!hasVideoPreview && videoPreviewUrl.length === 0) {
+        } else if (!hasVideoPreview && (videoPreviewUrl === undefined || videoPreviewUrl === null || videoPreviewUrl.length === 0)) {
           return [rowIndex, colIndex];
         }
       }
@@ -1525,7 +1564,7 @@ class TestHelpers {
    * @returns boolean - true if rating is kids-appropriate
    */
   public isKidsAppropriateRating(rating: string): boolean {
-    const kidsRatings = ['G', 'TV-Y', 'TV-Y7', 'TV-G', 'PG'];
+    const kidsRatings = ['G', 'TV-Y', 'TV-Y7', 'TV-G', 'PG', 'TV-PG'];
     return kidsRatings.includes(rating);
   }
 

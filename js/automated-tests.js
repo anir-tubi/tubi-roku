@@ -272,7 +272,8 @@ async function runAutomatedTests(done, branch = '', tags = [], testsPath = 'js/a
     `--reporter-option output=${jsonReportOutputPath}`, // output path for json reporter
     `--reporter-option reportDir=${testUtils.testsOutputFolder}/html`, // folder for mochawesome
     `--reporter-option reportFilename=report`, // filename for mochawesome
-    `--reporter-option json=false` // turn off json output for mochawesome
+    `--reporter-option json=false`, // turn off json output for mochawesome
+    '--exit' // Force mocha to exit after tests complete
   ];
 
   // Used to allow specifying a tag to limit to when run from the Github UI for the Automated UI Tests Github runner. Also used to specify if we are using a custom string instead.

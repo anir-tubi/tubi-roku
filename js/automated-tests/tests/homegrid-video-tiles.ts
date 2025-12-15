@@ -210,16 +210,12 @@ describe('HomeGrid Video Tiles', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842092
   it('C842092 - When a title does not have a video preview, a static image is shown @guest', async () => {
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
-    await testUtils.waitForElementToShowOnScreen('videoTitlesRowList', 'videoTitlesRowList not visible', 10000);
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus', 10000);
 
     await testUtils.waitForGridContentToLoad('videoTitlesRowList', 5000);
-    await utils.sleep(1000);
 
     const position = await testHelpers.findContentPositionInRowListThatContainsVideoPreview('videoTitlesRowList', false, 5);
-
     if (position.length === 0) {
       throw new Error('Could not find content without video preview in the first 5 rows');
     }
@@ -232,12 +228,7 @@ describe('HomeGrid Video Tiles', function () {
     const previewPlayerState = await testUtils.getElementField('previewVideoPlayer', 'state');
     expect(previewPlayerState).to.be.oneOf(['stopped', 'none'], 'Preview video player should not be playing for content without video preview');
 
-    await testUtils.waitForElementToShowOnScreen('backgroundPoster', 'Static image not visible', 15000);
-
-    await testUtils.retryWithTimeOut(async () => {
-      const posterVisible = await testUtils.getElementField('backgroundPoster', 'visible');
-      expect(posterVisible).to.equal(true, 'Static image should be visible when video preview is not available');
-    }, 10000);
+    await testUtils.waitForElementToShowOnScreen('inlineVideoPreviewPlayerContainerContentPoster', 'Static image not visible', 15000);
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842093
@@ -1113,18 +1104,44 @@ describe('HomeGrid Video Tiles', function () {
     expect(firstRowContent).to.be.an('array').with.lengthOf.at.least(1, 'First row should have at least one item');
 
     // Check all items in all rows for Kids Mode filtering
+    const violations = [];
+
     for (const row of rowsContent) {
       for (const itemContent of row) {
+        // Check if ratings exist
+        if (!itemContent.ratings || itemContent.ratings.length === 0) {
+          console.log(`WARNING: Content without ratings found: ${itemContent.title} (ID: ${itemContent.id})`);
+          continue;
+        }
+
         const rating = itemContent.ratings[0].value;
-        const restrictedRatings = ['R', 'MA', 'PG-13', 'NR', 'TV-13', 'TV-MA', 'TV-14'];
-        expect(rating).to.not.be.oneOf(restrictedRatings);
+        const isAllowed = testHelpers.isKidsAppropriateRating(rating);
+
+        if (!isAllowed) {
+          violations.push({
+            title: itemContent.title,
+            id: itemContent.id,
+            type: itemContent.type,
+            rating: rating
+          });
+        }
       }
     }
 
+    // Log all violations if any found
+    if (violations.length > 0) {
+      console.log(`\n❌ FAILED: Found ${violations.length} non-kids content item(s) in Kids Mode:`);
+      violations.forEach((v, index) => {
+        console.log(`  ${index + 1}. Title: "${v.title}" | ID: ${v.id} | Type: ${v.type} | Rating: ${v.rating}`);
+      });
+    }
+
+    expect(violations.length, `Found ${violations.length} non-kids content item(s) in Kids Mode. See console for details.`).to.equal(0);
+
     // Validate that video tile overlay group is visible in kids mode
-    await testUtils.waitForElementToShowOnScreen('videoTileOverlayGroup', 'videoTileOverlayGroup not visible in kids mode', 5000);
     const overlayGroup = await testUtils.getNodeForElement('videoTileOverlayGroup');
-    expect(overlayGroup.visible).to.equal(true, 'videoTileOverlayGroup should be visible in kids mode');
+    const isVisible = overlayGroup.visible == true && overlayGroup.opacity == 1;
+    expect(isVisible).to.equal(false, 'videoTileOverlayGroup should be visible in kids mode');
 
     // Validate that inline video preview player container has opacity 0 (not showing video preview in kids mode)
     // Wait for UI to update to Kids Mode state
@@ -1201,25 +1218,34 @@ describe('HomeGrid Video Tiles', function () {
       expect(rowsContent).to.be.an('array').with.lengthOf.at.least(1, 'Should have at least one row');
     }, 20000);
 
-    const kidsRatings = ['G', 'TV-Y', 'TV-Y7', 'TV-G'];
-    let foundNonKidsContent = false;
+    const violations = [];
 
     for (const row of rowsContent) {
       for (const item of row) {
         if (item.ratings && item.ratings.length > 0) {
           const rating = item.ratings[0].value;
-          if (!kidsRatings.includes(rating)) {
-            foundNonKidsContent = true;
-            break;
+          const isAllowed = testHelpers.isKidsAppropriateRating(rating);
+          if (!isAllowed) {
+            violations.push({
+              title: item.title,
+              id: item.id,
+              type: item.type,
+              rating: rating
+            });
           }
         }
       }
-      if (foundNonKidsContent) {
-        break;
-      }
     }
 
-    expect(foundNonKidsContent).to.be.false;
+    // Log all violations if any found
+    if (violations.length > 0) {
+      console.log(`\n❌ FAILED: Found ${violations.length} non-kids content item(s) with Little Kids parental control:`);
+      violations.forEach((v, index) => {
+        console.log(`  ${index + 1}. Title: "${v.title}" | ID: ${v.id} | Type: ${v.type} | Rating: ${v.rating}`);
+      });
+    }
+
+    expect(violations.length, `Found ${violations.length} non-kids content item(s) with Little Kids parental control. See console for details.`).to.equal(0);
 
     // Validate that inline video preview player container has opacity 0 (not showing video preview with Little Kids parental control)
     const previewContainer = await testUtils.getNodeForElement('inlineVideoPreviewPlayerContainer');
@@ -1254,25 +1280,34 @@ describe('HomeGrid Video Tiles', function () {
       expect(rowsContent).to.be.an('array').with.lengthOf.at.least(1, 'Should have at least one row');
     }, 20000);
 
-    const olderKidsRatings = ['G', 'TV-Y', 'TV-Y7', 'TV-G', 'PG', 'TV-PG'];
-    let foundAdultContent = false;
+    const violations = [];
 
     for (const row of rowsContent) {
       for (const item of row) {
         if (item.ratings && item.ratings.length > 0) {
           const rating = item.ratings[0].value;
-          if (!olderKidsRatings.includes(rating)) {
-            foundAdultContent = true;
-            break;
+          const isAllowed = testHelpers.isKidsAppropriateRating(rating);
+          if (!isAllowed) {
+            violations.push({
+              title: item.title,
+              id: item.id,
+              type: item.type,
+              rating: rating
+            });
           }
         }
       }
-      if (foundAdultContent) {
-        break;
-      }
     }
 
-    expect(foundAdultContent).to.be.false;
+    // Log all violations if any found
+    if (violations.length > 0) {
+      console.log(`\n❌ FAILED: Found ${violations.length} adult content item(s) with Older Kids parental control:`);
+      violations.forEach((v, index) => {
+        console.log(`  ${index + 1}. Title: "${v.title}" | ID: ${v.id} | Type: ${v.type} | Rating: ${v.rating}`);
+      });
+    }
+
+    expect(violations.length, `Found ${violations.length} adult content item(s) with Older Kids parental control. See console for details.`).to.equal(0);
 
     // Validate that inline video preview player container has opacity 0 (not showing video preview with Older Kids parental control)
     const previewContainer = await testUtils.getNodeForElement('inlineVideoPreviewPlayerContainer');

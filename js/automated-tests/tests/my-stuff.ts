@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ecp, odc, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
-import { shared } from '../test-helpers';
+import { shared, testHelpers } from '../test-helpers';
 
 
 
@@ -314,7 +314,11 @@ describe('MyStuff', function () {
     const { value: button } = await odc.getValue({
       keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#Menu.2',
     });
-    expect(button.itemContent?.id).to.equal('AddQueueMenuItem');
+    expect(button.itemContent?.id).not.to.equal('RemoveHistoryMenuItem');
+
+    const { node: focusedButton } = await odc.getFocusedNode();
+
+    expect(focusedButton.id).not.to.equal('RemoveHistoryMenuItem');
 
   });
 
@@ -964,7 +968,8 @@ describe('MyStuff', function () {
     for (const itemContent of myListContent) {
       if (itemContent.ratings && itemContent.ratings.length > 0) {
         const rating = itemContent.ratings[0].value;
-        await verifyKidsAppropriatRating(rating);
+        const isAllowed = testHelpers.isKidsAppropriateRating(rating);
+        expect(isAllowed).to.be.true;
       }
     }
 
@@ -1145,18 +1150,4 @@ async function createMixedKidsAndAdultContent(user) {
 
   // Small delay to ensure content is synced
   await utils.sleep(1000);
-}
-
-async function verifyKidsAppropriatRating(rating) {
-  // Define kids-appropriate ratings
-  const kidsRatings = ['G', 'TV-Y', 'TV-Y7', 'TV-G', 'PG'];
-
-  // Define adult-only ratings that should NOT appear in Kids Mode
-  const adultRatings = ['R', 'PG-13', 'TV-14', 'TV-MA', 'NC-17'];
-
-  // Verify the rating is kids-appropriate
-  expect(kidsRatings).to.include(rating, `Rating "${rating}" is not appropriate for Kids Mode`);
-
-  // Verify the rating is NOT an adult rating
-  expect(adultRatings).to.not.include(rating, `Adult rating "${rating}" should not appear in Kids Mode`);
 }

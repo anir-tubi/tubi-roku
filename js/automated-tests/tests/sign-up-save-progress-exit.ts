@@ -8,6 +8,7 @@ describe('Sign up Save Progress Exit Prompt', function () {
         const user = await testUtils.createAnonymousUser();
         user.setIsNewUser(false);
         await testUtils.startApplicationAtPage('home', { user: user });
+        await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
         await shared.openSeries();
         await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
     });
@@ -20,7 +21,7 @@ describe('Sign up Save Progress Exit Prompt', function () {
         await ecp.sendKeypress(ecp.Key.Ok);
         await ecp.sendKeypress(ecp.Key.Play);
         await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
-        await triggerSaveProgressExitPromp();
+        await triggerSaveProgressExitPrompt();
 
         await verifySaveProgressExitPrompt();
 
@@ -43,9 +44,11 @@ describe('Sign up Save Progress Exit Prompt', function () {
         await ecp.sendKeypress(ecp.Key.Play);
         await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
-        await triggerSaveProgressExitPromp();
+        await triggerSaveProgressExitPrompt();
+        await utils.sleep(1000);
 
         await verifySaveProgressExitPrompt();
+        await utils.sleep(1000);
 
         // Press OK on Sign Up to Save Progress button
         await ecp.sendKeypress(ecp.Key.Ok, { wait: 10000 });
@@ -54,9 +57,8 @@ describe('Sign up Save Progress Exit Prompt', function () {
         //await ecp.sleep(5000);
         await ecp.sendKeypress(ecp.Key.Ok);
 
-
         // Verify if on the Sign In to Your Account age
-        await testUtils.waitForElementToFullyShowOnScreen('emailVerificationButton', 'Button Not Found');
+        await testUtils.waitForCurrentScreenToEqual('signInScreen');
 
     });
 
@@ -69,7 +71,7 @@ describe('Sign up Save Progress Exit Prompt', function () {
         await ecp.sendKeypress(ecp.Key.Play);
         await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
-        await triggerSaveProgressExitPromp();
+        await triggerSaveProgressExitPrompt();
 
         await verifySaveProgressExitPrompt();
 
@@ -93,7 +95,7 @@ describe('Sign up Save Progress Exit Prompt', function () {
         await ecp.sendKeypress(ecp.Key.Play);
         await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
-        await triggerSaveProgressExitPromp();
+        await triggerSaveProgressExitPrompt();
 
         await verifySaveProgressExitPrompt();
 
@@ -111,7 +113,6 @@ describe('Sign up Save Progress Exit Prompt', function () {
     });
 
     // https://tubi.testrail.io/index.php?/cases/view/450490 - Need to remove this because of Magic Link
-
     it.skip('C450490 - Exit prompt - Guest user sign in through the modal and the CW row should populate, @signupsaveprogressexit', async () => {
 
         // Select a title
@@ -120,7 +121,7 @@ describe('Sign up Save Progress Exit Prompt', function () {
         await ecp.sendKeypress(ecp.Key.Play);
         await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
-        await triggerSaveProgressExitPromp();
+        await triggerSaveProgressExitPrompt();
 
         await verifySaveProgressExitPrompt();
 
@@ -164,75 +165,68 @@ describe('Sign up Save Progress Exit Prompt', function () {
 
         // Navigate to verify Continue Watching category appeared
         await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
-        await testUtils.waitForElementToFullyShowOnScreen(
-            'tvContinueWatchingRow'
-        );
+        await testUtils.waitForElementToFullyShowOnScreen('tvContinueWatchingRow');
+    });
 
+    // https://tubi.testrail.io/index.php?/cases/view/450491
+    it('C450491 - Exit prompt - Guest user autoplay to next episode, after playback more than 5 minutes press back button, @signupsaveprogressexit', async () => {
 
+        // Select a title
+        await ecp.sendKeypress(ecp.Key.Ok);
 
-        // https://tubi.testrail.io/index.php?/cases/view/450491
-        it('C450491 - Exit prompt - Guest user autoplay to next episode, after playback more than 5 minutes press back button, @signupsaveprogressexit', async () => {
+        await ecp.sendKeypress(ecp.Key.Play);
+        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 20000);
 
-            // Select a title
-            await ecp.sendKeypress(ecp.Key.Ok);
+        //seek to autoplay cue point
+        await ecp.sendKeypress(ecp.Key.Play);
+        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'paused');
+        await testUtils.seekPlayerToRelativePosition('videoPlayerScreen', 0, 'end');
 
-            await ecp.sendKeypress(ecp.Key.Play);
-            await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 20000);
+        await testUtils.waitForElementToHaveFocus('autoplayUINextEpisodeButton', 'Timed out waiting for Next Episode button to have focus', 15000);
+        // play next episode
+        await ecp.sendKeypress(ecp.Key.Ok);
+        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
-            //seek to autoplay cue point
-            await ecp.sendKeypress(ecp.Key.Play);
-            await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'paused');
-            await testUtils.seekPlayerToRelativePosition('videoPlayerScreen', 0, 'end');
+        // Trigger Sign up modal when exit playback
+        await triggerSaveProgressExitPrompt();
 
-            // wait for autoplay
-            await testUtils.waitForElementFieldToEqual('autoPlayContentPoster', 'itemHasfocus', true);
+        // verify Sign up modal when exit playback
+        await verifySaveProgressExitPrompt();
+    });
 
-            // play next episode
-            await ecp.sendKeypress(ecp.Key.Play);
-            await testUtils.waitForElementFieldToEqual('autoPlayContentPoster', 'itemHasfocus', false);
-            await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
+    // https://tubi.testrail.io/index.php?/cases/view/450495
+    it('C450495 - Exit prompt - Only show this treatment once per viewing session, @signupsaveprogressexit', async () => {
+        // Select a title
+        await ecp.sendKeypress(ecp.Key.Ok);
 
-            // Trigger Sign up modal when exit playback
-            await triggerSaveProgressExitPromp();
+        await ecp.sendKeypress(ecp.Key.Play);
+        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 20000);
 
-            // verify Sign up modal when exit playback
-            await verifySaveProgressExitPrompt();
-        });
+        // Trigger Sign up modal when exit playback
+        await triggerSaveProgressExitPrompt();
 
-        // https://tubi.testrail.io/index.php?/cases/view/450495
-        it('C450495 - Exit prompt - Only show this treatment once per viewing session, @signupsaveprogressexit', async () => {
-            // Select a title
-            await ecp.sendKeypress(ecp.Key.Ok);
+        // verify Sign up modal when exit playback
+        await verifySaveProgressExitPrompt();
 
-            await ecp.sendKeypress(ecp.Key.Play);
-            await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 20000);
+        // Press back
+        await ecp.sendKeypress(ecp.Key.Back);
+        await testUtils.waitForCurrentScreenToEqual('detailScreen');
+        await ecp.sendKeypress(ecp.Key.Back);
+        await testUtils.waitForCurrentScreenToEqual('tvScreen');
 
-            // Trigger Sign up modal when exit playback
-            await triggerSaveProgressExitPromp();
+        // Play a title
+        await ecp.sendKeypress(ecp.Key.Right);
+        await ecp.sendKeypress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Play);
+        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 20000);
 
-            // verify Sign up modal when exit playback
-            await verifySaveProgressExitPrompt();
+        // Trigger Sign up modal when exit playback
+        await triggerSaveProgressExitPrompt();
 
-            // Press back
-            await ecp.sendKeypress(ecp.Key.Back);
-            await testUtils.waitForCurrentScreenToEqual('detailScreen');
-            await ecp.sendKeypress(ecp.Key.Back);
-            await testUtils.waitForCurrentScreenToEqual('tvScreen');
-
-            // Play a title
-            await ecp.sendKeypress(ecp.Key.Right);
-            await ecp.sendKeypress(ecp.Key.Ok);
-            await ecp.sendKeypress(ecp.Key.Play);
-            await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 20000);
-
-            // Trigger Sign up modal when exit playback
-            await triggerSaveProgressExitPromp();
-
-            // Verify the exit prompt of sign up won't be displayed this time
-            await testUtils.waitForElementToNotShowOnScreen('signUpExitDialog');
-            const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
-            expect(detailScreenTitle.text).to.not.be.empty;
-        });
+        // Verify the exit prompt of sign up won't be displayed this time
+        await testUtils.waitForElementToNotShowOnScreen('signUpExitDialog');
+        const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
+        expect(detailScreenTitle.text).to.not.be.empty;
     });
 });
 
@@ -250,7 +244,7 @@ async function verifySaveProgressExitPrompt() {
     expect(signUpExitDialogLaterButton.text).to.equal('Sign Up Later');
 }
 
-async function triggerSaveProgressExitPromp() {
+async function triggerSaveProgressExitPrompt() {
     await ecp.sendKeypress(ecp.Key.Forward, { count: 2 });
     await ecp.sleep(6000);
     await ecp.sendKeypress(ecp.Key.Play, { wait: 2000 });

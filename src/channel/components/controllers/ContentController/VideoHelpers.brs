@@ -696,7 +696,7 @@ End Function
 Function showSignUpModal()
   heading = getTranslation("player_exit_prompt_signup_heading")
   message = getTranslation("player_exit_prompt_signup_sub_heading")
-  signUpToSaveProgressButton = getTranslation("metadata_continueWatching_notSignedIn_container_button")
+  signUpToSaveProgressButton = getTranslation("save_progress_later_dialog_button")
   signUpLaterButton = getTranslation("player_exit_prompt_signup_later_button")
 
   buttons = [signUpToSaveProgressButton, signUpLaterButton]
