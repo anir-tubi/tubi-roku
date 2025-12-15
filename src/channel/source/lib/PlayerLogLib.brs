@@ -868,7 +868,13 @@ Function playerLogLib_firePlayerPageExitEvent(playerExitInfo)
     playerExitInfo.message_map.is_from_autoplay = m.isFromAutoplay.toStr()
     playerExitInfo.message_map.video_resource_hdcp = m.hdcpVersion.toStr()
     playerExitInfo.message_map.video_resource_resolution = m.videoResolution.toStr()
-    playerExitInfo.message_map.streamformat = m.content.streamformat
+
+    if m.content <> invalid AND isNonEmptyString(m.content.streamformat) = true
+      playerExitInfo.message_map.streamformat = m.content.streamformat
+    else
+      playerExitInfo.message_map.streamformat = "unknown"
+    end if
+
     playerExitInfo.message_map.videoPosition = m.videoPosition.toStr()
     playerExitInfo.message_map.videoStateWhenExitingPlayer = m.videoStateWhenExitingPlayer
     playerExitInfo.message_map.playbackSource = FormatJson(m.playbackSource)
