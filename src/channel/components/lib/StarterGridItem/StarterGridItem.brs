@@ -304,7 +304,7 @@ Function onItemContentChange(msg)
       m.sotBadge = invalid
     end if
 
-    if itemContent.type <> "linear" AND m.availabilityBadge = invalid AND isAA(sotPosterLabels) = true AND sotPosterLabels.count() > 0 AND childGridItemComponent <> "PortraitVideoGridTile"
+    if itemContent.type <> "linear" AND m.availabilityBadge = invalid AND isAA(sotPosterLabels) = true AND sotPosterLabels.count() > 0 AND childGridItemComponent <> "PortraitVideoGridTile" AND itemContent.gridItemType <> "liveEventSpotlight"
       config = {
         primaryTextColor: m.primaryTextColor
         maxWidth: m.poster.width - 12
