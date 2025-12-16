@@ -2353,7 +2353,11 @@ Function appendPaginatedContainersToScreen(screen, response)
     if m.shouldDebounceVideoTilePreview = true AND m.videoPreviewDebounce.control = "stop"
       m.videoPreviewDebounce.control = "start"
     end if
-    screen.containerPaginationStatus = "complete"
+    if response.groupCursor = invalid
+      screen.containerPaginationStatus = "finished"
+    else
+      screen.containerPaginationStatus = "complete"
+    end if
   else
     screen.containerPaginationStatus = "finished"
   end if
