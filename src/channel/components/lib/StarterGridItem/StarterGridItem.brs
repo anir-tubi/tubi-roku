@@ -310,7 +310,8 @@ Function onItemContentChange(msg)
         maxWidth: m.poster.width - 12
         badgeTextFont: m.bodySmall
       }
-      m.sotBadge = createSotPosterLabels(sotPosterLabels, config, m.top)
+      m.sotBadge = createSotPosterLabels(sotPosterLabels, config)
+      showPosterLabesls(m.sotBadge, m.top)
     end if
   end if
 

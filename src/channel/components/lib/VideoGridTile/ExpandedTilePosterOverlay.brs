@@ -9,7 +9,6 @@ Function init()
   m.titleImage = topRef.findNode("titleImage")
   m.sotTopLabelGroup = topRef.findNode("sotTopLabelGroup")
   m.bottomContentGroup = topRef.findNode("bottomContentGroup")
-  m.sotMarker = topRef.findNode("sotMarker")
   m.channelLogo = topRef.findNode("channelLogo")
   m.overlayTitleRow = topRef.findNode("overlayTitleRow")
   m.channelLogoGroup = topRef.findNode("channelLogoGroup")
@@ -152,9 +151,10 @@ Function onItemContentChange(msg)
     end if
 
     sotInfo = itemContent.sotInfo
-    if isBadgeAdded = false AND isNonEmptyAA(sotInfo) = true
-      removeAllSotBadges(sotInfo)
-      setBadge(m.badgeTypes.sot, sotInfo)
+    sotposterlabels = itemContent.sotposterlabels
+    if isBadgeAdded = false AND (isNonEmptyAA(sotInfo) = true OR isNonEmptyAA(sotposterlabels) = true)
+      removeAllSotBadges()
+      setBadge(m.badgeTypes.sot, sotInfo, sotposterlabels)
     end if
 
     if itemContent.type = "linear"
@@ -253,7 +253,7 @@ End Function
 
 '@badgeType - string, Indicating format of the badge
 '@badgeInfo - assocArray, includes sotMarkers, sotMetaDataTopLabels, sotMetaData
-Function setBadge(badgeType = "live", badgeInfo = {})
+Function setBadge(badgeType = "live", badgeInfo = {}, posterLabels = {})
   if badgeType = m.badgeTypes.live
     badge = m.sotTopLabelGroup.createChild("Badge")
     badge.badgeTextWidth = 0.0
@@ -278,11 +278,13 @@ Function setBadge(badgeType = "live", badgeInfo = {})
   else if badgeType = m.badgeTypes.sot
     config = {
       focusedTextColor: m.primaryTextColor
+      primaryTextColor: m.primaryTextColor
       maxWidth: m.top.width - 12
       bodyMediumStrongFont: m.badgeSmallFont
+      badgeTextFont: m.badgeSmallFont
       textColor: m.primaryTextColor
     }
-    showSotBadges(badgeInfo, config, m.sotTopLabelGroup, m.bottomContentGroup)
+    showSotBadges(badgeInfo, config, m.sotTopLabelGroup, m.bottomContentGroup, posterLabels)
   end if
 End Function
 
@@ -321,26 +323,17 @@ Function onSkipAnimationChange(msg)
 End Function
 
 
-Function removeAllSotBadges(sotInfo = invalid)
-  if sotInfo <> invalid AND isNonEmptyArray(sotInfo.sotMetaDataTopLabels) = true
-    ' Remove all badges (top labels + marker) when top labels exist
-    topLabelCount = m.sotTopLabelGroup.getChildCount()
+Function removeAllSotBadges()
+  ' Remove all top label badges
+  topLabelCount = m.sotTopLabelGroup.getChildCount()
+  if topLabelCount > 0
     m.sotTopLabelGroup.removeChildrenIndex(topLabelCount, 0)
-    if m.sotMarker <> invalid AND m.sotMarker.getParent() <> invalid
-      m.bottomContentGroup.removeChild(m.sotMarker)
-    end if
-  else if sotInfo <> invalid
-    ' Only remove marker when no top labels exist
-    if m.sotMarker <> invalid AND m.sotMarker.getParent() <> invalid
-      m.bottomContentGroup.removeChild(m.sotMarker)
-    end if
-  else
-    ' Remove all badges when called without parameters (default behavior)
-    topLabelCount = m.sotTopLabelGroup.getChildCount()
-    m.sotTopLabelGroup.removeChildrenIndex(topLabelCount, 0)
-    if m.sotMarker <> invalid AND m.sotMarker.getParent() <> invalid
-      m.bottomContentGroup.removeChild(m.sotMarker)
-    end if
+  end if
+
+  ' Remove marker badge if it exists
+  existingMarker = m.bottomContentGroup.findNode("sotMarker")
+  if existingMarker <> invalid
+    m.bottomContentGroup.removeChild(existingMarker)
   end if
 End Function
 

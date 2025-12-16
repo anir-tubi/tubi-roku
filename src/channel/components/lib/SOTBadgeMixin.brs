@@ -9,15 +9,43 @@ Function clearSOTBadges(targetGroup)
 End Function
 
 
-Function showSotBadges(sotBadgeInfo, config, topLabelTargetGroup = invalid, markerTargetGroup = invalid, metedataTargetGroup = invalid)
+'**
+' * Displays SOT (Signals of Trust) badges in the specified target groups
+' *
+' * Creates and displays top label badges, marker badges, and poster labels based on
+' * the provided SOT badge information. Top labels are displayed if available from
+' * sotBadgeInfo, otherwise poster labels are used as fallback.
+' *
+' * @param {AssocArray} sotBadgeInfo - AssocArray containing SOT badge data:
+' *   - sotMetaDataTopLabels: Array of top label badge data (sotLabelText, sotIcon, sotType)
+' *   - sotMarkers: AssocArray with marker badge data (sotLabelText, sotIcon)
+' *   - sotMetaData: Array of metadata label badge data (optional)
+' * @param {AssocArray} config - Styling configuration for badges:
+' *   - focusedTextColor: Color for top label badges (required)
+' *   - primaryTextColor: Color for poster label badges (required)
+' *   - maxWidth: Maximum width for badges in pixels (required)
+' *   - bodyMediumStrongFont: Font for marker badge (optional)
+' *   - badgeTextFont: Font for poster label badges (optional)
+' *   - textColor: Color for marker badge (optional)
+' * @param {Node} topLabelTargetGroup - Target group node where top label badges will be appended (optional)
+' * @param {Node} markerTargetGroup - Target group node where marker badge will be appended (optional)
+' * @param {AssocArray} posterLabels - Fallback poster label data when top labels are not available:
+' *   - sotLabelText: Text to display on the badge (required)
+' *   - sotIcon: Icon URI for the badge (optional)
+' * @return {Void}
+' * @example showSotBadges(badgeInfo, config, m.sotTopLabelGroup, m.bottomContentGroup, posterLabels)
+'**
+Function showSotBadges(sotBadgeInfo, config, topLabelTargetGroup = invalid, markerTargetGroup = invalid, posterLabels = {})
   'Get the badges from the badge Info
   sotBadges = createSOTBadges(sotBadgeInfo, config)
 
   topLabels = sotBadges.topLabels
-  showTopLabels(topLabelTargetGroup, topLabels)
-
-  metaDataLabels = sotBadges.metaDataLabels
-  showMetaDataLabels(metedataTargetGroup, metaDataLabels)
+  if isNonEmptyArray(topLabels) = true
+    showTopLabels(topLabelTargetGroup, topLabels)
+  else if isNonEmptyAA(posterLabels) = true
+    posterLabels = createSotPosterLabels(posterLabels, config)
+    showPosterLabesls(posterLabels, topLabelTargetGroup)
+  end if
 
   marker = sotBadges.marker
   showMarkerLabels(markerTargetGroup, marker)
@@ -188,7 +216,14 @@ Function createSotMarker(sotMarkers, config, marker = invalid)
 End Function
 
 
-Function createSotPosterLabels(sotInfo, config, targetParent)
+Function showPosterLabesls(posterLabels, targetParent)
+  if posterLabels <> invalid AND targetParent <> invalid
+    targetParent.appendChild(posterLabels)
+  end if
+End Function
+
+
+Function createSotPosterLabels(sotInfo, config)
   if isNonEmptyString(sotInfo.sotLabelText) = true
     sotBadge = createObject("roSGNode", "Badge")
     sotBadge.id = "sotBadge"
@@ -205,7 +240,6 @@ Function createSotPosterLabels(sotInfo, config, targetParent)
 
     sotBadge.text = sotInfo.sotLabelText
     sotBadge.visible = true
-    targetParent.appendChild(sotBadge)
     return sotBadge
   end if
 

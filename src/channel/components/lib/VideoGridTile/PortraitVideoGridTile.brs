@@ -10,8 +10,9 @@ Function init()
   topRef.observeFieldScoped("rowHasFocus", "updateTileTranslation")
   topRef.observeFieldScoped("rowListHasFocus", "updateTileTranslation")
 
-  m.typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.timeLeftLabel, m.typographyConstants.ids.bodySmall)
+  typographyConstants = getTypographyConstants()
+  m.bodySmall = typographyConstants.ids.bodySmall
+  setTypographyOfLabel(m.timeLeftLabel, m.bodySmall)
 
   m.top.observeFieldScoped("itemContent", "onItemContentChange")
   if m.global <> invalid
@@ -91,10 +92,12 @@ Function onItemContentChange(msg)
     sotPosterLabels = itemContent.sotPosterLabels
     if isAA(sotPosterLabels) = true AND sotPosterLabels.count() > 0
       config = {
+        badgeTextFont: m.bodySmall
         primaryTextColor: m.primaryTextColor
         maxWidth: m.poster.width - 12
       }
-      m.sotBadge = createSotPosterLabels(sotPosterLabels, config, m.top)
+      m.sotBadge = createSotPosterLabels(sotPosterLabels, config)
+      showPosterLabesls(m.sotBadge, m.top)
     end if
 
     if itemContent.type = "linear"
@@ -121,7 +124,7 @@ Function setLinearBadge(badgeType = "live", badgeInfo = {})
     badge = createObject("roSGNode", "Badge")
     badge.badgeTextWidth = 0.0
     badge.textColor = m.primaryTextColor
-    badge.badgeTextFont = m.typographyConstants.ids.bodySmall
+    badge.badgeTextFont = m.bodySmall
     badge.translation = [15, 15]
     badge.borderUri = ""
     badge.backgroundUri = "pkg:/images/rounded-rect-live-$$RES$$.9.png"
@@ -130,7 +133,7 @@ Function setLinearBadge(badgeType = "live", badgeInfo = {})
   else if badgeType = m.badgeTypes.onNow
     badge = createObject("roSGNode", "Badge")
     badge.badgeTextWidth = 0.0
-    badge.badgeTextFont = m.typographyConstants.ids.bodySmall
+    badge.badgeTextFont = m.bodySmall
     badge.textColor = m.primaryTextColor
     badge.translation = [15, 15]
     badge.borderUri = ""
