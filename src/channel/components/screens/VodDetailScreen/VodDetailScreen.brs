@@ -36,6 +36,8 @@ Function init()
   topRef.observeFieldScoped("userSignedIn", "onUserSignedInChange")
   topRef.observeFieldScoped("shouldRefreshButtonList", "refreshButtonList")
   m.relatedContentContainer.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+  m.relatedContentContainer.observeFieldScoped("trackingContext", "onTrackingContextChange")
+  m.episodesContainer.observeFieldScoped("trackingContext", "onTrackingContextChange")
   m.episodesContainer.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   m.actionButtonList.observeFieldScoped("navigateWithinPageEventInfo", "onButtonListNavigateWithinPageEventInfoChange")
   m.sectionTabs.observeFieldScoped("navigateWithinPageEventInfo", "onButtonListNavigateWithinPageEventInfoChange")
@@ -722,6 +724,18 @@ Function onWasContentFetchCompletedChange(msg) as Void
   wasContentFetchCompleted = msg.getData()
   if wasContentFetchCompleted = true
     m.contentGroup.visible = true
+  end if
+End Function
+
+
+Function onTrackingContextChange(msg) as Void
+  trackingContext = msg.getData()
+
+  if trackingContext <> invalid
+    m.top.trackingComponentInfo = {
+      componentType: trackingContext.type
+      componentValues: trackingContext.values
+    }
   end if
 End Function
 
