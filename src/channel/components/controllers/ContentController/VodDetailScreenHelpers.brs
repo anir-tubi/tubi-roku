@@ -18,7 +18,7 @@ Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, 
     screen.observeFieldScoped("ctaSelectedButtonId", "onVodDetailCtaSelectedButtonIdChange")
     screen.observeFieldScoped("focusedSeason", "onFocusedSeasonChange")
     screen.observeFieldScoped("selectedSection", "onVodDetailSelectedSectionChange")
-    screen.observeFieldScoped("selectedEpisode", "onSelectedEpisodeChange")
+    screen.observeFieldScoped("playSelectedEpisode", "onPlaySelectedEpisodeChange")
     screen.observeFieldScoped("shouldPauseVideoPreview", "onVodDetailShouldPauseVideoPreviewChange")
     screen.observeFieldScoped("backgroundUriList", "onVodDetailBackgroundUriListChange")
     screen.id = m.constants.ui.screenIds.vodDetailScreen
@@ -886,10 +886,10 @@ End Function
 ' Handles episode selection from episode list
 ' Plays selected episode with progress resume if available
 ' @param msg - roSGNodeEvent containing selected episode node
-Function onSelectedEpisodeChange(msg)
-  selectedEpisode = msg.getData()
+Function onPlaySelectedEpisodeChange(msg)
   screen = msg.getRoSGNode()
   if screen <> invalid
+    selectedEpisode = screen.selectedEpisode
     ' Set progress bar
     history = getHistory(selectedEpisode.id.toStr())
     nowPos = 0

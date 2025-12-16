@@ -223,6 +223,7 @@ Function setSelectedEpisodeByIndex(itemIndex as Integer) as Void
     selectedItem = m.episodeGrid.content.getChild(itemIndex)
     if selectedItem <> invalid
       m.top.selectedEpisode = selectedItem
+      m.top.playSelectedEpisode = true
     end if
   end if
 End Function

@@ -18,6 +18,7 @@
     <!-- OUTPUTS -->
     <field id="focusedSeason" type="integer" />
     <field id="selectedEpisode" type="node" alwaysNotify="true" />
+    <field id="playSelectedEpisode" type="boolean" alwaysNotify="true" />
     <field id="navigateWithinPageInfo" type="assocarray" />
     <field id="trackingContext" type="assocarray" />
   </interface>

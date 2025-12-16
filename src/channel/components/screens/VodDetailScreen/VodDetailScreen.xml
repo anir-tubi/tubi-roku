@@ -44,6 +44,7 @@
     <field id="selectedRelatedContent" alias="relatedContentContainer.selectedContent" />
     <field id="focusedSeason" alias="episodesContainer.focusedSeason" />
     <field id="selectedEpisode" alias="episodesContainer.selectedEpisode" />
+    <field id="playSelectedEpisode" alias="episodesContainer.playSelectedEpisode" />
     <field id="selectedSection" type="string" alwaysNotify="true" />
     <field id="ctaSelectedButtonId" type="string" alwaysNotify="true" />
     <field id="shouldPauseVideoPreview" type="boolean" alwaysNotify="true" />
