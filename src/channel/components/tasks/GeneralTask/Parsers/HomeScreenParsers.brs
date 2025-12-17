@@ -200,6 +200,17 @@ Function processHdcRowAd(adUnit, aRequestedAdTypes, aParsedAds, isUserInVideoTil
 End Function
 
 
+' Converts ad ID to string
+Function getAdID(id) as String
+  if isNonEmptyString(id) = true
+    return id
+  else if isNumber(id) = true
+    return id.toStr()
+  end if
+  return ""
+End Function
+
+
 ' Processes carousel ad content from response.
 ' @param adID: String, The ad ID.
 ' @param assets: assocArray, Ad assets.
@@ -250,8 +261,9 @@ Function processCarouselAdContent(adID, assets, iValidUntil, aImageTracking = []
   ' Add the ad info to the carousel node
   adInfo = invalid
   if videoData <> invalid
+    ad_id = getAdID(adID) '// Ensure ad_id is a string or else there is a mismatch issue with RAF
     adInfo = {
-      ad_id: adID
+      ad_id: ad_id
       error: invalid
       id: adID
       impTracking: ""
@@ -324,8 +336,9 @@ Function processSpotlightAdContent(adID, assets, iValidUntil, aImageTracking = [
 
   adInfo = invalid
   if videoData <> invalid
+    ad_id = getAdID(adID) '// Ensure ad_id is a string or else there is a mismatch issue with RAF
     adInfo = {
-      ad_id: adID
+      ad_id: ad_id
       error: invalid
       id: adID
       impTracking: ""
@@ -381,11 +394,12 @@ Function processSkinAdRowContent(rowAdUnit, videoAdUnit) as Object
     iValidUntil = UpTime(0) + rowAdUnit.valid_duration
   end if
 
-  sID = ""
+  id = ""
   sPosterURL = ""
   adInfo = invalid
   if isValidAssetAdUnit(videoAdUnit) = true
-    sID = videoAdUnit.ad.id
+    id = videoAdUnit.ad.id
+
     videoAssets = videoAdUnit.ad.assets
     videoTrackers = videoAdUnit.trackers
     if videoAssets.poster_image <> invalid AND isNonEmptyString(videoAssets.poster_image.url) = true
@@ -398,10 +412,11 @@ Function processSkinAdRowContent(rowAdUnit, videoAdUnit) as Object
         aImpTracking = videoTrackers.imp
       end if
       if videoData <> invalid
+        ad_id = getAdID(id) '// Ensure ad_id is a string or else there is a mismatch issue with RAF
         adInfo = {
-          ad_id: sID
+          ad_id: ad_id
           error: invalid
-          id: sID
+          id: id
           impTracking: aImpTracking
           media: {
             duration: videoData.duration
@@ -420,7 +435,7 @@ Function processSkinAdRowContent(rowAdUnit, videoAdUnit) as Object
   categoryContentNode.validUntil = iValidUntil
   rowContentNode.type = m.constants.ui.contentTypes.skinAd
   rowContentNode.gridItemType = m.constants.ui.gridItemTypes.skinAd
-  rowContentNode.id = sID
+  rowContentNode.id = id
   rowContentNode.adInfo = adInfo
   if assets.color <> invalid AND isNonEmptyString(assets.color.text) = true
     rowContentNode.bgColor = assets.color.text
@@ -429,7 +444,7 @@ Function processSkinAdRowContent(rowAdUnit, videoAdUnit) as Object
   skinAdContent = CreateObject("roSGNode", "SkinAdContentNode")
   skinAdContent.gridItemType = m.constants.ui.gridItemTypes.skinAd
   skinAdContent.type = m.constants.ui.contentTypes.skinAd
-  skinAdContent.id = sID
+  skinAdContent.id = id
   skinAdContent.adInfo = adInfo
   if assets.brand_name <> invalid AND isNonEmptyString(assets.brand_name.text) = true
     rowContentNode.title = assets.brand_name.text
