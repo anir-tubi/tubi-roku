@@ -612,7 +612,12 @@ Function getVideoPreviewContentId()
 End Function
 
 
-Function renderAutoStartPlaybackFromPreviewCounter(contentFocused, diff)
+Function renderAutoStartPlaybackFromPreviewCounter(contentFocused, diff) as Void
+  if contentFocused = invalid OR arrayIncludes([m.constants.ui.contentTypes.adRowlistSpotlight, m.constants.ui.contentTypes.adRowlistCarousel], contentFocused.type) = true OR isVideoTileEnabledContainer(contentFocused.gridItemType, contentFocused.parentId) = false
+    fade(m.autoStartPreviewToPlaybackTimer, "out", 0.1)
+    return
+  end if
+
   if diff = 10
     currentScreen = getCurrentScreen()
     if currentScreen <> invalid AND contentFocused <> invalid AND arrayIncludes(m.videoTilesControlCategoryIds, contentFocused.parentId) = true AND isNonEmptyArray(currentScreen.featuredRowListTranslation) = true
@@ -628,5 +633,7 @@ Function renderAutoStartPlaybackFromPreviewCounter(contentFocused, diff)
     m.autoStartPreviewToPlaybackTimer.countdownText = diff.ToStr()
   else if diff >= 0 AND diff < 10
     m.autoStartPreviewToPlaybackTimer.countdownText = diff.ToStr()
+  else
+    fade(m.autoStartPreviewToPlaybackTimer, "out", 0.1)
   end if
 End Function

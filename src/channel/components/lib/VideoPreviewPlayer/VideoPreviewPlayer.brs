@@ -191,6 +191,7 @@ End Function
 ' @content: ContentNode, it contains videopreviewUrl, streamFormat & id for playback
 Function prepareToStartVideo(content)
   m.Video.content = invalid
+  m.top.duration = -1
   m.Video.content = content
 End Function
 
