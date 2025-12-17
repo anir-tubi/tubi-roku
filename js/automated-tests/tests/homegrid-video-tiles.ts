@@ -1909,4 +1909,121 @@ describe('HomeGrid Video Tiles', function () {
     const { isShowing } = await testUtils.isElementShowingOnScreen('videoTitlesRowList');
     expect(isShowing).to.equal(true, 'Featured row list should be visible on screen');
   });
+
+  // Test: Scroll down vertically through entire home grid and verify no duplicate containers
+  it('Should scroll through entire home grid without duplicate containers', async () => {
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for featured rowlist to have focus', 15000);
+    await testUtils.waitForGridContentToLoad('videoTitlesRowList', 10000);
+    await utils.sleep(1000);
+
+    const element = testUtils.getElementKeyPath('videoTitlesRowList');
+    const baseKeyPath = element.keyPath ? `${element.keyPath}.content` : 'content';
+
+    const seenContainers = new Map<string, number>(); // container identifier -> first row index seen
+    const processedRows = new Set<number>();
+    let previousRowIndex = -1;
+    let sameRowCount = 0;
+    let totalScrolls = 0;
+
+    // Helper function to check for duplicates
+    const checkDuplicate = (identifier: string, type: string, currentRowIndex: number) => {
+      if (identifier) {
+        if (seenContainers.has(identifier)) {
+          const firstSeenAt = seenContainers.get(identifier);
+          throw new Error(`Duplicate container found! ${type} "${identifier}" first seen at row ${firstSeenAt}, found again at row ${currentRowIndex}`);
+        }
+        seenContainers.set(identifier, currentRowIndex);
+      }
+    };
+
+    while (sameRowCount < 3 && totalScrolls < 100) {
+      try {
+        const focusedIndex = await testUtils.getCurrentlyFocusedGridItemIndex('videoTitlesRowList');
+        const currentRowIndex = focusedIndex[0];
+
+        // Track if row changed
+        if (currentRowIndex === previousRowIndex) {
+          sameRowCount++;
+        } else {
+          sameRowCount = 0;
+          previousRowIndex = currentRowIndex;
+        }
+
+        // Only check new rows for duplicates
+        if (!processedRows.has(currentRowIndex)) {
+          processedRows.add(currentRowIndex);
+
+          const { value: containerSlug } = await odc.getValue({
+            base: element.base,
+            keyPath: `${baseKeyPath}.${currentRowIndex}.slug`
+          });
+
+          checkDuplicate(containerSlug, 'slug', currentRowIndex);
+        }
+
+        await ecp.sendKeypress(ecp.Key.Down);
+        await utils.sleep(300);
+        totalScrolls++;
+
+      } catch (error) {
+        if (error.message?.includes('Duplicate container')) throw error;
+
+        sameRowCount++;
+        await ecp.sendKeypress(ecp.Key.Down);
+        await utils.sleep(300);
+        totalScrolls++;
+      }
+    }
+
+    expect(seenContainers.size).to.be.greaterThan(5, 'Should have at least 5 unique containers');
+    expect(sameRowCount).to.be.greaterThanOrEqual(3, 'Should have reached the end');
+  });
+
+  // Test: Scroll horizontally through comedy row and verify no duplicate content with pagination
+  it('Should scroll horizontally through comedy row without duplicate content', async () => {
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for featured rowlist to have focus', 15000);
+    await testUtils.waitForGridContentToLoad('videoTitlesRowList', 10000);
+    await utils.sleep(1000);
+
+    // Navigate to comedy row
+    await testHelpers.scrollDownToFindRow({ slug: 'comedy', rowListElementId: 'videoTitlesRowList', maxScrolls: 40 });
+    await utils.sleep(1000);
+
+    const focusedIndex = await testUtils.getCurrentlyFocusedGridItemIndex('videoTitlesRowList');
+    const comedyRowIndex = focusedIndex[0];
+
+    // Scroll right 30 times to trigger pagination
+    for (let i = 0; i < 60; i++) {
+      await ecp.sendKeypress(ecp.Key.Right, { wait: 50 });
+    }
+
+    // Wait for content to load after pagination
+    await utils.sleep(1000);
+
+    // Get all content from the comedy row
+    const rowContent = await testUtils.getRowListRowItemsContent('videoTitlesRowList', comedyRowIndex);
+
+    // Check for duplicate content IDs
+    const seenContentIds = new Map<string, number>(); // content id -> first index seen
+
+    for (let index = 0; index < rowContent.length; index++) {
+      const content = rowContent[index];
+      const contentId = content?.id;
+
+      if (contentId) {
+        if (seenContentIds.has(contentId)) {
+          const firstSeenAt = seenContentIds.get(contentId);
+          throw new Error(`Duplicate content found in comedy row! ID "${contentId}" first seen at index ${firstSeenAt}, found again at index ${index}`);
+        }
+        seenContentIds.set(contentId, index);
+      }
+    }
+
+    expect(rowContent.length).to.be.greaterThan(10, 'Comedy row should have more than 10 items');
+    expect(seenContentIds.size).to.equal(rowContent.length, 'All content items should have unique IDs');
+  });
 });

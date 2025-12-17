@@ -15,9 +15,7 @@ describe('MyStuff', function () {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Open side nav and navigate to My Stuff item
-    await highlightMyStuffMenuItem();
-
+    await shared.openMyStuffPage();
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/421097 - https://tubi.testrail.io/index.php?/cases/view/423509
@@ -27,11 +25,7 @@ describe('MyStuff', function () {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Open side nav and navigate to My Stuff item
-    await highlightMyStuffMenuItem();
-
-    // Select My Stuff
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuffPage();
 
     // Check unlock button and screen text for Guest user
     await testUtils.waitForElementToFullyShowOnScreen('myStuffEmptyScreen');
@@ -96,11 +90,7 @@ describe('MyStuff', function () {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Open side nav and navigate to My Stuff item
-    await highlightMyStuffMenuItem();
-
-    // Select My Stuff
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuffPage();
 
     // Check empty My Stuff page for Guest
     await testUtils.waitForElementToFullyShowOnScreen('myStuffEmptyScreen');
@@ -157,11 +147,7 @@ describe('MyStuff', function () {
     await testUtils.startApplicationAtPage('home', { user: user });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Open side nav and navigate to My Stuff item
-    await highlightMyStuffMenuItem();
-
-    // Select My Stuff
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuffPage();
 
     // Check that CW displays titles with history
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
@@ -190,11 +176,7 @@ describe('MyStuff', function () {
     await testUtils.startApplicationAtPage('home', { user: user });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Open side nav and navigate to My Stuff item
-    await highlightMyStuffMenuItem();
-
-    // Select My Stuff
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuffPage();
 
     // See that CW Row is empty
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
@@ -217,8 +199,7 @@ describe('MyStuff', function () {
     // Go To My Stuff page
     await ecp.sendKeypress(ecp.Key.Back);
     await ecp.sendKeypress(ecp.Key.Back);
-    await highlightMyStuffMenuItem();
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuffPage();
 
     // Verify that the title appears in CW section of My Stuff page
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
@@ -244,11 +225,7 @@ describe('MyStuff', function () {
     await testUtils.startApplicationAtPage('home', { user: user });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Open side nav and navigate to My Stuff item
-    await highlightMyStuffMenuItem();
-
-    // Select My Stuff
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuffPage();
 
     // See that CW Row is empty
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
@@ -282,11 +259,7 @@ describe('MyStuff', function () {
     await testUtils.startApplicationAtPage('home', { user: user });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Open side nav and navigate to My Stuff item
-    await highlightMyStuffMenuItem();
-
-    // Select My Stuff
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuffPage();
     await ecp.sendKeypress(ecp.Key.Down);
 
 
@@ -333,11 +306,7 @@ describe('MyStuff', function () {
     await testUtils.startApplicationAtPage('home', { user: user });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Open side nav and navigate to My Stuff item
-    await highlightMyStuffMenuItem();
-
-    // Select My Stuff
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuffPage();
     await utils.sleep(2000); // Wait for My Stuff page to load before navigation
     await ecp.sendKeypress(ecp.Key.Down);
 
@@ -379,11 +348,7 @@ describe('MyStuff', function () {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Open side nav and navigate to My Stuff item
-    await highlightMyStuffMenuItem();
-
-    // Select My Stuff
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuffPage();
 
     // Check that user is on My Stuff Screen (empty)
     await testUtils.waitForElementToFullyShowOnScreen('myStuffRegUserEmptyScreen');
@@ -395,6 +360,7 @@ describe('MyStuff', function () {
     await testUtils.waitForElementToFullyShowOnScreen('leftNavHomeButtonLabel');
 
   });
+
   // https://tubi.testrail.io/index.php?/cases/view/421262 - https://tubi.testrail.io/index.php?/cases/view/423512
   it('C421262 Registered User - Pressing Go to Home button from empty My Stuff page takes you to Home, @mystuff', async () => {
 
@@ -402,11 +368,7 @@ describe('MyStuff', function () {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Open side nav and navigate to My Stuff item
-    await highlightMyStuffMenuItem();
-
-    // Select My Stuff
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuffPage();
 
     // Check that user is on My Stuff Screen (empty)
     await testUtils.waitForElementToFullyShowOnScreen('myStuffRegUserEmptyScreen');
@@ -431,11 +393,7 @@ describe('MyStuff', function () {
     await testUtils.startApplicationAtPage('home', { user: user });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Open side nav and navigate to My Stuff item
-    await highlightMyStuffMenuItem();
-
-    // Select My Stuff
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuffPage();
     await utils.sleep(2000); // Wait for My Stuff page to load
 
     // Check that CW displays no titles and has correct text for empty row
@@ -472,11 +430,7 @@ describe('MyStuff', function () {
     await testUtils.startApplicationAtPage('home', { user: user });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Open side nav and navigate to My Stuff item
-    await highlightMyStuffMenuItem();
-
-    // Select My Stuff
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuffPage();
     await utils.sleep(2000); // Wait for My Stuff page to load before navigation
 
     // Verify that the title appears in CW section of My Stuff page
@@ -536,9 +490,7 @@ describe('MyStuff', function () {
     // Expect Home Side Nav item to be highlighted and on Home page
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Navigate to My Stuff Screen
-    await highlightMyStuffMenuItem();
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuffPage();
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', ['stopped', '', 'none']);
 
@@ -564,9 +516,7 @@ describe('MyStuff', function () {
     await testUtils.startApplicationAtPage('home', { user: user });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Navigate to My Stuff Screen
-    await highlightMyStuffMenuItem();
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuffPage();
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing');
   });
@@ -582,9 +532,7 @@ describe('MyStuff', function () {
     await testUtils.startApplicationAtPage('home', { user: user });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Navigate to My Stuff Screen
-    await highlightMyStuffMenuItem();
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuffPage();
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 15000);
   });
@@ -600,9 +548,7 @@ describe('MyStuff', function () {
     await testUtils.startApplicationAtPage('home', { user: user });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Navigate to My Stuff Screen
-    await highlightMyStuffMenuItem();
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuffPage();
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
 
 
@@ -616,6 +562,7 @@ describe('MyStuff', function () {
     // Check that video preview is playing when autoplay preview is turned on -  My List Row
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing');
   });
+
   //https://tubi.testrail.io/index.php?/cases/view/439697
   it('C439697 - Registered User - Video Preview for My List Series @mystuff', async () => {
 
@@ -627,9 +574,7 @@ describe('MyStuff', function () {
     await testUtils.startApplicationAtPage('home', { user: user });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Navigate to My Stuff Screen
-    await highlightMyStuffMenuItem();
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuffPage();
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
 
 
@@ -655,9 +600,7 @@ describe('MyStuff', function () {
     await testUtils.startApplicationAtPage('home', { user: user });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Navigate to My Stuff Screen
-    await highlightMyStuffMenuItem();
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuffPage();
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
 
 
@@ -689,9 +632,7 @@ describe('MyStuff', function () {
     await testUtils.startApplicationAtPage('home', { user: user });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Navigate to My Stuff Screen
-    await highlightMyStuffMenuItem();
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuffPage();
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
 
     // Navigate to Details page of title and check Resume button and title
@@ -713,9 +654,7 @@ describe('MyStuff', function () {
     await testUtils.startApplicationAtPage('home', { user: user });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Navigate to My Stuff Screen
-    await highlightMyStuffMenuItem();
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuffPage();
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
 
     // Navigate to Details page of title and check Resume button and title
@@ -737,9 +676,7 @@ describe('MyStuff', function () {
     await testUtils.startApplicationAtPage('home', { user: user });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Navigate to My Stuff Screen
-    await highlightMyStuffMenuItem();
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuffPage();
     await utils.sleep(2000); // Wait for My Stuff page to load
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
 
@@ -767,9 +704,7 @@ describe('MyStuff', function () {
     await testUtils.startApplicationAtPage('kids', { user: user });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Navigate to My Stuff Screen
-    await highlightMyStuffMenuItem();
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuffPage();
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
 
     // Navigate to Details page of title and check Resume button and title
@@ -822,11 +757,7 @@ describe('MyStuff', function () {
 
     await utils.sleep(2000);
 
-    // Open side nav and navigate to My Stuff item
-    await highlightMyStuffMenuItem();
-
-    // Select My Stuff
-    await ecp.sendKeypress(ecp.Key.Ok, { count: 2 });
+    await shared.openMyStuffPage();
 
     // Check that CW displays no titles and has correct text for empty row
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
@@ -858,9 +789,7 @@ describe('MyStuff', function () {
     await testUtils.startApplicationAtPage('kids', { user: user });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Navigate to My Stuff Screen
-    await highlightMyStuffMenuItem();
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuffPage();
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
 
     // Navigate to Details page of title and check Resume button and title
@@ -913,9 +842,7 @@ describe('MyStuff', function () {
     // Expect Home Side Nav item to be highlighted and on Home page
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Navigate to My Stuff Screen
-    await highlightMyStuffMenuItem();
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuffPage();
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', ['stopped', '', 'none']);
 
@@ -941,15 +868,11 @@ describe('MyStuff', function () {
     await testUtils.startApplicationAtPage('kids', { user: user });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
-    // Navigate to My Stuff
-    await highlightMyStuffMenuItem();
-    await utils.sleep(800);
-
     // Verify we're in Kids Mode by checking for Exit Kids option
     const exitKidsOption = await testUtils.getNodeForElement('exitKidsOption');
     expect(exitKidsOption.visible).to.equal(true);
 
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.openMyStuffPage();
 
     // Navigate to My List section  
     await ecp.sendKeypress(ecp.Key.Down);
@@ -986,110 +909,67 @@ describe('MyStuff', function () {
 
 });
 
-async function highlightMyStuffMenuItem() {
-
-  // Press left
-  await ecp.sendKeypress(ecp.Key.Left);
-
-  // Is the left Nav open and Home selected?
-  await testUtils.waitForElementToFullyShowOnScreen('leftNavHomeButtonLabel');
-
-  // Highlight My Stuff Menu item
-  await ecp.sendKeypress(ecp.Key.Down);
-  await testUtils.waitForElementToFullyShowOnScreen('categoriesLeftNavButtonSelected');
-  await utils.sleep(500); // NEED TO ADD SLEEP HERE, otherwise it selects Sign In button! 
-  await ecp.sendKeypress(ecp.Key.Down);
-  await testUtils.waitForElementToFullyShowOnScreen('myStuffSelected');
-
-}
 
 async function createWatchList(user) {
-
   // Create a user with mix of little kids and non-little kid rated titles with history
-
   const ContentTVG = await user.getContent().ofContentType('series').withRating('TV-G').retrieve({ limit: 6 });
   await user.addContentToWatchList(ContentTVG);
   const ContentG = await user.getContent().ofContentType('movie').withRating('G').retrieve({ limit: 6 });
   await user.addContentToWatchList(ContentG);
-
 }
+
 async function createWatchListOneTitle(user) {
-
   // Create a watch list one title movie
-
   await user.addContentToWatchList({
     id: '342067',
     type: 'movie'
-
   });
-
 }
 
 async function createHistoryEvergreenMovieTitle(user) {
-
   // Create a watch list one Evergreen title movie
-
   const contentId = await user.getContentById(342067);
   await user.addContentToViewHistory(contentId, 500);
-
 }
 
 async function createHistoryEvergreenSeriesTitle(user) {
-
   // Create a watch list one Evergreen title movie
-
   const contentId = await user.getContentById(300005163);
   await user.addContentToViewHistory(contentId, 500);
-
 }
 
 async function createWatchListOneTitleSeries(user) {
-
   // Create a user with one title series
-
   await user.addContentToWatchList({
     id: '03320',
     type: 'series'
   });
-
-
-
 }
 
 async function createWatchListThreeTitles(user) {
-
   // Create a user with 3 titles in watch list
-
   const ContentG = await user.getContent().ofContentType('movie').withRating('R').retrieve({ limit: 3 });
   await user.addContentToWatchList(ContentG);
-
 }
 
 async function createHistoryOneTitle(user) {
-
   // Create a user with one title in history, movie
-
   const movieContentPG = await user.getContent().withRating('PG').ofContentType('movie').retrieve({ limit: 1 });
   await user.addContentToViewHistory(movieContentPG, 500);
-
 }
 
 async function createHistoryOneTitleSeries(user) {
-
   const movieContent = await user.getContent().hasVideoPreview().ofContentType('series').retrieve({ limit: 1 });
   await user.addContentToViewHistory(movieContent, 500);
-
 }
 
 
 // Create history function
-
 async function createHistoryForPlayingTitle() {
   await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 15000);
   await ecp.sendKeypress(ecp.Key.Forward, { count: 3 });
   await utils.sleep(3000);
   await ecp.sendKeypress(ecp.Key.Play);
-
 }
 
 

@@ -69,6 +69,10 @@ describe('Autoplay Series', function () {
     await shared.openSeries();
     // Are we on the Series page?
     await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
+
+    // Find and scroll to a non-Reality show
+    await findAndScrollToNonRealityShow();
+
     await ecp.sendKeypress(ecp.Key.Play);
 
     await seekToEndToTriggerCuePointAndCheckIfNextEpisodePlays();
@@ -132,8 +136,10 @@ async function triggerSeriesAutoplayUI() {
   await shared.openSeries();
   // Are we on the Movies page?
   await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
-  await ecp.sendKeypress(ecp.Key.Down);
-  await utils.sleep(1000);
+
+  // Find and scroll to a non-Reality show
+  await findAndScrollToNonRealityShow();
+
   await ecp.sendKeypress(ecp.Key.Play);
   await seekToTriggerCuePoint();
 
@@ -176,9 +182,60 @@ async function validateAutoplayNextVideoUINotShowing() {
   await testUtils.goToPage('series');
   await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
 
+  // Find and scroll to a non-Reality show
+  await findAndScrollToNonRealityShow();
+
   await ecp.sendKeypress(ecp.Key.Play);
   await seekToTriggerCuePoint();
   await testUtils.waitForElementToHaveFocus('autoplayUINextEpisodeButton', 'Timed out waiting for next episode button to have focus', 15000);
 
   await testUtils.waitForElementToNotShowOnScreen('autoplayCountdownTimerSection', 'Countdown timer section is still showing', 10000);
+}
+
+/**
+ * Finds and scrolls to a TV show that does not belong to Reality genres
+ * 
+ * @param rowListElementId - The row list element ID (default: 'tvScreenRowList')
+ * @param maxRowsToSearch - Maximum number of rows to search (default: 10)
+ * @throws Error if no non-Reality show is found
+ */
+async function findAndScrollToNonRealityShow(
+  rowListElementId: any = 'tvScreenRowList',
+  maxRowsToSearch = 10
+): Promise<void> {
+  // Get all content grouped by row
+  const rowsContent = await testUtils.getAllRowListItemsContentGroupedByRow(rowListElementId);
+
+  // Search through rows
+  for (let rowIndex = 0; rowIndex < Math.min(rowsContent.length, maxRowsToSearch); rowIndex++) {
+    const rowContent = rowsContent[rowIndex];
+
+    // Search through items in this row
+    for (let colIndex = 0; colIndex < rowContent.length; colIndex++) {
+      const item = rowContent[colIndex];
+      // Skip ads
+      if (item.type?.includes('ad')) {
+        continue;
+      }
+
+      // Check if item has genres and doesn't include Reality
+      const genres = item.genres || [];
+      const isReality = genres.some((genre: string) =>
+        genre.toLowerCase().includes('reality')
+      );
+
+      // If not a reality show, scroll to it
+      if (!isReality) {
+        console.log(`Found non-Reality show: "${item.title}" at [${rowIndex}, ${colIndex}]`);
+
+        // Scroll to the position
+        await shared.jumpToRowListPosition(rowListElementId, rowIndex, colIndex);
+
+        return; // Successfully found and scrolled
+      }
+    }
+  }
+
+  // If we get here, no non-Reality show was found
+  throw new Error('Could not find a non-Reality show in the first ' + maxRowsToSearch + ' rows');
 }

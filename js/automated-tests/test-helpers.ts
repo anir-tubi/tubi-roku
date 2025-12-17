@@ -682,30 +682,13 @@ class TestHelpers {
   }
 
   /**
-   * HELPER: Highlights My Stuff menu item in side nav (without selecting)
-   * 
-   * PATTERN: Used 28+ times in my-stuff.ts
-   * 
-   * @example
-   * await testHelpers.highlightMyStuffMenuItem();
-   * // My Stuff is highlighted but not selected yet
-   */
-  public async highlightMyStuffMenuItem() {
-    await ecp.sendKeypress(ecp.Key.Left);
-    await testUtils.waitForElementToFullyShowOnScreen('sideNavMenu' as any);
-    await testUtils.jumpToRowWithTitle('sideNavMenu' as any, 'My Stuff');
-    await testUtils.waitForElementToFullyShowOnScreen('myStuffLeftNavButton' as any);
-  }
-
-  /**
    * HELPER: Opens My Stuff page
    * 
    * @example
    * await testHelpers.openMyStuffPage();
    */
   public async openMyStuffPage() {
-    await this.highlightMyStuffMenuItem();
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await testUtils.goToPage('myStuff');
   }
 
   /**
