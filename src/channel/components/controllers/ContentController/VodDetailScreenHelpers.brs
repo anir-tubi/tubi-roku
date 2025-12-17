@@ -1056,7 +1056,7 @@ End Function
 ' Shows disabled feature toast on major event days, otherwise sends delete history request
 ' @param content - Content node to remove from history
 Function removeHistoryFromVodDetailScreen(content)
-  history = getContentHistory(content)
+  history = getHistory(content.id)
 
   if history <> invalid
     requestInfo = m.userDeviceApi.deleteHistory(history.historyId)
