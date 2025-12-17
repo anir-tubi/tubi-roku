@@ -1936,11 +1936,16 @@ Function updateCategoryGridWithFeaturedList(response, screen)
 End Function
 
 
-Function onFeaturedRowFocusedItemChange(msg)
+Function onFeaturedRowFocusedItemChange(msg) as Void
   focusedItem = msg.getData()
   screen = msg.getRoSGNode()
 
-  if focusedItem <> invalid AND arrayIncludes(m.videoTilesControlCategoryIds, focusedItem.parentId) = true
+  if focusedItem = invalid
+    m.videoTilesControlMetadata.opacity = 0
+    return
+  end if
+
+  if arrayIncludes(m.videoTilesControlCategoryIds, focusedItem.parentId) = true
     ' Using a combination of visible and fade to avoid the issue where user scrolls past the row in between of fade in.
     m.videoTilesControlMetadata.visible = true
     fade(m.videoTilesControlMetadata, "in", 0.1)
@@ -1949,7 +1954,7 @@ Function onFeaturedRowFocusedItemChange(msg)
   end if
 
   ' Only process if the focused item is a video tile.
-  if focusedItem <> invalid AND isVideoTileEnabledContainer(focusedItem.gridItemType, focusedItem.parentId) = true
+  if isVideoTileEnabledContainer(focusedItem.gridItemType, focusedItem.parentId) = true
     m.inlineVideoPreviewPlayerContainer.visible = true
     ' In certain cases where the focused item is not the same as the itemContent, we need to update the itemContent.
     ' For ex: One instance is Continue watching row getting updated with the new item or existing item been deleted.
@@ -1959,7 +1964,7 @@ Function onFeaturedRowFocusedItemChange(msg)
   else
     m.inlineVideoPreviewPlayerContainer.visible = false
 
-    if focusedItem <> invalid AND focusedItem.type = m.constants.ui.contentTypes.adRowlistCarousel AND focusedItem.videoPreviewUrl <> ""
+    if focusedItem.type = m.constants.ui.contentTypes.adRowlistCarousel AND focusedItem.videoPreviewUrl <> ""
       ' If the content is adRowlistSpotlight, then set the video preview after a delay
       m.videoPreviewDebounce.duration = m.constants.player.videoPreviewDelayTimes.adCarousel
       m.videoPreviewDebounce.control = "start"
@@ -1968,7 +1973,7 @@ Function onFeaturedRowFocusedItemChange(msg)
 
   ' If VideoPreview is on and we have not started the debounce, we will start it.
   ' This is needed in case where for initial load and refresh cases where columnFocusChange is not triggered.
-  if focusedItem <> invalid AND isVideoPreviewOn() = true AND m.videoPreviewDebounce.control = "stop"
+  if isVideoPreviewOn() = true AND m.videoPreviewDebounce.control = "stop"
     if m.shouldDebounceVideoTilePreview = true AND screen.featuredListHasFocus = true
       m.videoPreviewDebounce.control = "start"
     else if screen.featuredListScrollingStatus = false AND screen.featuredListHasFocus = true
@@ -1980,6 +1985,7 @@ Function onFeaturedRowFocusedItemChange(msg)
 
   if isCurrentScreenHomeScreen() = true
     updateVideoTileScreenBackground(focusedItem, screen)
+    updatePlayerLayoutBasedOnFocusedContent(focusedItem)
   end if
   setUIBasedOnFocusedContent(focusedItem)
 End Function
