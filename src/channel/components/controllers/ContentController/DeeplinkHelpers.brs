@@ -1081,10 +1081,11 @@ End Function
 
 
 Function onDeeplinkLiveEventContentSuccess(content)
-  if content <> invalid AND isAA(content.scheduleData) AND content.scheduleData.playerType = m.constants.ui.playerTypes.fox
+  if content <> invalid AND isAA(content.scheduleData)
     playbackSource = getPlaybackSourceForDeeplinkType()
     scheduleData = content.scheduleData
     entryPoint = m.constants.deeplinks.entryPoints.linearDetail
+    shouldFireAnalytics = true
     if isAA(scheduleData) AND isNonEmptyString(scheduleData.startTime) = true AND (isLoggedInUser() = true OR content.needsLogin = false)
       startTime = content.scheduleData.startTime
       endTime = content.scheduleData.endTime
@@ -1098,7 +1099,9 @@ Function onDeeplinkLiveEventContentSuccess(content)
         if playerType = m.constants.ui.playerTypes.fox
           playLinearVideoWithFoxPlayer(content)
         else
-          playerLinearChannel(content)
+          shouldFireAnalytics = false
+          screenId = m.constants.ui.screenIds.epgScreen
+          fetchEPGChannel(screenId, scheduleData.channelId, onSingleChannelFetchForDeeplinkSuccess, showDeeplinkErrorModal)
         end if
       else
         showLinearDetailScreen(content, playbackSource)
@@ -1106,7 +1109,7 @@ Function onDeeplinkLiveEventContentSuccess(content)
     else
       showLinearDetailScreen(content, playbackSource)
     end if
-    if m.deeplinkContent <> invalid
+    if m.deeplinkContent <> invalid AND shouldFireAnalytics = true
       sendDeeplinkAnalytics(m.deeplinkContent, content, entryPoint, m.tracking, m.trackingLoggingTask, m.constants)
     end if
   else
