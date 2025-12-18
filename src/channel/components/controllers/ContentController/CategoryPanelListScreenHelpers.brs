@@ -409,8 +409,8 @@ End Function
 Function getCategoryPanelListDataFromServer(screen)
   tubiLog("CategoryPanelListScreenHelpers.getCategoryPanelListDataFromServer")
   if screen <> invalid AND screen.id = m.constants.ui.screenIds.categoryPanelListScreen
-    shouldKidsModeBeSentToServer = shouldKidsModeBeSentToServer()
-    categoriesListReqInfo = m.cmsApi.createCategoriesListReqInfo(shouldKidsModeBeSentToServer)
+    isKidsMode = shouldKidsModeBeSentToServer()
+    categoriesListReqInfo = m.cmsApi.createCategoriesListReqInfo(isKidsMode)
 
     m.makeRequest({
       url: categoriesListReqInfo.url

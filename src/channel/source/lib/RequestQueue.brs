@@ -46,21 +46,21 @@ End Function
 ''''''''''''''''
 ' pushRequest - add a request to the queue and start the request
 '
-' request - a request created by createAsyncHTTPRequest
+' requestInstance - a request created by createAsyncHTTPRequest
 '
-Function tubiq_pushRequest(request as Object) as Object
+Function tubiq_pushRequest(requestInstance as Object) as Object
   ' make room first
   m.advanceQueue_()
 
-  if request = invalid OR request["klass"] <> "TubiAsyncHTTPRequest"
+  if requestInstance = invalid OR requestInstance["klass"] <> "TubiAsyncHTTPRequest"
     tubiLog("Invalid object attempted to push to request queue")
     return invalid
   else
     ' push to queue only if there is room
     if m.maxSize = 0 OR m.queue.Count() < m.maxSize then
-      m.queue.Push(m.WrapRequest_(request))
+      m.queue.Push(m.WrapRequest_(requestInstance))
       m.AdvanceQueue_()
-      return request
+      return requestInstance
     end if
   end if
   return invalid
@@ -97,9 +97,9 @@ End Function
 ' Cancel a request and remove it from the queue.  We have to add this here because
 ' a Request object that is cancelled does not emit an event on which handleEvent could
 ' clean up the queue.
-Function tubiq_cancelRequest(request as Object)
-  if request <> invalid AND request.uuid <> invalid then
-    i = m.findRequestByUuid_(request.uuid)
+Function tubiq_cancelRequest(requestInstance as Object)
+  if requestInstance <> invalid AND requestInstance.uuid <> invalid then
+    i = m.findRequestByUuid_(requestInstance.uuid)
     if i <> -1 then
       m.queue[i].request.cancel()
       m.queue.Delete(i)
@@ -130,11 +130,11 @@ End Function
 
 
 ' Make our own object out of the initial request
-Function tubiq_wrapRequest_(request as Object) as Object
+Function tubiq_wrapRequest_(requestInstance as Object) as Object
   datetime = CreateObject("roDateTime")
   now = datetime.AsSeconds()
   return {
-    request: request
+    request: requestInstance
     urltransfer: invalid
     startTime: now
   }

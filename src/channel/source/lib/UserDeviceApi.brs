@@ -1,5 +1,5 @@
 ' Thin wrapper for the old UAPI user_device requests and the new account API requests
-Function UserDeviceApi(constants, apiUtils)
+Function UserDeviceApi(constants, apiUtilsInstance)
 
   defaultValues = {
     ' dependencies
@@ -41,10 +41,10 @@ Function UserDeviceApi(constants, apiUtils)
     createPostLogoutReqInfo: userDeviceApi_createPostLogoutReqInfo
   }
 
-  userDeviceApi = {}
-  userDeviceApi.append(apiUtils)
-  userDeviceApi.append(defaultValues)
-  return userDeviceApi
+  userDeviceApiInstance = {}
+  userDeviceApiInstance.append(apiUtilsInstance)
+  userDeviceApiInstance.append(defaultValues)
+  return userDeviceApiInstance
 
 End Function
 
@@ -454,15 +454,15 @@ End Function
 ' @param successCallback: function, callback that will be called if successful
 ' @param errorCallback: function, callback that will be called if unsuccessful
 Function userDeviceApi_createUserSettingsGeneralTaskReqInfo(successCallback, errorCallback = invalid)
-  request = m.createUserSettingsReqInfo()
-  request.append({
+  reqInfo = m.createUserSettingsReqInfo()
+  reqInfo.append({
     requestType: m.constants.reqNames.getUserSettings
     successCallback: successCallback
     errorCallback: errorCallback
     responseType: "assocarray"
     isGDPR: isGDPR() 'bs:disable-line 1140 LINT1001
   })
-  return request
+  return reqInfo
 End Function
 
 

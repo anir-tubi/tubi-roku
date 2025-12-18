@@ -1,9 +1,9 @@
-Function TubiLogger(constants, request, auth, sentry = invalid)
+Function TubiLogger(constants, requestInstance, auth, sentryInstance = invalid)
   return {
-    request: request
+    request: requestInstance
     auth: auth
     constants: constants
-    sentry: sentry
+    sentry: sentryInstance
 
     'server types are determined by specifically allowed strings that populate the 'type' field in the API
     'printed is part of what will be printed to the console
@@ -85,37 +85,37 @@ End Function
 
 'debug will only send logging to the server if the device id is in m.idsToLog
 Function tubiLog_debug(message = "" as Dynamic, serverTypeName = "" as String, subtype = "" as String, queue = invalid as Object, samplePercent = 1.0 as Float)
-  logInfo = m.buildLogInfo(message, m.logConsts.debug.serverType[serverTypeName], subtype, m.logConsts.debug.name)
-  m.printLogInfo(logInfo.level, logInfo.subtype, logInfo.message)
+  logInfoAA = m.buildLogInfo(message, m.logConsts.debug.serverType[serverTypeName], subtype, m.logConsts.debug.name)
+  m.printLogInfo(logInfoAA.level, logInfoAA.subtype, logInfoAA.message)
   if m.isLoggingAllowed() = true AND m.isSampled(samplePercent) = true
-    m.sendLogging(logInfo, queue)
+    m.sendLogging(logInfoAA, queue)
   end if
 End Function
 
 
 Function tubiLog_info(message = "" as Dynamic, serverTypeName = "" as String, subtype = "" as String, queue = invalid as Object, samplePercent = 1.0 as Float)
-  logInfo = m.buildLogInfo(message, m.logConsts.info.serverType[serverTypeName], subtype, m.logConsts.info.name)
-  m.printLogInfo(logInfo.level, logInfo.subtype, logInfo.message)
+  logInfoAA = m.buildLogInfo(message, m.logConsts.info.serverType[serverTypeName], subtype, m.logConsts.info.name)
+  m.printLogInfo(logInfoAA.level, logInfoAA.subtype, logInfoAA.message)
   if m.isLoggingAllowed() = true AND m.isSampled(samplePercent) = true
-    m.sendLogging(logInfo, queue)
+    m.sendLogging(logInfoAA, queue)
   end if
 End Function
 
 
 Function tubiLog_error(message = "" as Dynamic, serverTypeName = "" as String, subtype = "" as String, queue = invalid as Object, samplePercent = 1.0 as Float)
-  logInfo = m.buildLogInfo(message, m.logConsts.error.serverType[serverTypeName], subtype, m.logConsts.error.name)
-  m.printLogInfo(logInfo.level, logInfo.subtype, logInfo.message)
+  logInfoAA = m.buildLogInfo(message, m.logConsts.error.serverType[serverTypeName], subtype, m.logConsts.error.name)
+  m.printLogInfo(logInfoAA.level, logInfoAA.subtype, logInfoAA.message)
   if m.isLoggingAllowed() = true AND m.isSampled(samplePercent) = true
-    m.sendLogging(logInfo, queue)
+    m.sendLogging(logInfoAA, queue)
   end if
 End Function
 
 
 Function tubiLog_warn(message = "" as Dynamic, serverTypeName = "" as String, subtype = "" as String, queue = invalid as Object, samplePercent = 1.0 as Float)
-  logInfo = m.buildLogInfo(message, m.logConsts.warn.serverType[serverTypeName], subtype, m.logConsts.warn.name)
-  m.printLogInfo(logInfo.level, logInfo.subtype, logInfo.message)
+  logInfoAA = m.buildLogInfo(message, m.logConsts.warn.serverType[serverTypeName], subtype, m.logConsts.warn.name)
+  m.printLogInfo(logInfoAA.level, logInfoAA.subtype, logInfoAA.message)
   if m.isLoggingAllowed() = true AND m.isSampled(samplePercent) = true
-    m.sendLogging(logInfo, queue)
+    m.sendLogging(logInfoAA, queue)
   end if
 End Function
 
@@ -166,9 +166,7 @@ Function tubiLog_isLoggingAllowed()
     logsEnableType = type(clientLogsEnabled)
 
     if (logsEnableType = "Boolean" OR logsEnableType = "roBoolean") AND clientLogsEnabled = true
-      isMajorEventDay = m.isNowWithinTimePeriod(m.constants.configHubFallbacks.majorEventStart, m.constants.configHubFallbacks.majorEventEnd)
-
-      if isMajorEventDay = false
+      if m.isNowWithinTimePeriod(m.constants.configHubFallbacks.majorEventStart, m.constants.configHubFallbacks.majorEventEnd) = false
         return true
       end if
     end if
@@ -207,26 +205,26 @@ Function tubiLog_buildLogInfo_(message as Dynamic, serverType as Dynamic, subtyp
     message = FormatJson(message)
   end if
 
-  logInfo = {
+  logInfoAA = {
     level: level
     subtype: subtype
     message: message
   }
 
   if messageMap <> invalid then
-    logInfo["message_map"] = messageMap
+    logInfoAA["message_map"] = messageMap
   end if
 
   'serverType may be invalid
-  logInfo["type"] = serverType
+  logInfoAA["type"] = serverType
 
-  return logInfo
+  return logInfoAA
 End Function
 
 
 'sends the logging info to the server by creating a logging request and adding the logging request to the passed in request queue
-'@logInfo: roAssociativeArray ie.
-'  logInfo = {
+'@logInfoAA: roAssociativeArray ie.
+'  logInfoAA = {
 '    level: "error"
 '    subtype: "video-failure"
 '    message: "Video with id: 1234 failed to play"
@@ -237,14 +235,14 @@ End Function
 '@queue: roAssociativeArray, object as created by RequestQueue()
 '
 'returns invalid if the log was only printed to the console
-Function tubiLog_sendLogging_(logInfo as Object, queue as Object)
-  if logInfo <> invalid AND logInfo.count() > 0
-    if logInfo.message <> "" AND m.constants <> invalid
+Function tubiLog_sendLogging_(logInfoAA as Object, queue as Object)
+  if logInfoAA <> invalid AND logInfoAA.count() > 0
+    if logInfoAA.message <> "" AND m.constants <> invalid
 
-      if logInfo["type"] <> invalid AND logInfo.level <> "" AND logInfo.subtype <> "" AND queue <> invalid
+      if logInfoAA["type"] <> invalid AND logInfoAA.level <> "" AND logInfoAA.subtype <> "" AND queue <> invalid
         'don't send debug or info statements unless the user id is in m.constants.idsToLog
-        if m.constants.idsToLog.DoesExist(m.constants.deviceInfo.deviceId) OR logInfo.level = m.logConsts.warn.name OR logInfo.level = m.logConsts.error.name OR logInfo.level = m.logConsts.info.name
-          loggingRequest = m.getLoggingRequest(logInfo)
+        if m.constants.idsToLog.DoesExist(m.constants.deviceInfo.deviceId) OR logInfoAA.level = m.logConsts.warn.name OR logInfoAA.level = m.logConsts.error.name OR logInfoAA.level = m.logConsts.info.name
+          loggingRequest = m.getLoggingRequest(logInfoAA)
           return queue.pushRequest(loggingRequest)
         end if
       end if
@@ -275,9 +273,9 @@ End Function
 
 
 'uses Request().createAsync() to build a request that is ready to be sent to the logging API
-'@logInfo: associativeArray, a logInfo object as returned by m.buildLogInfo()
-Function tubiLog_getLoggingRequest_(logInfo as Object) as Object
-  body = m.getClientLogEvent(logInfo)
+'@logInfoAA: associativeArray, a logInfo object as returned by m.buildLogInfo()
+Function tubiLog_getLoggingRequest_(logInfoAA as Object) as Object
+  body = m.getClientLogEvent(logInfoAA)
   reqOptions = {
     body: FormatJson(body)
     method: m.constants.reqTypes.post
@@ -285,7 +283,7 @@ Function tubiLog_getLoggingRequest_(logInfo as Object) as Object
     retries: 0
   }
 
-  loggingRequest = m.request.createAsync(m.constants.urls.analyticsV3.sendEvent, "client_log_" + logInfo.level, reqOptions)
+  loggingRequest = m.request.createAsync(m.constants.urls.analyticsV3.sendEvent, "client_log_" + logInfoAA.level, reqOptions)
 
   return loggingRequest
 End Function

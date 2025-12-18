@@ -121,9 +121,8 @@ Function init()
   m.isPlayingAdsPreviousState = "content"
   m.isPlayingAdsCurrentState = "content"
 
-  request = TubiRequest(m.constants.settings)
   auth = TubiAuth(m.constants)
-  m.Tracking = TubiTracking(m.constants, auth, {}, request)
+  m.Tracking = TubiTracking(m.constants, auth, {}, TubiRequest(m.constants.settings))
   m.playerLogLib = invalid
 
   if m.constants.settings.clientLogsEnabled = true
@@ -168,17 +167,17 @@ End Function
 
 Function onChannelSelectedToPlayChanged()
   tubiLog("LinearVideoPlayerScreen.onChannelSelectedToPlayChanged")
-  playContent = true
+  shouldPlayContent = true
   if m.VideoOverlay.linearChannelToPlay.needsLogin = true
     if isLoggedInUser() = false
       m.top.control = "stop"
       m.top.channelSelected = m.VideoOverlay.linearChannelToPlay
       setVideoplayerLoadingScreenBackGround(true)
-      playContent = false
+      shouldPlayContent = false
     end if
   end if
 
-  if playContent = true
+  if shouldPlayContent = true
     m.top.channelSelected = m.VideoOverlay.linearChannelToPlay
     setVideoplayerLoadingScreenBackGround(false)
     m.top.ChannelSelectedUpdated = true

@@ -43,8 +43,7 @@ Function init()
   m.experiments = TubiExperiments(experimentsInfo)
   m.soTStaticConfig = getSoTStaticConfigFromGlobal()
   statSigExperimentsInfo = getStatsigExperimentsInfoFromGlobal()
-  statSigExperiments = StatsigExperimentsInterface(statSigExperimentsInfo)
-  m.metadataTranslate = TubiMetadataTranslate(m.constants, m.experiments, m.soTStaticConfig, statSigExperiments)
+  m.metadataTranslate = TubiMetadataTranslate(m.constants, m.experiments, m.soTStaticConfig, StatsigExperimentsInterface(statSigExperimentsInfo))
 
   'Content area
   m.RowList = m.top.findNode("RowList")

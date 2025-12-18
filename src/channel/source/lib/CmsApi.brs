@@ -1,12 +1,12 @@
 ' Thin wrapper for CMS API, Autopilot API and Search API requests.  Collected here to facilitate easy
 ' integration tests
-Function CmsApi(constants, apiUtils, experiments = invalid, statSigExperiments = invalid)
+Function CmsApi(constants, apiUtilsLib, experiments = invalid, experimentsInterface = invalid)
 
   defaultValues = {
     ' dependencies
     constants: constants
     experiments: experiments
-    statSigExperiments: statSigExperiments
+    statSigExperiments: experimentsInterface
 
     ' public
     setUtmCampaignConfig: cmsApi_setUtmCampaignConfig
@@ -40,10 +40,10 @@ Function CmsApi(constants, apiUtils, experiments = invalid, statSigExperiments =
     convertImageSizeFor720p: cmsApi_convertImageSizeFor720p
   }
 
-  cmsApi = {}
-  cmsApi.append(apiUtils)
-  cmsApi.append(defaultValues)
-  return cmsApi
+  cmsApiInstance = {}
+  cmsApiInstance.append(apiUtilsLib)
+  cmsApiInstance.append(defaultValues)
+  return cmsApiInstance
 
 End Function
 

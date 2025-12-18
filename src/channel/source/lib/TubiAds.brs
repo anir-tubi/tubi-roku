@@ -1,4 +1,4 @@
-Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType, tcfString = invalid, userConsentsOptOutStatus = invalid, isGDPR = false, prerollTimeoutExperiment = invalid)
+Function TubiAds(constants, requestInstance, requestQueue, auth, tracking, adContentType, tcfString = invalid, userConsentsOptOutStatus = invalid, isGdprValue = false, prerollTimeoutExperiment = invalid)
   'Add Support for Roku Advertising Framework
   roAdFramework = Roku_Ads()
 
@@ -38,7 +38,7 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
     ' dependencies
     constants: constants
     auth: auth
-    request: request
+    request: requestInstance
     tracking: tracking
 
     ' private
@@ -93,7 +93,7 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
     notUsedAdPodPixels: {} ' List of pixels for the current ad pod that should be sent if playback is stopped before we get an impression for that ad
     tcfString: tcfString ' IAB TC String, currently stored in m.global.IABTCF_TCString from one trust sdk.
     userConsentsOptOutStatus: userConsentsOptOutStatus ' assoc array of consent to purpose key mapping. ex: {"functional": true, "analytics": true}
-    isGDPR: isGDPR
+    isGDPR: isGdprValue
     adMessagePort: adMessagePort
     isAdultParentalLevel: true
   }
@@ -101,7 +101,7 @@ End Function
 
 
 ' returns a set of ad helper functions that can be used outside of TubiAds without invoking RAF
-Function TubiAdsLimited(constants, auth, tcfString = invalid, userConsentsOptOutStatus = invalid, isGDPR = false)
+Function TubiAdsLimited(constants, auth, tcfString = invalid, userConsentsOptOutStatus = invalid, isGdprValue = false)
 
   return {
     constants: constants
@@ -118,7 +118,7 @@ Function TubiAdsLimited(constants, auth, tcfString = invalid, userConsentsOptOut
     replaceMacro: tubiAds_replaceMacro
     tcfString: tcfString ' IAB TC String, currently stored in m.global.IABTCF_TCString from one trust sdk.
     userConsentsOptOutStatus: userConsentsOptOutStatus ' assoc array of consent to purpose key mapping. ex: {"functional": true, "analytics": true}
-    isGDPR: isGDPR
+    isGDPR: isGdprValue
   }
 End Function
 

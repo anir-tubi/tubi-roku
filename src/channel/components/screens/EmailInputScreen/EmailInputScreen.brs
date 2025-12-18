@@ -188,9 +188,9 @@ End Function
 
 
 Function onIsEmailValidChange(msg)
-  isEmailValid = msg.getData()
+  isEmailValidValue = msg.getData()
 
-  if isEmailValid = true
+  if isEmailValidValue = true
     fade(m.emailValidationMsg, "out", 0.3)
   else
     fade(m.emailValidationMsg, "in", 0.3)

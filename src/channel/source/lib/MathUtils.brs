@@ -136,12 +136,12 @@ Function convertSecondsToTimeLeftString(seconds as Integer) as String
 
   if seconds <> invalid
     hourValue = Int(seconds / 3600)
-    minValue = ((Int(seconds / 60) mod 60) + 1).toStr()
+    minuteValue = ((Int(seconds / 60) mod 60) + 1).toStr()
 
     if hourValue > 0
-      formattedString = getTranslation("h_m_left", { "hour": hourValue.toStr(), "minutes": minValue })
+      formattedString = getTranslation("h_m_left", { "hour": hourValue.toStr(), "minutes": minuteValue })
     else
-      formattedString = getTranslation("m_left", { "minutes": minValue })
+      formattedString = getTranslation("m_left", { "minutes": minuteValue })
     end if
   end if
 

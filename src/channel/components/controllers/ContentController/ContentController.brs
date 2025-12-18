@@ -149,8 +149,8 @@ Function addControllerUi()
   experimentsInfo = getExperimentsInfoFromGlobal()
   experiments = TubiExperiments(experimentsInfo)
   statSigExperimentsInfo = getStatsigExperimentsInfoFromGlobal()
-  statSigExperiments = StatsigExperimentsInterface(statSigExperimentsInfo)
-  m.cmsApi = CmsApi(m.constants, apiUtilsLib, experiments, statSigExperiments)
+  experimentsInterface = StatsigExperimentsInterface(statSigExperimentsInfo)
+  m.cmsApi = CmsApi(m.constants, apiUtilsLib, experiments, experimentsInterface)
   m.userDeviceApi = UserDeviceApi(m.constants, apiUtilsLib)
   m.tensorapi = TensorApi(m.constants, m.pub_serverPersistentData)
   m.rainmakerApi = RainmakerApi(m.constants)
@@ -2747,11 +2747,11 @@ End Function
 ' isUserInAdultsMode Returns true/false based on if the user is in adults mode based on parental controls and age info.
 Function isUserInAdultsMode()
   tubiLog("ContentController.isUserInAdultsMode")
-  isUserInAdultsMode = true
+  adultsMode = true
 
   ' Checking gf the parental control is not in adults level.
   if isParentalControlsAdultLevel() = false
-    isUserInAdultsMode = false
+    adultsMode = false
   else if shouldShowAgeGate() = true then
     if m.guestUserHasAgeInfo = invalid then
       m.guestUserHasAgeInfo = getGuestUserHasAgeInfo()
@@ -2759,11 +2759,11 @@ Function isUserInAdultsMode()
 
     ' Have to make sure we check expired as well as default state will always have hasAge = false
     if m.guestUserHasAgeInfo.hasAge = false AND m.guestUserHasAgeInfo.expired = false then
-      isUserInAdultsMode = false
+      adultsMode = false
     end if
   end if
 
-  return isUserInAdultsMode
+  return adultsMode
 End Function
 
 ' @key: string, key of the consent preference item. For ex: essential_functionality.
@@ -2979,14 +2979,14 @@ End Function
 
 
 Function getUserInfoGetContentRatingTitleLiked(nextPageId = invalid)
-  request = m.userDeviceApi.getContentRating("title", m.constants.ui.likeDislikeStates.liked, nextPageId)
-  request.append({
+  reqInfo = m.userDeviceApi.getContentRating("title", m.constants.ui.likeDislikeStates.liked, nextPageId)
+  reqInfo.append({
     "requestType": m.constants.reqNames.getContentRating
     "responseType": "assocarray"
     "successCallback": onGetUserInfoGetUserPreferencesRateTitleLikedSuccess
     "errorCallback": onGetUserInfoGetUserPreferencesRateTitleLikedError
   })
-  m.makeRequest(request)
+  m.makeRequest(reqInfo)
 End Function
 
 
@@ -3008,14 +3008,14 @@ End Function
 
 
 Function getUserInfoGetContentRatingTitleDisliked(nextPageId = invalid)
-  request = m.userDeviceApi.getContentRating("title", m.constants.ui.likeDislikeStates.disliked, nextPageId)
-  request.append({
+  reqInfo = m.userDeviceApi.getContentRating("title", m.constants.ui.likeDislikeStates.disliked, nextPageId)
+  reqInfo.append({
     "requestType": m.constants.reqNames.getContentRating
     "responseType": "assocarray"
     "successCallback": onGetUserInfoGetUserPreferencesRateTitleDislikedSuccess
     "errorCallback": onGetUserInfoGetUserPreferencesRateTitleDislikedError
   })
-  m.makeRequest(request)
+  m.makeRequest(reqInfo)
 End Function
 
 
@@ -3455,11 +3455,12 @@ End Function
 ' Checks if the video preview is queued.
 ' @return: boolean, true if the video preview is queued, false otherwise
 Function isVideoPreviewPlayQueued()
-  isVideoPreviewPlayQueued = false
+  queued = false
   if m.videoPreviewPlayer <> invalid AND m.queuedVideoPlayerCommand <> invalid AND m.videoPreviewPlayer.isSameNode(m.queuedVideoPlayerCommand.videoPlayerNode) = TRUE AND m.queuedVideoPlayerCommand.command = "play" then
-    isVideoPreviewPlayQueued = true
+    queued = true
   end if
-  return isVideoPreviewPlayQueued
+
+  return queued
 End Function
 
 

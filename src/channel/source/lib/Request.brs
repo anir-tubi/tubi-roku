@@ -26,9 +26,9 @@ End Function
 ' Request is used for general http requests
 ' the functions inside this module is more generic and can be used other endpoints
 Function Request(settings = { mode: "production", CharlesProxyEnabled: false })
-  request = TubiRequest(settings)
-  request.handleEvent = tubi_handleHttpEventV2
-  return request
+  requestInstance = TubiRequest(settings)
+  requestInstance.handleEvent = tubi_handleHttpEventV2
+  return requestInstance
 End Function
 
 
@@ -222,13 +222,13 @@ Function tubihttp_runSynchronous(timeout = 5 as Integer) as Object
   if didStart = true
     while true
       msg = wait(100, msgPort)
-      request = m.handleEvent(msg)
+      handledMessage = m.handleEvent(msg)
 
-      if request <> invalid
-        if request.response <> invalid AND request.response.data <> invalid AND request.response.data.len() > 0
-          res = request.response.data
+      if handledMessage <> invalid
+        if handledMessage.response <> invalid AND handledMessage.response.data <> invalid AND handledMessage.response.data.len() > 0
+          res = handledMessage.response.data
           exit while
-        else if request.response.code < 200 OR request.response.code >= 400
+        else if handledMessage.response.code < 200 OR handledMessage.response.code >= 400
           exit while
         end if
       end if

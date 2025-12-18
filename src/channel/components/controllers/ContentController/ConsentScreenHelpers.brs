@@ -392,8 +392,8 @@ Function getConsentOptOutStatusByKey(key)
       end if
     else
       ' Irrespective of whether user as opted in or opted out when we are in non adult mode we should treat has if user opted out.
-      isUserAllowedToManageConsent = isUserAllowedToManageConsent()
-      if m.consentSettings <> invalid AND isUserAllowedToManageConsent = true AND m.consentSettings.consents <> invalid
+      allowed = isUserAllowedToManageConsent()
+      if m.consentSettings <> invalid AND allowed = true AND m.consentSettings.consents <> invalid
         for each consent in m.consentSettings.consents
           if consent.key = key
             didOptOut = (consent.value = "opted_out")
@@ -413,19 +413,19 @@ End Function
 
 Function isUserAllowedToManageConsent()
   ' Since we have country specific Kids age. For ex: In GDPR countries less than 18 is kids.
-  ' Since outside of GDPR countries it is less than 13 is considered as kids mode. We will not create seperate mapping.
-  isUserAllowedToManageConsent = (isUserInAdultsMode() = true OR isParentalControlsTeensLevel() = true)
+  ' Since outside of GDPR countries it is less than 13 is considered as kids mode. We will not create separate mapping.
+  allowed = (isUserInAdultsMode() = true OR isParentalControlsTeensLevel() = true)
 
   if isGDPR(m.constants) = true
-    isUserAllowedToManageConsent = (isUserInAdultsMode() = true)
+    allowed = (isUserInAdultsMode() = true)
   end if
 
   ' If the kids mode UI is on than user is not allowed to manage consent.
   if isKidsUIOn() = true
-    isUserAllowedToManageConsent = false
+    allowed = false
   end if
 
-  return isUserAllowedToManageConsent
+  return allowed
 End Function
 
 
@@ -433,8 +433,7 @@ End Function
 Function getConsentsOptOutStatus()
   consentsStatus = {}
 
-  isUserAllowedToManageConsent = isUserAllowedToManageConsent()
-  if isUserAllowedToManageConsent = true
+  if isUserAllowedToManageConsent() = true
     consentKeys = m.constants.consentKeys
     for each key in consentKeys
       consentsStatus[consentKeys[key]] = getConsentOptOutStatusByKey(consentKeys[key])

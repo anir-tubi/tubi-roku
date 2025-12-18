@@ -33,8 +33,8 @@ Function init()
   experiments = TubiExperiments(experimentsInfo)
   soTStaticConfig = getSoTStaticConfigFromGlobal()
   statSigExperimentsInfo = getStatsigExperimentsInfoFromGlobal()
-  statSigExperiments = StatsigExperimentsInterface(statSigExperimentsInfo)
-  m.metadataTranslate = TubiMetadataTranslate(m.constants, experiments, soTStaticConfig, statSigExperiments)
+  experimentInterface = StatsigExperimentsInterface(statSigExperimentsInfo)
+  m.metadataTranslate = TubiMetadataTranslate(m.constants, experiments, soTStaticConfig, experimentInterface)
 
   m.RowList.drawFocusFeedbackOnTop = true
 

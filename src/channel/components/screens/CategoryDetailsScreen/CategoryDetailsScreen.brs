@@ -10,8 +10,7 @@ Function init()
   m.experiments = TubiExperiments(experimentsInfo)
   soTStaticConfig = getSoTStaticConfigFromGlobal()
   statSigExperimentsInfo = getStatsigExperimentsInfoFromGlobal()
-  statSigExperiments = StatsigExperimentsInterface(statSigExperimentsInfo)
-  m.metadataTranslate = TubiMetadataTranslate(m.constants, m.experiments, soTStaticConfig, statSigExperiments)
+  m.metadataTranslate = TubiMetadataTranslate(m.constants, m.experiments, soTStaticConfig, StatsigExperimentsInterface(statSigExperimentsInfo))
 
   m.itemsInRowCount = 8
 

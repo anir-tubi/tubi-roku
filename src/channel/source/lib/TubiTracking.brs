@@ -2,14 +2,14 @@
 ' @constants: assocArray, constants as set in Constants.brs and updated in the hotpatch
 ' @auth: TubiAuth, the auth object as returned by TubiAuth()
 ' @userConsentsOptOutStatus: AA, holds an assoc array indicating whether user has opted out of individual consent like analytics, marketing, etc.
-' @request: Request, the request object as returned by Request(). Should only be passed in if TubiTracking() is being called from within a task.
+' @requestInstance: Request, the request object as returned by Request(). Should only be passed in if TubiTracking() is being called from within a task.
 ' @externalConfigInfo: AA, holds the external config info. Should only be passed in if TubiTracking() is being called from within a task.
-Function TubiTracking(constants, auth, userConsentsOptOutStatus = {}, request = invalid, externalConfigInfo = invalid)
+Function TubiTracking(constants, auth, userConsentsOptOutStatus = {}, requestInstance = invalid, externalConfigInfo = invalid)
   return {
     constants: constants
     auth: auth
 
-    request: request
+    request: requestInstance
     externalConfigInfo: externalConfigInfo
 
     trackUserEvent: tubiTracking_trackUserEvent
@@ -143,8 +143,8 @@ Function tubiTracking_trackUserEvent(eventType = "", eventValues = invalid, requ
       eventConsentKey = blockedAnalyticsEvents[eventType]
     end if
 
-    isMajorEventDay = m.isNowWithinTimePeriod(m.externalConfigInfo.major_event_failsafe_start, m.externalConfigInfo.major_event_failsafe_end)
-    isEventInFailSafeBlockedList = isMajorEventDay = true AND m.externalConfigInfo.blocked_analytics_events <> invalid AND m.externalConfigInfo.blocked_analytics_events.doesExist(eventType) = true
+    majorEventDay = m.isNowWithinTimePeriod(m.externalConfigInfo.major_event_failsafe_start, m.externalConfigInfo.major_event_failsafe_end)
+    isEventInFailSafeBlockedList = majorEventDay = true AND m.externalConfigInfo.blocked_analytics_events <> invalid AND m.externalConfigInfo.blocked_analytics_events.doesExist(eventType) = true
     ' If the event name is not present in the blocked event list, we will proceed with sending the tracking request.
     ' If there is mapping than making sure we only proceed if a mapping is present in the userConsentsOptOutStatus and it is false.
     if (eventConsentKey = invalid OR userConsentsOptOutStatus[eventConsentKey] = false) AND isEventInFailSafeBlockedList = false

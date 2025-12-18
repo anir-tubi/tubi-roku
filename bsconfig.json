@@ -15,22 +15,16 @@
     "!components/controllers/StarterController/simple/StarterController.xml",
     "!components/OTPublishersSDK/**/*.*"
   ],
-  "diagnosticFilters": [{
-    "codes": [1104, 1090]
-  },
-  "source/tests/rooibos/rooibosDist.brs",
-  "source/rooibosFunctionMap.brs",
-  "source/3rdparty/rodash/rodash.cat.brs",
-  "source/3rdparty/roku/generalUtils.brs",
-  "components/tasks/BrazeTask/BrazeSDK.brs",
-  {
-    "codes": [1013],
-    "src": "components/lib/DevGridOverlay.brs"
-  }, {
-    "codes": [1115],
-    "src": "components/controllers/StarterController/StarterController.xml"
-  }, {
-    "codes": [1115],
-    "src": "components/controllers/StarterController/StartControllerWithTasks/StarterController.xml"
-  }]
+  "diagnosticFilters": [
+    {
+      "codes": [
+        1090
+      ]
+    },
+    "source/tests/**",
+    "source/tests/rooibos/rooibosDist.brs",
+    "source/rooibosFunctionMap.brs",
+    "source/3rdparty/rodash/rodash.cat.brs",
+    "components/tasks/BrazeTask/BrazeSDK.brs"
+  ]
 }

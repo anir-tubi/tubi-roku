@@ -6,9 +6,9 @@ Function RainmakerApi(constants)
     pauseAdsRequestInfo: rainmakerApi_pauseAdsRequestInfo
   }
 
-  rainmakerApi = {}
-  rainmakerApi.append(defaultValues)
-  return rainmakerApi
+  rainmakerApiInstance = {}
+  rainmakerApiInstance.append(defaultValues)
+  return rainmakerApiInstance
 End Function
 
 

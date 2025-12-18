@@ -12,17 +12,17 @@ Function convertSecondsToHoursString(seconds as Integer) as String
 
   if seconds <> invalid
     hourValue = Int(seconds / 3600)
-    minValue = Int(seconds / 60) mod 60
+    minuteValue = Int(seconds / 60) mod 60
 
-    if hourValue > 0 AND minValue > 0
-      retVal = Substitute("{0}h {1}m", hourValue.toStr(), minValue.toStr())
+    if hourValue > 0 AND minuteValue > 0
+      retVal = Substitute("{0}h {1}m", hourValue.toStr(), minuteValue.toStr())
     else if hourValue > 0
       retVal = Substitute("{0} h", hourValue.toStr())
     else
-      if minValue < 1
-        minValue = 1
+      if minuteValue < 1
+        minuteValue = 1
       end if
-      retVal = Substitute("{0} min", minValue.toStr())
+      retVal = Substitute("{0} min", minuteValue.toStr())
     end if
   end if
 

@@ -129,16 +129,16 @@ Function listen()
 
         m.soTStaticConfig.append(soTStaticConfig)
       else if field = "newStatSigExperiments" then
-        statSigExperiments = msg.getData()
+        newStatSigExperiments = msg.getData()
 
         ' Instead of trying to track down all the spots experimentsInfo might be used we are keeping the AA reference and just replacing the keys to update all to use the same data
         for each key in m.statSigExperimentsInfo
-          if statSigExperiments[key] = invalid
+          if newStatSigExperiments[key] = invalid
             m.statSigExperimentsInfo.delete(key)
           end if
         end for
 
-        m.statSigExperimentsInfo.append(statSigExperiments)
+        m.statSigExperimentsInfo.append(newStatSigExperiments)
       else
         conditionallyProcessAuthUpdatedMessage(msg)
       end if

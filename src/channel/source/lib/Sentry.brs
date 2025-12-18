@@ -21,8 +21,7 @@
 ' @auth: assocArray, an instance of the auth module as returned by TubiAuth()
 Function Sentry(constants, auth)
 
-  sentry = constants.thirdParty.sentry
-  if sentry = invalid
+  if constants.thirdParty.sentry = invalid
     return invalid
   end if
 

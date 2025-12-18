@@ -96,13 +96,13 @@ Function trackSceneGraphRealtimeEvent(evtData)
 End Function
 
 
-Function sendSceneGraphLog(logInfo)
+Function sendSceneGraphLog(logInfoAA)
   'runs the appropriate method (debug, error, etc.) from the logger object and add the log request to the tracking/logging queue
-  m.logger[logInfo.level](logInfo.message, logInfo.serverTypeName, logInfo.subtype, m.queue, logInfo.samplePercent)
+  m.logger[logInfoAA.level](logInfoAA.message, logInfoAA.serverTypeName, logInfoAA.subtype, m.queue, logInfoAA.samplePercent)
 End Function
 
 
-Function sendSceneGraphException(logInfo)
+Function sendSceneGraphException(logInfoAA)
   'runs the exception method from the logger object and send the log request to the sentry sdk
-  m.logger.exception(logInfo.message, logInfo.level, m.queue, logInfo.samplePercent)
+  m.logger.exception(logInfoAA.message, logInfoAA.level, m.queue, logInfoAA.samplePercent)
 End Function

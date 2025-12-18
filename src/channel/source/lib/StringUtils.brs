@@ -37,7 +37,7 @@ End Function
 '
 ' take a float or integer length in seconds, transform to timestamp "MM:SS".
 ' if the length is >= 3600, then it will return as "HH:MM:SS"
-Function formatLengthasMinsAndSecs(length as Dynamic) as String
+Function formatLengthAsMinsAndSecs(length as Dynamic) as String
   if type(length) = "Float" OR type(length) = "roFloat" OR type(length) = "Double" then length = Int(length)
   if (type(length) = "Integer" OR type(length) = "roInteger") AND length >= 0 then
     minutes = (length mod 3600) \ 60
@@ -101,7 +101,7 @@ End Function
 ' padStringLeft
 ' input:  @originalString: String, used to display
 '         @minLength: Integer, minimum number of characters returned from this function
-'         @padString: String, will be prepended
+'         @padCharacters: String, will be prepended
 ' return: result with paddedstring with more than minimum width
 '
 ' pad the provided string with padString(generally spaces) to length provided.
@@ -109,10 +109,10 @@ End Function
 ' padStringLeft("bbb", "0123", 8) = "01230123bbb"
 ' padString("bbb", 8, "0123") = "30123bbb"
 
-Function padStringLeft(originalString, padString, minLength) as String
+Function padStringLeft(originalString, padCharacters, minLength) as String
   originalString = originalString.Trim()
   while originalString.Len() < minLength
-    originalString = padString + originalString
+    originalString = padCharacters + originalString
   end while
   return originalString
 End Function

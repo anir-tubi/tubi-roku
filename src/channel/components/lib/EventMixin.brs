@@ -1,12 +1,12 @@
-'@playerLogLib: assocarray, playerLogLib library
+'@playerLogLibInstance: assocarray, playerLogLib library
 '@key: String, method name present in the library
 '@value: dynamic, param needs to passed to the method
-Function updatePlayerLogLib(playerLogLib, method, value = invalid)
-  if playerLogLib <> invalid AND isFunction(playerLogLib[method]) = true
+Function updatePlayerLogLib(playerLogLibInstance, method, value = invalid)
+  if playerLogLibInstance <> invalid AND isFunction(playerLogLibInstance[method]) = true
     if value = invalid
-      playerLogLib[method]()
+      playerLogLibInstance[method]()
     else
-      playerLogLib[method](value)
+      playerLogLibInstance[method](value)
     end if
   end if
 End Function

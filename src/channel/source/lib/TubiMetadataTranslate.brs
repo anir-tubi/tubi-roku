@@ -1,4 +1,4 @@
-Function TubiMetadataTranslate(constants, experiments = invalid, soTStaticConfig = invalid, statSigExperiments = invalid)
+Function TubiMetadataTranslate(constants, experiments = invalid, soTStaticConfig = invalid, statSigExperimentsInstance = invalid)
   return {
     ' public
     translateBackendTypeToClientSideType: tubiMetadataTranslate_translateBackendTypeToClientSideType
@@ -26,7 +26,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid, soTStaticConfig
     allowAfterHours: constants.settings.allowAfterHours
     experiments: experiments
     soTStaticConfig: soTStaticConfig
-    statSigExperiments: statSigExperiments
+    statSigExperiments: statSigExperimentsInstance
 
     dedupeBackgrounds: tubiMetadataTranslate_dedupeBackgrounds
     setTotalCount: tubiMetadataTranslate_setTotalCount
@@ -460,7 +460,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, t
     sotCustomization = container.child_ui_customization
   end if
 
-  canHideLeavingSoon = false
+  hideLeavingSoon = false
   if isAA(sotCustomization) = true AND sotCustomization.count() > 0 AND isAA(m.soTStaticConfig) = true AND m.soTStaticConfig.count() > 0
     'If the current children match any of the children in child_ui_customization, we will retrieve the SOT labels to display.
 
@@ -473,7 +473,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, t
     sotChild = sotCustomization[contentId]
 
     if sotChild <> invalid
-      canHideLeavingSoon = canHideLeavingSoon(sotChild)
+      hideLeavingSoon = canHideLeavingSoon(sotChild)
       sotInfo = m.getSignalTrustInfo(sotChild, contentFromServer)
 
       posterLables = sotChild.poster_labels
@@ -788,7 +788,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, t
   end if
 
   if contentFromServer.is_recurring <> invalid then translatedContent.isRecurring = contentFromServer.is_recurring
-  if contentFromServer.availability_ends <> invalid AND canHideLeavingSoon = false then translatedContent.availabilityEnds = contentFromServer.availability_ends
+  if contentFromServer.availability_ends <> invalid AND hideLeavingSoon = false then translatedContent.availabilityEnds = contentFromServer.availability_ends
   if contentFromServer.air_datetime <> invalid then translatedContent.airDateTime = contentFromServer.air_datetime
 
   hasVideoResources = false
@@ -2793,7 +2793,7 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
       translatedProgram.landscapePosterUrl = landscapePosterUrl
     end if
 
-    ' if a program = episode of a series, then series images are preffered
+    ' if a program = episode of a series, then series images are preferred
     if programFromServer.series_id <> invalid AND programFromServer.series_images <> invalid
       sHDGridPosterURL = m.getThumbnailImage(programFromServer, gridItemType, true)'first choice for series/episode
     else

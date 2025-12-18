@@ -274,18 +274,18 @@ End Function
 
 
 ' helper function which returns the time left in the format 'x hour and y mins left' if timeleft is more than an hour
-' else it retuns 'y mins left'
+' else it returns 'y mins left'
 Function getDurationHoursString(seconds as Integer) as String
   retVal = ""
 
   if seconds <> invalid
     hourValue = Int(seconds / 3600)
-    minValue = StrI((Int(seconds / 60) mod 60) + 1) 'increase the min by one so that we dont show 0 min
+    minuteValue = StrI((Int(seconds / 60) mod 60) + 1) 'increase the min by one so that we don't show 0 min
 
     if hourValue > 0
-      retVal = getTranslation("hour_mins_left", { "hour": StrI(hourValue), "minutes": minValue })
+      retVal = getTranslation("hour_mins_left", { "hour": StrI(hourValue), "minutes": minuteValue })
     else
-      retVal = getTranslation("mins_left", { "minutes": minValue })
+      retVal = getTranslation("mins_left", { "minutes": minuteValue })
     end if
   end if
 

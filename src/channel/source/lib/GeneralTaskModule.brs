@@ -252,19 +252,19 @@ Function generalTask_makeBatchRequest(batchInfo = {})
 
   ' Going in reverse order to avoid index getting off if we have to remove a request
   for i = requests.count() - 1 to 0 step -1
-    request = requests[i]
-    request.silenceCallbackWarnings = true
+    reqInfo = requests[i]
+    reqInfo.silenceCallbackWarnings = true
 
     ' If verification fails go ahead and kick it out
-    if m.verifyRequestInfo(request) = false then
+    if m.verifyRequestInfo(reqInfo) = false then
       requests.delete(i)
     else
       ' Else add in the default values
-      if request.id = invalid
-        request.id = deviceInfo.getRandomUUID()
+      if reqInfo.id = invalid
+        reqInfo.id = deviceInfo.getRandomUUID()
       end if
 
-      requests[i] = m.addDefaultRequestValues(request)
+      requests[i] = m.addDefaultRequestValues(reqInfo)
     end if
   end for
 
@@ -419,6 +419,6 @@ Function generalTask_updateGeneralTaskSoTStaticConfig(soTStaticConfig)
 End Function
 
 
-Function generalTask_updateGeneralTaskStatSigExperiments(statSigExperiments)
-  m.generalTask.newStatSigExperiments = statSigExperiments
+Function generalTask_updateGeneralTaskStatSigExperiments(newStatSigExperiments)
+  m.generalTask.newStatSigExperiments = newStatSigExperiments
 End Function

@@ -12,10 +12,10 @@ Function Main(startupArgs)
 
   port = CreateObject("roMessagePort")
   m.queue = TubiRequestQueue().create(port)
-  request = TubiRequest(constants.settings)
+  requestInstance = TubiRequest(constants.settings)
   auth = TubiAuth(constants)
   sentryInfo = Sentry(constants, auth)
-  log = TubiLogger(constants, request, auth, sentryInfo)
+  log = TubiLogger(constants, requestInstance, auth, sentryInfo)
 
   logCrashesOnStartup(m.startupArgs, log, constants)
 
@@ -27,7 +27,7 @@ Function Main(startupArgs)
   permaScreen.createScene("BackgroundScene")
   permaScreen.show()
 
-  while runChannel(constants, log, request) = true
+  while runChannel(constants, log, requestInstance) = true
   end while
 End Function
 
@@ -37,7 +37,7 @@ End Function
 ' @request: assocArray, an instance of the request module as returned by TubiRequest()
 '
 ' returns: boolean, true if the app should be restarted, false if the app should be closed
-Function runChannel(constants, log, request)
+Function runChannel(constants, log, requestInstance)
   startupArgs = {}
   if m.startupArgs <> invalid
     startupArgs.append(m.startupArgs)
@@ -274,7 +274,7 @@ End Function
 '
 ' @tubiRequest: assocArray, an instance of the request module as returned by TubiRequest()
 ' @requestInfo: assocArray, information related to the request like url,method and post body.
-Function updateRokuContinueWatchingInfo(tubiRequest, requestInfo)
-  tubiRequest = tubiRequest.createAsync(requestInfo.url, requestInfo.requestType, requestInfo.options)
-  m.queue.pushRequest(tubiRequest)
+Function updateRokuContinueWatchingInfo(tubiRequestInstance, requestInfo)
+  req = tubiRequestInstance.createAsync(requestInfo.url, requestInfo.requestType, requestInfo.options)
+  m.queue.pushRequest(req)
 End Function
