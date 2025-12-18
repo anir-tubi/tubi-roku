@@ -579,10 +579,6 @@ Function updatePlayerLayoutBasedOnFocusedContent(content)
   else if isKidsUIOn() = false AND isHomeScreen = true AND m.isUserInVideoTilesExperiment = true
     isContainerInControl = arrayIncludes(m.videoTilesControlCategoryIds, content.parentId)
     if isContainerInControl = false
-      ' Adding a pause to cover case where we are switching between inline and full screen video preview.
-      if m.videoPreviewPlayer.isDetailScreen = false
-        pauseVideoPreview()
-      end if
       updatePreviewPlayerToInlineView()
     else if arrayIncludes(["trueControlTop2Rows", "refinedControlTop2Rows"], m.videoTilesVariant) = true
       updatePreviewPlayerToCondensedView()
