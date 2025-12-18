@@ -32,7 +32,7 @@ const { replaceTypographyConstants, updateTypographyJSON } = require('./js/typog
 const { NoStackError } = require('./js/utilities');
 
 // Importing functions with Git functionality
-const { makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges, buildQaBranch, bumpBuild, bumpBuildTen, bumpRevision, tagBuild, createCdnPullRequestForOneTrustSDK, createCdnPullRequestForFoxVideoPlayer, sendSlackReminders, getCurrentBranch, isBranchTrackingPresent, createTranslationsPullRequestIfChanges, cherryPickTranslationsToQaBranch } = require('./js/git');
+const { makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges, buildQaBranch, bumpBuild, bumpBuildTen, bumpRevision, tagBuild, createCdnPullRequestForOneTrustSDK, createCdnPullRequestForFoxVideoPlayer, getCurrentBranch, isBranchTrackingPresent, createTranslationsPullRequestIfChanges, cherryPickTranslationsToQaBranch } = require('./js/git');
 
 // Importing functions related to Github action runners
 const { setupAutomatedTestsGithubActionRunner, startAutomatedTestsGithubActionRunner, removeAutomatedTestsGithubActionRunner } = require('./js/action-runner');
@@ -1161,7 +1161,7 @@ exports.test = series(setTest, clean, preprocessTests, buildInstalled, sideLoad)
 exports.buildQaBranch = buildQaBranch;
 exports.stage = series(validateBuildEnvironment, verifyLocalClientErrorConfigIsCurrent, uploadLatestTranslationsAndCreateTicketForMissingTranslations, setStaging, bumpRevision, exports.build, packageAll, pushStaging, pushBranch);
 exports.releaseOnGithub = series(tagBuild, pushTag, createGithubRelease);
-exports.release = series(validateBuildEnvironment, confirmRelease, verifyLocalClientErrorConfigIsCurrent, setProduction, bumpBuild, exports.build, packageAll, makeReleasePrs, exports.releaseOnGithub, sendSlackReminders);
+exports.release = series(validateBuildEnvironment, confirmRelease, verifyLocalClientErrorConfigIsCurrent, setProduction, bumpBuild, exports.build, packageAll, makeReleasePrs, exports.releaseOnGithub);
 exports.compareProd = findCommitsNotOnProductionBranch;
 exports.compareCheckedOut = findCommitsNotOnCurrentBranch;
 exports.addMissingImages = addMissingImagesToRemoteLibrary;
