@@ -65,7 +65,7 @@ Function retryComponentLibrary()
   previousUri = m.internalComponentLibrary.uri
 
   compLibType = "pkg"
-  if previousUri.instr(".zip") then
+  if previousUri.instr(".zip") > 0 then
     compLibType = "zip"
   end if
 
