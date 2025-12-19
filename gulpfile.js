@@ -54,8 +54,11 @@ const options = {
   telnet: process.env.ROKU_DEV_TELNET
 };
 
-// distribution ID of roku staging CDN pointing to s3 bucket tubi-rokucdn-source-staging
-const stagingCdnDistributionID = `E2ZVLLDFJT12OF`;
+// distribution ID of roku staging CDN pointing to s3 bucket tubi-roku-multi-cdn-source-staging-core
+const stagingCdnDistributionID = `E1DIAJVA9IZ6OD`;
+
+// S3 bucket name
+const S3_ROKU_MULTI_CDN_STAGING_CORE = 'tubi-roku-multi-cdn-source-staging-core';
 
 // overwrite the config and/or target default options with passed in arguments;
 // for example a -staging argument will set options.config to 'staging'
@@ -973,12 +976,10 @@ function pushStaging(done) {
   const minorBuildTag = getBuildTag('minor');
 
   const localRemoteComponentsPath = `build/tubi_remote_components_${buildTag}.pkg`;
-  const rcdnS3RemoteComponentsPath = `s3://tubi-rokucdn-source-staging/appFiles/components/tubi_remote_components_${buildTag}.pkg`;
-  const mrcdnS3RemoteComponentsPath = `s3://tubi-roku-multi-cdn-source-staging/appFiles/components/tubi_remote_components_${buildTag}.pkg`;
+  const mrcdnS3RemoteComponentsPath = `s3://${S3_ROKU_MULTI_CDN_STAGING_CORE}/appFiles/components/tubi_remote_components_${buildTag}.pkg`;
 
   const localStarterComponentsPath = `build/tubi_starter_components_${minorBuildTag}.pkg`;
-  const rcdnS3starterComponentsPath = `s3://tubi-rokucdn-source-staging/appFiles/starter-components/tubi_starter_components_${minorBuildTag}.pkg`;
-  const mrcdnS3starterComponentsPath = `s3://tubi-roku-multi-cdn-source-staging/appFiles/starter-components/tubi_starter_components_${minorBuildTag}.pkg`;
+  const mrcdnS3starterComponentsPath = `s3://${S3_ROKU_MULTI_CDN_STAGING_CORE}/appFiles/starter-components/tubi_starter_components_${minorBuildTag}.pkg`;
 
   let pushResult = shell.exec(`aws s3 cp ${localRemoteComponentsPath} ${mrcdnS3RemoteComponentsPath} --profile $AWS_PROFILE`);
 
@@ -986,24 +987,9 @@ function pushStaging(done) {
     pushResult = shell.exec(`aws s3 cp ${localStarterComponentsPath} ${mrcdnS3starterComponentsPath} --profile $AWS_PROFILE`);
   }
 
-  // delete this part of the code during submission build
-  if (!pushResult.stderr) {
-    pushResult = shell.exec(`aws s3 cp ${localRemoteComponentsPath} ${rcdnS3RemoteComponentsPath} --profile $AWS_PROFILE`);
-  }
-
-  // delete this part of the code during submission build
-  if (!pushResult.stderr) {
-    pushResult = shell.exec(`aws s3 cp ${localStarterComponentsPath} ${rcdnS3starterComponentsPath} --profile $AWS_PROFILE`);
-  }
-
   // invalidate the cloudfront so that new starter component can get replaced.
   if (!pushResult.stderr) {
     pushResult = shell.exec(`aws cloudfront create-invalidation --distribution-id ${stagingCdnDistributionID} --paths "/*" --profile $AWS_PROFILE`);
-  }
-
-  // delete this part of the code during submission build
-  if (!pushResult.stderr) {
-    pushResult = shell.exec(`aws cloudfront create-invalidation --distribution-id E1TFU8FZM49RLM --paths "/*" --profile $AWS_PROFILE`);
   }
 
   if (!pushResult.stderr) {
@@ -1019,7 +1005,7 @@ function pushOneTrustStaging(done) {
   const buildTag = getOneTrustBuildTag(options);
 
   const localPath = `build/tubi_one_trust_components_${buildTag}.pkg`;
-  const remotePath = `s3://tubi-roku-multi-cdn-source-staging/appFiles/one-trust-components/tubi_one_trust_components_${buildTag}.pkg`;
+  const remotePath = `s3://${S3_ROKU_MULTI_CDN_STAGING_CORE}/appFiles/one-trust-components/tubi_one_trust_components_${buildTag}.pkg`;
 
   const result = shell.exec(`aws s3 cp ${localPath} ${remotePath} --profile $AWS_PROFILE`);
 
@@ -1034,7 +1020,7 @@ function pushOneTrustStaging(done) {
 async function pushFoxVideoPlayerStaging(done) {
   const pkgPath = await packageFoxVideoPlayer(done);
 
-  const remotePath = `s3://tubi-roku-multi-cdn-source-staging/appFiles/fox-video-player-components/${path.basename(pkgPath)}`;
+  const remotePath = `s3://${S3_ROKU_MULTI_CDN_STAGING_CORE}/appFiles/fox-video-player-components/${path.basename(pkgPath)}`;
   const result = shell.exec(`aws s3 cp ${pkgPath} ${remotePath} --profile $AWS_PROFILE`);
 
   if (!result.stderr) {
