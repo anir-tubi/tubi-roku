@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="SubtitleSelectionOverlay" extends="Group">
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="SubtitleSelectionOverlay.brs" />
+
+  <interface>
+    <!-- Inputs -->
+    <field id="availableSubtitleTracks" type="array" />
+    <field id="currentSubtitleTrack" type="string" />
+    <field id="globalCaptionMode" type="string" />
+    <field id="show" type="boolean" alwaysNotify="true" />
+    <field id="hide" type="boolean" alwaysNotify="true" />
+    <field id="populate" type="boolean" alwaysNotify="true" />
+
+    <!-- Outputs -->
+    <field id="selectedTrack" type="assocarray" alwaysNotify="true" />
+    <field id="wasHidden" type="boolean" alwaysNotify="true" />
+    <field id="isVisible" type="boolean" value="false" />
+    <field id="playPressed" type="boolean" alwaysNotify="true" />
+  </interface>
+
+  <children>
+    <LayoutGroup
+      id="contentGroup"
+      translation="[1728, 888]"
+      horizAlignment="right"
+      opacity="0.0">
+
+      <EnhancedButtonList
+        id="buttonList"
+        buttonHeight="72"
+        padding="33"
+        showInactiveFocusState="true"
+        buttonBackgroundUri="pkg:/images/tabs-bg-$$RES$$.9.png"
+        layoutDirection="horiz"
+        buttonSpacing="[15]" />
+
+    </LayoutGroup>
+
+    <Timer
+      id="autoHideTimer"
+      duration="15"
+      repeat="false" />
+  </children>
+</component>
+

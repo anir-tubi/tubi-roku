@@ -247,6 +247,20 @@ Function init()
   m.ratingOverlayTimer = m.top.findNode("ratingOverlayTimer")
   m.ratingOverlayTimer.observeField("fire", "hideRatingOverlay")
 
+  m.subtitleSelectionOverlay = m.top.findNode("subtitleSelectionOverlay")
+  m.subtitleSelectionOverlay.observeFieldScoped("selectedTrack", "onSubtitleTrackSelected")
+  m.subtitleSelectionOverlay.observeFieldScoped("wasHidden", "onSubtitleSelectionOverlayHidden")
+  m.subtitleSelectionOverlay.observeFieldScoped("playPressed", "onSubtitleSelectionOverlayPlayPressed")
+
+  ' Subtitle overlay experiment: roku_player_subtitle_overlay_v1
+  ' - Show overlay only if experiment is enabled
+  ' - If user has preferredSubtitleTrack, show only once per app session
+  ' - If no preferredSubtitleTrack, show on every video
+  m.isSubtitleOverlayExperimentEnabled = getStatsigExperimentResource("roku_player_improvement", "roku_player_subtitle_overlay_v1", false).enabled
+  m.showSubtitleSelection = false
+  ' Flag to defer showing subtitle overlay until HUD closes (when skip button timer fires while HUD is visible)
+  m.pendingSubtitleOverlayOnHudClose = false
+
   m.ElapsedLabel = m.top.findNode("ElapsedLabel")
   m.RemainingLabel = m.top.findNode("RemainingLabel")
   m.RemainingMinimizedGroup = m.top.findNode("RemainingMinimizedGroup")
@@ -301,6 +315,7 @@ Function init()
   ' Map to store the history whether cuePoints button were shown or not.
   ' skip button for each cuepoint should only be shown once per video
   m.cuePointsHistory = {}
+  m.lastShownSkipCuepointType = ""
 
   m.RAFAdContainer = m.top.findNode("RAFAdContainer")
 
@@ -796,9 +811,10 @@ Function onScreenFocusChange()
 End Function
 
 
-'set the text for skipCuepoints button, making it visible and timer to autohide
-'@skipCuepointsTitle: string, text of the skipCuepoints button
-Function setSkipCuepointsButtonTextAndTimer(skipCuepointsTitle as String) as Void
+' setSkipCuepointsButtonTextAndTimer sets the text for skipCuepoints button, making it visible and starting timer to autohide.
+' @param skipCuepointsTitle - String, text to display on the skipCuepoints button (e.g., "Skip Intro", "Skip Recap")
+' @param skipCuepointType - String, type of cuepoint (intro, recap, earlyCredits) used to determine subtitle overlay behavior
+Function setSkipCuepointsButtonTextAndTimer(skipCuepointsTitle as String, skipCuepointType = "" as String) as Void
   tubiLog("VideoPlayer.setSkipCuepointsButtonTextAndTimer")
   m.skipCuepointsButtonTimer = m.top.createChild("Timer")
   m.skipCuepointsButtonTimer.duration = 10
@@ -806,6 +822,7 @@ Function setSkipCuepointsButtonTextAndTimer(skipCuepointsTitle as String) as Voi
   m.skipCuepointsButtonTimer.observeFieldScoped("fire", "autoHideSkipCuepointsButton")
   m.skipCuepointsButtonTimer.control = "start"
   m.skipCuepointsButton.text = skipCuepointsTitle
+  m.lastShownSkipCuepointType = skipCuepointType
   showSkipCuepointsButton()
 End Function
 
@@ -890,8 +907,23 @@ End Function
 'Autohide the SkipCuepoints button after timer reached and HUD is not visible
 Function autoHideSkipCuepointsButton()
   clearSkipCuepointsTimer()
+
+  ' Show subtitle selection overlay after skip cuepoints button auto-hides
+  ' Only show for SkipIntro and SkipRecap, not for SkipEarlyCredits
+  isIntroOrRecap = m.lastShownSkipCuepointType = m.constants.player.skipCuepointsButtonTypes.intro OR m.lastShownSkipCuepointType = m.constants.player.skipCuepointsButtonTypes.recap
+  shouldShowSubtitleOverlay = m.showSubtitleSelection = true AND m.subtitleSelectionOverlay.isVisible = false AND isIntroOrRecap = true
+
   if m.HUD.opacity < 1
     hideSkipCuepointsButton(m.top)
+
+    if shouldShowSubtitleOverlay = true
+      showSubtitleSelectionOverlay()
+    end if
+  else
+    ' HUD is visible - defer showing subtitle overlay until HUD closes
+    if shouldShowSubtitleOverlay = true
+      m.pendingSubtitleOverlayOnHudClose = true
+    end if
   end if
 End Function
 
@@ -1008,6 +1040,16 @@ Function setInitialCCAndAudioTracks()
   ' setInitialAudioTrack() may attempt to set a track that the current content does not contain in which
   ' case Roku's video player logic will choose an audio track
   setInitialAudioTrack(m.Video.availableAudioTracks)
+  ' Determine if subtitle selection overlay should be shown
+  ' This also fires the exposure event for both variant and control groups
+  m.showSubtitleSelection = shouldShowSubtitleSelectionOverlay()
+  ' Only populate subtitle selection overlay if we're going to show it
+  if m.showSubtitleSelection = true
+    m.subtitleSelectionOverlay.availableSubtitleTracks = m.Video.availableSubtitleTracks
+    m.subtitleSelectionOverlay.currentSubtitleTrack = m.Video.subtitleTrack
+    m.subtitleSelectionOverlay.globalCaptionMode = m.Video.globalCaptionMode
+    m.subtitleSelectionOverlay.populate = true
+  end if
   updatePlayerLogLib(m.playerLogLib, "setCaptions", m.Video.availableSubtitleTracks)
   updatePlayerLogLib(m.playerLogLib, "updateCaptionIndex", m.Video.subtitleTrack)
 End Function
@@ -1464,6 +1506,12 @@ Function onVideoStateChange(msg)
       end if
     end if
 
+    ' Show subtitle selection overlay only if content has no skip cuepoints
+    ' If content has skip cuepoints, show after skip button closes
+    if m.showSubtitleSelection = true AND m.subtitleSelectionOverlay.isVisible = false AND contentHasSkipCuepoints() = false
+      showSubtitleSelectionOverlay()
+    end if
+
   end if
 
   if state = "stopped" OR state = "finished" OR state = "error" OR state = "paused" then
@@ -1729,21 +1777,21 @@ Function onVideoPositionChange(msg)
       if canSkipCuepointsButtonBeShown(m.constants.player.skipCuepointsButtonTypes.intro, playProgressOk)
         m.cuePointsHistory[m.constants.player.skipCuepointsButtonTypes.intro] = true
         skipCuepointsText = getTranslation("skipIntro_Player")
-        setSkipCuepointsButtonTextAndTimer(skipCuepointsText)
+        setSkipCuepointsButtonTextAndTimer(skipCuepointsText, m.constants.player.skipCuepointsButtonTypes.intro)
       end if
     else if isSkipRecapCuePointsReached(content.creditCuePoints)
       'Implement recap
       if canSkipCuepointsButtonBeShown(m.constants.player.skipCuepointsButtonTypes.recap, playProgressOk)
         m.cuePointsHistory[m.constants.player.skipCuepointsButtonTypes.recap] = true
         skipRecapText = getTranslation("skipRecap_Player")
-        setSkipCuepointsButtonTextAndTimer(skipRecapText)
+        setSkipCuepointsButtonTextAndTimer(skipRecapText, m.constants.player.skipCuepointsButtonTypes.recap)
       end if
     else if isSkipEarlyCreditCuePointsReached(content.creditCuePoints)
       'Implement Early credits
       if canSkipCuepointsButtonBeShown(m.constants.player.skipCuepointsButtonTypes.earlyCredits, playProgressOk)
         m.cuePointsHistory[m.constants.player.skipCuepointsButtonTypes.earlyCredits] = true
         skipEarlyCredits = getTranslation("skipEarlyCredits_Player")
-        setSkipCuepointsButtonTextAndTimer(skipEarlyCredits)
+        setSkipCuepointsButtonTextAndTimer(skipEarlyCredits, m.constants.player.skipCuepointsButtonTypes.earlyCredits)
       end if
     else if m.skipCuepointsButton.text <> ""
       clearSkipCuepointsButtonAndTimer()
@@ -2335,6 +2383,9 @@ Function resetVideoPlayerState(content = invalid)
   m.ratingInterval = 0
   m.focusedButtonIndex = 0
   m.brandingLogo.opacity = 0
+  m.subtitleSelectionOverlay.hide = true
+  m.showSubtitleSelection = false
+  m.pendingSubtitleOverlayOnHudClose = false
 
   cleanupFallbackTimer()
   cleanupRetryTimer()
@@ -3368,6 +3419,109 @@ Function hideRatingOverlay()
 End Function
 
 
+' shouldShowSubtitleSelectionOverlay determines if the subtitle selection overlay should be shown.
+' Logic:
+' - Only show if there are available subtitle tracks
+' - Only show if roku_player_subtitle_overlay_v1 experiment is enabled
+' - If user has preferredSubtitleTrack: show only once ever (persisted in registry)
+' - If no preferredSubtitleTrack: show on every video
+' - Fires exposure event for both variant and control groups
+' @return boolean - true if overlay should be shown
+Function shouldShowSubtitleSelectionOverlay() as Boolean
+  ' Only show if there are available subtitle tracks
+  availableTracks = m.Video.availableSubtitleTracks
+  if availableTracks = invalid OR availableTracks.Count() = 0
+    return false
+  end if
+
+  ' Check if there's a preferred subtitle track
+  preferredSubtitleTrack = m.top.preferredSubtitleTrack
+  hasPreferredSubtitleTrack = isAA(preferredSubtitleTrack) = true AND isNonEmptyString(preferredSubtitleTrack.language) = true
+
+  ' Read registry once - only needed if user has a preferred track
+  hasShownOverlay = false
+  if hasPreferredSubtitleTrack = true
+    hasShownOverlay = (RegRead("hasShownSubtitleOverlayWithPreference", "subtitleOverlay") = "true")
+  end if
+
+  ' Fire exposure event for both variant and control groups
+  ' Fire for: first video (no preference OR preference but not shown yet)
+  ' Don't fire for: subsequent videos with preference (already exposed)
+  if hasPreferredSubtitleTrack = false OR hasShownOverlay = false
+    getStatsigExperimentResource("roku_player_improvement", "roku_player_subtitle_overlay_v1", true)
+  end if
+
+  ' Check if experiment is enabled (after firing exposure so both groups are tracked)
+  ' Return false for control group
+  if m.isSubtitleOverlayExperimentEnabled <> true
+    return false
+  end if
+
+  ' If user has preference and already shown, don't show again
+  if hasPreferredSubtitleTrack = true AND hasShownOverlay = true
+    return false
+  end if
+
+  ' Show the overlay (either no preference, or first time with preference)
+  return true
+End Function
+
+
+' showSubtitleSelectionOverlay shows the subtitle selection overlay component.
+' Sets focus to the overlay and saves registry flag when shown with a preferred subtitle track.
+Function showSubtitleSelectionOverlay()
+  if m.subtitleSelectionOverlay.isVisible = false
+    m.subtitleSelectionOverlay.show = true
+    m.focusedNode = m.subtitleSelectionOverlay
+
+    ' Save to registry if user has preferred subtitle track (to prevent showing again)
+    preferredSubtitleTrack = m.top.preferredSubtitleTrack
+    hasPreferredSubtitleTrack = isAA(preferredSubtitleTrack) = true AND isNonEmptyString(preferredSubtitleTrack.language) = true
+
+    if hasPreferredSubtitleTrack = true
+      hasShownOverlay = RegRead("hasShownSubtitleOverlayWithPreference", "subtitleOverlay")
+
+      if hasShownOverlay <> "true"
+        ' First time showing with preference - save to registry
+        RegWrite("hasShownSubtitleOverlayWithPreference", "true", "subtitleOverlay")
+      end if
+    end if
+  end if
+End Function
+
+
+' hideSubtitleSelectionOverlay hides the subtitle selection overlay component.
+' Focus is restored via onSubtitleSelectionOverlayHidden callback.
+Function hideSubtitleSelectionOverlay()
+  m.pendingSubtitleOverlayOnHudClose = false
+  if m.subtitleSelectionOverlay.isVisible = true
+    m.showSubtitleSelection = false
+    m.subtitleSelectionOverlay.hide = true
+  end if
+End Function
+
+
+' contentHasSkipCuepoints checks if the current video position has not yet crossed any skip cuepoints.
+' @return boolean - true if there are skip cuepoints ahead that haven't been crossed, false otherwise
+Function contentHasSkipCuepoints() as Boolean
+  content = m.Video.content
+  if content = invalid OR content.creditCuePoints = invalid
+    return false
+  end if
+
+  cuePoints = content.creditCuePoints
+  currentPosition = m.playerPosition
+
+  ' Check if intro cuepoint exists and hasn't been crossed yet
+  hasIntroPending = cuePoints.intro_start <> invalid AND cuePoints.intro_end <> invalid AND cuePoints.intro_start > 0 AND currentPosition < cuePoints.intro_end
+
+  ' Check if recap cuepoint exists and hasn't been crossed yet
+  hasRecapPending = cuePoints.recap_start <> invalid AND cuePoints.recap_end <> invalid AND cuePoints.recap_start > 0 AND currentPosition < cuePoints.recap_end
+
+  return hasIntroPending OR hasRecapPending
+End Function
+
+
 ' updateBrandingLogoVisibility manages the visibility of the branding logo group
 ' The branding logo should be visible when either transport controls or rating overlay is displayed
 ' @shouldShowBrandingLogo: boolean, true to show the logo with animation, false to hide the logo with animation
@@ -3481,6 +3635,7 @@ Function onWasCCBackButtonSelectedChange(msg)
   wasBackSelected = msg.getData()
   if wasBackSelected = true
     hideClosedCaptionAudioTrackOverlay()
+    hideSubtitleSelectionOverlay()
     m.closedCaptionAudioButton.focusState = true
   end if
 End Function
@@ -4125,4 +4280,47 @@ end sub
 ' Callback when ad fetch cooldown timer expires
 Function onAdFetchCooldownTimerFired()
   cleanupAdFetchCooldownTimer()
+End Function
+
+
+' onSubtitleTrackSelected handles when a subtitle track is selected from the overlay.
+' Updates the video subtitle track and caption mode.
+' When "Off" is selected, only globalCaptionMode is updated (subtitleTrack is not modified).
+' When a track is selected, subtitleTrack is set to the actual id(trackName).
+Function onSubtitleTrackSelected(msg)
+  item = msg.getData()
+
+  if item <> invalid
+    m.Video.subtitleTrack = item.id
+    if item.id = "Off"
+      m.Video.globalCaptionMode = "Off"
+      setAudioSubtitleTransportBarIcon("Off")
+    else
+      m.Video.globalCaptionMode = "On"
+      setAudioSubtitleTransportBarIcon("On")
+    end if
+  end if
+End Function
+
+
+' onSubtitleSelectionOverlayHidden handles when the subtitle selection overlay is hidden.
+' Restores focus to the play/pause button.
+Function onSubtitleSelectionOverlayHidden(msg)
+  m.showSubtitleSelection = false
+  m.pendingSubtitleOverlayOnHudClose = false
+  ' Set focus back to transport play/pause button
+  if m.PlayPauseButton <> invalid
+    m.PlayPauseButton.setFocus(true)
+    m.focusedNode = m.PlayPauseButton
+  end if
+End Function
+
+
+' onSubtitleSelectionOverlayPlayPressed handles when the play button is pressed while overlay is shown.
+' Shows transport and pauses the video.
+Function onSubtitleSelectionOverlayPlayPressed(msg)
+  if msg.getData() = true
+    showTransport()
+    pauseVideo(true, true)
+  end if
 End Function

@@ -588,6 +588,9 @@
       </LayoutGroup>
     </Group>
 
+    <SubtitleSelectionOverlay
+      id="subtitleSelectionOverlay" />
+
     <Poster
       id="controlIcon"
       width="48"

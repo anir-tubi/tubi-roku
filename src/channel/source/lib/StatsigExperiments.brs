@@ -49,6 +49,10 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         roku_player_retry_network_errors_v1: {
           default: { "enabled": false }
         }
+        ' Testing the subtitle overlay feature on the vod player
+        roku_player_subtitle_overlay_v1: {
+          default: { "enabled": false }
+        }
       }
 
       roku_postplay_countdown_timer: {

@@ -346,9 +346,15 @@ End Function
 ' @param press - Boolean, true if key was pressed (not released)
 ' @return Boolean - True if event was handled, false otherwise
 Function onKeyEvent(key as String, press as Boolean) as Boolean
-  if press = true AND (key = "OK" OR key = "play")
-    m.top.wasSelected = true
-    return true
+
+  if press then
+    m.top.pressedKey = key
+
+    if key = "OK" OR key = "play" then
+      m.top.wasSelected = true
+      return true
+    end if
   end if
+
   return false
 End Function

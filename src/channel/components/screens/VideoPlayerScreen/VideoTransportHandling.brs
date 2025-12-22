@@ -16,16 +16,12 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         handleOk()
       else if key = "play"
         handlePlayPause()
-
       else if key = "fastforward"
         handleFastForward()
-
       else if key = "rewind"
         handleRewind()
-
       else if key = "replay"
         handleHopBack(true, 20)
-
       else if key = "options"
         if m.ignoreOptionsKey = false then
           showTransport()
@@ -1706,6 +1702,12 @@ Function onHudStateChanged(msg)
     if m.skipCuepointsButton.visible = true
       skipCuepointsButtonTransLation = m.skipCuepointsButton.translation
       slideTo(m.skipCuepointsButton, [skipCuepointsButtonTransLation[0], m.skipCuepointsButtonDownTranslation], 0.6)
+    end if
+
+    ' Show pending subtitle overlay after HUD closes
+    if m.pendingSubtitleOverlayOnHudClose = true
+      m.pendingSubtitleOverlayOnHudClose = false
+      showSubtitleSelectionOverlay()
     end if
   end if
 End Function
