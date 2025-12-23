@@ -655,12 +655,7 @@ Function setFeaturedRowHeights()
     for i = 0 to featuredRowContent.getChildCount() - 1
       category = featuredRowContent.getChild(i)
       gridItemType = category.gridItemType
-      isBillboardRow = m.variant = "billboard" AND category.id = "featured"
-      if isBillboardRow = true
-        featuredRowHeight = m.featuredRowPoster[1] + metadataSectionHeight + 57
-      else
-        featuredRowHeight = m.featuredRowPoster[1] + metadataSectionHeight
-      end if
+      featuredRowHeight = m.featuredRowPoster[1] + metadataSectionHeight
 
       if category.sponsorImages <> invalid
         '// if this is a sponsored row, then adjust the spacing so row includes the header size of the sponsored row
@@ -1268,6 +1263,29 @@ Function updateFeaturedRowItemFocused()
       topRef.featuredRowFocusedItem = itemFocused
       updateCurrentFocusedItemBoundingRect()
       updateFocusXOffset(rowItemFocused[0])
+
+      if itemFocused.gridItemType = m.constants.ui.gridItemTypes.liveEventBanner
+        nextRowIndex = rowItemFocused[0] + 1
+        if nextRowIndex < m.top.featuredRowContent.getChildCount()
+          nextCategory = m.top.featuredRowContent.getChild(nextRowIndex)
+          if nextCategory <> invalid AND isVideoTileEnabledContainer(nextCategory.gridItemType, nextCategory.id) = true
+            updateRowHeight(nextRowIndex, m.featuredRowPoster[1] + 76)
+            m.resetRowHeights = true
+            m.modifiedRowIndex = nextRowIndex
+          end if
+        end if
+      else if m.resetRowHeights = true AND m.modifiedRowIndex <> invalid
+        ' Reset row height, accounting for sponsored row spacing if applicable
+        resetHeight = m.featuredRowPoster[1] + 240
+        modifiedCategory = m.top.featuredRowContent.getChild(m.modifiedRowIndex)
+        if modifiedCategory <> invalid AND modifiedCategory.sponsorImages <> invalid
+          ' Add 32 pixels for sponsored row header spacing
+          resetHeight = resetHeight + 32
+        end if
+        updateRowHeight(m.modifiedRowIndex, resetHeight)
+        m.resetRowHeights = false
+        m.modifiedRowIndex = invalid
+      end if
     end if
   end if
 End Function
@@ -1579,4 +1597,18 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
     end if
   end if
   return false
+End Function
+
+
+' Updates a specific row height in the featured row list
+' @param rowIndex - Index of the row to update
+' @param height - New height value
+Function updateRowHeight(rowIndex as Integer, height as Integer)
+  rowHeights = m.featuredRowList.rowHeights
+  rowHeights[rowIndex] = height
+  if FormatJson(rowHeights) <> FormatJson(m.featuredRowList.rowHeights)
+    m.ignoreCurrColumnChange = true
+    m.featuredRowList.rowHeights = rowHeights
+    m.ignoreCurrColumnChange = false
+  end if
 End Function
