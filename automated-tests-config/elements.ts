@@ -1561,27 +1561,22 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#Title',
   },
 
-  /** full device ID  */
-  fullDeviceID: {
-    keyPath: '#ContentController.#DialogBox.#ContentArea.#Title',
-  },
-
   /** About menu item */
   aboutMenuItem: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.2.#SettingsMenuGroup.#SettingsMenu.2',
   },
 
-  /** Full Device message */
-  fullDeviceMessage: {
-    keyPath:
-      '#ContentController.#DialogBox.#ContentArea.#MessageGroup.#Message',
-  },
-
   /** help page text */
   helpPageText: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#TextTwo',
+  },
+
+  /** Device ID label */
+  deviceIdText: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#TextTwoGroup.3',
   },
 
   /** Help link */

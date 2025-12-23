@@ -816,10 +816,6 @@ Function getTranslation_en_US()
       "description": "More details on the SignIn page when user is signed in",
       "message": "Email: {email}"
     },
-    "screenSettings_fullDeviceID": {
-      "description": "Text proceeding the full device ID",
-      "message": "Full Device ID"
-    },
     "screenSettings_about_title": {
       "description": "The title of the about screen",
       "message": "About Tubi"
@@ -834,7 +830,7 @@ Function getTranslation_en_US()
     },
     "screenSettings_about_description2": {
       "description": "The 2nd description on the about screen",
-      "message": "Visit {help_url}\n\nEmail our Support team at support@tubi.tv\n\nReach us on Facebook, Instagram, Twitter, and on our website at:\n{support_url}\n\nVersion {version}\nShort Device ID: {id} (press OK to see full Device ID)\n\n© {year} Tubi, Inc. all rights reserved."
+      "message": "Visit {help_url}\n\nEmail our Support team at support@tubi.tv\n\nReach us on Facebook, Instagram, Twitter, and on our website at:\n{support_url}\n\nVersion {version}\nDevice ID: {id}\n\n© {year} Tubi, Inc. all rights reserved."
     },
     "screenSettings_menu_parentalControls": {
       "description": "The label for the parental controls",
@@ -2890,10 +2886,6 @@ Function getTranslation_es_MX()
       "description": "More details on the SignIn page when user is signed in",
       "message": "Correo electrónico: {email}"
     },
-    "screenSettings_fullDeviceID": {
-      "description": "Text proceeding the full device ID",
-      "message": "ID de dispositivo completo"
-    },
     "screenSettings_about_title": {
       "description": "The title of the about screen",
       "message": "Acerca de Tubi"
@@ -4924,11 +4916,7 @@ Function getTranslation_fr_CA()
     },
     "screenSettings_signOut_description2": {
       "description": "More details on the SignIn page when user is signed in",
-      "message": "Email : {email}"
-    },
-    "screenSettings_fullDeviceID": {
-      "description": "Text proceeding the full device ID",
-      "message": "Numéro d'identification complet de l'appareil"
+      "message": "Email : {email}"
     },
     "screenSettings_about_title": {
       "description": "The title of the about screen",

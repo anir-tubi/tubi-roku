@@ -315,11 +315,11 @@ Function createAboutPanel()
     end if
   end if
 
-  sShortDeviceID = Right(m.constants.deviceInfo.deviceId, 7)
+  sFullDeviceID = m.constants.deviceInfo.deviceId
   sYear = CreateObject("roDateTime").GetYear().toStr()
   dynamicText = {
     version: sVersion,
-    id: sShortDeviceID,
+    id: sFullDeviceID,
     help_url: "http://help.tubitv.com",
     support_url: "https://tubitv.com/support",
     year: sYear
@@ -587,8 +587,6 @@ Function onMenuItemSelected()
     else
       m.top.signInSelected = true
     end if
-  else if buttonContent.id = "AboutButton"
-    m.top.showDeviceModal = true
   else if buttonContent.id = "ExitButton"
     m.top.showExitModal = true
 

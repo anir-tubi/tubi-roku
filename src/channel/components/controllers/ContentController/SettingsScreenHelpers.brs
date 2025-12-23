@@ -24,7 +24,6 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0)
   m.settingsScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   m.settingsScreen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
   m.settingsScreen.observeFieldScoped("backgroundUriList", "onSettingsBackgroundChange")
-  m.settingsScreen.observeFieldScoped("showDeviceModal", "onShowDeviceModal")
   m.settingsScreen.observeFieldScoped("showExitModal", "onShowExitModal")
   m.settingsScreen.observeFieldScoped("backButtonPressed", "onSettingsBackPressed")
   m.settingsScreen.observeFieldScoped("autoPreviewSettingSelected", "onAutoPreviewSettingSelected")
@@ -522,25 +521,6 @@ Function updateParentalSettingsErrorResponse(_error)
       onParentalSettingSelected()
     end if
   end if
-End Function
-
-
-Function onShowDeviceModal()
-  tubiLog("AboutScreen.showFullDeviceId")
-
-  deviceId = m.constants.deviceInfo.deviceId
-  pageInfo = m.settingsScreen.trackingPageInfo
-  dialogEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: "INFORMATION"
-      pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
-      dialog_action: "SHOW"
-      dialog_sub_type: "device-id"
-    }
-  }
-  showInfoModal(getTranslation("screenSettings_fullDeviceID"), deviceId, dialogEvent, m.trackingLoggingTask)
-
 End Function
 
 

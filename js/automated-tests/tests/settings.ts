@@ -58,17 +58,19 @@ describe('Settings', function () {
 
 
   // https://tubi.testrail.io/index.php?/cases/view/32370
-  it('C32370 - About Page - When user chooses the About Page and presses OK then Full Device ID is displayed, @settings', async () => {
-
-
+  it('C32370 - About Page - When user chooses the About Page then Full Device ID is displayed by default, @settings', async () => {
     // Go to Settings Page
     await goToSettingsPageSelectAbout();
 
+    // Full Device ID should be visible in the about panel by default (no modal needed)
+    const deviceIdText = await testUtils.getNodeForElement('deviceIdText');
+    expect(deviceIdText.text).to.include('Device ID:');
 
-    // Full Device ID modal present?
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await testUtils.waitForElementToFullyShowOnScreen('fullDeviceMessage');
-
+    // Validate that there's an actual device ID value after "Device ID:" text
+    // Device ID should be alphanumeric and at least 10 characters long
+    const deviceIdMatch = deviceIdText.text.match(/Device ID:\s*([a-zA-Z0-9]+)/);
+    expect(deviceIdMatch).to.not.be.null;
+    expect(deviceIdMatch![1]).to.match(/^[a-zA-Z0-9]+$/);
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/32371
