@@ -154,7 +154,7 @@ Function onGetVodContentError(error)
     ' 404 errors are not retryable - content ID is invalid
     ' Showing retry button would result in an endless loop
     if error <> invalid AND isInteger(error.code) = true AND error.code = 404 AND (isAA(playbackSource) = false OR playbackSource.srcForAds = m.constants.player.playbackOrigin.deeplink)
-      showErrorModal(modalInfo)
+      showErrorModal(modalInfo, invalid, invalid, onCloseErrorModal)
     else
       showErrorModal(modalInfo, onGetVodContentRetry)
     end if
