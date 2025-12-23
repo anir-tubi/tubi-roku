@@ -118,7 +118,7 @@ Function runChannel(constants, log, requestInstance)
         end if
       else if field = "rokuContinueWatchingRequestInfo"
         info = msg.getData()
-        updateRokuContinueWatchingInfo(request, info)
+        updateRokuContinueWatchingInfo(requestInstance, info)
       else if field = "sendLogToServer" then
         sendLogToServer(msg.getData(), log)
       else if field = "enableSystemLogTypes" then
