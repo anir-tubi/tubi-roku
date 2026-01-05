@@ -50,6 +50,11 @@
         <Poster
           id="titleImage"
           loadDisplayMode="limitSize" />
+        <Label
+          id="titleLabel">
+          <Font
+            role="font" />
+        </Label>
 
         <LayoutGroup
           id="metadataRow"

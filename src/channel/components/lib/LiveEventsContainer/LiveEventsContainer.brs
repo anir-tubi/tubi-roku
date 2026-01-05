@@ -5,6 +5,7 @@ Function init()
 
   m.contentSection = topRef.findNode("contentSection")
   m.buttonList = topRef.findNode("buttonList")
+  m.metadataSection = topRef.findNode("metadataSection")
   m.metadataRow = topRef.findNode("metadataRow")
   m.description = topRef.findNode("description")
   m.descriptionFocusButton = topRef.findNode("descriptionFocusButton")
@@ -12,6 +13,7 @@ Function init()
   m.titleImage = topRef.findNode("titleImage")
   m.titleImage.loadHeight = 249
   m.titleImage.loadWidth = 594
+  m.titleLabel = topRef.findNode("titleLabel")
 
   m.networkLogo = topRef.findNode("networkLogo")
   networkLogoSize = m.constants.ui.imageSizes.networkLogo
@@ -38,6 +40,7 @@ Function init()
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.description, typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.genres, typographyConstants.ids.bodySmall)
+  setTypographyOfLabel(m.titleLabel, typographyConstants.ids.headerMedium)
 
   m.tracking = TubiTrackingInfo(m.constants)
 
@@ -67,6 +70,7 @@ Function onThemeChange(msg = invalid)
     m.uhdAvailableBadge.backgroundColor = theme.defaultDarkTransparentAccent20
     m.uhdAvailableBadge.textColor = theme.highlightedTextColor
     m.genres.color = theme.primaryTextColor
+    m.titleLabel.color = theme.primaryTextColor
     m.focused2Color = theme.focused2Color
     m.backgroundColor = theme.backgroundColor
   end if
@@ -94,10 +98,12 @@ Function onItemContentChange()
   if isNode(itemContent) = true
     refreshButtonList()
     m.description.text = itemContent.description
-    if itemContent.titleImageUrl <> invalid
+    if isNonEmptyString(itemContent.titleImageUrl)
       m.titleImage.uri = itemContent.titleImageUrl
+      m.metadataSection.removeChild(m.titleLabel)
     else
-      m.titleImage.uri = ""
+      m.titleLabel.text = itemContent.title
+      m.metadataSection.removeChild(m.titleImage)
     end if
     scheduleData = itemContent.scheduleData
     if isAA(scheduleData) AND isNonEmptyString(scheduleData.channelLogo)
