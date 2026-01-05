@@ -123,6 +123,10 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
           default: { "disable": false }
         }
       }
+
+      roku_no_layer_experiment: {
+        default: { "no_layer": "no" }
+      }
     }
     statsigExperimentsInfo: statsigExperimentsInfo
     getExperimentResource: statsigExperiments_getExperimentResource
@@ -209,9 +213,12 @@ Function statsigExperiments_getExperiment(namespaceName as String, experimentNam
   end if
 
   hashedExperimentName = m.getHashValue(experimentName)
+  hashedNamespaceName = m.getHashValue(namespaceName)
 
-  if m.statsigExperimentsInfo.DoesExist(hashedExperimentName)
+  if m.statsigExperimentsInfo.DoesExist(hashedExperimentName) = true
     return m.statsigExperimentsInfo[hashedExperimentName]
+  else if m.statsigExperimentsInfo.DoesExist(hashedNamespaceName) = true
+    return m.statsigExperimentsInfo[hashedNamespaceName]
   else
     return invalid
   end if
@@ -219,8 +226,10 @@ End Function
 
 
 Function statsigExperiments_getDefaultResource(namespaceName as String, experimentName as String)
-  if m.defaultResources <> invalid AND m.defaultResources[namespaceName] <> invalid AND m.defaultResources[namespaceName][experimentName] <> invalid
+  if m.defaultResources <> invalid AND namespaceName <> "" AND m.defaultResources[namespaceName] <> invalid AND m.defaultResources[namespaceName][experimentName] <> invalid
     return m.defaultResources[namespaceName][experimentName].default
+  else if m.defaultResources <> invalid AND m.defaultResources[experimentName] <> invalid
+    return m.defaultResources[experimentName].default
   end if
 
   return invalid

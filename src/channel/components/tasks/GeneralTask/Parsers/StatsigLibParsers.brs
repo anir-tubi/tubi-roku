@@ -7,24 +7,34 @@ Function parseStatsigLibInitializeSuccess(fullResponse, reqInfo)
 
   if response <> invalid
     layerConfigs = response.layer_configs
+    dynamicConfigs = response.dynamic_configs
+    experimentLayerMapping = {}
 
     for each statsigKey in layerConfigs
       config = layerConfigs[statsigKey]
-
-      namespaceName = config.name
       experimentName = config.allocated_experiment_name
-
       if isNonEmptyString(experimentName) = true
-        experimentInfo[experimentName] = {
-          statsigKey: statsigKey
-          config: config
-          experimentName: experimentName
-          namespaceName: namespaceName
-          isActive: config.is_experiment_active
-          userInExperiment: config.is_user_in_experiment
-          groupName: config.group_name
-        }
+        experimentLayerMapping[experimentName] = config
       end if
+    end for
+
+    for each statsigKey in dynamicConfigs
+      config = dynamicConfigs[statsigKey]
+      experimentName = config.name
+      namespaceName = ""
+      if experimentLayerMapping.DoesExist(experimentName) = true
+        namespaceName = experimentLayerMapping[experimentName].name
+      end if
+
+      experimentInfo[experimentName] = {
+        statsigKey: statsigKey
+        config: config
+        experimentName: experimentName
+        namespaceName: namespaceName
+        isActive: config.is_experiment_active
+        userInExperiment: config.is_user_in_experiment
+        groupName: config.group_name
+      }
 
     end for
 

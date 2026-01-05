@@ -450,6 +450,8 @@ Function addControllerUi()
 
   ' This needs to go last as this will immediately call runControllerStartSequence if not logged in and we want all the initial state to be setup before this happens
   getUserInfo(onStartupAuthInfoReceived)
+
+  getStatsigExperimentResource("", "roku_no_layer_experiment", true)
 End Function
 
 
