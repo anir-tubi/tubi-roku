@@ -23,7 +23,7 @@ Direct Install: [my.roku.com/add/NDDHPHK](https://my.roku.com/add/NDDHPHK)
 1\. Clone repo:
 
 ```shell
-git clone git@github.com:adRise/project-total-recall.git
+git clone git@github.com:adRise/tubi-roku.git
 ```
 
 2\. Install Node (and npm)
@@ -44,7 +44,7 @@ npm install -g gulp-cli
 5\. Navigate to the project-total-recall directory
 
 ```shell
-cd project-total-recall
+cd tubi-roku
 ```
 
 6\. Install build libraries from npm (make sure node > 4.x is installed)
@@ -63,15 +63,17 @@ When asked to set up a dev password, use "1234" so it's easier for any developer
 
 8\. Set the developer id on your Roku device. (You will need to get a pkg, password, and developer id from the shared secret "Roku Rekey Info" in LastPass).
 
-* Navigate to the Roku device's IP in your browser; select Utilities. Take note of the IP address for step #6 when you will set the "ROKU_DEV_TARGET".
-* Upload the pkg file and enter the password and select `Rekey`. (This password will be used in step #6 to set "PKG_PASSWORD").
+* Navigate to the Roku device's IP in your browser; select Utilities. Take note of the IP address for step #11 when you will set the `ROKU_DEV_TARGET`.
+* Upload the pkg file and enter the password and select `Rekey`. (This password will be used in step #11 to set `PKG_PASSWORD`).
 * Check that you have the proper developer ID by navigating in your web browser to the Roku device's IP and then select Packager.
 
-9\.Create a Github Personal Access Token (this access token will be set as an environment variable in step #6):
+9\. Create a Github Personal Access Token (this access token will be set as an environment variable in step #11):
 
   - Follow the instructions at https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token
   - Only select the "repo" scope and "repo" sub scopes.
   - Copy the token, as you will not be able to see it again once you leave the page.
+  - Authorize the token with SSO to enable adRise org access.
+  ![](docs/github_pat_authorize.png)
 
 10\. Create Jira Token by visiting https://id.atlassian.com/manage-profile/security/api-tokens.
 
@@ -83,7 +85,7 @@ When asked to set up a dev password, use "1234" so it's easier for any developer
 (It might need a restart to take effect.)
 
 ```shell
-export ROKU_DEV_TARGET="<your-roku-ip>""
+export ROKU_DEV_TARGET="<your-roku-ip>"
 export DEV_PASSWORD="<dev password set up on Roku device>"
 export PKG_PASSWORD="<password from the GENKEY utility used for signing packages>"
 export RCDN_GIT_DIRECTORY="<path to the rcdn repo directory ex: ~/dev/rcdn>"
@@ -216,11 +218,11 @@ Or the command `Format Document`
 
 For more info on setting up tests in Rooibos, please see:
 
-https://github.com/georgejecook/rooibos/blob/master/docs/index.md#creating-test-suites
+https://github.com/rokucommunity/rooibos/blob/master/docs/index.md#creating-test-suites
 
 For API documentation (ie. what asserts can be run), please see:
 
-https://georgejecook.github.io/rooibos/
+https://rokucommunity.github.io/rooibos/
 
 To run unit tests, run the following command:
 
