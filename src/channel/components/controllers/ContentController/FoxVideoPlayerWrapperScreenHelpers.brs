@@ -13,8 +13,6 @@ Function playLinearVideoWithFoxPlayer(content = invalid)
 
   stopVideoPreview()
 
-  showHideLogo(m.constants.logoType.hide)
-
   ' We immediately show the player screen so we can show the loading spinner but have to wait until we are ready to actually try playing video
   foxVideoPlayerWrapperScreen = createObject("roSGNode", "FoxVideoPlayerWrapperScreen")
   foxVideoPlayerWrapperScreen.id = m.constants.ui.screenIds.foxVideoPlayerWrapperScreen
@@ -880,6 +878,10 @@ Function retrieveFoxListingResponseSuccess(response)
       m.trackingLoggingTask.trackEvent = event
     else if listing = invalid AND foxVideoPlayerWrapperScreen <> invalid then
       closeFoxVideoPlayer()
+    end if
+    currentScreen = getCurrentScreen()
+    if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.foxVideoPlayerWrapperScreen then
+      showHideLogo(m.constants.logoType.hide)
     end if
   end if
 End Function
