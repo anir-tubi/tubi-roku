@@ -271,6 +271,7 @@ Function getConstants()
   else
     constants.deviceInfo.isAutoplayEnabled = true
   end if
+
   videoResolution = constants.deviceInfo.videoMode.toInt()
 
   'names given to different request types for identification purposes (for example in the General Task)
@@ -1653,7 +1654,6 @@ Function getConstants()
   constants.ui.gridItemTypes.certifiedFresh = "certifiedFresh"
   constants.ui.gridItemTypes.liveEventSpotlight = "liveEventSpotlight"
   constants.ui.gridItemTypes.liveEventBanner = "liveEventBanner"
-  constants.ui.gridItemTypes.billboard = "billboard"
   constants.ui.gridItemTypes.controlLandscape = "controlLandscape"
 
   ' Holds the container ids which are not video tile containers.
@@ -1666,7 +1666,6 @@ Function getConstants()
   constants.ui.noInfoPanelGridItemTypes = [constants.ui.gridItemTypes.liveEventSpotlight, constants.ui.gridItemTypes.skinAd, constants.ui.gridItemTypes.adRowlistSpotlight]
   constants.ui.adGridItemTypes = [constants.ui.gridItemTypes.adRowlistCarousel, constants.ui.gridItemTypes.skinAd, constants.ui.gridItemTypes.adRowlistSpotlight]
   constants.ui.videoTilesListTranslation = [24, 144]
-  constants.ui.billboardVariantTranslation = [0, 75]
 
   constants.ui.uris = {}
 

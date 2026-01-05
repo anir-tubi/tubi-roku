@@ -141,8 +141,6 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
     if bannerImages <> invalid AND isNonEmptyString(bannerImages.ott_banner_background) = true
       sThumbnailURL = bannerImages.ott_banner_background
     end if
-  else if gridType = gridItemTypes.billboard AND canvasImages <> invalid AND isNonEmptyArray(canvasImages.billboard_tb)
-    sThumbnailURL = canvasImages.billboard_tb[0]
     ' To cover a use case where tensor falls back to fail safe.
   else if gridType = gridItemTypes.videoTile AND contentFromServer <> invalid AND isNonEmptyArray(contentFromServer.posterArts) = true
     sThumbnailURL = contentFromServer.posterArts[0]
@@ -1445,16 +1443,6 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
   categoryParent.totalDuplicates = categoryChildrenInfo.totalDuplicates
   categoryChildrenCount = categoryParent.children.count()
 
-  ' Applying this logic only for home screen and standard mode.
-  if m.statSigExperiments <> invalid AND contentMode = "" AND uiMode = "standard" AND screenId = m.constants.ui.screenIds.homeScreen
-    experiment = m.statSigExperiments.getExperimentResource("roku_video_tiles", "roku_video_tiles_1_7")
-    tileDesignType = experiment.design_type
-    isUserInVideoTilesExp = (tileDesignType = "videoTiles")
-    if isUserInVideoTilesExp = true AND container.id = m.constants.ui.categoryIds.recommendedForYou AND experiment.variant = "cinematicTop2Rows"
-      categoryParent.isControlLandscape = true
-    end if
-  end if
-
   ' container.cursor = invalid indicates we are dealing with response JSON
   ' from matrix/containers/:id or tensor/containers/:id endpoints.
   ' note: container.cursor = 0 for limitedUI model responses from
@@ -1566,13 +1554,11 @@ Function tubiMetadataTranslate_buildCategoryParentInfo(container, sOrientation =
 
     if m.statSigExperiments <> invalid
       experiment = m.statSigExperiments.getExperimentResource("roku_video_tiles", "roku_video_tiles_1_7")
-      tileDesignType = experiment.design_type
-      isUserInVideoTilesExp = (tileDesignType = "videoTiles") AND uiMode = "standard"
+      isUserInVideoTilesExp = (experiment.design_type = "videoTiles") AND uiMode = "standard"
 
       if isUserInVideoTilesExp = true
-        updateMetadata.gridItemSize = experiment.gridItemSize
-        updateMetadata.featuredRowPosterSize = experiment.featuredRowPosterSize
-        updateMetadata.videoTilesVariant = experiment.variant
+        updateMetadata.gridItemSize = m.constants.ui.imageSizes.videoTilesPortrait
+        updateMetadata.featuredRowPosterSize = m.constants.ui.imageSizes.featuredRowPoster
       end if
     end if
 
@@ -2187,14 +2173,10 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
 
   tileDesignType = "none"
   isUserInVideoTilesExperiment = false
-  controlCategoryIds = []
-  videoTilesVariant = "none"
   if m.statSigExperiments <> invalid
     experiment = m.statSigExperiments.getExperimentResource("roku_video_tiles", "roku_video_tiles_1_7")
     tileDesignType = experiment.design_type
-    controlCategoryIds = experiment.controlCategoryIds
     isUserInVideoTilesExperiment = (tileDesignType = "videoTiles") AND uiMode = "standard"
-    videoTilesVariant = experiment.variant
   end if
 
   isContentModeHomeScreen = (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
@@ -2203,15 +2185,7 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
   else if isAA(container.ui_customization) = true AND container.ui_customization.type = "live_event_banner"
     gridItemType = gridItemTypes.liveEventBanner
   else if screenId = m.constants.ui.screenIds.homeScreen AND isUserInVideoTilesExperiment = true AND isContentModeHomeScreen = true
-    if arrayIncludes(controlCategoryIds, container.id) = true
-      if (videoTilesVariant = "trueControlTop2Rows" OR videoTilesVariant = "refinedControlTop2Rows") AND container.id = m.constants.ui.categoryIds.recommendedForYou
-        gridItemType = gridItemTypes.portrait
-      else
-        gridItemType = gridItemTypes.landscape
-      end if
-    else
-      gridItemType = gridItemTypes.videoTile
-    end if
+    gridItemType = gridItemTypes.videoTile
   else if container.type = constants.ui.categoryTypes.linear
     gridItemType = gridItemTypes.linear
   else if container.id = constants.ui.categoryIds.certifiedFresh

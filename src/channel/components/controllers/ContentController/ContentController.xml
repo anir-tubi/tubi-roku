@@ -90,6 +90,7 @@
   <script type="text/brightscript" uri="LinearDetailScreenHelpers.brs" />
   <script type="text/brightscript" uri="VodDetailScreenHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/PerformanceMetricsTracker.brs" />
+  <script type="text/brightscript" uri="VideoTileHelpers.brs" />
 
   <interface>
 

@@ -168,7 +168,6 @@ Function addControllerUi()
   m.videoPreviewPlayer = m.top.findNode("videoPreviewPlayer")
   m.inlinePreviewFocusIndicator = m.top.findNode("inlinePreviewFocusIndicator")
   m.inlineVideoMetadataOverlay = m.top.findNode("inlineVideoMetadataOverlay")
-  m.videoTilesControlMetadata = m.top.findNode("videoTilesControlMetadata")
   m.autoStartPreviewToPlaybackTimer = createObject("roSGNode", "CircularCounter")
   m.autoStartPreviewToPlaybackTimer.id = "autoStartPreviewToPlaybackTimer"
   m.autoStartPreviewToPlaybackTimer.opacity = 0.0
@@ -185,29 +184,13 @@ Function addControllerUi()
     m.videoTilesVariant = experiment.variant
   end if
 
-  if m.videoTilesVariant = "refinedControlTop2Rows"
-    m.videoTilesControlMetadata.translation = [168, 192]
-    m.videoTilesControlMetadata.width = 741
-  else if m.videoTilesVariant = "trueControlTop2Rows"
-    m.videoTilesControlMetadata.translation = [168, 138]
-    m.videoTilesControlMetadata.width = 960
-    m.autoStartPreviewToPlaybackTimer.visible = false
-  else
-    m.videoTilesControlMetadata.translation = [168, 431]
-    m.videoTilesControlMetadata.width = 1056
-  end if
-
   ' Using clipping rect to ensure that when scrolling up the video tile gets clipped along with the rest of the row list tiles
   m.videoTileOverlayGroup.clippingRect = [videoTilesListTranslation[0], videoTilesListTranslation[1], 1920, 1080]
   m.videoTileOverlayGroup.translation = [videoTilesListTranslation[0], -6]
 
   ' This is used to track if the user is in the video tiles experiment.
   m.isUserInVideoTilesExperiment = (experiment <> invalid AND experiment.design_type = "videoTiles")
-  m.shouldDebounceVideoTilePreview = (experiment <> invalid AND experiment.should_debounce = true)
-  m.isInBillboardExperiment = (experiment <> invalid AND experiment.variant = "billboard")
   m.queuedVideoTilePreview = false
-
-  m.billboardContainerIndex = 0
 
   m.inlinePreviewPlayerFadeAnimation = invalid
 
@@ -218,11 +201,6 @@ Function addControllerUi()
   m.videoPreviewDebounce = CreateObject("roSGNode", "Timer")
   m.videoPreviewDebounce.duration = debounceTime
   m.videoPreviewDebounce.observeFieldScoped("fire", "startDebouncedVideoPreview")
-
-  m.videoTilesControlCategoryIds = []
-  if isAA(experiment) = true AND isNonEmptyArray(experiment.controlCategoryIds) = true
-    m.videoTilesControlCategoryIds = experiment.controlCategoryIds
-  end if
 
   updateVideoTileSize()
 
@@ -3380,16 +3358,7 @@ End Function
 ' Returns the size of the featured preivew player.
 ' @return: array, the size of the player
 Function getFeaturedPlayerSize()
-  experiment = getStatsigExperimentResource("roku_video_tiles", "roku_video_tiles_1_7", false)
-  if isNonEmptyArray(experiment.featuredRowPosterSize) = true
-    featuredRowPoster = experiment.featuredRowPosterSize
-  else
-    featuredRowPoster = m.constants.ui.imageSizes.featuredRowPoster
-  end if
-
-  if getVideoTileFocusedRow() = m.billboardContainerIndex AND experiment <> invalid AND experiment.variant = "billboard"
-    featuredRowPoster = m.constants.ui.imageSizes.billboard
-  end if
+  featuredRowPoster = m.constants.ui.imageSizes.featuredRowPoster
 
   ' Adding 4px to the width and 10px to the height to account for the border and rounded corners.
   ' Since we cannot achieve the rounded corners for video player and the focus indicator has rounded corners.
@@ -3706,59 +3675,8 @@ Function sendStatsigExposureEvent(exposureInfo)
 End Function
 
 
-Function updateVideoTileSize(scrollingStatus = false)
-  m.inlineVideoGridTitleLogo = m.top.findNode("inlineVideoGridTitleLogo")
-  experiment = getStatsigExperimentResource("roku_video_tiles", "roku_video_tiles_1_7", false)
-  if isNonEmptyArray(experiment.featuredRowPosterSize) = true
-    featuredRowPoster = experiment.featuredRowPosterSize
-  else
-    featuredRowPoster = m.constants.ui.imageSizes.featuredRowPoster
-  end if
-  paddingToAccountForFocusIndicator = 4
-  preBillboardWidth = featuredRowPoster[0] + paddingToAccountForFocusIndicator
-  preBillboardHeight = featuredRowPoster[1] + paddingToAccountForFocusIndicator
-
-  billboardSize = m.constants.ui.imageSizes.billboard
-  billboardWidth = billboardSize[0] + paddingToAccountForFocusIndicator
-  billboardHeight = billboardSize[1] + paddingToAccountForFocusIndicator
-
-  if getVideoTileFocusedRow() <= m.billboardContainerIndex AND m.isInBillboardExperiment = true
-    featuredRowPoster = billboardSize
-  end if
-  ' 4 is the padding to account for the focus indicator.
-  width = featuredRowPoster[0] + paddingToAccountForFocusIndicator
-  height = featuredRowPoster[1] + paddingToAccountForFocusIndicator
-  ' Adjusting the size of the metadata overlay with some additional padding to account for the focus indicator.
-
-  ' Below logic is to handle the case when user is scrolling up to billboard row.
-  ' We should not be updating the size of current Expanded video tile to larger size to avoid a effect of it expanded prematurely.
-  if m.inTransitInlineVideoMetadataOverlay.containerIndex <= m.billboardContainerIndex AND scrollingStatus = true AND m.isInBillboardExperiment = true
-    m.inlineVideoMetadataOverlay.width = preBillboardWidth
-    m.inlineVideoMetadataOverlay.height = preBillboardHeight
-    m.inlineVideoGridTitleLogo.width = preBillboardWidth
-    m.inlineVideoGridTitleLogo.height = preBillboardHeight
-  else
-    m.inlineVideoMetadataOverlay.width = width
-    m.inlineVideoMetadataOverlay.height = height
-    m.inlineVideoGridTitleLogo.width = width
-    m.inlineVideoGridTitleLogo.height = height
-  end if
-
-  if m.inTransitInlineVideoMetadataOverlay.containerIndex <= m.billboardContainerIndex AND m.isInBillboardExperiment = true AND m.inlineVideoMetadataOverlay.containerIndex < m.billboardContainerIndex + 1
-    m.inTransitInlineVideoMetadataOverlay.width = billboardWidth
-    m.inTransitInlineVideoMetadataOverlay.height = billboardHeight
-  else
-    m.inTransitInlineVideoMetadataOverlay.width = width
-    m.inTransitInlineVideoMetadataOverlay.height = height
-  end if
-
-  m.inlinePreviewFocusIndicator.height = m.inlineVideoMetadataOverlay.height + 12
-  m.inlinePreviewFocusIndicator.width = m.inlineVideoMetadataOverlay.width + 12
-End Function
-
-
 Function shouldDisplayFullScreenVideoBackground(content)
-  return arrayIncludes(m.videoTilesControlCategoryIds, content.parentId) = true OR content.gridItemType = m.constants.ui.gridItemTypes.liveEventSpotlight
+  return content.gridItemType = m.constants.ui.gridItemTypes.liveEventSpotlight
 End Function
 
 

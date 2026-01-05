@@ -120,15 +120,11 @@ Function updateHomeScreenContainersWithEpgListingInfo(schedule)
         child.scheduleData = schedule
         if isGreaterThanCurrentTime(schedule.endTime) = false
           content.removeChild(container)
-          m.billboardContainerIndex = 0
           screen.contentUpdated = true
-        else
-          m.billboardContainerIndex = 1
         end if
       end if
     end if
   end if
-  updateBillboardContainerIndex()
 End Function
 
 

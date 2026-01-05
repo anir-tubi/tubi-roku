@@ -30,7 +30,6 @@
     <field id="hideTitle" type="boolean" value="true" />
     <field id="descriptionWidth" type="float" value="0" />
     <field id="variant" type="string" />
-    <field id="isBillboardRow" type="boolean" />
   </interface>
 
   <children>

@@ -27,8 +27,6 @@
     <field id="itemHasFocus" type="boolean" />
     <field id="showContentPoster" type="boolean" value="true" />
     <field id="skipAnimation" type="boolean" />
-    <field id="containerIndex" type="float" />
-    <field id="billboardContainerIndex" type="integer" />
   </interface>
 
   <children>
@@ -42,10 +40,6 @@
       itemSpacings="[12, 9]"
       translation="[15, 0]"
       id="bottomContentGroup">
-      <Poster
-        id="titleImage"
-        opacity="0"
-        loadDisplayMode="limitSize" />
 
       <LayoutGroup
         layoutDirection="horiz"

@@ -1875,6 +1875,49 @@ describe('HomeGrid Video Tiles', function () {
     expect(isShowing).to.equal(true, 'Featured row list should be visible on screen');
   });
 
+  // Test for video preview resume when returning from side nav
+  it('Video preview resumes when user returns from side nav to video tiles @guest @videopreview', async () => {
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for videoTitlesRowList to have focus');
+
+    await testUtils.waitForGridContentToLoad('videoTitlesRowList', 10000);
+    await utils.sleep(1000);
+
+    // Find content with video preview
+    const position = await testHelpers.findContentPositionInRowListThatContainsVideoPreview('videoTitlesRowList', true, 5);
+    if (position.length === 0) {
+      throw new Error('Could not find content with video preview in featured row list');
+    }
+
+    // Navigate to content with video preview
+    await testHelpers.jumpToRowListPosition('videoTitlesRowList', position[0], position[1]);
+    await utils.sleep(2000);
+
+    // Verify video preview is playing
+    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 15000);
+    const previewStateBeforeSideNav = await testUtils.getElementField('previewVideoPlayer', 'state');
+    expect(previewStateBeforeSideNav).to.equal('playing', 'Video preview should be playing before navigating to side nav');
+
+    await ecp.sendKeypress(ecp.Key.Back);
+    await utils.sleep(1000);
+
+    // Verify side nav has focus
+    await testUtils.waitForSideNavMenuToBeExpanded();
+
+    // Verify video preview is paused
+    await utils.sleep(500);
+    const previewStateInSideNav = await testUtils.getElementField('previewVideoPlayer', 'state');
+    expect(previewStateInSideNav).to.be.oneOf(['paused', 'stopped'], 'Video preview should be paused when focus moves to side nav');
+
+    // Navigate back to video tiles (Right key)
+    await ecp.sendKeypress(ecp.Key.Right);
+    await utils.sleep(1000);
+
+    // Verify video tiles have focus again
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for videoTitlesRowList to have focus after returning from side nav');
+    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 10000);
+  });
+
   // Test: Scroll down vertically through entire home grid and verify no duplicate containers
   it('Should scroll through entire home grid without duplicate containers', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });

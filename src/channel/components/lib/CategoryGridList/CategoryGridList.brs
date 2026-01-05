@@ -64,24 +64,8 @@ Function init()
   m.lastFocusRow = 0
 
   experiment = getStatsigExperimentResource("roku_video_tiles", "roku_video_tiles_1_7", false)
-  if isNonEmptyArray(experiment.featuredRowPosterSize) = true
-    m.featuredRowPoster = experiment.featuredRowPosterSize
-  else
-    m.featuredRowPoster = m.constants.ui.imageSizes.featuredRowPoster
-  end if
-
-  m.featuredLandscapePoster = experiment.featuredLandscapePosterSize
-  m.controlCategoryIds = experiment.controlCategoryIds
-  if isNonEmptyArray(experiment.controlCategoryIds) = true
-    m.featuredRowList.rowLabelOffset = [[0, -3], [0, -3], [0, 6]]
-  end if
-  m.variant = experiment.variant
-
-  if isNonEmptyArray(experiment.gridItemSize) = true
-    m.gridItemSize = experiment.gridItemSize
-  else
-    m.gridItemSize = m.constants.ui.imageSizes.videoTilesPortrait
-  end if
+  m.featuredRowPoster = m.constants.ui.imageSizes.featuredRowPoster
+  m.gridItemSize = m.constants.ui.imageSizes.videoTilesPortrait
 
   m.expandedTileFocusXOffset = m.featuredRowPoster[0] - m.gridItemSize[0] + 4
 
@@ -89,16 +73,9 @@ Function init()
   ' 263 also includes the space between the last line of the description and container below it.
   m.rowListPosition = [0, 263 + m.featuredRowPoster[1]]
   m.isUserInVideoTiles = (experiment.design_type = "videoTiles")
-  m.videoTilesVariant = experiment.variant
 
   ' Creating a backup variable to check if user is in video tiles experiment, since we override value.
   m.isUserInVideoTilesExperiment = m.isUserInVideoTiles
-
-  m.videoTilesControlCategoryIds = []
-  if isAA(experiment) = true AND isNonEmptyArray(experiment.controlCategoryIds) = true
-    m.videoTilesControlCategoryIds = experiment.controlCategoryIds
-  end if
-
   m.ignoreCurrColumnChange = false
 End Function
 
@@ -641,9 +618,6 @@ Function setFeaturedRowHeights()
   gridItemTypes = m.constants.ui.gridItemTypes
   featuredRowContent = m.top.featuredRowContent
 
-  controlPortraitSize = imageSizes.largePoster
-  controlLandscapeSize = imageSizes.largeLandscape
-
   ' 246 is the height of the metadata section displayed beneath the featured focused tile.
   metadataSectionHeight = 240
   numRows = 3
@@ -665,8 +639,6 @@ Function setFeaturedRowHeights()
       shouldDisplayHeader = arrayIncludes(m.constants.ui.noHeaderGridTypes, category.gridItemType) = false
       showRowLabel.push(shouldDisplayHeader)
 
-      isControlCategory = arrayIncludes(m.controlCategoryIds, category.id)
-
       if gridItemType = gridItemTypes.liveEventSpotlight
         rowItemSize.push(liveEventsContainerSize)
         heights.push(liveEventsContainerSize[1])
@@ -682,39 +654,6 @@ Function setFeaturedRowHeights()
         adSize = m.constants.ui.imageSizes.adRowlistThumbnail
         rowItemSize.push(adSize)
         heights.push(adSize[1] + 64)
-      else if m.videoTilesVariant = "trueControlTop2Rows" AND isControlCategory = true
-        if category.id = m.constants.ui.categoryIds.featured
-          rowItemSize.push(controlLandscapeSize)
-          controlVideoTileContainerHeight = controlLandscapeSize[1]
-        else
-          rowItemSize.push(controlPortraitSize)
-          controlVideoTileContainerHeight = controlPortraitSize[1]
-        end if
-        controlVideoTileContainerHeight = controlVideoTileContainerHeight + 54
-        if category.sponsorImages <> invalid
-          controlVideoTileContainerHeight = controlVideoTileContainerHeight + 32
-        end if
-        heights.push(controlVideoTileContainerHeight)
-      else if m.videoTilesVariant = "refinedControlTop2Rows" AND isControlCategory = true
-        if category.id = m.constants.ui.categoryIds.featured
-          rowItemSize.push(m.featuredLandscapePoster)
-          controlVideoTileContainerHeight = m.featuredLandscapePoster[1]
-        else
-          rowItemSize.push(controlPortraitSize)
-          controlVideoTileContainerHeight = controlPortraitSize[1]
-        end if
-        controlVideoTileContainerHeight = controlVideoTileContainerHeight + 54
-        if category.sponsorImages <> invalid
-          controlVideoTileContainerHeight = controlVideoTileContainerHeight + 32
-        end if
-        heights.push(controlVideoTileContainerHeight)
-      else if isControlCategory = true
-        rowItemSize.push(m.featuredLandscapePoster)
-        controlVideoTileContainerHeight = m.featuredLandscapePoster[1] + 54
-        if category.sponsorImages <> invalid
-          controlVideoTileContainerHeight = controlVideoTileContainerHeight + 32
-        end if
-        heights.push(controlVideoTileContainerHeight)
       else
         rowItemSize.push(m.gridItemSize)
         heights.push(featuredRowHeight)
@@ -1308,18 +1247,13 @@ End Function
 Function updateFocusXOffset(currFocusRow, isInTransit = false)
   featuredRowContent = m.top.featuredRowContent
   focusXOffsets = m.featuredRowList.focusXOffset
-  billboardWidth = m.constants.ui.imageSizes.billboard[0]
   if isNode(featuredRowContent) = true AND isNonEmptyArray(focusXOffsets) = true
     focusXOffset = []
     for i = 0 to featuredRowContent.getChildCount() - 1
       category = featuredRowContent.getChild(i)
       gridItemType = category.gridItemType
       if (i = currFocusRow OR (isInTransit = true AND i = currFocusRow + 1)) AND isVideoTileEnabledContainer(gridItemType, category.id) = true
-        if category.id = "featured" AND m.variant = "billboard"
-          focusXOffset.push(m.expandedTileFocusXOffset + (billboardWidth - 788))
-        else
-          focusXOffset.push(m.expandedTileFocusXOffset)
-        end if
+        focusXOffset.push(m.expandedTileFocusXOffset)
       else
         focusXOffset.push(0)
       end if
@@ -1330,36 +1264,7 @@ Function updateFocusXOffset(currFocusRow, isInTransit = false)
       m.featuredRowList.focusXOffset = focusXOffset
       m.ignoreCurrColumnChange = false
     end if
-
-    container = featuredRowContent.getChild(currFocusRow)
-    isVideoTileControl = container <> invalid AND arrayIncludes(m.videoTilesControlCategoryIds, container.id) = true
-    if m.variant = "billboard"
-      translation = [0, 0]
-      if container <> invalid AND container.id = "featured"
-        translation = [0, -69]
-      end if
-      m.featuredRowList.translation = translation
-    else if isVideoTileControl = true AND m.videoTilesVariant = "trueControlTop2Rows"
-      if container <> invalid AND container.id = "featured"
-        translation = [3, 456]
-      else
-        translation = [3, 393]
-      end if
-      m.featuredRowList.translation = translation
-    else if isVideoTileControl = true AND m.videoTilesVariant = "refinedControlTop2Rows"
-      if container <> invalid AND container.id = "featured"
-        translation = [3, 489]
-      else
-        translation = [3, 393]
-      end if
-      m.featuredRowList.translation = translation
-    else if isVideoTileControl = true AND m.videoTilesVariant <> "trueControlTop2Rows"
-      m.featuredRowList.translation = [3, 504]
-    else
-      m.featuredRowList.translation = [0, 0]
-    end if
-
-    m.featuredRowList.drawFocusFeedback = isVideoTileControl
+    m.featuredRowList.translation = [0, 0]
   end if
 End Function
 
@@ -1487,10 +1392,6 @@ Function translateFeaturedListAndSetFocus(delayFeaturedFocus = false)
   end if
 
   slideFadeGeneral(m.FeaturedRowList, [0, 0], "in", 0.3, 0, 1, true, callback)
-  if m.isUserInVideoTiles = true
-    slideTo(m.RowList, [m.rowListPosition[0], m.rowListPosition[1]], 0.3)
-  end if
-
   m.top.hideInfoPanel = false
   updateFeaturedRowItemFocused()
 End Function
@@ -1516,7 +1417,7 @@ End Function
 
 
 Function isVideoTileEnabledContainer(gridItemType, categoryId)
-  return arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, gridItemType) = false AND arrayIncludes(m.videoTilesControlCategoryIds, categoryId) = false
+  return arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, gridItemType) = false
 End Function
 
 
@@ -1555,23 +1456,8 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
     bSkinAdAvailable = (isSkinAdsAvailable() = true)
 
     if key = "down" AND m.skinAdRow.isInFocusChain() = true
-      if m.FeaturedRowList.content <> invalid
-        fade(m.skinAdRow, "out", 0.3)
-        translateFeaturedListAndSetFocus(true)
-      else
-        m.top.lastFocusedList = "rowList"
-        slideFade(m.skinAdRow, "above", "out", 0.3)
-        m.RowList.setFocus(true)
-        slideTo(m.RowList, [0, 0], 0.3)
-      end if
-      return true
-    else if key = "down" AND m.FeaturedRowList.isInFocusChain() = true AND isNode(m.rowList.content) = true
-      m.top.lastFocusedList = "rowList"
-      slideFadeGeneral(m.featuredRowList, [0, -760], "out", 0.3, 0, -1, true)
-      if m.isUserInVideoTiles = true
-        slideTo(m.RowList, [0, 420], 0.3, 0.1)
-      end if
-      m.RowList.setFocus(true)
+      fade(m.skinAdRow, "out", 0.3)
+      translateFeaturedListAndSetFocus(true)
       return true
     else if key = "up" AND m.FeaturedRowList.isInFocusChain() = true AND bSkinAdAvailable = true
       m.top.lastFocusedList = "skinAdRow"
@@ -1583,17 +1469,6 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       updateFocusXOffset(-1)
 
       return true
-    else if key = "up" AND m.RowList.isInFocusChain() = true
-      if m.FeaturedRowList.content <> invalid
-        translateFeaturedListAndSetFocus()
-        return true
-      else if bSkinAdAvailable = true
-        slideFade(m.skinAdRow, "below", "in", 0.3)
-        m.top.lastFocusedList = "skinAdRow"
-        m.skinAdRow.setFocus(true)
-        slideTo(m.RowList, [0, 384], 0.3)
-        return true
-      end if
     end if
   end if
   return false

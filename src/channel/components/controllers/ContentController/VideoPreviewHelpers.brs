@@ -91,7 +91,7 @@ Function onVideoPreviewStateChanged(msg)
   tubiLog("VideoPreviewHelpers.onVideoPreviewStateChanged, " + videoPreviewState)
   currentScreen = getCurrentScreen()
   if (videoPreviewState = "playing" OR videoPreviewState = "paused") AND videoPreview <> invalid AND videoPreview.isBufferingComplete = true
-    if currentScreen.featuredListHasFocus = false AND m.isUserInVideoTilesExperiment = true
+    if currentScreen <> invalid AND currentScreen.featuredListHasFocus = false AND m.isUserInVideoTilesExperiment = true
       m.inlineVideoMetadataOverlay.showContentPoster = true
     else
       m.inlineVideoMetadataOverlay.showContentPoster = false
@@ -235,7 +235,9 @@ Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
     if content.gridItemType = m.constants.ui.gridItemTypes.skinAd OR content.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel OR content.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
       if content.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel AND isCurrentScreenHomeScreen() = true
         currentScreen = getCurrentScreen()
-        currentScreen.allowCarouselAutoRotate = false
+        if currentScreen <> invalid
+          currentScreen.allowCarouselAutoRotate = false
+        end if
       end if
 
       videoContent = createObject("RoSGNode", "AdContentNode")
@@ -474,11 +476,13 @@ Function setVideoPreviewAfterFocus(focusedContent, pageInfo = {}, componentInfo 
 End Function
 
 
-Function onVideoPreviewPositionChanged(msg)
+Function onVideoPreviewPositionChanged(msg) as Void
   videoPreviewScreen = msg.getRoSGNode()
   position = msg.getData()
   duration = videoPreviewScreen.duration
   currentScreen = getCurrentScreen()
+  if currentScreen = invalid then return
+
   contentFocused = currentScreen.contentFocused
   if contentFocused <> invalid AND (contentFocused.gridItemType = m.constants.ui.gridItemTypes.skinAd OR contentFocused.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel OR contentFocused.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight)
     reportAdQuartileIfNeeded(contentFocused, position, duration)
@@ -546,9 +550,11 @@ Function reportAdQuartileIfNeeded(adItem, position, duration)
 End Function
 
 
-Function onInlineVideoPreviewPositionChanged(msg)
+Function onInlineVideoPreviewPositionChanged(msg) as Void
   tubiLog("VideoPreviewHelpers.onInlineVideoPreviewPositionChanged")
   screen = getCurrentScreen()
+  if screen = invalid then return
+
   videoPreviewScreen = msg.getRoSGNode()
   position = msg.getData()
   duration = videoPreviewScreen.duration
@@ -577,14 +583,7 @@ Function updatePlayerLayoutBasedOnFocusedContent(content)
   else if content.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
     updatePreviewPlayerToAdCarousel()
   else if isKidsUIOn() = false AND isHomeScreen = true AND m.isUserInVideoTilesExperiment = true
-    isContainerInControl = arrayIncludes(m.videoTilesControlCategoryIds, content.parentId)
-    if isContainerInControl = false
-      updatePreviewPlayerToInlineView()
-    else if arrayIncludes(["trueControlTop2Rows", "refinedControlTop2Rows"], m.videoTilesVariant) = true
-      updatePreviewPlayerToCondensedView()
-    else
-      updatePreviewPlayerToFullScreen()
-    end if
+    updatePreviewPlayerToInlineView()
   else
     updatePreviewPlayerToCondensedView()
   end if
@@ -615,15 +614,8 @@ Function renderAutoStartPlaybackFromPreviewCounter(contentFocused, diff) as Void
   end if
 
   if diff = 10
-    currentScreen = getCurrentScreen()
-    if currentScreen <> invalid AND contentFocused <> invalid AND arrayIncludes(m.videoTilesControlCategoryIds, contentFocused.parentId) = true AND isNonEmptyArray(currentScreen.featuredRowListTranslation) = true
-      m.autoStartPreviewToPlaybackTimer.reParent(m.top, false)
-      width = m.autoStartPreviewToPlaybackTimer.boundingRect().width
-      m.autoStartPreviewToPlaybackTimer.translation = [1920 - width - 66, currentScreen.featuredRowListTranslation[1] - 40]
-    else
-      m.autoStartPreviewToPlaybackTimer.reParent(m.inlineVideoPreviewPlayerContainer, false)
-      m.autoStartPreviewToPlaybackTimer.translation = [612, 24]
-    end if
+    m.autoStartPreviewToPlaybackTimer.reParent(m.inlineVideoPreviewPlayerContainer, false)
+    m.autoStartPreviewToPlaybackTimer.translation = [612, 24]
 
     fade(m.autoStartPreviewToPlaybackTimer, "in", 0.3)
     m.autoStartPreviewToPlaybackTimer.countdownText = diff.ToStr()

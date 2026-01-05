@@ -6,8 +6,6 @@ Function init()
   m.Tracking = TubiTrackingInfo(m.constants)
   experimentInfo = getStatsigExperimentResource("roku_video_tiles", "roku_video_tiles_1_7", false)
   m.isUserInVideoTilesExperiment = isAA(experimentInfo) AND experimentInfo.design_type = "videoTiles"
-  m.isUserInBillboardVariant = isAA(experimentInfo) AND experimentInfo.variant = "billboard"
-  m.shouldDim = isAA(experimentInfo) AND experimentInfo.should_dim = true
   m.dimMask = m.top.findNode("dimMask")
 
   m.PageGroup = m.top.findNode("PageGroup")
@@ -16,9 +14,6 @@ Function init()
   m.maskUri = "pkg:/images/poster-mask.png"
   if m.isUserInVideoTilesExperiment = true
     m.maskUri = ""
-    if m.shouldDim = true
-      m.dimMask.visible = true
-    end if
   end if
   m.ContentArea = m.top.findNode("ContentArea")
   m.ContentArea.maskUri = m.maskUri
@@ -67,7 +62,6 @@ Function init()
   m.CategoryGridList.observeFieldScoped("hideInfoPanel", "onHideInfoPanelChange")
   m.CategoryGridList.observeFieldScoped("featuredRowListTranslation", "updateFeaturedRowListTranslation")
   m.ContentAreaParent.observeFieldScoped("translation", "updateFeaturedRowListTranslation")
-  m.top.observeFieldScoped("featuredListCurrFocusRow", "onFeaturedListCurrFocusRowChange")
 
   'used to know when to send tracking info. Do not send focus tracking info when the grid is 1st loaded
   m.gridHasGainedInitialFocus = false
@@ -95,14 +89,7 @@ Function init()
   setContentAreaState()
 
   m.scrollDirection = "none"
-
-  ' Logic related to roku_video_tiles_1_7 experiment.
-  if isAA(experimentInfo) = true AND experimentInfo.variant = "billboard"
-    m.videoTilesListTranslation = [0, m.constants.ui.videoTilesListTranslation[1]]
-  else
-    m.videoTilesListTranslation = m.constants.ui.videoTilesListTranslation
-  end if
-
+  m.videoTilesListTranslation = m.constants.ui.videoTilesListTranslation
 End Function
 
 
@@ -1351,17 +1338,3 @@ Function onKidsModeChange(msg)
     m.ContentAreaParent.translation = m.originalContentAreaTranslation
   end if
 End Function
-
-
-Function onFeaturedListCurrFocusRowChange(msg)
-  tubiLog("HomeScreen.onFeaturedListCurrFocusRowChange")
-  row = msg.getData()
-  featuredRowContent = m.top.featuredRowContent
-  if m.shouldDim = true AND featuredRowContent <> invalid
-    container = featuredRowContent.getChild(CInt(row))
-    m.dimMask.visible = container <> invalid AND arrayIncludes([m.constants.ui.categoryIds.featured, m.constants.ui.categoryIds.liveEventSpotlight], container.id)
-  else
-    m.dimMask.visible = false
-  end if
-End Function
-

@@ -20,13 +20,15 @@
 
   <interface>
     <field id="itemContent" type="node" alias="posterOverlay.itemContent" />
-    <field id="width" alias="poster.width, videoInGridGradient.width, posterOverlay.width, videoGridMetadata.width" />
-    <field id="height" alias="poster.height, videoInGridGradient.height, posterOverlay.height, videoGridMetadata.height" />
+    <field id="width"
+      alias="poster.width, videoInGridGradient.width, posterOverlay.width, videoGridMetadata.width" />
+    <field id="height"
+      alias="poster.height, videoInGridGradient.height, posterOverlay.height, videoGridMetadata.height" />
     <field id="itemHasFocus" type="boolean" alias="posterOverlay.itemHasFocus" />
-    <field id="showContentPoster" type="boolean" value="true" alias="posterOverlay.showContentPoster" />
+    <field id="showContentPoster" type="boolean" value="true"
+      alias="posterOverlay.showContentPoster" />
     <field id="skipAnimation" type="boolean" alias="posterOverlay.skipAnimation" />
-    <field id="containerIndex" type="float" alias="posterOverlay.containerIndex" />
-    <field id="billboardContainerIndex" type="integer" alias="posterOverlay.billboardContainerIndex" />
+    <field id="limitedUI" type="boolean" value="false" />
   </interface>
 
   <children>

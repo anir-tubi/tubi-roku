@@ -63,15 +63,9 @@ have been updated by ContentController
         <Group
           id="videoTileOverlayGroup"
           visible="false">
-          <ExpandedTileMetadata
-            opacity="0"
-            width="1056"
-            hideTitle="false"
-            id="videoTilesControlMetadata" />
           <ExpandedVideoGridTile
             id="inTransitInlineVideoMetadataOverlay"
             opacity="0"
-            containerIndex="1"
             skipAnimation="true" />
           <Group
             id="inlineVideoPreviewPlayerContainer"
@@ -79,10 +73,12 @@ have been updated by ContentController
             translation="[160, 204.5]">
             <ExpandedVideoGridTile
               id="inlineVideoMetadataOverlay"
-              translation="[5,4]" />
-            <VideoGridTitleLogo
+              translation="[5,4]"
+              limitedUI="false" />
+            <ExpandedVideoGridTile
               id="inlineVideoGridTitleLogo"
-              translation="[5,4]" />
+              translation="[5,4]"
+              limitedUI="true" />
             <Poster
               id="inlinePreviewFocusIndicator"
               width="801"

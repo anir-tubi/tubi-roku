@@ -268,9 +268,6 @@ Function onItemContentChange(msg)
         if m.childGridItem.hasField("parentArrayGrid") = true
           m.childGridItem.parentArrayGrid = m.parentArrayGrid
         end if
-        if m.childGridItem.hasField("videoTilesVariant") = true
-          m.childGridItem.videoTilesVariant = row.videoTilesVariant
-        end if
         ' Pass along the itemContent to the child
         m.childGridItem.itemContent = itemContent
 

@@ -622,11 +622,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
       homeScreen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
 
       if isKidsUIOn() = false AND screenID = m.constants.ui.screenIds.homeScreen
-        liveEventsContainer = sanitizeHomeScreenResponseAndReturnLiveEventsContainer(rawResponse)
-        if isNode(liveEventsContainer) AND liveEventsContainer.getChildCount() > 0
-          m.billboardContainerIndex = 1
-          updateBillboardContainerIndex()
-        end if
+        sanitizeHomeScreenResponseAndReturnLiveEventsContainer(rawResponse)
         refreshLiveEventsContainerWithEpgListingInfo(rawResponse)
 
         getStatsigExperimentResource("roku_video_tiles", "roku_video_tiles_1_7", true)
@@ -636,9 +632,6 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
           screen = getCurrentScreen()
           isSkinAdsAvailable = (homeScreen.skinAdContent <> invalid)
           m.videoTileOverlayGroup.visible = (isSkinAdsAvailable = false AND screen <> invalid AND screen.id = m.constants.ui.screenIds.homeScreen)
-          m.inTransitInlineVideoMetadataOverlay.containerIndex = 1
-          m.inlineVideoMetadataOverlay.containerIndex = 0
-          m.inlineVideoGridTitleLogo.containerIndex = 0
           updateCategoryGridWithFeaturedList(rawResponse, homeScreen)
           rawResponse = invalid
         end if
@@ -878,13 +871,6 @@ Function onContainerMoreItemsSuccess(response)
 End Function
 
 
-Function onVideoTilesListMoreItemsSuccess(response)
-  homeScreen = getCurrentScreen()
-  if homeScreen <> invalid AND homeScreen.featuredRowContent <> invalid AND isNode(response) = true AND homeScreen.featuredListCurrFocusRow <> invalid
-    rowFocused = homeScreen.featuredListCurrFocusRow
-    appendContentToCategory(response, homeScreen.featuredRowContent, rowFocused)
-  end if
-End Function
 
 
 ' Make a request to the server to get more items for a category.
@@ -983,7 +969,7 @@ Function appendContentToCategory(response, contentNode, rowFocused)
       category.state = response.state
       category.appendChildren(items)
       screen.containerAppendMoreTilesStatus = "complete"
-      if m.shouldDebounceVideoTilePreview = true AND m.videoPreviewDebounce.control = "stop"
+      if m.videoPreviewDebounce.control = "stop"
         m.videoPreviewDebounce.control = "start"
       end if
     end if
@@ -1566,20 +1552,7 @@ Function onFeaturedRowCurrFocusRowChange(msg)
   fade(m.autoStartPreviewToPlaybackTimer, "out", 0.1)
   ' It will only start the timer for the first time.
   m.performanceMetricsTracker.startMetricTiming("vertical_scroll_performance")
-  updateExpandedVideoTileCurrFocusRow(currFocusRow, screen.featuredListScrollDirection)
   updateVideoTileSize(screen.featuredListScrollingStatus)
-
-  if m.isInBillboardExperiment = true
-    billboardVariantTranslation = m.constants.ui.billboardVariantTranslation
-    if CInt(currFocusRow) = m.billboardContainerIndex
-      videoTilesListTranslation = billboardVariantTranslation
-    else
-      videoTilesListTranslation = [billboardVariantTranslation[0], m.constants.ui.videoTilesListTranslation[1]]
-    end if
-    ' Using clipping rect to ensure that when scrolling up the video tile gets clipped along with the rest of the row list tiles
-    m.videoTileOverlayGroup.clippingRect = [videoTilesListTranslation[0], videoTilesListTranslation[1], 1920, 1080]
-    m.videoTileOverlayGroup.translation = [videoTilesListTranslation[0], -6]
-  end if
 
   if screen.lastFocusedList = "featuredRowList"
     m.videoPreviewPlayer.opacity = 0
@@ -1604,19 +1577,6 @@ Function onFeaturedRowCurrFocusRowChange(msg)
       makeAdditionalContainersRequestConditionally(currFocusRow, screen)
     end if
   end if
-
-  content = screen.featuredRowContent
-  if content <> invalid
-    category = content.getChild(m.inTransitInlineVideoMetadataOverlay.containerIndex)
-    if category <> invalid AND arrayIncludes(m.videoTilesControlCategoryIds, category.id) = false
-      m.videoTilesControlMetadata.visible = false
-    end if
-
-    category = content.getChild(currFocusRow)
-    if category <> invalid AND arrayIncludes(m.videoTilesControlCategoryIds, category.id) = false
-      m.videoTilesControlMetadata.visible = false
-    end if
-  end if
 End Function
 
 
@@ -1631,247 +1591,37 @@ Function onFeaturedListScrollingStatusChange(msg)
       updateVideoTileSize(scrollingStatus)
       updateInTransitVideoMetadataOverlay()
     end if
-    if m.shouldDebounceVideoTilePreview = true
-      state = m.videoPreviewPlayer.playerState
-      if state = "playing" OR state = "paused"
-        stopVideoPreview()
-      end if
-    else
-      state = m.videoPreviewPlayer.playerState
-      if state = "playing" OR state = "paused"
-        stopVideoPreview()
-      end if
-      if m.queuedVideoTilePreview = true
-        startDebouncedVideoPreview()
-      end if
+    state = m.videoPreviewPlayer.playerState
+    if state = "playing" OR state = "paused"
+      stopVideoPreview()
     end if
   end if
 End Function
 
 
 ' Updates the in transit video metadata overlay when the user is scrolling up or down.
-Function updateInTransitVideoMetadataOverlay()
-  screen = getCurrentScreen()
-  ' Avoid the focus indicator from being shown when the row is scrolling.
-  if screen <> invalid AND isNode(screen.featuredRowContent) = true
-    currFocusRow = screen.featuredListCurrFocusRow
-    category = screen.featuredRowContent.getChild(currFocusRow)
-    columnFocused = 0
-    if screen.featuredListScrollDirection = "left" OR screen.featuredListScrollDirection = "right"
-      columnFocused = Cint(screen.featuredRowCurrFocusColumn)
-    else
-      if category <> invalid AND isNumber(category.focusIndex) = true AND category.focusIndex > 0
-        columnFocused = category.focusIndex
-      end if
-    end if
-    updateVideoTileOnFocusChange(currFocusRow, columnFocused, screen)
-  end if
-End Function
 
 
 ' Triggers a callback when the user is scrolling through the columns of the row.
-Function onFeaturedRowCurrFocusColumnChange()
-  tubiLog("HomeScreenHelpers.onFeaturedRowCurrFocusColumnChange")
-  m.inlineVideoMetadataOverlay.skipAnimation = false
-  m.videoPreviewDebounce.control = "stop"
-  fade(m.autoStartPreviewToPlaybackTimer, "out", 0.3)
-  stopCountdownTimer()
-  screen = getCurrentScreen()
-  if screen <> invalid
-    m.performanceMetricsTracker.startMetricTiming("horizontal_scroll_performance")
-    columnFocused = screen.featuredRowCurrFocusColumn
-    if isNumber(columnFocused) = false OR columnFocused < 0
-      columnFocused = 0
-    end if
-
-
-    rowFocused = screen.featuredListCurrFocusRow
-    updateVideoTileOnFocusChange(rowFocused, columnFocused, screen)
-
-    ' Calling lazy load for the next batch of items.
-    if isNumber(columnFocused) = true AND isNumber(rowFocused) = true AND screen.featuredRowContent <> invalid
-      category = screen.featuredRowContent.getChild(rowFocused)
-      makeContainerRequest(category, columnFocused, screen, onVideoTilesListMoreItemsSuccess)
-    end if
-
-    if columnFocused = Fix(columnFocused)
-      m.performanceMetricsTracker.endMetricTiming("horizontal_scroll_performance", { column: columnFocused, row: rowFocused, screen: screen.id })
-    end if
-  end if
-End Function
 
 
 ' Updates the video tile metadata overlay on focus change.
 ' @param rowFocused: int, the row index of the focused item.
 ' @param columnFocused: int, the column index of the focused item.
 ' @param screen: roSGNode, the screen node.
-Function updateVideoTileOnFocusChange(rowFocused, columnFocused, screen)
-  tubiLog("HomeScreenHelpers.updateVideoTileOnFocusChange")
-  ' Only process if the screen is the home screen.
-  ' Since all others screens are using topRight background variant vs home screen will use full screen background.
-  ' TODO: If we graduate roku_video_tiles_1_7 we should migrate the skin ad to be a itemComponent of FeaturedRowList so that we don't have to add these one off checks.
-
-  gridItemType = ""
-  contentFocused = invalid
-  if screen.featuredRowContent <> invalid
-    category = screen.featuredRowContent.getChild(rowFocused)
-    if category <> invalid
-      gridItemType = category.gridItemType
-      contentFocused = category.getChild(columnFocused)
-    end if
-  end if
-
-  if isCurrentScreenHomeScreen() = true
-    updateVideoTileScreenBackground(contentFocused, screen)
-  end if
-
-  if screen <> invalid AND screen.featuredRowContent <> invalid
-    isVideoTileEnabled = contentFocused <> invalid AND isVideoTileEnabledContainer(gridItemType, contentFocused.parentId)
-    if isVideoTileEnabled = true
-      pauseVideoPreviewAndShowPoster()
-    else
-      pauseVideoPreview()
-    end if
-    setInlineVideoMetadataOverlay(screen.featuredRowContent, columnFocused, rowFocused)
-  end if
-End Function
 
 
-Function pauseVideoPreviewAndShowPoster()
-  tubiLog("HomeScreenHelpers.pauseVideoPreviewAndShowPoster")
-  ' If the video preview is playing, we will pause it and show the poster.
-  ' This helps with smoother scrolling experience.
-  if m.inlineVideoPreviewPlayerContainer.opacity = 1
-    videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
-    if videoPlayer <> invalid
-      videoPlayer.visible = false
-    end if
-    m.inlinePreviewPlayerFadeAnimation = fade(m.videoPreviewPlayer, "out", 0.3)
-    if getVideoPreviewState() = "playing"
-      ' Gives better scrolling experience if we pause the video preview.
-      ' We are calling stopVideoPreview once we are done with scrolling.
-      ' We are pausing to avoid audio from playing in the background when user is scrolling.
-      pauseVideoPreview()
-    end if
-  end if
-  isLinearPlayerPlaying = isLinearPlayerLoadingOrPlaying()
-  screen = getCurrentScreen()
-  if screen <> invalid AND screen.featuredRowFocusedItem <> invalid
-    updatePlayerLayoutBasedOnFocusedContent(screen.featuredRowFocusedItem)
-  end if
-  if isLinearPlayerPlaying = true
-    stopAndHideLinearVideoPlayer()
-  end if
-  if screen.featuredListScrollDirection = "up" OR screen.featuredListScrollDirection = "down"
-    m.inlineVideoPreviewPlayerContainer.opacity = 0
-  else
-    m.inlineVideoPreviewPlayerContainer.opacity = 1
-  end if
-End Function
 
 
 ' Starts the inline preview when the featured row list has focus.
-Function startDebouncedVideoPreview()
-  m.queuedVideoTilePreview = false
-  screen = getCurrentScreen()
-  if isCurrentScreenHomeScreen() = true
-    if screen.featuredListHasFocus = true
-      stopCountdownTimer()
-      if isLinearPlayerLoadingOrPlaying() = true
-        stopAndHideLinearVideoPlayer()
-      end if
-      if screen.featuredRowContent <> invalid AND screen.featuredRowFocusedItem <> invalid
-        content = screen.featuredRowFocusedItem
-        state = getVideoPreviewState()
-        if getVideoPreviewContentId() <> content.id OR state = "stopped"
-          if content.type = m.constants.ui.categoryTypes.linear AND m.constants.deviceInfo.isAutoPlayEnabled = true
-            playLinearInlineGridView(content, screen)
-          else
-            componentTrackingInfo = getCategoryComponentTrackingInfo(screen)
-            setVideoPreviewAfterFocus(content, screen.trackingPageInfo, componentTrackingInfo)
-          end if
-        end if
-      end if
-    else
-      focusedContent = screen.contentFocused
-      if focusedContent <> invalid AND (focusedContent.type = m.constants.ui.contentTypes.adRowlistCarousel OR focusedContent.type = m.constants.ui.contentTypes.adRowlistSpotlight)
-        componentTrackingInfo = getCategoryComponentTrackingInfo(screen)
-        setVideoPreviewAfterFocus(focusedContent, screen.trackingPageInfo, componentTrackingInfo)
-      end if
-    end if
-  end if
-End Function
 
 
 ' Sets the inline video metadata overlay.
 ' @param featuredRowContent: roSGNode, the featured row content.
 ' @param columnFocused: int, the column index of the focused item.
 ' @param rowFocused: int, the row index of the focused item.
-Function setInlineVideoMetadataOverlay(featuredRowContent, columnFocused, rowFocused)
-  if (isNumber(columnFocused) = false OR columnFocused < 0)
-    columnFocused = 0
-  end if
-
-  if (isNumber(rowFocused) = false OR rowFocused < 0)
-    rowFocused = 0
-  end if
-
-  columnFocused = CInt(columnFocused)
-  rowFocused = CInt(rowFocused)
-
-  currCategory = featuredRowContent.getChild(rowFocused)
-  if currCategory <> invalid
-    itemContent = currCategory.getChild(columnFocused)
-    if itemContent <> invalid
-      m.inlineVideoMetadataOverlay.itemContent = itemContent
-      m.inlineVideoGridTitleLogo.itemContent = itemContent
-      m.videoTilesControlMetadata.itemContent = itemContent
-    end if
-    m.inlineVideoMetadataOverlay.visible = true
-    m.inlineVideoGridTitleLogo.visible = true
-  end if
-
-  screen = getCurrentScreen()
-  if screen.featuredListScrollDirection <> "left" AND screen.featuredListScrollDirection <> "right"
-    ' Predicting the next row to be focused based on current scroll direction.
-    ' We will reset the metadata if user changes the scroll direction inside onFeaturedListScrollDirectionChange.
-    screen = getCurrentScreen()
-    nextRow = 1
-    if screen.featuredListScrollDirection = "down"
-      nextRow = rowFocused + 1
-    else if rowFocused > 0 AND screen.featuredListScrollDirection = "up"
-      nextRow = rowFocused - 1
-    end if
-
-    nextCategory = featuredRowContent.getChild(nextRow)
-    if nextCategory <> invalid
-      ' Accessing column index from the category node since we preserve user previous focus index.
-      columnFocused = nextCategory.focusIndex
-      if isNumber(columnFocused) = false OR columnFocused < 0
-        columnFocused = 0
-      end if
-      isVideoTileEnabled = isVideoTileEnabledContainer(nextCategory.gridItemType, nextCategory.id)
-      m.inTransitInlineVideoMetadataOverlay.visible = (isVideoTileEnabled = true)
-      inTransitItemContent = nextCategory.getChild(columnFocused)
-      m.inTransitInlineVideoMetadataOverlay.itemContent = inTransitItemContent
-    end if
-  end if
-End Function
 
 
-Function playLinearInlineGridView(content, screen)
-  screen = getCurrentScreen()
-
-  if isCurrentScreenHomeScreen() = true
-    stopLinearVideoContent()
-    playbackSource = {
-      "srcForAnalytic": m.constants.player.playbackSource.unknown
-      "srcForAds": m.constants.player.playbackOrigin.container
-      "playbackContainer": screen.currCategoryId
-    }
-    playLinearVideoContent(content, true, screen.id, true, playbackSource)
-  end if
-End Function
 
 
 Function onFeaturedListHasFocusChange(msg)
@@ -1879,7 +1629,6 @@ Function onFeaturedListHasFocusChange(msg)
   hasFeaturedListFocus = msg.getData()
   screen = msg.getRoSGNode()
   m.videoTileOverlayGroup.visible = (isCurrentScreenHomeScreen() = true AND isKidsUIOn() = false AND screen.lastFocusedList = "featuredRowList")
-  m.videoTilesControlMetadata.visible = m.videoTileOverlayGroup.visible
   content = screen.featuredRowFocusedItem
   previewContent = m.videoPreviewPlayer.content
   m.videoPreviewPlayer.visible = (isCurrentScreenHomeScreen() = false OR (content <> invalid AND previewContent <> invalid AND content.id = previewContent.id))
@@ -1941,16 +1690,7 @@ Function onFeaturedRowFocusedItemChange(msg) as Void
   screen = msg.getRoSGNode()
 
   if focusedItem = invalid
-    m.videoTilesControlMetadata.opacity = 0
     return
-  end if
-
-  if arrayIncludes(m.videoTilesControlCategoryIds, focusedItem.parentId) = true
-    ' Using a combination of visible and fade to avoid the issue where user scrolls past the row in between of fade in.
-    m.videoTilesControlMetadata.visible = true
-    fade(m.videoTilesControlMetadata, "in", 0.1)
-  else
-    m.videoTilesControlMetadata.opacity = 0
   end if
 
   ' Only process if the focused item is a video tile.
@@ -1974,10 +1714,8 @@ Function onFeaturedRowFocusedItemChange(msg) as Void
   ' If VideoPreview is on and we have not started the debounce, we will start it.
   ' This is needed in case where for initial load and refresh cases where columnFocusChange is not triggered.
   if isVideoPreviewOn() = true AND m.videoPreviewDebounce.control = "stop"
-    if m.shouldDebounceVideoTilePreview = true AND screen.featuredListHasFocus = true
+    if screen.featuredListHasFocus = true
       m.videoPreviewDebounce.control = "start"
-    else if screen.featuredListScrollingStatus = false AND screen.featuredListHasFocus = true
-      startDebouncedVideoPreview()
     else
       m.queuedVideoTilePreview = true
     end if
@@ -2001,77 +1739,8 @@ Function onCurrCategoryIdChange()
 End Function
 
 
-Function updateInlineVideoMetadataOverlayVisibility(duration = 0)
-  tubiLog("HomeScreenHelpers.updateInlineVideoMetadataOverlayVisibility")
-  screen = getCurrentScreen()
-  if screen <> invalid
-    isHomeScreen = (screen <> invalid AND screen.id = m.constants.ui.screenIds.homeScreen)
-    m.videoTileOverlayGroup.visible = isHomeScreen
-    if m.isUserInVideoTilesExperiment = true AND isKidsUIOn() = false
-      if isHomeScreen AND screen.featuredRowContent <> invalid
-        content = screen.featuredRowFocusedItem
-        if getVideoPreviewStateForThisContent(content) <> "playing"
-          m.inlineVideoMetadataOverlay.showContentPoster = true
-        end if
-      else
-        ' Below logic handles displaying the large preview poster when skin ad is focused and during navigating back from ad player.
-        if screen <> invalid AND screen.lastFocusedList <> "skinAdRow"
-          fade(m.inlineVideoPreviewPlayerContainer, "out", duration, 0.1)
-        else
-          fade(m.inlineVideoPreviewPlayerContainer, "in", duration)
-        end if
-      end if
-    else
-      m.inlineVideoPreviewPlayerContainer.opacity = 0
-    end if
-
-    if isHomeScreen = false
-      fade(m.autoStartPreviewToPlaybackTimer, "out", 0.3)
-    end if
-  end if
-End Function
 
 
-Function onFeaturedRowListTranslationChange(msg)
-  tubiLog("HomeScreenHelpers.onFeaturedRowListTranslationChange")
-  screen = msg.getRoSGNode()
-  translation = screen.featuredRowListTranslation
-  if translation <> invalid
-    rectY = 52
-    if screen.currentFocusedItemBoundingRect <> invalid AND screen.currentFocusedItemBoundingRect.y <> 0
-      rectY = screen.currentFocusedItemBoundingRect.y
-    end if
-
-    isVerticalScroll = arrayIncludes(["down", "up"], screen.featuredListScrollDirection)
-
-    if isNumber(rectY) = true
-      inlineVideoPreviewPlayerContainer = m.inlineVideoPreviewPlayerContainer.translation
-      ' Below logic is required to avoid having the flickering effect when we update the translation of the focused expanded video tile once the scroll stops.
-      if isVerticalScroll = true AND screen.featuredListScrollingStatus = false
-        m.inlineVideoPreviewPlayerContainer.opacity = 0
-      end if
-      m.inlineVideoPreviewPlayerContainer.translation = [inlineVideoPreviewPlayerContainer[0], translation[1] + rectY]
-      m.inlineVideoPreviewPlayerContainer.opacity = 1
-    end if
-
-    inTransitCurrentFocusedItemBoundingRect = screen.inTransitCurrentFocusedItemBoundingRect
-    ' For Performance optimization reasons not processing it unless user is scrolling vertically.
-    if isVerticalScroll = true AND inTransitCurrentFocusedItemBoundingRect <> invalid AND inTransitCurrentFocusedItemBoundingRect.y <> 0
-      inTransitRectY = inTransitCurrentFocusedItemBoundingRect.y
-      currentInTransitTranslationY = m.inTransitInlineVideoMetadataOverlay.translation[1]
-      newInTransitTranslationY = translation[1] + inTransitRectY + 5
-      ' As soon as the scrolling stops we will hide the in transit video metadata overlay.
-      if screen.featuredListScrollingStatus = true AND isNumber(inTransitRectY) AND currentInTransitTranslationY <> newInTransitTranslationY
-        m.inTransitInlineVideoMetadataOverlay.translation = [165, newInTransitTranslationY]
-        m.inTransitInlineVideoMetadataOverlay.opacity = 1
-      else
-        m.inTransitInlineVideoMetadataOverlay.opacity = 0
-      end if
-    else if isVerticalScroll = true AND screen.featuredListScrollingStatus = false AND inTransitCurrentFocusedItemBoundingRect <> invalid AND inTransitCurrentFocusedItemBoundingRect.y = 0
-      m.inTransitInlineVideoMetadataOverlay.opacity = 0
-    end if
-  end if
-End Function
 
 
 Function getCategoryComponentTrackingInfo(screen)
@@ -2099,7 +1768,6 @@ Function onFeaturedListScrollDirectionChange(msg)
   screen = msg.getRoSGNode()
   scrollDirection = msg.getData()
   if scrollDirection = "down" OR scrollDirection = "up"
-    updateExpandedVideoTileCurrFocusRow(screen.featuredListCurrFocusRow, scrollDirection)
     updateVideoTileSize(screen.featuredListScrollingStatus)
     updateInTransitVideoMetadataOverlay()
   end if
@@ -2159,41 +1827,6 @@ Function getLiveEventsContainer(rawResponse)
 End Function
 
 
-Function getVideoTileFocusedRow()
-  screen = getCurrentScreen()
-  focusedRow = 0
-  if screen <> invalid AND screen.featuredListCurrFocusRow <> invalid
-    focusedRow = screen.featuredListCurrFocusRow
-  end if
-
-  return focusedRow
-End Function
-
-
-Function updateExpandedVideoTileCurrFocusRow(currFocusRow, scrollDirection)
-  m.inlineVideoMetadataOverlay.containerIndex = currFocusRow
-  nextFocusRow = 1
-  if scrollDirection <> "up"
-    nextFocusRow = currFocusRow + 1
-  else
-    nextFocusRow = currFocusRow - 1
-  end if
-  m.inlineVideoGridTitleLogo.containerIndex = currFocusRow
-
-  if nextFocusRow < 0 AND m.billboardContainerIndex > 0
-    nextFocusRow = m.billboardContainerIndex
-  end if
-  m.inTransitInlineVideoMetadataOverlay.containerIndex = nextFocusRow
-End Function
-
-
-Function updateBillboardContainerIndex()
-  m.inlineVideoMetadataOverlay.billboardContainerIndex = m.billboardContainerIndex
-  m.inTransitInlineVideoMetadataOverlay.billboardContainerIndex = m.billboardContainerIndex
-  m.inlineVideoGridTitleLogo.billboardContainerIndex = m.billboardContainerIndex
-End Function
-
-
 Function sanitizeHomeScreenResponseAndReturnLiveEventsContainer(rawResponse)
   liveEventsContainer = invalid
   if isNode(rawResponse) = true AND rawResponse.getChildCount() > 0
@@ -2212,18 +1845,6 @@ Function sanitizeHomeScreenResponseAndReturnLiveEventsContainer(rawResponse)
 End Function
 
 
-Function isVideoTileEnabledContainer(gridItemType, categoryId)
-  return arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, gridItemType) = false AND arrayIncludes(m.videoTilesControlCategoryIds, categoryId) = false
-End Function
-
-
-Function updateVideoTileScreenBackground(content, screen)
-  if isNode(content) = true AND (shouldDisplayFullScreenVideoBackground(content) OR arrayIncludes(m.constants.ui.adGridItemTypes, content.gridItemType))
-    setVideoContentScreenBackground(screen, content)
-  else if screen.id = m.constants.ui.screenIds.homeScreen
-    displayDefaultBackground()
-  end if
-End Function
 
 
 ' Requests additional content containers when user scrolls near the bottom
@@ -2356,7 +1977,7 @@ Function appendPaginatedContainersToScreen(screen, response)
     end if
 
     screen.hasNewContainers = true
-    if m.shouldDebounceVideoTilePreview = true AND m.videoPreviewDebounce.control = "stop"
+    if m.videoPreviewDebounce.control = "stop"
       m.videoPreviewDebounce.control = "start"
     end if
     if response.groupCursor = invalid

@@ -157,16 +157,11 @@ End Function
 ' Sets up title and initial configuration based on component variant
 ' @param itemContent - Content node with title and metadata
 Function setupTitleAndConfig(itemContent) as Void
-  isVideoTilesControlMetadata = m.top.id = "videoTilesControlMetadata"
   ' TODO: Revisit this logic after roku_video_tiles_1_7 experiment results. This is getting hard to manage.
   if m.top.variant = "detailScreenInfoPanel"
     m.metadataGroup.itemSpacings = [15]
-  else if isVideoTilesControlMetadata = false
+  else
     m.metadataGroup.itemSpacings = [9]
-  end if
-
-  if isVideoTilesControlMetadata = true AND m.title = invalid
-    appendTitleToMetadataGroup(itemContent)
   end if
 
   variant = m.top.variant
@@ -189,11 +184,7 @@ End Function
 ' @param itemContent - Content node to display
 Function routeContentDisplay(itemContent) as Void
   if itemContent.type = m.constants.ui.contentTypes.linear
-    if m.top.isBillboardRow = false
-      setThumbnailImage(itemContent.thumbnailUri, itemContent.type)
-    else
-      m.firstLineGroup.removeChild(m.channelLogo)
-    end if
+    setThumbnailImage(itemContent.thumbnailUri, itemContent.type)
     currentProgram = getCurrentLiveProgram(itemContent)
     if currentProgram <> invalid
       metadataOnLivePosterContent(currentProgram)
@@ -261,10 +252,8 @@ End Function
 ' Handles SOT badges and metadata height adjustments for control variant
 ' @param itemContent - Content node with SOT information
 Function handleSOTBadgesAndLayout(itemContent) as Void
-  isVideoTilesControlMetadata = m.top.id = "videoTilesControlMetadata"
-
   ' Adjust the translation based on height of the description text.
-  if isVideoTilesControlMetadata OR m.top.variant = "detailScreenInfoPanel"
+  if m.top.variant = "detailScreenInfoPanel"
     config = {
       focusedTextColor: m.focusedTextColor
       primaryTextolor: m.primaryTextColor
@@ -379,11 +368,7 @@ Function metadataOnPosterContent(itemContent)
       end if
     end for
 
-    if m.variant <> "trueControlTop2Rows" OR m.top.id <> "videoTilesControlMetadata"
-      prefixTextParts.push(text)
-    else
-      renderTags(text)
-    end if
+    prefixTextParts.push(text)
   end if
 
   if itemContent.releaseDate <> invalid
@@ -647,19 +632,6 @@ Function onHideTitleChange(msg)
 End Function
 
 
-' Handles isBillboardRow field changes and adjusts typography and spacing
-' @param msg - Message containing isBillboardRow boolean value
-Function onIsBillboardRowChange(msg)
-  isBillboardRow = msg.getData()
-  if isBillboardRow = true
-    setTypographyOfLabel(m.description, m.bodyMediumFont)
-    m.subHeadlinePrefixGroup.itemSpacings = [20]
-    m.subHeadlineSuffixGroup.itemSpacings = [20]
-    m.firstLineGroup.itemSpacings = [20]
-  end if
-End Function
-
-
 ' Renders subtitle/subheadline text parts with bullet separators
 ' @param parts - Array of text strings to display
 ' @param isPrefix - Boolean, true for prefix group, false for suffix group
@@ -672,9 +644,6 @@ Function renderSubHeadline(parts, isPrefix)
 
   ' Determine typography font once before loop
   typographyFont = m.bodySmallFont
-  if m.top.id = "videoTilesControlMetadata"
-    typographyFont = m.bodyMediumFont
-  end if
 
   ' Collect labels in array for batch insertion
   labels = []
@@ -688,9 +657,7 @@ Function renderSubHeadline(parts, isPrefix)
     })
     labels.push(label)
 
-    if m.top.isBillboardRow = false
-      prefix = " " + Chr(&hb7) + " "
-    end if
+    prefix = " " + Chr(&hb7) + " "
   end for
 
   ' Batch append all labels at once
@@ -733,14 +700,7 @@ Function appendTitleToMetadataGroup(itemContent = invalid)
   end if
   m.metadataGroup.insertChild(m.title, 0)
 
-  isVideoTilesControlMetadata = m.top.id = "videoTilesControlMetadata"
-  if m.variant = "trueControlTop2Rows" AND isVideoTilesControlMetadata
-    m.metadataGroup.itemSpacings = [18, 3, 15]
-  else if m.variant = "refinedControlTop2Rows" AND isVideoTilesControlMetadata
-    m.metadataGroup.itemSpacings = [15, 18]
-  else if m.variant = "cinematicTop2Rows" AND isVideoTilesControlMetadata
-    m.metadataGroup.itemSpacings = [9, 9]
-  else if isDetailScreenInfoPanel = false
+  if isDetailScreenInfoPanel = false
     m.metadataGroup.itemSpacings = [9, 3]
   end if
   setTypographyOfLabel(m.description, m.bodyMediumFont)

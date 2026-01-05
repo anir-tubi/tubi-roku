@@ -17,26 +17,6 @@ Function init()
   setTypographyOfLabel(m.SponsoredByText, typographyConstants.ids.bodySmall)
   setTypographyOfLabel(m.CategoryName, typographyConstants.ids.subheaderMedium)
 
-  parent = m.top.getParent()
-  m.parentArrayGrid = invalid
-  for x = 1 to 10
-    ' If at any point of view due to any reason parent is invalid and then exiting the for loop.
-    ' parent can be invalid if the starterGridItem is used outside of rowlist.
-    if parent = invalid
-      exit for
-    end if
-
-    if parent.hasField("currCategoryId") = true
-      m.parentArrayGrid = parent
-      exit for
-    end if
-    parent = parent.getParent()
-  end for
-
-  if m.parentArrayGrid <> invalid
-    m.parentArrayGrid.observeFieldScoped("currCategoryId", "updateCategoryNameVisibility")
-  end if
-
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
@@ -86,8 +66,6 @@ Function onContentChange()
 
     m.CategoryName.width = 1000
     m.subText.visible = false
-    ' TODO: Revisit this logic based on the experiment roku_video_tiles_1_7 results.
-    updateCategoryNameVisibility()
 
     if item.subtext <> invalid AND item.subtext <> ""
       ' Purposely passing in invalid constants for each row label to avoid having to pull in constants for each row label
@@ -144,14 +122,5 @@ Function onContentChange()
       m.SponsoredByPoster.height = 0
       m.SponsoredBy.translation = [m.SponsoredBy.translation[0], 0]
     end if
-  end if
-End Function
-
-
-Function updateCategoryNameVisibility()
-  item = m.top.content
-  if item <> invalid AND m.parentArrayGrid <> invalid AND m.parentArrayGrid.parentScreenId = "homeScreen"
-    categoryId = m.parentArrayGrid.currCategoryId
-    m.CategoryName.visible = item.videoTilesVariant <> "billboard" OR item.id <> "featured" OR categoryId = "skinAd" OR categoryId = "fox_live_events"
   end if
 End Function

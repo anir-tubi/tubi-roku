@@ -661,7 +661,6 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
   fullScreenBackground = imageSizes.fullScreenBackground
   featuredRowPoster = imageSizes.featuredRowPoster
   videoTilesPortrait = imageSizes.videoTilesPortrait
-  billboard = imageSizes.billboard
   controlLandscape = imageSizes.controlLandscape
 
   '//For now, ensure the large posters do not show up on the search screen
@@ -679,7 +678,6 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
     largestLandscapeSize = m.convertImageSizeFor720p(largestLandscapeSize)
     background = m.convertImageSizeFor720p(background)
     title = m.convertImageSizeFor720p(title)
-    billboard = m.convertImageSizeFor720p(billboard)
     featuredRowPoster = m.convertImageSizeFor720p(featuredRowPoster)
     videoTilesPortrait = m.convertImageSizeFor720p(videoTilesPortrait)
     fullScreenBackground = m.convertImageSizeFor720p(fullScreenBackground)
