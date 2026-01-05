@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { ecp, odc, utils, proxy } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
 import { testHelpers } from '../test-helpers';
+import { adTestHelpers, AdType } from '../ad-test-helpers';
 
 describe('HomeGrid Video Tiles', function () {
   before(async () => {
@@ -88,6 +89,8 @@ describe('HomeGrid Video Tiles', function () {
         `Tile at position [${featuredRowIndex}, ${i}] should have width 310, but got width=${tileSize.width}`);
     }
 
+    await testHelpers.findAndNavigateToVideoPreviewContent('videoTitlesRowList', true, 5);
+
     // Wait for inline video preview container to be visible
     await testUtils.waitForElementToShowOnScreen('inlineVideoPreviewPlayerContainer', 'Inline video preview player container not visible', 5000);
 
@@ -132,6 +135,8 @@ describe('HomeGrid Video Tiles', function () {
         `Tile at position [${featuredRowIndex}, ${i}] should have width 310, but got width=${tileSize.width}`);
     }
 
+    await testHelpers.findAndNavigateToVideoPreviewContent('videoTitlesRowList', true, 5);
+
     // Wait for inline video preview container to be visible
     await testUtils.waitForElementToShowOnScreen('inlineVideoPreviewPlayerContainer', 'Inline video preview player container not visible', 5000);
 
@@ -158,13 +163,7 @@ describe('HomeGrid Video Tiles', function () {
     await testUtils.waitForGridContentToLoad('videoTitlesRowList', 5000);
     await utils.sleep(1000);
 
-    const position = await testHelpers.findContentPositionInRowListThatContainsVideoPreview('videoTitlesRowList', true, 5);
-    if (position.length === 0) {
-      throw new Error('Could not find content with video preview in featured row list');
-    }
-
-    await testHelpers.jumpToRowListPosition('videoTitlesRowList', position[0], position[1]);
-    await utils.sleep(2000);
+    await testHelpers.findAndNavigateToVideoPreviewContent('videoTitlesRowList', true, 5);
 
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 15000);
   });
@@ -181,13 +180,7 @@ describe('HomeGrid Video Tiles', function () {
     await testUtils.waitForGridContentToLoad('videoTitlesRowList', 5000);
     await utils.sleep(1000);
 
-    const position = await testHelpers.findContentPositionInRowListThatContainsVideoPreview('videoTitlesRowList', true, 5);
-    if (position.length === 0) {
-      throw new Error('Could not find content with video preview in featured row list');
-    }
-
-    await testHelpers.jumpToRowListPosition('videoTitlesRowList', position[0], position[1]);
-    await utils.sleep(2000);
+    const position = await testHelpers.findAndNavigateToVideoPreviewContent('videoTitlesRowList', true, 5);
 
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 15000);
 
@@ -215,15 +208,9 @@ describe('HomeGrid Video Tiles', function () {
 
     await testUtils.waitForGridContentToLoad('videoTitlesRowList', 5000);
 
-    const position = await testHelpers.findContentPositionInRowListThatContainsVideoPreview('videoTitlesRowList', false, 5);
-    if (position.length === 0) {
-      throw new Error('Could not find content without video preview in the first 5 rows');
-    }
+    const position = await testHelpers.findAndNavigateToVideoPreviewContent('videoTitlesRowList', false, 5);
 
     const [row, col] = position;
-    await testHelpers.jumpToRowListPosition('videoTitlesRowList', row, col);
-
-    await utils.sleep(2000);
 
     const previewPlayerState = await testUtils.getElementField('previewVideoPlayer', 'state');
     expect(previewPlayerState).to.be.oneOf(['stopped', 'none'], 'Preview video player should not be playing for content without video preview');
@@ -310,15 +297,9 @@ describe('HomeGrid Video Tiles', function () {
     await testUtils.waitForGridContentToLoad('videoTitlesRowList', 10000);
     await utils.sleep(1000);
 
-    const position = await testHelpers.findContentPositionInRowListThatContainsVideoPreview('videoTitlesRowList', true, 5);
-    if (position.length === 0) {
-      throw new Error('Could not find content with video preview in movie screen');
-    }
+    const position = await testHelpers.findAndNavigateToVideoPreviewContent('videoTitlesRowList', true, 5);
 
     const [row, col] = position;
-    await testHelpers.jumpToRowListPosition('videoTitlesRowList', row, col);
-
-    await utils.sleep(2000);
 
     // Verify inlineVideoPreviewPlayerContainer is visible with opacity 1
     await testUtils.waitForElementToShowOnScreen('inlineVideoPreviewPlayerContainer', 'Inline video preview player container not visible', 5000);
@@ -346,13 +327,7 @@ describe('HomeGrid Video Tiles', function () {
     await testUtils.waitForGridContentToLoad('videoTitlesRowList', 10000);
     await utils.sleep(1000);
 
-    const position = await testHelpers.findContentPositionInRowListThatContainsVideoPreview('videoTitlesRowList', true, 5);
-    if (position.length === 0) {
-      throw new Error('Could not find content with video preview');
-    }
-
-    await testHelpers.jumpToRowListPosition('videoTitlesRowList', position[0], position[1]);
-    await utils.sleep(2000);
+    await testHelpers.findAndNavigateToVideoPreviewContent('videoTitlesRowList', true, 5);
 
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 10000);
 
@@ -382,13 +357,7 @@ describe('HomeGrid Video Tiles', function () {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for videoTitlesRowList to have focus', 20000);
 
-    const position = await testHelpers.findContentPositionInRowListThatContainsVideoPreview('videoTitlesRowList', true, 5);
-    if (position.length === 0) {
-      throw new Error('No content with video preview found on home screen');
-    }
-
-    await testHelpers.jumpToRowListPosition('videoTitlesRowList', position[0], position[1]);
-    await utils.sleep(2000);
+    await testHelpers.findAndNavigateToVideoPreviewContent('videoTitlesRowList', true, 5);
 
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 15000);
 
@@ -1673,11 +1642,7 @@ describe('HomeGrid Video Tiles', function () {
     await testUtils.waitForGridContentToLoad('videoTitlesRowList', 10000);
     await utils.sleep(1000);
 
-    const position = await testHelpers.findContentPositionInRowListThatContainsVideoPreview('videoTitlesRowList', true, 5);
-    expect(position.length).to.be.greaterThan(0, 'No video tiles with video preview found on home screen');
-
-    await testHelpers.jumpToRowListPosition('videoTitlesRowList', position[0], position[1]);
-    await utils.sleep(2000);
+    await testHelpers.findAndNavigateToVideoPreviewContent('videoTitlesRowList', true, 5);
 
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 15000);
     const previewContent = await testUtils.getElementField('previewVideoPlayer', 'content');
@@ -1825,7 +1790,7 @@ describe('HomeGrid Video Tiles', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842129
   it('C842129 - Overflow description fallback @guest @browse', async () => {
-    void proxy.resume();
+    proxy.resume();
     // Set up network proxy to inject movie with long description in Featured row
     const proxyPromise = testHelpers.mockHomescreenWithLongDescriptionContent();
 
@@ -2025,5 +1990,259 @@ describe('HomeGrid Video Tiles', function () {
 
     expect(rowContent.length).to.be.greaterThan(10, 'Comedy row should have more than 10 items');
     expect(seenContentIds.size).to.equal(rowContent.length, 'All content items should have unique IDs');
+  });
+
+  // Test Rail Link: TBD - Wrapper Ad Autoplay Test
+  it('Wrapper ad should autoplay into fullscreen and return to home screen after completion @guest @ads', async () => {
+    // Set up ads endpoint mock before launching app
+    proxy.resume();
+    const proxyPromise = adTestHelpers.mockAds([AdType.Wrapper, AdType.Spotlight]);
+    // Launch app
+    await testUtils.startApplicationAtPage('home', {
+      shouldCreateNewUser: false,
+      clearRegistry: false,
+      disableSkinAds: false
+    });
+    await utils.promiseTimeout(proxyPromise, 50000);
+    await testUtils.waitForElementToHaveFocus('skinAdRow', 'Timed out waiting for wrapper ad to have focus', 15000);
+    // Wait for wrapper ad to appear (wrapper ads show on homepage_video or tubi_app_homepage)
+    // The wrapper ad should automatically transition to fullscreen video playback
+    await utils.sleep(7000); // Allow time for ad to initialize
+
+    // Verify wrapper ad video player is visible and displaying on screen
+    await testUtils.waitForCurrentScreenToEqual('adPlayerScreen', 10000);
+
+    // Verify the ad is playing in fullscreen mode with retry
+    await testUtils.untilTrue(async () => {
+      const videoPlayer = await testUtils.getNodeForElement('adPlayerScreen');
+      return videoPlayer.adState === 'adsPlaying';
+    }, 'Wrapper ad should be playing', 10000);
+
+    // Verify ad player skin elements are visible and non-empty in fullscreen
+    await testUtils.waitForElementToShowOnScreen('adPlayerSkinAdLogo', 'Ad player logo should be visible', 3000);
+    const adPlayerLogoUri = await testUtils.getElementField('adPlayerSkinAdLogo', 'uri');
+    expect(adPlayerLogoUri).to.not.be.empty;
+
+    await testUtils.waitForElementToShowOnScreen('adPlayerSkinAdDescription', 'Ad player description should be visible', 3000);
+    const adPlayerDescText = await testUtils.getElementField('adPlayerSkinAdDescription', 'text');
+    expect(adPlayerDescText).to.not.be.empty;
+
+    // Verify player closes and returns to home screen
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 120000);
+    await testUtils.waitForElementToHaveFocus('skinAdRow', 'Should return focus to home grid', 30000);
+
+    // Verify home screen skin ad elements are visible and non-empty
+    await testUtils.waitForElementToShowOnScreen('skinAdLogo', 'Skin ad logo should be visible on home screen', 3000);
+    const skinAdLogoUri = await testUtils.getElementField('skinAdLogo', 'uri');
+    expect(skinAdLogoUri).to.not.be.empty;
+
+    await testUtils.waitForElementToShowOnScreen('skinAdDescription', 'Skin ad description should be visible on home screen', 3000);
+    const skinAdDescText = await testUtils.getElementField('skinAdDescription', 'text');
+    expect(skinAdDescText).to.not.be.empty;
+
+    // Verify skinAdCountdownText shows "Watch again" after ad completion
+    await testUtils.waitForElementToShowOnScreen('skinAdCountdownText', 'Skin ad countdown text should be visible on home screen', 3000);
+    const skinAdCountdownText = await testUtils.getElementField('skinAdCountdownText', 'text');
+    expect(skinAdCountdownText).to.equal('Watch again', 'Countdown text should show "Watch again" after ad completion');
+
+    // Verify preview player is playing and keeps looping by checking at intervals
+    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 3000);
+
+    // Check it's still playing after first interval
+    const previewDuration = await testUtils.getPlayerDuration('previewVideoPlayer');
+    await utils.sleep(previewDuration + 3000);
+    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 3000);
+
+    // Check it's still playing after second interval (confirms continuous looping)
+    await utils.sleep(previewDuration + 3000);
+    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 3000);
+
+    await ecp.sendKeypress(ecp.Key.Ok);
+
+    await testUtils.waitForCurrentScreenToEqual('adPlayerScreen', 120000);
+    await ecp.sendKeypress(ecp.Key.Back);
+
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 120000);
+    await testUtils.waitForElementToHaveFocus('skinAdRow', 'Should return focus to home grid', 30000);
+
+    await proxy.pause();
+  });
+
+  // Test Rail Link: TBD - Spotlight Container Ad Loop Test
+  it('Spotlight container ad should loop continuously in the grid @guest @ads', async () => {
+    // Set up ads endpoint mock before launching app
+    proxy.resume();
+    const proxyPromise = adTestHelpers.mockAds([AdType.Spotlight]);
+
+    // Launch app
+    await testUtils.startApplicationAtPage('home', {
+      shouldCreateNewUser: false,
+      clearRegistry: false
+    });
+    await utils.promiseTimeout(proxyPromise, 50000);
+    // Wait for home page to load
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for home page to load', 15000);
+    await utils.sleep(2000);
+
+    await testUtils.jumpToRowIndex('videoTitlesRowList', 2);
+    await utils.sleep(1000);
+
+    // Navigate to spotlight container ad row by ID (hdc_spotlight)
+    const rowItemsContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('videoTitlesRowList');
+    expect(rowItemsContent[0].id).to.equal('hdc_spotlight', 'Spotlight ad row should be at index 2');
+
+    const { value: title } = await odc.getValue({
+      keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.2.title.#CategoryName',
+    });
+
+    expect(title.text).to.equal('The gift of fast delivery', 'Spotlight ad row header should be "The gift of fast delivery"');
+
+    // Verify spotlight ad preview player is playing and keeps looping
+    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 3000);
+
+    // Check it's still playing after first interval
+    const previewDuration = await testUtils.getPlayerDuration('previewVideoPlayer');
+    await utils.sleep(previewDuration + 3000);
+    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 3000);
+
+    // Check it's still playing after second interval (confirms continuous looping)
+    await utils.sleep(previewDuration + 3000);
+    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 3000);
+
+
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await utils.sleep(1000);
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 120000);
+
+    await proxy.pause();
+  });
+
+  // Test Rail Link: TBD - HDC Carousel Ad Test
+  it('HDC carousel ad should display with proper brand elements @guest @ads', async () => {
+    // Set up ads endpoint mock with carousel override
+    proxy.resume();
+    const proxyPromise = adTestHelpers.mockAds([AdType.Carousel]);
+
+    // Launch app
+    await testUtils.startApplicationAtPage('home', {
+      shouldCreateNewUser: false,
+      clearRegistry: false
+    });
+    await utils.promiseTimeout(proxyPromise, 50000);
+
+    // Wait for home page to load
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for home page to load', 15000);
+    await utils.sleep(2000);
+
+    // Navigate to HDC carousel ad row by ID (hdc_row with carousel content)
+    // First, jump to row 1 to see peek row (row 2)
+    await testUtils.jumpToRowIndex('videoTitlesRowList', 1);
+    await utils.sleep(1000);
+
+    // Verify peek row (row 2) has carousel content
+    const peekRowTitleUri = await testUtils.getElementField('adCarouselContainerName', 'text');
+    expect(peekRowTitleUri).to.equal('Give Something Beautiful', 'Peek row header should be "Give Something Beautiful"');
+
+    // Verify peek row poster uri matches carousel poster
+    const peekRowPosterUri = await testUtils.getElementField('adCarouselContainerPoster', 'uri');
+    expect(peekRowPosterUri).to.include('xY5ORmI2BFwNUODkiBGFgT-Background%2520Video%2520Static%2520Image_Poster.png', 'Peek row poster should match carousel poster');
+
+    // Scroll down one row to carousel row (row 2)
+    await ecp.sendKeypress(ecp.Key.Down);
+    await utils.sleep(1000);
+
+    // Validate adCarouselTitle is not empty
+    await testUtils.waitForElementToShowOnScreen('adCarouselTitle', 'Carousel title should be visible', 3000);
+    const adCarouselTitleText = await testUtils.getElementField('adCarouselTitle', 'text');
+    expect(adCarouselTitleText).to.not.be.empty;
+
+    // Validate adCarouselBrandLogo is not empty
+    await testUtils.waitForElementToShowOnScreen('adCarouselBrandLogo', 'Carousel brand logo should be visible', 3000);
+    const adCarouselBrandLogoUri = await testUtils.getElementField('adCarouselBrandLogo', 'uri');
+    expect(adCarouselBrandLogoUri).to.not.be.empty;
+
+    // Validate adCarouselGrid has focus
+    await testUtils.waitForElementToHaveFocus('adCarouselGrid', 'Carousel grid should have focus', 3000);
+
+    // Validate adCarouselGrid has 5 children
+    const carouselGridChildCount = await testUtils.getElementField('adCarouselGrid', 'content.getChildCount()');
+    expect(carouselGridChildCount).to.equal(5, 'Carousel grid should have 5 children');
+
+    // Verify preview video player is playing
+    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 15000);
+    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'finished', 30000);
+
+    await utils.sleep(500);
+
+    // Validate background poster changes when navigating through carousel tiles
+    // Get both initial background poster URIs
+    const initialBackgroundUri1 = await testUtils.getElementField('backgroundPoster', 'uri');
+    const initialBackgroundUri2 = await testUtils.getElementField('backgroundPoster2', 'uri');
+
+    // Store both as initial state (at least one should be non-empty)
+    expect(initialBackgroundUri1 || initialBackgroundUri2).to.not.be.empty;
+
+    // Press right 4 times and capture background URIs after each press
+    const backgroundUriPairs: Array<{ uri1: string, uri2: string }> = [
+      { uri1: initialBackgroundUri1, uri2: initialBackgroundUri2 }
+    ];
+    await utils.sleep(500);
+    for (let i = 0; i < 4; i++) {
+      await ecp.sendKeypress(ecp.Key.Right);
+      await utils.sleep(500);
+
+      // Get both background poster URIs
+      const currentBackgroundUri1 = await testUtils.getElementField('backgroundPoster', 'uri');
+      const currentBackgroundUri2 = await testUtils.getElementField('backgroundPoster2', 'uri');
+
+      backgroundUriPairs.push({ uri1: currentBackgroundUri1, uri2: currentBackgroundUri2 });
+    }
+
+    // Verify each tile has a different background (check if either uri1 or uri2 changed between tiles)
+    for (let i = 1; i < backgroundUriPairs.length; i++) {
+      const prev = backgroundUriPairs[i - 1];
+      const curr = backgroundUriPairs[i];
+
+      const uri1Changed = curr.uri1 !== prev.uri1;
+      const uri2Changed = curr.uri2 !== prev.uri2;
+
+      expect(uri1Changed || uri2Changed, `Tile ${i} should have different background from tile ${i - 1}`).to.be.true;
+    }
+
+    // Press right one more time (5th press) to loop back to first tile
+    await ecp.sendKeypress(ecp.Key.Right);
+    await utils.sleep(500);
+
+    // Get both background poster URIs for the looped state
+    const loopedBackgroundUri1 = await testUtils.getElementField('backgroundPoster', 'uri');
+    const loopedBackgroundUri2 = await testUtils.getElementField('backgroundPoster2', 'uri');
+
+    // Collect all 4 URIs and check if at least 2 are the same
+    const allUris = [initialBackgroundUri1, initialBackgroundUri2, loopedBackgroundUri1, loopedBackgroundUri2];
+    const uniqueUris = new Set(allUris.filter(uri => uri && uri !== ''));
+
+    // If we have less than 4 unique URIs, it means at least 2 are the same (carousel looped back)
+    expect(uniqueUris.size, 'At least 2 background URIs should be the same when looping back (among 4 total URIs)').to.be.lessThan(4);
+
+    await ecp.sendKeypress(ecp.Key.Right);
+    await utils.sleep(500);
+    // Validate autorotate is working (carousel automatically advances without user input)
+    // Get initial background poster URIs before autorotate
+    const autorotateInitialUri1 = await testUtils.getElementField('backgroundPoster', 'uri');
+    const autorotateInitialUri2 = await testUtils.getElementField('backgroundPoster2', 'uri');
+
+    // Wait for autorotate interval (typically 10 seconds for carousels)
+    await utils.sleep(12000);
+
+    // Get background poster URIs after autorotate
+    const autorotateAfterUri1 = await testUtils.getElementField('backgroundPoster', 'uri');
+    const autorotateAfterUri2 = await testUtils.getElementField('backgroundPoster2', 'uri');
+
+    // Verify at least one URI changed (autorotate advanced to next tile)
+    const autorotateUri1Changed = autorotateAfterUri1 !== autorotateInitialUri1;
+    const autorotateUri2Changed = autorotateAfterUri2 !== autorotateInitialUri2;
+    expect(autorotateUri1Changed || autorotateUri2Changed, 'Carousel should autorotate to next tile automatically').to.be.true;
+
+    await proxy.pause();
   });
 });

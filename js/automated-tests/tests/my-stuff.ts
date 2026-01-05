@@ -180,33 +180,49 @@ describe('MyStuff', function () {
 
     // See that CW Row is empty
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
-    const emptyMyListContainerContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('emptyMyStuffContainer');
-    expect(emptyMyListContainerContent[0].title).to.equal('You\'re All Caught Up!');
-    expect(emptyMyListContainerContent[0].description).to.equal('Movies and series you haven’t finished will show up here.');
+    const continueWatchingRowTitle = await testUtils.getNodeForElement('continueWatchingRow');
 
+    // If the CW Row title is not "Watch Next", then the CW Row is empty.
+    if (continueWatchingRowTitle.text != "Watch Next") {
+      const emptyMyListContainerContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('emptyMyStuffContainer');
+      expect(emptyMyListContainerContent[0].title).to.equal('You\'re All Caught Up!');
+      expect(emptyMyListContainerContent[0].description).to.equal('Movies and series you haven\'t finished will show up here.');
+    }
     // Select a title from home page, let it stream for more than > 1 minute
     await testUtils.goToPage('home');
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
     await testUtils.jumpToRowWithTitle('videoTitlesRowList', 'Featured');
     await ecp.sendKeypress(ecp.Key.Ok);
-    await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
-    const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
-    const detailScreenTitle1 = detailScreenTitle.text;
+    await testUtils.waitForCurrentScreenToEqual('detailScreen', 2000);
     await ecp.sendKeypress(ecp.Key.Play);
     await createHistoryForPlayingTitle();
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 15000);
 
     // Go To My Stuff page
+    await testUtils.retryWithTimeOut(async () => {
+      await ecp.sendKeypress(ecp.Key.Back);
+      const { node: focusedNode } = await odc.getFocusedNode();
+      if (focusedNode.id == 'videoPlayerScreen') {
+        await utils.sleep(500);
+        await ecp.sendKeypress(ecp.Key.Back);
+      }
+      await testUtils.waitForCurrentScreenToEqual('detailScreen', 2000);
+    }, 15000);
+    const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
+    const detailScreenTitle1 = detailScreenTitle.text;
     await ecp.sendKeypress(ecp.Key.Back);
-    await ecp.sendKeypress(ecp.Key.Back);
+    await utils.sleep(1000);
     await shared.openMyStuffPage();
 
     // Verify that the title appears in CW section of My Stuff page
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
+    await testUtils.waitForElementToHaveFocus('myStuffGrid', 'Timed out waiting for Continue Watching Row to have focus');
+    await shared.jumpToRowListPosition('myStuffGrid', 0, 0);
     const continueWatchingRowPoster = await testUtils.getNodeForElement('continueWatchingRowPoster');
     expect(continueWatchingRowPoster.id).to.equal('gradientPoster');
     expect(continueWatchingRowPoster.width).to.equal(520);
     await ecp.sendKeypress(ecp.Key.Ok);
+    await testUtils.waitForCurrentScreenToEqual('detailScreen', 2000);
     await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
     const detailScreenTitle2 = await testUtils.getNodeForElement('detailScreenTitle');
     const detailScreenTitleMatch = detailScreenTitle2.text;

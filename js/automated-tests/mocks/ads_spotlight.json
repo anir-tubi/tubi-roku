@@ -1,0 +1,54 @@
+{
+  "_comment": "Mock data for SPOTLIGHT ADS ONLY - Used for spotlight container ad tests",
+  "ads": {
+    "ad_units": {
+      "hdc_row": {
+        "trackers": {
+          "q25": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/view-thru/homescreen/ROKU?id=eWnPstfN3p7z2wn2Dsql&data=cwrobaF8eXS3MSOcwhndfHPpCJY9WiIwiQ3LTciN55-K4bL2pkwMBi69uOOMaxgmWWQovFVOHXo2erAaKBfsXULRJiFQkThYZnQxikY-IXkrYMf7LG5s95LTJKtsboCGUMNC6zi4Fs0qbAkBfH4-u2I0QnaAk7SkzqSHiO_hrUA3daBi7lxyexKr5IbhLWXydhsvdEkxwf06s0yBHMwhfbNcAJr-jBKRfazPW5UGAKPqxcOMK4vVDGI5mWBJQlnJCtxuCRFrwJIHwfEeHTYL2nBUI4zj1RrKbOG-moTZfup8w-m6bv7L_xLNioBFxY9w3jWlBjLnas7nnBZWcXYXtNC5Kip4sDPrcgzH"
+          ],
+          "q50": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/view-thru/homescreen/ROKU?id=eWnPstfN3p7z2wn2Dsql&data=_n77-2vwM3OG1_vwU_khcY_X08CAV7QFVTztwWlRmC_5WXgXSwinyQZybOy2SSofATbTIaWrIHu5awr40cYTWRcoGmPEk7t8Ymn2N1FbgI08fE0M9PiCHyaJ01BUiYAuYA7xXlSoJhnHkp9U8MU6beiNIYTo7rLTUjvqB6h7tJjqVpuCgHtypYX6Zxu_CBSH8_3hUZybPsN6GJLEsW3WEEkS5-7JM2pDN2bRwzhFVM_nrxmLl9i0DlEN8EksiS-b7qSfRbWQlgOPh-K-632vsqwLaIEnelRNssvzb7dH7HoTghvWUeUkvBDj6YOv2yRUrCjs40_cubN2BuLOG7tNFB2o2_guiYSwOORZ"
+          ],
+          "q75": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/view-thru/homescreen/ROKU?id=eWnPstfN3p7z2wn2Dsql&data=pRi8hFazIJN1bf2I6aGNyCQxf0DiXG80En9_qFgUCDWgBSi37InmJsywQDd-_by8D_uzu4gr9jPrE3_m9ql1TQKfGmXY4P7hElLWtJLjxCV_HfwPbyP4Us1AgWJmsffY3_CyBqsjNCT4-Ln-6bGqvRKRcFWjX4c0EuBxfM3NZvNLTDvTNr3qPt0aA51lTtVWMt8P4g2W4rv-2JJMdaNSNlLlflHPK5Z27qZFPP2SuUs3GGMxciUjhYHDnNiIrAFhiJDojHplu_cgUUVLpau4EYdCL4OOSkRU-HuZ2t-Fr11cdempH6x95YIpQAgMI0V7TwVx9EzI5jivr2DEoZ1-bybYg5nn6zdKRmM9"
+          ],
+          "q0": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/view-thru/homescreen/ROKU?id=eWnPstfN3p7z2wn2Dsql&data=2GaNPAu92pMks_n2HEj1KsRSaPat8mf28cBuhJPTo-mKos706bO6ln8nF39TNA745An4T7LzXOXswf8x36HQ3TH-_jyIZtKjd-fc0BwITboljzGvyPGHNt6CS8wJ2vFDTLoNRrF46L5yEcLgC33RNq4uDXTG7UQkltWzZjZlJ1j_dDz8_9Ki7G905146hDhHxjcjqHlpwPwq4MnDuYOmsY1CC0D4IMCf8jJ-3WTEJ2k4pt4qFLolu2fzvZOjgXMYpx584e64z0Ord24lmweV4vBU9PDfXHlMM9hj9WN1PX4cd41CRMqp5q4Hf6gCJGWo2Cl9gkIRcMmv4azw4WPUEd4dalFr_xWr"
+          ],
+          "imp": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/homescreen/ROKU?id=eWnPstfN3p7z2wn2Dsql&data=uzhLZD5Qlnww15AIP3mj6XMMvvwsFJ_eHdls-JbTW7X6xFp6Cbz67lYPJZID2D2eHGs0nWhTOwKWZFW7CKFvJh3iXnGFEFPrZDPFuGopNb_RWYAWFQ0YULyl7iC4-Hu2E0n2ccFjErefpRNdgn2z4T_mxffMHTdiv1NHPrhvWCapF1O6EGfD3p_31PW4qxuXMwIQxiDbhoPVOROZB-Y_PWXMgIGDEJfzkR4madVNV9fSIMz-sv7dSqrZY-r2SKDQWMxHnWi2X9tbhBz4Kuehoi9D-d6R6816VILrMQheQ_wKcezack4V5LjuRGfypAH0L6av279Kkvp-W1PYvKuxgHopBr-SZEmQMziFnRBSwfxmZBPuczk"
+          ],
+          "q100": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/view-thru/homescreen/ROKU?id=eWnPstfN3p7z2wn2Dsql&data=8wxnxOIPkTzpfA22Jw3pGukzdsg1VSzmuzlOMu_xd5uY-cFeNflBb3MvnM0ATJl0924_DftOzKAHU4ndlxczPzxDGFuHAkC7xN49H7erMvkVukf1e0DZj2R5xEoliDfZHEeXCq-8qkQPYIlb4mmSQHdZh2ICqg7eBuYHiGifK3YG1iYkbufMPjjofEs-Xaf2Klgi66UNW9Zr2zygz56LPE_8IeSqQ9zm1Na0Wg43n9yGye2BR_f4f1HkHrnI0pxlhzg4XBob8wJvqBXXSIBeEGphBf6R8G74YpJbUuUZX2fROahncyuSqgu5qQE1_TPEBV4M_NhATYMAPEJzIB4CCPgSJd1BtULov4I9"
+          ]
+        },
+        "ad": {
+          "assets": {
+            "brand_text": {
+              "text": "The gift of fast delivery"
+            },
+            "background_image": {
+              "url": "https://ads-image.production-public.tubi.io/common/aidHash%3Df51ef6ca/z0NMO3AANZmWuTgrRGso70-Walmart_GrinchDomination_Spotlight_BackgroundImage.png"
+            },
+            "poster_image": {
+              "url": "https://ads-image.production-public.tubi.io/common/aidHash%3Df51ef6ca/4EZmOuO6TYk247G8Rm31H7-Walmart_GrinchDomination_Spotlight_Image.png"
+            },
+            "video": [
+              {
+                "duration": 10,
+                "url": "https://ark.tubi.video/v2/e9be02b94c4a59b23ed1aa6fc585225c/95d3299f-1927-4a29-9fdf-beeb06d70d95/1920x434_3400k.mp4",
+                "bitRate": 2688714,
+                "height": 434,
+                "width": 1920
+              }
+            ]
+          },
+          "id": 195886
+        },
+        "valid_duration": 60,
+        "rendering_code": "hdc_spotlight"
+      }
+    }
+  }
+}

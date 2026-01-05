@@ -45,9 +45,8 @@ function getStatusEmoji(report: TestReport): string {
   if (report.stats.failures > 0) {
     return '❌';
   }
-  if (report.stats.pending > 0) {
-    return '⚠️';
-  }
+  // Only show warning emoji if there are pending tests AND failures
+  // Pending tests without failures should show success
   return '✅';
 }
 

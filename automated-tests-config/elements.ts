@@ -93,6 +93,60 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentAreaParent.#ContentArea.#CategoryGridList.#FeaturedRowList',
   },
 
+  /** Skin ad row component in CategoryGridList */
+  skinAdRow: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentAreaParent.#ContentArea.#CategoryGridList.#skinAdRow.#rowList',
+  },
+
+  /** Skin ad brand logo (e.g., Walmart logo) */
+  skinAdLogo: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentAreaParent.#ContentArea.#CategoryGridList.#skinAdRow.#infoPanelGroup.#InfoPanel.#infoPanelGroup.#titleGroup.#titleImage',
+  },
+
+  /** Skin ad description text (e.g., "The gift of fast delivery") */
+  skinAdDescription: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentAreaParent.#ContentArea.#CategoryGridList.#skinAdRow.#infoPanelGroup.#InfoPanel.#infoPanelGroup.#descriptionPanel.#PanelGroup.#DescriptionTextGroup.#Description',
+  },
+
+  /** Countdown timer text in skin ad row */
+  skinAdCountdownText: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentAreaParent.#ContentArea.#CategoryGridList.#skinAdRow.#CountdownGroup.#CountdownTimerParent.#TextAndIconParentGroup.#TextAndIconLayoutGroup.0.#CountdownText',
+  },
+
+  /** Ad carousel title text */
+  adCarouselTitle: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#adContentGroup.#adRowlistCarousel.#carouselLayout.#titleLayout.#title',
+  },
+
+  /** Brand logo displayed in ad carousel */
+  adCarouselBrandLogo: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#adContentGroup.#adRowlistCarousel.#carouselLayout.#titleLayout.#carouselLayout.#sideImage',
+  },
+
+  /** MarkupGrid displaying ad carousel items */
+  adCarouselGrid: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#adContentGroup.#adRowlistCarousel.#carouselGrid',
+  },
+
+  /** Ad carousel container category name (peek row for carousel validation) */
+  adCarouselContainerName: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.2.title.#CategoryName',
+  },
+
+  /** Ad carousel container first poster (peek row poster for carousel validation) */
+  adCarouselContainerPoster: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.2.items.0.#poster',
+  },
+
   /** Component on the Movie Screen that we can pull content for the Grid from */
   /** movieScreenRowList (auto-updated) */
   /** movieScreenRowList (auto-updated) */
@@ -179,6 +233,11 @@ const elements = typeCheckElements({
   backgroundPoster: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#BackgroundGroup.#topRightContentPosterGroup.#poster1.#BackgroundPoster',
+  },
+
+  backgroundPoster2: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#BackgroundGroup.#topRightContentPosterGroup.#poster2.#BackgroundPoster',
   },
 
   /** Component contains side nav menu items. Useful for seeing which page is showing or to switch page is showing */
@@ -1032,6 +1091,24 @@ const elements = typeCheckElements({
   videoPlayerScreen: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen',
+  },
+
+  /** Ad player screen */
+  adPlayerScreen: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#adPlayerScreen',
+  },
+
+  /** Skin ad brand logo displayed during ad playback (e.g., Walmart logo) */
+  adPlayerSkinAdLogo: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#adPlayerScreen.#adDescriptionPanel.#PanelGroup.#QRParentGroup.#QRBackgroundSpacing.#QRContentParentGroup.#DescriptionTextGroup.#TitleGroup.#TitleImage',
+  },
+
+  /** Skin ad description text displayed during ad playback (e.g., "The gift of fast delivery") */
+  adPlayerSkinAdDescription: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#adPlayerScreen.#adDescriptionPanel.#PanelGroup.#QRParentGroup.#QRBackgroundSpacing.#QRContentParentGroup.#DescriptionTextGroup.#Description',
   },
 
   /** linear video screen */

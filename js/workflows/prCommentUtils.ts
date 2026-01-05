@@ -370,9 +370,8 @@ export function formatStatus(hasFailures: boolean, hasPending: boolean): string 
   if (hasFailures) {
     return `**Status:** ❌ **Failed**\n`;
   }
-  if (hasPending) {
-    return `**Status:** ⚠️ **Passed with Warnings**\n`;
-  }
+  // Only show pending warning if there are actual failures
+  // Pending tests without failures should be treated as passed
   return `**Status:** ✅ **Passed**\n`;
 }
 

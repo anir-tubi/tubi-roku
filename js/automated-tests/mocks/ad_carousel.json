@@ -1,0 +1,83 @@
+{
+  "ads": {
+    "ad_units": {
+      "hdc_row": {
+        "trackers": {
+          "q25": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/view-thru/homescreen/ROKU?id=Ms8B5qijw4K16NXyTSMo&data=D3gJadLqNLlKw3eDgDJL9uatpwUOxUA4_83kQShbQ4J41NbKH2s66d4ozkzbVAyYIhoVs2TA3z9rjQx57OjNLbiUcast3zSODUAuy3g6YOEYj7EfjOjcqGIXDO4VMgj51KkxBAK20FUf563rnNWZAx3x-mLhamjArBuIaIvtNakSv6dgHwvkj0RBukDyQN6AoFQnKYvSr0dV7WssCE5rBno02wRzaQGJhvO1zxEiWabN8bUcFcBcDK9ak5IiEpCCMcyUbeGJcLSWNO2p7NlYpSEidaS8j_ikwN1x4y1gZXn-y8kfAQLrm2e_Y-fZfGk8oLP_EERtmyY2zz6WJjp9cQjoc05xpKcjcws"
+          ],
+          "q50": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/view-thru/homescreen/ROKU?id=Ms8B5qijw4K16NXyTSMo&data=mZmjLnn7RBSXap51xkQ_YMZG2f2P57F2o22SyZMF7gv6EhZPedDXXOxDb-CjzQjGCzDcwD4go6FHdABG3qRl7JYK7MtA1hokKQXlMugw6hUXOz-DNKTmvhK_nd5oMTCOsKaT6V0wjBNRoszkTOnreoppRvRhVwCyJ--mUQ1UMNjadjHltPiZDb5wj7GgzZ-aQ1uHo4CCTVNxSUWGG-c6gt38zWFLylUly7b59MMnLeI88G_IEjBy80tGpJwZbyIUGpic1sROYaEljfStxloXKuKboGpQ9zk8_so4lg6L3yGcHM4V0Y7MvTqdbYoikwFLezgTU8gbaahuF9LoYkT_kl5xp8DwEpNIM0A"
+          ],
+          "q75": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/view-thru/homescreen/ROKU?id=Ms8B5qijw4K16NXyTSMo&data=OV-4pu8n-A2zaY8Hsj97PXG-CIzTvSDn-A_Pzs0oPxm4DL3-UOh-KYkZv-mgqCvGhgETsCa1qQXdhGTJHxXBQldxCr68wT6Q3f1Xh0IPY50z9-v3kRlY0Ch3I3M0hdKDmFGBCGnysp8xk05R7fEn5fScFVHIpf7hdGVwX0icu0NI4LIdkmOKPCIPELTOOjMfriaxJhrDRaDSJhE8OQMLK2ScGYOEzajoRRTBmWoHq6J7H78-HWI0UTQaA5V0D3uX1KlxwDyeTXsznBU3frRu4nqnijuQcABVq6PtGeE5HYjfkA5kdJXf7YATQWD8TH3MRv917T8-yz5gjGMAHemUIWwwE0gSILShI7g"
+          ],
+          "q0": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/view-thru/homescreen/ROKU?id=Ms8B5qijw4K16NXyTSMo&data=ZIoeyAzNxZ39ycwBn50jVolh8dzjp-MqWQKGG1_b5HqLj88eLrLNuUDc3NcNTITiK-5F2ol2lk7zpvuOOzvf8F1yN4JDGxqDpCCZR5YMFBVgPvEhXq5QUy2m-eBmxV-tRGt9BkxY5H0Uk27pmg3jdWPV8YfCQ9iXLMeDZoxR3LHRzqlTsuqFxaMg8nks66F3p4xqk9312ha-yZiSc4a7_oicse3TfcJ8KICHnI8nxwNtJMih68h3ejGuyzEBhuXUstFYkZbfa-aJdvGpn91Wxpuz1Gl8Bfb5Jy2qz7c_A2Ed-1Npl_AauMI19R15_bG1yRRC6b5zaovUFxjIRGiVV-O97dkXjvc"
+          ],
+          "imp": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/homescreen/ROKU?id=Ms8B5qijw4K16NXyTSMo&data=Ic0HB57x0wm4Cx4ynxZmDQGL1BP9j2Zw-m3sh83HIP-PlNkEwDxlOaDjoYrHXbUkuIH57J6PtAc-5RreMMDu_1uIh4o9d6vZmrn46c_o5TGyZU5JIa-1Q7Jb1VnNWP3PB95JjwwOj2yyvTe9vNEaF5gm8AgHUBUGbsxbU9iK78ejI5Zudu3zdkx1HAzRC4cQQR5Cwr-wJn8VO8RlCRm9mUMJ9UFN03hOt0kASWd9An-aYq2hJuwPSF_5Zd_QC0T-ohWhPAW-9msc3kZd0n8b_TCteIU5AnENEZRpt1mfkXBOI53Ma1hNgFwY_Jh0Mc1HJoteZpo0rH4IKUEMtues2OV3yu3LS9a3yDQl5L7n-BSir4Yj5A"
+          ],
+          "q100": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/view-thru/homescreen/ROKU?id=Ms8B5qijw4K16NXyTSMo&data=SgfPPKQ_oaIsdfF-DdDFWZ9ErH6V_pE2ZEchV_TL5NcbXyOLHImD2bqrSihKJSzzfBp68Zg6xCvz2euWA4RVcXvsaalSjJLJbgftzrLu3vpWaxd5mGsYIjn8NZ1AdBp7TJ6REh8KudY1wI87GqJmrOL0Ob0BMa2Tl27noZHzZNYhpUtUq7oF2OFPmTb6T9yDyuCPnZCI1bfMW6jWgNUKH_C2Tcq-O6UBNfj0cOxcZU1xSUVJUNfzz4Pk5IcniKfT9Va_5tPGD9_86urwCRVwKDgudBaK-CAN_KHNyq7JptE23IY8f5T4y4vPDhibKh6yvrHMznxfWqMQhhFp_VmD69_xun3MBVDaGKA"
+          ]
+        },
+        "ad": {
+          "assets": {
+            "background_3": {
+              "url": "https://ads-image.production-public.tubi.io/common/aidHash%3Df51ef6ca/xZvggdcpxUSRJrVtOO0twT-Background%2520Image%2520Tile%25203.png"
+            },
+            "poster_image": {
+              "url": "https://ads-image.production-public.tubi.io/common/aidHash%3Df51ef6ca/xY5ORmI2BFwNUODkiBGFgT-Background%2520Video%2520Static%2520Image_Poster.png"
+            },
+            "tile_4": {
+              "url": "https://ads-image.production-public.tubi.io/common/aidHash%3Df51ef6ca/dxqZ7cEqrzLCCcGYQlnUmf-Tile%25204.png"
+            },
+            "tile_1": {
+              "url": "https://ads-image.production-public.tubi.io/common/aidHash%3Df51ef6ca/FlIOtsy0Q84LfFaJk2JzZk-Tile%25201.png"
+            },
+            "background_4": {
+              "url": "https://ads-image.production-public.tubi.io/common/aidHash%3Df51ef6ca/8F4lvHcOp1bry9w0QmKGAC-Background%2520Image%2520Tile%25204.png"
+            },
+            "background_1": {
+              "url": "https://ads-image.production-public.tubi.io/common/aidHash%3Df51ef6ca/zJTRjCsIlcSDdI2xfunVdM-Background%2520Image%2520Tile%25202.png"
+            },
+            "brand_logo": {
+              "url": "https://ads-image.production-public.tubi.io/common/aidHash%3Df51ef6ca/Huk2ppx5IHEyZ1QEBSRU3g-Sephora%2520Brand%2520Logo.png"
+            },
+            "tile_2": {
+              "url": "https://ads-image.production-public.tubi.io/common/aidHash%3Df51ef6ca/YzH666MK9gqJsJzio5WyAE-Tile%25202.png"
+            },
+            "background_2": {
+              "url": "https://ads-image.production-public.tubi.io/common/aidHash%3Df51ef6ca/KKLGUwEk6h2cXFR3rZogoX-Background%2520Image%2520Tile%25202.png"
+            },
+            "tile_5": {
+              "url": "https://ads-image.production-public.tubi.io/common/aidHash%3Df51ef6ca/Ftff18JGIVVYmr9hilSGbS-Tile%25205.png"
+            },
+            "brand_text": {
+              "text": "Give Something Beautiful"
+            },
+            "tile_3": {
+              "url": "https://ads-image.production-public.tubi.io/common/aidHash%3Df51ef6ca/iw8zJRRLnFObIGIMmAP7Sl-Tile%25203.png"
+            },
+            "background_5": {
+              "url": "https://ads-image.production-public.tubi.io/common/aidHash%3Df51ef6ca/CRpg5uqyqZ6up9nAeU9Ndj-Background%2520Image%2520Tile%25205.png"
+            },
+            "video": [
+              {
+                "duration": 10.01,
+                "url": "https://ark.tubi.video/v2/cc3650210ecd8d2476447a2452d4a0ab/7ec8add2-9b5e-48e1-88c3-114474327f79/1920x594_3400k.mp4",
+                "bitRate": 2931535,
+                "height": 594,
+                "width": 1920
+              }
+            ]
+          },
+          "id": 194629
+        },
+        "valid_duration": 60,
+        "rendering_code": "hdc_carousel"
+      }
+    }
+  }
+}

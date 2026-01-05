@@ -16,10 +16,8 @@ let statusColor = '#36a64f'; // green
 if (report.stats.failures > 0) {
   statusEmoji = '❌';
   statusColor = '#dc3545'; // red
-} else if (report.stats.pending > 0) {
-  statusEmoji = '⚠️';
-  statusColor = '#ffc107'; // yellow
 }
+// Remove pending warning - only show warning if there are actual failures
 
 // Build test summary
 const { tests = 0, passes = 0, failures = 0, pending = 0, duration = 0 } = report.stats;

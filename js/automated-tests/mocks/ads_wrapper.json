@@ -1,0 +1,98 @@
+{
+  "_comment": "Mock data for WRAPPER ADS ONLY - Used for autoplay wrapper ad tests",
+  "ads": {
+    "ad_units": {
+      "homepage_video": {
+        "trackers": {
+          "q25": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/view-thru/homescreen/ROKU?id=eWnPstfN3p7z2wn2Dsql&data=nwPZsGIBR-jmI3pPYdzs0P16MQuxXK5-LVEatF0r6IPjCekHkzfcrx2FrhBFIshQPwV98rt2pjNdpt8nX46CO82GKzj-F4SErsB7ZAKzVZp_VFnVlCncIjF5N2PcTCC89Z9QwPfRWvhSGyfsHlwcPCQOX8kDceu1VvBeM_0IR_heBLEv7_NFya0PrDAqq9gEaIWB5oe1i7M2z5JAlkx66X36k320TUTkG_PP4scxLqGATKFZmjr9QE7zD4sn_PjIZ8v-3h-Udjt_P-ZJ86IEuLl81bHY0s4SH897MMaWplOq4CFjdhzmBpYAxkJXyCdLHZdNC9D9hIGPJPsUhu_22pZFRga28WWEzYEP_0wKZyo"
+          ],
+          "q50": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/view-thru/homescreen/ROKU?id=eWnPstfN3p7z2wn2Dsql&data=25fqMVO9C9_RrSIyH2JzW8F1bWqYwLA-JAYvilAHooJHYCATd1-uELw3TZVfScufYUL82egw2pPb4rfK7RuoNi201iitafPoFk3U6nP9M0VaOKjvdy_CluC5ZQrT-urcTiTUV1iKpb3rKZYxlDCKxlfYMekhD-pj6SIP4FWFRfXdBSJ_rCKnnLBvpxZ5zAF1GvUrvE3noRZqcJlMPWYPcZ87ERnKClSoq5zvdBZUha3VwDx0BnZmAqjCLyO6tRrjf5nG1kEQ5ieXBb179lL-FRUDkiw2PAiQWHEvScPMjyK5uLIc261-RN03AQvkxOKmAr_OmHoeVaL22UywE8vJX0kGbFVVBlcEMNM55EabZIA"
+          ],
+          "q75": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/view-thru/homescreen/ROKU?id=eWnPstfN3p7z2wn2Dsql&data=mbtjHUGXxHo1EVjKLQTK4pCF0Y9ownMU6K2BdIxQ59qFF2jgegcBUGTwUFPDCQuuDervCLk8ldUVUwJJCFW8sa9ttI7U8XG124foQxUnHfwOAx9we9kyQpzZf9Jc8HzloPNWuIgXKizsCqvaMtRrOUtDQA5NTCJynUEIBZPmWZw4-DjwF9CHiL8EOJsp1kITCGMa6yRIlteva0NXFuAD_tghdYDBuZC68tCAtcp0vrK5G15ESXWOK0lhFR057r_TKTx08gWb4wMgCE9PhSdN8hWMUqYBAhjwJo8McjX1BBIXiBd7KE5-D9ROFekm11-pz8AQeYkEeuimjMVgi9xJldOgKQvprIpmJsbQ2JZxjM4"
+          ],
+          "q0": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/view-thru/homescreen/ROKU?id=eWnPstfN3p7z2wn2Dsql&data=XQOylfNRjnJXdbOXHLo_cKPDq84IIKGEk6JoyUmLfusUnKP2QqVPTJ5rsIx7ZeJLwsnlFV_CEBGVv1sXk8YOPCy6LA2JFIT0-etESq-Ie8JqlYrv_aAYerMM95zuL-crjN9ys3SLBLU2Kvbq15oSAMgq-q4Dw8byuTbKdkW6sNOpbobhigyStRZwmj4PJ1triGOFZrVEytv_QMCwbPFleQ51Oog2hoVsDznLRsy-3FaZZ1Yjre_hFGd9NT94iWdy9bBr536Ax7Xax5RQIcR5ncZv14E3FZfIBUCthvukiyKHT4y6-QoBOBL1Q7VY4NKBH7z7ry3r36M-NtyG0uDqo6pd9wbW2Gx6XroCUDI"
+          ],
+          "imp": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/homescreen/ROKU?id=eWnPstfN3p7z2wn2Dsql&data=C_MKQVzzWh5cjSuzuC_SfyLc9TYrh8QO1KXkw4DpnjmlMb3h-wa6JaZOdGGUMq6hPxUYuQrgknheP7qC4TgRwT24BdYD-WAXGFKuILCXNzlKhZJ6VXHiz1RJh_LDgv4aV7IOIybYnEK3sMHtI0zf2YxOMoyEwpzcl2pnfQWZvTdzPP3aMNWdPaw09jccKCN87ujt70wgbS8aTWu6Hu0zEMGzq3_iGqZ3YL2zFLFlqHV1R9nHw6kGJ722z9N1wYBEhrAjf2AkxOOUQvN-YiqRfnd3W5_ukyk8fvS30iuNSNkBrUhM4rXRq19Y4qRCeo4Q87XyfBNAi7GFjq8KHjbRgD-MNA4oe6BrFdbRCfEv-Z1RVYjHymaYbgo"
+          ],
+          "q100": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/view-thru/homescreen/ROKU?id=eWnPstfN3p7z2wn2Dsql&data=f2U_aoMXM9CYpccjdIP7QrfCH5c75YMgsAcfzSngq_hwdIpQa45m66FaPVMJ9nY192Gqck0y_eg-sR1KnAKmwlBFU_llqJXdtsuJAttO7vRAVp9VB04JkPcBu74ZIrTWH1nG7CuoP24mMK9cof_VK7zzr9kgrG8ocDCYONeli_5gDIsT3qXcbj19v2j5_YzTOMAYxIziQ4Y4M57Olkf4_cMwV7h1Pu6y1sLRz1toYyo1UC0hYchVD-YpB0br6l9nDV8E2EIcSVqy3i5J8HR6B4wDs0qcOo6UHXN9D5XnDhM9_Vp0l-W4aHBb6Asd7tpIUfhXzTT1FeYu6waTpllCZtqDYS07XvSAHknEODY8n_A"
+          ]
+        },
+        "ad": {
+          "assets": {
+            "poster_image": {
+              "url": "https://ads-image.production-public.tubi.io/common/aidHash%3Df51ef6ca/KJRYZSQ6HHx84yuv1FOVjG-Walmart_GrinchDomination_Wrapper_Thumbnail.png"
+            },
+            "video": [
+              {
+                "duration": 30.058,
+                "url": "https://ark.tubi.video/v2/45c4d7aa58db359b2ccf0e2e912fd6df/de039c8a-4637-4d85-a7c0-1696edc0807d/1920x1080_3400k.mp4",
+                "bitRate": 2803231,
+                "height": 1080,
+                "width": 1920
+              }
+            ]
+          },
+          "id": 195059
+        },
+        "valid_duration": 60,
+        "rendering_code": "wrapper_video"
+      },
+      "tubi_app_homepage": {
+        "trackers": {
+          "q25": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/view-thru/homescreen/ROKU?id=eWnPstfN3p7z2wn2Dsql&data=6zYbSgKsErodkxqSn7qmuXoOgNO653kqqUiFffz67iYakTYt-AUb6YJX0NDPjbQZjrdlALqdNwVOqUg0_wgSGRoSX8mLH-RS-u98BKShqR36RZkMBoJkMhEioe0voiy7aJD5Eb1aizNmORgMi4et3jQSGhN5Zsy-H9pBYVNVuWwt_v1z00m9NSfIH2K-2dtA_6II3FT2ij2UCHA7Xxe1va9mdmsZnk5YvdzLCtaK86xlEquRlnRTGGdYJUFtnh7QwX0aiNdB_Ays6A_EmKTflsaoLv6UhkrDqVcbhh2XOFt5FFPXqTzETeCJrteZlryKtgkI8euA4IiAv5xNx-dPFBK3UNUUtU0yj0UR0dys"
+          ],
+          "q50": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/view-thru/homescreen/ROKU?id=eWnPstfN3p7z2wn2Dsql&data=TyzpWBUuNVnztbihVyJdwjBOu8QDGt6GSg67ShlzxsRsxwkdaNO0TTqC8J6G6CtgMzEpqNqUUzEmv67iVsXEhUORBsyYpf9IzDO941K8DqfYWLs9LpFXZZXvEcNAtLwPk6eJxi3zFViFvMgK_7FmPQFu9mGFw6iE0G6lg12lKbYbUiw1TfrdKayrcwnxdByWkVrJ3Wu_tPAH91lQqFcW70TqUrY6XJkjQGggW0N-kahMdgGU94oqqaEx1ue3lUshCd-0gAy-68fa8fpE-Gv9aytJJ2s3ah47AfKTbFgUPa3ZXSflcgjShB3IlcjBScPzm-mDQ7uGCECm9O8wUq2vhnWjqaBsj9NdEL0JvFNQ"
+          ],
+          "q75": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/view-thru/homescreen/ROKU?id=eWnPstfN3p7z2wn2Dsql&data=uqhsdJ_X1vWO4cVIXyJIvRL8Uo3hQQEfSbVxmFItaeB5uKaWEGjxz6H_nhc9qLNDURMMVrBV9ICoTK6mwNAFZ7dOFl3x70FTxh39qEiig8MdX0rVm9uqcDK0KW51SMuDQgaNvkM07Vp1bxs9_lXfINFa6_MnDpmuZg1ZLOe9BCn3jRdBoZswQfGQTPruPhpksmn4RUHp-RJQt1vePBPCgIWazXLQFANMf9GAM4rP6zsqkRvh9vRfXgEUKsJhvMmVowaFGPsX_8NA-iyK30-T3Q33edWTCd1FyZwYt2kdmn4gE3LSJrq-mGH_S-bTa6iEawn0rmWRWNGDNNLU_Qi9T4-ivOZbEY_CTYpxQKoR"
+          ],
+          "q0": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/view-thru/homescreen/ROKU?id=eWnPstfN3p7z2wn2Dsql&data=j2o6MiyGdaeQ70v-fKcXp77sn2Ayu3HXCn5xfZIU1LcQNYHINO8Kes_xeZFDPcjvgRMjYVW5mhhz-g_YgHEzlJ7WGCdkX677m2MtLpdM4UThAAkTIJbwmT3XLeenO_OO_qG2oagO5W_iLxX3jum3ujJrUGuSzpVoOZlBteJNen0QkhewYJ10t1QnMiIlh87zKBHyzJvxWAWZyoDce7JSDNRYat7ZAHzPokFgqc0l3OJ_9v8NE0blimhabikPjiN2O_zmMn9FJ95xBF3KhdS3CHdVSTMstb6MuQyjJHs54sTPMkagcBqCLJpdjnIEh74JKqqMY2APetJyRSBVmM_JZIOiR5Tl457nvN6T"
+          ],
+          "imp": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/homescreen/ROKU?id=eWnPstfN3p7z2wn2Dsql&data=7cPfsOaiQ5uLyS9weFD2b3QVl9Cp8uOx_4h7T_Lt1Tk6ICt3B3qXkciAKgRL_rYpGagz8SU35Xfq4ycvonRc6nNy0-dwFaa4yqFsVAnYdMwxPEWHJsZsZfqNiIXxx0oQ8EP-DCOUaXFJYeOncbUfrA7sJnm1h8HwhFnTklff8DbfLPjFPwNH6iXhppln7gZ6rJHR8y5CEXlyZo6FNrBqFfhS0i-eIunRwpQgeASWejia0XliK3zJ1iW9ajTaXNJJNqs40uuo1Fr0M9_u7J4VScgYm6pgpMeoo4OoXHzoWG7hBYRe8X_6ZNWPQP2nGVo-RR-dkDzUv3bt7xnIVT1n8mDBPgm2j8cZ3gzylN2IMFOnz6SKPhGcumk"
+          ],
+          "q100": [
+            "https://ads.production-public.tubi.io/pixel/v3/spotlight/view-thru/homescreen/ROKU?id=eWnPstfN3p7z2wn2Dsql&data=dhwyYJIYDKqqus75apZp1ruKGT0_LgFDG60z-SCQDM_Uy6-EV7qeNnulY_IFqddGtfvFGDrYznG-6pF1n9iMqYyQnn2vlUELjFwy1Ktdqmo7S03p0ttRGZ2vhYIprCWF5U36hpqy5o4Lpe6-oBuMi2nm9BWVscedZeHrOp3bYqQGSAKSoGv4553jLSe94rExoHYIoOej7JXhnTC1RR_9LurrCrJPBqM3jF1RMf52tYBFWlyfi3bXhO3WtgGS6jYb4NXaDHo3hf2r5oHZOatrzC3rme0SyjDsi682cFxycNJuRVvquTiH-kfB9dYhvaAGMW56HHtGY2dS_JocOhEfFyOQOv1bqrW5Sv1eZ0d1"
+          ]
+        },
+        "ad": {
+          "assets": {
+            "body": {
+              "text": "The gift of fast delivery"
+            },
+            "logo_url": {
+              "url": "https://ads-image.production-public.tubi.io/common/aidHash%3Df51ef6ca/uk4SGxzBW3GgdijiTBi0gB-12%253A16%2520most%2520recent%252C%2520Brand%2520Logo.png"
+            },
+            "video": [
+              {
+                "duration": 10,
+                "url": "https://ark.tubi.video/v2/85061b2b6f24ca4c8d86e4556376c83f/988b9f7f-dd41-4595-985d-bda56a84cb4f/1920x1080_3400k.mp4",
+                "bitRate": 2796667,
+                "height": 1080,
+                "width": 1920
+              }
+            ],
+            "title": {
+              "text": "Brought to you by"
+            },
+            "main_image": {
+              "url": "https://ads-image.production-public.tubi.io/common/aidHash%3Df51ef6ca/mtAkavFfAIQEx8enLCXftH-Video%2520Poster%2520Frame%252C%2520Still%2520Image%25201.jpg"
+            }
+          },
+          "id": 195058
+        },
+        "valid_duration": 60,
+        "rendering_code": "wrapper"
+      }
+    }
+  }
+}

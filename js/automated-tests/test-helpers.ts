@@ -1426,6 +1426,56 @@ class TestHelpers {
     return [];
   }
 
+  /**
+   * HELPER: Finds and navigates to content with/without video preview
+   * 
+   * PATTERN: Combines findContentPositionInRowListThatContainsVideoPreview + jumpToRowListPosition
+   * 
+   * USE WHEN:
+   *   - Need to find AND navigate to content with/without video preview
+   *   - Want automatic error handling if content not found
+   *   - Want consistent sleep timing after navigation
+   * 
+   * @param rowListElementId - The row list element to search in
+   * @param hasVideoPreview - Whether to find content with or without video preview (default: true)
+   * @param maxRowsToSearch - Maximum number of rows to search (default: 5)
+   * @param sleepAfterJump - Time to sleep after jumping to position (default: 2000ms)
+   * @returns [row, column] position that was navigated to
+   * @throws Error if no content matching criteria is found
+   * 
+   * @example
+   * // Find and navigate to content WITH video preview
+   * await testHelpers.findAndNavigateToVideoPreviewContent('videoTitlesRowList', true, 5);
+   * // Now focused on a title with video preview
+   * 
+   * @example
+   * // Find and navigate to content WITHOUT video preview
+   * const position = await testHelpers.findAndNavigateToVideoPreviewContent('videoTitlesRowList', false, 5);
+   * // Can use returned position if needed: const [row, col] = position;
+   */
+  public async findAndNavigateToVideoPreviewContent(
+    rowListElementId: string,
+    hasVideoPreview: boolean = true,
+    maxRowsToSearch: number = 5,
+    sleepAfterJump: number = 2000
+  ): Promise<[number, number]> {
+    const position = await this.findContentPositionInRowListThatContainsVideoPreview(
+      rowListElementId,
+      hasVideoPreview,
+      maxRowsToSearch
+    );
+
+    if (position.length === 0) {
+      const previewType = hasVideoPreview ? 'with' : 'without';
+      throw new Error(`Could not find content ${previewType} video preview in ${rowListElementId}`);
+    }
+
+    await this.jumpToRowListPosition(rowListElementId, position[0], position[1]);
+    await utils.sleep(sleepAfterJump);
+
+    return position as [number, number];
+  }
+
   /* ═══════════════════════════════════════════════════════════════════
    * DETAIL SCREEN HELPERS
    * ═══════════════════════════════════════════════════════════════════

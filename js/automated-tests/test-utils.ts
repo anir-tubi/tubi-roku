@@ -65,6 +65,7 @@ enum ScreenIds {
   'signInScreen' = 'signInScreen',
   'videoPlayerScreen' = 'videoPlayerScreen',
   'linearVideoPlayerScreen' = 'linearVideoPlayerScreen',
+  'adPlayerScreen' = 'adPlayerScreen',
   'epgScreen' = 'epgScreen',
   'emailVerificationScreen' = 'emailVerificationScreen',
   'forgotPasswordProcessingScreen' = 'forgotPasswordProcessingScreen',
@@ -407,6 +408,10 @@ class TestUtils {
 
     if (args.isAutoplayEnabled !== undefined) {
       constantsUpdates['deviceInfo.isAutoplayEnabled'] = args.isAutoplayEnabled;
+    }
+
+    if (args.disableSkinAds !== undefined) {
+      constantsUpdates['settings.disableSkinAds'] = args.disableSkinAds;
     }
 
     if (constantsUpdates && Object.keys(constantsUpdates).length > 0) {
@@ -2463,7 +2468,7 @@ const nonDeeplinkPages = ['home', 'search', 'settings', 'myStuff', 'movies', 'se
 /**
  * List of element ids that can be used with our video player helpers
  */
-type VideoPlayerElementId = 'videoPlayerScreen' | 'previewVideoPlayer' | 'previewVideoPlayerScreen' | 'linearVideoPlayerScreen' | 'foxPLayerElementID' | 'inlineVideoTilesPreviewPlayer';
+type VideoPlayerElementId = 'videoPlayerScreen' | 'previewVideoPlayer' | 'previewVideoPlayerScreen' | 'linearVideoPlayerScreen' | 'foxPLayerElementID' | 'inlineVideoTilesPreviewPlayer' | 'adPlayerScreen';
 
 
 enum ContentRatings {
@@ -2511,6 +2516,9 @@ type StartApplicationArgs = {
   noAds?: boolean;
 
   triggerFailSafe?: 'gameDayExperience'
+
+  /** Disables the skin ads feature */
+  disableSkinAds?: boolean;
 }
 
 
