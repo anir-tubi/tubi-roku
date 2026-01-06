@@ -288,6 +288,14 @@ Function renderButton(item as Object, isPrimaryButton as Dynamic, itemHasFocus a
     m.buttonBackground.width = buttonContentWidth + (padding * 2)
     m.buttonBackgroundFocused.width = m.buttonBackground.width
     m.elementsGroup.translation = [padding, m.top.height / 2]
+
+    if isNonEmptyString(item.iconUrl) = true
+      if item.rightAlignedIcon = true
+        m.iconGroup.reParent(m.elementsGroup, false)
+      else
+        m.elementsGroup.insertChild(m.iconGroup, 0)
+      end if
+    end if
   else
     m.label.text = ""
     m.labelFocused.text = ""
