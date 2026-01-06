@@ -797,29 +797,7 @@ Function onLineOneDataChange(msg)
 
     ' handle expiration warning
     expirationWarningPresent = (m.expireWarning.getParent() <> invalid)
-    if isNonEmptyString(data.availabilityEnds)
-      datetime = CreateObject("roDateTime")
-      datetime.FromISO8601String(data.availabilityEnds)
-      endSeconds = datetime.AsSeconds()
-      nowSeconds = CreateObject("roDateTime").AsSeconds()
-      daysRemaining = ((endSeconds - nowSeconds) \ 86400) + 1
-      ' BIZ REQ: only titles expiring in the next 2 weeks should display message
-      if daysRemaining > 0 AND daysRemaining <= 14
-        if daysRemaining > 1
-          m.expireWarning.text = getTranslation("metadata_expiresIn_plural", { days: daysRemaining.toStr() })
-        else
-          m.expireWarning.text = getTranslation("metadata_expiresIn_singular")
-        end if
-
-        if expirationWarningPresent = false
-          firstLineGroup.insertChild(m.expireWarning, insertIndex)
-        end if
-
-        insertIndex++
-      else if expirationWarningPresent = true
-        firstLineGroup.removeChild(m.expireWarning)
-      end if
-    else if isNonEmptyString(data.programTimeLeft) = true
+    if isNonEmptyString(data.programTimeLeft) = true
       m.expireWarning.text = data.programTimeLeft
 
       if expirationWarningPresent = false

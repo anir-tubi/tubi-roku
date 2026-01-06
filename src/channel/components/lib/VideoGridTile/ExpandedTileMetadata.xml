@@ -45,7 +45,7 @@
       <LayoutGroup
         id="firstLineGroup"
         layoutDirection="horiz"
-        itemSpacings="[10]"
+        itemSpacings="[12]"
         vertAlignment="center">
         <Poster
           id="channelLogo"
@@ -69,17 +69,19 @@
         <LayoutGroup
           id="subHeadlineSuffixGroup"
           layoutDirection="horiz" />
+        <Badge
+          id="sotBadge" />
         <Group
           id="Rating">
           <Poster
             id="RatingBackground"
-            height="30"
-            uri="pkg:/images/rating_background_video_tile_$$RES$$.9.png"
+            height="32"
+            uri="pkg:/images/rounded-rect-rating_background_video_tile-$$RES$$.9.png"
             loadDisplayMode="scaleToFit"
             loadSync="true" />
           <Label
             id="RatingLabel"
-            height="30"
+            height="32"
             width="0"
             numLines="1"
             wrap="false"
@@ -97,12 +99,9 @@
           width="36"
           loadDisplayMode="scaleToFit"
           loadSync="true" />
-        <Badge
-          id="sotBadge" />
         <Poster
           id="tubiPresentsLogo"
           height="27"
-          translation="[0,5]"
           loadDisplayMode="scaleToFit" />
       </LayoutGroup>
 

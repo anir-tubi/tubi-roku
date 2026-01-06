@@ -37,7 +37,6 @@ Function init()
   m.headerSmallFont = typographyConstants.ids.headerSmall
   m.headerMediumFont = typographyConstants.ids.headerMedium
   m.bodyExtraSmallStrongFont = typographyConstants.ids.bodyExtraSmallStrong
-  m.badgeTextFont = typographyConstants.ids.bodySmallStrong
   m.bodyMediumStrongFont = typographyConstants.ids.bodyMediumStrong
   m.subheaderSmallFont = typographyConstants.ids.subheaderSmall
 
@@ -441,15 +440,16 @@ Function metadataOnPosterContent(itemContent)
     if isSotBadgePresent = false
       ratingIndex = m.nodeHelpers.getChildIndex(ratingSotParent, m.rating)
       if ratingIndex <> -1
-        insertIndex = ratingIndex + 1
+        insertIndex = ratingIndex
       end if
       ratingSotParent.insertChild(m.sotBadge, insertIndex)
     end if
 
+    m.sotBadge.height = 36
     m.sotBadge.textColor = m.primaryTextColor
     m.sotBadge.borderUri = ""
     m.sotBadge.backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
-    m.sotBadge.badgeTextFont = m.badgeTextFont
+    m.sotBadge.badgeTextFont = m.bodySmallFont
     m.sotBadge.text = sotBadge.sotLabelText
     m.sotBadge.iconUri = sotBadge.sotIcon
 
