@@ -1,0 +1,84 @@
+# This workflow runs the daily sign-in/sign-out automation test every 24 hours
+# It verifies that sign-in and sign-out functionality works correctly
+name: Daily Sign In/Sign Out Automation
+
+# Controls when the action will run
+on:
+  # Run every 24 hours at 2:00 AM UTC
+  schedule:
+    - cron: '0 2 * * *'
+  # Allow manual triggering
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # name helps to check the status of github action
+    name: Run Daily Sign In/Sign Out Test
+    # The type of runner that the job will run
+    runs-on: [self-hosted, automated-tests-runner, enabled, 'Office Runner']
+    # timeouts after 10 minutes, if the execution/automated tests got stuck/crash
+    timeout-minutes: 10
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      - name: Install pip
+        run: |
+          curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+          sudo python3 get-pip.py
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # npm command install all required packages
+      - name: npm install
+        run: |
+          npm install
+
+      - name: Run Daily Sign In/Sign Out Test
+        env:
+          runId: ${{ github.run_id }}
+          branch: ${{ github.ref_name }}
+          tag: '@daily_sign_in_sign_out'
+          retries: 1
+        run: |
+          cp ~/rta-config.json ./rta-config.json
+          npx gulp runAutomatedTests
+
+      - name: Upload JSON Report
+        if: success() || failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: Daily Sign In Sign Out JSON Report
+          path: out/ui-tests-output/report.json
+
+      - name: Sync to TestRail
+        if: success() || failure()
+        run: python3 testRail/sync_to_testrail.py
+        continue-on-error: true
+
+      - name: Upload HTML Report
+        if: success() || failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: Daily Sign In Sign Out HTML Report
+          path: out/ui-tests-output/html
+
+      - name: Upload Failed Test Screenshots
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: Daily Sign In Sign Out Failed Screenshots
+          path: out/ui-tests-output/screenshots
+
+      - name: Send Slack Notification
+        if: success() || failure()
+        run: |
+          npx ts-node ./js/workflows/sendSlackAutomatedTestsResultNotification.ts
+
