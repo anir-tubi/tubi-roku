@@ -155,7 +155,7 @@
           visible="false">
           <Poster
             id="EmptyStateIcon"
-            uri="pkg:/images/video-placeholder.png"
+            uri="pkg:/images/video-placeholder.webp"
             width="192"
             height="192" />
 
