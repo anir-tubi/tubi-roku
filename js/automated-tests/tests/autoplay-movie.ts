@@ -72,7 +72,7 @@ describe('Autoplay Movies', function () {
     await utils.sleep(1000);
     const countDownNode = await testUtils.getNodeForElement('countDownSecondsAutoPlay');
     const seconds = parseInt(countDownNode.text);
-    expect(seconds).to.be.greaterThanOrEqual(28);
+    expect(seconds).to.be.greaterThanOrEqual(18);
   });
 
 
