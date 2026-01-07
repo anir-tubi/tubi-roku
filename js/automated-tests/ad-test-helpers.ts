@@ -115,8 +115,7 @@ class AdTestHelpers {
     return new Promise((resolve) => {
       proxy.addCallback({
         shouldProcess: (args) => {
-          const isAdsUrl = args.url.includes('/inapp');
-          return isAdsUrl;
+          return args.url.includes('/inapp');
         },
         processRequest: (args) => {
           // If we have a parsed body from express.json(), re-write it
@@ -132,19 +131,10 @@ class AdTestHelpers {
           }
         },
         processResponse: (args) => {
-          // Prepare the mock response body
-          const bodyData = JSON.stringify(adsResponse);
-          const bodyBuffer = Buffer.from(bodyData);
-
-          // Set appropriate response headers
-          args.res.setHeader('Content-Type', 'application/json');
-          args.res.setHeader('Content-Length', bodyBuffer.length);
-
-          resolve();
+          resolve(null);
           args.removeCallback();
-
-          // Return the mocked response body
-          return bodyBuffer;
+          // Return the mocked response body as string (proxy handles headers)
+          return JSON.stringify(adsResponse);
         }
       });
     });
@@ -194,16 +184,11 @@ class AdTestHelpers {
           }
         },
         processResponse: (args) => {
-          // Use custom data for response
-          const bodyData = JSON.stringify(customData);
-          const bodyBuffer = Buffer.from(bodyData);
-
-          args.res.setHeader('Content-Type', 'application/json');
-          args.res.setHeader('Content-Length', bodyBuffer.length);
-
-          resolve();
+          resolve(null);
           args.removeCallback();
-          return bodyBuffer;
+
+          // Return the mocked response body as string (proxy handles headers)
+          return JSON.stringify(customData);
         }
       });
     });

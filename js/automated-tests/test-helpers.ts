@@ -2323,22 +2323,35 @@ class TestHelpers {
   }
 
   /**
-   * Scroll down until the focused row's title or slug matches the target value
+   * Scroll down until the focused row's title or slug matches one of the target values
    * @param options - Configuration object
-   * @param options.title - Title of the row to find (e.g., 'On Now', 'Continue Watching', 'My List')
-   * @param options.slug - Slug of the row to find (e.g., 'on-now', 'continue-watching', 'my-list')
+   * @param options.title - Title(s) of the row to find. Can be a single string or array of strings (e.g., 'On Now' or ['Comedy', 'Action', 'Drama'])
+   * @param options.slug - Slug(s) of the row to find. Can be a single string or array of strings (e.g., 'on-now' or ['comedy', 'action', 'drama'])
    * @param options.rowListElementId - Element ID of the RowList to search in (default: 'videoTitlesRowList')
    * @param options.maxScrolls - Maximum number of times to scroll down (default: 20)
-   * @remarks Either `title` or `slug` must be provided. If `slug` is provided, only checks SLUG field. If `title` is provided, only checks TITLE field.
+   * @remarks Either `title` or `slug` must be provided. If `slug` is provided, only checks SLUG field. If `title` is provided, only checks TITLE field. When an array is provided, scrolling stops at the first matching row.
+   * 
+   * @example
+   * // Find single row by slug
+   * await testHelpers.scrollDownToFindRow({ slug: 'comedy' });
+   * 
+   * @example
+   * // Find first matching row from multiple slugs
+   * await testHelpers.scrollDownToFindRow({ slug: ['comedy', 'action', 'drama'] });
+   * 
+   * @example
+   * // Find row by title with custom max scrolls
+   * await testHelpers.scrollDownToFindRow({ title: 'On Now', maxScrolls: 40 });
    */
-  async scrollDownToFindRow(options: { title?: string; slug?: string; rowListElementId?: ElementOrElementId; maxScrolls?: number }): Promise<void> {
+  async scrollDownToFindRow(options: { title?: string | string[]; slug?: string | string[]; rowListElementId?: ElementOrElementId; maxScrolls?: number }): Promise<void> {
     const { title, slug, rowListElementId = 'videoTitlesRowList', maxScrolls = 20 } = options;
 
     if (!title && !slug) {
       throw new Error('Either "title" or "slug" must be provided');
     }
 
-    const searchValue = slug || title!;
+    // Convert single values to arrays for consistent handling
+    const searchValues = slug ? (Array.isArray(slug) ? slug : [slug]) : (Array.isArray(title) ? title : [title!]);
     const isSlugSearch = !!slug;
 
     const element = testUtils.getElementKeyPath(rowListElementId);
@@ -2349,6 +2362,7 @@ class TestHelpers {
 
     let found = false;
     let scrollCount = 0;
+    let foundValue: string | undefined;
 
     while (!found && scrollCount < maxScrolls) {
       try {
@@ -2363,10 +2377,11 @@ class TestHelpers {
             keyPath: `${baseKeyPath}.${rowIndex}.slug`
           });
 
-          if (slugFound && currentRowSlug === searchValue) {
+          if (slugFound && searchValues.includes(currentRowSlug)) {
             found = true;
+            foundValue = currentRowSlug;
           } else {
-            // Row slug doesn't match, scroll down and try again
+            // Row slug doesn't match any in the list, scroll down and try again
             await ecp.sendKeypress(ecp.Key.Down);
             await utils.sleep(500); // Wait for content to load
             scrollCount++;
@@ -2378,10 +2393,11 @@ class TestHelpers {
             keyPath: `${baseKeyPath}.${rowIndex}.TITLE`
           });
 
-          if (titleFound && currentRowTitle === searchValue) {
+          if (titleFound && searchValues.includes(currentRowTitle)) {
             found = true;
+            foundValue = currentRowTitle;
           } else {
-            // Row title doesn't match, scroll down and try again
+            // Row title doesn't match any in the list, scroll down and try again
             await ecp.sendKeypress(ecp.Key.Down);
             await utils.sleep(500); // Wait for content to load
             scrollCount++;
@@ -2395,8 +2411,9 @@ class TestHelpers {
     }
 
     if (!found) {
-      const fieldType = isSlugSearch ? 'slug' : 'title or slug';
-      throw new Error(`Could not find row with ${fieldType} "${searchValue}" after scrolling down ${maxScrolls} times`);
+      const fieldType = isSlugSearch ? 'slug' : 'title';
+      const searchList = searchValues.join('", "');
+      throw new Error(`Could not find row with ${fieldType} "${searchList}" after scrolling down ${maxScrolls} times`);
     }
   }
 }

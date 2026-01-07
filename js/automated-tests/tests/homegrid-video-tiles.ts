@@ -1998,7 +1998,7 @@ describe('HomeGrid Video Tiles', function () {
     await utils.sleep(1000);
 
     // Navigate to comedy row
-    await testHelpers.scrollDownToFindRow({ slug: 'comedy', rowListElementId: 'videoTitlesRowList', maxScrolls: 40 });
+    await testHelpers.scrollDownToFindRow({ slug: ['comedy', 'back_by_popular_demand_crm', 'action'], rowListElementId: 'videoTitlesRowList', maxScrolls: 40 });
     await utils.sleep(1000);
 
     const focusedIndex = await testUtils.getCurrentlyFocusedGridItemIndex('videoTitlesRowList');

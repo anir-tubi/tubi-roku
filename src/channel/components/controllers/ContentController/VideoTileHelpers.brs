@@ -452,7 +452,7 @@ End Function
 ' @param defaultValue integer - Default Y value if bounding rect is invalid
 ' @return integer - Valid rect Y position
 Function getValidRectY(screen, defaultValue as Integer) as Integer
-  if screen.currentFocusedItemBoundingRect <> invalid AND screen.currentFocusedItemBoundingRect.y <> 0
+  if isNonEmptyAA(screen.currentFocusedItemBoundingRect) AND screen.currentFocusedItemBoundingRect.y <> 0
     return screen.currentFocusedItemBoundingRect.y
   end if
   return defaultValue
