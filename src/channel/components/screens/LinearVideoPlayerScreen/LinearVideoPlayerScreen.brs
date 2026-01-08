@@ -343,6 +343,7 @@ Function onControlChange()
 
   if control = "play"
     updatePlayerLogLib(m.playerLogLib, "setManifestLoadedTime", m.top.manifestLoadedTime)
+    updatePlayerLogLib(m.playerLogLib, "setManifestUrlLength", m.top.manifestUrlLength)
     if m.top.content <> invalid
       prepareToStartVideo(m.top.content)
       updatePlayerLogLib(m.playerLogLib, "setLastStartStep", "START_LOAD")

@@ -35,6 +35,7 @@ Function LivePlayerLogLib(constants, tracking)
     ssaiVersion: constants.player.linear.ssaiVersion.unknown 'used in qualityOfService event
     videoPosition: -1 'used in various calculations and events like contentStartupPerformance
     duration: 0 'used in userFeedback event
+    manifestUrlLength: 0 'used in QoS event message_map
     playerType: constants.player.linear.player_type_unspecified
     manifestLoadedTime: 0
     playerFeedback: "" 'used in playerPageExit event
@@ -71,6 +72,7 @@ Function LivePlayerLogLib(constants, tracking)
     setVideoState: playerLogLib_setLiveVideoState
     setVideoPosition: playerLogLib_setLiveVideoPosition
     setManifestLoadedTime: playerLogLib_setLiveManifestLoadedTime
+    setManifestUrlLength: playerLogLib_setLiveManifestUrlLength
     setErrorCode: playerLogLib_setLiveErrorCode
     setBreakOffError: playerLogLib_setLiveBreakOffError
     setErrorModal: playerLogLib_setLiveErrorModal
@@ -613,6 +615,11 @@ Function playerLogLib_fireLiveQualityOfServiceEvent()
 
   qualityOfServiceInfo["download_frag_bitrate"] = downloadFragBitrate
 
+  ' Add manifest URL length to message_map for debugging/analytics
+  qualityOfServiceInfo["message_map"] = {
+    "media_url_length": m.manifestUrlLength
+  }
+
   m.sendEvent(qualityOfServiceInfo, "live_quality_of_services", eventBase)
 End Function
 
@@ -699,6 +706,17 @@ Function playerLogLib_setLiveManifestLoadedTime(manifestLoadedTime = 0)
 End Function
 
 
+'@manifestUrlLength: integer, length of manifest URL in characters
+'
+Function playerLogLib_setLiveManifestUrlLength(manifestUrlLength = 0)
+  if isNumber(manifestUrlLength) = true
+    m.manifestUrlLength = manifestUrlLength
+  else
+    m.manifestUrlLength = 0
+  end if
+End Function
+
+
 'setLastStartStep sets value to m.lastStartStep.
 'START_LOAD represents player start load but has not shown first frame;
 'VIEWED_FIRST_FRAME represents viewed first frame;
@@ -768,6 +786,7 @@ Function playerLogLib_resetAttributes()
   m.isAd = false
   m.adCount = 0
   m.cdn = ""
+  m.manifestUrlLength = 0
   m.isVideoPlayed = false
   m.hasErrorModalShown = false
   m.totalSegSize = 0

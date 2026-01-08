@@ -322,6 +322,7 @@ Function tubiAds_getRainmakerParams(content, breakPos = 0)
 
     params["gdpr_analytics"] = analyticsConsentStatus
     params["gdpr_personalized_ads"] = personalizedAdsConsentStatus
+    params["tcf"] = m.tcfString
   end if
 
   return params

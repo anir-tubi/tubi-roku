@@ -122,11 +122,13 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
         ' add ad params to video urls
         updatedVideoResources = getUpdatedLinearVideoResources(clonedContent)
         clonedContent.videoResources = updatedVideoResources
-
         streamUrl = getLiveUrlFromResources(clonedContent)
+
         if streamUrl <> invalid
           ' store the content on videoPlayer so it can be retrieved after the manifest is fetched
           videoPlayer.content = clonedContent
+          ' Store manifest URL length for QoS event
+          videoPlayer.manifestUrlLength = Len(streamUrl)
           getLiveStreamManifest(streamUrl)
         else
           ' no stream url so show an error

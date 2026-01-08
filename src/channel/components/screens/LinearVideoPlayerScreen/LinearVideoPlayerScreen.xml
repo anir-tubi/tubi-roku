@@ -88,6 +88,9 @@
       <!-- Time taken to load manifest in milliseconds -->
       <field id="manifestLoadedTime" type="integer"/>
 
+      <!-- Length of manifest URL in characters -->
+      <field id="manifestUrlLength" type="integer"/>
+
     <!-- OUTPUT -->
       <!-- Set to true if the back button was pressed while the video player has focus -->
       <field id="backButtonPressed" type="boolean" value="false" alwaysNotify="true" />
