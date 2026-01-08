@@ -8,7 +8,6 @@
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/VideoPreviewMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/DeviceMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
 
   <interface>

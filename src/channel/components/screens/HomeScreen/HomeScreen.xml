@@ -18,7 +18,6 @@
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/DeviceMixin.brs" />
 
   <interface>
     <!-- INPUTS -->

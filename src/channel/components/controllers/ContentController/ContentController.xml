@@ -35,7 +35,6 @@
   <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
   <script type="text/brightscript" uri="../../lib/CacheValidationMixin.brs" />
-  <script type="text/brightscript" uri="../../lib/DeviceMixin.brs" />
   <script type="text/brightscript" uri="../../lib/EventMixin.brs" />
   <script type="text/brightscript" uri="../../screens/ModalDialogs.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />

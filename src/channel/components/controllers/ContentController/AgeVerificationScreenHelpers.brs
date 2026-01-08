@@ -433,7 +433,7 @@ Function onAgeNotVerifiedAtSignup(error)
     if httpCode = 422 OR httpCode = 451
 
       ' If the user is in GDPR countries then user is not allowed to use the application if they are not 18+.
-      if isGDPR(m.constants) = true
+      if getExternalConfigValueFromGlobal("enable_onetrust_consent", true) = true
         resetAuthStateOnAgeGateError()
         showGDPRAgeGateErrorScreen()
       else

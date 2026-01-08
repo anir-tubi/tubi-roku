@@ -18,7 +18,6 @@
   <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TimeOffsetUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/DeviceMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StatsigExperiments.brs" />

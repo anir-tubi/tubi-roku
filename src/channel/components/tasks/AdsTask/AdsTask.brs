@@ -13,7 +13,7 @@ Function execAdsTask()
   requestQueue = TubiRequestQueue()
   auth = TubiAuth(constants)
   tracking = TubiTracking(constants, auth, videoPlayerNode.userConsentsOptOutStatus, requestInstance, m.externalConfigInfo)
-  gdpr = isGDPR(constants)
+  gdpr = getExternalConfigValueFromGlobal("enable_onetrust_consent", true)
 
   ' Get Statsig experiment for preroll timeout
   prerollTimeoutExperiment = getStatsigExperimentResource("roku_player_improvement", "roku_player_ad_preroll_timeout_v2", false)

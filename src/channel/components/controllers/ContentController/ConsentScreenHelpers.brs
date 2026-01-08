@@ -98,7 +98,7 @@ Function getConsent(onGetConsentCompletionCallback)
   m.onGetConsentCompletionCallback = onGetConsentCompletionCallback
   ' We are using One trust sdk only in GDPR countries.
   ' If the user is in gdpr country then we will fetch the partner token and proceed with One trust sdk initialization.
-  if isGDPR(m.constants) = true
+  if getExternalConfigValueFromGlobal("enable_onetrust_consent", true) = true
     oneTrustViews = m.top.createChild("Group")
     oneTrustViews.id = "oneTrustViews"
     m.oneTrustLib = m.top.createChild("ComponentLibrary")
@@ -157,7 +157,6 @@ Function initialiazeOneTrustSDK()
   sdkParams.version = oneTrustConfig.version
   sdkParams.location = oneTrustConfig.location
   sdkParams.language = m.constants.deviceInfo.language
-  sdkParams.countryCode = m.constants.deviceInfo.countryCode
 
   identifier = "roku:" + m.constants.deviceInfo.deviceId
   sdkParams.shouldCreateProfile = true
@@ -348,7 +347,7 @@ End Function
 
 
 Function onInitialGetConsentRequestComplete()
-  if isGDPR(m.constants) = true AND isUserConsentRequired() = true AND isUserInAdultsMode() = true AND isKidsUIOn() = false
+  if getExternalConfigValueFromGlobal("enable_onetrust_consent", true) = true AND isUserConsentRequired() = true AND isUserInAdultsMode() = true AND isKidsUIOn() = false
     ' Calling getConsents api so that we have the data ready whenever we are ready to calling startUserExperience or showConsentScreen method.
     showConsentScreen()
   else
@@ -383,7 +382,7 @@ Function getConsentOptOutStatusByKey(key)
 
   ' Proceeding with consent check only if key is not essential. Since if it is essential we are allowed to proceed in kids etc.
   if key <> m.constants.consentKeys.essential
-    if isGDPR(m.constants) = true
+    if getExternalConfigValueFromGlobal("enable_onetrust_consent", true) = true
       ' If one trust sdk is invalid that means initialization failed so defaulting to opt out.
       if m.oneTrust <> invalid
         didOptOut = (m.oneTrust.callFunc("getConsentStatusForGroupID", key) <> 1)
@@ -416,7 +415,7 @@ Function isUserAllowedToManageConsent()
   ' Since outside of GDPR countries it is less than 13 is considered as kids mode. We will not create separate mapping.
   allowed = (isUserInAdultsMode() = true OR isParentalControlsTeensLevel() = true)
 
-  if isGDPR(m.constants) = true
+  if getExternalConfigValueFromGlobal("enable_onetrust_consent", true) = true
     allowed = (isUserInAdultsMode() = true)
   end if
 
@@ -448,7 +447,7 @@ End Function
 ' It will return false if user has already provided consent(either accepted or rejected).
 Function isUserConsentRequired()
   consentRequired = false
-  if isGDPR(m.constants) = true
+  if getExternalConfigValueFromGlobal("enable_onetrust_consent", true) = true
     if m.oneTrust <> invalid
       consentRequired = m.oneTrust.callFunc("shouldShowBanner")
     end if

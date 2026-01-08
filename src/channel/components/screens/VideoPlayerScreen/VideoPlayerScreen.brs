@@ -60,7 +60,7 @@ Function init()
   m.NodeHelpers = TubiNodeHelpers()
 
   m.Tracking = TubiTracking(m.constants, m.auth, m.top.userConsentsOptOutStatus, TubiRequest(m.constants.settings))
-  isGDPRinArg = isGDPR()
+  isGDPRinArg = getExternalConfigValueFromGlobal("enable_onetrust_consent", true)
   m.adsLimited = TubiAdsLimited(m.constants, m.auth, m.top.tcfString, m.top.userConsentsOptOutStatus, isGDPRinArg)
   m.top.observeFieldScoped("tcfString", "onTCFStringChange")
   m.top.observeField("userConsentsOptOutStatus", "onUserConsentsOptOutStatusChange")

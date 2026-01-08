@@ -13,7 +13,7 @@ Function init()
   m.Menu = m.top.findNode("ParentalControlsMenu")
 
   'hide Teens option for nz & uk region
-  if isGDPR() = true
+  if getExternalConfigValueFromGlobal("enable_onetrust_consent", true) = true
     removeTeensOption()
   end if
 

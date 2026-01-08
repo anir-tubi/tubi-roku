@@ -13,7 +13,7 @@ Function showSearchScreen()
 
   searchScreen.isUserEligibleForTrendingSearchContents = (isUserInAdultsMode() = true AND isDeviceInUS() = true AND isKidsUIOn() = false)
 
-  if isGDPR() = false
+  if getExternalConfigValueFromGlobal("enable_onetrust_consent", true) = false
     searchScreen.isKidsModeAvailable = true
   end if
 

@@ -14,7 +14,6 @@
     <script type="text/brightscript" uri="pkg:/source/lib/AdsUtils.brs" />
     <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
     <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
-    <script type="text/brightscript" uri="pkg:/components/lib/DeviceMixin.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/TubiAds.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/TubiSGPreloadedAdShim.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />

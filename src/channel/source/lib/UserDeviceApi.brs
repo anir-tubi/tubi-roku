@@ -460,7 +460,7 @@ Function userDeviceApi_createUserSettingsGeneralTaskReqInfo(successCallback, err
     successCallback: successCallback
     errorCallback: errorCallback
     responseType: "assocarray"
-    isGDPR: isGDPR() 'bs:disable-line 1140 LINT1001
+    isGDPR: getExternalConfigValueFromGlobal("enable_onetrust_consent", true) 'bs:disable-line 1140 LINT1001
   })
   return reqInfo
 End Function

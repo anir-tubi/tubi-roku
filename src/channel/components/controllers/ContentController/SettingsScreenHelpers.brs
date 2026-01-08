@@ -606,7 +606,7 @@ Function onSelectedConsentChange(msg)
 
     sendComponentInteractionInfo(componentInteractionEvent)
 
-    if isGdpr(m.constants) = false
+    if getExternalConfigValueFromGlobal("enable_onetrust_consent", true) = false
       body = {}
       body[key] = value
       setConsent(body)
