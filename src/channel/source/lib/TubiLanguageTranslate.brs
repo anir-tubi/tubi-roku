@@ -2900,7 +2900,7 @@ Function getTranslation_es_MX()
     },
     "screenSettings_about_description2": {
       "description": "The 2nd description on the about screen",
-      "message": "Visita {help_url}\n\nEnvía un correo electrónico a nuestro equipo de apoyo a support@tubi.tv\n\nPonte en contacto con nosotros en Facebook, Instagram, Twitter y en nuestra página web: \n{support_url} \n\nVersión {version}\nID de dispositivo corto: {id} (presiona OK para ver el ID de dispositivo completo)\n\n© {year} Tubi, Inc. todos los derechos reservados."
+      "message": "Visita {help_url}\n\nEscribe a nuestro equipo de apoyo en support@tubi.tv\n\nEncuéntranos en Facebook, Instagram, Twitter y en nuestro sitio web:\n{support_url}\n\nVersión {version}\nID del dispositivo: {id}\n\n© {year} Tubi, Inc. Todos los derechos reservados."
     },
     "screenSettings_menu_parentalControls": {
       "description": "The label for the parental controls",
@@ -3412,7 +3412,11 @@ Function getTranslation_es_MX()
     },
     "metadata_continueWatching_notSignedIn_container_button": {
       "description": "button text for when a non registered user focuses on the continue watching container",
-      "message": "Regístrate para guardar tu progreso - GRATIS"
+      "message": "Regístrate para guardar progreso"
+    },
+    "save_progress_later_dialog_button": {
+      "description": "Button text for the 'save progress later' dialog button",
+      "message": "Regístrate para guardar progreso - GRATIS"
     },
     "metadata_directed": {
       "description": "metadata label to indicate the directors of the current video title",
@@ -4342,7 +4346,7 @@ Function getTranslation_es_MX()
     },
     "rating_pg_description": {
       "description": "Description for PG rating (Parental Guidance Suggested)",
-      "message": "Puede no ser adecuado para niños. Se recomienda 'orientación de los padres'. Puede contener material no apropiado para menores."
+      "message": "Parte del contenido puede no ser adecuado para niños. Se recomienda orientación de los padres. Puede contener material que los padres podrían considerar inapropiado para niños pequeños."
     },
     "rating_pg_13_description": {
       "description": "Description for PG-13 rating (Parents Strongly Cautioned)",
@@ -4916,7 +4920,7 @@ Function getTranslation_fr_CA()
     },
     "screenSettings_signOut_description2": {
       "description": "More details on the SignIn page when user is signed in",
-      "message": "Email : {email}"
+      "message": "Email : {email}"
     },
     "screenSettings_about_title": {
       "description": "The title of the about screen",
@@ -4932,7 +4936,7 @@ Function getTranslation_fr_CA()
     },
     "screenSettings_about_description2": {
       "description": "The 2nd description on the about screen",
-      "message": "Visitez {help_url} \n \n Envoyez un e-mail à notre équipe d'assistance support@tubi.tv \n \nContactez-nous sur Facebook, Instagram, Twitter et sur notre site Internet à : \n {support_url} \n \n Version {version} \n Numéro d'identification abrégé : {id} (appuyez sur OK pour voir le numéro complet de l'appareil) \n \n © {year} Tubi, Inc. tous droits réservés."
+      "message": "Visitez {help_url}\n\nÉcrivez à notre équipe de soutien à support@tubi.tv\n\nRetrouvez-nous sur Facebook, Instagram, Twitter et sur notre site Web :\n{support_url}\n\nVersion {version}\nID de l’appareil : {id}\n\n© {year} Tubi, Inc. Tous droits réservés."
     },
     "screenSettings_menu_parentalControls": {
       "description": "The label for the parental controls",
@@ -5444,7 +5448,11 @@ Function getTranslation_fr_CA()
     },
     "metadata_continueWatching_notSignedIn_container_button": {
       "description": "button text for when a non registered user focuses on the continue watching container",
-      "message": "Inscrivez-vous pour sauvegarder votre progression - GRATUIT"
+      "message": "Inscrivez-vous pour sauvegarder le progrès"
+    },
+    "save_progress_later_dialog_button": {
+      "description": "Button text for the 'save progress later' dialog button",
+      "message": "Inscrivez-vous pour sauvegarder le progrès - GRATUIT"
     },
     "metadata_directed": {
       "description": "metadata label to indicate the directors of the current video title",
@@ -6374,7 +6382,7 @@ Function getTranslation_fr_CA()
     },
     "rating_pg_description": {
       "description": "Description for PG rating (Parental Guidance Suggested)",
-      "message": "Peut ne pas convenir aux enfants. 'Orientation parentale' recommandée. Peut contenir du contenu que les parents n’apprécieraient pas pour leurs jeunes enfants."
+      "message": "Peut ne pas convenir aux enfants. Orientation parentale recommandée. Peut contenir du contenu que les parents pourraient juger inapproprié pour les jeunes enfants."
     },
     "rating_pg_13_description": {
       "description": "Description for PG-13 rating (Parents Strongly Cautioned)",
@@ -6421,10 +6429,6 @@ Function getTranslation_en_GB()
     "screenSettings_about_description": {
       "description": "The description on the about screen",
       "message": "Tubi is the leading free, premium, video streaming app. We have a large and diverse library of content with many thousands of titles and 3x fewer adverts than other TV services."
-    },
-    "screenSettings_about_description2": {
-      "description": "The 2nd description on the about screen",
-      "message": "Visit {help_url}\n\nEmail our Support team at support@tubi.tv\n\nReach us on Facebook, Instagram, X, and on our website at:\n{support_url}\n\nVersion {version}\nShort Device ID: {id} (press OK to see full Device ID)\n\n© {year} Tubi, Inc. all rights reserved."
     },
     "screenSettings_parentalControls_instructions": {
       "description": "Description of the parental controls screen",
@@ -6598,6 +6602,10 @@ Function getTranslation_en_GB()
     "rating_tv_ma_description": {
       "description": "Description for TV-MA rating (Mature Audience Only)",
       "message": "This programme is specifically designed to be viewed by adults and therefore may be unsuitable for children under 17."
+    },
+    "rating_pg_description": {
+      "description": "Description for PG rating (Parental Guidance Suggested)",
+      "message": "Some material may not be suitable for children. Parents are advised to provide parental guidance. May contain content parents might find inappropriate for young children."
     }
   }
 End Function
