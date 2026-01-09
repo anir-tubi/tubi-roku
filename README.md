@@ -193,6 +193,7 @@ By default, both tools are accessible from the Debug Panel in VSCode's primary s
 
 - Place the Roku Device View in the bottom panel.
 - Position the SceneGraph Inspector in the secondary sidebar to your right, as shown in the image below.
+- If SceneGraph Inspector shows error "Cannot read properties of undefined (reading 'screen')", change this setting on your Roku Device: Settings -> System -> Advanced System Settings -> Control by mobile apps -> Network Access -> switch to Enabled
 
 ![Roku Device View panel](/docs/vscode_roku_device_view_panel.png)
 
