@@ -33,6 +33,10 @@ End Function
 
 
 Function onTextChanged()
+  ' Reset widths to allow proper recalculation when badge is reused
+  m.badgeText.width = 0
+  m.badgeBackground.width = 0
+
   m.badgeText.text = m.top.text
   adjustBadgeSize()
 End Function
@@ -45,7 +49,6 @@ Function adjustBadgeSize()
   m.badgeIcon.height = height
 
   backgroundHeight = m.top.height
-
 
   ' Apply maxWidth constraint if set
   if maxWidthValue > 0 AND badgeInfoLayoutWidth > maxWidthValue
