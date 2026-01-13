@@ -26,7 +26,7 @@ describe('Daily Sign In/Sign Out Automation', function () {
   it('Daily - Sign up and Sign Out Flow @daily_sign_in_sign_out', async () => {
     // Step 1: Launch app as guest user
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Step 2: Sign up/Sign in flow
     console.log('Starting sign up/sign in flow...');
@@ -61,7 +61,7 @@ describe('Daily Sign In/Sign Out Automation', function () {
     await ecp.sendKeypress(ecp.Key.Ok); // Click "Start Watching"
 
     // Should return to home screen as registered user
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for home screen after registration');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for home screen after registration');
 
     // Open side nav to check signed in status
     await ecp.sendKeypress(ecp.Key.Left);
@@ -95,7 +95,7 @@ describe('Daily Sign In/Sign Out Automation', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Step 5: Verify sign out was successful
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for home screen after sign out', 20000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for home screen after sign out', 20000);
 
     // Verify user is signed out (sideNavSignedInLabel should not contain 'Hi')
     await testUtils.retryWithTimeOut(async () => {
@@ -120,7 +120,7 @@ describe('Daily Sign In/Sign Out Automation', function () {
 
     // Step 2: Launch app as guest user
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Step 3: Sign out if already signed in (cleanup from previous test)
     await ecp.sendKeypress(ecp.Key.Left);
@@ -133,7 +133,7 @@ describe('Daily Sign In/Sign Out Automation', function () {
       await ecp.sendKeypress(ecp.Key.Ok);
       await testUtils.waitForElementToShowOnScreen('signOutVerificationModalMessage', 'Sign out verification modal message not found', 15000);
       await ecp.sendKeypress(ecp.Key.Ok);
-      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for home screen after sign out', 20000);
+      await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for home screen after sign out', 20000);
     }
 
     // Step 4: Navigate to Sign In
@@ -173,7 +173,7 @@ describe('Daily Sign In/Sign Out Automation', function () {
     await ecp.sendKeypress(ecp.Key.Ok); // Submit sign-in
 
     // Step 10: Verify sign-in was successful - should return to home screen
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for home screen after sign in', 20000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for home screen after sign in', 20000);
 
     // Step 11: Verify user is signed in
     await ecp.sendKeypress(ecp.Key.Left);

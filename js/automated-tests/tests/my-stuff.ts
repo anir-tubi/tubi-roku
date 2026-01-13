@@ -185,8 +185,8 @@ describe('MyStuff', function () {
     // If the CW Row title is not "Watch Next", then the CW Row is empty.
     if (continueWatchingRowTitle.text != "Watch Next") {
       const emptyMyListContainerContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('emptyMyStuffContainer');
-      expect(emptyMyListContainerContent[0].title).to.equal('You\'re All Caught Up!');
-      expect(emptyMyListContainerContent[0].description).to.equal('Movies and series you haven\'t finished will show up here.');
+      expect(emptyMyListContainerContent[0].title).to.equal("You're All Caught Up!");
+      expect(emptyMyListContainerContent[0].description).to.equal("Movies and series you haven’t finished will show up here.");
     }
     // Select a title from home page, let it stream for more than > 1 minute
     await testUtils.goToPage('home');
@@ -416,8 +416,8 @@ describe('MyStuff', function () {
     await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
     await utils.sleep(2000);
     const emptyMyStuffContainerContent1 = await testUtils.getCurrentlyFocusedRowListRowItemsContent('emptyMyStuffContainer');
-    expect(emptyMyStuffContainerContent1[0].title).to.equal('You\'re All Caught Up!');
-    expect(emptyMyStuffContainerContent1[0].description).to.equal('Movies and series you haven’t finished will show up here.');
+    expect(emptyMyStuffContainerContent1[0].title).to.equal("You're All Caught Up!");
+    expect(emptyMyStuffContainerContent1[0].description).to.equal("Movies and series you haven’t finished will show up here.");
 
 
     // Check that My List displays titles 

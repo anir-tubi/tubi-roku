@@ -60,6 +60,7 @@ describe('Playback', function () {
 
     // Press play to start video, then check if it is playing
     await ecp.sendKeypress(ecp.Key.Play);
+    await testUtils.waitForCurrentScreenToEqual('videoPlayerScreen');
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
     // Press OK  to activate player controls
@@ -74,14 +75,14 @@ describe('Playback', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     //Get player position
-    const currentposition = await testUtils.getPlayerPosition();
-    const startposition = currentposition;
+    const currentPosition = await testUtils.getPlayerPosition();
+    const startPosition = currentPosition;
 
 
     // Hover on the rewind 30 second button, get start position
     await ecp.sendKeypress(ecp.Key.Left);
     await testUtils.waitForElementToFullyShowOnScreen('rewind30Button');
-    await seekWithinRange(startposition);
+    await seekWithinRange(startPosition);
 
   });
 

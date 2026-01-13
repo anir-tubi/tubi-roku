@@ -88,7 +88,6 @@ describe('Autoplay Movies', function () {
     const totalItems = gridContents.length;
     await ecp.sendKeypress(ecp.Key.Right, { count: totalItems, wait: 200 });
     await ecp.sendKeypress(ecp.Key.Ok);
-    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'stopped');
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
     const playerContent = await testUtils.getPlayerContent('videoPlayerScreen');
@@ -106,7 +105,6 @@ describe('Autoplay Movies', function () {
       'autoplayGridMovie'
     );
     await ecp.sendKeypress(ecp.Key.Play);
-    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'stopped');
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
     const playerContent = await testUtils.getPlayerContent('videoPlayerScreen');
@@ -226,6 +224,7 @@ async function seekToTriggerCuePoint() {
 }
 
 async function checkIfMovieAutoPlayUIisShowing() {
+  await testUtils.waitForElementToHaveFocus('autoplayGridMovie', 'Timed out waiting for Rowlist to have focus', 15000);
   await testUtils.waitForElementToFullyShowOnScreen('countDownAutoPlay');
   const countDownAutoPlay = await testUtils.getNodeForElement('countDownAutoPlay');
   // Testing to make sure countdown is showing.
@@ -241,6 +240,7 @@ async function checkIfMovieAutoPlayUIisShowing() {
     countDownNode = await testUtils.getNodeForElement('countDownSecondsAutoPlay');
     seconds = parseInt(countDownNode.text);
   }
+
   await utils.sleep(2000);
   const countDownNode2 = await testUtils.getNodeForElement('countDownSecondsAutoPlay');
   expect(seconds).to.be.greaterThan(parseInt(countDownNode2.text));
