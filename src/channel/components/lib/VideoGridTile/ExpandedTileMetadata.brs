@@ -240,7 +240,13 @@ Function routeContentDisplay(itemContent) as Void
 
     categoryContent = itemContent.getParent()
     if categoryContent <> invalid AND categoryContent.id = "continue_watching" AND itemContent.type <> m.constants.ui.contentTypes.series
-      metadataOnContinueWatchingContent(itemContent)
+      history = getHistory(itemContent.id)
+
+      if history <> invalid
+        metadataOnContinueWatchingContent(itemContent)
+      else
+        metadataOnPosterContent(itemContent)
+      end if
     else
       metadataOnPosterContent(itemContent)
     end if
@@ -513,6 +519,7 @@ Function metadataOnPosterContent(itemContent)
   if isDetailScreenInfoPanel = true AND itemContent.hasAudioDescription = true
     displayAudioDescriptionBadge()
   end if
+
 End Function
 
 
@@ -549,6 +556,7 @@ Function metadataOnContinueWatchingContent(itemContent)
       m.firstLineGroup.insertChild(m.progressBarGroup, index + 1)
     end if
   end if
+
 End Function
 
 
