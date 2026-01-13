@@ -6,11 +6,24 @@ import { elements } from '../../../automated-tests-config/elements';
 
 // Skipping these tests for now as it is still a experimental feature.
 // Will be used for manual testing during development and qa phase.
-describe.skip('Title Details Page', function () {
+describe('Title Details Page', function () {
+  // Helper function to start application with content details experiment overrides
+  async function startApplicationWithExperimentOverrides(page: string, args: any = {}) {
+    return await testUtils.startApplicationAtPage(page as any, {
+      ...args,
+      experimentOverrides: {
+        roku_content_details: {
+          roku_content_details_v2: {
+            default: { "enabled": true, "enable_left_button_exit": true }
+          }
+        }
+      }
+    });
+  }
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845203
   it('C845203 - Full Screen Video hero in the detail page as background @guest @detailsPage', async () => {
-    await testUtils.startApplicationAtPage('movies');
+    await startApplicationWithExperimentOverrides('movies');
 
     await utils.sleep(3000);
 
@@ -29,7 +42,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845244
   it('C845244 - Default Focus on horizontal button is Resume when movie has history @guest,@details_page', async () => {
-    await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
+    await startApplicationWithExperimentOverrides('movies', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -51,7 +64,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845215
   it('C845215 - Left arrow opens navigation bar @sidenav', async () => {
-    await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: false });
+    await startApplicationWithExperimentOverrides('movies', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -64,7 +77,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845251
   it('C845251 - Episodes is the first tab for series @guest,@series_details_page', async () => {
-    await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
+    await startApplicationWithExperimentOverrides('tv', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for TV screen rowlist to have focus', 15000);
 
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -78,7 +91,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845245
   it('C845245 - Default Focus on horizontal button is Play when title has no history @guest,@details_page', async () => {
-    await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
+    await startApplicationWithExperimentOverrides('movies', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -93,7 +106,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845248
   it('C845248 - Add to My List changes to Remove from my List when selected in details page @guest,@details_page', async () => {
-    await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
+    await startApplicationWithExperimentOverrides('movies', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -114,7 +127,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845243
   it('C845243 - Details page displays static image when user plays the content from details page and returns back to details page @guest,@details_page', async () => {
-    await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
+    await startApplicationWithExperimentOverrides('movies', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -135,7 +148,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845240
   it('C845240 - Video preview pauses when user scrolls through episodes, Details @guest,@details_page', async () => {
-    await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
+    await startApplicationWithExperimentOverrides('tv', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for TV screen rowlist to have focus');
 
     const position = await testHelpers.findContentPositionInRowListThatContainsVideoPreview('tvScreenRowList', true, 5);
@@ -159,7 +172,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845241
   it('C845241 - Video preview resumes when user goes back to main detail page from episodes or Details @guest,@series_details_page', async () => {
-    await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
+    await startApplicationWithExperimentOverrides('tv', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for TV screen rowlist to have focus');
     const position = await testHelpers.findContentPositionInRowListThatContainsVideoPreview('tvScreenRowList', true, 5);
     const [row, col] = position;
@@ -186,7 +199,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845242
   it('C845242 - Static image is displayed if video preview is not available in the detail page @guest,@details_page', async () => {
-    await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
+    await startApplicationWithExperimentOverrides('movies', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     const position = await testHelpers.findContentPositionInRowListThatContainsVideoPreview('movieScreenRowList', false, 5);
@@ -210,7 +223,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845238
   it('C845238 - Fullscreen video in details page autoplays if title is not played @guest,@details_page', async () => {
-    await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
+    await startApplicationWithExperimentOverrides('movies', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -229,7 +242,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845239
   it('C845239 - Video Preview resumes from homepage to detail page @videopreview', async () => {
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await startApplicationWithExperimentOverrides('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     const position = await testHelpers.findContentPositionInRowListThatContainsVideoPreview('videoTitlesRowList', true, 5);
@@ -250,7 +263,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845216
   it('C845216 - Episodes are displayed below Seasons and user can navigate across seasons and episodes @guest,@series_details_page', async () => {
-    await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
+    await startApplicationWithExperimentOverrides('tv', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for TV screen rowlist to have focus', 15000);
 
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -292,7 +305,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845206
   it('C845206 - Order for horizontal menu bar in details page of title that is from a network @guest,@details_page', async () => {
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await startApplicationWithExperimentOverrides('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await testHelpers.navigateToCategories();
@@ -364,7 +377,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845207
   it('C845207 - Registered user: Order for horizontal menu bar in details page of series @guest,@sdp_1', async () => {
-    await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: false });
+    await startApplicationWithExperimentOverrides('tv', { shouldCreateNewUser: false });
     await utils.sleep(2000);
     await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for TV screen rowlist to have focus', 15000);
 
@@ -393,7 +406,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845246
   it('C845246 - Default Focus on horizontal button is Play S6 E2 when series has history @guest,@sdp_1', async () => {
-    await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
+    await startApplicationWithExperimentOverrides('tv', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for TV screen rowlist to have focus', 15000);
 
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -422,7 +435,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845254
   it('C845254 - First episode will be displayed as default for Series that was never watched @guest,@sdp_1', async () => {
-    await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
+    await startApplicationWithExperimentOverrides('tv', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for TV screen rowlist to have focus', 15000);
 
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -459,7 +472,7 @@ describe.skip('Title Details Page', function () {
   // Test Rail Link: Manual test - All interactive buttons work correctly
   it('Test all detail page buttons: Like, Dislike, and Delete History @guest,@details_page,@buttons', async () => {
     // Start application and navigate to movies page
-    await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
+    await startApplicationWithExperimentOverrides('movies', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open movie detail page
@@ -598,7 +611,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845247
   it('C845247 - CTA buttons labels appear only when hovered over @guest @details_page', async () => {
-    await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
+    await startApplicationWithExperimentOverrides('movies', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -632,7 +645,7 @@ describe.skip('Title Details Page', function () {
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845212
   it('C845212 - Title and metadata below each tile is displayed @guest @browse', async () => {
     // Open a series detail page
-    await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: false });
+    await startApplicationWithExperimentOverrides('tv', { shouldCreateNewUser: false });
     await utils.sleep(2000);
     await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for TV screen rowlist to have focus', 15000);
 
@@ -698,7 +711,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845204
   it('C845204 - Title art is displayed in the details page for Series, if available @guest @series_details_page', async () => {
-    await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
+    await startApplicationWithExperimentOverrides('tv', { shouldCreateNewUser: true });
     await utils.sleep(3000);
     await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for TV screen rowlist to have focus', 20000);
 
@@ -718,7 +731,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845205
   it('C845205 - Title art is displayed in the details page for Movies, if available @guest @details_page', async () => {
-    await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
+    await startApplicationWithExperimentOverrides('movies', { shouldCreateNewUser: true });
     await utils.sleep(3000);
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 20000);
 
@@ -738,7 +751,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845208
   it('C845208 - Registered user: Order for horizontal menu bar in details page of movies @guest @details_page', async () => {
-    await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
+    await startApplicationWithExperimentOverrides('movies', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 30000);
 
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -772,7 +785,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845209
   it('C845209 - Registered user: Order for horizontal menu bar in details page of movies with history @guest @details_page', async () => {
-    await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
+    await startApplicationWithExperimentOverrides('movies', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -809,7 +822,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845210
   it('C845210 - Registered user: Order for horizontal menu bar in details page of series with history', async () => {
-    await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
+    await startApplicationWithExperimentOverrides('tv', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for series screen rowlist to have focus', 15000);
 
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -840,7 +853,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845250
   it('C845250 - Typed out art displays and becomes smaller and shifts to top of the page when user navigates to Episodes/Details @guest @series_details_page', async () => {
-    await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
+    await startApplicationWithExperimentOverrides('tv', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for TV screen rowlist to have focus', 15000);
 
     // Find a series without title art to test typed text
@@ -892,7 +905,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845214
   it('C845214 - Guest user: Order for horizontal menu bar in details page of movies @guest @details_page', async () => {
-    await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: false });
+    await startApplicationWithExperimentOverrides('movies', { shouldCreateNewUser: false });
     await utils.sleep(2000);
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
 
@@ -921,7 +934,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845252
   it('C845252 - Autoplay should comply with settings @autoplay', async () => {
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    await startApplicationWithExperimentOverrides('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await testHelpers.enableAutoplayInSettings(false);
@@ -951,7 +964,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845249
   it('C845249 - Title art becomes smaller and shifts to top of the page when user navigates to Episodes/Details @guest @series_details_page', async () => {
-    await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
+    await startApplicationWithExperimentOverrides('tv', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for TV screen rowlist to have focus', 15000);
 
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -986,7 +999,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845213
   it('C845213 - Guest user: Order for horizontal menu bar in details page of series @guest', async () => {
-    await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: false });
+    await startApplicationWithExperimentOverrides('tv', { shouldCreateNewUser: false });
     await utils.sleep(2000);
     await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for TV screen rowlist to have focus', 20000);
 
@@ -1011,7 +1024,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845211
   it('C845211 - secondary CTAs are simplified to icons unless hovered over in detail page @guest @details_page', async () => {
-    await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
+    await startApplicationWithExperimentOverrides('movies', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -1077,7 +1090,18 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845253
   it('C845253 - Deeplinking to a title should display the new details page design @guest @details_page @deeplink', async () => {
-    await testUtils.startApplicationWithDeeplink({ mediaType: 'movie', contentID: '342067', shouldCreateNewUser: true });
+    await testUtils.startApplicationWithDeeplink({
+      mediaType: 'movie',
+      contentID: '342067',
+      shouldCreateNewUser: true,
+      experimentOverrides: {
+        roku_content_details: {
+          roku_content_details_v2: {
+            default: { "enabled": true, "enable_left_button_exit": true }
+          }
+        }
+      }
+    });
 
     await testUtils.waitForCurrentScreenToEqual('videoPlayerScreen', 10000);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 10000);
@@ -1096,7 +1120,7 @@ describe.skip('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845255
   it('C845255 - Current episode will be displayed as default under Episodes for Series if already started watching @guest,@sdp_1', async () => {
-    await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
+    await startApplicationWithExperimentOverrides('tv', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for TV screen rowlist to have focus', 20000);
 
     await ecp.sendKeypress(ecp.Key.Ok);

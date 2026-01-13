@@ -418,6 +418,10 @@ class TestUtils {
       deeplink['constantsUpdates'] = JSON.stringify(constantsUpdates);
     }
 
+    if (args.experimentOverrides !== undefined) {
+      deeplink['experimentOverrides'] = JSON.stringify(args.experimentOverrides);
+    }
+
     await this.restartApplication({
       params: deeplink
     });
@@ -2519,6 +2523,9 @@ type StartApplicationArgs = {
 
   /** Disables the skin ads feature */
   disableSkinAds?: boolean;
+
+  /** Override default Statsig experiment configurations */
+  experimentOverrides?: any;
 }
 
 

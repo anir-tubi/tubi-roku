@@ -413,6 +413,11 @@ Function onStatsigInitializationSuccess(successResponse)
       statsigExperimentsInfo = {}
     end if
 
+    ' Apply experiment overrides from automation tests if provided (QA mode only)
+    if m.constants.settings.mode = "qa" then
+      applyDeepLinkExperimentOverrides(statsigExperimentsInfo)
+    end if
+
     m.global.statsigExperimentsInfo = statsigExperimentsInfo
 
     m.updateGeneralTaskStatSigExperiments(statsigExperimentsInfo)
@@ -446,6 +451,12 @@ Function onStatsigInitializationError(errorResponse)
   if m.constants.settings.mode <> "production"
     statsigExperimentsInfo = {}
     applyExperimentOverrides(statsigExperimentsInfo)
+
+    ' Apply deep-link experiment overrides for automation tests (QA mode only)
+    if m.constants.settings.mode = "qa" then
+      applyDeepLinkExperimentOverrides(statsigExperimentsInfo)
+    end if
+
     m.global.statsigExperimentsInfo = statsigExperimentsInfo
   end if
 
@@ -509,5 +520,43 @@ Function applyExperimentOverrides(statSigExperimentsInfo as Object) as Void
         }
       })
     end if
+  end for
+End Function
+
+
+' Apply experiment overrides from deep-link (for automation tests)
+' This allows automation tests to override experiment defaults via deep-link parameters
+' Should only be called in QA mode
+'
+' @param statSigExperimentsInfo: assocarray, the Statsig experiments info object (always empty)
+Function applyDeepLinkExperimentOverrides(statSigExperimentsInfo as Object) as Void
+  ' Get startup args and check for experiment overrides
+  startupArgs = m.top.getScene().startupArgs
+  if startupArgs = invalid OR startupArgs.experimentOverrides = invalid then return
+
+  ' Parse the experiment overrides JSON
+  experimentOverridesConfig = ParseJson(startupArgs.experimentOverrides)
+  if experimentOverridesConfig = invalid OR not isAA(experimentOverridesConfig) then return
+
+  ' Create Statsig interface to access hash method
+  experimentInterface = StatsigExperimentsInterface(statSigExperimentsInfo)
+
+  ' Loop through namespaces and experiments to populate statsigExperimentsInfo
+  for each namespace in experimentOverridesConfig
+    namespaceConfig = experimentOverridesConfig[namespace]
+    if not isAA(namespaceConfig) then continue for
+
+    for each experimentName in namespaceConfig
+      experimentConfig = namespaceConfig[experimentName]
+      if not isAA(experimentConfig) OR experimentConfig.default = invalid then continue for
+
+      ' Hash the experiment name and set the config
+      hashedExperimentId = experimentInterface.getHashValue(experimentName)
+      statSigExperimentsInfo[hashedExperimentId] = {
+        config: {
+          value: experimentConfig.default
+        }
+      }
+    end for
   end for
 End Function
