@@ -44,17 +44,8 @@ Function init()
   m.fullScreenPosterBottomGradient = topRef.findNode("fullScreenPosterBottomGradient")
   m.adDisplayLeftGradient = topRef.findNode("adDisplayLeftGradient")
   m.adDisplayBottomGradient = topRef.findNode("adDisplayBottomGradient")
-  m.videoTilesBackgroundGradient = topRef.findNode("videoTilesBackgroundGradient")
   m.timer = CreateObject("roSGNode", "Timer")
   m.timer.duration = 3
-
-
-  experiment = getStatsigExperimentResource("roku_video_tiles", "roku_video_tiles_1_7", false)
-  if isAA(experiment) = true
-    if experiment.variant = "refinedControlTop2Rows"
-      m.videoTilesBackgroundGradient.uri = "pkg:/images/background-masks/full_screen_variant_c_gradient-$$RES$$.webp"
-    end if
-  end if
 
   setMaskLayerUris()
   ' Prevent artifacts when a parent node is faded in, which might cause the masked image to show through the gradient.
@@ -176,10 +167,6 @@ Function newBackgroundSet()
 
   if m.lastBackgroundInfo <> invalid AND m.aCurrentBackgroundInfo <> invalid AND m.lastBackgroundInfo.type <> m.aCurrentBackgroundInfo.type
     backgroundType = m.aCurrentBackgroundInfo.type
-    ' Hiding the video tiles background gradient when the background type is not cinematic.
-    if m.videoTilesBackgroundGradient.opacity > 0 AND backgroundType <> backgroundTypes.cinematic
-      fade(m.videoTilesBackgroundGradient, "out", 0.1)
-    end if
 
     if backgroundType = backgroundTypes.fullScreen
       '// fullScreen2 displays the images in full screen with two gradient overlays, 1) a vertical gradient overlay that is more opaque on the bottom and 2) a horizontal gradient overlay that is more opaque on the left
@@ -189,17 +176,14 @@ Function newBackgroundSet()
       fade(m.fullScreenPosterGradient, "out", 0.5)
       fade(m.fullScreenPosterGradient2, "out", 0.5)
       fade(m.adDisplayGradient, "out", 0.5)
-    else if arrayIncludes([backgroundTypes.fullScreen2, backgroundTypes.spotlight, backgroundTypes.skinAd, backgroundTypes.cinematic], backgroundType)
+    else if arrayIncludes([backgroundTypes.fullScreen2, backgroundTypes.spotlight, backgroundTypes.skinAd], backgroundType)
       '// fullScreen2 displays the images in full screen with a vertical gradient overlay that is more opaque on the bottom.
       fade(m.circularMaskLayer, "out", 0.5)
       fade(m.posterGroupMask, "out", 0.5)
       fade(m.defaultBackground, "out", 0.5)
       fade(m.fullScreenPosterGradient, "out", 0.5)
       fade(m.adDisplayGradient, "out", 0.5)
-      if backgroundType = backgroundTypes.cinematic
-        fade(m.fullScreenPosterGradient2, "out", 0)
-        fade(m.videoTilesBackgroundGradient, "in", 0.5)
-      else if m.top.screenId = m.constants.ui.screenIds.vodDetailScreen
+      if m.top.screenId = m.constants.ui.screenIds.vodDetailScreen
         fade(m.fullScreenPosterGradient2, "out", 0)
       else
         fade(m.fullScreenPosterGradient2, "in", 0.5)
@@ -447,7 +431,7 @@ Function startTransitionIn()
   else if m.newBackgroundType = m.constants.ui.backgroundTypes.epg
     m.newPoster.epgTransitionInControl = "start"
     m.newPoster.lastAnimationName = "epgTransitionIn"
-  else if arrayIncludes([m.constants.ui.backgroundTypes.fullScreen, m.constants.ui.backgroundTypes.fullScreen2, m.constants.ui.backgroundTypes.spotlight, m.constants.ui.backgroundTypes.cinematic], m.newBackgroundType)
+  else if arrayIncludes([m.constants.ui.backgroundTypes.fullScreen, m.constants.ui.backgroundTypes.fullScreen2, m.constants.ui.backgroundTypes.spotlight], m.newBackgroundType)
     m.newPoster.fullScreenTransitionInControl = "start"
     m.newPoster.lastAnimationName = "FullScreenTransitionIn"
   else if m.newBackgroundType = m.constants.ui.backgroundTypes.adRowlistSpotlight OR m.newBackgroundType = m.constants.ui.backgroundTypes.adRowlistCarousel

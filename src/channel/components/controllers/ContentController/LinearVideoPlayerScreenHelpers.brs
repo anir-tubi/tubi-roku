@@ -99,7 +99,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
       else
         currentScreen = getCurrentScreen()
         ' If the current screen is the home screen and the featured list has focus, then switch to inline grid mode.
-        if isKidsUIOn() = false AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND currentScreen.featuredListHasFocus = true
+        if isKidsUIOn() = false AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND currentScreen.listHasFocus = true
           switchLinearToInlineGridMode(videoPlayer)
         else
           '//play at minimized state
@@ -574,7 +574,7 @@ Function animateLinearVideoPlayerToMinState(nDuration = .25, bVisible = true)
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   if videoPlayer <> invalid AND videoPlayer.content <> invalid
     currentScreen = getCurrentScreen()
-    enableInlineGridMode = isKidsUIOn() = false AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND currentScreen.featuredListHasFocus = true
+    enableInlineGridMode = isKidsUIOn() = false AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND currentScreen.listHasFocus = true
     if enableInlineGridMode = true
       switchLinearToInlineGridMode(videoPlayer)
     else
@@ -855,7 +855,7 @@ Function reactToLinearVideoPlayerErrorStateInNonFullscreenState()
   stopAndHideLinearVideoPlayer()
   homescreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
   if homescreen <> invalid
-    if homescreen.lastFocusedList = "featuredRowList"
+    if homescreen.lastFocusedList = "rowList"
       displayDefaultBackground()
     else
       setVideoContentScreenBackground(homescreen)

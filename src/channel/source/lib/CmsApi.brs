@@ -775,8 +775,8 @@ Function cmsApi_createHomeScreenBatchReqInfo(homeScreen, index, bKidsMode = fals
   windowInfo = m.getWindowInfo(homeScreen, index)
   if windowInfo <> invalid
 
-    if windowInfo.start = 0 AND homeScreen.featuredRowContent <> invalid
-      featuredCategory = homeScreen.featuredRowContent.getChild(0)
+    if windowInfo.start = 0 AND homeScreen.content <> invalid
+      featuredCategory = homeScreen.content.getChild(0)
       if featuredCategory <> invalid
         categoryReqInfo = m.createGetContainerContentsReqInfo(featuredCategory, homeScreen, bKidsMode, isSignedInUser, uiMode, true)
 

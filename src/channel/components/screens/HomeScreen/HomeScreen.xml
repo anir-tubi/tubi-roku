@@ -35,20 +35,22 @@
     <!-- Tells the ad carousel if it should stop or start automatically rotating -->
     <field id="allowCarouselAutoRotate" type="boolean" />
 
-    <!-- The helper class will call this when the new content is ready to be displayed on the screen. -->
+    <!-- The helper class will call this when the new content is ready to be displayed on the
+    screen. -->
     <field id="contentUpdated" alwaysNotify="true" alias="CategoryGridList.contentUpdated" />
-
-    <!-- Featured row content node -->
-    <field id="featuredRowContent" alias="CategoryGridList.featuredRowContent" />
 
     <!-- The helper will set this when the new skin Ad content is ready to be displayed on the
     screen. -->
     <field id="skinAdContentUpdated" alias="CategoryGridList.skinAdContentUpdated" />
 
-    <!-- The helper will set this when the ad content is ready to be displayed on the screen. Both contentFetchCompleted and skinAdContentUpdated have to be true before the screen can proceed to load which is communicated via setting of contentUpdated. -->
+    <!-- The helper will set this when the ad content is ready to be displayed on the screen. Both
+    contentFetchCompleted and skinAdContentUpdated have to be true before the screen can proceed to
+    load which is communicated via setting of contentUpdated. -->
     <field id="adContentFetchCompleted" type="boolean" value="false" />
 
-    <!-- The helper will set this when the content is ready to be displayed on the screen. Both contentFetchCompleted and skinAdContentUpdated have to be true before the screen can proceed to load which is communicated via setting of contentUpdated. -->
+    <!-- The helper will set this when the content is ready to be displayed on the screen. Both
+    contentFetchCompleted and skinAdContentUpdated have to be true before the screen can proceed to
+    load which is communicated via setting of contentUpdated. -->
     <field id="contentFetchCompleted" type="boolean" value="false" />
 
     <!-- What kind of content is this homeScreen displaying: movies, tv, normal, espanol etc -->
@@ -83,9 +85,7 @@
     <field id="shouldKidsModeBeSentToServer" type="boolean"
       alias="CategoryGridList.shouldKidsModeBeSentToServer" />
 
-    <field id="animateToCategory" alias="CategoryGridList.animateToCategory" />
     <field id="jumpToRowItemByID" alias="CategoryGridList.jumpToRowItemByID" />
-    <field id="jumpToRowItem" alias="CategoryGridList.jumpToRowItem" />
 
     <!-- If the screen is not enabled, then user should not be able to select anything -->
     <field id="enabled" type="boolean" alwaysNotify="true" />
@@ -131,9 +131,6 @@
     <!-- Will be set to true if we want to reset the grid position back to [0,0] -->
     <field id="resetGridPosition" alias="CategoryGridList.resetGridPosition" />
 
-    <field id="featuredRowFocusedItem" alias="CategoryGridList.featuredRowFocusedItem"
-      alwaysNotify="true" />
-
     <!-- Informs CategoryGridList add more content was appended to the category container during
     lazy loading. -->
     <field id="containerAppendMoreTilesStatus"
@@ -161,13 +158,13 @@
     <!-- Triggered when the ad has been in focus for awhile and needs to be reported. -->
     <field id="adTimerImpressionFire" type="boolean" value="false" alwaysNotify="true" />
 
-    <field id="featuredRowCurrFocusColumn" alias="CategoryGridList.featuredRowCurrFocusColumn" />
-    <field id="currFocusColumn" alias="CategoryGridList.currFocusColumn" />
+    <field id="oldRowFocusedItem" alias="CategoryGridList.oldRowFocusedItem" />
+    <field id="rowCurrFocusColumn" alias="CategoryGridList.rowCurrFocusColumn" />
 
-    <field id="featuredListCurrFocusRow" alias="CategoryGridList.featuredListCurrFocusRow" />
+    <field id="listCurrFocusRow" alias="CategoryGridList.listCurrFocusRow" />
 
-    <field id="featuredListScrollingStatus" alias="CategoryGridList.featuredListScrollingStatus" />
-    <field id="featuredListScrollDirection" alias="CategoryGridList.featuredListScrollDirection" />
+    <field id="listScrollingStatus" alias="CategoryGridList.listScrollingStatus" />
+    <field id="listScrollDirection" alias="CategoryGridList.listScrollDirection" />
 
     <!-- set to the contentNode of the CategoryGridList item which was clicked on -->
     <field id="contentSelected" type="node" />
@@ -192,10 +189,6 @@
     scrolling, each new focused column between the start and end scrolled columns will be dispatched
     as they begin to gain partial focus.  -->
     <field id="columnFocused" type="integer" value="-1" />
-
-    <field id="scrollingStatus" alias="CategoryGridList.scrollingStatus" />
-
-    <field id="currFocusRow" alias="CategoryGridList.currFocusRow" />
 
     <!-- content on the homescreen is loaded and spinner can be turned off -->
     <field id="contentReady" type="boolean" value="false" alwaysNotify="true" />
@@ -231,8 +224,8 @@
     to the parent that some of the containers has expired and to be loaded-->
     <field id="loadCategoryForIds" type="array" alwaysNotify="true" />
 
-    <!-- Communicates to the parent if the featured list has focus. -->
-    <field id="featuredListHasFocus" alias="CategoryGridList.featuredListHasFocus" />
+    <!-- Communicates to the parent if the list has focus. -->
+    <field id="listHasFocus" alias="CategoryGridList.listHasFocus" />
 
     <field id="currentFocusedItemBoundingRect"
       alias="CategoryGridList.currentFocusedItemBoundingRect" />
@@ -242,7 +235,7 @@
     <!-- Communicates to parent what was the last focused list was. -->
     <field id="lastFocusedList" alias="CategoryGridList.lastFocusedList" />
 
-    <field id="featuredRowListTranslation" type="array" alwaysNotify="true" />
+    <field id="rowListTranslation" type="array" alwaysNotify="true" />
     <field id="contentAreaTranslation" type="array" alias="ContentAreaParent.translation" />
 
     <!-- DATA STORE (Anything defined below are not meant to be used as output or input fields which

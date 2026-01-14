@@ -173,6 +173,7 @@ Function onSideNavItemSelected()
           if needsToShowAgeVerificationScreen() = true then
             showAgeVerificationScreenAtKidsModeExit(m.uiMode)
           else
+            hideNavMenu(false)
             disableKidsModeFromSideNav()
           end if
         else
@@ -186,6 +187,7 @@ Function onSideNavItemSelected()
             }
           }
           m.trackingLoggingTask.trackEvent = dialogEvent
+          hideNavMenu(false)
           enableKidsModeFromSideNav()
         end if
       else

@@ -292,18 +292,18 @@ Function getFocusedButton()
 End Function
 
 
-Function onDidSetReminderForEventContentChange(msg)
+Function onDidSetReminderForEventContentChange(_msg)
   refreshButtonList()
 End Function
 
 
-Function onUiRefreshTimerFired(msg)
+Function onUiRefreshTimerFired(_msg)
   refreshButtonList()
   updateAvailabilityBadge()
 End Function
 
 
-Function onSignedInChange(msg)
+Function onSignedInChange(_msg)
   refreshButtonList()
 End Function
 

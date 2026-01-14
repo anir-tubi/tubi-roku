@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { odc, ecp, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
-import { shared } from '../test-helpers';
+import { shared, testHelpers } from '../test-helpers';
 
 describe('Details Page', function () {
   describe('Movie Details Page', function () {
@@ -11,21 +11,18 @@ describe('Details Page', function () {
       await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
       await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
-      // We now want to find a piece of content that doesn't have a video preview
-      const rowListElement = testUtils.getElementKeyPath('movieScreenRowList');
-      const result = await findIndexForFirstItemWithoutVideoPreview(rowListElement.keyPath);
-      itemData = result.item;
+      // Find and navigate to content WITHOUT video preview
+      const [rowIndex, colIndex] = await testHelpers.findAndNavigateToVideoPreviewContent('movieScreenRowList', false, 5);
 
-      // If we found it go ahead and jump to it
-      if (result.index) {
-        await odc.setValue({
-          keyPath: rowListElement.keyPath,
-          field: 'jumpToRowItem',
-          value: result.index
-        });
-      } else {
-        console.error('Could not find a piece of content without video preview');
-      }
+      // Get the item data at the navigated position
+      const rowListElement = testUtils.getElementKeyPath('movieScreenRowList');
+      const { value: row } = await odc.getValue({
+        keyPath: `${rowListElement.keyPath}.content.${rowIndex}`,
+        responseMaxChildDepth: 1
+      });
+      const json = JSON.parse(row.json);
+      const item = row.children[colIndex];
+      itemData = json[item.id];
 
       // Now select that content to land us on the detail page
       await ecp.sendKeypress(ecp.Key.Ok);
@@ -462,21 +459,18 @@ describe('Details Page', function () {
     before(async () => {
       await shared.openSeriesScreenAndWaitUntilListIsFocused();
 
-      // We now want to find a piece of content that doesn't have a video preview
-      const rowListElement = testUtils.getElementKeyPath('tvScreenRowList');
-      const result = await findIndexForFirstItemWithoutVideoPreview(rowListElement.keyPath);
-      itemData = result.item;
+      // Find and navigate to content WITHOUT video preview
+      const [rowIndex, colIndex] = await testHelpers.findAndNavigateToVideoPreviewContent('tvScreenRowList', false, 5);
 
-      // If we found it go ahead and jump to it
-      if (result.index) {
-        await odc.setValue({
-          keyPath: rowListElement.keyPath,
-          field: 'jumpToRowItem',
-          value: result.index
-        });
-      } else {
-        console.error('Could not find a piece of content without video preview');
-      }
+      // Get the item data at the navigated position
+      const rowListElement = testUtils.getElementKeyPath('tvScreenRowList');
+      const { value: row } = await odc.getValue({
+        keyPath: `${rowListElement.keyPath}.content.${rowIndex}`,
+        responseMaxChildDepth: 1
+      });
+      const json = JSON.parse(row.json);
+      const item = row.children[colIndex];
+      itemData = json[item.id];
 
       // Now select that content to land us on the detail page
       await ecp.sendKeypress(ecp.Key.Ok);
@@ -671,34 +665,6 @@ describe('Details Page', function () {
   }); //Close describe Series Details page
 
 });// Close describe Details page
-
-async function findIndexForFirstItemWithoutVideoPreview(rowListKeyPath) {
-  const contentBaseKeyPath = rowListKeyPath + '.content';
-  const { value: totalRowCount } = await odc.getValue({
-    keyPath: contentBaseKeyPath + '.getChildCount()'
-  });
-
-
-  for (let rowIndex = 0; rowIndex < totalRowCount; rowIndex++) {
-    const { value: row } = await odc.getValue({
-      keyPath: contentBaseKeyPath + `.${rowIndex}`,
-      responseMaxChildDepth: 1
-    });
-    const json = JSON.parse(row.json);
-
-    for (let itemIndex = 0; itemIndex < row.children.length; itemIndex++) {
-      const item = row.children[itemIndex];
-      const itemFullInfo = json[item.id];
-      if (itemFullInfo && !itemFullInfo.video_preview_url) {
-        return {
-          index: [rowIndex, itemIndex],
-          item: itemFullInfo
-        };
-      }
-    }
-  }
-}
-
 
 async function verifyPlayFromBeginning() {
 

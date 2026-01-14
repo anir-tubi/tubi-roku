@@ -48,7 +48,7 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     homeScreen.observeFieldScoped("loadAllCategories", "onLoadAllCategories")
     homeScreen.observeFieldScoped("loadAllCategoriesViaRefreshTimer", "onLoadAllCategoriesAfterRefreshTimer")
-    homeScreen.observeFieldScoped("contentFocused", "onHomeScreenContentFocused")
+    homeScreen.observeFieldScoped("contentFocused", "onRowFocusedItemChange")
     homeScreen.observeFieldScoped("focusLost", "onHomeScreenFocusLost")
     homeScreen.observeFieldScoped("contentSelected", "onContentSelected")
     homeScreen.observeFieldScoped("contentToPlay", "onContentToPlay")
@@ -56,24 +56,17 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.observeFieldScoped("loadCategoryForIds", "onLoadCategoryForIds")
     homeScreen.observeFieldScoped("stopLinearVideoPlayer", "onStopLinearVideoPlayer")
     homeScreen.observeFieldScoped("sponsoredRowFocused", "onHomeScreenSponsoredRowFocused")
-    homeScreen.observeFieldScoped("columnFocused", "onColumnFocusChanged")
-    homeScreen.observeFieldScoped("currFocusRow", "onHomeScreenRowFocusChanged")
-    homeScreen.observeFieldScoped("currFocusColumn", "onHomeScreenColumnFocusChanged")
+    homeScreen.observeFieldScoped("rowCurrFocusColumn", "onRowCurrFocusColumnChange")
     homeScreen.observeFieldScoped("pauseVideoPreview", "onPauseVideoPreview")
     homeScreen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
-    homeScreen.observeFieldScoped("featuredRowCurrFocusColumn", "onFeaturedRowCurrFocusColumnChange")
-    homeScreen.observeFieldScoped("featuredListCurrFocusRow", "onFeaturedRowCurrFocusRowChange")
-    homeScreen.observeFieldScoped("featuredRowFocusedItem", "onFeaturedRowFocusedItemChange")
-    homeScreen.observeFieldScoped("featuredListHasFocus", "onFeaturedListHasFocusChange")
+    homeScreen.observeFieldScoped("listCurrFocusRow", "onRowCurrFocusRowChange")
+    homeScreen.observeFieldScoped("listHasFocus", "onListHasFocusChange")
     homeScreen.observeFieldScoped("adTimerImpressionFire", "onAdTimerImpressionFired")
     homeScreen.observeFieldScoped("currCategoryId", "onCurrCategoryIdChange")
-    homeScreen.observeFieldScoped("currentFocusedItemBoundingRect", "onFeaturedRowListTranslationChange")
-    homeScreen.observeFieldScoped("featuredRowListTranslation", "onFeaturedRowListTranslationChange")
-    homeScreen.observeFieldScoped("featuredListScrollDirection", "onFeaturedListScrollDirectionChange")
-    homeScreen.observeFieldScoped("featuredListScrollingStatus", "onFeaturedListScrollingStatusChange")
-    homeScreen.observeFieldScoped("scrollingStatus", "onFeaturedListScrollingStatusChange")
-    homeScreen.observeFieldScoped("scrollingStatus", "onScrollingStatusChange")
-    homeScreen.observeFieldScoped("featuredListScrollingStatus", "onScrollingStatusChange")
+    homeScreen.observeFieldScoped("currentFocusedItemBoundingRect", "onRowListTranslationChange")
+    homeScreen.observeFieldScoped("rowListTranslation", "onRowListTranslationChange")
+    homeScreen.observeFieldScoped("listScrollDirection", "onListScrollDirectionChange")
+    homeScreen.observeFieldScoped("listScrollingStatus", "onListScrollingStatusChange")
 
     m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop listening to timer before listing to it in case a previous screen started the timer
     m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
@@ -137,10 +130,6 @@ Function processHomeScreenBatchResponse(response, screenId)
   tubiLog("HomeScreenHelpers.processHomeScreenBatchResponse")
   homeScreen = getFromScreenCache(screenId)
   if homeScreen <> invalid
-    if isKidsUIOn() = false AND m.isUserInVideoTilesExperiment = true AND isNode(response) = true AND response.getChildCount() > 0 AND homeScreen.contentMode = m.constants.ui.contentMode.homescreen
-      updateCategoryGridWithFeaturedList(response, homeScreen)
-    end if
-
     homeScreen.batchResponse = response
   end if
 End Function
@@ -215,7 +204,7 @@ Function onReloadUserCategoriesInHomeScreen(response, screenId = "")
     ' For video tiles experiment, we need to update the featured row content.
     ' Since all the rows will be using new video tiles format.
     if m.isUserInVideoTilesExperiment = true AND screenId = m.constants.ui.screenIds.homeScreen
-      content = homeScreen.featuredRowContent
+      content = homeScreen.content
     else
       content = homeScreen.content
     end if
@@ -529,7 +518,7 @@ Function onHomesceenAdDisplaySuccessResponse(response)
 End Function
 
 
-Function onHomesceenAdDisplayErrorResponse(response)
+Function onHomesceenAdDisplayErrorResponse(_response)
   tubiLog("HomeScreenHelpers.onHomesceenAdDisplayErrorResponse")
   '//If the ad response fails, then fail silently and continue with the homescreen content update
   homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
@@ -555,11 +544,7 @@ Function checkIfHomeScreenContentIsReady(homeScreen)
       bHomeScreenContentReady = true
 
       adContent = homeScreen.adContent
-      if homeScreen.content <> invalid
-        homescreenContent = homeScreen.content
-      else
-        homescreenContent = homeScreen.featuredRowContent
-      end if
+      homescreenContent = homeScreen.content
 
       if adContent <> invalid then
         ' Insert each node into homeScreen.content at rowPlacement index
@@ -615,7 +600,6 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
       '      ...
       '   </CategoryContentNode>
       ' </CategoryContentNode>
-      homeScreen.content = rawResponse
       homeScreen.contentFetchCompleted = true
 
       homeScreen.personalizationId = rawResponse.personalizationId
@@ -632,14 +616,15 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
           screen = getCurrentScreen()
           isSkinAdsAvailable = (homeScreen.skinAdContent <> invalid)
           m.videoTileOverlayGroup.visible = (isSkinAdsAvailable = false AND screen <> invalid AND screen.id = m.constants.ui.screenIds.homeScreen)
-          updateCategoryGridWithFeaturedList(rawResponse, homeScreen)
-          rawResponse = invalid
+          updateCategoryGridWithRowList(rawResponse, homeScreen)
+        else
+          m.videoTileOverlayGroup.visible = false
+          homeScreen.content = rawResponse
         end if
       else
         m.videoTileOverlayGroup.visible = false
+        homeScreen.content = rawResponse
       end if
-
-      homeScreen.content = rawResponse
 
       checkIfHomeScreenContentIsReady(homeScreen)
 
@@ -813,22 +798,6 @@ Function jumpToParentScreenContentByID(sID, sDesiredContainerID = "", sParentScr
 End Function
 
 
-'// when a new item is focused on, then do something
-Function onHomeScreenContentFocused(msg)
-  tubiLog("HomeScreenHelpers.onHomeScreenContentFocused")
-  focusedContent = msg.getData()
-  homeScreen = msg.getRoSGNode()
-  ' Content Focused needs to be updated even when home screen is not in focus so that background image gets displayed even when side nav is in focus.
-  if homeScreen.isInFocusChain() = true
-    if homeScreen.lastFocusedList <> "featuredRowList"
-      setHomeScreenAfterFocus(focusedContent, homeScreen)
-    else
-      setHomeScreenAfterFocusForFeaturedRowList(focusedContent, homeScreen)
-    end if
-  end if
-End Function
-
-
 Function onHomeScreenFocusLost(msg)
   tubiLog("HomeScreenHelpers.onHomeScreenFocusLost")
   homeScreen = msg.getRoSGNode()
@@ -844,33 +813,12 @@ Function onHomeScreenFocusLost(msg)
 End Function
 
 
-'//when a new column of the row list begins to gain partial focus during a horizontal scroll, then do something
-Function onColumnFocusChanged(msg)
-  tubiLog("HomeScreenHelpers.onColumnFocusChanged")
-  if isLinearPlayerLoadingOrPlaying() = true
-    ' as the row list is scrolling, if the the linear video player is playing or loading, then make sure the linear video player is stopped.
-    stopAndHideLinearVideoPlayer()
-  end if
-
-  columnFocused = msg.getData()
-  homeScreen = msg.getRoSGNode()
-  rowFocused = homeScreen.currFocusRow
-  if isNumber(rowFocused) = true AND homeScreen.content <> invalid
-    category = homeScreen.content.getChild(rowFocused)
-    makeContainerRequest(category, columnFocused, homeScreen)
-  end if
-End Function
-
-
 Function onContainerMoreItemsSuccess(response)
   homeScreen = getCurrentScreen()
-  if homeScreen <> invalid AND homeScreen.content <> invalid AND isNode(response) = true AND homeScreen.currFocusRow <> invalid
-    rowFocused = homeScreen.currFocusRow
-    appendContentToCategory(response, homeScreen.content, rowFocused)
+  if homeScreen <> invalid AND homeScreen.content <> invalid AND isNode(response) = true AND homeScreen.listCurrFocusRow <> invalid
+    appendContentToCategory(response, homeScreen.content)
   end if
 End Function
-
-
 
 
 ' Make a request to the server to get more items for a category.
@@ -923,7 +871,7 @@ Function onContainerMoreItemsError(error)
   homeScreen = getCurrentScreen()
   if homeScreen <> invalid
     if m.isUserInVideoTilesExperiment = true
-      content = homeScreen.featuredRowContent
+      content = homeScreen.content
     else
       content = homeScreen.content
     end if
@@ -942,7 +890,7 @@ End Function
 ' @response, roSGNode, the response from the server.
 ' @contentNode, roSGNode, the content node to append the content to.
 ' @rowFocused, integer, the row index of the category that is focused.
-Function appendContentToCategory(response, contentNode, rowFocused)
+Function appendContentToCategory(response, contentNode)
   category = m.NodeHelpers.getChildById(contentNode, response.id)
   items = response.getChildren(-1, 0)
   if isNonEmptyArray(items) = true AND category <> invalid
@@ -977,154 +925,89 @@ Function appendContentToCategory(response, contentNode, rowFocused)
 End Function
 
 
-Function onHomeScreenRowFocusChanged(msg)
-  currFocusRow = msg.getData()
-  m.performanceMetricsTracker.startMetricTiming("vertical_scroll_performance")
-  screen = msg.getRoSGNode()
-  if currFocusRow = CInt(currFocusRow)
-    if isLinearPlayerLoadingORPlaying() = true
-      '//as the rowlist is scrolling, if the the linear video player is playing or loading, then make sure the linear video player has stopped
-      stopAndHideLinearVideoPlayer()
-    end if
-  else if m.inlinePreviewFocusIndicator.opacity = 1
-    ' Avoid the focus indicator from being shown when the row is scrolling.
-    fade(m.inlinePreviewFocusIndicator, "out", 0.1)
-
-    focusedContent = screen.contentFocused
-    if focusedContent <> invalid AND focusedContent.type = m.constants.ui.contentTypes.adRowlistSpotlight
-      '//Hide the video preview when the row is scrolling.
-      stopVideoPreview()
-    end if
-  end if
-
-  if currFocusRow = Fix(currFocusRow)
-    m.performanceMetricsTracker.endMetricTiming("vertical_scroll_performance", { row: currFocusRow, screen: screen.id })
-    if screen.containerPaginationStatus <> "finished"
-      makeAdditionalContainersRequestConditionally(currFocusRow, screen)
-    end if
-  end if
-
-End Function
-
-
-Function onHomeScreenColumnFocusChanged(msg)
-  currFocusColumn = msg.getData()
-  screen = msg.getRoSGNode()
-  m.performanceMetricsTracker.startMetricTiming("horizontal_scroll_performance")
-  rowFocused = screen.currFocusRow
-  if currFocusColumn = Fix(currFocusColumn)
-    m.performanceMetricsTracker.endMetricTiming("horizontal_scroll_performance", { column: currFocusColumn, row: rowFocused, screen: screen.id })
-  end if
-End Function
-
-
-
-' setHomeScreenAfterFocusForFeaturedRowList()
-' This function should be called when a new rowlist item on the homescreen gains focus.
-' Anything that needs to be set after a focus should be done in this function
-' @param focusedContent, roSGNode - The TubiContentNode of the focused content
-' @param homeScreen, roSGNode - The HomeScreen component that contains the focused content
-Function setHomeScreenAfterFocusForFeaturedRowList(focusedContent, homeScreen)
-  tubiLog("HomeScreenHelpers.setHomeScreenAfterFocusForFeaturedRowList")
-
-  '//update the UI anytime the homescreen changes focus.
-  setUIBasedOnFocusedContent(focusedContent)
-  if focusedContent <> invalid
-    currentScreen = getCurrentScreen()
-    if currentScreen.isSameNode(homeScreen) = true AND currentScreen.isInFocusChain() = true 'if there are any modals over home screen or focus has been lost to side nav
-
-      if focusedContent <> invalid AND (focusedContent.type = m.constants.ui.contentTypes.adRowlistCarousel OR focusedContent.type = m.constants.ui.contentTypes.adRowlistSpotlight) AND focusedContent.videoPreviewUrl <> ""
-        ' If the content is adRowlistCarousel or adRowlistSpotlight, then set the video preview after a delay
-        nAdVideoDelay = m.constants.player.videoPreviewDelayTimes.adCarousel
-        if focusedContent.type = m.constants.ui.contentTypes.adRowlistSpotlight
-          updatePlayerLayoutBasedOnFocusedContent(focusedContent)
-          nAdVideoDelay = m.constants.player.videoPreviewDelayTimes.adSpotlight
-          stopVideoPreview()
-        end if
-
-        m.videoPreviewDebounce.duration = nAdVideoDelay
-        m.videoPreviewDebounce.control = "start"
-      end if
-
-    end if
-  end if
-End Function
-
-
-
 ' setHomeScreenAfterFocus()
 ' This function should be called when a new rowlist item on the homescreen gains focus.
 ' Anything that needs to be set after a focus should be done in this function
 ' @param focusedContent, roSGNode - The TubiContentNode of the focused content
 ' @param homeScreen, roSGNode - The HomeScreen component that contains the focused content
-Function setHomeScreenAfterFocus(focusedContent, homeScreen)
+Function setHomeScreenAfterFocus(focusedContent, homeScreen) as Void
   tubiLog("HomeScreenHelpers.setHomeScreenAfterFocus")
 
-  '//update the UI anytime the homescreen changes focus.
   setUIBasedOnFocusedContent(focusedContent)
-  if focusedContent <> invalid
-    currentScreen = getCurrentScreen()
 
-    if currentScreen <> invalid AND currentScreen.id <> m.constants.ui.screenIds.linearVideoPlayerScreen
-      '//unless told otherwise later in this function, the default for bStopCountdownTimer is to assume that
-      '//we should stop the countdown timer
-      bStopCountdownTimer = true
-      if focusedContent.type = m.constants.ui.categoryTypes.linear AND m.SideNav.opened <> true AND m.tempModal = invalid AND m.constants.deviceInfo.isAutoplayEnabled = true
-        bPlayVideo = true
-        if isLinearPlayerPlayingThisContent(focusedContent) = true
-          '//No need to play the video. It already is playing the video
-          bPlayVideo = false
-        end if
+  if focusedContent = invalid
+    return
+  end if
 
-        if bPlayVideo = true
-          '//If player is currently not playing the current content, then display background and
-          '//tell player to load and play the video associated with the focused item
-          m.backgroundGroup.posterVisible = true '//reset the background so it can be seen
-          stopLinearVideoContent()
+  currentScreen = getCurrentScreen()
+  if currentScreen = invalid OR currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen
+    return
+  end if
 
-          if focusedContent.needsLogin = false OR getStatsigExperimentResource("roku_linear_reg_gate", "roku_linear_reg_gate_v1_1", false).enabled = false
-            playbackSource = {
-              "srcForAnalytic": m.constants.player.playbackSource.unknown
-              "srcForAds": m.constants.player.playbackOrigin.container
-              "playbackContainer": currentScreen.currCategoryId
-            }
-            playLinearVideoContent(focusedContent, true, homeScreen.id, true, playbackSource)
-          end if
-        else
-          bStopCountdownTimer = false
-          startCountdownTimer()
+  ' Default: stop countdown timer unless we're continuing to play linear content
+  shouldStopCountdownTimer = true
 
-          m.backgroundGroup.posterVisible = false
-        end if
-      else
-        if isLinearPlayerLoadingOrPlaying() = true
-          stopAndHideLinearVideoPlayer()
-        end if
+  ' Handle linear content autoplay
+  isLinearAutoplayCondition = (focusedContent.type = m.constants.ui.categoryTypes.linear AND m.SideNav.opened <> true AND m.tempModal = invalid AND m.constants.deviceInfo.isAutoplayEnabled = true)
+
+  if isLinearAutoplayCondition = true
+    isAlreadyPlaying = isLinearPlayerPlayingThisContent(focusedContent)
+
+    if isAlreadyPlaying = false
+      ' Display background and play the video
+      m.backgroundGroup.posterVisible = true
+      stopLinearVideoContent()
+
+      isGateEnabled = getStatsigExperimentResource("roku_linear_reg_gate", "roku_linear_reg_gate_v1_1", false).enabled
+      if focusedContent.needsLogin = false OR isGateEnabled = false
+        playbackSource = {
+          "srcForAnalytic": m.constants.player.playbackSource.unknown
+          "srcForAds": m.constants.player.playbackOrigin.container
+          "playbackContainer": currentScreen.currCategoryId
+        }
+        playLinearVideoContent(focusedContent, true, homeScreen.id, true, playbackSource)
       end if
-
-      if currentScreen.isSameNode(homeScreen) = true AND currentScreen.isInFocusChain() = true 'if there are any modals over home screen or focus has been lost to side nav
-        componentTrackingInfo = getCategoryComponentTrackingInfo(currentScreen)
-        if focusedContent <> invalid AND (focusedContent.type = m.constants.ui.contentTypes.adRowlistCarousel OR focusedContent.type = m.constants.ui.contentTypes.adRowlistSpotlight) AND focusedContent.videoPreviewUrl <> ""
-          ' If the content is adRowlistCarousel or adRowlistSpotlight, then set the video preview after a delay
-          nAdVideoDelay = m.constants.player.videoPreviewDelayTimes.adCarousel
-          if focusedContent.type = m.constants.ui.contentTypes.adRowlistSpotlight
-            updatePlayerLayoutBasedOnFocusedContent(focusedContent)
-            nAdVideoDelay = m.constants.player.videoPreviewDelayTimes.adSpotlight
-            stopVideoPreview()
-          end if
-
-          m.videoPreviewDebounce.duration = nAdVideoDelay
-          m.videoPreviewDebounce.control = "start"
-        else
-          ' If the content is not linear, adRowlistCarousel, or adRowlistSpotlight, then just set the video preview after focus
-          setVideoPreviewAfterFocus(focusedContent, currentScreen.trackingPageInfo, componentTrackingInfo)
-        end if
-      end if
-
-      if bStopCountdownTimer = true
-        stopCountdownTimer()
-      end if
+    else
+      ' Content is already playing, keep countdown timer running
+      shouldStopCountdownTimer = false
+      startCountdownTimer()
+      m.backgroundGroup.posterVisible = false
     end if
+  else
+    ' Non-linear or autoplay disabled: stop linear player if playing
+    if isLinearPlayerLoadingOrPlaying() = true
+      stopAndHideLinearVideoPlayer()
+    end if
+  end if
+
+  ' Handle video preview for home screen content
+  isHomeScreenInFocus = (currentScreen.isSameNode(homeScreen) = true AND currentScreen.isInFocusChain() = true)
+  if isHomeScreenInFocus = true
+    componentTrackingInfo = getCategoryComponentTrackingInfo(currentScreen)
+
+    ' Check if this is ad carousel/spotlight content with video preview
+    isAdCarousel = (focusedContent.type = m.constants.ui.contentTypes.adRowlistCarousel)
+    isAdSpotlight = (focusedContent.type = m.constants.ui.contentTypes.adRowlistSpotlight)
+    hasVideoPreview = (focusedContent.videoPreviewUrl <> "")
+
+    if (isAdCarousel = true OR isAdSpotlight = true) AND hasVideoPreview = true
+      ' Set video preview with delay for ad content
+      if isAdSpotlight = true
+        updatePlayerLayoutBasedOnFocusedContent(focusedContent)
+        stopVideoPreview()
+        m.videoPreviewDebounce.duration = m.constants.player.videoPreviewDelayTimes.adSpotlight
+      else
+        m.videoPreviewDebounce.duration = m.constants.player.videoPreviewDelayTimes.adCarousel
+      end if
+      m.videoPreviewDebounce.control = "start"
+    else
+      ' Set video preview immediately for regular content
+      setVideoPreviewAfterFocus(focusedContent, currentScreen.trackingPageInfo, componentTrackingInfo)
+    end if
+  end if
+
+  if shouldStopCountdownTimer = true
+    stopCountdownTimer()
   end if
 End Function
 
@@ -1546,15 +1429,15 @@ End Function
 ' Fade in and out the focus indicator when the user is scrolling through the rows.
 ' Provides similar better as row list fadeFocusWhileScrolling experience.
 ' @param msg: roSGNode, the message object.
-Function onFeaturedRowCurrFocusRowChange(msg)
+Function onRowCurrFocusRowChange(msg)
   screen = msg.getRoSGNode()
   currFocusRow = msg.getData()
   fade(m.autoStartPreviewToPlaybackTimer, "out", 0.1)
   ' It will only start the timer for the first time.
   m.performanceMetricsTracker.startMetricTiming("vertical_scroll_performance")
-  updateVideoTileSize(screen.featuredListScrollingStatus)
+  updateVideoTileSize(screen.listScrollingStatus)
 
-  if screen.lastFocusedList = "featuredRowList"
+  if screen.lastFocusedList = "rowList"
     m.videoPreviewPlayer.opacity = 0
     m.inlineVideoMetadataOverlay.skipAnimation = true
     ' Avoid the focus indicator from being shown when the row is scrolling.
@@ -1567,7 +1450,7 @@ Function onFeaturedRowCurrFocusRowChange(msg)
     pauseVideoPreviewAndShowPoster()
     ' So that we call at the end of transition.
     if currFocusRow = Fix(currFocusRow)
-      checkAndSetSponsorshipBackground(screen.featuredRowContent, currFocusRow)
+      checkAndSetSponsorshipBackground(screen.content, currFocusRow)
     end if
   end if
 
@@ -1582,12 +1465,15 @@ End Function
 
 ' Triggers a callback when list has started and stopped scrolling through the rows.
 ' @param msg: roSGNode, the message object.
-Function onFeaturedListScrollingStatusChange(msg)
+Function onListScrollingStatusChange(msg)
   scrollingStatus = msg.getData()
+  screen = msg.getRoSgNode()
+
+  isVideoTileEnabledScreen = isKidsUIOn() = false AND screen.id = m.constants.ui.screenIds.homeScreen
+
   ' Below logic helps to avoid us from updating the in transit video metadata overlay when the user is scrolling up or down.
   if scrollingStatus = false
-    screen = msg.getRoSgNode()
-    if screen.featuredRowContent <> invalid
+    if screen.content <> invalid AND isVideoTileEnabledScreen = true
       updateVideoTileSize(scrollingStatus)
       updateInTransitVideoMetadataOverlay()
     end if
@@ -1595,45 +1481,24 @@ Function onFeaturedListScrollingStatusChange(msg)
     if state = "playing" OR state = "paused"
       stopVideoPreview()
     end if
+
+    ' Handle paginated content queue
+    if m.paginatedContentQueue <> invalid
+      appendPaginatedContainersToScreen(screen, m.paginatedContentQueue)
+      m.paginatedContentQueue = invalid
+    end if
   end if
 End Function
 
 
-' Updates the in transit video metadata overlay when the user is scrolling up or down.
-
-
-' Triggers a callback when the user is scrolling through the columns of the row.
-
-
-' Updates the video tile metadata overlay on focus change.
-' @param rowFocused: int, the row index of the focused item.
-' @param columnFocused: int, the column index of the focused item.
-' @param screen: roSGNode, the screen node.
-
-
-
-
-' Starts the inline preview when the featured row list has focus.
-
-
-' Sets the inline video metadata overlay.
-' @param featuredRowContent: roSGNode, the featured row content.
-' @param columnFocused: int, the column index of the focused item.
-' @param rowFocused: int, the row index of the focused item.
-
-
-
-
-Function onFeaturedListHasFocusChange(msg)
-  tubiLog("HomeScreenHelpers.onFeaturedListHasFocusChange")
+Function onListHasFocusChange(msg)
+  tubiLog("HomeScreenHelpers.onListHasFocusChange")
   hasFeaturedListFocus = msg.getData()
   screen = msg.getRoSGNode()
-  m.videoTileOverlayGroup.visible = (isCurrentScreenHomeScreen() = true AND isKidsUIOn() = false AND screen.lastFocusedList = "featuredRowList")
-  content = screen.featuredRowFocusedItem
+  content = screen.contentFocused
   previewContent = m.videoPreviewPlayer.content
-  m.videoPreviewPlayer.visible = (isCurrentScreenHomeScreen() = false OR (content <> invalid AND previewContent <> invalid AND content.id = previewContent.id))
+  m.videoPreviewPlayer.visible = (isCurrentScreenHomeScreen() = false OR (content <> invalid AND previewContent <> invalid AND content.id = previewContent.id)) AND (previewContent <> invalid AND previewContent.gridItemType <> m.constants.ui.gridItemTypes.skinAd)
   if hasFeaturedListFocus = true
-
     if isCurrentScreenHomeScreen() = true
       updateVideoTileScreenBackground(content, screen)
     end if
@@ -1652,7 +1517,7 @@ Function onFeaturedListHasFocusChange(msg)
   else if isCurrentScreenHomeScreen() = true
     m.videoPreviewPlayer.visible = false
     m.inlinePreviewFocusIndicator.visible = false
-    if screen.lastFocusedList = "featuredRowList"
+    if screen.lastFocusedList = "rowList"
       pauseVideoPreview()
     end if
   else
@@ -1666,10 +1531,10 @@ Function onFeaturedListHasFocusChange(msg)
 End Function
 
 
-Function updateCategoryGridWithFeaturedList(response, screen)
-  screen.featuredRowContent = response
+Function updateCategoryGridWithRowList(response, screen)
+  screen.content = response
 
-  if screen.skinAdContent <> invalid OR (screen.featuredListHasFocus = false AND isKidsUIOn() = false)
+  if screen.skinAdContent <> invalid OR (screen.listHasFocus = false AND isKidsUIOn() = false)
     currentScreen = getCurrentScreen()
     isCurrScreenHomeScreen = currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen
     if isCurrScreenHomeScreen = true AND screen.isInFocusChain() = false
@@ -1685,7 +1550,7 @@ Function updateCategoryGridWithFeaturedList(response, screen)
 End Function
 
 
-Function onFeaturedRowFocusedItemChange(msg) as Void
+Function onRowFocusedItemChange(msg) as Void
   focusedItem = msg.getData()
   screen = msg.getRoSGNode()
 
@@ -1693,38 +1558,54 @@ Function onFeaturedRowFocusedItemChange(msg) as Void
     return
   end if
 
-  ' Only process if the focused item is a video tile.
-  if isVideoTileEnabledContainer(focusedItem.gridItemType, focusedItem.parentId) = true
+  ' Handle video tile enabled containers
+  isVideoTile = isVideoTileEnabledContainer(focusedItem.gridItemType)
+  isVideoTileEnabledScreen = isKidsUIOn() = false AND screen.id = m.constants.ui.screenIds.homeScreen
+  if screen.oldRowFocusedItem <> invalid AND screen.oldRowFocusedItem.gridItemType = m.constants.ui.gridItemTypes.skinAd
+    m.videoPreviewPlayer.visible = false
+  end if
+  m.videoTileOverlayGroup.visible = isVideoTileEnabledScreen AND focusedItem.gridItemType <> m.constants.ui.gridItemTypes.skinAd
+
+  ' Figure out a better way to handle this.
+  if isVideoTileEnabledScreen = false OR focusedItem.gridItemType = m.constants.ui.gridItemTypes.skinAd
+    fade(m.inlineVideoPreviewPlayerContainer, "out", 0.1)
+    setHomeScreenAfterFocus(focusedItem, screen)
+    return
+  end if
+
+  if isVideoTile = true
     m.inlineVideoPreviewPlayerContainer.visible = true
-    ' In certain cases where the focused item is not the same as the itemContent, we need to update the itemContent.
-    ' For ex: One instance is Continue watching row getting updated with the new item or existing item been deleted.
-    if isNode(m.inlineVideoMetadataOverlay.itemContent) = true AND focusedItem.title <> m.inlineVideoMetadataOverlay.itemContent.title
+    ' Update itemContent if the focused item has changed
+    ' For ex: Continue watching row getting updated with new item or existing item deleted
+    shouldUpdateOverlay = isNode(m.inlineVideoMetadataOverlay.itemContent) = true AND focusedItem.title <> m.inlineVideoMetadataOverlay.itemContent.title
+    if shouldUpdateOverlay = true
       updateInTransitVideoMetadataOverlay()
     end if
   else
     m.inlineVideoPreviewPlayerContainer.visible = false
-
+    ' Handle ad carousel with video preview
     if focusedItem.type = m.constants.ui.contentTypes.adRowlistCarousel AND focusedItem.videoPreviewUrl <> ""
-      ' If the content is adRowlistSpotlight, then set the video preview after a delay
       m.videoPreviewDebounce.duration = m.constants.player.videoPreviewDelayTimes.adCarousel
       m.videoPreviewDebounce.control = "start"
     end if
   end if
 
-  ' If VideoPreview is on and we have not started the debounce, we will start it.
-  ' This is needed in case where for initial load and refresh cases where columnFocusChange is not triggered.
-  if isVideoPreviewOn() = true AND m.videoPreviewDebounce.control = "stop"
-    if screen.featuredListHasFocus = true
+  ' Start video preview debounce if conditions are met
+  ' Needed for initial load and refresh cases where columnFocusChange is not triggered
+  if isVideoPreviewOn() = true AND (m.videoPreviewDebounce.control = "stop" OR m.videoPreviewDebounce.control = "none")
+    if screen.listHasFocus = true
       m.videoPreviewDebounce.control = "start"
     else
       m.queuedVideoTilePreview = true
     end if
   end if
 
+  ' Update UI for home screen
   if isCurrentScreenHomeScreen() = true
     updateVideoTileScreenBackground(focusedItem, screen)
     updatePlayerLayoutBasedOnFocusedContent(focusedItem)
   end if
+
   setUIBasedOnFocusedContent(focusedItem)
 End Function
 
@@ -1737,10 +1618,6 @@ Function onCurrCategoryIdChange()
   end if
   updateInlineVideoMetadataOverlayVisibility(0.3)
 End Function
-
-
-
-
 
 
 Function getCategoryComponentTrackingInfo(screen)
@@ -1764,11 +1641,12 @@ End Function
 ' This ensure we update the in transit video metadata overlay when the user is switching direction.
 ' Below when user is scrolling down we use next container poster vs previous container poster.
 ' @param msg: roSGNode, the message object.
-Function onFeaturedListScrollDirectionChange(msg)
+Function onListScrollDirectionChange(msg)
   screen = msg.getRoSGNode()
   scrollDirection = msg.getData()
-  if scrollDirection = "down" OR scrollDirection = "up"
-    updateVideoTileSize(screen.featuredListScrollingStatus)
+  isVideoTileEnabledScreen = isKidsUIOn() = false AND screen.id = m.constants.ui.screenIds.homeScreen
+  if isVideoTileEnabledScreen = true AND (scrollDirection = "down" OR scrollDirection = "up")
+    updateVideoTileSize(screen.listScrollingStatus)
     updateInTransitVideoMetadataOverlay()
   end if
 End Function
@@ -1845,19 +1723,13 @@ Function sanitizeHomeScreenResponseAndReturnLiveEventsContainer(rawResponse)
 End Function
 
 
-
-
 ' Requests additional content containers when user scrolls near the bottom
 ' Implements pagination by loading more containers as needed
 ' @param currFocusRow - The current row index where user focus is
 ' @param screen - The screen node requesting additional containers
 Function makeAdditionalContainersRequestConditionally(currFocusRow, screen) as Void
   if screen <> invalid AND screen.containerPaginationStatus <> "pending"
-    if screen.featuredRowContent <> invalid
-      content = screen.featuredRowContent
-    else
-      content = screen.content
-    end if
+    content = screen.content
 
     if isNode(content) = false
       return
@@ -1919,11 +1791,7 @@ End Function
 Function onAdditionalContainersSuccessResponse(response)
   screen = getScreenFromStackById(response.screenId)
   if screen <> invalid
-    if screen.featuredRowContent <> invalid
-      scrollingStatus = screen.featuredListScrollingStatus
-    else
-      scrollingStatus = screen.scrollingStatus
-    end if
+    scrollingStatus = screen.listScrollingStatus
 
     if scrollingStatus = false
       appendPaginatedContainersToScreen(screen, response)
@@ -1943,29 +1811,12 @@ Function onAdditionalContainersErrorResponse(response)
 End Function
 
 
-' Handles scrolling status changes on the screen
-' Appends queued paginated content when scrolling stops
-' @param msg - Message containing scrolling status boolean value
-Function onScrollingStatusChange(msg)
-  scrollingStatus = msg.getData()
-  screen = msg.getRoSGNode()
-  if scrollingStatus = false AND m.paginatedContentQueue <> invalid
-    appendPaginatedContainersToScreen(screen, m.paginatedContentQueue)
-    m.paginatedContentQueue = invalid
-  end if
-End Function
-
-
 ' Appends paginated content containers to the screen
 ' Updates pagination status and triggers video preview debounce if needed
 ' @param screen - The screen node to append containers to
 ' @param response - Response node containing content containers to append
 Function appendPaginatedContainersToScreen(screen, response)
-  if screen.featuredRowContent <> invalid
-    content = screen.featuredRowContent
-  else
-    content = screen.content
-  end if
+  content = screen.content
 
   if content <> invalid AND isNode(response) = true AND response.getChildCount() > 0
     items = response.getChildren(-1, 0)

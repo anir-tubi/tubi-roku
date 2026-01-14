@@ -165,7 +165,7 @@ Function setupTitleAndConfig(itemContent) as Void
 
   variant = m.top.variant
   if (variant = "portraitWithMetadata" OR variant = "detailScreenInfoPanel") AND m.title = invalid
-    appendTitleToMetadataGroup(itemContent)
+    appendTitleToMetadataGroup()
   end if
 
   ' Resetting the visibility of the rating and sot badge.
@@ -687,8 +687,7 @@ End Function
 
 ' Appends title label or title image to metadata group and configures spacing based on variant
 ' For detailScreenInfoPanel with title art, displays poster image; otherwise displays text label
-' @param itemContent - Content node with title
-Function appendTitleToMetadataGroup(itemContent = invalid)
+Function appendTitleToMetadataGroup()
   isDetailScreenInfoPanel = m.top.variant = "detailScreenInfoPanel"
 
   ' Create text label for title
@@ -831,8 +830,7 @@ End Function
 
 ' Handles changes to currentEpisode field
 ' Creates and updates the episode title label when currentEpisode is set
-' @param msg - Optional message containing currentEpisode data
-Function onCurrentEpisodeChange(msg = invalid) as Void
+Function onCurrentEpisodeChange() as Void
   currentEpisode = m.top.currentEpisode
   removeCurrentEpisodeTitleLabel()
 

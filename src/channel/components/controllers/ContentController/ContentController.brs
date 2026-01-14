@@ -1759,11 +1759,6 @@ Function setVideoContentScreenBackground(screen, content = invalid)
     isAdCarouselRowContent = gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
     if contentFocused.gridItemType = m.constants.ui.gridItemTypes.liveEventSpotlight
       displayFullScreenVideoBackground(contentFocused)
-    else if contentFocused <> invalid AND shouldDisplayFullScreenVideoBackground(contentFocused) = true AND m.videoTilesVariant <> "trueControlTop2Rows" AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND isKidsUIOn() = false
-      m.backgroundGroup.backgroundInfo = {
-        type: m.constants.ui.backgroundTypes.cinematic
-        uriList: contentFocused.backgrounds
-      }
     else if (videoPreviewState = "playing" OR videoPreviewState = "paused" OR videoPreviewState = "buffering" OR isVideoPreviewPlayQueued() = true) AND isSkinAdRowContent = false AND isAdCarouselRowContent = false
       m.backgroundGroup.backgroundInfo = {
         type: m.constants.ui.backgroundTypes.epg
@@ -2097,7 +2092,7 @@ Function onCustomSuspend(msg)
       ' This is needed to avoid having to use alwaysnotify on featuredListHasFocus and when app is suspended it does not fire focus change event on home screen.
       homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
       if homeScreen <> invalid
-        homeScreen.featuredListHasFocus = false
+        homeScreen.listHasFocus = false
       end if
     end if
 
@@ -2402,9 +2397,6 @@ Function onFullscreenCountdown()
     if screen.id = m.constants.ui.screenIds.homeScreen OR isAnEpgScreen(screen) = true
       if screen.id = m.constants.ui.screenIds.homeScreen
         contentToPlay = screen.contentFocused
-        if screen.featuredListHasFocus = true
-          contentToPlay = screen.featuredRowFocusedItem
-        end if
       else
         contentToPlay = screen.linearChannelToPlay
       end if

@@ -1,3 +1,5 @@
+' Initializes the CategoryGridList component
+' Sets up observers, node references, and initial configuration
 Function init()
   tubiLog("CategoryGridList.init")
   m.constants = getConstantsFromGlobal()
@@ -8,7 +10,6 @@ Function init()
   m.top.observeFieldScoped("jumpToRowItemByID", "onJumpToRowItemByIDChange")
   m.top.observeFieldScoped("contentUpdated", "onContentChange")
   m.top.observeFieldScoped("repopulateContent", "onRepopulateContent")
-  m.top.observeFieldScoped("removeFocusFromRowList", "onRemoveFocusFromRowList")
   m.top.observeFieldScoped("signedIn", "onSignedInChange")
   m.top.observeFieldScoped("parentScreenTrackingPageInfo", "onParentScreenTrackingPageInfoChange")
   m.top.observeFieldScoped("kidsMode", "onKidsModeChange")
@@ -16,27 +17,19 @@ Function init()
   m.top.observeFieldScoped("animateToItem", "onAnimateToItemChange")
   m.top.observeFieldScoped("hasNewContainers", "onHasNewContainersChange")
 
-  m.RowList = m.top.findNode("RowList")
-  m.RowList.observeFieldScoped("rowItemFocused", "onRowItemFocused")
-  m.RowList.observeFieldScoped("rowItemSelected", "onRowItemSelected")
+  m.rowList = m.top.findNode("rowList")
+  m.rowList.observeFieldScoped("rowItemFocused", "onRowItemFocused")
+  m.rowList.observeFieldScoped("rowItemSelected", "onRowItemSelected")
+  m.rowList.observeFieldScoped("currFocusColumn", "onRowCurrFocusColumnChange")
+  m.rowList.observeFieldScoped("currFocusRow", "onListCurrFocusRowChange")
+  m.rowList.observeFieldScoped("vertFocusDirection", "onVertFocusDirectionChange")
+  m.top.observeFieldScoped("contentUpdated", "onRowContentChange")
+  m.top.observeFieldScoped("resetRowList", "onResetRowListChange")
 
-  m.featuredRowList = m.top.findNode("featuredRowList")
-  m.featuredRowList.observeFieldScoped("rowItemFocused", "onFeaturedRowItemFocused")
-  m.featuredRowList.observeFieldScoped("rowItemSelected", "onFeaturedRowItemSelected")
-  m.featuredRowList.observeFieldScoped("currFocusColumn", "onFeaturedRowCurrFocusColumnChange")
-  m.featuredRowList.observeFieldScoped("currFocusRow", "onFeaturedListCurrFocusRowChange")
-  m.featuredRowList.observeFieldScoped("vertFocusDirection", "onVertFocusDirectionChange")
-  m.top.observeFieldScoped("contentUpdated", "onFeaturedRowContentChange")
-  m.top.observeFieldScoped("resetFeaturedRowList", "onResetFeaturedRowListChange")
-
-  experimentsInfo = getExperimentsInfoFromGlobal()
-  experiments = TubiExperiments(experimentsInfo)
   soTStaticConfig = getSoTStaticConfigFromGlobal()
   statSigExperimentsInfo = getStatsigExperimentsInfoFromGlobal()
   experimentInterface = StatsigExperimentsInterface(statSigExperimentsInfo)
-  m.metadataTranslate = TubiMetadataTranslate(m.constants, experiments, soTStaticConfig, experimentInterface)
-
-  m.RowList.drawFocusFeedbackOnTop = true
+  m.metadataTranslate = TubiMetadataTranslate(m.constants, invalid, soTStaticConfig, experimentInterface)
 
   ' stores an array of the form [y, x], which can be set on RowList.jumpToItem
   m.itemToJumpTo = invalid
@@ -55,7 +48,7 @@ Function init()
   end if
   onThemeChange()
 
-  ' Holds the value of last focused list, possible values are "", "skinAdRow" "rowlist".
+  ' Holds the value of last focused list, possible values are "", "skinAdRow" "rowList".
   ' These IDs match with the IDs of the components in the XML.
   m.top.lastFocusedList = ""
 
@@ -69,9 +62,6 @@ Function init()
 
   m.expandedTileFocusXOffset = m.featuredRowPoster[0] - m.gridItemSize[0] + 4
 
-  ' 263 is the height of the metadata section displayed beneath the featured focused tile.
-  ' 263 also includes the space between the last line of the description and container below it.
-  m.rowListPosition = [0, 263 + m.featuredRowPoster[1]]
   m.isUserInVideoTiles = (experiment.design_type = "videoTiles")
 
   ' Creating a backup variable to check if user is in video tiles experiment, since we override value.
@@ -80,6 +70,8 @@ Function init()
 End Function
 
 
+' Handles theme changes and applies colors to the row list
+' @param msg - Optional message containing theme data
 Function onThemeChange(msg = invalid)
   if msg <> invalid
     theme = msg.getData()
@@ -88,16 +80,18 @@ Function onThemeChange(msg = invalid)
   end if
 
   if theme <> invalid
-    m.RowList.focusBitmapBlendColor = theme.focusedColor
-    m.FeaturedRowList.focusBitmapBlendColor = theme.focusedColor
+    m.rowList.focusBitmapBlendColor = theme.focusedColor
   end if
 End Function
 
 
-Function onFeaturedRowContentChange(msg)
-  featuredRowContent = m.top.featuredRowContent
-  if featuredRowContent <> invalid then
-    m.featuredRowList.update({
+' Handles changes to the row content field
+' Updates the row list with new content and configuration
+' @param _msg - Message containing the new row content (unused)
+Function onRowContentChange(_msg)
+  rowContent = m.top.content
+  if rowContent <> invalid then
+    m.rowList.update({
       parentScreenId: m.top.parentScreenId
       parentScreenTrackingPageInfo: m.top.parentScreenTrackingPageInfo
       personalizationId: m.top.personalizationId
@@ -105,64 +99,55 @@ Function onFeaturedRowContentChange(msg)
       rowIndexBoost: 0
     }, true)
 
-    m.featuredRowList.content = featuredRowContent
+    m.rowList.content = rowContent
   end if
 End Function
 
 
-Function onResetFeaturedRowListChange(msg)
-  m.featuredRowList.content = invalid
+' Handles reset of the row list by clearing its content
+' @param _msg - Message triggering the reset (unused)
+Function onResetRowListChange(_msg)
+  m.rowList.content = invalid
 End Function
 
-Function onFeaturedRowItemSelected(msg)
-  tubiLog("CategoryGridList.onFeaturedRowItemSelected")
-  featuredItemSelected = msg.getData()
-  m.top.selectedPosition = featuredItemSelected
 
-  itemSelected = resolveAbbreviatedContent(m.top.featuredRowContent, featuredItemSelected)
+' Handles row item selection from the row list
+' Resolves abbreviated content and updates selected item field
+' @param msg - Message containing the selected item position [row, column]
+Function onRowItemSelected(msg)
+  tubiLog("CategoryGridList.onRowItemSelected")
+  itemSelectedFromRowList = msg.getData()
+  m.top.selectedPosition = itemSelectedFromRowList
+
+  itemSelected = resolveAbbreviatedContent(m.top.content, itemSelectedFromRowList)
   if itemSelected <> invalid
-    m.top.featuredItemSelected = itemSelected
+    m.top.itemSelectedFromRowList = itemSelected
   end if
 End Function
 
 
-Function onRemoveFocusFromRowList()
-  m.RowList.setFocus(false)
-End Function
-
-
-' This function is used to handle the case where the row list is focused and we are appending more tiles to the row list.
-' @param msg - The message object containing the status of the container append more tiles operation.
+' Handles container append more tiles status changes
+' Manages focus position during tile appending to prevent focus reset issues
+' @param msg - Message containing the status ("start", "complete", etc.)
 Function onContainerAppendMoreTilesStatusChange(msg)
   status = msg.getData()
 
-  ' NOTE: This is to handle a edge case bug only happens when we fast scroll by press and hold.
-  ' NOTE: Theory is that when we fast scroll and when roku is trying to scroll through items rapidly and we are also appending items at the same time it messes up internal logic of row list.
-  ' The idea around below logic is to handle the case where when we append more tiles to the row list, we need to reset the focus to the correct item.
+  ' Handle case where the featured row list is focused and we are appending more tiles to the row list.
+  ' NOTE: This is to handle an edge case bug only when we fast scroll by press and hold.
+  ' The idea is to handle the case where when we append more tiles to the row list, we need to reset the focus to the correct item.
   ' This is required because whenever we append more children to the row list, the focus position is reset to zero.
-  ' So in the below logic before we start appending we check if there is a difference between currFocusColumn and rowItemFocused[1], this indicates to us that user is fast scrolling because when user press and hold only currFocusColumn changes and rowItemFocused[1] is updated only when user releases the press.
-  ' So we store the value of where the user position is when we start appending and then we jump to that position when we are done appending.
-  ' This way user press and hold is seem less.
-  ' TODO: Revisit the logic below and remove either if or else based on whether we graduated roku_video_tiles_1_7 experiment.
-  ' TODO: Revisit logic inside onComponentFocusChange since that gets triggered a lot of times during navigation we might not need that logic. Not changing now to avoid scope creep for this PR.
-  if m.isUserInVideoTiles = true
-    if status = "start" AND isNonEmptyArray(m.featuredRowList.rowItemFocused) = true AND (m.featuredRowList.rowItemFocused[0] = m.featuredRowList.currFocusRow AND m.featuredRowList.rowItemFocused[1] <> m.top.featuredRowCurrFocusColumn)
-      m.resetListPositionOnRepopulateToIndex = [m.featuredRowList.currFocusRow, m.top.featuredRowCurrFocusColumn]
-    else if isNonEmptyArray(m.resetListPositionOnRepopulateToIndex) = true
-      m.FeaturedRowList.jumpToRowItem = m.resetListPositionOnRepopulateToIndex
-      m.resetListPositionOnRepopulateToIndex = invalid
-    end if
-  else
-    if status = "start" AND isNonEmptyArray(m.RowList.rowItemFocused) = true AND (m.RowList.rowItemFocused[0] = m.RowList.currFocusRow AND m.rowList.rowItemFocused[1] <> m.rowList.currFocusColumn)
-      m.resetListPositionOnRepopulateToIndex = [m.RowList.currFocusRow, CInt(m.RowList.currFocusColumn)]
-    else if isNonEmptyArray(m.resetListPositionOnRepopulateToIndex) = true
-      m.RowList.jumpToRowItem = m.resetListPositionOnRepopulateToIndex
-      m.resetListPositionOnRepopulateToIndex = invalid
-    end if
+  if status = "start" AND isNonEmptyArray(m.rowList.rowItemFocused) = true AND (m.rowList.rowItemFocused[0] = m.rowList.currFocusRow AND m.rowList.rowItemFocused[1] <> m.top.rowCurrFocusColumn)
+    m.resetListPositionOnRepopulateToIndex = [m.rowList.currFocusRow, m.top.rowCurrFocusColumn]
+  else if isNonEmptyArray(m.resetListPositionOnRepopulateToIndex) = true
+    m.rowList.jumpToRowItem = m.resetListPositionOnRepopulateToIndex
+    m.resetListPositionOnRepopulateToIndex = invalid
   end if
 End Function
 
 
+' Jumps to a specific row item by content ID and optional container ID
+' Searches through content to find matching item and sets focus
+' @return Boolean - True if item found and focused, false otherwise
 Function onJumpToRowItemByIDChange()
   tubiLog("CategoryGridList.onJumpToRowItemByIDChange")
   sDesiredContainerID = ""
@@ -172,13 +157,12 @@ Function onJumpToRowItemByIDChange()
     sDesiredContainerID = m.top.jumpToRowItemByID[1]
   end if
 
-  if m.isUserInVideoTiles = true AND m.featuredRowList.content <> invalid
-    content = m.featuredRowList.content
-  else
-    content = m.RowList.content
+  content = m.rowList.content
+  if content = invalid
+    return false
   end if
 
-  '//Loop thru the containers to find the content item with an ID that matches sContentID and focus on that content item
+  ' Loop through the containers to find the content item with an ID that matches sContentID and focus on that content item
   for i = 0 to content.getChildCount() - 1
     container = content.getChild(i)
     sTempContainerID = container.id
@@ -186,12 +170,8 @@ Function onJumpToRowItemByIDChange()
       for j = 0 to container.getChildCount() - 1
         item = container.getChild(j)
         if item.id = sContentID
-          'focus on the item
-          if m.isUserInVideoTiles = true
-            m.featuredRowList.jumpToRowItem = [i, j]
-          else
-            m.RowList.jumpToRowItem = [i, j]
-          end if
+          ' Focus on the item
+          m.rowList.jumpToRowItem = [i, j]
           return true
         end if
       end for
@@ -201,16 +181,12 @@ Function onJumpToRowItemByIDChange()
 End Function
 
 
-'''''''''''''''''''''''''
-' onComponentFocusChange
-'
-Function onComponentFocusChange(msg)
+' Handles focus changes on the component
+' Manages focus between skin ad row and row list, handles item jump behavior
+' @param _msg - Message containing focus state information (unused)
+Function onComponentFocusChange(_msg)
   tubiLog("CategoryGridList.onComponentFocusChange " + focusState(m.top))
-  if m.isUserInVideoTiles = true AND m.top.featuredRowContent <> invalid
-    content = m.top.featuredRowContent
-  else
-    content = m.top.content
-  end if
+  content = m.top.content
 
   itemToJumpTo = invalid
   if m.itemToJumpTo <> invalid AND resolveAbbreviatedContent(content, m.itemToJumpTo) <> invalid then
@@ -224,62 +200,28 @@ Function onComponentFocusChange(msg)
       m.top.lastFocusedList = "skinAdRow"
       m.skinAdRow.opacity = 1
       m.skinAdRow.setFocus(true)
-    else if m.isUserInVideoTiles = true AND m.FeaturedRowList.content <> invalid AND (m.top.lastFocusedList = "featuredRowList" OR m.top.lastFocusedList = "")
-      m.top.lastFocusedList = "featuredRowList"
-      m.top.featuredListHasFocus = true
-      m.FeaturedRowList.setFocus(true)
-    else
-      ' Don't want to do any of this logic if we are already have an item we are going to jump to
-      if itemToJumpTo = invalid then
-
-        rowItemFocused = m.RowList.rowItemFocused
-
-        if rowItemFocused.count() = 2
-          '// If count does not equal 2 then the rowList has not gained focus yet so use the default first item in the else block
-          itemToJumpTo = rowItemFocused
-        else
-          itemToJumpTo = [0, 0]
-        end if
-      end if
-
-      if resolveAbbreviatedContent(content, itemToJumpTo) <> invalid
-        m.top.lastFocusedList = "rowList"
-        m.RowList.setFocus(true)
-
-        ' Adding to check to make sure if reset grid position was requested.
-        ' Making sure we are resetting after focus is set to rowlist.
-        if m.top.resetGridPosition = true
-          itemToJumpTo = [0, 0]
-          m.top.resetGridPosition = false
-        end if
-      end if
-
-      m.LinearProgramRefreshTimer.control = "start"
-      ' When Grid get focus refresh all visible channels
-      onLinearProgramRefreshTimer()
+    else if (m.top.lastFocusedList = "rowList" OR m.top.lastFocusedList = "") AND m.top.content <> invalid
+      m.top.lastFocusedList = "rowList"
+      m.rowList.setFocus(true)
+      m.top.listHasFocus = true
     end if
   else if m.top.isInFocusChain() = false
     m.LinearProgramRefreshTimer.control = "stop"
   end if
 
-  ' We used to only jump to if m.top had focus. In some cases we would not jump back to the correct item after we modified the RowList content which triggers a jump to the first position usually. Now if we have a m.itemToJumpTo we will always jump to it when we receive a focus change event
-  if itemToJumpTo <> invalid then
-    m.RowList.jumpToRowItem = itemToJumpTo
-  end if
-
-  if m.isUserInVideoTiles = true
-    m.top.featuredListHasFocus = m.top.isInFocusChain() = true AND m.top.lastFocusedList = "featuredRowList" AND m.top.featuredRowContent <> invalid
-    if m.top.featuredListHasFocus = true AND (m.top.resetGridPosition = true OR itemToJumpTo <> invalid)
-      if m.top.resetGridPosition = true
-        itemToJumpTo = [0, 0]
-        m.top.resetGridPosition = false
-      end if
-      m.FeaturedRowList.jumpToRowItem = itemToJumpTo
+  m.top.listHasFocus = m.top.isInFocusChain() = true AND m.top.lastFocusedList <> "skinAdRow" AND m.top.content <> invalid
+  if m.top.listHasFocus = true AND (m.top.resetGridPosition = true OR itemToJumpTo <> invalid)
+    if m.top.resetGridPosition = true
+      itemToJumpTo = [0, 0]
+      m.top.resetGridPosition = false
     end if
+    m.rowList.jumpToRowItem = itemToJumpTo
   end if
 End Function
 
 
+' Handles content updates and UI state management
+' Configures row list visibility, translations, and skin ad row based on content state
 Function onContentChange()
   tubiLog("CategoryGridList.onContentChange")
 
@@ -287,7 +229,7 @@ Function onContentChange()
     m.isUserInVideoTiles = false
   end if
 
-  ' Resetting the state of the UI. Below condition safe guards against any rowList background refresh.
+  ' Resetting the state of the UI. Below condition safe guards against any background refresh.
   ' Like item getting added to CW row or queue row.
 
   ' Below condition is needed to handle a case where skinAdRow was visible.
@@ -297,26 +239,19 @@ Function onContentChange()
     m.top.lastFocusedList = ""
   end if
 
-  ' When the rowlist is in focus, we need to hide the featuredRowList.
-  ' In place of featuredRowList, we will show the info panel.
-  if m.top.lastFocusedList <> "rowList" AND m.top.featuredRowContent <> invalid
-    m.FeaturedRowList.opacity = 1
+  ' When not in focus, we show the RowList.
+  if m.top.content <> invalid
+    m.rowList.opacity = 1
   end if
 
-  bSetRowListFocus = false
-  '//RESET position of 1st-row elements
+  ' Reset position of 1st-row elements
   m.skinAdRow.translation = m.originalTranslationSkinAdRow
 
-
-  ' set the translation position of the page based on presence or absence of any 1st rows.
-  ' DO this BEFORE setting the content of the rowList (later in this function) or else the translation will not be properly set.
-  ' This is need mainly for the initial load and if skinAdRow is focused.
-  ' When any other list is focused, we will not show the skin ads.
+  ' Set the translation position of the page based on presence or absence of any 1st rows.
+  ' This is needed mainly for the initial load and if skinAdRow is focused.
   if isSkinAdsAvailable() = true AND (m.top.lastFocusedList = "skinAdRow" OR m.top.lastFocusedList = "")
-    if m.top.featuredRowContent <> invalid
-      m.FeaturedRowList.translation = [0, 345]
-    else
-      m.rowList.translation = [0, 384]
+    if m.top.content <> invalid
+      m.rowList.translation = [0, 345]
     end if
 
     m.skinAdRow.opacity = 1
@@ -331,60 +266,20 @@ Function onContentChange()
     end if
   else
     ' Resetting the state of the UI.
-    if m.top.featuredRowContent <> invalid
+    if m.top.content <> invalid
       ' This is needed only for initial load and not needed for subsequent loads.
       ' This is required for initial slide down animation.
       if m.top.lastFocusedList = ""
-        m.FeaturedRowList.translation = [0, 0]
+        m.rowList.translation = [0, 0]
       end if
-    else
-      m.RowList.translation = [0, 0]
     end if
 
     m.skinAdRow.opacity = 0
-    bSetRowListFocus = true
   end if
 
-  if m.top.content = invalid
-    m.RowList.content = invalid
-    '//reset some values. According to the Roku documentation, these fields should be read only but they seem to be writable.
-    if m.RowList.currFocusColumn <> invalid
-      m.RowList.currFocusColumn = 0
-    end if
-    m.RowList.rowItemFocused = [0, 0]
-    m.RowList.currFocusRow = 0
-    if m.top.featuredRowContent <> invalid
-      setFeaturedRowHeights()
-      if bSetRowListFocus = true
-        setRowListFocus()
-      end if
-    end if
-  else
-    ' Setting RowList invalid here will empty the grid.  It will be set after the first batch of
-    ' metadata is received.  Setting RowList.content with a few full categories will cause it to prefetch
-    ' posters and do a nice fade-in.
-    m.RowList.content = invalid
-    if m.top.content <> invalid then
-      setRowHeights()
-
-      if bSetRowListFocus = true
-        setRowListFocus()
-      end if
-    end if
-  end if
-
-  ' Since we are splitting grid content into two RowLists, we need to take into account rows that are in above rows.
-  m.RowList.update({
-    parentScreenId: m.top.parentScreenId
-    parentScreenTrackingPageInfo: m.top.parentScreenTrackingPageInfo
-    personalizationId: m.top.personalizationId
-    shouldTrackViewableImpressionEvent: m.top.shouldTrackViewableImpressionEvent
-    rowIndexBoost: 0
-  }, true)
-
-  ' Below is to add animation of slide down of the row list for the first time when screen is loaded.
-  if m.top.featuredRowContent <> invalid AND isSkinAdsAvailable() = false AND m.isUserInVideoTiles = true AND m.top.lastFocusedList <> "rowList"
-    slideTo(m.RowList, [m.rowListPosition[0], m.rowListPosition[1]], 0.3, 0.3)
+  if m.top.content <> invalid
+    setRowHeights()
+    setRowListFocus()
   end if
 
   updateCurrentFocusedItemBoundingRect()
@@ -393,32 +288,21 @@ Function onContentChange()
 End Function
 
 
-Function onParentScreenTrackingPageInfoChange(msg)
-  ' Since we are splitting grid content into two RowLists, we need to take into account rows that are in above rows.
-  m.RowList.update({
-    parentScreenTrackingPageInfo: m.top.parentScreenTrackingPageInfo
-    personalizationId: m.top.personalizationId
-  }, true)
-
-  m.FeaturedRowList.update({
+' Handles changes to parent screen tracking page info
+' Updates row list with new tracking information
+' @param _msg - Message containing tracking page info (unused)
+Function onParentScreenTrackingPageInfoChange(_msg)
+  m.rowList.update({
     parentScreenTrackingPageInfo: m.top.parentScreenTrackingPageInfo
     personalizationId: m.top.personalizationId
   }, true)
 End Function
 
 
-' onRepopulateContent callback gets triggered when adding/removing any row
-' it sets RowHeight and jumps the focus to a specified content.
+' Handles content repopulation when row order changes
+' Manages focus preservation when continue watching or queue rows are added/removed
 Function onRepopulateContent()
-  if m.top.content <> invalid
-    setRowHeights()
-  end if
-
-  if m.isUserInVideoTiles = true
-    rowItemFocused = m.FeaturedRowList.rowItemFocused
-  else
-    rowItemFocused = m.RowList.rowItemFocused
-  end if
+  rowItemFocused = m.rowList.rowItemFocused
 
   if m.itemToJumpTo <> invalid
     rowItemFocused = m.itemToJumpTo
@@ -435,15 +319,11 @@ Function onRepopulateContent()
   m.top.rowAdded = ""
   m.top.rowRemoved = ""
 
-  if m.isUserInVideoTiles = true
-    content = m.top.featuredRowContent
-  else
-    content = m.top.content
-  end if
+  content = m.top.content
 
   ' setting the rowItemSize and/or rowHeights moves the focus indicator back to the origin so
   ' we need to move the focus back to it's appropriate place. But we need to check that there is content
-  ' at the location or else the RowList loses focus and can't get it back.
+  ' at the location or else the list loses focus and can't get it back.
   if resolveAbbreviatedContent(content, rowItemFocused) <> invalid
     ' re-focus the most recently focused content
     m.itemToJumpTo = rowItemFocused
@@ -500,140 +380,40 @@ Function onRepopulateContent()
   end if
 
   ' We need to make sure the focused item is updated to account for cases where container content is updated.
-  if m.isUserInVideoTiles = true
-    updateFeaturedRowItemFocused()
-  end if
+  updateRowItemFocused()
 End Function
 
 
+' Sets row heights based on content type and grid item types
+' Configures row item sizes, spacing, and focus offsets
 Function setRowHeights()
-  'determine the height of each row in the RowList so we can set it on RowList.rowItemSize
-  rowItemSize = []
-  rowHeights = []
-  rowItemSpacings = []
-  focusXOffsets = []
-  numRows = 2
-  imageSizes = m.constants.ui.imageSizes
-  posterSize = imageSizes.largePoster
-  landscapeSize = imageSizes.largeLandscape
-  featuredRowPoster = imageSizes.featuredRowPoster
-  liveEventsContainerSize = imageSizes.liveEventsContainer
-  bannerSize = imageSizes.liveEventsBanner
-  showRowLabel = []
-
-  for i = 0 to m.top.content.getChildCount() - 1
-    category = m.top.content.getChild(i)
-    rowHeight = 0
-    rowHeightAdjustment = 57 '//The height of the row container heading and its vertical spacing
-    gridItemType = category.gridItemType
-    gridItemTypes = m.constants.ui.gridItemTypes
-
-    if gridItemType = gridItemTypes.liveEventSpotlight
-      rowItemSize.push(liveEventsContainerSize)
-      rowHeight = liveEventsContainerSize[1]
-    else if gridItemType = gridItemTypes.liveEventBanner
-      rowItemSize.push(bannerSize)
-      rowHeight = bannerSize[1]
-      rowHeightAdjustment = 0
-      ' Since we have to show a peek of the next container in the list, we need to show 3 rows.
-      numRows = 3
-    else if gridItemType = gridItemTypes.historySignedOutUser
-      posterHeight = posterSize[1]
-      rowItemSize.push([1693, posterHeight])
-      rowHeight = posterHeight
-      rowItemSpacings.push([15, 0])
-      focusXOffsets.push(0)
-    else if gridItemType = gridItemTypes.adRowlistSpotlight OR gridItemType = gridItemTypes.adRowlistCarousel
-      adSize = m.constants.ui.imageSizes.adRowlistThumbnail
-      rowItemSize.push(adSize)
-      rowHeight = adSize[1]
-      rowItemSpacings.push([15, 0])
-      focusXOffsets.push(0)
-      numRows = 3
-    else if gridItemType = gridItemTypes.portrait OR gridItemType = gridItemTypes.certifiedFresh
-      posterWidth = posterSize[0]
-      posterHeight = posterSize[1]
-      rowItemSize.push([posterWidth, posterHeight])
-      rowHeight = posterHeight
-      rowItemSpacings.push([15, 0])
-      focusXOffsets.push(0)
-    else if gridItemType = gridItemTypes.portraitTopTen
-      posterWidth = posterSize[0]
-      posterHeight = posterSize[1]
-      rowItemSize.push([posterWidth, posterHeight])
-      rowHeight = posterHeight
-      rowItemSpacings.push([243, 0])
-      'push the focus indicator to the right so it doesn't cover the top ten label
-      focusXOffsets.push(243)
-    else if gridItemType = gridItemTypes.landscape OR gridItemType = gridItemTypes.landscapeNoTitle OR gridItemType = gridItemTypes.linear
-      if gridItemType = gridItemTypes.landscapeWithMetadata
-        posterWidth = featuredRowPoster[0]
-        posterHeight = featuredRowPoster[1]
-      else
-        posterWidth = landscapeSize[0]
-        posterHeight = landscapeSize[1]
-      end if
-
-      if gridItemType = gridItemTypes.landscape then
-        rowHeightAdjustment = rowHeightAdjustment + 21
-      end if
-      rowItemSize.push([posterWidth, posterHeight])
-      rowHeight = posterHeight
-      rowItemSpacings.push([15, 0])
-      focusXOffsets.push(0)
-    end if
-    shouldDisplayHeader = arrayIncludes(m.constants.ui.noHeaderGridTypes, category.gridItemType) = false
-    showRowLabel.push(shouldDisplayHeader)
-
-    if category.sponsorImages <> invalid
-      '//if this is a sponsored row, then adjust the spacing so row includes the header size of the sponsored row
-      rowHeightAdjustment = rowHeightAdjustment + 32
-    end if
-    rowHeights.push(rowHeight + rowHeightAdjustment)
-  end for
-
-  '//setting the height of the m.RowList.itemSize is superceded by the rowHeight of each row
-  '//However, just in case the height of a row is not defined, then it will default to the height defined by itemSize
-  itemSize = [1752, posterSize[1]]
-  m.Rowlist.update({
-    "itemSize": itemSize
-    "rowItemSize": rowItemSize
-    "rowHeights": rowHeights
-    "showRowLabel": showRowLabel
-    "numRows": numRows
-    "rowItemSpacing": rowItemSpacings
-    "focusXOffset": focusXOffsets
-  })
-  m.RowList.content = m.top.content
-  setFeaturedRowHeights()
-End Function
-
-
-Function setFeaturedRowHeights()
   imageSizes = m.constants.ui.imageSizes
   guestCWPosterSize = imageSizes.guestContinueWatchingTile
   liveEventsContainerSize = imageSizes.liveEventsContainer
   bannerSize = imageSizes.banner
+  posterSize = imageSizes.largePoster
+  landscapeSize = imageSizes.largeLandscape
 
   gridItemTypes = m.constants.ui.gridItemTypes
-  featuredRowContent = m.top.featuredRowContent
+  rowContent = m.top.content
 
   ' 246 is the height of the metadata section displayed beneath the featured focused tile.
   metadataSectionHeight = 240
   numRows = 3
 
-  if isNode(featuredRowContent) = true
+  if isNode(rowContent) = true
     heights = []
     rowItemSize = []
     showRowLabel = []
-    for i = 0 to featuredRowContent.getChildCount() - 1
-      category = featuredRowContent.getChild(i)
+    for i = 0 to rowContent.getChildCount() - 1
+      category = rowContent.getChild(i)
       gridItemType = category.gridItemType
       featuredRowHeight = m.featuredRowPoster[1] + metadataSectionHeight
-
+      controlContainerHeightAdjustment = 57
       if category.sponsorImages <> invalid
         '// if this is a sponsored row, then adjust the spacing so row includes the header size of the sponsored row
         featuredRowHeight = featuredRowHeight + 32
+        controlContainerHeightAdjustment = controlContainerHeightAdjustment + 32
       end if
 
       shouldDisplayHeader = arrayIncludes(m.constants.ui.noHeaderGridTypes, category.gridItemType) = false
@@ -654,13 +434,24 @@ Function setFeaturedRowHeights()
         adSize = m.constants.ui.imageSizes.adRowlistThumbnail
         rowItemSize.push(adSize)
         heights.push(adSize[1] + 64)
+      else if gridItemType = gridItemTypes.landscapeNoTitle
+        posterWidth = landscapeSize[0]
+        posterHeight = landscapeSize[1]
+
+        rowItemSize.push([posterWidth, posterHeight])
+        heights.push(posterHeight + controlContainerHeightAdjustment)
+      else if gridItemType = gridItemTypes.portrait
+        posterWidth = posterSize[0]
+        posterHeight = posterSize[1]
+        rowItemSize.push([posterWidth, posterHeight])
+        heights.push(posterHeight + controlContainerHeightAdjustment)
       else
         rowItemSize.push(m.gridItemSize)
         heights.push(featuredRowHeight)
       end if
     end for
 
-    m.FeaturedRowList.update({
+    m.rowList.update({
       "showRowLabel": showRowLabel
       "rowItemSize": rowItemSize
       "rowHeights": heights
@@ -668,27 +459,28 @@ Function setFeaturedRowHeights()
       "numRows": numRows
     })
 
-    if m.top.featuredRowFocusedItem = invalid AND m.skinAdRow.content = invalid
-      container = featuredRowContent.getChild(0)
-      if container <> invalid AND isVideoTileEnabledContainer(container.gridItemType, container.id) = false
-        m.featuredRowList.focusXOffset = [0, 0]
+    if m.top.rowFocusedItem = invalid AND m.skinAdRow.content = invalid
+      container = rowContent.getChild(0)
+      if container <> invalid AND isVideoTileEnabledContainer(container.gridItemType) = false
+        m.rowList.focusXOffset = [0, 0]
       else
-        m.featuredRowList.focusXOffset = [m.expandedTileFocusXOffset, 0]
+        m.rowList.focusXOffset = [m.expandedTileFocusXOffset, 0]
       end if
-      m.FeaturedRowList.rowItemFocused = [0, 0]
+      m.rowList.rowItemFocused = [0, 0]
       if m.isUserInVideoTiles = true
-        m.top.lastFocusedList = "featuredRowList"
+        m.top.lastFocusedList = "rowList"
       end if
     end if
   end if
+
+  m.rowList.drawFocusFeedback = (m.isUserInVideoTiles = false)
 End Function
 
 
-' Resolve and internal ContentNode that's been abbreviated for the CategoryGridList
-' into a fully parsed TubiContentNode
-'
-' @content rowlist content node.
-' @rowItemIndex is 2D array of [rowindex, itemindex] from RowList.rowItemSelected or m.RowList.rowItemFocused
+' Resolves abbreviated content node into fully parsed TubiContentNode
+' @param content - Row list content node
+' @param rowItemIndex - 2D array of [rowIndex, itemIndex] from RowList.rowItemSelected or m.rowList.rowItemFocused
+' @return TubiContentNode or invalid if content not found
 Function resolveAbbreviatedContent(content, rowItemIndex)
   itemContent = invalid
   if content <> invalid AND rowItemIndex[0] <> invalid AND rowItemIndex[1] <> invalid
@@ -727,55 +519,9 @@ Function resolveAbbreviatedContent(content, rowItemIndex)
 End Function
 
 
-''''''''''''''''
-' onRowItemSelected - RowList.rowItemSelected event handler, triggered when user presses "OK"
-Function onRowItemSelected(msg)
-  tubiLog("CategoryGridList.onRowItemSelected")
-  if m.top.content <> invalid 'should not be necessary but crash reports show that it is.
-    rowItemSelected = msg.getData()
-    m.top.selectedPosition = rowItemSelected
-
-    category = m.top.content.getChild(rowItemSelected[0])
-    if category <> invalid
-      m.top.oldCategoryId = m.top.currCategoryId
-      m.top.currCategoryId = category.id
-    end if
-    itemSelected = resolveAbbreviatedContent(m.top.content, rowItemSelected)
-    if itemSelected <> invalid
-      m.top.itemSelected = itemSelected
-    end if
-  end if
-End Function
-
-
-'''''''''''''''
-' onRowItemFocused - RowList.rowItemFocused event handler.
-Function onRowItemFocused(msg)
-  tubiLog("CategoryGridList.onRowItemFocused")
-  rowItemFocused = msg.getData()
-  m.top.focusedPosition = rowItemFocused
-
-  if m.top.content <> invalid AND rowItemFocused <> invalid
-    category = m.top.content.getChild(rowItemFocused[0])
-    if category <> invalid then
-      category.focusIndex = rowItemFocused[1]
-      m.top.oldCategoryId = m.top.currCategoryId
-      m.top.currCategoryId = category.id
-
-      itemFocused = resolveAbbreviatedContent(m.top.content, rowItemFocused)
-      if itemFocused <> invalid
-        m.top.oldCursorPosition = m.top.cursorPosition
-        m.top.cursorPosition = m.top.focusedPosition
-        m.top.oldItemFocused = m.top.itemFocused
-        m.top.oldRowFocused = m.top.rowFocused
-        m.top.rowFocused = m.top.content.getChild(rowItemFocused[0])
-        m.top.itemFocused = itemFocused
-      end if
-    end if
-  end if
-End Function
-
-
+' Processes ad response batch and updates content accordingly
+' Handles ad additions, replacements, and removals with focus preservation
+' @param msg - Message containing array of ad response data
 Function onAdResponseInBatch(msg) as Void
   tubiLog("CategoryGridList.onAdResponseInBatch")
 
@@ -783,21 +529,17 @@ Function onAdResponseInBatch(msg) as Void
   if isNonEmptyArray(aResponse) = true
     content = m.top.content
 
-    '//Process the batch into categories for update
+    ' Process the batch into categories for update
     processResult = processAdBatchResponse(aResponse, content)
     aAdsToAdd = processResult.aAdsToAdd
     aAdsToReplace = processResult.aAdsToReplace
     removableCategories = processResult.removableCategories
 
     if content <> invalid
-      '//Capture last focus before mutations
+      ' Capture last focus before mutations
       lastFocusedRowID = ""
       lastRowItemFocused = invalid
-      if m.top.featuredRowContent <> invalid
-        rowItemFocused = m.FeaturedRowList.rowItemFocused
-      else
-        rowItemFocused = m.RowList.rowItemFocused
-      end if
+      rowItemFocused = m.rowList.rowItemFocused
 
       if isNonEmptyArray(rowItemFocused) AND rowItemFocused[0] > 0
         lastFocusedRow = content.getChild(rowItemFocused[0])
@@ -806,24 +548,27 @@ Function onAdResponseInBatch(msg) as Void
         end if
       end if
 
-      '//Update content with ads (remove, replace, add)
+      ' Update content with ads (remove, replace, add)
       shouldInformHomeScreen = updateContentWithAdBatches(content, aAdsToReplace, removableCategories, aAdsToAdd)
 
       m.top.content = content ' Set m.top.content before handling UI side effects
 
-      '//Restore focus and set row heights if changes occurred
+      ' Restore focus and set row heights if changes occurred
       if shouldInformHomeScreen = true
         restoreFocusAndRowHeightsAfterAdBatchUpdate(content, lastFocusedRowID, lastRowItemFocused)
       end if
     end if
 
-    '//Free references to the batch so that it can be garbage collected
+    ' Free references to the batch so that it can be garbage collected
     m.top.adResponseInBatch = invalid
   end if
 End Function
 
 
-' Helper to onAdResponseInBatch(): Processes the ad response batch into adds, replaces, and removals
+' Helper to onAdResponseInBatch(): Processes ad response batch into adds, replaces, and removals
+' @param aResponse - Array of ad response data
+' @param content - Current content node
+' @return Object with aAdsToAdd, aAdsToReplace, and removableCategories
 Function processAdBatchResponse(aResponse, content) as Object
   removableCategories = {}
   aAdsToAdd = []
@@ -838,7 +583,7 @@ Function processAdBatchResponse(aResponse, content) as Object
       '//If this is valid content, then we need to add it to the rowlist content later.
       if bValid = true
         rowPlacement = adContent.rowPlacement
-        if content <> invalid AND content.getChild(rowPlacement).id = containerID
+        if content <> invalid AND isNumber(rowPlacement) AND rowPlacement >= 0 AND content.getChild(rowPlacement).id = containerID
           aAdsToReplace.push(adContent)
         else
           '//If the row placement has changed, then mark content for removal from the current rowList, so it can be re-added back in at the new rowPlacement.
@@ -860,7 +605,12 @@ Function processAdBatchResponse(aResponse, content) as Object
 End Function
 
 
-' Helper to onAdResponseInBatch(): Updates the content by replacing, removing, and adding ad batches; returns if significant changes occurred
+' Helper to onAdResponseInBatch(): Updates content by replacing, removing, and adding ad batches
+' @param content - Content node to update
+' @param aAdsToReplace - Array of ads to replace
+' @param removableCategories - Associative array of category IDs to remove
+' @param aAdsToAdd - Array of ads to add
+' @return Boolean - True if significant changes occurred, false otherwise
 Function updateContentWithAdBatches(content, aAdsToReplace, removableCategories, aAdsToAdd) as Boolean
   shouldInformHomeScreen = false
 
@@ -896,14 +646,13 @@ Function updateContentWithAdBatches(content, aAdsToReplace, removableCategories,
 End Function
 
 
-' Helper to onAdResponseInBatch(): Restores focus to the last row item and sets row heights after ad batch updates
+' Restores focus and updates row heights after ad batch update
+' @param content - Updated content node
+' @param lastFocusedRowID - ID of the previously focused row
+' @param lastRowItemFocused - Position [row, column] of last focused item
 Function restoreFocusAndRowHeightsAfterAdBatchUpdate(content, lastFocusedRowID, lastRowItemFocused)
-  '//If the content had been removed or inserted, then we need to jump back to the last focused rowItem we reset the rowlist.content which happens when we reset the row heights.
-  if m.top.featuredRowContent <> invalid
-    rowList = m.FeaturedRowList
-  else
-    rowList = m.RowList
-  end if
+  ' If the content had been removed or inserted, then we need to jump back to the last focused rowItem
+  rowList = m.rowList
 
   if lastFocusedRowID <> ""
     for i = 0 to content.getChildCount() - 1
@@ -919,12 +668,15 @@ Function restoreFocusAndRowHeightsAfterAdBatchUpdate(content, lastFocusedRowID, 
     setRowHeights()
   end if
   if lastRowItemFocused <> invalid
-    '//::NOTE:: if the rowlist does not have focus (i.e. an ad component has focus), then the rowItemFocused will not be set even after jumpToRowItem is set.
+    ' NOTE:: if the rowlist does not have focus (i.e. an ad component has focus), then the rowItemFocused will not be set even after jumpToRowItem is set.
     rowList.jumpToRowItem = lastRowItemFocused
   end if
 End Function
 
 
+' Processes category response batch and merges metadata into content
+' Handles category updates and removals, informs home screen when needed
+' @param msg - Message containing category response batch node
 Function onCategoryResponseInBatch(msg) as Void
   tubiLog("CategoryGridList.categoryResponseInBatch")
 
@@ -988,21 +740,10 @@ Function onCategoryResponseInBatch(msg) as Void
       end if
     end if
 
-    ' Delayed setting of Rowlist content until first batch arrives
-    if m.RowList.content = invalid then
-      m.RowList.content = m.top.content
-    else if m.RowList.currFocusColumn > -1
-      ' This mainly happens because of reloading of the content in the category.
-      category = m.RowList.content.getChild(m.RowList.currFocusRow)
-      if category <> invalid AND category.focusIndex <> m.RowList.currFocusColumn
-        m.RowList.jumpToRowItem = m.RowList.rowItemFocused
-      end if
-    end if
-
-    ' inform home screen of first content after content has been set on RowList
+    ' inform home screen of first content after content has been set
     if shouldInformHomeScreen = true AND m.skinAdRow.content = invalid
       ' set focus once we have content to focus on.
-      ' will only affect limitedUI models as high spec models will set focus on m.RowList when m.top gains focus
+      ' will only affect limitedUI models as high spec models will set focus when m.top gains focus
       ' because their homescreen response contains content in it, but limitedUI models homescreen responses don't.
       setRowListFocus() 'only happens if m.top has focus, ie. when the app is launched or signin/signout
     end if
@@ -1013,6 +754,9 @@ Function onCategoryResponseInBatch(msg) as Void
 End Function
 
 
+' Merges fetched metadata into existing content at correct index
+' @param fetchedContent - Category content node from server
+' @return Integer - Index where content was merged, -1 if should be removed, -2 for special cases
 Function mergeMetadata(fetchedContent)
   tubiLog("Merging metadata for categoryId: " + fetchedContent.id)
   index = -1
@@ -1039,7 +783,7 @@ Function mergeMetadata(fetchedContent)
     if parentCategory = invalid then
       if index = -1 AND fetchedContent.id = "featured"
         fetchedContent.state = "loaded"
-        m.top.featuredRowContent.replaceChild(fetchedContent, 0)
+        m.top.content.replaceChild(fetchedContent, 0)
         return -2
       else
         tubiLog("Ignoring response due to changed index " + fetchedContent.id)
@@ -1058,62 +802,31 @@ Function mergeMetadata(fetchedContent)
 End Function
 
 
-' Sets focus on the rowlist, but only if the m.top has focus.
-' This function is called when content has been loaded on the RowList and the RowList is ready to accept focus.
-' In some cases where side nav or other components have focus, we don't want to set focus on the RowList however.
-' Setting focus on RowList triggers an update to itemFocused which Homescreen.brs listens to in order to update
-' the info panel. In the case that we do not want set focus on the RowList, we still need to let Homescreen.brs that
-' that content has loaded so it can update the infoPanel.
+' Sets focus to the row list if component has focus
+' Updates row focused field for featured row content
 Function setRowListFocus()
   tubiLog("CategoryGridList.setRowListFocus")
   if m.top.hasFocus() = true
-    if m.top.featuredRowContent <> invalid
-      m.top.lastFocusedList = "featuredRowList"
-      m.FeaturedRowList.setFocus(true)
-    else
-      m.top.lastFocusedList = "rowList"
-      m.RowList.setFocus(true)
-    end if
+    m.top.lastFocusedList = "rowList"
+    m.rowList.setFocus(true)
   else
-    ' If the rowlist is in focus chain or we do not have a featured row.
-    ' Then we need to show the default info panel.
-    ' Below logic handles the use case where home screen is refreshed but the focus after refresh is on the screen but modal or side nav.
-    ' Since featured row does not have info panel we need to check for presence of featured row content.
-    ' Featured row landscape poster logic is handled in homescreen helpers.
-    if m.RowList.isInFocusChain() = true OR m.isUserInVideoTiles = false
-      if m.RowList.currFocusRow <> invalid AND m.RowList.currFocusRow >= 0 AND m.RowList.currFocusColumn <> invalid AND m.RowList.currFocusColumn >= 0
-        '//If rowList is not in focus and new content is set, then one would think that rowItemFocused should be [0,0] but it isn't,
-        '//so that is why we use currFocusRow and currFocusColumn - to ensure the proper item is announced
-        row = Int(m.RowList.currFocusRow)
-        col = Int(m.RowList.currFocusColumn)
-        reloadedItemIndex = [row, col]
-      else if isNonEmptyArray(m.RowList.rowItemFocused) = true AND m.RowList.rowItemFocused[0] >= 0 AND m.RowList.rowItemFocused[1] >= 0
-        '//currFocusColumn is not available in firmware lower than Roku OS 10.5, so use rowItemFocused. It's imperfect, as it
-        '// may think a different item is focused instead of the 1st colum/1st row,
-        '// but it will not display a wrong metadata when the user quickly navigates away from 1st rowItem [0,0] as the content is loading
-        reloadedItemIndex = m.RowList.rowItemFocused
-      else
-        reloadedItemIndex = [0, 0]
-      end if
-      if m.RowList.content <> invalid
-        m.top.oldRowFocused = m.top.rowFocused
-        m.top.rowFocused = m.RowList.content.getChild(reloadedItemIndex[0])
-        m.top.reloadedItemToBeFocused = resolveAbbreviatedContent(m.top.content, reloadedItemIndex)
-      end if
-    else if m.FeaturedRowList.isInFocusChain() = true
-      if m.top.featuredRowContent <> invalid
-        rowItemFocused = m.featuredRowList.rowItemFocused
+    ' If not in focus chain, we still need to update row info for featured row content
+    if m.rowList.isInFocusChain() = true
+      if m.top.content <> invalid
+        rowItemFocused = m.rowList.rowItemFocused
         if isNonEmptyArray(rowItemFocused) = true
           m.top.oldRowFocused = m.top.rowFocused
-          m.top.rowFocused = m.top.featuredRowContent.getChild(rowItemFocused[0])
+          m.top.rowFocused = m.top.content.getChild(rowItemFocused[0])
         end if
       end if
-      m.FeaturedRowList.setFocus(true)
+      m.rowList.setFocus(true)
     end if
   end if
 End Function
 
 
+' Handles linear program refresh timer fires
+' Triggers global linear channel refresh when timer fires
 Function onLinearProgramRefreshTimer()
 
   if m.global <> invalid AND m.global.refreshLinearChannels <> invalid
@@ -1124,6 +837,9 @@ Function onLinearProgramRefreshTimer()
 End Function
 
 
+' Handles item selection from skin ad row
+' Updates selected position and item fields
+' @param msg - Message containing selected item position
 Function onSkinAdRowItemSelected(msg)
   content = m.top.skinAdContent
   rowItemSelected = msg.getData()
@@ -1137,6 +853,9 @@ Function onSkinAdRowItemSelected(msg)
 End Function
 
 
+' Handles item focus from skin ad row
+' Updates focused position, category, and item fields
+' @param msg - Message containing focused item position
 Function onSkinAdRowItemFocused(msg)
   tubiLog("CategoryGridList.onSkinAdRowItemFocused")
   rowItemFocused = msg.getData()
@@ -1154,10 +873,10 @@ Function onSkinAdRowItemFocused(msg)
       if content <> invalid then
         m.top.oldCursorPosition = m.top.cursorPosition
         m.top.cursorPosition = rowItemFocused
-        m.top.oldItemFocused = m.top.itemFocused
+        m.top.oldRowFocusedItem = m.top.rowFocusedItem
         m.top.oldRowFocused = m.top.rowFocused
         m.top.rowFocused = category
-        m.top.itemFocused = content.clone(true)
+        m.top.rowFocusedItem = content.clone(true)
         m.top.focusedPosition = rowItemFocused
       end if
     end if
@@ -1165,6 +884,9 @@ Function onSkinAdRowItemFocused(msg)
 End Function
 
 
+' Handles reloaded item to be focused
+' Updates reloadedItemToBeFocused field if item matches last focused list
+' @param msg - Message containing item to be focused
 Function onReloadedItemToBeFocused(msg)
   tubiLog("CategoryGridList.onReloadedItemToBeFocused")
   ' Not creating an alias to avoid it becoming bi-directional field into the skinAd.
@@ -1178,36 +900,41 @@ Function onReloadedItemToBeFocused(msg)
 End Function
 
 
-Function onFeaturedRowItemFocused(_msg)
-  updateFeaturedRowItemFocused()
+' Handles row item focused event from row list
+' Delegates to updateRowItemFocused for actual processing
+' @param _msg - Message (unused, prefix with underscore to indicate)
+Function onRowItemFocused(_msg)
+  updateRowItemFocused()
 End Function
 
 
-Function updateFeaturedRowItemFocused()
-  rowItemFocused = m.featuredRowList.rowItemFocused
+' Updates row item focused state and related fields
+' Resolves content, updates category/item fields, manages row heights for special cases
+Function updateRowItemFocused()
+  rowItemFocused = m.rowList.rowItemFocused
   if rowItemFocused <> invalid
-    itemFocused = resolveAbbreviatedContent(m.top.featuredRowContent, rowItemFocused)
+    itemFocused = resolveAbbreviatedContent(m.top.content, rowItemFocused)
     if itemFocused <> invalid
       topRef = m.top
       topRef.oldCategoryId = topRef.currCategoryId
-      category = topRef.featuredRowContent.getChild(rowItemFocused[0])
+      category = topRef.content.getChild(rowItemFocused[0])
       category.focusIndex = rowItemFocused[1]
       topRef.oldCategoryId = topRef.currCategoryId
       topRef.currCategoryId = category.id
       topRef.oldCursorPosition = topRef.cursorPosition
       topRef.cursorPosition = rowItemFocused
-      topRef.oldItemFocused = itemFocused
+      topRef.oldRowFocusedItem = m.top.rowFocusedItem
       topRef.oldRowFocused = topRef.rowFocused
       topRef.rowFocused = category
-      topRef.featuredRowFocusedItem = itemFocused
+      topRef.rowFocusedItem = itemFocused
       updateCurrentFocusedItemBoundingRect()
       updateFocusXOffset(rowItemFocused[0])
 
       if itemFocused.gridItemType = m.constants.ui.gridItemTypes.liveEventBanner
         nextRowIndex = rowItemFocused[0] + 1
-        if nextRowIndex < m.top.featuredRowContent.getChildCount()
-          nextCategory = m.top.featuredRowContent.getChild(nextRowIndex)
-          if nextCategory <> invalid AND isVideoTileEnabledContainer(nextCategory.gridItemType, nextCategory.id) = true
+        if nextRowIndex < m.top.content.getChildCount()
+          nextCategory = m.top.content.getChild(nextRowIndex)
+          if nextCategory <> invalid AND isVideoTileEnabledContainer(nextCategory.gridItemType) = true
             updateRowHeight(nextRowIndex, m.featuredRowPoster[1] + 76)
             m.resetRowHeights = true
             m.modifiedRowIndex = nextRowIndex
@@ -1216,7 +943,7 @@ Function updateFeaturedRowItemFocused()
       else if m.resetRowHeights = true AND m.modifiedRowIndex <> invalid
         ' Reset row height, accounting for sponsored row spacing if applicable
         resetHeight = m.featuredRowPoster[1] + 240
-        modifiedCategory = m.top.featuredRowContent.getChild(m.modifiedRowIndex)
+        modifiedCategory = m.top.content.getChild(m.modifiedRowIndex)
         if modifiedCategory <> invalid AND modifiedCategory.sponsorImages <> invalid
           ' Add 32 pixels for sponsored row header spacing
           resetHeight = resetHeight + 32
@@ -1230,56 +957,64 @@ Function updateFeaturedRowItemFocused()
 End Function
 
 
-' Observer that gets fired when the rowlist vertical focus direction field changes.
+' Observer that handles vertical focus direction field changes
+' Tracks scroll direction (up/down) for list navigation
+' @param msg - Message containing direction ("up", "down", or "none")
 Function onVertFocusDirectionChange(msg)
   direction = msg.getData()
   ' Since the direction gets reset during the flow.
   ' The value of m.scrollDirection gets reset to none after the value changes to up or down during scrolling.
   ' This is the reason we are maintaining our own directional scope variable.
   if direction <> "none"
-    m.top.featuredListScrollDirection = direction
+    m.top.listScrollDirection = direction
   end if
 End Function
 
 
 ' TODO: Revisit the isInTransit parameter since it is not used anywhere.
 ' Before we graduate the roku_video_tiles_1_7 experiment. If we do not find any other use cases for it remove the field.
+' Updates focus X offset for video tile expansion effect
+' @param currFocusRow - Current focused row index
+' @param isInTransit - Whether focus is transitioning between rows (default: false)
 Function updateFocusXOffset(currFocusRow, isInTransit = false)
-  featuredRowContent = m.top.featuredRowContent
-  focusXOffsets = m.featuredRowList.focusXOffset
-  if isNode(featuredRowContent) = true AND isNonEmptyArray(focusXOffsets) = true
+  rowContent = m.top.content
+  focusXOffsets = m.rowList.focusXOffset
+  if isNode(rowContent) = true AND isNonEmptyArray(focusXOffsets) = true
     focusXOffset = []
-    for i = 0 to featuredRowContent.getChildCount() - 1
-      category = featuredRowContent.getChild(i)
+    for i = 0 to rowContent.getChildCount() - 1
+      category = rowContent.getChild(i)
       gridItemType = category.gridItemType
-      if (i = currFocusRow OR (isInTransit = true AND i = currFocusRow + 1)) AND isVideoTileEnabledContainer(gridItemType, category.id) = true
+      if (i = currFocusRow OR (isInTransit = true AND i = currFocusRow + 1)) AND isVideoTileEnabledContainer(gridItemType) = true
         focusXOffset.push(m.expandedTileFocusXOffset)
       else
         focusXOffset.push(0)
       end if
     end for
     ' To Avoid unnecessary updates to the focusXOffset field, doing a simple array comparison.
-    if FormatJson(focusXOffset) <> FormatJson(m.featuredRowList.focusXOffset)
+    if FormatJson(focusXOffset) <> FormatJson(m.rowList.focusXOffset)
       m.ignoreCurrColumnChange = true
-      m.featuredRowList.focusXOffset = focusXOffset
+      m.rowList.focusXOffset = focusXOffset
       m.ignoreCurrColumnChange = false
     end if
-    m.featuredRowList.translation = [0, 0]
+    m.rowList.translation = [0, 0]
   end if
 End Function
 
 
-Function onFeaturedListCurrFocusRowChange(msg)
+' Handles current focus row changes in the row list
+' Updates focus X offset and bounding rect, manages column focus index
+' @param _msg - Message containing new current focus row
+Function onListCurrFocusRowChange(_msg)
   currFocusRow = 0
-  featuredRowContent = m.top.featuredRowContent
-  if isNode(featuredRowContent) = true AND m.top.lastFocusedList = "featuredRowList"
-    rowItemFocused = m.featuredRowList.rowItemFocused
+  rowContent = m.top.content
+  if isNode(rowContent) = true AND m.top.lastFocusedList = "rowList"
+    rowItemFocused = m.rowList.rowItemFocused
     if isNonEmptyArray(rowItemFocused) = true
       currFocusRow = rowItemFocused[0]
     end if
 
     nextFocusRow = 0
-    if m.top.featuredListScrollDirection = "down"
+    if m.top.listScrollDirection = "down"
       nextFocusRow = currFocusRow + 1
     else if currFocusRow > 0
       nextFocusRow = currFocusRow - 1
@@ -1288,7 +1023,7 @@ Function onFeaturedListCurrFocusRowChange(msg)
 
     updateCurrentFocusedItemBoundingRect()
 
-    category = featuredRowContent.getChild(nextFocusRow)
+    category = rowContent.getChild(nextFocusRow)
     if category <> invalid AND category.focusIndex > 0
       m.lastFocusColumnIndex = category.focusIndex
     else
@@ -1298,10 +1033,12 @@ Function onFeaturedListCurrFocusRowChange(msg)
 End Function
 
 
+' Updates bounding rectangles for current and next focused items
+' Used for UI animations and positioning based on focus state
 Function updateCurrentFocusedItemBoundingRect()
-  rowItemFocused = m.featuredRowList.rowItemFocused
-  featuredRowContent = m.top.featuredRowContent
-  if isNonEmptyArray(rowItemFocused) = true AND isNode(featuredRowContent) = true
+  rowItemFocused = m.rowList.rowItemFocused
+  rowContent = m.top.content
+  if isNonEmptyArray(rowItemFocused) = true AND isNode(rowContent) = true
     currFocusRow = rowItemFocused[0]
 
     ' Will be used to avoid updating the in transit bounding rect when the user scroll is about to end and the rowItemFocused gets updated.
@@ -1310,26 +1047,26 @@ Function updateCurrentFocusedItemBoundingRect()
     ' Since we are trying to update the bounding rect as the user scrolls we cannot use any of the row list fields to figure out the next row.
     ' Based on the scroll direction we are updating the next focus row.
     nextFocusRow = 1
-    if m.top.featuredListScrollDirection = "down"
+    if m.top.listScrollDirection = "down"
       nextFocusRow = currFocusRow + 1
     else if currFocusRow > 0
       nextFocusRow = currFocusRow - 1
     end if
 
     ' Updating the bounding rect for the next focus row.
-    category = featuredRowContent.getChild(nextFocusRow)
+    category = rowContent.getChild(nextFocusRow)
     if category <> invalid AND category.focusIndex <> invalid AND diff <= 0
       columnFocused = category.focusIndex
       if columnFocused < 0
         columnFocused = 0
       end if
-      nextBoundingRect = m.FeaturedRowList.subBoundingRect("item" + nextFocusRow.toStr() + "_" + columnFocused.toStr())
+      nextBoundingRect = m.rowList.subBoundingRect("item" + nextFocusRow.toStr() + "_" + columnFocused.toStr())
       m.top.inTransitCurrentFocusedItemBoundingRect = nextBoundingRect
     end if
 
     ' Updating the bounding rect for the current focus row.
     columnFocused = rowItemFocused[1]
-    boundingRect = m.FeaturedRowList.subBoundingRect("item" + currFocusRow.toStr() + "_" + columnFocused.toStr())
+    boundingRect = m.rowList.subBoundingRect("item" + currFocusRow.toStr() + "_" + columnFocused.toStr())
     m.top.currentFocusedItemBoundingRect = boundingRect
 
     m.lastFocusRow = currFocusRow
@@ -1337,9 +1074,10 @@ Function updateCurrentFocusedItemBoundingRect()
 End Function
 
 
-' Observer that gets fired when the featured row column focus changes.
-' @msg: object, the message object containing the new focus column.
-Function onFeaturedRowCurrFocusColumnChange(msg)
+' Observer that handles row column focus changes
+' Manages scroll direction tracking and updates rowCurrFocusColumn field
+' @param msg - Message object containing the new focus column
+Function onRowCurrFocusColumnChange(msg)
   ' ignoreCurrColumnChange is set to true when the user is scrolling through the columns of the row.
   ' Updating the focusXOffset field triggers currFocusColumnChange twice one for the row which we are removing the offset and one for which we are adding the offset.
   ' This optimizes the performance when unnecessary updates been triggered.
@@ -1355,17 +1093,17 @@ Function onFeaturedRowCurrFocusColumnChange(msg)
       ' If the current focus column is greater than the last current focus column, then we are scrolling right.
       ' If the current focus column is less than the last current focus column, then we are scrolling left.
       if currentFocusColumn > m.lastCurrentFocusColumn
-        featuredRowCurrFocusColumn = m.lastFocusColumnIndex + 1
-        m.top.featuredListScrollDirection = "right"
+        rowCurrFocusColumn = m.lastFocusColumnIndex + 1
+        m.top.listScrollDirection = "right"
       else
-        featuredRowCurrFocusColumn = m.lastFocusColumnIndex - 1
-        m.top.featuredListScrollDirection = "left"
+        rowCurrFocusColumn = m.lastFocusColumnIndex - 1
+        m.top.listScrollDirection = "left"
       end if
-      m.top.featuredRowCurrFocusColumn = featuredRowCurrFocusColumn
+      m.top.rowCurrFocusColumn = rowCurrFocusColumn
     else
       m.lastFocusColumnIndex = absCurCol
-      if m.lastFocusColumnIndex <> m.top.featuredRowCurrFocusColumn
-        m.top.featuredRowCurrFocusColumn = m.lastFocusColumnIndex
+      if m.lastFocusColumnIndex <> m.top.rowCurrFocusColumn
+        m.top.rowCurrFocusColumn = m.lastFocusColumnIndex
       end if
     end if
 
@@ -1374,96 +1112,92 @@ Function onFeaturedRowCurrFocusColumnChange(msg)
 End Function
 
 
+' Checks if skin ads are available and have content
+' @return Boolean - True if skin ad content exists and has children
 Function isSkinAdsAvailable()
   return (m.top.skinAdContent <> invalid AND m.top.skinAdContent.getChildCount() > 0)
 End Function
 
 
-Function translateFeaturedListAndSetFocus(delayFeaturedFocus = false)
+' Translates row list to position [0,0] and sets focus after animation completes
+' Handles smooth navigation from skin ads with delayed focus
+Function translateListAndSetFocus()
   callback = sub()
-    m.top.lastFocusedList = "featuredRowList"
-    m.FeaturedRowList.setFocus(true)
+    m.top.lastFocusedList = "rowList"
+    m.rowList.setFocus(true)
   end sub
 
-  ' Below logic handles logic to smoothen navigation around skin ads.
-  if delayFeaturedFocus = false
-    callback()
-    callback = invalid
-  end if
-
-  slideFadeGeneral(m.FeaturedRowList, [0, 0], "in", 0.3, 0, 1, true, callback)
+  slideFadeGeneral(m.rowList, [0, 0], "in", 0.3, 0, 1, true, callback)
   m.top.hideInfoPanel = false
-  updateFeaturedRowItemFocused()
+  updateRowItemFocused()
 End Function
 
 
-' Kids mode is a special case where we want to disable the small portrait description experiment.
+' Handles kids mode changes
+' Disables video tiles experiment when in kids mode
+' @param msg - Message containing new kids mode state
 Function onKidsModeChange(msg)
   kidsMode = msg.getData()
   m.isUserInVideoTiles = (m.isUserInVideoTilesExperiment AND kidsMode = false)
 End Function
 
 
+' Handles animate to item changes
+' Forwards animation request to row list if content is available
+' @param msg - Message containing item index to animate to
 Function onAnimateToItemChange(msg)
   tubiLog("CategoryGridList.onAnimateToItemChange")
-  '//::TODO::roku_video_tiles, change this observer to an alias once the roku_video_tiles experiment is fully rolled out.
   itemToAnimate = msg.getData()
-  if m.isUserInVideoTiles = true AND m.featuredRowList.content <> invalid
-    m.featuredRowList.animateToItem = itemToAnimate
-  else
-    m.RowList.animateToItem = itemToAnimate
+  if m.rowList.content <> invalid
+    m.rowList.animateToItem = itemToAnimate
   end if
 End Function
 
 
-Function isVideoTileEnabledContainer(gridItemType, categoryId)
-  return arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, gridItemType) = false
+' Checks if a container has video tile feature enabled
+' @param gridItemType - Type of grid item
+' @return Boolean - True if video tile is enabled for this container
+Function isVideoTileEnabledContainer(gridItemType)
+  return arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, gridItemType) = false AND gridItemType = m.constants.ui.gridItemTypes.videoTile
 End Function
 
 
-' Handles when new content containers are added to the grid
-' Preserves user focus position by jumping to previously focused row item
-' Updates row heights for featured or regular content layouts
-' @param msg - Message containing hasNewContainers boolean value
+' Handles new containers being added to the screen
+' Updates row heights and preserves focus position
+' @param msg - Message indicating new containers have been added
 Function onHasNewContainersChange(msg)
   hasNewContainers = msg.getData()
   if hasNewContainers = true
-    if m.top.featuredRowContent <> invalid
-      currFocusRow = m.featuredRowList.currFocusRow
-      rowItemFocused = [currFocusRow, 0]
-      category = m.top.featuredRowContent.getChild(currFocusRow)
-      if category <> invalid AND category.focusIndex <> -1
-        rowItemFocused[1] = category.focusIndex
-      end if
-      setFeaturedRowHeights()
-      m.featuredRowList.jumpToRowItem = rowItemFocused
-    else if m.top.content <> invalid
-      currFocusRow = m.RowList.currFocusRow
+    if m.top.content <> invalid
+      currFocusRow = m.rowList.currFocusRow
       rowItemFocused = [currFocusRow, 0]
       category = m.top.content.getChild(currFocusRow)
       if category <> invalid AND category.focusIndex <> -1
         rowItemFocused[1] = category.focusIndex
       end if
       setRowHeights()
-      m.RowList.jumpToRowItem = rowItemFocused
+      m.rowList.jumpToRowItem = rowItemFocused
     end if
   end if
 End Function
 
 
+' Handles key events for navigation between skin ad row and row list
+' @param key - Key pressed ("up", "down", etc.)
+' @param press - True if key is pressed, false if released
+' @return Boolean - True if key was handled, false otherwise
 Function onKeyEvent(key as String, press as Boolean) as Boolean
   if press = true
     bSkinAdAvailable = (isSkinAdsAvailable() = true)
 
     if key = "down" AND m.skinAdRow.isInFocusChain() = true
       fade(m.skinAdRow, "out", 0.3)
-      translateFeaturedListAndSetFocus(true)
+      translateListAndSetFocus()
       return true
-    else if key = "up" AND m.FeaturedRowList.isInFocusChain() = true AND bSkinAdAvailable = true
+    else if key = "up" AND m.rowList.isInFocusChain() = true AND bSkinAdAvailable = true
       m.top.lastFocusedList = "skinAdRow"
       m.skinAdRow.setFocus(true)
-      slideTo(m.RowList, [0, 565], 0.3)
-      slideTo(m.FeaturedRowList, [0, 384], 0.3)
+      slideTo(m.rowList, [0, 384], 0.3)
       fade(m.skinAdRow, "in", 0.3)
       updateCurrentFocusedItemBoundingRect()
       updateFocusXOffset(-1)
@@ -1475,15 +1209,15 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
 End Function
 
 
-' Updates a specific row height in the featured row list
+' Updates a specific row height in the row list
 ' @param rowIndex - Index of the row to update
-' @param height - New height value
+' @param height - New height value for the row
 Function updateRowHeight(rowIndex as Integer, height as Integer)
-  rowHeights = m.featuredRowList.rowHeights
+  rowHeights = m.rowList.rowHeights
   rowHeights[rowIndex] = height
-  if FormatJson(rowHeights) <> FormatJson(m.featuredRowList.rowHeights)
+  if FormatJson(rowHeights) <> FormatJson(m.rowList.rowHeights)
     m.ignoreCurrColumnChange = true
-    m.featuredRowList.rowHeights = rowHeights
+    m.rowList.rowHeights = rowHeights
     m.ignoreCurrColumnChange = false
   end if
 End Function

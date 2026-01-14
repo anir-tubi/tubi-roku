@@ -114,7 +114,7 @@ Function onItemContentChange(msg)
 End Function
 
 
-Function setLinearBadge(badgeType = "live", badgeInfo = {})
+Function setLinearBadge(badgeType = "live")
   badge = invalid
   if badgeType = m.badgeTypes.live
     badge = createObject("roSGNode", "Badge")

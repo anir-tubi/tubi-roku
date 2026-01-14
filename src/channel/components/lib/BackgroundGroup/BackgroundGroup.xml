@@ -142,12 +142,5 @@ screens), fullscreen (detail, search screens)
         width="1920"
         height="1080" />
     </Group>
-
-    <Poster
-      id="videoTilesBackgroundGradient"
-      uri="pkg:/images/background-masks/full_screen_variant_d_gradient-$$RES$$.webp"
-      opacity="0"
-      width="1920"
-      height="1080" />
   </children>
 </component>

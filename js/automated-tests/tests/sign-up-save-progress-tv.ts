@@ -8,6 +8,7 @@ describe('Sign up Save Progress TV', function () {
     const user = await testUtils.createAnonymousUser();
     user.setIsNewUser(false);
     await testUtils.startApplicationAtPage('home', { user: user });
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
     await shared.openSeries();
     await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
   });

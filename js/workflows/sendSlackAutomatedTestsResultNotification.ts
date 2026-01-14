@@ -9,21 +9,29 @@ const workflowRunUrl = `${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/action
 // Get branch name
 const rawBranch = env.GITHUB_HEAD_REF || env.GITHUB_REF_NAME || 'unknown';
 
+// Use actual failures array length instead of stats.failures
+// This ensures hook failures and affected tests are counted correctly
+const actualFailures = report.failures ? report.failures.length : 0;
 
 // Get status emoji and color
 let statusEmoji = '✅';
 let statusColor = '#36a64f'; // green
-if (report.stats.failures > 0) {
+if (actualFailures > 0) {
   statusEmoji = '❌';
   statusColor = '#dc3545'; // red
 }
 // Remove pending warning - only show warning if there are actual failures
 
 // Build test summary
-const { tests = 0, passes = 0, failures = 0, pending = 0, duration = 0 } = report.stats;
+const { tests = 0, pending = 0, duration = 0 } = report.stats;
+
+// Calculate actual passes: total tests - failures - pending
+// This ensures the math is correct when hooks fail
+const actualPasses = tests - actualFailures - pending;
+
 const testSummary = [
-  `${passes}/${tests} passed`,
-  failures > 0 ? `${failures} failed` : '',
+  `${actualPasses}/${tests} passed`,
+  actualFailures > 0 ? `${actualFailures} failed` : '',
   pending > 0 ? `${pending} pending` : ''
 ].filter(Boolean).join(' • ');
 
@@ -37,7 +45,7 @@ const formattedDuration = durationMinutes > 0
 
 // Format failed tests summary
 let failedTestsSection = '';
-if (failures > 0 && report.failures && report.failures.length > 0) {
+if (actualFailures > 0 && report.failures && report.failures.length > 0) {
   const failedTests = report.failures.slice(0, 5).map((failure, index) => {
     const title = failure.fullTitle || failure.title || 'Unknown test';
 
@@ -104,7 +112,7 @@ const blocks = [
       },
       {
         type: 'mrkdwn',
-        text: `*Status:*\n${statusEmoji} ${failures > 0 ? 'Failed' : pending > 0 ? 'Pending' : 'Passed'}`
+        text: `*Status:*\n${statusEmoji} ${actualFailures > 0 ? 'Failed' : pending > 0 ? 'Pending' : 'Passed'}`
       }
     ]
   }
@@ -155,7 +163,7 @@ blocks.push({
         emoji: true
       },
       url: workflowRunUrl,
-      style: failures > 0 ? 'danger' : 'primary'
+      style: actualFailures > 0 ? 'danger' : 'primary'
     }
   ]
 });

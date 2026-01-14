@@ -110,25 +110,34 @@ function formatFailedTests(failures: TestReport['failures']): string {
  */
 async function buildCommentBody(report: TestReport, workflowRunUrl: string, env: NodeJS.ProcessEnv): Promise<string> {
   const statusEmoji = getStatusEmoji(report);
-  const { tests = 0, passes = 0, failures = 0, pending = 0, duration = 0 } = report.stats;
+  const { tests = 0, pending = 0, duration = 0 } = report.stats;
+
+  // Use actual failures array length instead of stats.failures
+  // This ensures hook failures and affected tests are counted correctly
+  const actualFailures = report.failures ? report.failures.length : 0;
+
+  // Calculate actual passes: total tests - failures - pending
+  // This ensures the math is correct when hooks fail
+  const actualPasses = tests - actualFailures - pending;
+
   const durationSeconds = Math.round(duration / 1000);
   const formattedDuration = formatDuration(durationSeconds);
 
   const testSummary = [
-    `${passes}/${tests} passed`,
-    failures > 0 ? `${failures} failed` : '',
+    `${actualPasses}/${tests} passed`,
+    actualFailures > 0 ? `${actualFailures} failed` : '',
     pending > 0 ? `${pending} pending` : ''
   ].filter(Boolean).join(', ');
 
   let body = `## ${statusEmoji} Smoke Test Results\n\n`;
 
   // Status with icons using generic utility
-  body += formatStatus(failures > 0, pending > 0);
+  body += formatStatus(actualFailures > 0, pending > 0);
 
   body += `**Tests:** ${testSummary}\n`;
 
   // Add brief summary of failed tests if any
-  if (failures > 0 && report.failures) {
+  if (actualFailures > 0 && report.failures) {
     body += formatFailedTestsSummary(report.failures);
   }
 

@@ -1,7 +1,7 @@
 ' gets the video player state for content passed as param
 ' @content : TubiContentNode, which has the details about the title/video
 ' returns state : string, the state of videopreview
-Function getVideoPreviewStateForThisContent(content = invalid, isInFeaturedRowExp = false)
+Function getVideoPreviewStateForThisContent(content = invalid)
   tubiLog("VideoPreviewHelpers.getVideoPreviewStateForThisContent")
   state = "none"
 
@@ -49,10 +49,8 @@ Function stopVideoPreview(node = invalid)
   isListScrolling = false
   screen = getCurrentScreen()
   if screen <> invalid
-    if screen.hasField("featuredListScrollingStatus") = true AND screen.featuredListScrollingStatus = true
-      isListScrolling = screen.featuredListScrollingStatus
-    else if screen.hasField("scrollingStatus") = true AND screen.scrollingStatus = true
-      isListScrolling = screen.scrollingStatus
+    if screen.hasField("listScrollingStatus") = true AND screen.listScrollingStatus = true
+      isListScrolling = screen.listScrollingStatus
     end if
   end if
 
@@ -91,7 +89,7 @@ Function onVideoPreviewStateChanged(msg)
   tubiLog("VideoPreviewHelpers.onVideoPreviewStateChanged, " + videoPreviewState)
   currentScreen = getCurrentScreen()
   if (videoPreviewState = "playing" OR videoPreviewState = "paused") AND videoPreview <> invalid AND videoPreview.isBufferingComplete = true
-    if currentScreen <> invalid AND currentScreen.featuredListHasFocus = false AND m.isUserInVideoTilesExperiment = true
+    if currentScreen <> invalid AND currentScreen.listHasFocus = false AND m.isUserInVideoTilesExperiment = true
       m.inlineVideoMetadataOverlay.showContentPoster = true
     else
       m.inlineVideoMetadataOverlay.showContentPoster = false
@@ -102,7 +100,7 @@ Function onVideoPreviewStateChanged(msg)
     m.videoPreviewPlayer.opacity = 1
 
     isVodDetailPaused = (currentScreen.id = m.constants.ui.screenIds.vodDetailScreen AND currentScreen.shouldPauseVideoPreview = true)
-    showVideoPreviewPlayer = (currentScreen.isInFocusChain() = true OR currentScreen.lastFocusedList <> "featuredRowList") AND not isVodDetailPaused
+    showVideoPreviewPlayer = (currentScreen.isInFocusChain() = true OR currentScreen.lastFocusedList <> "rowList") AND not isVodDetailPaused
     videoPreview.visible = showVideoPreviewPlayer
 
     isAdRowlistSpotlight = (currentScreen.contentFocused <> invalid AND currentScreen.contentFocused.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight)
@@ -175,9 +173,6 @@ Function onVideoPreviewStateChanged(msg)
           }
 
           contentFocused = currentScreen.contentFocused
-          if isNonEmptyString(currentScreen.lastFocusedList) = true AND currentScreen.lastFocusedList = "featuredRowList"
-            contentFocused = currentScreen.featuredRowFocusedItem
-          end if
 
           showDetailScreen(contentFocused, false, skipDetailScreen, invalid, playbackSource)
         end if
@@ -303,11 +298,7 @@ Function updatePreviewPlayerToCondensedView()
 
   m.videoPreviewPlayer.reParent(m.backgroundVideoPreviewPlayerContainer, false)
   m.videoPreviewPlayer.clippingRect = [0, 0, 1920, 1080]
-  if m.videoTilesVariant = "refinedControlTop2Rows"
-    resizeToLocation(m.videoPreviewPlayer, 1308, 735, [612, 0], 0)
-  else
-    resizeToLocation(m.videoPreviewPlayer, 1120, 630, [799, 0], 0)
-  end if
+  resizeToLocation(m.videoPreviewPlayer, 1120, 630, [799, 0], 0)
   m.videoPreviewPlayer.unObserveFieldScoped("position")
   if isCurrentScreenHomeScreen() = true
     m.videoPreviewPlayer.observeFieldScoped("position", "onVideoPreviewPositionChanged")
@@ -558,7 +549,7 @@ Function onInlineVideoPreviewPositionChanged(msg) as Void
   videoPreviewScreen = msg.getRoSGNode()
   position = msg.getData()
   duration = videoPreviewScreen.duration
-  content = screen.featuredRowFocusedItem
+  content = screen.contentFocused
   if content <> invalid
     previewState = getVideoPreviewStateForThisContent(content)
     if m.videoPreviewPlayer.visible = true AND previewState = "playing"
@@ -608,7 +599,7 @@ End Function
 
 
 Function renderAutoStartPlaybackFromPreviewCounter(contentFocused, diff) as Void
-  if contentFocused = invalid OR arrayIncludes([m.constants.ui.contentTypes.adRowlistSpotlight, m.constants.ui.contentTypes.adRowlistCarousel], contentFocused.type) = true OR isVideoTileEnabledContainer(contentFocused.gridItemType, contentFocused.parentId) = false
+  if contentFocused = invalid OR arrayIncludes([m.constants.ui.contentTypes.adRowlistSpotlight, m.constants.ui.contentTypes.adRowlistCarousel], contentFocused.type) = true OR isVideoTileEnabledContainer(contentFocused.gridItemType) = false
     fade(m.autoStartPreviewToPlaybackTimer, "out", 0.1)
     return
   end if

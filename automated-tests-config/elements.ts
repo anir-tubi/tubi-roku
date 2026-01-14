@@ -87,10 +87,10 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#RowList',
   },
 
-  /** Component on the redesigned Home Screen (FeaturedRowList) */
+  /** Component on the redesigned Home Screen (RowList) */
   videoTitlesRowList: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentAreaParent.#ContentArea.#CategoryGridList.#FeaturedRowList',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentAreaParent.#ContentArea.#CategoryGridList.#RowList',
   },
 
   /** Skin ad row component in CategoryGridList */
@@ -138,13 +138,13 @@ const elements = typeCheckElements({
   /** Ad carousel container category name (peek row for carousel validation) */
   adCarouselContainerName: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.2.title.#CategoryName',
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList.2.title.#CategoryName',
   },
 
   /** Ad carousel container first poster (peek row poster for carousel validation) */
   adCarouselContainerPoster: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.2.items.0.#poster',
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList.2.items.0.#poster',
   },
 
   /** Component on the Movie Screen that we can pull content for the Grid from */
@@ -3071,41 +3071,41 @@ const elements = typeCheckElements({
 
   /** guestUserCWTileTitle - Title label in guest user Continue Watching tile: "Sign Up to Save Your Progress"
    * Note: Row index is dynamic. Use testUtils.getNodeWithDynamicPath() with runtime-determined row index.
-   * Template: #ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.{rowIndex}.items.0.#contentSection.#title
+   * Template: #ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList.{rowIndex}.items.0.#contentSection.#title
    * @example
    * const rowIndex = await testUtils.findRowIndexWithTitle('videoTitlesRowList', 'Continue Watching');
-   * const element = { keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.${rowIndex}.items.0.#contentSection.#title`, xpath: '//GuestUserContinueWatchingTile//Label[@name="title"]' };
+   * const element = { keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList.${rowIndex}.items.0.#contentSection.#title`, xpath: '//GuestUserContinueWatchingTile//Label[@name="title"]' };
    * const titleNode = await testUtils.getNodeWithDynamicPath(element);
    */
   guestUserCWTileTitle: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList',
     xpath: '//GuestUserContinueWatchingTile//Label[@name="title"]',
   },
 
   /** guestUserCWTileDescription - Description label in guest user Continue Watching tile
    * Note: Row index is dynamic. Use testUtils.getNodeWithDynamicPath() with runtime-determined row index.
-   * Template: #ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.{rowIndex}.items.0.#contentSection.#description
+   * Template: #ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList.{rowIndex}.items.0.#contentSection.#description
    */
   guestUserCWTileDescription: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList',
     xpath: '//GuestUserContinueWatchingTile//Label[@name="description"]',
   },
 
   /** guestUserCWTileButton - Sign up button in guest user Continue Watching tile
    * Note: Row index is dynamic. Use testUtils.getNodeWithDynamicPath() with runtime-determined row index.
-   * Template: #ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.{rowIndex}.items.0.#contentSection.#signUpButton
+   * Template: #ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList.{rowIndex}.items.0.#contentSection.#signUpButton
    */
   guestUserCWTileButton: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList',
     xpath: '//GuestUserContinueWatchingTile//SimpleButton[@name="signUpButton"]',
   },
 
   /** guestUserCWTileButtonLabel - Sign up button label text
    * Note: Row index is dynamic. Use testUtils.getNodeWithDynamicPath() with runtime-determined row index.
-   * Template: #ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.{rowIndex}.items.0.#contentSection.#signUpButton.#label
+   * Template: #ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList.{rowIndex}.items.0.#contentSection.#signUpButton.#label
    */
   guestUserCWTileButtonLabel: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList',
     xpath: '//GuestUserContinueWatchingTile//SimpleButton[@name="signUpButton"]//Label[@name="label"]',
   },
 

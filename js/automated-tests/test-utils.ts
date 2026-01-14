@@ -145,7 +145,7 @@ class TestUtils {
    * // For guest user CW tile at dynamically found row index 5:
    * const rowIndex = await testUtils.findRowIndexWithTitle('videoTitlesRowList', 'Continue Watching');
    * const element = {
-   *   keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.${rowIndex}.items.0.#contentSection.#title`,
+   *   keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList.${rowIndex}.items.0.#contentSection.#title`,
    *   xpath: '//GuestUserContinueWatchingTile//Label[@name="title"]'
    * };
    * const titleNode = await testUtils.getNodeWithDynamicPath(element);

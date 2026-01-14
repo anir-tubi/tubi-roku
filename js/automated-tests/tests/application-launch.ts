@@ -158,16 +158,16 @@ describe('Application Launch', function () {
 
     // Construct dynamic element objects with runtime row index
     const titleElement = {
-      keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.${rowIndex}.items.0.#contentSection.#title`
+      keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList.${rowIndex}.items.0.#contentSection.#title`
     };
     const descriptionElement = {
-      keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.${rowIndex}.items.0.#contentSection.#description`
+      keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList.${rowIndex}.items.0.#contentSection.#description`
     };
     const buttonElement = {
-      keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.${rowIndex}.items.0.#contentSection.#signUpButton`
+      keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList.${rowIndex}.items.0.#contentSection.#signUpButton`
     };
     const buttonLabelElement = {
-      keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.${rowIndex}.items.0.#contentSection.#signUpButton.#label`
+      keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList.${rowIndex}.items.0.#contentSection.#signUpButton.#label`
     };
 
     // Validate registration CTA title

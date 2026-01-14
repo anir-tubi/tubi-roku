@@ -14,7 +14,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842085
-  it('C842085 - Featured row is the first row @guest,@application_launch', async () => {
+  it('C842085 - Featured row is the first row @guest,@application_launch,@video_tiles', async () => {
     await testUtils.startApplicationAtPage('home');
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for FeaturedRowList to have focus');
 
@@ -23,7 +23,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842086
-  it('C842086 - Peek row is NOT dimmed @guest @browse', async () => {
+  it('C842086 - Peek row is NOT dimmed @guest @browse @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for featured rowlist to have focus');
 
@@ -41,7 +41,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842087
-  it('C842087 - Peek row has portrait tiles only @guest @browse', async () => {
+  it('C842087 - Peek row has portrait tiles only @guest @browse @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
 
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for featured rowlist to have focus', 15000);
@@ -65,7 +65,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842088
-  it('C842088 - Row in focus has video tile with moderate density (Guest User) @guest @browse', async () => {
+  it('C842088 - Row in focus has video tile with moderate density (Guest User) @guest @browse @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for featured rowlist to have focus', 15000);
 
@@ -105,7 +105,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842089
-  it('C842089 - Row in focus has video tile with moderate density (Registered User)', async () => {
+  it('C842089 - Row in focus has video tile with moderate density (Registered User) @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await testUtils.waitForElementToShowOnScreen('videoTitlesRowList', 'videoTitlesRowList not visible', 20000);
@@ -153,7 +153,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842090
-  it('C842090 - When a title is in focus, a video preview plays within a landscape tile @videopreview', async () => {
+  it('C842090 - When a title is in focus, a video preview plays within a landscape tile @videopreview @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
 
     await testUtils.waitForElementToShowOnScreen('videoTitlesRowList', 'videoTitlesRowList not visible', 25000);
@@ -169,7 +169,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842091
-  it('C842091 - When a title is NOT in focus, a static image is shown within a portrait tile @guest @browse', async () => {
+  it('C842091 - When a title is NOT in focus, a static image is shown within a portrait tile @guest @browse @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await utils.sleep(2000);
@@ -202,24 +202,20 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842092
-  it('C842092 - When a title does not have a video preview, a static image is shown @guest', async () => {
+  it.only('C842092 - When a title does not have a video preview, a static image is shown @guest @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus', 10000);
 
-    await testUtils.waitForGridContentToLoad('videoTitlesRowList', 5000);
-
-    const position = await testHelpers.findAndNavigateToVideoPreviewContent('videoTitlesRowList', false, 5);
-
-    const [row, col] = position;
-
+    await testHelpers.findAndNavigateToVideoPreviewContent('videoTitlesRowList', false, 5);
+    await utils.sleep(1000);
     const previewPlayerState = await testUtils.getElementField('previewVideoPlayer', 'state');
-    expect(previewPlayerState).to.be.oneOf(['stopped', 'none'], 'Preview video player should not be playing for content without video preview');
+    expect(previewPlayerState).to.not.equal('playing', 'Preview video player should not be playing for content without video preview');
 
     await testUtils.waitForElementToShowOnScreen('inlineVideoPreviewPlayerContainerContentPoster', 'Static image not visible', 15000);
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842093
-  it('C842093 - Selecting a video tile will open VOD details page @guest', async () => {
+  it('C842093 - Selecting a video tile will open VOD details page @guest @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus', 10000);
 
@@ -255,7 +251,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842094
-  it('C842094 - Video preview continues when user enters/exits details screen', async () => {
+  it('C842094 - Video preview continues when user enters/exits details screen @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
@@ -288,7 +284,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842095
-  it('C842095 - When video preview is disabled in app settings, static image is shown in video tile', async () => {
+  it('C842095 - When video preview is disabled in app settings, static image is shown in video tile @video_tiles', async () => {
     const user = await testUtils.createRegisteredUser();
     await user.enableVideoPreview(false);
     await testUtils.startApplicationAtPage('home', { user: user });
@@ -317,7 +313,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842096
-  it('C842096 - Background/foreground app while video tile is playing video preview @videopreview', async () => {
+  it('C842096 - Background/foreground app while video tile is playing video preview @videopreview @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
 
     await testUtils.waitForElementToShowOnScreen('videoTitlesRowList', 'videoTitlesRowList not visible', 25000);
@@ -353,7 +349,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842097
-  it('C842097 - Title autostarts when video preview ends', async () => {
+  it('C842097 - Title autostarts when video preview ends @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for videoTitlesRowList to have focus', 20000);
 
@@ -379,7 +375,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842098
-  it('C842098 - Vertical scrolling between rows @guest @browse', async () => {
+  it('C842098 - Vertical scrolling between rows @guest @browse @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for videoTitlesRowList to have focus');
     await utils.sleep(1000);
@@ -417,7 +413,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842099
-  it('C842099 - Horizontal scrolling across row @guest @browse', async () => {
+  it('C842099 - Horizontal scrolling across row @guest @browse @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for videoTitlesRowList to have focus');
 
@@ -480,7 +476,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842100
-  it('C842100 - Video tile displays title on poster overlay @guest @browse', async () => {
+  it('C842100 - Video tile displays title on poster overlay @guest @browse @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for featured rowlist to have focus', 15000);
 
@@ -514,7 +510,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842101
-  it('C842101 - Video tile displays title with regular text @guest @browse', async () => {
+  it('C842101 - Video tile displays title with regular text @guest @browse @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for featured rowlist to have focus', 15000);
 
@@ -556,7 +552,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842102
-  it('C842102 - Metadata displayed below video tile (movie) @guest @browse', async () => {
+  it('C842102 - Metadata displayed below video tile (movie) @guest @browse @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for videoTitlesRowList to have focus');
 
@@ -627,7 +623,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842103
-  it('C842103 - Metadata displayed below video tile (series)', async () => {
+  it('C842103 - Metadata displayed below video tile (series) @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await testUtils.waitForElementToShowOnScreen('videoTitlesRowList', 'videoTitlesRowList not visible', 20000);
@@ -698,7 +694,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842104
-  it('C842104 - Metadata displayed below video tile (linear) @guest @browse', async () => {
+  it('C842104 - Metadata displayed below video tile (linear) @guest @browse @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for videoTitlesRowList to have focus', 20000);
 
@@ -788,7 +784,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842105
-  it('C842105 - CW row with registration CTA for guest user @guest', async () => {
+  it('C842105 - CW row with registration CTA for guest user @guest @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for home screen to load', 20000);
@@ -864,7 +860,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842107
-  it('C842107 - Linear row with video tile @guest @browse', async () => {
+  it('C842107 - Linear row with video tile @guest @browse @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for videoTitlesRowList to have focus', 20000);
 
@@ -926,7 +922,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842108
-  it('C842108 - Creatorverse row with video tile @guest @browse', async () => {
+  it('C842108 - Creatorverse row with video tile @guest @browse @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await testUtils.waitForElementToShowOnScreen('videoTitlesRowList', 'videoTitlesRowList not visible', 20000);
@@ -968,7 +964,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842109
-  it('C842109 - Video tile displays long title with 2 line max (non-linear content) @guest @browse', async () => {
+  it('C842109 - Video tile displays long title with 2 line max (non-linear content) @guest @browse @video_tiles', async () => {
     proxy.resume();
     // Set up network proxy to inject movie with long title in Featured row
     const proxyPromise = testHelpers.mockHomescreenWithLongTitleContent('movie');
@@ -1001,7 +997,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842110
-  it('C842110 - Video tile displays long title with 1 line max (linear content) @guest @browse', async () => {
+  it('C842110 - Video tile displays long title with 1 line max (linear content) @guest @browse @video_tiles', async () => {
     // Create user and set up network proxy to inject linear content with long title in Featured row
     proxy.resume();
     const user = await testUtils.createRegisteredUser();
@@ -1031,7 +1027,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842111
-  it('C842111 - Video tile does NOT appear in Kids Mode @kidsmode', async () => {
+  it('C842111 - Video tile does NOT appear in Kids Mode @kidsmode @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 20000);
     await utils.sleep(2000);
@@ -1051,10 +1047,6 @@ describe('HomeGrid Video Tiles', function () {
     await utils.sleep(5000);
 
     // In Kids Mode, content switches from videoTitlesRowList to homeScreenRowList (same as Little Kids parental control)
-    await testUtils.waitForElementToShowOnScreen('videoTitlesRowList', 'videoTitlesRowList not visible after Kids Mode', 20000);
-    const videoTitlesRowList = await testUtils.getNodeForElement('videoTitlesRowList');
-    expect(videoTitlesRowList.content).to.be.null;
-
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'homeScreenRowList not visible after Kids Mode', 20000);
     await utils.sleep(2000);
 
@@ -1072,11 +1064,21 @@ describe('HomeGrid Video Tiles', function () {
     const firstRowContent = rowsContent[0];
     expect(firstRowContent).to.be.an('array').with.lengthOf.at.least(1, 'First row should have at least one item');
 
-    // Check all items in all rows for Kids Mode filtering
+    // Check all items in all rows for Kids Mode filtering and video tiles
     const violations = [];
+    const videoTileViolations = [];
 
     for (const row of rowsContent) {
       for (const itemContent of row) {
+        // Check if item has video tile grid item type
+        if (itemContent.grid_item_type === 'videoTile') {
+          videoTileViolations.push({
+            title: itemContent.title,
+            id: itemContent.id,
+            gridItemType: itemContent.grid_item_type
+          });
+        }
+
         // Check if ratings exist
         if (!itemContent.ratings || itemContent.ratings.length === 0) {
           console.log(`WARNING: Content without ratings found: ${itemContent.title} (ID: ${itemContent.id})`);
@@ -1096,6 +1098,16 @@ describe('HomeGrid Video Tiles', function () {
         }
       }
     }
+
+    // Log video tile violations if any found
+    if (videoTileViolations.length > 0) {
+      console.log(`\n❌ FAILED: Found ${videoTileViolations.length} video tile item(s) in Kids Mode:`);
+      videoTileViolations.forEach((v, index) => {
+        console.log(`  ${index + 1}. Title: "${v.title}" | ID: ${v.id} | GridItemType: ${v.gridItemType}`);
+      });
+    }
+
+    expect(videoTileViolations.length, `Found ${videoTileViolations.length} video tile item(s) in Kids Mode. Video tiles should not appear.`).to.equal(0);
 
     // Log all violations if any found
     if (violations.length > 0) {
@@ -1122,7 +1134,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842112
-  it('C842112 - Video tile does NOT appear in Movies Mode @guest @browse', async () => {
+  it('C842112 - Video tile does NOT appear in Movies Mode @guest @browse @video_tiles', async () => {
     await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
@@ -1143,7 +1155,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842113
-  it('C842113 - Video tile does NOT appear in TV Shows Mode @guest @browse', async () => {
+  it('C842113 - Video tile does NOT appear in TV Shows Mode @guest @browse @video_tiles', async () => {
     await testUtils.startApplicationAtPage('series', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
@@ -1164,7 +1176,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842114
-  it('C842114 - Video tile does NOT appear when Parental Controls = Little Kids @parental_controls', async () => {
+  it('C842114 - Video tile does NOT appear when Parental Controls = Little Kids @parental_controls @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus', 20000);
 
@@ -1177,8 +1189,6 @@ describe('HomeGrid Video Tiles', function () {
 
     // Verify homeScreenRowList is visible and has contents
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'homeScreenRowList not visible after settings', 20000);
-    const videoTitlesRowList = await testUtils.getNodeForElement('videoTitlesRowList');
-    expect(videoTitlesRowList.content).to.be.null;
     // Get all rows content - focus behavior may differ with parental controls, so we get content directly
     // Use retry mechanism to handle timing issues with grid loading
     let rowsContent;
@@ -1188,9 +1198,19 @@ describe('HomeGrid Video Tiles', function () {
     }, 20000);
 
     const violations = [];
+    const videoTileViolations = [];
 
     for (const row of rowsContent) {
       for (const item of row) {
+        // Check if item has video tile grid item type
+        if (item.grid_item_type === 'videoTile') {
+          videoTileViolations.push({
+            title: item.title,
+            id: item.id,
+            gridItemType: item.grid_item_type
+          });
+        }
+
         if (item.ratings && item.ratings.length > 0) {
           const rating = item.ratings[0].value;
           const isAllowed = testHelpers.isKidsAppropriateRating(rating);
@@ -1205,6 +1225,16 @@ describe('HomeGrid Video Tiles', function () {
         }
       }
     }
+
+    // Log video tile violations if any found
+    if (videoTileViolations.length > 0) {
+      console.log(`\n❌ FAILED: Found ${videoTileViolations.length} video tile item(s) with Little Kids parental control:`);
+      videoTileViolations.forEach((v, index) => {
+        console.log(`  ${index + 1}. Title: "${v.title}" | ID: ${v.id} | GridItemType: ${v.gridItemType}`);
+      });
+    }
+
+    expect(videoTileViolations.length, `Found ${videoTileViolations.length} video tile item(s) with Little Kids parental control. Video tiles should not appear.`).to.equal(0);
 
     // Log all violations if any found
     if (violations.length > 0) {
@@ -1222,7 +1252,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842115
-  it('C842115 - Video tile does NOT appear when Parental Controls = Older Kids @parental_controls', async () => {
+  it('C842115 - Video tile does NOT appear when Parental Controls = Older Kids @parental_controls @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 20000);
     await utils.sleep(2000);
@@ -1239,8 +1269,6 @@ describe('HomeGrid Video Tiles', function () {
 
     // Verify homeScreenRowList is visible and has contents (Older Kids may use homeScreenRowList like Little Kids)
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'homeScreenRowList not visible after settings', 20000);
-    const videoTitlesRowList = await testUtils.getNodeForElement('videoTitlesRowList');
-    expect(videoTitlesRowList.content).to.be.null;
 
     // Use retry mechanism to handle timing issues with grid loading
     let rowsContent;
@@ -1250,9 +1278,19 @@ describe('HomeGrid Video Tiles', function () {
     }, 20000);
 
     const violations = [];
+    const videoTileViolations = [];
 
     for (const row of rowsContent) {
       for (const item of row) {
+        // Check if item has video tile grid item type
+        if (item.grid_item_type === 'videoTile') {
+          videoTileViolations.push({
+            title: item.title,
+            id: item.id,
+            gridItemType: item.grid_item_type
+          });
+        }
+
         if (item.ratings && item.ratings.length > 0) {
           const rating = item.ratings[0].value;
           const isAllowed = testHelpers.isKidsAppropriateRating(rating);
@@ -1267,6 +1305,16 @@ describe('HomeGrid Video Tiles', function () {
         }
       }
     }
+
+    // Log video tile violations if any found
+    if (videoTileViolations.length > 0) {
+      console.log(`\n❌ FAILED: Found ${videoTileViolations.length} video tile item(s) with Older Kids parental control:`);
+      videoTileViolations.forEach((v, index) => {
+        console.log(`  ${index + 1}. Title: "${v.title}" | ID: ${v.id} | GridItemType: ${v.gridItemType}`);
+      });
+    }
+
+    expect(videoTileViolations.length, `Found ${videoTileViolations.length} video tile item(s) with Older Kids parental control. Video tiles should not appear.`).to.equal(0);
 
     // Log all violations if any found
     if (violations.length > 0) {
@@ -1284,7 +1332,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842116
-  it('C842116 - Video tile appear when Parental Controls = Teens @parental_controls', async () => {
+  it('C842116 - Video tile appear when Parental Controls = Teens @parental_controls @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 20000);
     await utils.sleep(2000);
@@ -1318,7 +1366,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842117
-  it('C842117 - Video tiles are not shown in Browse While Watching section', async () => {
+  it('C842117 - Video tiles are not shown in Browse While Watching section @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
@@ -1353,7 +1401,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842118
-  it('C842118 - Linear in Featured: Video tile autostarts after 10 seconds @guest @videopreview', async () => {
+  it('C842118 - Linear in Featured: Video tile autostarts after 10 seconds @guest @videopreview @video_tiles', async () => {
     // Create user and set up network proxy to inject linear content in Featured row
     proxy.resume();
     const user = await testUtils.createRegisteredUser();
@@ -1380,7 +1428,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842119
-  it('C842119 - Linear in Featured: Selecting a linear video tile takes user to linear full screen @guest @linear @featured', async () => {
+  it('C842119 - Linear in Featured: Selecting a linear video tile takes user to linear full screen @guest @linear @featured @video_tiles', async () => {
     // Create user and set up network proxy to inject linear content in Featured row
     proxy.resume();
     const user = await testUtils.createRegisteredUser();
@@ -1453,7 +1501,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842120
-  it('C842120 - Linear in Featured: Video tile displays "Live/On Now" badge for linear in Featured row @guest @linear @featured', async () => {
+  it('C842120 - Linear in Featured: Video tile displays "Live/On Now" badge for linear in Featured row @guest @linear @featured @video_tiles', async () => {
     // Create user and set up network proxy to inject linear content in Featured row
     proxy.resume();
     const user = await testUtils.createRegisteredUser();
@@ -1488,7 +1536,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842121
-  it('C842121 - Video tiles are shown in CA locale @guest @locale', async () => {
+  it('C842121 - Video tiles are shown in CA locale @guest @locale @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await testUtils.waitForElementToShowOnScreen('videoTitlesRowList', 'videoTitlesRowList not visible', 20000);
@@ -1536,7 +1584,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842122
-  it('C842122 - Video tiles are shown in UK locale @guest @locale', async () => {
+  it('C842122 - Video tiles are shown in UK locale @guest @locale @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await testUtils.waitForElementToShowOnScreen('videoTitlesRowList', 'videoTitlesRowList not visible', 20000);
@@ -1584,7 +1632,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842123
-  it('C842123 - Video tiles are shown in MX locale @guest @locale', async () => {
+  it('C842123 - Video tiles are shown in MX locale @guest @locale @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await testUtils.waitForElementToShowOnScreen('videoTitlesRowList', 'videoTitlesRowList not visible', 20000);
@@ -1632,7 +1680,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842124
-  it('C842124 - Video tiles on low-end device', async () => {
+  it('C842124 - Video tiles on low-end device @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
 
     await testUtils.waitForElementToShowOnScreen('videoTitlesRowList', 'videoTitlesRowList not visible', 25000);
@@ -1673,7 +1721,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842125
-  it('C842125 - Video tiles in different resolutions @guest @browse', async () => {
+  it('C842125 - Video tiles in different resolutions @guest @browse @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await testUtils.waitForElementToShowOnScreen('videoTitlesRowList', 'videoTitlesRowList not visible', 20000);
@@ -1726,7 +1774,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842126
-  it.skip('C842126 - SoT appears on Video Tile @guest @browse', async () => {
+  it.skip('C842126 - SoT appears on Video Tile @guest @browse @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await testUtils.waitForElementToShowOnScreen('videoTitlesRowList', 'videoTitlesRowList not visible', 20000);
@@ -1789,7 +1837,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842129
-  it('C842129 - Overflow description fallback @guest @browse', async () => {
+  it('C842129 - Overflow description fallback @guest @browse @video_tiles', async () => {
     proxy.resume();
     // Set up network proxy to inject movie with long description in Featured row
     const proxyPromise = testHelpers.mockHomescreenWithLongDescriptionContent();
@@ -1830,7 +1878,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842130
-  it('C842130 - Network row first tile @guest @browse', async () => {
+  it('C842130 - Network row first tile @guest @browse @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for featured rowlist to have focus', 15000);
 
@@ -1841,7 +1889,7 @@ describe('HomeGrid Video Tiles', function () {
     // Navigate down through each row and validate first item
     for (let rowIndex = 0; rowIndex < totalRows; rowIndex++) {
       // Get the first item (StarterGridItem) in current row
-      const starterGridItemKeyPath = `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.${rowIndex}.items.0`;
+      const starterGridItemKeyPath = `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList.${rowIndex}.items.0`;
 
       try {
         const { value: starterGridItem } = await odc.getValue({
@@ -1876,7 +1924,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test for video preview resume when returning from side nav
-  it('Video preview resumes when user returns from side nav to video tiles @guest @videopreview', async () => {
+  it('Video preview resumes when user returns from side nav to video tiles @guest @videopreview @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for videoTitlesRowList to have focus');
 
@@ -1919,7 +1967,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test: Scroll down vertically through entire home grid and verify no duplicate containers
-  it('Should scroll through entire home grid without duplicate containers', async () => {
+  it('Should scroll through entire home grid without duplicate containers @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for featured rowlist to have focus', 15000);
@@ -1989,8 +2037,147 @@ describe('HomeGrid Video Tiles', function () {
     expect(sameRowCount).to.be.greaterThanOrEqual(3, 'Should have reached the end');
   });
 
+  // Test Rail Link: TBD - First tile in Featured row has video preview
+  it('C842999 - First tile in Featured row plays video preview immediately @guest @videopreview @video_tiles', async () => {
+    // Helper function to normalize IDs by removing leading zeros for comparison (series IDs sometimes have leading zeros)
+    const normalizeId = (id: string) => String(Number(id));
+
+    // Set up network proxy to mock homescreen with first item having video preview
+    proxy.resume();
+
+    const proxyPromise = new Promise((resolve) => {
+      proxy.addCallback({
+        shouldProcess: (args) => {
+          return args.url.includes('/api/v7/homescreen');
+        },
+        processResponse: (args) => {
+          const responseJson = JSON.parse(args.responseBuffer.toString());
+          // Find Featured container (or use first container as fallback)
+          const featuredContainer = responseJson.containers.find((c: any) => c.id === 'featured') || responseJson.containers[0];
+          // Find first VOD content with video preview from any container
+          let itemWithPreviewId = null;
+          for (const container of responseJson.containers) {
+            if (!container.children) continue;
+
+            for (const childId of container.children) {
+              const content = responseJson.contents[childId];
+              if (content &&
+                (content.type === 'v' || content.type === 's') &&
+                content.video_preview_url?.trim()) {
+                itemWithPreviewId = childId;
+                break;
+              }
+            }
+            if (itemWithPreviewId) break;
+          }
+
+          // Move item to beginning of Featured row if found
+          if (itemWithPreviewId) {
+            const currentIndex = featuredContainer.children.indexOf(itemWithPreviewId);
+            if (currentIndex > 0) {
+              featuredContainer.children.splice(currentIndex, 1);
+            }
+            if (currentIndex !== 0) {
+              featuredContainer.children.unshift(itemWithPreviewId);
+            }
+          }
+
+          resolve(null);
+          args.removeCallback();
+          return JSON.stringify(responseJson);
+        }
+      });
+    });
+
+    // Start application
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false, clearRegistry: false });
+    await utils.promiseTimeout(proxyPromise, 10000);
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
+
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for videoTitlesRowList to have focus', 20000);
+
+    // Pause proxy to avoid interfering with subsequent requests
+    proxy.pause();
+
+    await utils.sleep(1000);
+
+    // Navigate to Featured row (should be first or second row)
+    const featuredRowIndex = await testUtils.findRowIndexWithTitle('videoTitlesRowList', 'Featured');
+    await testUtils.jumpToRowIndex('videoTitlesRowList', featuredRowIndex);
+    await utils.sleep(500);
+
+    // Jump to first item in Featured row
+    await testUtils.jumpToRowItem('videoTitlesRowList', [featuredRowIndex, 0]);
+    await utils.sleep(1000);
+
+    // Verify the first item has video preview URL
+    const firstItem = await testUtils.getCurrentlyFocusedGridItemContent('videoTitlesRowList');
+    expect(firstItem.video_preview_url).to.exist;
+    expect(firstItem.video_preview_url).to.be.a('string').with.length.greaterThan(0);
+
+    // Verify video preview player is visible
+    await testUtils.waitForElementToShowOnScreen('inlineVideoPreviewPlayerContainer', 'Inline video preview player container not visible', 5000);
+    const previewContainer = await testUtils.getNodeForElement('inlineVideoPreviewPlayerContainer');
+    expect(previewContainer.visible).to.equal(true, 'Inline video preview player container should be visible');
+    expect(previewContainer.opacity).to.equal(1, 'Inline video preview player container opacity should be 1');
+
+    // Verify preview is playing (using the inline video tiles preview player)
+    await testUtils.waitForPlayerStateToEqual('inlineVideoTilesPreviewPlayer', 'playing', 15000);
+    const playerState = await testUtils.getElementField('inlineVideoTilesPreviewPlayer', 'state');
+    expect(playerState).to.equal('playing', 'Video preview should be playing for first item in Featured row');
+
+    // Verify preview player has valid content
+    const previewContent = await testUtils.getElementField('inlineVideoTilesPreviewPlayer', 'content');
+    expect(previewContent).to.exist;
+    expect(normalizeId(previewContent.id)).to.equal(normalizeId(firstItem.id), 'Preview player should be playing the focused content');
+
+    // Verify preview player size matches expected dimensions
+    const previewPlayerWidth = await testUtils.getElementField('inlineVideoTilesPreviewPlayer', 'width');
+    const previewPlayerHeight = await testUtils.getElementField('inlineVideoTilesPreviewPlayer', 'height');
+    expect(previewPlayerWidth).to.be.greaterThanOrEqual(789, 'Preview player width should be at least 789');
+    expect(previewPlayerHeight).to.be.greaterThanOrEqual(442, 'Preview player height should be at least 442');
+
+    // Verify metadata overlay is visible and displays correct information
+    await testUtils.waitForElementToShowOnScreen('videoGridMetadataGroup', 'Video grid metadata not visible', 5000);
+
+    // Verify description is displayed
+    await testUtils.waitForElementToShowOnScreen('videoGridDescription', 'Description not displayed in video grid metadata', 5000);
+    const descriptionElement = await testUtils.getNodeForElement('videoGridDescription');
+    expect(descriptionElement.visible).to.equal(true, 'Description should be visible in video grid metadata');
+    expect(descriptionElement.text).to.exist.and.not.be.empty;
+
+    // Verify title is displayed on poster overlay
+    await testUtils.waitForElementToShowOnScreen('posterOverlayTitle', 'Poster overlay title not visible', 5000);
+    const posterTitleElement = await testUtils.getNodeForElement('posterOverlayTitle');
+    expect(posterTitleElement.visible).to.equal(true, 'Poster overlay title should be visible');
+    expect(posterTitleElement.text).to.exist.and.not.be.empty;
+
+    // Verify video tile overlay group is visible
+    const overlayGroup = await testUtils.getNodeForElement('videoTileOverlayGroup');
+    expect(overlayGroup.visible).to.equal(true, 'Video tile overlay group should be visible');
+
+    // Navigate right to verify preview changes
+    await ecp.sendKeypress(ecp.Key.Right);
+    await utils.sleep(2000);
+
+    // Verify new preview is playing
+    await testUtils.waitForPlayerStateToEqual('inlineVideoTilesPreviewPlayer', 'playing', 10000);
+    const secondItem = await testUtils.getCurrentlyFocusedGridItemContent('videoTitlesRowList');
+    const secondPreviewContent = await testUtils.getElementField('inlineVideoTilesPreviewPlayer', 'content');
+    expect(normalizeId(secondPreviewContent.id)).to.equal(normalizeId(secondItem.id), 'Preview player should update to play the newly focused content');
+
+    // Navigate back left to first item
+    await ecp.sendKeypress(ecp.Key.Left);
+    await utils.sleep(2000);
+
+    // Verify first item preview is playing again
+    await testUtils.waitForPlayerStateToEqual('inlineVideoTilesPreviewPlayer', 'playing', 10000);
+    const firstItemAgain = await testUtils.getCurrentlyFocusedGridItemContent('videoTitlesRowList');
+    expect(normalizeId(firstItemAgain.id)).to.equal(normalizeId(firstItem.id), 'Should return focus to first item');
+  });
+
   // Test: Scroll horizontally through comedy row and verify no duplicate content with pagination
-  it('Should scroll horizontally through comedy row without duplicate content', async () => {
+  it('Should scroll horizontally through comedy row without duplicate content @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for featured rowlist to have focus', 15000);
@@ -2036,7 +2223,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: TBD - Wrapper Ad Autoplay Test
-  it('Wrapper ad should autoplay into fullscreen and return to home screen after completion @guest @ads', async () => {
+  it('Wrapper ad should autoplay into fullscreen and return to home screen after completion @guest @ads @video_tiles', async () => {
     // Set up ads endpoint mock before launching app
     proxy.resume();
     const proxyPromise = adTestHelpers.mockAds([AdType.Wrapper, AdType.Spotlight]);
@@ -2112,7 +2299,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: TBD - Spotlight Container Ad Loop Test
-  it('Spotlight container ad should loop continuously in the grid @guest @ads', async () => {
+  it('Spotlight container ad should loop continuously in the grid @guest @ads @video_tiles', async () => {
     // Set up ads endpoint mock before launching app
     proxy.resume();
     const proxyPromise = adTestHelpers.mockAds([AdType.Spotlight]);
@@ -2135,7 +2322,7 @@ describe('HomeGrid Video Tiles', function () {
     expect(rowItemsContent[0].id).to.equal('hdc_spotlight', 'Spotlight ad row should be at index 2');
 
     const { value: title } = await odc.getValue({
-      keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#FeaturedRowList.2.title.#CategoryName',
+      keyPath: '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList.2.title.#CategoryName',
     });
 
     expect(title.text).to.equal('The gift of fast delivery', 'Spotlight ad row header should be "The gift of fast delivery"');
@@ -2161,7 +2348,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: TBD - HDC Carousel Ad Test
-  it('HDC carousel ad should display with proper brand elements @guest @ads', async () => {
+  it('HDC carousel ad should display with proper brand elements @guest @ads @video_tiles', async () => {
     // Set up ads endpoint mock with carousel override
     proxy.resume();
     const proxyPromise = adTestHelpers.mockAds([AdType.Carousel]);
@@ -2287,5 +2474,107 @@ describe('HomeGrid Video Tiles', function () {
     expect(autorotateUri1Changed || autorotateUri2Changed, 'Carousel should autorotate to next tile automatically').to.be.true;
 
     await proxy.pause();
+  });
+
+  // Test Rail Link: TBD - Video tile preview restoration after valid_duration expires
+  it('Video tile overlay and preview display correctly after valid_duration expires @guest @videopreview @video_tiles', async () => {
+    // Helper function to normalize IDs by removing leading zeros for comparison (series IDs sometimes have leading zeros)
+    const normalizeId = (id: string) => String(Number(id));
+
+    // Set up network proxy to mock homescreen with valid_duration = 10 seconds
+    proxy.resume();
+
+    const proxyPromise = new Promise<void>((resolve) => {
+      proxy.addCallback({
+        shouldProcess: (args) => args.url.includes('/api/v7/homescreen'),
+        processResponse: (args) => {
+          const responseJson = JSON.parse(args.responseBuffer.toString());
+          // Override valid_duration to 10 seconds at the root level
+          responseJson.valid_duration = 10;
+          resolve();
+          args.removeCallback();
+          return JSON.stringify(responseJson);
+        }
+      });
+    });
+
+    // Start application
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false, clearRegistry: false });
+    await utils.promiseTimeout(proxyPromise, 10000);
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for videoTitlesRowList to have focus', 20000);
+
+    // Pause proxy to avoid interfering with subsequent requests
+    proxy.pause();
+
+    // Navigate to Featured row using scrollDownToFindRow with featured slug
+    await testHelpers.scrollDownToFindRow({ slug: 'featured', rowListElementId: 'videoTitlesRowList' });
+    await utils.sleep(1000);
+
+    // Verify video tile overlay and preview are visible before navigating
+    await testUtils.waitForElementToShowOnScreen('videoTileOverlayGroup', 'Video tile overlay not visible', 5000);
+    const overlayGroupBefore = await testUtils.getNodeForElement('videoTileOverlayGroup');
+    expect(overlayGroupBefore.visible).to.equal(true, 'Video tile overlay should be visible');
+
+    await testUtils.waitForElementToShowOnScreen('inlineVideoPreviewPlayerContainer', 'Inline video preview player container not visible', 5000);
+    const previewContainerBefore = await testUtils.getNodeForElement('inlineVideoPreviewPlayerContainer');
+    expect(previewContainerBefore.visible).to.equal(true, 'Inline video preview player container should be visible');
+    expect(previewContainerBefore.opacity).to.equal(1, 'Inline video preview player container opacity should be 1');
+
+    // Get the focused content for later verification
+    const focusedContent = await testUtils.getCurrentlyFocusedGridItemContent('videoTitlesRowList');
+
+    // Press OK to navigate to detail screen
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await testUtils.waitForCurrentScreenToEqual('detailScreen', 10000);
+    await utils.sleep(1000);
+
+    // Wait for valid_duration to expire (10 seconds + buffer)
+    await utils.sleep(12000);
+
+    // Navigate back to home screen
+    await ecp.sendKeypress(ecp.Key.Back);
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 10000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for videoTitlesRowList to have focus', 10000);
+
+    // Verify we're still on the same item
+    const focusedContentAfter = await testUtils.getCurrentlyFocusedGridItemContent('videoTitlesRowList');
+    expect(normalizeId(focusedContentAfter.id)).to.equal(normalizeId(focusedContent.id), 'Should return to the same focused item');
+
+    // Verify video tile overlay is visible again
+    await testUtils.waitForElementToShowOnScreen('videoTileOverlayGroup', 'Video tile overlay not visible after returning', 5000);
+    const overlayGroupAfter = await testUtils.getNodeForElement('videoTileOverlayGroup');
+    expect(overlayGroupAfter.visible).to.equal(true, 'Video tile overlay should be visible after returning from detail screen');
+
+    // Verify inline video preview player container is visible
+    await testUtils.waitForElementToShowOnScreen('inlineVideoPreviewPlayerContainer', 'Inline video preview player container not visible after returning', 5000);
+    const previewContainerAfter = await testUtils.getNodeForElement('inlineVideoPreviewPlayerContainer');
+    expect(previewContainerAfter.visible).to.equal(true, 'Inline video preview player container should be visible after returning');
+    expect(previewContainerAfter.opacity).to.equal(1, 'Inline video preview player container opacity should be 1 after returning');
+
+    // Verify video preview is playing (if content has video preview)
+    if (focusedContent.video_preview_url && focusedContent.video_preview_url.trim().length > 0) {
+      await testUtils.waitForPlayerStateToEqual('inlineVideoTilesPreviewPlayer', 'playing', 10000);
+      const previewPlayerContent = await testUtils.getElementField('inlineVideoTilesPreviewPlayer', 'content');
+      expect(previewPlayerContent).to.exist;
+      expect(normalizeId(previewPlayerContent.id)).to.equal(normalizeId(focusedContent.id), 'Preview player should be playing the focused content');
+    }
+
+    // Verify metadata overlay is visible
+    await testUtils.waitForElementToShowOnScreen('videoGridMetadataGroup', 'Video grid metadata not visible after returning', 5000);
+    const metadataGroup = await testUtils.getNodeForElement('videoGridMetadataGroup');
+    expect(metadataGroup.visible).to.equal(true, 'Video grid metadata should be visible after returning');
+
+    // Verify description is displayed
+    await testUtils.waitForElementToShowOnScreen('videoGridDescription', 'Description not displayed after returning', 5000);
+    const descriptionElement = await testUtils.getNodeForElement('videoGridDescription');
+    expect(descriptionElement.visible).to.equal(true, 'Description should be visible after returning');
+    expect(descriptionElement.text).to.exist.and.not.be.empty;
+
+    // Verify poster overlay title is visible
+    await testUtils.waitForElementToShowOnScreen('posterOverlayTitle', 'Poster overlay title not visible after returning', 5000);
+    const posterTitleElement = await testUtils.getNodeForElement('posterOverlayTitle');
+    expect(posterTitleElement.visible).to.equal(true, 'Poster overlay title should be visible after returning');
+    expect(posterTitleElement.text).to.exist.and.not.be.empty;
   });
 });

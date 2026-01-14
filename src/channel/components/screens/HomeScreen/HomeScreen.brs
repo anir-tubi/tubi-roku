@@ -1,3 +1,5 @@
+' Initializes the HomeScreen component
+' Sets up observers, node references, tracking, and initial UI state
 Function init()
   tubiLog("HomeScreen.init")
 
@@ -48,20 +50,15 @@ Function init()
   'Content area
   m.CategoryGridList = topRef.findNode("CategoryGridList")
   m.CategoryGridList.observeFieldScoped("itemSelected", "onGridItemSelected")
-  m.CategoryGridList.observeFieldScoped("itemFocused", "onGridFocusChange")
-  m.CategoryGridList.observeFieldScoped("featuredItemSelected", "onFeaturedItemSelected")
+  m.CategoryGridList.observeFieldScoped("itemSelectedFromRowList", "onFeaturedItemSelected")
   m.CategoryGridList.observeFieldScoped("reloadedItemToBeFocused", "onItemToBeFocusedChange")
-  m.CategoryGridList.observeFieldScoped("currFocusRow", "onCurrFocusRowChange")
-  m.CategoryGridList.observeFieldScoped("currFocusColumn", "onCurrFocusColumnChange")
   m.CategoryGridList.observeFieldScoped("rowFocused", "onRowFocused")
-  m.CategoryGridList.observeFieldScoped("vertFocusDirection", "onVertFocusDirectionChange")
-  m.CategoryGridList.observeFieldScoped("rowlistTranslation", "onRowlistTranslationChange")
   m.CategoryGridList.observeFieldScoped("gridContentIsReady", "onGridContentIsReadyChange")
-  m.CategoryGridList.observeFieldScoped("featuredListHasFocus", "onFeaturedListHasFocusChange")
-  m.CategoryGridList.observeFieldScoped("featuredRowFocusedItem", "onFeaturedRowFocusedItemChange")
+  m.CategoryGridList.observeFieldScoped("listHasFocus", "onListHasFocusChange")
+  m.CategoryGridList.observeFieldScoped("rowFocusedItem", "onRowFocusedItemChange")
   m.CategoryGridList.observeFieldScoped("hideInfoPanel", "onHideInfoPanelChange")
-  m.CategoryGridList.observeFieldScoped("featuredRowListTranslation", "updateFeaturedRowListTranslation")
-  m.ContentAreaParent.observeFieldScoped("translation", "updateFeaturedRowListTranslation")
+  m.CategoryGridList.observeFieldScoped("rowListTranslation", "updateRowListTranslation")
+  m.ContentAreaParent.observeFieldScoped("translation", "updateRowListTranslation")
 
   'used to know when to send tracking info. Do not send focus tracking info when the grid is 1st loaded
   m.gridHasGainedInitialFocus = false
@@ -86,18 +83,21 @@ Function init()
   m.sponsorSlideAmt = 29 'the amount the grid slides up to fit the sponsored header. This is the difference of the heights of the sponsored and normal row titles
 
   m.originalContentAreaTranslation = [0, 516]
-  setContentAreaState()
 
   m.scrollDirection = "none"
   m.videoTilesListTranslation = m.constants.ui.videoTilesListTranslation
+
+  setContentAreaState()
 End Function
 
 
-Function setContentAreaState(state = invalid)
+' Sets the content area state based on video tiles experiment and focus state
+' Animates or directly sets the content area parent translation
+Function setContentAreaState()
   tubiLog("HomeScreen.setToRedesignContentArea")
 
   shouldAnimate = false
-  if m.isUserInVideoTilesExperiment = false OR (m.top.featuredListHasFocus = false AND m.CategoryGridList <> invalid AND m.CategoryGridList.lastFocusedList = "skinAdRow") OR m.top.featuredRowContent = invalid
+  if m.isUserInVideoTilesExperiment = false OR (m.top.listHasFocus = false AND m.CategoryGridList <> invalid AND m.CategoryGridList.lastFocusedList = "skinAdRow") OR (m.top.kidsMode = true OR m.top.id <> m.constants.ui.screenIds.homeScreen)
     m.currentContentAreaTranslation = m.originalContentAreaTranslation
     shouldAnimate = true
   else
@@ -109,27 +109,17 @@ Function setContentAreaState(state = invalid)
   else
     m.ContentAreaParent.translation = m.currentContentAreaTranslation
   end if
-  updateFeaturedRowListTranslation()
+  updateRowListTranslation()
 End Function
 
 
-' Move the mask to right below the row that should be completely visible. The mask image will fade out the rows underneath the focused row.
-' This assumes that up to one row is completely opaque - (unless nFocusRow is set to a row beyond the actual focused row.)
-' This also assumes that the mask height is constant.
-' If a special row is in focus, then setting nFocusRow to a negative number will make all rows of the rowlist translucent
-' @param nFocusRow Integer, The row that is or will be in focus.
-'     If nFocusRow < 0, then the mask will be placed on top of the 1st row
-' @param nFocusingPercent Number, When the row is in the process of gaining focus, this is a number from 0 to 1 indicating
-'     how close the row is to its final state.
+' Moves the content area mask to fade out rows underneath the focused row
+' @param nFocusRow - The row that is or will be in focus (negative for special top row)
+' @param nFocusingPercent - Progress indicator from 0 to 1 when row is gaining focus
 Function moveContentAreaMask(nFocusRow = -1, nFocusingPercent = 1)
   '//nMaskYNew will most likely be set to 0 w/ the following line unless the content rowList has been moved to make way for a special top row.
-  if m.isUserInVideoTilesExperiment = true
-    nMaskYNew = m.CategoryGridList.featuredRowListTranslation[1]
-    rowHeights = m.CategoryGridList.featuredRowHeights
-  else
-    nMaskYNew = m.CategoryGridList.rowlistTranslation[1]
-    rowHeights = m.CategoryGridList.rowHeights
-  end if
+  nMaskYNew = m.CategoryGridList.rowListTranslation[1]
+  rowHeights = m.CategoryGridList.rowHeights
 
   if nFocusRow >= 0 AND isNonEmptyArray(rowHeights) = true
     nMaxRowHeights = rowHeights.count()
@@ -151,6 +141,7 @@ Function moveContentAreaMask(nFocusRow = -1, nFocusingPercent = 1)
 End Function
 
 
+' Handles screen ID changes and updates tracking info and screen level
 Function onIDChange()
   '//Set the tracking based on the id of the homescreen
   '//::NOTE:: id should only be set after the instantiation of the HomeScreen, but before the screen is added to the stack
@@ -171,11 +162,13 @@ Function onIDChange()
   end if
 
   m.top.trackingPageInfo = newTrackingPageInfo
-  m.categoryGridList.parentScreenId = m.top.id
-  m.categoryGridList.parentScreenTrackingPageInfo = newTrackingPageInfo
+  m.CategoryGridList.parentScreenId = m.top.id
+  m.CategoryGridList.parentScreenTrackingPageInfo = newTrackingPageInfo
 End Function
 
 
+' Handles personalization ID changes and updates tracking page info
+' @param msg - Message containing new personalization ID
 Function onPersonalizationIdChanged(msg)
   personalizationId = msg.getData()
   trackingPageInfo = m.top.trackingPageInfo
@@ -183,18 +176,16 @@ Function onPersonalizationIdChanged(msg)
   if isAA(trackingPageInfo) = true AND isAA(trackingPageInfo.pageValues) = true
     trackingPageInfo.pageValues.personalization_id = personalizationId
     m.top.trackingPageInfo = trackingPageInfo
-    m.categoryGridList.parentScreenTrackingPageInfo = trackingPageInfo
+    m.CategoryGridList.parentScreenTrackingPageInfo = trackingPageInfo
   end if
 End Function
 
 
-Function onContentUpdated(msg)
+' Handles content updates and manages ad carousel component creation
+' Updates content area mask position based on skin ad presence
+Function onContentUpdated()
   if m.top.contentUpdated = true
-    if m.top.featuredRowContent <> invalid
-      content = m.top.featuredRowContent
-    else
-      content = m.top.content
-    end if
+    content = m.top.content
 
     deleteAdDisplayCarouselComponent() '//remove any existing ad carousel component before creating a new one
 
@@ -216,12 +207,13 @@ Function onContentUpdated(msg)
     else
       moveContentAreaMask(0)
     end if
-
-    onCurrFocusRowChange()
   end if
 End Function
 
 
+' Handles batch ad response changes and creates/updates ad carousel components
+' Processes skin ad impression tracking updates
+' @param msg - Message containing array of ad response data
 Function onBatchAdResponseChanged(msg)
   tubiLog("HomeScreen.onBatchAdResponseChanged")
   aResponse = msg.getData()
@@ -249,6 +241,8 @@ Function onBatchAdResponseChanged(msg)
 End Function
 
 
+' Handles changes to allow carousel auto rotate setting
+' @param msg - Message containing new auto rotate value
 Function onAllowCarouselAutoRotateChange(msg)
   tubiLog("HomeScreen.onAllowCarouselAutoRotateChange")
   allowCarouselAutoRotate = msg.getData()
@@ -258,6 +252,8 @@ Function onAllowCarouselAutoRotateChange(msg)
 End Function
 
 
+' Handles loading state changes
+' Clears content and resets UI when loading starts
 Function onLoadingChange()
   tubiLog("HomeScreen.onLoadingChange")
   bLoaded = (m.top.isLoading = false)
@@ -272,18 +268,17 @@ Function onLoadingChange()
     m.CategoryGridList.skinAdContent = invalid
     deleteAdDisplayCarouselComponent()
     m.top.adContent = invalid
-    m.CategoryGridList.featuredRowContent = invalid
+    m.CategoryGridList.content = invalid
     m.CategoryGridList.skinAdContentUpdated = true
-    m.top.featuredRowContent = invalid
     m.top.content = invalid
-    m.CategoryGridList.resetFeaturedRowList = true
+    m.CategoryGridList.resetRowList = true
 
     ' Resetting the previous state variables.
-    m.CategoryGridList.featuredListCurrFocusRow = -1
-    m.CategoryGridList.featuredRowCurrFocusColumn = -1
-    m.CategoryGridList.featuredListScrollDirection = "none"
-    m.CategoryGridList.featuredRowFocusedItem = invalid
-    m.CategoryGridList.featuredListHasFocus = false
+    m.CategoryGridList.listCurrFocusRow = -1
+    m.CategoryGridList.rowCurrFocusColumn = -1
+    m.CategoryGridList.listScrollDirection = "none"
+    m.CategoryGridList.rowFocusedItem = invalid
+    m.CategoryGridList.listHasFocus = false
 
     ' Resetting last focus list when reloading the screen.
     ' To Cover cases where skin ad is shown and then gets removed.
@@ -293,21 +288,13 @@ Function onLoadingChange()
 End Function
 
 
-''''''''''''''''''''
-' onScreenFocusChange
-'
-' Set focus back to category list or component group if the
-' screen has lost focus, usually due to another screen or dialog
-' being shown.
+' Handles screen focus changes
+' Refreshes content if needed when screen gains focus
 Function onScreenFocusChange()
   tubiLog("HomeScreen.onScreenFocusChange " + focusState(m.top))
   if m.top.hasFocus() = true
     'TODO: Revisit this if we ever use both.
-    if m.CategoryGridList.featuredRowContent <> invalid
-      content = m.CategoryGridList.featuredRowContent
-    else
-      content = m.CategoryGridList.content
-    end if
+    content = m.CategoryGridList.content
     if content <> invalid
       if shouldRefresh(content) = true
         m.top.loadAllCategories = true
@@ -325,29 +312,27 @@ Function onScreenFocusChange()
 End Function
 
 
-'''''''''''''''''''''''''''
-' onSignedInChange
-'
-' When signed in/out changes, we need to reload all categories to
-' reflect changes in parental controls between guest and signed-in
-' users
+' Handles signed in state changes
+' Updates CategoryGridList with new signed in status
 Function onSignedInChange()
   tubiLog("HomeScreen.onSignedInChange")
   m.CategoryGridList.signedIn = m.top.signedIn
 End Function
 
 
+' Handles reset content area values request
 Function onResetContentAreaValues()
   contractContentAreaToOriginal(1.0)
 End Function
 
 
-
-' A new row has been focused in the CategoryGridList
+' Handles row focus changes in CategoryGridList
+' Manages ad focus timer for sponsored and ad rows
+' @param msg - Message containing newly focused row
 Function onRowFocused(msg)
   tubiLog("HomeScreen.onRowFocused")
   row = msg.getData()
-  oldRow = m.categoryGridList.oldRowFocused
+  oldRow = m.CategoryGridList.oldRowFocused
   isRowAdContainerContainer = false
   if row <> invalid
     if isSponsoredRow(row) = true
@@ -367,7 +352,9 @@ Function onRowFocused(msg)
 End Function
 
 
-' @row: roSGNode, a CategoryContentNode
+' Checks if row is a sponsored row
+' @param row - CategoryContentNode to check
+' @return Boolean - True if row has sponsor images and pixels
 Function isSponsoredRow(row)
   if row.sponsorImages <> invalid AND row.sponsorImages.pixels <> invalid AND row.sponsorImages.pixels["homescreen"] <> invalid
     return true
@@ -377,39 +364,33 @@ Function isSponsoredRow(row)
 End Function
 
 
-' @row: roSGNode, a CategoryContentNode
+' Checks if row is an ad skin row
+' @param row - CategoryContentNode to check
+' @return Boolean - True if row is a skin ad type
 Function isAdSkinRow(row)
   return (row <> invalid AND row.gridItemType = m.constants.ui.gridItemTypes.skinAd)
 End Function
 
 
-' @row: roSGNode, a CategoryContentNode
+' Checks if row is an ad display carousel row
+' @param row - CategoryContentNode to check
+' @return Boolean - True if row is an ad carousel type
 Function isAdDisplayCarouselRow(row)
   return (row <> invalid AND row.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel)
 End Function
 
 
-' @row: roSGNode, a CategoryContentNode
+' Checks if row is an ad display container row
+' @param row - CategoryContentNode to check
+' @return Boolean - True if row is an ad spotlight type
 Function isAdDisplayContainerRow(row)
   return (row <> invalid AND row.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight)
 End Function
 
 
-' When the column changes focus, then report to any observers.
-Function onCurrFocusColumnChange(msg)
-  tubiLog("HomeScreen.onCurrFocusColumnChange")
-  column = msg.getData()
-  newColumn = Int(column)
-
-  if newColumn <> invalid AND newColumn <> m.currentColumn
-    '//make sure we only report the new column for a whole integer
-    m.currentColumn = newColumn
-
-    m.top.columnFocused = m.currentColumn
-  end if
-End Function
-
-
+' Handles ad carousel content focus changes
+' Updates background and content focused fields
+' @param msg - Message containing focused content
 Function onAdDisplayCarouselContentFocusedChanged(msg)
   contentFocused = msg.getData()
   if contentFocused <> invalid
@@ -419,7 +400,9 @@ Function onAdDisplayCarouselContentFocusedChanged(msg)
 End Function
 
 
-'//When the user manually focuses a different tile in the carousel, then report the navigation within event
+' Handles manual navigation within ad carousel
+' Fires navigate within page tracking event
+' @param msg - Message from carousel tile navigation
 Function onAdDisplayCarouselContentFocusedManually(msg)
   carouselComponent = msg.getRoSGNode()
   if carouselComponent <> invalid AND carouselComponent.itemFocused >= 0 AND carouselComponent.itemFocused <> carouselComponent.itemUnfocused AND carouselComponent.itemUnfocused >= 0
@@ -429,7 +412,7 @@ Function onAdDisplayCarouselContentFocusedManually(msg)
     categoryComponentInfo["category_slug"] = m.CategoryGridList.currCategoryId
 
     ' The rowIndexBoost is 1 based. And Roku row list index is 0 based.
-    rowIndexBoost = m.categoryGridList.rowIndexBoost + 1
+    rowIndexBoost = m.CategoryGridList.rowIndexBoost + 1
     '//user starting at the following row/column
     categoryComponentInfo["category_row"] = m.CategoryGridList.cursorPosition[0] + rowIndexBoost 'all analytics are 1 based
     categoryComponentInfo["category_col"] = nOldFocusCol
@@ -449,149 +432,8 @@ Function onAdDisplayCarouselContentFocusedManually(msg)
 End Function
 
 
-' fires when the RowList is in the process of scrolling between rows
-Function onCurrFocusRowChange()
-  tubiLog("HomeScreen.onCurrFocusRowChange")
-  'the focused row during the scroll as a float (ie. 2.3 is partially between 2nd and 3rd rows)
-  currFocusRow = m.CategoryGridList.currFocusRow
-
-  'the last row that was focused and settled as an integer
-  lastFocusRow = m.CategoryGridList.cursorPosition[0]
-
-  scrollDirection = m.scrollDirection
-
-  ' If a user quickly presses the up and down buttons quickly, before the
-  ' rowList can set rowList.rowItemFocused, we need to correct lastFocusRow to be accurate
-  if m.lastFocusPosition >= 0
-    if currFocusRow > m.lastFocusPosition AND scrollDirection = "up"
-      ' currFocusRow > lastFocusRow indicates the user is scrolling down, but if scrollDirection = "up"
-      ' it indicates a user did a down/up fast button press, so we need to update lastFocusRow
-      lastFocusRow += 1
-    else if currFocusRow < m.lastFocusPosition AND scrollDirection = "down"
-      ' currFocusRow > lastFocusRow indicates the user is scrolling up, but if scrollDirection = "down"
-      ' it indicates a user did a up/down fast button press, so we need to update lastFocusRow
-      lastFocusRow -= 1
-    else if currFocusRow = lastFocusRow
-      ' currFocusRow = lastFocusRow indicates the user concluded an up/down or down/up fast button press
-      ' and we need to update lastFocusRow
-      if scrollDirection = "up"
-        lastFocusRow += 1
-      else if scrollDirection = "down"
-        lastFocusRow -= 1
-      end if
-    end if
-  end if
-
-  rowPercent = -1
-  rowEnteringFocus = -1
-  rowLosingFocus = -1
-
-  ' There are 4 options when focusing a new category
-  ' 1) Both old and new focused categories are not vitg: do nothing
-  ' 2) Both old and new focused categories are vitg: do nothing
-  ' 3) Old category is vitg, new category is not vitg: shrink the CategoryGridList
-  ' 4) Old category is not vitg, new category is vitg: expand the CategoryGridList
-  ' Determine if the category being entered is vitg
-  if currFocusRow > lastFocusRow
-    ' scrolling down
-    rowEnteringFocus = Fix(currFocusRow) + 1
-    rowLosingFocus = Fix(currFocusRow)
-    if rowLosingFocus = currFocusRow
-      'when the scroll completes
-      rowEnteringFocus = Fix(currFocusRow)
-      rowLosingFocus = currFocusRow - 1
-    end if
-    rowPercent = currFocusRow - rowLosingFocus
-  else if currFocusRow < lastFocusRow
-    ' scrolling up
-    rowEnteringFocus = Fix(currFocusRow)
-    rowLosingFocus = Fix(currFocusRow) + 1
-    if rowEnteringFocus = currFocusRow
-      'when the scroll completes
-      rowEnteringFocus = Fix(currFocusRow)
-      rowLosingFocus = currFocusRow + 1
-    end if
-    rowPercent = Abs(currFocusRow - rowLosingFocus)
-  else if currFocusRow = lastFocusRow
-    ' this block should never happen since lastFocus is updated above in the case where there is a fast scroll
-    rowEnteringFocus = Fix(currFocusRow)
-    rowLosingFocus = lastFocusRow
-    rowPercent = 1
-  end if
-
-  if m.CategoryGridList.rowHeights <> invalid AND m.CategoryGridList.isInFocusChain() = true
-    nEnteringFocusedRowHeight = m.CategoryGridList.rowHeights[rowEnteringFocus]
-    nLosingFocusedRowHeight = m.CategoryGridList.rowHeights[rowLosingFocus]
-    if nLosingFocusedRowHeight <> nEnteringFocusedRowHeight
-      '//no need to move the mask if the previous and current rows have the same heights
-
-      moveContentAreaMask(rowEnteringFocus, rowPercent)
-    end if
-  end if
-
-  categoryEnteringFocus = invalid
-  categoryLosingFocus = invalid
-  if m.CategoryGridList.content <> invalid
-    categoryEnteringFocus = m.CategoryGridList.content.getChild(rowEnteringFocus) 'TubiCategoryNode
-    categoryLosingFocus = m.CategoryGridList.content.getChild(rowLosingFocus) 'TubiCategoryNode
-  end if
-
-  if categoryEnteringFocus <> invalid
-    sSponsorBackgroundURL = ""
-
-    isEnteringLiveEventRow = arrayIncludes(m.constants.ui.liveEventsGridTypes, categoryEnteringFocus.gridItemType)
-    isLeavingLiveEventRow = categoryLosingFocus <> invalid AND arrayIncludes(m.constants.ui.liveEventsGridTypes, categoryLosingFocus.gridItemType)
-
-    if isEnteringLiveEventRow = true
-      m.CategoryGridList.showFocusFeedback = false
-    else if isLeavingLiveEventRow = true AND currFocusRow = CInt(currFocusRow)
-      m.CategoryGridList.showFocusFeedback = true
-    else if isEnteringLiveEventRow = false AND isLeavingLiveEventRow = false
-      ' This covers case where the container gets removed.
-      m.CategoryGridList.showFocusFeedback = true
-    end if
-
-    isNoInfoPanelGridItemType = arrayIncludes(m.constants.ui.noInfoPanelGridItemTypes, categoryEnteringFocus.gridItemType) = true
-    if isNoInfoPanelGridItemType = true
-      if m.contentAreaAnimation <> invalid
-        m.contentAreaAnimation.control = "stop"
-      end if
-      expandContentAreaForContainersWithoutInfoPanel(rowPercent)
-    else if categoryEnteringFocus.sponsorImages <> invalid
-      '//if the entering row is sponsored, then take into account the extra room that the sponsor artwork takes up in the row header
-      if m.top.featuredRowContent = invalid
-        expandContentAreaForSponsorship(rowPercent)
-      end if
-      if m.constants.deviceInfo.limitedUi = false AND categoryEnteringFocus.sponsorImages.brandBackground <> ""
-        sSponsorBackgroundURL = categoryEnteringFocus.sponsorImages.brandBackground
-      else if categoryEnteringFocus.sponsorImages.brandColor <> ""
-        sSponsorBackgroundURL = categoryEnteringFocus.sponsorImages.brandColor
-      end if
-    else if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
-      expandContentAreaForAdDisplayCarousel(rowPercent)
-    else if categoryEnteringFocus.id = m.constants.ui.categoryIds.certifiedFresh
-      expandContentAreaForSponsorship(rowPercent)
-    else
-      contractContentAreaToOriginal(rowPercent)
-    end if
-    m.top.sponsorshipBackground = sSponsorBackgroundURL
-
-  else if categoryLosingFocus <> invalid
-    tubiLog("HomeScreen.onCurrFocusRowChange, elseIf categoryLosingFocus <> invalid ")
-    '//::QUESTION:: When does this elseIF block ever get triggered. If never, then consider getting rid of this block
-    contractContentAreaToOriginal(rowPercent)
-
-  end if
-
-  ' update m.lastFocusPosition or reset if we've concluded the scroll animation
-  m.lastFocusPosition = currFocusRow
-  if rowPercent = 1
-    m.lastFocusPosition = -1
-  end if
-End Function
-
-
-' @rowPercent: float, the percentage that the row is focused
+' Gradually contracts content area back to original position
+' @param rowPercent - Percentage of row focus progress (0-1)
 Function contractContentAreaToOriginal(rowPercent)
   tubiLog("HomeScreen.contractContentAreaToOriginal")
 
@@ -615,9 +457,9 @@ Function contractContentAreaToOriginal(rowPercent)
 End Function
 
 
-' Adjust the RowList based on the difference of the normal and sponsored row title heights and relative to where the rowList already is.
-'   So if a gridType already adjusted the rowList's position, then adjust it more but relative to where it already had been adjusted.
-' @rowPercent: float, the percentage that the Sponsorship row is focused
+' Expands content area for sponsorship row display
+' Adjusts row list position and info panel opacity
+' @param rowPercent - Percentage of sponsorship row focus progress (0-1)
 Function expandContentAreaForSponsorship(rowPercent)
   m.ContentAreaParent.translation = [m.ContentAreaParent.translation[0], m.currentContentAreaTranslation[1] - (m.sponsorSlideAmt * rowPercent)]
 
@@ -632,8 +474,9 @@ Function expandContentAreaForSponsorship(rowPercent)
 End Function
 
 
-' Adjust the content area for containers that do not have an info panel.
-' @rowPercent: float, the percentage that the container is focused
+' Expands content area for containers without info panel
+' Hides info panel and brings content to top of screen
+' @param rowPercent - Percentage of container focus progress (0-1)
 Function expandContentAreaForContainersWithoutInfoPanel(rowPercent)
   nDiffHeight = m.originalContentAreaTranslation[1] - 102 '//bring this to the top of the screen
   if m.currentContentAreaTranslation[1] = m.videoTilesListTranslation[1]
@@ -651,9 +494,9 @@ Function expandContentAreaForContainersWithoutInfoPanel(rowPercent)
 End Function
 
 
-' Adjust the RowList based on the difference of the normal and adRowlistCarousel row title heights and relative to where the rowList already is.
-'   So if a gridType already adjusted the rowList's position, then adjust it more but relative to where it already had been adjusted.
-' @rowPercent: float, the percentage that the adRowlistCarousel row is focused
+' Expands content area for ad display carousel
+' Hides info panel and brings content to top of screen
+' @param rowPercent - Percentage of carousel focus progress (0-1)
 Function expandContentAreaForAdDisplayCarousel(rowPercent)
   nDiffHeight = m.originalContentAreaTranslation[1] - 102 '//bring this to the top of the screen
   if m.currentContentAreaTranslation[1] = m.videoTilesListTranslation[1]
@@ -670,7 +513,8 @@ Function expandContentAreaForAdDisplayCarousel(rowPercent)
 End Function
 
 
-
+' Populates info panel based on focused content type
+' @param focusedContent - Content node to display in info panel
 Function populateInfoPanelByContent(focusedContent)
   if focusedContent <> invalid
     sType = focusedContent.type
@@ -696,105 +540,57 @@ Function populateInfoPanelByContent(focusedContent)
 End Function
 
 
-Function onFeaturedListHasFocusChange(msg)
-  m.infoPanelFade = slideFadeGeneral(m.InfoPanelParent, [0, -50], "out", 0.2)
+' Handles list focus state changes
+' Fades out info panel and updates content area state
+' @param _msg - Message containing new focus state
+Function onListHasFocusChange(_msg)
   setContentAreaState()
-  'Make sure Content is in correct location
-  moveContentAreaMaskBasedCurrentFocus()
 End Function
 
 
+' Handles featured item selection from CategoryGridList
 Function onFeaturedItemSelected()
-  selectedItem = m.CategoryGridList.featuredItemSelected
+  selectedItem = m.CategoryGridList.itemSelectedFromRowList
   handleItemSelected(selectedItem, m.top.selectedPosition)
 End Function
 
 
-'''''''''''''''''''''
-' onGridFocusChange
-'
-' On grid focus change, update the info panel
-Function onGridFocusChange() as Void
-  tubiLog("HomeScreen.onGridFocusChange")
+' Handles row focused item changes
+' Updates content, background, and info panel based on grid item type
+' @param msg - Message containing newly focused item
+Function onRowFocusedItemChange(msg) as Void
+  focusedContent = msg.getData()
+
+  ' Early returns for invalid states
+  if m.CategoryGridList.isInFocusChain() = false OR m.top.isLoading = true OR focusedContent = invalid
+    return
+  end if
+
   if m.top.contentReady = false
     m.top.contentReady = true
   end if
 
-  '//if the screen is loading or if the grid is not in focus then exit out of this function
-  if m.CategoryGridList.isInFocusChain() = false OR m.top.isLoading = true
-    return
-  end if
-  oldFocusedContent = m.CategoryGridList.oldItemFocused
-  focusedContent = m.CategoryGridList.itemFocused
+  m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(focusedContent, m.categoryGridList.focusedPosition)
+  ' Update focused content
+  m.top.contentFocused = focusedContent
 
-  if m.CategoryGridList.isInFocusChain() = true
-    '//if the CategoryGridList is in focus, then alter the UI.
-    if focusedContent <> invalid
-      if focusedContent.type <> m.constants.ui.gridItemTypes.linear AND oldFocusedContent <> invalid AND oldFocusedContent.type = m.constants.ui.gridItemTypes.linear
-        m.top.stopLinearVideoPlayer = true
-      end if
-
-      m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(focusedContent, m.CategoryGridList.focusedPosition)
-      m.top.contentFocused = focusedContent
-      gridItemType = focusedContent.gridItemType
-      if arrayIncludes(m.constants.ui.noInfoPanelGridItemTypes, gridItemType) = true
-        fadeOutInfoPanel()
-        m.top.backgroundUriList = determineBackgroundImage(focusedContent)
-      else
-        sType = focusedContent.type
-        if sType <> m.constants.ui.contentTypes.adRowlistCarousel
-          populateInfoPanelByContent(focusedContent)
-          fadeInContentArea()
-        else
-          '//Display the adRowlistCarousel Component
-          fadeOutInfoPanel()
-          displayAdDisplayCarousel()
-        end if
-      end if
-
-    end if
-
-  end if
-
-  '//Ensure the ContentArea Mask is at the proper location when new focus has changed.
-  moveContentAreaMaskBasedCurrentFocus()
-
-  fireNavigateWithinPageEvent()
-
-End Function
-
-
-Function onFeaturedRowFocusedItemChange(msg) as Void
-  tubiLog("HomeScreen.onFeaturedRowFocusedItemChange")
-  focusedContent = msg.getData()
-
-  '//if the screen is loading or if the grid is not in focus then exit out of this function
-  if m.CategoryGridList.isInFocusChain() = false OR m.top.isLoading = true
-    return
-  end if
-
-  if m.CategoryGridList.isInFocusChain() = true
-    '//if the CategoryGridList is in focus, then alter the UI.
-    if focusedContent <> invalid
-      m.top.contentFocused = focusedContent
-      if focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
-        m.top.backgroundUriList = determineBackgroundImage(focusedContent)
-      else
-        sType = focusedContent.type
-        if sType = m.constants.ui.contentTypes.adRowlistCarousel
-          '//Display the adRowlistCarousel Component
-          displayAdDisplayCarousel()
-        end if
-      end if
-
-    end if
-
+  ' Handle content based on grid item type
+  gridItemType = focusedContent.gridItemType
+  if gridItemType = m.constants.ui.gridItemTypes.skinAd OR gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
+    m.top.backgroundUriList = determineBackgroundImage(focusedContent)
+  else if focusedContent.type = m.constants.ui.contentTypes.adRowlistCarousel
+    displayAdDisplayCarousel()
+  else if gridItemType <> m.constants.ui.gridItemTypes.videoTile AND (m.top.id <> m.constants.ui.screenIds.homeScreen OR m.top.kidsMode = true)
+    populateInfoPanelByContent(focusedContent)
+    fadeInContentArea()
   end if
 
   fireNavigateWithinPageEvent()
 End Function
 
 
+' Deletes the ad display carousel component
+' Removes observers and handles focus transfer
 Function deleteAdDisplayCarouselComponent()
   tubiLog("HomeScreen.deleteAdDisplayCarouselComponent")
   if m.adRowlistCarouselComponent <> invalid
@@ -811,12 +607,15 @@ Function deleteAdDisplayCarouselComponent()
 End Function
 
 
-' Is the carousel component available and not marked for "deletion" (aka: removed from the scene graph)
+' Checks if ad display carousel component is available and visible
+' @return Boolean - True if carousel exists and has parent node
 Function isAdDisplayCarouselAvailable()
   return (m.adRowlistCarouselComponent <> invalid AND m.adRowlistCarouselComponent.getParent() <> invalid)
 End Function
 
 
+' Creates or updates ad display carousel component
+' @param content - Ad carousel content node
 Function createAdDisplayCarouselComponent(content)
   tubiLog("HomeScreen.createAdDisplayCarouselComponent")
   if content.type = m.constants.ui.contentTypes.adRowlistCarousel
@@ -849,53 +648,75 @@ Function createAdDisplayCarouselComponent(content)
 End Function
 
 
+' Fires navigate within page tracking event
+' Tracks user navigation between grid items
 Function fireNavigateWithinPageEvent()
-  'Set up the navigateWithinPageInfo to send to ContentController via Homescreen. Need for when CategoryGridList is in focus
-  oldRowIndexBoost = m.categoryGridList.rowIndexBoost + 1
-  newRowIndexBoost = m.categoryGridList.rowIndexBoost + 1
-
-  oldAnalyticsRow = m.CategoryGridList.oldCursorPosition[0] + oldRowIndexBoost
-  oldAnalyticsCol = m.CategoryGridList.oldCursorPosition[1] + 1
-  newAnalyticsRow = m.CategoryGridList.cursorPosition[0] + newRowIndexBoost
-  newAnalyticsCol = m.CategoryGridList.cursorPosition[1] + 1
-  oldFocusedContent = m.CategoryGridList.oldItemFocused
-
-  if m.gridHasGainedInitialFocus = true AND oldAnalyticsRow > 0 AND oldAnalyticsCol > 0 AND m.top.isInFocusChain() = true
-    if oldAnalyticsRow <> newAnalyticsRow OR oldAnalyticsCol <> newAnalyticsCol
-
-      categoryComponentInfo = {}
-      categoryComponentInfo["category_slug"] = m.CategoryGridList.oldCategoryId
-      categoryComponentInfo["category_row"] = oldAnalyticsRow
-      categoryComponentInfo["category_col"] = oldAnalyticsCol
-      'row is hardcoded to 1 in the line below because the row represents the row within the category_component, not within the grid
-      'and the current design only has one row per category
-      if oldFocusedContent <> invalid AND oldFocusedContent.type = m.constants.ui.contentTypes.channel
-        tile = m.Tracking.getUtilityTile(oldFocusedContent, oldAnalyticsCol, 1)
-        categoryComponentInfo["utility_tile"] = tile
-      else if oldFocusedContent <> invalid AND oldFocusedContent.type <> "continue_watching_signed_out_user"
-        tile = m.Tracking.getAnalyticsTile(oldFocusedContent, oldAnalyticsCol, 1)
-        categoryComponentInfo["content_tile"] = tile
-      end if
-
-      m.top.navigateWithinPageInfo = {
-        pageOneof: m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pageType, m.top.trackingPageInfo.pageValues)
-        componentOneof: m.Tracking.getAnalyticsComponent("category_component", categoryComponentInfo)
-        means_of_navigation: "BUTTON" 'MeansOfNavigation enum
-        vertical_location: newAnalyticsRow
-        horizontal_location: newAnalyticsCol
-      }
-    end if
-  end if
-
+  ' Set initial focus flag
   m.gridHasGainedInitialFocus = true
 
-  if m.CategoryGridList.lastFocusedList = "featuredRowList"
-    focusedContent = m.CategoryGridList.featuredRowFocusedItem
+  ' Calculate analytics positions (1-based for analytics)
+  rowIndexBoost = m.CategoryGridList.rowIndexBoost + 1
+  oldAnalyticsRow = m.CategoryGridList.oldCursorPosition[0] + rowIndexBoost
+  oldAnalyticsCol = m.CategoryGridList.oldCursorPosition[1] + 1
+  newAnalyticsRow = m.CategoryGridList.cursorPosition[0] + rowIndexBoost
+  newAnalyticsCol = m.CategoryGridList.cursorPosition[1] + 1
+
+  ' Track navigation only if position changed and conditions are met
+  shouldTrackNavigation = m.gridHasGainedInitialFocus = true AND oldAnalyticsRow > 0 AND oldAnalyticsCol > 0 AND m.top.isInFocusChain() = true
+  positionChanged = oldAnalyticsRow <> newAnalyticsRow OR oldAnalyticsCol <> newAnalyticsCol
+
+  if shouldTrackNavigation AND positionChanged
+    oldFocusedContent = m.CategoryGridList.oldRowFocusedItem
+    categoryComponentInfo = buildCategoryComponentInfo(oldFocusedContent, oldAnalyticsRow, oldAnalyticsCol)
+
+    m.top.navigateWithinPageInfo = {
+      pageOneof: m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pageType, m.top.trackingPageInfo.pageValues)
+      componentOneof: m.Tracking.getAnalyticsComponent("category_component", categoryComponentInfo)
+      means_of_navigation: "BUTTON"
+      vertical_location: newAnalyticsRow
+      horizontal_location: newAnalyticsCol
+    }
+  end if
+
+  ' Update tracking for rowList focus
+  if m.CategoryGridList.lastFocusedList = "rowList"
+    focusedContent = m.CategoryGridList.rowFocusedItem
     m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(focusedContent, m.CategoryGridList.cursorPosition)
   end if
 End Function
 
 
+' Builds category component info for tracking
+' @param content - TubiContentNode that was focused
+' @param analyticsRow - 1-based row position for analytics
+' @param analyticsCol - 1-based column position for analytics
+' @return Associative array with category component tracking information
+Function buildCategoryComponentInfo(content, analyticsRow, analyticsCol)
+  categoryComponentInfo = {
+    "category_slug": m.CategoryGridList.oldCategoryId,
+    "category_row": analyticsRow,
+    "category_col": analyticsCol
+  }
+
+  ' Add tile information if content is valid
+  ' Row is hardcoded to 1 because it represents the row within the category_component,
+  ' not within the grid, and the current design only has one row per category
+  if content <> invalid
+    tileRowIndex = 1
+    if content.type = m.constants.ui.contentTypes.channel
+      tile = m.Tracking.getUtilityTile(content, analyticsCol, tileRowIndex)
+      categoryComponentInfo["utility_tile"] = tile
+    else if content.type <> "continue_watching_signed_out_user"
+      tile = m.Tracking.getAnalyticsTile(content, analyticsCol, tileRowIndex)
+      categoryComponentInfo["content_tile"] = tile
+    end if
+  end if
+
+  return categoryComponentInfo
+End Function
+
+
+' Handles grid item selection
 Function onGridItemSelected() as Void
   tubiLog("HomeScreen.onGridItemSelected")
   selectedItem = m.CategoryGridList.itemSelected
@@ -903,20 +724,18 @@ Function onGridItemSelected() as Void
 End Function
 
 
-' @item: roSGNode, TubiContentNode with metadata for an item in the grid
-' @position: array, 2d array with [x,y] grid coordinate information
+' Handles item selection from grid
+' Updates tracking and triggers content selection if not scrolling
+' @param item - TubiContentNode that was selected
+' @param position - 2D array with [x,y] grid coordinate
 Function handleItemSelected(item, position)
   if m.top.isLoading <> true
     m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(item, position)
 
     ' Content controller observes contentSelected to populate/push the detail screen
     if item <> invalid then
-      ' Determine which scrolling status to check based on the focused list
-      if m.CategoryGridList.lastFocusedList = "featuredRowList"
-        isScrolling = m.CategoryGridList.featuredListScrollingStatus
-      else
-        isScrolling = m.CategoryGridList.scrollingStatus
-      end if
+      ' Use list scrolling status
+      isScrolling = m.CategoryGridList.listScrollingStatus
 
       if isScrolling = false
         ' If the row is still scrolling, do not select the item.
@@ -927,15 +746,17 @@ Function handleItemSelected(item, position)
 End Function
 
 
-' @gridItem: roSGNode, TubiContentNode with metadata for an item in the grid
-' @itemPosition: array, 2d array with [x,y] grid coordinate information
+' Gets tracking component info for grid item
+' @param gridItem - TubiContentNode to track
+' @param itemPosition - 2D array with [x,y] grid coordinate
+' @return Associative array with tracking component information
 Function getTrackingComponentInfoOfCategoryGridList(gridItem, itemPosition)
   trackingComponentInfo = {}
   if gridItem <> invalid AND itemPosition <> invalid AND itemPosition.Count() = 2
     componentValues = {}
     componentValues["category_slug"] = m.top.currCategoryId
     ' The rowIndexBoost is 1 based. And Roku row list index is 0 based.
-    rowIndexBoost = m.categoryGridList.rowIndexBoost + 1
+    rowIndexBoost = m.CategoryGridList.rowIndexBoost + 1
 
     componentValues["category_row"] = itemPosition[0] + rowIndexBoost 'all analytics are 1 based
     componentValues["category_col"] = itemPosition[1] + 1 'all analytics are 1 based
@@ -958,7 +779,8 @@ Function getTrackingComponentInfoOfCategoryGridList(gridItem, itemPosition)
 End Function
 
 
-' Is called when CategoryGridList has content loaded but did not gain focus, so we need to update the infoPanel
+' Handles item to be focused change when content loads without gaining focus
+' Updates info panel and background for reloaded content
 Function onItemToBeFocusedChange()
   tubiLog("HomeScreen.onItemToBeFocusedChange")
   if m.top.contentReady = false
@@ -981,8 +803,9 @@ Function onItemToBeFocusedChange()
 End Function
 
 
-'@mode: string, one of the valid constants.ui.infoPanelModes info panel modes (see InfoPanel.xml for details)
-'@contentNode: content node
+' Populates info panel with content based on mode
+' @param mode - Info panel mode (item, linearProgramHomescreen, continueWatching, sportsEvent)
+' @param contentNode - Content node to display
 Function populateInfoPanel(mode, contentNode)
 
   if contentNode <> invalid
@@ -1034,21 +857,25 @@ Function populateInfoPanel(mode, contentNode)
 End Function
 
 
+' Handles fullscreen countdown changes
 Function onFullscreenCountdown()
   m.InfoPanel.fullscreenCountdown = m.top.fullscreenCountdown
 End Function
 
 
+' Handles category refresh timer fire
+' Triggers category reload via refresh timer
 Function onCategoryRefreshTimer()
   tubiLog("HomeScreen.onCategoryRefreshTimer")
   m.top.loadAllCategoriesViaRefreshTimer = true
 End Function
 
 
-' Called when the adFocusTimer is fired
+' Handles ad focus timer fire
+' Triggers ad impression pixel firing for focused ad rows
 Function onAdFocusTimer()
   tubiLog("HomeScreen.onAdFocusTimer")
-  focusedContent = m.categoryGridList.rowFocused
+  focusedContent = m.CategoryGridList.rowFocused
 
   if isAdDisplayContainerRow(focusedContent) = true OR isAdDisplayCarouselRow(focusedContent) = true OR isAdSkinRow(focusedContent) = true
     m.top.adTimerImpressionFire = true
@@ -1056,14 +883,10 @@ Function onAdFocusTimer()
 End Function
 
 
+' Sets focus on category grid and manages carousel/info panel visibility
 Function setFocusOnCategoryGrid()
   tubiLog("Homescreen.setFocusOnCategoryGrid" + m.top.id)
-  focusedContent = m.categoryGridList.itemFocused
-  if m.CategoryGridList.lastFocusedList = "featuredRowList"
-    focusedContent = m.categoryGridList.featuredRowFocusedItem
-  else
-    focusedContent = m.categoryGridList.itemFocused
-  end if
+  focusedContent = m.CategoryGridList.rowFocusedItem
   shouldPlaceFocusOnCategoryGridList = true
   if focusedContent <> invalid AND (focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight OR focusedContent.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel)
     fadeOutInfoPanel()
@@ -1084,6 +907,7 @@ Function setFocusOnCategoryGrid()
 End Function
 
 
+' Hides ad display carousel with fade out animation
 Function hideAdDisplayCarousel()
   tubiLog("HomeScreen.hideAdDisplayCarousel")
   if isAdDisplayCarouselAvailable() = true
@@ -1093,6 +917,7 @@ Function hideAdDisplayCarousel()
 End Function
 
 
+' Displays ad display carousel and starts ad focus timer
 Function displayAdDisplayCarousel()
   tubiLog("HomeScreen.displayAdDisplayCarousel")
   if isAdDisplayCarouselAvailable() = true
@@ -1112,6 +937,8 @@ Function displayAdDisplayCarousel()
 End Function
 
 
+' Handles carousel fade out completion
+' Resets content area mask after carousel is hidden
 Function onCarouselFadeOutComplete()
   tubiLog("HomeScreen.onCarouselFadeOutComplete")
   if isAdDisplayCarouselAvailable() = false OR m.adRowlistCarouselComponent.isInFocusChain() = false
@@ -1121,6 +948,7 @@ Function onCarouselFadeOutComplete()
 End Function
 
 
+' Fades in content area and info panel
 Function fadeInContentArea()
   stopAnimation(m.gridFade)
   if m.CategoryGridList.opacity < 1
@@ -1134,12 +962,17 @@ Function fadeInContentArea()
 End Function
 
 
+' Fades out info panel
 Function fadeOutInfoPanel()
   stopAnimation(m.infoPanelFade)
   m.infoPanelFade = fade(m.InfoPanelParent, "out", .4)
 End Function
 
 
+' Handles key events for navigation and playback
+' @param key - Key pressed (left, back, down, up, play)
+' @param press - True if key is pressed, false if released
+' @return Boolean - True if key was handled, false otherwise
 Function onKeyEvent(key, press) as Boolean
   if press = true
     if key = "left" OR key = "back"
@@ -1153,22 +986,14 @@ Function onKeyEvent(key, press) as Boolean
       m.top.stopLinearVideoPlayer = true
     else if isAdDisplayCarouselAvailable() = true AND m.adRowlistCarouselComponent.isInFocusChain() = true
       if key = "down"
-        if m.CategoryGridList.lastFocusedList = "featuredRowList"
-          nCurrentFocusRow = m.CategoryGridList.featuredListCurrFocusRow
-        else
-          nCurrentFocusRow = m.CategoryGridList.currFocusRow
-        end if
+        nCurrentFocusRow = m.CategoryGridList.listCurrFocusRow
         '//Must set the focus before animating to the next item because CategoryGridList may call jumpToItem when focus changes.
         m.CategoryGridList.setFocus(true)
         m.CategoryGridList.animateToItem = nCurrentFocusRow + 1
         hideAdDisplayCarousel()
         return true
       else if key = "up"
-        if m.CategoryGridList.lastFocusedList = "featuredRowList"
-          nCurrentFocusRow = m.CategoryGridList.featuredListCurrFocusRow
-        else
-          nCurrentFocusRow = m.CategoryGridList.currFocusRow
-        end if
+        nCurrentFocusRow = m.CategoryGridList.listCurrFocusRow
         '//Must set the focus before animating to the next item because CategoryGridList may call jumpToItem when focus changes.
         m.CategoryGridList.setFocus(true)
         m.CategoryGridList.animateToItem = nCurrentFocusRow - 1
@@ -1187,6 +1012,8 @@ Function onKeyEvent(key, press) as Boolean
 End Function
 
 
+' Handles transport voice request commands
+' @param msg - Message containing voice command information
 Function onTransportVoiceRequest(msg)
   response = "unhandled"
   inputInfo = msg.getData()
@@ -1212,15 +1039,12 @@ Function onTransportVoiceRequest(msg)
 End Function
 
 
-' returns true if action was taken based on the "play" input and false if no action taken
+' Handles play input from remote or voice
+' @return Boolean - True if action was taken, false otherwise
 Function handlePlayInput()
   tubilog("HomeScreen.handlePlayInput")
   if m.top.isLoading <> true
-    if m.CategoryGridList.lastFocusedList = "featuredRowList"
-      itemFocused = m.CategoryGridList.featuredRowFocusedItem
-    else
-      itemFocused = m.CategoryGridList.itemFocused
-    end if
+    itemFocused = m.CategoryGridList.rowFocusedItem
 
     positionFocused = m.top.cursorPosition
     m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(itemFocused, positionFocused)
@@ -1235,12 +1059,14 @@ Function handlePlayInput()
 End Function
 
 
+' Refreshes expired home screen containers
+' Checks featured, skin ad, and content containers for expiration
 Function refreshHomeScreenContainers()
   tubilog("HomeScreen.refreshHomeScreenContainers")
   loadCategoryForIds = []
 
-  if m.CategoryGridList.featuredRowContent <> invalid
-    featuredContainer = m.CategoryGridList.featuredRowContent.getChild(0)
+  if m.CategoryGridList.content <> invalid
+    featuredContainer = m.CategoryGridList.content.getChild(0)
     if shouldRefresh(featuredContainer) = true
       loadCategoryForIds.push(featuredContainer.id)
     end if
@@ -1269,40 +1095,9 @@ Function refreshHomeScreenContainers()
 End Function
 
 
-' Observer that gets fired when the rowlist vertical focus direction field changes.
-Function onVertFocusDirectionChange(msg)
-  direction = msg.getData()
-  ' Since the direction gets reset during the flow.
-  ' The value of m.scrollDirection gets reset to none after the value changes to up or down during scrolling.
-  ' This is the reason we are maintaining our own directional scope variable.
-  if direction <> "none"
-    m.scrollDirection = direction
-  end if
-End Function
-
-
-' The content RowList within the categoryGridList is moving.
-' Usually that means a special row or the content rowList is gaining focus.
-Function onRowlistTranslationChange(msg)
-  moveContentAreaMaskBasedCurrentFocus()
-End Function
-
-
-'//Based on the current focused item, move the contentarea mask
-Function moveContentAreaMaskBasedCurrentFocus() '//Determine if the rowlist or a special row is in focus
-  nRowInFocus = -1
-  focusedContent = m.top.contentFocused
-  if m.top.kidsMode = true OR (focusedContent <> invalid AND focusedContent.gridItemType <> m.constants.ui.gridItemTypes.skinAd)
-    if m.CategoryGridList.cursorPosition <> invalid
-      nRowInFocus = m.CategoryGridList.cursorPosition[0]
-    else
-      nRowInFocus = 0
-    end if
-  end if
-  moveContentAreaMask(nRowInFocus)
-End Function
-
-
+' Handles grid content ready state changes
+' Updates content ready flag and content area state
+' @param msg - Message containing grid content ready status
 Function onGridContentIsReadyChange(msg)
   ' Not using alias to avoid making the field gridContentIsReady is ready bi-directional since contentReady inside homescreen.brs on other use cases.
   if msg.getData() = true AND m.top.contentReady = false
@@ -1312,6 +1107,9 @@ Function onGridContentIsReadyChange(msg)
 End Function
 
 
+' Handles hide info panel changes
+' Fades info panel in or out based on visibility state
+' @param msg - Message containing visibility state
 Function onHideInfoPanelChange(msg)
   visible = msg.getData()
   if visible = true
@@ -1322,16 +1120,20 @@ Function onHideInfoPanelChange(msg)
 End Function
 
 
-Function updateFeaturedRowListTranslation()
-  if m.top.featuredRowContent <> invalid
-    translation = m.categoryGridList.featuredRowListTranslation
+' Updates row list translation field
+' Adjusts translation based on content area parent position
+Function updateRowListTranslation()
+  if m.top.content <> invalid
+    translation = m.CategoryGridList.rowListTranslation
     translation[1] = translation[1] + m.ContentAreaParent.translation[1]
-    m.top.featuredRowListTranslation = translation
-    moveContentAreaMaskBasedCurrentFocus()
+    m.top.rowListTranslation = translation
   end if
 End Function
 
 
+' Handles kids mode changes
+' Adjusts content area translation when entering kids mode
+' @param msg - Message containing new kids mode state
 Function onKidsModeChange(msg)
   kidsMode = msg.getData()
   if m.isUserInVideoTilesExperiment = true AND kidsMode = true

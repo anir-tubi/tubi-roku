@@ -203,7 +203,7 @@ Function setBadge(badgeType = "live", badgeInfo = {}, posterLabels = {})
 End Function
 
 
-Function onPreloadPosterTimerFire(msg)
+Function onPreloadPosterTimerFire(_msg)
   if isNonEmptyString(m.preloadPoster.uri) = true
     ' If the image is taking more time to load switching to placeholder image until the image is loaded.
     m.poster.uri = "pkg:/images/placeholder-featured.webp"

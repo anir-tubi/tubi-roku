@@ -13,9 +13,8 @@
 ' @param response roSGNode - Server response containing additional content items to append
 Function onVideoTilesListMoreItemsSuccess(response) as Void
   homeScreen = getCurrentScreen()
-  if homeScreen <> invalid AND homeScreen.featuredRowContent <> invalid AND isNode(response) = true AND homeScreen.featuredListCurrFocusRow <> invalid
-    rowFocused = homeScreen.featuredListCurrFocusRow
-    appendContentToCategory(response, homeScreen.featuredRowContent, rowFocused)
+  if homeScreen <> invalid AND homeScreen.content <> invalid AND isNode(response) = true AND homeScreen.listCurrFocusRow <> invalid
+    appendContentToCategory(response, homeScreen.content)
   end if
 End Function
 
@@ -25,12 +24,12 @@ End Function
 ' Called when user scrolls vertically through rows
 Function updateInTransitVideoMetadataOverlay() as Void
   screen = getCurrentScreen()
-  if screen = invalid OR isNode(screen.featuredRowContent) = false
+  if screen = invalid OR isNode(screen.content) = false
     return
   end if
 
-  currFocusRow = screen.featuredListCurrFocusRow
-  category = screen.featuredRowContent.getChild(currFocusRow)
+  currFocusRow = screen.listCurrFocusRow
+  category = screen.content.getChild(currFocusRow)
   columnFocused = getValidatedColumnIndex(screen, category)
 
   updateVideoTileOnFocusChange(currFocusRow, columnFocused, screen)
@@ -46,8 +45,8 @@ End Function
 Function getValidatedColumnIndex(screen, category) as Integer
   columnFocused = 0
 
-  if screen.featuredListScrollDirection = "left" OR screen.featuredListScrollDirection = "right"
-    columnFocused = Cint(screen.featuredRowCurrFocusColumn)
+  if screen.listScrollDirection = "left" OR screen.listScrollDirection = "right"
+    columnFocused = Cint(screen.rowCurrFocusColumn)
   else
     if category <> invalid AND isNumber(category.focusIndex) = true AND category.focusIndex > 0
       columnFocused = category.focusIndex
@@ -61,8 +60,8 @@ End Function
 ' Handles horizontal scrolling through video tile columns
 ' Updates metadata overlay, triggers lazy loading, and tracks performance metrics
 ' Called when user navigates left/right through items in a row
-Function onFeaturedRowCurrFocusColumnChange() as Void
-  tubiLog("VideoTileHelper.onFeaturedRowCurrFocusColumnChange")
+Function onRowCurrFocusColumnChange() as Void
+  tubiLog("VideoTileHelper.onRowCurrFocusColumnChange")
 
   ' Reset animation states and stop timers
   m.inlineVideoMetadataOverlay.skipAnimation = false
@@ -78,17 +77,17 @@ Function onFeaturedRowCurrFocusColumnChange() as Void
   m.performanceMetricsTracker.startMetricTiming("horizontal_scroll_performance")
 
   ' Ensure valid column index
-  columnFocused = screen.featuredRowCurrFocusColumn
+  columnFocused = screen.rowCurrFocusColumn
   if isNumber(columnFocused) = false OR columnFocused < 0
     columnFocused = 0
   end if
 
-  rowFocused = screen.featuredListCurrFocusRow
+  rowFocused = screen.listCurrFocusRow
   updateVideoTileOnFocusChange(rowFocused, columnFocused, screen)
 
   ' Trigger lazy loading for next batch of items
-  if isNumber(columnFocused) = true AND isNumber(rowFocused) = true AND screen.featuredRowContent <> invalid
-    category = screen.featuredRowContent.getChild(rowFocused)
+  if isNumber(columnFocused) = true AND isNumber(rowFocused) = true AND screen.content <> invalid
+    category = screen.content.getChild(rowFocused)
     makeContainerRequest(category, columnFocused, screen, onVideoTilesListMoreItemsSuccess)
   end if
 
@@ -107,18 +106,21 @@ End Function
 ' @param columnFocused integer - Column index of the focused item
 ' @param screen roSGNode - The screen node containing the featured row content
 Function updateVideoTileOnFocusChange(rowFocused, columnFocused, screen) as Void
-  tubiLog("VideoTileHelper.updateVideoTileOnFocusChange")
-
+  isVideoTileEnabledScreen = isKidsUIOn() = false AND screen.id = m.constants.ui.screenIds.homeScreen
+  ' Only process if the user is a screen or mode where video tiles are enabled.
+  if isVideoTileEnabledScreen = false return
   ' Extract focused content information
   gridItemType = ""
   contentFocused = invalid
-  if screen.featuredRowContent <> invalid
-    category = screen.featuredRowContent.getChild(rowFocused)
+  if screen.content <> invalid
+    category = screen.content.getChild(rowFocused)
     if category <> invalid
       gridItemType = category.gridItemType
       contentFocused = category.getChild(columnFocused)
     end if
   end if
+
+  if gridItemType = m.constants.ui.gridItemTypes.skinAd return
 
   ' Update background only on home screen
   if isCurrentScreenHomeScreen() = true
@@ -126,14 +128,14 @@ Function updateVideoTileOnFocusChange(rowFocused, columnFocused, screen) as Void
   end if
 
   ' Handle video preview and metadata overlay
-  if screen <> invalid AND screen.featuredRowContent <> invalid
-    isVideoTileEnabled = contentFocused <> invalid AND isVideoTileEnabledContainer(gridItemType, contentFocused.parentId)
+  if screen <> invalid AND screen.content <> invalid
+    isVideoTileEnabled = contentFocused <> invalid AND isVideoTileEnabledContainer(gridItemType)
     if isVideoTileEnabled = true
       pauseVideoPreviewAndShowPoster()
     else
       pauseVideoPreview()
     end if
-    setInlineVideoMetadataOverlay(screen.featuredRowContent, columnFocused, rowFocused)
+    setInlineVideoMetadataOverlay(screen.content, columnFocused, rowFocused)
   end if
 End Function
 
@@ -162,8 +164,8 @@ Function pauseVideoPreviewAndShowPoster() as Void
   screen = getCurrentScreen()
   isLinearPlayerPlaying = isLinearPlayerLoadingOrPlaying()
 
-  if screen <> invalid AND screen.featuredRowFocusedItem <> invalid
-    updatePlayerLayoutBasedOnFocusedContent(screen.featuredRowFocusedItem)
+  if screen <> invalid AND screen.contentFocused <> invalid
+    updatePlayerLayoutBasedOnFocusedContent(screen.contentFocused)
   end if
 
   if isLinearPlayerPlaying = true
@@ -171,7 +173,7 @@ Function pauseVideoPreviewAndShowPoster() as Void
   end if
 
   ' Control visibility during vertical scrolling
-  isVerticalScroll = screen.featuredListScrollDirection = "up" OR screen.featuredListScrollDirection = "down"
+  isVerticalScroll = screen.listScrollDirection = "up" OR screen.listScrollDirection = "down"
   if isVerticalScroll = true
     m.inlineVideoPreviewPlayerContainer.opacity = 0
   else
@@ -191,10 +193,10 @@ Function startDebouncedVideoPreview() as Void
     return
   end if
 
-  if screen.featuredListHasFocus = true
-    handleFeaturedListVideoPreview(screen)
+  if screen.listHasFocus = true
+    handleListVideoPreview(screen)
   else
-    handleNonFeaturedListVideoPreview(screen)
+    handleNonListVideoPreview(screen)
   end if
 End Function
 
@@ -203,18 +205,18 @@ End Function
 ' Manages countdown timer and linear player state
 '
 ' @param screen roSGNode - The current screen node
-Function handleFeaturedListVideoPreview(screen) as Void
+Function handleListVideoPreview(screen) as Void
   stopCountdownTimer()
 
   if isLinearPlayerLoadingOrPlaying() = true
     stopAndHideLinearVideoPlayer()
   end if
 
-  if screen.featuredRowContent = invalid OR screen.featuredRowFocusedItem = invalid
+  if screen.content = invalid OR screen.contentFocused = invalid
     return
   end if
 
-  content = screen.featuredRowFocusedItem
+  content = screen.contentFocused
   state = getVideoPreviewState()
 
   ' Only start preview if content changed or not playing
@@ -233,7 +235,7 @@ End Function
 ' Only processes carousel and spotlight ad types
 '
 ' @param screen roSGNode - The current screen node
-Function handleNonFeaturedListVideoPreview(screen) as Void
+Function handleNonListVideoPreview(screen) as Void
   focusedContent = screen.contentFocused
   if focusedContent = invalid
     return
@@ -251,23 +253,23 @@ End Function
 ' Updates overlay content, logo, and visibility based on scroll direction
 ' Includes predictive loading for smoother vertical scrolling experience
 '
-' @param featuredRowContent roSGNode - The featured row content node containing all categories
+' @param content roSGNode - The row content node containing all categories
 ' @param columnFocused integer - Column index of focused item
 ' @param rowFocused integer - Row index of focused item
-Function setInlineVideoMetadataOverlay(featuredRowContent, columnFocused, rowFocused) as Void
+Function setInlineVideoMetadataOverlay(content, columnFocused, rowFocused) as Void
   ' Validate and normalize indices
   columnFocused = normalizeIndex(columnFocused)
   rowFocused = normalizeIndex(rowFocused)
 
   ' Update current row metadata
-  updateCurrentRowMetadata(featuredRowContent, columnFocused, rowFocused)
+  updateCurrentRowMetadata(content, columnFocused, rowFocused)
 
   ' Update predicted next row metadata (for smoother scrolling)
   screen = getCurrentScreen()
-  isHorizontalScroll = screen.featuredListScrollDirection = "left" OR screen.featuredListScrollDirection = "right"
+  isHorizontalScroll = screen.listScrollDirection = "left" OR screen.listScrollDirection = "right"
 
   if isHorizontalScroll = false
-    updatePredictedRowMetadata(featuredRowContent, rowFocused, screen)
+    updatePredictedRowMetadata(content, rowFocused, screen)
   end if
 End Function
 
@@ -286,11 +288,11 @@ End Function
 
 ' Updates metadata overlay for currently focused item
 '
-' @param featuredRowContent roSGNode - Featured row content
+' @param content roSGNode - Row content
 ' @param columnFocused integer - Column index
 ' @param rowFocused integer - Row index
-Function updateCurrentRowMetadata(featuredRowContent, columnFocused, rowFocused) as Void
-  currCategory = featuredRowContent.getChild(rowFocused)
+Function updateCurrentRowMetadata(content, columnFocused, rowFocused) as Void
+  currCategory = content.getChild(rowFocused)
   if currCategory = invalid
     return
   end if
@@ -309,19 +311,19 @@ End Function
 ' Updates in-transit metadata overlay for predicted next row
 ' Provides smoother scrolling by pre-loading next row's metadata
 '
-' @param featuredRowContent roSGNode - Featured row content
+' @param content roSGNode - Row content
 ' @param rowFocused integer - Current row index
 ' @param screen roSGNode - Current screen node
-Function updatePredictedRowMetadata(featuredRowContent, rowFocused, screen) as Void
+Function updatePredictedRowMetadata(content, rowFocused, screen) as Void
   ' Determine next row based on scroll direction
   nextRow = 1
-  if screen.featuredListScrollDirection = "down"
+  if screen.listScrollDirection = "down"
     nextRow = rowFocused + 1
-  else if rowFocused > 0 AND screen.featuredListScrollDirection = "up"
+  else if rowFocused > 0 AND screen.listScrollDirection = "up"
     nextRow = rowFocused - 1
   end if
 
-  nextCategory = featuredRowContent.getChild(nextRow)
+  nextCategory = content.getChild(nextRow)
   if nextCategory = invalid
     return
   end if
@@ -330,7 +332,7 @@ Function updatePredictedRowMetadata(featuredRowContent, rowFocused, screen) as V
   columnFocused = normalizeIndex(nextCategory.focusIndex)
 
   ' Show in-transit overlay only for video tile enabled containers
-  isVideoTileEnabled = isVideoTileEnabledContainer(nextCategory.gridItemType, nextCategory.id)
+  isVideoTileEnabled = isVideoTileEnabledContainer(nextCategory.gridItemType)
   m.inTransitInlineVideoMetadataOverlay.visible = (isVideoTileEnabled = true)
 
   if isVideoTileEnabled = true
@@ -380,7 +382,7 @@ Function updateInlineVideoMetadataOverlayVisibility(duration = 0) as Void
   ' Handle video tiles experiment visibility
   if m.isUserInVideoTilesExperiment = false OR isKidsUIOn() = true
     m.inlineVideoPreviewPlayerContainer.opacity = 0
-  else if isHomeScreen = true AND screen.featuredRowContent <> invalid
+  else if isHomeScreen = true AND screen.content <> invalid
     handleHomeScreenOverlayVisibility(screen)
   else
     handleNonHomeScreenOverlayVisibility(screen, duration)
@@ -397,7 +399,7 @@ End Function
 '
 ' @param screen roSGNode - Current screen node
 Function handleHomeScreenOverlayVisibility(screen) as Void
-  content = screen.featuredRowFocusedItem
+  content = screen.contentFocused
   if getVideoPreviewStateForThisContent(content) <> "playing"
     m.inlineVideoMetadataOverlay.showContentPoster = true
   end if
@@ -423,10 +425,10 @@ End Function
 ' Prevents flickering by managing opacity during scroll transitions
 '
 ' @param msg roSGNode - Message object containing screen and translation data
-Function onFeaturedRowListTranslationChange(msg) as Void
-  tubiLog("VideoTileHelper.onFeaturedRowListTranslationChange")
+Function onRowListTranslationChange(msg) as Void
+  tubiLog("VideoTileHelper.onRowListTranslationChange")
   screen = msg.getRoSGNode()
-  translation = screen.featuredRowListTranslation
+  translation = screen.rowListTranslation
 
   if translation = invalid
     return
@@ -434,7 +436,7 @@ Function onFeaturedRowListTranslationChange(msg) as Void
 
   ' NOTE: Magic number 52 is the default Y offset for the focused item bounding rect
   rectY = getValidRectY(screen, 52)
-  isVerticalScroll = arrayIncludes(["down", "up"], screen.featuredListScrollDirection)
+  isVerticalScroll = arrayIncludes(["down", "up"], screen.listScrollDirection)
 
   ' Update main inline video preview container position
   updateInlineVideoPreviewPosition(screen, translation, rectY, isVerticalScroll)
@@ -473,7 +475,7 @@ Function updateInlineVideoPreviewPosition(screen, translation, rectY, isVertical
   inlineVideoPreviewPlayerContainer = m.inlineVideoPreviewPlayerContainer.translation
 
   ' Prevent flickering when vertical scroll stops
-  if isVerticalScroll = true AND screen.featuredListScrollingStatus = false
+  if isVerticalScroll = true AND screen.listScrollingStatus = false
     m.inlineVideoPreviewPlayerContainer.opacity = 0
   end if
 
@@ -495,7 +497,7 @@ Function updateInTransitOverlayPosition(screen, translation) as Void
 
   ' Handle zero Y position case
   if inTransitRect.y = 0
-    if screen.featuredListScrollingStatus = false
+    if screen.listScrollingStatus = false
       m.inTransitInlineVideoMetadataOverlay.opacity = 0
     end if
     return
@@ -506,7 +508,7 @@ Function updateInTransitOverlayPosition(screen, translation) as Void
   newY = translation[1] + inTransitRect.y + 5
 
   ' Show overlay during active scrolling, hide when stopped
-  if screen.featuredListScrollingStatus = true AND isNumber(inTransitRect.y) AND currentY <> newY
+  if screen.listScrollingStatus = true AND isNumber(inTransitRect.y) AND currentY <> newY
     m.inTransitInlineVideoMetadataOverlay.translation = [165, newY]
     m.inTransitInlineVideoMetadataOverlay.opacity = 1
   else
@@ -519,10 +521,9 @@ End Function
 ' Returns false for non-video-tile grid item types
 '
 ' @param gridItemType string - The grid item type to check
-' @param categoryId string - The category ID (unused but kept for signature consistency)
 ' @return boolean - True if video tiles are enabled for this container
-Function isVideoTileEnabledContainer(gridItemType, categoryId) as Boolean
-  return arrayIncludes(m.constants.ui.nonVideoTileGridItemTypes, gridItemType) = false
+Function isVideoTileEnabledContainer(gridItemType) as Boolean
+  return gridItemType = m.constants.ui.gridItemTypes.videoTile
 End Function
 
 
@@ -533,7 +534,8 @@ End Function
 ' @param content roSGNode - The focused content node
 ' @param screen roSGNode - The screen node
 Function updateVideoTileScreenBackground(content, screen) as Void
-  shouldShowVideoBackground = isNode(content) = true AND (shouldDisplayFullScreenVideoBackground(content) OR arrayIncludes(m.constants.ui.adGridItemTypes, content.gridItemType))
+  isVideoTileEnabledScreen = isKidsUIOn() = false AND screen.id = m.constants.ui.screenIds.homeScreen
+  shouldShowVideoBackground = isNode(content) = true AND (shouldDisplayFullScreenVideoBackground(content) OR arrayIncludes(m.constants.ui.adGridItemTypes, content.gridItemType) OR isVideoTileEnabledScreen = false)
 
   if shouldShowVideoBackground = true
     setVideoContentScreenBackground(screen, content)

@@ -38,8 +38,8 @@ End Function
 
 ' Handles focus changes for the button list
 ' Updates inactive focus state when list loses focus and showInactiveFocusState is enabled
-' @param msg - Message object containing focus change data
-Function onButtonListFocusChange(msg as Object) as Void
+' @param _msg - Message object containing focus change data (unused)
+Function onButtonListFocusChange(_msg as Object) as Void
   if m.top.showInactiveFocusState = true
     updateInactiveFocusState()
   end if

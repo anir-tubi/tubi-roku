@@ -113,7 +113,7 @@ Function onHeightChange(msg)
 End Function
 
 
-Function onPreloadPosterTimerFire(msg)
+Function onPreloadPosterTimerFire(_msg)
   if isNonEmptyString(m.preloadPoster.uri) = true AND m.poster <> invalid
     ' If the image is taking more time to load switching to placeholder image until the image is loaded.
     m.poster.uri = "pkg:/images/placeholder-featured.webp"

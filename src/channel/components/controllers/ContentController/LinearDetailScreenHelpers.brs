@@ -109,8 +109,8 @@ Function updateHomeScreenContainersWithEpgListingInfo(schedule)
   if isAA(schedule) = true AND isNonEmptyString(schedule.startTime) = true
     screen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
     if isNode(screen) = true
-      if isNode(screen.featuredRowContent) = true
-        content = screen.featuredRowContent
+      if isNode(screen.content) = true
+        content = screen.content
       else
         content = screen.content
       end if
