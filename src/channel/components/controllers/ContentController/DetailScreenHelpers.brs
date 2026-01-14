@@ -100,10 +100,22 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     detailScreen.content = content
 
     sotInfo = content.sotInfo
+
     if isAA(sotInfo) = true
-      detailScreen.sotTopLabelSignals = sotInfo.sotMetaDataTopLabels
-      detailScreen.sotMetaData = sotInfo.sotMetaData
-      detailScreen.sotMarkers = sotInfo.sotMarkers
+      cansendExposureEvent = false
+      sotMetaDataTopLabels = sotInfo.sotMetaDataTopLabels
+      sotMetaData = sotInfo.sotMetaData
+      sotMarkers = sotInfo.sotMarkers
+
+      if (isNonEmptyArray(sotMetaDataTopLabels) = true OR isNonEmptyArray(sotMetaData) = true OR isAA(sotMarkers) = true)
+        cansendExposureEvent = true
+      end if
+
+      if getStatsigExperimentResource("roku_sot_reverse_ui_test_detail_screen", "roku_sot_reverse_ui_test_detail_screen_v1", cansendExposureEvent).enabled = false
+        detailScreen.sotTopLabelSignals = sotMetaDataTopLabels
+        detailScreen.sotMetaData = sotMetaData
+        detailScreen.sotMarkers = sotMarkers
+      end if
     end if
 
     ' waiting to populate the details screen for series until after we fetch episode data

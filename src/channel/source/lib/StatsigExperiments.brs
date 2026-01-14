@@ -105,6 +105,12 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
+      roku_sot_reverse_ui_test_detail_screen: {
+        roku_sot_reverse_ui_test_detail_screen_v1: {
+          default: { "enabled": false }
+        }
+      }
+
       roku_disable_magic_link: {
         roku_disable_magic_link_v1: {
           default: { "disable": false }
