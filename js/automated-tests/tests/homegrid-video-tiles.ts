@@ -202,7 +202,7 @@ describe('HomeGrid Video Tiles', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/842092
-  it.only('C842092 - When a title does not have a video preview, a static image is shown @guest @video_tiles', async () => {
+  it('C842092 - When a title does not have a video preview, a static image is shown @guest @video_tiles', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus', 10000);
 

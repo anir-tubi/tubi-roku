@@ -71,6 +71,9 @@ describe('Age Gate', function () {
     // Open Kids Mode
     await openKidsMode();
 
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await ecp.sendKeypress(ecp.Key.Left);
+
     // Exit Kids Mode
     await exitKidsMode();
 
@@ -99,7 +102,8 @@ describe('Age Gate', function () {
 
     // Open Kids Mode
     await openKidsMode();
-    await utils.sleep(1000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await ecp.sendKeypress(ecp.Key.Left);
     // Exit Kids Mode
     await exitKidsMode();
 
