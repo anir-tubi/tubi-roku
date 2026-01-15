@@ -741,15 +741,22 @@ Function showRestartChannelAfterConsentUpdatedDialog()
 End Function
 
 
-' Fetch active and setup experiments from Statsig Console API
+' Fetch experiments from Statsig Console API using bulk request approach
 '
-' Makes an API request to retrieve all experiments for the Tubi Roku app.
-' Includes proper authentication headers and query parameters.
+' Makes a batch of two parallel API requests to retrieve experiments:
+' 1. All active and setup experiments
+' 2. Abandoned/stopped experiments tagged with "ONGOING"
+'
+' The results are merged and displayed in the FeaturesPanel.
 ' Used by Testing Aid feature to display available experiments for override.
 Function fetchStatsigExperiments() as Void
-  requestInfo = {
+  batchRequests = []
+
+  ' Request 1: All active and setup experiments
+  activeRequest = {
+    id: "activeExperiments"
     url: m.constants.urls.statsig.consoleExperiments
-    requestType: m.constants.reqNames.fetchStatsigExperiments
+    requestType: m.constants.reqNames.fetchStatsigExperimentsActive
     options: {
       params: {
         "targetAppID": m.constants.thirdParty.statsig.targetAppId
@@ -759,25 +766,62 @@ Function fetchStatsigExperiments() as Void
         "STATSIG-API-KEY": m.constants.thirdParty.statsig.consoleApiKey
       }
     }
+    responseType: "assocarray"
+  }
+  batchRequests.push(activeRequest)
+
+  ' Request 2: Abandoned/stopped experiments with "ONGOING" tag
+  pausedRequest = {
+    id: "pausedRokuExperiments"
+    url: m.constants.urls.statsig.consoleExperiments
+    requestType: m.constants.reqNames.fetchStatsigExperimentsPaused
+    options: {
+      params: {
+        "targetAppID": m.constants.thirdParty.statsig.targetAppId
+        "status": "abandoned,experiment_stopped"
+        "tags": "ONGOING"
+      }
+      headers: {
+        "STATSIG-API-KEY": m.constants.thirdParty.statsig.consoleApiKey
+      }
+    }
+    responseType: "assocarray"
+  }
+  batchRequests.push(pausedRequest)
+
+  ' Execute batch request
+  m.makeBatchRequest({
+    requests: batchRequests
     successCallback: onFetchStatsigExperimentsSuccess
     errorCallback: onFetchStatsigExperimentsError
     responseType: "assocarray"
-  }
-
-  m.makeRequest(requestInfo)
+  })
 End Function
 
 
-' Handle successful experiments fetch from Statsig API
+' Handle successful experiments batch fetch
 '
-' Updates the SettingsScreen with the fetched experiments data,
-' which is then passed to the FeaturesPanel for display.
+' Merges results from both API calls (active/setup and abandoned/stopped with ONGOING tag)
+' into a single experiments list, sorts them alphabetically by name, and updates the SettingsScreen.
 '
-' @param response Associative array containing experiments data from Statsig API
+' @param response Associative array with keys: activeExperiments, pausedRokuExperiments
 Function onFetchStatsigExperimentsSuccess(response) as Void
   if m.settingsScreen = invalid OR response = invalid then return
 
-  m.settingsScreen.statsigExperiments = response
+  ' Merge experiments from both sources
+  mergedExperiments = []
+  if response.activeExperiments <> invalid AND isNonEmptyArray(response.activeExperiments.data) then
+    mergedExperiments.append(response.activeExperiments.data)
+  end if
+  if response.pausedRokuExperiments <> invalid AND isNonEmptyArray(response.pausedRokuExperiments.data) then
+    mergedExperiments.append(response.pausedRokuExperiments.data)
+  end if
+
+  ' Sort experiments alphabetically by name (case-insensitive)
+  mergedExperiments.sortBy("name", "i")
+
+  ' Set merged result on settings screen
+  m.settingsScreen.statsigExperiments = { data: mergedExperiments }
 End Function
 
 

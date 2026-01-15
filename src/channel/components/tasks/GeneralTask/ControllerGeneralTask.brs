@@ -298,7 +298,12 @@ Function registerParsingCallbacks()
     parseError: parseGenericError
   }
 
-  m.requestTypes[m.constants.reqNames.fetchStatsigExperiments] = {
+  m.requestTypes[m.constants.reqNames.fetchStatsigExperimentsActive] = {
+    parseSuccess: parseGenericSuccess
+    parseError: parseGenericError
+  }
+
+  m.requestTypes[m.constants.reqNames.fetchStatsigExperimentsPaused] = {
     parseSuccess: parseGenericSuccess
     parseError: parseGenericError
   }

@@ -341,7 +341,8 @@ Function getConstants()
   constants.reqNames.getSoTStaticConfig = "getSoTStaticConfig"
   constants.reqNames.statsigInitialize = "statsigInitialize"
   constants.reqNames.statsigExposure = "statsigExposure"
-  constants.reqNames.fetchStatsigExperiments = "fetchStatsigExperiments"
+  constants.reqNames.fetchStatsigExperimentsActive = "fetchStatsigExperimentsActive"
+  constants.reqNames.fetchStatsigExperimentsPaused = "fetchStatsigExperimentsPaused"
   constants.reqNames.getEpgListing = "getEpgListing"
 
   ' a list of reqnames that the general task will inject auth headers and should expect to handle 403 errors for
