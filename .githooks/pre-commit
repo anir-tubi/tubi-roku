@@ -1,0 +1,37 @@
+#!/bin/bash
+# Pre-commit hook to prevent .only() from being committed (Mocha test focus)
+# Automatically configured by npm postinstall script
+
+# Get list of staged TypeScript files in js/automated-tests/ directory
+# A=Added, C=Copied, M=Modified, R=Renamed
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep '\.ts$' | grep '^js/automated-tests/')
+
+# Exit early if no test files are staged
+[ -z "$STAGED_FILES" ] && exit 0
+
+# Check staged content (not working directory) for .only() patterns
+FOUND=0
+ERRORS=""
+
+for FILE in $STAGED_FILES; do
+  # Use git show to get the staged content and check for .only() after describe/it
+  # Matches: describe.only( or it.only( or .only(
+  while IFS= read -r line; do
+    LINE_NUM=$(echo "$line" | cut -d: -f1)
+    ERRORS="${ERRORS}  ${FILE}:${LINE_NUM}\n"
+    FOUND=1
+  done < <(git show ":$FILE" | grep -nE '\.(only)\s*\(' 2>/dev/null)
+done
+
+if [ $FOUND -eq 1 ]; then
+  echo ""
+  echo "❌ Commit blocked: Found .only() in staged content"
+  echo ""
+  echo -e "$ERRORS"
+  echo "Please remove .only() from describe/it before committing."
+  echo "To bypass (not recommended): git commit --no-verify"
+  echo ""
+  exit 1
+fi
+
+exit 0
