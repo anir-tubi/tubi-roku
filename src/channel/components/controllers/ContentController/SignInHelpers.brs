@@ -1440,7 +1440,7 @@ End Function
 Function onSignUpSignInErrorScreenContinueAsGuestUserButtonSelected(msg)
   screen = msg.getRoSGNode()
 
-  if getExternalConfigValueFromGlobal("enable_onetrust_consent", true) = false AND (isAllowedByPassRegistration() = true OR screen.wasRegistrationQueued = true)
+  if isOneTrustConsentEnabled() = false AND (isAllowedByPassRegistration() = true OR screen.wasRegistrationQueued = true)
     currentTimeSeconds = CreateObject("roDateTime").AsSeconds()
     ' 12 hours.
     expiryTimeInSeconds = currentTimeSeconds + (12 * 3600)

@@ -35,6 +35,23 @@ Function getExternalConfigValueFromGlobal(key, fallback)
 End Function
 
 
+' Returns whether OneTrust consent is enabled based on external config
+' Default value is determined by country code:
+' - UK (GB), CA: defaults to true
+' - All other countries: defaults to false
+Function isOneTrustConsentEnabled() as Boolean
+  constants = getConstantsFromGlobal()
+  if constants <> invalid AND constants.deviceInfo <> invalid AND constants.deviceInfo.countryCode <> invalid
+    countryCode = UCase(constants.deviceInfo.countryCode)
+    defaultValue = (countryCode = "GB" OR countryCode = "UK" OR countryCode = "CA")
+  else
+    defaultValue = false
+  end if
+
+  return getExternalConfigValueFromGlobal("enable_onetrust_consent", defaultValue)
+End Function
+
+
 ' make sure theme is set in the case that m.global is not immediately available
 ' limits the number of attempts so the while loop doesn't block into perpetuity.
 Function getExperimentsInfoFromGlobal()

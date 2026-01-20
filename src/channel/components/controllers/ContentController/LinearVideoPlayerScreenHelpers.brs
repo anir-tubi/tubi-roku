@@ -179,7 +179,7 @@ End Function
 Function getUpdatedLinearVideoResources(content)
   tcfString = getTCFString()
   consentOptOutStatus = getConsentsOptOutStatus()
-  gdpr = getExternalConfigValueFromGlobal("enable_onetrust_consent", true)
+  gdpr = isOneTrustConsentEnabled()
   adLib = TubiAdsLimited(m.constants, m.tubiAuthUpdate, tcfString, consentOptOutStatus, gdpr)
 
   ' add the ad parameters for the content. Back end will forward these parameters to YoSpace/Apollo

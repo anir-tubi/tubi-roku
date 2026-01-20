@@ -49,7 +49,7 @@ Function onScreenFocusChange()
     if m.top.isAllowedToManageConsent = true AND m.top.consentSettings <> invalid AND isNonEmptyArray(m.top.consentSettings.consents) = true
       m.managePreferences.setFocus(true)
       slideTo(m.panelContentSection, [0, -m.heading.translation[1]], 0.5)
-    else if getExternalConfigValueFromGlobal("enable_onetrust_consent", true) = true
+    else if isOneTrustConsentEnabled() = true
       m.managePrivacySettingsButton.setFocus(true)
     else
       m.qrCodeSections.setFocus(true)
@@ -99,7 +99,7 @@ Function onConsentSettingsChange(msg)
       yTranslationOfItemAfterManagePrefs = managePrefsRect.height + managePrefsTranslation[1] - 24
 
       buttonRectHeight = 0
-      if privacyCenterSettings.showConsentPreferences = true AND m.top.isAllowedToManageConsent = true AND getExternalConfigValueFromGlobal("enable_onetrust_consent", true) = true
+      if privacyCenterSettings.showConsentPreferences = true AND m.top.isAllowedToManageConsent = true AND isOneTrustConsentEnabled() = true
         m.saveAndContinueButton.visible = true
         buttonRectHeight = m.saveAndContinueButton.boundingRect().height
 
@@ -164,7 +164,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
           else
             m.managePreferences.setFocus(true)
           end if
-        else if getExternalConfigValueFromGlobal("enable_onetrust_consent", true) = true
+        else if isOneTrustConsentEnabled() = true
           m.managePrivacySettingsButton.setFocus(true)
         end if
 
@@ -197,7 +197,7 @@ End Function
 
 
 Function onIsAllowedToManageConsentChange(msg)
-  if msg.getData() = true AND getExternalConfigValueFromGlobal("enable_onetrust_consent", true) = true
+  if msg.getData() = true AND isOneTrustConsentEnabled() = true
     m.managePrivacySettingsButton.visible = true
     m.nonEditableModeWarningMessage.visible = false
     m.viewPrivacySettingsHint.visible = true

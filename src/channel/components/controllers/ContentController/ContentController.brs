@@ -797,7 +797,7 @@ Function runControllerStartSequence()
     ' If he is within 24 hour lock window we will present the age gate error screen.
     ' If it has been past 24 hour lock window then we will continue as if a new guest user is launching the application.
     ' since backend clears the consent when user receives age gate error user will be presented with consent screen after 24 hours.
-    if getExternalConfigValueFromGlobal("enable_onetrust_consent", true) = true
+    if isOneTrustConsentEnabled() = true
       if m.guestUserHasAgeInfo = invalid then
         m.guestUserHasAgeInfo = getGuestUserHasAgeInfo()
       end if
@@ -2436,7 +2436,7 @@ Function sendNielsenPing(pingType, content = invalid, successCallback = invalid,
   Auth = TubiAuth(m.constants)
   tcfString = getTCFString()
   consentOptOutStatus = getConsentsOptOutStatus()
-  gdpr = getExternalConfigValueFromGlobal("enable_onetrust_consent", true)
+  gdpr = isOneTrustConsentEnabled()
   adLib = TubiAdsLimited(m.constants, Auth, tcfString, consentOptOutStatus, gdpr)
   nielsenReqInfo = adLib.getNielsenPingRequestInfo(m.constants, pingType, content)
 

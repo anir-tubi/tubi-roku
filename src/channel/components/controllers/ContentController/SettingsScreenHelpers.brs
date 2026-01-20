@@ -606,7 +606,7 @@ Function onSelectedConsentChange(msg)
 
     sendComponentInteractionInfo(componentInteractionEvent)
 
-    if getExternalConfigValueFromGlobal("enable_onetrust_consent", true) = false
+    if isOneTrustConsentEnabled() = false
       body = {}
       body[key] = value
       setConsent(body)

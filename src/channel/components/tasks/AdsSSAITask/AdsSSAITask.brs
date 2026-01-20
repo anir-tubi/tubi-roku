@@ -28,7 +28,7 @@ Function execAdsSSAITask()
   auth = TubiAuth(m.constants)
   userConsentsOptOutStatus = m.top.userConsentsOptOutStatus
   m.tracking = TubiTracking(m.constants, auth, userConsentsOptOutStatus)
-  gdpr = getExternalConfigValueFromGlobal("enable_onetrust_consent", true)
+  gdpr = isOneTrustConsentEnabled()
   m.adLib = TubiAds(m.constants, m.request, requestQueueLib, auth, m.tracking, "mp4", m.top.tcfString, userConsentsOptOutStatus, gdpr)
   m.raf = m.adLib.roAdFramework
 

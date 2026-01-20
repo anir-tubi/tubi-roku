@@ -590,7 +590,7 @@ Function onVideoPlayerState(msg)
         showPlayerError(errorMessage, videoPlayer.videoErrorCode)
       end if
     else if state = "finished"
-      isAutoPlayOff = (getExternalConfigValueFromGlobal("enable_onetrust_consent", true) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR videoPlayer.isAutoPlayTimerOn = false
+      isAutoPlayOff = (isOneTrustConsentEnabled() = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR videoPlayer.isAutoPlayTimerOn = false
       finishedContent = videoPlayer.content
 
       if finishedContent.isTrailer = true
@@ -1321,7 +1321,7 @@ Function onUpNextResponse(upNextContent)
         end if
       else if upNextContent.getChildCount() > 0
         videoPlayer.upNextContent = upNextContent
-        isAutoPlayOff = (getExternalConfigValueFromGlobal("enable_onetrust_consent", true) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR videoPlayer.isAutoPlayTimerOn = false
+        isAutoPlayOff = (isOneTrustConsentEnabled() = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR videoPlayer.isAutoPlayTimerOn = false
         videoPlayer.isAutoPlayOff = isAutoPlayOff
         videoPlayer.upNextUpdateContent = true
       end if

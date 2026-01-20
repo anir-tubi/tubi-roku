@@ -378,7 +378,7 @@ Function createPrivacyCenterPanel(title)
   privacyCenterPanel.title = title
   privacyCenterPanel.isAllowedToManageConsent = m.top.isAllowedToManageConsent
 
-  if getExternalConfigValueFromGlobal("enable_onetrust_consent", true) = true
+  if isOneTrustConsentEnabled() = true
     privacyCenterPanel.observeFieldScoped("didUserSelectManagePrivacySettingsButton", "onDidUserSelectManagePrivacySettingsButton")
   else
     consentSettings = m.top.consentSettings

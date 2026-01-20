@@ -133,7 +133,7 @@ Function onVideoPreviewStateChanged(msg)
         isReplay = true
       end if
 
-      isFullPlayerBlockedForUser = (getExternalConfigValueFromGlobal("enable_onetrust_consent", true) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR (item <> invalid AND item.needsLogin = true AND isLoggedInUser() = false) OR arrayIncludes(m.constants.ui.fullScreenVideoPlayerGridItemTypes, item.gridItemType) = true OR item.playerType = m.constants.ui.playerTypes.fox
+      isFullPlayerBlockedForUser = (isOneTrustConsentEnabled() = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR (item <> invalid AND item.needsLogin = true AND isLoggedInUser() = false) OR arrayIncludes(m.constants.ui.fullScreenVideoPlayerGridItemTypes, item.gridItemType) = true OR item.playerType = m.constants.ui.playerTypes.fox
       if isReplay = true
         '//Loop the video in this case
         if m.maintask.isHdmiStatusOk = true
@@ -503,7 +503,7 @@ Function onVideoPreviewPositionChanged(msg) as Void
     '
     ' 4. Fox Content:
     '    - Content's playerType is Fox (requires special handling)
-    isFullPlayerBlockedForUser = (getExternalConfigValueFromGlobal("enable_onetrust_consent", true) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR contentFocused.needsLogin = true OR arrayIncludes(m.constants.ui.fullScreenVideoPlayerGridItemTypes, contentFocused.gridItemType) = true OR contentFocused.playerType = m.constants.ui.playerTypes.fox
+    isFullPlayerBlockedForUser = (isOneTrustConsentEnabled() = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR contentFocused.needsLogin = true OR arrayIncludes(m.constants.ui.fullScreenVideoPlayerGridItemTypes, contentFocused.gridItemType) = true OR contentFocused.playerType = m.constants.ui.playerTypes.fox
 
     if isFullPlayerBlockedForUser = false
       diff = duration - position
