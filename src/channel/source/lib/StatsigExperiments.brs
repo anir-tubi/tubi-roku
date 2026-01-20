@@ -76,7 +76,7 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
       '//This experiment will be for the new showcase ad campaigns.
       '//The default "enabled" values should be where the ads are shown. If Statsig is down, we want to show the ads.
       ads_homegrid_layer: {
-        ads_hdc_all_holdback_2: {
+        ads_hdc_all_holdback_v2: {
           '// Possible variants: enabled = true (show all ads), or enabled = false (no ads shown)
           default: { "enabled": true }
         }
