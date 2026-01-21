@@ -882,7 +882,7 @@ Function getConstants()
   constants.player.analyticsVersion = "1.0"
 
   ' number of seconds that the "up next" screen will show
-  constants.player.upNextCountdown = 30
+  constants.player.upNextCountdown = 20
 
   ' number of seconds that the "up next" screen will show for series
   constants.player.upNextCountdownForSeries = 15
@@ -914,6 +914,10 @@ Function getConstants()
   constants.player.transportAutoHideTime = 5
   constants.player.thumbnailFrequency = 5
   constants.player.browseWhileWatchingAutoHideTime = 12
+
+  constants.player.skipButtonDuration = 10
+  constants.player.ratingDisplayInterval = 3600
+  constants.player.adHeadsUpTime = 10
 
   constants.player.playbackSource = {}
   constants.player.playbackSource.autoplayDeliberate = "AUTOPLAY_DELIBERATE"

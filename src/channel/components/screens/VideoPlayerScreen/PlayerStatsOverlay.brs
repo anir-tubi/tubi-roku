@@ -416,21 +416,6 @@ Function onPlayerStatsChange(msg)
 End Function
 
 
-'Helper function that removes all characters after the ? in the url
-Function removeExcessUrl(url)
-  cutUrl = ""
-  if type(url) = "roString" OR type(url) = "String"
-    position = url.Instr(Chr(63)) 'checks for the position of the "?" in the url string
-    if position > -1
-      cutUrl = url.Left(position)
-    else
-      cutUrl = url
-    end if
-  end if
-  return cutUrl
-End Function
-
-
 Function formatNumber(num as Dynamic) as String
   if num = invalid then return "0"
 

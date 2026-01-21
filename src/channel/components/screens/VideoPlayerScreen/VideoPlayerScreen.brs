@@ -4,7 +4,7 @@
 '      ===============================
 '      start_video        only on start of episode playback, or autoplay invoked playback
 '
-'      resume_after_ads   after pre-roll and each mid-roll
+'      resume_after_break   after pre-roll and each mid-roll
 '
 '      play_progress      on start of scrubbing
 '                         at regular intervals set by 'pingFrequency' in constants
@@ -14,21 +14,15 @@
 '      pause_toggle       when paused using pause/play button
 '                         when resumed using pause/play button
 '
-'      subtitles_toggle   when subtitles turned off
-'                         when subtitles turned on
-'
-'
-'
-'
 '   User History tracking:
 '
 '      - when user exits the ad or video by pressing 'back'
 '      - right before a mid-roll
-'      - every 60 seconds of watching
+'      - every 3 minutes of watching
 '
 
 Function init()
-  tubiLog("VideoPlayer.init")
+  logDebug("VideoPlayer.init")
 
   ' handle BaseScreen functionality (see BaseScreen.xml)
   m.constants = getConstantsFromGlobal()
@@ -38,22 +32,11 @@ Function init()
     pageType: "video_player_page"
     pageValues: {}
   }
-  m.bAutostartRefreshExperimentEnabled = getExperimentResource("roku_video_autostart_ui_refresh", "roku_video_autostart_ui_refresh_v1", false).enabled = true
 
-  ' Ad request cuepoint alignment experiment (roku_player_align_ad_request_cuepoint_v2):
-  ' Control: prefetchTime=15, requestWithinWindow=false (request before 15s, not within 15s)
-  ' Variant1: prefetchTime=11, requestWithinWindow=false (request before 11s, not within 11s)
-  ' Variant2: prefetchTime=11, requestWithinWindow=true (request before 11s, also within 11s)
-  alignAdRequestExperimentConfig = getStatsigExperimentResource("roku_player_improvement", "roku_player_align_ad_request_cuepoint_v2", false)
-  m.adPrefetchTime = alignAdRequestExperimentConfig.prefetchTime ' adPrefetchTime is used to help to prefetch the ad before the actual cuepoint
-  m.alignAdRequestWithinWindow = alignAdRequestExperimentConfig.requestWithinWindow
   m.isAlignAdRequestExposureFired = false 'using this variable to avoid experiment calls during every video position change
 
   m.tubiTrackingInfo = TubiTrackingInfo(m.constants)
   m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
-
-  m.moviePostplayCountdown = getStatsigExperimentResource("roku_postplay_countdown_timer", "roku_postplay_countdown_timer_movie_v1", false).countdown
-  m.seriesPostplayCountdown = getStatsigExperimentResource("roku_postplay_countdown_timer", "roku_postplay_countdown_timer_series_v1", false).countdown
 
   m.top.handlesTransportVoiceRequests = true
   m._ = rodash()
@@ -63,7 +46,7 @@ Function init()
   isGDPRinArg = isOneTrustConsentEnabled()
   m.adsLimited = TubiAdsLimited(m.constants, m.auth, m.top.tcfString, m.top.userConsentsOptOutStatus, isGDPRinArg)
   m.top.observeFieldScoped("tcfString", "onTCFStringChange")
-  m.top.observeField("userConsentsOptOutStatus", "onUserConsentsOptOutStatusChange")
+  m.top.observeFieldScoped("userConsentsOptOutStatus", "onUserConsentsOptOutStatusChange")
   m.Loading = m.top.findNode("Loading")
   m.MinimizedAssets = m.top.findNode("MinimizedAssets")
   m.LoadingProgressBar = m.top.findNode("LoadingProgressBar")
@@ -73,15 +56,15 @@ Function init()
 
   m.UpNext = m.top.findNode("UpNext")
   m.UpNextParent = m.top.findNode("UpNextParent")
-  m.UpNext.observeField("contentSelected", "onUpNextContentSelected")
-  m.UpNext.observeField("opacity", "onUpNextOpacityChange")
-  m.UpNext.observeField("autoplayMode", "onUpNextAutolayModeChange")
+  m.UpNext.observeFieldScoped("contentSelected", "onUpNextContentSelected")
+  m.UpNext.observeFieldScoped("opacity", "onUpNextOpacityChange")
+  m.UpNext.observeFieldScoped("autoplayMode", "onUpNextAutolayModeChange")
   m.Video = m.top.findNode("VideoNode") ' reference in case we change from extending Video to extending Group
-  m.Video.observeField("streamInfo", "onStreamInfoChanged")
+  m.Video.observeFieldScoped("streamInfo", "onStreamInfoChanged")
   m.Video.observeFieldScoped("position", "onVideoPositionChange")
   m.Video.observeFieldScoped("state", "onVideoStateChange")
   m.Video.observeFieldScoped("bufferingStatus", "onBufferingStatus")
-  m.Video.observeField("streamingSegment", "onStreamingSegmentChange")
+  m.Video.observeFieldScoped("streamingSegment", "onStreamingSegmentChange")
   m.video.observeFieldScoped("availableSubtitleTracks", "setCCAudioTransportBarVisibility")
   m.video.observeFieldScoped("availableAudioTracks", "onAvailableAudioTracksChange")
   m.video.observeFieldScoped("audioTrack", "onAudioTrackChanged")
@@ -89,6 +72,9 @@ Function init()
   'downloadedSegment is needed for player log - Quality Of Service event
   m.video.observeFieldScoped("downloadedSegment", "onDownloadedSegment")
   m.videoBorder = m.top.findNode("VideoBorder")
+
+  ' Initialize all experiments in one place
+  initExperiments()
 
   ' Enable decoder stats with a 20% probability.
   ' Generates a random number between 0 and 1 using Rnd(0).
@@ -132,13 +118,6 @@ Function init()
     end if
   end if
 
-  ' asyncStopSemantics was broken prior to 14.0 so we are not running it on older firmware versions
-  isFirmwareOk = createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
-  if isFirmwareOk = true AND getExperimentResource("roku_async_stop", "roku_async_stop_v6", false).enabled = true then
-    m.video.asyncStopSemantics = true
-  end if
-
-  m.playerControlExperimentType = getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v3", false).type
   m.marginX = m.constants.ui.translations.player.marginX
 
   if m.playerControlExperimentType = "none"
@@ -158,14 +137,14 @@ Function init()
   m.BrowseWhileWatching.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
 
   m.top.observeFieldScoped("updateRelatedContent", "onRelatedContentUpdated")
-  m.top.observeField("updateContent", "onContentChange")
-  m.top.observeField("sprites", "onSpritesReceived")
-  m.top.observeField("control", "onControlChange")
-  m.top.observeField("transportVoiceRequest", "handleTransportVoiceEvent")
-  m.top.observeField("adState", "onAdStateChange")
-  m.top.observeField("adProgress", "onAdProgressChange")
-  m.top.observeField("displayAdLoadingMessage", "onDisplayAdLoadingMessage")
-  m.top.observeField("seekTo", "onSeekToChange")
+  m.top.observeFieldScoped("updateContent", "onContentChange")
+  m.top.observeFieldScoped("sprites", "onSpritesReceived")
+  m.top.observeFieldScoped("control", "onControlChange")
+  m.top.observeFieldScoped("transportVoiceRequest", "handleTransportVoiceEvent")
+  m.top.observeFieldScoped("adState", "onAdStateChange")
+  m.top.observeFieldScoped("adProgress", "onAdProgressChange")
+  m.top.observeFieldScoped("displayAdLoadingMessage", "onDisplayAdLoadingMessage")
+  m.top.observeFieldScoped("seekTo", "onSeekToChange")
   m.top.observeFieldScoped("adTrackingObject", "onAdTrackingObject")
   m.top.observeFieldScoped("adBufferingObject", "onAdBufferingObject")
   m.top.observeFieldScoped("filledAdData", "onHandleFilledAdData")
@@ -198,10 +177,7 @@ Function init()
   m.logoKids = m.top.findNode("tubiKidsLogo")
   m.brandingLogo = m.top.findNode("brandingLogo")
 
-  m.isBrandingLogoExperimentEnabled = getStatsigExperimentResource("roku_player_improvement", "roku_player_branding_v2", false).enabled
-
   ' Initialize retry configuration for network errors
-  m.isRetryExperimentEnabled = getStatsigExperimentResource("roku_player_improvement", "roku_player_retry_network_errors_v1", false).enabled
   m.retryConfig = {
     network: {
       maxRetries: 3
@@ -228,8 +204,8 @@ Function init()
   }
 
   ' Create retry and fallback timers once for reuse
-  m.retryTimer = createObject("roSGNode", "Timer")
-  m.fallbackTimer = createObject("roSGNode", "Timer")
+  m.retryTimer = m.top.findNode("retryTimer")
+  m.fallbackTimer = m.top.findNode("fallbackTimer")
 
   '//Variable to keep track where the m.ratingOverlay UI element should animated when the down button is pressed.
   m.ratingOverlayAnimatedPositionY = 150
@@ -245,24 +221,17 @@ Function init()
   m.descriptorCode = m.top.findNode("descriptorCode")
   m.descriptorDesc = m.top.findNode("descriptorDesc")
   m.ratingOverlayTimer = m.top.findNode("ratingOverlayTimer")
-  m.ratingOverlayTimer.observeField("fire", "hideRatingOverlay")
+  m.ratingOverlayTimer.observeFieldScoped("fire", "hideRatingOverlay")
 
   m.subtitleSelectionOverlay = m.top.findNode("subtitleSelectionOverlay")
   m.subtitleSelectionOverlay.observeFieldScoped("selectedTrack", "onSubtitleTrackSelected")
   m.subtitleSelectionOverlay.observeFieldScoped("wasHidden", "onSubtitleSelectionOverlayHidden")
   m.subtitleSelectionOverlay.observeFieldScoped("playPressed", "onSubtitleSelectionOverlayPlayPressed")
 
-  ' Subtitle overlay experiment: roku_player_subtitle_overlay_v1
-  ' - Show overlay only if experiment is enabled
-  ' - If user has preferredSubtitleTrack, show only once per app session
-  ' - If no preferredSubtitleTrack, show on every video
-  m.isSubtitleOverlayExperimentEnabled = getStatsigExperimentResource("roku_player_improvement", "roku_player_subtitle_overlay_v1", false).enabled
   m.showSubtitleSelection = false
   ' Flag to defer showing subtitle overlay until HUD closes (when skip button timer fires while HUD is visible)
   m.pendingSubtitleOverlayOnHudClose = false
 
-  m.ElapsedLabel = m.top.findNode("ElapsedLabel")
-  m.RemainingLabel = m.top.findNode("RemainingLabel")
   m.RemainingMinimizedGroup = m.top.findNode("RemainingMinimizedGroup")
   m.RemainingMinimizedBground = m.top.findNode("RemainingMinimizedBground")
   m.RemainingMinimizedLabel = m.top.findNode("RemainingMinimizedLabel")
@@ -273,7 +242,6 @@ Function init()
   m.HUD = m.top.findNode("HUD")
   m.AdHeadsUp = m.top.findNode("AdHeadsUp")
   m.adHeadsUpGroup = m.top.findNode("adHeadsUpGroup")
-  m.adBreakStartsInOverlay = m.top.findNode("AdBreakStartsInOverlay")
   m.AdHeadsUpText = m.top.findNode("AdHeadsUpText")
   m.Thumbnail = m.top.findNode("Thumbnail")
   m.VideoOverlay = m.top.findNode("VideoOverlay")
@@ -363,9 +331,7 @@ Function init()
   m.ignoreOptionsKey = m.constants.deviceInfo.firmwareCaptionMenu
   m.bufferingInfo = invalid
 
-  m.bufferingTimer = m.top.createChild("Timer")
-  m.bufferingTimer.duration = 10
-  m.bufferingTimer.repeat = false
+  m.bufferingTimer = m.top.findNode("bufferingTimer")
 
   m.controlIcon = m.top.findNode("controlIcon")
   m.Transport = m.top.findNode("Transport")
@@ -438,16 +404,14 @@ Function init()
 
   m.lastPingTime = 0
   m.lastSavedPosition = 0
-  m.adHeadsUpTime = 10 ' adHeadsUpTime helps to decide how long we need to show the AdHeadsup
+  m.adHeadsUpTime = m.constants.player.adHeadsUpTime ' adHeadsUpTime helps to decide how long we need to show the AdHeadsup
   m.midrolls = {} ' midrolls holds all cuepoints from API response
 
   ' Prevent re-fetching ads when playback resumes after an ad break.
   ' Roku may resume a few seconds earlier due to frame alignment, which can
   ' accidentally trigger another ad request. This cooldown flag avoids that.
   m.adFetchCooldown = false ' cooldown flag to prevent re-fetching ads on resume after ad break
-  m.adFetchCooldownTimer = createObject("roSGNode", "Timer") ' timer for ad fetch cooldown
-  m.adFetchCooldownTimer.duration = 10 ' 10 second cooldown
-  m.adFetchCooldownTimer.repeat = false
+  m.adFetchCooldownTimer = m.top.findNode("adFetchCooldownTimer") ' timer for ad fetch cooldown
   m.adFetchCooldownTimer.observeFieldScoped("fire", "onAdFetchCooldownTimerFired")
 
   m.mostRecentCompletedCuepoint = -1 'used to prevent multiple resume_after_break events from firing
@@ -624,13 +588,6 @@ Function init()
   m.sendFeedbackSelectionOverlay.observeFieldScoped("backOrLeftKeyPress", "onWasBackORLeftButtonSelectedForSendFeedback")
   m.sendFeedbackSelectionOverlay.observeFieldScoped("itemSelected", "onSendFeedBackOverlayItemSelected")
 
-  m.isAdsOverlayExperimentEnabled = getExperimentResource("roku_player_ui_refresh", "roku_ads_overlay_v1", false).overlay_type <> "none"
-  if m.isAdsOverlayExperimentEnabled = true
-    m.adCountdownOverlay = CreateObject("roSGNode", "AdCountdownOverlay")
-    m.adCountdownOverlay.id = "adCountdownOverlay"
-    m.adCountdownOverlay.translation = [81, 81]
-  end if
-
   ' Will be used to track the current subtitle and audio language for analytics purposes.
   m.currentSubtitleLanguage = ""
   m.currentAudioLanguage = ""
@@ -649,6 +606,41 @@ Function init()
   m.AdsTask = m.top.findNode("AdsTask")
   m.AdsTask.videoPlayerNode = m.top
   m.AdsTask.control = "RUN"
+End Function
+
+
+' Initializes all experiment configurations in one place
+' This function should be called from init() after m.constants and m.video are set
+Function initExperiments()
+  ' Autostart UI refresh experiment
+  m.bAutostartRefreshExperimentEnabled = getExperimentResource("roku_video_autostart_ui_refresh", "roku_video_autostart_ui_refresh_v1", false).enabled = true
+
+  ' Ad request cuepoint alignment experiment (roku_player_align_ad_request_cuepoint_v2):
+  ' Control: prefetchTime=15, requestWithinWindow=false (request before 15s, not within 15s)
+  ' Variant1: prefetchTime=11, requestWithinWindow=false (request before 11s, not within 11s)
+  ' Variant2: prefetchTime=11, requestWithinWindow=true (request before 11s, also within 11s)
+  alignAdRequestExperimentConfig = getStatsigExperimentResource("roku_player_improvement", "roku_player_align_ad_request_cuepoint_v2", false)
+  m.adPrefetchTime = alignAdRequestExperimentConfig.prefetchTime
+  m.alignAdRequestWithinWindow = alignAdRequestExperimentConfig.requestWithinWindow
+
+  ' Postplay countdown experiments
+  m.seriesPostplayCountdown = getStatsigExperimentResource("roku_postplay_countdown_timer", "roku_postplay_countdown_timer_series_v1", false).countdown
+
+  ' Async stop experiment - only enable on firmware 14.0+
+  isFirmwareOk = createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
+  if isFirmwareOk = true AND getExperimentResource("roku_async_stop", "roku_async_stop_v6", false).enabled = true then
+    m.video.asyncStopSemantics = true
+  end if
+
+  ' Player control UI experiment
+  m.playerControlExperimentType = getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v3", false).type
+
+  ' Network error retry experiment
+  m.isRetryExperimentEnabled = getStatsigExperimentResource("roku_player_improvement", "roku_player_retry_network_errors_v1", false).enabled
+
+  ' Subtitle overlay experiment
+  m.isSubtitleOverlayExperimentEnabled = getStatsigExperimentResource("roku_player_improvement", "roku_player_subtitle_overlay_v1", false).enabled
+
 End Function
 
 
@@ -815,9 +807,9 @@ End Function
 ' @param skipCuepointsTitle - String, text to display on the skipCuepoints button (e.g., "Skip Intro", "Skip Recap")
 ' @param skipCuepointType - String, type of cuepoint (intro, recap, earlyCredits) used to determine subtitle overlay behavior
 Function setSkipCuepointsButtonTextAndTimer(skipCuepointsTitle as String, skipCuepointType = "" as String) as Void
-  tubiLog("VideoPlayer.setSkipCuepointsButtonTextAndTimer")
+  logDebug("VideoPlayer.setSkipCuepointsButtonTextAndTimer")
   m.skipCuepointsButtonTimer = m.top.createChild("Timer")
-  m.skipCuepointsButtonTimer.duration = 10
+  m.skipCuepointsButtonTimer.duration = m.constants.player.skipButtonDuration
   m.skipCuepointsButtonTimer.repeat = false
   m.skipCuepointsButtonTimer.observeFieldScoped("fire", "autoHideSkipCuepointsButton")
   m.skipCuepointsButtonTimer.control = "start"
@@ -830,28 +822,29 @@ End Function
 'Make the skipCuepoints Button visible and based on transport
 'control visibility, set the translation and focus
 Function showSkipCuepointsButton()
-  tubiLog("videoPlayerScreen.showSkipCuepointsButton")
+  logDebug("videoPlayerScreen.showSkipCuepointsButton")
+  skipButtonWidth = m.skipCuepointsButton.boundingRect().width
 
   if m.HUD.opacity = 1
-    xPosition = m.top.width - (m.skipCuepointsButton.boundingRect().width + m.marginX)
+    xPosition = m.top.width - (skipButtonWidth + m.marginX)
     m.skipCuepointsButton.translation = [xPosition, m.skipCuepointsButtonUpTranslation]
-    width = m.skipCuepointsButton.boundingRect().width + 12
+    width = skipButtonWidth + 12
 
     if m.playerControlExperimentType = "variant1"
       slideTransportButtons(true, width)
     end if
   else if m.HUD.opacity > 0
     setFocusToComponent(m.skipCuepointsButton, true)
-    xPosition = m.top.width - (m.skipCuepointsButton.boundingRect().width + m.marginX)
+    xPosition = m.top.width - (skipButtonWidth + m.marginX)
     m.skipCuepointsButton.translation = [xPosition, m.skipCuepointsButtonUpTranslation]
-    width = m.skipCuepointsButton.boundingRect().width + 12
+    width = skipButtonWidth + 12
 
     if m.playerControlExperimentType = "variant1"
       slideTransportButtons(true, width)
     end if
   else
     setFocusToComponent(m.skipCuepointsButton, true)
-    xPosition = m.top.width - (m.skipCuepointsButton.boundingRect().width + m.marginX)
+    xPosition = m.top.width - (skipButtonWidth + m.marginX)
     m.skipCuepointsButton.translation = [xPosition, m.skipCuepointsButtonDownTranslation]
 
     if m.playerControlExperimentType = "variant1"
@@ -951,7 +944,7 @@ End Function
 
 
 Function playContent()
-  tubilog("VideoPlayer.playContent")
+  logDebug("VideoPlayer.playContent")
 
   if m.Video.content <> invalid
 
@@ -994,21 +987,19 @@ Function playContent()
       if cuepoints <> invalid
         ' Iterating all cuepoints and storing it in assocarray, so that we don't want to iterate on every position change(notificationInterval) of video.
         for each cuepoint in cuepoints
-          tubilog("VideoPlayer: MIDROLL: " + strI(cuepoint))
+          cuepointStr = strI(cuepoint)
+          logDebug("VideoPlayer: MIDROLL: " + cuepointStr)
 
           if Int(cuepoint) = 0
             fetchPreroll = true
           end if
 
-          m.midrolls[strI(cuepoint)] = true
+          m.midrolls[cuepointStr] = true
         end for
       end if
 
       if fetchPreroll = true
         updatePlayerLogLib(m.playerLogLib, "setAdType", "preroll")
-
-        'Fire roku_player_ad_preroll_timeout_v2 exposure event when fetching preroll ads
-        getStatsigExperimentResource("roku_player_improvement", "roku_player_ad_preroll_timeout_v2")
 
         ' Start pre-roll fetch
         m.top.adControl = "preroll"
@@ -1092,7 +1083,7 @@ End Function
 
 
 Function onContentChange() as Void
-  tubiLog("VideoPlayer.onContentChange")
+  logDebug("VideoPlayer.onContentChange")
   stopVideo()
   m.isBWWShownForDeeplinkUser = false
 
@@ -1128,7 +1119,7 @@ End Function
 
 Function onControlChange()
   control = m.top.control
-  tubiLog("VideoPlayer.onControlChange " + control)
+  logDebug("VideoPlayer.onControlChange " + control)
   updatePlayerLogLib(m.playerLogLib, "setVideoControl", control)
 
   if control = "play"
@@ -1220,7 +1211,7 @@ Function onRetryTimerFired()
   m.retryConfig.isRetrying = false
 
   ' QA DEBUG LOG
-  tubiLog("RETRY_TEST: Attempting retry " + m.retryConfig.currentRetryCount.toStr() + " of " + m.retryConfig.network.maxRetries.toStr())
+  logDebug("RETRY_TEST: Attempting retry " + m.retryConfig.currentRetryCount.toStr() + " of " + m.retryConfig.network.maxRetries.toStr())
 
   updatePlayerLogLib(m.playerLogLib, "setRetryCount", 1)
   ' RETRY: Play the same content again without advancing codec/DRM
@@ -1246,7 +1237,7 @@ End Function
 
 'Occurs when m.Video.state changes (not when m.top.state changes)
 Function onVideoStateChange(msg)
-  tubiLog("VideoPlayer.onVideoStateChange " + msg.GetData())
+  logDebug("VideoPlayer.onVideoStateChange " + msg.GetData())
   state = msg.GetData()
 
   updatePlayerLogLib(m.playerLogLib, "setVideoState", state)
@@ -1529,96 +1520,21 @@ Function onVideoStateChange(msg)
 End Function
 
 
-' updates the lastPingTime
-' @position: int, this is video position
-Function updateLastPingTime(position)
-  m.lastPingTime = position
-End Function
-
-
-Function fireStartVideoOrTrailerEvent()
-
-  'start_video user event analytics
-  if m.top.isTrailer = true
-    'set up tracking for trailer
-    trackEvent({
-      type: "start_trailer"
-      values: {
-        video_id: m.Video.content.id.toInt()
-        is_fullscreen: true
-      }
-    })
-  else
-    'set up tracking for normal playback
-    playbackSource = m.top.playbackSource
-    isLiveTv = false
-    isFullScreen = true
-    isEmbedded = false
-
-    hasSubtitles = false
-    if m.Video.globalCaptionMode = "On" AND m.Video.content.hasSubtitles = true
-      hasSubtitles = true
-    end if
-
-    resourceType = "VIDEO_RESOURCE_TYPE_UNKNOWN"
-    if m.Video.content.drmType = m.constants.player.drmTypes.dashWidevine
-      resourceType = "VIDEO_RESOURCE_TYPE_DASH_WIDEVINE"
-    else if m.Video.content.drmType = m.constants.player.drmTypes.dashPlayready
-      resourceType = "VIDEO_RESOURCE_TYPE_DASH_PLAYREADY"
-    else if m.Video.content.drmType = m.constants.player.drmTypes.dash
-      resourceType = "VIDEO_RESOURCE_TYPE_DASH"
-    else if m.Video.content.drmType = m.constants.player.drmTypes.hlsv6
-      resourceType = "VIDEO_RESOURCE_TYPE_HLSV6"
-    else if m.Video.content.drmType = m.constants.player.drmTypes.hlsv3
-      resourceType = "VIDEO_RESOURCE_TYPE_HLSV3"
-    end if
-
-    codeType = "VIDEO_CODEC_UNKNOWN"
-    if isNonEmptyString(m.Video.content.codec) = true
-      codeType = "VIDEO_CODEC_" + m.Video.content.codec
-    end if
-
-    resolution = "VIDEO_RESOLUTION_UNKNOWN"
-    if isNonEmptyString(m.Video.content.resolution) = true
-      resolution = "VIDEO_RESOLUTION_" + m.Video.content.resolution + "P"
-    end if
-
-    startPosition = Int(m.playerPosition * 1000)
-    if startPosition < 0
-      startPosition = 0 'reset the player position to 0 since we do not know why
-    end if
-
-    trackEvent({
-      type: "start_video"
-      values: {
-        video_id: m.Video.content.id.toInt()
-        start_position: startPosition
-        current_cdn: "" 'not possible for Roku client
-        has_subtitles: hasSubtitles 'the video player will show subtitles at start
-        is_livetv: isLiveTv
-        is_embedded: isEmbedded
-        is_fullscreen: isFullScreen
-        playback_source: playbackSource.srcForAnalytic
-        video_player: "DEFAULT"
-        video_resource_type: resourceType
-        video_resource_url: m.Video.content.URL
-        video_codec_type: codeType
-        video_resolution: resolution
-        audio_language: UCase(m.currentAudioLanguage)
-        subtitle_language: UCase(m.currentSubtitleLanguage)
-      }
-    })
-  end if
-
-End Function
-
-
 '''''''''''''''''''''''''
 ' onVideoPositionChange
 '
 ' The notificationInterval and analyticsInterval are not necessarily equal or evenly divisible
 ' so we check the time passage before we send playProgress events
-Function onVideoPositionChange(msg)
+Function onVideoPositionChange(msg) as Void
+  'Early exit for stopped state
+  if m.VideoState = "stop"
+    return
+  end if
+
+  topRef = m.top
+  content = topRef.content
+  adState = topRef.adState
+  constants = m.constants
 
   floatPosition = msg.getData()
   m.top.position = floatPosition
@@ -1632,12 +1548,6 @@ Function onVideoPositionChange(msg)
   end if
 
   m.positionArr.push(position)
-
-  positionLog = ""
-  if position <> invalid
-    positionLog = position.toStr()
-  end if
-  tubiLog("VideoPlayer.onVideoPositionChange position = " + positionLog)
   updatePlayerLogLib(m.playerLogLib, "setVideoPosition", position)
 
   ' protects against video positions being updated after we've told the player to pause
@@ -1647,7 +1557,7 @@ Function onVideoPositionChange(msg)
   end if
 
   ' show the TV Rating/Descriptors every hour
-  if m.ratingInterval >= (60 * 60) AND m.ratingOverlay.opacity = 0.0 AND m.AdHeadsUp.visible = false
+  if m.ratingInterval >= m.constants.player.ratingDisplayInterval AND m.ratingOverlay.opacity = 0.0 AND m.AdHeadsUp.visible = false
     showRatingOverlay()
   end if
 
@@ -1689,19 +1599,16 @@ Function onVideoPositionChange(msg)
     end if
   end if
 
-  adState = m.top.adState
-  content = m.top.content
-
   ' User history
   ' NOTE: historyPosition should not be set near an ad break due to race condition where RAF being
   ' invoked will cause the AuthTask thread to get stuck, never completing and staying in a "run"
   ' state perpetually.
   if (m.playerPosition > m.lastsavedPosition + m.historyInterval1Min OR m.playerPosition < m.lastsavedPosition - m.historyInterval1Min) AND adState <> "adsPending"
 
-    if m.top.isTrailer = false AND isLoggedInUser() = true AND (content.type = m.constants.ui.contentTypes.video OR content.type = m.constants.ui.contentTypes.sportsEvent)
+    if topRef.isTrailer = false AND isLoggedInUser() = true AND (content.type = constants.ui.contentTypes.video OR content.type = constants.ui.contentTypes.sportsEvent)
 
-      ' update history when interval reaches 3 minutes for treatment group OR 1 minute for control group
-      if m.playerPosition > m.lastsavedPosition + m.constants.player.historyFrequency3Mins
+      ' update history when interval reaches 3 minutes
+      if m.playerPosition > m.lastsavedPosition + constants.player.historyFrequency3Mins
         historyPosition(m.playerPosition)
       end if
     end if
@@ -1731,12 +1638,12 @@ Function onVideoPositionChange(msg)
         clearSkipCuepointsButtonAndTimer()
 
         if m.bAutostartRefreshExperimentEnabled = true
-          if m.top.content.parentType = "series"
+          if topRef.content.parentType = "series"
             '//Make sure the upNext component is located in the original layer
             m.UpNextParent.insertChild(m.UpNext, 0)
           else
             '//Minimize the movie player if this is a movie
-            m.top.insertChild(m.UpNext, 0)
+            topRef.insertChild(m.UpNext, 0)
             nVideoMinimizedTranslation = m.MinimizedAssets.translation
             resizeToLocation(m.Video, 640, 360, nVideoMinimizedTranslation, .5) ' Resize the video player to a smaller size for the UpNext screen
             m.RemainingMinimizedGroup.opacity = 0
@@ -1765,8 +1672,8 @@ Function onVideoPositionChange(msg)
       m.shouldShowUpNext = true
     end if
 
-    if m.playerPosition + m.constants.player.fetchNextDuration >= content.creditCuePoints.postlude
-      m.top.upNextCuepointReached = true
+    if m.playerPosition + constants.player.fetchNextDuration >= content.creditCuePoints.postlude
+      topRef.upNextCuepointReached = true
     end if
   end if
 
@@ -1774,24 +1681,24 @@ Function onVideoPositionChange(msg)
   if content <> invalid AND content.creditCuePoints <> invalid
     if isSkipIntroCuePointsReached(content.creditCuePoints)
       'implement intro
-      if canSkipCuepointsButtonBeShown(m.constants.player.skipCuepointsButtonTypes.intro, playProgressOk)
-        m.cuePointsHistory[m.constants.player.skipCuepointsButtonTypes.intro] = true
+      if canSkipCuepointsButtonBeShown(constants.player.skipCuepointsButtonTypes.intro, playProgressOk)
+        m.cuePointsHistory[constants.player.skipCuepointsButtonTypes.intro] = true
         skipCuepointsText = getTranslation("skipIntro_Player")
-        setSkipCuepointsButtonTextAndTimer(skipCuepointsText, m.constants.player.skipCuepointsButtonTypes.intro)
+        setSkipCuepointsButtonTextAndTimer(skipCuepointsText, constants.player.skipCuepointsButtonTypes.intro)
       end if
     else if isSkipRecapCuePointsReached(content.creditCuePoints)
       'Implement recap
-      if canSkipCuepointsButtonBeShown(m.constants.player.skipCuepointsButtonTypes.recap, playProgressOk)
-        m.cuePointsHistory[m.constants.player.skipCuepointsButtonTypes.recap] = true
+      if canSkipCuepointsButtonBeShown(constants.player.skipCuepointsButtonTypes.recap, playProgressOk)
+        m.cuePointsHistory[constants.player.skipCuepointsButtonTypes.recap] = true
         skipRecapText = getTranslation("skipRecap_Player")
-        setSkipCuepointsButtonTextAndTimer(skipRecapText, m.constants.player.skipCuepointsButtonTypes.recap)
+        setSkipCuepointsButtonTextAndTimer(skipRecapText, constants.player.skipCuepointsButtonTypes.recap)
       end if
     else if isSkipEarlyCreditCuePointsReached(content.creditCuePoints)
       'Implement Early credits
-      if canSkipCuepointsButtonBeShown(m.constants.player.skipCuepointsButtonTypes.earlyCredits, playProgressOk)
-        m.cuePointsHistory[m.constants.player.skipCuepointsButtonTypes.earlyCredits] = true
+      if canSkipCuepointsButtonBeShown(constants.player.skipCuepointsButtonTypes.earlyCredits, playProgressOk)
+        m.cuePointsHistory[constants.player.skipCuepointsButtonTypes.earlyCredits] = true
         skipEarlyCredits = getTranslation("skipEarlyCredits_Player")
-        setSkipCuepointsButtonTextAndTimer(skipEarlyCredits, m.constants.player.skipCuepointsButtonTypes.earlyCredits)
+        setSkipCuepointsButtonTextAndTimer(skipEarlyCredits, constants.player.skipCuepointsButtonTypes.earlyCredits)
       end if
     else if m.skipCuepointsButton.text <> ""
       clearSkipCuepointsButtonAndTimer()
@@ -1799,7 +1706,7 @@ Function onVideoPositionChange(msg)
   end if
 
   'Advertisements
-  if m.top.enableAds = true AND m.midrolls.count() > 0 then
+  if topRef.enableAds = true AND m.midrolls.count() > 0 then
     m.AdHeadsUp.visible = false ' default to AdHeadsUp being off; this will catch ff, replay, rew during the countdown
 
     ' Initialize variables
@@ -1851,7 +1758,7 @@ Function onVideoPositionChange(msg)
     end if
 
     ' show the ads countdown if appropriate (show if ads are available and within adHeadsUpTime)
-    adPosition = m.top.adPosition
+    adPosition = topRef.adPosition
     if adState = "adsPending" AND isInWindow(m.playerPosition, adPosition, m.adHeadsUpTime) = true
       if m.TopOverlay.opacity = 0
         ' Don't show the ad heads up when the transport/overlay is showing, since it crowds the space of the title on the overlay
@@ -1867,7 +1774,7 @@ Function onVideoPositionChange(msg)
     isCuepointReached = m.midrolls[strI(m.playerPosition)]
 
     'A pending ad from the previous cue point was not played for some reason. we need to fire the AdMissed event for the previous one.
-    if adState = "adsPending" AND m.missedAdReported = false AND Int(m.playerPosition) > Int(m.top.adPosition)
+    if adState = "adsPending" AND m.missedAdReported = false AND Int(m.playerPosition) > Int(topRef.adPosition)
 
       sendAdMissedEvent("exitAfterCuePointPassed")
       m.missedAdReported = true
@@ -1928,18 +1835,9 @@ End Function
 
 
 Function showAdHeadUpText(cuepoint)
-
   m.AdHeadsUp.visible = true
-  seconds = stri(cuepoint - m.playerPosition).trim()
-
-  if m.isAdsOverlayExperimentEnabled = true
-    m.adBreakStartsInOverlay.visible = true
-    m.adBreakStartsInOverlay.timeRemaining = seconds
-  else
-    m.adBreakStartsInOverlay.visible = false
-    m.AdHeadsUpText.text = getTranslation("videoPlayer_adHeadsUp", { seconds: seconds })
-    m.adBreakStartsInOverlay.reCalculateWidth = true
-  end if
+  seconds = strI(cuepoint - m.playerPosition).trim()
+  m.AdHeadsUpText.text = getTranslation("videoPlayer_adHeadsUp", { seconds: seconds })
 End Function
 
 
@@ -1969,7 +1867,7 @@ Function onAdStateChange(msg)
     m.missedAdReported = false
   end if
 
-  tubiLog("VideoPlayer.onAdStateChange adState = " + adState + " VideoState = " + m.VideoState + " Video.State = " + m.Video.state)
+  logDebug("VideoPlayer.onAdStateChange adState = " + adState + " VideoState = " + m.VideoState + " Video.State = " + m.Video.state)
   if adState = "ready"
     m.top.adState = "init"
     if m.top.adControl <> ""
@@ -2077,7 +1975,7 @@ Function onSpritesReceived(msg)
   if thumbnailsInfo <> invalid
     ' sprites are reset to invalid when video playback stops. Don't log when that happens because
     ' it's confusing when reading the logs.
-    tubiLog("VideoPlayer.onSpritesReceived")
+    logDebug("VideoPlayer.onSpritesReceived")
 
     if thumbnailsInfo.thumbnailUrls <> invalid AND thumbnailsInfo.thumbnailUrls.count() > 0
       m.Thumbnail.numSprites = thumbnailsInfo.thumbnailSpan
@@ -2118,7 +2016,7 @@ Function onUpNextContentSelected(msg)
   ' can be invalid when up next content is reset when new video is played
   ' we don't want to trigger potential animations at that point.
   if contentSelected <> invalid
-    tubiLog("VideoPlayer.onUpNextContentSelected")
+    logDebug("VideoPlayer.onUpNextContentSelected")
     m.UpNext.hide = true
     resetVideoPlayerBackToOriginalPosition()
   end if
@@ -2190,41 +2088,9 @@ Function onBufferingTimerFired()
 End Function
 
 
-
-' Helper function to prevent tracking events being sent for trailers
-Function trackEvent(event as Object)
-  allowedTrailerEvents = {
-    "start_trailer": true
-    "trailer_play_progress": true
-    "finish_trailer": true
-  }
-
-  if m.top.isTrailer = false OR allowedTrailerEvents[event.type] = true
-    appendContentUserContextValues(event.values, m.top.content, m.top.isAdultParentalLevel)
-    m.global.trackingLoggingTask.trackEvent = event
-  end if
-End Function
-
-
-' Helper function to prevent historyPosition being sent during trailers
-Function historyPosition(position)
-  if m.top.isTrailer = false
-    ' round the position up/down based on 0.5 rule.
-    ' this is necessary since isAtPosition() is returning true if the decimal is greater than 0.5.
-    ' If we do not round here, and a user exits the video player during ad playback, the history would be
-    ' stored always rounding down, but the ad check is done while rounding up over 0.5. So, if a user then
-    ' resumes playback, the ad call sends the position as 1 second less than the midroll cuepoint, and
-    ' no ads are returned, when they should be returned.
-    position = round(position)
-    m.top.historyPosition = position
-    m.lastSavedPosition = position
-  end if
-End Function
-
-
 Function cancelReplayCaptions()
   if m.video.globalCaptionMode = "On" AND m.replayCaptionEnd <> 0
-    tubilog("Turning off replay captions")
+    logDebug("Turning off replay captions")
     m.replayCaptionEnd = 0
     m.video.globalCaptionMode = "Instant replay"
   end if
@@ -2353,6 +2219,55 @@ Function prepareToStartVideo(content, videoResourceIndex = [0, 0])
 End Function
 
 
+' Updates the content node's url and httpHeaders fields with the videoResource info indicated by the index value
+'
+' @contentNode: roSGNode, a TubiContentNode
+' @resource: assocarray, contains manifest details
+' @videoResourceIndex: intarray, [0] -> codexIndex & [1] -> drmIndex
+Function setDrmOnContent(contentNode, resource, videoResourceIndex)
+  logDebug("VideoPlayer.setDrmOnContent")
+
+  if resource <> invalid
+    ' reset DRM fields
+    contentNode.drmParams = {}
+    contentNode.encodingType = ""
+    contentNode.encodingKey = ""
+
+    ' set general fields related to DRM
+    contentNode.httpHeaders = resource.drmHeaders
+    contentNode.url = resource.url
+    contentNode.length = resource.length
+    contentNode.streamFormat = resource.streamFormat
+    contentNode.drmType = resource.type
+    contentNode.codec = resource.codec
+    contentNode.resolution = resource.resolution
+    contentNode.currentVideoResourceIndex = videoResourceIndex
+    contentNode.hdcpVersion = resource.hdcpVersion
+
+    updatePlayerLogLib(m.playerLogLib, "setVideoContent", contentNode)
+
+    '//set youbora field
+    youboraTracking = {}
+    trackingKeys = m.constants.thirdParty.youbora.trackingKeys
+    youboraTracking[trackingKeys.titanVersionOrExperimentVersion] = resource.titanVersionOrExperimentVersion
+    youboraTracking[trackingKeys.generatorVersion] = resource.generatorVersion
+    contentNode.youboraTracking = youboraTracking
+
+    ' set DRM scheme specific fields
+    if resource.type = m.constants.player.drmTypes.dashWidevine
+      contentNode.drmParams = resource.drmParams
+    else if resource.type = m.constants.player.drmTypes.dashPlayready
+      contentNode.encodingType = resource.encodingType
+      contentNode.encodingKey = resource.encodingKey
+    end if
+    return true
+  else
+    updatePlayerLogLib(m.playerLogLib, "setVideoContent", contentNode)
+  end if
+  return false
+End Function
+
+
 Function onCaptionModeChange(msg)
   globalCaptionMode = msg.getData()
   m.closedCaptionAndAudioSelectionOverlay.globalCaptionMode = globalCaptionMode
@@ -2441,7 +2356,7 @@ End Function
 
 
 Function stopAdsPlayback()
-  tubilog("VideoPlayer.stopAdsPlayback")
+  logDebug("VideoPlayer.stopAdsPlayback")
 
   renderer = m.RAFAdContainer.getChild(0)
   rendererType = getNodeSubtype(renderer)
@@ -2456,7 +2371,7 @@ End Function
 
 
 Function stopVideo()
-  tubilog("VideoPlayer.stopVideo")
+  logDebug("VideoPlayer.stopVideo")
 
   'unObserveClosedCaptionAndAudioTrack is required to prevent callbacks for the globalCaptionMode, subtitle, and audio track fields when user exits player or changes the video content
   unObserveClosedCaptionAndAudioTrack()
@@ -2876,10 +2791,66 @@ Function createTransportButtons()
 End Function
 
 
+' advanceDrmOnContent function gets triggered when player error occurs due to drm
+' @contentNode: roSGNode, a TubiContentNode
+Function advanceDrmOnContent(contentNode)
+  logDebug("VideoPlayer.advanceDrmOnContent")
+
+  if contentNode <> invalid
+    videoResources = contentNode.videoResources
+    currentVideoResourceIndex = contentNode.currentVideoResourceIndex
+
+    if videoResources <> invalid AND currentVideoResourceIndex <> invalid AND currentVideoResourceIndex.Count() >= 2
+      currentCodecIndex = currentVideoResourceIndex[0]
+      currentDrmIndex = currentVideoResourceIndex[1]
+
+      if videoResources[currentCodecIndex] <> invalid
+        currentResource = videoResources[currentCodecIndex][currentDrmIndex]
+
+        nextCodecIndex = currentCodecIndex
+        nextDrmIndex = currentDrmIndex + 1
+        nextResource = invalid
+
+        if videoResources[currentCodecIndex] <> invalid
+          nextResource = videoResources[currentCodecIndex][nextDrmIndex]
+        end if
+
+        if nextResource = invalid
+          nextCodecIndex = currentCodecIndex + 1
+          nextDrmIndex = 0
+
+          if videoResources[nextCodecIndex] <> invalid
+            nextResource = videoResources[nextCodecIndex][nextDrmIndex]
+          end if
+        end if
+
+        if nextResource <> invalid AND setDrmOnContent(contentNode, nextResource, [nextCodecIndex, nextDrmIndex]) = true
+          sendVideoResourceFallbackToPlayerLogLib(currentResource, nextResource, "DRM")
+
+          fallbackInfo = {
+            failed_url: removeExcessUrl(currentResource.url)
+            failed_drm: currentResource.type
+            fallback_url: removeExcessUrl(nextResource.url)
+            fallback_drm: nextResource.type
+            model: m.constants.deviceInfo.model
+            video_id: contentNode.id
+          }
+
+          ' log that we fell back to the next playback option after playback failed due to DRM
+          logError(FormatJSON(fallbackInfo), "videoLoad", "drm-fallback", 0.1)
+          return true
+        end if
+      end if
+    end if
+  end if
+  return false
+End Function
+
+
 ' advanceCodecOnContent function gets triggered when player error occurs due to codec capability
 ' @contentNode: roSGNode, a TubiContentNode
 Function advanceCodecOnContent(contentNode)
-  tubiLog("VideoPlayer.advanceCodecOnContent")
+  logDebug("VideoPlayer.advanceCodecOnContent")
 
   if contentNode <> invalid
     videoResources = contentNode.videoResources
@@ -2926,7 +2897,7 @@ End Function
 ' checkIfCodecFallbackIsAvailable function checks if a codec fallback is available.
 ' @contentNode: roSGNode, a TubiContentNode
 Function checkIfCodecFallbackIsAvailable(contentNode)
-  tubiLog("VideoPlayer.advanceCodecOnContent")
+  logDebug("VideoPlayer.advanceCodecOnContent")
 
   if contentNode <> invalid
     videoResources = contentNode.videoResources
@@ -2947,7 +2918,7 @@ End Function
 ' checkIfDRMFallbackIsAvailable function checks if a DRM fallback is available.
 ' @contentNode: roSGNode, a TubiContentNode
 Function checkIfDRMFallbackIsAvailable(contentNode)
-  tubiLog("VideoPlayer.advanceDrmOnContent")
+  logDebug("VideoPlayer.advanceDrmOnContent")
 
   if contentNode <> invalid
     videoResources = contentNode.videoResources
@@ -3041,233 +3012,6 @@ Function sendVideoResourceFallbackToPlayerLogLib(failedResource, fallbackResourc
     }
     updatePlayerLogLib(m.playerLogLib, "fireVideoResourceFallbackEvent", videoResourceFallback)
   end if
-End Function
-
-
-' advanceDrmOnContent function gets triggered when player error occurs due to drm
-' @contentNode: roSGNode, a TubiContentNode
-Function advanceDrmOnContent(contentNode)
-  tubiLog("VideoPlayer.advanceDrmOnContent")
-
-  if contentNode <> invalid
-    videoResources = contentNode.videoResources
-    currentVideoResourceIndex = contentNode.currentVideoResourceIndex
-
-    if videoResources <> invalid AND currentVideoResourceIndex <> invalid AND currentVideoResourceIndex.Count() >= 2
-
-      currentCodecIndex = currentVideoResourceIndex[0]
-      currentDrmIndex = currentVideoResourceIndex[1]
-
-      if videoResources[currentCodecIndex] <> invalid
-        currentResource = videoResources[currentCodecIndex][currentDrmIndex]
-
-        nextCodecIndex = currentCodecIndex
-        nextDrmIndex = currentDrmIndex + 1
-        nextResource = invalid
-
-        if videoResources[currentCodecIndex] <> invalid
-          nextResource = videoResources[currentCodecIndex][nextDrmIndex]
-        end if
-
-        if nextResource = invalid
-          nextCodecIndex = currentCodecIndex + 1
-          nextDrmIndex = 0
-
-          if videoResources[nextCodecIndex] <> invalid
-            nextResource = videoResources[nextCodecIndex][nextDrmIndex]
-          end if
-        end if
-
-        if nextResource <> invalid AND setDrmOnContent(contentNode, nextResource, [nextCodecIndex, nextDrmIndex]) = true
-          sendVideoResourceFallbackToPlayerLogLib(currentResource, nextResource, "DRM")
-
-          fallbackInfo = {
-            failed_url: removeExcessUrl(currentResource.url)
-            failed_drm: currentResource.type
-            fallback_url: removeExcessUrl(nextResource.url)
-            fallback_drm: nextResource.type
-            model: m.constants.deviceInfo.model
-            video_id: contentNode.id
-          }
-
-          ' log that we fell back to the next playback option after playback failed due to DRM
-          logError(FormatJSON(fallbackInfo), "videoLoad", "drm-fallback", 0.1)
-          return true
-        end if
-      end if
-    end if
-  end if
-  return false
-End Function
-
-
-' Updates the content node's url and httpHeaders fields with the videoResource info indicated by the index value
-'
-' @contentNode: roSGNode, a TubiContentNode
-' @resource: assocarray, contains manifest details
-' @videoResourceIndex: intarray, [0] -> codexIndex & [1] -> drmIndex
-Function setDrmOnContent(contentNode, resource, videoResourceIndex)
-  tubiLog("VideoPlayer.setDrmOnContent")
-
-  if resource <> invalid
-    ' reset DRM fields
-    contentNode.drmParams = {}
-    contentNode.encodingType = ""
-    contentNode.encodingKey = ""
-
-    ' set general fields related to DRM
-    contentNode.httpHeaders = resource.drmHeaders
-    contentNode.url = resource.url
-    contentNode.length = resource.length
-    contentNode.streamFormat = resource.streamFormat
-    contentNode.drmType = resource.type
-    contentNode.codec = resource.codec
-    contentNode.resolution = resource.resolution
-    contentNode.currentVideoResourceIndex = videoResourceIndex
-    contentNode.hdcpVersion = resource.hdcpVersion
-
-    updatePlayerLogLib(m.playerLogLib, "setVideoContent", contentNode)
-
-    '//set youbora field
-    youboraTracking = {}
-    trackingKeys = m.constants.thirdParty.youbora.trackingKeys
-    youboraTracking[trackingKeys.titanVersionOrExperimentVersion] = resource.titanVersionOrExperimentVersion
-    youboraTracking[trackingKeys.generatorVersion] = resource.generatorVersion
-    contentNode.youboraTracking = youboraTracking
-
-    ' set DRM scheme specific fields
-    if resource.type = m.constants.player.drmTypes.dashWidevine
-      contentNode.drmParams = resource.drmParams
-    else if resource.type = m.constants.player.drmTypes.dashPlayready
-      contentNode.encodingType = resource.encodingType
-      contentNode.encodingKey = resource.encodingKey
-    end if
-    return true
-  else
-    updatePlayerLogLib(m.playerLogLib, "setVideoContent", contentNode)
-  end if
-  return false
-End Function
-
-
-Function getPlaybackErrorInfo(position, downloadedSegment, streamingSegment, streamInfo, errorCode, errorStr, content)
-  errorInfo = {
-    video_id: ""
-    video_url: ""
-  }
-  if errorCode = -3
-    errorInfo.error_message = "Server did not respond with hls segment. Potential 504 or 404. Following segment likely has issue."
-    ' Check for position to be > 0 in order to prevent segments from previous videos to populate
-    ' the error messaging for the current video.
-    if position > 0 AND downloadedSegment <> invalid
-      ' in the case of errorCode = -3, it likely means there was a 504 or 404 response from the server which ultimately was the source of the error.
-      ' we get the last downloaded segment which is the last good segment instead of the current streaming segment, which may be several segments ahead of the bad segment.
-      ' in this case, the segment causing the error is the segment AFTER the logged segment.
-      errorInfo.segment_sequence = downloadedSegment.segSequence
-      errorInfo.segment_url = removeExcessUrl(downloadedSegment.SegUrl)
-      errorInfo.segment_bitrate = downloadedSegment.BitrateBps
-    end if
-  else if errorStr <> invalid
-    errorInfo.error_message = errorStr
-    if position > 0 AND streamingSegment <> invalid
-      ' streamingSegment can be invalid when the server returns a 504, 404, etc.
-      errorInfo.segment_url = removeExcessUrl(streamingSegment.segUrl)
-      errorInfo.segment_start_time = streamingSegment.segStartTime
-      errorInfo.segment_sequence = streamingSegment.segSequence
-      errorInfo.segment_bitrate = streamingSegment.segBitrateBps
-    end if
-  end if
-  errorInfo.error_code = errorCode
-
-  if content <> invalid then errorInfo.video_id = content.id
-
-  if position > 0 AND streamInfo <> invalid
-    errorInfo.video_url = removeExcessUrl(streamInfo.streamUrl)
-  else if content <> invalid
-    errorInfo.video_url = removeExcessUrl(content.url)
-  end if
-
-  return errorInfo
-End Function
-
-
-'Helper function that removes all characters after the ? in the url
-Function removeExcessUrl(url)
-  cutUrl = ""
-  if type(url) = "roString" OR type(url) = "String"
-    position = url.Instr(Chr(63)) 'checks for the position of the "?" in the url string
-    if position > -1
-      cutUrl = url.Left(position)
-    else
-      cutUrl = url
-    end if
-  end if
-  return cutUrl
-End Function
-
-
-' Play progress events should occur at the following instances
-' a user watches for 10s
-' an ad break starts
-' a user begins a "seek" functionality (skip 10s, hop 30s, ff/rew, jump to beginning)
-' a user selects to "jump to next video"
-'
-' @callSource: string, temporary param used for debugging large playProgressEvents,
-'              should be removed after issue is fixed.
-Function getPlayProgressEvent(callSource = "")
-  playProgressEvent = invalid
-  if m.playerPosition > m.lastPingTime
-
-    viewTime = Int((m.playerPosition - m.lastPingTime) * 1000) 'ms
-
-    playProgressEvent = {
-      type: "play_progress"
-      values: {
-        video_id: m.Video.content.id.toInt()
-        position: Int(m.playerPosition * 1000) 'ms - without Int(), can return scientific notation, causing API error
-        view_time: viewTime
-        video_player: "DEFAULT"
-      }
-    }
-
-    ''//::TODO:: Remove this block once the play_progress viewtime value exceeds 15000 issue fixed - added this for debugging purpose
-    if viewTime >= 15000
-      adState = m.top.adState
-      videoInfo = {}
-      videoInfo.adState = adState
-      videoInfo.viewTime = viewTime.tostr()
-      videoInfo.videoState = m.VideoState
-      videoInfo.playerPosition = m.playerPosition
-      videoInfo.previousPlayerPosition = m.previousPlayerPosition
-      videoInfo.callSource = callSource
-      videoInfo.previousCallSource = m.previousPlayProgressCallSource
-      videoInfo.positionArr = m.positionArr
-      logInfo(FormatJSON(videoInfo), "videoInfo", "view-time-exceeds")
-    end if
-
-    ' resetting m.positionArr everytime play progress event gets fires
-    m.positionArr = []
-
-    if m.top.isTrailer = true
-      playProgressEvent.type = "trailer_play_progress"
-    else
-      playProgressEvent.values.playback_source = m.top.playbackSource.srcForAnalytic
-    end if
-
-    'nominal_speed will be added to the Connection message, rather than the PlayProgressEvent message,
-    'but is still sent via this interface
-    if m.Video.streamInfo <> invalid AND m.Video.streamInfo.measuredBitrate <> invalid
-      'measuredBitrate appears to be reported in bits despite the documentation that it is kibibits
-      measuredBitrate = Int(m.Video.streamInfo.measuredBitrate / 1000000) 'dividing by 10^6
-
-      if measuredBitrate >= 0
-        playProgressEvent.values.nominal_speed = measuredBitrate
-      end if
-    end if
-  end if
-
-  m.previousPlayProgressCallSource = callSource
-  return playProgressEvent
 End Function
 
 
@@ -3527,8 +3271,7 @@ End Function
 ' @shouldShowBrandingLogo: boolean, true to show the logo with animation, false to hide the logo with animation
 ' @delay: integer, delay to start the animation
 Function updateBrandingLogoVisibility(shouldShowBrandingLogo = false, delay = 0)
-  'roku_player_branding_v2 exposure event should be fired when content loads
-  if shouldShowBrandingLogo = true AND getStatsigExperimentResource("roku_player_improvement", "roku_player_branding_v2", true).enabled = true
+  if shouldShowBrandingLogo = true
     ' Update branding logo URI and width based on app mode, then show with animation
     if m.top.appMode = "KIDS_MODE"
       m.brandingLogo.uri = "pkg:/images/logo-kids-large.webp"
@@ -3953,10 +3696,6 @@ Function onAdTrackingObject(msg)
   'adStatus=PodComplete, when AdPod completes
   'adStatus=Close, when user closes the Ad
 
-  if m.isAdsOverlayExperimentEnabled = true
-    m.adCountdownOverlay.adInfo = adInfo
-  end if
-
   pixelsFiredStatus = adInfo.pixelsFiredStatus
 
   if isAA(pixelsFiredStatus) = true
@@ -3982,18 +3721,7 @@ Function onAdTrackingObject(msg)
   end if
 
   if adStatus = "PodStart"
-    ' Firing the exposure event when ad is loaded.
-    getExperimentResource("roku_player_ui_refresh", "roku_ads_overlay_v1", true)
     updatePlayerLogLib(m.playerLogLib, "setTotalAdDurationInCurrentPod", adInfo)
-  else if adStatus = "Impression" AND m.isAdsOverlayExperimentEnabled = true
-    ' Since Roku clears out the node when the ad is complete, we need to re-append the adCountdownOverlay to the RAFAdContainer.
-    overlay = m.RAFAdContainer.findNode("adCountdownOverlay")
-    if overlay = invalid
-      rafRender = m.RAFAdContainer.getChild(0)
-      if rafRender <> invalid
-        rafRender.appendChild(m.adCountdownOverlay)
-      end if
-    end if
   else if adStatus = "Start"
     m.playerExitInfo["ad_counts"] += 1
     updatePlayerLogLib(m.playerLogLib, "setAdCount", 1)
@@ -4043,17 +3771,6 @@ Function onAdBufferingObject(msg)
     updatePlayerLogLib(m.playerLogLib, "setAdBufferStartTime")
   end if
 
-  if m.isAdsOverlayExperimentEnabled = true
-    ' Adding a check for optimization so that we do not have to perform find node always.
-    if progress = 100
-      ' Hide the overlay when the ad is fully buffered.
-      overlay = m.RAFAdContainer.findNode("overlay")
-      if overlay <> invalid
-        overlay.opacity = 0
-      end if
-    end if
-    m.adCountdownOverlay.adInfo = adBufferingInfo
-  end if
 End Function
 
 
@@ -4079,66 +3796,6 @@ Function onExitPlayer(msg)
 End Function
 
 
-'Determine the reason for the missed ad event
-'@reason: string, possible values are autoPlay, exitDuringPlayback, exitBeforeResponse, exitBeforePlayback, exitAfterCuePointPassed
-'
-Function sendAdMissedEvent(reason)
-  adMissedInfo = {
-    reason: reason
-    position: Int(m.playerPosition) * 1000 'ms
-    cue_point: Int(m.top.adPosition) * 1000 'ms
-  }
-
-  if isAA(m.filledAdData) = true
-
-    if m.filledAdData.adResponseTime <> invalid AND m.filledAdData.adResponseTime <> -1
-      adMissedInfo.response_time = m.filledAdData.adResponseTime * 1000 'ms
-    end if
-
-    if m.filledAdData.adCount <> invalid AND m.filledAdData.adCount > 0
-      adMissedInfo.ad_count = m.filledAdData.adCount
-    end if
-
-    if m.filledAdData.totalAdsDuration <> invalid AND m.filledAdData.totalAdsDuration > 0
-      adMissedInfo.total_ads_duration = Int(m.filledAdData.totalAdsDuration) * 1000 'ms
-    end if
-
-  end if
-
-  if isNonEmptyArray(m.positionArr) = true
-    sPositionArr = []
-
-    for each arr in m.positionArr
-      sPositionArr.push(arr.toStr())
-    end for
-
-    adMissedInfo.message_map = { playerPositionArr: sPositionArr.join(",") }
-  end if
-  updatePlayerLogLib(m.playerLogLib, "fireAdMissedEvent", adMissedInfo)
-End Function
-
-
-Function fireBrowseWhileWatchingPlaybackSessionEndEvent()
-  if m.playerLogLib <> invalid AND m.playerLogLib.didUserSeeBwwPeek = true
-    isSeries = m.top.content <> invalid AND m.top.content.parentType = "series"
-    playbackSource = m.playerLogLib.playbackSource
-    isFromDeeplink = false
-    if isAA(playbackSource) = true
-      srcForAds = playbackSource.srcForAds
-      isFromDeeplink = (srcForAds = m.constants.player.playbackOrigin.deeplink)
-    end if
-    data = {
-      "openCount": m.playerLogLib.bwwOpenCount
-      "didConvert": m.playerLogLib.bwwDidConvert
-      "isSeries": isSeries
-      "isDeeplink": isFromDeeplink
-    }
-
-    logInfo(FormatJson(data), "videoInfo", "browseWhileWatchingPlaybackSessionEnd")
-  end if
-End Function
-
-
 Function onShowPlayerStatsChange(msg)
   m.showPlayerStats = msg.getData()
 End Function
@@ -4146,32 +3803,6 @@ End Function
 
 Function updatePlayerStatsOverlay()
   updatePlayerStatsOverlayMixin(m.constants, m.Video, m.showPlayerStats, m.playerStatsOverlay)
-End Function
-
-
-' Helper function to check if an error code is a network retryable error
-' @errorCode: integer, the video player error code
-' @retryConfig: object, the retry configuration containing errorCodes map
-' @returns: boolean, true if error code is in the network retryable error codes map
-Function isNetworkRetryableError(errorCode as Integer, retryConfig as Object) as Boolean
-  if retryConfig <> invalid AND retryConfig.network <> invalid AND retryConfig.network.errorCodes <> invalid
-    errorCodeKey = errorCode.toStr()
-    return retryConfig.network.errorCodes.DoesExist(errorCodeKey)
-  end if
-  return false
-End Function
-
-
-' Helper function to determine retry strategy based on error code
-' @errorCode: integer, the video player error code
-' @returns: string, the strategy to use: "retry_network", "fallback_codec", "fallback_drm", or "fatal"
-Function getErrorRetryStrategy(errorCode as Integer) as String
-  errorCodeKey = errorCode.toStr()
-  if m.errorRetryStrategyMap.DoesExist(errorCodeKey)
-    return m.errorRetryStrategyMap[errorCodeKey]
-  else
-    return "fatal"
-  end if
 End Function
 
 

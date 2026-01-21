@@ -2,6 +2,7 @@
 <component name="VideoPlayerScreen" extends="BaseScreen" >
   <script type="text/brightscript" uri="VideoPlayerScreen.brs" />
   <script type="text/brightscript" uri="VideoTransportHandling.brs" />
+  <script type="text/brightscript" uri="VideoPlayerAnalyticsMixin.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/UserMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/MathUtils.brs" />
@@ -19,6 +20,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/PlayerLogLib.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnalyticsMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/PlayerStatsMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/screens/VideoPlayerScreen/VideoPlayerMixin.brs" />
 
   <interface>
 
@@ -368,7 +370,6 @@
             role="font"/>
         </Label>
       </Group>
-      <AdBreakStartsInOverlay translation="[81, 81]" id="adBreakStartsInOverlay" visible="false" />
     </Group>
 
     <Poster
@@ -398,14 +399,6 @@
         vertAlignment="top"
         horizAlignment="left"
         itemSpacings="[6]"/>
-
-      <IconWithLabel
-        id="sendFeedBackButtonTopRight"
-        visible="false"
-        width="72"
-        height="72"
-        focusUri="pkg:/images/transport/sgplayer/icon-feedback-focus.webp"
-        unFocusUri="pkg:/images/transport/sgplayer/icon-feedback-unfocused.webp"/>
 
     </Group>
 
@@ -656,13 +649,13 @@
       repeat="false" />
 
     <Timer
-      id="screenTime"
-      duration="5"
-      repeat="true" />
-
-    <Timer
       id="PauseAdOverlayTimer"
       duration="5"/>
+
+    <Timer id="retryTimer" />
+    <Timer id="fallbackTimer" />
+    <Timer id="bufferingTimer" duration="10" repeat="false" />
+    <Timer id="adFetchCooldownTimer" duration="10" repeat="false" />
 
   </children>
 </component>

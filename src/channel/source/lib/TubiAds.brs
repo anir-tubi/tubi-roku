@@ -1,4 +1,4 @@
-Function TubiAds(constants, requestInstance, requestQueue, auth, tracking, adContentType, tcfString = invalid, userConsentsOptOutStatus = invalid, isGdprValue = false, prerollTimeoutExperiment = invalid)
+Function TubiAds(constants, requestInstance, requestQueue, auth, tracking, adContentType, tcfString = invalid, userConsentsOptOutStatus = invalid, isGdprValue = false)
   'Add Support for Roku Advertising Framework
   roAdFramework = Roku_Ads()
 
@@ -59,7 +59,6 @@ Function TubiAds(constants, requestInstance, requestQueue, auth, tracking, adCon
     shouldSendGoogleBeacons: false ' Let's us know if during a given ad pod we should send beacons to Google or not
     adResponseTime: -1
     totalAdBreakAdsPerSession: 0
-    prerollTimeoutExperiment: prerollTimeoutExperiment ' Statsig experiment for preroll timeout
     currentAdType: "preroll" ' Current ad type: "preroll", "midroll", or "seek"
 
     'pixelsFiredStatus is used in PlayerLog QualityOfService event
@@ -405,9 +404,8 @@ Function tubiAds_retrieveAds(adsUrl, adInsertionMethod)
   if tubiReq.start(port) = true then
     timeout = 10000 ' in milliseconds
 
-    ' Use a 12-, 8-, 5-second timeout for preroll ads when the experiment is enabled, depending on the timeout value specified in the experiment.
-    if m.currentAdType = "preroll" AND m.prerollTimeoutExperiment <> invalid AND isInteger(m.prerollTimeoutExperiment.timeout) = true
-      timeout = m.prerollTimeoutExperiment.timeout ' in milliseconds
+    if m.currentAdType = "preroll"
+      timeout = 8000 ' in milliseconds
     end if
 
     msg = wait(timeout, port)

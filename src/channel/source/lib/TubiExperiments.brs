@@ -65,29 +65,11 @@ Function TubiExperiments(experimentsInfo) as Object
       }
 
       roku_player_ui_refresh: {
-        ' We will run 4 overlay types. Possible values are none, variant1, variant2, variant3, variant4
-        roku_ads_overlay_v1: {
-          default: { "overlay_type": "none" }
-          holdout_control: { "overlay_type": "none" }
-          holdout_winning: { "overlay_type": "none" }
-        },
         'Possible values are none, variant1
         roku_player_control_ui_refresh_v3: {
           default: { "type": "none" }
           holdout_control: { "type": "none" }
           holdout_winning: { "type": "none" }
-        }
-      }
-
-      ' We will run 3 types. Possible values are none, variant1, variant2
-      ' none - (control) production version
-      ' variant1 - new loader (circular) + branding logo on top right corner of player
-      ' variant2 - old loader (bar) + branding logo on top right corner of player
-      roku_player_branding: {
-        roku_player_branding_v1: {
-          default: { "type": "none" }
-          holdout_control: { "enabled": false }
-          holdout_winning: { "enabled": false }
         }
       }
 

@@ -8,6 +8,8 @@
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/EventMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/screens/VideoPlayerScreen/VideoPlayerMixin.brs" />
 
   <interface>
     <!-- INPUT -->

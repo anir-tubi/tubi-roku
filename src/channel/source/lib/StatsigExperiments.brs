@@ -25,20 +25,12 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
       }
 
       roku_player_improvement: {
-        'Showing branding logo on top right corner of player
-        roku_player_branding_v2: {
-          default: { "enabled": true }
-        }
         ' Ad request cuepoint alignment experiment with 3 variants:
         ' Control: prefetchTime=15, requestWithinWindow=false (request before 15s, not within 15s)
         ' Variant1: prefetchTime=11, requestWithinWindow=false (request before 11s, not within 11s)
         ' Variant2: prefetchTime=11, requestWithinWindow=true (request before 11s, also within 11s)
         roku_player_align_ad_request_cuepoint_v2: {
           default: { "prefetchTime": 15, "requestWithinWindow": false }
-        }
-        ' Testing preroll ad timeout values: 12s, 8s and 5s variants
-        roku_player_ad_preroll_timeout_v2: {
-          default: { "timeout": 8000 }
         }
         ' Testing autoplay of content immediately after the trailer finishes
         roku_autoplay_after_trailer_v1: {
@@ -56,11 +48,6 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
       }
 
       roku_postplay_countdown_timer: {
-        ' Possible values for movie timer: 10s, 20s, 40s, 60s (default: 30s)
-        roku_postplay_countdown_timer_movie_v1: {
-          default: { countdown: 20 }
-        }
-
         ' Possible values for series timer: 3s, 5s, 10s (default: 15s)
         roku_postplay_countdown_timer_series_v1: {
           default: { countdown: 15 }

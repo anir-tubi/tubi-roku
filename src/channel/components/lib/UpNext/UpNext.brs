@@ -11,7 +11,6 @@ Function init()
   m.top.observeField("resetContent", "onResetContent")
   m.top.observeField("command", "onCommand")
 
-  m.moviePostplayCountdown = getStatsigExperimentResource("roku_postplay_countdown_timer", "roku_postplay_countdown_timer_movie_v1", false).countdown
   m.seriesPostplayCountdown = getStatsigExperimentResource("roku_postplay_countdown_timer", "roku_postplay_countdown_timer_series_v1", false).countdown
 
   '//::NOTE:: the translation of m.UpNextUI is modified by AnimationMixin,
@@ -30,7 +29,7 @@ Function init()
   m.backgroundGroup = m.top.findNode("BackgroundGroup")
   m.countdownGroup = m.top.findNode("CountdownGroup")
   m.countdownGroup.secondsTranslationId = "screenEndCard_upNextIn"
-  m.countdownGroup.maxSeconds = m.moviePostplayCountdown
+  m.countdownGroup.maxSeconds = m.constants.player.upNextCountdown
 
   m.UpNextSeriesMenu = m.top.findNode("UpNextSeriesMenu")
   m.UpNextSeriesMenu.observeFieldScoped("itemSelected", "onSeriesItemSelected")
@@ -134,7 +133,7 @@ Function init()
   m.GridMovie.targetSet = targetSet
 
   ' The seconds remaining
-  m.timeRemaining = m.moviePostplayCountdown
+  m.timeRemaining = m.constants.player.upNextCountdown
 
   ' Used to determine if navigate_within_page events should be sent. Only send when the Up Next content row already
   ' has focus, not when it gains focus.
@@ -264,7 +263,7 @@ Function onContentChange()
       m.MovieGroup.visible = true
       m.SeriesGroup.visible = false
       m.GridMovie.content = content
-      m.timeRemaining = m.moviePostplayCountdown
+      m.timeRemaining = m.constants.player.upNextCountdown
       updateInfoPanel(m.InfoMovie, m.GridMovie.content.getChild(0))
       if bAutoStartExperimentEnabled = true
         m.UpNextParent.translation = [m.constants.ui.translations.marginX, 729]
@@ -420,7 +419,7 @@ Function itemFocusedHelper(grid, info)
       if isNonEmptyString(content.seriesId) = true
         m.timeRemaining = m.seriesPostplayCountdown
       else
-        m.timeRemaining = m.moviePostplayCountdown
+        m.timeRemaining = m.constants.player.upNextCountdown
       end if
     end if
   end if
@@ -567,8 +566,6 @@ Function onShow()
   ' reset the countdown timer prior to fading in the up next content so that
   ' the timer doesn't flash an old time from the previous time the up next UI was visible.
   if m.MovieGroup.visible = true
-    '//fire the roku_postplay_countdown_timer_movie_v1 exposure event
-    getStatsigExperimentResource("roku_postplay_countdown_timer", "roku_postplay_countdown_timer_movie_v1", true)
     drawCountdown(m.CountdownMovie, m.timeRemaining)
   else
     '//fire the roku_postplay_countdown_timer_series_v1 exposure event
@@ -602,5 +599,5 @@ End Function
 
 Function stopTimer()
   m.Timer.control = "stop"
-  m.timeRemaining = m.moviePostplayCountdown
+  m.timeRemaining = m.constants.player.upNextCountdown
 End Function
