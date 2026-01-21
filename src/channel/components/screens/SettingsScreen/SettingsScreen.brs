@@ -12,11 +12,14 @@ Function init()
   m.Title = m.top.findNode("Title")
   m.Title.text = getTranslation("menu_settings")
 
+  m.isUserInMultiAccount = isUserInMultiAccountFromRegistry()
+
   ' Create the menu
   m.SettingsMenuPanel = createSettingsMenuPanel()
   m.SettingsMenuPanel.observeField("createNextPanelIndex", "onCreateNextPanelIndex")
   m.SettingsMenuPanel.observeField("itemSelected", "onMenuItemSelected")
   m.SettingsMenuPanel.observeField("itemFocused", "onDetailScreenMenuItemFocused")
+  m.SettingsMenuPanel.observeField("focusedChild", "onSlidePanelFocusedChildChanged")
 
   ' This must happen after the pane is all set up so that the createNextPanelIndex
   ' event fires for the default menu selection
@@ -24,7 +27,6 @@ Function init()
   m.top.observeField("focusedChild", "onComponentFocusChange")
   m.top.observeField("parentalSettingUpdated", "onSignInInfoChange")
   m.top.observeFieldScoped("itemRequested", "onItemRequested")
-
   m.top.observeFieldScoped("signInInfo", "onSignInInfoChange")
   m.top.observeFieldScoped("uiMode", "onUiModeChange")
 
@@ -75,8 +77,12 @@ Function onSignInInfoChange()
     child = m.PanelSet.getChild(i)
     if child.subtype() = "ParentalControlsPanel"
       createParentalControlsPanel(child)
+    else if child.subtype() = "ContentSettingsAccountsPanel"
+      createContentSettingsAccountsPanel(child)
     else if child.subtype() = "AutoplayPreviewPanel"
       createOrUpdateAutoPlayPreviewPanel(child)
+    else if child.subtype() = "SignOutProfilePanel"
+      createSignOutProfilePanel(child)
     end if
   end for
 End Function
@@ -143,7 +149,12 @@ Function createNextPanel(buttonContent)
 
   if buttonContent <> invalid
     if buttonContent.id = "ParentalControlsButton"
-      nextPanel = createParentalControlsPanel()
+      ' Check if we should show ContentSettingsAccountsPanel instead
+      if shouldShowContentSettingsAccountsPanel()
+        nextPanel = createContentSettingsAccountsPanel()
+      else
+        nextPanel = createParentalControlsPanel()
+      end if
     else if buttonContent.id = "AutoplayPreviewButton"
       nextPanel = createOrUpdateAutoPlayPreviewPanel()
     else if buttonContent.id = "AboutButton"
@@ -155,8 +166,12 @@ Function createNextPanel(buttonContent)
     else if buttonContent.id = "YourPrivacyChoicesButton"
       nextPanel = createLegalPanel(buttonContent.title, m.constants.urls.yourPrivacyChoicesUrl)
     else if buttonContent.id = "SignInOutButton"
-      if isSignedIn() = true
-        nextPanel = createSignOutPanel()
+      if isLoggedInUser() = true
+        if m.isUserInMultiAccount = true
+          nextPanel = createSignOutProfilePanel()
+        else
+          nextPanel = createSignOutPanel()
+        end if
       else
         nextPanel = createSignInPanel()
       end if
@@ -176,21 +191,43 @@ Function isSignedIn()
 End Function
 
 
+Function isKidsProfileSignInInfo()
+  bIsKidsProfile = false
+  signInInfo = m.top.signInInfo
+  if signInInfo <> invalid
+    pcRating = signInInfo.parentalrating
+
+    bIsKidsProfile = ((pcRating <> invalid AND (pcRating < 2 OR pcRating = 4 OR pcRating = 5)) AND isNonEmptyString(signInInfo.parentId) = true)
+  end if
+  return bIsKidsProfile
+End Function
+
+
 Function createParentalControlsPanel(existingPanel = invalid)
   if existingPanel = invalid
     pcPanel = CreateObject("roSGNode", "ParentalControlsPanel")
     pcPanel.observeFieldScoped("audioGuideText", "onAudioGuideTextChanged")
     pcPanel.observeFieldScoped("itemSelected", "onParentalControlsItemSelected")
+    pcPanel.observeFieldScoped("pinUpdateBtnSelected", "onPinUpdateBtnSelected")
   else
     pcPanel = existingPanel
   end if
-
+  pcPanel.isUserInMultiAccount = m.top.isUserInMultiAccount
   pcPanel.width = m.rightPanelWidth
   pcPanel.focusable = true
   pcPanel.hasNextPanel = false
   pcPanel.leftOnly = false
   pcPanel.selectButtonMovesPanelForward = false
   pcPanel.offset = m.rightPanelOffset
+
+  if m.top.isUserInMultiAccount = true
+    if isKidsProfileSignInInfo() = true
+      pcPanel.showPCForKids = true
+      pcPanel.focusable = false
+    else
+      pcPanel.showPCForKids = false
+    end if
+  end if
 
   if isSignedIn() = true
     pcPanel.isLoading = true
@@ -200,6 +237,8 @@ Function createParentalControlsPanel(existingPanel = invalid)
   else
     pcPanel.selectItem = 3 ' default if not signed in
   end if
+
+  pcPanel.showPinLayout = false 'do not show pin layout for control
   return pcPanel
 End Function
 
@@ -347,6 +386,7 @@ Function createSettingsMenuPanel()
   settingsMenuPanel.selectButtonMovesPanelForward = true
   settingsMenuPanel.signInInfo = m.top.signInInfo
   settingsMenuPanel.uiMode = m.top.uiMode
+  settingsMenuPanel.isUserInMultiAccount = m.isUserInMultiAccount
   return settingsMenuPanel
 End Function
 
@@ -472,6 +512,72 @@ Function createSignInPanel()
 
   panel.focusable = false
   panel.offset = m.rightPanelOffset
+  return panel
+End Function
+
+
+Function createSignOutProfilePanel(existingPanel = invalid)
+
+  if existingPanel = invalid
+    panel = CreateObject("roSGNode", "SignOutProfilePanel")
+    panel.observeFieldScoped("signOutSelected", "onSignOutProfilePanelItemSelected")
+  else
+    panel = existingPanel
+  end if
+
+  panel.title = getTranslation("screenSettings_menu_Account")
+  signInInfo = m.top.signInInfo
+
+  sName = ""
+  sEmail = ""
+  sAvatarUrl = ""
+  sInitial = ""
+  sParentalRating = 3
+
+  if signInInfo <> invalid
+    sName = signInInfo.name
+    sEmail = signInInfo.email
+    sAvatarUrl = signInInfo.avatarUrl
+    sInitial = ""
+
+    if isNonEmptyString(signInInfo.name) = true
+      sInitial = signInInfo.name.left(1)
+    end if
+    sParentalRating = signInInfo.parentalRating
+    if signInInfo.linkedAccounts <> invalid
+      panel.linkedAccounts = signInInfo.linkedAccounts
+      panel.linkedAccountsLabel = getTranslation("screenSettings_linked_accounts_label")
+      panel.linkedAccountsDescription = getTranslation("screenSettings_linked_accounts_description")
+    end if
+
+  end if
+  panel.name = sName
+
+  panel.email = sEmail
+  panel.avatarUrl = sAvatarUrl
+
+  panel.description = getTranslation("screenSettings_manage_account_description")
+  panel.manageTitle = getTranslation("screenSettings_manage_account_title")
+
+  if isKidsProfileSignInInfo() = true
+    panel.parentalRating = sParentalRating
+    panel.focusable = false
+    panel.signOutText = ""
+  else
+    panel.focusable = true
+    panel.signOutText = getTranslation("screenSettings_menu_signOut")
+  end if
+
+  panel.activationUrl = "tubi.tv/account"
+  panel.initial = uCase(sInitial)
+
+
+  panel.width = m.rightPanelWidth
+  panel.hasNextPanel = false
+  panel.leftOnly = false
+  panel.selectButtonMovesPanelForward = false
+  panel.offset = m.rightPanelOffset
+
   return panel
 End Function
 
@@ -612,7 +718,33 @@ End Function
 
 Function onParentalControlsItemSelected(msg)
   tubiLog("SettingsScreen.onParentalControlsItemSelected")
+  pcPanel = msg.getRoSGNode()
+  if pcPanel <> invalid
+    m.top.pcChangeRequestId = pcPanel.pcChangeRequestId
+  end if
+
   m.top.parentalSettingSelected = msg.GetData()
+  ' settings page need analytics
+  pageValues = {
+    account_page_type: "PARENTAL"
+  }
+
+  leftSideNavComponent = {
+    left_nav_section: "ACCOUNT"
+  }
+
+  pageOneof = m.Tracking.getAnalyticsPage("account_page", pageValues)
+  componentOneof = m.Tracking.getAnalyticsComponent("left_side_nav_component", leftSideNavComponent)
+  m.top.componentInteractionInfo = {
+    pageOneof: pageOneof
+    componentOneof: componentOneof
+    user_interaction: "CONFIRM"
+  }
+End Function
+
+
+Function onPinUpdateBtnSelected(msg)
+  m.top.pinUpdateBtnSelected = msg.getData()
 End Function
 
 
@@ -642,7 +774,7 @@ End Function
 Function onItemRequested()
   list = m.SettingsMenuPanel.list
   if list <> invalid
-    if list.itemFocused <> invalid
+    if list.itemFocused <> invalid AND list.itemFocused >= 0
       buttonContent = list.content.getChild(list.itemFocused)
 
       if m.top.itemRequested <> invalid AND m.top.itemRequested <> "" AND m.top.itemRequested <> buttonContent.id
@@ -693,4 +825,121 @@ End Function
 Function onDidUserSelectManagePrivacySettingsButton()
   ' since privacy center is dyanmically created we cannot use alias.
   m.top.didUserSelectManagePrivacySettingsButton = true
+End Function
+
+
+Function onSignOutProfilePanelItemSelected(msg)
+  signout = msg.GetData()
+  if signout = true
+    m.top.signOutSelected = true
+  end if
+End Function
+
+
+' Check if we should show the ContentSettingsAccountsPanel
+' Returns true if user is in multi-account mode and has kids accounts
+Function shouldShowContentSettingsAccountsPanel()
+  if m.top.isUserInMultiAccount = true
+    signInInfo = m.top.signInInfo
+    if signInInfo <> invalid AND signInInfo.linkedAccounts <> invalid AND signInInfo.linkedAccounts.count() > 0
+      return true
+    end if
+  end if
+  return false
+End Function
+
+
+' Create the ContentSettingsAccountsPanel
+Function createContentSettingsAccountsPanel(existingPanel = invalid)
+  if existingPanel = invalid
+    accountsPanel = CreateObject("roSGNode", "ContentSettingsAccountsPanel")
+    accountsPanel.observeFieldScoped("audioGuideText", "onAudioGuideTextChanged")
+    accountsPanel.observeFieldScoped("itemFocused", "onCreateLinkedAccountParentalControlsPanel")
+  else
+    accountsPanel = existingPanel
+  end if
+
+  accountsPanel.width = 800
+  accountsPanel.focusable = true
+  accountsPanel.hasNextPanel = false
+  accountsPanel.leftOnly = true
+  accountsPanel.isFullScreen = true
+
+  accountsPanel.createNextPanelOnItemFocus = false
+  accountsPanel.selectButtonMovesPanelForward = true
+  accountsPanel.offset = [36, -100]
+
+  ' Pass signInInfo to the panel
+  if m.top.signInInfo <> invalid
+    accountsPanel.signInInfo = m.top.signInInfo
+  end if
+
+  return accountsPanel
+End Function
+
+
+Function onCreateLinkedAccountParentalControlsPanel(msg)
+  itemFocused = msg.getData()
+
+  if m.panelSet.isGoingBack = false
+
+    parentalControlsPanel = getPanelBySubtype("ParentalControlsPanel")
+
+    if parentalControlsPanel = invalid
+
+      parentalControlsPanel = createParentalControlsPanel()
+
+
+      if parentalControlsPanel <> invalid
+        m.panelSet.appendChild(parentalControlsPanel)
+        parentalControlsPanel.offset = [0, -100]
+        parentalControlsPanel.width = 900
+        parentalControlsPanel.hideDescription = true
+        if m.settingsMenuPanel.signInInfo <> invalid AND m.settingsMenuPanel.signInInfo.linkedAccounts <> invalid
+          parentalControlsPanel.hasPin = m.settingsMenuPanel.signInInfo.hasPin
+        else
+          parentalControlsPanel.hasPin = false
+        end if
+
+
+      end if
+    end if
+
+    if itemFocused <> invalid AND parentalControlsPanel <> invalid
+      parentalControlsPanel.pcChangeRequestId = itemFocused.id
+
+      if itemFocused.isKidsAccount = true
+        parentalControlsPanel.showPCForKids = true
+        parentalControlsPanel.showPinLayout = false
+        linkedAccounts = invalid
+        if m.top.signInInfo <> invalid
+          linkedAccounts = m.top.signInInfo.linkedAccounts
+        end if
+        if linkedAccounts <> invalid
+          for each item in linkedAccounts
+            account = linkedAccounts[item]
+            if item = itemFocused.id
+              parentalControlsPanel.selectItem = account.parentalRating
+              exit for
+            end if
+          end for
+        end if
+
+      else
+        parentalControlsPanel.showPCForKids = false
+        parentalControlsPanel.showPinLayout = true
+        parentalControlsPanel.selectItem = itemFocused.parentalRating
+      end if
+    end if
+
+  end if
+
+End Function
+
+
+Function onSlidePanelFocusedChildChanged(msg)
+  ' TODO:Without this function app is crashing silently sometimes. We might need to inform Roku about this problem.
+  if m.settingsMenuPanel.isInFocusChain() = true AND m.panelSet.leftPanelIndex = 1
+    m.panelSet.goBack = true
+  end if
 End Function

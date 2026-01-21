@@ -254,6 +254,7 @@ Function makeApiRequest(reqInfo, batchInfo = invalid) as Boolean
         isValidAuthInfoAvailable = false
       else
         authInfo = m.auth.getAuthInfo()
+
         ' It is expected that the authInfo should never be invalid when accessed here. It is possible that the token is expired but for simplicity we send the request and when we get the 403 response we will retry after updating the auth info. This allows for a simpler process and more consistent behavior.
         if authInfo <> invalid AND authInfo.accessToken <> invalid AND m.auth.checkIfAuthExpired(authInfo) = false then
 

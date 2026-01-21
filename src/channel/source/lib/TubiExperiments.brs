@@ -136,7 +136,6 @@ Function TubiExperiments(experimentsInfo) as Object
           holdout_winning: { "enabled": false }
         }
       }
-
     }
 
     'public methods

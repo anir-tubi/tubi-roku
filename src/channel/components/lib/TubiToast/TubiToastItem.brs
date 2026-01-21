@@ -47,10 +47,21 @@ Function onShow(_msg)
     createLeftImage(inputArgs)
     imageWidth = m.leftImage.width + 24 ' 72 image width + 24 spacing between image and message
     imageHeight = m.leftImage.height + 72 '36 upper margin + 36 bottom margin
+
+    'a specific toast for profiles
+    if inputArgs.profileInitial <> invalid AND inputArgs.profileInitial <> ""
+      updateLeftImageWithInitial(inputArgs)
+    end if
   else if m.leftImage <> invalid
     m.infoPaneContainer.removeChild(m.leftImage)
     m.leftImage.uri = ""
     m.leftImage = invalid
+
+    if m.leftImageInitial <> invalid
+      m.infoPaneContainer.removeChild(m.leftImageInitial)
+      m.leftImageInitial.text = ""
+      m.leftImageInitial = invalid
+    end if
   end if
 
   'header
@@ -185,4 +196,26 @@ Function createHeaderText(inputArgs)
   if inputArgs.headerColor <> invalid AND inputArgs.headerColor <> ""
     m.header.color = inputArgs.headerColor
   end if
+End Function
+
+
+Function updateLeftImageWithInitial(inputArgs)
+  if m.leftImage <> invalid
+    if m.leftImageInitial = invalid
+      m.leftImageInitial = createObject("roSGNode", "Label")
+
+      typographyConstants = getTypographyConstants()
+      setTypographyOfLabel(m.leftImageInitial, typographyConstants.ids.headerSmall)
+      m.leftImageInitial.text = inputArgs.profileInitial
+      width = m.leftImageInitial.boundingRect().width
+      transX = ((m.leftImage.width - width) / 2) + width
+
+      m.infoPaneContainer.itemSpacings = [-transX, 24] ' negative value to move the initial to the left
+      m.infoPaneContainer.insertChild(m.leftImageInitial, 1)
+    else
+
+      m.leftImageInitial.text = inputArgs.profileInitial
+    end if
+  end if
+
 End Function

@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ - KidsAccountSetupScreen
+ -
+ - Screen for setting up a Tubi Kids account with adult account selection,
+ - kid's name, content settings, and PIN configuration.
+ -
+ -->
+<component name="KidsAccountSetupScreen" extends="BaseScreen">
+
+  <script type="text/brightscript" uri="KidsAccountSetupScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ProfileMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+
+  <interface>
+    <!-- INPUT -->
+    <field id="signInInfo" type="assocarray" />
+    <field id="parentProfile" type="assocarray" />
+
+    <!-- OUTPUT -->
+    <field id="startWatchBtnSeleted" type="boolean" alwaysNotify="true" />
+    <field id="backButtonSelected" type="boolean" alwaysNotify="true" />
+
+  </interface>
+
+  <children>
+
+    <!-- Main Content Layout -->
+    <LayoutGroup
+      id="mainContentGroup"
+      layoutDirection="horiz"
+      horizAlignment="custom"
+      vertAlignment="custom"
+      translation="[192, 180]">
+
+      <!-- Left Side: Form Fields -->
+      <LayoutGroup
+        id="formGroup"
+        translation="[0, 0]"
+        layoutDirection="vert"
+        itemSpacings="[12, 28, 28]">
+
+        <!-- Header Section -->
+        <LayoutGroup
+          id="headerGroup"
+          layoutDirection="vert"
+          itemSpacings="[8]">
+          <Label
+            id="pageHeading"
+            width="1019">
+            <Font
+              role="font" />
+          </Label>
+          <Label
+            id="subHeading"
+            numLines="1"
+            maxLines="1"
+            width="1019">
+            <Font
+              role="font" />
+          </Label>
+        </LayoutGroup>
+
+        <!-- Form Fields Section -->
+        <LayoutGroup
+          id="formFieldsGroup"
+          layoutDirection="vert"
+          itemSpacings="[12, 12, 12, 12]">
+
+          <!-- Adult Account Field -->
+          <Group
+            id="adultAccountGroup">
+            <Rectangle
+              id="adultAccountField"
+              width="580"
+              height="88" />
+            <Label
+              id="adultAccountLabel"
+              translation="[24, 8]"
+              height="28"
+              width="532">
+              <Font
+                role="font" />
+            </Label>
+            <Group
+              id="adultAccountValueGroup"
+              translation="[24, 36]">
+              <ProfileIcon
+                id="adultAccountIcon"
+                width="28"
+                height="28" />
+              <Label
+                id="adultAccountValue"
+                translation="[36, 0]"
+                width="496">
+                <Font
+                  role="font" />
+              </Label>
+            </Group>
+          </Group>
+
+          <!-- Adult Account Description -->
+          <Label
+            id="adultAccountDescription"
+            width="580">
+            <Font
+              role="font" />
+          </Label>
+
+          <!-- Kid's First Name Field -->
+          <Group
+            id="kidFirstNameGroup">
+            <Rectangle
+              id="kidFirstNameField"
+              width="580"
+              height="88" />
+            <Label
+              id="kidFirstNameLabel"
+              translation="[24, 8]"
+              height="28"
+              width="532">
+              <Font
+                role="font" />
+            </Label>
+            <Label
+              id="kidFirstNameValue"
+              translation="[24, 36]"
+              width="532">
+              <Font
+                role="font" />
+            </Label>
+          </Group>
+
+          <!-- Content Setting and PIN Row -->
+          <LayoutGroup
+            id="contentSettingPinRow"
+            layoutDirection="horiz"
+            itemSpacings="[8]">
+            <!-- Content Setting Field -->
+            <Group
+              id="contentSettingGroup">
+              <Rectangle
+                id="contentSettingField"
+                width="376"
+                height="88" />
+              <Label
+                id="contentSettingLabel"
+                translation="[24, 8]"
+                height="28"
+                width="328">
+                <Font
+                  role="font" />
+              </Label>
+              <Label
+                id="contentSettingValue"
+                translation="[24, 36]"
+                width="328">
+                <Font
+                  role="font" />
+              </Label>
+            </Group>
+
+            <!-- PIN Field -->
+            <Group
+              id="pinGroup">
+              <Rectangle
+                id="pinField"
+                width="196"
+                height="88" />
+              <Label
+                id="pinLabel"
+                translation="[24, 8]"
+                height="28"
+                width="148">
+                <Font
+                  role="font" />
+              </Label>
+              <Label
+                id="digitLabel"
+                translation="[24, 36]"
+                width="196">
+                <Font
+                  role="font" />
+              </Label>
+            </Group>
+          </LayoutGroup>
+
+          <!-- PIN Description -->
+          <Label
+            id="pinDescription"
+            width="580">
+            <Font
+              role="font" />
+          </Label>
+        </LayoutGroup>
+
+        <!-- Terms and Privacy Text -->
+        <Label
+          id="termsText"
+          numLines="2"
+          maxLines="2"
+          wrap="true"
+          height="100"
+          width="580">
+          <Font
+            role="font" />
+        </Label>
+
+        <!-- Start Watching Button -->
+        <SimpleButton
+          id="startWatchingButton"
+          width="580"
+          height="72" />
+
+      </LayoutGroup>
+
+      <!-- Right Side: Profile Preview -->
+      <LayoutGroup
+        id="profilePreviewGroup"
+        layoutDirection="vert"
+        itemSpacings="[16]"
+        translation="[1196, 360]"
+        horizAlignment="left"
+        vertAlignment="center">
+        <!-- Large Avatar -->
+        <MarkupGrid
+          id="ProfileMenu"
+          itemSize="[300, 420]"
+          itemSpacing="[50, 0]"
+          rowHeights="[300]"
+          columnWidths="[300]"
+          columnSpacings="[100]"
+          numColumns="1"
+          numRows="1"
+          focusable="false"
+          drawFocusFeedbackOnTop="false"
+          itemComponentName="ProfileMenuItem" />
+      </LayoutGroup>
+    </LayoutGroup>
+  </children>
+</component>

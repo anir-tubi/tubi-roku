@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="AgeSelectionListItem" extends="Group">
+  <script type="text/brightscript" uri="AgeSelectionListItem.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+
+  <interface>
+    <field id="itemContent" type="node" />
+  </interface>
+
+  <children>
+    <Poster
+      id="PosterBackground"
+      uri="pkg:/images/poster-mask.png"
+      translation="[0,0]"
+      width="356"
+      height="576" />
+
+    <LayoutGroup
+      id="AgeSelectionListItemGroup"
+      layoutDirection="vert"
+      itemSpacings="[4,36,36, 16]"
+      horizAlignment="center"
+      vertAlignment="center"
+      translation="[178,288]">
+      <Label
+        id="AgeRatingLabel"
+        horizAlign="center"
+        width="356">
+        <Font
+          role="font" />
+      </Label>
+      <Label
+        id="AgeRange"
+        horizAlign="center"
+        width="356">
+        <Font
+          role="font" />
+      </Label>
+      <Poster
+        id="KidsModePoster"
+        width="225"
+        height="210" />
+
+      <Label
+        id="IncludedUpToLabel"
+        horizAlign="center"
+        width="356">
+        <Font
+          role="font" />
+      </Label>
+      <LayoutGroup
+        id="RatingsBadgeGroup"
+        layoutDirection="horiz"
+        horizAlignment="center"
+        vertAlignment="center"
+        itemSpacings="[12]">
+        <Badge
+          id="RatingsBadge1" />
+        <Badge
+          id="RatingsBadge2" />
+      </LayoutGroup>
+
+    </LayoutGroup>
+  </children>
+</component>

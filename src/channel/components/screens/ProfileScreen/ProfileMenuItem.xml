@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="ProfileMenuItem" extends="Group">
+
+  <script type="text/brightscript" uri="ProfileMenuItem.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+
+
+  <interface>
+    <!-- INPUTS -->
+    <field id="itemContent" type="node" />
+
+    <!-- OUTPUTS -->
+  </interface>
+
+  <children>
+    <LayoutGroup
+      id="textGroup"
+      layoutDirection="vert"
+      horizAlignment="center"
+      itemspacings="[42,6]"
+      translation="[120,20]">
+
+      <Poster
+        id="MenuItemIcon"
+        height="201"
+        width="201" />
+      <LayoutGroup
+        id="BottomItemTextGroup"
+        layoutDirection="horiz"
+        itemspacings="[8]">
+        <Label
+          id="BottomItemText"
+          horizAlign="center"
+          width="200">
+          <Font
+            role="font" />
+        </Label>
+      </LayoutGroup>
+    </LayoutGroup>
+
+
+    <Label
+      id="MenuItemText">
+      <Font
+        role="font" />
+    </Label>
+  </children>
+</component>

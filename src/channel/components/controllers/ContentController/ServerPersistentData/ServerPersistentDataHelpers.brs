@@ -3,6 +3,7 @@ Function getServerPersistentData(onGetServerPersistentDataCompletionCallback = i
   isUserSigedIn = isLoggedInUser()
 
   if isUserSigedIn = true
+
     batchRequests = m.userDeviceApi.createUserAndDeviceSettingsBatchRequests()
     ' Makes a network request to both user and device settings if user loggedIn
     m.makeBatchRequest({
@@ -11,6 +12,7 @@ Function getServerPersistentData(onGetServerPersistentDataCompletionCallback = i
       errorCallback: onGetServerPersistentDataError
       responseType: "assocarray"
     })
+
   else
     requestInfo = m.userDeviceApi.createDeviceSettingsReqInfo()
     ' Makes a network request to device settings if user not logged in.
@@ -24,6 +26,25 @@ Function getServerPersistentData(onGetServerPersistentDataCompletionCallback = i
     })
   end if
 
+End Function
+
+
+Function refreshUserServerPersistentData(onGetServerPersistentDataCompletionCallback = invalid)
+
+  m.onGetServerPersistentDataCompletionCallback = onGetServerPersistentDataCompletionCallback
+  isUserSigedIn = isLoggedInUser()
+
+  if isUserSigedIn = true
+    requestInfo = m.userDeviceApi.createUserSettingsReqInfo()
+    m.makeRequest({
+      url: requestInfo.url
+      options: requestInfo.options
+      responseType: "assocarray"
+      requestType: m.constants.reqNames.getServerPersistentData
+      successCallback: onGetServerPersistentDataComplete
+      errorCallback: onGetServerPersistentDataError
+    })
+  end if
 End Function
 
 
@@ -95,6 +116,7 @@ Function saveServerPersistentData(serverPersistentData, saveInto = "")
       requestInfo = m.userDeviceApi.createPatchDeviceSettingsReqInfo(mappedPersistentData)
     end if
 
+
     m.makeRequest({
       url: requestInfo.url
       requestType: m.constants.reqNames.patchServerPersistentData
@@ -133,6 +155,8 @@ Function saveLocalServerPersistentData(newServerPersistentData)
   ' We are adding checks both during save and using the backend response to cover a use case if
   ' someone carries the device to GDPR country we do not use their settings from US.
   serverPersistentDataKeys = m.constants.serverPersistentDataKeys
+  updatedRegistryData = {}
+  updatedKidsData = []
   persistentDataKeyConsentKeyMapping = m.constants.persistentDataKeyConsentKeyMapping
 
   for i = 0 to newServerPersistentData.count() - 1
@@ -146,9 +170,67 @@ Function saveLocalServerPersistentData(newServerPersistentData)
           m.pub_serverPersistentData[key] = entries[key]
         end if
       end if
+
+      if m.constants.serverPersistentRegistryKeys[key] <> invalid
+
+        if key = "avatarurl"
+          urls = entries[key]
+          if urls.medium <> invalid AND urls.medium["2x"] <> invalid
+            updatedRegistryData[key] = urls.medium["2x"]
+          end if
+        else if key = "kids"
+          for each kid in entries[key]
+            kidProfile = m.tubiAuthUpdate.getProfileAuthInfo(kid.tubi_id)
+            if kidProfile.tubiId = invalid 'just to check if kid profile is already created
+              updatedKidsData.push(kid)
+            end if
+          end for
+        else
+          updatedRegistryData[key] = entries[key]
+        end if
+
+      end if
+
     end for
   end for
 
+  if isUserInMultiAccount() = true
+    if updatedRegistryData.count() > 0
+      regTubiId = updatedRegistryData.tubiId
+      if m.tubiAuthUpdate.getProfileAuthInfo(regTubiId).count() > 0
+        m.tubiAuthUpdate.createOrUpdateProfileAuth(regTubiId, updatedRegistryData)
+      end if
+    end if
+
+    if updatedKidsData.count() > 0
+      for each kid in updatedKidsData
+        kidFormattedData = m.tubiAuthUpdate.formatAuthInfoFromServer(kid)
+        'since this is a kid account, we need to set hasage to true since we know that kids are always < 13
+        kidFormattedData.hasAge = "true"
+        m.tubiAuthUpdate.createOrUpdateProfileAuth(kidFormattedData.tubiId, kidFormattedData)
+      end for
+    end if
+  end if
+
+
   m.pubSub.publish("pub_serverPersistentData", m.pub_serverPersistentData)
+
+End Function
+
+
+Function resetUserServerPersistentData()
+  resetValues = {
+    "subtitleTrack": {},
+    "audioTrack": {},
+    "isVideoPreviewOn": true
+    "isAutoPlayTimerOn": true
+    "isLikeToastNotificationShown": false
+    "isDisLikeToastNotificationShown": false
+    "email": ""
+    "parentalRating": 3
+    "hasPassword": false
+    "birthday": ""
+  }
+  saveLocalServerPersistentData([resetValues])
 
 End Function

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ - TabButton
+ - Individual tab button component used within TabButtons MarkupList
+ -->
+<component name="TabButton" extends="Group">
+  <script type="text/brightscript" uri="TabButton.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!-- INPUT -->
+    <field id="itemContent" type="node" />
+    <field id="focusPercent" type="float" />
+    <field id="gridHasFocus" type="boolean" />
+    <field id="itemHasFocus" type="boolean" />
+  </interface>
+
+  <children>
+    <Label
+      id="tabLabelUnfocused"
+      width="322"
+      height="60"
+      horizAlign="center"
+      vertAlign="center">
+      <Font
+        role="font" />
+    </Label>
+
+    <Label
+      id="tabLabelFocused"
+      width="322"
+      height="60"
+      opacity="0.0"
+      horizAlign="center"
+      vertAlign="center">
+      <Font
+        role="font" />
+    </Label>
+
+  </children>
+</component>

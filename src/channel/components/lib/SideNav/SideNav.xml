@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 
 <!--
  - SideNav Group
@@ -22,72 +22,88 @@
 
   <interface>
     <!-- INPUTS -->
-      <field id="width" type="float"/>
+    <field id="width" type="float" />
 
-      <field id="opened" value="false" type="boolean"/>
+    <field id="opened" value="false" type="boolean" />
 
-      <!-- Should the sideNav display the Sign In menu item? -->
-      <field id="displaySignIn" value="true" type="boolean"/>
+    <!-- Should the sideNav display the Sign In menu item? -->
+    <field id="displaySignIn" value="true" type="boolean" />
 
-      <!-- Should the sideNav display the Sign In menu item? -->
-      <field id="displayKids" value="true" type="boolean"/>
+    <!-- Should the sideNav display the Sign In menu item? -->
+    <field id="displayKids" value="true" type="boolean" />
 
-      <!-- Should the sideNav display the Espanol menu item? -->
-      <field id="displayEspanol" value="true" type="boolean"/>
+    <!-- Should the sideNav display the Espanol menu item? -->
+    <field id="displayEspanol" value="true" type="boolean" />
 
-      <!-- The following are the strings associated with this UI element that is changed from the helper/controller file -->
-      <field id="stringSignIn" type="string"/>
+    <!-- The following are the strings associated with this UI element that is changed from the
+    helper/controller file -->
+    <field id="stringSignIn" type="string" alwaysNotify="true" />
 
-      <!-- Setting to false grays out the espanol item making it unselectable -->
-      <field id="espanolItemTurnedOn" type="boolean" value="true"/>
+    <!-- Setting to false grays out the espanol item making it unselectable -->
+    <field id="espanolItemTurnedOn" type="boolean" value="true" />
 
-      <!-- Setting to false grays out the live tv item making it unselectable -->
-      <field id="linearEPGItemTurnedOn" type="boolean" value="true"/>
+    <!-- Setting to false grays out the live tv item making it unselectable -->
+    <field id="linearEPGItemTurnedOn" type="boolean" value="true" />
 
-      <!-- Setting to false grays out the kids item making it unselectable -->
-      <field id="kidsItemTurnedOn" value="true" type="boolean"/>
+    <!-- Setting to false grays out the kids item making it unselectable -->
+    <field id="kidsItemTurnedOn" value="true" type="boolean" />
 
-      <!-- Allowed values are those in constants.ui.modes -->
-      <field id="uiMode" type="string"/>
+    <!-- Allowed values are those in constants.ui.modes -->
+    <field id="uiMode" type="string" />
 
-      <!--The id of one of the menu items. If the menu item exists and is selectable, then itemSelected will be updated. -->
-      <field id="itemRequested" type="string" alwaysNotify="true"/>
+    <!--The
+    id of one of the menu items. If the menu item exists and is selectable, then itemSelected will
+    be updated. -->
+    <field id="itemRequested" type="string" alwaysNotify="true" />
 
-      <field id="selectedItemRequested" type="string" alwaysNotify="true"/>
+    <field id="selectedItemRequested" type="string" alwaysNotify="true" />
 
-      <!-- createMenuItems is used to create menu items on side nav, invoked from controller  -->
-      <field id="createMenuItems" type="boolean"/>
+    <!-- createMenuItems is used to create menu items on side nav, invoked from controller  -->
+    <field id="createMenuItems" type="boolean" />
 
+    <field id="profileSelectionMenuVisible"
+      alias="ProfileSelectionMenu.visible, ProfileSelectionMenuBgTop.visible , ProfileSelectionMenuBgBotton.visible" />
+
+    <field id="profileSelectionMenuContent" type="node" />
+
+    <!-- this field is used when user is in multi account experiment-->
+    <field id="isUserInMultiAccount" type="boolean" />
+
+    <field id="profileUrl" type="string" />
 
     <!-- OUTPUT -->
-      <!-- The sideNavContentNode for the side nav menu item that was selected. This field should not be observed, as
-      the contents of the node can change frequently, even if the node itself remains the same. It can be checked for the
+    <!-- The sideNavContentNode for the side nav menu item that was selected. This field should not
+    be observed, as
+      the contents of the node can change frequently, even if the node itself remains the same. It can be
+    checked for the
       current state of the node. -->
-      <field id="itemSelected" type="node"/>
+    <field id="itemSelected" type="node" />
 
-      <!-- The id of the menu item that was selected -->
-      <field id="itemSelectedId" type="string" alwaysNotify="true"/>
+    <!-- The id of the menu item that was selected -->
+    <field id="itemSelectedId" type="string" alwaysNotify="true" />
 
-      <!-- The id of the menu item that is associated with a screen that is currently active/visible. -->
-      <field id="itemCurrentId" type="string" alwaysNotify="true"/>
+    <!-- The id of the menu item that is associated with a screen that is currently active/visible. -->
+    <field id="itemCurrentId" type="string" alwaysNotify="true" />
 
-      <!-- The focused position of the current menu list. -->
-      <field id="focusedPosition" type="integer"/>
+    <!-- The focused position of the current menu list. -->
+    <field id="focusedPosition" type="integer" />
 
-      <!-- Holds the information needed to populate a navigate_within_page event. This will
+    <!-- Holds the information needed to populate a navigate_within_page event. This will
            be observed by the SideNavHelper, which will subsequently pass it to the contentController
            which will be responsible for sending navigate_within_page events.
            See tubiTracking_getAnalyticsEvent for the format of the navigate_within_page AA
       -->
-      <field id="navigateWithinPageInfo" type="assocarray" />
+    <field id="navigateWithinPageInfo" type="assocarray" />
+
+    <field id="profileSelected" type="string" alwaysNotify="true" />
 
   </interface>
 
   <children>
     <LayoutGroup
-        id="itemGroups"
-        layoutDirection="vert"
-        itemSpacings="[1]">
+      id="itemGroups"
+      layoutDirection="vert"
+      itemSpacings="[1]">
 
       <Group>
         <Poster
@@ -103,11 +119,33 @@
           focusBitmapUri="pkg:/images/menu-focus-$$RES$$.9.png"
           drawFocusFeedbackOnTop="false"
           itemComponentName="SideNavIconComponent">
-          <ContentNode id="MainContent" role="content" >
+          <ContentNode id="MainContent" role="content">
           </ContentNode>
         </MarkupGrid>
       </Group>
 
     </LayoutGroup>
+    <Poster
+      id="ProfileSelectionMenuBgBottom"
+      visible="false"
+      uri="pkg:/images/menu-focus-$$RES$$.9.png" />
+    <Poster
+      id="ProfileSelectionMenuBgTop"
+      visible="false"
+      uri="pkg:/images/menu-focus-$$RES$$.9.png" />
+    <MarkupGrid
+      id="ProfileSelectionMenu"
+      translation="[33,81]"
+      itemSize="[438, 100]"
+      drawFocusFeedbackOnTop="false"
+      itemComponentName="ProfileSideNavItem"
+      focusFootprintBitmapUri="pkg:/images/transparent.png"
+      focusBitmapUri="pkg:/images/menu-focus-$$RES$$.9.png"
+      itemSpacing="[0,0]"
+      numRows="8"
+      numColumns="1"
+      visible="false"
+      vertFocusAnimationStyle="floatingFocus" />
+
   </children>
 </component>

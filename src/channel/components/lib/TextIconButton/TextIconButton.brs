@@ -35,6 +35,12 @@ Function drawButton()
     m.ButtonIcon.uri = uri
   end if
 
+  if m.top.bgUri <> invalid AND m.top.bgUri <> ""
+    m.ButtonBG.uri = m.top.bgUri
+  else
+    m.ButtonBG.uri = "pkg:/images/pill_top_nav_$$RES$$.9.png"
+  end if
+
   if m.top.alwaysShowLabel = true
     m.ButtonBG.width = calculateButtonWidth()
   else

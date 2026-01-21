@@ -7,6 +7,9 @@
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ProfileMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ProfileMixinGenPurpose.brs" />
+
 
   <interface>
     <!-- INPUTS -->
@@ -48,6 +51,7 @@
     in teens parental controls.  -->
     <field id="isAllowedToManageConsent" type="boolean" value="false" />
 
+    <field id="isUserInMultiAccount" type="boolean" value="false" alwaysNotify="true" />
     <!-- Holds the Statsig experiments data fetched from API  -->
     <field id="statsigExperiments" type="assocarray" alwaysNotify="true" />
 
@@ -63,6 +67,8 @@
     if logged in -->
     <field id="fetchUserSettings" type="boolean" alwaysNotify="true" />
     <field id="parentalSettingSelected" type="integer" alwaysNotify="true" />
+    <!-- Used to store the tubiID of the account which is being changed for the parental controls -->
+    <field id="pcChangeRequestId" type="string" />
     <field id="autoPreviewSettingSelected" type="integer" alwaysNotify="true" />
     <field id="autoPlayTimerSettingSelected" type="integer" alwaysNotify="true" />
     <!-- Holds all the draft or unsaved changes to consents. ex: {"essential_functionality":
@@ -78,6 +84,8 @@
     <!-- Holds the true/false based on if the user selected manage privacy settings button.  -->
     <field id="didUserSelectManagePrivacySettingsButton" type="boolean" alwaysNotify="true" />
 
+    <!-- Holds the true/false based on if the user selected pin button.  -->
+    <field id="pinUpdateBtnSelected" type="boolean" alwaysNotify="true" />
     <!-- Trigger to fetch Statsig experiments  -->
     <field id="fetchStatsigExperiments" type="boolean" alwaysNotify="true" />
 

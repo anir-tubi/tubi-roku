@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="ContentSettingCheckButton" extends="CheckButton">
+  <script type="text/brightscript" uri="ContentSettingCheckButton.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/Badge/Badge.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+</component>

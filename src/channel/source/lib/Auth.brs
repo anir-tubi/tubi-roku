@@ -1,6 +1,7 @@
 ' TubiAuth provides a read only way to access auth info
 '@constants: assocArray, the constants object returned from getConstants()
-Function TubiAuth(constants)
+'@profileId: string, optional profile ID for multi-profile support (defaults to legacy single-user)
+Function TubiAuth(constants, profileId = invalid)
   authRegSection = "auth"
   if constants <> invalid AND constants.settings.stagingApis = true then
     authRegSection = "auth_staging"
@@ -9,12 +10,17 @@ Function TubiAuth(constants)
   return {
     authRegSection: authRegSection
     constants: constants
+    profileId: profileId
 
     'public methods
     getAuthInfoNoUpdate: tubiAuth_getAuthInfoNoUpdate
     getAuthInfo: tubiAuth_getAuthInfoNoUpdate ' Duplicated to allow easier migration
     checkIfAuthExpired: tubiAuth_checkIfAuthExpired
     getAuthHeaders: tubiAuth_getAuthHeaders
+
+    'profile-aware methods
+    getProfileAuthInfo: tubiAuth_getProfileAuthInfo
+    getAllProfilesAuthInfo: tubiAuth_getAllProfilesAuthInfo
 
     'private methods
     regRead: tubiAuth_regRead
@@ -25,27 +31,36 @@ End Function
 
 ' TubiAuthUpdate provides all the capabilities of TubiAuth and adds ability to update auth
 '@constants: assocArray, the constants object returned from getConstants()
-Function TubiAuthUpdate(constants)
+'@profileId: string, optional profile ID for multi-profile support (defaults to legacy single-user)
+Function TubiAuthUpdate(constants, profileId = invalid)
   ' Verify we are being called from a controller
   if m.generalTask = invalid then
     tubiLog("TubiAuthUpdate() must be called from a controller", "error")
     return invalid
   end if
 
-  module = TubiAuth(constants)
+  module = TubiAuth(constants, profileId)
   module.append({
     ' controllerCallbackIds
     callbackForLogout: invalid
     callBackForInitOrUpdateAuthInfo: invalid
     callBackForTransferRefreshToken: invalid
+    callBackForSwitchToProfile: invalid
 
     ' public methods
     initOrUpdateAuthInfo: tubiAuth_initOrUpdateAuthInfo
     setAuthInfo: tubiAuth_setAuthInfo
     logout: tubiAuth_logout ' Should only be called internally or by logout() in shared.brs
+    logOutProfile: tubiAuth_logOutProfile
+    logOutCurrentProfile: tubiAuth_logOutCurrentProfile
     updateAuthInfoWithAge: tubiAuth_updateAuthInfoWithAge
     transferRefreshToken: tubiAuth_transferRefreshToken
     handleRegistration: tubiAuth_handleRegistration
+
+    ' profile-aware methods
+    createOrUpdateProfileAuth: tubiAuth_createOrUpdateProfileAuth
+    deleteProfileAuth: tubiAuth_deleteProfileAuth
+    copyProfileToMainAuth: tubiAuth_copyProfileToMainAuth
 
     'private methods
     saveAuthInfo: tubiAuth_saveAuthInfo
@@ -187,6 +202,13 @@ Function tubiAuth_setAuthInfo(key, value)
       refreshtoken: true
       secretkey: true
       userid: true
+      useruuid: true
+      avatarurl: true
+      haspin: true
+      tubiid: true
+      email: true
+      parentid: true
+      parentalrating: true
     }
 
     correctlyCasedKey = invalid
@@ -200,7 +222,7 @@ Function tubiAuth_setAuthInfo(key, value)
 
     if correctlyCasedKey <> invalid then
       sec = createObject("roRegistrySection", m.authRegSection)
-      sec.write(correctlyCasedKey, value)
+      sec.write(LCase(correctlyCasedKey), value)
       sec.flush() ' commit it
     else
       tubiLog("Key " + key + " is not a valid auth registry value", "warn")
@@ -399,6 +421,12 @@ Function tubiAuth_handleAnonymousTokenResponse(response)
     end if
   end if
 
+  ' create a new guest profile to store the auth info
+  currentAuth = m.getAuthInfoNoUpdate()
+  if currentAuth.count() > 0
+    m.createOrUpdateProfileAuth("guest", currentAuth)
+  end if
+
   ' We want to always call the callback so we don't get stuck waiting indefinitely
   controllerCallbackId = response.responseContext.controllerCallbackId
   callback = m[controllerCallbackId]
@@ -430,6 +458,7 @@ Function tubiAuth_handleAnonymousRefreshTokenResponse(response)
       if newAuthInfo <> invalid
         ' handling the succesful token refresh
         m.saveAuthInfo(newAuthInfo, true)
+
       else
         ' Since the refresh token call failed.
         ' This else part is triggered because backend HTTP code was not 401 or 403.
@@ -462,9 +491,22 @@ End Function
 '  hasAge: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
 '}
 '@serverAuthInfo: assocArray of auth info as received from the server
-Function tubiAuth_handleRegistration(serverAuthInfo)
+Function tubiAuth_handleRegistration(serverAuthInfo, alsoSaveToProfileAuth = false)
   authInfo = m.formatAuthInfoFromServer(serverAuthInfo)
   m.saveAuthInfo(authInfo)
+  if alsoSaveToProfileAuth = true
+    profileId = authInfo.tubiId
+    m.createOrUpdateProfileAuth(profileId, authInfo)
+    'if there are kids, save the kids profile as well
+    if serverAuthInfo.kids <> invalid
+      for each kid in serverAuthInfo.kids
+        kidAuthInfo = m.formatAuthInfoFromServer(kid)
+        'since this is a kid account, we need to set hasage to true since we know that kids are always < 13
+        kidAuthInfo.hasAge = "true"
+        m.createOrUpdateProfileAuth(kidAuthInfo.tubiId, kidAuthInfo)
+      end for
+    end if
+  end if
 End Function
 
 
@@ -504,9 +546,19 @@ Function tubiAuth_transferRefreshToken(externalAuthInfo, callback)
   controllerCallbackId = "callBackForTransferRefreshToken"
   m[controllerCallbackId] = callback
 
-  m.makeRequest(requestInfo, "handleTransferRefreshResponse", controllerCallbackId, {
-    "userId": externalAuthInfo.userId
-  })
+  if externalAuthInfo.isUserInMultiAccount = true
+    responseContext = {
+      "userId": externalAuthInfo.userId
+      "tubiId": externalAuthInfo.tubiId
+      "isUserInMultiAccount": true
+    }
+  else
+    responseContext = {
+      "userId": externalAuthInfo.userId
+      "isUserInMultiAccount": false
+    }
+  end if
+  m.makeRequest(requestInfo, "handleTransferRefreshResponse", controllerCallbackId, responseContext)
 End Function
 
 
@@ -540,6 +592,10 @@ Function tubiAuth_updateAuthInfoWithAge(hasAge)
       ' presence of userId indicates the user is logged in.
       ' Only save hasAge for a logged in user.
       m.setAuthInfo("hasage", hasAge.toStr())
+      'Update the profile auth info if it exists.
+      if authInfo.tubiId <> invalid AND m.getProfileAuthInfo(authInfo.tubiId).count() > 0 then
+        m.createOrUpdateProfileAuth(authInfo.tubiId, { "hasAge": hasAge.toStr() })
+      end if
     end if
   end if
 End Function
@@ -589,6 +645,10 @@ End Function
 Function tubiAuth_logout(callback = invalid)
   controllerCallbackId = "callbackForLogout"
   m[controllerCallbackId] = callback
+  profileId = m.getAuthInfoNoUpdate().tubiId
+  if profileId <> invalid
+    m.logOutProfile(profileId)
+  end if
   m.deleteAuthInfo()
   m.fetchAndSaveAnonymousAuthInfo(controllerCallbackId)
 End Function
@@ -598,6 +658,37 @@ Function tubiAuth_deleteAuthInfo()
   authSection = CreateObject("roRegistry")
   authSection.delete(m.authRegSection)
   authSection.flush()
+End Function
+
+
+Function tubiAuth_logOutCurrentProfile(callback = invalid)
+  authInfo = m.getAuthInfoNoUpdate()
+  profileId = authInfo.tubiId
+  m.logOutProfile(profileId, callback)
+End Function
+
+
+Function tubiAuth_logOutProfile(profileId, callback = invalid)
+  if callback <> invalid
+    controllerCallbackId = "callbackForLogout"
+    m[controllerCallbackId] = callback
+  end if
+
+  if profileId = invalid
+    authInfo = m.getAuthInfoNoUpdate()
+    profileId = authInfo.tubiId
+  end if
+  ' while signing out the parent, delete all the kids accounts asscoiated
+  profiles = m.getAllProfilesAuthInfo()
+  for each id in profiles
+    kidProfile = profiles[id]
+    if kidProfile.parentId = profileId
+      m.deleteProfileAuth(kidProfile.tubiId)
+    end if
+  end for
+
+  m.deleteProfileAuth(profileId)
+  'm.deleteAuthInfo() 'TODO: uncomment after testing for edge cases where we logout and there are requests in queue etc.
 End Function
 
 
@@ -728,7 +819,11 @@ Function tubiAuth_handleRefreshResponse(response, isTransferRefreshResponse = fa
       callback = m[controllerCallbackId]
       if callback <> invalid then
         m[controllerCallbackId] = invalid
-        m.logout(callback)
+        if isTransferRefreshResponse = false then
+          m.logout(callback)
+        else
+          callback()
+        end if
       end if
     else
       newAuthInfo = m.updateAuthInfo(response.data)
@@ -738,9 +833,21 @@ Function tubiAuth_handleRefreshResponse(response, isTransferRefreshResponse = fa
           ' Transfer refresh does not have the userId in the response so we have to add from the info passed in from mobile
           newAuthInfo.userId = response.responseContext.userId
           newAuthInfo.authType = "MOBILE_APP"
+          if response.responseContext.isUserInMultiAccount = true then
+            newAuthInfo.tubiId = response.responseContext.tubiId
+            'create the profile with authInfo here since user is in multi account experiment and we need to add
+            ' the profile, so new user is created.
+            m.createOrUpdateProfileAuth(newAuthInfo.tubiId, newAuthInfo)
+          end if
         end if
 
         m.saveAuthInfo(newAuthInfo, true)
+        ' also update the profile auth Info if it exists. We do not want to just update the
+        ' profile auth info if it does not exist, which will create a new profile with the authInfo, if user is not in multi account experiment.
+        currentAuth = m.getAuthInfoNoUpdate()
+        if currentAuth.tubiId <> invalid AND m.getProfileAuthInfo(currentAuth.tubiId).count() > 0 then
+          m.createOrUpdateProfileAuth(currentAuth.tubiId, currentAuth)
+        end if
       else
         ' Since the refresh token call failed.
         ' This else part is triggered because backend HTTP code was not 401 or 403.
@@ -785,6 +892,11 @@ Function tubiAuth_formatAuthInfoFromServer(serverAuthInfo)
   if serverAuthInfo.authType <> invalid then authInfo.authType = serverAuthInfo.authType
   if serverAuthInfo.has_age <> invalid then authInfo.hasAge = serverAuthInfo.has_age.toStr()
   if serverAuthInfo.user_uuid <> invalid then authInfo.userUuid = serverAuthInfo.user_uuid
+  if serverAuthInfo.has_pin <> invalid then authInfo.hasPin = serverAuthInfo.has_pin.toStr()
+  if serverAuthInfo.tubi_id <> invalid then authInfo.tubiId = serverAuthInfo.tubi_id.toStr()
+  if serverAuthInfo.email <> invalid then authInfo.email = serverAuthInfo.email
+  if serverAuthInfo.parent_tubi_id <> invalid then authInfo.parentId = serverAuthInfo.parent_tubi_id.toStr()
+  if serverAuthInfo.parental_rating <> invalid then authInfo.parentalRating = serverAuthInfo.parental_rating.toStr()
 
   authInfo.firstName = ""
   if serverAuthInfo.first_name <> invalid
@@ -799,6 +911,11 @@ Function tubiAuth_formatAuthInfoFromServer(serverAuthInfo)
   authInfo.name = ""
   if serverAuthInfo.name <> invalid
     authInfo.name = serverAuthInfo.name
+  end if
+
+  authInfo.avatarUrl = ""
+  if serverAuthInfo.avatar_url <> invalid AND serverAuthInfo.avatar_url.medium <> invalid AND serverAuthInfo.avatar_url.medium["2x"] <> invalid
+    authInfo.avatarUrl = serverAuthInfo.avatar_url.medium["2x"]
   end if
 
   return authInfo
@@ -1132,4 +1249,118 @@ Function tubiAuthGeneralTaskRequestCallback(response)
       tubiLog("tubiAuthGeneralTaskRequestCallback: responseContext.callbackName is invalid", "warn")
     end if
   end if
+End Function
+
+
+' ===== PROFILE-AWARE AUTH FUNCTIONS =====
+
+' Get auth info for a specific profile
+' @profileId: string, the profile ID to get auth info for
+Function tubiAuth_getProfileAuthInfo(profileId)
+  if profileId = invalid OR profileId = ""
+    return m.getAuthInfoNoUpdate()
+  end if
+
+  profileAuthSection = "auth"
+  if m.constants <> invalid AND m.constants.settings.stagingApis = true then
+    profileAuthSection = "auth_staging"
+  end if
+  profileAuthSection = profileAuthSection + "__" + profileId
+
+  return m.regReadAll(profileAuthSection)
+
+End Function
+
+
+' Get auth info for all profiles
+' @returns: assocArray with profile IDs as keys and auth info as values
+Function tubiAuth_getAllProfilesAuthInfo()
+  allProfiles = {}
+  registry = CreateObject("roRegistry")
+  sections = registry.getSectionList()
+
+  authPrefix = "auth"
+  if m.constants <> invalid AND m.constants.settings.stagingApis = true then
+    authPrefix = "auth_staging"
+  end if
+
+  for each section in sections
+    if section.InStr(authPrefix + "__") = 0
+      profileId = section.Replace(authPrefix + "__", "")
+      if profileId <> ""
+        allProfiles[profileId] = m.regReadAll(section)
+      end if
+    end if
+  end for
+
+  return allProfiles
+End Function
+
+
+' Create auth info for a new profile (TubiAuthUpdate only)
+' NOTE: ONLY SEND FORMATED DATA FOR REGISTRY AS PER REGISTRY KEYS specified in formatAuthInfoFromServer
+' @profileId: string, the profile ID to create
+' @authInfo: assocArray, the auth info to save for this profile
+Function tubiAuth_createOrUpdateProfileAuth(profileId, authInfo)
+  if profileId <> invalid AND profileId <> "" AND authInfo <> invalid
+
+    profileAuthSection = "auth"
+    if m.constants <> invalid AND m.constants.settings.stagingApis = true
+      profileAuthSection = "auth_staging"
+    end if
+
+    profileAuthSection = profileAuthSection + "__" + profileId
+
+    ' Save auth info to profile-specific registry section
+    sec = CreateObject("roRegistrySection", profileAuthSection)
+    for each key in authInfo
+      if authInfo[key] <> invalid
+        sec.write(LCase(key), authInfo[key].toStr())
+      end if
+
+    end for
+
+    sec.flush()
+  end if
+End Function
+
+
+' Delete auth info for a profile (TubiAuthUpdate only)
+' @profileId: string, the profile ID to delete
+Function tubiAuth_deleteProfileAuth(profileId)
+  if profileId = invalid OR profileId = ""
+    tubiLog("tubiAuth_deleteProfileAuth: Invalid profile ID", "error")
+    return false
+  end if
+
+  profileAuthSection = "auth"
+  if m.constants <> invalid AND m.constants.settings.stagingApis = true then
+    profileAuthSection = "auth_staging"
+  end if
+  profileAuthSection = profileAuthSection + "__" + profileId
+
+  authSection = CreateObject("roRegistry")
+  authSection.delete(profileAuthSection)
+  authSection.flush()
+
+  tubiLog("Deleted auth for profile: " + profileId)
+  return true
+End Function
+
+
+' ===== PROFILES METADATA FUNCTIONS =====
+
+' Copy profile auth info to main auth section
+' @profileId: string, the profile ID to copy from
+Function tubiAuth_copyProfileToMainAuth(profileId)
+  if isNonEmptyString(profileId)
+    profileAuthInfo = m.getProfileAuthInfo(profileId)
+    if profileAuthInfo.count() > 0
+      m.deleteAuthInfo()
+      sec = createObject("roRegistrySection", m.authRegSection)
+      sec.writeMulti(profileAuthInfo)
+      sec.flush()
+    end if
+  end if
+
 End Function

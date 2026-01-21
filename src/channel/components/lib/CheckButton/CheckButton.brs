@@ -42,6 +42,7 @@ Function updateTheme(theme)
     m.focusedThemeColor = theme.focusedTextColor
     m.unfocusedThemeColor = theme.primaryTextColor
     m.background.blendColor = theme.neutralSolidColor2
+    m.neutralColor = theme.neutralSolidColor
   end if
   applyStyling()
 End Function

@@ -1,18 +1,18 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<component name="SideNavIconComponent" extends="Group" >
+<?xml version="1.0" encoding="utf-8"?>
+<component name="SideNavIconComponent" extends="Group">
   <script type="text/brightscript" uri="SideNavIconComponent.brs" />
   <script type="text/brightscript" uri="../AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
 
   <interface>
     <field id="itemContent" type="node" />
     <field id="gridHasFocus" type="boolean" />
     <field id="focusPercent" type="float" />
-    <field id="active" value="false" type="boolean" alwaysNotify="true"/>
+    <field id="active" value="false" type="boolean" alwaysNotify="true" />
     <field id="height" type="float" alwaysNotify="true" />
-    <field id="width" type="float"/>
+    <field id="width" type="float" />
   </interface>
 
   <children>
@@ -23,7 +23,7 @@
         translation="[36, 0]"
         loadSync="true"
         width="36"
-        height="36"/>
+        height="36" />
       <Poster
         id="focusedIcon"
         translation="[36, 0]"
@@ -31,7 +31,7 @@
         width="36"
         height="36"
         visible="false"
-        opacity="0"/>
+        opacity="0" />
     </Group>
 
     <Label
@@ -40,7 +40,7 @@
       horizAlign="left">
       <Font
         id="subtextFont"
-        role="font"/>
+        role="font" />
     </Label>
     <LayoutGroup
       id="LabelParent"
@@ -48,27 +48,57 @@
       layoutDirection="horiz"
       itemSpacings="[12, -72]"
       vertAlignment="custom">
-      <Group>
-        <Label
-          id="Label"
-          vertAlign="center"
-          opacity="0">
-          <Font
-            id="Font"
-            role="font"/>
-        </Label>
-        <Label
-          id="focusedLabel"
-          vertAlign="center"
-          visible="false"
-          opacity="0">
-          <Font
-            id="focusedFont"
-            role="font"/>
-        </Label>
-      </Group>
+      <LayoutGroup
+        id="TextGroup"
+        layoutDirection="vert"
+        itemSpacings="[2]"
+        vertAlignment="custom">
+        <Group>
+          <Label
+            id="Label"
+            vertAlign="center"
+            width="269"
+            opacity="0">
+            <Font
+              id="Font"
+              role="font" />
+          </Label>
+          <Label
+            id="focusedLabel"
+            vertAlign="center"
+            width="269"
+            visible="false"
+            opacity="0">
+            <Font
+              id="focusedFont"
+              role="font" />
+          </Label>
+        </Group>
+        <Group
+          id="bottomTextGroup">
+          <Label
+            id="bottomTxt"
+            width="269"
+            vertAlign="center"
+            opacity="0">
+            <Font
+              id="bottomTextFont"
+              role="font" />
+          </Label>
+          <Label
+            id="focusedBottomTxt"
+            vertAlign="center"
+            width="269"
+            visible="false"
+            opacity="0">
+            <Font
+              id="focusedBottomTextFont"
+              role="font" />
+          </Label>
+        </Group>
+      </LayoutGroup>
       <Group
-        id="sideIconParent"/>
+        id="sideIconParent" />
     </LayoutGroup>
   </children>
 </component>

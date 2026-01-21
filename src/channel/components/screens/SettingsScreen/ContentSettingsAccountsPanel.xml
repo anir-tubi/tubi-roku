@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="ContentSettingsAccountsPanel" extends="ListPanel">
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="ContentSettingsAccountsPanel.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+    <field id="offset" alias="Offset.translation" />
+    <field id="signInInfo" type="assocarray" alwaysNotify="true" />
+
+    <!-- OUTPUTS -->
+    <field id="itemSelected" type="string" alwaysNotify="true" />
+    <field id="itemFocused" type="node" alwaysNotify="true" />
+    <field id="audioGuideText" type="string" alwaysNotify="true" />
+  </interface>
+
+  <children>
+    <Group
+      id="Offset">
+
+      <LayoutGroup
+        id="ContentGroup"
+        layoutDirection="vert"
+        itemSpacings="[45]">
+        <Label
+          id="Title"
+          height="73"
+          vertAlign="bottom">
+          <Font
+            role="font" />
+        </Label>
+
+        <Label
+          id="Instructions"
+          width="650"
+          wrap="true"
+          vertAlign="bottom">
+          <Font
+            role="font" />
+        </Label>
+
+        <MarkupGrid
+          id="AccountsList"
+          itemComponentName="ProfileContentSettingItem"
+          numRows="5"
+          numColumns="1"
+          itemSize="[582,96]"
+          itemSpacing="[0,12]"
+          focusFootprintBitmapUri="pkg:/images/menu-focus-$$RES$$.9.png"
+          focusBitmapUri="pkg:/images/menu-focus-$$RES$$.9.png"
+          drawFocusFeedbackOnTop="false"
+          vertFocusAnimationStyle="floatingFocus">
+        </MarkupGrid>
+      </LayoutGroup>
+    </Group>
+  </children>
+</component>

@@ -460,6 +460,14 @@ Function showSignOutModal(dialogEvent, trackingTask, callback = invalid)
   showSimpleInstantResumableModal(title, message, buttons, dialogEvent, trackingTask, callback)
 End Function
 
+
+Function showSignOutProfileWithKidsModal(dialogEvent, trackingTask, callback = invalid)
+  title = getTranslation("dialog_signOut_title_kids")
+  message = getTranslation("dialog_signOut_description_kids")
+  buttons = [getTranslation("dialog_signOut_button_ok"), getTranslation("dialog_button_cancel")]
+  showSimpleInstantResumableModal(title, message, buttons, dialogEvent, trackingTask, callback)
+End Function
+
 '''''''''''''''''''''''
 ' showInfoModal
 '

@@ -5,6 +5,7 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0)
   m.settingsScreen = CreateObject("roSGNode", "SettingsScreen")
   m.settingsScreen.id = m.constants.ui.screenIds.settingsScreen
   m.settingsScreen.uiMode = m.uiMode
+  m.settingsScreen.isUserInMultiAccount = isUserInMultiAccount()
   ' Passing in the saved isVideoPreviewOn.
   m.settingsScreen.isVideoPreviewOn = m.pub_serverPersistentData.isVideoPreviewOn
   m.settingsScreen.isAutoPlayTimerOn = isAutoPlayTimerOn()
@@ -38,6 +39,7 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0)
   end if
 
   m.settingsScreen.observeFieldScoped("autoPlayTimerSettingSelected", "onAutoPlayTimerSettingSelected")
+  m.settingsScreen.observeFieldScoped("pinUpdateBtnSelected", "onForgotPinSelected")
 
   if screenLevel <> 0
     m.settingsScreen.screenLevel = screenLevel
@@ -58,20 +60,66 @@ Function setSettingsScreenSignInInfo()
       signedIn: false
       name: ""
       email: ""
+      avatarUrl: ""
+      parentalRating: 3
+      parentId: ""
     }
 
     authInfo = m.tubiAuthUpdate.getAuthInfo()
     if isLoggedInUser(authInfo) = true
+      tubiId = authInfo.tubiId
       aaSignIn.signedIn = true
+      aaSignIn.avatarUrl = authInfo.avatarUrl
       aaSignIn.email = m.pub_serverPersistentData.email
+      aaSignIn.parentalRating = m.pub_serverPersistentData.parentalRating
+      aaSignIn.hasPin = authInfo.hasPin
       if isNonEmptyString(authInfo.firstName) = true AND isNonEmptyString(authInfo.lastName) = true
         sName = authInfo.firstName + " " + authInfo.lastName
       else
         sName = authInfo.name
       end if
 
+      if authInfo.parentId <> invalid
+        aaSignIn.parentId = authInfo.parentId
+      end if
+
       aaSignIn.name = sName
+
+      profiles = m.tubiAuthUpdate.getAllProfilesAuthInfo()
+      if profiles.count() > 1
+        linkedAccounts = {}
+
+        for each id in profiles
+          profile = profiles[id]
+          if profile.parentId = tubiId
+            linkedKidsAccount = {}
+            if isNonEmptyString(profile.avatarUrl) = true
+              linkedKidsAccount.avatarUrl = profile.avatarUrl
+            else
+              linkedKidsAccount.avatarUrl = ""
+            end if
+
+            if isNonEmptyString(profile.firstName) = true
+              sName = profile.firstName
+            else
+              sName = profile.name
+            end if
+            linkedKidsAccount.name = sName
+
+            if isNonEmptyString(profile.parentalRating) = true
+              linkedKidsAccount.parentalRating = profile.parentalRating.toInt()
+            else
+              linkedKidsAccount.parentalRating = profile.parentalRating
+            end if
+
+            linkedAccounts[profile.tubiId] = linkedKidsAccount
+          end if
+        end for
+        aaSignIn.linkedAccounts = linkedAccounts
+      end if
     end if
+
+    aaSignIn.parentalRating = m.pub_serverPersistentData.parentalRating
 
     m.settingsScreen.signInInfo = aaSignIn
   end if
@@ -86,16 +134,46 @@ End Function
 
 Function onSettingsSignOutSelected()
   tubiLog("SettingsScreenHelpers.onSettingsSignOutSelected")
-  dialogEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: "INFORMATION" 'DialogType enum - TODO use a "SIGN_OUT" type when it becomes available in protos
-      pageOneof: m.Tracking.getAnalyticsPage("account_page", { account_page_type: "PARENTAL" }) 'settings_page doesn't exist in protos
-      dialog_action: "SHOW"
-      dialog_sub_type: "sign-out-settings"
+
+  if isUserInMultiAccount() = false
+    pageInfo = m.Tracking.getAnalyticsPage("account_page", { account_page_type: "PARENTAL" })
+
+    dialogEvent = {
+      type: "dialog"
+      values: {
+        dialog_type: "INFORMATION" 'DialogType enum - TODO use a "SIGN_OUT" type when it becomes available in protos
+        pageOneof: pageInfo 'settings_page doesn't exist in protos
+        dialog_action: "SHOW"
+        dialog_sub_type: "sign-out-settings"
+      }
     }
-  }
-  showSignOutModal(dialogEvent, m.trackingLoggingTask, onSignOutModalSelected)
+    showSignOutModal(dialogEvent, m.trackingLoggingTask, onSignOutModalSelected)
+  else
+    pageInfo = m.Tracking.getAnalyticsPage("account_page", { account_page_type: "ACCOUNT" })
+
+    dialogEvent = {
+      type: "dialog"
+      values: {
+        dialog_type: "SIGN_OUT" 'DialogType enum - TODO use a "SIGN_OUT" type when it becomes available in protos
+        pageOneof: pageInfo 'settings_page doesn't exist in protos
+        dialog_action: "SHOW"
+        dialog_sub_type: "sign-out"
+      }
+    }
+    showSignOutProfileWithKidsModal(dialogEvent, m.trackingLoggingTask, onSignOutProfileSelected)
+    'Send ComponentInteractionEvent
+    button_component = {
+      button_type: "TEXT"
+      button_value: "SIGN_OUT"
+    }
+    componentInteractionInfo = {
+      pageOneof: pageInfo
+      componentOneof: m.Tracking.getAnalyticsComponent("button_component", button_component)
+      user_interaction: "CONFIRM"
+    }
+
+    sendcomponentInteractionInfo(componentInteractionInfo)
+  end if
 End Function
 
 
@@ -126,9 +204,27 @@ Function onSignOutModalSelected()
 
   logout(onSignOutCompleted)
 
-  m.NodeHelpers.removeAllChildren(m.global.bookmarkIds)
-  m.NodeHelpers.removeAllChildren(m.global.historyIds)
-  m.NodeHelpers.removeAllChildren(m.global.likeIds)
+  clearGlobalUserData()
+End Function
+
+
+Function onSignOutProfileSelected()
+
+  requestInfo = m.userDeviceApi.createPostLogoutReqInfo()
+  m.makeRequest({
+    url: requestInfo.url
+    options: requestInfo.options
+    requestType: m.constants.reqNames.postLogout
+    silenceCallbackWarnings: true
+  })
+  setSettingsScreenSignInInfo()
+
+  ' Setting focus to spinner before calling logout(), which triggers the home screen to refresh and gain focus.
+  m.spinner.visible = true
+  m.spinner.setFocus(true)
+
+  signOutCurrentProfile(onLogOutProfileCompleted)
+
 End Function
 
 
@@ -214,6 +310,68 @@ Function onAutoPlayTimerSettingSelected(msg)
   componentInteractionInfo = getComponentInteractionInfo(userInteraction, pageInfo, "left_side_nav_component", leftSideNavComponent)
   if autoPlayTimerSettingSelected = 0 OR autoPlayTimerSettingSelected = 1
     sendComponentInteractionInfo(componentInteractionInfo)
+  end if
+End Function
+
+
+Function updatePin(signInInfo)
+  if signInInfo <> invalid
+    m.pcPinInputScreen = createObject("roSGNode", "ParentalControlPinInputScreen")
+    m.pcPinInputScreen.signInInfo = signInInfo
+    m.pcPinInputScreen.mode = "edit_pin"
+    m.pcPinInputScreen.observeFieldScoped("pinSubmitted", "onPinCreateOrEditForKidsAccount")
+    m.pcPinInputScreen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
+
+    if (isNonEmptyString(signInInfo.hasPin) = true AND signInInfo.hasPin = "true") OR (signInInfo.hasPin = true)
+      pinAction = "EDIT_PIN"
+    else
+      pinAction = "CREATE_PIN"
+    end if
+
+    trackingPageInfo = {
+      pageType: "pin_page"
+      pageValues: {
+        pin_action: pinAction
+      }
+    }
+    m.pcPinInputScreen.trackingPageInfo = trackingPageInfo
+
+    pushScreen(m.pcPinInputScreen, true, true)
+  end if
+End Function
+
+
+Function onPinCreateOrEditForKidsAccount(msg)
+
+  currentAuthInfo = m.tubiAuthUpdate.getAuthInfo()
+  isKidsAccount = isKidsProfile(currentAuthInfo)
+
+  if isKidsAccount = true
+    authInfo = m.tubiAuthUpdate.getProfileAuthInfo(currentAuthInfo.parentId)
+  else
+    authInfo = currentAuthInfo
+  end if
+
+  if isLoggedInUser(authInfo) = true AND isUserInMultiAccount() = true
+    sTubiId = authInfo.tubiId
+    signInInfo = m.pcPinInputScreen.signInInfo
+    if signInInfo <> invalid AND signInInfo.pinSubmitted <> invalid AND signInInfo.password <> invalid
+      ' update the local authInfo for the kids account
+      m.tubiAuthUpdate.createOrUpdateProfileAuth(sTubiId, { haspin: true })
+
+      pinSettingsInfo = m.userDeviceApi.updatePinReqInfoForKidsAccount(signInInfo.password, signInInfo.pinSubmitted)
+
+      m.makeRequest({
+        url: pinSettingsInfo.url
+        requestType: m.constants.reqNames.postPinUpdateForKids
+        successCallback: onPinUpdateSuccess
+        options: pinSettingsInfo.options
+        responseType: "assocarray"
+        errorCallback: onPinUpdateError
+      })
+
+    end if
+
   end if
 End Function
 
@@ -322,19 +480,162 @@ Function onPasswordConfirm(msg = invalid)
   end if
 
   authInfo = m.tubiAuthUpdate.getAuthInfo()
-  if isLoggedInUser(authInfo) = true then
-    parentalRatingReq = m.userDeviceApi.updateParentalRatingReqInfo(m.settingsScreen.parentalSettingSelected, sPassword)
+  if isLoggedInUser(authInfo) = true
+    useV2ParentalRating = false
+    isUpdateForKidsAccount = false
+    sName = ""
+    sTubiId = ""
 
-    m.makeRequest({
-      url: parentalRatingReq.url
-      requestType: m.constants.reqNames.updateParentalRating
-      options: parentalRatingReq.options
-      successCallback: refreshAuthTokenAfterParentalControlsChange
-      errorCallback: updateParentalSettingsErrorResponse
-      responseType: "assocarray"
-      password: sPassword
-    })
+    if isUserInMultiAccount() = true
+      useV2ParentalRating = true
+
+      pcChangeRequestId = m.settingsScreen.pcChangeRequestId
+      if pcChangeRequestId <> invalid
+        signInInfo = m.settingsScreen.signInInfo
+        if signInInfo <> invalid AND signInInfo.linkedAccounts <> invalid
+          linkedAccounts = signInInfo.linkedAccounts
+
+          for each item in linkedAccounts
+            account = linkedAccounts[item]
+            if item = pcChangeRequestId
+              sName = account.name
+              sTubiId = item
+              isUpdateForKidsAccount = true
+              exit for
+            end if
+          end for
+        end if
+      end if
+    end if
+
+    if isUpdateForKidsAccount = true
+      patchSettingsInfo = m.userDeviceApi.updateParentalRatingReqInfoForKidsAccount(m.settingsScreen.parentalSettingSelected, sPassword, sName, sTubiId)
+
+      m.makeRequest({
+        url: patchSettingsInfo.url
+        requestType: m.constants.reqNames.patchKidsParentalRating
+        options: patchSettingsInfo.options
+        successCallback: refreshAuthTokenAfterPCChangeForKidsAccount
+        errorCallback: updateParentalSettingsErrorResponse
+        responseType: "assocarray"
+        password: sPassword
+      })
+
+    else
+      parentalRatingReq = m.userDeviceApi.updateParentalRatingReqInfo(m.settingsScreen.parentalSettingSelected, sPassword, useV2ParentalRating)
+      m.makeRequest({
+        url: parentalRatingReq.url
+        requestType: m.constants.reqNames.updateParentalRating
+        options: parentalRatingReq.options
+        successCallback: refreshAuthTokenAfterParentalControlsChange
+        errorCallback: updateParentalSettingsErrorResponse
+        responseType: "assocarray"
+        password: sPassword
+      })
+    end if
+
   end if
+End Function
+
+
+Function onPasswordConfirmForPinUpdate(response = invalid)
+  sPassword = ""
+  if response <> invalid AND response.valid = true AND isConfirmPasswordScreen() = true
+    sPassword = m.confirmPasswordScreen.passwordText
+    m.confirmPasswordScreen.isLoading = true
+    m.passwordCache = {
+      password: sPassword
+      currentTime: getNowSeconds()
+    }
+  else if m.passwordCache <> invalid then
+    '//if not coming from the password screen, then coming from a saved password within the last few minutes
+    sPassword = m.passwordCache.password
+  end if
+
+  if isNonEmptyString(sPassword) = true
+    signInInfo = {
+      password: sPassword
+    }
+    updatePin(signInInfo)
+  else if isConfirmPasswordScreen() = true
+    onPasswordValidateError(response)
+  end if
+
+
+End Function
+
+
+Function refreshUIAfterParentalControlsChange()
+  tubiLog("SettingsScreenHelper.refreshUIAfterParentalControlsChange")
+  if m.confirmPasswordScreen <> invalid then
+    m.confirmPasswordScreen.isLoading = false
+  end if
+
+  showHideSpinner(false)
+  if isConfirmPasswordScreen() = true
+    popScreen(true, true)
+  end if
+
+
+  '//Update menu so it appears updated. This is only needed if the password has been saved locally and was not entered immediately from the password screen
+  m.settingsScreen.parentalSettingUpdated = true
+  pcSelected = m.settingsScreen.parentalSettingSelected
+  if pcSelected < 2 OR pcSelected = 4 OR pcSelected = 5
+    setUiMode(m.constants.ui.modes.kidsParental)
+  else
+    '//turn off kids mode (if it is on) when switching to teens and greater
+    '// Also, disable the manual version of kids mode if the user had previously enabled kids mode manually
+    if isKidsUIOn() = true
+      setUiMode(m.constants.ui.modes.standard)
+    end if
+  end if
+
+  ' If the parental controls was changed to adults.
+  if isUserInAdultsMode() = true AND isKidsUIOn() = false
+    getConsent(onConsentRefreshAfterParentalControlsChange)
+  else
+    refreshScreenAfterParentalChanges()
+  end if
+
+  dialogEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "SIGNIN_REQUIRED"
+      pageOneof: m.Tracking.getAnalyticsPage(m.settingsScreen.trackingPageInfo.pageType, m.settingsScreen.trackingPageInfo.pageValues)
+      dialog_action: "SHOW"
+      dialog_sub_type: "parental-updated-" + m.settingsScreen.parentalSettingSelected.toStr()
+    }
+  }
+
+  parentalSetting = m.settingsScreen.parentalSettingSelected
+  sMessageID = ""
+  if type(parentalSetting) = "roInt"
+    sMessageID = "screenSettings_error_parentalChanges_description_group" + parentalSetting.toStr()
+  end if
+  if sMessageID = ""
+    sMessageID = "screenSettings_error_parentalChanges_description_default"
+  end if
+
+  title = getTranslation("screenSettings_error_parentalChanges")
+  message = getTranslation(sMessageID)
+  showSimpleInstantResumableModal(title, message, [], dialogEvent, m.trackingLoggingTask)
+End Function
+
+
+
+Function refreshUIAfterPCChangeForKidsAccount()
+  tubiLog("SettingsScreenHelper.refreshUIAfterPCChangeForKidsAccount")
+  if m.confirmPasswordScreen <> invalid then
+    m.confirmPasswordScreen.isLoading = false
+  end if
+
+  showHideSpinner(false)
+  if isConfirmPasswordScreen() = true
+    popScreen(true, true)
+  end if
+
+  'update the local signInInfo for the kids account after patch request
+  setSettingsScreenSignInInfo()
 End Function
 
 
@@ -386,61 +687,32 @@ Function refreshScreenAfterParentalChanges()
 End Function
 
 
-Function refreshUIAfterParentalControlsChange()
-  tubiLog("SettingsScreenHelper.refreshUIAfterParentalControlsChange")
-  if m.confirmPasswordScreen <> invalid then
-    m.confirmPasswordScreen.isLoading = false
-  end if
-
-  showHideSpinner(false)
-  if isConfirmPasswordScreen() = true
-    popScreen(true, true)
-  end if
-
-
-  '//Update menu so it appears updated. This is only needed if the password has been saved locally and was not entered immediately from the password screen
-  m.settingsScreen.parentalSettingUpdated = true
-
-  if m.settingsScreen.parentalSettingSelected < 2
-    setUiMode(m.constants.ui.modes.kidsParental)
-  else
-    '//turn off kids mode (if it is on) when switching to teens and greater
-    '// Also, disable the manual version of kids mode if the user had previously enabled kids mode manually
-    if isKidsUIOn() = true
-      setUiMode(m.constants.ui.modes.standard)
+Function refreshAuthTokenAfterPCChangeForKidsAccount(response)
+  if response <> invalid
+    if isConfirmPasswordScreen() = true
+      m.passwordCache = {
+        password: response.requestInput.password
+        currentTime: getNowSeconds()
+      }
+    else
+      showHideSpinner(true)
     end if
-  end if
 
-  ' If the parental controls was changed to adults.
-  if isUserInAdultsMode() = true AND isKidsUIOn() = false
-    getConsent(onConsentRefreshAfterParentalControlsChange)
-  else
-    refreshScreenAfterParentalChanges()
-  end if
 
-  dialogEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: "SIGNIN_REQUIRED"
-      pageOneof: m.Tracking.getAnalyticsPage(m.settingsScreen.trackingPageInfo.pageType, m.settingsScreen.trackingPageInfo.pageValues)
-      dialog_action: "SHOW"
-      dialog_sub_type: "parental-updated-" + m.settingsScreen.parentalSettingSelected.toStr()
-    }
-  }
+    'update the local authInfo for the kids account
+    sTubiId = response.parsedresponse.tubi_id
+    parentalRating = response.parsedresponse.parental_rating_v2
+    if parentalRating <> invalid AND isNonEmptyString(sTubiId) = true
+      m.tubiAuthUpdate.createOrUpdateProfileAuth(sTubiId, { parentalRating: parentalRating })
+    end if
+    m.tubiAuthUpdate.initOrUpdateAuthInfo(refreshUIAfterPCChangeForKidsAccount, true)
 
-  parentalSetting = m.settingsScreen.parentalSettingSelected
-  sMessageID = ""
-  if type(parentalSetting) = "roInt"
-    sMessageID = "screenSettings_error_parentalChanges_description_group" + parentalSetting.toStr()
   end if
-  if sMessageID = ""
-    sMessageID = "screenSettings_error_parentalChanges_description_default"
-  end if
-
-  title = getTranslation("screenSettings_error_parentalChanges")
-  message = getTranslation(sMessageID)
-  showSimpleInstantResumableModal(title, message, [], dialogEvent, m.trackingLoggingTask)
 End Function
+
+
+
+
 
 
 Function refreshAuthTokenAfterParentalControlsChange(response)
@@ -454,23 +726,13 @@ Function refreshAuthTokenAfterParentalControlsChange(response)
     else
       showHideSpinner(true)
     end if
+    m.tubiAuthUpdate.initOrUpdateAuthInfo(refreshUIAfterParentalControlsChange, true)
 
-    ' Although not a perfect solution but based on the test 1 second seems to be good enough delay.
-    ' Even in worst case scenario if backend takes more time we will still refresh the auth token but might see some calls that fail due to expired token.
-    ' But below logic should cover majority of the cases.
-    m.parentalChangeAuthRefreshTokenTimer = CreateObject("roSGNode", "Timer")
-    m.parentalChangeAuthRefreshTokenTimer.duration = 1
-    m.parentalChangeAuthRefreshTokenTimer.control = "start"
-    m.parentalChangeAuthRefreshTokenTimer.observeFieldScoped("fire", "onParentalChangeAuthRefreshTokenTimerFired")
   end if
 End Function
 
 
-Function onParentalChangeAuthRefreshTokenTimerFired()
-  m.parentalChangeAuthRefreshTokenTimer.control = "stop"
-  m.parentalChangeAuthRefreshTokenTimer = invalid
-  m.tubiAuthUpdate.initOrUpdateAuthInfo(refreshUIAfterParentalControlsChange, true)
-End Function
+
 
 
 Function onConsentRefreshAfterParentalControlsChange()
@@ -642,7 +904,8 @@ End Function
 
 
 Function onFetchUserSettingsChanged()
-  getUserSettingsRequest = m.userDeviceApi.createUserSettingsGeneralTaskReqInfo(onSettingsScreenGetUserSettingsSuccess, onSettingsScreenGetUserSettingsError)
+  isMultiAccount = isUserInMultiAccount()
+  getUserSettingsRequest = m.userDeviceApi.createUserSettingsGeneralTaskReqInfo(onSettingsScreenGetUserSettingsSuccess, onSettingsScreenGetUserSettingsError, isMultiAccount)
   m.makeRequest(getUserSettingsRequest)
 End Function
 

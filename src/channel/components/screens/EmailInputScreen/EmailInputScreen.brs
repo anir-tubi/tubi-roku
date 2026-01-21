@@ -87,6 +87,7 @@ Function onThemeChange(msg = invalid)
     m.continue.color = theme.backgroundColorLight
     m.emailValidationMsg.color = theme.cautionColor
     m.pageHeading.color = theme.primaryTextColor
+    m.subHeaderColor = theme.secondaryTextColor
 
     paletteColors = m.keyboard.palette.colors
     paletteColors.FocusItemColor = theme.focusedTextColor
@@ -200,15 +201,13 @@ End Function
 
 Function onKeyEvent(key as String, press as Boolean) as Boolean
 
-  if key = "OK"
-    m.emailTextEditBox.text = m.keyboard.text
-  end if
-
   handled = true
   if press = false then
     return false
   else
-    if key = "back"
+    if key = "OK"
+      m.emailTextEditBox.text = m.keyboard.text
+    else if key = "back"
       m.top.backButtonSelected = true
 
     else if key = "down"

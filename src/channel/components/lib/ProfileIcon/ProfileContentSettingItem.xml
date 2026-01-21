@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="ProfileContentSettingItem" extends="Group">
+
+  <script type="text/brightscript" uri="ProfileContentSettingItem.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+    <field id="itemContent" type="node" />
+    <field id="focusPercent" type="float" />
+    <field id="gridHasFocus" type="boolean" />
+    <field id="itemHasFocus" type="boolean" />
+    <field id="height" type="float" />
+
+    <!-- OUTPUTS -->
+  </interface>
+
+  <children>
+
+    <Group
+      id="IconParent">
+      <ProfileIcon
+        id="Icon" />
+
+      <Label
+        translation="[42, 33]"
+        id="menuItemText">
+        <Font
+          role="font" />
+      </Label>
+
+    </Group>
+
+
+    <LayoutGroup
+      id="LabelParent"
+      layoutDirection="vert"
+      translation="[88, 30]"
+      itemSpacings="[4]"
+      horizAlignment="left"
+      vertAlignment="custom">
+
+      <Group>
+        <Label
+          id="unfocusedLabel"
+          width="269"
+          height="40">
+          <Font
+            id="unfocusedFont"
+            role="font" />
+        </Label>
+        <Label
+          id="focusedLabel"
+          width="269"
+          height="40"
+          opacity="0">
+          <Font
+            id="focusedFont"
+            role="font" />
+        </Label>
+      </Group>
+
+      <Group
+        id="kidsLogoGroup">
+        <Poster
+          id="kidsLogo"
+          opacity="1"
+          width="64"
+          height="12"
+          uri="pkg:/images/profile-kids-logo.png" />
+
+        <Poster
+          id="kidsLogoFocused"
+          opacity="0"
+          width="64"
+          height="12"
+          uri="pkg:/images/tubi_kids_logo_white.png" />
+      </Group>
+
+    </LayoutGroup>
+
+  </children>
+</component>

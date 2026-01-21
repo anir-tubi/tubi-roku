@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="EmailInputOrAddKidsScreen" extends="BaseScreen">
+
+  <script type="text/brightscript" uri="EmailInputOrAddKidsScreen.brs" />
+  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/UserMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/FocusMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <interface>
+    <!-- INPUT -->
+    <!-- when set to false, a message indicating that the user should enter a valid email appears -->
+    <field id="isEmailValid" type="boolean" value="true" />
+
+    <field id="profiles" type="node" />
+
+    <!-- OUTPUT -->
+
+    <!-- continueSelected is triggered when user selects continue button, which checks email exists
+    in database -->
+    <field id="continueSelected" type="boolean" alwaysNotify="true" />
+
+    <!-- email field will have user entered email and it will be set when user selects continue
+    button -->
+    <field id="email" type="string" />
+
+    <field id="hasPin" type="boolean" />
+    <field id="parentProfileId" type="string" />
+
+    <!-- backButtonSelected is triggered when user selects back button on keyboard-->
+    <field id="backButtonSelected" type="integer" alias="back.selected" />
+
+    <field id="accountTypeSelected" type="string" />
+
+  </interface>
+
+  <children>
+
+    <Poster
+      id="backButtonPoster"
+      uri="pkg:/images/back_button.png"
+      translation="[126,60]"
+      width="170"
+      height="72" />
+
+    <TabButtons
+      id="tabButtons"
+      translation="[630, 180]" />
+
+    <Label
+      id="pageHeading"
+      horizAlign="center"
+      translation="[0, 304]"
+      width="1920">
+      <Font
+        role="font" />
+    </Label>
+
+    <Group
+      id="EmailGroup"
+      translation="[0, 408]">
+      <LayoutGroup
+        id="emailLayout"
+        translation="[0, 0]"
+        layoutDirection="vert"
+        vertAlignment="custom"
+        horizAlignment="custom"
+        itemSpacings="[10]">
+
+        <Group
+          translation="[645,0]">
+          <TextEditBox
+            id="emailTextEditBox"
+            width="630"
+            height="84" />
+        </Group>
+
+        <Label
+          id="emailValidationMsg"
+          translation="[645, 0]"
+          opacity="0.0"
+          width="600">
+          <Font
+            role="font" />
+        </Label>
+
+      </LayoutGroup>
+
+      <LayoutGroup
+        layoutDirection="vert"
+        horizAlignment="custom"
+        vertAlignment="custom"
+        translation="[250, 50]"
+        itemSpacings="[20]">
+
+        <DynamicKeyboard
+          id="Keyboard" />
+
+        <ButtonGroup
+          id="buttonGroup"
+          layoutDirection="horiz"
+          itemSpacings="[39]"
+          translation="[2,0]">
+
+          <SimpleButton
+            id="back"
+            width="177" />
+
+          <SimpleButton
+            id="continue"
+            width="1149" />
+
+        </ButtonGroup>
+      </LayoutGroup>
+    </Group>
+
+    <Group
+      id="KidsGroup"
+      translation="[0, 484]"
+      visible="false">
+      <LayoutGroup
+        id="bottomTextGroup"
+        horizAlignment="center"
+        vertAlignment="center"
+        layoutDirection="vert"
+        translation="[1040, 261]"
+        itemSpacings="[145, 10]">
+
+        <MarkupGrid
+          id="ProfileMenu"
+          itemSize="[240, 324]"
+          itemSpacing="[80, 0]"
+          rowHeights="[240]"
+          columnWidths="[240]"
+          columnSpacings="[100]"
+          numColumns="4"
+          numRows="1"
+          focusBitmapUri="pkg:/images/avatar_focus_$$RES$$.9.png"
+          focusFootprintBitmapUri="pkg:/images/transparent.png"
+          drawFocusFeedbackOnTop="false"
+          itemComponentName="ProfileMenuItem" />
+
+
+        <Label
+          id="bottomTextHeader"
+          width="1920"
+          horizAlign="center">
+          <Font
+            role="font" />
+        </Label>
+
+
+        <Label
+          id="bottomText"
+          width="1920"
+          horizAlign="center">
+          <Font
+            role="font" />
+        </Label>
+      </LayoutGroup>
+
+    </Group>
+
+  </children>
+</component>

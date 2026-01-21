@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="ProfileSideNavItem" extends="Group">
+
+  <script type="text/brightscript" uri="ProfileSideNavItem.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+    <field id="itemContent" type="node" />
+    <field id="focusPercent" type="float" />
+    <field id="index" type="integer" />
+    <field id="height" type="float" />
+
+    <!-- OUTPUTS -->
+  </interface>
+
+  <children>
+
+    <Group
+      id="IconParent">
+      <Poster
+        id="Icon"
+        translation="[36, 32]"
+        loadSync="true"
+        width="36"
+        height="36" />
+      <Poster
+        id="focusedIcon"
+        translation="[36, 32]"
+        loadSync="true"
+        width="36"
+        height="36"
+        opacity="0" />
+
+      <Label
+        translation="[42, 33]"
+        id="menuItemText">
+        <Font
+          role="font" />
+      </Label>
+
+    </Group>
+
+    <LayoutGroup
+      id="LabelParent"
+      layoutDirection="vert"
+      translation="[88, 30]"
+      itemSpacings="[4]"
+      horizAlignment="left"
+      vertAlignment="custom">
+      <Group>
+        <Label
+          id="Label"
+          width="269"
+          height="40">
+          <Font
+            id="Font"
+            role="font" />
+        </Label>
+        <Label
+          id="focusedLabel"
+          width="269"
+          height="40"
+          opacity="0">
+          <Font
+            id="focusedFont"
+            role="font" />
+        </Label>
+      </Group>
+
+      <Group
+        id="subTxtParent">
+        <Label
+          id="subTxt">
+          <Font
+            role="font" />
+        </Label>
+        <Label
+          id="subTxtFocused">
+          <Font
+            role="font" />
+        </Label>
+      </Group>
+      <Group
+        id="kidsLogoGroup"
+        visible="false">
+        <Poster
+          id="kidsLogo"
+          opacity="1"
+          width="64"
+          height="12"
+          uri="pkg:/images/profile-kids-logo.png" />
+
+        <Poster
+          id="kidsLogoFocused"
+          opacity="0"
+          width="64"
+          height="12"
+          uri="pkg:/images/tubi_kids_logo_white.png" />
+      </Group>
+
+    </LayoutGroup>
+
+    <Poster
+      id="sideIcon"
+      width="60"
+      height="60"
+      translation="[365, 20]" />
+
+    <Poster
+      id="sideIconFocused"
+      width="60"
+      height="60"
+      translation="[365, 20]"
+      opacity="0" />
+  </children>
+</component>

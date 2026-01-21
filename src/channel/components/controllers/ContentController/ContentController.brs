@@ -46,6 +46,10 @@ Function init()
   ' Holds the callback method value which will be called once the initial get consent request is completed.
   m.onGetConsentCompletionCallback = invalid
 
+  ' Used to know if the profile migration has been completedd. Profile migration happens if user is in multi account
+  'experiment to create first profile or we already have profiles.
+  m.profileMigrationComplete = false
+
   ' Holds the instance of one trust sdk. Creating m scope variable so that we do not have to access the instance from global.
   ' Since One trust sdk access m.global.OTsdk within it's codebase we need to update the m.global.OTsdk to have the sdk instance.
   ' The reason why we are also storing it's reference in m scope for better performance since we access the sdk instance a lot of items during the app session.
@@ -349,6 +353,9 @@ Function addControllerUi()
   ' Below boolean flag is used in registration flow, which indicates whether we need to display the roku continue watching consent screen.
   ' will be set to true if the user is in US and is in the experiment control group.
   m.shouldShowRokuCWConsentScreen = false
+
+  ' Below boolean flag is used to check if the user is in multi account experiment and they have profiles
+  m.isUserInMultiAccount = false
 
   ' During registration flow if the user is eligible to be shown the roku continue watching consent screen.
   ' Below variable will hold the method that needs to be called after user either accepts or reject continue watching consent.
@@ -789,6 +796,9 @@ Function runControllerStartSequence()
     handleStartUpArgs()
   else if m.authInfoNeedsRefreshing = true
     ' External refresh token was passed in (ie. from mobile) and we are waiting for the network request with the updated auth info to proceed
+  else if m.profileMigrationComplete <> true
+    performProfileMigration()
+    ' wait till we trasfer the user to the new profile
   else if m.isConsentCheckComplete <> true
     ' Below logic handles the use case where in the previous session if the user entered a age less than 18.
     ' and the user is in gdpr country. During the start up flow we are checking if the user is in gdpr country.
@@ -866,7 +876,6 @@ Function runControllerStartSequence()
   else
     m.performanceMetricsTracker.endAppLaunchMetricTiming("start_app_ui_load_after_configs")
     ' All of the above checked values are true, so we are ready to start the channel UI
-
     ' initSideNav must run after m.global.trackingLoggingTask is set in case there are any experiments
     ' within the side nav component that rely on trackingLoggingTask to send exposure events.
     ' initSideNav relies on m.kidsModeFeatureOn being set, so run after m.kidsModeFeatureOn is set.
@@ -903,6 +912,9 @@ Function setUiModeAndLoadContent()
     ' we were asked to deep link into a content item. Go to it
     ' whether we were logged in or not.
     handleDeeplink()
+  else if isUserInMultiAccount() = true AND m.uiMode <> m.constants.ui.modes.kidsAgeGate
+    profiles = m.tubiAuthUpdate.getAllProfilesAuthInfo()
+    showProfileSelectorScreen(m.constants, profiles)
   else
     startChannelFromAppLoad()
   end if
@@ -955,7 +967,7 @@ Function handleStartUpArgs()
 
   ' First see if the user is logged in. If they are then we don't use the external auth info.
   authInfo = m.tubiAuthUpdate.getAuthInfo()
-  if isLoggedInUser(authInfo) <> true then
+  if isLoggedInUser(authInfo) <> true AND isUserInMultiAccount() = false
     ' checks if auth info has been received after a deeplink from external tubi device (iOS) supplied a refresh token
     externalAuthInfo = getExternalAuthInfoFromStartupArgs(startupArgs)
     ' Next make sure we have valid external auth info
@@ -965,6 +977,20 @@ Function handleStartUpArgs()
 
       m.tubiAuthUpdate.transferRefreshToken(externalAuthInfo, onAuthInfoRefreshed)
     end if
+  else if isUserInMultiAccount() = true
+    if startupArgs.tubiId <> invalid AND startupArgs.tubiId.unescape() <> "" AND startupArgs.tubiId.unescape() <> "0"
+      tubiId = startupArgs.tubiId.unescape()
+      if m.tubiAuthUpdate.getProfileAuthInfo(tubiId).count() > 0 'user already exists in the registry, so switch
+        m.tubiAuthUpdate.copyProfileToMainAuth(tubiId)
+      else
+        externalAuthInfo = getExternalAuthInfoWithTubiIdFromStartupArgs(startupArgs)
+        if externalAuthInfo <> invalid
+          m.authInfoNeedsRefreshing = true
+          m.tubiAuthUpdate.transferRefreshToken(externalAuthInfo, onAuthInfoRefreshed)
+        end if
+      end if
+    end if
+
   end if
 
   if m.deeplinkContent <> invalid
@@ -1020,6 +1046,30 @@ Function getExternalAuthInfoFromStartupArgs(args)
           externalDeviceId: args.deviceId.unescape()
           externalRefreshToken: args.refreshToken.unescape()
           userId: args.userId.unescape()
+        }
+      end if
+    end if
+  end if
+
+  return externalAuthInfo
+End Function
+
+
+'@args: assocArray, the startupArgs passed into main when the channel starts
+Function getExternalAuthInfoWithTubiIdFromStartupArgs(args)
+  ' deeplinks coming from ios or android devices need to be authenticated
+  externalAuthInfo = invalid
+
+  if args.refreshToken <> invalid AND args.userId <> invalid AND args.tubiId <> invalid AND args.deviceId <> invalid AND args.entry <> invalid
+    if args.refreshToken.unescape() <> "" AND args.userId.unescape() <> "" AND args.userId.unescape() <> "0" AND args.tubiId.unescape() <> "" AND args.tubiId.unescape() <> "0" AND args.deviceId.unescape() <> ""
+      if Lcase(args.entry) = "iphone" OR Lcase(args.entry) = "ipad" OR Lcase(args.entry) = "ios" OR Lcase(args.entry) = "android"
+        externalAuthInfo = {
+          platform: args.entry
+          externalDeviceId: args.deviceId.unescape()
+          externalRefreshToken: args.refreshToken.unescape()
+          userId: args.userId.unescape()
+          tubiId: args.tubiId.unescape()
+          isUserInMultiAccount: true
         }
       end if
     end if
@@ -1310,6 +1360,13 @@ Function setUiMode(mode)
       setCommonKidsModeElements()
       m.sideNav.uiMode = mode
     end if
+  else if mode = m.constants.ui.modes.kidsProfile
+    'kids profile
+    if m.kidsModeFeatureOn = true
+      m.uiMode = mode
+      setCommonKidsModeElements()
+      m.sideNav.uiMode = mode
+    end if
   else if mode = m.constants.ui.modes.kidsAgeGate
     'kids mode due to age gating
     if m.kidsModeFeatureOn = true
@@ -1373,19 +1430,29 @@ End Function
 Function setUiModeFromState()
   tubiLog("ContentController.setUiModeFromState")
   modeSet = false
-  if isKidsModeEnabledByParentalControls() = true
-    setUiMode(m.constants.ui.modes.kidsParental)
-    modeSet = true
-  else if shouldShowAgeGate() = true then
-    if m.guestUserHasAgeInfo = invalid then
-      m.guestUserHasAgeInfo = getGuestUserHasAgeInfo()
-    end if
-
-    ' Have to make sure we check expired as well as default state will always have hasAge = false
-    if m.guestUserHasAgeInfo.hasAge = false AND m.guestUserHasAgeInfo.expired = false then
-      setUiMode(m.constants.ui.modes.kidsAgeGate)
+  if isUserInMultiAccount() = false
+    if isKidsProfile() = true 'this is only to ensure that if statsig fails and active user was kids profile, then at least we have kids UI.
+      setUiMode(m.constants.ui.modes.kidsProfile)
       modeSet = true
+    else if isKidsModeEnabledByParentalControls() = true
+      setUiMode(m.constants.ui.modes.kidsParental)
+      modeSet = true
+    else if shouldShowAgeGate() = true then
+      if m.guestUserHasAgeInfo = invalid then
+        m.guestUserHasAgeInfo = getGuestUserHasAgeInfo()
+      end if
+
+      ' Have to make sure we check expired as well as default state will always have hasAge = false
+      if m.guestUserHasAgeInfo.hasAge = false AND m.guestUserHasAgeInfo.expired = false then
+        setUiMode(m.constants.ui.modes.kidsAgeGate)
+        modeSet = true
+      end if
+
     end if
+  else
+    authInfo = m.tubiAuthUpdate.getAuthInfo()
+    setUiModeForProfileSelected(authInfo)
+    modeSet = true
   end if
 
   if modeSet = false then
@@ -1435,7 +1502,7 @@ End Function
 
 
 Function isKidsUIOn()
-  if m.uiMode = m.constants.ui.modes.kids OR m.uiMode = m.constants.ui.modes.kidsAgeGate OR m.uiMode = m.constants.ui.modes.kidsParental
+  if m.uiMode = m.constants.ui.modes.kids OR m.uiMode = m.constants.ui.modes.kidsAgeGate OR m.uiMode = m.constants.ui.modes.kidsParental OR m.uiMode = m.constants.ui.modes.kidsProfile
     return true
   end if
   return false
@@ -1447,9 +1514,37 @@ Function isKidsModeEnabledByParentalControls() as Boolean
   bEnabled = false
 
   authInfo = m.tubiAuthUpdate.getAuthInfo()
-  if isLoggedInUser(authInfo) = true AND m.pub_serverPersistentData.parentalRating < 2 then
+  pcRating = m.pub_serverPersistentData.parentalRating
+  if isLoggedInUser(authInfo) = true AND (pcRating < 2 OR pcRating = 4 OR pcRating = 5) then
     bEnabled = true
   end if
+  return bEnabled
+End Function
+
+
+Function isKidsProfile(authInfo = invalid) as Boolean
+  bEnabled = false
+  if authInfo = invalid
+    authInfo = m.tubiAuthUpdate.getAuthInfo()
+  end if
+
+  isKidsRating = false
+  authPCRating = authInfo.parentalRating
+
+  authPCStr = AnyToStringButNotInvalid(authPCRating)
+
+  if authPCStr <> invalid AND authPCStr <> ""
+    pcRating = authPCStr.toInt()
+
+    if pcRating < 2 OR pcRating = 4 OR pcRating = 5
+      isKidsRating = true
+    end if
+  end if
+
+  if isLoggedInUser(authInfo) = true AND isKidsRating = true AND isNonEmptyString(authInfo.parentId) = true then
+    bEnabled = true
+  end if
+
   return bEnabled
 End Function
 
@@ -1489,6 +1584,11 @@ Function refreshAllDetailScreens()
 
     if screen.subType() = "DetailScreen"
       content = screen.content 'No need to re fetch the content, just re populate the screen content
+      if isUserInMultiAccount() = true
+        if screen.content <> invalid AND screen.content.validUntil <> invalid
+          screen.content.validUntil = 0
+        end if
+      end if
       populateDetailScreen(screen, content, false, -1)
       resetRelatedContent(screen)
       screen.isWaitingForServerResponse = false
@@ -2461,7 +2561,7 @@ Function showHideLogoBasedOnUiMode(presentedByURL = "", presentedByText = "")
 
   if mode = m.constants.ui.modes.standard
     showHideLogo(m.constants.logoType.tubi, presentedByURL, presentedByText)
-  else if mode = m.constants.ui.modes.kids OR mode = m.constants.ui.modes.kidsAgeGate OR mode = m.constants.ui.modes.kidsParental
+  else if mode = m.constants.ui.modes.kids OR mode = m.constants.ui.modes.kidsAgeGate OR mode = m.constants.ui.modes.kidsParental OR mode = m.constants.ui.modes.kidsProfile
     showHideLogo(m.constants.logoType.tubiKids, presentedByURL, presentedByText)
   else if mode = m.constants.ui.modes.latino
     showHideLogo(m.constants.logoType.tubiEspanol, presentedByURL, presentedByText)
@@ -2799,7 +2899,8 @@ End Function
 
 
 Function refreshUserInfoAndRunControllerStartSequence()
-  getUserSettingsRequest = m.userDeviceApi.createUserSettingsGeneralTaskReqInfo(onGetUserInfoSuccess, onGetUserInfoFailure)
+  isMultiAccount = isUserInMultiAccount()
+  getUserSettingsRequest = m.userDeviceApi.createUserSettingsGeneralTaskReqInfo(onGetUserInfoSuccess, onGetUserInfoFailure, isMultiAccount)
   m.makeRequest(getUserSettingsRequest)
 End Function
 
@@ -2822,7 +2923,29 @@ Function onGetUserInfoSuccess(userInfo)
     if userInfo.hasAge <> invalid
       Auth.setAuthInfo("hasAge", userInfo.hasAge)
     end if
+
+    if userInfo.userUuid <> invalid
+      Auth.setAuthInfo("userUuid", userInfo.userUuid)
+    end if
+
+    if userInfo.avatarUrl <> invalid
+      Auth.setAuthInfo("avatarUrl", userInfo.avatarUrl)
+    end if
+
+    if userInfo.hasPin <> invalid
+      Auth.setAuthInfo("hasPin", userInfo.hasPin)
+    end if
+
+    if userInfo.tubiId <> invalid
+      Auth.setAuthInfo("tubiId", userInfo.tubiId)
+    end if
+
+    if userInfo.email <> invalid
+      Auth.setAuthInfo("email", userInfo.email)
+    end if
   end if
+
+
   runControllerStartSequence()
 End Function
 
@@ -2912,8 +3035,15 @@ Function getUserInfo(callback)
   if isLoggedInUser(authInfo) = true AND isMajorEventDay() = false
     getHistoryIds(getHistoryIdsSuccess, getHistoryIdsError)
     getQueueIds(getQueueIdsSuccess, getQueueIdsError)
-    getUserInfoGetContentRatingTitleLiked()
-    getUserInfoGetContentRatingTitleDisliked()
+
+    'for kids account there wont be like/dislike preferences.
+    if isNonEmptyString(authInfo.parentId) = true then
+      m.getUserPreferencesRateTitleLikedResponseReceived = true
+      m.getUserPreferencesRateTitleDislikedResponseReceived = true
+    else
+      getUserInfoGetContentRatingTitleLiked()
+      getUserInfoGetContentRatingTitleDisliked()
+    end if
   else
     m.getHistoryIdsResponseReceived = true
     m.getQueueIdsResponseReceived = true
@@ -3037,8 +3167,12 @@ End Function
 
 Function needsToShowAgeVerificationScreen()
   authInfo = m.tubiAuthUpdate.getAuthInfo()
-  if isLoggedInUser(authInfo) = true AND authInfo.hasAge = true then
-    return false
+  if isLoggedInUser(authInfo) = true
+    if authInfo.hasAge = true then
+      return false
+    else if isNonEmptyString(authInfo.parentId) = true ' kids account, no need to show age gate
+      return false
+    end if
   else
     guestUserHasAgeInfo = getGuestUserHasAgeInfo()
     ' In the case that the user is logged in but there is no age information associated with the account, hasAge defaults to false.
@@ -3663,6 +3797,87 @@ Function sendStatsigExposureEvent(exposureInfo)
     end if
 
     m.statsigExperiments.logExposure(exposureInfo)
+  end if
+End Function
+
+
+Function onStartMigrateDefaultUserToNewProfileSuccess(userInfo)
+  'create or update the profile metadata section
+  if userInfo <> invalid
+    Auth = m.tubiAuthUpdate
+
+    authInfo = {}
+    currentAuthInfo = Auth.getAuthInfo()
+    authInfo.append(currentAuthInfo) 'append whats in the current auth for the new profile
+
+    if userInfo.firstName <> invalid
+      authInfo.firstName = userInfo.firstName
+    end if
+
+    if userInfo.lastName <> invalid
+      authInfo.lastName = userInfo.lastName
+    end if
+
+    if userInfo.name <> invalid
+      authInfo.name = userInfo.name
+    end if
+
+    if userInfo.hasAge <> invalid
+      authInfo.hasAge = userInfo.hasAge
+    end if
+
+    if userInfo.userUuid <> invalid
+      authInfo.userUuid = userInfo.userUuid
+    end if
+
+    if userInfo.avatarUrl <> invalid
+      authInfo.avatarUrl = userInfo.avatarUrl
+    end if
+
+    if userInfo.hasPin <> invalid
+      authInfo.hasPin = userInfo.hasPin
+    end if
+
+    if userInfo.tubiId <> invalid
+      authInfo.tubiId = userInfo.tubiId
+    end if
+
+    if userInfo.email <> invalid
+      authInfo.email = userInfo.email
+    end if
+
+    Auth.createOrUpdateProfileAuth(userInfo.tubiId, authInfo)
+    'create fake guest profile so that user has option to switch to guest.
+    Auth.createOrUpdateProfileAuth("guest", { "name": "", })
+  end if
+
+  m.profileMigrationComplete = true
+  runControllerStartSequence()
+End Function
+
+
+Function setNotMigratedDefaultState(error = invalid)
+  m.profileMigrationComplete = true
+  runControllerStartSequence()
+End Function
+
+
+Function performProfileMigration()
+  TubiLog("performProfileMigration")
+  if getStatsigExperimentResource("roku_multi_account", "roku_multi_account_v0", false).variant <> "none" AND isLoggedInUser() = true
+    auth = m.tubiAuthUpdate
+    oldAuthExists = auth.getAuthInfo()
+
+    if oldAuthExists.expireTime <> invalid AND isUserInMultiAccount() = false
+      ' get the user info from settings api and patch with what we have already stored in the registry
+      'use v2 parental rating from settings api since we are anyway going to migrate.
+      requestInfo = m.userDeviceApi.createUserSettingsGeneralTaskReqInfo(onStartMigrateDefaultUserToNewProfileSuccess, setNotMigratedDefaultState, true)
+      m.makeRequest(requestInfo)
+    else
+      setNotMigratedDefaultState()
+    end if
+  else
+    setNotMigratedDefaultState()
   end if
 End Function
 

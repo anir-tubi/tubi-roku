@@ -1,15 +1,21 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!-- Extend the ContentNode so we can add some custom fields -->
-<component name = "SideNavContentNode" extends="ContentNode">
+<component name="SideNavContentNode" extends="ContentNode">
   <interface>
-    <field id="iconUrl" type="string" value=""/>
-    <field id="filledIconUrl" type="string" value=""/>
-    <field id="fontSize" type="integer" value="32"/>
-    <field id="bold" type="boolean" value="true"/>
-    <!-- Is the button currently available to the user to be focused upon? If not, then the label will not be visible and the icon may be set to semi-transparent-->
-    <field id="active" type="boolean" value="false"/>
-    <!-- Even if the item is active or enabled, if turnedOn = false, then the button will appear disabled; it will be grayed off no matter what if turnedOn = false -->
-    <field id="turnedOn" type="boolean" value="true"/>
-    <field id="selected" type="boolean" value="false"/>
+    <field id="iconUrl" type="string" value="" />
+    <field id="filledIconUrl" type="string" value="" />
+    <field id="fontSize" type="integer" value="32" />
+    <field id="bold" type="boolean" value="true" />
+    <!-- Is the button currently available to the user to be focused upon? If not, then the label
+    will not be visible and the icon may be set to semi-transparent-->
+    <field id="active" type="boolean" value="false" />
+    <!-- Even if the item is active or enabled, if turnedOn = false, then the button will appear
+    disabled; it will be grayed off no matter what if turnedOn = false -->
+    <field id="turnedOn" type="boolean" value="true" />
+    <field id="selected" type="boolean" value="false" />
+    <field id="sideIconUrl" type="string" value="" />
+    <field id="bottomTxt" type="string" value="" />
+    <field id="isKidsAccount" type="boolean" value="false" />
+    <field id="parentalRating" type="integer" value="3" />
   </interface>
 </component>

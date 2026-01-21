@@ -5,6 +5,8 @@ Function initSideNav()
   '//         2) all of the menu items start out being visible and this function informs the sideNav component which menu items should be hidden
   m.SideNav.observeFieldScoped("itemSelectedId", "onSideNavItemSelected")
   m.SideNav.observeFieldScoped("navigateWithinPageInfo", "onSideNavNavigateWithinPageInfoChanged")
+  m.SideNav.observeFieldScoped("profileSelected", "onProfileSelected")
+  m.SideNav.isUserInMultiAccount = isUserInMultiAccount()
 
   m.SideNav.createMenuItems = true
 
@@ -90,12 +92,20 @@ Function setSideNavSignedInItem(authInfo)
     if isLoggedInUser(authInfo)
       '//User is signed in
       sName = ""
-      if authInfo.firstName <> invalid
+      if isNonEmptyString(authInfo.firstName) = true
         sName = authInfo.firstName
-      else if authInfo.name <> invalid
+      else if isNonEmptyString(authInfo.name) = true
         sName = authInfo.name
       end if
-      sName = getTranslation("menu_signedIn", { name: sName })
+      if isUserInMultiAccount() = true
+        if isNonEmptyString(authInfo.parentId) = true
+          m.SideNav.displayKids = false
+        end if
+
+        m.SideNav.profileUrl = authInfo.avatarUrl
+      else
+        sName = getTranslation("menu_signedIn", { name: sName })
+      end if
     end if
     m.SideNav.stringSignIn = sName
   end if
@@ -137,6 +147,11 @@ Function onSideNavItemSelected()
     sideNavComponentValues = {
       left_nav_section: m.Tracking.sideNavPageMap[itemSelectedId]
     }
+
+    if isUserInMultiAccount() = true AND itemSelectedId = m.constants.ui.sideNavIds.profile
+      sideNavComponentValues.left_nav_section = "ACCOUNT_SELECTION"
+    end if
+
     if currentScreenNow.hasField("reset") = true
       '//reset the previous current screen
       currentScreenNow.reset = true
@@ -152,14 +167,18 @@ Function onSideNavItemSelected()
         setUiMode(m.constants.ui.modes.standard)
       end if
 
-      if isLoggedInUser(authInfo) = false then
-        '//if user is not signed in, then bring up the sign on page; otherwise, don't do anything
-        startSignIn(onSideNavSignInCompleted)
-        bNewScreenCalledSuccess = false ' setting bNewScreenCalledSuccess as false to keep the sidenav open when RFI modal is displayed. This is to avoid focus issue.
+      if isUserInMultiAccount() = true
+        showHideProfileMenu(true)
       else
-        '//Bring user to the settings page and select the signout option
-        showSettingsScreen("SignInOutButton")
-        bNewScreenCalledSuccess = true
+        if isLoggedInUser(authInfo) = false then
+          '//if user is not signed in, then bring up the sign on page; otherwise, don't do anything
+          startSignIn(onSideNavSignInCompleted)
+          bNewScreenCalledSuccess = false ' setting bNewScreenCalledSuccess as false to keep the sidenav open when RFI modal is displayed. This is to avoid focus issue.
+        else
+          '//Bring user to the settings page and select the signout option
+          showSettingsScreen("SignInOutButton")
+          bNewScreenCalledSuccess = true
+        end if
       end if
     else if itemSelectedId = m.constants.ui.sideNavIds.kidsMode
       if currentScreenNow <> invalid AND currentScreenNow.id = m.constants.ui.screenIds.vodDetailScreen
@@ -172,6 +191,9 @@ Function onSideNavItemSelected()
         if isKidsUIOn() = true
           if needsToShowAgeVerificationScreen() = true then
             showAgeVerificationScreenAtKidsModeExit(m.uiMode)
+          else if isUserInMultiAccount() = true
+            showPasswordValidateScreen(authInfo, authInfo, onPasswordValidateKidsModeExit)
+            hideNavMenu(false)
           else
             hideNavMenu(false)
             disableKidsModeFromSideNav()
@@ -434,12 +456,13 @@ Function onKidsModeSettingsCall()
 End Function
 
 
-'@param b: Boolean, setting to true opens the side nav, setting to false closes the side nav.
-Function openSideNav(b = true)
-  m.SideNav.opened = b
-  if b = false
+'@param open: Boolean, setting to true opens the side nav, setting to false closes the side nav.
+Function openSideNav(open = true)
+  m.SideNav.opened = open
+  if open = false
     topScreen = getCurrentScreen()
     m.videoPreviewDebounce.control = "stop"
+    m.SideNav.profileSelectionMenuVisible = false
     sideNavId = m.constants.ui.screenIdToSideNavId[topScreen.id]
     itemSelectedId = m.SideNav.itemSelectedId
     if itemSelectedId = m.constants.ui.sideNavIds.kidsMode AND sideNavId <> invalid
@@ -480,9 +503,15 @@ Function getSideNavInteractionEvent(screen, trackingLib, userInteraction)
       return event
     end if
 
+
+
     leftSideNavComponent = {
       left_nav_section: trackingLib.sideNavPageMap[sideNavId]
     }
+    'Once multi account graduates, we will remove this if condition and change sideNavPageMap to point profile to ACCOUNT_SELECTION
+    if isUserInMultiAccount() = true AND sideNavId = m.constants.ui.sideNavIds.profile
+      leftSideNavComponent.left_nav_section = "ACCOUNT_SELECTION"
+    end if
 
     event = {
       type: "component_interaction"
@@ -569,4 +598,82 @@ Function getSideNavIdAssociatedWithScreen(screen)
   end if
 
   return sideNavId
+End Function
+
+
+Function createProfileSelectionListContentNode()
+  currentProfileId = m.tubiAuthUpdate.getAuthInfo().tubiId
+  menuItems = invalid
+  if isUserInMultiAccount() = true
+
+    profiles = m.tubiAuthUpdate.getAllProfilesAuthInfo()
+    menuItems = CreateObject("roSGNode", "ContentNode")
+    for each tubiId in profiles
+
+      profile = profiles[tubiId]
+      isKidsAccount = (isNonEmptyString(profile.parentId) = true)
+
+
+      menuItem = CreateObject("roSGNode", "SideNavContentNode")
+      name = profile.firstName
+      if name = "" OR name = invalid
+        name = profile.name
+      end if
+      menuItem.title = name
+      menuItem.id = profile.tubiId
+      if profile.name <> invalid
+        menuItem.secondaryTitle = UCase(profile.name.left(1))
+      else if profile.firstName <> invalid
+        menuItem.secondaryTitle = UCase(profile.firstName.left(1))
+      else
+        menuItem.secondaryTitle = ""
+      end if
+
+      menuItem.iconUrl = profile.avatarUrl
+      menuItem.isKidsAccount = isKidsAccount
+
+      guestTitle = getTranslation("continue_as_guest_button")
+      if profile.name = "" OR profile.name = guestTitle
+        menuItem.title = guestTitle
+        menuItem.id = "guest"
+        menuItem.iconUrl = "pkg:/images/account-icon.webp"
+        menuItem.filledIconUrl = "pkg:/images/account-icon-filled.webp"
+      end if
+
+      if profile.tubiId = currentProfileId
+        menuItem.sideIconUrl = "pkg:/images/upArrow.png"
+        menuItem.shortDescriptionLine1 = getTranslation("profile_switch_account")
+        menuItems.insertChild(menuItem, 0)
+      else
+        menuItems.appendChild(menuItem)
+      end if
+
+    end for
+
+    if menuItems.getChildCount() < 8
+      'append add account item
+      addItem = CreateObject("roSGNode", "SideNavContentNode")
+      addItem.title = getTranslation("add_account")
+      addItem.id = "add_profile"
+      addItem.iconUrl = "pkg:/images/icon-add.png"
+      addItem.filledIconUrl = "pkg:/images/icon-add.png"
+      addItem.shortDescriptionLine1 = getTranslation("screenSideNav_add_account_description")
+      menuItems.appendChild(addItem)
+    end if
+  end if
+  return menuItems
+End Function
+
+
+Function showHideProfileMenu(show = true)
+  if show = true
+    menuItems = createProfileSelectionListContentNode()
+    if menuItems <> invalid
+      m.sideNav.profileSelectionMenuContent = menuItems
+    end if
+    m.sideNav.profileSelectionMenuVisible = true
+  else
+    m.sideNav.profileSelectionMenuVisible = false
+  end if
+
 End Function

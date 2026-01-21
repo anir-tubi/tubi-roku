@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ - Age verification screen allows user to enter a birthdate to confirm their age.
+ - Age calculation and confirmation happens on the backend and is handled by
+ - AgeVerificationHelpers.brs
+ -->
+<component name="KidsAgeSelectionScreen" extends="BaseScreen">
+
+  <script type="text/brightscript" uri="KidsAgeSelectionScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+
+  <interface>
+
+    <!-- INPUT -->
+    <field id="signInInfo" type="assocarray" />
+
+    <!-- The uiMode before we come into this screen as designs call for us to switch the theme to
+    the
+  standard one when displaying this screen but we may need to switch back to the previous mode after
+  we leave this screen -->
+    <field id="previousUiMode" type="string" />
+
+    <!-- OUTPUT -->
+
+    <!-- event that occurs when a user selects the Start Watching button -->
+    <field id="ageSelected" type="boolean" />
+
+    <!-- event that occurs when a user selects the back button -->
+    <field id="backButtonPressed" type="boolean" alwaysNotify="true" />
+
+  </interface>
+
+  <children>
+    <Poster
+      id="backButtonPoster"
+      uri="pkg:/images/back_button.png"
+      translation="[126,60]"
+      width="170"
+      height="72" />
+
+    <LayoutGroup
+      layoutDirection="vert"
+      itemSpacings="[8,8,30]"
+      horizAlignment="center"
+      vertAlignment="center"
+      translation="[960,540]">
+
+      <Label
+        id="TopPageHeader"
+        horizAlign="center">
+        <Font
+          role="font" />
+      </Label>
+      <Label
+        id="PageHeader"
+        horizAlign="center"
+        width="1668">
+        <Font
+          role="font" />
+      </Label>
+      <Label
+        id="SubHeader"
+        horizAlign="center"
+        width="1668">
+        <Font
+          role="font" />
+      </Label>
+      <markupgrid
+        id="AgeSelectionList"
+        itemSize="[356, 581]"
+        itemComponentName="AgeSelectionListItem"
+        focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+        focusFootprintBitmapUri="pkg:/images/transparent.png"
+        itemSpacing="[36, 0]"
+        numColumns="4"
+        numRows="1"
+        rowHeights="[581]"
+        columnWidths="[356]"
+        columnSpacings="[36]" />
+    </LayoutGroup>
+
+  </children>
+</component>

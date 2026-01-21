@@ -297,6 +297,7 @@ Function getConstants()
   constants.reqNames.emailExists = "emailExists"
   constants.reqNames.signUp = "signUp"
   constants.reqNames.signIn = "signIn"
+  constants.reqNames.signUpForKids = "signUpForKids"
   constants.reqNames.deviceRegister = "deviceRegister" 'verify age
   constants.reqNames.checkBirthdayInfo = "checkBirthdayInfo" 'verify age
   constants.reqNames.patchUserSettings = "patchUserSettings"
@@ -317,6 +318,7 @@ Function getConstants()
   constants.reqNames.getContentRating = "getContentRating"
   constants.reqNames.setContentRating = "setContentRating"
   constants.reqNames.updateParentalRating = "updateParentalRating"
+  constants.reqNames.patchKidsParentalRating = "patchKidsParentalRating"
   constants.reqNames.deleteFromQueue = "deleteFromQueue"
   constants.reqNames.postToQueue = "postToQueue"
   constants.reqNames.deleteHistory = "deleteHistory"
@@ -344,12 +346,17 @@ Function getConstants()
   constants.reqNames.fetchStatsigExperimentsActive = "fetchStatsigExperimentsActive"
   constants.reqNames.fetchStatsigExperimentsPaused = "fetchStatsigExperimentsPaused"
   constants.reqNames.getEpgListing = "getEpgListing"
+  constants.reqNames.postPinUpdateForKids = "postPinUpdateForKids"
+  constants.reqNames.validatePassword = "validatePassword"
+  constants.reqNames.validatePin = "validatePin"
+
 
   ' a list of reqnames that the general task will inject auth headers and should expect to handle 403 errors for
   constants.reqNames.acceptsTubiAuth = {}
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getQueue] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getHistory] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.patchUserSettings] = true
+  constants.reqNames.acceptsTubiAuth[constants.reqNames.postPinUpdateForKids] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.checkBirthdayInfo] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getAutocomplete] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getSearchScreen] = true
@@ -372,10 +379,12 @@ Function getConstants()
   constants.reqNames.acceptsTubiAuth[constants.reqNames.queryStatusOfMagicLink] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.postUserHistory] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.signup] = true
+  constants.reqNames.acceptsTubiAuth[constants.reqNames.signUpForKids] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.signIn] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getContentRating] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.setContentRating] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.updateParentalRating] = true
+  constants.reqNames.acceptsTubiAuth[constants.reqNames.patchKidsParentalRating] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.deleteFromQueue] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.postToQueue] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.deviceRegister] = true
@@ -396,6 +405,8 @@ Function getConstants()
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getEPGPrograms] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getSoTStaticConfig] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getEpgListing] = true
+  constants.reqNames.acceptsTubiAuth[constants.reqNames.validatePassword] = true
+  constants.reqNames.acceptsTubiAuth[constants.reqNames.validatePin] = true
 
   constants.anonymous = {}
   constants.anonymous.algorithm = "TUBI-HMAC-SHA256"
@@ -662,6 +673,9 @@ Function getConstants()
   constants.urls.account.signup = constants.urls.account.urlBase + "/user/signup"
   constants.urls.account.deviceSettings = constants.urls.account.urlBase + "/device/settings"
   constants.urls.account.consent = constants.urls.account.urlBase + "/consent"
+  constants.urls.account.signupForKids = constants.urls.account.urlBase + "/accounts/kids"
+  constants.urls.account.updatePinforKids = constants.urls.account.urlBase + "/accounts/kids/pin"
+  constants.urls.account.validatePin = constants.urls.account.urlBase + "/accounts/kids/pin/validate"
 
   constants.urls.account.anonymousSigningKey = constants.urls.account.urlBase + "/device/anonymous/signing_key"
   constants.urls.account.anonymousToken = constants.urls.account.urlBase + "/device/anonymous/token"
@@ -672,6 +686,7 @@ Function getConstants()
   constants.urls.account.transferToken = constants.urls.account.urlBase + "/user_device/login/transfer"
   constants.urls.account.resetPassword = constants.urls.account.urlBase + "/user_device/password/reset"
   constants.urls.account.logout = constants.urls.account.urlBase + "/user_device/logout"
+  constants.urls.account.passwordValidate = constants.urls.account.urlBase + "/accounts/password/validate"
 
   constants.urls.lishi = {}
   constants.urls.lishi.baseUrl = "https://lishi.production-public.tubi.io"
@@ -1196,6 +1211,9 @@ Function getConstants()
   ' TODO remove in next submission release
   constants.errors.codes.userNotFound = "USER_NOT_FOUND"
   constants.errors.codes.invalidToken = "INVALID_TOKEN"
+  constants.errors.codes.duplicateKidName = "DUPLICATE_KID_NAME"
+  constants.errors.codes.tooManyKids = "TOO_MANY_KIDS"
+  constants.errors.codes.invalidNameChars = "INVALID_NAME_CHARS"
 
   ' IDs for input devices, https://docs.tubi.io/protos/index#analytics.SearchEvent.input_device
   constants.inputDevices = {}
@@ -1219,19 +1237,6 @@ Function getConstants()
   constants.ui.ages = {}
   constants.ui.ages.ageGate = 13
 
-  constants.ui.ratings = {}
-  aUS = []
-  aUS.push("G, TV-Y, TV-G") '//Group 0, Little Kids
-  aUS.push("PG, TV-PG, TV-Y7") '//Group 1, Big Kids
-  aUS.push("PG-13, TV-14") '//Group 2, Teens
-  aUS.push("R, TV-MA, NC-17") '//Group 3, Adults
-  constants.ui.ratings["US"] = aUS
-  aMX = []
-  aMX.push("A") '//Group 0, Little Kids
-  aMX.push("B") '//Group 1, Big Kids
-  aMX.push("B15") '//Group 2, Teens
-  aMX.push("C, D") '//Group 3, Adults
-  constants.ui.ratings["MX"] = aMX
 
   'what ratings are highly mature and should be treated differently? May not be applicable to all countries.
   constants.ui.matureRatings = {}
@@ -1348,6 +1353,7 @@ Function getConstants()
   constants.ui.modes.kidsParental = "kidsParental" 'kids mode when a user has little kids or older kids selected via parental controls
   constants.ui.modes.kidsAgeGate = "kidsAgeGate" 'a limited version of kids mode that a user sees if they fail the COPPA age gate
   constants.ui.modes.latino = "latino"
+  constants.ui.modes.kidsProfile = "kidsProfile" 'multi account mode, when a user has multiple accounts
 
   'Screen levels dictate the hierarchy of the app and prevent scenarios where users can get into infinite screen loops.
   'Screens cannot be pushed on top of a screen whose screenLevel is greater than theirs.
@@ -1377,12 +1383,16 @@ Function getConstants()
   constants.ui.screenLevels.emailInputScreen = 90
   constants.ui.screenLevels.signInScreen = 90
   constants.ui.screenLevels.ageGateScreen = 90
+  constants.ui.screenLevels.kidsAgeSelectionScreen = 90
   constants.ui.screenLevels.consentScreen = 120
   constants.ui.screenLevels.rokuContinueWatchingConsentScreen = 120
   constants.ui.screenLevels.managePreferencesScreen = 130
   constants.ui.screenLevels.linearDetailScreen = 50
   constants.ui.screenLevels.vodDetailScreen = 50
   constants.ui.screenLevels.foxVideoPlayerWrapperScreen = 60
+  constants.ui.screenLevels.profileSelectorScreen = 90
+  constants.ui.screenLevels.kidsAccountSetupScreen = 90
+  constants.ui.screenLevels.parentalControlPinInputScreen = 90
 
   constants.ui.screenIds = {}
   constants.ui.screenIds.homeScreen = "homeScreen"
@@ -1411,7 +1421,12 @@ Function getConstants()
   constants.ui.screenIds.eventDetailScreen = "eventDetailScreen"
   constants.ui.screenIds.foxVideoPlayerWrapperScreen = "FoxVideoPlayerWrapperScreen"
   constants.ui.screenIds.linearDetailScreen = "linearDetailScreen"
+  constants.ui.screenIds.profileSelectorScreen = "profileSelectorScreen"
+  constants.ui.screenIds.kidsAccountSetupScreen = "kidsAccountSetupScreen"
   constants.ui.screenIds.vodDetailScreen = "vodDetailScreen"
+  constants.ui.screenIds.parentalControlPinInputScreen = "parentalControlPinInputScreen"
+  constants.ui.screenIds.kidsAgeSelectionScreen = "kidsAgeSelectionScreen"
+  constants.ui.screenIds.nameInputScreen = "nameInputScreen"
 
   ' notAllowedContainerIds are the containers which are not allowed to be displayed on category screen,
   ' because currently we support only portrait style in category detail screen
@@ -1716,7 +1731,15 @@ Function getConstants()
   constants.serverValues.tensorVideoRenditions.fourK = "4K_READY"
 
   ' Creates mapping against parental rating to a header string.
-  constants.serverValues.parentalControls = ["YOUNGER_CHILD", "OLDER_CHILD", "TEEN", "ADULT"]
+  constants.serverValues.parentalControls = ["YOUNGER_CHILD", "OLDER_CHILD", "TEEN", "ADULT", "YOUNGEST_CHILD", "OLDEST_CHILD"]
+
+  constants.ui.ratings = {}
+  constants.ui.ratings[constants.serverValues.parentalControls[0]] = ["TV-G", "G"] '//Group 0, Little Kids
+  constants.ui.ratings[constants.serverValues.parentalControls[1]] = ["TV-PG", "PG"] '//Group 1, Big Kids
+  constants.ui.ratings[constants.serverValues.parentalControls[2]] = ["TV-14", "PG-13"] '//Group 2, Teens
+  constants.ui.ratings[constants.serverValues.parentalControls[3]] = ["TV-MA", "R", "NC-17"] '//Group 3, Adults
+  constants.ui.ratings[constants.serverValues.parentalControls[4]] = ["TV-Y"] '//Group 4, youngest Kids
+  constants.ui.ratings[constants.serverValues.parentalControls[5]] = ["TV-Y7", "TV-Y7-FV"] '//Group 5, oldest Kids
 
   constants.urls.realtime.distributionMapping = {
     "viewTime": true,
@@ -2021,6 +2044,18 @@ Function getConstants()
     "birthday": constants.consentKeys.essential
     "us_privacy_string": constants.consentKeys.essential
   }
+
+  constants.serverPersistentRegistryKeys = {}
+  constants.serverPersistentRegistryKeys.tubiId = "tubi_id"
+  constants.serverPersistentRegistryKeys.firstName = "first_name"
+  constants.serverPersistentRegistryKeys.lastName = "last_name"
+  constants.serverPersistentRegistryKeys.name = "name"
+  constants.serverPersistentRegistryKeys.hasPin = "has_pin"
+  constants.serverPersistentRegistryKeys.kids = "kids"
+  constants.serverPersistentRegistryKeys.avatarUrl = "avatar_url"
+  constants.serverPersistentRegistryKeys.hasAge = "has_age"
+  constants.serverPersistentRegistryKeys.email = "email"
+  constants.serverPersistentRegistryKeys.parentalRating = "parental_rating_v2" ' we are blindly using V2 here because we are using registry only for treatment of MA
 
   return constants
 End Function

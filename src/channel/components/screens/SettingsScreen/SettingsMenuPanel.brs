@@ -16,6 +16,8 @@ Function init()
   m.top.observeFieldScoped("signInInfo", "onSignInInfoChange")
   m.top.observeFieldScoped("uiMode", "onUiModeChange")
 
+  m.isUserInMultiAccount = isUserInMultiAccountFromRegistry()
+
   setSettingsSidePanelMenuItems()
 
   resetSettingsMenuVerticalPosition()
@@ -43,61 +45,104 @@ End Function
 
 Function setSettingsSidePanelMenuItems()
 
-  testAidDisplayOrder = 7
-
   autoPlayPreviewText = getTranslation("screenSettings_menu_autoplayControls")
-
   ' Adding a display order field since roku does not maintain order in an associative array.
-  availablePanelItems = {
-    "parentalControls": {
-      subType: "DetailMenuItemContentNode"
-      id: "ParentalControlsButton"
-      title: getTranslation("screenSettings_menu_parentalControls")
-      iconUrl: "pkg:/images/icon-parental.webp"
-      displayOrder: 1
-    },
+  index = 1
+  availablePanelItems = {}
+
+  if m.isUserInMultiAccount = true
+    availablePanelItems.append({
+      "signInOut": {
+        subType: "DetailMenuItemContentNode"
+        id: "SignInOutButton"
+        title: getTranslation("menu_signIn")
+        iconUrl: "pkg:/images/icon-account.webp"
+        displayOrder: index
+    } })
+    index = index + 1
+
+    availablePanelItems.append({
+      "parentalControls": {
+        subType: "DetailMenuItemContentNode"
+        id: "ParentalControlsButton"
+        title: getTranslation("screenSettings_menu_contentSettings")
+        iconUrl: "pkg:/images/icon-parental.webp"
+        displayOrder: index
+    } })
+
+  else
+    availablePanelItems.append({
+      "parentalControls": {
+        subType: "DetailMenuItemContentNode"
+        id: "ParentalControlsButton"
+        title: getTranslation("screenSettings_menu_parentalControls")
+        iconUrl: "pkg:/images/icon-parental.webp"
+        displayOrder: index
+    } })
+  end if
+
+  index = index + 1
+
+  availablePanelItems.append({
+
     "autoplayPreview": {
       subType: "DetailMenuItemContentNode"
       id: "AutoplayPreviewButton"
       title: autoPlayPreviewText
       iconUrl: "pkg:/images/icon-trailer.webp"
-      displayOrder: 2
-    },
+      displayOrder: index
+  } })
+
+  index = index + 1
+  availablePanelItems.append({
     "about": {
       subType: "DetailMenuItemContentNode"
       id: "AboutButton"
       title: getTranslation("screenSettings_menu_about")
       iconUrl: "pkg:/images/icon-about.webp"
-      displayOrder: 3
-    },
+      displayOrder: index
+  } })
+
+  index = index + 1
+  availablePanelItems.append({
     "privacyCenter": {
       subType: "DetailMenuItemContentNode"
       id: "PrivacyCenterButton"
       title: getTranslation("screenSettings_menu_PrivacyCenter")
       iconUrl: "pkg:/images/icon-privacy.webp"
-      displayOrder: 4
-    },
-    "signInOut": {
-      subType: "DetailMenuItemContentNode"
-      id: "SignInOutButton"
-      title: getTranslation("menu_signIn")
-      iconUrl: "pkg:/images/icon-account.webp"
-      displayOrder: 5
-    },
+      displayOrder: index
+  } })
+
+  if m.isUserInMultiAccount = false
+    index = index + 1
+    availablePanelItems.append({
+      "signInOut": {
+        subType: "DetailMenuItemContentNode"
+        id: "SignInOutButton"
+        title: getTranslation("menu_signIn")
+        iconUrl: "pkg:/images/icon-account.webp"
+        displayOrder: index
+    } })
+  end if
+
+  index = index + 1
+  availablePanelItems.append({
     "exit": {
       subType: "DetailMenuItemContentNode"
       id: "ExitButton"
       title: getTranslation("menu_exit")
       iconUrl: "pkg:/images/sideNavExit.webp"
-      displayOrder: 6
-    },
+      displayOrder: index
+  } })
+  index = index + 1
+  availablePanelItems.append({
     "testAid": {
       subType: "DetailMenuItemContentNode"
       id: "TestingAidButton"
       title: "TestAid"
-      displayOrder: testAidDisplayOrder
+      displayOrder: index
     }
-  }
+  })
 
   ' removing the parental controls if the config returns false.
   if getExternalConfigValueFromGlobal("enable_parental_control", false) = false then
@@ -125,17 +170,21 @@ Function setSettingsSidePanelMenuItems()
   end for
 
   menuItems.sortBy("displayOrder")
-
   m.settingsMenuContent.update(menuItems, true)
 End Function
 
 
 Function onSignInInfoChange()
   sText = getTranslation("menu_signIn")
-  signInInfo = m.top.signInInfo
-  if signInInfo <> invalid AND signInInfo.signedIn = true
-    sText = getTranslation("screenSettings_menu_signOut")
+  if m.isUserInMultiAccount = true
+    sText = getTranslation("screenSettings_menu_Account")
+  else
+    signInInfo = m.top.signInInfo
+    if signInInfo <> invalid AND signInInfo.signedIn = true
+      sText = getTranslation("screenSettings_menu_signOut")
+    end if
   end if
+
 
   signInButton = m.nodeHelpers.getChildById(m.settingsMenuContent, "SignInOutButton")
   if signInButton <> invalid

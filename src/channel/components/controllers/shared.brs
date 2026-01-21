@@ -349,6 +349,17 @@ Function logout(callback = invalid)
 End Function
 
 
+Function signOutCurrentProfile(callback = invalid)
+  m.tubiAuthUpdate.logOutCurrentProfile()
+
+  if isFunction(callback)
+    callback()
+  end if
+End Function
+
+
+
+
 ' @returns: boolean, true if the current time is during a major event, false if not
 Function isMajorEventDay()
   majorEventStart = getExternalConfigValueFromGlobal("major_event_failsafe_start", m.constants.configHubFallbacks.majorEventStart)

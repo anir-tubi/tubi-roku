@@ -39,12 +39,18 @@ Function parseGetUserSettingsSuccess(fullResponse, reqInfo)
   if parsed.has_password <> invalid then
     result["hasPassword"] = parsed.has_password
   end if
+  'keep the parental_rating for older clients
+  if reqInfo.isUserInMultiAccount = true AND parsed.parental_rating_v2 <> invalid
+    parentalRating = parsed.parental_rating_v2
+  else
+    parentalRating = parsed.parental_rating
+  end if
 
-  if parsed.parental_rating <> invalid
-    result["parentalRating"] = parsed.parental_rating
+  if parentalRating <> invalid then
+    result["parentalRating"] = parentalRating
     if reqInfo.isGDPR = true then
       'Setting Parental Control option to Older Kids for nz & uk region, if the parental option was selected as Teens from other region
-      if parsed.parental_rating = 2
+      if parentalRating = 2
         result["parentalRating"] = 1
       end if
     end if
@@ -78,6 +84,18 @@ Function parseGetUserSettingsSuccess(fullResponse, reqInfo)
     result["userUuid"] = parsed.user_uuid
   end if
 
+  if parsed.avatar_url <> invalid AND parsed.avatar_url.medium <> invalid AND parsed.avatar_url.medium["2x"] <> invalid
+    result["avatarUrl"] = parsed.avatar_url.medium["2x"]
+  end if
+
+  if parsed.has_pin <> invalid
+    result["hasPin"] = parsed.has_pin
+  end if
+
+  if parsed.tubi_id <> invalid
+    result["tubiId"] = parsed.tubi_id
+  end if
+
   return result
 End Function
 
@@ -102,4 +120,58 @@ Function parseGetContentRatingSuccess(fullResponse, reqInfo)
     "nodes": nodes
     "nextPageId": data.next
   }
+End Function
+
+
+Function parseValidatePasswordSuccess(fullResponse, reqInfo)
+  parsedResponse = {}
+
+  if isAA(fullResponse) = true
+    parsedResponse = fullResponse.data
+  end if
+
+  return parsedResponse
+End Function
+
+
+Function parseValidatePasswordError(fullResponse, _reqInfo)
+  return {
+    code: fullResponse.code
+  }
+End Function
+
+
+Function parseValidatePinSuccess(fullResponse, reqInfo)
+  parsedResponse = {}
+
+  if isAA(fullResponse) = true
+    parsedResponse = fullResponse.data
+  end if
+
+  return parsedResponse
+End Function
+
+
+Function parseValidatePinError(fullResponse, _reqInfo)
+  return {
+    code: fullResponse.code
+  }
+End Function
+
+
+Function parseUpdatePinSuccess(fullResponse, reqInfo)
+  parsedResponse = {}
+
+  parsedResponse.success = true
+
+  return parsedResponse
+End Function
+
+
+Function parseUpdatePinError(fullResponse, reqInfo)
+
+  return {
+    code: fullResponse.code
+  }
+
 End Function

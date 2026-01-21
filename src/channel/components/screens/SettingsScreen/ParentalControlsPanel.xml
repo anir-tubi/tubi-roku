@@ -1,82 +1,114 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<component name="ParentalControlsPanel" extends="Panel" >
+<?xml version="1.0" encoding="utf-8"?>
+<component name="ParentalControlsPanel" extends="Panel">
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="ParentalControlsPanel.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StatsigExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StatsigLib.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/StatsigExperimentMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ProfileMixinGenPurpose.brs" />
 
 
   <interface>
     <!-- INPUTS -->
-      <!-- make a particular setting "checked" and focused -->
-      <field id="selectItem" type="integer" alwaysNotify="true"/>
-      <field id="offset" alias="Offset.translation"/>
-      <field id="isLoading" type="boolean"/>
+    <!-- make a particular setting "checked" and focused -->
+    <field id="selectItem" type="integer" alwaysNotify="true" />
+    <field id="offset" alias="Offset.translation" />
+    <field id="isLoading" type="boolean" />
+    <field id="isUserInMultiAccount" type="boolean" value="false" alwaysNotify="true" />
+    <field id="hideDescription" type="boolean" value="false" />
+    <field id="showPCForKids" type="boolean" value="false" />
 
+    <field id="hasPin" type="boolean" value="false" />
+    <field id="showPinLayout" type="boolean" alwaysNotify="true" />
 
     <!-- OUTPUTS -->
-      <field id="itemSelected" type="integer" alwaysNotify="true"/>
-      <field id="audioGuideText" type="string" alwaysNotify="true"/>
+    <field id="itemSelected" type="integer" alwaysNotify="true" />
+    <field id="audioGuideText" type="string" alwaysNotify="true" />
+    <!-- This field is used to store the account information for the linked account-->
+    <field id="pcChangeRequestId" type="string" />
+    <field id="pinUpdateBtnSelected" alias="PinButton.selected" />
   </interface>
 
   <children>
     <Group
       id="Offset">
 
-    <LayoutGroup
-      id="ContentGroup"
-      layoutDirection="vert"
-      itemSpacings="[45]">
-      <Label
-        id="Title"
-        height="73"
-        vertAlign="bottom">
-        <Font
-         role="font"/>
-      </Label>
+      <LayoutGroup
+        id="ContentGroup"
+        layoutDirection="vert"
+        itemSpacings="[45]">
+        <Label
+          id="Title"
+          height="73"
+          vertAlign="bottom">
+          <Font
+            role="font" />
+        </Label>
 
-      <Label
-        id="Instructions"
-        width="1002"
-        wrap="true"
-        vertAlign="bottom">
-        <Font
-         role="font"/>
-      </Label>
+        <Label
+          id="Instructions"
+          width="1002"
+          wrap="true"
+          vertAlign="bottom">
+          <Font
+            role="font" />
+        </Label>
 
-      <MarkupList
-        id="ParentalControlsMenu"
-        numRows="12"
-        itemSize="[560,80]"
-        itemSpacing="[0,8]"
-        itemComponentName="CheckButton"
-        vertFocusAnimationStyle="floatingFocus">
-        <ContentNode
-          id="SettingsMenuContent"
-          role="content">
-          <CheckButtonContentNode
-            id="LittleKids"/>
-          <CheckButtonContentNode
-            id="OlderKids"/>
-          <CheckButtonContentNode
-            id="Teens"/>
-          <CheckButtonContentNode
-            id="Adults"/>
-        </ContentNode>
-      </MarkupList>
-    </LayoutGroup>
+        <MarkupList
+          id="ParentalControlsMenu"
+          numRows="12"
+          itemSize="[560,80]"
+          itemSpacing="[0,8]"
+          itemComponentName="CheckButton"
+          vertFocusAnimationStyle="floatingFocus">
+          <ContentNode
+            id="SettingsMenuContent"
+            role="content">
+            <CheckButtonContentNode
+              id="LittleKids" />
+            <CheckButtonContentNode
+              id="OlderKids" />
+            <CheckButtonContentNode
+              id="Teens" />
+            <CheckButtonContentNode
+              id="Adults" />
+          </ContentNode>
+        </MarkupList>
+        <LayoutGroup
+          id="PinLayout"
+          layoutDirection="vert"
+          horizAlignment="left"
+          vertAlignment="top"
+          itemSpacings="[16, 36]">
+          <Label
+            id="PinLabel">
+            <Font
+              role="font" />
+          </Label>
+          <Label
+            id="PinDescription"
+            maxLines="1">
+            <Font
+              role="font" />
+          </Label>
+          <SimpleButton
+            id="PinButton"
+            width="218"
+            height="72" />
+        </LayoutGroup>
+      </LayoutGroup>
 
-    <Spinner
-      id="Spinner"
-      visible="false"
-      height="717"
-      width="1034"
-      translation="[0,0]"/>
+      <Spinner
+        id="Spinner"
+        visible="false"
+        height="717"
+        width="1034"
+        translation="[0,0]" />
     </Group>
   </children>
 </component>

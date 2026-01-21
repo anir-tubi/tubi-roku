@@ -98,6 +98,12 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
+      roku_multi_account: {
+        roku_multi_account_v0: {
+          default: { "variant": "none" } ' "none", "adult_with_kids"
+        }
+      }
+
       roku_content_details: {
         ' New content details screen experiment
         roku_content_details_v2: {

@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="ParentalControlPinInputScreen" extends="BaseScreen">
+
+  <script type="text/brightscript" uri="ParentalControlPinInputScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+
+  <interface>
+
+    <!-- INPUT -->
+    <field id="signInInfo" type="assocarray" />
+    <field id="text" alias="NumberPad.text" />
+    <!-- Pin screen is used in various situations.  Each time it needs different
+      title and different behavior.
+      possible values : add_pin, edit_pin, confirm_pin, enter_pin -->
+    <field id="mode" type="string" value="add_pin" />
+
+    <field id="pinError" type="boolean" value="false" alwaysNotify="true" />
+
+
+    <!-- OUTPUT -->
+    <field id="pinSubmitted" type="boolean" alwaysNotify="true" />
+    <field id="forgotPinSelected" type="boolean" alwaysNotify="true" />
+
+  </interface>
+
+  <children>
+    <Poster
+      id="BackButtonPoster"
+      uri="pkg:/images/back_button.png"
+      translation="[126,60]"
+      visible="false"
+      width="170"
+      height="72" />
+
+    <LayoutGroup
+      layoutDirection="vert"
+      itemSpacings="[4,8,20,20, -60, 20, 8]"
+      horizAlignment="center"
+      vertAlignment="center"
+      translation="[960,540]">
+
+      <Label
+        id="TopPageHeader"
+        horizAlign="center">
+        <Font
+          role="font" />
+      </Label>
+      <Label
+        id="pageHeader"
+        horizAlign="center"
+        width="1668">
+        <Font
+          role="font" />
+      </Label>
+      <Label
+        id="PageSubHeader"
+        horizAlign="center"
+        width="1668">
+        <Font
+          role="font" />
+      </Label>
+
+      <LayoutGroup
+        id="pinGroup"
+        layoutDirection="horiz"
+        vertAlignment="center"
+        horizAlignment="center"
+        itemSpacings="[8]">
+        <Group>
+          <Poster
+            width="99"
+            height="87"
+            uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+            id="digit1Poster">
+          </Poster>
+          <Poster
+            width="99"
+            height="87"
+            uri="pkg:/images/pin-bg-input.png"
+            id="digit1bg">
+          </Poster>
+          <Label
+            width="99"
+            height="87"
+            horizAlign="center"
+            vertAlign="center"
+            id="digit1">
+            <Font
+              role="font" />
+          </Label>
+        </Group>
+
+        <Group>
+          <Poster
+            width="99"
+            height="87"
+            uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+            visible="false"
+            id="digit2Poster">
+          </Poster>
+          <Poster
+            width="99"
+            height="87"
+            uri="pkg:/images/pin-bg-input.png"
+            id="digit2bg">
+          </Poster>
+          <Label
+            width="99"
+            height="87"
+            horizAlign="center"
+            vertAlign="center"
+            id="digit2">
+            <Font
+              role="font" />
+          </Label>
+        </Group>
+
+        <Group>
+          <Poster
+            width="99"
+            height="87"
+            uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+            visible="false"
+            id="digit3Poster">
+          </Poster>
+          <Poster
+            width="99"
+            height="87"
+            uri="pkg:/images/pin-bg-input.png"
+            id="digit3bg">
+          </Poster>
+          <Label
+            width="99"
+            height="87"
+            horizAlign="center"
+            vertAlign="center"
+            id="digit3">
+            <Font
+              role="font" />
+          </Label>
+        </Group>
+
+        <Group>
+          <Poster
+            width="99"
+            height="87"
+            uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+            visible="false"
+            id="digit4Poster">
+          </Poster>
+          <Poster
+            width="99"
+            height="87"
+            uri="pkg:/images/pin-bg-input.png"
+            id="digit4bg">
+          </Poster>
+          <Label
+            width="99"
+            height="87"
+            horizAlign="center"
+            vertAlign="center"
+            id="digit4">
+            <Font
+              role="font" />
+          </Label>
+        </Group>
+      </LayoutGroup>
+
+      <Label
+        id="errorMessage"
+        visible="false">
+        <Font
+          role="font" />
+      </Label>
+
+      <NumberPad
+        id="NumberPad" />
+      <SimpleButton
+        id="continueButton"
+        width="420"
+        height="72" />
+      <SimpleButton
+        id="multiPurposeButton"
+        width="420"
+        height="72" />
+    </LayoutGroup>
+  </children>
+
+
+</component>

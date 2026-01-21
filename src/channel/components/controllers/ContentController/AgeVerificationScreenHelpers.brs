@@ -78,6 +78,12 @@ Function showAgeVerificationScreenAtSignUp(signInInfo = invalid as Object)
 End Function
 
 
+Function showAgeVerificationScreenAtSignUpForKids(signInInfo = invalid as Object)
+  tubiLog("AgeVerificationScreenHelpers.showAgeVerificationScreenAtSignUpForKids")
+  showSignUpAgeVerificationScreenForKids(signInInfo)
+End Function
+
+
 ' Occurs during exiting kids mode
 ' @currentUiMode: string current mode we were in before going to age verification screen, one of the values in constants.ui.modes
 Function showAgeVerificationScreenAtKidsModeExit(currentUiMode)
@@ -86,6 +92,12 @@ Function showAgeVerificationScreenAtKidsModeExit(currentUiMode)
   setUiMode(m.constants.ui.modes.standard)
   showAgeVerificationScreen(onAgeSubmittedAtKidsModeExit, invalid, currentUiMode)
 End Function
+
+
+Function showSignUpAgeVerificationScreenForKids(signInInfo)
+  showKidsAgeSelectionScreen(signInInfo)
+End Function
+
 
 ' Occurs during deeplink received while in kids mode
 ' @currentUiMode: string current mode we were in before going to age verification screen, one of the values in constants.ui.modes
@@ -266,6 +278,10 @@ Function verifyAgeAtSignup(signInInfo, birthdate)
       lastName = signInInfo.lastName
     end if
 
+    if isUserInMultiAccount() = true
+      usedEmailAsFirstName = false
+    end if
+
     options = {}
     options.body = {
       platform: m.constants.platform
@@ -281,6 +297,7 @@ Function verifyAgeAtSignup(signInInfo, birthdate)
         temporary_name: usedEmailAsFirstName
       }
     }
+
 
     requestInfo = m.userDeviceApi.signUpReqInfo(options)
     m.makeRequest({
@@ -442,6 +459,8 @@ Function onAgeNotVerifiedAtSignup(error)
 
     else if httpCode = 400 AND errorCode <> invalid AND (errorCode = errorCodes.invalidParams OR errorCode = errorCodes.invalidEmailDomain OR errorCode = errorCodes.blockedEmailDomain OR errorCode = errorCodes.emailExists)
       handleInvalidEmailError() ' happens when user enters invalid email domain
+    else if httpCode = 400 AND errorCode <> invalid AND (errorCode = errorCodes.duplicateKidName OR errorCode = errorCodes.tooManyKids OR errorCode = errorCodes.invalidNameChars)
+      handleInvalidKidSignupError(errorCode)
     else
       handleNetworkErrorOnSignUp(error) ' happens when there is a network failure or some backend issue
     end if
@@ -555,8 +574,15 @@ Function handle_422_451_error(callback, errorCode = 0)
     logMsg = FormatJson(logMsg)
     logInfo(logMsg, "clientInfo", "dont_complete_signup_after_rfi")
   end if
+  if isUserInMultiAccount() = true 'in case of multi account, just lock the guest profile.
+    if m.callbackAfterSignIn = invalid
+      m.callbackAfterSignIn = refreshScreenAndContentAfterSignIn
+    end if
+    handleGuestProfileSelection()
+  else
+    logout()
+  end if
 
-  logout()
   setUiMode(m.constants.ui.modes.kidsAgeGate) ' setting ui mode to kids Age gate
 
   callback() ' redirecting to kidsMode before showing enterKidsMode modal, so that user will be aware what the experience will be
@@ -643,6 +669,19 @@ Function showAgeVerificationScreen(ageSubmittedCallback, signInInfo = invalid, p
   ageVerificationScreen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
   pushScreen(ageVerificationScreen, true, true)
 End Function
+
+' showKidsAgeSelectionScreen is used to display create KidsAgeSelectionScreen in multi Profile mode
+' @signInInfo: assocarray used for tracking parent info for kids
+Function showKidsAgeSelectionScreen(signInInfo)
+  ageVerificationScreen = createObject("roSGNode", "KidsAgeSelectionScreen")
+  ageVerificationScreen.id = m.constants.ui.screenIds.kidsAgeSelectionScreen
+  ageVerificationScreen.signInInfo = signInInfo
+  ageVerificationScreen.observeFieldScoped("ageSelected", "onAgeSelectedAtSignUpForKids")
+  ageVerificationScreen.observeFieldScoped("backButtonPressed", "onBackButtonPressed")
+  ageVerificationScreen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
+  pushScreen(ageVerificationScreen, true, true)
+End Function
+
 
 ' SignUpAgeVerificationScreen is used to display create AgeVerificationScreen and display
 ' @signInInfo: assocarray used for tracking info later

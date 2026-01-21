@@ -42,6 +42,11 @@ Function registerParsingCallbacks()
     parseError: parseSignUpError
   }
 
+  m.requestTypes[m.constants.reqNames.signUpForKids] = {
+    parseSuccess: parseSignUpSuccessForKids
+    parseError: parseSignUpError
+  }
+
   ' signin
   m.requestTypes[m.constants.reqNames.signIn] = {
     parseSuccess: parseSignInSuccess
@@ -80,6 +85,12 @@ Function registerParsingCallbacks()
 
   'updateParentalRating
   m.requestTypes[m.constants.reqNames.updateParentalRating] = {
+    parseSuccess: parseUpdateParentalRatingSuccess
+    parseError: parseGenericError
+  }
+
+  'updateParentalRatingForKidsAccount
+  m.requestTypes[m.constants.reqNames.patchKidsParentalRating] = {
     parseSuccess: parseUpdateParentalRatingSuccess
     parseError: parseGenericError
   }
@@ -296,6 +307,21 @@ Function registerParsingCallbacks()
   m.requestTypes[m.constants.reqNames.getEpgListing] = {
     parseSuccess: parseEpgListingSuccess
     parseError: parseGenericError
+  }
+
+  m.requestTypes[m.constants.reqNames.validatePassword] = {
+    parseSuccess: parseValidatePasswordSuccess
+    parseError: parseValidatePasswordError
+  }
+
+  m.requestTypes[m.constants.reqNames.validatePin] = {
+    parseSuccess: parseValidatePinSuccess
+    parseError: parseValidatePinError
+  }
+
+  m.requestTypes[m.constants.reqNames.postPinUpdateForKids] = {
+    parseSuccess: parseUpdatePinSuccess
+    parseError: parseUpdatePinError
   }
 
   m.requestTypes[m.constants.reqNames.fetchStatsigExperimentsActive] = {

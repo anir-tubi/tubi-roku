@@ -17,7 +17,13 @@ Function startSignIn(callbackAfterSignIn = invalid, callbackAfterSignInParams = 
 
   m.callbackAfterSignIn = callbackAfterSignIn
   m.callbackAfterSignInParams = callbackAfterSignInParams
-  showRFIScreen()
+
+  if isUserInMultiAccount() = true
+    showProfileSelectorScreen(m.constants)
+  else
+    showRFIScreen()
+  end if
+
 
 End Function
 
@@ -144,20 +150,24 @@ End Function
 Function onEmailInputContinueSelected(evt)
   TubiLog("SignInHelpers.onEmailInputContinueSelected")
   screen = evt.getRoSGNode() 'emailInputScreen
-  email = screen.email
 
-  if isEmailValid(email) = true
-    input = {
-      email: email
-      emailType: "manual"
-    }
-
-    checkEmailExists(input)
+  if screen.getSubtype() = "EmailInputOrAddKidsScreen" AND screen.accountTypeSelected <> invalid AND screen.accountTypeSelected = "kids"
+    showNameInputScreen(screen)
   else
-    screen.isEmailValid = false
-    ' re-setting focus on the screen is necessary to re-set voiceEnabled on the keyboard
-    screen.setFocus(false)
-    screen.setFocus(true)
+    email = screen.email
+
+    if isEmailValid(email) = true
+      input = {
+        email: email
+        emailType: "manual"
+      }
+      checkEmailExists(input)
+    else
+      screen.isEmailValid = false
+      ' re-setting focus on the screen is necessary to re-set voiceEnabled on the keyboard
+      screen.setFocus(false)
+      screen.setFocus(true)
+    end if
   end if
 
 End Function
@@ -212,10 +222,40 @@ Function onEmailInputBackButtonSelected()
   popScreen(true, true)
   onStopAndClearEmailVerificationTimer()
 
+  if isUserInMultiAccount() = true
+    setUIModeFromState()
+  end if
+
   if m.signUpToSaveProgressCancelledCallback <> invalid
     signUpToSaveProgressCancelledCallback = m.signUpToSaveProgressCancelledCallback
     m.signUpToSaveProgressCancelledCallback = invalid
     signUpToSaveProgressCancelledCallback()
+  end if
+End Function
+
+
+Function onNameInputBackButtonSelected()
+  popScreen(true, true)
+End Function
+
+
+Function onNameInputContinueSelected(evt)
+  screen = evt.getRoSGNode()
+  signInInfo = screen.signInInfo
+  accountTypeSelected = screen.accountTypeSelected
+
+  registerEvent = {
+    type: "register"
+    values: {
+      progress: "COMPLETED_NAME"
+    }
+  }
+  m.trackingLoggingTask.trackEvent = registerEvent
+
+  if accountTypeSelected <> invalid AND accountTypeSelected = "kids"
+    showAgeVerificationScreenAtSignUpForKids(signInInfo)
+  else
+    showAgeVerificationScreenAtSignUp(signInInfo)
   end if
 End Function
 
@@ -281,7 +321,7 @@ Function onEmailExistsResponse(response)
 
       emailScreen = invalid
       screen = getCurrentScreen()
-      if screen <> invalid AND screen.isSubType("EmailInputScreen") = true
+      if screen <> invalid AND (screen.isSubType("EmailInputScreen") = true OR screen.isSubType("EmailInputOrAddKidsScreen") = true)
         emailScreen = screen
       end if
 
@@ -300,37 +340,46 @@ Function onEmailExistsResponse(response)
           signUpCredentials.emailType = emailType
           signUpCredentials.gender = gender
 
-          if isNonEmptyString(firstName) = false
-            '//if first name does not exist, (i.e. when the user manually enters their email address),
-            '// then use the 1st part of the email address
-            emailSplitArr = email.split("@")
-            emailSplitArrayCount = emailSplitArr.Count()
+          if isUserInMultiAccount() = false
+            if isNonEmptyString(firstName) = false
+              '//if first name does not exist, (i.e. when the user manually enters their email address),
+              '// then use the 1st part of the email address
+              emailSplitArr = email.split("@")
+              emailSplitArrayCount = emailSplitArr.Count()
 
-            '// If user enters email as somename@domain.com, then it takes firstName as "somename"
-            if emailSplitArrayCount = 2
-              firstName = emailSplitArr[0]
-              '// If user enters email with multiple "@" symbol, eg. some@name@domain.com, so@me@name@domain.com etc
-              '// then also it takes firstName as "somename"
-            else if emailSplitArrayCount > 2
-              for i = 0 to emailSplitArrayCount - 2
-                firstName += emailSplitArr[i]
-              end for
+              '// If user enters email as somename@domain.com, then it takes firstName as "somename"
+              if emailSplitArrayCount = 2
+                firstName = emailSplitArr[0]
+                '// If user enters email with multiple "@" symbol, eg. some@name@domain.com, so@me@name@domain.com etc
+                '// then also it takes firstName as "somename"
+              else if emailSplitArrayCount > 2
+                for i = 0 to emailSplitArrayCount - 2
+                  firstName += emailSplitArr[i]
+                end for
+              end if
             end if
+
+            ' Removing below special characters from firstName/lastName fields as it is not accepted in backend.
+            regex = CreateObject("roRegex", "[<>&,`'!@$%()=+{}[\]\""]", "") '" quote comment to aid in syntax highlighting
+            firstName = regex.replaceAll(firstName, "")
+            lastName = regex.replaceAll(lastName, "")
+
+            signUpCredentials.firstName = Left(firstName, 20) ' limiting by 20 characters for the firstname field
+            signUpCredentials.lastName = lastName
+
+            if emailScreen <> invalid
+              emailScreen.isEmailValid = true
+            end if
+
+            showAgeVerificationScreenAtSignUp(signUpCredentials)
+          else 'user is in multi account
+            if emailScreen <> invalid
+              emailScreen.isEmailValid = true
+              emailScreen.signInInfo = signUpCredentials
+            end if
+
+            showNameInputScreen(emailScreen)
           end if
-
-          ' Removing below special characters from firstName/lastName fields as it is not accepted in backend.
-          regex = CreateObject("roRegex", "[<>&,`'!@$%()=+{}[\]\""]", "") '" quote comment to aid in syntax highlighting
-          firstName = regex.replaceAll(firstName, "")
-          lastName = regex.replaceAll(lastName, "")
-
-          signUpCredentials.firstName = Left(firstName, 20) ' limiting by 20 characters for the firstname field
-          signUpCredentials.lastName = lastName
-
-          if emailScreen <> invalid
-            emailScreen.isEmailValid = true
-          end if
-
-          showAgeVerificationScreenAtSignUp(signUpCredentials)
         else if parsedResponse.code = "INVALID_FORMAT"
           ' user's email address is not acceptable. Could be valid from a semantic point of view,
           ' but might be blocked by backend due to known spam domain
@@ -432,6 +481,24 @@ Function showSignInScreen(userInput)
 End Function
 
 
+Function showNameInputScreen(screen)
+  nameScreen = CreateObject("roSGNode", "NameInputScreen")
+  nameScreen.id = m.constants.ui.screenIds.nameInputScreen
+  if screen <> invalid
+    nameScreen.email = screen.email
+    nameScreen.hasPin = screen.hasPin
+    nameScreen.parentProfileId = screen.parentProfileId
+    if screen.accountTypeSelected <> invalid
+      nameScreen.accountTypeSelected = screen.accountTypeSelected
+    end if
+  end if
+  nameScreen.observeFieldScoped("continueSelected", "onNameInputContinueSelected")
+  nameScreen.observeFieldScoped("backButtonSelected", "onNameInputBackButtonSelected")
+  nameScreen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
+  pushScreen(nameScreen, true, true)
+End Function
+
+
 ' onSignInScreenEmailSelected callback triggers when user selects the email text box
 Function onSignInScreenEmailSelected()
   showEmailScreen()
@@ -452,6 +519,30 @@ Function showEmailScreen()
 End Function
 
 
+Function showEmailScreenWithProfileSelection()
+  emailScreen = CreateObject("roSGNode", "EmailInputOrAddKidsScreen")
+  emailScreen.id = m.constants.ui.screenIds.emailInputScreen
+  profiles = m.tubiAuthUpdate.getAllProfilesAuthInfo()
+  emailScreen.profiles = getProfilesListContent(profiles, true)
+  emailScreen.observeFieldScoped("continueSelected", "onEmailInputContinueSelected")
+  emailScreen.observeFieldScoped("backButtonSelected", "onEmailInputBackButtonSelected")
+  emailScreen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
+  emailScreen.observeFieldScoped("accountTypeSelected", "onAccountTypeSelected")
+  emailScreen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
+  pushScreen(emailScreen, true, true)
+  return emailScreen
+End Function
+
+Function onAccountTypeSelected(msg)
+  accType = msg.getData()
+  if accType <> invalid AND accType = "kids"
+    setUiMode(m.constants.ui.modes.kidsProfile)
+  else
+    setUiMode(m.constants.ui.modes.standard)
+  end if
+End Function
+
+
 Function onBackgroundScreenUpdated(msg)
   TubiLog("SignInHelpers.onBackgroundScreenUpdated")
   screen = msg.getRoSGNode()
@@ -467,7 +558,8 @@ End Function
 ' onSignUpResponse callback is triggered when the sign up is success
 ' @_response: the response of signUp API in the form of AA
 Function onSignUpResponse(response)
-  m.tubiAuthUpdate.handleRegistration(response)
+  isUsrInMultiAccount = isUserInMultiAccount()
+  m.tubiAuthUpdate.handleRegistration(response, isUsrInMultiAccount)
 
   event = {
     type: "account"
@@ -489,6 +581,7 @@ Function onSignUpResponse(response)
   end if
 
   onActivationSuccess()
+  showWelcomeProfileToast()
 End Function
 
 
@@ -504,9 +597,16 @@ End Function
 
 
 ' @rfiSignInInfo: AssociativeArray - A record of the Roku account's signin info: i.e. email, firstname, gender, etc.
-Function signUserIn(email, password, rfiSignInInfo = invalid)
+Function signUserIn(email, password, rfiSignInInfo = invalid, successCallback = invalid, errorCallback = invalid)
   if isAA(rfiSignInInfo) = false then
     rfiSignInInfo = {}
+  end if
+
+  if successCallback = invalid then
+    successCallback = onSignInResponse
+  end if
+  if errorCallback = invalid then
+    errorCallback = onSignInError
   end if
 
   options = {}
@@ -526,8 +626,8 @@ Function signUserIn(email, password, rfiSignInInfo = invalid)
     url: requestInfo.url
     requestType: m.constants.reqNames.signIn
     options: requestInfo.options
-    successCallback: onSignInResponse
-    errorCallback: onSignInError
+    successCallback: successCallback
+    errorCallback: errorCallback
     responseType: "assocarray"
     email: email
     rfiSignInInfo: rfiSignInInfo
@@ -538,7 +638,9 @@ End Function
 ' onSignInResponse callback is triggered when the sign In is success
 ' @response: assocarray or invalid, the response of signIn API in the form of AA or invalid if called from onQueryStatusOfMagicLinkResponse
 Function onSignInResponse(response)
-  m.tubiAuthUpdate.handleRegistration(response)
+  isUsrInMultiAccount = isUserInMultiAccount()
+  m.tubiAuthUpdate.handleRegistration(response, isUsrInMultiAccount)
+
 
   event = {
     type: "account"
@@ -597,6 +699,7 @@ Function onSignInResponse(response)
   end if
 
   onActivationSuccess()
+  showWelcomeProfileToast()
 End Function
 
 
@@ -666,7 +769,12 @@ End Function
 
 Function refreshConsent()
   handleUpdatedAuth()
-  getConsent(showConsentScreenOrRefreshServerPersistentData)
+  if isUserInMultiAccount() = true AND isKidsProfile() = true
+
+    refreshServerPersistentDataAfterSignIn()
+  else
+    getConsent(showConsentScreenOrRefreshServerPersistentData)
+  end if
 End Function
 
 
@@ -687,7 +795,7 @@ End Function
 Function onPostSignInAuthInfoUpdated()
   tubiLog("SignInHelpers.onPostSignInAuthInfoUpdated")
   authInfo = m.tubiAuthUpdate.getAuthInfo()
-  if (shouldShowAgeGate() AND authInfo <> invalid AND authInfo.hasAge <> true)
+  if (shouldShowAgeGate() AND authInfo <> invalid AND isLoggedInUser(authInfo) = true AND authInfo.hasAge <> true)
     m.spinner.visible = false
     signInInfo = invalid
 
@@ -758,7 +866,7 @@ Function onSideNavSignInCompleted()
     setDirtyUserCategories(m.constants.ui.categoryIds.history)
   end if
 
-  setContentToRefreshAllPersonalizedScreens()
+  setContentToRefreshAllPersonalizedScreens(true)
 
   refreshAllDetailScreens()
   authInfo = m.tubiAuthUpdate.getAuthInfo()
@@ -806,6 +914,34 @@ Function onSignOutCompleted()
 End Function
 
 
+Function onLogOutProfileCompleted()
+  tubiLog("SignInHelpers.onLogOutProfileCompleted")
+
+  clearGlobalUserData()
+
+  profiles = m.tubiAuthUpdate.getAllProfilesAuthInfo()
+
+  if profiles["guest"] <> invalid
+    profileCount = profiles.count() - 1
+    profiles.delete("guest")
+  else
+    profileCount = profiles.count()
+  end if
+
+  if profileCount = 0
+    m.sideNav.isUserInMultiAccount = false
+    handleGuestProfileSelection()
+  else if profileCount = 1
+    m.sideNav.isUserInMultiAccount = false
+    profileId = profiles.Keys()[0]
+    handleRegularProfileSelection(profileId)
+  else if profiles.count() > 1
+    m.sideNav.isUserInMultiAccount = true
+    showProfileSelectorScreen(m.constants, profiles)
+  end if
+End Function
+
+
 Function getConsentAfterSignOut()
   handleUpdatedAuth()
   getConsent(showConsentScreenOrRefreshServerPersistentDataAfterSignOut)
@@ -824,8 +960,14 @@ End Function
 Function onPostSignOutServerPersistentDataRefresh()
   tubiLog("SignInHelpers.onPostSignOutServerPersistentDataRefresh")
   authInfo = m.tubiAuthUpdate.getAuthInfo()
-  ' set the mode before any changes are done to the UI
-  setUiMode(m.constants.ui.modes.standard)
+
+  if isUserInMultiAccount() = false
+    if isKidsUIOn() = false
+      setUiMode(m.constants.ui.modes.standard)
+    end if
+  else
+    setUiModeForProfileSelected(authInfo)
+  end if
 
   setContentToRefreshAllPersonalizedScreens()
   setSideNavSignedInItem(authInfo)
@@ -865,10 +1007,15 @@ Function onQueueAfterSignIn()
   tubiLog("SignInHelpers.onQueueAfterSignIn")
   refreshUiAfterSignIn()
 
-  ' setContentToRefresh is not required for homescreen as we are fetching homescreen content
-  ' right after adding into queue when onBookmarkedAfterSignIn() is called.
-  ' We need to enforce that content is added to queue first, before re-fetching the homescreen.
-  setContentToRefreshAllPersonalizedScreens(false)
+  if isUserInMultiAccount() = true AND isKidsUIOn() = true
+    setContentToRefreshAllPersonalizedScreens() 'for kids profile, we need to refresh the homescreen.
+  else
+
+    ' setContentToRefresh is not required for homescreen as we are fetching homescreen content
+    ' right after adding into queue when onBookmarkedAfterSignIn() is called.
+    ' We need to enforce that content is added to queue first, before re-fetching the homescreen.
+    setContentToRefreshAllPersonalizedScreens(false)
+  end if
 
   currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
@@ -1086,6 +1233,12 @@ Function popScreenAfterSignInProcess()
     "ManagePreferencesScreen": true
     "RokuCWConsentScreen": true
     "SignInSignUpErrorScreen": true
+    "ProfileSelectorScreen": true
+    "NameInputScreen": true
+    "KidsAgeSelectionScreen": true
+    "EmailInputOrAddKidsScreen": true
+    "ParentalControlPinInputScreen": true
+    "KidsAccountSetupScreen": true
   }
 
   count = m.screenStack.getChildCount() - 1

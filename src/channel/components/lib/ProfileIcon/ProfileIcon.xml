@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="ProfileIcon" extends="Group">
+  <script type="text/brightscript" uri="ProfileIcon.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+
+  <interface>
+    <field id="uri" type="string" alias="PosterBackground.uri" />
+    <field id="width" type="float" alias="PosterBackground.width" />
+    <field id="height" type="float" alias="PosterBackground.height" />
+    <field id="text" alias="PosterText.text" />
+    <field id="textColor" type="string" alias="PosterText.color" />
+    <field id="textFont" type="string" />
+    <field id="textAlign" type="string" alias="PosterText.horizAlign" value="center" />
+    <field id="textVertAlign" type="string" alias="PosterText.vertAlign" value="center" />
+  </interface>
+
+  <children>
+    <Poster
+      id="PosterBackground"
+      height="121"
+      width="121"
+      loadDisplayMode="scaleToFill" />
+    <Label
+      id="PosterText"
+      horizAlign="center"
+      vertAlign="center">
+      <Font
+        role="font" />
+    </Label>
+  </children>
+</component>

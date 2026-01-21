@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<component name="NameInputScreen" extends="EmailInputScreen">
+
+  <script type="text/brightscript" uri="NameInputScreen.brs" />
+
+  <interface>
+
+    <!-- INPUT -->
+    <field id="signInInfo" type="assocarray" />
+    <field id="accountTypeSelected" type="string" />
+    <field id="hasPin" type="boolean" />
+    <field id="parentProfileId" type="string" />
+
+
+    <!-- OUTPUT -->
+    <field id="name" type="string" />
+
+  </interface>
+
+  <children>
+    <Label
+      id="SubHeading"
+      translation="[500, 140]"
+      horizAlign="center"
+      vertAlign="center"
+      width="920">
+      <Font
+        role="font" />
+    </Label>
+  </children>
+</component>

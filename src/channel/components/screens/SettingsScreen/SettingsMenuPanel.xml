@@ -1,28 +1,33 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<component name="SettingsMenuPanel" extends="ListPanel" >
-  <script type="text/brightscript" uri="SettingsMenuPanel.brs"/>
-  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
+<?xml version="1.0" encoding="utf-8"?>
+<component name="SettingsMenuPanel" extends="ListPanel">
+  <script type="text/brightscript" uri="SettingsMenuPanel.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StatsigExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StatsigLib.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/StatsigExperimentMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/VideoPreviewMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ProfileMixinGenPurpose.brs" />
 
   <interface>
     <!-- INPUTS -->
-      <!-- associative array that will indicate if the user is signed in and if so, the aa will contain their info.  -->
-      <field id="signInInfo" type="assocarray" alwaysNotify="true" />
+    <!-- associative array that will indicate if the user is signed in and if so, the aa will
+    contain their info.  -->
+    <field id="signInInfo" type="assocarray" alwaysNotify="true" />
 
-      <!-- Allowed values are those in constants.ui.modes -->
-      <field id="uiMode" type="string"/>
+    <!-- Allowed values are those in constants.ui.modes -->
+    <field id="uiMode" type="string" />
+
+    <field id="isUserInMultiAccount" type="boolean" value="false" alwaysNotify="true" />
 
     <!-- OUTPUTS -->
-      <field id="content" alias="SettingsMenu.content"/>
-      <field id="itemSelected" alias="SettingsMenu.itemSelected"/>
-      <field id="itemFocused" alias="SettingsMenu.itemFocused"/>
-      <field id="itemUnfocused" alias="SettingsMenu.itemUnfocused"/>
+    <field id="content" alias="SettingsMenu.content" />
+    <field id="itemSelected" alias="SettingsMenu.itemSelected" />
+    <field id="itemFocused" alias="SettingsMenu.itemFocused" />
+    <field id="itemUnfocused" alias="SettingsMenu.itemUnfocused" />
   </interface>
 
   <children>

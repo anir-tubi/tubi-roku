@@ -20,9 +20,9 @@ Function init()
 
   'set initial tracking values
   m.top.trackingPageInfo = {
-    pageType: "auth_page"
+    pageType: "register_page"
     pageValues: {
-      auth_action: "PASSWORD_CONFIRMATION"
+      auth_method: "PASSWORD_CONFIRMATION"
     }
   }
 

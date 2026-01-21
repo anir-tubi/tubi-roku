@@ -15,6 +15,14 @@ Function parseGetServerPersistentData(fullResponse, _reqInfo)
       end if
     end for
 
+    settingsRegistryKeys = m.constants.serverPersistentRegistryKeys
+    for each registryKey in settingsRegistryKeys.keys()
+      backendKey = settingsRegistryKeys[registryKey]
+      if data[backendKey] <> invalid
+        serverPersistentData[registryKey] = data[backendKey]
+      end if
+    end for
+
   end if
 
   return serverPersistentData

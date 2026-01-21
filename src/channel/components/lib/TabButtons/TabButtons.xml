@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ - TabButtons
+ - 
+ - A toggle component that switches between "For Adults" and "For Kids" modes
+ - with animated focus indicator using MarkupList
+ -->
+<component name="TabButtons" extends="Group">
+  <script type="text/brightscript" uri="TabButtons.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+
+  <interface>
+    <!-- INPUT -->
+
+    <!-- OUTPUT -->
+    <field id="itemSelected" alias="tabsList.itemSelected" />
+    <field id="itemFocused" alias="tabsList.itemFocused" />
+  </interface>
+
+  <children>
+    <Poster
+      id="backgroundRail"
+      uri="pkg:/images/pill_button_$$RES$$.9.png"
+      translation="[0,0]"
+      width="652"
+      height="68" />
+
+    <FilledButtonMarkupGrid
+      id="tabsList"
+      numColumns="2"
+      numRows="1"
+      itemSize="[326,68]"
+      itemSpacing="[0,0]"
+      itemComponentName="tabButton"
+      horizFocusAnimationStyle="floatingFocus"
+      focusBitmapUri="pkg:/images/pill_button_$$RES$$.9.png"
+      translation="[0,0]"
+      focusFootprintBitmapUri="pkg:/images/pill_button_$$RES$$.9.png">
+
+      <ContentNode
+        id="tabsContent"
+        role="content" />
+    </FilledButtonMarkupGrid>
+
+  </children>
+</component>

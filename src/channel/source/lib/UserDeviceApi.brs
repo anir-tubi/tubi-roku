@@ -19,11 +19,16 @@ Function UserDeviceApi(constants, apiUtilsInstance)
     deleteHistory: userDeviceApi_deleteHistory
     queryStatusOfMagicLink: userDeviceApi_queryStatusOfMagicLink
     updateParentalRatingReqInfo: userDeviceApi_updateParentalRatingReqInfo
+    updateParentalRatingReqInfoForKidsAccount: userDeviceApi_updateParentalRatingReqInfoForKidsAccount
+    updatePinReqInfoForKidsAccount: userDeviceApi_updatePinReqInfoForKidsAccount
     removeFromQueueReqInfo: userDeviceApi_removeFromQueueReqInfo
     addToQueueReqInfo: userDeviceApi_addToQueueReqInfo
     getQueueReqInfo: userDeviceApi_getQueueReqInfo
     getHistoryReqInfo: userDeviceApi_getHistoryReqInfo
     getAddHistoryRequestInfo: userDeviceApi_getAddHistoryRequestInfo
+    signUpReqInfoForKids: userDeviceApi_signUpReqInfoForKids
+    passwordValidateRegInfo: userDeviceApi_passwordValidateRegInfo
+    validatePinReqInfoForKidsAccount: userDeviceApi_validatePinReqInfoForKidsAccount
 
     ' serverPersistentData related methods.
     createUserSettingsReqInfo: userDeviceApi_createUserSettingsReqInfo
@@ -93,6 +98,27 @@ Function userDeviceApi_signUpReqInfo(passedOptions = {})
   params = {}
   headers.append(m.getCommonOptions().headers)
   'passing device advertiser id to signup request.
+  params["idfa"] = m.constants.deviceInfo.deviceAdId
+  body = FormatJSON(passedOptions.body)
+  options["method"] = m.constants.reqTypes.post
+  options["body"] = body
+  options["headers"] = headers
+  options["params"] = params
+  return {
+    url: url
+    options: options
+  }
+End Function
+
+
+
+Function userDeviceApi_signUpReqInfoForKids(passedOptions = {})
+  url = m.constants.urls.account.signupForKids
+  options = {}
+  headers = {}
+  params = {}
+  headers.append(m.getCommonOptions().headers)
+  'TODO : check if we need to pass idfa for kids account
   params["idfa"] = m.constants.deviceInfo.deviceAdId
   body = FormatJSON(passedOptions.body)
   options["method"] = m.constants.reqTypes.post
@@ -219,6 +245,22 @@ Function userDeviceApi_resetPassword(email)
 End Function
 
 
+'@password: string, user entered password
+Function userDeviceApi_passwordValidateRegInfo(password)
+  url = m.constants.urls.account.passwordValidate
+  options = m.getCommonOptions()
+  body = {
+    password: password
+  }
+  options["method"] = m.constants.reqTypes.post
+  options["body"] = FormatJSON(body)
+  return {
+    url: url
+    options: options
+  }
+End Function
+
+
 '@uid: string, unique identifier generated through magicLink for each user
 Function userDeviceApi_queryStatusOfMagicLink(uid)
   url = m.constants.urls.account.magicLink + "/" + uid
@@ -283,17 +325,92 @@ Function userDeviceApi_getContentRating(target, ratingType, nextPageId = "")
 End Function
 
 
+' @parentalRating: integer, selected parentalRating from the settings screen
+' @password: string, user entered password
+' @name: string, user entered name
+' @tubiId: string, unique identifier generated through magicLink for each user
+Function userDeviceApi_updateParentalRatingReqInfoForKidsAccount(parentalRating, password, name, tubiId)
+  url = m.constants.urls.account.signupForKids
+  options = {}
+  headers = m.getCommonOptions().headers
+  body = {
+    parental_rating_v2: parentalRating,
+    password: password,
+    name: name,
+    tubi_id: tubiId
+  }
+  options["method"] = m.constants.reqTypes.patch
+  options["body"] = FormatJson(body)
+  options["headers"] = headers
+
+  return {
+    url: url
+    options: options
+  }
+End Function
+
+
+' @password: string, user entered password
+' @pin: string, user entered pin
+Function userDeviceApi_updatePinReqInfoForKidsAccount(password, pin)
+  url = m.constants.urls.account.updatePinforKids
+  options = {}
+  headers = m.getCommonOptions().headers
+  body = {
+    pin: pin,
+    password: password,
+  }
+  options["method"] = m.constants.reqTypes.post
+  options["body"] = FormatJson(body)
+  options["headers"] = headers
+
+  return {
+    url: url
+    options: options
+  }
+
+End Function
+
+
+'@pin: string, user entered pin
+Function userDeviceApi_validatePinReqInfoForKidsAccount(pin)
+  url = m.constants.urls.account.validatePin
+  options = {}
+  headers = m.getCommonOptions().headers
+  body = {
+    pin: pin,
+  }
+  options["method"] = m.constants.reqTypes.post
+  options["body"] = FormatJson(body)
+  options["headers"] = headers
+
+  return {
+    url: url
+    options: options
+  }
+
+End Function
+
+
 '@parentalRating: integer, selected parentalRating from the settings screen
 'password: string, user entered password
-Function userDeviceApi_updateParentalRatingReqInfo(parentalRating, password)
+Function userDeviceApi_updateParentalRatingReqInfo(parentalRating, password, useV2ParentalRating = false)
 
   url = m.constants.urls.account.parentalRating
   options = {}
   headers = m.getCommonOptions().headers
-  body = {
-    parental_rating: parentalRating,
-    password: password
-  }
+  if useV2ParentalRating = true
+    body = {
+      parental_rating_v2: parentalRating,
+      password: password
+    }
+  else
+    body = {
+      parental_rating: parentalRating,
+      password: password
+    }
+  end if
+
   options["method"] = m.constants.reqTypes.put
   options["body"] = FormatJson(body)
   options["headers"] = headers
@@ -453,13 +570,14 @@ End Function
 ' Servers as a wrapper around createUserSettingsReqInfo to include all of the fields needed for use in GeneralTask
 ' @param successCallback: function, callback that will be called if successful
 ' @param errorCallback: function, callback that will be called if unsuccessful
-Function userDeviceApi_createUserSettingsGeneralTaskReqInfo(successCallback, errorCallback = invalid)
+Function userDeviceApi_createUserSettingsGeneralTaskReqInfo(successCallback, errorCallback = invalid, isMultiAccount = false)
   reqInfo = m.createUserSettingsReqInfo()
   reqInfo.append({
     requestType: m.constants.reqNames.getUserSettings
     successCallback: successCallback
     errorCallback: errorCallback
     responseType: "assocarray"
+    isUserInMultiAccount: isMultiAccount
     isGDPR: isOneTrustConsentEnabled() 'bs:disable-line 1140 LINT1001
   })
   return reqInfo

@@ -18,6 +18,14 @@ Function init()
   m.ItemGroups = m.top.findNode("itemGroups")
   m.MainContent = m.top.findNode("MainContent")
   m.background = m.top.findNode("background")
+  m.profileSelectionMenu = m.top.findNode("ProfileSelectionMenu")
+  m.profileSelectionMenuBgTop = m.top.findNode("ProfileSelectionMenuBgTop")
+  m.profileSelectionMenuBgBottom = m.top.findNode("ProfileSelectionMenuBgBottom")
+
+  m.profileSelectionMenu.observeFieldScoped("itemSelected", "onProfileSelectionMenuItemSelected")
+  m.profileSelectionMenu.observeFieldScoped("itemFocused", "onProfileSelectionMenuItemFocused")
+  m.profileSelectionMenu.observeFieldScoped("visible", "onProfileSelectionMenuVisibleChanged")
+  m.top.observeFieldScoped("profileSelectionMenuContent", "onProfileSelectionMenuContentChanged")
 End Function
 
 
@@ -78,21 +86,43 @@ Function createMainContent(item)
     contentNode.title = m.top.stringSignIn
 
     signTxt = getTranslation("menu_signIn")
+    guestTitle = getTranslation("continue_as_guest_button")
 
     if contentNode.title = ""
       contentNode.title = signTxt
     end if
 
-    if contentNode.title = signTxt 'if title is 'SignIn', that means, user has signed out=>set subtext also 'SignIn'
-      contentNode.shortDescriptionLine1 = signTxt
-      contentNode.ShortDescriptionLine2 = getTranslation("registration_signup_button_free")
+    if contentNode.title = signTxt 'if title is 'SignIn', that means, user has signed out=>set subtext also 'SignIn' or 'Guest'
+      if m.top.isUserInMultiAccount = true
+        contentNode.title = guestTitle
+        contentNode.shortDescriptionLine1 = guestTitle
+        contentNode.bottomTxt = getTranslation("profile_switch_account")
+        contentNode.sideIconUrl = "pkg:/images/downArrow.png"
+        contentNode.iconUrl = "pkg:/images/icon-account.webp"
+        contentNode.filledIconUrl = "pkg:/images/sideNavAccountFilled.webp"
+        contentNode.secondaryTitle = ""
+      else
+        contentNode.iconUrl = "pkg:/images/icon-account.webp"
+        contentNode.filledIconUrl = "pkg:/images/sideNavAccountFilled.webp"
+        contentNode.shortDescriptionLine1 = signTxt
+        contentNode.ShortDescriptionLine2 = getTranslation("registration_signup_button_free")
+      end if
+
     else
-      contentNode.shortDescriptionLine1 = "" 'If title is not "SignIn" but something like 'hi user' then user has signedIn and no need to show subtext
-      contentNode.ShortDescriptionLine2 = ""
+      if m.top.isUserInMultiAccount = true
+        contentNode.bottomTxt = getTranslation("profile_switch_account")
+        contentNode.sideIconUrl = "pkg:/images/downArrow.png"
+        contentNode.iconUrl = m.top.profileUrl
+        contentNode.filledIconUrl = m.top.profileUrl
+        contentNode.secondaryTitle = UCase(contentNode.title.left(1))
+      else
+        contentNode.iconUrl = "pkg:/images/icon-account.webp"
+        contentNode.filledIconUrl = "pkg:/images/sideNavAccountFilled.webp"
+        contentNode.shortDescriptionLine1 = "" 'If title is not "SignIn" but something like 'hi user' then user has signedIn and no need to show subtext
+        contentNode.ShortDescriptionLine2 = ""
+      end if
     end if
 
-    contentNode.iconUrl = "pkg:/images/icon-account.webp"
-    contentNode.filledIconUrl = "pkg:/images/sideNavAccountFilled.webp"
   else if item = m.constants.ui.sideNavIds.settings
     contentNode.title = getTranslation("menu_settings")
     contentNode.iconUrl = "pkg:/images/sideNavSettings.webp"
@@ -177,6 +207,9 @@ Function onThemeChange(msg = invalid)
 
   if theme <> invalid
     m.background.blendColor = theme.neutralColor
+    m.profileSelectionMenu.focusBitmapBlendColor = theme.focusedColor
+    m.profileSelectionMenuBgTop.blendColor = theme.neutralsolidcolor2
+    m.profileSelectionMenuBgBottom.blendColor = theme.neutralsolidcolor2
   end if
 End Function
 
@@ -187,15 +220,89 @@ Function onSignInChange()
   if m.profileContent <> invalid
     m.profileContent.title = m.top.stringSignIn
     signTxt = getTranslation("menu_signIn")
-    if m.profileContent.title = signTxt
-      m.profileContent.shortDescriptionLine1 = signTxt
-      m.profileContent.shortDescriptionLine2 = getTranslation("registration_signup_button_free")
-    else
-      m.profileContent.shortDescriptionLine1 = ""
-      m.profileContent.shortDescriptionLine2 = ""
-    end if
+    guestTitle = getTranslation("continue_as_guest_button")
 
+    if m.profileContent.title = signTxt 'guest
+      if m.top.isUserInMultiAccount = true
+        m.profileContent.title = guestTitle
+        m.profileContent.shortDescriptionLine1 = guestTitle
+        m.profileContent.bottomTxt = getTranslation("profile_switch_account")
+        m.profileContent.sideIconUrl = "pkg:/images/downArrow.png"
+        m.profileContent.iconUrl = "pkg:/images/icon-account.webp"
+        m.profileContent.filledIconUrl = "pkg:/images/sideNavAccountFilled.webp"
+        m.profileContent.secondaryTitle = ""
+      else
+        m.profileContent.iconUrl = "pkg:/images/icon-account.webp"
+        m.profileContent.shortDescriptionLine1 = signTxt
+        m.profileContent.shortDescriptionLine2 = getTranslation("registration_signup_button_free")
+        m.profileContent.bottomTxt = ""
+        m.profileContent.secondaryTitle = ""
+        m.profileContent.sideIconUrl = ""
+      end if
+    else
+      if m.top.isUserInMultiAccount = true
+        m.profileContent.bottomTxt = getTranslation("profile_switch_account")
+        m.profileContent.shortDescriptionLine1 = ""
+        m.profileContent.sideIconUrl = "pkg:/images/downArrow.png"
+        m.profileContent.iconUrl = m.top.profileUrl
+        m.profileContent.filledIconUrl = m.top.profileUrl
+        m.profileContent.secondaryTitle = UCase(m.profileContent.title.left(1))
+      else
+        m.profileContent.iconUrl = "pkg:/images/icon-account.webp"
+        m.profileContent.shortDescriptionLine1 = ""
+        m.profileContent.shortDescriptionLine2 = ""
+        m.profileContent.bottomTxt = ""
+        m.profileContent.secondaryTitle = ""
+        m.profileContent.sideIconUrl = ""
+      end if
+
+    end if
   end if
+End Function
+
+
+Function onProfileSelectionMenuContentChanged()
+  m.profileSelectionMenu.content = m.top.ProfileSelectionMenuContent
+  m.profileSelectionMenu.translation = m.ItemGroups.translation
+  size = m.profileSelectionMenu.boundingRect()
+  width = size.width
+  m.profileSelectionMenuBgTop.width = width
+  m.profileSelectionMenuBgBottom.width = width
+
+  height = size.height
+  m.profileSelectionMenuBgBottom.height = height - 112 '112 = 100 size of top cell + 12 spacing
+  m.profileSelectionMenuBgTop.height = 100
+
+  yTranslation = m.profileSelectionMenu.translation[1] + 112
+  m.profileSelectionMenuBgBottom.translation = [m.profileSelectionMenu.translation[0], yTranslation]
+
+  m.profileSelectionMenuBgTop.translation = m.profileSelectionMenu.translation
+End Function
+
+
+
+Function onProfileSelectionMenuVisibleChanged()
+  if m.profileSelectionMenu.visible = true
+    m.profileSelectionMenuBgTop.visible = true 'not sure why alias is not working here
+    m.profileSelectionMenuBgBottom.visible = true
+    m.profileSelectionMenu.setFocus(true)
+  else if m.profileSelectionMenu.visible = false
+    m.profileSelectionMenuBgTop.visible = false 'not sure why alias is not working here
+    m.profileSelectionMenuBgBottom.visible = false
+    focusItemInList(m.mainItems, m.constants.ui.sideNavIds.profile)
+  end if
+End Function
+
+
+
+Function onProfileSelectionMenuItemSelected(msg)
+  item = msg.getData()
+  profile = m.profileSelectionMenu.content.getChild(item)
+
+  m.top.profileSelected = profile.id
+  m.profileSelectionMenu.visible = false
+  'TOODOO: send tracking events
+
 End Function
 
 
@@ -269,6 +376,33 @@ Function onKidsDisplayChanged()
 End Function
 
 
+Function onSetSideNavForProfileTypeChanged(profileType)
+
+  if profileType = "adult"
+    sCountryCode = UCase(m.constants.deviceInfo.countryCode)
+
+    insertMenuItemInMenuLists(m.constants.ui.sideNavIds.kidsMode)
+    insertMenuItemInMenuLists(m.constants.ui.sideNavIds.categories)
+    insertMenuItemInMenuLists(m.constants.ui.sideNavIds.myList)
+
+    bInMoviesSeriesExperimentUK = ((sCountryCode = "GB" OR sCountryCode = "UK") AND getExperimentResource("roku_add_movies_series", "roku_add_movies_series_uk_v2").enabled = true)
+
+    if (sCountryCode = "US" OR sCountryCode = "CA" OR sCountryCode = "MX" OR bInMoviesSeriesExperimentUK = true)
+      insertMenuItemInMenuLists(m.constants.ui.sideNavIds.movies)
+      insertMenuItemInMenuLists(m.constants.ui.sideNavIds.tv)
+    end if
+
+    if getExternalConfigValueFromGlobal("livetv", false) = true
+      insertMenuItemInMenuLists(m.constants.ui.sideNavIds.linearEPG)
+    end if
+
+    insertMenuItemInMenuLists(m.constants.ui.sideNavIds.espanol)
+    insertMenuItemInMenuLists(m.constants.ui.sideNavIds.settings)
+  end if
+
+End Function
+
+
 ' Insert the menu item associated with sMenuID into the m.MainContent menu lists in the order that the menu item belongs
 ' @sMenuID string one of constants.ui.sideNavIds for which we want to add if it does not already exist
 Function insertMenuItemInMenuLists(sMenuID)
@@ -276,11 +410,13 @@ Function insertMenuItemInMenuLists(sMenuID)
   if nMenuItemOriginalIndex >= 0
     '//menuItem belongs in the menu list, so allowed to proceed to determine where the menu item actually belongs in the list in its current state
     nIndex = 0
+    isAlreadyAdded = false
     nMenuListCountUntil = m.MainContent.getChildCount() - 1
     for i = 0 to nMenuListCountUntil
       menuContentItem = m.MainContent.getChild(i)
       sMenuContentItemID = menuContentItem.Id
       if sMenuID = sMenuContentItemID
+        isAlreadyAdded = true
         '// The menu to be inserted to the menu is already in the menu. No need to do anything
         exit for
       else
@@ -299,17 +435,21 @@ Function insertMenuItemInMenuLists(sMenuID)
       end if
     end for
 
-    menuItem = m[sMenuID + "Content"]
-    if menuItem = invalid
-      menuItem = createMainContent(sMenuID)
+    if isAlreadyAdded = false
+      menuItem = m[sMenuID + "Content"]
+      if menuItem = invalid
+        menuItem = createMainContent(sMenuID)
+      end if
+
+      '//Ensure the menu items match the active state of the other menu items
+      menuItem.active = m.top.opened
+
+      '//add the menu items at their proper locations
+      m.MainContent.insertChild(menuItem, nIndex)
+
+
+      verticallyCenterSideNav()
     end if
-
-    '//Ensure the menu items match the active state of the other menu items
-    menuItem.active = m.top.opened
-
-    '//add the menu items at their proper locations
-    m.MainContent.insertChild(menuItem, nIndex)
-    verticallyCenterSideNav()
   end if
 End Function
 
@@ -338,7 +478,29 @@ End Function
 Function onUiModeChanged()
   if m.top.uiMode = m.constants.ui.modes.kids
     ' kids
+    if m.top.isUserInMultiAccount = true
+      removeMovies()
+      removeTv()
+      removeLiveTv()
+      removeChannels()
+      removeEspanol()
+      'removeMyList()
+      verticallyCenterSideNav()
+    end if
     setCommonSideNavKidsValues()
+
+  else if m.top.uiMode = m.constants.ui.modes.kidsProfile
+    if m.top.isUserInMultiAccount = true
+      removeKids()
+      removeMovies()
+      removeTv()
+      removeLiveTv()
+      removeChannels()
+      removeEspanol()
+      verticallyCenterSideNav()
+    else
+      setCommonSideNavKidsValues()
+    end if
   else if m.top.uiMode = m.constants.ui.modes.kidsParental
     ' kids mode due to parental controls
     setCommonSideNavKidsValues()
@@ -347,7 +509,9 @@ Function onUiModeChanged()
     end if
   else if m.top.uiMode = m.constants.ui.modes.kidsAgeGate
     ' kids mode due to age gating
-    removeProfile()
+    if m.top.isUserInMultiAccount = false
+      removeProfile()
+    end if
     removeKids()
     removeMovies()
     removeTv()
@@ -365,6 +529,9 @@ Function onUiModeChanged()
     if m.espanolContent <> invalid then m.espanolContent.turnedOn = true
     if m.kidsModeContent <> invalid then m.kidsModeContent.title = getTranslation("menu_kids")
   else if m.top.uiMode = m.constants.ui.modes.standard
+    if m.top.isUserInMultiAccount = true
+      onSetSideNavForProfileTypeChanged("adult")
+    end if
     ' standard
     if m.channelsContent <> invalid then m.channelsContent.turnedOn = true
     if m.moviesContent <> invalid then m.moviesContent.turnedOn = true
@@ -462,6 +629,9 @@ Function onKeyEvent(key, press) as Boolean
     if key = "up"
       return true
     else if key = "down"
+      return true
+    else if key = "back" AND m.profileSelectionMenu.visible = true
+      m.profileSelectionMenu.visible = false
       return true
     end if
   end if
@@ -632,6 +802,11 @@ Function onItemFocused(msg)
   ' trigger navigate_within_page events in ContentController
   pageType = m.Tracking.sideNavPageMap[item.id]
 
+  if m.top.isUserInMultiAccount = true AND item.id = m.constants.ui.sideNavIds.profile
+    'Once multi account graduates, we will remove this if condition and change sideNavPageMap to point profile to ACCOUNT_SELECTION
+    pageType = "ACCOUNT_SELECTION"
+  end if
+
   if m.oldSideNavFocusedButton <> invalid AND m.oldSideNavFocusedButton.left_nav_section <> pageType
     row = itemFocused + 1
     col = 1
@@ -668,4 +843,21 @@ End Function
 Function jumpToListItem(list, index)
   list.jumpToItem = index
   setSelectedItemBackgroundTranslation(index)
+End Function
+
+
+Function onProfileSelectionMenuItemFocused(msg)
+  list = msg.getRoSGNode()
+  itemFocused = list.itemFocused
+  row = itemFocused + 1
+  col = 1
+
+  sideNaveComponent = { left_nav_section: "ACCOUNT_SELECTION" }
+  m.top.navigateWithinPageInfo = {
+    componentOneof: m.Tracking.getAnalyticsComponent("left_side_nav_component", sideNaveComponent)
+    means_of_navigation: "SCROLL" 'MeansOfNavigation enum
+
+    vertical_location: row '//The row location of the side nav
+    horizontal_location: col '//The column location of the side nav
+  }
 End Function

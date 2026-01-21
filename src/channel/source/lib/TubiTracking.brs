@@ -640,6 +640,14 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       user_interaction: "" 'Interaction enum
     }
 
+    account_selection: {
+      pageOneof: {}
+    }
+
+    pin_page: {
+      pageOneof: {}
+    }
+
     account: {
       manip: "" 'Manipulation enum
       current: "" 'User.AuthType enum
@@ -647,6 +655,11 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       user_type: "" 'UserType enum
       message: ""
       status: "" 'ActionStatus enum
+    }
+
+    register: {
+      progress: "" 'completed name
+
     }
 
     exposure: {
@@ -1030,8 +1043,19 @@ Function tubiTracking_getOneOfs()
     register_action: "" 'Action enum
   }
 
+  auth_page = {
+    auth_action: "" 'Action enum
+  }
+
   account_page = {
     account_page_type: "" 'PageType enum
+  }
+
+  account_selection_page = {
+  }
+
+  pin_page = {
+    pin_action: "" 'PinAction enum
   }
 
   access_menu_page = {}
@@ -1069,6 +1093,10 @@ Function tubiTracking_getOneOfs()
 
   section_middleNav = {
     middle_nav_section: "" ' Section enum
+  }
+
+  section_topNav = {
+    top_nav_section: "" ' Section enum
   }
 
   search_suggestions_component = {
@@ -1124,6 +1152,8 @@ Function tubiTracking_getOneOfs()
     your_privacy_page: your_privacy_page
     privacy_preferences_page: privacy_preferences_page
     linear_details_page: linear_details_page
+    account_selection_page: account_selection_page
+    pin_page: pin_page
     ' splash_page: splash_page
     ' forget_page: forget_page
   }
@@ -1158,12 +1188,16 @@ Function tubiTracking_getOneOfs()
     dest_your_privacy_page: your_privacy_page
     dest_privacy_preferences_page: privacy_preferences_page
     dest_linear_details_page: linear_details_page
+    dest_account_selection_page: account_selection_page
+    dest_pin_page: pin_page
     ' dest_splash_page: splash_page
     ' dest_forget_page: forget_page
   }
 
   dest_componentOneof = {
     dest_left_side_nav_component: section_leftNav
+
+    dest_top_nav_component: section_topNav
 
     dest_middle_nav_component: section_middleNav
 
@@ -1194,6 +1228,8 @@ Function tubiTracking_getOneOfs()
     left_side_nav_component: section_leftNav
 
     middle_nav_component: section_middleNav
+
+    top_nav_component: section_topNav
 
     category_component: {
       ' Used for category screen, channel details screen, channel/category grid screen
