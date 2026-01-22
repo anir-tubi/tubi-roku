@@ -3810,6 +3810,9 @@ Function onStartMigrateDefaultUserToNewProfileSuccess(userInfo)
     currentAuthInfo = Auth.getAuthInfo()
     authInfo.append(currentAuthInfo) 'append whats in the current auth for the new profile
 
+    'save the auth info backup space in the registry so that we can use it if anything goes wrong.
+    Auth.saveAuthInfoBackup(currentAuthInfo, "authbackup")
+
     if userInfo.firstName <> invalid
       authInfo.firstName = userInfo.firstName
     end if

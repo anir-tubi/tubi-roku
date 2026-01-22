@@ -191,7 +191,7 @@ Function onSideNavItemSelected()
         if isKidsUIOn() = true
           if needsToShowAgeVerificationScreen() = true then
             showAgeVerificationScreenAtKidsModeExit(m.uiMode)
-          else if isUserInMultiAccount() = true
+          else if isUserInMultiAccount() = true AND isLoggedInUser(authInfo) = true
             showPasswordValidateScreen(authInfo, authInfo, onPasswordValidateKidsModeExit)
             hideNavMenu(false)
           else

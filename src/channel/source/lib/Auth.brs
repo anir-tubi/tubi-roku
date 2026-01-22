@@ -61,6 +61,7 @@ Function TubiAuthUpdate(constants, profileId = invalid)
     createOrUpdateProfileAuth: tubiAuth_createOrUpdateProfileAuth
     deleteProfileAuth: tubiAuth_deleteProfileAuth
     copyProfileToMainAuth: tubiAuth_copyProfileToMainAuth
+    saveAuthInfoBackup: tubiAuth_saveAuthInfoBackup
 
     'private methods
     saveAuthInfo: tubiAuth_saveAuthInfo
@@ -1363,4 +1364,21 @@ Function tubiAuth_copyProfileToMainAuth(profileId)
     end if
   end if
 
+End Function
+
+
+'this function is not for general use, it isused to save the authInfo into backup in anticipation of future profiles experiment instead of accounts.
+Function tubiAuth_saveAuthInfoBackup(authInfo, authSectionName = "authbackup")
+  if authInfo <> invalid
+    sec = createObject("roRegistrySection", authSectionName)
+    for each key in authInfo
+
+      if authInfo[key] <> invalid
+        sec.write(LCase(key), authInfo[key].toStr())
+      end if
+
+
+    end for
+    sec.flush()
+  end if
 End Function
