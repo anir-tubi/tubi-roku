@@ -995,7 +995,7 @@ function pushStaging(done) {
   if (!pushResult.stderr) {
     done();
   } else {
-    done(new NoStackError(`AWS S3 error: Hint - check valet auth. And also make sure AWS_PROFILE env variable set to main-roku-dev`));
+    done(new NoStackError(`AWS S3 error: Hint - check valet auth. And also make sure AWS_PROFILE env variable set to tubi-core-staging-developer`));
   }
 }
 
@@ -1012,7 +1012,7 @@ function pushOneTrustStaging(done) {
   if (!result.stderr) {
     done();
   } else {
-    done(new NoStackError(`AWS S3 error: Hint - check valet auth. And also make sure AWS_PROFILE env variable set to main-roku-dev`));
+    done(new NoStackError(`AWS S3 error: Hint - check valet auth. And also make sure AWS_PROFILE env variable set to tubi-core-staging-developer`));
   }
 }
 
@@ -1026,7 +1026,7 @@ async function pushFoxVideoPlayerStaging(done) {
   if (!result.stderr) {
     done();
   } else {
-    done(new NoStackError(`AWS S3 error: Hint - check valet auth. And also make sure AWS_PROFILE env variable set to main-roku-dev`));
+    done(new NoStackError(`AWS S3 error: Hint - check valet auth. And also make sure AWS_PROFILE env variable set to tubi-core-staging-developer`));
   }
 }
 

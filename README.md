@@ -91,7 +91,7 @@ export PKG_PASSWORD="<password from the GENKEY utility used for signing packages
 export RCDN_GIT_DIRECTORY="<path to the rcdn repo directory ex: ~/dev/rcdn>"
 export GITHUB_PAT="<github personal access token>"
 export ROKU_DEV_TELNET="sametab" (optional)
-export AWS_PROFILE=main-roku-dev
+export AWS_PROFILE=tubi-core-staging-developer
 export JIRA_TOKEN="<jira personal api token>"
 export JIRA_EMAIL="<personal jira account email>"
 ```
