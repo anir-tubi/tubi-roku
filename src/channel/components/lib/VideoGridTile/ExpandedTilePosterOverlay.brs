@@ -20,8 +20,9 @@ Function init()
   }
 
   typographyConstants = getTypographyConstants()
+  m.bodySmallStrong = typographyConstants.ids.bodySmallStrong
   setTypographyOfLabel(m.title, typographyConstants.ids.bodyMediumStrong)
-  setTypographyOfLabel(m.subtitle, typographyConstants.ids.bodySmallStrong)
+  setTypographyOfLabel(m.subtitle, m.bodySmallStrong)
   m.badgeTextFont = typographyConstants.ids.bodyExtraSmallStrong
   m.headerMediumFont = typographyConstants.ids.headerMedium
   m.bodyMediumStrongFont = typographyConstants.ids.bodyMediumStrong
@@ -168,15 +169,27 @@ End Function
 '@badgeType - string, Indicating format of the badge
 '@badgeInfo - assocArray, includes sotMarkers, sotMetaDataTopLabels, sotMetaData
 Function setBadge(badgeType = "live", badgeInfo = {}, posterLabels = {})
+  isSotReverseUiExperimentEnabled = getStatsigExperimentResource("roku_sot_reverse_ui_test", "roku_sot_reverse_ui_test_v1", false).enabled = true
+
   if badgeType = m.badgeTypes.live
     badge = m.sotTopLabelGroup.createChild("Badge")
     badge.badgeTextWidth = 0.0
     badge.maxWidth = m.top.width - 12
     badge.textColor = m.primaryTextColor
-    badge.translation = [15, 15]
-    badge.badgeTextFont = m.badgeSmallFont
-    badge.borderUri = ""
-    badge.backgroundUri = "pkg:/images/rounded-rect-live-$$RES$$.9.png"
+    badge.height = 40
+
+    if isSotReverseUiExperimentEnabled = true
+      badge.backgroundColor = m.focused2Color
+      badge.backgroundUri = "pkg:/images/badge-background-$$RES$$.9.png"
+      badge.translation = [4, 4]
+      badge.badgeTextFont = m.bodySmallStrong
+    else
+      badge.translation = [15, 15]
+      badge.badgeTextFont = m.badgeSmallFont
+      badge.borderUri = ""
+      badge.backgroundUri = "pkg:/images/rounded-rect-live-$$RES$$.9.png"
+    end if
+
     badge.iconUri = "pkg:/images/live-icon-filled.webp"
     badge.text = getTranslation("screenSearch_liveText")
   else if badgeType = m.badgeTypes.onNow
@@ -184,20 +197,46 @@ Function setBadge(badgeType = "live", badgeInfo = {}, posterLabels = {})
     badge.badgeTextWidth = 0.0
     badge.maxWidth = m.top.width - 12
     badge.textColor = m.primaryTextColor
-    badge.translation = [15, 15]
-    badge.badgeTextFont = m.badgeSmallFont
-    badge.borderUri = ""
-    badge.backgroundUri = "pkg:/images/rounded-rect-on-now-$$RES$$.9.png"
+    badge.height = 40
+
+    if isSotReverseUiExperimentEnabled = true
+      badge.backgroundColor = m.blueBadgeColor
+      badge.backgroundUri = "pkg:/images/badge-background-$$RES$$.9.png"
+      badge.translation = [4, 4]
+      badge.badgeTextFont = m.bodySmallStrong
+    else
+      badge.badgeTextFont = m.badgeSmallFont
+      badge.borderUri = ""
+      badge.backgroundUri = "pkg:/images/rounded-rect-on-now-$$RES$$.9.png"
+      badge.translation = [15, 15]
+    end if
+
     badge.text = getTranslation("onNow")
   else if badgeType = m.badgeTypes.sot
+    badgeTextFont = m.badgeSmallFont
+    markerFont = m.bodySmallStrong
+    textColor = m.primaryTextColor
+    backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
+    translation = [15, 15]
+    markerTextColor = m.primaryTextColor
+    if isSotReverseUiExperimentEnabled = true
+      markerFont = m.bodyMediumStrongFont
+      badgeTextFont = m.bodySmallStrong
+      textColor = m.focusedTextColor
+      backgroundUri = "pkg:/images/badge-background-$$RES$$.9.png"
+      translation = [4, 4]
+    end if
+
     config = {
-      focusedTextColor: m.primaryTextColor
-      primaryTextColor: m.primaryTextColor
+      textColor: textColor
       maxWidth: m.top.width - 12
-      bodyMediumStrongFont: m.badgeSmallFont
-      badgeTextFont: m.badgeSmallFont
-      textColor: m.primaryTextColor
+      backgroundUri: backgroundUri
+      markerFont: markerFont
+      badgeTextFont: badgeTextFont
+      translation: translation
+      markerTextColor: markerTextColor
     }
+
     showSotBadges(badgeInfo, config, m.sotTopLabelGroup, m.bottomContentGroup, posterLabels)
   end if
 End Function

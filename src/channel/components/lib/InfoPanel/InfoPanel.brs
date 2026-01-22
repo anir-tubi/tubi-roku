@@ -126,7 +126,8 @@ Function init()
   setTypographyOfLabel(m.channelNameHeader, m.typographyConstants.ids.subheaderSmall)
 
   m.bodySmall = m.typographyConstants.ids.bodySmall
-  m.bodyMediumStrongFont = m.typographyConstants.ids.bodySmallStrong
+  m.bodySmallStrong = m.typographyConstants.ids.bodySmallStrong
+  m.markerFont = m.typographyConstants.ids.bodyMediumStrong
 
 
   m.BadgeTypes = {
@@ -378,10 +379,14 @@ Function onSotMarkersChange(msg)
   shouldAddMarker = (isAA(sotMarker) = true AND sotMarker.count() > 0)
   if shouldAddMarker = true
 
+    markerFont = m.bodySmallStrong
+    if getStatsigExperimentResource("roku_sot_reverse_ui_test", "roku_sot_reverse_ui_test_v1", false).enabled = true
+      markerFont = m.markerFont
+    end if
     config = {
-      bodyMediumStrongFont: m.bodyMediumStrongFont
+      markerFont: markerFont
       maxWidth: m.top.width - 12
-      primaryTextColor: m.theme.primaryTextColor
+      markerTextColor: m.theme.primaryTextColor
     }
 
     createSotMarker(sotMarker, config, m.sotMarker)
@@ -523,12 +528,23 @@ Function onSotTopLabelSignalsChange(msg)
   'Remove all the previous badges before adding the new one
   m.nodeHelpers.removeAllChildren(m.sotTopLabelGroup)
 
+  textColor = m.theme.primaryTextColor
+  backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
+  badgeTextFont = m.bodySmall
+  markerFont = m.bodySmallStrong
+  if getStatsigExperimentResource("roku_sot_reverse_ui_test", "roku_sot_reverse_ui_test_v1", false).enabled = true
+    textColor = m.theme.focusedTextColor
+    backgroundUri = "pkg:/images/badge-background-$$RES$$.9.png"
+    badgeTextFont = m.bodySmallStrong
+    markerFont = m.markerFont
+  end if
+
   config = {
-    focusedTextColor: m.theme.primaryTextColor
-    bodyMediumStrongFont: m.bodyMediumStrongFont
-    badgeTextFont: m.bodySmall
+    markerFont: markerFont
+    badgeTextFont: badgeTextFont
     maxWidth: m.top.width - 12
-    textColor: m.theme.primaryTextColor
+    textColor: textColor
+    backgroundUri: backgroundUri
   }
 
   ' If we have sotTopLabelSignals, use them

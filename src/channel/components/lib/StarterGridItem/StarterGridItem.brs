@@ -58,6 +58,7 @@ Function init()
   typographyConstants = getTypographyConstants()
   m.subheaderSmallFont = typographyConstants.ids.subheaderSmall
   m.bodySmall = typographyConstants.ids.bodySmall
+  m.bodySmallStrong = typographyConstants.ids.bodySmallStrong
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "setThemeColors")
@@ -302,11 +303,25 @@ Function onItemContentChange(msg)
     end if
 
     if itemContent.type <> "linear" AND m.availabilityBadge = invalid AND isAA(sotPosterLabels) = true AND sotPosterLabels.count() > 0 AND childGridItemComponent <> "PortraitVideoGridTile" AND itemContent.gridItemType <> "liveEventSpotlight"
+      textColor = m.primaryTextColor
+      badgeTextFont = m.bodySmall
+      translation = [15, 15]
+      backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
+      if getStatsigExperimentResource("roku_sot_reverse_ui_test", "roku_sot_reverse_ui_test_v1", false).enabled = true
+        textColor = m.focusedTextColor
+        badgeTextFont = m.bodySmallStrong
+        backgroundUri = "pkg:/images/badge-background-$$RES$$.9.png"
+        translation = [4, 4]
+      end if
+
       config = {
-        primaryTextColor: m.primaryTextColor
+        textColor: textColor
         maxWidth: m.poster.width - 12
-        badgeTextFont: m.bodySmall
+        badgeTextFont: badgeTextFont
+        translation: translation
+        backgroundUri: backgroundUri
       }
+
       m.sotBadge = createSotPosterLabels(sotPosterLabels, config)
       showPosterLabesls(m.sotBadge, m.top)
     end if

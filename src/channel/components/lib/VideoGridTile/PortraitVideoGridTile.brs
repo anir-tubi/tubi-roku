@@ -9,6 +9,7 @@ Function init()
 
   typographyConstants = getTypographyConstants()
   m.bodySmall = typographyConstants.ids.bodySmall
+  m.bodySmallStrong = typographyConstants.ids.bodySmallStrong
   setTypographyOfLabel(m.timeLeftLabel, m.bodySmall)
 
   m.top.observeFieldScoped("itemContent", "onItemContentChange")
@@ -87,9 +88,23 @@ Function onItemContentChange(msg)
 
     sotPosterLabels = itemContent.sotPosterLabels
     if isAA(sotPosterLabels) = true AND sotPosterLabels.count() > 0
+
+      badgeTextFont = m.bodySmall
+      textColor = m.primaryTextColor
+      translation = [12, 12]
+      backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
+      if getStatsigExperimentResource("roku_sot_reverse_ui_test", "roku_sot_reverse_ui_test_v1", false).enabled = true
+        badgeTextFont = m.bodySmallStrong
+        textColor = m.focusedTextColor
+        translation = [4, 4]
+        backgroundUri = "pkg:/images/badge-background-$$RES$$.9.png"
+      end if
+
       config = {
-        badgeTextFont: m.bodySmall
-        primaryTextColor: m.primaryTextColor
+        badgeTextFont: badgeTextFont
+        backgroundUri: backgroundUri
+        textColor: textColor
+        translation: translation
         maxWidth: m.poster.width - 12
       }
       m.sotBadge = createSotPosterLabels(sotPosterLabels, config)
@@ -116,26 +131,49 @@ End Function
 
 Function setLinearBadge(badgeType = "live")
   badge = invalid
+  isSotReverseUiExperimentEnabled = getStatsigExperimentResource("roku_sot_reverse_ui_test", "roku_sot_reverse_ui_test_v1", false).enabled = true
+
   if badgeType = m.badgeTypes.live
     badge = createObject("roSGNode", "Badge")
     badge.badgeTextWidth = 0.0
     badge.textColor = m.primaryTextColor
-    badge.badgeTextFont = m.bodySmall
-    badge.translation = [15, 15]
-    badge.borderUri = ""
-    badge.backgroundUri = "pkg:/images/rounded-rect-live-$$RES$$.9.png"
     badge.iconUri = "pkg:/images/live-icon-filled.webp"
+    badge.height = 40
+
+    if isSotReverseUiExperimentEnabled = true
+      badge.backgroundColor = m.focused2Color
+      badge.backgroundUri = "pkg:/images/badge-background-$$RES$$.9.png"
+      badge.translation = [4, 4]
+      badge.badgeTextFont = m.bodySmallStrong
+    else
+      badge.badgeTextFont = m.bodySmall
+      badge.borderUri = ""
+      badge.backgroundUri = "pkg:/images/rounded-rect-live-$$RES$$.9.png"
+      badge.translation = [15, 15]
+    end if
+
     badge.text = getTranslation("screenSearch_liveText")
   else if badgeType = m.badgeTypes.onNow
     badge = createObject("roSGNode", "Badge")
     badge.badgeTextWidth = 0.0
-    badge.badgeTextFont = m.bodySmall
+    badge.height = 40
+
+    if isSotReverseUiExperimentEnabled = true
+      badge.backgroundColor = m.blueBadgeColor
+      badge.backgroundUri = "pkg:/images/badge-background-$$RES$$.9.png"
+      badge.translation = [4, 4]
+      badge.badgeTextFont = m.bodySmallStrong
+    else
+      badge.badgeTextFont = m.bodySmall
+      badge.borderUri = ""
+      badge.backgroundUri = "pkg:/images/rounded-rect-on-now-$$RES$$.9.png"
+      badge.translation = [15, 15]
+    end if
+
     badge.textColor = m.primaryTextColor
-    badge.translation = [15, 15]
-    badge.borderUri = ""
     badge.text = getTranslation("onNow")
-    badge.backgroundUri = "pkg:/images/rounded-rect-on-now-$$RES$$.9.png"
   end if
+
   if badge <> invalid
     m.linearBadge = badge
     m.top.appendChild(m.linearBadge)

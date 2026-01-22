@@ -37,6 +37,7 @@ Function init()
   m.headerSmallFont = typographyConstants.ids.headerSmall
   m.headerMediumFont = typographyConstants.ids.headerMedium
   m.bodyExtraSmallStrongFont = typographyConstants.ids.bodyExtraSmallStrong
+  m.bodySmallStrong = typographyConstants.ids.bodySmallStrong
   m.bodyMediumStrongFont = typographyConstants.ids.bodyMediumStrong
   m.subheaderSmallFont = typographyConstants.ids.subheaderSmall
 
@@ -71,7 +72,6 @@ Function onThemeChange(msg = invalid)
     m.focusedTextColor = theme.focusedTextColor
     m.shadeColor = theme.shadeColor
     m.backgroundColor = theme.shadeColor
-    m.cautionColor = theme.cautionColor
 
     m.progressBar.focusColor = theme.focusedColor
     m.progressBar.trackColor = theme.neutralColor
@@ -257,16 +257,30 @@ End Function
 ' Handles SOT badges and metadata height adjustments for control variant
 ' @param itemContent - Content node with SOT information
 Function handleSOTBadgesAndLayout(itemContent) as Void
-  ' Adjust the translation based on height of the description text.
+  badgeTextFont = m.bodySmallFont
+  textColor = m.primaryTextColor
+  markerTextColor = m.primaryTextColor
+  backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
+  markerFont = m.bodySmallStrong
+  translation = [15, 15]
+  if getStatsigExperimentResource("roku_sot_reverse_ui_test", "roku_sot_reverse_ui_test_v1", false).enabled = true
+    badgeTextFont = m.bodySmallStrong
+    textColor = m.focusedTextColor
+    markerFont = m.bodyMediumStrongFont
+    backgroundUri = "pkg:/images/badge-background-$$RES$$.9.png"
+    translation = [4, 4]
+  end if
+
   if m.top.variant = "detailScreenInfoPanel"
     config = {
       focusedTextColor: m.focusedTextColor
-      primaryTextolor: m.primaryTextColor
+      textColor: textColor
       maxWidth: m.top.width - 12
-      badgeTextFont: m.bodySmallFont
-      bodyMediumStrongFont: m.bodyMediumStrongFont
-      textColor: m.primaryTextColor
-      cautionColor: m.cautionColor
+      badgeTextFont: badgeTextFont
+      translation: translation
+      markerFont: markerFont
+      markerTextColor: markerTextColor
+      backgroundUri: backgroundUri
     }
 
     sotBadges = createSOTBadges(itemContent.sotInfo, config)
@@ -451,11 +465,20 @@ Function metadataOnPosterContent(itemContent)
       ratingSotParent.insertChild(m.sotBadge, insertIndex)
     end if
 
-    m.sotBadge.height = 36
-    m.sotBadge.textColor = m.primaryTextColor
+    textColor = m.primaryTextColor
+    backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
+    badgeTextFont = m.bodySmallFont
+    if getStatsigExperimentResource("roku_sot_reverse_ui_test", "roku_sot_reverse_ui_test_v1", false).enabled = true
+      textColor = m.focusedTextColor
+      backgroundUri = "pkg:/images/badge-background-$$RES$$.9.png"
+      badgeTextFont = m.bodySmallStrong
+    end if
+
+    m.sotBadge.textColor = textColor
     m.sotBadge.borderUri = ""
-    m.sotBadge.backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
-    m.sotBadge.badgeTextFont = m.bodySmallFont
+    m.sotBadge.height = 36
+    m.sotBadge.backgroundUri = backgroundUri
+    m.sotBadge.badgeTextFont = badgeTextFont
     m.sotBadge.text = sotBadge.sotLabelText
     m.sotBadge.iconUri = sotBadge.sotIcon
 

@@ -21,10 +21,9 @@ End Function
 ' *   - sotMarkers: AssocArray with marker badge data (sotLabelText, sotIcon)
 ' *   - sotMetaData: Array of metadata label badge data (optional)
 ' * @param {AssocArray} config - Styling configuration for badges:
-' *   - focusedTextColor: Color for top label badges (required)
-' *   - primaryTextColor: Color for poster label badges (required)
+' *   - textColor: Color for poster label badges (required)
 ' *   - maxWidth: Maximum width for badges in pixels (required)
-' *   - bodyMediumStrongFont: Font for marker badge (optional)
+' *   - markerFont: Font for marker badge (optional)
 ' *   - badgeTextFont: Font for poster label badges (optional)
 ' *   - textColor: Color for marker badge (optional)
 ' * @param {Node} topLabelTargetGroup - Target group node where top label badges will be appended (optional)
@@ -33,9 +32,12 @@ End Function
 ' *   - sotLabelText: Text to display on the badge (required)
 ' *   - sotIcon: Icon URI for the badge (optional)
 ' * @return {Void}
-' * @example showSotBadges(badgeInfo, config, m.sotTopLabelGroup, m.bottomContentGroup, posterLabels)
 '**
 Function showSotBadges(sotBadgeInfo, config, topLabelTargetGroup = invalid, markerTargetGroup = invalid, posterLabels = {})
+  if topLabelTargetGroup <> invalid AND config.translation <> invalid
+    topLabelTargetGroup.translation = config.translation
+  end if
+
   'Get the badges from the badge Info
   sotBadges = createSOTBadges(sotBadgeInfo, config)
 
@@ -88,10 +90,9 @@ End Function
 ' Creates SOT (Signals of Trust) badge nodes from sotInfo data
 ' @param sotInfo - AssocArray containing sotMetaDataTopLabels and sotMarkers
 ' @param config - AssocArray with optional styling configuration:
-'   - focusedTextColor: color for top label badges (required)
 '   - maxWidth: maximum width for badges (required)
-'   - bodyMediumStrongFont: font for marker badge (optional)
-'   - textColor: color for marker badge (optional)
+'   - markerFont: font for marker badge (optional)
+'   - textColor: text color for badges
 ' @return AssocArray with topLabels (array of Badge nodes) and marker (Badge node or invalid)
 Function createSOTBadges(sotInfo, config)
   result = {
@@ -132,7 +133,7 @@ End Function
 
 ' Creates a Badge node with SOT label configuration
 ' @param labelData - AssocArray containing sotLabelText and sotIcon
-' @param config - AssocArray with styling configuration ( textColor, maxWidth, badgeTextFont)
+' @param config - AssocArray with styling configuration ( textColor, maxWidth, badgeTextFont, textColor)
 ' @return Badge node or invalid
 Function createBadge(labelData, config)
   if isAA(labelData) = false OR isAA(config) = false then return invalid
@@ -141,12 +142,15 @@ Function createBadge(labelData, config)
   badge.isSotBadge = true
   badge.text = labelData.sotLabelText
   badge.borderUri = ""
-  badge.backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
-  badge.iconUri = labelData.sotIcon
+  badge.backgroundUri = config.backgroundUri
   badge.textColor = config.textColor
+  badge.height = 40
+
   if config.badgeTextFont <> invalid
     badge.badgeTextFont = config.badgeTextFont
   end if
+
+  badge.iconUri = labelData.sotIcon
   badge.maxWidth = config.maxWidth
 
   return badge
@@ -156,6 +160,7 @@ End Function
 Function createTopLabels(sotMetaDataTopLabels, config)
   ' Create top label badges from sotMetaDataTopLabels
   sotTopLabels = []
+
   if isNonEmptyArray(sotMetaDataTopLabels) = true
     for each signal in sotMetaDataTopLabels
       ' Ignore TubiPresents (sotType = "tubiPresentsLogo") as it's handled separately
@@ -189,7 +194,6 @@ Function createMetadataLabels(sotMetaDataLabels, config)
   return sotMetaDataLabel
 End Function
 
-
 Function createSotMarker(sotMarkers, config, marker = invalid)
   if isNonEmptyAA(sotMarkers) = true
     if marker = invalid
@@ -201,12 +205,12 @@ Function createSotMarker(sotMarkers, config, marker = invalid)
     marker.text = sotMarkers.sotLabelText
     marker.iconUri = sotMarkers.sotIcon
 
-    if config.bodyMediumStrongFont <> invalid
-      marker.badgeTextFont = config.bodyMediumStrongFont
+    if config.markerFont <> invalid
+      marker.badgeTextFont = config.markerFont
     end if
 
-    if config.primaryTextColor <> invalid
-      marker.textColor = config.primaryTextColor
+    if config.markerTextColor <> invalid
+      marker.textColor = config.markerTextColor
     end if
 
     return marker
@@ -227,16 +231,19 @@ Function createSotPosterLabels(sotInfo, config)
   if isNonEmptyString(sotInfo.sotLabelText) = true
     sotBadge = createObject("roSGNode", "Badge")
     sotBadge.id = "sotBadge"
-    sotBadge.translation = [12, 12]
-    sotBadge.textColor = config.primaryTextColor
     sotBadge.borderUri = ""
     sotBadge.isSotBadge = true
-    sotBadge.backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
-    sotBadge.iconUri = sotInfo.sotIcon
-    sotBadge.maxWidth = config.maxWidth
+    sotBadge.height = 40
+    sotBadge.backgroundUri = config.backgroundUri
+    sotBadge.textColor = config.textColor
+    sotBadge.translation = config.translation
+
     if config.badgeTextFont <> invalid
       sotBadge.badgeTextFont = config.badgeTextFont
     end if
+
+    sotBadge.iconUri = sotInfo.sotIcon
+    sotBadge.maxWidth = config.maxWidth
 
     sotBadge.text = sotInfo.sotLabelText
     sotBadge.visible = true

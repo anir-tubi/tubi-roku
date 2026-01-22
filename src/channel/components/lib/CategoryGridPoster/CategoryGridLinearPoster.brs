@@ -131,23 +131,47 @@ End Function
 '@badgeText - string, Indicating text on the badge
 Function setBadge(badgeType = "live", badgeText = "")
 
+  isSotReverseUiExperimentEnabled = getStatsigExperimentResource("roku_sot_reverse_ui_test", "roku_sot_reverse_ui_test_v1", false).enabled = true
+
   if badgeType = m.badgeTypes.live
     badge = m.badgeGroup.createChild("Badge")
-    badge.textColor = m.primaryTextColor
     badge.iconUri = "pkg:/images/live-icon-filled.webp"
+    badge.textColor = m.primaryTextColor
     badge.maxWidth = m.top.width - 12
-    badge.badgeTextFont = m.typographyConstants.ids.bodySmall
-    badge.borderUri = ""
-    badge.backgroundUri = "pkg:/images/rounded-rect-live-$$RES$$.9.png"
+    badge.height = 40
+
+    if isSotReverseUiExperimentEnabled = true
+      badge.backgroundColor = m.focused2Color
+      badge.backgroundUri = "pkg:/images/badge-background-$$RES$$.9.png"
+      m.badgeGroup.translation = [4, 4]
+      badge.badgeTextFont = m.typographyConstants.ids.bodySmallStrong
+    else
+      badge.badgeTextFont = m.typographyConstants.ids.bodySmall
+      badge.borderUri = ""
+      badge.backgroundUri = "pkg:/images/rounded-rect-live-$$RES$$.9.png"
+      m.badgeGroup.translation = [12, 12]
+    end if
+
     badge.text = getTranslation("screenSearch_liveText")
   else if badgeType = m.badgeTypes.onNow
     badge = m.badgeGroup.createChild("Badge")
     badge.textColor = m.primaryTextColor
-    badge.badgeTextFont = m.typographyConstants.ids.bodySmall
-    badge.text = getTranslation("onNow")
     badge.maxWidth = m.top.width - 12
-    badge.borderUri = ""
-    badge.backgroundUri = "pkg:/images/rounded-rect-on-now-$$RES$$.9.png"
+    badge.height = 40
+
+    if isSotReverseUiExperimentEnabled = true
+      badge.backgroundColor = m.blueBadgeColor
+      badge.backgroundUri = "pkg:/images/badge-background-$$RES$$.9.png"
+      m.badgeGroup.translation = [4, 4]
+      badge.badgeTextFont = m.typographyConstants.ids.bodySmallStrong
+    else
+      badge.badgeTextFont = m.typographyConstants.ids.bodySmall
+      badge.borderUri = ""
+      badge.backgroundUri = "pkg:/images/rounded-rect-on-now-$$RES$$.9.png"
+      m.badgeGroup.translation = [12, 12]
+    end if
+
+    badge.text = getTranslation("onNow")
   else if badgeType = m.badgeTypes.language
     if badgeText <> ""
       lang = Ucase(badgeText)
@@ -158,9 +182,9 @@ Function setBadge(badgeType = "live", badgeText = "")
         badge.text = m.languages[lang]
       end if
     end if
+    m.badgeGroup.translation = [12, 12]
   end if
 
-  m.badgeGroup.translation = [12, 12]
 End Function
 
 
