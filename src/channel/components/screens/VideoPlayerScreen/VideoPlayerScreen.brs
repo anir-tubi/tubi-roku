@@ -424,7 +424,9 @@ Function init()
   'This variable holds the value of Ad information from rainmaker response
   m.filledAdData = {}
   'This variable is used to send an AdMissed event if the previous cue point was missed
-  m.missedAdReported = true
+  m.isMissedAdEventSent = true
+  'This variable is used to track if ad buffering happened before ad playback started
+  m.adBufferingBeforeStart = true
 
   'The field typically indicates whether a user has already seen a signup save progress modal or not.
   m.wasSignUpToSaveProgressModalAlreadyShown = false
@@ -1141,21 +1143,21 @@ Function onControlChange()
 
     adState = m.top.adState
 
-    if m.missedAdReported = false AND (adState = "adsClosed" OR adState = "adsPlaying" OR adState = "fetching" OR adState = "adsPending")
+    if m.isMissedAdEventSent = false AND (adState = "adsClosed" OR adState = "adsPlaying" OR adState = "fetching" OR adState = "adsPending")
       if m.top.goToNext = true
         reason = "autoPlay"
-      else
-        if adState = "adsClosed" OR adState = "adsPlaying"
-          reason = "exitDuringPlayback"
-        else if adState = "fetching"
-          reason = "exitBeforeResponse"
-        else 'adsPending
+      else if adState = "fetching"
+        reason = "exitBeforeResponse"
+      else 'adsClosed OR adsPlaying OR adsPending
+        if m.adBufferingBeforeStart = true
           reason = "exitBeforePlayback"
+        else
+          reason = "exitDuringPlayback"
         end if
       end if
 
       sendAdMissedEvent(reason)
-      m.missedAdReported = true
+      m.isMissedAdEventSent = true
 
       'Reset filledAdData to prevent it from being used for future events.
       m.filledAdData = {}
@@ -1774,10 +1776,10 @@ Function onVideoPositionChange(msg) as Void
     isCuepointReached = m.midrolls[strI(m.playerPosition)]
 
     'A pending ad from the previous cue point was not played for some reason. we need to fire the AdMissed event for the previous one.
-    if adState = "adsPending" AND m.missedAdReported = false AND Int(m.playerPosition) > Int(topRef.adPosition)
+    if adState = "adsPending" AND m.isMissedAdEventSent = false AND Int(m.playerPosition) > Int(m.top.adPosition)
 
       sendAdMissedEvent("exitAfterCuePointPassed")
-      m.missedAdReported = true
+      m.isMissedAdEventSent = true
 
       'Reset filledAdData to prevent it from being used for future events.
       m.filledAdData = {}
@@ -1862,9 +1864,13 @@ Function onAdStateChange(msg)
   adState = msg.getData()
   updatePlayerLogLib(m.playerLogLib, "setAdState", adState)
 
-  'if ads are pending, reset the flag to indicate that the missed ad has not yet been reported
-  if adState = "adsPending"
-    m.missedAdReported = false
+  'When ads are pending or fetching, reset flags to track missed ad events and mark buffering phase before ad starts.
+  'When ads are completed or no ads available, mark that no missed ad event needs to be sent.
+  if adState = "adsPending" OR adState = "fetching"
+    m.isMissedAdEventSent = false
+    m.adBufferingBeforeStart = true
+  else if adState = "adsCompleted" OR adState = "noAds"
+    m.isMissedAdEventSent = true
   end if
 
   logDebug("VideoPlayer.onAdStateChange adState = " + adState + " VideoState = " + m.VideoState + " Video.State = " + m.Video.state)
@@ -3723,6 +3729,7 @@ Function onAdTrackingObject(msg)
   if adStatus = "PodStart"
     updatePlayerLogLib(m.playerLogLib, "setTotalAdDurationInCurrentPod", adInfo)
   else if adStatus = "Start"
+    m.adBufferingBeforeStart = false
     m.playerExitInfo["ad_counts"] += 1
     updatePlayerLogLib(m.playerLogLib, "setAdCount", 1)
     updatePlayerLogLib(m.playerLogLib, "fireAdStartupPerformanceEvent", adInfo)
