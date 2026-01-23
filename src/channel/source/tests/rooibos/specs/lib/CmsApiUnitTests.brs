@@ -6,6 +6,42 @@ Function CmsApiSetup()
   pub_serverPersistentData = createObject("roSGNode", "ServerPersistentData")
   utils = ApiUtils(constants, pub_serverPersistentData)
   m.cmsApi = CmsApi(constants, utils)
+
+  ' Cache 720p check (won't change during tests)
+  m.is720p = (m.cmsApi.constants.deviceInfo.displayHeight = 720 OR m.cmsApi.constants.deviceInfo.lowVram = true)
+
+  ' Helper function to convert image sizes for 720p (matches CmsApi conversion logic)
+  m.convertImageSizeFor720p = Function(originalSize as Object) as Object
+    scaleFactor = 0.6667
+    newWidth = Int(originalSize[0] * scaleFactor)
+    newHeight = Int(originalSize[1] * scaleFactor)
+    return [newWidth, newHeight]
+  End Function
+
+  ' Helper function to get expected image param string the same way setImageParams does
+  ' (uses largePoster/largeLandscape, applies 720p conversion if needed, returns formatted string)
+  m.getExpectedImageParam = Function(imageType as String, isSearchScreen = false) as String
+    imageSizes = m.cmsApi.constants.ui.imageSizes
+    if imageType = "poster"
+      if isSearchScreen = true
+        size = imageSizes.poster
+      else
+        size = imageSizes.largePoster
+      end if
+      suffix = "_poster"
+    else if imageType = "landscape"
+      size = imageSizes.largeLandscape
+      suffix = "_landscape"
+    else
+      return ""
+    end if
+
+    if m.is720p = true
+      size = m.convertImageSizeFor720p(size)
+    end if
+
+    return "w" + size[0].ToStr() + "h" + size[1].ToStr() + suffix
+  End Function
 End Function
 
 
@@ -35,7 +71,7 @@ Function cmsApi_createRelatedContentReqInfo_test()
     params: {
       "isKidsMode": true,
       "video_resources": m.cmsApi.constants.player.drmOrderWidevineHlsv6
-      "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largePoster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largePoster[1].ToStr() + "_poster"
+      "images[poster_tb]": m.getExpectedImageParam("poster")
       "app_id": m.cmsApi.constants.settings.shortAppName
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
@@ -62,7 +98,7 @@ Function cmsApi_createRelatedContentReqInfo_test()
     params: {
       "isKidsMode": false,
       "video_resources": m.cmsApi.constants.player.drmOrderWidevineHlsv6
-      "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largePoster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largePoster[1].ToStr() + "_poster"
+      "images[poster_tb]": m.getExpectedImageParam("poster")
       "app_id": m.cmsApi.constants.settings.shortAppName
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
@@ -161,7 +197,7 @@ Function cmsApi_createSingleContentReqInfo_test()
       "isKidsMode": false
       "includeChannels": true
       "video_resources": m.cmsApi.constants.player.drmOrderWidevineHlsv6
-      "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largeLandscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largeLandscape[1].ToStr() + "_landscape"
+      "images[landscape_tb]": m.getExpectedImageParam("landscape")
     }
   }
 
@@ -292,8 +328,8 @@ Function cmsApi_createHomeScreenReqInfo_test()
       "include_empty_history": true
       "include_empty_queue": true
       "is_kids_mode": false
-      "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largePoster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largePoster[1].ToStr() + "_poster"
-      "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largeLandscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largeLandscape[1].ToStr() + "_landscape"
+      "images[poster_tb]": m.getExpectedImageParam("poster")
+      "images[landscape_tb]": m.getExpectedImageParam("landscape")
       "contentMode": m.cmsApi.constants.ui.contentMode.homescreen
       "customParam": "custom_param_value"
       "idfa": m.cmsApi.constants.deviceInfo.deviceAdId
@@ -452,8 +488,8 @@ Function cmsApi_createMiniHomeScreenReqInfo_test()
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
       "is_kids_mode": false
-      "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largePoster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largePoster[1].ToStr() + "_poster"
-      "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largeLandscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largeLandscape[1].ToStr() + "_landscape"
+      "images[poster_tb]": m.getExpectedImageParam("poster")
+      "images[landscape_tb]": m.getExpectedImageParam("landscape")
       "contentMode": m.cmsApi.constants.ui.contentMode.homescreen
       "customParam": "custom_param_value"
       "idfa": m.cmsApi.constants.deviceInfo.deviceAdId
@@ -611,8 +647,8 @@ Function cmsApi_createCategoryReqInfo_test()
       "is_kids_mode": false
       "cursor": 0
       "contents_limit": 19
-      "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largePoster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largePoster[1].ToStr() + "_poster"
-      "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largeLandscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largeLandscape[1].ToStr() + "_landscape"
+      "images[poster_tb]": m.getExpectedImageParam("poster")
+      "images[landscape_tb]": m.getExpectedImageParam("landscape")
       "contentMode": m.cmsApi.constants.ui.contentMode.homescreen
       "customParam": "custom_param_value"
     }
@@ -707,8 +743,8 @@ Function cmsApi_createCategoryReqInfo_test()
       "is_kids_mode": false
       "cursor": 10
       "contents_limit": m.cmsApi.constants.performance.categoryGridList.lazyLoadBatchSize
-      "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largePoster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largePoster[1].ToStr() + "_poster"
-      "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largeLandscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largeLandscape[1].ToStr() + "_landscape"
+      "images[poster_tb]": m.getExpectedImageParam("poster")
+      "images[landscape_tb]": m.getExpectedImageParam("landscape")
       "contentMode": ""
       "expanded": true
     }
@@ -808,7 +844,7 @@ Function cmsApi_createSearchReqInfo_test()
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
       "search": "search_text"
       "is_kids_mode": false
-      "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.poster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.poster[1].ToStr() + "_poster"
+      "images[poster_tb]": m.getExpectedImageParam("poster", true)
     }
   }
 
@@ -844,8 +880,8 @@ End Function
 
 '@Test unit tests setImageParams
 Function cmsApi_setImageParams_test()
-  posterParam = "w252h360_poster"
-  landscapeParam = "w520h292_landscape"
+  posterParam = m.getExpectedImageParam("poster")
+  landscapeParam = m.getExpectedImageParam("landscape")
 
   ' test add poster only
   existingParams = {
@@ -904,7 +940,7 @@ End Function
 
 '@Test unit tests setTupianPosterParam
 Function cmsApi_setTupianPosterParam_test()
-  posterParam = "w252h360_poster"
+  posterParam = m.getExpectedImageParam("poster")
 
   existingParams = {
     userid: "1234"
@@ -923,7 +959,7 @@ End Function
 
 '@Test unit tests setTupianLandscapeParam
 Function cmsApi_setTupianLandscapeParam_test()
-  landscapeParam = "w520h292_landscape"
+  landscapeParam = m.getExpectedImageParam("landscape")
 
   existingParams = {
     userid: "1234"
