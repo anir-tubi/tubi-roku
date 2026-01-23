@@ -70,7 +70,9 @@ enum ScreenIds {
   'emailVerificationScreen' = 'emailVerificationScreen',
   'forgotPasswordProcessingScreen' = 'forgotPasswordProcessingScreen',
   'consentScreen' = 'consentScreen',
-  'managePreferencesScreen' = 'managePreferencesScreen'
+  'managePreferencesScreen' = 'managePreferencesScreen',
+  'signUpAgeVerificationScreen' = 'signUpAgeVerificationScreen',
+  'rokuContinueWatchingConsentScreen' = 'rokuContinueWatchingConsentScreen'
 }
 
 
@@ -479,7 +481,8 @@ class TestUtils {
       'myStuff': 'My Stuff',
       'series': 'TV Shows',
       'livefeed': 'Live TV',
-      'espanol': 'Español'
+      'espanol': 'Español',
+      'categories': 'Categories'
     };
 
     const selectedPage = pageTileMapping[page];
@@ -930,6 +933,45 @@ class TestUtils {
       rowsContent.push(rowItemsContent);
     }
     return rowsContent;
+  }
+
+
+  /**
+   * Used to retrieve row-level metadata (slug, TITLE, etc.) for all rows in a RowList
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   * @returns array of row metadata objects (each containing slug, TITLE, etc.)
+   */
+  public async getAllRowListRowsMetadata(elementOrElementId: ElementOrElementId, timeout = 10000) {
+    const element = this.getElementKeyPath(elementOrElementId);
+    let baseKeyPath = `content`;
+    if (element.keyPath) {
+      baseKeyPath = element.keyPath + '.' + baseKeyPath;
+    }
+
+    const rowCount = await this.retryWithTimeOut(async () => {
+      const { found, value: rowCount } = await odc.getValue({
+        keyPath: `${baseKeyPath}.getChildCount()`
+      });
+      if (!found) {
+        throw new Error(`Can't find row count`);
+      }
+      return rowCount;
+    }, timeout);
+
+    const rowsMetadata = [];
+    for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+      const { found, value } = await odc.getValue({
+        base: element.base,
+        keyPath: `${baseKeyPath}.${rowIndex}`,
+        responseMaxChildDepth: 0  // Don't get children, just the row metadata
+      });
+
+      // Always push to maintain array index correspondence with UI row indices
+      // Push null for rows that couldn't be retrieved
+      rowsMetadata.push(found ? value : null);
+    }
+    return rowsMetadata;
   }
 
 

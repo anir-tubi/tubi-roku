@@ -93,7 +93,31 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentAreaParent.#ContentArea.#CategoryGridList.#RowList',
   },
 
+  /** Spotlight row item at row index 2, item index 0 */
+  videoTitlesRowListSpotlightRow: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList.2.items.0',
+  },
+
+  /** Spotlight row title at row index 2 */
+  videoTitlesRowListSpotlightRowTitle: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList.2.title.#CategoryName',
+  },
+
+  /** Spotlight row title at row index 2 */
+  videoTitlesRowListSpotlightRowPoster: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList.2.items.0.#poster',
+  },
+
   /** Skin ad row component in CategoryGridList */
+
+  skinAdContainer: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentAreaParent.#ContentArea.#CategoryGridList.#skinAdRow',
+  },
+
   skinAdRow: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentAreaParent.#ContentArea.#CategoryGridList.#skinAdRow.#rowList',
@@ -115,6 +139,42 @@ const elements = typeCheckElements({
   skinAdCountdownText: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentAreaParent.#ContentArea.#CategoryGridList.#skinAdRow.#CountdownGroup.#CountdownTimerParent.#TextAndIconParentGroup.#TextAndIconLayoutGroup.0.#CountdownText',
+  },
+
+  skinAdCountdownTimer: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentAreaParent.#ContentArea.#CategoryGridList.#skinAdRow.#CountdownGroup.#CountdownTimerParent',
+  },
+
+  /** "Brought to you by" label in SkinAdRow */
+  presentedByLabel: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentAreaParent.#ContentArea.#CategoryGridList.#skinAdRow.#infoPanelGroup.#InfoPanel.#infoPanelGroup.#presentedByLabel',
+  },
+
+  /** Tubi logo in SkinAdRow InfoPanel */
+  skinAdTubiLogo: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentAreaParent.#ContentArea.#CategoryGridList.#skinAdRow.#infoPanelGroup.#InfoPanel.#infoPanelGroup.#tubiLogo',
+  },
+
+  /** Skin ad elements on OTHER screens (should NOT exist) */
+  /** Movie screen skin ad row - should not exist if ads are home-only */
+  movieScreenSkinAdRow: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#movieScreen.#PageGroup.#ContentAreaParent.#ContentArea.#CategoryGridList.#skinAdRow',
+  },
+
+  /** TV Shows screen skin ad row - should not exist if ads are home-only */
+  tvScreenSkinAdRow: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#tvScreen.#PageGroup.#ContentAreaParent.#ContentArea.#CategoryGridList.#skinAdRow',
+  },
+
+  /** Categories screen skin ad row - should not exist if ads are home-only */
+  categoryListScreenSkinAdRow: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#categoryListScreen.#PageGroup.#ContentAreaParent.#ContentArea.#CategoryGridList.#skinAdRow',
   },
 
   /** Ad carousel title text */
@@ -380,6 +440,10 @@ const elements = typeCheckElements({
     keyPath: '#RPayShareDialog',
   },
 
+  /** Modal dialog screen (extends BaseDialogScreen) */
+  modalDialogScreen: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack',
+  },
 
   /** Content title on the detail screen */
   detailScreenTitle: {
@@ -501,7 +565,25 @@ const elements = typeCheckElements({
 
   tubiKidsLogo: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#logoGroup.#tubiKidsLogo',
+      '#ContentController.#uiGroup.#ContentGroup.9.#tubiKidsLogo',
+  },
+
+  /** Tubi logo in header logoGroup */
+  headerTubiLogo: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#logoGroup.#tubiLogo',
+  },
+
+  /** "Brought to you by" label in header presentedByGroup */
+  headerPresentedByLabel: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#logoGroup.#presentedByGroup.#presentedByLabel',
+  },
+
+  /** Brand logo image in header presentedByGroup */
+  headerPresentedByImage: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#logoGroup.#presentedByGroup.#presentedByImage',
   },
 
   exitKidsOption: {
@@ -787,11 +869,6 @@ const elements = typeCheckElements({
   raitingLabelInDetailsScreen: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#Rating.#RatingLabel',
-  },
-
-  kidsLogoHomeScreen: {
-    keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#logoGroup.#tubiKidsLogo',
   },
 
   titleStarringLabel: {
@@ -1099,6 +1176,12 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#adPlayerScreen',
   },
 
+  /** Video player for ad playback */
+  adPlayerVideo: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#adPlayerScreen.#RAFAdContainer.#rafrender.#adPlayer',
+  },
+
   /** Skin ad brand logo displayed during ad playback (e.g., Walmart logo) */
   adPlayerSkinAdLogo: {
     keyPath:
@@ -1115,6 +1198,18 @@ const elements = typeCheckElements({
   linearVideoPlayerScreen: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#linearVideoPlayerScreen',
+  },
+
+  /** linear video screen */
+  linearVideoPlayerVideoNode: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#linearVideoPlayerScreen.#VideoNode',
+  },
+
+  /** Overlay content area in linear video player screen */
+  linearOverlayContentArea: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#linearVideoPlayerScreen.#VideoOverlay.#overlayParent.#overlayContentArea',
   },
 
   /** Fox Player element ID */
@@ -1287,12 +1382,13 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#channelListScreen.#PageGroup.#ChannelCategoryGrid.0.#PosterRect',
   },
 
-  channelsVideoGridPoster: {
+  categoriesScreenContentGridPoster: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsVideoGrid.0.#poster',
   },
 
-  channelsVideoGrid: {
+  /** Categories screen content grid */
+  categoriesScreenContentGrid: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.3.#PageGroup.#PageAnimatedGroup.#ChannelsContentGrid',
   },
@@ -1379,6 +1475,11 @@ const elements = typeCheckElements({
 
   /** Enter your password meesage on dialog box */
   enterPasswordContentMessage: {
+    keyPath: '#ContentController.#DialogBox.#ContentArea.#MessageGroup.#Message',
+  },
+
+  /** Dialog message for adding to My List without account */
+  addToMyListAccountNeededMessage: {
     keyPath: '#ContentController.#DialogBox.#ContentArea.#MessageGroup.#Message',
   },
 
@@ -1527,6 +1628,16 @@ const elements = typeCheckElements({
 
   continueWatchingConsentScreen: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#rokuContinueWatchingConsentScreen.0.#heading',
+  },
+
+  /** OneTrust consent banner (GDPR Initial Consent screen) */
+  otBanner: {
+    keyPath: '#ContentController.#oneTrustViews.#OTBanner',
+  },
+
+  /** OneTrust consent checkbox in preference center */
+  otConsentCheckbox: {
+    keyPath: '#ContentController.#oneTrustViews.#OTPreferenceCenter.#buttonsListGrp.0.0.#statusRec.#statusImage',
   },
 
   confirmYourAgeText: {
@@ -1695,7 +1806,7 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuTextFocused',
   },
 
-  channelSideNav: {
+  categoriesListMenu: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryPanelListScreen.#PageGroup.#PanelSet.2.#MenuGroup.#Menu'
   },
@@ -1964,6 +2075,11 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#sendFeedbackSelectionOverlayGroup.#sendFeedbackSelectionOverlay.2.#overlayBackground.#sendFeedbackSection.#sendFeedbackHeaderLabel',
   },
 
+  closedCaptionAndAudioSelectionOverlay: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup',
+  },
+
 
   /** Audio tracks section */
   audioTracksSection: {
@@ -2170,6 +2286,12 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.#AgeVerificationNumberPadGroup.#AgeVerificationNumberPad.#keyboard.0',
   },
 
+  /** Start Watching button on age verification screen */
+  ageVerificationStartButton: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.#AgeVerificationNumberPadGroup.#AgeVerificationStartButton',
+  },
+
   /** Autoplay Title */
   autoPlayTitle: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextParent.#UpNextMovieGroup.#movieTiles.#FocusBox',
@@ -2231,6 +2353,11 @@ const elements = typeCheckElements({
   epgProgramGrid: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#epgScreen.#PageGroup.#programGuide.#channelsGrid.0.#ChannelPoster',
+  },
+
+  linearEPGProgramGrid: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#epgScreen.#PageGroup.#programGuide.#ProgramGrid',
   },
 
   customSplashPoster: {
@@ -2404,6 +2531,12 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#DialogBox.#ContentArea.#Title',
   },
 
+  /** Guest menu container on My Stuff screen for signed-out users */
+  guestMenu: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#SignedOutUI.#GuestMenu',
+  },
+
   unlockNowForMyStuff: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#SignedOutUI.#GuestMenu.0.#DetailsMenuTextParent.#DetailsMenuTextFocused',
@@ -2447,7 +2580,7 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#channelListScreen.#PageGroup.#ChannelCategoryGrid',
   },
 
-  channelVideoGrid: {
+  categoryDetailsVideoGrid: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsVideoGrid',
   },
 
@@ -2781,6 +2914,12 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#DialogBox.#ButtonList.1.#buttonTextParent.#buttonText'
   },
 
+  /** Sign in Button */
+  dialogBoxButtonList: {
+    keyPath:
+      '#ContentController.#DialogBox.#ButtonList',
+  },
+
   // Oops wrong password dialog
   wrongPasswordDialog: {
     keyPath: '#ContentController.#DialogBox.#ContentArea'
@@ -2834,6 +2973,11 @@ const elements = typeCheckElements({
   // Loading Progress Bar
   loadingProgressBar: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#Loading.#LoadingProgressBar'
+  },
+
+  /** "View Privacy Settings" button in Privacy Center panel */
+  managePrivacySettingsButton: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.#privacyCenterPanel.#Offset.#panelContentSection.#managePrivacySettingsButton'
   },
 
   // Privacy Center Continue Watching Header

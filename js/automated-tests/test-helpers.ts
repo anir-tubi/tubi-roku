@@ -115,7 +115,6 @@ class TestHelpers {
   public async findContentPositionInGridThatContainsVideoPreview(gridId: any, hasVideoPreview = true, columnsPerRow = 5) {
     let position = -1;
     const content = await testUtils.getAllGridItemsContent(gridId);
-
     for (const [index, item] of content.entries()) {
       if (hasVideoPreview && item.videoPreviewUrl?.trim().length > 0) {
         position = index;
@@ -863,12 +862,15 @@ class TestHelpers {
    * 
    * @param user - User API instance from shared.ts
    */
-  public async createUserWatchList(user: any) {
+  public async createUserWatchList(user: any): Promise<number> {
     const contentTVG = await user.getContent().ofContentType('series').withRating('TV-G').retrieve({ limit: 6 });
     await user.addContentToWatchList(contentTVG);
 
     const contentG = await user.getContent().ofContentType('movie').withRating('G').retrieve({ limit: 6 });
     await user.addContentToWatchList(contentG);
+
+    // Return the total number of items actually added
+    return contentTVG.length + contentG.length;
   }
 
   /**
@@ -919,7 +921,11 @@ class TestHelpers {
     await ecp.sendKeypress(ecp.Key.Left);
     await testUtils.goToPage('settings');
 
+    // Wait for settings menu to have focus before navigating
+    await testUtils.waitForElementToHaveFocus('settingsMenu', 'Timed out waiting for settings menu to have focus', 10000);
+
     await ecp.sendKeypress(ecp.Key.Down);
+    await testUtils.waitForElementToShowOnScreen('autoplayPreviewMenu', 'Timed out waiting for autoplay preview menu to show', 10000);
     await ecp.sendKeypress(ecp.Key.Ok);
 
     if (skipElement) {
@@ -966,13 +972,16 @@ class TestHelpers {
    * 
    * VERIFIES:
    *   - Exit Kids option becomes visible after entering Kids Mode
+   * 
+   * @example
+   * await testHelpers.openKidsMode();
+   * // User is now in Kids Mode
    */
   public async openKidsMode() {
     await ecp.sendKeypress(ecp.Key.Left);
-    await ecp.sendKeypress(ecp.Key.Up);
-    await utils.sleep(3000);
-    await ecp.sendKeypress(ecp.Key.Up);
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await testUtils.waitForSideNavMenuToBeExpanded();
+    await testUtils.selectMenuItem('sideNavMenu', 'Kids');
+    await utils.sleep(1000);
     const exitKidsOption = await testUtils.getNodeForElement('exitKidsOption');
     expect(exitKidsOption.visible).to.be.true;
   }
@@ -980,11 +989,21 @@ class TestHelpers {
   /**
    * HELPER: Exits Kids Mode
    * 
-   * NOTE: Implementation TBD - would navigate to Exit Kids option in side nav
+   * USE WHEN:
+   *   - Need to exit Kids Mode to access adult content
+   *   - Testing age gate functionality
+   * 
+   * PREREQUISITES:
+   *   - User must be in Kids Mode
+   * 
+   * @example
+   * await testHelpers.exitKidsMode();
+   * // Age gate may appear if user hasn't entered valid age
    */
   public async exitKidsMode() {
-    // Implementation would go here
-    // Navigate to Exit Kids option and select
+    await ecp.sendKeypress(ecp.Key.Left);
+    await testUtils.waitForSideNavMenuToBeExpanded();
+    await testUtils.selectMenuItem('sideNavMenu', 'Exit Kids');
   }
 
   /* ═══════════════════════════════════════════════════════════════════
@@ -1100,10 +1119,10 @@ class TestHelpers {
    * @param emailInputElement - Email input element ID (default: 'emailAddressBox')
    * 
    * @example
-   * await testHelpers.completeRegistrationFlow();
-   * await testHelpers.completeRegistrationFlow('custom@email.com');
+   * await testHelpers.completeGuestUserRegistrationFlow();
+   * await testHelpers.completeGuestUserRegistrationFlow('custom@email.com');
    */
-  public async completeRegistrationFlow(email?: string, emailInputElement: any = 'emailAddressBox') {
+  public async completeGuestUserRegistrationFlow(email?: string, emailInputElement: any = 'emailAddressBox') {
     // Wait for modal and navigate through it
     await utils.sleep(7000);
     await ecp.sendKeypress(ecp.Key.Down, { wait: 1000 });
@@ -1119,13 +1138,6 @@ class TestHelpers {
     await ecp.sendKeypress(ecp.Key.Right);
     await ecp.sendKeypress(ecp.Key.Down, { count: 4, wait: 1000 });
     await ecp.sendKeypress(ecp.Key.Ok);
-  }
-
-  /**
-   * BACKWARD COMPATIBILITY
-   */
-  public async completeGuestUserRegistrationFlow() {
-    await this.completeRegistrationFlow();
   }
 
   /* ═══════════════════════════════════════════════════════════════════
@@ -1379,6 +1391,7 @@ class TestHelpers {
    * @param rowListElementId - Element ID of the RowList (e.g., 'movieScreenRowList', 'videoTitlesRowList')
    * @param hasVideoPreview - true to find WITH preview, false to find WITHOUT (default: true)
    * @param maxRowsToSearch - Maximum number of rows to search (default: 5)
+   * @param contentType - Optional content type to filter by (e.g., 's' for series, 'v' for movie)
    * @returns [row, column] array or empty array if not found
    * 
    * @example
@@ -1395,11 +1408,16 @@ class TestHelpers {
    * if (position.length === 0) {
    *   throw new Error('Could not find content with video preview');
    * }
+   * 
+   * @example
+   * // Find series WITH video preview
+   * const position = await testHelpers.findContentPositionInRowListThatContainsVideoPreview('videoTitlesRowList', true, 5, 's');
    */
   public async findContentPositionInRowListThatContainsVideoPreview(
     rowListElementId: any,
     hasVideoPreview = true,
-    maxRowsToSearch = 5
+    maxRowsToSearch = 5,
+    contentType?: string
   ): Promise<[number, number] | []> {
     // Get all content grouped by row
     const rowsContent = await testUtils.getAllRowListItemsContentGroupedByRow(rowListElementId);
@@ -1412,12 +1430,17 @@ class TestHelpers {
         if (item.type.includes('ad')) {
           continue;
         }
-        const videoPreviewUrl = item.video_preview_url?.trim();
+
+        // Check if content type matches (if specified)
+        if (contentType && item.type !== contentType) {
+          continue;
+        }
 
         // Check if item matches the video preview criteria
-        if (hasVideoPreview && videoPreviewUrl.length > 0) {
+        // Use continuous optional chaining to safely access length property
+        if (hasVideoPreview && item.video_preview_url?.trim().length > 0) {
           return [rowIndex, colIndex];
-        } else if (!hasVideoPreview && (videoPreviewUrl === undefined || videoPreviewUrl === null || videoPreviewUrl.length === 0)) {
+        } else if (!hasVideoPreview && (!item.video_preview_url || item.video_preview_url?.trim().length === 0)) {
           return [rowIndex, colIndex];
         }
       }
@@ -1441,6 +1464,7 @@ class TestHelpers {
    * @param hasVideoPreview - Whether to find content with or without video preview (default: true)
    * @param maxRowsToSearch - Maximum number of rows to search (default: 5)
    * @param sleepAfterJump - Time to sleep after jumping to position (default: 2000ms)
+   * @param contentType - Optional content type to filter by (e.g., 's' for series, 'v' for movie)
    * @returns [row, column] position that was navigated to
    * @throws Error if no content matching criteria is found
    * 
@@ -1453,17 +1477,23 @@ class TestHelpers {
    * // Find and navigate to content WITHOUT video preview
    * const position = await testHelpers.findAndNavigateToVideoPreviewContent('videoTitlesRowList', false, 5);
    * // Can use returned position if needed: const [row, col] = position;
+   * 
+   * @example
+   * // Find and navigate to series WITH video preview
+   * await testHelpers.findAndNavigateToVideoPreviewContent('videoTitlesRowList', true, 5, 2000, 's');
    */
   public async findAndNavigateToVideoPreviewContent(
     rowListElementId: string,
     hasVideoPreview: boolean = true,
     maxRowsToSearch: number = 5,
-    sleepAfterJump: number = 2000
+    sleepAfterJump: number = 2000,
+    contentType?: string
   ): Promise<[number, number]> {
     const position = await this.findContentPositionInRowListThatContainsVideoPreview(
       rowListElementId,
       hasVideoPreview,
-      maxRowsToSearch
+      maxRowsToSearch,
+      contentType
     );
 
     if (position.length === 0) {
@@ -1472,6 +1502,60 @@ class TestHelpers {
     }
 
     await this.jumpToRowListPosition(rowListElementId, position[0], position[1]);
+    await utils.sleep(sleepAfterJump);
+
+    return position as [number, number];
+  }
+
+  /**
+   * HELPER: Finds content in a grid (MarkupGrid) with/without video preview and navigates to it
+   * 
+   * Combines findContentPositionInGridThatContainsVideoPreview + navigation in one call.
+   * Useful for quickly finding and focusing on content with specific video preview requirements.
+   * 
+   * @param gridElementId - Grid element ID (e.g., 'categoriesScreenContentGrid', 'categoryDetailsVideoGrid')
+   * @param hasVideoPreview - true to find WITH preview (default), false to find WITHOUT preview
+   * @param columnsPerRow - Number of columns in the grid (default: 5)
+   * @param sleepAfterJump - Milliseconds to wait after navigation (default: 2000)
+   * @returns [row, column] position that was navigated to
+   * @throws Error if no content matching criteria is found
+   * 
+   * @example
+   * // Find and navigate to content WITH video preview in Kids category grid
+   * await testHelpers.findAndNavigateToVideoPreviewContentInGrid('categoriesScreenContentGrid', true, 6);
+   * // Now focused on a title with video preview
+   * 
+   * @example
+   * // Find and navigate to content WITHOUT video preview
+   * const position = await testHelpers.findAndNavigateToVideoPreviewContentInGrid('categoryDetailsVideoGrid', false, 5);
+   * // Can use returned position if needed: const [row, col] = position;
+   */
+  public async findAndNavigateToVideoPreviewContentInGrid(
+    gridElementId: any,
+    hasVideoPreview: boolean = true,
+    columnsPerRow: number = 5,
+    sleepAfterJump: number = 2000
+  ): Promise<[number, number]> {
+    const position = await this.findContentPositionInGridThatContainsVideoPreview(
+      gridElementId,
+      hasVideoPreview,
+      columnsPerRow
+    );
+
+    if (position.length === 0) {
+      const previewType = hasVideoPreview ? 'with' : 'without';
+      throw new Error(`Could not find content ${previewType} video preview in ${gridElementId}`);
+    }
+
+    // Convert [row, col] back to single index for jumpToItem
+    const itemIndex = position[0] * columnsPerRow + position[1];
+
+    // Use jumpToItem to navigate to the found index
+    await odc.setValue(testUtils.getElementKeyPath(gridElementId, {
+      field: 'jumpToItem',
+      value: itemIndex
+    }), { timeout: 10000 });
+
     await utils.sleep(sleepAfterJump);
 
     return position as [number, number];
@@ -2355,58 +2439,59 @@ class TestHelpers {
     const searchValues = slug ? (Array.isArray(slug) ? slug : [slug]) : (Array.isArray(title) ? title : [title!]);
     const isSlugSearch = !!slug;
 
-    const element = testUtils.getElementKeyPath(rowListElementId);
-    let baseKeyPath = `content`;
-    if (element.keyPath) {
-      baseKeyPath = element.keyPath + '.' + baseKeyPath;
-    }
-
     let found = false;
     let scrollCount = 0;
-    let foundValue: string | undefined;
+    let foundRowIndex: number | undefined;
 
     while (!found && scrollCount < maxScrolls) {
       try {
-        // Get the currently focused row index
-        const focusedIndex = await testUtils.getCurrentlyFocusedGridItemIndex(rowListElementId);
-        const rowIndex = focusedIndex[0];
+        // Get row-level metadata (slug, TITLE, etc.) instead of children
+        const allRowsMetadata = await testUtils.getAllRowListRowsMetadata(rowListElementId, 10000);
 
-        if (isSlugSearch) {
-          // Only check slug field when slug parameter is provided
-          const { found: slugFound, value: currentRowSlug } = await odc.getValue({
-            base: element.base,
-            keyPath: `${baseKeyPath}.${rowIndex}.slug`
-          });
+        // Search for the target row in loaded content
+        for (let rowIndex = 0; rowIndex < allRowsMetadata.length; rowIndex++) {
+          const rowMetadata = allRowsMetadata[rowIndex];
 
-          if (slugFound && searchValues.includes(currentRowSlug)) {
-            found = true;
-            foundValue = currentRowSlug;
-          } else {
-            // Row slug doesn't match any in the list, scroll down and try again
-            await ecp.sendKeypress(ecp.Key.Down);
-            await utils.sleep(500); // Wait for content to load
-            scrollCount++;
+          // Skip null entries (rows that couldn't be retrieved)
+          if (!rowMetadata) {
+            continue;
           }
-        } else {
-          // Only check title field when title parameter is provided
-          const { found: titleFound, value: currentRowTitle } = await odc.getValue({
-            base: element.base,
-            keyPath: `${baseKeyPath}.${rowIndex}.TITLE`
-          });
 
-          if (titleFound && searchValues.includes(currentRowTitle)) {
-            found = true;
-            foundValue = currentRowTitle;
+          if (isSlugSearch) {
+            // Check slug field
+            if (rowMetadata.slug && searchValues.includes(rowMetadata.slug)) {
+              found = true;
+              foundRowIndex = rowIndex;
+              break;
+            }
           } else {
-            // Row title doesn't match any in the list, scroll down and try again
-            await ecp.sendKeypress(ecp.Key.Down);
-            await utils.sleep(500); // Wait for content to load
-            scrollCount++;
+            // Check TITLE field
+            if (rowMetadata.TITLE && searchValues.includes(rowMetadata.TITLE)) {
+              found = true;
+              foundRowIndex = rowIndex;
+              break;
+            }
           }
         }
+
+        if (found && foundRowIndex !== undefined) {
+          // Jump directly to the found row
+          await testUtils.jumpToRowIndex(rowListElementId, foundRowIndex, 10000);
+          return;
+        }
+
+        // Not found in current loaded content, scroll down 5 times to load more
+        const scrollBatchSize = Math.min(5, maxScrolls - scrollCount);
+        if (scrollBatchSize > 0) {
+          await ecp.sendKeypress(ecp.Key.Down, { count: scrollBatchSize, wait: 500 });
+          scrollCount += scrollBatchSize;
+        }
+
       } catch (e) {
-        // Error getting focused row or title/slug, scroll down and try again
+        console.error('Error getting content:', e);
+        // Error getting content, scroll down and try again
         await ecp.sendKeypress(ecp.Key.Down);
+        await utils.sleep(500);
         scrollCount++;
       }
     }
@@ -2416,6 +2501,99 @@ class TestHelpers {
       const searchList = searchValues.join('", "');
       throw new Error(`Could not find row with ${fieldType} "${searchList}" after scrolling down ${maxScrolls} times`);
     }
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════════════
+   * APPLICATION LIFECYCLE HELPERS
+   * ═══════════════════════════════════════════════════════════════════
+   */
+
+  /**
+   * HELPER: Fully exits the app by backgrounding and confirming exit
+   * 
+   * USE WHEN:
+   *   - Testing app relaunch behavior
+   *   - Verifying state persistence across app sessions
+   *   - Clearing app state between test scenarios
+   * 
+   * HOW IT WORKS:
+   *   1. Presses Back twice to background the app
+   *   2. Waits briefly for background menu
+   *   3. Presses OK to confirm exit
+   *   4. Waits for app to fully close
+   * 
+   * COMMON USE CASES:
+   *   - Test "Watch again" bubble reset after app relaunch
+   *   - Verify user state persistence
+   *   - Test fresh app launch scenarios
+   * 
+   * @example
+   * // Exit the app completely
+   * await testHelpers.fullyExitApp();
+   * 
+   * // Re-launch the app
+   * await ecp.sendLaunchChannel();
+   * await utils.sleep(5000);
+   */
+  public async fullyExitApp(): Promise<void> {
+    // Press Back twice to background the app
+    await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
+    await utils.sleep(100);
+
+    // Press OK to confirm exit
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await utils.sleep(1000);
+  }
+
+
+  /**
+   * Completes the UI-based sign-up flow by entering email and age
+   * 
+   * Based on completeGuestUserRegistrationFlow() + age verification from daily-sign-in-sign-out
+   * 
+   * @param email - Email address to use for sign-up (optional, generates unique email if not provided)
+   * @param age - Age to enter for age verification (defaults to '20')
+   * 
+   * @example
+   * // Use auto-generated email and default age
+   * await testHelpers.completeSignUpFlow();
+   * 
+   * @example
+   * // Use specific email and age
+   * await testHelpers.completeSignUpFlow('test@tubi.tv', '25');
+   * 
+   * @returns The email used for sign-up
+   */
+  public async completeSignUpFlow(email?: string, age: string = '20'): Promise<string> {
+    // Generate unique email if not provided
+    if (!email) {
+      email = this.generateTestEmail();
+    }
+    await utils.sleep(2000);
+    // Wait for modal and navigate through it (always happens)
+    await ecp.sendKeypress(ecp.Key.Back, { wait: 1000 });
+
+    await testUtils.waitForCurrentScreenToEqual('emailInputScreen');
+
+    // Enter email (based on completeGuestUserRegistrationFlow)
+    await ecp.sendText(email);
+    await ecp.sendKeypress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4, wait: 1000 });
+    await ecp.sendKeypress(ecp.Key.Ok);
+
+    // Wait for age verification screen
+    await testUtils.waitForCurrentScreenToEqual('signUpAgeVerificationScreen');
+
+    // Enter age
+    await ecp.sendText(age);
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
+    await ecp.sendKeypress(ecp.Key.Ok);
+
+    await testUtils.waitForCurrentScreenToEqual('rokuContinueWatchingConsentScreen');
+    await ecp.sendKeypress(ecp.Key.Ok);
+
+    return email;
   }
 }
 

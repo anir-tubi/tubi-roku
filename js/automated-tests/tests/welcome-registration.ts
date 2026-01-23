@@ -96,7 +96,7 @@ describe('Welcome Registration', function () {
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/450820
-  it('C450820 - Returning registered user should not see the Welcome Registration component, @welcome_modal', async () => {
+  it('C450820 - Returning registered user should not see the Welcome Registration component, @welcome_modal @manual_regression', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true, hideStartupModals: false });
 
     // Verify Welcome Modal not displayed and Homescreen displayec

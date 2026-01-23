@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ecp, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
-import { shared } from '../test-helpers';
+import { shared, testHelpers } from '../test-helpers';
 
 describe('Age Gate', function () {
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/242480
@@ -10,10 +10,10 @@ describe('Age Gate', function () {
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open Kids Mode
-    await openKidsMode();
-
+    await testHelpers.openKidsMode();
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
     // Exit Kids Mode
-    await exitKidsMode();
+    await testHelpers.exitKidsMode();
 
     // Verify Age Gate screen
     await verifyAgeGateScreen();
@@ -69,13 +69,11 @@ describe('Age Gate', function () {
 
 
     // Open Kids Mode
-    await openKidsMode();
+    await testHelpers.openKidsMode();
 
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
-    await ecp.sendKeypress(ecp.Key.Left);
-
     // Exit Kids Mode
-    await exitKidsMode();
+    await testHelpers.exitKidsMode();
 
     // Verify Age Gate Screen
     await verifyAgeGateScreen();
@@ -101,11 +99,11 @@ describe('Age Gate', function () {
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open Kids Mode
-    await openKidsMode();
+    await testHelpers.openKidsMode();
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
-    await ecp.sendKeypress(ecp.Key.Left);
+
     // Exit Kids Mode
-    await exitKidsMode();
+    await testHelpers.exitKidsMode();
 
     // Verify Age Gate Screen
     await verifyAgeGateScreen();
@@ -145,10 +143,10 @@ describe('Age Gate', function () {
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open Kids Mode
-    await openKidsMode();
-
+    await testHelpers.openKidsMode();
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
     // Exit Kids Mode
-    await exitKidsMode();
+    await testHelpers.exitKidsMode();
 
     // Verify Age Gate Screen
     await verifyAgeGateScreen();
@@ -215,17 +213,6 @@ describe('Age Gate', function () {
 
   });
 });
-
-async function openKidsMode() {
-  await ecp.sendKeypress(ecp.Key.Left);
-  await testUtils.waitForSideNavMenuToBeExpanded();
-  await testUtils.selectMenuItem('sideNavMenu', 'Kids');
-}
-
-async function exitKidsMode() {
-  await testUtils.waitForSideNavMenuToBeExpanded();
-  await testUtils.selectMenuItem('sideNavMenu', 'Exit Kids');
-}
 
 async function selectSignInFromHomeScreen() {
   // Sign in

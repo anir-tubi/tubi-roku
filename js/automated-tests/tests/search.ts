@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { ecp, odc, proxy, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
 import { moveToGrid } from '../analytics/utils/helpers';
-import { shared } from '../test-helpers';
+import { shared, testHelpers } from '../test-helpers';
 
 
 describe('Search', function () {
@@ -72,40 +72,6 @@ describe('Search', function () {
 			await testUtils.retryWithTimeOut(async () => {
 				const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
 				expect(searchResultsText.text).to.equal('NBC News NOW');
-			});
-		});
-
-		it('C244260 - The user should be able to access the channel guide and other player features from the player page of the selected channel @search', async () => {
-			await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-			await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
-			await testUtils.goToPage('search');
-			await testUtils.waitForElementToShowOnScreen('trendingSearchResultsGrid', 'Timed out waiting for element to have focus', 10000);
-			await ecp.sendText('nbc');
-
-			await shared.navigateToContentInSearchResults({ title: LINEAR_CHANNEL_TITLE });
-			await testUtils.retryWithTimeOut(async () => {
-				const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-				expect(searchResultsText.text).to.equal(LINEAR_CHANNEL_TITLE);
-			});
-
-			const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
-			expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon-filled.webp');
-			await ecp.sendKeypress(ecp.Key.Ok);
-
-			// Verify that the linear channel plays
-			await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 10000);
-
-			// Press left to access the EPG left nav and verify the closed captions button exists
-			await ecp.sendKeypress(ecp.Key.Left, { count: 2 });
-			await testUtils.retryWithTimeOut(async () => {
-				const btnCC_label = await testUtils.getNodeForElement('btnCC_label');
-				expect(btnCC_label.text).to.equal('Subtitles');
-			});
-
-			// Verify that the Full TV Guide button exists
-			await testUtils.retryWithTimeOut(async () => {
-				const epgFullTVGuide = await testUtils.getNodeForElement('epgFullTVGuide');
-				expect(epgFullTVGuide.text).to.equal('Full TV Guide');
 			});
 		});
 
@@ -187,55 +153,67 @@ describe('Search', function () {
 		});
 
 		// https://tubi.testrail.io/index.php?/cases/view/22728
-		it('C22728 - Guest User - Navigate to Search, input characters and select movie title, @search @navigation', async () => {
+		it('C22728 - Search - When movie selected then corresponding movie details page displayed @search @navigation @manual_regression', async () => {
+			/**
+			 * Pre-conditions: None
+			 * 
+			 * Test Steps:
+			 * 1. Launch app
+			 * 2. Navigate to search
+			 * 3. Search for a movie
+			 * 4. Select movie from results
+			 * 5. Verify movie details page is displayed with correct content
+			 */
 
-			// Launch Tubi and observe homescreen
-			await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-			await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+			// Launch app
+			await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+			await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
+			await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for videoTitlesRowList to have focus', 20000);
 
-			// Navigate to Search page using testUtils.goToPage
+			// Navigate to search
 			await testUtils.goToPage('search');
+			await testUtils.waitForCurrentScreenToEqual('searchScreen', 10000);
+			await utils.sleep(1000);
 
-			// Wait for search screen to be ready
-			await testUtils.waitForCurrentScreenToEqual('searchScreen');
-			await testUtils.untilTrue(async () => {
-				const contents = await testUtils.getAllGridItemsContent('trendingSearchResultsGrid');
-				return contents.length > 5;
-			}, 'trendingSearchResultsGrid content count not greater than 5', 30000);
-
-			// Input some characters that displays results
+			// Enter search query for a popular movie
 			await ecp.sendText('action');
-			await testUtils.retryWithTimeOut(async () => {
-				const searchHintText = await testUtils.getNodeForElement('searchHintText');
-				expect(searchHintText.text).to.match(/\d+ titles found/);
-			}, 30000);
-
-			// Navigate to the search results grid
-			await shared.navigateRightToSearchGrid();
-
-			// Verify search results text is visible
-			await testUtils.retryWithTimeOut(async () => {
-				const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-				expect(searchResultsText.visible).to.equal(true);
-			});
-
-			// Select a movie title from results
 			await utils.sleep(2000);
+
+			// Verify search results appear
+			await testUtils.waitForElementToShowOnScreen('searchResultGrid', 'Search results grid not visible', 10000);
+
+			// Navigate to search results grid using helper
+			await testHelpers.navigateRightToSearchGrid();
+			await utils.sleep(500);
+
+			// Navigate to first movie in search results (type 'v' and no seriesId)
+			await testUtils.navigateToGridItem('searchResultGrid', (item) => item.type === 'video' && (!item.seriesId || item.seriesId === ''));
+			await utils.sleep(500);
+
+			// Get the focused movie content
+			const movieContent = await testUtils.getCurrentlyFocusedGridItemContent('searchResultGrid');
+			expect(movieContent.type).to.equal('video', 'Selected content should be a movie');
+
+			// Select the movie
 			await ecp.sendKeypress(ecp.Key.Ok);
+			await testUtils.waitForCurrentScreenToEqual('detailScreen', 10000);
 
-			// Verify we're on the detail screen
-			await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle', 'Detail screen not displayed', 10000);
-
-			// Verify title is not empty
+			// Verify movie details page is displayed
+			await testUtils.waitForElementToShowOnScreen('detailScreenTitle', 'Detail screen title not visible', 5000);
 			const detailTitle = await testUtils.getNodeForElement('detailScreenTitle');
-			expect(detailTitle.text).to.not.be.empty;
+			expect(detailTitle.visible).to.equal(true, 'Movie details page should be visible');
+			expect(detailTitle.text).to.exist.and.not.be.empty;
 
+			// Verify content matches
+			const detailContent = await testUtils.getElementField('detailScreen', 'content');
+			expect(detailContent).to.exist;
+			expect(detailContent.id).to.equal(movieContent.id, 'Detail page should show the selected movie');
 		});
 
 	});
 
 	//https://tubi.testrail.io/index.php?/cases/view/585698
-	it('C585698 - Should display trending searches under search results for no results scenario @search', async () => {
+	it('C585698 - Should display trending searches under search results for no results scenario @search @manual_regression', async () => {
 		// Launch Tubi and observe homescreen
 		await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
 		await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');

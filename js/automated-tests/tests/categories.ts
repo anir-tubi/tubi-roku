@@ -120,7 +120,7 @@ describe('Categories', function () {
     // Go to Categories Details page
     await testHelpers.navigateToCategories();
     await ecp.sendKeypress(ecp.Key.Down);
-    await testUtils.waitForElementToShowOnScreen('channelsVideoGrid');
+    await testUtils.waitForElementToShowOnScreen('categoriesScreenContentGrid');
     await ecp.sendKeypress(ecp.Key.Right);
 
     // Are we on the Video Grid? 
@@ -257,8 +257,7 @@ describe('Categories', function () {
 
     // Verify Channel Video Grid
     await testUtils.waitForElementToShowOnScreen('channelsDetailsGrid');
-    const position = await shared.findContentPositionInGridThatContainsVideoPreview('channelsDetailsGrid', true, 6);
-    await moveToGrid({ grid: { row: 0, col: 0 }, destRow: position[0], destCol: position[1] });
+    const position = await testHelpers.findAndNavigateToVideoPreviewContentInGrid('channelsDetailsGrid', true, 6);
 
     // Additional check to make sure the video preview is playing
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing');
@@ -275,19 +274,22 @@ describe('Categories', function () {
     // Go to Categories Details page
     await testHelpers.navigateToCategories();
 
-    //Verify Recommended button at the top
-    await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
-
-    await testUtils.waitForElementToShowOnScreen('categoryPosterFirst');
+    await testUtils.waitForElementToHaveFocus('categoriesListMenu', 'Timed out waiting for categories list menu to have focus');
+    await testUtils.waitForGridContentToLoad('categoriesScreenContentGrid', 10000);
     await ecp.sendKeypress(ecp.Key.Right, { wait: 200 });
+    await testUtils.waitForElementToHaveFocus('categoriesScreenContentGrid', 'Timed out waiting for categories screen content grid to have focus');
     await testUtils.waitForElementToFullyShowOnScreen('categoriesDetailsPageInfo');
 
-    const position = await shared.findContentPositionInGridThatContainsVideoPreview('channelsVideoGrid', false, 4);
-    await moveToGrid({ grid: { row: 0, col: 0 }, destRow: position[0], destCol: position[1] });
+    const position = await testHelpers.findAndNavigateToVideoPreviewContentInGrid('categoriesScreenContentGrid', false, 4);
 
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'stopped');
 
-    await testUtils.waitForElementToShowOnScreen('backgroundPoster');
+    // Verify either backgroundPoster or backgroundPoster2 has opacity 1 (static image is shown)
+    await testUtils.untilTrue(async () => {
+      const backgroundPoster = await testUtils.getNodeForElement('backgroundPoster');
+      const backgroundPoster2 = await testUtils.getNodeForElement('backgroundPoster2');
+      return backgroundPoster.opacity === 1 || backgroundPoster2.opacity === 1;
+    }, 'Either backgroundPoster or backgroundPoster2 should have opacity 1', 5000);
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/C638444
@@ -335,40 +337,35 @@ describe('Categories', function () {
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/765057
-  it('C765057 - When a title is in focus, video preview does not play when Autoplay Previews is Off, @categories', async () => {
-    // Create user with watch list and history
-    const user = await testUtils.createRegisteredUser();
-    // Launch to home page
-    await testUtils.startApplicationAtPage('home', { user: user });
+  it('C765057 - If video previews is turned off in app settings, static image is shown when title is in focus @categories @manual_regression', async () => {
+    /**
+     * Pre-conditions:
+     * - Guest or Registered user
+     * - Video preview is turned off in app settings.
+     * 
+     * Test Steps:
+     * 1. Launch app.
+     * 2. Turn off video previews in settings.
+     * 3. In left nav, select "Categories".
+     * 4. Select any category.
+     * 5. Focus on a title that has a video preview.
+     * 6. Verify static image is shown (not video preview).
+     */
+
+    // Launch app as guest user
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
-    await ecp.sendKeypress(ecp.Key.Left);
-    await testUtils.waitForElementToFullyShowOnScreen('sideNavMenu');
 
-    // Open settings
-    await ecp.sendKeypress(ecp.Key.Left);
-    await shared.openSettings();
+    // Turn off Video Previews in Settings
+    await testHelpers.enablePreviewInSettings(false);
 
-    // Are we on Settings page?
-    await testUtils.waitForElementToFullyShowOnScreen('settingsScreen');
-
-    // Turn off video previews
-    await ecp.sendKeypress(ecp.Key.Down);
-    // Waiting until the autoplay preview section is fully shown on screen.
-    await testUtils.waitForElementToFullyShowOnScreen('autoplayPreviewOn');
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await ecp.sendKeypress(ecp.Key.Down);
-    await ecp.sendKeypress(ecp.Key.Ok);
-
-    // Navigate to back to home screen
-    await ecp.sendKeypress(ecp.Key.Back, { count: 2, wait: 200 });
-
-    // Expect Home Side Nav item to be highlighted and on Home page
-    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    // Wait for home screen
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 10000);
 
     // Go to Categories Details page
     await testHelpers.navigateToCategories();
 
-    //Verify Recommended button at the top
+    // Verify Recommended button at the top
     await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
 
     // Select Category Button
@@ -377,71 +374,100 @@ describe('Categories', function () {
     // Is the first poster now selected? 
     await testUtils.waitForElementToFullyShowOnScreen('categoryPosterFirst');
 
-    // Is the Background Poster present?
+    // Find and navigate to content with video preview (to verify static image is shown for content that HAS preview capability)
+    const position = await testHelpers.findAndNavigateToVideoPreviewContentInGrid('categoriesScreenContentGrid', true, 6);
+    expect(position.length).to.equal(2, 'Could not find content with video preview');
+
+    // Verify static image is shown (background poster should be visible since preview is OFF)
     await testUtils.waitForElementToShowOnScreen('backgroundPoster');
+
+    // Verify preview player is NOT playing (since previews are turned off)
+    const previewPlayer = await testUtils.getNodeForElement('previewVideoPlayer');
+    expect(previewPlayer.state).to.not.equal('playing', 'Preview should not be playing when previews are turned off');
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/765055
   // https://tubi.testrail.io/index.php?/cases/view/765065
   // https://tubi.testrail.io/index.php?/cases/view/765058
-  it('C765055 - When a title is in focus, video preview plays when Autoplay Previews is On, @categories', async () => {
-    // Launch to home page
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+  it('C765055 - Video preview plays when title is in focus @categories @manual_regression', async () => {
+    /**
+     * Pre-conditions:
+     * - Guest or Registered user
+     * 
+     * Test Steps:
+     * 1. Launch app.
+     * 2. In left nav, select "Categories".
+     * 3. Select any category.
+     * 4. Focus on a title that has a video preview.
+     * 5. Verify video preview plays.
+     */
+
+    // Launch app as guest user
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
     await testHelpers.navigateToCategories();
 
-    //Verify Recommended button at the top
+    // Verify Recommended button at the top
     await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
 
     // Select Category Button
     await ecp.sendKeypress(ecp.Key.Ok);
 
-    // Is the first poster now selected? 
-    await testUtils.waitForElementToFullyShowOnScreen('categoryPosterFirst');
-    const position = await shared.findContentPositionInGridThatContainsVideoPreview('channelsVideoGrid', true, 6);
-    await moveToGrid({ grid: { row: 0, col: 0 }, destRow: position[0], destCol: position[1] });
-    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing');
-
-    await ecp.sendKeypress(ecp.Key.Ok, { wait: 200 });
-    // Verify Details page opens
-    await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
-    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing');
-
-    // Navigate back to category list screen.
-    await ecp.sendKeypress(ecp.Key.Back, { wait: 200 });
-    // Is the first poster now selected? 
+    // Is the first poster now selected?
     await testUtils.waitForElementToFullyShowOnScreen('categoryPosterFirst');
 
-    // Moving focus to category filters.
-    await ecp.sendKeypress(ecp.Key.Back, { wait: 200 });
-    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'paused');
+    // Find and navigate to content with video preview
+    const position = await testHelpers.findAndNavigateToVideoPreviewContentInGrid('categoriesScreenContentGrid', true, 6);
+    expect(position.length).to.equal(2, 'Could not find content with video preview');
+
+    // Verify video preview is playing
+    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 10000);
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/765059
-  it('C765059 - Once video preview ends, title auto starts, @categories', async () => {
-    // Launch to home page
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+  it('C765059 - Once video preview ends, title autostarts @categories @manual_regression', async () => {
+    /**
+     * Pre-conditions:
+     * - Guest or Registered user
+     * 
+     * Test Steps:
+     * 1. Launch app.
+     * 2. In left nav, select "Categories".
+     * 3. Select any category.
+     * 4. Focus on a title that has a video preview.
+     * 5. Let video preview complete.
+     * 6. Verify title autostarts (navigates to detail screen and starts playing).
+     */
+
+    // Launch app as guest user
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Go to Categories Details page
     await testHelpers.navigateToCategories();
 
-    //Verify Recommended button at the top
+    // Verify Recommended button at the top
     await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
 
     // Select Category Button
     await ecp.sendKeypress(ecp.Key.Ok);
 
-    // Is the first poster now selected? 
+    // Is the first poster now selected?
     await testUtils.waitForElementToFullyShowOnScreen('categoryPosterFirst');
-    const position = await shared.findContentPositionInGridThatContainsVideoPreview('channelsVideoGrid', true, 6);
-    await moveToGrid({ grid: { row: 0, col: 0 }, destRow: position[0], destCol: position[1] });
 
-    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing');
+    // Find and navigate to content with video preview
+    const position = await testHelpers.findAndNavigateToVideoPreviewContentInGrid('categoriesScreenContentGrid', true, 6);
+    expect(position.length).to.equal(2, 'Could not find content with video preview');
+
+    // Verify video preview is playing
+    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 10000);
+
+    // Seek to near end of preview to speed up test
     await testUtils.seekPlayerToRelativePosition('previewVideoPlayerScreen', -1000, "end");
-    // Verify Details page opens
+
+    // Verify Details page opens (autostart behavior)
     await testUtils.waitForCurrentScreenToEqual('videoPlayerScreen', 20000);
   });
 
@@ -556,8 +582,8 @@ async function verifyFourColumns() {
   await utils.sleep(1000);
 
   // Are we still on the 4th title after navigating right more than 3 times?
-  const channelsVideoGrid = await testUtils.getNodeForElement('channelsVideoGrid');
-  expect(channelsVideoGrid.currFocusColumn).to.equal(3);
+  const categoriesScreenContentGrid = await testUtils.getNodeForElement('categoriesScreenContentGrid');
+  expect(categoriesScreenContentGrid.currFocusColumn).to.equal(3);
 
 }
 

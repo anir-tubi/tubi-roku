@@ -28,7 +28,6 @@ describe('Age gate', function () {
 	it('RequesttForInfoEvent when DOB is submitted C152086, C166029, C165481, C165480 @analyticsASet1,@analyticsAgeGate', async () => {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
-		await ecp.sendKeypress(ecp.Key.Right);
 		await kidsHome.exitKidsMode();
 		const ageGate = AgeGatePage();
 		await ageGate.pageDidLoad();
@@ -42,7 +41,6 @@ describe('Age gate', function () {
 	it('Wrong data @analyticsASet1,@analyticsAgeGate', async () => {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
-		await ecp.sendKeypress(ecp.Key.Right);
 		await kidsHome.exitKidsMode();
 		const ageGate = AgeGatePage();
 		await ageGate.pageDidLoad();

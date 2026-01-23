@@ -12,7 +12,7 @@ describe('Details Page', function () {
       await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
       // Find and navigate to content WITHOUT video preview
-      const [rowIndex, colIndex] = await testHelpers.findAndNavigateToVideoPreviewContent('movieScreenRowList', false, 5);
+      const [rowIndex, colIndex] = await testHelpers.findAndNavigateToVideoPreviewContent('movieScreenRowList', false, 40);
 
       // Get the item data at the navigated position
       const rowListElement = testUtils.getElementKeyPath('movieScreenRowList');

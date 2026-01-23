@@ -1,6 +1,6 @@
 import { testUtils } from '../../test-utils';
 import { expect } from 'chai';
-import { ecp,utils } from 'roku-test-automation';
+import { ecp, utils } from 'roku-test-automation';
 import Container from './container';
 
 
@@ -9,7 +9,7 @@ const Categories = () => {
 		channelCategoryGrid: async () =>
 			await testUtils.getNodeForElement('channelCategoryGrid'),
 		channelSideNavigation: async () =>
-			await testUtils.getNodeForElement('channelSideNav'),
+			await testUtils.getNodeForElement('categoriesListMenu'),
 		titleName: async () =>
 			await testUtils.getNodeForElement('titleNameInCategories'),
 	};
@@ -29,7 +29,7 @@ const Categories = () => {
 	}
 
 	async function selectCategoryByName(categoryName) {
-		await testUtils.jumpToRowWithTitle('channelSideNav', categoryName);
+		await testUtils.jumpToRowWithTitle('categoriesListMenu', categoryName);
 		await utils.sleep(1500);
 		await ecp.sendKeypress(ecp.Key.Ok);
 		const container = Container();

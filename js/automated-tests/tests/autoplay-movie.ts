@@ -10,7 +10,7 @@ describe('Autoplay Movies', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/768091
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/105693
-  it('C768091 - Autoplay Next Video On - Autoplay next title @autoplay', async () => {
+  it('C768091 - Autoplay Next Video On - Autoplay next title @autoplay, @manual_regression', async () => {
     await triggerMovieAutoplayUI();
 
     const { node } = await odc.getFocusedNode();
@@ -113,7 +113,7 @@ describe('Autoplay Movies', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/705819
-  it('C705819 - BWW does not appear while autoplay modal is shown @autoplay', async () => {
+  it('C705819 - BWW does not appear while autoplay modal is shown @autoplay @manual_regression', async () => {
     await triggerMovieAutoplayUI();
 
     await testUtils.waitForElementToHaveFocus('autoplayGridMovie', 'Timed out waiting for Movie Grid to have focus', 15000);
@@ -158,6 +158,7 @@ describe('Autoplay Movies', function () {
   it('C148692 - Autoplay - Movie - When user searches for a movie and initiates playback, Autoplay should work @autoplay,@smoke', async () => {
     // Search for a Movie title
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus', 15000);
     await shared.enableAutoplayInSettings(true);
     await testUtils.goToPage('search')
     await testUtils.waitForElementToFullyShowOnScreen('searchKeyPad');

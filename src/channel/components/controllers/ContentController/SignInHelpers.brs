@@ -909,6 +909,12 @@ Function onSignOutCompleted()
     "isVideoPreviewOn": true
     "isAutoPlayTimerOn": true
   }])
+
+  ' Exit Kids mode if user was in Kids mode when signing out
+  if isKidsUIOn() = true
+    disableKidsModeFromSideNav()
+  end if
+
   getConsentAfterSignOut()
   getServerPersistentData()
 End Function

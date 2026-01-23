@@ -8,8 +8,8 @@ const Container = () => {
 	const elements = {
 		grid: async () =>
 			await testUtils.getNodeForElement(CONTAINER_PAGE_NODES.GRID),
-		channelsVideoGrid: async () =>
-			await testUtils.getNodeForElement('channelsVideoGrid'),
+	categoriesScreenContentGrid: async () =>
+		await testUtils.getNodeForElement('categoriesScreenContentGrid'),
 		titleDescription: async () =>
 			await testUtils.getNodeForElement(CONTAINER_PAGE_NODES.TITLE_DESCRIPTION),
 		titleName: async () =>
@@ -28,7 +28,7 @@ const Container = () => {
 
 	async function pageDidLoad() {
 		await testUtils.retryWithTimeOut(async () => {
-			const grid = await elements.channelsVideoGrid();
+			const grid = await elements.categoriesScreenContentGrid();
 			expect(grid.visible).to.equal(true);
 		});
 	}

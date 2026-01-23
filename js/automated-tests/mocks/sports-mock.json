@@ -1,0 +1,190 @@
+{
+  "613762": {
+    "video_resources": [
+      {
+        "type": "hlsv3",
+        "manifest": {
+          "url": "https://live-manifest.production-public.tubi.io/live/5cfbe5af-a9c2-45cc-ade9-8e13e39fa2d0/playlist.m3u8?token=eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJjb3VudHJ5IjoiVVMiLCJkZXZpY2VfaWQiOiI4NDg0MDA1ZS01MjUzLTUxYTEtOWQ3Ni0wYWNlZTE3YjZkOTgiLCJleHAiOjE3NjkwMDc1NDcsImlzcyI6ImxpdmVfbmV3c19tYW5pZmVzdCIsInBsYXRmb3JtIjoiUk9LVSIsInJzcyI6ImFwOnJlYWwtbWFkcmlkMi1qbTFHOUgiLCJ1c2VyX2lkIjo0NjIzNDg3NjZ9.O5dqBl30S0psCBExOTQf4pJx_b2W1_eLKcMizIma9vpEPzrGTfOhpYjMtFjjYzRl9SojzSU_Umn8u-qtYAtVUg&tb.sid=3e305688-17b6-45a5-b955-e3148b33a310&ap-fb=aHR0cHM6Ly9saXZlLW1hbmlmZXN0LnByb2R1Y3Rpb24tcHVibGljLnR1YmkuaW8vbGl2ZS81Y2ZiZTVhZi1hOWMyLTQ1Y2MtYWRlOS04ZTEzZTM5ZmEyZDAvcGxheWxpc3QubTN1OD90b2tlbj1leUpoYkdjaU9pSklVelV4TWlJc0luUjVjQ0k2SWtwWFZDSjkuZXlKamIzVnVkSEo1SWpvaVZWTWlMQ0prWlhacFkyVmZhV1FpT2lJNE5EZzBNREExWlMwMU1qVXpMVFV4WVRFdE9XUTNOaTB3WVdObFpURTNZalprT1RnaUxDSmxlSEFpT2pFM05qa3dNRGMxTkRjc0ltbHpjeUk2SW14cGRtVmZibVYzYzE5dFlXNXBabVZ6ZENJc0luQnNZWFJtYjNKdElqb2lVazlMVlNJc0luSnpjeUk2SW5Kak9taDBkSEJ6T2k4dllXVm5hWE10WTJ4dmRXUm1jbTl1ZEMweExuUjFZbWt1ZG1sa1pXOHZZVEE0TUdRMk9HRXRNRGxrWmkwME9ETTNMVGcwWmpFdE1UUmlNREZsWWpsaU1qY3dMM0JzWVhsc2FYTjBMbTB6ZFRnaUxDSjFjMlZ5WDJsa0lqbzBOakl6TkRnM05qWjkuZFVEaExCa3R1MmxUS2dnZlZ5b1lkNXVrZHZJRWpMSjk0MDN3MGRhMG5WbVZvcTdjRDBVb0tJakpSVTVjcW1mOGtiVTJ1ZDBFMWlIcjBFeURGUmd5UXcmdGIuc2lkPWE3MDM2YTMzLTdkMGItNDJkNC05MWJlLTRlMTVjMTI3YTQ2NA"
+        },
+        "ssai_version": "apollo"
+      }
+    ],
+    "has_trailer": false,
+    "detailed_type": "linear",
+    "description": "Real Madrid TV is a free digital television channel, operated by Real Madrid specialising in the Spanish football club.",
+    "availability_duration": 31536000,
+    "needs_login": false,
+    "landscape_images": [
+      "https://canvas-lb.tubitv.com/opts/sZkS5_9LqLkYmQ==/90cfa34a-ba34-4c01-a793-56ffadde815a/CIgEEKQCOgUxLjEuOA=="
+    ],
+    "publisher_id": "9af39de1ce45aa9dadf1026d8d2a0f9a",
+    "availability_ends": null,
+    "images": {
+      "background_tb": [
+        "https://canvas-lb.tubitv.com/opts/S26-gUc6vYi1hA==/b7c677b1-5a90-459f-92f8-385696b0eb92/CIkEEKYCOgUxLjEuOA=="
+      ],
+      "control_landscape_tb": [
+        "https://canvas-lb.tubitv.com/opts/6JihC9J-2igWdw==/b7c677b1-5a90-459f-92f8-385696b0eb92/CIICEJABOgUxLjEuOA=="
+      ],
+      "hero_tb": [
+        "https://canvas-lb.tubitv.com/opts/wE53_wPYZMKKNA==/b7c677b1-5a90-459f-92f8-385696b0eb92/CI4EEKYCOgUxLjEuOA=="
+      ],
+      "landscape_tb": [
+        "https://canvas-lb.tubitv.com/opts/VmuRlQPV8YZmiw==/90cfa34a-ba34-4c01-a793-56ffadde815a/CNMCEL4BOgUxLjEuOA=="
+      ],
+      "poster_tb": [
+        "https://canvas-lb.tubitv.com/opts/PGCJDkkioJkUQA==/9186663a-f546-4f3b-abe4-7a95a971e003/CKcBEO4BOgUxLjEuOA=="
+      ],
+      "title_art": [],
+      "video_tiles_portrait_tb": [
+        "https://canvas-lb.tubitv.com/opts/KXl8kdNrA2C4-w==/9186663a-f546-4f3b-abe4-7a95a971e003/CM4BEKYCOgUxLjEuOA=="
+      ]
+    },
+    "directors": [],
+    "backgrounds": [
+      "https://canvas-lb.tubitv.com/opts/ol0fPcfgnhq2oA==/b7c677b1-5a90-459f-92f8-385696b0eb92/CIAPELgIOgUxLjEuOA=="
+    ],
+    "gracenote_id": "121197",
+    "availability_starts": "2020-06-22T00:00:00.000Z",
+    "schedules": [
+      {
+        "start_time": "2026-01-18T14:45:00.000Z",
+        "live": false,
+        "end_time": "2026-01-18T17:00:00.000Z",
+        "program_id": "500006541"
+      }
+    ],
+    "tags": [
+      "Sport"
+    ],
+    "video_renditions": [],
+    "genres": [],
+    "posterarts": [
+      "https://canvas-lb.tubitv.com/opts/ibQuSAA5ZJ66Dg==/9186663a-f546-4f3b-abe4-7a95a971e003/CNIBEKwCOgUxLjEuOA=="
+    ],
+    "content_tags": {
+      "days_remaining": null,
+      "imdb_rating": null,
+      "is_shiny": false,
+      "most_liked": null,
+      "rotten_tomatoes_score": null
+    },
+    "ad_languages": [],
+    "login_reason": "UNKNOWN",
+    "player_type": "tubi",
+    "has_subtitle": true,
+    "gn_fields": null,
+    "vibes": null,
+    "year": 2021,
+    "video_metadata": [],
+    "lang": "English",
+    "epg_feed": {
+      "callsign": "",
+      "feed_type": "Gracenote"
+    },
+    "hero_images": [
+      "https://canvas-lb.tubitv.com/opts/8OyNTPYU76wBdA==/b7c677b1-5a90-459f-92f8-385696b0eb92/CJgDEIoBOgUxLjEuOA=="
+    ],
+    "type": "l",
+    "actors": [],
+    "thumbnails": [
+      "https://canvas-lb.tubitv.com/opts/lRnoZdPrCpO77Q==/4bb7bdf1-16ba-4d7c-b077-893f549c4022/CD0QPToFMS4xLjhAAQ=="
+    ],
+    "import_id": "cinedigm_linear",
+    "ratings": [
+      {
+        "code": "TV-14",
+        "system": "tvpg",
+        "value": "TV-14",
+        "descriptors": []
+      }
+    ],
+    "id": "613762",
+    "title": "Real Madrid",
+    "is_cdc": false
+  },
+  "500006541": {
+    "video_resources": [],
+    "schedule_data": null,
+    "has_trailer": false,
+    "detailed_type": "sports_event",
+    "video_previews": [],
+    "description": "Final.",
+    "availability_duration": 0,
+    "league": null,
+    "needs_login": false,
+    "landscape_images": [],
+    "publisher_id": "tubi-internal-epg",
+    "has_video_resources": false,
+    "availability_ends": null,
+    "images": {
+      "background_tb": [],
+      "control_landscape_tb": [
+        "https://canvas-lb.tubitv.com/opts/tknlLWZ_0Krbrw==/5cffd777-d30b-445a-abd7-65971472b248/CIICEJABOgUxLjEuOA=="
+      ],
+      "hero_tb": [
+        "https://canvas-lb.tubitv.com/opts/Ctr3W1Q6uZi_jQ==/5cffd777-d30b-445a-abd7-65971472b248/CI4EEKYCOgUxLjEuOA=="
+      ],
+      "landscape_tb": [],
+      "poster_tb": [
+        "https://canvas-lb.tubitv.com/opts/Yqa0K3n04GuXxQ==/5b6ef96b-ce71-4100-8706-125cacba23fc/CKcBEO4BOgUxLjEuOA=="
+      ],
+      "title_art": [],
+      "video_tiles_portrait_tb": [
+        "https://canvas-lb.tubitv.com/opts/AfL0r2sZ5DPd9Q==/5b6ef96b-ce71-4100-8706-125cacba23fc/CM4BEKYCOgUxLjEuOA=="
+      ]
+    },
+    "directors": [],
+    "backgrounds": [],
+    "gracenote_id": "EP052955140005",
+    "availability_starts": null,
+    "tags": [],
+    "video_renditions": [],
+    "genres": [],
+    "posterarts": [
+      "https://canvas-lb.tubitv.com/opts/hy4TQmJggdSlMg==/5b6ef96b-ce71-4100-8706-125cacba23fc/CNIBEKwCOgUxLjEuOA=="
+    ],
+    "competitors": [],
+    "content_tags": {
+      "days_remaining": null,
+      "imdb_rating": null,
+      "is_shiny": false,
+      "most_liked": null,
+      "rotten_tomatoes_score": null
+    },
+    "ad_languages": [],
+    "login_reason": "UNKNOWN",
+    "player_type": "tubi",
+    "has_subtitle": false,
+    "gn_fields": null,
+    "vibes": null,
+    "year": 2024,
+    "duration": 0,
+    "video_metadata": [],
+    "lang": "",
+    "epg_feed": null,
+    "hero_images": [
+      "https://canvas-lb.tubitv.com/opts/wP11a6g5dDC-BA==/5cffd777-d30b-445a-abd7-65971472b248/CK4DEPIBOgUxLjEuOA=="
+    ],
+    "air_datetime": "2024-12-18T17:00:00.000Z",
+    "type": "se",
+    "actors": [],
+    "teams": [],
+    "thumbnails": [
+      "https://canvas-lb.tubitv.com/opts/jPP4zlGC9xiRBw==/3b138b76-7d78-419f-b8fc-2ccd654691cb/CPoBEI0BOgUxLjEuOA=="
+    ],
+    "import_id": "tubi-internal-epg",
+    "video_preview_url": "",
+    "ratings": [
+      {
+        "code": "NR",
+        "system": "mpaa",
+        "value": "NR",
+        "descriptors": []
+      }
+    ],
+    "id": "500006541",
+    "title": "Real Madrid vs. CF Pachuca",
+    "is_cdc": false
+  }
+}

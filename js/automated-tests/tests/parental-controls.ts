@@ -193,7 +193,7 @@ describe('Parental Controls', function () {
     // Check Ratings label
     const categoryRatingsLabel = await testUtils.getNodeForElement('categoryRatingsLabel');
     await testUtils.waitForGridContentToLoad('categoryPageGrid');
-    const rowItemsContent = await testUtils.getAllGridItemsContent('channelsVideoGrid');
+    const rowItemsContent = await testUtils.getAllGridItemsContent('categoriesScreenContentGrid');
 
     for (const itemContent of rowItemsContent) {
       const rating = itemContent.rating[0].value;

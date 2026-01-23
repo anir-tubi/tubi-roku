@@ -1428,6 +1428,7 @@ Function getConstants()
   constants.ui.screenIds.profileSelectorScreen = "profileSelectorScreen"
   constants.ui.screenIds.kidsAccountSetupScreen = "kidsAccountSetupScreen"
   constants.ui.screenIds.vodDetailScreen = "vodDetailScreen"
+  constants.ui.screenIds.signUpAgeVerificationScreen = "signUpAgeVerificationScreen"
   constants.ui.screenIds.parentalControlPinInputScreen = "parentalControlPinInputScreen"
   constants.ui.screenIds.kidsAgeSelectionScreen = "kidsAgeSelectionScreen"
   constants.ui.screenIds.nameInputScreen = "nameInputScreen"

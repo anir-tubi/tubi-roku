@@ -37,6 +37,7 @@ Function init()
   topRef.observeFieldScoped("batchAdResponse", "onBatchAdResponseChanged")
   topRef.observeFieldScoped("allowCarouselAutoRotate", "onAllowCarouselAutoRotateChange")
   topRef.observeFieldScoped("kidsMode", "onKidsModeChange")
+  topRef.observeFieldScoped("isVideoPreviewOn", "onIsVideoPreviewOnChange")
   m.CategoryRefreshTimer = topRef.findNode("CategoryRefreshTimer")
   m.CategoryRefreshTimer.duration = m.constants.timers.categoryContentRefreshTimeout
   m.CategoryRefreshTimer.observeFieldScoped("fire", "onCategoryRefreshTimer")
@@ -96,8 +97,22 @@ End Function
 Function setContentAreaState()
   tubiLog("HomeScreen.setToRedesignContentArea")
 
+  ' Check if user is not in video tiles experiment
+  notInExperiment = (m.isUserInVideoTilesExperiment = false)
+
+  ' Check if skin ad exists and rowlist is not focused
+  hasSkinAdNotFocused = false
+  if m.top.listHasFocus = false AND m.CategoryGridList <> invalid
+    skinAdExists = (m.top.skinAdContent <> invalid AND m.top.skinAdContent.getChildCount() > 0)
+    rowListNotFocused = (m.CategoryGridList.lastFocusedList <> "rowList")
+    hasSkinAdNotFocused = (skinAdExists AND rowListNotFocused)
+  end if
+
+  ' Check if in kids mode or not on home screen
+  notHomeOrKidsMode = (m.top.kidsMode = true OR m.top.id <> m.constants.ui.screenIds.homeScreen)
+
   shouldAnimate = false
-  if m.isUserInVideoTilesExperiment = false OR (m.top.listHasFocus = false AND m.CategoryGridList <> invalid AND m.CategoryGridList.lastFocusedList = "skinAdRow") OR (m.top.kidsMode = true OR m.top.id <> m.constants.ui.screenIds.homeScreen)
+  if notInExperiment OR hasSkinAdNotFocused OR notHomeOrKidsMode
     m.currentContentAreaTranslation = m.originalContentAreaTranslation
     shouldAnimate = true
   else
@@ -186,6 +201,7 @@ End Function
 Function onContentUpdated()
   if m.top.contentUpdated = true
     content = m.top.content
+    setContentAreaState()
 
     deleteAdDisplayCarouselComponent() '//remove any existing ad carousel component before creating a new one
 
@@ -248,6 +264,16 @@ Function onAllowCarouselAutoRotateChange(msg)
   allowCarouselAutoRotate = msg.getData()
   if isAdDisplayCarouselAvailable() = true
     m.adRowlistCarouselComponent.allowCarouselAutoRotate = allowCarouselAutoRotate
+  end if
+End Function
+
+
+' Handles video preview setting changes
+' Updates carousel video preview state when setting changes
+Function onIsVideoPreviewOnChange(msg)
+  isVideoPreviewOn = msg.getData()
+  if isAdDisplayCarouselAvailable() = true
+    m.adRowlistCarouselComponent.isVideoPreviewOn = isVideoPreviewOn
   end if
 End Function
 
@@ -636,6 +662,7 @@ Function createAdDisplayCarouselComponent(content)
       m.adRowlistCarouselComponent.observeFieldScoped("tileManuallyNavigated", "onAdDisplayCarouselContentFocusedManually")
       m.adRowlistCarouselComponent.id = "adRowlistCarousel"
       m.adRowlistCarouselComponent.opacity = 0
+      m.adRowlistCarouselComponent.isVideoPreviewOn = m.top.isVideoPreviewOn
       m.adRowlistCarouselComponent.content = content
       m.adRowlistCarouselComponent.updateContent = true
       m.adContentGroup.appendChild(m.adRowlistCarouselComponent)
@@ -1064,13 +1091,6 @@ End Function
 Function refreshHomeScreenContainers()
   tubilog("HomeScreen.refreshHomeScreenContainers")
   loadCategoryForIds = []
-
-  if m.CategoryGridList.content <> invalid
-    featuredContainer = m.CategoryGridList.content.getChild(0)
-    if shouldRefresh(featuredContainer) = true
-      loadCategoryForIds.push(featuredContainer.id)
-    end if
-  end if
 
   if m.CategoryGridList.skinAdContent <> invalid
     skinAdContainer = m.CategoryGridList.skinAdContent.getChild(0)

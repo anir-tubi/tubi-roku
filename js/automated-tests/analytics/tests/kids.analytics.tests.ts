@@ -27,7 +27,6 @@ describe('Kids Events', function () {
 	it('entering Kids Mode C22571 and C22572 Exiting Kids Mode - Analytics Event and entering Kids Mode C22573 and C130118 App mode contains kids when home page load event occurs @analyticsASet1,@analyticsKids', async () => {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
-		await ecp.sendKeypress(ecp.Key.Right);
 		await kidsHome.exitKidsMode();
 		await utils.sleep(1000);
 		await verifyC22571();

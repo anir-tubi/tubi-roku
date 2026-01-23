@@ -42,6 +42,7 @@ Function showHomeScreen(constants, screenID = "")
     m.performanceMetricsTracker.startAppLaunchMetricTiming("home_screen_tensor_request")
     showHideSpinner(true)
     homeScreen = CreateObject("roSGNode", "HomeScreen")
+    homeScreen.id = screenID
     homeScreen.shouldFocusWhenPushed = m.top.fadeInContentController
     homeScreen.observeFieldScoped("backgroundUriList", "onVideoContentScreenBackgroundUpdated")
     homeScreen.observeFieldScoped("sponsorshipBackground", "onSponsorshipBackgroundChanged")
@@ -91,7 +92,6 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.kidsMode = isKidsUIOn()
     updateInlineVideoMetadataOverlayVisibility()
     homeScreen.canLoadCategories = true
-    homeScreen.id = screenID
 
     fetchHomescreen(homeScreen)
     setInScreenCache(homeScreen)
@@ -379,6 +379,7 @@ Function fetchHomeScreen(homeScreen, useCache = false)
     }
 
     isKidsMode = shouldKidsModeBeSentToServer()
+    homeScreen.kidsMode = isKidsUIOn()
 
     if homeScreen <> invalid AND homeScreen.content <> invalid AND useCache = true AND homeScreen.content.lastModified <> invalid
       headers["If-Modified-Since"] = homeScreen.content.lastModified

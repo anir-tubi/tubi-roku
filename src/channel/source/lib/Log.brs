@@ -189,7 +189,7 @@ Function tubiLog_printLogInfo_(level as String, subType as String, message as Dy
     end if
 
     ' user has set consoleLoggingEnabled to true in their dev.yml/qa.yml
-    print tubiLog_getLogPrintout_(level, subtype, message)
+    print tubiLog_getLogPrintout_(level, subType, message)
   #end if
 End Function
 

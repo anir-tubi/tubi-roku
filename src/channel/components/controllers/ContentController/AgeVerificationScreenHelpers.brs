@@ -687,6 +687,7 @@ End Function
 ' @signInInfo: assocarray used for tracking info later
 Function showSignUpAgeVerificationScreen(signInInfo)
   ageVerificationScreen = createObject("roSGNode", "SignUpAgeVerificationScreen")
+  ageVerificationScreen.id = m.constants.ui.screenIds.signUpAgeVerificationScreen
   ageVerificationScreen.signInInfo = signInInfo
   ageVerificationScreen.observeFieldScoped("ageSubmitted", "onAgeSubmittedAtSignUp")
   ageVerificationScreen.observeFieldScoped("backButtonPressed", "onBackButtonPressed")

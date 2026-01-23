@@ -103,7 +103,7 @@ describe('Settings', function () {
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/705829
-  it('C705829 - Roku Autoplay OFF - Tubi autoplay settings cannot be toggled on/off in settings screen, @autoplay @settings', async () => {
+  it('C705829 - Roku Autoplay OFF - Tubi autoplay settings cannot be toggled on/off in settings screen, @autoplay @settings @manual_regression', async () => {
 
     // Start app with Roku's autoplay setting disabled
     await testUtils.startApplicationAtPage('home', {
@@ -136,7 +136,7 @@ describe('Settings', function () {
   });
 
   //https://tubi.testrail.io/index.php?/cases/view/705820
-  it('C705820 - Roku Autoplay OFF - animationLogo video is NOT playing during startup', async () => {
+  it('C705820 - Roku Autoplay OFF - animationLogo video is NOT playing during startup @manual_regression', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true, isAutoplayEnabled: false });
 
     //Verify autoPlayDisabled in Roku settings
@@ -160,7 +160,7 @@ describe('Settings', function () {
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/770140
-  it('C770140- Privacy Policy Page - If Rokus autoplay setting = OFF, Autoplay Next Video should be accesible, @settings', async () => {
+  it('C770140- Privacy Policy Page - If Rokus autoplay setting = OFF, Autoplay Next Video should be accesible, @settings @manual_regression', async () => {
 
     // Start app with Roku's autoplay setting disabled
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true, isAutoplayEnabled: false }); // This sets Roku system level autoplay to OFF

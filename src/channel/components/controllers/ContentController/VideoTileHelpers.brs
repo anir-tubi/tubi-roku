@@ -376,7 +376,7 @@ Function updateInlineVideoMetadataOverlayVisibility(duration = 0) as Void
     return
   end if
 
-  isHomeScreen = (screen.id = m.constants.ui.screenIds.homeScreen)
+  isHomeScreen = (screen.id = m.constants.ui.screenIds.homeScreen AND screen.content <> invalid AND isKidsUIOn() = false)
   m.videoTileOverlayGroup.visible = isHomeScreen
 
   ' Handle video tiles experiment visibility

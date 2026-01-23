@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { ecp } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
+import { testHelpers } from '../test-helpers';
 
 describe('Continue Watching Consent During Registration', function () {
     beforeEach(async () => {
@@ -124,13 +125,10 @@ describe('Continue Watching Consent During Registration', function () {
     // https://tubi.testrail.io/index.php?/cases/view/547236
     it('C547236 - Guest User - Show CW Consent Screen during Registration after Exiting Kids Mode, @cwconsent', async () => {
         // Enter Kids mode
-        await ecp.sendKeypress(ecp.Key.Left);
-        await testUtils.jumpToRowWithTitle('sideNavMenu', 'Kids');
-        await ecp.sendKeypress(ecp.Key.Ok);
-
+        await testHelpers.openKidsMode();
+        await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
         // Exit Kids mode
-        await testUtils.jumpToRowWithTitle('sideNavMenu', 'Exit Kids');
-        await ecp.sendKeypress(ecp.Key.Ok);
+        await testHelpers.exitKidsMode();
 
         // Verify on Confirm your age page
         await testUtils.waitForElementToShowOnScreen('ageVerificationNumberPad');

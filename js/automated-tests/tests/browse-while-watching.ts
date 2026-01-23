@@ -454,7 +454,7 @@ describe('Browse While Watching', function () {
     });
 
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/833542
-    it('C833542 - YMAL BWW has 20 titles max @regression @guest', async () => {
+    it('C833542 - YMAL BWW has 20 titles max @regression @guest @manual_regression', async () => {
         await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
         await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 

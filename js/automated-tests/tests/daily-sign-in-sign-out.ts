@@ -29,7 +29,6 @@ describe('Daily Sign In/Sign Out Automation', function () {
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Step 2: Sign up/Sign in flow
-    console.log('Starting sign up/sign in flow...');
 
     // Navigate to Sign In from home screen
     await ecp.sendKeypress(ecp.Key.Left);
@@ -69,11 +68,8 @@ describe('Daily Sign In/Sign Out Automation', function () {
     const sideNavSignedInLabel = await testUtils.getNodeForElement('sideNavSignedInLabel');
     expect(sideNavSignedInLabel.text).to.contain('Hi');
 
-    console.log('Sign up completed successfully. User is now signed in.');
 
     // Step 4: Sign out
-    console.log('Starting sign out flow...');
-
     // Navigate to Settings
     await ecp.sendKeypress(ecp.Key.Left);
     await shared.openSettings();
@@ -111,7 +107,6 @@ describe('Daily Sign In/Sign Out Automation', function () {
       }
     }, 10000);
 
-    console.log('Sign out completed successfully');
   });
 
   it('Daily - Sign In Flow @daily_sign_in_sign_out', async () => {

@@ -251,7 +251,7 @@ Function onContentChange()
   ' This is needed mainly for the initial load and if skinAdRow is focused.
   if isSkinAdsAvailable() = true AND (m.top.lastFocusedList = "skinAdRow" OR m.top.lastFocusedList = "")
     if m.top.content <> invalid
-      m.rowList.translation = [0, 345]
+      m.rowList.translation = [0, 384]
     end if
 
     m.skinAdRow.opacity = 1

@@ -353,11 +353,13 @@ describe('HomeGrid Video Tiles', function () {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for videoTitlesRowList to have focus', 20000);
 
-    await testHelpers.findAndNavigateToVideoPreviewContent('videoTitlesRowList', true, 5);
+    await testHelpers.findAndNavigateToVideoPreviewContent('videoTitlesRowList', true, 5, 2000, 's');
 
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 15000);
 
-    await utils.sleep(90000);
+    const previewPlayer = await testUtils.getNodeForElement('previewVideoPlayer');
+
+    await utils.sleep((previewPlayer.duration + 3) * 1000);
 
     await testUtils.retryWithTimeOut(async () => {
       const currentScreen = await testUtils.getElementField('screenStack', '-1', 10000);
@@ -2472,6 +2474,103 @@ describe('HomeGrid Video Tiles', function () {
     const autorotateUri1Changed = autorotateAfterUri1 !== autorotateInitialUri1;
     const autorotateUri2Changed = autorotateAfterUri2 !== autorotateInitialUri2;
     expect(autorotateUri1Changed || autorotateUri2Changed, 'Carousel should autorotate to next tile automatically').to.be.true;
+
+    await proxy.pause();
+  });
+
+  // Test Rail Link: TBD - HDC Carousel Ad Auto-rotate with Preview Disabled
+  it('HDC carousel ad auto-rotate works when preview is turned off @guest @ads @video_tiles', async () => {
+    /**
+     * Test Steps:
+     * 1. Launch app with video preview disabled
+     * 2. Navigate to HDC carousel ad row
+     * 3. Verify carousel displays with proper brand elements
+     * 4. Wait and verify carousel auto-rotates to next tile
+     * 
+     * Expected:
+     * - Carousel displays properly with brand elements
+     * - Auto-rotate works even when video preview is disabled
+     * - Background changes after auto-rotate interval (~10s)
+     */
+
+    // Set up carousel ad mock
+    proxy.resume();
+    const proxyPromise = adTestHelpers.mockAds([AdType.Carousel]);
+    const user = await testUtils.createRegisteredUser();
+
+    // Launch app with video preview disabled
+    await testUtils.startApplicationAtPage('home', {
+      user,
+      clearRegistry: false
+    });
+    await utils.promiseTimeout(proxyPromise, 50000);
+
+    // Wait for home page to load
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for home page to load', 15000);
+    await utils.sleep(2000);
+
+    // Disable video preview in settings
+    await testHelpers.enablePreviewInSettings(false);
+    await utils.sleep(2000);
+
+    // Return to home screen
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 10000);
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Should return to home screen', 5000);
+    await utils.sleep(3000);
+
+    // Navigate to HDC carousel ad row - jump to row 1 (see peek row 2), then Down to carousel row
+    await testUtils.jumpToRowIndex('videoTitlesRowList', 1);
+    await utils.sleep(1000);
+
+    // Verify peek row header is visible with carousel content
+    const peekRowTitleUri = await testUtils.getElementField('adCarouselContainerName', 'text');
+    expect(peekRowTitleUri).to.equal('Give Something Beautiful', 'Peek row header should show carousel brand');
+
+    // Navigate down to carousel row
+    await ecp.sendKeypress(ecp.Key.Down);
+    await utils.sleep(1000);
+
+    // Verify carousel grid has focus
+    await testUtils.waitForElementToHaveFocus('adCarouselGrid', 'Should be focused on carousel grid', 5000);
+
+    // Validate carousel brand elements are displayed
+    await testUtils.waitForElementToShowOnScreen('adCarouselTitle', 'Carousel title should be visible', 3000);
+    const adCarouselTitleText = await testUtils.getElementField('adCarouselTitle', 'text');
+    expect(adCarouselTitleText).to.not.be.empty;
+
+    // Validate brand logo is visible
+    await testUtils.waitForElementToShowOnScreen('adCarouselBrandLogo', 'Brand logo should be visible', 3000);
+    const adCarouselBrandLogoUri = await testUtils.getElementField('adCarouselBrandLogo', 'uri');
+    expect(adCarouselBrandLogoUri).to.not.be.empty;
+
+    // Get initial background poster URIs before auto-rotate
+    const initialBackgroundUri1 = await testUtils.getElementField('backgroundPoster', 'uri');
+    const initialBackgroundUri2 = await testUtils.getElementField('backgroundPoster2', 'uri');
+
+    // Wait for auto-rotate interval (carousel should rotate after ~10 seconds)
+    // Adding 2 seconds buffer for safety
+    await utils.sleep(12000);
+
+    // Get background poster URIs after auto-rotate
+    const afterRotateUri1 = await testUtils.getElementField('backgroundPoster', 'uri');
+    const afterRotateUri2 = await testUtils.getElementField('backgroundPoster2', 'uri');
+
+    // Verify at least one URI changed (auto-rotate occurred)
+    const uri1Changed = afterRotateUri1 !== initialBackgroundUri1;
+    const uri2Changed = afterRotateUri2 !== initialBackgroundUri2;
+    expect(uri1Changed || uri2Changed, 'Carousel should auto-rotate to next tile even with preview disabled').to.be.true;
+
+    // Verify carousel is still functional - press Right to manually navigate
+    await ecp.sendKeypress(ecp.Key.Right);
+    await utils.sleep(1000);
+
+    // Get URIs after manual navigation to verify carousel navigation still works
+    const afterRightUri1 = await testUtils.getElementField('backgroundPoster', 'uri');
+    const afterRightUri2 = await testUtils.getElementField('backgroundPoster2', 'uri');
+
+    // At least one URI should be different from after auto-rotate
+    const manualNavWorking = (afterRightUri1 !== afterRotateUri1) || (afterRightUri2 !== afterRotateUri2);
+    expect(manualNavWorking, 'Manual carousel navigation should still work').to.be.true;
 
     await proxy.pause();
   });

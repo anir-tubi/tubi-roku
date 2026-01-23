@@ -7,7 +7,7 @@ import { moveToRow } from '../utils/helpers';
 const elements = {
 	settingsScreen: async () =>
 		await testUtils.getNodeForElement(SETTINGS_NODES.SETTINGS_SCREEN),
-	kidsLogo: async () => await testUtils.getNodeForElement('kidsLogoHomeScreen'),
+	kidsLogo: async () => await testUtils.getNodeForElement('tubiKidsLogo'),
 };
 export const settingsTabs = {
 	parentalControls: {

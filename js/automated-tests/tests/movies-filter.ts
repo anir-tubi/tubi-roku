@@ -82,7 +82,7 @@ describe('Homescreen Navigation - Movies Filter', function () {
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/103112
-  it('C103112 - Movies Filter - Continue Watching titles with expiration should show expiration info in Details @movies @expiration', async () => {
+  it('C103112 - Movies Filter - Continue Watching titles with expiration should show expiration info in Details @movies @expiration @manual_regression', async () => {
     // Scroll to Continue Watching row
     await shared.scrollDownToFindRow({ slug: 'continue_watching', rowListElementId: 'movieScreenRowList' });
 

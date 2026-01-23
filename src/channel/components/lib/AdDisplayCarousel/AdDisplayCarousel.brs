@@ -117,12 +117,14 @@ Function onItemFocused(msg)
   index = msg.getData()
   item = m.carouselGrid.content.getChild(index)
   if item <> invalid
-    if isNonEmptyString(item.videoPreviewUrl) = false
-      m.top.allowCarouselAutoRotate = true
-      m.focusTimer.control = "start"
-    else
+    ' Only stop auto-rotate if video preview is enabled AND item has videoPreviewUrl
+    ' If video preview is disabled, always allow auto-rotate regardless of videoPreviewUrl
+    if m.top.isVideoPreviewOn = true AND isNonEmptyString(item.videoPreviewUrl) = true
       m.top.allowCarouselAutoRotate = false
       m.focusTimer.control = "stop"
+    else
+      m.top.allowCarouselAutoRotate = true
+      m.focusTimer.control = "start"
     end if
 
     m.top.contentFocused = item

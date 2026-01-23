@@ -142,7 +142,7 @@ async function selectCategories() {
 async function findMenuItemPositionByTitle({ title }) {
   let position = -1;
   const contents = await testUtils.getAllGridItemsContent(
-    "channelSideNav"
+    "categoriesListMenu"
   );
 
   for (const [index, item] of contents.entries()) {

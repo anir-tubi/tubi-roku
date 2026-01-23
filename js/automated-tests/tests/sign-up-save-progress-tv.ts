@@ -100,7 +100,7 @@ describe('Sign up Save Progress TV', function () {
   });
 
    // Removed due to magic link graduation - need a workaround
-  it('C260845 - Guest - When user  presses Play on the Series Details page after choosing to Sign Up to Save Progress, the title plays,@signupsaveprogress', async () => {
+  it('C260845 - Guest - When user  presses Play on the Series Details page after choosing to Sign Up to Save Progress, the title plays,@signupsaveprogress @manual_regression', async () => {
 
       // Select a title
       await ecp.sendKeypress(ecp.Key.Ok);

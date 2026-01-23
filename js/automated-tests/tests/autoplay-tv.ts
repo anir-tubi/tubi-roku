@@ -2,14 +2,27 @@ import { expect } from 'chai';
 import { ecp, odc, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
 
-import { shared } from '../test-helpers';
+import { shared, testHelpers } from '../test-helpers';
 import { waitForDebugger } from 'inspector';
 
 describe('Autoplay Series', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/768087
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535750
-  it('C768087 - Autoplay Next Video On - Autoplay next title @autoplay', async () => {
+  it('C768087 - Series - Autoplay Next Video On - Autoplay next episode @autoplay @manual_regression', async () => {
+    /**
+     * Pre-conditions:
+     * - Device is whitelisted for Treatment
+     * - Settings > Autoplay Next Video = On
+     * 
+     * Test Steps:
+     * 1. Launch app with registered user
+     * 2. Enable Autoplay Next Video in settings
+     * 3. Find and play a series episode
+     * 4. Wait for episode to end
+     * 5. Verify next episode autoplays
+     */
+
     await triggerSeriesAutoplayUI();
 
     await testUtils.waitForElementToHaveFocus('autoplayUINextEpisodeButton', 'Timed out waiting for Next Episode button to have focus', 15000);
@@ -226,8 +239,6 @@ async function findAndScrollToNonRealityShow(
 
       // If not a reality show, scroll to it
       if (!isReality) {
-        console.log(`Found non-Reality show: "${item.title}" at [${rowIndex}, ${colIndex}]`);
-
         // Scroll to the position
         await shared.jumpToRowListPosition(rowListElementId, rowIndex, colIndex);
 

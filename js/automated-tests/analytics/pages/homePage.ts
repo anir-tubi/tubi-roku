@@ -26,7 +26,7 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 		homeScreenPosterVideoPreview: async () =>
 			await testUtils.getNodeForElement(NODES.HOME_SCREEN_POSTER_VIDEO_PREVIEW),
 		homeScreenKidsLogo: async () =>
-			await testUtils.getNodeForElement('kidsLogoHomeScreen'),
+			await testUtils.getNodeForElement('tubiKidsLogo'),
 		exitToUseFeatureMessage: async () =>
 			await testUtils.getNodeForElement('exitToUseThisFeatureMesage'),
 		exitToUseFeatureMessageKids: async () =>
@@ -498,7 +498,7 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 		return await playTitle(false, false, true);
 	}
 
-	async function navigateDown(times,wait = 200) {
+	async function navigateDown(times, wait = 200) {
 		await ecp.sendKeypress(ecp.Key.Down, { count: times, wait: wait });
 	}
 

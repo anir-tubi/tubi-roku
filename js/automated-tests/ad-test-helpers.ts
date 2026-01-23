@@ -89,10 +89,50 @@ class AdTestHelpers {
    * const proxyPromise = adTestHelpers.mockAds([AdType.Wrapper]);
    * await testUtils.startApplicationAtPage('home');
    * await utils.promiseTimeout(proxyPromise, 50000);
+   * 
+   * @example
+   * // Use persistCallback for tests that need multiple /inapp requests
+   * const { cleanup } = await adTestHelpers.mockAds([AdType.Carousel], { persistCallback: true });
+   * // ... test logic that navigates away and back to home screen ...
+   * if (cleanup) cleanup(); // Remove callback when done
    */
-  public async mockAds(types: AdType[]): Promise<void> {
+  /**
+   * PRIVATE: Rewrite tracker URLs to route through proxy (like Charles does)
+   * Format: http://PROXY_HOST:PROXY_PORT/;;ORIGINAL_URL
+   * Only rewrites URLs inside "trackers" objects (pixel tracking URLs)
+   */
+  private rewriteUrlsForProxy(obj: any, proxyUrl: string, isInsideTrackers: boolean = false): any {
+    if (typeof obj === 'string') {
+      // Only rewrite if we're inside a "trackers" object and it's a tracking pixel URL
+      if (isInsideTrackers && obj.startsWith('https://') && obj.includes('ads.production-public.tubi.io/pixel')) {
+        return `${proxyUrl}/;;${obj}`;
+      }
+      return obj;
+    }
+
+    if (Array.isArray(obj)) {
+      return obj.map(item => this.rewriteUrlsForProxy(item, proxyUrl, isInsideTrackers));
+    }
+
+    if (obj !== null && typeof obj === 'object') {
+      const result: any = {};
+      for (const key in obj) {
+        // Check if we're entering a "trackers" object
+        const isTrackersKey = key === 'trackers';
+        result[key] = this.rewriteUrlsForProxy(obj[key], proxyUrl, isInsideTrackers || isTrackersKey);
+      }
+      return result;
+    }
+
+    return obj;
+  }
+
+  public async mockAds(types: AdType[], options?: { validDuration?: number; persistCallback?: boolean }): Promise<{ cleanup?: () => void }> {
     // Helper to check if a type is included
     const includesType = (type: AdType) => types.includes(type);
+
+    // Determine if callback should persist (default: false for backwards compatibility)
+    const persistCallback = options?.persistCallback ?? false;
 
     // Build response by merging specific ad type files
     const adsResponse = { ads: { ad_units: {} } };
@@ -107,17 +147,34 @@ class AdTestHelpers {
     if (includesType(AdType.Carousel)) {
       const carouselData = this.loadAdMockFile('ad_carousel.json');
       Object.assign(adsResponse.ads.ad_units, carouselData.ads.ad_units);
+
+      // Override valid_duration if specified
+      if (options?.validDuration !== undefined && adsResponse.ads.ad_units['hdc_row']) {
+        adsResponse.ads.ad_units['hdc_row'].valid_duration = options.validDuration;
+      }
     } else if (includesType(AdType.Spotlight)) {
       const spotlightData = this.loadAdMockFile('ads_spotlight.json');
       Object.assign(adsResponse.ads.ad_units, spotlightData.ads.ad_units);
+
+      // Override valid_duration if specified
+      if (options?.validDuration !== undefined && adsResponse.ads.ad_units['hdc_row']) {
+        adsResponse.ads.ad_units['hdc_row'].valid_duration = options.validDuration;
+      }
     }
 
     return new Promise((resolve) => {
+      let callbackArgs: any = null;
+
       proxy.addCallback({
         shouldProcess: (args) => {
           return args.url.includes('/inapp');
         },
         processRequest: (args) => {
+          // Store callback args so we can remove it later
+          if (!callbackArgs) {
+            callbackArgs = args;
+          }
+
           // If we have a parsed body from express.json(), re-write it
           // because express.json() consumed the request stream
           if (args.requestBody && Object.keys(args.requestBody).length > 0) {
@@ -131,10 +188,36 @@ class AdTestHelpers {
           }
         },
         processResponse: (args) => {
-          resolve(null);
-          args.removeCallback();
+          // Extract proxy IP and port from the request Host header
+          // The Roku device sends requests to the proxy, so args.req.headers.host contains the proxy address
+          const proxyHost = args.req.headers.host;
+          const proxyUrl = `http://${proxyHost}`;
+
+          // Rewrite all URLs in the response to route through proxy
+          const rewrittenResponse = this.rewriteUrlsForProxy(adsResponse, proxyUrl);
+
+          // Handle callback persistence based on options
+          if (persistCallback) {
+            // For tests that need multiple /inapp requests (e.g., returning to home screen)
+            // Resolve with cleanup function on first request, but keep callback active
+            if (!callbackArgs.resolved) {
+              callbackArgs.resolved = true;
+              resolve({
+                cleanup: () => {
+                  if (callbackArgs) {
+                    callbackArgs.removeCallback();
+                  }
+                }
+              });
+            }
+          } else {
+            // Default behavior: resolve and remove callback after first request
+            resolve({});
+            args.removeCallback();
+          }
+
           // Return the mocked response body as string (proxy handles headers)
-          return JSON.stringify(adsResponse);
+          return JSON.stringify(rewrittenResponse);
         }
       });
     });

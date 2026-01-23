@@ -23,7 +23,7 @@ const SearchPage = () => {
 	const elements = {
 		searchGrid: async () => await testUtils.getNodeForElement('searchGrid'),
 		kidsLogo: async () =>
-			await testUtils.getNodeForElement('kidsLogoHomeScreen'),
+			await testUtils.getNodeForElement('tubiKidsLogo'),
 		foundSearch: async () =>
 			await testUtils.getNodeForElement('foundTitlesSearch'),
 		searchResultsText: async () =>

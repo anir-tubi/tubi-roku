@@ -6,6 +6,9 @@ import type { ElementOrElementId } from '../../../automated-tests-config/element
 
 
 describe('Video Preview', function () {
+  // Increase timeout for video preview tests as they wait for video playback
+  this.timeout(300000); // 5 minutes
+
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/257895
   it('C257895 - Verify that High TVT Evergreen titles will have Video Preview clips @videopreview', async () => {
     const user = await testUtils.createRegisteredUser();
@@ -115,25 +118,14 @@ describe('Video Preview', function () {
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
     await shared.ensurePlayableContentFocused();
 
-    //Open left nav
-    await ecp.sendKeypress(ecp.Key.Left);
-
-    // Open settings
-    await shared.openSettings();
-
     // Turn off video previews
-    await ecp.sendKeypress(ecp.Key.Down);
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await ecp.sendKeypress(ecp.Key.Down);
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await shared.enablePreviewInSettings(false);
 
     // Go back to home page and verify that autoplay is off
-    await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 10000);
 
     // Verify that video preview is not playing
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', ['stopped', '', 'none']);
-
-
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/345985
@@ -145,8 +137,9 @@ describe('Video Preview', function () {
     // Verify that video is playing
     await checkForPreview();
 
-    // Let the preview end
-    await utils.sleep(90000); // IMPROVEMENT with helper (See to End)
+    // Let the preview end (wait for duration + 2 seconds)
+    const videoPlayerNode = await testUtils.getNodeForElement('previewVideoPlayer');
+    await utils.sleep((videoPlayerNode.duration * 1000) + 3000);
 
     // Verify that video is playing
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 10000);
@@ -171,8 +164,9 @@ describe('Video Preview', function () {
     // Verify that video is playing
     await checkForPreview('homeScreenRowList');
 
-    // Let the preview end
-    await utils.sleep(90000);
+    // Let the preview end (wait for duration + 2 seconds)
+    const videoPlayerNode = await testUtils.getNodeForElement('previewVideoPlayer');
+    await utils.sleep((videoPlayerNode.duration * 1000) + 2000);
 
     // Verify that video is playing
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 5000);
@@ -297,7 +291,7 @@ describe('Video Preview', function () {
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/705821
-  it('C705821- Roku Autoplay OFF - Video previews are disabled, @autoplay @videopreview', async () => {
+  it('C705821- Roku Autoplay OFF - Video previews are disabled, @autoplay @videopreview @manual_regression', async () => {
 
     // Start app with Roku's autoplay setting disabled
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true, isAutoplayEnabled: false });

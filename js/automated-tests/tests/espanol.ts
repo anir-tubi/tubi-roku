@@ -52,6 +52,8 @@ describe('Espanol', function () {
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
 
     await shared.openKidsMode();
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
+    await ecp.sendKeypress(ecp.Key.Left);
 
     // In Kids Mode?
     const exitKidsOption = await testUtils.getNodeForElement('exitKidsOption');

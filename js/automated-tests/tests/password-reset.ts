@@ -5,7 +5,7 @@ import { testUtils } from '../test-utils';
 describe('Sign In: On-Device Password Reset', function () {
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/476627
-  it.skip('C476627 - Registered User - Sign In with valid credentials, @password_reset', async () => {
+  it.skip('C476627 - Registered User - Sign In with valid credentials, @password_reset @manual_regression', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');

@@ -74,7 +74,7 @@ describe('Live', function () {
         // Navigate to the Live News Row (with pagination support)
         await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
         await utils.sleep(2000);
-        await shared.scrollDownToFindRow({ title: 'On Now' });
+        await shared.scrollDownToFindRow({ slug: 'recommended_linear_channels', maxScrolls: 40 });
 
         // Verify that linear preview video is playing
         await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 20000);
@@ -100,7 +100,7 @@ describe('Live', function () {
 
         // Navigate to the Live News Row (with pagination support)
         await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
-        await shared.scrollDownToFindRow({ title: 'On Now' });
+        await shared.scrollDownToFindRow({ slug: 'recommended_linear_channels', maxScrolls: 40 });
 
         // Verify that full video plays after preview video is playing
 
