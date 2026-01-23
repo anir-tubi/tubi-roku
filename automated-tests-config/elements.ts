@@ -3089,14 +3089,14 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#ScreenStack.#vodDetailScreen.#contentGroup.#contentContainer.#additionalContentContainer.#relatedContentContainer.#ymalTileMetadata.#metadataGroup.#description',
   },
 
-  /** detailScreenTitle */
-  vodDetailScreenTitle: {
+  /** detailScreenTitleImage - Title image (deprecated, use vodDetailScreenTitle for text label) */
+  vodDetailScreenTitleImage: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#vodDetailScreen.#contentGroup.#contentContainer.#videoMetadataPanel.#metadataGroup.#infoPanel.#metadataGroup.#titleImage.#titleArt',
   },
 
-  /** detailScreenTitleLabel - Title text shown at same level as titleImage when no title art */
-  vodDetailScreenTitleLabel: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#vodDetailScreen.#contentGroup.#contentContainer.#videoMetadataPanel.#metadataGroup.#infoPanel.#metadataGroup.#titleLabel',
+  /** detailScreenTitle - Title text label shown in details page */
+  vodDetailScreenTitle: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#vodDetailScreen.#contentGroup.#contentContainer.#videoMetadataPanel.#metadataGroup.#infoPanel.#metadataGroup.#title',
   },
 
   /** contentTitleImage - Title image shown when scrolled down */

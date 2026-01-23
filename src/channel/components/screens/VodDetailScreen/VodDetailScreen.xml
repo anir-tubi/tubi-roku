@@ -126,7 +126,6 @@
       <Label
         id="contentTitleLabel"
         height="54"
-        width="1440"
         vertAlign="center" />
     </Group>
   </children>

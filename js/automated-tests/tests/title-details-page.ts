@@ -720,12 +720,10 @@ describe('Title Details Page', function () {
 
     await testUtils.waitForElementToShowOnScreen('vodDetailScreenActionButtons', 'Menu not shown', 10000);
 
-    await testUtils.waitForElementToShowOnScreen('vodDetailScreenTitle', 'Title image not visible', 10000);
-
-    const titleImage = await testUtils.getNodeForElement('vodDetailScreenTitle');
-    expect(titleImage.visible).to.equal(true, 'Title art should be visible in the details page for series');
-    expect(titleImage.uri).to.exist;
-    expect(titleImage.uri).to.not.equal('', 'Title art URI should not be empty when available');
+    const titleLabel = await testUtils.getNodeForElement('vodDetailScreenTitle');
+    expect(titleLabel.visible).to.equal(true, 'Title label should be visible in the details page for series');
+    expect(titleLabel.text).to.exist;
+    expect(titleLabel.text).to.not.equal('', 'Title text should not be empty');
   });
 
 
@@ -740,12 +738,12 @@ describe('Title Details Page', function () {
 
     await testUtils.waitForElementToShowOnScreen('vodDetailScreenActionButtons', 'Menu not shown', 10000);
 
-    await testUtils.waitForElementToShowOnScreen('vodDetailScreenTitle', 'Title image not visible', 10000);
+    await testUtils.waitForElementToShowOnScreen('vodDetailScreenTitle', 'Title label not visible', 10000);
 
-    const titleImage = await testUtils.getNodeForElement('vodDetailScreenTitle');
-    expect(titleImage.visible).to.equal(true, 'Title art should be visible in the details page for movies');
-    expect(titleImage.uri).to.exist;
-    expect(titleImage.uri).to.not.equal('', 'Title art URI should not be empty when available');
+    const titleLabel = await testUtils.getNodeForElement('vodDetailScreenTitle');
+    expect(titleLabel.visible).to.equal(true, 'Title label should be visible in the details page for movies');
+    expect(titleLabel.text).to.exist;
+    expect(titleLabel.text).to.not.equal('', 'Title text should not be empty');
   });
 
 
@@ -970,7 +968,14 @@ describe('Title Details Page', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForCurrentScreenToEqual('vodDetailScreen', 15000);
 
-    await testUtils.waitForElementToShowOnScreen('vodDetailScreenTitle', 'Title art not visible', 10000);
+    await testUtils.waitForElementToShowOnScreen('vodDetailScreenTitle', 'Title label not visible', 10000);
+    await testUtils.waitForElementToShowOnScreen('vodDetailScreenActionButtons', 'Menu not shown', 10000);
+    await testUtils.waitForElementToShowOnScreen('vodDetailScreenSectionTabs', 'Section tabs not shown', 10000);
+
+    await ecp.sendKeypress(ecp.Key.Down);
+    await utils.sleep(1000);
+
+    await testUtils.waitForElementToShowOnScreen('contentTitleLabel', 'Content title label not visible after navigation', 10000);
 
     // Get initial boundingRect by calling boundingRect() function
     const initialBoundingRectResult = await odc.getValue({
@@ -979,16 +984,9 @@ describe('Title Details Page', function () {
     const widthBefore = initialBoundingRectResult.value.width;
     const heightBefore = initialBoundingRectResult.value.height;
 
-    await testUtils.waitForElementToShowOnScreen('vodDetailScreenSectionTabs', 'Section tabs not shown', 10000);
-
-    await ecp.sendKeypress(ecp.Key.Down);
-    await utils.sleep(1000);
-
-    await testUtils.waitForElementToShowOnScreen('contentTitleImage', 'Content title image not visible after navigation', 10000);
-
-    // Get updated boundingRect from contentTitleImage (shown when scrolled down)
+    // Get updated boundingRect from contentTitleLabel (shown when scrolled down)
     const updatedBoundingRectResult = await odc.getValue({
-      keyPath: elements.contentTitleImage.keyPath + '.boundingRect()'
+      keyPath: elements.contentTitleLabel.keyPath + '.boundingRect()'
     });
     const widthAfter = updatedBoundingRectResult.value.width;
     const heightAfter = updatedBoundingRectResult.value.height;
@@ -1090,11 +1088,12 @@ describe('Title Details Page', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845253
   it('C845253 - Deeplinking to a title should display the new details page design @guest @details_page @deeplink', async () => {
+    const user = await testUtils.createRegisteredUser();
     await testUtils.startApplicationWithDeeplink({
       mediaType: 'movie',
-      contentID: '342067',
-      shouldCreateNewUser: true,
-      experimentOverrides: {
+      contentID: '342067'
+    }, {
+      user, experimentOverrides: {
         roku_content_details: {
           roku_content_details_v2: {
             default: { "enabled": true, "enable_left_button_exit": true }
