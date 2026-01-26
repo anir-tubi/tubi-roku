@@ -6,17 +6,13 @@ Function init()
   m._ = rodash()
   m.constants = getConstantsFromGlobal()
   m.Tracking = TubiTrackingInfo(m.constants)
-  experimentInfo = getStatsigExperimentResource("roku_video_tiles", "roku_video_tiles_1_7", false)
-  m.isUserInVideoTilesExperiment = isAA(experimentInfo) AND experimentInfo.design_type = "videoTiles"
   m.dimMask = m.top.findNode("dimMask")
 
   m.PageGroup = m.top.findNode("PageGroup")
   m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]
   m.ContentAreaParent = m.top.findNode("ContentAreaParent")
   m.maskUri = "pkg:/images/poster-mask.png"
-  if m.isUserInVideoTilesExperiment = true
-    m.maskUri = ""
-  end if
+  ' Note: maskUri will be updated when enableVideoTiles field is set
   m.ContentArea = m.top.findNode("ContentArea")
   m.ContentArea.maskUri = m.maskUri
   m.adContentGroup = m.top.findNode("adContentGroup")
@@ -37,6 +33,7 @@ Function init()
   topRef.observeFieldScoped("batchAdResponse", "onBatchAdResponseChanged")
   topRef.observeFieldScoped("allowCarouselAutoRotate", "onAllowCarouselAutoRotateChange")
   topRef.observeFieldScoped("kidsMode", "onKidsModeChange")
+  topRef.observeFieldScoped("enableVideoTiles", "onEnableVideoTilesChange")
   topRef.observeFieldScoped("isVideoPreviewOn", "onIsVideoPreviewOnChange")
   m.CategoryRefreshTimer = topRef.findNode("CategoryRefreshTimer")
   m.CategoryRefreshTimer.duration = m.constants.timers.categoryContentRefreshTimeout
@@ -92,13 +89,26 @@ Function init()
 End Function
 
 
+' Handles enable video tiles field changes
+' Updates mask URI based on video tiles state
+Function onEnableVideoTilesChange()
+  if m.top.enableVideoTiles = true
+    m.maskUri = ""
+  else
+    m.maskUri = "pkg:/images/poster-mask.png"
+  end if
+  m.ContentArea.maskUri = m.maskUri
+  setContentAreaState()
+End Function
+
+
 ' Sets the content area state based on video tiles experiment and focus state
 ' Animates or directly sets the content area parent translation
 Function setContentAreaState()
   tubiLog("HomeScreen.setToRedesignContentArea")
 
-  ' Check if user is not in video tiles experiment
-  notInExperiment = (m.isUserInVideoTilesExperiment = false)
+  ' Check if user is not in video tiles
+  notInExperiment = (m.top.enableVideoTiles = false)
 
   ' Check if skin ad exists and rowlist is not focused
   hasSkinAdNotFocused = false
@@ -108,11 +118,11 @@ Function setContentAreaState()
     hasSkinAdNotFocused = (skinAdExists AND rowListNotFocused)
   end if
 
-  ' Check if in kids mode or not on home screen
-  notHomeOrKidsMode = (m.top.kidsMode = true OR m.top.id <> m.constants.ui.screenIds.homeScreen)
+  ' Check if video tiles are disabled
+  notVideoTilesEnabled = (m.top.enableVideoTiles <> true)
 
   shouldAnimate = false
-  if notInExperiment OR hasSkinAdNotFocused OR notHomeOrKidsMode
+  if notInExperiment OR hasSkinAdNotFocused OR notVideoTilesEnabled
     m.currentContentAreaTranslation = m.originalContentAreaTranslation
     shouldAnimate = true
   else
@@ -606,7 +616,7 @@ Function onRowFocusedItemChange(msg) as Void
     m.top.backgroundUriList = determineBackgroundImage(focusedContent)
   else if focusedContent.type = m.constants.ui.contentTypes.adRowlistCarousel
     displayAdDisplayCarousel()
-  else if gridItemType <> m.constants.ui.gridItemTypes.videoTile AND (m.top.id <> m.constants.ui.screenIds.homeScreen OR m.top.kidsMode = true)
+  else if gridItemType <> m.constants.ui.gridItemTypes.videoTile AND m.top.enableVideoTiles <> true
     populateInfoPanelByContent(focusedContent)
     fadeInContentArea()
   end if
@@ -953,7 +963,7 @@ Function displayAdDisplayCarousel()
       m.adFocusTimer.control = "start"
     end if
 
-    if m.isUserInVideoTilesExperiment = true
+    if m.top.enableVideoTiles = true
       m.ContentArea.maskUri = "pkg:/images/poster-mask-ads-no-dim.png"
     else
       m.ContentArea.maskUri = "pkg:/images/poster-mask-ads.png"
@@ -1152,11 +1162,11 @@ End Function
 
 
 ' Handles kids mode changes
-' Adjusts content area translation when entering kids mode
+' Adjusts content area translation when entering or exiting kids mode
 ' @param msg - Message containing new kids mode state
 Function onKidsModeChange(msg)
   kidsMode = msg.getData()
-  if m.isUserInVideoTilesExperiment = true AND kidsMode = true
+  if m.top.enableVideoTiles = false AND kidsMode = true
     m.ContentAreaParent.translation = m.originalContentAreaTranslation
   end if
 End Function

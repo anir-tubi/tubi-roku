@@ -135,6 +135,9 @@
 
     <field id="kidsMode" type="boolean" />
 
+    <!-- Indicates if video tiles should be enabled for the current screen -->
+    <field id="enableVideoTiles" type="boolean" />
+
     <field id="resetRowList" type="boolean" value="false" alwaysNotify="true" />
 
     <!-- OUTPUT -->

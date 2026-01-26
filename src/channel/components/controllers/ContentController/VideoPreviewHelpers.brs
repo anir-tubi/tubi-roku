@@ -44,7 +44,6 @@ Function stopVideoPreview(node = invalid)
     node = m.videoPreviewPlayer
   end if
 
-  ' TODO: Remove if we do not graduate roku_video_tiles_1_7 experiment.
   ' This is needed to provide smooth scrolling experience when the user is scrolling the list because calling video stop causes glitchy behavior.
   isListScrolling = false
   screen = getCurrentScreen()
@@ -66,7 +65,7 @@ End Function
 
 Function onPauseVideoPreview()
   tubiLog("VideoPreviewHelpers.onPauseVideoPreview")
-  if m.isUserInVideoTilesExperiment = true
+  if isVideoTileEnabledScreen() = true
     m.inlineVideoMetadataOverlay.showContentPoster = true
   end if
 
@@ -89,7 +88,7 @@ Function onVideoPreviewStateChanged(msg)
   tubiLog("VideoPreviewHelpers.onVideoPreviewStateChanged, " + videoPreviewState)
   currentScreen = getCurrentScreen()
   if (videoPreviewState = "playing" OR videoPreviewState = "paused") AND videoPreview <> invalid AND videoPreview.isBufferingComplete = true
-    if currentScreen <> invalid AND currentScreen.listHasFocus = false AND m.isUserInVideoTilesExperiment = true
+    if currentScreen <> invalid AND currentScreen.listHasFocus = false AND isVideoTileEnabledScreen() = true
       m.inlineVideoMetadataOverlay.showContentPoster = true
     else
       m.inlineVideoMetadataOverlay.showContentPoster = false
@@ -145,7 +144,7 @@ Function onVideoPreviewStateChanged(msg)
       else if item <> invalid AND item.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel OR item.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
         '// Simply stop the video preview for adRowlistCarousel or adRowlistSpotlight content
         m.backgroundGroup.posterVisible = true
-        if isCurrentScreenHomeScreen() = true AND item.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
+        if isVideoTileEnabledScreen() = false AND item.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
           currentScreen.allowCarouselAutoRotate = true
         end if
       else if m.maintask.isHdmiStatusOk = true AND isFullPlayerBlockedForUser = false
@@ -228,7 +227,7 @@ Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
 
     ' If the experiment is enabled and focused content is from featured row than expand preview to full screen.
     if content.gridItemType = m.constants.ui.gridItemTypes.skinAd OR content.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel OR content.gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
-      if content.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel AND isCurrentScreenHomeScreen() = true
+      if content.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel AND isVideoTileEnabledScreen() = false
         currentScreen = getCurrentScreen()
         if currentScreen <> invalid
           currentScreen.allowCarouselAutoRotate = false
@@ -265,7 +264,7 @@ Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
       videoContent.previewId = ""
     end if
 
-    if isKidsUIOn() = false AND m.isUserInVideoTilesExperiment = true
+    if isKidsUIOn() = false AND isVideoTileEnabledScreen() = true
       videoContent.addField("parentCategory", "string", false)
       videoContent.parentCategory = content.parentId
     end if
@@ -273,8 +272,7 @@ Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
     videoPreview.content = videoContent
     videoPreview.updateContent = true
 
-    screen = getCurrentScreen()
-    if isKidsUIOn() = false AND m.isUserInVideoTilesExperiment = true AND screen <> invalid AND screen.id = m.constants.ui.screenIds.homeScreen
+    if isVideoTileEnabledScreen() = true
       m.videoPreviewPlayer.videoPlayerType = "VIDEO_IN_GRID"
     else
       m.videoPreviewPlayer.videoPlayerType = "BANNER"
@@ -300,7 +298,7 @@ Function updatePreviewPlayerToCondensedView()
   m.videoPreviewPlayer.clippingRect = [0, 0, 1920, 1080]
   resizeToLocation(m.videoPreviewPlayer, 1120, 630, [799, 0], 0)
   m.videoPreviewPlayer.unObserveFieldScoped("position")
-  if isCurrentScreenHomeScreen() = true
+  if isVideoTileEnabledScreen() = false
     m.videoPreviewPlayer.observeFieldScoped("position", "onVideoPreviewPositionChanged")
   end if
   m.videoPreviewPlayer.opacity = 1
@@ -309,7 +307,7 @@ End Function
 
 Function updatePreviewPlayerToInlineView()
   tubiLog("VideoPreviewHelpers.updatePreviewPlayerToInlineView")
-  if isCurrentScreenHomeScreen() = true
+  if isVideoTileEnabledScreen() = true
     screen = getCurrentScreen()
 
     if screen <> invalid
@@ -373,7 +371,7 @@ End Function
 
 Function updatePreviewPlayerToAdSpotlight()
   playerSize = m.constants.ui.imageSizes.adRowlistThumbnail
-  if m.isUserInVideoTilesExperiment = false
+  if isVideoTileEnabledScreen() = false
     m.inlineVideoPreviewPlayerContainer.translation = [135, 164]
   end if
 
@@ -484,7 +482,7 @@ Function onVideoPreviewPositionChanged(msg) as Void
     end if
   end if
 
-  if m.isUserInVideoTilesExperiment = true AND contentFocused <> invalid AND m.videoTilesVariant <> "trueControlTop2Rows"
+  if isVideoTileEnabledScreen() = true AND contentFocused <> invalid
     ' Determines if the full video player should be blocked for the current user
     ' The full player is blocked if ANY of these conditions are true:
     '
@@ -563,8 +561,6 @@ End Function
 
 Function updatePlayerLayoutBasedOnFocusedContent(content)
   tubiLog("VideoPreviewHelpers.updatePlayerLayoutBasedOnFocusedContent")
-  currentScreen = getCurrentScreen()
-  isHomeScreen = currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen
   if arrayIncludes(m.constants.ui.fullScreenVideoPlayerGridItemTypes, content.gridItemType)
     ' Reducing 1px from both width and height since the player is in background and keeping full width causes roku to display closed captioning overlay.
     ' To avoid any other Roku OS level default behavior from kicking in reducing 1px to give a impression that player is not in full screen.
@@ -573,7 +569,7 @@ Function updatePlayerLayoutBasedOnFocusedContent(content)
     updatePreviewPlayerToAdSpotlight()
   else if content.gridItemType = m.constants.ui.gridItemTypes.adRowlistCarousel
     updatePreviewPlayerToAdCarousel()
-  else if isKidsUIOn() = false AND isHomeScreen = true AND m.isUserInVideoTilesExperiment = true
+  else if isVideoTileEnabledScreen() = true
     updatePreviewPlayerToInlineView()
   else
     updatePreviewPlayerToCondensedView()

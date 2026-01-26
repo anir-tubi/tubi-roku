@@ -57,17 +57,13 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.observeFieldScoped("loadCategoryForIds", "onLoadCategoryForIds")
     homeScreen.observeFieldScoped("stopLinearVideoPlayer", "onStopLinearVideoPlayer")
     homeScreen.observeFieldScoped("sponsoredRowFocused", "onHomeScreenSponsoredRowFocused")
-    homeScreen.observeFieldScoped("rowCurrFocusColumn", "onRowCurrFocusColumnChange")
     homeScreen.observeFieldScoped("pauseVideoPreview", "onPauseVideoPreview")
     homeScreen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
-    homeScreen.observeFieldScoped("listCurrFocusRow", "onRowCurrFocusRowChange")
-    homeScreen.observeFieldScoped("listHasFocus", "onListHasFocusChange")
     homeScreen.observeFieldScoped("adTimerImpressionFire", "onAdTimerImpressionFired")
     homeScreen.observeFieldScoped("currCategoryId", "onCurrCategoryIdChange")
-    homeScreen.observeFieldScoped("currentFocusedItemBoundingRect", "onRowListTranslationChange")
-    homeScreen.observeFieldScoped("rowListTranslation", "onRowListTranslationChange")
-    homeScreen.observeFieldScoped("listScrollDirection", "onListScrollDirectionChange")
-    homeScreen.observeFieldScoped("listScrollingStatus", "onListScrollingStatusChange")
+
+    ' Set up video tiles observers
+    setupVideoTilesObservers(homeScreen)
 
     m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop listening to timer before listing to it in case a previous screen started the timer
     m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
@@ -201,13 +197,7 @@ Function onReloadUserCategoriesInHomeScreen(response, screenId = "")
   homeScreen = getFromScreenCache(screenId)
 
   if homeScreen <> invalid
-    ' For video tiles experiment, we need to update the featured row content.
-    ' Since all the rows will be using new video tiles format.
-    if m.isUserInVideoTilesExperiment = true AND screenId = m.constants.ui.screenIds.homeScreen
-      content = homeScreen.content
-    else
-      content = homeScreen.content
-    end if
+    content = homeScreen.content
 
     if content <> invalid
       newCategory = invalid
@@ -397,6 +387,7 @@ Function fetchHomeScreen(homeScreen, useCache = false)
       responseType: "node"
       isSignedInUser: isLoggedInUser()
       uiMode: m.uiMode
+      screenId: homeScreen.id
     })
 
     if useCache = false
@@ -442,7 +433,7 @@ Function createHomescreenAdRequest(homescreenId, successCallback, aAdTypes = [],
     screenId: homescreenId
     adTypes: aAdTypes
     timeoutInMilliSec: adDisplayReqInfo.timeoutInMilliSec
-    isUserInVideoTilesExperiment: m.isUserInVideoTilesExperiment
+    isUserInVideoTilesExperiment: isVideoTileEnabledScreen(homescreenId)
   })
 End Function
 
@@ -606,17 +597,27 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
       homeScreen.personalizationId = rawResponse.personalizationId
       homeScreen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
 
-      if isKidsUIOn() = false AND screenID = m.constants.ui.screenIds.homeScreen
-        sanitizeHomeScreenResponseAndReturnLiveEventsContainer(rawResponse)
-        refreshLiveEventsContainerWithEpgListingInfo(rawResponse)
+      ' Set the enableVideoTiles field using the centralized method
+      ' Pass screenID to ensure correct rules are applied for the target screen
+      enableVideoTiles = isVideoTileEnabledScreen(screenID)
+      homeScreen.enableVideoTiles = enableVideoTiles
 
-        getStatsigExperimentResource("roku_video_tiles", "roku_video_tiles_1_7", true)
-        if m.isUserInVideoTilesExperiment = true AND isNode(rawResponse) = true AND rawResponse.getChildCount() > 0
-          ' Only show the video tile overlay group if the screen is the home screen and the skin ads are not available.
+      sanitizeHomeScreenResponseAndReturnLiveEventsContainer(rawResponse)
+      refreshLiveEventsContainerWithEpgListingInfo(rawResponse)
+
+      ' Log experiment exposure for all eligible screens where experiment controls behavior
+      ' Exclude homeScreen in standard mode (always enabled, not experiment-controlled)
+      ' This ensures both treatment and control groups are logged for accurate A/B testing
+      if isNode(rawResponse) = true AND rawResponse.getChildCount() > 0 AND m.constants.ui.videoTilesEligibleScreenIds[screenID] = true AND (screenID <> m.constants.ui.screenIds.homeScreen OR isKidsUIOn() = true)
+        getStatsigExperimentResource("", "roku_video_tiles_1_9", true)
+      end if
+
+      if enableVideoTiles
+        if isNode(rawResponse) = true AND rawResponse.getChildCount() > 0
+          ' Only show the video tile overlay group if the screen is eligible for video tiles and skin ads are not available.
           ' This is needed because we refresh home screen behind the scenes during parent controls change.
-          screen = getCurrentScreen()
           isSkinAdsAvailable = (homeScreen.skinAdContent <> invalid)
-          m.videoTileOverlayGroup.visible = (isSkinAdsAvailable = false AND screen <> invalid AND screen.id = m.constants.ui.screenIds.homeScreen)
+          m.videoTileOverlayGroup.visible = (isSkinAdsAvailable = false)
           updateCategoryGridWithRowList(rawResponse, homeScreen)
         else
           m.videoTileOverlayGroup.visible = false
@@ -770,7 +771,7 @@ Function onHomeScreenSponsoredRowFocused(msg)
   isSponsoredRowFocused = msg.getData()
   homeScreen = msg.getRoSGNode()
   currentScreen = getCurrentScreen()
-  if isSponsoredRowFocused = true AND homeScreen <> invalid AND currentScreen <> invalid AND currentScreen.isSameNode(homeScreen) AND m.isUserInVideoTilesExperiment = false
+  if isSponsoredRowFocused = true AND homeScreen <> invalid AND currentScreen <> invalid AND currentScreen.isSameNode(homeScreen) AND isVideoTileEnabledScreen() = false
     row = homeScreen.rowFocused
     if row <> invalid
       manageHomeScreenSponsorPixels(row)
@@ -846,6 +847,7 @@ Function makeContainerRequest(category, columnFocused, homeScreen, successCallba
       if categoryReqInfo <> invalid
         category.state = "containerPaginationRequestPending"
         m.makeRequest({
+          screenId: homeScreen.id
           url: categoryReqInfo.url
           requestType: categoryReqInfo.requestType
           options: categoryReqInfo.options
@@ -871,7 +873,7 @@ Function onContainerMoreItemsError(error)
   ' Adding a logic to account for any failures in the container pagination request.
   homeScreen = getCurrentScreen()
   if homeScreen <> invalid
-    if m.isUserInVideoTilesExperiment = true
+    if isVideoTileEnabledScreen() = true
       content = homeScreen.content
     else
       content = homeScreen.content
@@ -1438,7 +1440,7 @@ Function onRowCurrFocusRowChange(msg)
   m.performanceMetricsTracker.startMetricTiming("vertical_scroll_performance")
   updateVideoTileSize(screen.listScrollingStatus)
 
-  if screen.lastFocusedList = "rowList"
+  if screen.lastFocusedList <> "skinAdRow" AND isVideoTileEnabledScreen() = true
     m.videoPreviewPlayer.opacity = 0
     m.inlineVideoMetadataOverlay.skipAnimation = true
     ' Avoid the focus indicator from being shown when the row is scrolling.
@@ -1457,7 +1459,7 @@ Function onRowCurrFocusRowChange(msg)
 
   if currFocusRow = Fix(currFocusRow)
     m.performanceMetricsTracker.endMetricTiming("vertical_scroll_performance", { row: currFocusRow, screen: screen.id })
-    if screen.containerPaginationStatus <> "finished"
+    if screen.containerPaginationStatus <> "finished" AND screen.isSubType("HomeScreen") = true
       makeAdditionalContainersRequestConditionally(currFocusRow, screen)
     end if
   end if
@@ -1470,11 +1472,11 @@ Function onListScrollingStatusChange(msg)
   scrollingStatus = msg.getData()
   screen = msg.getRoSgNode()
 
-  isVideoTileEnabledScreen = isKidsUIOn() = false AND screen.id = m.constants.ui.screenIds.homeScreen
+  isVideoTileEnabled = isVideoTileEnabledScreen()
 
   ' Below logic helps to avoid us from updating the in transit video metadata overlay when the user is scrolling up or down.
   if scrollingStatus = false
-    if screen.content <> invalid AND isVideoTileEnabledScreen = true
+    if screen.content <> invalid AND isVideoTileEnabled = true
       updateVideoTileSize(scrollingStatus)
       updateInTransitVideoMetadataOverlay()
     end if
@@ -1498,9 +1500,10 @@ Function onListHasFocusChange(msg)
   screen = msg.getRoSGNode()
   content = screen.contentFocused
   previewContent = m.videoPreviewPlayer.content
-  m.videoPreviewPlayer.visible = (isCurrentScreenHomeScreen() = false OR (content <> invalid AND previewContent <> invalid AND content.id = previewContent.id)) AND (previewContent <> invalid AND previewContent.gridItemType <> m.constants.ui.gridItemTypes.skinAd)
+  isVideoTileEnabled = isVideoTileEnabledScreen()
+  m.videoPreviewPlayer.visible = (isVideoTileEnabled = false OR (content <> invalid AND previewContent <> invalid AND content.id = previewContent.id)) AND (previewContent <> invalid AND previewContent.gridItemType <> m.constants.ui.gridItemTypes.skinAd)
   if hasFeaturedListFocus = true
-    if isCurrentScreenHomeScreen() = true
+    if isVideoTileEnabled = true
       updateVideoTileScreenBackground(content, screen)
     end if
 
@@ -1515,10 +1518,10 @@ Function onListHasFocusChange(msg)
       startDebouncedVideoPreview()
     end if
     setUIBasedOnFocusedContent(content)
-  else if isCurrentScreenHomeScreen() = true
+  else if isVideoTileEnabled = true
     m.videoPreviewPlayer.visible = false
     m.inlinePreviewFocusIndicator.visible = false
-    if screen.lastFocusedList = "rowList"
+    if screen.lastFocusedList <> "skinAdRow"
       pauseVideoPreview()
     end if
   else
@@ -1561,14 +1564,14 @@ Function onRowFocusedItemChange(msg) as Void
 
   ' Handle video tile enabled containers
   isVideoTile = isVideoTileEnabledContainer(focusedItem.gridItemType)
-  isVideoTileEnabledScreen = isKidsUIOn() = false AND screen.id = m.constants.ui.screenIds.homeScreen
+  isVideoTileEnabled = isVideoTileEnabledScreen()
   if screen.oldRowFocusedItem <> invalid AND screen.oldRowFocusedItem.gridItemType = m.constants.ui.gridItemTypes.skinAd
     m.videoPreviewPlayer.visible = false
   end if
-  m.videoTileOverlayGroup.visible = isVideoTileEnabledScreen AND focusedItem.gridItemType <> m.constants.ui.gridItemTypes.skinAd
+  m.videoTileOverlayGroup.visible = isVideoTileEnabled
 
   ' Figure out a better way to handle this.
-  if isVideoTileEnabledScreen = false OR focusedItem.gridItemType = m.constants.ui.gridItemTypes.skinAd
+  if isVideoTileEnabled = false OR focusedItem.gridItemType = m.constants.ui.gridItemTypes.skinAd
     fade(m.inlineVideoPreviewPlayerContainer, "out", 0.1)
     setHomeScreenAfterFocus(focusedItem, screen)
     return
@@ -1601,8 +1604,8 @@ Function onRowFocusedItemChange(msg) as Void
     end if
   end if
 
-  ' Update UI for home screen
-  if isCurrentScreenHomeScreen() = true
+  ' Update UI based on screen type
+  if isVideoTileEnabled = true
     updateVideoTileScreenBackground(focusedItem, screen)
     updatePlayerLayoutBasedOnFocusedContent(focusedItem)
   end if
@@ -1645,8 +1648,8 @@ End Function
 Function onListScrollDirectionChange(msg)
   screen = msg.getRoSGNode()
   scrollDirection = msg.getData()
-  isVideoTileEnabledScreen = isKidsUIOn() = false AND screen.id = m.constants.ui.screenIds.homeScreen
-  if isVideoTileEnabledScreen = true AND (scrollDirection = "down" OR scrollDirection = "up")
+  isVideoTileEnabled = isVideoTileEnabledScreen()
+  if isVideoTileEnabled = true AND (scrollDirection = "down" OR scrollDirection = "up")
     updateVideoTileSize(screen.listScrollingStatus)
     updateInTransitVideoMetadataOverlay()
   end if

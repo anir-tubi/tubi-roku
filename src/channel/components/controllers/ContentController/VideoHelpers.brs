@@ -77,7 +77,7 @@ Function playVideoContentWhileSkippingDetailScreen(content, nowPos, currentTrack
     sendVideoPlayerCommand(videoPlayer, "play")
     updateRokuContinueWatchingInfo(content, nowPos)
 
-    if m.isUserInVideoTilesExperiment = true AND playbackSource.srcForAnalytic = "previews"
+    if isVideoTileEnabledScreen() = true AND playbackSource.srcForAnalytic = "previews"
       removeTopMostScreenWithIDFromStack(m.constants.ui.screenIds.detailScreen)
       displayDefaultBackground()
     end if

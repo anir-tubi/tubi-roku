@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  VideoTilesScreen - Base screen component for screens that support video tiles
+  
+  Extends BaseScreen and includes all required fields for video tiles functionality.
+  Screens that need video tiles support should extend this instead of BaseScreen.
+  
+  Note: listCurrFocusRow and listScrollingStatus are synced from the RowList via
+  sub-observers in initVideoTilesScreen(). No need to manually alias these fields.
+-->
+
+<component name="VideoTilesScreen" extends="BaseScreen">
+  <script type="text/brightscript" uri="VideoTilesScreen.brs" />
+
+  <interface>
+    <!-- Video Tiles Required Fields -->
+
+    <!-- Communicates to the parent that the video preview should be paused -->
+    <field id="pauseVideoPreview" type="boolean" alwaysNotify="true" />
+
+    <!-- Enables video tiles mode for the screen -->
+    <field id="enableVideoTiles" type="boolean" />
+
+    <!-- Indicates if the list has focus -->
+    <field id="listHasFocus" type="boolean" value="false" />
+
+    <!-- Current focus row in the row list (override with alias in concrete screen) -->
+    <field id="listCurrFocusRow" type="float" />
+
+    <!-- Row list translation for video tiles positioning -->
+    <field id="rowListTranslation" type="array" value="[0, 0]" alwaysNotify="true" />
+
+    <!-- List scrolling status (override with alias in concrete screen) -->
+    <field id="listScrollingStatus" type="boolean" value="false" />
+
+    <!-- Current focus column for scroll tracking (calculated by mixin, not aliased) -->
+    <field id="rowCurrFocusColumn" type="float" />
+
+    <!-- List scroll direction (up, down, left, right, none) -->
+    <field id="listScrollDirection" type="string" value="none" />
+
+    <!-- Current focused item bounding rectangle -->
+    <field id="currentFocusedItemBoundingRect" type="assocarray" />
+
+    <!-- In-transit focused item bounding rectangle (for animations) -->
+    <field id="inTransitCurrentFocusedItemBoundingRect" type="assocarray" />
+
+    <!-- End Video Tiles Required Fields -->
+  </interface>
+</component>

@@ -183,7 +183,11 @@ Function onItemContentChange(msg)
     row = itemContent.getParent()
 
     if gridItemType = "emptyContainer" then
-      childGridItemComponent = "CategoryGridPoster"
+      if row <> invalid AND row.useVideoTilesFormat = true
+        childGridItemComponent = "MyStuffEmptyVideoTile"
+      else
+        childGridItemComponent = "CategoryGridPoster"
+      end if
     else if gridItemType = "videoTile"
       childGridItemComponent = "PortraitVideoGridTile"
     else if gridItemType = "landscapeInnerMetadata" then

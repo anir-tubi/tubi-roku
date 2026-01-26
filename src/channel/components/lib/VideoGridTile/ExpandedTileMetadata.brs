@@ -28,9 +28,6 @@ Function init()
   m.top.observeFieldScoped("hideTitle", "onHideTitleChange")
   m.top.observeFieldScoped("width", "onWidthChange")
 
-  experimentInfo = getStatsigExperimentResource("roku_video_tiles", "roku_video_tiles_1_7", false)
-  m.variant = experimentInfo.variant
-
   typographyConstants = getTypographyConstants()
   m.bodyMediumFont = typographyConstants.ids.bodyMedium
   m.bodySmallFont = typographyConstants.ids.bodySmall
@@ -156,7 +153,6 @@ End Function
 ' Sets up title and initial configuration based on component variant
 ' @param itemContent - Content node with title and metadata
 Function setupTitleAndConfig(itemContent) as Void
-  ' TODO: Revisit this logic after roku_video_tiles_1_7 experiment results. This is getting hard to manage.
   if m.top.variant = "detailScreenInfoPanel"
     m.metadataGroup.itemSpacings = [15]
   else
@@ -347,7 +343,7 @@ Function handleSOTBadgesAndLayout(itemContent) as Void
     ' With 3 lines of description text, the height is 230px and with 2 lines of description text, the height is 192px.
     ' And parent level translation is set based on 2 lines of description text. So we are adjusting the bottom padding by negative margining the metadataGroup.
     ' This is required only for control variant.
-    if m.variant <> "trueControlTop2Rows" AND m.top.variant <> "detailScreenInfoPanel"
+    if m.top.variant <> "detailScreenInfoPanel"
       height = m.metadataGroup.boundingRect().height
       translation = m.metadataGroup.translation
       m.metadataGroup.translation = [translation[0], 192 - height]

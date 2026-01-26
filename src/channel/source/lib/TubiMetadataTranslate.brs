@@ -53,6 +53,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid, soTStaticConfig
     parseScheduleData: tubiMetadataTranslate_parseScheduleData
     parseUICustomization: tubiMetadataTranslate_parseUICustomization
     processSotStaticConfig: tubiMetadataTranslate_processSotStaticConfig
+    isVideoTileEnabledScreen: tubiMetadataTranslate_isVideoTileEnabledScreen
   }
 End Function
 
@@ -1120,13 +1121,9 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
       if container.id = m.constants.ui.categoryIds.history AND isSignedInUser = false AND uiMode <> m.constants.ui.modes.kidsAgeGate
         '//if continue watching container while user is signed out,
         ' then ensure row is empty except for 1 item that will entice users to sign in
-        categoryAA = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode, contentMode)
+        categoryAA = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode, contentMode, screenId, uiMode)
       else
-        shouldInsertChannelTile = true
-        isContentModeHomeScreen = (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
-        if isContentModeHomeScreen = true AND uiMode = "standard" AND m.statSigExperiments <> invalid AND m.statSigExperiments.getExperimentResource("roku_video_tiles", "roku_video_tiles_1_7").design_type = "videoTiles"
-          shouldInsertChannelTile = false
-        end if
+        shouldInsertChannelTile = not m.isVideoTileEnabledScreen(screenId, uiMode)
         categoryAA = m.buildCategoryAAWithInsert(container, contents, "", "", false, contentMode, screenId, isSignedInUser, uiMode, shouldInsertChannelTile, {})
       end if
 
@@ -1317,7 +1314,7 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
   if container.id = m.constants.ui.categoryIds.history AND isSignedInUser = false AND uiMode <> m.constants.ui.modes.kidsAgeGate
     '//if continue watching container while user is signed out,
     ' then ensure row is empty except for 1 item that will entice users to sign in
-    categoryMetadata = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode, contentMode)
+    categoryMetadata = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode, contentMode, screenId, uiMode)
   else
     categoryMetadata = m.buildCategoryAAWithInsert(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser, uiMode, false, requestContext)
   end if
@@ -1434,6 +1431,7 @@ End Function
 Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode = "homeScreen", screenId = "", isSignedInUser = false, uiMode = "standard", requestContext = {})
   categoryParent = m.buildCategoryParentInfo(container, sOrientation, contentMode, uiMode)
   gridItemType = m.getGridItemType(container, sOrientation, m.constants, screenId, contentMode, uiMode)
+  requestContext.screenId = screenId
   categoryChildrenInfo = m.buildCategoryChildrenInfo(container, contents, contentsJson, gridItemType, bFullData, isSignedInUser, uiMode, requestContext)
 
   categoryParent.children = categoryChildrenInfo.children
@@ -1552,16 +1550,6 @@ Function tubiMetadataTranslate_buildCategoryParentInfo(container, sOrientation =
       child_ui_customization: container.child_ui_customization 'child_ui_customization is the not camel case because we are trying to store the container filed as is in field name
     }
 
-    if m.statSigExperiments <> invalid
-      experiment = m.statSigExperiments.getExperimentResource("roku_video_tiles", "roku_video_tiles_1_7")
-      isUserInVideoTilesExp = (experiment.design_type = "videoTiles") AND uiMode = "standard"
-
-      if isUserInVideoTilesExp = true
-        updateMetadata.gridItemSize = m.constants.ui.imageSizes.videoTilesPortrait
-        updateMetadata.featuredRowPosterSize = m.constants.ui.imageSizes.featuredRowPoster
-      end if
-    end if
-
     m.categorySubtexts = {}
     m.categorySubtexts[m.constants.ui.categoryIds.recommendedForYou] = getTranslation("registration_signIn_recommended")
 
@@ -1676,13 +1664,8 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             seasons = fullChild.num_seasons
           end if
 
-          tileDesignType = "none"
-          isUserInVideoTilesExp = false
-          if m.statSigExperiments <> invalid
-            experiment = m.statSigExperiments.getExperimentResource("roku_video_tiles", "roku_video_tiles_1_7")
-            tileDesignType = experiment.design_type
-            isUserInVideoTilesExp = (tileDesignType = "videoTiles") AND uiMode = "standard"
-          end if
+
+          isUserInVideoTilesExp = m.isVideoTileEnabledScreen(requestContext.screenId, uiMode)
 
           rottenTomatoScore = 0
           if isAA(fullChild.content_tags) = true AND isNonEmptyArray(fullChild.content_tags.rotten_tomatoes_certified_fresh) = true
@@ -1750,7 +1733,6 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
               seasons: seasons
               type: sContentType
               userStarRating: rottenTomatoScore
-              tileDesignType: tileDesignType
               featuredLandscape: featuredLandscape
               controlLandscape: controlLandscape
               sotPosterLabels: sotPosterLabels
@@ -2000,17 +1982,10 @@ Function tubiMetadataTranslate_translate(contentToTranslate, isSignedInUser = fa
 End Function
 
 
-Function tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA(container, bKidsMode = false, contentMode = "")
+Function tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA(container, bKidsMode = false, contentMode = "", screenId = "", uiMode = "standard")
   updateMetadata = {}
   if container <> invalid
-    isContentModeHomeScreen = (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
-    ' Remove useVideoTilesFormat field irrespective of whether we graduate or not graduate the experiment.
-    ' Since this field is temporary since we need to support both formats for now.
-    useVideoTilesFormat = false
-    if m.statSigExperiments <> invalid AND isContentModeHomeScreen = true AND bKidsMode <> true
-      experiment = m.statSigExperiments.getExperimentResource("roku_video_tiles", "roku_video_tiles_1_7")
-      useVideoTilesFormat = (isAA(experiment) = true AND experiment.design_type = "videoTiles")
-    end if
+    useVideoTilesFormat = m.isVideoTileEnabledScreen(screenId, uiMode)
 
     updateMetadata = {
       id: container.id
@@ -2071,6 +2046,14 @@ End Function
 Function tubiMetadataTranslate_buildEmptyMyStuffCategoryAA(container)
   updateMetadata = {}
   if container <> invalid
+    ' Check if user is in video tiles experiment
+    ' MyStuff screen is always eligible (in videoTilesEligibleScreenIds) and always in standard mode
+    useVideoTilesFormat = false
+    if m.statSigExperiments <> invalid
+      experiment = m.statSigExperiments.getExperimentResource("", "roku_video_tiles_1_9")
+      useVideoTilesFormat = (experiment.enabled = true)
+    end if
+
     updateMetadata = {
       id: container.id
       slug: container.slug
@@ -2083,6 +2066,7 @@ Function tubiMetadataTranslate_buildEmptyMyStuffCategoryAA(container)
       state: "full"
       gridItemType: m.constants.ui.gridItemTypes.emptyContainer
       type: m.contentTypes.emptyContainer
+      useVideoTilesFormat: useVideoTilesFormat
     }
 
     jsonAA = {}
@@ -2171,26 +2155,19 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
   gridItemTypes = constants.ui.gridItemTypes
   gridItemType = gridItemTypes.portrait
 
-  tileDesignType = "none"
-  isUserInVideoTilesExperiment = false
-  if m.statSigExperiments <> invalid
-    experiment = m.statSigExperiments.getExperimentResource("roku_video_tiles", "roku_video_tiles_1_7")
-    tileDesignType = experiment.design_type
-    isUserInVideoTilesExperiment = (tileDesignType = "videoTiles") AND uiMode = "standard"
-  end if
+  isUserInVideoTilesExperiment = m.isVideoTileEnabledScreen(screenId, uiMode)
 
-  isContentModeHomeScreen = (isNonEmptyString(contentMode) = false OR contentMode = m.constants.ui.contentMode.homescreen)
   if isAA(container.ui_customization) = true AND container.ui_customization.type = "live_event_spotlight"
     gridItemType = gridItemTypes.liveEventSpotlight
   else if isAA(container.ui_customization) = true AND container.ui_customization.type = "live_event_banner"
     gridItemType = gridItemTypes.liveEventBanner
-  else if screenId = m.constants.ui.screenIds.homeScreen AND isUserInVideoTilesExperiment = true AND isContentModeHomeScreen = true
+  else if isUserInVideoTilesExperiment = true
     gridItemType = gridItemTypes.videoTile
   else if container.type = constants.ui.categoryTypes.linear
     gridItemType = gridItemTypes.linear
   else if container.id = constants.ui.categoryIds.certifiedFresh
     gridItemType = gridItemTypes.certifiedFresh
-  else if container.id = constants.ui.categoryIds.featured AND orientation <> gridItemTypes.portrait AND tileDesignType <> "controlReOrderContainers"
+  else if container.id = constants.ui.categoryIds.featured AND orientation <> gridItemTypes.portrait
     ' `orientation <> gridItemTypes.portrait` is required as the search screen container.id is featured but uses portrait imagery
     gridItemType = gridItemTypes.landscapeNoTitle
   else if orientation = gridItemTypes.landscapeInnerMetadata
@@ -3288,4 +3265,27 @@ Function tubiMetadataTranslate_parseUICustomization(uiCustomization) as Object
   end if
 
   return parsedUicustomization
+End Function
+
+
+Function tubiMetadataTranslate_isVideoTileEnabledScreen(screenId = "", uiMode = "standard") as Boolean
+  if isNonEmptyString(screenId) = false
+    return false
+  end if
+
+  ' Always enable video tiles on homeScreen in standard mode (not kids mode)
+  if screenId = m.constants.ui.screenIds.homeScreen AND uiMode = "standard"
+    return true
+  end if
+
+  ' For all eligible screens (home, tv, movies, espanol, my stuff), enable based on experiment
+  ' Note: This includes homeScreen in kids mode
+  if m.constants.ui.videoTilesEligibleScreenIds[screenId] = true
+    if m.statSigExperiments <> invalid
+      experiment = m.statSigExperiments.getExperimentResource("", "roku_video_tiles_1_9")
+      return experiment.enabled = true
+    end if
+  end if
+
+  return false
 End Function

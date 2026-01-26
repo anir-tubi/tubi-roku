@@ -20,7 +20,7 @@ Function showMyStuffScreen()
     screen = CreateObject("roSGNode", "MyStuffScreen")
     screen.trackingLoadStartTime = UpTime(0)
     screen.observeFieldScoped("contentSelected", "onMyStuffContentSelected")
-    screen.observeFieldScoped("contentFocused", "onMyStuffScreenContentFocused")
+    screen.observeFieldScoped("contentFocused", "onRowFocusedItemChange")
     screen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     screen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
     screen.observeFieldScoped("contentToPlay", "onContentToPlay")
@@ -30,6 +30,9 @@ Function showMyStuffScreen()
     screen.observeFieldScoped("refreshContent", "onRefreshContentSignalForMyStuffScreen")
     screen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
     screen.observeFieldScoped("pauseVideoPreview", "onPauseVideoPreview")
+
+    ' Set up video tiles observers
+    setupVideoTilesObservers(screen)
 
     if bLoggedInUser = true
       screen.isLoading = true
@@ -41,6 +44,10 @@ Function showMyStuffScreen()
 
   screen.isVideoPreviewOn = m.pub_serverPersistentData.isVideoPreviewOn
   m.pubSub.subscribe("pub_serverPersistentData.isVideoPreviewOn", screen, "isVideoPreviewOn")
+
+  ' Set the enableVideoTiles field using the centralized method
+  enableVideoTiles = isVideoTileEnabledScreen(m.constants.ui.screenIds.myStuffScreen)
+  screen.enableVideoTiles = enableVideoTiles
 
   setInScreenCache(screen)
   screen.trackingPageInfo = {
@@ -117,6 +124,8 @@ Function onMyStuffBatchResponse(response)
     if isNode(response) = true AND response.getChildCount() > 0
       screen.content = response
       screen.contentUpdated = true
+
+      getStatsigExperimentResource("", "roku_video_tiles_1_9", true)
     else
       modalInfo = {
         message: getTranslation("error_noContent_description")
@@ -364,14 +373,4 @@ Function onMyStuffContentSelected(msg)
 
     processUserContentSelection(content, screen, playbackSource)
   end if
-End Function
-
-
-' The event hander function for when a content item gains focus on the my stuff screen
-Function onMyStuffScreenContentFocused(msg)
-  tubiLog("MyStuffScreenHelpers.onMyStuffScreenContentFocused")
-  focusedContent = msg.getData()
-  screen = msg.getRoSGNode()
-  componentTrackingInfo = getCategoryComponentTrackingInfo(screen)
-  setVideoPreviewAfterFocus(focusedContent, screen.trackingPageInfo, componentTrackingInfo)
 End Function

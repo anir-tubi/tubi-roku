@@ -10,6 +10,11 @@ Function parseHomeScreenContentSuccess(fullResponse, reqInfo)
 
   uiMode = "standard"
 
+  screenId = "homeScreen"
+  if reqInfo <> invalid AND reqInfo.screenId <> invalid
+    screenId = reqInfo.screenId
+  end if
+
   if reqInfo <> invalid AND reqInfo.options <> invalid
 
     options = reqInfo.options
@@ -32,7 +37,7 @@ Function parseHomeScreenContentSuccess(fullResponse, reqInfo)
     isSignedInUser = reqInfo.isSignedInUser
   end if
 
-  convertedMetadata = m.metadataTranslate.translateHomescreen(parsedResponse, contentMode, isKidsMode, uiMode, "homeScreen", isSignedInUser)
+  convertedMetadata = m.metadataTranslate.translateHomescreen(parsedResponse, contentMode, isKidsMode, uiMode, screenId, isSignedInUser)
 
   if headers <> invalid AND headers["last-modified"] <> invalid
     convertedMetadata.update({

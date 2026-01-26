@@ -109,6 +109,9 @@
     KidsMode On-->
     <field id="kidsMode" alias="CategoryGridList.kidsMode" />
 
+    <!-- Indicates if video tiles should be enabled for the current screen -->
+    <field id="enableVideoTiles" type="boolean" alias="CategoryGridList.enableVideoTiles" />
+
     <!-- incoming metadata from GeneralTask
            type is node, so that it takes less time to send data from one file to another file when comparing
     to assocarray

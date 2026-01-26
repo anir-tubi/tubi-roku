@@ -10,9 +10,7 @@ Function init()
   m.top.observeFieldScoped("jumpToRowItemByID", "onJumpToRowItemByIDChange")
   m.top.observeFieldScoped("contentUpdated", "onContentChange")
   m.top.observeFieldScoped("repopulateContent", "onRepopulateContent")
-  m.top.observeFieldScoped("signedIn", "onSignedInChange")
   m.top.observeFieldScoped("parentScreenTrackingPageInfo", "onParentScreenTrackingPageInfoChange")
-  m.top.observeFieldScoped("kidsMode", "onKidsModeChange")
   m.top.observeFieldScoped("containerAppendMoreTilesStatus", "onContainerAppendMoreTilesStatusChange")
   m.top.observeFieldScoped("animateToItem", "onAnimateToItemChange")
   m.top.observeFieldScoped("hasNewContainers", "onHasNewContainersChange")
@@ -56,16 +54,11 @@ Function init()
   m.lastFocusColumnIndex = 0
   m.lastFocusRow = 0
 
-  experiment = getStatsigExperimentResource("roku_video_tiles", "roku_video_tiles_1_7", false)
   m.featuredRowPoster = m.constants.ui.imageSizes.featuredRowPoster
   m.gridItemSize = m.constants.ui.imageSizes.videoTilesPortrait
 
   m.expandedTileFocusXOffset = m.featuredRowPoster[0] - m.gridItemSize[0] + 4
 
-  m.isUserInVideoTiles = (experiment.design_type = "videoTiles")
-
-  ' Creating a backup variable to check if user is in video tiles experiment, since we override value.
-  m.isUserInVideoTilesExperiment = m.isUserInVideoTiles
   m.ignoreCurrColumnChange = false
 End Function
 
@@ -224,10 +217,6 @@ End Function
 ' Configures row list visibility, translations, and skin ad row based on content state
 Function onContentChange()
   tubiLog("CategoryGridList.onContentChange")
-
-  if m.top.parentScreenId <> invalid AND m.top.parentScreenId <> m.constants.ui.screenIds.homeScreen
-    m.isUserInVideoTiles = false
-  end if
 
   ' Resetting the state of the UI. Below condition safe guards against any background refresh.
   ' Like item getting added to CW row or queue row.
@@ -467,13 +456,13 @@ Function setRowHeights()
         m.rowList.focusXOffset = [m.expandedTileFocusXOffset, 0]
       end if
       m.rowList.rowItemFocused = [0, 0]
-      if m.isUserInVideoTiles = true
+      if m.top.enableVideoTiles = true
         m.top.lastFocusedList = "rowList"
       end if
     end if
   end if
 
-  m.rowList.drawFocusFeedback = (m.isUserInVideoTiles = false)
+  m.rowList.drawFocusFeedback = (m.top.enableVideoTiles = false)
 End Function
 
 
@@ -971,12 +960,9 @@ Function onVertFocusDirectionChange(msg)
 End Function
 
 
-' TODO: Revisit the isInTransit parameter since it is not used anywhere.
-' Before we graduate the roku_video_tiles_1_7 experiment. If we do not find any other use cases for it remove the field.
 ' Updates focus X offset for video tile expansion effect
 ' @param currFocusRow - Current focused row index
-' @param isInTransit - Whether focus is transitioning between rows (default: false)
-Function updateFocusXOffset(currFocusRow, isInTransit = false)
+Function updateFocusXOffset(currFocusRow)
   rowContent = m.top.content
   focusXOffsets = m.rowList.focusXOffset
   if isNode(rowContent) = true AND isNonEmptyArray(focusXOffsets) = true
@@ -984,7 +970,7 @@ Function updateFocusXOffset(currFocusRow, isInTransit = false)
     for i = 0 to rowContent.getChildCount() - 1
       category = rowContent.getChild(i)
       gridItemType = category.gridItemType
-      if (i = currFocusRow OR (isInTransit = true AND i = currFocusRow + 1)) AND isVideoTileEnabledContainer(gridItemType) = true
+      if i = currFocusRow AND isVideoTileEnabledContainer(gridItemType) = true
         focusXOffset.push(m.expandedTileFocusXOffset)
       else
         focusXOffset.push(0)
@@ -1130,15 +1116,6 @@ Function translateListAndSetFocus()
   slideFadeGeneral(m.rowList, [0, 0], "in", 0.3, 0, 1, true, callback)
   m.top.hideInfoPanel = false
   updateRowItemFocused()
-End Function
-
-
-' Handles kids mode changes
-' Disables video tiles experiment when in kids mode
-' @param msg - Message containing new kids mode state
-Function onKidsModeChange(msg)
-  kidsMode = msg.getData()
-  m.isUserInVideoTiles = (m.isUserInVideoTilesExperiment AND kidsMode = false)
 End Function
 
 

@@ -91,6 +91,9 @@ Function init()
   m.top.observeFieldScoped("jumpToRowItemByIdAndIndex", "onJumpToRowItemChange")
   m.top.observeFieldScoped("reset", "onResetChange")
 
+  ' Initialize video tiles support using mixin
+  initVideoTilesScreen(m.ContentArea, m.RowList, m.InfoPanel)
+
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.SignedOutUITitle, typographyConstants.ids.headerSmall)
   setTypographyOfLabel(m.SignedOutUISubtitle, typographyConstants.ids.bodyLarge)
@@ -166,6 +169,8 @@ Function onScreenFocusChange()
       end if
     end if
   end if
+
+  m.top.listHasFocus = m.rowList.isInFocusChain()
 End Function
 
 
@@ -217,6 +222,8 @@ Function onContentUpdateChange() as Void
       else
         m.AllEmptyUI.visible = true
         m.RowList.visible = false
+        m.top.listHasFocus = false
+        m.top.content = invalid
         m.InfoPanel.visible = false
         if m.top.isInFocusChain() = true
           m.AllEmptyUIMenu.setFocus(true)
@@ -238,12 +245,14 @@ Function setRowHeights()
   'determine the height of each row in the RowList so we can set it on RowList.rowItemSize
   rowItemSize = []
   rowHeights = []
+
   for i = 0 to m.top.content.getChildCount() - 1
     category = m.top.content.getChild(i)
     rowHeight = 0
     rowHeightAdjustment = 56 '//The height of the row container heading and its vertical spacing
     gridItemType = category.gridItemType
     gridItemTypes = m.constants.ui.gridItemTypes
+
     if gridItemType = gridItemTypes.emptyContainer
       rowItemSize.push(m.constants.ui.imageSizes.emptyContainer)
       rowHeight = m.constants.ui.imageSizes.emptyContainer[1]
@@ -252,6 +261,14 @@ Function setRowHeights()
       posterHeight = m.constants.ui.imageSizes.largeLandscape[1]
       rowItemSize.push([posterWidth, posterHeight])
       rowHeight = posterHeight
+    else if isVideoTileEnabledContainer(gridItemType) = true
+      ' Video tiles row - use featured row height with metadata section
+      featuredRowHeight = getVideoTileRowHeight(category.sponsorImages)
+      if category.sponsorImages <> invalid
+        rowHeightAdjustment = rowHeightAdjustment + 32
+      end if
+      rowItemSize.push(m.gridItemSize)
+      rowHeight = featuredRowHeight - rowHeightAdjustment
     else
       posterWidth = m.constants.ui.imageSizes.largePoster[0]
       posterHeight = m.constants.ui.imageSizes.largePoster[1]
@@ -261,16 +278,8 @@ Function setRowHeights()
     rowHeights.push(rowHeight + rowHeightAdjustment)
   end for
 
-  '//setting the height of the m.RowList.itemSize is superceded by the rowHeight of each row.
-  '//However, just in case the height of a row is not defined, then it will default to the height defined by itemSize
-  itemSize = [1752, m.constants.ui.imageSizes.largePoster[1]]
-  m.Rowlist.update({
-    "itemSize": itemSize
-    "rowItemSize": rowItemSize
-    "rowHeights": rowHeights
-    "showRowLabel": [true]
-  })
-  m.RowList.content = m.top.content
+  ' Use mixin helper to configure row heights with video tiles support
+  configureRowHeights(m.RowList, rowItemSize, rowHeights, m.top.content)
 End Function
 
 
@@ -306,22 +315,30 @@ Function onRowItemFocused(msg) as Boolean
 
     m.top.trackingComponentInfo = getTrackingComponentInfoOfRowList(itemFocused, newCursorPosition)
 
-    mode = m.constants.ui.infoPanelModes.item
-    if category.gridItemType = m.constants.ui.gridItemTypes.emptyContainer
-      emptyContentNode = CreateObject("roSGNode", "TubiContentNode")
-      if category.id = m.constants.ui.categoryIds.history
-        emptyContentNode.title = getTranslation("metadata_myStuff_empty_continueWatchingInfoPanel_title")
-        emptyContentNode.description = getTranslation("metadata_myStuff_empty_continueWatchingInfoPanel_description")
-        mode = m.constants.ui.infoPanelModes.continueWatching
-      else if category.id = m.constants.ui.categoryIds.queue
-        emptyContentNode.title = getTranslation("metadata_myStuff_empty_myListInfoPanel_title")
-        emptyContentNode.description = getTranslation("metadata_myStuff_empty_myListInfoPanel_description")
-        mode = m.constants.ui.infoPanelModes.continueWatching
-      end if
+    ' Update focus offset and bounding rect for video tiles using mixin
+    updateFocusForItem(m.RowList, newCursorPosition[0])
 
-      populateInfoPanel(mode, emptyContentNode) 'empties the info panel
-    else
-      populateInfoPanelByContent(itemFocused)
+    m.InfoPanel.visible = not m.top.enableVideoTiles
+
+    ' Only populate InfoPanel when video tiles are not enabled
+    if m.top.enableVideoTiles <> true
+      mode = m.constants.ui.infoPanelModes.item
+      if category.gridItemType = m.constants.ui.gridItemTypes.emptyContainer
+        emptyContentNode = CreateObject("roSGNode", "TubiContentNode")
+        if category.id = m.constants.ui.categoryIds.history
+          emptyContentNode.title = getTranslation("metadata_myStuff_empty_continueWatchingInfoPanel_title")
+          emptyContentNode.description = getTranslation("metadata_myStuff_empty_continueWatchingInfoPanel_description")
+          mode = m.constants.ui.infoPanelModes.continueWatching
+        else if category.id = m.constants.ui.categoryIds.queue
+          emptyContentNode.title = getTranslation("metadata_myStuff_empty_myListInfoPanel_title")
+          emptyContentNode.description = getTranslation("metadata_myStuff_empty_myListInfoPanel_description")
+          mode = m.constants.ui.infoPanelModes.continueWatching
+        end if
+
+        populateInfoPanel(mode, emptyContentNode) 'empties the info panel
+      else
+        populateInfoPanelByContent(itemFocused)
+      end if
     end if
 
     'Set up the navigateWithinPageInfo to send to ContentController.
@@ -698,6 +715,7 @@ Function onResetChange(msg)
     m.RowList.jumpToRowItem = [0, 0]
   end if
 End Function
+
 
 Function onKeyEvent(key as String, press as Boolean) as Boolean
   tubiLog("MyStuffScreen.onKeyEvent key = " + key)

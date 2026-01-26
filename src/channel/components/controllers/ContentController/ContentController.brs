@@ -181,29 +181,20 @@ Function addControllerUi()
   ' Holds the poster for the video tile that is in transit.That is in case of user scrolling down next container poster vs previous container poster when scrolling up.
   m.inTransitInlineVideoMetadataOverlay = m.top.findNode("inTransitInlineVideoMetadataOverlay")
   m.videoTileOverlayGroup = m.top.findNode("videoTileOverlayGroup")
-  experiment = getStatsigExperimentResource("roku_video_tiles", "roku_video_tiles_1_7", false)
+  experiment = getStatsigExperimentResource("", "roku_video_tiles_1_9", false)
   videoTilesListTranslation = m.constants.ui.videoTilesListTranslation
-  m.videoTilesVariant = ""
-  if isAA(experiment) = true
-    m.videoTilesVariant = experiment.variant
-  end if
-
   ' Using clipping rect to ensure that when scrolling up the video tile gets clipped along with the rest of the row list tiles
   m.videoTileOverlayGroup.clippingRect = [videoTilesListTranslation[0], videoTilesListTranslation[1], 1920, 1080]
   m.videoTileOverlayGroup.translation = [videoTilesListTranslation[0], -6]
 
   ' This is used to track if the user is in the video tiles experiment.
-  m.isUserInVideoTilesExperiment = (experiment <> invalid AND experiment.design_type = "videoTiles")
+  m.isUserInVideoTilesExperiment = (experiment <> invalid AND experiment.enabled)
   m.queuedVideoTilePreview = false
 
   m.inlinePreviewPlayerFadeAnimation = invalid
 
-  debounceTime = m.constants.player.videoPreviewDelayTimes.videoTiles
-  if m.isUserInVideoTilesExperiment AND isNumber(experiment.debounce_time)
-    debounceTime = experiment.debounce_time
-  end if
   m.videoPreviewDebounce = CreateObject("roSGNode", "Timer")
-  m.videoPreviewDebounce.duration = debounceTime
+  m.videoPreviewDebounce.duration = m.constants.player.videoPreviewDelayTimes.videoTiles
   m.videoPreviewDebounce.observeFieldScoped("fire", "startDebouncedVideoPreview")
 
   updateVideoTileSize()
@@ -1824,7 +1815,7 @@ End Function
 Function onVideoContentScreenBackgroundUpdated(msg)
   tubiLog("ContentController.onVideoContentScreenBackgroundUpdated")
   screen = msg.getRoSGNode()
-  setVideoContentScreenBackground(screen)
+  updateVideoTileScreenBackground(screen.contentFocused, screen)
 End Function
 
 
@@ -2188,11 +2179,9 @@ Function onCustomSuspend(msg)
         linearVideoPlayer.control = "stop"
       end if
 
-      ' Remove this line if we do not graduated roku_video_tiles_1_7.
       ' This is needed to avoid having to use alwaysnotify on featuredListHasFocus and when app is suspended it does not fire focus change event on home screen.
-      homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-      if homeScreen <> invalid
-        homeScreen.listHasFocus = false
+      if currentScreen <> invalid
+        currentScreen.listHasFocus = false
       end if
     end if
 
@@ -2512,7 +2501,7 @@ Function onFullscreenCountdown()
           selectLinearContent(contentToPlay)
         end if
 
-        if m.isUserInVideoTilesExperiment = true AND screen.id = m.constants.ui.screenIds.homeScreen AND nNewCount > 0
+        if isVideoTileEnabledScreen() = true AND nNewCount > 0
           if nNewCount + 1 = m.constants.settings.linearFullscreenTimeout
             fade(m.autoStartPreviewToPlaybackTimer, "in", 0.1)
           end if

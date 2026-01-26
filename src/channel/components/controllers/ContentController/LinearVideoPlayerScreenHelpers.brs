@@ -99,7 +99,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
       else
         currentScreen = getCurrentScreen()
         ' If the current screen is the home screen and the featured list has focus, then switch to inline grid mode.
-        if isKidsUIOn() = false AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND currentScreen.listHasFocus = true
+        if isVideoTileEnabledScreen() = true AND currentScreen <> invalid AND currentScreen.listHasFocus = true
           switchLinearToInlineGridMode(videoPlayer)
         else
           '//play at minimized state
@@ -574,7 +574,7 @@ Function animateLinearVideoPlayerToMinState(nDuration = .25, bVisible = true)
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   if videoPlayer <> invalid AND videoPlayer.content <> invalid
     currentScreen = getCurrentScreen()
-    enableInlineGridMode = isKidsUIOn() = false AND currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND currentScreen.listHasFocus = true
+    enableInlineGridMode = isVideoTileEnabledScreen() = true AND currentScreen <> invalid AND currentScreen.listHasFocus = true
     if enableInlineGridMode = true
       switchLinearToInlineGridMode(videoPlayer)
     else
@@ -853,12 +853,12 @@ Function reactToLinearVideoPlayerErrorStateInNonFullscreenState()
   ' We don't show an error modal when in non full screen mode since users didn't explicitly select
   ' to start playback. If an error occurs heres, not showing an error modal allows users to continue navigating.
   stopAndHideLinearVideoPlayer()
-  homescreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-  if homescreen <> invalid
-    if homescreen.lastFocusedList = "rowList"
+  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  if homeScreen <> invalid
+    if homeScreen.lastFocusedList <> "skinAdRow" AND isVideoTileEnabledScreen(homeScreen.id) = true
       displayDefaultBackground()
     else
-      setVideoContentScreenBackground(homescreen)
+      setVideoContentScreenBackground(homeScreen)
     end if
   end if
 End Function

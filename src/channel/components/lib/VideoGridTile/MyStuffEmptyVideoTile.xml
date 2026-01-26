@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="MyStuffEmptyVideoTile" extends="Group">
+  <script type="text/brightscript" uri="MyStuffEmptyVideoTile.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+
+  <interface>
+    <field id="itemContent" type="node" />
+    <field id="width" alias="border.width, title.width, subtitle.width" />
+    <field id="height" alias="border.height" />
+    <field id="itemHasFocus" type="boolean" />
+    <field id="rowHasFocus" type="boolean" />
+    <field id="rowListHasFocus" type="boolean" />
+  </interface>
+
+  <children>
+    <Poster
+      id="border"
+      uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png" />
+
+    <LayoutGroup
+      id="contentSection"
+      layoutDirection="vert"
+      horizAlignment="custom"
+      itemSpacings="[18]">
+
+      <Poster
+        id="icon"
+        width="84"
+        height="84" />
+
+      <Label
+        id="title"
+        height="39"
+        horizAlign="center"
+        vertAlign="center">
+        <Font
+          role="font" />
+      </Label>
+
+      <Label
+        id="subtitle"
+        wrap="true"
+        ellipsizeOnBoundary="true"
+        numLines="1"
+        vertAlign="center"
+        horizAlign="center">
+        <Font
+          role="font" />
+      </Label>
+
+    </LayoutGroup>
+  </children>
+</component>

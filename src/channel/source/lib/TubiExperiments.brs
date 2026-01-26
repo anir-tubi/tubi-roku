@@ -65,28 +65,6 @@ Function TubiExperiments(experimentsInfo) as Object
       }
 
       'This experiment will not be under holdout and will clean up once we take the decision.
-      roku_home_screen_redesign: {
-        roku_home_screen_redesign_v_1_5_restart: {
-          ' Possible values for design_type are "withDescriptionPortraitSmall", "controlReOrderContainers",  "none"
-          ' Possible values for container_id are "featured" or any other tensor container id
-          ' Possible values for gridItemSize are [310, 442] or [252, 360]
-          ' Possible values for featuredRowPosterSize are [788, 442] or [720, 360]
-          ' sample ex: default: {"design_type": "withDescriptionPortraitSmall", container_id: "featured", gridItemSize: [252, 360], featuredRowPosterSize: [720, 360] }
-          ' default: {"design_type": "withDescriptionPortraitSmall", should_debounce: false, gridItemSize: [310, 442], featuredRowPosterSize: [788, 442] }
-          default: { "design_type": "none", container_id: "none", should_debounce: false, gridItemSize: [], featuredRowPosterSize: [] }
-          holdout_control: { "design_type": "none", container_id: "none", should_debounce: false, gridItemSize: [], featuredRowPosterSize: [] }
-          holdout_winning: { "design_type": "none", container_id: "none", should_debounce: false, gridItemSize: [], featuredRowPosterSize: [] }
-        }
-
-        roku_home_screen_redesign_v_1_6: {
-          ' default: { "design_type": "withDescriptionPortraitSmall", should_debounce: false, gridItemSize: [310, 442], featuredRowPosterSize: [788, 442], variant: "billboard", should_dim: true }
-          default: { "design_type": "none", should_debounce: false, gridItemSize: [], featuredRowPosterSize: [], variant: "", should_dim: false }
-          holdout_control: { "design_type": "none", should_debounce: false, gridItemSize: [], featuredRowPosterSize: [], should_dim: false }
-          holdout_winning: { "design_type": "none", should_debounce: false, gridItemSize: [], featuredRowPosterSize: [], should_dim: false }
-        }
-      }
-
-      'This experiment will not be under holdout and will clean up once we take the decision.
       roku_no_change_experiment: {
         roku_no_change_experiment_v3: {
           default: { "enabled": false }

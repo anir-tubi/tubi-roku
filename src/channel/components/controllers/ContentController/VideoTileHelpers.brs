@@ -7,6 +7,23 @@
 ' - Container pagination
 
 
+' Sets up all video tiles-related observers for a screen
+' This is a reusable helper that should be called when initializing any video tiles-enabled screen
+'
+' @param screen roSGNode - The screen node to set up observers on
+Function setupVideoTilesObservers(screen) as Void
+  if screen <> invalid
+    screen.observeFieldScoped("rowCurrFocusColumn", "onRowCurrFocusColumnChange")
+    screen.observeFieldScoped("listCurrFocusRow", "onRowCurrFocusRowChange")
+    screen.observeFieldScoped("listHasFocus", "onListHasFocusChange")
+    screen.observeFieldScoped("listScrollDirection", "onListScrollDirectionChange")
+    screen.observeFieldScoped("listScrollingStatus", "onListScrollingStatusChange")
+    screen.observeFieldScoped("currentFocusedItemBoundingRect", "onRowListTranslationChange")
+    screen.observeFieldScoped("rowListTranslation", "onRowListTranslationChange")
+  end if
+End Function
+
+
 ' Handles pagination response for video tile containers
 ' Appends additional content items to the currently focused row in the featured row list
 '
@@ -86,7 +103,7 @@ Function onRowCurrFocusColumnChange() as Void
   updateVideoTileOnFocusChange(rowFocused, columnFocused, screen)
 
   ' Trigger lazy loading for next batch of items
-  if isNumber(columnFocused) = true AND isNumber(rowFocused) = true AND screen.content <> invalid
+  if isNumber(columnFocused) = true AND isNumber(rowFocused) = true AND screen.content <> invalid AND screen.isSubType("HomeScreen") = true
     category = screen.content.getChild(rowFocused)
     makeContainerRequest(category, columnFocused, screen, onVideoTilesListMoreItemsSuccess)
   end if
@@ -106,13 +123,13 @@ End Function
 ' @param columnFocused integer - Column index of the focused item
 ' @param screen roSGNode - The screen node containing the featured row content
 Function updateVideoTileOnFocusChange(rowFocused, columnFocused, screen) as Void
-  isVideoTileEnabledScreen = isKidsUIOn() = false AND screen.id = m.constants.ui.screenIds.homeScreen
+  isVideoTileEnabled = isVideoTileEnabledScreen()
   ' Only process if the user is a screen or mode where video tiles are enabled.
-  if isVideoTileEnabledScreen = false return
+  if isVideoTileEnabled = false return
   ' Extract focused content information
   gridItemType = ""
   contentFocused = invalid
-  if screen.content <> invalid
+  if screen.content <> invalid AND rowFocused <> invalid
     category = screen.content.getChild(rowFocused)
     if category <> invalid
       gridItemType = category.gridItemType
@@ -123,7 +140,7 @@ Function updateVideoTileOnFocusChange(rowFocused, columnFocused, screen) as Void
   if gridItemType = m.constants.ui.gridItemTypes.skinAd return
 
   ' Update background only on home screen
-  if isCurrentScreenHomeScreen() = true
+  if isVideoTileEnabledScreen() = true
     updateVideoTileScreenBackground(contentFocused, screen)
   end if
 
@@ -189,7 +206,7 @@ Function startDebouncedVideoPreview() as Void
   m.queuedVideoTilePreview = false
   screen = getCurrentScreen()
 
-  if isCurrentScreenHomeScreen() = false
+  if isVideoTileEnabledScreen() = false
     return
   end if
 
@@ -350,7 +367,7 @@ End Function
 Function playLinearInlineGridView(content, screen) as Void
   screen = getCurrentScreen()
 
-  if isCurrentScreenHomeScreen() = false
+  if isVideoTileEnabledScreen() = false
     return
   end if
 
@@ -376,20 +393,18 @@ Function updateInlineVideoMetadataOverlayVisibility(duration = 0) as Void
     return
   end if
 
-  isHomeScreen = (screen.id = m.constants.ui.screenIds.homeScreen AND screen.content <> invalid AND isKidsUIOn() = false)
-  m.videoTileOverlayGroup.visible = isHomeScreen
+  isVideoTileEnabled = isVideoTileEnabledScreen() AND screen.content <> invalid
+  m.videoTileOverlayGroup.visible = isVideoTileEnabled
 
   ' Handle video tiles experiment visibility
-  if m.isUserInVideoTilesExperiment = false OR isKidsUIOn() = true
-    m.inlineVideoPreviewPlayerContainer.opacity = 0
-  else if isHomeScreen = true AND screen.content <> invalid
+  if isVideoTileEnabled = true AND screen.content <> invalid
     handleHomeScreenOverlayVisibility(screen)
   else
     handleNonHomeScreenOverlayVisibility(screen, duration)
   end if
 
-  ' Hide auto-start timer when not on home screen
-  if isHomeScreen = false
+  ' Hide auto-start timer when video tiles are not enabled
+  if isVideoTileEnabled = false
     fade(m.autoStartPreviewToPlaybackTimer, "out", 0.3)
   end if
 End Function
@@ -527,6 +542,33 @@ Function isVideoTileEnabledContainer(gridItemType) as Boolean
 End Function
 
 
+' Determines if video tiles should be enabled for the current screen
+' @return Boolean - true if video tiles should be enabled, false otherwise
+Function isVideoTileEnabledScreen(screenId = "" as String) as Boolean
+  ' If no screenId provided, get from current screen
+  if screenId = ""
+    currentScreen = getCurrentScreen()
+    if currentScreen = invalid then return false
+    screenId = currentScreen.id
+  end if
+
+  isInKidsMode = isKidsUIOn()
+
+  ' Always enable video tiles on homeScreen in standard mode (not kids mode)
+  if screenId = m.constants.ui.screenIds.homeScreen AND isInKidsMode = false
+    return true
+  end if
+
+  ' For all eligible screens (home, tv, movies, espanol, my stuff), enable based on experiment
+  ' Note: This includes homeScreen in kids mode
+  if m.constants.ui.videoTilesEligibleScreenIds[screenId] = true
+    return m.isUserInVideoTilesExperiment
+  end if
+
+  return false
+End Function
+
+
 ' Updates screen background based on focused video tile content
 ' Shows full screen background for live events or ad content
 ' Falls back to default background for home screen
@@ -534,12 +576,12 @@ End Function
 ' @param content roSGNode - The focused content node
 ' @param screen roSGNode - The screen node
 Function updateVideoTileScreenBackground(content, screen) as Void
-  isVideoTileEnabledScreen = isKidsUIOn() = false AND screen.id = m.constants.ui.screenIds.homeScreen
-  shouldShowVideoBackground = isNode(content) = true AND (shouldDisplayFullScreenVideoBackground(content) OR arrayIncludes(m.constants.ui.adGridItemTypes, content.gridItemType) OR isVideoTileEnabledScreen = false)
+  isVideoTileEnabled = isVideoTileEnabledScreen()
+  shouldShowVideoBackground = isNode(content) = true AND (shouldDisplayFullScreenVideoBackground(content) OR arrayIncludes(m.constants.ui.adGridItemTypes, content.gridItemType) OR isVideoTileEnabled = false)
 
   if shouldShowVideoBackground = true
     setVideoContentScreenBackground(screen, content)
-  else if screen.id = m.constants.ui.screenIds.homeScreen
+  else if isVideoTileEnabled = true
     displayDefaultBackground()
   end if
 End Function

@@ -469,6 +469,7 @@ Function onStatsigInitializationError(errorResponse)
     end if
 
     m.global.statsigExperimentsInfo = statsigExperimentsInfo
+    m.updateGeneralTaskStatSigExperiments(statsigExperimentsInfo)
   end if
 
   m.performanceMetricsTracker.endAppLaunchMetricTiming("statsig_initialization_request")

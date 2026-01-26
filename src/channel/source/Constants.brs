@@ -1456,6 +1456,14 @@ Function getConstants()
   constants.ui.cacheableScreenIds[constants.ui.screenIds.signInScreen] = true
   constants.ui.cacheableScreenIds[constants.ui.screenIds.epgScreen] = true
 
+  ' Screens eligible for video tiles experiment
+  constants.ui.videoTilesEligibleScreenIds = {}
+  constants.ui.videoTilesEligibleScreenIds[constants.ui.screenIds.homeScreen] = true
+  constants.ui.videoTilesEligibleScreenIds[constants.ui.screenIds.tvScreen] = true
+  constants.ui.videoTilesEligibleScreenIds[constants.ui.screenIds.movieScreen] = true
+  constants.ui.videoTilesEligibleScreenIds[constants.ui.screenIds.espanolScreen] = true
+  constants.ui.videoTilesEligibleScreenIds[constants.ui.screenIds.myStuffScreen] = true
+
   ' top level content ids for parent content nodes that don't have a content id from the backend
   constants.ui.contentIds = {}
   constants.ui.contentIds.homegrid = "homegrid"
@@ -1682,7 +1690,7 @@ Function getConstants()
   ' We will include ads containers in this list in future.
   constants.ui.noHeaderGridTypes = [constants.ui.gridItemTypes.liveEventSpotlight, constants.ui.gridItemTypes.liveEventBanner]
   constants.ui.liveEventsGridTypes = [constants.ui.gridItemTypes.liveEventSpotlight, constants.ui.gridItemTypes.liveEventBanner]
-  constants.ui.nonVideoTileGridItemTypes = [constants.ui.gridItemTypes.historySignedOutUser, constants.ui.gridItemTypes.liveEventSpotlight, constants.ui.gridItemTypes.liveEventBanner, constants.ui.gridItemTypes.adRowlistCarousel, constants.ui.gridItemTypes.adRowlistSpotlight]
+  constants.ui.nonVideoTileGridItemTypes = [constants.ui.gridItemTypes.historySignedOutUser, constants.ui.gridItemTypes.liveEventSpotlight, constants.ui.gridItemTypes.liveEventBanner, constants.ui.gridItemTypes.adRowlistCarousel, constants.ui.gridItemTypes.adRowlistSpotlight, constants.ui.gridItemTypes.emptyContainer]
   constants.ui.fullScreenVideoPlayerGridItemTypes = [constants.ui.gridItemTypes.skinAd, constants.ui.gridItemTypes.liveEventSpotlight]
   constants.ui.noInfoPanelGridItemTypes = [constants.ui.gridItemTypes.liveEventSpotlight, constants.ui.gridItemTypes.skinAd, constants.ui.gridItemTypes.adRowlistSpotlight]
   constants.ui.adGridItemTypes = [constants.ui.gridItemTypes.adRowlistCarousel, constants.ui.gridItemTypes.skinAd, constants.ui.gridItemTypes.adRowlistSpotlight]

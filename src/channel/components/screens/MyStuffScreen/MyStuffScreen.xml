@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<component name="MyStuffScreen" extends="BaseScreen">
+<?xml version="1.0" encoding="utf-8"?>
+<component name="MyStuffScreen" extends="VideoTilesScreen">
 
   <script type="text/brightscript" uri="MyStuffScreen.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/CacheValidationMixin.brs" />
@@ -14,68 +14,70 @@
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/ContentMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/UserMixin.brs" />
 
   <interface>
     <!-- INPUTS -->
 
-      <!-- When the Helper receives valid category data from the server, it sets the new value to this field. -->
-      <field id="content" type="node"/>
+    <!-- When the Helper receives valid category data from the server, it sets the new value to this
+    field. -->
+    <field id="content" type="node" />
 
-      <!-- contentUpdated should be set when the new content is ready to be displayed on the screen. -->
-      <field id="contentUpdated" type="boolean" alwaysNotify="true"/>
+    <!-- contentUpdated should be set when the new content is ready to be displayed on the screen. -->
+    <field id="contentUpdated" type="boolean" alwaysNotify="true" />
 
-      <!-- removes any existing content on the RowList! -->
-      <field id="isLoading" type="boolean" />
+    <!-- removes any existing content on the RowList! -->
+    <field id="isLoading" type="boolean" />
 
-      <!-- set to true if the user is signed in and we want to change the experience based on that. -->
-      <field id="signedIn" type="boolean" value="true"/>
+    <!-- set to true if the user is signed in and we want to change the experience based on that. -->
+    <field id="signedIn" type="boolean" value="true" />
 
-      <!-- Indicated whether to play/pause/stop video preview -->
-      <field id="isVideoPreviewOn" type="boolean" value="true" />
+    <!-- Indicated whether to play/pause/stop video preview -->
+    <field id="isVideoPreviewOn" type="boolean" value="true" />
 
-      <!-- If the screen is not enabled, then user should not be able to select anything -->
-      <field id="enabled" type="boolean" alwaysNotify="true"/>
+    <!-- If the screen is not enabled, then user should not be able to select anything -->
+    <field id="enabled" type="boolean" alwaysNotify="true" />
 
-      <!-- An associative array containing 2 params (id, index) detailing where the focus indicator should jump to.
-          The ID param is a string of the content ID that should be focused on - IF it exists in the current rowList content.
-          The index is a 2-element array containing the row and column numbers where the rowList shluld focus on. -->
-      <field id="jumpToRowItemByIdAndIndex" type="assocarray" alwaysNotify="true"/>
+    <!-- An associative array containing 2 params (id, index) detailing where the focus indicator
+    should jump to.
+          The ID param is a string of the content ID that should be focused on - IF it exists in the current
+    rowList content.
+          The index is a 2-element array containing the row and column numbers where the rowList shluld focus
+    on. -->
+    <field id="jumpToRowItemByIdAndIndex" type="assocarray" alwaysNotify="true" />
 
     <!-- OUTPUTS -->
-      <!-- set to the contentNode of the RowList item which was clicked on -->
-      <field id="contentSelected" type="node"/>
+    <!-- set to the contentNode of the RowList item which was clicked on -->
+    <field id="contentSelected" type="node" />
 
-      <!-- set to the contentNode of the RowList item which was focused on -->
-      <field id="contentFocused" type="node"/>
+    <!-- set to the contentNode of the RowList item which was focused on -->
+    <field id="contentFocused" type="node" />
 
-      <!-- set to the contentNode of the RowList item which was focused when
+    <!-- set to the contentNode of the RowList item which was focused when
            the "play" input transport deeplink was triggered
       -->
-      <field id="contentToPlay" type="node"/>
+    <field id="contentToPlay" type="node" />
 
-      <!-- content on the mystuffScreen is loaded and spinner can be turned off -->
-      <field id="contentReady" type="boolean" value="false" alwaysNotify="true" />
+    <!-- content on the mystuffScreen is loaded and spinner can be turned off -->
+    <field id="contentReady" type="boolean" value="false" alwaysNotify="true" />
 
-      <!-- Holds a load time start value [returned from UpTime()] that can be used to determine how long the page took to load. -->
-      <field id="trackingLoadStartTime" type="integer" />
+    <!-- Holds a load time start value [returned from UpTime()] that can be used to determine how
+    long the page took to load. -->
+    <field id="trackingLoadStartTime" type="integer" />
 
-      <!-- A 2-element array where the focus indicator is located in the screen's rowList -->
-      <field id="cursorPosition" type="Array" />
+    <!-- A 2-element array where the focus indicator is located in the screen's rowList -->
+    <field id="cursorPosition" type="Array" />
 
-      <!-- set to true when the user wants to sign-up -->
-      <field id="signUpButtonSelected" type="boolean" alwaysNotify="true" />
+    <!-- set to true when the user wants to sign-up -->
+    <field id="signUpButtonSelected" type="boolean" alwaysNotify="true" />
 
-      <!-- set to true when the user wants to go to the home screen -->
-      <field id="homeButtonSelected" type="boolean" alwaysNotify="true" />
+    <!-- set to true when the user wants to go to the home screen -->
+    <field id="homeButtonSelected" type="boolean" alwaysNotify="true" />
 
-      <!-- tells ContentController/Helpers that the content metadata is
+    <!-- tells ContentController/Helpers that the content metadata is
             out of the cache window and should be updated -->
-      <field id="refreshContent" type="boolean" alwaysNotify="true" />
-
-      <!-- Communicates to the parent that the video preview should be paused -->
-      <field id="pauseVideoPreview" type="boolean" alwaysNotify="true"/>
+    <field id="refreshContent" type="boolean" alwaysNotify="true" />
   </interface>
 
   <children>
@@ -93,7 +95,7 @@
           horizAlign="center"
           vertAlign="bottom">
           <Font
-            role="font"/>
+            role="font" />
         </Label>
         <Label
           id="SignedOutUISubtitle"
@@ -102,7 +104,7 @@
           horizAlign="center"
           vertAlign="bottom">
           <Font
-            role="font"/>
+            role="font" />
         </Label>
         <Label
           id="SignedOutUIBlurb"
@@ -111,7 +113,7 @@
           horizAlign="center"
           vertAlign="bottom">
           <Font
-            role="font"/>
+            role="font" />
         </Label>
         <MarkupGrid
           id="GuestMenu"
@@ -127,7 +129,7 @@
             role="content">
             <DetailMenuItemContentNode
               id="SignInOutButton"
-              align="center"/>
+              align="center" />
           </ContentNode>
         </MarkupGrid>
       </LayoutGroup>
@@ -145,7 +147,7 @@
           horizAlign="center"
           vertAlign="bottom">
           <Font
-            role="font"/>
+            role="font" />
         </Label>
         <Label
           id="AllEmptyUISubtitle"
@@ -154,7 +156,7 @@
           horizAlign="center"
           vertAlign="bottom">
           <Font
-            role="font"/>
+            role="font" />
         </Label>
         <Label
           id="AllEmptyUISubtitle2"
@@ -162,7 +164,7 @@
           horizAlign="center"
           vertAlign="bottom">
           <Font
-            role="font"/>
+            role="font" />
         </Label>
         <MarkupGrid
           id="AllEmptyUIMenu"
@@ -178,7 +180,7 @@
             role="content">
             <DetailMenuItemContentNode
               id="AllEmptyUIButton"
-              align="center"/>
+              align="center" />
           </ContentNode>
         </MarkupGrid>
       </LayoutGroup>
@@ -188,7 +190,7 @@
         translation="[0,105]"
         visible="false"
         maxHeight="387"
-        maxTitleLines="2"/>
+        maxTitleLines="2" />
       <MaskGroup
         id="ContentArea"
         maskUri="pkg:/images/poster-mask.png"
@@ -206,7 +208,7 @@
           showRowCounter="[false]"
           fadeFocusFeedbackWhenAutoScrolling="true"
           rowFocusAnimationStyle="floatingFocus"
-          vertFocusAnimationStyle="fixedFocus"/>
+          vertFocusAnimationStyle="fixedFocus" />
       </MaskGroup>
     </Group>
   </children>

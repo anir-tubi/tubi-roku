@@ -528,28 +528,13 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
     params["utm_campaign_config"] = utmCampaignConfig
   end if
 
-  tileDesignType = "none"
-  if m.statSigExperiments <> invalid AND bKidsMode = false
-    experiment = m.statSigExperiments.getExperimentResource("roku_video_tiles", "roku_video_tiles_1_7")
-    tileDesignType = experiment.design_type
-  end if
-
-  if imageParamTypes = invalid AND tileDesignType = "videoTiles"
-    imageParamTypes = [
-      "poster"
-      "landscape"
-      "background"
-      "featured"
-      "title"
-    ]
-  else if imageParamTypes = invalid
-    imageParamTypes = [
-      "poster"
-      "landscape"
-      "background"
-      "title"
-    ]
-  end if
+  imageParamTypes = [
+    "poster"
+    "landscape"
+    "background"
+    "featured"
+    "title"
+  ]
 
   params = m.setImageParams(imageParamTypes, params, screenId, containerGridItemType)
 

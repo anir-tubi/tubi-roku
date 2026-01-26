@@ -38,11 +38,6 @@ Function init()
   m.title.lineSpacing = 0
 
   m.titleAnimation = invalid
-
-  experimentInfo = getStatsigExperimentResource("roku_video_tiles", "roku_video_tiles_1_7", false)
-  if isAA(experimentInfo) = true
-    m.variant = experimentInfo.variant
-  end if
 End Function
 
 
