@@ -27,13 +27,13 @@
       uri="pkg:/images/pill_button_$$RES$$.9.png"
       translation="[0,0]"
       width="652"
-      height="68" />
+      height="60" />
 
     <FilledButtonMarkupGrid
       id="tabsList"
       numColumns="2"
       numRows="1"
-      itemSize="[326,68]"
+      itemSize="[326,60]"
       itemSpacing="[0,0]"
       itemComponentName="tabButton"
       horizFocusAnimationStyle="floatingFocus"

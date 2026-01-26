@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<component name="NameInputScreen" extends="EmailInputScreen">
+<!--
+ - NameInputScreen
+ -->
+<component name="NameInputScreen" extends="BaseScreen">
 
   <script type="text/brightscript" uri="NameInputScreen.brs" />
+  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/UserMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/FocusMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
 
   <interface>
 
@@ -11,22 +19,85 @@
     <field id="accountTypeSelected" type="string" />
     <field id="hasPin" type="boolean" />
     <field id="parentProfileId" type="string" />
-
+    <field id="email" type="string" />
 
     <!-- OUTPUT -->
     <field id="name" type="string" />
+    <field id="continueSelected" type="boolean" alwaysNotify="true" />
+    <field id="backButtonSelected" type="integer" alias="back.selected" />
 
   </interface>
 
   <children>
-    <Label
-      id="SubHeading"
-      translation="[500, 140]"
-      horizAlign="center"
-      vertAlign="center"
-      width="920">
-      <Font
-        role="font" />
-    </Label>
+
+    <Poster
+      id="backButtonPoster"
+      uri="pkg:/images/back_button.png"
+      translation="[126,60]"
+      width="170"
+      height="72" />
+    <LayoutGroup
+      id="nameLayout"
+      translation="[0, 168]"
+      layoutDirection="vert"
+      vertAlignment="custom"
+      horizAlignment="custom"
+      itemSpacings="[30, 10]">
+      <Label
+        id="pageHeading"
+        horizAlign="center"
+        width="1920">
+        <Font
+          role="font" />
+      </Label>
+
+      <Label
+        id="subHeading"
+        translation="[500, 0]"
+        horizAlign="center"
+        vertAlign="center"
+        width="920">
+        <Font
+          role="font" />
+      </Label>
+
+      <Group
+        translation="[645,0]">
+        <TextEditBox
+          id="nameTextEditBox"
+          width="630"
+          height="84" />
+      </Group>
+
+    </LayoutGroup>
+
+    <LayoutGroup
+      layoutDirection="vert"
+      horizAlignment="custom"
+      vertAlignment="custom"
+      translation="[250, 375]"
+      itemSpacings="[20]">
+
+      <DynamicKeyboard
+        id="Keyboard"
+        domain="alphanumeric" />
+
+      <ButtonGroup
+        id="buttonGroup"
+        layoutDirection="horiz"
+        itemSpacings="[39]"
+        translation="[2,0]">
+
+        <SimpleButton
+          id="back"
+          width="177" />
+
+        <SimpleButton
+          id="continue"
+          width="1149" />
+
+      </ButtonGroup>
+    </LayoutGroup>
+
   </children>
 </component>

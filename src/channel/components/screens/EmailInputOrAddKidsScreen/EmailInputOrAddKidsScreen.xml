@@ -124,7 +124,7 @@
         horizAlignment="center"
         vertAlignment="center"
         layoutDirection="vert"
-        translation="[1040, 261]"
+        translation="[1040, 120]"
         itemSpacings="[145, 10]">
 
         <MarkupGrid
@@ -142,24 +142,25 @@
           itemComponentName="ProfileMenuItem" />
 
 
-        <Label
-          id="bottomTextHeader"
-          width="1920"
-          horizAlign="center">
-          <Font
-            role="font" />
-        </Label>
-
-
-        <Label
-          id="bottomText"
-          width="1920"
-          horizAlign="center">
-          <Font
-            role="font" />
-        </Label>
       </LayoutGroup>
+      <Label
+        id="bottomTextHeader"
+        translation="[0, 469]"
+        width="1920"
+        horizAlign="center">
+        <Font
+          role="font" />
+      </Label>
 
+
+      <Label
+        id="bottomText"
+        translation="[0, 509]"
+        width="1920"
+        horizAlign="center">
+        <Font
+          role="font" />
+      </Label>
     </Group>
 
   </children>

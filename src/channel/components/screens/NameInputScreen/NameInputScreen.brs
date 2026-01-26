@@ -1,22 +1,44 @@
-Function Init()
+Function init()
+  m.constants = getConstantsFromGlobal()
 
   m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
-  m.top.unobserveFieldScoped("isEmailValid")
   m.top.observeFieldScoped("accountTypeSelected", "onAccountTypeSelected")
 
-  m.pageHeading = m.top.findNode("PageHeading")
-  m.subHeading = m.top.findNode("SubHeading")
-  typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.subHeading, typographyConstants.ids.bodyLargeStrong)
-  m.subHeading.color = m.subHeaderColor
+  m.pageHeading = m.top.findNode("pageHeading")
+  m.subHeading = m.top.findNode("subHeading")
 
-  m.keyboard.domain = "name"
+  m.nameTextEditBox = m.top.findNode("nameTextEditBox")
+  m.nameTextEditBox.maxTextLength = 100
 
 
-  m.privacyDisclaimer.text = ""
+  m.keyboard = m.top.findNode("Keyboard")
+  m.keyboard.textEditBox.opacity = 0.00001
+  m.keyboard.textEditBox.maxTextLength = 100
+  m.keyboard.domain = "alphanumeric"
 
-  setNameScreenHeading()
+  'This will save the last focused key of the keyboard used to enable the roku default audioguide after screen components read.
+  m.keyFocused = ""
 
+  'This will disable the default roku screen reader for customKeyboard to read screen heading which are not read by roku default screen reader.
+  m.keyboard.muteAudioGuide = true
+  m.keyboard.observeFieldScoped("keyGrid", "onKeyGridChange")
+
+  m.keyboard.palette = handleKeyboardColors()
+
+  m.back = m.top.findNode("back")
+  m.back.text = getTranslation("linearVideoPlayer_buttonBack")
+
+  m.continue = m.top.findNode("continue")
+  m.continue.text = getTranslation("dialog_button_continue")
+  m.continue.observeFieldScoped("selected", "onContinueButtonSelected")
+
+  m.keyboard.textEditBox.observeFieldScoped("focusedChild", "onKeyboardTextEditBoxFocusedChildChange")
+
+  m.keyboard.textEditBox.observeFieldScoped("cursorPosition", "onKeyboardTextEditBoxCursorPositionChange")
+
+  m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
+
+  'set initial tracking values
   m.top.trackingPageInfo = {
     pageType: "register_page"
     pageValues: {
@@ -24,11 +46,114 @@ Function Init()
     }
   }
 
+  m.top.isStackable = true
+  m.top.screenLevel = m.constants.ui.screenLevels.emailInputScreen
+
+  m.backgroundUriList = []
+
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.pageHeading, typographyConstants.ids.headerLarge)
+  setTypographyOfLabel(m.subHeading, typographyConstants.ids.bodyLargeStrong)
+
+  setNameScreenHeading()
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
 End Function
 
-' onFirstNameChanged callback triggers when user changes the first name input
-Function onContinueButtonSelected(evt)
 
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+
+  if theme <> invalid
+    m.back.color = theme.backgroundColorLight
+    m.continue.color = theme.backgroundColorLight
+    m.pageHeading.color = theme.primaryTextColor
+    m.subHeading.color = theme.secondaryTextColor
+
+    paletteColors = m.keyboard.palette.colors
+    paletteColors.FocusItemColor = theme.focusedTextColor
+    paletteColors.FocusColor = theme.focusedColor
+    m.keyboard.palette.colors = paletteColors
+  end if
+End Function
+
+
+Function onScreenFocusChange()
+  tubiLog("NameInputScreen.onScreenFocusChange")
+  if m.top.hasFocus() then
+    m.nameTextEditBox.active = true
+    m.keyboard.unobserveFieldScoped("text")
+    m.keyboard.observeFieldScoped("text", "onKeyboardTextChanged")
+
+    ' force a background update
+    m.top.backgroundUriList = m.backgroundUriList
+
+    m.Keyboard.textEditBox.voiceEnabled = true
+    m.keyboard.keyGrid.setFocus(true)
+  end if
+
+  if m.top.isInFocusChain() = false
+    m.nameTextEditBox.active = false
+    m.keyboard.unobserveFieldScoped("text")
+    m.Keyboard.textEditBox.voiceEnabled = false
+  end if
+End Function
+
+
+'This function is to read the first focused keys in the keyboard as we disable the default screen reader for keyboard initially
+'to read the screen components and later we enable roku default screen reader for keyboard.
+'NOTE: hardcoded values are to match the default keyboard.
+Function onKeyGridChange(msg)
+  keyGrid = msg.getData()
+  if isNonEmptyString(m.keyFocused) = true AND m.keyboard.muteAudioGuide = true
+
+    if keyGrid.keyFocused = "a"
+      audioGuideText = keyGrid.keyFocused + " " + "alpha"
+    else
+      audioGuideText = keyGrid.keyFocused + " " + m.constants.audioGuideHints.buttonHint
+    end if
+
+    readAudioGuideText(audioGuideText, false)
+
+    'This is to read the screen text and suspend the kepboard default audio guide until focus moved to next key.
+    if m.keyFocused <> keyGrid.keyFocused
+      m.keyboard.muteAudioGuide = false
+      m.keyboard.unObserveFieldScoped("keyGrid")
+    end if
+  end if
+
+  m.keyFocused = keyGrid.keyFocused
+End Function
+
+
+Function onKeyboardTextEditBoxFocusedChildChange()
+  tubiLog("NameInputScreen.onKeyboardTextEditBoxFocusedChildChange")
+  ' Don't allow textEditBox to take focus since we're not showing it
+  if m.keyboard.textEditBox.hasFocus()
+    m.keyboard.keyGrid.setFocus(true)
+  end if
+End Function
+
+
+Function onKeyboardTextEditBoxCursorPositionChange(msg)
+  m.nameTextEditBox.cursorPosition = msg.getData()
+End Function
+
+
+Function onKeyboardTextChanged()
+  m.nameTextEditBox.text = m.keyboard.text
+End Function
+
+
+' onContinueButtonSelected callback triggers when user selects continue button
+Function onContinueButtonSelected(evt)
   isButtonSelected = evt.getData()
 
   if isButtonSelected = true
@@ -37,7 +162,7 @@ Function onContinueButtonSelected(evt)
     ' on the SignInScreen, which prevents voiceEnabled is getting to true
     ' on the SignInScreen.
     m.keyboard.textEditBox.voiceEnabled = false
-    firstName = m.emailTextEditBox.text
+    firstName = m.nameTextEditBox.text
     m.top.name = firstName
     signInInfo = {}
 
@@ -46,11 +171,9 @@ Function onContinueButtonSelected(evt)
       signInInfo["hasPin"] = m.top.hasPin
       signInInfo["parentProfileId"] = m.top.parentProfileId
     else
-
       signInInfo["email"] = m.top.email
       signInInfo["firstName"] = firstName
       signInInfo["lastName"] = ""
-
     end if
     m.top.signInInfo = signInInfo
     m.top.continueSelected = true
@@ -65,7 +188,6 @@ End Function
 
 
 Function setNameScreenHeading(accountType = "adults")
-
   if accountType = "kids"
     m.pageHeading.text = getTranslation("name_screen_heading_kids")
     m.subHeading.text = getTranslation("name_screen_subheading_kids")
@@ -73,5 +195,46 @@ Function setNameScreenHeading(accountType = "adults")
     m.pageHeading.text = getTranslation("name_screen_heading")
     m.subHeading.text = ""
   end if
+  readAudioGuideText(m.pageHeading.text)
+End Function
 
+
+Function onKeyEvent(key as String, press as Boolean) as Boolean
+  handled = true
+  if press = false then
+    return false
+  else
+    if key = "OK"
+      m.nameTextEditBox.text = m.keyboard.text
+    else if key = "back"
+      m.top.backButtonSelected = true
+
+    else if key = "down"
+      if m.keyboard.isInFocusChain() = true
+        m.continue.setFocus(true)
+        readAudioGuideText(m.continue.text)
+      end if
+
+    else if key = "up"
+      if m.continue.hasFocus() = true
+        m.keyboard.setFocus(true)
+      else if m.back.hasFocus() = true
+        m.keyboard.setFocus(true)
+      end if
+
+    else if key = "right"
+      if m.back.hasFocus() = true
+        m.continue.setFocus(true)
+        readAudioGuideText(m.continue.text)
+      end if
+
+    else if key = "left"
+      if m.continue.hasFocus() = true
+        m.back.setFocus(true)
+        readAudioGuideText(m.back.text)
+      end if
+
+    end if
+    return handled
+  end if
 End Function

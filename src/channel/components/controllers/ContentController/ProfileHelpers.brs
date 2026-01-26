@@ -146,22 +146,25 @@ End Function
 Function handleProfileSelectionViaGate(profileSelected)
   authInfo = m.tubiAuthUpdate.getAuthInfo()
   profileAuthInfo = m.tubiAuthUpdate.getProfileAuthInfo(profileSelected)
-  userSwitchAction = getUserSwitchAction(authInfo, profileAuthInfo)
-  if userSwitchAction = "passwordGate"
-    showPasswordValidateScreen(authInfo, profileAuthInfo, onPasswordValidateSubmitted)
-  else if userSwitchAction = "pinGate"
-    processKidsPinGate(authInfo, profileAuthInfo)
-  else if userSwitchAction = "ageGate" AND needsToShowAgeVerificationScreen() = true
-    showAgeVerificationScreenAtKidsModeExit(m.uiMode)
-  else if userSwitchAction = "signInPasswordGate"
-    showPasswordValidateScreen(authInfo, profileAuthInfo, onEmailPasswordValidateSubmitted)
-  else if userSwitchAction = "NotAllowed"
-    'do nothing here
-  else
-    if profileSelected = "guest"
-      handleGuestProfileSelection()
+  if authInfo.tubiId <> profileAuthInfo.tubiId
+
+    userSwitchAction = getUserSwitchAction(authInfo, profileAuthInfo)
+    if userSwitchAction = "passwordGate"
+      showPasswordValidateScreen(authInfo, profileAuthInfo, onPasswordValidateSubmitted)
+    else if userSwitchAction = "pinGate"
+      processKidsPinGate(authInfo, profileAuthInfo)
+    else if userSwitchAction = "ageGate" AND needsToShowAgeVerificationScreen() = true
+      showAgeVerificationScreenAtKidsModeExit(m.uiMode)
+    else if userSwitchAction = "signInPasswordGate"
+      showPasswordValidateScreen(authInfo, profileAuthInfo, onEmailPasswordValidateSubmitted)
+    else if userSwitchAction = "NotAllowed"
+      'do nothing here
     else
-      handleRegularProfileSelection(profileSelected)
+      if profileSelected = "guest"
+        handleGuestProfileSelection()
+      else
+        handleRegularProfileSelection(profileSelected)
+      end if
     end if
   end if
 End Function

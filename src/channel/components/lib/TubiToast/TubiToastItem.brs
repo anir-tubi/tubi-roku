@@ -56,12 +56,6 @@ Function onShow(_msg)
     m.infoPaneContainer.removeChild(m.leftImage)
     m.leftImage.uri = ""
     m.leftImage = invalid
-
-    if m.leftImageInitial <> invalid
-      m.infoPaneContainer.removeChild(m.leftImageInitial)
-      m.leftImageInitial.text = ""
-      m.leftImageInitial = invalid
-    end if
   end if
 
   'header
@@ -203,15 +197,20 @@ Function updateLeftImageWithInitial(inputArgs)
   if m.leftImage <> invalid
     if m.leftImageInitial = invalid
       m.leftImageInitial = createObject("roSGNode", "Label")
+      m.leftImageInitial.id = "leftImageInitial"
 
       typographyConstants = getTypographyConstants()
       setTypographyOfLabel(m.leftImageInitial, typographyConstants.ids.headerSmall)
       m.leftImageInitial.text = inputArgs.profileInitial
-      width = m.leftImageInitial.boundingRect().width
-      transX = ((m.leftImage.width - width) / 2) + width
+      size = m.leftImageInitial.boundingRect()
+      width = size.width
+      height = size.height
 
-      m.infoPaneContainer.itemSpacings = [-transX, 24] ' negative value to move the initial to the left
-      m.infoPaneContainer.insertChild(m.leftImageInitial, 1)
+      transX = ((m.leftImage.width - width) / 2)
+      transY = ((m.leftImage.height - height) / 2)
+
+      m.leftImage.appendChild(m.leftImageInitial)
+      m.leftImageInitial.translation = [transX, transY]
     else
 
       m.leftImageInitial.text = inputArgs.profileInitial

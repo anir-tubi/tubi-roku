@@ -49,6 +49,8 @@ Function init()
 
   m.backgroundUriList = []
 
+  m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
+
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.header, typographyConstants.ids.headerLarge)
   setTypographyOfLabel(m.topHeader, typographyConstants.ids.bodyLargeStrong)

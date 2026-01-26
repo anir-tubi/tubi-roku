@@ -688,10 +688,12 @@ End Function
 Function onMenuItemSelected()
   buttonContent = m.SettingsMenuPanel.content.getChild(m.SettingsMenuPanel.itemSelected)
   if buttonContent.id = "SignInOutButton"
-    if isSignedIn() = true
-      m.top.signOutSelected = true
-    else
-      m.top.signInSelected = true
+    if m.top.isUserInMultiAccount = false
+      if isSignedIn() = true
+        m.top.signOutSelected = true
+      else
+        m.top.signInSelected = true
+      end if
     end if
   else if buttonContent.id = "ExitButton"
     m.top.showExitModal = true
