@@ -493,7 +493,7 @@ Function onHomesceenAdDisplaySuccessResponse(response)
         '// based on the associated experiment's values.
         if adResponse <> invalid
           if adResponse.type = m.constants.ui.contentTypes.skinAd
-            if getStatsigExperimentResource("ads_homegrid_layer", "ads_hdc_all_holdback_v2", true).enabled = true
+            if getStatsigExperimentResource("ads_homegrid_layer", "ads_hdc_all_holdback_v3", true).enabled = true
               skinAdsWrapper = adResponse
 
               ' Do not display video tile overlay group if the skin ads is available.
@@ -501,7 +501,7 @@ Function onHomesceenAdDisplaySuccessResponse(response)
               m.videoTileOverlayGroup.visible = false
             end if
           else if adResponse.type = m.constants.ui.contentTypes.adRowlistCarousel OR adResponse.type = m.constants.ui.contentTypes.adRowlistSpotlight
-            if getStatsigExperimentResource("ads_homegrid_layer", "ads_hdc_all_holdback_v2", true).enabled = true
+            if getStatsigExperimentResource("ads_homegrid_layer", "ads_hdc_all_holdback_v3", true).enabled = true
               aParsedResponseAfterExperimentCheck.push(adResponse)
             end if
           end if
