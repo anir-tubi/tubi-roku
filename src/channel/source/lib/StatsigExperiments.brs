@@ -45,6 +45,10 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         roku_player_subtitle_overlay_v1: {
           default: { "enabled": false }
         }
+        ' Testing the new player ui with old loader, Possible values are none, variant1
+        roku_player_control_ui_refresh_v4: {
+          default: { "type": "none" }
+        }
       }
 
       roku_postplay_countdown_timer: {

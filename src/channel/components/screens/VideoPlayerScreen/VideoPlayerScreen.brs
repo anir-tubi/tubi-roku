@@ -635,7 +635,7 @@ Function initExperiments()
   end if
 
   ' Player control UI experiment
-  m.playerControlExperimentType = getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v3", false).type
+  m.playerControlExperimentType = getStatsigExperimentResource("roku_player_improvement", "roku_player_control_ui_refresh_v4", false).type
 
   ' Network error retry experiment
   m.isRetryExperimentEnabled = getStatsigExperimentResource("roku_player_improvement", "roku_player_retry_network_errors_v1", false).enabled

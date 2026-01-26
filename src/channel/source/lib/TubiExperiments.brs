@@ -64,15 +64,6 @@ Function TubiExperiments(experimentsInfo) as Object
         }
       }
 
-      roku_player_ui_refresh: {
-        'Possible values are none, variant1
-        roku_player_control_ui_refresh_v3: {
-          default: { "type": "none" }
-          holdout_control: { "type": "none" }
-          holdout_winning: { "type": "none" }
-        }
-      }
-
       'This experiment will not be under holdout and will clean up once we take the decision.
       roku_home_screen_redesign: {
         roku_home_screen_redesign_v_1_5_restart: {

@@ -1617,7 +1617,7 @@ Function showTransport()
   end if
 
   'Firing the exposure event when transport UI is displayed.
-  getExperimentResource("roku_player_ui_refresh", "roku_player_control_ui_refresh_v3")
+  getStatsigExperimentResource("roku_player_improvement", "roku_player_control_ui_refresh_v4")
 
   creditCuePoints = getCreditCuepointsFromContent(m.top.content)
 
