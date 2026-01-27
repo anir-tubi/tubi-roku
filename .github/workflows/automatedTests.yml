@@ -69,10 +69,54 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
+  # Job to determine the target branches to run the tests against
+  set-target-branches:
+    runs-on: ubuntu-latest
+    outputs:
+      branches: ${{ steps.set-matrix.outputs.branches }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Build matrix of target branches
+        id: set-matrix
+        run: |
+          # For manual workflow_dispatch, use the selected branch
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            SELECTED_BRANCH="${{ github.ref_name }}"
+            echo "Manual dispatch detected, using selected branch: $SELECTED_BRANCH"
+            echo 'branches=["'$SELECTED_BRANCH'"]' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # For scheduled runs, find latest QA branch and build matrix with master
+          # Fetch all remote branches
+          git fetch --all
+          
+          # Find all QA branches matching pattern qa_*_*_* (e.g., qa_3_8_36) and get the most recently updated one
+          # Pattern matches: qa_ followed by digits, underscore, digits, underscore, digits
+          LATEST_QA_BRANCH=$(git for-each-ref --sort=-committerdate refs/remotes/origin/qa_* --format='%(refname:short)' | sed 's|origin/||' | grep -E '^qa_[0-9]+_[0-9]+_[0-9]+$' | head -n 1)
+          
+          # Build matrix JSON - always include master
+          if [ -z "$LATEST_QA_BRANCH" ]; then
+            echo "No QA branch found matching pattern qa_*_*_*"
+            echo 'branches=["master"]' >> "$GITHUB_OUTPUT"
+          else
+            echo "Found latest QA branch: $LATEST_QA_BRANCH"
+            echo 'branches=["master","'$LATEST_QA_BRANCH'"]' >> "$GITHUB_OUTPUT"
+          fi
+
   build:
+    needs: set-target-branches
+    # Use matrix strategy to run against both master and latest QA branch
+    strategy:
+      fail-fast: false
+      matrix:
+        branch: ${{ fromJson(needs.set-target-branches.outputs.branches) }}
     # name helps to check the status of github action
-    name: Run Automated UI Tests
+    name: Run Automated UI Tests (${{ matrix.branch }})
     # The type of runner that the job will run
     runs-on: [self-hosted, enabled, roku, automation-regression]
     # timeouts after 4 hours
@@ -83,13 +127,15 @@ jobs:
       # print out passed in job params for reference
       - name: Job Params
         run: |
-          echo branch: "${{ github.ref_name }}"
+          echo branch: "${{ matrix.branch }}"
           echo tag: "${{ inputs.tag }}"
           echo customString: "${{ inputs.customString }}"
           echo bail: "${{ inputs.bail }}"
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ matrix.branch }}
 
       # npm command install all required packages
       - name: npm install
@@ -99,7 +145,7 @@ jobs:
       - name: gulp runAutomatedTests
         env:
           runId: ${{ github.run_id }}
-          branch: ${{ github.ref_name }}
+          branch: ${{ matrix.branch }}
           tag: ${{ inputs.tag || 'Run All Tests' }}
           customString: ${{ inputs.customString || '' }}
           bail: ${{ inputs.bail || false }}
@@ -110,28 +156,39 @@ jobs:
           sed -i -e "s/<DEVICE-PASSWORD>/$DEV_PASSWORD/g" ./rta-config.json
           npx gulp runAutomatedTests
 
+      - name: Sanitize branch name for artifact upload
+        id: sanitize-branch-name
+        if: success() || failure()
+        run: |
+          # Replace invalid characters with underscores
+          # Invalid chars: " : < > | * ? \r \n \ /
+          SANITIZED_BRANCH_NAME=$(echo "${{ matrix.branch }}" | sed 's/[":<>|*?\\\/]/_/g' | tr -d '\r\n')
+          echo "value=$SANITIZED_BRANCH_NAME" >> "$GITHUB_OUTPUT"
+
       - name: Upload JSON Report
         if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
-          name: JSON Report
+          name: JSON Report (${{ steps.sanitize-branch-name.outputs.value }})
           path: out/ui-tests-output/report.json
 
       - name: Upload HTML Report
         if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
-          name: HTML Report
+          name: HTML Report (${{ steps.sanitize-branch-name.outputs.value }})
           path: out/ui-tests-output/html
 
       - name: Upload Failed Test Screenshots
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: Failed Test Screenshots
+          name: Failed Test Screenshots (${{ steps.sanitize-branch-name.outputs.value }})
           path: out/ui-tests-output/screenshots
 
       - name: Send Slack Notification
         if: success() || failure()
+        env:
+          branch: ${{ matrix.branch }}
         run: |
           npx ts-node ./js/workflows/sendSlackAutomatedTestsResultNotification.ts
