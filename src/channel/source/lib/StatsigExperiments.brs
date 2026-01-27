@@ -25,11 +25,13 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
       }
 
       roku_player_improvement: {
-        ' Ad request cuepoint alignment experiment with 3 variants:
-        ' Control: prefetchTime=15, requestWithinWindow=false (request before 15s, not within 15s)
-        ' Variant1: prefetchTime=11, requestWithinWindow=false (request before 11s, not within 11s)
-        ' Variant2: prefetchTime=11, requestWithinWindow=true (request before 11s, also within 11s)
-        roku_player_align_ad_request_cuepoint_v2: {
+        ' Ad request cuepoint alignment experiment with 5 variants:
+        ' Control:   prefetchTime = 15, requestWithinWindow = false (request only before 15s, not within the 15s window)
+        ' Variant 1: prefetchTime = 6,  requestWithinWindow = false (request only before 6s, not within the 6s window)
+        ' Variant 2: prefetchTime = 6,  requestWithinWindow = true (request before 6s and also within the 6s window)
+        ' Variant 3: prefetchTime = 3,  requestWithinWindow = false (request only before 3s, not within the 3s window)
+        ' Variant 4: prefetchTime = 3,  requestWithinWindow = true (request before 3s and also within the 3s window)
+        roku_player_align_ad_request_cuepoint_v3: {
           default: { "prefetchTime": 15, "requestWithinWindow": false }
         }
         ' Testing autoplay of content immediately after the trailer finishes

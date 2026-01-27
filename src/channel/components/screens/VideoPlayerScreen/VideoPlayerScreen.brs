@@ -73,6 +73,7 @@ Function init()
   m.video.observeFieldScoped("downloadedSegment", "onDownloadedSegment")
   m.videoBorder = m.top.findNode("VideoBorder")
 
+  m.adPrefetchTimeUsedForExposure = 15 ' default prefetch time for ad request cuepoint alignment experiment used for exposure firing
   ' Initialize all experiments in one place
   initExperiments()
 
@@ -617,11 +618,8 @@ Function initExperiments()
   ' Autostart UI refresh experiment
   m.bAutostartRefreshExperimentEnabled = getExperimentResource("roku_video_autostart_ui_refresh", "roku_video_autostart_ui_refresh_v1", false).enabled = true
 
-  ' Ad request cuepoint alignment experiment (roku_player_align_ad_request_cuepoint_v2):
-  ' Control: prefetchTime=15, requestWithinWindow=false (request before 15s, not within 15s)
-  ' Variant1: prefetchTime=11, requestWithinWindow=false (request before 11s, not within 11s)
-  ' Variant2: prefetchTime=11, requestWithinWindow=true (request before 11s, also within 11s)
-  alignAdRequestExperimentConfig = getStatsigExperimentResource("roku_player_improvement", "roku_player_align_ad_request_cuepoint_v2", false)
+  ' Ad request cuepoint alignment experiment (roku_player_align_ad_request_cuepoint_v3):
+  alignAdRequestExperimentConfig = getStatsigExperimentResource("roku_player_improvement", "roku_player_align_ad_request_cuepoint_v3", false)
   m.adPrefetchTime = alignAdRequestExperimentConfig.prefetchTime
   m.alignAdRequestWithinWindow = alignAdRequestExperimentConfig.requestWithinWindow
 
@@ -1714,12 +1712,25 @@ Function onVideoPositionChange(msg) as Void
     ' Initialize variables
     isCuepointPrefetchTimeReached = false
     potentialCuepoint = -1
-    shouldFireExposure = false
 
     ' Fetch midroll ads early only if ads are neither pending nor currently fetching.
     if (adState <> "adsPending" AND adState <> "fetching")
       currentPosition = m.playerPosition
       prefetchCuepoint = currentPosition + m.adPrefetchTime
+
+      if m.isAlignAdRequestExposureFired = false
+        ' Determine if we should fire exposure: when timeToCuepoint is within 15s of m.adPrefetchTimeUsedForExposure
+        for each cuepointStr in m.midrolls
+          cuepoint = val(cuepointStr)
+          timeToCuepoint = cuepoint - currentPosition
+          if timeToCuepoint > 0 AND timeToCuepoint <= m.adPrefetchTimeUsedForExposure
+            ' Fire exposure event if needed and not already fired
+            getStatsigExperimentResource("roku_player_improvement", "roku_player_align_ad_request_cuepoint_v3")
+            m.isAlignAdRequestExposureFired = true
+            exit for
+          end if
+        end for
+      end if
 
       ' Check if we're at the exact prefetch time boundary for a cuepoint
       if m.midrolls[strI(prefetchCuepoint)] = true
@@ -1731,10 +1742,8 @@ Function onVideoPositionChange(msg) as Void
           cuepoint = val(cuepointStr)
           timeToCuepoint = cuepoint - currentPosition
 
-          ' Fire exposure when entering the prefetch window
           if timeToCuepoint > 0 AND timeToCuepoint < m.adPrefetchTime
-            shouldFireExposure = true
-            ' Request ads within window only if requestWithinWindow = true (Variant 2)
+            ' Request ads within window only if requestWithinWindow = true
             ' Skip if cooldown is active (prevents re-fetch on resume after ad break)
             if m.alignAdRequestWithinWindow = true AND m.adFetchCooldown = false
               isCuepointPrefetchTimeReached = true
@@ -1745,11 +1754,7 @@ Function onVideoPositionChange(msg) as Void
         end for
       end if
 
-      ' Fire exposure event if needed and not already fired
-      if shouldFireExposure = true AND m.isAlignAdRequestExposureFired = false
-        getStatsigExperimentResource("roku_player_improvement", "roku_player_align_ad_request_cuepoint_v2")
-        m.isAlignAdRequestExposureFired = true
-      end if
+
     end if
 
     ' Fetch midroll ads if conditions are met
