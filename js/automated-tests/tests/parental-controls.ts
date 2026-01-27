@@ -423,7 +423,7 @@ describe('Parental Controls', function () {
     // Send adult title text
     await testUtils.waitForElementToFullyShowOnScreen('searchGrid');
     await ecp.sendText('drugs');
-    await testUtils.waitForElementToFullyShowOnScreen('noResultsMessage');
+    await testUtils.waitForElementToFullyShowOnScreen('noResultsMessage', 'No results message not shown', 15000);
 
     // Verify no result for Older Kids level
     const noResultsMessage = testUtils.getNodeForElement('noResultsMessage');

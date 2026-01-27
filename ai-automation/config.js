@@ -6,7 +6,7 @@ const path = require('path');
  */
 const config = {
   // Timeouts and intervals
-  CLAUDE_TIMEOUT: 600000, // 10 minutes
+  CLAUDE_TIMEOUT: 900000, // 15 minutes (increased for sonnet model with better reliability)
   MAX_LINT_ATTEMPTS: 2,
   MAX_TEST_RETRY_ATTEMPTS: 3,
   PROGRESS_INTERVAL: 2000,
@@ -18,7 +18,6 @@ const config = {
     testsDir: 'js/automated-tests/tests',
     configDir: 'automated-tests-config',
     claudeDir: '.claude',
-    claudeInstructions: '.claude/instructions.md',
     learnedFixes: 'ai-automation/learned-fixes.md'
   },
 
@@ -61,7 +60,6 @@ const config = {
     skipPermissions: true,
     // Feature-specific toggles
     features: {
-      domParsing: true,          // Re-enabled with full XML (150KB limit, was 50KB)
       errorCategorization: true, // LLM for error categorization
       userTypeDetermination: true // LLM for user type
     }

@@ -26,7 +26,7 @@ async function callClaude(prompt, options = {}) {
       '--print',
       '--model', model,
       '--output-format', 'text',
-      '--tools', '' // Disable tools to speed up response
+      '--tools', '' // Disable all tools to prevent conversational responses
     ];
 
     // Add permission bypass if configured (recommended for automation)
@@ -153,129 +153,6 @@ async function callClaude(prompt, options = {}) {
 }
 
 /**
- * Call Claude for element matching analysis
- * @param {string} targetElement - Element name to find
- * @param {Array<Object>} suggestions - List of available elements
- * @param {string} context - Screen context (e.g., "detailScreen", "homeScreen")
- * @returns {Promise<Object|null>}
- */
-async function callClaudeForElementMatching(targetElement, suggestions, context = null) {
-  // Limit to first 10 suggestions to keep prompt short
-  const limitedSuggestions = suggestions.slice(0, 10);
-  const elementsDescription = limitedSuggestions.map((s, i) =>
-    `${i + 1}.${s.name}(${s.type})${s.text ? `:"${s.text.substring(0, 50)}"` : ''}`
-  ).join('\n');
-
-  // Build context-aware instructions
-  let contextInstructions = '';
-  if (context) {
-    if (context.includes('detail')) {
-      contextInstructions = `\n⚠️ SCREEN CONTEXT: This element is on DETAIL SCREEN (movie/series details page).
-⚠️ Prefer elements with "detail", "info", "panel" in their names.
-⚠️ REJECT elements with "tvShows", "homeScreen", "rowList" - those are for home page, not details page.`;
-    } else if (context.includes('home')) {
-      contextInstructions = `\n⚠️ SCREEN CONTEXT: This element is on HOME SCREEN.
-⚠️ Prefer elements with "home", "rowList", "content" in their names.
-⚠️ REJECT elements with "detail", "info", "panel" - those are for details page, not home.`;
-    } else if (context.includes('tvShows')) {
-      contextInstructions = `\n⚠️ SCREEN CONTEXT: This element is on TV SHOWS SCREEN.
-⚠️ Prefer elements with "tvShows", "series", "tv" in their names.
-⚠️ REJECT elements with "movie", "detail" if not relevant to TV shows.`;
-    }
-  }
-
-  const prompt = `Find best match for "${targetElement}" from these elements:
-${elementsDescription}
-${contextInstructions}
-
-Consider: name similarity, text content, type, screen context.
-
-RETURN ONLY THIS JSON FORMAT WITH NO OTHER TEXT:
-{"elementName":"match or null","confidence":"high","reasoning":"brief explanation"}`;
-
-  return callClaude(prompt, { model: 'haiku', expectJson: true, timeout: 15000 });
-}
-
-/**
- * Call Claude for DOM element path finding
- * @param {string} xmlData - The DOM XML
- * @param {string} targetElement - Element to find
- * @param {string} context - Screen context (e.g., "detailScreen", "homeScreen")
- * @returns {Promise<Object|null>}
- */
-async function callClaudeForDOMParsing(xmlData, targetElement, context = null) {
-  // Truncate XML if it's extremely large (keep first 150KB)
-  // Note: Typical Roku DOM is ~100KB, Claude Haiku can handle 200K tokens (~800KB text)
-  const maxXmlSize = 150000;
-  let truncatedXml = xmlData;
-  if (xmlData.length > maxXmlSize) {
-    truncatedXml = xmlData.substring(0, maxXmlSize) + '\n... (truncated)';
-  }
-
-  // Build context-aware instructions
-  let contextInstructions = '';
-  let requiredPathElement = '';
-
-  if (context) {
-    if (context.includes('detail')) {
-      requiredPathElement = 'detailScreen';
-      contextInstructions = `
-⚠️ CRITICAL: This element is on DETAIL SCREEN (movie/series details page).
-⚠️ The path MUST contain "detailScreen" - paths with "HomeScreen" are WRONG.
-⚠️ Expected pattern: ContentController → uiGroup → ContentGroup → ScreenStack → detailScreen → AnimationGroup → DetailInfoPanel
-⚠️ REJECT any path containing: HomeScreen, ContentRows, RowList (those are home page, not details page)`;
-    } else if (context.includes('home')) {
-      requiredPathElement = 'HomeScreen';
-      contextInstructions = `
-⚠️ CRITICAL: This element is on HOME SCREEN.
-⚠️ The path MUST contain "HomeScreen" - paths with "detailScreen" are WRONG.
-⚠️ Expected pattern: ContentController → HomeScreen → ContentRows → RowList`;
-    }
-  }
-
-  const prompt = `Find "${targetElement}" in Roku DOM.
-${contextInstructions}
-
-RULES:
-1. Start from ContentController
-2. ${requiredPathElement ? `PATH MUST INCLUDE: "${requiredPathElement}"` : 'Build complete path'}
-3. Match: Line1, FirstLineGroup, TwoLineInfo (case insensitive, partial match)
-4. Only visible elements
-5. ⚠️ CRITICAL: ALWAYS use the "name" attribute from XML elements, NOT the tag name
-   - Example: <RowList name="browseWhileWatchingRowList"> → use "browseWhileWatchingRowList"
-   - Example: <Label name="header"> → use "header"
-   - If element has no "name" attribute, use the tag name as fallback
-6. ⚠️ PATH RULE: Build SIMPLIFIED path with only KEY navigation elements
-   - KEEP: ContentController, uiGroup, ContentGroup, ScreenStack, [screen names], [named feature components]
-   - SKIP only these generic layout containers: RenderableNode, LayoutGroup, Offset, AnimationGroup
-   - ⚠️ NEVER include "RenderableNode" - it's not a valid element ID
-   - Example: ContentController → uiGroup → ContentGroup → ScreenStack → videoPlayerScreen → browseWhileWatchingRowList → header
-   - Pattern: ContentController → uiGroup → ContentGroup → ScreenStack → [screen] → [feature components] → [target]
-
-XML (search for ${requiredPathElement || 'element'}):
-${truncatedXml}
-
-RETURN JSON (xpath MUST use dot notation with # prefix for each element):
-{"found":true,"path":["ContentController","uiGroup","ContentGroup","ScreenStack","${requiredPathElement || 'Screen'}","..."],"xpath":"#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#${requiredPathElement || 'Screen'}.#...","matchedElement":"${targetElement}","confidence":"high","reasoning":"brief"}
-
-⚠️ CRITICAL xpath FORMAT:
-- Use DOT (.) to separate elements, NOT > or /
-- Add # prefix to each element name
-- Use element "name" attributes (not tag names)
-- Use SIMPLIFIED path (skip generic containers but KEEP ScreenStack)
-- Example GOOD: "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#browseWhileWatchingRowList.#header"
-- WRONG formats:
-  - Using tag names instead of name attributes
-  - "#ContentController>#uiGroup" or "#ContentController/#uiGroup"
-  - Including RenderableNode, LayoutGroup, Offset, AnimationGroup
-
-Not found:
-{"found":false,"path":[],"xpath":null,"confidence":"none","reasoning":"not in visible ${requiredPathElement || 'DOM'}","suggestions":[]}`;
-
-  return callClaude(prompt, { model: 'haiku', expectJson: true, timeout: 60000 });
-}
-
-/**
  * Call Claude for error categorization
  * @param {string} errorOutput - The test error output
  * @returns {Promise<Object|null>}
@@ -284,13 +161,27 @@ async function callClaudeForErrorCategorization(errorOutput) {
   // Keep only last 1500 chars
   const truncatedError = errorOutput.slice(-1500);
 
-  const prompt = `Categorize this test error into one of these types:
-EMPTY_STRING(timing,fixable), VISIBILITY(fixable), UNDEFINED(fixable), TIMEOUT(fixable), FOCUS(fixable), GRID_CONTENT(fixable), PLAYER_STATE(fixable), NAVIGATION(fixable), WRONG_VALUE(NOT fixable), HOOK_FAILURE, UNKNOWN.
+  const prompt = `You are a JSON-only analysis tool. Do NOT ask questions. Do NOT use tools. Do NOT be conversational.
+
+TASK: Categorize this test error.
+
+Error Types:
+- EMPTY_STRING: Field is empty string (timing issue, fixable)
+- VISIBILITY: Element not visible (fixable)
+- UNDEFINED: Property/element undefined (fixable)
+- TIMEOUT: Operation timed out (fixable)
+- FOCUS: Focus issue (fixable)
+- GRID_CONTENT: Grid/list content issue (fixable)
+- PLAYER_STATE: Player state issue (fixable)
+- NAVIGATION: Navigation issue (fixable)
+- WRONG_VALUE: Wrong value (NOT fixable)
+- HOOK_FAILURE: Hook failed
+- UNKNOWN: Unknown error
 
 Error:
 ${truncatedError}
 
-RETURN ONLY THIS JSON FORMAT WITH NO OTHER TEXT:
+OUTPUT REQUIREMENT: Reply with ONLY valid JSON, nothing else.
 {"type":"EMPTY_STRING","description":"brief description","shouldFix":true,"confidence":"high","reasoning":"brief explanation"}`;
 
   return callClaude(prompt, { model: 'haiku', expectJson: true, timeout: 15000 });
@@ -303,22 +194,77 @@ RETURN ONLY THIS JSON FORMAT WITH NO OTHER TEXT:
  * @returns {Promise<Object|null>}
  */
 async function callClaudeForUserTypeDetermination(testSteps, preConditions) {
-  const prompt = `Determine user type: Guest (no account) or Registered (signed in).
-Features requiring account: history, queue, favorites. Default to Guest if unclear.
+  const prompt = `You are a JSON-only analysis tool. Do NOT ask questions. Do NOT use tools. Do NOT be conversational.
+
+TASK: Determine user type from these test details.
+
+Rules:
+- "Guest" = no account needed (browsing, search, viewing content)
+- "Registered" = requires account (history, queue, favorites, watchlist)
+- Default to "Guest" if unclear
 
 Pre-conditions: ${preConditions}
 Test steps: ${testSteps}
 
-RETURN ONLY THIS JSON FORMAT WITH NO OTHER TEXT:
+OUTPUT REQUIREMENT: Reply with ONLY valid JSON, nothing else.
 {"userType":"Guest","confidence":"high","reasoning":"brief explanation"}`;
 
   return callClaude(prompt, { model: 'haiku', expectJson: true, timeout: 15000 });
 }
 
+/**
+ * Call Claude to determine screen/page from test steps
+ * @param {string} testSteps - Test steps from TestRail
+ * @param {string} testName - Test name
+ * @param {string} section - Section name
+ * @returns {Promise<Object|null>}
+ */
+async function callClaudeForScreenDetermination(testSteps, testName, section) {
+  const prompt = `You are a JSON-only analysis tool. Do NOT ask questions. Do NOT use tools. Do NOT be conversational.
+
+TASK: Determine which screen/page this test covers.
+
+Test Name: ${testName}
+Section: ${section}
+Test Steps: ${testSteps}
+
+Common screens: Home, Search, Detail, Player, Settings, My Stuff, Kids Mode, Other
+
+OUTPUT REQUIREMENT: Reply with ONLY valid JSON, nothing else.
+{"screen":"Home","confidence":"high","reasoning":"brief explanation"}`;
+
+  return callClaude(prompt, { model: 'haiku', expectJson: true, timeout: 15000 });
+}
+
+/**
+ * Call Claude to generate appropriate test tags
+ * @param {string} testName - Test name
+ * @param {string} section - Section name
+ * @param {string} testSteps - Test steps
+ * @returns {Promise<Object|null>}
+ */
+async function callClaudeForTagGeneration(testName, section, testSteps) {
+  const prompt = `You are a JSON-only analysis tool. Do NOT ask questions. Do NOT use tools. Do NOT be conversational.
+
+TASK: Generate appropriate test tags.
+
+Test Name: ${testName}
+Section: ${section}
+Test Steps: ${testSteps}
+
+Common tags: @smoke, @search, @playback, @navigation, @detail, @player, @manual_regression, @validation
+
+OUTPUT REQUIREMENT: Reply with ONLY valid JSON, nothing else.
+{"tags":"@search @manual_regression","confidence":"high","reasoning":"brief explanation"}`;
+
+  return callClaude(prompt, { model: 'haiku', expectJson: true, timeout: 15000 });
+}
+
+
 module.exports = {
   callClaude,
-  callClaudeForElementMatching,
-  callClaudeForDOMParsing,
   callClaudeForErrorCategorization,
-  callClaudeForUserTypeDetermination
+  callClaudeForUserTypeDetermination,
+  callClaudeForScreenDetermination,
+  callClaudeForTagGeneration
 };

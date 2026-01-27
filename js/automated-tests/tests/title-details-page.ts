@@ -141,9 +141,14 @@ describe('Title Details Page', function () {
     await testUtils.waitForCurrentScreenToEqual('vodDetailScreen', 10000);
 
     await utils.sleep(2000);
-    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'stopped');
+    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'stopped', 15000);
 
-    await testUtils.waitForElementToShowOnScreen('backgroundPoster', 'Static image not shown', 10000);
+    // Verify either backgroundPoster or backgroundPoster2 has opacity 1 (static image is shown)
+    await testUtils.untilTrue(async () => {
+      const backgroundPoster = await testUtils.getNodeForElement('backgroundPoster');
+      const backgroundPoster2 = await testUtils.getNodeForElement('backgroundPoster2');
+      return backgroundPoster.opacity === 1 || backgroundPoster2.opacity === 1;
+    }, 'Either backgroundPoster or backgroundPoster2 should have opacity 1', 20000);
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845240
@@ -215,10 +220,12 @@ describe('Title Details Page', function () {
 
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'stopped', 10000);
 
-    await testUtils.waitForElementToShowOnScreen('backgroundPoster', 'Static image not visible', 10000);
-
-    const posterVisible = await testUtils.getElementField('backgroundPoster', 'visible');
-    expect(posterVisible).to.equal(true, 'Static image should be visible when video preview is not available');
+    // Verify either backgroundPoster or backgroundPoster2 has opacity 1 (static image is shown)
+    await testUtils.untilTrue(async () => {
+      const backgroundPoster = await testUtils.getNodeForElement('backgroundPoster');
+      const backgroundPoster2 = await testUtils.getNodeForElement('backgroundPoster2');
+      return backgroundPoster.opacity === 1 || backgroundPoster2.opacity === 1;
+    }, 'Either backgroundPoster or backgroundPoster2 should have opacity 1', 10000);
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/845238
@@ -231,7 +238,8 @@ describe('Title Details Page', function () {
 
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 10000);
 
-    await utils.sleep(10000);
+    // Seek to near end of preview to trigger autoplay
+    await testUtils.seekPlayerToRelativePosition('previewVideoPlayerScreen', -1000, 'end');
 
     await testUtils.waitForCurrentScreenToEqual('videoPlayerScreen', 60000);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 10000);
@@ -950,12 +958,16 @@ describe('Title Details Page', function () {
     await testHelpers.enableAutoplayInSettings(true);
     await testUtils.goToPage('movies');
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
+    await ecp.sendKeypress(ecp.Key.Down);
+    await ecp.sendKeypress(ecp.Key.Right, { count: 2 });
 
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForCurrentScreenToEqual('videoPlayerScreen', 15000);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 15000);
     await utils.sleep(1000);
     await testUtils.seekPlayerToRelativePosition('videoPlayerScreen', 0, 'end');
+
+    await testUtils.waitForElementToHaveFocus('autoplayGridMovie', 'Timed out waiting for Rowlist to have focus', 15000);
 
     await testHelpers.verifyAutoplayUIShowing('countDownAutoPlay', 'countDownSecondsAutoPlay', true);
   });

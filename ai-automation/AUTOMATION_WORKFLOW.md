@@ -71,7 +71,7 @@ RERUN_AUTOMATED_TESTS=true npx gulp runAutomatedTests
 
 - **`gulpfile.js`** - Test generation logic (uses Claude Code SDK)
 - **`testrail-case-fetcher.js`** - Fetches test cases from TestRail
-- **`dynamic-hierarchy-finder.js`** - Finds elements in Roku DOM
+- **`lib/llm-client.js`** - Claude AI integration including query-ui functionality for finding elements
 - **Root `gulpfile.js`** - Test execution and element finder tasks
 
 ## Configuration

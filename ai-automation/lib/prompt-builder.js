@@ -1,7 +1,7 @@
 // @ts-check
-const fs = require('fs');
-const path = require('path');
-const config = require('../config');
+const fs = require("fs");
+const path = require("path");
+const config = require("../config");
 
 /**
  * Normalize test case ID to ensure it has 'C' prefix
@@ -9,8 +9,76 @@ const config = require('../config');
  * @returns {string}
  */
 function normalizeTestCaseId(testCaseId) {
-  if (!testCaseId) return '';
-  return testCaseId.startsWith('C') ? testCaseId : 'C' + testCaseId;
+  if (!testCaseId) return "";
+  return testCaseId.startsWith("C") ? testCaseId : "C" + testCaseId;
+}
+
+
+/**
+ * Detect keywords in test text and return search patterns
+ * @param {string} text - Test text (name + preconditions + steps)
+ * @returns {Array<{keyword: string, searchPattern: string}>}
+ */
+function detectKeywords(text) {
+  const patterns = [
+    { keywords: ['charles', 'network traffic', 'observe network', 'api', 'intercept'], keyword: 'Network/Proxy', searchPattern: 'import.*proxy' },
+    { keywords: ['play video', 'playback', 'player', 'playing', 'pause'], keyword: 'Playback', searchPattern: 'waitForPlayerStateToEqual' },
+    { keywords: ['history', 'resume', 'continue watching'], keyword: 'History', searchPattern: 'createHistory' },
+    { keywords: ['detail page', 'movie details', 'series details'], keyword: 'Detail Screen', searchPattern: 'detailScreen' },
+    { keywords: ['autoplay', 'preview'], keyword: 'Autoplay', searchPattern: 'previewVideoPlayer' },
+    { keywords: ['my list', 'watchlist', 'favorites', 'my stuff'], keyword: 'My List', searchPattern: 'addToMyList|removeFromMyList' },
+    { keywords: ['parental control', 'kids mode'], keyword: 'Parental Controls', searchPattern: 'setParentalControls' },
+  ];
+
+  const detected = [];
+  for (const pattern of patterns) {
+    if (pattern.keywords.some(kw => text.includes(kw))) {
+      detected.push({ keyword: pattern.keyword, searchPattern: pattern.searchPattern });
+    }
+  }
+
+  return detected.length > 0 ? detected : [{ keyword: 'General', searchPattern: 'it\\(' }];
+}
+
+/**
+ * Get relevant element IDs from elements.ts based on screen mentions
+ * @param {string} text - Test text
+ * @returns {Array<string>}
+ */
+function getRelevantElements(text) {
+  const elementsPath = path.join(config.paths.projectRoot, config.paths.configDir, 'elements.ts');
+
+  if (!fs.existsSync(elementsPath)) {
+    return [];
+  }
+
+  // Read elements.ts and extract element names
+  // Match both quoted ('key': {) and unquoted (key: {) TypeScript object keys
+  const elementsContent = fs.readFileSync(elementsPath, 'utf8');
+  const elementMatches = elementsContent.matchAll(/(?:['"](\w+)['"]|(\w+))\s*:\s*\{/g);
+  const allElements = Array.from(elementMatches, m => m[1] || m[2]);
+
+  // Filter elements based on screen keywords in test
+  const screenKeywords = {
+    search: ['search', 'trending'],
+    detail: ['detail', 'movie', 'series', 'vod'],
+    player: ['player', 'video', 'playback'],
+    home: ['home', 'grid', 'row'],
+    mystuff: ['mystuff', 'myStuff', 'watchlist'],
+  };
+
+  const relevantElements = [];
+  for (const [screen, keywords] of Object.entries(screenKeywords)) {
+    if (keywords.some(kw => text.includes(kw))) {
+      // Add elements that contain screen-related keywords
+      relevantElements.push(...allElements.filter(el =>
+        keywords.some(kw => el.toLowerCase().includes(kw))
+      ));
+    }
+  }
+
+  // Remove duplicates and limit to 10 most relevant
+  return [...new Set(relevantElements)].slice(0, 10);
 }
 
 /**
@@ -20,23 +88,21 @@ function normalizeTestCaseId(testCaseId) {
  * @param {string} wrongIdFromPreviousAttempt - ID that AI used incorrectly in previous attempt
  * @returns {string}
  */
-function buildPrompt(testDetails, existingTestIds = [], wrongIdFromPreviousAttempt = null) {
-  const instructionsPath = path.join(config.paths.projectRoot, config.paths.claudeInstructions);
-  let instructions = '';
-
-  if (fs.existsSync(instructionsPath)) {
-    instructions = fs.readFileSync(instructionsPath, 'utf8');
-  }
-
+function buildPrompt(
+  testDetails,
+  existingTestIds = [],
+  wrongIdFromPreviousAttempt = null,
+) {
   const normalizedTestCaseId = normalizeTestCaseId(testDetails.testCaseId);
-  const hasPreConditions = testDetails.preConditions && testDetails.preConditions !== 'No pre-conditions specified';
-
-  // Build list of forbidden IDs (show first 20 as examples)
-  const forbiddenIdsPreview = existingTestIds.slice(0, 20).join(', ');
-  const totalExistingTests = existingTestIds.length;
+  const hasPreConditions =
+    testDetails.preConditions &&
+    testDetails.preConditions !== "No pre-conditions specified";
+  const hasExpectedResult =
+    testDetails.expectedResult &&
+    testDetails.expectedResult !== "No expected result specified";
 
   // If this is a retry, add explicit correction feedback AT THE VERY TOP
-  let retryFeedback = '';
+  let retryFeedback = "";
   if (wrongIdFromPreviousAttempt) {
     retryFeedback = `
 🚨 CRITICAL ERROR IN PREVIOUS ATTEMPT 🚨
@@ -45,211 +111,242 @@ YOU USED THE WRONG TEST CASE ID: ${wrongIdFromPreviousAttempt}
 The CORRECT test case ID is: ${normalizedTestCaseId}
 
 DO NOT REPEAT THIS MISTAKE!
-You MUST use: ${normalizedTestCaseId}
 
 `;
   }
 
-  return `${retryFeedback}You are a code generator for Roku Tubi app tests.
+  // Detect keywords for targeted instruction injection
+  const testText = `${testDetails.testName} ${testDetails.preConditions} ${testDetails.testSteps} ${testDetails.expectedResult || ''}`.toLowerCase();
+  const detectedKeywords = detectKeywords(testText);
 
-🚨 **CRITICAL - TEST CASE ID YOU MUST USE** 🚨
+  // Get relevant elements if screen is mentioned
+  const relevantElements = getRelevantElements(testText);
 
-THE ONLY TEST CASE ID YOU ARE ALLOWED TO USE IS: ${normalizedTestCaseId}
+  return `${retryFeedback}<test_requirement>
+TEST CASE: ${normalizedTestCaseId} (use this ID only)
 
-TEST REQUIREMENTS:
-- Test Case ID: ${normalizedTestCaseId} ← THIS IS THE ONLY CORRECT ID!
-- Name: ${testDetails.testName}
-- Section: ${testDetails.mainSection}
-- User Type: ${testDetails.userType}${hasPreConditions ? `\n- Pre-conditions: ${testDetails.preConditions}` : ''}
-- Steps: ${testDetails.testSteps}
+Test Name: ${testDetails.testName}
+Section: ${testDetails.mainSection}
+User Type: ${testDetails.userType}
+${hasPreConditions ? `Pre-conditions: ${testDetails.preConditions}` : ""}
+Test Steps:
+${testDetails.testSteps}
 
-⛔ FORBIDDEN TEST IDs (${totalExistingTests} tests already exist):
-${forbiddenIdsPreview}${totalExistingTests > 20 ? `... and ${totalExistingTests - 20} more` : ''}
+${hasExpectedResult ? `Expected Result:
+${testDetails.expectedResult}
 
-🚨 **CRITICAL RULES:**
-1. ✅ USE ONLY: ${normalizedTestCaseId}
-2. ❌ NEVER copy test case IDs from existing tests
-3. ❌ NEVER generate multiple tests - ONLY ONE it() block
-4. ✅ Learn code patterns from existing tests, but generate NEW test with ${normalizedTestCaseId}
-5. ✅ Read test-helpers.ts and test-utils.ts to find existing helpers (DO NOT write custom logic if helper exists)
-6. ❌ NEVER use findNode() or property chaining (node.child?.grandchild) - add nested elements to elements.ts instead
-7. ✅ Follow the 5-STEP PROCESS documented in instructions.md
-8. ✅ Refer to node_modules/roku-test-automation/README.md for roku-test-automation framework patterns (ArrayGrid/RowList element access, odc.getValue() syntax, grid navigation)
-9. ✅ Use startApplicationAtPage('home') for general tests - ONLY use 'movies', 'series', etc. if test specifically requires that mode
+` : ""}${existingTestIds.length > 0 ? `${existingTestIds.length} existing tests - do not copy IDs` : ""}
+</test_requirement>
 
-🚨 **BEFORE RETURNING CODE - FINAL VERIFICATION:**
-1. Does the it() block contain "${normalizedTestCaseId}"? If NO → FIX IT
-2. Does the TestRail link contain "${normalizedTestCaseId.replace('C', '')}"? If NO → FIX IT
-3. Did you use any forbidden test IDs? If YES → START OVER
+${relevantElements.length > 0 ? `<relevant_elements>
+These element IDs exist in automated-tests-config/elements.ts:
+${relevantElements.join('\n')}
+Use EXACT names from this list.
+</relevant_elements>
 
-INSTRUCTIONS:
-${instructions}
+` : ""}<guidelines>
 
-OUTPUT FORMAT:
-- Return ONLY TypeScript code (no markdown, no explanations)
-- Generate ONLY ONE it() block for ${normalizedTestCaseId}
-- Start with import statements (first character must be 'i')
-- Use correct imports: import { ecp, odc, utils } from 'roku-test-automation';
-- CRITICAL: You MUST include the TestRail link comment AFTER imports and BEFORE the it() block
+SEARCH PATTERNS: Grep for '${detectedKeywords.map(kw => kw.searchPattern).join("' OR '")}'. Read 2-3 examples. Copy exact patterns.
 
-REQUIRED STRUCTURE (follow this EXACT format):
-import { expect } from 'chai';
-import { ecp, odc, utils } from 'roku-test-automation';
-import { testUtils } from '../test-utils';
+SETUP:
+- User: ${testDetails.userType}
+- Start: testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true${detectedKeywords.some(kw => kw.keyword === 'Network/Proxy') ? ', clearRegistry: false' : ''} })
 
-// Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/${normalizedTestCaseId.replace('C', '')}
-it('${normalizedTestCaseId} - ${testDetails.testName} @tags', async () => {
-  // Your test code here
+CONSTRAINTS:
+- No utils.sleep() > 2000ms (use waitForElementToShowOnScreen, waitForPlayerStateToEqual)
+- No 'message' param in waitForCurrentScreenToEqual/retryWithTimeOut
+- Use exact element names from elements.ts${detectedKeywords.some(kw => kw.keyword === 'Network/Proxy') ? '\n- PROXY: When using proxy.start(), add clearRegistry:false to startApplicationAtPage' : ''}
+
+FORMAT (REQUIRED):
+it('${normalizedTestCaseId} - Test name @tags', async () => {
+  /**
+   * Pre-conditions:
+${hasPreConditions ? testDetails.preConditions.split('\n').map(line => `   * ${line.trim()}`).join('\n') : '   * No pre-conditions'}
+   *
+   * Test Steps:
+${testDetails.testSteps.split('\n').map((line, idx) => `   * ${idx + 1}. ${line.trim()}`).join('\n')}
+   */
+
+  // test code here
 });
 
-🚨 The TestRail link comment is MANDATORY and must appear AFTER imports, BEFORE the it() block
-🚨 The format is: // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/${normalizedTestCaseId.replace('C', '')}
+OUTPUT: TypeScript code only. Start with 'import'. No explanations/markdown.
+</guidelines>`;
+}
 
-Generate ONLY the TypeScript test code now - no explanations, no markdown, no summaries.`;
+/**
+ * Extract type names from TypeScript error messages
+ * @param {string} errorText
+ * @returns {string[]}
+ */
+function extractTypeNamesFromErrors(errorText) {
+  const typeNames = new Set();
+
+  // Pattern 1: "Property 'X' does not exist on type 'TypeName'"
+  const pattern1 = /does not exist on type '([^']+)'/g;
+  let match;
+  while ((match = pattern1.exec(errorText)) !== null) {
+    typeNames.add(match[1]);
+  }
+
+  // Pattern 2: "Property 'X' is private and only accessible within class 'ClassName'"
+  const pattern2 = /only accessible within class '([^']+)'/g;
+  while ((match = pattern2.exec(errorText)) !== null) {
+    typeNames.add(match[1]);
+  }
+
+  // Pattern 3: "Type 'TypeName' is missing the following properties"
+  const pattern3 = /Type '([^']+)' is missing/g;
+  while ((match = pattern3.exec(errorText)) !== null) {
+    typeNames.add(match[1]);
+  }
+
+  return Array.from(typeNames);
+}
+
+/**
+ * Find and read type definition files for the given type names
+ * @param {string[]} typeNames
+ * @returns {Object[]} Array of {typeName, filePath, content}
+ */
+function findTypeDefinitions(typeNames) {
+  const results = [];
+  const projectRoot = path.resolve(__dirname, '../../');
+  const nodeModulesPath = path.join(projectRoot, 'node_modules');
+
+  for (const typeName of typeNames) {
+    try {
+      // Search in node_modules for .d.ts files containing the type
+      const { execSync } = require('child_process');
+
+      // Use grep to find type definitions (faster than reading all files)
+      const grepCommand = `grep -r "interface ${typeName}\\|class ${typeName}\\|type ${typeName}" "${nodeModulesPath}" --include="*.d.ts" -l 2>/dev/null | head -1`;
+      const foundFile = execSync(grepCommand, { encoding: 'utf8' }).trim();
+
+      if (foundFile) {
+        const content = fs.readFileSync(foundFile, 'utf8');
+        results.push({
+          typeName,
+          filePath: foundFile.replace(projectRoot, ''),
+          content
+        });
+      }
+    } catch (error) {
+      // File not found or grep error - continue
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Find example usage patterns from existing tests
+ * @param {string} errorText
+ * @param {string} fileContent
+ * @returns {string[]} Array of example code snippets
+ */
+function findExamplePatterns(errorText, fileContent) {
+  const examples = [];
+  const { execSync } = require('child_process');
+  const projectRoot = path.resolve(__dirname, '../../');
+  const testDirectories = ['js/automated-tests/tests', 'js/automated-tests'];
+
+  try {
+    // Detect patterns to search for based on error and file content
+    const searchPatterns = [];
+
+    // If error involves proxy callbacks
+    if (errorText.includes('NetworkProxy') || errorText.includes('proxy') || fileContent.includes('proxy.addCallback')) {
+      searchPatterns.push('proxy.addCallback');
+    }
+
+    // If error involves removeCallback
+    if (errorText.includes('removeCallback') || fileContent.includes('removeCallback')) {
+      searchPatterns.push('args.removeCallback');
+    }
+
+    // If error involves element operations
+    if (errorText.includes('element') && (fileContent.includes('getNodeForElement') || fileContent.includes('waitForElement'))) {
+      searchPatterns.push('waitForElementToShowOnScreen');
+      searchPatterns.push('getNodeForElement');
+    }
+
+    // Search for each pattern and extract examples
+    for (const pattern of searchPatterns) {
+      for (const testDir of testDirectories) {
+        const searchPath = path.join(projectRoot, testDir);
+        if (!fs.existsSync(searchPath)) continue;
+
+        try {
+          // Use grep to find files with the pattern, then extract context
+          const grepCommand = `grep -r "${pattern}" "${searchPath}" --include="*.ts" -A 15 -B 2 2>/dev/null | head -80`;
+          const result = execSync(grepCommand, { encoding: 'utf8', timeout: 3000 }).trim();
+
+          if (result) {
+            examples.push(`Example usage of "${pattern}":\n${result}`);
+            break; // Found an example for this pattern, move to next
+          }
+        } catch (error) {
+          // Continue to next directory
+        }
+      }
+    }
+  } catch (error) {
+    // If example search fails, just continue without examples
+  }
+
+  return examples;
 }
 
 /**
  * Build prompt for fixing lint/type errors
  * @param {string} fileContent
  * @param {Object} lintResult
- * @param {string} instructions
  * @returns {string}
  */
-function buildLintFixPrompt(fileContent, lintResult, instructions) {
-  return `Fix the following ${lintResult.type} errors in this test file:
+function buildLintFixPrompt(fileContent, lintResult) {
+  let promptContent = `Fix these ${lintResult.type} errors:
 
-ERRORS:
-${lintResult.errors}
+${lintResult.errors}`;
 
-CURRENT FILE CONTENT:
-${fileContent}
+  // If TypeScript errors, try to include relevant type definitions
+  if (lintResult.type === 'typescript') {
+    const typeNames = extractTypeNamesFromErrors(lintResult.errors);
 
-INSTRUCTIONS:
-${instructions}
+    if (typeNames.length > 0) {
+      const typeDefinitions = findTypeDefinitions(typeNames);
 
-OUTPUT FORMAT - CRITICAL RULES:
-⚠️  NEVER return explanatory text like "I've fixed the errors" or "Here's the fixed code"
-⚠️  NEVER add comments explaining what you fixed
-⚠️  NEVER return markdown code blocks
+      if (typeDefinitions.length > 0) {
+        promptContent += '\n\nRELEVANT TYPE DEFINITIONS:\n';
+        for (const typeDef of typeDefinitions) {
+          promptContent += `\n--- ${typeDef.typeName} (from ${typeDef.filePath}) ---\n${typeDef.content}\n`;
+        }
+      }
+    }
 
-REQUIRED OUTPUT:
-- Return ONLY the complete fixed TypeScript code
-- Start with import statement (first character must be 'i')
-- No markdown, no explanations, no comments about changes
-- Just the raw TypeScript code ready to save
-
-YOUR FIRST CHARACTER MUST BE: i (from "import")`;
-}
-
-/**
- * Build prompt for fixing test errors
- * @param {Object} params
- * @returns {string}
- */
-function buildTestFixPrompt({
-  fileContent,
-  errorOutput,
-  errorCategory,
-  failingTestName,
-  attempt,
-  instructions,
-  learnedFix
-}) {
-  let promptContent = `You are fixing a failing Roku test. Analyze the error and fix the test code.
-
-ATTEMPT ${attempt}/3
-
-ERROR TYPE: ${errorCategory.type}
-ERROR DESCRIPTION: ${errorCategory.description}
-FAILING TEST: ${failingTestName}
-
-ERROR OUTPUT (last 1500 chars):
-${errorOutput.slice(-1500)}
-
-CURRENT TEST FILE:
-${fileContent}
-
-PROJECT INSTRUCTIONS:
-${instructions}
-`;
-
-  // Add learned fixes context if available
-  if (learnedFix && learnedFix.found) {
-    promptContent += `\n\nLEARNED FIXES FOR ${errorCategory.type}:
-Review these past solutions for similar errors:
-${learnedFix.content}
-
-Apply similar patterns from learned fixes above.
-`;
+    // Find and include example patterns from existing tests
+    const examples = findExamplePatterns(lintResult.errors, fileContent);
+    if (examples.length > 0) {
+      promptContent += '\n\nEXAMPLE PATTERNS FROM EXISTING TESTS:\n';
+      promptContent += 'These show correct usage patterns from working tests in the codebase:\n\n';
+      for (const example of examples) {
+        promptContent += `${example}\n\n`;
+      }
+    }
   }
 
-  // Add specific fix guidance based on error type
-  const fixGuidance = getFixGuidanceForErrorType(errorCategory.type);
-  if (fixGuidance) {
-    promptContent += `\n\n${fixGuidance}`;
-  }
+  promptContent += `
 
-  promptContent += `\n\nOUTPUT FORMAT:
-- Return ONLY the complete fixed TypeScript test file
-- No markdown code blocks, no explanations, no comments about changes
-- Just the raw TypeScript code ready to save
-- Keep all other tests unchanged, only fix the failing one
+CURRENT FILE:
+${fileContent}
 
-NOW: Analyze the error and return the fixed test code.`;
+OUTPUT: TypeScript code only. Start with 'import'. Preserve .only() modifiers.`;
 
   return promptContent;
-}
-
-/**
- * Get fix guidance for specific error type
- * @param {string} errorType
- * @returns {string}
- */
-function getFixGuidanceForErrorType(errorType) {
-  const guidance = {
-    EMPTY_STRING: `FIX GUIDANCE:
-- Add retryWithTimeOut() before assertions to wait for field to populate
-- Example: await testUtils.retryWithTimeOut(async () => { const element = await testUtils.getNodeForElement('name'); expect(element.text).to.equal('expected'); });
-- Never assert immediately after getting an element`,
-
-    VISIBILITY: `FIX GUIDANCE:
-- Add wait for element visibility before assertions
-- Example: await testUtils.retryWithTimeOut(async () => { const element = await testUtils.getNodeForElement('name'); expect(element.visible).to.equal(true); });
-- Ensure screen is fully loaded before checking visibility`,
-
-    UNDEFINED: `FIX GUIDANCE:
-- Add wait for element or property to exist
-- Check if element needs to be loaded first (e.g., waitForGridContentToLoad)
-- Use retryWithTimeOut to wait for property to be defined`,
-
-    TIMEOUT: `FIX GUIDANCE:
-- Check if prerequisites are met (correct screen, element loaded, etc.)
-- Increase timeout if operation legitimately takes longer
-- Verify the wait condition is correct
-- Ensure proper navigation before waiting`,
-
-    FOCUS: `FIX GUIDANCE:
-- Use waitForElementToHaveFocus() before focus assertions
-- Verify element is in the focus chain
-- Check if navigation completed before focus check`,
-
-    GRID_CONTENT: `FIX GUIDANCE:
-- Use waitForGridContentToLoad() before accessing grid items
-- Ensure rowList or grid is focused and loaded
-- Wait for content field to populate`,
-
-    PLAYER_STATE: `FIX GUIDANCE:
-- Use waitForPlayerStateToEqual() to wait for specific player states
-- Add waits after playback commands (play, pause)
-- Check player state before assertions`
-  };
-
-  return guidance[errorType] || '';
 }
 
 module.exports = {
   normalizeTestCaseId,
   buildPrompt,
   buildLintFixPrompt,
-  buildTestFixPrompt
 };

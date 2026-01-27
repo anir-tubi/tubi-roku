@@ -7,6 +7,7 @@ const { exec } = require('child_process');
 const inquirer = require('inquirer');
 const { fetchTestCaseWithContext } = require('./testrail-case-fetcher.js');
 const { buildPrompt, buildLintFixPrompt } = require('./lib/prompt-builder.js');
+const config = require('./config');
 
 // Suppress regex flag warnings
 process.on('warning', (warning) => {
@@ -18,7 +19,6 @@ process.on('warning', (warning) => {
 });
 
 const projectRoot = path.resolve(__dirname, '..');
-const CLAUDE_TIMEOUT = 600000; // 10 minutes (increased from 2 to handle large codebases)
 
 // ============================================================================
 // USER INPUT
@@ -169,19 +169,6 @@ function checkClaudeAvailable() {
   } catch {
     return false;
   }
-}
-
-/**
- * Call Claude AI to analyze and match elements
- * Now uses the centralized LLM client
- * @param {string} targetElement - Element name to find
- * @param {Array<Object>} suggestions - List of available elements
- * @param {string} context - Screen context (e.g., "detailScreen", "homeScreen")
- * @returns {Promise<Object>}
- */
-async function callClaudeForElementMatching(targetElement, suggestions, context = null) {
-  const { callClaudeForElementMatching: claudeClient } = require('./lib/llm-client');
-  return claudeClient(targetElement, suggestions, context);
 }
 
 /**
@@ -348,9 +335,10 @@ function getAllExistingTestCaseIds() {
  * Generate test with automatic retry if wrong test case ID is used
  * @param {Object} testDetails
  * @param {number} maxAttempts
+ * @param {string} sessionId - Optional session ID to maintain context across generations
  * @returns {Promise<string>} Generated test code
  */
-async function generateTestWithRetry(testDetails, maxAttempts = 3) {
+async function generateTestWithRetry(testDetails, maxAttempts = 3, sessionId = null) {
   const existingTestIds = getAllExistingTestCaseIds();
   let lastWrongId = null;
 
@@ -359,7 +347,7 @@ async function generateTestWithRetry(testDetails, maxAttempts = 3) {
     console.log(`📍 Generation Attempt ${attempt}/${maxAttempts}`);
     console.log(`${'='.repeat(60)}\n`);
 
-    const result = await generateTestWithAI(testDetails, existingTestIds, lastWrongId, attempt);
+    const result = await generateTestWithAI(testDetails, existingTestIds, lastWrongId, attempt, sessionId);
 
     if (result.isValid) {
       console.log(`\n✅ Test generated successfully with correct ID: ${testDetails.testCaseId}`);
@@ -388,7 +376,7 @@ async function generateTestWithRetry(testDetails, maxAttempts = 3) {
   }
 }
 
-async function generateTestWithAI(testDetails, existingTestIds, wrongIdFromPreviousAttempt = null, attempt = 1) {
+async function generateTestWithAI(testDetails, existingTestIds, wrongIdFromPreviousAttempt = null, attempt = 1, sessionId = null) {
   if (attempt === 1) {
     console.log('🤖 Calling Claude Code SDK with project context...');
 
@@ -408,19 +396,24 @@ async function generateTestWithAI(testDetails, existingTestIds, wrongIdFromPrevi
     console.log(`🔄 Regenerating with correction feedback (attempt ${attempt})...`);
   }
 
-  return new Promise((resolve, reject) => {
-    console.log('📁 Claude will read project files directly...');
-    console.log('🤖 Claude will analyze the project and generate test...');
-    console.log('⏳ This may take 30-60 seconds...\n');
+  console.log('📁 Claude will read project files directly...');
+  console.log('🤖 Claude will analyze the project and generate test...');
+  console.log('⏳ This may take 30-60 seconds...\n');
 
-    const promptContent = buildPrompt(testDetails, existingTestIds, wrongIdFromPreviousAttempt);
+  const promptContent = buildPrompt(testDetails, existingTestIds, wrongIdFromPreviousAttempt);
+
+  return new Promise((resolve, reject) => {
 
     // Write prompt to a temporary file to avoid shell escaping issues
     const tmpFile = path.join(projectRoot, '.claude-prompt-tmp');
     fs.writeFileSync(tmpFile, promptContent);
 
-    // Add test files for pattern learning, but AI must NOT copy test case IDs
-    const claudeCommand = `cat ${tmpFile} | claude --print --add-dir js/automated-tests --add-dir automated-tests-config --add-dir .claude`;
+    // Use roku-test-gen agent for specialized behavior (NO --print for full tool access)
+    // Use --model sonnet for more reliable, complete outputs
+    // Use --session-id to maintain context across tests in a suite (if provided)
+    // Use explicit tool permissions (Read, Grep, Glob only - NO Write/Edit)
+    const sessionParam = sessionId ? ` --session-id ${sessionId}` : '';
+    const claudeCommand = `cat ${tmpFile} | claude --agent roku-test-gen --model sonnet${sessionParam} --allowed-tools "Read,Grep,Glob" --add-dir js/automated-tests --add-dir automated-tests-config --output-format text`;
 
     // Progress indicators
     const progressInterval = setInterval(() => process.stdout.write('.'), 2000);
@@ -430,7 +423,7 @@ async function generateTestWithAI(testDetails, existingTestIds, wrongIdFromPrevi
     }, 10000);
 
     // @ts-ignore
-    exec(claudeCommand, { cwd: projectRoot, timeout: CLAUDE_TIMEOUT }, (error, stdout, stderr) => {
+    exec(claudeCommand, { cwd: projectRoot, timeout: config.CLAUDE_TIMEOUT, maxBuffer: 10 * 1024 * 1024 }, (error, stdout, stderr) => {
       // Clean up temp file
       try {
         fs.unlinkSync(tmpFile);
@@ -443,8 +436,9 @@ async function generateTestWithAI(testDetails, existingTestIds, wrongIdFromPrevi
       if (error) {
         console.error('\n❌ Claude execution failed:', error.message);
         if (error.signal === 'SIGTERM' || error.message.includes('timeout')) {
-          console.error('⏰ Claude timed out after 10 minutes');
+          console.error('⏰ Claude timed out after 15 minutes');
           console.error('💡 This is unusual - the codebase may be very large or Claude API may be slow');
+          console.error('💡 Consider simplifying the test case or checking Claude API status');
         }
         reject(error);
         return;
@@ -841,35 +835,78 @@ function findCorrectInsertPosition(fileContent, testDetails) {
   }
 }
 
-function saveTest(generatedTest, testDetails) {
-  // Use the second part of subSection (after first ›) for filename, or last part if only 2 parts
-  let sectionName;
+/**
+ * Derives section name from testDetails for file naming
+ * @param {Object} testDetails - Test details object
+ * @returns {string} Section name
+ */
+function deriveSectionName(testDetails) {
   if (testDetails.subSection && testDetails.subSection.includes('›')) {
     const parts = testDetails.subSection.split('›').map(p => p.trim());
     // If we have 3+ parts, use the second one (index 1)
-    // Example: "Playback › Browse While Watching › V4 › Control" → "Browse While Watching"
     // If we have exactly 2 parts, use the last one (index 1)
-    // Example: "Details Page › Series Details Page" → "Series Details Page"
-    sectionName = parts.length >= 2 ? parts[1] : parts[parts.length - 1];
+    return parts.length >= 2 ? parts[1] : parts[parts.length - 1];
   } else if (testDetails.subSection) {
-    sectionName = testDetails.subSection;
+    return testDetails.subSection;
   } else {
-    // Fallback to mainSection
-    sectionName = testDetails.mainSection || testDetails.testName;
+    return testDetails.mainSection || testDetails.testName;
   }
+}
 
-  const fileName = sectionName
+/**
+ * Converts section name to filename format
+ * @param {string} sectionName - Section name
+ * @returns {string} Filename without extension
+ */
+function sectionNameToFileName(sectionName) {
+  return sectionName
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, '')
     .replace(/\s+/g, '-');
+}
+
+/**
+ * Generates describe block name from testDetails or filename
+ * @param {Object} testDetails - Test details object
+ * @param {string} fileName - Optional filename to convert
+ * @returns {string} Describe block name in title case
+ */
+function generateDescribeName(testDetails, fileName = null) {
+  // Prefer section names from testDetails
+  if (testDetails.subSection) return testDetails.subSection;
+  if (testDetails.mainSection) return testDetails.mainSection;
+
+  // Fallback to converting filename to title case
+  if (fileName) {
+    return fileName
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+
+  return 'Tests';
+}
+
+function saveTest(generatedTest, testDetails) {
+  // Use custom fileName if provided, otherwise derive from section name
+  let fileName;
+  if (testDetails.customFileName) {
+    fileName = testDetails.customFileName;
+    console.log(`📄 Using custom file name: ${fileName}.ts`);
+  } else {
+    const sectionName = deriveSectionName(testDetails);
+    fileName = sectionNameToFileName(sectionName);
+  }
 
   // Try to find an existing file that might match
   const testsDir = path.join(projectRoot, 'js/automated-tests/tests');
   let filePath = path.join(testsDir, `${fileName}.ts`);
 
-  // If exact file doesn't exist, search for similar files
-  if (!fs.existsSync(filePath)) {
+  // If exact file doesn't exist and no custom fileName, search for similar files
+  if (!fs.existsSync(filePath) && !testDetails.customFileName) {
     const allTestFiles = fs.readdirSync(testsDir).filter(f => f.endsWith('.ts'));
+
+    const sectionName = deriveSectionName(testDetails);
 
     // Extract key words from section name (remove version numbers, parentheses content, etc.)
     const keyWords = sectionName
@@ -911,6 +948,8 @@ function saveTest(generatedTest, testDetails) {
     } else {
       console.log(`📝 No matching file found, will create: ${fileName}.ts`);
     }
+  } else if (!fs.existsSync(filePath) && testDetails.customFileName) {
+    console.log(`📝 Will create new file: ${fileName}.ts`);
   }
 
   // Ensure directory exists
@@ -1004,10 +1043,53 @@ function saveTest(generatedTest, testDetails) {
       const insertPosition = findCorrectInsertPosition(existingContent, testDetails);
 
       if (insertPosition === -1) {
-        console.error('⚠️  Could not find appropriate describe block in existing file.');
-        console.error('🛑 SAFETY: Refusing to overwrite existing file with tests');
-        console.error('💡 File may have unusual structure or no describe blocks');
-        // Don't overwrite - keep existing file intact
+        console.log('⚠️  No describe block found in existing file.');
+        console.log('🔧 Will wrap existing tests in a describe block and add new test');
+
+        // Extract imports from existing content
+        const existingLines = existingContent.split('\n');
+        const importLines = [];
+        const testLines = [];
+        let inImports = true;
+
+        for (const line of existingLines) {
+          if (inImports && (line.trim().startsWith('import ') || line.trim() === '')) {
+            importLines.push(line);
+          } else {
+            inImports = false;
+            testLines.push(line);
+          }
+        }
+
+        // Determine describe block name using helper
+        const describeName = generateDescribeName(testDetails, path.basename(filePath, '.ts'));
+
+        // Create new file structure with describe block
+        const updatedContent = [
+          ...importLines,
+          '',
+          `describe('${describeName}', function () {`,
+          ...testLines.map(line => line ? '  ' + line : ''),
+          '',
+          '  ' + newTestCase,
+          '});',
+          ''
+        ].join('\n');
+
+        fs.writeFileSync(filePath, updatedContent);
+        console.log(`✅ Wrapped existing tests in describe('${describeName}') and added new test`);
+
+        // Verify tests weren't lost
+        const afterTestCount = (updatedContent.match(/\sit\(/g) || []).length + (updatedContent.match(/\sit\.only\(/g) || []).length;
+        const beforeTestCount = (existingContent.match(/\sit\(/g) || []).length + (existingContent.match(/\sit\.only\(/g) || []).length;
+        console.log(`📊 Test count: ${beforeTestCount} → ${afterTestCount} (expected: ${beforeTestCount + 1})`);
+
+        if (afterTestCount < beforeTestCount) {
+          console.error('🚨 ERROR: Tests were lost during save! Rolling back...');
+          fs.writeFileSync(filePath, existingContent); // Restore original
+          console.error('✅ Restored original file');
+          throw new Error('Test save failed: Tests were lost during describe-wrapping operation. File has been restored.');
+        }
       } else {
         // Insert new test case before the closing });
         const updatedContent =
@@ -1027,12 +1109,62 @@ function saveTest(generatedTest, testDetails) {
           console.error('🚨 ERROR: Tests were lost during save! Rolling back...');
           fs.writeFileSync(filePath, existingContent); // Restore original
           console.error('✅ Restored original file');
+          throw new Error('Test save failed: Tests were lost during insert operation. File has been restored.');
         }
       }
     }
   } else {
     console.log(`📝 Creating new file: ${fileName}.ts`);
-    fs.writeFileSync(filePath, generatedTest);
+
+    // For new files, check if generated code has a describe block
+    // If not, wrap it in one
+    if (!generatedTest.includes('describe(')) {
+      console.log('🔧 Wrapping test in describe block for new file');
+
+      // Extract imports
+      const lines = generatedTest.split('\n');
+      const importLines = [];
+      const testLines = [];
+      let inImports = true;
+
+      for (const line of lines) {
+        if (inImports && (line.trim().startsWith('import ') || line.trim() === '')) {
+          importLines.push(line);
+        } else {
+          inImports = false;
+          testLines.push(line);
+        }
+      }
+
+      // Determine describe block name using helper
+      const describeName = generateDescribeName(testDetails, fileName);
+
+      // Create file with describe block
+      let wrappedContent = [
+        ...importLines,
+        '',
+        '/**',
+        ` * ${describeName} Test Suite`,
+        ' * Generated from TestRail Suite',
+        ' */',
+        `describe('${describeName}', function () {`,
+        ...testLines.map(line => line ? '  ' + line : ''),
+        '});',
+        ''
+      ].join('\n');
+
+      // Add .only to the test for isolated execution
+      wrappedContent = wrappedContent.replace(/(\s+it)\(/, '$1.only(');
+      console.log('✅ Added .only to new test case for isolated execution');
+
+      fs.writeFileSync(filePath, wrappedContent);
+      console.log(`✅ Created new file with describe('${describeName}') block`);
+    } else {
+      // Already has describe block, but add .only for isolated execution
+      const contentWithOnly = generatedTest.replace(/(\s+it)\(/, '$1.only(');
+      console.log('✅ Added .only to new test case for isolated execution');
+      fs.writeFileSync(filePath, contentWithOnly);
+    }
   }
 
   console.log(`💾 Test saved: ${filePath}`);
@@ -1045,7 +1177,7 @@ function saveTest(generatedTest, testDetails) {
 
 async function runLinter(filePath) {
   return new Promise((resolve) => {
-    console.log('🔍 Running linter and TypeScript checks...');
+    console.log('🔍 Running TypeScript check...');
 
     if (!fs.existsSync(filePath)) {
       console.log('❌ File does not exist:', filePath);
@@ -1060,78 +1192,46 @@ async function runLinter(filePath) {
       return;
     }
 
-    // Run ESLint with auto-fix
+    // Create a temporary tsconfig that only checks the single file
+    const tempTsConfigPath = path.join(projectRoot, '.tsconfig-temp.json');
+    // Ensure the path is relative to projectRoot and uses forward slashes
+    const relativePath = path.relative(projectRoot, filePath).replace(/\\/g, '/');
+    const tempTsConfig = {
+      extends: './tsconfig.json',
+      files: [relativePath],
+      include: [],
+      exclude: ["**/*"]
+    };
+
+    fs.writeFileSync(tempTsConfigPath, JSON.stringify(tempTsConfig, null, 2));
+
+    // Run TypeScript check on the single file with project config
     // @ts-ignore
-    exec(`npx eslint ${filePath} --fix`, (eslintError, eslintStdout, eslintStderr) => {
-      if (eslintError) {
-        console.log('\n⚠️  ESLint found issues:\n');
-        console.log('━'.repeat(60));
-        // Both stdout and stderr can contain error info
-        const eslintOutput = (eslintStdout + '\n' + eslintStderr).trim();
-        console.log(eslintOutput);
-        console.log('━'.repeat(60));
-        console.log('');
-        resolve({ hasErrors: true, errors: eslintOutput, type: 'eslint' });
-        return;
+    exec(`npx -p typescript tsc --noEmit --project ${tempTsConfigPath}`, (tscError, tscStdout, tscStderr) => {
+      // Clean up temp file
+      try {
+        fs.unlinkSync(tempTsConfigPath);
+      } catch (e) {
+        // Ignore cleanup errors
       }
 
-      console.log('✅ ESLint passed');
+      if (tscError) {
+        // TypeScript errors usually go to stdout
+        const tscOutput = (tscStdout + '\n' + tscStderr).trim();
 
-      // Run TypeScript check with project config
-      // @ts-ignore
-      exec(`npx tsc --noEmit --project ${projectRoot}/tsconfig.json`, (tscError, tscStdout, tscStderr) => {
-        if (tscError) {
-          // TypeScript errors usually go to stdout
-          const tscOutput = (tscStdout + '\n' + tscStderr).trim();
-
-          // First, check if the generated file is mentioned in the output
-          const lines = tscOutput.split('\n');
-          const fileErrorLines = [];
-
-          // Find all lines that reference the generated file
-          for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
-            if (line.includes(filePath)) {
-              // Found an error in our file - capture this line and the next few lines for context
-              fileErrorLines.push(line);
-              // Capture up to 3 following lines that might be part of the error message
-              for (let j = 1; j <= 3 && i + j < lines.length; j++) {
-                const nextLine = lines[i + j];
-                // Stop if we hit another file path or empty line
-                if (nextLine.trim().match(/^[a-zA-Z\/\.].*\(\d+,\d+\):/) || nextLine.trim() === '') {
-                  break;
-                }
-                fileErrorLines.push(nextLine);
-              }
-            }
-          }
-
-          // If there are file-specific errors, report them
-          if (fileErrorLines.length > 0) {
-            console.log('\n⚠️  TypeScript found issues in generated test:\n');
-            console.log('━'.repeat(60));
-            console.log(fileErrorLines.join('\n'));
-            console.log('━'.repeat(60));
-            console.log('');
-            resolve({ hasErrors: true, errors: fileErrorLines.join('\n'), type: 'typescript' });
-            return;
-          }
-
-          // If no file-specific errors, check if there are project-level errors
-          const hasProjectErrors = tscOutput.includes('error TS');
-          if (hasProjectErrors) {
-            console.log('\n⚠️  TypeScript found project-level issues (not in generated test)');
-            console.log('💡 Generated test is OK, but project has configuration issues');
-            console.log('✅ Skipping TypeScript errors - they are not in the generated test');
-            resolve({ hasErrors: false });
-            return;
-          }
+        if (tscOutput.trim()) {
+          console.log('\n⚠️  TypeScript found issues:\n');
+          console.log('━'.repeat(60));
+          console.log(tscOutput);
+          console.log('━'.repeat(60));
+          console.log('');
+          resolve({ hasErrors: true, errors: tscOutput, type: 'typescript' });
+          return;
         }
+      }
 
-        console.log('✅ TypeScript check passed');
-        console.log('🎉 All checks passed!');
-        resolve({ hasErrors: false });
-      });
+      console.log('✅ TypeScript check passed');
+      resolve({ hasErrors: false });
     });
   });
 }
@@ -1140,9 +1240,8 @@ async function fixLintErrors(filePath, lintResult) {
   console.log('\n🤖 Using AI to fix lint/type errors...');
 
   const fileContent = fs.readFileSync(filePath, 'utf8');
-  const instructions = fs.readFileSync(path.join(projectRoot, '.claude/instructions.md'), 'utf8');
 
-  const promptContent = buildLintFixPrompt(fileContent, lintResult, instructions);
+  const promptContent = buildLintFixPrompt(fileContent, lintResult);
 
   // @ts-ignore
   return new Promise((resolve, reject) => {
@@ -1150,13 +1249,15 @@ async function fixLintErrors(filePath, lintResult) {
     const tmpFile = path.join(projectRoot, '.claude-lint-fix-tmp');
     fs.writeFileSync(tmpFile, promptContent);
 
-    // Add test files for pattern learning, but AI must NOT copy test case IDs
-    const claudeCommand = `cat ${tmpFile} | claude --print --add-dir js/automated-tests --add-dir automated-tests-config --add-dir .claude`;
+    // Use roku-test-gen agent for specialized behavior (NO --print for full tool access)
+    // Use --model sonnet for more reliable, complete outputs
+    // Use explicit tool permissions (Read, Grep, Glob only - NO Write/Edit)
+    const claudeCommand = `cat ${tmpFile} | claude --agent roku-test-gen --model sonnet --allowed-tools "Read,Grep,Glob" --add-dir js/automated-tests --add-dir automated-tests-config --output-format text`;
 
     console.log('⏳ Calling Claude to fix errors...');
 
     // @ts-ignore
-    exec(claudeCommand, { cwd: projectRoot, timeout: CLAUDE_TIMEOUT }, (error, stdout, stderr) => {
+    exec(claudeCommand, { cwd: projectRoot, timeout: config.CLAUDE_TIMEOUT, maxBuffer: 10 * 1024 * 1024 }, (error, stdout, stderr) => {
       // Clean up temp file
       try {
         fs.unlinkSync(tmpFile);
@@ -1250,16 +1351,22 @@ function removeOnlyFromTest(filePath) {
 async function runGeneratedTest(filePath) {
   // @ts-ignore
   return new Promise((resolve, reject) => {
-    console.log('\n🧪 Running generated test...');
+    console.log('\n🧪 Running generated test with full gulp automation...');
+    console.log('💡 Using runAutomatedTests to ensure proper build, package, and device setup');
 
-    // Run test with proper mocha configuration (ts-node and include.ts)
-    // This matches the mocha config in package.json
-    const testCommand = `cd ${projectRoot} && RERUN_AUTOMATED_TESTS=true npx mocha --require ts-node/register --require ./js/automated-tests/include.ts --timeout 120000 ${filePath}`;
+    // Use the official runAutomatedTests gulp task which handles:
+    // - Building the project (buildAutomatedTests)
+    // - Creating Roku package (device.createPackage)
+    // - Custom mocha reporter
+    // - Report generation
+    // - Retry logic
+    // The test has .only marker, so only this test will run
+    const testCommand = `cd ${projectRoot} && npx gulp runAutomatedTests`;
 
     exec(testCommand, {
       timeout: 300000,
       maxBuffer: 10 * 1024 * 1024, // 10MB buffer for large output
-      env: { ...process.env, RERUN_AUTOMATED_TESTS: 'true' }
+      env: { ...process.env }
     }, (error, stdout, stderr) => {
       const output = stdout + stderr;
 
@@ -1492,7 +1599,6 @@ async function fixTestWithAI(filePath, errorOutput, errorCategory, learnedFix, a
   console.log(`📋 Error: ${errorCategory.description}`);
 
   const fileContent = fs.readFileSync(filePath, 'utf8');
-  const instructions = fs.readFileSync(path.join(projectRoot, '.claude/instructions.md'), 'utf8');
 
   // Extract the relevant test case that's failing
   const failingTestMatch = errorOutput.match(/\d+\)\s+(.+?):/);
@@ -1515,9 +1621,6 @@ ${errorOutput.slice(-1500)}
 
 CURRENT TEST FILE:
 ${fileContent}
-
-PROJECT INSTRUCTIONS:
-${instructions}
 `;
 
   // Add learned fixes context if available
@@ -1655,13 +1758,15 @@ YOUR FIRST LINE MUST BE: import
     const tmpFile = path.join(projectRoot, '.claude-error-fix-tmp');
     fs.writeFileSync(tmpFile, promptContent);
 
-    // Add test files for pattern learning, but AI must NOT copy test case IDs
-    const claudeCommand = `cat ${tmpFile} | claude --print --add-dir js/automated-tests --add-dir automated-tests-config --add-dir .claude`;
+    // Use roku-test-gen agent for specialized behavior (NO --print for full tool access)
+    // Use --model sonnet for more reliable, complete outputs
+    // Use explicit tool permissions (Read, Grep, Glob only - NO Write/Edit)
+    const claudeCommand = `cat ${tmpFile} | claude --agent roku-test-gen --model sonnet --allowed-tools "Read,Grep,Glob" --add-dir js/automated-tests --add-dir automated-tests-config --output-format text`;
 
     console.log('⏳ Claude is analyzing the error and generating fix...');
 
     // @ts-ignore
-    exec(claudeCommand, { cwd: projectRoot, timeout: CLAUDE_TIMEOUT }, (error, stdout, stderr) => {
+    exec(claudeCommand, { cwd: projectRoot, timeout: config.CLAUDE_TIMEOUT, maxBuffer: 10 * 1024 * 1024 }, (error, stdout, stderr) => {
       try {
         fs.unlinkSync(tmpFile);
       } catch (e) {
@@ -1812,142 +1917,127 @@ async function findAndAddMissingElement(elementName) {
   await new Promise(resolve => setTimeout(resolve, 2000));
 
   try {
-    const { findElementHierarchy } = require('./dynamic-hierarchy-finder.js');
+    const { spawn } = require('child_process');
     const fs = require('fs');
     const path = require('path');
 
-    // Try to extract context and base element name
-    // Example: "detailScreenTitle" -> context="detailScreen", baseName="Title"
-    let context = null;
-    let baseElementName = elementName;
-
-    // Common screen contexts
+    // Extract base element name (remove screen context prefix if present)
+    let searchTerm = elementName;
     const screenContexts = ['detailScreen', 'homeScreen', 'tvShowsScreen', 'espanolScreen', 'myStuffScreen', 'settingsScreen'];
     for (const screenContext of screenContexts) {
       if (elementName.startsWith(screenContext)) {
-        context = screenContext;
-        baseElementName = elementName.substring(screenContext.length);
-        console.log(`📍 Detected context: ${context}`);
-        console.log(`📍 Base element name: ${baseElementName}`);
+        searchTerm = elementName.substring(screenContext.length);
+        console.log(`📍 Detected context: ${screenContext}`);
+        console.log(`📍 Base element name: ${searchTerm}`);
         break;
       }
     }
 
-    // Find the element using hierarchy finder with context
-    console.log(`🔍 Searching for: ${baseElementName}`);
-    console.log(`📍 Context: ${context || 'none detected'}`);
-    const result = await findElementHierarchy(baseElementName, true, context);
-
-    if (!result.found) {
-      console.log(`❌ Element '${baseElementName}' not found on current screen`);
-
-      // Show suggestions if available and ask AI to choose
-      if (result.suggestions && result.suggestions.length > 0) {
-        console.log(`\n🤖 Asking AI to analyze ${result.suggestions.length} visible elements...`);
-        if (context) {
-          console.log(`📍 Using screen context: ${context}`);
-        }
-
-        // Call Claude API to analyze (now using centralized LLM client with context)
-        const aiResponse = await callClaudeForElementMatching(baseElementName, result.suggestions, context);
-
-        if (aiResponse && aiResponse.elementName) {
-          console.log(`\n🎯 AI selected: ${aiResponse.elementName}`);
-          console.log(`   Confidence: ${aiResponse.confidence}`);
-          console.log(`   Reasoning: ${aiResponse.reasoning}`);
-
-          console.log(`\n🔄 Attempting to use AI-suggested element: ${aiResponse.elementName}`);
-          const suggestionResult = await findElementHierarchy(aiResponse.elementName, true, context);
-
-          if (suggestionResult.found) {
-            console.log(`✅ Successfully found AI-suggested element!`);
-            result.found = true;
-            result.path = suggestionResult.path;
-            result.xpath = suggestionResult.xpath;
-            result.usedSuggestion = aiResponse.elementName;
-            result.aiReasoning = aiResponse.reasoning;
-          } else {
-            console.log(`❌ Could not find hierarchy for suggested element`);
-            return false;
-          }
-        } else {
-          console.log(`\n❌ AI could not find a suitable match`);
-          console.log(`   Reasoning: ${aiResponse?.reasoning || 'Unknown'}`);
-          return false;
-        }
-      } else {
-        console.log('💡 Tip: Make sure the test navigated to the correct screen before failing');
-        return false;
-      }
-    }
-
-    // Check if element already exists and update it, or add new
+    // Read elements.ts before calling query-ui to check if element was added
     const elementsFilePath = path.join(projectRoot, 'automated-tests-config', 'elements.ts');
-    const elementsContent = fs.readFileSync(elementsFilePath, 'utf8');
-    // Match element definition including optional trailing comma
-    const elementExistsRegex = new RegExp(`^(\\s*)${elementName}:\\s*\\{[^}]*\\},?`, 'm');
-    const elementExistsMatch = elementsContent.match(elementExistsRegex);
+    const elementsContentBefore = fs.readFileSync(elementsFilePath, 'utf8');
 
-    if (elementExistsMatch) {
-      console.log(`ℹ️  Element '${elementName}' already exists in elements.ts - updating xpath...`);
+    // Execute /query-ui command via Claude CLI
+    console.log(`🔍 Executing /query-ui command for: ${searchTerm}`);
 
-      // Update the existing element's keyPath
-      const indent = elementExistsMatch[1].replace(/\n/g, ''); // Remove newlines from indent
-      let comment = `/** ${elementName} (auto-updated) */`;
-      if (result.usedSuggestion) {
-        comment = `/** ${elementName} (auto-updated from ${result.usedSuggestion}) */`;
-        console.log(`\nℹ️  Note: Element was automatically mapped from suggested element: ${result.usedSuggestion}`);
-        console.log(`   Original: ${elementName} (not found in DOM)`);
-        console.log(`   Mapped to: ${result.usedSuggestion} (found in DOM)`);
+    return new Promise((resolve) => {
+      const args = ['--output-format', 'text'];
+
+      // Add permission bypass if configured
+      if (config.llm && config.llm.skipPermissions) {
+        args.push('--dangerously-skip-permissions');
       }
 
-      const updatedEntry = `${indent}${comment}\n${indent}${elementName}: {\n${indent}  keyPath: '${result.xpath}',\n${indent}},`;
+      // Add the skill command as an argument (skills don't work with --print mode)
+      args.push(`/query-ui`);
+      args.push(searchTerm);
 
-      // Replace the old element definition with the updated one
-      const updatedContent = elementsContent.replace(elementExistsRegex, updatedEntry);
-      fs.writeFileSync(elementsFilePath, updatedContent);
+      const claude = spawn('claude', args, {
+        cwd: projectRoot, // Run from project root so query-ui can find rta-config.json
+        stdio: ['pipe', 'pipe', 'pipe']
+      });
 
-      console.log(`✅ Successfully updated '${elementName}' in elements.ts with new xpath`);
-      return true;
-    }
+      let stdout = '';
+      let stderr = '';
+      let timeoutHandle;
+      let isResolved = false;
 
-    // Add to elements.ts with note if we used a suggestion (new element)
-    let comment = `/** ${elementName} */`;
-    if (result.usedSuggestion) {
-      comment = `/** ${elementName} (auto-mapped from ${result.usedSuggestion}) */`;
-      console.log(`\nℹ️  Note: Element was automatically mapped from suggested element: ${result.usedSuggestion}`);
-      console.log(`   Original: ${elementName} (not found in DOM)`);
-      console.log(`   Mapped to: ${result.usedSuggestion} (found in DOM)`);
-    }
-    const entry = `  ${comment}\n  ${elementName}: {\n    keyPath: '${result.xpath}',\n  },`;
-    const insertionRegex = /(\n\}\);?\s*\n\s*export\s+\{)/;
-
-    if (!insertionRegex.test(elementsContent)) {
-      console.log('❌ Could not find insertion point in elements.ts');
-      return false;
-    }
-
-    // Ensure the last element has a trailing comma before we insert
-    // Find the last closing brace before the export and make sure there's a comma after it
-    let updatedContent = elementsContent.replace(
-      /(\n\s*\},?)(\s*\n\}\);?\s*\n\s*export\s+\{)/,
-      (match, lastElement, closing) => {
-        // If lastElement doesn't end with comma, add it
-        if (!lastElement.trim().endsWith(',')) {
-          return lastElement + ',' + closing;
+      // Set up timeout handler (60 seconds for query-ui operations)
+      timeoutHandle = setTimeout(() => {
+        if (!isResolved) {
+          isResolved = true;
+          claude.kill('SIGTERM');
+          console.error(`\n❌ query-ui command timed out after 60 seconds`);
+          resolve(false);
         }
-        return match;
-      }
-    );
+      }, 60000);
 
-    // Now insert the new element
-    updatedContent = updatedContent.replace(insertionRegex, `\n${entry}\n$1`);
-    fs.writeFileSync(elementsFilePath, updatedContent);
+      claude.stdout.on('data', (data) => {
+        const output = data.toString();
+        stdout += output;
+        // Show Claude's output in real-time
+        process.stdout.write(output);
+      });
 
-    console.log(`✅ Successfully added '${elementName}' to elements.ts`);
-    return true;
+      claude.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      claude.on('close', (code) => {
+        if (isResolved) return;
+        isResolved = true;
+
+        if (timeoutHandle) {
+          clearTimeout(timeoutHandle);
+        }
+
+        if (code !== 0 && code !== null) {
+          console.error(`\n❌ query-ui command failed with code ${code}`);
+          if (stderr) console.error(stderr);
+          resolve(false);
+          return;
+        }
+
+        // Check if element was added to elements.ts
+        try {
+          const elementsContentAfter = fs.readFileSync(elementsFilePath, 'utf8');
+
+          // Check if the element name appears in the file now (either as original name or as the matched element)
+          const elementPattern = new RegExp(`\\b${elementName}\\s*:\\s*\\{`, 'm');
+
+          if (elementPattern.test(elementsContentAfter) && !elementPattern.test(elementsContentBefore)) {
+            console.log(`\n✅ Successfully added '${elementName}' to elements.ts via query-ui`);
+            resolve(true);
+          } else if (elementsContentAfter !== elementsContentBefore) {
+            // File was modified, but element name is different
+            console.log(`\nℹ️  Element may have been added with a different name - elements.ts was modified`);
+            resolve(true);
+          } else {
+            // File wasn't modified at all - query-ui failed to add the element
+            console.log(`\n⚠️  query-ui did not add the element - elements.ts was not modified`);
+            console.log(`💡 The element likely doesn't exist on the current screen or query-ui encountered an error`);
+            resolve(false);
+          }
+        } catch (readErr) {
+          console.error(`\n❌ Error checking elements.ts: ${readErr.message}`);
+          resolve(false);
+        }
+      });
+
+      claude.on('error', (error) => {
+        if (isResolved) return;
+        isResolved = true;
+
+        if (timeoutHandle) {
+          clearTimeout(timeoutHandle);
+        }
+        console.error(`\n❌ Failed to execute claude command: ${error.message}`);
+        resolve(false);
+      });
+    });
+
   } catch (err) {
-    console.log(`❌ Failed to add element: ${err.message}`);
+    console.log(`❌ Failed to execute query-ui: ${err.message}`);
     console.log('💡 Tip: Make sure the test navigated to the correct screen before failing');
     return false;
   }
@@ -2344,7 +2434,7 @@ Common fixes for this error type:
 }
 
 // ============================================================================
-// MAIN TASK
+// MAIN TASKS
 // ============================================================================
 
 // ============================================================================
@@ -2384,100 +2474,168 @@ gulp.task('test-retry-workflow', async (done) => {
   }
 });
 
-gulp.task('generate-test', async (done) => {
-  try {
-    console.log('🚀 Starting Test Generation...\n');
+/**
+ * Generate a single test (extracted for reusability with session preservation)
+ * @param {string|null} caseId - Test case ID (e.g., "539948" or "C539948"), or null for interactive mode
+ * @param {string|null} sessionId - Optional session ID for context preservation
+ * @param {Object} options - Additional options
+ * @returns {Promise<{success: boolean, filePath: string, testResult: Object}>}
+ */
+async function generateSingleTest(caseId = null, sessionId = null, options = {}) {
+  const { shouldRunLinter = true, shouldRunTest = true, customFileName = null } = options;
 
-    // Get test details from user
-    const testDetails = await promptUser();
+  console.log('🚀 Starting Test Generation...\n');
 
-    console.log('\n📝 Test Details:');
-    console.log(`  Name: ${testDetails.testName}`);
-    console.log(`  User Type: ${testDetails.userType}`);
-    console.log(`  Screen: ${testDetails.screen}`);
-    if (testDetails.preConditions && testDetails.preConditions !== 'No pre-conditions specified') {
-      console.log(`  Pre-conditions: ${testDetails.preConditions.substring(0, 80)}${testDetails.preConditions.length > 80 ? '...' : ''}`);
-    }
-    console.log(`  Steps: ${testDetails.testSteps.substring(0, 80)}${testDetails.testSteps.length > 80 ? '...' : ''}`);
-    console.log(`  Tags: ${testDetails.tags}\n`);
+  let testDetails;
 
-    // Generate test with Claude (with automatic retry if wrong ID is used)
-    const generatedTest = await generateTestWithRetry(testDetails);
+  if (caseId) {
+    // Batch mode: fetch from TestRail
+    const numericCaseId = String(caseId).replace('C', ''); // Remove C prefix if present
+    console.log(`📋 Fetching test case C${numericCaseId} from TestRail...\n`);
 
-    // Save test file
-    const filePath = saveTest(generatedTest, testDetails);
+    testDetails = await fetchTestCaseWithContext(numericCaseId);
 
-    // Run linter and fix errors with AI if needed
-    if (testDetails.runLinter) {
-      let lintAttempts = 0;
-      const maxLintAttempts = 2;
+    // Add required fields
+    testDetails.testName = testDetails.title;
+    testDetails.testCaseId = String(testDetails.caseId);
+    testDetails.testSteps = testDetails.testSteps || 'No steps provided';
+    testDetails.preConditions = testDetails.preConditions || 'No pre-conditions specified';
+    testDetails.runLinter = shouldRunLinter;
+    testDetails.runTest = shouldRunTest;
+    testDetails.customFileName = customFileName;
 
-      while (lintAttempts < maxLintAttempts) {
-        const lintResult = await runLinter(filePath);
+    // Use AI to determine metadata (sequentially to avoid "Session ID already in use" errors)
+    console.log(`🤖 Using AI to analyze test metadata...`);
+    const { callClaudeForUserTypeDetermination, callClaudeForScreenDetermination, callClaudeForTagGeneration } = require('./lib/llm-client');
 
-        if (!lintResult || !lintResult.hasErrors) {
-          break; // No errors, we're good
-        }
+    const userTypeResult = await callClaudeForUserTypeDetermination(testDetails.testSteps, testDetails.preConditions).catch(() => null);
+    const screenResult = await callClaudeForScreenDetermination(testDetails.testSteps, testDetails.testName, testDetails.sectionName).catch(() => null);
+    const tagResult = await callClaudeForTagGeneration(testDetails.testName, testDetails.sectionName, testDetails.testSteps).catch(() => null);
 
-        lintAttempts++;
-        console.log(`\n🔧 Lint attempt ${lintAttempts}/${maxLintAttempts} - Found ${lintResult.type} errors`);
+    testDetails.userType = userTypeResult?.userType || 'Guest';
+    testDetails.screen = screenResult?.screen || 'Other';
+    testDetails.tags = tagResult?.tags || '@manual_regression';
 
-        if (lintAttempts < maxLintAttempts) {
-          const fixed = await fixLintErrors(filePath, lintResult);
-          if (!fixed) {
-            console.log('⚠️  AI could not fix errors automatically');
-            break;
-          }
-        } else {
-          console.log('⚠️  Max lint fix attempts reached');
-          console.log('💡 Some errors remain - will try to run test anyway');
-        }
+    if (userTypeResult) console.log(`   👤 User Type: ${testDetails.userType} (${userTypeResult.confidence})`);
+    if (screenResult) console.log(`   📱 Screen: ${testDetails.screen} (${screenResult.confidence})`);
+    if (tagResult) console.log(`   🏷️  Tags: ${testDetails.tags} (${tagResult.confidence})`);
+
+    // Small delay to ensure Claude session is released before the main test generation
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  } else {
+    // Interactive mode: prompt user
+    testDetails = await promptUser();
+  }
+
+  console.log('\n📝 Test Details:');
+  console.log(`  Name: ${testDetails.testName}`);
+  console.log(`  User Type: ${testDetails.userType}`);
+  console.log(`  Screen: ${testDetails.screen}`);
+  if (testDetails.preConditions && testDetails.preConditions !== 'No pre-conditions specified') {
+    console.log(`  Pre-conditions: ${testDetails.preConditions.substring(0, 80)}${testDetails.preConditions.length > 80 ? '...' : ''}`);
+  }
+  console.log(`  Steps: ${testDetails.testSteps.substring(0, 80)}${testDetails.testSteps.length > 80 ? '...' : ''}`);
+  console.log(`  Tags: ${testDetails.tags}\n`);
+
+  // Generate test with Claude (with automatic retry if wrong ID is used)
+  const generatedTest = await generateTestWithRetry(testDetails, 3, sessionId);
+
+  // Save test file
+  const filePath = saveTest(generatedTest, testDetails);
+
+  // Run linter and fix errors with AI if needed
+  if (testDetails.runLinter) {
+    let lintAttempts = 0;
+    const maxLintAttempts = config.MAX_LINT_ATTEMPTS;
+
+    while (lintAttempts < maxLintAttempts) {
+      const lintResult = await runLinter(filePath);
+
+      if (!lintResult || !lintResult.hasErrors) {
+        break; // No errors, we're good
       }
-    }
 
-    console.log('\n✅ Test generation complete!');
-    console.log(`📁 File: ${filePath}`);
+      lintAttempts++;
+      console.log(`\n🔧 Lint attempt ${lintAttempts}/${maxLintAttempts} - Found ${lintResult.type} errors`);
 
-    // Automatically run test with retry logic (if requested)
-    if (testDetails.runTest) {
-      const testResult = await runTestWithRetry(filePath, 3);
-
-      // ALWAYS remove .only after test execution, regardless of success or failure
-      // This prevents .only from being left in the file when tests fail
-      removeTestOnlyFromFile(filePath);
-
-      if (testResult.success) {
-        console.log('\n🎉 Test generated and verified successfully!');
-        console.log(`✅ Test passed after ${testResult.attempts} attempt(s)`);
-
-        // Remove .only from test file after successful execution
-        removeTestOnlyFromFile(filePath);
-
-        // Auto-record fix if errors were resolved
-        if (testResult.attempts > 1 && testResult.fixedErrorType && testResult.errorCategory && testResult.errorOutput) {
-          console.log('\n📚 Auto-recording successful fix to learned-fixes.md...');
-          await recordFixToLearnedFixes(filePath, testResult.errorCategory, testResult.errorOutput, testResult);
+      if (lintAttempts < maxLintAttempts) {
+        const fixed = await fixLintErrors(filePath, lintResult);
+        if (!fixed) {
+          console.log('⚠️  AI could not fix errors automatically');
+          break;
         }
       } else {
-        console.log('\n⚠️  Test generated but not passing');
-        console.log('\n📋 Developer Action Required:');
-        console.log('  1. Review the generated test code');
-        console.log('  2. Check the error output above');
-        console.log('  3. Manually debug and fix remaining issues');
-        console.log(`  4. File location: ${filePath}`);
+        console.log('⚠️  Max lint fix attempts reached');
+        console.log('💡 Some errors remain - will try to run test anyway');
+      }
+    }
+  }
 
-        // Offer to record the failed attempt for learning
-        if (testResult.errorCategory) {
-          console.log('\n💡 This failure could be recorded for future learning');
-          console.log(`   Error type: ${testResult.errorCategory.type}`);
-          console.log('   Once manually fixed, consider adding to learned-fixes.md');
-        }
+  console.log('\n✅ Test generation complete!');
+  console.log(`📁 File: ${filePath}`);
+
+  // Automatically run test with retry logic (if requested)
+  let testResult = { success: false };
+  if (testDetails.runTest) {
+    testResult = await runTestWithRetry(filePath, 3);
+
+    // ALWAYS remove .only after test execution, regardless of success or failure
+    // This prevents .only from being left in the file when tests fail
+    removeTestOnlyFromFile(filePath);
+
+    if (testResult.success) {
+      console.log('\n🎉 Test generated and verified successfully!');
+      console.log(`✅ Test passed after ${testResult.attempts} attempt(s)`);
+
+      // Auto-record fix if errors were resolved
+      if (testResult.attempts > 1 && testResult.fixedErrorType && testResult.errorCategory && testResult.errorOutput) {
+        console.log('\n📚 Auto-recording successful fix to learned-fixes.md...');
+        await recordFixToLearnedFixes(filePath, testResult.errorCategory, testResult.errorOutput, testResult);
       }
     } else {
-      console.log('\n📋 Next steps:');
-      console.log('  1. Review the generated test');
-      console.log('  2. Run: RERUN_AUTOMATED_TESTS=true npx gulp runAutomatedTests');
+      console.log('\n⚠️  Test generated but not passing');
+      console.log('\n📋 Developer Action Required:');
+      console.log('  1. Review the generated test code');
+      console.log('  2. Check the error output above');
+      console.log('  3. Manually debug and fix remaining issues');
+      console.log(`  4. File location: ${filePath}`);
+
+      // Offer to record the failed attempt for learning
+      if (testResult.errorCategory) {
+        console.log('\n💡 This failure could be recorded for future learning');
+        console.log(`   Error type: ${testResult.errorCategory.type}`);
+        console.log('   Once manually fixed, consider adding to learned-fixes.md');
+      }
     }
+  } else {
+    console.log('\n📋 Next steps:');
+    console.log('  1. Review the generated test');
+    console.log('  2. Run: RERUN_AUTOMATED_TESTS=true npx gulp runAutomatedTests');
+  }
+
+  // Return result for programmatic use
+  return {
+    success: testResult.success,
+    filePath,
+    testResult
+  };
+}
+
+// Gulp task wrapper for generate-test (calls the extracted function)
+gulp.task('generate-test', async (done) => {
+  try {
+    // Parse command line args
+    const caseIdArg = process.argv.find(arg => arg.startsWith('--caseId='));
+    const sessionIdArg = process.argv.find(arg => arg.startsWith('--sessionId='));
+
+    const caseId = caseIdArg ? caseIdArg.split('=')[1] : null;
+    const sessionId = sessionIdArg ? sessionIdArg.split('=')[1] : null;
+
+    // Call the extracted function
+    await generateSingleTest(caseId, sessionId, {
+      shouldRunLinter: true,
+      shouldRunTest: true
+    });
 
     done();
   } catch (error) {
@@ -2486,6 +2644,200 @@ gulp.task('generate-test', async (done) => {
   }
 });
 
+
+gulp.task('generate-suite', async (done) => {
+  try {
+    console.log('🚀 Starting Suite Batch Test Generation...\n');
+
+    // Get suiteId and sectionId from command line args
+    const suiteIdArg = process.argv.find(arg => arg.startsWith('--suiteId='));
+    const sectionIdArg = process.argv.find(arg => arg.startsWith('--sectionId='));
+    const projectIdArg = process.argv.find(arg => arg.startsWith('--projectId='));
+    const fileNameArg = process.argv.find(arg => arg.startsWith('--fileName='));
+
+    if (!suiteIdArg) {
+      console.error('❌ Error: --suiteId parameter is required');
+      console.log('\n💡 Usage: npx gulp generate-suite --suiteId=47 [--sectionId=100771] [--projectId=1] [--fileName=my-test-file]');
+      done(new Error('Missing suiteId parameter'));
+      return;
+    }
+
+    const suiteId = parseInt(suiteIdArg.split('=')[1], 10);
+    const sectionId = sectionIdArg ? parseInt(sectionIdArg.split('=')[1], 10) : null;
+    const projectId = projectIdArg ? parseInt(projectIdArg.split('=')[1], 10) : null;
+    const customFileName = fileNameArg ? fileNameArg.split('=')[1].replace(/\.ts$/, '') : null; // Remove .ts if provided
+
+    console.log(`📋 Suite ID: ${suiteId}`);
+    if (sectionId) console.log(`📂 Section ID: ${sectionId}`);
+    if (projectId) console.log(`🏗️  Project ID: ${projectId} (manual override)`);
+    if (customFileName) console.log(`📄 Custom file name: ${customFileName}.ts`);
+    console.log('');
+
+    // Fetch all cases from suite/section
+    const { fetchCasesFromSuite } = require('./testrail-case-fetcher.js');
+    const cases = await fetchCasesFromSuite(suiteId, sectionId, projectId);
+
+    if (!cases || cases.length === 0) {
+      console.log('⚠️  No test cases found in this suite/section');
+      done();
+      return;
+    }
+
+    console.log(`\n🎯 Will generate ${cases.length} tests sequentially...\n`);
+    console.log('═'.repeat(60));
+
+    // Note: Each test is generated independently (no shared session)
+    // This avoids "Session ID already in use" conflicts
+
+    // Snapshot test files before generation (for Prettier formatting later)
+    const testsDir = path.join(projectRoot, 'js/automated-tests/tests');
+    const filesBeforeGeneration = new Set();
+    const fileTimestamps = {};
+
+    if (fs.existsSync(testsDir)) {
+      const files = fs.readdirSync(testsDir).filter(f => f.endsWith('.ts'));
+      files.forEach(file => {
+        filesBeforeGeneration.add(file);
+        const filePath = path.join(testsDir, file);
+        fileTimestamps[file] = fs.statSync(filePath).mtimeMs;
+      });
+    }
+
+    const results = {
+      total: cases.length,
+      successful: 0,
+      failed: 0,
+      errors: [],
+      passedTests: [], // Track which tests passed
+      failedTests: [] // Track which tests failed
+    };
+
+    // Generate tests one by one by calling generate-test
+    for (let i = 0; i < cases.length; i++) {
+      const testCase = cases[i];
+      const caseId = `C${testCase.id}`;
+
+      console.log(`\n[${i + 1}/${cases.length}] Generating: ${caseId} - ${testCase.title}`);
+      console.log('─'.repeat(60));
+
+      try {
+        const result = await generateSingleTest(testCase.id, null, {
+          shouldRunLinter: true,
+          shouldRunTest: true,
+          customFileName: customFileName
+        });
+
+        if (result.success) {
+          console.log(`✅ Successfully generated: ${caseId}`);
+          results.successful++;
+          results.passedTests.push(caseId);
+        } else {
+          console.error(`❌ Test generated but failed validation: ${caseId}`);
+          results.failed++;
+          results.failedTests.push(caseId);
+          results.errors.push({
+            caseId,
+            error: 'Test failed validation'
+          });
+        }
+
+        // Small delay between tests
+        if (i < cases.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay
+        }
+
+      } catch (error) {
+        console.error(`❌ Failed to generate ${caseId}: ${error.message}`);
+        results.failed++;
+        results.failedTests.push(caseId);
+        results.errors.push({
+          caseId,
+          error: error.message
+        });
+      }
+    }
+
+    // Print summary
+    console.log('\n\n');
+    console.log('═'.repeat(60));
+    console.log('📊 BATCH GENERATION SUMMARY');
+    console.log('═'.repeat(60));
+    console.log(`Total:      ${results.total}`);
+    console.log(`Successful: ${results.successful} ✅`);
+    console.log(`Failed:     ${results.failed} ❌`);
+
+    // Show passed tests
+    if (results.passedTests.length > 0) {
+      console.log('\n✅ Passed Tests:');
+      console.log(`  ${results.passedTests.join(', ')}`);
+    }
+
+    // Show failed tests with errors
+    if (results.failedTests.length > 0) {
+      console.log('\n❌ Failed Tests:');
+      console.log(`  ${results.failedTests.join(', ')}`);
+
+      console.log('\n📋 Failure Details:');
+      results.errors.forEach(err => {
+        console.log(`  ${err.caseId}: ${err.error}`);
+      });
+    }
+
+    console.log('═'.repeat(60));
+
+    // Note: .only markers are only removed by generate-test if each individual test passed
+    // Any remaining .only markers indicate tests that failed verification
+    console.log('\n📋 Next Steps:');
+    console.log('   1. Review the generated tests');
+    console.log('   2. Tests that passed verification have .only removed automatically');
+    console.log('   3. Tests that still have .only failed and need manual review');
+    console.log('   4. Run all tests together using:');
+    console.log(`      RERUN_AUTOMATED_TESTS=true npx gulp runAutomatedTests`);
+
+    // Format only newly generated or modified test files with Prettier
+    if (results.successful > 0) {
+      // Find files that are new or modified
+      const changedFiles = [];
+      if (fs.existsSync(testsDir)) {
+        const filesAfterGeneration = fs.readdirSync(testsDir).filter(f => f.endsWith('.ts'));
+
+        filesAfterGeneration.forEach(file => {
+          const filePath = path.join(testsDir, file);
+          const currentMtime = fs.statSync(filePath).mtimeMs;
+
+          // File is new or modified
+          if (!filesBeforeGeneration.has(file) || fileTimestamps[file] !== currentMtime) {
+            changedFiles.push(filePath);
+          }
+        });
+      }
+
+      if (changedFiles.length > 0) {
+        console.log(`\n🎨 Formatting ${changedFiles.length} generated test file(s) with Prettier...`);
+        const filesArg = changedFiles.map(f => `"${f}"`).join(' ');
+
+        exec(`npx prettier --write ${filesArg}`, (error, stdout, stderr) => {
+          if (error) {
+            console.log(`⚠️  Prettier formatting failed: ${error.message}`);
+            console.log('   Tests were generated but may have formatting issues');
+          } else {
+            console.log('✅ Test files formatted successfully');
+          }
+          done();
+        });
+      } else {
+        console.log('\n⚠️  No new test files detected for formatting');
+        done();
+      }
+    } else {
+      done();
+    }
+
+  } catch (error) {
+    console.error('❌ Error:', error.message);
+    done(error);
+  }
+});
 
 gulp.task('default', gulp.series('generate-test'));
 

@@ -368,6 +368,12 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen',
   },
 
+  /** Search Screen */
+  searchScreen: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen',
+  },
+
   /** Settings page */
   settingsPagePanelSet: {
     keyPath:

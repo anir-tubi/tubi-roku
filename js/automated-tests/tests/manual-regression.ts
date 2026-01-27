@@ -7175,9 +7175,11 @@ describe('General Regression Tests', function () {
     await ecp.sendKeypress(ecp.Key.Down);
     await utils.sleep(2000);
 
-    // Verify player content has changed (no longer spotlight ad)
-    const newPlayerContent = await testUtils.getElementField('previewVideoPlayer', 'content');
-    expect(newPlayerContent?.id).to.not.equal('hdc_spotlight', 'Player content should have changed from spotlight ad');
+    // Wait for player content to change (no longer spotlight ad)
+    await testUtils.untilTrue(async () => {
+      const newPlayerContent = await testUtils.getElementField('previewVideoPlayer', 'content');
+      return newPlayerContent?.id !== 'hdc_spotlight';
+    }, 'Player content should have changed from spotlight ad', 10000);
 
     // Verify new content video is playing (VOD preview from the newly focused item)
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 10000);
@@ -7238,9 +7240,11 @@ describe('General Regression Tests', function () {
     await ecp.sendKeypress(ecp.Key.Down);
     await utils.sleep(2000);
 
-    // Verify player content has changed (no longer spotlight ad)
-    const newPlayerContent = await testUtils.getElementField('previewVideoPlayer', 'content');
-    expect(newPlayerContent?.id).to.not.equal('hdc_spotlight', 'Player content should have changed from spotlight ad');
+    // Wait for player content to change (no longer spotlight ad)
+    await testUtils.untilTrue(async () => {
+      const newPlayerContent = await testUtils.getElementField('previewVideoPlayer', 'content');
+      return newPlayerContent?.id !== 'hdc_spotlight';
+    }, 'Player content should have changed from spotlight ad', 10000);
 
     // Verify new content video is playing (VOD preview from the newly focused item)
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 10000);

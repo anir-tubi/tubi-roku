@@ -142,7 +142,55 @@ async function fetchTestCaseWithContext(caseId) {
 }
 
 
+/**
+ * Fetches all test cases from a suite or section
+ * @param {number} suiteId - TestRail suite ID
+ * @param {number} sectionId - Optional section ID to filter cases
+ * @param {number} projectId - Optional TestRail project ID (will be fetched from suite if not provided)
+ * @returns {Promise<Array>} Array of case objects with id and title
+ */
+async function fetchCasesFromSuite(suiteId, sectionId = null, projectId = null) {
+  try {
+    console.log(`📋 Fetching test cases from suite ${suiteId}${sectionId ? ` section ${sectionId}` : ''}...`);
+
+    // If project ID not provided, fetch it from the suite
+    if (!projectId) {
+      const suiteData = await makeTestRailRequest(`get_suite/${suiteId}`);
+      projectId = suiteData.project_id;
+      console.log(`   Project ID: ${projectId} (from suite)`);
+    }
+
+    // Build endpoint with filters
+    let endpoint = `get_cases/${projectId}&suite_id=${suiteId}`;
+    if (sectionId) {
+      endpoint += `&section_id=${sectionId}`;
+    }
+
+    const response = await makeTestRailRequest(endpoint);
+
+    // The API returns an object with a 'cases' array
+    if (!response || !response.cases || !Array.isArray(response.cases)) {
+      throw new Error('Invalid response from TestRail API');
+    }
+
+    const cases = response.cases;
+    console.log(`✅ Found ${cases.length} test cases`);
+
+    // Return simplified case objects
+    return cases.map(c => ({
+      id: c.id,
+      title: c.title,
+      section_id: c.section_id
+    }));
+
+  } catch (error) {
+    console.error(`❌ Error fetching cases from suite: ${error.message}`);
+    throw error;
+  }
+}
+
 module.exports = {
   fetchTestCaseWithContext,
-  makeTestRailRequest
+  makeTestRailRequest,
+  fetchCasesFromSuite
 };
