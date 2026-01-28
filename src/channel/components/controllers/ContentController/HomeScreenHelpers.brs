@@ -316,6 +316,11 @@ Function fetchHomeScreen(homeScreen, useCache = false)
   ' This check causes all category fetches to be skipped prior to the field
   ' being set to true.  Then, once true categories reload any time fetchHomeScreen() is
   ' called, such as when signedIn field changes.
+  if homeScreen <> invalid
+    ' Set the enableVideoTiles field using the centralized method
+    ' Pass screenID to ensure correct rules are applied for the target screen
+    homeScreen.enableVideoTiles = isVideoTileEnabledScreen(homeScreen.id)
+  end if
   if homeScreen.canLoadCategories = true
     '//reset contentFetchCompleted flags
     homeScreen.contentFetchCompleted = false
@@ -592,15 +597,11 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
       '      ...
       '   </CategoryContentNode>
       ' </CategoryContentNode>
+      enableVideoTiles = isVideoTileEnabledScreen(screenID)
       homeScreen.contentFetchCompleted = true
 
       homeScreen.personalizationId = rawResponse.personalizationId
       homeScreen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
-
-      ' Set the enableVideoTiles field using the centralized method
-      ' Pass screenID to ensure correct rules are applied for the target screen
-      enableVideoTiles = isVideoTileEnabledScreen(screenID)
-      homeScreen.enableVideoTiles = enableVideoTiles
 
       sanitizeHomeScreenResponseAndReturnLiveEventsContainer(rawResponse)
       refreshLiveEventsContainerWithEpgListingInfo(rawResponse)
@@ -1523,6 +1524,8 @@ Function onListHasFocusChange(msg)
     m.inlinePreviewFocusIndicator.visible = false
     if screen.lastFocusedList <> "skinAdRow"
       pauseVideoPreview()
+    else
+      m.videoTileOverlayGroup.visible = false
     end if
   else
     screen = getCurrentScreen()

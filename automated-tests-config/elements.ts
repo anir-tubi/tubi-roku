@@ -2568,6 +2568,11 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#AllEmptyUI.#AllEmptyUIMenu.0.#DetailsMenuTextParent.#DetailsMenuTextFocused',
   },
 
+  myStuffAllEmptyUIMenu: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#AllEmptyUI.#AllEmptyUIMenu',
+  },
+
   /** channels list screen */
   channelsListScreenGrid: {
     keyPath:

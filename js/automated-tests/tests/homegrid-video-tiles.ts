@@ -357,19 +357,16 @@ describe('HomeGrid Video Tiles', function () {
 
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 15000);
 
-    const previewPlayer = await testUtils.getNodeForElement('previewVideoPlayer');
-
-    await utils.sleep((previewPlayer.duration + 3) * 1000);
+    // Seek to 5 seconds before the end of the preview to speed up the test
+    await testUtils.seekPlayerToRelativePosition('previewVideoPlayerScreen', -5000, 'end');
 
     await testUtils.retryWithTimeOut(async () => {
       const currentScreen = await testUtils.getElementField('screenStack', '-1', 10000);
       expect(currentScreen.id).to.equal('videoPlayerScreen', 'Should transition to full video player screen after preview ends');
     }, 60000);
 
-    await testUtils.retryWithTimeOut(async () => {
-      const playerState = await testUtils.getElementField('videoPlayerScreen', 'state', 5000);
-      expect(playerState).to.be.oneOf(['playing', 'buffering'], 'Full video should be playing or buffering after autoplay');
-    }, 60000);
+    await testUtils.waitForCurrentScreenToEqual('videoPlayerScreen', 10000);
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 10000);
 
     const content = await testUtils.getElementField('videoPlayerScreen', 'content');
     expect(content.title).to.exist;
@@ -2296,6 +2293,61 @@ describe('HomeGrid Video Tiles', function () {
 
     await testUtils.waitForCurrentScreenToEqual('homeScreen', 120000);
     await testUtils.waitForElementToHaveFocus('skinAdRow', 'Should return focus to home grid', 30000);
+
+    await proxy.pause();
+  });
+
+  // Test Rail Link: TBD - Video tiles visibility when scrolling from wrapper ad
+  it('Video tiles are shown when scrolling down from wrapper ad and hidden when scrolling back up @guest @ads @video_tiles', async () => {
+    // Set up ads endpoint mock before launching app
+    proxy.resume();
+    const proxyPromise = adTestHelpers.mockAds([AdType.Wrapper]);
+    // Launch app
+    await testUtils.startApplicationAtPage('home', {
+      shouldCreateNewUser: false,
+      clearRegistry: false,
+      disableSkinAds: false
+    });
+    await utils.promiseTimeout(proxyPromise, 50000);
+    await testUtils.waitForElementToHaveFocus('skinAdRow', 'Timed out waiting for wrapper ad to have focus', 15000);
+    // Wait for grid content to load
+    await testUtils.waitForGridContentToLoad('videoTitlesRowList', 10000);
+
+    // Verify video tiles are hidden when focus is on wrapper ad
+    // Check if either overlay is hidden or container opacity is 0 (either condition indicates video tiles are hidden)
+    const videoTileOverlayGroup = await testUtils.getNodeForElement('videoTileOverlayGroup');
+    const inlineVideoPreviewContainer = await testUtils.getNodeForElement('inlineVideoPreviewPlayerContainer');
+    const isVideoTilesHidden = videoTileOverlayGroup.visible === false || inlineVideoPreviewContainer.opacity === 0;
+    expect(isVideoTilesHidden).to.equal(true, 'Video tiles should be hidden when focus is on wrapper ad (either overlay hidden or container opacity 0)');
+
+    // Scroll down from wrapper ad to video tiles
+    await ecp.sendKeypress(ecp.Key.Down);
+    await utils.sleep(1000);
+
+    // Verify video tiles row list has focus
+    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for videoTitlesRowList to have focus after scrolling down', 10000);
+    await ecp.sendKeypress(ecp.Key.Back);
+    await utils.sleep(1000);
+    // Verify video tiles are shown
+    await testUtils.waitForElementToShowOnScreen('videoTileOverlayGroup', 'Video tile overlay should be visible after scrolling down', 5000);
+    const videoTileOverlayGroupAfterDown = await testUtils.getNodeForElement('videoTileOverlayGroup');
+    const inlineVideoPreviewContainerAfterDown = await testUtils.getNodeForElement('inlineVideoPreviewPlayerContainer');
+    expect(videoTileOverlayGroupAfterDown.visible).to.equal(true, 'Video tile overlay should be visible when focus is on video tiles');
+    expect(inlineVideoPreviewContainerAfterDown.opacity).to.equal(1, 'Inline video preview container should have opacity 1 when focus is on video tiles');
+    await ecp.sendKeypress(ecp.Key.Right);
+    // Scroll back up to wrapper ad
+    await ecp.sendKeypress(ecp.Key.Up);
+    await utils.sleep(1000);
+
+    // Verify wrapper ad has focus again
+    await testUtils.waitForElementToHaveFocus('skinAdRow', 'Timed out waiting for wrapper ad to have focus after scrolling up', 10000);
+    await utils.sleep(1000);
+
+    const videoTileOverlayGroupAfterUp = await testUtils.getNodeForElement('videoTileOverlayGroup');
+    const inlineVideoPreviewContainerAfterUp = await testUtils.getNodeForElement('inlineVideoPreviewPlayerContainer');
+    const isVideoTilesHiddenAfterUp = videoTileOverlayGroupAfterUp.visible === false || inlineVideoPreviewContainerAfterUp.opacity === 0;
+    expect(isVideoTilesHiddenAfterUp).to.equal(true, 'Video tiles should be hidden when focus returns to wrapper ad (either overlay hidden or container opacity 0)');
+
 
     await proxy.pause();
   });

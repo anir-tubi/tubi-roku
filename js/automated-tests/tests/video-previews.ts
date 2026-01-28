@@ -234,7 +234,7 @@ describe('Video Preview', function () {
     await utils.sleep(2000);
     await ecp.sendKeypress(ecp.Key.Back);
 
-    await testUtils.waitForElementToFullyShowOnScreen('emptyMyStuffButton');
+    await testUtils.waitForElementToHaveFocus('myStuffAllEmptyUIMenu', 'Timed out waiting for My Stuff All Empty UI Menu to have focus');
     await testUtils.waitForElementToNotShowOnScreen('previewVideoPlayer');
   });
 

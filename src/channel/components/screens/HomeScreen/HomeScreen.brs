@@ -118,11 +118,8 @@ Function setContentAreaState()
     hasSkinAdNotFocused = (skinAdExists AND rowListNotFocused)
   end if
 
-  ' Check if video tiles are disabled
-  notVideoTilesEnabled = (m.top.enableVideoTiles <> true)
-
   shouldAnimate = false
-  if notInExperiment OR hasSkinAdNotFocused OR notVideoTilesEnabled
+  if notInExperiment OR hasSkinAdNotFocused
     m.currentContentAreaTranslation = m.originalContentAreaTranslation
     shouldAnimate = true
   else

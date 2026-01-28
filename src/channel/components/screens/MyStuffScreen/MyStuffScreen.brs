@@ -167,6 +167,9 @@ Function onScreenFocusChange()
       if m.RowList.content <> invalid AND shouldRefresh(m.RowList.content) = true 'cacheValidationMixin
         m.top.refreshContent = true
       end if
+    else if m.isAllContentEmpty = true
+      m.AllEmptyUIMenu.setFocus(true)
+      m.top.backgroundUriList = [m.defaultBackgroundUri]
     end if
   end if
 
