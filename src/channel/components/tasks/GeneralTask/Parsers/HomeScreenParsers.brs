@@ -245,23 +245,6 @@ Function processCarouselAdContent(adID, assets, iValidUntil, aImageTracking = []
     carouselNode.videoPreviewUrl = videoData.url
   end if
 
-  aCarousel = []
-  for each sKey in assets.keys()
-    if sKey.startsWith("background_") = true
-      sIndex = sKey.split("background_")[1]
-      tile = assets["tile_" + sIndex]
-      carouselTile = parseCarouselTile(assets[sKey], tile, isUserInVideoTilesExperiment)
-      if carouselTile <> invalid
-        aCarousel.push(carouselTile)
-      end if
-    end if
-  end for
-
-  ' If no valid carousel tiles were found, skip this ad unit
-  if aCarousel.Count() = 0
-    return invalid
-  end if
-
   '//::NOTE:: quartile pixels are currently not being returned, but if they ever do, they will be supported.
   ' Add the ad info to the carousel node
   adInfo = invalid
@@ -279,6 +262,24 @@ Function processCarouselAdContent(adID, assets, iValidUntil, aImageTracking = []
       }
       type: "video"
     }
+  end if
+
+  aCarousel = []
+  for each sKey in assets.keys()
+    if sKey.startsWith("background_") = true
+      sIndex = sKey.split("background_")[1]
+      tile = assets["tile_" + sIndex]
+      carouselTile = parseCarouselTile(assets[sKey], tile, isUserInVideoTilesExperiment)
+      if carouselTile <> invalid
+        carouselTile.adInfo = adInfo
+        aCarousel.push(carouselTile)
+      end if
+    end if
+  end for
+
+  ' If no valid carousel tiles were found, skip this ad unit
+  if aCarousel.Count() = 0
+    return invalid
   end if
 
   translatedThumb = CreateObject("roSGNode", "TubiContentNode")
@@ -326,7 +327,7 @@ Function processSpotlightAdContent(adID, assets, iValidUntil, aImageTracking = [
     rowContentNode.title = assets.brand_text.text
   end if
 
-  translatedThumb = CreateObject("roSGNode", "TubiContentNode")
+  translatedThumb = CreateObject("roSGNode", "AdContentNode")
   translatedThumb.id = m.constants.ui.categoryIds.adRowlistSpotlight
   translatedThumb.slug = adID
   translatedThumb.type = m.constants.ui.contentTypes.adRowlistSpotlight
@@ -356,6 +357,7 @@ Function processSpotlightAdContent(adID, assets, iValidUntil, aImageTracking = [
     }
   end if
   rowContentNode.adInfo = adInfo
+  translatedThumb.adInfo = adInfo
 
   aBackgrounds = []
   if assets.background_image <> invalid AND isNonEmptyString(assets.background_image.url) = true

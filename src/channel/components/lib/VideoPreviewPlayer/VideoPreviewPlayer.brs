@@ -340,7 +340,7 @@ End Function
 
 
 'set hasCompleted to true when user watches the entire video preview, otherwise set it to false.
-Function getFinishPreviewEvent(hasCompleted = false)
+Function getFinishPreviewEvent(hasCompleted = false) as Object
 
   videoContent = m.Video.content
   finishPreviewEvent = invalid
@@ -353,7 +353,6 @@ Function getFinishPreviewEvent(hasCompleted = false)
     finishPreviewEvent = {
       type: "finish_preview"
       values: {
-        video_id: videoContent.id.toInt()
         end_position: Int(m.playerPosition * 1000) 'ms
         preview_id: previewId
         video_player: m.top.videoPlayerType
@@ -361,6 +360,17 @@ Function getFinishPreviewEvent(hasCompleted = false)
         has_completed: hasCompleted
       }
     }
+    if videoContent.isSubType("AdContentNode") = true
+      if isNonEmptyAA(videoContent.adInfo) = true AND isNonEmptyString(videoContent.adInfo.ad_id) = true
+        finishPreviewEvent.values.ad_id = videoContent.adInfo.ad_id.toInt()
+      else
+        '// ad_id is required for ad content nodes, so don't fire the event if it's missing
+        return invalid
+      end if
+    else
+      finishPreviewEvent.values.video_id = videoContent.id.toInt()
+    end if
+
   end if
 
   componentInfo = m.top.componentInfoForAnalytics
@@ -372,7 +382,7 @@ Function getFinishPreviewEvent(hasCompleted = false)
 End Function
 
 
-Function fireStartPreviewEvent()
+Function fireStartPreviewEvent() as Void
   videoContent = m.Video.content
   startPreviewEvent = invalid
 
@@ -382,13 +392,23 @@ Function fireStartPreviewEvent()
     startPreviewEvent = {
       type: "start_preview"
       values: {
-        video_id: videoContent.id.toInt()
         is_fullscreen: false
         video_player: m.top.videoPlayerType
         preview_id: previewId
         pageOneof: m.tubiTrackingInfo.getAnalyticsPage(m.currentPageInfo.pageType, m.currentPageInfo.pageValues)
       }
     }
+
+    if videoContent.isSubType("AdContentNode") = true
+      if isNonEmptyAA(videoContent.adInfo) = true AND isNonEmptyString(videoContent.adInfo.ad_id) = true
+        startPreviewEvent.values.ad_id = videoContent.adInfo.ad_id.toInt()
+      else
+        '// ad_id is required for ad content nodes, so don't fire the event if it's missing
+        return
+      end if
+    else
+      startPreviewEvent.values.video_id = videoContent.id.toInt()
+    end if
 
     componentInfo = m.top.componentInfoForAnalytics
     if isAA(componentInfo) = true AND isAA(componentInfo.componentOneof) = true

@@ -13,6 +13,8 @@
     
     <field id="json" type="string" />
 
+    <field id="slug" type="string" />
+
     <field id="imageImpTracking" type="array"/>
 
     <field id="videoPreviewUrl" type="string"/>
