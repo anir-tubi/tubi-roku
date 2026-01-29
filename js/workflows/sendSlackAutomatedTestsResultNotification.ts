@@ -6,8 +6,9 @@ const report = JSON.parse(fs.readFileSync(jsonReportOutputPath, 'utf8'));
 const env = process.env;
 const workflowRunUrl = `${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}`;
 
-// Get branch name - prefer explicit branch env var (from matrix), fallback to GitHub refs
-const rawBranch = env.branch || env.GITHUB_HEAD_REF || env.GITHUB_REF_NAME || 'unknown';
+// Get branch name - prefer CLI arg (from matrix job), else fallback to GitHub refs
+const branchArg = process.argv[2];
+const rawBranch = branchArg || env.GITHUB_HEAD_REF || env.GITHUB_REF_NAME || 'unknown';
 
 // Use actual failures array length instead of stats.failures
 // This ensures hook failures and affected tests are counted correctly

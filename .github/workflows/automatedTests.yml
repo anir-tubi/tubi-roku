@@ -113,14 +113,15 @@ jobs:
     # Use matrix strategy to run against both master and latest QA branch
     strategy:
       fail-fast: false
+      max-parallel: 1 # Limits concurrent jobs to 1 to avoid flakiness from sharing Rokus
       matrix:
         branch: ${{ fromJson(needs.set-target-branches.outputs.branches) }}
     # name helps to check the status of github action
     name: Run Automated UI Tests (${{ matrix.branch }})
     # The type of runner that the job will run
     runs-on: [self-hosted, enabled, roku, automation-regression]
-    # timeouts after 4 hours
-    timeout-minutes: 240
+    # timeouts after 3 hours
+    timeout-minutes: 180
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -188,7 +189,5 @@ jobs:
 
       - name: Send Slack Notification
         if: success() || failure()
-        env:
-          branch: ${{ matrix.branch }}
         run: |
-          npx ts-node ./js/workflows/sendSlackAutomatedTestsResultNotification.ts
+          npx ts-node ./js/workflows/sendSlackAutomatedTestsResultNotification.ts "${{ matrix.branch }}"
