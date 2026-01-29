@@ -4553,6 +4553,230 @@ Function getTranslation_es_MX()
       "description": "Button label when the content is unavailable",
       "message": "Contenido no disponible"
     },
+    "profile_selector_screen_title": {
+      "description": "Title of the profile selector screen",
+      "message": "¿Quién está viendo?"
+    },
+    "continue_as_guest_button": {
+      "description": "Button text displayed on profile selector screen",
+      "message": "Invitado"
+    },
+    "profile_switch_account": {
+      "description": "Button text displayed on profile selector screen",
+      "message": "Cambiar cuenta"
+    },
+    "add_account": {
+      "description": "Button text displayed on profile selector screen",
+      "message": "Agregar cuenta"
+    },
+    "screenSettings_menu_Account": {
+      "description": "A menu Item for the Settings screen",
+      "message": "Cuenta"
+    },
+    "screenSettings_manage_account_title": {
+      "description": "A description for the manage account screen",
+      "message": "Administrar tu cuenta"
+    },
+    "screenSettings_manage_account_description": {
+      "description": "A title for the manage account screen",
+      "message": "Para actualizar tu información o preferencias, escanea el código QR o visita la URL. Reinicia la app para ver los cambios."
+    },
+    "kids_screen_heading": {
+      "description": "Heading of the kids screen",
+      "message": "Elige un adulto para agregar una cuenta infantil"
+    },
+    "kids_screen_bottom_text_header": {
+      "description": "Bottom text header of the kids screen",
+      "message": "¿Quieres iniciar sesión en una cuenta Kids existente?"
+    },
+    "kids_screen_bottom_text": {
+      "description": "Bottom text of the kids screen",
+      "message": "Cambia a “Para adultos” e inicia sesión con una cuenta de adulto; iniciaremos sesión automáticamente para tu hijo."
+    },
+    "kids_screen_tab_buttons_adults": {
+      "description": "Tab buttons of the kids screen",
+      "message": "Para adultos"
+    },
+    "kids_screen_tab_buttons_kids": {
+      "description": "Tab buttons of the kids screen",
+      "message": "Para niños"
+    },
+    "name_screen_heading": {
+      "description": "Heading of the name screen",
+      "message": "¿Cuál es tu nombre?"
+    },
+    "name_screen_heading_kids": {
+      "description": "Heading of the name screen",
+      "message": "¿Cuál es el nombre de tu hijo?"
+    },
+    "name_screen_subheading_kids": {
+      "description": "Subheading of the name screen",
+      "message": "Configuración de cuenta Tubi Kids"
+    },
+    "kidsAgeSelection_header": {
+      "description": "Heading of the sign up kids age selection screen",
+      "message": "Elige una configuración de contenido"
+    },
+    "kidsAgeSelection_sub_header": {
+      "description": "Subheading of the sign up kids age selection screen",
+      "message": "Obtén más información sobre clasificaciones en tubi.tv/LINK"
+    },
+    "kidsAgeSelection_top_header": {
+      "description": "Top header of the sign up kids age selection screen",
+      "message": "Configuración de cuenta Tubi Kids"
+    },
+    "kidsAgeSelection_ageRatingLabel": {
+      "description": "Age rating label of the kids age selection screen",
+      "message": "Clasificación de edad"
+    },
+    "kidsAgeSelection_includedUpToLabel": {
+      "description": "Included up to label of the kids age selection screen",
+      "message": "Incluye hasta"
+    },
+    "ParentalControlPinPad_header": {
+      "description": "Header of the parental control pin pad screen",
+      "message": "Agregar PIN"
+    },
+    "ParentalControlPinPad_sub_header": {
+      "description": "Subheader of the parental control pin pad screen",
+      "message": "Este PIN evita que los niños cambien la configuración o salgan de Tubi Kids."
+    },
+    "screenSettings_linked_accounts_label": {
+      "description": "Label for the linked accounts screen",
+      "message": "Cuentas vinculadas"
+    },
+    "screenSettings_linked_accounts_description": {
+      "description": "Description for the linked accounts screen",
+      "message": "Estas son las cuentas de Tubi Kids vinculadas a tu cuenta de adulto:"
+    },
+    "dialog_signOut_title_kids": {
+      "description": "Title of the dialog window when the user is signing out of a kids account",
+      "message": "Cerrar sesión cierra las cuentas infantiles"
+    },
+    "dialog_signOut_description_kids": {
+      "description": "Description of the dialog window when the user is signing out of a kids account",
+      "message": "Estás por cerrar sesión en Tubi. Esto cerrará todas las cuentas infantiles vinculadas."
+    },
+    "screenSideNav_add_account_description": {
+      "description": "Description of the add account item in the side nav",
+      "message": "Para adultos y niños"
+    },
+    "screenSettings_menu_contentSettings": {
+      "description": "Menu option on the app's side nav to change content settings",
+      "message": "Configuración de contenido"
+    },
+    "screenSettings_contentSetting_YOUNGER_CHILD": {
+      "description": "Content setting label for younger child",
+      "message": "Clasificación 4-6"
+    },
+    "screenSettings_contentSetting_OLDER_CHILD": {
+      "description": "Content setting label for older child",
+      "message": "Clasificación 7-9"
+    },
+    "screenSettings_contentSetting_TEEN": {
+      "description": "Content setting label for teen",
+      "message": "Adolescente (13-17 años)"
+    },
+    "screenSettings_contentSetting_ADULT": {
+      "description": "Content setting label for adult",
+      "message": "Adulto (18+ años)"
+    },
+    "screenSettings_contentSetting_YOUNGEST_CHILD": {
+      "description": "Content setting label for youngest child",
+      "message": "Clasificación 1-3"
+    },
+    "screenSettings_contentSetting_OLDEST_CHILD": {
+      "description": "Content setting label for oldest child",
+      "message": "Clasificación 10-12"
+    },
+    "kidsAccountSetup_pageHeading": {
+      "description": "Page heading for Tubi Kids Account Setup screen",
+      "message": "Configuración de cuenta Tubi Kids"
+    },
+    "kidsAccountSetup_subHeading": {
+      "description": "Subheading for Tubi Kids Account Setup screen",
+      "message": "Ingresa la información de tu hijo para personalizar y configurar su cuenta Tubi Kids."
+    },
+    "kidsAccountSetup_startWatchingButton": {
+      "description": "Start Watching button text on Kids Account Setup screen",
+      "message": "Empezar a ver"
+    },
+    "kidsAccountSetup_adultAccountLabel": {
+      "description": "Label for adult account field on Kids Account Setup screen",
+      "message": "Cuenta de adulto"
+    },
+    "kidsAccountSetup_adultAccountDescription": {
+      "description": "Description text for adult account field",
+      "message": "Esta cuenta gestionará la cuenta de Tubi Kids."
+    },
+    "kidsAccountSetup_kidFirstNameLabel": {
+      "description": "Label for kid's first name field",
+      "message": "Nombre del niño"
+    },
+    "kidsAccountSetup_contentSettingLabel": {
+      "description": "Label for content setting field",
+      "message": "Configuración de contenido"
+    },
+    "kidsAccountSetup_pinDescription": {
+      "description": "Description text for PIN field",
+      "message": "Debes ingresar este PIN para salir de Tubi Kids."
+    },
+    "kidsAccountSetup_termsText": {
+      "description": "Terms text for Kids Account Setup screen",
+      "message": "Al hacer clic en Empezar a ver, aceptas {url1} y {url2}"
+    },
+    "screenSettings_contentSettings_instructions": {
+      "description": "Instructions text for content settings panel",
+      "message": "Establece límites de clasificación para ti y tus hijos y gestiona tu PIN para una visualización segura."
+    },
+    "screenSettings_contentSettings_create_pinLabel": {
+      "description": "Label for the create pin button",
+      "message": "Crear PIN"
+    },
+    "screenSettings_contentSettings_edit_pinLabel": {
+      "description": "Label for the edit pin button",
+      "message": "Editar PIN"
+    },
+    "screenSettings_parentalControls_pinLabel": {
+      "description": "Label for the pin label",
+      "message": "PIN"
+    },
+    "screenSettings_parentalControls_pinDescription": {
+      "description": "Description for the pin description",
+      "message": "Este PIN evita que tu hijo salga de Tubi Kids."
+    },
+    "screenSettings_parentalPassword_create_new_pin": {
+      "description": "Label for the create new pin button",
+      "message": "Crear nuevo PIN"
+    },
+    "screenSettings_parentalPassword_confirm_pin": {
+      "description": "Label for the confirm pin button",
+      "message": "Confirmar nuevo PIN"
+    },
+    "screenSettings_parentalPassword_error_pin_mismatch": {
+      "description": "Error message when the pin does not match",
+      "message": "El PIN no coincide. Intenta de nuevo."
+    },
+    "ParentalControlPinInputScreen_enter_pin_header": {
+      "description": "Header of the enter pin screen",
+      "message": "Ingresa PIN"
+    },
+    "ParentalControlPinInputScreen_forgot_pin_button_label": {
+      "description": "Label of the forgot pin button in the parental control pin input screen",
+      "message": "¿Olvidaste el PIN?"
+    },
+    "screenSettings_pinPassword_title": {
+      "description": "Title of the pin password screen",
+      "message": "Ingresa tu contraseña para editar tu PIN"
+    },
+    "passwordScreen_account_enter_title": {
+      "description": "Title of the password screen for account enter",
+      "message": "{name}, ingresa tu contraseña para empezar a ver"
+    },
+    "new_account_welcome_header": {
+      "description": "A header for the message that let's the user know they've been signed in with the given email",
+      "message": "¡Bienvenido, {name}!"
+    },
     "reminder_set_toast_header": {
       "description": "Toast message header that is displayed when we set a reminder for a content",
       "message": "Recordatorio agregado"
@@ -4564,6 +4788,38 @@ Function getTranslation_es_MX()
     "reminder_set_button_label": {
       "description": "Label of the button to remove a reminder for a content",
       "message": "Recordatorio activado"
+    },
+    "ParentalControlPinInputScreen_skip_button_label": {
+      "description": "Label of the skip button in the parental control pin input screen",
+      "message": "Desactivar PIN"
+    },
+    "parental_pin_update_success_header": {
+      "description": "Header of the toast that is shown when the parental pin is updated successfully",
+      "message": "PIN editado"
+    },
+    "parental_pin_update_success_message": {
+      "description": "Message of the toast that is shown when the parental pin is updated successfully",
+      "message": "Tu nuevo PIN ya está listo"
+    },
+    "parental_pin_update_error_message": {
+      "description": "Message of the toast that is shown when the parental pin update fails",
+      "message": "Intenta de nuevo más tarde"
+    },
+    "parental_pin_update_error_button_label": {
+      "description": " button label of the dialog that is shown when the parental pin update fails",
+      "message": "Volver a inicio Kids"
+    },
+    "duplicate_kid_name_error_message": {
+      "description": "Error message shown when a kid profile with the same name already exists",
+      "message": "Ya existe un perfil con este nombre. Elige otro nombre."
+    },
+    "too_many_kids_error_message": {
+      "description": "Error message shown when the user has reached the maximum number of kid profiles",
+      "message": "Alcanzaste el número máximo de perfiles infantiles."
+    },
+    "invalid_name_chars_error_message": {
+      "description": "Error message shown when the profile name contains invalid characters",
+      "message": "Este nombre contiene caracteres no válidos."
     },
     "screenDetails_button_resume": {
       "description": "Label of button to allow users to resume the current video title",
@@ -6589,6 +6845,230 @@ Function getTranslation_fr_CA()
       "description": "Button label when the content is unavailable",
       "message": "Contenu non disponible"
     },
+    "profile_selector_screen_title": {
+      "description": "Title of the profile selector screen",
+      "message": "Qui regarde ?"
+    },
+    "continue_as_guest_button": {
+      "description": "Button text displayed on profile selector screen",
+      "message": "Invité"
+    },
+    "profile_switch_account": {
+      "description": "Button text displayed on profile selector screen",
+      "message": "Changer de compte"
+    },
+    "add_account": {
+      "description": "Button text displayed on profile selector screen",
+      "message": "Ajouter un compte"
+    },
+    "screenSettings_menu_Account": {
+      "description": "A menu Item for the Settings screen",
+      "message": "Compte"
+    },
+    "screenSettings_manage_account_title": {
+      "description": "A description for the manage account screen",
+      "message": "Gérer votre compte"
+    },
+    "screenSettings_manage_account_description": {
+      "description": "A title for the manage account screen",
+      "message": "Pour mettre à jour vos infos ou préférences, scannez le code QR ou visitez l’URL. Redémarrez l’app pour voir les changements."
+    },
+    "kids_screen_heading": {
+      "description": "Heading of the kids screen",
+      "message": "Choisissez un adulte pour ajouter un compte enfants"
+    },
+    "kids_screen_bottom_text_header": {
+      "description": "Bottom text header of the kids screen",
+      "message": "Voulez-vous vous connecter à un compte Kids existant ?"
+    },
+    "kids_screen_bottom_text": {
+      "description": "Bottom text of the kids screen",
+      "message": "Passez à « Pour adultes » et connectez-vous avec un compte adulte — votre enfant sera connecté automatiquement."
+    },
+    "kids_screen_tab_buttons_adults": {
+      "description": "Tab buttons of the kids screen",
+      "message": "Pour adultes"
+    },
+    "kids_screen_tab_buttons_kids": {
+      "description": "Tab buttons of the kids screen",
+      "message": "Pour enfants"
+    },
+    "name_screen_heading": {
+      "description": "Heading of the name screen",
+      "message": "Quel est votre prénom ?"
+    },
+    "name_screen_heading_kids": {
+      "description": "Heading of the name screen",
+      "message": "Quel est le prénom de votre enfant ?"
+    },
+    "name_screen_subheading_kids": {
+      "description": "Subheading of the name screen",
+      "message": "Configuration du compte Tubi Kids"
+    },
+    "kidsAgeSelection_header": {
+      "description": "Heading of the sign up kids age selection screen",
+      "message": "Choisissez un paramètre de contenu"
+    },
+    "kidsAgeSelection_sub_header": {
+      "description": "Subheading of the sign up kids age selection screen",
+      "message": "En savoir plus sur les classifications à tubi.tv/LINK"
+    },
+    "kidsAgeSelection_top_header": {
+      "description": "Top header of the sign up kids age selection screen",
+      "message": "Configuration du compte Tubi Kids"
+    },
+    "kidsAgeSelection_ageRatingLabel": {
+      "description": "Age rating label of the kids age selection screen",
+      "message": "Cote d’âge"
+    },
+    "kidsAgeSelection_includedUpToLabel": {
+      "description": "Included up to label of the kids age selection screen",
+      "message": "Inclus jusqu’à"
+    },
+    "ParentalControlPinPad_header": {
+      "description": "Header of the parental control pin pad screen",
+      "message": "Ajouter un NIP"
+    },
+    "ParentalControlPinPad_sub_header": {
+      "description": "Subheader of the parental control pin pad screen",
+      "message": "Ce NIP empêche les enfants de modifier les paramètres ou de quitter Tubi Kids."
+    },
+    "screenSettings_linked_accounts_label": {
+      "description": "Label for the linked accounts screen",
+      "message": "Comptes liés"
+    },
+    "screenSettings_linked_accounts_description": {
+      "description": "Description for the linked accounts screen",
+      "message": "Voici les comptes Tubi Kids liés à votre compte adulte :"
+    },
+    "dialog_signOut_title_kids": {
+      "description": "Title of the dialog window when the user is signing out of a kids account",
+      "message": "La déconnexion ferme les comptes enfants"
+    },
+    "dialog_signOut_description_kids": {
+      "description": "Description of the dialog window when the user is signing out of a kids account",
+      "message": "Vous êtes sur le point de vous déconnecter de Tubi. Tous les comptes enfants liés seront déconnectés."
+    },
+    "screenSideNav_add_account_description": {
+      "description": "Description of the add account item in the side nav",
+      "message": "Pour adultes et enfants"
+    },
+    "screenSettings_menu_contentSettings": {
+      "description": "Menu option on the app's side nav to change content settings",
+      "message": "Paramètre de contenu"
+    },
+    "screenSettings_contentSetting_YOUNGER_CHILD": {
+      "description": "Content setting label for younger child",
+      "message": "Cote d’âge 4-6"
+    },
+    "screenSettings_contentSetting_OLDER_CHILD": {
+      "description": "Content setting label for older child",
+      "message": "Cote d’âge 7-9"
+    },
+    "screenSettings_contentSetting_TEEN": {
+      "description": "Content setting label for teen",
+      "message": "Adolescent (13-17)"
+    },
+    "screenSettings_contentSetting_ADULT": {
+      "description": "Content setting label for adult",
+      "message": "Adulte (18+)"
+    },
+    "screenSettings_contentSetting_YOUNGEST_CHILD": {
+      "description": "Content setting label for youngest child",
+      "message": "Cote d’âge 1-3"
+    },
+    "screenSettings_contentSetting_OLDEST_CHILD": {
+      "description": "Content setting label for oldest child",
+      "message": "Cote d’âge 10-12"
+    },
+    "kidsAccountSetup_pageHeading": {
+      "description": "Page heading for Tubi Kids Account Setup screen",
+      "message": "Configuration du compte Tubi Kids"
+    },
+    "kidsAccountSetup_subHeading": {
+      "description": "Subheading for Tubi Kids Account Setup screen",
+      "message": "Entrez les infos de votre enfant pour personnaliser et configurer son compte Tubi Kids."
+    },
+    "kidsAccountSetup_startWatchingButton": {
+      "description": "Start Watching button text on Kids Account Setup screen",
+      "message": "Commencer à regarder"
+    },
+    "kidsAccountSetup_adultAccountLabel": {
+      "description": "Label for adult account field on Kids Account Setup screen",
+      "message": "Compte adulte"
+    },
+    "kidsAccountSetup_adultAccountDescription": {
+      "description": "Description text for adult account field",
+      "message": "Ce compte gérera le compte Tubi Kids."
+    },
+    "kidsAccountSetup_kidFirstNameLabel": {
+      "description": "Label for kid's first name field",
+      "message": "Prénom de l’enfant"
+    },
+    "kidsAccountSetup_contentSettingLabel": {
+      "description": "Label for content setting field",
+      "message": "Paramètre de contenu"
+    },
+    "kidsAccountSetup_pinDescription": {
+      "description": "Description text for PIN field",
+      "message": "Vous devez entrer ce NIP pour quitter Tubi Kids."
+    },
+    "kidsAccountSetup_termsText": {
+      "description": "Terms text for Kids Account Setup screen",
+      "message": "En cliquant sur Commencer à regarder, vous acceptez {url1} et {url2}"
+    },
+    "screenSettings_contentSettings_instructions": {
+      "description": "Instructions text for content settings panel",
+      "message": "Définissez des limites de classification pour vous et vos enfants et gérez votre NIP pour un visionnement sécuritaire."
+    },
+    "screenSettings_contentSettings_create_pinLabel": {
+      "description": "Label for the create pin button",
+      "message": "Créer un NIP"
+    },
+    "screenSettings_contentSettings_edit_pinLabel": {
+      "description": "Label for the edit pin button",
+      "message": "Modifier le NIP"
+    },
+    "screenSettings_parentalControls_pinLabel": {
+      "description": "Label for the pin label",
+      "message": "NIP"
+    },
+    "screenSettings_parentalControls_pinDescription": {
+      "description": "Description for the pin description",
+      "message": "Ce NIP empêche votre enfant de quitter Tubi Kids."
+    },
+    "screenSettings_parentalPassword_create_new_pin": {
+      "description": "Label for the create new pin button",
+      "message": "Créer un nouveau NIP"
+    },
+    "screenSettings_parentalPassword_confirm_pin": {
+      "description": "Label for the confirm pin button",
+      "message": "Confirmer le nouveau NIP"
+    },
+    "screenSettings_parentalPassword_error_pin_mismatch": {
+      "description": "Error message when the pin does not match",
+      "message": "Le NIP ne correspond pas. Réessayez."
+    },
+    "ParentalControlPinInputScreen_enter_pin_header": {
+      "description": "Header of the enter pin screen",
+      "message": "Entrez le NIP"
+    },
+    "ParentalControlPinInputScreen_forgot_pin_button_label": {
+      "description": "Label of the forgot pin button in the parental control pin input screen",
+      "message": "NIP oublié"
+    },
+    "screenSettings_pinPassword_title": {
+      "description": "Title of the pin password screen",
+      "message": "Entrez votre mot de passe pour modifier votre NIP"
+    },
+    "passwordScreen_account_enter_title": {
+      "description": "Title of the password screen for account enter",
+      "message": "{name}, entrez votre mot de passe pour commencer à regarder"
+    },
+    "new_account_welcome_header": {
+      "description": "A header for the message that let's the user know they've been signed in with the given email",
+      "message": "Bienvenue, {name}!"
+    },
     "reminder_set_toast_header": {
       "description": "Toast message header that is displayed when we set a reminder for a content",
       "message": "Rappel ajouté"
@@ -6600,6 +7080,38 @@ Function getTranslation_fr_CA()
     "reminder_set_button_label": {
       "description": "Label of the button to remove a reminder for a content",
       "message": "Rappel activé"
+    },
+    "ParentalControlPinInputScreen_skip_button_label": {
+      "description": "Label of the skip button in the parental control pin input screen",
+      "message": "Désactiver le NIP"
+    },
+    "parental_pin_update_success_header": {
+      "description": "Header of the toast that is shown when the parental pin is updated successfully",
+      "message": "NIP modifié"
+    },
+    "parental_pin_update_success_message": {
+      "description": "Message of the toast that is shown when the parental pin is updated successfully",
+      "message": "Votre nouveau NIP est prêt à être utilisé"
+    },
+    "parental_pin_update_error_message": {
+      "description": "Message of the toast that is shown when the parental pin update fails",
+      "message": "Réessayez un peu plus tard"
+    },
+    "parental_pin_update_error_button_label": {
+      "description": " button label of the dialog that is shown when the parental pin update fails",
+      "message": "Retour à l’accueil Kids"
+    },
+    "duplicate_kid_name_error_message": {
+      "description": "Error message shown when a kid profile with the same name already exists",
+      "message": "Un profil portant ce nom existe déjà. Choisissez un autre nom."
+    },
+    "too_many_kids_error_message": {
+      "description": "Error message shown when the user has reached the maximum number of kid profiles",
+      "message": "Vous avez atteint le nombre maximal de profils enfants."
+    },
+    "invalid_name_chars_error_message": {
+      "description": "Error message shown when the profile name contains invalid characters",
+      "message": "Ce nom contient des caractères non valides."
     },
     "screenDetails_button_resume": {
       "description": "Label of button to allow users to resume the current video title",
@@ -6819,6 +7331,10 @@ Function getTranslation_en_GB()
     "videoPlayer_adBreakStartsIn": {
       "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
       "message": "Adverts start in"
+    },
+    "kidsAccountSetup_subHeading": {
+      "description": "Subheading for Tubi Kids Account Setup screen",
+      "message": "Enter your kid's info below to personalise and set up their Tubi Kids account."
     },
     "reminder_set_toast_header": {
       "description": "Toast message header that is displayed when we set a reminder for a content",
