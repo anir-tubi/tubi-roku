@@ -1,4 +1,4 @@
-# Cursor AI Rules for Tubi Roku Project
+# AI Rules for Tubi Roku Project
 
 ## Quick Reference - Most Common Mistakes
 1. ❌ Using `onChange` in XML → ✅ Use `observeFieldScoped()` in init()
@@ -455,4 +455,3 @@ End Function
 - Uses BrightScript programming language
 - Supports multiple languages: en-US, es-MX, fr-CA
 - Handles both 1080p and 720p displays with image scaling
-
