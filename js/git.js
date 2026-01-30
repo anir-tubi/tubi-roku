@@ -13,6 +13,9 @@ const { NoStackError, execShellCommand } = require('./utilities');
 
 const githubDeveloperInfo = require('./github-developer-info.json');
 
+// Slack webhook URL used for release/experiment reminders and translations PR review
+const SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/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';
+
 // constants used for interacting with the github API
 const ghInfo = {
   owner: 'adRise',
@@ -504,7 +507,6 @@ async function sendSlackReminders(done) {
   log(`...Sending slack reminders to the team`);
   const prodBranch = getProductionBranchName();
   const currentBranch = getCurrentBranch(done);
-  const webHookUrl = 'https://hooks.slack.com/services/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';
 
   const pullRequestCommits = await findPullRequestCommitDifferences(done, currentBranch, prodBranch, true);
 
@@ -527,7 +529,7 @@ async function sendSlackReminders(done) {
       const message = `<@${memberId}> , Please create the experiment if needed for : \n\`\`\`  ${prReleaseNotes}\`\`\``;
 
       //post and forget
-      sendSlackMessage(message, webHookUrl);
+      sendSlackMessage(message, SLACK_WEBHOOK_URL);
     }
 
   }
@@ -1338,6 +1340,10 @@ async function createTranslationsPullRequest(done) {
 
     const prUrl = prResponse.data.html_url;
     log(`✅ Successfully created pull request: ${prUrl}`);
+
+    // Notify Slack to request PR review
+    const slackMessage = `Please review the following Translations PR: <${prUrl}|View PR>`;
+    await sendSlackMessage(slackMessage, SLACK_WEBHOOK_URL);
 
     // Copy PR URL to clipboard
     try {
