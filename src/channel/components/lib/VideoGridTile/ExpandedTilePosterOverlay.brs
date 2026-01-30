@@ -233,6 +233,9 @@ Function setBadge(badgeType = "live", badgeInfo = {}, posterLabels = {})
     }
 
     showSotBadges(badgeInfo, config, m.sotTopLabelGroup, m.bottomContentGroup, posterLabels)
+
+    'Fire Exposure event when we show SOT badge.
+    getStatsigExperimentResource("roku_sot_reverse_ui_test", "roku_sot_reverse_ui_test_v1", true)
   end if
 End Function
 

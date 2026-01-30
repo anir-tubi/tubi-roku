@@ -92,7 +92,7 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
 
       roku_sot_reverse_ui_test: {
         roku_sot_reverse_ui_test_v1: {
-          default: { "enabled": true }
+          default: { "enabled": false }
         }
       }
 

@@ -455,6 +455,14 @@ Function onRenderTrackingChange(msg)
   topRef = m.top
   content = topRef.itemContent
 
+  if content <> invalid AND (state = "full" OR state = "partial")
+    ' Check if badge exists in StarterGridItem
+    badgeExist = m.sotBadge <> invalid
+    if badgeExist = true OR (isAA(content.sotPosterLabels) = true AND content.sotPosterLabels.count() > 0)
+      getStatsigExperimentResource("roku_sot_reverse_ui_test", "roku_sot_reverse_ui_test_v1", true)
+    end if
+  end if
+
   MIN_VISIBLE_THRESHOLD = 1000
 
   ' Checking the item is of a certain type that we want to track viewable impression event for.
