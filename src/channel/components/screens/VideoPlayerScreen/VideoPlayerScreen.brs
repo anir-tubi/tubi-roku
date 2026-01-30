@@ -1018,6 +1018,7 @@ Function playContent()
       m.Video.control = "play"
       setInitialCCAndAudioTracks()
     end if
+
     m.shouldFireStartVideoEvent = true
   end if
 
@@ -2269,7 +2270,7 @@ Function setDrmOnContent(contentNode, resource, videoResourceIndex)
     contentNode.youboraTracking = youboraTracking
 
     ' set DRM scheme specific fields
-    if resource.type = m.constants.player.drmTypes.dashWidevine
+    if resource.type = m.constants.player.drmTypes.dashWidevine OR resource.type = m.constants.player.drmTypes.hlsv6Widevine
       contentNode.drmParams = resource.drmParams
     else if resource.type = m.constants.player.drmTypes.dashPlayready
       contentNode.encodingType = resource.encodingType
@@ -2840,6 +2841,10 @@ Function advanceDrmOnContent(contentNode)
         end if
 
         if nextResource <> invalid AND setDrmOnContent(contentNode, nextResource, [nextCodecIndex, nextDrmIndex]) = true
+
+          ' fire exposure event for video playback
+          getStatsigExperimentResource("roku_player_improvement", "roku_player_drm_order_hlsv6_widevine", true)
+
           sendVideoResourceFallbackToPlayerLogLib(currentResource, nextResource, "DRM")
 
           fallbackInfo = {

@@ -30,6 +30,7 @@ Function CmsApi(constants, apiUtilsLib, experiments = invalid, experimentsInterf
 
 
     ' private
+    getSupportedVideoResources: cmsApi_getSupportedVideoResources
     setImageParams: cmsApi_setImageParams
     setTupianPosterParam: cmsApi_setTupianPosterParam
     setTupianLandscapeParam: cmsApi_setTupianLandscapeParam
@@ -56,7 +57,7 @@ End Function
 Function cmsApi_createRelatedContentReqInfo(contentId, bKidsMode = false, limit = 0)
   options = m.getCommonOptions(true)
   options.params["isKidsMode"] = bKidsMode
-  options.params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
+  options.params["video_resources"] = m.getSupportedVideoResources()
   options.params = m.setTupianPosterParam(options.params)
   options.params["content_id"] = contentId
 
@@ -81,7 +82,7 @@ Function cmsApi_createUpNextContentReqInfo(passedOptions, bDisplayLargestLandsca
   options = m.getCommonOptions(true)
   params = options.params
   headers = options.headers
-  params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
+  params["video_resources"] = m.getSupportedVideoResources()
   params["limit_resolutions"] = m.constants.player.limitResolutions
 
   if passedOptions <> invalid
@@ -120,7 +121,7 @@ Function cmsApi_createSingleContentReqInfo(contentId, includeChannels = false, b
   options.params["content_id"] = contentId
   options.params["isKidsMode"] = bKidsMode
   options.params["includeChannels"] = includeChannels
-  options.params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
+  options.params["video_resources"] = m.getSupportedVideoResources()
   options.params["limit_resolutions"] = m.constants.player.limitResolutions
   options.params = m.setImageParams(["title", "landscape", "background"], options.params)
 
@@ -152,7 +153,7 @@ Function cmsApi_createSeriesEpisodesBySeasonReqInfo(seriesId, season = 1, pageIn
   options.params["pagination[page_size_in_season]"] = pageSizeInSeason
   options.params["isKidsMode"] = bKidsMode
   options.params["includeChannels"] = includeChannels
-  options.params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
+  options.params["video_resources"] = m.getSupportedVideoResources()
   options.params["limit_resolutions"] = m.constants.player.limitResolutions
   options.params = m.setImageParams(["title", "landscape", "background"], options.params)
 
@@ -359,7 +360,7 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
   ' content_mode is mandatory param and its value needs to be passed as empty for fetching homescreen content
   params["content_mode"] = "" ' default contentMode
   params["limit_resolutions"] = m.constants.player.limitResolutions
-  params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
+  params["video_resources"] = m.getSupportedVideoResources()
 
   'passing device advertiser id to homescreen request for home screen personalization
   params["idfa"] = m.constants.deviceInfo.deviceAdId
@@ -518,7 +519,7 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
   params["contents_limit"] = m.constants.performance.categoryGridList.finalBlockSize
   params["content_mode"] = ""
   params["limit_resolutions"] = m.constants.player.limitResolutions
-  params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
+  params["video_resources"] = m.getSupportedVideoResources()
   params["include_ui_customization"] = true
 
   utmCampaignConfig = m.utmCampaignConfig
@@ -593,7 +594,7 @@ Function cmsApi_createSearchReqInfo(searchText, bKidsMode = false, sAutoComplete
 
   options.params = m.setImageParams(imageParamTypes, options.params, m.constants.ui.screenIds.searchScreen)
   options.params["limit_resolutions"] = m.constants.player.limitResolutions
-  options.params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
+  options.params["video_resources"] = m.getSupportedVideoResources()
 
   if includeLinear = true
     'setting the include_linear param to true will enable the linear content available for search screen from backend
@@ -1016,7 +1017,7 @@ Function cmsApi_createGetSeasonListBySeriesIdReqInfo(seriesId, bKidsMode = false
   headers = options.headers
 
   params["is_kids_mode"] = bKidsMode
-  params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
+  params["video_resources"] = m.getSupportedVideoResources()
   params["limit_resolutions"] = m.constants.player.limitResolutions
 
   if passedOptions <> invalid
@@ -1038,4 +1039,21 @@ Function cmsApi_createGetSeasonListBySeriesIdReqInfo(seriesId, bKidsMode = false
     url: url
     options: options
   }
+End Function
+
+
+' Returns the list of supported video resources based on Statsig experiment
+' hlsv6_widevine is only included when roku_player_drm_order_hlsv6_widevine experiment is enabled
+Function cmsApi_getSupportedVideoResources()
+  videoResources = m.constants.player.drmOrderWithoutHlsWidevine
+
+  if m.statSigExperiments <> invalid
+    experimentResource = m.statSigExperiments.getExperimentResource("roku_player_improvement", "roku_player_drm_order_hlsv6_widevine")
+
+    if experimentResource <> invalid AND experimentResource.enabled = true
+      videoResources = m.constants.player.drmOrderWithHlsWidevine
+    end if
+  end if
+
+  return videoResources
 End Function

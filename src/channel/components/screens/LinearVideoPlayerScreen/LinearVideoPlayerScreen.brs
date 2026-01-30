@@ -974,7 +974,7 @@ Function setDrmOnContent(contentNode, resource, videoResourceIndex)
     contentNode.youboraTracking = youboraTracking
 
     ' set DRM scheme specific fields
-    if resource.type = m.constants.player.drmTypes.dashWidevine
+    if resource.type = m.constants.player.drmTypes.dashWidevine OR resource.type = m.constants.player.drmTypes.hlsv6Widevine
       contentNode.drmParams = resource.drmParams
     else if resource.type = m.constants.player.drmTypes.dashPlayready
       contentNode.encodingType = resource.encodingType

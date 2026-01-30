@@ -2264,14 +2264,21 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
 
       if validResource = true
 
-        if video.type = m.constants.player.drmTypes.dashWidevine
-          resource.type = m.constants.player.drmTypes.dashWidevine
-          resource.streamFormat = "dash"
+        if video.type = m.constants.player.drmTypes.dashWidevine OR video.type = m.constants.player.drmTypes.hlsv6Widevine
+          resource.type = video.type
+
+          if video.type = m.constants.player.drmTypes.hlsv6Widevine
+            resource.streamFormat = "hls"
+          else
+            resource.streamFormat = "dash"
+          end if
+
           if video.license_server <> invalid
             resource.drmParams = {
               keySystem: "Widevine"
               licenseServerURL: video.license_server.url
             }
+
             if video.license_server.auth_header_key <> invalid AND video.license_server.auth_header_value <> invalid
               resource.drmHeaders = [video.license_server.auth_header_key + ":" + video.license_server.auth_header_value]
             end if
