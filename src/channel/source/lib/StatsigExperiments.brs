@@ -136,6 +136,7 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
     }
     statsigExperimentsInfo: statsigExperimentsInfo
     getExperimentResource: statsigExperiments_getExperimentResource
+    getExperimentActualResource: statsigExperiments_getExperimentActualResource
     getExperimentTracking: statsigExperiments_getExperimentTracking
     getExperiment: statsigExperiments_getExperiment
     getDefaultResource: statsigExperiments_getDefaultResource
@@ -196,13 +197,32 @@ End Function
 '
 Function statsigExperiments_getExperimentResource(namespaceName as String, experimentName as String)
   defaultResource = m.getDefaultResource(namespaceName, experimentName)
-  experiment = m.getExperiment(namespaceName, experimentName)
+  experimentResource = m.getExperimentActualResource(namespaceName, experimentName)
 
-  if experiment <> invalid AND experiment.config <> invalid AND experiment.config.value <> invalid
-    return experiment.config.value
+  if experimentResource <> invalid
+    return experimentResource
   else
     return defaultResource
   end if
+End Function
+
+
+' Get actual experiment resource from Statsig experiments response
+' @namespaceName: experiment namespace
+' @experimentName: experiment name
+'
+' @returns: experiment config value or invalid
+Function statsigExperiments_getExperimentActualResource(namespaceName as String, experimentName as String)
+  experiment = m.getExperiment(namespaceName, experimentName)
+
+  if experiment <> invalid AND experiment.config <> invalid AND experiment.config.value <> invalid
+    value = experiment.config.value
+    if type(value) = "roAssociativeArray" AND value.keys().isEmpty() = false
+      return experiment.config.value
+    end if
+  end if
+
+  return invalid
 End Function
 
 

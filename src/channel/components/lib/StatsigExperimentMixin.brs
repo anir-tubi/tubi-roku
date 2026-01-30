@@ -13,9 +13,15 @@ Function getStatsigExperimentResource(namespaceName as String, experimentName as
 
   experiments = StatsigExperimentsInterface(m.statsigExperimentsInfo)
   resource = experiments.getExperimentResource(namespaceName, experimentName)
+  actualResource = experiments.getExperimentActualResource(namespaceName, experimentName)
 
-  if sendEvent = true AND resource <> invalid
-    sendOutStatsigExperimentTracking(namespaceName, experimentName, experiments)
+  if sendEvent = true
+    if actualResource <> invalid
+      '// if we have an actual resource from statsig, not a local default, then send out tracking
+      sendOutStatsigExperimentTracking(namespaceName, experimentName, experiments)
+    else if experimentName <> invalid AND experimentName <> ""
+      tubiLog("StatsigExperimentMixin.getStatsigExperimentResource: No actual resource for experiment " + experimentName + ", not sending tracking event.")
+    end if
   end if
 
   return resource
