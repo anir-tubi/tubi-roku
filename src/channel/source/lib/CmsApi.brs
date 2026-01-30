@@ -102,7 +102,6 @@ Function cmsApi_createUpNextContentReqInfo(passedOptions, bDisplayLargestLandsca
   options.params = m.setTupianPosterParam(options.params)
 
   if bDisplayLargestLandscape = true
-    '//::NOTE:: if the roku_video_autostart_ui_refresh_v1 is graduated, replace bDisplayLargestLandscape with isSeries, in which case the largest landscape image will be used for series only
     options.params = m.setImageParams(["largestLandscape"], options.params)
   else
     options.params = m.setTupianLandscapeParam(options.params)

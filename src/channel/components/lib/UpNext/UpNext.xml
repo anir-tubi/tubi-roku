@@ -13,7 +13,6 @@
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/UserMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
-  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StatsigLib.brs" />
@@ -126,12 +125,6 @@
           <Group
             id="metadata"
             translation="[270,0]">
-            <Label
-              id="CountdownLabelMovie"
-              translation="[0,0]">
-              <Font
-              role="font"/>
-            </Label>
             <InfoPanel
               id="InfoMovie"
               mode="item"
@@ -155,12 +148,6 @@
           <Group
             id="metadataSeries"
             translation="[597,0]">
-            <Label
-              id="CountdownLabelSeries"
-              height="0">
-              <Font
-              role="font"/>
-            </Label>
             <InfoPanel
               id="InfoSeries"
               mode="item"
@@ -170,7 +157,6 @@
               maxTitleLines="2"/>
           </Group>
 
-        <!-- ::TODO:: If roku_video_autostart_ui_refresh_v1 experiment is graduated, should we revisit this so we can create the button w/o needing a markupGrid  -->
         <FilledButtonMarkupGrid
           id="UpNextSeriesMenu"
           translation="[387,552]"

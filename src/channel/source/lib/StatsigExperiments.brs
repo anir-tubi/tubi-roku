@@ -51,12 +51,13 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         roku_player_control_ui_refresh_v4: {
           default: { "type": "none" }
         }
-      }
-
-      roku_postplay_countdown_timer: {
-        ' Possible values for series timer: 3s, 5s, 10s (default: 15s)
-        roku_postplay_countdown_timer_series_v1: {
-          default: { countdown: 15 }
+        ' Postplay countdown timer experiment for series (roku_postplay_countdown_timer_series_v2):
+        ' Control: 15s countdown
+        ' Variant 1: 3s countdown
+        ' Variant 2: 3s countdown + simplified UI (no posters, only a Next Episode button)
+        ' Variant 3: 3s countdown + simplified UI + automatic skip recap after autoplay
+        roku_postplay_countdown_timer_series_v2: {
+          default: { countdown: 15, simplifiedUI: false, automaticSkipRecap: false }
         }
       }
 

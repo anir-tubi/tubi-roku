@@ -129,7 +129,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         end if
 
       else if key = "up"
-        if(m.bAutostartRefreshExperimentEnabled = true AND isNonEmptyString(m.Video.content.seriesId) = false AND m.UpNext.isInFocusChain() = true)
+        if(isNonEmptyString(m.Video.content.seriesId) = false AND m.UpNext.isInFocusChain() = true)
           '//::TODO::JHAND - upNext - disable the focus Up if the video is not visible
           m.Video.setFocus(true)
           m.VideoBorder.visible = true
@@ -161,7 +161,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         end if
 
       else if key = "down"
-        if(m.bAutostartRefreshExperimentEnabled = true AND m.Video.hasFocus() = true AND m.UpNext.opacity <> 0)
+        if(m.Video.hasFocus() = true AND m.UpNext.opacity <> 0)
           m.UpNext.setFocus(true)
           m.VideoBorder.visible = false
         else if (m.TopOverlay.opacity = 0 AND m.Thumbnail.visible = false) AND m.focusedNode.isSameNode(m.BrowseWhileWatching) = false
@@ -204,7 +204,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         end if
 
       else if key = "back"
-        if m.UpNext.isInFocusChain() = true OR (m.bAutostartRefreshExperimentEnabled = true AND m.Video.hasFocus() = true AND m.UpNext.opacity <> 0)
+        if m.UpNext.isInFocusChain() = true OR (m.Video.hasFocus() = true AND m.UpNext.opacity <> 0)
           backOutOfUpNext()
         else if m.VideoState = "play"
           hideBrowseWhileWatching()
@@ -245,7 +245,7 @@ End Function
 
 ' This function is called when the user exits the UpNext screen
 Function backOutOfUpNext()
-  if m.bAutostartRefreshExperimentEnabled = true AND m.Video.width <> 1920
+  if m.Video.width <> 1920
     resizeToLocation(m.Video, 1920, 1080, [0, 0], .25) ' reset the video player
     m.Video.opacity = 1
     m.RemainingMinimizedGroup.visible = false
@@ -608,7 +608,7 @@ End Function
 
 
 Function handleOk()
-  if m.bAutostartRefreshExperimentEnabled = true AND m.Video.isInFocusChain() = true AND m.UpNext.opacity <> 0
+  if m.Video.isInFocusChain() = true AND m.UpNext.opacity <> 0
     backOutOfUpNext()
   else if m.HUD.opacity = 0 AND m.skipCuepointsButton.hasFocus() = false
     showTransport()
@@ -1867,14 +1867,14 @@ Function isButtonPressAllowed(key, videoState, videoNode)
 
   'When upNext is focused, only back keys are allowed.
   if m.UpNext.isInFocusChain() = true AND (disabledKeys[key] = true)
-    if isNonEmptyString(m.Video.content.seriesId) = true OR m.bAutostartRefreshExperimentEnabled = false OR key <> "up" OR m.Video.opacity < 1
+    if isNonEmptyString(m.Video.content.seriesId) = true OR key <> "up" OR m.Video.opacity < 1
       isAllowed = false
     end if
   end if
 
   'When the video player is focused, only down and OK keys are allowed.
   if m.Video.isInFocusChain() = true AND (disabledKeys[key] = true)
-    if m.bAutostartRefreshExperimentEnabled = false OR (key <> "down" AND key <> "OK")
+    if (key <> "down" AND key <> "OK")
       isAllowed = false
     end if
   end if
@@ -1901,8 +1901,7 @@ Function isActiveVideoState(videoState, videoNode)
   }
 
   isActive = true
-  if m.bAutostartRefreshExperimentEnabled = false OR not ((videoState = "stop" OR videoNode.state = "stopped") AND m.UpNext.opacity > 0 AND isNonEmptyString(m.Video.content.seriesId) = false)
-    '//if the upNext UI is showing after a movie is done playing while in the roku_video_autostart_ui_refresh_v1 experiment, then we do not want to disable the active video state
+  if not ((videoState = "stop" OR videoNode.state = "stopped") AND m.UpNext.opacity > 0 AND isNonEmptyString(m.Video.content.seriesId) = false)
     if disactiveStates[videoState] = true
       isActive = false
     end if

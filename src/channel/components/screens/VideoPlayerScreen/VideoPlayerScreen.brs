@@ -615,16 +615,14 @@ End Function
 ' Initializes all experiment configurations in one place
 ' This function should be called from init() after m.constants and m.video are set
 Function initExperiments()
-  ' Autostart UI refresh experiment
-  m.bAutostartRefreshExperimentEnabled = getExperimentResource("roku_video_autostart_ui_refresh", "roku_video_autostart_ui_refresh_v1", false).enabled = true
-
   ' Ad request cuepoint alignment experiment (roku_player_align_ad_request_cuepoint_v3):
   alignAdRequestExperimentConfig = getStatsigExperimentResource("roku_player_improvement", "roku_player_align_ad_request_cuepoint_v3", false)
   m.adPrefetchTime = alignAdRequestExperimentConfig.prefetchTime
   m.alignAdRequestWithinWindow = alignAdRequestExperimentConfig.requestWithinWindow
 
-  ' Postplay countdown experiments
-  m.seriesPostplayCountdown = getStatsigExperimentResource("roku_postplay_countdown_timer", "roku_postplay_countdown_timer_series_v1", false).countdown
+  ' Postplay series countdown experiment
+  m.seriesPostplayTimerExperiment = getStatsigExperimentResource("roku_player_improvement", "roku_postplay_countdown_timer_series_v2", false)
+  m.seriesPostplayCountdown = m.seriesPostplayTimerExperiment.countdown
 
   ' Async stop experiment - only enable on firmware 14.0+
   isFirmwareOk = createObject("roDeviceInfo").getOSVersion().major.toInt() >= 14
@@ -945,6 +943,14 @@ End Function
 
 Function playContent()
   logDebug("VideoPlayer.playContent")
+
+  ' If recap was skipped during autoplay (user clicked Next Episode with experiment enabled),
+  ' mark recap as already shown to prevent "Skip Recap" button from appearing when playback
+  ' starts slightly before recap_end due to video segment boundaries.
+  if m.top.recapSkippedOnAutoplay = true
+    m.cuePointsHistory[m.constants.player.skipCuepointsButtonTypes.recap] = true
+    m.top.recapSkippedOnAutoplay = false
+  end if
 
   if m.Video.content <> invalid
 
@@ -1468,7 +1474,7 @@ Function onVideoStateChange(msg)
     m.Loading.visible = false
     m.top.state = state
   else
-    if m.bAutostartRefreshExperimentEnabled = true AND m.UpNext.opacity > 0 AND m.Video.width <> 1920
+    if m.UpNext.opacity > 0 AND m.Video.width <> 1920
       '//the video player is not in full screen mode and the up next component is visible, so do not display the loading screen
       m.RemainingMinimizedGroup.opacity = 0
       m.Video.opacity = 0
@@ -1637,22 +1643,20 @@ Function onVideoPositionChange(msg) as Void
         setFocusToPlaybackControl()
         clearSkipCuepointsButtonAndTimer()
 
-        if m.bAutostartRefreshExperimentEnabled = true
-          if topRef.content.parentType = "series"
-            '//Make sure the upNext component is located in the original layer
-            m.UpNextParent.insertChild(m.UpNext, 0)
-          else
-            '//Minimize the movie player if this is a movie
-            topRef.insertChild(m.UpNext, 0)
-            nVideoMinimizedTranslation = m.MinimizedAssets.translation
-            resizeToLocation(m.Video, 640, 360, nVideoMinimizedTranslation, .5) ' Resize the video player to a smaller size for the UpNext screen
-            m.RemainingMinimizedGroup.opacity = 0
-            fade(m.RemainingMinimizedGroup, "in", 0.5, 0.5)
-            updateMinimizedTimes()
-            m.RemainingMinimizedGroup.visible = true
-            m.VideoBorder.width = 640
-            m.VideoBorder.height = 360
-          end if
+        if topRef.content.parentType = "series"
+          '//Make sure the upNext component is located in the original layer
+          m.UpNextParent.insertChild(m.UpNext, 0)
+        else
+          '//Minimize the movie player if this is a movie
+          topRef.insertChild(m.UpNext, 0)
+          nVideoMinimizedTranslation = m.MinimizedAssets.translation
+          resizeToLocation(m.Video, 640, 360, nVideoMinimizedTranslation, .5) ' Resize the video player to a smaller size for the UpNext screen
+          m.RemainingMinimizedGroup.opacity = 0
+          fade(m.RemainingMinimizedGroup, "in", 0.5, 0.5)
+          updateMinimizedTimes()
+          m.RemainingMinimizedGroup.visible = true
+          m.VideoBorder.width = 640
+          m.VideoBorder.height = 360
         end if
 
         m.UpNext.show = true

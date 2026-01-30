@@ -205,6 +205,11 @@
            -->
       <field id="autoplayMode" type="string" />
 
+      <!-- Set to true when recap was skipped during autoplay (user clicked Next Episode with experiment enabled).
+           This prevents the "Skip Recap" button from showing when playback starts slightly before recap_end due to segment boundaries.
+           -->
+      <field id="recapSkippedOnAutoplay" type="boolean" value="false" />
+
       <!-- Autoplay this content when this field is set -->
       <field id="upNextContentToAutoplay" type="node" />
 

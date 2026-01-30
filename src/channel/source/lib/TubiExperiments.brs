@@ -39,15 +39,6 @@ Function TubiExperiments(experimentsInfo) as Object
         }
       }
 
-      'This experiment will be under holdout
-      roku_video_autostart_ui_refresh: {
-        roku_video_autostart_ui_refresh_v1: {
-          default: { "enabled": true }
-          holdout_control: { "enabled": false }
-          holdout_winning: { "enabled": true }
-        }
-      }
-
       roku_add_movies_series: {
         roku_add_movies_series_uk_v2: {
           default: { "enabled": false }

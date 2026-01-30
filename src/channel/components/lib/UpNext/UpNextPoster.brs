@@ -20,11 +20,7 @@ Function onContentChange()
     if item.seriesId <> invalid AND item.seriesId <> ""
       sURI = item.landscape
     else
-      if getExperimentResource("roku_video_autostart_ui_refresh", "roku_video_autostart_ui_refresh_v1", false).enabled = true
-        sURI = item.landscape
-      else
-        sURI = item.hdgridposterurl
-      end if
+      sURI = item.landscape
     end if
 
     m.poster.uri = sURI

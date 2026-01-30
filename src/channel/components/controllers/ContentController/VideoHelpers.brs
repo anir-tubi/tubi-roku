@@ -525,10 +525,60 @@ Function playUpNextContent(nextContent, playbackSource = { "srcForAnalytic": "un
       returnToDetailScreenFromVideo(true, true, "upnext")
     else
       nowPos = processResume(content)
+
+      ' Skip recap for series autoplay when user deliberately clicks "Next Episode"
+      ' Experiment: roku_postplay_countdown_timer_series_v2
+      ' Conditions: simplifiedUI = true AND automaticSkipRecap = true AND autoplayMode = "deliberate"
+      seriesPostplayTimerExperiment = getStatsigExperimentResource("roku_player_improvement", "roku_postplay_countdown_timer_series_v2", false)
+      shouldSkipRecap = (seriesPostplayTimerExperiment.simplifiedUI = true AND seriesPostplayTimerExperiment.automaticSkipRecap = true)
+
+      recapSkipped = false
+      if shouldSkipRecap = true AND playbackSource <> invalid AND playbackSource.srcForAnalytic = "deliberate"
+        recapEndPos = getAutoplayStartPosition(content, nowPos)
+        if recapEndPos <> nowPos
+          nowPos = recapEndPos
+          recapSkipped = true
+        end if
+      end if
+
+      ' Set flag on videoPlayer to prevent "Skip Recap" button from showing
+      ' when playback starts slightly before recap_end due to segment boundaries
+      if recapSkipped = true
+        'IMPORTANT — one-shot behavior:
+        'The player consumes this flag (skips recap if true) and then resets it to false.
+        'Do not rely on this value persisting after playback starts.
+        videoPlayer.recapSkippedOnAutoplay = true
+      end if
+
       playVideoContent(content, playbackSource, nowPos)
     end if
 
   end if
+End Function
+
+
+' Determines the start position for autoplay content when skipping recap.
+' Returns recap_end position if content has valid recap cuepoints and nowPos is before recap_end.
+' Otherwise, returns the original nowPos.
+' @content: roSGNode, the content node for the episode to be played
+' @nowPos: integer, the default start position from processResume
+' @return: integer, the adjusted start position (recap_end if skipping recap, otherwise nowPos)
+Function getAutoplayStartPosition(content, nowPos)
+  if content = invalid OR isNonEmptyString(content.seriesId) = false
+    return nowPos
+  end if
+
+  if isNonEmptyAA(content.creditCuePoints) = false
+    return nowPos
+  end if
+
+  recapEnd = content.creditCuePoints.recap_end
+  if recapEnd = invalid OR recapEnd <= 0 OR nowPos > recapEnd
+    return nowPos
+  end if
+
+  ' Skip recap by starting at recap_end position
+  return recapEnd
 End Function
 
 
@@ -1278,7 +1328,7 @@ Function fetchUpNextContent(videoPlayer)
       options.params.delete("container_id")
     end if
 
-    bUseLargestLandscapeImage = getExperimentResource("roku_video_autostart_ui_refresh", "roku_video_autostart_ui_refresh_v1", false).enabled = true AND videoPlayer.content.parentType = "series"
+    bUseLargestLandscapeImage = (videoPlayer.content.parentType = m.constants.ui.contentTypes.series)
     upNextReqInfo = m.cmsApi.createUpNextContentReqInfo(options, bUseLargestLandscapeImage)
 
     return m.makeRequest({
