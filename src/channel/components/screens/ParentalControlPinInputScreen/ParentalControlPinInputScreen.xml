@@ -14,6 +14,8 @@
       possible values : add_pin, edit_pin, confirm_pin, enter_pin -->
     <field id="mode" type="string" value="add_pin" />
 
+    <field id="errorCode" type="integer" value="0" />
+
     <field id="pinError" type="boolean" value="false" alwaysNotify="true" />
 
 

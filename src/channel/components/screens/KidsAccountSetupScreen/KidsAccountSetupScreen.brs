@@ -80,13 +80,13 @@ Function init()
   m.top.trackingPageInfo = {
     pageType: "register_page"
     pageValues: {
-      auth_method: "CLICKED_REGISTER"
+      auth_method: "EMAIL"
     }
   }
 
   m.top.screenLevel = m.constants.ui.screenLevels.emailInputScreen
   m.top.isStackable = true
-  m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
+  m.top.instantResumeAction = m.constants.instantResumeActions.restartApp
 
   m.backgroundUriList = []
   m.pinText = ""

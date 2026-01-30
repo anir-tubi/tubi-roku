@@ -306,6 +306,14 @@ Function onKidsAccountSetupContinueSelected()
 
   currentScreen = popScreenAfterSignInProcess()
   onActivationSuccess()
+  registerEvent = {
+    type: "register"
+    values: {
+      progress: "CLICKED_REGISTER"
+    }
+  }
+
+  m.trackingLoggingTask.trackEvent = registerEvent
 
   if currentScreen <> invalid AND currentScreen.getSubtype() = "HomeScreen" AND currentScreen.isInFocusChain() = false
     'focus was lost to spinner in activation success, so we need to set focus to home screen if it is not in focus.
@@ -398,6 +406,18 @@ Function onSignUpForKidsResponse(response)
       ' update the local authInfo for the kids account
       m.tubiAuthUpdate.createOrUpdateProfileAuth(parentTubiId, { haspin: hasPin })
     end if
+
+    accountEvent = {
+      type: "account"
+      values: {
+        manip: "SIGNUP_KID"
+        message: "SUCCESS"
+        current: "EMAIL"
+        status: "SUCCESS"
+      }
+    }
+
+    m.trackingLoggingTask.trackEvent = accountEvent
 
     showKidsAccountSetupScreen(response, parentProfileInfo)
   end if
@@ -503,7 +523,14 @@ End Function
 Function onPinValidateError(error = invalid)
   tubiLog("ProfileHelpers.onPinValidateError")
   parentalControlPinInputScreen = getCurrentScreen()
+
   if parentalControlPinInputScreen.getSubtype() = "ParentalControlPinInputScreen"
+    if error <> invalid 'to handle special cases like too many failed attemps for PIN
+      parentalControlPinInputScreen.errorCode = error.code
+    else
+      parentalControlPinInputScreen.errorCode = 0
+    end if
+
     parentalControlPinInputScreen.pinError = true
   end if
 End Function
@@ -758,11 +785,11 @@ Function getUserSwitchAction(authInfo, profileSelected)
 
   pcMap = {
     "0": 1 'younger child
-    "1": 3 'older Child
+    "1": 2 'older Child
     "2": 4'teen child
     "3": 5 'adult
     "4": 0 'youngest child
-    "5": 2 'oldest child
+    "5": 3 'oldest child
   }
 
   key = fromAccount + "-" + switchToAccount

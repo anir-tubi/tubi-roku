@@ -16,6 +16,7 @@ Function init()
   }
 
   m.top.screenLevel = m.constants.ui.screenLevels.kidsAgeSelectionScreen
+  m.top.instantResumeAction = m.constants.instantResumeActions.restartApp
 
   m.backgroundUriList = []
 

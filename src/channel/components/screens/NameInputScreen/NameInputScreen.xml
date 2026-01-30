@@ -67,6 +67,16 @@
           id="nameTextEditBox"
           width="630"
           height="84" />
+
+        <Label
+          id="nameValidationMsg"
+          translation="[0, 100]"
+          opacity="0.0"
+          width="600">
+          <Font
+            role="font" />
+        </Label>
+
       </Group>
 
     </LayoutGroup>
@@ -75,7 +85,7 @@
       layoutDirection="vert"
       horizAlignment="custom"
       vertAlignment="custom"
-      translation="[250, 375]"
+      translation="[250, 400]"
       itemSpacings="[20]">
 
       <DynamicKeyboard

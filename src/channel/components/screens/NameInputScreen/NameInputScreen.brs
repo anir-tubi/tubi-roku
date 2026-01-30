@@ -9,6 +9,8 @@ Function init()
 
   m.nameTextEditBox = m.top.findNode("nameTextEditBox")
   m.nameTextEditBox.maxTextLength = 100
+  m.nameValidationMsg = m.top.findNode("nameValidationMsg")
+  m.nameValidationMsg.text = getTranslation("invalid_name_title")
 
 
   m.keyboard = m.top.findNode("Keyboard")
@@ -36,7 +38,7 @@ Function init()
 
   m.keyboard.textEditBox.observeFieldScoped("cursorPosition", "onKeyboardTextEditBoxCursorPositionChange")
 
-  m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
+  m.top.instantResumeAction = m.constants.instantResumeActions.restartApp
 
   'set initial tracking values
   m.top.trackingPageInfo = {
@@ -54,6 +56,7 @@ Function init()
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.pageHeading, typographyConstants.ids.headerLarge)
   setTypographyOfLabel(m.subHeading, typographyConstants.ids.bodyLargeStrong)
+  setTypographyOfLabel(m.nameValidationMsg, typographyConstants.ids.bodySmallStrong)
 
   setNameScreenHeading()
 
@@ -76,6 +79,7 @@ Function onThemeChange(msg = invalid)
     m.continue.color = theme.backgroundColorLight
     m.pageHeading.color = theme.primaryTextColor
     m.subHeading.color = theme.secondaryTextColor
+    m.nameValidationMsg.color = theme.cautionColor
 
     paletteColors = m.keyboard.palette.colors
     paletteColors.FocusItemColor = theme.focusedTextColor
@@ -163,20 +167,25 @@ Function onContinueButtonSelected(evt)
     ' on the SignInScreen.
     m.keyboard.textEditBox.voiceEnabled = false
     firstName = m.nameTextEditBox.text
-    m.top.name = firstName
-    signInInfo = {}
+    if isNameValid(firstName) = true
+      showNameErrorMsg(false)
+      m.top.name = firstName
+      signInInfo = {}
 
-    if m.top.accountTypeSelected = "kids"
-      signInInfo["firstName"] = firstName
-      signInInfo["hasPin"] = m.top.hasPin
-      signInInfo["parentProfileId"] = m.top.parentProfileId
+      if m.top.accountTypeSelected = "kids"
+        signInInfo["firstName"] = firstName
+        signInInfo["hasPin"] = m.top.hasPin
+        signInInfo["parentProfileId"] = m.top.parentProfileId
+      else
+        signInInfo["email"] = m.top.email
+        signInInfo["firstName"] = firstName
+        signInInfo["lastName"] = ""
+      end if
+      m.top.signInInfo = signInInfo
+      m.top.continueSelected = true
     else
-      signInInfo["email"] = m.top.email
-      signInInfo["firstName"] = firstName
-      signInInfo["lastName"] = ""
+      showNameErrorMsg(true)
     end if
-    m.top.signInInfo = signInInfo
-    m.top.continueSelected = true
   end if
 End Function
 
@@ -236,5 +245,29 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
 
     end if
     return handled
+  end if
+End Function
+
+
+' Validates that a name contains only letters, spaces, hyphens, and apostrophes
+' @param name - The name string to validate
+' @return Boolean - true if name is valid, false otherwise
+Function isNameValid(name as String) as Boolean
+  if name = invalid OR name.Trim() = ""
+    return false
+  end if
+
+  ' Pattern allows letters and numbers
+  namePattern = CreateObject("roRegex", "^[A-Za-z0-9\s]+$", "")
+
+  return namePattern.IsMatch(name.Trim())
+End Function
+
+
+Function showNameErrorMsg(show)
+  if show = true
+    fade(m.nameValidationMsg, "in", 0.3)
+  else
+    fade(m.nameValidationMsg, "out", 0.3)
   end if
 End Function

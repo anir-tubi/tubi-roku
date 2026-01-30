@@ -58,7 +58,7 @@ Function init()
 
   m.keyboard.textEditBox.observeFieldScoped("cursorPosition", "onKeyboardTextEditBoxCursorPositionChange")
 
-  m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
+  m.top.instantResumeAction = m.constants.instantResumeActions.restartApp
 
   'set initial tracking values
   m.top.trackingPageInfo = {

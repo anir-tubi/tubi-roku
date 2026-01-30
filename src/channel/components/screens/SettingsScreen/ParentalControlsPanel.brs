@@ -71,7 +71,11 @@ End Function
 Function setParentalControlStringsForMultiUser(kidsMode = false)
 
   m.Title.text = getTranslation("screenSettings_menu_contentSettings")
-  m.Instructions.text = getTranslation("screenSettings_parentalControls_instructions")
+  if kidsMode = true
+    m.Instructions.text = getTranslation("screenSettings_parentalControls_kids_instructions")
+  else
+    m.Instructions.text = getTranslation("screenSettings_parentalControls_instructions")
+  end if
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.Title, typographyConstants.ids.headerSmall)

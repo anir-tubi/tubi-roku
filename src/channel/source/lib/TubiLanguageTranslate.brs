@@ -872,6 +872,10 @@ Function getTranslation_en_US()
       "description": "Description of the parental controls screen",
       "message": "Please select the appropriate viewing age for Tubi TV. Your selection will determine which movie and show ratings you can view in the app. If this selection is changed, you will be required to enter your account password."
     },
+    "screenSettings_parentalControls_kids_instructions": {
+      "description": "Description of the parental controls screen",
+      "message": "Due to content restrictions, you must return to the adult account to update your content settings."
+    },
     "screenSettings_autoplayPreview_instructions": {
       "description": "Description of the autoplay preview user choice screen",
       "message": "You can turn the autoplay functionality on or off, which allows you to preview the video while browsing."
@@ -1625,6 +1629,10 @@ Function getTranslation_en_US()
     "invalid_email_title": {
       "description": "Asking to enter a valid email on Email screen",
       "message": "Please enter a valid email"
+    },
+    "invalid_name_title": {
+      "description": "Asking to enter a valid name on Name screen",
+      "message": "Please enter a valid name"
     },
     "email_screen_heading": {
       "description": "Asking to enter a email on Email screen",
@@ -2481,6 +2489,10 @@ Function getTranslation_en_US()
     "parental_pin_update_error_button_label": {
       "description": " button label of the dialog that is shown when the parental pin update fails",
       "message": "Back to Kids Home"
+    },
+    "parental_pin_failed_too_many_times_error_message": {
+      "description": "Error message shown when the user has failed too many PIN attempts",
+      "message": "Too many failed attempts. Try again in an hour"
     },
     "duplicate_kid_name_error_message": {
       "description": "Error message shown when a kid profile with the same name already exists",

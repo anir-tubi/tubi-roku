@@ -49,7 +49,7 @@ Function init()
 
   m.backgroundUriList = []
 
-  m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
+  m.top.instantResumeAction = m.constants.instantResumeActions.restartApp
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.header, typographyConstants.ids.headerLarge)
@@ -289,6 +289,12 @@ End Function
 
 Function onPinErrorChange(msg)
   if msg.getData() = true
+    if m.top.errorCode = 429 'speical case for failed too many times
+      m.errorMessage.text = getTranslation("parental_pin_failed_too_many_times_error_message")
+    else
+      m.errorMessage.text = getTranslation("screenSettings_parentalPassword_error_pin_mismatch")
+    end if
+
     showPinErrorMessage(true)
   end if
 End Function
