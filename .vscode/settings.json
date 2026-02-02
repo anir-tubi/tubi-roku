@@ -1,0 +1,29 @@
+{
+  "files.exclude": {
+    "out": true,
+    "build": true,
+    "src/experiments": true,
+    "brighterscript": true,
+    "package-lock.json": true,
+    "OTPublishersSDK": true,
+    "companion-channel": true
+  },
+  "search.exclude": {
+    "out": true,
+    "build": true,
+    "src/experiments": true,
+    "brighterscript": true,
+    "package-lock.json": true,
+    "OTPublishersSDK": true
+  },
+  "brightscript.bsdk": "embedded",
+  "cSpell.words": [
+    "isbool",
+    "islist",
+    "isnonemptystr",
+    "isnullorempty",
+    "isxmlelement",
+    "strtobool",
+    "strtoi"
+  ]
+}

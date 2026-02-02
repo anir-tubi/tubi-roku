@@ -1,7 +1,0 @@
-{
-  "search.exclude": {
-    "out": true,
-    "build": true,
-    "src/experiments": true
-  },
-}

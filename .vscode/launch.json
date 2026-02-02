@@ -5,14 +5,18 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "autoRunSgDebugCommands": [
+        "brightscript_warnings 0"
+      ],
       "type": "brightscript",
       "request": "launch",
-      "name": "Build & Deploy",
-      "host": "${env:ROKU_DEV_TARGET}",
+      "name": "Build & Deploy: Component Libraries Enabled",
+      "host": "${env:ROKU_VSCODE_DEV_TARGET}",
       "password": "${env:DEV_PASSWORD}",
       "envFile": "${workspaceFolder}/.vscode/.env",
       "preLaunchTask": "gulp-build",
-      // "logLevel": "trace",
+      "logLevel": "error",
+      // "debugServer": 4711,
       // "logfilePath": "${workspaceFolder}/build/logs.txt",
       "sourceDirs": [
         "${workspaceFolder}/src/channel/"
@@ -22,11 +26,76 @@
         "**/*"
       ],
       "stopDebuggerOnAppExit": false,
-      "retainStagingFolder": false,
-      "injectRdbOnDeviceComponent": true,
-      "disableScreenSaver": true,
+      "retainStagingFolder": true,
       "componentLibrariesPort": 8090,
-      "logLevel": "debug",
+      "componentLibraries": [{
+        "rootDir": "${workspaceFolder}/build/starter/",
+        "outFile": "tubi_starter_components_${major_version}_${minor_version}.zip",
+        "files": [
+          "**/*"
+        ],
+        "sourceDirs": [
+          "${workspaceFolder}/src/channel/"
+        ]
+      }, {
+        "rootDir": "${workspaceFolder}/build/remote/",
+        "outFile": "tubi_remote_components_${major_version}_${minor_version}_${build_version}_${revision_version}.zip",
+        "files": [
+          "**/*"
+        ],
+        "sourceDirs": [
+          "${workspaceFolder}/src/channel/"
+        ]
+      }]
+    },
+    {
+      "autoRunSgDebugCommands": [
+        "brightscript_warnings 0"
+      ],
+      "type": "brightscript",
+      "request": "launch",
+      "name": "Build & Deploy: Component Libraries Disabled",
+      "host": "${env:ROKU_VSCODE_DEV_TARGET}",
+      "password": "${env:DEV_PASSWORD}",
+      "envFile": "${workspaceFolder}/.vscode/.env",
+      "preLaunchTask": "gulp-build",
+      "logLevel": "error",
+      // "debugServer": 4711,
+      // "logfilePath": "${workspaceFolder}/build/logs.txt",
+      "sourceDirs": [
+        "${workspaceFolder}/src/channel/"
+      ],
+      "rootDir": "${workspaceFolder}/build/local/",
+      "files": [
+        "**/*"
+      ],
+      "stopDebuggerOnAppExit": false,
+      "retainStagingFolder": true
+    },
+    {
+      "autoRunSgDebugCommands": [
+        "brightscript_warnings 0"
+      ],
+      "type": "brightscript",
+      "request": "launch",
+      "name": "Build & Deploy: Fox Video Player",
+      "host": "${env:ROKU_VSCODE_DEV_TARGET}",
+      "password": "${env:DEV_PASSWORD}",
+      "envFile": "${workspaceFolder}/.vscode/.env",
+      "preLaunchTask": "gulp-buildPlusFoxVideoPlayer",
+      "logLevel": "error",
+      // "debugServer": 4711,
+      // "logfilePath": "${workspaceFolder}/build/logs.txt",
+      "sourceDirs": [
+        "${workspaceFolder}/src/channel/"
+      ],
+      "rootDir": "${workspaceFolder}/build/local/",
+      "files": [
+        "**/*"
+      ],
+      "stopDebuggerOnAppExit": false,
+      "retainStagingFolder": true,
+      "componentLibrariesPort": 8090,
       "componentLibraries": [
         {
           "rootDir": "${workspaceFolder}/build/starter/",
@@ -47,6 +116,16 @@
           "sourceDirs": [
             "${workspaceFolder}/src/channel/"
           ]
+        },
+        {
+          "rootDir": "${workspaceFolder}/build/fox_video_player",
+          "outFile": "fox_video_player.zip",
+          "files": [
+            "**/*"
+          ],
+          "sourceDirs": [
+            "${workspaceFolder}/fox-video-player"
+          ]
         }
       ]
     },
@@ -62,7 +141,8 @@
       "runtimeArgs": [
         "--nolazy"
       ],
-      "console": "integratedTerminal"
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
     },
     {
       "name": "Run Automated Tests",
@@ -71,6 +151,20 @@
       "program": "${workspaceRoot}/node_modules/gulp/bin/gulp.js",
       "args": [
         "runAutomatedTests"
+      ],
+      "cwd": "${workspaceRoot}",
+      "runtimeArgs": [
+        "--nolazy"
+      ],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Run Automated Tests Analytics",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceRoot}/node_modules/gulp/bin/gulp.js",
+      "args": [
+        "runAutomatedAnalyticsTests"
       ],
       "cwd": "${workspaceRoot}",
       "runtimeArgs": [
@@ -93,12 +187,26 @@
       "console": "integratedTerminal"
     },
     {
+      "name": "Run Tooling Tests",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceRoot}/node_modules/gulp/bin/gulp.js",
+      "args": [
+        "runToolingTests"
+      ],
+      "cwd": "${workspaceRoot}",
+      "runtimeArgs": [
+        "--nolazy"
+      ],
+      "console": "integratedTerminal"
+    },
+    {
       "name": "Debug Gulp Specific Command",
       "type": "node",
       "request": "launch",
       "program": "${workspaceRoot}/node_modules/gulp/bin/gulp.js",
       "args": [
-        "convertSuitestTest"
+        "updateErrorConfig"
       ],
       "cwd": "${workspaceRoot}",
       "runtimeArgs": [
@@ -142,7 +250,9 @@
         "buildReleaseNotes",
         "buildQaChanges",
         "convertXpathsToKeyPaths",
-        "convertSuitestTest"
+        "convertSuitestTest",
+        "runToolingTests",
+        "buildTestAccount"
       ]
     }
   ]

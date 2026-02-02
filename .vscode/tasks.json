@@ -12,6 +12,16 @@
       "presentation": {
         "reveal": "silent",
       }
+    },
+    {
+      "label": "gulp-buildPlusFoxVideoPlayer",
+      "type": "shell",
+      "command": "npx rimraf build && gulp buildPlusFoxVideoPlayer",
+      "group": "none",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "silent",
+      }
     }
   ]
 }
