@@ -10,11 +10,6 @@ Function parseHomeScreenContentSuccess(fullResponse, reqInfo)
 
   uiMode = "standard"
 
-  screenId = "homeScreen"
-  if reqInfo <> invalid AND reqInfo.screenId <> invalid
-    screenId = reqInfo.screenId
-  end if
-
   if reqInfo <> invalid AND reqInfo.options <> invalid
 
     options = reqInfo.options
@@ -35,6 +30,11 @@ Function parseHomeScreenContentSuccess(fullResponse, reqInfo)
   isSignedInUser = false
   if reqInfo <> invalid
     isSignedInUser = reqInfo.isSignedInUser
+  end if
+
+  screenId = m.constants.ui.screenIds.homeScreen
+  if reqInfo <> invalid AND reqInfo.screenId <> invalid
+    screenId = reqInfo.screenId
   end if
 
   convertedMetadata = m.metadataTranslate.translateHomescreen(parsedResponse, contentMode, isKidsMode, uiMode, screenId, isSignedInUser)
@@ -560,20 +560,24 @@ Function parseSoTStaticConfigSuccess(fullResponse, reqInfo)
     parsedResponse.customizations = response.customizations
 
     neContentIds = response.new_episode
-    for each id in neContentIds
-      if isString(id) = false
-        id = id.toStr()
-      end if
-      newEpisode[id] = true
-    end for
+    if neContentIds <> invalid then
+      for each id in neContentIds
+        if isString(id) = false
+          id = id.toStr()
+        end if
+        newEpisode[id] = true
+      end for
+    end if
 
     tpContentIds = response.tubi_presents
-    for each id in tpContentIds
-      if isString(id) = false
-        id = id.toStr()
-      end if
-      tubiPresents[id] = true
-    end for
+    if tpContentIds <> invalid then
+      for each id in tpContentIds
+        if isString(id) = false
+          id = id.toStr()
+        end if
+        tubiPresents[id] = true
+      end for
+    end if
 
     parsedResponse.newEpisode = newEpisode
     parsedResponse.tubiPresents = tubiPresents
@@ -581,4 +585,62 @@ Function parseSoTStaticConfigSuccess(fullResponse, reqInfo)
   end if
 
   return response
+End Function
+
+
+' @fullResponse: assocArray, as returned by Request.handleEvent, but with
+'                            .data value converted from JSON to AA already
+' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseCollectionSuccess(fullResponse, reqInfo)
+  gridContentNode = parseHomeScreenContentSuccess(fullResponse, reqInfo)
+
+  appNode = invalid
+  appAA = fullResponse.response.data.app
+
+  ' Make sure we have everything we need to not crash so we don't need to check later
+  if appAA = invalid then
+    appAA = {}
+  end if
+
+  if isAA(appAA.images) = false then
+    appAA.images = {}
+  end if
+
+  if isArray(appAA.images.hero) = false then
+    appAA.images.hero = []
+  end if
+
+  if isArray(appAA.images.logo) = false then
+    appAA.images.logo = []
+  else if appAA.images.logo.Count() > 0 then
+    ' Round the logo corners
+    appAA.images.logo[0] = m.metadataTranslate.getRoundedCornersURL(appAA.images.logo[0], 999)
+  end if
+
+  if isString(appAA.description) = false then
+    appAA.description = ""
+  end if
+
+  if isArray(appAA.genres) = false then
+    appAA.genres = []
+  end if
+
+  if isString(appAA.title) = false then
+    appAA.title = ""
+  end if
+
+  if isString(appAA.type) = false then
+    appAA.type = ""
+  end if
+
+  appNode = createObject("roSGNode", "Node")
+  appNode.update(appAA, true)
+
+  collectionNode = createObject("roSGNode", "Node")
+  collectionNode.update({
+    "app": appNode
+    "gridContent": gridContentNode
+  }, true)
+
+  return collectionNode
 End Function

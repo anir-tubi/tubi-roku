@@ -346,6 +346,7 @@ Function getConstants()
   constants.reqNames.fetchStatsigExperimentsActive = "fetchStatsigExperimentsActive"
   constants.reqNames.fetchStatsigExperimentsPaused = "fetchStatsigExperimentsPaused"
   constants.reqNames.getEpgListing = "getEpgListing"
+  constants.reqNames.getCollection = "getCollection"
   constants.reqNames.postPinUpdateForKids = "postPinUpdateForKids"
   constants.reqNames.validatePassword = "validatePassword"
   constants.reqNames.validatePin = "validatePin"
@@ -405,6 +406,7 @@ Function getConstants()
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getEPGPrograms] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getSoTStaticConfig] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getEpgListing] = true
+  constants.reqNames.acceptsTubiAuth[constants.reqNames.getCollection] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.validatePassword] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.validatePin] = true
 
@@ -601,7 +603,7 @@ Function getConstants()
     constants.urls.autopilot.urlBase = "https://autopilot-cdn.staging-public.tubi.io/api"
   end if
 
-  constants.urls.autopilot.relatedContent = constants.urls.autopilot.urlBase + "/v1/related"
+  constants.urls.autopilot.relatedContent = constants.urls.autopilot.urlBase + "/v2/related"
   constants.urls.autopilot.upNextContent = constants.urls.autopilot.urlBase + "/v3/autoplay"
 
   'search url
@@ -635,6 +637,8 @@ Function getConstants()
   constants.urls.tensor.cdn.epgChannelIds = constants.urls.tensor.cdn.urlBase + "/v2/epg"
   constants.urls.tensor.cdn.browserList = constants.urls.tensor.cdn.urlBase + "/v1/browse_list"
   constants.urls.tensor.SoTStaticConfig = constants.urls.tensor.cdn.urlBase + "/v1/ui_customization/static_config"
+  ' Naming as collections to avoid confusion of using the term apps in our code and that is what the screen is named
+  constants.urls.tensor.cdn.collections = constants.urls.tensor.cdn.urlBase + "/v1/apps"
 
   'remote Config hub url
   constants.urls.configHub = {}
@@ -1388,6 +1392,7 @@ Function getConstants()
   constants.ui.screenLevels.detailScreen = 50
   constants.ui.screenLevels.episodeScreen = 50
   constants.ui.screenLevels.eventDetailScreen = 50
+  constants.ui.screenLevels.collectionScreen = 50
   constants.ui.screenLevels.videoPlayerScreen = 60
   constants.ui.screenLevels.adPlayerScreen = 60
   constants.ui.screenLevels.linearVideoPlayerScreen = 60
@@ -1436,6 +1441,7 @@ Function getConstants()
   constants.ui.screenIds.profileSelectorScreen = "profileSelectorScreen"
   constants.ui.screenIds.kidsAccountSetupScreen = "kidsAccountSetupScreen"
   constants.ui.screenIds.vodDetailScreen = "vodDetailScreen"
+  constants.ui.screenIds.collectionScreen = "collectionScreen"
   constants.ui.screenIds.signUpAgeVerificationScreen = "signUpAgeVerificationScreen"
   constants.ui.screenIds.parentalControlPinInputScreen = "parentalControlPinInputScreen"
   constants.ui.screenIds.kidsAgeSelectionScreen = "kidsAgeSelectionScreen"
@@ -1506,6 +1512,11 @@ Function getConstants()
   constants.ui.logoSizes.skinAds.infoPanel.width = "594"
   constants.ui.logoSizes.skinAds.infoPanel.height = "249"
 
+  constants.ui.imageSizeMultiplier = 1
+  if di.getUIResolution().name = "HD" then
+    constants.ui.imageSizeMultiplier = 2 / 3
+  end if
+
   constants.ui.imageSizes = {}
 
   'Sizes of poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
@@ -1575,6 +1586,10 @@ Function getConstants()
   constants.ui.imageSizes.billboard = [1209, 681]
 
   constants.ui.imageSizes.categoryLargePoster = [291, 417]
+
+  constants.ui.imageSizes.creatorDetailScreenLogo = [36, 36]
+  constants.ui.imageSizes.creatorScreenLogo = [64, 64]
+  constants.ui.imageSizes.creatorScreenBackground = [1161, 651]
 
   ' Size for the background image.
   if limitedUi = true
@@ -1658,6 +1673,7 @@ Function getConstants()
   constants.ui.detailScreenMenuItemIds = {}
   constants.ui.detailScreenMenuItemIds.playMenuItem = "PlayMenuItem"
   constants.ui.detailScreenMenuItemIds.resumeMenuItem = "ResumeMenuItem"
+  constants.ui.detailScreenMenuItemIds.creatorMenuItem = "CreatorMenuItem"
   constants.ui.detailScreenMenuItemIds.watchTrailerMenuItem = "WatchTrailerMenuItem"
   constants.ui.detailScreenMenuItemIds.likeMenuItem = "LikeMenuItem"
   constants.ui.detailScreenMenuItemIds.dislikeMenuItem = "DislikeMenuItem"
@@ -1692,6 +1708,8 @@ Function getConstants()
   constants.ui.gridItemTypes.liveEventSpotlight = "liveEventSpotlight"
   constants.ui.gridItemTypes.liveEventBanner = "liveEventBanner"
   constants.ui.gridItemTypes.controlLandscape = "controlLandscape"
+  constants.ui.gridItemTypes.episodeItem = "episodeItem"
+  constants.ui.gridItemTypes.episodeItemLatestEpisodes = "episodeItemLatestEpisodes"
 
   ' Holds the container ids which are not video tile containers.
   ' This will help us to avoid showing the expanded video tile.

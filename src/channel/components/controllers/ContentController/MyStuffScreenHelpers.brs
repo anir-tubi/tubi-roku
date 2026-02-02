@@ -18,7 +18,6 @@ Function showMyStuffScreen()
   else
 
     screen = CreateObject("roSGNode", "MyStuffScreen")
-    screen.trackingLoadStartTime = UpTime(0)
     screen.observeFieldScoped("contentSelected", "onMyStuffContentSelected")
     screen.observeFieldScoped("contentFocused", "onRowFocusedItemChange")
     screen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")

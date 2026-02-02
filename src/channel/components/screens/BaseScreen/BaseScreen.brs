@@ -1,6 +1,8 @@
 Function init()
   m.audioGuide = CreateObject("roAudioGuide")
   m.defaultBackgroundUri = ""
+
+  m.top.trackingLoadStartTime = UpTime(0)
 End Function
 
 

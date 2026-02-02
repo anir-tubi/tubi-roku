@@ -14,10 +14,9 @@ Function init() as Void
   m.progressBarGroup = topRef.findNode("progressBarGroup")
   m.progressBar = topRef.findNode("progressBar")
 
-  ' Set typography
-  setTypographyOfLabel(m.episodeTitle, m.typographyConstants.ids.subheaderSmall)
-  setTypographyOfLabel(m.description, m.typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.duration, m.typographyConstants.ids.bodySmall)
+  setTypographyOfLabel(m.episodeTitle, m.typographyConstants.ids.subheaderSmall, { lineSpacing: 2 })
+  setTypographyOfLabel(m.description, m.typographyConstants.ids.bodyMedium, { lineSpacing: 2 })
+  setTypographyOfLabel(m.duration, m.typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.ratingLabel, m.typographyConstants.ids.bodyExtraSmallStrong)
 
   if m.global <> invalid
@@ -60,22 +59,47 @@ Function onItemContentChange(msg = invalid) as Void
   content = m.top.itemContent
   if content = invalid then return
 
-  ' Set basic info
-  m.thumbnail.uri = content.landscape
-  ' TODO: Temporary fix for episode title formatting. Remove this once we have a proper backend solution.
-  m.episodeTitle.text = formatEpisodeTitle(content.title)
+  episodeTitle = content.title
 
-  ' Set description if available
-  if content.description <> invalid
-    m.description.text = content.description
+  if episodeTitle = invalid then
+    episodeTitle = ""
   end if
 
+  if content.gridItemType = "episodeItemLatestEpisodes" then
+    m.description.scale = [0, 0]
+    m.description.visible = false
+    m.episodeTitle.maxLines = 2
+
+    if isNonEmptyString(content.seriesTitle) = true then
+      episodeTitle = content.seriesTitle + chr(10) + episodeTitle
+    end if
+  else
+    m.description.scale = [1, 1]
+    m.description.visible = true
+
+    ' Will need to revisit with next detail screen experiment
+    m.description.maxLines = 2
+    m.episodeTitle.maxLines = 1
+
+    ' Set description if available
+    if content.description <> invalid
+      m.description.text = content.description
+    end if
+  end if
+
+  ' Set basic info
+  imageUrl = content.landscape
+  m.thumbnail.uri = imageUrl
+  m.episodeTitle.text = episodeTitle
+
   ' Set duration if available
+  durationText = ""
   contentLength = content.length
   if contentLength <> invalid AND contentLength > 0
     durationMin = int(contentLength / 60)
-    m.duration.text = durationMin.toStr() + " min"
+    durationText = durationMin.toStr() + " min"
   end if
+  m.duration.text = durationText
 
   ' Set rating badge
   setRatingBadge(content.rating)
@@ -83,7 +107,6 @@ Function onItemContentChange(msg = invalid) as Void
 
   ' Set progress bar based on viewing history
   setProgressBar(content.id.toStr(), contentLength)
-
 
   if m.itemHeight <> invalid AND m.itemHeight > 600
     m.description.maxLines = 5
@@ -116,32 +139,6 @@ Function calculateProgressPercentage(history, duration) as Float
   if not isNumber(duration) OR duration <= 0 then return 0
 
   return (history.nowPos / duration) * 100
-End Function
-
-
-' Formats episode title from "S01:E01 - Pilot" to "S1 E1 - Pilot"
-' @param title - String, the original episode title
-' @return String - Formatted episode title
-Function formatEpisodeTitle(title as String) as String
-  if not isNonEmptyString(title) then return title
-
-  ' Match pattern: S followed by digits, colon, E followed by digits
-  regex = CreateObject("roRegex", "S([0-9]+):E([0-9]+)", "i")
-  matches = regex.Match(title)
-
-  if matches.Count() >= 3
-    ' Extract season and episode numbers
-    seasonNum = matches[1].toInt()
-    episodeNum = matches[2].toInt()
-
-    ' Replace "S01:E01" with "S1 E1"
-    replacement = "S" + seasonNum.toStr() + " E" + episodeNum.toStr()
-    formattedTitle = regex.Replace(title, replacement)
-    return formattedTitle
-  end if
-
-  ' If pattern doesn't match, return original title
-  return title
 End Function
 
 

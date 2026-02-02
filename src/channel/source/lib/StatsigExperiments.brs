@@ -137,6 +137,12 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
       roku_no_layer_experiment: {
         default: { "no_layer": "no" }
       }
+
+      roku_creator_m2: {
+        roku_creator_m2_v1: {
+          default: { "enabled": true }
+        }
+      }
     }
     statsigExperimentsInfo: statsigExperimentsInfo
     getExperimentResource: statsigExperiments_getExperimentResource

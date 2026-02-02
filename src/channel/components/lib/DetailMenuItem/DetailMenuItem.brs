@@ -177,6 +177,14 @@ Function onItemContentChange()
       end if
     end if
 
+    if item.id = "CreatorMenuItem" then
+      ' Don't want blend color to be changed for creator
+      m.IconFocused.blendcolor = m.Icon.blendcolor
+    else if m.IconFocused.blendcolor = m.Icon.blendcolor then
+      ' Safety in case menu item gets reused
+      onThemeChange()
+    end if
+
   end if
 End Function
 

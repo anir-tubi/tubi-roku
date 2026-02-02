@@ -57,9 +57,6 @@
     <!-- content on the EPG Screen is loaded and spinner can be turned off -->
     <field id="contentReady" type="boolean" value="false" alwaysNotify="true" />
 
-    <!-- Holds a load time start value [returned from UpTime()] that can be used to determine how long the page took to load.-->
-    <field id="trackingLoadStartTime" type="integer" />
-
     <!-- Trigger the content to be loaded.   -->
     <field id="loadAllChannels" type="boolean" value="false" alwaysNotify="true"/>
 

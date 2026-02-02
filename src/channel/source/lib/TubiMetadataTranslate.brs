@@ -109,7 +109,7 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
     sThumbnailURL = canvasImages.video_tiles_portrait_tb[0]
   else if gridType = gridItemTypes.controlLandscape AND canvasImages <> invalid AND isNonEmptyArray(canvasImages.control_landscape_tb) = true
     sThumbnailURL = canvasImages.control_landscape_tb[0]
-  else if gridType = gridItemTypes.landscape OR gridType = gridItemTypes.landscapeNoTitle OR gridType = gridItemTypes.landscapeInnerMetadata OR gridType = gridItemTypes.linear
+  else if gridType = gridItemTypes.landscape OR gridType = gridItemTypes.landscapeNoTitle OR gridType = gridItemTypes.landscapeInnerMetadata OR gridType = gridItemTypes.linear OR gridType = gridItemTypes.episodeItem OR gridType = gridItemTypes.episodeItemLatestEpisodes then
     if canvasImages <> invalid AND type(canvasImages.landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.landscape_tb[0])
       '//A custom landscape size was requested, use this image instead of the default image
       sThumbnailURL = canvasImages.landscape_tb[0]
@@ -149,7 +149,6 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
 
   '//Ensure thumbnails have rounded corners - will only work with Tupian URLs
   sThumbnailURL = m.getRoundedCornersURL(sThumbnailURL)
-
   return sThumbnailURL
 End Function
 
@@ -894,6 +893,16 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, t
     end if
   end if
 
+  if contentFromServer.series_title <> invalid then
+    if type(translatedContent) = "roAssociativeArray"
+      translatedContent["seriesTitle"] = contentFromServer.series_title
+    else if type(translatedContent) = "roSGNode"
+      translatedContent.update({
+        "seriesTitle": contentFromServer.series_title
+      }, true)
+    end if
+  end if
+
   ' return the total number of children converted
   return count
 End Function
@@ -1124,7 +1133,12 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
         categoryAA = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode, contentMode, screenId, uiMode)
       else
         shouldInsertChannelTile = not m.isVideoTileEnabledScreen(screenId, uiMode)
-        categoryAA = m.buildCategoryAAWithInsert(container, contents, "", "", false, contentMode, screenId, isSignedInUser, uiMode, shouldInsertChannelTile, {})
+
+        bFullData = false
+        if screenId = m.constants.ui.screenIds.collectionScreen then
+          bFullData = true
+        end if
+        categoryAA = m.buildCategoryAAWithInsert(container, contents, "", "", bFullData, contentMode, screenId, isSignedInUser, uiMode, shouldInsertChannelTile, {})
       end if
 
       if categoryAA <> invalid
@@ -1433,6 +1447,15 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
   gridItemType = m.getGridItemType(container, sOrientation, m.constants, screenId, contentMode, uiMode)
   requestContext.screenId = screenId
   categoryChildrenInfo = m.buildCategoryChildrenInfo(container, contents, contentsJson, gridItemType, bFullData, isSignedInUser, uiMode, requestContext)
+
+  if isNonEmptyArray(container.related_to) then
+    relatedTo = createObject("roSgNode", "Node")
+    relatedTo.update({
+      id: container.related_to[0].value
+      type: container.related_to[0].type
+    }, true)
+    categoryParent.relatedTo = relatedTo
+  end if
 
   categoryParent.children = categoryChildrenInfo.children
   categoryParent.json = categoryChildrenInfo.contentsJson
@@ -2174,6 +2197,12 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
     gridItemType = gridItemTypes.landscapeInnerMetadata
   else if container.id = constants.ui.categoryIds.topTenSeries AND screenId <> constants.ui.screenIds.categoryDetailsScreen
     gridItemType = gridItemTypes.portraitTopTen
+  else if screenId = constants.ui.screenIds.collectionScreen then
+    gridItemType = gridItemTypes.episodeItem
+
+    if container.type = "latest_episodes" then
+      gridItemType = gridItemTypes.episodeItemLatestEpisodes
+    end if
   end if
 
   return gridItemType

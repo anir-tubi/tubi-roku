@@ -1087,6 +1087,11 @@ Function tubiTracking_getOneOfs()
     video_id: -1
   }
 
+  collection_page = {
+    id: ""
+    section: ""
+  }
+
   section_leftNav = {
     left_nav_section: "" ' Section enum
   }
@@ -1152,6 +1157,7 @@ Function tubiTracking_getOneOfs()
     your_privacy_page: your_privacy_page
     privacy_preferences_page: privacy_preferences_page
     linear_details_page: linear_details_page
+    collection_page: collection_page
     account_selection_page: account_selection_page
     pin_page: pin_page
     ' splash_page: splash_page
@@ -1188,28 +1194,20 @@ Function tubiTracking_getOneOfs()
     dest_your_privacy_page: your_privacy_page
     dest_privacy_preferences_page: privacy_preferences_page
     dest_linear_details_page: linear_details_page
+    dest_collection_page: collection_page
     dest_account_selection_page: account_selection_page
     dest_pin_page: pin_page
     ' dest_splash_page: splash_page
     ' dest_forget_page: forget_page
   }
 
-  dest_componentOneof = {
-    dest_left_side_nav_component: section_leftNav
-
-    dest_top_nav_component: section_topNav
-
-    dest_middle_nav_component: section_middleNav
-
-    dest_search_suggestions_component: search_suggestions_component
-
-    dest_related_component: {
-      content_tile: {} ' ContentTile message
-    }
-
-    dest_episode_video_list_component: {
-      content_tile: {} ' ContentTile message
-    }
+  categoryComponent = {
+    ' Used for category screen, channel details screen, channel/category grid screen
+    category_slug: ""
+    category_row: -1 ' 1 based index
+    category_col: -1 ' 1 based index
+    content_tile: {} ' ContentTile message - optional
+    utility_tile: {} ' UtilityTile message - optional
   }
 
   ' At some point we may need to split the component "Oneof" like we did with the page and dest_page "Oneof"
@@ -1229,16 +1227,9 @@ Function tubiTracking_getOneOfs()
 
     middle_nav_component: section_middleNav
 
-    top_nav_component: section_topNav
+    category_component: categoryComponent
 
-    category_component: {
-      ' Used for category screen, channel details screen, channel/category grid screen
-      category_slug: ""
-      category_row: -1 ' 1 based index
-      category_col: -1 ' 1 based index
-      content_tile: {} ' ContentTile message - optional
-      utility_tile: {} ' UtilityTile message - optional
-    }
+    top_nav_component: section_topNav
 
     mystuff_component: {
       ' Used for mystuff screen
@@ -1298,11 +1289,30 @@ Function tubiTracking_getOneOfs()
     }
   }
 
+  dest_componentOneof = {
+    dest_left_side_nav_component: section_leftNav
+
+    dest_top_nav_component: section_topNav
+
+    dest_middle_nav_component: section_middleNav
+
+    dest_search_suggestions_component: search_suggestions_component
+
+    dest_related_component: {
+      content_tile: {} ' ContentTile message
+    }
+
+    dest_episode_video_list_component: {
+      content_tile: {} ' ContentTile message
+
+      dest_category_component: categoryComponent
+    }
+  }
+
   selectorOneOf = {
     content_selector: {
       tiles: []
       selections: []
-
     }
     string_selector: {
       options: ""

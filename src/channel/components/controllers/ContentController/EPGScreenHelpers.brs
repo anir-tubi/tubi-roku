@@ -80,8 +80,6 @@ End Function
 Function fetchEPGScreenChannels(screen, mode = "")
   tubiLog("EPGScreenHelpers.fetchEPGScreenChannels")
 
-  screen.trackingLoadStartTime = UpTime(0)
-
   screen.unobserveFieldScoped("contentReady")
   screen.observeFieldScoped("contentReady", "onEPGscreenContentReady")
   fetchEPGChannels(screen, mode)

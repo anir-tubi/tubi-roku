@@ -19,6 +19,7 @@ Function CmsApi(constants, apiUtilsLib, experiments = invalid, experimentsInterf
     createAdHomescreenDisplayContainerReqInfo: cmsApi_createAdHomescreenDisplayContainerReqInfo
     createHomeScreenReqInfo: cmsApi_createHomeScreenReqInfo
     createMiniHomeScreenOnPlayerReqInfo: cmsApi_createMiniHomeScreenOnPlayerReqInfo
+    createGetCollectionInfo: cmsApi_createGetCollectionInfo
     createCategoryReqInfo: cmsApi_createCategoryReqInfo
     createSearchReqInfo: cmsApi_createSearchReqInfo
     createAutocompleteReqInfo: cmsApi_createAutocompleteReqInfo
@@ -59,7 +60,13 @@ Function cmsApi_createRelatedContentReqInfo(contentId, bKidsMode = false, limit 
   options.params["isKidsMode"] = bKidsMode
   options.params["video_resources"] = m.getSupportedVideoResources()
   options.params = m.setTupianPosterParam(options.params)
-  options.params["content_id"] = contentId
+
+  ' Used to allow us to pass in an app_id instead of content_id for collections
+  if isAA(contentId) = true then
+    options.params[contentId.type] = contentId.id
+  else
+    options.params["content_id"] = contentId
+  end if
 
   if limit > 0
     options.params["limit"] = limit
@@ -123,6 +130,12 @@ Function cmsApi_createSingleContentReqInfo(contentId, includeChannels = false, b
   options.params["includeChannels"] = includeChannels
   options.params["video_resources"] = m.getSupportedVideoResources()
   options.params["limit_resolutions"] = m.constants.player.limitResolutions
+
+  creatorDetailScreenLogo = m.constants.ui.imageSizes.creatorDetailScreenLogo
+  w = Int(creatorDetailScreenLogo[0] * m.constants.ui.imageSizeMultiplier)
+  h = Int(creatorDetailScreenLogo[1] * m.constants.ui.imageSizeMultiplier)
+  options.params["creator_tensor_app_images[logo]"] = "w" + w.toStr() + "h" + h.toStr() + "_logo"
+
   options.params = m.setImageParams(["title", "landscape", "background"], options.params)
 
   capability = formatJson({ "content_types": ["se"] })
@@ -500,6 +513,57 @@ Function cmsApi_createMiniHomeScreenOnPlayerReqInfo(bKidsMode = false, passedOpt
 End Function
 
 
+'''''''''''''''''''''
+' homeScreenReq()
+'
+
+' @passedOptions: assocArray, options that are used to create a request (ie, headers, params, method, etc.)
+'                 see request.brs for more info
+Function cmsApi_createGetCollectionInfo(appId)
+  if isNonEmptyString(appId) = false
+    return invalid
+  end if
+
+  options = m.getCommonOptions(true)
+  params = options.params
+  headers = options.headers
+
+  params["include_ui_customization"] = true
+
+  params["limit_resolutions"] = m.constants.player.limitResolutions
+  params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
+
+  params["idfa"] = m.constants.deviceInfo.deviceAdId
+
+  imageParamTypes = [
+    "landscape"
+  ]
+
+  params = m.setImageParams(imageParamTypes, options.params)
+
+  imageSizeMultiplier = m.constants.ui.imageSizeMultiplier
+
+  creatorScreenLogo = m.constants.ui.imageSizes.creatorScreenLogo
+  w = Int(creatorScreenLogo[0] * imageSizeMultiplier)
+  h = Int(creatorScreenLogo[1] * imageSizeMultiplier)
+  options.params["app_images[logo]"] = "w" + w.toStr() + "h" + h.toStr() + "_logo"
+
+  creatorScreenBackground = m.constants.ui.imageSizes.creatorScreenBackground
+  w = Int(creatorScreenBackground[0] * imageSizeMultiplier)
+  h = Int(creatorScreenBackground[1] * imageSizeMultiplier)
+  options.params["app_images[hero]"] = "w" + w.toStr() + "h" + h.toStr() + "_hero"
+
+  options.params = params
+  options.headers = headers
+
+  url = m.constants.urls.tensor.cdn.collections + "/" + appId
+  return {
+    url: url
+    options: options
+  }
+End Function
+
+
 ' @categoryId, string, the UAPI id for the category
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
 ' @passedOptions: assocArray, options that are used to create a request (ie, headers, params, method, etc.)
@@ -656,8 +720,7 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "", c
     landscapeSize = imageSizes.largeLandscape
   end if
 
-  is720p = (m.constants.deviceInfo.displayHeight = 720 OR m.constants.deviceInfo.lowVram = true)
-  if is720p = true
+  if m.constants.ui.imageSizeMultiplier < 1 then
     posterSize = m.convertImageSizeFor720p(posterSize)
     landscapeSize = m.convertImageSizeFor720p(landscapeSize)
     largestLandscapeSize = m.convertImageSizeFor720p(largestLandscapeSize)
@@ -721,22 +784,6 @@ End Function
 ' @existingParams: assocArray, any parameters that have already been defined that need to be added to
 Function cmsApi_setTupianBackgroundParam(existingParams = {})
   return m.setImageParams(["background"], existingParams)
-End Function
-
-
-' Converts image sizes from 1920x1080 resolution to 1280x720 resolution
-' @originalSize: array - [width, height] array for 1920x1080 resolution
-' @return: array - [width, height] array scaled for 1280x720 resolution
-Function cmsApi_convertImageSizeFor720p(originalSize as Object) as Object
-  ' Calculate scaling factors: 1280/1920 = 0.6667, 720/1080 = 0.6667
-  ' Both dimensions scale by the same factor since we're maintaining aspect ratio
-  scaleFactor = 0.6667
-
-  ' Convert to integers after scaling
-  newWidth = Int(originalSize[0] * scaleFactor)
-  newHeight = Int(originalSize[1] * scaleFactor)
-
-  return [newWidth, newHeight]
 End Function
 
 
@@ -904,6 +951,22 @@ Function cmsApi_getFullCategoryId(category)
     end if
   end if
   return categoryId
+End Function
+
+
+' Converts image sizes from 1920x1080 resolution to 1280x720 resolution if necessary
+' @originalSize: array - [width, height] array for 1920x1080 resolution
+' @return: array - [width, height] array scaled for 1280x720 resolution
+Function cmsApi_convertImageSizeFor720p(originalSize as Object) as Object
+  ' Calculate scaling factors: 1280/1920 = 0.6667, 720/1080 = 0.6667
+  ' Both dimensions scale by the same factor since we're maintaining aspect ratio
+  scaleFactor = m.constants.ui.imageSizeMultiplier
+
+  ' Convert to integers after scaling
+  newWidth = Int(originalSize[0] * scaleFactor)
+  newHeight = Int(originalSize[1] * scaleFactor)
+
+  return [newWidth, newHeight]
 End Function
 
 

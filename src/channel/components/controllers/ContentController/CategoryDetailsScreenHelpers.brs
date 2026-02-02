@@ -8,7 +8,6 @@ Function showCategoryDetailsScreen(content, sendNavigationLoadEvents = true, con
   tubiLog("CategoryDetailsScreenHelpers.showCategoryDetailsScreen")
 
   categoryDetailsScreen = CreateObject("roSGNode", "CategoryDetailsScreen")
-  categoryDetailsScreen.trackingLoadStartTime = UpTime(0)
   categoryDetailsScreen.observeFieldScoped("contentSelected", "onCategoryContentSelected")
   categoryDetailsScreen.observeFieldScoped("backgroundUriList", "onCategoryScreenBackgroundChange")
   categoryDetailsScreen.observeFieldScoped("sponsorshipBackground", "onSponsorshipBackgroundChanged")

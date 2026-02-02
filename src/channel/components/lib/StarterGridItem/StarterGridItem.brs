@@ -182,7 +182,9 @@ Function onItemContentChange(msg)
     childGridItemComponent = invalid
     row = itemContent.getParent()
 
-    if gridItemType = "emptyContainer" then
+    if gridItemType = "episodeItem" OR gridItemType = "episodeItemLatestEpisodes" then
+      childGridItemComponent = "EpisodeItem"
+    else if gridItemType = "emptyContainer" then
       if row <> invalid AND row.useVideoTilesFormat = true
         childGridItemComponent = "MyStuffEmptyVideoTile"
       else
@@ -536,4 +538,3 @@ Function createTitleLabel()
   m.top.appendChild(titleLabelGroup)
   m.titleLabelGroup = titleLabelGroup
 End Function
-

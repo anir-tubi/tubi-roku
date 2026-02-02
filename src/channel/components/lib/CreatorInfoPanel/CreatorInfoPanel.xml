@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="CreatorInfoPanel" extends="Group">
+  <script type="text/brightscript" uri="CreatorInfoPanel.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <field id="content" type="node" />
+
+    <field id="firstRowFocusPercent" alias="genresLabel.opacity, descriptionLabel.opacity" />
+  </interface>
+
+  <children>
+    <LayoutGroup itemSpacings="[16]">
+      <LayoutGroup layoutDirection="horiz" itemSpacings="[16]" vertAlignment="center">
+        <Poster id="poster" />
+
+        <Label
+          id="nameLabel" />
+      </LayoutGroup>
+
+      <Label id="genresLabel" />
+
+      <Label
+        id="descriptionLabel"
+        wrap="true"
+        maxLines="2"
+        width="960" />
+    </LayoutGroup>
+  </children>
+</component>

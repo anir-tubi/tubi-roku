@@ -165,6 +165,9 @@
       <!-- set to true when the user selects the 'Play' menu button -->
       <field id="playSelected" type="boolean" alwaysNotify="true" />
 
+      <!-- set to true when the user selects the creator menu button -->
+      <field id="creatorSelected" type="boolean" alwaysNotify="true" />
+
       <!-- set to true when the user selects the 'Like' menu button -->
       <field id="likeSelected" type="boolean" alwaysNotify="true" />
 
@@ -220,11 +223,6 @@
 
       <field id="refreshRelatedContent" type="boolean" alwaysNotify="true" />
 
-      <!-- Holds a load time start value [returned from UpTime()] that can be used to determine how long the page took to load.
-           Used when showing a series/episode page
-      -->
-      <field id="trackingLoadStartTime" type="integer" />
-
       <!-- Communicates to the parent that the video preview should be stopped -->
       <field id="stopVideoPreview" type="boolean" alwaysNotify="true"/>
 
@@ -238,6 +236,8 @@
     <DetailMenuItemContentNode
       id="PlayMenuItem"
       iconUrl="pkg:/images/icon-play.webp"/>
+    <DetailMenuItemContentNode
+      id="CreatorMenuItem"/>
     <DetailMenuItemContentNode
       id="LikeMenuItem"
       isUnfocusedFootprintEnabled="true"

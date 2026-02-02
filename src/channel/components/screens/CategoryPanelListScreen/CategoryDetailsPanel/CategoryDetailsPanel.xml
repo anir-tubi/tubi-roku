@@ -94,14 +94,6 @@
               Please note: that it is important that alwaysNotify is set to true so we can communicate to the Helper when the cache is out of date, value > 0-->
       <field id="categoryBatchIndex" type="integer" alwaysNotify="true" />
 
-      <!-- This field indicates that categorydetail page is fully loaded with all available contents or upto constants.performance.categoryGridList.finalLazyLoadSize-->
-      <field id="isFullyLoaded" alias="pageTitleAndCounter.isFullyLoaded" />
-
-      <!-- Holds a load time start value [returned from UpTime()] that can be used to determine how long the page took to load.
-           Used when showing a series/episode page
-      -->
-      <field id="trackingLoadStartTime" type="integer" />
-
       <!-- will be used to change the background images on the content controller -->
       <field id="backgroundUriList" type="stringarray" alwaysNotify="true"/>
 

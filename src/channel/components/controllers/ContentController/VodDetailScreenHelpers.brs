@@ -22,7 +22,6 @@ Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, 
     screen.observeFieldScoped("shouldPauseVideoPreview", "onVodDetailShouldPauseVideoPreviewChange")
     screen.observeFieldScoped("backgroundUriList", "onVodDetailBackgroundUriListChange")
     screen.id = m.constants.ui.screenIds.vodDetailScreen
-    screen.trackingLoadStartTime = Uptime(0)
     screen.shouldFocusWhenPushed = m.top.fadeInContentController
     screen.playbackSource = playbackSource
     screen.userSignedIn = isLoggedInUser()
@@ -1221,4 +1220,3 @@ Function onVodDetailShouldPauseVideoPreviewChange(msg)
     resumeVideoPreview()
   end if
 End Function
-

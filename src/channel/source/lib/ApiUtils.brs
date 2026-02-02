@@ -44,7 +44,6 @@ Function apiUtils_getCommonOptions(appendFailSafeHeaders = false)
 
   options = {
     params: {
-      "app_id": m.constants.settings.shortAppName
       "platform": m.constants.platform
       "device_id": m.constants.deviceInfo.deviceId
     }

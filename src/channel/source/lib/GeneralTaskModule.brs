@@ -233,7 +233,7 @@ End Function
 '             each key in the batch response AA will be the request id, and the associated value will be the request's response.
 '
 ' returns the final submitted batchInfo or invalid if something went wrong
-Function generalTask_makeBatchRequest(batchInfo = {})
+Function generalTask_makeBatchRequest(batchInfo)
   if isAA(batchInfo) = false then
     tubiLog("GeneralTask.makeBatchRequest - request info not of valid type, no request made", "warn")
     return invalid
@@ -280,36 +280,6 @@ Function generalTask_makeBatchRequest(batchInfo = {})
   m.generalTask.batchRequest = batchInfo
 
   return batchInfo
-End Function
-
-
-' successCallbackWrapper
-'
-' this callback gets invoked once the value is set in response field of the callback node
-' @msg : roSGNodeEvent, will have callback node
-Function successCallbackWrapper(msg)
-  callbackNode = msg.getRoSGNode()
-  callback = m.getGeneralTaskSuccessCallback(callbackNode)
-
-  if callback <> invalid then
-    response = msg.getData()
-    callback(response)
-  end if
-End Function
-
-
-' error callback wrapper
-'
-' this callback gets invoked once the value is set in error field of the callback node
-' @msg : roSGNodeEvent, will have callback node
-Function errorCallbackWrapper(msg)
-  callbackNode = msg.getRoSGNode()
-  callback = m.getGeneralTaskErrorCallback(callbackNode)
-  if callback <> invalid then
-    error = msg.getData()
-
-    callback(error)
-  end if
 End Function
 
 
@@ -383,22 +353,6 @@ Function generalTask_isValidBatchResponseType(responseType)
 End Function
 
 
-' returns an AA of all the interface types that are arrays (not including a single vector2D)
-Function getArrayInterfaceTypes()
-  return {
-    "floatarray": true
-    "intarray": true
-    "boolarray": true
-    "stringarray": true
-    "vector2darray": true
-    "colorarray": true
-    "timearray": true
-    "nodearray": true
-    "array": true
-  }
-End Function
-
-
 Function generalTask_updateGeneralTaskConstants(constants)
   m.generalTask.newConstants = constants
 End Function
@@ -421,4 +375,71 @@ End Function
 
 Function generalTask_updateGeneralTaskStatSigExperiments(newStatSigExperiments)
   m.generalTask.newStatSigExperiments = newStatSigExperiments
+End Function
+
+
+' successCallbackWrapper
+'
+' this callback gets invoked once the value is set in response field of the callback node
+' @msg : roSGNodeEvent, will have callback node
+Function successCallbackWrapper(msg)
+  callbackNode = msg.getRoSGNode()
+  callback = m.generalTaskModule.getGeneralTaskSuccessCallback(callbackNode)
+
+  if callback <> invalid then
+    response = msg.getData()
+    callback(response)
+  end if
+End Function
+
+
+' error callback wrapper
+'
+' this callback gets invoked once the value is set in error field of the callback node
+' @msg : roSGNodeEvent, will have callback node
+Function errorCallbackWrapper(msg)
+  callbackNode = msg.getRoSGNode()
+  callback = m.generalTaskModule.getGeneralTaskErrorCallback(callbackNode)
+
+  if callback <> invalid then
+    error = msg.getData()
+
+    callback(error)
+  end if
+End Function
+
+
+' returns an AA of all the interface types that are arrays (not including a single vector2D)
+Function getArrayInterfaceTypes()
+  return {
+    "floatarray": true
+    "intarray": true
+    "boolarray": true
+    "stringarray": true
+    "vector2darray": true
+    "colorarray": true
+    "timearray": true
+    "nodearray": true
+    "array": true
+  }
+End Function
+
+
+Function makeNetworkRequest(reqInfo)
+  if m.generalTaskModule = invalid
+    m.generalTaskModule = {}
+    GeneralTaskModule(m.generalTaskModule, m.global.generalTask)
+  end if
+
+  m.generalTaskModule.makeRequest(reqInfo)
+End Function
+
+
+Function makeBatchNetworkRequest(batchInfo)
+  if m.generalTaskModule = invalid
+    m.generalTaskModule = {}
+    GeneralTaskModule(m.generalTaskModule, m.global.generalTask)
+  end if
+
+  m.generalTaskModule.makeBatchRequest(batchInfo)
 End Function

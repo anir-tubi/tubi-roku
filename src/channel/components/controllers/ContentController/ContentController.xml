@@ -91,6 +91,7 @@
   <script type="text/brightscript" uri="pkg:/components/lib/ProfileMixin.brs" />
   <script type="text/brightscript" uri="VodDetailScreenHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/PerformanceMetricsTracker.brs" />
+  <script type="text/brightscript" uri="CollectionScreenHelpers.brs" />
   <script type="text/brightscript" uri="VideoTileHelpers.brs" />
 
   <interface>

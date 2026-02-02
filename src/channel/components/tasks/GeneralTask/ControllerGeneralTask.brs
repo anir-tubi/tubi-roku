@@ -119,6 +119,7 @@ Function registerParsingCallbacks()
   ' autopilot related content
   m.requestTypes[m.constants.reqNames.getRelatedContent] = {
     parseSuccess: parseDetailScreenRelatedContentSuccess
+    parseError: parseGenericError
   }
 
   ' season list by series ID
@@ -332,6 +333,12 @@ Function registerParsingCallbacks()
   m.requestTypes[m.constants.reqNames.fetchStatsigExperimentsPaused] = {
     parseSuccess: parseGenericSuccess
     parseError: parseGenericError
+  }
+
+  m.requestTypes[m.constants.reqNames.getCollection] = {
+    parseSuccess: parseCollectionSuccess
+    parseError: parseGenericError
+    passRawResponse: true
   }
 End Function
 

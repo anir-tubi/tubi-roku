@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="TubiRowList" extends="RowList">
+  <script type="text/brightscript" uri="TubiRowList.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+  <!-- INPUT -->
+    <field id="trackingPageInfo" type="assocarray" />
+
+    <field id="contentSupplied" type="assocarray" />
+
+  <!-- OUTPUT -->
+    <field id="contentNeeded" type="assocarray" />
+
+    <!-- The index of the content has been selected. A 2D array [row, column] if row item was selected and a 1D array [row] if row title was selected -->
+    <field id="selectedContentIndex" type="array" alwaysNotify="true" />
+
+    <!-- The index of the content to play. A 2D array [row, column] -->
+    <field id="playContentIndex" type="array" alwaysNotify="true" />
+
+    <!-- Navigate within page event tracking info -->
+    <field id="navigateWithinPageInfo" type="assocarray" alwaysNotify="true" />
+
+    <!-- stores the component info of the component that was selected when navigating to a new screen. Looks like:
+      {
+        componentType: "category_component" Corresponds to one of the page types in tubiTracking_getAnalyticsComponent which mirrors the protos repo.
+        componentValues: {} An assoc array with key/values that match the componentType as found in tubiTracking_getAnalyticsComponent().
+      }
+    -->
+    <field id="trackingComponentInfo" type="assocarray" alwaysNotify="true" />
+  </interface>
+</component>

@@ -29,11 +29,11 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
 
     detailScreen = CreateObject("roSGNode", "DetailScreen")
     detailScreen.id = m.constants.ui.screenIds.detailScreen
-    detailScreen.trackingLoadStartTime = Uptime(0)
     detailScreen.shouldFocusWhenPushed = m.top.fadeInContentController
     detailScreen.playbackSource = playbackSource
     detailScreen.observeFieldScoped("playSelected", "onPlay")
     detailScreen.observeFieldScoped("resumeSelected", "onResume")
+    detailScreen.observeFieldScoped("creatorSelected", "onCreatorSelected")
     detailScreen.observeFieldScoped("likeSelected", "onLikeSelected")
     detailScreen.observeFieldScoped("dislikeSelected", "onDislikeSelected")
     detailScreen.observeFieldScoped("removeLikeSelected", "onRemoveLike")
@@ -1956,6 +1956,17 @@ Function onPlay(msg)
   detailScreen = msg.getRoSGNode()
   playVideoDetailScreen(detailScreen, detailScreen.playbackSource)
 
+End Function
+
+
+Function onCreatorSelected(msg)
+  detailScreen = msg.getRoSGNode()
+
+  content = detailScreen.content
+  if content <> invalid AND content.creatorTensorApp <> invalid then
+    appId = detailScreen.content.creatorTensorApp.id
+    showCollectionScreen(appId)
+  end if
 End Function
 
 

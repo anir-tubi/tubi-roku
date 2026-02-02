@@ -72,7 +72,10 @@ End Function
 '@param labelNode, Node: The Label Node that its properties will be set based on the ID passed
 '@param typographyId, String: The ID that will determine the properties of the label node.
 '     The value of this ID should be one of the IDs available in this file: i.e. getTypographyConstants().ids.headerLarge
-Function setTypographyOfLabel(labelNode, typographyId)
+'@param overrides, assocArray: (optional) An AA that can contain overrides for certain typography properties.
+'     Supported override keys:
+'       lineSpacing: integer, the line spacing value to set on the label node
+Function setTypographyOfLabel(labelNode, typographyId, overrides = invalid)
   constants = getTypographyConstants()
 
   if typographyId <> invalid AND labelNode <> invalid
@@ -82,8 +85,12 @@ Function setTypographyOfLabel(labelNode, typographyId)
       nFontSize = getTypographyFontSize(aaTypography)
 
       nLineSpacing = 0
-      if aaTypography.lineHeight <> invalid AND aaTypography.lineHeight > 0
-        nLineSpacing = aaTypography.lineHeight - nFontSize
+      if overrides <> invalid AND overrides.lineSpacing <> invalid
+        nLineSpacing = overrides.lineSpacing
+      else
+        if aaTypography.lineHeight <> invalid AND aaTypography.lineHeight > 0
+          nLineSpacing = aaTypography.lineHeight - nFontSize
+        end if
       end if
 
       '//set properties depending on the label mode type
@@ -94,6 +101,7 @@ Function setTypographyOfLabel(labelNode, typographyId)
       else if labelNode.subType() = "Label" OR labelNode.subType() = "ScrollableText"
         fontNode = labelNode.font
 
+        ' TODO move away from using this
         if fontNode.id = "RedesignDescriptionFont"
           labelNode.lineSpacing = 2
         else if nLineSpacing >= 0

@@ -13,7 +13,6 @@ Function UserDeviceApiSetup()
   m.checkBirthdayUrl = m.constants.urls.account.checkBirthday
   m.patchSettingsUrl = m.constants.urls.account.userSettings
   m.historyUrl = m.constants.urls.lishi.viewHistory
-  m.app_id = m.constants.settings.shortAppName
   m.platform = m.constants.platform
   m.device_id = m.constants.deviceInfo.deviceId
   m.testEmail = "test@tubi.tv"
@@ -49,9 +48,6 @@ Function userDeviceApi_emailExistsReqInfo_test()
   m.assertNotInvalid(requestInfo.options)
   params = requestInfo.options.params
   m.assertNotInvalid(params)
-
-  m.assertNotInvalid(params.app_id)
-  m.assertEqual(params.app_id, m.app_id)
 
   m.assertNotInvalid(params.device_id)
   m.assertEqual(params.device_id, m.device_id)
@@ -509,7 +505,6 @@ Function userDeviceApi_addHistoryReqVideo_ParentIdAsInvalid_test()
   m.assertEqual(headers["x-client-platform"], "roku")
 
   m.assertEqual(options.params.device_id, m.deviceId)
-  m.assertEqual(options.params.app_id, m.app_id)
   m.assertEqual(options.params.platform, m.platform)
 End Function
 
@@ -544,7 +539,6 @@ Function userDeviceApi_addHistoryReqVideo_ParentIdAsEmpty_test()
   m.assertEqual(headers["x-client-platform"], "roku")
 
   m.assertEqual(options.params.device_id, m.deviceId)
-  m.assertEqual(options.params.app_id, m.app_id)
   m.assertEqual(options.params.platform, m.platform)
 End Function
 
@@ -581,7 +575,6 @@ Function userDeviceApi_addHistoryReqEpisodeParentIdAsString_test()
   m.assertEqual(headers["x-client-platform"], "roku")
 
   m.assertEqual(options.params.device_id, m.deviceId)
-  m.assertEqual(options.params.app_id, m.app_id)
   m.assertEqual(options.params.platform, m.platform)
 End Function
 
@@ -618,7 +611,6 @@ Function userDeviceApi_addHistoryReqEpisodeParentIdAsInteger_test()
   m.assertEqual(headers["x-client-platform"], "roku")
 
   m.assertEqual(options.params.device_id, m.deviceId)
-  m.assertEqual(options.params.app_id, m.app_id)
   m.assertEqual(options.params.platform, m.platform)
 End Function
 

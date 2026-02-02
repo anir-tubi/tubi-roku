@@ -215,8 +215,6 @@ Function onItemFocused(msg)
       ' Update the info panel
       populateInfoPanel(m.InfoPanel, content)
 
-      m.PageTitleAndCounter.currentIndex = item
-
       ' Update the background image
       if type(content.backgrounds) = "roArray" AND content.backgrounds.count() > 0
         m.top.backgroundUriList = content.backgrounds

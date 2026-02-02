@@ -126,6 +126,7 @@ Function getHistory(contentId)
   if contentId <> invalid
     historyIds = getFieldFromGlobal("historyIds")
     if historyIds <> invalid
+      ' TODO optimize search by indexing historyIds by contentId
       history = historyIds.findNode(contentId)
     end if
   end if

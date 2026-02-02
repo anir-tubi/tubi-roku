@@ -90,10 +90,6 @@
     <!-- If the screen is not enabled, then user should not be able to select anything -->
     <field id="enabled" type="boolean" alwaysNotify="true" />
 
-    <!-- Acts a circuit breaker in case categories are attempted to be fetched before categories are
-    initially loaded -->
-    <field id="canLoadCategories" type="boolean" />
-
     <!-- Triggers a reset of the ContentArea translation values in the case they were adjusted by
     VITG -->
     <field id="resetContentAreaValues" type="boolean" alwaysNotify="true" />
@@ -211,11 +207,6 @@
 
     <!-- will be used to change the sponsored background images on the content controller -->
     <field id="sponsorshipBackground" type="string" alwaysNotify="true" />
-
-    <!-- Holds a load time start value [returned from UpTime()] that can be used to determine how
-    long the page took to load.
-      -->
-    <field id="trackingLoadStartTime" type="integer" />
 
     <!-- Communicates to the parent that the linear video player should be stopped -->
     <field id="stopLinearVideoPlayer" type="boolean" alwaysNotify="true" />

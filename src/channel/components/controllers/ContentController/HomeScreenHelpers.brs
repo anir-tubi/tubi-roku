@@ -87,7 +87,6 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.kidsModeFeatureOn = m.kidsModeFeatureOn
     homeScreen.kidsMode = isKidsUIOn()
     updateInlineVideoMetadataOverlayVisibility()
-    homeScreen.canLoadCategories = true
 
     fetchHomescreen(homeScreen)
     setInScreenCache(homeScreen)
@@ -316,92 +315,90 @@ Function fetchHomeScreen(homeScreen, useCache = false)
   ' This check causes all category fetches to be skipped prior to the field
   ' being set to true.  Then, once true categories reload any time fetchHomeScreen() is
   ' called, such as when signedIn field changes.
-  if homeScreen <> invalid
-    ' Set the enableVideoTiles field using the centralized method
-    ' Pass screenID to ensure correct rules are applied for the target screen
-    homeScreen.enableVideoTiles = isVideoTileEnabledScreen(homeScreen.id)
-  end if
-  if homeScreen.canLoadCategories = true
-    '//reset contentFetchCompleted flags
-    homeScreen.contentFetchCompleted = false
-    homeScreen.adContentFetchCompleted = false
 
-    homeScreen.trackingLoadStartTime = UpTime(0)
-    authInfo = m.tubiAuthUpdate.getAuthInfo()
-    homeScreen.signedIn = isLoggedInUser(authInfo)
-    homeScreen.unobserveFieldScoped("contentReady")
-    homeScreen.observeFieldScoped("contentReady", "onHomescreenContentReady")
+  ' Set the enableVideoTiles field using the centralized method
+  ' Pass screenID to ensure correct rules are applied for the target screen
+  homeScreen.enableVideoTiles = isVideoTileEnabledScreen(homeScreen.id)
 
-    successHandler = onHomeScreenSuccessResponse
-    errorHandler = onHomeScreenErrorResponse
-    if homeScreen.id = m.constants.ui.screenIds.movieScreen
-      successHandler = onMovieScreenSuccessResponse
-      errorHandler = onMovieScreenErrorResponse
-    else if homeScreen.id = m.constants.ui.screenIds.tvScreen
-      successHandler = onTVScreenSuccessResponse
-      errorHandler = onTVScreenErrorResponse
-    else if homeScreen.id = m.constants.ui.screenIds.espanolScreen
-      successHandler = onEspanolScreenSuccessResponse
-      errorHandler = onEspanolScreenErrorResponse
-    else if homeScreen.id = m.constants.ui.screenIds.homeScreen
-      if isKidsUIOn() = false AND isParentalControlsAdultLevel() = true
-        '//Call an ad endpoint to get ad content for the homescreen. The ad endpoint will return if any ads are active
-        aAdTypes = [m.constants.adTypes.adRowlistCarousel, m.constants.adTypes.adRowlistSpotlight, m.constants.adTypes.skinAd]
+  '//reset contentFetchCompleted flags
+  homeScreen.contentFetchCompleted = false
+  homeScreen.adContentFetchCompleted = false
 
-        createHomescreenAdRequest(homeScreen.id, onHomesceenAdDisplaySuccessResponse, aAdTypes, onHomesceenAdDisplayErrorResponse)
-      else
-        'If in kids mode, then user is not in experiment and we should indicate that the adContentFetchCompleted flag is true so that ads are not waited on when loading homescreen content
-        homeScreen.adContent = []
-        homeScreen.adContentFetchCompleted = true
-      end if
-    end if
+  homeScreen.trackingLoadStartTime = UpTime(0)
+  authInfo = m.tubiAuthUpdate.getAuthInfo()
+  homeScreen.signedIn = isLoggedInUser(authInfo)
+  homeScreen.unobserveFieldScoped("contentReady")
+  homeScreen.observeFieldScoped("contentReady", "onHomescreenContentReady")
 
-    ' For tensor API, we need to pass as empty string for homescreen
-    if homeScreen.contentMode = m.constants.ui.contentMode.homescreen
-      contentMode = ""
+  successHandler = onHomeScreenSuccessResponse
+  errorHandler = onHomeScreenErrorResponse
+  if homeScreen.id = m.constants.ui.screenIds.movieScreen
+    successHandler = onMovieScreenSuccessResponse
+    errorHandler = onMovieScreenErrorResponse
+  else if homeScreen.id = m.constants.ui.screenIds.tvScreen
+    successHandler = onTVScreenSuccessResponse
+    errorHandler = onTVScreenErrorResponse
+  else if homeScreen.id = m.constants.ui.screenIds.espanolScreen
+    successHandler = onEspanolScreenSuccessResponse
+    errorHandler = onEspanolScreenErrorResponse
+  else if homeScreen.id = m.constants.ui.screenIds.homeScreen
+    if isKidsUIOn() = false AND isParentalControlsAdultLevel() = true
+      '//Call an ad endpoint to get ad content for the homescreen. The ad endpoint will return if any ads are active
+      aAdTypes = [m.constants.adTypes.adRowlistCarousel, m.constants.adTypes.adRowlistSpotlight, m.constants.adTypes.skinAd]
+
+      createHomescreenAdRequest(homeScreen.id, onHomesceenAdDisplaySuccessResponse, aAdTypes, onHomesceenAdDisplayErrorResponse)
     else
-      contentMode = homeScreen.contentMode
+      'If in kids mode, then user is not in experiment and we should indicate that the adContentFetchCompleted flag is true so that ads are not waited on when loading homescreen content
+      homeScreen.adContent = []
+      homeScreen.adContentFetchCompleted = true
     end if
-
-    options = {}
-
-    headers = {}
-    params = {
-      group_start: 0
-      group_size: m.constants.performance.categoryGridList.numContainers
-      contents_limit: m.constants.performance.categoryGridList.initialBlockSize
-      content_mode: contentMode
-    }
-
-    isKidsMode = shouldKidsModeBeSentToServer()
-    homeScreen.kidsMode = isKidsUIOn()
-
-    if homeScreen <> invalid AND homeScreen.content <> invalid AND useCache = true AND homeScreen.content.lastModified <> invalid
-      headers["If-Modified-Since"] = homeScreen.content.lastModified
-    end if
-
-    options.params = params
-    options.headers = headers
-    homeScreenReqInfo = m.CmsApi.createHomeScreenReqInfo(isKidsMode, options)
-    m.makeRequest({
-      url: homeScreenReqInfo.url
-      requestType: m.constants.reqNames.getHomescreen
-      options: homeScreenReqInfo.options
-      successCallback: successHandler
-      errorCallback: errorHandler
-      responseType: "node"
-      isSignedInUser: isLoggedInUser()
-      uiMode: m.uiMode
-      screenId: homeScreen.id
-    })
-
-    if useCache = false
-      homeScreen.resetContentAreaValues = true
-      setHomeScreenLoading(homeScreen)
-    end if
-
-    homeScreen.containerPaginationStatus = "none"
   end if
+
+  ' For tensor API, we need to pass as empty string for homescreen
+  if homeScreen.contentMode = m.constants.ui.contentMode.homescreen
+    contentMode = ""
+  else
+    contentMode = homeScreen.contentMode
+  end if
+
+  options = {}
+
+  headers = {}
+  params = {
+    group_start: 0
+    group_size: m.constants.performance.categoryGridList.numContainers
+    contents_limit: m.constants.performance.categoryGridList.initialBlockSize
+    content_mode: contentMode
+  }
+
+  isKidsMode = shouldKidsModeBeSentToServer()
+  homeScreen.kidsMode = isKidsUIOn()
+
+  if homeScreen <> invalid AND homeScreen.content <> invalid AND useCache = true AND homeScreen.content.lastModified <> invalid
+    headers["If-Modified-Since"] = homeScreen.content.lastModified
+  end if
+
+  options.params = params
+  options.headers = headers
+  homeScreenReqInfo = m.CmsApi.createHomeScreenReqInfo(isKidsMode, options)
+  m.makeRequest({
+    url: homeScreenReqInfo.url
+    requestType: m.constants.reqNames.getHomescreen
+    options: homeScreenReqInfo.options
+    successCallback: successHandler
+    errorCallback: errorHandler
+    responseType: "node"
+    isSignedInUser: isLoggedInUser()
+    uiMode: m.uiMode
+    screenId: homeScreen.id
+  })
+
+  if useCache = false
+    homeScreen.resetContentAreaValues = true
+    setHomeScreenLoading(homeScreen)
+  end if
+
+  homeScreen.containerPaginationStatus = "none"
 End Function
 
 
@@ -745,7 +742,6 @@ Function retryCategoryList(screenID)
   tubiLog("HomeScreenHelpers.retryCategoryList")
   homeScreen = getFromScreenCache(screenID)
   if homeScreen <> invalid
-    homeScreen.canLoadCategories = true
     fetchHomescreen(homeScreen)
     homeScreen.setFocus(true)
   end if

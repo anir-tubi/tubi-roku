@@ -425,7 +425,7 @@ Function processSuccessResponse(result, callbackTypes, job)
       fullJson = responseFromServer.data
       parsedJson = invalid
       if fullJson <> invalid AND fullJson <> ""
-        parsedJson = parseJson(responseFromServer.data)
+        parsedJson = parseJson(fullJson)
       end if
 
       if parsedJson <> invalid
@@ -681,7 +681,11 @@ Function processErrorResponse(result, callbackTypes, job)
       job.reqInfo.callbackNode.error = output
     end if
   else
-    job.reqInfo.callbackNode.response = invalid
+    if job.batchInfo <> invalid then
+      accumulateBatchResponse(job, invalid)
+    else
+      job.reqInfo.callbackNode.response = invalid
+    end if
   end if
 
 End Function

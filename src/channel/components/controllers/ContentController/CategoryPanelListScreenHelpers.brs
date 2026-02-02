@@ -22,7 +22,6 @@ Function showCategoryPanelListScreen(constants, sendNavigationLoadEvents = true,
     pageType = "category_list_page"
 
     panelScreen.id = m.constants.ui.screenIds.categoryPanelListScreen
-    panelScreen.trackingLoadStartTime = UpTime(0)
     panelScreen.observeFieldScoped("backgroundUriList", "onCategoryScreenBackgroundChange")
     panelScreen.observeFieldScoped("refreshContent", "onRefreshCategoryPanelListSignal")
     panelScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")

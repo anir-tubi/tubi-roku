@@ -15,7 +15,6 @@
          This is necessary because the player screen modifies the content node directly without cloning,
          which can trigger unwanted observer updates. Using alwaysNotify ensures controlled updates. -->
     <field id="contentUpdated" type="boolean" value="false" alwaysNotify="true" />
-    <field id="trackingLoadStartTime" type="integer" />
     <field id="playbackSource" type="assocarray" />
     <field id="relatedContent" type="node" alias="relatedContentContainer.content" />
     <field id="relatedContentUpdated" alias="relatedContentContainer.contentUpdated" />

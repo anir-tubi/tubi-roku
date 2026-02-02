@@ -16,6 +16,9 @@ Function pushScreen(screen as Object, sendNavigateEvents = true, sendLoadingEven
   'handle user tracking for loading screen
   if sendLoadingEvents = true
     screenTrackingLoad(screen.trackingPageInfo)
+
+    ' Remove from currently loading screens list if we are firing load event right away
+    cleanupLoadingScreen(screen)
   end if
 
   ' don't focus the pushed screen if there is an active modal

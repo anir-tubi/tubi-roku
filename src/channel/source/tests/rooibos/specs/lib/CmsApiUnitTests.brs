@@ -60,7 +60,6 @@ Function cmsApi_createRelatedContentReqInfo_test()
     "isKidsMode"
     "video_resources"
     "images[poster_tb]"
-    "app_id"
     "platform"
     "device_id"
   ]
@@ -72,7 +71,6 @@ Function cmsApi_createRelatedContentReqInfo_test()
       "isKidsMode": true,
       "video_resources": m.cmsApi.constants.player.drmOrderWithoutHlsWidevine
       "images[poster_tb]": m.getExpectedImageParam("poster")
-      "app_id": m.cmsApi.constants.settings.shortAppName
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
       "content_id": "123456"
@@ -88,7 +86,6 @@ Function cmsApi_createRelatedContentReqInfo_test()
   m.assertEqual(kidsRelatedReqOptions.params["isKidsMode"], kidsRelatedReqInfo.options.params["isKidsMode"])
   m.assertEqual(kidsRelatedReqOptions.params["video_resources"], kidsRelatedReqInfo.options.params["video_resources"])
   m.assertEqual(kidsRelatedReqOptions.params["images[poster_tb]"], kidsRelatedReqInfo.options.params["images[poster_tb]"])
-  m.assertEqual(kidsRelatedReqOptions.params["app_id"], kidsRelatedReqInfo.options.params["app_id"])
   m.assertEqual(kidsRelatedReqOptions.params["platform"], kidsRelatedReqInfo.options.params["platform"])
   m.assertEqual(kidsRelatedReqOptions.params["device_id"], kidsRelatedReqInfo.options.params["device_id"])
 
@@ -99,7 +96,6 @@ Function cmsApi_createRelatedContentReqInfo_test()
       "isKidsMode": false,
       "video_resources": m.cmsApi.constants.player.drmOrderWithoutHlsWidevine
       "images[poster_tb]": m.getExpectedImageParam("poster")
-      "app_id": m.cmsApi.constants.settings.shortAppName
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
       "content_id": "123456"
@@ -114,7 +110,6 @@ Function cmsApi_createRelatedContentReqInfo_test()
   m.assertAAHasKeys(relatedReqInfo.options.params, params)
   m.assertEqual(relatedReqInfo.options.params["isKidsMode"], relatedReqOptions.params["isKidsMode"])
   m.assertEqual(relatedReqInfo.options.params["video_resources"], relatedReqOptions.params["video_resources"])
-  m.assertEqual(relatedReqInfo.options.params["app_id"], relatedReqOptions.params["app_id"])
   m.assertEqual(relatedReqInfo.options.params["platform"], relatedReqOptions.params["platform"])
   m.assertEqual(relatedReqInfo.options.params["device_id"], relatedReqOptions.params["device_id"])
   m.assertEqual(relatedReqInfo.options.params["images[poster_tb]"], relatedReqOptions.params["images[poster_tb]"])
@@ -129,7 +124,6 @@ Function cmsApi_createUpNextContentReqInfo_test()
   ]
   params = [
     "video_resources"
-    "app_id"
     "platform"
     "device_id"
     "custom_param"
@@ -139,7 +133,6 @@ Function cmsApi_createUpNextContentReqInfo_test()
   upNextUrl = m.cmsApi.constants.urls.autopilot.upNextContent
   upNextOptions = {
     params: {
-      "app_id": m.cmsApi.constants.settings.shortAppName
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
       "video_resources": m.cmsApi.constants.player.drmOrderWithoutHlsWidevine
@@ -160,7 +153,6 @@ Function cmsApi_createUpNextContentReqInfo_test()
   m.assertAAHasKeys(upNextInfo, infoKeys)
   m.assertEqual(upNextInfo.url, upNextUrl)
   m.assertAAHasKeys(upNextInfo.options.params, params)
-  m.assertEqual(upNextInfo.options.params["app_id"], upNextOptions.params["app_id"])
   m.assertEqual(upNextInfo.options.params["platform"], upNextOptions.params["platform"])
   m.assertEqual(upNextInfo.options.params["device_id"], upNextOptions.params["device_id"])
   m.assertEqual(upNextInfo.options.params["video_resources"], upNextOptions.params["video_resources"])
@@ -177,7 +169,6 @@ Function cmsApi_createSingleContentReqInfo_test()
     "options"
   ]
   params = [
-    "app_id"
     "platform"
     "device_id"
     "content_id"
@@ -190,7 +181,6 @@ Function cmsApi_createSingleContentReqInfo_test()
   singleContentUrl = m.cmsApi.constants.urls.content.singleContent
   singleContentOptions = {
     params: {
-      "app_id": m.cmsApi.constants.settings.shortAppName
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
       "content_id": "123456"
@@ -208,7 +198,6 @@ Function cmsApi_createSingleContentReqInfo_test()
   m.assertAAHasKeys(singleContentInfo, infoKeys)
   m.assertEqual(singleContentInfo.url, singleContentUrl)
   m.assertAAHasKeys(singleContentInfo.options.params, params)
-  m.assertEqual(singleContentInfo.options.params["app_id"], singleContentOptions.params["app_id"])
   m.assertEqual(singleContentInfo.options.params["platform"], singleContentOptions.params["platform"])
   m.assertEqual(singleContentInfo.options.params["device_id"], singleContentOptions.params["device_id"])
   m.assertEqual(singleContentInfo.options.params["content_id"], singleContentOptions.params["content_id"])
@@ -226,7 +215,6 @@ Function cmsApi_createSingleContentReqInfo_test()
   m.assertAAHasKeys(singleContentInfo, infoKeys)
   m.assertEqual(singleContentInfo.url, singleContentUrl)
   m.assertAAHasKeys(singleContentInfo.options.params, params)
-  m.assertEqual(singleContentInfo.options.params["app_id"], singleContentOptions.params["app_id"])
   m.assertEqual(singleContentInfo.options.params["platform"], singleContentOptions.params["platform"])
   m.assertEqual(singleContentInfo.options.params["device_id"], singleContentOptions.params["device_id"])
   m.assertEqual(singleContentInfo.options.params["content_id"], singleContentOptions.params["content_id"])
@@ -245,7 +233,6 @@ Function cmsApi_createSingleContentReqInfo_test()
   m.assertAAHasKeys(singleContentInfo, infoKeys)
   m.assertEqual(singleContentInfo.url, singleContentUrl)
   m.assertAAHasKeys(singleContentInfo.options.params, params)
-  m.assertEqual(singleContentInfo.options.params["app_id"], singleContentOptions.params["app_id"])
   m.assertEqual(singleContentInfo.options.params["platform"], singleContentOptions.params["platform"])
   m.assertEqual(singleContentInfo.options.params["device_id"], singleContentOptions.params["device_id"])
   m.assertEqual(singleContentInfo.options.params["content_id"], singleContentOptions.params["content_id"])
@@ -263,7 +250,6 @@ Function cmsApi_createThumbnailsReqInfo_test()
     "options"
   ]
   params = [
-    "app_id"
     "platform"
     "device_id"
     "type"
@@ -273,7 +259,6 @@ Function cmsApi_createThumbnailsReqInfo_test()
   thumbsUrl = m.cmsApi.constants.urls.cms.thumbnails + "/123456/thumbnail_sprites"
   thumbsOptions = {
     params: {
-      "app_id": m.cmsApi.constants.settings.shortAppName
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
       "type": "5x"
@@ -287,7 +272,6 @@ Function cmsApi_createThumbnailsReqInfo_test()
   m.assertAAHasKeys(thumbsInfo, infoKeys)
   m.assertEqual(thumbsInfo.url, thumbsUrl)
   m.assertAAHasKeys(thumbsInfo.options.params, params)
-  m.assertEqual(thumbsInfo.options.params["app_id"], thumbsOptions.params["app_id"])
   m.assertEqual(thumbsInfo.options.params["platform"], thumbsOptions.params["platform"])
   m.assertEqual(thumbsInfo.options.params["device_id"], thumbsOptions.params["device_id"])
   m.assertEqual(thumbsInfo.options.params["type"], thumbsOptions.params["type"])
@@ -302,7 +286,6 @@ Function cmsApi_createHomeScreenReqInfo_test()
     "options"
   ]
   params = [
-    "app_id"
     "platform"
     "device_id"
     "include_empty_history"
@@ -322,7 +305,6 @@ Function cmsApi_createHomeScreenReqInfo_test()
   homeUrl = m.cmsApi.constants.urls.tensor.cdn.homescreen
   homeOptions = {
     params: {
-      "app_id": m.cmsApi.constants.settings.shortAppName
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
       "include_empty_history": true
@@ -359,7 +341,6 @@ Function cmsApi_createHomeScreenReqInfo_test()
   m.assertEqual(homeInfo.url, homeUrl)
   m.assertAAHasKeys(homeInfo.options.params, params)
   m.assertAAHasKeys(homeInfo.options.headers, headers)
-  m.assertEqual(homeInfo.options.params["app_id"], homeOptions.params["app_id"])
   m.assertEqual(homeInfo.options.params["platform"], homeOptions.params["platform"])
   m.assertEqual(homeInfo.options.params["device_id"], homeOptions.params["device_id"])
   m.assertEqual(homeInfo.options.params["include_empty_history"], homeOptions.params["include_empty_history"])
@@ -383,7 +364,6 @@ Function cmsApi_createHomeScreenReqInfo_test()
   m.assertEqual(homeInfo.url, homeUrl)
   m.assertAAHasKeys(homeInfo.options.params, params)
   m.assertAAHasKeys(homeInfo.options.headers, headers)
-  m.assertEqual(homeInfo.options.params["app_id"], homeOptions.params["app_id"])
   m.assertEqual(homeInfo.options.params["platform"], homeOptions.params["platform"])
   m.assertEqual(homeInfo.options.params["device_id"], homeOptions.params["device_id"])
   m.assertEqual(homeInfo.options.params["include_empty_history"], homeOptions.params["include_empty_history"])
@@ -408,7 +388,6 @@ Function cmsApi_createHomeScreenReqInfo_test()
   m.assertEqual(homeInfo.url, homeUrl)
   m.assertAAHasKeys(homeInfo.options.params, params)
   m.assertAAHasKeys(homeInfo.options.headers, headers)
-  m.assertEqual(homeInfo.options.params["app_id"], homeOptions.params["app_id"])
   m.assertEqual(homeInfo.options.params["platform"], homeOptions.params["platform"])
   m.assertEqual(homeInfo.options.params["device_id"], homeOptions.params["device_id"])
   m.assertEqual(homeInfo.options.params["include_empty_history"], homeOptions.params["include_empty_history"])
@@ -429,7 +408,6 @@ Function cmsApi_createHomeScreenReqInfo_test()
   homeOptions.params.delete("images[landscape_tb]")
   homeOptions.params.delete("images[poster_tb]")
   params = [
-    "app_id"
     "platform"
     "device_id"
     "include_empty_history"
@@ -445,7 +423,6 @@ Function cmsApi_createHomeScreenReqInfo_test()
   m.assertEqual(homeInfo.url, homeUrl)
   m.assertAAHasKeys(homeInfo.options.params, params)
   m.assertAAHasKeys(homeInfo.options.headers, headers)
-  m.assertEqual(homeInfo.options.params["app_id"], homeOptions.params["app_id"])
   m.assertEqual(homeInfo.options.params["platform"], homeOptions.params["platform"])
   m.assertEqual(homeInfo.options.params["device_id"], homeOptions.params["device_id"])
   m.assertEqual(homeInfo.options.params["include_empty_history"], homeOptions.params["include_empty_history"])
@@ -466,7 +443,6 @@ Function cmsApi_createMiniHomeScreenReqInfo_test()
     "options"
   ]
   params = [
-    "app_id"
     "platform"
     "device_id"
     "is_kids_mode"
@@ -484,7 +460,6 @@ Function cmsApi_createMiniHomeScreenReqInfo_test()
   homeUrl = m.cmsApi.constants.urls.tensor.cdn.homescreen
   homeOptions = {
     params: {
-      "app_id": m.cmsApi.constants.settings.shortAppName
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
       "is_kids_mode": false
@@ -520,7 +495,6 @@ Function cmsApi_createMiniHomeScreenReqInfo_test()
   m.assertEqual(homeInfo.url, homeUrl)
   m.assertAAHasKeys(homeInfo.options.params, params)
   m.assertAAHasKeys(homeInfo.options.headers, headers)
-  m.assertEqual(homeInfo.options.params["app_id"], homeOptions.params["app_id"])
   m.assertEqual(homeInfo.options.params["platform"], homeOptions.params["platform"])
   m.assertEqual(homeInfo.options.params["device_id"], homeOptions.params["device_id"])
   m.assertEqual(homeInfo.options.params["is_kids_mode"], homeOptions.params["is_kids_mode"])
@@ -543,7 +517,6 @@ Function cmsApi_createMiniHomeScreenReqInfo_test()
   m.assertEqual(homeInfo.url, homeUrl)
   m.assertAAHasKeys(homeInfo.options.params, params)
   m.assertAAHasKeys(homeInfo.options.headers, headers)
-  m.assertEqual(homeInfo.options.params["app_id"], homeOptions.params["app_id"])
   m.assertEqual(homeInfo.options.params["platform"], homeOptions.params["platform"])
   m.assertEqual(homeInfo.options.params["device_id"], homeOptions.params["device_id"])
   m.assertEqual(homeInfo.options.params["is_kids_mode"], homeOptions.params["is_kids_mode"])
@@ -567,7 +540,6 @@ Function cmsApi_createMiniHomeScreenReqInfo_test()
   m.assertEqual(homeInfo.url, homeUrl)
   m.assertAAHasKeys(homeInfo.options.params, params)
   m.assertAAHasKeys(homeInfo.options.headers, headers)
-  m.assertEqual(homeInfo.options.params["app_id"], homeOptions.params["app_id"])
   m.assertEqual(homeInfo.options.params["platform"], homeOptions.params["platform"])
   m.assertEqual(homeInfo.options.params["device_id"], homeOptions.params["device_id"])
   m.assertEqual(homeInfo.options.params["is_kids_mode"], homeOptions.params["is_kids_mode"])
@@ -587,7 +559,6 @@ Function cmsApi_createMiniHomeScreenReqInfo_test()
   homeOptions.params.delete("images[landscape_tb]")
   homeOptions.params.delete("images[poster_tb]")
   params = [
-    "app_id"
     "platform"
     "device_id"
     "is_kids_mode"
@@ -601,7 +572,6 @@ Function cmsApi_createMiniHomeScreenReqInfo_test()
   m.assertEqual(homeInfo.url, homeUrl)
   m.assertAAHasKeys(homeInfo.options.params, params)
   m.assertAAHasKeys(homeInfo.options.headers, headers)
-  m.assertEqual(homeInfo.options.params["app_id"], homeOptions.params["app_id"])
   m.assertEqual(homeInfo.options.params["platform"], homeOptions.params["platform"])
   m.assertEqual(homeInfo.options.params["device_id"], homeOptions.params["device_id"])
   m.assertEqual(homeInfo.options.params["is_kids_mode"], homeOptions.params["is_kids_mode"])
@@ -621,7 +591,6 @@ Function cmsApi_createCategoryReqInfo_test()
     "options"
   ]
   params = [
-    "app_id"
     "platform"
     "device_id"
     "is_kids_mode"
@@ -641,7 +610,6 @@ Function cmsApi_createCategoryReqInfo_test()
   categoryUrl = m.cmsApi.constants.urls.tensor.cdn.container + "/my_category"
   categoryOptions = {
     params: {
-      "app_id": m.cmsApi.constants.settings.shortAppName
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
       "is_kids_mode": false
@@ -676,7 +644,6 @@ Function cmsApi_createCategoryReqInfo_test()
   m.assertEqual(categoryInfo.url, categoryUrl)
   m.assertAAHasKeys(categoryInfo.options.params, params)
   m.assertAAHasKeys(categoryInfo.options.headers, headers)
-  m.assertEqual(categoryInfo.options.params["app_id"], categoryOptions.params["app_id"])
   m.assertEqual(categoryInfo.options.params["platform"], categoryOptions.params["platform"])
   m.assertEqual(categoryInfo.options.params["device_id"], categoryOptions.params["device_id"])
   m.assertEqual(categoryInfo.options.params["is_kids_mode"], categoryOptions.params["is_kids_mode"])
@@ -697,7 +664,6 @@ Function cmsApi_createCategoryReqInfo_test()
   m.assertEqual(categoryInfo.url, categoryUrl)
   m.assertAAHasKeys(categoryInfo.options.params, params)
   m.assertAAHasKeys(categoryInfo.options.headers, headers)
-  m.assertEqual(categoryInfo.options.params["app_id"], categoryOptions.params["app_id"])
   m.assertEqual(categoryInfo.options.params["platform"], categoryOptions.params["platform"])
   m.assertEqual(categoryInfo.options.params["device_id"], categoryOptions.params["device_id"])
   m.assertEqual(categoryInfo.options.params["is_kids_mode"], categoryOptions.params["is_kids_mode"])
@@ -720,7 +686,6 @@ Function cmsApi_createCategoryReqInfo_test()
   m.assertEqual(categoryInfo.url, categoryUrl)
   m.assertAAHasKeys(categoryInfo.options.params, params)
   m.assertAAHasKeys(categoryInfo.options.headers, headers)
-  m.assertEqual(categoryInfo.options.params["app_id"], categoryOptions.params["app_id"])
   m.assertEqual(categoryInfo.options.params["platform"], categoryOptions.params["platform"])
   m.assertEqual(categoryInfo.options.params["device_id"], categoryOptions.params["device_id"])
   m.assertEqual(categoryInfo.options.params["is_kids_mode"], categoryOptions.params["is_kids_mode"])
@@ -737,7 +702,6 @@ Function cmsApi_createCategoryReqInfo_test()
   ' lazy loading starting at 10 to next 48 contents
   lazyCategoryOptions = {
     params: {
-      "app_id": m.cmsApi.constants.settings.shortAppName
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
       "is_kids_mode": false
@@ -767,7 +731,6 @@ Function cmsApi_createCategoryReqInfo_test()
   m.assertEqual(categoryInfo.count(), 2)
   m.assertAAHasKeys(categoryInfo, infoKeys)
   m.assertEqual(categoryInfo.url, categoryUrl)
-  m.assertEqual(categoryInfo.options.params["app_id"], lazyCategoryOptions.params["app_id"])
   m.assertEqual(categoryInfo.options.params["platform"], lazyCategoryOptions.params["platform"])
   m.assertEqual(categoryInfo.options.params["device_id"], lazyCategoryOptions.params["device_id"])
   m.assertEqual(categoryInfo.options.params["is_kids_mode"], lazyCategoryOptions.params["is_kids_mode"])
@@ -789,7 +752,6 @@ Function cmsApi_createAutocompleteReqInfo_test()
     "options"
   ]
   params = [
-    "app_id"
     "platform"
     "device_id"
     "search"
@@ -799,7 +761,6 @@ Function cmsApi_createAutocompleteReqInfo_test()
 
   autocompleteOptions = {
     params: {
-      "app_id": m.cmsApi.constants.settings.shortAppName
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
       "search": "search_text"
@@ -812,7 +773,6 @@ Function cmsApi_createAutocompleteReqInfo_test()
   m.assertAAHasKeys(autocompleteInfo, infoKeys)
   m.assertEqual(autocompleteInfo.url, autocompleteUrl)
   m.assertAAHasKeys(autocompleteInfo.options.params, params)
-  m.assertEqual(autocompleteInfo.options.params["app_id"], autocompleteOptions.params["app_id"])
   m.assertEqual(autocompleteInfo.options.params["platform"], autocompleteOptions.params["platform"])
   m.assertEqual(autocompleteInfo.options.params["device_id"], autocompleteOptions.params["device_id"])
   m.assertEqual(autocompleteInfo.options.params["search"], autocompleteOptions.params["search"])
@@ -827,7 +787,6 @@ Function cmsApi_createSearchReqInfo_test()
     "options"
   ]
   params = [
-    "app_id"
     "platform"
     "device_id"
     "search"
@@ -839,7 +798,6 @@ Function cmsApi_createSearchReqInfo_test()
 
   searchOptions = {
     params: {
-      "app_id": m.cmsApi.constants.settings.shortAppName
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
       "search": "search_text"
@@ -855,7 +813,6 @@ Function cmsApi_createSearchReqInfo_test()
   m.assertAAHasKeys(searchInfo, infoKeys)
   m.assertEqual(searchInfo.url, searchUrl)
   m.assertAAHasKeys(searchInfo.options.params, params)
-  m.assertEqual(searchInfo.options.params["app_id"], searchOptions.params["app_id"])
   m.assertEqual(searchInfo.options.params["platform"], searchOptions.params["platform"])
   m.assertEqual(searchInfo.options.params["device_id"], searchOptions.params["device_id"])
   m.assertEqual(searchInfo.options.params["search"], searchOptions.params["search"])
@@ -869,7 +826,6 @@ Function cmsApi_createSearchReqInfo_test()
   m.assertAAHasKeys(searchInfo, infoKeys)
   m.assertEqual(searchInfo.url, searchUrl)
   m.assertAAHasKeys(searchInfo.options.params, params)
-  m.assertEqual(searchInfo.options.params["app_id"], searchOptions.params["app_id"])
   m.assertEqual(searchInfo.options.params["platform"], searchOptions.params["platform"])
   m.assertEqual(searchInfo.options.params["device_id"], searchOptions.params["device_id"])
   m.assertEqual(searchInfo.options.params["search"], searchOptions.params["search"])

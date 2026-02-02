@@ -8,7 +8,6 @@
   <interface>
     <!-- INPUTS -->
     <field id="content" type="node" alias="liveEventsContainer.itemContent" />
-    <field id="trackingLoadStartTime" type="integer" />
     <field id="playbackSource" type="assocarray" />
     <field id="didUserSetReminderForEventContent" type="boolean" />
     <field id="relatedContent" type="node" alias="relatedContentContainer.content" />

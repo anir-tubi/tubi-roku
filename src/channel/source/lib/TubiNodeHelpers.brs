@@ -140,6 +140,7 @@ End Function
 ' or the unchanged parent node if the insert didn't work.
 ' Inserting the original child node instead of a clone of the child would remove the child from the original parent.
 Function tubiNodeHelpers_immutableInsertChild(parent as Object, child as Object, index as Integer)
+  ' TODO should remove this and other methods that are not used anymore
   clonedParent = parent.clone(true)
   clonedChild = child.clone(true)
 

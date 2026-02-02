@@ -21,14 +21,12 @@ Function apiUtils_getCommonOptions_test()
     "params"
   ]
   params = [
-    "app_id"
     "platform"
     "device_id"
   ]
 
   deviceId = m.apiUtils.constants.deviceInfo.deviceId
   platform = m.apiUtils.constants.platform
-  appId = m.apiUtils.constants.settings.shortAppName
 
   clientVersion = m.apiUtils.constants.deviceInfo.clientVersion
 
@@ -36,7 +34,6 @@ Function apiUtils_getCommonOptions_test()
 
   m.assertAAHasKeys(commonOptions, options)
   m.assertAAHasKeys(commonOptions.params, params)
-  m.assertEqual(commonOptions.params.app_id, appId)
   m.assertEqual(commonOptions.params.platform, platform)
   m.assertEqual(commonOptions.params.device_id, deviceId)
   m.assertInvalid(commonOptions.headers["X-TUBI-PLATFORM"])

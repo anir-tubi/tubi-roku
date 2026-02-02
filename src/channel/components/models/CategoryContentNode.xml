@@ -46,5 +46,6 @@
 
     <field id="ads" type="node" />
 
+    <field id="relatedTo" type="node" />
   </interface>
 </component>

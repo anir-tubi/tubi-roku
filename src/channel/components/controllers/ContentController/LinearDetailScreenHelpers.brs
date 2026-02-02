@@ -14,7 +14,6 @@ Function showLinearDetailScreen(content, playbackSource)
     screen.observeFieldScoped("selectedRelatedContent", "onLinearDetailRelatedContentSelected")
     screen.observeFieldScoped("ctaButtonSelectedId", "onLinearDetailCtaButtonSelected")
     screen.id = m.constants.ui.screenIds.linearDetailScreen
-    screen.trackingLoadStartTime = Uptime(0)
     screen.shouldFocusWhenPushed = m.top.fadeInContentController
     screen.playbackSource = playbackSource
     ' we make changes to the content from this point forward. If we don't clone, changes will be propagated to the original content in home or search screen.

@@ -143,9 +143,6 @@
 
       <field id="contentIdToFocusOnLoadComplete" type="string" />
 
-      <!-- Holds a load time start value [returned from UpTime()] that can be used to determine how long the page took to load.-->
-      <field id="trackingLoadStartTime" type="integer" />
-
       <!-- Timestamp of the last time we finished playing back video with this player. If -1 then we are currently playing back. -->
       <field id="timestampOfLastVideoPlayback" type="integer" value="0" />
       <field id="isDisplayingOverlay" alias="VideoOverlay.isDisplaying" />

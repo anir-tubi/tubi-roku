@@ -12,6 +12,7 @@ Function init()
   m.defaultSecondaryMenuY = m.SecondaryMenu.translation[1]
   m.ResumeMenuItem = m.top.findNode("ResumeMenuItem")
   m.PlayMenuItem = m.top.findNode("PlayMenuItem")
+  m.CreatorMenuItem = m.top.findNode("CreatorMenuItem")
   m.LikeMenuItem = m.top.findNode("LikeMenuItem")
   m.DislikeMenuItem = m.top.findNode("DislikeMenuItem")
   m.LikeDislikeMenuItem = m.top.findNode("LikeDislikeMenuItem")
@@ -77,6 +78,7 @@ Function init()
   m.RelatedGrid.observeFieldScoped("itemSelected", "onRelatedContentSelected")
   m.RelatedGrid.observeFieldScoped("itemFocused", "onRelatedItemFocused")
   m.Info.observeFieldScoped("descriptionSelected", "onDescriptionSelected")
+  m.top.observeFieldScoped("content", "onContentChange")
 
 
   setInitialMenuItems()
@@ -140,6 +142,8 @@ End Function
 Function setDetailStrings()
   m.PlayMenuItem.title = getTranslation("screenDetails_button_play")
   m.PlayMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.PlayMenuItem.id]
+
+  ' TODO need to set analytics value for creator button
 
   m.LikeMenuItem.title = getTranslation("screenDetails_button_like")
   m.LikeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.LikeMenuItem.id]
@@ -945,6 +949,8 @@ Function handleMenuItemSelected(itemSelected)
     else if itemSelected.id = m.constants.ui.detailScreenMenuItemIds.playMenuItem
       m.top.playSelected = true
       m.Menu.jumpToItem = 0 '//reset menu back to the top after a video is requested to play
+    else if itemSelected.id = m.constants.ui.detailScreenMenuItemIds.creatorMenuItem
+      m.top.creatorSelected = true
     else if itemSelected.id = m.constants.ui.detailScreenMenuItemIds.likeDislikeMenuItem
       if m.LikeDislikeMenuItem.title = getTranslation("screenDetails_button_changingRating")
         '//If it is still trying to change the rating then do nothing if this button is clicked again
@@ -996,6 +1002,26 @@ Function handleMenuItemSelected(itemSelected)
 
   m.mainMenuSelected = false
   m.secondaryMenuSelected = false
+End Function
+
+
+Function onContentChange(msg) as Void
+  content = msg.getData()
+
+  add = false
+  creator = content.creatorTensorApp
+  if creator <> invalid then
+    if getStatsigExperimentResource("roku_creator_m2", "roku_creator_m2_v1", true).enabled = false then
+      return
+    end if
+
+    add = true
+    m.CreatorMenuItem.title = creator.title
+    m.CreatorMenuItem.iconUrl = creator.images.logo[0]
+  end if
+
+  creatorButtonIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.CreatorMenuItem.id)
+  addRemoveMenuItem(add, creatorButtonIndex, m.CreatorMenuItem, [m.ResumeMenuItem, m.PlayMenuItem])
 End Function
 
 

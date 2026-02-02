@@ -10,7 +10,7 @@
   <script type="text/brightscript" uri="../../lib/CacheValidationMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" /> 
+  <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
 
   <interface>
     <!-- INPUT -->
@@ -26,7 +26,7 @@
 
       <!-- Should the screen load the content. This is set immediately after the content changes indicating that it is safe to load the content.  -->
       <field id="shouldLoadContent" type="boolean" alwaysNotify="true"/>
-      
+
       <!-- Should the screen load the category content. This is set immediately after the categoryContent changes indicating that it is safe to load the categoryContent.  -->
       <field id="shouldLoadCategoryContent" type="boolean" alwaysNotify="true"/>
 
@@ -37,6 +37,9 @@
               2. user has scrolled down to an index where we need to load more contents.
               Please note: that it is important that alwaysNotify is set to true so we can communicate to the Helper when the cache is out of date, value > 0 -->
       <field id="categoryBatchIndex" type="integer" alwaysNotify="true" />
+
+      <!-- This field indicates that categorydetail page is fully loaded with all available contents or up to constants.performance.categoryGridList.finalLazyLoadSize-->
+      <field id="isFullyLoaded" type="boolean" />
 
       <!-- hides or shows the loading spinner -->
       <field id="isLoading" type="boolean" alias="spinner.visible" />
@@ -64,7 +67,7 @@
        <field id="failedJumpToItemByID" type="string" alwaysNotify="true"/>
 
       <!-- The item in the grid (from the vertical list of categories on the left side) that is in focus -->
-      <field id="itemFocused" type="integer" alwaysNotify="true"/> 
+      <field id="itemFocused" type="integer" alwaysNotify="true"/>
 
       <!-- the content node representing the item (from the vertical list of categories on the left side) which is in focus -->
       <field id="categoryListItemFocused" type="node" alwaysNotify="true"/>
@@ -94,9 +97,6 @@
       <!-- Same as the trackingPageInfo property, but is it the trackingPageInfo for the current category panel -->
       <field id="categoryTrackingPageInfo" type="assocarray" alwaysNotify="true"/>
 
-      <!-- Holds a load time start value [returned from UpTime()] that can be used to determine how long the page took to load.  -->
-      <field id="trackingLoadStartTime" type="integer" />
-      
       <!-- Holds a load time start value [returned from UpTime()] that can be used to determine how long the category panel took to load. -->
       <field id="categoryTrackingLoadStartTime" type="integer" />
 

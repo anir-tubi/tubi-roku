@@ -14,18 +14,23 @@ Function init()
   m.performanceMetricsTracker = PerformanceMetricsTracker()
   m.performanceMetricsTracker.startAppLaunchMetricTiming("time_to_first_tile_focus")
 
+  m.currentlyLoadingScreens = []
+
   ' We need to create the general task in order to load our base dependencies (like experiments, remote config, etc.) but we will need to update the general task after the base dependencies are loaded.
   generalTask = createObject("roSGNode", "ControllerGeneralTask") ' initiate GeneralTask
   observeUpdateAuth(generalTask)
   observeLogoutAndRestartApp(generalTask)
 
   ' Initiate GeneralTaskModule by passing caller context.
-  ' Calling GeneralTaskModule() will append methods to the local m.
-  ' DO NOT overwrite m variable methods/properties which belongs to GeneralTaskModule.
-  GeneralTaskModule(m, generalTask)
+  m.generalTaskModule = {}
+  GeneralTaskModule(m.generalTaskModule, generalTask)
+  ' Appends generalTaskModule to controller m for backward compatibility.
+  m.append(m.generalTaskModule)
 
   ' Should be created after GeneralTaskModule has run as TubiAuthUpdate will verify that the GeneralTaskModule is available
   m.tubiAuthUpdate = TubiAuthUpdate(m.constants)
+  m.global.addField("generalTask", "node", false)
+  m.global.generalTask = generalTask
 
   m.deeplinkContent = invalid
 
@@ -1779,6 +1784,31 @@ End Function
 Function onNavigateWithinPageInfoChange(msg)
   navigateWithinPageInfo = msg.getData()
   sendNavigateWithinPageInfo(navigateWithinPageInfo)
+End Function
+
+
+Function onScreenPageErrorInfoChange(msg)
+  screenPageErrorInfo = msg.getData()
+  screen = msg.getRoSGNode()
+  showErrorModal(screenPageErrorInfo)
+
+  cleanupLoadingScreen(screen)
+End Function
+
+
+' Removes passed in screen from m.currentlyLoadingScreens if it exists and returns the timespan of the time it took to load
+Function cleanupLoadingScreen(screen)
+  ' Clear up the screen if it was still loading
+  for i = 0 to m.currentlyLoadingScreens.count() - 1
+    loadingScreen = m.currentlyLoadingScreens[i]
+    timespan = loadingScreen.timespan
+    if screen.isSameNode(loadingScreen.screen) = true
+      m.currentlyLoadingScreens.delete(i)
+      return timespan
+    end if
+  end for
+
+  return invalid
 End Function
 
 
@@ -3555,6 +3585,7 @@ End Function
 ' @screen, roSGNode, the screen that the user selected the content item from.
 ' @playbackSource, assocarray, the playback source for the content.
 Function processUserContentSelection(content, screen, playbackSource = {}) as Void
+  ' TODO @prajwalkshetty investigate way to not have this be required
   if screen.isInFocusChain() = false
     return
   end if
@@ -3690,6 +3721,7 @@ End Function
 ' @screen, roSGNode, the screen that the user selected the content item from.
 ' @playbackSource, assocarray, the playback source for the content.
 Function processUserPlayAction(content, screen, playbackSource = {}) as Void
+  ' TODO @prajwalkshetty investigate way to not have this be required
   if screen.isInFocusChain() = false
     return
   end if
@@ -3934,4 +3966,43 @@ Function addConstantsFromStartupArgs(startupArgs, constants)
   end for
 
   return constants
+End Function
+
+
+' Provides a common spot for creating a screen that will hook up common logic from BaseScreen
+' @screenName: string, the name of the screen to create
+' @return: roSGNode, the created screen
+Function createScreen(screenName)
+  screen = createObject("roSGNode", screenName)
+  screen.observeFieldScoped("pageLoadComplete", "onScreenPageLoadCompleteChange")
+  screen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+  screen.observeFieldScoped("pageErrorInfo", "onScreenPageErrorInfoChange")
+
+  m.currentlyLoadingScreens.push({
+    "screen": screen
+    "timespan": createObject("roTimespan")
+  })
+
+  return screen
+End Function
+
+
+Function onScreenPageLoadCompleteChange(msg) as Void
+  pageLoadComplete = msg.getData()
+
+  if pageLoadComplete = false then
+    return
+  end if
+
+  screen = msg.getRoSgNode()
+
+  loadingTimespan = cleanupLoadingScreen(screen)
+
+  if loadingTimespan <> invalid then
+    ' IMPROVEMENT can add our own screen performance tracking here
+
+    screenTrackingLoad(screen.trackingPageInfo, loadingTimespan.totalMilliseconds())
+  end if
+
+  showHideSpinner(false)
 End Function

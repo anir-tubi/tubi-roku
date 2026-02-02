@@ -17,6 +17,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/TimeOffsetUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/GeneralTaskModule.brs" />
 
   <interface>
     <!-- INPUT -->
@@ -108,6 +109,13 @@
             } -->
       <field id="showToastMessage" type="assocarray" alwaysNotify="true"/>
 
+      <!-- Holds a load time start value [returned from UpTime()] that can be used to determine how long the page took to load. -->
+      <field id="trackingLoadStartTime" type="integer" />
+
+      <!-- Works in combination with the new createScreen function to indicate when the page has finished loading -->
+      <field id="pageLoadComplete" type="boolean" alwaysNotify="true" />
+
+      <field id="pageErrorInfo" type="assocarray" alwaysNotify="true" />
   </interface>
 
   <children>

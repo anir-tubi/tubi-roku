@@ -5,6 +5,16 @@ Function parseDetailScreenSingleContentSuccess(fullResponse, reqInfo)
   parsedResponse = fullResponse.data
   updatedContent = CreateObject("roSGNode", "TubiContentNode")
   m.metadataTranslate.translateRecursive(parsedResponse, updatedContent, reqInfo.issignedinuser)
+
+  app = parsedResponse.creator_tensor_app
+  if isAA(app) AND isNonEmptyString(app.id) AND isNonEmptyString(app.title) AND isAA(app.images) AND isNonEmptyArray(app.images.logo) then
+    ' Go ahead and round the logo
+    app.images.logo[0] = m.metadataTranslate.getRoundedCornersURL(app.images.logo[0], 999)
+    updatedContent.update({
+      "creatorTensorApp": app
+    }, true)
+  end if
+
   return updatedContent
 End Function
 
