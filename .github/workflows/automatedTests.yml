@@ -120,8 +120,7 @@ jobs:
     name: Run Automated UI Tests (${{ matrix.branch }})
     # The type of runner that the job will run
     runs-on: [self-hosted, enabled, roku, automation-regression]
-    # timeouts after 3 hours
-    timeout-minutes: 180
+    timeout-minutes: 240
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -144,6 +143,7 @@ jobs:
           npm install
 
       - name: gulp runAutomatedTests
+        timeout-minutes: 235
         env:
           runId: ${{ github.run_id }}
           branch: ${{ matrix.branch }}
