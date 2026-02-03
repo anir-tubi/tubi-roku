@@ -84,6 +84,10 @@ settings:
   # Setting the below value to true will turn on displaying the live events spotlight and banner on the home screen
   enableLiveEventsSpotlightAndBanner: false
 
+  # Setting the below value to a number greater than 0 will override the default console logging level. Works in conjunction with consoleLoggingEnabled bs_const.
+  # Log level: 0=all logs (debug/info/warn/error), 1=info/warn/error, 2=warn/error, 3=error only
+  consoleLoggingLevel: 1
+
   bs_const:
     #By default nothing will be printed to debug console.(port : 8085)
     #To enable console debug logs, set consoleLoggingEnabled to true

@@ -100,6 +100,7 @@ function load(options) {
     remoteComponentLibProvided: `TubiRemoteLib-${build.component_library_manifest.build_version}`,
     fileType: overWrittenDataPre.settings.remoteComponentsExtension,
     bsConst: getBsConstsFromSettings(overWrittenDataPre.settings),
+    consoleLoggingLevel: overWrittenDataPre.settings.consoleLoggingLevel,
   };
 
   const defaultDataPost = parse(defaultProfile, templateValues);

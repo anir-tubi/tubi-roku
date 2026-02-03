@@ -74,6 +74,10 @@ settings:
   # This field is only used in controller scope.
   enableFailSafe: false
 
+  # Setting the below value to a number greater than 0 will override the default console logging level. Works in conjunction with consoleLoggingEnabled bs_const.
+  # Log level: 0=all logs (debug/info/warn/error), 1=info/warn/error, 2=warn/error, 3=error only
+  consoleLoggingLevel: 3
+
   # Any configs added to the bs_const setting will be included in the various manifest
   # configurations via the handlebars templates
   bs_const:
@@ -111,6 +115,7 @@ manifest:
   sdk_instant_resume: 1
   run_as_process: 1
   channel_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ1cm46cm9rdS5jb206dG9rZW5taW50OmNoYW5uZWx0b2tlbiIsImF1ZCI6InVybjpyb2t1LmNvbTpzdGIvY2hhbm5lbCIsInN1YiI6InVybjpyb2t1LmNvbTpzdGIvNzM2NDQzIiwianRpIjoidXJuOjNkNjAzY2U5LTFiNWUtNDc0My04ZWNiLTBlZjYyMmQ3MGFlZSIsImlhdCI6MTY5NTA3NjI3MCwiZXhwIjoyMDEwNDM2MjcwLCJuYmYiOjE2OTMyNjE4NzAsInJva3UtdGZ2IjoiMSIsInJva3UtcGVybSI6WyJqd3RfaGVhZGVyIl0sInJlbWFyayI6IlJJU0stMTE0NjUiLCJyb2t1LWNoYW5uZWwtaWQiOlsiNDE0NjgiLCI3MzY0NDMiXX0.ow4mc9FweZZTWSpFPO-LStKLKhRvAvgZRM6lRc3IO2PH7YgQjO852pfqvHTA5UjdyW14fr5_m6x8vIvwAeWjJaj-MQunJ-DUoUB6R94FwBa_h5AAG4xb71UjQDG3IaMkUuccSIshuuMM2M8t__5WopDJz5L1jreh85IGLyYY1EFGfVKaYCMX3aY5HYy0AWwY1QYP18tWhoGJaUWiXDfOvM6xEgf0QjIKtGfig9Lv1VshYcuuza6_qo2uvso9r1hhObOd4qHo_qo-j42bWV-NCT_oAkfwUQ5cYAHQwBALhNQmatbqiSax92qavZW2xAItHQ_4N5shQlcxCI7GnyG8Yg"
+  consoleLoggingLevel: {{consoleLoggingLevel}}
   bs_const: {{bsConst}}
   dial_title: "com.tubitv.ott"
 

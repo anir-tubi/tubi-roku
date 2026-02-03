@@ -176,20 +176,68 @@ Function tubiLog_isLoggingAllowed()
 End Function
 
 
+' Gets log level value (initialized lazily on first access)
+' Since consoleLoggingLevel is a compile-time constant, it won't change during runtime
+Function tubiLog_getLogLevel_() as Integer
+  #if consoleLoggingEnabled
+    if m.configuredLogLevel = invalid
+      m.configuredLogLevel = 0
+
+      appInfo = CreateObject("roAppInfo")
+      logLevel = appInfo.GetValue("consoleLoggingLevel")
+
+      if logLevel <> invalid AND logLevel <> ""
+        logLevelInt = logLevel.toInt()
+        if logLevelInt <> invalid AND logLevelInt >= 0 AND logLevelInt <= 3
+          m.configuredLogLevel = logLevelInt
+        end if
+      end if
+    end if
+
+    return m.configuredLogLevel
+  #else
+    return -1
+  #end if
+End Function
+
+
+' Checks if a log level should be printed based on the configured consoleLoggingLevel
+' @level: string, the log level ("debug", "info", "warn", or "error")
+' @returns: boolean, true if the log should be printed
+Function tubiLog_shouldPrintLog_(level as String) as Boolean
+  #if consoleLoggingEnabled
+    logLevelsMap = {
+      debug: 0
+      info: 1
+      warn: 2
+      error: 3
+    }
+
+    if logLevelsMap[level] = invalid
+      return true ' defaulting to true if the level is unknown or not set
+    end if
+
+    return logLevelsMap[level] >= tubiLog_getLogLevel_()
+  #else
+    return false
+  #end if
+End Function
+
+
 ' prints the log on console based
 '@level: string, (optional), possible log levels are "debug", "info", "warn", or "error"
 '@subtype: string, (optional), a small string used to differentiate log messages
 '@message: string or roAssociativeArray, the message to be logged
 Function tubiLog_printLogInfo_(level as String, subType as String, message as Dynamic)
-
   #if consoleLoggingEnabled
+    if tubiLog_shouldPrintLog_(level) = true
+      if type(message) = "roAssociativeArray"
+        message = FormatJson(message)
+      end if
 
-    if type(message) = "roAssociativeArray"
-      message = FormatJson(message)
+      ' user has set consoleLoggingEnabled to true in their dev.yml/qa.yml
+      print tubiLog_getLogPrintout_(level, subType, message)
     end if
-
-    ' user has set consoleLoggingEnabled to true in their dev.yml/qa.yml
-    print tubiLog_getLogPrintout_(level, subType, message)
   #end if
 End Function
 

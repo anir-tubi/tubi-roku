@@ -92,6 +92,10 @@ settings:
   useRemoteComponents: true
   processAnimationLogo: true
 
+  # Setting the below value to a number greater than 0 will override the default console logging level. Works in conjunction with consoleLoggingEnabled bs_const.
+  # Log level: 0=all logs (debug/info/warn/error), 1=info/warn/error, 2=warn/error, 3=error only
+  consoleLoggingLevel: 0
+
   # any settings config values under bs_consts below will overwrite
   # bs_consts values set in the various manifests in default.yml
   bs_const:
