@@ -3148,7 +3148,20 @@ Function tubiMetadataTranslate_getTheIconAndTextFromConfig(sotSignal, content)
 
         end if
 
-        if isNonEmptyString(signalMap.icon) = true
+        ' Use iconV2 only if the user is part of the "roku_sot_reverse_ui_test" experiment;
+        ' If we decide not to graduate this experiment, revert to the previous behavior (show the original icon instead of iconV2)
+        ' or uncomment the code below:
+        ' if isNonEmptyString(signalMap.icon) = true
+        '     sotIcon = signalMap.icon
+        ' end if
+        if m.statSigExperiments <> invalid
+          experiment = m.statSigExperiments.getExperimentResource("roku_sot_reverse_ui_test", "roku_sot_reverse_ui_test_v1")
+          if isAA(experiment) = true AND experiment.enabled = true AND isNonEmptyString(signalMap.icon_v2) = true
+            sotIcon = signalMap.icon_v2
+          else if isNonEmptyString(signalMap.icon) = true
+            sotIcon = signalMap.icon
+          end if
+        else if isNonEmptyString(signalMap.icon) = true
           sotIcon = signalMap.icon
         end if
 
