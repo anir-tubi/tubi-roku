@@ -31,10 +31,7 @@ have been updated by ContentController
       visible="false">
 
       <Group
-        id="backgroundVideoPreviewPlayerContainer">
-        <VideoPreviewPlayer
-          id="videoPreviewPlayer" />
-      </Group>
+        id="backgroundVideoPreviewPlayerContainer" />
 
       <!--  Group that contains the linear video player when it is not in its fullscreen state -->
       <Group

@@ -215,7 +215,7 @@ Function onPlayerStatsChange(msg)
 
       if isNonEmptyString(streamInfo.streamUrl) = true
         streamUrl = streamInfo.streamUrl
-        m.streamUrlValue.text = removeExcessUrl(streamUrl)
+        m.streamUrlValue.text = removeQueryParams(streamUrl)
       else
         m.streamUrlValue.text = "Unknown"
       end if
@@ -268,7 +268,7 @@ Function onPlayerStatsChange(msg)
                 for dIdx = 0 to codecResources.count() - 1
                   resource = codecResources[dIdx]
                   if isAA(resource) = true AND isNonEmptyString(resource.url) = true
-                    updatedUrl = removeExcessUrl(resource.url)
+                    updatedUrl = removeQueryParams(resource.url)
                     fallbackUrls.push(updatedUrl)
                   end if
                 end for
@@ -278,7 +278,7 @@ Function onPlayerStatsChange(msg)
                   if dIdx < codecResources.count()
                     resource = codecResources[dIdx]
                     if isAA(resource) = true AND isNonEmptyString(resource.url) = true
-                      updatedUrl = removeExcessUrl(resource.url)
+                      updatedUrl = removeQueryParams(resource.url)
                       fallbackUrls.push(updatedUrl)
                     end if
                   end if
@@ -343,7 +343,7 @@ Function onPlayerStatsChange(msg)
       end if
 
       if isNonEmptyString(streamSeg.segUrl) = true
-        m.streamSegUrlValue.text = removeExcessUrl(streamSeg.segUrl)
+        m.streamSegUrlValue.text = removeQueryParams(streamSeg.segUrl)
       else
         m.streamSegUrlValue.text = "Unknown"
       end if
@@ -406,7 +406,7 @@ Function onPlayerStatsChange(msg)
       end if
 
       if isNonEmptyString(dlSeg.segUrl) = true
-        m.dlSegUrlValue.text = removeExcessUrl(dlSeg.segUrl)
+        m.dlSegUrlValue.text = removeQueryParams(dlSeg.segUrl)
       else
         m.dlSegUrlValue.text = "Unknown"
       end if

@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<component name="VideoPlayerScreen" extends="BaseScreen" >
+<?xml version="1.0" encoding="utf-8"?>
+<component name="VideoPlayerScreen" extends="BaseScreen">
   <script type="text/brightscript" uri="VideoPlayerScreen.brs" />
   <script type="text/brightscript" uri="VideoTransportHandling.brs" />
   <script type="text/brightscript" uri="VideoPlayerAnalyticsMixin.brs" />
@@ -14,46 +14,48 @@
   <script type="text/brightscript" uri="pkg:/components/lib/EventMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiAds.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/AdsUtils.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/google/gam_utils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Sentry.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/PlayerLogLib.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnalyticsMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/PlayerStatsMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/components/screens/VideoPlayerScreen/VideoPlayerMixin.brs" />
+  <script type="text/brightscript"
+    uri="pkg:/components/screens/VideoPlayerScreen/VideoPlayerMixin.brs" />
 
   <interface>
 
     <!-- INPUT -->
-      <!-- Alias fields for the video node -->
-      <field id="width" alias="VideoNode.width"/>
-      <field id="height" alias="VideoNode.height"/>
-      <field id="videoSponsorExposureId" type="string"/>
+    <!-- Alias fields for the video node -->
+    <field id="width" alias="VideoNode.width" />
+    <field id="height" alias="VideoNode.height" />
+    <field id="videoSponsorExposureId" type="string" />
 
-      <!-- New content has been added to the video player -->
-      <field id="content" type="node"/>
-      <field id="updateContent" type="boolean" alwaysNotify="true"/>
-      <field id="sprites" type="node"/>
-      <field id="upNextContent" alias="UpNext.content"/>
-      <field id="upNextUpdateContent" alias="UpNext.updateContent"/>
-      <field id="isAutoPlayOff" alias="UpNext.isAutoPlayOff"/>
+    <!-- New content has been added to the video player -->
+    <field id="content" type="node" />
+    <field id="updateContent" type="boolean" alwaysNotify="true" />
+    <field id="sprites" type="node" />
+    <field id="upNextContent" alias="UpNext.content" />
+    <field id="upNextUpdateContent" alias="UpNext.updateContent" />
+    <field id="isAutoPlayOff" alias="UpNext.isAutoPlayOff" />
 
-      <!-- Valid values "play", "pause", "resume", "stop" -->
-      <field id="control" type="string" value="none" alwaysNotify="true"/>
+    <!-- Valid values "play", "pause", "resume", "stop" -->
+    <field id="control" type="string" value="none" alwaysNotify="true" />
 
-      <!-- interval in seconds for sending position data to the tracking server -->
-      <field id="analyticsInterval" type="integer" value="0"/>
+    <!-- interval in seconds for sending position data to the tracking server -->
+    <field id="analyticsInterval" type="integer" value="0" />
 
-      <!-- WRITE-ONLY field tells if the video player should change its appearance to be kid friendly or not and same will be used for sending in AdServer-->
-      <field id="appMode" type="string" value="DEFAULT_MODE" />
+    <!-- WRITE-ONLY field tells if the video player should change its appearance to be kid friendly
+    or not and same will be used for sending in AdServer-->
+    <field id="appMode" type="string" value="DEFAULT_MODE" />
 
-      <!-- Enable/disable ads breaks.  This can be changed during playback in order to
+    <!-- Enable/disable ads breaks.  This can be changed during playback in order to
         -  postpone midrolls when there is an overlay (e.g. EPG) that the user is
         -  interacting with and we don't want to interrupt
         -->
-      <field id="enableAds" type="boolean" value="true"/>
+    <field id="enableAds" type="boolean" value="true" />
 
-      <!-- State that lets the player know how it is being used, so it can determine
+    <!-- State that lets the player know how it is being used, so it can determine
         -  how it should do tracking.
         -  Allowed sources are:
         -  'unknown'
@@ -61,209 +63,228 @@
         -  'automatic'
         -  'deliberate'
         -->
-      <field id="playbackSource" type="assocArray" value="{}" />
+    <field id="playbackSource" type="assocArray" value="{}" />
 
-      <!--
+    <!--
         -
         - Ad playback interface to main Brightscript thread
         -
         -->
 
-      <!--
+    <!--
         - Written to by AdsTask.
         - Possible values: init, fetching, noAds, adsPending, adsPlaying, adsClosed, adsCompleted
         -->
-      <field id="adState" type="string" value=""/>
+    <field id="adState" type="string" value="" />
 
 
-      <!--
+    <!--
         - When the rainmaker receives the Ad response, adFilled will be set using TubiAds
         -->
-      <field id="filledAdData" type="assocarray" alwaysNotify="true"/>
+    <field id="filledAdData" type="assocarray" alwaysNotify="true" />
 
-      <!--
+    <!--
         - When the RAF changes the playback tracking state, this AA object is set]
         - Possible keys are adcount, adindex, duration, rendersequence, type
         - For an update set of keys, see where this object is set: TubiAds.tubiAds_adTrackingCallback
-        @see https://developer.roku.com/docs/developer-program/advertising/integrating-roku-advertising-framework.md#tracking
+        @see
+    https://developer.roku.com/docs/developer-program/advertising/integrating-roku-advertising-framework.md#tracking
         -->
-      <field id="adTrackingObject" type="assocarray" alwaysNotify="true"/>
+    <field id="adTrackingObject" type="assocarray" alwaysNotify="true" />
 
 
-      <!--
+    <!--
         - When the RAF changes the playback tracking state, this AA object is set]
         - Possible keys are adprogress, adindex, ad, canvaslayers
         - For an update set of keys, see where this object is set: TubiAds.tubiAds_adBufferingCallback
-        @see https://developer.roku.com/docs/developer-program/advertising/integrating-roku-advertising-framework.md#tracking
+        @see
+    https://developer.roku.com/docs/developer-program/advertising/integrating-roku-advertising-framework.md#tracking
         -->
-      <field id="adBufferingObject" type="assocarray" alwaysNotify="true"/>
+    <field id="adBufferingObject" type="assocarray" alwaysNotify="true" />
 
-      <!--
+    <!--
         - Written to by the scene graph thread.
         - Possible values:  preroll, midroll, seek, play, stop
         -->
-      <field id="adControl" type="string" value="" alwaysNotify="true"/>
+    <field id="adControl" type="string" value="" alwaysNotify="true" />
 
-      <!-- Message shown during ad loading and video loading -->
-      <field id="loadingMessage" alias="LoadingMessage.text" />
+    <!-- Message shown during ad loading and video loading -->
+    <field id="loadingMessage" alias="LoadingMessage.text" />
 
-      <!-- When this is set to true, then change LoadingMessage.text to reflect the propper message -->
-      <field id="displayAdLoadingMessage" type="boolean" value="false" alwaysNotify="true"/>
+    <!-- When this is set to true, then change LoadingMessage.text to reflect the propper message -->
+    <field id="displayAdLoadingMessage" type="boolean" value="false" alwaysNotify="true" />
 
-      <!-- isTrailer will be set true for trailers, otherwise false -->
-      <field id="isTrailer" type="boolean" value="false"/>
+    <!-- isTrailer will be set true for trailers, otherwise false -->
+    <field id="isTrailer" type="boolean" value="false" />
 
-      <!-- preferredSubtitleTrack will hold user previously selected subtitle track obtained from either device settings endpoint.  -->
-      <!-- Sample: {"language": "EN"} -->
-      <field id="preferredSubtitleTrack" type="assocarray" value="{}" />
+    <!-- preferredSubtitleTrack will hold user previously selected subtitle track obtained from
+    either device settings endpoint.  -->
+    <!-- Sample: {"language": "EN"} -->
+    <field id="preferredSubtitleTrack" type="assocarray" value="{}" />
 
-      <!-- preferredAudioTrack will hold user previously selected track obtained from either device settings endpoint.  -->
-      <!-- Sample: {"language": "en","role": "main"} -->
-      <field id="preferredAudioTrack" type="assocarray" value="{}" />
+    <!-- preferredAudioTrack will hold user previously selected track obtained from either device
+    settings endpoint.  -->
+    <!-- Sample: {"language": "en","role": "main"} -->
+    <field id="preferredAudioTrack" type="assocarray" value="{}" />
 
-      <!-- pauseAd response node will be set to this field -->
-      <field id="pauseAdResponse" type="node" alwaysNotify="true"/>
+    <!-- pauseAd response node will be set to this field -->
+    <field id="pauseAdResponse" type="node" alwaysNotify="true" />
 
-       <!-- sendPendingPauseAdPixel will be set when user press home key from remote -->
-      <field id="sendPendingPauseAdPixel" type="boolean" alwaysNotify="true"/>
+    <!-- sendPendingPauseAdPixel will be set when user press home key from remote -->
+    <field id="sendPendingPauseAdPixel" type="boolean" alwaysNotify="true" />
 
-      <!-- Holds the consent opt out status for all individual preferences like marketing,analytics etc. -->
-      <field id="userConsentsOptOutStatus" type="assocarray" value="{}" />
+    <!-- Holds the consent opt out status for all individual preferences like marketing,analytics
+    etc. -->
+    <field id="userConsentsOptOutStatus" type="assocarray" value="{}" />
 
-      <!-- Holds the tcf string value. -->
-      <field id="tcfString" type="string" />
+    <!-- Holds the tcf string value. -->
+    <field id="tcfString" type="string" />
 
-      <!-- YMAL content to be displayed on YMAL Row inside player -->
-      <field id="relatedContent" type="node" />
+    <!-- YMAL content to be displayed on YMAL Row inside player -->
+    <field id="relatedContent" type="node" />
 
-      <!-- boolean field which tells the YMAL content is updated -->
-      <field id="updateRelatedContent" type="boolean" alwaysNotify="true"/>
+    <!-- boolean field which tells the YMAL content is updated -->
+    <field id="updateRelatedContent" type="boolean" alwaysNotify="true" />
 
-      <!-- boolean field which can be set to true for showing the YMAL in full screen and set focus to YMAL -->
-      <field id="showYMALInFullScreen" type="boolean" alwaysNotify="true"/>
+    <!-- boolean field which can be set to true for showing the YMAL in full screen and set focus to
+    YMAL -->
+    <field id="showYMALInFullScreen" type="boolean" alwaysNotify="true" />
 
-      <!-- Used to allow seeking the video player while still maintaining proper state tracking. Sets video player seek field to appropriate value and updates necessary state. `seek` field is time/double based and value specified should be in seconds -->
-      <field id="seekTo" type="time" />
+    <!-- Used to allow seeking the video player while still maintaining proper state tracking. Sets
+    video player seek field to appropriate value and updates necessary state. `seek` field is
+    time/double based and value specified should be in seconds -->
+    <field id="seekTo" type="time" />
 
-      <!-- time taken to load player screen in milliseconds -->
-      <field id="loadTime" type="integer"/>
+    <!-- time taken to load player screen in milliseconds -->
+    <field id="loadTime" type="integer" />
 
-      <!-- exitPlayer helps to find out when to fire playerExit event -->
-      <field id="exitPlayer" type="boolean"/>
+    <!-- exitPlayer helps to find out when to fire playerExit event -->
+    <field id="exitPlayer" type="boolean" />
 
-      <!-- exitReason helps to find out how the player screen got exited/closed -->
-      <field id="exitReason" type="string"/>
+    <!-- exitReason helps to find out how the player screen got exited/closed -->
+    <field id="exitReason" type="string" />
 
-      <!-- isAdultParentalLevel will be set to true if the user is at the adult parental level -->
-      <field id="isAdultParentalLevel" type="boolean" value="false" />
+    <!-- isAdultParentalLevel will be set to true if the user is at the adult parental level -->
+    <field id="isAdultParentalLevel" type="boolean" value="false" />
 
     <!-- OUTPUT -->
-      <!-- Set to true if the back button was pressed while the video player has focus -->
-      <field id="backButtonPressed" type="boolean" value="false" alwaysNotify="true" />
-      <field id="upButtonPressed" type="boolean" value="false" alwaysNotify="true" />
+    <!-- Set to true if the back button was pressed while the video player has focus -->
+    <field id="backButtonPressed" type="boolean" value="false" alwaysNotify="true" />
+    <field id="upButtonPressed" type="boolean" value="false" alwaysNotify="true" />
 
-      <field id="isAutoPlayTimerOn" type="boolean" value="true" />
+    <field id="isAutoPlayTimerOn" type="boolean" value="true" />
 
-      <field id="showSignUpModal" type="boolean" alwaysNotify="true" />
+    <field id="showSignUpModal" type="boolean" alwaysNotify="true" />
 
-      <field id="position" type="float"/>
+    <field id="position" type="float" />
 
-      <!-- Set to true if the skip trailer button was pressed -->
-      <field id="skipTrailer" type="boolean" value="false" alwaysNotify="true" />
+    <!-- Set to true if the skip trailer button was pressed -->
+    <field id="skipTrailer" type="boolean" value="false" alwaysNotify="true" />
 
-      <!-- Set to true if the "go to end" button was pressed on the transport,
+    <!-- Set to true if the "go to end" button was pressed on the transport,
            acts as an event and holds state, so must be reset -->
-      <field id="goToNext" type="boolean" value="false" />
+    <field id="goToNext" type="boolean" value="false" />
 
-      <field id="state" type="string" />
+    <field id="state" type="string" />
 
-      <!-- Video position for updates to history. This is only updated at historyFrequency interval -->
-      <field id="historyPosition" type="integer" value="0" />
+    <!-- Video position for updates to history. This is only updated at historyFrequency interval -->
+    <field id="historyPosition" type="integer" value="0" />
 
-      <!-- field for communicating playback position to the ad shim -->
-      <field id="adPosition" type="float" />
+    <!-- field for communicating playback position to the ad shim -->
+    <field id="adPosition" type="float" />
 
-      <field id="adProgress" type="integer" value="0" />
+    <field id="adProgress" type="integer" value="0" />
 
-      <!-- Error message to be displayed to the user -->
-      <field id="errorMsg" type="string" />
+    <!-- Error message to be displayed to the user -->
+    <field id="errorMsg" type="string" />
 
-      <!-- Error message as told by the video node  -->
-      <field id="videoErrorMsg" type="string" alias="VideoNode.errorMsg" />
+    <!-- Error message as told by the video node  -->
+    <field id="videoErrorMsg" type="string" alias="VideoNode.errorMsg" />
 
-      <!-- Error code as told by the video node  -->
-      <field id="videoErrorCode" type="integer" alias="VideoNode.errorCode" />
+    <!-- Error code as told by the video node  -->
+    <field id="videoErrorCode" type="integer" alias="VideoNode.errorCode" />
 
-      <!-- Pass through Up Next component events to video helper -->
-      <field id="upNextNavigateWithinPageInfo" alias="UpNext.navigateWithinPageInfo" />
+    <!-- Pass through Up Next component events to video helper -->
+    <field id="upNextNavigateWithinPageInfo" alias="UpNext.navigateWithinPageInfo" />
 
-      <!-- Pass through Related component events to video helper -->
-      <field id="relatedNavigateWithinPageInfo" type="assocarray"/>
+    <!-- Pass through Related component events to video helper -->
+    <field id="relatedNavigateWithinPageInfo" type="assocarray" />
 
-      <!-- Used to set the autoplay_deliberate and autoplay_automatic analytics values
-           for PlayProgressEvents and StartVideoEvents. Allowed values are "automatic", "deliberate" and "unknown"
+    <!-- Used to set the autoplay_deliberate and autoplay_automatic analytics values
+           for PlayProgressEvents and StartVideoEvents. Allowed values are "automatic", "deliberate" and
+    "unknown"
            -->
-      <field id="autoplayMode" type="string" />
+    <field id="autoplayMode" type="string" />
 
-      <!-- Set to true when recap was skipped during autoplay (user clicked Next Episode with experiment enabled).
-           This prevents the "Skip Recap" button from showing when playback starts slightly before recap_end due to segment boundaries.
+    <!-- Set to true when recap was skipped during autoplay (user clicked Next Episode with
+    experiment enabled).
+           This prevents the "Skip Recap" button from showing when playback starts slightly before recap_end
+    due to segment boundaries.
            -->
-      <field id="recapSkippedOnAutoplay" type="boolean" value="false" />
+    <field id="recapSkippedOnAutoplay" type="boolean" value="false" />
 
-      <!-- Autoplay this content when this field is set -->
-      <field id="upNextContentToAutoplay" type="node" />
+    <!-- Autoplay this content when this field is set -->
+    <field id="upNextContentToAutoplay" type="node" />
 
-      <!-- set to the contentNode of the Related item which was focused when
+    <!-- set to the contentNode of the Related item which was focused when
            the ok button is pressed
       -->
-      <field id="relatedContentToPlay" type="node" />
+    <field id="relatedContentToPlay" type="node" />
 
-      <!-- set to true when the relatedContentToPlay field is updated -->
-      <field id="relatedContentToPlayUpdated" type="boolean" alwaysNotify="true"/>
+    <!-- set to true when the relatedContentToPlay field is updated -->
+    <field id="relatedContentToPlayUpdated" type="boolean" alwaysNotify="true" />
 
-      <!-- streamingSegment will be set when streamingSegment of videoNode value changes -->
-      <field id="segInfo" type="assocarray"/>
+    <!-- streamingSegment will be set when streamingSegment of videoNode value changes -->
+    <field id="segInfo" type="assocarray" />
 
-      <!-- Is set to true when the creditsCuepoint has been reached or surpassed.
+    <!-- Is set to true when the creditsCuepoint has been reached or surpassed.
            Fires every time that Video.position updates and position is >= to the creditsCuepoint
        -->
-      <field id="upNextCuepointReached" type="boolean" alwaysNotify="true"/>
+    <field id="upNextCuepointReached" type="boolean" alwaysNotify="true" />
 
-      <!-- We observe the VideoNode state change and when the state = "error", the call back chain of events
+    <!-- We observe the VideoNode state change and when the state = "error", the call back chain of
+    events
            eventually sets VideoNode.control = "stop". Due to an idiosyncrasy in Roku behavior, this prevents
-           the Youbora plugin from observing the error state on the video node, and so, we must manually trigger
-           the Youbora plugin with the error info. The content controller observes this field and sends error info to Youbora.
+           the Youbora plugin from observing the error state on the video node, and so, we must manually
+    trigger
+           the Youbora plugin with the error info. The content controller observes this field and sends error
+    info to Youbora.
       -->
-      <field id="sendYouboraError" type="boolean" alwaysNotify="true" />
-      <field id="sendVideoTrackingStart" type="boolean" alwaysNotify="true" />
+    <field id="sendYouboraError" type="boolean" alwaysNotify="true" />
+    <field id="sendVideoTrackingStart" type="boolean" alwaysNotify="true" />
 
-      <!-- Timestamp of the last time we finished playing back video with this player. If -1 then we are currently playing back. -->
-      <field id="timestampOfLastVideoPlayback" type="integer" value="0" />
+    <!-- Timestamp of the last time we finished playing back video with this player. If -1 then we
+    are currently playing back. -->
+    <field id="timestampOfLastVideoPlayback" type="integer" value="0" />
 
-      <!-- current player position will be set as integer to videoPositionForPauseAdRequest when user pauses the video
+    <!-- current player position will be set as integer to videoPositionForPauseAdRequest when user
+    pauses the video
            this is used in pause Ad request -->
-      <field id="videoPositionForPauseAdRequest" type="integer" />
+    <field id="videoPositionForPauseAdRequest" type="integer" />
 
-      <!-- this field is triggered when the user pauses the video. This will let the helper know to get the pauseAd overlay info.-->
-      <field id="getPauseAd" type="boolean" alwaysNotify="true"/>
+    <!-- this field is triggered when the user pauses the video. This will let the helper know to
+    get the pauseAd overlay info.-->
+    <field id="getPauseAd" type="boolean" alwaysNotify="true" />
 
-      <!-- pixelUrl to fire during pause ad -->
-      <field id="sendPauseAdPixel" type="string" alwaysNotify="true"/>
+    <!-- pixelUrl to fire during pause ad -->
+    <field id="sendPauseAdPixel" type="string" alwaysNotify="true" />
 
-      <field id="subtitleTrackSettings" type="assocarray" value="{}" />
-      <field id="audioTrackSettings" type="assocarray" value="{}" />
+    <field id="subtitleTrackSettings" type="assocarray" value="{}" />
+    <field id="audioTrackSettings" type="assocarray" value="{}" />
 
-      <!-- Set the like/dislike state: valid strings are constants.ui.likeDislikeStates.liked or constants.ui.likeDislikeStates.disliked - or it can be an empty string "" to signify none.   -->
-      <field id="autoPlayLikeDislikeState" type="string" alwaysNotify="true"/>
+    <!-- Set the like/dislike state: valid strings are constants.ui.likeDislikeStates.liked or
+    constants.ui.likeDislikeStates.disliked - or it can be an empty string "" to signify none.   -->
+    <field id="autoPlayLikeDislikeState" type="string" alwaysNotify="true" />
 
-      <!-- set to true when the user selects like button in the player -->
-      <field id="autoPlayLikeRemoveLikeSelected" type="boolean" alwaysNotify="true" />
+    <!-- set to true when the user selects like button in the player -->
+    <field id="autoPlayLikeRemoveLikeSelected" type="boolean" alwaysNotify="true" />
 
-      <!-- set to true when the user selects disLike button in the player -->
-      <field id="autoPlayDisLikeRemoveDislikeSelected" type="boolean" alwaysNotify="true" />
+    <!-- set to true when the user selects disLike button in the player -->
+    <field id="autoPlayDisLikeRemoveDislikeSelected" type="boolean" alwaysNotify="true" />
 
-      <!-- This field is used to expose the task to allow us to be able to communicate directly with the task from the contentController context regarding auth -->
-      <field id="task" type="node" />
+    <!-- This field is used to expose the task to allow us to be able to communicate directly with
+    the task from the contentController context regarding auth -->
+    <field id="task" type="node" />
   </interface>
 
   <children>
@@ -272,7 +293,7 @@
       width="1920"
       height="1080"
       enableUI="false"
-      cgms = "3"
+      cgms="3"
       enableTrickPlay="false"
       visible="true" />
 
@@ -281,7 +302,7 @@
       visible="false">
       <Poster
         id="RemainingMinimizedBground"
-        uri="pkg:/images/bgroundRemainingTime.9.png"/>
+        uri="pkg:/images/bgroundRemainingTime.9.png" />
       <Label
         id="RemainingMinimizedLabel"
         text="-00:00"
@@ -290,18 +311,18 @@
         vertAlign="center"
         width="0">
         <Font
-          role="font"/>
+          role="font" />
       </Label>
     </Group>
 
     <Group
       id="MinimizedAssets"
       translation="[1240,40]">
-        <Poster
-          id="VideoBorder"
-          visible="false"
-          uri="pkg:/images/selector-$$RES$$.9.png"/>
-      </Group>
+      <Poster
+        id="VideoBorder"
+        visible="false"
+        uri="pkg:/images/selector-$$RES$$.9.png" />
+    </Group>
 
     <Group
       id="Loading"
@@ -310,7 +331,7 @@
         id="LoadingBackground"
         color="0x000000FF"
         width="1920"
-        height="1080"/>
+        height="1080" />
       <Group
         id="logoGroup">
         <Poster
@@ -319,7 +340,7 @@
           height="135"
           uri="pkg:/images/logo-xlarge.webp"
           loadSync="true"
-          translation="[734,382]"/>
+          translation="[734,382]" />
         <Poster
           id="tubiKidsLogo"
           width="726"
@@ -327,8 +348,8 @@
           uri="pkg:/images/logo-kids-xlarge.webp"
           loadSync="true"
           visible="false"
-          translation="[608,382]"/>
-        </Group>
+          translation="[608,382]" />
+      </Group>
       <Label
         id="LoadingMessage"
         height="64"
@@ -337,13 +358,13 @@
         vertAlign="center"
         translation="[0,606]">
         <Font
-          role="font"/>
+          role="font" />
       </Label>
       <TubiProgressBar
         id="LoadingProgressBar"
         width="750"
         progress="50"
-        translation="[584,696]"/>
+        translation="[584,696]" />
     </Group>
 
     <Spinner
@@ -352,7 +373,7 @@
       showShade="false"
       width="1920"
       height="1080"
-      translation="[0,0]"/>  
+      translation="[0,0]" />
 
     <Group
       id="AdHeadsUp"
@@ -364,7 +385,7 @@
           width="1920"
           height="317"
           translation="[0,0]"
-          uri="pkg:/images/ads-countdown-gradient.9.png"/>
+          uri="pkg:/images/ads-countdown-gradient.9.png" />
         <Label
           id="AdHeadsUpText"
           translation="[0,72]"
@@ -372,7 +393,7 @@
           horizAlign="center"
           vertAlign="center">
           <Font
-            role="font"/>
+            role="font" />
         </Label>
       </Group>
     </Group>
@@ -383,7 +404,7 @@
       height="1080"
       opacity="0.0"
       translation="[0,0]"
-      uri="pkg:/images/gradient-ymal.webp"/>
+      uri="pkg:/images/gradient-ymal.webp" />
 
     <Poster
       id="VideoOverlay"
@@ -391,7 +412,7 @@
       height="1080"
       opacity="0.0"
       translation="[0,0]"
-      uri="pkg:/images/playback-gradient-$$RES$$.9.png"/>
+      uri="pkg:/images/playback-gradient-$$RES$$.9.png" />
 
     <Group
       id="TopOverlay"
@@ -403,31 +424,31 @@
         layoutDirection="vert"
         vertAlignment="top"
         horizAlignment="left"
-        itemSpacings="[6]"/>
+        itemSpacings="[6]" />
 
     </Group>
 
-     <LayoutGroup
-       id="brandingLogoGroup"
-       layoutDirection="horiz"
-       vertAlignment="top"
-       horizAlignment="right"
-       translation="[1728, 80]"
-       itemSpacings="[6]">
+    <LayoutGroup
+      id="brandingLogoGroup"
+      layoutDirection="horiz"
+      vertAlignment="top"
+      horizAlignment="right"
+      translation="[1728, 80]"
+      itemSpacings="[6]">
       <Poster
         id="brandingLogo"
         uri="pkg:/images/logo-large.webp"
-        opacity="0.0"/>
-     </LayoutGroup>
+        opacity="0.0" />
+    </LayoutGroup>
 
     <Group
       id="HUD"
       visible="true"
-      opacity="0.0" >
+      opacity="0.0">
 
       <Label
         id="quickSeekLabel"
-        visible="false"/>
+        visible="false" />
 
       <LayoutGroup
         id="seekGroup"
@@ -436,9 +457,9 @@
         horizAlignment="center"
         itemSpacings="[12]"
         visible="false">
-       
+
         <Label
-          id="currentSeekLabel"/>
+          id="currentSeekLabel" />
 
         <Poster
           id="seekBackground"
@@ -454,15 +475,15 @@
             translation="[10,18]">
             <SimpleLabel
               id="seekSpeedLabel"
-              text="1"/>
+              text="1" />
             <Poster
               id="seekIcon"
               width="19"
               height="12"
               uri="pkg:/images/transport/sgplayer/icon-vector-fwd.webp"
-              loadSync="true"/>
-          </LayoutGroup>    
-        </Poster>  
+              loadSync="true" />
+          </LayoutGroup>
+        </Poster>
 
       </LayoutGroup>
 
@@ -471,14 +492,15 @@
         layoutDirection="vert"
         vertAlignment="top"
         horizAlignment="custom"
-        opacity="1.0"/>
+        opacity="1.0" />
 
-      <!-- Thumbnail should be placed as the last child of the HUD component so that transport buttons or components do not overlay it. -->
+      <!-- Thumbnail should be placed as the last child of the HUD component so that transport
+      buttons or components do not overlay it. -->
       <SpritePoster
         id="Thumbnail"
         width="342"
         height="192"
-        spriteDirection="horiz"/>
+        spriteDirection="horiz" />
 
     </Group>  <!-- HUD -->
 
@@ -486,7 +508,7 @@
       id="SkipTrailerButton"
       width="260"
       height="80"
-      translation="[0, -10]"/>
+      translation="[0, -10]" />
 
     <TextIconButton
       id="SkipTrailerTextIconButton"
@@ -496,11 +518,11 @@
       iconHeight="36"
       alwaysShowLabel="true"
       translation="[192, 783]"
-      opacity="0.0"/>
+      opacity="0.0" />
 
     <SimpleButton
       id="skipCuepointsSimpleButton"
-      visible="false"/>
+      visible="false" />
 
     <TextIconButton
       id="skipCuepointsTextIconButton"
@@ -509,7 +531,7 @@
       iconWidth="36"
       iconHeight="36"
       alwaysShowLabel="false"
-      visible="false"/>
+      visible="false" />
 
     <Group
       id="ratingOverlay"
@@ -520,7 +542,7 @@
         width="1164"
         height="390"
         translation="[0,0]"
-        uri="pkg:/images/rating_gradient.png"/>
+        uri="pkg:/images/rating_gradient.png" />
       <LayoutGroup
         id="ratingBarAndLabel"
         vertAlignment="top"
@@ -530,7 +552,7 @@
         <Rectangle
           id="ratingBar"
           width="2"
-          height="87"/>
+          height="87" />
         <LayoutGroup
           id="ratingAndGenre"
           layoutDirection="vert"
@@ -546,7 +568,7 @@
               vertAlign="center"
               id="ratedLabel">
               <Font
-                role="font"/>
+                role="font" />
             </Label>
             <Group
               id="ratingGroup">
@@ -554,7 +576,7 @@
                 id="RatingBackground"
                 height="36"
                 uri="pkg:/images/ratingBackground.9.png"
-                loadSync="true"/>
+                loadSync="true" />
               <Label
                 id="ratingLabel"
                 height="36"
@@ -566,20 +588,20 @@
                 horizAlign="center"
                 vertAlign="center">
                 <Font
-                  role="font"/>
+                  role="font" />
               </Label>
             </Group>
             <Label
               id="descriptorCode">
               <Font
                 id="Vaud22px"
-                role="font"/>
+                role="font" />
             </Label>
           </LayoutGroup>
           <Label
             id="descriptorDesc">
             <Font
-              role="font"/>
+              role="font" />
           </Label>
         </LayoutGroup>
       </LayoutGroup>
@@ -594,8 +616,8 @@
       height="48"
       loadSync="true"
       translation="[936, 515]"
-      opacity="0.0"/>
-      
+      opacity="0.0" />
+
     <Group
       id="UpNextParent">
       <UpNext
@@ -604,7 +626,7 @@
     </Group>
 
     <Group
-      id="BrowseWhileWatchingRow"/>
+      id="BrowseWhileWatchingRow" />
 
     <Rectangle
       id="closedCaptionAndAudioSelectionOverlayGroup"
@@ -627,7 +649,7 @@
 
     <PauseAdOverlay
       id="PauseAdOverlay"
-      opacity="0.0"/>
+      opacity="0.0" />
 
     <!-- RAF needs a parent group with no other elements, otherwise it will use
       - the Group dimensions set by the other children and not scale appropriately.
@@ -655,7 +677,7 @@
 
     <Timer
       id="PauseAdOverlayTimer"
-      duration="5"/>
+      duration="5" />
 
     <Timer id="retryTimer" />
     <Timer id="fallbackTimer" />

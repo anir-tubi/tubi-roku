@@ -2848,9 +2848,9 @@ Function advanceDrmOnContent(contentNode)
           sendVideoResourceFallbackToPlayerLogLib(currentResource, nextResource, "DRM")
 
           fallbackInfo = {
-            failed_url: removeExcessUrl(currentResource.url)
+            failed_url: removeQueryParams(currentResource.url)
             failed_drm: currentResource.type
-            fallback_url: removeExcessUrl(nextResource.url)
+            fallback_url: removeQueryParams(nextResource.url)
             fallback_drm: nextResource.type
             model: m.constants.deviceInfo.model
             video_id: contentNode.id
@@ -2895,9 +2895,9 @@ Function advanceCodecOnContent(contentNode)
           sendVideoResourceFallbackToPlayerLogLib(currentResource, nextResource, "CODEC")
 
           fallbackInfo = {
-            failed_url: removeExcessUrl(currentResource.url)
+            failed_url: removeQueryParams(currentResource.url)
             failed_codec: currentResource.codec
-            fallback_url: removeExcessUrl(nextResource.url)
+            fallback_url: removeQueryParams(nextResource.url)
             fallback_codec: nextResource.codec
             model: m.constants.deviceInfo.model
             video_id: contentNode.id
@@ -3024,11 +3024,11 @@ Function sendVideoResourceFallbackToPlayerLogLib(failedResource, fallbackResourc
       failed_video_resource_type: failedResourceType
       failed_video_codec_type: failedCodecType
       failed_hdcp_version: failedHdcpversion
-      failed_url: removeExcessUrl(failedResource.url)
+      failed_url: removeQueryParams(failedResource.url)
       fallback_video_resource_type: fallbackResourceType
       fallback_video_codec_type: fallbackCodecType
       fallback_hdcp_version: fallbackHdcpversion
-      fallback_url: removeExcessUrl(fallbackResource.url)
+      fallback_url: removeQueryParams(fallbackResource.url)
     }
     updatePlayerLogLib(m.playerLogLib, "fireVideoResourceFallbackEvent", videoResourceFallback)
   end if

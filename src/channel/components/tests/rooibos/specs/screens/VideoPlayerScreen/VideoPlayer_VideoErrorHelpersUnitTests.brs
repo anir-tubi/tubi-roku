@@ -68,8 +68,8 @@ Function videoHelpers_getPlaybackErrorInfo_test()
   mi = m.mockedInfo
   correctErrorInfo = {
     video_id: mi.content.id
-    video_url: removeExcessUrl(mi.streamInfo.streamUrl)
-    segment_url: removeExcessUrl(mi.streamingSegment.segUrl)
+    video_url: removeQueryParams(mi.streamInfo.streamUrl)
+    segment_url: removeQueryParams(mi.streamingSegment.segUrl)
     segment_start_time: mi.streamingSegment.segStartTime
     segment_sequence: mi.streamingSegment.segSequence
     segment_bitrate: mi.streamingSegment.segBitrateBps
@@ -86,7 +86,7 @@ Function videoHelpers_getPlaybackErrorInfo_Position0()
   mi = m.mockedInfo
   correctErrorInfo = {
     video_id: mi.content.id
-    video_url: removeExcessUrl(mi.content.url)
+    video_url: removeQueryParams(mi.content.url)
     error_code: mi.errorCode5
     error_message: mi.errorStr5
   }
@@ -100,8 +100,8 @@ Function videoHelpers_getPlaybackErrorInfo_Error3()
   mi = m.mockedInfo
   correctErrorInfo = {
     video_id: mi.content.id
-    video_url: removeExcessUrl(mi.streamInfo.streamUrl)
-    segment_url: removeExcessUrl(mi.downloadedSegment.segUrl)
+    video_url: removeQueryParams(mi.streamInfo.streamUrl)
+    segment_url: removeQueryParams(mi.downloadedSegment.segUrl)
     segment_sequence: mi.downloadedSegment.segSequence
     segment_bitrate: mi.downloadedSegment.bitrateBps
     error_code: mi.errorCode3
@@ -117,7 +117,7 @@ Function videoHelpers_getPlaybackErrorInfo_Error3_Position0()
   mi = m.mockedInfo
   correctErrorInfo = {
     video_id: mi.content.id
-    video_url: removeExcessUrl(mi.content.url)
+    video_url: removeQueryParams(mi.content.url)
     error_code: mi.errorCode3
     error_message: mi.alteredErrorStr3
   }
@@ -126,9 +126,9 @@ Function videoHelpers_getPlaybackErrorInfo_Error3_Position0()
 End Function
 
 
-'@Test removeExcessUrl unit test
-Function videoHelpers_removeExcessUrl()
+'@Test removeQueryParams unit test
+Function videoHelpers_removeQueryParams()
   url = "http://c13.adrise.tv/v2/sources/content-owners/mgm/389496/v20179270205-,577,877,1189,1581,2176,k.mp4.m3u8?WkuQ8Q_G9-5DOf4_xiCDbIE4b7yEuIg5P1ieENFOvRmVjNGf07mQjEhIYQaFHSURKMZaMTmIPzLyoVywCEQFjn7sc4s"
   shortUrl = "http://c13.adrise.tv/v2/sources/content-owners/mgm/389496/v20179270205-,577,877,1189,1581,2176,k.mp4.m3u8"
-  m.AssertEqual(removeExcessUrl(url), shortUrl)
+  m.AssertEqual(removeQueryParams(url), shortUrl)
 End Function

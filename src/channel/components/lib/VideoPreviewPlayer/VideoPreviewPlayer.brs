@@ -448,27 +448,12 @@ Function getPlaybackErrorInfo(position, streamInfo, errorCode, errorMsg, content
   if content <> invalid then errorInfo.video_id = content.id
 
   if position > 0 AND streamInfo <> invalid
-    errorInfo.video_url = removeExcessUrl(streamInfo.streamUrl)
+    errorInfo.video_url = removeQueryParams(streamInfo.streamUrl)
   else if content <> invalid
-    errorInfo.video_url = removeExcessUrl(content.url)
+    errorInfo.video_url = removeQueryParams(content.url)
   end if
 
   return errorInfo
-End Function
-
-
-'Helper function that removes all characters after the ? in the url
-Function removeExcessUrl(url)
-  cutUrl = ""
-  if type(url) = "roString" OR type(url) = "String"
-    position = url.Instr(Chr(63)) 'checks for the position of the "?" in the url string
-    if position > -1
-      cutUrl = url.Left(position)
-    else
-      cutUrl = url
-    end if
-  end if
-  return cutUrl
 End Function
 
 

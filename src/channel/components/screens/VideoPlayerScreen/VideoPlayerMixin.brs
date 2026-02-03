@@ -12,14 +12,14 @@ Function getPlaybackErrorInfo(position, downloadedSegment, streamingSegment, str
       ' we get the last downloaded segment which is the last good segment instead of the current streaming segment, which may be several segments ahead of the bad segment.
       ' in this case, the segment causing the error is the segment AFTER the logged segment.
       errorInfo.segment_sequence = downloadedSegment.segSequence
-      errorInfo.segment_url = removeExcessUrl(downloadedSegment.SegUrl)
+      errorInfo.segment_url = removeQueryParams(downloadedSegment.SegUrl)
       errorInfo.segment_bitrate = downloadedSegment.BitrateBps
     end if
   else if errorStr <> invalid
     errorInfo.error_message = errorStr
     if position > 0 AND streamingSegment <> invalid
       ' streamingSegment can be invalid when the server returns a 504, 404, etc.
-      errorInfo.segment_url = removeExcessUrl(streamingSegment.segUrl)
+      errorInfo.segment_url = removeQueryParams(streamingSegment.segUrl)
       errorInfo.segment_start_time = streamingSegment.segStartTime
       errorInfo.segment_sequence = streamingSegment.segSequence
       errorInfo.segment_bitrate = streamingSegment.segBitrateBps
@@ -30,27 +30,12 @@ Function getPlaybackErrorInfo(position, downloadedSegment, streamingSegment, str
   if content <> invalid then errorInfo.video_id = content.id
 
   if position > 0 AND streamInfo <> invalid
-    errorInfo.video_url = removeExcessUrl(streamInfo.streamUrl)
+    errorInfo.video_url = removeQueryParams(streamInfo.streamUrl)
   else if content <> invalid
-    errorInfo.video_url = removeExcessUrl(content.url)
+    errorInfo.video_url = removeQueryParams(content.url)
   end if
 
   return errorInfo
-End Function
-
-
-'Helper function that removes all characters after the ? in the url
-Function removeExcessUrl(url)
-  cutUrl = ""
-  if type(url) = "roString" OR type(url) = "String"
-    position = url.Instr(Chr(63)) 'checks for the position of the "?" in the url string
-    if position > -1
-      cutUrl = url.Left(position)
-    else
-      cutUrl = url
-    end if
-  end if
-  return cutUrl
 End Function
 
 

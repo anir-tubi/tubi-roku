@@ -174,7 +174,22 @@ Function addControllerUi()
 
   m.backgroundVideoPreviewPlayerContainer = m.top.findNode("backgroundVideoPreviewPlayerContainer")
   m.inlineVideoPreviewPlayerContainer = m.top.findNode("inlineVideoPreviewPlayerContainer")
-  m.videoPreviewPlayer = m.top.findNode("videoPreviewPlayer")
+
+  ' Check reusable video node experiment to determine which player to use
+  reusableVideoNodeExperiment = getStatsigExperimentResource("reusable_video_node", "reusable_video_node_v1", true)
+  isReusableVideoNodeEnabled = (reusableVideoNodeExperiment <> invalid AND reusableVideoNodeExperiment.enabled)
+
+  ' Create video preview player dynamically based on experiment
+  if isReusableVideoNodeEnabled = true
+    ' Create and add ReusablePreviewPlayer
+    m.videoPreviewPlayer = CreateObject("roSGNode", "ReusablePreviewPlayer")
+  else
+    ' Create and add VideoPreviewPlayer
+    m.videoPreviewPlayer = CreateObject("roSGNode", "VideoPreviewPlayer")
+  end if
+  m.videoPreviewPlayer.id = "videoPreviewPlayer"
+  m.backgroundVideoPreviewPlayerContainer.appendChild(m.videoPreviewPlayer)
+
   m.inlinePreviewFocusIndicator = m.top.findNode("inlinePreviewFocusIndicator")
   m.inlineVideoMetadataOverlay = m.top.findNode("inlineVideoMetadataOverlay")
   m.autoStartPreviewToPlaybackTimer = createObject("roSGNode", "CircularCounter")

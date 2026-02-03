@@ -131,6 +131,22 @@ Function capitalize(s as String)
 End Function
 
 
+' Removes query parameters from a URL
+' Returns the URL portion before the "?" character
+' @url: string, a URL that may contain query parameters
+' @return: string, the URL without query parameters, or empty string if invalid
+Function removeQueryParams(url) as String
+  if isString(url) = false then return ""
+
+  position = url.Instr(Chr(63)) ' Find "?" character
+  if position > -1
+    return url.Left(position)
+  end if
+
+  return url
+End Function
+
+
 ' Helper function that breaks down a url into its component parts
 ' @url: string, a url
 ' @paramsAA: AA, An associative array that contains the param names as the keys and the corresponding values as strings

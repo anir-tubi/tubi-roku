@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="ReusablePreviewPlayer" extends="Group">
+  <script type="text/brightscript" uri="ReusablePreviewPlayer.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/CacheValidationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+
+  <interface>
+
+    <!-- INPUT -->
+    <!-- Video node dimensions (not aliased, handled via observers) -->
+    <field id="width" type="float" />
+    <field id="height" type="float" />
+
+    <field id="content" type="node" />
+    <field id="updateContent" type="boolean" alwaysNotify="true" />
+
+    <field id="videoPlayerType" type="string" value="BANNER" />
+
+    <!-- pageInfoForAnalytics is the pageInfo of VideoPreview's parent screen -->
+    <field id="pageInfoForAnalytics" type="assocarray" value="{}" />
+
+    <!-- componentInfoForAnalytics is the pageInfo of VideoPreview's parent component -->
+    <field id="componentInfoForAnalytics" type="assocarray" value="{}" />
+
+    <!-- supports "play", "stop", "pause" -->
+    <field id="control" type="string" value="none" alwaysNotify="true" />
+
+    <!-- Used to allow seeking the video player while still maintaining proper state tracking. Sets
+    video player seek field to appropriate value and updates necessary state. `seek` field is
+    time/double based and value specified should be in seconds -->
+    <field id="seekTo" type="time" />
+
+    <field id="isDetailScreen" type="boolean" value="false" />
+
+    <!-- OUTPUT -->
+
+    <!-- Observing state interface helps to show/hide static poster background -->
+    <field id="state" type="string" />
+
+    <!-- Unix timestamp of the last time we finished playing back video with this player. If -1 then
+    we are currently playing back. -->
+    <field id="timestampOfLastVideoPlayback" type="integer" value="0" />
+
+    <!-- Video node output fields (not aliased, updated via observers) -->
+    <field id="position" type="time" />
+    <field id="duration" type="time" />
+    <field id="bufferingStatus" type="assocarray" />
+    <field id="isBufferingComplete" type="boolean" />
+    <field id="playerState" type="string" />
+  </interface>
+
+  <children>
+    <!-- No Video node here - will be reparented from m.global.appVideoNode -->
+  </children>
+</component>

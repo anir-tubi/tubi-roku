@@ -90,6 +90,12 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         default: { enabled: false }
       }
 
+      reusable_video_node: {
+        reusable_video_node_v1: {
+          default: { enabled: false }
+        }
+      }
+
       roku_sot_reverse_ui_test: {
         roku_sot_reverse_ui_test_v1: {
           default: { "enabled": false }
