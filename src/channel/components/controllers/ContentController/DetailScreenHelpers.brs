@@ -946,7 +946,7 @@ Function getDetailScreenContent(screen = invalid)
     screen = getTopDetailScreenFromStack()
   end if
 
-  if screen <> invalid AND screen.subType() = "DetailScreen" AND screen.content <> invalid
+  if screen <> invalid AND (screen.subType() = "DetailScreen" OR screen.subType() = "VodDetailScreen") AND screen.content <> invalid
     return screen.content
   else
     return invalid
@@ -963,7 +963,7 @@ Function getTopDetailScreenFromStack()
     if hiddenScreen = invalid
       ' we are outside of the screen stack depth so there are no more hidden screens
       exit while
-    else if hiddenScreen.id = m.constants.ui.screenIds.detailScreen
+    else if hiddenScreen.id = m.constants.ui.screenIds.detailScreen OR hiddenScreen.id = m.constants.ui.screenIds.vodDetailScreen
       detailScreen = hiddenScreen
     else
       screenStackDepth += 1

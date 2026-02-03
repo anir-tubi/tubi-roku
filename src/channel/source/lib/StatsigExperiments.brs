@@ -34,10 +34,6 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         roku_player_align_ad_request_cuepoint_v3: {
           default: { "prefetchTime": 15, "requestWithinWindow": false }
         }
-        ' Testing autoplay of content immediately after the trailer finishes
-        roku_autoplay_after_trailer_v1: {
-          default: { "enabled": false }
-        }
         ' Retry logic for transient network errors (-1, -2, -3) with exponential backoff
         ' When enabled: 3 retries with delays [0.5s, 1s, 2s] for network errors before fallback
         roku_player_retry_network_errors_v1: {

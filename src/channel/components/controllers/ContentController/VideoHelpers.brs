@@ -644,14 +644,8 @@ Function onVideoPlayerState(msg)
       finishedContent = videoPlayer.content
 
       if finishedContent.isTrailer = true
-
-        if getStatsigExperimentResource("roku_player_improvement", "roku_autoplay_after_trailer_v1", true).enabled = true
-          stopVideoContent(videoPlayer)
-          playActualContentFromDetailScreen()
-        else
-          returnToDetailScreenFromVideo(true, true, "trailer")
-        end if
-
+        stopVideoContent(videoPlayer)
+        playActualContentFromDetailScreen()
       else if videoPlayer.upNextContentToAutoplay <> invalid
         ' the video ended while the autoplay UI was still present, now autoplay the chosen video
         ' or autoplay the video that was focused when the timer expired
@@ -1051,24 +1045,32 @@ End Function
 ' playActualContentFromDetailScreen
 '
 ' Handles both series episodes and regular content
+' Called when trailer finishes playing to start playback of the actual content
 Function playActualContentFromDetailScreen()
-  if getHiddenScreen() <> invalid AND getHiddenScreen().id = m.constants.ui.screenIds.detailScreen
-    detailScreen = getHiddenScreen()
-    detailScreenContent = getDetailScreenContent(detailScreen)
+  detailScreen = getHiddenScreen()
 
-    if detailScreenContent <> invalid AND detailScreenContent.type = "series"
-      episode = getEpisodeContent(detailScreen.content)
+  if detailScreen <> invalid
+    ' Handle VodDetailScreen (new screen) - uses screen.episodes for episode storage
+    if detailScreen.id = m.constants.ui.screenIds.vodDetailScreen AND detailScreen.content <> invalid
+      playSelectedVodContent(detailScreen.content, detailScreen.playbackSource, detailScreen.episodes)
 
-      if episode <> invalid then
-        nowPos = processResume(episode)
+      ' Handle DetailScreen (old screen) - uses content children for episode storage
+    else if detailScreen.id = m.constants.ui.screenIds.detailScreen
+      detailScreenContent = getDetailScreenContent(detailScreen)
 
-        if nowPos >= 0
-          playVideoContent(episode, detailScreen.playbackSource, nowPos)
+      if detailScreenContent <> invalid AND detailScreenContent.type = "series"
+        episode = getEpisodeContent(detailScreen.content)
+
+        if episode <> invalid then
+          nowPos = processResume(episode)
+          if nowPos >= 0
+            playVideoContent(episode, detailScreen.playbackSource, nowPos)
+          end if
         end if
+      else if detailScreenContent <> invalid
+        nowPos = processResume(detailScreenContent)
+        playVideoContent(detailScreenContent, detailScreen.playbackSource, nowPos)
       end if
-    else if detailScreenContent <> invalid
-      nowPos = processResume(detailScreenContent)
-      playVideoContent(detailScreenContent, detailScreen.playbackSource, nowPos)
     end if
   end if
 End Function
