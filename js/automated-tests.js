@@ -333,7 +333,7 @@ async function runAutomatedTests(done, branch = '', tags = [], testsPath = 'js/a
     ]
   });
 
-  const code = await spawnShellCommand(done, `npx mocha ${mochaOptions.join(' ')} ${testsPath}`, true);
+  const code = await spawnShellCommand(done, `npx mocha ${mochaOptions.join(' ')} "${testsPath}"`, true);
   await appendDataToJsonReport(branch);
   if (code !== 0) {
     done(new Error('Tests failed'));

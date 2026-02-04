@@ -37,13 +37,13 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      - name: Generate rta-config.json
+        run: node js/workflows/generateRtaConfig.js
+
       - name: gulp runAutomatedTestsSmoke
         env:
           retries: 1
         run: |
-          cp ./rta-config.example.json ./rta-config.json
-          sed -i -e "s/<DEVICE-IP>/$ROKU_DEV_TARGET/g" ./rta-config.json
-          sed -i -e "s/<DEVICE-PASSWORD>/$DEV_PASSWORD/g" ./rta-config.json
           npx gulp runAutomatedTestsSmoke
 
       - name: Upload JSON Report

@@ -1218,6 +1218,12 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#linearVideoPlayerScreen.#VideoOverlay.#overlayParent.#overlayContentArea',
   },
 
+  /** Program grid in linear video player */
+  linearProgramGrid: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#linearVideoPlayerScreen.#VideoOverlay.#EPG.#ProgramGrid',
+  },
+
   /** Fox Player element ID */
   foxPLayerElementID: {
     keyPath:

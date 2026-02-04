@@ -213,6 +213,22 @@ class TestUtils {
   }
 
 
+  /**
+   * Use this to observe an element or field and wait until it matches using retry polling.
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
+   * @param matcher - A function that receives the element/field value and returns true if it matches
+   * @param field - Optional field name to check on the element
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public async observeFieldUntilMatch(elementOrElementId: ElementOrElementId, matcher: (value: any) => boolean, field?: string, timeout = 10000): Promise<void> {
+    await this.untilTrue(async () => {
+      const node = await this.getNodeForElement(elementOrElementId);
+      const value = field ? node?.[field] : node;
+      return matcher(value);
+    }, `Timed out waiting for ${elementOrElementId}${field ? '.' + field : ''} to match`, timeout);
+  }
+
+
   // Helper to wait until application has started up. Not necessarily fully loaded though
   public async waitForApplicationStartup() {
     await odc.onFieldChangeOnce({

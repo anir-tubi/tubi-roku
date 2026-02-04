@@ -36,7 +36,9 @@ describe('Details Page', function () {
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
       // Find and navigate to a series in the row list
-      await shared.findAndNavigateToContentType('s', 'homeScreenRowList');
+      const { row, column } = await shared.findAndNavigateToContentType('s', 'homeScreenRowList');
+      await testUtils.waitForElementFieldToEqual('homeScreenRowList', 'itemFocused', row, 10000);
+      await testUtils.waitForElementFieldToEqual('homeScreenRowList', 'currFocusColumn', column, 10000);
 
       await ecp.sendKeypress(ecp.Key.Ok);
       await testUtils.waitForCurrentScreenToEqual('detailScreen');

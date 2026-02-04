@@ -34,9 +34,6 @@ const { NoStackError } = require('./js/utilities');
 // Importing functions with Git functionality
 const { makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges, buildQaBranch, bumpBuild, bumpBuildTen, bumpRevision, tagBuild, createCdnPullRequestForOneTrustSDK, createCdnPullRequestForFoxVideoPlayer, getCurrentBranch, isBranchTrackingPresent, createTranslationsPullRequestIfChanges, cherryPickTranslationsToQaBranch } = require('./js/git');
 
-// Importing functions related to Github action runners
-const { setupAutomatedTestsGithubActionRunner, startAutomatedTestsGithubActionRunner, removeAutomatedTestsGithubActionRunner } = require('./js/action-runner');
-
 // importing functions related to client error config
 const { updateLocalClientErrorConfigFile, verifyLocalClientErrorConfigIsCurrent } = require('./js/local-client-error-config');
 
@@ -1258,11 +1255,6 @@ exports.packageCompanionChannel = packageCompanionChannel;
 exports.buildReleaseNotes = buildReleaseNotesOutput;
 exports.buildQaChanges = buildQaChangesOutput;
 exports.runPerformanceTests = series(setPerformanceTestsConfig, clean, buildInstalled, runPerformanceTests);
-
-// Github action runner related
-exports.setupAutomatedTestsRunner = setupAutomatedTestsGithubActionRunner;
-exports.startAutomatedTestsRunner = startAutomatedTestsGithubActionRunner;
-exports.removeAutomatedTestsRunner = removeAutomatedTestsGithubActionRunner;
 
 //command lines related to the crowdin language translations
 exports.updateLocalTranslations = updateLocalTranslations;

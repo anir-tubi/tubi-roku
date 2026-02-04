@@ -559,7 +559,9 @@ class TestHelpers {
     if (colIndex === -1) {
       throw new Error(`No movie found in current row of ${rowListElementId}`);
     }
-    await ecp.sendKeypress(ecp.Key.Right, { count: colIndex });
+    const currentIndex = await testUtils.getCurrentlyFocusedGridItemIndex(rowListElementId);
+    const rowIndex = currentIndex[0];
+    await testUtils.jumpToRowItem(rowListElementId, [rowIndex, colIndex]);
   }
 
   /**
@@ -588,8 +590,10 @@ class TestHelpers {
    * // Find live content with custom max rows
    * await testHelpers.findAndNavigateToContentType('l', 'videoTitlesRowList', 10);
    */
-  public async findAndNavigateToContentType(contentType: string, rowListElementId: ElementOrElementId = 'videoTitlesRowList', maxRowsToCheck: number = 20): Promise<void> {
+  public async findAndNavigateToContentType(contentType: string, rowListElementId: ElementOrElementId = 'videoTitlesRowList', maxRowsToCheck: number = 20): Promise<{ row: number; column: number }> {
     let foundContent = false;
+    let foundRow = -1;
+    let foundColumn = -1;
 
     for (let rowAttempt = 0; rowAttempt < maxRowsToCheck; rowAttempt++) {
       await utils.sleep(300);
@@ -608,8 +612,14 @@ class TestHelpers {
         }
 
         if (colIndex !== -1) {
-          // Found content, navigate to it
-          await ecp.sendKeypress(ecp.Key.Right, { count: colIndex });
+          // Get the current row index
+          const currentIndex = await testUtils.getCurrentlyFocusedGridItemIndex(rowListElementId);
+          foundRow = currentIndex[0];
+          foundColumn = colIndex;
+
+          // Found content, navigate to it using absolute positioning
+          await testUtils.jumpToRowItem(rowListElementId, [foundRow, colIndex]);
+
           foundContent = true;
           break;
         }
@@ -631,6 +641,8 @@ class TestHelpers {
       const rowText = maxRowsToCheck === 1 ? 'current row' : `${maxRowsToCheck} rows`;
       throw new Error(`Could not find ${contentTypeName} in ${rowListElementId} after checking ${rowText}`);
     }
+
+    return { row: foundRow, column: foundColumn };
   }
 
   /**
@@ -2428,7 +2440,7 @@ class TestHelpers {
    * // Find row by title with custom max scrolls
    * await testHelpers.scrollDownToFindRow({ title: 'On Now', maxScrolls: 40 });
    */
-  async scrollDownToFindRow(options: { title?: string | string[]; slug?: string | string[]; rowListElementId?: ElementOrElementId; maxScrolls?: number }): Promise<void> {
+  async scrollDownToFindRow(options: { title?: string | string[]; slug?: string | string[]; rowListElementId?: ElementOrElementId; maxScrolls?: number }): Promise<number> {
     const { title, slug, rowListElementId = 'videoTitlesRowList', maxScrolls = 20 } = options;
 
     if (!title && !slug) {
@@ -2477,7 +2489,7 @@ class TestHelpers {
         if (found && foundRowIndex !== undefined) {
           // Jump directly to the found row
           await testUtils.jumpToRowIndex(rowListElementId, foundRowIndex, 10000);
-          return;
+          return foundRowIndex;
         }
 
         // Not found in current loaded content, scroll down 5 times to load more
@@ -2496,11 +2508,10 @@ class TestHelpers {
       }
     }
 
-    if (!found) {
-      const fieldType = isSlugSearch ? 'slug' : 'title';
-      const searchList = searchValues.join('", "');
-      throw new Error(`Could not find row with ${fieldType} "${searchList}" after scrolling down ${maxScrolls} times`);
-    }
+    // If we reach here, the row was not found
+    const fieldType = isSlugSearch ? 'slug' : 'title';
+    const searchList = searchValues.join('", "');
+    throw new Error(`Could not find row with ${fieldType} "${searchList}" after scrolling down ${maxScrolls} times`);
   }
 
 

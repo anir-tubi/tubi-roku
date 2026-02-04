@@ -558,40 +558,12 @@ describe('HomeGrid Video Tiles', function () {
     await testUtils.waitForGridContentToLoad('videoTitlesRowList', 10000);
     await utils.sleep(1000);
 
-    // Find a movie (type 'v') in the grid
-    let foundMovie = false;
-    let moviePosition = [-1, -1];
-
-    for (let rowIndex = 0; rowIndex < 10; rowIndex++) {
-      await testUtils.jumpToRowIndex('videoTitlesRowList', rowIndex);
-      await utils.sleep(500);
-
-      const rowContent = await testUtils.getRowListRowItemsContent('videoTitlesRowList', rowIndex);
-
-      if (!rowContent || rowContent.length === 0) {
-        continue;
-      }
-
-      for (let colIndex = 0; colIndex < rowContent.length; colIndex++) {
-        const item = rowContent[colIndex];
-        if (item.type === 'v') {
-          moviePosition = [rowIndex, colIndex];
-          foundMovie = true;
-          break;
-        }
-      }
-
-      if (foundMovie) {
-        break;
-      }
+    // Find a movie (type 'v') using helper with contentType filter
+    const position = await testHelpers.findContentPositionInRowListThatContainsVideoPreview('videoTitlesRowList', true, 10, 'v');
+    if (position.length === 0) {
+      throw new Error('Could not find a movie with video preview in the first 10 rows');
     }
-
-    if (!foundMovie) {
-      throw new Error('Could not find a movie in the first 10 rows');
-    }
-
-    // Navigate to the movie
-    await testUtils.jumpToRowItem('videoTitlesRowList', moviePosition);
+    await testHelpers.jumpToRowListPosition('videoTitlesRowList', position[0], position[1]);
     await utils.sleep(1000);
 
     const content = await testUtils.getCurrentlyFocusedGridItemContent('videoTitlesRowList');

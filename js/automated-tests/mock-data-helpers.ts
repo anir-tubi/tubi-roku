@@ -64,53 +64,69 @@ class MockDataHelpers {
   /**
    * PRIVATE: Mock sports content in a specific container
    * 
-   * @param containerSlug - Container slug to inject sports content into
-   * @param containerTitle - Container title for display
+   * Uses the full homescreen mock (homescreen-live-mock.json) and updates
+   * the schedules of linear channels to be live.
+   * 
+   * @param containerSlug - Container slug to find and update schedules for
    * @returns Promise that resolves when sports content is mocked
    */
-  private async mockSportsContentInContainer(containerSlug: string, containerTitle: string): Promise<void> {
-    // Load the sports mock file and add live timestamps
-    let sportsData = this.loadMockFile('sports-mock.json');
-    sportsData = this.addLiveTimestampsToSportsData(sportsData);
+  public async mockSportsContentInContainer(containerSlug: string): Promise<void> {
+    // Load the sports mock file as a template
+    const sportsTemplate = this.loadMockFile('sports-mock.json');
+    const channelTemplate = sportsTemplate['613762'];
+    const programTemplate = sportsTemplate['500006541'];
 
-    // Mock home screen endpoint to inject Real Madrid into specified container
+    // Mock home screen endpoint to inject sports content with real channel's program
     return new Promise((resolve) => {
       proxy.addCallback({
         shouldProcess: (args) => {
           return args.url.includes('/api/v7/homescreen');
         },
         processResponse: (args) => {
+          const now = new Date();
+          const startTime = new Date(now.getTime() - 60 * 60 * 1000); // 1 hour ago
+          const endTime = new Date(now.getTime() + 60 * 60 * 1000);   // 1 hour from now
+
           const responseJson = JSON.parse(args.responseBuffer.toString());
 
-          // Find the specified container
+          // Find the specified container to get a real channel
           const container = responseJson.containers?.find((c: any) => c.slug === containerSlug);
 
-          if (container) {
-            // Prepend Real Madrid to existing container
-            if (!container.children) {
-              container.children = [];
-            }
-            if (!container.children.includes('613762')) {
-              container.children.unshift('613762');
-            }
-          } else {
-            // Create the container if it doesn't exist
-            if (!responseJson.containers) {
-              responseJson.containers = [];
-            }
-            responseJson.containers.push({
-              id: containerSlug,
-              slug: containerSlug,
-              title: containerTitle,
-              children: ['613762']
-            });
-          }
+          if (container && container.children && container.children.length > 0) {
+            // Get the first real channel
+            const realChannelId = container.children[0];
+            const realChannelContent = responseJson.contents?.[realChannelId];
+            if (realChannelContent && realChannelContent.schedules && realChannelContent.schedules.length > 0) {
+              // Get the real channel's first schedule and program
+              const realSchedule = realChannelContent.schedules[0];
+              const realProgramId = realSchedule.program_id;
+              const realProgram = responseJson.contents?.[realProgramId];
+              // Create new channel content using template but with real channel's ID and video_resources
+              const newChannelContent = {
+                ...channelTemplate,
+                id: realChannelId,
+                video_resources: realChannelContent.video_resources, // Keep real channel's video resources
+                schedules: [{
+                  ...realSchedule,
+                  start_time: startTime.toISOString(),
+                  end_time: endTime.toISOString(),
+                  live: true,
+                  program_id: realProgramId
+                }]
+              };
 
-          // Add sports content data to contents map
-          if (!responseJson.contents) {
-            responseJson.contents = {};
+              // Create new program content using template but with real program's ID
+              const newProgramContent = {
+                ...programTemplate,
+                id: realProgramId,
+                title: realProgram?.title || programTemplate.title
+              };
+
+              // Override the channel and program in the response
+              responseJson.contents[realChannelId] = newChannelContent;
+              responseJson.contents[realProgramId] = newProgramContent;
+            }
           }
-          Object.assign(responseJson.contents, sportsData);
 
           resolve(null);
           args.removeCallback();
@@ -153,7 +169,7 @@ class MockDataHelpers {
    * });
    */
   public async mockSportsContent(): Promise<void> {
-    return this.mockSportsContentInContainer('recommended_linear_channels', 'On Now');
+    return this.mockSportsContentInContainer('recommended_linear_channels');
   }
 
   /**
@@ -180,7 +196,7 @@ class MockDataHelpers {
    * await utils.promiseTimeout(proxyPromise, 50000);
    */
   public async mockSportsContentInFeatured(): Promise<void> {
-    return this.mockSportsContentInContainer('featured', 'Featured');
+    return this.mockSportsContentInContainer('featured');
   }
 
   /**

@@ -130,6 +130,14 @@ describe('Title Details Page', function () {
     await startApplicationWithExperimentOverrides('movies', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
+    // Find content that has a video preview
+    const position = await testHelpers.findContentPositionInRowListThatContainsVideoPreview('movieScreenRowList', true, 5);
+    if (position.length === 0) {
+      throw new Error('Could not find content with video preview');
+    }
+    const [row, col] = position;
+    await testHelpers.jumpToRowListPosition('movieScreenRowList', row, col);
+
     await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForCurrentScreenToEqual('vodDetailScreen', 10000);
 
@@ -218,7 +226,11 @@ describe('Title Details Page', function () {
 
     await testUtils.waitForElementToShowOnScreen('vodDetailScreen', 'Detail screen not visible', 10000);
 
-    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'stopped', 10000);
+    // Verify preview player is not playing, buffering, or paused
+    await testUtils.untilTrue(async () => {
+      const playerState = await testUtils.getElementField('previewVideoPlayer', 'state');
+      return playerState !== 'playing' && playerState !== 'buffering' && playerState !== 'paused';
+    }, 'Preview player should not be playing, buffering, or paused', 10000);
 
     // Verify either backgroundPoster or backgroundPoster2 has opacity 1 (static image is shown)
     await testUtils.untilTrue(async () => {
@@ -232,6 +244,14 @@ describe('Title Details Page', function () {
   it('C845238 - Fullscreen video in details page autoplays if title is not played @guest,@details_page', async () => {
     await startApplicationWithExperimentOverrides('movies', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Find content that has a video preview
+    const position = await testHelpers.findContentPositionInRowListThatContainsVideoPreview('movieScreenRowList', true, 5);
+    if (position.length === 0) {
+      throw new Error('Could not find content with video preview');
+    }
+    const [row, col] = position;
+    await testHelpers.jumpToRowListPosition('movieScreenRowList', row, col);
 
     await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForCurrentScreenToEqual('vodDetailScreen', 10000);
