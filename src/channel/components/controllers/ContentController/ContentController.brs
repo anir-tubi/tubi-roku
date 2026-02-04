@@ -2807,6 +2807,24 @@ Function getComponentInteractionInfo(userInteraction, pageInfo, componentType, c
 End Function
 
 
+' Sends ComponentInteractionEvent for button interactions (OK/Play/Back/Left).
+' buttonValue: "OK", "PLAY", "LEFT", or "BACK" depending on which button user pressed.
+' buttonType: "TEXT", "IMAGE", or "UNKNOWN" based on how the button appears.
+' userInteraction: "CONFIRM" for OK/Play/Left, "BACK" for Back key.
+' screen: optional; if invalid, uses getCurrentScreen(). Must have trackingPageInfo (pageType, pageValues).
+Function sendButtonComponentInteractionEvent(buttonValue as String, buttonType as String, userInteraction = "CONFIRM", screen = invalid) as Void
+  if screen = invalid then screen = getCurrentScreen()
+  if screen = invalid OR screen.trackingPageInfo = invalid OR isNonEmptyString(screen.trackingPageInfo.pageType) = false then return
+  pageInfo = screen.trackingPageInfo
+  componentValues = {
+    button_type: buttonType
+    button_value: buttonValue
+  }
+  componentInteractionInfo = getComponentInteractionInfo(userInteraction, pageInfo, "button_component", componentValues)
+  sendcomponentInteractionInfo(componentInteractionInfo)
+End Function
+
+
 Function updateScreenCacheOnPlayback(currentVideoScreenID)
   screenIds = m.cache.getCachedScreenIds()
   linearVideoPlayerScreenId = m.constants.ui.screenIds.linearVideoPlayerScreen
@@ -3609,6 +3627,7 @@ Function processUserContentSelection(content, screen, playbackSource = {}) as Vo
   if isAA(content.scheduleData)
     playerType = content.scheduleData.playerType
   end if
+  sendButtonComponentInteractionEvent("OK", "TEXT", "CONFIRM", screen)
 
   m.videoPreviewDebounce.control = "stop"
   if isNonEmptyString(content.actionId) = true
@@ -3745,7 +3764,7 @@ Function processUserPlayAction(content, screen, playbackSource = {}) as Void
   if isAA(content.scheduleData)
     playerType = content.scheduleData.playerType
   end if
-
+  sendButtonComponentInteractionEvent("PLAY", "IMAGE", "CONFIRM", screen)
   ' Since category panel list screen re-uses the method allowing it to play the content.
   if contentType = m.constants.uapiContentTypes.channel
     contentMode = ""

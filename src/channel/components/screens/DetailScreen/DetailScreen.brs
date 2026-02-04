@@ -1235,6 +1235,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
   if press then
     if key = "back"
       if not m.top.isWaitingForServerResponse
+        m.top.backTriggerKey = "BACK"
         m.top.backButtonPressed = true
         return true
       end if
@@ -1274,6 +1275,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       return true
     else if key = "left"
       if m.SecondaryMenu.isInFocusChain() = false AND m.RelatedGrid.isInFocusChain() = false
+        m.top.backTriggerKey = "LEFT"
         m.top.backButtonPressed = true
         return true
       else if m.SecondaryMenu.isInFocusChain() = true

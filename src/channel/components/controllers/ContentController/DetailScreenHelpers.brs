@@ -1735,7 +1735,21 @@ Function onCloseErrorModal()
 End Function
 
 
-Function onDetailBackButtonPressedChange()
+' Sends ComponentInteractionEvent for Back/Left on detail page only when user actually pressed Back/Left (observer path).
+' When invoked directly (onCloseErrorModal, DeeplinkHelpers) msg is invalid - do not send event.
+Function onDetailBackButtonPressedChange(msg = invalid)
+  detailScreen = invalid
+  if msg <> invalid then detailScreen = msg.getRoSGNode()
+  if detailScreen = invalid then detailScreen = getTopDetailScreenFromStack()
+  ' Only send ComponentInteractionEvent when back was triggered by user key press (observer fired); skip when called programmatically
+  if msg <> invalid AND detailScreen <> invalid AND detailScreen.trackingPageInfo <> invalid
+    lastKey = detailScreen.backTriggerKey
+    if isNonEmptyString(lastKey) = true
+      userInteraction = "BACK"
+      if lastKey = "LEFT" then userInteraction = "CONFIRM"
+      sendButtonComponentInteractionEvent(lastKey, "IMAGE", userInteraction, detailScreen)
+    end if
+  end if
   showHideSpinner(false)
   ' TODO(Chris): This is in terrible need of refactor. We shouldn't be calling this directly
   ' but we have to invoke the "empty stack" logic at this point.

@@ -4,7 +4,7 @@ import { testUtils } from '../test-utils';
 import { shared, testHelpers } from '../test-helpers';
 import { moveToGrid } from '../analytics/utils/helpers';
 import { adTestHelpers, AdType } from '../ad-test-helpers';
-import { validateAnalyticsEvent, createAnalyticsCallback, EXISTS } from '../analytics-validator';
+import { validateAnalyticsEvent, createAnalyticsCallback, EXISTS } from './analytics/analytics-validator';
 import { mockDataHelpers } from '../mock-data-helpers';
 import { title } from 'process';
 

@@ -19,7 +19,7 @@ const { testUtils, auth, ContentTypes, ContentRatings } = require('./automated-t
 
 const jsonReportOutputPath = `${testUtils.testsOutputFolder}/report.json`;
 
-async function runAutomatedTestsCli(done, testsPath = 'js/automated-tests/tests/*.ts') {
+async function runAutomatedTestsCli(done, testsPath = 'js/automated-tests/tests/**/*.ts') {
   const testsFolder = path.dirname(testsPath);
   const availableTags = getAvailableTags(testsFolder);
 
@@ -254,7 +254,7 @@ function runAutomatedAnalyticsTests(done) {
 }
 
 
-async function runAutomatedTests(done, branch = '', tags = [], testsPath = 'js/automated-tests/tests/*.ts', shouldUseExistingBranch = false) {
+async function runAutomatedTests(done, branch = '', tags = [], testsPath = 'js/automated-tests/tests/**/*.ts', shouldUseExistingBranch = false) {
   // Load env file to allow overrides while developing tests
   const envPath = '.vscode/.env';
   if (fs.existsSync(envPath)) {
@@ -318,16 +318,11 @@ async function runAutomatedTests(done, branch = '', tags = [], testsPath = 'js/a
     mochaOptions.push(`--parallel --jobs ${config.RokuDevice.devices.length}`);
   }
 
-  // Retry failed tests once by default (can be disabled with DISABLE_TEST_RETRY=true or retries=0)
-  // Can also set custom retry count with retries env variable (used in GitHub workflows)
-  if (process.env.DISABLE_TEST_RETRY === 'true') {
-    // No retries
-  } else if (process.env.retries !== undefined) {
-    // Respect explicit retry count (including 0 to disable retries)
+  // No automatic retries unless explicitly requested via retries env (e.g. GitHub Actions set retries: 2)
+  if (process.env.retries !== undefined && process.env.retries !== '') {
     mochaOptions.push(`--retries ${process.env.retries}`);
   } else {
-    // Default to 1 retry for local development
-    mochaOptions.push('--retries 1');
+    mochaOptions.push('--retries 0');
   }
 
   // We need to make our package here or else when we run in parallel they will all attempt to make the package at the same time
@@ -432,28 +427,30 @@ async function appendDataToJsonReport(branch) {
 
 
 // Gets a list of all tags available for our tests.
-// Pulled from the actual tests
+// Pulled from the actual tests (recurses into subdirectories e.g. tests/analytics/)
 function getAvailableTags(folder = 'js/automated-tests/tests') {
   const tags = {};
-  const files = fs.readdirSync(folder);
   const pattern = /it\([^@]*([@a-zA-Z_0-9,]*)/g;
-  for (const file of files) {
-    if (!folder.includes('analytics') && file.split('.').pop() !== 'ts') {
-      continue;
-    }
 
-    const fileContents = fs.readFileSync(`${folder}/${file}`, 'utf-8');
-    for (const match of fileContents.matchAll(pattern)) {
-      for (let tag of match[1].split(',')) {
-        tag = tag.trim();
-        if (tag.length === 0) {
-          continue;
+  function scanDir(dir) {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const ent of entries) {
+      const filePath = `${dir}/${ent.name}`;
+      if (ent.isDirectory()) {
+        scanDir(filePath);
+      } else if (ent.name.endsWith('.ts')) {
+        const fileContents = fs.readFileSync(filePath, 'utf-8');
+        for (const match of fileContents.matchAll(pattern)) {
+          for (let tag of match[1].split(',')) {
+            tag = tag.trim();
+            if (tag.length === 0) continue;
+            tags[tag] = true;
+          }
         }
-        tags[tag] = true;
       }
     }
   }
-
+  scanDir(folder);
   return Object.keys(tags).sort();
 }
 
