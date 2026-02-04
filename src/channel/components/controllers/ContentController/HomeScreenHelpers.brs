@@ -615,7 +615,8 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
           ' Only show the video tile overlay group if the screen is eligible for video tiles and skin ads are not available.
           ' This is needed because we refresh home screen behind the scenes during parent controls change.
           isSkinAdsAvailable = (homeScreen.skinAdContent <> invalid)
-          m.videoTileOverlayGroup.visible = (isSkinAdsAvailable = false)
+          ' Since we do background refresh we have to use current screen state to determine if video tiles should be enabled.
+          m.videoTileOverlayGroup.visible = (isSkinAdsAvailable = false AND isVideoTileEnabledScreen() = true)
           updateCategoryGridWithRowList(rawResponse, homeScreen)
         else
           m.videoTileOverlayGroup.visible = false
@@ -1537,7 +1538,7 @@ End Function
 Function updateCategoryGridWithRowList(response, screen)
   screen.content = response
 
-  if screen.skinAdContent <> invalid OR (screen.listHasFocus = false AND isKidsUIOn() = false)
+  if screen.skinAdContent <> invalid OR (screen.listHasFocus = false AND isVideoTileEnabledScreen() = true)
     currentScreen = getCurrentScreen()
     isCurrScreenHomeScreen = currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen
     if isCurrScreenHomeScreen = true AND screen.isInFocusChain() = false
