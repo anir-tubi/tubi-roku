@@ -58,6 +58,8 @@ Function init()
 
   m.animationDuration = 0.4
 
+  m.isComingSoon = false ' Initialize coming soon flag
+
   experiment = getStatsigExperimentResource("roku_content_details", "roku_content_details_v2", false)
   m.isLeftBackExitEnabled = experiment <> invalid AND experiment.enable_left_button_exit = true
 
@@ -122,6 +124,9 @@ Function onContentChange()
     else
       m.contentGroup.visible = false
     end if
+
+    m.isComingSoon = isComingSoonContent(content)
+
     refreshButtonList()
     if m.sectionTabs = invalid OR isNonEmptyArray(m.sectionTabs.buttons) = false
       renderSectionTabs()
@@ -190,20 +195,23 @@ Function refreshButtonList()
     like = getLike(contentId)
 
     ' Build button list using helper functions
-    addPlayOrResumeButtons(buttons, itemContent, history)
-    addSignInButton(buttons)
+    if m.isComingSoon = false
+      addPlayOrResumeButtons(buttons, itemContent, history)
+      addSignInButton(buttons)
+      addRemoveHistoryButton(buttons, history)
+
+      if m.top.isInKidsMode = false
+        addLikeDislikeButtons(buttons, like)
+
+        if isNonEmptyString(itemContent.channelId)
+          addChannelButton(buttons, itemContent)
+        end if
+      end if
+    end if
+
     addTrailerButton(buttons, itemContent)
     addQueueButton(buttons, bookmark)
 
-    if m.top.isInKidsMode = false
-      addLikeDislikeButtons(buttons, like)
-    end if
-
-    addRemoveHistoryButton(buttons, history)
-
-    if isNonEmptyString(itemContent.channelId) AND m.top.isInKidsMode = false
-      addChannelButton(buttons, itemContent)
-    end if
   end if
 
   ' Pass buttons array to the button list component
@@ -625,13 +633,29 @@ End Function
 ' @param bookmark - Object, the bookmark object or invalid
 Function addQueueButton(buttons, bookmark) as Void
   if bookmark <> invalid
-    translationKey = "screenDetails_button_noQueue"
     buttonId = "removeFromQueue"
-    iconUrl = "pkg:/images/icon-remove-from-queue.webp"
+
+    if m.isComingSoon = false
+      translationKey = "screenDetails_button_noQueue"
+      iconUrl = "pkg:/images/icon-remove-from-queue.webp"
+    else
+      translationKey = "screenDetails_button_remove_reminder"
+      iconUrl = "pkg:/images/reminder-set.webp"
+    end if
   else
-    translationKey = "screenDetails_button_queue"
     buttonId = "addToQueue"
-    iconUrl = "pkg:/images/icon-add-to-queue.webp"
+
+    if m.isComingSoon = false
+      translationKey = "screenDetails_button_queue"
+      iconUrl = "pkg:/images/icon-add-to-queue.webp"
+    else
+      if isLoggedInUser() = false
+        translationKey = "screenDetails_button_sign_in_to_set_reminder"
+      else
+        translationKey = "screenDetails_button_set_reminder"
+      end if
+      iconUrl = "pkg:/images/set-reminder.webp"
+    end if
   end if
 
   buttons.push({

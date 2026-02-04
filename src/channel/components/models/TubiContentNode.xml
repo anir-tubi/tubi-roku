@@ -121,6 +121,9 @@
     <!-- availability_ends: eg. "2019-03-31T00:00:00Z" -->
     <field id="availabilityEnds" type="string" />
 
+    <!-- availability_starts: eg. "2019-03-31T00:00:00Z" -->
+    <field id="availabilityStarts" type="string" />
+
     <!-- air_datetime: eg. "2019-09-24T14:15:22Z" -->
     <field id="airDateTime" type="string" />
 

@@ -4,6 +4,7 @@
 ' @successCb, roFunction, callback to be run on success
 ' @errorCb, roFunction, callback to be run on error
 Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, errorCb = invalid)
+  tubiLog("VodDetailScreenHelpers.showVodDetailScreen")
   showHideLogoBasedOnUiMode()
 
   if inputContent <> invalid
@@ -34,21 +35,7 @@ Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, 
     end if
     screen.trackingPageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
     screen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
-    if content.type = m.constants.ui.contentTypes.series
-      screen.wasContentFetchCompleted = false
-      getSeasonList(content.id, onGetSeasonListSuccess, onGetSeasonListError)
-    else
-      ' During deep-link use case we already have the complete content node, so we can skip the fetch.
-      screen.wasContentFetchCompleted = content.hasVideoResources
-      if content.hasVideoResources <> true
-        getSingleContentFromServer(content, onGetVodContentSuccess, onGetVodContentError)
-      end if
-      getYouMayAlsoLikeContent(content)
-    end if
 
-    if screen.wasContentFetchCompleted = false
-      showHideSpinner(true)
-    end if
     pushScreen(screen, true, true)
 
     m.showVodDetailScreenCallback = {
@@ -66,6 +53,22 @@ Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, 
     end if
 
     onVodDetailBackgroundUriListChange()
+
+    if content.type = m.constants.ui.contentTypes.series
+      screen.wasContentFetchCompleted = false
+      getSeasonList(content.id, onGetSeasonListSuccess, onGetSeasonListError)
+    else
+      ' During deep-link use case we already have the complete content node, so we can skip the fetch.
+      screen.wasContentFetchCompleted = content.hasVideoResources
+      if content.hasVideoResources <> true
+        getSingleContentFromServer(content, onGetVodContentSuccess, onGetVodContentError)
+      end if
+      getYouMayAlsoLikeContent(content)
+    end if
+    if screen.wasContentFetchCompleted = false
+      showHideSpinner(true)
+    end if
+
   end if
 End Function
 
@@ -98,6 +101,7 @@ End Function
 ' Fetches related content when "More Like This" tab is selected if not already loaded
 ' @param msg - roSGNodeEvent containing the selected section ID
 Function onVodDetailSelectedSectionChange(msg)
+  tubiLog("VodDetailScreenHelpers.onVodDetailSelectedSectionChange")
   selectedSection = msg.getData()
   screen = msg.getRoSGNode()
   if selectedSection = "moreLikeThis" AND screen.relatedContent = invalid
@@ -110,6 +114,7 @@ End Function
 ' Updates screen with fetched content and triggers playback if skip detail screen was requested
 ' @param content - Content node returned from API
 Function onGetVodContentSuccess(content)
+  tubiLog("VodDetailScreenHelpers.onGetVodContentSuccess")
   screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen, content.id)
   if screen <> invalid
     ' Content API does not seem to return sotInfo, so we are copying it from the screen content.
@@ -133,6 +138,7 @@ End Function
 ' Shows error modal with retry option (except for 404 errors)
 ' @param error - Error response from API
 Function onGetVodContentError(error)
+  tubiLog("VodDetailScreenHelpers.onGetVodContentError")
   screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen)
   if screen <> invalid AND screen.getSubtype() = "VodDetailScreen"
     screen.wasContentFetchCompleted = true
@@ -164,6 +170,7 @@ End Function
 ' Retry callback for VOD content fetch
 ' Re-attempts to fetch content from server
 Function onGetVodContentRetry()
+  tubiLog("VodDetailScreenHelpers.onGetVodContentRetry")
   screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen)
   if screen <> invalid AND screen.getSubtype() = "VodDetailScreen"
     content = screen.content
@@ -179,6 +186,7 @@ End Function
 ' Navigates to detail screen of selected related content with appropriate tracking source
 ' @param msg - roSGNodeEvent containing selected content node
 Function onVodDetailRelatedContentSelectedChange(msg)
+  tubiLog("VodDetailScreenHelpers.onVodDetailRelatedContentSelectedChange")
   selectedContent = msg.getData()
   if selectedContent <> invalid
     ' The content node gets modified down the line so avoiding the changes to the original content node.
@@ -195,6 +203,7 @@ End Function
 ' @param screen - VOD detail screen node
 ' @return Content node to play (episode for series, original content otherwise)
 Function getPlayableContent(screen) as Object
+  tubiLog("VodDetailScreenHelpers.getPlayableContent")
   content = screen.content
   history = getHistory(content.id)
 
@@ -213,6 +222,7 @@ End Function
 ' @param content - Content node (movie or series)
 ' @return History node (episode history for series with currentEpisodeId, otherwise content history)
 Function getContentHistory(content as Object) as Object
+  tubiLog("VodDetailScreenHelpers.getContentHistory")
   history = getHistory(content.id)
 
   if content.type = m.constants.ui.contentTypes.series
@@ -230,6 +240,7 @@ End Function
 ' Waits for content fetch completion before processing if necessary
 ' @param msg - roSGNodeEvent containing the selected button ID
 Function onVodDetailCtaSelectedButtonIdChange(msg) as Void
+  tubiLog("VodDetailScreenHelpers.onVodDetailCtaSelectedButtonIdChange")
   screen = msg.getRoSGNode()
   if screen <> invalid AND screen.content <> invalid AND isNonEmptyString(screen.ctaSelectedButtonId)
     id = screen.ctaSelectedButtonId
@@ -299,6 +310,7 @@ End Function
 ' Refreshes VOD detail screen after user signs in
 ' Updates user signed-in state, refreshes UI and marks personalized screens for refresh
 Function refreshVodDetailScreenAfterSignIn()
+  tubiLog("VodDetailScreenHelpers.refreshVodDetailScreenAfterSignIn")
   popScreenAfterSignInProcess()
   screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen)
   if screen <> invalid
@@ -332,6 +344,7 @@ End Function
 ' Updates the VOD detail screen with fetched related content
 ' @param relatedContent - Content node containing related titles
 Function onGetRelatedContentSuccess(relatedContent)
+  tubiLog("VodDetailScreenHelpers.onGetRelatedContentSuccess")
   if relatedContent <> invalid
     screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen, relatedContent.id)
     if screen <> invalid
@@ -347,6 +360,7 @@ End Function
 ' @successCallback: roFunction, callback to be run on success
 ' @errorCallback: roFunction, callback to be run on error
 Function getSeasonList(contentId, successCallback, errorCallback)
+  tubiLog("VodDetailScreenHelpers.getSeasonList")
   ' Fetch first season, first page with 10 episodes
   seasonRequestInfo = m.CmsApi.createGetSeasonListBySeriesIdReqInfo(contentId, shouldKidsModeBeSentToServer(), { seriesId: contentId })
   m.makeRequest({
@@ -365,6 +379,7 @@ End Function
 ' Success callback for season list request
 ' @seasonData: roSGNode, the season data content node
 Function onGetSeasonListSuccess(seasonData)
+  tubiLog("VodDetailScreenHelpers.onGetSeasonListSuccess")
   if seasonData <> invalid AND seasonData.seasonSelectorContent <> invalid
     seriesId = seasonData.seriesId
     screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen, seriesId)
@@ -424,6 +439,7 @@ End Function
 ' Handles focused season change
 ' @msg: object, the message containing the focused season
 Function onFocusedSeasonChange(msg)
+  tubiLog("VodDetailScreenHelpers.onFocusedSeasonChange")
   focusedSeason = msg.getData()
   screen = msg.getRoSGNode()
   if screen <> invalid AND screen.content <> invalid AND focusedSeason <> invalid AND focusedSeason <> screen.defaultSelectedSeason AND screen.seasonList <> invalid
@@ -498,6 +514,7 @@ End Function
 ' @param content - The main content node containing trailer information
 ' @return TubiContentNode configured for trailer playback, or invalid if no valid trailer info
 Function createTrailerContent(content as Object) as Object
+  tubiLog("VodDetailScreenHelpers.createTrailerContent")
   if content = invalid OR content.trailerInfo = invalid then return invalid
 
   ' Cache trailerInfo reference to avoid repeated property lookups
@@ -513,6 +530,7 @@ Function createTrailerContent(content as Object) as Object
   ' Build all properties in a single object for efficient batch update
   properties = {
     nowPos: 0
+    availabilityStarts: content.availabilityStarts
     isTrailer: true
     isCdc: content.isCdc
     url: trailerInfo.url
@@ -541,6 +559,7 @@ End Function
 ' Shows sign-in dialog if user is not logged in, otherwise sends API request
 ' @param content - Content node to add to queue
 Function addContentToMyList(content) as Void
+  tubiLog("VodDetailScreenHelpers.addContentToMyList")
   if isLoggedInUser() = false
     title = getTranslation("screenDetails_error_addQueue_title")
     if content <> invalid AND content.type = m.constants.ui.contentTypes.series
@@ -582,6 +601,7 @@ End Function
 ' Updates local bookmark state, refreshes button list and sends analytics
 ' @param response - API response containing content_id
 Function onAddContentToMyListSuccess(response)
+  tubiLog("VodDetailScreenHelpers.onAddContentToMyListSuccess")
   if response <> invalid AND response.content_id <> invalid
     contentId = getContentIdFromQueueResponse(response)
     screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen, contentId)
@@ -600,6 +620,7 @@ End Function
 ' Shows appropriate error message based on content type
 ' @param error - Error response from API
 Function onAddContentToMyListError(error) as Void
+  tubiLog("VodDetailScreenHelpers.onAddContentToMyListError")
   screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen)
   content = invalid
   if screen <> invalid then content = screen.content
@@ -616,6 +637,7 @@ End Function
 ' Callback to add content to queue after successful sign-in
 ' Refreshes screen state and triggers add to queue flow
 Function addContentToMyListAfterSignIn()
+  tubiLog("VodDetailScreenHelpers.addContentToMyListAfterSignIn")
   screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen)
   if screen <> invalid
     refreshVodDetailScreenAfterSignIn()
@@ -628,6 +650,7 @@ End Function
 ' Sends API request to remove content using bookmark ID
 ' @param content - Content node to remove from queue
 Function removeContentFromMyList(content)
+  tubiLog("VodDetailScreenHelpers.removeContentFromMyList")
   bookmark = getBookmark(content.id)
   if bookmark <> invalid
     if content.type = m.constants.ui.contentTypes.video
@@ -654,6 +677,7 @@ End Function
 ' Updates local bookmark state, refreshes button list and sends analytics
 ' @param response - API response containing content_id
 Function onRemoveContentFromMyListSuccess(response)
+  tubiLog("VodDetailScreenHelpers.onRemoveContentFromMyListSuccess")
   if response <> invalid AND response.content_id <> invalid
     contentId = getContentIdFromQueueResponse(response)
     screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen, contentId)
@@ -673,6 +697,7 @@ End Function
 ' @param response - API response containing content_id and content_type
 ' @return Formatted content ID string
 Function getContentIdFromQueueResponse(response)
+  tubiLog("VodDetailScreenHelpers.getContentIdFromQueueResponse")
   contentId = response.content_id.toStr()
   if response.content_type = m.constants.ui.contentTypes.series AND contentId.startsWith("0") = false
     contentId = "0" + contentId
@@ -685,6 +710,7 @@ End Function
 ' Shows appropriate error message based on content type
 ' @param error - Error response from API
 Function onRemoveContentFromMyListError(error) as Void
+  tubiLog("VodDetailScreenHelpers.onRemoveContentFromMyListError")
   screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen)
   content = invalid
   if screen <> invalid then content = screen.content
@@ -704,6 +730,7 @@ End Function
 ' @param action - Like action (like, dislike, removeLike, removeDislike)
 ' @param trackingPageInfo - Tracking page information for analytics
 Function likeDislikeContent(content, action, trackingPageInfo)
+  tubiLog("VodDetailScreenHelpers.likeDislikeContent")
   updateLikeDislikeRequestInfo = m.userDeviceApi.setContentRating(content.id, action)
   likeDislikeActions = m.constants.ui.likeDislikeActions
   eventType = {}
@@ -729,6 +756,7 @@ End Function
 ' Updates local like state, refreshes button list and updates screen state
 ' @param response - API response containing content ID and action
 Function onContentLikeDislikeChangedSuccess(response)
+  tubiLog("VodDetailScreenHelpers.onContentLikeDislikeChangedSuccess")
   if response <> invalid AND type(response.data) = "roArray"
     contentId = response.data[0]
     action = response.action
@@ -755,6 +783,7 @@ End Function
 ' @param buttonId - String, button ID ("like" or "dislike")
 ' @return String - Action from constants.ui.likeDislikeActions
 Function getLikeDislikeAction(content, buttonId as String) as String
+  tubiLog("VodDetailScreenHelpers.getLikeDislikeAction")
   like = getLike(content.id)
   if like <> invalid
     if like.state = "liked"
@@ -782,6 +811,7 @@ End Function
 ' Callback executed after successful sign-in when user wanted to like/dislike content on VOD detail screen
 ' Uses screen.ctaSelectedButtonId to determine which action to execute
 Function onLikeDislikeAfterSignInVodDetail()
+  tubiLog("VodDetailScreenHelpers.onLikeDislikeAfterSignInVodDetail")
   refreshVodDetailScreenAfterSignIn()
   screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen)
   if screen <> invalid AND screen.content <> invalid AND isNonEmptyString(screen.ctaSelectedButtonId)
@@ -799,6 +829,7 @@ End Function
 ' @param action - The like action from constants.ui.likeDislikeActions
 ' @return The liked state from constants.ui.likeDislikeStates, or empty string
 Function translateLikeActionToState(action as String) as Dynamic
+  tubiLog("VodDetailScreenHelpers.translateLikeActionToState")
   ' Map action to state using associative array for O(1) lookup
   likeDislikeActions = m.constants.ui.likeDislikeActions
   likeDislikeStates = m.constants.ui.likeDislikeStates
@@ -818,6 +849,7 @@ End Function
 ' @param screen - The VOD detail screen node
 ' @param action - The like action that was performed
 Function setVodDetailLikeDislikeState(screen as Object, action as String) as Void
+  tubiLog("VodDetailScreenHelpers.setVodDetailLikeDislikeState")
   ' Show toast notification for US users (non-kids mode only)
   canShowToast = (UCase(m.constants.deviceInfo.countryCode) = "US" AND isKidsUIOn() = false)
   if canShowToast = true
@@ -835,6 +867,7 @@ End Function
 ' @param screen - The detail screen for analytics tracking
 ' @param state - The like/dislike state (liked or disliked)
 Function showLikeDislikeToast(screen as Object, state as String) as Void
+  tubiLog("VodDetailScreenHelpers.showLikeDislikeToast")
   likeDislikeStates = m.constants.ui.likeDislikeStates
   dialogSubType = state + "_title"
 
@@ -886,6 +919,7 @@ End Function
 ' Plays selected episode with progress resume if available
 ' @param msg - roSGNodeEvent containing selected episode node
 Function onPlaySelectedEpisodeChange(msg)
+  tubiLog("VodDetailScreenHelpers.onPlaySelectedEpisodeChange")
   screen = msg.getRoSGNode()
   if screen <> invalid
     selectedEpisode = screen.selectedEpisode
@@ -905,6 +939,7 @@ End Function
 ' Creates a channel content node and navigates to category details screen
 ' @param channelId - String ID of the channel to display
 Function showChannelDetailsScreen(channelId)
+  tubiLog("VodDetailScreenHelpers.showChannelDetailsScreen")
   channelNode = CreateObject("roSGNode", "CategoryContentNode")
   channelNode.id = channelId
   channelNode.type = m.constants.ui.contentTypes.channel
@@ -919,21 +954,28 @@ End Function
 ' @param playbackSource - Playback source information for analytics
 ' @param episodes - Optional episodes list for series content
 Function playSelectedVodContent(content, playbackSource, episodes = invalid)
-  ' Handle resume action
-  history = getHistory(content.id)
-  if content.type = m.constants.ui.contentTypes.series
-    content = getPlayableEpisode(episodes, history)
+  tubiLog("VodDetailScreenHelpers.playSelectedVodContent")
 
-    if history <> invalid AND isNonEmptyString(history.currentEpisodeId)
-      history = m.nodeHelpers.getChildById(history, history.currentEpisodeId)
+  isComingSoon = isComingSoonContent(content)
+  '//Ensure content is not coming soon; otherwise do not play
+  if isComingSoon = false
+    ' Handle resume action
+    history = getHistory(content.id)
+    if content.type = m.constants.ui.contentTypes.series
+      content = getPlayableEpisode(episodes, history)
+
+      if history <> invalid AND isNonEmptyString(history.currentEpisodeId)
+        history = m.nodeHelpers.getChildById(history, history.currentEpisodeId)
+      end if
     end if
+
+    nowPos = 0
+    if history <> invalid AND history.nowPos > 0
+      nowPos = history.nowPos
+    end if
+    playVideoContent(content, playbackSource, nowPos)
   end if
 
-  nowPos = 0
-  if history <> invalid AND history.nowPos > 0
-    nowPos = history.nowPos
-  end if
-  playVideoContent(content, playbackSource, nowPos)
 End Function
 
 
@@ -943,6 +985,7 @@ End Function
 ' @param playbackSource - Playback source information for analytics
 ' @param episodes - Optional episodes list for series content (used when skipping detail screen)
 Function executeVodDetailSuccessCallback(content, playbackSource, episodes = invalid) as Void
+  tubiLog("VodDetailScreenHelpers.executeVodDetailSuccessCallback")
   ' send deep-link analytics if the content was deep-linked to this screen.
   if m.enteredFromDeepLink = true AND m.deeplinkContent <> invalid
     sendDeeplinkAnalytics(m.deeplinkContent, content, m.constants.deeplinks.entryPoints.video, m.Tracking, m.trackingLoggingTask, m.constants)
@@ -950,7 +993,10 @@ Function executeVodDetailSuccessCallback(content, playbackSource, episodes = inv
 
   successCb = m.showVodDetailScreenCallback.success
   if successCb = skipDetailScreen
-    playSelectedVodContent(content, playbackSource, episodes)
+    isComingSoon = isComingSoonContent(content)
+    if isComingSoon = false
+      playSelectedVodContent(content, playbackSource, episodes)
+    end if
   else if successCb <> invalid
     successCb(content)
   end if
@@ -961,10 +1007,15 @@ End Function
 ' Retrieves playbackSource and episodes from the screen, then calls playSelectedVodContent
 ' @param content - Content node to play
 Function playVodContentFromDetailScreen(content) as Void
+  tubiLog("VodDetailScreenHelpers.playVodContentFromDetailScreen")
   if content = invalid return
+
   screen = getDetailScreenFromStackWithId(m.constants.ui.screenIds.vodDetailScreen, content.id)
   if screen <> invalid
-    playSelectedVodContent(content, screen.playbackSource, screen.episodes)
+    isComingSoon = isComingSoonContent(content)
+    if isComingSoon = false
+      playSelectedVodContent(content, screen.playbackSource, screen.episodes)
+    end if
   end if
 End Function
 
@@ -973,6 +1024,7 @@ End Function
 ' @trackingPageInfo: object, the page info for analytics
 ' @returns: object, the page oneof for analytics, or empty object if invalid
 Function getAnalyticsPageOneof(trackingPageInfo) as Object
+  tubiLog("VodDetailScreenHelpers.getAnalyticsPageOneof")
   pageOneof = {}
   if isAA(trackingPageInfo)
     pageOneof = m.Tracking.getAnalyticsPage(trackingPageInfo.pageType, trackingPageInfo.pageValues)
@@ -985,6 +1037,7 @@ End Function
 ' @content: roSGNode, the content node
 ' @returns: object, associative array with series_id or video_id
 Function getContentIdForAnalytics(content) as Object
+  tubiLog("VodDetailScreenHelpers.getContentIdForAnalytics")
   contentIdValues = {}
 
   if content <> invalid AND content.id <> invalid
@@ -1008,6 +1061,7 @@ End Function
 ' @operation: string, the bookmark operation (ADD_TO_QUEUE or REMOVE_FROM_QUEUE)
 ' @trackingPageInfo: object, the page info for analytics
 Function sendVodDetailBookmarkAnalytics(content, operation, trackingPageInfo) as Void
+  tubiLog("VodDetailScreenHelpers.sendVodDetailBookmarkAnalytics")
   bookmarkAnalyticsEvent = {
     contentOneof: getContentIdForAnalytics(content)
     op: operation
@@ -1031,6 +1085,7 @@ End Function
 ' @trackingPageInfo: object, the page info for analytics
 ' @eventType: string, the event type (LIKE, DISLIKE, UNDO_LIKE, UNDO_DISLIKE)
 Function sendVodDetailLikeSelectAnalytics(content, trackingPageInfo, eventType) as Void
+  tubiLog("VodDetailScreenHelpers.sendVodDetailLikeSelectAnalytics")
   componentValues = getContentIdForAnalytics(content)
   targetOneof = m.Tracking.getAnalyticsComponent("content", componentValues)
   targetOneof.content.user_interaction = eventType
@@ -1055,6 +1110,7 @@ End Function
 ' Shows disabled feature toast on major event days, otherwise sends delete history request
 ' @param content - Content node to remove from history
 Function removeHistoryFromVodDetailScreen(content)
+  tubiLog("VodDetailScreenHelpers.removeHistoryFromVodDetailScreen")
   history = getHistory(content.id)
 
   if history <> invalid
@@ -1075,6 +1131,7 @@ End Function
 ' Updates local history cache and refreshes button list on detail screen
 ' @param response - API response containing content payload
 Function onHistoryRemovedFromVodDetail(status) as Void
+  tubiLog("VodDetailScreenHelpers.onHistoryRemovedFromVodDetail")
   if status
     ' Update local history cache
     handleHistoryChange()
@@ -1092,6 +1149,7 @@ End Function
 ' Shows appropriate error message
 ' @param response - Error response from API
 Function onHistoryRemovedFromVodDetailError(response) as Void
+  tubiLog("VodDetailScreenHelpers.onHistoryRemovedFromVodDetailError")
   handleVodDetailButtonError(response, "REMOVE_FROM_HISTORY", "screenDetails_error_noHistory_description", m.constants.errors.subtypes.removeHistoryError)
 End Function
 
@@ -1102,6 +1160,7 @@ End Function
 ' @param translationKey - The translation key for the error message
 ' @param errorSubtype - The error subtype from constants (e.g., m.constants.errors.subtypes.removeHistoryError)
 Function handleVodDetailButtonError(response, componentName, translationKey, errorSubtype) as Void
+  tubiLog("VodDetailScreenHelpers.handleVodDetailButtonError")
   code = ""
   if response <> invalid AND response.code <> invalid
     code = response.code
@@ -1132,6 +1191,7 @@ End Function
 ' Shows side navigation and triggers open animation if requested
 ' @param msg - roSGNodeEvent containing boolean indicating whether to open side nav
 Function onOpenSideNavChange(msg)
+  tubiLog("VodDetailScreenHelpers.onOpenSideNavChange")
   shouldOpenSideNav = msg.getData()
   m.SideNav.visible = shouldOpenSideNav
   if shouldOpenSideNav = true
@@ -1147,6 +1207,7 @@ End Function
 ' @param shouldSendAnalyticsEvent - Boolean indicating whether to send analytics on screen pop
 ' @param reason - String reason for exiting playback (for analytics)
 Function refreshVodDetailScreenAfterPlayback(shouldSendAnalyticsEvent, reason) as Void
+  tubiLog("VodDetailScreenHelpers.refreshVodDetailScreenAfterPlayback")
   ' remove the video player screen to reveal the details screen (or episodes list screen)
   videoPlayer = getCurrentScreen()
   videoContent = invalid
@@ -1195,6 +1256,7 @@ End Function
 ' @param content - Content node to get related content for
 ' @param limit - Optional limit for number of related items (default: 0 for no limit)
 Function getYouMayAlsoLikeContent(content, limit = 0)
+  tubiLog("VodDetailScreenHelpers.getYouMayAlsoLikeContent")
   if content <> invalid
     info = m.cmsApi.createRelatedContentReqInfo(content.id, shouldKidsModeBeSentToServer(), limit)
     m.makeRequest({
@@ -1212,6 +1274,7 @@ End Function
 
 
 Function onVodDetailShouldPauseVideoPreviewChange(msg)
+  tubiLog("VodDetailScreenHelpers.onVodDetailShouldPauseVideoPreviewChange")
   shouldPause = msg.getData()
 
   if shouldPause = true

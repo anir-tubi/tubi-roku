@@ -6,6 +6,7 @@ Function init()
   m.offset = m.top.findNode("Offset")
   m.infoPanelGroup = m.top.findNode("infoPanelGroup")
   m.topHeaderGroup = m.top.findNode("topHeaderGroup")
+  m.topLabelParentGroup = m.top.findNode("topLabelParentGroup")
   m.sotTopLabelGroup = m.top.findNode("sotTopLabelGroup")
   m.liveBadgeHeader = m.top.findNode("liveBadgeHeader")
   m.channelNameHeader = m.top.findNode("channelNameHeader")
@@ -89,6 +90,7 @@ Function init()
   m.top.observeFieldScoped("liveBadgeHeaderText", "onLiveBadgeHeaderTextChange")
   m.top.observeFieldScoped("isTubiOriginal", "onIsTubiOriginalChange")
   m.top.observeFieldScoped("sotMarkers", "onSotMarkersChange")
+  m.top.observeFieldScoped("availabilityStarts", "onAvailabilityStartsChange")
   m.offset.observeFieldScoped("translation", "onOffsetTranslationChange")
   m.partnerLogo.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.rating.observeFieldScoped("loadStatus", "onPosterLoadStatus")
@@ -520,6 +522,58 @@ Function onIsTubiOriginalChange(msg)
   isTubiOriginal = msg.getData()
   m.tubiOriginal.visible = (isTubiOriginal = true)
 End Function
+
+
+Function onAvailabilityStartsChange(msg)
+  availabilityStarts = msg.getData()
+
+  if m.comingSoonBadge <> invalid
+    m.topLabelParentGroup.removeChild(m.comingSoonBadge)
+  end if
+  isComingSoon = isComingSoonBasedOnDate(availabilityStarts)
+  if isComingSoon = true
+    startDateTime = CreateObject("roDateTime")
+    startDateTime.FromISO8601String(availabilityStarts)
+    startDateTime.ToLocalTime()
+
+    month = startDateTime.GetMonth()
+    day = startDateTime.GetDayOfMonth().toStr()
+    sComingSoonDate = getTranslation("short_version_date_wo_year_format_" + month.toStr(), { day: day })
+    sComingSoonText = getTranslation("info_panel_coming_soon", { date: sComingSoonDate })
+    '::TODO:: Use localized full month day format when available: version Roku OS 12.0
+    ' sComingSoonDate = startDateTime.asDateStringLoc("MMMM d")
+
+    setTextOfComingSoonButton(sComingSoonText)
+    m.topLabelParentGroup.appendChild(m.comingSoonBadge)
+    m.sotTopLabelGroup.visible = false
+
+  else
+    m.sotTopLabelGroup.visible = true
+  end if
+End Function
+
+
+' Sets the text of the coming soon button, creating the (m.comingSoonBadge) button if it doesn't exist
+Function setTextOfComingSoonButton(sText)
+  buttonContent = {
+    title: sText
+    isPrimaryButton: true
+  }
+  content = CreateObject("roSGNode", "ContentNode")
+  content.update(buttonContent, true)
+
+  if m.comingSoonBadge = invalid
+    button = CreateObject("roSGNode", "EnhancedButton")
+    button.height = 62
+    button.padding = 33
+
+    m.comingSoonBadge = button
+  end if
+
+  m.comingSoonBadge.itemContent = content
+  m.comingSoonBadge.itemHasFocus = true
+End Function
+
 
 Function onSotTopLabelSignalsChange(msg)
   sotTopLabelSignals = msg.getData()
@@ -1199,6 +1253,7 @@ Function onTitleTypographyChange(msg)
     titleTypography = m.typographyConstants.ids.headerSmall
   end if
   setTypographyOfLabel(m.title, titleTypography)
+
   shouldCalculateHeight()
 End Function
 
@@ -1224,7 +1279,7 @@ Function onModeChange()
     ' used for movies and series on the homescreen and similar screens
     m.infoPanelGroup.appendChild(m.offset)
     offsetChildrenArray = [
-      m.sotTopLabelGroup,
+      m.topLabelParentGroup,
       m.title,
       m.twoLineInfo,
       m.descriptionGroup
@@ -1253,7 +1308,7 @@ Function onModeChange()
     ' used for movies on the details screen
     m.infoPanelGroup.appendChild(m.offset)
     offsetChildrenArray = [
-      m.sotTopLabelGroup,
+      m.topLabelParentGroup,
       m.title,
       m.twoLineInfo,
       m.descriptionGroup
@@ -1287,7 +1342,7 @@ Function onModeChange()
     ' used for episodes/series on the details screen
     m.infoPanelGroup.appendChild(m.offset)
     offsetChildrenArray = [
-      m.sotTopLabelGroup,
+      m.topLabelParentGroup,
       m.title,
       m.episode,
       m.twoLineInfo,

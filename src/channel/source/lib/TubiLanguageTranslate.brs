@@ -394,7 +394,10 @@ Function getTranslation_en_US()
     },
     "dialog_errorPrefix": {
       "description": "When the user is displayed an error, this is the prefix of the error ID that is presented to them: i.e. Error 101",
-      "message": "Error: "
+      "message": "Error: ",
+      "markedEmptyTranslationForLocale": [
+        "es_MX"
+      ]
     },
     "dialog_defaultError_title": {
       "description": "The default title of a popup error dialog",
@@ -458,7 +461,11 @@ Function getTranslation_en_US()
     },
     "dialog_button_ok": {
       "description": "Label of the dialog button to confirm the action the dialog is asking",
-      "message": "OK"
+      "message": "OK",
+      "markedEmptyTranslationForLocale": [
+        "fr_CA",
+        "es_MX"
+      ]
     },
     "dialog_button_off": {
       "description": "Label of the dialog button to turn something off: i.e. turn off closed captions",
@@ -1038,7 +1045,7 @@ Function getTranslation_en_US()
     },
     "onNow": {
       "description": "badge text to show program is not live but on now",
-      "message": "On Now"
+      "message": "ON NOW"
     },
     "day_1": {
       "description": "shortened version Monday, formatted with , and a space",
@@ -1115,6 +1122,54 @@ Function getTranslation_en_US()
     "short_version_date_format_12": {
       "description": "Shortened version of date format for the month of December",
       "message": "Dec {day}, {year}"
+    },
+    "short_version_date_wo_year_format_1": {
+      "description": "Shortened version of date format without the year for the month of January",
+      "message": "January {day}"
+    },
+    "short_version_date_wo_year_format_2": {
+      "description": "Shortened version of date format without the year for the month of February",
+      "message": "February {day}"
+    },
+    "short_version_date_wo_year_format_3": {
+      "description": "Shortened version of date format without the year for the month of March",
+      "message": "March {day}"
+    },
+    "short_version_date_wo_year_format_4": {
+      "description": "Shortened version of date format without the year for the month of April",
+      "message": "April {day}"
+    },
+    "short_version_date_wo_year_format_5": {
+      "description": "Shortened version of date format without the year for the month of May",
+      "message": "May {day}"
+    },
+    "short_version_date_wo_year_format_6": {
+      "description": "Shortened version of date format without the year for the month of June",
+      "message": "June {day}"
+    },
+    "short_version_date_wo_year_format_7": {
+      "description": "Shortened version of date format without the year for the month of July",
+      "message": "July {day}"
+    },
+    "short_version_date_wo_year_format_8": {
+      "description": "Shortened version of date format without the year for the month of August",
+      "message": "August {day}"
+    },
+    "short_version_date_wo_year_format_9": {
+      "description": "Shortened version of date format without the year for the month of September",
+      "message": "September {day}"
+    },
+    "short_version_date_wo_year_format_10": {
+      "description": "Shortened version of date format without the year for the month of October",
+      "message": "October {day}"
+    },
+    "short_version_date_wo_year_format_11": {
+      "description": "Shortened version of date format without the year for the month of November",
+      "message": "November {day}"
+    },
+    "short_version_date_wo_year_format_12": {
+      "description": "Shortened version of date format without the year for the month of December",
+      "message": "December {day}"
     },
     "channelGuide_error_fetchContent_description": {
       "description": "Onscreen message to indicate channel Guide content could not be loaded",
@@ -1370,19 +1425,35 @@ Function getTranslation_en_US()
     },
     "metadata_hoursAndMinutes": {
       "description": "a duration listed in hours and minutes (abbreviated for brevity and so singular and plural forms are irrelevant)",
-      "message": "{hours} h {minutes} min"
+      "message": "{hours} h {minutes} min",
+      "markedEmptyTranslationForLocale": [
+        "fr_CA",
+        "es_MX"
+      ]
     },
     "metadata_hours": {
       "description": "a duration listed in hours (abbreviated for brevity and so singular and plural forms are irrelevant)",
-      "message": "{hours} h"
+      "message": "{hours} h",
+      "markedEmptyTranslationForLocale": [
+        "fr_CA",
+        "es_MX"
+      ]
     },
     "metadata_minutes": {
       "description": "a duration listed in minutes (abbreviated for brevity and so singular and plural forms are irrelevant)",
-      "message": "{minutes} min"
+      "message": "{minutes} min",
+      "markedEmptyTranslationForLocale": [
+        "fr_CA",
+        "es_MX"
+      ]
     },
     "metadata_seconds": {
       "description": "a duration listed in seconds (abbreviated for brevity and so singular and plural forms are irrelevant)",
-      "message": "{seconds} sec"
+      "message": "{seconds} sec",
+      "markedEmptyTranslationForLocale": [
+        "fr_CA",
+        "es_MX"
+      ]
     },
     "metadata_seasons_plural": {
       "description": "Label of how many seasons of the current TV title",
@@ -1398,7 +1469,10 @@ Function getTranslation_en_US()
     },
     "metadata_series": {
       "description": "Label to indicate a title is a TV series",
-      "message": "Series"
+      "message": "Series",
+      "markedEmptyTranslationForLocale": [
+        "es_MX"
+      ]
     },
     "sponsor_brought_by": {
       "description": "When content is sponsored by an advertizer, then this text proceeds the image of the sponsor. The text and the image should make a complete sentence.",
@@ -1466,7 +1540,10 @@ Function getTranslation_en_US()
     },
     "linearVideoPlayer_buttonGuide": {
       "description": "Label of a Button to view the channel guide",
-      "message": "Guide"
+      "message": "Guide",
+      "markedEmptyTranslationForLocale": [
+        "fr_CA"
+      ]
     },
     "linearVideoPlayer_buttonGuide2": {
       "description": "Label of a Button to view the channel guide",
@@ -1808,11 +1885,19 @@ Function getTranslation_en_US()
     },
     "ad": {
       "description": "This label used for badge overlaid on top of a thumbnail to indicate it is associated with an AD. The text needs to be very few characters.",
-      "message": "AD"
+      "message": "AD",
+      "markedEmptyTranslationForLocale": [
+        "fr_CA",
+        "es_MX"
+      ]
     },
     "replay": {
       "description": "This label used for badge to indicate the content availability",
       "message": "Replay"
+    },
+    "info_panel_coming_soon": {
+      "description": "Label to indicate that the content is coming soon with the date of availability",
+      "message": "Coming {date}"
     },
     "info_panel_reminder_is_set": {
       "description": "Hint in the content metadata area informing the user that the reminder is set for this content",
@@ -1832,7 +1917,11 @@ Function getTranslation_en_US()
     },
     "cc_audio_overlay_audio": {
       "description": "Available audio tracks section header label.",
-      "message": "Audio"
+      "message": "Audio",
+      "markedEmptyTranslationForLocale": [
+        "fr_CA",
+        "es_MX"
+      ]
     },
     "thank_you_title": {
       "description": "title on the qr code overlay after submitting the video playback feedback.",
@@ -2044,7 +2133,10 @@ Function getTranslation_en_US()
     },
     "updated_terms_toast_header": {
       "description": "Header on the toast message informing the user of update ToS",
-      "message": "Important"
+      "message": "Important",
+      "markedEmptyTranslationForLocale": [
+        "fr_CA"
+      ]
     },
     "privacy_center_restart_channel": {
       "description": "Settings screen privacy center restart channel button label.",
@@ -2084,11 +2176,10 @@ Function getTranslation_en_US()
     },
     "live_on_day": {
       "description": "day label used in air date countdown timer",
-      "message": "{day} D"
-    },
-    "dialog_gdpr_manage_privacy_settings_error_description": {
-      "description": "Error dialog description shown due to one trust component library failure when clicking manage privacy settings.",
-      "message": "Please try restarting Tubi to update the privacy settings. Please email support@tubi.tv if this keeps happening."
+      "message": "{day} D",
+      "markedEmptyTranslationForLocale": [
+        "es_MX"
+      ]
     },
     "cc_audio_overlay_subtitles_mode": {
       "description": "Available modes displayed on closed caption overlay",

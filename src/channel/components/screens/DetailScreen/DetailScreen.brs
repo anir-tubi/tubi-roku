@@ -41,6 +41,8 @@ Function init()
   m.mainMenuSelected = false
   m.secondaryMenuSelected = false
 
+  m.isComingSoon = false ' Initialize coming soon flag
+
   m.Menu.observeFieldScoped("focusedChild", "onMenuFocusChange")
   m.SecondaryMenu.observeFieldScoped("focusedChild", "onSecondaryMenuFocusChange")
 
@@ -445,6 +447,50 @@ Function changeLikeDislikeButtonText()
 End Function
 
 
+Function onContentChange(msg) as Void
+  tubiLog("DetailScreen.onContentChange")
+  content = msg.getData()
+  isComingSoon = isComingSoonContent(content)
+
+  m.isComingSoon = isComingSoon
+  if isComingSoon = true
+    '// If the content is coming soon, remove the certain buttons from the menu and display the coming soon badge on the info panel
+    menuIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.PlayMenuItem.id)
+    addRemoveMenuItem(false, menuIndex)
+    menuIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.LikeMenuItem.id)
+    addRemoveMenuItem(false, menuIndex)
+    menuIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.DislikeMenuItem.id)
+    addRemoveMenuItem(false, menuIndex)
+    menuIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.LikeDislikeMenuItem.id)
+    addRemoveMenuItem(false, menuIndex)
+    menuIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.ResumeMenuItem.id)
+    addRemoveMenuItem(false, menuIndex)
+
+    '//Display the coming soon badge on the info panel
+    m.Info.availabilityStarts = m.top.content.availabilityStarts
+
+  else
+    m.Info.availabilityStarts = ""
+  end if
+
+  add = false
+  creator = content.creatorTensorApp
+  if creator <> invalid then
+    if getStatsigExperimentResource("roku_creator_m2", "roku_creator_m2_v1", true).enabled = false then
+      return
+    end if
+
+    add = true
+    m.CreatorMenuItem.title = creator.title
+    m.CreatorMenuItem.iconUrl = creator.images.logo[0]
+  end if
+
+  creatorButtonIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.CreatorMenuItem.id)
+  addRemoveMenuItem(add, creatorButtonIndex, m.CreatorMenuItem, [m.ResumeMenuItem, m.PlayMenuItem])
+
+End Function
+
+
 Function onIsHistory()
   tubiLog("DetailScreen.onIsHistory")
   'if removing from history, remove the resume button
@@ -498,7 +544,6 @@ Function onIsSeries()
     end if
 
   end if
-
 
   addRemoveMenuItem(m.top.isSeries, episodeListIndex, m.EpisodesMenuItem, menuItems)
 End Function
@@ -1005,26 +1050,6 @@ Function handleMenuItemSelected(itemSelected)
 End Function
 
 
-Function onContentChange(msg) as Void
-  content = msg.getData()
-
-  add = false
-  creator = content.creatorTensorApp
-  if creator <> invalid then
-    if getStatsigExperimentResource("roku_creator_m2", "roku_creator_m2_v1", true).enabled = false then
-      return
-    end if
-
-    add = true
-    m.CreatorMenuItem.title = creator.title
-    m.CreatorMenuItem.iconUrl = creator.images.logo[0]
-  end if
-
-  creatorButtonIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.CreatorMenuItem.id)
-  addRemoveMenuItem(add, creatorButtonIndex, m.CreatorMenuItem, [m.ResumeMenuItem, m.PlayMenuItem])
-End Function
-
-
 Function onRelatedContentChange()
   tubiLog("DetailScreen.onRelatedContentChange")
   relatedContent = m.top.relatedContent
@@ -1203,7 +1228,12 @@ Function onTransportVoiceRequest(msg)
 End Function
 
 
-Function handlePlayInput()
+Function handlePlayInput() as Void
+  if m.isComingSoon = true
+    '//If the content is coming soon, then we should not allow the user to play it.
+    return
+  end if
+
   itemFocused = m.Menu.content.getChild(m.Menu.itemFocused)
   if m.top.isVideoPreviewOn = true
     m.top.stopVideoPreview = true

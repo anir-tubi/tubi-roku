@@ -2542,6 +2542,7 @@ End Function
 
 Function updateTransportButtons(content)
   m.SkipTrailerButton.enabled = false
+  isComingSoon = isComingSoonContent(content)
 
   if m.playerControlExperimentType = "variant1"
     m.ProgressBar.highlightPointer = true
@@ -2553,16 +2554,18 @@ Function updateTransportButtons(content)
     if content.isTrailer = true
       m.Transport.translation = [0, 783]
       m.thumbnailMaxYOffset = 870
-      m.SkipTrailerButton.enabled = true
+      if isComingSoon = false
+        m.SkipTrailerButton.enabled = true
 
-      if content.type = "series"
-        m.SkipTrailerButton.text = getTranslation("videoPlayer_button_watchSeries")
-      else
-        m.SkipTrailerButton.text = getTranslation("videoPlayer_button_watchMovie")
+        if content.type = "series"
+          m.SkipTrailerButton.text = getTranslation("videoPlayer_button_watchSeries")
+        else
+          m.SkipTrailerButton.text = getTranslation("videoPlayer_button_watchMovie")
+        end if
+
+        'Thumbnail should be placed as the last child of the HUD component so that transport buttons or components do not overlay it.
+        m.HUD.insertChild(m.SkipTrailerButton, m.HUD.getChildCount() - 1)
       end if
-
-      'Thumbnail should be placed as the last child of the HUD component so that transport buttons or components do not overlay it.
-      m.HUD.insertChild(m.SkipTrailerButton, m.HUD.getChildCount() - 1)
 
       m.StartButton.uri = "pkg:/images/icon-resume.webp"
       m.TransportButtons.appendChild(m.StartButton)
@@ -2592,7 +2595,7 @@ Function updateTransportButtons(content)
     childrenCount = m.TransportButtons.getChildCount()
     m.TransportButtons.removeChildrenIndex(childrenCount, 0)
 
-    if content.isTrailer = true
+    if content.isTrailer = true AND isComingSoon = false
       m.SkipTrailerButton.enabled = true
 
       if content.type = "series"

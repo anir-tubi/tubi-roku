@@ -163,6 +163,7 @@ Function setupTitleAndConfig(itemContent) as Void
   if (variant = "portraitWithMetadata" OR variant = "detailScreenInfoPanel") AND m.title = invalid
     appendTitleToMetadataGroup()
   end if
+  appendComingSoonToMetadataGroup(itemContent)
 
   ' Resetting the visibility of the rating and sot badge.
   m.rating.visible = true
@@ -724,14 +725,14 @@ Function appendTitleToMetadataGroup()
   ' Create text label for title
   m.title = createObject("roSGNode", "Label")
   m.title.id = "title"
-  if isDetailScreenInfoPanel
+  if isDetailScreenInfoPanel = true
     m.title.update({
       width: 960
       height: 60
       vertAlign: "bottom"
     })
   end if
-  if isDetailScreenInfoPanel
+  if isDetailScreenInfoPanel = true
     setTypographyOfLabel(m.title, m.headerMediumFont)
   else
     setTypographyOfLabel(m.title, m.headerSmallFont)
@@ -742,6 +743,60 @@ Function appendTitleToMetadataGroup()
     m.metadataGroup.itemSpacings = [9, 3]
   end if
   setTypographyOfLabel(m.description, m.bodyMediumFont)
+End Function
+
+
+' Appends comingSoon badge to metadata group and configures spacing based on variant
+' @param itemContent - Content node with title
+Function appendComingSoonToMetadataGroup(itemContent) as Void
+  isDetailScreenInfoPanel = (m.top.variant = "detailScreenInfoPanel")
+
+  isComingSoon = isComingSoonContent(itemContent)
+
+  if m.comingSoonBadge <> invalid
+    m.metadataGroup.removeChild(m.comingSoonBadge)
+  end if
+
+  if isDetailScreenInfoPanel = false OR isComingSoon = false
+    return
+  end if
+
+  startDateTime = CreateObject("roDateTime")
+  startDateTime.FromISO8601String(itemContent.availabilityStarts)
+  startDateTime.ToLocalTime()
+
+  month = startDateTime.GetMonth()
+  day = startDateTime.GetDayOfMonth().toStr()
+  sComingSoonDate = getTranslation("short_version_date_wo_year_format_" + month.toStr(), { day: day })
+  sComingSoonText = getTranslation("info_panel_coming_soon", { date: sComingSoonDate })
+  '::TODO:: Use localized full month day format when available: version Roku OS 12.0
+  ' sComingSoonDate = startDateTime.asDateStringLoc("MMMM d")
+
+  setTextOfComingSoonButton(sComingSoonText)
+  m.metadataGroup.insertChild(m.comingSoonBadge, 0)
+
+End Function
+
+
+' Sets the text of the coming soon button, creating the (m.comingSoonBadge) button if it doesn't exist
+Function setTextOfComingSoonButton(sText)
+  buttonContent = {
+    title: sText
+    isPrimaryButton: true
+  }
+  content = CreateObject("roSGNode", "ContentNode")
+  content.update(buttonContent, true)
+
+  if m.comingSoonBadge = invalid
+    button = CreateObject("roSGNode", "EnhancedButton")
+    button.height = 62
+    button.padding = 33
+
+    m.comingSoonBadge = button
+  end if
+
+  m.comingSoonBadge.itemContent = content
+  m.comingSoonBadge.itemHasFocus = true
 End Function
 
 

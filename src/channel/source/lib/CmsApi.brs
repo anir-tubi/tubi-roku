@@ -208,6 +208,7 @@ Function cmsApi_createCategoriesListReqInfo(bKidsMode = false)
     is_kids_mode: bKidsMode
     content_mode: ""
     idfa: m.constants.deviceInfo.deviceAdId
+    include: ["coming_soon_in_browser_list"]
   })
 
   utmCampaignConfig = m.utmCampaignConfig

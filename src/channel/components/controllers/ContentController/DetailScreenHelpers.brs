@@ -21,6 +21,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     showVodDetailScreen(content, playbackSource, successCb, errorCb)
     return
   end if
+
   tubiLog("DetailScreenHelpers.showDetailScreen")
   '//Update the logo based on the current detail screen UI. For example, the previous (home) screen may been showing a modified skinAd logo
   showHideLogoBasedOnUiMode()
@@ -76,9 +77,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
         end if
 
       end if
-
     end if
-
 
     ' m.actionType variable is used for setting a callback function after successful a data fetch retry in the case where
     ' users select a menu button from the detail screen, but the original data fetch was unsuccessful. In this way,
@@ -277,11 +276,15 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     hasVideoresources = content.hasVideoresources
     airDatetime = content.airDatetime
     info = getAvailabilityTypeBadgeAndMatchTimeValues(airDatetime, hasVideoresources)
+    isComingSoon = isComingSoonContent(content)
+    if isComingSoon = true
+      info.availabilityType = m.constants.ui.contentTimings.upcoming
+    end if
+
     matchTime = info.matchTime
     badgeText = info.badgeText
     availabilityType = info.availabilityType
     detailScreen.availabilityType = availabilityType
-
     detailScreen.hasTrailer = (content.hasTrailer = true)
 
     bookmark = getBookmark(content.id)
@@ -379,7 +382,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
       end if
     end if
 
-    'Removie this code once the leaving soon is graduated.
+    'Remove this code once the leaving soon is graduated.
     canShowLeavingSoon = true
     if isNonEmptyArray(detailScreen.sotTopLabelSignals) = true
       for each sotTopSignal in detailScreen.sotTopLabelSignals
@@ -413,7 +416,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     detailScreen.lineTwoData = lineTwoData
     detailScreen.starring = stateSource.actors
     detailScreen.directors = stateSource.directors
-    detailScreen.reminderIsSet = (availabilityType = "upcoming" AND bookmark <> invalid)
+    detailScreen.reminderIsSet = (availabilityType = m.constants.ui.contentTimings.upcoming AND bookmark <> invalid)
     if content.needsLogin = true AND isLoggedInUser() = false
       detailScreen.loginReason = content.loginReason
       detailScreen.needsLoginHint = true ' because we do not repull the content after signed in.
@@ -520,17 +523,23 @@ End Function
 Function getSingleContentFromServer(content, successCallback, errorCallback)
   tubiLog("DetailScreenHelpers.getSingleContentFromServer")
   if content <> invalid
+    isComingSoon = isComingSoonContent(content)
 
-    singleRequestInfo = m.cmsApi.createSingleContentReqInfo(content.id, true, shouldKidsModeBeSentToServer())
-    m.makeRequest({
-      url: singleRequestInfo.url
-      requestType: m.constants.reqNames.getSingleContent
-      options: singleRequestInfo.options
-      successCallback: successCallback
-      errorCallback: errorCallback
-      responseType: "node"
-      isSignedInUser: isLoggedInUser()
-    })
+    if isComingSoon = false
+      singleRequestInfo = m.cmsApi.createSingleContentReqInfo(content.id, true, shouldKidsModeBeSentToServer())
+      m.makeRequest({
+        url: singleRequestInfo.url
+        requestType: m.constants.reqNames.getSingleContent
+        options: singleRequestInfo.options
+        successCallback: successCallback
+        errorCallback: errorCallback
+        responseType: "node"
+        isSignedInUser: isLoggedInUser()
+      })
+    else
+      tubiLog("DetailScreenHelpers.getSingleContentFromServer, display Coming Soon content")
+      successCallback(content)
+    end if
   end if
 End Function
 
@@ -626,9 +635,9 @@ Function handleSingleContentResponse(refreshedContent, sendTracking = true) as V
 End Function
 
 
-'if there is any afterfun has been passed to detail page execute that function
+'execute any valid afterFn Function that was been passed to detail page.
 '@detailScreen, roSGNode, a DetailScreen component to be populated
-'@afterFn: callback which will be triggered after fetching data from backend
+'@afterFn: callback Function which will be triggered after fetching data from backend
 Function handleDetailScreenAfterFn(detailScreen, afterFn)
   ' making sure the app launch animation logo is completed before invoking playHelper/resumeHelper
   if m.top.fadeInContentController = true OR afterFn = episodesHelper
@@ -1709,6 +1718,7 @@ End Function
 
 
 Function onRelatedContentSelected(msg)
+  tubiLog("DetailScreenHelper.onRelatedContentSelected")
   detailScreen = msg.getRoSGNode()
   content = invalid
   if detailScreen <> invalid AND detailScreen.relatedContent <> invalid
@@ -1730,6 +1740,7 @@ End Function
 
 
 Function onCloseErrorModal()
+  tubiLog("DetailScreenHelper.onCloseErrorModal")
   '//exit the detail screen entirely since the content could not be gathered.
   onDetailBackButtonPressedChange()
 End Function
@@ -1738,6 +1749,7 @@ End Function
 ' Sends ComponentInteractionEvent for Back/Left on detail page only when user actually pressed Back/Left (observer path).
 ' When invoked directly (onCloseErrorModal, DeeplinkHelpers) msg is invalid - do not send event.
 Function onDetailBackButtonPressedChange(msg = invalid)
+  tubiLog("DetailScreenHelper.onDetailBackButtonPressedChange")
   detailScreen = invalid
   if msg <> invalid then detailScreen = msg.getRoSGNode()
   if detailScreen = invalid then detailScreen = getTopDetailScreenFromStack()
@@ -1830,6 +1842,7 @@ Function trailerHelper(screen)
         trailerContent.url = content.trailerInfo.url
         trailerContent.streamFormat = content.trailerInfo.streamFormat
         trailerContent.id = content.trailerInfo.id
+        trailerContent.availabilityStarts = content.availabilityStarts
         trailerContent.subtitleTracks = []
         trailerContent.subtitleConfig = invalid
         trailerContent.rating = content.rating
@@ -1994,16 +2007,20 @@ End Function
 
 Function playVideoDetailScreen(detailScreen, playbackSource = { "srcForAnalytic": "unknown", "srcForAds": "unknown" })
   tubiLog("DetailScreenHelpers.playVideoDetailScreen")
-  if detailScreen <> invalid AND isFetchingInProgress(detailScreen) <> true
-    detailScreen.playbackSource = playbackSource
-    if isPlayable(detailScreen) = true
-      playHelper(detailScreen)
-    else
-      m.actionType = playHelper
-      detailScreen.isLoading = true
-      getSingleContentFromServer(detailScreen.content, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
-    end if
 
+  if detailScreen <> invalid AND isFetchingInProgress(detailScreen) <> true
+
+    isComingSoon = isComingSoonContent(detailScreen.content)
+    if isComingSoon = false
+      detailScreen.playbackSource = playbackSource
+      if isPlayable(detailScreen) = true
+        playHelper(detailScreen)
+      else
+        m.actionType = playHelper
+        detailScreen.isLoading = true
+        getSingleContentFromServer(detailScreen.content, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
+      end if
+    end if
   end if
 End Function
 
@@ -2136,6 +2153,11 @@ Function skipDetailScreen(refreshedContent) as Void
   if detailScreen <> invalid
     populateDetailScreen(detailScreen, refreshedContent, false, -1)
     nowPos = 0
+
+    if isComingSoonContent(detailScreen.content) = true
+      tubiLog("DetailScreenHelpers.skipDetailScreen: content is coming soon, not skipping to player")
+      return
+    end if
 
     if refreshedContent.needsLogin = false AND detailScreen.availabilityType <> m.constants.ui.contentTimings.upcoming
       if m.enteredFromDeeplink = true AND m.deeplinkContent <> invalid AND m.deeplinkContent.nowPos >= 0
@@ -2315,6 +2337,10 @@ Function getDetailScreenAnalyticsPageInfo(content, constants)
   hasVideoResources = content.hasVideoResources
 
   info = getAvailabilityTypeBadgeAndMatchTimeValues(airDateTime, hasVideoResources)
+  isComingSoon = isComingSoonContent(content)
+  if isComingSoon = true
+    info.availabilityType = m.constants.ui.contentTimings.upcoming
+  end if
   availabilityType = info.availabilityType
 
   if content <> invalid AND type(content.id) = "roString"
@@ -2488,6 +2514,7 @@ End Function
 
 
 Function onRelatedContentToPlay(msg)
+  tubiLog("DetailScreenHelper.onRelatedContentToPlay")
   screen = msg.getRoSGNode()
   if screen <> invalid then
     content = screen.relatedContentToPlay

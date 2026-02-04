@@ -9,7 +9,8 @@
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/lib/ComingSoonMixin.brs"/>
 
   <interface>
     <!-- INPUTS -->
@@ -141,7 +142,7 @@
     <!-- content to populated the RelatedGrid -->
     <field id="relatedContent" alias="RelatedGrid.content" />
 
-    <field id="content" type="node" />
+      <field id="content" type="node" alwaysNotify="true" />
 
     <!-- State that lets the player know how it is being used, so it can determine
         -  how it should do tracking.
@@ -168,6 +169,7 @@
     <field id="sotMarkers" alias="DetailInfoPanel.sotMarkers" />
     <field id="sotMetaData" alias="DetailInfoPanel.sotMetaData" />
     <field id="sotTopLabelSignals" alias="DetailInfoPanel.sotTopLabelSignals" />
+
 
     <!-- OUTPUTS -->
 

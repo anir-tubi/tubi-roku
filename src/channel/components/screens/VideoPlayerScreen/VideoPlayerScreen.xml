@@ -20,8 +20,8 @@
   <script type="text/brightscript" uri="pkg:/source/lib/PlayerLogLib.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnalyticsMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/PlayerStatsMixin.brs" />
-  <script type="text/brightscript"
-    uri="pkg:/components/screens/VideoPlayerScreen/VideoPlayerMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ComingSoonMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/screens/VideoPlayerScreen/VideoPlayerMixin.brs" />
 
   <interface>
 

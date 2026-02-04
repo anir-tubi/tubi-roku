@@ -787,6 +787,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer as Object, t
 
   if contentFromServer.is_recurring <> invalid then translatedContent.isRecurring = contentFromServer.is_recurring
   if contentFromServer.availability_ends <> invalid AND hideLeavingSoon = false then translatedContent.availabilityEnds = contentFromServer.availability_ends
+  if contentFromServer.availability_starts <> invalid then translatedContent.availabilityStarts = contentFromServer.availability_starts
   if contentFromServer.air_datetime <> invalid then translatedContent.airDateTime = contentFromServer.air_datetime
 
   hasVideoResources = false

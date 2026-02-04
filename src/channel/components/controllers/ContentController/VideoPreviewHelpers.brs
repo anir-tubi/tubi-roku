@@ -162,7 +162,10 @@ Function onVideoPreviewStateChanged(msg)
             playVideoDetailScreen(currentScreen, playbackSource)
           end if
         else if currentScreen.subType() = "VodDetailScreen"
-          playSelectedVodContent(currentScreen.content, currentScreen.playbackSource, currentScreen.episodes)
+          isComingSoon = isComingSoonContent(currentScreen.content)
+          if isComingSoon = false
+            playSelectedVodContent(currentScreen.content, currentScreen.playbackSource, currentScreen.episodes)
+          end if
         else
           '//by default open the detail screen
           playbackSource = {

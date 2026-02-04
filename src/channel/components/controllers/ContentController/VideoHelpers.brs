@@ -644,8 +644,14 @@ Function onVideoPlayerState(msg)
       finishedContent = videoPlayer.content
 
       if finishedContent.isTrailer = true
-        stopVideoContent(videoPlayer)
-        playActualContentFromDetailScreen()
+        isComingSoon = isComingSoonContent(finishedContent)
+        if isComingSoon = false AND getStatsigExperimentResource("roku_player_improvement", "roku_autoplay_after_trailer_v1", true).enabled = true
+          stopVideoContent(videoPlayer)
+          playActualContentFromDetailScreen()
+        else
+          returnToDetailScreenFromVideo(true, true, "trailer")
+        end if
+
       else if videoPlayer.upNextContentToAutoplay <> invalid
         ' the video ended while the autoplay UI was still present, now autoplay the chosen video
         ' or autoplay the video that was focused when the timer expired
@@ -1017,25 +1023,41 @@ End Function
 Function onSkipTrailer(msg) as Void
   tubiLog("VideoHelpers.onSkipTrailer")
   skipTrailer = msg.getData()
+  isComingSoon = false
+
+  detailScreen = getHiddenScreen()
+  if detailScreen <> invalid AND detailScreen.id = m.constants.ui.screenIds.vodDetailScreen OR detailScreen.id = m.constants.ui.screenIds.detailScreen
+    isComingSoon = isComingSoonContent(detailScreen.content)
+  end if
+
+
   experiment = getStatsigExperimentResource("roku_content_details", "roku_content_details_v2", false)
   if experiment.enabled = true AND skipTrailer = true
-    videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
-    if videoPlayer <> invalid AND videoPlayer.content <> invalid
-      screen = getHiddenScreen()
-      if screen <> invalid AND screen.id = m.constants.ui.screenIds.vodDetailScreen AND screen.content <> invalid
-        stopVideoContent(videoPlayer)
-        playSelectedVodContent(screen.content, screen.playbackSource, screen.episodes)
+    if isComingSoon = false
+      videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
+      if videoPlayer <> invalid AND videoPlayer.content <> invalid
+        if detailScreen <> invalid AND detailScreen.id = m.constants.ui.screenIds.vodDetailScreen AND detailScreen.content <> invalid
+          stopVideoContent(videoPlayer)
+          playSelectedVodContent(detailScreen.content, detailScreen.playbackSource, detailScreen.episodes)
+        end if
       end if
+    else
+      returnToDetailScreenFromVideo(true, true, "trailer")
     end if
     return
   end if
 
   if skipTrailer = true
-    videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
 
-    if videoPlayer <> invalid
-      stopVideoContent(videoPlayer)
-      playActualContentFromDetailScreen()
+    if isComingSoon = false
+      videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
+
+      if videoPlayer <> invalid
+        stopVideoContent(videoPlayer)
+        playActualContentFromDetailScreen()
+      end if
+    else
+      returnToDetailScreenFromVideo(true, true, "trailer")
     end if
 
   end if

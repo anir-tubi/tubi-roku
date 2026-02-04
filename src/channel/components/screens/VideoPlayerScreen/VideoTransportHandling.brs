@@ -69,7 +69,13 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
           if m.focusedButtonIndex = 0
 
             if m.top.isTrailer = true
-              setFocusToComponent(m.SkipTrailerButton)
+              skipIndex = m.NodeHelpers.getChildIndexById(m.HUD, m.SkipTrailerButton.id)
+              if skipIndex >= 0
+                '//Make sure the skip button is available in the HUD before setting focus to the button
+                setFocusToComponent(m.SkipTrailerButton)
+              else
+                return false
+              end if
             else
               return false
             end if

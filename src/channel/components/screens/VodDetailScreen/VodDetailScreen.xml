@@ -3,8 +3,11 @@
   <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/UserMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ComingSoonMixin.brs" />
   <script type="text/brightscript" uri="VodDetailScreenAnalytics.brs" />
   <script type="text/brightscript" uri="VodDetailScreen.brs" />
 
@@ -38,6 +41,7 @@
     <field id="shouldRefreshScreen" type="boolean" value="false" alwaysNotify="true" />
 
     <!-- OUTPUTS -->
+
     <field id="backButtonPressed" type="boolean" alwaysNotify="true" />
     <field id="openSideNav" type="boolean" alwaysNotify="true" />
     <field id="selectedRelatedContent" alias="relatedContentContainer.selectedContent" />
