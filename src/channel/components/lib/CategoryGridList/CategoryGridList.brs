@@ -1108,12 +1108,9 @@ End Function
 ' Translates row list to position [0,0] and sets focus after animation completes
 ' Handles smooth navigation from skin ads with delayed focus
 Function translateListAndSetFocus()
-  callback = sub()
-    m.top.lastFocusedList = "rowList"
-    m.rowList.setFocus(true)
-  end sub
-
-  slideFadeGeneral(m.rowList, [0, 0], "in", 0.3, 0, 1, true, callback)
+  m.rowList.translation = [0, 0]
+  m.top.lastFocusedList = "rowList"
+  m.rowList.setFocus(true)
   m.top.hideInfoPanel = false
   updateRowItemFocused()
 End Function

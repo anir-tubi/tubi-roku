@@ -1568,7 +1568,7 @@ Function onRowFocusedItemChange(msg) as Void
   if screen.oldRowFocusedItem <> invalid AND screen.oldRowFocusedItem.gridItemType = m.constants.ui.gridItemTypes.skinAd
     m.videoPreviewPlayer.visible = false
   end if
-  m.videoTileOverlayGroup.visible = isVideoTileEnabled
+  m.videoTileOverlayGroup.visible = isVideoTileEnabled AND screen.lastFocusedList = "rowList"
 
   ' Figure out a better way to handle this.
   if isVideoTileEnabled = false OR focusedItem.gridItemType = m.constants.ui.gridItemTypes.skinAd
