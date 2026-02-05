@@ -8,6 +8,8 @@ Function initSideNav()
   m.SideNav.observeFieldScoped("profileSelected", "onProfileSelected")
   m.SideNav.isUserInMultiAccount = isUserInMultiAccount()
 
+  createTooltipForAddAccounts()
+
   m.SideNav.createMenuItems = true
 
   ' display Espanol, TV, Movies menu items only if the countryCode is US
@@ -191,7 +193,7 @@ Function onSideNavItemSelected()
         if isKidsUIOn() = true
           if needsToShowAgeVerificationScreen() = true then
             showAgeVerificationScreenAtKidsModeExit(m.uiMode)
-          else if isUserInMultiAccount() = true AND isLoggedInUser(authInfo) = true
+          else if isUserInMultiAccount() = true AND isLoggedInUser(authInfo) = true AND shouldShowPWScreenToExitKidsMode(authInfo.tubiId) = true
             showPasswordValidateScreen(authInfo, authInfo, onPasswordValidateKidsModeExit)
             hideNavMenu(false)
           else
@@ -642,7 +644,11 @@ Function createProfileSelectionListContentNode()
 
       if profile.tubiId = currentProfileId
         menuItem.sideIconUrl = "pkg:/images/upArrow.png"
-        menuItem.shortDescriptionLine1 = getTranslation("profile_switch_account")
+        if m.sideNav.showAddAccountsTooltip = true
+          menuItem.shortDescriptionLine1 = getTranslation("add_more_accounts")
+        else
+          menuItem.shortDescriptionLine1 = getTranslation("profile_switch_account")
+        end if
         menuItems.insertChild(menuItem, 0)
       else
         menuItems.appendChild(menuItem)
@@ -676,4 +682,29 @@ Function showHideProfileMenu(show = true)
     m.sideNav.profileSelectionMenuVisible = false
   end if
 
+End Function
+
+
+Function createTooltipForAddAccounts()
+  if m.SideNav.isUserInMultiAccount = true
+    ' tool tip and all related code can be removed once multi account experiment is graduated
+    if m.multiAccountVisitCount = 0
+      visitCount = regRead("multiVisitCount", "visit")
+      if visitCount = invalid
+        count = 1
+      else
+        count = visitCount.toInt()
+        count = count + 1
+      end if
+
+      m.multiAccountVisitCount = count
+      regWrite("multiVisitCount", count.toStr(), "visit")
+
+      profiles = m.tubiAuthUpdate.getAllProfilesAuthInfo()
+
+      if profiles.count() < 3 AND (m.multiAccountVisitCount = 2 OR m.multiAccountVisitCount = 3)
+        m.sideNav.showAddAccountsTooltip = true
+      end if
+    end if
+  end if
 End Function

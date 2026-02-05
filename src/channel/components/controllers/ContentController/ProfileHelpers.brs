@@ -1,5 +1,5 @@
 ' @constants: assocArray, constants as set in Constants.brs
-Function showProfileSelectorScreen(constants, profiles = invalid)
+Function showProfileSelectorScreen(constants, profiles = invalid, disableBack = false)
   tubiLog("ProgileHelpers.showProfileSelectorScreen")
 
   showHideLogo(m.constants.logoType.tubi)
@@ -11,6 +11,7 @@ Function showProfileSelectorScreen(constants, profiles = invalid)
   profileSelectorScreen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
   profileSelectorScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
   profileSelectorScreen.observeFieldScoped("profileSelected", "onProfileSelected")
+  profileSelectorScreen.disableBack = disableBack
   profileSelectorScreen.isStackable = true
   profileSelectorScreen.screenLevel = constants.ui.screenLevels.signInScreen
 
@@ -149,13 +150,15 @@ Function handleProfileSelectionViaGate(profileSelected)
   if authInfo.tubiId <> profileAuthInfo.tubiId
 
     userSwitchAction = getUserSwitchAction(authInfo, profileAuthInfo)
-    if userSwitchAction = "passwordGate"
+    sourceProfile = pickSourceProfileForPWScreen(authInfo, profileAuthInfo)
+
+    if userSwitchAction = "passwordGate" AND shouldShowPWScreenToExitKidsMode(sourceProfile.tubiId) = true
       showPasswordValidateScreen(authInfo, profileAuthInfo, onPasswordValidateSubmitted)
     else if userSwitchAction = "pinGate"
       processKidsPinGate(authInfo, profileAuthInfo)
     else if userSwitchAction = "ageGate" AND needsToShowAgeVerificationScreen() = true
       showAgeVerificationScreenAtKidsModeExit(m.uiMode)
-    else if userSwitchAction = "signInPasswordGate"
+    else if userSwitchAction = "signInPasswordGate" AND shouldShowPWScreenToExitKidsMode(sourceProfile.tubiId) = true
       showPasswordValidateScreen(authInfo, profileAuthInfo, onEmailPasswordValidateSubmitted)
     else if userSwitchAction = "NotAllowed"
       'do nothing here
@@ -220,9 +223,9 @@ Function onSwitchProfileSuccess(authInfo)
 
   m.spinner.visible = true
   m.spinner.setFocus(true)
-
-  setUiModeForProfileSelected(authInfo)
   setSideNavForProfileSelected(authInfo)
+  setUiModeForProfileSelected(authInfo)
+
   resetUserServerPersistentData()
 
   if isNonEmptyString(authInfo.parentId) = true
@@ -537,17 +540,24 @@ End Function
 
 
 
+' Returns the appropriate profile to use as name source based on auth type
+' @param authInfo - Current user's auth info
+' @param profileAuthInfo - Target profile's auth info
+Function pickSourceProfileForPWScreen(authInfo, profileAuthInfo)
+
+  if isKidsProfile(authInfo) = true
+    return profileAuthInfo
+  else if isLoggedInUser(authInfo) = true
+    return authInfo
+  end if
+  return profileAuthInfo
+End Function
+
+
 Function showPasswordValidateScreen(authInfo, profileAuthInfo, successCallback = invalid)
   m.confirmPasswordScreen = CreateObject("roSGNode", "ConfirmPasswordScreen")
 
-  if isKidsProfile(authInfo) = true
-    nameSource = profileAuthInfo
-  else if isLoggedInUser(authInfo) = true
-    nameSource = authInfo
-  else
-    nameSource = profileAuthInfo
-  end if
-
+  nameSource = pickSourceProfileForPWScreen(authInfo, profileAuthInfo)
   name = nameSource.name
 
   if isNonEmptyString(name) = false
@@ -651,6 +661,9 @@ Function onPasswordValidateSuccess(response)
       profileId = profileAuthInfo.tubiId
     end if
 
+    currentAuthInfo = m.tubiAuthUpdate.getAuthInfo()
+    updatePasswordExpiryTimeForProfile(currentAuthInfo)
+
     if profileId = "guest"
       handleGuestProfileSelection()
     else
@@ -664,6 +677,8 @@ End Function
 Function onPasswordValidateKidsModeExitSuccess(response)
   if response <> invalid AND response.valid = true AND isConfirmPasswordScreen() = true
     disableKidsModeFromSideNav()
+    authInfo = m.tubiAuthUpdate.getAuthInfo()
+    updatePasswordExpiryTimeForProfile(authInfo)
   else
     onPasswordValidateError(response)
   end if
@@ -896,6 +911,11 @@ End Function
 Function onSignInToChangeProfileResponse(response)
 
   isUsrInMultiAccount = isUserInMultiAccount()
+  dateTime = CreateObject("roDateTime")
+  nowTime = dateTime.AsSeconds()
+
+  passwordExpireTS = nowTime + m.constants.timers.coppaFailTimeout
+  response["pwexpts"] = passwordExpireTS
   m.tubiAuthUpdate.handleRegistration(response, isUsrInMultiAccount)
 
 
@@ -1075,4 +1095,44 @@ Function handleInvalidKidSignupError(errorCode)
   title = getTranslation("dialog_defaultError_title")
   buttons = [getTranslation("dialog_button_ok")]
   showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, handlerFun)
+End Function
+
+
+Function updatePasswordExpiryTimeForProfile(profileAuthInfo)
+  if profileAuthInfo <> invalid AND isNonEmptyString(profileAuthInfo.tubiId) = true AND profileAuthInfo.count() > 0
+    dateTime = CreateObject("roDateTime")
+    nowTime = dateTime.AsSeconds()
+
+    passwordExpireTS = nowTime + m.constants.timers.coppaFailTimeout
+    paswdExpTimeStamp = { "pwexpts": passwordExpireTS }
+
+    m.tubiAuthUpdate.createOrUpdateProfileAuth(profileAuthInfo.tubiId, paswdExpTimeStamp)
+
+  end if
+End Function
+
+
+Function shouldShowPWScreenToExitKidsMode(tubiId)
+  if isNonEmptyString(tubiId) = true
+
+    profileAuthInfo = m.tubiAuthUpdate.getProfileAuthInfo(tubiId)
+
+    if profileAuthInfo <> invalid
+      dateTime = CreateObject("roDateTime")
+      nowTime = dateTime.AsSeconds()
+
+      if isString(profileAuthInfo.pwExpTs) = true
+        passwordExpireTS = profileAuthInfo.pwExpTs.toInt()
+      else if isInteger(profileAuthInfo.pwExpTs) = true
+        passwordExpireTS = profileAuthInfo.pwExpTs
+      else
+        passwordExpireTS = 0
+      end if
+
+      if passwordExpireTS > nowTime
+        return false
+      end if
+    end if
+  end if
+  return true
 End Function

@@ -97,6 +97,8 @@
 
     <field id="profileSelected" type="string" alwaysNotify="true" />
 
+    <field id="showAddAccountsTooltip" type="boolean" value="false" />
+
   </interface>
 
   <children>

@@ -60,6 +60,10 @@ Function init()
   ' The reason why we are also storing it's reference in m scope for better performance since we access the sdk instance a lot of items during the app session.
   m.oneTrust = invalid
 
+
+  ' Used to keep track of the number of times the user has visited the multi account experiment.
+  m.multiAccountVisitCount = 0
+
   m.global.addField("statsigExposureInfo", "assocarray", false)
   m.global.observeFieldScoped("statsigExposureInfo", "onStatsigExposureInfoChange")
 
@@ -925,7 +929,12 @@ Function setUiModeAndLoadContent()
     handleDeeplink()
   else if isUserInMultiAccount() = true AND m.uiMode <> m.constants.ui.modes.kidsAgeGate
     profiles = m.tubiAuthUpdate.getAllProfilesAuthInfo()
-    showProfileSelectorScreen(m.constants, profiles)
+
+    if profiles.count() > 2 OR m.multiAccountVisitCount = 1
+      showProfileSelectorScreen(m.constants, profiles, true)
+    else
+      startChannelFromAppLoad()
+    end if
   else
     startChannelFromAppLoad()
   end if
@@ -3338,8 +3347,12 @@ Function setGuestUserHasAgeInfo(hasAge)
   }
 
   if hasAge = true
-    ' update with the expire time used if the user passed the age gate
-    hasAgeStored.expireTime = nowTime + m.constants.timers.coppaPassTimeout
+    if isUserInMultiAccount() = true
+      hasAgeStored.expireTime = nowTime + m.constants.timers.coppaFailTimeout
+    else
+      ' update with the expire time used if the user passed the age gate
+      hasAgeStored.expireTime = nowTime + m.constants.timers.coppaPassTimeout
+    end if
   end if
 
   hasAgeStoredJson = FormatJson(hasAgeStored)

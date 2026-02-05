@@ -1834,6 +1834,7 @@ Function getConstants()
   defaultDarkTransparentForeground75 = "THEME_defaultDarkTransparentForeground75_THEME"
   defaultDarkTransparentScrim = "THEME_defaultDarkTransparentScrim_THEME"
   defaultDarkSolidSurface10 = "THEME_defaultDarkSolidSurface10_THEME"
+  defaultDarkSolidSurface10Inverse = "THEME_defaultDarkSolidSurface10Inverse_THEME"
   defaultDarkSolidSurface20 = "THEME_defaultDarkSolidSurface20_THEME"
   defaultDarkStatusSuccess = "THEME_defaultDarkStatusSuccess_THEME"
   defaultDarkStatusCaution = "THEME_defaultDarkStatusCaution_THEME"
@@ -1864,6 +1865,7 @@ Function getConstants()
   kidsDarkTransparentForeground75 = "THEME_kidsDarkTransparentForeground75_THEME"
   kidsDarkTransparentScrim = "THEME_kidsDarkTransparentScrim_THEME"
   kidsDarkSolidSurface10 = "THEME_kidsDarkSolidSurface10_THEME"
+  kidsDarkSolidSurface10Inverse = "THEME_kidsDarkSolidSurface10Inverse_THEME"
   kidsDarkSolidSurface20 = "THEME_kidsDarkSolidSurface20_THEME"
   'kidsDarkStatusSuccess = "THEME_kidsDarkStatusSuccess_THEME"   '//::NOTE:: not currently being used
   kidsDarkStatusCaution = "THEME_kidsDarkStatusCaution_THEME"
@@ -1920,6 +1922,7 @@ Function getConstants()
 
     inversePrimaryTextColor: defaultLightPrimaryForeground
     inverseNeutralColor2: defaultLightTransparentForeground10
+    inverseNeutralColor: defaultDarkSolidSurface10Inverse
     defaultDarkTransparentAccent20: defaultDarkTransparentAccent20
   }
 
@@ -1938,6 +1941,7 @@ Function getConstants()
     neutralColor3: kidsDarkTransparentForeground5
     neutralSolidColor: kidsDarkSolidSurface10
     neutralSolidColor2: kidsDarkSolidSurface20
+    inverseNeutralColor: kidsDarkSolidSurface10Inverse
     backgroundColorLight: kidsDarkPrimaryForeground
     backgroundColorLight2: kidsDarkTransparentForeground75
     shadeColor: kidsDarkTransparentBackground75

@@ -943,7 +943,7 @@ Function onLogOutProfileCompleted()
     handleRegularProfileSelection(profileId)
   else if profiles.count() > 1
     m.sideNav.isUserInMultiAccount = true
-    showProfileSelectorScreen(m.constants, profiles)
+    showProfileSelectorScreen(m.constants, profiles, true)
   end if
 End Function
 

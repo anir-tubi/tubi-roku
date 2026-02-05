@@ -78,6 +78,8 @@ Function onKeyEvent(key, press) as Boolean
       m.profileMenu.setFocus(true)
       m.continueGuestButton.itemHasFocus = false
       return true
+    else if key = "back" AND m.top.disableBack = true
+      return true
     end if
   end if
 

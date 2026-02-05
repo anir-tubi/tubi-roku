@@ -15,6 +15,8 @@ Function init()
   m.top.observeFieldScoped("itemRequested", "onItemRequested")
   m.top.observeFieldScoped("selectedItemRequested", "onSelectedItemRequested")
   m.top.observeFieldScoped("createMenuItems", "onCreateMenuItems")
+  m.top.observeFieldScoped("showAddAccountsTooltip", "onShowAddAccountsTooltipChanged")
+  m.bottomTextStr = getTranslation("profile_switch_account")
   m.ItemGroups = m.top.findNode("itemGroups")
   m.MainContent = m.top.findNode("MainContent")
   m.background = m.top.findNode("background")
@@ -26,6 +28,7 @@ Function init()
   m.profileSelectionMenu.observeFieldScoped("itemFocused", "onProfileSelectionMenuItemFocused")
   m.profileSelectionMenu.observeFieldScoped("visible", "onProfileSelectionMenuVisibleChanged")
   m.top.observeFieldScoped("profileSelectionMenuContent", "onProfileSelectionMenuContentChanged")
+
 End Function
 
 
@@ -96,7 +99,7 @@ Function createMainContent(item)
       if m.top.isUserInMultiAccount = true
         contentNode.title = guestTitle
         contentNode.shortDescriptionLine1 = guestTitle
-        contentNode.bottomTxt = getTranslation("profile_switch_account")
+        contentNode.bottomTxt = m.bottomTextStr
         contentNode.sideIconUrl = "pkg:/images/downArrow.png"
         contentNode.iconUrl = "pkg:/images/icon-account.webp"
         contentNode.filledIconUrl = "pkg:/images/sideNavAccountFilled.webp"
@@ -110,7 +113,7 @@ Function createMainContent(item)
 
     else
       if m.top.isUserInMultiAccount = true
-        contentNode.bottomTxt = getTranslation("profile_switch_account")
+        contentNode.bottomTxt = m.bottomTextStr
         contentNode.sideIconUrl = "pkg:/images/downArrow.png"
         contentNode.iconUrl = m.top.profileUrl
         contentNode.filledIconUrl = m.top.profileUrl
@@ -210,6 +213,13 @@ Function onThemeChange(msg = invalid)
     m.profileSelectionMenu.focusBitmapBlendColor = theme.focusedColor
     m.profileSelectionMenuBgTop.blendColor = theme.neutralsolidcolor2
     m.profileSelectionMenuBgBottom.blendColor = theme.neutralsolidcolor2
+    if m.addAccountsTooltip <> invalid
+      m.addAccountsTooltip.backgroundColor = theme.inverseneutralcolor
+      m.addAccountsTooltip.arrowColor = theme.inverseneutralcolor
+      m.addAccountsTooltip.textColor = theme.focusedtextcolor
+    end if
+    m.toolTipColor = theme.inverseneutralcolor
+    m.toolTipTextColor = theme.focusedtextcolor
   end if
 End Function
 
@@ -226,7 +236,7 @@ Function onSignInChange()
       if m.top.isUserInMultiAccount = true
         m.profileContent.title = guestTitle
         m.profileContent.shortDescriptionLine1 = guestTitle
-        m.profileContent.bottomTxt = getTranslation("profile_switch_account")
+        m.profileContent.bottomTxt = m.bottomTextStr
         m.profileContent.sideIconUrl = "pkg:/images/downArrow.png"
         m.profileContent.iconUrl = "pkg:/images/icon-account.webp"
         m.profileContent.filledIconUrl = "pkg:/images/sideNavAccountFilled.webp"
@@ -241,7 +251,7 @@ Function onSignInChange()
       end if
     else
       if m.top.isUserInMultiAccount = true
-        m.profileContent.bottomTxt = getTranslation("profile_switch_account")
+        m.profileContent.bottomTxt = m.bottomTextStr
         m.profileContent.shortDescriptionLine1 = ""
         m.profileContent.sideIconUrl = "pkg:/images/downArrow.png"
         m.profileContent.iconUrl = m.top.profileUrl
@@ -654,12 +664,44 @@ Function onOpenedChanged()
     setContentActive(m.MainContent)
     animateClippingRect(m.mainItems, [0, 0, m.mainItemsOriginalItemSize[0], 1080], 0.2)
     resize(m.background, m.mainItemsOriginalItemSize[0], m.mainItemsOriginalItemSize[1], 0.2)
+    if m.addAccountsTooltip <> invalid
+      m.addAccountsTooltip.visible = false
+    end if
   else
     setContentActive(m.MainContent, false)
     animateClippingRect(m.mainItems, [0, 0, 108, 1080], 0.2)
     resize(m.background, 100, m.mainItems.itemSize[1], 0.2)
     m.listItemSelected = invalid
     m.oldSideNavFocusedButton = invalid
+  end if
+End Function
+
+
+Function onShowAddAccountsTooltipChanged()
+  if m.top.isUserInMultiAccount = true AND m.top.showAddAccountsTooltip = true
+    m.bottomTextStr = getTranslation("add_more_accounts")
+    if m.addAccountsTooltip = invalid
+      m.addAccountsTooltip = CreateObject("roSGNode", "Tooltip")
+      m.addAccountsTooltip.arrowPlacement = "left"
+      m.addAccountsTooltip.showArrow = true
+      transX = m.ItemGroups.translation[0] + 100
+      transY = m.ItemGroups.translation[1]
+      m.addAccountsTooltip.translation = [transX, transY]
+      m.addAccountsTooltip.backgroundColor = m.toolTipColor
+      m.addAccountsTooltip.arrowColor = m.toolTipColor
+      m.addAccountsTooltip.textColor = m.toolTipTextColor
+      m.addAccountsTooltip.text = getTranslation("add_more_accounts")
+      m.top.appendChild(m.addAccountsTooltip)
+
+      'create timer to hide tooltip after 12 seconds
+      m.toolTipTimer = CreateObject("roSGNode", "Timer")
+      m.toolTipTimer.repeat = false
+      m.toolTipTimer.duration = 12 '12 seconds
+      m.toolTipTimer.control = "start"
+      m.toolTipTimer.observeFieldScoped("fire", "onToolTipTimerFired")
+    end if
+  else
+    onToolTipTimerFired()
   end if
 End Function
 
@@ -837,6 +879,11 @@ Function verticallyCenterSideNav()
   translationX = m.ItemGroups.translation[0]
   translationY = (1080 - sideNavHeight) / 2
   m.ItemGroups.translation = [translationX, translationY]
+  if m.addAccountsTooltip <> invalid
+    transX = translationX + 100
+    transY = translationY
+    m.addAccountsTooltip.translation = [transX, transY]
+  end if
 End Function
 
 
@@ -860,4 +907,18 @@ Function onProfileSelectionMenuItemFocused(msg)
     vertical_location: row '//The row location of the side nav
     horizontal_location: col '//The column location of the side nav
   }
+End Function
+
+
+Function onToolTipTimerFired()
+  if m.toolTipTimer <> invalid
+    m.toolTipTimer.unobserveFieldScoped("fire")
+    m.toolTipTimer.control = "stop"
+    m.toolTipTimer = invalid
+    if m.addAccountsTooltip <> invalid
+      m.addAccountsTooltip.visible = false
+      m.top.removeChild(m.addAccountsTooltip)
+      m.addAccountsTooltip = invalid
+    end if
+  end if
 End Function

@@ -149,6 +149,11 @@ Function tubiAuth_getAuthInfoNoUpdate()
         authInfo.hasAge = false
       end if
     end if
+
+    if authInfo.pwExpTs <> invalid
+      authInfo.pwExpTs = authInfo.pwExpTs.toInt()
+    end if
+
     return authInfo
   end if
 
@@ -210,6 +215,7 @@ Function tubiAuth_setAuthInfo(key, value)
       email: true
       parentid: true
       parentalrating: true
+      pwexpts: true
     }
 
     correctlyCasedKey = invalid
@@ -898,6 +904,7 @@ Function tubiAuth_formatAuthInfoFromServer(serverAuthInfo)
   if serverAuthInfo.email <> invalid then authInfo.email = serverAuthInfo.email
   if serverAuthInfo.parent_tubi_id <> invalid then authInfo.parentId = serverAuthInfo.parent_tubi_id.toStr()
   if serverAuthInfo.parental_rating <> invalid then authInfo.parentalRating = serverAuthInfo.parental_rating.toStr()
+  if serverAuthInfo.pwexpts <> invalid then authInfo.pwExpTs = serverAuthInfo.pwexpts.toStr()
 
   authInfo.firstName = ""
   if serverAuthInfo.first_name <> invalid

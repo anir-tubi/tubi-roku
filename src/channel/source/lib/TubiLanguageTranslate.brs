@@ -2389,6 +2389,10 @@ Function getTranslation_en_US()
       "description": "Button text displayed on profile selector screen",
       "message": "Add Account"
     },
+    "add_more_accounts": {
+      "description": "Button text displayed on profile selector screen",
+      "message": "Add More Accounts"
+    },
     "screenSettings_menu_Account": {
       "description": "A menu Item for the Settings screen",
       "message": "Account"

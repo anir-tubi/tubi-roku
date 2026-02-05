@@ -9,6 +9,8 @@
   <interface>
     <!-- INPUTS -->
     <field id="content" type="node" />
+    <!-- if true, user can not navigate back from WWP -->
+    <field id="disableBack" type="boolean" value="false" />
 
     <!-- OUTPUTS -->
     <!-- set to the profile id of the profile which was selected -->

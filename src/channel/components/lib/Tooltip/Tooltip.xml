@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="Tooltip" extends="Group">
+  <script type="text/brightscript" uri="Tooltip.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <interface>
+    <field id="backgroundColor" type="string" alias="TooltipBackground.blendColor" />
+    <field id="arrowColor" type="string" alias="TooltipArrow.blendColor" />
+    <field id="textColor" type="string" alias="TooltipText.color" />
+    <field id="text" type="string" />
+    <field id="width" type="float" alias="TooltipBackground.width" />
+    <field id="height" type="float" alias="TooltipBackground.height" value="52" />
+    <field id="typography" type="string" />
+    <field id="horizontalPadding" type="float" value="24" />
+    <field id="autoSize" type="boolean" value="true" />
+    <!-- arrowPlacement values: top, bottom, left, right -->
+    <field id="arrowPlacement" type="string" alwaysNotify="true" />
+    <field id="showArrow" type="boolean" value="true" />
+  </interface>
+
+  <children>
+    <Poster
+      id="TooltipArrow"
+      uri="pkg:/images/left-arrow.png"
+      height="21"
+      width="21"
+      loadDisplayMode="scaleToFit" />
+    <Poster
+      id="TooltipBackground"
+      uri="pkg:/images/badge-background-$$RES$$.9.png"
+      width="0"
+      height="52" />
+    <Label
+      id="TooltipText"
+      height="24"
+      vertAlign="center"
+      horizAlign="center"
+      maxLines="1">
+      <Font
+        role="font" />
+    </Label>
+  </children>
+</component>
