@@ -87,6 +87,26 @@ Function onStarterConfigAvailable(starterConfig)
     processAnimationLogo(settings.animationLogoUrl)
   end if
 
+  if settings.mode <> "production" then
+    ' Check if we are overwriting the remote components url via registry for testing purposes
+    registrySection = createObject("roRegistrySection", "configurationOverrides")
+
+    configurationOverrides = registrySection.ReadMulti([
+      "remoteComponentsUrl"
+      "remoteComponentLibProvided"
+    ])
+
+    if isNonEmptyString(configurationOverrides.remoteComponentsUrl) = true AND isNonEmptyString(configurationOverrides.remoteComponentLibProvided) = true then
+      settings["remoteComponentLibProvided"] = configurationOverrides.remoteComponentLibProvided
+      settings["remoteComponentsUrl"] = configurationOverrides.remoteComponentsUrl
+      print "TubiScene: Overriding remoteComponentsUrl to "; settings["remoteComponentsUrl"]
+
+      m.global.update({
+        "remoteComponentLibraryOverridden": true
+      }, true)
+    end if
+  end if
+
   if settings.useRemoteComponents = true then
     m.tubiRemoteLibrary.observeFieldScoped("loadStatus", "onRemoteLibraryLoadStatusChange")
     m.tubiRemoteLibrary.uri = settings.remoteComponentsUrl
