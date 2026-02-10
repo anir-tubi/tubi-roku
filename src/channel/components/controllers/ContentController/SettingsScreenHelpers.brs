@@ -389,8 +389,25 @@ Function onParentalSettingSelected()
   parentalSetting = m.settingsScreen.parentalSettingSelected
   if m.settingsScreen.signInInfo <> invalid AND m.settingsScreen.signInInfo.signedIn = true
     m.settingsScreen.actionAfterActivation = ""
+
+    currentRating = m.pub_serverPersistentData.parentalRating
+    isChangePCRating = true
+
+    if isUserInMultiAccount() = true
+
+      if isNonEmptyString(m.settingsScreen.pcChangeRequestId) = true AND m.settingsScreen.signInInfo.linkedAccounts <> invalid
+        kid = m.settingsScreen.signInInfo.linkedAccounts[m.settingsScreen.pcChangeRequestId]
+        if kid <> invalid
+          currentRating = kid.parentalRating
+        end if
+      end if
+      isChangePCRating = (getPCV2Mapping(parentalSetting) <> getPCV2Mapping(currentRating))
+    else
+      isChangePCRating = (currentRating <> parentalSetting)
+    end if
+
     authInfo = m.tubiAuthUpdate.getAuthInfo()
-    if isLoggedInUser(authInfo) = true AND parentalSetting <> m.pub_serverPersistentData.parentalRating then
+    if isLoggedInUser(authInfo) = true AND isChangePCRating = true then
       ' parental settings have been updated
       nNowDate = getNowSeconds()
       nSavedSeconds = 0
@@ -432,6 +449,12 @@ Function onParentalSettingSelected()
           tubiLog("SettingsScreenHelpers.onParentalSettingSelected(), use saved password")
           '//if there is a saved password, was it submitted within the last 5 minutes (300 seconds), if so, then use that password
           onPasswordConfirm()
+        else if isUserInMultiAccount() = true
+          if getPCV2Mapping(parentalSetting) < getPCV2Mapping(currentRating)
+            onPasswordConfirm()
+          else
+            showConfirmPasswordScreen()
+          end if
         else
           showConfirmPasswordScreen()
         end if
@@ -1173,4 +1196,21 @@ Function showRestartAfterExperimentOverrideDialog(experimentId as String, groupN
   }
 
   showModal(modalInfo, buttonInfo)
+End Function
+
+
+Function getPCV2Mapping(parentalSetting as Integer) as Integer
+  ' pcMap is mapping between the parental controls and how it is interpretted in multi account. This is a mapping from 4 PC values to 6 pc values
+  '   "0": 1 ' younger Child
+  '   "1": 2'older Child
+  '   "2": 4 'teen
+  '   "3": 5 'adult
+  '   "4": 0 'youngest child
+  '   "5": 3 'oldest child
+  ' }
+
+  pcMap = [1, 2, 4, 5, 0, 3]
+
+  return pcMap[parentalSetting]
+
 End Function

@@ -41,7 +41,7 @@
       <LayoutGroup
         id="ContentGroup"
         layoutDirection="vert"
-        itemSpacings="[45]">
+        itemSpacings="[25]">
         <Label
           id="Title"
           height="73"
@@ -84,7 +84,7 @@
           layoutDirection="vert"
           horizAlignment="left"
           vertAlignment="top"
-          itemSpacings="[16, 36]">
+          itemSpacings="[16, 15]">
           <Label
             id="PinLabel">
             <Font

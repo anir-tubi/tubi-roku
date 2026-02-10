@@ -71,14 +71,31 @@ End Function
 
 
 Function onSignInInfoChange()
-  m.SettingsMenuPanel.signInInfo = m.top.signInInfo
+  signInfo = m.top.signInInfo
+  m.SettingsMenuPanel.signInInfo = signInfo
   ' renew the parental controls/autoplay preview panel if it is showing
   for i = 0 to m.PanelSet.getChildCount() - 1
     child = m.PanelSet.getChild(i)
+
     if child.subtype() = "ParentalControlsPanel"
-      createParentalControlsPanel(child)
+
+      kidsId = child.pcChangeRequestId
+
+      if isNonEmptyString(kidsId) = true
+        ' if kids accoount is being modified, do not create a new panel because we will not fetch user settings for kids account
+        if signInfo.linkedAccounts <> invalid AND signInfo.linkedAccounts[kidsId] <> invalid
+          child.selectItem = signInfo.linkedAccounts[kidsId].parentalRating
+        end if
+      else
+        createParentalControlsPanel(child)
+      end if
+
     else if child.subtype() = "ContentSettingsAccountsPanel"
-      createContentSettingsAccountsPanel(child)
+      isPCChangeForKids = (isNonEmptyString(m.top.pcChangeRequestId) = true)
+
+      if isPCChangeForKids = false ' adult account
+        createContentSettingsAccountsPanel(child)
+      end if
     else if child.subtype() = "AutoplayPreviewPanel"
       createOrUpdateAutoPlayPreviewPanel(child)
     else if child.subtype() = "SignOutProfilePanel"
@@ -233,7 +250,11 @@ Function createParentalControlsPanel(existingPanel = invalid)
     pcPanel.isLoading = true
     m.top.unobserveFieldScoped("userSettings")
     m.top.observeFieldScoped("userSettings", "onUserSettingsReceived")
-    m.top.fetchUserSettings = true
+    if isNonEmptyString(pcPanel.pcChangeRequestId) = true
+      pcPanel.isLoading = false
+    else
+      m.top.fetchUserSettings = true
+    end if
   else
     pcPanel.selectItem = 3 ' default if not signed in
   end if
@@ -329,7 +350,15 @@ Function onUserSettingsReceived(msg)
   parentalControlsPanel = getPanelBySubtype("ParentalControlsPanel")
   if parentalControlsPanel <> invalid then
     userSettings = msg.GetData()
-    parentalControlsPanel.selectItem = userSettings.parentalRating
+
+    pcRequestForKids = false
+    if isNonEmptyString(parentalControlsPanel.pcChangeRequestId) = true
+      pcRequestForKids = true
+    end if
+
+    if pcRequestForKids = false 'adult account
+      parentalControlsPanel.selectItem = userSettings.parentalRating
+    end if
     parentalControlsPanel.isLoading = false
   end if
 End Function
@@ -930,7 +959,13 @@ Function onCreateLinkedAccountParentalControlsPanel(msg)
       else
         parentalControlsPanel.showPCForKids = false
         parentalControlsPanel.showPinLayout = true
-        parentalControlsPanel.selectItem = itemFocused.parentalRating
+
+        ' If user settings are available, it will have latest parental rating
+        if m.top.userSettings <> invalid
+          parentalControlsPanel.selectItem = m.top.userSettings.parentalRating
+        else
+          parentalControlsPanel.selectItem = itemFocused.parentalRating
+        end if
       end if
     end if
 

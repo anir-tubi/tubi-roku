@@ -349,13 +349,13 @@ Function onKeyEvent(key, press) as Boolean
     if key = "up"
       if m.isPinLayoutPresent = true AND m.pinButton.isInFocusChain() = true
         m.Menu.setFocus(true)
-        m.ContentGroup.translation = [0, 0]
+
         return true
       end if
     else if key = "down"
       if m.isPinLayoutPresent = true AND m.Menu.isInFocusChain() = true
         m.pinButton.setFocus(true)
-        m.ContentGroup.translation = [0, -250]
+
         return true
       end if
     end if
