@@ -315,6 +315,9 @@ End Function
 Function onSectionTabFocused(msg)
   focusedTab = msg.getData()
   if focusedTab <> invalid AND focusedTab.id <> invalid
+    ' Send CONFIRM component interaction event for section tab focus
+    setComponentInteractionEventForButton("CONFIRM", focusedTab)
+
     tabId = focusedTab.id
     m.relatedContentContainer.visible = false
     m.episodesContainer.visible = false
