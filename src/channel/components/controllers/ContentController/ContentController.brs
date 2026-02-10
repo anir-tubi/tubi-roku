@@ -309,6 +309,7 @@ Function addControllerUi()
   m.global.bookmarkIds = CreateObject("roSGNode", "BookmarkContentNode")
   m.global.addField("historyIds", "node", false)
   m.global.historyIds = CreateObject("roSGNode", "HistoryContentNode")
+  m.global.addField("historyUpdated", "boolean", true)
   m.global.addField("likeIds", "node", false)
   m.global.likeIds = CreateObject("roSGNode", "LikeContentNode")
 
@@ -1350,7 +1351,10 @@ End Function
 Function onHistoryRefresh(historyIds)
   tubiLog("ContentController.onHistoryRefresh")
   m.global.historyIds = historyIds
+
+  ' IMPROVEMENT could probably get rid of
   refreshAllDetailScreens()
+  m.global.historyUpdated = true
 End Function
 
 

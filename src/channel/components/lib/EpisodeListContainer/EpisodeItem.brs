@@ -21,6 +21,7 @@ Function init() as Void
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
+    m.global.observeFieldScoped("historyUpdated", "onHistoryUpdated")
   end if
   onThemeChange()
 
@@ -106,11 +107,23 @@ Function onItemContentChange(msg = invalid) as Void
   m.subtitlesIcon.visible = content.hasSubtitles
 
   ' Set progress bar based on viewing history
+  ' IMPROVEMENT Do not believe toStr is needed
   setProgressBar(content.id.toStr(), contentLength)
 
   if m.itemHeight <> invalid AND m.itemHeight > 600
     m.description.maxLines = 5
   end if
+End Function
+
+
+Function onHistoryUpdated() as Void
+  content = m.top.itemContent
+  if content = invalid then return
+
+  contentLength = content.length
+  if contentLength = invalid then return
+
+  setProgressBar(content.id, contentLength)
 End Function
 
 
