@@ -95,12 +95,18 @@ End Function
 ' @return String The name of the current variant/group, or invalid if not found
 Function getCurrentVariant(experimentData) as Dynamic
   ' Early return for invalid input or uninitialized experiments interface
-  if experimentData = invalid OR experimentData.layerId = invalid OR experimentData.id = invalid OR m.experiments = invalid
+  if experimentData = invalid OR experimentData.id = invalid OR m.experiments = invalid
     return invalid
   end if
 
+  layerId = experimentData.layerId
+  if layerId = invalid
+    layerId = ""
+  end if
+
   ' Get the experiment tracking info to find the group name
-  trackingInfo = m.experiments.getExperimentTracking(experimentData.layerId, experimentData.id)
+  trackingInfo = m.experiments.getExperimentTracking(layerId, experimentData.id)
+
   if trackingInfo = invalid OR trackingInfo.group = invalid
     return invalid
   end if

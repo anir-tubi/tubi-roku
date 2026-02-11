@@ -3328,13 +3328,9 @@ Function tubiMetadataTranslate_isVideoTileEnabledScreen(screenId = "", uiMode = 
     return true
   end if
 
-  ' For all eligible screens (home, tv, movies, espanol, my stuff), enable based on experiment
-  ' Note: This includes homeScreen in kids mode
-  if m.constants.ui.videoTilesEligibleScreenIds[screenId] = true
-    if m.statSigExperiments <> invalid
-      experiment = m.statSigExperiments.getExperimentResource("", "roku_video_tiles_1_9")
-      return experiment.enabled = true
-    end if
+  if m.statSigExperiments <> invalid
+    experiment = m.statSigExperiments.getExperimentResource("", "roku_video_tiles_1_9")
+    return experiment <> invalid AND isAA(experiment.enabled_screens) = true AND experiment.enabled_screens.doesExist(screenId)
   end if
 
   return false

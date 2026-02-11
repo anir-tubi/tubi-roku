@@ -105,6 +105,33 @@ End Function
 
 
 ' ============================================================================
+' BUTTON COMPONENT ANALYTICS TRACKING
+' ============================================================================
+
+' Fires ComponentInteractionEvent for button interactions (e.g., LEFT key to open side nav)
+' @param buttonValue - String, button value (e.g., "LEFT", "BACK")
+' @param buttonType - String, button type (e.g., "UNKNOWN", "IMAGE", "TEXT")
+' @param userInteraction - String, user interaction type (e.g., "CONFIRM", "BACK")
+Function fireButtonComponentInteractionEvent(buttonValue as String, buttonType as String, userInteraction as String) as Void
+  if m.top.trackingPageInfo = invalid then return
+
+  componentValues = {
+    button_type: buttonType
+    button_value: buttonValue
+  }
+
+  pageOneof = m.tracking.getAnalyticsPage(m.top.trackingPageInfo.pageType, m.top.trackingPageInfo.pageValues)
+  componentOneof = m.tracking.getAnalyticsComponent("button_component", componentValues)
+
+  m.top.componentInteractionInfo = {
+    pageOneof: pageOneof
+    componentOneof: componentOneof
+    user_interaction: userInteraction
+  }
+End Function
+
+
+' ============================================================================
 ' SIDE NAV ANALYTICS TRACKING
 ' ============================================================================
 

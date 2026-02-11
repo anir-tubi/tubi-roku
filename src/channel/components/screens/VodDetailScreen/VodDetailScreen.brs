@@ -781,11 +781,13 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         ' Resume video preview when navigating back to buttons
         m.top.shouldPauseVideoPreview = false
       else
+        m.top.backTriggerKey = "BACK"
         m.top.backButtonPressed = true
       end if
       return true
     else if key = "left" AND m.contentContainer.focusedIndex = 1 AND m.isLeftBackExitEnabled = true
       m.top.shouldPauseVideoPreview = true
+      fireButtonComponentInteractionEvent("LEFT", "UNKNOWN", "CONFIRM")
       fireNavigateToSideNavEvent()
       setSideNavState(true)
       return true

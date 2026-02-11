@@ -559,13 +559,7 @@ Function isVideoTileEnabledScreen(screenId = "" as String) as Boolean
     return true
   end if
 
-  ' For all eligible screens (home, tv, movies, espanol, my stuff), enable based on experiment
-  ' Note: This includes homeScreen in kids mode
-  if m.constants.ui.videoTilesEligibleScreenIds[screenId] = true
-    return m.isUserInVideoTilesExperiment
-  end if
-
-  return false
+  return m.constants.ui.videoTilesEligibleScreenIds.doesExist(screenId)
 End Function
 
 

@@ -190,11 +190,37 @@ export const PLAYBACK_SOURCE = {
   UNKNOWN_PLAYBACK_SOURCE: 'UNKNOWN_PLAYBACK_SOURCE',
 } as const;
 
-/** User interaction for component_interaction. */
+/** User interaction for component_interaction (from client.proto UserInteraction enum). */
 export const USER_INTERACTION = {
+  UNKNOWN: 'UNKNOWN',
   CONFIRM: 'CONFIRM',
+  BACK: 'BACK',
   TOGGLE_ON: 'TOGGLE_ON',
   TOGGLE_OFF: 'TOGGLE_OFF',
+  LEFT: 'LEFT',
+  RIGHT: 'RIGHT',
+  UP: 'UP',
+  DOWN: 'DOWN',
+} as const;
+
+/** Button type for component_interaction.button_component (from client.proto ButtonComponent.ButtonType enum). */
+export const BUTTON_TYPE = {
+  UNKNOWN: 'UNKNOWN',
+  IMAGE: 'IMAGE',
+  TEXT: 'TEXT',
+  ICON: 'ICON',
+} as const;
+
+/** Button value for component_interaction.button_component (common button values used in analytics). */
+export const BUTTON_VALUE = {
+  OK: 'OK',
+  BACK: 'BACK',
+  LEFT: 'LEFT',
+  RIGHT: 'RIGHT',
+  UP: 'UP',
+  DOWN: 'DOWN',
+  PLAY: 'PLAY',
+  PAUSE: 'PAUSE',
 } as const;
 
 /** Single object for tests that need all analytics-related constants. */
@@ -206,6 +232,8 @@ export const AnalyticsConstants = {
   VIDEO_PLAYER,
   PLAYBACK_SOURCE,
   USER_INTERACTION,
+  BUTTON_TYPE,
+  BUTTON_VALUE,
   ANALYTICS_EVENT_KEYS,
 };
 

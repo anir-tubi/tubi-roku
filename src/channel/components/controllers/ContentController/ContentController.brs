@@ -211,8 +211,11 @@ Function addControllerUi()
   m.videoTileOverlayGroup.clippingRect = [videoTilesListTranslation[0], videoTilesListTranslation[1], 1920, 1080]
   m.videoTileOverlayGroup.translation = [videoTilesListTranslation[0], -6]
 
-  ' This is used to track if the user is in the video tiles experiment.
-  m.isUserInVideoTilesExperiment = (experiment <> invalid AND experiment.enabled)
+  ' Not ideal but this is simpler and being it is for experiment purpose and we will remove using this approach to override constants when experiment is removed.
+  if experiment <> invalid AND isAA(experiment.enabled_screens) = true
+    m.constants.ui.videoTilesEligibleScreenIds = experiment.enabled_screens
+  end if
+
   m.queuedVideoTilePreview = false
 
   m.inlinePreviewPlayerFadeAnimation = invalid
@@ -3644,7 +3647,7 @@ Function processUserContentSelection(content, screen, playbackSource = {}) as Vo
   if isAA(content.scheduleData)
     playerType = content.scheduleData.playerType
   end if
-  sendButtonComponentInteractionEvent("OK", "TEXT", "CONFIRM", screen)
+  sendButtonComponentInteractionEvent("OK", "UNKNOWN", "CONFIRM", screen)
 
   m.videoPreviewDebounce.control = "stop"
   if isNonEmptyString(content.actionId) = true
@@ -3781,7 +3784,7 @@ Function processUserPlayAction(content, screen, playbackSource = {}) as Void
   if isAA(content.scheduleData)
     playerType = content.scheduleData.playerType
   end if
-  sendButtonComponentInteractionEvent("PLAY", "IMAGE", "CONFIRM", screen)
+  sendButtonComponentInteractionEvent("PLAY", "UNKNOWN", "CONFIRM", screen)
   ' Since category panel list screen re-uses the method allowing it to play the content.
   if contentType = m.constants.uapiContentTypes.channel
     contentMode = ""

@@ -1472,11 +1472,6 @@ Function getConstants()
 
   ' Screens eligible for video tiles experiment
   constants.ui.videoTilesEligibleScreenIds = {}
-  constants.ui.videoTilesEligibleScreenIds[constants.ui.screenIds.homeScreen] = true
-  constants.ui.videoTilesEligibleScreenIds[constants.ui.screenIds.tvScreen] = true
-  constants.ui.videoTilesEligibleScreenIds[constants.ui.screenIds.movieScreen] = true
-  constants.ui.videoTilesEligibleScreenIds[constants.ui.screenIds.espanolScreen] = true
-  constants.ui.videoTilesEligibleScreenIds[constants.ui.screenIds.myStuffScreen] = true
 
   ' top level content ids for parent content nodes that don't have a content id from the backend
   constants.ui.contentIds = {}

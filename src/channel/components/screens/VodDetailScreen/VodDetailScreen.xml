@@ -43,6 +43,8 @@
     <!-- OUTPUTS -->
 
     <field id="backButtonPressed" type="boolean" alwaysNotify="true" />
+    <!-- Set to "BACK" or "LEFT" when user presses back/left before backButtonPressed fires (for ComponentInteractionEvent) -->
+    <field id="backTriggerKey" type="string" />
     <field id="openSideNav" type="boolean" alwaysNotify="true" />
     <field id="selectedRelatedContent" alias="relatedContentContainer.selectedContent" />
     <field id="focusedSeason" alias="episodesContainer.focusedSeason" />

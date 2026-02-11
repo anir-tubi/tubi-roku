@@ -82,8 +82,12 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         }
       }
 
+      ' Video tiles experiment: Controls which screens show video previews in tiles
+      ' enabled_screens: AA mapping screen IDs to boolean (true = enabled for that screen)
+      ' Possible screen ID values: movieScreen, tvScreen, espanolScreen, myStuffScreen
+      ' Note: homeScreen is always enabled in standard mode (not controlled by experiment)
       roku_video_tiles_1_9: {
-        default: { enabled: false }
+        default: { enabled_screens: {} }
       }
 
       reusable_video_node: {
