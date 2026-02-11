@@ -36,9 +36,10 @@
     <field id="jumpToItem" alias="relatedContentContainer.jumpToItem" />
 
     <!-- OUTPUTS -->
-    <!-- selectedRelatedContentItemUpdated should be observed instead of this field -->
     <field id="selectedRelatedContentItem" type="node"
       alias="relatedContentContainer.selectedContent" />
+    <field id="selectedRelatedContentTrigger" type="string" alwaysNotify="true"
+      alias="relatedContentContainer.selectedContentTrigger" />
 
     <field id="keyPress" type="string" alwaysNotify="true" />
 

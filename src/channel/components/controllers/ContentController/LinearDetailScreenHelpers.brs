@@ -11,7 +11,7 @@ Function showLinearDetailScreen(content, playbackSource)
     screen.observeFieldScoped("backButtonPressed", "onDetailBackButtonPressedChange")
     screen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     screen.observeFieldScoped("trackingComponentInfo", "onTrackingComponentInfoChange")
-    screen.observeFieldScoped("selectedRelatedContent", "onLinearDetailRelatedContentSelected")
+    screen.observeFieldScoped("selectedRelatedContentTrigger", "onLinearDetailSelectedRelatedContentTriggerChange")
     screen.observeFieldScoped("ctaButtonSelectedId", "onLinearDetailCtaButtonSelected")
     screen.id = m.constants.ui.screenIds.linearDetailScreen
     screen.shouldFocusWhenPushed = m.top.fadeInContentController
@@ -79,16 +79,18 @@ Function handleLinearRelatedResponse(relatedContent)
 End Function
 
 
-Function onLinearDetailRelatedContentSelected(msg)
+Function onLinearDetailSelectedRelatedContentTriggerChange(msg) as Void
   screen = msg.getRoSGNode()
-  content = msg.getData()
-  m.videoSponsorExposureId = ""
+  if screen <> invalid AND screen.id = m.constants.ui.screenIds.linearDetailScreen
+    content = screen.selectedRelatedContent
+    m.videoSponsorExposureId = ""
 
-  playbackSource = {
-    "srcForAnalytic": m.constants.player.playbackSource.unknown
-    "srcForAds": m.constants.player.playbackOrigin.ymal
-  }
-  processUserContentSelection(content, screen, playbackSource)
+    playbackSource = {
+      "srcForAnalytic": m.constants.player.playbackSource.unknown
+      "srcForAds": m.constants.player.playbackOrigin.ymal
+    }
+    processUserContentSelection(content, screen, playbackSource)
+  end if
 End Function
 
 

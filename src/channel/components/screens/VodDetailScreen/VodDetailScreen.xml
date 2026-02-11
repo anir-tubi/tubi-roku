@@ -47,9 +47,10 @@
     <field id="backTriggerKey" type="string" />
     <field id="openSideNav" type="boolean" alwaysNotify="true" />
     <field id="selectedRelatedContent" alias="relatedContentContainer.selectedContent" />
+    <field id="selectedRelatedContentTrigger" type="string" alwaysNotify="true" alias="relatedContentContainer.selectedContentTrigger" />
     <field id="focusedSeason" alias="episodesContainer.focusedSeason" />
     <field id="selectedEpisode" alias="episodesContainer.selectedEpisode" />
-    <field id="playSelectedEpisode" alias="episodesContainer.playSelectedEpisode" />
+    <field id="playSelectedEpisode" type="boolean" alwaysNotify="true" alias="episodesContainer.playSelectedEpisode" />
     <field id="selectedSection" type="string" alwaysNotify="true" />
     <field id="ctaSelectedButtonId" type="string" alwaysNotify="true" />
     <field id="shouldPauseVideoPreview" type="boolean" alwaysNotify="true" />

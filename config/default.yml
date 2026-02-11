@@ -76,7 +76,7 @@ settings:
 
   # Setting the below value to a number greater than 0 will override the default console logging level. Works in conjunction with consoleLoggingEnabled bs_const.
   # Log level: 0=all logs (debug/info/warn/error), 1=info/warn/error, 2=warn/error, 3=error only
-  consoleLoggingLevel: 3
+  consoleLoggingLevel: 2
 
   # Any configs added to the bs_const setting will be included in the various manifest
   # configurations via the handlebars templates

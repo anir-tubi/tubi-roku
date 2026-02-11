@@ -128,7 +128,7 @@ Function init()
   browseWhileWatchingRow = m.top.findNode("BrowseWhileWatchingRow")
 
   m.BrowseWhileWatching = browseWhileWatchingRow.createChild("Related")
-  m.BrowseWhileWatching.observeFieldScoped("selectedRelatedContentItem", "onRelatedItemSelected")
+  m.BrowseWhileWatching.observeFieldScoped("selectedRelatedContentTrigger", "onRelatedItemSelected")
 
   m.BrowseWhileWatching.translation = [m.marginX, 550]
   m.BrowseWhileWatching.associatedPageName = "video_player_page"
@@ -3609,13 +3609,15 @@ Function onRelatedItemSelected(msg)
 
   if screen <> invalid then
     selectedContent = screen.selectedRelatedContentItem
-    animateTransport("out")
-    hideBrowseWhileWatching()
-    setFocusToPlaybackControl()
-    m.top.relatedContentToPlay = selectedContent
-    resetTransportButtons()
+    if selectedContent <> invalid
+      animateTransport("out")
+      hideBrowseWhileWatching()
+      setFocusToPlaybackControl()
+      m.top.relatedContentToPlay = selectedContent
+      resetTransportButtons()
 
-    updatePlayerLogLib(m.playerLogLib, "setBrowseWhileWatchingDidConvert", true)
+      updatePlayerLogLib(m.playerLogLib, "setBrowseWhileWatchingDidConvert", true)
+    end if
   end if
 
 End Function

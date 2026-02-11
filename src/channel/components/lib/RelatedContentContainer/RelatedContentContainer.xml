@@ -26,7 +26,8 @@
     <!-- OUTPUTS -->
     <field id="navigateWithinPageInfo" type="assocarray" />
     <field id="trackingContext" type="assocarray" />
-    <field id="selectedContent" type="node" alwaysNotify="true" />
+    <field id="selectedContent" type="node" />
+    <field id="selectedContentTrigger" type="string" alwaysNotify="true" />
     <field id="focusedContent" type="node" alwaysNotify="true" />
     <field id="focusedIndex" alias="grid.itemFocused" />
   </interface>

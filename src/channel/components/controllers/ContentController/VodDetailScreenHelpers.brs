@@ -15,7 +15,7 @@ Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, 
     screen.observeFieldScoped("backButtonPressed", "onDetailBackButtonPressedChange")
     screen.observeFieldScoped("openSideNav", "onOpenSideNavChange")
     screen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
-    screen.observeFieldScoped("selectedRelatedContent", "onVodDetailRelatedContentSelectedChange")
+    screen.observeFieldScoped("selectedRelatedContentTrigger", "onVodDetailSelectedRelatedContentTriggerChange")
     screen.observeFieldScoped("ctaSelectedButtonId", "onVodDetailCtaSelectedButtonIdChange")
     screen.observeFieldScoped("focusedSeason", "onFocusedSeasonChange")
     screen.observeFieldScoped("selectedSection", "onVodDetailSelectedSectionChange")
@@ -62,6 +62,8 @@ Function showVodDetailScreen(inputContent, playbackSource, successCb = invalid, 
       screen.wasContentFetchCompleted = content.hasVideoResources
       if content.hasVideoResources <> true
         getSingleContentFromServer(content, onGetVodContentSuccess, onGetVodContentError)
+      else
+        onGetVodContentSuccess(content)
       end if
       getYouMayAlsoLikeContent(content)
     end if
@@ -184,15 +186,26 @@ End Function
 
 ' Handles selection of related content item
 ' Navigates to detail screen of selected related content with appropriate tracking source
-' @param msg - roSGNodeEvent containing selected content node
-Function onVodDetailRelatedContentSelectedChange(msg)
-  tubiLog("VodDetailScreenHelpers.onVodDetailRelatedContentSelectedChange")
-  selectedContent = msg.getData()
-  if selectedContent <> invalid
-    ' The content node gets modified down the line so avoiding the changes to the original content node.
-    content = selectedContent.clone(true)
-    stopVideoPreview()
-    showVodDetailScreen(content, { "srcForAnalytic": "ymal", "srcForAds": "ymal" })
+' @param msg - roSGNodeEvent containing the pressed key
+Function onVodDetailSelectedRelatedContentTriggerChange(msg) as Void
+  tubiLog("VodDetailScreenHelpers.onVodDetailSelectedRelatedContentTriggerChange")
+  screen = msg.getRoSGNode()
+  pressedKey = msg.getData()
+  if screen <> invalid AND screen.id = m.constants.ui.screenIds.vodDetailScreen
+    content = screen.selectedRelatedContent
+    if content <> invalid
+      playbackSource = {
+        "srcForAnalytic": m.constants.player.playbackOrigin.ymal
+        "srcForAds": m.constants.player.playbackOrigin.ymal
+      }
+
+      stopVideoPreview()
+      successCb = invalid
+      if pressedKey = "play"
+        successCb = skipDetailScreen
+      end if
+      showVodDetailScreen(content, playbackSource, successCb)
+    end if
   end if
 End Function
 
@@ -917,11 +930,11 @@ End Function
 
 ' Handles episode selection from episode list
 ' Plays selected episode with progress resume if available
-' @param msg - roSGNodeEvent containing selected episode node
-Function onPlaySelectedEpisodeChange(msg)
+' @param msg - roSGNodeEvent containing episode selected flag
+Function onPlaySelectedEpisodeChange(msg) as Void
   tubiLog("VodDetailScreenHelpers.onPlaySelectedEpisodeChange")
   screen = msg.getRoSGNode()
-  if screen <> invalid
+  if screen <> invalid AND screen.id = m.constants.ui.screenIds.vodDetailScreen
     selectedEpisode = screen.selectedEpisode
     ' Set progress bar
     history = getHistory(selectedEpisode.id.toStr())

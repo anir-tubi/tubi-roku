@@ -113,11 +113,13 @@ End Function
 
 ' Sets the selected content based on the provided item index
 ' @param itemIndex - The index of the item to select
-Function setSelectedContentByIndex(itemIndex as Integer) as Void
+' @param pressedKey - The key that was pressed
+Function setSelectedContentByIndex(itemIndex as Integer, pressedKey = "OK" as String) as Void
   if m.grid.content <> invalid AND itemIndex >= 0
     selectedItem = m.grid.content.getChild(itemIndex)
     if selectedItem <> invalid
       m.top.selectedContent = selectedItem
+      m.top.selectedContentTrigger = pressedKey
     end if
   end if
 End Function
@@ -180,7 +182,7 @@ End Function
 ' @return true if key was handled, false otherwise
 Function onKeyEvent(key as String, press as Boolean) as Boolean
   if press = true AND key = "play"
-    setSelectedContentByIndex(m.grid.itemFocused)
+    setSelectedContentByIndex(m.grid.itemFocused, key)
     return true
   end if
   return false

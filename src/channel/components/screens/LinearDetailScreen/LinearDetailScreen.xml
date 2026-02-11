@@ -17,6 +17,7 @@
     <!-- OUTPUTS -->
     <field id="backButtonPressed" type="boolean" alwaysNotify="true" />
     <field id="selectedRelatedContent" alias="relatedContentContainer.selectedContent" />
+    <field id="selectedRelatedContentTrigger" type="string" alwaysNotify="true" alias="relatedContentContainer.selectedContentTrigger" />
     <field id="ctaButtonSelectedId" alias="liveEventsContainer.ctaButtonSelectedId" />
   </interface>
 
