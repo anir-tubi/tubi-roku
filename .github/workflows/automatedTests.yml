@@ -108,39 +108,37 @@ jobs:
             echo 'branches=["master","'$LATEST_QA_BRANCH'"]' >> "$GITHUB_OUTPUT"
           fi
 
-  build:
-    needs: set-target-branches
-    # Use matrix strategy to run against both master and latest QA branch
+  detect-runner:
+    uses: ./.github/workflows/detect-multi-device-runner.yml
+    secrets:
+      ROKU_AUTO_PAT: ${{ secrets.ROKU_AUTO_PAT }}
+
+  test:
+    needs: [set-target-branches, detect-runner]
     strategy:
       fail-fast: false
-      max-parallel: 1 # Limits concurrent jobs to 1 to avoid flakiness from sharing Rokus
+      max-parallel: 1
       matrix:
         branch: ${{ fromJson(needs.set-target-branches.outputs.branches) }}
-    # name helps to check the status of github action
-    name: Run Automated UI Tests (${{ matrix.branch }})
-    # The type of runner that the job will run
-    runs-on: [self-hosted, enabled, roku, automation-regression]
+    name: Run Automated UI Tests (${{ matrix.branch }}) [${{ needs.detect-runner.outputs.available == 'true' && 'multi-device' || 'single-device' }}]
+    runs-on: ${{ needs.detect-runner.outputs.available == 'true' && fromJSON('["self-hosted", "enabled", "roku", "automation-regression", "multi-device"]') || fromJSON('["self-hosted", "enabled", "roku", "automation-regression"]') }}
     timeout-minutes: 240
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # print out passed in job params for reference
       - name: Job Params
         run: |
           echo branch: "${{ matrix.branch }}"
           echo tag: "${{ inputs.tag }}"
           echo customString: "${{ inputs.customString }}"
           echo bail: "${{ inputs.bail }}"
+          echo runner-type: "${{ needs.detect-runner.outputs.available == 'true' && 'multi-device' || 'single-device' }}"
 
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
         with:
           ref: ${{ matrix.branch }}
 
-      # npm command install all required packages
       - name: npm install
-        run: |
-          npm install
+        run: npm install
 
       - name: Generate rta-config.json
         run: node js/workflows/generateRtaConfig.js
@@ -154,15 +152,12 @@ jobs:
           customString: ${{ inputs.customString || '' }}
           bail: ${{ inputs.bail || false }}
           retries: 1
-        run: |
-          npx gulp runAutomatedTests
+        run: npx gulp runAutomatedTests
 
       - name: Sanitize branch name for artifact upload
         id: sanitize-branch-name
         if: success() || failure()
         run: |
-          # Replace invalid characters with underscores
-          # Invalid chars: " : < > | * ? \r \n \ /
           SANITIZED_BRANCH_NAME=$(echo "${{ matrix.branch }}" | sed 's/[":<>|*?\\\/]/_/g' | tr -d '\r\n')
           echo "value=$SANITIZED_BRANCH_NAME" >> "$GITHUB_OUTPUT"
 
@@ -189,5 +184,4 @@ jobs:
 
       - name: Send Slack Notification
         if: success() || failure()
-        run: |
-          npx ts-node ./js/workflows/sendSlackAutomatedTestsResultNotification.ts "${{ matrix.branch }}"
+        run: npx ts-node ./js/workflows/sendSlackAutomatedTestsResultNotification.ts "${{ matrix.branch }}"

@@ -15,61 +15,20 @@ concurrency:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # name helps to check the status of github action
-    name: Run Automated UI Tests @smoke
-    # The type of runner that the job will run
-    runs-on: [self-hosted, enabled, roku, automation-smoke]
-    # timeouts after 15 minutes, if the execution/automated tests got stuck/crash
-    timeout-minutes: 15
-    # Permissions for posting PR comments
+  # Detect if multi-device runner is available, fallback to single-device if not
+  detect-runner:
+    uses: ./.github/workflows/detect-multi-device-runner.yml
+    secrets:
+      ROKU_AUTO_PAT: ${{ secrets.ROKU_AUTO_PAT }}
+
+  # Run tests with dynamic runner selection
+  test:
+    needs: detect-runner
+    name: Run Automated UI Tests @smoke [${{ needs.detect-runner.outputs.available == 'true' && 'multi-device' || 'single-device' }}]
     permissions:
       contents: read
       issues: write
       pull-requests: write
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
-
-      - name: Install Dependencies
-        run: npm install
-
-      - name: Generate rta-config.json
-        run: node js/workflows/generateRtaConfig.js
-
-      - name: gulp runAutomatedTestsSmoke
-        env:
-          retries: 1
-        run: |
-          npx gulp runAutomatedTestsSmoke
-
-      - name: Upload JSON Report
-        if: success() || failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: JSON Report
-          path: out/ui-tests-output/report.json
-
-      - name: Upload HTML Report
-        if: success() || failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: HTML Report
-          path: out/ui-tests-output/html
-
-      - name: Upload Failed Test Screenshots
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: Failed Test Screenshots
-          path: out/ui-tests-output/screenshots
-
-      - name: Post PR Test Results Comment
-        if: success() || failure()
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          npx ts-node ./js/workflows/postPRTestResults.ts
+    uses: ./.github/workflows/run-automated-tests-smoke.yml
+    with:
+      runner-labels: ${{ needs.detect-runner.outputs.available == 'true' && '["self-hosted", "enabled", "roku", "automation-smoke", "multi-device"]' || '["self-hosted", "enabled", "roku", "automation-smoke"]' }}

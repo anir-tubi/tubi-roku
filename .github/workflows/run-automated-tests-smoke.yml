@@ -1,0 +1,61 @@
+name: Run Automated Tests Smoke (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      runner-labels:
+        description: 'JSON array of runner labels'
+        required: true
+        type: string
+
+jobs:
+  test:
+    runs-on: ${{ fromJSON(inputs.runner-labels) }}
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Generate rta-config.json
+        run: node js/workflows/generateRtaConfig.js
+
+      - name: gulp runAutomatedTestsSmoke
+        env:
+          retries: 1
+        run: |
+          npx gulp runAutomatedTestsSmoke
+
+      - name: Upload JSON Report
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: JSON Report
+          path: out/ui-tests-output/report.json
+
+      - name: Upload HTML Report
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: HTML Report
+          path: out/ui-tests-output/html
+
+      - name: Upload Failed Test Screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Failed Test Screenshots
+          path: out/ui-tests-output/screenshots
+
+      - name: Post PR Test Results Comment
+        if: success() || failure()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          npx ts-node ./js/workflows/postPRTestResults.ts
