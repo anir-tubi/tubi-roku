@@ -80,6 +80,8 @@ Function playVideoContentWhileSkippingDetailScreen(content, nowPos, currentTrack
     if isVideoTileEnabledScreen() = true AND playbackSource.srcForAnalytic = "previews"
       removeTopMostScreenWithIDFromStack(m.constants.ui.screenIds.detailScreen)
       displayDefaultBackground()
+    else if currentTrackingPageInfo <> invalid AND isString(currentTrackingPageInfo.pageType) = true AND currentTrackingPageInfo.pageType = "collection_page" then
+      removeTopMostScreenWithIDFromStack(m.constants.ui.screenIds.detailScreen)
     end if
   end if
 End Function
@@ -1704,4 +1706,3 @@ Function onCloseYMALContentFetchErrorModal()
     currentScreen.showYMALInFullScreen = true
   end if
 End Function
-
