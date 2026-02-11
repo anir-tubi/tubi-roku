@@ -204,7 +204,6 @@ Function getTranslationSetByLocale(locale)
     translationSet = getTranslation_en_GB()
   else if locale = "fr_ca"
     translationSet = getTranslation_fr_CA()
-  else if locale = "fr_fr"
   else if locale = "de_de"
   else if locale = "it_it"
   else if locale = "pt_br"

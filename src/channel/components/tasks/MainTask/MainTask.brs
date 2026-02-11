@@ -8,10 +8,6 @@ Function init()
   ' Add each field to be handled here
   m.top.observeFieldScoped("transportVoiceResponse", m.port)
 
-  ' Enabling low memory event. Adding it to m scope since roku does not fire the event if it is not in m scope.
-  m.deviceInfo = CreateObject("roAppMemoryMonitor")
-  m.deviceInfo.setMessagePort(m.port)
-
   constants = getConstantsFromGlobal()
   disableHdmiStatusChecks = false
   if constants.settings.mode = "qa" AND constants.settings.disableHdmiStatusChecks = true then

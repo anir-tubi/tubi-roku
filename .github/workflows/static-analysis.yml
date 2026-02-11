@@ -1,0 +1,159 @@
+name: Static Analysis
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+    branches:
+      - 'master'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  static-analysis:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Cache node modules
+        id: node-cache
+        uses: actions/cache@v4
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+          restore-keys: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+
+      - name: Install Dependencies
+        if: steps.node-cache.outputs.cache-hit != 'true'
+        run: npm install
+
+      - name: Build application
+        run: npx gulp build
+
+      - name: Run static analysis
+        id: sca-analysis
+        continue-on-error: true
+        timeout-minutes: 10
+        run: |
+          set +e  # Added so that a non-zero Java exit does not stop the script early
+          java -jar scripts/sca-cmd/lib/sca-cmd.jar build/local --exit error --severity warning --format json 2>&1
+          EXIT_CODE=$?
+          echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
+
+      - name: Upload SCA Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: SCA Report
+          path: reports/SCA_Report.json
+          retention-days: 7
+          if-no-files-found: warn
+
+      - name: Comment PR with analysis results
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const exitCode = '${{ steps.sca-analysis.outputs.exit_code }}';
+            let report;
+            let errorCount = 0;
+            let warningCount = 0;
+            let formattedOutput = '';
+        
+            try {
+              const fs = require('fs');
+              report = JSON.parse(fs.readFileSync('reports/SCA_Report.json', 'utf8'));
+            } catch (error) {
+              report = { logs: [] };
+            }
+            
+            // Format logs for display
+            if (report.logs && report.logs.length > 0) {
+              errorCount = report.logs.filter(log => log.severity === 'error').length;
+              warningCount = report.logs.filter(log => log.severity === 'warning').length;
+
+              formattedOutput = report.logs.map((log) => {
+                const severity = (log.severity || 'unknown').toUpperCase();
+                const category = log.category || 'uncategorized';
+                const message = log.message || 'No message';
+                const path = log.path || 'N/A';
+                const lineNumber = log.lineNumber ? `:${log.lineNumber}` : '';
+                const certReqs = log.certRequirements && log.certRequirements.length > 0 
+                  ? ` [Cert: ${log.certRequirements.join(', ')}]` 
+                  : '';
+                const docs = log.documentationUrls && log.documentationUrls.length > 0 
+                  ? `\n  Docs: ${log.documentationUrls.map(doc => doc.url).join(', ')}`
+                  : '';
+                
+                return `[${severity}] ${category} - ${path}${lineNumber}${certReqs}\n  ${message}${docs}`;
+              }).join('\n\n');
+            } else {
+              formattedOutput = 'No issues found.';
+            }
+            
+            let statusText = '';
+            if (exitCode === '0') {
+              statusText = `✅ **Analysis completed; found ${warningCount} warning${warningCount !== 1 ? 's' : ''}**`;
+            } else if (!report.logs || report.logs.length === 0) {
+              statusText = `❌ **Analysis failed with exit code ${exitCode}**`;
+            } else {
+              statusText = `❌ **Analysis found ${errorCount} error${errorCount !== 1 ? 's' : ''} and ${warningCount} warning${warningCount !== 1 ? 's' : ''}**`;
+            }
+            
+            const comment = [
+              '## Static Analysis Results',
+              '',
+              statusText,
+              '',
+              '<details>',
+              '<summary>Click to view full output</summary>',
+              '',
+              '```',
+              formattedOutput,
+              '```',
+              '',
+              '</details>',
+              '',
+              `_Analysis run on commit: ${{ github.event.pull_request.head.sha }}_`
+            ].join('\n');
+            
+            // Find existing comment - paginate through all comments to handle PRs with >30 comments
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user && comment.user.type === 'Bot' && comment.body.includes('Static Analysis Results')
+            );
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            }
