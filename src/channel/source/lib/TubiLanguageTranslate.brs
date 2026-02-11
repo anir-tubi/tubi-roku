@@ -4684,6 +4684,10 @@ Function getTranslation_es_MX()
       "description": "Button text displayed on profile selector screen",
       "message": "Agregar cuenta"
     },
+    "add_more_accounts": {
+      "description": "Button text displayed on profile selector screen",
+      "message": "Agregar más cuentas"
+    },
     "screenSettings_menu_Account": {
       "description": "A menu Item for the Settings screen",
       "message": "Cuenta"
@@ -6987,6 +6991,10 @@ Function getTranslation_fr_CA()
     "add_account": {
       "description": "Button text displayed on profile selector screen",
       "message": "Ajouter un compte"
+    },
+    "add_more_accounts": {
+      "description": "Button text displayed on profile selector screen",
+      "message": "Ajouter d’autres comptes"
     },
     "screenSettings_menu_Account": {
       "description": "A menu Item for the Settings screen",
