@@ -65,7 +65,11 @@ Function getLocale()
 
   locale = getDefaultLocale()
   if constants <> invalid
-    locale = constants.deviceInfo.locale
+    if constants.settings <> invalid AND constants.settings.mode <> "production " AND constants.settings.sudoLocale <> invalid
+      locale = constants.settings.sudoLocale
+    else
+      locale = constants.deviceInfo.locale
+    end if
   end if
 
   return locale

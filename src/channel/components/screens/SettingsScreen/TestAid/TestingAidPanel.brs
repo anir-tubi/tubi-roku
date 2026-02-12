@@ -74,6 +74,12 @@ Function onItemFocused(msg)
     end if
   else if item.id = "changeCountry"
     m.infoArea.text = "Select the country. It will work for White listed IPs only. Contact CSS for whitelisting" + chr(10) + "Current Country: " + m.constants.deviceInfo.countryCode
+  else if item.id = "changeLanguage"
+    sudoLocale = "N/A"
+    if m.constants.settings <> invalid AND m.constants.settings.sudoLocale <> invalid
+      sudoLocale = m.constants.settings.sudoLocale
+    end if
+    m.infoArea.text = "Select the language for testing." + chr(10) + "Current Locale: " + m.constants.deviceInfo.locale + chr(10) + "SudoLocale: " + sudoLocale
   else if item.id = "playerStats"
     m.infoArea.text = "This toggles the display of player stats within the video player, helping QA and developers understand the current playback."
   else if item.id = "features"
@@ -88,6 +94,7 @@ Function onItemFocused(msg)
     end if
   end if
   showCountryList(item.id = "changeCountry")
+  showLanguageList(item.id = "changeLanguage")
   displayProxyKB(item.id = "addProxy")
 End Function
 
@@ -154,6 +161,9 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       else if m.countryListMenu <> invalid AND m.countryListMenu.isInFocusChain() = true
         m.Menu.setFocus(true)
         handled = true
+      else if m.languageListMenu <> invalid AND m.languageListMenu.isInFocusChain() = true
+        m.Menu.setFocus(true)
+        handled = true
       else if m.featuresPanel <> invalid AND m.featuresPanel.isInFocusChain() = true
         m.Menu.setFocus(true)
         handled = true
@@ -165,6 +175,9 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
           handled = true
         else if m.countryListMenu <> invalid AND m.countryListMenu.visible = true
           m.countryListMenu.setFocus(true)
+          handled = true
+        else if m.languageListMenu <> invalid AND m.languageListMenu.visible = true
+          m.languageListMenu.setFocus(true)
           handled = true
         else if m.featuresPanel <> invalid
           isFeaturesVisible = m.featuresPanel.visible
@@ -487,6 +500,63 @@ Function onCountryListMenuChanged(msg)
   'after registry been updated restart the app.
   m.top.appRestartRequested = true
 
+End Function
+
+
+Function showLanguageList(show = false)
+  if show = true
+    if m.languageListMenu = invalid
+      m.languageListMenu = createObject("roSGNode", "markupList")
+      m.languageListMenu.numRows = "5"
+      m.languageListMenu.itemSize = "[585,72]"
+      m.languageListMenu.itemSpacing = "[0,8]"
+      m.languageListMenu.focusBitmapBlendColor = m.focusedColor
+      m.languageListMenu.itemComponentName = "CheckButton"
+      m.languageListMenu.vertFocusAnimationStyle = "floatingFocus"
+      m.languageListMenu.translation = "[700,200]"
+      m.languageListMenu.id = "languageListMenu"
+
+      languageList = createObject("roSGNode", "ContentNode")
+      languageList.update({
+        id: "languageList"
+        children: [
+          { id: "resetDefault", title: "Reset to Default" }
+          { id: "en_US", title: "English (US)" }
+          { id: "en_GB", title: "English (UK)" }
+          { id: "es_MX", title: "Spanish" }
+          { id: "fr_CA", title: "French" }
+        ]
+      }, true)
+
+      m.languageListMenu.content = languageList
+      m.top.appendChild(m.languageListMenu)
+      m.languageListMenu.observeFieldScoped("itemSelected", "onLanguageListMenuChanged")
+    end if
+    m.languageListMenu.visible = true
+  else
+    if m.languageListMenu <> invalid
+      m.languageListMenu.visible = false
+    end if
+  end if
+End Function
+
+
+Function onLanguageListMenuChanged(msg)
+  itemSelected = msg.getData()
+  if itemSelected <> invalid AND itemSelected >= 0
+    selectedLocale = m.languageListMenu.content.getChild(itemSelected).id
+  else
+    selectedLocale = "en_US"
+  end if
+
+  registrySection = CreateObject("roRegistrySection", m.constants.registrySectionIDs.settingsOverride)
+  if selectedLocale = "resetDefault"
+    registrySection.delete("sudoLocale")
+  else
+    registrySection.write("sudoLocale", selectedLocale)
+  end if
+  registrySection.flush()
+  m.top.appRestartRequested = true
 End Function
 
 

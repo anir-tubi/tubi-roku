@@ -39,6 +39,10 @@ Function getConstants()
     if settingsOverride.sudoCountry <> invalid then
       constants.settings.sudoCountry = settingsOverride.sudoCountry
     end if
+
+    if settingsOverride.sudoLocale <> invalid then
+      constants.settings.sudoLocale = settingsOverride.sudoLocale
+    end if
   end if
 
   ' Roku's channel/app id for the production Tubi app. It is used with the continue watching feature to enable testing the feature in sideloaded/beta channels.

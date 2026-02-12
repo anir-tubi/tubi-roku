@@ -56,6 +56,9 @@
               id="features"
               title="Experiments" />
             <CheckButtonContentNode
+              id="changeLanguage"
+              title="Change Language" />
+            <CheckButtonContentNode
               id="viewRegistry"
               title="View Registry" />
             <CheckButtonContentNode
