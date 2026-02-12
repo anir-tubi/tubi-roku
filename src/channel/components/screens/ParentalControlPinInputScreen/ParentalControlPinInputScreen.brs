@@ -196,20 +196,19 @@ Function onContinueButtonSelected(msg)
     len = m.numberPad.text.len()
     if len = 4
       pinSubmitted = m.numberPad.text
-    end if
 
-    if m.getPinConfirmed = true AND m.pinConfirmed = false
-      if m.pinNeedsConfirmation = invalid
-        m.pinNeedsConfirmation = pinSubmitted
-        setMode("confirm_pin")
-        clearNumberPad()
+      if m.getPinConfirmed = true AND m.pinConfirmed = false
+        if m.pinNeedsConfirmation = invalid
+          m.pinNeedsConfirmation = pinSubmitted
+          setMode("confirm_pin")
+          clearNumberPad()
+        else
+          comparePin(m.pinNeedsConfirmation, pinSubmitted)
+        end if
       else
-        comparePin(m.pinNeedsConfirmation, pinSubmitted)
+        setPinSubmitted(pinSubmitted)
       end if
-    else
-      setPinSubmitted(pinSubmitted)
     end if
-
   end if
 End Function
 
@@ -316,9 +315,20 @@ Function onMultiPurposeButtonSelected(msg)
 
   if isButtonSelected <> invalid AND isButtonSelected.id = "multiPurposeButton"
     if isButtonSelected.text = getTranslation("ParentalControlPinInputScreen_skip_button_label")
-      onContinueButtonSelected(msg)
+      onSkipButtonSelected(msg)
     else if isButtonSelected.text = getTranslation("ParentalControlPinInputScreen_forgot_pin_button_label")
       m.top.forgotPinSelected = true
     end if
   end if
+End Function
+
+
+Function onSkipButtonSelected(msg)
+
+  isButtonSelected = msg.getData()
+  if isButtonSelected = true
+    pinSubmitted = ""
+    setPinSubmitted(pinSubmitted)
+  end if
+
 End Function

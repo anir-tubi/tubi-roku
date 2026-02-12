@@ -7,7 +7,6 @@
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/ProfileMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/ProfileMixinGenPurpose.brs" />
 
 

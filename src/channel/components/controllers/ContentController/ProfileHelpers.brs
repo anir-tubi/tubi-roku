@@ -340,8 +340,20 @@ End Function
 Function onPinSubmittedForKidsAccount(msg)
   parentalControlPinInputScreen = msg.getRoSGNode()
   isPinSubmitted = msg.getData()
-  signInInfo = parentalControlPinInputScreen.signInInfo
+
   if isPinSubmitted = true
+    signInInfo = parentalControlPinInputScreen.signInInfo
+    'send register event
+
+    registerEvent = {
+      type: "register"
+      values: {
+        progress: "COMPLETED_PIN"
+      }
+    }
+
+    m.trackingLoggingTask.trackEvent = registerEvent
+
     verifyKidsAtSignup(signInInfo)
   end if
 End Function
