@@ -59,6 +59,10 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
         roku_postplay_countdown_timer_series_v2: {
           default: { countdown: 15, simplifiedUI: false, automaticSkipRecap: false }
         }
+        ' Testing the BWW posters with landscape layout instead of portrait
+        roku_bww_landscape_v1: {
+          default: { enabled: false }
+        }
       }
 
       roku_linear_reg_gate: {

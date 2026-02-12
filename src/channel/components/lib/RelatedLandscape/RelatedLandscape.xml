@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- RelatedLandscape - Landscape BWW row for video player (You Might Also Like) -->
+<component name="RelatedLandscape" extends="Group">
+  <script type="text/brightscript" uri="RelatedLandscape.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+    <field id="content" type="node" />
+    <field id="updateContent" type="boolean" alwaysNotify="true" />
+    <!-- shows the YMAL row partially -->
+    <field id="show" type="boolean" alwaysNotify="true" />
+    <!-- hides the YMAL row -->
+    <field id="hide" type="boolean" alwaysNotify="true" />
+    <!-- opens the YMAL in full screen -->
+    <field id="open" type="boolean" alwaysNotify="true" />
+    <!-- closes the YMAL so it is only shown as a peek -->
+    <field id="close" type="boolean" alwaysNotify="true" />
+    <!-- show the YMAL in full screen -->
+    <field id="showInFullScreen" type="boolean" alwaysNotify="true" />
+    <!-- The analytics page type value associated with the parent page -->
+    <field id="associatedPageName" type="string" />
+    <!-- show or hide the Info panel component (for compatibility) -->
+    <field id="showInfoPanel" type="boolean" alwaysNotify="true" />
+
+    <field id="focusedContent" type="node" alwaysNotify="true" />
+    <field id="jumpToItem" type="integer" />
+
+    <!-- OUTPUTS -->
+    <field id="selectedRelatedContentItem" type="node" alwaysNotify="true" />
+    <field id="keyPress" type="string" alwaysNotify="true" />
+    <field id="navigateWithinPageInfo" type="assocarray" />
+    <field id="trackingComponentInfo" type="assocarray" />
+  </interface>
+
+  <children>
+    <Group
+      id="landscapeRowGroup"
+      opacity="0.0">
+
+      <Group
+        id="landscapeRow"
+        opacity="0.2">
+
+        <Label
+          id="rowTitle"
+          width="1536" />
+
+        <MarkupGrid
+          id="landscapeGrid"
+          itemComponentName="BWWLandscapeItem"
+          numRows="1"
+          itemSpacing="[16, 16]"
+          itemSize="[520, 486]"
+          translation="[0, 57]"
+          drawFocusFeedback="false"
+          fadeFocusFeedbackWhenAutoScrolling="true"
+          horizFocusAnimationStyle="fixedFocus" />
+
+      </Group>
+
+    </Group>
+  </children>
+</component>

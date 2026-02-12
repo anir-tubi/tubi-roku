@@ -1683,8 +1683,14 @@ Function animateTransport(direction)
   end if
 
   'Changing opacity to 1, since we changed the opacity to 0 when hiding BrowseWhileWatching
-  if direction = "in" AND m.TransportButtons.opacity = 0.0
-    fade(m.TransportButtons, "in", 0.4)
+  target = m.TransportButtons
+
+  if m.isBWWLandscapeEnabled = true
+    target = m.Transport
+  end if
+
+  if direction = "in" AND target.opacity = 0.0
+    fade(target, "in", 0.4)
   end if
 
   m.hudState = slideFade(m.HUD, "below", direction, 0.6)
@@ -2222,7 +2228,13 @@ Function animateTransportAndBrowseWhileWatching(direction)
 
     handleSkipCuepointsButtonOnAnimateTransport("out")
     fade(m.TopOverlay, "out", 0.4)
-    fade(m.TransportButtons, "out", 0.4)
+
+    if m.isBWWLandscapeEnabled = true
+      fade(m.Transport, "out", 0.4)
+    else
+      fade(m.TransportButtons, "out", 0.4)
+    end if
+
     if m.top.isTrailer = true
       fade(m.SkipTrailerButton, "out", 0.6)
     end if
@@ -2264,7 +2276,12 @@ Function animateTransportAndBrowseWhileWatching(direction)
     if m.skipCuepointsButtonTimer = invalid
       m.TransportButtons.translation = [m.TransportButtonsXTranslation, 0]
     end if
-    transportButtonState = fade(m.TransportButtons, "in", 0.4)
+
+    if m.isBWWLandscapeEnabled = true
+      transportButtonState = fade(m.Transport, "in", 0.4)
+    else
+      transportButtonState = fade(m.TransportButtons, "in", 0.4)
+    end if
 
     if transportButtonState <> invalid
       transportButtonState.observeFieldScoped("state", "onTransportButtonStateChanged")

@@ -127,10 +127,17 @@ Function init()
 
   browseWhileWatchingRow = m.top.findNode("BrowseWhileWatchingRow")
 
-  m.BrowseWhileWatching = browseWhileWatchingRow.createChild("Related")
-  m.BrowseWhileWatching.observeFieldScoped("selectedRelatedContentTrigger", "onRelatedItemSelected")
+  ' Create either landscape or portrait BWW based on experiment
+  if m.isBWWLandscapeEnabled = true
+    m.BrowseWhileWatching = browseWhileWatchingRow.createChild("RelatedLandscape")
+    m.BrowseWhileWatching.translation = [m.marginX, 945]
+    m.BrowseWhileWatching.observeFieldScoped("selectedRelatedContentItem", "onRelatedItemSelected")
+  else
+    m.BrowseWhileWatching = browseWhileWatchingRow.createChild("Related")
+    m.BrowseWhileWatching.translation = [m.marginX, 550]
+    m.BrowseWhileWatching.observeFieldScoped("selectedRelatedContentTrigger", "onRelatedItemSelected")
+  end if
 
-  m.BrowseWhileWatching.translation = [m.marginX, 550]
   m.BrowseWhileWatching.associatedPageName = "video_player_page"
   m.BrowseWhileWatching.observeFieldScoped("trackingComponentInfo", "onTrackingComponentInfo")
   m.BrowseWhileWatching.observeFieldScoped("focusedContent", "onRelatedItemFocused")
@@ -638,6 +645,9 @@ Function initExperiments()
 
   ' Subtitle overlay experiment
   m.isSubtitleOverlayExperimentEnabled = getStatsigExperimentResource("roku_player_improvement", "roku_player_subtitle_overlay_v1", false).enabled
+
+  ' BWW Landscape experiment
+  m.isBWWLandscapeEnabled = getStatsigExperimentResource("roku_player_improvement", "roku_bww_landscape_v1", false).enabled
 
 End Function
 
