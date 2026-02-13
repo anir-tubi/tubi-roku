@@ -178,9 +178,7 @@ Function handleGuestProfileSelection()
   ' Check if guest profile exists in registry
   guestProfileAuth = m.tubiAuthUpdate.getProfileAuthInfo("guest")
 
-  if isLoggedInUser() = false
-    popScreenAfterSignInProcess()
-  else if guestProfileAuth.count() > 0
+  if guestProfileAuth.count() > 0
     if m.getAuthOperationInProgress = false then
       m.getAuthOperationInProgress = true
       m.tubiAuthUpdate.copyProfileToMainAuth("guest")

@@ -700,9 +700,7 @@ Function createTooltipForAddAccounts()
       m.multiAccountVisitCount = count
       regWrite("multiVisitCount", count.toStr(), "visit")
 
-      profiles = m.tubiAuthUpdate.getAllProfilesAuthInfo()
-
-      if profiles.count() < 3 AND (m.multiAccountVisitCount = 2 OR m.multiAccountVisitCount = 3)
+      if m.multiAccountVisitCount < 4
         m.sideNav.showAddAccountsTooltip = true
       end if
     end if

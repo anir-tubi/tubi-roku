@@ -12,7 +12,7 @@ Function init()
   m.Title = m.top.findNode("Title")
   m.Title.text = getTranslation("menu_settings")
 
-  m.isUserInMultiAccount = isUserInMultiAccountFromRegistry()
+  m.isUserInMultiAccount = isUserInMultiAccount()
 
   ' Create the menu
   m.SettingsMenuPanel = createSettingsMenuPanel()

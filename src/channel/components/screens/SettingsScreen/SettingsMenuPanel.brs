@@ -16,7 +16,7 @@ Function init()
   m.top.observeFieldScoped("signInInfo", "onSignInInfoChange")
   m.top.observeFieldScoped("uiMode", "onUiModeChange")
 
-  m.isUserInMultiAccount = isUserInMultiAccountFromRegistry()
+  m.isUserInMultiAccount = isUserInMultiAccount()
 
   setSettingsSidePanelMenuItems()
 

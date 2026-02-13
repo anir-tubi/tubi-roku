@@ -52,7 +52,7 @@ Function init()
   ' We do not want to show unfocused background as per designs.
   m.Menu.focusFootprintBitmapUri = "pkg:/images/transparent.png"
 
-  if isUserInMultiAccountFromRegistry() = true
+  if isUserInMultiAccount() = true
     m.isUserInMultiAccount = true
     m.isPinLayoutPresent = true
   else

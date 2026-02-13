@@ -590,8 +590,14 @@ Function handle_422_451_error(callback, errorCode = 0)
   currentScreen = getCurrentScreen()
   if m.uiMode = m.constants.ui.modes.kidsAgeGate then
     if callback = handle_422_451_errorAtKidsModeExitCallback OR callback = handle_422_451_errorAtInputDeeplinkCallback then
-      title = getTranslation("dialog_cannotExitKidsMode_title")
-      message = getTranslation("dialog_cannotExitKidsMode_description")
+      if isUserInMultiAccount() = true
+        title = getTranslation("dialog_cannotExitKidsMode_title_multi_account")
+        message = getTranslation("dialog_cannotExitKidsMode_description_multi_account")
+      else
+        title = getTranslation("dialog_cannotExitKidsMode_title")
+        message = getTranslation("dialog_cannotExitKidsMode_description")
+      end if
+
       dialogEvent = {
         type: "dialog"
         values: {
@@ -604,8 +610,6 @@ Function handle_422_451_error(callback, errorCode = 0)
       buttons = [getTranslation("dialog_button_close")]
       showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask)
     else
-      title = getTranslation("dialog_kidsWelcome_title")
-      message = getTranslation("dialog_kidsWelcomeAgeGate_description")
       dialogEvent = {
         type: "dialog"
         values: {
@@ -615,7 +619,24 @@ Function handle_422_451_error(callback, errorCode = 0)
           dialog_sub_type: "welcome-age-gate"
         }
       }
-      showSimpleInstantResumableModal(title, message, [], dialogEvent, m.trackingLoggingTask)
+
+      if isUserInMultiAccount() = true
+        title = getTranslation("dialog_kidsWelcome_title_multi_account")
+        msgStr = getTranslation("dialog_kidsWelcomeAgeGate_description_multi_account")
+
+        toastInfo = {
+          message: msgStr
+          selfDestructTimer: 5
+          imageUri: "pkg:/images/icon-account.webp"
+          headerText: title
+        }
+        showToast(toastInfo, true, dialogEvent)
+
+      else
+        title = getTranslation("dialog_kidsWelcome_title")
+        message = getTranslation("dialog_kidsWelcomeAgeGate_description")
+        showSimpleInstantResumableModal(title, message, [], dialogEvent, m.trackingLoggingTask)
+      end if
     end if
   end if
 End Function

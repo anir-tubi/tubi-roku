@@ -111,8 +111,10 @@ Function setSettingsScreenSignInInfo()
             else
               linkedKidsAccount.parentalRating = profile.parentalRating
             end if
+            if isNonEmptyString(profile.tubiId) = true
+              linkedAccounts[profile.tubiId] = linkedKidsAccount
+            end if
 
-            linkedAccounts[profile.tubiId] = linkedKidsAccount
           end if
         end for
         aaSignIn.linkedAccounts = linkedAccounts

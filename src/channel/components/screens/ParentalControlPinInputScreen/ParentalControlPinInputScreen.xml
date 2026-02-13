@@ -36,7 +36,7 @@
 
     <LayoutGroup
       layoutDirection="vert"
-      itemSpacings="[4,8,20,20, -60, 20, 8]"
+      itemSpacings="[4,8,15,15, -80, 20, 8,8]"
       horizAlignment="center"
       vertAlignment="center"
       translation="[960,540]">
@@ -70,20 +70,20 @@
         itemSpacings="[8]">
         <Group>
           <Poster
-            width="99"
-            height="87"
+            width="87"
+            height="75"
             uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
             id="digit1Poster">
           </Poster>
           <Poster
-            width="99"
-            height="87"
+            width="87"
+            height="75"
             uri="pkg:/images/pin-bg-input.png"
             id="digit1bg">
           </Poster>
           <Label
-            width="99"
-            height="87"
+            width="87"
+            height="75"
             horizAlign="center"
             vertAlign="center"
             id="digit1">
@@ -94,21 +94,21 @@
 
         <Group>
           <Poster
-            width="99"
-            height="87"
+            width="87"
+            height="75"
             uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
             visible="false"
             id="digit2Poster">
           </Poster>
           <Poster
-            width="99"
-            height="87"
+            width="87"
+            height="75"
             uri="pkg:/images/pin-bg-input.png"
             id="digit2bg">
           </Poster>
           <Label
-            width="99"
-            height="87"
+            width="87"
+            height="75"
             horizAlign="center"
             vertAlign="center"
             id="digit2">
@@ -119,21 +119,21 @@
 
         <Group>
           <Poster
-            width="99"
-            height="87"
+            width="87"
+            height="75"
             uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
             visible="false"
             id="digit3Poster">
           </Poster>
           <Poster
-            width="99"
-            height="87"
+            width="87"
+            height="75"
             uri="pkg:/images/pin-bg-input.png"
             id="digit3bg">
           </Poster>
           <Label
-            width="99"
-            height="87"
+            width="87"
+            height="75"
             horizAlign="center"
             vertAlign="center"
             id="digit3">
@@ -144,21 +144,21 @@
 
         <Group>
           <Poster
-            width="99"
-            height="87"
+            width="87"
+            height="75"
             uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
             visible="false"
             id="digit4Poster">
           </Poster>
           <Poster
-            width="99"
-            height="87"
+            width="87"
+            height="75"
             uri="pkg:/images/pin-bg-input.png"
             id="digit4bg">
           </Poster>
           <Label
-            width="99"
-            height="87"
+            width="87"
+            height="75"
             horizAlign="center"
             vertAlign="center"
             id="digit4">
@@ -177,14 +177,33 @@
 
       <NumberPad
         id="NumberPad" />
-      <SimpleButton
-        id="continueButton"
-        width="420"
-        height="72" />
-      <SimpleButton
-        id="multiPurposeButton"
-        width="420"
-        height="72" />
+      <LayoutGroup
+        layoutDirection="vert"
+        id="buttonLayout"
+        horizAlignment="center"
+        vertAlignment="center"
+        itemSpacings="[8]">
+        <SimpleButton
+          id="continueButton"
+          width="420"
+          height="65" />
+        <Label
+          id="skipButtonLegalText"
+          width="1200"
+          maxLines="2"
+          numLines="2"
+          wrap="true"
+          horizAlign="center"
+          vertAlign="center"
+          visible="false">
+          <Font
+            role="font" />
+        </Label>
+        <SimpleButton
+          id="multiPurposeButton"
+          width="420"
+          height="65" />
+      </LayoutGroup>
     </LayoutGroup>
   </children>
 

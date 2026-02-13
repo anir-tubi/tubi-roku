@@ -15,6 +15,10 @@ Function init()
   m.digit3bg = m.top.findNode("digit3bg")
   m.digit4bg = m.top.findNode("digit4bg")
   m.errorMessage = m.top.findNode("errorMessage")
+  m.buttonLayout = m.top.findNode("buttonLayout")
+  m.skipButtonLegalText = m.top.findNode("skipButtonLegalText")
+  m.skipButtonLegalText.text = getTranslation("ParentalControlPinInputScreen_skip_button_legal_label", { url: "https://tubitv.com/help-center/App-Features-and-Settings/articles/42331260335643" })
+  m.skipButtonLegalText.visible = true
 
   m.errorMessage.text = getTranslation("screenSettings_parentalPassword_error_pin_mismatch")
   m.constants = getConstantsFromGlobal()
@@ -62,6 +66,7 @@ Function init()
   setTypographyOfLabel(m.continueButton, typographyConstants.ids.bodyMediumStrong)
   setTypographyOfLabel(m.multiPurposeButton, typographyConstants.ids.bodyMediumStrong)
   setTypographyOfLabel(m.errorMessage, typographyConstants.ids.bodySmall)
+  setTypographyOfLabel(m.skipButtonLegalText, typographyConstants.ids.bodySmall)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -97,6 +102,7 @@ Function onThemeChange(msg = invalid)
   m.digit3bg.blendColor = theme.primaryTextColor
   m.digit4bg.blendColor = theme.primaryTextColor
   m.errorMessage.color = theme.cautionColor
+  m.skipButtonLegalText.color = theme.secondaryTextColor
 End Function
 
 
@@ -260,12 +266,14 @@ Function setMode(mode)
     m.header.text = getTranslation("screenSettings_parentalPassword_create_new_pin")
     m.top.screenLevel = m.constants.ui.screenLevels.confirmpasswordscreen
     m.multiPurposeButton.visible = false
+    m.buttonLayout.removeChild(m.skipButtonLegalText)
     m.backButtonPoster.visible = true
     m.getPinConfirmed = true
   else if mode = "confirm_pin"
     m.header.text = getTranslation("screenSettings_parentalPassword_confirm_pin")
     m.top.screenLevel = m.constants.ui.screenLevels.confirmpasswordscreen
     m.multiPurposeButton.visible = false
+    m.buttonLayout.removeChild(m.skipButtonLegalText)
     m.backButtonPoster.visible = true
     m.getPinConfirmed = true
   else if mode = "enter_pin"
@@ -273,11 +281,15 @@ Function setMode(mode)
     m.top.screenLevel = m.constants.ui.screenLevels.confirmpasswordscreen
     m.multiPurposeButton.text = getTranslation("ParentalControlPinInputScreen_forgot_pin_button_label")
     m.multiPurposeButton.visible = true
+    m.buttonLayout.removeChild(m.skipButtonLegalText)
     m.backButtonPoster.visible = true
     m.getPinConfirmed = false
   else
     m.header.text = getTranslation("screenSettings_parentalPassword_create_new_pin")
     m.top.screenLevel = m.constants.ui.screenLevels.ageGateScreen
+    if m.skipButtonLegalText.getParent() = invalid
+      m.buttonLayout.insertChild(m.skipButtonLegalText, 1)
+    end if
     m.multiPurposeButton.text = getTranslation("ParentalControlPinInputScreen_skip_button_label")
     m.multiPurposeButton.visible = true
     m.backButtonPoster.visible = false

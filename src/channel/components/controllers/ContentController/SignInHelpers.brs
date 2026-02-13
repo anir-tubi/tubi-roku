@@ -880,7 +880,7 @@ End Function
 Function onMatureContentWarningSignInCompleted()
   tubiLog("SignInHelpers.onMatureContentWarningSignInCompleted")
   refreshUiAfterSignIn()
-  setContentToRefreshAllPersonalizedScreens(false)
+  setContentToRefreshAllPersonalizedScreens(true)
 
   currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false

@@ -610,6 +610,14 @@ Function getTranslation_en_US()
       "description": "A description informing users they cannot exit Tubi Kids for the next 24 hours",
       "message": "You cannot exit Tubi Kids at this time. Please try again in 24 hours. Questions? Drop us a line at www.tubi.tv/support"
     },
+    "dialog_kidsWelcome_title_multi_account": {
+      "description": "Title for dialog when account was not created for multi-account",
+      "message": "Account not created"
+    },
+    "dialog_kidsWelcomeAgeGate_description_multi_account": {
+      "description": "Description informing users their data is being deleted but they can still use Tubi Kids",
+      "message": "We are deleting the data you provided to register.You can still check out Tubi Kids"
+    },
     "dialog_cannotExitKidsMode_title": {
       "description": "Title for dialog telling the user they can not exit kids mode",
       "message": "Cannot Exit Kids Mode"
@@ -617,6 +625,14 @@ Function getTranslation_en_US()
     "dialog_cannotExitKidsMode_description": {
       "description": "Description for dialog telling the user they can not exit kids mode",
       "message": "Please try again in 24 hours.\nQuestions? Drop us an email at support@tubi.tv"
+    },
+    "dialog_cannotExitKidsMode_title_multi_account": {
+      "description": "Title for dialog telling the user they are in kids mode for multi-account",
+      "message": "You're in Kids Mode for 24 hours."
+    },
+    "dialog_cannotExitKidsMode_description_multi_account": {
+      "description": "Description for dialog telling the user how to get support for multi-account",
+      "message": "Questions? Let us know at www.tubi.tv/support"
     },
     "dialog_exitApp_title": {
       "description": "Title of the dialog window that asks the user if they want to exit the app",
@@ -2571,6 +2587,10 @@ Function getTranslation_en_US()
     "ParentalControlPinInputScreen_skip_button_label": {
       "description": "Label of the skip button in the parental control pin input screen",
       "message": "Turn Off PIN"
+    },
+    "ParentalControlPinInputScreen_skip_button_legal_label": {
+      "description": "legal text for the skip button in the parental control pin input screen",
+      "message": "By clicking Turn off PIN below, you allow this kid to exit Tubi Kids accounts without restriction. Learn more at {url}"
     },
     "parental_pin_update_success_header": {
       "description": "Header of the toast that is shown when the parental pin is updated successfully",

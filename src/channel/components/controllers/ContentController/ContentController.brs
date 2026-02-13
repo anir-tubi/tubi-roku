@@ -932,13 +932,11 @@ Function setUiModeAndLoadContent()
     ' whether we were logged in or not.
     handleDeeplink()
   else if isUserInMultiAccount() = true AND m.uiMode <> m.constants.ui.modes.kidsAgeGate
-    profiles = m.tubiAuthUpdate.getAllProfilesAuthInfo()
+    authInfo = m.tubiAuthUpdate.getAuthInfo()
 
-    if profiles.count() > 2 OR m.multiAccountVisitCount = 1
-      showProfileSelectorScreen(m.constants, profiles, true)
-    else
-      startChannelFromAppLoad()
-    end if
+
+    handleRegularProfileSelection(authInfo.tubiId)
+
   else
     startChannelFromAppLoad()
   end if
@@ -3925,6 +3923,7 @@ Function onStartMigrateDefaultUserToNewProfileSuccess(userInfo)
     end if
 
     Auth.createOrUpdateProfileAuth(userInfo.tubiId, authInfo)
+    Auth.copyProfileToMainAuth(userInfo.tubiId)
     'create fake guest profile so that user has option to switch to guest.
     Auth.createOrUpdateProfileAuth("guest", { "name": "", })
   end if
@@ -3942,20 +3941,42 @@ End Function
 
 Function performProfileMigration()
   TubiLog("performProfileMigration")
-  if getStatsigExperimentResource("roku_multi_account", "roku_multi_account_v0", false).variant <> "none" AND isLoggedInUser() = true
-    auth = m.tubiAuthUpdate
-    oldAuthExists = auth.getAuthInfo()
+  auth = m.tubiAuthUpdate.getAuthInfo()
+  'if UK/AU and kids profile is selected, then copy the kids parent
+  if m.enableMultipleAccounts = invalid
+    m.enableMultipleAccounts = getExternalConfigValueFromGlobal("enable_multiple_accounts", false)
+  end if
 
-    if oldAuthExists.expireTime <> invalid AND isUserInMultiAccount() = false
-      ' get the user info from settings api and patch with what we have already stored in the registry
-      'use v2 parental rating from settings api since we are anyway going to migrate.
-      requestInfo = m.userDeviceApi.createUserSettingsGeneralTaskReqInfo(onStartMigrateDefaultUserToNewProfileSuccess, setNotMigratedDefaultState, true)
-      m.makeRequest(requestInfo)
+  ' if multi account not enabled from remote config, then swith off multi account feature
+  if m.enableMultipleAccounts = false
+    if isKidsProfile(auth) = true
+      m.tubiAuthUpdate.copyProfileToMainAuth("guest")
+    end if
+
+    m.profileMigrationComplete = true
+    runControllerStartSequence()
+  else
+
+    if getStatsigExperimentResource("roku_multi_account", "roku_multi_account_v0", false).variant <> "none" AND isLoggedInUser() = true
+      auth = m.tubiAuthUpdate
+      oldAuthExists = auth.getAuthInfo()
+
+      if oldAuthExists.expireTime <> invalid AND isUserInMultiAccount() = false
+        ' get the user info from settings api and patch with what we have already stored in the registry
+        'use v2 parental rating from settings api since we are anyway going to migrate.
+        requestInfo = m.userDeviceApi.createUserSettingsGeneralTaskReqInfo(onStartMigrateDefaultUserToNewProfileSuccess, setNotMigratedDefaultState, true)
+        m.makeRequest(requestInfo)
+      else
+        setNotMigratedDefaultState()
+      end if
     else
       setNotMigratedDefaultState()
     end if
-  else
-    setNotMigratedDefaultState()
+
+    'treatment group
+    if isLoggedInUser() = true OR isUserInMultiAccount() = true
+      getStatsigExperimentResource("roku_multi_account", "roku_multi_account_v0", true)
+    end if
   end if
 End Function
 
