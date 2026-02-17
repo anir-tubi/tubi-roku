@@ -46,6 +46,38 @@
     <!-- In-transit focused item bounding rectangle (for animations) -->
     <field id="inTransitCurrentFocusedItemBoundingRect" type="assocarray" />
 
+    <!-- Current cursor position in the RowList [row, column] -->
+    <field id="cursorPosition" type="array" />
+
+    <!-- User sign-in status -->
+    <field id="isSignedInUser" type="boolean" />
+
+    <!-- UI mode (normal, kids, etc.) -->
+    <field id="uiMode" type="string" />
+
+    <!-- Communicates to parent what was the last focused list was. -->
+    <field id="lastFocusedList" type="string" value="rowList" />
+
+    <!-- Controls whether to track viewable impression events for the screen -->
+    <field id="shouldTrackViewableImpressionEvent" type="boolean" />
+
     <!-- End Video Tiles Required Fields -->
+
+    <!-- Common Screen Fields (shared by all VideoTilesScreen subclasses) -->
+
+    <!-- Content node containing the screen's data -->
+    <field id="content" type="node" />
+
+    <!-- When true, screen is in loading state -->
+    <field id="isLoading" type="boolean" />
+
+    <!-- Set to the contentNode of the RowList item which was selected -->
+    <field id="contentSelected" type="node" />
+
+    <!-- Set to the contentNode of the RowList item which was focused -->
+    <field id="contentFocused" type="node" />
+
+    <!-- Content is loaded and ready to display -->
+    <field id="contentReady" type="boolean" value="false" alwaysNotify="true" />
   </interface>
 </component>

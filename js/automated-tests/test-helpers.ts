@@ -434,27 +434,6 @@ class TestHelpers {
   }
 
   /**
-   * HELPER: Starts app at home screen and waits for home list focus
-   * 
-   * PATTERN: Used 245+ times - consolidates common startup pattern
-   * 
-   * @param shouldCreateNewUser - Whether to create new user (default: true)
-   * @param user - Optional specific user to start with
-   * 
-   * @example
-   * await testHelpers.startAtHomeScreen(); // New user
-   * await testHelpers.startAtHomeScreen(false); // Guest user
-   * 
-   * const user = await testUtils.createRegisteredUser();
-   * await testHelpers.startAtHomeScreen(true, user); // Specific user
-   */
-  public async startAtHomeScreen(shouldCreateNewUser = true, user?: any) {
-    const options = user ? { user } : { shouldCreateNewUser };
-    await testUtils.startApplicationAtPage('home', options);
-    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
-  }
-
-  /**
    * HELPER: Generic page navigation with optional focus wait
    * 
    * @param page - Page to navigate to ('movies', 'series', 'settings', 'myStuff', etc.)
@@ -999,23 +978,77 @@ class TestHelpers {
   }
 
   /**
-   * HELPER: Exits Kids Mode
+   * HELPER: Exits Kids Mode (side nav only)
+   * 
+   * Opens the side nav and selects "Exit Kids". This does NOT handle the
+   * age gate screen that follows. Use `exitKidsModeWithAgeGate()` for the
+   * full exit flow.
    * 
    * USE WHEN:
-   *   - Need to exit Kids Mode to access adult content
-   *   - Testing age gate functionality
+   *   - Testing age gate functionality directly (need manual control of age entry)
    * 
    * PREREQUISITES:
    *   - User must be in Kids Mode
    * 
    * @example
    * await testHelpers.exitKidsMode();
-   * // Age gate may appear if user hasn't entered valid age
+   * // Age gate will appear — handle manually
    */
   public async exitKidsMode() {
     await ecp.sendKeypress(ecp.Key.Left);
     await testUtils.waitForSideNavMenuToBeExpanded();
     await testUtils.selectMenuItem('sideNavMenu', 'Exit Kids');
+  }
+
+  /**
+   * HELPER: Exits Kids Mode and completes age gate verification
+   * 
+   * Full flow: opens side nav → selects "Exit Kids" → waits for age gate →
+   * enters a valid adult birth year → submits → waits for home screen.
+   * 
+   * USE WHEN:
+   *   - Need to fully exit Kids Mode and return to the adult home screen
+   *   - Test does not need to verify age gate UI itself
+   * 
+   * PREREQUISITES:
+   *   - User must be in Kids Mode
+   * 
+   * @param age - Age to enter (must be > 12 to successfully exit). Defaults to 18.
+   * 
+   * @example
+   * await testHelpers.exitKidsModeWithAgeGate();
+   * // Now on adult home screen with videoTitlesRowList focused
+   * 
+   * @example
+   * // Exit with a specific age (still > 12)
+   * await testHelpers.exitKidsModeWithAgeGate(25);
+   */
+  public async exitKidsModeWithAgeGate(age = 18) {
+    // Open side nav and select "Exit Kids"
+    await this.exitKidsMode();
+
+    // Wait for age gate screen to appear
+    await testUtils.waitForElementToShowOnScreen(
+      'ageVerificationNumberPad',
+      'Age gate not shown after selecting Exit Kids',
+      10000,
+    );
+
+    // Enter birth year for the given age
+    const birthYear = new Date().getFullYear() - age;
+    await ecp.sendText(birthYear.toString());
+
+    // Navigate to submit button and press OK
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
+    await ecp.sendKeypress(ecp.Key.Ok);
+
+    // Wait for home screen to load after successful exit
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
+    await testUtils.waitForElementToHaveFocus(
+      'videoTitlesRowList',
+      'Timed out waiting for home screen after exiting kids mode',
+      20000,
+    );
   }
 
   /* ═══════════════════════════════════════════════════════════════════
@@ -1725,7 +1758,7 @@ class TestHelpers {
     expect(subtitle1.text).to.equal('Find your favorites fast, pick up where you left off–all in one place.');
 
     const subtitle2 = await testUtils.getNodeForElement('myStuffRegScreenSubTitle2');
-    expect(subtitle2.text).to.equal('Use the bookmark button to save series and movies to your My List.');
+    expect(subtitle2.text).to.equal('Use the bookmark button to save series and movies to My List, and quickly get back to what you were watching with Continue Watching.');
   }
 
   /**
@@ -2046,7 +2079,7 @@ class TestHelpers {
    *
    * @private
    */
-  private async fetchLinearContent(user: any, count = 2): Promise<any[]> {
+  public async fetchLinearContent(user: any, count = 2): Promise<any[]> {
     const linearChannelsUrl = 'https://tensor-cdn.production-public.tubi.io/api/v7/containers/recommended_linear_channels?' +
       'images%5Bbackground_tb%5D=w1197h675_background&' +
       'images%5Blandscape_tb%5D=w520h292_landscape&' +
@@ -2356,7 +2389,7 @@ class TestHelpers {
    *
    * VALIDATES:
    *   - Title: "Sign Up to Save Your Progress"
-   *   - Description: "Pick up right where you left off next time you play a TV Series or a Movie. Available upon sign up."
+   *   - Description: "Pick up right where you left off next time you play a TV Series or a Movie."
    *   - Sign up button visibility
    *   - Button label text: "Sign Up to Save Progress"
    *
@@ -2407,7 +2440,7 @@ class TestHelpers {
     // Validate registration CTA description
     const descriptionNode = await testUtils.getNodeWithDynamicPath(descriptionElement, 10000);
     expect(descriptionNode.visible).to.equal(true, 'Guest user CW tile description should be visible');
-    expect(descriptionNode.text).to.equal('Pick up right where you left off next time you play a TV Series or a Movie. Available upon sign up.',
+    expect(descriptionNode.text).to.equal('Pick up right where you left off next time you play a TV Series or a Movie.',
       'CW tile should display correct description');
 
     // Validate sign up button is present and visible

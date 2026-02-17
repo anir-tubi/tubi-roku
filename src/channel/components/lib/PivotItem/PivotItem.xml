@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  PivotItem - A specialized EnhancedButton for pivot list items
+
+  Extends EnhancedButton with pivot-specific behavior.
+  Used as the item component in PivotList.
+-->
+<component name="PivotItem" extends="EnhancedButton">
+  <script type="text/brightscript" uri="PivotItem.brs" />
+
+  <children>
+    <Poster
+      id="pivotBackground"
+      uri="pkg:/images/pivot-background-$$RES$$.9.png"
+      loadSync="true" />
+  </children>
+</component>

@@ -7,7 +7,7 @@ Function getVideoPreviewStateForThisContent(content = invalid)
 
   videoPreview = m.videoPreviewPlayer
   if content <> invalid AND videoPreview <> invalid AND videoPreview.content <> invalid
-    if videoPreview.content.id = content.id
+    if videoPreview.content.id = content.id AND isNonEmptyString(videoPreview.state) = true
       state = videoPreview.state
     end if
   end if

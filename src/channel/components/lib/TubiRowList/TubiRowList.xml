@@ -10,15 +10,20 @@
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
 
   <interface>
-  <!-- INPUT -->
+    <!-- INPUT -->
     <field id="trackingPageInfo" type="assocarray" />
 
     <field id="contentSupplied" type="assocarray" />
 
-  <!-- OUTPUT -->
+    <!-- If true, we will disable overriding the drawFocusFeedback inside the
+    onRowItemFocusedChanged function -->
+    <field id="useDefaultFocusFeedback" type="boolean" value="true" />
+
+    <!-- OUTPUT -->
     <field id="contentNeeded" type="assocarray" />
 
-    <!-- The index of the content has been selected. A 2D array [row, column] if row item was selected and a 1D array [row] if row title was selected -->
+    <!-- The index of the content has been selected. A 2D array [row, column] if row item was
+    selected and a 1D array [row] if row title was selected -->
     <field id="selectedContentIndex" type="array" alwaysNotify="true" />
 
     <!-- The index of the content to play. A 2D array [row, column] -->
@@ -27,10 +32,13 @@
     <!-- Navigate within page event tracking info -->
     <field id="navigateWithinPageInfo" type="assocarray" alwaysNotify="true" />
 
-    <!-- stores the component info of the component that was selected when navigating to a new screen. Looks like:
+    <!-- stores the component info of the component that was selected when navigating to a new
+    screen. Looks like:
       {
-        componentType: "category_component" Corresponds to one of the page types in tubiTracking_getAnalyticsComponent which mirrors the protos repo.
-        componentValues: {} An assoc array with key/values that match the componentType as found in tubiTracking_getAnalyticsComponent().
+        componentType: "category_component" Corresponds to one of the page types in
+    tubiTracking_getAnalyticsComponent which mirrors the protos repo.
+        componentValues: {} An assoc array with key/values that match the componentType as found in
+    tubiTracking_getAnalyticsComponent().
       }
     -->
     <field id="trackingComponentInfo" type="assocarray" alwaysNotify="true" />

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  BackHint - Displays "Press [Back] For" hint with styled pill button
+-->
+<component name="BackHint" extends="Group">
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="BackHint.brs" />
+
+  <interface>
+    <field id="height" type="float" value="57"
+      alias="pressLabel.height, pillBackground.height, forLabel.height, backLabel.height" />
+  </interface>
+
+  <children>
+    <LayoutGroup
+      id="hintLayout"
+      layoutDirection="horiz"
+      itemSpacings="[9]">
+      <Label
+        id="pressLabel"
+        vertAlign="center" />
+      <Group id="pillGroup">
+        <Poster
+          width="90"
+          id="pillBackground"
+          uri="pkg:/images/pivot-background-$$RES$$.9.png" />
+        <Label
+          width="90"
+          vertAlign="center"
+          horizAlign="center"
+          id="backLabel" />
+      </Group>
+      <Label
+        id="forLabel"
+        vertAlign="center" />
+    </LayoutGroup>
+  </children>
+</component>

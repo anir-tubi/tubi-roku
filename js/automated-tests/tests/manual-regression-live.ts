@@ -1224,8 +1224,7 @@ describe('Live/Linear TV Regression Tests', function () {
     expect(hasLinear).to.equal(false, 'Kids Featured row should not contain linear content');
 
     // Exit kids mode before checking other pages
-    await testHelpers.exitKidsMode();
-    await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist after exiting kids mode', 10000);
+    await testHelpers.exitKidsModeWithAgeGate();
 
     // Check Movies page
     await testUtils.goToPage('movies');

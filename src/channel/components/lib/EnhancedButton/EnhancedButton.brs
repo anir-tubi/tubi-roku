@@ -45,6 +45,7 @@ Function init() as Void
   setTypographyOfLabel(m.badgeText, bodyExtraSmallStrongFont)
   setTypographyOfLabel(m.badgeTextFocused, bodyExtraSmallStrongFont)
   setTypographyOfLabel(m.subtitle, bodyExtraSmallStrongFont)
+  m.fonts = typographyConstants.ids
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -113,6 +114,16 @@ Function onItemContentChange() as Void
   if m.top.itemContent = invalid then return
 
   item = m.top.itemContent
+
+  ' Allow backgroundUri override through itemContent
+  if isNonEmptyString(item.backgroundUri)
+    m.top.backgroundUri = item.backgroundUri
+  end if
+
+  ' Allow padding override through itemContent
+  if isInteger(item.padding)
+    m.top.padding = item.padding
+  end if
 
   renderButton(item, item.isPrimaryButton, false)
 

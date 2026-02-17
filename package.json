@@ -71,7 +71,7 @@
     "brighterscript-xml-plugin": "^0.2.1",
     "needle": "^3.2.0",
     "roku-deploy": "^3.12.5",
-    "roku-test-automation": "^2.0.13-0"
+    "roku-test-automation": "^2.2.1"
   },
   "mocha": {
     "timeout": 120000,

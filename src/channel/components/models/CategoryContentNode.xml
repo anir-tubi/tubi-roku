@@ -47,5 +47,8 @@
     <field id="ads" type="node" />
 
     <field id="relatedTo" type="node" />
+
+    <!-- UI customization data for child content (e.g. SOT badge labels) -->
+    <field id="child_ui_customization" type="assocarray" />
   </interface>
 </component>

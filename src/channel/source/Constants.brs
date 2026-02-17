@@ -354,6 +354,8 @@ Function getConstants()
   constants.reqNames.postPinUpdateForKids = "postPinUpdateForKids"
   constants.reqNames.validatePassword = "validatePassword"
   constants.reqNames.validatePin = "validatePin"
+  constants.reqNames.getAllPivots = "getAllPivots"
+  constants.reqNames.getPivotContainers = "getPivotContainers"
 
 
   ' a list of reqnames that the general task will inject auth headers and should expect to handle 403 errors for
@@ -413,6 +415,8 @@ Function getConstants()
   constants.reqNames.acceptsTubiAuth[constants.reqNames.getCollection] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.validatePassword] = true
   constants.reqNames.acceptsTubiAuth[constants.reqNames.validatePin] = true
+  constants.reqNames.acceptsTubiAuth[constants.reqNames.getAllPivots] = true
+  constants.reqNames.acceptsTubiAuth[constants.reqNames.getPivotContainers] = true
 
   constants.anonymous = {}
   constants.anonymous.algorithm = "TUBI-HMAC-SHA256"
@@ -643,6 +647,10 @@ Function getConstants()
   constants.urls.tensor.SoTStaticConfig = constants.urls.tensor.cdn.urlBase + "/v1/ui_customization/static_config"
   ' Naming as collections to avoid confusion of using the term apps in our code and that is what the screen is named
   constants.urls.tensor.cdn.collections = constants.urls.tensor.cdn.urlBase + "/v1/apps"
+
+  ' tensor non-cdn url (for apps/pivots API) - derived from CDN URL by removing "-cdn"
+  constants.urls.tensor.urlBase = constants.urls.tensor.cdn.urlBase.replace("-cdn", "")
+  constants.urls.tensor.apps = constants.urls.tensor.urlBase + "/v1/apps"
 
   'remote Config hub url
   constants.urls.configHub = {}
@@ -1283,6 +1291,7 @@ Function getConstants()
   constants.ui.categoryIds.adRowlistSpotlight = "hdc_spotlight"
   constants.ui.categoryIds.adRowlistCarousel = "hdc_carousel"
   constants.ui.categoryIds.liveEventSpotlight = "live_event_spotlight"
+  constants.ui.categoryIds.guestUserMyStuff = "guest_user_my_stuff"
 
   constants.ui.categoryTypes = {}
   'these map to tensor api container types
@@ -1393,6 +1402,7 @@ Function getConstants()
   constants.ui.screenLevels.categoryPanelListScreen = 20
   constants.ui.screenLevels.confirmPasswordScreen = 40
   constants.ui.screenLevels.categoryDetailsScreen = 40
+  constants.ui.screenLevels.pivotDetailScreen = 40
   constants.ui.screenLevels.detailScreen = 50
   constants.ui.screenLevels.episodeScreen = 50
   constants.ui.screenLevels.eventDetailScreen = 50
@@ -1450,6 +1460,7 @@ Function getConstants()
   constants.ui.screenIds.parentalControlPinInputScreen = "parentalControlPinInputScreen"
   constants.ui.screenIds.kidsAgeSelectionScreen = "kidsAgeSelectionScreen"
   constants.ui.screenIds.nameInputScreen = "nameInputScreen"
+  constants.ui.screenIds.pivotDetailScreen = "pivotDetailScreen"
 
   ' notAllowedContainerIds are the containers which are not allowed to be displayed on category screen,
   ' because currently we support only portrait style in category detail screen
@@ -1627,16 +1638,6 @@ Function getConstants()
   'Location of the linear background and minimized linear video player
   constants.ui.imageTranslations.epgLinearVideoPlayerOnEPGScreen_minimizedTranslation = [800, 0]
 
-  constants.ui.sideNavOpenIds = {}
-  constants.ui.sideNavOpenIds[constants.ui.screenIds.homeScreen] = true
-  constants.ui.sideNavOpenIds[constants.ui.screenIds.categoryPanelListScreen] = true
-  constants.ui.sideNavOpenIds[constants.ui.screenIds.espanolScreen] = true
-  constants.ui.sideNavOpenIds[constants.ui.screenIds.epgScreen] = true
-  constants.ui.sideNavOpenIds[constants.ui.screenIds.tvScreen] = true
-  constants.ui.sideNavOpenIds[constants.ui.screenIds.movieScreen] = true
-  constants.ui.sideNavOpenIds[constants.ui.screenIds.myStuffScreen] = true
-  constants.ui.sideNavOpenIds[constants.ui.screenIds.searchScreen] = true
-
   constants.ui.sideNavIds = {}
   constants.ui.sideNavIds.home = "home"
   constants.ui.sideNavIds.search = "search"
@@ -1719,7 +1720,7 @@ Function getConstants()
   constants.ui.fullScreenVideoPlayerGridItemTypes = [constants.ui.gridItemTypes.skinAd, constants.ui.gridItemTypes.liveEventSpotlight]
   constants.ui.noInfoPanelGridItemTypes = [constants.ui.gridItemTypes.liveEventSpotlight, constants.ui.gridItemTypes.skinAd, constants.ui.gridItemTypes.adRowlistSpotlight]
   constants.ui.adGridItemTypes = [constants.ui.gridItemTypes.adRowlistCarousel, constants.ui.gridItemTypes.skinAd, constants.ui.gridItemTypes.adRowlistSpotlight]
-  constants.ui.videoTilesListTranslation = [24, 144]
+  constants.ui.videoTilesListTranslation = [12, 144]
 
   constants.ui.uris = {}
 

@@ -340,6 +340,17 @@ Function registerParsingCallbacks()
     parseError: parseGenericError
     passRawResponse: true
   }
+
+  m.requestTypes[m.constants.reqNames.getAllPivots] = {
+    parseSuccess: parsePivotsSuccess
+    parseError: parseGenericError
+  }
+
+  m.requestTypes[m.constants.reqNames.getPivotContainers] = {
+    parseSuccess: parseHomeScreenContentSuccess
+    parseError: parseGenericError
+    passRawResponse: true
+  }
 End Function
 
 

@@ -39,6 +39,7 @@ Function showHomeScreen(constants, screenID = "")
     '//when cached homescreen is displayed, then check UI needs to be updated
     setHomeScreenAfterFocus(homeScreen.contentFocused, homeScreen)
   else
+    m.inlineVideoMetadataOverlay.resetState = true
     m.performanceMetricsTracker.startAppLaunchMetricTiming("home_screen_tensor_request")
     showHideSpinner(true)
     homeScreen = CreateObject("roSGNode", "HomeScreen")
@@ -49,7 +50,6 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     homeScreen.observeFieldScoped("loadAllCategories", "onLoadAllCategories")
     homeScreen.observeFieldScoped("loadAllCategoriesViaRefreshTimer", "onLoadAllCategoriesAfterRefreshTimer")
-    homeScreen.observeFieldScoped("contentFocused", "onRowFocusedItemChange")
     homeScreen.observeFieldScoped("focusLost", "onHomeScreenFocusLost")
     homeScreen.observeFieldScoped("contentSelected", "onContentSelected")
     homeScreen.observeFieldScoped("contentToPlay", "onContentToPlay")
@@ -61,6 +61,7 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
     homeScreen.observeFieldScoped("adTimerImpressionFire", "onAdTimerImpressionFired")
     homeScreen.observeFieldScoped("currCategoryId", "onCurrCategoryIdChange")
+    homeScreen.observeFieldScoped("pivotSelected", "onPivotSelected")
 
     ' Set up video tiles observers
     setupVideoTilesObservers(homeScreen)
@@ -89,6 +90,10 @@ Function showHomeScreen(constants, screenID = "")
     updateInlineVideoMetadataOverlayVisibility()
 
     fetchHomescreen(homeScreen)
+
+    ' Set up PivotList and fetch pivot data
+    homeScreen.pivotServerPersistentData = m.pub_serverPersistentData
+
     setInScreenCache(homeScreen)
 
     'page_load tracking will happen when content is received and displayed when onHomescreenContentReady() is called.
@@ -318,7 +323,13 @@ Function fetchHomeScreen(homeScreen, useCache = false)
 
   ' Set the enableVideoTiles field using the centralized method
   ' Pass screenID to ensure correct rules are applied for the target screen
-  homeScreen.enableVideoTiles = isVideoTileEnabledScreen(homeScreen.id)
+  screenId = homeScreen.id
+  homeScreen.enableVideoTiles = isVideoTileEnabledScreen(screenId)
+  isPivotExperimentEnabled = false
+  if UCase(m.constants.deviceInfo.countryCode) = "US"
+    isPivotExperimentEnabled = getStatsigExperimentResource("roku_pivots", "roku_pivots_v1", true).enabled = true
+  end if
+  homeScreen.showPivots = (isPivotExperimentEnabled AND screenId = m.constants.ui.screenIds.homeScreen AND isKidsUIOn() = false AND isParentalControlsTeensLevel() = false)
 
   '//reset contentFetchCompleted flags
   homeScreen.contentFetchCompleted = false
@@ -346,7 +357,7 @@ Function fetchHomeScreen(homeScreen, useCache = false)
       '//Call an ad endpoint to get ad content for the homescreen. The ad endpoint will return if any ads are active
       aAdTypes = [m.constants.adTypes.adRowlistCarousel, m.constants.adTypes.adRowlistSpotlight, m.constants.adTypes.skinAd]
 
-      createHomescreenAdRequest(homeScreen.id, onHomesceenAdDisplaySuccessResponse, aAdTypes, onHomesceenAdDisplayErrorResponse)
+      createHomescreenAdRequest(screenId, onHomesceenAdDisplaySuccessResponse, aAdTypes, onHomesceenAdDisplayErrorResponse)
     else
       'If in kids mode, then user is not in experiment and we should indicate that the adContentFetchCompleted flag is true so that ads are not waited on when loading homescreen content
       homeScreen.adContent = []
@@ -390,7 +401,7 @@ Function fetchHomeScreen(homeScreen, useCache = false)
     responseType: "node"
     isSignedInUser: isLoggedInUser()
     uiMode: m.uiMode
-    screenId: homeScreen.id
+    screenId: screenId
   })
 
   if useCache = false
@@ -616,7 +627,8 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
           ' This is needed because we refresh home screen behind the scenes during parent controls change.
           isSkinAdsAvailable = (homeScreen.skinAdContent <> invalid)
           ' Since we do background refresh we have to use current screen state to determine if video tiles should be enabled.
-          m.videoTileOverlayGroup.visible = (isSkinAdsAvailable = false AND isVideoTileEnabledScreen() = true)
+          isVideoTileEnabled = (isSkinAdsAvailable = false AND isVideoTileEnabledScreen() = true)
+          updateVideoTileOverlayVisibility(homeScreen, isVideoTileEnabled)
           updateCategoryGridWithRowList(rawResponse, homeScreen)
         else
           m.videoTileOverlayGroup.visible = false
@@ -1155,9 +1167,13 @@ End Function
 
 ' Called when the user selects a content item on the home screen.
 ' @msg, roSGNode, the message containing the content item and the home screen node.
-Function onContentSelected(msg)
+Function onContentSelected(msg) as Void
   tubiLog("HomeScreenHelpers.onContentSelected")
-  content = msg.getData()
+  screen = msg.getRoSGNode()
+  content = screen.contentFocused
+
+  if content = invalid then return
+
   contentType = content.type
 
   if contentType <> m.constants.ui.contentTypes.adRowlistCarousel AND contentType <> m.constants.ui.contentTypes.adRowlistSpotlight
@@ -1501,6 +1517,7 @@ Function onListHasFocusChange(msg)
   isVideoTileEnabled = isVideoTileEnabledScreen()
   m.videoPreviewPlayer.visible = (isVideoTileEnabled = false OR (content <> invalid AND previewContent <> invalid AND content.id = previewContent.id)) AND (previewContent <> invalid AND previewContent.gridItemType <> m.constants.ui.gridItemTypes.skinAd)
   if hasFeaturedListFocus = true
+    updateVideoTileOverlayVisibility(screen, isVideoTileEnabled)
     if isVideoTileEnabled = true
       updateVideoTileScreenBackground(content, screen)
     end if
@@ -1519,11 +1536,13 @@ Function onListHasFocusChange(msg)
   else if isVideoTileEnabled = true
     m.videoPreviewPlayer.visible = false
     m.inlinePreviewFocusIndicator.visible = false
+    ' Skin Ad will be on continue loop.
     if screen.lastFocusedList <> "skinAdRow"
       pauseVideoPreview()
-    else
-      m.videoTileOverlayGroup.visible = false
     end if
+
+    ' If the user moves focus to wrapper ad or pivot list, hide the video tiles overlay.
+    updateVideoTileOverlayVisibility(screen, isVideoTileEnabled)
   else
     screen = getCurrentScreen()
     if screen <> invalid AND screen.id = m.constants.ui.screenIds.linearDetailScreen
@@ -1568,7 +1587,13 @@ Function onRowFocusedItemChange(msg) as Void
   if screen.oldRowFocusedItem <> invalid AND screen.oldRowFocusedItem.gridItemType = m.constants.ui.gridItemTypes.skinAd
     m.videoPreviewPlayer.visible = false
   end if
-  m.videoTileOverlayGroup.visible = isVideoTileEnabled AND screen.lastFocusedList = "rowList"
+  updateVideoTileOverlayVisibility(screen, isVideoTileEnabled)
+
+  ' Update UI based on screen type
+  if isVideoTileEnabled = true
+    updateVideoTileScreenBackground(focusedItem, screen)
+    updatePlayerLayoutBasedOnFocusedContent(focusedItem)
+  end if
 
   ' Figure out a better way to handle this.
   if isVideoTileEnabled = false OR focusedItem.gridItemType = m.constants.ui.gridItemTypes.skinAd
@@ -1602,12 +1627,6 @@ Function onRowFocusedItemChange(msg) as Void
     else
       m.queuedVideoTilePreview = true
     end if
-  end if
-
-  ' Update UI based on screen type
-  if isVideoTileEnabled = true
-    updateVideoTileScreenBackground(focusedItem, screen)
-    updatePlayerLayoutBasedOnFocusedContent(focusedItem)
   end if
 
   setUIBasedOnFocusedContent(focusedItem)
@@ -1842,5 +1861,33 @@ Function appendPaginatedContainersToScreen(screen, response)
     end if
   else
     screen.containerPaginationStatus = "finished"
+  end if
+End Function
+
+
+' Handles pivot selection from the PivotList
+' Navigates to the selected pivot's detail screen
+' @param msg - Message containing the selected pivot info (id, title)
+Function onPivotSelected(msg) as Void
+  ' msg.getData() returns the array [row, column] from pivotSelected
+  ' Get the actual pivot node from pivotSelectedNode for convenience
+  homeScreen = msg.getRoSGNode()
+  if homeScreen = invalid then return
+  trackingComponentInfo = homeScreen.trackingComponentInfo
+
+  pivot = homeScreen.pivotSelectedNode
+  if pivot = invalid then return
+
+  ' Check if this is the search pivot
+  if pivot.id = "search"
+    ' Navigate to search screen, passing pivot dest component info for NavigateToPageEvent on back
+    searchScreen = showSearchScreen(false)
+    if searchScreen <> invalid
+      searchScreen.destTrackingComponentInfo = trackingComponentInfo
+    end if
+  else
+    ' Navigate to pivot detail screen with the pivot content node
+    ' Pass trackingComponentInfo as dest component so NavigateToPageEvent on back includes dest_collection_component
+    showPivotDetailScreen(pivot, trackingComponentInfo)
   end if
 End Function

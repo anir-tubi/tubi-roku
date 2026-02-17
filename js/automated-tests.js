@@ -19,8 +19,8 @@ const { testUtils, auth, ContentTypes, ContentRatings } = require('./automated-t
 
 const jsonReportOutputPath = `${testUtils.testsOutputFolder}/report.json`;
 
-async function runAutomatedTestsCli(done, testsPath = 'js/automated-tests/tests/**/*.ts') {
-  const testsFolder = path.dirname(testsPath);
+async function runAutomatedTestsCli(done, testsFolder = 'js/automated-tests/tests') {
+  const testsPath = `${testsFolder}/**/*.ts`;
   const availableTags = getAvailableTags(testsFolder);
 
   const choices = [];
@@ -87,7 +87,7 @@ async function runAutomatedAnalyticsTestsCli(done) {
   env.set({
     analyticAutomatedTests: 'true'
   });
-  await runAutomatedTestsCli(done, 'js/automated-tests/analytics/tests/*.ts');
+  await runAutomatedTestsCli(done, 'js/automated-tests/analytics/tests');
   done();
 }
 
@@ -95,7 +95,7 @@ async function runAutomatedAnalyticsTestsForAdsCli(done) {
   env.set({
     enableAdsForTesting: 'true',
   });
-  await runAutomatedTestsCli(done, 'js/automated-tests/analytics/tests/*.ts');
+  await runAutomatedTestsCli(done, 'js/automated-tests/analytics/tests');
   done();
 }
 

@@ -27,6 +27,7 @@ Function init()
   m.AllEmptyUISubtitle2.width = m.AllEmptyUISubtitle2.boundingRect().width
   m.top.screenLevel = m.constants.ui.screenLevels.myStuffScreen
   m.top.id = m.constants.ui.screenIds.myStuffScreen
+  m.top.shouldShowSideNav = true
   m.isAllContentEmpty = false '//when the content is loaded and it is discovered that all the containers are empty, then this is set to true
 
   m.top.handlesTransportVoiceRequests = true
@@ -146,13 +147,13 @@ End Function
 Function onScreenFocusChange()
   tubiLog("MyStuffScreen.onScreenFocusChange")
   if m.top.hasFocus() = true
-    if m.top.signedIn = false
+    if m.top.signedIn = false AND m.top.enableVideoTiles <> true
       m.GuestMenu.setFocus(true)
       m.top.backgroundUriList = [m.defaultBackgroundUri]
     else if m.top.content <> invalid
       if m.top.content.getChildCount() > 0
         oldFocusedRowItem = m.top.cursorPosition
-        if m.isAllContentEmpty = true
+        if m.isAllContentEmpty = true AND m.top.enableVideoTiles <> true
           m.AllEmptyUIMenu.setFocus(true)
           m.top.backgroundUriList = [m.defaultBackgroundUri]
         else
@@ -167,7 +168,7 @@ Function onScreenFocusChange()
       if m.RowList.content <> invalid AND shouldRefresh(m.RowList.content) = true 'cacheValidationMixin
         m.top.refreshContent = true
       end if
-    else if m.isAllContentEmpty = true
+    else if m.isAllContentEmpty = true AND m.top.enableVideoTiles <> true
       m.AllEmptyUIMenu.setFocus(true)
       m.top.backgroundUriList = [m.defaultBackgroundUri]
     end if
@@ -202,7 +203,6 @@ Function onContentUpdateChange() as Void
     nContainers = content.getChildCount()
     if nContainers > 0
       m.isAllContentEmpty = true
-      nMyLikesContainerIndex = -1
       for i = 0 to nContainers - 1
         container = content.getChild(i)
         if container.gridItemType <> m.constants.ui.gridItemTypes.emptyContainer
@@ -210,15 +210,21 @@ Function onContentUpdateChange() as Void
         end if
       end for
 
-      if nMyLikesContainerIndex >= 0
-        '//Remove the MyLikes Container if no video titles are in the container
-        m.top.content.removeChildIndex(nMyLikesContainerIndex)
-      end if
-
       if m.isAllContentEmpty = false
+        ' In video tiles mode, always show RowList even when all content is empty
+        ' because MyStuffEmptyStateTile handles empty/signed-out states within the RowList
         m.AllEmptyUI.visible = false
         m.RowList.visible = true
-        m.InfoPanel.visible = true
+        m.InfoPanel.visible = (m.top.enableVideoTiles <> true)
+        if m.top.isInFocusChain() = true
+          m.RowList.setFocus(true)
+        end if
+      else if m.top.enableVideoTiles = true AND m.isAllContentEmpty = true
+        m.top.content = buildEmptyMyStuffContent()
+        setRowHeights()
+        m.AllEmptyUI.visible = false
+        m.InfoPanel.visible = false
+        m.RowList.visible = true
         if m.top.isInFocusChain() = true
           m.RowList.setFocus(true)
         end if
@@ -257,8 +263,13 @@ Function setRowHeights()
     gridItemTypes = m.constants.ui.gridItemTypes
 
     if gridItemType = gridItemTypes.emptyContainer
-      rowItemSize.push(m.constants.ui.imageSizes.emptyContainer)
-      rowHeight = m.constants.ui.imageSizes.emptyContainer[1]
+      if category.useVideoTilesFormat = true
+        rowItemSize.push(m.constants.ui.imageSizes.guestContinueWatchingTile)
+        rowHeight = m.constants.ui.imageSizes.guestContinueWatchingTile[1]
+      else
+        rowItemSize.push(m.constants.ui.imageSizes.emptyContainer)
+        rowHeight = m.constants.ui.imageSizes.emptyContainer[1]
+      end if
     else if gridItemType = gridItemTypes.landscapeInnerMetadata
       posterWidth = m.constants.ui.imageSizes.largeLandscape[0]
       posterHeight = m.constants.ui.imageSizes.largeLandscape[1]
@@ -301,10 +312,14 @@ Function onRowItemFocused(msg) as Boolean
     m.top.cursorPosition = newCursorPosition
     oldFocusedContent = m.top.contentFocused
 
-    m.top.contentFocused = resolveAbbreviatedContent(newCursorPosition)
-
     category = m.RowList.content.getChild(newCursorPosition[0])
     if category <> invalid
+      if category.id = m.constants.ui.categoryIds.guestUserMyStuff
+        m.top.contentFocused = category.getChild(0)
+      else
+        m.top.contentFocused = getTubiContentNodeFromRowItem(newCursorPosition, m.metadataTranslate, m.top.signedIn)
+      end if
+
       m.oldCategoryId = m.currCategoryId
       m.currCategoryId = category.id
 
@@ -313,7 +328,7 @@ Function onRowItemFocused(msg) as Boolean
     end if
 
     '//Set the Metadata
-    itemFocused = resolveAbbreviatedContent(m.RowList.rowItemFocused)
+    itemFocused = getTubiContentNodeFromRowItem(m.RowList.rowItemFocused, m.metadataTranslate, m.top.signedIn)
     m.top.backgroundUriList = determineBackgroundImage(itemFocused)
 
     m.top.trackingComponentInfo = getTrackingComponentInfoOfRowList(itemFocused, newCursorPosition)
@@ -488,17 +503,18 @@ End Function
 Function handleItemSelected(selectedPosition)
   tubiLog("MyStuffScreen.handleItemSelected")
   if m.top.content <> invalid
-    itemSelected = resolveAbbreviatedContent(selectedPosition)
+    itemSelected = getTubiContentNodeFromRowItem(selectedPosition, m.metadataTranslate, m.top.signedIn)
 
     category = m.RowList.content.getChild(selectedPosition[0])
-    if category.gridItemType <> m.constants.ui.gridItemTypes.emptyContainer
+    emptyContainerGridItemType = m.constants.ui.gridItemTypes.emptyContainer
+    if category.gridItemType <> emptyContainerGridItemType
       '//don't do anything if the empty container is selected
-
       m.top.trackingComponentInfo = getTrackingComponentInfoOfRowList(itemSelected, selectedPosition)
       if itemSelected <> invalid
         m.top.contentSelected = itemSelected
       end if
-
+    else if (category.id = m.constants.ui.categoryIds.guestUserMyStuff OR category.gridItemType = emptyContainerGridItemType)
+      m.top.homeButtonSelected = true
     end if
   end if
 End Function
@@ -524,43 +540,6 @@ Function getTrackingComponentInfoOfRowList(gridItem, itemPosition)
   end if
 
   return trackingComponentInfo
-End Function
-
-
-
-' Get the abbreviated version of the TubiContentNode for the RowList associated with the passed rowItemIndex
-'
-' @rowItemIndex is 2D array of [rowindex, itemindex] from RowList.rowItemSelected or m.RowList.rowItemFocused
-Function getAbbreviatedContent(rowItemIndex)
-  tubiLog("MyStuffScreen.getAbbreviatedContent")
-  content = invalid
-  if m.top.content <> invalid AND rowItemIndex[0] <> invalid AND rowItemIndex[1] <> invalid
-    category = m.top.content.getChild(rowItemIndex[0])
-    if category <> invalid
-      content = category.getChild(rowItemIndex[1])
-    end if
-  end if
-
-  return content
-End Function
-
-
-' Resolve and internal ContentNode that's been abbreviated for the RowList
-' into a fully parsed TubiContentNode
-'
-' @rowItemIndex is 2D array of [rowindex, itemindex] from RowList.rowItemSelected or m.RowList.rowItemFocused
-Function resolveAbbreviatedContent(rowItemIndex)
-  tubiLog("MyStuffScreen.resolveAbbreviatedContent")
-
-  content = getAbbreviatedContent(rowItemIndex)
-  category = m.top.content.getChild(rowItemIndex[0])
-  if content <> invalid AND isNonEmptyString(content.id)
-    contentId = content.id
-    contentFromJSON = m.metadataTranslate.getContentFromCategoryJson(category, contentId, m.top.signedIn) ' can return invalid
-    return contentFromJSON
-  end if
-
-  return invalid
 End Function
 
 
@@ -605,7 +584,7 @@ End Function
 Function handlePlayInput()
   if m.top.isLoading <> true AND m.top.signedIn = true
 
-    itemFocused = resolveAbbreviatedContent(m.RowList.rowItemFocused)
+    itemFocused = getTubiContentNodeFromRowItem(m.RowList.rowItemFocused, m.metadataTranslate, m.top.signedIn)
     positionFocused = m.top.cursorPosition
     category = m.RowList.content.getChild(positionFocused[0])
     ' Content controller observes contentSelected to populate/push the detail screen
@@ -628,13 +607,25 @@ Function onSignedInChange()
   tubiLog("MyStuffScreen.onSignedInChange")
 
   if m.top.signedIn = false
-    m.ContentArea.visible = false
-    m.SignedOutUI.visible = true
-    m.GuestMenu.setFocus(true)
-    m.AllEmptyUI.visible = false
-    m.InfoPanel.visible = false
-    m.isAllContentEmpty = false
-    m.top.backgroundUriList = [m.defaultBackgroundUri]
+    if m.top.enableVideoTiles = true
+      ' In video tiles mode, use RowList for signed-out state
+      ' MyStuffEmptyStateTile renders the sign-up prompt within the RowList
+      m.ContentArea.visible = true
+      m.SignedOutUI.visible = false
+      m.AllEmptyUI.visible = false
+      m.InfoPanel.visible = false
+      m.isAllContentEmpty = false
+      m.top.content = buildEmptyMyStuffContent()
+      m.top.contentUpdated = true
+    else
+      m.ContentArea.visible = false
+      m.SignedOutUI.visible = true
+      m.GuestMenu.setFocus(true)
+      m.AllEmptyUI.visible = false
+      m.InfoPanel.visible = false
+      m.isAllContentEmpty = false
+      m.top.backgroundUriList = [m.defaultBackgroundUri]
+    end if
   else
     m.ContentArea.visible = true
     m.SignedOutUI.visible = false
@@ -717,6 +708,62 @@ Function onResetChange(msg)
     m.top.cursorPosition = [-1, -1]
     m.RowList.jumpToRowItem = [0, 0]
   end if
+End Function
+
+
+' Builds RowList content for empty MyStuff in video tiles mode
+' Supports both guest (signed out) and logged-in empty states
+Function buildEmptyMyStuffContent() as Object
+  content = CreateObject("roSGNode", "CategoryContentNode")
+  categoryId = m.constants.ui.categoryIds.guestUserMyStuff
+  isSignedIn = (m.top.signedIn = true)
+
+  if isSignedIn
+    tileTitle = getTranslation("screenMyStuff_allEmptyUITitle")
+    tileDescription = getTranslation("screenMyStuff_allEmptyUISubtitle")
+    tileButtonText = getTranslation("my_stuff_find_more_to_watch")
+    tileBadgeText = ""
+  else
+    tileTitle = getTranslation("guest_tile_title")
+    tileDescription = getTranslation("guest_tile_description")
+    tileButtonText = getTranslation("guest_tile_sign_up_now")
+    tileBadgeText = getTranslation("registration_signup_button_free")
+  end if
+
+  content.update({
+    children: [
+      {
+        subType: "CategoryContentNode"
+        id: categoryId
+        slug: categoryId
+        title: getTranslation("menu_mystuff")
+        description: ""
+        totalCount: 0
+        offset: m.constants.performance.categoryGridList.initialBlockSize
+        json: ""
+        state: "full"
+        gridItemType: m.constants.ui.gridItemTypes.emptyContainer
+        type: m.constants.ui.contentTypes.emptyContainer
+        useVideoTilesFormat: true
+        children: [
+          {
+            id: m.constants.ui.contentTypes.emptyContainer
+            type: m.constants.ui.contentTypes.emptyContainer
+            title: tileTitle
+            description: tileDescription
+            buttonText: tileButtonText
+            badgeText: tileBadgeText
+            isSignedIn: isSignedIn
+            iconUrl: m.constants.ui.uris.myStuffContinueWatchingIcon
+            gridItemType: m.constants.ui.gridItemTypes.emptyContainer
+            hdGridPosterUrl: m.constants.ui.uris.emptyContainerMyStuffBackground
+          }
+        ]
+      }
+    ]
+  }, true)
+
+  return content
 End Function
 
 

@@ -300,13 +300,19 @@ function findExamplePatterns(errorText, fileContent) {
 
 /**
  * Build prompt for fixing lint/type errors
- * @param {string} fileContent
+ * @param {string} filePath
  * @param {Object} lintResult
  * @returns {string}
  */
-function buildLintFixPrompt(fileContent, lintResult) {
-  let promptContent = `Fix these ${lintResult.type} errors:
+function buildLintFixPrompt(filePath, lintResult) {
+  const fs = require('fs');
+  const fileContent = fs.readFileSync(filePath, 'utf8');
 
+  let promptContent = `Fix these ${lintResult.type} errors in the file by using the Edit tool to make the necessary changes.
+
+FILE PATH: ${filePath}
+
+ERRORS TO FIX:
 ${lintResult.errors}`;
 
   // If TypeScript errors, try to include relevant type definitions
@@ -337,10 +343,13 @@ ${lintResult.errors}`;
 
   promptContent += `
 
-CURRENT FILE:
-${fileContent}
-
-OUTPUT: TypeScript code only. Start with 'import'. Preserve .only() modifiers.`;
+INSTRUCTIONS:
+1. Read the file to understand the current code
+2. Use the Edit tool to fix each error
+3. Preserve all .only() modifiers exactly as they appear
+4. If there are syntax errors from invalid text (like plain English descriptions in the code), use Edit to remove those lines
+5. DO NOT output code as text - use the Edit tool to modify the file directly
+6. After fixing all errors, respond with "Fixed all errors" or list any errors you could not fix`;
 
   return promptContent;
 }

@@ -72,7 +72,8 @@ enum ScreenIds {
   'consentScreen' = 'consentScreen',
   'managePreferencesScreen' = 'managePreferencesScreen',
   'signUpAgeVerificationScreen' = 'signUpAgeVerificationScreen',
-  'rokuContinueWatchingConsentScreen' = 'rokuContinueWatchingConsentScreen'
+  'rokuContinueWatchingConsentScreen' = 'rokuContinueWatchingConsentScreen',
+  'pivotDetailScreen' = 'pivotDetailScreen'
 }
 
 

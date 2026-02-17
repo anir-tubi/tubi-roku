@@ -984,6 +984,8 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       m.gridHasFocus = false
       m.bResultsInFocus = false
       return true
+    else if key = "back" AND (m.Keyboard.isInFocusChain() = true OR m.autocompleteMenu.isInFocusChain() = true)
+      return false
     end if
   else
     if key = "up" AND m.Keyboard.isInFocusChain() = true AND m.isSearchRequestInProgress = false AND m.autocomplete.visible = true

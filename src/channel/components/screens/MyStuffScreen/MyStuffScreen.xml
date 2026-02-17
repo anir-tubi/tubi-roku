@@ -20,15 +20,8 @@
   <interface>
     <!-- INPUTS -->
 
-    <!-- When the Helper receives valid category data from the server, it sets the new value to this
-    field. -->
-    <field id="content" type="node" />
-
     <!-- contentUpdated should be set when the new content is ready to be displayed on the screen. -->
     <field id="contentUpdated" type="boolean" alwaysNotify="true" />
-
-    <!-- removes any existing content on the RowList! -->
-    <field id="isLoading" type="boolean" />
 
     <!-- set to true if the user is signed in and we want to change the experience based on that. -->
     <field id="signedIn" type="boolean" value="true" />
@@ -48,22 +41,11 @@
     <field id="jumpToRowItemByIdAndIndex" type="assocarray" alwaysNotify="true" />
 
     <!-- OUTPUTS -->
-    <!-- set to the contentNode of the RowList item which was clicked on -->
-    <field id="contentSelected" type="node" />
-
-    <!-- set to the contentNode of the RowList item which was focused on -->
-    <field id="contentFocused" type="node" />
 
     <!-- set to the contentNode of the RowList item which was focused when
            the "play" input transport deeplink was triggered
       -->
     <field id="contentToPlay" type="node" />
-
-    <!-- content on the mystuffScreen is loaded and spinner can be turned off -->
-    <field id="contentReady" type="boolean" value="false" alwaysNotify="true" />
-
-    <!-- A 2-element array where the focus indicator is located in the screen's rowList -->
-    <field id="cursorPosition" type="Array" />
 
     <!-- set to true when the user wants to sign-up -->
     <field id="signUpButtonSelected" type="boolean" alwaysNotify="true" />

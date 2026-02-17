@@ -5,6 +5,7 @@ import { testHelpers } from '../../test-helpers';
 import {
   validateAnalyticsEvent,
   createAnalyticsCallback,
+  setupRejectionTracking,
   EXISTS,
   NUMBER,
   POSITIVE_NUMBER,
@@ -105,6 +106,9 @@ describe('Video Tiles Analytics Tests', function () {
   after(async () => {
     await proxy.stop();
   });
+
+  // Auto-clear stale callbacks before each test and check for rejections after
+  setupRejectionTracking();
 
   afterEach(async () => {
     await proxy.pause();
@@ -1009,7 +1013,7 @@ describe('Video Tiles Analytics Tests', function () {
      * 3. Press OK to click the video tile while preview is playing
      *
      * Expected:
-     * - ComponentInteractionEvent (button_component: OK, UNKNOWN) fires before NavigateToPageEvent (v2 spec)
+     * - ComponentInteractionEvent (button_component: OK, IMAGE) fires before NavigateToPageEvent (v2 spec)
      * - NavigateToPageEvent fires to VideoPage or SeriesDetailPage
      * - PageLoadEvent fires for VideoPage or SeriesDetailPage
      * - PreviewPlayProgressEvent continues with video_player="BANNER" and component_type="PreviewComponent"
@@ -1051,9 +1055,9 @@ describe('Video Tiles Analytics Tests', function () {
       const okButtonEvent = analyticsEvents.find(e =>
         e.event?.component_interaction?.button_component !== undefined &&
         e.event?.component_interaction?.button_component?.button_value === BUTTON_VALUE.OK &&
-        e.event?.component_interaction?.button_component?.button_type === BUTTON_TYPE.UNKNOWN
+        e.event?.component_interaction?.button_component?.button_type === BUTTON_TYPE.IMAGE
       );
-      expect(okButtonEvent, 'Missing ComponentInteractionEvent (button_component: OK, UNKNOWN) when clicking video tile').to.exist;
+      expect(okButtonEvent, 'Missing ComponentInteractionEvent (button_component: OK, IMAGE) when clicking video tile').to.exist;
 
       validateAnalyticsEvent(
         okButtonEvent,
@@ -1063,7 +1067,7 @@ describe('Video Tiles Analytics Tests', function () {
               home_page: getPageValidator('home_page', { content_mode: EXISTS }),
               button_component: {
                 button_value: BUTTON_VALUE.OK,
-                button_type: BUTTON_TYPE.UNKNOWN
+                button_type: BUTTON_TYPE.IMAGE
               },
               user_interaction: USER_INTERACTION.CONFIRM
             }
@@ -1232,7 +1236,7 @@ describe('Video Tiles Analytics Tests', function () {
   /**
    * Q: How many users back out from the details page and return to the tile?
    * A: User returns to home and video preview continues in the tile.
-   * Tracking: ComponentInteractionEvent (button_component: BACK, UNKNOWN, user_interaction CONFIRM);
+   * Tracking: ComponentInteractionEvent (button_component: BACK, IMAGE, user_interaction CONFIRM);
    * navigate_to_page (home_page/for_you_page); page_load for home;
    * preview_play_progress with VIDEO_IN_GRID and CategoryComponent.
    */
@@ -1248,7 +1252,7 @@ describe('Video Tiles Analytics Tests', function () {
      * 2. Press Back to return to previous page
      * 
      * Expected:
-     * - ComponentInteractionEvent (button_component: BACK, UNKNOWN, user_interaction CONFIRM) fires before navigate
+     * - ComponentInteractionEvent (button_component: BACK, IMAGE, user_interaction CONFIRM) fires before navigate
      * - NavigateToPageEvent fires from VideoPage/SeriesDetailPage back to HomePage/ForYouPage
      * - PageLoadEvent fires for HomePage/ForYouPage
      * - PreviewPlayProgressEvent continues with video_player="VIDEO_IN_GRID" and CategoryComponent
@@ -1292,13 +1296,13 @@ describe('Video Tiles Analytics Tests', function () {
       await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
       await utils.sleep(5000); // Wait for analytics to fire
 
-      // Verify ComponentInteractionEvent (button_component: BACK, UNKNOWN, user_interaction CONFIRM) fired when pressing Back on details
+      // Verify ComponentInteractionEvent (button_component: BACK, IMAGE, user_interaction CONFIRM) fired when pressing Back on details
       const backButtonEvent = analyticsEvents.find(e =>
         e.event?.component_interaction?.button_component !== undefined &&
         e.event?.component_interaction?.button_component?.button_value === BUTTON_VALUE.BACK &&
-        e.event?.component_interaction?.button_component?.button_type === BUTTON_TYPE.UNKNOWN
+        e.event?.component_interaction?.button_component?.button_type === BUTTON_TYPE.IMAGE
       );
-      expect(backButtonEvent, 'Missing ComponentInteractionEvent (button_component: BACK, UNKNOWN) when pressing Back on details').to.exist;
+      expect(backButtonEvent, 'Missing ComponentInteractionEvent (button_component: BACK, IMAGE) when pressing Back on details').to.exist;
       validateAnalyticsEvent(
         backButtonEvent,
         {
@@ -1306,7 +1310,7 @@ describe('Video Tiles Analytics Tests', function () {
             component_interaction: {
               button_component: {
                 button_value: BUTTON_VALUE.BACK,
-                button_type: BUTTON_TYPE.UNKNOWN
+                button_type: BUTTON_TYPE.IMAGE
               },
               user_interaction: USER_INTERACTION.CONFIRM
             }
@@ -1402,10 +1406,10 @@ describe('Video Tiles Analytics Tests', function () {
   });
 
   /**
-   * ComponentInteractionEvent (ButtonComponent, LEFT, UNKNOWN, user_interaction CONFIRM) fires when user
+   * ComponentInteractionEvent (ButtonComponent, LEFT, IMAGE, user_interaction CONFIRM) fires when user
    * presses Left on details page (when focus is not on secondary menu or related grid), then NavigateToPageEvent back to home.
    */
-  it('CXXXXX - Press Left on details page fires ComponentInteractionEvent (LEFT, UNKNOWN, CONFIRM) then returns to tile @video_tiles @analytics', async () => {
+  it('CXXXXX - Press Left on details page fires ComponentInteractionEvent (LEFT, IMAGE, CONFIRM) then returns to tile @video_tiles @analytics', async () => {
     /**
      * Pre-conditions:
      * - roku_video_tiles_1_9 experiment enabled
@@ -1417,7 +1421,7 @@ describe('Video Tiles Analytics Tests', function () {
      * 2. On details page, press Left (triggers back when focus not on secondary menu / related grid)
      *
      * Expected:
-     * - ComponentInteractionEvent (button_component: LEFT, UNKNOWN, user_interaction CONFIRM) with page context (video_page or series_detail_page)
+     * - ComponentInteractionEvent (button_component: LEFT, IMAGE, user_interaction CONFIRM) with page context (video_page or series_detail_page)
      * - NavigateToPageEvent back to HomePage/ForYouPage
      */
 
@@ -1451,13 +1455,13 @@ describe('Video Tiles Analytics Tests', function () {
       await testUtils.waitForCurrentScreenToEqual('homeScreen', 15000);
       await utils.sleep(5000); // Wait for analytics to fire
 
-      // Verify ComponentInteractionEvent (ButtonComponent, LEFT, UNKNOWN, user_interaction CONFIRM) fired
+      // Verify ComponentInteractionEvent (ButtonComponent, LEFT, IMAGE, user_interaction CONFIRM) fired
       const leftButtonEvent = analyticsEvents.find(e =>
         e.event?.component_interaction?.button_component !== undefined &&
         e.event?.component_interaction?.button_component?.button_value === BUTTON_VALUE.LEFT &&
-        e.event?.component_interaction?.button_component?.button_type === BUTTON_TYPE.UNKNOWN
+        e.event?.component_interaction?.button_component?.button_type === BUTTON_TYPE.IMAGE
       );
-      expect(leftButtonEvent, 'Missing ComponentInteractionEvent (button_component: LEFT, UNKNOWN) when pressing Left on details').to.exist;
+      expect(leftButtonEvent, 'Missing ComponentInteractionEvent (button_component: LEFT, IMAGE) when pressing Left on details').to.exist;
 
       validateAnalyticsEvent(
         leftButtonEvent,
@@ -1466,7 +1470,7 @@ describe('Video Tiles Analytics Tests', function () {
             component_interaction: {
               button_component: {
                 button_value: BUTTON_VALUE.LEFT,
-                button_type: BUTTON_TYPE.UNKNOWN
+                button_type: BUTTON_TYPE.IMAGE
               },
               user_interaction: USER_INTERACTION.CONFIRM
             }

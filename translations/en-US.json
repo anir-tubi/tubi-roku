@@ -944,7 +944,7 @@
   },
   "screenMyStuff_allEmptyUISubtitle": {
     "description": "The subtitle of the MyStuff Screen for the guest user.",
-    "message": "Use the bookmark button to save series and movies to your My List."
+    "message": "Use the bookmark button to save series and movies to My List, and quickly get back to what you were watching with Continue Watching."
   },
   "screenDetails_button_trailer": {
     "description": "Label of button to allow users to watch a preview of the current video title",
@@ -1104,7 +1104,7 @@
   },
   "metadata_myStuff_empty_myList_description": {
     "description": "For an empty MyList container, this is the description/subtitle that is display in the empty container",
-    "message": "Use the bookmark button to save favorite series and movies. They’ll show up here."
+    "message": "Use the bookmark button to save series and movies to My List."
   },
   "metadata_myStuff_empty_continueWatching_title": {
     "description": "For an empty continueWatching container, this is the title that is display in the empty container",
@@ -1140,7 +1140,7 @@
   },
   "metadata_continueWatching_notSignedIn_description": {
     "description": "tells non registered user what they need to do to see the continue watching container",
-    "message": "Pick up right where you left off next time you play a TV Series or a Movie. Available upon sign up."
+    "message": "Pick up right where you left off next time you play a TV Series or a Movie."
   },
   "metadata_continueWatching_notSignedIn_container_description": {
     "description": "tells non registered user what they need to do to see the continue watching container",
@@ -2451,5 +2451,45 @@
   "save_progress_button": {
     "description": "Label for save progress button",
     "message": "Save Progress"
+  },
+  "back_hint_press": {
+    "description": "Text before the Back button pill in the back hint component",
+    "message": "Press"
+  },
+  "back_hint_back": {
+    "description": "Text inside the Back button pill in the back hint component",
+    "message": "Back"
+  },
+  "back_hint_for": {
+    "description": "Text after the Back button pill in the back hint component",
+    "message": "For"
+  },
+  "my_stuff_find_more_to_watch": {
+    "description": "Button text on the empty My Stuff tile encouraging users to browse content",
+    "message": "Find More to Watch"
+  },
+  "guest_tile_no_subscription": {
+    "description": "Selling point on guest user tile indicating no subscription is needed",
+    "message": "No Subscription"
+  },
+  "guest_tile_no_credit_card": {
+    "description": "Selling point on guest user tile indicating no credit card is needed",
+    "message": "No Credit Card"
+  },
+  "guest_tile_free_forever": {
+    "description": "Selling point on guest user tile indicating the service is free forever",
+    "message": "Free Forever"
+  },
+  "guest_tile_title": {
+    "description": "Title on guest user tile in My Stuff screen prompting sign-up",
+    "message": "Sign Up to Save Your Stuff"
+  },
+  "guest_tile_description": {
+    "description": "Description on guest user tile in My Stuff screen explaining benefits",
+    "message": "Find your favorites fast, pick up where you left off — all in one place. Free forever."
+  },
+  "guest_tile_sign_up_now": {
+    "description": "Button text on guest user tile prompting sign-up",
+    "message": "Sign Up Now"
   }
 }

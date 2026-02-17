@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  PivotList - A RowList that supports variable-width EnhancedButton items
+  
+  Extends RowList and automatically measures button widths before setting content.
+  This enables variableWidthItems support.
+  
+  Usage:
+    1. Set fetchData = true to fetch pivot data from the API
+    2. OR set pivotContent with pre-parsed content
+    3. The component will measure widths and populate the RowList automatically
+    4. Observe pivotSelected for user selection
+-->
+<component name="PivotList" extends="RowList">
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/ApiUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StatsigLib.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StatsigExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/CmsApi.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/GeneralTaskModule.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="PivotList.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+    <!-- ServerPersistentData node for CmsApi creation -->
+    <field id="serverPersistentData" type="node" />
+
+    <!-- Set to true to fetch pivot data from the API -->
+    <field id="fetchData" type="boolean" value="false" />
+
+    <!-- Parsed pivot content (rootContent → rowNode → itemNodes) -->
+    <field id="pivotContent" type="node" />
+
+    <!-- Button height (default: 60) -->
+    <field id="buttonHeight" type="integer" value="60" />
+
+    <!-- OUTPUTS -->
+    <!-- Selected pivot position [row, column] - triggers on selection -->
+    <field id="pivotSelected" type="array" alwaysNotify="true" />
+
+    <!-- Selected pivot content node - set when selection occurs -->
+    <field id="pivotSelectedNode" type="node" alwaysNotify="true" />
+
+    <!-- Focused pivot position [row, column] - triggers on focus change -->
+    <field id="pivotFocused" type="array" alwaysNotify="true" />
+
+    <!-- Focused pivot content node - set when focus changes -->
+    <field id="pivotFocusedNode" type="node" alwaysNotify="true" />
+
+    <!-- Tracking page info from the parent screen for analytics -->
+    <field id="trackingPageInfo" type="assocarray" />
+
+    <!-- Component interaction info for analytics (TOGGLE_ON, TOGGLE_OFF, CONFIRM) -->
+    <field id="componentInteractionInfo" type="assocarray" alwaysNotify="true" />
+
+    <!-- Navigate within page info for analytics -->
+    <field id="navigateWithinPageInfo" type="assocarray" alwaysNotify="true" />
+
+    <field id="trackingComponentInfo" type="assocarray" alwaysNotify="true" />
+
+    <!-- Set to true when content is ready and displayed -->
+    <field id="contentReady" type="boolean" value="false" alwaysNotify="true" />
+  </interface>
+
+  <children>
+  </children>
+</component>

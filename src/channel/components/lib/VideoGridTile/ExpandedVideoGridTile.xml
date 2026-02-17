@@ -29,6 +29,7 @@
       alias="posterOverlay.showContentPoster" />
     <field id="skipAnimation" type="boolean" alias="posterOverlay.skipAnimation" />
     <field id="limitedUI" type="boolean" value="false" />
+    <field id="resetState" type="boolean" alwaysNotify="true" />
   </interface>
 
   <children>

@@ -178,7 +178,7 @@ describe('Application Launch', function () {
     // Validate registration CTA description
     const descriptionNode = await testUtils.getNodeWithDynamicPath(descriptionElement, 10000);
     expect(descriptionNode.visible).to.equal(true, 'Guest user CW tile description should be visible');
-    expect(descriptionNode.text).to.equal('Pick up right where you left off next time you play a TV Series or a Movie. Available upon sign up.',
+    expect(descriptionNode.text).to.equal('Pick up right where you left off next time you play a TV Series or a Movie.',
       'CW tile should display correct description');
 
     // Validate sign up button is present and visible

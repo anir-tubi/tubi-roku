@@ -19,7 +19,6 @@ Function showMyStuffScreen()
 
     screen = CreateObject("roSGNode", "MyStuffScreen")
     screen.observeFieldScoped("contentSelected", "onMyStuffContentSelected")
-    screen.observeFieldScoped("contentFocused", "onRowFocusedItemChange")
     screen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     screen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
     screen.observeFieldScoped("contentToPlay", "onContentToPlay")

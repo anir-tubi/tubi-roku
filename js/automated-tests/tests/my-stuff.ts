@@ -183,7 +183,7 @@ describe('MyStuff', function () {
     await utils.sleep(2000);
     const emptyMyListContainerContent2 = await testUtils.getCurrentlyFocusedRowListRowItemsContent('emptyMyStuffContainer');
     expect(emptyMyListContainerContent2[0].title).to.equal('Your My List Is Empty');
-    expect(emptyMyListContainerContent2[0].description).to.equal('Use the bookmark button to save favorite series and movies. They’ll show up here.');
+    expect(emptyMyListContainerContent2[0].description).to.equal('Use the bookmark button to save series and movies to My List.');
 
   });
 
@@ -308,7 +308,7 @@ describe('MyStuff', function () {
     await testUtils.waitForElementToFullyShowOnScreen('myListScreenTitle');
     const emptyMyListContainerContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('emptyMyStuffContainer');
     expect(emptyMyListContainerContent[0].title).to.equal('Your My List Is Empty');
-    expect(emptyMyListContainerContent[0].description).to.equal('Use the bookmark button to save favorite series and movies. They’ll show up here.');
+    expect(emptyMyListContainerContent[0].description).to.equal('Use the bookmark button to save series and movies to My List.');
 
     // Verify that the title appears in CW section of My Stuff page
     await ecp.sendKeypress(ecp.Key.Up);
@@ -960,7 +960,7 @@ async function checkEmptyMyStuffScreenRegistered() {
   const myStuffRegScreenSubTitle = await testUtils.getNodeForElement('myStuffRegScreenSubTitle');
   expect(myStuffRegScreenSubTitle.text).to.equal('Find your favorites fast, pick up where you left off–all in one place.');
   const myStuffRegScreenSubTitle2 = await testUtils.getNodeForElement('myStuffRegScreenSubTitle2');
-  expect(myStuffRegScreenSubTitle2.text).to.equal('Use the bookmark button to save series and movies to your My List.');
+  expect(myStuffRegScreenSubTitle2.text).to.equal('Use the bookmark button to save series and movies to My List, and quickly get back to what you were watching with Continue Watching.');
 
 }
 

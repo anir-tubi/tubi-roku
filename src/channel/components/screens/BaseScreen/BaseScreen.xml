@@ -67,11 +67,17 @@
       -->
       <field id="navigateWithinPageInfo" type="assocarray" />
 
+      <!-- Holds the information needed to populate a navigate_to_page event. This will
+           be observed by the contentController which will be responsible for sending
+           navigate_to_page events.
+      -->
+      <field id="navigateToPageInfo" type="assocarray" alwaysNotify="true" />
+
        <!-- Holds the information needed to populate a component_interaction event. This will
            be observed by the contentController which will be responsible for sending
            component_interaction events.
       -->
-      <field id="componentInteractionInfo" type="assocarray"/>
+      <field id="componentInteractionInfo" type="assocarray" alwaysNotify="true" />
 
       <!-- Holds the "level" of the screen relative to other screens.
            Screens with smaller screenLevel values cannot be stacked on top of screens with higher screenLevel values.
@@ -82,6 +88,9 @@
 
       <!-- If set to true, allows screens of the same type and same screenLevel to stack on top of each other  -->
       <field id="isStackable" type="boolean" value="false" />
+
+      <!-- Controls whether side navigation is visible for this screen -->
+      <field id="shouldShowSideNav" type="boolean" value="false" />
 
       <!-- passes information eventually back to firmware to let it know if the "input" deeplink
            with type = transport was handled
@@ -116,6 +125,10 @@
       <field id="pageLoadComplete" type="boolean" alwaysNotify="true" />
 
       <field id="pageErrorInfo" type="assocarray" alwaysNotify="true" />
+
+      <!-- Destination tracking component info for NavigateToPageEvent when backing out of this screen.
+           Stores the dest_componentOneof (e.g. pivot collection component) to include in the event. -->
+      <field id="destTrackingComponentInfo" type="assocarray" />
   </interface>
 
   <children>

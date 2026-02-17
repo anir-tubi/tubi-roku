@@ -787,7 +787,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       return true
     else if key = "left" AND m.contentContainer.focusedIndex = 1 AND m.isLeftBackExitEnabled = true
       m.top.shouldPauseVideoPreview = true
-      fireButtonComponentInteractionEvent("LEFT", "UNKNOWN", "CONFIRM")
+      fireButtonComponentInteractionEvent("LEFT", "IMAGE", "CONFIRM")
       fireNavigateToSideNavEvent()
       setSideNavState(true)
       return true

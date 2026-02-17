@@ -13,6 +13,7 @@
 ' @param screen roSGNode - The screen node to set up observers on
 Function setupVideoTilesObservers(screen) as Void
   if screen <> invalid
+    screen.observeFieldScoped("contentFocused", "onRowFocusedItemChange")
     screen.observeFieldScoped("rowCurrFocusColumn", "onRowCurrFocusColumnChange")
     screen.observeFieldScoped("listCurrFocusRow", "onRowCurrFocusRowChange")
     screen.observeFieldScoped("listHasFocus", "onListHasFocusChange")
@@ -21,6 +22,61 @@ Function setupVideoTilesObservers(screen) as Void
     screen.observeFieldScoped("currentFocusedItemBoundingRect", "onRowListTranslationChange")
     screen.observeFieldScoped("rowListTranslation", "onRowListTranslationChange")
   end if
+End Function
+
+
+' Updates the visibility of the video tile overlay group
+' Checks if video tiles are enabled and if the rowList is the last focused list
+'
+' @param screen roSGNode - The screen node to check
+' @param isVideoTileEnabled boolean - Whether video tiles are enabled for this screen (optional, will be calculated if not provided)
+Function updateVideoTileOverlayVisibility(screen = invalid, isVideoTileEnabled = invalid) as Void
+  if m.videoTileOverlayGroup = invalid then return
+
+  if screen = invalid
+    screen = getCurrentScreen()
+  end if
+
+  if screen = invalid then return
+
+  ' Calculate isVideoTileEnabled if not provided
+  if isVideoTileEnabled = invalid
+    isVideoTileEnabled = isVideoTileEnabledScreen() AND screen.content <> invalid
+  end if
+
+  ' Set visibility based on video tiles enabled and lastFocusedList
+  ' Only show overlay if video tiles are enabled AND the rowList has focus
+  if screen.hasField("lastFocusedList")
+    m.videoTileOverlayGroup.visible = isVideoTileEnabled AND screen.lastFocusedList = "rowList"
+  else
+    ' Fallback for screens without lastFocusedList field
+    m.videoTileOverlayGroup.visible = isVideoTileEnabled
+  end if
+End Function
+
+
+' Updates video tile overlay position based on screen's translation
+' Screens can override position by defining a videoTileOverlayTranslation field [x, y]
+' Otherwise falls back to constants.ui.videoTilesListTranslation
+'
+' @param screen roSGNode - The screen node to get translation from
+Function updateVideoTileOverlayPosition(screen) as Void
+  if screen = invalid OR m.videoTileOverlayGroup = invalid then return
+
+  ' Default to constants values
+  videoTilesListTranslation = m.constants.ui.videoTilesListTranslation
+  screenTranslationX = videoTilesListTranslation[0]
+  screenTranslationY = videoTilesListTranslation[1]
+
+  ' Check if screen has override field
+  if screen.hasField("videoTileOverlayTranslation") AND screen.videoTileOverlayTranslation <> invalid AND screen.videoTileOverlayTranslation.count() >= 2
+    screenTranslationX = screen.videoTileOverlayTranslation[0]
+    screenTranslationY = screen.videoTileOverlayTranslation[1]
+  end if
+
+  ' Update overlay group positioning and clipping based on translation
+  m.videoTileOverlayGroup.clippingRect = [screenTranslationX, screenTranslationY, 1920, 1080]
+  m.videoTileOverlayGroup.translation = [screenTranslationX, -6]
 End Function
 
 
@@ -46,6 +102,9 @@ Function updateInTransitVideoMetadataOverlay() as Void
   end if
 
   currFocusRow = screen.listCurrFocusRow
+  if currFocusRow = invalid
+    return
+  end if
   category = screen.content.getChild(currFocusRow)
   columnFocused = getValidatedColumnIndex(screen, category)
 
@@ -103,7 +162,7 @@ Function onRowCurrFocusColumnChange() as Void
   updateVideoTileOnFocusChange(rowFocused, columnFocused, screen)
 
   ' Trigger lazy loading for next batch of items
-  if isNumber(columnFocused) = true AND isNumber(rowFocused) = true AND screen.content <> invalid AND screen.isSubType("HomeScreen") = true
+  if isNumber(columnFocused) = true AND isNumber(rowFocused) = true AND screen.content <> invalid AND (screen.isSubType("HomeScreen") = true OR screen.isSubType("PivotDetailScreen") = true)
     category = screen.content.getChild(rowFocused)
     makeContainerRequest(category, columnFocused, screen, onVideoTilesListMoreItemsSuccess)
   end if
@@ -394,7 +453,7 @@ Function updateInlineVideoMetadataOverlayVisibility(duration = 0) as Void
   end if
 
   isVideoTileEnabled = isVideoTileEnabledScreen() AND screen.content <> invalid
-  m.videoTileOverlayGroup.visible = isVideoTileEnabled
+  updateVideoTileOverlayVisibility(screen, isVideoTileEnabled)
 
   ' Handle video tiles experiment visibility
   if isVideoTileEnabled = true AND screen.content <> invalid
@@ -444,8 +503,8 @@ Function onRowListTranslationChange(msg) as Void
   tubiLog("VideoTileHelper.onRowListTranslationChange")
   screen = msg.getRoSGNode()
   translation = screen.rowListTranslation
-
-  if translation = invalid
+  currentScreen = getCurrentScreen()
+  if translation = invalid OR (currentScreen <> invalid AND screen.id <> currentScreen.id)
     return
   end if
 
@@ -556,6 +615,10 @@ Function isVideoTileEnabledScreen(screenId = "" as String) as Boolean
 
   ' Always enable video tiles on homeScreen in standard mode (not kids mode)
   if screenId = m.constants.ui.screenIds.homeScreen AND isInKidsMode = false
+    return true
+  end if
+
+  if screenId = m.constants.ui.screenIds.pivotDetailScreen
     return true
   end if
 

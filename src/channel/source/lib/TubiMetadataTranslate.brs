@@ -2115,6 +2115,8 @@ Function tubiMetadataTranslate_buildEmptyMyStuffCategoryAA(container)
       type: m.constants.ui.contentTypes.emptyContainer
       title: sTitle
       description: sDescription
+      buttonText: getTranslation("my_stuff_find_more_to_watch")
+      isSignedIn: true
       iconUrl: sIconURL
       gridItemType: m.constants.ui.gridItemTypes.emptyContainer
     }
@@ -3325,6 +3327,10 @@ Function tubiMetadataTranslate_isVideoTileEnabledScreen(screenId = "", uiMode = 
 
   ' Always enable video tiles on homeScreen in standard mode (not kids mode)
   if screenId = m.constants.ui.screenIds.homeScreen AND uiMode = "standard"
+    return true
+  end if
+
+  if screenId = m.constants.ui.screenIds.pivotDetailScreen
     return true
   end if
 

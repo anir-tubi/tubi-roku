@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  PivotDetailScreen - Video tiles view for pivot content
+  
+  Extends VideoTilesScreen for video tiles support.
+  Used with roku__pivots_v1 experiment.
+-->
+<component name="PivotDetailScreen" extends="VideoTilesScreen">
+  <script type="text/brightscript" uri="pkg:/source/lib/ApiUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/CmsApi.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs" />
+  <script type="text/brightscript" uri="PivotDetailScreen.brs" />
+  <interface>
+    <!-- INPUTS -->
+
+    <!-- Pivot/App ID for fetching collection data -->
+    <field id="pivotId" type="string" />
+
+    <!-- Pivot title to display at the top of the screen -->
+    <field id="pivotTitle" type="string" alias="pivotTitleLabel.text" />
+
+    <!-- ServerPersistentData node for CmsApi creation -->
+    <field id="serverPersistentData" type="node" />
+
+    <!-- Pagination status for container loading -->
+    <!-- Possible values: "none", "pending", "complete", "error", "finished" -->
+    <field id="containerPaginationStatus" type="string" value="none" />
+
+    <!-- Override translation for video tile overlay [x, y] (default:
+    constants.ui.videoTilesListTranslation=[24, 144]) -->
+    <field id="videoTileOverlayTranslation" type="array" value="[-84, 153]" />
+
+    <!-- OUTPUTS -->
+
+    <!-- Set to the index of the RowList item which was selected -->
+    <field id="contentSelectedIndex" type="array" alwaysNotify="true" />
+
+    <!-- The index of the content to play via play button [row, column] -->
+    <field id="playContentIndex" alias="rowList.playContentIndex" alwaysNotify="true" />
+
+    <!-- Set to true when the user presses back button -->
+    <field id="backButtonPressed" type="boolean" alwaysNotify="true" />
+
+    <!-- Signals that more tiles are being appended to a container during lazy loading -->
+    <!-- Possible values: "none", "start", "complete" -->
+    <field id="containerAppendMoreTilesStatus" type="string" value="none" />
+  </interface>
+
+  <children>
+    <Group
+      id="screenContentGroup"
+      translation="[84, 0]">
+      <Label
+        id="pivotTitleLabel"
+        translation="[0, 48]"
+        visible="false" />
+      <Group id="PageGroup">
+        <TubiRowList
+          id="rowList"
+          itemComponentName="StarterGridItem"
+          rowTitleComponentName="CategoryGridRowLabel"
+          rowItemSpacing="[[16,0]]"
+          itemSpacing="[0,32]"
+          rowSpacings="[32]"
+          numRows="2"
+          showRowCounter="[false]"
+          useDefaultFocusFeedback="false"
+          fadeFocusFeedbackWhenAutoScrolling="true"
+          rowFocusAnimationStyle="fixedFocus"
+          vertFocusAnimationStyle="fixedFocus" />
+      </Group>
+    </Group>
+  </children>
+</component>

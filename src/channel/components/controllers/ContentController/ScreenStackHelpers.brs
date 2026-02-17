@@ -102,7 +102,11 @@ Function popScreen(sendNavigateEvents = true, sendLoadingEvents = true)
 
   if sendNavigateEvents = true AND topHidden <> invalid AND toBePopped <> invalid
     'Attaching the trackingComponentInfo on NavigateToPage event and resetting it
-    screenTrackingNavigate(toBePopped.trackingPageInfo, topHidden.trackingPageInfo, toBePopped.trackingComponentInfo)
+    destComponentInfo = invalid
+    if toBePopped.hasField("destTrackingComponentInfo") = true
+      destComponentInfo = toBePopped.destTrackingComponentInfo
+    end if
+    screenTrackingNavigate(toBePopped.trackingPageInfo, topHidden.trackingPageInfo, toBePopped.trackingComponentInfo, destComponentInfo)
     toBePopped.trackingComponentInfo = invalid
   end if
 
@@ -150,7 +154,11 @@ End Function
 
 
 ' 'tracking for navigating to a screen
-Function screenTrackingNavigate(oldTrackingPageInfo, newTrackingPageInfo, trackingComponentInfo = invalid)
+' @param oldTrackingPageInfo - Page info of the screen being navigated from
+' @param newTrackingPageInfo - Page info of the screen being navigated to
+' @param trackingComponentInfo - Source component info (componentOneof)
+' @param destTrackingComponentInfo - Destination component info (dest_componentOneof), e.g. pivot component when backing from search
+Function screenTrackingNavigate(oldTrackingPageInfo, newTrackingPageInfo, trackingComponentInfo = invalid, destTrackingComponentInfo = invalid)
   sourcePageType = ""
   sourcePageValues = {}
   if oldTrackingPageInfo <> invalid
@@ -178,6 +186,12 @@ Function screenTrackingNavigate(oldTrackingPageInfo, newTrackingPageInfo, tracki
     componentOneof: m.Tracking.getAnalyticsComponent(trackingComponentType, trackingComponentValues)
     dest_pageOneof: m.Tracking.getAnalyticsPage(destPageType, destPageValues) 'page navigating to - a valid page type (see NavigateToPageEvent in events.protos)
   }
+
+  ' Include dest_componentOneof if provided (e.g. pivot component when backing from search to home)
+  if destTrackingComponentInfo <> invalid AND destTrackingComponentInfo.componentType <> invalid
+    destComponentType = "dest_" + destTrackingComponentInfo.componentType
+    eventValues.dest_componentOneof = m.Tracking.getAnalyticsDestinationComponent(destComponentType, destTrackingComponentInfo.componentValues)
+  end if
 
   if newTrackingPageInfo <> invalid AND newTrackingPageInfo.additionalContextValues <> invalid
     eventValues.append(newTrackingPageInfo.additionalContextValues)
@@ -271,8 +285,11 @@ Function onScreenChange()
   currentScreen = getCurrentScreen()
 
   if currentScreen <> invalid AND currentScreen.id <> invalid
-    m.sideNav.visible = (m.constants.ui.sideNavOpenIds[currentScreen.id] = true)
+    m.sideNav.visible = (currentScreen.shouldShowSideNav = true)
     m.backgroundGroup.screenId = currentScreen.id
+
+    ' Update video tile overlay position for the new current screen
+    updateVideoTileOverlayPosition(currentScreen)
   end if
   ' Processing any queued braze messaging if they are queued due to being in non whitelisted screens.
   processQueuedInAppMessage()

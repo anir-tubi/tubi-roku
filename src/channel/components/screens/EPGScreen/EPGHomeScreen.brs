@@ -30,6 +30,7 @@ Function init()
 
   'm.top
   m.top.screenLevel = m.constants.ui.screenLevels.epgScreen
+  m.top.shouldShowSideNav = true
   m.top.observeField("updateTimeGridContent", "onTimeContentChange")
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("transportVoiceRequest", "onTransportVoiceRequest")

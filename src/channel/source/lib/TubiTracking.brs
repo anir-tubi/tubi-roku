@@ -42,6 +42,7 @@ Function TubiTracking(constants, auth, userConsentsOptOutStatus = {}, requestIns
     getAnalyticsSelector: tubiTracking_getAnalyticsSelector
     getAnalyticsTile: tubiTracking_getAnalyticsTile
     getUtilityTile: tubiTracking_getUtilityTile
+    getPivotCollectionComponent: tubiTracking_getPivotCollectionComponent
     getAnalyticsAd: tubiTracking_getAnalyticsAd
     getAnalyticsHomePageContentMode: tubiTracking_getAnalyticsHomePageContentMode
     getLanguageCode: tubiTracking_getLanguageCode
@@ -91,6 +92,7 @@ Function TubiTrackingInfo(constants)
     getAnalyticsSelector: tubiTracking_getAnalyticsSelector
     getAnalyticsTile: tubiTracking_getAnalyticsTile
     getUtilityTile: tubiTracking_getUtilityTile
+    getPivotCollectionComponent: tubiTracking_getPivotCollectionComponent
     getAnalyticsAd: tubiTracking_getAnalyticsAd
     getAnalyticsHomePageContentMode: tubiTracking_getAnalyticsHomePageContentMode
     getLanguageCode: tubiTracking_getLanguageCode
@@ -471,6 +473,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       pageOneof: {} 'page navigating from - a valid page type (see NavigateToPageEvent in events.protos)
       componentOneof: {} 'a valid component type (see NavigateToPageEvent in events.protos)
       dest_pageOneof: {} 'page navigating to - a valid page type (see NavigateToPageEvent in events.protos)
+      dest_componentOneof: {} 'a valid component type (see NavigateToPageEvent in events.protos)
     }
 
     navigate_within_page: {
@@ -805,6 +808,36 @@ Function tubiTracking_getUtilityTile(contentNode, colPos = 1, rowPos = 1)
   end if
 
   return tile
+End Function
+
+
+' Build the structure for a pivot collection component
+' @param pivotContent - The pivot content node (optional)
+' @param itemIndex - The column position of the pivot (optional)
+' @param row - The row position (optional, 1-based)
+' @param navSectionDynamic - "UNKNOWN" or "STICKY" (optional)
+' @return AA with sub_type, utility_tile, row, nav_section_dynamic
+Function tubiTracking_getPivotCollectionComponent(pivotContent = invalid, itemIndex = invalid, row = invalid, navSectionDynamic = invalid)
+  componentValues = {
+    sub_type: "PIVOT"
+  }
+
+  ' Add utility_tile if pivot content is provided
+  if pivotContent <> invalid AND itemIndex <> invalid
+    componentValues.utility_tile = tubiTracking_getUtilityTile(pivotContent, itemIndex, 1)
+  end if
+
+  ' Add row if provided
+  if row <> invalid
+    componentValues.row = row
+  end if
+
+  ' Add nav_section_dynamic if provided
+  if navSectionDynamic <> invalid
+    componentValues.nav_section_dynamic = navSectionDynamic
+  end if
+
+  return componentValues
 End Function
 
 
@@ -1210,6 +1243,13 @@ Function tubiTracking_getOneOfs()
     utility_tile: {} ' UtilityTile message - optional
   }
 
+  collectionComponent = {
+    sub_type: "" ' CollectionComponent.sub_type enum
+    utility_tile: {} ' UtilityTile message
+    row: -1 ' 1 based index
+    nav_section_dynamic: "" ' NavSectionDynamic enum
+  }
+
   ' At some point we may need to split the component "Oneof" like we did with the page and dest_page "Oneof"
   ' but for now this is sufficient
   componentOneof = {
@@ -1287,6 +1327,8 @@ Function tubiTracking_getOneOfs()
     preview_component: {
       content_tile: {}
     }
+
+    collection_component: collectionComponent
   }
 
   dest_componentOneof = {
@@ -1307,6 +1349,8 @@ Function tubiTracking_getOneOfs()
 
       dest_category_component: categoryComponent
     }
+
+    dest_collection_component: collectionComponent
   }
 
   selectorOneOf = {

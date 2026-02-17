@@ -127,7 +127,6 @@ Function onVideoStateChange(msg)
       trackEvent(finishPreviewEvent)
     end if
 
-    m.top.content = invalid
     m.videoState = "stop"
   else if state = "stopped" then
     ' If Roku stops the video node instead of us (when application is backgrounded as one example) then the state does not get updated without this

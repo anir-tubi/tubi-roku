@@ -14,6 +14,9 @@ Function init()
   m.top.observeFieldScoped("containerAppendMoreTilesStatus", "onContainerAppendMoreTilesStatusChange")
   m.top.observeFieldScoped("animateToItem", "onAnimateToItemChange")
   m.top.observeFieldScoped("hasNewContainers", "onHasNewContainersChange")
+  m.top.observeFieldScoped("requestFocusXOffsetUpdate", "onRequestFocusXOffsetUpdate")
+  m.top.observeFieldScoped("requestRowHeightReset", "onRequestRowHeightReset")
+  m.top.observeFieldScoped("resetCategoryGridState", "onResetCategoryGridState")
 
   m.rowList = m.top.findNode("rowList")
   m.rowList.observeFieldScoped("rowItemFocused", "onRowItemFocused")
@@ -189,11 +192,11 @@ Function onComponentFocusChange(_msg)
 
   ' If top has focus then we need to focus the RowList itself
   if m.top.hasFocus() = true then
-    if (isSkinAdsAvailable() = true) AND (m.top.lastFocusedList = "skinAdRow" OR m.top.lastFocusedList = "")
+    if isSkinAdsAvailable() = true AND m.top.lastFocusedList <> "rowList"
       m.top.lastFocusedList = "skinAdRow"
       m.skinAdRow.opacity = 1
       m.skinAdRow.setFocus(true)
-    else if (m.top.lastFocusedList = "rowList" OR m.top.lastFocusedList = "") AND m.top.content <> invalid
+    else if m.top.lastFocusedList <> "skinAdRow" AND m.top.content <> invalid
       m.top.lastFocusedList = "rowList"
       m.rowList.setFocus(true)
       m.top.listHasFocus = true
@@ -238,7 +241,7 @@ Function onContentChange()
 
   ' Set the translation position of the page based on presence or absence of any 1st rows.
   ' This is needed mainly for the initial load and if skinAdRow is focused.
-  if isSkinAdsAvailable() = true AND (m.top.lastFocusedList = "skinAdRow" OR m.top.lastFocusedList = "")
+  if isSkinAdsAvailable() = true AND m.top.lastFocusedList <> "rowList"
     if m.top.content <> invalid
       m.rowList.translation = [0, 384]
     end if
@@ -439,6 +442,11 @@ Function setRowHeights()
         heights.push(featuredRowHeight)
       end if
     end for
+
+    ' If a row was shrunk due to live event banner, keep it at the shrunk height
+    if m.resetRowHeights = true AND m.modifiedRowIndex <> invalid AND m.modifiedRowIndex < heights.count()
+      heights[m.modifiedRowIndex] = m.featuredRowPoster[1] + 76
+    end if
 
     m.rowList.update({
       "showRowLabel": showRowLabel
@@ -919,29 +927,38 @@ Function updateRowItemFocused()
       updateCurrentFocusedItemBoundingRect()
       updateFocusXOffset(rowItemFocused[0])
 
-      if itemFocused.gridItemType = m.constants.ui.gridItemTypes.liveEventBanner
-        nextRowIndex = rowItemFocused[0] + 1
-        if nextRowIndex < m.top.content.getChildCount()
-          nextCategory = m.top.content.getChild(nextRowIndex)
-          if nextCategory <> invalid AND isVideoTileEnabledContainer(nextCategory.gridItemType) = true
-            updateRowHeight(nextRowIndex, m.featuredRowPoster[1] + 76)
-            m.resetRowHeights = true
-            m.modifiedRowIndex = nextRowIndex
-          end if
-        end if
-      else if m.resetRowHeights = true AND m.modifiedRowIndex <> invalid
-        ' Reset row height, accounting for sponsored row spacing if applicable
-        resetHeight = m.featuredRowPoster[1] + 240
-        modifiedCategory = m.top.content.getChild(m.modifiedRowIndex)
-        if modifiedCategory <> invalid AND modifiedCategory.sponsorImages <> invalid
-          ' Add 32 pixels for sponsored row header spacing
-          resetHeight = resetHeight + 32
-        end if
-        updateRowHeight(m.modifiedRowIndex, resetHeight)
-        m.resetRowHeights = false
-        m.modifiedRowIndex = invalid
+      adjustRowHeightForLiveEventBanner(itemFocused, rowItemFocused[0])
+    end if
+  end if
+End Function
+
+
+' Adjusts row height when navigating near live event banners
+' Shrinks the next row when a live event banner is focused, resets when moving away
+' @param itemFocused - The currently focused item node
+' @param currentRowIndex - The current row index
+Function adjustRowHeightForLiveEventBanner(itemFocused, currentRowIndex) as Void
+  if itemFocused.gridItemType = m.constants.ui.gridItemTypes.liveEventBanner
+    nextRowIndex = currentRowIndex + 1
+    if nextRowIndex < m.top.content.getChildCount()
+      nextCategory = m.top.content.getChild(nextRowIndex)
+      if nextCategory <> invalid AND isVideoTileEnabledContainer(nextCategory.gridItemType) = true
+        updateRowHeight(nextRowIndex, m.featuredRowPoster[1] + 76)
+        m.resetRowHeights = true
+        m.modifiedRowIndex = nextRowIndex
       end if
     end if
+  else if m.resetRowHeights = true AND m.modifiedRowIndex <> invalid
+    ' Reset row height, accounting for sponsored row spacing if applicable
+    resetHeight = m.featuredRowPoster[1] + 240
+    modifiedCategory = m.top.content.getChild(m.modifiedRowIndex)
+    if modifiedCategory <> invalid AND modifiedCategory.sponsorImages <> invalid
+      ' Add 32 pixels for sponsored row header spacing
+      resetHeight = resetHeight + 32
+    end if
+    updateRowHeight(m.modifiedRowIndex, resetHeight)
+    m.resetRowHeights = false
+    m.modifiedRowIndex = invalid
   end if
 End Function
 
@@ -982,7 +999,9 @@ Function updateFocusXOffset(currFocusRow)
       m.rowList.focusXOffset = focusXOffset
       m.ignoreCurrColumnChange = false
     end if
-    m.rowList.translation = [0, 0]
+    if m.top.lastFocusedList = "rowList"
+      m.rowList.translation = [0, 0]
+    end if
   end if
 End Function
 
@@ -1156,10 +1175,63 @@ Function onHasNewContainersChange(msg)
 End Function
 
 
+' Handles request to update focus X offset
+' @param msg - Message containing the row index to update (-1 to reset)
+' Resets focus X offset and row height when leaving the category grid
+' Called when focus moves to pivot list or other external component
+Function onResetCategoryGridState(msg) as Void
+  if isSkinAdsAvailable() = true
+    focusSkinAdRow()
+  end if
+  updateFocusXOffset(-1)
+  m.top.requestRowHeightReset = CInt(m.top.listCurrFocusRow)
+End Function
+
+
+' Handles request to update focus X offset for a specific row
+' @param msg - Message containing the row index, or -1 to reset
+Function onRequestFocusXOffsetUpdate(msg) as Void
+  currFocusRow = msg.getData()
+  updateFocusXOffset(currFocusRow)
+End Function
+
+
+' Handles request to reset row height for specified row index
+' Resets the row to default video tile height
+' @param msg - Message containing the row index to reset
+Function onRequestRowHeightReset(msg) as Void
+  rowIndex = msg.getData()
+  if m.top.content = invalid OR m.top.content.getChildCount() = 0 then return
+  if rowIndex < 0 OR rowIndex >= m.top.content.getChildCount() then return
+
+  category = m.top.content.getChild(rowIndex)
+  if category = invalid then return
+
+  ' Check if row is a video tile enabled container
+  if isVideoTileEnabledContainer(category.gridItemType) = true
+    resetHeight = m.featuredRowPoster[1] + 76
+    updateRowHeight(rowIndex, resetHeight)
+    m.resetRowHeights = true
+    m.modifiedRowIndex = rowIndex
+  end if
+End Function
+
+
 ' Handles key events for navigation between skin ad row and row list
 ' @param key - Key pressed ("up", "down", etc.)
 ' @param press - True if key is pressed, false if released
 ' @return Boolean - True if key was handled, false otherwise
+' Focuses the skin ad row and slides the row list down
+Function focusSkinAdRow() as Void
+  m.top.lastFocusedList = "skinAdRow"
+  m.skinAdRow.setFocus(true)
+  slideTo(m.rowList, [0, 384], 0.3)
+  fade(m.skinAdRow, "in", 0.3)
+  updateCurrentFocusedItemBoundingRect()
+  updateFocusXOffset(-1)
+End Function
+
+
 Function onKeyEvent(key as String, press as Boolean) as Boolean
   if press = true
     bSkinAdAvailable = (isSkinAdsAvailable() = true)
@@ -1169,13 +1241,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       translateListAndSetFocus()
       return true
     else if key = "up" AND m.rowList.isInFocusChain() = true AND bSkinAdAvailable = true
-      m.top.lastFocusedList = "skinAdRow"
-      m.skinAdRow.setFocus(true)
-      slideTo(m.rowList, [0, 384], 0.3)
-      fade(m.skinAdRow, "in", 0.3)
-      updateCurrentFocusedItemBoundingRect()
-      updateFocusXOffset(-1)
-
+      focusSkinAdRow()
       return true
     end if
   end if

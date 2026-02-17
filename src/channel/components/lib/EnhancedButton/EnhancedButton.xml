@@ -23,7 +23,7 @@
 
     <!-- OUTPUTS -->
     <!-- Helps us with width calculation when we want to use with ArrayGrid -->
-    <field id="calculatedTextWidth" type="integer" />
+    <field id="calculatedTextWidth" type="float" />
     <field id="pressedKey" type="string" />
     <field id="wasSelected" type="boolean" alwaysNotify="true" />
     <field id="wasFocused" type="boolean" alwaysNotify="true" />

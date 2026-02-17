@@ -10,7 +10,6 @@ Function showLinearDetailScreen(content, playbackSource)
     screen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
     screen.observeFieldScoped("backButtonPressed", "onDetailBackButtonPressedChange")
     screen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
-    screen.observeFieldScoped("trackingComponentInfo", "onTrackingComponentInfoChange")
     screen.observeFieldScoped("selectedRelatedContentTrigger", "onLinearDetailSelectedRelatedContentTriggerChange")
     screen.observeFieldScoped("ctaButtonSelectedId", "onLinearDetailCtaButtonSelected")
     screen.id = m.constants.ui.screenIds.linearDetailScreen

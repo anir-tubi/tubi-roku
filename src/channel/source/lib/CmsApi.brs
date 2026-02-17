@@ -28,6 +28,7 @@ Function CmsApi(constants, apiUtilsLib, experiments = invalid, experimentsInterf
     createHomeScreenBatchReqInfoForContainers: cmsApi_createHomeScreenBatchReqInfoForContainers
     createGetContainerContentsReqInfo: cmsApi_createGetContainerContentsReqInfo
     createGetSeasonListBySeriesIdReqInfo: cmsApi_createGetSeasonListBySeriesIdReqInfo
+    createGetAllPivotsReqInfo: cmsApi_createGetAllPivotsReqInfo
 
 
     ' private
@@ -518,9 +519,11 @@ End Function
 ' homeScreenReq()
 '
 
+' @appId: string, the app/collection ID
 ' @passedOptions: assocArray, options that are used to create a request (ie, headers, params, method, etc.)
 '                 see request.brs for more info
-Function cmsApi_createGetCollectionInfo(appId)
+'                 Supported params: group_start, group_size, contents_limit
+Function cmsApi_createGetCollectionInfo(appId, passedOptions = {})
   if isNonEmptyString(appId) = false
     return invalid
   end if
@@ -535,6 +538,16 @@ Function cmsApi_createGetCollectionInfo(appId)
   params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
 
   params["idfa"] = m.constants.deviceInfo.deviceAdId
+
+  ' Apply passed params (group_start, group_size, contents_limit, etc.)
+  if passedOptions <> invalid AND passedOptions.params <> invalid
+    params.append(passedOptions.params)
+  end if
+
+  ' Apply passed headers
+  if passedOptions <> invalid AND passedOptions.headers <> invalid
+    headers.append(passedOptions.headers)
+  end if
 
   imageParamTypes = [
     "landscape"
@@ -1101,6 +1114,39 @@ Function cmsApi_createGetSeasonListBySeriesIdReqInfo(seriesId, bKidsMode = false
 
   return {
     url: url
+    options: options
+  }
+End Function
+
+
+' Creates request info for fetching all pivots
+' Includes feature_flags[treatment_group] from roku_pivots_v1 experiment
+' @return Object containing url and options for the pivots API request
+Function cmsApi_createGetAllPivotsReqInfo()
+  options = m.getCommonOptions(true)
+  params = options.params
+
+  params.append({
+    "type": "PIVOT"
+    "limit_resolutions": m.constants.player.limitResolutions
+    "video_resources": cmsApi_getSupportedVideoResources()
+  })
+
+  ' Add treatment_group from roku_pivots experiment
+  if m.statSigExperiments <> invalid
+    experimentResource = m.statSigExperiments.getExperimentResource("roku_pivots", "roku_pivots_v1")
+    if experimentResource <> invalid AND isNonEmptyString(experimentResource.treatment_group)
+      params["feature_flags[treatment_group]"] = experimentResource.treatment_group
+    end if
+  end if
+
+  params = m.setImageParams(["landscape"], options.params)
+
+  options.params = params
+
+  return {
+    url: m.constants.urls.tensor.apps
+    requestType: m.constants.reqNames.getAllPivots
     options: options
   }
 End Function

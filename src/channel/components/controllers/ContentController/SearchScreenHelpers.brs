@@ -1,5 +1,5 @@
 ' Show the search screen
-Function showSearchScreen()
+Function showSearchScreen(shouldShowSideNav = true)
   tubiLog("SearchScreenHelpers.onSearchSelected")
   searchScreen = CreateObject("roSGNode", "SearchScreen")
   searchScreen.observeFieldScoped("contentSelected", "onSearchContentSelected")
@@ -21,6 +21,7 @@ Function showSearchScreen()
   searchScreen.searchText = "" '//Set searchText to "" to initiate the search screen and load the default "search results"
 
   searchScreen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
+  searchScreen.shouldShowSideNav = shouldShowSideNav
 
   pushScreen(searchScreen, true, true)
   return searchScreen

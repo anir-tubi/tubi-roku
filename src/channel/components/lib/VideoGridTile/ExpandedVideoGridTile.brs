@@ -8,6 +8,7 @@ Function init()
 
   topRef.observeFieldScoped("itemContent", "onItemContentChange")
   topRef.observeFieldScoped("height", "onHeightChange")
+  topRef.observeFieldScoped("resetState", "onResetState")
 
   ' Creating a temporary poster that we will use to kind of pre-load the next poster to avoid having flash of grey when we navigate to the next item.
   ' This should not cause any performance issues since roku caches images. since both posters use same url it will not re-download the image and not use extra memory.
@@ -118,4 +119,14 @@ Function onPreloadPosterTimerFire(_msg)
     ' If the image is taking more time to load switching to placeholder image until the image is loaded.
     m.poster.uri = "pkg:/images/placeholder-featured.webp"
   end if
+End Function
+
+
+' Resets the tile state by clearing poster URIs and stopping any pending preload
+Function onResetState(msg = invalid) as Void
+  if m.poster <> invalid
+    m.poster.uri = ""
+  end if
+  m.preloadPoster.uri = ""
+  m.preloadPosterTimer.control = "stop"
 End Function

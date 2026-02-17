@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
  - GeneralTaskLibrary
  -
@@ -22,6 +22,7 @@
     <script type="text/brightscript" uri="Parsers/UncategorizedParsers.brs" />
     <script type="text/brightscript" uri="Parsers/ServerPersistentDataParser.brs" />
     <script type="text/brightscript" uri="Parsers/ConsentScreenParsers.brs" />
+    <script type="text/brightscript" uri="Parsers/PivotParsers.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/TubiBookmarks.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/CmsApi.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/ApiUtils.brs" />

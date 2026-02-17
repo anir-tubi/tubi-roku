@@ -17,6 +17,7 @@ Function TubiNodeHelpers()
     removeChildAnimationNodes: tubiNodeHelpers_removeChildAnimationNodes
     removeAllChildren: tubiNodeHelpers_removeAllChildren
     findParentWithField: tubiNodeHelpers_findParentWithField
+    getNodeFromPosition: tubiNodeHelpers_getNodeFromPosition
   }
 End Function
 
@@ -287,4 +288,28 @@ Function tubiNodeHelpers_findParentWithField(node, fieldName, maxDepth = 10)
   end while
 
   return invalid
+End Function
+
+
+' Extracts a child node from a content tree using a position array [row, column]
+' Useful for getting the actual node from RowList selection events
+' @param contentNode - roSGNode, the root content node (e.g., RowList.content)
+' @param position - Array, [rowIndex, columnIndex] position
+' @return roSGNode or invalid - The child node at the specified position, or invalid if not found
+Function tubiNodeHelpers_getNodeFromPosition(contentNode, position)
+  if contentNode = invalid OR position = invalid OR position.count() < 2 then return invalid
+
+  rowIndex = position[0]
+  columnIndex = position[1]
+
+  ' Get the row node
+  if rowIndex < 0 OR rowIndex >= contentNode.getChildCount() then return invalid
+  rowNode = contentNode.getChild(rowIndex)
+  if rowNode = invalid then return invalid
+
+  ' Get the column node
+  if columnIndex < 0 OR columnIndex >= rowNode.getChildCount() then return invalid
+  itemNode = rowNode.getChild(columnIndex)
+
+  return itemNode
 End Function

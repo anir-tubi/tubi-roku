@@ -987,6 +987,11 @@ Function playSelectedVodContent(content, playbackSource, episodes = invalid)
       nowPos = history.nowPos
     end if
     playVideoContent(content, playbackSource, nowPos)
+
+    if playbackSource.srcForAnalytic = "previews"
+      removeTopMostScreenWithIDFromStack(m.constants.ui.screenIds.vodDetailScreen)
+      displayDefaultBackground()
+    end if
   end if
 
 End Function

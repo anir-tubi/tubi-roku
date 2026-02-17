@@ -117,6 +117,7 @@ Function onRowItemFocusedChanged(msg) as Void
 
   componentValues = {
     "category_slug": rowContent.slug
+    "category_col": 1 ' Will always be 1 for row list since we do not have vertical sections
     "category_row": analyticRow
     "content_tile": m.tracking.getAnalyticsTile(itemContent, analyticCol)
   }
@@ -203,7 +204,9 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       onRowItemFocusedChanged(invalid)
     end if
 
-    m.top.drawFocusFeedback = (m.currentlyFocusedRowContent = invalid)
+    if m.top.useDefaultFocusFeedback = true then
+      m.top.drawFocusFeedback = (m.currentlyFocusedRowContent = invalid)
+    end if
   else if key = "play" then
     ' Don't want to propagate play key if a row title is focused
     if m.currentlyFocusedRowContent = invalid then

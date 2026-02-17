@@ -6,28 +6,42 @@ Function init()
   m._ = rodash()
   m.constants = getConstantsFromGlobal()
   m.Tracking = TubiTrackingInfo(m.constants)
-  m.dimMask = m.top.findNode("dimMask")
+  topRef = m.top
+  topRef.shouldShowSideNav = true
 
-  m.PageGroup = m.top.findNode("PageGroup")
+  m.dimMask = topRef.findNode("dimMask")
+  m.PageGroup = topRef.findNode("PageGroup")
   m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]
-  m.ContentAreaParent = m.top.findNode("ContentAreaParent")
+  m.ContentAreaParent = topRef.findNode("ContentAreaParent")
   m.maskUri = "pkg:/images/poster-mask.png"
   ' Note: maskUri will be updated when enableVideoTiles field is set
-  m.ContentArea = m.top.findNode("ContentArea")
+  m.ContentArea = topRef.findNode("ContentArea")
   m.ContentArea.maskUri = m.maskUri
-  m.adContentGroup = m.top.findNode("adContentGroup")
-  m.InfoPanel = m.top.findNode("InfoPanel")
-  m.InfoPanelParent = m.top.findNode("InfoPanelParent")
+  m.adContentGroup = topRef.findNode("adContentGroup")
+  m.InfoPanel = topRef.findNode("InfoPanel")
+  m.InfoPanelParent = topRef.findNode("InfoPanelParent")
+  m.backButtonHint = topRef.findNode("backButtonHint")
+  m.pivotContentArea = topRef.findNode("pivotContentArea")
+  if m.constants.deviceInfo.scaledUi = true
+    m.pivotContentArea.maskSize = [1106, 42]
+  else
+    m.pivotContentArea.maskSize = [1659, 63]
+  end if
+  m.pivotList = topRef.findNode("pivotList")
+  m.pivotList.observeFieldScoped("pivotFocused", "onPivotFocusedChange")
+  m.pivotList.observeFieldScoped("componentInteractionInfo", "onPivotComponentInteractionInfo")
+  m.pivotList.observeFieldScoped("navigateWithinPageInfo", "onPivotNavigateWithinPageInfo")
+  m.pivotList.observeFieldScoped("trackingComponentInfo", "onPivotTrackingComponentInfo")
+  topRef.observeFieldScoped("showPivots", "onShowPivotsChange")
 
-  topRef = m.top
   topRef.observeField("focusedChild", "onScreenFocusChange")
   topRef.observeFieldScoped("signedIn", "onSignedInChange")
-  topRef.observeField("categoryMenuVisible", "onCategoryMenuVisible")
-  topRef.observeField("isLoading", "onLoadingChange")
-  topRef.observeField("resetContentAreaValues", "onResetContentAreaValues")
-  topRef.observeField("id", "onIDChange")
-  topRef.observeField("fullscreenCountdown", "onFullscreenCountdown")
-  topRef.observeField("transportVoiceRequest", "onTransportVoiceRequest")
+  topRef.observeFieldScoped("categoryMenuVisible", "onCategoryMenuVisible")
+  topRef.observeFieldScoped("isLoading", "onLoadingChange")
+  topRef.observeFieldScoped("resetContentAreaValues", "onResetContentAreaValues")
+  topRef.observeFieldScoped("id", "onIDChange")
+  topRef.observeFieldScoped("fullscreenCountdown", "onFullscreenCountdown")
+  topRef.observeFieldScoped("transportVoiceRequest", "onTransportVoiceRequest")
   topRef.observeFieldScoped("personalizationId", "onPersonalizationIdChanged")
   topRef.observeFieldScoped("contentUpdated", "onContentUpdated")
   topRef.observeFieldScoped("batchAdResponse", "onBatchAdResponseChanged")
@@ -186,6 +200,7 @@ Function onIDChange()
   m.top.trackingPageInfo = newTrackingPageInfo
   m.CategoryGridList.parentScreenId = m.top.id
   m.CategoryGridList.parentScreenTrackingPageInfo = newTrackingPageInfo
+  m.pivotList.trackingPageInfo = newTrackingPageInfo
 End Function
 
 
@@ -335,7 +350,21 @@ Function onScreenFocusChange()
         refreshHomeScreenContainers()
       end if
     end if
-    setFocusOnCategoryGrid()
+
+    if m.pivotList.content <> invalid AND (m.top.lastFocusedList = "pivotList" OR m.top.sideNavFocusedPosition = 0)
+      focusedContent = m.CategoryGridList.rowFocusedItem
+      if focusedContent <> invalid AND focusedContent.gridItemType = m.constants.ui.gridItemTypes.skinAd
+        m.top.contentFocused = focusedContent
+      end if
+      m.pivotList.setFocus(true)
+      ' Fire NavigateWithinPage from side nav to pivot when coming from side nav
+      if m.top.sideNavFocusedPosition = 0
+        fireNavigateFromSideNavToPivotEvent()
+        m.top.sideNavFocusedPosition = -1
+      end if
+    else
+      setFocusOnCategoryGrid()
+    end if
 
     m.top.shouldFocusWhenPushed = true
   else if m.top.isInFocusChain() = false
@@ -609,13 +638,18 @@ Function onRowFocusedItemChange(msg) as Void
 
   ' Handle content based on grid item type
   gridItemType = focusedContent.gridItemType
+
+  m.pivotList.visible = gridItemType <> m.constants.ui.gridItemTypes.adRowlistSpotlight AND gridItemType <> m.constants.ui.gridItemTypes.adRowlistCarousel AND m.pivotList.content <> invalid
+
   if gridItemType = m.constants.ui.gridItemTypes.skinAd OR gridItemType = m.constants.ui.gridItemTypes.adRowlistSpotlight
     m.top.backgroundUriList = determineBackgroundImage(focusedContent)
   else if focusedContent.type = m.constants.ui.contentTypes.adRowlistCarousel
     displayAdDisplayCarousel()
-  else if gridItemType <> m.constants.ui.gridItemTypes.videoTile AND m.top.enableVideoTiles <> true
-    populateInfoPanelByContent(focusedContent)
-    fadeInContentArea()
+  else
+    if gridItemType <> m.constants.ui.gridItemTypes.videoTile AND m.top.enableVideoTiles <> true
+      populateInfoPanelByContent(focusedContent)
+      fadeInContentArea()
+    end if
   end if
 
   fireNavigateWithinPageEvent()
@@ -1003,13 +1037,81 @@ Function fadeOutInfoPanel()
 End Function
 
 
+' Transitions focus from category grid to pivot list
+' Resets category grid state, fires analytics, and sets focus on pivot list
+' @param key - The key that triggered the focus change ("up" or "back")
+Function focusPivotList(key as String) as Void
+  if m.top.lastFocusedList = "rowList"
+    m.CategoryGridList.resetCategoryGridState = true
+  end if
+  ' Fire ButtonComponent event for the key that triggered pivot focus
+  fireButtonFocusPivotEvent(key)
+  ' Fire toggle ON and navigate from category to pivot analytics
+  onNavigatingToPivotMenu()
+  m.top.lastFocusedList = "pivotList"
+  m.top.pauseVideoPreview = true
+  m.pivotList.setFocus(true)
+End Function
+
+
+' Animates the back button hint in and slides the pivot list to the right
+Function showBackHint() as Void
+  if m.isBackHintVisible = true then return
+  m.isBackHintVisible = true
+  fade(m.backButtonHint, "in", 0.3)
+  slideTo(m.pivotList, [234, 0], 0.3)
+End Function
+
+
+' Animates the back button hint out and slides the pivot list back
+Function hideBackHint() as Void
+  if m.isBackHintVisible <> true then return
+  m.isBackHintVisible = false
+  fade(m.backButtonHint, "out", 0.3)
+  slideTo(m.pivotList, [0, 0], 0.3)
+End Function
+
+
 ' Handles key events for navigation and playback
 ' @param key - Key pressed (left, back, down, up, play)
 ' @param press - True if key is pressed, false if released
 ' @return Boolean - True if key was handled, false otherwise
 Function onKeyEvent(key, press) as Boolean
   if press = true
-    if key = "left" OR key = "back"
+    if key = "up" AND m.CategoryGridList.isInFocusChain() = true AND m.pivotList.content <> invalid
+      focusPivotList("up")
+      return true
+    else if key = "down" AND m.pivotList.isInFocusChain() = true
+      ' Fire TOGGLE_OFF when moving from pivot list back to category grid
+      if m.pivotList.pivotFocusedNode <> invalid
+        focusedPosition = m.pivotList.pivotFocused
+        if isNonEmptyArray(focusedPosition) AND focusedPosition.count() >= 2
+          firePivotComponentInteractionEvent(m.pivotList.pivotFocusedNode, focusedPosition[1], "TOGGLE_OFF")
+        end if
+      end if
+
+      skinAdContent = m.top.skinAdContent
+      if skinAdContent = invalid OR skinAdContent.getChildCount() = 0
+        currentFocusRow = 0
+        if isNonEmptyArray(m.top.cursorPosition) = true
+          currentFocusRow = m.top.cursorPosition[0]
+        end if
+        m.CategoryGridList.requestFocusXOffsetUpdate = currentFocusRow
+      end if
+      ' Resetting the last focused so that category grid list decides where to set focus.
+      m.top.lastFocusedList = ""
+      m.CategoryGridList.setFocus(true)
+      return true
+    else if key = "left" OR key = "back"
+      ' Fire TOGGLE_OFF and NavigateWithinPage when pressing Left from pivot to side nav
+      if m.pivotList.isInFocusChain() = true AND m.pivotList.pivotFocusedNode <> invalid
+        focusedPosition = m.pivotList.pivotFocused
+        if isNonEmptyArray(focusedPosition) AND focusedPosition.count() >= 2
+          firePivotComponentInteractionEvent(m.pivotList.pivotFocusedNode, focusedPosition[1], "TOGGLE_OFF")
+          fireNavigateFromPivotToSideNavEvent()
+        end if
+      end if
+
       ' This is required to stop videoPreview
       itemFocused = m.CategoryGridList.itemFocused
       if m.top.isVideoPreviewOn = true OR (itemFocused <> invalid AND itemFocused.gridItemType = m.constants.ui.gridItemTypes.skinAd)
@@ -1018,6 +1120,11 @@ Function onKeyEvent(key, press) as Boolean
 
       ' navigating to the side nav
       m.top.stopLinearVideoPlayer = true
+
+      if m.pivotList.content <> invalid AND m.pivotList.content.getChildCount() > 0 AND m.pivotList.isInFocusChain() = false AND key = "back"
+        focusPivotList("back")
+        return true
+      end if
     else if isAdDisplayCarouselAvailable() = true AND m.adRowlistCarouselComponent.isInFocusChain() = true
       if key = "down"
         nCurrentFocusRow = m.CategoryGridList.listCurrFocusRow
@@ -1166,4 +1273,230 @@ Function onKidsModeChange(msg)
   if m.top.enableVideoTiles = false AND kidsMode = true
     m.ContentAreaParent.translation = m.originalContentAreaTranslation
   end if
+End Function
+
+
+' Handles navigation to pivot menu from category grid
+' Stores source category info for later NavigateWithinPage event
+Function onNavigatingToPivotMenu() as Void
+  ' Store the current tracking component info for NavigateWithinPage event
+  ' This will be used when the pivot list fires TOGGLE_ON
+  ' The trackingComponentInfo is already built with proper content_tile/utility_tile
+  if m.top.trackingComponentInfo <> invalid
+    m.pendingPivotNavigation = m.top.trackingComponentInfo
+  end if
+End Function
+
+
+' Handles showPivots changes - resets pivot list content when hidden
+' @param msg - Message containing the showPivots boolean value
+Function onShowPivotsChange(msg) as Void
+  if msg.getData() = false
+    m.pivotList.content = invalid
+  end if
+End Function
+
+
+' Handles pivot focused changes - fires NavigateWithinPage when navigating from category to pivot
+' @param msg - Message containing the focused pivot position [row, column]
+Function onPivotFocusedChange(msg) as Void
+  focusedPosition = msg.getData()
+  if focusedPosition = invalid OR focusedPosition.count() < 2 then return
+
+  ' Get pivot node from PivotList
+  pivotContent = m.pivotList.pivotFocusedNode
+  if pivotContent = invalid then return
+
+  pivotCol = focusedPosition[1]
+
+  ' Check if we have pending navigation from category grid
+  if isNonEmptyAA(m.pendingPivotNavigation) = true
+    pivotRow = 1 ' Pivot list is at row 1 for analytics
+
+    ' Fire NavigateWithinPage from category to pivot
+    fireNavigateFromCategoryToPivotEvent(m.pendingPivotNavigation, pivotRow, pivotContent, pivotCol + 1)
+
+    ' Clear pending navigation
+    m.pendingPivotNavigation = invalid
+  end if
+
+  ' Fire TOGGLE_ON when focusing on a pivot
+  firePivotComponentInteractionEvent(pivotContent, pivotCol, "TOGGLE_ON")
+End Function
+
+
+' Forwards componentInteractionInfo from PivotList to HomeScreen
+Function onPivotComponentInteractionInfo(msg) as Void
+  m.top.componentInteractionInfo = msg.getData()
+End Function
+
+
+' Forwards navigateWithinPageInfo from PivotList to HomeScreen
+Function onPivotNavigateWithinPageInfo(msg) as Void
+  m.top.navigateWithinPageInfo = msg.getData()
+End Function
+
+
+' Forwards trackingComponentInfo from PivotList to HomeScreen
+Function onPivotTrackingComponentInfo(msg) as Void
+  m.top.trackingComponentInfo = msg.getData()
+End Function
+
+
+' ==================== ANALYTICS SECTION ====================
+
+
+' Fires ComponentInteractionEvent for pivot interactions (TOGGLE_ON, TOGGLE_OFF, CONFIRM)
+' @param pivotContent - The pivot ContentNode
+' @param utilityTileCol - The column position of the focused pivot
+' @param userInteraction - "TOGGLE_ON", "TOGGLE_OFF", or "CONFIRM"
+Function firePivotComponentInteractionEvent(pivotContent as Dynamic, utilityTileCol as Integer, userInteraction as String) as Void
+  if m.tracking = invalid OR pivotContent = invalid then return
+
+  pageInfo = m.top.trackingPageInfo
+  componentValues = m.tracking.getPivotCollectionComponent(pivotContent, utilityTileCol + 1, 1, "STICKY")
+
+  ' Set componentInteractionInfo on HomeScreen field
+  m.top.componentInteractionInfo = {
+    pageOneof: m.tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+    componentOneof: m.tracking.getAnalyticsComponent("collection_component", componentValues)
+    user_interaction: userInteraction
+  }
+End Function
+
+
+' Fires ComponentInteractionEvent with ButtonComponent when user presses Up or Back to focus pivot menu
+' @param key - The key that triggered the focus change ("up" or "back")
+Function fireButtonFocusPivotEvent(key as String) as Void
+  if m.tracking = invalid then return
+
+  pageInfo = m.top.trackingPageInfo
+  if pageInfo = invalid then return
+
+  buttonValue = "UP_FOCUS_PIVOT"
+  if key = "back"
+    buttonValue = "BACK_FOCUS_PIVOT"
+  end if
+
+  componentValues = {
+    button_value: buttonValue
+    button_type: "IMAGE"
+  }
+
+  m.top.componentInteractionInfo = {
+    pageOneof: m.tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+    componentOneof: m.tracking.getAnalyticsComponent("button_component", componentValues)
+    user_interaction: "CONFIRM"
+  }
+End Function
+
+
+' Returns focused pivot info as { pivotContent, pivotCol, pivotRow, componentValues } or invalid
+Function getFocusedPivotInfo() as Dynamic
+  pivotContent = m.pivotList.pivotFocusedNode
+  if pivotContent = invalid then return invalid
+
+  focusedPosition = m.pivotList.pivotFocused
+  if focusedPosition = invalid OR focusedPosition.count() < 2 then return invalid
+
+  pivotCol = focusedPosition[1] + 1
+  pivotRow = 1
+
+  return {
+    pivotContent: pivotContent
+    pivotCol: pivotCol
+    pivotRow: pivotRow
+    componentValues: m.tracking.getPivotCollectionComponent(pivotContent, pivotCol, pivotRow, "STICKY")
+  }
+End Function
+
+
+' Fires NavigateWithinPageEvent when navigating FROM side nav TO pivot menu
+Function fireNavigateFromSideNavToPivotEvent() as Void
+  if m.tracking = invalid then return
+
+  pageInfo = m.top.trackingPageInfo
+  if pageInfo = invalid then return
+
+  pivotInfo = getFocusedPivotInfo()
+  if pivotInfo = invalid then return
+
+  ' Build source: LeftSideNavComponent with left_nav_section
+  sourceComponentValues = {
+    left_nav_section: m.top.sideNavLeftNavSection
+  }
+
+  pageOneof = m.tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+  componentOneof = m.tracking.getAnalyticsComponent("left_side_nav_component", sourceComponentValues)
+  destComponentOneof = m.tracking.getAnalyticsDestinationComponent("dest_collection_component", pivotInfo.componentValues)
+
+  m.top.navigateWithinPageInfo = {
+    pageOneof: pageOneof
+    componentOneof: componentOneof
+    dest_componentOneof: destComponentOneof
+    means_of_navigation: "BUTTON"
+    vertical_location: pivotInfo.pivotRow
+    horizontal_location: pivotInfo.pivotCol
+  }
+End Function
+
+
+' Fires NavigateWithinPageEvent when navigating FROM pivot menu TO side nav
+Function fireNavigateFromPivotToSideNavEvent() as Void
+  if m.tracking = invalid then return
+
+  pageInfo = m.top.trackingPageInfo
+  if pageInfo = invalid then return
+
+  pivotInfo = getFocusedPivotInfo()
+  if pivotInfo = invalid then return
+
+  ' Build destination: LeftSideNavComponent with nav_section derived from screen ID
+  sideNavId = m.constants.ui.screenIdToSideNavId[m.top.id]
+  destComponentValues = {
+    left_nav_section: m.tracking.sideNavPageMap[sideNavId]
+  }
+
+  pageOneof = m.tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+  componentOneof = m.tracking.getAnalyticsComponent("collection_component", pivotInfo.componentValues)
+  destComponentOneof = m.tracking.getAnalyticsDestinationComponent("dest_left_side_nav_component", destComponentValues)
+
+  m.top.navigateWithinPageInfo = {
+    pageOneof: pageOneof
+    componentOneof: componentOneof
+    dest_componentOneof: destComponentOneof
+    means_of_navigation: "BUTTON"
+  }
+End Function
+
+
+' Fires NavigateWithinPageEvent when navigating FROM category grid TO pivot menu
+' @param sourceComponentInfo - Already-built component info from trackingComponentInfo (includes content_tile/utility_tile)
+' @param pivotRow - The row position where pivot sits
+' @param pivotContent - The destination pivot content node
+' @param pivotCol - The column position of the destination pivot element
+Function fireNavigateFromCategoryToPivotEvent(sourceComponentInfo as Object, pivotRow as Integer, pivotContent as Dynamic, pivotCol as Integer) as Void
+  if m.tracking = invalid OR sourceComponentInfo = invalid then return
+
+  pageInfo = m.top.trackingPageInfo
+  if pageInfo = invalid then return
+
+  ' Build destination component values using helper method
+  destComponentValues = m.tracking.getPivotCollectionComponent(pivotContent, pivotCol, pivotRow, "STICKY")
+
+  pageOneof = m.tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+
+  ' Use the already-built source component info
+  componentOneof = m.tracking.getAnalyticsComponent(sourceComponentInfo.componentType, sourceComponentInfo.componentValues)
+
+  destComponentOneof = m.tracking.getAnalyticsDestinationComponent("dest_collection_component", destComponentValues)
+
+  m.top.navigateWithinPageInfo = {
+    pageOneof: pageOneof
+    componentOneof: componentOneof
+    dest_componentOneof: destComponentOneof
+    means_of_navigation: "BUTTON"
+    vertical_location: pivotRow
+    horizontal_location: pivotCol
+  }
 End Function

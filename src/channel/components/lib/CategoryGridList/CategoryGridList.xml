@@ -200,6 +200,15 @@
 
     <!-- Informs CategoryGridList that more containers were added to screen. -->
     <field id="hasNewContainers" type="boolean" value="false" alwaysNotify="true" />
+
+    <!-- Field to trigger focus X offset update with specific row index. Set to -1 to reset. -->
+    <field id="requestFocusXOffsetUpdate" type="integer" alwaysNotify="true" />
+
+    <!-- Field to trigger row height reset. Pass integer row index (e.g., 0 for first row). -->
+    <field id="requestRowHeightReset" type="integer" alwaysNotify="true" />
+
+    <!-- Resets focus X offset and row height when leaving the category grid (e.g., focusing pivot list) -->
+    <field id="resetCategoryGridState" type="boolean" alwaysNotify="true" />
   </interface>
 
   <children>

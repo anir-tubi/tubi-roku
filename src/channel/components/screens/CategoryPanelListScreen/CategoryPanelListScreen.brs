@@ -9,6 +9,7 @@ Function init()
 
   m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
   m.top.handlesTransportVoiceRequests = true
+  m.top.shouldShowSideNav = true
 
   m.leftPanelWidth = 384
   '//Hardcode the right panel width so the right panel's loading spinner is centered to the panel

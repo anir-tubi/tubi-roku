@@ -208,6 +208,24 @@
 - **When to Use Alias**: Use for direct property forwarding without transformation
 - For Poster nodes, use `blendColor` instead of `color` (e.g., `alias="background.blendColor"`)
 
+### Exposing Functions via callFunc
+- **MANDATORY**: When a function needs to be called from outside a component using `callFunc()`, it must be declared in the component's interface
+- **FORMAT**: `<function name="functionName" />`
+- **PLACEMENT**: Function declarations go inside the `<interface>` section, at the end after all field declarations, BEFORE the closing `</interface>` tag
+- **EXAMPLE**:
+  ```xml
+  <interface>
+    <field id="content" type="node" />
+    <field id="hasNewContainers" type="boolean" />
+
+    <function name="updateFocusXOffset" />
+  </interface>
+  
+  <children>
+  ```
+- **USAGE**: `componentNode.callFunc("functionName", param1, param2)`
+- **RATIONALE**: Makes the function part of the component's public API and enables external invocation
+
 ### XML Element Configuration
 - **MANDATORY**: Set width, height, translation, and alignment directly in XML element tags
 - **CRITICAL**: All width, height, and translation values must be divisible by 3
@@ -288,10 +306,11 @@
 - **MANDATORY**: When a button is needed, ALWAYS use `EnhancedButton` component instead of Rectangle or Label
 - **MANDATORY**: EnhancedButton provides proper focus handling, theming, and accessibility
 - **MANDATORY**: Use `EnhancedButton` for all interactive button elements
+- **MANDATORY**: EnhancedButton ALWAYS requires a `height` to be set - without it the button will not render correctly
 - **MANDATORY**: Set `isPrimaryButton = true` in the ContentNode for all dynamically created buttons
 - **MANDATORY**: For lists of buttons, use a single handler function instead of individual handlers
 - **MANDATORY**: Add output field to pass button selection up the chain
-- **Example**: `<EnhancedButton id="myButton" text="Button Text" />`
+- **Example**: `<EnhancedButton id="myButton" height="72" />`
 - **Dynamic Example**: `buttonContent.isPrimaryButton = true`
 - **Handler Example**: `button.observeFieldScoped("wasSelected", "onButtonSelected")`
 - **Output Field Example**: `<field id="selectedButtonId" type="string" alwaysNotify="true" />`
@@ -376,18 +395,29 @@ End Function
 
 ### Screen Helpers Pattern
 - Create `show[ScreenName]()` function in helpers file
-- **MANDATORY**: Follow the correct screen creation pattern:
-  1. **Create screen node**: `screen = CreateObject("roSGNode", "[ScreenName]")`
+- **MANDATORY**: Follow the correct screen creation pattern (reference: `showCollectionScreen` in `CollectionScreenHelpers.brs`):
+  1. **Create screen**: `screen = createScreen("[ScreenName]")` — use the `createScreen()` helper, NOT `CreateObject("roSGNode", ...)`
   2. **Set up observers**: `screen.observeFieldScoped("fieldName", "onFieldNameChange")`
-  3. **Set screen ID**: `screen.id = m.constants.ui.screenIds.[screenName]`
-  4. **Set tracking load time**: `screen.trackingLoadStartTime = Uptime(0)`
-  5. **Set focus behavior**: `screen.shouldFocusWhenPushed = m.top.fadeInContentController`
-  6. **Set tracking page info**: `screen.trackingPageInfo = { pageType: "page_type", pageValues: {} }`
-  7. **Call pushScreen**: `pushScreen(screen, true, true)`
+  3. **Set screen ID** (if needed for later identification): `screen.id = m.constants.ui.screenIds.[screenName]`
+  4. **Set tracking page info**: `screen.trackingPageInfo = { pageType: "page_type", pageValues: {} }`
+  5. **Set screen-specific fields**: e.g. `screen.appId = appId`
+  6. **Show spinner if needed**: `showHideSpinner(true)`
+  7. **Call pushScreen**: `pushScreen(screen, true, false)`
+- **MANDATORY**: Use `Function` / `End Function` (not `sub` / `end sub`)
+- **MANDATORY**: Separate each function with exactly 2 blank lines
 - **IMPORTANT**: Always include the new helper script in `ContentController.xml`
 - Add script reference: `<script type="text/brightscript" uri="[ScreenName]Helpers.brs" />`
 - **MANDATORY**: Helper files must be included in ContentController.xml to be accessible
-- **Example**: `<script type="text/brightscript" uri="TriviaGenreSelectionScreenHelpers.brs" />`
+- **Example**:
+  ```brightscript
+  screen = createScreen("[ScreenName]")
+  screen.observeFieldScoped("fieldName", "onFieldNameChange")
+  screen.id = m.constants.ui.screenIds.[screenName]
+  screen.trackingPageInfo = { pageType: "page_type", pageValues: {} }
+  showHideSpinner(true)
+  pushScreen(screen, true, false)
+  ```
+- **Reference**: See `showCollectionScreen()` in `CollectionScreenHelpers.brs` for a complete implementation
 
 ## Mixin Standards
 - Mixins are always created directly under `src/channel/components/lib/`

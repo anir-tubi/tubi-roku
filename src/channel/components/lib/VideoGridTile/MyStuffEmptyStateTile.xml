@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<component name="MyStuffEmptyVideoTile" extends="Group">
-  <script type="text/brightscript" uri="MyStuffEmptyVideoTile.brs" />
+<component name="MyStuffEmptyStateTile" extends="Group">
+  <script type="text/brightscript" uri="MyStuffEmptyStateTile.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
@@ -10,7 +10,7 @@
 
   <interface>
     <field id="itemContent" type="node" />
-    <field id="width" alias="border.width, title.width, subtitle.width" />
+    <field id="width" alias="border.width" />
     <field id="height" alias="border.height" />
     <field id="itemHasFocus" type="boolean" />
     <field id="rowHasFocus" type="boolean" />
@@ -23,36 +23,38 @@
       uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png" />
 
     <LayoutGroup
-      id="contentSection"
+      id="metadataGroup"
       layoutDirection="vert"
-      horizAlignment="custom"
-      itemSpacings="[18]">
-
-      <Poster
-        id="icon"
-        width="84"
-        height="84" />
-
+      itemSpacings="[15]">
       <Label
         id="title"
-        height="39"
-        horizAlign="center"
-        vertAlign="center">
-        <Font
-          role="font" />
-      </Label>
-
-      <Label
-        id="subtitle"
+        maxLines="2"
         wrap="true"
-        ellipsizeOnBoundary="true"
-        numLines="1"
-        vertAlign="center"
-        horizAlign="center">
-        <Font
-          role="font" />
-      </Label>
-
+        width="633" />
+      <Label
+        id="description"
+        width="633"
+        wrap="true"
+        maxLines="3" />
     </LayoutGroup>
+
+    <LayoutGroup
+      id="sellingPointsGroup"
+      layoutDirection="vert"
+      horizAlignment="center">
+      <Label
+        id="noSubscriptionLabel"
+        horizAlign="center" />
+      <Label
+        id="noCreditCardLabel"
+        horizAlign="center" />
+      <Label
+        id="freeForeverLabel"
+        horizAlign="center" />
+    </LayoutGroup>
+
+    <EnhancedButton
+      height="105"
+      id="signUpButton" />
   </children>
 </component>

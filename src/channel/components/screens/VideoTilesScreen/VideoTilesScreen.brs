@@ -31,10 +31,8 @@
 Function initVideoTilesScreen(contentAreaNode, rowListNode, infoPanelNode = invalid) as Void
   constants = getConstantsFromGlobal()
 
-  ' Initialize mask URI management
-  m.maskUri = "pkg:/images/poster-mask.png"
   m.contentAreaNode = contentAreaNode
-  m.contentAreaNode.maskUri = m.maskUri
+  m.originalContentAreaTranslation = m.contentAreaNode.translation
 
   ' Store row list reference
   m.rowListNode = rowListNode
@@ -43,7 +41,6 @@ Function initVideoTilesScreen(contentAreaNode, rowListNode, infoPanelNode = inva
   m.originalRowFocusAnimationStyle = rowListNode.rowFocusAnimationStyle
 
   ' Store original translations
-  m.originalContentAreaTranslation = m.contentAreaNode.translation
   m.currentContentAreaTranslation = m.originalContentAreaTranslation
   m.videoTilesListTranslation = constants.ui.videoTilesListTranslation
 
@@ -62,6 +59,7 @@ Function initVideoTilesScreen(contentAreaNode, rowListNode, infoPanelNode = inva
   ' Set up row list observers for video tiles
   rowListNode.observeFieldScoped("currFocusColumn", "onRowCurrFocusColumnChange")
   rowListNode.observeFieldScoped("currFocusRow", "onListCurrFocusRowChange")
+  rowListNode.observeFieldScoped("rowItemFocused", "onRowItemFocusedChange")
   rowListNode.observeFieldScoped("vertFocusDirection", "onVertFocusDirectionChange")
   rowListNode.observeFieldScoped("translation", "onRowListTranslationChange")
   rowListNode.observeFieldScoped("scrollingStatus", "onRowListScrollingStatusChange")
@@ -72,11 +70,21 @@ Function initVideoTilesScreen(contentAreaNode, rowListNode, infoPanelNode = inva
 
   ' Set up top-level observer for enableVideoTiles
   m.top.observeFieldScoped("enableVideoTiles", "onEnableVideoTilesChange")
+  m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
 
   ' Initialize rowListTranslation and field syncs immediately
   updateRowListTranslation(rowListNode.translation)
   m.top.listCurrFocusRow = rowListNode.currFocusRow
   m.top.listScrollingStatus = rowListNode.scrollingStatus
+End Function
+
+
+' Handles screen focus changes
+Function onScreenFocusChange() as Void
+  if m.top.hasFocus() = true
+    m.rowList.setFocus(true)
+  end if
+  m.top.listHasFocus = m.rowList.isInFocusChain()
 End Function
 
 
@@ -180,7 +188,7 @@ Function onListCurrFocusRowChange(msg) as Void
     updateCurrentFocusedItemBoundingRect(rowListNode)
 
     category = rowContent.getChild(nextFocusRow)
-    if category <> invalid AND category.focusIndex > 0
+    if category <> invalid AND isNumber(category.focusIndex) = true AND category.focusIndex > 0
       m.lastFocusColumnIndex = category.focusIndex
     else
       m.lastFocusColumnIndex = 0
@@ -303,6 +311,22 @@ Function onRowCurrFocusColumnChange(msg) as Void
 End Function
 
 
+' Persists the focused column index on the category content node
+' Fires on every focus change (row or column), keeping focusIndex
+' in sync for bounding rect and focus offset calculations
+' @param msg - Message containing [rowIndex, columnIndex]
+Function onRowItemFocusedChange(msg) as Void
+  rowItemFocused = msg.getData()
+  rowContent = m.top.content
+  if isNonEmptyArray(rowItemFocused) = true AND isNode(rowContent) = true
+    category = rowContent.getChild(rowItemFocused[0])
+    if category <> invalid
+      category.focusIndex = rowItemFocused[1]
+    end if
+  end if
+End Function
+
+
 ' Checks if a container type supports video tiles
 ' Returns true for video tile grid item type
 ' @param gridItemType - The grid item type to check
@@ -333,7 +357,7 @@ End Function
 ' @param content - Content node
 Function configureRowHeights(rowListNode, rowItemSize, rowHeights, content) as Void
   rowListNode.update({
-    "itemSize": [1752, m.gridItemSize[1]]
+    "itemSize": [1920, m.gridItemSize[1]]
     "rowItemSize": rowItemSize
     "rowHeights": rowHeights
     "showRowLabel": [true]
@@ -386,4 +410,42 @@ Function syncListScrollingStatus() as Void
   if m.rowListNode <> invalid
     m.top.listScrollingStatus = m.rowListNode.scrollingStatus
   end if
+End Function
+
+
+' Gets the content node from a RowList position
+' @param rowItemIndex - 2D array of [rowIndex, itemIndex] from RowList.rowItemFocused or RowList.rowItemSelected
+' @return ContentNode - The content node at the specified position, or invalid
+Function getContentNodeFromRowItem(rowItemIndex) as Dynamic
+  content = invalid
+  if m.top.content <> invalid AND rowItemIndex[0] <> invalid AND rowItemIndex[1] <> invalid
+    category = m.top.content.getChild(rowItemIndex[0])
+    if category <> invalid
+      content = category.getChild(rowItemIndex[1])
+    end if
+  end if
+
+  return content
+End Function
+
+
+' Gets a fully parsed TubiContentNode from a RowList position
+' Uses metadataTranslate to get full content details from category JSON
+' @param rowItemIndex - 2D array of [rowIndex, itemIndex] from RowList.rowItemFocused or RowList.rowItemSelected
+' @param metadataTranslate - TubiMetadataTranslate instance for parsing content (optional)
+' @param isSignedIn - Whether the user is signed in (optional, default: false)
+' @return ContentNode - Fully parsed TubiContentNode, or invalid
+Function getTubiContentNodeFromRowItem(rowItemIndex, metadataTranslate = invalid, isSignedIn = false) as Dynamic
+  content = getContentNodeFromRowItem(rowItemIndex)
+
+  if content <> invalid AND isNonEmptyString(content.id) AND metadataTranslate <> invalid
+    category = m.top.content.getChild(rowItemIndex[0])
+    if category <> invalid
+      contentId = content.id
+      contentFromJSON = metadataTranslate.getContentFromCategoryJson(category, contentId, isSignedIn)
+      return contentFromJSON
+    end if
+  end if
+
+  return invalid
 End Function

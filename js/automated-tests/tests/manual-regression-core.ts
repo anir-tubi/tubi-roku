@@ -770,6 +770,7 @@ describe('Core Manual Regression Tests', function () {
     await testUtils.waitForElementToShowOnScreen('tubiKidsLogo', 'Kids logo not visible', 10000);
     const kidsLogo = await testUtils.getNodeForElement('tubiKidsLogo');
     expect(kidsLogo.visible).to.equal(true, 'Should be in kids mode');
+
     // Select "Exit Kids Mode" option
     await testHelpers.exitKidsMode();
 

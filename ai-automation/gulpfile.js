@@ -172,53 +172,6 @@ function checkClaudeAvailable() {
 }
 
 /**
- * Adds .only to a specific test case by ID, or to the last test if no ID provided
- * @param {string} code - The test file code
- * @param {string} testCaseId - Optional test case ID (e.g., "C535817")
- * @returns {string} Code with .only added to the correct test
- */
-function addOnlyToSpecificTest(code, testCaseId = null) {
-  if (code.includes('it.only(')) {
-    // .only already exists, no need to add
-    return code;
-  }
-
-  // If testCaseId is provided, find and add .only to that specific test
-  if (testCaseId) {
-    // Normalize testCaseId (ensure it has C prefix)
-    const normalizedId = testCaseId.startsWith('C') ? testCaseId : 'C' + testCaseId;
-
-    // Look for the test with this ID in the it() description
-    // Pattern: it('C535817 - or it("C535817 -
-    const testPattern = new RegExp(`(\\s+it)\\(['"](${normalizedId}[^'"]*?)['"]`, 'g');
-    const match = testPattern.exec(code);
-
-    if (match) {
-      // Found the test with this ID, add .only to it
-      const result = code.replace(testPattern, '$1.only(\'$2\'');
-      console.log(`✅ Added .only to test ${normalizedId}`);
-      return result;
-    } else {
-      console.log(`⚠️  Could not find test with ID ${normalizedId}, adding .only to last test`);
-    }
-  }
-
-  // Fallback: Add .only to the last it() test (most likely the newly added one)
-  const itBlocks = code.match(/(\s+it)\([^)]+\)/g);
-  if (itBlocks && itBlocks.length > 0) {
-    const lastItBlock = itBlocks[itBlocks.length - 1];
-    const lastItBlockWithOnly = lastItBlock.replace(/(\s+it)\(/, '$1.only(');
-    const lastIndex = code.lastIndexOf(lastItBlock);
-    const result = code.substring(0, lastIndex) + lastItBlockWithOnly + code.substring(lastIndex + lastItBlock.length);
-    console.log('✅ Added .only to last test');
-    return result;
-  }
-
-  console.log('⚠️  Could not add .only - no it() blocks found');
-  return code;
-}
-
-/**
  * Removes .only from all test cases in a file
  * @param {string} filePath - Path to the test file
  */
@@ -265,6 +218,16 @@ function cleanGeneratedCode(stdout) {
     /^.*?Here is the code:\s*/is,
     // @ts-ignore
     /^.*?Fixed code:\s*/is,
+    // @ts-ignore
+    /^.*?I need permission.*?\n\n/is,
+    // @ts-ignore
+    /^.*?The issue is that.*?\n\n/is,
+    // @ts-ignore
+    /^.*?The TypeScript errors are caused by.*?\n\n/is,
+    // @ts-ignore
+    /^.*?The problem is.*?\n\n/is,
+    // @ts-ignore
+    /^.*?The fix replaces.*?\n\n/is,
   ];
 
   for (const pattern of explanationPatterns) {
@@ -411,7 +374,7 @@ async function generateTestWithAI(testDetails, existingTestIds, wrongIdFromPrevi
     // Use roku-test-gen agent for specialized behavior (NO --print for full tool access)
     // Use --model sonnet for more reliable, complete outputs
     // Use --session-id to maintain context across tests in a suite (if provided)
-    // Use explicit tool permissions (Read, Grep, Glob only - NO Write/Edit)
+    // Keep using text output for test generation since validation logic (ID checking, retries) is complex
     const sessionParam = sessionId ? ` --session-id ${sessionId}` : '';
     const claudeCommand = `cat ${tmpFile} | claude --agent roku-test-gen --model sonnet${sessionParam} --allowed-tools "Read,Grep,Glob" --add-dir js/automated-tests --add-dir automated-tests-config --output-format text`;
 
@@ -1236,12 +1199,15 @@ async function runLinter(filePath) {
   });
 }
 
-async function fixLintErrors(filePath, lintResult) {
-  console.log('\n🤖 Using AI to fix lint/type errors...');
+async function fixLintErrors(filePath, lintResult, retryAttempt = 0) {
+  const maxRetries = 2;
+  console.log(`\n🤖 Using AI to fix lint/type errors... (attempt ${retryAttempt + 1}/${maxRetries})`);
 
-  const fileContent = fs.readFileSync(filePath, 'utf8');
+  // Store original file content to compare later
+  const originalContent = fs.readFileSync(filePath, 'utf8');
 
-  const promptContent = buildLintFixPrompt(fileContent, lintResult);
+  // Build prompt that instructs AI to use Edit tool
+  const promptContent = buildLintFixPrompt(filePath, lintResult);
 
   // @ts-ignore
   return new Promise((resolve, reject) => {
@@ -1249,60 +1215,75 @@ async function fixLintErrors(filePath, lintResult) {
     const tmpFile = path.join(projectRoot, '.claude-lint-fix-tmp');
     fs.writeFileSync(tmpFile, promptContent);
 
-    // Use roku-test-gen agent for specialized behavior (NO --print for full tool access)
-    // Use --model sonnet for more reliable, complete outputs
-    // Use explicit tool permissions (Read, Grep, Glob only - NO Write/Edit)
-    const claudeCommand = `cat ${tmpFile} | claude --agent roku-test-gen --model sonnet --allowed-tools "Read,Grep,Glob" --add-dir js/automated-tests --add-dir automated-tests-config --output-format text`;
+    // Use roku-test-gen agent with Edit tool enabled
+    // AI will directly edit the file instead of outputting text
+    const claudeCommand = `cat ${tmpFile} | claude --agent roku-test-gen --model sonnet --allowed-tools "Read,Grep,Glob,Edit" --add-dir js/automated-tests --add-dir automated-tests-config`;
 
     console.log('⏳ Calling Claude to fix errors...');
 
     // @ts-ignore
-    exec(claudeCommand, { cwd: projectRoot, timeout: config.CLAUDE_TIMEOUT, maxBuffer: 10 * 1024 * 1024 }, (error, stdout, stderr) => {
+    exec(claudeCommand, { cwd: projectRoot, timeout: config.CLAUDE_TIMEOUT, maxBuffer: 10 * 1024 * 1024 }, async (error, stdout, stderr) => {
       // Clean up temp file
       try {
         fs.unlinkSync(tmpFile);
       } catch (e) {
         // Ignore cleanup errors
       }
+
       if (error) {
         console.error('\n❌ Claude execution failed:', error.message);
-        resolve(false);
-        return;
-      }
 
-      console.log('✅ Claude generated fixes');
+        // Restore file to original state — the AI may have partially edited it before failing
+        fs.writeFileSync(filePath, originalContent);
+        console.log('🔄 Restored file to pre-edit state');
 
-      const fixedCode = cleanGeneratedCode(stdout);
-
-      // STRICT VALIDATION: Ensure output is actual code
-      if (!fixedCode.trim().startsWith('import')) {
-        console.error('⚠️  Fixed code does not start with import statement');
-        console.error('Output preview:', fixedCode.substring(0, 200));
-        resolve(false);
-        return;
-      }
-
-      if (!fixedCode.includes('import') || !fixedCode.includes('describe')) {
-        console.log('⚠️  Generated output may not be valid TypeScript test code');
-        resolve(false);
-        return;
-      }
-
-      // Check for explanatory text
-      const explanationIndicators = ['I can see that', 'Looking at', 'The test already exists', 'I\'ve fixed'];
-      for (const phrase of explanationIndicators) {
-        if (fixedCode.includes(phrase)) {
-          console.error('⚠️  Fixed code contains explanatory text instead of pure code');
-          console.error(`Found phrase: "${phrase}"`);
-          resolve(false);
+        // Retry if we haven't exceeded max retries
+        if (retryAttempt < maxRetries - 1) {
+          console.log('🔄 Retrying...');
+          const retryResult = await fixLintErrors(filePath, lintResult, retryAttempt + 1);
+          resolve(retryResult);
           return;
         }
+
+        resolve(false);
+        return;
       }
 
-      // Ensure .only is added to the correct test for isolation
-      const finalCode = addOnlyToSpecificTest(fixedCode);
+      // Check if file was modified by comparing content
+      const newContent = fs.readFileSync(filePath, 'utf8');
+      const fileWasModified = newContent !== originalContent;
 
-      fs.writeFileSync(filePath, finalCode);
+      if (!fileWasModified) {
+        console.error('⚠️  File was not modified by AI');
+
+        // Retry if we haven't exceeded max retries
+        if (retryAttempt < maxRetries - 1) {
+          console.log('🔄 Retrying...');
+          const retryResult = await fixLintErrors(filePath, lintResult, retryAttempt + 1);
+          resolve(retryResult);
+          return;
+        }
+
+        resolve(false);
+        return;
+      }
+
+      // SAFETY CHECK: Ensure we're not losing tests
+      // Count it() blocks in original vs modified code
+      const originalTestCount = (originalContent.match(/\sit\(/g) || []).length + (originalContent.match(/\sit\.only\(/g) || []).length;
+      const newTestCount = (newContent.match(/\sit\(/g) || []).length + (newContent.match(/\sit\.only\(/g) || []).length;
+
+      if (newTestCount < originalTestCount) {
+        console.error(`\n⚠️  SAFETY CHECK FAILED: AI lint fix deleted tests!`);
+        console.error(`   Original file has ${originalTestCount} test(s)`);
+        console.error(`   Modified file has ${newTestCount} test(s)`);
+        console.error(`   🛑 Reverting changes to prevent data loss`);
+        fs.writeFileSync(filePath, originalContent);
+        resolve(false);
+        return;
+      }
+
+      console.log(`✅ Safety check passed: ${newTestCount} test(s) preserved`);
       console.log('✅ AI applied fixes to file');
       resolve(true);
     });
@@ -1598,17 +1579,13 @@ async function fixTestWithAI(filePath, errorOutput, errorCategory, learnedFix, a
   console.log(`\n🤖 Using AI to analyze and fix ${errorCategory.type} error...`);
   console.log(`📋 Error: ${errorCategory.description}`);
 
-  const fileContent = fs.readFileSync(filePath, 'utf8');
-
   // Extract the relevant test case that's failing
   const failingTestMatch = errorOutput.match(/\d+\)\s+(.+?):/);
   const failingTestName = failingTestMatch ? failingTestMatch[1] : 'unknown test';
 
-  // Extract test case ID from the failing test name (e.g., "C535817 - Test Name")
-  const testCaseIdMatch = failingTestName.match(/^(C\d+)/);
-  const testCaseId = testCaseIdMatch ? testCaseIdMatch[1] : null;
+  let promptContent = `You are fixing a failing Roku test. Analyze the error and fix the test code using the Edit tool.
 
-  let promptContent = `You are fixing a failing Roku test. Analyze the error and fix the test code.
+FILE PATH: ${filePath}
 
 ATTEMPT ${attempt}/3
 
@@ -1618,9 +1595,6 @@ FAILING TEST: ${failingTestName}
 
 ERROR OUTPUT (last 1500 chars):
 ${errorOutput.slice(-1500)}
-
-CURRENT TEST FILE:
-${fileContent}
 `;
 
   // Add learned fixes context if available
@@ -1715,53 +1689,32 @@ IMPORTANT: Player states are NOT elements!
 </critical_note>
 
 <output_requirements>
-CRITICAL FORMAT RULES - YOUR RESPONSE MUST FOLLOW THESE EXACTLY:
+CRITICAL INSTRUCTIONS:
 
-1. Return the COMPLETE FIXED FILE with ALL tests (not just the failing one)
-2. Your ENTIRE response must be ONLY valid TypeScript code
-3. NO markdown code fences (no \`\`\`typescript or \`\`\`)
-4. NO explanatory text before, after, or within the code
-5. NO comments like "I've fixed:" or "The issue was:"
-6. Start IMMEDIATELY with the first import statement
-7. Include ALL existing tests in the file - only fix the one that's failing
-8. Preserve all other tests exactly as they are
+1. Read the file to understand the current code: ${filePath}
+2. Use the Edit tool to fix ONLY the failing test: ${failingTestName}
+3. Preserve all other tests exactly as they are
+4. DO NOT output code as text - use the Edit tool to modify the file directly
+5. Make targeted edits to fix the specific error
+6. After editing, respond with "Fixed test successfully" or describe any issues
 
-CORRECT OUTPUT (full file with all tests):
-import { expect } from 'chai';
-import { ecp, utils } from 'roku-test-automation';
-import { testUtils } from '../test-utils';
-
-describe('Test Suite', function () {
-  // Test 1 (existing - keep as is)
-  it('existing test 1', async () => { ... });
-
-  // Test 2 (FIXED - this is the failing one)
-  it('failing test', async () => {
-    // Your fixes here
-  });
-
-  // Test 3 (existing - keep as is)
-  it('existing test 3', async () => { ... });
-});
-
-INCORRECT OUTPUT (DO NOT DO THIS):
-Here's the fixed test:
-\`\`\`typescript
-it('failing test', async () => { ... });
-\`\`\`
-
-YOUR FIRST LINE MUST BE: import
+IMPORTANT:
+- Use Edit tool to change only the code that needs fixing
+- Do NOT rewrite the entire file
+- Preserve all existing tests and imports
 </output_requirements>`;
+
+  // Store original file content to verify changes
+  const originalContent = fs.readFileSync(filePath, 'utf8');
 
   // @ts-ignore
   return new Promise((resolve, reject) => {
     const tmpFile = path.join(projectRoot, '.claude-error-fix-tmp');
     fs.writeFileSync(tmpFile, promptContent);
 
-    // Use roku-test-gen agent for specialized behavior (NO --print for full tool access)
-    // Use --model sonnet for more reliable, complete outputs
-    // Use explicit tool permissions (Read, Grep, Glob only - NO Write/Edit)
-    const claudeCommand = `cat ${tmpFile} | claude --agent roku-test-gen --model sonnet --allowed-tools "Read,Grep,Glob" --add-dir js/automated-tests --add-dir automated-tests-config --output-format text`;
+    // Use roku-test-gen agent with Edit tool enabled
+    // AI will directly edit the file instead of outputting text
+    const claudeCommand = `cat ${tmpFile} | claude --agent roku-test-gen --model sonnet --allowed-tools "Read,Grep,Glob,Edit" --add-dir js/automated-tests --add-dir automated-tests-config`;
 
     console.log('⏳ Claude is analyzing the error and generating fix...');
 
@@ -1775,43 +1728,41 @@ YOUR FIRST LINE MUST BE: import
 
       if (error) {
         console.error('\n❌ Claude execution failed:', error.message);
+
+        // Restore file to original state — the AI may have partially edited it before failing
+        fs.writeFileSync(filePath, originalContent);
+        console.log('🔄 Restored file to pre-edit state');
+
         resolve(false);
         return;
       }
 
-      console.log('✅ Claude generated fix');
+      // Check if file was modified by comparing content
+      const newContent = fs.readFileSync(filePath, 'utf8');
+      const fileWasModified = newContent !== originalContent;
 
-      const fixedCode = cleanGeneratedCode(stdout);
-
-      if (!fixedCode.includes('import') || !fixedCode.includes('describe')) {
-        console.log('⚠️  Generated output may not be valid TypeScript test code');
+      if (!fileWasModified) {
+        console.error('⚠️  File was not modified by AI');
         resolve(false);
         return;
       }
 
       // SAFETY CHECK: Ensure we're not losing tests
-      // Count it() blocks in original vs fixed code
-      const originalContent = fs.readFileSync(filePath, 'utf8');
+      // Count it() blocks in original vs modified code
       const originalTestCount = (originalContent.match(/\sit\(/g) || []).length + (originalContent.match(/\sit\.only\(/g) || []).length;
-      const fixedTestCount = (fixedCode.match(/\sit\(/g) || []).length + (fixedCode.match(/\sit\.only\(/g) || []).length;
+      const newTestCount = (newContent.match(/\sit\(/g) || []).length + (newContent.match(/\sit\.only\(/g) || []).length;
 
-      if (fixedTestCount < originalTestCount) {
-        console.error(`\n⚠️  SAFETY CHECK FAILED: AI fix would delete tests!`);
+      if (newTestCount < originalTestCount) {
+        console.error(`\n⚠️  SAFETY CHECK FAILED: AI fix deleted tests!`);
         console.error(`   Original file has ${originalTestCount} test(s)`);
-        console.error(`   Fixed code has ${fixedTestCount} test(s)`);
-        console.error(`   🛑 Refusing to overwrite file to prevent data loss`);
-        console.error(`   💡 The AI may have returned only the failing test instead of the full file`);
+        console.error(`   Modified file has ${newTestCount} test(s)`);
+        console.error(`   🛑 Reverting changes to prevent data loss`);
+        fs.writeFileSync(filePath, originalContent);
         resolve(false);
         return;
       }
 
-      console.log(`✅ Safety check passed: ${fixedTestCount} test(s) preserved`);
-
-      // Ensure .only is added to the correct test for isolation
-      // Use the test case ID to target the specific test that's being fixed
-      const finalCode = addOnlyToSpecificTest(fixedCode, testCaseId);
-
-      fs.writeFileSync(filePath, finalCode);
+      console.log(`✅ Safety check passed: ${newTestCount} test(s) preserved`);
       console.log(`✅ Applied AI fix for ${errorCategory.type} error`);
       resolve(true);
     });

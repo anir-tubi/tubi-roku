@@ -61,6 +61,10 @@ import {
   validateAnalyticsEvent,
   createAnalyticsCallback,
   createLogCustomExposureCallback,
+  assertNoRejections,
+  checkPendingRejections,
+  setupRejectionTracking,
+  formatRejections,
   assertEventExists,
   assertEventCount,
   extractEventsByType,
@@ -75,6 +79,7 @@ import {
   type AnalyticsEvent,
   type ProxyArgs,
   type AnalyticsCallbackConfig,
+  type AnalyticsRejection,
   type LogCustomExposureFilter,
 } from './analytics-validator';
 
@@ -83,6 +88,10 @@ export {
   validateAnalyticsEvent,
   createAnalyticsCallback,
   createLogCustomExposureCallback,
+  assertNoRejections,
+  checkPendingRejections,
+  setupRejectionTracking,
+  formatRejections,
   assertEventExists,
   assertEventCount,
   extractEventsByType,
@@ -99,6 +108,7 @@ export {
   type AnalyticsEvent,
   type ProxyArgs,
   type AnalyticsCallbackConfig,
+  type AnalyticsRejection,
   type LogCustomExposureFilter,
 };
 

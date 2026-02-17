@@ -1757,7 +1757,7 @@ Function onDetailBackButtonPressedChange(msg = invalid)
   if msg <> invalid AND detailScreen <> invalid AND detailScreen.trackingPageInfo <> invalid
     lastKey = detailScreen.backTriggerKey
     if isNonEmptyString(lastKey) = true
-      sendButtonComponentInteractionEvent(lastKey, "UNKNOWN", "CONFIRM", detailScreen)
+      sendButtonComponentInteractionEvent(lastKey, "IMAGE", "CONFIRM", detailScreen)
     end if
   end if
   showHideSpinner(false)

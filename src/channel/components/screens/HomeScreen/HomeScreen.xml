@@ -53,6 +53,12 @@
     load which is communicated via setting of contentUpdated. -->
     <field id="contentFetchCompleted" type="boolean" value="false" />
 
+    <!-- The focused position in the side nav when returning to this screen (0 = top/home) -->
+    <field id="sideNavFocusedPosition" type="integer" value="-1" />
+
+    <!-- The left_nav_section analytics value of the focused side nav item (e.g. "HOME", "MOVIES") -->
+    <field id="sideNavLeftNavSection" type="string" />
+
     <!-- What kind of content is this homeScreen displaying: movies, tv, normal, espanol etc -->
     <field id="contentMode" alias="CategoryGridList.contentMode" />
 
@@ -235,10 +241,44 @@
     <!-- DATA STORE (Anything defined below are not meant to be used as output or input fields which
     will triggered change events. ) -->
     <field id="personalizationId" type="string" alias="CategoryGridList.personalizationId" />
+
+    <!-- PIVOT LIST -->
+    <!-- ServerPersistentData for PivotList CmsApi -->
+    <field id="pivotServerPersistentData" type="node" alias="pivotList.serverPersistentData" />
+
+    <!-- Controls pivot list visibility and data fetching -->
+    <field id="showPivots" alias="pivotList.fetchData" />
+
+    <!-- Selected pivot from the pivot list -->
+    <field id="pivotSelected" alias="pivotList.pivotSelected" />
+
+    <!-- Selected pivot content node -->
+    <field id="pivotSelectedNode" alias="pivotList.pivotSelectedNode" />
+
+    <!-- Focused pivot position [row, column] -->
+    <field id="pivotFocused" alias="pivotList.pivotFocused" />
+
+    <!-- Focused pivot content node -->
+    <field id="pivotFocusedNode" alias="pivotList.pivotFocusedNode" />
   </interface>
 
   <children>
     <Group id="PageGroup">
+      <MaskGroup
+        id="pivotContentArea"
+        translation="[0, 51]"
+        maskUri="pkg:/images/pivot-row-mask.png"
+        maskOffset="[-123, 0]">
+        <!-- Back button hint -->
+        <BackHint
+          opacity="0"
+          id="backButtonHint" />
+        <!-- Translation without back hint is 0 and with back hint is 234 -->
+        <PivotList
+          translation="[0, 0]"
+          itemSize="[1920, 60]"
+          id="pivotList" />
+      </MaskGroup>
       <Group
         id="InfoPanelParent">
         <InfoPanel

@@ -111,6 +111,42 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList.2.items.0.#poster',
   },
 
+  /** PivotList component on the Home Screen (horizontal tabs at top) */
+  pivotList: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#pivotList',
+  },
+
+  /** PivotList component on the Movie Screen */
+  movieScreenPivotList: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#PageGroup.#pivotList',
+  },
+
+  /** PivotList component on the TV Screen */
+  tvScreenPivotList: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#tvScreen.#PageGroup.#pivotList',
+  },
+
+  /** PivotList component on the Espanol Screen */
+  espanolScreenPivotList: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#espanolScreen.#PageGroup.#pivotList',
+  },
+
+  /** RowList component on Pivot Detail Screen (after clicking a pivot) */
+  pivotDetailRowList: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#pivotDetailScreen.#PageGroup.#rowList',
+  },
+
+  /** Title label on Pivot Detail Screen showing the selected pivot name (e.g., "LOL Hits") */
+  pivotDetailScreenTitle: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#pivotDetailScreen.#screenContentGroup.#pivotTitleLabel',
+  },
+
   /** Skin ad row component in CategoryGridList */
 
   skinAdContainer: {

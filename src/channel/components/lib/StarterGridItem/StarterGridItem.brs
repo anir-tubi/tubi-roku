@@ -186,7 +186,7 @@ Function onItemContentChange(msg)
       childGridItemComponent = "EpisodeItem"
     else if gridItemType = "emptyContainer" then
       if row <> invalid AND row.useVideoTilesFormat = true
-        childGridItemComponent = "MyStuffEmptyVideoTile"
+        childGridItemComponent = "MyStuffEmptyStateTile"
       else
         childGridItemComponent = "CategoryGridPoster"
       end if
@@ -196,7 +196,7 @@ Function onItemContentChange(msg)
       childGridItemComponent = "CategoryGridPoster"
     else if gridItemType = "continue_watching_signed_out_user" then
       if row.useVideoTilesFormat = true
-        childGridItemComponent = "GuestUserContinueWatchingTile"
+        childGridItemComponent = "MyStuffEmptyStateTile"
       else
         childGridItemComponent = "CategoryGridPoster"
       end if

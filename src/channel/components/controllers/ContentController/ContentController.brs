@@ -709,6 +709,11 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         end if
       else if (key = "right" OR key = "left") AND isSideNavActive() = true
         '//The RIGHT Key has been pressed, now hide the menu
+        currentScreen = getCurrentScreen()
+        if currentScreen <> invalid AND currentScreen.hasField("sideNavFocusedPosition") = true
+          currentScreen.sideNavFocusedPosition = m.SideNav.focusedPosition
+          currentScreen.sideNavLeftNavSection = m.Tracking.sideNavPageMap[m.SideNav.itemCurrentId]
+        end if
         hideNavMenu(true)
         focusCurrentScreen()
         bReacted = true
@@ -2670,7 +2675,7 @@ Function showHideLogo(logoType, presentedByURL = "", presentedByText = "")
 
     presentedWidth = m.presentedByGroup.boundingRect().width
     logoWidth = m.logo.boundingRect().width
-    x = 1776 - (logoWidth + presentedWidth) ' 1920 - total - (135 - logo width + 24 space + 87 -margin + presentedWidth)
+    x = 1865 - (logoWidth + presentedWidth) ' 1920 - total - (135 - logo width + 24 space + 87 -margin + presentedWidth)
     x1 = x + logoWidth + 24 + (presentedWidth / 2) ' 159 =  135 + 24
     m.presentedByGroup.translation = [x1, 33]
     m.logo.translation = [x, 54]
@@ -3645,7 +3650,7 @@ Function processUserContentSelection(content, screen, playbackSource = {}) as Vo
   if isAA(content.scheduleData)
     playerType = content.scheduleData.playerType
   end if
-  sendButtonComponentInteractionEvent("OK", "UNKNOWN", "CONFIRM", screen)
+  sendButtonComponentInteractionEvent("OK", "IMAGE", "CONFIRM", screen)
 
   m.videoPreviewDebounce.control = "stop"
   if isNonEmptyString(content.actionId) = true
@@ -3782,7 +3787,7 @@ Function processUserPlayAction(content, screen, playbackSource = {}) as Void
   if isAA(content.scheduleData)
     playerType = content.scheduleData.playerType
   end if
-  sendButtonComponentInteractionEvent("PLAY", "UNKNOWN", "CONFIRM", screen)
+  sendButtonComponentInteractionEvent("PLAY", "IMAGE", "CONFIRM", screen)
   ' Since category panel list screen re-uses the method allowing it to play the content.
   if contentType = m.constants.uapiContentTypes.channel
     contentMode = ""
