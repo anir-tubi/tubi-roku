@@ -39,10 +39,6 @@ Function getConstants()
     if settingsOverride.sudoCountry <> invalid then
       constants.settings.sudoCountry = settingsOverride.sudoCountry
     end if
-
-    if settingsOverride.sudoLocale <> invalid then
-      constants.settings.sudoLocale = settingsOverride.sudoLocale
-    end if
   end if
 
   ' Roku's channel/app id for the production Tubi app. It is used with the continue watching feature to enable testing the feature in sideloaded/beta channels.
@@ -267,7 +263,12 @@ Function getConstants()
   constants.deviceInfo.buildVersion = buildVersion
   constants.deviceInfo.revisionVersion = revisionVersion
   constants.deviceInfo.language = di.GetCurrentLocale().Left(2)
-  constants.deviceInfo.locale = di.GetCurrentLocale()
+  ' Override locale from TestAid if set in registry (similar to sudoCountry for countryCode)
+  if type(settingsOverride) = "roAssociativeArray" AND settingsOverride.sudoLocale <> invalid AND constants.settings.mode <> "production"
+    constants.deviceInfo.locale = settingsOverride.sudoLocale
+  else
+    constants.deviceInfo.locale = di.GetCurrentLocale()
+  end if
   constants.deviceInfo.scaledUi = scaledUi
   constants.deviceInfo.videoMode = di.GetVideoMode()
   if FindMemberFunction(di, "IsAutoplayEnabled") <> invalid

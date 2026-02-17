@@ -75,11 +75,7 @@ Function onItemFocused(msg)
   else if item.id = "changeCountry"
     m.infoArea.text = "Select the country. It will work for White listed IPs only. Contact CSS for whitelisting" + chr(10) + "Current Country: " + m.constants.deviceInfo.countryCode
   else if item.id = "changeLanguage"
-    sudoLocale = "N/A"
-    if m.constants.settings <> invalid AND m.constants.settings.sudoLocale <> invalid
-      sudoLocale = m.constants.settings.sudoLocale
-    end if
-    m.infoArea.text = "Select the language for testing." + chr(10) + "Current Locale: " + m.constants.deviceInfo.locale + chr(10) + "SudoLocale: " + sudoLocale
+    m.infoArea.text = "Select the language for testing." + chr(10) + "Current Locale: " + m.constants.deviceInfo.locale
   else if item.id = "playerStats"
     m.infoArea.text = "This toggles the display of player stats within the video player, helping QA and developers understand the current playback."
   else if item.id = "features"
@@ -517,14 +513,15 @@ Function showLanguageList(show = false)
       m.languageListMenu.id = "languageListMenu"
 
       languageList = createObject("roSGNode", "ContentNode")
+      currentLocale = m.constants.deviceInfo.locale
       languageList.update({
         id: "languageList"
         children: [
           { id: "resetDefault", title: "Reset to Default" }
-          { id: "en_US", title: "English (US)" }
-          { id: "en_GB", title: "English (UK)" }
-          { id: "es_MX", title: "Spanish" }
-          { id: "fr_CA", title: "French" }
+          { id: "en_US", title: "English (US)", checked: currentLocale = "en_US" }
+          { id: "en_GB", title: "English (UK)", checked: currentLocale = "en_GB" }
+          { id: "es_MX", title: "Spanish", checked: currentLocale = "es_MX" }
+          { id: "fr_CA", title: "French", checked: currentLocale = "fr_CA" }
         ]
       }, true)
 
