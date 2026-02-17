@@ -656,7 +656,7 @@ Function createProfileSelectionListContentNode()
 
     end for
 
-    if menuItems.getChildCount() < 8
+    if menuItems.getChildCount() < 8 AND isKidsUIOn() <> true
       'append add account item
       addItem = CreateObject("roSGNode", "SideNavContentNode")
       addItem.title = getTranslation("add_account")
