@@ -3092,6 +3092,14 @@ Function getTranslation_es_MX()
       "description": "A description informing users they cannot exit Tubi Kids for the next 24 hours",
       "message": "No puedes salir de Tubi Kids en este momento. Inténtelo de nuevo en 24 horas. Preguntas? Envíanos una línea a www.tubi.tv/support"
     },
+    "dialog_kidsWelcome_title_multi_account": {
+      "description": "Title for dialog when account was not created for multi-account",
+      "message": "Cuenta no creada"
+    },
+    "dialog_kidsWelcomeAgeGate_description_multi_account": {
+      "description": "Description informing users their data is being deleted but they can still use Tubi Kids",
+      "message": "Estamos eliminando los datos que proporcionaste para registrarte. Aún puedes explorar Tubi Kids"
+    },
     "dialog_cannotExitKidsMode_title": {
       "description": "Title for dialog telling the user they can not exit kids mode",
       "message": "No se pudo Salir del Modo Niños"
@@ -3099,6 +3107,14 @@ Function getTranslation_es_MX()
     "dialog_cannotExitKidsMode_description": {
       "description": "Description for dialog telling the user they can not exit kids mode",
       "message": "Por favor, inténtelo de nuevo en 24 horas.\nPreguntas? Háganos saber en support@tubi.tv"
+    },
+    "dialog_cannotExitKidsMode_title_multi_account": {
+      "description": "Title for dialog telling the user they are in kids mode for multi-account",
+      "message": "Estás en Modo Kids por 24 horas."
+    },
+    "dialog_cannotExitKidsMode_description_multi_account": {
+      "description": "Description for dialog telling the user how to get support for multi-account",
+      "message": "¿Preguntas? Escríbenos en www.tubi.tv/support"
     },
     "dialog_exitApp_title": {
       "description": "Title of the dialog window that asks the user if they want to exit the app",
@@ -4970,6 +4986,10 @@ Function getTranslation_es_MX()
       "description": "Label of the skip button in the parental control pin input screen",
       "message": "Desactivar PIN"
     },
+    "ParentalControlPinInputScreen_skip_button_legal_label": {
+      "description": "legal text for the skip button in the parental control pin input screen",
+      "message": "Al hacer clic en Desactivar PIN abajo, permites que este niño salga de Tubi Kids sin restricciones. Más información en {url}"
+    },
     "parental_pin_update_success_header": {
       "description": "Header of the toast that is shown when the parental pin is updated successfully",
       "message": "PIN editado"
@@ -5400,6 +5420,14 @@ Function getTranslation_fr_CA()
       "description": "A description informing users they cannot exit Tubi Kids for the next 24 hours",
       "message": "Vous ne pouvez pas quitter Tubi Enfants pour le moment. Veuillez réessayer dans 24 heures. Vous avez des questions ? Écrivez-nous à www.tubi.tv/support"
     },
+    "dialog_kidsWelcome_title_multi_account": {
+      "description": "Title for dialog when account was not created for multi-account",
+      "message": "Compte non créé"
+    },
+    "dialog_kidsWelcomeAgeGate_description_multi_account": {
+      "description": "Description informing users their data is being deleted but they can still use Tubi Kids",
+      "message": "Nous supprimons les données fournies pour l’inscription. Vous pouvez toujours consulter Tubi Kids"
+    },
     "dialog_cannotExitKidsMode_title": {
       "description": "Title for dialog telling the user they can not exit kids mode",
       "message": "Impossible de quitter le mode Enfants"
@@ -5407,6 +5435,14 @@ Function getTranslation_fr_CA()
     "dialog_cannotExitKidsMode_description": {
       "description": "Description for dialog telling the user they can not exit kids mode",
       "message": "Veuillez réessayer dans 24 heures.\nVous avez des questions ? Envoyez-nous un e-mail à support@tubi.tv"
+    },
+    "dialog_cannotExitKidsMode_title_multi_account": {
+      "description": "Title for dialog telling the user they are in kids mode for multi-account",
+      "message": "Vous êtes en mode Kids pour 24 heures."
+    },
+    "dialog_cannotExitKidsMode_description_multi_account": {
+      "description": "Description for dialog telling the user how to get support for multi-account",
+      "message": "Des questions? Écrivez-nous à www.tubi.tv/support"
     },
     "dialog_exitApp_title": {
       "description": "Title of the dialog window that asks the user if they want to exit the app",
@@ -7277,6 +7313,10 @@ Function getTranslation_fr_CA()
     "ParentalControlPinInputScreen_skip_button_label": {
       "description": "Label of the skip button in the parental control pin input screen",
       "message": "Désactiver le NIP"
+    },
+    "ParentalControlPinInputScreen_skip_button_legal_label": {
+      "description": "legal text for the skip button in the parental control pin input screen",
+      "message": "En cliquant sur Désactiver le NIP ci-dessous, vous permettez à cet enfant de quitter Tubi Kids sans restriction. En savoir plus à {url}"
     },
     "parental_pin_update_success_header": {
       "description": "Header of the toast that is shown when the parental pin is updated successfully",
