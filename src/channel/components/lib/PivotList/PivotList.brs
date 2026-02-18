@@ -19,6 +19,7 @@ Function init() as Void
   topRef.showRowCounter = [false]
   topRef.variableWidthItems = [true]
   topRef.drawFocusFeedback = false
+  topRef.fadeFocusFeedbackWhenAutoScrolling = true
   topRef.rowFocusAnimationStyle = "fixedFocus"
 
   ' Set up observers

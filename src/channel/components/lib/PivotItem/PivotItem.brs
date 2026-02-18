@@ -79,6 +79,7 @@ Function init() as Void
   topRef.observeFieldScoped("renderTracking", "onPivotRenderTrackingChange")
   topRef.observeFieldScoped("itemContent", "onPivotItemContentChange")
   topRef.observeFieldScoped("itemHasFocus", "onPivotItemFocusChange")
+  topRef.observeFieldScoped("focusPercent", "onPivotItemFocusPercentChange")
 End Function
 
 
@@ -226,5 +227,17 @@ Function onPivotRenderTrackingChange(msg = invalid) as Void
     m.itemVisibleTimespan = invalid
     m.impressionDwellTime = 0
     m.itemFocusTimespan = invalid
+  end if
+End Function
+
+
+Function onPivotItemFocusPercentChange(msg = invalid) as Void
+  topRef = m.top
+  focusPercent = topRef.focusPercent
+  ' Adding a check for better performance.
+  if focusPercent = 0 OR focusPercent = 1
+    itemHasFocus = focusPercent = 1 AND topRef.rowListHasFocus
+    m.top.wasFocused = itemHasFocus
+    updateButtonState(itemHasFocus)
   end if
 End Function

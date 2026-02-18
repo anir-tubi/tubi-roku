@@ -20,6 +20,7 @@
     <field id="backgroundUri" type="string" value="pkg:/images/pill_button_$$RES$$.9.png" />
     <field id="backgroundBlendColor" type="string" />
     <field id="padding" type="integer" value="48" />
+    <field id="rowListHasFocus" type="boolean" />
 
     <!-- OUTPUTS -->
     <!-- Helps us with width calculation when we want to use with ArrayGrid -->
