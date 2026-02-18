@@ -415,6 +415,15 @@ Function addControllerUi()
     screenId: "" ' Contains id of screen where the tile is visible. Possible values are from constants.ui.screenIds
   }
 
+  ' Holds queued pivot impression events (similar to viewableImpressionEvents but for pivot items).
+  ' Uses components/utility_tiles structure instead of containers/contents.
+  m.pivotImpressionEvents = {
+    utilityTiles: [] ' Array of utility tile impression data: { id, row, col, duration, dwell_time }
+    pageOneof: invalid
+    personalizationId: ""
+    screenId: ""
+  }
+
   m.sendImpressionEventTimer = CreateObject("roSGNode", "Timer")
   m.sendImpressionEventTimer.duration = 10
   m.sendImpressionEventTimer.observeFieldScoped("fire", "sendImpressionEvent")
@@ -3384,35 +3393,47 @@ Function onViewableImpressionEventInfoChange(msg)
   ' The sequence of events are when navigating between home to movies. Home Screen items tracking info becomes none for all items and then the movies screen becomes full.
   data = msg.getData()
 
-  if (m.viewableImpressionEvents.screenId <> invalid AND data.screenId <> m.viewableImpressionEvents.screenId) OR (m.viewableImpressionEvents.personalizationId <> invalid AND data.personalizationId <> m.viewableImpressionEvents.personalizationId)
-    ' After sending the events the m.viewableImpressionEvents will be reset.
-    sendImpressionEvent()
+  ' Branch by trackingType: pivot items use a separate aggregation path
+  clientTrackingInfo = invalid
+  if isAA(data) = true AND isAA(data.clientTrackingInfo) = true
+    clientTrackingInfo = data.clientTrackingInfo
   end if
 
-  ' Using screenId check because screenId is only available if the tile is displayed in HomeScreen.
-  ' We cannot use screen.isSubtype("HomeScreen") because when the user navigates from homescreen to detailscreen,
-  ' we will get some events of homescreen tiles hidden after the current screen changes to details screen.
-  if isNonEmptyString(data.screenId) = true
-    containerId = data.containerId
-    containers = m.viewableImpressionEvents.containers
-
-    ' Checking if this the first tile for a particular row and then creating a entry in the map.
-    if containers[containerId] = invalid
-      containers[containerId] = {
-        id: containerId
-        contents: []
-      }
+  if clientTrackingInfo <> invalid AND clientTrackingInfo.trackingType = "pivot"
+    aggregatePivotImpression(data)
+  else
+    ' Existing tile impression logic — flush only if screen/personalization actually changed
+    ' (not on the initial empty → set transition, since screenId starts as "")
+    if (isNonEmptyString(m.viewableImpressionEvents.screenId) = true AND data.screenId <> m.viewableImpressionEvents.screenId) OR (isNonEmptyString(m.viewableImpressionEvents.personalizationId) = true AND data.personalizationId <> m.viewableImpressionEvents.personalizationId)
+      ' After sending the events the m.viewableImpressionEvents will be reset.
+      sendImpressionEvent()
     end if
 
-    containers[containerId].contents.push(data.itemInfo)
+    ' Using screenId check because screenId is only available if the tile is displayed in HomeScreen.
+    ' We cannot use screen.isSubtype("HomeScreen") because when the user navigates from homescreen to detailscreen,
+    ' we will get some events of homescreen tiles hidden after the current screen changes to details screen.
+    if isNonEmptyString(data.screenId) = true
+      containerId = data.containerId
+      containers = m.viewableImpressionEvents.containers
 
-    m.viewableImpressionEvents.containers = containers
+      ' Checking if this the first tile for a particular row and then creating a entry in the map.
+      if containers[containerId] = invalid
+        containers[containerId] = {
+          id: containerId
+          contents: []
+        }
+      end if
 
-    if isNonEmptyString(m.viewableImpressionEvents.screenId) = false
-      trackingPageInfo = data.screenTrackingInfo
-      m.viewableImpressionEvents.pageOneof = m.Tracking.getAnalyticsPage(trackingPageInfo.pageType, trackingPageInfo.pageValues)
-      m.viewableImpressionEvents.personalizationId = data.personalizationId
-      m.viewableImpressionEvents.screenId = data.screenId
+      containers[containerId].contents.push(data.itemInfo)
+
+      m.viewableImpressionEvents.containers = containers
+
+      if isNonEmptyString(m.viewableImpressionEvents.screenId) = false
+        trackingPageInfo = data.screenTrackingInfo
+        m.viewableImpressionEvents.pageOneof = m.Tracking.getAnalyticsPage(trackingPageInfo.pageType, trackingPageInfo.pageValues)
+        m.viewableImpressionEvents.personalizationId = data.personalizationId
+        m.viewableImpressionEvents.screenId = data.screenId
+      end if
     end if
   end if
 
@@ -3431,29 +3452,47 @@ End Function
 
 
 Function sendImpressionEvent()
-  if m.viewableImpressionEvents <> invalid AND isMajorEventDay() = false
-    if m.viewableImpressionEvents.containers <> invalid AND m.viewableImpressionEvents.containers.count() > 0
-      tubiLog("ContentController.sendImpressionEvent")
+  if isMajorEventDay() = false
+    ' Send tile impressions (containers-based format)
+    if m.viewableImpressionEvents <> invalid AND m.viewableImpressionEvents.containers <> invalid AND m.viewableImpressionEvents.containers.count() > 0
+      tubiLog("ContentController.sendImpressionEvent (tiles)")
       containers = []
       items = m.viewableImpressionEvents.containers.Items()
       for each item in items
         containers.push(item.value)
       end for
 
-      eventValues = {
+      sendImpressionBatch({
         pageOneOf: m.viewableImpressionEvents.pageOneof
         containers: containers
         personalization_id: m.viewableImpressionEvents.personalizationId
-      }
+      })
+    end if
 
-      trackData = m.Tracking.getViewableImpressionEvent(eventValues)
-      requestInfo = m.Tracking.createViewableImpressionTrackingReqInfo(trackData)
+    ' Send pivot impressions (components/utility_tiles format)
+    if m.pivotImpressionEvents <> invalid AND m.pivotImpressionEvents.utilityTiles.count() > 0
+      tubiLog("ContentController.sendImpressionEvent (pivots)")
 
-      m.makeRequest({
-        url: requestInfo.url
-        requestType: m.constants.reqNames.postViewableImpression
-        options: requestInfo.options
-        silenceCallbackWarnings: true
+      ' Use the first utility tile as the representative item inside collection_component.
+      ' The proto requires CollectionComponent.item (utility_tile) to be set.
+      firstTile = m.pivotImpressionEvents.utilityTiles[0]
+
+      sendImpressionBatch({
+        pageOneOf: m.pivotImpressionEvents.pageOneof
+        components: [{
+          id: "PIVOT"
+          collection_component: {
+            row: 1
+            sub_type: "PIVOT"
+            utility_tile: {
+              id: firstTile.id
+              row: firstTile.row
+              col: firstTile.col
+            }
+          }
+          utility_tiles: m.pivotImpressionEvents.utilityTiles
+        }]
+        personalization_id: m.pivotImpressionEvents.personalizationId
       })
     end if
   end if
@@ -3465,7 +3504,61 @@ Function sendImpressionEvent()
     screenId: ""
   }
 
+  m.pivotImpressionEvents = {
+    utilityTiles: []
+    pageOneof: invalid
+    personalizationId: ""
+    screenId: ""
+  }
+
   startClientImpressionTimer()
+End Function
+
+
+' Sends a single viewable impression batch to the analytics endpoint
+' @param eventValues - The impression payload (may contain containers or components)
+Function sendImpressionBatch(eventValues as Object) as Void
+  trackData = m.Tracking.getViewableImpressionEvent(eventValues)
+  requestInfo = m.Tracking.createViewableImpressionTrackingReqInfo(trackData)
+
+  m.makeRequest({
+    url: requestInfo.url
+    requestType: m.constants.reqNames.postViewableImpression
+    options: requestInfo.options
+    silenceCallbackWarnings: true
+  })
+End Function
+
+
+' Aggregates a single pivot item impression into the pivot impression batch
+' @param data - Impression data containing clientTrackingInfo with pivot-specific fields
+Function aggregatePivotImpression(data) as Void
+  if isNonEmptyString(data.screenId) = false then return
+
+  clientInfo = data.clientTrackingInfo
+
+  ' Flush only if screen/personalization actually changed from a previously set value
+  ' (not on the initial empty → set transition, since screenId starts as "")
+  if (isNonEmptyString(m.pivotImpressionEvents.screenId) = true AND data.screenId <> m.pivotImpressionEvents.screenId) OR (isNonEmptyString(m.pivotImpressionEvents.personalizationId) = true AND data.personalizationId <> m.pivotImpressionEvents.personalizationId)
+    sendImpressionEvent()
+  end if
+
+  ' Add utility tile impression data
+  m.pivotImpressionEvents.utilityTiles.push({
+    id: clientInfo.pivotId
+    row: 1
+    col: clientInfo.col
+    duration: clientInfo.duration
+    dwell_time: clientInfo.dwell_time
+  })
+
+  ' Set page context on first pivot impression in this batch
+  if isNonEmptyString(m.pivotImpressionEvents.screenId) = false
+    trackingPageInfo = data.trackingPageInfo
+    m.pivotImpressionEvents.pageOneof = m.Tracking.getAnalyticsPage(trackingPageInfo.pageType, trackingPageInfo.pageValues)
+    m.pivotImpressionEvents.personalizationId = data.personalizationId
+    m.pivotImpressionEvents.screenId = data.screenId
+  end if
 End Function
 
 

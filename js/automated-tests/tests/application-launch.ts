@@ -157,17 +157,21 @@ describe('Application Launch', function () {
     const rowIndex = await testUtils.findRowIndexWithSlug('videoTitlesRowList', 'continue_watching');
 
     // Construct dynamic element objects with runtime row index
+    // Updated structure: MyStuffEmptyStateTile's named children are accessible directly from StarterGridItem
+    const videoTitlesRowListElement = testUtils.getElementKeyPath('videoTitlesRowList');
+    const baseKeyPath = `${videoTitlesRowListElement.keyPath}.${rowIndex}.items.0`;
+
     const titleElement = {
-      keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList.${rowIndex}.items.0.#contentSection.#title`
+      keyPath: `${baseKeyPath}.#metadataGroup.#title`
     };
     const descriptionElement = {
-      keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList.${rowIndex}.items.0.#contentSection.#description`
+      keyPath: `${baseKeyPath}.#metadataGroup.#description`
     };
     const buttonElement = {
-      keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList.${rowIndex}.items.0.#contentSection.#signUpButton`
+      keyPath: `${baseKeyPath}.#signUpButton`
     };
     const buttonLabelElement = {
-      keyPath: `#ContentController.#uiGroup.#ContentGroup.#screenStackGroup.#homeScreen.#RowList.${rowIndex}.items.0.#contentSection.#signUpButton.#label`
+      keyPath: `${baseKeyPath}.#signUpButton.#elementsGroup.#titleGroup.#labelGroup.#labelFocused`
     };
 
     // Validate registration CTA title

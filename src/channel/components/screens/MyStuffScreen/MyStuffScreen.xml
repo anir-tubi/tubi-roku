@@ -138,7 +138,9 @@
         </Label>
         <Label
           id="AllEmptyUISubtitle2"
-          maxLines="1"
+          width="1536"
+          maxLines="3"
+          wrap="true"
           horizAlign="center"
           vertAlign="bottom">
           <Font

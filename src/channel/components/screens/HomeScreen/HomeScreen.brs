@@ -201,6 +201,7 @@ Function onIDChange()
   m.CategoryGridList.parentScreenId = m.top.id
   m.CategoryGridList.parentScreenTrackingPageInfo = newTrackingPageInfo
   m.pivotList.trackingPageInfo = newTrackingPageInfo
+  m.pivotList.parentScreenId = m.top.id
 End Function
 
 
@@ -214,7 +215,9 @@ Function onPersonalizationIdChanged(msg)
     trackingPageInfo.pageValues.personalization_id = personalizationId
     m.top.trackingPageInfo = trackingPageInfo
     m.CategoryGridList.parentScreenTrackingPageInfo = trackingPageInfo
+    m.pivotList.trackingPageInfo = trackingPageInfo
   end if
+
 End Function
 
 
@@ -1466,6 +1469,8 @@ Function fireNavigateFromPivotToSideNavEvent() as Void
     componentOneof: componentOneof
     dest_componentOneof: destComponentOneof
     means_of_navigation: "BUTTON"
+    vertical_location: pivotInfo.pivotRow
+    horizontal_location: pivotInfo.pivotCol
   }
 End Function
 

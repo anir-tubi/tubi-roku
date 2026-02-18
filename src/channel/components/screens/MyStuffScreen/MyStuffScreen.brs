@@ -23,8 +23,6 @@ Function init()
   m.AllEmptyUITitle.text = getTranslation("screenMyStuff_allEmptyUITitle")
   m.AllEmptyUISubtitle.text = getTranslation("screenMyStuff_signedOutUISubtitle")
   m.AllEmptyUISubtitle2.text = getTranslation("screenMyStuff_allEmptyUISubtitle")
-  m.AllEmptyUISubtitle2.width = 0 '//set to 0 so the boundingRect()'s dimensions are properly set
-  m.AllEmptyUISubtitle2.width = m.AllEmptyUISubtitle2.boundingRect().width
   m.top.screenLevel = m.constants.ui.screenLevels.myStuffScreen
   m.top.id = m.constants.ui.screenIds.myStuffScreen
   m.top.shouldShowSideNav = true

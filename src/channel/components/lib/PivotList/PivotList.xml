@@ -39,6 +39,9 @@
     <!-- Button height (default: 60) -->
     <field id="buttonHeight" type="integer" value="60" />
 
+    <!-- Viewable impression tracking field (set by parent screen) -->
+    <field id="parentScreenId" type="string" />
+
     <!-- OUTPUTS -->
     <!-- Selected pivot position [row, column] - triggers on selection -->
     <field id="pivotSelected" type="array" alwaysNotify="true" />

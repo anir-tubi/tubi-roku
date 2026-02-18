@@ -8,6 +8,10 @@
 <component name="PivotItem" extends="EnhancedButton">
   <script type="text/brightscript" uri="PivotItem.brs" />
 
+  <interface>
+    <field id="index" type="integer" />
+  </interface>
+
   <children>
     <Poster
       id="pivotBackground"

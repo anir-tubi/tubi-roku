@@ -1690,7 +1690,8 @@ End Function
 
 Function tubiTracking_getViewableImpressionEvent(eventValues) as Object
   eventBase = {
-    containers: [] ' Repeated property of type container.
+    containers: [] ' Repeated property of type container (video tiles).
+    components: [] ' Repeated property of type component (pivot items).
     personalization_id: ""
     pageOneof: {} 'current screen
   }
