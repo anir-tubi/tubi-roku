@@ -43,7 +43,8 @@ Function init()
   m.top.observeFieldScoped("startupArgs", "onStartupArgs")
 
   m.isExternalConfigReady = false ' Used to know when external config has been loaded so we know if we can proceed
-  m.isExperimentsConfigReady = false ' Used to know when experiments have been loaded so we know if we can proceed
+  ' TODO: CLEAN UP THE CODE LATER. REMOVING POPPER FOR SUBMISSION.
+  m.isExperimentsConfigReady = true ' Used to know when experiments have been loaded so we know if we can proceed
   m.isStatsigConfigReady = false ' Used to know when Statsig experiments have been loaded so we know if we can proceed
   m.soTStaticConfigComplete = false ' Used to know when the SoT static config has been loaded so we know if we can proceed
   m.startupDelayComplete = false
