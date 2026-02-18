@@ -9,7 +9,6 @@ Function init()
 
   ' List of fields that will only be observed if we have a child grid item component with that field
   m.conditionallyObservedFields = [
-    "itemHasFocus"
     "rowListHasFocus"
     "rowHasFocus"
     "focusPercent"
@@ -90,6 +89,7 @@ End Function
 
 Function onItemFocusChange(msg)
   itemHasFocus = msg.getData()
+  conditionallyObservedFieldCallback(msg) ' Pass along the focus change to the child grid item
   itemContent = m.top.itemContent
   MIN_VISIBLE_THRESHOLD = 1000
 
@@ -417,12 +417,6 @@ Function addConditionalFieldObservers(childGridItem)
 
         ' Set the initial value for each field
         childGridItem[field] = m.top[field]
-
-        ' For focus tracking, we also need to observe the child's focus changes
-        ' to ensure dwell_time calculation works for child components like CategoryGridPoster
-        if field = "itemHasFocus" then
-          childGridItem.observeFieldScoped("itemHasFocus", "onItemFocusChange")
-        end if
       end if
     end for
   end if
@@ -433,21 +427,17 @@ Function removeConditionalFieldObservers()
   for each field in m.conditionallyObservedFields
     m.top.unobserveFieldScoped(field)
   end for
-
-  ' Also unobserve child focus changes if we have a child grid item
-  if m.childGridItem <> invalid AND m.childGridItem.hasField("itemHasFocus") then
-    m.childGridItem.unobserveFieldScoped("itemHasFocus")
-  end if
 End Function
 
 
 ' set as the function callback for each field in m.conditionallyObservedFields
 Function conditionallyObservedFieldCallback(msg)
   childGridItem = m.childGridItem
+  field = msg.getField()
   if childGridItem = invalid then
     tubiLog("m.childGridItem was invalid. Cannot pass along field to child", "warn")
-  else
-    childGridItem[msg.getField()] = msg.getData()
+  else if childGridItem.hasField(field) = true
+    childGridItem[field] = msg.getData()
   end if
 End Function
 
