@@ -63,6 +63,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Comment PR with analysis results
+        id: sca-results
         if: always()
         uses: actions/github-script@v7
         with:
@@ -72,6 +73,7 @@ jobs:
             let report;
             let errorCount = 0;
             let warningCount = 0;
+            let suppressedCount = 0;
             let formattedOutput = '';
         
             try {
@@ -81,12 +83,21 @@ jobs:
               report = { logs: [] };
             }
             
+            // Suppress errors related to mm_icon_focus* attributes (e.g., mm_icon_focus_hd, mm_icon_focus_sd).
+            // These are expected errors due to SCA not expanding localized file paths and should not fail the analysis.
+            // Warnings for the same attributes are NOT suppressed.
+            const isSuppressed = (log) =>
+              log.severity === 'error' && /mm_icon_focus/.test(log.message);
+
             // Format logs for display
             if (report.logs && report.logs.length > 0) {
-              errorCount = report.logs.filter(log => log.severity === 'error').length;
-              warningCount = report.logs.filter(log => log.severity === 'warning').length;
+              suppressedCount = report.logs.filter(isSuppressed).length;
+              const activeLogs = report.logs.filter(log => !isSuppressed(log));
 
-              formattedOutput = report.logs.map((log) => {
+              errorCount = activeLogs.filter(log => log.severity === 'error').length;
+              warningCount = activeLogs.filter(log => log.severity === 'warning').length;
+
+              formattedOutput = activeLogs.map((log) => {
                 const severity = (log.severity || 'unknown').toUpperCase();
                 const category = log.category || 'uncategorized';
                 const message = log.message || 'No message';
@@ -101,17 +112,22 @@ jobs:
                 
                 return `[${severity}] ${category} - ${path}${lineNumber}${certReqs}\n  ${message}${docs}`;
               }).join('\n\n');
-            } else {
+            }
+
+            if (formattedOutput === '') {
               formattedOutput = 'No issues found.';
             }
             
             let statusText = '';
-            if (exitCode === '0') {
-              statusText = `✅ **Analysis completed; found ${warningCount} warning${warningCount !== 1 ? 's' : ''}**`;
+            const suppressedNote = suppressedCount > 0
+              ? `\n> _${suppressedCount} mm_icon_focus error${suppressedCount !== 1 ? 's' : ''} suppressed_`
+              : '';
+            if (exitCode === '0' || (errorCount === 0 && suppressedCount > 0 && report.logs && report.logs.length > 0)) {
+              statusText = `✅ **Analysis completed; found ${warningCount} warning${warningCount !== 1 ? 's' : ''}**${suppressedNote}`;
             } else if (!report.logs || report.logs.length === 0) {
               statusText = `❌ **Analysis failed with exit code ${exitCode}**`;
             } else {
-              statusText = `❌ **Analysis found ${errorCount} error${errorCount !== 1 ? 's' : ''} and ${warningCount} warning${warningCount !== 1 ? 's' : ''}**`;
+              statusText = `❌ **Analysis found ${errorCount} error${errorCount !== 1 ? 's' : ''} and ${warningCount} warning${warningCount !== 1 ? 's' : ''}**${suppressedNote}`;
             }
             
             const comment = [
@@ -142,14 +158,19 @@ jobs:
               comment.user && comment.user.type === 'Bot' && comment.body.includes('Static Analysis Results')
             );
             
+            const toolCrashed = exitCode !== '0' && (!report.logs || report.logs.length === 0);
+            const hasIssues = errorCount > 0 || warningCount > 0 || toolCrashed;
+
             if (botComment) {
+              // Always update an existing comment so a fixed commit reflects the current state
               await github.rest.issues.updateComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 comment_id: botComment.id,
                 body: comment
               });
-            } else {
+            } else if (hasIssues) {
+              // Create a new comment when there are errors, warnings, or tool crashes
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -157,3 +178,12 @@ jobs:
                 body: comment
               });
             }
+
+            // Export error count so the next step can fail the workflow if needed.
+            // When the tool crashes with no report, treat it as at least 1 error so the workflow fails.
+            core.setOutput('error_count', toolCrashed ? 1 : errorCount);
+
+      - name: Fail workflow if errors found
+        if: always() && steps.sca-results.outputs.error_count > 0
+        run: |
+          exit 1
