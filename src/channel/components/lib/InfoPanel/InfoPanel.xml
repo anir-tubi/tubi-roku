@@ -151,13 +151,10 @@
         translation="[0,0]">
 
 
-        <Group
-          id="topLabelParentGroup">
-          <LayoutGroup
+        <LayoutGroup
             layoutDirection="horiz"
             id="sotTopLabelGroup"
             itemSpacings="[9]" />
-        </Group>
 
         <LayoutGroup
           id="topHeaderGroup"

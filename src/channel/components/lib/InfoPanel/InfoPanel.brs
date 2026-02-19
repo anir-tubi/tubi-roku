@@ -6,7 +6,6 @@ Function init()
   m.offset = m.top.findNode("Offset")
   m.infoPanelGroup = m.top.findNode("infoPanelGroup")
   m.topHeaderGroup = m.top.findNode("topHeaderGroup")
-  m.topLabelParentGroup = m.top.findNode("topLabelParentGroup")
   m.sotTopLabelGroup = m.top.findNode("sotTopLabelGroup")
   m.liveBadgeHeader = m.top.findNode("liveBadgeHeader")
   m.channelNameHeader = m.top.findNode("channelNameHeader")
@@ -525,11 +524,22 @@ End Function
 
 
 Function onAvailabilityStartsChange(msg)
-  availabilityStarts = msg.getData()
+  setSotTopLabels()
+End Function
 
-  if m.comingSoonBadge <> invalid
-    m.topLabelParentGroup.removeChild(m.comingSoonBadge)
-  end if
+
+Function onSotTopLabelSignalsChange(msg)
+  setSotTopLabels()
+End Function
+
+
+Function setSotTopLabels()
+  'Remove all the previous badges before adding the new one
+  m.nodeHelpers.removeAllChildren(m.sotTopLabelGroup)
+
+  sotTopLabelSignals = m.top.sotTopLabelSignals
+  sotMetaData = m.top.sotmetadata
+  availabilityStarts = m.top.availabilityStarts
   isComingSoon = isComingSoonBasedOnDate(availabilityStarts)
   if isComingSoon = true
     startDateTime = CreateObject("roDateTime")
@@ -543,44 +553,20 @@ Function onAvailabilityStartsChange(msg)
     '::TODO:: Use localized full month day format when available: version Roku OS 12.0
     ' sComingSoonDate = startDateTime.asDateStringLoc("MMMM d")
 
-    setTextOfComingSoonButton(sComingSoonText)
-    m.topLabelParentGroup.appendChild(m.comingSoonBadge)
-    m.sotTopLabelGroup.visible = false
+    sotComingSoon = {}
+    sotComingSoon.sotLabelText = sComingSoonText
+    sotComingSoon.sotIcon = ""
 
-  else
-    m.sotTopLabelGroup.visible = true
-  end if
-End Function
-
-
-' Sets the text of the coming soon button, creating the (m.comingSoonBadge) button if it doesn't exist
-Function setTextOfComingSoonButton(sText)
-  buttonContent = {
-    title: sText
-    isPrimaryButton: true
-  }
-  content = CreateObject("roSGNode", "ContentNode")
-  content.update(buttonContent, true)
-
-  if m.comingSoonBadge = invalid
-    button = CreateObject("roSGNode", "EnhancedButton")
-    button.height = 62
-    button.padding = 33
-
-    m.comingSoonBadge = button
+    if isNonEmptyArray(sotTopLabelSignals) = true
+      sotTopLabelSignals.unshift(sotComingSoon) ' Add coming soon label to the beginning of sotTopLabelSignals so it appears as the first label
+    else if isNonEmptyArray(sotMetaData) = true
+      sotMetaData.unshift(sotComingSoon) ' Add coming soon label to the beginning of sotMetaData so it appears as the first label
+    else
+      sotTopLabelSignals = []
+      sotTopLabelSignals.unshift(sotComingSoon) ' Add coming soon label to the beginning of sotTopLabelSignals so it appears as the first label
+    end if
   end if
 
-  m.comingSoonBadge.itemContent = content
-  m.comingSoonBadge.itemHasFocus = true
-End Function
-
-
-Function onSotTopLabelSignalsChange(msg)
-  sotTopLabelSignals = msg.getData()
-  sotMetaData = m.top.sotmetadata
-
-  'Remove all the previous badges before adding the new one
-  m.nodeHelpers.removeAllChildren(m.sotTopLabelGroup)
 
   textColor = m.theme.primaryTextColor
   backgroundUri = "pkg:/images/rounded-background-$$RES$$.9.png"
@@ -601,6 +587,7 @@ Function onSotTopLabelSignalsChange(msg)
     backgroundUri: backgroundUri
   }
 
+
   ' If we have sotTopLabelSignals, use them
   if isNonEmptyArray(sotTopLabelSignals) = true
     ' Fill up to 2 labels from sotMetaData if needed
@@ -614,6 +601,8 @@ Function onSotTopLabelSignalsChange(msg)
     end if
 
     sotTopLabels = createTopLabels(sotTopLabelSignals, config)
+
+
     showTopLabels(m.sotTopLabelGroup, sotTopLabels)
     ' If no sotTopLabelSignals but we have sotMetaData, use metadata labels instead (max 2)
   else if isNonEmptyArray(sotMetaData) = true
@@ -1279,7 +1268,7 @@ Function onModeChange()
     ' used for movies and series on the homescreen and similar screens
     m.infoPanelGroup.appendChild(m.offset)
     offsetChildrenArray = [
-      m.topLabelParentGroup,
+      m.sotTopLabelGroup,
       m.title,
       m.twoLineInfo,
       m.descriptionGroup
@@ -1308,7 +1297,7 @@ Function onModeChange()
     ' used for movies on the details screen
     m.infoPanelGroup.appendChild(m.offset)
     offsetChildrenArray = [
-      m.topLabelParentGroup,
+      m.sotTopLabelGroup,
       m.title,
       m.twoLineInfo,
       m.descriptionGroup
@@ -1342,7 +1331,7 @@ Function onModeChange()
     ' used for episodes/series on the details screen
     m.infoPanelGroup.appendChild(m.offset)
     offsetChildrenArray = [
-      m.topLabelParentGroup,
+      m.sotTopLabelGroup,
       m.title,
       m.episode,
       m.twoLineInfo,
