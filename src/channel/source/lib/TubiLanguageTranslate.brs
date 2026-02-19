@@ -3650,7 +3650,7 @@ Function getTranslation_es_MX()
     },
     "screenMyStuff_allEmptyUISubtitle": {
       "description": "The subtitle of the MyStuff Screen for the guest user.",
-      "message": "Para añadir un título a Mi lista, utilice el icono de marcador."
+      "message": "Usa el botón de marcador para guardar series y películas en Mi lista y vuelve rápido con Continuar viendo."
     },
     "screenDetails_button_trailer": {
       "description": "Label of button to allow users to watch a preview of the current video title",
@@ -3810,7 +3810,7 @@ Function getTranslation_es_MX()
     },
     "metadata_myStuff_empty_myList_description": {
       "description": "For an empty MyList container, this is the description/subtitle that is display in the empty container",
-      "message": "Use el marcador para guardar series y películas favoritas. Aparecerán aquí."
+      "message": "Usa el botón de marcador para guardar series y películas en Mi lista."
     },
     "metadata_myStuff_empty_continueWatching_title": {
       "description": "For an empty continueWatching container, this is the title that is display in the empty container",
@@ -3846,7 +3846,7 @@ Function getTranslation_es_MX()
     },
     "metadata_continueWatching_notSignedIn_description": {
       "description": "tells non registered user what they need to do to see the continue watching container",
-      "message": "Continúa justo donde dejaste de ver la próxima vez que veas una serie o película. Disponible al registrarte."
+      "message": "Continúa justo donde lo dejaste la próxima vez que reproduzcas una serie o película."
     },
     "metadata_continueWatching_notSignedIn_container_description": {
       "description": "tells non registered user what they need to do to see the continue watching container",
@@ -5085,6 +5085,46 @@ Function getTranslation_es_MX()
     "save_progress_button": {
       "description": "Label for save progress button",
       "message": "Guardar progreso"
+    },
+    "back_hint_press": {
+      "description": "Text before the Back button pill in the back hint component",
+      "message": "Presiona"
+    },
+    "back_hint_back": {
+      "description": "Text inside the Back button pill in the back hint component",
+      "message": "Atrás"
+    },
+    "back_hint_for": {
+      "description": "Text after the Back button pill in the back hint component",
+      "message": "Para"
+    },
+    "my_stuff_find_more_to_watch": {
+      "description": "Button text on the empty My Stuff tile encouraging users to browse content",
+      "message": "Encuentra más para ver"
+    },
+    "guest_tile_no_subscription": {
+      "description": "Selling point on guest user tile indicating no subscription is needed",
+      "message": "Sin suscripción"
+    },
+    "guest_tile_no_credit_card": {
+      "description": "Selling point on guest user tile indicating no credit card is needed",
+      "message": "Sin tarjeta"
+    },
+    "guest_tile_free_forever": {
+      "description": "Selling point on guest user tile indicating the service is free forever",
+      "message": "Gratis siempre"
+    },
+    "guest_tile_title": {
+      "description": "Title on guest user tile in My Stuff screen prompting sign-up",
+      "message": "Regístrate para guardar tu progreso"
+    },
+    "guest_tile_description": {
+      "description": "Description on guest user tile in My Stuff screen explaining benefits",
+      "message": "Encuentra tus favoritos rápido y continúa donde lo dejaste — todo en un solo lugar. Gratis para siempre."
+    },
+    "guest_tile_sign_up_now": {
+      "description": "Button text on guest user tile prompting sign-up",
+      "message": "Regístrate ahora"
     }
   }
 End Function
@@ -5978,7 +6018,7 @@ Function getTranslation_fr_CA()
     },
     "screenMyStuff_allEmptyUISubtitle": {
       "description": "The subtitle of the MyStuff Screen for the guest user.",
-      "message": "Pour ajouter un titre à votre liste, utilisez l'icône marque-page."
+      "message": "Utilisez le bouton favori pour enregistrer des séries et films dans Ma liste et reprendre rapidement avec Continuer à regarder."
     },
     "screenDetails_button_trailer": {
       "description": "Label of button to allow users to watch a preview of the current video title",
@@ -6138,7 +6178,7 @@ Function getTranslation_fr_CA()
     },
     "metadata_myStuff_empty_myList_description": {
       "description": "For an empty MyList container, this is the description/subtitle that is display in the empty container",
-      "message": "Utilisez bouton de signet pour enregistrer vos séries et films préférés. Ils montreront ici."
+      "message": "Utilisez le bouton favori pour enregistrer des séries et films dans Ma liste."
     },
     "metadata_myStuff_empty_continueWatching_title": {
       "description": "For an empty continueWatching container, this is the title that is display in the empty container",
@@ -6174,7 +6214,7 @@ Function getTranslation_fr_CA()
     },
     "metadata_continueWatching_notSignedIn_description": {
       "description": "tells non registered user what they need to do to see the continue watching container",
-      "message": "Reprenez là où vous vous êtes arrêté la prochaine fois que vous regarderez une série TV ou un film. Disponible après vous être inscrit(e)."
+      "message": "Reprenez exactement où vous avez arrêté la prochaine fois que vous regardez une série ou un film."
     },
     "metadata_continueWatching_notSignedIn_container_description": {
       "description": "tells non registered user what they need to do to see the continue watching container",
@@ -7413,6 +7453,46 @@ Function getTranslation_fr_CA()
     "save_progress_button": {
       "description": "Label for save progress button",
       "message": "Sauvegarder progrès"
+    },
+    "back_hint_press": {
+      "description": "Text before the Back button pill in the back hint component",
+      "message": "Appuyez"
+    },
+    "back_hint_back": {
+      "description": "Text inside the Back button pill in the back hint component",
+      "message": "Retour"
+    },
+    "back_hint_for": {
+      "description": "Text after the Back button pill in the back hint component",
+      "message": "Pour"
+    },
+    "my_stuff_find_more_to_watch": {
+      "description": "Button text on the empty My Stuff tile encouraging users to browse content",
+      "message": "Trouvez plus à regarder"
+    },
+    "guest_tile_no_subscription": {
+      "description": "Selling point on guest user tile indicating no subscription is needed",
+      "message": "Sans abonnement"
+    },
+    "guest_tile_no_credit_card": {
+      "description": "Selling point on guest user tile indicating no credit card is needed",
+      "message": "Aucune carte"
+    },
+    "guest_tile_free_forever": {
+      "description": "Selling point on guest user tile indicating the service is free forever",
+      "message": "Gratuit à vie"
+    },
+    "guest_tile_title": {
+      "description": "Title on guest user tile in My Stuff screen prompting sign-up",
+      "message": "Inscrivez-vous pour sauvegarder vos contenus"
+    },
+    "guest_tile_description": {
+      "description": "Description on guest user tile in My Stuff screen explaining benefits",
+      "message": "Trouvez vos favoris rapidement et reprenez où vous avez arrêté — tout au même endroit. Gratuit à vie."
+    },
+    "guest_tile_sign_up_now": {
+      "description": "Button text on guest user tile prompting sign-up",
+      "message": "Inscrivez-vous maintenant"
     }
   }
 End Function
@@ -7487,10 +7567,6 @@ Function getTranslation_en_GB()
     "metadata_expiring_singular": {
       "description": "label to indicate the user has exactly 1 day to watch a video",
       "message": "Expiring in 1 day"
-    },
-    "metadata_myStuff_empty_myList_description": {
-      "description": "For an empty MyList container, this is the description/subtitle that is display in the empty container",
-      "message": "Use the bookmark button to save series and movies to My List."
     },
     "registration_signIn_recommended": {
       "description": "text appended to recommended row label to subtly remind users that they are signed out so that they understand that they need to sign-in to use Tubi at its fullest",
@@ -7616,6 +7692,10 @@ Function getTranslation_en_GB()
     "rating_pg_description": {
       "description": "Description for PG rating (Parental Guidance Suggested)",
       "message": "Some material may not be suitable for children. Parents are advised to provide parental guidance. May contain content parents might find inappropriate for young children."
+    },
+    "guest_tile_description": {
+      "description": "Description on guest user tile in My Stuff screen explaining benefits",
+      "message": "Find your favourites fast, pick up where you left off — all in one place. Free forever."
     }
   }
 End Function
