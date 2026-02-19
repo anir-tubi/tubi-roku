@@ -124,6 +124,11 @@
     most 1 child/ad campaign.  -->
     <field id="batchAdResponse" type="array" />
 
+    <!-- Ad impression updates are written by the helper to `adImpressionUpdates`.
+      The helper assigns a new array value when updates are queued so the screen
+      will be notified via the `adImpressionUpdates` field change. No separate
+      boolean flag is required. -->
+
     <!-- This field is used to force remove focus from the rowlist. -->
     <field id="removeFocusFromRowList" type="boolean"
       alias="CategoryGridList.removeFocusFromRowList" />
@@ -220,9 +225,11 @@
     <!-- Communicates to the parent that the video preview should be paused -->
     <field id="pauseVideoPreview" type="boolean" alwaysNotify="true" />
 
-    <!--Communicates
-    to the parent that some of the containers has expired and to be loaded-->
+    <!-- Communicates to the parent that some of the containers has expired and to be loaded-->
     <field id="loadCategoryForIds" type="array" alwaysNotify="true" />
+
+    <!-- Request to refresh ad impression pixels for ads that have become not visible -->
+    <field id="requestAdPixelRefresh" type="boolean" alwaysNotify="true" />
 
     <!-- Communicates to the parent if the list has focus. -->
     <field id="listHasFocus" alias="CategoryGridList.listHasFocus" />
@@ -241,6 +248,7 @@
     <!-- DATA STORE (Anything defined below are not meant to be used as output or input fields which
     will triggered change events. ) -->
     <field id="personalizationId" type="string" alias="CategoryGridList.personalizationId" />
+    <field id="adImpressionUpdates" type="array" />
 
     <!-- PIVOT LIST -->
     <!-- ServerPersistentData for PivotList CmsApi -->

@@ -45,6 +45,7 @@ Function init()
   topRef.observeFieldScoped("personalizationId", "onPersonalizationIdChanged")
   topRef.observeFieldScoped("contentUpdated", "onContentUpdated")
   topRef.observeFieldScoped("batchAdResponse", "onBatchAdResponseChanged")
+  topRef.observeFieldScoped("adImpressionUpdates", "onAdImpressionUpdatesChanged")
   topRef.observeFieldScoped("allowCarouselAutoRotate", "onAllowCarouselAutoRotateChange")
   topRef.observeFieldScoped("kidsMode", "onKidsModeChange")
   topRef.observeFieldScoped("enableVideoTiles", "onEnableVideoTilesChange")
@@ -70,10 +71,14 @@ Function init()
   m.CategoryGridList.observeFieldScoped("rowFocusedItem", "onRowFocusedItemChange")
   m.CategoryGridList.observeFieldScoped("hideInfoPanel", "onHideInfoPanelChange")
   m.CategoryGridList.observeFieldScoped("rowListTranslation", "updateRowListTranslation")
+  m.CategoryGridList.observeFieldScoped("listCurrFocusRow", "onListCurrFocusRowChange")
   m.ContentAreaParent.observeFieldScoped("translation", "updateRowListTranslation")
 
   'used to know when to send tracking info. Do not send focus tracking info when the grid is 1st loaded
   m.gridHasGainedInitialFocus = false
+
+  'Track ad rows that have had their pixels fired for viewport-based refresh
+  m.adRowsAwaitingViewportRefresh = {}
 
   'set initial tracking values
   topRef.trackingPageInfo = {
@@ -282,6 +287,48 @@ Function onBatchAdResponseChanged(msg)
 End Function
 
 
+' Processes queued ad impression pixel updates queued by HomeScreenHelpers
+' The helper writes ad update objects to `m.top.adImpressionUpdates` and
+' assigns a new array to the field to notify the screen (no boolean flag
+' required). Each update is an AA: { id: <string>, type: <string>, imageImpTracking: <array> }
+Function onAdImpressionUpdatesChanged(msg) as Void
+  tubiLog("HomeScreen.onAdImpressionUpdatesChanged")
+
+  ' Prefer the change message data (the new array). Fallback to the field if needed.
+  updates = msg.getData()
+
+  if isNonEmptyArray(updates) = false
+    ' Nothing to process so exit
+    return
+  end if
+
+  ' Apply each queued update to the appropriate UI node
+  for each upd in updates
+    if upd <> invalid then
+      sId = upd.id
+      sType = upd.type
+      aPixels = upd.imageImpTracking
+
+      if sType = m.constants.ui.contentTypes.skinAd
+        ' Skin ad lives in CategoryGridList.skinAdContent
+        if m.CategoryGridList.skinAdContent <> invalid AND m.CategoryGridList.skinAdContent.id = sId AND m.CategoryGridList.skinAdContent.getChildCount() > 0
+          m.CategoryGridList.skinAdContent.getChild(0).imageImpTracking = aPixels
+        end if
+      else if m.CategoryGridList.content <> invalid
+        ' For carousel and spotlight, find the container in content and update the impression tracking info
+        for i = 0 to m.CategoryGridList.content.getChildCount() - 1
+          item = m.CategoryGridList.content.getChild(i)
+          if item <> invalid AND item.id = sId AND item.type = sType
+            item.imageImpTracking = aPixels
+            exit for
+          end if
+        end for
+      end if
+    end if
+  end for
+End Function
+
+
 ' Handles changes to allow carousel auto rotate setting
 ' @param msg - Message containing new auto rotate value
 Function onAllowCarouselAutoRotateChange(msg)
@@ -407,13 +454,90 @@ Function onRowFocused(msg)
         isRowAdContainerContainer = true
       end if
     end if
+
+    '//Check if we need to refresh impression pixels for the old row
+    '//For skin ads, refresh immediately when losing focus as they hide themselves
+    if isAdSkinRow(oldRow) = true AND oldRow.id <> row.id
+      '//Skin ad loses visibility immediately when focus changes
+      m.top.requestAdPixelRefresh = true
+    end if
+
+    if isAdDisplayCarouselRow(row) = true OR isAdDisplayContainerRow(row) = true
+      '//For carousel and spotlight, track for viewport-based refresh
+      m.adRowsAwaitingViewportRefresh[row.id] = row
+    end if
+
   end if
 
-  if isRowAdContainerContainer = false
+
+  if isRowAdContainerContainer = false OR m.top.visible = false
     m.adFocusTimer.control = "stop"
   else
+    if isAdSkinRow(row) = true
+      '//For skin ads, we want to fire pixels at a different time than other ad types
+      m.adFocusTimer.duration = m.constants.timers.skinAdFocusPixelFire
+    else
+      m.adFocusTimer.duration = m.constants.timers.adFocusPixelFire
+    end if
     m.adFocusTimer.control = "start"
   end if
+End Function
+
+
+' Handles list current focus row changes
+' Checks if ad rows have exited the viewport and triggers pixel refresh
+' @param msg - Message containing new current focus row
+Function onListCurrFocusRowChange(msg)
+  tubiLog("HomeScreen.onListCurrFocusRowChange")
+  currFocusRow = msg.getData()
+
+  '//Check if any tracked ad rows are no longer in viewport
+  checkAdRowsInViewport(currFocusRow)
+End Function
+
+
+' Checks if tracked ad rows are still in viewport and triggers pixel refresh if not
+' Viewport is defined as rows that could potentially be visible on screen
+' @param currFocusRow - The current focused row index
+Function checkAdRowsInViewport(currFocusRow) as Void
+  content = m.top.content
+  if content = invalid OR m.adRowsAwaitingViewportRefresh.Count() = 0
+    return
+  end if
+
+  '//Collect keys to delete after iteration to avoid modifying AA during for-each
+  keysToDelete = []
+
+  '//Check each tracked ad row to see if it's still in viewport
+  for each adId in m.adRowsAwaitingViewportRefresh
+    adRow = m.adRowsAwaitingViewportRefresh[adId]
+    if adRow <> invalid
+      '//Find the row index of this ad
+      adRowIndex = -1
+      for i = 0 to content.getChildCount() - 1
+        item = content.getChild(i)
+        if item <> invalid AND item.id = adId
+          adRowIndex = i
+          exit for
+        end if
+      end for
+
+      '//If row is found and outside viewport, trigger pixel refresh
+      if adRowIndex >= 0
+        isOutsideViewport = (currFocusRow <= adRowIndex - 2) OR (currFocusRow >= adRowIndex + 1)
+        if isOutsideViewport = true
+          '//Row has exited viewport - trigger pixel refresh
+          m.top.requestAdPixelRefresh = true
+          keysToDelete.push(adId)
+        end if
+      end if
+    end if
+  end for
+
+  '//Delete keys after loop completes to avoid undefined behavior
+  for each adId in keysToDelete
+    m.adRowsAwaitingViewportRefresh.delete(adId)
+  end for
 End Function
 
 
@@ -811,6 +935,7 @@ Function handleItemSelected(item, position)
       if isScrolling = false
         ' If the row is still scrolling, do not select the item.
         m.top.contentSelected = item
+        m.adFocusTimer.control = "stop" '//Stop the ad focus timer when an item is selected to prevent any potential conflicts with sponsored rows or ad rows. Do this after contentSelected is set to ensure that if there are any observers that trigger on contentSelected, the timer is stopped after those are triggered.
       end if
     end if
   end if
@@ -994,6 +1119,7 @@ Function displayAdDisplayCarousel()
   if isAdDisplayCarouselAvailable() = true
     m.adRowlistCarouselComponent.setFocus(true)
     if m.adRowlistCarouselComponent.content <> invalid AND isNonEmptyArray(m.adRowlistCarouselComponent.content.imageImpTracking) = true
+      m.adFocusTimer.duration = m.constants.timers.adFocusPixelFire
       m.adFocusTimer.control = "start"
     end if
 

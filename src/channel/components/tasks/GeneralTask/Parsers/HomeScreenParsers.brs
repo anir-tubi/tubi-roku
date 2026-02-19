@@ -188,9 +188,6 @@ Function processHdcRowAd(adUnit, aRequestedAdTypes, aParsedAds, isUserInVideoTil
     aImageTracking = adUnit.trackers.imp
   end if
   iValidUntil = UpTime(0) + m.constants.cacheTimes.homescreenAd
-  if adUnit.valid_duration <> invalid AND isInt(adUnit.valid_duration) = true
-    iValidUntil = UpTime(0) + adUnit.valid_duration
-  end if
 
   for each adType in aRequestedAdTypes
     if adType = m.constants.adTypes.adRowlistCarousel AND adUnit.rendering_code = m.constants.ui.categoryIds.adRowlistCarousel
@@ -397,9 +394,6 @@ Function processSkinAdRowContent(rowAdUnit, videoAdUnit) as Object
   assets = rowAdUnit.ad.assets
 
   iValidUntil = UpTime(0) + m.constants.cacheTimes.homescreenAd
-  if rowAdUnit.valid_duration <> invalid AND isInt(rowAdUnit.valid_duration) = true
-    iValidUntil = UpTime(0) + rowAdUnit.valid_duration
-  end if
 
   id = ""
   sPosterURL = ""
@@ -479,6 +473,7 @@ Function processSkinAdRowContent(rowAdUnit, videoAdUnit) as Object
   end if
   if rowAdUnit.trackers <> invalid AND isNonEmptyArray(rowAdUnit.trackers.imp) = true
     categoryContentNode.imageImpTracking = rowAdUnit.trackers.imp
+    rowContentNode.imageImpTracking = rowAdUnit.trackers.imp
   end if
   if assets.main_image <> invalid AND isNonEmptyString(assets.main_image.url) = true
     skinAdContent.backgrounds = [assets.main_image.url]
@@ -494,6 +489,8 @@ Function processSkinAdRowContent(rowAdUnit, videoAdUnit) as Object
 
   categoryContentNode.id = m.constants.ui.categoryIds.skinAd
   categoryContentNode.gridItemType = m.constants.ui.gridItemTypes.skinAd
+  categoryContentNode.adInfo = adInfo
+  categoryContentNode.type = m.constants.ui.contentTypes.skinAd
   categoryContentNode.appendChild(skinAdContent)
   rowContentNode.appendChild(categoryContentNode)
 

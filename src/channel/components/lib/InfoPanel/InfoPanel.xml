@@ -155,7 +155,6 @@
             layoutDirection="horiz"
             id="sotTopLabelGroup"
             itemSpacings="[9]" />
-
         <LayoutGroup
           id="topHeaderGroup"
           layoutDirection="horiz"

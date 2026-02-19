@@ -50,6 +50,7 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.observeFieldScoped("loadAllCategories", "onLoadAllCategories")
     homeScreen.observeFieldScoped("loadAllCategoriesViaRefreshTimer", "onLoadAllCategoriesAfterRefreshTimer")
     homeScreen.observeFieldScoped("focusLost", "onHomeScreenFocusLost")
+    homeScreen.observeFieldScoped("visible", "onHomeScreenVisibilityChange")
     homeScreen.observeFieldScoped("contentSelected", "onContentSelected")
     homeScreen.observeFieldScoped("contentToPlay", "onContentToPlay")
     homeScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
@@ -60,6 +61,7 @@ Function showHomeScreen(constants, screenID = "")
     homeScreen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
     homeScreen.observeFieldScoped("adTimerImpressionFire", "onAdTimerImpressionFired")
     homeScreen.observeFieldScoped("currCategoryId", "onCurrCategoryIdChange")
+    homeScreen.observeFieldScoped("requestAdPixelRefresh", "onRequestAdPixelRefresh")
     homeScreen.observeFieldScoped("pivotSelected", "onPivotSelected")
 
     ' Set up video tiles observers
@@ -824,6 +826,28 @@ Function onHomeScreenFocusLost(msg)
 End Function
 
 
+Function onHomeScreenVisibilityChange(msg) as Void
+  tubiLog("HomeScreenHelpers.onHomeScreenVisibilityChange")
+  homeScreen = msg.getRoSGNode()
+  bIsVisible = msg.getData()
+
+  if bIsVisible = false AND homeScreen <> invalid
+    '//If the homescreen is becoming invisible, then perform some ad related cleanup.
+
+    if homeScreen.rowFocused <> invalid AND homeScreen.rowFocused.type = m.constants.ui.contentTypes.skinAd
+      '//However, do not do this if the focused row is a skin ad, which signifies that the fullscreen skinAd is probably playing.
+      return
+    end if
+
+    '//Remove any ads that were marked for removal when homescreen becomes invisible
+    removeMarkedAds(homeScreen)
+
+    '//Request pixel refresh for any ad rows that need it when homescreen becomes invisible
+    requestPixelRefreshForAllPendingAds(homeScreen)
+  end if
+End Function
+
+
 Function onContainerMoreItemsSuccess(response)
   homeScreen = getCurrentScreen()
   if homeScreen <> invalid AND homeScreen.content <> invalid AND isNode(response) = true AND homeScreen.listCurrFocusRow <> invalid
@@ -1065,8 +1089,263 @@ Function checkHomeScreenFocusRowToSendAdPixels(homeScreen)
       '//Once the pixel has been sent, then set the imageImpTracking to invalid so that it is not sent again
       row.imageImpTracking = invalid
       sendAdPixels(imageImpTracking)
+      '//Mark the ad as needing pixel refresh when it becomes not visible
+      markAdForPixelRefresh(row)
     end if
   end if
+End Function
+
+
+' Marks an ad row for impression pixel refresh
+' Stores ad info immediately when pixels are fired for later refresh request
+' @param row: roSGNode, the ad row (CategoryContentNode) that had pixels fired
+Function markAdForPixelRefresh(row)
+  tubiLog("HomeScreenHelpers.markAdForPixelRefresh")
+  if row <> invalid
+    sContentType = row.type
+
+    if sContentType = m.constants.ui.contentTypes.adRowlistCarousel OR sContentType = m.constants.ui.contentTypes.adRowlistSpotlight OR sContentType = m.constants.ui.contentTypes.skinAd
+      '//Initialize the tracking object if needed
+      if m.adsAwaitingPixelRefresh = invalid
+        m.adsAwaitingPixelRefresh = {
+          isProcessing: false,
+          ads: {}
+        }
+      end if
+
+      '//Store the ad info immediately when pixels are fired
+      sAdKey = row.type
+      ' Use ad-level id (row.adInfo.ad_id) when present.
+      if row.adInfo <> invalid AND row.adInfo.ad_id <> invalid AND row.adInfo.ad_id <> "" then
+        sOriginalAdId = row.adInfo.ad_id
+
+        m.adsAwaitingPixelRefresh.ads[sAdKey] = {
+          originalAdId: sOriginalAdId
+          adType: row.type
+        }
+      end if
+    end if
+  end if
+End Function
+
+
+' Handles request to refresh ad impression pixels
+' Triggered when an ad that had pixels fired becomes not visible
+' @param msg - Message containing boolean trigger
+Function onRequestAdPixelRefresh(msg) as Void
+  tubiLog("HomeScreenHelpers.onRequestAdPixelRefresh")
+  shouldRefreshPixels = msg.getData()
+  homeScreen = msg.getRoSGNode()
+
+  if shouldRefreshPixels = true AND homeScreen <> invalid
+    requestPixelRefreshForAllPendingAds(homeScreen)
+  end if
+End Function
+
+
+' Handles successful response from refreshed ad impression pixels request
+' Updates impression pixels if same ad, marks for removal if no ad or different ad
+' @param response - Array containing ad response data
+Function onRefreshedAdImpressionPixelsResponse(response) as Void
+  tubiLog("HomeScreenHelpers.onRefreshedAdImpressionPixelsResponse")
+
+  if m.adsAwaitingPixelRefresh = invalid
+    return
+  end if
+
+  '//Collect ads that need pixel updates for batched processing
+  aAdsToUpdate = []
+
+  '//Process each ad in the response
+  if isNonEmptyArray(response) = true
+    for each adContent in response
+      if adContent = invalid then continue for
+
+      sContentType = adContent.type
+
+      '//Check if we have a pending pixel refresh request for this ad type
+      awaitingInfo = m.adsAwaitingPixelRefresh.ads[sContentType]
+      if awaitingInfo = invalid then continue for
+
+      sResponseAdID = invalid
+      if adContent.adInfo <> invalid AND adContent.adInfo.ad_id <> invalid AND adContent.adInfo.ad_id <> "" then
+        sResponseAdID = adContent.adInfo.ad_id
+      end if
+
+      if sResponseAdID = awaitingInfo.originalAdId
+        '//Same ad ID - add to batch for pixel update
+        aAdsToUpdate.push(adContent)
+      else
+        '//Different ad ID - mark for removal at next safe opportunity
+        markAdForRemoval(awaitingInfo.originalAdId, sContentType)
+      end if
+
+      '//Remove from pending list
+      m.adsAwaitingPixelRefresh.ads.delete(sContentType)
+    end for
+  end if
+
+  '//Update all impression pixels in a single batched call
+  if isNonEmptyArray(aAdsToUpdate) = true
+    homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+    if homeScreen <> invalid
+      updateAdImpressionPixels(homeScreen, aAdsToUpdate)
+    end if
+  end if
+
+  '//Check if any pending requests returned no ad (should be marked for removal)
+  if m.adsAwaitingPixelRefresh.ads <> invalid
+    for each sAdKey in m.adsAwaitingPixelRefresh.ads
+      awaitingInfo = m.adsAwaitingPixelRefresh.ads[sAdKey]
+      if awaitingInfo <> invalid
+        '//No ad returned - mark for removal at next safe opportunity
+        markAdForRemoval(awaitingInfo.originalAdId, awaitingInfo.adType)
+      end if
+    end for
+
+  end if
+
+  '//Clear the pending list
+  m.adsAwaitingPixelRefresh = invalid
+
+  '//If homescreen is not visible, immediately remove any ads that were just marked for removal
+  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  if homeScreen <> invalid AND homeScreen.isInFocusChain() = false
+    removeMarkedAds(homeScreen)
+  end if
+
+End Function
+
+
+' Handles error response from refreshed ad impression pixels request
+' Clears the processing flag to allow future requests
+' @param response - Error response data
+Function onRefreshedAdImpressionPixelsError(response) as Void
+  tubiLog("HomeScreenHelpers.onRefreshedAdImpressionPixelsError")
+
+  '//Clear the processing flag to allow future requests
+  if m.adsAwaitingPixelRefresh <> invalid
+    m.adsAwaitingPixelRefresh.isProcessing = false
+  end if
+End Function
+
+
+' Updates impression pixels for existing ads in a single batched update
+' @param homeScreen: roSGNode, the HomeScreen component
+' @param aAdContents: array, array of ad content objects with new impression pixels
+Function updateAdImpressionPixels(homeScreen, aAdContents) as Void
+  tubiLog("HomeScreenHelpers.updateAdImpressionPixels")
+
+  if homeScreen = invalid OR isNonEmptyArray(aAdContents) = false
+    return
+  end if
+
+  ' Build the updates array from the provided ad contents.
+  ' The Homescreen UI layer (HomeScreen.brs) is responsible for applying
+  ' visual/Node updates such as setting imageImpTracking.
+  newUpdates = []
+  for each adContent in aAdContents
+    newUpdates.push({
+      id: adContent.id
+      type: adContent.type
+      imageImpTracking: adContent.imageImpTracking
+    })
+  end for
+
+  homeScreen.adImpressionUpdates = newUpdates
+End Function
+
+
+' Marks an ad for removal at the next safe opportunity
+' @param sAdId: string, the ID of the ad to mark for removal
+' @param sAdType: string, the type of the ad
+Function markAdForRemoval(sAdId, sAdType) as Void
+  tubiLog("HomeScreenHelpers.markAdForRemoval")
+
+  '//Initialize the removal list if needed
+  if m.adsMarkedForRemoval = invalid
+    m.adsMarkedForRemoval = []
+  end if
+
+  '//Add to removal list
+  m.adsMarkedForRemoval.push({
+    adId: sAdId
+    adType: sAdType
+  })
+End Function
+
+
+' Removes ads that have been marked for removal
+' Called when homescreen is refreshed or becomes invisible
+' @param homeScreen: roSGNode, the HomeScreen component
+Function removeMarkedAds(homeScreen) as Void
+  tubiLog("HomeScreenHelpers.removeMarkedAds")
+
+  if isNonEmptyArray(m.adsMarkedForRemoval) = false OR homeScreen = invalid
+    return
+  end if
+
+  shouldRepopulateContent = false
+
+  '//Process each ad marked for removal
+  for i = 0 to m.adsMarkedForRemoval.Count() - 1
+    adInfo = m.adsMarkedForRemoval[i]
+    if adInfo <> invalid
+      sAdType = adInfo.adType
+      sAdId = adInfo.adId
+
+      '//Handle skin ad removal
+      if sAdType = m.constants.ui.contentTypes.skinAd
+        if homeScreen.skinAdContent <> invalid AND homeScreen.skinAdContent.id = sAdId
+          homeScreen.skinAdContent = invalid
+          homeScreen.skinAdContentUpdated = true
+        end if
+      else
+        '//Handle carousel and spotlight ad removal
+        content = homeScreen.content
+        if content <> invalid
+          for j = content.getChildCount() - 1 to 0 step -1
+            item = content.getChild(j)
+            if item <> invalid AND item.type = sAdType AND item.adInfo <> invalid AND item.adInfo.ad_id = sAdId
+              content.removeChild(item)
+              shouldRepopulateContent = true
+            end if
+          end for
+        end if
+      end if
+    end if
+  end for
+
+  '//Set repopulate flag once if any ads were removed
+  if shouldRepopulateContent = true
+    homeScreen.repopulateContent = true
+  end if
+
+  '//Clear the marked list
+  m.adsMarkedForRemoval = invalid
+End Function
+
+
+' Requests pixel refresh for all ads in homescreen that need it
+' Called when homescreen becomes invisible to catch any ads that haven't triggered refresh yet
+' @param homeScreen: roSGNode, the HomeScreen component
+Function requestPixelRefreshForAllPendingAds(homeScreen) as Void
+  tubiLog("HomeScreenHelpers.requestPixelRefreshForAllPendingAds")
+  if homeScreen = invalid OR isKidsUIOn() = true OR isParentalControlsAdultLevel() = false OR m.adsAwaitingPixelRefresh = invalid OR m.adsAwaitingPixelRefresh.ads.Count() = 0 OR m.adsAwaitingPixelRefresh.isProcessing = true
+    return
+  end if
+
+  '//Set flag to prevent concurrent requests
+  m.adsAwaitingPixelRefresh.isProcessing = true
+
+  '//Request all ad types - response handler will only process what's in m.adsAwaitingPixelRefresh.ads
+  aAdTypesToRefresh = [
+    m.constants.adTypes.adRowlistCarousel,
+    m.constants.adTypes.adRowlistSpotlight,
+    m.constants.adTypes.skinAd
+  ]
+
+  createHomescreenAdRequest(homeScreen.id, onRefreshedAdImpressionPixelsResponse, aAdTypesToRefresh, onRefreshedAdImpressionPixelsError)
 End Function
 
 
@@ -1188,8 +1467,9 @@ Function onContentSelected(msg) as Void
     }
     processUserContentSelection(content, homeScreen, playbackSource)
 
-    if contentType = m.constants.ui.contentTypes.skinAd
-      ' If the content selected is a skinAd, then check if there are any ad pixels to be sent.
+    if contentType = m.constants.ui.contentTypes.skinAd AND (m.adsAwaitingPixelRefresh = invalid OR m.adsAwaitingPixelRefresh.ads[contentType] = invalid)
+      '// If the content selected is a skinAd, then check if there are any ad pixels to be sent. But only do so if we haven't already sent pixels for this ad: i.e. it's not in the adsAwaitingPixelRefresh list.
+      '// essentially this should be fired if the user selects the skinAd before the ad timer impression fires.
       checkHomeScreenFocusRowToSendAdPixels(homeScreen)
     end if
   end if

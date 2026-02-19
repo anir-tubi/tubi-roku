@@ -880,8 +880,10 @@ Function getConstants()
     constants.timers.categoryContentRefreshTimeout = 12 * 60 * 60
   end if
 
-  '// Time in seconds when we fire pixels when an ad is in focus
+  '// Time in seconds when we fire impression pixels after an HDC ad has gained focus
   constants.timers.adFocusPixelFire = 1
+  '// Time in seconds when we fire impression pixels after a skinAd wrapper ad has gained focus
+  constants.timers.skinAdFocusPixelFire = 0.01
 
   ' Time in seconds after which stored hasAge info becomes expired for COPPA
   constants.timers.coppaFailTimeout = 24 * 60 * 60 ' 1 day
@@ -1174,9 +1176,9 @@ Function getConstants()
   constants.cacheTimes = {}
   constants.cacheTimes.content = 2 * 60 * 60 ' Time in seconds after which an individual piece of content' cache is not valid
   constants.cacheTimes.category = 4 * 60 * 60 ' Time in seconds after which a category's cache is not valid
-  constants.cacheTimes.homescreen = 6 * 60 * 60 ' Time in seconds after which the category screen's cache is not valid
+  constants.cacheTimes.homescreen = 6 * 60 * 60 ' Time in seconds after which the home screen's cache is not valid
   constants.cacheTimes.epgscreen = 6 * 60 * 60 ' Time in seconds after which the epg screen's cache is not valid
-  constants.cacheTimes.homescreenAd = 60 ' Time in seconds after which the homescreen ad cache is not valid
+  constants.cacheTimes.homescreenAd = 6 * 60 * 60 ' Time in seconds after which the homescreen ad cache is not valid
 
   'This will store the error codes that are needed to be displayed to the user.
   'Review the following page to see the list of error codes that are used across platforms:
