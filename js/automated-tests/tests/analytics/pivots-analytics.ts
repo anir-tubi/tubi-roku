@@ -83,7 +83,6 @@ async function safeResumeProxy(): Promise<void> {
   try {
     proxy.resume();
   } catch (e) {
-    console.error('Error resuming proxy: ', e);
     await proxy.start();
   }
 }
@@ -1237,6 +1236,7 @@ describe('Pivots Analytics Tests', function () {
 
       // Wait for the video preview to start playing
       await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 15000);
+      await utils.sleep(2000);
 
       // Clear events, resume proxy, and navigate away to trigger finish_preview
       await safeResumeProxy();

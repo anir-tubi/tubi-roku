@@ -39,7 +39,6 @@ Function showHomeScreen(constants, screenID = "")
     '//when cached homescreen is displayed, then check UI needs to be updated
     setHomeScreenAfterFocus(homeScreen.contentFocused, homeScreen)
   else
-    m.inlineVideoMetadataOverlay.resetState = true
     m.performanceMetricsTracker.startAppLaunchMetricTiming("home_screen_tensor_request")
     showHideSpinner(true)
     homeScreen = CreateObject("roSGNode", "HomeScreen")

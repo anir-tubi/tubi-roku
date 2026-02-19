@@ -77,6 +77,12 @@ Function updateVideoTileOverlayPosition(screen) as Void
   ' Update overlay group positioning and clipping based on translation
   m.videoTileOverlayGroup.clippingRect = [screenTranslationX, screenTranslationY, 1920, 1080]
   m.videoTileOverlayGroup.translation = [screenTranslationX, -6]
+
+  ' Reset the state of the inline video metadata overlay when video tiles are enabled
+  ' This avoid flash from previously focused item when video tiles are enabled.
+  if isVideoTileEnabledScreen(screen.id) = true
+    m.inlineVideoMetadataOverlay.resetState = true
+  end if
 End Function
 
 

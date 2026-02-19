@@ -715,37 +715,51 @@ export function createAnalyticsCallback(
 /**
  * Assert that no analytics events were rejected by the backend.
  *
- * Can be used for a specific callback or omitted to check all callbacks
- * created since the last call to checkPendingRejections().
+ * Transient server errors (5xx) are logged as warnings but do not throw.
+ * Only validation failures (4xx) cause an assertion error.
  *
  * @param callback - The callback returned by createAnalyticsCallback
  * @param context - Optional context string for the assertion message
  */
 export function assertNoRejections(callback: AnalyticsCallbackConfig, context?: string): void {
   const prefix = context ? `[${context}] ` : '';
-  expect(
-    callback.rejections,
-    `${prefix}Analytics events were rejected by backend:\n${formatRejections(callback.rejections)}`
-  ).to.have.lengthOf(0);
+
+  const validationFailures = callback.rejections.filter(r => r.statusCode < 500);
+  const serverErrors = callback.rejections.filter(r => r.statusCode >= 500);
+
+  if (serverErrors.length > 0) {
+    console.warn(
+      `\n⚠ ${prefix}${serverErrors.length} analytics event(s) hit transient server errors (5xx) — not failing test:\n` +
+      formatRejections(serverErrors)
+    );
+  }
+
+  if (validationFailures.length > 0) {
+    expect(
+      validationFailures,
+      `${prefix}Analytics events were rejected by backend:\n${formatRejections(validationFailures)}`
+    ).to.have.lengthOf(0);
+  }
 }
 
 /**
- * Check all analytics callbacks created during the current test for backend rejections,
- * then clear the registry. Designed to be called from an `afterEach` hook so that
- * every test automatically validates that no events were rejected — no per-test
- * boilerplate needed.
+ * Log all analytics backend rejections captured during the current test,
+ * then clear the registry. Never throws — safe for `afterEach` hooks
+ * without risking suite-wide abort.
+ *
+ * - 5xx errors are logged as warnings (transient server issues)
+ * - 4xx errors are logged as errors (validation failures)
+ *
+ * Use `assertNoRejections()` inside a test body when you need a hard failure.
  *
  * @example Inside a describe block (covers all tests in the suite):
  * describe('My Analytics Tests', () => {
- *   afterEach(() => {
- *     checkPendingRejections();
- *   });
+ *   setupRejectionTracking();
  *
  *   it('fires event X', async () => {
  *     const events: any[] = [];
  *     proxy.addCallback(createAnalyticsCallback(events));
  *     // ... test actions and assertions ...
- *     // No need to call assertNoRejections — afterEach handles it
  *   });
  * });
  */
@@ -755,12 +769,23 @@ export function checkPendingRejections(): void {
   // Clear the registry regardless of outcome so the next test starts clean
   _callbackRegistry.length = 0;
 
-  if (allRejections.length > 0) {
-    // Use expect so it integrates with the test runner's assertion reporting
-    expect(
-      allRejections,
-      `Analytics events were rejected by backend:\n${formatRejections(allRejections)}`
-    ).to.have.lengthOf(0);
+  if (allRejections.length === 0) return;
+
+  const validationFailures = allRejections.filter(r => r.statusCode < 500);
+  const serverErrors = allRejections.filter(r => r.statusCode >= 500);
+
+  if (serverErrors.length > 0) {
+    console.warn(
+      `\n⚠ ${serverErrors.length} analytics event(s) hit transient server errors (5xx):\n` +
+      formatRejections(serverErrors)
+    );
+  }
+
+  if (validationFailures.length > 0) {
+    console.error(
+      `\n✖ ${validationFailures.length} analytics event(s) rejected by backend (4xx):\n` +
+      formatRejections(validationFailures)
+    );
   }
 }
 

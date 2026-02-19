@@ -283,7 +283,8 @@ Function startVideoPreview(content, pageInfo = {}, componentInfo = {})
     m.videoPreviewPlayer.isDetailScreen = false
 
     ' If there is no delay, we can start the video preview immediately.
-    sendVideoPlayerCommand(videoPreview, "prebuffer")
+    ' DO-NOT use prebuffer since it is not supported in some devices.
+    sendVideoPlayerCommand(videoPreview, "play")
     m.autoStartPreviewToPlaybackTimer.opacity = 0
   end if
 
