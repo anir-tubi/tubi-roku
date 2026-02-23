@@ -1783,6 +1783,8 @@ Function onListScrollingStatusChange(msg)
       appendPaginatedContainersToScreen(screen, m.paginatedContentQueue)
       m.paginatedContentQueue = invalid
     end if
+  else
+    m.videoPreviewDebounce.control = "stop"
   end if
 End Function
 

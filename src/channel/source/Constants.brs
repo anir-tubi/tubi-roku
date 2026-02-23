@@ -649,10 +649,6 @@ Function getConstants()
   ' Naming as collections to avoid confusion of using the term apps in our code and that is what the screen is named
   constants.urls.tensor.cdn.collections = constants.urls.tensor.cdn.urlBase + "/v1/apps"
 
-  ' tensor non-cdn url (for apps/pivots API) - derived from CDN URL by removing "-cdn"
-  constants.urls.tensor.urlBase = constants.urls.tensor.cdn.urlBase.replace("-cdn", "")
-  constants.urls.tensor.apps = constants.urls.tensor.urlBase + "/v1/apps"
-
   'remote Config hub url
   constants.urls.configHub = {}
   constants.urls.configHub.urlBase = "https://config-hub-cdn.production-public.tubi.io"

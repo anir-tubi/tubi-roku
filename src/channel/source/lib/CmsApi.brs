@@ -1145,7 +1145,7 @@ Function cmsApi_createGetAllPivotsReqInfo()
   options.params = params
 
   return {
-    url: m.constants.urls.tensor.apps
+    url: m.constants.urls.tensor.cdn.collections
     requestType: m.constants.reqNames.getAllPivots
     options: options
   }
