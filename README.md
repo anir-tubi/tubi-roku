@@ -1,6 +1,6 @@
 # Tubi Roku Channel
 
-[![Build Status](https://github.com/adRise/project-total-recall/tree/master)](https://github.com/adRise/project-total-recall/actions/workflows/executeUnitTests.yml)
+[![Unit Tests](https://github.com/adRise/tubi-roku/actions/workflows/executeUnitTests.yml/badge.svg)](https://github.com/adRise/tubi-roku/actions/workflows/executeUnitTests.yml) [![Automated UI Tests](https://github.com/adRise/tubi-roku/actions/workflows/automatedTests.yml/badge.svg)](https://github.com/adRise/tubi-roku/actions/workflows/automatedTests.yml)
 
 This README covers details and procedures specific to this repository. For broader information relevant to the Roku department, check out the [Additional Information page](MORE.md).
 
@@ -41,7 +41,7 @@ npm install -g npx
 npm install -g gulp-cli
 ```
 
-5\. Navigate to the project-total-recall directory
+5\. Navigate to the tubi-roku directory
 
 ```shell
 cd tubi-roku
@@ -118,9 +118,9 @@ __The most commonly used Gulp commands__
 * `$ gulp stage` - bumps the revision number, build a zip using the "staging" config and upload starter components, and remote components to the staging CDN.
 * `$ gulp addMissingImages` - updates new_images_since file with images that need to be included in the remote component library.
 * `$ gulp bumpQA` - bumps the revision number. This is used during the QA process. As changes are made and new QA builds are created, the revision number is used to distinguish between builds.
-* `$ gulp release` - bump the build number, build starter and remote components .pkgs using the "production" config. This command will also make PRs to the CDN repo and this project-total-recall repo on Github.
+* `$ gulp release` - bump the build number, build starter and remote components .pkgs using the "production" config. This command will also make PRs to the CDN repo and this tubi-roku repo on Github.
 * `$ gulp buildQaChanges` - Generates the output for the ticket that we give to QA of the changes between the current branch and the current production branch. Will automatically copy to the clipboard.
-* `$ gulp buildReleaseNotes` -Generates the output for the release notes to be pasted on the release: https://github.com/adRise/project-total-recall/tags
+* `$ gulp buildReleaseNotes` -Generates the output for the release notes to be pasted on the release: https://github.com/adRise/tubi-roku/tags
 
 __Gulp options__
 
@@ -358,15 +358,15 @@ TBD
     - Automatic release note generation has now been added. If you choose not to use the automatically generated release notes, please make sure that the release notes adhere to the following. Each build note should be correspond to a change that was submitted as part of the QA JIRA ticket that you made earlier. Remember, do not use commit messages, but rather write simple phrases or sentences that are easy to digest and accurately describe what the change was. Assume non technical readers will be consuming this information.
   - copy the Github urls for the two PRs made above to the clipboard.
 
-    __Note:__ As an edge case, if you need to manually perform the release steps for the new build, follow the [Manual Submission Release Steps](https://github.com/adRise/project-total-recall/docs/manual_release.md#submission-release)
+    __Note:__ As an edge case, if you need to manually perform the release steps for the new build, follow the [Manual Submission Release Steps](https://github.com/adRise/tubi-roku/docs/manual_release.md#submission-release)
 
-11\. Inform the team that the PRs are ready for review (you can paste the urls that were added to the clipboard when the last step completed, into the `#roku_dev slack channel`. The PR URLs can also be found on the project-total-recall and rcdn repos respectively), and wait for approval.
+11\. Inform the team that the PRs are ready for review (you can paste the urls that were added to the clipboard when the last step completed, into the [`#roku-prs`](https://fox.enterprise.slack.com/archives/C099JR27AUU) slack channel. The PR URLs can also be found on the tubi-roku and rcdn repos respectively), and wait for approval.
 
 12\. Merge the new PR in the rcdn repo. Also merge the release_x_y_z PR into the x_y_branch branch in project_total_recall. Once merged, delete both of these branches.
 
 13\. check if you need to run multifactor authentication for AWS. Typically this means running `$ valet`. Refer to the [valet repo](https://github.com/adRise/valet#installation) on how to install the valet command.
 
-- __DO NOT PROCEED TO THE FOLLOWING INFRA SCRIPT STEP UNTIL THE PR FOR THE rcdn REPO AND THE PR FOR THE project-total-recall REPO ARE APPROVED AND MERGED.__
+- __DO NOT PROCEED TO THE FOLLOWING INFRA SCRIPT STEP UNTIL THE PR FOR THE rcdn REPO AND THE PR FOR THE tubi-roku REPO ARE APPROVED AND MERGED.__
 
 14\. Use an infra script to move the updates from the CDN repo to the actual CDN servers.
 
@@ -404,7 +404,7 @@ TBD
 18\. Once the channel update has been released by Roku, create a release on Github
 
 - From the following link, find the tag that was just pushed to Github, and click on the link for that tag.
-  - [github.com/adRise/project-total-recall/tags](https://github.com/adRise/project-total-recall/tags)
+  - [github.com/adRise/tubi-roku/tags](https://github.com/adRise/tubi-roku/tags)
 
 - Select "Edit Tag"
 - If you made a pre-release as part of step #7, uncheck the "This is a pre-release" box and then select "Update Release". You can skip the other sub steps of step #12.
@@ -492,9 +492,9 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
   - prompt you to make a Github release (including adding build notes) in the CLI based on the tag that was just created. __If you choose not to make a release in the CLI, you must do step 14.__
     - Automatic release note generation has now been added. If you choose not to use the automatically generated release notes, please make sure that the release notes adhere to the following. Each build note should be correspond to a change that was submitted as part of the QA JIRA ticket that you made earlier. Remember, do not use commit messages, but rather write simple phrases or sentences that are easy to digest and accurately describe what the change was. Assume non technical readers will be consuming this information.
 
-  __Note:__ As an edge case, if you need to manually perform the release steps for the new build, follow the [Manual Remote Release Steps](https://github.com/adRise/project-total-recall/docs/manual_release.md#remote-release)
+  __Note:__ As an edge case, if you need to manually perform the release steps for the new build, follow the [Manual Remote Release Steps](https://github.com/adRise/tubi-roku/docs/manual_release.md#remote-release)
 
-11\. Inform the team that the PRs are ready for review (you can paste the urls that were added to the clipboard when the last step completed, into the `#rokudev slack channel`. The PR URLs can also be found on the project-total-recall and rcdn repos respectively), and wait for approval.
+11\. Inform the team that the PRs are ready for review (you can paste the urls that were added to the clipboard when the last step completed, into the [`#roku-prs`](https://fox.enterprise.slack.com/archives/C099JR27AUU) slack channel. The PR URLs can also be found on the tubi-roku and rcdn repos respectively), and wait for approval.
 
 12\. Merge the new PR in the rcdn repo. Also merge the release_x_y_z PR into the x_y_branch branch in project_total_recall. Once merged, delete both of these branches.
 
@@ -537,7 +537,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 16\. Create a release on Github (only if you did not create a release in the CLI as part of step 9). As part of the release script, a tag was automatically created and pushed to Github.
 
 - From the following link, find the tag that was just pushed to Github, and click on the link for that tag.
-  - [github.com/adRise/project-total-recall/tags](https://github.com/adRise/project-total-recall/tags)
+  - [github.com/adRise/tubi-roku/tags](https://github.com/adRise/tubi-roku/tags)
 
 - Select "Edit Tag"
 
@@ -825,11 +825,11 @@ In an attempt to standardize and allow real time updates to the application's er
 
 **Enable/Disable Self-hosted Github Action Runner**
 
-If you need to temporarily disable a runner then an easy way to do this is by going to [Github.com > Settings > Actions > Runners](https://github.com/adRise/project-total-recall/settings/actions/runners). Click on the runner you would like to enable or disable. Click the gear icon to the right and then uncheck `enabled` to disable the runner or check it reenable it.
+If you need to temporarily disable a runner then an easy way to do this is by going to [Github.com > Settings > Actions > Runners](https://github.com/adRise/tubi-roku/settings/actions/runners). Click on the runner you would like to enable or disable. Click the gear icon to the right and then uncheck `enabled` to disable the runner or check it reenable it.
 
 **Restart Office Self-hosted Github Action Runner**
 
-A linux machine has been dedicated in the San Francisco office to be used for GitHub PR unit testing. A Github Actions runner is running on this linux machine.  A roku device is connected to the linux machine. If for some reason the ip address for the Roku changes then it can be updated by going to [Settings > Secrets and variables > Actions and clicking over to the Variables tab](https://github.com/adRise/project-total-recall/settings/variables/actions). `UNIT_TEST_RUNNER_ROKU_IP_ADDRESS` is for the Roku's ip address and `UNIT_TEST_RUNNER_ROKU_PASSWORD` the password used for dev mode.
+A linux machine has been dedicated in the San Francisco office to be used for GitHub PR unit testing. A Github Actions runner is running on this linux machine.  A roku device is connected to the linux machine. If for some reason the ip address for the Roku changes then it can be updated by going to [Settings > Secrets and variables > Actions and clicking over to the Variables tab](https://github.com/adRise/tubi-roku/settings/variables/actions). `UNIT_TEST_RUNNER_ROKU_IP_ADDRESS` is for the Roku's ip address and `UNIT_TEST_RUNNER_ROKU_PASSWORD` the password used for dev mode.
 
 When any PR is raised against master, the Github Actions runner triggers all of the project's unit tests. The PR will be allowed to merge based on the runner's test results.
 
@@ -851,7 +851,7 @@ Roku app integration with Charles proxy.
 
 ## Charles Setup:
 
---   In the docs folder there is file called [CharlesRewrites.xml](https://github.com/adRise/project-total-recall/blob/master/docs/CharlesRewrites.xml).  This file is used to import the required rewrites into Charles.
+--   In the docs folder there is file called [CharlesRewrites.xml](https://github.com/adRise/tubi-roku/blob/master/docs/CharlesRewrites.xml).  This file is used to import the required rewrites into Charles.
 
 ### Rewrite
 
@@ -904,7 +904,7 @@ Whenever we want to update to a newer version of One Trust Library, we have to p
 2\. Navigate to https://app.onetrust.com/mobile/scripts and select Roku from the list of applications.
 3\. Select SDK from the navigation bar shown in the screen.
 4\. Select the SDK Version we want to upgrade to from the dropdown and click download sdk.
-5\. Create a new branch on project-total-recall repo and copy over the changes from download sdk into OTPublishersSDK folder present in the root of the repository.
+5\. Create a new branch on tubi-roku repo and copy over the changes from download sdk into OTPublishersSDK folder present in the root of the repository.
 6\. Create a pull request once the changes are reviewed and merged.
 7\. To publish the new version of the One Trust component library to the staging aws bucket:
 ```shell
@@ -957,7 +957,7 @@ In a situation where the currently released version needs to be rolled back to t
   7. Commit the change with commit message 'Rollback to Version x_y_z' and push the branch.
 
   8. Create the PR against the master
-  9. Request for review in `#rokudev slack channel`.
+  9. Request for review in [`#roku-prs`](https://fox.enterprise.slack.com/archives/C099JR27AUU) slack channel.
 
   10. After the PR has been APPROVED, merge the PR.
   11. Follow the regular release deployment procress:
