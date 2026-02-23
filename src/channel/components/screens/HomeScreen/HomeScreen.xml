@@ -275,15 +275,16 @@
       <MaskGroup
         id="pivotContentArea"
         translation="[0, 51]"
-        maskUri="pkg:/images/pivot-row-mask.png"
-        maskOffset="[-123, 0]">
+        maskOffset="[-54, 0]"
+        maskUri="pkg:/images/pivot-row-mask-$$RES$$.png">
         <!-- Back button hint -->
         <BackHint
           opacity="0"
           id="backButtonHint" />
         <!-- Translation without back hint is 0 and with back hint is 234 -->
         <PivotList
-          translation="[0, 0]"
+          translation="[-54, 0]"
+          focusXOffset="[54]"
           itemSize="[1920, 60]"
           id="pivotList" />
       </MaskGroup>

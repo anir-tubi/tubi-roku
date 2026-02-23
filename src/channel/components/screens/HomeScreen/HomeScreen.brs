@@ -22,14 +22,7 @@ Function init()
   m.InfoPanelParent = topRef.findNode("InfoPanelParent")
   m.backButtonHint = topRef.findNode("backButtonHint")
   m.pivotContentArea = topRef.findNode("pivotContentArea")
-  if m.constants.deviceInfo.scaledUi = true
-    m.pivotMaskSize = [1106, 42]
-    m.sideNavOffset = 225
-  else
-    m.pivotMaskSize = [1659, 63]
-    m.sideNavOffset = 338
-  end if
-  m.pivotContentArea.maskSize = m.pivotMaskSize
+  m.sideNavOffset = 338
   m.pivotList = topRef.findNode("pivotList")
   m.pivotList.observeFieldScoped("pivotFocused", "onPivotFocusedChange")
   m.pivotList.observeFieldScoped("componentInteractionInfo", "onPivotComponentInteractionInfo")
@@ -394,8 +387,6 @@ End Function
 Function onScreenFocusChange()
   tubiLog("HomeScreen.onScreenFocusChange " + focusState(m.top))
   if m.top.hasFocus() = true
-    m.pivotContentArea.maskSize = m.pivotMaskSize
-
     'TODO: Revisit this if we ever use both.
     content = m.CategoryGridList.content
     if content <> invalid
@@ -422,8 +413,9 @@ Function onScreenFocusChange()
     end if
 
     m.top.shouldFocusWhenPushed = true
+    m.pivotContentArea.maskOffset = [-54, 0]
   else if m.top.isInFocusChain() = false
-    m.pivotContentArea.maskSize = [m.pivotMaskSize[0] - m.sideNavOffset, m.pivotMaskSize[1]]
+    m.pivotContentArea.maskOffset = [-54 - m.sideNavOffset, 0]
     m.adFocusTimer.control = "stop"
     m.top.focusLost = true
   end if
