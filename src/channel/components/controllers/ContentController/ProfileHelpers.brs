@@ -27,7 +27,7 @@ Function showProfileSelectorScreen(constants, profiles = invalid, disableBack = 
     menuContent = getProfilesListContent(profiles)
     pCount = menuContent.getChildCount()
     if pCount > 0 'at least one profile is present
-      if pCount < 7
+      if pCount < 7 AND isKidsUIOn() <> true
         'append add account item
         addProfileItem = createObject("roSGNode", "ContentNode")
         addProfileItem.id = "add_profile"

@@ -4040,27 +4040,34 @@ End Function
 
 Function performProfileMigration()
   TubiLog("performProfileMigration")
-  auth = m.tubiAuthUpdate.getAuthInfo()
+  auth = m.tubiAuthUpdate
+  authInfo = auth.getAuthInfo()
   'if UK/AU and kids profile is selected, then copy the kids parent
   if m.enableMultipleAccounts = invalid
     m.enableMultipleAccounts = getExternalConfigValueFromGlobal("enable_multiple_accounts", false)
   end if
 
   ' if multi account not enabled from remote config, then swith off multi account feature
-  if m.enableMultipleAccounts = false
-    if isKidsProfile(auth) = true
-      m.tubiAuthUpdate.copyProfileToMainAuth("guest")
+  if m.enableMultipleAccounts = false OR UCase(m.constants.deviceInfo.countryCode) <> "US"
+    if isKidsProfile(authInfo) = true
+      auth.copyProfileToMainAuth("guest")
     end if
 
     m.profileMigrationComplete = true
     runControllerStartSequence()
   else
+    isSignedUser = isLoggedInUser(authInfo)
+    profiles = auth.getAllProfilesAuthInfo()
 
-    if getStatsigExperimentResource("roku_multi_account", "roku_multi_account_v0", false).variant <> "none" AND isLoggedInUser() = true
-      auth = m.tubiAuthUpdate
-      oldAuthExists = auth.getAuthInfo()
+    if profiles["guest"] <> invalid
+      profileCount = profiles.count() - 1
+    else
+      profileCount = profiles.count()
+    end if
 
-      if oldAuthExists.expireTime <> invalid AND isUserInMultiAccount() = false
+    if getStatsigExperimentResource("roku_multi_account", "roku_multi_account_v0", false).variant <> "none" AND isSignedUser = true
+
+      if authInfo.expireTime <> invalid AND profileCount = 0
         ' get the user info from settings api and patch with what we have already stored in the registry
         'use v2 parental rating from settings api since we are anyway going to migrate.
         requestInfo = m.userDeviceApi.createUserSettingsGeneralTaskReqInfo(onStartMigrateDefaultUserToNewProfileSuccess, setNotMigratedDefaultState, true)
@@ -4072,8 +4079,8 @@ Function performProfileMigration()
       setNotMigratedDefaultState()
     end if
 
-    'treatment group
-    if isLoggedInUser() = true OR isUserInMultiAccount() = true
+    'send exposure event
+    if isSignedUser = true OR profileCount > 0
       getStatsigExperimentResource("roku_multi_account", "roku_multi_account_v0", true)
     end if
   end if

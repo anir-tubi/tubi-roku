@@ -17,7 +17,6 @@ Function isUserInMultiAccount()
     return false
   end if
 
-  isTreamentEnabled = (getStatsigExperimentResource("roku_multi_account", "roku_multi_account_v0", false).variant <> "none")
 
   if profiles["guest"] <> invalid
     profileCount = profiles.count() - 1
@@ -25,15 +24,19 @@ Function isUserInMultiAccount()
     profileCount = profiles.count()
   end if
 
-  if isTreamentEnabled = true AND profileCount > 0
+
+  isTreamentEnabled = (getStatsigExperimentResource("roku_multi_account", "roku_multi_account_v0", false).variant <> "none")
+
+  if isTreamentEnabled = true AND profileCount > 0 AND UCase(m.constants.deviceInfo.countryCode) = "US"
     return true
   end if
 
 
-  ' THIS IF IS COMMENTED OUT FOR SUBMISSION BUILD. IT WILL BE UNCOMMENTED FOR REMOTE RELEASE.
-  ' if isTreamentEnabled = false AND profileCount > 1
-  '   return true
-  ' end if
+  ' if user has already created a profile then we always show give them MAKA feature.
+  ' one use case is if user in US registers multiple accounts and then travel to MX.
+  if profileCount > 1
+    return true
+  end if
 
   return false
 End Function
