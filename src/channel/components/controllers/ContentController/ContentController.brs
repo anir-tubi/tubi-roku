@@ -4101,7 +4101,7 @@ Function playerLinearChannel(content)
 End Function
 
 
-Function onLinearChannelFetchSuccess(response)
+Function onLinearChannelFetchSuccess(response, _storeInCache = false)
   if isNode(response)
     content = response.getChild(0)
     if content <> invalid
