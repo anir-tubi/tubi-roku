@@ -3624,6 +3624,54 @@ Function getTranslation_es_MX()
       "description": "Shortened version of date format for the month of December",
       "message": "dic {day}, {year}"
     },
+    "short_version_date_wo_year_format_1": {
+      "description": "Shortened version of date format without the year for the month of January",
+      "message": "{day} de enero"
+    },
+    "short_version_date_wo_year_format_2": {
+      "description": "Shortened version of date format without the year for the month of February",
+      "message": "{day} de febrero"
+    },
+    "short_version_date_wo_year_format_3": {
+      "description": "Shortened version of date format without the year for the month of March",
+      "message": "{day} de marzo"
+    },
+    "short_version_date_wo_year_format_4": {
+      "description": "Shortened version of date format without the year for the month of April",
+      "message": "{day} de abril"
+    },
+    "short_version_date_wo_year_format_5": {
+      "description": "Shortened version of date format without the year for the month of May",
+      "message": "{day} de mayo"
+    },
+    "short_version_date_wo_year_format_6": {
+      "description": "Shortened version of date format without the year for the month of June",
+      "message": "{day} de junio"
+    },
+    "short_version_date_wo_year_format_7": {
+      "description": "Shortened version of date format without the year for the month of July",
+      "message": "{day} de julio"
+    },
+    "short_version_date_wo_year_format_8": {
+      "description": "Shortened version of date format without the year for the month of August",
+      "message": "{day} de agosto"
+    },
+    "short_version_date_wo_year_format_9": {
+      "description": "Shortened version of date format without the year for the month of September",
+      "message": "{day} de septiembre"
+    },
+    "short_version_date_wo_year_format_10": {
+      "description": "Shortened version of date format without the year for the month of October",
+      "message": "{day} de octubre"
+    },
+    "short_version_date_wo_year_format_11": {
+      "description": "Shortened version of date format without the year for the month of November",
+      "message": "{day} de noviembre"
+    },
+    "short_version_date_wo_year_format_12": {
+      "description": "Shortened version of date format without the year for the month of December",
+      "message": "{day} de diciembre"
+    },
     "channelGuide_error_fetchContent_description": {
       "description": "Onscreen message to indicate channel Guide content could not be loaded",
       "message": "No se pudo cargar el guía de canales."
@@ -4297,6 +4345,10 @@ Function getTranslation_es_MX()
     "replay": {
       "description": "This label used for badge to indicate the content availability",
       "message": "Repetición"
+    },
+    "info_panel_coming_soon": {
+      "description": "Label to indicate that the content is coming soon with the date of availability",
+      "message": "Llega el {date}"
     },
     "info_panel_reminder_is_set": {
       "description": "Hint in the content metadata area informing the user that the reminder is set for this content",
@@ -5992,6 +6044,54 @@ Function getTranslation_fr_CA()
       "description": "Shortened version of date format for the month of December",
       "message": "{day} déc {year}"
     },
+    "short_version_date_wo_year_format_1": {
+      "description": "Shortened version of date format without the year for the month of January",
+      "message": "{day} janvier"
+    },
+    "short_version_date_wo_year_format_2": {
+      "description": "Shortened version of date format without the year for the month of February",
+      "message": "{day} février"
+    },
+    "short_version_date_wo_year_format_3": {
+      "description": "Shortened version of date format without the year for the month of March",
+      "message": "{day} mars"
+    },
+    "short_version_date_wo_year_format_4": {
+      "description": "Shortened version of date format without the year for the month of April",
+      "message": "{day} avril"
+    },
+    "short_version_date_wo_year_format_5": {
+      "description": "Shortened version of date format without the year for the month of May",
+      "message": "{day} mai"
+    },
+    "short_version_date_wo_year_format_6": {
+      "description": "Shortened version of date format without the year for the month of June",
+      "message": "{day} juin"
+    },
+    "short_version_date_wo_year_format_7": {
+      "description": "Shortened version of date format without the year for the month of July",
+      "message": "{day} juillet"
+    },
+    "short_version_date_wo_year_format_8": {
+      "description": "Shortened version of date format without the year for the month of August",
+      "message": "{day} août"
+    },
+    "short_version_date_wo_year_format_9": {
+      "description": "Shortened version of date format without the year for the month of September",
+      "message": "{day} septembre"
+    },
+    "short_version_date_wo_year_format_10": {
+      "description": "Shortened version of date format without the year for the month of October",
+      "message": "{day} octobre"
+    },
+    "short_version_date_wo_year_format_11": {
+      "description": "Shortened version of date format without the year for the month of November",
+      "message": "{day} novembre"
+    },
+    "short_version_date_wo_year_format_12": {
+      "description": "Shortened version of date format without the year for the month of December",
+      "message": "{day} décembre"
+    },
     "channelGuide_error_fetchContent_description": {
       "description": "Onscreen message to indicate channel Guide content could not be loaded",
       "message": "Impossible de charger le guide des chaînes."
@@ -6665,6 +6765,10 @@ Function getTranslation_fr_CA()
     "replay": {
       "description": "This label used for badge to indicate the content availability",
       "message": "Rediffusion"
+    },
+    "info_panel_coming_soon": {
+      "description": "Label to indicate that the content is coming soon with the date of availability",
+      "message": "Arrive le {date}"
     },
     "info_panel_reminder_is_set": {
       "description": "Hint in the content metadata area informing the user that the reminder is set for this content",
