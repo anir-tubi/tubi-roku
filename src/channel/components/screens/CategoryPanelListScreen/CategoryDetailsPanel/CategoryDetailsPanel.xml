@@ -70,6 +70,8 @@
       <!-- assigning this value helps to redirect the user to specific category/channel detailscreen once user signedIn via category/channel detailscreen -->
       <field id="categoryId" type="string"/>
 
+      <field id="isFullyLoaded" type="boolean" alias="pageTitleAndCounter.isFullyLoaded" />
+
     <!-- OUTPUT -->
       <!-- passes information eventually back to firmware to let it know if the "input" deeplink
            with type = transport was handled
@@ -128,7 +130,6 @@
           opacity="0"/>
         <CategoryGridRowLabel
           translation="[0,540]"
-          countTranslationXPos="1050"
           id="pageTitleAndCounter"/>
         <MarkupGrid
           id="ChannelsContentGrid"

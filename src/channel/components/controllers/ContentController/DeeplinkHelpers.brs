@@ -980,7 +980,6 @@ End Function
 
 Function handleSingleContentDeeplinkError(error)
   tubilog("DeeplinkHelpers.handleSingleContentDeeplinkError")
-
   message = getTranslation("screenDetails_error_getContent_description")
   if m.enteredFromDeepLink = false AND m.deepLinkContent <> invalid
     'only in case of the movie, we have already sneaked the showdetail screen, so we need to
@@ -992,18 +991,26 @@ Function handleSingleContentDeeplinkError(error)
         onDetailBackButtonPressedChange()
       end if
     end if
-
+    currentScreen = getCurrentScreen()
     'If user issues input deeplink on linearvideoplayer/videoplayer, video will stop and tries to play deeplink content.
     'In case of deeplink error, bring the user back to detail screen.
-    currentScreen = getCurrentScreen()
     if currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen
       returnToPreviousScreenFromLinearVideo(false)
     else if currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
       returnToDetailScreenFromVideo(true, true, "deeplink")
     end if
-  end if
 
-  showDeeplinkErrorModal(error, message)
+    showDeeplinkErrorModal(error, message)
+  else
+    ' when user is in trying to deeplink to movie or series and we encounter an error, we need to send analytics and reset the deeplink values
+    ' and land the user on the previous screen (most likely the home screen) rather than showing the error modal.
+    sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.home, m.Tracking, m.trackingLoggingTask, m.constants)
+    resetDeeplinkValues()
+    currentScreen = getCurrentScreen()
+    if currentScreen <> invalid AND currentScreen.isSubtype("HomeScreen") = false
+      popScreen()
+    end if
+  end if
 End Function
 
 ' parses a uri encoded list of key:value pair
