@@ -453,7 +453,7 @@ Function setVideoPreviewAfterFocus(focusedContent, pageInfo = {}, componentInfo 
           m.backgroundGroup.posterVisible = true
         end if
 
-        if focusedContent.videoPreviewUrl <> ""
+        if focusedContent.videoPreviewUrl <> "" AND isComingSoonContent(focusedContent) = false
           startVideoPreview(focusedContent, pageInfo, componentInfo)
         end if
 
