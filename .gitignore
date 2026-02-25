@@ -11,3 +11,8 @@ rta-config.json
 .idea
 src/experiments/*
 .cursor/mcp.json
+allure-results/
+allure-report/
+.test-bucket-id
+.test-bucket-data.json
+.test-run-summary.json

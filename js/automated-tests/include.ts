@@ -4,10 +4,6 @@ import { ecp, odc, device, utils } from 'roku-test-automation';
 import { auth, testUtils } from './test-utils';
 
 exports.mochaHooks = {
-  // Useful for debugging what is running on which Roku device
-  // beforeEach() {
-  //   console.log(this.currentTest.title, process.env.MOCHA_WORKER_ID)
-  // },
   async beforeAll() {
     let deviceSelector = 0;
     if (process.env.MOCHA_WORKER_ID !== undefined) {
@@ -75,6 +71,11 @@ exports.mochaHooks = {
     }
   },
   async afterAll() {
+    try {
+      const host = device.getCurrentDeviceConfig().host;
+      const workerId = process.env.MOCHA_WORKER_ID ?? '0';
+      console.log(`\n  Suite completed on device ${host} (worker ${workerId})\n`);
+    } catch (_) {}
     await odc.shutdown();
   }
 };

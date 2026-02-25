@@ -51,14 +51,18 @@ describe('LazyLoad', function () {
 
     // Navigate to a category with < 200 titles and validate < 200
     await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
-    const position = await findMenuItemPositionByTitle({ title: 'Action' });
-    await ecp.sendKeypress(ecp.Key.Down, { count: position, wait: 4000 });
+    await testUtils.jumpToGridItemWithTitle('categoriesListMenu', 'Action');
+    await testUtils.retryWithTimeOut(async () => {
+      const focused = await testUtils.getCurrentlyFocusedGridItemContent('categoriesListMenu');
+      expect(focused.title).to.equal('Action');
+    });
+    await testUtils.waitForElementToShowOnScreen('channelCategoryGrid', 'Category grid not loaded');
     await ecp.sendKeypress(ecp.Key.Right);
     await testUtils.waitForElementToFullyShowOnScreen('categoriesDetailsPageInfo');
 
     // Navigate down 
     await ecp.sendKeypress(ecp.Key.Down, { count: 50 });
-    await utils.sleep(5000); // itemCounter update isn't recognized without sleep
+    await utils.sleep(5000);
 
     const contents = await testUtils.getAllGridItemsContent('channelCategoryGrid');
     const itemCounter = contents.length;
@@ -82,9 +86,12 @@ describe('LazyLoad', function () {
 
     // Navigate to a category with 1000
     await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
-    const position = await findMenuItemPositionByTitle({ title: 'Action' });
-    await ecp.sendKeypress(ecp.Key.Down, { count: position, wait: 4000 });
-    await testUtils.waitForElementToFullyShowOnScreen('actionButtonFocused');
+    await testUtils.jumpToGridItemWithTitle('categoriesListMenu', 'Action');
+    await testUtils.retryWithTimeOut(async () => {
+      const focused = await testUtils.getCurrentlyFocusedGridItemContent('categoriesListMenu');
+      expect(focused.title).to.equal('Action');
+    });
+    await testUtils.waitForElementToShowOnScreen('channelCategoryGrid', 'Category grid not loaded');
     await ecp.sendKeypress(ecp.Key.Right);
     await testUtils.waitForElementToFullyShowOnScreen('categoriesDetailsPageInfo');
 
@@ -139,18 +146,3 @@ async function selectCategories() {
   await testUtils.waitForElementToFullyShowOnScreen('channelRecommendedButton');
 }
 
-async function findMenuItemPositionByTitle({ title }) {
-  let position = -1;
-  const contents = await testUtils.getAllGridItemsContent(
-    "categoriesListMenu"
-  );
-
-  for (const [index, item] of contents.entries()) {
-    if (item.title === title) {
-      position = index;
-      break;
-    }
-  }
-
-  return position;
-}

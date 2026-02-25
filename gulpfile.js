@@ -1247,6 +1247,37 @@ exports.runAutomatedAnalyticsTests = runAutomatedAnalyticsTests;
 exports.runAutomatedAnalyticsTestsForAdsCli = runAutomatedAnalyticsTestsForAdsCli;
 exports.runAutomatedTestsSmoke = runAutomatedTestsSmoke;
 
+function generateAllureReport(done) {
+  return automatedTests().generateAllureReport(done);
+}
+
+function clearAllureResults(done) {
+  return automatedTests().clearAllureResults(done);
+}
+
+function serveAllureReport(done) {
+  return automatedTests().serveAllureReport(done);
+}
+
+function startTestBucket(done) {
+  return automatedTests().startTestBucket(done);
+}
+
+function closeTestBucket(done) {
+  return automatedTests().closeTestBucket(done);
+}
+
+function pushReportToDashboard(done) {
+  return automatedTests().pushReportToDashboard(done);
+}
+
+exports.generateAllureReport = generateAllureReport;
+exports.clearAllureResults = clearAllureResults;
+exports.serveAllureReport = serveAllureReport;
+exports.startTestBucket = startTestBucket;
+exports.closeTestBucket = closeTestBucket;
+exports.pushReportToDashboard = pushReportToDashboard;
+
 exports.runToolingTests = series(setAutomatedTestsConfig, clean, buildInstalled, runToolingTests);
 
 exports.installCompanionChannel = installCompanionChannel;

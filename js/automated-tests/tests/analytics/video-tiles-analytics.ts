@@ -419,13 +419,9 @@ describe('Video Tiles Analytics Tests', function () {
       await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true, clearRegistry: false });
       await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus', 20000);
 
-      // Wait for video tiles to be enabled (if experiment is on)
-      await utils.sleep(2000);
-
-      // Navigate to first video tile row (typically row 0 or 1)
-      // Focus on a video tile
-      await ecp.sendKeypress(ecp.Key.Down, { count: 1, wait: 1000 });
-      await utils.sleep(3000); // Wait for preview to start and analytics to fire
+      // Find and navigate to a tile that has a video preview
+      await testHelpers.findAndNavigateToVideoPreviewContent('videoTitlesRowList', true, 5);
+      await utils.sleep(3000);
 
       // Verify we received start_preview event
       expect(analyticsEvents.length).to.be.greaterThan(0, 'Should receive start_preview event');
@@ -697,12 +693,9 @@ describe('Video Tiles Analytics Tests', function () {
       await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true, clearRegistry: false });
       await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus', 20000);
 
-      // Wait for video tiles to be enabled
-      await utils.sleep(2000);
-
-      // Focus on a video tile
-      await ecp.sendKeypress(ecp.Key.Down, { count: 1, wait: 1000 });
-      await utils.sleep(22000); // Wait for preview to play and multiple progress events to fire (at least 2 events)
+      // Find and navigate to a tile that has a video preview
+      await testHelpers.findAndNavigateToVideoPreviewContent('videoTitlesRowList', true, 5);
+      await utils.sleep(3000);
 
       // Verify we received preview_play_progress events
       expect(analyticsEvents.length).to.be.greaterThan(0, 'Should receive preview_play_progress events');
@@ -792,12 +785,9 @@ describe('Video Tiles Analytics Tests', function () {
       await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true, clearRegistry: false });
       await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus', 20000);
 
-      // Wait for video tiles to be enabled
-      await utils.sleep(2000);
-
-      // Focus on a video tile (preview starts)
-      await ecp.sendKeypress(ecp.Key.Down, { count: 1, wait: 1000 });
-      await utils.sleep(3000); // Wait for preview to start
+      // Find and navigate to a tile that has a video preview
+      await testHelpers.findAndNavigateToVideoPreviewContent('videoTitlesRowList', true, 5);
+      await utils.sleep(3000);
 
       // Navigate away (move to next tile horizontally) before preview completes
       await ecp.sendKeypress(ecp.Key.Right, { wait: 500 });
@@ -893,12 +883,9 @@ describe('Video Tiles Analytics Tests', function () {
       await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true, clearRegistry: false });
       await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus', 20000);
 
-      // Move focus to a tile that has a video preview (preview starts)
-      const position = await testHelpers.findContentPositionInRowListThatContainsVideoPreview('videoTitlesRowList', true, 5);
-      if (position.length === 0) {
-        throw new Error('Could not find content with video preview in videoTitlesRowList');
-      }
-      await testHelpers.jumpToRowListPosition('videoTitlesRowList', position[0], position[1]);
+      // Find and navigate to a tile that has a video preview
+      await testHelpers.findAndNavigateToVideoPreviewContent('videoTitlesRowList', true, 5);
+      await utils.sleep(3000);
       await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 15000);
 
       // Clear initial events before seeking

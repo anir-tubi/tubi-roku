@@ -11,17 +11,14 @@ describe('Details Page', function () {
       await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
       await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
-      // Find and navigate to content WITHOUT video preview
-      const [rowIndex, colIndex] = await testHelpers.findAndNavigateToVideoPreviewContent('movieScreenRowList', false, 40);
-
       // Get the item data at the navigated position
       const rowListElement = testUtils.getElementKeyPath('movieScreenRowList');
       const { value: row } = await odc.getValue({
-        keyPath: `${rowListElement.keyPath}.content.${rowIndex}`,
+        keyPath: `${rowListElement.keyPath}.content.0`,
         responseMaxChildDepth: 1
       });
       const json = JSON.parse(row.json);
-      const item = row.children[colIndex];
+      const item = row.children[0];
       itemData = json[item.id];
 
       // Now select that content to land us on the detail page
@@ -37,9 +34,24 @@ describe('Details Page', function () {
 
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535838
     it('C535838 - Movie Details - When Movie Details page is opened then background image is seen @registered_user,@smoke,@mdp_1', async () => {
-      const backgroundGroup = await testUtils.getNodeForElement('backgroundGroup');
-      expect(backgroundGroup.posterVisible).to.equal(true);
-      expect(backgroundGroup.backgroundInfo.urilist.length).to.be.greaterThan(0);
+      await testHelpers.enablePreviewInSettings(false);
+      await testUtils.goToPage('movies');
+      await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
+      await ecp.sendKeypress(ecp.Key.Ok);
+      await utils.sleep(2000);
+
+      try {
+        const backgroundGroup = await testUtils.getNodeForElement('backgroundGroup');
+        expect(backgroundGroup.posterVisible).to.equal(true);
+        expect(backgroundGroup.backgroundInfo.urilist.length).to.be.greaterThan(0);
+      } finally {
+        await ecp.sendKeypress(ecp.Key.Back);
+        await testHelpers.enablePreviewInSettings(true);
+        await testUtils.goToPage('movies');
+        await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
+        await ecp.sendKeypress(ecp.Key.Ok);
+        await utils.sleep(2000);
+      }
     });
 
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/537370
@@ -459,17 +471,14 @@ describe('Details Page', function () {
     before(async () => {
       await shared.openSeriesScreenAndWaitUntilListIsFocused();
 
-      // Find and navigate to content WITHOUT video preview
-      const [rowIndex, colIndex] = await testHelpers.findAndNavigateToVideoPreviewContent('tvScreenRowList', false, 5);
-
-      // Get the item data at the navigated position
+      // Get the item data at the first position
       const rowListElement = testUtils.getElementKeyPath('tvScreenRowList');
       const { value: row } = await odc.getValue({
-        keyPath: `${rowListElement.keyPath}.content.${rowIndex}`,
+        keyPath: `${rowListElement.keyPath}.content.0`,
         responseMaxChildDepth: 1
       });
       const json = JSON.parse(row.json);
-      const item = row.children[colIndex];
+      const item = row.children[0];
       itemData = json[item.id];
 
       // Now select that content to land us on the detail page
@@ -478,19 +487,33 @@ describe('Details Page', function () {
 
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/537453
     it('C537453 - Series - When series details page is opened then background poster should be displayed, @registered_user,@sdp_2,@smoke', async () => {
+      await testHelpers.enablePreviewInSettings(false);
+      await testUtils.goToPage('tv');
+      await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
+      await ecp.sendKeypress(ecp.Key.Ok);
+      await utils.sleep(2000);
 
-      // Verify we are on the details page
-      let detailScreenTitle;
-      await testUtils.retryWithTimeOut(async () => {
-        detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
-        expect(detailScreenTitle.text).to.not.be.empty;
-      });
+      try {
+        // Verify we are on the details page
+        let detailScreenTitle;
+        await testUtils.retryWithTimeOut(async () => {
+          detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
+          expect(detailScreenTitle.text).to.not.be.empty;
+        });
 
-      // Verify background poster is displayed
-      await testUtils.retryWithTimeOut(async () => {
-        const titleSeriesBackgroundPoster = await testUtils.getNodeForElement('titleSeriesBackgroundPoster');
-        expect(titleSeriesBackgroundPoster.visible).to.equal(true);
-      });
+        // Verify background poster is displayed
+        await testUtils.retryWithTimeOut(async () => {
+          const titleSeriesBackgroundPoster = await testUtils.getNodeForElement('titleSeriesBackgroundPoster');
+          expect(titleSeriesBackgroundPoster.visible).to.equal(true);
+        });
+      } finally {
+        await ecp.sendKeypress(ecp.Key.Back);
+        await testHelpers.enablePreviewInSettings(true);
+        await testUtils.goToPage('tv');
+        await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
+        await ecp.sendKeypress(ecp.Key.Ok);
+        await utils.sleep(2000);
+      }
     });
 
 

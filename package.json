@@ -26,6 +26,8 @@
     "@types/node": "^17.0.19",
     "@typescript-eslint/eslint-plugin": "^5.54.0",
     "@typescript-eslint/parser": "^5.54.0",
+    "allure-commandline": "^2.36.0",
+    "allure-mocha": "^3.4.5",
     "brighterscript": "0.67.3",
     "chai": "^4.2.0",
     "clipboardy": "^2.3.0",

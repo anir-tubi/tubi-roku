@@ -1,0 +1,117 @@
+name: Upload Test Reports to S3
+
+on:
+  workflow_dispatch:
+    inputs:
+      artifact_name:
+        description: 'Name of the artifact to download'
+        required: true
+      run_id:
+        description: 'Run ID of the workflow that produced the artifact'
+        required: true
+      platform:
+        description: 'Platform name (e.g., roku)'
+        required: true
+        default: 'roku'
+      env:
+        type: choice
+        description: 'Target S3 environment'
+        options:
+          - staging
+          - production
+        default: 'production'
+
+
+jobs:
+  upload-to-s3:
+    runs-on: [self-hosted, "${{ inputs.env }}"]
+    env:
+      BUCKET: "tubi-automation-ott-reports-${{ inputs.env }}"
+      REGION: "${{ inputs.env == 'production' && 'us-west-2' || 'us-east-2' }}"
+      ARTIFACT_NAME: ${{ inputs.artifact_name }}
+      RUN_ID: ${{ inputs.run_id }}
+      PLATFORM: ${{ inputs.platform }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Job params
+        run: |
+          echo "Artifact:  ${ARTIFACT_NAME}"
+          echo "Run ID:    ${RUN_ID}"
+          echo "Platform:  ${PLATFORM}"
+          echo "Bucket:    ${BUCKET}"
+          echo "Region:    ${REGION}"
+          echo "Trigger:   ${{ github.event_name }}"
+
+      - name: Get artifact ID
+        env:
+          RAW_ARTIFACT_NAME: ${{ env.ARTIFACT_NAME }}
+        run: |
+          ENCODED_NAME=$(python3 -c "import os, urllib.parse; print(urllib.parse.quote(os.environ['RAW_ARTIFACT_NAME']))")
+
+          curl -s -H "Authorization: token ${{ secrets.ROKU_AUTO_PAT }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/runs/${RUN_ID}/artifacts?name=${ENCODED_NAME}&per_page=100" \
+            > artifacts.json
+
+          TOTAL=$(jq -r '.total_count // 0' artifacts.json)
+          echo "Found ${TOTAL} artifact(s) in run ${RUN_ID}"
+
+          ARTIFACT_ID=$(jq -r --arg name "$RAW_ARTIFACT_NAME" \
+            '[.artifacts[] | select(.name == $name)] | sort_by(.created_at) | last | .id // empty' \
+            artifacts.json)
+          if [ -z "$ARTIFACT_ID" ]; then
+            echo "ERROR: No artifact named '${RAW_ARTIFACT_NAME}' in run ${RUN_ID}"
+            echo "Available artifacts:"
+            jq -r '.artifacts[] | "  - \(.name) (id: \(.id))"' artifacts.json
+            exit 1
+          fi
+          echo "Using artifact ID: ${ARTIFACT_ID}"
+          echo "ARTIFACT_ID=$ARTIFACT_ID" >> $GITHUB_ENV
+
+      - name: Download artifact ZIP
+        run: |
+          curl -fL -H "Authorization: token ${{ secrets.ROKU_AUTO_PAT }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$ARTIFACT_ID/zip" \
+            -o artifact-file.zip
+
+      - name: Unzip and normalize artifact
+        run: |
+          unzip artifact-file.zip -d artifact-raw
+
+          # If the zip contains a nested allure-report/ folder, use its contents
+          if [ -d "artifact-raw/allure-report" ]; then
+            mv artifact-raw/allure-report allure-report
+            rm -rf artifact-raw
+          else
+            mv artifact-raw allure-report
+          fi
+
+          echo "Report root contents:"
+          ls allure-report/
+
+      - name: Set S3 path
+        run: echo "S3_REPORT_DIR=reports/${PLATFORM}/${RUN_ID}" >> $GITHUB_ENV
+
+      - name: Upload report to S3
+        run: |
+          aws s3 sync "./allure-report" "s3://${BUCKET}/${S3_REPORT_DIR}/" \
+            --region "${REGION}"
+
+      - name: Download or create data.json
+        run: |
+          if ! aws s3 cp "s3://${BUCKET}/reports/${PLATFORM}/data.json" ./data.json \
+            --region "${REGION}"; then
+            echo "[]" > data.json
+          fi
+
+      - name: Update data.json
+        env:
+          BUILD_NUMBER: ${{ env.RUN_ID }}
+        run: node js/workflows/updateReportDataJson.js
+
+      - name: Upload updated data.json
+        run: |
+          aws s3 cp "./data.json" "s3://${BUCKET}/reports/${PLATFORM}/data.json" \
+            --region "${REGION}" \
+            --cache-control "no-store"

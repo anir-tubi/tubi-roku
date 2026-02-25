@@ -34,9 +34,14 @@ describe('Parental Controls', function () {
       }
     });
 
-    // Verify that the user can't view the title
-    const invalidDeepLinkDialog = testUtils.getNodeForElement('invalidDeepLinkDialog');
-    expect((await invalidDeepLinkDialog).visible).to.be.true;
+    // Verify that the detail screen is not loaded (restricted content blocked)
+    let detailScreenLoaded = false;
+    try {
+      await testUtils.waitForCurrentScreenToEqual('detailScreen', 5000);
+      detailScreenLoaded = true;
+    } catch (_) {}
+    expect(detailScreenLoaded, 'Detail screen should not have loaded for restricted content').to.be.false;
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 5000);
 
   });
 
@@ -70,9 +75,14 @@ describe('Parental Controls', function () {
       }
     });
 
-    // Verify that the user can't view the title
-    const invalidDeepLinkDialog = testUtils.getNodeForElement('invalidDeepLinkDialog');
-    expect((await invalidDeepLinkDialog).visible).to.be.true;
+    // Verify that the detail screen is not loaded (restricted content blocked)
+    let detailScreenLoaded = false;
+    try {
+      await testUtils.waitForCurrentScreenToEqual('detailScreen', 5000);
+      detailScreenLoaded = true;
+    } catch (_) {}
+    expect(detailScreenLoaded, 'Detail screen should not have loaded for restricted content').to.be.false;
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 5000);
 
   });
 
@@ -102,9 +112,14 @@ describe('Parental Controls', function () {
       }
     });
 
-    // Verify that the user can't view the title
-    const invalidDeepLinkDialog = testUtils.getNodeForElement('invalidDeepLinkDialog');
-    expect((await invalidDeepLinkDialog).visible).to.be.true;
+    // Verify that the detail screen is not loaded (restricted content blocked)
+    let detailScreenLoaded = false;
+    try {
+      await testUtils.waitForCurrentScreenToEqual('detailScreen', 5000);
+      detailScreenLoaded = true;
+    } catch (_) {}
+    expect(detailScreenLoaded, 'Detail screen should not have loaded for restricted content').to.be.false;
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 5000);
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/535834
@@ -423,23 +438,23 @@ describe('Parental Controls', function () {
     // Send adult title text
     await testUtils.waitForElementToFullyShowOnScreen('searchGrid');
     await ecp.sendText('drugs');
-    await testUtils.waitForElementToFullyShowOnScreen('noResultsMessage', 'No results message not shown', 15000);
 
-    // Verify no result for Older Kids level
-    const noResultsMessage = testUtils.getNodeForElement('noResultsMessage');
+    // Wait for either search results or the no-results message to appear
+    let hasResults = false;
+    await testUtils.untilTrue(async () => {
+      const noResults = await testUtils.isElementShowingOnScreen('noResultsMessage');
+      const results = await testUtils.isElementShowingOnScreen('searchResultGrid');
+      if (noResults.isShowing || results.isShowing) {
+        hasResults = results.isShowing;
+        return true;
+      }
+      return false;
+    }, 'Neither search results nor no-results message appeared', 15000);
 
     let isAdultContentPresent = false;
-    // In some cases we get some contents for the search term.
-    if ((await noResultsMessage).text.includes('Please try again') == false) {
-      const contents = await testUtils.getAllGridItemsContent(
-        'searchResultGrid'
-      );
-      for (const [index, item] of contents.entries()) {
-        if (item.rating == 'TV-MA') {
-          isAdultContentPresent = true;
-          break;
-        }
-      }
+    if (hasResults) {
+      const contents = await testUtils.getAllGridItemsContent('searchResultGrid');
+      isAdultContentPresent = contents.some((item: any) => item.rating === 'TV-MA');
     }
 
     expect(isAdultContentPresent).to.be.false;

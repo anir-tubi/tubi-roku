@@ -804,9 +804,14 @@ describe('Core Manual Regression Tests', function () {
     });
     await utils.sleep(3000);
 
-    // Verify that the user can't view the title
-    const invalidDeepLinkDialog = testUtils.getNodeForElement('invalidDeepLinkDialog');
-    expect((await invalidDeepLinkDialog).visible).to.be.true;
+    // Verify that the detail screen is not loaded (restricted content blocked)
+    let detailScreenLoaded = false;
+    try {
+      await testUtils.waitForCurrentScreenToEqual('detailScreen', 5000);
+      detailScreenLoaded = true;
+    } catch (_) {}
+    expect(detailScreenLoaded, 'Detail screen should not have loaded for restricted content').to.be.false;
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 5000);
   });
 
 
@@ -1355,7 +1360,7 @@ describe('Core Manual Regression Tests', function () {
     await utils.sleep(1000);
 
     // Navigate to Continue Watching row
-    const cwRowIndex = await testUtils.findRowIndexWithTitle('videoTitlesRowList', 'Continue Watching');
+    const cwRowIndex = await testUtils.findRowIndexWithSlug('videoTitlesRowList', 'continue_watching');
     await testUtils.jumpToRowIndex('videoTitlesRowList', cwRowIndex);
     await utils.sleep(1000);
 

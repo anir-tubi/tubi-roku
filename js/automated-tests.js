@@ -335,6 +335,7 @@ async function runAutomatedTests(done, branch = '', tags = [], testsPath = 'js/a
 
   const code = await spawnShellCommand(done, `npx mocha ${mochaOptions.join(' ')} "${testsPath}"`, true);
   await appendDataToJsonReport(branch);
+
   if (code !== 0) {
     done(new Error('Tests failed'));
   } else {
@@ -465,6 +466,184 @@ function outputAvailableAutomatedTestTags(done) {
 }
 
 
+/**
+ * Wraps a Gulp done callback to ensure it's only called once.
+ * Prevents "done called too many times" errors in async child process handlers.
+ */
+function onceCallback(done) {
+  let called = false;
+  return (err) => {
+    if (called) return;
+    called = true;
+    done(err);
+  };
+}
+
+
+/**
+ * Generates an Allure HTML report from the allure-results directory.
+ * Output is written to allure-report/.
+ * Requires allure-commandline to be installed.
+ */
+function generateAllureReport(done) {
+  const finish = onceCallback(done);
+  const allureCommand = require('allure-commandline');
+  const generation = allureCommand(['generate', 'allure-results', '--clean', '-o', 'allure-report']);
+
+  generation.on('exit', (exitCode) => {
+    if (exitCode === 0) {
+      log('Allure report generated successfully at allure-report/');
+      finish();
+    } else {
+      finish(new Error('Allure report generation failed'));
+    }
+  });
+  generation.on('error', (err) => {
+    finish(new Error(`Failed to spawn Allure process: ${err.message}`));
+  });
+}
+
+
+/**
+ * Removes the allure-results directory to start fresh before a new test run.
+ */
+function clearAllureResults(done) {
+  fs.rm('allure-results', { recursive: true, force: true }, (err) => {
+    if (err) {
+      log('Warning: could not clear allure-results');
+    } else {
+      log('Cleared allure-results/');
+    }
+    done();
+  });
+}
+
+
+/**
+ * Starts a local Allure server to view results in the browser.
+ * Blocks until the user stops it with Ctrl+C.
+ */
+function serveAllureReport(done) {
+  const finish = onceCallback(done);
+  const allureCommand = require('allure-commandline');
+  const serve = allureCommand(['serve', 'allure-results']);
+
+  serve.on('exit', () => {
+    log('Allure server stopped');
+    finish();
+  });
+  serve.on('error', (err) => {
+    finish(new Error(`Failed to spawn Allure process: ${err.message}`));
+  });
+  log('Allure server started — press Ctrl+C to stop');
+}
+
+
+/**
+ * Creates a new test bucket on the Automation UI dashboard.
+ * Persists the bucket ID to disk for the mocha reporter and closeTestBucket to use.
+ *
+ * Env: DASHBOARD_API_URL (required), PLATFORM, tag, RUNNERS, GITHUB_RUN_ID.
+ */
+function startTestBucket(done) {
+  const { DashboardManager } = require('./automated-tests/dashboard-manager');
+
+  const dashboardApiUrl = process.env.DASHBOARD_API_URL;
+  if (!dashboardApiUrl) {
+    done(new Error('DASHBOARD_API_URL is required'));
+    return;
+  }
+
+  const rawTag = process.env.tag;
+  const tag = (rawTag && rawTag.startsWith('@')) ? rawTag : null;
+
+  DashboardManager.startBucket({
+    dashboardApiUrl,
+    platform: process.env.PLATFORM || 'roku',
+    tag,
+    runners: process.env.RUNNERS || '1',
+    githubActionId: process.env.GITHUB_RUN_ID || null,
+  }).then((bucketId) => {
+    if (bucketId) {
+      log(`Test bucket created: ${bucketId}`);
+    } else {
+      log('Warning: Dashboard did not return a bucket ID');
+    }
+    done();
+  }).catch((err) => {
+    done(err);
+  });
+}
+
+
+/**
+ * Closes the active test bucket on the Automation UI dashboard.
+ * Reads the test summary written by the mocha reporter to include final counts.
+ * Cleans up all temp files (.test-bucket-id, .test-bucket-data.json, .test-run-summary.json).
+ *
+ * Env: DASHBOARD_API_URL (required), TEST_OUTCOME
+ */
+function closeTestBucket(done) {
+  const { DashboardManager } = require('./automated-tests/dashboard-manager');
+
+  const dashboardApiUrl = process.env.DASHBOARD_API_URL;
+  if (!dashboardApiUrl) {
+    done(new Error('DASHBOARD_API_URL is required'));
+    return;
+  }
+
+  const success = process.env.TEST_OUTCOME !== 'failure';
+  DashboardManager.closeBucket({ dashboardApiUrl, success })
+    .then(() => done())
+    .catch((err) => done(err));
+}
+
+
+/**
+ * Pushes the generated Allure report to the Automation UI dashboard
+ * via the /api/reports/ingest-direct endpoint.
+ * Spawns push-report-to-dashboard.ts as a child process.
+ *
+ * Env: DASHBOARD_API_URL (required), PLATFORM, REPORT_ID, GITHUB_RUN_ID
+ */
+function pushReportToDashboard(done) {
+  const dashboardApiUrl = process.env.DASHBOARD_API_URL;
+  if (!dashboardApiUrl) {
+    log('DASHBOARD_API_URL not set, skipping report push');
+    done();
+    return;
+  }
+
+  const reportDir = 'allure-report';
+  if (!fs.existsSync(reportDir)) {
+    done(new Error('Allure report directory not found. Generate the report first.'));
+    return;
+  }
+
+  const childEnv = {
+    ...process.env,
+    REPORT_DIR: reportDir,
+    DASHBOARD_API_URL: dashboardApiUrl,
+    PLATFORM: process.env.PLATFORM || 'roku',
+    REPORT_ID: process.env.REPORT_ID || process.env.GITHUB_RUN_ID || String(Date.now()),
+  };
+
+  const finish = onceCallback(done);
+  const { spawn } = require('child_process');
+  const child = spawn('npx', ['ts-node', 'js/automated-tests/push-report-to-dashboard.ts'], {
+    stdio: 'inherit',
+    env: childEnv,
+  });
+
+  child.on('exit', (code) => {
+    finish(code !== 0 ? new Error(`Push report exited with code ${code}`) : undefined);
+  });
+  child.on('error', (err) => {
+    finish(new Error(`Failed to push report: ${err.message}`));
+  });
+}
+
+
 module.exports = {
   runAutomatedTestsCli,
   runAutomatedAnalyticsTestsCli,
@@ -474,5 +653,11 @@ module.exports = {
   outputAvailableAutomatedTestTags,
   jsonReportOutputPath,
   runAutomatedTestsSmoke,
-  runAutomatedAnalyticsTests
+  runAutomatedAnalyticsTests,
+  generateAllureReport,
+  clearAllureResults,
+  serveAllureReport,
+  startTestBucket,
+  closeTestBucket,
+  pushReportToDashboard
 };

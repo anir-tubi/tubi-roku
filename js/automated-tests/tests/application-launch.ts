@@ -7,6 +7,8 @@ import { shared } from '../test-helpers';
 describe('Application Launch', function () {
   before(async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    await testUtils.waitForCurrentScreenToEqual('homeScreen', 10000);
+    await testUtils.waitForGridContentToLoad('videoTitlesRowList', 10000);
     await testUtils.waitForElementToHaveFocus('videoTitlesRowList', 'Timed out waiting for Rowlist to have focus');
     await testUtils.jumpToRowWithTitle('videoTitlesRowList', 'Featured');
   });
@@ -27,6 +29,8 @@ describe('Application Launch', function () {
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535748
   it('C535748 - Application Launch - Registered User - When user tries to play a title after user has registered device then the title should play on tubi @application_launch, @smoke', async () => {
     await ecp.sendKeypress(ecp.Key.Ok);
+    await testUtils.waitForCurrentScreenToEqual('detailScreen', 10000);
+    await testUtils.waitForElementToHaveFocus('detailScreenMenu', 'Timed out waiting for Menu to have focus');
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 20000);
   });
