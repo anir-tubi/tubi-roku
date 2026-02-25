@@ -7,6 +7,10 @@
 ' @param destTrackingComponentInfo - Optional dest component info for NavigateToPageEvent on back (e.g. pivot collection component)
 Function showPivotDetailScreen(pivot as Dynamic, destTrackingComponentInfo = invalid) as Void
   showHideSpinner(true)
+
+  ' Reset the state of the inline video metadata overlay when video tiles are enabled
+  ' This avoid flash from previously focused item when video tiles are enabled.
+  m.inlineVideoMetadataOverlay.resetState = true
   screen = createScreen("PivotDetailScreen")
   screen.shouldTrackViewableImpressionEvent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
   ' Set up observers

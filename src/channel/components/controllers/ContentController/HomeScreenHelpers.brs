@@ -8,6 +8,11 @@ Function showHomeScreen(constants, screenID = "")
     screenID = constants.ui.screenIds.homeScreen
   end if
 
+
+  ' Reset the state of the inline video metadata overlay when video tiles are enabled
+  ' This avoid flash from previously focused item when video tiles are enabled.
+  m.inlineVideoMetadataOverlay.resetState = true
+
   homeScreen = getFromScreenCache(screenID)
   if homeScreen <> invalid
     ' this is required for setting focus to homescreen after activation/signout
