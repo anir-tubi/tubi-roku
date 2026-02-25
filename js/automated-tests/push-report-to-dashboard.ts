@@ -8,7 +8,7 @@
  * Mirrors the web-ott-automation pushToAutomationUI.cjs script.
  *
  * Environment Variables:
- *   DASHBOARD_API_URL  - Automation UI API base URL (required)
+ *   API_URL            - Full ingest-direct endpoint URL (required)
  *   PLATFORM           - Platform identifier (default: 'roku')
  *   REPORT_ID          - Unique report identifier, typically github.run_id
  *   REPORT_DIR         - Path to the generated Allure report (default: 'allure-report')
@@ -22,7 +22,7 @@ import axios from 'axios';
 
 const config = {
   reportDir: process.env.REPORT_DIR || 'allure-report',
-  apiUrl: process.env.DASHBOARD_API_URL,
+  apiUrl: process.env.API_URL,
   platform: process.env.PLATFORM || 'roku',
   reportId: process.env.REPORT_ID || process.env.GITHUB_RUN_ID || String(Date.now()),
   timeout: 60000,
@@ -129,14 +129,6 @@ function readTestCaseDetails(reportDir: string, uids: string[]): Record<string, 
 // --- API Communication ---
 
 /**
- * Normalizes the API URL to ensure it points to the ingest-direct endpoint.
- * Handles trailing slashes and /api suffix variations.
- */
-function buildIngestUrl(apiUrl: string): string {
-  return apiUrl.replace(/\/+$/, '').replace(/\/api$/, '') + '/api/reports/ingest-direct';
-}
-
-/**
  * Builds the payload for the ingest-direct API endpoint.
  */
 function buildPayload(suitesData: AllureSuitesData, testCases: Record<string, unknown>): IngestPayload {
@@ -166,20 +158,18 @@ function buildPayload(suitesData: AllureSuitesData, testCases: Record<string, un
  */
 async function pushReport(): Promise<void> {
   if (!config.apiUrl) {
-    throw new Error('DASHBOARD_API_URL is required');
+    throw new Error('API_URL is required');
   }
 
   if (!fs.existsSync(config.reportDir)) {
     throw new Error(`Report directory does not exist: ${config.reportDir}`);
   }
 
-  const ingestUrl = buildIngestUrl(config.apiUrl);
-
   console.log(`Pushing report to Automation UI`);
   console.log(`Platform:   ${config.platform}`);
   console.log(`Report ID:  ${config.reportId}`);
   console.log(`Report Dir: ${config.reportDir}`);
-  console.log(`API URL:    ${ingestUrl}`);
+  console.log(`API URL:    ${config.apiUrl}`);
 
   const suitesData = readSuitesData(config.reportDir);
   console.log(`Loaded suites with ${suitesData.children?.length || 0} top-level entries`);
@@ -193,7 +183,7 @@ async function pushReport(): Promise<void> {
   const payloadSize = Buffer.byteLength(JSON.stringify(payload));
   console.log(`Payload size: ${(payloadSize / 1024).toFixed(2)} KB`);
 
-  const response = await axios.post(ingestUrl, payload, {
+  const response = await axios.post(config.apiUrl, payload, {
     headers: { 'Content-Type': 'application/json' },
     timeout: config.timeout,
     maxBodyLength: config.maxPayloadBytes,

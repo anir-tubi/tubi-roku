@@ -604,12 +604,12 @@ function closeTestBucket(done) {
  * via the /api/reports/ingest-direct endpoint.
  * Spawns push-report-to-dashboard.ts as a child process.
  *
- * Env: DASHBOARD_API_URL (required), PLATFORM, REPORT_ID, GITHUB_RUN_ID
+ * Env: API_URL (required - full ingest-direct endpoint URL), PLATFORM, REPORT_ID, GITHUB_RUN_ID
  */
 function pushReportToDashboard(done) {
-  const dashboardApiUrl = process.env.DASHBOARD_API_URL;
-  if (!dashboardApiUrl) {
-    log('DASHBOARD_API_URL not set, skipping report push');
+  const apiUrl = process.env.API_URL;
+  if (!apiUrl) {
+    log('API_URL not set, skipping report push');
     done();
     return;
   }
@@ -623,7 +623,7 @@ function pushReportToDashboard(done) {
   const childEnv = {
     ...process.env,
     REPORT_DIR: reportDir,
-    DASHBOARD_API_URL: dashboardApiUrl,
+    API_URL: apiUrl,
     PLATFORM: process.env.PLATFORM || 'roku',
     REPORT_ID: process.env.REPORT_ID || process.env.GITHUB_RUN_ID || String(Date.now()),
   };

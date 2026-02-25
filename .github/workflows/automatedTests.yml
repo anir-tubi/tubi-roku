@@ -195,7 +195,7 @@ jobs:
       - name: Push Report to Dashboard
         if: (success() || failure()) && matrix.branch == 'master'
         env:
-          DASHBOARD_API_URL: ${{ vars.DASHBOARD_API_URL }}
+          API_URL: https://automation-ui.infra.tubi-core-staging.tubi.io/api/reports/ingest-direct
           PLATFORM: roku
           REPORT_ID: ${{ github.run_id }}
         run: npx gulp pushReportToDashboard
