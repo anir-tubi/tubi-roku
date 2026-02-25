@@ -1,0 +1,160 @@
+name: Automation UI Dashboard API
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        type: choice
+        options:
+          - start
+          - complete
+          - push-report
+      platform:
+        description: 'Platform name'
+        required: true
+        default: 'roku'
+      tag:
+        description: 'Test tag (used for start action)'
+        required: false
+        default: 'Run All Tests'
+      github_action_id:
+        description: 'GitHub run ID of the calling workflow'
+        required: false
+      estimated_tests:
+        description: 'Estimated number of tests'
+        required: false
+        default: '605'
+      estimated_suites:
+        description: 'Estimated number of suites'
+        required: false
+        default: '49'
+      test_outcome:
+        description: 'Test outcome (success or failure) - used for complete action'
+        required: false
+        default: 'success'
+      artifact_name:
+        description: 'Name of the Allure Report artifact (used for push-report action)'
+        required: false
+      run_id:
+        description: 'Run ID of the workflow that produced the artifact (used for push-report action)'
+        required: false
+
+jobs:
+  dashboard-api:
+    runs-on: [self-hosted, staging]
+    steps:
+      - name: Start test run
+        if: inputs.action == 'start'
+        run: |
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${{ vars.DASHBOARD_API_URL }}/test-run/start" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "event": "test_run_started",
+              "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'",
+              "platform": "${{ inputs.platform }}",
+              "runners": "1",
+              "tag": "${{ inputs.tag }}",
+              "githubActionId": "${{ inputs.github_action_id }}",
+              "estimated": {
+                "tests": ${{ inputs.estimated_tests }},
+                "suites": ${{ inputs.estimated_suites }}
+              }
+            }')
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+          echo "HTTP Status: $HTTP_CODE"
+          echo "Response: $BODY"
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+            BUCKET_ID=$(echo "$BODY" | jq -r '.data.test_run_id_in_progress // empty')
+            echo "Test bucket created: $BUCKET_ID"
+          else
+            echo "Failed to start test run (HTTP $HTTP_CODE)"
+            exit 1
+          fi
+
+      - name: Complete test run
+        if: inputs.action == 'complete'
+        run: |
+          SUCCESS=${{ inputs.test_outcome == 'success' && 'true' || 'false' }}
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${{ vars.DASHBOARD_API_URL }}/test-run/complete" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "event": "test_run_completed",
+              "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'",
+              "platform": "${{ inputs.platform }}",
+              "success": '"$SUCCESS"'
+            }')
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+          echo "HTTP Status: $HTTP_CODE"
+          echo "Response: $BODY"
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+            echo "Test run completed successfully"
+          else
+            echo "Failed to complete test run (HTTP $HTTP_CODE)"
+            exit 1
+          fi
+
+      - name: Checkout code
+        if: inputs.action == 'push-report'
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        if: inputs.action == 'push-report'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        if: inputs.action == 'push-report'
+        run: npm install
+
+      - name: Get artifact ID
+        if: inputs.action == 'push-report'
+        env:
+          RAW_ARTIFACT_NAME: ${{ inputs.artifact_name }}
+          RUN_ID: ${{ inputs.run_id }}
+        run: |
+          ENCODED_NAME=$(python3 -c "import os, urllib.parse; print(urllib.parse.quote(os.environ['RAW_ARTIFACT_NAME']))")
+          curl -s -H "Authorization: token ${{ secrets.ROKU_AUTO_PAT }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/runs/${RUN_ID}/artifacts?name=${ENCODED_NAME}&per_page=100" \
+            > artifacts.json
+          TOTAL=$(jq -r '.total_count // 0' artifacts.json)
+          echo "Found ${TOTAL} artifact(s) in run ${RUN_ID}"
+          ARTIFACT_ID=$(jq -r --arg name "$RAW_ARTIFACT_NAME" \
+            '[.artifacts[] | select(.name == $name)] | sort_by(.created_at) | last | .id // empty' \
+            artifacts.json)
+          if [ -z "$ARTIFACT_ID" ]; then
+            echo "ERROR: No artifact named '${RAW_ARTIFACT_NAME}' in run ${RUN_ID}"
+            jq -r '.artifacts[] | "  - \(.name) (id: \(.id))"' artifacts.json
+            exit 1
+          fi
+          echo "Using artifact ID: ${ARTIFACT_ID}"
+          echo "ARTIFACT_ID=$ARTIFACT_ID" >> $GITHUB_ENV
+
+      - name: Download and extract artifact
+        if: inputs.action == 'push-report'
+        run: |
+          curl -fL -H "Authorization: token ${{ secrets.ROKU_AUTO_PAT }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$ARTIFACT_ID/zip" \
+            -o artifact-file.zip
+          unzip artifact-file.zip -d artifact-raw
+          if [ -d "artifact-raw/allure-report" ]; then
+            mv artifact-raw/allure-report allure-report
+            rm -rf artifact-raw
+          else
+            mv artifact-raw allure-report
+          fi
+          echo "Report contents:"
+          ls allure-report/
+
+      - name: Push report to dashboard
+        if: inputs.action == 'push-report'
+        env:
+          API_URL: https://automation-ui.infra.tubi-core-staging.tubi.io/api/reports/ingest-direct
+          PLATFORM: ${{ inputs.platform }}
+          REPORT_ID: ${{ inputs.run_id }}
+          REPORT_DIR: allure-report
+        run: npx ts-node js/automated-tests/push-report-to-dashboard.ts

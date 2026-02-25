@@ -147,14 +147,24 @@ jobs:
         if: matrix.branch == 'master'
         run: npx gulp clearAllureResults
 
-      - name: Start Dashboard Test Bucket
+      - name: Trigger Dashboard Test Run Start
         if: matrix.branch == 'master'
-        env:
-          DASHBOARD_API_URL: ${{ vars.DASHBOARD_API_URL }}
-          PLATFORM: roku
-          tag: ${{ inputs.tag || 'Run All Tests' }}
-          GITHUB_RUN_ID: ${{ github.run_id }}
-        run: npx gulp startTestBucket
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.ROKU_AUTO_PAT }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'dashboard-api.yml',
+              ref: 'master',
+              inputs: {
+                action: 'start',
+                platform: 'roku',
+                tag: '${{ inputs.tag || 'Run All Tests' }}',
+                github_action_id: String(${{ github.run_id }}),
+              },
+            });
         continue-on-error: true
 
       - name: gulp runAutomatedTests
@@ -168,17 +178,26 @@ jobs:
           bail: ${{ inputs.bail || false }}
           retries: 1
           ENABLE_ALLURE: ${{ matrix.branch == 'master' && 'true' || 'false' }}
-          DASHBOARD_API_URL: ${{ matrix.branch == 'master' && vars.DASHBOARD_API_URL || '' }}
-          AUTOMATION_UI_IN_PROGRESS: ${{ matrix.branch == 'master' && 'true' || '' }}
           PLATFORM: roku
         run: npx gulp runAutomatedTests
 
-      - name: Close Dashboard Test Bucket
+      - name: Trigger Dashboard Test Run Complete
         if: (success() || failure()) && matrix.branch == 'master'
-        env:
-          DASHBOARD_API_URL: ${{ vars.DASHBOARD_API_URL }}
-          TEST_OUTCOME: ${{ steps.run-tests.outcome }}
-        run: npx gulp closeTestBucket
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.ROKU_AUTO_PAT }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'dashboard-api.yml',
+              ref: 'master',
+              inputs: {
+                action: 'complete',
+                platform: 'roku',
+                test_outcome: '${{ steps.run-tests.outcome }}',
+              },
+            });
         continue-on-error: true
 
       - name: Set up Java for Allure
@@ -191,15 +210,6 @@ jobs:
       - name: Generate Allure Report
         if: (success() || failure()) && matrix.branch == 'master'
         run: npx gulp generateAllureReport
-
-      - name: Push Report to Dashboard
-        if: (success() || failure()) && matrix.branch == 'master'
-        env:
-          API_URL: https://automation-ui.infra.tubi-core-staging.tubi.io/api/reports/ingest-direct
-          PLATFORM: roku
-          REPORT_ID: ${{ github.run_id }}
-        run: npx gulp pushReportToDashboard
-        continue-on-error: true
 
       - name: Sanitize branch name for artifact upload
         id: sanitize-branch-name
@@ -239,6 +249,26 @@ jobs:
       - name: Send Slack Notification
         if: success() || failure()
         run: npx ts-node ./js/workflows/sendSlackAutomatedTestsResultNotification.ts "${{ matrix.branch }}"
+
+      - name: Trigger Dashboard Report Push
+        if: (success() || failure()) && matrix.branch == 'master'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.ROKU_AUTO_PAT }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'dashboard-api.yml',
+              ref: 'master',
+              inputs: {
+                action: 'push-report',
+                platform: 'roku',
+                artifact_name: 'Allure Report (${{ steps.sanitize-branch-name.outputs.value }})',
+                run_id: String(${{ github.run_id }}),
+              },
+            });
+        continue-on-error: true
 
       - name: Trigger S3 upload workflow
         if: (success() || failure()) && matrix.branch == 'master'
