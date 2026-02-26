@@ -100,7 +100,15 @@ Function fetchCollectionData(pivotId) as Void
     }
   }
 
-  reqInfo = m.cmsApi.createGetCollectionInfo(pivotId, options)
+  imageParamTypes = [
+    "poster"
+    "landscape"
+    "background"
+    "title"
+    "featured"
+  ]
+
+  reqInfo = m.cmsApi.createGetCollectionInfo(pivotId, options, imageParamTypes)
   reqInfo.requestType = m.constants.reqNames.getPivotContainers
   reqInfo.responseType = "node"
   reqInfo.successCallback = onFetchCollectionSuccess

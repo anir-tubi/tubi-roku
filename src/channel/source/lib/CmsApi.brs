@@ -393,12 +393,8 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
       "landscape"
       "background"
       "title"
+      "featured"
     ]
-
-    ' Appending it only for home tab.
-    if isNonEmptyString(params["content_mode"]) = false
-      imageParamTypes.push("featured")
-    end if
 
     params = m.setImageParams(imageParamTypes, options.params, m.constants.ui.screenIds.homeScreen)
   end if
@@ -523,7 +519,8 @@ End Function
 ' @passedOptions: assocArray, options that are used to create a request (ie, headers, params, method, etc.)
 '                 see request.brs for more info
 '                 Supported params: group_start, group_size, contents_limit
-Function cmsApi_createGetCollectionInfo(appId, passedOptions = {})
+' @imageParamTypes: Array, What image types/sizes should be requested from the backend. If none are passed, then a default set of types will be used.
+Function cmsApi_createGetCollectionInfo(appId, passedOptions = {}, imageParamTypes = invalid)
   if isNonEmptyString(appId) = false
     return invalid
   end if
@@ -549,9 +546,11 @@ Function cmsApi_createGetCollectionInfo(appId, passedOptions = {})
     headers.append(passedOptions.headers)
   end if
 
-  imageParamTypes = [
-    "landscape"
-  ]
+  if imageParamTypes = invalid
+    imageParamTypes = [
+      "landscape"
+    ]
+  end if
 
   params = m.setImageParams(imageParamTypes, options.params)
 

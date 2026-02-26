@@ -646,7 +646,8 @@ Function onLinearVideoPlayerVisibleFullscreenChange(msg)
   bVisible = videoPlayer.visible
   bFullScreen = videoPlayer.fullscreen
   if bFullScreen = false
-    m.SideNav.visible = true
+    currentScreen = getCurrentScreen()
+    m.SideNav.visible = currentScreen <> invalid AND currentScreen.shouldShowSideNav
     if bVisible = false
       '//Is the video player no longer visible and not in fullscreen? i.e. the news container is no longer in focus
       m.logoGroup.visible = true
