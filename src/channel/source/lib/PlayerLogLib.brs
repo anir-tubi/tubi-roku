@@ -857,6 +857,14 @@ Function playerLogLib_firePlayerPageExitEvent(playerExitInfo)
     playerExitInfo["stage"] = m.playerStage
     playerExitInfo["is_buffering"] = m.isBuffering
 
+    position = m.videoPosition
+    if position = -1
+      position = 0
+    end if
+
+    playerExitInfo["current_position"] = Round(position)
+    playerExitInfo["content_duration"] = Round(m.duration)
+
     if isNonEmptyString(m.playerFeedback) = true
       playerExitInfo["feedback"] = m.playerFeedback
     end if
@@ -875,7 +883,7 @@ Function playerLogLib_firePlayerPageExitEvent(playerExitInfo)
       playerExitInfo.message_map.streamformat = "unknown"
     end if
 
-    playerExitInfo.message_map.videoPosition = m.videoPosition.toStr()
+    playerExitInfo.message_map.videoPosition = Round(position).toStr()
     playerExitInfo.message_map.videoStateWhenExitingPlayer = m.videoStateWhenExitingPlayer
     playerExitInfo.message_map.playbackSource = FormatJson(m.playbackSource)
     playerExitInfo.message_map.durationSinceEnterPlayerPage = m.timeOnPlayerScreen.totalMilliseconds().toStr()
