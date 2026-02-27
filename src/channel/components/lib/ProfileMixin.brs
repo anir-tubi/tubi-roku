@@ -25,7 +25,7 @@ Function isUserInMultiAccount()
   end if
 
 
-  isTreamentEnabled = (getStatsigExperimentResource("roku_multi_account", "roku_multi_account_v0", false).variant <> "none")
+  isTreamentEnabled = (getStatsigExperimentResource("roku_multi_account", "roku_multi_account_v1", false).variant <> "none")
 
   if isTreamentEnabled = true AND profileCount > 0 AND UCase(m.constants.deviceInfo.countryCode) = "US"
     return true

@@ -107,7 +107,7 @@ Function StatsigExperimentsInterface(statsigExperimentsInfo) as Object
       }
 
       roku_multi_account: {
-        roku_multi_account_v0: {
+        roku_multi_account_v1: {
           default: { "variant": "none" } ' "none", "adult_with_kids"
         }
       }

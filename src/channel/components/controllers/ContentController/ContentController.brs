@@ -4074,7 +4074,7 @@ Function performProfileMigration()
       profileCount = profiles.count()
     end if
 
-    if getStatsigExperimentResource("roku_multi_account", "roku_multi_account_v0", false).variant <> "none" AND isSignedUser = true
+    if getStatsigExperimentResource("roku_multi_account", "roku_multi_account_v1", false).variant <> "none" AND isSignedUser = true
 
       if authInfo.expireTime <> invalid AND profileCount = 0
         ' get the user info from settings api and patch with what we have already stored in the registry
@@ -4090,7 +4090,7 @@ Function performProfileMigration()
 
     'send exposure event
     if isSignedUser = true OR profileCount > 0
-      getStatsigExperimentResource("roku_multi_account", "roku_multi_account_v0", true)
+      getStatsigExperimentResource("roku_multi_account", "roku_multi_account_v1", true)
     end if
   end if
 End Function
